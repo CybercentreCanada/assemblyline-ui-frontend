@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/core";
 import Body from "./body";
 
-const breakpoints = ["360px", "768px", "1024px", "1440px"];
+const breakpoints = ["30px", "768px", "1024px", "1440px"];
 breakpoints.sm = breakpoints[0];
 breakpoints.md = breakpoints[1];
 breakpoints.lg = breakpoints[2];
