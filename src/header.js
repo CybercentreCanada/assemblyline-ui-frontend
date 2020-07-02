@@ -47,7 +47,7 @@ const Header = props => {
             Menu
           </DrawerHeader>
           <DrawerBody>
-            <DrawerItems>Submit</DrawerItems>
+            <DrawerItems><a href="submit.html">Submit</a></DrawerItems>
             <DrawerItems>Submissions</DrawerItems>
             <DrawerItems>Alerts</DrawerItems>
             <DrawerItems>Signatures</DrawerItems>
@@ -81,7 +81,7 @@ const Header = props => {
         <DarkMode>
           <Flex align="center" mr={{sm: 0, md: 6}}>
             <Heading as="h1" size="lg" letterSpacing={"-.1rem"} color="white">
-              Assemblyline
+              <a href="/">Assemblyline</a>
             </Heading>
           </Flex>
           <Box
@@ -90,7 +90,7 @@ const Header = props => {
             alignItems="center"
             flexGrow={1}>
 
-            <Button variant="ghost">Submit</Button>
+            <Button as="a" href="/submit.html" variant="ghost">Submit</Button>
             <Button variant="ghost">Submissions</Button>
             <Button variant="ghost">Alerts</Button>
             <Button variant="ghost">Signatures</Button>
@@ -107,7 +107,7 @@ const Header = props => {
             </MenuButton>
             <MenuList>
               <MenuGroup>
-                <MenuItem display="block" padding="1rem 4rem">
+                <MenuItem as="a" href="/account.html" display="block" padding="1rem 4rem">
                   <Flex justify="center" style={{"margin-bottom": "1rem"}}>
                       <Avatar
                         size="xl"
@@ -120,8 +120,10 @@ const Header = props => {
               </MenuGroup>
               <MenuDivider />
               <MenuGroup title="Profile">
-                <MenuItem>Manage account</MenuItem>
-                <MenuItem>Settings</MenuItem>
+                <MenuItem as="a" href="/account.html">Manage account</MenuItem>
+                <MenuItem as="a" href="/dashboard.html">Dashboard</MenuItem>
+                <MenuItem as="a" href="/settings.html">Settings</MenuItem>
+                <MenuItem as="a" href="/logout.html">Sign out</MenuItem>
               </MenuGroup>
               <MenuDivider />
               <MenuGroup title="Theming">
@@ -131,9 +133,11 @@ const Header = props => {
                 </MenuItem>
               </MenuGroup>
               <MenuDivider />
-              <MenuGroup title="Help">
-                <MenuItem>Docs</MenuItem>
-                <MenuItem>FAQ</MenuItem>
+              <MenuGroup title="Administration">
+                <MenuItem as="a" href="/admin/errors.html">Error viewer</MenuItem>
+                <MenuItem as="a" href="/admin/services.html">Services</MenuItem>
+                <MenuItem as="a" href="/admin/site_map.html">Site map</MenuItem>
+                <MenuItem as="a" href="/admin/users.html">Users</MenuItem>
               </MenuGroup>
             </MenuList>
           </Menu>
