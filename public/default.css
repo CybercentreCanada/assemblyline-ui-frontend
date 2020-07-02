@@ -1,0 +1,37 @@
+
+.dark-mode .banner{
+    filter: invert(15%)
+}
+
+.dropzone {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background-color: #fafafa;
+    outline: none;
+    transition: border .24s ease-in-out;
+    border: 2px #f1f1f1 dashed;
+    border-radius: 5px;
+    color: #CCC;
+}
+
+.dropzone.drag-enter, .dropzone:hover {
+    border: 2px #AAA dashed;
+    background-color: #F6F6F6;
+    color: #AAA;
+}
+
+.dark-mode .dropzone{
+    color: #61729a;
+    background-color: #2e364b;
+    border: 2px #4f5e79 dashed;
+}
+
+.dark-mode .dropzone.drag-enter,
+.dark-mode .dropzone:hover{
+    color: #909ebf;
+    background-color: #475679;
+    border: 2px #7183a1 dashed;
+}
