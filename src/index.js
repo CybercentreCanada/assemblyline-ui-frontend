@@ -10,7 +10,7 @@ import {
 import Body from "./body";
 import Header from "./header";
 
-const breakpoints = ["30px", "768px", "1024px", "1440px"];
+const breakpoints = ["300px", "768px", "1024px", "1440px"];
 breakpoints.sm = breakpoints[0];
 breakpoints.md = breakpoints[1];
 breakpoints.lg = breakpoints[2];
