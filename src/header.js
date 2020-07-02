@@ -20,7 +20,7 @@ import {
   MenuGroup,
   MenuDivider,
   MenuItem,
-  MenuButton, DarkMode
+  MenuButton, DarkMode, IconButton
 } from "@chakra-ui/core";
 
 const DrawerItems = ({ children }) => (
@@ -61,7 +61,7 @@ const Header = props => {
         align="center"
         justify="space-between"
         wrap="wrap"
-        padding="0.5rem"
+        padding="0.4rem"
         paddingLeft="1.5rem"
         paddingRight="1.5rem"
         backgroundColor="gray.700"
@@ -100,19 +100,27 @@ const Header = props => {
         <Menu>
             <MenuButton>
               <Avatar
-                size="sm"
-                display={{ sm: "block", md: "none"  }}
-                name="Steve Garon"
-                src="https://s.gravatar.com/avatar/15925199802f2e849415dcb146df9085"/>
-              <Avatar
-                size="md"
-                display={{ sm: "none", md: "block"  }}
+                height={{sm: "2rem", md: "2.5rem"}}
+                width={{sm: "2rem", md: "2.5rem"}}
                 name="Steve Garon"
                 src="https://s.gravatar.com/avatar/15925199802f2e849415dcb146df9085"/>
             </MenuButton>
             <MenuList>
+              <MenuGroup>
+                <MenuItem display="block" padding="1rem 4rem">
+                  <Flex justify="center" style={{"margin-bottom": "1rem"}}>
+                      <Avatar
+                        size="xl"
+                        name="Steve Garon"
+                        src="https://s.gravatar.com/avatar/15925199802f2e849415dcb146df9085"/>
+                  </Flex>
+                  <Text textAlign="center"><b>Steve Garon</b></Text>
+                  <Text textAlign="center" fontSize="sm">steve.garon@gmail.com</Text>
+                </MenuItem>
+              </MenuGroup>
+              <MenuDivider />
               <MenuGroup title="Profile">
-                <MenuItem>My Account</MenuItem>
+                <MenuItem>Manage account</MenuItem>
                 <MenuItem>Settings</MenuItem>
               </MenuGroup>
               <MenuDivider />
