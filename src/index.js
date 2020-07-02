@@ -1,13 +1,14 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import Menu from "./menu";
 import {
   theme,
   ThemeProvider,
   CSSReset,
   ColorModeProvider
 } from "@chakra-ui/core";
+
 import Body from "./body";
+import Header from "./header";
 
 const breakpoints = ["30px", "768px", "1024px", "1440px"];
 breakpoints.sm = breakpoints[0];
@@ -32,7 +33,7 @@ function App() {
   return (
     <div>
       <CSSReset />
-      <Menu />
+      <Header />
       <Body />
     </div>
   );
