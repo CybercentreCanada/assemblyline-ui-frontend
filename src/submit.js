@@ -39,7 +39,6 @@ function Submit() {
             marginTop="20px"
             marginBottom="60px">
         <Image
-            w={{sm: "75%", md: "initial"}}
             className="banner"
             src="banner.svg"
             alt="Assemblyline Logo"/>

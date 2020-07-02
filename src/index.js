@@ -35,7 +35,7 @@ function App() {
       <CSSReset />
       <Header />
       <Flex justify="center" px={{sm: "1rem", md: "0"}} py={{sm: "1rem", md: "2rem"}}>
-          <Box maxW={{sm: "100%", md: "750px", lg: "970px", xl: "1350px"}}>
+          <Box maxW={{sm: "95%", md: "750px", lg: "970px", xl: "1350px"}}>
             <Submit />
           </Box>
         </Flex>
