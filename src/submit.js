@@ -67,8 +67,8 @@ function Submit() {
           </TabPanel>
           <TabPanel>
             <Flex marginTop="30px">
-              <Input placeholder="Url to scan" />
-              <Button marginLeft="1rem">Scan</Button>
+              <Input roundedRight={0} placeholder="Url to scan" />
+              <Button roundedLeft={0}>Scan</Button>
             </Flex>
             <Text color={{dark: "gray.200", light: "gray.600"}} marginTop="60px" fontSize="sm" textAlign="center">By clicking <i>Scan</i>, you consent to our <Link href="/tos.html">Terms of Service</Link>.</Text>
           </TabPanel>

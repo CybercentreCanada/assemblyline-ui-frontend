@@ -20,7 +20,7 @@ import {
   MenuGroup,
   MenuDivider,
   MenuItem,
-  MenuButton, DarkMode, IconButton
+  MenuButton, DarkMode,
 } from "@chakra-ui/core";
 
 const DrawerItems = ({ children }) => (
