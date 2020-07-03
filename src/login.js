@@ -1,5 +1,5 @@
 import {Button, Image, Input, Stack} from "@chakra-ui/core";
-import React from "react";
+import React, {useEffect, useState} from "react";
 
 function Separator(){
     return (
@@ -16,6 +16,12 @@ function AuthProvider(props){
 }
 
 function UserPassLogin(){
+    const [user, setUser] = useState({});
+    useEffect(()=> {
+        fetch('/api/v4/auth/login/?=').then(res => res.json()).then(data => {
+        setUser(data);
+      })
+    }, []);
     return (
         <Stack marginTop="3rem">
             <Input name="username" placeholder="Username"/>
