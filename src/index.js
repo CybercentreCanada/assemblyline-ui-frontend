@@ -4,7 +4,7 @@ import {
     theme,
     ThemeProvider,
     CSSReset,
-    ColorModeProvider, Flex, Box, Heading, Text
+    ColorModeProvider, Flex, Box,
 } from "@chakra-ui/core";
 
 import Submit from "./submit";
