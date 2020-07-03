@@ -36,12 +36,6 @@ function FileDropper(props) {
 }
 
 function Submit() {
-  const [currentTime, setCurrentTime] = useState(-1);
-  useEffect(()=> {
-    fetch('/time').then(res => res.json()).then(data => {
-      setCurrentTime(data.time);
-    })
-  }, []);
   return (
     <>
       <Flex justify="center"
