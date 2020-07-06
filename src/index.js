@@ -6,6 +6,7 @@ import {theme, ThemeProvider, CSSReset, ColorModeProvider, Flex, Box} from "@cha
 import Header from "./header";
 import LoginScreen from "./login"
 import Submit from "./submit";
+import LoadingScreen from "./loading"
 
 const breakpoints = ["300px", "768px", "992px", "1440px"];
 breakpoints.sm = breakpoints[0];
@@ -43,17 +44,23 @@ function AppData(){
 function App() {
   const [user, setUser] = useState({});
   useEffect(()=> {
-    fetch('/api/whoami').then(res => res.json()).then(data => {
-      setUser(data);
-    })
+    fetch('/api/whoami')
+      .then(
+        (res) => {res.json()},
+        (error) => {renderedApp = <LoginScreen/>}
+      )
+      .then((result) => {
+        if (result === undefined){
+          renderedApp = <LoginScreen/>
+        }
+        else{
+          setUser(result);
+          renderedApp = <AppData/>;  
+        }
+      },
+      (error) => {renderedApp = <LoginScreen/>})
   }, []);
-  let renderedApp;
-  if (Object.keys(user).length === 0 ){
-    renderedApp = <AppData/>;
-  }
-  else{
-    renderedApp = <LoginScreen/>;
-  }
+  let renderedApp = <LoadingScreen/>;
   return (
     <BrowserRouter>
       <CSSReset />
