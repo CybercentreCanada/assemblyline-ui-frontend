@@ -2,6 +2,7 @@ import React, { useState, useEffect }  from "react";
 import {Flex, Image, Tabs, TabList, Tab, TabPanel, TabPanels, Box, Text, Link, Button, Input} from "@chakra-ui/core";
 import {useDropzone} from 'react-dropzone';
 import {AiOutlineSecurityScan} from 'react-icons/ai'
+import Banner from "./banner"
 
 function FileDropper(props) {
   const {acceptedFiles, getRootProps, getInputProps, isDragActive} = useDropzone();
@@ -41,10 +42,7 @@ function Submit() {
       <Flex justify="center"
             marginTop="20px"
             marginBottom="60px">
-        <Image
-            className="banner"
-            src="banner.svg"
-            alt="Assemblyline Logo"/>
+        <Banner/>
       </Flex>
       <Tabs variant="enclosed">
         <TabList>

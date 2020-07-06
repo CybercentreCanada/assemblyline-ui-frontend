@@ -1,8 +1,4 @@
 
-.dark-mode .banner{
-    filter: invert(16%)
-}
-
 .dropzone {
     flex: 1;
     display: flex;
@@ -23,16 +19,16 @@
 }
 
 .dark-mode .dropzone{
-    color: #61729a;
-    background-color: #2e364b;
-    border: 2px #4f5e79 dashed;
+    color: #586a88;
+    background-color: #262e3c;
+    border: 2px #586a88 dashed;
 }
 
 .dark-mode .dropzone.drag-enter,
 .dark-mode .dropzone:hover{
-    color: #909ebf;
-    background-color: #475679;
-    border: 2px #7183a1 dashed;
+    color: #809bc8;
+    background-color: #2f3849;
+    border: 2px #809bc8 dashed;
 }
 
 .dark-mode .action_divider > div {

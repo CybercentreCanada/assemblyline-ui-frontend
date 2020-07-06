@@ -1,5 +1,6 @@
-import {Button, Image, Input, Stack} from "@chakra-ui/core";
+import {Button, Input, Stack} from "@chakra-ui/core";
 import React, {useEffect, useState} from "react";
+import Banner from "./banner"
 
 function Separator(){
     return (
@@ -49,8 +50,8 @@ function LoginScreen(){
                 boxShadow={{sm: "", md: "lg"}}
                 px={"2rem"}
                 py={"3rem"}>
-                <Image className="banner" src="banner.svg" alt="Assemblyline Logo"/>
-                <UserPassLogin/>
+                <Banner />
+                <UserPassLogin/>0
                 <Separator/>
                 <AuthProvider name={"Azure AD"}/>
             </Stack>

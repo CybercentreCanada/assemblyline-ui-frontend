@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import ReactDOM from "react-dom";
 import {BrowserRouter, Route} from "react-router-dom";
 import {theme, ThemeProvider, CSSReset, ColorModeProvider, Flex, Box} from "@chakra-ui/core";
+import { mode } from "@chakra-ui/theme-tools"
 
 import Header from "./header";
 import LoginScreen from "./login"
@@ -48,7 +49,7 @@ function App() {
     })
   }, []);
   let renderedApp;
-  if (Object.keys(user).length > 0 ){
+  if (Object.keys(user).length === 0 ){
     renderedApp = <AppData/>;
   }
   else{

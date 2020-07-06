@@ -1,4 +1,6 @@
 import React from "react";
+import { GrUserAdmin } from "react-icons/gr"
+import { useHistory } from "react-router-dom"
 import {
   Box,
   Heading,
@@ -20,11 +22,12 @@ import {
   MenuGroup,
   MenuDivider,
   MenuItem,
-  MenuButton, DarkMode,
+  MenuButton, DarkMode, Image, Divider, IconButton, Link
 } from "@chakra-ui/core";
+import Robot from "./robot";
 
 const DrawerItems = ({ children }) => (
-  <Text mt={{ base: 4, md: 0 }} mr={6} display="block">
+  <Text w="100%" mt={{ base: 4, md: 0 }} mr={6} display="block">
     {children}
   </Text>
 );
@@ -33,6 +36,16 @@ const Header = props => {
   const [showMenu, setShowMenu] = React.useState(false);
   const menuToggle = () => setShowMenu(!showMenu);
   const { colorMode, toggleColorMode } = useColorMode();
+
+  let bgColor;
+  if (colorMode === "dark"){
+    bgColor = "gray.700";
+  }
+  else{
+    bgColor = "gray.700";
+  }
+
+  const history = useHistory();
 
   return (
     <>
@@ -47,11 +60,16 @@ const Header = props => {
             Menu
           </DrawerHeader>
           <DrawerBody>
-            <DrawerItems><a href="submit.html">Submit</a></DrawerItems>
+            <Link mt={4} mr={6} href="/submit.html">Submit</Link>
             <DrawerItems>Submissions</DrawerItems>
             <DrawerItems>Alerts</DrawerItems>
             <DrawerItems>Signatures</DrawerItems>
             <DrawerItems>Help</DrawerItems>
+            <Divider/>
+                <DrawerItems onClick={() => history.push("/admin/errors.html")}>Error viewer</DrawerItems>
+                <DrawerItems onClick={() => history.push("/admin/services.html")}>Services</DrawerItems>
+                <DrawerItems onClick={() => history.push("/admin/site_map.html")}>Site map</DrawerItems>
+                <DrawerItems onClick={() => history.push("/admin/users.html")}>Users</DrawerItems>
           </DrawerBody>
           <DrawerFooter/>
         </DrawerContent>
@@ -62,9 +80,10 @@ const Header = props => {
         justify="space-between"
         wrap="wrap"
         padding="0.4rem"
-        paddingLeft="1.5rem"
+        paddingLeft={{sm: "1.5rem", md: 0}}
         paddingRight="1.5rem"
-        backgroundColor="gray.700"
+        backgroundColor={bgColor}
+        boxShadow={"lg"}
         {...props}>
 
         <Box display={{ sm: "block", md: "none" }} onClick={menuToggle}>
@@ -79,6 +98,7 @@ const Header = props => {
         </Box>
 
         <DarkMode>
+          <Image h={{sm: "2rem", md: "2.5rem"}} className="banner" src="/al-robot_dark.svg" alt="Assemblyline Logo"/>
           <Flex align="center" mr={{sm: 0, md: 6}}>
             <Heading as="h1" size="lg" letterSpacing={"-.1rem"} color="white">
               <a href="/">Assemblyline</a>
@@ -88,16 +108,21 @@ const Header = props => {
             display={{ sm: "none", md: "flex" }}
             width={{ sm: "full", md: "auto" }}
             alignItems="center"
-            flexGrow={1}>
+            flexGrow={5}>
 
-            <Button as="a" href="/submit.html" variant="ghost">Submit</Button>
+            <Button onClick={() => history.push("/submit.html")} variant="ghost">Submit</Button>
             <Button variant="ghost">Submissions</Button>
             <Button variant="ghost">Alerts</Button>
             <Button variant="ghost">Signatures</Button>
             <Button variant="ghost">Help</Button>
           </Box>
         </DarkMode>
-        <Menu>
+        <Box
+          width={{ sm: "full", md: "auto" }}
+          alignItems="center"
+          flexGrow={1}>
+
+          <Menu>
             <MenuButton>
               <Avatar
                 height={{sm: "2rem", md: "2.5rem"}}
@@ -107,8 +132,8 @@ const Header = props => {
             </MenuButton>
             <MenuList>
               <MenuGroup>
-                <MenuItem as="a" href="/account.html" display="block" padding="1rem 4rem">
-                  <Flex justify="center" style={{"margin-bottom": "1rem"}}>
+                <MenuItem onClick={() => history.push("/account.html")} display="block" padding="1rem 4rem">
+                  <Flex justify="center" style={{"marginBottom": "1rem"}}>
                       <Avatar
                         size="xl"
                         name="Steve Garon"
@@ -120,10 +145,10 @@ const Header = props => {
               </MenuGroup>
               <MenuDivider />
               <MenuGroup title="Profile">
-                <MenuItem as="a" href="/account.html">Manage account</MenuItem>
-                <MenuItem as="a" href="/dashboard.html">Dashboard</MenuItem>
-                <MenuItem as="a" href="/settings.html">Settings</MenuItem>
-                <MenuItem as="a" href="/logout.html">Sign out</MenuItem>
+                <MenuItem onClick={() => history.push("/account.html")}>Manage account</MenuItem>
+                <MenuItem onClick={() => history.push("/dashboard.html")}>Dashboard</MenuItem>
+                <MenuItem onClick={() => history.push("/settings.html")}>Settings</MenuItem>
+                <MenuItem onClick={() => history.push("/logout.html")}>Sign out</MenuItem>
               </MenuGroup>
               <MenuDivider />
               <MenuGroup title="Theming">
@@ -134,14 +159,14 @@ const Header = props => {
               </MenuGroup>
               <MenuDivider />
               <MenuGroup title="Administration">
-                <MenuItem as="a" href="/admin/errors.html">Error viewer</MenuItem>
-                <MenuItem as="a" href="/admin/services.html">Services</MenuItem>
-                <MenuItem as="a" href="/admin/site_map.html">Site map</MenuItem>
-                <MenuItem as="a" href="/admin/users.html">Users</MenuItem>
+                <MenuItem onClick={() => history.push("/admin/errors.html")}>Error viewer</MenuItem>
+                <MenuItem onClick={() => history.push("/admin/services.html")}>Services</MenuItem>
+                <MenuItem onClick={() => history.push("/admin/site_map.html")}>Site map</MenuItem>
+                <MenuItem onClick={() => history.push("/admin/users.html")}>Users</MenuItem>
               </MenuGroup>
             </MenuList>
           </Menu>
-
+        </Box>
       </Flex>
     </>
   );
