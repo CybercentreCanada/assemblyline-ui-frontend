@@ -24,12 +24,6 @@ import {
   MenuButton, DarkMode, Image, Divider, IconButton, Link
 } from "@chakra-ui/core";
 
-const DrawerItems = ({ children }) => (
-  <Text w="100%" mt={{ base: 4, md: 0 }} mr={6} display="block">
-    {children}
-  </Text>
-);
-
 const Header = props => {
   const [showMenu, setShowMenu] = React.useState(false);
   const menuToggle = () => setShowMenu(!showMenu);
@@ -57,18 +51,35 @@ const Header = props => {
           <DrawerHeader borderBottomWidth="1px">
             Menu
           </DrawerHeader>
-          <DrawerBody>
-            <Link mt={4} mr={6} href="/submit.html">Submit</Link>
-            <DrawerItems>Submissions</DrawerItems>
-            <DrawerItems>Alerts</DrawerItems>
-            <DrawerItems>Signatures</DrawerItems>
-            <DrawerItems>Help</DrawerItems>
+          <DrawerBody overflowY="scroll">
+            <label style={{fontSize: "80%"}}><b>Submissions</b></label>
+            <Link display="block" py={2} href="/submit.html">Submit files</Link>
+            <Link display="block" py={2} href="/submissions.html">View Submissions</Link>
+            <Divider/>
+            <label style={{fontSize: "80%"}}><b>Alerts</b></label>
+            <Link display="block" py={2} href="/alerts.html">View Alerts</Link>
+            <Link display="block" py={2} href="/worflows.html">Manage Workflows</Link>
+            <Divider/>
+            <label style={{fontSize: "80%"}}><b>Signatures</b></label>
+            <Link display="block" py={2} href="/signatures.html">Manage signatures</Link>
+            <Link display="block" py={2} href="/sources.html">Manage sources</Link>
+            <Divider/>
+            <label style={{fontSize: "80%"}}><b>Search</b></label>
+            <Link display="block" py={2} href="/search.html">All Indexes</Link>
+            <Link display="block" py={2} href="/search.html?search_scope=alert">Alert Indexes</Link>
+            <Link display="block" py={2} href="/search.html?search_scope=file">File Indexes</Link>
+            <Link display="block" py={2} href="/search.html?search_scope=result">result Indexes</Link>
+            <Link display="block" py={2} href="/search.html?search_scope=signature">Signature Indexes</Link>
+            <Link display="block" py={2} href="/search.html?search_scope=submission">Submission Indexes</Link>
+            <Divider/>
+            <label style={{fontSize: "80%"}}><b>Help</b></label>
+            
             <Divider/>
             <label style={{fontSize: "80%"}}><b>Administration</b></label>
-            <DrawerItems onClick={() => history.push("/admin/errors.html")}>Error viewer</DrawerItems>
-            <DrawerItems onClick={() => history.push("/admin/services.html")}>Services</DrawerItems>
-            <DrawerItems onClick={() => history.push("/admin/site_map.html")}>Site map</DrawerItems>
-            <DrawerItems onClick={() => history.push("/admin/users.html")}>Users</DrawerItems>
+            <Link display="block" py={2} href="/admin/errors.html">Error viewer</Link>
+            <Link display="block" py={2} href="/admin/services.html">Services</Link>
+            <Link display="block" py={2} href="/admin/site_map.html">Site map</Link>
+            <Link display="block" py={2} href="/admin/users.html">Users</Link>
           </DrawerBody>
           <DrawerFooter/>
         </DrawerContent>
@@ -79,7 +90,7 @@ const Header = props => {
         justify="space-between"
         wrap="wrap"
         padding="0.4rem"
-        paddingLeft={{sm: "1.5rem", md: 0}}
+        paddingLeft="1.5rem"
         paddingRight="1.5rem"
         backgroundColor={bgColor}
         boxShadow={"lg"}
@@ -98,7 +109,7 @@ const Header = props => {
 
         <DarkMode>
           <Flex align="center" mr={{sm: 0, md: 6}}>
-            <Heading as="h1" size="lg" letterSpacing={"-.15rem"} color="white" pl="1.5rem">
+            <Heading as="h1" size="lg" letterSpacing={"-.15rem"} color="white">
               <a href="/">Assemblyline</a>
             </Heading>
           </Flex>
@@ -126,15 +137,15 @@ const Header = props => {
             </MenuButton>
             <MenuList>
               <MenuGroup>
-                <MenuItem onClick={() => history.push("/account.html")} display="block" padding="1rem 4rem">
-                  <Flex justify="center" style={{"marginBottom": "1rem"}}>
-                      <Avatar
-                        size="xl"
-                        name="Steve Garon"
-                        src="https://s.gravatar.com/avatar/15925199802f2e849415dcb146df9085"/>
-                  </Flex>
-                  <Text textAlign="center"><b>Steve Garon</b></Text>
-                  <Text textAlign="center" fontSize="sm">steve.garon@gmail.com</Text>
+                <MenuItem onClick={() => history.push("/account.html")} display="flex" padding="1rem">
+                  <Avatar
+                    size="lg"
+                    name="Steve Garon"
+                    src="https://s.gravatar.com/avatar/15925199802f2e849415dcb146df9085"/>
+                  <Box pl="0.5rem">
+                    <Text fontSize="sm" isTruncated><b>Steve Garon</b></Text>
+                    <Text fontSize="xs" isTruncated>Steve.Garon@cyber.gc.ca</Text>
+                  </Box>
                 </MenuItem>
               </MenuGroup>
               <MenuDivider />
