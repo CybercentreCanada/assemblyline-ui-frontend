@@ -1,4 +1,4 @@
-import {Button, Input, Stack} from "@chakra-ui/core";
+import {Button, Input, Stack, useColorMode} from "@chakra-ui/core";
 import React, {useEffect, useState} from "react";
 import Banner from "./banner"
 
@@ -39,8 +39,24 @@ function UserPassLogin(){
 }
 
 function LoginScreen(){
+    const { colorMode, toggleColorMode } = useColorMode();
+
+    let bgColor;
+    if (colorMode === "dark"){
+      bgColor = "gray.700";
+    }
+    else{
+      bgColor = "white";
+    }
+
     return (
-        <div style={{position: "fixed", top: '50%', left: "50%", transform: "translate(-50%, -50%)"}}>
+        <div 
+          style={{
+              position: "fixed", 
+              top: '50%', 
+              left: "50%", 
+              transform: "translate(-50%, -50%)"
+              }}>
             <Stack
                 borderWidth={{sm: "0", md: "1px"}}
                 maxW={{sm: "xs", md: "22rem"}}
@@ -49,7 +65,8 @@ function LoginScreen(){
                 overflow={"hidden"}
                 boxShadow={{sm: "", md: "lg"}}
                 px={"2rem"}
-                py={"3rem"}>
+                py={"3rem"}
+                backgroundColor={bgColor}>
                 <Banner />
                 <UserPassLogin/>0
                 <Separator/>

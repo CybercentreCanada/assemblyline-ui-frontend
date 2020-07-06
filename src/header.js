@@ -21,7 +21,7 @@ import {
   MenuGroup,
   MenuDivider,
   MenuItem,
-  MenuButton, DarkMode, Image, Divider, IconButton, Link
+  MenuButton, DarkMode, Divider, Link
 } from "@chakra-ui/core";
 
 const Header = props => {
@@ -29,12 +29,14 @@ const Header = props => {
   const menuToggle = () => setShowMenu(!showMenu);
   const { colorMode, toggleColorMode } = useColorMode();
 
-  let bgColor;
+  let bgColor, textColor;
   if (colorMode === "dark"){
-    bgColor = "gray.700";
+    bgColor = "gray.600";
+    textColor = "gray.200";
   }
   else{
-    bgColor = "gray.700";
+    bgColor = "gray.200";
+    textColor = "gray.600"
   }
 
   const history = useHistory();
@@ -92,7 +94,7 @@ const Header = props => {
         padding="0.4rem"
         paddingLeft="1.5rem"
         paddingRight="1.5rem"
-        backgroundColor={bgColor}
+        backgroundColor="gray.700"
         boxShadow={"lg"}
         {...props}>
 
@@ -132,8 +134,10 @@ const Header = props => {
               <Avatar
                 height={{sm: "2rem", md: "2.5rem"}}
                 width={{sm: "2rem", md: "2.5rem"}}
+                backgroundColor="gray.600"
+                color="gray.200"
                 name="Steve Garon"
-                src="https://s.gravatar.com/avatar/15925199802f2e849415dcb146df9085"/>
+                src="https://s.gravatar.com/avatar/d02d91817faa8beb4d272ae2ac708859?s=256"/>
             </MenuButton>
             <MenuList>
               <MenuGroup>
@@ -141,7 +145,9 @@ const Header = props => {
                   <Avatar
                     size="lg"
                     name="Steve Garon"
-                    src="https://s.gravatar.com/avatar/15925199802f2e849415dcb146df9085"/>
+                    backgroundColor={bgColor}
+                    color={textColor}
+                    src="https://s.gravatar.com/avatar/d02d91817faa8beb4d272ae2ac708859?s=256"/>
                   <Box pl="0.5rem">
                     <Text fontSize="sm" isTruncated><b>Steve Garon</b></Text>
                     <Text fontSize="xs" isTruncated>Steve.Garon@cyber.gc.ca</Text>
