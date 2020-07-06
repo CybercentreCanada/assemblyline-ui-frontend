@@ -1,5 +1,4 @@
 import React from "react";
-import { GrUserAdmin } from "react-icons/gr"
 import { useHistory } from "react-router-dom"
 import {
   Box,
@@ -24,7 +23,6 @@ import {
   MenuItem,
   MenuButton, DarkMode, Image, Divider, IconButton, Link
 } from "@chakra-ui/core";
-import Robot from "./robot";
 
 const DrawerItems = ({ children }) => (
   <Text w="100%" mt={{ base: 4, md: 0 }} mr={6} display="block">
@@ -66,10 +64,11 @@ const Header = props => {
             <DrawerItems>Signatures</DrawerItems>
             <DrawerItems>Help</DrawerItems>
             <Divider/>
-                <DrawerItems onClick={() => history.push("/admin/errors.html")}>Error viewer</DrawerItems>
-                <DrawerItems onClick={() => history.push("/admin/services.html")}>Services</DrawerItems>
-                <DrawerItems onClick={() => history.push("/admin/site_map.html")}>Site map</DrawerItems>
-                <DrawerItems onClick={() => history.push("/admin/users.html")}>Users</DrawerItems>
+            <label style={{fontSize: "80%"}}><b>Administration</b></label>
+            <DrawerItems onClick={() => history.push("/admin/errors.html")}>Error viewer</DrawerItems>
+            <DrawerItems onClick={() => history.push("/admin/services.html")}>Services</DrawerItems>
+            <DrawerItems onClick={() => history.push("/admin/site_map.html")}>Site map</DrawerItems>
+            <DrawerItems onClick={() => history.push("/admin/users.html")}>Users</DrawerItems>
           </DrawerBody>
           <DrawerFooter/>
         </DrawerContent>
@@ -98,9 +97,8 @@ const Header = props => {
         </Box>
 
         <DarkMode>
-          <Image h={{sm: "2rem", md: "2.5rem"}} className="banner" src="/al-robot_dark.svg" alt="Assemblyline Logo"/>
           <Flex align="center" mr={{sm: 0, md: 6}}>
-            <Heading as="h1" size="lg" letterSpacing={"-.1rem"} color="white">
+            <Heading as="h1" size="lg" letterSpacing={"-.15rem"} color="white" pl="1.5rem">
               <a href="/">Assemblyline</a>
             </Heading>
           </Flex>
@@ -117,11 +115,7 @@ const Header = props => {
             <Button variant="ghost">Help</Button>
           </Box>
         </DarkMode>
-        <Box
-          width={{ sm: "full", md: "auto" }}
-          alignItems="center"
-          flexGrow={1}>
-
+        
           <Menu>
             <MenuButton>
               <Avatar
@@ -166,7 +160,6 @@ const Header = props => {
               </MenuGroup>
             </MenuList>
           </Menu>
-        </Box>
       </Flex>
     </>
   );
