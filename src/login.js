@@ -1,7 +1,6 @@
-import {Button, Input, Stack, useColorMode} from "@chakra-ui/core";
-import React, {useEffect, useState, getCookieValue} from "react";
+import {Button, Input, Stack, useColorMode, useToast} from "@chakra-ui/core";
+import React, {useState} from "react";
 import Banner from "./banner"
-import axios from 'axios';
 
 function Separator(){
     return (
@@ -17,31 +16,57 @@ function AuthProvider(props){
     return <Button>Sign in with {props.name}</Button>;
 }
 
-function login(username, password){
-    return axios.post('/api/v4/auth/login/', {user: username, password: password});
-    const requestOptions = {
-        method: 'POST',
-        mode: 'cors',
-        headers: { 
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'X-XSRF-TOKEN': getCookieValue('XSRF-TOKEN')
-        },
-        credentials: "include",
-        body: JSON.stringify({user: username, password: password})
-    };
-
-    return fetch('/api/v4/auth/login/', requestOptions)
-        .then(res => res.json())
-        .then(user => {
-            window.location.reload(false);
-        });
-}
-
 function UserPassLogin(){
-    const [user, setUser] = useState({});
+    const toast = useToast();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+
+    function login(username_p, password_p){
+        const requestOptions = {
+            method: 'POST',
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({user: username_p, password: password_p})
+        };
+
+        fetch('/api/v4/auth/login/', requestOptions)
+            .then(res => {
+                return res.json()
+            })
+            .catch(() => {
+                return {
+                        api_error_message: "Login API unreachable.",
+                        api_response: "",
+                        api_server_version: "4.0.0",
+                        api_status_code: 400
+                    }
+            })
+            .then(api_data => {
+                if (api_data === undefined || !api_data.hasOwnProperty('api_status_code')){
+                    toast({
+                        title: "Login failure",
+                        description: "Invalid data returned by login API.",
+                        status: "error",
+                        duration: 9000,
+                        isClosable: true
+                    })
+                }
+                else if (api_data.api_status_code !== 200){
+                    toast({
+                        title: "Login failure",
+                        description: api_data.api_error_message,
+                        status: "error",
+                        duration: 9000,
+                        isClosable: true
+                    })
+                }
+                else {
+                    window.location.reload(false);
+                }
+            });
+    }
 
     return (
         <Stack marginTop="3rem">
@@ -58,8 +83,8 @@ function UserPassLogin(){
     );
 }
 
-function LoginScreen(props){
-    const { colorMode, toggleColorMode } = useColorMode();
+function LoginScreen(){
+    const { colorMode } = useColorMode();
 
     let bgColor;
     if (colorMode === "dark"){

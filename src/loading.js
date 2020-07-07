@@ -1,18 +1,8 @@
-import {useColorMode, CircularProgress, Flex} from "@chakra-ui/core";
+import {CircularProgress, Flex} from "@chakra-ui/core";
 import React from "react";
 import Banner from "./banner"
 
 function LoadingScreen(){
-    const { colorMode, toggleColorMode } = useColorMode();
-
-    let bgColor;
-    if (colorMode === "dark"){
-      bgColor = "gray.700";
-    }
-    else{
-      bgColor = "white";
-    }
-
     return (
         <div 
           style={{
@@ -23,7 +13,7 @@ function LoadingScreen(){
               }}>
             <Banner />
             <Flex justify="center">
-                <CircularProgress isIndeterminate></CircularProgress>
+                <CircularProgress isIndeterminate/>
             </Flex>
         </div>
     );

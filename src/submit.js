@@ -1,5 +1,5 @@
-import React, { useState, useEffect }  from "react";
-import {Flex, Image, Tabs, TabList, Tab, TabPanel, TabPanels, Box, Text, Link, Button, Input} from "@chakra-ui/core";
+import React from "react";
+import {Flex, Tabs, TabList, Tab, TabPanel, TabPanels, Box, Text, Link, Button, Input} from "@chakra-ui/core";
 import {useDropzone} from 'react-dropzone';
 import {AiOutlineSecurityScan} from 'react-icons/ai'
 import Banner from "./banner"

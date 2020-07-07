@@ -7,6 +7,7 @@ import Header from "./header";
 import LoginScreen from "./login"
 import Submit from "./submit";
 import LoadingScreen from "./loading"
+import getXSRFCookie from "./helpers/xsrf"
 
 const breakpoints = ["300px", "768px", "992px", "1440px"];
 breakpoints.sm = breakpoints[0];
@@ -46,26 +47,36 @@ function App() {
   const [renderedApp, setRenderedApp] = useState(<LoadingScreen/>);
   
   useEffect(()=> {
-    fetch('/api/v4/user/whoami/', {credentials: "same-origin"})
-      .then(
-        (res) => {
-          res.json()
+    const requestOptions = {
+        method: 'GET',
+        headers: {
+            'X-XSRF-TOKEN': getXSRFCookie()
         },
-        (error) => {
+        credentials: "same-origin"
+    };
+
+    fetch('/api/v4/user/whoami/', requestOptions)
+      .then(
+        res => {
+            if (res.ok) return res.json();
+        },
+        error => {
+          console.log(error);
           setRenderedApp(<LoginScreen/>)
         }
       )
-      .then((result) => {
-        if (result === undefined){
+      .then(result => {
+        if (result === undefined || !result.hasOwnProperty('api_response')){
           setRenderedApp(<LoginScreen/>)
         }
         else{
-          setUser(result);
-          setRenderedApp(<AppData/>);  
+          setUser(result.api_response);
+          setRenderedApp(<AppData/>);
         }
       },
-      (error) => {
-        setRenderedApp(<LoginScreen/>)
+      error => {
+          console.log(error);
+          setRenderedApp(<LoginScreen/>)
       })
   }, []);
   return (
