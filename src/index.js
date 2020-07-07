@@ -43,24 +43,31 @@ function AppData(){
 
 function App() {
   const [user, setUser] = useState({});
+  const [renderedApp, setRenderedApp] = useState(<LoadingScreen/>);
+  
   useEffect(()=> {
-    fetch('/api/whoami')
+    fetch('/api/v4/user/whoami/', {credentials: "same-origin"})
       .then(
-        (res) => {res.json()},
-        (error) => {renderedApp = <LoginScreen/>}
+        (res) => {
+          res.json()
+        },
+        (error) => {
+          setRenderedApp(<LoginScreen/>)
+        }
       )
       .then((result) => {
         if (result === undefined){
-          renderedApp = <LoginScreen/>
+          setRenderedApp(<LoginScreen/>)
         }
         else{
           setUser(result);
-          renderedApp = <AppData/>;  
+          setRenderedApp(<AppData/>);  
         }
       },
-      (error) => {renderedApp = <LoginScreen/>})
+      (error) => {
+        setRenderedApp(<LoginScreen/>)
+      })
   }, []);
-  let renderedApp = <LoadingScreen/>;
   return (
     <BrowserRouter>
       <CSSReset />

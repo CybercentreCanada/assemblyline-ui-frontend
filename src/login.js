@@ -1,6 +1,7 @@
 import {Button, Input, Stack, useColorMode} from "@chakra-ui/core";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, getCookieValue} from "react";
 import Banner from "./banner"
+import axios from 'axios';
 
 function Separator(){
     return (
@@ -16,18 +17,37 @@ function AuthProvider(props){
     return <Button>Sign in with {props.name}</Button>;
 }
 
+function login(username, password){
+    return axios.post('/api/v4/auth/login/', {user: username, password: password});
+    const requestOptions = {
+        method: 'POST',
+        mode: 'cors',
+        headers: { 
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-XSRF-TOKEN': getCookieValue('XSRF-TOKEN')
+        },
+        credentials: "include",
+        body: JSON.stringify({user: username, password: password})
+    };
+
+    return fetch('/api/v4/auth/login/', requestOptions)
+        .then(res => res.json())
+        .then(user => {
+            window.location.reload(false);
+        });
+}
+
 function UserPassLogin(){
     const [user, setUser] = useState({});
-    useEffect(()=> {
-        fetch('/api/v4/auth/login/?=').then(res => res.json()).then(data => {
-        setUser(data);
-      })
-    }, []);
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+
     return (
         <Stack marginTop="3rem">
-            <Input name="username" placeholder="Username"/>
-            <Input type="password" name="password" placeholder="Password"/>
-            <Button>Sign in</Button>
+            <Input name="username" placeholder="Username" onChange={(event) => setUsername(event.target.value)}/>
+            <Input type="password" name="password" placeholder="Password" onChange={event => setPassword(event.target.value)}/>
+            <Button onClick={() => login(username, password)}>Sign in</Button>
             <div style={{marginTop: "1rem", display: "block", textAlign: "center", fontSize: "0.75rem"}}>
                 Do not have an account? <Button size="xs" variant="link">Sign up!</Button>
             </div>
@@ -38,7 +58,7 @@ function UserPassLogin(){
     );
 }
 
-function LoginScreen(){
+function LoginScreen(props){
     const { colorMode, toggleColorMode } = useColorMode();
 
     let bgColor;
@@ -68,7 +88,7 @@ function LoginScreen(){
                 py={"3rem"}
                 backgroundColor={bgColor}>
                 <Banner />
-                <UserPassLogin/>0
+                <UserPassLogin/>
                 <Separator/>
                 <AuthProvider name={"Azure AD"}/>
             </Stack>
