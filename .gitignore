@@ -7,6 +7,9 @@
 
 # testing
 /coverage
+.idea
+venv
+__pycache__
 
 # production
 /build
