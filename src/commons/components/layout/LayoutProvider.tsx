@@ -137,7 +137,7 @@ function AppLayoutProvider(props: LayoutProviderProps) {
   const storedAutoHideAppbar = localStorage.getItem('autoHideAppbar');
   initialAutoHideAppbar = storedAutoHideAppbar ? !!JSON.parse(storedAutoHideAppbar) : props.value.defaultAutoHideAppbar;
   
-  const [showMenus, setShowMenus] = useState<boolean>(!!props.user)
+  const [showMenus, setShowMenus] = useState<boolean>(true)
   const [theme, setTheme] = useState<string>(initialTheme)
   const [drawer, setDrawer] = useState<boolean>(initialDrawer)
   const [quickSearch, setQuickSearch] = useState<boolean>(initialQuickSearch)  
@@ -202,8 +202,8 @@ function AppLayoutProvider(props: LayoutProviderProps) {
       }}>
         <Box className={classes.app}>
           <CssBaseline />
-          {showMenus ? <TopBar/> : null}
-          {showMenus ? <LeftNavDrawer/>: null}
+          {props.user !== null && showMenus ? <TopBar/> : null}
+          {props.user !== null && showMenus ? <LeftNavDrawer/>: null}
           <Box className={classes.container}>
             {props.children}
           </Box>
