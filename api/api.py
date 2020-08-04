@@ -12,7 +12,12 @@ app.config.update(
 def login():
     data = request.json
     if data.get('user', None) == "test" and data.get('password', None) == "test":
-        session["user"] = data['user']
+        session["user"] = dict(
+            username="sgaron",
+            name="Steve Garon",
+            email="steve.garon@cyber.gc.ca",
+            avatar="https://cdn.iconscout.com/icon/free/png-512/avatar-370-456322.png"
+        )
         out = {"api_response": {"success": True}, "api_status_code": 200, "api_error_message": ""}
         status = 200
     else:
@@ -38,7 +43,7 @@ def logout():
 @app.route('/api/v4/user/whoami/')
 def whoami():
     if session.get('user', None) is not None:
-        out = {"api_response": {"user": session['user']}, "api_status_code": 200, "api_error_message": ""}
+        out = {"api_response": session['user'], "api_status_code": 200, "api_error_message": ""}
         status = 200
     else:
         # Wait so we can showcase app loading page
