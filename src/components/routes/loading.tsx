@@ -5,8 +5,8 @@ import {CircularProgress, useTheme} from "@material-ui/core";
 import useAppLayout from "../../commons/components/hooks/useAppLayout";
 
 function LoadingScreen(){
-    const {theme} = useTheme()
-    const {getBanner} = useAppLayout()
+    const theme = useTheme()
+    const { getBanner } = useAppLayout()
     
     return (
         <div 
@@ -17,7 +17,7 @@ function LoadingScreen(){
               left: "50%", 
               transform: "translate(-50%, -50%)"
               }}>
-            {getBanner(theme)}
+            { getBanner(theme) }
             <CircularProgress variant={"indeterminate"}/>
         </div>
     );
