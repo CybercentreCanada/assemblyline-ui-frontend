@@ -11,7 +11,6 @@ import useAppLayout from "../../commons/components/hooks/useAppLayout";
 function UserPassLogin(){
     const { t } = useTranslation();
     const { enqueueSnackbar, closeSnackbar }  = useSnackbar();
-    const { setCurrentUser } = useAppLayout();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const snackBarOptions: OptionsObject = {
@@ -27,28 +26,43 @@ function UserPassLogin(){
     }
 
     function onSubmit(event) {
-        if (!login(username, password)){
-            event.preventDefault();
-        }
+        login(username, password);
+        event.preventDefault();
     }
 
     function login(username_p, password_p){
-        // This is obvisouly not how you should do authentification... perhaps you can call an API? 
-        if (username_p === null || username_p === null || username_p === "" || 
-            password_p === null || password_p === null || password_p === ""){
-            enqueueSnackbar(t("page.login.error"), snackBarOptions)
-            return false;
-        }
-        else{
-            setCurrentUser({
-                username: "sgaron",
-                name: "Steve Garon",
-                //email: "sgaron.cse@gmail.com",
-                email: "steve.garon@cyber.gc.ca",
-                avatar: "https://cdn.iconscout.com/icon/free/png-512/avatar-370-456322.png"
+        const requestOptions: RequestInit = {
+            method: 'POST',
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({user: username_p, password: password_p})
+        };
+
+        fetch('/api/v4/auth/login/', requestOptions)
+            .then(res => {
+                return res.json()
             })
-            return true;
-        }
+            .catch(() => {
+                return {
+                        api_error_message: "API server unreachable.",
+                        api_response: "",
+                        api_server_version: "4.0.0",
+                        api_status_code: 400
+                    }
+            })
+            .then(api_data => {
+                if (api_data === undefined || !api_data.hasOwnProperty('api_status_code')){
+                    enqueueSnackbar("Invalid data returned by API server.", snackBarOptions);
+                }
+                else if (api_data.api_status_code !== 200){
+                    enqueueSnackbar(api_data.api_error_message, snackBarOptions);
+                }
+                else {
+                    window.location.reload(false);
+                }
+            });
     }
 
     return (

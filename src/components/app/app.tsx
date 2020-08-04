@@ -1,43 +1,60 @@
-import React from "react";
-import { Switch, BrowserRouter, Route } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { BrowserRouter } from "react-router-dom";
 
 import { SnackbarProvider } from "notistack";
 
 import AppLayoutProvider from "../../commons/components/layout/LayoutProvider";
-import Dashboard from "../routes/dashboard";
-import LoginScreen from "../routes/login";
-import Logout from "../routes/logout";
-import NotFoundPage from "../routes/404_dl";
-import Submit from "../routes/submit";
-import Submissions from "../routes/submission";
+import getXSRFCookie from "../../helpers/xsrf";
 import useMyLayout from "../hooks/useMyLayout";
+import LoginScreen from "../routes/login";
+import LoadingScreen from "../routes/loading";
+import Routes from "../routes/routes";
 
 type AppProps = {};
 
-const App: React.FC<AppProps> = () => {
-  // This is obviously not where the login user should be fetch from, 
-  //   maybe an API call or a checking a secure session cookie
-  let user = null;
-  const storedUser = localStorage.getItem('currentUser');
-  user = storedUser ? JSON.parse(storedUser) : null;
-
-  const renderRoutes = () => {
-    return <Switch>
-      <Route exact path="/" component={Submit} />
-      <Route exact path="/dashboard" component={Dashboard} />
-      <Route exact path="/submit" component={Submit} />
-      <Route path="/submissions" component={Submissions} />
-      <Route exact path="/logout" component={Logout} />
-      <Route component={NotFoundPage}/>
-    </Switch>
-  }
+const App: React.FC<AppProps> = () => {  
+  const [user, setUser] = useState(null);
+  const [renderedApp, setRenderedApp] = useState(null);
 
   const layout = useMyLayout();
+  useEffect(()=> {
+    const requestOptions: RequestInit = {
+        method: 'GET',
+        headers: {
+            'X-XSRF-TOKEN': getXSRFCookie()
+        },
+        credentials: "same-origin"
+    };
+
+    fetch('/api/v4/user/whoami/', requestOptions)
+      .then(
+        res => {
+            if (res.ok) return res.json();
+        },
+        error => {
+          console.log(error);
+          setRenderedApp(<LoginScreen/>)
+        }
+      )
+      .then(result => {
+        if (result === undefined || !result.hasOwnProperty('api_response')){
+          setRenderedApp(<LoginScreen/>)
+        }
+        else{
+          setUser(result.api_response);
+          setRenderedApp(<Routes/>);
+        }
+      },
+      error => {
+          console.log(error);
+          setRenderedApp(<LoginScreen/>)
+      })
+  }, []);
   return (
     <BrowserRouter>
       <AppLayoutProvider value={layout} user={user}>
         <SnackbarProvider>
-          {user ? renderRoutes() : <LoginScreen/>}
+          {renderedApp ? renderedApp : <LoadingScreen/>}
         </SnackbarProvider>
       </AppLayoutProvider>
     </BrowserRouter>
