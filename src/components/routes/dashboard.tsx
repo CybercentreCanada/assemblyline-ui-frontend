@@ -11,7 +11,7 @@ function createData(id) {
 const useStyles = makeStyles((theme) => ({
   card: {
     flexGrow: 1, 
-    minHeight: "180px", 
+    minHeight: "175px", 
     minWidth: "320px", 
     padding: theme.spacing(2), 
     margin: theme.spacing(1)
@@ -19,8 +19,8 @@ const useStyles = makeStyles((theme) => ({
   watermark: {
     color: theme.palette.action.disabledBackground, 
     margin: "auto",
-    width: "280px",
-    lineHeight: "160px",
+    width: "275px",
+    lineHeight: "155px",
     textAlign: "center"}
 }));   
 
@@ -29,7 +29,7 @@ function Dashboard() {
   const classes = useStyles();
   
   let cards = []
-  for (let x = 0; x < 24; x++){
+  for (let x = 0; x < 12; x++){
     cards.push(createData(x+1))
   }
 
