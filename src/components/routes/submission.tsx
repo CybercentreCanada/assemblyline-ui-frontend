@@ -13,7 +13,7 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Typography from '@material-ui/core/Typography';
 
-import PageFullWidth from "../../commons/components/layout/pages/PageFullWidth";
+import PageFullWidth from "commons/components/layout/pages/PageFullWidth";
 
 const useStyles = makeStyles((theme) => ({
   table: {},

@@ -5,7 +5,7 @@ import { AppBar, Toolbar, Box, IconButton, useTheme, useScrollTrigger, Slide, ma
 import MenuIcon from '@material-ui/icons/Menu';
 import withWidth, { isWidthUp } from '@material-ui/core/withWidth';
 
-import useAppLayout from "../../hooks/useAppLayout";
+import useAppLayout from "commons/components/hooks/useAppLayout";
 import AppSwitcher from "./AppSwitcher";
 import QuickSearch from "./QuickSearch";
 import ThemeSelectionIcon from "./ThemeSelectionIcon";

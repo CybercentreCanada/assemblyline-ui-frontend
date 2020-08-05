@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Box,  InputBase, fade } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core";
-import useAppLayout from "../../hooks/useAppLayout";
+import useAppLayout from "commons/components/hooks/useAppLayout";
 import SearchIcon from '@material-ui/icons/Search';
 import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";

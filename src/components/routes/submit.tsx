@@ -15,8 +15,8 @@ import TabPanel from '@material-ui/lab/TabPanel';
 import TextField from "@material-ui/core/TextField";
 import Typography from '@material-ui/core/Typography';
 
-import PageCenter from "../../commons/components/layout/pages/PageCenter";
-import useAppLayout from "../../commons/components/hooks/useAppLayout";
+import PageCenter from "commons/components/layout/pages/PageCenter";
+import useAppLayout from "commons/components/hooks/useAppLayout";
 
 
 function FileDropper(props) {

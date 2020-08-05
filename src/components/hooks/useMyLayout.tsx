@@ -16,7 +16,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
 import SupervisorAccountOutlinedIcon from '@material-ui/icons/SupervisorAccountOutlined';
 
-import { AppLayoutProps } from "../../commons/components/layout/LayoutProvider";
+import { AppLayoutProps } from "commons/components/layout/LayoutProvider";
 
 const useMyLayout = (): AppLayoutProps => {
   const {t} = useTranslation();

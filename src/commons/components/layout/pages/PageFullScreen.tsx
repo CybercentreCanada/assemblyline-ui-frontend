@@ -3,8 +3,8 @@ import { makeStyles, Box, IconButton, useScrollTrigger } from "@material-ui/core
 
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
-import useFullscreenStatus from "../../hooks/useFullscreenStatus";
-import useAppLayout from "../../hooks/useAppLayout";
+import useFullscreenStatus from "commons/components/hooks/useFullscreenStatus";
+import useAppLayout from "commons/components/hooks/useAppLayout";
 
 
 const useStyles = (isFullscreen, topbarShown) => {

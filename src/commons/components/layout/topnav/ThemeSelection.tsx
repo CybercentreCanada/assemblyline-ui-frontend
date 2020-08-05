@@ -13,7 +13,7 @@ import {
   Switch,
 } from "@material-ui/core";
 import { useTranslation } from "react-i18next";
-import useAppLayout from "../../hooks/useAppLayout";
+import useAppLayout from "commons/components/hooks/useAppLayout";
 import withWidth, { isWidthDown, isWidthUp } from '@material-ui/core/withWidth';
 
 export enum Lang {

@@ -4,8 +4,8 @@ import { useTranslation } from "react-i18next";
 import { useSnackbar, OptionsObject } from 'notistack';
 import {Button, TextField, Box, useTheme, CircularProgress, createStyles, makeStyles, Theme} from "@material-ui/core";
 
-import CardCentered from '../../commons/components/layout/pages/CardCentered';
-import useAppLayout from "../../commons/components/hooks/useAppLayout";
+import CardCentered from 'commons/components/layout/pages/CardCentered';
+import useAppLayout from "commons/components/hooks/useAppLayout";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

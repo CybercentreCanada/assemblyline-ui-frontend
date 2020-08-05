@@ -3,12 +3,12 @@ import { BrowserRouter } from "react-router-dom";
 
 import { SnackbarProvider } from "notistack";
 
-import AppLayoutProvider from "../../commons/components/layout/LayoutProvider";
-import getXSRFCookie from "../../helpers/xsrf";
-import useMyLayout from "../hooks/useMyLayout";
-import LoginScreen from "../routes/login";
-import LoadingScreen from "../routes/loading";
-import Routes from "../routes/routes";
+import AppLayoutProvider from "commons/components/layout/LayoutProvider";
+import getXSRFCookie from "helpers/xsrf";
+import useMyLayout from "components/hooks/useMyLayout";
+import LoginScreen from "components/routes/login";
+import LoadingScreen from "components/routes/loading";
+import Routes from "components/routes/routes";
 
 type AppProps = {};
 

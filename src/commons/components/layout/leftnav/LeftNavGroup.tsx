@@ -4,7 +4,7 @@ import { Box, List, ListItem, ListItemIcon, Popover, ListItemText, Collapse, Too
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 
-import useAppLayout from "../../hooks/useAppLayout";
+import useAppLayout from "commons/components/hooks/useAppLayout";
 import LeftNavItem from "./LeftNavItem";
 import { LeftNavGroupProps } from "./LeftNavDrawer";
 

@@ -5,7 +5,7 @@ import { ListItem, ListItemIcon, ListItemText, Tooltip } from "@material-ui/core
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import withWidth, { isWidthDown } from '@material-ui/core/withWidth';
 
-import useAppLayout from "../../hooks/useAppLayout";
+import useAppLayout from "commons/components/hooks/useAppLayout";
 import { LeftNavItemProps } from "./LeftNavDrawer";
 
 const useStyles = makeStyles((theme: Theme) =>

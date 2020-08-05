@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, Typography, Card, makeStyles } from '@material-ui/core';
-import PageFullscreen from '../../commons/components/layout/pages/PageFullScreen';
+import PageFullscreen from 'commons/components/layout/pages/PageFullScreen';
 
 
 function createData(id) {

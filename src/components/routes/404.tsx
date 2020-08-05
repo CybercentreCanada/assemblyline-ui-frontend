@@ -5,7 +5,7 @@ import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 import LinkOffIcon from '@material-ui/icons/LinkOff';
 
-import PageCenter from "../../commons/components/layout/pages/PageCenter";
+import PageCenter from "commons/components/layout/pages/PageCenter";
 
 const NotFoundPage = () => {
     const { t } = useTranslation();

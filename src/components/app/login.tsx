@@ -3,8 +3,8 @@ import { useSnackbar, OptionsObject } from 'notistack';
 
 import {Button, TextField, Link, Box, makeStyles, useTheme} from "@material-ui/core";
 
-import TextDivider from "../visual/text_divider";
-import useAppLayout from "../../commons/components/hooks/useAppLayout";
+import TextDivider from "components/visual/text_divider";
+import useAppLayout from "commons/components/hooks/useAppLayout";
 
 
 function AuthProvider(props){

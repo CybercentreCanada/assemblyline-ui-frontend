@@ -17,8 +17,8 @@ import {
   ClickAwayListener,
   ListItemIcon,
 } from "@material-ui/core";
-import useAppLayout from "../../hooks/useAppLayout";
-import useGravatar from "../../hooks/useGravatar";
+import useAppLayout from "commons/components/hooks/useAppLayout";
+import useGravatar from "commons/components/hooks/useGravatar";
 import { Link } from "react-router-dom";
 import ThemeSelection from "./ThemeSelection";
 

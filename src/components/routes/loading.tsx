@@ -2,7 +2,7 @@ import React from "react";
 
 import {CircularProgress, useTheme, Box} from "@material-ui/core";
 
-import useAppLayout from "../../commons/components/hooks/useAppLayout";
+import useAppLayout from "commons/components/hooks/useAppLayout";
 
 function LoadingScreen(){
     const theme = useTheme()

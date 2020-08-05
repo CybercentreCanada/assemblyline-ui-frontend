@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 import { CssBaseline, makeStyles, ThemeProvider, useMediaQuery, Box } from "@material-ui/core";
 
-import useAppTheme, { AppThemeColorProps } from "../hooks/useAppTheme";
+import useAppTheme, { AppThemeColorProps } from "commons/components/hooks/useAppTheme";
 import LeftNavDrawer, { LeftNavElement } from "./leftnav/LeftNavDrawer";
 import TopBar from "./topnav/TopBar";
 import { AppElement } from "./topnav/AppSwitcher";

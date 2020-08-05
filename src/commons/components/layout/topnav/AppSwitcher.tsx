@@ -14,7 +14,7 @@ import {
   Link
 } from "@material-ui/core";
 import AppsIcon from "@material-ui/icons/Apps";
-import useAppLayout from "../../hooks/useAppLayout";
+import useAppLayout from "commons/components/hooks/useAppLayout";
 import withWidth, { isWidthDown } from '@material-ui/core/withWidth';
 
 export type AppElement = {

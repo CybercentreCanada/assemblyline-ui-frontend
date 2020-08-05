@@ -21,7 +21,7 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import withWidth, { isWidthDown } from '@material-ui/core/withWidth';
 
-import useAppLayout from "../../hooks/useAppLayout";
+import useAppLayout from "commons/components/hooks/useAppLayout";
 import LeftNavGroup from "./LeftNavGroup";
 import LeftNavItem from "./LeftNavItem";
 

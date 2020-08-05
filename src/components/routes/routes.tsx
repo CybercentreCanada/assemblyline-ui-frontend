@@ -1,11 +1,11 @@
 import React from "react";
 import { Switch, Route } from "react-router-dom";
 
-import Dashboard from "../routes/dashboard";
-import Logout from "../routes/logout";
-import NotFoundPage from "../routes/404_dl";
-import Submit from "../routes/submit";
-import Submissions from "../routes/submission";
+import Dashboard from "components/routes/dashboard";
+import Logout from "components/routes/logout";
+import NotFoundPage from "components/routes/404_dl";
+import Submit from "components/routes/submit";
+import Submissions from "components/routes/submission";
 
 
 const Routes = () => {
