@@ -10,6 +10,7 @@ app.config.update(
 
 @app.route('/api/v4/auth/login/', methods=["POST"])
 def login():
+    time.sleep(1)
     data = request.json
     if data.get('user', None) == "test" and data.get('password', None) == "test":
         session["user"] = dict(
@@ -29,6 +30,7 @@ def login():
 
 @app.route('/api/v4/auth/logout/', methods=["GET"])
 def logout():
+    time.sleep(1)
     try:
         session.pop('user', None)
         out = {"api_response": {"success": True}, "api_status_code": 200, "api_error_message": ""}
@@ -42,12 +44,12 @@ def logout():
 
 @app.route('/api/v4/user/whoami/')
 def whoami():
+    time.sleep(1)
     if session.get('user', None) is not None:
         out = {"api_response": session['user'], "api_status_code": 200, "api_error_message": ""}
         status = 200
     else:
         # Wait so we can showcase app loading page
-        time.sleep(2)
         out = {"api_response": {}, "api_status_code": 401, "api_error_message": "You must login first"}
         status = 401
 
