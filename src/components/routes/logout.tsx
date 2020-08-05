@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { useSnackbar, OptionsObject } from "notistack";
 
-import { Box, useTheme, Typography } from "@material-ui/core";
+import { Box, useTheme, Typography, CircularProgress } from "@material-ui/core";
 
 import useAppLayout from "../../commons/components/hooks/useAppLayout";
 import CardCentered from '../../commons/components/layout/pages/CardCentered';
@@ -54,19 +54,21 @@ function Logout(){
                 enqueueSnackbar(api_data.api_error_message, snackBarOptions);
             }
             else {
-                // There is probably more stuff to be done to properly logout a user...
                 setTimeout(() => {
                     setCurrentUser(null)
                     window.location.replace("/")
-                }, 1000)
+                }, 500)
             }
         });
 
     return (
         <CardCentered>
             <Box textAlign="center">
-                <Box color={theme.palette.primary.main} fontSize="30pt">{ getBanner(theme) }</Box>
-                <Typography>{t("page.logout")}</Typography>
+                { getBanner(theme) }
+                <Box mb={3}>
+                    <Typography>{t("page.logout")}</Typography>
+                </Box>
+                <CircularProgress size={24}/>
             </Box>
         </CardCentered>
     );
