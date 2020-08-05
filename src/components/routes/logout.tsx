@@ -12,7 +12,7 @@ function Logout(){
     const { t } = useTranslation()
     const { enqueueSnackbar, closeSnackbar }  = useSnackbar();
     const theme = useTheme();
-    const { getBanner, hideMenus, setCurrentUser } = useAppLayout();
+    const { getBanner, hideMenus } = useAppLayout();
     const requestOptions: RequestInit = {
         method: 'GET',
         credentials: "same-origin",
@@ -55,7 +55,6 @@ function Logout(){
             }
             else {
                 setTimeout(() => {
-                    setCurrentUser(null)
                     window.location.replace("/")
                 }, 500)
             }
