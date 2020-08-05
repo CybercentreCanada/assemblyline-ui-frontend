@@ -7,10 +7,11 @@ app.config.update(
     SESSION_COOKIE_SECURE=False
 )
 
+API_DELAY = 0
 
 @app.route('/api/v4/auth/login/', methods=["POST"])
 def login():
-    time.sleep(1)
+    time.sleep(API_DELAY)
     data = request.json
     if data.get('user', None) == "test" and data.get('password', None) == "test":
         session["user"] = dict(
@@ -30,7 +31,7 @@ def login():
 
 @app.route('/api/v4/auth/logout/', methods=["GET"])
 def logout():
-    time.sleep(1)
+    time.sleep(API_DELAY)
     try:
         session.pop('user', None)
         out = {"api_response": {"success": True}, "api_status_code": 200, "api_error_message": ""}
@@ -44,7 +45,7 @@ def logout():
 
 @app.route('/api/v4/user/whoami/')
 def whoami():
-    time.sleep(1)
+    time.sleep(API_DELAY)
     if session.get('user', None) is not None:
         out = {"api_response": session['user'], "api_status_code": 200, "api_error_message": ""}
         status = 200
