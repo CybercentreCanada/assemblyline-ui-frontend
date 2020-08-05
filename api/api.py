@@ -13,18 +13,22 @@ API_DELAY = 0
 def login():
     time.sleep(API_DELAY)
     data = request.json
-    if data.get('user', None) == "test" and data.get('password', None) == "test":
-        session["user"] = dict(
-            username="sgaron",
-            name="Steve Garon",
-            email="steve.garon@cyber.gc.ca",
-            avatar="https://cdn.iconscout.com/icon/free/png-512/avatar-370-456322.png"
-        )
-        out = {"api_response": {"success": True}, "api_status_code": 200, "api_error_message": ""}
-        status = 200
+    if data.get('user', None) == "admin" and data.get('password', None) == "admin":
+        if data.get('otp', None) == "123123":
+            session["user"] = dict(
+                username="sgaron",
+                name="Steve Garon",
+                email="steve.garon@cyber.gc.ca",
+                avatar="https://cdn.iconscout.com/icon/free/png-512/avatar-370-456322.png"
+            )
+            out = {"api_response": {"success": True}, "api_status_code": 200, "api_error_message": ""}
+            status = 200
+        else:
+            out = {"api_response": {}, "api_status_code": 401, "api_error_message": "Wrong OTP token"}    
+            status = 401
     else:
         out = {"api_response": {}, "api_status_code": 400, "api_error_message": "Bad username/password"}
-        status = 400
+        status = 401
 
     return make_response(jsonify(out), status)
 
