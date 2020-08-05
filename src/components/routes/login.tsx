@@ -22,14 +22,15 @@ const useStyles = makeStyles((theme: Theme) =>
 type OTPProps = {
     login: () => void,
     buttonLoading: boolean;
-    setOTP: (value: string) => void
+    setOneTimePass: (value: string) => void
 };
   
-function OTPLogin(props: OTPProps){
+function OneTimePassLogin(props: OTPProps){
     const { t } = useTranslation();
     const classes = useStyles();
 
     function onSubmit(event) {
+        console.log(props)
         props.login();
         event.preventDefault();
     }
@@ -37,7 +38,7 @@ function OTPLogin(props: OTPProps){
     return (
         <form onSubmit={onSubmit}>
             <Box display={"flex"} flexDirection={"column"}>
-                <TextField autoFocus variant={"outlined"} size={"small"} label={t("page.login.otp")} onChange={(event) => props.setOTP(event.target.value)}/>
+                <TextField autoFocus variant={"outlined"} size={"small"} label={t("page.login.otp")} onChange={(event) => props.setOneTimePass(event.target.value)}/>
                 <Button type="submit" style={{marginTop: "1.5rem"}} variant={"contained"} color={"primary"} disabled={props.buttonLoading}>
                     {t("page.login.button")}
                     {props.buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
@@ -86,7 +87,7 @@ export default function LoginScreen(){
     const { enqueueSnackbar, closeSnackbar }  = useSnackbar();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const [OTP, setOTP] = useState("");
+    const [oneTimePass, setOneTimePass] = useState("");
     const [buttonLoading, setButtonLoading] = useState(false);
     const snackBarOptions: OptionsObject = {
         variant: "error",
@@ -111,7 +112,7 @@ export default function LoginScreen(){
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({user: username, password: password, otp: OTP})
+            body: JSON.stringify({user: username, password: password, otp: oneTimePass})
         };
 
         setButtonLoading(true);
@@ -135,7 +136,7 @@ export default function LoginScreen(){
                 }
                 else if (api_data.api_status_code !== 200){
                     if (api_data.api_error_message === "Wrong OTP token"){
-                        setRenderedLoginMethod(<OTPLogin login={login} buttonLoading={buttonLoading} setOTP={setOTP}/>)
+                        setRenderedLoginMethod(<OneTimePassLogin login={login} buttonLoading={buttonLoading} setOneTimePass={setOneTimePass}/>)
                     }
                     enqueueSnackbar(api_data.api_error_message, snackBarOptions);
                 }
