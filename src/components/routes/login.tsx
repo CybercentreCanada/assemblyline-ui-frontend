@@ -87,7 +87,7 @@ function UserPassLogin(){
     return (
         <form onSubmit={onSubmit}>
             <Box display={"flex"} flexDirection={"column"}>
-                <TextField variant={"outlined"} size={"small"} label={t("page.login.username")} onChange={(event) => setUsername(event.target.value)}/>
+                <TextField autoFocus variant={"outlined"} size={"small"} label={t("page.login.username")} onChange={(event) => setUsername(event.target.value)}/>
                 <TextField style={{marginTop: ".5rem"}} variant={"outlined"} size={"small"} type="password" label={t("page.login.password")} onChange={event => setPassword(event.target.value)}/>
                 <Button type="submit" style={{marginTop: "1.5rem"}} variant={"contained"} color={"primary"} disabled={buttonLoading}>
                     {t("page.login.button")}
