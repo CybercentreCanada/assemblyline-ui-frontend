@@ -3,7 +3,6 @@ const md5 = require("md5");
 
 const useGravatar = (email: string)  => {
     return useMemo(() => {
-        console.log(email)
         if (email !== null ){
             return `https://s.gravatar.com/avatar/${md5(email)}?d=404`
         }
