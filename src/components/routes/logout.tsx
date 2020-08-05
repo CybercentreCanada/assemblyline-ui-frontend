@@ -32,9 +32,9 @@ function Logout(){
         }
     }
 
-    hideMenus()
-
     useEffect( () => {
+        hideMenus()
+
         fetch('/api/v4/auth/logout/', requestOptions)
         .then(res => {
             return res.json()
