@@ -34,6 +34,7 @@ const useStyles = makeStyles((theme) => ({
 
 export type AppLayoutProps = {
   appName: string,
+  allowGravatar: boolean,
   allowQuickSearch: boolean,
   allowReset: boolean,
   appIconDark: React.ReactElement<any>,

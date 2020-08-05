@@ -63,7 +63,7 @@ const UserProfile = () => {
   const classes = useStyles();
   const theme = useTheme();
   const { currentUser, layoutProps } = useAppLayout();
-  const gravatarUrl = useGravatar(currentUser.email);
+  const gravatarUrl = useGravatar(layoutProps.allowGravatar ? currentUser.email : null);
   const [popperAnchorEl, setPopperAnchorEl] = useState(null);
 
   const onProfileClick = (event: React.MouseEvent) => {
@@ -109,8 +109,9 @@ const UserProfile = () => {
         <Avatar
           className={classes.iconButton}
           alt={currentUser.name}
-          src={currentUser.avatar ? currentUser.avatar : gravatarUrl}
-        />
+          src={currentUser.avatar ? currentUser.avatar : gravatarUrl}>
+            {currentUser.name.split(" ", 2).map((n)=>n[0].toUpperCase()).join("")}
+        </Avatar>
         <Popper
           open={isPopperOpen}
           anchorEl={popperAnchorEl}
@@ -130,8 +131,9 @@ const UserProfile = () => {
                           height: theme.spacing(8),
                         }}
                         alt={currentUser.name}
-                        src={currentUser.avatar ? currentUser.avatar : gravatarUrl}
-                      />
+                        src={currentUser.avatar ? currentUser.avatar : gravatarUrl}>
+                          {currentUser.name.split(" ", 2).map((n)=>n[0].toUpperCase()).join("")}
+                      </Avatar>
                       <Box pl={2}>
                         <Typography variant={"body1"} noWrap>
                           <b>{currentUser.name}</b>

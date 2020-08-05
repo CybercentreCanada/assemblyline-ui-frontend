@@ -254,6 +254,7 @@ const useMyLayout = (): AppLayoutProps => {
 
   return {
     appName: "Assemblyline",
+    allowGravatar: true,
     allowQuickSearch: true,
     allowReset: false,
     appIconDark: darkLogo,
