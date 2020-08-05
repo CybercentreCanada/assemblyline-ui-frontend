@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useSnackbar, OptionsObject } from "notistack";
 
@@ -34,7 +34,8 @@ function Logout(){
 
     hideMenus()
 
-    fetch('/api/v4/auth/logout/', requestOptions)
+    useEffect( () => {
+        fetch('/api/v4/auth/logout/', requestOptions)
         .then(res => {
             return res.json()
         })
@@ -59,6 +60,8 @@ function Logout(){
                 }, 500)
             }
         });
+    // eslint-disable-next-line
+    }, [])
 
     return (
         <CardCentered>
