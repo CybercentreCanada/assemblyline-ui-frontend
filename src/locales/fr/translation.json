@@ -35,6 +35,7 @@
     "page.login.error": "Tapez simplement n'importe quoi dans les champs du nom d'utilisateur et du mot de passe ...",
     "page.login.username": "Nom d'utilisateur",
     "page.login.password": "Mot de passe",
+    "page.login.otp": "Mot de passe à usage unique",
     "page.login.button": "Se connecter",
     "page.logout": "Déconnexion de l'utilisateur actuel ... ",
     "page.submission": "Soumissions", 

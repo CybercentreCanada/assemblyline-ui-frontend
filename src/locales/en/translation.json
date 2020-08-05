@@ -35,6 +35,7 @@
     "page.login.error": "Just type anything in both username and password fields...",
     "page.login.username": "Username",
     "page.login.password": "Password",
+    "page.login.otp": "OTP Token",
     "page.login.button": "Sign in",
     "page.logout": "Logging out current user ... ",
     "page.submission": "Submissions", 

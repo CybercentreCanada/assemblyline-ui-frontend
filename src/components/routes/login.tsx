@@ -19,12 +19,74 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-function UserPassLogin(){
+type OTPProps = {
+    login: () => void,
+    buttonLoading: boolean;
+    setOTP: (value: string) => void
+};
+  
+function OTPLogin(props: OTPProps){
     const { t } = useTranslation();
     const classes = useStyles();
+
+    function onSubmit(event) {
+        props.login();
+        event.preventDefault();
+    }
+
+    return (
+        <form onSubmit={onSubmit}>
+            <Box display={"flex"} flexDirection={"column"}>
+                <TextField autoFocus variant={"outlined"} size={"small"} label={t("page.login.otp")} onChange={(event) => props.setOTP(event.target.value)}/>
+                <Button type="submit" style={{marginTop: "1.5rem"}} variant={"contained"} color={"primary"} disabled={props.buttonLoading}>
+                    {t("page.login.button")}
+                    {props.buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                </Button>
+                
+            </Box>
+        </form>
+    );
+}
+
+type LoginProps = {
+    login: () => void,
+    buttonLoading: boolean;
+    setPassword: (value: string) => void, 
+    setUsername: (value: string) => void
+};
+  
+function UserPassLogin(props: LoginProps){
+    const { t } = useTranslation();
+    const classes = useStyles();
+
+    function onSubmit(event) {
+        props.login();
+        event.preventDefault();
+    }
+
+    return (
+        <form onSubmit={onSubmit}>
+            <Box display={"flex"} flexDirection={"column"}>
+                <TextField autoFocus variant={"outlined"} size={"small"} label={t("page.login.username")} onChange={(event) => props.setUsername(event.target.value)}/>
+                <TextField style={{marginTop: ".5rem"}} variant={"outlined"} size={"small"} type="password" label={t("page.login.password")} onChange={event => props.setPassword(event.target.value)}/>
+                <Button type="submit" style={{marginTop: "1.5rem"}} variant={"contained"} color={"primary"} disabled={props.buttonLoading}>
+                    {t("page.login.button")}
+                    {props.buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                </Button>
+                
+            </Box>
+        </form>
+    );
+}
+
+export default function LoginScreen(){
+    const theme = useTheme();
+    const { getBanner } = useAppLayout();
+    const [renderedLoginMethod, setRenderedLoginMethod] = useState(null);
     const { enqueueSnackbar, closeSnackbar }  = useSnackbar();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [OTP, setOTP] = useState("");
     const [buttonLoading, setButtonLoading] = useState(false);
     const snackBarOptions: OptionsObject = {
         variant: "error",
@@ -38,12 +100,7 @@ function UserPassLogin(){
         }
     }
 
-    function onSubmit(event) {
-        login(username, password);
-        event.preventDefault();
-    }
-
-    function login(username_p, password_p){
+    function login(){
         if (buttonLoading){
             return
         }
@@ -54,7 +111,7 @@ function UserPassLogin(){
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({user: username_p, password: password_p})
+            body: JSON.stringify({user: username, password: password, otp: OTP})
         };
 
         setButtonLoading(true);
@@ -71,11 +128,15 @@ function UserPassLogin(){
                     }
             })
             .then(api_data => {
+                console.log(api_data)
                 setButtonLoading(false)
                 if (api_data === undefined || !api_data.hasOwnProperty('api_status_code')){
                     enqueueSnackbar("Invalid data returned by API server.", snackBarOptions);
                 }
                 else if (api_data.api_status_code !== 200){
+                    if (api_data.api_error_message === "Wrong OTP token"){
+                        setRenderedLoginMethod(<OTPLogin login={login} buttonLoading={buttonLoading} setOTP={setOTP}/>)
+                    }
                     enqueueSnackbar(api_data.api_error_message, snackBarOptions);
                 }
                 else {
@@ -85,30 +146,9 @@ function UserPassLogin(){
     }
 
     return (
-        <form onSubmit={onSubmit}>
-            <Box display={"flex"} flexDirection={"column"}>
-                <TextField autoFocus variant={"outlined"} size={"small"} label={t("page.login.username")} onChange={(event) => setUsername(event.target.value)}/>
-                <TextField style={{marginTop: ".5rem"}} variant={"outlined"} size={"small"} type="password" label={t("page.login.password")} onChange={event => setPassword(event.target.value)}/>
-                <Button type="submit" style={{marginTop: "1.5rem"}} variant={"contained"} color={"primary"} disabled={buttonLoading}>
-                    {t("page.login.button")}
-                    {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
-                </Button>
-                
-            </Box>
-        </form>
-    );
-}
-
-function LoginScreen(){
-    const theme = useTheme();
-    const { getBanner } = useAppLayout();
-
-    return (
         <CardCentered>
             <Box color={theme.palette.primary.main} fontSize="30pt">{ getBanner(theme) }</Box>
-            <UserPassLogin/>
+            {renderedLoginMethod ? renderedLoginMethod : <UserPassLogin login={login} buttonLoading={buttonLoading} setPassword={setPassword} setUsername={setUsername}/>}
         </CardCentered>
     );
 }
-
-export default LoginScreen;
