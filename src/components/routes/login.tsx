@@ -1,11 +1,15 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import { useTranslation } from "react-i18next";
 
 import { useSnackbar, OptionsObject } from 'notistack';
-import { Button, TextField, Box, useTheme, CircularProgress, createStyles, makeStyles, Theme } from "@material-ui/core";
+import { Button, TextField, Box, useTheme, CircularProgress, createStyles, makeStyles, Theme, Typography } from "@material-ui/core";
+import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 
 import CardCentered from 'commons/components/layout/pages/CardCentered';
 import useAppLayout from "commons/components/hooks/useAppLayout";
+import toArrayBuffer from "helpers/toArrayBuffer";
+
+const CBOR = require('helpers/cbor.js')
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -18,6 +22,92 @@ const useStyles = makeStyles((theme: Theme) =>
     }
   }),
 );
+
+type SecTokenProps = {
+    enqueueSnackbar: (message, options) => void,
+    login: (focusTarget) => void,
+    setShownControls: (value: string) => void,
+    setWebAuthNResponse: (value: number[]) => void,
+    snackBarOptions: OptionsObject,
+    username: string
+};
+  
+function SecurityTokenLogin(props: SecTokenProps){  
+    const { t } = useTranslation();
+    const requestOptions: RequestInit = {
+        method: 'GET',
+        credentials: "same-origin",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    };
+
+    useEffect( () => {
+        fetch(`/api/v4/webauthn/authenticate/begin/${props.username}/`, requestOptions)
+        .then(res => {
+            return res.json()
+        })
+        .catch(() => {
+            return {
+                    api_error_message: "API server unreachable.",
+                    api_response: "",
+                    api_server_version: "4.0.0",
+                    api_status_code: 400
+                }
+        })
+        .then(api_data => {
+            if (api_data === undefined || !api_data.hasOwnProperty('api_status_code')){
+                props.enqueueSnackbar("Invalid data returned by API server.", props.snackBarOptions);
+            }
+            else if (api_data.api_status_code !== 200){
+                props.enqueueSnackbar(api_data.api_error_message, props.snackBarOptions);
+            }
+            else {
+                let arrayData = toArrayBuffer(api_data.api_response);
+                const options = CBOR.decode(arrayData.buffer);
+                const credentialHelper = navigator.credentials;
+                if (credentialHelper !== undefined){
+                    credentialHelper.get(options).then(
+                        function(assertion) {
+                            let assertion_data = CBOR.encode({})
+                            /*
+                            let assertion_data = CBOR.encode({
+                                "credentialId": new Uint8Array(assertion.rawId),
+                                "authenticatorData": new Uint8Array(assertion.response.authenticatorData),
+                                "clientDataJSON": new Uint8Array(assertion.response.clientDataJSON),
+                                "signature": new Uint8Array(assertion.response.signature)
+                            });
+                            */
+    
+                            props.setWebAuthNResponse(Array.from(new Uint8Array(assertion_data)))
+                            props.login(null)
+                        }).catch(
+                            function(ex) {
+                                if (ex.indexOf("invalid domain") !== 0){
+
+                                }
+                                props.setShownControls("otp")
+                                props.enqueueSnackbar(t("page.login.securitytoken.unavailable"), props.snackBarOptions);
+                        });
+                }
+                else{
+                    props.setShownControls("otp")
+                    props.enqueueSnackbar(t("page.login.securitytoken.unavailable"), props.snackBarOptions);
+                }
+            }
+        });
+    // eslint-disable-next-line
+    }, [])
+
+    return (
+        <Box display={"flex"} flexDirection={"column"} textAlign="center">
+            <Box>
+                <LockOutlinedIcon style={{fontSize: "108pt"}} color="action"/>
+            </Box>
+            <Typography variant="h6" color="textSecondary">{t("page.login.securitytoken")}</Typography>
+        </Box>
+    );
+}
 
 type OTPProps = {
     onSubmit: (event) => void,
@@ -77,6 +167,7 @@ export default function LoginScreen(){
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [oneTimePass, setOneTimePass] = useState("");
+    const [webAuthNResponse, setWebAuthNResponse] = useState([]);
     const [buttonLoading, setButtonLoading] = useState(false);
     const snackBarOptions: OptionsObject = {
         variant: "error",
@@ -106,7 +197,12 @@ export default function LoginScreen(){
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({user: username, password: password, otp: oneTimePass})
+            body: JSON.stringify({
+                user: username, 
+                password: password, 
+                otp: oneTimePass,
+                webauthn_auth_resp: webAuthNResponse,
+            })
         };
 
         setButtonLoading(true);
@@ -131,10 +227,15 @@ export default function LoginScreen(){
                     if (api_data.api_error_message === "Wrong OTP token" && shownControls !== 'otp'){
                         setShownControls("otp")
                     }
+                    else if (api_data.api_error_message === "Wrong Security Token" && shownControls !== "sectoken"){
+                        setShownControls("sectoken")
+                    }
                     else{
                         enqueueSnackbar(api_data.api_error_message, snackBarOptions);
-                        focusTarget.select()
-                        focusTarget.focus()
+                        if (focusTarget !== null){
+                            focusTarget.select()
+                            focusTarget.focus()
+                        }
                     }
                 }
                 else {
@@ -149,7 +250,8 @@ export default function LoginScreen(){
             {
                 {
                     'up': <UserPassLogin onSubmit={onSubmit} buttonLoading={buttonLoading} setPassword={setPassword} setUsername={setUsername}/>,
-                    'otp': <OneTimePassLogin onSubmit={onSubmit} buttonLoading={buttonLoading} setOneTimePass={setOneTimePass}/>
+                    'otp': <OneTimePassLogin onSubmit={onSubmit} buttonLoading={buttonLoading} setOneTimePass={setOneTimePass}/>,
+                    'sectoken': <SecurityTokenLogin setShownControls={setShownControls} enqueueSnackbar={enqueueSnackbar} snackBarOptions={snackBarOptions} login={login} setWebAuthNResponse={setWebAuthNResponse} username={username}/>
                 }[shownControls]
             }
         </CardCentered>
