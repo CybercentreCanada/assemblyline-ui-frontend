@@ -262,7 +262,7 @@ export default function LoginScreen(props){
                                     <TextDivider/>
                                     <Box display="flex" flexDirection="column" justifyContent="space-between">
                                         {props.oAuthProviders.map((item, idx) => (
-                                            <Button style={idx !== 0 ? {marginTop: "1.5rem"} : null} variant={"contained"} color={"primary"} disabled={props.buttonLoading}>
+                                            <Button key={idx} style={idx !== 0 ? {marginTop: "1.5rem"} : null} variant={"contained"} color={"primary"} disabled={props.buttonLoading} href={`/api/v4/auth/login/?oauth_provider=${item}`}>
                                                 {`${t("page.login.button_oauth")} ${item}`}
                                                 {props.buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
                                             </Button>
