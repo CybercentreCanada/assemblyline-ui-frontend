@@ -83,9 +83,7 @@ function SecurityTokenLogin(props: SecTokenProps){
                             props.login(null)
                         }).catch(
                             function(ex) {
-                                if (ex.indexOf("invalid domain") !== 0){
-
-                                }
+                                console.log(`${ex.name}: ${ex.message}`)
                                 props.setShownControls("otp")
                                 props.enqueueSnackbar(t("page.login.securitytoken.unavailable"), props.snackBarOptions);
                         });
