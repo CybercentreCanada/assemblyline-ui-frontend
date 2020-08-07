@@ -36,6 +36,7 @@
     "page.login.password": "Password",
     "page.login.otp": "One Time Password",
     "page.login.button": "Sign in",
+    "page.login.button_oauth": "Sign in with",
     "page.login.securitytoken": "Please touch the flashing security token now...",
     "page.login.securitytoken.error": "Security token was invalid or operation was cancelled. Try with One Time Password instead...",
     "page.login.securitytoken.unavailable": "Cannot use security token on this server. Use One Time Password instead...",

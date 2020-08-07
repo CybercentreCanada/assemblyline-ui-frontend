@@ -10,6 +10,9 @@ import LoginScreen from "components/routes/login";
 import LoadingScreen from "components/routes/loading";
 import Routes from "components/routes/routes";
 
+// This should be defined from an outside source
+const OAUTH_PROVIDERS = ["azure_ad", "google"]
+
 type AppProps = {};
 
 const App: React.FC<AppProps> = () => {  
@@ -33,12 +36,12 @@ const App: React.FC<AppProps> = () => {
         },
         error => {
           console.log(error);
-          setRenderedApp(<LoginScreen/>)
+          setRenderedApp(<LoginScreen oAuthProviders={OAUTH_PROVIDERS}/>)
         }
       )
       .then(result => {
         if (result === undefined || !result.hasOwnProperty('api_response')){
-          setRenderedApp(<LoginScreen/>)
+          setRenderedApp(<LoginScreen oAuthProviders={OAUTH_PROVIDERS}/>)
         }
         else{
           setUser(result.api_response);
@@ -47,7 +50,7 @@ const App: React.FC<AppProps> = () => {
       },
       error => {
           console.log(error);
-          setRenderedApp(<LoginScreen/>)
+          setRenderedApp(<LoginScreen oAuthProviders={OAUTH_PROVIDERS}/>)
       })
   }, []);
   return (

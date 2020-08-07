@@ -8,6 +8,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import CardCentered from 'commons/components/layout/pages/CardCentered';
 import useAppLayout from "commons/components/hooks/useAppLayout";
 import toArrayBuffer from "helpers/toArrayBuffer";
+import TextDivider from "components/visual/text_divider";
 
 const CBOR = require('helpers/cbor.js')
 
@@ -157,8 +158,14 @@ function UserPassLogin(props: LoginProps){
     );
 }
 
-export default function LoginScreen(){
+type LoginScreenProps = {
+    oAuthProviders: string[]
+};
+
+export default function LoginScreen(props){
+    const { t } = useTranslation();
     const theme = useTheme();
+    const classes = useStyles();
     const { getBanner } = useAppLayout();
     const [shownControls, setShownControls] = useState("up");
     const { enqueueSnackbar, closeSnackbar }  = useSnackbar();
@@ -247,7 +254,22 @@ export default function LoginScreen(){
             <Box color={theme.palette.primary.main} fontSize="30pt">{ getBanner(theme) }</Box>
             {
                 {
-                    'up': <UserPassLogin onSubmit={onSubmit} buttonLoading={buttonLoading} setPassword={setPassword} setUsername={setUsername}/>,
+                    'up': 
+                        <>
+                            <UserPassLogin onSubmit={onSubmit} buttonLoading={buttonLoading} setPassword={setPassword} setUsername={setUsername}/>
+                            {props.oAuthProviders !== undefined && props.oAuthProviders.length !== 0 ? 
+                                <>
+                                    <TextDivider/>
+                                    <Box display="flex" flexDirection="column" justifyContent="space-between">
+                                        {props.oAuthProviders.map((item, idx) => (
+                                            <Button style={idx !== 0 ? {marginTop: "1.5rem"} : null} variant={"contained"} color={"primary"} disabled={props.buttonLoading}>
+                                                {`${t("page.login.button_oauth")} ${item}`}
+                                                {props.buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                                            </Button>
+                                        ))}
+                                    </Box>
+                                </> : null }
+                        </>,
                     'otp': <OneTimePassLogin onSubmit={onSubmit} buttonLoading={buttonLoading} setOneTimePass={setOneTimePass}/>,
                     'sectoken': <SecurityTokenLogin setShownControls={setShownControls} enqueueSnackbar={enqueueSnackbar} snackBarOptions={snackBarOptions} login={login} setWebAuthNResponse={setWebAuthNResponse} username={username}/>
                 }[shownControls]
