@@ -1,0 +1,98 @@
+version: '2.4'
+
+services:
+  # Dependancies
+  minio:
+    image: minio/minio
+    environment:
+      MINIO_ACCESS_KEY: al_storage_key
+      MINIO_SECRET_KEY: Ch@ngeTh!sPa33w0rd
+    ports:
+      - '9000:9000'
+    command: server /data
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.8.0
+    environment:
+      - xpack.security.enabled=true
+      - discovery.type=single-node
+      - logger.level=WARN
+      - "ELASTIC_PASSWORD=devpass"
+      - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
+    ports:
+      - '9200:9200'
+    healthcheck:
+      test: ["CMD-SHELL", "curl --silent --fail -u elastic:$$ELASTIC_PASSWORD localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+
+  redis:
+    image: redis
+    ports:
+      - '6379:6379'
+      - '6380:6379'
+    healthcheck:
+      test: ["CMD", "redis-cli","ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  nginx:
+    image: cccs/nginx-ssl
+    volumes:
+      - ./minimal.template:/opt/minimal.template
+    ports:
+      - '80:80'
+      - '443:443'
+    environment:
+      - FRONTEND_HOST=10.162.228.5
+      - UI_HOST=10.162.228.5
+      - SOCKET_HOST=10.162.228.5
+      - FQDN=10.162.228.5.nip.io
+      - MAX_BODY_SIZE=100M
+      - TEMPLATE=minimal
+
+  # Create test data
+  create_test_data:
+    image: cccs/assemblyline-core
+    environment:
+      DEV_ADMIN_PASS: $DEV_ADMIN_PASS
+      DEV_USER_PASS: $DEV_USER_PASS
+    volumes:
+      - ./config.yml:/etc/assemblyline/config.yml:ro
+    restart: on-failure
+    command: python -m assemblyline.odm.random_data.create_test_data nosvc nosigs
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
+  # UI
+  al_ui:
+    image: cccs/assemblyline-ui
+    environment: 
+      - AL_UNSECURED_UI=true
+    ports:
+      - '5000:5000'
+    volumes:
+      - ./config.yml:/etc/assemblyline/config.yml:ro
+    restart: on-failure
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
+  # SocketIO Server
+  al_socketio:
+    image: cccs/assemblyline-socketio
+    ports:
+      - '5002:5002'
+    volumes:
+      - ./config.yml:/etc/assemblyline/config.yml:ro
+    restart: on-failure
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
+networks:
+  default:
+    name: external
