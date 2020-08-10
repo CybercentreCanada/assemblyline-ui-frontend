@@ -17,8 +17,7 @@ type AppProps = {};
 
 const App: React.FC<AppProps> = () => {  
   const [user, setUser] = useState(null);
-  // TODO: Switch renderedApp to a string with a switch case instead
-  const [renderedApp, setRenderedApp] = useState(null);
+  const [renderedApp, setRenderedApp] = useState("load");
 
   const layout = useMyLayout();
   useEffect(()=> {
@@ -37,28 +36,34 @@ const App: React.FC<AppProps> = () => {
           },
           error => {
             console.log(error);
-            setRenderedApp(<LoginScreen oAuthProviders={OAUTH_PROVIDERS}/>)
+            setRenderedApp("login")
           }
         )
         .then(result => {
           if (result === undefined || !result.hasOwnProperty('api_response')){
-            setRenderedApp(<LoginScreen oAuthProviders={OAUTH_PROVIDERS}/>)
+            setRenderedApp("login")
           }
           else{
             setUser(result.api_response);
-            setRenderedApp(<Routes/>);
+            setRenderedApp("routes");
           }
         },
         error => {
             console.log(error);
-            setRenderedApp(<LoginScreen oAuthProviders={OAUTH_PROVIDERS}/>)
+            setRenderedApp("login")
         })
   }, []);
   return (
     <BrowserRouter>
       <AppLayoutProvider value={layout} user={user}>
         <SnackbarProvider>
-          {renderedApp ? renderedApp : <LoadingScreen/>}
+          { 
+            {
+              "load": <LoadingScreen/>,
+              "login": <LoginScreen oAuthProviders={OAUTH_PROVIDERS}/>,
+              "routes": <Routes/>,
+            }[renderedApp]
+          }
         </SnackbarProvider>
       </AppLayoutProvider>
     </BrowserRouter>
