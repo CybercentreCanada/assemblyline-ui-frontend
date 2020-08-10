@@ -358,7 +358,7 @@ export default function LoginScreen(props){
 
     return (
         <CardCentered>
-            <Box style={{cursor: "pointer"}} onClick={() => setShownControls('up')}>{ getBanner(theme) }</Box>
+            <Box style={{cursor: "pointer"}} onClick={reset}>{ getBanner(theme) }</Box>
             {
                 {
                     'up': 
