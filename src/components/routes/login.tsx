@@ -26,9 +26,8 @@ const useStyles = makeStyles((theme: Theme) =>
 
 type SecTokenProps = {
     enqueueSnackbar: (message, options) => void,
-    login: (focusTarget) => void,
     setShownControls: (value: string) => void,
-    setWebAuthNResponse: (value: number[]) => void,
+    setWebAuthNResponse: (value) => void,
     snackBarOptions: OptionsObject,
     username: string
 };
@@ -69,24 +68,21 @@ function SecurityTokenLogin(props: SecTokenProps){
                 const credentialHelper = navigator.credentials;
                 if (credentialHelper !== undefined){
                     credentialHelper.get(options).then(
-                        function(assertion) {
-                            let assertion_data = CBOR.encode({})
-                            /*
+                        function(assertion: PublicKeyCredential) {
+                            let response = assertion.response as AuthenticatorAssertionResponse;
                             let assertion_data = CBOR.encode({
                                 "credentialId": new Uint8Array(assertion.rawId),
-                                "authenticatorData": new Uint8Array(assertion.response.authenticatorData),
-                                "clientDataJSON": new Uint8Array(assertion.response.clientDataJSON),
-                                "signature": new Uint8Array(assertion.response.signature)
+                                "authenticatorData": new Uint8Array(response.authenticatorData),
+                                "clientDataJSON": new Uint8Array(response.clientDataJSON),
+                                "signature": new Uint8Array(response.signature)
                             });
-                            */
-    
+                            
                             props.setWebAuthNResponse(Array.from(new Uint8Array(assertion_data)))
-                            props.login(null)
                         }).catch(
                             function(ex) {
                                 console.log(`${ex.name}: ${ex.message}`)
                                 props.setShownControls("otp")
-                                props.enqueueSnackbar(t("page.login.securitytoken.unavailable"), props.snackBarOptions);
+                                props.enqueueSnackbar(t("page.login.securitytoken.error"), props.snackBarOptions);
                         });
                 }
                 else{
@@ -172,7 +168,7 @@ export default function LoginScreen(props){
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [oneTimePass, setOneTimePass] = useState("");
-    const [webAuthNResponse, setWebAuthNResponse] = useState([]);
+    const [webAuthNResponse, setWebAuthNResponse] = useState(null);
     const [buttonLoading, setButtonLoading] = useState(false);
     const snackBarOptions: OptionsObject = {
         variant: "error",
@@ -232,6 +228,10 @@ export default function LoginScreen(props){
                     if (api_data.api_error_message === "Wrong OTP token" && shownControls !== 'otp'){
                         setShownControls("otp")
                     }
+                    else if (api_data.api_error_message === "Wrong Security Token" && shownControls === "sectoken"){
+                        setShownControls("otp")
+                        enqueueSnackbar(t("page.login.securitytoken.error"), snackBarOptions);
+                    }
                     else if (api_data.api_error_message === "Wrong Security Token" && shownControls !== "sectoken"){
                         setShownControls("sectoken")
                     }
@@ -249,9 +249,16 @@ export default function LoginScreen(props){
             });
     }
 
+    useEffect(() => {
+        if (webAuthNResponse !== null){
+            login(null)
+        }
+    // eslint-disable-next-line
+    }, [webAuthNResponse])
+
     return (
         <CardCentered>
-            <Box color={theme.palette.primary.main} fontSize="30pt">{ getBanner(theme) }</Box>
+            <Box color={theme.palette.primary.main} fontSize="30pt" style={{cursor: "pointer"}} onClick={() => setShownControls('up')}>{ getBanner(theme) }</Box>
             {
                 {
                     'up': 
@@ -271,7 +278,7 @@ export default function LoginScreen(props){
                                 </> : null }
                         </>,
                     'otp': <OneTimePassLogin onSubmit={onSubmit} buttonLoading={buttonLoading} setOneTimePass={setOneTimePass}/>,
-                    'sectoken': <SecurityTokenLogin setShownControls={setShownControls} enqueueSnackbar={enqueueSnackbar} snackBarOptions={snackBarOptions} login={login} setWebAuthNResponse={setWebAuthNResponse} username={username}/>
+                    'sectoken': <SecurityTokenLogin setShownControls={setShownControls} enqueueSnackbar={enqueueSnackbar} snackBarOptions={snackBarOptions} setWebAuthNResponse={setWebAuthNResponse} username={username}/>
                 }[shownControls]
             }
         </CardCentered>
