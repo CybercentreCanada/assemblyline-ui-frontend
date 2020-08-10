@@ -2,13 +2,16 @@ import React, {useState, useEffect} from "react";
 import { useTranslation } from "react-i18next";
 
 import { useSnackbar, OptionsObject } from 'notistack';
-import { Button, TextField, Box, useTheme, CircularProgress, createStyles, makeStyles, Theme, Typography } from "@material-ui/core";
+import { Button, TextField, Box, useTheme, CircularProgress, createStyles, makeStyles, Theme, Typography, Avatar, Link } from "@material-ui/core";
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 
 import CardCentered from 'commons/components/layout/pages/CardCentered';
 import useAppLayout from "commons/components/hooks/useAppLayout";
 import toArrayBuffer from "helpers/toArrayBuffer";
 import TextDivider from "components/visual/text_divider";
+import { useLocation } from "react-router-dom";
+import Skeleton from '@material-ui/lab/Skeleton';
+
 
 const CBOR = require('helpers/cbor.js')
 
@@ -34,7 +37,7 @@ type SecTokenProps = {
   
 function SecurityTokenLogin(props: SecTokenProps){  
     const { t } = useTranslation();
-    const requestOptions: RequestInit = {
+    const stRequestOptions: RequestInit = {
         method: 'GET',
         credentials: "same-origin",
         headers: {
@@ -43,7 +46,7 @@ function SecurityTokenLogin(props: SecTokenProps){
     };
 
     useEffect( () => {
-        fetch(`/api/v4/webauthn/authenticate/begin/${props.username}/`, requestOptions)
+        fetch(`/api/v4/webauthn/authenticate/begin/${props.username}/`, stRequestOptions)
         .then(res => {
             return res.json()
         })
@@ -104,6 +107,35 @@ function SecurityTokenLogin(props: SecTokenProps){
     );
 }
 
+type OAuthProps = {
+    avatar: string,
+    username: string,
+    oAuthToken: string,
+    buttonLoading: boolean,
+    onSubmit: (event) => void,
+    reset: (event) => void
+};
+  
+function OAuthLogin(props: OAuthProps){
+    const { t } = useTranslation();
+    const classes = useStyles();
+    const theme = useTheme()
+
+    return (        
+        <form onSubmit={props.onSubmit}>
+            <Box display={"flex"} flexDirection={"column"} textAlign="center" justifyContent="center">
+                {!props.oAuthToken ? <Skeleton variant="circle" style={{alignSelf: "center"}} width={144} height={144} /> :<Avatar style={{alignSelf: "center", width: theme.spacing(18), height: theme.spacing(18)}} src={props.avatar}/>}
+                <Typography color="textPrimary" gutterBottom={true}>{!props.oAuthToken ? <Skeleton /> :props.username }</Typography>
+                <Button type="submit" style={{marginTop: "1.5rem", marginBottom: "1.5rem"}} variant={"contained"} color={"primary"} disabled={props.buttonLoading}>
+                    {t("page.login.button")}
+                    {props.buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                </Button>
+                <Link variant="body2" href="#" onClick={props.reset}>{t('page.login.other')}</Link>
+            </Box>
+        </form>
+    );
+}
+
 type OTPProps = {
     onSubmit: (event) => void,
     buttonLoading: boolean;
@@ -127,6 +159,7 @@ function OneTimePassLogin(props: OTPProps){
         </form>
     );
 }
+
 
 type LoginProps = {
     onSubmit: (event) => void,
@@ -159,14 +192,18 @@ type LoginScreenProps = {
 };
 
 export default function LoginScreen(props){
+    const location = useLocation();
+    const params = new URLSearchParams(location.search);
     const { t } = useTranslation();
     const theme = useTheme();
     const classes = useStyles();
     const { getBanner } = useAppLayout();
-    const [shownControls, setShownControls] = useState("up");
+    const [shownControls, setShownControls] = useState(params.get("provider") ? "oauth" : "up");
     const { enqueueSnackbar, closeSnackbar }  = useSnackbar();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [avatar, setAvatar] = useState("");
+    const [oAuthToken, setOAuthToken] = useState("");
     const [oneTimePass, setOneTimePass] = useState("");
     const [webAuthNResponse, setWebAuthNResponse] = useState(null);
     const [buttonLoading, setButtonLoading] = useState(false);
@@ -187,27 +224,41 @@ export default function LoginScreen(props){
         event.preventDefault();
     }
 
+    function reset(event) {
+        setWebAuthNResponse(null)
+        setShownControls('up')
+        setUsername("")
+        setPassword("")
+        setAvatar("")
+        setOAuthToken("")
+        setOneTimePass("")
+        
+        event.preventDefault();
+    }
+
     function login(focusTarget){
         if (buttonLoading){
             return
         }
 
-        const requestOptions: RequestInit = {
+        const data = {
+            user: username, 
+            password: password, 
+            otp: oneTimePass,
+            webauthn_auth_resp: webAuthNResponse,
+            oauth_token: oAuthToken
+        }
+        const loginRequestOptions: RequestInit = {
             method: 'POST',
             credentials: "same-origin",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({
-                user: username, 
-                password: password, 
-                otp: oneTimePass,
-                webauthn_auth_resp: webAuthNResponse,
-            })
+            body: JSON.stringify(data)
         };
 
         setButtonLoading(true);
-        fetch('/api/v4/auth/login/', requestOptions)
+        fetch('/api/v4/auth/login/', loginRequestOptions)
             .then(res => {
                 return res.json()
             })
@@ -238,8 +289,10 @@ export default function LoginScreen(props){
                     else{
                         enqueueSnackbar(api_data.api_error_message, snackBarOptions);
                         if (focusTarget !== null){
-                            focusTarget.select()
-                            focusTarget.focus()
+                            if (focusTarget.hasOwnProperty('select')){
+                                focusTarget.select()
+                                focusTarget.focus()
+                            }
                         }
                     }
                 }
@@ -250,15 +303,57 @@ export default function LoginScreen(props){
     }
 
     useEffect(() => {
+        console.log("useEffect called ! ")
         if (webAuthNResponse !== null){
             login(null)
         }
+        if (shownControls === "oauth"){
+            console.log('oauth')
+
+            const oauthRequestOptions: RequestInit = {
+                method: 'GET',
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            };
+            
+            setButtonLoading(true);
+            fetch(`/api/v4/auth/oauth/${location.search}`, oauthRequestOptions)
+                .then(res => {
+                    return res.json()
+                })
+                .catch(() => {
+                    return {
+                            api_error_message: "API server unreachable.",
+                            api_response: "",
+                            api_server_version: "4.0.0",
+                            api_status_code: 400
+                        }
+                })
+                .then(api_data => {
+                    setButtonLoading(false)
+                    if (api_data === undefined || !api_data.hasOwnProperty('api_status_code')){
+                        enqueueSnackbar("Invalid data returned by API server.", snackBarOptions);
+                    }
+                    else if (api_data.api_status_code !== 200){
+                        enqueueSnackbar(api_data.api_error_message, snackBarOptions);
+                        setShownControls("up")
+                    }
+                    else {
+                        setAvatar(api_data.api_response.avatar)
+                        setUsername(api_data.api_response.username)
+                        setOAuthToken(api_data.api_response.oauth_token)
+                    }
+                });
+
+        }
     // eslint-disable-next-line
-    }, [webAuthNResponse])
+    }, [webAuthNResponse, shownControls])
 
     return (
         <CardCentered>
-            <Box color={theme.palette.primary.main} fontSize="30pt" style={{cursor: "pointer"}} onClick={() => setShownControls('up')}>{ getBanner(theme) }</Box>
+            <Box style={{cursor: "pointer"}} onClick={() => setShownControls('up')}>{ getBanner(theme) }</Box>
             {
                 {
                     'up': 
@@ -269,7 +364,7 @@ export default function LoginScreen(props){
                                     <TextDivider/>
                                     <Box display="flex" flexDirection="column" justifyContent="space-between">
                                         {props.oAuthProviders.map((item, idx) => (
-                                            <Button key={idx} style={idx !== 0 ? {marginTop: "1.5rem"} : null} variant={"contained"} color={"primary"} disabled={props.buttonLoading} href={`/api/v4/auth/login/?oauth_provider=${item}`}>
+                                            <Button key={idx} style={idx !== 0 ? {marginTop: "1.5rem"} : null} variant={"contained"} color={"primary"} disabled={props.buttonLoading} href={`/api/v4/auth/login/?redirect_to_login=false&oauth_provider=${item}`}>
                                                 {`${t("page.login.button_oauth")} ${item}`}
                                                 {props.buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
                                             </Button>
@@ -277,6 +372,7 @@ export default function LoginScreen(props){
                                     </Box>
                                 </> : null }
                         </>,
+                    'oauth': <OAuthLogin reset={reset} oAuthToken={oAuthToken} avatar={avatar} username={username} onSubmit={onSubmit} buttonLoading={buttonLoading}/>,
                     'otp': <OneTimePassLogin onSubmit={onSubmit} buttonLoading={buttonLoading} setOneTimePass={setOneTimePass}/>,
                     'sectoken': <SecurityTokenLogin setShownControls={setShownControls} enqueueSnackbar={enqueueSnackbar} snackBarOptions={snackBarOptions} setWebAuthNResponse={setWebAuthNResponse} username={username}/>
                 }[shownControls]

@@ -35,6 +35,7 @@
     "page.login.username": "Nom d'utilisateur",
     "page.login.password": "Mot de passe",
     "page.login.otp": "Mot de passe à usage unique",
+    "page.login.other": "Ou connectez-vous avec un utilisateur différent...",
     "page.login.button": "Se connecter",
     "page.login.button_oauth": "Se connecter avec",
     "page.login.securitytoken": "Veuillez toucher le jeton de sécurité clignotant",

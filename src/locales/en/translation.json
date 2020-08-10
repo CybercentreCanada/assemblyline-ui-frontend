@@ -35,6 +35,7 @@
     "page.login.username": "Username",
     "page.login.password": "Password",
     "page.login.otp": "One Time Password",
+    "page.login.other": "Or sign in as a different user...",
     "page.login.button": "Sign in",
     "page.login.button_oauth": "Sign in with",
     "page.login.securitytoken": "Please touch the flashing security token",
