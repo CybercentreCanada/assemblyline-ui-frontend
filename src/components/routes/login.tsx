@@ -126,10 +126,12 @@ function OAuthLogin(props: OAuthProps){
             <Box display={"flex"} flexDirection={"column"} textAlign="center" justifyContent="center">
                 {!props.oAuthToken ? <Skeleton variant="circle" style={{alignSelf: "center"}} width={144} height={144} /> :<Avatar style={{alignSelf: "center", width: theme.spacing(18), height: theme.spacing(18)}} src={props.avatar}/>}
                 <Typography color="textPrimary" gutterBottom={true}>{!props.oAuthToken ? <Skeleton /> :props.username }</Typography>
-                <Button type="submit" style={{marginTop: "1.5rem", marginBottom: "1.5rem"}} variant={"contained"} color={"primary"} disabled={props.buttonLoading}>
-                    {t("page.login.button")}
-                    {props.buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
-                </Button>
+                {!props.oAuthToken ? 
+                    <Skeleton style={{height: "56px", marginTop: "1.5rem", marginBottom: "1.5rem"}} /> : 
+                    <Button type="submit" style={{marginTop: "1.5rem", marginBottom: "1.5rem"}} variant={"contained"} color={"primary"} disabled={props.buttonLoading}>
+                        {t("page.login.button")}
+                        {props.buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                    </Button>}
                 <Link variant="body2" href="#" onClick={props.reset}>{t('page.login.other')}</Link>
             </Box>
         </form>
@@ -319,7 +321,6 @@ export default function LoginScreen(props){
                 }
             };
             
-            setButtonLoading(true);
             fetch(`/api/v4/auth/oauth/${location.search}`, oauthRequestOptions)
                 .then(res => {
                     return res.json()
