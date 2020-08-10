@@ -9,7 +9,7 @@ import CardCentered from 'commons/components/layout/pages/CardCentered';
 import useAppLayout from "commons/components/hooks/useAppLayout";
 import toArrayBuffer from "helpers/toArrayBuffer";
 import TextDivider from "components/visual/text_divider";
-import { useLocation } from "react-router-dom";
+import { useLocation, useHistory } from "react-router-dom";
 import Skeleton from '@material-ui/lab/Skeleton';
 
 
@@ -193,6 +193,7 @@ type LoginScreenProps = {
 
 export default function LoginScreen(props){
     const location = useLocation();
+    const history = useHistory();
     const params = new URLSearchParams(location.search);
     const { t } = useTranslation();
     const theme = useTheme();
@@ -344,6 +345,9 @@ export default function LoginScreen(props){
                         setAvatar(api_data.api_response.avatar)
                         setUsername(api_data.api_response.username)
                         setOAuthToken(api_data.api_response.oauth_token)
+                        if (params.get("provider")){
+                            history.push("/")
+                        }
                     }
                 });
 
