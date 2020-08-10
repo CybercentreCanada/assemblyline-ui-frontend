@@ -41,7 +41,7 @@ function Logout(){
         })
         .catch(() => {
             return {
-                    api_error_message: "API server unreachable.",
+                    api_error_message: t("api.unreachable"),
                     api_response: "",
                     api_server_version: "4.0.0",
                     api_status_code: 400
@@ -49,7 +49,7 @@ function Logout(){
         })
         .then(api_data => {
             if (api_data === undefined || !api_data.hasOwnProperty('api_status_code')){
-                enqueueSnackbar("Invalid data returned by API server.", snackBarOptions);
+                enqueueSnackbar(t("api.invalid"), snackBarOptions);
             }
             else if (api_data.api_status_code !== 200){
                 enqueueSnackbar(api_data.api_error_message, snackBarOptions);

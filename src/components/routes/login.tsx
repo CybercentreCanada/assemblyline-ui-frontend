@@ -52,7 +52,7 @@ function SecurityTokenLogin(props: SecTokenProps){
         })
         .catch(() => {
             return {
-                    api_error_message: "API server unreachable.",
+                    api_error_message: t("api.unreachable"),
                     api_response: "",
                     api_server_version: "4.0.0",
                     api_status_code: 400
@@ -60,7 +60,7 @@ function SecurityTokenLogin(props: SecTokenProps){
         })
         .then(api_data => {
             if (api_data === undefined || !api_data.hasOwnProperty('api_status_code')){
-                props.enqueueSnackbar("Invalid data returned by API server.", props.snackBarOptions);
+                props.enqueueSnackbar(t("api.invalid"), props.snackBarOptions);
             }
             else if (api_data.api_status_code !== 200){
                 props.enqueueSnackbar(api_data.api_error_message, props.snackBarOptions);
@@ -267,7 +267,7 @@ export default function LoginScreen(props){
             })
             .catch(() => {
                 return {
-                        api_error_message: "API server unreachable.",
+                        api_error_message: t("api.unreachable"),
                         api_response: "",
                         api_server_version: "4.0.0",
                         api_status_code: 400
@@ -276,7 +276,7 @@ export default function LoginScreen(props){
             .then(api_data => {
                 setButtonLoading(false)
                 if (api_data === undefined || !api_data.hasOwnProperty('api_status_code')){
-                    enqueueSnackbar("Invalid data returned by API server.", snackBarOptions);
+                    enqueueSnackbar(t("api.invalid"), snackBarOptions);
                 }
                 else if (api_data.api_status_code !== 200){
                     if (api_data.api_error_message === "Wrong OTP token" && shownControls !== 'otp'){
@@ -327,7 +327,7 @@ export default function LoginScreen(props){
                 })
                 .catch(() => {
                     return {
-                            api_error_message: "API server unreachable.",
+                            api_error_message: t("api.unreachable"),
                             api_response: "",
                             api_server_version: "4.0.0",
                             api_status_code: 400
@@ -336,7 +336,7 @@ export default function LoginScreen(props){
                 .then(api_data => {
                     setButtonLoading(false)
                     if (api_data === undefined || !api_data.hasOwnProperty('api_status_code')){
-                        enqueueSnackbar("Invalid data returned by API server.", snackBarOptions);
+                        enqueueSnackbar(t("api.invalid"), snackBarOptions);
                     }
                     else if (api_data.api_status_code !== 200){
                         enqueueSnackbar(api_data.api_error_message, snackBarOptions);

@@ -1,5 +1,7 @@
 {
     "app.language": "Language",
+    "api.unreachable": "API server unreachable",
+    "api.invalid": "Invalid data returned by API server",
     "banner.alt": "Assemblyline Banner",
     "logo.alt": "Assemblyline Logo",
     "drawer.alerts": "Alerts",
