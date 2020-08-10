@@ -53,6 +53,17 @@ services:
       - MAX_BODY_SIZE=100M
       - TEMPLATE=minimal
 
+  nginx_old:
+    image: cccs/nginx-ssl
+    ports:
+      - '8443:443'
+    environment:
+      - UI_HOST=10.162.228.5
+      - SOCKET_HOST=10.162.228.5
+      - FQDN=10.162.228.5.nip.io
+      - MAX_BODY_SIZE=100M
+      - TEMPLATE=minimal
+
   # Create test data
   create_test_data:
     image: cccs/assemblyline-core
@@ -70,8 +81,6 @@ services:
   # UI
   al_ui:
     image: cccs/assemblyline-ui
-    environment: 
-      - AL_UNSECURED_UI=true
     ports:
       - '5000:5000'
     volumes:
