@@ -17,7 +17,10 @@ export default function TextDivider(){
         marginLeft: "-30px",
         position: "absolute",
         top: "-10px",
-        width: "60px"
+        width: "60px",
+        [theme.breakpoints.down('xs')]: {
+          backgroundColor: theme.palette.background.default
+        },
       }
     }));
     const classes = useStyles();
