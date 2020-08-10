@@ -37,7 +37,7 @@
     "page.login.otp": "Mot de passe à usage unique",
     "page.login.button": "Se connecter",
     "page.login.button_oauth": "Se connecter avec",
-    "page.login.securitytoken": "Veuillez toucher le jeton de sécurité clignotant maintenant ...",
+    "page.login.securitytoken": "Veuillez toucher le jeton de sécurité clignotant",
     "page.login.securitytoken.error": "Le jeton de sécurité n'est pas valide ou l'opération a été annulée. Essayez plutôt avec un mot de passe unique...",
     "page.login.securitytoken.unavailable": "Impossible d'utiliser le jeton de sécurité sur ce serveur. Utilisez plutôt un mot de passe unique...",
     "page.logout": "Déconnexion de l'utilisateur actuel ... ",
