@@ -306,13 +306,10 @@ export default function LoginScreen(props){
     }
 
     useEffect(() => {
-        console.log("useEffect called ! ")
         if (webAuthNResponse !== null){
             login(null)
         }
         if (shownControls === "oauth"){
-            console.log('oauth')
-
             const oauthRequestOptions: RequestInit = {
                 method: 'GET',
                 credentials: "same-origin",
