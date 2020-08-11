@@ -518,9 +518,9 @@ export default function LoginScreen(props: LoginScreenProps){
                         setAvatar(api_data.api_response.avatar)
                         setUsername(api_data.api_response.username)
                         setOAuthToken(api_data.api_response.oauth_token)
-                        if (params.get("provider")){
-                            history.push("/")
-                        }
+                    }
+                    if (params.get("provider")){
+                        history.push("/")
                     }
                 });
 
