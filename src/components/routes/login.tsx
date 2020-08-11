@@ -333,7 +333,7 @@ function ResetPassword(props: ResetPasswordProps){
                 {done ? 
                     <Typography align="center">{t("page.login.reset.done")}</Typography> :
                     <>
-                        <TextField autoFocus type="email" variant={"outlined"} size={"small"} label={t("page.login.reset")} onChange={(event) => setEmail(event.target.value)}/>
+                        <TextField autoFocus type="email" variant={"outlined"} size={"small"} label={t("page.login.reset.email")} onChange={(event) => setEmail(event.target.value)}/>
                         <Button type="submit" style={{marginTop: "1.5rem"}} variant={"contained"} color={"primary"} disabled={props.buttonLoading}>
                             {t("page.login.reset.button")}
                             {props.buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
@@ -532,7 +532,7 @@ export default function LoginScreen(props: LoginScreenProps){
                         <>
                             {props.allowUserPass ? <UserPassLogin onSubmit={onSubmit} buttonLoading={buttonLoading} setPassword={setPassword} setUsername={setUsername}/> : null}
                             {props.allowSignup ? <Typography align="center" variant="caption" style={{marginTop: theme.spacing(2)}}>{t('page.login.signup')}&nbsp;<Link href="#" onClick={signup}>{t('page.login.signup.link')}</Link></Typography> : null }
-                            {props.allowPWReset ? <Typography align="center" variant="caption" style={{marginTop: theme.spacing(pwPadding)}}>{t('page.login.pw_reset')}&nbsp;<Link href="#" onClick={resetPW}>{t('page.login.pw_reset.link')}</Link></Typography> : null }
+                            {props.allowPWReset ? <Typography align="center" variant="caption" style={{marginTop: theme.spacing(pwPadding)}}>{t('page.login.reset.desc')}&nbsp;<Link href="#" onClick={resetPW}>{t('page.login.reset.link')}</Link></Typography> : null }
                             {props.oAuthProviders !== undefined && props.oAuthProviders.length !== 0 ? 
                                 <>
                                     {props.allowUserPass ? <TextDivider/> : null}
