@@ -390,13 +390,16 @@ export default function LoginScreen(props: LoginScreenProps){
     }
 
     function reset(event) {
-        setWebAuthNResponse(null)
-        setShownControls('up')
-        setUsername("")
-        setPassword("")
-        setAvatar("")
-        setOAuthToken("")
-        setOneTimePass("")
+        if ((shownControls === "oauth" && oAuthToken) || shownControls !== "oauth"){
+            setWebAuthNResponse(null)
+            setShownControls('up')
+            setUsername("")
+            setPassword("")
+            setAvatar("")
+            setOAuthToken("")
+            setOneTimePass("")
+            
+        }
         
         event.preventDefault();
     }
