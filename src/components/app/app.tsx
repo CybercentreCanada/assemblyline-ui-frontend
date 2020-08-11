@@ -21,10 +21,14 @@ type AppProps = {};
 
 const App: React.FC<AppProps> = () => {  
   const [user, setUser] = useState(null);
-  const [renderedApp, setRenderedApp] = useState("load");
+  const params = new URLSearchParams(window.location.search);
+  const [renderedApp, setRenderedApp] = useState(params.get("provider") ? "login" : "load");
 
   const layout = useMyLayout();
   useEffect(()=> {
+      if (params.get("provider")){
+        return;
+      }
       const requestOptions: RequestInit = {
           method: 'GET',
           headers: {
@@ -56,6 +60,7 @@ const App: React.FC<AppProps> = () => {
             console.log(error);
             setRenderedApp("login")
         })
+  // eslint-disable-next-line
   }, []);
   return (
     <BrowserRouter>
