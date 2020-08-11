@@ -12,6 +12,10 @@ import Routes from "components/routes/routes";
 
 // TODO: This should be defined from an outside source
 const OAUTH_PROVIDERS = ["azure_ad"]
+const ALLOW_USERPASS_LOGIN = true
+const ALLOW_SIGNUP = true
+const ALLOW_PW_RESET = true
+// END TODO
 
 type AppProps = {};
 
@@ -60,7 +64,8 @@ const App: React.FC<AppProps> = () => {
           { 
             {
               "load": <LoadingScreen/>,
-              "login": <LoginScreen oAuthProviders={OAUTH_PROVIDERS}/>,
+              "login": <LoginScreen oAuthProviders={OAUTH_PROVIDERS} allowUserPass={ALLOW_USERPASS_LOGIN} 
+                                    allowSignup={ALLOW_SIGNUP} allowPWReset={ALLOW_PW_RESET}/>,
               "routes": <Routes/>,
             }[renderedApp]
           }

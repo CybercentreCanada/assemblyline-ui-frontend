@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 type SecTokenProps = {
-    enqueueSnackbar: (message, options) => void,
+    enqueueSnackbar: (message: string, options: OptionsObject) => void,
     setShownControls: (value: string) => void,
     setWebAuthNResponse: (value) => void,
     snackBarOptions: OptionsObject,
@@ -189,11 +189,170 @@ function UserPassLogin(props: LoginProps){
     );
 }
 
+type ResetPasswordNowProps = {
+    buttonLoading: boolean, 
+    setButtonLoading: (value: boolean) => void,
+    enqueueSnackbar: (message: string, options: OptionsObject) => void,
+    snackBarOptions: OptionsObject,
+    setShownControls: (shownControls: string) => void
+};
+  
+function ResetPasswordNow(props: ResetPasswordNowProps){
+    const location = useLocation();
+    const history = useHistory();
+    const { t } = useTranslation();
+    const classes = useStyles();
+    const params = new URLSearchParams(location.search);
+    const [password, setPassword] = useState("");
+    const [passwordConfirm, setPasswordConfirm] = useState("");
+    const [done, setDone] = useState(false);
+
+    function onSubmit(event){
+        const resetRequestOptions: RequestInit = {
+            method: 'POST',
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                reset_id: params.get("reset_id"),
+                password: password, 
+                password_confirm: passwordConfirm
+            })
+        };
+        
+        props.setButtonLoading(true)
+        fetch(`/api/v4/auth/reset_pwd/`, resetRequestOptions)
+            .then(res => {
+                return res.json()
+            })
+            .catch(() => {
+                return {
+                        api_error_message: t("api.unreachable"),
+                        api_response: "",
+                        api_server_version: "4.0.0",
+                        api_status_code: 400
+                    }
+            })
+            .then(api_data => {
+                props.setButtonLoading(false)
+                if (api_data === undefined || !api_data.hasOwnProperty('api_status_code')){
+                    props.enqueueSnackbar(t("api.invalid"), props.snackBarOptions);
+                }
+                else if (api_data.api_status_code !== 200){
+                    props.enqueueSnackbar(api_data.api_error_message, props.snackBarOptions);
+                }
+                else {
+                    setDone(true)
+                    if (params.get("reset_id")){
+                        history.push("/")
+                    }
+                    setTimeout(() => props.setShownControls('up'), 7000) 
+                }
+            });
+        event.preventDefault()
+    }
+
+    return (
+        <form onSubmit={onSubmit}>
+            <Box display={"flex"} flexDirection={"column"}>
+                {done ? 
+                    <>
+                        <Typography align="center" variant="h6" gutterBottom={true}>{t("page.login.reset_now.done")}</Typography>
+                        <Typography align="center" variant="caption">{t("page.login.reset_now.redirect")}</Typography>
+                    </> :
+                    <>
+                        <TextField autoFocus type="password" variant={"outlined"} size={"small"} label={t("page.login.reset_now.password")} onChange={(event) => setPassword(event.target.value)}/>
+                        <TextField style={{marginTop: ".5rem"}} type="password" variant={"outlined"} size={"small"} label={t("page.login.reset_now.password_confirm")} onChange={(event) => setPasswordConfirm(event.target.value)}/>
+                        <Button type="submit" style={{marginTop: "1.5rem"}} variant={"contained"} color={"primary"} disabled={props.buttonLoading}>
+                            {t("page.login.reset_now.button")}
+                            {props.buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                        </Button>
+                    </>
+                }
+            </Box>
+        </form>
+    );
+}
+
+type ResetPasswordProps = {
+    buttonLoading: boolean, 
+    setButtonLoading: (value: boolean) => void,
+    enqueueSnackbar: (message: string, options: OptionsObject) => void,
+    snackBarOptions: OptionsObject,
+    setShownControls: (shownControls: string) => void
+};
+  
+function ResetPassword(props: ResetPasswordProps){
+    const { t } = useTranslation();
+    const classes = useStyles();
+    const [email, setEmail] = useState("");
+    const [done, setDone] = useState(false);
+
+    function onSubmit(event){
+        const resetRequestOptions: RequestInit = {
+            method: 'POST',
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({email: email})
+        };
+        
+        props.setButtonLoading(true)
+        fetch(`/api/v4/auth/get_reset_link/`, resetRequestOptions)
+            .then(res => {
+                return res.json()
+            })
+            .catch(() => {
+                return {
+                        api_error_message: t("api.unreachable"),
+                        api_response: "",
+                        api_server_version: "4.0.0",
+                        api_status_code: 400
+                    }
+            })
+            .then(api_data => {
+                props.setButtonLoading(false)
+                if (api_data === undefined || !api_data.hasOwnProperty('api_status_code')){
+                    props.enqueueSnackbar(t("api.invalid"), props.snackBarOptions);
+                }
+                else if (api_data.api_status_code !== 200){
+                    props.enqueueSnackbar(api_data.api_error_message, props.snackBarOptions);
+                }
+                else {
+                    setDone(true)
+                }
+            });
+        event.preventDefault()
+    }
+
+    return (
+        <form onSubmit={onSubmit}>
+            <Box display={"flex"} flexDirection={"column"}>
+                {done ? 
+                    <Typography align="center">{t("page.login.reset.done")}</Typography> :
+                    <>
+                        <TextField autoFocus type="email" variant={"outlined"} size={"small"} label={t("page.login.reset")} onChange={(event) => setEmail(event.target.value)}/>
+                        <Button type="submit" style={{marginTop: "1.5rem"}} variant={"contained"} color={"primary"} disabled={props.buttonLoading}>
+                            {t("page.login.reset.button")}
+                            {props.buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                        </Button>
+                    </>
+                }
+            </Box>
+        </form>
+    );
+}
+
 type LoginScreenProps = {
+    allowUserPass: boolean,
+    allowSignup: boolean,
+    allowPWReset: boolean,
     oAuthProviders: string[]
 };
 
-export default function LoginScreen(props){
+export default function LoginScreen(props: LoginScreenProps){
     const location = useLocation();
     const history = useHistory();
     const params = new URLSearchParams(location.search);
@@ -201,7 +360,7 @@ export default function LoginScreen(props){
     const theme = useTheme();
     const classes = useStyles();
     const { getBanner } = useAppLayout();
-    const [shownControls, setShownControls] = useState(params.get("provider") ? "oauth" : "up");
+    const [shownControls, setShownControls] = useState(params.get("provider") ? "oauth" : params.get("reset_id") ? "reset_now" : "up");
     const { enqueueSnackbar, closeSnackbar }  = useSnackbar();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -210,6 +369,7 @@ export default function LoginScreen(props){
     const [oneTimePass, setOneTimePass] = useState("");
     const [webAuthNResponse, setWebAuthNResponse] = useState(null);
     const [buttonLoading, setButtonLoading] = useState(false);
+    const pwPadding = props.allowSignup ? 1 : 2
     const snackBarOptions: OptionsObject = {
         variant: "error",
         autoHideDuration: 4000,
@@ -236,6 +396,16 @@ export default function LoginScreen(props){
         setOAuthToken("")
         setOneTimePass("")
         
+        event.preventDefault();
+    }
+
+    function resetPW(event) {
+        setShownControls('reset')
+        event.preventDefault();
+    }
+
+    function signup(event) {
+        setShownControls('signup')
         event.preventDefault();
     }
 
@@ -360,20 +530,25 @@ export default function LoginScreen(props){
                 {
                     'up': 
                         <>
-                            <UserPassLogin onSubmit={onSubmit} buttonLoading={buttonLoading} setPassword={setPassword} setUsername={setUsername}/>
+                            {props.allowUserPass ? <UserPassLogin onSubmit={onSubmit} buttonLoading={buttonLoading} setPassword={setPassword} setUsername={setUsername}/> : null}
+                            {props.allowSignup ? <Typography align="center" variant="caption" style={{marginTop: theme.spacing(2)}}>{t('page.login.signup')}&nbsp;<Link href="#" onClick={signup}>{t('page.login.signup.link')}</Link></Typography> : null }
+                            {props.allowPWReset ? <Typography align="center" variant="caption" style={{marginTop: theme.spacing(pwPadding)}}>{t('page.login.pw_reset')}&nbsp;<Link href="#" onClick={resetPW}>{t('page.login.pw_reset.link')}</Link></Typography> : null }
                             {props.oAuthProviders !== undefined && props.oAuthProviders.length !== 0 ? 
                                 <>
-                                    <TextDivider/>
+                                    {props.allowUserPass ? <TextDivider/> : null}
                                     <Box display="flex" flexDirection="column" justifyContent="space-between">
                                         {props.oAuthProviders.map((item, idx) => (
-                                            <Button key={idx} style={idx !== 0 ? {marginTop: "1.5rem"} : null} variant={"contained"} color={"primary"} disabled={props.buttonLoading} href={`/api/v4/auth/login/?redirect_to_login=false&oauth_provider=${item}`}>
+                                            <Button key={idx} style={idx !== 0 ? {marginTop: "1.5rem"} : null} variant={"contained"} color={"primary"} disabled={buttonLoading} href={`/api/v4/auth/login/?redirect_to_login=false&oauth_provider=${item}`}>
                                                 {`${t("page.login.button_oauth")} ${item}`}
-                                                {props.buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                                                {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
                                             </Button>
                                         ))}
                                     </Box>
                                 </> : null }
                         </>,
+                    'signup': <></>,
+                    'reset': <ResetPassword setShownControls={setShownControls} enqueueSnackbar={enqueueSnackbar} snackBarOptions={snackBarOptions} setButtonLoading={setButtonLoading} buttonLoading={buttonLoading}/>,
+                    'reset_now': <ResetPasswordNow setShownControls={setShownControls} enqueueSnackbar={enqueueSnackbar} snackBarOptions={snackBarOptions} setButtonLoading={setButtonLoading} buttonLoading={buttonLoading}/>,
                     'oauth': <OAuthLogin reset={reset} oAuthToken={oAuthToken} avatar={avatar} username={username} onSubmit={onSubmit} buttonLoading={buttonLoading}/>,
                     'otp': <OneTimePassLogin onSubmit={onSubmit} buttonLoading={buttonLoading} setOneTimePass={setOneTimePass}/>,
                     'sectoken': <SecurityTokenLogin setShownControls={setShownControls} enqueueSnackbar={enqueueSnackbar} snackBarOptions={snackBarOptions} setWebAuthNResponse={setWebAuthNResponse} username={username}/>
