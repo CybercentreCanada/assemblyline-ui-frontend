@@ -132,7 +132,9 @@ function OAuthLogin(props: OAuthProps){
                         {t("page.login.button")}
                         {props.buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
                     </Button>}
-                <Link variant="body2" href="#" onClick={props.reset}>{t('page.login.other')}</Link>
+                {!props.oAuthToken ?
+                    <Skeleton /> :
+                    <Link variant="body2" href="#" onClick={props.reset}>{t('page.login.other')}</Link>}
             </Box>
         </form>
     );
