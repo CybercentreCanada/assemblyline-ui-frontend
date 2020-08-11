@@ -1,19 +1,18 @@
 import React, {useState, useEffect} from "react";
 import { useTranslation } from "react-i18next";
+import { useLocation, useHistory } from "react-router-dom";
 
 import { useSnackbar, OptionsObject } from 'notistack';
-import { Button, TextField, Box, useTheme, CircularProgress, createStyles, makeStyles, Theme, Typography, Avatar, Link } from "@material-ui/core";
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import { Button, Box, useTheme, CircularProgress, createStyles, makeStyles, Theme, Typography, Link } from "@material-ui/core";
 
 import CardCentered from 'commons/components/layout/pages/CardCentered';
 import useAppLayout from "commons/components/hooks/useAppLayout";
-import toArrayBuffer from "helpers/toArrayBuffer";
+import { OAuthLogin } from "components/routes/login/oauth";
+import { OneTimePassLogin } from "components/routes/login/otp";
+import { ResetPassword, ResetPasswordNow } from "components/routes/login/reset"
+import { SecurityTokenLogin } from "components/routes/login/sectoken";
+import { UserPassLogin } from "components/routes/login/userpass";
 import TextDivider from "components/visual/text_divider";
-import { useLocation, useHistory } from "react-router-dom";
-import Skeleton from '@material-ui/lab/Skeleton';
-
-
-const CBOR = require('helpers/cbor.js')
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -26,326 +25,6 @@ const useStyles = makeStyles((theme: Theme) =>
     }
   }),
 );
-
-type SecTokenProps = {
-    enqueueSnackbar: (message: string, options: OptionsObject) => void,
-    setShownControls: (value: string) => void,
-    setWebAuthNResponse: (value) => void,
-    snackBarOptions: OptionsObject,
-    username: string
-};
-  
-function SecurityTokenLogin(props: SecTokenProps){  
-    const { t } = useTranslation();
-    const stRequestOptions: RequestInit = {
-        method: 'GET',
-        credentials: "same-origin",
-        headers: {
-            "Content-Type": "application/json"
-        }
-    };
-
-    useEffect( () => {
-        fetch(`/api/v4/webauthn/authenticate/begin/${props.username}/`, stRequestOptions)
-        .then(res => {
-            return res.json()
-        })
-        .catch(() => {
-            return {
-                    api_error_message: t("api.unreachable"),
-                    api_response: "",
-                    api_server_version: "4.0.0",
-                    api_status_code: 400
-                }
-        })
-        .then(api_data => {
-            if (api_data === undefined || !api_data.hasOwnProperty('api_status_code')){
-                props.enqueueSnackbar(t("api.invalid"), props.snackBarOptions);
-            }
-            else if (api_data.api_status_code !== 200){
-                props.enqueueSnackbar(api_data.api_error_message, props.snackBarOptions);
-            }
-            else {
-                let arrayData = toArrayBuffer(api_data.api_response);
-                const options = CBOR.decode(arrayData.buffer);
-                const credentialHelper = navigator.credentials;
-                if (credentialHelper !== undefined){
-                    credentialHelper.get(options).then(
-                        function(assertion: PublicKeyCredential) {
-                            let response = assertion.response as AuthenticatorAssertionResponse;
-                            let assertion_data = CBOR.encode({
-                                "credentialId": new Uint8Array(assertion.rawId),
-                                "authenticatorData": new Uint8Array(response.authenticatorData),
-                                "clientDataJSON": new Uint8Array(response.clientDataJSON),
-                                "signature": new Uint8Array(response.signature)
-                            });
-                            
-                            props.setWebAuthNResponse(Array.from(new Uint8Array(assertion_data)))
-                        }).catch(
-                            function(ex) {
-                                console.log(`${ex.name}: ${ex.message}`)
-                                props.setShownControls("otp")
-                                props.enqueueSnackbar(t("page.login.securitytoken.error"), props.snackBarOptions);
-                        });
-                }
-                else{
-                    props.setShownControls("otp")
-                    props.enqueueSnackbar(t("page.login.securitytoken.unavailable"), props.snackBarOptions);
-                }
-            }
-        });
-    // eslint-disable-next-line
-    }, [])
-
-    return (
-        <Box display={"flex"} flexDirection={"column"} textAlign="center">
-            <Box>
-                <LockOutlinedIcon style={{fontSize: "108pt"}} color="action"/>
-            </Box>
-            <Typography variant="h6" color="textSecondary">{t("page.login.securitytoken")}</Typography>
-        </Box>
-    );
-}
-
-type OAuthProps = {
-    avatar: string,
-    username: string,
-    oAuthToken: string,
-    buttonLoading: boolean,
-    onSubmit: (event) => void,
-    reset: (event) => void
-};
-  
-function OAuthLogin(props: OAuthProps){
-    const { t } = useTranslation();
-    const classes = useStyles();
-    const theme = useTheme()
-
-    return (        
-        <form onSubmit={props.onSubmit}>
-            <Box display={"flex"} flexDirection={"column"} textAlign="center" justifyContent="center">
-                {!props.oAuthToken ? <Skeleton variant="circle" style={{alignSelf: "center"}} width={144} height={144} /> :<Avatar style={{alignSelf: "center", width: theme.spacing(18), height: theme.spacing(18)}} src={props.avatar}/>}
-                <Typography color="textPrimary" gutterBottom={true}>{!props.oAuthToken ? <Skeleton /> :props.username }</Typography>
-                {!props.oAuthToken ? 
-                    <Skeleton style={{height: "56px", marginTop: "1.5rem", marginBottom: "1.5rem"}} /> : 
-                    <Button type="submit" style={{marginTop: "1.5rem", marginBottom: "1.5rem"}} variant={"contained"} color={"primary"} disabled={props.buttonLoading}>
-                        {t("page.login.button")}
-                        {props.buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
-                    </Button>}
-                {!props.oAuthToken ?
-                    <Skeleton /> :
-                    <Link variant="body2" href="#" onClick={props.reset}>{t('page.login.other')}</Link>}
-            </Box>
-        </form>
-    );
-}
-
-type OTPProps = {
-    onSubmit: (event) => void,
-    buttonLoading: boolean;
-    setOneTimePass: (value: string) => void
-};
-  
-function OneTimePassLogin(props: OTPProps){  
-    const { t } = useTranslation();
-    const classes = useStyles();
-
-    return (
-        <form onSubmit={props.onSubmit}>
-            <Box display={"flex"} flexDirection={"column"}>
-                <TextField inputProps={{ maxLength: 6 }} autoFocus variant={"outlined"} size={"small"} label={t("page.login.otp")} onChange={(event) => props.setOneTimePass(event.target.value)}/>
-                <Button type="submit" style={{marginTop: "1.5rem"}} variant={"contained"} color={"primary"} disabled={props.buttonLoading}>
-                    {t("page.login.button")}
-                    {props.buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
-                </Button>
-                
-            </Box>
-        </form>
-    );
-}
-
-
-type LoginProps = {
-    onSubmit: (event) => void,
-    buttonLoading: boolean;
-    setPassword: (value: string) => void, 
-    setUsername: (value: string) => void
-};
-  
-function UserPassLogin(props: LoginProps){
-    const { t } = useTranslation();
-    const classes = useStyles();
-
-    return (
-        <form onSubmit={props.onSubmit}>
-            <Box display={"flex"} flexDirection={"column"}>
-                <TextField autoFocus variant={"outlined"} size={"small"} label={t("page.login.username")} onChange={(event) => props.setUsername(event.target.value)}/>
-                <TextField style={{marginTop: ".5rem"}} variant={"outlined"} size={"small"} type="password" label={t("page.login.password")} onChange={event => props.setPassword(event.target.value)}/>
-                <Button type="submit" style={{marginTop: "1.5rem"}} variant={"contained"} color={"primary"} disabled={props.buttonLoading}>
-                    {t("page.login.button")}
-                    {props.buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
-                </Button>
-                
-            </Box>
-        </form>
-    );
-}
-
-type ResetPasswordNowProps = {
-    buttonLoading: boolean, 
-    setButtonLoading: (value: boolean) => void,
-    enqueueSnackbar: (message: string, options: OptionsObject) => void,
-    snackBarOptions: OptionsObject,
-    setShownControls: (shownControls: string) => void
-};
-  
-function ResetPasswordNow(props: ResetPasswordNowProps){
-    const location = useLocation();
-    const history = useHistory();
-    const { t } = useTranslation();
-    const classes = useStyles();
-    const params = new URLSearchParams(location.search);
-    const [password, setPassword] = useState("");
-    const [passwordConfirm, setPasswordConfirm] = useState("");
-    const [done, setDone] = useState(false);
-
-    function onSubmit(event){
-        const resetRequestOptions: RequestInit = {
-            method: 'POST',
-            credentials: "same-origin",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                reset_id: params.get("reset_id"),
-                password: password, 
-                password_confirm: passwordConfirm
-            })
-        };
-        
-        props.setButtonLoading(true)
-        fetch(`/api/v4/auth/reset_pwd/`, resetRequestOptions)
-            .then(res => {
-                return res.json()
-            })
-            .catch(() => {
-                return {
-                        api_error_message: t("api.unreachable"),
-                        api_response: "",
-                        api_server_version: "4.0.0",
-                        api_status_code: 400
-                    }
-            })
-            .then(api_data => {
-                props.setButtonLoading(false)
-                if (api_data === undefined || !api_data.hasOwnProperty('api_status_code')){
-                    props.enqueueSnackbar(t("api.invalid"), props.snackBarOptions);
-                }
-                else if (api_data.api_status_code !== 200){
-                    props.enqueueSnackbar(api_data.api_error_message, props.snackBarOptions);
-                }
-                else {
-                    setDone(true)
-                    if (params.get("reset_id")){
-                        history.push("/")
-                    }
-                    setTimeout(() => props.setShownControls('up'), 7000) 
-                }
-            });
-        event.preventDefault()
-    }
-
-    return (
-        <form onSubmit={onSubmit}>
-            <Box display={"flex"} flexDirection={"column"}>
-                {done ? 
-                    <>
-                        <Typography align="center" variant="h6" gutterBottom={true}>{t("page.login.reset_now.done")}</Typography>
-                        <Typography align="center" variant="caption">{t("page.login.reset_now.redirect")}</Typography>
-                    </> :
-                    <>
-                        <TextField autoFocus type="password" variant={"outlined"} size={"small"} label={t("page.login.reset_now.password")} onChange={(event) => setPassword(event.target.value)}/>
-                        <TextField style={{marginTop: ".5rem"}} type="password" variant={"outlined"} size={"small"} label={t("page.login.reset_now.password_confirm")} onChange={(event) => setPasswordConfirm(event.target.value)}/>
-                        <Button type="submit" style={{marginTop: "1.5rem"}} variant={"contained"} color={"primary"} disabled={props.buttonLoading}>
-                            {t("page.login.reset_now.button")}
-                            {props.buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
-                        </Button>
-                    </>
-                }
-            </Box>
-        </form>
-    );
-}
-
-type ResetPasswordProps = {
-    buttonLoading: boolean, 
-    setButtonLoading: (value: boolean) => void,
-    enqueueSnackbar: (message: string, options: OptionsObject) => void,
-    snackBarOptions: OptionsObject,
-    setShownControls: (shownControls: string) => void
-};
-  
-function ResetPassword(props: ResetPasswordProps){
-    const { t } = useTranslation();
-    const classes = useStyles();
-    const [email, setEmail] = useState("");
-    const [done, setDone] = useState(false);
-
-    function onSubmit(event){
-        const resetRequestOptions: RequestInit = {
-            method: 'POST',
-            credentials: "same-origin",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({email: email})
-        };
-        
-        props.setButtonLoading(true)
-        fetch(`/api/v4/auth/get_reset_link/`, resetRequestOptions)
-            .then(res => {
-                return res.json()
-            })
-            .catch(() => {
-                return {
-                        api_error_message: t("api.unreachable"),
-                        api_response: "",
-                        api_server_version: "4.0.0",
-                        api_status_code: 400
-                    }
-            })
-            .then(api_data => {
-                props.setButtonLoading(false)
-                if (api_data === undefined || !api_data.hasOwnProperty('api_status_code')){
-                    props.enqueueSnackbar(t("api.invalid"), props.snackBarOptions);
-                }
-                else if (api_data.api_status_code !== 200){
-                    props.enqueueSnackbar(api_data.api_error_message, props.snackBarOptions);
-                }
-                else {
-                    setDone(true)
-                }
-            });
-        event.preventDefault()
-    }
-
-    return (
-        <form onSubmit={onSubmit}>
-            <Box display={"flex"} flexDirection={"column"}>
-                {done ? 
-                    <Typography align="center">{t("page.login.reset.done")}</Typography> :
-                    <>
-                        <TextField autoFocus type="email" variant={"outlined"} size={"small"} label={t("page.login.reset.email")} onChange={(event) => setEmail(event.target.value)}/>
-                        <Button type="submit" style={{marginTop: "1.5rem"}} variant={"contained"} color={"primary"} disabled={props.buttonLoading}>
-                            {t("page.login.reset.button")}
-                            {props.buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
-                        </Button>
-                    </>
-                }
-            </Box>
-        </form>
-    );
-}
 
 type LoginScreenProps = {
     allowUserPass: boolean,
@@ -362,7 +41,7 @@ export default function LoginScreen(props: LoginScreenProps){
     const theme = useTheme();
     const classes = useStyles();
     const { getBanner } = useAppLayout();
-    const [shownControls, setShownControls] = useState(params.get("provider") ? "oauth" : params.get("reset_id") ? "reset_now" : "up");
+    const [shownControls, setShownControls] = useState(params.get("provider") ? "oauth" : params.get("reset_id") ? "reset_now" : "login");
     const { enqueueSnackbar, closeSnackbar }  = useSnackbar();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -392,7 +71,7 @@ export default function LoginScreen(props: LoginScreenProps){
     function reset(event) {
         if ((shownControls === "oauth" && oAuthToken) || shownControls !== "oauth"){
             setWebAuthNResponse(null)
-            setShownControls('up')
+            setShownControls("login")
             setUsername("")
             setPassword("")
             setAvatar("")
@@ -510,7 +189,7 @@ export default function LoginScreen(props: LoginScreenProps){
                     }
                     else if (api_data.api_status_code !== 200){
                         enqueueSnackbar(api_data.api_error_message, snackBarOptions);
-                        setShownControls("up")
+                        setShownControls("login")
                     }
                     else {
                         setAvatar(api_data.api_response.avatar)
@@ -531,7 +210,7 @@ export default function LoginScreen(props: LoginScreenProps){
             <Box style={{cursor: "pointer"}} onClick={reset}>{ getBanner(theme) }</Box>
             {
                 {
-                    'up': 
+                    "login": 
                         <>
                             {props.allowUserPass ? <UserPassLogin onSubmit={onSubmit} buttonLoading={buttonLoading} setPassword={setPassword} setUsername={setUsername}/> : null}
                             {props.allowSignup ? <Typography align="center" variant="caption" style={{marginTop: theme.spacing(2)}}>{t('page.login.signup')}&nbsp;<Link href="#" onClick={signup}>{t('page.login.signup.link')}</Link></Typography> : null }
