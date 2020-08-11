@@ -108,8 +108,7 @@ type ResetPasswordProps = {
     buttonLoading: boolean, 
     setButtonLoading: (value: boolean) => void,
     enqueueSnackbar: (message: string, options: OptionsObject) => void,
-    snackBarOptions: OptionsObject,
-    setShownControls: (shownControls: string) => void
+    snackBarOptions: OptionsObject
 };
   
 export function ResetPassword(props: ResetPasswordProps){

@@ -11,6 +11,7 @@ import { OAuthLogin } from "components/routes/login/oauth";
 import { OneTimePassLogin } from "components/routes/login/otp";
 import { ResetPassword, ResetPasswordNow } from "components/routes/login/reset"
 import { SecurityTokenLogin } from "components/routes/login/sectoken";
+import { SignUp } from "components/routes/login/signup";
 import { UserPassLogin } from "components/routes/login/userpass";
 import TextDivider from "components/visual/text_divider";
 
@@ -53,7 +54,18 @@ export default function LoginScreen(props: LoginScreenProps){
     const pwPadding = props.allowSignup ? 1 : 2
     const snackBarOptions: OptionsObject = {
         variant: "error",
-        autoHideDuration: 4000,
+        autoHideDuration: 5000,
+        anchorOrigin: {
+            vertical: 'bottom',
+            horizontal: 'center',
+        },
+        onClick: snack => {
+            closeSnackbar()
+        }
+    }
+    const snackBarSuccessOptions: OptionsObject = {
+        variant: "success",
+        autoHideDuration: 10000,
         anchorOrigin: {
             vertical: 'bottom',
             horizontal: 'center',
@@ -161,7 +173,7 @@ export default function LoginScreen(props: LoginScreenProps){
         if (webAuthNResponse !== null){
             login(null)
         }
-        if (shownControls === "oauth"){
+        else if (shownControls === "oauth"){
             const oauthRequestOptions: RequestInit = {
                 method: 'GET',
                 credentials: "same-origin",
@@ -202,6 +214,42 @@ export default function LoginScreen(props: LoginScreenProps){
                 });
 
         }
+        else if (params.get("registration_key")){
+            const signupRequestOptions: RequestInit = {
+                method: 'POST',
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({registration_key: params.get("registration_key")})
+            };
+            
+            fetch(`/api/v4/auth/signup_validate/`, signupRequestOptions)
+                .then(res => {
+                    return res.json()
+                })
+                .catch(() => {
+                    return {
+                            api_error_message: t("api.unreachable"),
+                            api_response: "",
+                            api_server_version: "4.0.0",
+                            api_status_code: 400
+                        }
+                })
+                .then(api_data => {
+                    setButtonLoading(false)
+                    if (api_data === undefined || !api_data.hasOwnProperty('api_status_code')){
+                        enqueueSnackbar(t("api.invalid"), snackBarOptions);
+                    }
+                    else if (api_data.api_status_code !== 200){
+                        enqueueSnackbar(api_data.api_error_message, snackBarOptions);
+                    }
+                    else {
+                        enqueueSnackbar(t('page.login.signup.completed'), snackBarSuccessOptions);
+                    }
+                    history.push("/")
+                });
+        }
     // eslint-disable-next-line
     }, [webAuthNResponse, shownControls])
 
@@ -228,8 +276,8 @@ export default function LoginScreen(props: LoginScreenProps){
                                     </Box>
                                 </> : null }
                         </>,
-                    'signup': <></>,
-                    'reset': <ResetPassword setShownControls={setShownControls} enqueueSnackbar={enqueueSnackbar} snackBarOptions={snackBarOptions} setButtonLoading={setButtonLoading} buttonLoading={buttonLoading}/>,
+                    'signup': <SignUp enqueueSnackbar={enqueueSnackbar} snackBarOptions={snackBarOptions} setButtonLoading={setButtonLoading} buttonLoading={buttonLoading}/>,
+                    'reset': <ResetPassword enqueueSnackbar={enqueueSnackbar} snackBarOptions={snackBarOptions} setButtonLoading={setButtonLoading} buttonLoading={buttonLoading}/>,
                     'reset_now': <ResetPasswordNow setShownControls={setShownControls} enqueueSnackbar={enqueueSnackbar} snackBarOptions={snackBarOptions} setButtonLoading={setButtonLoading} buttonLoading={buttonLoading}/>,
                     'oauth': <OAuthLogin reset={reset} oAuthToken={oAuthToken} avatar={avatar} username={username} onSubmit={onSubmit} buttonLoading={buttonLoading}/>,
                     'otp': <OneTimePassLogin onSubmit={onSubmit} buttonLoading={buttonLoading} setOneTimePass={setOneTimePass}/>,
