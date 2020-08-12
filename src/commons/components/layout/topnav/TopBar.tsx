@@ -6,10 +6,11 @@ import MenuIcon from '@material-ui/icons/Menu';
 import withWidth, { isWidthUp } from '@material-ui/core/withWidth';
 
 import useAppLayout from "commons/components/hooks/useAppLayout";
-import AppSwitcher from "./AppSwitcher";
-import QuickSearch from "./QuickSearch";
-import ThemeSelectionIcon from "./ThemeSelectionIcon";
-import UserProfile from "./UserProfile";
+import AppSwitcher from "commons/components/layout/topnav/AppSwitcher";
+import QuickSearch from "commons/components/layout/topnav/QuickSearch";
+import ThemeSelectionIcon from "commons/components/layout/topnav/ThemeSelectionIcon";
+import UserProfile from "commons/components/layout/topnav/UserProfile";
+import Breadcrumbs from "commons/components/layout/breadcrumbs/Breadcrumbs";
 
 
 function HideOnScroll(props) {
@@ -27,6 +28,7 @@ function HideOnScroll(props) {
     );
   }
   
+//  
 const useStyles = (layout) => {
     return makeStyles((theme) => ({
         appBar: {
@@ -75,7 +77,7 @@ type AppBarProps = {
 
 const TopBar: React.FC<AppBarProps> = (props) => {
     const theme = useTheme();
-    const {currentLayout, layoutProps, showQuickSearch, autoHideAppbar, getLogo, toggleDrawer} = useAppLayout();
+    const {currentLayout, layoutProps, showQuickSearch, autoHideAppbar, breadcrumbsEnabled, breadcrumbsPlacement, getLogo, toggleDrawer} = useAppLayout();
     const classes = useStyles(currentLayout);
     const isTopLayout = currentLayout === "top"
     
@@ -88,7 +90,7 @@ const TopBar: React.FC<AppBarProps> = (props) => {
         }
         return null;
     }
-    
+
     return <HideOnScroll enabled={!isTopLayout && autoHideAppbar}>
         <AppBar elevation={isTopLayout ? 2 : 0} position="fixed" className={classes.appBar} >
             <Toolbar disableGutters={isTopLayout} className={classes.toolbar}>
@@ -101,6 +103,7 @@ const TopBar: React.FC<AppBarProps> = (props) => {
                     <MenuIcon />
                 </IconButton>
                 {renderTitle()}
+                {layoutProps.allowBreadcrumbs && breadcrumbsEnabled && breadcrumbsPlacement === "topbar" ? <Breadcrumbs/> : null}
                 {layoutProps.allowQuickSearch && showQuickSearch && isWidthUp('sm', props.width) ? <QuickSearch /> : <Box flexGrow={1} /> }
                 {layoutProps.topnav.themeSelectionUnder === "icon" ? <ThemeSelectionIcon /> : null}
                 <AppSwitcher />

@@ -5,8 +5,8 @@ import ExpandMore from '@material-ui/icons/ExpandMore';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 
 import useAppLayout from "commons/components/hooks/useAppLayout";
-import LeftNavItem from "./LeftNavItem";
-import { LeftNavGroupProps } from "./LeftNavDrawer";
+import LeftNavItem from "commons/components/layout/leftnav/LeftNavItem";
+import { LeftNavGroupProps } from "commons/components/layout/leftnav/LeftNavDrawer";
 
 const LeftNavGroup: React.FC<LeftNavGroupProps> = ({open = true, id, title, icon, items}) => {
     const { drawerState} = useAppLayout();

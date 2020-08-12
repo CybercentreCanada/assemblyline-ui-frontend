@@ -22,8 +22,8 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import withWidth, { isWidthDown } from '@material-ui/core/withWidth';
 
 import useAppLayout from "commons/components/hooks/useAppLayout";
-import LeftNavGroup from "./LeftNavGroup";
-import LeftNavItem from "./LeftNavItem";
+import LeftNavGroup from "commons/components/layout/leftnav/LeftNavGroup";
+import LeftNavItem from "commons/components/layout/leftnav/LeftNavItem";
 
 const drawerWidth = 240;
 

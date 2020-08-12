@@ -1,16 +1,55 @@
 import React from "react";
-import { Typography, Box } from "@material-ui/core";
+import { Box, Button, IconButton } from "@material-ui/core";
+import useSitemap from "commons/components/hooks/useSitemap";
+import BreadcrumbLastItem from "commons/components/layout/breadcrumbs/BreadcrumbLastItem";
+import Breadcrumbs from "commons/components/layout/breadcrumbs/Breadcrumbs";
+
+
+export type PageHeaderAction = {
+  title?: string,
+  icon?: React.ReactNode,
+  color?: "primary" | "secondary"
+  action: () => void
+}
 
 type PageHeaderProps = {
-  title: string;
+  mode?: "title" | "breadcrumbs" | "provided"
+  actions?: PageHeaderAction[],
+  title?: React.ReactNode
 };
 
-const PageHeader: React.FC<PageHeaderProps> = ({ title }) => {
-  return (
-      <Box display="inline-block" pt={3}>
-        <Typography variant="h6">{title}</Typography>
+const PageHeader: React.FC<PageHeaderProps> = ({mode, title, actions}) => {
+  const {last} = useSitemap();
+
+  let comp = null;
+  switch(mode) {
+    case "breadcrumbs":
+      comp = <Breadcrumbs disableStyle={true} />
+      break;
+    case "provided":
+      comp = <Box display="inline-block" >{title}</Box>  
+      break;
+    default: 
+      comp = <Box component="span" >
+        <BreadcrumbLastItem item={last()} />
       </Box>
-  );
+  }
+
+  return <Box pb={1} display="flex" flexShrink={0} width="100%">
+    <Box display="inline-block" flexGrow={1}>{comp}</Box>
+    <Box display="inline-block">
+      {actions ? actions.map((a, i) => {
+        if(a.title) {
+          return <Button key={`ph-action-${i}`} startIcon={a.icon} color={a.color} onClick={a.action}>{a.title}</Button>
+        }
+        return <IconButton key={`ph-action-${i}`} color={a.color} onClick={a.action} >{a.icon}</IconButton>
+      }) : null}
+    </Box>    
+  </Box>
+
+
 };
 
 export default PageHeader;
+
+

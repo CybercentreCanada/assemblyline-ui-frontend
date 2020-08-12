@@ -6,7 +6,7 @@ import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import withWidth, { isWidthDown } from '@material-ui/core/withWidth';
 
 import useAppLayout from "commons/components/hooks/useAppLayout";
-import { LeftNavItemProps } from "./LeftNavDrawer";
+import { LeftNavItemProps } from "commons/components/layout/leftnav/LeftNavDrawer";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

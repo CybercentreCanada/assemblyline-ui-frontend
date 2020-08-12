@@ -1,0 +1,42 @@
+import React, { useState } from "react";
+
+import { makeStyles, Tooltip, Box } from "@material-ui/core";
+import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
+import { useTranslation } from "react-i18next";
+import BreadcrumbsLong from "commons/components/layout/breadcrumbs/BreadcrumbsLong";
+import { BreadcrumbItem } from "commons/components/hooks/useSitemap";
+
+const useStyles = makeStyles(({
+    moreicon: {
+        // opacity: 1,
+        verticalAlign: "bottom",
+        marginTop: "5px",
+        display: "inline-flex",
+         "&:hover": {
+            cursor: "pointer",
+        }
+    }    
+}))
+
+type BreadcrumbEllipsisItemProps = {
+    items: BreadcrumbItem[]
+}
+
+const BreadcrumbEllipsisItem: React.FC<BreadcrumbEllipsisItemProps> = ({items}) => {
+    const {t} = useTranslation();
+    const classes = useStyles();
+    const [open, setOpen] = useState(false)
+    const onToggleHidden = () => setOpen(!open)
+
+    const ellipsis = <Tooltip title={t(open ? "tooltip.breadcrumbs.min" :  "tooltip.breadcrumbs.max")} >
+        <MoreHorizIcon fontSize="small" className={classes.moreicon} onClick={onToggleHidden}  />
+    </Tooltip>
+
+    return <Box style={{display: "inline-flex"}}>
+        {ellipsis} {open ? <>&nbsp;&nbsp;</> : null}
+        {open ? <BreadcrumbsLong items={items} disableEllipsis={true} disableStyle={true} allLinks={true} /> : null}
+    </Box >       
+}    
+
+
+export default BreadcrumbEllipsisItem;

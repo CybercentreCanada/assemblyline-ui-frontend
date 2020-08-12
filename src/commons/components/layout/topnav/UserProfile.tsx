@@ -20,9 +20,7 @@ import {
 import useAppLayout from "commons/components/hooks/useAppLayout";
 import useGravatar from "commons/components/hooks/useGravatar";
 import { Link } from "react-router-dom";
-import ThemeSelection from "./ThemeSelection";
-
-
+import ThemeSelection from "commons/components/layout/topnav/ThemeSelection";
 
 const useStyles = makeStyles((theme) => ({
   popper: {
@@ -45,15 +43,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-
 export type UserProfileProps = {
-    username: string,
-    email: string,
-    name: string,
-    avatar: string,
-};
-
-export type UserMenuElement = {
+  username: string,
+  email: string,
+  name: string,
+  avatar: string,
+};export type UserMenuElement = {
   name: string,
   route: string,
   icon?: React.ReactElement<any>;

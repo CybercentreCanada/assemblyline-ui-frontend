@@ -28,7 +28,20 @@ const isLang = (lang: Lang): boolean => {
 const ThemeSelection = (props) => {
   const theme = useTheme();
   const { t } = useTranslation();
-  const { currentLayout, showQuickSearch, autoHideAppbar, layoutProps, toggleLayout, toggleTheme, toggleQuickSearch, toggleAutoHideAppbar} = useAppLayout();
+  const { 
+    currentLayout, 
+    showQuickSearch, 
+    autoHideAppbar, 
+    layoutProps, 
+    breadcrumbsEnabled, 
+    breadcrumbsState, 
+    toggleLayout, 
+    toggleTheme, 
+    toggleQuickSearch, 
+    toggleAutoHideAppbar, 
+    toggleShowBreadcrumbs, 
+    toggleBreadcrumbsState,
+  } = useAppLayout();
 
   const onToggleLanguage = () => {
     i18n.changeLanguage(
@@ -99,6 +112,29 @@ const ThemeSelection = (props) => {
             />
         </ListItemSecondaryAction>
       </ListItem>
+      {layoutProps.allowBreadcrumbs ? <><ListItem button disabled={isWidthDown("xs", props.width)} onClick={toggleShowBreadcrumbs}>
+          <ListItemText>{t("personalization.showbreadcrumbs")}</ListItemText>
+          <ListItemSecondaryAction>
+            <Switch
+              edge="end"
+              disabled={isWidthDown("xs", props.width)}
+              checked={breadcrumbsEnabled && isWidthUp("xs", props.width)}
+              onClick={toggleShowBreadcrumbs}
+              />
+          </ListItemSecondaryAction>
+        </ListItem>        
+        {breadcrumbsEnabled ? <ListItem button disabled={isWidthDown("xs", props.width)} onClick={toggleBreadcrumbsState}>
+        <ListItemText>{t("personalization.minimizebreadcrumbs")}</ListItemText>
+          <ListItemSecondaryAction>
+            <Switch
+              edge="end"
+              disabled={isWidthDown("xs", props.width)}
+              checked={!breadcrumbsState && isWidthUp("xs", props.width)}
+              onClick={toggleBreadcrumbsState}
+              />
+          </ListItemSecondaryAction>
+        </ListItem> : null}        
+      </>: null}
     </List>
     {layoutProps.allowReset ? 
       <Box>
