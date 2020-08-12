@@ -167,7 +167,7 @@ function AppLayoutProvider(props: LayoutProviderProps) {
   const breadcrumbsPlacement = props.value.breadcrumbsPlacement ? props.value.breadcrumbsPlacement : "topbar"  
 
 
-  const [showMenus, setShowMenus] = useState<boolean>(!!props.user)
+  const [showMenus, setShowMenus] = useState<boolean>(true)
   const [theme, setTheme] = useState<string>(initialTheme)
   const [drawer, setDrawer] = useState<boolean>(initialDrawer)
   const [breadcrumbsEnabled, setBreadcrumbsEnabled] = useState<boolean>(initialBreadcrumbsEnabled)

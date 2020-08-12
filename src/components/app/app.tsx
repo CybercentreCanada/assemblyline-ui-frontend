@@ -9,6 +9,7 @@ import useMyLayout from "components/hooks/useMyLayout";
 import LoginScreen from "components/routes/login";
 import LoadingScreen from "components/routes/loading";
 import Routes from "components/routes/routes";
+import Tos from "components/routes/tos";
 
 // TODO: This should be defined from an outside source
 const OAUTH_PROVIDERS = ["azure_ad"]
@@ -53,7 +54,12 @@ const App: React.FC<AppProps> = () => {
           }
           else{
             setUser(result.api_response);
-            setRenderedApp("routes");
+            if (!result.api_response.agrees_with_tos){
+              setRenderedApp("tos");
+            }
+            else{
+              setRenderedApp("routes");
+            }
           }
         },
         error => {
@@ -69,6 +75,7 @@ const App: React.FC<AppProps> = () => {
           { 
             {
               "load": <LoadingScreen/>,
+              "tos": <Tos/>,
               "login": <LoginScreen oAuthProviders={OAUTH_PROVIDERS} allowUserPass={ALLOW_USERPASS_LOGIN} 
                                     allowSignup={ALLOW_SIGNUP} allowPWReset={ALLOW_PW_RESET}/>,
               "routes": <Routes/>,
