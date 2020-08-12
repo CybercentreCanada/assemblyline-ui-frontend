@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { IconButton, useTheme, ClickAwayListener, Popper, Fade, Paper } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core";
 import TuneIcon from '@material-ui/icons/Tune';
-import ThemeSelection from "./ThemeSelection";
+import ThemeSelection from "commons/components/layout/topnav/ThemeSelection";
 
 const useStyles = () => {
     return makeStyles((theme) => ({
