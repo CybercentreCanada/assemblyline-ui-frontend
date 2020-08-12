@@ -268,7 +268,7 @@ export default function LoginScreen(props: LoginScreenProps){
                                     {props.allowUserPass ? <TextDivider/> : null}
                                     <Box display="flex" flexDirection="column" justifyContent="space-between">
                                         {props.oAuthProviders.map((item, idx) => (
-                                            <Button key={idx} style={idx !== 0 ? {marginTop: "1.5rem"} : null} variant={"contained"} color={"primary"} disabled={buttonLoading} onClick={() => localStorage.setItem(`nextLocation`, `${location.pathname}${location.search}`)} href={`/api/v4/auth/login/?redirect_to_login=false&oauth_provider=${item}`}>
+                                            <Button key={idx} style={idx !== 0 ? {marginTop: "1.5rem"} : null} variant={"contained"} color={"primary"} disabled={buttonLoading} onClick={() => localStorage.setItem(`nextLocation`, `${location.pathname}${location.search}`)} href={`/api/v4/auth/login/?oauth_provider=${item}`}>
                                                 {`${t("page.login.button_oauth")} ${item}`}
                                                 {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
                                             </Button>
