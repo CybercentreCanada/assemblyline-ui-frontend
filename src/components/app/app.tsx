@@ -10,6 +10,8 @@ import LoginScreen from "components/routes/login";
 import LoadingScreen from "components/routes/loading";
 import Routes from "components/routes/routes";
 import Tos from "components/routes/tos";
+import UserProvider from "commons/components/user/UserProvider";
+import useMyUser from "components/hooks/useMyUser";
 
 // TODO: This should be defined from an outside source
 const OAUTH_PROVIDERS = ["azure_ad"]
@@ -21,11 +23,12 @@ const ALLOW_PW_RESET = true
 type AppProps = {};
 
 const App: React.FC<AppProps> = () => {  
-  const [user, setUser] = useState(null);
   const params = new URLSearchParams(window.location.search);
   const [renderedApp, setRenderedApp] = useState(params.get("provider") ? "login" : "load");
 
   const layout = useMyLayout();
+  const myUser = useMyUser();
+
   useEffect(()=> {
       if (params.get("provider")){
         return;
@@ -45,15 +48,17 @@ const App: React.FC<AppProps> = () => {
           },
           error => {
             console.log(error);
+            myUser.setUser(null);
             setRenderedApp("login")
           }
         )
         .then(result => {
           if (result === undefined || !result.hasOwnProperty('api_response')){
+            myUser.setUser(null);
             setRenderedApp("login")
           }
           else{
-            setUser(result.api_response);
+            myUser.setUser(result.api_response);
             if (!result.api_response.agrees_with_tos){
               setRenderedApp("tos");
             }
@@ -64,25 +69,28 @@ const App: React.FC<AppProps> = () => {
         },
         error => {
             console.log(error);
+            myUser.setUser(null);
             setRenderedApp("login")
         })
   // eslint-disable-next-line
   }, []);
   return (
-    <BrowserRouter>
-      <AppLayoutProvider value={layout} user={user}>
-        <SnackbarProvider>
-          { 
-            {
-              "load": <LoadingScreen/>,
-              "tos": <Tos/>,
-              "login": <LoginScreen oAuthProviders={OAUTH_PROVIDERS} allowUserPass={ALLOW_USERPASS_LOGIN} 
-                                    allowSignup={ALLOW_SIGNUP} allowPWReset={ALLOW_PW_RESET}/>,
-              "routes": <Routes/>,
-            }[renderedApp]
-          }
-        </SnackbarProvider>
-      </AppLayoutProvider>
+    <BrowserRouter>      
+      <UserProvider {...myUser} >
+        <AppLayoutProvider value={layout}>
+          <SnackbarProvider>
+            { 
+              {
+                "load": <LoadingScreen/>,
+                "tos": <Tos/>,
+                "login": <LoginScreen oAuthProviders={OAUTH_PROVIDERS} allowUserPass={ALLOW_USERPASS_LOGIN} 
+                                      allowSignup={ALLOW_SIGNUP} allowPWReset={ALLOW_PW_RESET}/>,
+                "routes": <Routes/>,
+              }[renderedApp]
+            }
+          </SnackbarProvider>
+        </AppLayoutProvider>
+      </UserProvider>
     </BrowserRouter>
   );
 };

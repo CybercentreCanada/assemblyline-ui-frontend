@@ -6,6 +6,7 @@ import { Box, useTheme, Typography, CircularProgress } from "@material-ui/core";
 
 import useAppLayout from "commons/components/hooks/useAppLayout";
 import CardCentered from 'commons/components/layout/pages/CardCentered';
+import useMyUser from "components/hooks/useMyUser";
 
 
 function Logout(){
@@ -13,6 +14,7 @@ function Logout(){
     const { enqueueSnackbar, closeSnackbar }  = useSnackbar();
     const theme = useTheme();
     const { getBanner, hideMenus } = useAppLayout();
+    const { setUser } = useMyUser();
     const requestOptions: RequestInit = {
         method: 'GET',
         credentials: "same-origin",
@@ -55,6 +57,7 @@ function Logout(){
                 enqueueSnackbar(api_data.api_error_message, snackBarOptions);
             }
             else {
+                setUser(null)
                 setTimeout(() => {
                     window.location.replace("/")
                 }, 500)

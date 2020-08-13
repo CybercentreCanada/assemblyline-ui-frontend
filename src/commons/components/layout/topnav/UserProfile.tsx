@@ -21,6 +21,7 @@ import useAppLayout from "commons/components/hooks/useAppLayout";
 import useGravatar from "commons/components/hooks/useGravatar";
 import { Link } from "react-router-dom";
 import ThemeSelection from "commons/components/layout/topnav/ThemeSelection";
+import useUser from "commons/components/hooks/useUser";
 
 const useStyles = makeStyles((theme) => ({
   popper: {
@@ -42,13 +43,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-
-export type UserProfileProps = {
-  username: string,
-  email: string,
-  name: string,
-  avatar: string,
-};export type UserMenuElement = {
+export type UserMenuElement = {
   name: string,
   route: string,
   icon?: React.ReactElement<any>;
@@ -57,7 +52,8 @@ export type UserProfileProps = {
 const UserProfile = () => {
   const classes = useStyles();
   const theme = useTheme();
-  const { currentUser, layoutProps } = useAppLayout();
+  const {user: currentUser} = useUser();
+  const { layoutProps } = useAppLayout();
   const gravatarUrl = useGravatar(layoutProps.allowGravatar ? currentUser.email : null);
   const [popperAnchorEl, setPopperAnchorEl] = useState(null);
 
@@ -80,7 +76,7 @@ const UserProfile = () => {
   const renderMenu = (type, menuItems, title) => {
     if(menuItems !== undefined && menuItems !== null && menuItems.length !== 0) {
         return <Box>
-            <Divider /> 
+            <Divider />
             <List dense subheader={<ListSubheader disableSticky>{title}</ListSubheader>}>
               {menuItems.map((a, i) => (
                 <ListItem button component={Link} to={a.route} key={`${type}-${i}`}>
@@ -141,7 +137,7 @@ const UserProfile = () => {
                   </ListItem>
                 </List>
                 {renderMenu("usermenu", layoutProps.topnav.userMenu, layoutProps.topnav.userMenuTitle)}
-                {renderMenu("adminmenu", layoutProps.topnav.adminMenu, layoutProps.topnav.adminMenuTitle)}
+                {currentUser.is_admin ? renderMenu("adminmenu", layoutProps.topnav.adminMenu, layoutProps.topnav.adminMenuTitle) : null}
                 {renderThemeSelection(layoutProps.topnav.themeSelectionUnder === "profile")}
               </Paper>
             </Fade>

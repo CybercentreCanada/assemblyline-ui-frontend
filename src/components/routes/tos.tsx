@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useSnackbar, OptionsObject } from "notistack";
 
-import { makeStyles, useTheme, Button, CircularProgress } from "@material-ui/core";
-import Box from "@material-ui/core/Box";
-import Typography from '@material-ui/core/Typography';
+import { makeStyles, useTheme, Button, CircularProgress, Box, Typography } from "@material-ui/core";
+import Skeleton from "@material-ui/lab/Skeleton";
 
 import PageCenter from "commons/components/layout/pages/PageCenter";
 import useAppLayout from "commons/components/hooks/useAppLayout";
-import Skeleton from "@material-ui/lab/Skeleton";
-import { useSnackbar, OptionsObject } from "notistack";
-import CheckCircleOutlinedIcon from '@material-ui/icons/CheckCircleOutlined';
+import useMyUser from "components/hooks/useMyUser";
 import getXSRFCookie from "helpers/xsrf";
 
 const Markdown = require('react-markdown')
@@ -20,7 +18,8 @@ export default function Tos() {
     const theme = useTheme();
     const [ tos, setTos ] = useState("")
     const [ buttonLoading, setButtonLoading ] = useState(false)
-    const { getBanner, currentUser } = useAppLayout();
+    const { getBanner } = useAppLayout();
+    const { user: currentUser } = useMyUser();
     const { enqueueSnackbar, closeSnackbar }  = useSnackbar();
     const snackBarOptions: OptionsObject = {
         variant: "error",
@@ -144,7 +143,7 @@ export default function Tos() {
                         <Box textAlign="left">
                             <Markdown source={tos} />
                         </Box>
-                        { currentUser['agrees_with_tos'] ? 
+                        { currentUser.agrees_with_tos ? 
                             <Box mt={6}>
                                 <Typography variant={"subtitle1"} color={"secondary"}>{`${t('page.tos.agreed')} ${currentUser['agrees_with_tos']}`}</Typography>
                             </Box> 

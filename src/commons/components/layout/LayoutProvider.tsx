@@ -4,8 +4,9 @@ import useAppTheme, { AppThemeColorProps } from "commons/components/hooks/useApp
 import LeftNavDrawer, { LeftNavElement } from "commons/components/layout/leftnav/LeftNavDrawer";
 import TopBar from "commons/components/layout/topnav/TopBar";
 import { AppElement } from "commons/components/layout/topnav/AppSwitcher";
-import { UserMenuElement, UserProfileProps } from "commons/components/layout/topnav/UserProfile";
+import { UserMenuElement } from "commons/components/layout/topnav/UserProfile";
 import PageHeader from "commons/components/layout/pages/PageHeader";
+import useUser from "commons/components/hooks/useUser";
 
 const useStyles = (layout) => {
   return makeStyles((theme) => ({
@@ -66,14 +67,12 @@ export type AppLayoutProps = {
   },
   leftnav: {
     elements: LeftNavElement[];
-  },
-  userReady: (user) => boolean
+  }
 };
 
 export type AppLayoutContextProps = {
   autoHideAppbar: boolean,
   currentLayout: string,
-  currentUser: UserProfileProps | null,
   drawerState: boolean,
   breadcrumbsEnabled: boolean,
   breadcrumbsState: boolean,
@@ -83,7 +82,6 @@ export type AppLayoutContextProps = {
   getBanner: (theme) => React.ReactElement<any>,
   getLogo: (theme)  => React.ReactElement<any>,
   hideMenus: () => void,
-  setCurrentUser: (user: UserProfileProps) => void,
   toggleLayout: () => void,
   toggleTheme: () => void,
   toggleDrawer: () => void,
@@ -99,7 +97,6 @@ export const AppLayoutContext = React.createContext<AppLayoutContextProps>(null)
 type LayoutProviderProps = {
   children: React.ReactNode,
   value: AppLayoutProps,
-  user: UserProfileProps | null;
 };
 
 
@@ -110,6 +107,7 @@ function AppLayoutProvider(props: LayoutProviderProps) {
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
   const storedDarkMode = localStorage.getItem("darkMode");
   const darkMode = storedDarkMode ? !!JSON.parse(storedDarkMode) : null;
+  const {isReady: isUserReady} = useUser();
 
   if (darkMode !== null && darkMode === true){
     initialTheme = "dark" as "dark";
@@ -164,7 +162,7 @@ function AppLayoutProvider(props: LayoutProviderProps) {
   initialBreadcrumbsState = storedBreadcrumbs ? !!JSON.parse(storedBreadcrumbs) : props.value.defaultBreadcrumbsOpen;
 
   // Breadcrumb placement.
-  const breadcrumbsPlacement = props.value.breadcrumbsPlacement ? props.value.breadcrumbsPlacement : "topbar"  
+  const breadcrumbsPlacement = props.value.breadcrumbsPlacement ? props.value.breadcrumbsPlacement : "topbar"
 
 
   const [showMenus, setShowMenus] = useState<boolean>(true)
@@ -179,10 +177,6 @@ function AppLayoutProvider(props: LayoutProviderProps) {
   const classes = useStyles(layout);
   const showBreadcrumbsOnPage = useMediaQuery(muiTheme.breakpoints.only("sm")) && props.value.allowQuickSearch && quickSearch
 
-
-  const setCurrentUser = (user: UserProfileProps) => {
-    localStorage.setItem('currentUser', JSON.stringify(user));
-  }
 
   const onToggleLayout = () => {
     const newLayout = layout === "top" ? "side" : "top"
@@ -226,7 +220,6 @@ function AppLayoutProvider(props: LayoutProviderProps) {
       <AppLayoutContext.Provider value={{
         autoHideAppbar: autoHideAppbar,
         currentLayout: layout,
-        currentUser: props.user,
         drawerState: drawer,
         breadcrumbsEnabled,
         breadcrumbsState,
@@ -240,7 +233,6 @@ function AppLayoutProvider(props: LayoutProviderProps) {
           return theme.palette.type === "dark" ? props.value.appIconDark : props.value.appIconLight
         },
         hideMenus: () => setShowMenus(false),
-        setCurrentUser: setCurrentUser,
         toggleLayout: onToggleLayout,
         toggleTheme: onToggleTheme,
         toggleDrawer: onToggleDrawer,
@@ -251,8 +243,8 @@ function AppLayoutProvider(props: LayoutProviderProps) {
       }}>
         <Box className={classes.app}>
           <CssBaseline />
-          {props.value.userReady(props.user) && showMenus ? <TopBar/> : null}
-          {props.value.userReady(props.user) && showMenus ? <LeftNavDrawer/>: null}
+          {isUserReady() && showMenus ? <TopBar/> : null}
+          {isUserReady() && showMenus ? <LeftNavDrawer/>: null}
           <Box className={classes.container}>
             {props.value.allowBreadcrumbs && breadcrumbsEnabled && (breadcrumbsPlacement === "page" || showBreadcrumbsOnPage) ? <PageHeader mode="breadcrumbs" /> : null}
             {props.children}

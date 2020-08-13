@@ -282,13 +282,6 @@ const useMyLayout = (): AppLayoutProps => {
     },
     leftnav: {
       elements: MENU_ITEMS
-    },
-    userReady: (user) => {
-      if (user === null || !user.agrees_with_tos || !user.is_active){
-        return false
-      }
-
-      return true
     }
   }
 }
