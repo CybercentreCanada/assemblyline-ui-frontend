@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useSnackbar, OptionsObject } from "notistack";
 
-import { makeStyles, useTheme, Button, CircularProgress, Box, Typography } from "@material-ui/core";
+import { makeStyles, useTheme, Button, CircularProgress, Box, Typography, Link } from "@material-ui/core";
 import Skeleton from "@material-ui/lab/Skeleton";
 
 import PageCenter from "commons/components/layout/pages/PageCenter";
@@ -141,7 +141,7 @@ export default function Tos() {
                 {tos ? 
                     <>
                         <Box textAlign="left">
-                            <Markdown source={tos} />
+                            <Markdown source={tos} renderers={{link: Link}}/>
                         </Box>
                         { currentUser.agrees_with_tos ? 
                             <Box mt={6}>
