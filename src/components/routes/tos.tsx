@@ -145,7 +145,7 @@ export default function Tos() {
                         </Box>
                         { currentUser.agrees_with_tos ? 
                             <Box mt={6}>
-                                <Typography variant={"subtitle1"} color={"secondary"}>{`${t('page.tos.agreed')} ${currentUser['agrees_with_tos']}`}</Typography>
+                                <Typography variant={"subtitle1"} color={"secondary"}>{t('page.tos.agreed')}</Typography>
                             </Box> 
                         : 
                             <Button style={{marginTop: "3rem", marginBottom: "3rem"}} variant={"contained"} color={"primary"} disabled={buttonLoading} onClick={acceptTos}>
