@@ -45,8 +45,13 @@ export default function Tos() {
     }));
     const classes = useStyles();
 
-    function acceptTos(){
+    function acceptTOS(){
         apiCall(`/api/v4/user/tos/${currentUser.username}/`, () => window.location.reload(false),
+                "GET", true, true, () => setButtonLoading(true), () => setButtonLoading(false))
+    }
+
+    function cancelTOS(){
+        apiCall('/api/v4/auth/logout/', () => window.location.reload(false),
                 "GET", true, true, () => setButtonLoading(true), () => setButtonLoading(false))
     }
 
@@ -61,7 +66,7 @@ export default function Tos() {
                 <Box>
                     { getBanner(theme) }
                 </Box>
-                <Box textAlign="left">
+                <Box mb={6} textAlign="left">
                     <Typography variant={"h3"} gutterBottom={true}>{t("page.tos")}</Typography>
                 </Box>
                 {tos ? 
@@ -74,10 +79,17 @@ export default function Tos() {
                                 <Typography variant={"subtitle1"} color={"secondary"}>{t('page.tos.agreed')}</Typography>
                             </Box> 
                         : 
-                            <Button style={{marginTop: "3rem", marginBottom: "3rem"}} variant={"contained"} color={"primary"} disabled={buttonLoading} onClick={acceptTos}>
-                                {t("page.tos.button")}
-                                {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
-                            </Button>
+                            <Box>
+                                <Button style={{marginTop: "3rem", marginBottom: "3rem"}} variant={"contained"} color={"primary"} disabled={buttonLoading} onClick={acceptTOS}>
+                                    {t("page.tos.button")}
+                                    {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                                </Button>
+                                <Button style={{marginLeft:"1rem", marginTop: "3rem", marginBottom: "3rem"}} variant={"contained"} color={"secondary"} disabled={buttonLoading} onClick={cancelTOS}>
+                                    {t("page.tos.logout")}
+                                    {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                                </Button>
+                            </Box>
+                            
                         }
                     </>
                 : 

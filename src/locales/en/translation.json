@@ -88,6 +88,7 @@
     "page.tos": "Terms of Service",
     "page.tos.button": "Accept terms",
     "page.tos.agreed": "You've already agreed to the terms of service...",
+    "page.tos.logout": "Logout",
     "usermenu": "User Menu",
     "usermenu.account": "Manage Account",
     "usermenu.settings": "Settings",

@@ -88,6 +88,7 @@
     "page.tos": "Conditions d'utilisation",
     "page.tos.button": "Accepter les conditions",
     "page.tos.agreed": "Vous avez déja accepté les conditions d'utilisation...",
+    "page.tos.logout": "Déconnexion",
     "usermenu": "Menu de l'utilisateur",
     "usermenu.account": "Gérer son compte",
     "usermenu.settings": "Paramètres",
