@@ -6,7 +6,8 @@ import Skeleton from "@material-ui/lab/Skeleton";
 
 import PageCenter from "commons/components/layout/pages/PageCenter";
 import useAppLayout from "commons/components/hooks/useAppLayout";
-import useMyUser from "components/hooks/useMyUser";
+import useUser from "commons/components/hooks/useUser";
+import { CustomUser } from "components/hooks/useMyUser";
 import useMyAPI from "components/hooks/useMyAPI";
 
 const Markdown = require('react-markdown')
@@ -18,7 +19,7 @@ export default function Tos() {
     const [ tos, setTos ] = useState("")
     const [ buttonLoading, setButtonLoading ] = useState(false)
     const { getBanner } = useAppLayout();
-    const { user: currentUser } = useMyUser();
+    const { user: currentUser } = useUser<CustomUser>();
     const apiCall = useMyAPI()
     const useStyles = makeStyles((theme) => ({
         no_pad: {

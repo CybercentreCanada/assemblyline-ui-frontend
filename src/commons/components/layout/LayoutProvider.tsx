@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { CssBaseline, makeStyles, ThemeProvider, useMediaQuery, Box, useTheme } from "@material-ui/core";
 import useAppTheme, { AppThemeColorProps } from "commons/components/hooks/useAppTheme";
-import LeftNavDrawer, { LeftNavElement } from "commons/components/layout/leftnav/LeftNavDrawer";
-import TopBar from "commons/components/layout/topnav/TopBar";
-import { AppElement } from "commons/components/layout/topnav/AppSwitcher";
-import { UserMenuElement } from "commons/components/layout/topnav/UserProfile";
-import PageHeader from "commons/components/layout/pages/PageHeader";
+import LeftNavDrawer, { LeftNavElement } from "./leftnav/LeftNavDrawer";
+import TopBar from "./topnav/TopBar";
+import { AppElement } from "./topnav/AppSwitcher";
+import { UserMenuElement } from "./topnav/UserProfile";
+import PageHeader from "./pages/PageHeader";
 import useUser from "commons/components/hooks/useUser";
 
 const useStyles = (layout) => {
@@ -36,7 +36,28 @@ const useStyles = (layout) => {
 };
 
 
-export type AppLayoutProps = {
+export type AppLayoutContextProps = {
+  autoHideAppbar: boolean,
+  currentLayout: string,
+  drawerState: boolean,
+  breadcrumbsEnabled: boolean,
+  breadcrumbsState: boolean,
+  breadcrumbsPlacement: string,
+  layoutProps: AppLayoutProps,
+  showQuickSearch: boolean,
+  getBanner: (theme) => React.ReactElement<any>,
+  getLogo: (theme)  => React.ReactElement<any>,
+  hideMenus: () => void,
+  toggleLayout: () => void,
+  toggleTheme: () => void,
+  toggleDrawer: () => void,
+  toggleQuickSearch: () => void,
+  toggleAutoHideAppbar: () => void,
+  toggleShowBreadcrumbs: () => void,
+  toggleBreadcrumbsState: () => void,
+}
+
+export interface AppLayoutProps {
   appName: string,
   allowBreadcrumbs?: boolean,
   allowGravatar?: boolean,
@@ -70,37 +91,15 @@ export type AppLayoutProps = {
   }
 };
 
-export type AppLayoutContextProps = {
-  autoHideAppbar: boolean,
-  currentLayout: string,
-  drawerState: boolean,
-  breadcrumbsEnabled: boolean,
-  breadcrumbsState: boolean,
-  breadcrumbsPlacement: string,
-  layoutProps: AppLayoutProps,
-  showQuickSearch: boolean,
-  getBanner: (theme) => React.ReactElement<any>,
-  getLogo: (theme)  => React.ReactElement<any>,
-  hideMenus: () => void,
-  toggleLayout: () => void,
-  toggleTheme: () => void,
-  toggleDrawer: () => void,
-  toggleQuickSearch: () => void,
-  toggleAutoHideAppbar: () => void,
-  toggleShowBreadcrumbs: () => void,
-  toggleBreadcrumbsState: () => void,
-}
+interface LayoutProviderProps extends AppLayoutProps {
+  children: React.ReactNode,
+};
 
 export const AppLayoutContext = React.createContext<AppLayoutContextProps>(null);
 
 
-type LayoutProviderProps = {
-  children: React.ReactNode,
-  value: AppLayoutProps,
-};
-
-
 function AppLayoutProvider(props: LayoutProviderProps) {
+  const {children, ...layoutProps} = props;
   // Load DarkMode defaults
   let initialTheme;
   const muiTheme = useTheme();
@@ -119,7 +118,7 @@ function AppLayoutProvider(props: LayoutProviderProps) {
     initialTheme = "dark" as "dark";
   }
   else {
-    initialTheme = props.value.defaultTheme;
+    initialTheme = layoutProps.defaultTheme;
   }
 
   // Load Initial Layout Default
@@ -132,37 +131,37 @@ function AppLayoutProvider(props: LayoutProviderProps) {
     initialLayout = 'side' as 'side';
   }
   else{
-    initialLayout = props.value.defaultLayout;
+    initialLayout = layoutProps.defaultLayout;
   }
 
   // Load Nav Drawer Default State
   let initialDrawer;
   const storedDrawer = localStorage.getItem('drawerOpen');
-  initialDrawer = storedDrawer ? !!JSON.parse(storedDrawer) : props.value.defaultDrawerOpen;
+  initialDrawer = storedDrawer ? !!JSON.parse(storedDrawer) : layoutProps.defaultDrawerOpen;
 
   // Load Quick Search Default State
   let initialQuickSearch;
   const storedQuickSearch = localStorage.getItem('showQuickSearch');
-  initialQuickSearch = storedQuickSearch ? !!JSON.parse(storedQuickSearch) : props.value.defaultShowQuickSearch;
+  initialQuickSearch = storedQuickSearch ? !!JSON.parse(storedQuickSearch) : layoutProps.defaultShowQuickSearch;
 
   // Load Auto hide Topbar default state
   let initialAutoHideAppbar;
   const storedAutoHideAppbar = localStorage.getItem('autoHideAppbar');
-  initialAutoHideAppbar = storedAutoHideAppbar ? !!JSON.parse(storedAutoHideAppbar) : props.value.defaultAutoHideAppbar;
+  initialAutoHideAppbar = storedAutoHideAppbar ? !!JSON.parse(storedAutoHideAppbar) : layoutProps.defaultAutoHideAppbar;
 
   // Load Breadcrumbs Default State
   let initialBreadcrumbsEnabled;
   const storedShowBreadcrumbs = localStorage.getItem('breadcrumbsEnabled');
-  initialBreadcrumbsEnabled = storedShowBreadcrumbs ? !!JSON.parse(storedShowBreadcrumbs) : props.value.defaultShowBreadcrumbs;
+  initialBreadcrumbsEnabled = storedShowBreadcrumbs ? !!JSON.parse(storedShowBreadcrumbs) : layoutProps.defaultShowBreadcrumbs;
 
 
   // Load Breadcrumbs Default Expanded/Minimize State
   let initialBreadcrumbsState;
   const storedBreadcrumbs = localStorage.getItem('breadcrumbsState');
-  initialBreadcrumbsState = storedBreadcrumbs ? !!JSON.parse(storedBreadcrumbs) : props.value.defaultBreadcrumbsOpen;
+  initialBreadcrumbsState = storedBreadcrumbs ? !!JSON.parse(storedBreadcrumbs) : layoutProps.defaultBreadcrumbsOpen;
 
   // Breadcrumb placement.
-  const breadcrumbsPlacement = props.value.breadcrumbsPlacement ? props.value.breadcrumbsPlacement : "topbar"
+  const breadcrumbsPlacement = layoutProps.breadcrumbsPlacement ? layoutProps.breadcrumbsPlacement : "topbar"
 
 
   const [showMenus, setShowMenus] = useState<boolean>(true)
@@ -173,9 +172,9 @@ function AppLayoutProvider(props: LayoutProviderProps) {
   const [quickSearch, setQuickSearch] = useState<boolean>(initialQuickSearch)
   const [autoHideAppbar, setAutoHideAppbar] = useState<boolean>(initialAutoHideAppbar)
   const [layout, setLayout] = useState<"top"| "side">(initialLayout)
-  const [appTheme] = useAppTheme(theme === "dark", props.value.colors);
+  const [appTheme] = useAppTheme(theme === "dark", layoutProps.colors);
   const classes = useStyles(layout);
-  const showBreadcrumbsOnPage = useMediaQuery(muiTheme.breakpoints.only("sm")) && props.value.allowQuickSearch && quickSearch
+  const showBreadcrumbsOnPage = useMediaQuery(muiTheme.breakpoints.only("sm")) && layoutProps.allowQuickSearch && quickSearch
 
 
   const onToggleLayout = () => {
@@ -223,14 +222,14 @@ function AppLayoutProvider(props: LayoutProviderProps) {
         drawerState: drawer,
         breadcrumbsEnabled,
         breadcrumbsState,
-        breadcrumbsPlacement: props.value.breadcrumbsPlacement ? props.value.breadcrumbsPlacement : "topbar",
-        layoutProps: props.value,
+        breadcrumbsPlacement: layoutProps.breadcrumbsPlacement ? layoutProps.breadcrumbsPlacement : "topbar",
+        layoutProps,
         showQuickSearch: quickSearch,
         getBanner: (theme) => {
-          return theme.palette.type === "dark" ? props.value.bannerDark : props.value.bannerLight
+          return theme.palette.type === "dark" ? layoutProps.bannerDark : layoutProps.bannerLight
         },
         getLogo: (theme) => {
-          return theme.palette.type === "dark" ? props.value.appIconDark : props.value.appIconLight
+          return theme.palette.type === "dark" ? layoutProps.appIconDark : layoutProps.appIconLight
         },
         hideMenus: () => setShowMenus(false),
         toggleLayout: onToggleLayout,
@@ -246,7 +245,7 @@ function AppLayoutProvider(props: LayoutProviderProps) {
           {isUserReady() && showMenus ? <TopBar/> : null}
           {isUserReady() && showMenus ? <LeftNavDrawer/>: null}
           <Box className={classes.container}>
-            {props.value.allowBreadcrumbs && breadcrumbsEnabled && (breadcrumbsPlacement === "page" || showBreadcrumbsOnPage) ? <PageHeader mode="breadcrumbs" /> : null}
+            {layoutProps.allowBreadcrumbs && breadcrumbsEnabled && (breadcrumbsPlacement === "page" || showBreadcrumbsOnPage) ? <PageHeader mode="breadcrumbs" /> : null}
             {props.children}
           </Box>
         </Box>

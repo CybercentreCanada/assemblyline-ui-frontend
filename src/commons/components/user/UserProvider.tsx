@@ -10,25 +10,23 @@ export type UserProfileProps = {
   is_admin: boolean
 }
 
-export type UserContextProps = {
-    user: UserProfileProps,
-    setUser: (user: UserProfileProps) => void,
+export interface UserContextProps<U extends UserProfileProps> {
+    user: U,
+    setUser: (user: U) => void,
     isReady: () => boolean
 }
 
-
-export const UserContext = React.createContext<UserContextProps>(null);
-
-export type UserProviderProps = {
-    user: UserProfileProps,
-    setUser: (user: UserProfileProps) => void,
-    isReady: () => boolean,
+export interface UserProviderProps<U extends UserProfileProps>  extends UserContextProps <U> {
     provided?: boolean,
+    children?: React.ReactNode
 }
 
-const UserProvider: React.FC<UserProviderProps> = ({user, isReady, setUser, provided = false, children}) => {
+export const UserContext = React.createContext<UserContextProps<UserProfileProps>>(null);
 
-  if(!isReady() && !provided) {
+function UserProvider<U extends UserProfileProps>(props: UserProviderProps<U>) {
+  const {children, provided, ...contextProps} = props;
+
+  if(!contextProps.isReady() && !provided) {
     // TODO: maybe provide skeleton layout while awaiting.
     return <Box paddingTop={10}>
       <PageCenter width={50}>
@@ -37,10 +35,7 @@ const UserProvider: React.FC<UserProviderProps> = ({user, isReady, setUser, prov
     </Box>
   }
 
-  // TODO: build in logic that check if there is a user or not.
-  // - Provide fetch-user rest endpoint as property, and use endpoint to fetch it.
-  // - If no user, then it can forward to a login page, provide fake user, etc...
-  return <UserContext.Provider value={{user, setUser, isReady}} >
+  return <UserContext.Provider value={contextProps} >
       {children}
     </UserContext.Provider>
 }

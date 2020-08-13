@@ -26,8 +26,8 @@ const App: React.FC<AppProps> = () => {
   const params = new URLSearchParams(window.location.search);
   const [renderedApp, setRenderedApp] = useState(params.get("provider") ? "login" : "load");
 
-  const layout = useMyLayout();
-  const myUser = useMyUser();
+  const layoutProps = useMyLayout();
+  const userProps = useMyUser();
 
   useEffect(()=> {
       if (params.get("provider")){
@@ -48,17 +48,15 @@ const App: React.FC<AppProps> = () => {
           },
           error => {
             console.log(error);
-            myUser.setUser(null);
             setRenderedApp("login")
           }
         )
         .then(result => {
           if (result === undefined || !result.hasOwnProperty('api_response')){
-            myUser.setUser(null);
             setRenderedApp("login")
           }
           else{
-            myUser.setUser(result.api_response);
+            userProps.setUser(result.api_response);
             if (!result.api_response.agrees_with_tos){
               setRenderedApp("tos");
             }
@@ -69,15 +67,14 @@ const App: React.FC<AppProps> = () => {
         },
         error => {
             console.log(error);
-            myUser.setUser(null);
             setRenderedApp("login")
         })
   // eslint-disable-next-line
   }, []);
   return (
     <BrowserRouter>      
-      <UserProvider {...myUser} >
-        <AppLayoutProvider value={layout}>
+      <UserProvider {...userProps} >
+        <AppLayoutProvider {...layoutProps}>
           <SnackbarProvider>
             { 
               {

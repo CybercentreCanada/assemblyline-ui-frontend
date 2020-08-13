@@ -15,10 +15,16 @@ type SiteMapContextProps = {
     routes: SiteMapRoute[]
 }
 
+
+type SiteMapProviderProps = SiteMapContextProps & {
+    children: React.ReactNode
+}
+
 export const SiteMapContext = React.createContext<SiteMapContextProps>(null);
 
-function SiteMapProvider({children, config}) {
-    return <SiteMapContext.Provider value={config}>
+function SiteMapProvider(props: SiteMapProviderProps) {
+    const {children, ...contextProps} = props;
+    return <SiteMapContext.Provider value={contextProps}>
         {children}
     </SiteMapContext.Provider>
 }
