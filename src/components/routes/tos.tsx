@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { useSnackbar, OptionsObject } from "notistack";
 
 import { makeStyles, useTheme, Button, CircularProgress, Box, Typography, Link } from "@material-ui/core";
 import Skeleton from "@material-ui/lab/Skeleton";
@@ -8,7 +7,7 @@ import Skeleton from "@material-ui/lab/Skeleton";
 import PageCenter from "commons/components/layout/pages/PageCenter";
 import useAppLayout from "commons/components/hooks/useAppLayout";
 import useMyUser from "components/hooks/useMyUser";
-import getXSRFCookie from "helpers/xsrf";
+import useMyAPI from "components/hooks/useMyAPI";
 
 const Markdown = require('react-markdown')
 
@@ -20,19 +19,7 @@ export default function Tos() {
     const [ buttonLoading, setButtonLoading ] = useState(false)
     const { getBanner } = useAppLayout();
     const { user: currentUser } = useMyUser();
-    const { enqueueSnackbar, closeSnackbar }  = useSnackbar();
-    const snackBarOptions: OptionsObject = {
-        variant: "error",
-        autoHideDuration: 5000,
-        anchorOrigin: {
-            vertical: 'bottom',
-            horizontal: 'center',
-        },
-        onClick: snack => {
-            closeSnackbar()
-        }
-    }
-
+    const apiCall = useMyAPI()
     const useStyles = makeStyles((theme) => ({
         no_pad: {
             padding: 0
@@ -58,74 +45,12 @@ export default function Tos() {
     const classes = useStyles();
 
     function acceptTos(){
-        const acceptRequestOptions: RequestInit = {
-            method: 'GET',
-            credentials: "same-origin",
-            headers: {
-                "Content-Type": "application/json",
-                "X-XSRF-TOKEN": getXSRFCookie()
-            }
-        };
-        setButtonLoading(true);
-        fetch(`/api/v4/user/tos/${currentUser.username}/`, acceptRequestOptions)
-            .then(res => {
-                return res.json()
-            })
-            .catch(() => {
-                return {
-                        api_error_message: t("api.unreachable"),
-                        api_response: "",
-                        api_server_version: "4.0.0",
-                        api_status_code: 400
-                    }
-            })
-            .then(api_data => {
-                setButtonLoading(false);
-                if (api_data === undefined || !api_data.hasOwnProperty('api_status_code')){
-                    enqueueSnackbar(t("api.invalid"), snackBarOptions);
-                }
-                else if (api_data.api_status_code !== 200){
-                    enqueueSnackbar(api_data.api_error_message, snackBarOptions);
-                }
-                else {
-                    window.location.reload(false)
-                }
-            });
+        apiCall(`/api/v4/user/tos/${currentUser.username}/`, () => window.location.reload(false),
+                "GET", true, true, () => setButtonLoading(true), () => setButtonLoading(false))
     }
 
     useEffect(() => {
-        const requestOptions: RequestInit = {
-            method: 'GET',
-            credentials: "same-origin",
-            headers: {
-                "Content-Type": "application/json",
-                "X-XSRF-TOKEN": getXSRFCookie()
-            }
-        };
-        
-        fetch('/api/v4/help/tos/', requestOptions)
-            .then(res => {
-                return res.json()
-            })
-            .catch(() => {
-                return {
-                        api_error_message: t("api.unreachable"),
-                        api_response: "",
-                        api_server_version: "4.0.0",
-                        api_status_code: 400
-                    }
-            })
-            .then(api_data => {
-                if (api_data === undefined || !api_data.hasOwnProperty('api_status_code')){
-                    enqueueSnackbar(t("api.invalid"), snackBarOptions);
-                }
-                else if (api_data.api_status_code !== 200){
-                    enqueueSnackbar(api_data.api_error_message, snackBarOptions);
-                }
-                else {
-                    setTos(api_data.api_response)
-                }
-            });
+        apiCall('/api/v4/help/tos/', (api_data) => setTos(api_data.api_response))
     // eslint-disable-next-line
     }, [])
 
