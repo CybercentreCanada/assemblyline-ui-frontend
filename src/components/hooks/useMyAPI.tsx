@@ -25,7 +25,7 @@ export default function useMyAPI() {
     }
 
     function apiCall(url: string, method: string = "GET", 
-                     onSuccess: (api_data: APIResponseProps) => void, 
+                     onSuccess: (api_data: APIResponseProps) => void = null, 
                      onFailure: (api_data: APIResponseProps) => void = null,
                      onEnter: () => void = null, 
                      onExit: () => void = null, 
