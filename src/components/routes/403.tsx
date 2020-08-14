@@ -7,7 +7,12 @@ import BlockIcon from '@material-ui/icons/Block';
 
 import PageCenter from "commons/components/layout/pages/PageCenter";
 
-const ForbiddenPage = () => {
+type ForbiddenPageProps = {
+    disabled: boolean
+}
+
+const ForbiddenPage = (props: ForbiddenPageProps) => {
+    const { disabled } = props;
     const { t } = useTranslation();
     return (
         <PageCenter width={65}>
@@ -15,7 +20,12 @@ const ForbiddenPage = () => {
                 <BlockIcon color="secondary" fontSize="inherit" />
             </Box>
             <Box pb={2}><Typography variant="h3">{t("page.403.title")}</Typography></Box>
-            <Box><Typography variant="h6">{t("page.403.description")}</Typography></Box>
+            {disabled ? 
+                <Box><Typography variant="h6">{t("page.403.disabled")}</Typography></Box>
+            :
+                <Box><Typography variant="h6">{t("page.403.not_allowed")}</Typography></Box>
+            }
+            
         </PageCenter>
     );
 };
