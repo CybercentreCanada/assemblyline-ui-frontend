@@ -9,11 +9,11 @@ import PageCenter from "commons/components/layout/pages/PageCenter";
 const NotFoundPage = () => {
     const { t } = useTranslation();
     return (
-        <PageCenter width={75}>
+        <PageCenter width={65}>
             <Box pt={10} pb={6}>
                 <img alt={t("page.404_dl.alt")} src="/images/dead_link.png" style={{maxHeight:"300px", maxWidth: "90%"}}/>
             </Box>
-            <Box><Typography variant="h5">{t("page.404_dl.description")}</Typography></Box>
+            <Box><Typography variant="h6">{t("page.404_dl.description")}</Typography></Box>
         </PageCenter>
     );
 };
