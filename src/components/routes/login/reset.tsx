@@ -1,10 +1,10 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import { useTranslation } from "react-i18next";
+import { useLocation, useHistory } from "react-router-dom";
 
-import {  OptionsObject } from 'notistack';
 import { Button, TextField, Box,  CircularProgress, Typography, makeStyles, createStyles } from "@material-ui/core";
 
-import { useLocation, useHistory } from "react-router-dom";
+import useMyAPI from "components/hooks/useMyAPI";
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -20,10 +20,7 @@ const useStyles = makeStyles(() =>
 
 type ResetPasswordNowProps = {
     buttonLoading: boolean, 
-    setButtonLoading: (value: boolean) => void,
-    enqueueSnackbar: (message: string, options: OptionsObject) => void,
-    snackBarOptions: OptionsObject,
-    setShownControls: (shownControls: string) => void
+    setButtonLoading: (value: boolean) => void
 };
   
 export function ResetPasswordNow(props: ResetPasswordNowProps){
@@ -31,56 +28,41 @@ export function ResetPasswordNow(props: ResetPasswordNowProps){
     const history = useHistory();
     const { t } = useTranslation();
     const classes = useStyles();
+    const apiCall = useMyAPI()
     const params = new URLSearchParams(location.search);
+    const [resetID, setResetID] = useState("");
     const [password, setPassword] = useState("");
     const [passwordConfirm, setPasswordConfirm] = useState("");
     const [done, setDone] = useState(false);
 
+
     function onSubmit(event){
-        const resetRequestOptions: RequestInit = {
-            method: 'POST',
-            credentials: "same-origin",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                reset_id: params.get("reset_id"),
+        apiCall({
+            url: "/api/v4/auth/reset_pwd/",
+            method: "POST",
+            body: {
+                reset_id: resetID,
                 password: password, 
                 password_confirm: passwordConfirm
-            })
-        };
-        
-        props.setButtonLoading(true)
-        fetch(`/api/v4/auth/reset_pwd/`, resetRequestOptions)
-            .then(res => {
-                return res.json()
-            })
-            .catch(() => {
-                return {
-                        api_error_message: t("api.unreachable"),
-                        api_response: "",
-                        api_server_version: "4.0.0",
-                        api_status_code: 400
-                    }
-            })
-            .then(api_data => {
-                props.setButtonLoading(false)
-                if (api_data === undefined || !api_data.hasOwnProperty('api_status_code')){
-                    props.enqueueSnackbar(t("api.invalid"), props.snackBarOptions);
-                }
-                else if (api_data.api_status_code !== 200){
-                    props.enqueueSnackbar(api_data.api_error_message, props.snackBarOptions);
-                }
-                else {
-                    setDone(true)
-                    if (params.get("reset_id")){
-                        history.push("/")
-                    }
-                    setTimeout(() => props.setShownControls('up'), 7000) 
-                }
-            });
+            },
+            onEnter: () => props.setButtonLoading(true),
+            onExit: () => props.setButtonLoading(false),
+            onSuccess: () => {
+                setDone(true)
+                setTimeout(() => window.location.reload(false), 7000) 
+            }
+        })
         event.preventDefault()
     }
+
+    useEffect(() => {
+        setResetID(params.get("reset_id"))
+    
+        if (params.get("reset_id")){
+            history.push("/")
+        }
+        // eslint-disable-next-line
+    }, [])
 
     return (
         <form onSubmit={onSubmit}>
@@ -106,52 +88,25 @@ export function ResetPasswordNow(props: ResetPasswordNowProps){
 
 type ResetPasswordProps = {
     buttonLoading: boolean, 
-    setButtonLoading: (value: boolean) => void,
-    enqueueSnackbar: (message: string, options: OptionsObject) => void,
-    snackBarOptions: OptionsObject
+    setButtonLoading: (value: boolean) => void
 };
   
 export function ResetPassword(props: ResetPasswordProps){
     const { t } = useTranslation();
     const classes = useStyles();
+    const apiCall = useMyAPI();
     const [email, setEmail] = useState("");
     const [done, setDone] = useState(false);
 
     function onSubmit(event){
-        const resetRequestOptions: RequestInit = {
-            method: 'POST',
-            credentials: "same-origin",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({email: email})
-        };
-        
-        props.setButtonLoading(true)
-        fetch(`/api/v4/auth/get_reset_link/`, resetRequestOptions)
-            .then(res => {
-                return res.json()
-            })
-            .catch(() => {
-                return {
-                        api_error_message: t("api.unreachable"),
-                        api_response: "",
-                        api_server_version: "4.0.0",
-                        api_status_code: 400
-                    }
-            })
-            .then(api_data => {
-                props.setButtonLoading(false)
-                if (api_data === undefined || !api_data.hasOwnProperty('api_status_code')){
-                    props.enqueueSnackbar(t("api.invalid"), props.snackBarOptions);
-                }
-                else if (api_data.api_status_code !== 200){
-                    props.enqueueSnackbar(api_data.api_error_message, props.snackBarOptions);
-                }
-                else {
-                    setDone(true)
-                }
-            });
+        apiCall({
+            url: "/api/v4/auth/get_reset_link/",
+            method: "POST",
+            body: {email: email},
+            onEnter: () => props.setButtonLoading(true),
+            onExit: () => props.setButtonLoading(false),
+            onSuccess: () => setDone(true)
+        })
         event.preventDefault()
     }
 

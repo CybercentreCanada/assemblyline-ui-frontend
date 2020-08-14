@@ -1,8 +1,8 @@
 import React, {useState} from "react";
 import { useTranslation } from "react-i18next";
 
-import {  OptionsObject } from 'notistack';
 import { Button, TextField, Box,  CircularProgress, Typography, makeStyles, createStyles } from "@material-ui/core";
+import useMyAPI from "components/hooks/useMyAPI";
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -18,14 +18,13 @@ const useStyles = makeStyles(() =>
 
 type SignUpProps = {
     buttonLoading: boolean, 
-    setButtonLoading: (value: boolean) => void,
-    enqueueSnackbar: (message: string, options: OptionsObject) => void,
-    snackBarOptions: OptionsObject
+    setButtonLoading: (value: boolean) => void
 };
   
 export function SignUp(props: SignUpProps){
     const { t } = useTranslation();
     const classes = useStyles();
+    const apiCall = useMyAPI();
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -33,45 +32,19 @@ export function SignUp(props: SignUpProps){
     const [done, setDone] = useState(false);
 
     function onSubmit(event){
-        const resetRequestOptions: RequestInit = {
-            method: 'POST',
-            credentials: "same-origin",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
+        apiCall({
+            url: "/api/v4/auth/signup/",
+            method: "POST",
+            body: {
                 user: username,
                 password: password, 
                 password_confirm: passwordConfirm,
                 email: email
-            })
-        };
-        
-        props.setButtonLoading(true)
-        fetch(`/api/v4/auth/signup/`, resetRequestOptions)
-            .then(res => {
-                return res.json()
-            })
-            .catch(() => {
-                return {
-                        api_error_message: t("api.unreachable"),
-                        api_response: "",
-                        api_server_version: "4.0.0",
-                        api_status_code: 400
-                    }
-            })
-            .then(api_data => {
-                props.setButtonLoading(false)
-                if (api_data === undefined || !api_data.hasOwnProperty('api_status_code')){
-                    props.enqueueSnackbar(t("api.invalid"), props.snackBarOptions);
-                }
-                else if (api_data.api_status_code !== 200){
-                    props.enqueueSnackbar(api_data.api_error_message, props.snackBarOptions);
-                }
-                else {
-                    setDone(true)
-                }
-            });
+            },
+            onEnter: () => props.setButtonLoading(true),
+            onExit: () => props.setButtonLoading(false),
+            onSuccess: () => setDone(true)
+        })
         event.preventDefault()
     }
 

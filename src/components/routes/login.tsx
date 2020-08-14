@@ -14,6 +14,7 @@ import { SecurityTokenLogin } from "components/routes/login/sectoken";
 import { SignUp } from "components/routes/login/signup";
 import { UserPassLogin } from "components/routes/login/userpass";
 import TextDivider from "components/visual/text_divider";
+import useMyAPI from "components/hooks/useMyAPI";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -41,6 +42,7 @@ export default function LoginScreen(props: LoginScreenProps){
     const { t } = useTranslation();
     const theme = useTheme();
     const classes = useStyles();
+    const apiCall = useMyAPI();
     const { getBanner } = useAppLayout();
     const [shownControls, setShownControls] = useState(params.get("provider") ? "oauth" : params.get("reset_id") ? "reset_now" : "login");
     const { enqueueSnackbar, closeSnackbar }  = useSnackbar();
@@ -115,58 +117,39 @@ export default function LoginScreen(props: LoginScreenProps){
             webauthn_auth_resp: webAuthNResponse,
             oauth_token: oAuthToken
         }
-        const loginRequestOptions: RequestInit = {
-            method: 'POST',
-            credentials: "same-origin",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
-        };
 
-        setButtonLoading(true);
-        fetch('/api/v4/auth/login/', loginRequestOptions)
-            .then(res => {
-                return res.json()
-            })
-            .catch(() => {
-                return {
-                        api_error_message: t("api.unreachable"),
-                        api_response: "",
-                        api_server_version: "4.0.0",
-                        api_status_code: 400
-                    }
-            })
-            .then(api_data => {
-                setButtonLoading(false)
-                if (api_data === undefined || !api_data.hasOwnProperty('api_status_code')){
-                    enqueueSnackbar(t("api.invalid"), snackBarOptions);
+        apiCall({
+            url: "/api/v4/auth/login/",
+            method: "POST",
+            body: data,
+            reloadOnUnauthorize: false,
+            onEnter: () => setButtonLoading(true), 
+            onExit: () => setButtonLoading(false),
+            onFailure: (api_data) => {
+                if (api_data.api_error_message === "Wrong OTP token" && shownControls !== 'otp'){
+                    setShownControls("otp")
                 }
-                else if (api_data.api_status_code !== 200){
-                    if (api_data.api_error_message === "Wrong OTP token" && shownControls !== 'otp'){
-                        setShownControls("otp")
-                    }
-                    else if (api_data.api_error_message === "Wrong Security Token" && shownControls === "sectoken"){
-                        setShownControls("otp")
-                        enqueueSnackbar(t("page.login.securitytoken.error"), snackBarOptions);
-                    }
-                    else if (api_data.api_error_message === "Wrong Security Token" && shownControls !== "sectoken"){
-                        setShownControls("sectoken")
-                    }
-                    else{
-                        enqueueSnackbar(api_data.api_error_message, snackBarOptions);
-                        if (focusTarget !== null){
-                            if (focusTarget.hasOwnProperty('select')){
-                                focusTarget.select()
-                                focusTarget.focus()
-                            }
+                else if (api_data.api_error_message === "Wrong Security Token" && shownControls === "sectoken"){
+                    setShownControls("otp")
+                    enqueueSnackbar(t("page.login.securitytoken.error"), snackBarOptions);
+                }
+                else if (api_data.api_error_message === "Wrong Security Token" && shownControls !== "sectoken"){
+                    setShownControls("sectoken")
+                }
+                else{
+                    enqueueSnackbar(api_data.api_error_message, snackBarOptions);
+                    if (focusTarget !== null){
+                        if (focusTarget.hasOwnProperty('select')){
+                            focusTarget.select()
+                            focusTarget.focus()
                         }
                     }
                 }
-                else {
-                    window.location.reload(false);
-                }
-            });
+            }, 
+            onSuccess: () => {
+                window.location.reload(false)
+            }
+        })
     }
 
     useEffect(() => {
@@ -174,81 +157,32 @@ export default function LoginScreen(props: LoginScreenProps){
             login(null)
         }
         else if (shownControls === "oauth"){
-            const oauthRequestOptions: RequestInit = {
-                method: 'GET',
-                credentials: "same-origin",
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            };
-            
-            fetch(`/api/v4/auth/oauth/${location.search}`, oauthRequestOptions)
-                .then(res => {
-                    return res.json()
-                })
-                .catch(() => {
-                    return {
-                            api_error_message: t("api.unreachable"),
-                            api_response: "",
-                            api_server_version: "4.0.0",
-                            api_status_code: 400
-                        }
-                })
-                .then(api_data => {
-                    setButtonLoading(false)
-                    if (api_data === undefined || !api_data.hasOwnProperty('api_status_code')){
-                        enqueueSnackbar(t("api.invalid"), snackBarOptions);
-                    }
-                    else if (api_data.api_status_code !== 200){
-                        enqueueSnackbar(api_data.api_error_message, snackBarOptions);
-                        setShownControls("login")
-                    }
-                    else {
-                        setAvatar(api_data.api_response.avatar)
-                        setUsername(api_data.api_response.username)
-                        setOAuthToken(api_data.api_response.oauth_token)
-                    }
+            apiCall({
+                url: `/api/v4/auth/oauth/${location.search}`,
+                onSuccess: (api_data) => {
+                    setAvatar(api_data.api_response.avatar)
+                    setUsername(api_data.api_response.username)
+                    setOAuthToken(api_data.api_response.oauth_token)
+                },
+                onFailure: (api_data) => {
+                    enqueueSnackbar(api_data.api_error_message, snackBarOptions);
+                    setShownControls("login")
+                },
+                onFinalize: () => {
                     if (params.get("provider")){
                         history.push(localStorage.getItem('nextLocation') || "/")
                     }
-                });
-
+                }
+            })
         }
         else if (params.get("registration_key")){
-            const signupRequestOptions: RequestInit = {
+            apiCall({
+                url: "/api/v4/auth/signup_validate/",
                 method: 'POST',
-                credentials: "same-origin",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({registration_key: params.get("registration_key")})
-            };
-            
-            fetch(`/api/v4/auth/signup_validate/`, signupRequestOptions)
-                .then(res => {
-                    return res.json()
-                })
-                .catch(() => {
-                    return {
-                            api_error_message: t("api.unreachable"),
-                            api_response: "",
-                            api_server_version: "4.0.0",
-                            api_status_code: 400
-                        }
-                })
-                .then(api_data => {
-                    setButtonLoading(false)
-                    if (api_data === undefined || !api_data.hasOwnProperty('api_status_code')){
-                        enqueueSnackbar(t("api.invalid"), snackBarOptions);
-                    }
-                    else if (api_data.api_status_code !== 200){
-                        enqueueSnackbar(api_data.api_error_message, snackBarOptions);
-                    }
-                    else {
-                        enqueueSnackbar(t('page.login.signup.completed'), snackBarSuccessOptions);
-                    }
-                    history.push("/")
-                });
+                body: {registration_key: params.get("registration_key")},
+                onSuccess: () => enqueueSnackbar(t('page.login.signup.completed'), snackBarSuccessOptions),
+                onFinalize: () => history.push("/")
+            })
         }
     // eslint-disable-next-line
     }, [webAuthNResponse, shownControls])
@@ -276,9 +210,9 @@ export default function LoginScreen(props: LoginScreenProps){
                                     </Box>
                                 </> : null }
                         </>,
-                    'signup': <SignUp enqueueSnackbar={enqueueSnackbar} snackBarOptions={snackBarOptions} setButtonLoading={setButtonLoading} buttonLoading={buttonLoading}/>,
-                    'reset': <ResetPassword enqueueSnackbar={enqueueSnackbar} snackBarOptions={snackBarOptions} setButtonLoading={setButtonLoading} buttonLoading={buttonLoading}/>,
-                    'reset_now': <ResetPasswordNow setShownControls={setShownControls} enqueueSnackbar={enqueueSnackbar} snackBarOptions={snackBarOptions} setButtonLoading={setButtonLoading} buttonLoading={buttonLoading}/>,
+                    'signup': <SignUp setButtonLoading={setButtonLoading} buttonLoading={buttonLoading}/>,
+                    'reset': <ResetPassword setButtonLoading={setButtonLoading} buttonLoading={buttonLoading}/>,
+                    'reset_now': <ResetPasswordNow setButtonLoading={setButtonLoading} buttonLoading={buttonLoading}/>,
                     'oauth': <OAuthLogin reset={reset} oAuthToken={oAuthToken} avatar={avatar} username={username} onSubmit={onSubmit} buttonLoading={buttonLoading}/>,
                     'otp': <OneTimePassLogin onSubmit={onSubmit} buttonLoading={buttonLoading} setOneTimePass={setOneTimePass}/>,
                     'sectoken': <SecurityTokenLogin setShownControls={setShownControls} enqueueSnackbar={enqueueSnackbar} snackBarOptions={snackBarOptions} setWebAuthNResponse={setWebAuthNResponse} username={username}/>

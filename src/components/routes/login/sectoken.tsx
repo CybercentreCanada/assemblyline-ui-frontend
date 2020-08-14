@@ -6,6 +6,7 @@ import { Box, Typography } from "@material-ui/core";
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 
 import toArrayBuffer from "helpers/toArrayBuffer";
+import useMyAPI from "components/hooks/useMyAPI";
 
 const CBOR = require('helpers/cbor.js')
 
@@ -19,35 +20,12 @@ type SecTokenProps = {
   
 export function SecurityTokenLogin(props: SecTokenProps){  
     const { t } = useTranslation();
-    const stRequestOptions: RequestInit = {
-        method: 'GET',
-        credentials: "same-origin",
-        headers: {
-            "Content-Type": "application/json"
-        }
-    };
+    const apiCall = useMyAPI();
 
     useEffect( () => {
-        fetch(`/api/v4/webauthn/authenticate/begin/${props.username}/`, stRequestOptions)
-        .then(res => {
-            return res.json()
-        })
-        .catch(() => {
-            return {
-                    api_error_message: t("api.unreachable"),
-                    api_response: "",
-                    api_server_version: "4.0.0",
-                    api_status_code: 400
-                }
-        })
-        .then(api_data => {
-            if (api_data === undefined || !api_data.hasOwnProperty('api_status_code')){
-                props.enqueueSnackbar(t("api.invalid"), props.snackBarOptions);
-            }
-            else if (api_data.api_status_code !== 200){
-                props.enqueueSnackbar(api_data.api_error_message, props.snackBarOptions);
-            }
-            else {
+        apiCall({
+            url: `/api/v4/webauthn/authenticate/begin/${props.username}/`,
+            onSuccess: (api_data) => {
                 let arrayData = toArrayBuffer(api_data.api_response);
                 const options = CBOR.decode(arrayData.buffer);
                 const credentialHelper = navigator.credentials;
@@ -75,7 +53,7 @@ export function SecurityTokenLogin(props: SecTokenProps){
                     props.enqueueSnackbar(t("page.login.securitytoken.unavailable"), props.snackBarOptions);
                 }
             }
-        });
+        })
     // eslint-disable-next-line
     }, [])
 

@@ -28,6 +28,8 @@ export default function useMyAPI() {
     type APICallProps = {
         url: string,
         method?: string,
+        body?: any,
+        reloadOnUnauthorize?: boolean,
         onSuccess?: (api_data: APIResponseProps) => void,
         onFailure?: (api_data: APIResponseProps) => void,
         onEnter?: () => void,
@@ -36,14 +38,16 @@ export default function useMyAPI() {
     }
 
     function apiCall(props: APICallProps){   
-        const { url, method, onSuccess, onFailure, onEnter, onExit, onFinalize } = props;
+        const { url, method, body, reloadOnUnauthorize, onSuccess, onFailure, onEnter, onExit, onFinalize } = props;
+        const allowReload = reloadOnUnauthorize === undefined || reloadOnUnauthorize
         const requestOptions: RequestInit = {
             method: method || "GET",
             credentials: "same-origin",
             headers: {
                 "Content-Type": "application/json",
                 "X-XSRF-TOKEN": getXSRFCookie()
-            }
+            },
+            body: body ? JSON.stringify(body) : null
         };
 
         // Run enter callback
@@ -52,7 +56,7 @@ export default function useMyAPI() {
         // Fetch the URL
         fetch(url, requestOptions)
             .then(res => {
-                if (res.status === 401){
+                if (res.status === 401 && allowReload){
                     // Trigger a page reload, we're not logged in anymore
                     window.location.reload(false)
                 }
@@ -75,7 +79,7 @@ export default function useMyAPI() {
                     enqueueSnackbar(t("api.invalid"), snackBarOptions);
                 }
                 // Detect login request
-                else if (api_data.api_status_code === 401){
+                else if (api_data.api_status_code === 401 && allowReload){
                     // Do nothing... we are reloading the page
                     return    
                 }
