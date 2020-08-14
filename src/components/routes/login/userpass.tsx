@@ -29,7 +29,7 @@ export function UserPassLogin(props: UserPassLoginProps){
     return (
         <form onSubmit={props.onSubmit}>
             <Box display={"flex"} flexDirection={"column"}>
-                <TextField autoFocus variant={"outlined"} size={"small"} label={t("page.login.username")} onChange={(event) => props.setUsername(event.target.value)}/>
+                <TextField autoFocus inputProps={{'autocorrect': "off", 'autocapitalize': "off"}} variant={"outlined"} size={"small"} label={t("page.login.username")} onChange={(event) => props.setUsername(event.target.value)}/>
                 <TextField style={{marginTop: ".5rem"}} variant={"outlined"} size={"small"} type="password" label={t("page.login.password")} onChange={event => props.setPassword(event.target.value)}/>
                 <Button type="submit" style={{marginTop: "1.5rem"}} variant={"contained"} color={"primary"} disabled={props.buttonLoading}>
                     {t("page.login.button")}
