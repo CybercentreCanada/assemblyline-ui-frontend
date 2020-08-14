@@ -10,7 +10,7 @@ export type APIResponseProps = {
 }
 
 export default function useMyAPI() {
-    const {t} = useTranslation()
+    const { t } = useTranslation()
     const { enqueueSnackbar, closeSnackbar }  = useSnackbar();
     const snackBarOptions: OptionsObject = {
         variant: "error",
