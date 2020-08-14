@@ -46,17 +46,28 @@ export default function Tos() {
     const classes = useStyles();
 
     function acceptTOS(){
-        apiCall(`/api/v4/user/tos/${currentUser.username}/`, "GET", () => window.location.reload(false),
-                null, () => setButtonLoading(true), () => setButtonLoading(false))
+        apiCall({
+            url: `/api/v4/user/tos/${currentUser.username}/`, 
+            onSuccess: () => window.location.reload(false),
+            onEnter: () => setButtonLoading(true), 
+            onExit: () => setButtonLoading(false)
+        })
     }
 
     function cancelTOS(){
-        apiCall('/api/v4/auth/logout/', "GET", () => window.location.reload(false),
-                null, () => setButtonLoading(true), () => setButtonLoading(false))
+        apiCall({
+            url: '/api/v4/auth/logout/', 
+            onSuccess: () => window.location.reload(false),
+            onEnter: () => setButtonLoading(true), 
+            onExit: () => setButtonLoading(false)
+        })
     }
 
     useEffect(() => {
-        apiCall('/api/v4/help/tos/', "GET", (api_data) => setTos(api_data.api_response))
+        apiCall({
+            url: '/api/v4/help/tos/', 
+            onSuccess: (api_data) => setTos(api_data.api_response)
+        })
     // eslint-disable-next-line
     }, [])
 

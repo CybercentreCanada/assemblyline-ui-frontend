@@ -24,14 +24,21 @@ export default function useMyAPI() {
         }
     }
 
-    function apiCall(url: string, method: string = "GET", 
-                     onSuccess: (api_data: APIResponseProps) => void = null, 
-                     onFailure: (api_data: APIResponseProps) => void = null,
-                     onEnter: () => void = null, 
-                     onExit: () => void = null, 
-                     onFinalize: (api_data: APIResponseProps) => void = null){
+    
+    type APICallProps = {
+        url: string,
+        method?: string,
+        onSuccess?: (api_data: APIResponseProps) => void,
+        onFailure?: (api_data: APIResponseProps) => void,
+        onEnter?: () => void,
+        onExit?: () => void,
+        onFinalize?: (api_data: APIResponseProps) => void
+    }
+
+    function apiCall(props: APICallProps){   
+        const { url, method, onSuccess, onFailure, onEnter, onExit, onFinalize } = props;
         const requestOptions: RequestInit = {
-            method: method,
+            method: method || "GET",
             credentials: "same-origin",
             headers: {
                 "Content-Type": "application/json",
