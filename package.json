@@ -1,6 +1,6 @@
 {
   "name": "assemblyline-ui-frontend",
-  "version": "0.1.0",
+  "version": "4.0.0",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.11.0",
@@ -56,7 +56,19 @@
   "devDependencies": {
     "@iconify/icons-logos": "^1.0.12",
     "@iconify/icons-simple-icons": "^1.0.40",
-    "@iconify/react": "^1.1.3"
+    "@iconify/react": "^1.1.3",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-typescript": "^9.0.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-config-react": "^1.1.7",
+    "eslint-config-react-app": "^5.2.1",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-jsx-a11y": "^6.3.1",
+    "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-react": "^7.20.3",
+    "eslint-plugin-react-hooks": "^4.0.8",
+    "prettier": "^2.0.5",
+    "prettier-plugin-organize-imports": "^1.1.1"
   },
   "proxy": "http://localhost:5000"
 }

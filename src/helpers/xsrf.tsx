@@ -1,14 +1,15 @@
-
-export default function getXSRFCookie(){
-    let xsrf_token = null;
-    if (document.cookie !== undefined){
-        try{
-            xsrf_token = document.cookie
-                .split('; ')
-                .find(row => row.startsWith('XSRF-TOKEN'))
-                .split('=')[1];
-        }
-        catch (ex){}
+export default function getXSRFCookie() {
+  let xsrfToken = null;
+  if (document.cookie !== undefined) {
+    try {
+      // eslint-disable-next-line prefer-destructuring
+      xsrfToken = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('XSRF-TOKEN'))
+        .split('=')[1];
+    } catch (ex) {
+      // Ignore... we will return null
     }
-    return xsrf_token;
+  }
+  return xsrfToken;
 }

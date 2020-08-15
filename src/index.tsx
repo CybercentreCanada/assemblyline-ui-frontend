@@ -1,8 +1,8 @@
+import 'fontsource-roboto';
 import React from 'react';
-import "./i18n";
-import './sass/main.scss';
 import ReactDOM from 'react-dom';
 import App from './components/app/app';
-import "fontsource-roboto"
+import './i18n';
+import './sass/main.scss';
 
-ReactDOM.render(<App />,  document.getElementById('root'));
+ReactDOM.render(<App />, document.getElementById('root'));

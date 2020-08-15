@@ -1,58 +1,58 @@
-import React, { useState } from "react";
 import {
-  IconButton,
-  Popper,
   Avatar,
-  Typography,
-  useTheme,
-  Paper,
+  Box,
+  ClickAwayListener,
+  Divider,
   Fade,
-  makeStyles,
+  IconButton,
   List,
   ListItem,
-  Box,
-  Divider,
-  ListSubheader,
-  ListItemText,
-  ClickAwayListener,
   ListItemIcon,
-} from "@material-ui/core";
-import useAppLayout from "commons/components/hooks/useAppLayout";
-import useGravatar from "commons/components/hooks/useGravatar";
-import { Link } from "react-router-dom";
-import ThemeSelection from "commons/components/layout/topnav/ThemeSelection";
-import useUser from "commons/components/hooks/useUser";
+  ListItemText,
+  ListSubheader,
+  makeStyles,
+  Paper,
+  Popper,
+  Typography,
+  useTheme
+} from '@material-ui/core';
+import useAppLayout from 'commons/components/hooks/useAppLayout';
+import useGravatar from 'commons/components/hooks/useGravatar';
+import useUser from 'commons/components/hooks/useUser';
+import ThemeSelection from 'commons/components/layout/topnav/ThemeSelection';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   popper: {
     zIndex: theme.zIndex.drawer + 2,
-    minWidth: "280px",
+    minWidth: '280px'
   },
   avatarButton: {
     padding: 0,
     marginLeft: theme.spacing(1),
-    marginRight: theme.spacing(1),
+    marginRight: theme.spacing(1)
   },
   iconButton: {
     width: theme.spacing(5),
     height: theme.spacing(5),
-    [theme.breakpoints.down("xs")]: {
+    [theme.breakpoints.down('xs')]: {
       width: theme.spacing(4),
-      height: theme.spacing(4),
-    },
-  },
+      height: theme.spacing(4)
+    }
+  }
 }));
 
 export type UserMenuElement = {
-  name: string,
-  route: string,
+  name: string;
+  route: string;
   icon?: React.ReactElement<any>;
 };
 
 const UserProfile = () => {
   const classes = useStyles();
   const theme = useTheme();
-  const {user: currentUser} = useUser();
+  const { user: currentUser } = useUser();
   const { layoutProps } = useAppLayout();
   const gravatarUrl = useGravatar(layoutProps.allowGravatar ? currentUser.email : null);
   const [popperAnchorEl, setPopperAnchorEl] = useState(null);
@@ -61,47 +61,52 @@ const UserProfile = () => {
     setPopperAnchorEl(popperAnchorEl ? null : event.currentTarget);
   };
 
-  const onClickAway = () => setPopperAnchorEl(null)
+  const onClickAway = () => setPopperAnchorEl(null);
   const isPopperOpen = !!popperAnchorEl;
 
-  const renderThemeSelection = (enabled) => {
-    if (enabled){
-      return <Box>
-        <Divider />
-        <ThemeSelection />
-      </Box>
-    }
-  }
-
-  const renderMenu = (type, menuItems, title) => {
-    if(menuItems !== undefined && menuItems !== null && menuItems.length !== 0) {
-        return <Box>
-            <Divider />
-            <List dense subheader={<ListSubheader disableSticky>{title}</ListSubheader>}>
-              {menuItems.map((a, i) => (
-                <ListItem button component={Link} to={a.route} key={`${type}-${i}`}>
-                  {a.icon ? <ListItemIcon>{a.icon}</ListItemIcon> : null}
-                  <ListItemText>{a.name}</ListItemText>
-                </ListItem>
-              ))}
-            </List>
-          </Box>
+  const renderThemeSelection = (enabled: boolean) => {
+    if (enabled) {
+      return (
+        <Box>
+          <Divider />
+          <ThemeSelection />
+        </Box>
+      );
     }
     return null;
-  }
+  };
+
+  const renderMenu = (type, menuItems, title) => {
+    if (menuItems !== undefined && menuItems !== null && menuItems.length !== 0) {
+      return (
+        <Box>
+          <Divider />
+          <List dense subheader={<ListSubheader disableSticky>{title}</ListSubheader>}>
+            {menuItems.map((a, i) => (
+              <ListItem button component={Link} to={a.route} key={`${type}-${i}`}>
+                {a.icon ? <ListItemIcon>{a.icon}</ListItemIcon> : null}
+                <ListItemText>{a.name}</ListItemText>
+              </ListItem>
+            ))}
+          </List>
+        </Box>
+      );
+    }
+    return null;
+  };
 
   return (
     <ClickAwayListener onClickAway={onClickAway}>
-      <IconButton
-        edge={"end"}
-        className={classes.avatarButton}
-        onClick={onProfileClick}
-      >
+      <IconButton edge="end" className={classes.avatarButton} onClick={onProfileClick}>
         <Avatar
           className={classes.iconButton}
           alt={currentUser.name}
-          src={currentUser.avatar ? currentUser.avatar : gravatarUrl}>
-            {currentUser.name.split(" ", 2).map((n)=>n[0].toUpperCase()).join("")}
+          src={currentUser.avatar ? currentUser.avatar : gravatarUrl}
+        >
+          {currentUser.name
+            .split(' ', 2)
+            .map(n => n[0].toUpperCase())
+            .join('')}
         </Avatar>
         <Popper
           open={isPopperOpen}
@@ -119,26 +124,32 @@ const UserProfile = () => {
                       <Avatar
                         style={{
                           width: theme.spacing(8),
-                          height: theme.spacing(8),
+                          height: theme.spacing(8)
                         }}
                         alt={currentUser.name}
-                        src={currentUser.avatar ? currentUser.avatar : gravatarUrl}>
-                          {currentUser.name.split(" ", 2).map((n)=>n[0].toUpperCase()).join("")}
+                        src={currentUser.avatar ? currentUser.avatar : gravatarUrl}
+                      >
+                        {currentUser.name
+                          .split(' ', 2)
+                          .map(n => n[0].toUpperCase())
+                          .join('')}
                       </Avatar>
                       <Box pl={2}>
-                        <Typography variant={"body1"} noWrap>
+                        <Typography variant="body1" noWrap>
                           <b>{currentUser.name}</b>
                         </Typography>
-                        <Typography variant={"caption"} noWrap>
+                        <Typography variant="caption" noWrap>
                           {currentUser.email}
                         </Typography>
                       </Box>
                     </Box>
                   </ListItem>
                 </List>
-                {renderMenu("usermenu", layoutProps.topnav.userMenu, layoutProps.topnav.userMenuTitle)}
-                {currentUser.is_admin ? renderMenu("adminmenu", layoutProps.topnav.adminMenu, layoutProps.topnav.adminMenuTitle) : null}
-                {renderThemeSelection(layoutProps.topnav.themeSelectionUnder === "profile")}
+                {renderMenu('usermenu', layoutProps.topnav.userMenu, layoutProps.topnav.userMenuTitle)}
+                {currentUser.is_admin
+                  ? renderMenu('adminmenu', layoutProps.topnav.adminMenu, layoutProps.topnav.adminMenuTitle)
+                  : null}
+                {renderThemeSelection(layoutProps.topnav.themeSelectionUnder === 'profile')}
               </Paper>
             </Fade>
           )}

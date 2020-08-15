@@ -1,13 +1,14 @@
-import { useMemo } from "react";
-const md5 = require("md5");
+import { useMemo } from 'react';
 
-const useGravatar = (email: string)  => {
-    return useMemo(() => {
-        if (email !== null ){
-            return `https://s.gravatar.com/avatar/${md5(email)}?d=404`
-        }
-        return null
-    }, [email])
-}
+const md5 = require('md5');
 
-export default useGravatar
+const useGravatar = (email: string) => {
+  return useMemo(() => {
+    if (email !== null) {
+      return `https://s.gravatar.com/avatar/${md5(email)}?d=404`;
+    }
+    return null;
+  }, [email]);
+};
+
+export default useGravatar;

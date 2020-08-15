@@ -1,252 +1,250 @@
-import React, { useState } from "react";
-import { CssBaseline, makeStyles, ThemeProvider, useMediaQuery, Box, useTheme } from "@material-ui/core";
-import useAppTheme, { AppThemeColorProps } from "commons/components/hooks/useAppTheme";
-import LeftNavDrawer, { LeftNavElement } from "./leftnav/LeftNavDrawer";
-import TopBar from "./topnav/TopBar";
-import { AppElement } from "./topnav/AppSwitcher";
-import { UserMenuElement } from "./topnav/UserProfile";
-import PageHeader from "./pages/PageHeader";
-import useUser from "commons/components/hooks/useUser";
+import { Box, CssBaseline, makeStyles, ThemeProvider, useMediaQuery, useTheme } from '@material-ui/core';
+import useAppTheme, { AppThemeColorProps } from 'commons/components/hooks/useAppTheme';
+import useUser from 'commons/components/hooks/useUser';
+import React, { useState } from 'react';
+import LeftNavDrawer, { LeftNavElement } from './leftnav/LeftNavDrawer';
+import PageHeader from './pages/PageHeader';
+import { AppElement } from './topnav/AppSwitcher';
+import TopBar from './topnav/TopBar';
+import { UserMenuElement } from './topnav/UserProfile';
 
-const useStyles = (layout) => {
-  return makeStyles((theme) => ({
+const useStyles = layout => {
+  return makeStyles(theme => ({
     app: {
       // display: "block",
-      [theme.breakpoints.up("md")]: {
+      [theme.breakpoints.up('md')]: {
         // There are issues with display flex that propagate to other components.
         // If we are not able to fix them we should consider using block but
         //   calculating the padding depending on the menu state
-        display: "flex",
-      },
+        display: 'flex'
+      }
     },
     container: {
-      display: "block",
-      paddingTop: layout === "top" ? theme.spacing(9) : theme.spacing(8),
+      display: 'block',
+      paddingTop: layout === 'top' ? theme.spacing(9) : theme.spacing(8),
       paddingLeft: theme.spacing(3),
       paddingRight: theme.spacing(3),
       paddingBottom: theme.spacing(3),
-      [theme.breakpoints.only("sm")]: {
-        paddingLeft: theme.spacing(10),
+      [theme.breakpoints.only('sm')]: {
+        paddingLeft: theme.spacing(10)
       },
-      [theme.breakpoints.up("md")]: {
-        flexGrow: 1,
-      },
+      [theme.breakpoints.up('md')]: {
+        flexGrow: 1
+      }
     }
-  }))()
+  }))();
 };
-
 
 export type AppLayoutContextProps = {
-  autoHideAppbar: boolean,
-  currentLayout: string,
-  drawerState: boolean,
-  breadcrumbsEnabled: boolean,
-  breadcrumbsState: boolean,
-  breadcrumbsPlacement: string,
-  layoutProps: AppLayoutProps,
-  showQuickSearch: boolean,
-  getBanner: (theme) => React.ReactElement<any>,
-  getLogo: (theme)  => React.ReactElement<any>,
-  hideMenus: () => void,
-  toggleLayout: () => void,
-  toggleTheme: () => void,
-  toggleDrawer: () => void,
-  toggleQuickSearch: () => void,
-  toggleAutoHideAppbar: () => void,
-  toggleShowBreadcrumbs: () => void,
-  toggleBreadcrumbsState: () => void,
-}
+  autoHideAppbar: boolean;
+  currentLayout: string;
+  drawerState: boolean;
+  breadcrumbsEnabled: boolean;
+  breadcrumbsState: boolean;
+  breadcrumbsPlacement: string;
+  layoutProps: AppLayoutProps;
+  showQuickSearch: boolean;
+  getBanner: (theme) => React.ReactElement<any>;
+  getLogo: (theme) => React.ReactElement<any>;
+  hideMenus: () => void;
+  toggleLayout: () => void;
+  toggleTheme: () => void;
+  toggleDrawer: () => void;
+  toggleQuickSearch: () => void;
+  toggleAutoHideAppbar: () => void;
+  toggleShowBreadcrumbs: () => void;
+  toggleBreadcrumbsState: () => void;
+};
 
 export interface AppLayoutProps {
-  appName: string,
-  allowBreadcrumbs?: boolean,
-  allowGravatar?: boolean,
-  allowQuickSearch?: boolean,
-  allowReset?: boolean,
-  appIconDark: React.ReactElement<any>,
-  appIconLight: React.ReactElement<any>,
-  bannerDark: React.ReactElement<any>,
-  bannerLight: React.ReactElement<any>,
-  colors: AppThemeColorProps,
-  defaultTheme: "dark" | "light",
-  defaultLayout: "top" | "side",
-  defaultDrawerOpen?: boolean,
-  defaultShowQuickSearch?: boolean,
-  defaultAutoHideAppbar?: boolean,
-  defaultShowBreadcrumbs?: boolean,
-  defaultBreadcrumbsOpen?: boolean,
-  breadcrumbsPlacement?: "topbar" | "page",
+  appName: string;
+  allowBreadcrumbs?: boolean;
+  allowGravatar?: boolean;
+  allowQuickSearch?: boolean;
+  allowReset?: boolean;
+  appIconDark: React.ReactElement<any>;
+  appIconLight: React.ReactElement<any>;
+  bannerDark: React.ReactElement<any>;
+  bannerLight: React.ReactElement<any>;
+  colors: AppThemeColorProps;
+  defaultTheme: 'dark' | 'light';
+  defaultLayout: 'top' | 'side';
+  defaultDrawerOpen?: boolean;
+  defaultShowQuickSearch?: boolean;
+  defaultAutoHideAppbar?: boolean;
+  defaultShowBreadcrumbs?: boolean;
+  defaultBreadcrumbsOpen?: boolean;
+  breadcrumbsPlacement?: 'topbar' | 'page';
   topnav: {
-    apps?: AppElement[],
-    userMenu?: UserMenuElement[],
-    userMenuTitle?: string,
-    adminMenu?: UserMenuElement[],
-    adminMenuTitle?: string,
-    quickSearchURI?: string,
-    quickSearchParam?: string,
-    themeSelectionUnder: "profile" | "icon"
-  },
+    apps?: AppElement[];
+    userMenu?: UserMenuElement[];
+    userMenuTitle?: string;
+    adminMenu?: UserMenuElement[];
+    adminMenuTitle?: string;
+    quickSearchURI?: string;
+    quickSearchParam?: string;
+    themeSelectionUnder: 'profile' | 'icon';
+  };
   leftnav: {
     elements: LeftNavElement[];
-  }
-};
+  };
+}
 
 interface LayoutProviderProps extends AppLayoutProps {
-  children: React.ReactNode,
-};
+  children: React.ReactNode;
+}
 
 export const AppLayoutContext = React.createContext<AppLayoutContextProps>(null);
 
-
 function AppLayoutProvider(props: LayoutProviderProps) {
-  const {children, ...layoutProps} = props;
+  const { children, ...layoutProps } = props;
   // Load DarkMode defaults
   let initialTheme;
   const muiTheme = useTheme();
-  const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
-  const storedDarkMode = localStorage.getItem("darkMode");
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const storedDarkMode = localStorage.getItem('darkMode');
   const darkMode = storedDarkMode ? !!JSON.parse(storedDarkMode) : null;
-  const {isReady: isUserReady} = useUser();
+  const { isReady: isUserReady } = useUser();
 
-  if (darkMode !== null && darkMode === true){
-    initialTheme = "dark" as "dark";
-  }
-  else if (darkMode !== null && darkMode === false){
-    initialTheme = "light" as "light";
-  }
-  else if (prefersDarkMode){
-    initialTheme = "dark" as "dark";
-  }
-  else {
+  if (darkMode !== null && darkMode === true) {
+    initialTheme = 'dark' as 'dark';
+  } else if (darkMode !== null && darkMode === false) {
+    initialTheme = 'light' as 'light';
+  } else if (prefersDarkMode) {
+    initialTheme = 'dark' as 'dark';
+  } else {
     initialTheme = layoutProps.defaultTheme;
   }
 
   // Load Initial Layout Default
   let initialLayout;
   const storedNavLayout = localStorage.getItem('navLayout');
-  if (storedNavLayout && storedNavLayout === 'top'){
+  if (storedNavLayout && storedNavLayout === 'top') {
     initialLayout = 'top' as 'top';
-  }
-  else if (storedNavLayout && storedNavLayout === 'side'){
+  } else if (storedNavLayout && storedNavLayout === 'side') {
     initialLayout = 'side' as 'side';
-  }
-  else{
+  } else {
     initialLayout = layoutProps.defaultLayout;
   }
 
   // Load Nav Drawer Default State
-  let initialDrawer;
   const storedDrawer = localStorage.getItem('drawerOpen');
-  initialDrawer = storedDrawer ? !!JSON.parse(storedDrawer) : layoutProps.defaultDrawerOpen;
+  const initialDrawer = storedDrawer ? !!JSON.parse(storedDrawer) : layoutProps.defaultDrawerOpen;
 
   // Load Quick Search Default State
-  let initialQuickSearch;
   const storedQuickSearch = localStorage.getItem('showQuickSearch');
-  initialQuickSearch = storedQuickSearch ? !!JSON.parse(storedQuickSearch) : layoutProps.defaultShowQuickSearch;
+  const initialQuickSearch = storedQuickSearch ? !!JSON.parse(storedQuickSearch) : layoutProps.defaultShowQuickSearch;
 
   // Load Auto hide Topbar default state
-  let initialAutoHideAppbar;
   const storedAutoHideAppbar = localStorage.getItem('autoHideAppbar');
-  initialAutoHideAppbar = storedAutoHideAppbar ? !!JSON.parse(storedAutoHideAppbar) : layoutProps.defaultAutoHideAppbar;
+  const initialAutoHideAppbar = storedAutoHideAppbar
+    ? !!JSON.parse(storedAutoHideAppbar)
+    : layoutProps.defaultAutoHideAppbar;
 
   // Load Breadcrumbs Default State
-  let initialBreadcrumbsEnabled;
   const storedShowBreadcrumbs = localStorage.getItem('breadcrumbsEnabled');
-  initialBreadcrumbsEnabled = storedShowBreadcrumbs ? !!JSON.parse(storedShowBreadcrumbs) : layoutProps.defaultShowBreadcrumbs;
-
+  const initialBreadcrumbsEnabled = storedShowBreadcrumbs
+    ? !!JSON.parse(storedShowBreadcrumbs)
+    : layoutProps.defaultShowBreadcrumbs;
 
   // Load Breadcrumbs Default Expanded/Minimize State
-  let initialBreadcrumbsState;
   const storedBreadcrumbs = localStorage.getItem('breadcrumbsState');
-  initialBreadcrumbsState = storedBreadcrumbs ? !!JSON.parse(storedBreadcrumbs) : layoutProps.defaultBreadcrumbsOpen;
+  const initialBreadcrumbsState = storedBreadcrumbs
+    ? !!JSON.parse(storedBreadcrumbs)
+    : layoutProps.defaultBreadcrumbsOpen;
 
   // Breadcrumb placement.
-  const breadcrumbsPlacement = layoutProps.breadcrumbsPlacement ? layoutProps.breadcrumbsPlacement : "topbar"
+  const breadcrumbsPlacement = layoutProps.breadcrumbsPlacement ? layoutProps.breadcrumbsPlacement : 'topbar';
 
-
-  const [showMenus, setShowMenus] = useState<boolean>(true)
-  const [theme, setTheme] = useState<string>(initialTheme)
-  const [drawer, setDrawer] = useState<boolean>(initialDrawer)
-  const [breadcrumbsEnabled, setBreadcrumbsEnabled] = useState<boolean>(initialBreadcrumbsEnabled)
-  const [breadcrumbsState, setBreadcrumbsState] = useState<boolean>(initialBreadcrumbsState)
-  const [quickSearch, setQuickSearch] = useState<boolean>(initialQuickSearch)
-  const [autoHideAppbar, setAutoHideAppbar] = useState<boolean>(initialAutoHideAppbar)
-  const [layout, setLayout] = useState<"top"| "side">(initialLayout)
-  const [appTheme] = useAppTheme(theme === "dark", layoutProps.colors);
+  const [showMenus, setShowMenus] = useState<boolean>(true);
+  const [theme, setTheme] = useState<string>(initialTheme);
+  const [drawer, setDrawer] = useState<boolean>(initialDrawer);
+  const [breadcrumbsEnabled, setBreadcrumbsEnabled] = useState<boolean>(initialBreadcrumbsEnabled);
+  const [breadcrumbsState, setBreadcrumbsState] = useState<boolean>(initialBreadcrumbsState);
+  const [quickSearch, setQuickSearch] = useState<boolean>(initialQuickSearch);
+  const [autoHideAppbar, setAutoHideAppbar] = useState<boolean>(initialAutoHideAppbar);
+  const [layout, setLayout] = useState<'top' | 'side'>(initialLayout);
+  const [appTheme] = useAppTheme(theme === 'dark', layoutProps.colors);
   const classes = useStyles(layout);
-  const showBreadcrumbsOnPage = useMediaQuery(muiTheme.breakpoints.only("sm")) && layoutProps.allowQuickSearch && quickSearch
-
+  const showBreadcrumbsOnPage =
+    useMediaQuery(muiTheme.breakpoints.only('sm')) && layoutProps.allowQuickSearch && quickSearch;
 
   const onToggleLayout = () => {
-    const newLayout = layout === "top" ? "side" : "top"
+    const newLayout = layout === 'top' ? 'side' : 'top';
     localStorage.setItem('navLayout', newLayout);
-    setLayout(newLayout)
-  }
+    setLayout(newLayout);
+  };
 
   const onToggleTheme = () => {
-    const newTheme = theme === "dark" ? "light" : "dark"
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
     localStorage.setItem('darkMode', JSON.stringify(newTheme === 'dark'));
-    setTheme(newTheme)
-  }
+    setTheme(newTheme);
+  };
 
   const onToggleDrawer = () => {
-    localStorage.setItem("drawerOpen", JSON.stringify(!drawer));
-    setDrawer(!drawer)
-  }
+    localStorage.setItem('drawerOpen', JSON.stringify(!drawer));
+    setDrawer(!drawer);
+  };
 
   const onToggleQuickSearch = () => {
-    localStorage.setItem("showQuickSearch", JSON.stringify(!quickSearch));
-    setQuickSearch(!quickSearch)
-  }
+    localStorage.setItem('showQuickSearch', JSON.stringify(!quickSearch));
+    setQuickSearch(!quickSearch);
+  };
 
   const onToggleAutoHideAppbar = () => {
-    localStorage.setItem("autoHideAppbar", JSON.stringify(!autoHideAppbar));
-    setAutoHideAppbar(!autoHideAppbar)
-  }
+    localStorage.setItem('autoHideAppbar', JSON.stringify(!autoHideAppbar));
+    setAutoHideAppbar(!autoHideAppbar);
+  };
 
   const onToggleShowBreadcrumbs = () => {
-    localStorage.setItem("breadcrumbsEnabled", JSON.stringify(!breadcrumbsEnabled));
-    setBreadcrumbsEnabled(!breadcrumbsEnabled)
-  }
+    localStorage.setItem('breadcrumbsEnabled', JSON.stringify(!breadcrumbsEnabled));
+    setBreadcrumbsEnabled(!breadcrumbsEnabled);
+  };
 
   const onToggleBreadcrumbsState = () => {
-    localStorage.setItem("breadcrumbsState", JSON.stringify(!breadcrumbsState));
-    setBreadcrumbsState(!breadcrumbsState)
-  }
+    localStorage.setItem('breadcrumbsState', JSON.stringify(!breadcrumbsState));
+    setBreadcrumbsState(!breadcrumbsState);
+  };
 
   return (
     <ThemeProvider theme={appTheme}>
-      <AppLayoutContext.Provider value={{
-        autoHideAppbar: autoHideAppbar,
-        currentLayout: layout,
-        drawerState: drawer,
-        breadcrumbsEnabled,
-        breadcrumbsState,
-        breadcrumbsPlacement: layoutProps.breadcrumbsPlacement ? layoutProps.breadcrumbsPlacement : "topbar",
-        layoutProps,
-        showQuickSearch: quickSearch,
-        getBanner: (theme) => {
-          return theme.palette.type === "dark" ? layoutProps.bannerDark : layoutProps.bannerLight
-        },
-        getLogo: (theme) => {
-          return theme.palette.type === "dark" ? layoutProps.appIconDark : layoutProps.appIconLight
-        },
-        hideMenus: () => setShowMenus(false),
-        toggleLayout: onToggleLayout,
-        toggleTheme: onToggleTheme,
-        toggleDrawer: onToggleDrawer,
-        toggleQuickSearch: onToggleQuickSearch,
-        toggleAutoHideAppbar: onToggleAutoHideAppbar,
-        toggleShowBreadcrumbs: onToggleShowBreadcrumbs,
-        toggleBreadcrumbsState: onToggleBreadcrumbsState,
-      }}>
+      <AppLayoutContext.Provider
+        value={{
+          autoHideAppbar,
+          currentLayout: layout,
+          drawerState: drawer,
+          breadcrumbsEnabled,
+          breadcrumbsState,
+          breadcrumbsPlacement: layoutProps.breadcrumbsPlacement ? layoutProps.breadcrumbsPlacement : 'topbar',
+          layoutProps,
+          showQuickSearch: quickSearch,
+          getBanner: myTheme => {
+            return myTheme.palette.type === 'dark' ? layoutProps.bannerDark : layoutProps.bannerLight;
+          },
+          getLogo: myTheme => {
+            return myTheme.palette.type === 'dark' ? layoutProps.appIconDark : layoutProps.appIconLight;
+          },
+          hideMenus: () => setShowMenus(false),
+          toggleLayout: onToggleLayout,
+          toggleTheme: onToggleTheme,
+          toggleDrawer: onToggleDrawer,
+          toggleQuickSearch: onToggleQuickSearch,
+          toggleAutoHideAppbar: onToggleAutoHideAppbar,
+          toggleShowBreadcrumbs: onToggleShowBreadcrumbs,
+          toggleBreadcrumbsState: onToggleBreadcrumbsState
+        }}
+      >
         <Box className={classes.app}>
           <CssBaseline />
-          {isUserReady() && showMenus ? <TopBar/> : null}
-          {isUserReady() && showMenus ? <LeftNavDrawer/>: null}
+          {isUserReady() && showMenus ? <TopBar /> : null}
+          {isUserReady() && showMenus ? <LeftNavDrawer /> : null}
           <Box className={classes.container}>
-            {layoutProps.allowBreadcrumbs && breadcrumbsEnabled && (breadcrumbsPlacement === "page" || showBreadcrumbsOnPage) ? <PageHeader mode="breadcrumbs" /> : null}
-            {props.children}
+            {layoutProps.allowBreadcrumbs &&
+            breadcrumbsEnabled &&
+            (breadcrumbsPlacement === 'page' || showBreadcrumbsOnPage) ? (
+              <PageHeader mode="breadcrumbs" />
+            ) : null}
+            {children}
           </Box>
         </Box>
       </AppLayoutContext.Provider>
