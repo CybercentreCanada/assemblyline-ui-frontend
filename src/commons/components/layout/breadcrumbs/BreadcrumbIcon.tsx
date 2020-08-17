@@ -1,5 +1,5 @@
 import { makeStyles } from '@material-ui/core';
-import { BreadcrumbItem } from 'commons/components/hooks/useSitemap';
+import { BreadcrumbItem } from 'commons/components/hooks/useAppSitemap';
 import React from 'react';
 
 const useStyles = makeStyles(theme => ({

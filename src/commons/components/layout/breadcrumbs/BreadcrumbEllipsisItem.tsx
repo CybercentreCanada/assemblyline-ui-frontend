@@ -1,6 +1,6 @@
 import { Box, makeStyles, Tooltip } from '@material-ui/core';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
-import { BreadcrumbItem } from 'commons/components/hooks/useSitemap';
+import { BreadcrumbItem } from 'commons/components/hooks/useAppSitemap';
 import BreadcrumbsLong from 'commons/components/layout/breadcrumbs/BreadcrumbsLong';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';

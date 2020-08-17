@@ -1,4 +1,4 @@
-import { UserProfileProps, UserProviderProps } from 'commons/components/user/UserProvider';
+import { UserContextProps, UserProfileProps } from 'commons/components/user/UserProvider';
 import { useState } from 'react';
 
 export interface CustomUser extends UserProfileProps {
@@ -16,7 +16,7 @@ export interface CustomUser extends UserProfileProps {
 }
 
 // Application specific hook that will provide configuration to commons [useUser] hook.
-export default function useMyUser(): UserProviderProps<CustomUser> {
+export default function useMyUser(): UserContextProps<CustomUser> {
   const [user, setState] = useState<CustomUser>(null);
 
   const setUser = (curUser: CustomUser) => {
@@ -34,7 +34,6 @@ export default function useMyUser(): UserProviderProps<CustomUser> {
   return {
     user,
     setUser,
-    isReady,
-    provided: true // Skip user provider loading screen
+    isReady
   };
 }

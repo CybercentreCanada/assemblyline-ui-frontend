@@ -17,13 +17,13 @@ import {
   useTheme
 } from '@material-ui/core';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
+import useUser from 'commons/components/hooks/useAppUser';
 import useGravatar from 'commons/components/hooks/useGravatar';
-import useUser from 'commons/components/hooks/useUser';
 import ThemeSelection from 'commons/components/layout/topnav/ThemeSelection';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-const useStyles = makeStyles(theme => ({
+export const useStyles = makeStyles(theme => ({
   popper: {
     zIndex: theme.zIndex.drawer + 2,
     minWidth: '280px'
@@ -64,7 +64,7 @@ const UserProfile = () => {
   const onClickAway = () => setPopperAnchorEl(null);
   const isPopperOpen = !!popperAnchorEl;
 
-  const renderThemeSelection = (enabled: boolean) => {
+  const renderThemeSelection = enabled => {
     if (enabled) {
       return (
         <Box>

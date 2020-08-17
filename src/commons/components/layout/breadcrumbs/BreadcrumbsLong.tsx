@@ -1,7 +1,7 @@
 import MuiBreadcrumbs from '@material-ui/core/Breadcrumbs';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
-import { BreadcrumbItem } from 'commons/components/hooks/useSitemap';
+import { BreadcrumbItem } from 'commons/components/hooks/useAppSitemap';
 import BreadcrumbEllipsisItem from 'commons/components/layout/breadcrumbs/BreadcrumbEllipsisItem';
 import BreadcrumbLastItem from 'commons/components/layout/breadcrumbs/BreadcrumbLastItem';
 import BreadcrumbLinkItem from 'commons/components/layout/breadcrumbs/BreadcrumbLinkItem';
@@ -20,12 +20,7 @@ type BreadcrumbsLongProps = {
 const splitItems = (
   items: BreadcrumbItem[],
   disableEllipsis: boolean
-): {
-  first: BreadcrumbItem;
-  ellipsis: BreadcrumbItem[];
-  after: BreadcrumbItem[];
-  last: BreadcrumbItem;
-} => {
+): { first: BreadcrumbItem; ellipsis: BreadcrumbItem[]; after: BreadcrumbItem[]; last: BreadcrumbItem } => {
   const first = items[0];
   let ellipsis = null;
   let after = items.length > 2 ? items.slice(1, items.length - 1) : null;
@@ -67,10 +62,7 @@ const BreadcrumbsLong: React.FC<BreadcrumbsLongProps> = ({
       ) : null}
       {ellipsis ? <BreadcrumbEllipsisItem key="bcrumb-ellipsis" items={ellipsis} /> : null}
       {after
-        ? after.map(item => (
-            // eslint-disable-next-line react/jsx-indent
-            <BreadcrumbLinkItem key={`bcrumb-${item.route.path}`} item={item} textOnly={textOnly} />
-          ))
+        ? after.map(item => <BreadcrumbLinkItem key={`bcrumb-${item.route.path}`} item={item} textOnly={textOnly} />)
         : null}
       {last ? (
         allLinks ? (

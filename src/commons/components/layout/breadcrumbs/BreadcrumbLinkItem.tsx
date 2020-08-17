@@ -1,5 +1,5 @@
 import { Link, makeStyles, Tooltip } from '@material-ui/core';
-import useSitemap, { BreadcrumbItem } from 'commons/components/hooks/useSitemap';
+import useAppSitemap, { BreadcrumbItem } from 'commons/components/hooks/useAppSitemap';
 import BreadcrumbIcon from 'commons/components/layout/breadcrumbs/BreadcrumbIcon';
 import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
@@ -29,7 +29,7 @@ const BreadcrumbLinkItem: React.FC<BreadcrumbLinkItemProps> = ({ item, textOnly 
     route,
     matcher: { url }
   } = item;
-  const { resolveTitle } = useSitemap();
+  const { resolveTitle } = useAppSitemap();
   return (
     <LinkRouter
       style={route.icon ? { paddingTop: '3px' } : null}

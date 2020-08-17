@@ -28,7 +28,7 @@ const LeftNavItem: React.FC<LeftNavItemProps> = props => {
   const item = (
     <ListItem
       button
-      component={Link}
+      component={route ? Link : null}
       to={route}
       dense={!!nested}
       className={nested ? classes.nested : null}

@@ -3,12 +3,12 @@ import withWidth, { isWidthUp } from '@material-ui/core/withWidth';
 import MenuIcon from '@material-ui/icons/Menu';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import Breadcrumbs from 'commons/components/layout/breadcrumbs/Breadcrumbs';
-import AppSwitcher from 'commons/components/layout/topnav/AppSwitcher';
-import QuickSearch from 'commons/components/layout/topnav/QuickSearch';
-import ThemeSelectionIcon from 'commons/components/layout/topnav/ThemeSelectionIcon';
-import UserProfile from 'commons/components/layout/topnav/UserProfile';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import AppSwitcher from './AppSwitcher';
+import QuickSearch from './QuickSearch';
+import ThemeSelectionIcon from './ThemeSelectionIcon';
+import UserProfile from './UserProfile';
 
 function HideOnScroll(props) {
   const { children, window, enabled } = props;
@@ -25,6 +25,7 @@ function HideOnScroll(props) {
   );
 }
 
+//
 const useStyles = layout => {
   return makeStyles(theme => ({
     appBar: {
@@ -59,7 +60,7 @@ const useStyles = layout => {
     },
     icon: {
       display: 'flex',
-      padding: '0 10px',
+      paddingLeft: '10px',
       [theme.breakpoints.down('xs')]: {
         display: 'none'
       }

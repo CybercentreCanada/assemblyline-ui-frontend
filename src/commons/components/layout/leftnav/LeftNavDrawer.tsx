@@ -25,7 +25,7 @@ import { Link } from 'react-router-dom';
 
 const drawerWidth = 240;
 
-const useStyles = makeStyles(theme => ({
+export const useStyles = makeStyles(theme => ({
   drawer: {
     width: drawerWidth,
     flexShrink: 0,
@@ -79,7 +79,7 @@ export type LeftNavItemProps = {
   id: number | string;
   text: string;
   icon?: React.ReactElement<any>;
-  route: string;
+  route?: string;
   nested?: boolean;
   width?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 };

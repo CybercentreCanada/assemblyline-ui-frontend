@@ -1,7 +1,7 @@
 import { Box, Button, CircularProgress, Link, makeStyles, Typography, useTheme } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
-import useUser from 'commons/components/hooks/useUser';
+import useUser from 'commons/components/hooks/useAppUser';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';

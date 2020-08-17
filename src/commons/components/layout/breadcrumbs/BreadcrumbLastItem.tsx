@@ -1,5 +1,5 @@
 import { Tooltip, Typography } from '@material-ui/core';
-import useSitemap, { BreadcrumbItem } from 'commons/components/hooks/useSitemap';
+import useAppSitemap, { BreadcrumbItem } from 'commons/components/hooks/useAppSitemap';
 import BreadcrumbIcon from 'commons/components/layout/breadcrumbs/BreadcrumbIcon';
 import { useStyles as useLinkStyle, useStyles } from 'commons/components/layout/breadcrumbs/BreadcrumbLinkItem';
 import React from 'react';
@@ -16,7 +16,7 @@ const BreadcrumbLastItem: React.FC<BreadcrumbLastItemProps> = ({ item, textOnly 
     matcher: { url }
   } = item;
   const linkClasses = useLinkStyle();
-  const { resolveTitle } = useSitemap();
+  const { resolveTitle } = useAppSitemap();
 
   return (
     <Typography

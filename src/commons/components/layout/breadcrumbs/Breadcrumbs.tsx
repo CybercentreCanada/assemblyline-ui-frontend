@@ -1,6 +1,6 @@
 import { makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
-import useSitemap from 'commons/components/hooks/useSitemap';
+import useAppSitemap from 'commons/components/hooks/useAppSitemap';
 import BreadcrumbsLong from 'commons/components/layout/breadcrumbs/BreadcrumbsLong';
 import BreadcrumbsShort from 'commons/components/layout/breadcrumbs/BreadcrumbsShort';
 import React from 'react';
@@ -28,8 +28,8 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ disableStyle }) => {
   const { breadcrumbsState } = useAppLayout();
   const {
     breadcrumbs,
-    sitemap: { lastOnly, exceptLast, allLinks }
-  } = useSitemap();
+    props: { lastOnly, exceptLast, allLinks }
+  } = useAppSitemap();
   const items = exceptLast ? (breadcrumbs.length > 1 ? breadcrumbs.slice(0, breadcrumbs.length - 1) : []) : breadcrumbs;
 
   return breadcrumbsState && isMedium ? (

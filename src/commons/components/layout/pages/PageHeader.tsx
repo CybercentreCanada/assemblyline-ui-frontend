@@ -1,5 +1,5 @@
 import { Box, Button, IconButton } from '@material-ui/core';
-import useSitemap from 'commons/components/hooks/useSitemap';
+import useAppSitemap from 'commons/components/hooks/useAppSitemap';
 import BreadcrumbLastItem from 'commons/components/layout/breadcrumbs/BreadcrumbLastItem';
 import Breadcrumbs from 'commons/components/layout/breadcrumbs/Breadcrumbs';
 import React from 'react';
@@ -18,7 +18,7 @@ type PageHeaderProps = {
 };
 
 const PageHeader: React.FC<PageHeaderProps> = ({ mode, title, actions }) => {
-  const { last } = useSitemap();
+  const { last } = useAppSitemap();
 
   let comp = null;
   switch (mode) {

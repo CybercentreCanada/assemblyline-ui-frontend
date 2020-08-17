@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import { appendRoute, BreadcrumbItem, getRoute } from '../hooks/useAppSitemap';
 
 export type SiteMapRoute = {
   path: string;
@@ -8,25 +10,42 @@ export type SiteMapRoute = {
   icon?: React.ReactNode;
 };
 
-type SiteMapContextProps = {
-  // eslint-disable-next-line react/require-default-props
+export interface SiteMapContextProps {
   lastOnly?: boolean;
-  // eslint-disable-next-line react/require-default-props
   exceptLast?: boolean;
-  // eslint-disable-next-line react/require-default-props
   allLinks?: boolean;
   routes: SiteMapRoute[];
-};
+}
 
-type SiteMapProviderProps = SiteMapContextProps & {
+interface SiteMapProviderProps extends SiteMapContextProps {
   children: React.ReactNode;
-};
+}
 
-export const SiteMapContext = React.createContext<SiteMapContextProps>(null);
+export interface SitemapProviderContextProps extends SiteMapContextProps {
+  breadcrumbs: BreadcrumbItem[];
+}
+
+export const SiteMapContext = React.createContext<SitemapProviderContextProps>(null);
 
 function SiteMapProvider(props: SiteMapProviderProps) {
   const { children, ...contextProps } = props;
-  return <SiteMapContext.Provider value={contextProps}>{children}</SiteMapContext.Provider>;
+  const history = useHistory();
+  const [breadcrumbs, setBreadcrumbs] = useState(
+    appendRoute([getRoute('/', contextProps.routes)], getRoute(history.location.pathname, contextProps.routes))
+  );
+
+  useEffect(() => {
+    // The return callback will ensure the event handler deregisters when component
+    //  is unmounted.  Failure to do this will result in an event handler
+    //  being registered each time this component renders.
+    return history.listen(location => {
+      const _matchedRoute = getRoute(location.pathname + location.search, contextProps.routes);
+      const _breadcrumbs = appendRoute(breadcrumbs, _matchedRoute);
+      setBreadcrumbs(_breadcrumbs);
+    });
+  });
+
+  return <SiteMapContext.Provider value={{ breadcrumbs, ...contextProps }}>{children}</SiteMapContext.Provider>;
 }
 
 export default SiteMapProvider;

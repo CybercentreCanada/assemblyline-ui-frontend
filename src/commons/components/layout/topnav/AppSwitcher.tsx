@@ -79,11 +79,7 @@ const AppSwitcher: React.FC<AppsSwitcherProps> = props => {
                         target={a.newWindow ? '_blank' : null}
                         href={a.route}
                         key={`button-${i}`}
-                        style={{
-                          display: 'inherit',
-                          textDecoration: 'none',
-                          fontWeight: 400
-                        }}
+                        style={{ display: 'inherit', textDecoration: 'none', fontWeight: 400 }}
                       >
                         <Box display="inline-flex">
                           <Avatar
@@ -101,15 +97,8 @@ const AppSwitcher: React.FC<AppsSwitcherProps> = props => {
                             }
                             style={
                               a.img_d === null || typeof a.img_d === 'string'
-                                ? {
-                                    width: theme.spacing(8),
-                                    height: theme.spacing(8)
-                                  }
-                                : {
-                                    backgroundColor: 'transparent',
-                                    width: theme.spacing(8),
-                                    height: theme.spacing(8)
-                                  }
+                                ? { width: theme.spacing(8), height: theme.spacing(8) }
+                                : { backgroundColor: 'transparent', width: theme.spacing(8), height: theme.spacing(8) }
                             }
                           >
                             {isDarkTheme

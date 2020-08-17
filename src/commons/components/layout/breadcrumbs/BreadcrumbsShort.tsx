@@ -1,7 +1,7 @@
 import MuiBreadcrumbs from '@material-ui/core/Breadcrumbs';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
-import { BreadcrumbItem } from 'commons/components/hooks/useSitemap';
+import { BreadcrumbItem } from 'commons/components/hooks/useAppSitemap';
 import BreadcrumbEllipsisItem from 'commons/components/layout/breadcrumbs/BreadcrumbEllipsisItem';
 import BreadcrumbLastItem from 'commons/components/layout/breadcrumbs/BreadcrumbLastItem';
 import BreadcrumbLinkItem from 'commons/components/layout/breadcrumbs/BreadcrumbLinkItem';

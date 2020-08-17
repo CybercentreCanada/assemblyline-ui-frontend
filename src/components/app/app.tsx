@@ -1,6 +1,10 @@
+import useAppLayout from 'commons/components/hooks/useAppLayout';
+import useAppUser from 'commons/components/hooks/useAppUser';
 import AppLayoutProvider from 'commons/components/layout/LayoutProvider';
+import SiteMapProvider from 'commons/components/sitemap/SitemapProvider';
 import UserProvider from 'commons/components/user/UserProvider';
 import useMyLayout from 'components/hooks/useMyLayout';
+import useMySitemap from 'components/hooks/useMySitemap';
 import useMyUser from 'components/hooks/useMyUser';
 import LoadingScreen from 'components/routes/loading';
 import LockedPage from 'components/routes/locked';
@@ -22,15 +26,13 @@ const LOCKOUT_AUTO_NOTIFY = true;
 const HAS_TOS = true;
 // END TODO
 
-type AppProps = {};
-
-const App: React.FC<AppProps> = () => {
+const MyApp = () => {
   const params = new URLSearchParams(window.location.search);
   const [renderedApp, setRenderedApp] = useState(params.get('provider') ? 'login' : 'load');
 
-  const layoutProps = useMyLayout();
-  const userProps = useMyUser();
   const { t } = useTranslation();
+  const { setUser } = useAppUser();
+  const { setReady } = useAppLayout();
 
   useEffect(() => {
     if (params.get('provider')) {
@@ -65,7 +67,8 @@ const App: React.FC<AppProps> = () => {
         } else if (api_data.api_status_code !== 200) {
           setRenderedApp('login');
         } else {
-          userProps.setUser(api_data.api_response);
+          setUser(api_data.api_response);
+          setReady(true);
           if (!api_data.api_response.agrees_with_tos) {
             setRenderedApp('tos');
           } else {
@@ -75,30 +78,45 @@ const App: React.FC<AppProps> = () => {
       });
     // eslint-disable-next-line
   }, []);
+  return {
+    load: <LoadingScreen />,
+    locked: <LockedPage hasTOS={HAS_TOS} autoNotify={LOCKOUT_AUTO_NOTIFY} />,
+    login: (
+      <LoginScreen
+        oAuthProviders={OAUTH_PROVIDERS}
+        allowUserPass={ALLOW_USERPASS_LOGIN}
+        allowSignup={ALLOW_SIGNUP}
+        allowPWReset={ALLOW_PW_RESET}
+      />
+    ),
+    routes: <Routes />,
+    tos: <Tos />
+  }[renderedApp];
+};
+
+const App: React.FC = () => {
+  // WARNING: do not use these hooks any other places than here.
+  // Each of these hooks have corresponding hooks in the commons
+  //  that accesses they global state stored in react context providers.
+  const layoutProps = useMyLayout();
+  const sitemapProps = useMySitemap();
+  const userProps = useMyUser();
+  // For src/components/hooks/useMyLayout -[use]-> src/commons/components/hooks/useAppLayout
+  // For src/components/hooks/useMySiteMap -[use]-> src/commons/components/hooks/useAppSiteMap
+  // For src/components/hooks/useMyUser -[use]-> src/commons/components/hooks/useAppUser
+
+  // General TemplateUI layout structure.
   return (
     <BrowserRouter>
-      <UserProvider {...userProps}>
-        <AppLayoutProvider {...layoutProps}>
-          <SnackbarProvider>
-            {
-              {
-                load: <LoadingScreen />,
-                locked: <LockedPage hasTOS={HAS_TOS} autoNotify={LOCKOUT_AUTO_NOTIFY} />,
-                login: (
-                  <LoginScreen
-                    oAuthProviders={OAUTH_PROVIDERS}
-                    allowUserPass={ALLOW_USERPASS_LOGIN}
-                    allowSignup={ALLOW_SIGNUP}
-                    allowPWReset={ALLOW_PW_RESET}
-                  />
-                ),
-                routes: <Routes />,
-                tos: <Tos />
-              }[renderedApp]
-            }
-          </SnackbarProvider>
-        </AppLayoutProvider>
-      </UserProvider>
+      <SiteMapProvider {...sitemapProps}>
+        <UserProvider {...userProps}>
+          <AppLayoutProvider {...layoutProps}>
+            <SnackbarProvider>
+              <MyApp />
+            </SnackbarProvider>
+          </AppLayoutProvider>
+        </UserProvider>
+      </SiteMapProvider>
     </BrowserRouter>
   );
 };
