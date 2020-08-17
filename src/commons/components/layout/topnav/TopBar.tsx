@@ -2,11 +2,11 @@ import { AppBar, Box, IconButton, makeStyles, Slide, Toolbar, useScrollTrigger, 
 import withWidth, { isWidthUp } from '@material-ui/core/withWidth';
 import MenuIcon from '@material-ui/icons/Menu';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
-import AppSwitcher from 'commons/components/layout/AppSwitcher';
 import Breadcrumbs from 'commons/components/layout/breadcrumbs/Breadcrumbs';
-import QuickSearch from 'commons/components/layout/QuickSearch';
-import ThemeSelectionIcon from 'commons/components/layout/ThemeSelectionIcon';
-import UserProfile from 'commons/components/layout/UserProfile';
+import AppSwitcher from 'commons/components/layout/topnav/AppSwitcher';
+import QuickSearch from 'commons/components/layout/topnav/QuickSearch';
+import ThemeSelectionIcon from 'commons/components/layout/topnav/ThemeSelectionIcon';
+import UserProfile from 'commons/components/layout/topnav/UserProfile';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
