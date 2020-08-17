@@ -1,12 +1,12 @@
 import { Box, CssBaseline, makeStyles, ThemeProvider, useMediaQuery, useTheme } from '@material-ui/core';
 import useAppTheme, { AppThemeColorProps } from 'commons/components/hooks/useAppTheme';
 import useAppUser from 'commons/components/hooks/useAppUser';
+import LeftNavDrawer, { LeftNavElement } from 'commons/components/layout/leftnav/LeftNavDrawer';
+import PageHeader from 'commons/components/layout/pages/PageHeader';
+import { AppElement } from 'commons/components/layout/topnav/AppSwitcher';
+import TopBar from 'commons/components/layout/topnav/TopBar';
+import { UserMenuElement } from 'commons/components/layout/topnav/UserProfile';
 import React, { useState } from 'react';
-import LeftNavDrawer, { LeftNavElement } from './leftnav/LeftNavDrawer';
-import PageHeader from './pages/PageHeader';
-import { AppElement } from './topnav/AppSwitcher';
-import TopBar from './topnav/TopBar';
-import { UserMenuElement } from './topnav/UserProfile';
 
 const useStyles = layout => {
   return makeStyles(theme => ({

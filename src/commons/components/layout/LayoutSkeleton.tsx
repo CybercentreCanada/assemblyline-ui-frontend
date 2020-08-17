@@ -12,10 +12,10 @@ import {
 } from '@material-ui/core';
 import AppsIcon from '@material-ui/icons/Apps';
 import Skeleton from '@material-ui/lab/Skeleton';
+import useAppLayout from 'commons/components/hooks/useAppLayout';
+import { LeftNavElement } from 'commons/components/layout/leftnav/LeftNavDrawer';
+import { useStyles as userProfileStyles } from 'commons/components/layout/topnav/UserProfile';
 import React from 'react';
-import useAppLayout from '../hooks/useAppLayout';
-import { LeftNavElement } from './leftnav/LeftNavDrawer';
-import { useStyles as userProfileStyles } from './topnav/UserProfile';
 
 /**
  * MaterialUI dynamic style classes for layout skeleton component.

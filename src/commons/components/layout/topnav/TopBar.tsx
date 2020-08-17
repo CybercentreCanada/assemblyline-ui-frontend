@@ -2,13 +2,13 @@ import { AppBar, Box, IconButton, makeStyles, Slide, Toolbar, useScrollTrigger, 
 import withWidth, { isWidthUp } from '@material-ui/core/withWidth';
 import MenuIcon from '@material-ui/icons/Menu';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
+import AppSwitcher from 'commons/components/layout/AppSwitcher';
 import Breadcrumbs from 'commons/components/layout/breadcrumbs/Breadcrumbs';
+import QuickSearch from 'commons/components/layout/QuickSearch';
+import ThemeSelectionIcon from 'commons/components/layout/ThemeSelectionIcon';
+import UserProfile from 'commons/components/layout/UserProfile';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import AppSwitcher from './AppSwitcher';
-import QuickSearch from './QuickSearch';
-import ThemeSelectionIcon from './ThemeSelectionIcon';
-import UserProfile from './UserProfile';
 
 function HideOnScroll(props) {
   const { children, window, enabled } = props;

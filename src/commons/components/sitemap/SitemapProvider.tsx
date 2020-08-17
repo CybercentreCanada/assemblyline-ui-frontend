@@ -1,6 +1,6 @@
+import { appendRoute, BreadcrumbItem, getRoute } from 'commons/components/hooks/useAppSitemap';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { appendRoute, BreadcrumbItem, getRoute } from '../hooks/useAppSitemap';
 
 export type SiteMapRoute = {
   path: string;
