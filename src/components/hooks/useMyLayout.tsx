@@ -297,6 +297,9 @@ const useMyLayout = (): AppLayoutProps => {
     defaultAutoHideAppbar: true,
     defaultShowBreadcrumbs: true,
     defaultBreadcrumbsOpen: true,
+    leftnav: {
+      elements: MENU_ITEMS
+    },
     topnav: {
       adminMenu: ADMIN_MENU_ITEMS,
       adminMenuTitle: t('adminmenu'),
@@ -305,9 +308,6 @@ const useMyLayout = (): AppLayoutProps => {
       themeSelectionUnder: 'icon' as 'icon',
       userMenu: USER_MENU_ITEMS,
       userMenuTitle: t('usermenu')
-    },
-    leftnav: {
-      elements: MENU_ITEMS
     }
   };
 };
