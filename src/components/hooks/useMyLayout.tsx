@@ -298,12 +298,13 @@ const useMyLayout = (): AppLayoutProps => {
     defaultShowBreadcrumbs: true,
     defaultBreadcrumbsOpen: true,
     topnav: {
-      apps: APP_SWITCHER_ITEMS,
-      userMenu: USER_MENU_ITEMS,
-      userMenuTitle: t('usermenu'),
       adminMenu: ADMIN_MENU_ITEMS,
       adminMenuTitle: t('adminmenu'),
-      themeSelectionUnder: 'icon' as 'icon'
+      apps: APP_SWITCHER_ITEMS,
+      quickSearchURI: '/search',
+      themeSelectionUnder: 'icon' as 'icon',
+      userMenu: USER_MENU_ITEMS,
+      userMenuTitle: t('usermenu')
     },
     leftnav: {
       elements: MENU_ITEMS
