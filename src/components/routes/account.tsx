@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, CircularProgress, IconButton, makeStyles, useTheme } from '@material-ui/core';
+import { Avatar, Box, Button, CircularProgress, Grid, IconButton, makeStyles, useTheme } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 import useUser from 'commons/components/hooks/useAppUser';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
@@ -11,7 +11,6 @@ export default function Account() {
   const inputRef = useRef(null);
   const { t } = useTranslation();
   const theme = useTheme();
-  const [newImg, setNewImg] = useState('');
   const [user, setUser] = useState(null);
   const [buttonLoading, setButtonLoading] = useState(false);
   const { user: currentUser } = useUser<CustomUser>();
@@ -21,14 +20,27 @@ export default function Account() {
       padding: 0
     },
     page: {
-      maxWidth: '960px',
-      width: '100%',
-      [curTheme.breakpoints.down('sm')]: {
-        maxWidth: '100%'
-      },
-      [curTheme.breakpoints.only('md')]: {
-        maxWidth: '630px'
-      }
+      width: '80%'
+    },
+    item: {
+      textAlign: 'center',
+      padding: curTheme.spacing(2)
+    },
+    skelItem: {
+      display: 'inline-block'
+    },
+    skelButton: {
+      display: 'inline-block',
+      width: '9rem',
+      height: '4rem'
+    },
+    skelInput: {
+      display: 'inline-block',
+      height: '3rem'
+    },
+    skelLabel: {
+      display: 'inline-block',
+      width: '8rem'
     },
     buttonProgress: {
       position: 'absolute',
@@ -51,17 +63,18 @@ export default function Account() {
     });
   }
 
-  function handleFileChange(dataURI) {
-    setNewImg(dataURI);
+  function toggleAccountEnabled() {
+    setUser({ ...user, is_active: !user.is_active });
   }
-  function handleFile(e) {
+
+  function handleAvatar(e) {
     var reader = new FileReader();
     var file = e.target.files[0];
 
     if (!file) return;
 
     reader.onload = function (img) {
-      handleFileChange(img.target.result);
+      setUser({ ...user, avatar: img.target.result.toString() });
     };
     reader.readAsDataURL(file);
   }
@@ -71,7 +84,8 @@ export default function Account() {
     apiCall({
       url: `/api/v4/user/${currentUser.username}/?load_avatar`,
       onSuccess: api_data => {
-        //setUser(api_data.api_response);
+        setUser(api_data.api_response);
+        //setTimeout(() => setUser(api_data.api_response), 1500);
       }
     });
     // eslint-disable-next-line
@@ -79,60 +93,79 @@ export default function Account() {
 
   return (
     <PageCenter>
-      <Box className={classes.page} display="inline-block" textAlign="center">
-        {user ? (
-          <>
-            <Box textAlign="left">
-              <input
-                ref={inputRef}
-                accept="image/*"
-                id="contained-button-file"
-                type="file"
-                style={{ display: 'none' }}
-                onChange={handleFile}
-              />
-              <label htmlFor="contained-button-file">
-                <IconButton
-                  onClick={e => {
-                    inputRef.current.click();
-                  }}
-                >
-                  <Avatar
-                    style={{
-                      width: theme.spacing(16),
-                      height: theme.spacing(16)
-                    }}
-                    alt={user.name}
-                    src={newImg ? newImg : user.avatar}
+      <Box mt={6} className={classes.page} display="inline-block" textAlign="center">
+        <Grid container spacing={6}>
+          <Grid item xs={6} className={classes.item}>
+            <Grid container spacing={3}>
+              <Grid item xs={12}>
+                {user ? (
+                  <>
+                    <input
+                      ref={inputRef}
+                      accept="image/*"
+                      id="contained-button-file"
+                      type="file"
+                      style={{ display: 'none' }}
+                      onChange={handleAvatar}
+                    />
+                    <label htmlFor="contained-button-file">
+                      <IconButton
+                        onClick={e => {
+                          inputRef.current.click();
+                        }}
+                      >
+                        <Avatar
+                          style={{
+                            width: theme.spacing(20),
+                            height: theme.spacing(20)
+                          }}
+                          alt={user.name}
+                          src={user.avatar}
+                        >
+                          {user.name
+                            .split(' ', 2)
+                            .map(n => n[0].toUpperCase())
+                            .join('')}
+                        </Avatar>
+                      </IconButton>
+                    </label>
+                  </>
+                ) : (
+                  <Skeleton
+                    className={classes.skelItem}
+                    variant="circle"
+                    width={theme.spacing(20)}
+                    height={theme.spacing(20)}
+                  />
+                )}
+              </Grid>
+              <Grid item xs={12}>
+                {user ? (
+                  <Button
+                    variant="contained"
+                    color={user.is_active ? 'primary' : 'secondary'}
+                    onClick={toggleAccountEnabled}
                   >
-                    {user.name
-                      .split(' ', 2)
-                      .map(n => n[0].toUpperCase())
-                      .join('')}
-                  </Avatar>
-                </IconButton>
-              </label>
-            </Box>
+                    {user.is_active ? t('page.account.enabled') : t('page.account.disabled')}
+                  </Button>
+                ) : (
+                  <Skeleton className={classes.skelButton} />
+                )}
+              </Grid>
+            </Grid>
+          </Grid>
 
-            <Button
-              style={{ marginLeft: '1rem', marginTop: '3rem', marginBottom: '3rem' }}
-              variant="contained"
-              color="primary"
-              disabled={buttonLoading}
-              onClick={saveUser}
-            >
-              {t('page.account.save')}
-              {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
-            </Button>
-          </>
-        ) : (
-          <>
-            <Skeleton variant="circle" width={theme.spacing(16)} height={theme.spacing(16)} />
-            <Box alignSelf="center">
-              <Skeleton style={{ marginTop: '3rem' }} width="8rem" height="3rem" />
-            </Box>
-          </>
-        )}
+          <Grid item xs={12} className={classes.item}>
+            {user ? (
+              <Button variant="contained" color="primary" disabled={buttonLoading} onClick={saveUser}>
+                {t('page.account.save')}
+                {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+              </Button>
+            ) : (
+              <Skeleton className={classes.skelButton} />
+            )}
+          </Grid>
+        </Grid>
       </Box>
     </PageCenter>
   );

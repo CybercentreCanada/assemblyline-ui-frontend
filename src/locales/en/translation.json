@@ -38,6 +38,8 @@
   "page.404_dl.description": "Looks like this 'Link' is dead...",
   "page.404_dl.alt": "Dead Link",
   "page.account.save": "Save changes",
+  "page.account.enabled": "Account Enabled",
+  "page.account.disabled": "Account Disabled",
   "page.dashboard.title": "Dashboard",
   "page.locked.title": "Waiting for approval...",
   "page.locked.auto_notify": "System administrators have been notified. You will receive an email once your account is active.",
