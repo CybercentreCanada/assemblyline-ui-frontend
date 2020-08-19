@@ -37,6 +37,7 @@
   "page.404.description": "La page que vous recherchez est introuvable ...",
   "page.404_dl.description": "On dirait que ce 'Link' est mort...",
   "page.404_dl.alt": "Link mort",
+  "page.account.save": "Enregistrer Changements",
   "page.dashboard.title": "Tableau de bord",
   "page.locked.title": "En attente d'approbation...",
   "page.locked.auto_notify": "Les administrateurs système ont été informés. Vous recevrez un e-mail une fois que votre compte sera actif.",

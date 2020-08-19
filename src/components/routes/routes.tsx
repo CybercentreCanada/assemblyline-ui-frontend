@@ -1,4 +1,5 @@
 import NotFoundPage from 'components/routes/404_dl';
+import Account from 'components/routes/account';
 import Dashboard from 'components/routes/dashboard';
 import Logout from 'components/routes/logout';
 import Submissions from 'components/routes/submission';
@@ -11,11 +12,15 @@ const Routes = () => {
   return (
     <Switch>
       <Route exact path="/" component={Submit} />
+      <Route exact path="/submit" component={Submit} />
+      <Route exact path="/submissions" component={Submissions} />
       <Route exact path="/dashboard" component={Dashboard} />
       <Route exact path="/logout" component={Logout} />
-      <Route path="/submissions" component={Submissions} />
-      <Route exact path="/submit" component={Submit} />
+
       <Route exact path="/tos" component={Tos} />
+
+      <Route exact path="/account" component={Account} />
+
       <Route component={NotFoundPage} />
     </Switch>
   );
