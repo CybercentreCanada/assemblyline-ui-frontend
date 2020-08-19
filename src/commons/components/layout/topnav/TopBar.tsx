@@ -60,7 +60,7 @@ const useStyles = layout => {
     },
     icon: {
       display: 'flex',
-      paddingLeft: '10px',
+      padding: '0 10px',
       [theme.breakpoints.down('xs')]: {
         display: 'none'
       }

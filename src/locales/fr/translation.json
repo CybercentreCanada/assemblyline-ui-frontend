@@ -17,7 +17,7 @@
   "drawer.help.service": "Liste des Services",
   "drawer.manage": "Gestion",
   "drawer.manage.heuristics": "Heuristiques",
-  "drawer.manage.manage": "Signatures",
+  "drawer.manage.signatures": "Signatures",
   "drawer.manage.source": "Sources de Signature",
   "drawer.manage.workflow": "Flux de travail",
   "drawer.search": "Recherche",
@@ -71,6 +71,8 @@
   "page.login.securitytoken.unavailable": "Impossible d'utiliser le jeton de sécurité sur ce serveur. Utilisez plutôt un mot de passe unique...",
   "page.logout": "Déconnexion de l'utilisateur actuel ... ",
   "page.submission": "Soumissions",
+  "page.submission.detail": "Détail",
+  "page.submission.report": "Rapport",
   "page.submission.subtitle": "soumission(s) au total",
   "page.submission.header.starttime": "Heure de début",
   "page.submission.header.verdict": "Verdicte",
@@ -110,6 +112,8 @@
   "personalization.quicksearch": "Afficher recherche rapide",
   "personalization.autohideappbar": "Masquer la barre supérieure",
   "personalization.reset_text": "Réinitialiser les paramètres",
+  "personalization.showbreadcrumbs": "Afficher fils d'ariane",
+  "personalization.minimizebreadcrumbs": "Minimiser fils d'ariane",
   "quicksearch.placeholder": "Recherche ...",
   "quicksearch.aria": "recherche"
 }

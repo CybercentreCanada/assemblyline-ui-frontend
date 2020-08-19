@@ -17,7 +17,7 @@
   "drawer.help.service": "Service Listing",
   "drawer.manage": "Manage",
   "drawer.manage.heuristics": "Heuristics",
-  "drawer.manage.manage": "Signatures",
+  "drawer.manage.signatures": "Signatures",
   "drawer.manage.source": "Signature Sources",
   "drawer.manage.workflow": "Workflows",
   "drawer.search": "Search",
@@ -71,6 +71,8 @@
   "page.login.securitytoken.unavailable": "Cannot use security token on this server. Use One Time Password instead...",
   "page.logout": "Logging out current user ... ",
   "page.submission": "Submissions",
+  "page.submission.detail": "Detail",
+  "page.submission.report": "Report",
   "page.submission.subtitle": "total submission(s)",
   "page.submission.header.starttime": "Start Time",
   "page.submission.header.verdict": "Verdict",
@@ -110,6 +112,8 @@
   "personalization.quicksearch": "Show Quick Search",
   "personalization.autohideappbar": "Auto Hide Topbar",
   "personalization.reset_text": "Reset to site defaults",
+  "personalization.showbreadcrumbs": "Show Breadcrumbs",
+  "personalization.minimizebreadcrumbs": "Minimize Breadcrumbs",
   "quicksearch.placeholder": "Search ...",
   "quicksearch.aria": "search"
 }

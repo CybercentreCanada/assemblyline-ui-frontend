@@ -74,28 +74,28 @@ const useMyLayout = (): AppLayoutProps => {
             id: 'manage.heuristics',
             text: t('drawer.manage.heuristics'),
             icon: null,
-            route: '/heuristics',
+            route: '/manage/heuristics',
             nested: true
           },
           {
             id: 'manage.manage',
-            text: t('drawer.manage.manage'),
+            text: t('drawer.manage.signatures'),
             icon: null,
-            route: '/signatures',
+            route: '/manage/signatures',
             nested: true
           },
           {
             id: 'manage.source',
             text: t('drawer.manage.source'),
             icon: null,
-            route: '/sources',
+            route: '/manage/sources',
             nested: true
           },
           {
             id: 'manage.workflow',
             text: t('drawer.manage.workflow'),
             icon: null,
-            route: '/workflows',
+            route: '/manage/workflows',
             nested: true
           }
         ]
@@ -274,6 +274,8 @@ const useMyLayout = (): AppLayoutProps => {
 
   return {
     appName: 'Assemblyline',
+    allowBreadcrumbs: true,
+    allowBreadcrumbsMinimize: false,
     allowGravatar: false,
     allowQuickSearch: true,
     allowReset: false,
@@ -281,6 +283,7 @@ const useMyLayout = (): AppLayoutProps => {
     appIconLight: lightLogo,
     bannerLight: lightBanner,
     bannerDark: darkBanner,
+    breadcrumbsPlacement: 'topbar',
     colors: {
       darkPrimary: '#7c93b9',
       darkSecondary: '#929cad',
@@ -292,6 +295,8 @@ const useMyLayout = (): AppLayoutProps => {
     defaultDrawerOpen: false,
     defaultShowQuickSearch: true,
     defaultAutoHideAppbar: true,
+    defaultShowBreadcrumbs: true,
+    defaultBreadcrumbsOpen: true,
     topnav: {
       apps: APP_SWITCHER_ITEMS,
       userMenu: USER_MENU_ITEMS,

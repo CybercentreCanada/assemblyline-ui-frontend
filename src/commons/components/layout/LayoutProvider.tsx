@@ -61,6 +61,7 @@ export type AppLayoutContextProps = {
 export interface AppLayoutProps {
   appName: string;
   allowBreadcrumbs?: boolean;
+  allowBreadcrumbsMinimize?: boolean;
   allowGravatar?: boolean;
   allowQuickSearch?: boolean;
   allowReset?: boolean;

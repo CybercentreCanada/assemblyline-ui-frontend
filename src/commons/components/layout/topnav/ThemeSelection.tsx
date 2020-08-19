@@ -128,14 +128,18 @@ const ThemeSelection = ({ width }) => {
                 />
               </ListItemSecondaryAction>
             </ListItem>
-            {breadcrumbsEnabled ? (
-              <ListItem button disabled={isWidthDown('xs', width)} onClick={toggleBreadcrumbsState}>
+            {layoutProps.allowBreadcrumbsMinimize ? (
+              <ListItem
+                button
+                disabled={!breadcrumbsEnabled && isWidthDown('xs', width)}
+                onClick={toggleBreadcrumbsState}
+              >
                 <ListItemText>{t('personalization.minimizebreadcrumbs')}</ListItemText>
                 <ListItemSecondaryAction>
                   <Switch
                     edge="end"
                     disabled={isWidthDown('xs', width)}
-                    checked={!breadcrumbsState && isWidthUp('xs', width)}
+                    checked={breadcrumbsEnabled && !breadcrumbsState && isWidthUp('xs', width)}
                     onClick={toggleBreadcrumbsState}
                   />
                 </ListItemSecondaryAction>

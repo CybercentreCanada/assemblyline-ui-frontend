@@ -5,15 +5,19 @@ import { useHistory } from 'react-router-dom';
 export type SiteMapRoute = {
   path: string;
   title: string;
+  icon?: React.ReactNode;
   isRoot?: boolean;
   isLeaf?: boolean;
-  icon?: React.ReactNode;
+  exclude?: boolean;
+  breadcrumbs?: string[];
 };
 
 export interface SiteMapContextProps {
   lastOnly?: boolean;
   exceptLast?: boolean;
   allLinks?: boolean;
+  itemsBefore?: number;
+  itemsAfter?: number;
   routes: SiteMapRoute[];
 }
 
