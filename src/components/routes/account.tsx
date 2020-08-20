@@ -7,18 +7,25 @@ import {
   Grid,
   IconButton,
   isWidthDown,
-  isWidthUp,
   makeStyles,
-  TextField,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   Typography,
   useTheme,
   withWidth
 } from '@material-ui/core';
+import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
 import Skeleton from '@material-ui/lab/Skeleton';
 import useUser from 'commons/components/hooks/useAppUser';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
+import { OptionsObject, useSnackbar } from 'notistack';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -31,23 +38,22 @@ function Account<AppBarProps>({ width }) {
   const { t } = useTranslation();
   const theme = useTheme();
   const [user, setUser] = useState(null);
+  const [modified, setModified] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
   const { user: currentUser } = useUser<CustomUser>();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+
   const apiCall = useMyAPI();
   const useStyles = makeStyles(curTheme => ({
-    no_pad: {
-      padding: 0
-    },
     page: {
       width: '90%',
-      maxWidth: '1000px',
+      maxWidth: '1200px',
       [theme.breakpoints.down('sm')]: {
         width: '100%'
       }
     },
-    item: {
-      textAlign: 'center',
-      padding: curTheme.spacing(2)
+    group: {
+      marginTop: '1rem'
     },
     skelItem: {
       display: 'inline-block'
@@ -56,15 +62,6 @@ function Account<AppBarProps>({ width }) {
       display: 'inline-block',
       width: '9rem',
       height: '4rem'
-    },
-    skelInput: {
-      display: 'inline-block',
-      height: '3rem',
-      width: '100%'
-    },
-    skelLabel: {
-      display: 'inline-block',
-      width: '8rem'
     },
     buttonProgress: {
       position: 'absolute',
@@ -76,44 +73,68 @@ function Account<AppBarProps>({ width }) {
   }));
   const classes = useStyles();
 
+  const snackBarSuccessOptions: OptionsObject = {
+    variant: 'success',
+    autoHideDuration: 10000,
+    anchorOrigin: {
+      vertical: 'bottom',
+      horizontal: 'center'
+    },
+    onClick: snack => {
+      closeSnackbar();
+    }
+  };
+
   function saveUser() {
     apiCall({
       url: `/api/v4/user/${currentUser.username}/`,
       method: 'POST',
       body: user,
-      onSuccess: () => window.location.reload(false),
+      onSuccess: () => {
+        setModified(false);
+        enqueueSnackbar(t('page.account.success_save'), snackBarSuccessOptions);
+      },
       onEnter: () => setButtonLoading(true),
       onExit: () => setButtonLoading(false)
     });
   }
 
   function setName(value) {
+    setModified(true);
     setUser({ ...user, name: value });
   }
 
   function setGroups(value) {
+    setModified(true);
     setUser({ ...user, groups: [value] });
   }
 
   function setConfirmPassword(value) {
+    setModified(true);
     setUser({ ...user, new_pass_confirm: value });
   }
 
   function setNewPassword(value) {
+    setModified(true);
     setUser({ ...user, new_pass: value });
   }
 
   function setAPIQuota(value) {
+    setModified(true);
     setUser({ ...user, api_quota: value });
   }
 
   function setSubmissionQuota(value) {
+    setModified(true);
     setUser({ ...user, submission_quota: value });
   }
 
   function toggleAccountEnabled() {
+    setModified(true);
     setUser({ ...user, is_active: !user.is_active });
   }
+
+  function handleClick(event, value) {}
 
   function toggleRole(role) {
     const newTypes = user.type;
@@ -122,6 +143,7 @@ function Account<AppBarProps>({ width }) {
     } else {
       newTypes.splice(newTypes.indexOf(role), 1);
     }
+    setModified(true);
     setUser({ ...user, type: newTypes });
   }
 
@@ -132,6 +154,7 @@ function Account<AppBarProps>({ width }) {
     if (!file) return;
 
     reader.onload = img => {
+      setModified(true);
       setUser({ ...user, avatar: img.target.result.toString() });
     };
     reader.readAsDataURL(file);
@@ -142,8 +165,9 @@ function Account<AppBarProps>({ width }) {
     apiCall({
       url: `/api/v4/user/${currentUser.username}/?load_avatar`,
       onSuccess: api_data => {
-        setUser(api_data.api_response);
-        // setTimeout(() => setUser(api_data.api_response), 1500);
+        // TODO: uncomment when done making pretty
+        // setUser(api_data.api_response);
+        setTimeout(() => setUser(api_data.api_response), 1500);
       }
     });
     // eslint-disable-next-line
@@ -152,13 +176,13 @@ function Account<AppBarProps>({ width }) {
   return (
     <PageCenter>
       <Box className={classes.page} display="inline-block" textAlign="center">
-        <Box pt={6} pb={8} textAlign="left">
+        <Box pt={6} pb={4}>
           <Typography variant="h4">{t('page.account')}</Typography>
         </Box>
 
-        <Grid container spacing={4}>
-          <Grid item xs={12} sm={4} md={3} className={classes.item}>
-            <Grid container>
+        <Grid container spacing={2} justify="center">
+          <Grid item sm={12} md={3}>
+            <Grid container className={classes.group}>
               <Grid item xs={12}>
                 {user ? (
                   <>
@@ -200,6 +224,7 @@ function Account<AppBarProps>({ width }) {
                     height={theme.spacing(16)}
                   />
                 )}
+                <Typography gutterBottom>{user ? user.uname : <Skeleton />}</Typography>
               </Grid>
               <Grid item style={{ marginTop: '2rem' }} xs={12}>
                 {user ? (
@@ -215,163 +240,218 @@ function Account<AppBarProps>({ width }) {
             </Grid>
           </Grid>
 
-          <Grid item xs={12} sm={8} md={5} className={classes.item}>
-            <Grid
-              container
-              direction="column"
-              alignItems="stretch"
-              justify="flex-start"
-              alignContent="flex-start"
-              style={{ textAlign: 'left' }}
-            >
+          <Grid item sm={12} md={9} style={{ width: '100%' }}>
+            <TableContainer className={classes.group} component={Paper}>
+              <Table aria-label={t('page.account.profile')}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell colSpan={isWidthDown('xs', width) ? 2 : 3}>
+                      <Typography variant="h6" gutterBottom>
+                        {t('page.account.profile')}
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow>
+                    {isWidthDown('xs', width) ? null : (
+                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.account.uname')}</TableCell>
+                    )}
+                    <TableCell width="100%">
+                      {!isWidthDown('xs', width) ? null : (
+                        <Typography variant="caption">{t('page.account.uname')}</Typography>
+                      )}
+                      {user ? <Box>{user.uname}</Box> : <Skeleton />}
+                    </TableCell>
+                    <TableCell align="right" />
+                  </TableRow>
+                  <TableRow hover style={{ cursor: 'pointer' }} onClick={event => handleClick(event, user.name)}>
+                    {isWidthDown('xs', width) ? null : (
+                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.account.name')}</TableCell>
+                    )}
+                    <TableCell width="100%">
+                      {!isWidthDown('xs', width) ? null : (
+                        <Typography variant="caption">{t('page.account.name')}</Typography>
+                      )}
+                      {user ? <Box>{user.name}</Box> : <Skeleton />}
+                    </TableCell>
+                    <TableCell align="right">
+                      <ChevronRightOutlinedIcon />
+                    </TableCell>
+                  </TableRow>
+                  <TableRow hover style={{ cursor: 'pointer' }} onClick={event => handleClick(event, user.groups)}>
+                    {isWidthDown('xs', width) ? null : (
+                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.account.groups')}</TableCell>
+                    )}
+                    <TableCell width="100%">
+                      {!isWidthDown('xs', width) ? null : (
+                        <Typography variant="caption">{t('page.account.groups')}</Typography>
+                      )}
+                      {user ? <Box>{user.groups}</Box> : <Skeleton />}
+                    </TableCell>
+                    <TableCell align="right">
+                      <ChevronRightOutlinedIcon />
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    {isWidthDown('xs', width) ? null : (
+                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.account.email')}</TableCell>
+                    )}
+                    <TableCell width="100%">
+                      {!isWidthDown('xs', width) ? null : (
+                        <Typography variant="caption">{t('page.account.email')}</Typography>
+                      )}
+                      {user ? <Box>{user.email}</Box> : <Skeleton />}
+                    </TableCell>
+                    <TableCell align="right" />
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+
+            <TableContainer className={classes.group} component={Paper}>
+              <Table aria-label={t('page.account.options')}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell colSpan={3}>
+                      <Typography variant="h6" gutterBottom>
+                        {t('page.account.options')}
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow>
+                    {isWidthDown('xs', width) ? null : (
+                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.account.roles')}</TableCell>
+                    )}
+                    <TableCell width="100%">
+                      {!isWidthDown('xs', width) ? null : (
+                        <Typography variant="caption">{t('page.account.roles')}</Typography>
+                      )}
+                      {user ? (
+                        <Box>
+                          <Chip
+                            style={{ margin: '2px' }}
+                            size="small"
+                            color={user.type.includes('user') ? 'primary' : 'default'}
+                            onClick={() => toggleRole('user')}
+                            label={t('page.account.normal_user')}
+                          />
+                          <Chip
+                            style={{ margin: '2px' }}
+                            size="small"
+                            color={user.type.includes('admin') ? 'primary' : 'default'}
+                            onClick={() => toggleRole('admin')}
+                            label={t('page.account.admin')}
+                          />
+                          <Chip
+                            style={{ margin: '2px' }}
+                            size="small"
+                            color={user.type.includes('signature_manager') ? 'primary' : 'default'}
+                            onClick={() => toggleRole('signature_manager')}
+                            label={t('page.account.signature_manager')}
+                          />
+                          <Chip
+                            style={{ margin: '2px' }}
+                            size="small"
+                            color={user.type.includes('signature_importer') ? 'primary' : 'default'}
+                            onClick={() => toggleRole('signature_importer')}
+                            label={t('page.account.signature_importer')}
+                          />
+                        </Box>
+                      ) : (
+                        <Skeleton />
+                      )}
+                    </TableCell>
+                    <TableCell align="right" />
+                  </TableRow>
+                  <TableRow hover style={{ cursor: 'pointer' }} onClick={event => handleClick(event, user.api_quota)}>
+                    {isWidthDown('xs', width) ? null : (
+                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.account.api_quota')}</TableCell>
+                    )}
+                    <TableCell width="100%">
+                      {!isWidthDown('xs', width) ? null : (
+                        <Typography variant="caption">{t('page.account.api_quota')}</Typography>
+                      )}
+                      {user ? <Box>{user.api_quota}</Box> : <Skeleton />}
+                    </TableCell>
+                    <TableCell align="right">
+                      <ChevronRightOutlinedIcon />
+                    </TableCell>
+                  </TableRow>
+                  <TableRow
+                    hover
+                    style={{ cursor: 'pointer' }}
+                    onClick={event => handleClick(event, user.submission_quota)}
+                  >
+                    {isWidthDown('xs', width) ? null : (
+                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.account.submission_quota')}</TableCell>
+                    )}
+                    <TableCell width="100%">
+                      {!isWidthDown('xs', width) ? null : (
+                        <Typography variant="caption">{t('page.account.submission_quota')}</Typography>
+                      )}
+                      {user ? <Box>{user.submission_quota}</Box> : <Skeleton />}
+                    </TableCell>
+                    <TableCell align="right">
+                      <ChevronRightOutlinedIcon />
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+
+            <TableContainer className={classes.group} component={Paper}>
+              <Table aria-label={t('page.account.security')}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell colSpan={2}>
+                      <Typography variant="h6" gutterBottom>
+                        {t('page.account.security')}
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow hover style={{ cursor: 'pointer' }} onClick={event => handleClick(event, user.name)}>
+                    <TableCell width="100%">{user ? t('page.account.change_password') : <Skeleton />}</TableCell>
+                    <TableCell align="right">
+                      <ChevronRightOutlinedIcon />
+                    </TableCell>
+                  </TableRow>
+                  <TableRow hover style={{ cursor: 'pointer' }} onClick={event => handleClick(event, user.name)}>
+                    <TableCell width="100%">{user ? t('page.account.2fa_on') : <Skeleton />}</TableCell>
+                    <TableCell align="right">
+                      <ChevronRightOutlinedIcon />
+                    </TableCell>
+                  </TableRow>
+                  <TableRow hover style={{ cursor: 'pointer' }} onClick={event => handleClick(event, user.groups)}>
+                    <TableCell width="100%">{user ? t('page.account.token') : <Skeleton />}</TableCell>
+                    <TableCell align="right">
+                      <ChevronRightOutlinedIcon />
+                    </TableCell>
+                  </TableRow>
+                  <TableRow hover style={{ cursor: 'pointer' }} onClick={event => handleClick(event, user.groups)}>
+                    <TableCell width="100%">{user ? t('page.account.api_key') : <Skeleton />}</TableCell>
+                    <TableCell align="right">
+                      <ChevronRightOutlinedIcon />
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+
+            <Box mt={3}>
               {user ? (
-                <>
-                  <Typography variant="caption">{user ? t('page.account.uname') : <Skeleton />}</Typography>
-                  <Typography style={{ textTransform: 'uppercase' }} gutterBottom>
-                    {user.uname}
-                  </Typography>
-
-                  <TextField
-                    fullWidth
-                    size="small"
-                    label={t('page.account.name')}
-                    value={user.name}
-                    margin="dense"
-                    onChange={event => setName(event.target.value)}
-                  />
-
-                  <TextField
-                    fullWidth
-                    size="small"
-                    label={t('page.account.new_password')}
-                    type="password"
-                    margin="dense"
-                    onChange={event => setNewPassword(event.target.value)}
-                  />
-
-                  <TextField
-                    fullWidth
-                    size="small"
-                    label={t('page.account.confirm_password')}
-                    type="password"
-                    margin="dense"
-                    onChange={event => setConfirmPassword(event.target.value)}
-                  />
-
-                  <TextField
-                    fullWidth
-                    size="small"
-                    label={t('page.account.groups')}
-                    margin="dense"
-                    value={user.groups}
-                    onChange={event => setGroups(event.target.value)}
-                  />
-
-                  <Typography style={{ marginTop: theme.spacing(2) }} variant="caption">
-                    {user ? t('page.account.email') : <Skeleton />}
-                  </Typography>
-                  <Typography gutterBottom>{user.email}</Typography>
-                </>
+                <Button variant="contained" color="primary" disabled={buttonLoading || !modified} onClick={saveUser}>
+                  {t('page.account.save')}
+                  {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                </Button>
               ) : (
-                <>
-                  <Skeleton className={classes.skelInput} />
-                  <Skeleton className={classes.skelInput} />
-                  <Skeleton className={classes.skelInput} />
-                  <Skeleton className={classes.skelInput} />
-                  <Skeleton className={classes.skelInput} />
-                  <Skeleton className={classes.skelInput} />
-                </>
+                <Skeleton className={classes.skelButton} />
               )}
-            </Grid>
-          </Grid>
-          <Grid
-            item
-            sm={4}
-            style={{ display: isWidthDown('xs', width) || isWidthUp('md', width) ? 'none' : 'block' }}
-          />
-          <Grid item xs={12} sm={4} md={4} className={classes.item}>
-            {user ? (
-              <Grid
-                container
-                direction="column"
-                alignItems="stretch"
-                justify="flex-start"
-                alignContent="flex-start"
-                style={{ textAlign: 'left' }}
-              >
-                <Typography variant="caption">{user ? t('page.account.roles') : <Skeleton />}</Typography>
-                <Box mb={1}>
-                  <Chip
-                    style={{ margin: '2px' }}
-                    size="small"
-                    color={user.type.includes('user') ? 'primary' : 'default'}
-                    onClick={() => toggleRole('user')}
-                    label={t('page.account.normal_user')}
-                  />
-                  <Chip
-                    style={{ margin: '2px' }}
-                    size="small"
-                    color={user.type.includes('admin') ? 'primary' : 'default'}
-                    onClick={() => toggleRole('admin')}
-                    label={t('page.account.admin')}
-                  />
-                  <Chip
-                    style={{ margin: '2px' }}
-                    size="small"
-                    color={user.type.includes('signature_manager') ? 'primary' : 'default'}
-                    onClick={() => toggleRole('signature_manager')}
-                    label={t('page.account.signature_manager')}
-                  />
-                  <Chip
-                    style={{ margin: '2px' }}
-                    size="small"
-                    color={user.type.includes('signature_importer') ? 'primary' : 'default'}
-                    onClick={() => toggleRole('signature_importer')}
-                    label={t('page.account.signature_importer')}
-                  />
-                </Box>
-
-                <TextField
-                  fullWidth
-                  type="number"
-                  size="small"
-                  label={t('page.account.api_quota')}
-                  margin="dense"
-                  value={user.api_quota}
-                  onChange={event => setAPIQuota(event.target.value)}
-                />
-
-                <TextField
-                  fullWidth
-                  type="number"
-                  size="small"
-                  label={t('page.account.submission_quota')}
-                  margin="dense"
-                  value={user.submission_quota}
-                  onChange={event => setSubmissionQuota(event.target.value)}
-                />
-              </Grid>
-            ) : (
-              <>
-                <Skeleton className={classes.skelInput} />
-                <Skeleton className={classes.skelInput} />
-                <Skeleton className={classes.skelInput} />
-                <Skeleton className={classes.skelInput} />
-                <Skeleton className={classes.skelInput} />
-                <Skeleton className={classes.skelInput} />
-              </>
-            )}
-          </Grid>
-
-          <Grid item xs={12} className={classes.item}>
-            {user ? (
-              <Button variant="contained" color="primary" disabled={buttonLoading} onClick={saveUser}>
-                {t('page.account.save')}
-                {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
-              </Button>
-            ) : (
-              <Skeleton className={classes.skelButton} />
-            )}
+            </Box>
           </Grid>
         </Grid>
       </Box>
