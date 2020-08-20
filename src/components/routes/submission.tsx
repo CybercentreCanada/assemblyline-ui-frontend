@@ -1,4 +1,4 @@
-import { Chip, useTheme } from '@material-ui/core';
+import { Chip } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import Paper from '@material-ui/core/Paper';
 import makeStyles from '@material-ui/core/styles/makeStyles';
@@ -47,13 +47,12 @@ for (let x = 0; x < Math.floor(Math.random() * 270 + 30); x++) {
 
 export default function Submissions() {
   const classes = useStyles();
-  const theme = useTheme();
   const { t } = useTranslation();
 
   return (
     <PageFullWidth>
-      <Box pb={theme.spacing(1)}>
-        <Typography variant="h3">{t('page.submission')}</Typography>
+      <Box pb={8}>
+        <Typography variant="h4">{t('page.submission')}</Typography>
         <Typography variant="subtitle1" color="secondary">
           {rows.length} {t('page.submission.subtitle')}
         </Typography>
