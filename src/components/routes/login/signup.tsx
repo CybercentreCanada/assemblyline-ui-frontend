@@ -58,7 +58,7 @@ export function SignUp({ buttonLoading, setButtonLoading }: SignUpProps) {
           <>
             <TextField
               autoFocus
-              inputProps={{ autocorrect: 'off', autocapitalize: 'off' }}
+              inputProps={{ autoCorrect: 'off', autoCapitalize: 'off' }}
               variant="outlined"
               size="small"
               label={t('page.login.signup.username')}
@@ -81,7 +81,7 @@ export function SignUp({ buttonLoading, setButtonLoading }: SignUpProps) {
               onChange={event => setPasswordConfirm(event.target.value)}
             />
             <TextField
-              inputProps={{ autocorrect: 'off', autocapitalize: 'off' }}
+              inputProps={{ autoCorrect: 'off', autoCapitalize: 'off' }}
               style={{ marginTop: '.5rem' }}
               variant="outlined"
               size="small"

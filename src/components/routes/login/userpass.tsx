@@ -30,7 +30,7 @@ export function UserPassLogin({ onSubmit, buttonLoading, setPassword, setUsernam
       <Box display="flex" flexDirection="column">
         <TextField
           autoFocus
-          inputProps={{ autocorrect: 'off', autocapitalize: 'off' }}
+          inputProps={{ autoCorrect: 'off', autoCapitalize: 'off' }}
           variant="outlined"
           size="small"
           label={t('page.login.username')}
