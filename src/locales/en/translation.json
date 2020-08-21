@@ -37,7 +37,6 @@
   "page.404.description": "The page you are looking for cannot be found...",
   "page.404_dl.description": "Looks like this 'Link' is dead...",
   "page.404_dl.alt": "Dead Link",
-  "page.account": "Manage Account",
   "page.account.success_save": "Changes to your account were successfully saved.",
   "page.account.profile": "Profile",
   "page.account.options": "Options",

@@ -60,7 +60,7 @@ function Account<AppBarProps>({ width }) {
     drawer: {
       width: '500px',
       [theme.breakpoints.down('xs')]: {
-        width: '100%'
+        width: '100vw'
       }
     },
     row: {
@@ -291,11 +291,7 @@ function Account<AppBarProps>({ width }) {
         </Drawer>
       </React.Fragment>
 
-      <Box className={classes.page} display="inline-block" textAlign="center">
-        <Box pt={6} pb={4}>
-          <Typography variant="h4">{t('page.account')}</Typography>
-        </Box>
-
+      <Box className={classes.page} py={6} display="inline-block" textAlign="center">
         <Grid container spacing={2} justify="center">
           <Grid item sm={12} md={3}>
             <Grid container className={classes.group}>
