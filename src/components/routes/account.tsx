@@ -184,9 +184,7 @@ function Account<AppBarProps>({ width }) {
     apiCall({
       url: `/api/v4/user/${currentUser.username}/?load_avatar`,
       onSuccess: api_data => {
-        // TODO: uncomment when done making pretty
-        // setUser(api_data.api_response);
-        setTimeout(() => setUser(api_data.api_response), 1500);
+        setUser(api_data.api_response);
       }
     });
     // eslint-disable-next-line
