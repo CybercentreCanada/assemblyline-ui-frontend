@@ -4,6 +4,7 @@ import {
   Button,
   Chip,
   CircularProgress,
+  Drawer,
   Grid,
   IconButton,
   isWidthDown,
@@ -15,6 +16,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
   Typography,
   useTheme,
   withWidth
@@ -25,6 +27,7 @@ import useUser from 'commons/components/hooks/useAppUser';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
+import ChipInput from 'material-ui-chip-input';
 import { OptionsObject, useSnackbar } from 'notistack';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -37,6 +40,8 @@ function Account<AppBarProps>({ width }) {
   const inputRef = useRef(null);
   const { t } = useTranslation();
   const theme = useTheme();
+  const [drawerType, setDrawerType] = useState(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [modified, setModified] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
@@ -51,6 +56,15 @@ function Account<AppBarProps>({ width }) {
       [theme.breakpoints.down('sm')]: {
         width: '100%'
       }
+    },
+    drawer: {
+      width: '500px',
+      [theme.breakpoints.down('xs')]: {
+        width: '100%'
+      }
+    },
+    row: {
+      height: '62px'
     },
     group: {
       marginTop: '1rem'
@@ -106,7 +120,7 @@ function Account<AppBarProps>({ width }) {
 
   function setGroups(value) {
     setModified(true);
-    setUser({ ...user, groups: [value] });
+    setUser({ ...user, groups: value });
   }
 
   function setConfirmPassword(value) {
@@ -134,7 +148,12 @@ function Account<AppBarProps>({ width }) {
     setUser({ ...user, is_active: !user.is_active });
   }
 
-  function handleClick(event, value) {}
+  function toggleDrawer(type) {
+    if (user) {
+      setDrawerType(type);
+      setDrawerOpen(true);
+    }
+  }
 
   function toggleRole(role) {
     const newTypes = user.type;
@@ -175,6 +194,105 @@ function Account<AppBarProps>({ width }) {
 
   return (
     <PageCenter>
+      <React.Fragment key="right">
+        <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
+          <Box p={6} className={classes.drawer} display="flex" flexDirection="column">
+            {drawerType && user
+              ? {
+                  api_quota: (
+                    <>
+                      <Typography variant="h4">{t('page.account.api_quota')}</Typography>
+                      <Typography variant="caption" color="textSecondary" gutterBottom>
+                        {t('page.account.api_quota_edit_title')}
+                      </Typography>
+                      <TextField
+                        autoFocus
+                        type="number"
+                        margin="normal"
+                        variant="outlined"
+                        onChange={event => setAPIQuota(event.target.value)}
+                        value={user.api_quota}
+                      />
+                    </>
+                  ),
+                  change_password: (
+                    <>
+                      <Typography variant="h4" gutterBottom>
+                        {t('page.account.change_password')}
+                      </Typography>
+                      <TextField
+                        autoFocus
+                        type="password"
+                        margin="normal"
+                        variant="outlined"
+                        label={t('page.account.new_password')}
+                        onChange={event => setNewPassword(event.target.value)}
+                      />
+                      <TextField
+                        type="password"
+                        margin="normal"
+                        variant="outlined"
+                        label={t('page.account.confirm_password')}
+                        onChange={event => setConfirmPassword(event.target.value)}
+                      />
+                    </>
+                  ),
+                  groups: (
+                    <>
+                      <Typography variant="h4">{t('page.account.groups')}</Typography>
+                      <Typography variant="caption" color="textSecondary" gutterBottom>
+                        {t('page.account.groups_edit_title')}
+                      </Typography>
+                      <ChipInput
+                        margin="normal"
+                        defaultValue={user.groups}
+                        onChange={chips => setGroups(chips)}
+                        variant="outlined"
+                      />
+                    </>
+                  ),
+                  name: (
+                    <>
+                      <Typography variant="h4">{t('page.account.name')}</Typography>
+                      <Typography variant="caption" color="textSecondary" gutterBottom>
+                        {t('page.account.name_edit_title')}
+                      </Typography>
+                      <TextField
+                        autoFocus
+                        margin="normal"
+                        variant="outlined"
+                        onChange={event => setName(event.target.value)}
+                        value={user.name}
+                      />
+                    </>
+                  ),
+                  submission_quota: (
+                    <>
+                      <Typography variant="h4">{t('page.account.submission_quota')}</Typography>
+                      <Typography variant="caption" color="textSecondary" gutterBottom>
+                        {t('page.account.submission_quota_edit_title')}
+                      </Typography>
+                      <TextField
+                        autoFocus
+                        type="number"
+                        margin="normal"
+                        variant="outlined"
+                        onChange={event => setSubmissionQuota(event.target.value)}
+                        value={user.submission_quota}
+                      />
+                    </>
+                  )
+                }[drawerType]
+              : null}
+            <Box alignSelf="flex-end" pt={6}>
+              <Button variant="contained" onClick={() => setDrawerOpen(false)}>
+                {t('page.account.done')}
+              </Button>
+            </Box>
+          </Box>
+        </Drawer>
+      </React.Fragment>
+
       <Box className={classes.page} display="inline-block" textAlign="center">
         <Box pt={6} pb={4}>
           <Typography variant="h4">{t('page.account')}</Typography>
@@ -210,7 +328,7 @@ function Account<AppBarProps>({ width }) {
                         >
                           {user.name
                             .split(' ', 2)
-                            .map(n => n[0].toUpperCase())
+                            .map(n => (n ? n[0].toUpperCase() : ''))
                             .join('')}
                         </Avatar>
                       </IconButton>
@@ -253,7 +371,7 @@ function Account<AppBarProps>({ width }) {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  <TableRow>
+                  <TableRow className={classes.row}>
                     {isWidthDown('xs', width) ? null : (
                       <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.account.uname')}</TableCell>
                     )}
@@ -265,7 +383,7 @@ function Account<AppBarProps>({ width }) {
                     </TableCell>
                     <TableCell align="right" />
                   </TableRow>
-                  <TableRow hover style={{ cursor: 'pointer' }} onClick={event => handleClick(event, user.name)}>
+                  <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('name')}>
                     {isWidthDown('xs', width) ? null : (
                       <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.account.name')}</TableCell>
                     )}
@@ -279,7 +397,7 @@ function Account<AppBarProps>({ width }) {
                       <ChevronRightOutlinedIcon />
                     </TableCell>
                   </TableRow>
-                  <TableRow hover style={{ cursor: 'pointer' }} onClick={event => handleClick(event, user.groups)}>
+                  <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('groups')}>
                     {isWidthDown('xs', width) ? null : (
                       <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.account.groups')}</TableCell>
                     )}
@@ -287,13 +405,13 @@ function Account<AppBarProps>({ width }) {
                       {!isWidthDown('xs', width) ? null : (
                         <Typography variant="caption">{t('page.account.groups')}</Typography>
                       )}
-                      {user ? <Box>{user.groups}</Box> : <Skeleton />}
+                      {user ? <Box>{user.groups.join(' | ')}</Box> : <Skeleton />}
                     </TableCell>
                     <TableCell align="right">
                       <ChevronRightOutlinedIcon />
                     </TableCell>
                   </TableRow>
-                  <TableRow>
+                  <TableRow className={classes.row}>
                     {isWidthDown('xs', width) ? null : (
                       <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.account.email')}</TableCell>
                     )}
@@ -366,7 +484,7 @@ function Account<AppBarProps>({ width }) {
                     </TableCell>
                     <TableCell align="right" />
                   </TableRow>
-                  <TableRow hover style={{ cursor: 'pointer' }} onClick={event => handleClick(event, user.api_quota)}>
+                  <TableRow hover style={{ cursor: 'pointer' }} onClick={event => toggleDrawer('api_quota')}>
                     {isWidthDown('xs', width) ? null : (
                       <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.account.api_quota')}</TableCell>
                     )}
@@ -380,11 +498,7 @@ function Account<AppBarProps>({ width }) {
                       <ChevronRightOutlinedIcon />
                     </TableCell>
                   </TableRow>
-                  <TableRow
-                    hover
-                    style={{ cursor: 'pointer' }}
-                    onClick={event => handleClick(event, user.submission_quota)}
-                  >
+                  <TableRow hover style={{ cursor: 'pointer' }} onClick={event => toggleDrawer('submission_quota')}>
                     {isWidthDown('xs', width) ? null : (
                       <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.account.submission_quota')}</TableCell>
                     )}
@@ -414,25 +528,25 @@ function Account<AppBarProps>({ width }) {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  <TableRow hover style={{ cursor: 'pointer' }} onClick={event => handleClick(event, user.name)}>
+                  <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('change_password')}>
                     <TableCell width="100%">{user ? t('page.account.change_password') : <Skeleton />}</TableCell>
                     <TableCell align="right">
                       <ChevronRightOutlinedIcon />
                     </TableCell>
                   </TableRow>
-                  <TableRow hover style={{ cursor: 'pointer' }} onClick={event => handleClick(event, user.name)}>
+                  <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('2fa_on')}>
                     <TableCell width="100%">{user ? t('page.account.2fa_on') : <Skeleton />}</TableCell>
                     <TableCell align="right">
                       <ChevronRightOutlinedIcon />
                     </TableCell>
                   </TableRow>
-                  <TableRow hover style={{ cursor: 'pointer' }} onClick={event => handleClick(event, user.groups)}>
+                  <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('token')}>
                     <TableCell width="100%">{user ? t('page.account.token') : <Skeleton />}</TableCell>
                     <TableCell align="right">
                       <ChevronRightOutlinedIcon />
                     </TableCell>
                   </TableRow>
-                  <TableRow hover style={{ cursor: 'pointer' }} onClick={event => handleClick(event, user.groups)}>
+                  <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('api_key')}>
                     <TableCell width="100%">{user ? t('page.account.api_key') : <Skeleton />}</TableCell>
                     <TableCell align="right">
                       <ChevronRightOutlinedIcon />
