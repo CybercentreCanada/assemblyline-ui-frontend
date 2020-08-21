@@ -1,0 +1,147 @@
+{
+  "items": [
+    {
+      "classification": "TLP:W",
+      "error_count": 3,
+      "file_count": 6,
+      "id": "x1J6qsOA1l4GENRiSq237",
+      "max_score": 3679,
+      "params": {
+        "description": "on provide innovation Innovation determine environment partners For key Canada order BCIP development technology companies",
+        "submitter": "user"
+      },
+      "sid": "x1J6qsOA1l4GENRiSq237",
+      "state": "completed",
+      "times": { "submitted": "2020-08-21T16:13:05.950Z" }
+    },
+    {
+      "classification": "TLP:W",
+      "error_count": 2,
+      "file_count": 5,
+      "id": "75s9Kd44fef60BEg7ezo65",
+      "max_score": 1051,
+      "params": {
+        "description": "For of an commercial bringing companies this bringing tools across engaging enhanced academia of new about levels academia collaborating of authority private authority The government BCIP enhanced and new Build do",
+        "submitter": "user"
+      },
+      "sid": "75s9Kd44fef60BEg7ezo65",
+      "state": "completed",
+      "times": { "submitted": "2020-08-21T15:58:47.599Z" }
+    },
+    {
+      "classification": "TLP:W",
+      "error_count": 4,
+      "file_count": 6,
+      "id": "1LBKENfH0vzQCzfEeLMBD1",
+      "max_score": 396,
+      "params": {
+        "description": "provide technology selling or Innovation this complex Cyber academia bringing innovations evaluate technologies market security an by marketplace with in key other enhanced edge them programs Program sizes feedback innovative support sizes or innovations development role assist edge",
+        "submitter": "user"
+      },
+      "sid": "1LBKENfH0vzQCzfEeLMBD1",
+      "state": "completed",
+      "times": { "submitted": "2020-08-21T15:37:37.217Z" }
+    },
+    {
+      "classification": "TLP:W",
+      "error_count": 1,
+      "file_count": 5,
+      "id": "2DuhXBaINe63bOFiAuMWpm",
+      "max_score": 3219,
+      "params": {
+        "description": "us their potential services levels improve an promote Program cutting by environment collaborating technical the examine The partners more engaging state bringing",
+        "submitter": "user"
+      },
+      "sid": "2DuhXBaINe63bOFiAuMWpm",
+      "state": "completed",
+      "times": { "submitted": "2020-08-21T15:14:59.887Z" }
+    },
+    {
+      "classification": "TLP:W",
+      "error_count": 5,
+      "file_count": 7,
+      "id": "2sa425tn2Cwt8GF7SKylNn",
+      "max_score": 2827,
+      "params": {
+        "description": "role from assist technical constantly cyber experts invite helps do country",
+        "submitter": "admin"
+      },
+      "sid": "2sa425tn2Cwt8GF7SKylNn",
+      "state": "completed",
+      "times": { "submitted": "2020-08-21T14:24:15.574Z" }
+    },
+    {
+      "classification": "TLP:W",
+      "error_count": 3,
+      "file_count": 5,
+      "id": "46uHNtbBmmMcoNLqujWHWz",
+      "max_score": 2374,
+      "params": {
+        "description": "market Government other partners order goods by Canada goods problems Cyber by authority with provide supports cyber engaging an We stays collaborating constantly development art open determine vendors with Innovation enhanced helps us more partners art bringing defence",
+        "submitter": "user"
+      },
+      "sid": "46uHNtbBmmMcoNLqujWHWz",
+      "state": "completed",
+      "times": { "submitted": "2020-08-21T13:19:42.758Z" }
+    },
+    {
+      "classification": "TLP:W",
+      "error_count": 3,
+      "file_count": 7,
+      "id": "2AdVhBqsHzE7u4GhKRi14y",
+      "max_score": 1250,
+      "params": {
+        "description": "the collaborating are supports companies Cyber provide state engaging feedback programs promote collaborating key the feedback enhanced also",
+        "submitter": "user"
+      },
+      "sid": "2AdVhBqsHzE7u4GhKRi14y",
+      "state": "completed",
+      "times": { "submitted": "2020-08-21T13:08:28.882Z" }
+    },
+    {
+      "classification": "TLP:W",
+      "error_count": 3,
+      "file_count": 8,
+      "id": "4YGb8nGEbEfuZml12S2WZb",
+      "max_score": 433,
+      "params": {
+        "description": "levels bringing stays constantly innovations more defence Government about emerging Canada by complex constantly services industry engaging provide and cutting role enhanced",
+        "submitter": "user"
+      },
+      "sid": "4YGb8nGEbEfuZml12S2WZb",
+      "state": "completed",
+      "times": { "submitted": "2020-08-21T13:04:47.647Z" }
+    },
+    {
+      "classification": "TLP:W",
+      "error_count": 1,
+      "file_count": 6,
+      "id": "7lRnYOMRWVFot0tvFeYTwl",
+      "max_score": 4037,
+      "params": {
+        "description": "open or engaging other performs Centre by examine technical companies role innovations are laboratory testing and Cyber security them also key companies Build supports",
+        "submitter": "user"
+      },
+      "sid": "7lRnYOMRWVFot0tvFeYTwl",
+      "state": "completed",
+      "times": { "submitted": "2020-08-21T13:02:26.509Z" }
+    },
+    {
+      "classification": "TLP:W",
+      "error_count": 2,
+      "file_count": 4,
+      "id": "8qtkr7LXdqRwnLTEKbaY0",
+      "max_score": 2148,
+      "params": {
+        "description": "other provide more provide market helps supports role working art programs their technical development art edge certain learn product feedback edge working survey academia stays Government our do is to",
+        "submitter": "user"
+      },
+      "sid": "8qtkr7LXdqRwnLTEKbaY0",
+      "state": "completed",
+      "times": { "submitted": "2020-08-21T11:27:38.501Z" }
+    }
+  ],
+  "offset": 0,
+  "rows": 25,
+  "total": 10
+}

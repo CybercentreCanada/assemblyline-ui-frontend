@@ -1,0 +1,17 @@
+{
+  "agrees_with_tos": "2020-08-21T13:56:45.718604Z",
+  "allow_2fa": true,
+  "allow_apikeys": true,
+  "allow_security_tokens": true,
+  "avatar": "https://cdn.iconscout.com/icon/free/png-512/avatar-372-456324.png",
+  "c12n_enforcing": false,
+  "classification": "TLP:W",
+  "email": "admin@assemblyline.local",
+  "groups": ["USERS", "ADMIN"],
+  "is_active": true,
+  "is_admin": true,
+  "name": "Administrator",
+  "read_only": false,
+  "roles": ["user", "admin"],
+  "username": "admin"
+}

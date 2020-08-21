@@ -1,0 +1,20 @@
+{
+  "2fa_enabled": false,
+  "agrees_with_tos": "2020-08-21T13:34:05.426660Z",
+  "api_quota": 10,
+  "apikeys": [],
+  "avatar": "https://cdn.iconscout.com/icon/free/png-512/avatar-370-456322.png",
+  "can_impersonate": false,
+  "classification": "TLP:W",
+  "dn": null,
+  "email": "user@assemblyline.local",
+  "groups": ["USERS"],
+  "has_password": true,
+  "is_active": true,
+  "name": "Default User",
+  "security_token_enabled": false,
+  "security_tokens": [],
+  "submission_quota": 5,
+  "type": ["user"],
+  "uname": "user"
+}
