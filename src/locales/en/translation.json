@@ -130,6 +130,8 @@
   "page.alerts.label": "Labels",
   "page.alerts.priority": "Priority",
   "page.alerts.status": "Status",
+  "page.alerts.fileinfo": "File Info",
+  "page.alerts.ownership": "Ownership",
   "usermenu": "User Menu",
   "usermenu.account": "Manage Account",
   "usermenu.settings": "Settings",

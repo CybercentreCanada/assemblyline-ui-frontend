@@ -2,8 +2,8 @@ import { Box } from '@material-ui/core';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import useMyAPI from 'components/hooks/useMyAPI';
 import React, { useEffect, useState } from 'react';
-import { AlertItem } from './alert';
-import AlertList from './alert-list';
+import { AlertItem } from './alert-card';
+import AlertGrid from './alert-grid';
 
 const Alerts: React.FC = () => {
   const apiCall = useMyAPI();
@@ -26,7 +26,7 @@ const Alerts: React.FC = () => {
   return (
     <Box>
       <PageHeader mode="provided" title={<h2>{`Total: ${alerts.length}`}</h2>} />
-      <AlertList items={alerts} />
+      <AlertGrid items={alerts} />
     </Box>
   );
 };
