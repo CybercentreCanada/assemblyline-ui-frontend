@@ -21,7 +21,7 @@ const Alerts: React.FC = () => {
       onEnter: () => console.log('enter'),
       onExit: () => console.log('exit')
     });
-  }, []);
+  }, [apiCall, setAlerts]);
 
   return (
     <Box>

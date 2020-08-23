@@ -1,6 +1,8 @@
 import {
   Box,
+  Button,
   Card,
+  CardActions,
   CardContent,
   Chip,
   Grid,
@@ -86,6 +88,10 @@ const useStyles = makeStyles(theme => ({
     '& li:last-child > span::after': {
       display: 'none'
     }
+  },
+  button: {
+    // border: '1px solid',
+    // borderColor: theme.palette.secondary.light
   }
 }));
 
@@ -199,11 +205,9 @@ const AlertCard: React.FC<AlertProps> = ({ item }) => {
                   </Grid>
                   <Grid item xs={8}>
                     <Link href={item.file.name}>{item.file.name}</Link>
-                    <Box component="span">
-                      <Typography variant="caption">
-                        {item.file.size} ({(item.file.size / 1024).toFixed(2)}Kb)
-                      </Typography>
-                    </Box>
+                    <Typography variant="caption" style={{ marginLeft: theme.spacing(1) }}>
+                      {item.file.size}({(item.file.size / 1024).toFixed(2)}Kb)
+                    </Typography>
                     <Typography>{item.file.type}</Typography>
                   </Grid>
                   <Grid item xs={4}>
@@ -294,6 +298,26 @@ const AlertCard: React.FC<AlertProps> = ({ item }) => {
           </Box>
         </Box>
       </CardContent>
+      <CardActions>
+        <Button size="small" variant="contained">
+          Submission &nbsp;
+        </Button>
+        <Button size="small" variant="contained">
+          Search SHA256
+        </Button>
+        <Button size="small" variant="contained">
+          Count Similar
+        </Button>
+        <Button size="small" variant="contained">
+          Related IDs
+        </Button>
+        <Button size="small" variant="contained">
+          Has Ownership
+        </Button>
+        <Button size="small" variant="contained">
+          Workflow Action
+        </Button>
+      </CardActions>
     </Card>
   );
 };
