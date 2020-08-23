@@ -132,6 +132,7 @@
   "page.alerts.status": "Status",
   "page.alerts.fileinfo": "File Info",
   "page.alerts.ownership": "Ownership",
+  "page.alerts.heuristic": "Heuristic",
   "usermenu": "User Menu",
   "usermenu.account": "Manage Account",
   "usermenu.settings": "Settings",

@@ -72,6 +72,7 @@
   "page.alerts.status": "Statut",
   "page.alerts.fileinfo": "Info du fichier",
   "page.alerts.ownership": "Propriété",
+  "page.alerts.heuristic": "Heuristique",
   "page.dashboard.title": "Tableau de bord",
   "page.locked.title": "En attente d'approbation...",
   "page.locked.auto_notify": "Les administrateurs système ont été informés. Vous recevrez un e-mail une fois que votre compte sera actif.",

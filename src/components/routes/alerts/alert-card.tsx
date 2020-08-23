@@ -13,7 +13,7 @@ import {
 } from '@material-ui/core';
 import ClipboardIcon from '@material-ui/icons/AssignmentReturned';
 import useClipboard from 'components/hooks/useClipboard';
-import React from 'react';
+import React, { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(theme => ({
@@ -32,10 +32,7 @@ const useStyles = makeStyles(theme => ({
     flexWrap: 'wrap',
     listStyle: 'none',
     marginLeft: -theme.spacing(0.5),
-    paddingLeft: 0,
-    paddingRight: 0,
-    paddingTop: theme.spacing(0.5),
-    paddingBottom: theme.spacing(0.5),
+    padding: 0,
     boxShadow: 'inherit',
     margin: 0,
     '& li ': {
@@ -58,6 +55,24 @@ const useStyles = makeStyles(theme => ({
     '& :hover': {
       cursor: 'pointer'
     }
+  },
+  separatedList: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    listStyle: 'none',
+    marginLeft: -theme.spacing(0.5),
+    padding: 0,
+    boxShadow: 'inherit',
+    margin: 0,
+    '& a::after': {
+      content: "'|'",
+      margin: '0 5px',
+      fontWeight: 'bold',
+      fontSize: 'larger'
+    },
+    '& li:last-child > a::after': {
+      display: 'none'
+    }
   }
 }));
 
@@ -72,12 +87,19 @@ export type AlertFile = {
 
 export type AlertItem = {
   sid: string;
+  alert_id: string;
   type: string;
   reporting_ts: string;
   label: string[];
   priority: string;
   status: string;
   file: AlertFile;
+  owner: string;
+  category: string;
+  metadata: {
+    [key: string]: any;
+  }[];
+  heuristic: { name: string[] };
 };
 
 type AlertProps = {
@@ -106,7 +128,7 @@ const AlertCard: React.FC<AlertProps> = ({ item }) => {
                 </Typography>
               </Grid>
               <Grid item xs={8}>
-                <Typography component="span">{item.reporting_ts}</Typography>
+                <Typography>{item.reporting_ts}</Typography>
               </Grid>
               {/* row 2 */}
               <Grid item xs={4}></Grid>
@@ -144,7 +166,7 @@ const AlertCard: React.FC<AlertProps> = ({ item }) => {
               <Grid item xs={8}>
                 <DefaultChip label={item.status} />
               </Grid>
-              {/* row 6 */}
+              {/* row 6: File Info */}
               <Grid item xs={12}>
                 <Grid container>
                   <Grid item xs={4}>
@@ -190,13 +212,70 @@ const AlertCard: React.FC<AlertProps> = ({ item }) => {
                   </Grid>
                 </Grid>
               </Grid>
-              {/* row 7 */}
+              {/* row 7: Owner */}
               <Grid item xs={4}>
-                <Typography component="div" className={classes.typoLabel}>
+                <Typography component="span" className={classes.typoLabel}>
                   {t('page.alerts.ownership')}
                 </Typography>
               </Grid>
-              <Grid item xs={8}></Grid>
+              <Grid item xs={8}>
+                <Typography>{item.owner}</Typography>
+              </Grid>
+              {/* row 8: Metadata */}
+              <Grid item xs={12}>
+                <Grid container>
+                  {Object.keys(item.metadata).map(k => (
+                    <Fragment key={k}>
+                      <Grid item xs={4}>
+                        <Typography className={classes.typoLabel}>{k}</Typography>
+                      </Grid>
+                      <Grid item xs={8}>
+                        <Typography>{item.metadata[k]}</Typography>
+                      </Grid>
+                    </Fragment>
+                  ))}
+                </Grid>
+              </Grid>
+              {/* row 9: Category */}
+              {item.category ? (
+                <>
+                  <Grid item xs={4}>
+                    <Typography component="span" className={classes.typoLabel}>
+                      {t('page.alerts.cateory')}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={8}>
+                    <Typography>{item.category}</Typography>
+                  </Grid>
+                </>
+              ) : null}
+              {/* row 10: Patterns */}
+
+              {/* row 11: Heurisitics */}
+              {item.heuristic ? (
+                <>
+                  <Grid item xs={4}>
+                    <Typography component="span" className={classes.typoLabel}>
+                      {t('page.alerts.heuristic')}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={8}>
+                    <ul className={classes.separatedList}>
+                      {item.heuristic.name.map(h => (
+                        <li key={h}>
+                          <Link href="#">{h}</Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </Grid>
+                </>
+              ) : null}
+              {/* row 12: Behaviours. */}
+              {/* row 13: Attibutions */}
+              {/* row 14: AV Hits */}
+              {/* row 15: IPs */}
+              {/* row 16: Domains */}
+              {/* row 17: Yara Hits */}
             </Grid>
           </Box>
         </Box>
