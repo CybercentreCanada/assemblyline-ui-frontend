@@ -81,6 +81,7 @@
   "page.alerts.ip": "IPs",
   "page.alerts.domain": "Domaines",
   "page.alerts.yara": "Yara Hits",
+  "page.alerts.tooltip.actions": "Action d'alerte",
   "page.dashboard.title": "Tableau de bord",
   "page.locked.title": "En attente d'approbation...",
   "page.locked.auto_notify": "Les administrateurs système ont été informés. Vous recevrez un e-mail une fois que votre compte sera actif.",

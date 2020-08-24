@@ -17,6 +17,7 @@ import ClipboardIcon from '@material-ui/icons/AssignmentReturned';
 import useClipboard from 'components/hooks/useClipboard';
 import React, { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
+import { AlertItem } from './alerts';
 
 const useStyles = makeStyles(theme => ({
   card: {
@@ -54,7 +55,7 @@ const useStyles = makeStyles(theme => ({
     textOverflow: 'ellipsis'
   },
   clipboardIcon: {
-    '& :hover': {
+    '&:hover': {
       cursor: 'pointer'
     }
   },
@@ -88,62 +89,14 @@ const useStyles = makeStyles(theme => ({
     '& li:last-child > span::after': {
       display: 'none'
     }
-  },
-  button: {
-    // border: '1px solid',
-    // borderColor: theme.palette.secondary.light
   }
 }));
 
-export type AlertFile = {
-  md5: string;
-  name: string;
-  sha1: string;
-  sha256: string;
-  size: number;
-  type: string;
-};
-
-export type AlertItem = {
-  sid: string;
-  alert_id: string;
-  type: string;
-  reporting_ts: string;
-  label: string[];
-  priority: string;
-  status: string;
-  file: AlertFile;
-  owner: string;
-  category: string;
-  heuristic: { name: string[] };
-  metadata: {
-    [key: string]: any;
-  }[];
-  attack: {
-    category: string;
-    pattern: string[];
-  };
-  al: {
-    attrib: string[];
-    av: string[];
-    behavior: string[];
-    domain: string[];
-    domain_dynamic: string[];
-    domain_static: string[];
-    ip: string[];
-    ip_dynamic: string[];
-    ip_static: string[];
-    request_end_time: string[];
-    score: number;
-    yara: string[];
-  };
-};
-
-type AlertProps = {
+type AlertCardProps = {
   item: AlertItem;
 };
 
-const AlertCard: React.FC<AlertProps> = ({ item }) => {
+const AlertCard: React.FC<AlertCardProps> = ({ item }) => {
   const theme = useTheme();
   const classes = useStyles();
   const { copy } = useClipboard();

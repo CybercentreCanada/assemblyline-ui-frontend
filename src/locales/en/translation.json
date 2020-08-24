@@ -141,6 +141,7 @@
   "page.alerts.ip": "IPs",
   "page.alerts.domain": "Domains",
   "page.alerts.yara": "Yara Hits",
+  "page.alerts.tooltip.actions": "Alert actions",
   "usermenu": "User Menu",
   "usermenu.account": "Manage Account",
   "usermenu.settings": "Settings",

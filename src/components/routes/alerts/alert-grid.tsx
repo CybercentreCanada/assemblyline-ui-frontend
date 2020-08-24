@@ -1,6 +1,7 @@
 import { Grid } from '@material-ui/core';
 import React from 'react';
-import AlertCard, { AlertItem } from './alert-card';
+import AlertCard from './alert-card2';
+import { AlertItem } from './alerts';
 
 type AlertListProps = {
   items: AlertItem[];
