@@ -12,7 +12,7 @@ const useStyles = makeStyles(theme => ({
 
 type AlertListProps = {
   items: AlertItem[];
-  onItemClick?: (item: AlertItem) => void;
+  onItemClick: (item: AlertItem) => void;
 };
 
 //
@@ -21,7 +21,7 @@ const AlertList: React.FC<AlertListProps> = ({ items, onItemClick }) => {
   return (
     <Box>
       {items.map(i => (
-        <Box className={classes.listItem} onClick={() => onItemClick(i)}>
+        <Box key={i.sid} className={classes.listItem} onClick={() => onItemClick(i)}>
           <AlertListItem item={i} />
         </Box>
       ))}
