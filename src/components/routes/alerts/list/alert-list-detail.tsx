@@ -1,5 +1,6 @@
-import { Box, Drawer, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
+import { Box, Drawer, makeStyles, Typography, useMediaQuery, useTheme } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
+import DescriptionIcon from '@material-ui/icons/Description';
 import clsx from 'clsx';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import { AlertItem } from 'components/routes/alerts/alerts';
@@ -59,7 +60,7 @@ const useStyles = makeStyles(theme => ({
   // }
   drawer: {
     // position: 'relative',
-    width: 600,
+    width: 900,
     flexShrink: 0,
     whiteSpace: 'nowrap'
   },
@@ -72,7 +73,7 @@ const useStyles = makeStyles(theme => ({
   },
   drawerOpen: {
     padding: theme.spacing(2),
-    width: 600,
+    width: 900,
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen
@@ -158,13 +159,12 @@ const AlertListDetail: React.FC<AlertListDetailProps> = ({ items }) => {
               <div className={classes.list}>
                 <PageHeader
                   mode="provided"
-                  // title={
-                  //   <Box display="flex">
-                  //     <DescriptionIcon />
-                  //     <Typography>{item.file.name}</Typography>
-                  //   </Box>
-                  // }
-                  title="Testing"
+                  title={
+                    <Box display="flex">
+                      <DescriptionIcon />
+                      <Typography>{item.file.name}</Typography>
+                    </Box>
+                  }
                   actions={[{ icon: <CloseIcon />, action: () => setItem(null) }]}
                 />
                 <AlertDetails item={item} />

@@ -23,7 +23,6 @@ export type AlertItem = {
   status: string;
   file: AlertFile;
   owner: string;
-  category: string;
   group_count: number;
   heuristic: { name: string[] };
   metadata: {
