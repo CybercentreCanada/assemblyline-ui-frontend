@@ -15,6 +15,7 @@ const Viewport = ({ children }) => {
       window.removeEventListener('resize', updateHeight);
     };
   }, []);
+  console.log(height);
   return (
     <div ref={ref} style={{ height }}>
       {children}

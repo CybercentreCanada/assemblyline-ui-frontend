@@ -1,7 +1,7 @@
 import { Box, makeStyles } from '@material-ui/core';
+import { AlertItem } from 'components/routes/alerts/alerts';
+import AlertListItem from 'components/routes/alerts/list/alert-list-item';
 import React from 'react';
-import AlertListItem from './alert-list-item';
-import { AlertItem } from './alerts';
 
 const useStyles = makeStyles(theme => ({
   listItem: {
@@ -15,7 +15,6 @@ type AlertListProps = {
   onItemClick: (item: AlertItem) => void;
 };
 
-//
 const AlertList: React.FC<AlertListProps> = ({ items, onItemClick }) => {
   const classes = useStyles();
   return (

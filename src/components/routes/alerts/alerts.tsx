@@ -2,7 +2,7 @@ import { Box } from '@material-ui/core';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import useMyAPI from 'components/hooks/useMyAPI';
 import React, { useEffect, useState } from 'react';
-import AlertListDetail from './alert-list-detail';
+import AlertListDetail from './list/alert-list-detail';
 
 export type AlertFile = {
   md5: string;

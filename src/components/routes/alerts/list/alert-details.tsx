@@ -3,7 +3,7 @@ import ClipboardIcon from '@material-ui/icons/AssignmentReturned';
 import useClipboard from 'components/hooks/useClipboard';
 import React, { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AlertItem } from './alerts';
+import { AlertItem } from '../alerts';
 
 const useStyles = makeStyles(theme => ({
   card: {
@@ -23,6 +23,7 @@ const useStyles = makeStyles(theme => ({
     marginLeft: -theme.spacing(0.5),
     padding: 0,
     boxShadow: 'inherit',
+    backgroundColor: theme.palette.background.default,
     margin: 0,
     '& li ': {
       margin: theme.spacing(0.5)
@@ -51,6 +52,7 @@ const useStyles = makeStyles(theme => ({
     listStyle: 'none',
     padding: 0,
     boxShadow: 'inherit',
+    backgroundColor: theme.palette.background.default,
     margin: 0,
     '& a': {
       color: theme.palette.primary.main
@@ -91,9 +93,7 @@ const AlertDetails = ({ item }) => {
     <Grid container spacing={1}>
       {/* row 1 */}
       <Grid item xs={4}>
-        <Typography component="span" className={classes.typoLabel}>
-          {item.type}
-        </Typography>
+        <Typography className={classes.typoLabel}>{item.type}</Typography>
       </Grid>
       <Grid item xs={8}>
         <Typography>{item.reporting_ts}</Typography>

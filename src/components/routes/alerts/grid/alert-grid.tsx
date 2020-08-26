@@ -1,12 +1,13 @@
 import { Grid } from '@material-ui/core';
+import { AlertItem } from 'components/routes/alerts/alerts';
+import AlertCard from 'components/routes/alerts/grid/alert-card2';
 import React from 'react';
-import AlertCard from './alert-card2';
-import { AlertItem } from './alerts';
 
 type AlertListProps = {
   items: AlertItem[];
 };
 
+// .
 const AlertGrid: React.FC<AlertListProps> = ({ items }) => {
   return (
     <Grid container spacing={3}>

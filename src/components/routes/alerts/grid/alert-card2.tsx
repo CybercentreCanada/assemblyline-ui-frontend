@@ -16,11 +16,12 @@ import {
 import ClipboardIcon from '@material-ui/icons/AssignmentReturned';
 import ScoreIcon from '@material-ui/icons/Score';
 import useClipboard from 'components/hooks/useClipboard';
+import { AlertItem } from 'components/routes/alerts/alerts';
+import AlertCardActions from 'components/routes/alerts/grid/alert-card-actions';
 import React, { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
-import AlertCardActions from './alert-card-actions';
-import { AlertItem } from './alerts';
 
+//
 const useStyles = makeStyles(theme => ({
   card: {
     padding: theme.spacing(2),

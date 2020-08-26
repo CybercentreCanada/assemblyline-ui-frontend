@@ -17,7 +17,7 @@ import ClipboardIcon from '@material-ui/icons/AssignmentReturned';
 import useClipboard from 'components/hooks/useClipboard';
 import React, { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AlertItem } from './alerts';
+import { AlertItem } from '../alerts';
 
 const useStyles = makeStyles(theme => ({
   card: {

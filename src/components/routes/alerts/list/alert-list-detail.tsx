@@ -1,9 +1,12 @@
-import { Box, Drawer, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
+import { Box, Drawer, makeStyles, Typography, useMediaQuery, useTheme } from '@material-ui/core';
+import CloseIcon from '@material-ui/icons/Close';
 import clsx from 'clsx';
+import PageHeader from 'commons/components/layout/pages/PageHeader';
+import { AlertItem } from 'components/routes/alerts/alerts';
+import AlertDetails from 'components/routes/alerts/list/alert-details';
+import AlertList from 'components/routes/alerts/list/alert-list';
+import Viewport from 'components/routes/alerts/viewport';
 import React, { useState } from 'react';
-import AlertDetails from './alert-details';
-import AlertList from './alert-list';
-import { AlertItem } from './alerts';
 
 const useStyles = makeStyles(theme => ({
   // drawer: {
@@ -63,7 +66,9 @@ const useStyles = makeStyles(theme => ({
   drawerPaper: {
     position: 'absolute',
     flexShrink: 0,
-    whiteSpace: 'nowrap'
+    whiteSpace: 'nowrap',
+    border: 'none',
+    backgroundColor: theme.palette.background.default
   },
   drawerOpen: {
     padding: theme.spacing(2),
@@ -72,10 +77,10 @@ const useStyles = makeStyles(theme => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen
     }),
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down('sm')]: {
       position: 'fixed',
       width: '100vw',
-      zIndex: 1000,
+      zIndex: 10000,
       top: 0,
       right: 0,
       bottom: 0
@@ -91,6 +96,18 @@ const useStyles = makeStyles(theme => ({
   },
   list: {
     flexGrow: 1
+  },
+  '@global': {
+    '*::-webkit-scrollbar': {
+      width: '0.4em'
+    },
+    '*::-webkit-scrollbar-track': {
+      '-webkit-box-shadow': 'inset 0 0 6px rgba(0,0,0,0.00)'
+    },
+    '*::-webkit-scrollbar-thumb': {
+      backgroundColor: 'rgba(0,0,0,.1)',
+      outline: '1px solid slategrey'
+    }
   }
 }));
 
@@ -116,35 +133,45 @@ const AlertListDetail: React.FC<AlertListDetailProps> = ({ items }) => {
   const hasItem = !!item;
 
   return (
-    <div style={{ display: 'flex', position: 'relative' }}>
-      <Box className={classes.list}>
-        <AlertList items={items} onItemClick={onItemClick} />
-      </Box>
-      <Box position="relative">
-        <Drawer
-          open={!!item}
-          variant="permanent"
-          anchor="right"
-          className={clsx(classes.drawer, {
-            [classes.drawerOpen]: hasItem,
-            [classes.drawerClose]: !hasItem
-          })}
-          classes={{
-            paper: clsx(classes.drawerPaper, {
+    <Viewport>
+      <div style={{ height: '100%', display: 'flex', position: 'relative' }}>
+        <Box overflow="auto" className={classes.list}>
+          <AlertList items={items} onItemClick={onItemClick} />
+        </Box>
+        <Box overflow="auto" position="relative">
+          <Drawer
+            open={!!item}
+            variant="permanent"
+            anchor="right"
+            className={clsx(classes.drawer, {
               [classes.drawerOpen]: hasItem,
               [classes.drawerClose]: !hasItem
-            })
-          }}
-        >
-          {item ? (
-            <div className={classes.list}>
-              <Box onClick={() => setItem(null)}>Close</Box>
-              <AlertDetails item={item} />
-            </div>
-          ) : null}
-        </Drawer>
-      </Box>
-    </div>
+            })}
+            classes={{
+              paper: clsx(classes.drawerPaper, {
+                [classes.drawerOpen]: hasItem,
+                [classes.drawerClose]: !hasItem
+              })
+            }}
+          >
+            {item ? (
+              <div className={classes.list}>
+                <PageHeader
+                  mode="provided"
+                  title={
+                    <Typography color="secondary" variant="h6">
+                      {item.file.name}
+                    </Typography>
+                  }
+                  actions={[{ icon: <CloseIcon />, action: () => setItem(null) }]}
+                />
+                <AlertDetails item={item} />
+              </div>
+            ) : null}
+          </Drawer>
+        </Box>
+      </div>
+    </Viewport>
   );
 
   // return (

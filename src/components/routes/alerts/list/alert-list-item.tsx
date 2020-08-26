@@ -1,8 +1,8 @@
 import { Badge, Box, Chip, ListItem, makeStyles, Typography, useTheme, withStyles } from '@material-ui/core';
 import ScoreIcon from '@material-ui/icons/Score';
+import { AlertItem } from 'components/routes/alerts/alerts';
+import AlertCardActions from 'components/routes/alerts/grid/alert-card-actions';
 import React from 'react';
-import AlertCardActions from './alert-card-actions';
-import { AlertItem } from './alerts';
 
 const useStyles = makeStyles(theme => ({
   listItem: {
@@ -25,7 +25,6 @@ type AlertListItemProps = {
 
 //
 const AlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
-  const theme = useTheme();
   const classes = useStyles();
   return (
     <ListItem className={classes.listItem}>
