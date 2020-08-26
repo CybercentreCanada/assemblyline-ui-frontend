@@ -10,74 +10,38 @@ import Viewport from 'components/routes/alerts/viewport';
 import React, { useState } from 'react';
 
 const useStyles = makeStyles(theme => ({
-  // drawer: {
-  //   position: 'relative',
-  //   flexShrink: 0,
-  //   whiteSpace: 'nowrap'
-  // },
-  // drawerPaper: {
-  //   padding: theme.spacing(1),
-  //   position: 'absolute',
-  //   flexShrink: 0,
-  //   whiteSpace: 'nowrap'
-  // },
-  // drawerOpen: {
-  //   width: theme.breakpoints.up('lg') ? 800 : 0,
-  //   transition: theme.transitions.create('width', {
-  //     easing: theme.transitions.easing.sharp,
-  //     duration: theme.transitions.duration.enteringScreen
-  //   })
-  // },
-  // drawerClose: {
-  //   transition: theme.transitions.create('width', {
-  //     easing: theme.transitions.easing.sharp,
-  //     duration: theme.transitions.duration.leavingScreen
-  //   }),
-  //   overflowX: 'hidden',
-  //   width: 0
-  // },
-  // left: {
-  //   maxWidth: '100%',
-  //   flexGrow: 1
-  // },
-  // right: {
-  //   flexGrow: 0,
-  //   backgroundColor: theme.palette.background.paper,
-  //   [theme.breakpoints.down('md')]: {
-  //     position: 'absolute',
-  //     zIndex: 1000,
-  //     top: 0,
-  //     right: 0,
-  //     bottom: 0
-  //   }
-  // },
-  rightContent: {
-    // padding: theme.spacing(2)
-    // width: 600
-  },
-  // rightDrawer: {
-  //   position: 'absolute'
-  // }
   drawer: {
-    // position: 'relative',
-    width: 900,
+    width: 700,
     flexShrink: 0,
-    whiteSpace: 'nowrap'
+    whiteSpace: 'nowrap',
+    [theme.breakpoints.only('xl')]: {
+      width: 900
+    }
   },
   drawerPaper: {
     position: 'absolute',
     flexShrink: 0,
     whiteSpace: 'nowrap',
-    border: 'none',
-    backgroundColor: theme.palette.background.default
+    border: 'none'
+    // backgroundColor: theme.palette.background.default,
+    // [theme.breakpoints.down('md')]: {
+    //   backgroundColor: theme.palette.background.paper
+    // }
   },
   drawerOpen: {
     padding: theme.spacing(2),
-    width: 900,
+    width: 700,
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen
     }),
+    [theme.breakpoints.down('md')]: {
+      position: 'absolute',
+      zIndex: 10000,
+      top: 0,
+      right: 0,
+      bottom: 0
+    },
     [theme.breakpoints.down('sm')]: {
       position: 'fixed',
       width: '100vw',
@@ -85,6 +49,9 @@ const useStyles = makeStyles(theme => ({
       top: 0,
       right: 0,
       bottom: 0
+    },
+    [theme.breakpoints.only('xl')]: {
+      width: 900
     }
   },
   drawerClose: {
@@ -94,6 +61,9 @@ const useStyles = makeStyles(theme => ({
     }),
     overflowX: 'hidden',
     width: 0
+  },
+  noBorder: {
+    border: 'none'
   },
   list: {
     flexGrow: 1
@@ -119,7 +89,7 @@ type AlertListDetailProps = {
 const AlertListDetail: React.FC<AlertListDetailProps> = ({ items }) => {
   const classes = useStyles();
   const theme = useTheme();
-  const isUpMd = useMediaQuery(theme.breakpoints.up('lg'));
+  const isGtLg = useMediaQuery(theme.breakpoints.only('lg'));
   const [item, setItem] = useState<AlertItem>(null);
 
   const onItemClick = selectedItem => {
@@ -128,18 +98,18 @@ const AlertListDetail: React.FC<AlertListDetailProps> = ({ items }) => {
   };
 
   // console.log(item);.
-  // console.log(isUpMd);
+  console.log(`isGtLg ${isGtLg}`);
   // console.log(classes.drawerOpen);....
 
   const hasItem = !!item;
 
   return (
     <Viewport>
-      <div style={{ height: '100%', display: 'flex', position: 'relative' }}>
+      <div style={{ height: '100%', display: 'flex', position: 'relative', width: '100%' }}>
         <Box overflow="auto" className={classes.list}>
           <AlertList items={items} onItemClick={onItemClick} />
         </Box>
-        <Box overflow="auto" position="relative">
+        <Box overflow="auto">
           <Drawer
             open={!!item}
             variant="permanent"
@@ -151,7 +121,8 @@ const AlertListDetail: React.FC<AlertListDetailProps> = ({ items }) => {
             classes={{
               paper: clsx(classes.drawerPaper, {
                 [classes.drawerOpen]: hasItem,
-                [classes.drawerClose]: !hasItem
+                [classes.drawerClose]: !hasItem,
+                [classes.noBorder]: !hasItem
               })
             }}
           >

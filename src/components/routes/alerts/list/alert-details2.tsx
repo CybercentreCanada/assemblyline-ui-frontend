@@ -1,4 +1,4 @@
-import { Box, Chip, Divider, Grid, makeStyles, Typography, useTheme, withStyles } from '@material-ui/core';
+import { Box, Button, Chip, Divider, Grid, makeStyles, Typography, useTheme, withStyles } from '@material-ui/core';
 import React from 'react';
 import { AlertItem } from '../alerts';
 
@@ -19,7 +19,7 @@ const useStyles = makeStyles(theme => ({
     marginLeft: -theme.spacing(0.5),
     padding: 0,
     boxShadow: 'inherit',
-    backgroundColor: theme.palette.background.default,
+    // backgroundColor: theme.palette.background.default,
     margin: 0,
     '& li ': {
       marginLeft: theme.spacing(0.5),
@@ -38,8 +38,41 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
 
   return (
     <Box>
+      <Grid container spacing={2}>
+        <Grid item xs={6}>
+          {/* Labels Section */}
+          <Box className={classes.section}>
+            <Typography className={classes.sectionTitle}>Labels</Typography>
+            <Divider />
+            <ul className={classes.labels}>
+              {item.label.map((label, i) => (
+                <li key={`alert-label-${i}`}>
+                  <DefaultChip label={label} />
+                </li>
+              ))}
+            </ul>
+          </Box>
+        </Grid>
+        <Grid item xs={3}>
+          {/* Priority Section */}
+          <Box className={classes.section}>
+            <Typography className={classes.sectionTitle}>Priority</Typography>
+            <Divider />
+            <DefaultChip label={item.priority} />
+          </Box>
+        </Grid>
+        <Grid item xs={3}>
+          {/* Status Section */}
+          <Box className={classes.section}>
+            <Typography className={classes.sectionTitle}>Status</Typography>
+            <Divider />
+            <DefaultChip label={item.status} />
+          </Box>
+        </Grid>
+      </Grid>
+
       {/* Labels Section */}
-      <Box className={classes.section}>
+      {/* <Box className={classes.section}>
         <Typography className={classes.sectionTitle}>Labels</Typography>
         <Divider />
         <ul className={classes.labels}>
@@ -49,21 +82,21 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
             </li>
           ))}
         </ul>
-      </Box>
+      </Box> */}
 
       {/* Priority Section */}
-      <Box className={classes.section}>
+      {/* <Box className={classes.section}>
         <Typography className={classes.sectionTitle}>Priority</Typography>
         <Divider />
         <DefaultChip label={item.priority} />
-      </Box>
+      </Box> */}
 
       {/* Status Section */}
-      <Box className={classes.section}>
+      {/* <Box className={classes.section}>
         <Typography className={classes.sectionTitle}>Status</Typography>
         <Divider />
         <DefaultChip label={item.status} />
-      </Box>
+      </Box> */}
 
       {/* File Info */}
       <Box className={classes.section}>
@@ -71,8 +104,11 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
         <Divider />
         <Grid container spacing={1}>
           <Grid item xs={12}>
-            <DefaultChip label={item.file.type} />
-            &nbsp;{item.file.name}&nbsp;
+            <Typography variant="caption">Type</Typography>&nbsp;
+            <DefaultChip label={item.file.type} /> -
+            <Box component="span" ml={1} mr={1}>
+              {item.file.name}
+            </Box>
             <Typography variant="caption">
               {item.file.size}({(item.file.size / 1024).toFixed(2)} Kb)
             </Typography>
@@ -144,6 +180,68 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
         </Box>
       ) : null}
 
+      {/* Heuristics Section */}
+      {item.heuristic && item.heuristic.name && item.heuristic.name.length > 0 ? (
+        <Box className={classes.section}>
+          <Typography className={classes.sectionTitle}>Heuristics</Typography>
+          <Divider />
+          <ul className={classes.labels}>
+            {item.heuristic.name.map(n => (
+              <li>
+                <Button size="small" variant="outlined">
+                  {n}
+                </Button>
+              </li>
+            ))}
+          </ul>
+        </Box>
+      ) : null}
+
+      {/* AL Behaviours Section */}
+      {item.al.behavior ? (
+        <Box className={classes.section}>
+          <Typography className={classes.sectionTitle}>Behaviours</Typography>
+          <Divider />
+          <ul className={classes.labels}>
+            {item.al.behavior.map(b => (
+              <li>
+                <DefaultChip label={b} />
+              </li>
+            ))}
+          </ul>
+        </Box>
+      ) : null}
+
+      {/* AL Attributions Section */}
+      {item.al.attrib ? (
+        <Box className={classes.section}>
+          <Typography className={classes.sectionTitle}>Attributions</Typography>
+          <Divider />
+          <ul className={classes.labels}>
+            {item.al.attrib.map(a => (
+              <li>
+                <DefaultChip label={a} />
+              </li>
+            ))}
+          </ul>
+        </Box>
+      ) : null}
+
+      {/* AL AV Hits */}
+      {item.al.av ? (
+        <Box className={classes.section}>
+          <Typography className={classes.sectionTitle}>AV Hits</Typography>
+          <Divider />
+          <ul className={classes.labels}>
+            {item.al.av.map(a => (
+              <li>
+                <DefaultChip label={a} />
+              </li>
+            ))}
+          </ul>
+        </Box>
+      ) : null}
+
       {/* IPs sections */}
       <Box className={classes.section}>
         <Typography className={classes.sectionTitle}>IPs</Typography>
@@ -184,6 +282,62 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
           </Grid>
         </Grid>
       </Box>
+
+      {/* Domains sections */}
+      <Box className={classes.section}>
+        <Typography className={classes.sectionTitle}>Domains</Typography>
+        <Divider />
+        <Grid container spacing={3}>
+          <Grid item xs={4}>
+            {item.al.domain.map(i => (
+              <div>{i}</div>
+            ))}
+          </Grid>
+          <Grid item xs={4}>
+            <Grid container spacing={1}>
+              <Grid item xs={4}>
+                <Typography variant="caption">
+                  <i>Dynamic</i>
+                </Typography>
+              </Grid>
+              <Grid item xs={8}>
+                {item.al.domain_dynamic.map(i => (
+                  <div>{i}</div>
+                ))}
+              </Grid>
+            </Grid>
+          </Grid>
+          <Grid item xs={4}>
+            <Grid container spacing={0}>
+              <Grid item xs={4}>
+                <Typography variant="caption">
+                  <i>Static</i>
+                </Typography>
+              </Grid>
+              <Grid item xs={8}>
+                {item.al.domain_static.map(i => (
+                  <div>{i}</div>
+                ))}
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+      </Box>
+
+      {/* YARA Hits */}
+      {item.al.yara ? (
+        <Box className={classes.section}>
+          <Typography className={classes.sectionTitle}>Yara Hits</Typography>
+          <Divider />
+          <ul className={classes.labels}>
+            {item.al.yara.map(a => (
+              <li>
+                <DefaultChip label={a} />
+              </li>
+            ))}
+          </ul>
+        </Box>
+      ) : null}
     </Box>
   );
 };

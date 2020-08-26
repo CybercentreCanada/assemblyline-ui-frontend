@@ -69,6 +69,7 @@ const Alerts: React.FC = () => {
   return (
     <Box>
       <PageHeader mode="provided" title={<h2>{`Total: ${alerts.length}`}</h2>} />
+      {/* <Divider /> */}
       {/* <AlertGrid items={alerts} /> */}
       {/* <AlertList items={alerts} /> */}
       <AlertListDetail items={alerts} />
