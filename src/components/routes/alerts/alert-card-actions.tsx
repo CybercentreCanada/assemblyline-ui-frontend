@@ -7,6 +7,7 @@ const AlertCardActions = () => {
   const { t } = useTranslation();
   const [anchorEl, setAnchorEl] = useState(null);
   const onClick = (event: React.MouseEvent) => {
+    event.stopPropagation()
     setAnchorEl(anchorEl ? null : event.currentTarget);
   };
   return (

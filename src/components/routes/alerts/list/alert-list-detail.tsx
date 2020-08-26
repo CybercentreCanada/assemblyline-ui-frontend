@@ -1,9 +1,9 @@
-import { Box, Drawer, makeStyles, Typography, useMediaQuery, useTheme } from '@material-ui/core';
+import { Box, Drawer, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import clsx from 'clsx';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import { AlertItem } from 'components/routes/alerts/alerts';
-import AlertDetails from 'components/routes/alerts/list/alert-details';
+import AlertDetails from 'components/routes/alerts/list/alert-details2';
 import AlertList from 'components/routes/alerts/list/alert-list';
 import Viewport from 'components/routes/alerts/viewport';
 import React, { useState } from 'react';
@@ -158,11 +158,13 @@ const AlertListDetail: React.FC<AlertListDetailProps> = ({ items }) => {
               <div className={classes.list}>
                 <PageHeader
                   mode="provided"
-                  title={
-                    <Typography color="secondary" variant="h6">
-                      {item.file.name}
-                    </Typography>
-                  }
+                  // title={
+                  //   <Box display="flex">
+                  //     <DescriptionIcon />
+                  //     <Typography>{item.file.name}</Typography>
+                  //   </Box>
+                  // }
+                  title="Testing"
                   actions={[{ icon: <CloseIcon />, action: () => setItem(null) }]}
                 />
                 <AlertDetails item={item} />

@@ -1,4 +1,4 @@
-import { Box, Button, IconButton } from '@material-ui/core';
+import { Box, Button, IconButton, Toolbar } from '@material-ui/core';
 import useAppSitemap from 'commons/components/hooks/useAppSitemap';
 import BreadcrumbLastItem from 'commons/components/layout/breadcrumbs/BreadcrumbLastItem';
 import Breadcrumbs from 'commons/components/layout/breadcrumbs/Breadcrumbs';
@@ -37,11 +37,9 @@ const PageHeader: React.FC<PageHeaderProps> = ({ mode, title, actions }) => {
   }
 
   return (
-    <Box pb={1} display="flex" flexShrink={0} width="100%">
-      <Box display="inline-block" flexGrow={1}>
-        {comp}
-      </Box>
-      <Box display="inline-block">
+    <Toolbar disableGutters>
+      <Box flexGrow={1}>{comp}</Box>
+      <Box>
         {actions
           ? actions.map((a, i) => {
               if (a.title) {
@@ -59,7 +57,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({ mode, title, actions }) => {
             })
           : null}
       </Box>
-    </Box>
+    </Toolbar>
   );
 };
 

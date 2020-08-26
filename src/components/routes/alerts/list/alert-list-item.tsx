@@ -1,7 +1,7 @@
 import { Badge, Box, Chip, ListItem, makeStyles, Typography, useTheme, withStyles } from '@material-ui/core';
 import ScoreIcon from '@material-ui/icons/Score';
 import { AlertItem } from 'components/routes/alerts/alerts';
-import AlertCardActions from 'components/routes/alerts/grid/alert-card-actions';
+import AlertCardActions from 'components/routes/alerts/alert-card-actions';
 import React from 'react';
 
 const useStyles = makeStyles(theme => ({
@@ -11,7 +11,7 @@ const useStyles = makeStyles(theme => ({
     padding: theme.spacing(2),
     '&:hover': {
       cursor: 'pointer',
-      backgroundColor: theme.palette.grey[800]
+      backgroundColor: theme.palette.type === 'dark' ? theme.palette.grey[800] : theme.palette.grey[200]
     },
     '& > *': {
       marginRight: theme.spacing(1)

@@ -6,7 +6,7 @@ import React from 'react';
 const useStyles = makeStyles(theme => ({
   listItem: {
     borderBottom: '1px solid',
-    borderBottomColor: theme.palette.grey[800]
+    borderBottomColor: theme.palette.type === 'dark' ? theme.palette.grey[800] : theme.palette.grey[300]
   }
 }));
 
