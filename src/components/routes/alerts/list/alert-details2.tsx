@@ -1,6 +1,19 @@
-import { Box, Button, Chip, Divider, Grid, makeStyles, Typography, useTheme, withStyles } from '@material-ui/core';
+import {
+  Box,
+  Button,
+  Chip,
+  Divider,
+  Grid,
+  makeStyles,
+  Typography,
+  useMediaQuery,
+  useTheme,
+  withStyles
+} from '@material-ui/core';
+import useClipboard from 'components/hooks/useClipboard';
+import { AlertItem } from 'components/routes/alerts/alerts';
 import React from 'react';
-import { AlertItem } from '../alerts';
+import { BsClipboard } from 'react-icons/bs';
 
 const useStyles = makeStyles(theme => ({
   section: {
@@ -26,6 +39,12 @@ const useStyles = makeStyles(theme => ({
       marginRight: theme.spacing(0.5),
       marginBottom: theme.spacing(0.5)
     }
+  },
+  clipboardIcon: {
+    '&:hover': {
+      cursor: 'pointer',
+      backgroundColor: theme.palette.background.paper
+    }
   }
 }));
 
@@ -35,12 +54,14 @@ type AlertDetailsProps = {
 
 const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
   const theme = useTheme();
+  const isLteSm = useMediaQuery(theme.breakpoints.down('sm'));
   const classes = useStyles();
+  const { copy } = useClipboard();
 
   return (
     <Box>
       <Grid container spacing={2}>
-        <Grid item xs={6}>
+        <Grid item xs={isLteSm ? 12 : 6}>
           {/* Labels Section */}
           <Box className={classes.section}>
             <Typography className={classes.sectionTitle}>Labels</Typography>
@@ -54,7 +75,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
             </ul>
           </Box>
         </Grid>
-        <Grid item xs={3}>
+        <Grid item xs={isLteSm ? 12 : 3}>
           {/* Priority Section */}
           <Box className={classes.section}>
             <Typography className={classes.sectionTitle}>Priority</Typography>
@@ -62,7 +83,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
             <DefaultChip label={item.priority} />
           </Box>
         </Grid>
-        <Grid item xs={3}>
+        <Grid item xs={isLteSm ? 12 : 3}>
           {/* Status Section */}
           <Box className={classes.section}>
             <Typography className={classes.sectionTitle}>Status</Typography>
@@ -71,33 +92,6 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
           </Box>
         </Grid>
       </Grid>
-
-      {/* Labels Section */}
-      {/* <Box className={classes.section}>
-        <Typography className={classes.sectionTitle}>Labels</Typography>
-        <Divider />
-        <ul className={classes.labels}>
-          {item.label.map((label, i) => (
-            <li key={`alert-label-${i}`}>
-              <DefaultChip label={label} />
-            </li>
-          ))}
-        </ul>
-      </Box> */}
-
-      {/* Priority Section */}
-      {/* <Box className={classes.section}>
-        <Typography className={classes.sectionTitle}>Priority</Typography>
-        <Divider />
-        <DefaultChip label={item.priority} />
-      </Box> */}
-
-      {/* Status Section */}
-      {/* <Box className={classes.section}>
-        <Typography className={classes.sectionTitle}>Status</Typography>
-        <Divider />
-        <DefaultChip label={item.status} />
-      </Box> */}
 
       {/* File Info */}
       <Box className={classes.section}>
@@ -115,13 +109,21 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
             </Typography>
           </Grid>
           <Grid item xs={12}>
-            <pre style={{ margin: 0 }}>
-              MD5:&nbsp;&nbsp;&nbsp;&nbsp;{item.file.md5}
-              <br />
-              SHA1:&nbsp;&nbsp;&nbsp;{item.file.sha1}
-              <br />
-              SHA256:&nbsp;{item.file.sha256}
-            </pre>
+            <Box display="flex">
+              <BsClipboard className={classes.clipboardIcon} onClick={() => copy(item.file.md5)} />
+              &nbsp;
+              <pre style={{ margin: 0 }}>MD5:&nbsp;&nbsp;&nbsp;&nbsp;{item.file.md5}</pre>
+            </Box>
+            <Box display="flex">
+              <BsClipboard className={classes.clipboardIcon} onClick={() => copy(item.file.sha1)} />
+              &nbsp;
+              <pre style={{ margin: 0 }}>SHA1:&nbsp;&nbsp;&nbsp;{item.file.sha1}</pre>
+            </Box>
+            <Box display="flex">
+              <BsClipboard className={classes.clipboardIcon} onClick={() => copy(item.file.sha256)} />
+              &nbsp;
+              <pre style={{ margin: 0 }}>SHA256:&nbsp;{item.file.sha256}</pre>
+            </Box>
           </Grid>
         </Grid>
       </Box>
@@ -157,13 +159,13 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
           <Typography className={classes.sectionTitle}>Attack</Typography>
           <Divider />
           <Grid container spacing={1}>
-            <Grid item xs={4}>
+            <Grid item xs={isLteSm ? 12 : 4}>
               <Typography variant="caption" style={{ marginRight: theme.spacing(1) }}>
                 <i>Type</i>
               </Typography>
               <DefaultChip label={item.attack.category} />
             </Grid>
-            <Grid item xs={8}>
+            <Grid item xs={isLteSm ? 12 : 8}>
               <Typography variant="caption" style={{ marginRight: theme.spacing(1) }}>
                 <i>Patterns</i>
               </Typography>
@@ -248,33 +250,33 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
         <Typography className={classes.sectionTitle}>IPs</Typography>
         <Divider />
         <Grid container spacing={3}>
-          <Grid item xs={4}>
+          <Grid item xs={isLteSm ? 12 : 4}>
             {item.al.ip.map(i => (
               <div>{i}</div>
             ))}
           </Grid>
-          <Grid item xs={4}>
+          <Grid item xs={isLteSm ? 12 : 4}>
             <Grid container spacing={1}>
-              <Grid item xs={4}>
+              <Grid item xs={isLteSm ? 12 : 4}>
                 <Typography variant="caption">
                   <i>Dynamic</i>
                 </Typography>
               </Grid>
-              <Grid item xs={8}>
+              <Grid item xs={isLteSm ? 12 : 8}>
                 {item.al.ip_dynamic.map(i => (
                   <div>{i}</div>
                 ))}
               </Grid>
             </Grid>
           </Grid>
-          <Grid item xs={4}>
+          <Grid item xs={isLteSm ? 12 : 4}>
             <Grid container spacing={0}>
-              <Grid item xs={4}>
+              <Grid item xs={isLteSm ? 12 : 4}>
                 <Typography variant="caption">
                   <i>Static</i>
                 </Typography>
               </Grid>
-              <Grid item xs={8}>
+              <Grid item xs={isLteSm ? 12 : 8}>
                 {item.al.ip_static.map(i => (
                   <div>{i}</div>
                 ))}
@@ -289,33 +291,33 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
         <Typography className={classes.sectionTitle}>Domains</Typography>
         <Divider />
         <Grid container spacing={3}>
-          <Grid item xs={4}>
+          <Grid item xs={isLteSm ? 12 : 4}>
             {item.al.domain.map(i => (
               <div>{i}</div>
             ))}
           </Grid>
-          <Grid item xs={4}>
+          <Grid item xs={isLteSm ? 12 : 4}>
             <Grid container spacing={1}>
-              <Grid item xs={4}>
+              <Grid item xs={isLteSm ? 12 : 4}>
                 <Typography variant="caption">
                   <i>Dynamic</i>
                 </Typography>
               </Grid>
-              <Grid item xs={8}>
+              <Grid item xs={isLteSm ? 12 : 8}>
                 {item.al.domain_dynamic.map(i => (
                   <div>{i}</div>
                 ))}
               </Grid>
             </Grid>
           </Grid>
-          <Grid item xs={4}>
+          <Grid item xs={isLteSm ? 12 : 4}>
             <Grid container spacing={0}>
-              <Grid item xs={4}>
+              <Grid item xs={isLteSm ? 12 : 4}>
                 <Typography variant="caption">
                   <i>Static</i>
                 </Typography>
               </Grid>
-              <Grid item xs={8}>
+              <Grid item xs={isLteSm ? 12 : 8}>
                 {item.al.domain_static.map(i => (
                   <div>{i}</div>
                 ))}
