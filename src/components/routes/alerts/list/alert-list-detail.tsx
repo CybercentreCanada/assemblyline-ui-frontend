@@ -1,6 +1,5 @@
 import { Box, Drawer, makeStyles, Typography, useMediaQuery, useTheme } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
-import DescriptionIcon from '@material-ui/icons/Description';
 import clsx from 'clsx';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import { AlertItem } from 'components/routes/alerts/alerts';
@@ -11,10 +10,13 @@ import React, { useState } from 'react';
 
 const useStyles = makeStyles(theme => ({
   drawer: {
-    width: 700,
+    width: 600,
     flexShrink: 0,
     whiteSpace: 'nowrap',
-    [theme.breakpoints.only('xl')]: {
+    [theme.breakpoints.up('xl')]: {
+      width: 700
+    },
+    [theme.breakpoints.up('xl')]: {
       width: 900
     }
   },
@@ -22,22 +24,33 @@ const useStyles = makeStyles(theme => ({
     position: 'absolute',
     flexShrink: 0,
     whiteSpace: 'nowrap',
-    border: 'none'
-    // backgroundColor: theme.palette.background.default,
-    // [theme.breakpoints.down('md')]: {
-    //   backgroundColor: theme.palette.background.paper
-    // }
+    border: 'none',
+    backgroundColor: theme.palette.background.default,
+    [theme.breakpoints.up('xs')]: {
+      // backgroundColor: theme.palette.background.paper
+      // border: 'inherit'
+      boxShadow:
+        theme.palette.type === 'dark'
+          ? `-4px 0 4px -2px ${theme.palette.grey[900]}`
+          : `-4px 0 4px -2px ${theme.palette.grey[500]}`
+    }
   },
   drawerOpen: {
-    padding: theme.spacing(2),
-    width: 700,
+    // padding: theme.spacing(2),
+    width: 600,
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen
     }),
+    [theme.breakpoints.up('lg')]: {
+      width: 700
+    },
+    [theme.breakpoints.up('xl')]: {
+      width: 900
+    },
     [theme.breakpoints.down('md')]: {
       position: 'absolute',
-      zIndex: 10000,
+      zIndex: theme.zIndex.appBar,
       top: 0,
       right: 0,
       bottom: 0
@@ -49,9 +62,6 @@ const useStyles = makeStyles(theme => ({
       top: 0,
       right: 0,
       bottom: 0
-    },
-    [theme.breakpoints.only('xl')]: {
-      width: 900
     }
   },
   drawerClose: {
@@ -67,6 +77,12 @@ const useStyles = makeStyles(theme => ({
   },
   list: {
     flexGrow: 1
+  },
+  drawerTemporary: {
+    backgroundColor: theme.palette.background.default,
+    [theme.breakpoints.down('xs')]: {
+      width: '100vw'
+    }
   },
   '@global': {
     '*::-webkit-scrollbar': {
@@ -89,59 +105,36 @@ type AlertListDetailProps = {
 const AlertListDetail: React.FC<AlertListDetailProps> = ({ items }) => {
   const classes = useStyles();
   const theme = useTheme();
-  const isGtLg = useMediaQuery(theme.breakpoints.only('lg'));
+  const isLtMd = useMediaQuery(theme.breakpoints.down('md'));
+  const [open, setOpen] = useState<boolean>(false);
   const [item, setItem] = useState<AlertItem>(null);
 
   const onItemClick = selectedItem => {
     console.log(selectedItem);
     setItem(selectedItem);
+    setOpen(true);
   };
-
-  // console.log(item);.
-  console.log(`isGtLg ${isGtLg}`);
-  // console.log(classes.drawerOpen);....
 
   const hasItem = !!item;
 
   return (
     <Viewport>
+      {/* <PageHeader
+        mode="provided"
+        title={<h2>{`Total: ${items.length}`}</h2>}
+        backgroundColor={theme.palette.background.default}
+        isSticky
+      /> */}
       <div style={{ height: '100%', display: 'flex', position: 'relative', width: '100%' }}>
         <Box overflow="auto" className={classes.list}>
           <AlertList items={items} onItemClick={onItemClick} />
         </Box>
         <Box overflow="auto">
-          <Drawer
-            open={!!item}
-            variant="permanent"
-            anchor="right"
-            className={clsx(classes.drawer, {
-              [classes.drawerOpen]: hasItem,
-              [classes.drawerClose]: !hasItem
-            })}
-            classes={{
-              paper: clsx(classes.drawerPaper, {
-                [classes.drawerOpen]: hasItem,
-                [classes.drawerClose]: !hasItem,
-                [classes.noBorder]: !hasItem
-              })
-            }}
-          >
-            {item ? (
-              <div className={classes.list}>
-                <PageHeader
-                  mode="provided"
-                  title={
-                    <Box display="flex">
-                      <DescriptionIcon />
-                      <Typography>{item.file.name}</Typography>
-                    </Box>
-                  }
-                  actions={[{ icon: <CloseIcon />, action: () => setItem(null) }]}
-                />
-                <AlertDetails item={item} />
-              </div>
-            ) : null}
-          </Drawer>
+          {isLtMd ? (
+            <DrawerTemporary item={item} open={open} setOpen={setOpen} />
+          ) : (
+            <DrawerPermanent item={item} open={open} setOpen={setOpen} />
+          )}
         </Box>
       </div>
     </Viewport>
@@ -216,6 +209,89 @@ const AlertListDetail: React.FC<AlertListDetailProps> = ({ items }) => {
   //     </Box>
   //   </Viewport>
   // );
+};
+
+const DrawerPermanent: React.FC<{ item: AlertItem; open: boolean; setOpen: (open: boolean) => void }> = ({
+  item,
+  open,
+  setOpen
+}) => {
+  const theme = useTheme();
+  const classes = useStyles();
+  const hasItem = !!item;
+  return (
+    <Drawer
+      open={open}
+      variant="permanent"
+      anchor="right"
+      className={clsx(classes.drawer, {
+        [classes.drawerOpen]: open,
+        [classes.drawerClose]: !open
+      })}
+      classes={{
+        paper: clsx(classes.drawerPaper, {
+          [classes.drawerOpen]: open,
+          [classes.drawerClose]: !open
+        })
+      }}
+    >
+      {open ? (
+        <div>
+          <PageHeader
+            mode="provided"
+            title={
+              <Box display="flex" pl={1}>
+                {/* <DescriptionIcon fontSize="large" color="secondary" /> */}
+                <Typography variant="h6">{item.file.name}</Typography>
+              </Box>
+            }
+            actions={[{ icon: <CloseIcon />, action: () => setOpen(false) }]}
+            backgroundColor={theme.palette.background.default}
+            elevation={0}
+            isSticky
+          />
+          <Box p={2}>
+            <AlertDetails item={item} />
+          </Box>
+        </div>
+      ) : null}
+    </Drawer>
+  );
+};
+
+const DrawerTemporary: React.FC<{ item: AlertItem; open: boolean; setOpen: (open: boolean) => void }> = ({
+  item,
+  open,
+  setOpen
+}) => {
+  const theme = useTheme();
+  const classes = useStyles();
+  return (
+    <Drawer open={open} anchor="right" onClose={() => setOpen(false)}>
+      {item ? (
+        <Box className={classes.drawerTemporary}>
+          <PageHeader
+            mode="provided"
+            title={
+              <Box display="flex" pl={1}>
+                {/* <DescriptionIcon fontSize="large" color="secondary" /> */}
+                <Typography variant="h6">{item.file.name}</Typography>
+              </Box>
+            }
+            actions={[{ icon: <CloseIcon />, action: () => setOpen(false) }]}
+            backgroundColor={theme.palette.background.default}
+            elevation={0}
+            isSticky
+          />
+          <Box p={2}>
+            <AlertDetails item={item} />
+          </Box>
+        </Box>
+      ) : (
+        <div>Closing...</div>
+      )}
+    </Drawer>
+  );
 };
 
 export default AlertListDetail;

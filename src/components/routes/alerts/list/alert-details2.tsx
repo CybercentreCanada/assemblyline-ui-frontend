@@ -23,7 +23,8 @@ const useStyles = makeStyles(theme => ({
     margin: 0,
     '& li ': {
       marginLeft: theme.spacing(0.5),
-      marginRight: theme.spacing(0.5)
+      marginRight: theme.spacing(0.5),
+      marginBottom: theme.spacing(0.5)
     }
   }
 }));
@@ -44,7 +45,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
           <Box className={classes.section}>
             <Typography className={classes.sectionTitle}>Labels</Typography>
             <Divider />
-            <ul className={classes.labels}>
+            <ul className={classes.labels} style={{ marginTop: theme.spacing(-0.5) }}>
               {item.label.map((label, i) => (
                 <li key={`alert-label-${i}`}>
                   <DefaultChip label={label} />
