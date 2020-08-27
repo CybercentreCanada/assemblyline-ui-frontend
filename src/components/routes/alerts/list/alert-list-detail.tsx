@@ -3,7 +3,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import clsx from 'clsx';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import { AlertItem } from 'components/routes/alerts/alerts';
-import AlertDetails from 'components/routes/alerts/list/alert-details2';
+import AlertDetails from 'components/routes/alerts/list/alert-details';
 import AlertList from 'components/routes/alerts/list/alert-list';
 import Viewport from 'components/routes/alerts/viewport';
 import React, { useState } from 'react';
@@ -110,21 +110,12 @@ const AlertListDetail: React.FC<AlertListDetailProps> = ({ items }) => {
   const [item, setItem] = useState<AlertItem>(null);
 
   const onItemClick = selectedItem => {
-    console.log(selectedItem);
     setItem(selectedItem);
     setOpen(true);
   };
 
-  const hasItem = !!item;
-
   return (
     <Viewport>
-      {/* <PageHeader
-        mode="provided"
-        title={<h2>{`Total: ${items.length}`}</h2>}
-        backgroundColor={theme.palette.background.default}
-        isSticky
-      /> */}
       <div style={{ height: '100%', display: 'flex', position: 'relative', width: '100%' }}>
         <Box overflow="auto" className={classes.list}>
           <AlertList items={items} onItemClick={onItemClick} />
@@ -139,76 +130,6 @@ const AlertListDetail: React.FC<AlertListDetailProps> = ({ items }) => {
       </div>
     </Viewport>
   );
-
-  // return (
-  //   <div style={{ position: 'relative' }}>
-  //     <AlertList items={items} onItemClick={onItemClick} />
-  //     <Drawer variant="persistent" anchor="right" open={!!item} className={classes.rightDrawer}>
-  //       {item ? (
-  //         <div className={classes.rightContent}>
-  //           <Box onClick={() => setItem(null)}>Close</Box>
-  //           <AlertDetails item={item} />
-  //         </div>
-  //       ) : null}
-  //     </Drawer>
-  //   </div>
-  // );
-
-  // return (
-  //   <Viewport>
-  //     <Box height="100%" display="flex" flexDirection="row" position="relative">
-  //       <Box overflow="auto" className={classes.left}>
-  //         <AlertList items={items} onItemClick={onItemClick} />
-  //       </Box>
-  //       <Box overflow="auto" className={classes.right}>
-  //         {item ? (
-  //           <div className={classes.rightContent}>
-  //             <Box onClick={() => setItem(null)}>Close</Box>
-  //             <Box>{item.sid}</Box>
-  //             <Box>
-  //               Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ipsam, molestiae quaerat tempora eligendi
-  //               dicta corporis qui libero at commodi repudiandae inventore soluta laudantium architecto voluptatibus
-  //               eius odio saepe nemo. Vitae!
-  //             </Box>
-  //           </div>
-  //         ) : null}
-  //       </Box>
-  //     </Box>
-  //   </Viewport>
-
-  // const hasItem = !!item;.
-  // return (
-  //   <Viewport>
-  //     <Box height="100%" display="flex" flexDirection="row">
-  //       <Box flex="1 1 auto" overflow="auto">
-  //         <AlertList items={items} onItemClick={onItemClick} />
-  //       </Box>
-  //       <Box display="flex" flex="0 0 auto" overflow="auto">
-  //         <Drawer
-  //           variant="permanent"
-  //           anchor="right"
-  //           className={clsx(classes.drawer, {
-  //             [classes.drawerOpen]: hasItem,
-  //             [classes.drawerClose]: !hasItem
-  //           })}
-  //           classes={{
-  //             paper: clsx(classes.drawerPaper, {
-  //               [classes.drawerOpen]: hasItem,
-  //               [classes.drawerClose]: !hasItem
-  //             })
-  //           }}
-  //         >
-  //           {item ? (
-  //             <Box>
-  //               <Box onClick={() => setItem(null)}>Close</Box>
-  //               <AlertDetails item={item} />
-  //             </Box>
-  //           ) : null}
-  //         </Drawer>
-  //       </Box>
-  //     </Box>
-  //   </Viewport>
-  // );
 };
 
 const DrawerPermanent: React.FC<{ item: AlertItem; open: boolean; setOpen: (open: boolean) => void }> = ({
@@ -218,7 +139,6 @@ const DrawerPermanent: React.FC<{ item: AlertItem; open: boolean; setOpen: (open
 }) => {
   const theme = useTheme();
   const classes = useStyles();
-  const hasItem = !!item;
   return (
     <Drawer
       open={open}
@@ -241,7 +161,6 @@ const DrawerPermanent: React.FC<{ item: AlertItem; open: boolean; setOpen: (open
             mode="provided"
             title={
               <Box display="flex" pl={1}>
-                {/* <DescriptionIcon fontSize="large" color="secondary" /> */}
                 <Typography variant="h6">{item.file.name}</Typography>
               </Box>
             }

@@ -1,81 +1,49 @@
-import { Box, Chip, Grid, Link, makeStyles, Paper, Typography, useTheme, withStyles } from '@material-ui/core';
-import ClipboardIcon from '@material-ui/icons/AssignmentReturned';
+import {
+  Box,
+  Button,
+  Chip,
+  Divider,
+  Grid,
+  makeStyles,
+  Typography,
+  useMediaQuery,
+  useTheme,
+  withStyles
+} from '@material-ui/core';
 import useClipboard from 'components/hooks/useClipboard';
-import React, { Fragment } from 'react';
-import { useTranslation } from 'react-i18next';
-import { AlertItem } from '../alerts';
+import { AlertItem } from 'components/routes/alerts/alerts';
+import React from 'react';
+import { BsClipboard } from 'react-icons/bs';
 
 const useStyles = makeStyles(theme => ({
-  card: {
-    padding: theme.spacing(2),
-    height: '100%'
+  section: {
+    margin: theme.spacing(1),
+    '& > hr': {
+      marginBottom: theme.spacing(1)
+    }
   },
-  gridList: {
-    width: '100%'
+  sectionTitle: {
+    fontWeight: 'bold'
   },
-  statusChip: {
-    colorPrimary: 'red'
-  },
-  labelList: {
+  labels: {
     display: 'flex',
     flexWrap: 'wrap',
     listStyle: 'none',
     marginLeft: -theme.spacing(0.5),
     padding: 0,
     boxShadow: 'inherit',
-    backgroundColor: theme.palette.background.default,
+    // backgroundColor: theme.palette.background.default,
     margin: 0,
     '& li ': {
-      margin: theme.spacing(0.5)
+      marginLeft: theme.spacing(0.5),
+      marginRight: theme.spacing(0.5),
+      marginBottom: theme.spacing(0.5)
     }
-  },
-  typoLabel: {
-    fontWeight: 'bold'
-  },
-  textWithIcon: {
-    display: 'flex',
-    alignItems: 'center'
-  },
-  longValues: {
-    maxWidth: 200,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis'
   },
   clipboardIcon: {
     '&:hover': {
-      cursor: 'pointer'
-    }
-  },
-  separatedList: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    listStyle: 'none',
-    padding: 0,
-    boxShadow: 'inherit',
-    backgroundColor: theme.palette.background.default,
-    margin: 0,
-    '& a': {
-      color: theme.palette.primary.main
-    },
-    '& a::after': {
-      content: "'|'",
-      margin: '0 5px',
-      fontWeight: 'bold'
-    },
-    '& li:last-child > a::after': {
-      display: 'none'
-    },
-    '& span': {
-      color: theme.palette.primary.main,
-      fontWeight: 'bold'
-    },
-    '& span::after': {
-      content: "'|'",
-      margin: '0 5px',
-      fontWeight: 'bold'
-    },
-    '& li:last-child > span::after': {
-      display: 'none'
+      cursor: 'pointer',
+      transform: 'scale(1.1)'
     }
   }
 }));
@@ -84,183 +52,302 @@ type AlertDetailsProps = {
   item: AlertItem;
 };
 
-const AlertDetails = ({ item }) => {
+const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
   const theme = useTheme();
-  const { t } = useTranslation();
+  const isLteSm = useMediaQuery(theme.breakpoints.down('sm'));
   const classes = useStyles();
   const { copy } = useClipboard();
+
   return (
-    <Grid container spacing={1}>
-      {/* row 1 */}
-      <Grid item xs={4}>
-        <Typography className={classes.typoLabel}>{item.type}</Typography>
+    <Box>
+      <Grid container spacing={2}>
+        <Grid item xs={isLteSm ? 12 : 6}>
+          {/* Labels Section. */}
+          <Box className={classes.section}>
+            <Typography className={classes.sectionTitle}>Labels</Typography>
+            <Divider />
+            <ul className={classes.labels} style={{ marginTop: theme.spacing(-0.5) }}>
+              {item.label.map((label, i) => (
+                <li key={`alert-label-${i}`}>
+                  <DefaultChip label={label} />
+                </li>
+              ))}
+            </ul>
+          </Box>
+        </Grid>
+        <Grid item xs={isLteSm ? 12 : 3}>
+          {/* Priority Section */}
+          <Box className={classes.section}>
+            <Typography className={classes.sectionTitle}>Priority</Typography>
+            <Divider />
+            <DefaultChip label={item.priority} />
+          </Box>
+        </Grid>
+        <Grid item xs={isLteSm ? 12 : 3}>
+          {/* Status Section */}
+          <Box className={classes.section}>
+            <Typography className={classes.sectionTitle}>Status</Typography>
+            <Divider />
+            <DefaultChip label={item.status} />
+          </Box>
+        </Grid>
       </Grid>
-      <Grid item xs={8}>
-        <Typography>{item.reporting_ts}</Typography>
-      </Grid>
-      {/* row 2 */}
-      <Grid item xs={4} />
-      <Grid item xs={8} />
-      {/* row 3 */}
-      <Grid item xs={4}>
-        <Typography className={classes.typoLabel}>{t('page.alerts.label')}</Typography>
-      </Grid>
-      <Grid item xs={8}>
-        <Paper component="ul" className={classes.labelList}>
-          {item.label.map((label, i) => (
-            <li key={`alert-label-${i}`}>
-              <DefaultChip label={label} />
-            </li>
-          ))}
-        </Paper>
-      </Grid>
-      {/* row 4 */}
-      <Grid item xs={4}>
-        <Typography className={classes.typoLabel}>{t('page.alerts.priority')}</Typography>
-      </Grid>
-      <Grid item xs={8}>
-        <DefaultChip label={item.priority} />
-      </Grid>
-      {/* row 5 */}
-      <Grid item xs={4}>
-        <Typography className={classes.typoLabel}>{t('page.alerts.status')}</Typography>
-      </Grid>
-      <Grid item xs={8}>
-        <DefaultChip label={item.status} />
-      </Grid>
-      {/* row 6: File Info */}
-      <Grid item xs={12}>
+
+      {/* File Info */}
+      <Box className={classes.section}>
+        <Typography className={classes.sectionTitle}>File Info</Typography>
+        <Divider />
         <Grid container spacing={1}>
-          <Grid item xs={4}>
-            <Typography className={classes.typoLabel}>{t('page.alerts.fileinfo')}</Typography>
-          </Grid>
-          <Grid item xs={8}>
-            <Link href={item.file.name}>{item.file.name}</Link>
-            <Typography variant="caption" style={{ marginLeft: theme.spacing(1) }}>
-              {item.file.size}({(item.file.size / 1024).toFixed(2)}Kb)
+          <Grid item xs={12}>
+            <Typography variant="caption">Type</Typography>&nbsp;
+            <DefaultChip label={item.file.type} /> -
+            <Box component="span" ml={1} mr={1}>
+              {item.file.name}
+            </Box>
+            <Typography variant="caption">
+              {item.file.size}({(item.file.size / 1024).toFixed(2)} Kb)
             </Typography>
-            <Typography>{item.file.type}</Typography>
           </Grid>
-          <Grid item xs={4}>
-            <Typography className={classes.typoLabel}>MD5</Typography>
-          </Grid>
-          <Grid item xs={8}>
-            <Box className={classes.textWithIcon}>
-              <Typography className={classes.longValues}>{item.file.md5}</Typography>
-              <ClipboardIcon className={classes.clipboardIcon} onClick={event => copy(item.file.md5)} />
+          <Grid item xs={12}>
+            <Box display="flex">
+              <BsClipboard className={classes.clipboardIcon} onClick={() => copy(item.file.md5)} />
+              &nbsp;
+              <pre style={{ margin: 0 }}>MD5:&nbsp;&nbsp;&nbsp;&nbsp;{item.file.md5}</pre>
             </Box>
-          </Grid>
-          <Grid item xs={4}>
-            <Typography className={classes.typoLabel}>SHA1</Typography>
-          </Grid>
-          <Grid item xs={8}>
-            <Box className={classes.textWithIcon}>
-              <Typography className={classes.longValues}>{item.file.sha1}</Typography>
-              <ClipboardIcon className={classes.clipboardIcon} onClick={() => copy(item.file.sha1)} />
+            <Box display="flex">
+              <BsClipboard className={classes.clipboardIcon} onClick={() => copy(item.file.sha1)} />
+              &nbsp;
+              <pre style={{ margin: 0 }}>SHA1:&nbsp;&nbsp;&nbsp;{item.file.sha1}</pre>
             </Box>
-          </Grid>
-          <Grid item xs={4}>
-            <Typography className={classes.typoLabel}>SHA256</Typography>
-          </Grid>
-          <Grid item xs={8}>
-            <Box className={classes.textWithIcon}>
-              <Typography className={classes.longValues}>{item.file.sha256}</Typography>
-              <ClipboardIcon className={classes.clipboardIcon} onClick={event => copy(item.file.sha256)} />
+            <Box display="flex">
+              <BsClipboard className={classes.clipboardIcon} onClick={() => copy(item.file.sha256)} />
+              &nbsp;
+              <pre style={{ margin: 0 }}>SHA256:&nbsp;{item.file.sha256}</pre>
             </Box>
           </Grid>
         </Grid>
-      </Grid>
-      {/* row 7: Owner */}
+      </Box>
+
+      {/* Ownership Section */}
       {item.owner ? (
-        <>
-          <Grid item xs={4}>
-            <Typography className={classes.typoLabel}>{t('page.alerts.ownership')}</Typography>
-          </Grid>
-          <Grid item xs={8}>
-            <Typography>{item.owner}</Typography>
-          </Grid>
-        </>
+        <Box className={classes.section}>
+          <Typography className={classes.sectionTitle}>Ownership</Typography>
+          <Divider />
+          <DefaultChip label={item.owner} />
+        </Box>
       ) : null}
-      {/* row 8: Metadata */}
-      <Grid item xs={12}>
-        <Grid container spacing={1}>
-          {Object.keys(item.metadata).map(k => (
-            <Fragment key={k}>
-              <Grid item xs={4}>
-                <Typography className={classes.typoLabel}>{k}</Typography>
-              </Grid>
-              <Grid item xs={8}>
-                <Typography>{item.metadata[k]}</Typography>
-              </Grid>
-            </Fragment>
-          ))}
-        </Grid>
-      </Grid>
-      {/* row 9: Category */}
+
+      {/* Metadata Section */}
+      {item.metadata && Object.keys(item.metadata).length > 0 ? (
+        <Box className={classes.section}>
+          <Typography className={classes.sectionTitle}>Metadata</Typography>
+          <Divider />
+          <pre style={{ margin: 0 }}>
+            {Object.keys(item.metadata).map(k => (
+              <span>
+                {k}: {item.metadata[k]}
+                <br />
+              </span>
+            ))}
+          </pre>
+        </Box>
+      ) : null}
+
+      {/* Attack Section */}
       {item.attack.category ? (
-        <>
-          <Grid item xs={4}>
-            <Typography className={classes.typoLabel}>{t('page.alerts.category')}</Typography>
+        <Box className={classes.section}>
+          <Typography className={classes.sectionTitle}>Attack</Typography>
+          <Divider />
+          <Grid container spacing={1}>
+            <Grid item xs={isLteSm ? 12 : 4}>
+              <Typography variant="caption" style={{ marginRight: theme.spacing(1) }}>
+                <i>Type</i>
+              </Typography>
+              <DefaultChip label={item.attack.category} />
+            </Grid>
+            <Grid item xs={isLteSm ? 12 : 8}>
+              <Typography variant="caption" style={{ marginRight: theme.spacing(1) }}>
+                <i>Patterns</i>
+              </Typography>
+              <Box display="inline-block">
+                <ul className={classes.labels}>
+                  {item.attack.pattern.map(p => (
+                    <li>
+                      <DefaultChip label={p} />
+                    </li>
+                  ))}
+                </ul>
+              </Box>
+            </Grid>
           </Grid>
-          <Grid item xs={8}>
-            <Typography style={{ fontWeight: 'bold', color: theme.palette.primary.main }}>
-              {item.attack.category}
-            </Typography>
-          </Grid>
-        </>
+        </Box>
       ) : null}
-      {/* row 10: Patterns */}
-      <SeparatedList label={t('page.alerts.patterns')} list={item.attack.pattern} />
-      {/* row 11: Heurisitics. */}
-      <SeparatedList label={t('page.alerts.heuristic')} list={item.heuristic.name} component="link" />
-      {/* row 12: Behaviours. */}
-      <SeparatedList label={t('page.alerts.behaviours')} list={item.al.behavior} />
-      {/* row 13: Attibutions */}
-      <SeparatedList label={t('page.alerts.attributions')} list={item.al.attrib} />
-      {/* row 14: AV Hits */}
-      <SeparatedList label={t('page.alerts.avhits')} list={item.al.av} />
-      {/* row 15: IPs */}
-      <SeparatedList label={t('page.alerts.ip')} list={item.al.ip} />
-      {/* row 16: Domains */}
-      <SeparatedList label={t('page.alerts.domain')} list={item.al.domain} />
-      {/* row 17: Yara Hits */}
-      <SeparatedList label={t('page.alerts.yara')} list={item.al.yara} />
-    </Grid>
+
+      {/* Heuristics Section */}
+      {item.heuristic && item.heuristic.name && item.heuristic.name.length > 0 ? (
+        <Box className={classes.section}>
+          <Typography className={classes.sectionTitle}>Heuristics</Typography>
+          <Divider />
+          <ul className={classes.labels}>
+            {item.heuristic.name.map(n => (
+              <li>
+                <Button size="small" variant="outlined">
+                  {n}
+                </Button>
+              </li>
+            ))}
+          </ul>
+        </Box>
+      ) : null}
+
+      {/* AL Behaviours Section */}
+      {item.al.behavior ? (
+        <Box className={classes.section}>
+          <Typography className={classes.sectionTitle}>Behaviours</Typography>
+          <Divider />
+          <ul className={classes.labels}>
+            {item.al.behavior.map(b => (
+              <li>
+                <DefaultChip label={b} />
+              </li>
+            ))}
+          </ul>
+        </Box>
+      ) : null}
+
+      {/* AL Attributions Section */}
+      {item.al.attrib ? (
+        <Box className={classes.section}>
+          <Typography className={classes.sectionTitle}>Attributions</Typography>
+          <Divider />
+          <ul className={classes.labels}>
+            {item.al.attrib.map(a => (
+              <li>
+                <DefaultChip label={a} />
+              </li>
+            ))}
+          </ul>
+        </Box>
+      ) : null}
+
+      {/* AL AV Hits */}
+      {item.al.av ? (
+        <Box className={classes.section}>
+          <Typography className={classes.sectionTitle}>AV Hits</Typography>
+          <Divider />
+          <ul className={classes.labels}>
+            {item.al.av.map(a => (
+              <li>
+                <DefaultChip label={a} />
+              </li>
+            ))}
+          </ul>
+        </Box>
+      ) : null}
+
+      {/* IPs sections */}
+      <Box className={classes.section}>
+        <Typography className={classes.sectionTitle}>IPs</Typography>
+        <Divider />
+        <Grid container spacing={3}>
+          <Grid item xs={isLteSm ? 12 : 4}>
+            {item.al.ip.map(i => (
+              <div>{i}</div>
+            ))}
+          </Grid>
+          <Grid item xs={isLteSm ? 12 : 4}>
+            <Grid container spacing={1}>
+              <Grid item xs={isLteSm ? 12 : 4}>
+                <Typography variant="caption">
+                  <i>Dynamic</i>
+                </Typography>
+              </Grid>
+              <Grid item xs={isLteSm ? 12 : 8}>
+                {item.al.ip_dynamic.map(i => (
+                  <div>{i}</div>
+                ))}
+              </Grid>
+            </Grid>
+          </Grid>
+          <Grid item xs={isLteSm ? 12 : 4}>
+            <Grid container spacing={0}>
+              <Grid item xs={isLteSm ? 12 : 4}>
+                <Typography variant="caption">
+                  <i>Static</i>
+                </Typography>
+              </Grid>
+              <Grid item xs={isLteSm ? 12 : 8}>
+                {item.al.ip_static.map(i => (
+                  <div>{i}</div>
+                ))}
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+      </Box>
+
+      {/* Domains sections */}
+      <Box className={classes.section}>
+        <Typography className={classes.sectionTitle}>Domains</Typography>
+        <Divider />
+        <Grid container spacing={3}>
+          <Grid item xs={isLteSm ? 12 : 4}>
+            {item.al.domain.map(i => (
+              <div>{i}</div>
+            ))}
+          </Grid>
+          <Grid item xs={isLteSm ? 12 : 4}>
+            <Grid container spacing={1}>
+              <Grid item xs={isLteSm ? 12 : 4}>
+                <Typography variant="caption">
+                  <i>Dynamic</i>
+                </Typography>
+              </Grid>
+              <Grid item xs={isLteSm ? 12 : 8}>
+                {item.al.domain_dynamic.map(i => (
+                  <div>{i}</div>
+                ))}
+              </Grid>
+            </Grid>
+          </Grid>
+          <Grid item xs={isLteSm ? 12 : 4}>
+            <Grid container spacing={0}>
+              <Grid item xs={isLteSm ? 12 : 4}>
+                <Typography variant="caption">
+                  <i>Static</i>
+                </Typography>
+              </Grid>
+              <Grid item xs={isLteSm ? 12 : 8}>
+                {item.al.domain_static.map(i => (
+                  <div>{i}</div>
+                ))}
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+      </Box>
+
+      {/* YARA Hits */}
+      {item.al.yara ? (
+        <Box className={classes.section}>
+          <Typography className={classes.sectionTitle}>Yara Hits</Typography>
+          <Divider />
+          <ul className={classes.labels}>
+            {item.al.yara.map(a => (
+              <li>
+                <DefaultChip label={a} />
+              </li>
+            ))}
+          </ul>
+        </Box>
+      ) : null}
+    </Box>
   );
 };
 
 const DefaultChip = ({ label }) => {
-  const theme = useTheme();
-  const DChip = withStyles({
-    root: {
-      background: theme.palette.primary.dark,
-      color: theme.palette.primary.contrastText
-    }
-  })(Chip);
+  const DChip = withStyles({})(Chip);
   return <DChip label={label} size="small" />;
-};
-
-const SeparatedList = ({ label, list, component = 'span' }) => {
-  const classes = useStyles();
-  if (!list) {
-    return null;
-  }
-  return (
-    <>
-      <Grid item xs={4}>
-        <Typography className={classes.typoLabel}>{label}</Typography>
-      </Grid>
-      <Grid item xs={8}>
-        <Paper component="ul" className={classes.separatedList}>
-          {list.map((t: string, i: number) => (
-            <li key={`alert-list-${i}`}>
-              {component === 'link' ? <Link href={t}>{t}</Link> : <Typography component="span">{t}</Typography>}
-            </li>
-          ))}
-        </Paper>
-      </Grid>
-    </>
-  );
 };
 
 export default AlertDetails;
