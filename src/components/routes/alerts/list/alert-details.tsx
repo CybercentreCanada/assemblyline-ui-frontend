@@ -78,19 +78,12 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
           </Box>
         </Grid>
         <Grid item xs={isLteSm ? 12 : 3}>
-          {/* Priority Section */}
+          {/* Priority Section. */}
           <Box className={classes.section}>
             <Typography className={classes.sectionTitle}>Priority</Typography>
             <Divider />
             <Box display="flex">
-              <AlertPriority name={item.priority} withText />
-              {/* <Typography>{item.priority}</Typography> */}
-              {/* <Chip
-                size="small"
-                label={item.priority}
-                variant="outlined"
-                icon={<AlertPriority name={item.priority} />}
-              /> */}
+              <AlertPriority name={item.priority} withText withChip />
             </Box>
           </Box>
         </Grid>
