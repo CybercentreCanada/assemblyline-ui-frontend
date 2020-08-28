@@ -14,10 +14,12 @@ import useClipboard from 'components/hooks/useClipboard';
 import { AlertItem } from 'components/routes/alerts/alerts';
 import React from 'react';
 import { BsClipboard } from 'react-icons/bs';
+import AlertPriority from './alert-priority';
 
 const useStyles = makeStyles(theme => ({
   section: {
     margin: theme.spacing(1),
+    marginBottom: theme.spacing(3),
     '& > hr': {
       marginBottom: theme.spacing(1)
     }
@@ -66,7 +68,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
           <Box className={classes.section}>
             <Typography className={classes.sectionTitle}>Labels</Typography>
             <Divider />
-            <ul className={classes.labels} style={{ marginTop: theme.spacing(-0.5) }}>
+            <ul className={classes.labels}>
               {item.label.map((label, i) => (
                 <li key={`alert-label-${i}`}>
                   <DefaultChip label={label} />
@@ -80,7 +82,16 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
           <Box className={classes.section}>
             <Typography className={classes.sectionTitle}>Priority</Typography>
             <Divider />
-            <DefaultChip label={item.priority} />
+            <Box display="flex">
+              <AlertPriority name={item.priority} withText />
+              {/* <Typography>{item.priority}</Typography> */}
+              {/* <Chip
+                size="small"
+                label={item.priority}
+                variant="outlined"
+                icon={<AlertPriority name={item.priority} />}
+              /> */}
+            </Box>
           </Box>
         </Grid>
         <Grid item xs={isLteSm ? 12 : 3}>

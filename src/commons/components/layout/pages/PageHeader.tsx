@@ -1,4 +1,4 @@
-import { AppBar, Box, Button, IconButton, Toolbar } from '@material-ui/core';
+import { AppBar, Box, Button, ButtonProps, IconButton, IconButtonProps, Toolbar, useTheme } from '@material-ui/core';
 import useAppSitemap from 'commons/components/hooks/useAppSitemap';
 import BreadcrumbLastItem from 'commons/components/layout/breadcrumbs/BreadcrumbLastItem';
 import Breadcrumbs from 'commons/components/layout/breadcrumbs/Breadcrumbs';
@@ -8,7 +8,8 @@ export type PageHeaderAction = {
   title?: string;
   icon?: React.ReactNode;
   color?: 'primary' | 'secondary';
-  action: () => void;
+  action?: () => void;
+  btnProp?: ButtonProps | IconButtonProps;
 };
 
 type PageHeaderProps = {
@@ -28,6 +29,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   backgroundColor = 'inherit',
   elevation = 0
 }) => {
+  const theme = useTheme();
   const { last } = useAppSitemap();
   let comp = null;
   switch (mode) {
@@ -59,13 +61,26 @@ const PageHeader: React.FC<PageHeaderProps> = ({
             ? actions.map((a, i) => {
                 if (a.title) {
                   return (
-                    <Button key={`ph-action-${i}`} startIcon={a.icon} color={a.color} onClick={a.action}>
+                    <Button
+                      key={`ph-action-${i}`}
+                      startIcon={a.icon}
+                      color={a.color}
+                      onClick={a.action}
+                      {...(a.btnProp as ButtonProps)}
+                      style={{ marginRight: theme.spacing(1) }}
+                    >
                       {a.title}
                     </Button>
                   );
                 }
                 return (
-                  <IconButton key={`ph-action-${i}`} color={a.color} onClick={a.action}>
+                  <IconButton
+                    key={`ph-action-${i}`}
+                    color={a.color}
+                    onClick={a.action}
+                    {...(a.btnProp as IconButtonProps)}
+                    style={{ marginRight: theme.spacing(1) }}
+                  >
                     {a.icon}
                   </IconButton>
                 );
