@@ -26,7 +26,7 @@ const AlertPriority = ({ name, withText = false, withChip = false }) => {
     );
   }
   return (
-    <Box style={{ color }} display="flex">
+    <Box style={{ color }} display="inline-flex">
       {arrow} {withText ? <Typography>{name}</Typography> : ''}
     </Box>
   );
