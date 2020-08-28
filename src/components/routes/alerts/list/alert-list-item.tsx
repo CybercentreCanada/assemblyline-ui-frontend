@@ -1,4 +1,4 @@
-import { Avatar, Box, Chip, ListItem, makeStyles, Typography, useTheme, withStyles } from '@material-ui/core';
+import { Avatar, Box, Chip, ListItem, makeStyles, Typography } from '@material-ui/core';
 import ScoreIcon from '@material-ui/icons/Score';
 import AlertCardActions from 'components/routes/alerts/alert-card-actions';
 import { AlertItem } from 'components/routes/alerts/alerts';
@@ -48,24 +48,6 @@ const AlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
       <AlertCardActions />
     </ListItem>
   );
-};
-
-const StatusChip = ({ label }) => {
-  const theme = useTheme();
-  const COLOR_MAP = {
-    CRITICAL: 'hsl(0, 100%, 50%)',
-    HIGH: 'hsl(16, 100%, 50%)',
-    MEDIUM: 'hsl(39, 100%, 50%)',
-    LOW: 'hsl(60, 100%, 50%)'
-  };
-  const SChip = withStyles({
-    root: {
-      backgroundColor: COLOR_MAP[label],
-      color: theme.palette.getContrastText(COLOR_MAP[label])
-    }
-  })(Chip);
-
-  return <SChip label={label} size="small" />;
 };
 
 export default AlertListItem;
