@@ -110,6 +110,7 @@ const AlertListDetail: React.FC<AlertListDetailProps> = ({ items }) => {
   const classes = useStyles();
   const theme = useTheme();
   const isSTEMedium = useMediaQuery(theme.breakpoints.down('md'));
+  const isSTELarge = useMediaQuery(theme.breakpoints.down('lg'));
   const [state, setState] = useState<{ open: boolean; item: AlertItem }>({ open: false, item: null });
 
   const onItemClick = selectedItem => {
@@ -120,7 +121,12 @@ const AlertListDetail: React.FC<AlertListDetailProps> = ({ items }) => {
     <Viewport>
       <div style={{ height: '100%', display: 'flex', position: 'relative', width: '100%' }}>
         <Box overflow="auto" className={classes.list}>
-          <AlertList items={items} selected={state.item && state.open ? state.item : null} onItemClick={onItemClick} />
+          <AlertList
+            items={items}
+            selected={state.item && state.open ? state.item : null}
+            itemLayout={state.open && isSTELarge ? 'stack' : 'inline'}
+            onItemClick={onItemClick}
+          />
         </Box>
         <Box overflow="auto">
           {isSTEMedium ? (

@@ -12,17 +12,18 @@ const useStyles = makeStyles(theme => ({
 
 type AlertListProps = {
   items: AlertItem[];
+  itemLayout?: 'inline' | 'stack';
   selected?: AlertItem;
   onItemClick: (item: AlertItem) => void;
 };
 
-const AlertList: React.FC<AlertListProps> = ({ items, selected = null, onItemClick }) => {
+const AlertList: React.FC<AlertListProps> = ({ items, selected = null, itemLayout = 'inline', onItemClick }) => {
   const classes = useStyles();
   return (
     <Box>
       {items.map(i => (
         <Box key={i.sid} className={classes.listItem} onClick={() => onItemClick(i)}>
-          <AlertListItem item={i} isSelected={i === selected} />
+          <AlertListItem item={i} isSelected={i === selected} layout={itemLayout} />
         </Box>
       ))}
     </Box>

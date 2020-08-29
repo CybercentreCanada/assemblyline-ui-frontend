@@ -13,29 +13,30 @@ const useStyles = makeStyles(theme => ({
       backgroundColor: theme.palette.type === 'dark' ? theme.palette.grey[800] : theme.palette.grey[200]
     },
     '&[data-selectedalert="true"]': {
-      backgroundColor: theme.palette.type === 'dark' ? theme.palette.grey[700] : theme.palette.grey[300]
+      backgroundColor: theme.palette.type === 'dark' ? theme.palette.grey[900] : theme.palette.grey[300]
     }
   }
 }));
 
 type AlertListItemProps = {
   item: AlertItem;
+  layout?: 'inline' | 'stack';
   isSelected?: boolean;
 };
 
 const AlertListItem: React.FC<AlertListItemProps> = props => {
-  const { isSelected = false } = props;
+  const { isSelected = false, layout = 'inline' } = props;
   const theme = useTheme();
   const classes = useStyles();
   const isLTEMedium = useMediaQuery(theme.breakpoints.up('md'));
   return (
     <Box className={classes.listItem} data-selectedalert={isSelected}>
-      {isLTEMedium ? <AlertLteMedidum {...props} /> : <AlertStMedidum {...props} />}
+      {isLTEMedium && layout === 'inline' ? <AlertItemDefault {...props} /> : <AlertItemSmall {...props} />}
     </Box>
   );
 };
 
-const AlertLteMedidum: React.FC<AlertListItemProps> = ({ item }) => {
+const AlertItemDefault: React.FC<AlertListItemProps> = ({ item }) => {
   return (
     <Grid container style={{ alignItems: 'center' }}>
       <Grid item xs={4}>
@@ -74,7 +75,7 @@ const AlertLteMedidum: React.FC<AlertListItemProps> = ({ item }) => {
   );
 };
 
-const AlertStMedidum: React.FC<AlertListItemProps> = ({ item }) => {
+const AlertItemSmall: React.FC<AlertListItemProps> = ({ item }) => {
   const theme = useTheme();
   return (
     <Box p={2}>
@@ -96,7 +97,7 @@ const AlertStMedidum: React.FC<AlertListItemProps> = ({ item }) => {
         </Grid>
       </Grid>
       <Grid container style={{ alignItems: 'center' }}>
-        <Grid item xs={4}>
+        <Grid item xs={2}>
           <Chip
             size="small"
             label={item.classification}
@@ -106,7 +107,7 @@ const AlertStMedidum: React.FC<AlertListItemProps> = ({ item }) => {
         <Grid item xs={4}>
           <Chip size="small" label={item.status} />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={2}>
           <Chip
             label={item.al.score}
             size="small"
