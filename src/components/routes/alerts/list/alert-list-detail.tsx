@@ -10,7 +10,7 @@ import React, { useState } from 'react';
 
 const useStyles = makeStyles(theme => ({
   drawer: {
-    width: 600,
+    width: 500,
     flexShrink: 0,
     whiteSpace: 'nowrap',
     [theme.breakpoints.up('xl')]: {
@@ -27,8 +27,6 @@ const useStyles = makeStyles(theme => ({
     border: 'none',
     backgroundColor: theme.palette.background.default,
     [theme.breakpoints.up('xs')]: {
-      // backgroundColor: theme.palette.background.paper
-      // border: 'inherit'
       boxShadow:
         theme.palette.type === 'dark'
           ? `-4px 0 4px -2px ${theme.palette.grey[900]}`
@@ -36,8 +34,7 @@ const useStyles = makeStyles(theme => ({
     }
   },
   drawerOpen: {
-    // padding: theme.spacing(2),
-    width: 600,
+    width: 500,
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen
@@ -84,6 +81,13 @@ const useStyles = makeStyles(theme => ({
       width: '100vw'
     }
   },
+  resizeAnchor: {
+    padding: '5px',
+    backgroundColor: 'silver',
+    '&:hover': {
+      cursor: 'col-resize'
+    }
+  },
   '@global': {
     '*::-webkit-scrollbar': {
       width: '0.4em'
@@ -105,26 +109,24 @@ type AlertListDetailProps = {
 const AlertListDetail: React.FC<AlertListDetailProps> = ({ items }) => {
   const classes = useStyles();
   const theme = useTheme();
-  const isLtMd = useMediaQuery(theme.breakpoints.down('md'));
-  const [open, setOpen] = useState<boolean>(false);
-  const [item, setItem] = useState<AlertItem>(null);
+  const isSTEMedium = useMediaQuery(theme.breakpoints.down('md'));
+  const [state, setState] = useState<{ open: boolean; item: AlertItem }>({ open: false, item: null });
 
   const onItemClick = selectedItem => {
-    setItem(selectedItem);
-    setOpen(true);
+    setState({ open: true, item: selectedItem });
   };
 
   return (
     <Viewport>
       <div style={{ height: '100%', display: 'flex', position: 'relative', width: '100%' }}>
         <Box overflow="auto" className={classes.list}>
-          <AlertList items={items} onItemClick={onItemClick} />
+          <AlertList items={items} selected={state.item && state.open ? state.item : null} onItemClick={onItemClick} />
         </Box>
         <Box overflow="auto">
-          {isLtMd ? (
-            <DrawerTemporary item={item} open={open} setOpen={setOpen} />
+          {isSTEMedium ? (
+            <DrawerTemporary {...state} setOpen={_open => setState({ ...state, open: _open })} />
           ) : (
-            <DrawerPermanent item={item} open={open} setOpen={setOpen} />
+            <DrawerPermanent {...state} setOpen={_open => setState({ ...state, open: _open })} />
           )}
         </Box>
       </div>
@@ -193,7 +195,6 @@ const DrawerTemporary: React.FC<{ item: AlertItem; open: boolean; setOpen: (open
             mode="provided"
             title={
               <Box display="flex" pl={1}>
-                {/* <DescriptionIcon fontSize="large" color="secondary" /> */}
                 <Typography variant="h6">{item.file.name}</Typography>
               </Box>
             }

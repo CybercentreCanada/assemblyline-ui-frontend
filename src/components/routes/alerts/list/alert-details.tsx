@@ -34,7 +34,6 @@ const useStyles = makeStyles(theme => ({
     marginLeft: -theme.spacing(0.5),
     padding: 0,
     boxShadow: 'inherit',
-    // backgroundColor: theme.palette.background.default,
     margin: 0,
     '& li ': {
       marginLeft: theme.spacing(0.5),
