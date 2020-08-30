@@ -76,6 +76,9 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
   useLayoutEffect(() => {
     console.log('layoutEffect...');
 
+    // TODO: collapsible left/right.
+    // TODO: remember last width when toggling.
+
     const _containerEl = containerEl.current;
     const _leftEl = leftEl.current;
     const _rightEl = rightEl.current;
