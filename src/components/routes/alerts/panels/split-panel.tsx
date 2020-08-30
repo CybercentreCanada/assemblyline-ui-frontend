@@ -147,7 +147,7 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
           {/* <h3 style={{ textAlign: 'center' }}>Left</h3> */}
           {left}
         </div>
-        <div ref={anchorEl} className={classes.anchor} />
+        <div ref={anchorEl} className={classes.anchor} style={{ width: right && left ? '5px' : '0px' }} />
       </div>
       <div ref={rightEl} className={classes.right}>
         {/* <h3 style={{ textAlign: 'center' }}>Right</h3> */}

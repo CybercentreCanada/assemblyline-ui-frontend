@@ -24,8 +24,8 @@ const AlertsSplitPanel: React.FC<AlertsSplitPanelProps> = ({ items }) => {
         leftMinWidth={800}
         rightMinWidth={600}
         left={
-          <Box pr={2}>
-            <AlertList items={items} onItemClick={item => setState({ ...state, item })} />
+          <Box pr={state.open ? 2 : 0}>
+            <AlertList items={items} onItemClick={item => setState({ open: true, item })} />
           </Box>
         }
         right={
