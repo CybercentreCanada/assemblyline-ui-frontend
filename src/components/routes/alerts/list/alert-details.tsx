@@ -147,7 +147,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
           <Divider />
           <pre style={{ margin: 0 }}>
             {Object.keys(item.metadata).map(k => (
-              <span>
+              <span key={`alert-metadata-${k}`}>
                 {k}: {item.metadata[k]}
                 <br />
               </span>
@@ -174,8 +174,8 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
               </Typography>
               <Box display="inline-block">
                 <ul className={classes.labels}>
-                  {item.attack.pattern.map(p => (
-                    <li>
+                  {item.attack.pattern.map((p, i) => (
+                    <li key={`alert-pattern-${i}`}>
                       <DefaultChip label={p} />
                     </li>
                   ))}
@@ -192,8 +192,8 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
           <Typography className={classes.sectionTitle}>Heuristics</Typography>
           <Divider />
           <ul className={classes.labels}>
-            {item.heuristic.name.map(n => (
-              <li>
+            {item.heuristic.name.map((n, i) => (
+              <li key={`alert-heuristic-${i}`}>
                 <Button size="small" variant="outlined">
                   {n}
                 </Button>
@@ -209,8 +209,8 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
           <Typography className={classes.sectionTitle}>Behaviours</Typography>
           <Divider />
           <ul className={classes.labels}>
-            {item.al.behavior.map(b => (
-              <li>
+            {item.al.behavior.map((b, i) => (
+              <li key={`alert-behaviour-${i}`}>
                 <DefaultChip label={b} />
               </li>
             ))}
@@ -224,8 +224,8 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
           <Typography className={classes.sectionTitle}>Attributions</Typography>
           <Divider />
           <ul className={classes.labels}>
-            {item.al.attrib.map(a => (
-              <li>
+            {item.al.attrib.map((a, i) => (
+              <li key={`alert-attrib-${i}`}>
                 <DefaultChip label={a} />
               </li>
             ))}
@@ -239,8 +239,8 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
           <Typography className={classes.sectionTitle}>AV Hits</Typography>
           <Divider />
           <ul className={classes.labels}>
-            {item.al.av.map(a => (
-              <li>
+            {item.al.av.map((a, i) => (
+              <li key={`alert-av-${i}`}>
                 <DefaultChip label={a} />
               </li>
             ))}
@@ -254,8 +254,8 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
         <Divider />
         <Grid container spacing={3}>
           <Grid item xs={isLteSm ? 12 : 4}>
-            {item.al.ip.map(i => (
-              <div>{i}</div>
+            {item.al.ip.map((ip, i) => (
+              <div key={`alert-ip-${i}`}>{ip}</div>
             ))}
           </Grid>
           <Grid item xs={isLteSm ? 12 : 4}>
@@ -266,8 +266,8 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
                 </Typography>
               </Grid>
               <Grid item xs={isLteSm ? 12 : 8}>
-                {item.al.ip_dynamic.map(i => (
-                  <div>{i}</div>
+                {item.al.ip_dynamic.map((ip, i) => (
+                  <div key={`alert-ipdynamic-${i}`}>{ip}</div>
                 ))}
               </Grid>
             </Grid>
@@ -280,8 +280,8 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
                 </Typography>
               </Grid>
               <Grid item xs={isLteSm ? 12 : 8}>
-                {item.al.ip_static.map(i => (
-                  <div>{i}</div>
+                {item.al.ip_static.map((ip, i) => (
+                  <div key={`alert-ipdynamic-${i}`}>{ip}</div>
                 ))}
               </Grid>
             </Grid>
@@ -295,8 +295,8 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
         <Divider />
         <Grid container spacing={3}>
           <Grid item xs={isLteSm ? 12 : 4}>
-            {item.al.domain.map(i => (
-              <div>{i}</div>
+            {item.al.domain.map((d, i) => (
+              <div key={`alert-domain-${i}`}>{d}</div>
             ))}
           </Grid>
           <Grid item xs={isLteSm ? 12 : 4}>
@@ -307,8 +307,8 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
                 </Typography>
               </Grid>
               <Grid item xs={isLteSm ? 12 : 8}>
-                {item.al.domain_dynamic.map(i => (
-                  <div>{i}</div>
+                {item.al.domain_dynamic.map((d, i) => (
+                  <div key={`alert-domain-${i}`}>{d}</div>
                 ))}
               </Grid>
             </Grid>
@@ -321,8 +321,8 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
                 </Typography>
               </Grid>
               <Grid item xs={isLteSm ? 12 : 8}>
-                {item.al.domain_static.map(i => (
-                  <div>{i}</div>
+                {item.al.domain_static.map((d, i) => (
+                  <div key={`alert-domain-${i}`}>{d}</div>
                 ))}
               </Grid>
             </Grid>
@@ -336,8 +336,8 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
           <Typography className={classes.sectionTitle}>Yara Hits</Typography>
           <Divider />
           <ul className={classes.labels}>
-            {item.al.yara.map(a => (
-              <li>
+            {item.al.yara.map((a, i) => (
+              <li key={`alert-yara-${i}`}>
                 <DefaultChip label={a} />
               </li>
             ))}

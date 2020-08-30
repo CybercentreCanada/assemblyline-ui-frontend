@@ -1,3 +1,4 @@
+import { useMediaQuery, useTheme } from '@material-ui/core';
 import useMyAPI from 'components/hooks/useMyAPI';
 import React, { useEffect, useState } from 'react';
 import AlertsSplitPanel from './list/alerts-split-panel';
@@ -49,6 +50,8 @@ export type AlertItem = {
 
 const Alerts: React.FC = () => {
   const apiCall = useMyAPI();
+  const theme = useTheme();
+  const isLTELarge = useMediaQuery(theme.breakpoints.up('lg'));
   const [alerts, setAlerts] = useState<AlertItem[]>([]);
 
   useEffect(() => {
@@ -65,12 +68,8 @@ const Alerts: React.FC = () => {
     });
   }, [apiCall, setAlerts]);
 
-  return (
-    // <Box>
-    // <AlertListDetail items={alerts} />
-    <AlertsSplitPanel items={alerts} />
-    // </Box>
-  );
+  // return <Box>{isLTELarge ? <AlertsSplitPanel items={alerts} /> : <AlertListDetail items={alerts} />}</Box>;
+  return <AlertsSplitPanel items={alerts} />;
 };
 
 export default Alerts;
