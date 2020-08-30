@@ -1,7 +1,7 @@
 import { makeStyles } from '@material-ui/core';
 import React, { useLayoutEffect, useRef } from 'react';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
   container: {
     display: 'flex',
     flexDirection: 'row',
@@ -21,15 +21,18 @@ const useStyles = makeStyles({
   right: {
     // flex: '1 1 auto',
     // backgroundColor: 'grey',
+    display: 'flex',
+    flexDirection: 'row',
+    // width: '100%',
     overflow: 'auto',
     height: '100%'
   },
   anchor: {
     width: '5px',
     height: '100%',
-    backgroundColor: 'black',
+    backgroundColor: theme.palette.type === 'dark' ? 'hsl(211, 0%, 25%)' : 'hsl(211, 0%, 90%)',
     '&:hover': {
-      backgroundColor: 'hsl(211, 0%, 25%)',
+      backgroundColor: theme.palette.type === 'dark' ? 'hsl(211, 0%, 20%)' : 'hsl(211, 0%, 75%)',
       cursor: 'col-resize'
     }
   },
@@ -45,7 +48,7 @@ const useStyles = makeStyles({
       outline: '1px solid slategrey'
     }
   }
-});
+}));
 
 type SplitPanelProps = {
   leftInitWidth?: number;

@@ -18,7 +18,7 @@ import AlertPriority from './alert-priority';
 
 const useStyles = makeStyles(theme => ({
   section: {
-    margin: theme.spacing(1),
+    // margin: theme.spacing(1),
     marginBottom: theme.spacing(3),
     '& > hr': {
       marginBottom: theme.spacing(1)
