@@ -1,7 +1,6 @@
-import { Box } from '@material-ui/core';
 import useMyAPI from 'components/hooks/useMyAPI';
 import React, { useEffect, useState } from 'react';
-import AlertListDetail from './list/alert-list-detail';
+import AlertsSplitPanel from './list/alerts-split-panel';
 
 export type AlertFile = {
   md5: string;
@@ -57,23 +56,20 @@ const Alerts: React.FC = () => {
       url: '/api/v4/alert/grouped/<group_by>/',
       method: 'get',
       onSuccess: response => {
-        console.log('sucess');
-        console.log(response.api_response.items);
+        // console.log('sucess');
+        // console.log(response.api_response.items);
         setAlerts(response.api_response.items);
-      },
-      onEnter: () => console.log('enter'),
-      onExit: () => console.log('exit')
+      }
+      // onEnter: () => console.log('enter'),
+      // onExit: () => console.log('exit')
     });
   }, [apiCall, setAlerts]);
 
   return (
-    <Box>
-      {/* <PageHeader mode="provided" title={<h2>{`Total: ${alerts.length}`}</h2>} /> */}
-      {/* <Divider /> */}
-      {/* <AlertGrid items={alerts} /> */}
-      {/* <AlertList items={alerts} /> */}
-      <AlertListDetail items={alerts} />
-    </Box>
+    // <Box>
+    // <AlertListDetail items={alerts} />
+    <AlertsSplitPanel items={alerts} />
+    // </Box>
   );
 };
 

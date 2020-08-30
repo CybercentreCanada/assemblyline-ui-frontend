@@ -5,7 +5,7 @@ import PageHeader from 'commons/components/layout/pages/PageHeader';
 import { AlertItem } from 'components/routes/alerts/alerts';
 import AlertDetails from 'components/routes/alerts/list/alert-details';
 import AlertList from 'components/routes/alerts/list/alert-list';
-import Viewport from 'components/routes/alerts/viewport';
+import Viewport from 'components/routes/alerts/panels/viewport';
 import React, { useState } from 'react';
 
 const useStyles = makeStyles(theme => ({
@@ -124,7 +124,7 @@ const AlertListDetail: React.FC<AlertListDetailProps> = ({ items }) => {
           <AlertList
             items={items}
             selected={state.item && state.open ? state.item : null}
-            itemLayout={state.open && isSTELarge ? 'stack' : 'inline'}
+            itemLayout={state.open && isSTEMedium ? 'stack' : 'inline'}
             onItemClick={onItemClick}
           />
         </Box>
