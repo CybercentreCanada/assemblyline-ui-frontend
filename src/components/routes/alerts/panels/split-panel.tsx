@@ -21,8 +21,8 @@ const useStyles = makeStyles(theme => ({
   right: {
     // flex: '1 1 auto',
     // backgroundColor: 'grey',
-    display: 'flex',
-    flexDirection: 'row',
+    // display: 'flex',
+    // flexDirection: 'row',
     // width: '100%',
     overflow: 'auto',
     height: '100%'

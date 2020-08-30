@@ -30,11 +30,11 @@ const AlertsSplitPanel: React.FC<AlertsSplitPanelProps> = ({ items }) => {
         }
         right={
           state.item ? (
-            <Box flexGrow={1} p={2}>
+            <Box p={2} pt={0}>
               <PageHeader
                 mode="provided"
                 title={
-                  <Box display="flex" pl={1}>
+                  <Box display="flex">
                     <Typography variant="h6">{state.item.file.name}</Typography>
                   </Box>
                 }
