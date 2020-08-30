@@ -1,5 +1,5 @@
 import { Box, makeStyles } from '@material-ui/core';
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -42,13 +42,14 @@ type SplitPanelProps = {
   // right: React.ReactNode;
 };
 
-const SplitPanel: React.FC<SplitPanelProps> = ({ leftMinWidth = 200, rightMinWidth = 200 }) => {
+const SplitPanel: React.FC<SplitPanelProps> = ({ leftMinWidth = 200, rightMinWidth = 200, breakpoint = 500 }) => {
   const classes = useStyles();
   const containerEl = useRef<HTMLDivElement>();
   const leftEl = useRef<HTMLDivElement>();
   const rightEl = useRef<HTMLDivElement>();
   const anchorEl = useRef<HTMLDivElement>();
   const mouseDownRef = useRef<boolean>(false);
+  const [layout, setLayout] = useState<'default' | 'drawer'>('default');
 
   useLayoutEffect(() => {
     const _containerEl = containerEl.current;
@@ -85,7 +86,16 @@ const SplitPanel: React.FC<SplitPanelProps> = ({ leftMinWidth = 200, rightMinWid
     // Event: window[resize]
     const onWindowResize = event => {
       console.log(event);
-      // updateLayout()
+      // updateLayout(leftMinWidth);
+      checkLayout();
+    };
+
+    const checkLayout = () => {
+      const cW = _containerEl.getBoundingClientRect().width;
+      const _layout = cW < breakpoint ? 'drawer' : 'default';
+      if (_layout !== layout) {
+        setLayout(_layout);
+      }
     };
 
     // Update the widths of left and right split panel elements for the specified left value.
@@ -115,22 +125,44 @@ const SplitPanel: React.FC<SplitPanelProps> = ({ leftMinWidth = 200, rightMinWid
       _rightEl.style.width = `${_rightWidth}px`;
     };
 
-    updateLayout(leftMinWidth);
+    if (layout === 'default') {
+      updateLayout(leftMinWidth);
+    }
 
     // Register handlers.
-    _anchorEl.addEventListener('mousedown', onAnchorMD);
+    if (_anchorEl) {
+      _anchorEl.addEventListener('mousedown', onAnchorMD);
+    }
     _containerEl.addEventListener('mouseup', onAnchorMU);
     _containerEl.addEventListener('mousemove', onAnchorMM);
     _containerEl.addEventListener('mouseleave', onAnchorMO);
     window.addEventListener('resize', onWindowResize);
     return () => {
-      _anchorEl.removeEventListener('mousedown', onAnchorMD);
+      if (_anchorEl) {
+        _anchorEl.removeEventListener('mousedown', onAnchorMD);
+      }
       _containerEl.removeEventListener('mouseup', onAnchorMU);
       _containerEl.removeEventListener('mousemove', onAnchorMM);
       _containerEl.removeEventListener('mouseleave', onAnchorMO);
       window.removeEventListener('resize', onWindowResize);
     };
   });
+
+  //
+  if (containerEl.current) {
+    console.log(containerEl.current.getBoundingClientRect().width);
+  }
+  if (layout === 'drawer') {
+    return (
+      <div ref={containerEl} className={classes.container}>
+        <div ref={leftEl} className={classes.left}>
+          <div className={classes.leftContent}>
+            <h3 style={{ textAlign: 'center' }}>Left</h3>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div ref={containerEl} className={classes.container}>
