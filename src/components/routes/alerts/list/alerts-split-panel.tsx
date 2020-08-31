@@ -12,6 +12,7 @@ type AlertsSplitPanelProps = {
   items: AlertItem[];
 };
 
+//
 const AlertsSplitPanel: React.FC<AlertsSplitPanelProps> = ({ items }) => {
   const [state, setState] = useState<{ open: boolean; item: AlertItem }>({ open: false, item: null });
 
@@ -22,6 +23,7 @@ const AlertsSplitPanel: React.FC<AlertsSplitPanelProps> = ({ items }) => {
         leftMinWidth={500}
         rightMinWidth={600}
         breakpoint={1100}
+        rightOpen={state.open}
         left={
           <Box pr={state.open ? 2 : 0}>
             <AlertList items={items} onItemClick={item => setState({ open: true, item })} />
@@ -37,7 +39,7 @@ const AlertsSplitPanel: React.FC<AlertsSplitPanelProps> = ({ items }) => {
                     <Typography variant="h6">{state.item.file.name}</Typography>
                   </Box>
                 }
-                actions={[{ icon: <CloseIcon />, action: () => setState({ item: null, open: false }) }]}
+                actions={[{ icon: <CloseIcon />, action: () => setState({ ...state, open: false }) }]}
                 // backgroundColor={theme.palette.background.}
                 elevation={0}
                 isSticky

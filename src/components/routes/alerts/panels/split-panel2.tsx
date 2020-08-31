@@ -50,6 +50,7 @@ type SplitPanelProps = {
   leftMinWidth?: number;
   rightMinWidth?: number;
   breakpoint?: number;
+  rightOpen?: boolean;
   left: React.ReactNode;
   right: React.ReactNode;
 };
@@ -59,6 +60,7 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
   right,
   leftMinWidth = 200,
   rightMinWidth = 200,
+  rightOpen = true,
   breakpoint = 500
 }) => {
   const classes = useStyles();
@@ -186,8 +188,8 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
             {left}
           </div>
         </div>
-        <Drawer open={!!right} anchor="right">
-          {right !== undefined ? right : <div>Closing...</div>}
+        <Drawer open={right && rightOpen} anchor="right">
+          {right}
         </Drawer>
       </div>
     );
