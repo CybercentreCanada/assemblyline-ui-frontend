@@ -63,7 +63,7 @@ export default function OTP<OTPProps>({ setDrawerOpen, set2FAEnabled }) {
             <Skeleton variant="rect" style={{ width: '195px', height: '195px' }} />
           )}
         </Box>
-        <TextDivider />
+        <TextDivider forcePaper />
         <Typography gutterBottom>{t('page.account.2fa_manual')}</Typography>
         <Box py={4}>
           <Typography variant="caption">{response ? response.secret_key : <Skeleton />}</Typography>

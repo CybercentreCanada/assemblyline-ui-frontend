@@ -2,7 +2,11 @@ import { makeStyles } from '@material-ui/core';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-export default function TextDivider() {
+type TextDividerProps = {
+  forcePaper?: (value: boolean) => void;
+};
+
+export default function TextDividerProps<TextDividerProps>({ forcePaper = false }) {
   const { t } = useTranslation();
   const useStyles = makeStyles(theme => ({
     divider: {
@@ -21,7 +25,7 @@ export default function TextDivider() {
       top: '-10px',
       width: '60px',
       [theme.breakpoints.down('xs')]: {
-        backgroundColor: theme.palette.background.default
+        backgroundColor: forcePaper ? theme.palette.background.paper : theme.palette.background.default
       }
     }
   }));
