@@ -22,7 +22,8 @@ const AlertsSplitPanel: React.FC<AlertsSplitPanelProps> = ({ items }) => {
         leftInitWidthPerc={60}
         leftMinWidth={500}
         rightMinWidth={600}
-        breakpoint={1100}
+        rightDrawerBreakpoint={1100}
+        rightDrawerWidth={600}
         rightOpen={state.open}
         left={
           <Box pr={state.open ? 2 : 0}>

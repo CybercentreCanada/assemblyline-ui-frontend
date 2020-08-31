@@ -49,7 +49,8 @@ type SplitPanelProps = {
   leftInitWidthPerc?: number;
   leftMinWidth?: number;
   rightMinWidth?: number;
-  breakpoint?: number;
+  rightDrawerBreakpoint?: number;
+  rightDrawerWidth?: number;
   rightOpen?: boolean;
   left: React.ReactNode;
   right: React.ReactNode;
@@ -61,7 +62,8 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
   leftMinWidth = 200,
   rightMinWidth = 200,
   rightOpen = true,
-  breakpoint = 500
+  rightDrawerBreakpoint = 500,
+  rightDrawerWidth = 400
 }) => {
   const classes = useStyles();
   const containerEl = useRef<HTMLDivElement>();
@@ -113,7 +115,7 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
 
     const checkLayout = () => {
       const cW = _containerEl.getBoundingClientRect().width;
-      const _layout = cW < breakpoint ? 'drawer' : 'default';
+      const _layout = cW < rightDrawerBreakpoint ? 'drawer' : 'default';
       if (_layout !== layout) {
         setLayout(_layout);
       }
@@ -126,7 +128,7 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
       let _leftWidth: number;
       let _rightWidth: number;
 
-      if (!right) {
+      if (!right || !rightOpen) {
         //
         _leftWidth = cW;
         _rightWidth = 0;
@@ -148,6 +150,9 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
       leftSizeRef.current = _leftWidth;
 
       console.log(`cW[${cW}],lW[${_leftWidth}],rW[${_rightWidth}]`);
+
+      // Update the left and right widths.
+      // We update the DOM directly to minimize the amount of re-render and state updates.
       _leftEl.style.width = `${_leftWidth}px`;
       _rightEl.style.width = `${_rightWidth}px`;
     };
@@ -176,40 +181,35 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
   });
 
   //
-  if (containerEl.current) {
-    console.log(containerEl.current.getBoundingClientRect().width);
-  }
+
+  // We display the right panel as a drawer.
   if (layout === 'drawer') {
+    const drawerClasses = makeStyles({
+      paper: {
+        width: rightDrawerWidth
+      }
+    })();
     return (
       <div ref={containerEl} className={classes.container}>
         <div ref={leftEl} className={classes.left}>
-          <div className={classes.leftContent}>
-            {/* <h3 style={{ textAlign: 'center' }}>Left</h3> */}
-            {left}
-          </div>
+          <div className={classes.leftContent}>{left}</div>
         </div>
-        <Drawer open={right && rightOpen} anchor="right">
+        <Drawer open={right && rightOpen} anchor="right" classes={{ paper: drawerClasses.paper }}>
           {right}
         </Drawer>
       </div>
     );
   }
 
+  // Default split panel layout.
   return (
     <div ref={containerEl} className={classes.container}>
       <div ref={leftEl} className={classes.left}>
-        <div className={classes.leftContent}>
-          {/* <h3 style={{ textAlign: 'center' }}>Left</h3> */}
-          {left}
-        </div>
+        <div className={classes.leftContent}>{left}</div>
         <div ref={anchorEl} className={classes.anchor} />
       </div>
       <div ref={rightEl} className={classes.right}>
-        {/* <h3 style={{ textAlign: 'center' }}>Right</h3>
-        <Box width={800} height={600}>
-          test
-        </Box> */}
-        {right}
+        {right && rightOpen ? right : null}
       </div>
     </div>
   );
