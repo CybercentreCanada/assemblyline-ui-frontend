@@ -27,6 +27,9 @@ import useUser from 'commons/components/hooks/useAppUser';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
+import APIKeys from 'components/routes/account/api_keys';
+import OTP from 'components/routes/account/otp';
+import SecurityToken from 'components/routes/account/token';
 import ChipInput from 'material-ui-chip-input';
 import { OptionsObject, useSnackbar } from 'notistack';
 import React, { useEffect, useRef, useState } from 'react';
@@ -36,7 +39,7 @@ type AccountProps = {
   width: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 };
 
-function Account<AppBarProps>({ width }) {
+function Account<AccountProps>({ width }) {
   const inputRef = useRef(null);
   const { t } = useTranslation();
   const theme = useTheme();
@@ -121,6 +124,11 @@ function Account<AppBarProps>({ width }) {
   function setGroups(value) {
     setModified(true);
     setUser({ ...user, groups: value });
+  }
+
+  function set2FAEnabled(value) {
+    enqueueSnackbar(t('page.account.2fa_enabled'), snackBarSuccessOptions);
+    setUser({ ...user, '2fa_enabled': value });
   }
 
   function setConfirmPassword(value) {
@@ -279,14 +287,19 @@ function Account<AppBarProps>({ width }) {
                         value={user.submission_quota}
                       />
                     </>
-                  )
+                  ),
+                  otp: <OTP setDrawerOpen={setDrawerOpen} set2FAEnabled={set2FAEnabled} />,
+                  token: <SecurityToken />,
+                  api_key: <APIKeys />
                 }[drawerType]
               : null}
-            <Box alignSelf="flex-end" pt={6}>
-              <Button variant="contained" onClick={() => setDrawerOpen(false)}>
-                {t('page.account.done')}
-              </Button>
-            </Box>
+            {drawerType !== 'otp' ? (
+              <Box alignSelf="flex-end" pt={6}>
+                <Button variant="contained" onClick={() => setDrawerOpen(false)}>
+                  {t('page.account.done')}
+                </Button>
+              </Box>
+            ) : null}
           </Box>
         </Drawer>
       </React.Fragment>
@@ -528,7 +541,7 @@ function Account<AppBarProps>({ width }) {
                       <ChevronRightOutlinedIcon />
                     </TableCell>
                   </TableRow>
-                  <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('2fa_on')}>
+                  <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('otp')}>
                     <TableCell width="100%">{user ? t('page.account.2fa_on') : <Skeleton />}</TableCell>
                     <TableCell align="right">
                       <ChevronRightOutlinedIcon />
