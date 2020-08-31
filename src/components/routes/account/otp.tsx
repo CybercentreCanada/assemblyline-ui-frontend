@@ -20,22 +20,27 @@ export default function OTP<OTPProps>({ setDrawerOpen, set2FAEnabled }) {
   function validateOTP() {
     apiCall({
       url: `/api/v4/auth/validate_otp/${tempOTP}/`,
-      onSuccess: api_data => {
+      onSuccess: () => {
         setDrawerOpen(false);
+        set2FAEnabled(true);
       }
     });
   }
 
   useEffect(() => {
-    // Load user on start
-    setTimeout(() => {
-      apiCall({
-        url: '/api/v4/auth/setup_otp/',
-        onSuccess: api_data => {
-          setResponse(api_data.api_response);
-        }
-      });
-    }, 2000);
+    // Load OTP setup on start
+    apiCall({
+      url: '/api/v4/auth/setup_otp/',
+      onSuccess: api_data => {
+        setResponse(api_data.api_response);
+      },
+      onFailure: () => {
+        set2FAEnabled(true);
+        setTimeout(() => {
+          setDrawerOpen(false);
+        }, 1000);
+      }
+    });
 
     // eslint-disable-next-line
   }, []);

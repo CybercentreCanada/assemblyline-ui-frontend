@@ -28,6 +28,7 @@ import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import APIKeys from 'components/routes/account/api_keys';
+import DisableOTP from 'components/routes/account/disable_otp';
 import OTP from 'components/routes/account/otp';
 import SecurityToken from 'components/routes/account/token';
 import ChipInput from 'material-ui-chip-input';
@@ -127,7 +128,21 @@ function Account<AccountProps>({ width }) {
   }
 
   function set2FAEnabled(value) {
-    enqueueSnackbar(t('page.account.2fa_enabled'), snackBarSuccessOptions);
+    if (value && user['2fa_enabled']) {
+      enqueueSnackbar(t('page.account.2fa_already_enabled'), {
+        ...snackBarSuccessOptions,
+        variant: 'error',
+        autoHideDuration: 5000
+      });
+    } else if (value) {
+      enqueueSnackbar(t('page.account.2fa_enabled'), snackBarSuccessOptions);
+    } else {
+      enqueueSnackbar(t('page.account.2fa_disabled'), {
+        ...snackBarSuccessOptions,
+        variant: 'warning',
+        autoHideDuration: 5000
+      });
+    }
     setUser({ ...user, '2fa_enabled': value });
   }
 
@@ -289,11 +304,12 @@ function Account<AccountProps>({ width }) {
                     </>
                   ),
                   otp: <OTP setDrawerOpen={setDrawerOpen} set2FAEnabled={set2FAEnabled} />,
+                  disable_otp: <DisableOTP setDrawerOpen={setDrawerOpen} set2FAEnabled={set2FAEnabled} />,
                   token: <SecurityToken />,
                   api_key: <APIKeys />
                 }[drawerType]
               : null}
-            {drawerType !== 'otp' ? (
+            {drawerType !== 'otp' && drawerType !== 'disable_otp' ? (
               <Box alignSelf="flex-end" pt={6}>
                 <Button variant="contained" onClick={() => setDrawerOpen(false)}>
                   {t('page.account.done')}
@@ -541,8 +557,14 @@ function Account<AccountProps>({ width }) {
                       <ChevronRightOutlinedIcon />
                     </TableCell>
                   </TableRow>
-                  <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('otp')}>
-                    <TableCell width="100%">{user ? t('page.account.2fa_on') : <Skeleton />}</TableCell>
+                  <TableRow
+                    hover
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => toggleDrawer(user['2fa_enabled'] ? 'disable_otp' : 'otp')}
+                  >
+                    <TableCell width="100%">
+                      {user ? user['2fa_enabled'] ? t('page.account.2fa_off') : t('page.account.2fa_on') : <Skeleton />}
+                    </TableCell>
                     <TableCell align="right">
                       <ChevronRightOutlinedIcon />
                     </TableCell>
