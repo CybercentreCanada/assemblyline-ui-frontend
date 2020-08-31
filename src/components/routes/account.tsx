@@ -569,12 +569,16 @@ function Account<AccountProps>({ width }) {
                       <ChevronRightOutlinedIcon />
                     </TableCell>
                   </TableRow>
-                  <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('token')}>
-                    <TableCell width="100%">{user ? t('page.account.token') : <Skeleton />}</TableCell>
-                    <TableCell align="right">
-                      <ChevronRightOutlinedIcon />
-                    </TableCell>
-                  </TableRow>
+                  {user ? (
+                    user['2fa_enabled'] ? (
+                      <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('token')}>
+                        <TableCell width="100%">{user ? t('page.account.token') : <Skeleton />}</TableCell>
+                        <TableCell align="right">
+                          <ChevronRightOutlinedIcon />
+                        </TableCell>
+                      </TableRow>
+                    ) : null
+                  ) : null}
                   <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('api_key')}>
                     <TableCell width="100%">{user ? t('page.account.api_key') : <Skeleton />}</TableCell>
                     <TableCell align="right">
