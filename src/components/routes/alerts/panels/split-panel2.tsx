@@ -66,6 +66,11 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
   rightDrawerWidth = 400
 }) => {
   const classes = useStyles();
+  const drawerClasses = makeStyles({
+    paper: {
+      width: rightDrawerWidth
+    }
+  })();
   const containerEl = useRef<HTMLDivElement>();
   const leftEl = useRef<HTMLDivElement>();
   const rightEl = useRef<HTMLDivElement>();
@@ -158,6 +163,7 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
     };
 
     if (layout === 'default') {
+      checkLayout();
       updateLayout(leftSizeRef.current);
     }
 
@@ -184,17 +190,12 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
 
   // We display the right panel as a drawer.
   if (layout === 'drawer') {
-    const drawerClasses = makeStyles({
-      paper: {
-        width: rightDrawerWidth
-      }
-    })();
     return (
       <div ref={containerEl} className={classes.container}>
         <div ref={leftEl} className={classes.left}>
           <div className={classes.leftContent}>{left}</div>
         </div>
-        <Drawer open={right && rightOpen} anchor="right" classes={{ paper: drawerClasses.paper }}>
+        <Drawer open={rightOpen} anchor="right" classes={{ paper: drawerClasses.paper }}>
           {right}
         </Drawer>
       </div>
@@ -206,7 +207,7 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
     <div ref={containerEl} className={classes.container}>
       <div ref={leftEl} className={classes.left}>
         <div className={classes.leftContent}>{left}</div>
-        <div ref={anchorEl} className={classes.anchor} />
+        {right && rightOpen ? <div ref={anchorEl} className={classes.anchor} /> : null}
       </div>
       <div ref={rightEl} className={classes.right}>
         {right && rightOpen ? right : null}
