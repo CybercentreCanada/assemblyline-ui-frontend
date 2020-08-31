@@ -1,4 +1,4 @@
-import { Box, makeStyles } from '@material-ui/core';
+import { Drawer, makeStyles } from '@material-ui/core';
 import React, { useLayoutEffect, useRef, useState } from 'react';
 
 const useStyles = makeStyles(theme => ({
@@ -11,8 +11,8 @@ const useStyles = makeStyles(theme => ({
     flex: '1 1 auto',
     overflow: 'auto',
     display: 'flex',
-    flexDirection: 'row',
-    backgroundColor: 'silver'
+    flexDirection: 'row'
+    // backgroundColor: 'silver'
   },
   leftContent: {
     flex: '1 1 auto'
@@ -28,8 +28,20 @@ const useStyles = makeStyles(theme => ({
   },
   right: {
     flex: '1 1 auto',
-    overflow: 'auto',
-    backgroundColor: 'darkgrey'
+    overflow: 'auto'
+    // backgroundColor: 'darkgrey'
+  },
+  '@global': {
+    '*::-webkit-scrollbar': {
+      width: '0.4em'
+    },
+    '*::-webkit-scrollbar-track': {
+      '-webkit-box-shadow': 'inset 0 0 6px rgba(0,0,0,0.00)'
+    },
+    '*::-webkit-scrollbar-thumb': {
+      backgroundColor: 'rgba(0,0,0,.1)',
+      outline: '1px solid slategrey'
+    }
   }
 }));
 
@@ -38,17 +50,24 @@ type SplitPanelProps = {
   leftMinWidth?: number;
   rightMinWidth?: number;
   breakpoint?: number;
-  // left: React.ReactNode;
-  // right: React.ReactNode;
+  left: React.ReactNode;
+  right: React.ReactNode;
 };
 
-const SplitPanel: React.FC<SplitPanelProps> = ({ leftMinWidth = 200, rightMinWidth = 200, breakpoint = 500 }) => {
+const SplitPanel: React.FC<SplitPanelProps> = ({
+  left,
+  right,
+  leftMinWidth = 200,
+  rightMinWidth = 200,
+  breakpoint = 500
+}) => {
   const classes = useStyles();
   const containerEl = useRef<HTMLDivElement>();
   const leftEl = useRef<HTMLDivElement>();
   const rightEl = useRef<HTMLDivElement>();
   const anchorEl = useRef<HTMLDivElement>();
   const mouseDownRef = useRef<boolean>(false);
+  const leftSizeRef = useRef<number>(leftMinWidth);
   const [layout, setLayout] = useState<'default' | 'drawer'>('default');
 
   useLayoutEffect(() => {
@@ -105,8 +124,11 @@ const SplitPanel: React.FC<SplitPanelProps> = ({ leftMinWidth = 200, rightMinWid
       let _leftWidth: number;
       let _rightWidth: number;
 
-      //
-      if (leftWidth < leftMinWidth) {
+      if (!right) {
+        //
+        _leftWidth = cW;
+        _rightWidth = 0;
+      } else if (leftWidth < leftMinWidth) {
         //
         _leftWidth = leftMinWidth;
         _rightWidth = cW - leftMinWidth;
@@ -120,13 +142,16 @@ const SplitPanel: React.FC<SplitPanelProps> = ({ leftMinWidth = 200, rightMinWid
         _rightWidth = cW - leftWidth;
       }
 
+      // keep track of last size update.
+      leftSizeRef.current = _leftWidth;
+
       console.log(`cW[${cW}],lW[${_leftWidth}],rW[${_rightWidth}]`);
       _leftEl.style.width = `${_leftWidth}px`;
       _rightEl.style.width = `${_rightWidth}px`;
     };
 
     if (layout === 'default') {
-      updateLayout(leftMinWidth);
+      updateLayout(leftSizeRef.current);
     }
 
     // Register handlers.
@@ -157,9 +182,13 @@ const SplitPanel: React.FC<SplitPanelProps> = ({ leftMinWidth = 200, rightMinWid
       <div ref={containerEl} className={classes.container}>
         <div ref={leftEl} className={classes.left}>
           <div className={classes.leftContent}>
-            <h3 style={{ textAlign: 'center' }}>Left</h3>
+            {/* <h3 style={{ textAlign: 'center' }}>Left</h3> */}
+            {left}
           </div>
         </div>
+        <Drawer open={!!right} anchor="right">
+          {right !== undefined ? right : <div>Closing...</div>}
+        </Drawer>
       </div>
     );
   }
@@ -168,15 +197,17 @@ const SplitPanel: React.FC<SplitPanelProps> = ({ leftMinWidth = 200, rightMinWid
     <div ref={containerEl} className={classes.container}>
       <div ref={leftEl} className={classes.left}>
         <div className={classes.leftContent}>
-          <h3 style={{ textAlign: 'center' }}>Left</h3>
+          {/* <h3 style={{ textAlign: 'center' }}>Left</h3> */}
+          {left}
         </div>
         <div ref={anchorEl} className={classes.anchor} />
       </div>
       <div ref={rightEl} className={classes.right}>
-        <h3 style={{ textAlign: 'center' }}>Right</h3>
+        {/* <h3 style={{ textAlign: 'center' }}>Right</h3>
         <Box width={800} height={600}>
           test
-        </Box>
+        </Box> */}
+        {right}
       </div>
     </div>
   );

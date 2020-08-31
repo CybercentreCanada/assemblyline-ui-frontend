@@ -1,9 +1,9 @@
-import { Box, Typography, useMediaQuery, useTheme } from '@material-ui/core';
+import { Box, Typography } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import React, { useState } from 'react';
 import { AlertItem } from '../alerts';
-import SplitPanel from '../panels/split-panel';
+import SplitPanel from '../panels/split-panel2';
 import Viewport from '../panels/viewport';
 import AlertDetails from './alert-details';
 import AlertList from './alert-list';
@@ -12,10 +12,7 @@ type AlertsSplitPanelProps = {
   items: AlertItem[];
 };
 
-//
 const AlertsSplitPanel: React.FC<AlertsSplitPanelProps> = ({ items }) => {
-  const theme = useTheme();
-  const isLTELarge = useMediaQuery(theme.breakpoints.up('lg'));
   const [state, setState] = useState<{ open: boolean; item: AlertItem }>({ open: false, item: null });
 
   return (
@@ -23,7 +20,7 @@ const AlertsSplitPanel: React.FC<AlertsSplitPanelProps> = ({ items }) => {
       <SplitPanel
         leftInitWidthPerc={60}
         leftMinWidth={500}
-        rightMinWidth={500}
+        rightMinWidth={600}
         breakpoint={1100}
         left={
           <Box pr={state.open ? 2 : 0}>

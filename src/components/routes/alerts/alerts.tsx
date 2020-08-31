@@ -1,8 +1,7 @@
 import { useMediaQuery, useTheme } from '@material-ui/core';
 import useMyAPI from 'components/hooks/useMyAPI';
 import React, { useEffect, useState } from 'react';
-import SplitPanel from './panels/split-panel2';
-import Viewport from './panels/viewport';
+import AlertsSplitPanel from './list/alerts-split-panel';
 
 export type AlertFile = {
   md5: string;
@@ -69,13 +68,13 @@ const Alerts: React.FC = () => {
     });
   }, [apiCall, setAlerts]);
 
-  // return <Box>{isLTELarge ? <AlertsSplitPanel items={alerts} /> : <AlertListDetail items={alerts} />}</Box>;
-  // return <AlertsSplitPanel items={alerts} />;.
-  return (
-    <Viewport>
-      <SplitPanel />
-    </Viewport>
-  );
+  // return <Box>{isLTELarge ? <AlertsSplitPanel items={alerts} /> : <AlertListDetail items={alerts} />}</Box>;.
+  return <AlertsSplitPanel items={alerts} />;
+  // return (
+  //   <Viewport>
+  //     <SplitPanel />
+  //   </Viewport>
+  // );
 };
 
 export default Alerts;
