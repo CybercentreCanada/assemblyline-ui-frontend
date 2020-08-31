@@ -1,4 +1,4 @@
-import { Box, Typography } from '@material-ui/core';
+import { Box, Typography, useTheme } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import React, { useState } from 'react';
@@ -14,6 +14,7 @@ type AlertsSplitPanelProps = {
 
 //
 const AlertsSplitPanel: React.FC<AlertsSplitPanelProps> = ({ items }) => {
+  const theme = useTheme();
   const [state, setState] = useState<{ open: boolean; item: AlertItem }>({ open: false, item: null });
 
   return (
@@ -24,10 +25,11 @@ const AlertsSplitPanel: React.FC<AlertsSplitPanelProps> = ({ items }) => {
         rightMinWidth={600}
         rightDrawerBreakpoint={1100}
         rightDrawerWidth={600}
+        rightDrawerBackgroundColor={theme.palette.background.default}
         rightOpen={state.open}
         left={
           <Box pr={state.open ? 2 : 0}>
-            <AlertList items={items} onItemClick={item => setState({ open: true, item })} />
+            <AlertList items={items} onItemClick={item => setState({ open: true, item })} selected={state.item} />
           </Box>
         }
         right={
@@ -41,7 +43,7 @@ const AlertsSplitPanel: React.FC<AlertsSplitPanelProps> = ({ items }) => {
                   </Box>
                 }
                 actions={[{ icon: <CloseIcon />, action: () => setState({ ...state, open: false }) }]}
-                // backgroundColor={theme.palette.background.}
+                backgroundColor={theme.palette.background.default}
                 elevation={0}
                 isSticky
               />

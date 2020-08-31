@@ -51,6 +51,7 @@ type SplitPanelProps = {
   rightMinWidth?: number;
   rightDrawerBreakpoint?: number;
   rightDrawerWidth?: number;
+  rightDrawerBackgroundColor?: string;
   rightOpen?: boolean;
   left: React.ReactNode;
   right: React.ReactNode;
@@ -63,11 +64,13 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
   rightMinWidth = 200,
   rightOpen = true,
   rightDrawerBreakpoint = 500,
+  rightDrawerBackgroundColor,
   rightDrawerWidth = 400
 }) => {
   const classes = useStyles();
   const drawerClasses = makeStyles({
     paper: {
+      backgroundColor: rightDrawerBackgroundColor,
       width: rightDrawerWidth
     }
   })();
@@ -87,34 +90,33 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
 
     // Event: anchorEl[mousedown]
     const onAnchorMD = (event: MouseEvent) => {
-      console.log('mouse down');
+      // console.log('mouse down');
       mouseDownRef.current = true;
     };
 
     // Event: containerEl[mouseup]
     const onAnchorMU = () => {
-      console.log('mouse up');
+      // console.log('mouse up');
       mouseDownRef.current = false;
     };
 
     // Event: containerEl[mousemove]
     const onAnchorMM = (event: MouseEvent) => {
       if (mouseDownRef.current) {
-        console.log(`moved by: ${event.movementX}`);
+        // console.log(`moved by: ${event.movementX}`);
         updateLayout(_leftEl.getBoundingClientRect().width + event.movementX);
       }
     };
 
     // Event: containerEl[mouseleave]
     const onAnchorMO = () => {
-      console.log('mouse exit.');
+      // console.log('mouse exit.');
       mouseDownRef.current = false;
     };
 
     // Event: window[resize]
     const onWindowResize = event => {
-      console.log(event);
-      // updateLayout(leftMinWidth);
+      // console.log(event);
       checkLayout();
     };
 
@@ -154,7 +156,7 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
       // keep track of last size update.
       leftSizeRef.current = _leftWidth;
 
-      console.log(`cW[${cW}],lW[${_leftWidth}],rW[${_rightWidth}]`);
+      // console.log(`cW[${cW}],lW[${_leftWidth}],rW[${_rightWidth}]`);
 
       // Update the left and right widths.
       // We update the DOM directly to minimize the amount of re-render and state updates.
@@ -186,9 +188,7 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
     };
   });
 
-  //
-
-  // We display the right panel as a drawer.
+  // We display the right panel as a drawer
   if (layout === 'drawer') {
     return (
       <div ref={containerEl} className={classes.container}>
