@@ -28,8 +28,8 @@ const useStyles = makeStyles(theme => ({
   },
   right: {
     flex: '1 1 auto',
-    overflow: 'auto',
-    transition: 'width 0.2s ease 0s'
+    overflow: 'auto'
+    // transition: 'width 0.2s ease 0s'
   },
   '@global': {
     '*::-webkit-scrollbar': {
@@ -134,10 +134,19 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
       checkLayout();
     };
 
-    // Get the default width of the left panel.
-    const defaultLeftWidth = () => {
+    // Get the base left width for the next layout update.
+    const nextLeftWidthBase = () => {
       const cW = _containerEl.getBoundingClientRect().width;
-      return !right || !rightOpen ? cW : cW * (leftInitWidthPerc / 100);
+      // Not right panel.
+      if (!right || !rightOpen) {
+        return cW;
+      }
+      // The last non-fullwidth/non-zero width.
+      if (leftSizeRef.current) {
+        return leftSizeRef.current;
+      }
+      // First time opening the right panel.
+      return cW * (leftInitWidthPerc / 100);
     };
 
     // Check to see if we've hit the layout breakpoint.
@@ -157,19 +166,19 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
       let _rightWidth: number;
 
       if (!right || !rightOpen) {
-        //
+        // No right panel.
         _leftWidth = cW;
         _rightWidth = 0;
       } else if (leftWidth < leftMinWidth) {
-        //
+        // Left side is within range.
         _leftWidth = leftMinWidth;
         _rightWidth = cW - leftMinWidth;
       } else if (cW - leftWidth < rightMinWidth) {
-        //
-        _leftWidth = defaultLeftWidth();
-        _rightWidth = cW - _leftWidth;
+        // left size want to overflow into right size.
+        _leftWidth = cW - rightMinWidth;
+        _rightWidth = rightMinWidth;
       } else {
-        //
+        // iz all gooudd. we within range on both sides.
         _leftWidth = leftWidth;
         _rightWidth = cW - leftWidth;
       }
@@ -177,7 +186,7 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
       // keep track of last size update.
       // only update it if we're not closing the right side.
       // this will ensure it opens at same size next time around.
-      if (right && _rightWidth > 0) {
+      if (right && _rightWidth > 0 && _leftWidth !== cW) {
         leftSizeRef.current = _leftWidth;
       }
 
@@ -190,13 +199,13 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
     };
 
     // Initialize the width of left panel.
-    if (!leftSizeRef.current) {
-      leftSizeRef.current = defaultLeftWidth();
-    }
+    // if (!leftSizeRef.current) {
+    //   leftSizeRef.current = defaultLeftWidth();
+    // }
 
     if (layout === 'default') {
       checkLayout();
-      updateLayout(leftSizeRef.current);
+      updateLayout(nextLeftWidthBase());
     }
 
     // Register handlers.
