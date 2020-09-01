@@ -3,36 +3,20 @@ import React, { useLayoutEffect, useRef, useState } from 'react';
 
 const useStyles = makeStyles(theme => ({
   container: {
-    // display: 'flex',
-    // flexDirection: 'row',
-    width: '100%',
+    display: 'flex',
+    flexDirection: 'row',
     height: '100%'
   },
   left: {
-    // flex: '0 0 auto',
+    flex: '1 1 auto',
     overflow: 'auto',
-    display: 'inline-flex',
-    flexDirection: 'row',
-    // backgroundColor: 'silver',
-    height: '100%',
-    width: '100%',
-    verticalAlign: 'top'
+    display: 'flex',
+    flexDirection: 'row'
   },
   leftContent: {
     flex: '1 1 auto'
-    // display: 'inline-block',
-  },
-  right: {
-    // flex: '1 1 auto',
-    // backgroundColor: 'grey',
-    display: 'inline-block',
-    // flexDirection: 'row',
-    // width: '100%',
-    overflow: 'auto',
-    height: '100%'
   },
   anchor: {
-    // display: 'inline-block',
     width: '5px',
     height: '100%',
     backgroundColor: theme.palette.type === 'dark' ? 'hsl(211, 0%, 25%)' : 'hsl(211, 0%, 90%)',
@@ -40,6 +24,11 @@ const useStyles = makeStyles(theme => ({
       backgroundColor: theme.palette.type === 'dark' ? 'hsl(211, 0%, 20%)' : 'hsl(211, 0%, 75%)',
       cursor: 'col-resize'
     }
+  },
+  right: {
+    flex: '1 1 auto',
+    overflow: 'auto',
+    transition: 'width 0.2s ease 0s'
   },
   '@global': {
     '*::-webkit-scrollbar': {
@@ -56,10 +45,13 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type SplitPanelProps = {
-  leftInitWidthPerc?: number;
   leftMinWidth?: number;
+  leftInitWidthPerc?: number;
   rightMinWidth?: number;
-  breakpoint?: number;
+  rightDrawerBreakpoint?: number;
+  rightDrawerWidth?: number;
+  rightDrawerBackgroundColor?: string;
+  rightOpen?: boolean;
   left: React.ReactNode;
   right: React.ReactNode;
 };
@@ -68,167 +60,208 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
   left,
   right,
   leftInitWidthPerc = 50,
-  breakpoint = 500,
   leftMinWidth = 200,
-  rightMinWidth = 200
+  rightMinWidth = 200,
+  rightOpen = true,
+  rightDrawerBreakpoint = 500,
+  rightDrawerBackgroundColor,
+  rightDrawerWidth = 400
 }) => {
   const classes = useStyles();
+  const drawerClasses = makeStyles(theme => ({
+    paper: {
+      backgroundColor: rightDrawerBackgroundColor,
+      width: rightDrawerWidth,
+      [theme.breakpoints.down('sm')]: {
+        position: 'fixed',
+        width: '100vw',
+        top: 0,
+        right: 0,
+        bottom: 0
+      }
+    }
+  }))();
   const containerEl = useRef<HTMLDivElement>();
   const leftEl = useRef<HTMLDivElement>();
   const rightEl = useRef<HTMLDivElement>();
   const anchorEl = useRef<HTMLDivElement>();
-  const leftWidthRef = useRef<number>();
   const mouseDownRef = useRef<boolean>(false);
+  const leftSizeRef = useRef<number>();
   const [layout, setLayout] = useState<'default' | 'drawer'>('default');
 
   useLayoutEffect(() => {
-    console.log('layoutEffect...');
-
-    // TODO: collapsible left/right.
-    // TODO: remember last width when toggling.
-
     const _containerEl = containerEl.current;
     const _leftEl = leftEl.current;
     const _rightEl = rightEl.current;
     const _anchorEl = anchorEl.current;
 
-    //
-    const relativeWidth = () => {
-      return _containerEl.getBoundingClientRect().width * (leftInitWidthPerc / 100);
-    };
-
-    //
-    const computedTotal = () => {
-      const lW = _leftEl.getBoundingClientRect().width;
-      const rW = _rightEl.getBoundingClientRect().width;
-      return lW + rW;
-    };
-
     // Event: anchorEl[mousedown]
     const onAnchorMD = (event: MouseEvent) => {
-      console.log('mouse down');
+      // console.log('mouse down');
       mouseDownRef.current = true;
+      if (_rightEl) {
+        // remove transition effect when resizing.
+        // this will prevent delays and other weirdness.
+        // the dom update is fast enough to keep up and make
+        //  things smooth.
+        _rightEl.style.transition = 'none';
+      }
     };
 
     // Event: containerEl[mouseup]
     const onAnchorMU = () => {
-      console.log('mouse up');
+      // console.log('mouse up');
       mouseDownRef.current = false;
+      if (_rightEl) {
+        // reset the transition effect when no longer resizing.
+        _rightEl.style.transition = 'width 0.2s ease 0s';
+      }
     };
 
     // Event: containerEl[mousemove]
     const onAnchorMM = (event: MouseEvent) => {
       if (mouseDownRef.current) {
-        console.log(`moved by: ${event.movementX}`);
-
-        updateLayout(leftWidthRef.current + event.movementX);
+        // console.log(`moved by: ${event.movementX}`);
+        updateLayout(_leftEl.getBoundingClientRect().width + event.movementX);
       }
     };
 
     // Event: containerEl[mouseleave]
     const onAnchorMO = () => {
-      console.log('mouse exit.');
+      // console.log('mouse exit.');
       mouseDownRef.current = false;
     };
 
     // Event: window[resize]
     const onWindowResize = event => {
       // console.log(event);
-      updateLayout(relativeWidth());
+      checkLayout();
+    };
+
+    // Get the base left width for the next layout update.
+    const nextLeftWidthBase = () => {
+      const cW = _containerEl.getBoundingClientRect().width;
+      // Not right panel.
+      if (!right || !rightOpen) {
+        return cW;
+      }
+      // The last non-fullwidth/non-zero width.
+      if (leftSizeRef.current) {
+        return leftSizeRef.current;
+      }
+      // First time opening the right panel.
+      return cW * (leftInitWidthPerc / 100);
+    };
+
+    // Check to see if we've hit the layout breakpoint.
+    const checkLayout = () => {
+      console.log('checking layout...');
+      const cW = _containerEl.getBoundingClientRect().width;
+      const _layout = cW < rightDrawerBreakpoint ? 'drawer' : 'default';
+      console.log(_layout);
+      if (_layout !== layout) {
+        setLayout(_layout);
+      }
+      return _layout;
     };
 
     // Update the widths of left and right split panel elements for the specified left value.
-    const updateLayout = (leftWidth: number, bypassTotal = false) => {
+    const updateLayout = (leftWidth: number) => {
       const cW = _containerEl.getBoundingClientRect().width;
-      const _leftWidth = right ? (leftWidth > leftMinWidth ? leftWidth : leftMinWidth) : cW;
-      const _rightWidth = right ? (cW - _leftWidth > rightMinWidth ? cW - _leftWidth : rightMinWidth) : 0;
 
-      // if (_leftWidth + _rightWidth > cW) {
-      //   alert('error!!!');
-      // }
+      let _leftWidth: number;
+      let _rightWidth: number;
 
-      // if (_leftWidth > leftMinWidth && (_rightWidth === 0 || _rightWidth > rightMinWidth)) {
-      leftWidthRef.current = _leftWidth;
-      _leftEl.style.width = `${_leftWidth}px`;
-      _rightEl.style.width = `${_rightWidth}px`;
-      // }
-
-      console.log(`cW[${cW}]:lW[${_leftWidth}]:rW[${_rightWidth}]:computedTotal[${computedTotal()}}]`);
-      if (computedTotal() > cW) {
-        // if (cW < breakpoint) {
-        leftWidthRef.current = cW;
-        _leftEl.style.width = `${cW}px`;
-        _rightEl.style.width = `${0}px`;
-        setLayout('drawer');
-      } else if (layout === 'drawer') {
-        leftWidthRef.current = relativeWidth();
-        _leftEl.style.width = `${leftWidthRef.current}px`;
-        _rightEl.style.width = `${cW - leftWidthRef.current}px`;
-        setLayout('default');
+      if (!right || !rightOpen) {
+        // No right panel.
+        _leftWidth = cW;
+        _rightWidth = 0;
+      } else if (leftWidth < leftMinWidth) {
+        // Left side is within range.
+        _leftWidth = leftMinWidth;
+        _rightWidth = cW - leftMinWidth;
+      } else if (cW - leftWidth < rightMinWidth) {
+        // left size want to overflow into right size.
+        _leftWidth = cW - rightMinWidth;
+        _rightWidth = rightMinWidth;
+      } else {
+        // iz all gooudd. we within range on both sides.
+        _leftWidth = leftWidth;
+        _rightWidth = cW - leftWidth;
       }
 
-      // if (!right) {
-      //   leftWidthRef.current = cW;
-      // } else if (leftWidth && leftWidth > leftMinWidth) {
-      //   leftWidthRef.current = leftWidth;
-      // }
+      // keep track of last size update.
+      // only update it if we're not closing the right side.
+      // this will ensure it opens at same size next time around.
+      if (right && _rightWidth > 0 && _leftWidth !== cW) {
+        leftSizeRef.current = _leftWidth;
+      }
 
-      // if (right && leftWidthRef.current === cW) {
-      //   leftWidthRef.current = leftInitWidth;
-      // }
+      // console.log(`cW[${cW}],lW[${_leftWidth}],rW[${_rightWidth}]`);
 
-      // const _leftWidth = leftWidthRef.current;
-      // const _rightWidth = cW - _leftWidth;
-
-      // console.log(`cW[${cW}]:lW[${_leftWidth}]:rW[${_rightWidth}]`);
-      // if (_leftWidth > leftMinWidth && (_rightWidth === 0 || _rightWidth > rightMinWidth)) {
-      //   _leftEl.style.width = `${_leftWidth}px`;
-      //   _rightEl.style.width = `${cW - _leftWidth}px`;
-      // }
+      // Update the left and right widths.
+      // We update the DOM directly to minimize the amount of re-render and state updates.
+      if (_leftEl) {
+        _leftEl.style.width = `${_leftWidth}px`;
+      }
+      if (_rightEl) {
+        _rightEl.style.width = `${_rightWidth}px`;
+      }
     };
 
-    // Initial layout.
-    updateLayout(relativeWidth());
+    // Initialize the width of left panel.
+    // if (!leftSizeRef.current) {
+    //   leftSizeRef.current = defaultLeftWidth();
+    // }..
+
+    const _layout = checkLayout();
+    if (_layout === 'default') {
+      updateLayout(nextLeftWidthBase());
+    }
 
     // Register handlers.
-    _anchorEl.addEventListener('mousedown', onAnchorMD);
+    if (_anchorEl) {
+      _anchorEl.addEventListener('mousedown', onAnchorMD);
+    }
     _containerEl.addEventListener('mouseup', onAnchorMU);
     _containerEl.addEventListener('mousemove', onAnchorMM);
     _containerEl.addEventListener('mouseleave', onAnchorMO);
     window.addEventListener('resize', onWindowResize);
     return () => {
-      _anchorEl.removeEventListener('mousedown', onAnchorMD);
+      if (_anchorEl) {
+        _anchorEl.removeEventListener('mousedown', onAnchorMD);
+      }
       _containerEl.removeEventListener('mouseup', onAnchorMU);
       _containerEl.removeEventListener('mousemove', onAnchorMM);
       _containerEl.removeEventListener('mouseleave', onAnchorMO);
       window.removeEventListener('resize', onWindowResize);
     };
-  }, [leftInitWidthPerc, leftMinWidth, rightMinWidth, right, layout]);
+  });
 
-  console.log(layout);
-
-  return (
-    <div style={{ height: '100%', display: 'flex' }}>
+  // We display the right panel as a temporary drawer.
+  if (layout === 'drawer') {
+    return (
       <div ref={containerEl} className={classes.container}>
         <div ref={leftEl} className={classes.left}>
-          <div className={classes.leftContent}>
-            {/* <h3 style={{ textAlign: 'center' }}>Left</h3> */}
-            {left}
-          </div>
-          <div ref={anchorEl} className={classes.anchor} style={{ width: right && left ? '5px' : '0px' }} />
+          <div className={classes.leftContent}>{left}</div>
         </div>
-        <div ref={rightEl} className={classes.right}>
-          {/* <h3 style={{ textAlign: 'center' }}>Right</h3> */}
-          {layout === 'default' ? right : null}
-        </div>
-      </div>
-      {layout === 'drawer' && right ? (
-        // <Box display="flex">.
-        <Drawer open variant="persistent" anchor="right">
+        <Drawer open={rightOpen} anchor="right" classes={{ paper: drawerClasses.paper }}>
           {right}
         </Drawer>
-      ) : // </Box>
-      null}
+      </div>
+    );
+  }
+
+  // Default split panel layout.
+  return (
+    <div ref={containerEl} className={classes.container}>
+      <div ref={leftEl} className={classes.left}>
+        <div className={classes.leftContent}>{left}</div>
+        {right && rightOpen ? <div ref={anchorEl} className={classes.anchor} /> : null}
+      </div>
+      <div ref={rightEl} className={classes.right}>
+        {right && rightOpen ? right : null}
+      </div>
     </div>
   );
 };

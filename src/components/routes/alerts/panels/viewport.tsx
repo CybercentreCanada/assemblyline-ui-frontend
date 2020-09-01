@@ -15,14 +15,15 @@ const useStyles = makeStyles({
   }
 });
 
-const Viewport = ({ children }) => {
+const Viewport = ({ children, isNested = false }) => {
   const classes = useStyles();
   const ref = useRef<HTMLDivElement>();
   const [height, setHeight] = useState<number>(0);
   useLayoutEffect(() => {
     const updateHeight = () => {
       const { current: element } = ref;
-      const _height = window.innerHeight - element.offsetTop;
+      const rect = element.getBoundingClientRect();
+      const _height = window.innerHeight - rect.top;
       setHeight(_height);
     };
     window.addEventListener('resize', updateHeight);

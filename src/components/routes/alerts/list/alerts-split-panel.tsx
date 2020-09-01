@@ -1,10 +1,10 @@
 import { Box, Typography, useTheme } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
+import { AlertItem } from 'components/routes/alerts/alerts';
+import SplitPanel from 'components/routes/alerts/panels/split-panel';
+import Viewport from 'components/routes/alerts/panels/viewport';
 import React, { useState } from 'react';
-import { AlertItem } from '../alerts';
-import SplitPanel from '../panels/split-panel2';
-import Viewport from '../panels/viewport';
 import AlertDetails from './alert-details';
 import AlertList from './alert-list';
 

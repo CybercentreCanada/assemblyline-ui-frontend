@@ -1,5 +1,7 @@
+import { Box, Divider, useTheme } from '@material-ui/core';
 import useMyAPI from 'components/hooks/useMyAPI';
 import React, { useEffect, useState } from 'react';
+import AlertsHeader from './list/alerts-header';
 import AlertsSplitPanel from './list/alerts-split-panel';
 
 export type AlertFile = {
@@ -48,6 +50,7 @@ export type AlertItem = {
 };
 
 const Alerts: React.FC = () => {
+  const theme = useTheme();
   const apiCall = useMyAPI();
   const [alerts, setAlerts] = useState<AlertItem[]>([]);
 
@@ -65,8 +68,45 @@ const Alerts: React.FC = () => {
     });
   }, [apiCall, setAlerts]);
 
-  // return <AlertGrid items={alerts} />;
-  return <AlertsSplitPanel items={alerts} />;
+  // return (
+
+  // return <AlertGrid items={alerts} />;..
+  return (
+    <Box display="flex" flexDirection="row">
+      <Box flex="0 0 auto" mt={2} display="flex" flexDirection="row">
+        <Box mr={2}>
+          <AlertsHeader />
+        </Box>
+        <Divider orientation="vertical" />
+      </Box>
+      <Box ml={2} flex="1 1 auto">
+        <AlertsSplitPanel items={alerts} />
+      </Box>
+    </Box>
+  );
+  // return (
+  //   <Viewport>
+  //     <SplitPanel
+  //       leftInitWidthPerc={15}
+  //       left={
+  //         <Box mt={2}>
+  //           <AlertsHeader />
+  //         </Box>
+  //       }
+  //       right={
+  //         <Box ml={2}>
+  //           <AlertsSplitPanel items={alerts} />
+  //         </Box>
+  //       }
+  //     />
+  //   </Viewport>
+  // );
+  // <Box>
+  //   <Box mt={theme.spacing(0.1)} mb={theme.spacing(0.1)}>
+  //   </Box>
+  //   <AlertsSplitPanel items={alerts} />
+  // </Box>
+  // );
 };
 
 export default Alerts;
