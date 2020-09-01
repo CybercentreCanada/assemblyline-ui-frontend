@@ -117,6 +117,16 @@ function Account<AccountProps>({ width }) {
     });
   }
 
+  function toggleToken(token) {
+    const newTokens = user.security_tokens;
+    if (newTokens.indexOf(token) === -1) {
+      newTokens.push(token);
+    } else {
+      newTokens.splice(newTokens.indexOf(token), 1);
+    }
+    setUser({ ...user, security_tokens: newTokens });
+  }
+
   function setName(value) {
     setModified(true);
     setUser({ ...user, name: value });
@@ -305,7 +315,14 @@ function Account<AccountProps>({ width }) {
                   ),
                   otp: <OTP setDrawerOpen={setDrawerOpen} set2FAEnabled={set2FAEnabled} />,
                   disable_otp: <DisableOTP setDrawerOpen={setDrawerOpen} set2FAEnabled={set2FAEnabled} />,
-                  token: <SecurityToken />,
+                  token: (
+                    <SecurityToken
+                      user={user}
+                      toggleToken={toggleToken}
+                      enqueueSnackbar={enqueueSnackbar}
+                      snackBarOptions={snackBarSuccessOptions}
+                    />
+                  ),
                   api_key: <APIKeys />
                 }[drawerType]
               : null}
