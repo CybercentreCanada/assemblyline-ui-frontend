@@ -12,7 +12,6 @@ const useStyles = makeStyles(theme => ({
     overflow: 'auto',
     display: 'flex',
     flexDirection: 'row'
-    // backgroundColor: 'silver'
   },
   leftContent: {
     flex: '1 1 auto'
@@ -28,8 +27,8 @@ const useStyles = makeStyles(theme => ({
   },
   right: {
     flex: '1 1 auto',
-    overflow: 'auto'
-    // transition: 'width 0.2s ease 0s'
+    overflow: 'auto',
+    transition: 'width 0.2s ease 0s'
   },
   '@global': {
     '*::-webkit-scrollbar': {
@@ -101,6 +100,10 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
       // console.log('mouse down');
       mouseDownRef.current = true;
       if (_rightEl) {
+        // remove transition effect when resizing.
+        // this will prevent delays and other weirdness.
+        // the dom update is fast enough to keep up and make
+        //  things smooth.
         _rightEl.style.transition = 'none';
       }
     };
@@ -110,6 +113,7 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
       // console.log('mouse up');
       mouseDownRef.current = false;
       if (_rightEl) {
+        // reset the transition effect when no longer resizing.
         _rightEl.style.transition = 'width 0.2s ease 0s';
       }
     };
