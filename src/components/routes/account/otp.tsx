@@ -83,7 +83,12 @@ export default function OTP<OTPProps>({ setDrawerOpen, set2FAEnabled }) {
           <Button style={{ marginRight: '8px' }} variant="contained" onClick={() => setDrawerOpen(false)}>
             {t('page.account.cancel')}
           </Button>
-          <Button disabled={isNull(response)} variant="contained" color="primary" onClick={() => validateOTP()}>
+          <Button
+            disabled={isNull(response) || tempOTP === ''}
+            variant="contained"
+            color="primary"
+            onClick={() => validateOTP()}
+          >
             {t('page.account.validate')}
           </Button>
         </Box>
