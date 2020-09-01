@@ -1,4 +1,4 @@
-import { Box, Button, TextField, Typography } from '@material-ui/core';
+import { Box, Button, TextField, Typography, useTheme } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 import useMyAPI from 'components/hooks/useMyAPI';
 import TextDivider from 'components/visual/text_divider';
@@ -13,6 +13,7 @@ type OTPProps = {
 
 export default function OTP<OTPProps>({ setDrawerOpen, set2FAEnabled }) {
   const apiCall = useMyAPI();
+  const theme = useTheme();
   const [response, setResponse] = useState(null);
   const [tempOTP, setTempOTP] = useState('');
   const { t } = useTranslation();
@@ -54,6 +55,7 @@ export default function OTP<OTPProps>({ setDrawerOpen, set2FAEnabled }) {
         <Box py={4} display="flex" flexDirection="row" justifyContent="center">
           {response ? (
             <div
+              style={{ backgroundColor: 'white' }}
               // eslint-disable-next-line react/no-danger
               dangerouslySetInnerHTML={{
                 __html: response.qrcode
