@@ -116,23 +116,21 @@ export default function SecurityToken<SecurityTokenProps>({ user, toggleToken, e
         )}
       </Box>
 
-      <Box pt={4} display="flex" flexDirection="row">
-        <Box alignSelf="center" flexGrow={2}>
-          <TextField
-            style={{ width: '100%' }}
-            size="small"
-            margin="normal"
-            variant="outlined"
-            label={t('page.account.token.temp_token')}
-            onChange={event => setTempToken(event.target.value)}
-            value={tempToken}
-          />
-        </Box>
-        <Box alignSelf="center">
-          <Button disabled={tempToken === ''} onClick={() => handleNew()} color="primary">
-            {t('page.account.token.add')}
-          </Button>
-        </Box>
+      <Box width="100%">
+        <TextField
+          style={{ width: '100%' }}
+          size="small"
+          margin="normal"
+          variant="outlined"
+          label={t('page.account.token.temp_token')}
+          onChange={event => setTempToken(event.target.value)}
+          value={tempToken}
+        />
+      </Box>
+      <Box alignSelf="flex-end">
+        <Button disabled={tempToken === ''} onClick={() => handleNew()} color="primary" variant="contained">
+          {t('page.account.token.add')}
+        </Button>
       </Box>
 
       <Dialog

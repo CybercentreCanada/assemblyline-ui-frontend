@@ -22,6 +22,7 @@ import {
   withWidth
 } from '@material-ui/core';
 import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
+import CloseIcon from '@material-ui/icons/Close';
 import Skeleton from '@material-ui/lab/Skeleton';
 import useUser from 'commons/components/hooks/useAppUser';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
@@ -127,6 +128,16 @@ function Account<AccountProps>({ width }) {
     setUser({ ...user, security_tokens: newTokens });
   }
 
+  function toggleAPIKey(apiKey) {
+    const newKeys = user.apikeys;
+    if (newKeys.indexOf(apiKey) === -1) {
+      newKeys.push(apiKey);
+    } else {
+      newKeys.splice(newKeys.indexOf(apiKey), 1);
+    }
+    setUser({ ...user, apikeys: newKeys });
+  }
+
   function setName(value) {
     setModified(true);
     setUser({ ...user, name: value });
@@ -227,7 +238,12 @@ function Account<AccountProps>({ width }) {
     <PageCenter>
       <React.Fragment key="right">
         <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
-          <Box p={6} className={classes.drawer} display="flex" flexDirection="column">
+          <Box alignSelf="flex-end">
+            <IconButton onClick={() => setDrawerOpen(false)}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+          <Box pt={4} pb={6} px={4} className={classes.drawer} display="flex" flexDirection="column">
             {drawerType && user
               ? {
                   api_quota: (
@@ -323,16 +339,16 @@ function Account<AccountProps>({ width }) {
                       snackBarOptions={snackBarSuccessOptions}
                     />
                   ),
-                  api_key: <APIKeys />
+                  api_key: (
+                    <APIKeys
+                      user={user}
+                      toggleAPIKey={toggleAPIKey}
+                      enqueueSnackbar={enqueueSnackbar}
+                      snackBarOptions={snackBarSuccessOptions}
+                    />
+                  )
                 }[drawerType]
               : null}
-            {drawerType !== 'otp' && drawerType !== 'disable_otp' ? (
-              <Box alignSelf="flex-end" pt={6}>
-                <Button variant="contained" onClick={() => setDrawerOpen(false)}>
-                  {t('page.account.done')}
-                </Button>
-              </Box>
-            ) : null}
           </Box>
         </Drawer>
       </React.Fragment>
@@ -597,7 +613,7 @@ function Account<AccountProps>({ width }) {
                     ) : null
                   ) : null}
                   <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('api_key')}>
-                    <TableCell width="100%">{user ? t('page.account.api_key') : <Skeleton />}</TableCell>
+                    <TableCell width="100%">{user ? t('page.account.apikeys') : <Skeleton />}</TableCell>
                     <TableCell align="right">
                       <ChevronRightOutlinedIcon />
                     </TableCell>
