@@ -46,8 +46,8 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type SplitPanelProps = {
-  leftInitWidthPerc?: number;
   leftMinWidth?: number;
+  leftInitWidthPerc?: number;
   rightMinWidth?: number;
   rightDrawerBreakpoint?: number;
   rightDrawerWidth?: number;
@@ -60,6 +60,7 @@ type SplitPanelProps = {
 const SplitPanel: React.FC<SplitPanelProps> = ({
   left,
   right,
+  leftInitWidthPerc = 50,
   leftMinWidth = 200,
   rightMinWidth = 200,
   rightOpen = true,
@@ -68,18 +69,25 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
   rightDrawerWidth = 400
 }) => {
   const classes = useStyles();
-  const drawerClasses = makeStyles({
+  const drawerClasses = makeStyles(theme => ({
     paper: {
       backgroundColor: rightDrawerBackgroundColor,
-      width: rightDrawerWidth
+      width: rightDrawerWidth,
+      [theme.breakpoints.down('sm')]: {
+        position: 'fixed',
+        width: '100vw',
+        top: 0,
+        right: 0,
+        bottom: 0
+      }
     }
-  })();
+  }))();
   const containerEl = useRef<HTMLDivElement>();
   const leftEl = useRef<HTMLDivElement>();
   const rightEl = useRef<HTMLDivElement>();
   const anchorEl = useRef<HTMLDivElement>();
   const mouseDownRef = useRef<boolean>(false);
-  const leftSizeRef = useRef<number>(leftMinWidth);
+  const leftSizeRef = useRef<number>();
   const [layout, setLayout] = useState<'default' | 'drawer'>('default');
 
   useLayoutEffect(() => {
@@ -92,14 +100,18 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
     const onAnchorMD = (event: MouseEvent) => {
       // console.log('mouse down');
       mouseDownRef.current = true;
-      _rightEl.style.transition = 'none';
+      if (_rightEl) {
+        _rightEl.style.transition = 'none';
+      }
     };
 
     // Event: containerEl[mouseup]
     const onAnchorMU = () => {
       // console.log('mouse up');
       mouseDownRef.current = false;
-      _rightEl.style.transition = 'width 0.2s ease 0s';
+      if (_rightEl) {
+        _rightEl.style.transition = 'width 0.2s ease 0s';
+      }
     };
 
     // Event: containerEl[mousemove]
@@ -122,6 +134,13 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
       checkLayout();
     };
 
+    // Get the default width of the left panel.
+    const defaultLeftWidth = () => {
+      const cW = _containerEl.getBoundingClientRect().width;
+      return !right || !rightOpen ? cW : cW * (leftInitWidthPerc / 100);
+    };
+
+    // Check to see if we've hit the layout breakpoint.
     const checkLayout = () => {
       const cW = _containerEl.getBoundingClientRect().width;
       const _layout = cW < rightDrawerBreakpoint ? 'drawer' : 'default';
@@ -147,8 +166,8 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
         _rightWidth = cW - leftMinWidth;
       } else if (cW - leftWidth < rightMinWidth) {
         //
-        _leftWidth = cW - rightMinWidth;
-        _rightWidth = rightMinWidth;
+        _leftWidth = defaultLeftWidth();
+        _rightWidth = cW - _leftWidth;
       } else {
         //
         _leftWidth = leftWidth;
@@ -156,7 +175,11 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
       }
 
       // keep track of last size update.
-      leftSizeRef.current = _leftWidth;
+      // only update it if we're not closing the right side.
+      // this will ensure it opens at same size next time around.
+      if (right && _rightWidth > 0) {
+        leftSizeRef.current = _leftWidth;
+      }
 
       // console.log(`cW[${cW}],lW[${_leftWidth}],rW[${_rightWidth}]`);
 
@@ -165,6 +188,11 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
       _leftEl.style.width = `${_leftWidth}px`;
       _rightEl.style.width = `${_rightWidth}px`;
     };
+
+    // Initialize the width of left panel.
+    if (!leftSizeRef.current) {
+      leftSizeRef.current = defaultLeftWidth();
+    }
 
     if (layout === 'default') {
       checkLayout();
@@ -190,7 +218,7 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
     };
   });
 
-  // We display the right panel as a drawer
+  // We display the right panel as a temporary drawer.
   if (layout === 'drawer') {
     return (
       <div ref={containerEl} className={classes.container}>

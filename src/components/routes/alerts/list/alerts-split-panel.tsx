@@ -20,11 +20,11 @@ const AlertsSplitPanel: React.FC<AlertsSplitPanelProps> = ({ items }) => {
   return (
     <Viewport>
       <SplitPanel
-        leftInitWidthPerc={60}
         leftMinWidth={500}
+        leftInitWidthPerc={60}
         rightMinWidth={600}
         rightDrawerBreakpoint={1100}
-        rightDrawerWidth={600}
+        rightDrawerWidth={900}
         rightDrawerBackgroundColor={theme.palette.background.default}
         rightOpen={state.open}
         left={
