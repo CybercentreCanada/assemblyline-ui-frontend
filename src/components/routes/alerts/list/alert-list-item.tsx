@@ -97,7 +97,29 @@ const AlertItemSmall: React.FC<AlertListItemProps> = ({ item }) => {
         </Grid>
       </Grid>
       <Grid container style={{ alignItems: 'center' }}>
-        <Grid item xs={2}>
+        <Grid item xs={12}>
+          <Chip
+            size="small"
+            label={item.classification}
+            style={{ marginLeft: theme.spacing(1), marginRight: theme.spacing(1) }}
+          />
+          <Chip
+            size="small"
+            label={item.status}
+            style={{ marginLeft: theme.spacing(1), marginRight: theme.spacing(1) }}
+          />
+          <Chip
+            label={item.al.score}
+            size="small"
+            avatar={
+              <Avatar>
+                <ScoreIcon />
+              </Avatar>
+            }
+            style={{ marginLeft: theme.spacing(1), marginRight: theme.spacing(1) }}
+          />
+        </Grid>
+        {/* <Grid item xs={2}>
           <Chip
             size="small"
             label={item.classification}
@@ -117,7 +139,7 @@ const AlertItemSmall: React.FC<AlertListItemProps> = ({ item }) => {
               </Avatar>
             }
           />
-        </Grid>
+        </Grid> */}
       </Grid>
     </Box>
   );

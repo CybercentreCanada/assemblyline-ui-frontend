@@ -28,8 +28,8 @@ const useStyles = makeStyles(theme => ({
   },
   right: {
     flex: '1 1 auto',
-    overflow: 'auto'
-    // backgroundColor: 'darkgrey'
+    overflow: 'auto',
+    transition: 'width 0.2s ease 0s'
   },
   '@global': {
     '*::-webkit-scrollbar': {
@@ -92,12 +92,14 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
     const onAnchorMD = (event: MouseEvent) => {
       // console.log('mouse down');
       mouseDownRef.current = true;
+      _rightEl.style.transition = 'none';
     };
 
     // Event: containerEl[mouseup]
     const onAnchorMU = () => {
       // console.log('mouse up');
       mouseDownRef.current = false;
+      _rightEl.style.transition = 'width 0.2s ease 0s';
     };
 
     // Event: containerEl[mousemove]
