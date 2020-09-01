@@ -1,6 +1,6 @@
 import { Grid } from '@material-ui/core';
 import { AlertItem } from 'components/routes/alerts/alerts';
-import AlertCard from 'components/routes/alerts/grid/alert-card2';
+import AlertCard from 'components/routes/alerts/grid/alert-card';
 import React from 'react';
 
 type AlertListProps = {

@@ -10,7 +10,7 @@ import {
   useTheme,
   withStyles
 } from '@material-ui/core';
-import useClipboard from 'components/hooks/useClipboard';
+import useClipboard from 'commons/components/hooks/useClipboard';
 import { AlertItem } from 'components/routes/alerts/alerts';
 import React from 'react';
 import { BsClipboard } from 'react-icons/bs';
