@@ -17,12 +17,12 @@ const useStyles = (layout, showSpacing) => {
     },
     container: {
       display: 'block',
-      paddingTop: showSpacing ? (layout === 'top' ? theme.spacing(9) : theme.spacing(8)) : 0,
-      paddingLeft: showSpacing ? theme.spacing(3) : 0,
-      paddingRight: showSpacing ? theme.spacing(3) : 0,
-      paddingBottom: showSpacing ? theme.spacing(3) : 0,
+      paddingTop: showSpacing ? (layout === 'top' ? theme.spacing(9) : theme.spacing(8)) : theme.spacing(3),
+      paddingLeft: theme.spacing(3),
+      paddingRight: theme.spacing(3),
+      paddingBottom: theme.spacing(3),
       [theme.breakpoints.only('sm')]: {
-        paddingLeft: showSpacing ? theme.spacing(10) : 0
+        paddingLeft: showSpacing ? theme.spacing(10) : theme.spacing(3)
       },
       [theme.breakpoints.up('md')]: {
         flexGrow: 1
