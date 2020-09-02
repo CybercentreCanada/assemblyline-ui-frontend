@@ -404,7 +404,7 @@ function Account<AccountProps>({ width }) {
                 {user ? (
                   <Chip
                     color={user.is_active ? 'primary' : 'default'}
-                    onClick={toggleAccountEnabled}
+                    onClick={currentUser.username !== user.uname ? toggleAccountEnabled : null}
                     label={user.is_active ? t('page.account.enabled') : t('page.account.disabled')}
                   />
                 ) : (
@@ -509,28 +509,28 @@ function Account<AccountProps>({ width }) {
                             style={{ margin: '2px' }}
                             size="small"
                             color={user.type.includes('user') ? 'primary' : 'default'}
-                            onClick={() => toggleRole('user')}
+                            onClick={currentUser.is_admin ? () => toggleRole('user') : null}
                             label={t('page.account.normal_user')}
                           />
                           <Chip
                             style={{ margin: '2px' }}
                             size="small"
                             color={user.type.includes('admin') ? 'primary' : 'default'}
-                            onClick={() => toggleRole('admin')}
+                            onClick={currentUser.is_admin ? () => toggleRole('admin') : null}
                             label={t('page.account.admin')}
                           />
                           <Chip
                             style={{ margin: '2px' }}
                             size="small"
                             color={user.type.includes('signature_manager') ? 'primary' : 'default'}
-                            onClick={() => toggleRole('signature_manager')}
+                            onClick={currentUser.is_admin ? () => toggleRole('signature_manager') : null}
                             label={t('page.account.signature_manager')}
                           />
                           <Chip
                             style={{ margin: '2px' }}
                             size="small"
                             color={user.type.includes('signature_importer') ? 'primary' : 'default'}
-                            onClick={() => toggleRole('signature_importer')}
+                            onClick={currentUser.is_admin ? () => toggleRole('signature_importer') : null}
                             label={t('page.account.signature_importer')}
                           />
                         </Box>
@@ -540,7 +540,11 @@ function Account<AccountProps>({ width }) {
                     </TableCell>
                     <TableCell align="right" />
                   </TableRow>
-                  <TableRow hover style={{ cursor: 'pointer' }} onClick={event => toggleDrawer('api_quota')}>
+                  <TableRow
+                    hover={currentUser.is_admin}
+                    style={{ cursor: currentUser.is_admin ? 'pointer' : 'default' }}
+                    onClick={currentUser.is_admin ? event => toggleDrawer('api_quota') : null}
+                  >
                     {isWidthDown('xs', width) ? null : (
                       <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.account.api_quota')}</TableCell>
                     )}
@@ -550,11 +554,13 @@ function Account<AccountProps>({ width }) {
                       )}
                       {user ? <Box>{user.api_quota}</Box> : <Skeleton />}
                     </TableCell>
-                    <TableCell align="right">
-                      <ChevronRightOutlinedIcon />
-                    </TableCell>
+                    <TableCell align="right">{currentUser.is_admin ? <ChevronRightOutlinedIcon /> : null}</TableCell>
                   </TableRow>
-                  <TableRow hover style={{ cursor: 'pointer' }} onClick={event => toggleDrawer('submission_quota')}>
+                  <TableRow
+                    hover={currentUser.is_admin}
+                    style={{ cursor: currentUser.is_admin ? 'pointer' : 'default' }}
+                    onClick={currentUser.is_admin ? event => toggleDrawer('submission_quota') : null}
+                  >
                     {isWidthDown('xs', width) ? null : (
                       <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.account.submission_quota')}</TableCell>
                     )}
@@ -564,9 +570,7 @@ function Account<AccountProps>({ width }) {
                       )}
                       {user ? <Box>{user.submission_quota}</Box> : <Skeleton />}
                     </TableCell>
-                    <TableCell align="right">
-                      <ChevronRightOutlinedIcon />
-                    </TableCell>
+                    <TableCell align="right">{currentUser.is_admin ? <ChevronRightOutlinedIcon /> : null}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
