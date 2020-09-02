@@ -5,17 +5,25 @@ import { AlertItem } from 'components/routes/alerts/alerts';
 import SplitPanel from 'components/routes/alerts/panels/split-panel';
 import Viewport from 'components/routes/alerts/panels/viewport';
 import React, { useState } from 'react';
+import { isEscape } from '../panels/keyboard';
 import AlertDetails from './alert-details';
 import AlertList from './alert-list';
 
 type AlertsSplitPanelProps = {
+  loading?: boolean;
   items: AlertItem[];
 };
 
-//
-const AlertsSplitPanel: React.FC<AlertsSplitPanelProps> = ({ items }) => {
+// .
+const AlertsSplitPanel: React.FC<AlertsSplitPanelProps> = ({ loading = false, items }) => {
   const theme = useTheme();
   const [state, setState] = useState<{ open: boolean; item: AlertItem }>({ open: false, item: null });
+
+  const onListKeyDown = keyCode => {
+    if (isEscape(keyCode) && state.open) {
+      setState({ ...state, open: false });
+    }
+  };
 
   return (
     <Viewport>
@@ -29,7 +37,13 @@ const AlertsSplitPanel: React.FC<AlertsSplitPanelProps> = ({ items }) => {
         rightOpen={state.open}
         left={
           <Box pr={state.open ? 2 : 0}>
-            <AlertList items={items} onItemClick={item => setState({ open: true, item })} selected={state.item} />
+            <AlertList
+              loading={loading}
+              selected={state.open && state.item ? state.item.id : -1}
+              items={items}
+              onSelection={item => setState({ open: true, item })}
+              onKeyDown={onListKeyDown}
+            />
           </Box>
         }
         right={

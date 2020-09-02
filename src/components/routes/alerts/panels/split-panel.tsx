@@ -155,10 +155,8 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
 
     // Check to see if we've hit the layout breakpoint.
     const checkLayout = () => {
-      console.log('checking layout...');
       const cW = _containerEl.getBoundingClientRect().width;
       const _layout = cW < rightDrawerBreakpoint ? 'drawer' : 'default';
-      console.log(_layout);
       if (_layout !== layout) {
         setLayout(_layout);
       }

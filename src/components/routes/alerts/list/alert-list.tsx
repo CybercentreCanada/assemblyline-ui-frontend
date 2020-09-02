@@ -1,32 +1,34 @@
-import { Box, makeStyles } from '@material-ui/core';
 import { AlertItem } from 'components/routes/alerts/alerts';
 import AlertListItem from 'components/routes/alerts/list/alert-list-item';
+import List from 'components/routes/alerts/panels/list';
 import React from 'react';
 
-const useStyles = makeStyles(theme => ({
-  listItem: {
-    borderBottom: '1px solid',
-    borderBottomColor: theme.palette.type === 'dark' ? theme.palette.grey[800] : theme.palette.grey[300]
-  }
-}));
-
 type AlertListProps = {
+  loading?: boolean;
+  selected?: string | number;
   items: AlertItem[];
   itemLayout?: 'inline' | 'stack';
-  selected?: AlertItem;
-  onItemClick: (item: AlertItem) => void;
+  onSelection: (item: AlertItem) => void;
+  onKeyDown?: (keyCode: number, items: AlertItem[], selectedId: number | string) => void;
 };
 
-const AlertList: React.FC<AlertListProps> = ({ items, selected = null, itemLayout = 'inline', onItemClick }) => {
-  const classes = useStyles();
+const AlertList: React.FC<AlertListProps> = ({
+  loading = true,
+  selected = -1,
+  items,
+  itemLayout = 'inline',
+  onSelection,
+  onKeyDown
+}) => {
   return (
-    <Box>
-      {items.map(i => (
-        <Box key={i.sid} className={classes.listItem} onClick={() => onItemClick(i)}>
-          <AlertListItem item={i} isSelected={i === selected} layout={itemLayout} />
-        </Box>
-      ))}
-    </Box>
+    <List
+      loading={loading}
+      selected={selected}
+      items={items}
+      onItemSelected={onSelection}
+      onRenderItem={i => <AlertListItem item={i} layout={itemLayout} />}
+      onKeyDown={onKeyDown}
+    />
   );
 };
 

@@ -1,38 +1,21 @@
-import { Avatar, Box, Chip, Grid, makeStyles, Typography, useMediaQuery, useTheme } from '@material-ui/core';
+import { Avatar, Box, Chip, Grid, Typography, useMediaQuery, useTheme } from '@material-ui/core';
 import ScoreIcon from '@material-ui/icons/Score';
 import { AlertItem } from 'components/routes/alerts/alerts';
 import React from 'react';
 import AlertCardActions from '../alert-card-actions';
 import AlertPriority from './alert-priority';
 
-const useStyles = makeStyles(theme => ({
-  listItem: {
-    wordBreak: 'break-all',
-    '&:hover': {
-      cursor: 'pointer',
-      backgroundColor: theme.palette.type === 'dark' ? theme.palette.grey[800] : theme.palette.grey[200]
-    },
-    '&[data-selectedalert="true"]': {
-      backgroundColor: theme.palette.type === 'dark' ? theme.palette.grey[800] : theme.palette.grey[200]
-    }
-  }
-}));
-
 type AlertListItemProps = {
   item: AlertItem;
   layout?: 'inline' | 'stack';
-  isSelected?: boolean;
 };
 
 const AlertListItem: React.FC<AlertListItemProps> = props => {
-  const { isSelected = false, layout = 'inline' } = props;
+  const { layout = 'inline' } = props;
   const theme = useTheme();
-  const classes = useStyles();
   const isLTEMedium = useMediaQuery(theme.breakpoints.up('md'));
   return (
-    <Box className={classes.listItem} data-selectedalert={isSelected}>
-      {isLTEMedium && layout === 'inline' ? <AlertItemDefault {...props} /> : <AlertItemSmall {...props} />}
-    </Box>
+    <Box>{isLTEMedium && layout === 'inline' ? <AlertItemDefault {...props} /> : <AlertItemSmall {...props} />}</Box>
   );
 };
 

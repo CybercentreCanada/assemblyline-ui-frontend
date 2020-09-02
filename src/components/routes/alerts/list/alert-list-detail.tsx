@@ -123,9 +123,8 @@ const AlertListDetail: React.FC<AlertListDetailProps> = ({ items }) => {
         <Box overflow="auto" className={classes.list}>
           <AlertList
             items={items}
-            selected={state.item && state.open ? state.item : null}
             itemLayout={state.open && isSTEMedium ? 'stack' : 'inline'}
-            onItemClick={onItemClick}
+            onSelection={onItemClick}
           />
         </Box>
         <Box overflow="auto">
