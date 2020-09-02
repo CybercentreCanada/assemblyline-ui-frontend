@@ -8,7 +8,7 @@ import TopBar from 'commons/components/layout/topnav/TopBar';
 import { UserMenuElement } from 'commons/components/layout/topnav/UserProfile';
 import React, { useState } from 'react';
 
-const useStyles = layout => {
+const useStyles = (layout, showSpacing) => {
   return makeStyles(theme => ({
     app: {
       [theme.breakpoints.up('md')]: {
@@ -17,12 +17,12 @@ const useStyles = layout => {
     },
     container: {
       display: 'block',
-      paddingTop: layout === 'top' ? theme.spacing(9) : theme.spacing(8),
-      paddingLeft: theme.spacing(3),
-      paddingRight: theme.spacing(3),
-      paddingBottom: theme.spacing(3),
+      paddingTop: showSpacing ? (layout === 'top' ? theme.spacing(9) : theme.spacing(8)) : 0,
+      paddingLeft: showSpacing ? theme.spacing(3) : 0,
+      paddingRight: showSpacing ? theme.spacing(3) : 0,
+      paddingBottom: showSpacing ? theme.spacing(3) : 0,
       [theme.breakpoints.only('sm')]: {
-        paddingLeft: theme.spacing(10)
+        paddingLeft: showSpacing ? theme.spacing(10) : 0
       },
       [theme.breakpoints.up('md')]: {
         flexGrow: 1
@@ -166,7 +166,7 @@ function AppLayoutProvider(props: LayoutProviderProps) {
   const [autoHideAppbar, setAutoHideAppbar] = useState<boolean>(initialAutoHideAppbar);
   const [layout, setLayout] = useState<'top' | 'side'>(initialLayout);
   const [appTheme] = useAppTheme(theme === 'dark', layoutProps.colors);
-  const classes = useStyles(layout);
+  const classes = useStyles(layout, isUserReady() && appReady && showMenus);
   const showBreadcrumbsOnPage =
     useMediaQuery(muiTheme.breakpoints.only('sm')) &&
     layoutProps.allowQuickSearch &&
