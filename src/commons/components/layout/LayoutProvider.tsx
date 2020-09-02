@@ -11,11 +11,7 @@ import React, { useState } from 'react';
 const useStyles = layout => {
   return makeStyles(theme => ({
     app: {
-      // display: "block",
       [theme.breakpoints.up('md')]: {
-        // There are issues with display flex that propagate to other components.
-        // If we are not able to fix them we should consider using block but
-        //   calculating the padding depending on the menu state
         display: 'flex'
       }
     },
@@ -172,7 +168,12 @@ function AppLayoutProvider(props: LayoutProviderProps) {
   const [appTheme] = useAppTheme(theme === 'dark', layoutProps.colors);
   const classes = useStyles(layout);
   const showBreadcrumbsOnPage =
-    useMediaQuery(muiTheme.breakpoints.only('sm')) && layoutProps.allowQuickSearch && quickSearch;
+    useMediaQuery(muiTheme.breakpoints.only('sm')) &&
+    layoutProps.allowQuickSearch &&
+    quickSearch &&
+    isUserReady() &&
+    appReady &&
+    showMenus;
 
   const onToggleLayout = () => {
     const newLayout = layout === 'top' ? 'side' : 'top';
