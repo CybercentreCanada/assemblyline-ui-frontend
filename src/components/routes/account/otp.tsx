@@ -16,6 +16,15 @@ export default function OTP<OTPProps>({ setDrawerOpen, set2FAEnabled }) {
   const [response, setResponse] = useState(null);
   const [tempOTP, setTempOTP] = useState('');
   const { t } = useTranslation();
+  const regex = RegExp('^[0-9]{1,6}$');
+
+  function handleOTPChange(event) {
+    if (regex.test(event.target.value) || event.target.value === '') {
+      setTempOTP(event.target.value);
+    } else {
+      event.preventDefault();
+    }
+  }
 
   function validateOTP() {
     apiCall({
@@ -70,13 +79,13 @@ export default function OTP<OTPProps>({ setDrawerOpen, set2FAEnabled }) {
           <Typography variant="caption">{response ? response.secret_key : <Skeleton />}</Typography>
         </Box>
         <TextField
-          inputProps={{ maxLength: 6 }}
           disabled={isNull(response)}
           style={{ width: '100%' }}
           margin="normal"
           variant="outlined"
           label={t('page.account.2fa_temp_otp')}
-          onChange={event => setTempOTP(event.target.value)}
+          onChange={handleOTPChange}
+          value={tempOTP}
         />
 
         <Box textAlign="end" pt={6}>

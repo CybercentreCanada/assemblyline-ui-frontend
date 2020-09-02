@@ -37,6 +37,7 @@ export default function APIKeys<APIKeysProps>({ user, toggleAPIKey, enqueueSnack
   const apiCall = useMyAPI();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const regex = RegExp('^[a-zA-Z][a-zA-Z0-9_]*$');
 
   function handleDelete() {
     apiCall({
@@ -58,6 +59,14 @@ export default function APIKeys<APIKeysProps>({ user, toggleAPIKey, enqueueSnack
         toggleAPIKey(tempKeyName);
       }
     });
+  }
+
+  function handleKeyNameChange(event) {
+    if (regex.test(event.target.value) || event.target.value === '') {
+      setTempKeyName(event.target.value);
+    } else {
+      event.preventDefault();
+    }
   }
 
   function handleSelectChange(event) {
@@ -108,7 +117,7 @@ export default function APIKeys<APIKeysProps>({ user, toggleAPIKey, enqueueSnack
           margin="normal"
           variant="outlined"
           label={t('page.account.apikeys.temp_token')}
-          onChange={event => setTempKeyName(event.target.value)}
+          onChange={handleKeyNameChange}
           value={tempKeyName}
         />
       </Box>

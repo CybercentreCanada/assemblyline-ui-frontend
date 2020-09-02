@@ -31,6 +31,15 @@ export default function SecurityToken<SecurityTokenProps>({ user, toggleToken, e
   const [selectedToken, setSelectedToken] = useState(null);
   const [tempToken, setTempToken] = useState('');
   const apiCall = useMyAPI();
+  const regex = RegExp('^[a-zA-Z][a-zA-Z0-9_ ]*$');
+
+  function handleTokenChange(event) {
+    if (regex.test(event.target.value) || event.target.value === '') {
+      setTempToken(event.target.value);
+    } else {
+      event.preventDefault();
+    }
+  }
 
   function handleDelete() {
     apiCall({
@@ -123,7 +132,7 @@ export default function SecurityToken<SecurityTokenProps>({ user, toggleToken, e
           margin="normal"
           variant="outlined"
           label={t('page.account.token.temp_token')}
-          onChange={event => setTempToken(event.target.value)}
+          onChange={handleTokenChange}
           value={tempToken}
         />
       </Box>
