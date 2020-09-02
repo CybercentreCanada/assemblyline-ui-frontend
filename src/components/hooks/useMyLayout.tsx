@@ -119,35 +119,35 @@ const useMyLayout = (): AppLayoutProps => {
             id: 'search.alert',
             text: t('drawer.search.alert'),
             icon: null,
-            route: '/search?index=alert',
+            route: '/search/alert',
             nested: true
           },
           {
             id: 'search.file',
             text: t('drawer.search.file'),
             icon: null,
-            route: '/search?index=file',
+            route: '/search/file',
             nested: true
           },
           {
             id: 'search.result',
             text: t('drawer.search.result'),
             icon: null,
-            route: '/search?index=result',
+            route: '/search/result',
             nested: true
           },
           {
             id: 'search.signature',
             text: t('drawer.search.signature'),
             icon: null,
-            route: '/search?index=signature',
+            route: '/search/signature',
             nested: true
           },
           {
             id: 'search.submission',
             text: t('drawer.search.submission'),
             icon: null,
-            route: '/search?index=submission',
+            route: '/search/submission',
             nested: true
           }
         ]
@@ -210,7 +210,7 @@ const useMyLayout = (): AppLayoutProps => {
     //    name: "Assemblyline",
     //    img_d: "/images/al_dark.svg",
     //    img_l: "/images/al.svg",
-    //    route: "http://10.162.228.5:3000"
+    //    route: "https://localhost"
     //  },
   ];
 

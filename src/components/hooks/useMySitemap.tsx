@@ -59,6 +59,7 @@ export default function useMySitemap() {
       { path: '/manage/sources', title: t('drawer.manage.source'), breadcrumbs: ['/manage'] },
       { path: '/manage/workflows', title: t('drawer.manage.workflow'), breadcrumbs: ['/manage'] },
       { path: '/search', title: t('drawer.search'), isRoot: true, icon: <SearchIcon /> },
+      { path: '/search/:id', title: '{:id}', breadcrumbs: ['/search'] },
       { path: '/search?index=alert', title: t('drawer.search.alert'), breadcrumbs: ['/search'] },
       { path: '/search?index=file', title: t('drawer.search.file'), breadcrumbs: ['/search'] },
       { path: '/search?index=result', title: t('drawer.search.result'), breadcrumbs: ['/search'] },
