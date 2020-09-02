@@ -111,7 +111,7 @@ function UserDetail<UserDetailProps>({ width, username }) {
       body: user,
       onSuccess: () => {
         setModified(false);
-        enqueueSnackbar(t('page.user_detail.success_save'), snackBarSuccessOptions);
+        enqueueSnackbar(t('page.user.success_save'), snackBarSuccessOptions);
       },
       onEnter: () => setButtonLoading(true),
       onExit: () => setButtonLoading(false)
@@ -150,15 +150,15 @@ function UserDetail<UserDetailProps>({ width, username }) {
 
   function set2FAEnabled(value) {
     if (value && user['2fa_enabled']) {
-      enqueueSnackbar(t('page.user_detail.2fa_already_enabled'), {
+      enqueueSnackbar(t('page.user.2fa_already_enabled'), {
         ...snackBarSuccessOptions,
         variant: 'error',
         autoHideDuration: 5000
       });
     } else if (value) {
-      enqueueSnackbar(t('page.user_detail.2fa_enabled'), snackBarSuccessOptions);
+      enqueueSnackbar(t('page.user.2fa_enabled'), snackBarSuccessOptions);
     } else {
-      enqueueSnackbar(t('page.user_detail.2fa_disabled'), {
+      enqueueSnackbar(t('page.user.2fa_disabled'), {
         ...snackBarSuccessOptions,
         variant: 'warning',
         autoHideDuration: 5000
@@ -248,9 +248,9 @@ function UserDetail<UserDetailProps>({ width, username }) {
               ? {
                   api_quota: (
                     <>
-                      <Typography variant="h4">{t('page.user_detail.api_quota')}</Typography>
+                      <Typography variant="h4">{t('page.user.api_quota')}</Typography>
                       <Typography variant="caption" color="textSecondary" gutterBottom>
-                        {t('page.user_detail.api_quota_edit_title')}
+                        {t('page.user.api_quota_edit_title')}
                       </Typography>
                       <TextField
                         autoFocus
@@ -265,30 +265,30 @@ function UserDetail<UserDetailProps>({ width, username }) {
                   change_password: (
                     <>
                       <Typography variant="h4" gutterBottom>
-                        {t('page.user_detail.change_password')}
+                        {t('page.user.change_password')}
                       </Typography>
                       <TextField
                         autoFocus
                         type="password"
                         margin="normal"
                         variant="outlined"
-                        label={t('page.user_detail.new_password')}
+                        label={t('page.user.new_password')}
                         onChange={event => setNewPassword(event.target.value)}
                       />
                       <TextField
                         type="password"
                         margin="normal"
                         variant="outlined"
-                        label={t('page.user_detail.confirm_password')}
+                        label={t('page.user.confirm_password')}
                         onChange={event => setConfirmPassword(event.target.value)}
                       />
                     </>
                   ),
                   groups: (
                     <>
-                      <Typography variant="h4">{t('page.user_detail.groups')}</Typography>
+                      <Typography variant="h4">{t('page.user.groups')}</Typography>
                       <Typography variant="caption" color="textSecondary" gutterBottom>
-                        {t('page.user_detail.groups_edit_title')}
+                        {t('page.user.groups_edit_title')}
                       </Typography>
                       <ChipInput
                         margin="normal"
@@ -300,9 +300,9 @@ function UserDetail<UserDetailProps>({ width, username }) {
                   ),
                   name: (
                     <>
-                      <Typography variant="h4">{t('page.user_detail.name')}</Typography>
+                      <Typography variant="h4">{t('page.user.name')}</Typography>
                       <Typography variant="caption" color="textSecondary" gutterBottom>
-                        {t('page.user_detail.name_edit_title')}
+                        {t('page.user.name_edit_title')}
                       </Typography>
                       <TextField
                         autoFocus
@@ -315,9 +315,9 @@ function UserDetail<UserDetailProps>({ width, username }) {
                   ),
                   submission_quota: (
                     <>
-                      <Typography variant="h4">{t('page.user_detail.submission_quota')}</Typography>
+                      <Typography variant="h4">{t('page.user.submission_quota')}</Typography>
                       <Typography variant="caption" color="textSecondary" gutterBottom>
-                        {t('page.user_detail.submission_quota_edit_title')}
+                        {t('page.user.submission_quota_edit_title')}
                       </Typography>
                       <TextField
                         autoFocus
@@ -405,7 +405,7 @@ function UserDetail<UserDetailProps>({ width, username }) {
                   <Chip
                     color={user.is_active ? 'primary' : 'default'}
                     onClick={currentUser.username !== user.uname ? toggleAccountEnabled : null}
-                    label={user.is_active ? t('page.user_detail.enabled') : t('page.user_detail.disabled')}
+                    label={user.is_active ? t('page.user.enabled') : t('page.user.disabled')}
                   />
                 ) : (
                   <Skeleton className={classes.skelButton} />
@@ -416,12 +416,12 @@ function UserDetail<UserDetailProps>({ width, username }) {
 
           <Grid item sm={12} md={9} style={{ width: '100%' }}>
             <TableContainer className={classes.group} component={Paper}>
-              <Table aria-label={t('page.user_detail.profile')}>
+              <Table aria-label={t('page.user.profile')}>
                 <TableHead>
                   <TableRow>
                     <TableCell colSpan={isWidthDown('xs', width) ? 2 : 3}>
                       <Typography variant="h6" gutterBottom>
-                        {t('page.user_detail.profile')}
+                        {t('page.user.profile')}
                       </Typography>
                     </TableCell>
                   </TableRow>
@@ -429,11 +429,11 @@ function UserDetail<UserDetailProps>({ width, username }) {
                 <TableBody>
                   <TableRow className={classes.row}>
                     {isWidthDown('xs', width) ? null : (
-                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.user_detail.uname')}</TableCell>
+                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.user.uname')}</TableCell>
                     )}
                     <TableCell width="100%">
                       {!isWidthDown('xs', width) ? null : (
-                        <Typography variant="caption">{t('page.user_detail.uname')}</Typography>
+                        <Typography variant="caption">{t('page.user.uname')}</Typography>
                       )}
                       {user ? <Box>{user.uname}</Box> : <Skeleton />}
                     </TableCell>
@@ -441,11 +441,11 @@ function UserDetail<UserDetailProps>({ width, username }) {
                   </TableRow>
                   <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('name')}>
                     {isWidthDown('xs', width) ? null : (
-                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.user_detail.name')}</TableCell>
+                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.user.name')}</TableCell>
                     )}
                     <TableCell width="100%">
                       {!isWidthDown('xs', width) ? null : (
-                        <Typography variant="caption">{t('page.user_detail.name')}</Typography>
+                        <Typography variant="caption">{t('page.user.name')}</Typography>
                       )}
                       {user ? <Box>{user.name}</Box> : <Skeleton />}
                     </TableCell>
@@ -455,11 +455,11 @@ function UserDetail<UserDetailProps>({ width, username }) {
                   </TableRow>
                   <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('groups')}>
                     {isWidthDown('xs', width) ? null : (
-                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.user_detail.groups')}</TableCell>
+                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.user.groups')}</TableCell>
                     )}
                     <TableCell width="100%">
                       {!isWidthDown('xs', width) ? null : (
-                        <Typography variant="caption">{t('page.user_detail.groups')}</Typography>
+                        <Typography variant="caption">{t('page.user.groups')}</Typography>
                       )}
                       {user ? <Box>{user.groups.join(' | ')}</Box> : <Skeleton />}
                     </TableCell>
@@ -469,11 +469,11 @@ function UserDetail<UserDetailProps>({ width, username }) {
                   </TableRow>
                   <TableRow className={classes.row}>
                     {isWidthDown('xs', width) ? null : (
-                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.user_detail.email')}</TableCell>
+                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.user.email')}</TableCell>
                     )}
                     <TableCell width="100%">
                       {!isWidthDown('xs', width) ? null : (
-                        <Typography variant="caption">{t('page.user_detail.email')}</Typography>
+                        <Typography variant="caption">{t('page.user.email')}</Typography>
                       )}
                       {user ? <Box>{user.email}</Box> : <Skeleton />}
                     </TableCell>
@@ -484,12 +484,12 @@ function UserDetail<UserDetailProps>({ width, username }) {
             </TableContainer>
 
             <TableContainer className={classes.group} component={Paper}>
-              <Table aria-label={t('page.user_detail.options')}>
+              <Table aria-label={t('page.user.options')}>
                 <TableHead>
                   <TableRow>
                     <TableCell colSpan={3}>
                       <Typography variant="h6" gutterBottom>
-                        {t('page.user_detail.options')}
+                        {t('page.user.options')}
                       </Typography>
                     </TableCell>
                   </TableRow>
@@ -497,11 +497,11 @@ function UserDetail<UserDetailProps>({ width, username }) {
                 <TableBody>
                   <TableRow>
                     {isWidthDown('xs', width) ? null : (
-                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.user_detail.roles')}</TableCell>
+                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.user.roles')}</TableCell>
                     )}
                     <TableCell width="100%">
                       {!isWidthDown('xs', width) ? null : (
-                        <Typography variant="caption">{t('page.user_detail.roles')}</Typography>
+                        <Typography variant="caption">{t('page.user.roles')}</Typography>
                       )}
                       {user ? (
                         <Box>
@@ -510,28 +510,28 @@ function UserDetail<UserDetailProps>({ width, username }) {
                             size="small"
                             color={user.type.includes('user') ? 'primary' : 'default'}
                             onClick={currentUser.is_admin ? () => toggleRole('user') : null}
-                            label={t('page.user_detail.normal_user')}
+                            label={t('page.user.normal_user')}
                           />
                           <Chip
                             style={{ margin: '2px' }}
                             size="small"
                             color={user.type.includes('admin') ? 'primary' : 'default'}
                             onClick={currentUser.is_admin ? () => toggleRole('admin') : null}
-                            label={t('page.user_detail.admin')}
+                            label={t('page.user.admin')}
                           />
                           <Chip
                             style={{ margin: '2px' }}
                             size="small"
                             color={user.type.includes('signature_manager') ? 'primary' : 'default'}
                             onClick={currentUser.is_admin ? () => toggleRole('signature_manager') : null}
-                            label={t('page.user_detail.signature_manager')}
+                            label={t('page.user.signature_manager')}
                           />
                           <Chip
                             style={{ margin: '2px' }}
                             size="small"
                             color={user.type.includes('signature_importer') ? 'primary' : 'default'}
                             onClick={currentUser.is_admin ? () => toggleRole('signature_importer') : null}
-                            label={t('page.user_detail.signature_importer')}
+                            label={t('page.user.signature_importer')}
                           />
                         </Box>
                       ) : (
@@ -546,11 +546,11 @@ function UserDetail<UserDetailProps>({ width, username }) {
                     onClick={currentUser.is_admin ? event => toggleDrawer('api_quota') : null}
                   >
                     {isWidthDown('xs', width) ? null : (
-                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.user_detail.api_quota')}</TableCell>
+                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.user.api_quota')}</TableCell>
                     )}
                     <TableCell width="100%">
                       {!isWidthDown('xs', width) ? null : (
-                        <Typography variant="caption">{t('page.user_detail.api_quota')}</Typography>
+                        <Typography variant="caption">{t('page.user.api_quota')}</Typography>
                       )}
                       {user ? <Box>{user.api_quota}</Box> : <Skeleton />}
                     </TableCell>
@@ -562,11 +562,11 @@ function UserDetail<UserDetailProps>({ width, username }) {
                     onClick={currentUser.is_admin ? event => toggleDrawer('submission_quota') : null}
                   >
                     {isWidthDown('xs', width) ? null : (
-                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.user_detail.submission_quota')}</TableCell>
+                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.user.submission_quota')}</TableCell>
                     )}
                     <TableCell width="100%">
                       {!isWidthDown('xs', width) ? null : (
-                        <Typography variant="caption">{t('page.user_detail.submission_quota')}</Typography>
+                        <Typography variant="caption">{t('page.user.submission_quota')}</Typography>
                       )}
                       {user ? <Box>{user.submission_quota}</Box> : <Skeleton />}
                     </TableCell>
@@ -577,19 +577,19 @@ function UserDetail<UserDetailProps>({ width, username }) {
             </TableContainer>
 
             <TableContainer className={classes.group} component={Paper}>
-              <Table aria-label={t('page.user_detail.security')}>
+              <Table aria-label={t('page.user.security')}>
                 <TableHead>
                   <TableRow>
                     <TableCell colSpan={2}>
                       <Typography variant="h6" gutterBottom>
-                        {t('page.user_detail.security')}
+                        {t('page.user.security')}
                       </Typography>
                     </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('change_password')}>
-                    <TableCell width="100%">{user ? t('page.user_detail.change_password') : <Skeleton />}</TableCell>
+                    <TableCell width="100%">{user ? t('page.user.change_password') : <Skeleton />}</TableCell>
                     <TableCell align="right">
                       <ChevronRightOutlinedIcon />
                     </TableCell>
@@ -600,15 +600,7 @@ function UserDetail<UserDetailProps>({ width, username }) {
                     onClick={() => toggleDrawer(user['2fa_enabled'] ? 'disable_otp' : 'otp')}
                   >
                     <TableCell width="100%">
-                      {user ? (
-                        user['2fa_enabled'] ? (
-                          t('page.user_detail.2fa_off')
-                        ) : (
-                          t('page.user_detail.2fa_on')
-                        )
-                      ) : (
-                        <Skeleton />
-                      )}
+                      {user ? user['2fa_enabled'] ? t('page.user.2fa_off') : t('page.user.2fa_on') : <Skeleton />}
                     </TableCell>
                     <TableCell align="right">
                       <ChevronRightOutlinedIcon />
@@ -617,7 +609,7 @@ function UserDetail<UserDetailProps>({ width, username }) {
                   {user ? (
                     user['2fa_enabled'] ? (
                       <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('token')}>
-                        <TableCell width="100%">{user ? t('page.user_detail.token') : <Skeleton />}</TableCell>
+                        <TableCell width="100%">{user ? t('page.user.token') : <Skeleton />}</TableCell>
                         <TableCell align="right">
                           <ChevronRightOutlinedIcon />
                         </TableCell>
@@ -625,7 +617,7 @@ function UserDetail<UserDetailProps>({ width, username }) {
                     ) : null
                   ) : null}
                   <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('api_key')}>
-                    <TableCell width="100%">{user ? t('page.user_detail.apikeys') : <Skeleton />}</TableCell>
+                    <TableCell width="100%">{user ? t('page.user.apikeys') : <Skeleton />}</TableCell>
                     <TableCell align="right">
                       <ChevronRightOutlinedIcon />
                     </TableCell>
@@ -637,7 +629,7 @@ function UserDetail<UserDetailProps>({ width, username }) {
             <Box mt={3}>
               {user ? (
                 <Button variant="contained" color="primary" disabled={buttonLoading || !modified} onClick={saveUser}>
-                  {t('page.user_detail.save')}
+                  {t('page.user.save')}
                   {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
                 </Button>
               ) : (
