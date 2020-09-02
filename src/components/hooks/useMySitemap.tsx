@@ -92,6 +92,13 @@ export default function useMySitemap() {
         title: t('adminmenu.users'),
         icon: <SupervisorAccountOutlinedIcon />,
         breadcrumbs: ['/admin']
+      },
+      {
+        path: '/admin/users/:id',
+        title: '{:id}',
+        isRoot: true,
+        icon: <AccountCircleOutlinedIcon />,
+        breadcrumbs: ['/admin', '/admin/users']
       }
     ]
   };

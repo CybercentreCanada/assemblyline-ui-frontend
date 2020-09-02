@@ -46,7 +46,7 @@ export default function APIKeys<APIKeysProps>({ user, toggleAPIKey, enqueueSnack
       onSuccess: () => {
         toggleAPIKey(selectedAPIKey);
         setSelectedAPIKey(null);
-        enqueueSnackbar(t('page.account.apikeys.removed'), snackBarOptions);
+        enqueueSnackbar(t('page.user.apikeys.removed'), snackBarOptions);
       }
     });
   }
@@ -86,14 +86,14 @@ export default function APIKeys<APIKeysProps>({ user, toggleAPIKey, enqueueSnack
   return (
     <>
       <Typography variant="h4" gutterBottom>
-        {t('page.account.apikeys.title')}
+        {t('page.user.apikeys.title')}
       </Typography>
       <Typography variant="caption" gutterBottom>
-        {t('page.account.apikeys.desc')}
+        {t('page.user.apikeys.desc')}
       </Typography>
       <Box py={4}>
         <Typography variant="subtitle1" gutterBottom>
-          {t('page.account.apikeys.list')}
+          {t('page.user.apikeys.list')}
         </Typography>
         {user.apikeys.length !== 0 ? (
           user.apikeys.map((e, i) => (
@@ -104,7 +104,7 @@ export default function APIKeys<APIKeysProps>({ user, toggleAPIKey, enqueueSnack
         ) : (
           <Box py={2}>
             <Typography variant="subtitle2" color="secondary">
-              {t('page.account.apikeys.none')}
+              {t('page.user.apikeys.none')}
             </Typography>
           </Box>
         )}
@@ -116,7 +116,7 @@ export default function APIKeys<APIKeysProps>({ user, toggleAPIKey, enqueueSnack
           size="small"
           margin="normal"
           variant="outlined"
-          label={t('page.account.apikeys.temp_token')}
+          label={t('page.user.apikeys.temp_token')}
           onChange={handleKeyNameChange}
           value={tempKeyName}
         />
@@ -131,7 +131,7 @@ export default function APIKeys<APIKeysProps>({ user, toggleAPIKey, enqueueSnack
         </Box>
         <Box alignSelf="flex-end" pl={1}>
           <Button disabled={tempKeyName === ''} onClick={() => handleCreate()} color="primary" variant="contained">
-            {t('page.account.apikeys.add')}
+            {t('page.user.apikeys.add')}
           </Button>
         </Box>
       </Box>
@@ -143,7 +143,7 @@ export default function APIKeys<APIKeysProps>({ user, toggleAPIKey, enqueueSnack
         aria-labelledby="new-dialog-title"
         aria-describedby="new-dialog-description"
       >
-        <DialogTitle id="new-dialog-title">{t('page.account.apikeys.new_title')}</DialogTitle>
+        <DialogTitle id="new-dialog-title">{t('page.user.apikeys.new_title')}</DialogTitle>
         <DialogContent>
           <DialogContentText id="new-dialog-description">
             <Box pt={2} pb={4}>
@@ -156,16 +156,16 @@ export default function APIKeys<APIKeysProps>({ user, toggleAPIKey, enqueueSnack
           </DialogContentText>
           <DialogContentText id="new-dialog-notice-title">
             <Typography variant="subtitle2" color="textPrimary">
-              {t('page.account.apikeys.new_notice_title')}
+              {t('page.user.apikeys.new_notice_title')}
             </Typography>
           </DialogContentText>
           <DialogContentText id="new-dialog-notice-texte">
-            <Typography variant="body2">{t('page.account.apikeys.new_notice_text')}</Typography>
+            <Typography variant="body2">{t('page.user.apikeys.new_notice_text')}</Typography>
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => handleNew()} color="primary" autoFocus>
-            {t('page.account.done')}
+            {t('page.user.done')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -178,17 +178,17 @@ export default function APIKeys<APIKeysProps>({ user, toggleAPIKey, enqueueSnack
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          {t('page.account.apikeys.remove_title')}: {selectedAPIKey}
+          {t('page.user.apikeys.remove_title')}: {selectedAPIKey}
         </DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">{t('page.account.apikeys.remove_text')}</DialogContentText>
+          <DialogContentText id="alert-dialog-description">{t('page.user.apikeys.remove_text')}</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setSelectedAPIKey(null)} color="primary" autoFocus>
-            {t('page.account.cancel')}
+            {t('page.user.cancel')}
           </Button>
           <Button onClick={() => handleDelete()} color="primary">
-            {t('page.account.apikeys.remove')}
+            {t('page.user.apikeys.remove')}
           </Button>
         </DialogActions>
       </Dialog>

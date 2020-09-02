@@ -28,20 +28,22 @@ import useUser from 'commons/components/hooks/useAppUser';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
-import APIKeys from 'components/routes/user_detail/api_keys';
-import DisableOTP from 'components/routes/user_detail/disable_otp';
-import OTP from 'components/routes/user_detail/otp';
-import SecurityToken from 'components/routes/user_detail/token';
+import APIKeys from 'components/routes/user/api_keys';
+import DisableOTP from 'components/routes/user/disable_otp';
+import OTP from 'components/routes/user/otp';
+import SecurityToken from 'components/routes/user/token';
 import ChipInput from 'material-ui-chip-input';
 import { OptionsObject, useSnackbar } from 'notistack';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 
-type UserDetailProps = {
+type UserProps = {
   width: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 };
 
-function UserDetail<UserDetailProps>({ width, username }) {
+function User<UserProps>({ width, username }) {
+  const { id } = useParams();
   const inputRef = useRef(null);
   const { t } = useTranslation();
   const theme = useTheme();
@@ -106,7 +108,7 @@ function UserDetail<UserDetailProps>({ width, username }) {
 
   function saveUser() {
     apiCall({
-      url: `/api/v4/user/${username}/`,
+      url: `/api/v4/user/${username || id}/`,
       method: 'POST',
       body: user,
       onSuccess: () => {
@@ -226,7 +228,7 @@ function UserDetail<UserDetailProps>({ width, username }) {
   useEffect(() => {
     // Load user on start
     apiCall({
-      url: `/api/v4/user/${username}/?load_avatar`,
+      url: `/api/v4/user/${username || id}/?load_avatar`,
       onSuccess: api_data => {
         setUser(api_data.api_response);
       }
@@ -597,7 +599,7 @@ function UserDetail<UserDetailProps>({ width, username }) {
                   <TableRow
                     hover
                     style={{ cursor: 'pointer' }}
-                    onClick={() => toggleDrawer(user['2fa_enabled'] ? 'disable_otp' : 'otp')}
+                    onClick={() => toggleDrawer(user && user['2fa_enabled'] ? 'disable_otp' : 'otp')}
                   >
                     <TableCell width="100%">
                       {user ? user['2fa_enabled'] ? t('page.user.2fa_off') : t('page.user.2fa_on') : <Skeleton />}
@@ -643,4 +645,4 @@ function UserDetail<UserDetailProps>({ width, username }) {
   );
 }
 
-export default withWidth()(UserDetail);
+export default withWidth()(User);

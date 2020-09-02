@@ -25,15 +25,15 @@ export default function DisableOTP<DisableOTPProps>({ setDrawerOpen, set2FAEnabl
   return (
     <>
       <Typography variant="h4" gutterBottom>
-        {t('page.account.2fa_disable_title')}
+        {t('page.user.2fa_disable_title')}
       </Typography>
-      <Typography>{t('page.account.2fa_disable_desc')}</Typography>
+      <Typography>{t('page.user.2fa_disable_desc')}</Typography>
       <Box textAlign="end" pt={6}>
         <Button style={{ marginRight: '8px' }} variant="contained" onClick={() => setDrawerOpen(false)}>
-          {t('page.account.cancel')}
+          {t('page.user.cancel')}
         </Button>
         <Button variant="contained" color="primary" onClick={() => disableOTP()}>
-          {t('page.account.2fa_disable')}
+          {t('page.user.2fa_disable')}
         </Button>
       </Box>
     </>

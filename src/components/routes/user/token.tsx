@@ -47,7 +47,7 @@ export default function SecurityToken<SecurityTokenProps>({ user, toggleToken, e
       onSuccess: () => {
         toggleToken(selectedToken);
         setSelectedToken(null);
-        enqueueSnackbar(t('page.account.token.removed'), snackBarOptions);
+        enqueueSnackbar(t('page.user.token.removed'), snackBarOptions);
       }
     });
   }
@@ -76,7 +76,7 @@ export default function SecurityToken<SecurityTokenProps>({ user, toggleToken, e
                 onSuccess: () => {
                   toggleToken(tempToken);
                   setTempToken('');
-                  enqueueSnackbar(t('page.account.token.added'), snackBarOptions);
+                  enqueueSnackbar(t('page.user.token.added'), snackBarOptions);
                 }
               });
             })
@@ -101,14 +101,14 @@ export default function SecurityToken<SecurityTokenProps>({ user, toggleToken, e
   return (
     <>
       <Typography variant="h4" gutterBottom>
-        {t('page.account.token.title')}
+        {t('page.user.token.title')}
       </Typography>
       <Typography variant="caption" gutterBottom>
-        {t('page.account.token.desc')}
+        {t('page.user.token.desc')}
       </Typography>
       <Box py={4}>
         <Typography variant="subtitle1" gutterBottom>
-          {t('page.account.token.list')}
+          {t('page.user.token.list')}
         </Typography>
         {user.security_tokens.length !== 0 ? (
           user.security_tokens.map((e, i) => (
@@ -119,7 +119,7 @@ export default function SecurityToken<SecurityTokenProps>({ user, toggleToken, e
         ) : (
           <Box py={2}>
             <Typography variant="subtitle2" color="secondary">
-              {t('page.account.token.none')}
+              {t('page.user.token.none')}
             </Typography>
           </Box>
         )}
@@ -131,14 +131,14 @@ export default function SecurityToken<SecurityTokenProps>({ user, toggleToken, e
           size="small"
           margin="normal"
           variant="outlined"
-          label={t('page.account.token.temp_token')}
+          label={t('page.user.token.temp_token')}
           onChange={handleTokenChange}
           value={tempToken}
         />
       </Box>
       <Box alignSelf="flex-end">
         <Button disabled={tempToken === ''} onClick={() => handleNew()} color="primary" variant="contained">
-          {t('page.account.token.add')}
+          {t('page.user.token.add')}
         </Button>
       </Box>
 
@@ -149,17 +149,17 @@ export default function SecurityToken<SecurityTokenProps>({ user, toggleToken, e
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          {t('page.account.token.remove_title')}: {selectedToken}
+          {t('page.user.token.remove_title')}: {selectedToken}
         </DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">{t('page.account.token.remove_text')}</DialogContentText>
+          <DialogContentText id="alert-dialog-description">{t('page.user.token.remove_text')}</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setSelectedToken(null)} color="primary" autoFocus>
-            {t('page.account.cancel')}
+            {t('page.user.cancel')}
           </Button>
           <Button onClick={() => handleDelete()} color="primary">
-            {t('page.account.token.remove')}
+            {t('page.user.token.remove')}
           </Button>
         </DialogActions>
       </Dialog>

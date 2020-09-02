@@ -5,6 +5,7 @@ import Logout from 'components/routes/logout';
 import Submissions from 'components/routes/submission';
 import Submit from 'components/routes/submit';
 import Tos from 'components/routes/tos';
+import User from 'components/routes/user';
 import React from 'react';
 import { Route, Switch } from 'react-router-dom';
 
@@ -20,6 +21,7 @@ const Routes = () => {
       <Route exact path="/tos" component={Tos} />
 
       <Route exact path="/account" component={Account} />
+      <Route path="/admin/users/:id" component={User} />
 
       <Route component={NotFoundPage} />
     </Switch>
