@@ -181,5 +181,7 @@
   "personalization.showbreadcrumbs": "Show Breadcrumbs",
   "personalization.minimizebreadcrumbs": "Minimize Breadcrumbs",
   "quicksearch.placeholder": "Search ...",
-  "quicksearch.aria": "search"
+  "quicksearch.aria": "search",
+  "tooltip.breadcrumbs.max": "Expand Breadcrumbs",
+  "tooltip.breadcrumbs.min": "Collapse Breadcrumbs"
 }
