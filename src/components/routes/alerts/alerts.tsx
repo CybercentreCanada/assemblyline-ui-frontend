@@ -111,10 +111,12 @@ const Alerts: React.FC = () => {
   return (
     // <AlertsGrid items={alerts.original} />
     <Box>
-      <AlertsHeader
-        onFilterBtnClick={() => console.log('filter...')}
-        onExpandBtnClick={() => setDrawer({ open: true, type: 'filter' })}
-      />
+      <Box pb={theme.spacing(0.25)}>
+        <AlertsHeader
+          onFilterBtnClick={() => console.log('filter...')}
+          onExpandBtnClick={() => setDrawer({ open: true, type: 'filter' })}
+        />
+      </Box>
       <AlertsSplitPanel loading={alerts.loading} items={alerts.original} />
       <Drawer open={drawer.open} anchor="right" onClose={() => setDrawer({ ...drawer, open: false })}>
         {
