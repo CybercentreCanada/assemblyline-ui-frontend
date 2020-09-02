@@ -4,6 +4,13 @@ import React from 'react';
 function CardCentered({ width, children }) {
   const useStyles = makeStyles(theme => ({
     card: {
+      display: 'flex',
+      flexDirection: 'column',
+      position: 'absolute',
+      left: '50%', // X
+      top: '50%', // Y
+      transform: 'translate(-50%, -50%)',
+      maxWidth: '22rem',
       backgroundColor: theme.palette.background.paper,
       borderRadius: '4px',
       [theme.breakpoints.down('xs')]: {
@@ -21,19 +28,7 @@ function CardCentered({ width, children }) {
   const classes = useStyles();
 
   return (
-    <Card
-      elevation={isWidthDown('xs', width) ? 0 : 4}
-      className={classes.card}
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'fixed',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        maxWidth: '22rem'
-      }}
-    >
+    <Card elevation={isWidthDown('xs', width) ? 0 : 4} className={classes.card}>
       {children}
     </Card>
   );
