@@ -8,25 +8,21 @@ import TopBar from 'commons/components/layout/topnav/TopBar';
 import { UserMenuElement } from 'commons/components/layout/topnav/UserProfile';
 import React, { useState } from 'react';
 
-const useStyles = layout => {
+const useStyles = (layout, showSpacing) => {
   return makeStyles(theme => ({
     app: {
-      // display: "block",
       [theme.breakpoints.up('md')]: {
-        // There are issues with display flex that propagate to other components.
-        // If we are not able to fix them we should consider using block but
-        //   calculating the padding depending on the menu state
         display: 'flex'
       }
     },
     container: {
       display: 'block',
-      paddingTop: layout === 'top' ? theme.spacing(9) : theme.spacing(8),
+      paddingTop: showSpacing ? (layout === 'top' ? theme.spacing(9) : theme.spacing(8)) : theme.spacing(3),
       paddingLeft: theme.spacing(3),
       paddingRight: theme.spacing(3),
       // paddingBottom: theme.spacing(3),
       [theme.breakpoints.only('sm')]: {
-        paddingLeft: theme.spacing(10)
+        paddingLeft: showSpacing ? theme.spacing(10) : theme.spacing(3)
       },
       [theme.breakpoints.up('md')]: {
         flexGrow: 1
@@ -170,9 +166,14 @@ function AppLayoutProvider(props: LayoutProviderProps) {
   const [autoHideAppbar, setAutoHideAppbar] = useState<boolean>(initialAutoHideAppbar);
   const [layout, setLayout] = useState<'top' | 'side'>(initialLayout);
   const [appTheme] = useAppTheme(theme === 'dark', layoutProps.colors);
-  const classes = useStyles(layout);
+  const classes = useStyles(layout, isUserReady() && appReady && showMenus);
   const showBreadcrumbsOnPage =
-    useMediaQuery(muiTheme.breakpoints.only('sm')) && layoutProps.allowQuickSearch && quickSearch;
+    useMediaQuery(muiTheme.breakpoints.only('sm')) &&
+    layoutProps.allowQuickSearch &&
+    quickSearch &&
+    isUserReady() &&
+    appReady &&
+    showMenus;
 
   const onToggleLayout = () => {
     const newLayout = layout === 'top' ? 'side' : 'top';
