@@ -6,7 +6,7 @@ function CardCentered({ width, children }) {
     card: {
       backgroundColor: theme.palette.background.paper,
       borderRadius: '4px',
-      [theme.breakpoints.down('sm')]: {
+      [theme.breakpoints.down('xs')]: {
         backgroundColor: theme.palette.background.default,
         width: '100%',
         maxWidth: '22rem',
