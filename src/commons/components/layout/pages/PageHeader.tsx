@@ -1,4 +1,4 @@
-import { Box, Button, IconButton } from '@material-ui/core';
+import { AppBar, Box, Button, ButtonProps, IconButton, IconButtonProps, Toolbar, useTheme } from '@material-ui/core';
 import useAppSitemap from 'commons/components/hooks/useAppSitemap';
 import BreadcrumbLastItem from 'commons/components/layout/breadcrumbs/BreadcrumbLastItem';
 import Breadcrumbs from 'commons/components/layout/breadcrumbs/Breadcrumbs';
@@ -8,18 +8,29 @@ export type PageHeaderAction = {
   title?: string;
   icon?: React.ReactNode;
   color?: 'primary' | 'secondary';
-  action: () => void;
+  action?: () => void;
+  btnProp?: ButtonProps | IconButtonProps;
 };
 
 type PageHeaderProps = {
   mode?: 'title' | 'breadcrumbs' | 'provided';
   actions?: PageHeaderAction[];
   title?: React.ReactNode;
+  isSticky?: boolean;
+  elevation?: number;
+  backgroundColor?: string;
 };
 
-const PageHeader: React.FC<PageHeaderProps> = ({ mode, title, actions }) => {
+const PageHeader: React.FC<PageHeaderProps> = ({
+  mode,
+  title,
+  actions,
+  isSticky = false,
+  backgroundColor = 'inherit',
+  elevation = 0
+}) => {
+  const theme = useTheme();
   const { last } = useAppSitemap();
-
   let comp = null;
   switch (mode) {
     case 'breadcrumbs':
@@ -37,29 +48,47 @@ const PageHeader: React.FC<PageHeaderProps> = ({ mode, title, actions }) => {
   }
 
   return (
-    <Box pb={1} display="flex" flexShrink={0} width="100%">
-      <Box display="inline-block" flexGrow={1}>
-        {comp}
-      </Box>
-      <Box display="inline-block">
-        {actions
-          ? actions.map((a, i) => {
-              if (a.title) {
+    <AppBar
+      position={isSticky ? 'sticky' : 'relative'}
+      style={{ backgroundColor }}
+      elevation={elevation}
+      color="inherit"
+    >
+      <Toolbar disableGutters>
+        <Box flexGrow={1}>{comp}</Box>
+        <Box>
+          {actions
+            ? actions.map((a, i) => {
+                if (a.title) {
+                  return (
+                    <Button
+                      key={`ph-action-${i}`}
+                      startIcon={a.icon}
+                      color={a.color}
+                      onClick={a.action}
+                      {...(a.btnProp as ButtonProps)}
+                      style={{ marginRight: theme.spacing(1) }}
+                    >
+                      {a.title}
+                    </Button>
+                  );
+                }
                 return (
-                  <Button key={`ph-action-${i}`} startIcon={a.icon} color={a.color} onClick={a.action}>
-                    {a.title}
-                  </Button>
+                  <IconButton
+                    key={`ph-action-${i}`}
+                    color={a.color}
+                    onClick={a.action}
+                    {...(a.btnProp as IconButtonProps)}
+                    style={{ marginRight: theme.spacing(1) }}
+                  >
+                    {a.icon}
+                  </IconButton>
                 );
-              }
-              return (
-                <IconButton key={`ph-action-${i}`} color={a.color} onClick={a.action}>
-                  {a.icon}
-                </IconButton>
-              );
-            })
-          : null}
-      </Box>
-    </Box>
+              })
+            : null}
+        </Box>
+      </Toolbar>
+    </AppBar>
   );
 };
 
