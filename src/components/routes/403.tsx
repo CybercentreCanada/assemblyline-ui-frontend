@@ -6,11 +6,10 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 type ForbiddenPageProps = {
-  disabled: boolean;
+  disabled?: boolean;
 };
 
-const ForbiddenPage = (props: ForbiddenPageProps) => {
-  const { disabled } = props;
+export default function ForbiddenPage<ForbiddenPageProps>({ disabled = false }) {
   const { t } = useTranslation();
   return (
     <PageCenter width={65}>
@@ -31,6 +30,4 @@ const ForbiddenPage = (props: ForbiddenPageProps) => {
       )}
     </PageCenter>
   );
-};
-
-export default ForbiddenPage;
+}
