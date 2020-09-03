@@ -9,6 +9,9 @@ const useStyles = makeStyles(theme => ({
     '&:focus': { outline: 'none' }
   },
   listItem: {
+    // minHeight: theme.spacing(5),
+    padding: theme.spacing(2),
+    // margin: theme.spacing(1),
     wordBreak: 'break-all',
     '&:hover': {
       cursor: 'pointer',
@@ -47,26 +50,23 @@ export default function List<I extends ListItemProps>({
   onItemSelected,
   onKeyDown
 }: ListProps<I>) {
+  // Setup hooks.
   const [cursor, setCursor] = useState<number>(-1);
   const classes = useStyles();
+
+  // Function throttler to streamline keydown event handlers.
   const throttler = new Throttler(10);
 
+  // key_hander:keyup
   const _onKeyUp = (event: React.KeyboardEvent) => {};
 
+  // key_hander:keydown
   const _onKeyDown = (event: React.KeyboardEvent) => {
-    console.log(`kd[${event.keyCode}]`);
+    // console.log(`kd[${event.keyCode}]`);
     const { keyCode } = event;
 
     if (isArrowUp(keyCode) || isArrowDown(keyCode)) {
-      throttler.throttle(() => {
-        if (isArrowUp(keyCode)) {
-          const nextIndex = cursor - 1 >= 0 ? cursor - 1 : items.length - 1;
-          setCursor(nextIndex);
-        } else if (isArrowDown(keyCode)) {
-          const nextIndex = cursor + 1 < items.length ? cursor + 1 : 0;
-          setCursor(nextIndex);
-        }
-      });
+      _onKeyDownThrottled(keyCode);
     } else if (isEnter(keyCode)) {
       onSelection(items[cursor], cursor);
     }
@@ -74,28 +74,44 @@ export default function List<I extends ListItemProps>({
     onKeyDown(keyCode, items, selected);
   };
 
+  // throttled keydown handler.
+  const _onKeyDownThrottled = (keyCode: number) => {
+    throttler.throttle(() => {
+      if (isArrowUp(keyCode)) {
+        const nextIndex = cursor - 1 >= 0 ? cursor - 1 : items.length - 1;
+        setCursor(nextIndex);
+      } else if (isArrowDown(keyCode)) {
+        const nextIndex = cursor + 1 < items.length ? cursor + 1 : 0;
+        setCursor(nextIndex);
+      }
+    });
+  };
+
+  // Items selection handler.
   const onSelection = (item, i) => {
     setCursor(i);
     onItemSelected(item);
   };
 
-  //
+  // If its loading show skeleton of list.
   if (loading) {
     return <ListSkeleton />;
   }
 
-  //
+  // Render the List component.
   return (
     <Box tabIndex={-1} onKeyUp={_onKeyUp} onKeyDown={_onKeyDown} className={classes.list}>
       {items.map((item, i) => (
-        <Box
-          key={item.id}
-          className={classes.listItem}
-          onClick={() => onSelection(item, i)}
-          data-listposition={i}
-          data-listitemselected={i === cursor || item.id === selected}
-        >
-          {onRenderItem(item)}
+        <Box mr={0}>
+          <Box
+            key={item.id}
+            className={classes.listItem}
+            onClick={() => onSelection(item, i)}
+            data-listposition={i}
+            data-listitemselected={i === cursor || item.id === selected}
+          >
+            {onRenderItem(item)}
+          </Box>
           <Divider />
         </Box>
       ))}
@@ -103,6 +119,7 @@ export default function List<I extends ListItemProps>({
   );
 }
 
+// List skeleton component.
 const ListSkeleton = () => {
   const theme = useTheme();
   return (
