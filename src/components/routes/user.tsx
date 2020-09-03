@@ -40,6 +40,7 @@ import { useParams } from 'react-router-dom';
 
 type UserProps = {
   width: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  username: string;
 };
 
 function User<UserProps>({ width, username }) {
