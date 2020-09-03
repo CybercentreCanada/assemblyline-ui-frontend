@@ -3,20 +3,25 @@ import AccountTreeOutlinedIcon from '@material-ui/icons/AccountTreeOutlined';
 import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
 import AssignmentOutlinedIcon from '@material-ui/icons/AssignmentOutlined';
 import BuildOutlinedIcon from '@material-ui/icons/BuildOutlined';
+import CodeOutlinedIcon from '@material-ui/icons/CodeOutlined';
 import DashboardOutlinedIcon from '@material-ui/icons/DashboardOutlined';
 import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import FingerprintOutlinedIcon from '@material-ui/icons/FingerprintOutlined';
 import HelpOutlineOutlinedIcon from '@material-ui/icons/HelpOutlineOutlined';
+import LiveHelpOutlinedIcon from '@material-ui/icons/LiveHelpOutlined';
 import MapOutlinedIcon from '@material-ui/icons/MapOutlined';
 import NotificationImportantOutlinedIcon from '@material-ui/icons/NotificationImportantOutlined';
 import PublishOutlinedIcon from '@material-ui/icons/PublishOutlined';
 import SearchIcon from '@material-ui/icons/Search';
 import SettingsApplicationsOutlinedIcon from '@material-ui/icons/SettingsApplicationsOutlined';
 import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
+import SimCardOutlinedIcon from '@material-ui/icons/SimCardOutlined';
 import SupervisorAccountOutlinedIcon from '@material-ui/icons/SupervisorAccountOutlined';
 import { AppLayoutProps } from 'commons/components/layout/LayoutProvider';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { BiNetworkChart } from 'react-icons/bi';
 
 const useMyLayout = (): AppLayoutProps => {
   const { t } = useTranslation();
@@ -75,28 +80,28 @@ const useMyLayout = (): AppLayoutProps => {
           {
             id: 'manage.heuristics',
             text: t('drawer.manage.heuristics'),
-            icon: null,
+            alt_icon: <SimCardOutlinedIcon />,
             route: '/manage/heuristics',
             nested: true
           },
           {
             id: 'manage.manage',
             text: t('drawer.manage.signatures'),
-            icon: null,
+            alt_icon: <FingerprintOutlinedIcon />,
             route: '/manage/signatures',
             nested: true
           },
           {
             id: 'manage.source',
             text: t('drawer.manage.source'),
-            icon: null,
+            alt_icon: <CodeOutlinedIcon />,
             route: '/manage/sources',
             nested: true
           },
           {
             id: 'manage.workflow',
             text: t('drawer.manage.workflow'),
-            icon: null,
+            alt_icon: <BiNetworkChart />,
             route: '/manage/workflows',
             nested: true
           }
@@ -170,7 +175,7 @@ const useMyLayout = (): AppLayoutProps => {
           {
             id: 'help.classification',
             text: t('drawer.help.classification'),
-            alt_icon: <HelpOutlineOutlinedIcon />,
+            alt_icon: <LiveHelpOutlinedIcon />,
             route: '/help/classification',
             nested: true
           },
