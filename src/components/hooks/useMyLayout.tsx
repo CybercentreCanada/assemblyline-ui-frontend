@@ -80,28 +80,28 @@ const useMyLayout = (): AppLayoutProps => {
           {
             id: 'manage.heuristics',
             text: t('drawer.manage.heuristics'),
-            alt_icon: <SimCardOutlinedIcon />,
+            icon: <SimCardOutlinedIcon />,
             route: '/manage/heuristics',
             nested: true
           },
           {
             id: 'manage.manage',
             text: t('drawer.manage.signatures'),
-            alt_icon: <FingerprintOutlinedIcon />,
+            icon: <FingerprintOutlinedIcon />,
             route: '/manage/signatures',
             nested: true
           },
           {
             id: 'manage.source',
             text: t('drawer.manage.source'),
-            alt_icon: <CodeOutlinedIcon />,
+            icon: <CodeOutlinedIcon />,
             route: '/manage/sources',
             nested: true
           },
           {
             id: 'manage.workflow',
             text: t('drawer.manage.workflow'),
-            alt_icon: <BiNetworkChart />,
+            icon: <BiNetworkChart />,
             route: '/manage/workflows',
             nested: true
           }
@@ -168,35 +168,35 @@ const useMyLayout = (): AppLayoutProps => {
           {
             id: 'help.api',
             text: t('drawer.help.api'),
-            alt_icon: <AssignmentOutlinedIcon />,
+            icon: <AssignmentOutlinedIcon />,
             route: '/help/api',
             nested: true
           },
           {
             id: 'help.classification',
             text: t('drawer.help.classification'),
-            alt_icon: <LiveHelpOutlinedIcon />,
+            icon: <LiveHelpOutlinedIcon />,
             route: '/help/classification',
             nested: true
           },
           {
             id: 'help.configuration',
             text: t('drawer.help.configuration'),
-            alt_icon: <SettingsApplicationsOutlinedIcon />,
+            icon: <SettingsApplicationsOutlinedIcon />,
             route: '/help/configuration',
             nested: true
           },
           {
             id: 'help.search',
             text: t('drawer.help.search'),
-            alt_icon: <SearchIcon />,
+            icon: <SearchIcon />,
             route: '/help/search',
             nested: true
           },
           {
             id: 'help.service',
             text: t('drawer.help.service'),
-            alt_icon: <AccountTreeOutlinedIcon />,
+            icon: <AccountTreeOutlinedIcon />,
             route: '/help/service',
             nested: true
           }
@@ -299,7 +299,8 @@ const useMyLayout = (): AppLayoutProps => {
     defaultShowBreadcrumbs: true,
     defaultBreadcrumbsOpen: true,
     leftnav: {
-      elements: MENU_ITEMS
+      elements: MENU_ITEMS,
+      hideNestedIcons: true
     },
     topnav: {
       adminMenu: ADMIN_MENU_ITEMS,
