@@ -1,6 +1,7 @@
 import AccountCircleOutlinedIcon from '@material-ui/icons/AccountCircleOutlined';
 import AccountTreeOutlinedIcon from '@material-ui/icons/AccountTreeOutlined';
 import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
+import AssignmentOutlinedIcon from '@material-ui/icons/AssignmentOutlined';
 import BuildOutlinedIcon from '@material-ui/icons/BuildOutlined';
 import DashboardOutlinedIcon from '@material-ui/icons/DashboardOutlined';
 import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
@@ -10,6 +11,7 @@ import MapOutlinedIcon from '@material-ui/icons/MapOutlined';
 import NotificationImportantOutlinedIcon from '@material-ui/icons/NotificationImportantOutlined';
 import PublishOutlinedIcon from '@material-ui/icons/PublishOutlined';
 import SearchIcon from '@material-ui/icons/Search';
+import SettingsApplicationsOutlinedIcon from '@material-ui/icons/SettingsApplicationsOutlined';
 import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
 import SupervisorAccountOutlinedIcon from '@material-ui/icons/SupervisorAccountOutlined';
 import { AppLayoutProps } from 'commons/components/layout/LayoutProvider';
@@ -111,42 +113,36 @@ const useMyLayout = (): AppLayoutProps => {
           {
             id: 'search.all',
             text: t('drawer.search.all'),
-            icon: null,
             route: '/search',
             nested: true
           },
           {
             id: 'search.alert',
             text: t('drawer.search.alert'),
-            icon: null,
             route: '/search/alert',
             nested: true
           },
           {
             id: 'search.file',
             text: t('drawer.search.file'),
-            icon: null,
             route: '/search/file',
             nested: true
           },
           {
             id: 'search.result',
             text: t('drawer.search.result'),
-            icon: null,
             route: '/search/result',
             nested: true
           },
           {
             id: 'search.signature',
             text: t('drawer.search.signature'),
-            icon: null,
             route: '/search/signature',
             nested: true
           },
           {
             id: 'search.submission',
             text: t('drawer.search.submission'),
-            icon: null,
             route: '/search/submission',
             nested: true
           }
@@ -167,35 +163,35 @@ const useMyLayout = (): AppLayoutProps => {
           {
             id: 'help.api',
             text: t('drawer.help.api'),
-            icon: null,
+            alt_icon: <AssignmentOutlinedIcon />,
             route: '/help/api',
             nested: true
           },
           {
             id: 'help.classification',
             text: t('drawer.help.classification'),
-            icon: null,
+            alt_icon: <HelpOutlineOutlinedIcon />,
             route: '/help/classification',
             nested: true
           },
           {
             id: 'help.configuration',
             text: t('drawer.help.configuration'),
-            icon: null,
+            alt_icon: <SettingsApplicationsOutlinedIcon />,
             route: '/help/configuration',
             nested: true
           },
           {
             id: 'help.search',
             text: t('drawer.help.search'),
-            icon: null,
+            alt_icon: <SearchIcon />,
             route: '/help/search',
             nested: true
           },
           {
             id: 'help.service',
             text: t('drawer.help.service'),
-            icon: null,
+            alt_icon: <AccountTreeOutlinedIcon />,
             route: '/help/service',
             nested: true
           }

@@ -3,6 +3,7 @@ import Account from 'components/routes/account';
 import Admin from 'components/routes/admin';
 import Users from 'components/routes/admin/users';
 import Dashboard from 'components/routes/dashboard';
+import Help from 'components/routes/help';
 import Logout from 'components/routes/logout';
 import Submissions from 'components/routes/submission';
 import Submit from 'components/routes/submit';
@@ -19,6 +20,7 @@ const Routes = () => {
       <Route exact path="/submissions" component={Submissions} />
       <Route exact path="/dashboard" component={Dashboard} />
       <Route exact path="/logout" component={Logout} />
+      <Route exact path="/help" component={Help} />
 
       <Route exact path="/tos" component={Tos} />
 
