@@ -38,6 +38,7 @@ export type AppLayoutContextProps = {
   breadcrumbsEnabled: boolean;
   breadcrumbsState: boolean;
   breadcrumbsPlacement: string;
+  hideNestedIcons: boolean;
   layoutProps: AppLayoutProps;
   showQuickSearch: boolean;
   getBanner: (theme) => React.ReactElement<any>;
@@ -86,6 +87,7 @@ export interface AppLayoutProps {
   };
   leftnav: {
     elements: LeftNavElement[];
+    hideNestedIcons?: boolean;
   };
 }
 
@@ -222,6 +224,7 @@ function AppLayoutProvider(props: LayoutProviderProps) {
           breadcrumbsEnabled,
           breadcrumbsState,
           breadcrumbsPlacement: layoutProps.breadcrumbsPlacement ? layoutProps.breadcrumbsPlacement : 'topbar',
+          hideNestedIcons: !!layoutProps.leftnav.hideNestedIcons,
           layoutProps,
           showQuickSearch: quickSearch,
           getBanner: curTheme => {

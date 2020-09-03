@@ -79,7 +79,6 @@ export type LeftNavItemProps = {
   id: number | string;
   text: string;
   icon?: React.ReactElement<any>;
-  alt_icon?: React.ReactElement<any>;
   route?: string;
   nested?: boolean;
   width?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';

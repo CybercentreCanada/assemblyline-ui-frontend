@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const LeftNavItem: React.FC<LeftNavItemProps> = props => {
   const classes = useStyles();
-  const { drawerState, toggleDrawer } = useAppLayout();
+  const { drawerState, hideNestedIcons, toggleDrawer } = useAppLayout();
   const { text, icon, nested, route } = props;
 
   const onCloseDrawerIfOpen = () => {
@@ -35,7 +35,7 @@ const LeftNavItem: React.FC<LeftNavItemProps> = props => {
       key={text}
       onClick={onCloseDrawerIfOpen}
     >
-      {icon ? <ListItemIcon>{icon}</ListItemIcon> : null}
+      {(icon && !nested) || (!hideNestedIcons && icon && nested) ? <ListItemIcon>{icon}</ListItemIcon> : null}
       <ListItemText primary={text} />
     </ListItem>
   );
