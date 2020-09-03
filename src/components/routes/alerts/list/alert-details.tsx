@@ -18,7 +18,6 @@ import AlertPriority from './alert-priority';
 
 const useStyles = makeStyles(theme => ({
   section: {
-    // margin: theme.spacing(1),
     marginBottom: theme.spacing(3),
     '& > hr': {
       marginBottom: theme.spacing(1)
@@ -26,30 +25,8 @@ const useStyles = makeStyles(theme => ({
   },
   sectionTitle: {
     fontWeight: 'bold'
-    // padding: theme.spacing(0.5),
-    // paddingLeft: theme.spacing(0.5),
-    // paddingRight: theme.spacing(0.5),
-    // paddingBottom: theme.spacing(0.25),
-    // paddingTop: theme.spacing(0.25)
-    // backgroundColor: theme.palette.type === 'dark' ? theme.palette.background.paper : theme.palette.grey[300]
   },
-  sectionContent: {
-    // marginLeft: theme.spacing(0.5)
-  },
-  // labels: {
-  //   display: 'flex',
-  //   flexWrap: 'wrap',
-  //   listStyle: 'none',
-  //   marginLeft: -theme.spacing(0.5),
-  //   padding: 0,
-  //   boxShadow: 'inherit',
-  //   margin: 0,
-  //   '& li ': {
-  //     marginLeft: theme.spacing(0.5),
-  //     marginRight: theme.spacing(0.5),
-  //     marginBottom: theme.spacing(0.5)
-  //   }
-  // },
+  sectionContent: {},
   clipboardIcon: {
     '&:hover': {
       cursor: 'pointer',

@@ -196,8 +196,6 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
         leftSizeRef.current = _leftWidth;
       }
 
-      // console.log(`cW[${cW}],lW[${_leftWidth}],rW[${_rightWidth}]`);
-
       // Update the left and right widths.
       // We update the DOM directly to minimize the amount of re-render and state updates.
       if (_leftEl) {
@@ -208,11 +206,7 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
       }
     };
 
-    // Initialize the width of left panel.
-    // if (!leftSizeRef.current) {
-    //   leftSizeRef.current = defaultLeftWidth();
-    // }..
-
+    // Resize panels if we're in the default view.
     const _layout = checkLayout();
     if (_layout === 'default') {
       updateLayout(nextLeftWidthBase());
