@@ -9,7 +9,7 @@ import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import FingerprintOutlinedIcon from '@material-ui/icons/FingerprintOutlined';
 import HelpOutlineOutlinedIcon from '@material-ui/icons/HelpOutlineOutlined';
-import LiveHelpOutlinedIcon from '@material-ui/icons/LiveHelpOutlined';
+import LabelOutlinedIcon from '@material-ui/icons/LabelOutlined';
 import MapOutlinedIcon from '@material-ui/icons/MapOutlined';
 import NotificationImportantOutlinedIcon from '@material-ui/icons/NotificationImportantOutlined';
 import PublishOutlinedIcon from '@material-ui/icons/PublishOutlined';
@@ -175,7 +175,7 @@ const useMyLayout = (): AppLayoutProps => {
           {
             id: 'help.classification',
             text: t('drawer.help.classification'),
-            icon: <LiveHelpOutlinedIcon />,
+            icon: <LabelOutlinedIcon />,
             route: '/help/classification',
             nested: true
           },
