@@ -14,7 +14,8 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'row'
   },
   leftContent: {
-    flex: '1 1 auto'
+    flex: '1 1 auto',
+    flexDirection: 'row'
   },
   anchor: {
     width: '5px',
@@ -29,19 +30,19 @@ const useStyles = makeStyles(theme => ({
     flex: '0 0 auto',
     overflow: 'auto',
     transition: 'width 0.2s ease 0s'
+  },
+  '@global': {
+    '*::-webkit-scrollbar': {
+      width: '0.8em'
+    },
+    '*::-webkit-scrollbar-track': {
+      '-webkit-box-shadow': 'inset 0 0 6px rgba(0,0,0,0.00)'
+    },
+    '*::-webkit-scrollbar-thumb': {
+      backgroundColor: 'rgba(0,0,0,.1)'
+      // outline: '1px solid slategrey'
+    }
   }
-  // '@global': {
-  //   '*::-webkit-scrollbar': {
-  //     width: '0.4em'
-  //   },
-  //   '*::-webkit-scrollbar-track': {
-  //     '-webkit-box-shadow': 'inset 0 0 6px rgba(0,0,0,0.00)'
-  //   },
-  //   '*::-webkit-scrollbar-thumb': {
-  //     backgroundColor: 'rgba(0,0,0,.1)',
-  //     outline: '1px solid slategrey'
-  //   }
-  // }
 }));
 
 type SplitPanelProps = {
@@ -255,8 +256,8 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
     <div ref={containerEl} className={classes.container}>
       <div ref={leftEl} className={classes.left}>
         <div className={classes.leftContent}>{left}</div>
-        {right && rightOpen ? <div ref={anchorEl} className={classes.anchor} /> : null}
       </div>
+      {right && rightOpen ? <div ref={anchorEl} className={classes.anchor} /> : null}
       <div ref={rightEl} className={classes.right}>
         {right && rightOpen ? right : null}
       </div>

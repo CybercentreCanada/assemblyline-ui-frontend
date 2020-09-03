@@ -34,9 +34,10 @@ const ChipList: React.FC<ChipListProps> = ({ items }) => {
   );
 };
 
+//
 const Chip: React.FC<ChipProps> = props => {
   const classes = useStyles();
-  return <MuiChip {...props} className={classes.chip} />;
+  return <MuiChip size="small" {...props} className={classes.chip} />;
 };
 
 export { ChipList, Chip };

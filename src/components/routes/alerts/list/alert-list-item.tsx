@@ -1,4 +1,4 @@
-Modifiedimport { Box, Grid, Typography, useMediaQuery, useTheme } from '@material-ui/core';
+import { Box, Grid, Typography, useMediaQuery, useTheme } from '@material-ui/core';
 import { AlertItem } from 'components/routes/alerts/alerts';
 import React from 'react';
 import { Chip, ChipList } from '../panels/chips';

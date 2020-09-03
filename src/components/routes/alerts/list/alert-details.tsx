@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   Chip,
   Divider,
   Grid,
@@ -14,6 +13,7 @@ import useClipboard from 'commons/components/hooks/useClipboard';
 import { AlertItem } from 'components/routes/alerts/alerts';
 import React from 'react';
 import { BsClipboard } from 'react-icons/bs';
+import { ChipList } from '../panels/chips';
 import AlertPriority from './alert-priority';
 
 const useStyles = makeStyles(theme => ({
@@ -36,20 +36,20 @@ const useStyles = makeStyles(theme => ({
   sectionContent: {
     // marginLeft: theme.spacing(0.5)
   },
-  labels: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    listStyle: 'none',
-    marginLeft: -theme.spacing(0.5),
-    padding: 0,
-    boxShadow: 'inherit',
-    margin: 0,
-    '& li ': {
-      marginLeft: theme.spacing(0.5),
-      marginRight: theme.spacing(0.5),
-      marginBottom: theme.spacing(0.5)
-    }
-  },
+  // labels: {
+  //   display: 'flex',
+  //   flexWrap: 'wrap',
+  //   listStyle: 'none',
+  //   marginLeft: -theme.spacing(0.5),
+  //   padding: 0,
+  //   boxShadow: 'inherit',
+  //   margin: 0,
+  //   '& li ': {
+  //     marginLeft: theme.spacing(0.5),
+  //     marginRight: theme.spacing(0.5),
+  //     marginBottom: theme.spacing(0.5)
+  //   }
+  // },
   clipboardIcon: {
     '&:hover': {
       cursor: 'pointer',
@@ -72,18 +72,12 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
     <Box>
       <Grid container spacing={2}>
         <Grid item xs={isLteSm ? 12 : 6}>
-          {/* Labels Section. */}
+          {/* Labels Section */}
           <Box className={classes.section}>
             <Typography className={classes.sectionTitle}>Labels</Typography>
             <Divider />
             <Box className={classes.sectionContent}>
-              <ul className={classes.labels}>
-                {item.label.map((label, i) => (
-                  <li key={`alert-label-${i}`}>
-                    <DefaultChip label={label} />
-                  </li>
-                ))}
-              </ul>
+              <ChipList items={item.label.map(label => ({ label }))} />
             </Box>
           </Box>
         </Grid>
@@ -195,13 +189,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
                   <i>Patterns</i>
                 </Typography>
                 <Box display="inline-block">
-                  <ul className={classes.labels}>
-                    {item.attack.pattern.map((p, i) => (
-                      <li key={`alert-pattern-${i}`}>
-                        <DefaultChip label={p} />
-                      </li>
-                    ))}
-                  </ul>
+                  <ChipList items={item.attack.pattern.map(label => ({ label }))} />
                 </Box>
               </Grid>
             </Grid>
@@ -215,15 +203,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
           <Typography className={classes.sectionTitle}>Heuristics</Typography>
           <Divider />
           <Box className={classes.sectionContent}>
-            <ul className={classes.labels}>
-              {item.heuristic.name.map((n, i) => (
-                <li key={`alert-heuristic-${i}`}>
-                  <Button size="small" variant="outlined">
-                    {n}
-                  </Button>
-                </li>
-              ))}
-            </ul>
+            <ChipList items={item.heuristic.name.map(label => ({ label }))} />
           </Box>
         </Box>
       ) : null}
@@ -234,13 +214,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
           <Typography className={classes.sectionTitle}>Behaviours</Typography>
           <Divider />
           <Box className={classes.sectionContent}>
-            <ul className={classes.labels}>
-              {item.al.behavior.map((b, i) => (
-                <li key={`alert-behaviour-${i}`}>
-                  <DefaultChip label={b} />
-                </li>
-              ))}
-            </ul>
+            <ChipList items={item.al.behavior.map(label => ({ label }))} />
           </Box>
         </Box>
       ) : null}
@@ -251,13 +225,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
           <Typography className={classes.sectionTitle}>Attributions</Typography>
           <Divider />
           <Box className={classes.sectionContent}>
-            <ul className={classes.labels}>
-              {item.al.attrib.map((a, i) => (
-                <li key={`alert-attrib-${i}`}>
-                  <DefaultChip label={a} />
-                </li>
-              ))}
-            </ul>
+            <ChipList items={item.al.attrib.map(label => ({ label }))} />
           </Box>
         </Box>
       ) : null}
@@ -268,13 +236,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
           <Typography className={classes.sectionTitle}>AV Hits</Typography>
           <Divider />
           <Box className={classes.sectionContent}>
-            <ul className={classes.labels}>
-              {item.al.av.map((a, i) => (
-                <li key={`alert-av-${i}`}>
-                  <DefaultChip label={a} />
-                </li>
-              ))}
-            </ul>
+            <ChipList items={item.al.av.map(label => ({ label }))} />
           </Box>
         </Box>
       ) : null}
@@ -371,13 +333,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
           <Typography className={classes.sectionTitle}>Yara Hits</Typography>
           <Divider />
           <Box className={classes.sectionContent}>
-            <ul className={classes.labels}>
-              {item.al.yara.map((a, i) => (
-                <li key={`alert-yara-${i}`}>
-                  <DefaultChip label={a} />
-                </li>
-              ))}
-            </ul>
+            <ChipList items={item.al.yara.map(label => ({ label }))} />
           </Box>
         </Box>
       ) : null}
