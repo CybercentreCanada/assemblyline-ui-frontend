@@ -1,6 +1,9 @@
 import { Box, Checkbox, createStyles, FormControlLabel, makeStyles } from '@material-ui/core';
+import { useTheme } from '@material-ui/core/styles';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 import Skeleton from '@material-ui/lab/Skeleton';
 import React from 'react';
+import Masonry from 'react-masonry-css';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -25,7 +28,7 @@ function ServiceTreeItemSkel() {
 function ServiceTreeItem({ item, onChange }) {
   const classes = useStyles();
   return (
-    <>
+    <Box display="block">
       <FormControlLabel
         control={
           <Checkbox
@@ -47,11 +50,16 @@ function ServiceTreeItem({ item, onChange }) {
             })
           : null}
       </Box>
-    </>
+    </Box>
   );
 }
 
 export default function ServiceTree({ settings, setSettings, setModified = null }) {
+  const theme = useTheme();
+  const sm = useMediaQuery(theme.breakpoints.only('sm'));
+  const xs = useMediaQuery(theme.breakpoints.only('xs'));
+  const bp = xs ? 1 : sm ? 2 : 3;
+
   function handleServiceChange(name, category) {
     if (settings) {
       const newServices = settings.services;
@@ -87,32 +95,39 @@ export default function ServiceTree({ settings, setSettings, setModified = null 
   }
 
   return settings ? (
-    <Box>
+    <Masonry breakpointCols={bp} className="m-grid" columnClassName="m-grid_column">
       {settings.services.map((category, cat_id) => {
         return <ServiceTreeItem key={cat_id} item={category} onChange={handleServiceChange} />;
       })}
-    </Box>
+    </Masonry>
   ) : (
-    <Box>
-      <ServiceTreeItemSkel />
-      <Box pl={4}>
+    <Masonry breakpointCols={bp} className="m-grid" columnClassName="m-grid_column">
+      <Box>
         <ServiceTreeItemSkel />
-        <ServiceTreeItemSkel />
-        <ServiceTreeItemSkel />
+        <Box pl={4}>
+          <ServiceTreeItemSkel />
+          <ServiceTreeItemSkel />
+          <ServiceTreeItemSkel />
+          <ServiceTreeItemSkel />
+        </Box>
       </Box>
-      <ServiceTreeItemSkel />
-      <Box pl={4}>
+      <Box>
         <ServiceTreeItemSkel />
-        <ServiceTreeItemSkel />
+        <Box pl={4}>
+          <ServiceTreeItemSkel />
+          <ServiceTreeItemSkel />
+        </Box>
       </Box>
-      <ServiceTreeItemSkel />
-      <Box pl={4}>
+      <Box>
         <ServiceTreeItemSkel />
-        <ServiceTreeItemSkel />
-        <ServiceTreeItemSkel />
-        <ServiceTreeItemSkel />
-        <ServiceTreeItemSkel />
+        <Box pl={4}>
+          <ServiceTreeItemSkel />
+          <ServiceTreeItemSkel />
+          <ServiceTreeItemSkel />
+          <ServiceTreeItemSkel />
+          <ServiceTreeItemSkel />
+        </Box>
       </Box>
-    </Box>
+    </Masonry>
   );
 }
