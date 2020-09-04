@@ -16,9 +16,7 @@ const useStyles = makeStyles(theme => ({
     flex: '1 1 auto'
   },
   listItem: {
-    // minHeight: theme.spacing(5),
     padding: theme.spacing(2),
-    // margin: theme.spacing(1),
     wordBreak: 'break-all',
     '&:hover': {
       cursor: 'pointer',
@@ -60,7 +58,6 @@ export default function List<I extends ListItemProps>({
   // Setup hooks.
   const [cursor, setCursor] = useState<number>(-1);
   const classes = useStyles();
-  // const containerEl = useRef<HTMLDivElement>();
 
   // Function throttler to streamline keydown event handlers.
   const throttler = new Throttler(10);
@@ -121,9 +118,8 @@ export default function List<I extends ListItemProps>({
     <Box tabIndex={-1} onKeyUp={_onKeyUp} onKeyDown={_onKeyDown} className={classes.list}>
       <div className={classes.listContent}>
         {items.map((item, i) => (
-          <Box mr={0}>
+          <Box mr={0} key={item.id}>
             <Box
-              key={item.id}
               className={classes.listItem}
               onClick={() => onSelection(item, i)}
               data-listposition={i}

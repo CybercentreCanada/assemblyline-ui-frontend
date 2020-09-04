@@ -23,7 +23,7 @@ const useStyles = makeStyles(theme => ({
   },
   right: {
     display: 'flex',
-    flex: '0 0 auto',
+    flex: '1 1 auto',
     overflow: 'auto',
     transition: 'width 0.2s ease 0s'
   },
@@ -99,6 +99,8 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
       // console.log('mouse down');
       mouseDownRef.current = true;
       if (_rightEl) {
+        // disable text selection when resizing panels.
+        _containerEl.style.userSelect = 'none';
         // remove transition effect when resizing.
         // this will prevent delays and other weirdness.
         // the dom update is fast enough to keep up and make
@@ -112,6 +114,8 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
       // console.log('mouse up');
       mouseDownRef.current = false;
       if (_rightEl) {
+        // Reenable text selection.
+        _containerEl.style.userSelect = 'inherit';
         // reset the transition effect when no longer resizing.
         _rightEl.style.transition = 'width 0.2s ease 0s';
       }
@@ -120,8 +124,8 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
     // Event: containerEl[mousemove]
     const onAnchorMM = (event: MouseEvent) => {
       if (mouseDownRef.current) {
-        // console.log(`moved by: ${event.movementX}`);
-        updateLayout(_leftEl.getBoundingClientRect().width + event.movementX);
+        console.log(`moved by: ${event.movementX}`);
+        updateLayout(leftSizeRef.current + event.movementX);
       }
     };
 

@@ -25,8 +25,10 @@ export interface AlertItem extends ListItemProps {
   status: string;
   file: AlertFile;
   owner: string;
+  hint_owner: boolean;
   group_count: number;
   classification: string;
+  filtered: boolean;
   heuristic: { name: string[] };
   metadata: {
     [key: string]: any;

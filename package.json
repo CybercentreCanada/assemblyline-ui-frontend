@@ -16,6 +16,7 @@
     "@types/react-icons": "^3.0.0",
     "@types/react-router-dom": "^5.1.5",
     "clsx": "^1.1.1",
+    "date-fns": "^2.16.1",
     "fontsource-roboto": "^2.1.4",
     "i18next": "^19.6.0",
     "i18next-browser-languagedetector": "^5.0.0",

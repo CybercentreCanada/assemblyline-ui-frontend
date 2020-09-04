@@ -53,7 +53,7 @@ const AlertsSplitPanel: React.FC<AlertsSplitPanelProps> = ({ loading = false, it
                 mode="provided"
                 title={
                   <Box display="flex">
-                    <Typography variant="h6">{state.item.file.name}</Typography>
+                    <Typography variant="h6">{state.item.alert_id}</Typography>
                   </Box>
                 }
                 actions={[{ icon: <CloseIcon />, action: () => setState({ ...state, open: false }) }]}

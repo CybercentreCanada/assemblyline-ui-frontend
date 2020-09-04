@@ -1,5 +1,7 @@
 import { Box, Grid, Typography, useMediaQuery, useTheme } from '@material-ui/core';
+import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
 import { AlertItem } from 'components/routes/alerts/alerts';
+import { formatDistanceToNowStrict } from 'date-fns';
 import React from 'react';
 import { Chip, ChipList } from '../panels/chips';
 import AlertPriority from './alert-priority';
@@ -35,8 +37,11 @@ const AlertItemDefault: React.FC<AlertListItemProps> = ({ item }) => {
         <Grid item xs={4}>
           <AlertScore score={item.al.score} variant="outlined" />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={2}>
           <Chip size="small" variant="outlined" label={item.status} />
+        </Grid>
+        <Grid item xs={2}>
+          {formatDistanceToNowStrict(new Date(item.reporting_ts))}
         </Grid>
         {/* <Grid item xs={4}>
           <Box display="flex" flexDirection="row" mt={1}>
@@ -46,8 +51,17 @@ const AlertItemDefault: React.FC<AlertListItemProps> = ({ item }) => {
         </Grid> */}
       </Grid>
       <Grid container style={{ alignItems: 'center' }}>
-        <Grid item xs={12}>
+        <Grid item xs={8}>
           <ChipList items={item.label.map(label => ({ label, size: 'small', variant: 'outlined' }))} />
+        </Grid>
+        <Grid item xs={2}>
+          <Box alignItems="center" display="flex">
+            <AssignmentIndIcon />
+            &nbsp;{item.owner ? item.owner : item.hint_owner ? 'assigned' : 'none'}
+          </Box>
+        </Grid>
+        <Grid item xs={2}>
+          <Typography>{item.group_count}x</Typography>
         </Grid>
       </Grid>
     </Box>
