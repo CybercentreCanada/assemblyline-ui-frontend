@@ -97,7 +97,7 @@ function User<UserProps>({ width, username }) {
 
   const snackBarSuccessOptions: OptionsObject = {
     variant: 'success',
-    autoHideDuration: 10000,
+    autoHideDuration: 3000,
     anchorOrigin: {
       vertical: 'bottom',
       horizontal: 'center'
@@ -156,7 +156,7 @@ function User<UserProps>({ width, username }) {
       enqueueSnackbar(t('page.user.2fa_already_enabled'), {
         ...snackBarSuccessOptions,
         variant: 'error',
-        autoHideDuration: 5000
+        autoHideDuration: 3000
       });
     } else if (value) {
       enqueueSnackbar(t('page.user.2fa_enabled'), snackBarSuccessOptions);
@@ -164,7 +164,7 @@ function User<UserProps>({ width, username }) {
       enqueueSnackbar(t('page.user.2fa_disabled'), {
         ...snackBarSuccessOptions,
         variant: 'warning',
-        autoHideDuration: 5000
+        autoHideDuration: 3000
       });
     }
     setUser({ ...user, '2fa_enabled': value });
