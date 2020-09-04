@@ -36,16 +36,20 @@ export interface ListItemProps {
 interface ListProps<I extends ListItemProps> {
   loading?: boolean;
   selected?: number | string;
+  items: I[];
   onKeyDown?: (keyCode: number, items: I[], selectedId: string | number) => void;
   onItemSelected: (item: I) => void;
   onRenderItem: (item: I) => React.ReactNode;
-  items: I[];
+  onScrollAtTop?: () => void;
+  onScrollAtBottom?: () => void;
 }
 
 List.defaultProps = {
   selected: null,
   loading: false,
-  onKeyDown: () => null
+  onKeyDown: () => null,
+  onScrollAtTop: () => null,
+  onScrollAtBottom: () => null
 };
 
 export default function List<I extends ListItemProps>({
@@ -54,7 +58,9 @@ export default function List<I extends ListItemProps>({
   items,
   onRenderItem,
   onItemSelected,
-  onKeyDown
+  onKeyDown,
+  onScrollAtTop,
+  onScrollAtBottom
 }: ListProps<I>) {
   // Setup hooks.
   const [cursor, setCursor] = useState<number>(-1);
@@ -98,6 +104,24 @@ export default function List<I extends ListItemProps>({
     });
   };
 
+  const _onScroll = (event: React.UIEvent<HTMLDivElement>) => {
+    const { currentTarget } = event;
+    const cH = currentTarget.getBoundingClientRect().height;
+    const sT = currentTarget.scrollTop;
+    const sH = currentTarget.scrollHeight;
+
+    console.log(currentTarget.scrollHeight);
+    const currentPosition = cH + sT;
+
+    if (currentPosition >= sH) {
+      console.log('We go to the bottom of things...');
+      onScrollAtTop();
+    } else if (sT === 0) {
+      console.log('We at the to of it.');
+      onScrollAtBottom();
+    }
+  };
+
   // Ensure the list element at specified position is into view.
   const scrollSelection = (target: HTMLDivElement, position: number) => {
     target.querySelector(`[data-listposition="${position}"`).scrollIntoView({ block: 'nearest' });
@@ -116,7 +140,7 @@ export default function List<I extends ListItemProps>({
 
   // Render the List component.
   return (
-    <Box tabIndex={-1} onKeyUp={_onKeyUp} onKeyDown={_onKeyDown} className={classes.list}>
+    <Box tabIndex={-1} onKeyUp={_onKeyUp} onKeyDown={_onKeyDown} className={classes.list} onScroll={_onScroll}>
       <div className={classes.listContent}>
         {items.map((item, i) => (
           <Box mr={0} key={item.id}>
