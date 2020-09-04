@@ -122,11 +122,11 @@ export default function APIKeys<APIKeysProps>({ user, toggleAPIKey, enqueueSnack
         />
       </Box>
       <Box display="flex" flexDirection="row" width="100%">
-        <Box alignSelf="center" pl={1} flexGrow={2}>
-          <Select id="priv" value={tempKeyPriv} onChange={handleSelectChange}>
-            <MenuItem value="READ">R</MenuItem>
-            <MenuItem value="READ_WRITE">RW</MenuItem>
-            <MenuItem value="WRITE">W</MenuItem>
+        <Box alignSelf="center" flexGrow={2}>
+          <Select id="priv" value={tempKeyPriv} onChange={handleSelectChange} variant="outlined" margin="dense">
+            <MenuItem value="READ">READ</MenuItem>
+            <MenuItem value="READ_WRITE">READ/WRITE</MenuItem>
+            <MenuItem value="WRITE">WRITE</MenuItem>
           </Select>
         </Box>
         <Box alignSelf="flex-end" pl={1}>
