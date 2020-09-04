@@ -389,7 +389,7 @@ function Settings<SettingsProps>({ width }) {
               </TableRow>
               <TableRow hover style={{ cursor: 'pointer' }} onClick={event => toggleDrawer('ttl')}>
                 {isWidthDown('xs', width) ? null : (
-                  <TableCell style={{ whiteSpace: 'nowrap' }}>
+                  <TableCell>
                     <Typography variant="body1">{t('page.settings.submissions.ttl')}</Typography>
                     <Typography variant="caption">{t('page.settings.submissions.ttl_desc')}</Typography>
                   </TableCell>
@@ -435,7 +435,7 @@ function Settings<SettingsProps>({ width }) {
             <TableBody>
               <TableRow hover style={{ cursor: 'pointer' }} onClick={event => toggleDrawer('view')}>
                 {isWidthDown('xs', width) ? null : (
-                  <TableCell style={{ whiteSpace: 'nowrap' }}>
+                  <TableCell>
                     <Typography variant="body1">{t('page.settings.interface.view')}</Typography>
                     <Typography variant="caption">{t('page.settings.interface.view_desc')}</Typography>
                   </TableCell>
@@ -463,7 +463,7 @@ function Settings<SettingsProps>({ width }) {
               </TableRow>
               <TableRow hover style={{ cursor: 'pointer' }} onClick={event => toggleDrawer('encoding')}>
                 {isWidthDown('xs', width) ? null : (
-                  <TableCell style={{ whiteSpace: 'nowrap' }}>
+                  <TableCell>
                     <Typography variant="body1">{t('page.settings.interface.encoding')}</Typography>
                     <Typography variant="caption">{t('page.settings.interface.encoding_desc')}</Typography>
                   </TableCell>
@@ -491,7 +491,7 @@ function Settings<SettingsProps>({ width }) {
               </TableRow>
               <TableRow hover style={{ cursor: 'pointer' }} onClick={event => toggleDrawer('score')}>
                 {isWidthDown('xs', width) ? null : (
-                  <TableCell style={{ whiteSpace: 'nowrap' }}>
+                  <TableCell>
                     <Typography variant="body1">{t('page.settings.interface.score')}</Typography>
                     <Typography variant="caption">{t('page.settings.interface.score_desc')}</Typography>
                   </TableCell>
