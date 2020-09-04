@@ -1,11 +1,12 @@
 import { Box, Typography, useTheme } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
+import { isEscape } from 'components/elements/keyboard';
 import SplitPanel from 'components/elements/split-panel';
 import Viewport from 'components/elements/viewport';
+import AlertActionsMenu from 'components/routes/alerts/alert-actions-menu';
 import { AlertItem } from 'components/routes/alerts/alerts';
 import React, { useState } from 'react';
-import { isEscape } from '../../../elements/keyboard';
 import AlertDetails from './alert-details';
 import AlertList from './alert-list';
 
@@ -14,7 +15,6 @@ type AlertsSplitPanelProps = {
   items: AlertItem[];
 };
 
-// .
 const AlertsSplitPanel: React.FC<AlertsSplitPanelProps> = ({ loading = false, items }) => {
   const theme = useTheme();
   const [state, setState] = useState<{ open: boolean; item: AlertItem }>({ open: false, item: null });
@@ -36,7 +36,6 @@ const AlertsSplitPanel: React.FC<AlertsSplitPanelProps> = ({ loading = false, it
         rightDrawerBackgroundColor={theme.palette.background.default}
         rightOpen={state.open}
         left={
-          // <Box pr={state.open ? 2 : 0}>
           <AlertList
             loading={loading}
             selected={state.open && state.item ? state.item.id : -1}
@@ -44,7 +43,6 @@ const AlertsSplitPanel: React.FC<AlertsSplitPanelProps> = ({ loading = false, it
             onSelection={item => setState({ open: true, item })}
             onKeyDown={onListKeyDown}
           />
-          // </Box>
         }
         right={
           state.item ? (
@@ -52,7 +50,8 @@ const AlertsSplitPanel: React.FC<AlertsSplitPanelProps> = ({ loading = false, it
               <PageHeader
                 mode="provided"
                 title={
-                  <Box display="flex">
+                  <Box display="flex" alignItems="center">
+                    <AlertActionsMenu />
                     <Typography variant="h6">{state.item.alert_id}</Typography>
                   </Box>
                 }

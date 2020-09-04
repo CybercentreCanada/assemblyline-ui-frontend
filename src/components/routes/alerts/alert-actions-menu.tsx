@@ -3,11 +3,11 @@ import MenuIcon from '@material-ui/icons/Menu';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const AlertCardActions = () => {
+const AlertActionsMenu = () => {
   const { t } = useTranslation();
   const [anchorEl, setAnchorEl] = useState(null);
   const onClick = (event: React.MouseEvent) => {
-    event.stopPropagation()
+    event.stopPropagation();
     setAnchorEl(anchorEl ? null : event.currentTarget);
   };
   return (
@@ -43,4 +43,4 @@ const AlertCardActions = () => {
   );
 };
 
-export default AlertCardActions;
+export default AlertActionsMenu;
