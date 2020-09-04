@@ -1,10 +1,10 @@
 import { Box, Drawer, useTheme } from '@material-ui/core';
 import useMyAPI from 'components/hooks/useMyAPI';
 import React, { useEffect, useState } from 'react';
+import { ListItemProps } from '../../elements/list';
 import AlertsFilters from './list/alerts-filters';
 import AlertsHeader from './list/alerts-header';
 import AlertsSplitPanel from './list/alerts-split-panel';
-import { ListItemProps } from './panels/list';
 
 export type AlertFile = {
   md5: string;

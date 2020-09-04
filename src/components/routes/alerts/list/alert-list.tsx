@@ -1,6 +1,6 @@
+import List from 'components/elements/list';
 import { AlertItem } from 'components/routes/alerts/alerts';
 import AlertListItem from 'components/routes/alerts/list/alert-list-item';
-import List from 'components/routes/alerts/panels/list';
 import React from 'react';
 
 type AlertListProps = {

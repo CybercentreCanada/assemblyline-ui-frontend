@@ -1,5 +1,5 @@
 import { Avatar, ChipProps, useTheme } from '@material-ui/core';
-import { Chip } from 'components/routes/alerts/panels/chips';
+import { Chip } from 'components/elements/chips';
 import React from 'react';
 
 const ALERT_SCORE_MAP = {

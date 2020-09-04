@@ -1,9 +1,9 @@
 import { Box, Grid, Typography, useMediaQuery, useTheme } from '@material-ui/core';
 import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
+import { Chip, ChipList } from 'components/elements/chips';
 import { AlertItem } from 'components/routes/alerts/alerts';
 import { formatDistanceToNowStrict } from 'date-fns';
 import React from 'react';
-import { Chip, ChipList } from '../panels/chips';
 import AlertPriority from './alert-priority';
 import AlertScore from './alert-score';
 
