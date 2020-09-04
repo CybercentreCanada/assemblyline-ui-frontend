@@ -1,4 +1,4 @@
-import { Drawer, makeStyles } from '@material-ui/core';
+import { Box, Drawer, makeStyles } from '@material-ui/core';
 import React, { useLayoutEffect, useRef, useState } from 'react';
 
 const useStyles = makeStyles(theme => ({
@@ -8,14 +8,9 @@ const useStyles = makeStyles(theme => ({
     height: '100%'
   },
   left: {
-    flex: '1 1 auto',
-    overflow: 'auto',
     display: 'flex',
-    flexDirection: 'row'
-  },
-  leftContent: {
     flex: '1 1 auto',
-    flexDirection: 'row'
+    overflow: 'auto'
   },
   anchor: {
     width: '5px',
@@ -27,6 +22,7 @@ const useStyles = makeStyles(theme => ({
     }
   },
   right: {
+    display: 'flex',
     flex: '0 0 auto',
     overflow: 'auto',
     transition: 'width 0.2s ease 0s'
@@ -44,6 +40,8 @@ const useStyles = makeStyles(theme => ({
     }
   }
 }));
+
+export const SplitPanelContext = React.createContext<{ leftEl: HTMLDivElement }>(null);
 
 type SplitPanelProps = {
   leftMinWidth?: number;
@@ -231,12 +229,12 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
     };
   });
 
-  // We display the right panel as a temporary drawer.
+  // We display the right panel as a temporary drawer...
   if (layout === 'drawer') {
     return (
       <div ref={containerEl} className={classes.container}>
         <div ref={leftEl} className={classes.left}>
-          <div className={classes.leftContent}>{left}</div>
+          {left}
         </div>
         <Drawer open={rightOpen} anchor="right" classes={{ paper: drawerClasses.paper }}>
           {right}
@@ -249,7 +247,7 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
   return (
     <div ref={containerEl} className={classes.container}>
       <div ref={leftEl} className={classes.left}>
-        <div className={classes.leftContent}>{left}</div>
+        <Box flex={1}>{left}</Box>
       </div>
       {right && rightOpen ? <div ref={anchorEl} className={classes.anchor} /> : null}
       <div ref={rightEl} className={classes.right}>

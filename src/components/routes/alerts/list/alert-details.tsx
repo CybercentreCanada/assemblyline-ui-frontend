@@ -1,19 +1,9 @@
-import {
-  Box,
-  Chip,
-  Divider,
-  Grid,
-  makeStyles,
-  Typography,
-  useMediaQuery,
-  useTheme,
-  withStyles
-} from '@material-ui/core';
+import { Box, Divider, Grid, makeStyles, Typography, useMediaQuery, useTheme } from '@material-ui/core';
 import useClipboard from 'commons/components/hooks/useClipboard';
 import { AlertItem } from 'components/routes/alerts/alerts';
 import React from 'react';
 import { BsClipboard } from 'react-icons/bs';
-import { ChipList } from '../panels/chips';
+import { Chip, ChipList } from '../panels/chips';
 import AlertPriority from './alert-priority';
 
 const useStyles = makeStyles(theme => ({
@@ -46,7 +36,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
   const { copy } = useClipboard();
 
   return (
-    <Box>
+    <Box overflow="auto">
       <Grid container spacing={2}>
         <Grid item xs={isLteSm ? 12 : 6}>
           {/* Labels Section */}
@@ -76,7 +66,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
             <Typography className={classes.sectionTitle}>Status</Typography>
             <Divider />
             <Box className={classes.sectionContent}>
-              <DefaultChip label={item.status} />
+              <Chip label={item.status} />
             </Box>
           </Box>
         </Grid>
@@ -90,7 +80,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
           <Grid container spacing={1}>
             <Grid item xs={12}>
               <Typography variant="caption">Type</Typography>&nbsp;
-              <DefaultChip label={item.file.type} /> -
+              <Chip label={item.file.type} /> -
               <Box component="span" ml={1} mr={1}>
                 {item.file.name}
               </Box>
@@ -125,7 +115,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
           <Typography className={classes.sectionTitle}>Ownership</Typography>
           <Divider />
           <Box className={classes.sectionContent}>
-            <DefaultChip label={item.owner} />
+            <Chip label={item.owner} />
           </Box>
         </Box>
       ) : null}
@@ -159,7 +149,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
                 <Typography variant="caption" style={{ marginRight: theme.spacing(1) }}>
                   <i>Type</i>
                 </Typography>
-                <DefaultChip label={item.attack.category} />
+                <Chip label={item.attack.category} />
               </Grid>
               <Grid item xs={isLteSm ? 12 : 8}>
                 <Typography variant="caption" style={{ marginRight: theme.spacing(1) }}>
@@ -316,11 +306,6 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
       ) : null}
     </Box>
   );
-};
-
-const DefaultChip = ({ label }) => {
-  const DChip = withStyles({})(Chip);
-  return <DChip label={label} size="small" />;
 };
 
 export default AlertDetails;

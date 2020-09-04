@@ -36,19 +36,19 @@ const AlertsSplitPanel: React.FC<AlertsSplitPanelProps> = ({ loading = false, it
         rightDrawerBackgroundColor={theme.palette.background.default}
         rightOpen={state.open}
         left={
-          <Box pr={state.open ? 2 : 0}>
-            <AlertList
-              loading={loading}
-              selected={state.open && state.item ? state.item.id : -1}
-              items={items}
-              onSelection={item => setState({ open: true, item })}
-              onKeyDown={onListKeyDown}
-            />
-          </Box>
+          // <Box pr={state.open ? 2 : 0}>
+          <AlertList
+            loading={loading}
+            selected={state.open && state.item ? state.item.id : -1}
+            items={items}
+            onSelection={item => setState({ open: true, item })}
+            onKeyDown={onListKeyDown}
+          />
+          // </Box>
         }
         right={
           state.item ? (
-            <Box p={2} pt={0}>
+            <Box p={2} pt={0} width="100%">
               <PageHeader
                 mode="provided"
                 title={

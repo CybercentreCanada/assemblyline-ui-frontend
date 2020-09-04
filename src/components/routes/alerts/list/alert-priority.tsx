@@ -1,6 +1,7 @@
-import { Box, Chip, makeStyles, Typography, useTheme } from '@material-ui/core';
+import { Box, makeStyles, Typography, useTheme } from '@material-ui/core';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
+import { Chip } from 'components/routes/alerts/panels/chips';
 import React from 'react';
 
 const useStyles = makeStyles({

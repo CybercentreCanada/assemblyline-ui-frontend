@@ -6,7 +6,14 @@ import Throttler from './throttler';
 
 const useStyles = makeStyles(theme => ({
   list: {
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'row',
+    overflow: 'auto',
     '&:focus': { outline: 'none' }
+  },
+  listContent: {
+    flex: '1 1 auto'
   },
   listItem: {
     // minHeight: theme.spacing(5),
@@ -53,6 +60,7 @@ export default function List<I extends ListItemProps>({
   // Setup hooks.
   const [cursor, setCursor] = useState<number>(-1);
   const classes = useStyles();
+  // const containerEl = useRef<HTMLDivElement>();
 
   // Function throttler to streamline keydown event handlers.
   const throttler = new Throttler(10);
@@ -62,11 +70,14 @@ export default function List<I extends ListItemProps>({
 
   // key_hander:keydown
   const _onKeyDown = (event: React.KeyboardEvent) => {
+    //
+    event.preventDefault();
     // console.log(`kd[${event.keyCode}]`);
+    // const { currentTarget } = event;
     const { keyCode } = event;
 
     if (isArrowUp(keyCode) || isArrowDown(keyCode)) {
-      _onKeyDownThrottled(keyCode);
+      _onKeyDownThrottled(keyCode, event.currentTarget as HTMLDivElement);
     } else if (isEnter(keyCode)) {
       onSelection(items[cursor], cursor);
     }
@@ -75,16 +86,23 @@ export default function List<I extends ListItemProps>({
   };
 
   // throttled keydown handler.
-  const _onKeyDownThrottled = (keyCode: number) => {
+  const _onKeyDownThrottled = (keyCode: number, target: HTMLDivElement) => {
     throttler.throttle(() => {
       if (isArrowUp(keyCode)) {
         const nextIndex = cursor - 1 >= 0 ? cursor - 1 : items.length - 1;
         setCursor(nextIndex);
+        scrollSelection(target, nextIndex);
       } else if (isArrowDown(keyCode)) {
         const nextIndex = cursor + 1 < items.length ? cursor + 1 : 0;
         setCursor(nextIndex);
+        scrollSelection(target, nextIndex);
       }
     });
+  };
+
+  // Ensure the list element at specified position is into view.
+  const scrollSelection = (target: HTMLDivElement, position: number) => {
+    target.querySelector(`[data-listposition="${position}"`).scrollIntoView({ block: 'nearest' });
   };
 
   // Items selection handler.
@@ -101,20 +119,22 @@ export default function List<I extends ListItemProps>({
   // Render the List component.
   return (
     <Box tabIndex={-1} onKeyUp={_onKeyUp} onKeyDown={_onKeyDown} className={classes.list}>
-      {items.map((item, i) => (
-        <Box mr={0}>
-          <Box
-            key={item.id}
-            className={classes.listItem}
-            onClick={() => onSelection(item, i)}
-            data-listposition={i}
-            data-listitemselected={i === cursor || item.id === selected}
-          >
-            {onRenderItem(item)}
+      <div className={classes.listContent}>
+        {items.map((item, i) => (
+          <Box mr={0}>
+            <Box
+              key={item.id}
+              className={classes.listItem}
+              onClick={() => onSelection(item, i)}
+              data-listposition={i}
+              data-listitemselected={i === cursor || item.id === selected}
+            >
+              {onRenderItem(item)}
+            </Box>
+            <Divider />
           </Box>
-          <Divider />
-        </Box>
-      ))}
+        ))}
+      </div>
     </Box>
   );
 }
