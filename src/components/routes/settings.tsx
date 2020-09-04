@@ -28,6 +28,7 @@ import useUser from 'commons/components/hooks/useAppUser';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
+import ServiceTree from 'components/layout/serviceTree';
 import { OptionsObject, useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -89,7 +90,7 @@ function Settings<SettingsProps>({ width }) {
 
   const snackBarSuccessOptions: OptionsObject = {
     variant: 'success',
-    autoHideDuration: 10000,
+    autoHideDuration: 3000,
     anchorOrigin: {
       vertical: 'bottom',
       horizontal: 'center'
@@ -100,62 +101,82 @@ function Settings<SettingsProps>({ width }) {
   };
 
   function setTTL(value) {
-    setModified(true);
-    setSettings({ ...settings, ttl: parseInt(value) });
+    if (settings) {
+      setModified(true);
+      setSettings({ ...settings, ttl: parseInt(value) });
+    }
   }
 
   function toggleDynamicPrevention() {
-    setModified(true);
-    setSettings({ ...settings, ignore_dynamic_recursion_prevention: !settings.ignore_dynamic_recursion_prevention });
+    if (settings) {
+      setModified(true);
+      setSettings({ ...settings, ignore_dynamic_recursion_prevention: !settings.ignore_dynamic_recursion_prevention });
+    }
   }
 
   function toggleFiltering() {
-    setModified(true);
-    setSettings({ ...settings, ignore_filtering: !settings.ignore_filtering });
+    if (settings) {
+      setModified(true);
+      setSettings({ ...settings, ignore_filtering: !settings.ignore_filtering });
+    }
   }
 
   function toggleCaching() {
-    setModified(true);
-    setSettings({ ...settings, ignore_cache: !settings.ignore_cache });
+    if (settings) {
+      setModified(true);
+      setSettings({ ...settings, ignore_cache: !settings.ignore_cache });
+    }
   }
 
   function toggleDeepScan() {
-    setModified(true);
-    setSettings({ ...settings, deep_scan: !settings.deep_scan });
+    if (settings) {
+      setModified(true);
+      setSettings({ ...settings, deep_scan: !settings.deep_scan });
+    }
   }
 
   function toggleProfile() {
-    setModified(true);
-    setSettings({ ...settings, profile: !settings.profile });
+    if (settings) {
+      setModified(true);
+      setSettings({ ...settings, profile: !settings.profile });
+    }
   }
 
   function handleViewChange(event) {
-    setModified(true);
-    setSettings({ ...settings, submission_view: event.target.value });
+    if (settings) {
+      setModified(true);
+      setSettings({ ...settings, submission_view: event.target.value });
+    }
   }
 
   function handleEncodingChange(event) {
-    setModified(true);
-    setSettings({ ...settings, download_encoding: event.target.value });
+    if (settings) {
+      setModified(true);
+      setSettings({ ...settings, download_encoding: event.target.value });
+    }
   }
 
   function handleScoreChange(event) {
-    setModified(true);
-    setSettings({ ...settings, expand_min_score: event.target.value });
+    if (settings) {
+      setModified(true);
+      setSettings({ ...settings, expand_min_score: event.target.value });
+    }
   }
 
   function saveSettings() {
-    apiCall({
-      url: `/api/v4/user/settings/${currentUser.username}/`,
-      method: 'POST',
-      body: settings,
-      onSuccess: () => {
-        setModified(false);
-        enqueueSnackbar(t('page.settings.success_save'), snackBarSuccessOptions);
-      },
-      onEnter: () => setButtonLoading(true),
-      onExit: () => setButtonLoading(false)
-    });
+    if (settings) {
+      apiCall({
+        url: `/api/v4/user/settings/${currentUser.username}/`,
+        method: 'POST',
+        body: settings,
+        onSuccess: () => {
+          setModified(false);
+          enqueueSnackbar(t('page.settings.success_save'), snackBarSuccessOptions);
+        },
+        onEnter: () => setButtonLoading(true),
+        onExit: () => setButtonLoading(false)
+      });
+    }
   }
 
   function toggleDrawer(type) {
@@ -505,24 +526,7 @@ function Settings<SettingsProps>({ width }) {
             <Typography variant="h6" gutterBottom>
               {t('page.settings.service')}
             </Typography>
-            {settings ? (
-              settings.services.map((category, cat_id) => {
-                return (
-                  <Box key={cat_id}>
-                    {category.name}
-                    {category.services.map((service, service_id) => {
-                      return (
-                        <Box key={service_id} pl={4}>
-                          {service.name}
-                        </Box>
-                      );
-                    })}
-                  </Box>
-                );
-              })
-            ) : (
-              <Skeleton />
-            )}
+            <ServiceTree settings={settings} setSettings={setSettings} setModified={setModified} />
           </Box>
         </Paper>
 
