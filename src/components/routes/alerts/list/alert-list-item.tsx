@@ -15,7 +15,6 @@ const AlertListItem: React.FC<AlertListItemProps> = props => {
   const theme = useTheme();
   const isDownSM = useMediaQuery(theme.breakpoints.down('sm'));
   const isDownXS = useMediaQuery(theme.breakpoints.down('xs'));
-
   if (isDownXS) {
     return <AlertItemXSmall {...props} />;
   }
