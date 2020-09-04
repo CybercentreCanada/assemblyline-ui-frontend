@@ -629,16 +629,24 @@ function User<UserProps>({ width, username }) {
               </Table>
             </TableContainer>
 
-            <Box mt={3}>
-              {user ? (
+            {user && modified ? (
+              <Box
+                py={1}
+                style={{
+                  position: 'fixed',
+                  bottom: 0,
+                  left: 0,
+                  width: '100%',
+                  backgroundColor: theme.palette.background.default,
+                  boxShadow: theme.shadows[4]
+                }}
+              >
                 <Button variant="contained" color="primary" disabled={buttonLoading || !modified} onClick={saveUser}>
                   {t('page.user.save')}
                   {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
                 </Button>
-              ) : (
-                <Skeleton className={classes.skelButton} />
-              )}
-            </Box>
+              </Box>
+            ) : null}
           </Grid>
         </Grid>
       </Box>

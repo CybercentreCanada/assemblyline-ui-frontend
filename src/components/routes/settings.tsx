@@ -530,16 +530,24 @@ function Settings<SettingsProps>({ width }) {
           </Box>
         </Paper>
 
-        <Box mt={3}>
-          {settings ? (
+        {settings && modified ? (
+          <Box
+            py={1}
+            style={{
+              position: 'fixed',
+              bottom: 0,
+              left: 0,
+              width: '100%',
+              backgroundColor: theme.palette.background.default,
+              boxShadow: theme.shadows[4]
+            }}
+          >
             <Button variant="contained" color="primary" disabled={buttonLoading || !modified} onClick={saveSettings}>
               {t('page.settings.save')}
               {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
             </Button>
-          ) : (
-            <Skeleton className={classes.skelButton} />
-          )}
-        </Box>
+          </Box>
+        ) : null}
       </Box>
     </PageCenter>
   );
