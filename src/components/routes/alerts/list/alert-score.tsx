@@ -56,6 +56,7 @@ const AlertScore: React.FC<AlertScoreProps> = props => {
 
   return (
     <Chip
+      {...chipProps}
       label={withText ? text : ''}
       avatar={
         <Avatar style={{ backgroundColor: color, color: theme.palette.getContrastText(color) }}>

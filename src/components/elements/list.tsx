@@ -10,6 +10,7 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'row',
     overflow: 'auto',
+    width: '100%',
     '&:focus': { outline: 'none' }
   },
   listContent: {

@@ -7,7 +7,7 @@ type AlertListProps = {
   loading?: boolean;
   selected?: string | number;
   items: AlertItem[];
-  itemLayout?: 'inline' | 'stack';
+  // itemLayout?: 'inline' | 'stack';
   onSelection: (item: AlertItem) => void;
   onKeyDown?: (keyCode: number, items: AlertItem[], selectedId: number | string) => void;
 };
@@ -16,7 +16,7 @@ const AlertList: React.FC<AlertListProps> = ({
   loading = true,
   selected = -1,
   items,
-  itemLayout = 'inline',
+  // itemLayout = 'inline',
   onSelection,
   onKeyDown
 }) => {
@@ -26,7 +26,7 @@ const AlertList: React.FC<AlertListProps> = ({
       selected={selected}
       items={items}
       onItemSelected={onSelection}
-      onRenderItem={i => <AlertListItem item={i} layout={itemLayout} />}
+      onRenderItem={i => <AlertListItem item={i} />}
       onKeyDown={onKeyDown}
     />
   );
