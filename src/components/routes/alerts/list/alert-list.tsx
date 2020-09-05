@@ -1,4 +1,4 @@
-import List from 'components/elements/list';
+import List, { ListPage } from 'components/elements/list';
 import AlertListItem from 'components/routes/alerts/list/alert-list-item';
 import { AlertItem } from 'components/routes/alerts/useAlerts';
 import React from 'react';
@@ -6,9 +6,9 @@ import React from 'react';
 type AlertListProps = {
   loading?: boolean;
   selected?: string | number;
-  items: AlertItem[];
+  page: ListPage<AlertItem>;
   onSelection: (item: AlertItem) => void;
-  onKeyDown?: (keyCode: number, items: AlertItem[], selectedId: number | string) => void;
+  onKeyDown?: (keyCode: number, page: ListPage<AlertItem>, selectedId: number | string) => void;
   onNextPage: () => void;
   onPreviousPage: () => void;
 };
@@ -16,7 +16,7 @@ type AlertListProps = {
 const AlertList: React.FC<AlertListProps> = ({
   loading = true,
   selected = -1,
-  items,
+  page,
   onSelection,
   onKeyDown,
   onNextPage,
@@ -26,7 +26,7 @@ const AlertList: React.FC<AlertListProps> = ({
     <List
       loading={loading}
       selected={selected}
-      items={items}
+      page={page}
       onItemSelected={onSelection}
       onRenderItem={i => <AlertListItem item={i} />}
       onKeyDown={onKeyDown}

@@ -1,4 +1,4 @@
-import { ListItemProps } from 'components/elements/list';
+import { ListItemProps, ListPage } from 'components/elements/list';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { useEffect, useState } from 'react';
 
@@ -49,9 +49,19 @@ export interface AlertItem extends ListItemProps {
   };
 }
 
-export default function useAlerts() {
+interface UsingAlerts {
+  loading: boolean;
+  page: ListPage<AlertItem>;
+  nextPage: () => void;
+  previousPage: () => void;
+}
+
+export default function useAlerts(): UsingAlerts {
   const apiCall = useMyAPI();
-  const [state, setState] = useState<{ loading: boolean; alerts: AlertItem[] }>({ loading: false, alerts: [] });
+  const [state, setState] = useState<{ loading: boolean; page: ListPage<AlertItem> }>({
+    loading: false,
+    page: { index: 0, items: [] }
+  });
 
   useEffect(() => {
     apiCall({
@@ -59,10 +69,36 @@ export default function useAlerts() {
       method: 'get',
       onSuccess: response => {
         const _alerts = response.api_response.items.map(item => ({ ...item, id: item.sid }));
-        setState({ loading: false, alerts: _alerts });
+        setState({ loading: false, page: { index: 0, items: _alerts } });
       }
     });
   }, [apiCall, setState]);
 
-  return state;
+  const nextPage = () => {
+    setState({ ...state, loading: true });
+    apiCall({
+      url: '/api/v4/alert/grouped/<group_by>/',
+      method: 'get',
+      onSuccess: response => {
+        const _alerts = response.api_response.items.map(item => ({ ...item, id: item.sid }));
+        setState({ loading: false, page: { index: state.page.index + 1, items: _alerts } });
+      }
+    });
+  };
+
+  const previousPage = () => {
+    if (state.page.index > 0) {
+      setState({ ...state, loading: true });
+      apiCall({
+        url: '/api/v4/alert/grouped/<group_by>/',
+        method: 'get',
+        onSuccess: response => {
+          const _alerts = response.api_response.items.map(item => ({ ...item, id: item.sid }));
+          setState({ loading: false, page: { index: state.page.index - 1, items: _alerts } });
+        }
+      });
+    }
+  };
+
+  return { ...state, nextPage, previousPage };
 }

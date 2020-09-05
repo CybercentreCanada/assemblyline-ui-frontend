@@ -36,11 +36,16 @@ export interface ListItemProps {
   id: number | string;
 }
 
+export interface ListPage<I extends ListItemProps> {
+  index: number;
+  items: I[];
+}
+
 interface ListProps<I extends ListItemProps> {
   loading?: boolean;
   selected?: number | string;
-  items: I[];
-  onKeyDown?: (keyCode: number, items: I[], selectedId: string | number) => void;
+  page: ListPage<I>;
+  onKeyDown?: (keyCode: number, page: ListPage<I>, selectedId: string | number) => void;
   onItemSelected: (item: I) => void;
   onRenderItem: (item: I) => React.ReactNode;
   onNextPage?: () => void;
@@ -58,7 +63,7 @@ List.defaultProps = {
 export default function List<I extends ListItemProps>({
   loading,
   selected,
-  items,
+  page,
   onRenderItem,
   onItemSelected,
   onKeyDown,
@@ -86,21 +91,21 @@ export default function List<I extends ListItemProps>({
     if (isArrowUp(keyCode) || isArrowDown(keyCode)) {
       _onKeyDownThrottled(keyCode, event.currentTarget as HTMLDivElement);
     } else if (isEnter(keyCode)) {
-      onSelection(items[cursor], cursor);
+      onSelection(page[cursor], cursor);
     }
 
-    onKeyDown(keyCode, items, selected);
+    onKeyDown(keyCode, page, selected);
   };
 
   // throttled keydown handler.
   const _onKeyDownThrottled = (keyCode: number, target: HTMLDivElement) => {
     throttler.throttle(() => {
       if (isArrowUp(keyCode)) {
-        const nextIndex = cursor - 1 >= 0 ? cursor - 1 : items.length - 1;
+        const nextIndex = cursor - 1 >= 0 ? cursor - 1 : page.items.length - 1;
         setCursor(nextIndex);
         scrollSelection(target, nextIndex);
       } else if (isArrowDown(keyCode)) {
-        const nextIndex = cursor + 1 < items.length ? cursor + 1 : 0;
+        const nextIndex = cursor + 1 < page.items.length ? cursor + 1 : 0;
         setCursor(nextIndex);
         scrollSelection(target, nextIndex);
       }
@@ -145,7 +150,7 @@ export default function List<I extends ListItemProps>({
   return (
     <Box tabIndex={-1} onKeyUp={_onKeyUp} onKeyDown={_onKeyDown} className={classes.list} onScroll={_onScroll}>
       <div className={classes.listContent}>
-        {items.map((item, i) => (
+        {page.items.map((item, i) => (
           <Box mr={0} key={item.id}>
             <Box
               className={classes.listItem}

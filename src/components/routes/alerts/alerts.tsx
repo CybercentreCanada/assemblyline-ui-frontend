@@ -7,12 +7,12 @@ import useAlerts from './useAlerts';
 
 const Alerts: React.FC = () => {
   const theme = useTheme();
-  const { loading, alerts } = useAlerts();
+  const { loading, page, nextPage, previousPage } = useAlerts();
   const [drawer, setDrawer] = useState<{ open: boolean; type: 'filter' }>({ open: false, type: null });
 
-  const onListNextPage = () => {};
+  // const onListNextPage = () => nextPage();
 
-  const onListPreviousPage = () => {};
+  // const onListPreviousPage = () => previousPage;
 
   return (
     <Box>
@@ -22,12 +22,7 @@ const Alerts: React.FC = () => {
           onExpandBtnClick={() => setDrawer({ open: true, type: 'filter' })}
         />
       </Box>
-      <AlertsSplitPanel
-        loading={loading}
-        items={alerts}
-        onListNextPage={onListNextPage}
-        onListPreviousPage={onListPreviousPage}
-      />
+      <AlertsSplitPanel loading={loading} page={page} onListNextPage={nextPage} onListPreviousPage={previousPage} />
       <Drawer open={drawer.open} anchor="right" onClose={() => setDrawer({ ...drawer, open: false })}>
         {
           {

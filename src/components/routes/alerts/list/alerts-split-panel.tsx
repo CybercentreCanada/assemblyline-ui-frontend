@@ -2,6 +2,7 @@ import { Box, Typography, useTheme } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import { isEscape } from 'components/elements/keyboard';
+import { ListPage } from 'components/elements/list';
 import SplitPanel from 'components/elements/split-panel';
 import Viewport from 'components/elements/viewport';
 import AlertActionsMenu from 'components/routes/alerts/alert-actions-menu';
@@ -12,14 +13,14 @@ import AlertList from './alert-list';
 
 type AlertsSplitPanelProps = {
   loading?: boolean;
-  items: AlertItem[];
+  page: ListPage<AlertItem>;
   onListNextPage: () => void;
   onListPreviousPage: () => void;
 };
 
 const AlertsSplitPanel: React.FC<AlertsSplitPanelProps> = ({
   loading = false,
-  items,
+  page,
   onListNextPage,
   onListPreviousPage
 }) => {
@@ -46,7 +47,7 @@ const AlertsSplitPanel: React.FC<AlertsSplitPanelProps> = ({
           <AlertList
             loading={loading}
             selected={state.open && state.item ? state.item.id : -1}
-            items={items}
+            page={page}
             onSelection={item => setState({ open: true, item })}
             onKeyDown={onListKeyDown}
             onNextPage={onListNextPage}
