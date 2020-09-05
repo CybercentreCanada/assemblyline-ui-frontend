@@ -1,24 +1,26 @@
 import List from 'components/elements/list';
-import { AlertItem } from 'components/routes/alerts/alerts';
 import AlertListItem from 'components/routes/alerts/list/alert-list-item';
+import { AlertItem } from 'components/routes/alerts/useAlerts';
 import React from 'react';
 
 type AlertListProps = {
   loading?: boolean;
   selected?: string | number;
   items: AlertItem[];
-  // itemLayout?: 'inline' | 'stack';
   onSelection: (item: AlertItem) => void;
   onKeyDown?: (keyCode: number, items: AlertItem[], selectedId: number | string) => void;
+  onNextPage: () => void;
+  onPreviousPage: () => void;
 };
 
 const AlertList: React.FC<AlertListProps> = ({
   loading = true,
   selected = -1,
   items,
-  // itemLayout = 'inline',
   onSelection,
-  onKeyDown
+  onKeyDown,
+  onNextPage,
+  onPreviousPage
 }) => {
   return (
     <List
@@ -28,6 +30,8 @@ const AlertList: React.FC<AlertListProps> = ({
       onItemSelected={onSelection}
       onRenderItem={i => <AlertListItem item={i} />}
       onKeyDown={onKeyDown}
+      onNextPage={onNextPage}
+      onPreviousPage={onPreviousPage}
     />
   );
 };

@@ -43,16 +43,16 @@ interface ListProps<I extends ListItemProps> {
   onKeyDown?: (keyCode: number, items: I[], selectedId: string | number) => void;
   onItemSelected: (item: I) => void;
   onRenderItem: (item: I) => React.ReactNode;
-  onScrollAtTop?: () => void;
-  onScrollAtBottom?: () => void;
+  onNextPage?: () => void;
+  onPreviousPage?: () => void;
 }
 
 List.defaultProps = {
   selected: null,
   loading: false,
   onKeyDown: () => null,
-  onScrollAtTop: () => null,
-  onScrollAtBottom: () => null
+  onNextPage: () => null,
+  onPreviousPage: () => null
 };
 
 export default function List<I extends ListItemProps>({
@@ -62,8 +62,8 @@ export default function List<I extends ListItemProps>({
   onRenderItem,
   onItemSelected,
   onKeyDown,
-  onScrollAtTop,
-  onScrollAtBottom
+  onNextPage,
+  onPreviousPage
 }: ListProps<I>) {
   // Setup hooks.
   const [cursor, setCursor] = useState<number>(-1);
@@ -118,10 +118,10 @@ export default function List<I extends ListItemProps>({
 
     if (currentPosition >= sH) {
       console.log('We go to the bottom of things...');
-      onScrollAtTop();
+      onNextPage();
     } else if (sT === 0) {
       console.log('We at the to of it.');
-      onScrollAtBottom();
+      onPreviousPage();
     }
   };
 

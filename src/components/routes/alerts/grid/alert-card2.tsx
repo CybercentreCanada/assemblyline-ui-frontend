@@ -17,7 +17,7 @@ import ClipboardIcon from '@material-ui/icons/AssignmentReturned';
 import ScoreIcon from '@material-ui/icons/Score';
 import useClipboard from 'commons/components/hooks/useClipboard';
 import AlertCardActions from 'components/routes/alerts/alert-actions-menu';
-import { AlertItem } from 'components/routes/alerts/alerts';
+import { AlertItem } from 'components/routes/alerts/useAlerts';
 import React, { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 

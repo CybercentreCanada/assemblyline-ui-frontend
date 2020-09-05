@@ -5,7 +5,7 @@ import { isEscape } from 'components/elements/keyboard';
 import SplitPanel from 'components/elements/split-panel';
 import Viewport from 'components/elements/viewport';
 import AlertActionsMenu from 'components/routes/alerts/alert-actions-menu';
-import { AlertItem } from 'components/routes/alerts/alerts';
+import { AlertItem } from 'components/routes/alerts/useAlerts';
 import React, { useState } from 'react';
 import AlertDetails from './alert-details';
 import AlertList from './alert-list';
@@ -13,9 +13,16 @@ import AlertList from './alert-list';
 type AlertsSplitPanelProps = {
   loading?: boolean;
   items: AlertItem[];
+  onListNextPage: () => void;
+  onListPreviousPage: () => void;
 };
 
-const AlertsSplitPanel: React.FC<AlertsSplitPanelProps> = ({ loading = false, items }) => {
+const AlertsSplitPanel: React.FC<AlertsSplitPanelProps> = ({
+  loading = false,
+  items,
+  onListNextPage,
+  onListPreviousPage
+}) => {
   const theme = useTheme();
   const [state, setState] = useState<{ open: boolean; item: AlertItem }>({ open: false, item: null });
 
@@ -42,6 +49,8 @@ const AlertsSplitPanel: React.FC<AlertsSplitPanelProps> = ({ loading = false, it
             items={items}
             onSelection={item => setState({ open: true, item })}
             onKeyDown={onListKeyDown}
+            onNextPage={onListNextPage}
+            onPreviousPage={onListPreviousPage}
           />
         }
         right={
