@@ -21,10 +21,13 @@ const useStyles = makeStyles(theme => ({
     wordBreak: 'break-all',
     '&:hover': {
       cursor: 'pointer',
-      backgroundColor: theme.palette.type === 'dark' ? theme.palette.grey[800] : theme.palette.grey[200]
+      backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 17%)' : 'hsl(0, 0%, 95%)'
+    },
+    '&[data-listitemfocus="true"]': {
+      backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 17%)' : 'hsl(0, 0%, 95%)'
     },
     '&[data-listitemselected="true"]': {
-      backgroundColor: theme.palette.type === 'dark' ? theme.palette.grey[800] : theme.palette.grey[200]
+      backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 15%)' : 'hsl(0, 0%, 92%)'
     }
   }
 }));
@@ -148,7 +151,8 @@ export default function List<I extends ListItemProps>({
               className={classes.listItem}
               onClick={() => onSelection(item, i)}
               data-listposition={i}
-              data-listitemselected={i === cursor || item.id === selected}
+              data-listitemselected={item.id === selected}
+              data-listitemfocus={i === cursor}
             >
               {onRenderItem(item)}
             </Box>
