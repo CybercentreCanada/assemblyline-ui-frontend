@@ -13,7 +13,7 @@ const Alerts: React.FC = () => {
   // const onListNextPage = () => nextPage();
 
   // const onListPreviousPage = () => previousPage;
-
+  console.log(`current page: ${page.index}`);
   return (
     <Box>
       <Box pb={theme.spacing(0.25)}>

@@ -1,4 +1,4 @@
-import { Box, Divider, makeStyles, useTheme } from '@material-ui/core';
+import { Box, Divider, LinearProgress, makeStyles, useTheme } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 import React, { useState } from 'react';
 import { isArrowDown, isArrowUp, isEnter } from './keyboard';
@@ -29,6 +29,18 @@ const useStyles = makeStyles(theme => ({
     '&[data-listitemselected="true"]': {
       backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 15%)' : 'hsl(0, 0%, 92%)'
     }
+  },
+  progressCt: {
+    position: 'absolute',
+    zIndex: 1,
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: theme.palette.background.default,
+    height: theme.spacing(2)
+  },
+  progress: {
+    height: 10
   }
 }));
 
@@ -115,18 +127,27 @@ export default function List<I extends ListItemProps>({
   const _onScroll = (event: React.UIEvent<HTMLDivElement>) => {
     const { currentTarget } = event;
     const cH = currentTarget.getBoundingClientRect().height;
+    const cTH = currentTarget.scrollHeight;
     const sT = currentTarget.scrollTop;
-    const sH = currentTarget.scrollHeight;
+    const sH = cTH - cH;
+    const cP = cH + sT;
 
-    console.log(currentTarget.scrollHeight);
-    const currentPosition = cH + sT;
+    // NOTE: sT is not the srollable height, but rather the height of container
+    // including the scollable area.
+    // Therefore scrollable area is [cTH - cH].
 
-    if (currentPosition >= sH) {
-      console.log('We go to the bottom of things...');
+    if (cP === cTH) {
+      // Handler when reaching bottom of scrollable height.
+      // [scrollTop = 1] to prevent top handler to trigger.
+      currentTarget.scrollTo({ top: 1 });
       onNextPage();
     } else if (sT === 0) {
-      console.log('We at the to of it.');
-      onPreviousPage();
+      // Handler when reaching top of scrollable height.
+      // [scrollTop = sH - 1] to prevent bottom handler to trigger.
+      if (page.index > 0) {
+        currentTarget.scrollTo({ top: sH - 1 });
+        onPreviousPage();
+      }
     }
   };
 
@@ -142,29 +163,37 @@ export default function List<I extends ListItemProps>({
   };
 
   // If its loading show skeleton of list.
-  if (loading) {
+  if (loading && page.index === -1) {
     return <ListSkeleton />;
   }
 
   // Render the List component.
   return (
-    <Box tabIndex={-1} onKeyUp={_onKeyUp} onKeyDown={_onKeyDown} className={classes.list} onScroll={_onScroll}>
-      <div className={classes.listContent}>
-        {page.items.map((item, i) => (
-          <Box mr={0} key={item.id}>
-            <Box
-              className={classes.listItem}
-              onClick={() => onSelection(item, i)}
-              data-listposition={i}
-              data-listitemselected={item.id === selected}
-              data-listitemfocus={i === cursor}
-            >
-              {onRenderItem(item)}
+    <Box position="relative" height="100%" display="flex" flexDirection="row">
+      {loading ? (
+        <Box className={classes.progressCt}>
+          <LinearProgress classes={{ root: classes.progress }} />
+        </Box>
+      ) : null}
+
+      <Box tabIndex={-1} onKeyUp={_onKeyUp} onKeyDown={_onKeyDown} className={classes.list} onScroll={_onScroll}>
+        <div className={classes.listContent}>
+          {page.items.map((item, i) => (
+            <Box mr={0} key={`listpage[${page.index}].id[${item.id}]`} id={`listpage[${page.index}].id[${item.id}]`}>
+              <Box
+                className={classes.listItem}
+                onClick={() => onSelection(item, i)}
+                data-listposition={i}
+                data-listitemselected={item.id === selected}
+                data-listitemfocus={i === cursor}
+              >
+                {onRenderItem(item)}
+              </Box>
+              <Divider />
             </Box>
-            <Divider />
-          </Box>
-        ))}
-      </div>
+          ))}
+        </div>
+      </Box>
     </Box>
   );
 }

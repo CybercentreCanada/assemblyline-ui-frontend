@@ -60,7 +60,7 @@ export default function useAlerts(): UsingAlerts {
   const apiCall = useMyAPI();
   const [state, setState] = useState<{ loading: boolean; page: ListPage<AlertItem> }>({
     loading: false,
-    page: { index: 0, items: [] }
+    page: { index: -1, items: [] }
   });
 
   useEffect(() => {
@@ -75,28 +75,34 @@ export default function useAlerts(): UsingAlerts {
   }, [apiCall, setState]);
 
   const nextPage = () => {
+    console.log(`loading nextpage:  ${state.page.index + 1}`);
     setState({ ...state, loading: true });
-    apiCall({
-      url: '/api/v4/alert/grouped/<group_by>/',
-      method: 'get',
-      onSuccess: response => {
-        const _alerts = response.api_response.items.map(item => ({ ...item, id: item.sid }));
-        setState({ loading: false, page: { index: state.page.index + 1, items: _alerts } });
-      }
-    });
-  };
-
-  const previousPage = () => {
-    if (state.page.index > 0) {
-      setState({ ...state, loading: true });
+    setTimeout(() => {
       apiCall({
         url: '/api/v4/alert/grouped/<group_by>/',
         method: 'get',
         onSuccess: response => {
           const _alerts = response.api_response.items.map(item => ({ ...item, id: item.sid }));
-          setState({ loading: false, page: { index: state.page.index - 1, items: _alerts } });
+          setState({ loading: false, page: { index: state.page.index + 1, items: _alerts } });
         }
       });
+    }, 1000);
+  };
+
+  const previousPage = () => {
+    if (state.page.index > 0) {
+      console.log(`loading previouspage:  ${state.page.index + 1}`);
+      setState({ ...state, loading: true });
+      setTimeout(() => {
+        apiCall({
+          url: '/api/v4/alert/grouped/<group_by>/',
+          method: 'get',
+          onSuccess: response => {
+            const _alerts = response.api_response.items.map(item => ({ ...item, id: item.sid }));
+            setState({ loading: false, page: { index: state.page.index - 1, items: _alerts } });
+          }
+        });
+      }, 1000);
     }
   };
 
