@@ -138,36 +138,34 @@ export default function List<I extends ListItemProps>({
         if (nextIndex >= 0) {
           updateCursor(nextIndex, true);
           scrollSelection(target, nextIndex);
+        } else {
+          previousPage(target);
         }
-        // else {
-        //   previousPage(target);
-        // }
       } else if (isArrowDown(keyCode)) {
         const nextIndex = cursorRef.current + 1;
         if (nextIndex < page.items.length) {
           updateCursor(nextIndex, true);
           scrollSelection(target, nextIndex);
+        } else {
+          nextPage(target);
         }
-        // else {
-        //   nextPage(target);
-        // }
       }
     });
   };
 
   // scroll_handler: this is where we deal with infinite_scroll paging.
   const _onScroll = (event: React.MouseEvent<HTMLDivElement>) => {
-    console.log('scrolling...');
-    const { currentTarget: target } = event;
-    const cH = target.getBoundingClientRect().height;
-    const cTH = target.scrollHeight;
-    const sT = target.scrollTop;
-    const cP = cH + sT;
-    if (cP === cTH) {
-      nextPage(target);
-    } else if (sT === 0 && page.index > 0) {
-      previousPage(target);
-    }
+    // console.log('scrolling...');
+    // const { currentTarget: target } = event;
+    // const cH = target.getBoundingClientRect().height;
+    // const cTH = target.scrollHeight;
+    // const sT = target.scrollTop;
+    // const cP = cH + sT;
+    // if (cP === cTH) {
+    //   nextPage(target);
+    // } else if (sT === 0 && page.index > 0) {
+    //   previousPage(target);
+    // }
   };
 
   // Ensure the list element at specified position is into view.

@@ -10,9 +10,8 @@ import Tos from 'components/routes/tos';
 import User from 'components/routes/user';
 import React from 'react';
 import { Route, Switch } from 'react-router-dom';
-import Alerts from './alerts/alerts';
+import Alerts from './alerts/alerts2';
 
-//.
 const Routes = () => {
   return (
     <Switch>
