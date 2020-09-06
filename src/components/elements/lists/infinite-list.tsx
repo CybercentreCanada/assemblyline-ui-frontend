@@ -1,5 +1,7 @@
 import { Box, Divider, makeStyles } from '@material-ui/core';
-import React from 'react';
+import { isArrowDown, isArrowUp, isEnter, isEscape } from 'components/elements/keyboard';
+import Throttler from 'components/elements/throttler';
+import React, { useState } from 'react';
 import { AutoSizer, IndexRange, InfiniteLoader, List } from 'react-virtualized';
 
 const useStyles = makeStyles(theme => ({
@@ -51,12 +53,14 @@ export default function InfiniteList<I extends InfiniteListItem>({
 }: InfiniteListProps<I>) {
   //
   const classes = useStyles();
+  const [cursor, setCursor] = useState<number>(2);
+
+  // Function throttler to streamline keydown event handlers.
+  const throttler = new Throttler(10);
 
   //
   const isRowLoaded = ({ index }): boolean => {
-    const isLoaded = index < items.length;
-    console.log(`isRowLoaded[${index}: ${isLoaded} : ${items.length}]`);
-    return isLoaded;
+    return index < items.length;
   };
 
   //
@@ -69,10 +73,64 @@ export default function InfiniteList<I extends InfiniteListItem>({
     const item = items[index];
     return (
       <Box key={key} style={style} onClick={() => onItemSelected(item)}>
-        <Box className={classes.listItem}>{loading ? <span>Loading...</span> : onRenderItem(item)}</Box>
+        <Box
+          className={classes.listItem}
+          data-listposition={index}
+          data-listitemselected={item === selected}
+          data-listitemfocus={index === cursor}
+        >
+          {loading ? <span>Loading...</span> : onRenderItem(item)}
+        </Box>
         <Divider />
       </Box>
     );
+  };
+
+  const onKeyDown = (event: React.KeyboardEvent) => {
+    event.preventDefault();
+    const { keyCode } = event;
+    if (isArrowUp(keyCode) || isArrowDown(keyCode)) {
+      // Here we handle our custom scrolls and cursor item selection.
+      _onKeyDownThrottled(keyCode, event.currentTarget as HTMLDivElement);
+    } else if (isEnter(keyCode)) {
+      // [ENTER]: select the cursor item.
+      onItemSelected(items[cursor]);
+    } else if (isEscape(keyCode)) {
+      // [ENTER]: select the cursor item.
+      onItemSelected(null);
+    }
+    // TODO: handle[PageUp,PageDown ]
+  };
+
+  const _onKeyDownThrottled = (keyCode: number, target: HTMLDivElement) => {
+    // This will ensure that users who hold down UP/DOWN arrow key don't overload
+    //  react with constant stream of keydown events.
+    // We'll process on event every 10ms and throw away the rest.
+    throttler.throttle(() => {
+      if (isArrowUp(keyCode)) {
+        console.log('keyup');
+        const nextIndex = cursor - 1;
+        if (nextIndex > -1) {
+          setCursor(nextIndex);
+          scrollSelection(target, nextIndex);
+        }
+      } else if (isArrowDown(keyCode)) {
+        console.log('keydown');
+        const nextIndex = cursor + 1;
+        if (nextIndex < items.length) {
+          setCursor(nextIndex);
+          scrollSelection(target, nextIndex);
+        }
+      }
+    });
+  };
+
+  // Ensure the list element at specified position is into view.
+  const scrollSelection = (target: HTMLDivElement, position: number) => {
+    const scrollToEl = target.querySelector(`[data-listposition="${position}"`);
+    if (scrollToEl) {
+      scrollToEl.scrollIntoView({ block: 'nearest' });
+    }
   };
 
   //
@@ -82,17 +140,20 @@ export default function InfiniteList<I extends InfiniteListItem>({
         return (
           <InfiniteLoader isRowLoaded={isRowLoaded} loadMoreRows={loadMoreRows} rowCount={totalCount}>
             {({ onRowsRendered, registerChild }) => (
-              <List
-                ref={registerChild}
-                onRowsRendered={onRowsRendered}
-                rowRenderer={rowRenderer}
-                rowCount={items.length}
-                height={height}
-                rowHeight={rowHeight}
-                rowWidth={width}
-                width={width}
-                style={{ outline: 'none' }}
-              />
+              <Box onKeyDown={onKeyDown}>
+                <List
+                  ref={registerChild}
+                  onRowsRendered={onRowsRendered}
+                  rowRenderer={rowRenderer}
+                  rowCount={items.length}
+                  height={height}
+                  rowHeight={rowHeight}
+                  rowWidth={width}
+                  width={width}
+                  style={{ outline: 'none' }}
+                  on
+                />
+              </Box>
             )}
           </InfiniteLoader>
         );
