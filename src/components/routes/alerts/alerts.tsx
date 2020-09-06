@@ -12,8 +12,18 @@ const Alerts: React.FC = () => {
 
   // const onListNextPage = () => nextPage();
 
-  // const onListPreviousPage = () => previousPage;
-  console.log(`current page: ${page.index}`);
+  // const onListPreviousPage = () => previousPage;.
+
+  // console.log(`current page: ${page.index}`);
+  // return (
+  //   <VirutalizedList
+  //     items={page.items}
+  //     loaded={!loading}
+  //     onNextPage={nextPage}
+  //     onRenderItem={i => <AlertListItem item={i} />}
+  //   />
+  // );
+
   return (
     <Box>
       <Box pb={theme.spacing(0.25)}>
