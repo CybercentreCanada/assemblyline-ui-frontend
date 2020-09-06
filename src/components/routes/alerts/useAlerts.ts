@@ -1,4 +1,5 @@
 import { ListItemProps, ListPage } from 'components/elements/list';
+import { InfiniteListItem } from 'components/elements/lists/infinite-list';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { useEffect, useState } from 'react';
 
@@ -11,7 +12,7 @@ export type AlertFile = {
   type: string;
 };
 
-export interface AlertItem extends ListItemProps {
+export interface AlertItem extends ListItemProps, InfiniteListItem {
   sid: string;
   alert_id: string;
   type: string;
@@ -52,8 +53,10 @@ export interface AlertItem extends ListItemProps {
 interface UsingAlerts {
   loading: boolean;
   page: ListPage<AlertItem>;
+  items: AlertItem[];
   nextPage: () => void;
   previousPage: () => void;
+  onNextPage: (startIndex: number, stopIndex: number) => Promise<any>;
 }
 
 export default function useAlerts(): UsingAlerts {
@@ -61,6 +64,11 @@ export default function useAlerts(): UsingAlerts {
   const [state, setState] = useState<{ loading: boolean; page: ListPage<AlertItem> }>({
     loading: false,
     page: { index: -1, items: [] }
+  });
+
+  const [vState, setVState] = useState<{ loading: boolean; items: AlertItem[] }>({
+    loading: false,
+    items: []
   });
 
   useEffect(() => {
@@ -72,6 +80,19 @@ export default function useAlerts(): UsingAlerts {
         setState({ loading: false, page: { index: 0, items: _alerts } });
       }
     });
+
+    fetch('/api/v4/alert/grouped/<group_by>/')
+      .then(res => res.json())
+      .then(api_data => {
+        const _sliced = api_data.api_response.items.slice(0, 12);
+
+        _sliced.forEach((item, i) => {
+          // eslint-disable-next-line no-param-reassign
+          item.id = i;
+        });
+
+        setVState({ loading: false, items: _sliced });
+      });
   }, [apiCall, setState]);
 
   const nextPage = () => {
@@ -106,5 +127,24 @@ export default function useAlerts(): UsingAlerts {
     }
   };
 
-  return { ...state, nextPage, previousPage };
+  const onNextPage = (startIndex: number, stopIndex: number): Promise<any> => {
+    console.log(`fetching[${startIndex},${stopIndex}]`);
+    setVState({ ...vState, loading: true });
+    return fetch('/api/v4/alert/grouped/<group_by>/')
+      .then(res => res.json())
+      .then(api_data => {
+        const size = stopIndex - startIndex;
+
+        const _sliced = api_data.api_response.items.slice(0, size);
+
+        _sliced.forEach((item, i) => {
+          // eslint-disable-next-line no-param-reassign
+          item.id = startIndex + i;
+        });
+
+        setVState({ loading: false, items: [...vState.items, ..._sliced] });
+      });
+  };
+
+  return { ...state, ...vState, nextPage, previousPage, onNextPage };
 }

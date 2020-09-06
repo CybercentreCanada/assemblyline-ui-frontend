@@ -41,8 +41,6 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export const SplitPanelContext = React.createContext<{ leftEl: HTMLDivElement }>(null);
-
 type SplitPanelProps = {
   leftMinWidth?: number;
   leftInitWidthPerc?: number;
