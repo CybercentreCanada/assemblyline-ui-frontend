@@ -24,7 +24,7 @@ const Alerts: React.FC = () => {
       <AlertListItem item={item} />
     </Box>
   );
-  //
+
   return (
     <Box>
       <Box pb={theme.spacing(0.25)}>
@@ -47,7 +47,7 @@ const Alerts: React.FC = () => {
               items={items}
               loading={loading}
               totalCount={100}
-              rowHeight={125}
+              rowHeight={130}
               selected={state.open && state.selectedItem ? state.selectedItem : null}
               onItemSelected={(item: AlertItem) => setState({ open: true, selectedItem: item })}
               onNextPage={onNextPage}
