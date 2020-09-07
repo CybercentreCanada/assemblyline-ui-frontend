@@ -1,5 +1,5 @@
-import { ListItemProps, ListPage } from 'components/elements/list';
 import { InfiniteListItem } from 'components/elements/lists/infinite-list';
+import { ListItemProps, ListPage } from 'components/elements/lists/list';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { useEffect, useState } from 'react';
 

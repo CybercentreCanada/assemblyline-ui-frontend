@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AutoSizer, IndexRange, InfiniteLoader, List } from 'react-virtualized';
-import { ListItemProps } from './list';
+import { ListItemProps } from './lists/list';
 import Viewport from './viewport';
 
 // export interface VirtualizedListItemProps {

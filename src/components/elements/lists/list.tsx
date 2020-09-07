@@ -1,8 +1,8 @@
 import { Box, Divider, LinearProgress, makeStyles, useTheme } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 import React, { useRef, useState } from 'react';
-import { isArrowDown, isArrowUp, isEnter } from './keyboard';
-import Throttler from './throttler';
+import { isArrowDown, isArrowUp, isEnter } from '../keyboard';
+import Throttler from '../throttler';
 
 const useStyles = makeStyles(theme => ({
   list: {
@@ -88,21 +88,11 @@ export default function List<I extends ListItemProps>({
 
   const classes = useStyles();
   const [cursor, setCursor] = useState<number>(-1);
-  const cursorRef = useRef<number>(-1);
-  const scrollRef = useRef<boolean>(true);
   const listEl = useRef<HTMLDivElement>();
   const maskEl = useRef<HTMLDivElement>();
 
   // Function throttler to streamline keydown event handlers.
   const throttler = new Throttler(10);
-
-  //
-  const updateCursor = (position: number, render: boolean = false) => {
-    cursorRef.current = position;
-    if (render) {
-      setCursor(cursorRef.current);
-    }
-  };
 
   // key_hander:keyup
   const _onKeyUp = (event: React.KeyboardEvent) => {};
@@ -121,7 +111,7 @@ export default function List<I extends ListItemProps>({
         _onKeyDownThrottled(keyCode, event.currentTarget as HTMLDivElement);
       } else if (isEnter(keyCode)) {
         // [ENTER]: select the cursor item.
-        onSelection(page[cursor], cursor);
+        onSelection(page.items[cursor], cursor);
       }
       onKeyDown(keyCode, page, selected);
     }
@@ -134,39 +124,57 @@ export default function List<I extends ListItemProps>({
     // We'll process on event every 10ms and throw away the rest.
     throttler.throttle(() => {
       if (isArrowUp(keyCode)) {
-        const nextIndex = cursorRef.current - 1;
-        if (nextIndex >= 0) {
-          updateCursor(nextIndex, true);
-          scrollSelection(target, nextIndex);
-        } else {
-          previousPage(target);
-        }
+        const nextIndex = cursor - 1 > -1 ? cursor - 1 : page.items.length - 1;
+        setCursor(nextIndex);
+        scrollSelection(target, nextIndex);
       } else if (isArrowDown(keyCode)) {
-        const nextIndex = cursorRef.current + 1;
-        if (nextIndex < page.items.length) {
-          updateCursor(nextIndex, true);
-          scrollSelection(target, nextIndex);
-        } else {
-          nextPage(target);
-        }
+        const nextIndex = cursor + 1 < page.items.length ? cursor + 1 : 0;
+        setCursor(nextIndex);
+        scrollSelection(target, nextIndex);
       }
     });
   };
 
   // scroll_handler: this is where we deal with infinite_scroll paging.
-  const _onScroll = (event: React.MouseEvent<HTMLDivElement>) => {
-    // console.log('scrolling...');
-    // const { currentTarget: target } = event;
-    // const cH = target.getBoundingClientRect().height;
-    // const cTH = target.scrollHeight;
-    // const sT = target.scrollTop;
-    // const cP = cH + sT;
-    // if (cP === cTH) {
-    //   nextPage(target);
-    // } else if (sT === 0 && page.index > 0) {
-    //   previousPage(target);
-    // }
-  };
+  // const _onScroll = (event: React.MouseEvent<HTMLDivElement>) => {
+  // console.log('scrolling...');
+  // const { currentTarget: target } = event;
+  // const cH = target.getBoundingClientRect().height;
+  // const cTH = target.scrollHeight;
+  // const sT = target.scrollTop;
+  // const cP = cH + sT;
+  // if (cP === cTH) {
+  //   nextPage(target);
+  // } else if (sT === 0 && page.index > 0) {
+  //   previousPage(target);
+  // }
+  // };
+
+  // // Handler when reaching bottom of scrollable height.
+  // // [scrollTop = 1] to prevent top handler to trigger.
+  // const nextPage = (target: HTMLDivElement) => {
+  //   showProgress();
+  //   updateCursor(0);
+  //   onNextPage();
+  //   target.scrollTo({ top: 1 });
+  // };
+
+  // // Handler when reaching top of scrollable height.
+  // // [scrollTop = sH - 1] to prevent bottom handler to trigger.
+  // const previousPage = (target: HTMLDivElement) => {
+  //   // NOTE: cTH is not the srollable height, but rather the height of container
+  //   //  plus the scollable area.
+  //   // Therefore scrollable area is [cTH - cH].
+  //   if (page.index > 0) {
+  //     showProgress();
+  //     const cH = target.getBoundingClientRect().height;
+  //     const cTH = target.scrollHeight;
+  //     const sH = cTH - cH;
+  //     updateCursor(page.items.length - 1);
+  //     onPreviousPage();
+  //     target.scrollTo({ top: sH - 1 });
+  //   }
+  // };
 
   // Ensure the list element at specified position is into view.
   const scrollSelection = (target: HTMLDivElement, position: number) => {
@@ -174,53 +182,27 @@ export default function List<I extends ListItemProps>({
   };
 
   const showProgress = () => {
-    if (listEl.current) {
-      listEl.current.style.overflow = 'hidden';
-    }
+    // if (listEl.current) {
+    //   listEl.current.style.overflow = 'hidden';
+    // }
     if (maskEl.current) {
       maskEl.current.style.display = 'block';
     }
   };
 
   const hideProgress = () => {
-    if (listEl.current) {
-      listEl.current.style.overflow = 'auto';
-    }
+    // if (listEl.current) {
+    //   listEl.current.style.overflow = 'auto';
+    // }
     if (maskEl.current) {
       maskEl.current.style.display = 'none';
       // maskEl.current.style.zIndex = '-1';
     }
   };
 
-  // Handler when reaching bottom of scrollable height.
-  // [scrollTop = 1] to prevent top handler to trigger.
-  const nextPage = (target: HTMLDivElement) => {
-    showProgress();
-    updateCursor(0);
-    onNextPage();
-    target.scrollTo({ top: 1 });
-  };
-
-  // Handler when reaching top of scrollable height.
-  // [scrollTop = sH - 1] to prevent bottom handler to trigger.
-  const previousPage = (target: HTMLDivElement) => {
-    // NOTE: cTH is not the srollable height, but rather the height of container
-    //  plus the scollable area.
-    // Therefore scrollable area is [cTH - cH].
-    if (page.index > 0) {
-      showProgress();
-      const cH = target.getBoundingClientRect().height;
-      const cTH = target.scrollHeight;
-      const sH = cTH - cH;
-      updateCursor(page.items.length - 1);
-      onPreviousPage();
-      target.scrollTo({ top: sH - 1 });
-    }
-  };
-
   // Items selection handler.
   const onSelection = (item, i) => {
-    updateCursor(i, true);
+    setCursor(i);
     onItemSelected(item);
   };
 
@@ -239,17 +221,8 @@ export default function List<I extends ListItemProps>({
     <Box position="relative" height="100%" display="flex" flexDirection="row" overflow="hidden">
       <div ref={maskEl} className={classes.progressCt}>
         <LinearProgress classes={{ root: classes.progress }} />
-        {/* <Box className={classes.progressMask}>&nbsp;</Box> */}
       </div>
-      <div
-        ref={listEl}
-        role="button"
-        tabIndex={-1}
-        onKeyUp={_onKeyUp}
-        onKeyDown={_onKeyDown}
-        className={classes.list}
-        onScroll={_onScroll}
-      >
+      <div ref={listEl} role="button" tabIndex={-1} onKeyUp={_onKeyUp} onKeyDown={_onKeyDown} className={classes.list}>
         <div className={classes.listContent}>
           {page.items.map((item, i) => (
             <Box mr={0} key={`listpage[${page.index}].id[${item.id}]`} id={`listpage[${page.index}].id[${item.id}]`}>
@@ -258,7 +231,7 @@ export default function List<I extends ListItemProps>({
                 onClick={() => onSelection(item, i)}
                 data-listposition={i}
                 data-listitemselected={item.id === selected}
-                data-listitemfocus={i === cursorRef.current}
+                data-listitemfocus={i === cursor}
               >
                 {onRenderItem(item)}
               </Box>

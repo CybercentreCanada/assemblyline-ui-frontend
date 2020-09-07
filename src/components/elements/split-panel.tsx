@@ -1,4 +1,4 @@
-import { Box, Drawer, makeStyles } from '@material-ui/core';
+import { Drawer, makeStyles } from '@material-ui/core';
 import React, { useLayoutEffect, useRef, useState } from 'react';
 
 const useStyles = makeStyles(theme => ({
@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flex: '1 1 auto',
     overflow: 'auto',
-    transition: 'width 0.2s ease 0s'
+    transition: 'width 0.1s ease 0s'
   },
   '@global': {
     '*::-webkit-scrollbar': {
@@ -115,7 +115,7 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
         // Reenable text selection.
         _containerEl.style.userSelect = 'inherit';
         // reset the transition effect when no longer resizing.
-        _rightEl.style.transition = 'width 0.2s ease 0s';
+        _rightEl.style.transition = 'width 0.1s ease 0s';
       }
     };
 
@@ -249,7 +249,7 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
   return (
     <div ref={containerEl} className={classes.container}>
       <div ref={leftEl} className={classes.left}>
-        <Box flex={1}>{left}</Box>
+        <div style={{ flex: '1 1 auto' }}>{left}</div>
       </div>
       {right && rightOpen ? <div ref={anchorEl} className={classes.anchor} /> : null}
       <div ref={rightEl} className={classes.right}>

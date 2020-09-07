@@ -5,7 +5,6 @@ import React, { useState } from 'react';
 import { AutoSizer, IndexRange, InfiniteLoader, List } from 'react-virtualized';
 
 const useStyles = makeStyles(theme => ({
-  list: {},
   listItem: {
     padding: theme.spacing(2),
     wordBreak: 'break-all',
@@ -134,30 +133,84 @@ export default function InfiniteList<I extends InfiniteListItem>({
   };
 
   //
+  // return (
+  //   <AutoSizer>
+  //     {({ width, height }) => {
+  //       return (
+  //         <Box onKeyDown={onKeyDown}>
+  //           <List
+  //             // ref={registerChild}
+  //             // onRowsRendered={onRowsRendered}
+  //             rowRenderer={rowRenderer}
+  //             rowCount={items.length}
+  //             height={height}
+  //             rowHeight={rowHeight}
+  //             rowWidth={width}
+  //             width={width}
+  //             style={{ outline: 'none' }}
+  //             on
+  //           />
+  //         </Box>
+  //       );
+  //     }}
+  //   </AutoSizer>
+  // );
+
+  //
+
+  //
   return (
-    <AutoSizer>
-      {({ width, height }) => {
-        return (
-          <InfiniteLoader isRowLoaded={isRowLoaded} loadMoreRows={loadMoreRows} rowCount={totalCount}>
-            {({ onRowsRendered, registerChild }) => (
-              <Box onKeyDown={onKeyDown}>
-                <List
-                  ref={registerChild}
-                  onRowsRendered={onRowsRendered}
-                  rowRenderer={rowRenderer}
-                  rowCount={items.length}
-                  height={height}
-                  rowHeight={rowHeight}
-                  rowWidth={width}
-                  width={width}
-                  style={{ outline: 'none' }}
-                  on
-                />
-              </Box>
-            )}
-          </InfiniteLoader>
-        );
-      }}
-    </AutoSizer>
+    <InfiniteLoader isRowLoaded={isRowLoaded} loadMoreRows={loadMoreRows} rowCount={totalCount}>
+      {({ onRowsRendered, registerChild }) => (
+        <AutoSizer>
+          {({ height, width }) => (
+            <Box onKeyDown={onKeyDown}>
+              <List
+                ref={registerChild}
+                onRowsRendered={onRowsRendered}
+                rowRenderer={rowRenderer}
+                rowCount={items.length}
+                height={height}
+                rowHeight={rowHeight}
+                rowWidth={width}
+                width={width}
+                style={{ outline: 'none' }}
+                on
+              />
+            </Box>
+          )}
+        </AutoSizer>
+      )}
+    </InfiniteLoader>
   );
+
+  //
+  // return (
+  //   <div style={{ flex: '1 1 auto', width: '100%' }}>
+  //     <AutoSizer>
+  //       {({ width, height }) => {
+  //         return (
+  //           <InfiniteLoader isRowLoaded={isRowLoaded} loadMoreRows={loadMoreRows} rowCount={totalCount}>
+  //             {({ onRowsRendered, registerChild }) => (
+  //               <Box onKeyDown={onKeyDown}>
+  //                 <List
+  //                   ref={registerChild}
+  //                   onRowsRendered={onRowsRendered}
+  //                   rowRenderer={rowRenderer}
+  //                   rowCount={items.length}
+  //                   height={height}
+  //                   rowHeight={rowHeight}
+  //                   rowWidth={width}
+  //                   width={width}
+  //                   style={{ outline: 'none' }}
+  //                   on
+  //                 />
+  //               </Box>
+  //             )}
+  //           </InfiniteLoader>
+  //         );
+  //       }}
+  //     </AutoSizer>
+  //   </div>
+  // );
 }

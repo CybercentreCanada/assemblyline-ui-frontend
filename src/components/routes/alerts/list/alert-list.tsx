@@ -1,4 +1,4 @@
-import List, { ListPage } from 'components/elements/list';
+import List, { ListPage } from 'components/elements/lists/list';
 import AlertListItem from 'components/routes/alerts/list/alert-list-item';
 import { AlertItem } from 'components/routes/alerts/useAlerts';
 import React from 'react';
