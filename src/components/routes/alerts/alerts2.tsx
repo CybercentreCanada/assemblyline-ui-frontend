@@ -1,5 +1,5 @@
 import { useTheme } from '@material-ui/core';
-import VirtualizedList from 'components/elements/virtualized-list';
+import VirtualizedList from 'components/elements/lists/virtualized-list';
 import React, { useState } from 'react';
 import AlertListItem from './list/alert-list-item';
 import useAlerts from './useAlerts';

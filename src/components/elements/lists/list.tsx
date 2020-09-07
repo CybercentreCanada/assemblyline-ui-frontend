@@ -174,7 +174,7 @@ export default function List<I extends ListItemProps>({
   //     onPreviousPage();
   //     target.scrollTo({ top: sH - 1 });
   //   }
-  // };
+  // };.
 
   // Ensure the list element at specified position is into view.
   const scrollSelection = (target: HTMLDivElement, position: number) => {

@@ -107,14 +107,12 @@ export default function InfiniteList<I extends InfiniteListItem>({
     // We'll process on event every 10ms and throw away the rest.
     throttler.throttle(() => {
       if (isArrowUp(keyCode)) {
-        console.log('keyup');
         const nextIndex = cursor - 1;
         if (nextIndex > -1) {
           setCursor(nextIndex);
           scrollSelection(target, nextIndex);
         }
       } else if (isArrowDown(keyCode)) {
-        console.log('keydown');
         const nextIndex = cursor + 1;
         if (nextIndex < items.length) {
           setCursor(nextIndex);
@@ -132,33 +130,6 @@ export default function InfiniteList<I extends InfiniteListItem>({
     }
   };
 
-  //
-  // return (
-  //   <AutoSizer>
-  //     {({ width, height }) => {
-  //       return (
-  //         <Box onKeyDown={onKeyDown}>
-  //           <List
-  //             // ref={registerChild}
-  //             // onRowsRendered={onRowsRendered}
-  //             rowRenderer={rowRenderer}
-  //             rowCount={items.length}
-  //             height={height}
-  //             rowHeight={rowHeight}
-  //             rowWidth={width}
-  //             width={width}
-  //             style={{ outline: 'none' }}
-  //             on
-  //           />
-  //         </Box>
-  //       );
-  //     }}
-  //   </AutoSizer>
-  // );
-
-  //
-
-  //
   return (
     <InfiniteLoader isRowLoaded={isRowLoaded} loadMoreRows={loadMoreRows} rowCount={totalCount}>
       {({ onRowsRendered, registerChild }) => (
@@ -183,34 +154,4 @@ export default function InfiniteList<I extends InfiniteListItem>({
       )}
     </InfiniteLoader>
   );
-
-  //
-  // return (
-  //   <div style={{ flex: '1 1 auto', width: '100%' }}>
-  //     <AutoSizer>
-  //       {({ width, height }) => {
-  //         return (
-  //           <InfiniteLoader isRowLoaded={isRowLoaded} loadMoreRows={loadMoreRows} rowCount={totalCount}>
-  //             {({ onRowsRendered, registerChild }) => (
-  //               <Box onKeyDown={onKeyDown}>
-  //                 <List
-  //                   ref={registerChild}
-  //                   onRowsRendered={onRowsRendered}
-  //                   rowRenderer={rowRenderer}
-  //                   rowCount={items.length}
-  //                   height={height}
-  //                   rowHeight={rowHeight}
-  //                   rowWidth={width}
-  //                   width={width}
-  //                   style={{ outline: 'none' }}
-  //                   on
-  //                 />
-  //               </Box>
-  //             )}
-  //           </InfiniteLoader>
-  //         );
-  //       }}
-  //     </AutoSizer>
-  //   </div>
-  // );
 }

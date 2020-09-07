@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flex: '1 1 auto',
     overflow: 'auto',
-    transition: 'width 0.1s ease 0s'
+    transition: 'width 0.2s ease 0'
   },
   '@global': {
     '*::-webkit-scrollbar': {
@@ -115,7 +115,7 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
         // Reenable text selection.
         _containerEl.style.userSelect = 'inherit';
         // reset the transition effect when no longer resizing.
-        _rightEl.style.transition = 'width 0.1s ease 0s';
+        _rightEl.style.transition = 'width 0.2s ease 0s';
       }
     };
 
@@ -246,10 +246,12 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
   }
 
   // Default split panel layout.
+  console.log(right);
   return (
     <div ref={containerEl} className={classes.container}>
       <div ref={leftEl} className={classes.left}>
         <div style={{ flex: '1 1 auto' }}>{left}</div>
+        {/* {left} */}
       </div>
       {right && rightOpen ? <div ref={anchorEl} className={classes.anchor} /> : null}
       <div ref={rightEl} className={classes.right}>

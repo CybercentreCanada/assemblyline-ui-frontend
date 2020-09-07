@@ -19,11 +19,10 @@ const Alerts: React.FC = () => {
   const [drawer, setDrawer] = useState<{ open: boolean; type: 'filter' }>({ open: false, type: null });
 
   const rowRenderer = item => (
-    // <Box>
-    //   <Typography variant="h6">{item.id}</Typography>
-    //   <AlertListItem item={item} />
-    // </Box>
-    <AlertListItem item={item} />
+    <Box>
+      <Typography variant="h6">{item.id}</Typography>
+      <AlertListItem item={item} />
+    </Box>
   );
 
   console.log(`open[${state.open}],item[${state.selectedItem}]`);
@@ -49,8 +48,8 @@ const Alerts: React.FC = () => {
             <InfiniteList
               items={items}
               loading={loading}
-              totalCount={12}
-              rowHeight={97}
+              totalCount={100}
+              rowHeight={130}
               selected={state.open && state.selectedItem ? state.selectedItem : null}
               onItemSelected={(item: AlertItem) => setState({ open: true, selectedItem: item })}
               onNextPage={onNextPage}
