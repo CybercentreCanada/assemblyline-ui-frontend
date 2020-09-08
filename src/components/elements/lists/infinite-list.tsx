@@ -1,5 +1,5 @@
 import { Box, Divider, makeStyles } from '@material-ui/core';
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 
 const useStyles = makeStyles(theme => ({
   infiniteListCt: {
@@ -55,16 +55,6 @@ export default function InfiniteList<I extends InfiniteListItem>({
   // Element references.
   const containerEl = useRef<HTMLDivElement>();
   const innerEl = useRef<HTMLDivElement>();
-
-  //
-  // const frameRef = useRef<{ top: number; frame: number; bottom: number; startIndex; endIndex }>();
-  const [frameState, setFrameState] = useState<{
-    top: number;
-    frame: number;
-    bottom: number;
-    startIndex: number;
-    endIndex: number;
-  }>({ top: 200, frame: 200, bottom: 200, startIndex: 0, endIndex: 0 });
 
   // Render children relative to top
   // Row renderer.
