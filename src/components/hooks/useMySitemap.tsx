@@ -108,8 +108,8 @@ export default function useMySitemap() {
       },
       { path: '/help/search', title: t('drawer.help.search'), icon: <SearchIcon />, breadcrumbs: ['/help'] },
       {
-        path: '/help/service',
-        title: t('drawer.help.service'),
+        path: '/help/services',
+        title: t('drawer.help.services'),
         icon: <AccountTreeOutlinedIcon />,
         breadcrumbs: ['/help']
       },

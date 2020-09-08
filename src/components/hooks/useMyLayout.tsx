@@ -194,10 +194,10 @@ const useMyLayout = (): AppLayoutProps => {
             nested: true
           },
           {
-            id: 'help.service',
-            text: t('drawer.help.service'),
+            id: 'help.services',
+            text: t('drawer.help.services'),
             icon: <AccountTreeOutlinedIcon />,
-            route: '/help/service',
+            route: '/help/services',
             nested: true
           }
         ]

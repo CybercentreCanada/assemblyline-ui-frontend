@@ -6,6 +6,7 @@ import Dashboard from 'components/routes/dashboard';
 import Help from 'components/routes/help';
 import Logout from 'components/routes/logout';
 import Manage from 'components/routes/manage';
+import Services from 'components/routes/services';
 import Settings from 'components/routes/settings';
 import Submissions from 'components/routes/submission';
 import Submit from 'components/routes/submit';
@@ -24,6 +25,7 @@ const Routes = () => {
       <Route exact path="/admin/users/:id" component={User} />
       <Route exact path="/dashboard" component={Dashboard} />
       <Route exact path="/help" component={Help} />
+      <Route exact path="/help/services" component={Services} />
       <Route exact path="/logout" component={Logout} />
       <Route exact path="/manage" component={Manage} />
       <Route exact path="/settings" component={Settings} />
