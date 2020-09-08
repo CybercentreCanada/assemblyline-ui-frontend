@@ -1,7 +1,6 @@
 import { InfiniteListItem } from 'components/elements/lists/infinite-list';
 import { ListItemProps } from 'components/elements/lists/list';
 import { VirtualizedListItem } from 'components/elements/lists/virtualized-list';
-import useMyAPI from 'components/hooks/useMyAPI';
 import { useEffect, useState } from 'react';
 
 export type AlertFile = {
@@ -58,14 +57,10 @@ interface UsingAlerts {
 }
 
 export default function useAlerts(): UsingAlerts {
-  const apiCall = useMyAPI();
-
   const [state, setState] = useState<{ loading: boolean; items: AlertItem[] }>({
     loading: true,
     items: []
   });
-
-  console.log('...useAlerts');
 
   useEffect(() => {
     fetch('/api/v4/alert/grouped/<group_by>/')

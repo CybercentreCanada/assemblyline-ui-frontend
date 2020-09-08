@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import { Box, Divider, makeStyles } from '@material-ui/core';
+import { Box, Divider, LinearProgress, makeStyles } from '@material-ui/core';
 import { isArrowDown, isArrowUp, isEnter, isEscape } from 'components/elements/keyboard';
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import Throttler from '../throttler';
@@ -10,7 +10,6 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'row',
     width: '100%',
-
     position: 'relative',
     overflow: 'auto',
     outline: 'none'
@@ -34,6 +33,19 @@ const useStyles = makeStyles(theme => ({
     '&[data-listitemselected="true"]': {
       backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 15%)' : 'hsl(0, 0%, 92%)'
     }
+  },
+  progressCt: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    opacity: 0.7,
+    zIndex: 1,
+    backgroundColor: theme.palette.background.default
+  },
+  progressSpinner: {
+    height: '10px'
   }
 }));
 
@@ -55,7 +67,7 @@ interface InfiniteListProps<I extends InfiniteListItem> {
   rowHeight: number;
   onItemSelected: (item: I) => void;
   onRenderItem: (item: InfiniteListItem) => React.ReactNode;
-  onNextPage: (startIndex: number, stopIndex: number) => Promise<any>;
+  onMoreItems: (startIndex: number, stopIndex: number) => Promise<any>;
 }
 
 InfiniteList.defaultProps = {
@@ -69,7 +81,7 @@ export default function InfiniteList<I extends InfiniteListItem>({
   rowHeight,
   onItemSelected,
   onRenderItem,
-  onNextPage
+  onMoreItems
 }: InfiniteListProps<I>) {
   // Styles.
   const classes = useStyles();
@@ -106,17 +118,16 @@ export default function InfiniteList<I extends InfiniteListItem>({
 
   // Handler::OnScroll
   const onScroll = (event: React.UIEvent<HTMLElement>) => {
+    console.log('scrolling..');
     const _frame = computeFrame(items, rowHeight);
     setFrame(_frame);
     if (_frame.rH === 0) {
-      console.log('fetching next page of items...');
-      onNextPage(items.length, items.length + 10);
+      onMoreItems(items.length, items.length + 10);
     }
   };
 
   // Handler::OnScroll
   const onKeyDown = (event: React.KeyboardEvent) => {
-    console.log(event);
     event.preventDefault();
     const { keyCode } = event;
     if (isArrowUp(keyCode) || isArrowDown(keyCode)) {
@@ -156,7 +167,7 @@ export default function InfiniteList<I extends InfiniteListItem>({
 
   // Ensure the list element at specified position is into view.
   const scrollSelection = (target: HTMLDivElement, position: number, direction: 'up' | 'down') => {
-    const scrollToEl = target.querySelector(`[data-listposition="${position}"`);
+    const scrollToEl = target.querySelector(`[data-listposition="${position}]"`);
     if (scrollToEl) {
       scrollToEl.scrollIntoView({ block: 'nearest' });
     } else {
@@ -206,16 +217,33 @@ export default function InfiniteList<I extends InfiniteListItem>({
     // initialize/update scrolling container height.
     innerEl.current.style.height = `${items.length * rowHeight}px`;
 
+    //
+    const firstItem = innerEl.current.querySelector('[data-listposition="0"]');
+    if (firstItem) {
+      console.log(firstItem.getBoundingClientRect().height);
+    }
+
     // compute which items are within visual frame.
     setFrame(computeFrame(items, rowHeight));
   }, [items, rowHeight]);
 
-  //
   return (
     <div ref={containerEl} className={classes.infiniteListCt} tabIndex={-1} onScroll={onScroll} onKeyDown={onKeyDown}>
+      {loading ? (
+        <div className={classes.progressCt} style={{ top: frame.sT, height: frame.fH }}>
+          <LinearProgress className={classes.progressSpinner} />
+        </div>
+      ) : null}
       <div ref={innerEl} className={classes.infiniteListInnerCt}>
         {frame.displayItems.map(item => rowRenderer(item))}
       </div>
     </div>
   );
+  // return (
+  //   <div ref={containerEl} className={classes.infiniteListCt} tabIndex={-1} onScroll={onScroll} onKeyDown={onKeyDown}>
+  //     <div ref={innerEl} className={classes.infiniteListInnerCt}>
+  //       {frame.displayItems.map(item => rowRenderer(item))}.
+  //     </div>
+  //   </div>
+  // );
 }

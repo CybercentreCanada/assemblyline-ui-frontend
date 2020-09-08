@@ -122,7 +122,7 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
     // Event: containerEl[mousemove]
     const onAnchorMM = (event: MouseEvent) => {
       if (mouseDownRef.current) {
-        console.log(`moved by: ${event.movementX}`);
+        // console.log(`moved by: ${event.movementX}`);
         updateLayout(leftSizeRef.current + event.movementX);
       }
     };
@@ -246,7 +246,6 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
   }
 
   // Default split panel layout.
-  console.log(right);
   return (
     <div ref={containerEl} className={classes.container}>
       <div ref={leftEl} className={classes.left}>

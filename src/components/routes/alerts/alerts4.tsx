@@ -49,7 +49,7 @@ const Alerts: React.FC = () => {
               rowHeight={130}
               selected={state.open && state.selectedItem ? state.selectedItem : null}
               onItemSelected={(item: AlertItem) => setState({ open: true, selectedItem: item })}
-              onNextPage={onNextPage}
+              onMoreItems={onNextPage}
               onRenderItem={rowRenderer}
             />
           }
