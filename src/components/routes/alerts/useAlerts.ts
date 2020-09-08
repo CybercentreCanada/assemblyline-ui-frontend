@@ -1,5 +1,5 @@
 import { InfiniteListItem } from 'components/elements/lists/infinite-list';
-import { ListItemProps, ListPage } from 'components/elements/lists/list';
+import { ListItemProps } from 'components/elements/lists/list';
 import { VirtualizedListItem } from 'components/elements/lists/virtualized-list';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { useEffect, useState } from 'react';
@@ -53,35 +53,21 @@ export interface AlertItem extends ListItemProps, VirtualizedListItem, InfiniteL
 
 interface UsingAlerts {
   loading: boolean;
-  page: ListPage<AlertItem>;
   items: AlertItem[];
-  nextPage: () => void;
-  previousPage: () => void;
   onNextPage: (startIndex: number, stopIndex: number) => Promise<any>;
 }
 
 export default function useAlerts(): UsingAlerts {
   const apiCall = useMyAPI();
-  const [state, setState] = useState<{ loading: boolean; page: ListPage<AlertItem> }>({
-    loading: false,
-    page: { index: -1, items: [] }
-  });
 
-  const [vState, setVState] = useState<{ loading: boolean; items: AlertItem[] }>({
+  const [state, setState] = useState<{ loading: boolean; items: AlertItem[] }>({
     loading: true,
     items: []
   });
 
-  useEffect(() => {
-    apiCall({
-      url: '/api/v4/alert/grouped/<group_by>/',
-      method: 'get',
-      onSuccess: response => {
-        const _alerts = response.api_response.items.map(item => ({ ...item, id: item.sid }));
-        setState({ loading: false, page: { index: 0, items: _alerts } });
-      }
-    });
+  console.log('...useAlerts');
 
+  useEffect(() => {
     fetch('/api/v4/alert/grouped/<group_by>/')
       .then(res => res.json())
       .then(api_data => {
@@ -92,45 +78,13 @@ export default function useAlerts(): UsingAlerts {
           item.id = i;
         });
 
-        setVState({ loading: false, items: _sliced });
+        setState({ loading: false, items: _sliced });
       });
-  }, [apiCall, setState]);
-
-  const nextPage = () => {
-    console.log(`loading nextpage:  ${state.page.index + 1}`);
-    setState({ ...state, loading: true });
-    setTimeout(() => {
-      apiCall({
-        url: '/api/v4/alert/grouped/<group_by>/',
-        method: 'get',
-        onSuccess: response => {
-          const _alerts = response.api_response.items.map(item => ({ ...item, id: item.sid }));
-          setState({ loading: false, page: { index: state.page.index + 1, items: _alerts } });
-        }
-      });
-    }, 1000);
-  };
-
-  const previousPage = () => {
-    if (state.page.index > 0) {
-      console.log(`loading previouspage:  ${state.page.index + 1}`);
-      setState({ ...state, loading: true });
-      setTimeout(() => {
-        apiCall({
-          url: '/api/v4/alert/grouped/<group_by>/',
-          method: 'get',
-          onSuccess: response => {
-            const _alerts = response.api_response.items.map(item => ({ ...item, id: item.sid }));
-            setState({ loading: false, page: { index: state.page.index - 1, items: _alerts } });
-          }
-        });
-      }, 1000);
-    }
-  };
+  }, []);
 
   const onNextPage = (startIndex: number, stopIndex: number): Promise<any> => {
     console.log(`fetching[${startIndex},${stopIndex}]`);
-    setVState({ ...vState, loading: true });
+    setState({ ...state, loading: true });
     return fetch('/api/v4/alert/grouped/<group_by>/')
       .then(res => res.json())
       .then(api_data => {
@@ -143,9 +97,11 @@ export default function useAlerts(): UsingAlerts {
           item.id = startIndex + i;
         });
 
-        setVState({ loading: false, items: [...vState.items, ..._sliced] });
+        setTimeout(() => {
+          setState({ loading: false, items: [...state.items, ..._sliced] });
+        }, 1000);
       });
   };
 
-  return { ...state, ...vState, nextPage, previousPage, onNextPage };
+  return { ...state, onNextPage };
 }

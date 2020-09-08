@@ -25,21 +25,6 @@ const Alerts: React.FC = () => {
     </Box>
   );
 
-  //
-  // return (
-  //   <Viewport>
-  //     <InfiniteList
-  //       items={items}
-  //       loading={loading}
-  //       rowHeight={130}
-  //       // selected={state.open && state.selectedItem ? state.selectedItem : null}
-  //       onItemSelected={(item: AlertItem) => setState({ open: true, selectedItem: item })}
-  //       onNextPage={onNextPage}
-  //       onRenderItem={rowRenderer}
-  //     />
-  //   </Viewport>
-  // );
-
   return (
     <Box>
       <Box pb={theme.spacing(0.25)}>
@@ -62,7 +47,7 @@ const Alerts: React.FC = () => {
               items={items}
               loading={loading}
               rowHeight={130}
-              // selected={state.open && state.selectedItem ? state.selectedItem : null}
+              selected={state.open && state.selectedItem ? state.selectedItem : null}
               onItemSelected={(item: AlertItem) => setState({ open: true, selectedItem: item })}
               onNextPage={onNextPage}
               onRenderItem={rowRenderer}

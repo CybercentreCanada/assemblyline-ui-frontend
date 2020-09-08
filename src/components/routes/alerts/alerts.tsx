@@ -7,32 +7,19 @@ import useAlerts from './useAlerts';
 
 const Alerts: React.FC = () => {
   const theme = useTheme();
-  const { loading, page, nextPage, previousPage } = useAlerts();
+  const { loading, items } = useAlerts();
   const [drawer, setDrawer] = useState<{ open: boolean; type: 'filter' }>({ open: false, type: null });
 
-  // const onListNextPage = () => nextPage();
-
-  // const onListPreviousPage = () => previousPage;.
-
-  // console.log(`current page: ${page.index}`);
-  // return (
-  //   <VirutalizedList
-  //     items={page.items}
-  //     loaded={!loading}
-  //     onNextPage={nextPage}
-  //     onRenderItem={i => <AlertListItem item={i} />}
-  //   />
-  // );
-
+  //
   return (
     <Box>
       <Box pb={theme.spacing(0.25)}>
         <AlertsHeader
-          onFilterBtnClick={() => console.log('filter...')}
+          onFilterBtnClick={() => console.log('filter....')}
           onExpandBtnClick={() => setDrawer({ open: true, type: 'filter' })}
         />
       </Box>
-      <AlertsSplitPanel loading={loading} page={page} onListNextPage={nextPage} onListPreviousPage={previousPage} />
+      <AlertsSplitPanel loading={loading} items={items} />
       <Drawer open={drawer.open} anchor="right" onClose={() => setDrawer({ ...drawer, open: false })}>
         {
           {

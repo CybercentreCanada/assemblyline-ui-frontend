@@ -1,5 +1,8 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 import { Box, Divider, makeStyles } from '@material-ui/core';
+import { isArrowDown, isArrowUp, isEnter, isEscape } from 'components/elements/keyboard';
 import React, { useLayoutEffect, useRef, useState } from 'react';
+import Throttler from '../throttler';
 
 const useStyles = makeStyles(theme => ({
   infiniteListCt: {
@@ -10,7 +13,6 @@ const useStyles = makeStyles(theme => ({
 
     position: 'relative',
     overflow: 'auto',
-    // height: '500px'
     outline: 'none'
   },
   infiniteListInnerCt: {
@@ -49,15 +51,21 @@ export interface InfiniteListItem {
 interface InfiniteListProps<I extends InfiniteListItem> {
   loading: boolean;
   items: I[];
+  selected?: I;
   rowHeight: number;
   onItemSelected: (item: I) => void;
   onRenderItem: (item: InfiniteListItem) => React.ReactNode;
   onNextPage: (startIndex: number, stopIndex: number) => Promise<any>;
 }
 
+InfiniteList.defaultProps = {
+  selected: null
+};
+
 export default function InfiniteList<I extends InfiniteListItem>({
   loading,
   items,
+  selected,
   rowHeight,
   onItemSelected,
   onRenderItem,
@@ -72,6 +80,12 @@ export default function InfiniteList<I extends InfiniteListItem>({
 
   // Store the current frame in state.
   const [frame, setFrame] = useState<InfiniteListFrame<I>>({ displayItems: [], sT: -1, fH: -1, rH: -1 });
+
+  // Cursor position for keyboard navigation.
+  const [cursor, setCursor] = useState<number>(-1);
+
+  // Function throttler to streamline keydown event handlers.
+  const throttler = new Throttler(10);
 
   // Compute the frame of items within visual range.
   const computeFrame = (_items: I[], _rowHeight: number): InfiniteListFrame<I> => {
@@ -100,6 +114,63 @@ export default function InfiniteList<I extends InfiniteListItem>({
     }
   };
 
+  // Handler::OnScroll
+  const onKeyDown = (event: React.KeyboardEvent) => {
+    console.log(event);
+    event.preventDefault();
+    const { keyCode } = event;
+    if (isArrowUp(keyCode) || isArrowDown(keyCode)) {
+      // Here we handle our custom scrolls and cursor item selection.
+      _onKeyDownThrottled(keyCode, event.currentTarget as HTMLDivElement);
+    } else if (isEnter(keyCode)) {
+      // [ENTER]: select the cursor item.
+      onItemSelected(items[cursor]);
+    } else if (isEscape(keyCode)) {
+      // [ENTER]: select the cursor item.
+      onItemSelected(null);
+    }
+    // TODO: handle[PageUp,PageDown ]
+  };
+
+  //
+  const _onKeyDownThrottled = (keyCode: number, target: HTMLDivElement) => {
+    // This will ensure that users who hold down UP/DOWN arrow key don't overload
+    //  react with constant stream of keydown events.
+    // We'll process on event every 10ms and throw away the rest.
+    throttler.throttle(() => {
+      if (isArrowUp(keyCode)) {
+        const nextIndex = cursor - 1;
+        if (nextIndex > -1) {
+          setCursor(nextIndex);
+          scrollSelection(target, nextIndex, 'up');
+        }
+      } else if (isArrowDown(keyCode)) {
+        const nextIndex = cursor + 1;
+        if (nextIndex < items.length) {
+          setCursor(nextIndex);
+        }
+        scrollSelection(target, nextIndex, 'down');
+      }
+    });
+  };
+
+  // Ensure the list element at specified position is into view.
+  const scrollSelection = (target: HTMLDivElement, position: number, direction: 'up' | 'down') => {
+    const scrollToEl = target.querySelector(`[data-listposition="${position}"`);
+    if (scrollToEl) {
+      scrollToEl.scrollIntoView({ block: 'nearest' });
+    } else {
+      // Items might not be rendered yet because of we only render what's
+      //  within visual range.
+      containerEl.current.scrollBy({ top: direction === 'down' ? rowHeight : -rowHeight });
+    }
+  };
+
+  const onItemClick = ({ item, index }: { index: number; item: I }) => {
+    setCursor(index);
+    onItemSelected(item);
+  };
+
   // Row renderer.
   // Each item is absolutely positioned relative to the top of the innerContainer
   //  in order to ensure that it lines up with the current scrolling range.
@@ -108,7 +179,7 @@ export default function InfiniteList<I extends InfiniteListItem>({
       <Box
         mr={0}
         key={`listitem[${displayItem.index}].id[${displayItem.item.id}]`}
-        onClick={() => onItemSelected(displayItem.item)}
+        onClick={() => onItemClick(displayItem)}
         style={{
           top: displayItem.index * rowHeight,
           left: 0,
@@ -117,7 +188,12 @@ export default function InfiniteList<I extends InfiniteListItem>({
           height: rowHeight
         }}
       >
-        <Box className={classes.listItem} data-listposition={displayItem.index}>
+        <Box
+          className={classes.listItem}
+          data-listposition={displayItem.index}
+          data-listitemselected={displayItem.item === selected}
+          data-listitemfocus={displayItem.index === cursor}
+        >
           {onRenderItem(displayItem.item)}
         </Box>
         <Divider />
@@ -136,7 +212,7 @@ export default function InfiniteList<I extends InfiniteListItem>({
 
   //
   return (
-    <div ref={containerEl} className={classes.infiniteListCt} tabIndex={-1} onScroll={onScroll}>
+    <div ref={containerEl} className={classes.infiniteListCt} tabIndex={-1} onScroll={onScroll} onKeyDown={onKeyDown}>
       <div ref={innerEl} className={classes.infiniteListInnerCt}>
         {frame.displayItems.map(item => rowRenderer(item))}
       </div>

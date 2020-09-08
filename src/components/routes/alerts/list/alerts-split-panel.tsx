@@ -2,7 +2,6 @@ import { Box, Typography, useTheme } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import { isEscape } from 'components/elements/keyboard';
-import { ListPage } from 'components/elements/lists/list';
 import SplitPanel from 'components/elements/split-panel';
 import Viewport from 'components/elements/viewport';
 import AlertActionsMenu from 'components/routes/alerts/alert-actions-menu';
@@ -13,24 +12,15 @@ import AlertList from './alert-list';
 
 type AlertsSplitPanelProps = {
   loading?: boolean;
-  page: ListPage<AlertItem>;
-  onListNextPage: () => void;
-  onListPreviousPage: () => void;
+  items: AlertItem[];
 };
 
-const AlertsSplitPanel: React.FC<AlertsSplitPanelProps> = ({
-  loading = false,
-  page,
-  onListNextPage,
-  onListPreviousPage
-}) => {
+const AlertsSplitPanel: React.FC<AlertsSplitPanelProps> = ({ loading = false, items }) => {
   const theme = useTheme();
   const [state, setState] = useState<{ open: boolean; item: AlertItem }>({ open: false, item: null });
 
   const onListKeyDown = keyCode => {
-    console.log(keyCode);
     if (isEscape(keyCode) && state.open) {
-      console.log('closing...');
       setState({ ...state, open: false });
     }
   };
@@ -49,15 +39,13 @@ const AlertsSplitPanel: React.FC<AlertsSplitPanelProps> = ({
           <AlertList
             loading={loading}
             selected={state.open && state.item ? state.item.id : -1}
-            page={page}
+            items={items}
             onSelection={item => {
               console.log('selected..');
               console.log(item);
               setState({ open: true, item });
             }}
             onKeyDown={onListKeyDown}
-            onNextPage={onListNextPage}
-            onPreviousPage={onListPreviousPage}
           />
         }
         right={
