@@ -35,6 +35,13 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+interface InfiniteListFrame<I extends InfiniteListItem> {
+  sT: number;
+  fH: number;
+  rH: number;
+  displayItems: { index: number; item: I }[];
+}
+
 export interface InfiniteListItem {
   id: number | string;
 }
@@ -63,9 +70,11 @@ export default function InfiniteList<I extends InfiniteListItem>({
   const containerEl = useRef<HTMLDivElement>();
   const innerEl = useRef<HTMLDivElement>();
 
-  const [frame, setFrame] = useState<{ index: number; item: I }[]>([]);
+  // Store the current frame in state.
+  const [frame, setFrame] = useState<InfiniteListFrame<I>>({ displayItems: [], sT: -1, fH: -1, rH: -1 });
 
-  const computeFrame = (_items: I[], _rowHeight: number) => {
+  // Compute the frame of items within visual range.
+  const computeFrame = (_items: I[], _rowHeight: number): InfiniteListFrame<I> => {
     const { current: _containerEl } = containerEl;
     const { current: _innerEl } = innerEl;
     const tH = _innerEl.getBoundingClientRect().height;
@@ -73,50 +82,27 @@ export default function InfiniteList<I extends InfiniteListItem>({
     const sT = _containerEl.scrollTop;
     const cP = fH + sT;
     const rH = tH - cP;
-
     const itemCount = Math.ceil(fH / _rowHeight);
-
     const topIndex = Math.floor(sT / _rowHeight);
-
-    console.log(`${topIndex}-${topIndex + itemCount}`);
-
     const displayItems = _items
       .slice(topIndex, topIndex + itemCount)
       .map((item, index) => ({ index: topIndex + index, item }));
-
-    return { displayItems, rH };
+    return { displayItems, sT, rH, fH };
   };
 
-  //
+  // Handler::OnScroll
   const onScroll = (event: React.UIEvent<HTMLElement>) => {
-    // const tH = innerEl.current.getBoundingClientRect().height;
-    // const fH = containerEl.current.getBoundingClientRect().height;
-    // const sT = event.currentTarget.scrollTop;
-    // const cP = fH + sT;
-    // const rH = tH - cP;
-
-    // const itemCount = Math.ceil(fH / rowHeight);
-
-    // const topIndex = Math.floor(sT / rowHeight);
-
-    // console.log(`${topIndex}-${topIndex + itemCount}`);
-
-    // const _items = items
-    //   .slice(topIndex, topIndex + itemCount)
-    //   .map((item, index) => ({ index: topIndex + index, item }));
-
-    const { displayItems, rH } = computeFrame(items, rowHeight);
-
-    setFrame(displayItems);
-
-    if (rH === 0) {
+    const _frame = computeFrame(items, rowHeight);
+    setFrame(_frame);
+    if (_frame.rH === 0) {
       console.log('fetching next page of items...');
       onNextPage(items.length, items.length + 10);
     }
   };
 
-  // Render children relative to top
   // Row renderer.
+  // Each item is absolutely positioned relative to the top of the innerContainer
+  //  in order to ensure that it lines up with the current scrolling range.
   const rowRenderer = (displayItem: { index: number; item: I }) => {
     return (
       <Box
@@ -139,24 +125,20 @@ export default function InfiniteList<I extends InfiniteListItem>({
     );
   };
 
+  // Compute new frame and innerContainer height each time we receive new items.
   useLayoutEffect(() => {
-    // initialize scrolling container height.
+    // initialize/update scrolling container height.
     innerEl.current.style.height = `${items.length * rowHeight}px`;
 
-    const { displayItems } = computeFrame(items, rowHeight);
-    setFrame(displayItems);
-
-    // const fH = containerEl.current.getBoundingClientRect().height;
-
-    // const itemCount = Math.ceil(fH / rowHeight);
-    // setDisplayItems(items.slice(0, itemCount).map((item, index) => ({ index, item })));
-    // console.log(itemCount);
+    // compute which items are within visual frame.
+    setFrame(computeFrame(items, rowHeight));
   }, [items, rowHeight]);
 
+  //
   return (
     <div ref={containerEl} className={classes.infiniteListCt} tabIndex={-1} onScroll={onScroll}>
       <div ref={innerEl} className={classes.infiniteListInnerCt}>
-        {frame.map(item => rowRenderer(item))}
+        {frame.displayItems.map(item => rowRenderer(item))}
       </div>
     </div>
   );
