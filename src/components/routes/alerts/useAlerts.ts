@@ -1,5 +1,6 @@
 import { InfiniteListItem } from 'components/elements/lists/infinite-list';
 import { ListItemProps, ListPage } from 'components/elements/lists/list';
+import { VirtualizedListItem } from 'components/elements/lists/virtualized-list';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { useEffect, useState } from 'react';
 
@@ -12,7 +13,7 @@ export type AlertFile = {
   type: string;
 };
 
-export interface AlertItem extends ListItemProps, InfiniteListItem {
+export interface AlertItem extends ListItemProps, VirtualizedListItem, InfiniteListItem {
   sid: string;
   alert_id: string;
   type: string;
@@ -67,7 +68,7 @@ export default function useAlerts(): UsingAlerts {
   });
 
   const [vState, setVState] = useState<{ loading: boolean; items: AlertItem[] }>({
-    loading: false,
+    loading: true,
     items: []
   });
 

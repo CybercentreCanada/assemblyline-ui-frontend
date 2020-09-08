@@ -1,8 +1,8 @@
 import { useTheme } from '@material-ui/core';
-import VirtualizedList from 'components/elements/lists/virtualized-list';
+import VirtualizedList from 'components/elements/lists/prototype/virtualized-list';
+import AlertListItem from 'components/routes/alerts/list/alert-list-item';
+import useAlerts from 'components/routes/alerts/useAlerts';
 import React, { useState } from 'react';
-import AlertListItem from './list/alert-list-item';
-import useAlerts from './useAlerts';
 
 const Alerts: React.FC = () => {
   const theme = useTheme();

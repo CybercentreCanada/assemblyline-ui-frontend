@@ -1,158 +1,157 @@
+import { Box, Divider, makeStyles } from '@material-ui/core';
+import { isArrowDown, isArrowUp, isEnter, isEscape } from 'components/elements/keyboard';
+import Throttler from 'components/elements/throttler';
 import React, { useState } from 'react';
 import { AutoSizer, IndexRange, InfiniteLoader, List } from 'react-virtualized';
-import Viewport from '../viewport';
-import { ListItemProps } from './list';
 
-// export interface VirtualizedListItemProps {
-//   id: number | string;
-// }
+const useStyles = makeStyles(theme => ({
+  listItem: {
+    padding: theme.spacing(2),
+    wordBreak: 'break-all',
+    '&:hover': {
+      cursor: 'pointer',
+      backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 17%)' : 'hsl(0, 0%, 95%)'
+    },
+    '&[data-listitemfocus="true"]': {
+      backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 17%)' : 'hsl(0, 0%, 95%)'
+    },
+    '&[data-listitemselected="true"]': {
+      backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 15%)' : 'hsl(0, 0%, 92%)'
+    }
+  }
+}));
 
-// export interface VirtualizedListPage<I extends VirtualizedListItemProps> {
-//   index: number;
-//   items: I[];
-// }
-
-interface VirtualizedListProps<I extends ListItemProps> {
-  loaded: boolean;
-  items: I[];
-  onNextPage: () => void;
-  onRenderItem: (item: I) => React.ReactNode;
+export interface VirtualizedListItem {
+  id: number | string;
 }
 
-export default function VirtualizedList<I extends ListItemProps>({
-  loaded,
+interface VirtualizedListProps<I extends VirtualizedListItem> {
+  loading: boolean;
+  items: I[];
+  selected: I;
+  rowHeight: number;
+  totalCount?: number;
+  onItemSelected: (item: I) => void;
+  onRenderItem: (item: I) => React.ReactNode;
+  onNextPage: (startIndex: number, stopIndex: number) => Promise<any>;
+}
+
+VirtualizedList.defaultProps = {
+  totalCount: 10000
+};
+
+export default function VirtualizedList<I extends VirtualizedListItem>({
+  loading,
   items,
-  onNextPage,
-  onRenderItem
+  rowHeight,
+  totalCount,
+  selected,
+  onItemSelected,
+  onRenderItem,
+  onNextPage
 }: VirtualizedListProps<I>) {
   //
-  const [rows, setRows] = useState<{ id: number }[]>([{ id: 0 }]);
-  // const { current: rows } = useRef<{ id: number }[]>([{ id: 0 }]);
+  const classes = useStyles();
+  const [cursor, setCursor] = useState<number>(2);
+
+  // Function throttler to streamline keydown event handlers.
+  const throttler = new Throttler(10);
 
   //
-  // const hasNextPage = true;
+  const isRowLoaded = ({ index }): boolean => {
+    return index < items.length;
+  };
 
-  // If there are more items to be loaded then add an extra row to hold a loading indicator.
-  const rowCount = rows.length;
-
-  // Only load 1 page of items at a time.
-  // Pass an empty callback to InfiniteLoader in case it asks us to load more than once.
-  // const loadMoreRows = !loaded ? () => {} : async () => onNextPage();
+  //
   const loadMoreRows = (params: IndexRange): Promise<any> => {
-    // if (!loaded) {
-    //   return () => {};
-    // }
-    console.log('more rows please...');
-    console.log(params);
-
-    const newRows = [];
-    for (let i = params.startIndex; i <= params.stopIndex; i++) {
-      newRows.push({ id: `new_id.${i}` });
-    }
-
-    // rows.current.push(...newItems);
-    setRows([...rows, ...newRows]);
-    // rows.push(...newRows);
-
-    console.log(rows);
-
-    return Promise.resolve();
+    return onNextPage(params.startIndex, params.stopIndex);
   };
 
-  // Every row is loaded except for our loading indicator row.
-  const isRowLoaded = ({ index }) => {
-    const _loaded = index < rows.length;
-    console.log(`isRowLoaded...${index}: ${_loaded}`);
-    return _loaded;
-  };
-
-  // Render a list item or a loading indicator.
+  //
   const rowRenderer = ({ index, key, style }) => {
-    console.log(`r[${index}:${key}]`);
-    const item = rows[index];
+    const item = items[index];
     return (
-      <div
-        key={key}
-        style={style}
-        // style={{ borderBottom: '1px solid hsl(0, 0%, 15%)', backgroundColor: 'hsl(0, 0%, 20%)', height: 200 }}
-      >
-        <div style={{ borderBottom: '1px solid hsl(0, 0%, 15%)', backgroundColor: 'hsl(0, 0%, 20%)', height: 200 }}>
-          {index}: {item.id}
-        </div>
-      </div>
+      <Box key={key} style={style} onClick={() => onItemSelected(item)}>
+        <Box
+          className={classes.listItem}
+          data-listposition={index}
+          data-listitemselected={item === selected}
+          data-listitemfocus={index === cursor}
+        >
+          {loading ? <span>Loading...</span> : onRenderItem(item)}
+        </Box>
+        <Divider />
+      </Box>
     );
-
-    // return onRenderItem(items[index]);
-    // let content;
-    // if (!isRowLoaded({ index })) {
-    //   content = 'Loading...';
-    // } else {
-    //   content = list.getIn([index, 'name']);
-    // }
-
-    // return (
-    //   <div key={key} style={style}>
-    //     {content}
-    //   </div>
-    // );
   };
 
-  // return (
-  //   <AutoSizer>
-  //     {({ width, height }) => {
-  //       return (
-  //         <List
-  //           width={width}
-  //           height={height}
-  //           rowHeight={rowHeight}
-  //           rowRenderer={this.renderRow}
-  //           rowCount={this.list.length}
-  //           overscanRowCount={3}
-  //         />
-  //       );
-  //     }}
-  //   </AutoSizer>
-  // );..
+  const onKeyDown = (event: React.KeyboardEvent) => {
+    event.preventDefault();
+    const { keyCode } = event;
+    if (isArrowUp(keyCode) || isArrowDown(keyCode)) {
+      // Here we handle our custom scrolls and cursor item selection.
+      _onKeyDownThrottled(keyCode, event.currentTarget as HTMLDivElement);
+    } else if (isEnter(keyCode)) {
+      // [ENTER]: select the cursor item.
+      onItemSelected(items[cursor]);
+    } else if (isEscape(keyCode)) {
+      // [ENTER]: select the cursor item.
+      onItemSelected(null);
+    }
+    // TODO: handle[PageUp,PageDown ]
+  };
+
+  const _onKeyDownThrottled = (keyCode: number, target: HTMLDivElement) => {
+    // This will ensure that users who hold down UP/DOWN arrow key don't overload
+    //  react with constant stream of keydown events.
+    // We'll process on event every 10ms and throw away the rest.
+    throttler.throttle(() => {
+      if (isArrowUp(keyCode)) {
+        const nextIndex = cursor - 1;
+        if (nextIndex > -1) {
+          setCursor(nextIndex);
+          scrollSelection(target, nextIndex);
+        }
+      } else if (isArrowDown(keyCode)) {
+        const nextIndex = cursor + 1;
+        if (nextIndex < items.length) {
+          setCursor(nextIndex);
+          scrollSelection(target, nextIndex);
+        }
+      }
+    });
+  };
+
+  // Ensure the list element at specified position is into view.
+  const scrollSelection = (target: HTMLDivElement, position: number) => {
+    const scrollToEl = target.querySelector(`[data-listposition="${position}"`);
+    if (scrollToEl) {
+      scrollToEl.scrollIntoView({ block: 'nearest' });
+    }
+  };
 
   return (
-    <Viewport>
-      <AutoSizer>
-        {({ width, height }) => {
-          return (
-            <InfiniteLoader isRowLoaded={isRowLoaded} loadMoreRows={loadMoreRows} rowCount={1000}>
-              {({ onRowsRendered, registerChild }) => (
-                <List
-                  ref={registerChild}
-                  onRowsRendered={onRowsRendered}
-                  rowRenderer={rowRenderer}
-                  rowCount={rows.length}
-                  height={height}
-                  rowHeight={200}
-                  rowWidth={1500}
-                  width={width}
-                />
-              )}
-            </InfiniteLoader>
-          );
-        }}
-      </AutoSizer>
-    </Viewport>
+    <InfiniteLoader isRowLoaded={isRowLoaded} loadMoreRows={loadMoreRows} rowCount={totalCount}>
+      {({ onRowsRendered, registerChild }) => (
+        <AutoSizer>
+          {({ height, width }) => (
+            <Box onKeyDown={onKeyDown}>
+              <List
+                ref={registerChild}
+                onRowsRendered={onRowsRendered}
+                rowRenderer={rowRenderer}
+                rowCount={items.length}
+                height={height}
+                rowHeight={rowHeight}
+                rowWidth={width}
+                width={width}
+                style={{ outline: 'none' }}
+                on
+              />
+            </Box>
+          )}
+        </AutoSizer>
+      )}
+    </InfiniteLoader>
   );
-
-  // <InfiniteLoader isRowLoaded={isRowLoaded} loadMoreRows={loadMoreRows} rowCount={1000}>
-  //   {({ onRowsRendered, registerChild }) => (
-  //     <List
-  //       ref={registerChild}
-  //       onRowsRendered={onRowsRendered}
-  //       rowRenderer={rowRenderer}
-  //       rowCount={rows.length}
-  //       height={500}
-  //       rowHeight={200}
-  //       rowWidth={1500}
-  //       width={2000}
-  //     />
-  //   )}
-  // </InfiniteLoader>
-  // );
 }
-// export default VirtualizedList;

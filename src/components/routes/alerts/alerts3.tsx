@@ -1,7 +1,7 @@
 import { Box, Drawer, Typography, useTheme } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
-import InfiniteList from 'components/elements/lists/infinite-list';
+import VirtualizedList from 'components/elements/lists/virtualized-list';
 import SplitPanel from 'components/elements/split-panel';
 import Viewport from 'components/elements/viewport';
 import React, { useState } from 'react';
@@ -45,7 +45,7 @@ const Alerts: React.FC = () => {
           rightDrawerBackgroundColor={theme.palette.background.default}
           rightOpen={state.open}
           left={
-            <InfiniteList
+            <VirtualizedList
               items={items}
               loading={loading}
               totalCount={100}

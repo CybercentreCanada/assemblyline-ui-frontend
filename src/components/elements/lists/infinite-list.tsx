@@ -1,10 +1,17 @@
 import { Box, Divider, makeStyles } from '@material-ui/core';
-import { isArrowDown, isArrowUp, isEnter, isEscape } from 'components/elements/keyboard';
-import Throttler from 'components/elements/throttler';
-import React, { useState } from 'react';
-import { AutoSizer, IndexRange, InfiniteLoader, List } from 'react-virtualized';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 
 const useStyles = makeStyles(theme => ({
+  infiniteListCt: {
+    position: 'relative',
+    overflow: 'auto',
+    height: '500px'
+  },
+  infiniteListInnerCt: {
+    position: 'relative',
+    overflow: 'hidden'
+  },
+
   listItem: {
     padding: theme.spacing(2),
     wordBreak: 'break-all',
@@ -28,130 +35,72 @@ export interface InfiniteListItem {
 interface InfiniteListProps<I extends InfiniteListItem> {
   loading: boolean;
   items: I[];
-  selected: I;
   rowHeight: number;
-  totalCount?: number;
   onItemSelected: (item: I) => void;
-  onRenderItem: (item: I) => React.ReactNode;
+  onRenderItem: (item: InfiniteListItem) => React.ReactNode;
   onNextPage: (startIndex: number, stopIndex: number) => Promise<any>;
 }
-
-InfiniteList.defaultProps = {
-  totalCount: 10000
-};
 
 export default function InfiniteList<I extends InfiniteListItem>({
   loading,
   items,
   rowHeight,
-  totalCount,
-  selected,
   onItemSelected,
   onRenderItem,
   onNextPage
 }: InfiniteListProps<I>) {
-  //
+  // Styles.
   const classes = useStyles();
-  const [cursor, setCursor] = useState<number>(2);
 
-  // Function throttler to streamline keydown event handlers.
-  const throttler = new Throttler(10);
-
-  //
-  const isRowLoaded = ({ index }): boolean => {
-    return index < items.length;
-  };
+  // Element references.
+  const containerEl = useRef<HTMLDivElement>();
+  const innerEl = useRef<HTMLDivElement>();
 
   //
-  const loadMoreRows = (params: IndexRange): Promise<any> => {
-    return onNextPage(params.startIndex, params.stopIndex);
-  };
+  // const frameRef = useRef<{ top: number; frame: number; bottom: number; startIndex; endIndex }>();
+  const [frameState, setFrameState] = useState<{
+    top: number;
+    frame: number;
+    bottom: number;
+    startIndex: number;
+    endIndex: number;
+  }>({ top: 200, frame: 200, bottom: 200, startIndex: 0, endIndex: 0 });
 
-  //
-  const rowRenderer = ({ index, key, style }) => {
-    const item = items[index];
+  // Render children relative to top
+  // Row renderer.
+  const rowRenderer = (item: I, index: number) => {
+    const sT = containerEl.current.scrollTop;
     return (
-      <Box key={key} style={style} onClick={() => onItemSelected(item)}>
-        <Box
-          className={classes.listItem}
-          data-listposition={index}
-          data-listitemselected={item === selected}
-          data-listitemfocus={index === cursor}
-        >
-          {loading ? <span>Loading...</span> : onRenderItem(item)}
+      <Box
+        mr={0}
+        key={`listitem[${index}].id[${item.id}]`}
+        onClick={() => onItemSelected(item)}
+        style={{ top: sT + index * rowHeight, left: 0, position: 'absolute', width: '100%', height: rowHeight }}
+      >
+        <Box className={classes.listItem} data-listposition={index}>
+          {onRenderItem(item)}
         </Box>
         <Divider />
       </Box>
     );
   };
 
-  const onKeyDown = (event: React.KeyboardEvent) => {
-    event.preventDefault();
-    const { keyCode } = event;
-    if (isArrowUp(keyCode) || isArrowDown(keyCode)) {
-      // Here we handle our custom scrolls and cursor item selection.
-      _onKeyDownThrottled(keyCode, event.currentTarget as HTMLDivElement);
-    } else if (isEnter(keyCode)) {
-      // [ENTER]: select the cursor item.
-      onItemSelected(items[cursor]);
-    } else if (isEscape(keyCode)) {
-      // [ENTER]: select the cursor item.
-      onItemSelected(null);
-    }
-    // TODO: handle[PageUp,PageDown ]
-  };
+  useLayoutEffect(() => {
+    innerEl.current.style.height = `${items.length * rowHeight}px`;
 
-  const _onKeyDownThrottled = (keyCode: number, target: HTMLDivElement) => {
-    // This will ensure that users who hold down UP/DOWN arrow key don't overload
-    //  react with constant stream of keydown events.
-    // We'll process on event every 10ms and throw away the rest.
-    throttler.throttle(() => {
-      if (isArrowUp(keyCode)) {
-        const nextIndex = cursor - 1;
-        if (nextIndex > -1) {
-          setCursor(nextIndex);
-          scrollSelection(target, nextIndex);
-        }
-      } else if (isArrowDown(keyCode)) {
-        const nextIndex = cursor + 1;
-        if (nextIndex < items.length) {
-          setCursor(nextIndex);
-          scrollSelection(target, nextIndex);
-        }
-      }
-    });
-  };
+    const fH = containerEl.current.getBoundingClientRect().height;
+    console.log(fH);
 
-  // Ensure the list element at specified position is into view.
-  const scrollSelection = (target: HTMLDivElement, position: number) => {
-    const scrollToEl = target.querySelector(`[data-listposition="${position}"`);
-    if (scrollToEl) {
-      scrollToEl.scrollIntoView({ block: 'nearest' });
-    }
-  };
+    // console.log(innerEl.current.style.height);.
+  });
+
+  // InfinitListInnerCt overflow into
 
   return (
-    <InfiniteLoader isRowLoaded={isRowLoaded} loadMoreRows={loadMoreRows} rowCount={totalCount}>
-      {({ onRowsRendered, registerChild }) => (
-        <AutoSizer>
-          {({ height, width }) => (
-            <Box onKeyDown={onKeyDown}>
-              <List
-                ref={registerChild}
-                onRowsRendered={onRowsRendered}
-                rowRenderer={rowRenderer}
-                rowCount={items.length}
-                height={height}
-                rowHeight={rowHeight}
-                rowWidth={width}
-                width={width}
-                style={{ outline: 'none' }}
-                on
-              />
-            </Box>
-          )}
-        </AutoSizer>
-      )}
-    </InfiniteLoader>
+    <div ref={containerEl} className={classes.infiniteListCt}>
+      <div ref={innerEl} className={classes.infiniteListInnerCt}>
+        {items.map((item, i) => rowRenderer(item, i))}
+      </div>
+    </div>
   );
 }
