@@ -264,7 +264,7 @@ export default function ApiDoc() {
                             </Grid>
                             <Grid item xs={12}>
                               <Card variant="outlined">
-                                <Box component="pre" p={1}>
+                                <Box component="pre" px={2}>
                                   {api.description}
                                 </Box>
                               </Card>
