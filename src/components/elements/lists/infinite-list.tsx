@@ -1,15 +1,21 @@
 import { Box, Divider, makeStyles } from '@material-ui/core';
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 
 const useStyles = makeStyles(theme => ({
   infiniteListCt: {
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'row',
+    width: '100%',
+
     position: 'relative',
-    overflow: 'auto',
-    height: '500px'
+    overflow: 'auto'
+    // height: '500px'
   },
   infiniteListInnerCt: {
     position: 'relative',
-    overflow: 'hidden'
+    overflow: 'hidden',
+    width: '100%'
   },
 
   listItem: {
@@ -56,19 +62,42 @@ export default function InfiniteList<I extends InfiniteListItem>({
   const containerEl = useRef<HTMLDivElement>();
   const innerEl = useRef<HTMLDivElement>();
 
+  const [displayItems, setDisplayItems] = useState<{ index: number; item: I }[]>([]);
+
+  //
+  const onScroll = (event: React.UIEvent<HTMLElement>) => {
+    const fH = containerEl.current.getBoundingClientRect().height;
+    const sT = event.currentTarget.scrollTop;
+    const cP = fH + sT;
+
+    const itemCount = Math.ceil(fH / rowHeight);
+
+    const topIndex = Math.floor(sT / rowHeight);
+
+    console.log(`${topIndex}-${topIndex + itemCount}`);
+
+    setDisplayItems(items.slice(topIndex, topIndex + itemCount).map((item, index) => ({ index, item })));
+  };
+
   // Render children relative to top
   // Row renderer.
-  const rowRenderer = (item: I, index: number) => {
+  const rowRenderer = (displayItem: { index: number; item: I }) => {
     const sT = containerEl.current.scrollTop;
     return (
       <Box
         mr={0}
-        key={`listitem[${index}].id[${item.id}]`}
-        onClick={() => onItemSelected(item)}
-        style={{ top: sT + index * rowHeight, left: 0, position: 'absolute', width: '100%', height: rowHeight }}
+        key={`listitem[${displayItem.index}].id[${displayItem.item.id}]`}
+        onClick={() => onItemSelected(displayItem.item)}
+        style={{
+          top: sT + displayItem.index * rowHeight,
+          left: 0,
+          position: 'absolute',
+          width: '100%',
+          height: rowHeight
+        }}
       >
-        <Box className={classes.listItem} data-listposition={index}>
-          {onRenderItem(item)}
+        <Box className={classes.listItem} data-listposition={displayItem.index}>
+          {onRenderItem(displayItem.item)}
         </Box>
         <Divider />
       </Box>
@@ -76,20 +105,20 @@ export default function InfiniteList<I extends InfiniteListItem>({
   };
 
   useLayoutEffect(() => {
+    // initialize scrolling container height.
     innerEl.current.style.height = `${items.length * rowHeight}px`;
 
     const fH = containerEl.current.getBoundingClientRect().height;
-    console.log(fH);
 
-    // console.log(innerEl.current.style.height);.
-  });
-
-  // InfinitListInnerCt overflow into
+    const itemCount = Math.ceil(fH / rowHeight);
+    setDisplayItems(items.slice(0, itemCount).map((item, index) => ({ index, item })));
+    console.log(itemCount);
+  }, [items, rowHeight]);
 
   return (
-    <div ref={containerEl} className={classes.infiniteListCt}>
+    <div ref={containerEl} className={classes.infiniteListCt} tabIndex={-1} onScroll={onScroll}>
       <div ref={innerEl} className={classes.infiniteListInnerCt}>
-        {items.map((item, i) => rowRenderer(item, i))}
+        {displayItems.map(item => rowRenderer(item))}
       </div>
     </div>
   );
