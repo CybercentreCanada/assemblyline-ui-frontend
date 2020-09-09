@@ -1,4 +1,3 @@
-import { Chip } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import Paper from '@material-ui/core/Paper';
 import makeStyles from '@material-ui/core/styles/makeStyles';
@@ -10,6 +9,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
+import CustomChip from 'components/visual/CustomChip';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -78,13 +78,13 @@ export default function Submissions() {
                   {row.start_time}
                 </TableCell>
                 <TableCell>
-                  <Chip color="primary" size="small" label={row.verdict} />
+                  <CustomChip type="square" color="primary" size="tiny" label={row.verdict} />
                 </TableCell>
                 <TableCell style={{ wordBreak: 'break-all' }}>{row.description}</TableCell>
                 <TableCell>{row.user}</TableCell>
                 <TableCell>{row.num_files}</TableCell>
                 <TableCell>
-                  <Chip size="small" label={row.classification} variant="outlined" />
+                  <CustomChip type="classification" size="tiny" label={row.classification} variant="outlined" />
                 </TableCell>
                 <TableCell>{row.status}</TableCell>
               </TableRow>
