@@ -53,9 +53,6 @@ const useStyles = makeStyles(theme => ({
   },
   expandOpen: {
     transform: 'rotate(180deg)'
-  },
-  test: {
-    height: '100px'
   }
 }));
 
@@ -72,22 +69,22 @@ export default function ApiDoc() {
   const downSM = useMediaQuery(theme.breakpoints.down('sm'));
   const xs = useMediaQuery(theme.breakpoints.only('xs'));
   const isDark = theme.palette.type === 'dark';
-  const methodBGColor = {
-    DELETE: isDark ? theme.palette.error.dark : theme.palette.error.light,
-    GET: isDark ? theme.palette.info.dark : theme.palette.info.light,
-    POST: isDark ? theme.palette.success.dark : theme.palette.success.light,
-    PUT: isDark ? theme.palette.warning.dark : theme.palette.warning.light
+  const methodColor = {
+    DELETE: 'error',
+    GET: 'info',
+    POST: 'success',
+    PUT: 'warning'
   };
-  const privBGColor = {
-    E: isDark ? theme.palette.error.dark : theme.palette.error.light,
-    R: isDark ? theme.palette.success.dark : theme.palette.success.light,
-    W: isDark ? theme.palette.warning.dark : theme.palette.warning.light
+  const privColor = {
+    E: 'error',
+    R: 'success',
+    W: 'warning'
   };
-  const userBGColor = {
-    admin: isDark ? theme.palette.error.dark : theme.palette.error.light,
-    signature_manager: isDark ? theme.palette.info.dark : theme.palette.info.light,
+  const userColor = {
+    admin: 'error',
+    signature_manager: 'info',
     user: null,
-    signature_importer: isDark ? theme.palette.warning.dark : theme.palette.warning.light
+    signature_importer: 'warning'
   };
 
   function toggleBlueprintExpand(bp) {
@@ -220,10 +217,7 @@ export default function ApiDoc() {
                                 {api.methods.map((method, midx) => {
                                   return (
                                     <CustomChip
-                                      style={{
-                                        backgroundColor: methodBGColor[method],
-                                        color: isDark ? theme.palette.common.white : null
-                                      }}
+                                      color={methodColor[method]}
                                       type="square"
                                       size="small"
                                       key={midx}
@@ -296,10 +290,7 @@ export default function ApiDoc() {
                                         return (
                                           <CustomChip
                                             key={uidx}
-                                            style={{
-                                              backgroundColor: userBGColor[utype],
-                                              color: isDark ? theme.palette.common.white : null
-                                            }}
+                                            color={userColor[utype]}
                                             type="square"
                                             size="tiny"
                                             label={t(`page.help.api.user_type.${utype}`)}
@@ -318,10 +309,7 @@ export default function ApiDoc() {
                                           return (
                                             <CustomChip
                                               key={pidx}
-                                              style={{
-                                                backgroundColor: privBGColor[ptype],
-                                                color: isDark ? theme.palette.common.white : null
-                                              }}
+                                              color={privColor[ptype]}
                                               type="square"
                                               size="tiny"
                                               label={t(`page.help.api.priv.${ptype}`)}
@@ -340,13 +328,10 @@ export default function ApiDoc() {
                                         return (
                                           <CustomChip
                                             key={metid}
-                                            style={{
-                                              backgroundColor: methodBGColor[met],
-                                              color: isDark ? theme.palette.common.white : null
-                                            }}
+                                            color={methodColor[met]}
                                             type="square"
                                             size="tiny"
-                                            label={met}
+                                            label={t(met)}
                                           />
                                         );
                                       })}
