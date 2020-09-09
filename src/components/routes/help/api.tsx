@@ -1,7 +1,22 @@
-import { Box, Card, Chip, Collapse, Grid, makeStyles, Typography, useMediaQuery, useTheme } from '@material-ui/core';
+import {
+  Box,
+  Card,
+  Chip,
+  Collapse,
+  Grid,
+  makeStyles,
+  MenuItem,
+  Select,
+  Typography,
+  useMediaQuery,
+  useTheme
+} from '@material-ui/core';
+import CheckOutlinedIcon from '@material-ui/icons/CheckOutlined';
+import ClearOutlinedIcon from '@material-ui/icons/ClearOutlined';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Skeleton from '@material-ui/lab/Skeleton';
 import clsx from 'clsx';
+import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,7 +25,6 @@ const apiHeight = '48px';
 const useStyles = makeStyles(theme => ({
   api: {
     minHeight: apiHeight,
-    alignItems: 'center',
     cursor: 'pointer',
     '&:hover': {
       backgroundColor: theme.palette.action.selected
@@ -53,12 +67,24 @@ export default function ApiDoc() {
   const { t } = useTranslation();
 
   const downSM = useMediaQuery(theme.breakpoints.down('sm'));
+  const xs = useMediaQuery(theme.breakpoints.only('xs'));
   const isDark = theme.palette.type === 'dark';
   const methodBGColor = {
     DELETE: isDark ? theme.palette.error.dark : theme.palette.error.light,
     GET: isDark ? theme.palette.info.dark : theme.palette.info.light,
     POST: isDark ? theme.palette.success.dark : theme.palette.success.light,
     PUT: isDark ? theme.palette.warning.dark : theme.palette.warning.light
+  };
+  const privBGColor = {
+    E: isDark ? theme.palette.error.dark : theme.palette.error.light,
+    R: isDark ? theme.palette.success.dark : theme.palette.success.light,
+    W: isDark ? theme.palette.warning.dark : theme.palette.warning.light
+  };
+  const userBGColor = {
+    admin: isDark ? theme.palette.error.dark : theme.palette.error.light,
+    signature_manager: isDark ? theme.palette.info.dark : theme.palette.info.light,
+    user: null,
+    signature_importer: isDark ? theme.palette.warning.dark : theme.palette.warning.light
   };
 
   function toggleBlueprintExpand(bp) {
@@ -113,203 +139,288 @@ export default function ApiDoc() {
     // eslint-disable-next-line
   }, [apiSelected]);
 
-  return apiDefinition ? (
-    <Box display="flex" flexDirection="column">
-      {Object.keys(apiDefinition.blueprints).map((bp, i) => {
-        return (
-          <Box key={i}>
-            <Box
-              display="flex"
-              flexDirection="row"
-              flexWrap="wrap"
-              className={classes.blueprint}
-              borderBottom={1}
-              px={1}
-              onClick={() => toggleBlueprintExpand(bp)}
-            >
-              <Typography variant="body2" color="textSecondary" style={{ fontWeight: 800 }}>
-                {`/api/${apiSelected}/`}&nbsp;
-              </Typography>
-              <Box flexGrow={1}>
-                <Typography variant="h6" style={{ fontWeight: 800 }} color="secondary">
-                  {bp}
-                </Typography>
-              </Box>
-              <Box display="inline-flex" width={downSM ? '100%' : null} justifyContent="flex-end">
-                <Typography variant="body2" color="textSecondary" align="right">
-                  {apiDefinition.blueprints[bp]}
-                </Typography>
-                <ExpandMoreIcon
-                  className={clsx(classes.expand, {
-                    [classes.expandOpen]: expandMap[bp]
-                  })}
-                />
-              </Box>
-            </Box>
-            <Collapse in={expandMap[bp]} timeout="auto" unmountOnExit>
-              <Box
-                py={1}
-                style={{
-                  backgroundColor: isDark ? theme.palette.grey[900] : theme.palette.grey[100]
-                }}
-              >
-                {blueprintAPIs(bp).map((api, idx) => {
-                  return (
-                    <>
-                      <Box
-                        className={classes.api}
-                        px={1}
-                        key={idx}
-                        display="flex"
-                        flexDirection="row"
-                        flexWrap="wrap"
-                        alignItems="center"
-                        onClick={() => toggleBlueprintExpand(api.name)}
-                      >
-                        <Box>
-                          {api.methods.map((method, midx) => {
-                            return (
-                              <Chip
-                                style={{
-                                  backgroundColor: methodBGColor[method],
-                                  color: theme.palette.common.white,
-                                  marginRight: '4px'
-                                }}
-                                size="small"
-                                key={midx}
-                                label={method}
-                              />
-                            );
-                          })}
-                        </Box>
-                        <Box flexGrow={1}>
-                          <Typography variant="body2" color="textSecondary">
-                            {api.path}
-                          </Typography>
-                        </Box>
-                        <Box display="inline-flex" width={downSM ? '100%' : null} justifyContent="flex-end">
-                          <Typography align="right" variant="caption">
-                            {api.name}
-                          </Typography>
-
-                          <ExpandMoreIcon
-                            className={clsx(classes.expand, {
-                              [classes.expandOpen]: expandMap[api.name]
-                            })}
-                          />
-                        </Box>
-                      </Box>
-                      <Collapse in={expandMap[api.name]} timeout="auto" unmountOnExit>
-                        <Box
-                          border={1}
-                          borderTop={0}
-                          borderBottom={0}
-                          p={1}
-                          borderColor={isDark ? theme.palette.grey[900] : theme.palette.grey[100]}
-                          bgcolor={theme.palette.background.default}
-                        >
-                          <Grid container>
-                            {!api.complete ? (
-                              <>
-                                <Grid item xs={4} sm={3}>
-                                  {t('page.help.api.complete')}:
-                                </Grid>
-                                <Grid item xs={8} sm={9}>
-                                  {t('page.help.api.incomplete')}
-                                </Grid>
-                              </>
-                            ) : null}
-                            {api.protected ? (
-                              <>
-                                <Grid item xs={4} sm={3}>
-                                  {t('page.help.api.requirements')}:
-                                </Grid>
-                                <Grid item xs={8} sm={9}>
-                                  {t('page.help.api.require_login')}
-                                </Grid>
-                              </>
-                            ) : null}
-                            <Grid item xs={4} sm={3}>
-                              {t('page.help.api.allowed_users')}:
-                            </Grid>
-                            <Grid item xs={8} sm={9}>
-                              {api.require_type}
-                            </Grid>
-                            <Grid item xs={4} sm={3}>
-                              {t('page.help.api.api_key_req')}:
-                            </Grid>
-                            <Grid item xs={8} sm={9}>
-                              {api.required_priv}
-                            </Grid>
-                            <Grid item xs={4} sm={3}>
-                              {t('page.help.api.abs_path')}:
-                            </Grid>
-                            <Grid item xs={8} sm={9}>
-                              {api.path}
-                            </Grid>
-                            <Grid item xs={4} sm={3}>
-                              {t('page.help.api.allowed_methods')}:
-                            </Grid>
-                            <Grid item xs={8} sm={9}>
-                              {api.methods}
-                            </Grid>
-                            <Grid item xs={4} sm={3}>
-                              {t('page.help.api.internal_func')}:
-                            </Grid>
-                            <Grid item xs={8} sm={9}>
-                              {api.function}
-                            </Grid>
-                            <Grid item xs={12}>
-                              {t('page.help.api.description')}:
-                            </Grid>
-                            <Grid item xs={12}>
-                              <Card variant="outlined">
-                                <Box component="pre" px={2}>
-                                  {api.description}
-                                </Box>
-                              </Card>
-                            </Grid>
-                          </Grid>
-                        </Box>
-                      </Collapse>
-                    </>
-                  );
-                })}
-              </Box>
-            </Collapse>
-          </Box>
-        );
-      })}
-    </Box>
-  ) : (
-    <Box display="flex" flexDirection="column">
-      {[...Array(21)].map((_, i) => {
-        return (
-          <Box
-            display="flex"
-            flexDirection="row"
-            flexWrap="wrap"
-            className={classes.blueprintSkel}
-            borderBottom={1}
-            px={1}
+  return (
+    <PageCenter width="90%" maxWidth="1350px">
+      <Box textAlign="left">
+        {apiList ? (
+          <Select
+            id="api"
+            value={apiSelected}
+            onChange={event => setApiSelected(event.target.value)}
+            variant="outlined"
+            margin="dense"
           >
-            <Typography variant="body2" style={{ paddingRight: '8px' }}>
-              <Skeleton width="2rem" />
-            </Typography>
-            <Box flexGrow={1}>
-              <Typography variant="h6">
-                <Skeleton width="12rem" />
-              </Typography>
-            </Box>
-            <Box display="inline-flex" width={downSM ? '100%' : null} justifyContent="flex-end">
-              <Typography variant="body2" style={{ paddingRight: '16px' }}>
-                <Skeleton width="14rem" />
-              </Typography>
-              <Skeleton width="1rem" />
-            </Box>
+            {apiList.map((version, index) => {
+              return (
+                <MenuItem key={index} value={version}>
+                  {version.replace('v', t('page.help.api.version')) + t('page.help.api.version_end')}
+                </MenuItem>
+              );
+            })}
+          </Select>
+        ) : (
+          <Skeleton variant="rect" style={{ height: '2rem', width: '14rem' }} />
+        )}
+        {apiDefinition ? (
+          <Box display="flex" flexDirection="column">
+            {Object.keys(apiDefinition.blueprints).map((bp, i) => {
+              return (
+                <Box key={i}>
+                  <Box
+                    display="flex"
+                    flexDirection="row"
+                    flexWrap="wrap"
+                    className={classes.blueprint}
+                    borderBottom={1}
+                    px={1}
+                    onClick={() => toggleBlueprintExpand(bp)}
+                  >
+                    <Typography variant="body2" color="textSecondary" style={{ fontWeight: 800, lineHeight: 2 }}>
+                      {`/api/${apiSelected}/`}&nbsp;
+                    </Typography>
+                    <Box flexGrow={1}>
+                      <Typography variant="h6" style={{ fontWeight: 800, lineHeight: 2 }} color="secondary">
+                        {bp}
+                      </Typography>
+                    </Box>
+                    <Box display="inline-flex" width={downSM ? '100%' : null} justifyContent="flex-end">
+                      <Typography variant="body2" color="textSecondary" align="right" style={{ lineHeight: 2 }}>
+                        {apiDefinition.blueprints[bp]}
+                      </Typography>
+                      <ExpandMoreIcon
+                        className={clsx(classes.expand, {
+                          [classes.expandOpen]: expandMap[bp]
+                        })}
+                      />
+                    </Box>
+                  </Box>
+                  <Collapse in={expandMap[bp]} timeout="auto" unmountOnExit>
+                    <Box
+                      py={1}
+                      style={{
+                        backgroundColor: isDark ? theme.palette.grey[900] : theme.palette.grey[100]
+                      }}
+                    >
+                      {blueprintAPIs(bp).map((api, idx) => {
+                        return (
+                          <Box key={idx}>
+                            <Box
+                              className={classes.api}
+                              px={1}
+                              display="flex"
+                              flexDirection={xs ? 'column' : 'row'}
+                              flexWrap="wrap"
+                              alignItems={xs ? 'flex-start' : 'center'}
+                              onClick={() => toggleBlueprintExpand(api.name)}
+                            >
+                              <Box>
+                                {api.methods.map((method, midx) => {
+                                  return (
+                                    <Chip
+                                      style={{
+                                        backgroundColor: methodBGColor[method],
+                                        color: isDark ? theme.palette.common.white : null,
+                                        marginRight: '4px'
+                                      }}
+                                      size="small"
+                                      key={midx}
+                                      label={method}
+                                    />
+                                  );
+                                })}
+                              </Box>
+                              <Box flexGrow={1}>
+                                <Typography
+                                  variant="body2"
+                                  color="textSecondary"
+                                  style={{ wordBreak: 'break-word', lineHeight: 2 }}
+                                >
+                                  {api.path}
+                                </Typography>
+                              </Box>
+                              <Box display="inline-flex" width={downSM ? '100%' : null} justifyContent="flex-end">
+                                <Typography align="right" variant="caption" style={{ lineHeight: 2 }}>
+                                  {api.name}
+                                </Typography>
+
+                                <ExpandMoreIcon
+                                  className={clsx(classes.expand, {
+                                    [classes.expandOpen]: expandMap[api.name]
+                                  })}
+                                />
+                              </Box>
+                            </Box>
+                            <Collapse in={expandMap[api.name]} timeout="auto" unmountOnExit>
+                              <Box
+                                border={1}
+                                borderTop={0}
+                                borderBottom={0}
+                                p={1}
+                                borderColor={isDark ? theme.palette.grey[900] : theme.palette.grey[100]}
+                                bgcolor={theme.palette.background.default}
+                              >
+                                <Grid container alignItems="center">
+                                  <>
+                                    <Grid item xs={8} sm={4} md={3} lg={2}>
+                                      <Box fontWeight="fontWeightMedium">{t('page.help.api.complete')}:</Box>
+                                    </Grid>
+                                    <Grid item xs={4} sm={8} md={9} lg={4}>
+                                      {api.complete ? (
+                                        <CheckOutlinedIcon htmlColor={theme.palette.success.main} />
+                                      ) : (
+                                        <ClearOutlinedIcon htmlColor={theme.palette.error.main} />
+                                      )}
+                                    </Grid>
+                                  </>
+                                  <>
+                                    <Grid item xs={8} sm={4} md={3} lg={2}>
+                                      <Box fontWeight="fontWeightMedium">{t('page.help.api.protected')}:</Box>
+                                    </Grid>
+                                    <Grid item xs={4} sm={8} md={9} lg={4}>
+                                      {api.protected ? (
+                                        <CheckOutlinedIcon htmlColor={theme.palette.success.main} />
+                                      ) : (
+                                        <ClearOutlinedIcon htmlColor={theme.palette.error.main} />
+                                      )}
+                                    </Grid>
+                                  </>
+                                  <>
+                                    <Grid item xs={12} sm={4} md={3} lg={2}>
+                                      <Box fontWeight="fontWeightMedium">{t('page.help.api.require_type')}:</Box>
+                                    </Grid>
+                                    <Grid item xs={12} sm={8} md={9} lg={4}>
+                                      {api.require_type.map((utype, uidx) => {
+                                        return (
+                                          <Chip
+                                            key={uidx}
+                                            style={{
+                                              backgroundColor: userBGColor[utype],
+                                              color: isDark ? theme.palette.common.white : null,
+                                              marginRight: '4px',
+                                              marginBottom: '2px'
+                                            }}
+                                            size="small"
+                                            label={t(`page.help.api.user_type.${utype}`)}
+                                          />
+                                        );
+                                      })}
+                                    </Grid>
+                                  </>
+                                  {api.required_priv ? (
+                                    <>
+                                      <Grid item xs={12} sm={4} md={3} lg={2}>
+                                        <Box fontWeight="fontWeightMedium">{t('page.help.api.required_priv')}:</Box>
+                                      </Grid>
+                                      <Grid item xs={12} sm={8} md={9} lg={4}>
+                                        {api.required_priv.map((ptype, pidx) => {
+                                          return (
+                                            <Chip
+                                              key={pidx}
+                                              style={{
+                                                backgroundColor: privBGColor[ptype],
+                                                color: isDark ? theme.palette.common.white : null,
+                                                marginRight: '4px',
+                                                marginBottom: '2px'
+                                              }}
+                                              size="small"
+                                              label={t(`page.help.api.priv.${ptype}`)}
+                                            />
+                                          );
+                                        })}
+                                      </Grid>
+                                    </>
+                                  ) : null}
+                                  <>
+                                    <Grid item xs={12} sm={4} md={3} lg={2}>
+                                      <Box fontWeight="fontWeightMedium">{t('page.help.api.methods')}:</Box>
+                                    </Grid>
+                                    <Grid item xs={12} sm={8} md={9} lg={4}>
+                                      {api.methods.map((met, metid) => {
+                                        return (
+                                          <Chip
+                                            key={metid}
+                                            style={{
+                                              backgroundColor: methodBGColor[met],
+                                              color: isDark ? theme.palette.common.white : null,
+                                              marginRight: '4px',
+                                              marginBottom: '2px'
+                                            }}
+                                            size="small"
+                                            label={met}
+                                          />
+                                        );
+                                      })}
+                                    </Grid>
+                                  </>
+                                  <>
+                                    <Grid item xs={12} sm={4} md={3} lg={2}>
+                                      <Box fontWeight="fontWeightMedium">{t('page.help.api.path')}:</Box>
+                                    </Grid>
+                                    <Grid item xs={12} sm={8} md={9} lg={4}>
+                                      <Box lineHeight={2} fontFamily="Monospace" style={{ wordBreak: 'break-word' }}>
+                                        {api.path}
+                                      </Box>
+                                    </Grid>
+                                  </>
+                                  <>
+                                    <Grid item xs={12}>
+                                      <Box fontWeight="fontWeightMedium" lineHeight={2}>
+                                        {t('page.help.api.description')}:
+                                      </Box>
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                      <Card variant="outlined" style={{ overflowX: 'auto' }}>
+                                        <Box component="pre" px={2}>
+                                          {api.description}
+                                        </Box>
+                                      </Card>
+                                    </Grid>
+                                  </>
+                                </Grid>
+                              </Box>
+                            </Collapse>
+                          </Box>
+                        );
+                      })}
+                    </Box>
+                  </Collapse>
+                </Box>
+              );
+            })}
           </Box>
-        );
-      })}
-    </Box>
+        ) : (
+          <Box display="flex" flexDirection="column">
+            {[...Array(21)].map((_, i) => {
+              return (
+                <Box
+                  key={i}
+                  display="flex"
+                  flexDirection="row"
+                  flexWrap="wrap"
+                  className={classes.blueprintSkel}
+                  borderBottom={1}
+                  px={1}
+                >
+                  <Typography variant="body2" style={{ paddingRight: '8px' }}>
+                    <Skeleton width="2rem" />
+                  </Typography>
+                  <Box flexGrow={1}>
+                    <Typography variant="h6">
+                      <Skeleton width="12rem" />
+                    </Typography>
+                  </Box>
+                  <Box display="inline-flex" width={downSM ? '100%' : null} justifyContent="flex-end">
+                    <Typography variant="body2" style={{ paddingRight: '16px', lineHeight: 2 }}>
+                      <Skeleton width="14rem" />
+                    </Typography>
+                    <Skeleton width="1rem" />
+                  </Box>
+                </Box>
+              );
+            })}
+          </Box>
+        )}
+      </Box>
+    </PageCenter>
   );
 }

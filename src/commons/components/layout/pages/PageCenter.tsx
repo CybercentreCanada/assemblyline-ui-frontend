@@ -10,7 +10,7 @@ const useStyles = (w, mxw) => {
       maxWidth: mxw,
       [theme.breakpoints.down('xs')]: {
         width: 'auto',
-        maxWidth: '95%'
+        maxWidth: '100%'
       }
     }
   }))();
