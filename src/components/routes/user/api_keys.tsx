@@ -124,9 +124,9 @@ export default function APIKeys<APIKeysProps>({ user, toggleAPIKey, enqueueSnack
       <Box display="flex" flexDirection="row" width="100%">
         <Box alignSelf="center" flexGrow={2}>
           <Select id="priv" value={tempKeyPriv} onChange={handleSelectChange} variant="outlined" margin="dense">
-            <MenuItem value="READ">READ</MenuItem>
-            <MenuItem value="READ_WRITE">READ/WRITE</MenuItem>
-            <MenuItem value="WRITE">WRITE</MenuItem>
+            <MenuItem value="READ">{t('page.user.apikeys.r_token')}</MenuItem>
+            <MenuItem value="READ_WRITE">{t('page.user.apikeys.rw_token')}</MenuItem>
+            <MenuItem value="WRITE">{t('page.user.apikeys.w_token')}</MenuItem>
           </Select>
         </Box>
         <Box alignSelf="flex-end" pl={1}>
