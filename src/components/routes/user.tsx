@@ -2,7 +2,6 @@ import {
   Avatar,
   Box,
   Button,
-  Chip,
   CircularProgress,
   Drawer,
   Grid,
@@ -32,6 +31,7 @@ import APIKeys from 'components/routes/user/api_keys';
 import DisableOTP from 'components/routes/user/disable_otp';
 import OTP from 'components/routes/user/otp';
 import SecurityToken from 'components/routes/user/token';
+import CustomChip from 'components/visual/CustomChip';
 import ChipInput from 'material-ui-chip-input';
 import { OptionsObject, useSnackbar } from 'notistack';
 import React, { useEffect, useRef, useState } from 'react';
@@ -405,10 +405,11 @@ function User<UserProps>({ width, username }) {
               </Grid>
               <Grid item style={{ marginTop: '2rem' }} xs={12}>
                 {user ? (
-                  <Chip
+                  <CustomChip
                     color={user.is_active ? 'primary' : 'default'}
                     onClick={currentUser.username !== user.uname ? toggleAccountEnabled : null}
                     label={user.is_active ? t('page.user.enabled') : t('page.user.disabled')}
+                    type="square"
                   />
                 ) : (
                   <Skeleton className={classes.skelButton} />
@@ -508,29 +509,29 @@ function User<UserProps>({ width, username }) {
                       )}
                       {user ? (
                         <Box>
-                          <Chip
-                            style={{ margin: '2px' }}
+                          <CustomChip
+                            type="square"
                             size="small"
                             color={user.type.includes('user') ? 'primary' : 'default'}
                             onClick={currentUser.is_admin ? () => toggleRole('user') : null}
                             label={t('page.user.normal_user')}
                           />
-                          <Chip
-                            style={{ margin: '2px' }}
+                          <CustomChip
+                            type="square"
                             size="small"
                             color={user.type.includes('admin') ? 'primary' : 'default'}
                             onClick={currentUser.is_admin ? () => toggleRole('admin') : null}
                             label={t('page.user.admin')}
                           />
-                          <Chip
-                            style={{ margin: '2px' }}
+                          <CustomChip
+                            type="square"
                             size="small"
                             color={user.type.includes('signature_manager') ? 'primary' : 'default'}
                             onClick={currentUser.is_admin ? () => toggleRole('signature_manager') : null}
                             label={t('page.user.signature_manager')}
                           />
-                          <Chip
-                            style={{ margin: '2px' }}
+                          <CustomChip
+                            type="square"
                             size="small"
                             color={user.type.includes('signature_importer') ? 'primary' : 'default'}
                             onClick={currentUser.is_admin ? () => toggleRole('signature_importer') : null}
