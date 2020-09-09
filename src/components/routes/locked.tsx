@@ -17,7 +17,7 @@ const LockedPage = (props: LockedPageProps) => {
   return (
     <>
       {hasTOS ? (
-        <PageCenter width={65}>
+        <PageCenter width="65%">
           <Box pt={6} textAlign="center" fontSize={200}>
             <HourglassEmptyOutlinedIcon color="secondary" fontSize="inherit" />
           </Box>

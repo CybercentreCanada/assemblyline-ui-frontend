@@ -1,4 +1,4 @@
-import { makeStyles, useTheme } from '@material-ui/core';
+import { makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
@@ -96,6 +96,8 @@ function Submit() {
   const theme = useTheme();
   const { getBanner } = useAppLayout();
   const [value, setValue] = React.useState('0');
+  const downSM = useMediaQuery(theme.breakpoints.down('sm'));
+  const md = useMediaQuery(theme.breakpoints.only('md'));
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -104,22 +106,12 @@ function Submit() {
   const useStyles = makeStyles(curTheme => ({
     no_pad: {
       padding: 0
-    },
-    page: {
-      maxWidth: '960px',
-      width: '100%',
-      [curTheme.breakpoints.down('sm')]: {
-        maxWidth: '100%'
-      },
-      [curTheme.breakpoints.only('md')]: {
-        maxWidth: '630px'
-      }
     }
   }));
   const classes = useStyles();
   return (
-    <PageCenter>
-      <Box className={classes.page} display="inline-block" textAlign="center">
+    <PageCenter maxWidth={md ? '630px' : downSM ? '100%' : '960px'}>
+      <Box display="inline-block" textAlign="center" width="100%">
         <Box display="inline-block" marginBottom="2rem">
           {getBanner(theme)}
         </Box>

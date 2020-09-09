@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 const NotFoundPage = () => {
   const { t } = useTranslation();
   return (
-    <PageCenter width={65}>
+    <PageCenter width="65%">
       <Box pt={6} textAlign="center" fontSize={200}>
         <LinkOffIcon color="secondary" fontSize="inherit" />
       </Box>

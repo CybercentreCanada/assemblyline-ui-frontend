@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 const NotFoundPage = () => {
   const { t } = useTranslation();
   return (
-    <PageCenter width={65}>
+    <PageCenter width="65%">
       <Box pt={10} pb={6}>
         <img alt={t('page.404_dl.alt')} src="/images/dead_link.png" style={{ maxHeight: '300px', maxWidth: '90%' }} />
       </Box>

@@ -12,7 +12,7 @@ type ForbiddenPageProps = {
 export default function ForbiddenPage<ForbiddenPageProps>({ disabled = false }) {
   const { t } = useTranslation();
   return (
-    <PageCenter width={65}>
+    <PageCenter width="65%">
       <Box pt={6} textAlign="center" fontSize={200}>
         <BlockIcon color="secondary" fontSize="inherit" />
       </Box>
