@@ -1,7 +1,6 @@
 import {
   Box,
   Card,
-  Chip,
   Collapse,
   Grid,
   makeStyles,
@@ -18,6 +17,7 @@ import Skeleton from '@material-ui/lab/Skeleton';
 import clsx from 'clsx';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useMyAPI from 'components/hooks/useMyAPI';
+import CustomChip from 'components/visual/CustomChip';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -53,6 +53,9 @@ const useStyles = makeStyles(theme => ({
   },
   expandOpen: {
     transform: 'rotate(180deg)'
+  },
+  test: {
+    height: '100px'
   }
 }));
 
@@ -142,7 +145,7 @@ export default function ApiDoc() {
   return (
     <PageCenter width="90%" maxWidth="1350px">
       <Box textAlign="left">
-        {apiList ? (
+        {apiList && apiSelected ? (
           <Select
             id="api"
             value={apiSelected}
@@ -216,12 +219,12 @@ export default function ApiDoc() {
                               <Box>
                                 {api.methods.map((method, midx) => {
                                   return (
-                                    <Chip
+                                    <CustomChip
                                       style={{
                                         backgroundColor: methodBGColor[method],
-                                        color: isDark ? theme.palette.common.white : null,
-                                        marginRight: '4px'
+                                        color: isDark ? theme.palette.common.white : null
                                       }}
+                                      type="square"
                                       size="small"
                                       key={midx}
                                       label={method}
@@ -291,15 +294,14 @@ export default function ApiDoc() {
                                     <Grid item xs={12} sm={8} md={9} lg={4}>
                                       {api.require_type.map((utype, uidx) => {
                                         return (
-                                          <Chip
+                                          <CustomChip
                                             key={uidx}
                                             style={{
                                               backgroundColor: userBGColor[utype],
-                                              color: isDark ? theme.palette.common.white : null,
-                                              marginRight: '4px',
-                                              marginBottom: '2px'
+                                              color: isDark ? theme.palette.common.white : null
                                             }}
-                                            size="small"
+                                            type="square"
+                                            size="tiny"
                                             label={t(`page.help.api.user_type.${utype}`)}
                                           />
                                         );
@@ -314,15 +316,14 @@ export default function ApiDoc() {
                                       <Grid item xs={12} sm={8} md={9} lg={4}>
                                         {api.required_priv.map((ptype, pidx) => {
                                           return (
-                                            <Chip
+                                            <CustomChip
                                               key={pidx}
                                               style={{
                                                 backgroundColor: privBGColor[ptype],
-                                                color: isDark ? theme.palette.common.white : null,
-                                                marginRight: '4px',
-                                                marginBottom: '2px'
+                                                color: isDark ? theme.palette.common.white : null
                                               }}
-                                              size="small"
+                                              type="square"
+                                              size="tiny"
                                               label={t(`page.help.api.priv.${ptype}`)}
                                             />
                                           );
@@ -337,15 +338,14 @@ export default function ApiDoc() {
                                     <Grid item xs={12} sm={8} md={9} lg={4}>
                                       {api.methods.map((met, metid) => {
                                         return (
-                                          <Chip
+                                          <CustomChip
                                             key={metid}
                                             style={{
                                               backgroundColor: methodBGColor[met],
-                                              color: isDark ? theme.palette.common.white : null,
-                                              marginRight: '4px',
-                                              marginBottom: '2px'
+                                              color: isDark ? theme.palette.common.white : null
                                             }}
-                                            size="small"
+                                            type="square"
+                                            size="tiny"
                                             label={met}
                                           />
                                         );
