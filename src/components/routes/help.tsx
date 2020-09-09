@@ -1,3 +1,4 @@
+import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useMyLayout from 'components/hooks/useMyLayout';
 import LinkGrid from 'components/layout/linkgrid';
 import React from 'react';
@@ -12,5 +13,9 @@ export default function Help() {
     }
   }
 
-  return <LinkGrid items={items} />;
+  return (
+    <PageCenter>
+      <LinkGrid items={items} />
+    </PageCenter>
+  );
 }

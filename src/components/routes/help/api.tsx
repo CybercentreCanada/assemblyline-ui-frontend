@@ -140,7 +140,7 @@ export default function ApiDoc() {
   }, [apiSelected]);
 
   return (
-    <PageCenter width="90%" maxWidth="1350px">
+    <PageCenter>
       <Box textAlign="left">
         {apiList && apiSelected ? (
           <Select

@@ -22,7 +22,7 @@ type PageCenterProps = {
   children: React.ReactNode;
 };
 
-const PageCenter: React.FC<PageCenterProps> = ({ width = '95%', maxWidth = '100%', children }) => {
+const PageCenter: React.FC<PageCenterProps> = ({ width = '95%', maxWidth = '1200px', children }) => {
   const classes = useStyles(width, maxWidth);
   return <Box className={classes.page}>{children}</Box>;
 };
