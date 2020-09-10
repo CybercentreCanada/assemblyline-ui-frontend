@@ -18,13 +18,6 @@ const Alerts: React.FC = () => {
   const [state, setState] = useState<{ open: boolean; selectedItem: AlertItem }>({ open: false, selectedItem: null });
   const [drawer, setDrawer] = useState<{ open: boolean; type: 'filter' }>({ open: false, type: null });
 
-  const rowRenderer = item => (
-    <Box>
-      <Typography variant="h6">{item.id}</Typography>
-      <AlertListItem item={item} />
-    </Box>
-  );
-
   return (
     <Box>
       <Box pb={theme.spacing(0.25)}>
@@ -50,7 +43,7 @@ const Alerts: React.FC = () => {
               selected={state.open && state.selectedItem ? state.selectedItem : null}
               onItemSelected={(item: AlertItem) => setState({ open: true, selectedItem: item })}
               onMoreItems={onNextPage}
-              onRenderItem={rowRenderer}
+              onRenderItem={(item: AlertItem) => <AlertListItem item={item} />}
             />
           }
           right={
