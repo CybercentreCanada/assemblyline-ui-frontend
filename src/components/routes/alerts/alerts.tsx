@@ -3,7 +3,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import InfiniteList from 'components/elements/lists/infinite-list';
 import SplitPanel from 'components/elements/panels/split-panel';
-import Viewport from 'components/elements/viewport';
+import Viewport from 'components/elements/panels/viewport';
 import React, { useState } from 'react';
 import AlertActionsMenu from './alert-actions-menu';
 import AlertDetails from './list/alert-details';

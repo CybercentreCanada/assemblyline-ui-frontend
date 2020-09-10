@@ -5,7 +5,6 @@ const useStyles = makeStyles({
   viewportCt: {
     position: 'relative'
   },
-  //
   viewport: {
     position: 'absolute',
     top: 0,
