@@ -6,10 +6,10 @@ import SplitPanel from 'components/elements/panels/split-panel';
 import Viewport from 'components/elements/panels/viewport';
 import React, { useState } from 'react';
 import AlertActionsMenu from './alert-actions-menu';
-import AlertDetails from './list/alert-details';
-import AlertListItem from './list/alert-list-item';
-import AlertsFilters from './list/alerts-filters';
-import AlertsHeader from './list/alerts-header';
+import AlertDetails from './alert-details';
+import AlertListItem from './alert-list-item';
+import AlertsFilters from './alerts-filters';
+import AlertsHeader from './alerts-header';
 import useAlerts, { AlertItem } from './useAlerts';
 
 const Alerts: React.FC = () => {
