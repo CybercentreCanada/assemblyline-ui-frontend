@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import { Box, Divider, LinearProgress, makeStyles } from '@material-ui/core';
+import { Box, CircularProgress, Divider, makeStyles } from '@material-ui/core';
 import { isArrowDown, isArrowUp, isEnter, isEscape } from 'components/elements/keyboard';
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import Throttler from '../throttler';
@@ -42,10 +42,14 @@ const useStyles = makeStyles(theme => ({
     right: 0,
     opacity: 0.7,
     zIndex: 1,
+    alignItems: 'center',
     backgroundColor: theme.palette.background.default
   },
   progressSpinner: {
-    height: '10px'
+    position: 'absolute',
+    left: '50%',
+    top: '50%'
+    // margin: 'auto'
   }
 }));
 
@@ -167,7 +171,7 @@ export default function InfiniteList<I extends InfiniteListItem>({
 
   // Ensure the list element at specified position is into view.
   const scrollSelection = (target: HTMLDivElement, position: number, direction: 'up' | 'down') => {
-    const scrollToEl = target.querySelector(`[data-listposition="${position}]"`);
+    const scrollToEl = target.querySelector(`[data-listposition="${position}"]`);
     if (scrollToEl) {
       scrollToEl.scrollIntoView({ block: 'nearest' });
     } else {
@@ -177,6 +181,7 @@ export default function InfiniteList<I extends InfiniteListItem>({
     }
   };
 
+  //
   const onItemClick = ({ item, index }: { index: number; item: I }) => {
     setCursor(index);
     onItemSelected(item);
@@ -231,7 +236,7 @@ export default function InfiniteList<I extends InfiniteListItem>({
     <div ref={containerEl} className={classes.infiniteListCt} tabIndex={-1} onScroll={onScroll} onKeyDown={onKeyDown}>
       {loading ? (
         <div className={classes.progressCt} style={{ top: frame.sT, height: frame.fH }}>
-          <LinearProgress className={classes.progressSpinner} />
+          <CircularProgress className={classes.progressSpinner} />
         </div>
       ) : null}
       <div ref={innerEl} className={classes.infiniteListInnerCt}>
@@ -239,11 +244,4 @@ export default function InfiniteList<I extends InfiniteListItem>({
       </div>
     </div>
   );
-  // return (
-  //   <div ref={containerEl} className={classes.infiniteListCt} tabIndex={-1} onScroll={onScroll} onKeyDown={onKeyDown}>
-  //     <div ref={innerEl} className={classes.infiniteListInnerCt}>
-  //       {frame.displayItems.map(item => rowRenderer(item))}.
-  //     </div>
-  //   </div>
-  // );
 }
