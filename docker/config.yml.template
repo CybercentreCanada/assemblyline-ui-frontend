@@ -33,6 +33,6 @@ services:
 ui:
   audit: false
   debug: false
-  email: dev@assemblyline.local
+  email: dev@<YOUR_IP>.nip.io
   enforce_quota: false
-  fqdn: assemblyline.local
+  fqdn: <YOUR_IP>.nip.io

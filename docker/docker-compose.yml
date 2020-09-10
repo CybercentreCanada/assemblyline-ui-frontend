@@ -17,12 +17,12 @@ services:
       - xpack.security.enabled=true
       - discovery.type=single-node
       - logger.level=WARN
-      - "ELASTIC_PASSWORD=devpass"
-      - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
+      - 'ELASTIC_PASSWORD=devpass'
+      - 'ES_JAVA_OPTS=-Xms1024m -Xmx1024m'
     ports:
       - '9200:9200'
     healthcheck:
-      test: ["CMD-SHELL", "curl --silent --fail -u elastic:$$ELASTIC_PASSWORD localhost:9200/_cluster/health || exit 1"]
+      test: ['CMD-SHELL', 'curl --silent --fail -u elastic:$$ELASTIC_PASSWORD localhost:9200/_cluster/health || exit 1']
       interval: 30s
       timeout: 30s
       retries: 3
@@ -33,7 +33,7 @@ services:
       - '6379:6379'
       - '6380:6379'
     healthcheck:
-      test: ["CMD", "redis-cli","ping"]
+      test: ['CMD', 'redis-cli', 'ping']
       interval: 30s
       timeout: 10s
       retries: 3
@@ -46,10 +46,10 @@ services:
       - '80:80'
       - '443:443'
     environment:
-      - FRONTEND_HOST=10.162.228.5
-      - UI_HOST=10.162.228.5
-      - SOCKET_HOST=10.162.228.5
-      - FQDN=10.162.228.5.nip.io
+      - FRONTEND_HOST=${EXTERNAL_IP}
+      - UI_HOST=${EXTERNAL_IP}
+      - SOCKET_HOST=${EXTERNAL_IP}
+      - FQDN=${EXTERNAL_IP}.nip.io
       - MAX_BODY_SIZE=100M
       - TEMPLATE=minimal
 
@@ -58,9 +58,9 @@ services:
     ports:
       - '8443:443'
     environment:
-      - UI_HOST=10.162.228.5
-      - SOCKET_HOST=10.162.228.5
-      - FQDN=10.162.228.5.nip.io
+      - UI_HOST=${EXTERNAL_IP}
+      - SOCKET_HOST=${EXTERNAL_IP}
+      - FQDN=${EXTERNAL_IP}.nip.io
       - MAX_BODY_SIZE=100M
       - TEMPLATE=minimal
 

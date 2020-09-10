@@ -16,6 +16,7 @@ __pycache__
 
 # misc
 /docker/config.yml
+/docker/.env
 .DS_Store
 .env*.local
 
