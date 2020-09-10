@@ -9,6 +9,10 @@ export const useStyles = (layout, open, hasQuickSearch) => {
   return makeStyles(theme => ({
     breadcrumbs: {
       flexGrow: 1,
+      transition: theme.transitions.create('margin-left', {
+        easing: theme.transitions.easing.easeInOut,
+        duration: theme.transitions.duration.short
+      }),
       [theme.breakpoints.down(hasQuickSearch ? 'sm' : 'xs')]: {
         display: 'none'
       },
@@ -62,6 +66,7 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ disableStyle }) => {
       items={items}
       disableStyle={disableStyle}
       allLinks={allLinks}
+      isStatic={isStatic}
       itemsBefore={isExpanded ? itemsBefore : 0}
       itemsAfter={isExpanded ? itemsAfter : 1}
     />

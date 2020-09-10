@@ -25,11 +25,9 @@ const LinkRouter = props => <Link {...props} component={RouterLink} />;
 
 const BreadcrumbLinkItem: React.FC<BreadcrumbLinkItemProps> = ({ item, textOnly = false }) => {
   const classes = useStyles();
-  const {
-    route,
-    matcher: { url }
-  } = item;
+  const { route, matcher } = item;
   const { resolveTitle } = useAppSitemap();
+  const url = matcher ? matcher.url : route.path;
   return (
     <LinkRouter
       style={route.icon ? { paddingTop: '3px' } : null}

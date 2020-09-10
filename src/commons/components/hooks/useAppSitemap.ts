@@ -28,7 +28,7 @@ export const getRoute = (route: string, siteMap: SiteMapRoute[]): BreadcrumbItem
     // eslint-disable-next-line no-console
     console.warn(`Found more than one sitemap route match for: ${route}`);
   }
-  return matched && matched[0] ? matched[0] : null;
+  return matched && matched[0] ? matched[0] : { route: { path: route, title: '404' }, matcher: null };
 };
 
 export const appendRoute = (breadcrumbs: BreadcrumbItem[], breadcrumb: BreadcrumbItem): BreadcrumbItem[] => {

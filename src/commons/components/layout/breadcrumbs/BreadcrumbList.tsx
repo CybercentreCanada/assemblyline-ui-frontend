@@ -16,6 +16,7 @@ type BreadcrumbListProps = {
   allLinks?: boolean;
   textOnly?: boolean;
   exceptLast?: boolean;
+  isStatic?: boolean;
   itemsBefore?: number;
   itemsAfter?: number;
   items: BreadcrumbItem[];
@@ -25,10 +26,11 @@ const splitItems = (
   items: BreadcrumbItem[],
   itemsBeforeCount: number,
   itemsAfterCount: number,
-  expanded: boolean
+  expanded: boolean,
+  isStatic: boolean
 ): { before: BreadcrumbItem[]; after: BreadcrumbItem[]; hasEllipsis: boolean } => {
   const _items = items.concat().filter(i => !i.route.exclude);
-  if (_items.length <= itemsBeforeCount + itemsAfterCount + 1) {
+  if (_items.length <= itemsBeforeCount + itemsAfterCount + 1 || isStatic) {
     return { before: null, after: _items, hasEllipsis: false };
   }
   const before = _items.slice(0, itemsBeforeCount);
@@ -43,7 +45,8 @@ const BreadcrumbList: React.FC<BreadcrumbListProps> = ({
   itemsAfter = 1,
   allLinks = false,
   textOnly = false,
-  exceptLast = false
+  exceptLast = false,
+  isStatic = false
 }) => {
   const [expanded, setExpanded] = useState<boolean>(false);
   const { currentLayout, drawerState, showQuickSearch } = useAppLayout();
@@ -52,7 +55,8 @@ const BreadcrumbList: React.FC<BreadcrumbListProps> = ({
     exceptLast ? items.slice(0, items.length - 1) : items,
     itemsBefore,
     itemsAfter,
-    expanded
+    expanded,
+    isStatic
   );
   const last = after.length > 0 && !allLinks ? after.pop() : before ? before.pop() : null;
   return (
