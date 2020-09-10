@@ -27,6 +27,7 @@ const useStyles = makeStyles(theme => ({
     overflow: 'auto',
     transition: 'width 0.2s ease 0'
   },
+  // Maybe move this to App.tsx to truely make it global?
   '@global': {
     '*::-webkit-scrollbar': {
       width: '0.8em'
@@ -36,7 +37,6 @@ const useStyles = makeStyles(theme => ({
     },
     '*::-webkit-scrollbar-thumb': {
       backgroundColor: 'rgba(0,0,0,.1)'
-      // outline: '1px solid slategrey'
     }
   }
 }));

@@ -1,8 +1,8 @@
 import { Box, Typography, useTheme } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
-import { isEscape } from 'components/elements/keyboard';
-import SplitPanel from 'components/elements/split-panel';
+import SplitPanel from 'components/elements/panels/split-panel';
+import { isEscape } from 'components/elements/utils/keyboard';
 import Viewport from 'components/elements/viewport';
 import AlertActionsMenu from 'components/routes/alerts/alert-actions-menu';
 import { AlertItem } from 'components/routes/alerts/useAlerts';

@@ -1,7 +1,7 @@
 import { Box, Divider, Grid, makeStyles, Typography, useMediaQuery, useTheme } from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
 import useClipboard from 'commons/components/hooks/useClipboard';
-import { Chip, ChipList } from 'components/elements/chips';
+import { Chip, ChipList } from 'components/elements/mui/chips';
 import { AlertItem } from 'components/routes/alerts/useAlerts';
 import { format } from 'date-fns';
 import React from 'react';

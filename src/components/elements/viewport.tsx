@@ -15,7 +15,7 @@ const useStyles = makeStyles({
   }
 });
 
-const Viewport = ({ children, isNested = false }) => {
+const Viewport = ({ children }) => {
   const classes = useStyles();
   const ref = useRef<HTMLDivElement>();
   const [height, setHeight] = useState<number>(0);

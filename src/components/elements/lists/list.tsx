@@ -1,9 +1,9 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import { Box, Divider, makeStyles, useTheme } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
+import Throttler from 'components/elements/utils/throttler';
 import React, { useRef, useState } from 'react';
-import { isArrowDown, isArrowUp, isEnter } from '../keyboard';
-import Throttler from '../throttler';
+import { isArrowDown, isArrowUp, isEnter } from '../utils/keyboard';
 
 const useStyles = makeStyles(theme => ({
   list: {

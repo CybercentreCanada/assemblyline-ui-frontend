@@ -1,6 +1,4 @@
 import { InfiniteListItem } from 'components/elements/lists/infinite-list';
-import { ListItemProps } from 'components/elements/lists/list';
-import { VirtualizedListItem } from 'components/elements/lists/virtualized-list';
 import { useEffect, useState } from 'react';
 
 export type AlertFile = {
@@ -12,7 +10,7 @@ export type AlertFile = {
   type: string;
 };
 
-export interface AlertItem extends ListItemProps, VirtualizedListItem, InfiniteListItem {
+export interface AlertItem extends InfiniteListItem {
   sid: string;
   alert_id: string;
   type: string;

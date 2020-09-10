@@ -1,8 +1,8 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import { Box, CircularProgress, Divider, makeStyles } from '@material-ui/core';
-import { isArrowDown, isArrowUp, isEnter, isEscape } from 'components/elements/keyboard';
+import { isArrowDown, isArrowUp, isEnter, isEscape } from 'components/elements/utils/keyboard';
+import Throttler from 'components/elements/utils/throttler';
 import React, { useLayoutEffect, useRef, useState } from 'react';
-import Throttler from '../throttler';
 
 const useStyles = makeStyles(theme => ({
   infiniteListCt: {
@@ -69,12 +69,14 @@ interface InfiniteListProps<I extends InfiniteListItem> {
   items: I[];
   selected?: I;
   rowHeight: number;
+  pageSize?: number;
   onItemSelected: (item: I) => void;
   onRenderItem: (item: InfiniteListItem) => React.ReactNode;
   onMoreItems: (startIndex: number, stopIndex: number) => Promise<any>;
 }
 
 InfiniteList.defaultProps = {
+  pageSize: 10,
   selected: null
 };
 
@@ -83,6 +85,7 @@ export default function InfiniteList<I extends InfiniteListItem>({
   items,
   selected,
   rowHeight,
+  pageSize,
   onItemSelected,
   onRenderItem,
   onMoreItems
@@ -122,11 +125,10 @@ export default function InfiniteList<I extends InfiniteListItem>({
 
   // Handler::OnScroll
   const onScroll = (event: React.UIEvent<HTMLElement>) => {
-    console.log('scrolling..');
     const _frame = computeFrame(items, rowHeight);
     setFrame(_frame);
     if (_frame.rH === 0) {
-      onMoreItems(items.length, items.length + 10);
+      onMoreItems(items.length, items.length + pageSize);
     }
   };
 
