@@ -39,7 +39,7 @@ const Alerts: React.FC = () => {
             <InfiniteList
               items={items}
               loading={loading}
-              rowHeight={130}
+              rowHeight={97}
               selected={state.open && state.selectedItem ? state.selectedItem : null}
               onItemSelected={(item: AlertItem) => setState({ open: true, selectedItem: item })}
               onMoreItems={onNextPage}

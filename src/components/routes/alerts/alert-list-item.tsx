@@ -28,7 +28,7 @@ const AlertItemDefault: React.FC<AlertListItemProps> = ({ item }) => {
   return (
     <Box>
       <Grid container style={{ alignItems: 'center' }}>
-        <Grid item xs={4}>
+        <Grid item xs={3}>
           <AlertPriority name={item.priority} />
           <Box component="span" ml={1} mr={1}>
             {item.file.name}
@@ -36,6 +36,9 @@ const AlertItemDefault: React.FC<AlertListItemProps> = ({ item }) => {
           <Typography variant="caption">
             {item.file.size}({(item.file.size / 1024).toFixed(2)}Kb)
           </Typography>
+        </Grid>
+        <Grid item xs={1}>
+          {item.id}
         </Grid>
         <Grid item xs={4}>
           <AlertScore score={item.al.score} />
