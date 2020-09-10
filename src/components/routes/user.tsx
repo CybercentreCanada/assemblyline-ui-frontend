@@ -598,20 +598,22 @@ function User<UserProps>({ width, username }) {
                       <ChevronRightOutlinedIcon />
                     </TableCell>
                   </TableRow>
-                  <TableRow
-                    hover
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => toggleDrawer(user && user['2fa_enabled'] ? 'disable_otp' : 'otp')}
-                  >
-                    <TableCell width="100%">
-                      {user ? user['2fa_enabled'] ? t('page.user.2fa_off') : t('page.user.2fa_on') : <Skeleton />}
-                    </TableCell>
-                    <TableCell align="right">
-                      <ChevronRightOutlinedIcon />
-                    </TableCell>
-                  </TableRow>
+                  {currentUser.allow_2fa ? (
+                    <TableRow
+                      hover
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => toggleDrawer(user && user['2fa_enabled'] ? 'disable_otp' : 'otp')}
+                    >
+                      <TableCell width="100%">
+                        {user ? user['2fa_enabled'] ? t('page.user.2fa_off') : t('page.user.2fa_on') : <Skeleton />}
+                      </TableCell>
+                      <TableCell align="right">
+                        <ChevronRightOutlinedIcon />
+                      </TableCell>
+                    </TableRow>
+                  ) : null}
                   {user ? (
-                    user['2fa_enabled'] ? (
+                    user['2fa_enabled'] && currentUser.allow_security_tokens ? (
                       <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('token')}>
                         <TableCell width="100%">{user ? t('page.user.token') : <Skeleton />}</TableCell>
                         <TableCell align="right">
@@ -620,12 +622,14 @@ function User<UserProps>({ width, username }) {
                       </TableRow>
                     ) : null
                   ) : null}
-                  <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('api_key')}>
-                    <TableCell width="100%">{user ? t('page.user.apikeys') : <Skeleton />}</TableCell>
-                    <TableCell align="right">
-                      <ChevronRightOutlinedIcon />
-                    </TableCell>
-                  </TableRow>
+                  {currentUser.allow_apikeys ? (
+                    <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('api_key')}>
+                      <TableCell width="100%">{user ? t('page.user.apikeys') : <Skeleton />}</TableCell>
+                      <TableCell align="right">
+                        <ChevronRightOutlinedIcon />
+                      </TableCell>
+                    </TableRow>
+                  ) : null}
                 </TableBody>
               </Table>
             </TableContainer>
