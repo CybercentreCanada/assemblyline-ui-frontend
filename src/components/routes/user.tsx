@@ -513,14 +513,22 @@ function User<UserProps>({ width, username }) {
                             type="square"
                             size="small"
                             color={user.type.includes('user') ? 'primary' : 'default'}
-                            onClick={currentUser.is_admin ? () => toggleRole('user') : null}
+                            onClick={
+                              currentUser.username !== user.uname && currentUser.is_admin
+                                ? () => toggleRole('user')
+                                : null
+                            }
                             label={t('page.user.normal_user')}
                           />
                           <CustomChip
                             type="square"
                             size="small"
                             color={user.type.includes('admin') ? 'primary' : 'default'}
-                            onClick={currentUser.is_admin ? () => toggleRole('admin') : null}
+                            onClick={
+                              currentUser.username !== user.uname && currentUser.is_admin
+                                ? () => toggleRole('admin')
+                                : null
+                            }
                             label={t('page.user.admin')}
                           />
                           <CustomChip
