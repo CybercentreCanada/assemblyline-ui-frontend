@@ -45,7 +45,7 @@ Installing docker-compose is done the same way on all Linux distros. Follow thes
     # Test docker-compose installation
     docker-compose --version
 
-For reference, here are the instructions on Docker’s website: https://docs.docker.com/compose/install/
+For reference, here are the instructions on Docker’s website: <https://docs.docker.com/compose/install/>
 
 ## Configure the dev environment
 
