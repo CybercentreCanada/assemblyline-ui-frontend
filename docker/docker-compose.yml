@@ -73,7 +73,7 @@ services:
     volumes:
       - ./config.yml:/etc/assemblyline/config.yml:ro
     restart: on-failure
-    command: python -m assemblyline.odm.random_data.create_test_data nosvc nosigs
+    command: python -m assemblyline.odm.random_data.create_test_data full
     depends_on:
       elasticsearch:
         condition: service_healthy
