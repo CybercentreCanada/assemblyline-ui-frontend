@@ -5,6 +5,7 @@ import Users from 'components/routes/admin/users';
 import Dashboard from 'components/routes/dashboard';
 import Help from 'components/routes/help';
 import ApiDoc from 'components/routes/help/api';
+import Configuration from 'components/routes/help/configuration';
 import Services from 'components/routes/help/services';
 import Logout from 'components/routes/logout';
 import Manage from 'components/routes/manage';
@@ -27,6 +28,7 @@ const Routes = () => {
       <Route exact path="/dashboard" component={Dashboard} />
       <Route exact path="/help" component={Help} />
       <Route exact path="/help/api" component={ApiDoc} />
+      <Route exact path="/help/configuration" component={Configuration} />
       <Route exact path="/help/services" component={Services} />
       <Route exact path="/logout" component={Logout} />
       <Route exact path="/manage" component={Manage} />
