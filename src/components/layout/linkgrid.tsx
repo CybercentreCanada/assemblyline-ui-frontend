@@ -1,15 +1,13 @@
 import { Box, Button, Typography, useTheme } from '@material-ui/core';
 import LinkIcon from '@material-ui/icons/Link';
-import { LeftNavItemProps } from 'commons/components/layout/leftnav/LeftNavDrawer';
-import { UserMenuElement } from 'commons/components/layout/topnav/UserProfile';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
 type LinkGridProps = {
-  items: LeftNavItemProps[] | UserMenuElement[];
+  items: any[];
 };
 
-export default function LinkGrid<LinkGridProps>({ items }) {
+export default function LinkGrid({ items }: LinkGridProps) {
   const theme = useTheme();
   return (
     <Box display="flex" flexDirection="row" flexWrap="wrap" justifyContent="space-around">

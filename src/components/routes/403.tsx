@@ -10,7 +10,7 @@ type ForbiddenPageProps = {
   disabled?: boolean;
 };
 
-export default function ForbiddenPage<ForbiddenPageProps>({ disabled = false }) {
+export default function ForbiddenPage({ disabled = false }: ForbiddenPageProps) {
   const { t } = useTranslation(['error403']);
   const theme = useTheme();
   return (
@@ -36,3 +36,7 @@ export default function ForbiddenPage<ForbiddenPageProps>({ disabled = false }) 
     </PageCenter>
   );
 }
+
+ForbiddenPage.defaultProps = {
+  disabled: false
+};

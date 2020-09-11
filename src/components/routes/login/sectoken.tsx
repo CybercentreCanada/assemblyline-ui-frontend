@@ -16,13 +16,19 @@ type SecTokenProps = {
   username: string;
 };
 
-export function SecurityTokenLogin(props: SecTokenProps) {
+export function SecurityTokenLogin({
+  username,
+  enqueueSnackbar,
+  setShownControls,
+  setWebAuthNResponse,
+  snackBarOptions
+}: SecTokenProps) {
   const { t } = useTranslation();
   const apiCall = useMyAPI();
 
   useEffect(() => {
     apiCall({
-      url: `/api/v4/webauthn/authenticate/begin/${props.username}/`,
+      url: `/api/v4/webauthn/authenticate/begin/${username}/`,
       onSuccess: api_data => {
         const arrayData = toArrayBuffer(api_data.api_response);
         const options = CBOR.decode(arrayData.buffer);
@@ -39,17 +45,17 @@ export function SecurityTokenLogin(props: SecTokenProps) {
                 signature: new Uint8Array(response.signature)
               });
 
-              props.setWebAuthNResponse(Array.from(new Uint8Array(assertionData)));
+              setWebAuthNResponse(Array.from(new Uint8Array(assertionData)));
             })
             .catch(ex => {
               // eslint-disable-next-line no-console
               console.log(`${ex.name}: ${ex.message}`);
-              props.setShownControls('otp');
-              props.enqueueSnackbar(t('page.login.securitytoken.error'), props.snackBarOptions);
+              setShownControls('otp');
+              enqueueSnackbar(t('page.login.securitytoken.error'), snackBarOptions);
             });
         } else {
-          props.setShownControls('otp');
-          props.enqueueSnackbar(t('page.login.securitytoken.unavailable'), props.snackBarOptions);
+          setShownControls('otp');
+          enqueueSnackbar(t('page.login.securitytoken.unavailable'), snackBarOptions);
         }
       }
     });

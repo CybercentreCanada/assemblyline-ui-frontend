@@ -3,10 +3,10 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 type TextDividerProps = {
-  forcePaper?: (value: boolean) => void;
+  forcePaper?: boolean;
 };
 
-export default function TextDividerProps<TextDividerProps>({ forcePaper = false }) {
+export default function TextDivider({ forcePaper = false }: TextDividerProps) {
   const { t } = useTranslation();
   const useStyles = makeStyles(theme => ({
     divider: {
@@ -38,3 +38,7 @@ export default function TextDividerProps<TextDividerProps>({ forcePaper = false 
     </div>
   );
 }
+
+TextDivider.defaultProps = {
+  forcePaper: false
+};
