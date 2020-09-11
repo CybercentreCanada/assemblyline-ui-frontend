@@ -100,7 +100,7 @@ export default function InfiniteList<I extends InfiniteListItem>({
   // Store the current frame in state.
   const [frame, setFrame] = useState<InfiniteListFrame<I>>({ displayItems: [], sT: -1, fH: -1, rH: -1 });
 
-  // Cursor position for keyboard navigation.
+  // Track cursor index position for keyboard navigation.
   const [cursor, setCursor] = useState<number>(-1);
 
   // Function throttler to streamline keydown event handlers.
@@ -108,18 +108,26 @@ export default function InfiniteList<I extends InfiniteListItem>({
 
   // Compute the frame of items within visual range.
   const computeFrame = (_items: I[], _rowHeight: number): InfiniteListFrame<I> => {
+    // extract some requirement dom element for measurements.
+    // a 'frame' here refers to the set of elements within visual range.
     const { current: _containerEl } = containerEl;
     const { current: _innerEl } = innerEl;
     const tH = _innerEl.getBoundingClientRect().height;
     const fH = _containerEl.getBoundingClientRect().height;
     const sT = _containerEl.scrollTop;
+    // current position of scroll at bottom of frame.
     const cP = fH + sT;
+    // remaining height, hidden height, i.e. what's overflowing under scroll.
     const rH = tH - cP;
-    const itemCount = Math.ceil(fH / _rowHeight);
+    // given the specified row height, how many items we can show in a frame.
+    const itemCount = Math.ceil(fH / _rowHeight) + 1;
+    // the total index of the first element shown.
     const topIndex = Math.floor(sT / _rowHeight);
+    // extract all the elements that we'll show in a frame.
     const displayItems = _items
       .slice(topIndex, topIndex + itemCount)
       .map((item, index) => ({ index: topIndex + index, item }));
+    // Give it back ... someone or something, needs to know!
     return { displayItems, sT, rH, fH };
   };
 
@@ -224,14 +232,20 @@ export default function InfiniteList<I extends InfiniteListItem>({
     // initialize/update scrolling container height.
     innerEl.current.style.height = `${items.length * rowHeight}px`;
 
-    //
-    const firstItem = innerEl.current.querySelector('[data-listposition="0"]');
-    if (firstItem) {
-      console.log(firstItem.getBoundingClientRect().height);
-    }
-
     // compute which items are within visual frame.
-    setFrame(computeFrame(items, rowHeight));
+    const updateFrame = () => {
+      setFrame(computeFrame(items, rowHeight));
+    };
+
+    // Recompute the frame each time this component mounts or receives update to properties.
+    updateFrame();
+
+    // Register a windows resize event to ensure frame measurement remain in line with window size.
+    window.addEventListener('resize', updateFrame);
+    return () => {
+      // Deregister window event listener.
+      window.removeEventListener('resize', updateFrame);
+    };
   }, [items, rowHeight]);
 
   return (

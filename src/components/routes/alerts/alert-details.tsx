@@ -5,6 +5,7 @@ import { Chip, ChipList } from 'components/elements/mui/chips';
 import { AlertItem } from 'components/routes/alerts/useAlerts';
 import { format } from 'date-fns';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
 import AlertPriority from './alert-priority';
 
@@ -32,6 +33,7 @@ type AlertDetailsProps = {
 };
 
 const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const isLteSm = useMediaQuery(theme.breakpoints.down('sm'));
   const classes = useStyles();
@@ -41,16 +43,14 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
     <Box overflow="auto">
       {item.filtered ? (
         <Box mb={2}>
-          <Alert severity="warning">
-            Alert data filtered because submitter does not have the privileges to see all the results
-          </Alert>
+          <Alert severity="warning">{t('page.alerts.details.data_filtered_msg')}</Alert>
         </Box>
       ) : null}
       <Grid container spacing={2}>
         <Grid item xs={isLteSm ? 12 : 6}>
           {/* Labels Section */}
           <Box className={classes.section}>
-            <Typography className={classes.sectionTitle}>Labels</Typography>
+            <Typography className={classes.sectionTitle}>{t('page.alerts.details.label')}</Typography>
             <Divider />
             <Box className={classes.sectionContent}>
               <ChipList items={item.label.map(label => ({ label, variant: 'outlined' }))} />
@@ -60,7 +60,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
         <Grid item xs={isLteSm ? 12 : 3}>
           {/* Priority Section. */}
           <Box className={classes.section}>
-            <Typography className={classes.sectionTitle}>Priority</Typography>
+            <Typography className={classes.sectionTitle}>{t('page.alerts.details.priority')}</Typography>
             <Divider />
             <Box className={classes.sectionContent}>
               <Box display="flex">
@@ -72,7 +72,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
         <Grid item xs={isLteSm ? 12 : 3}>
           {/* Status Section */}
           <Box className={classes.section}>
-            <Typography className={classes.sectionTitle}>Status</Typography>
+            <Typography className={classes.sectionTitle}>{t('page.alerts.details.status')}</Typography>
             <Divider />
             <Box className={classes.sectionContent}>
               <Chip label={item.status} variant="outlined" />
@@ -86,7 +86,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
         {/* Type Section */}
         <Grid item xs={isLteSm ? 12 : 3}>
           <Box className={classes.section}>
-            <Typography className={classes.sectionTitle}>Type</Typography>
+            <Typography className={classes.sectionTitle}>{t('page.alerts.details.type')}</Typography>
             <Divider />
             <Box className={classes.sectionContent}>{item.type}</Box>
           </Box>
@@ -94,7 +94,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
         <Grid item xs={isLteSm ? 12 : 3}>
           {/* Priority Section. */}
           <Box className={classes.section}>
-            <Typography className={classes.sectionTitle}>Reporting Date</Typography>
+            <Typography className={classes.sectionTitle}>{t('page.alerts.details.reporting_date')}</Typography>
             <Divider />
             <Box className={classes.sectionContent}>
               {format(new Date(item.reporting_ts), 'yyyy-MM-dd HH:mm:ss.SSSSSS')}
@@ -104,7 +104,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
         <Grid item xs={isLteSm ? 12 : 3}>
           {/* Priority Section. */}
           <Box className={classes.section}>
-            <Typography className={classes.sectionTitle}>Owner</Typography>
+            <Typography className={classes.sectionTitle}>{t('page.alerts.details.ownership')}</Typography>
             <Divider />
             <Box className={classes.sectionContent}>
               {item.owner ? item.owner : item.hint_owner ? 'assigned' : 'none'}
@@ -114,7 +114,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
         <Grid item xs={isLteSm ? 12 : 3}>
           {/* Group Count Section */}
           <Box className={classes.section}>
-            <Typography className={classes.sectionTitle}>Group Count</Typography>
+            <Typography className={classes.sectionTitle}>{t('page.alerts.details.group_count')}</Typography>
             <Divider />
             <Box className={classes.sectionContent}>{item.group_count}x</Box>
           </Box>
@@ -123,12 +123,12 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
 
       {/* File Info */}
       <Box className={classes.section}>
-        <Typography className={classes.sectionTitle}>File Info</Typography>
+        <Typography className={classes.sectionTitle}>{t('page.alerts.details.file_info')}</Typography>
         <Divider />
         <Box className={classes.sectionContent}>
           <Grid container spacing={1}>
             <Grid item xs={12}>
-              <Typography variant="caption">Type</Typography>&nbsp;
+              <Typography variant="caption">{t('page.alerts.details.file_type')}</Typography>&nbsp;
               <Chip label={item.file.type} variant="outlined" /> -
               <Box component="span" ml={1} mr={1}>
                 {item.file.name}
@@ -158,19 +158,10 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
         </Box>
       </Box>
 
-      {/* Ownership Section */}
-      {item.owner ? (
-        <Box className={classes.section}>
-          <Typography className={classes.sectionTitle}>Ownership</Typography>
-          <Divider />
-          <Box className={classes.sectionContent}>{item.owner}</Box>
-        </Box>
-      ) : null}
-
       {/* Metadata Section */}
       {item.metadata && Object.keys(item.metadata).length > 0 ? (
         <Box className={classes.section}>
-          <Typography className={classes.sectionTitle}>Metadata</Typography>
+          <Typography className={classes.sectionTitle}>{t('page.alerts.details.metadata')}</Typography>
           <Divider />
           <Box className={classes.sectionContent}>
             <pre style={{ margin: 0 }}>
@@ -188,19 +179,19 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
       {/* Attack Section */}
       {item.attack.category ? (
         <Box className={classes.section}>
-          <Typography className={classes.sectionTitle}>Attack</Typography>
+          <Typography className={classes.sectionTitle}>{t('page.alerts.details.attack')}</Typography>
           <Divider />
           <Box className={classes.sectionContent}>
             <Grid container spacing={1}>
               <Grid item xs={isLteSm ? 12 : 4}>
                 <Typography variant="caption" style={{ marginRight: theme.spacing(1) }}>
-                  <i>Type</i>
+                  <i>{t('page.alerts.details.attack_type')}</i>
                 </Typography>
                 <Chip label={item.attack.category} variant="outlined" />
               </Grid>
               <Grid item xs={isLteSm ? 12 : 8}>
                 <Typography variant="caption" style={{ marginRight: theme.spacing(1) }}>
-                  <i>Patterns</i>
+                  <i>{t('page.alerts.details.attack_pattern')}</i>
                 </Typography>
                 <Box display="inline-block">
                   <ChipList items={item.attack.pattern.map(label => ({ label, variant: 'outlined' }))} />
@@ -214,7 +205,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
       {/* Heuristics Section */}
       {item.heuristic && item.heuristic.name && item.heuristic.name.length > 0 ? (
         <Box className={classes.section}>
-          <Typography className={classes.sectionTitle}>Heuristics</Typography>
+          <Typography className={classes.sectionTitle}>{t('page.alerts.details.heuristic')}</Typography>
           <Divider />
           <Box className={classes.sectionContent}>
             <ChipList items={item.heuristic.name.map(label => ({ label, variant: 'outlined' }))} />
@@ -225,7 +216,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
       {/* AL Behaviours Section */}
       {item.al.behavior ? (
         <Box className={classes.section}>
-          <Typography className={classes.sectionTitle}>Behaviours</Typography>
+          <Typography className={classes.sectionTitle}>{t('page.alerts.details.behaviours')}</Typography>
           <Divider />
           <Box className={classes.sectionContent}>
             <ChipList items={item.al.behavior.map(label => ({ label, variant: 'outlined' }))} />
@@ -236,7 +227,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
       {/* AL Attributions Section */}
       {item.al.attrib ? (
         <Box className={classes.section}>
-          <Typography className={classes.sectionTitle}>Attributions</Typography>
+          <Typography className={classes.sectionTitle}>{t('page.alerts.details.attributions')}</Typography>
           <Divider />
           <Box className={classes.sectionContent}>
             <ChipList items={item.al.attrib.map(label => ({ label, variant: 'outlined' }))} />
@@ -247,7 +238,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
       {/* AL AV Hits */}
       {item.al.av ? (
         <Box className={classes.section}>
-          <Typography className={classes.sectionTitle}>AV Hits</Typography>
+          <Typography className={classes.sectionTitle}>{t('page.alerts.details.avhits')}</Typography>
           <Divider />
           <Box className={classes.sectionContent}>
             <ChipList items={item.al.av.map(label => ({ label, variant: 'outlined' }))} />
@@ -257,7 +248,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
 
       {/* IPs sections */}
       <Box className={classes.section}>
-        <Typography className={classes.sectionTitle}>IPs</Typography>
+        <Typography className={classes.sectionTitle}>{t('page.alerts.details.ip')}</Typography>
         <Divider />
         <Box className={classes.sectionContent}>
           <Grid container spacing={3}>
@@ -265,7 +256,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
               <Grid container spacing={1}>
                 <Grid item xs={isLteSm ? 12 : 4}>
                   <Typography variant="caption">
-                    <i>Dynamic</i>
+                    <i>{t('page.alerts.details.ip_dynamic')}</i>
                   </Typography>
                 </Grid>
                 <Grid item xs={isLteSm ? 12 : 8}>
@@ -279,7 +270,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
               <Grid container spacing={0}>
                 <Grid item xs={isLteSm ? 12 : 4}>
                   <Typography variant="caption">
-                    <i>Static</i>
+                    <i>{t('page.alerts.details.ip_static')}</i>
                   </Typography>
                 </Grid>
                 <Grid item xs={isLteSm ? 12 : 8}>
@@ -295,7 +286,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
 
       {/* Domains sections */}
       <Box className={classes.section}>
-        <Typography className={classes.sectionTitle}>Domains</Typography>
+        <Typography className={classes.sectionTitle}>{t('page.alerts.details.domain')}</Typography>
         <Divider />
         <Box className={classes.sectionContent}>
           <Grid container spacing={3}>
@@ -303,7 +294,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
               <Grid container spacing={1}>
                 <Grid item xs={isLteSm ? 12 : 4}>
                   <Typography variant="caption">
-                    <i>Dynamic</i>
+                    <i>{t('page.alerts.details.domain_dynamic')}</i>
                   </Typography>
                 </Grid>
                 <Grid item xs={isLteSm ? 12 : 8}>
@@ -317,7 +308,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
               <Grid container spacing={0}>
                 <Grid item xs={isLteSm ? 12 : 4}>
                   <Typography variant="caption">
-                    <i>Static</i>
+                    <i>{t('page.alerts.details.domain_static')}</i>
                   </Typography>
                 </Grid>
                 <Grid item xs={isLteSm ? 12 : 8}>
@@ -334,7 +325,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
       {/* YARA Hits */}
       {item.al.yara ? (
         <Box className={classes.section}>
-          <Typography className={classes.sectionTitle}>Yara Hits</Typography>
+          <Typography className={classes.sectionTitle}>{t('page.alerts.details.yara_hits')}</Typography>
           <Divider />
           <Box className={classes.sectionContent}>
             <ChipList items={item.al.yara.map(label => ({ label, variant: 'outlined' }))} />
