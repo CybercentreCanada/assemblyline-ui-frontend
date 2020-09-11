@@ -24,15 +24,15 @@ export default function Configuration() {
   useEffect(() => {
     // Load all services on start
     apiCall({
-      url: '/api/v4/help/configuration/',
-      onSuccess: api_data => {
-        setConfiguration(api_data.api_response);
-      }
-    });
-    apiCall({
       url: '/api/v4/help/constants/',
       onSuccess: api_data => {
         setConstants(api_data.api_response);
+      }
+    });
+    apiCall({
+      url: '/api/v4/help/configuration/',
+      onSuccess: api_data => {
+        setConfiguration(api_data.api_response);
       }
     });
     // eslint-disable-next-line
@@ -57,7 +57,7 @@ export default function Configuration() {
                   return <CustomChip type="square" size="tiny" key={id} label={tag} style={{ padding: '5px' }} />;
                 })
               : [...Array(192)].map((_, i) => {
-                  return <Skeleton key={i} style={{ height: '2rem', width: '10rem', margin: '5px' }} />;
+                  return <Skeleton key={i} style={{ height: '2rem', width: '8rem', marginRight: '3px' }} />;
                 })}
           </Box>
 
@@ -227,7 +227,18 @@ export default function Configuration() {
                     </Grid>
                   );
                 })
-              : null}
+              : [...Array(10)].map((_, i) => {
+                  return (
+                    <Grid container spacing={1}>
+                      <Grid key={i} item xs={12} sm={5} md={4}>
+                        <Skeleton style={{ height: '2rem' }} />
+                      </Grid>
+                      <Grid item xs={12} sm={7} md={8}>
+                        <Skeleton style={{ height: '2rem' }} />
+                      </Grid>
+                    </Grid>
+                  );
+                })}
           </Box>
         </Box>
       </Box>
