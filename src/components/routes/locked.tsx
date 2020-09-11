@@ -12,7 +12,7 @@ type LockedPageProps = {
 };
 
 const LockedPage = ({ autoNotify, hasTOS }: LockedPageProps) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['locked']);
   return (
     <>
       {hasTOS ? (
@@ -21,15 +21,15 @@ const LockedPage = ({ autoNotify, hasTOS }: LockedPageProps) => {
             <HourglassEmptyOutlinedIcon color="secondary" fontSize="inherit" />
           </Box>
           <Box pb={2}>
-            <Typography variant="h3">{t('page.locked.title')}</Typography>
+            <Typography variant="h3">{t('title')}</Typography>
           </Box>
           {autoNotify ? (
             <Box>
-              <Typography variant="h6">{t('page.locked.auto_notify')}</Typography>
+              <Typography variant="h6">{t('auto_notify')}</Typography>
             </Box>
           ) : (
             <Box>
-              <Typography variant="h6">{t('page.locked.contact_admin')}</Typography>
+              <Typography variant="h6">{t('contact_admin')}</Typography>
             </Box>
           )}
         </PageCenter>
