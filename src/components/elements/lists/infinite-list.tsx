@@ -13,6 +13,8 @@ const useStyles = makeStyles(theme => ({
     width: '100%',
     position: 'relative',
     overflow: 'auto',
+    // border: '2px solid',
+    // borderColor: theme.palette.primary.main,
     outline: 'none'
   },
   infiniteListInnerCt: {
@@ -124,6 +126,7 @@ export default function InfiniteList<I extends InfiniteListItem>({
     const itemCount = Math.ceil(fH / _rowHeight) + 1;
     // the total index of the first element shown.
     const topIndex = Math.floor(sT / _rowHeight);
+    console.log(topIndex);
     // extract all the elements that we'll show in a frame.
     const displayItems = _items
       .slice(topIndex, topIndex + itemCount)
@@ -134,11 +137,12 @@ export default function InfiniteList<I extends InfiniteListItem>({
 
   //
   const onFocus = (event: React.FocusEvent<HTMLDivElement>) => {
-    if (cursor === -1) {
-      setCursor(0);
-    } else {
-      scrollSelection(event.currentTarget, cursor, 'start');
-    }
+    setFrame(computeFrame(items, rowHeight));
+    // if (cursor === -1) {
+    //   setCursor(0);
+    // } else {
+    //   scrollSelection(event.currentTarget, cursor, 'start');
+    // }
   };
 
   // Handler::OnScroll
