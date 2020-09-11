@@ -64,7 +64,7 @@ export default function ApiDoc() {
   const classes = useStyles();
   const [expandMap, setExpandMap] = useState({});
   const theme = useTheme();
-  const { t } = useTranslation();
+  const { t } = useTranslation(['helpAPI']);
 
   const downSM = useMediaQuery(theme.breakpoints.down('sm'));
   const xs = useMediaQuery(theme.breakpoints.only('xs'));
@@ -153,7 +153,7 @@ export default function ApiDoc() {
             {apiList.map((version, index) => {
               return (
                 <MenuItem key={index} value={version}>
-                  {version.replace('v', t('page.help.api.version')) + t('page.help.api.version_end')}
+                  {version.replace('v', t('version')) + t('version_end')}
                 </MenuItem>
               );
             })}
@@ -259,7 +259,7 @@ export default function ApiDoc() {
                                 <Grid container alignItems="center">
                                   <>
                                     <Grid item xs={8} sm={4} md={3} lg={2}>
-                                      <Box fontWeight="fontWeightMedium">{t('page.help.api.complete')}:</Box>
+                                      <Box fontWeight="fontWeightMedium">{t('complete')}:</Box>
                                     </Grid>
                                     <Grid item xs={4} sm={8} md={9} lg={4}>
                                       {api.complete ? (
@@ -271,7 +271,7 @@ export default function ApiDoc() {
                                   </>
                                   <>
                                     <Grid item xs={8} sm={4} md={3} lg={2}>
-                                      <Box fontWeight="fontWeightMedium">{t('page.help.api.protected')}:</Box>
+                                      <Box fontWeight="fontWeightMedium">{t('protected')}:</Box>
                                     </Grid>
                                     <Grid item xs={4} sm={8} md={9} lg={4}>
                                       {api.protected ? (
@@ -283,7 +283,7 @@ export default function ApiDoc() {
                                   </>
                                   <>
                                     <Grid item xs={12} sm={4} md={3} lg={2}>
-                                      <Box fontWeight="fontWeightMedium">{t('page.help.api.require_type')}:</Box>
+                                      <Box fontWeight="fontWeightMedium">{t('require_type')}:</Box>
                                     </Grid>
                                     <Grid item xs={12} sm={8} md={9} lg={4}>
                                       {api.require_type.map((utype, uidx) => {
@@ -293,7 +293,7 @@ export default function ApiDoc() {
                                             color={userColor[utype]}
                                             type="square"
                                             size="tiny"
-                                            label={t(`page.help.api.user_type.${utype}`)}
+                                            label={t(`user_type.${utype}`)}
                                           />
                                         );
                                       })}
@@ -302,7 +302,7 @@ export default function ApiDoc() {
                                   {api.required_priv ? (
                                     <>
                                       <Grid item xs={12} sm={4} md={3} lg={2}>
-                                        <Box fontWeight="fontWeightMedium">{t('page.help.api.required_priv')}:</Box>
+                                        <Box fontWeight="fontWeightMedium">{t('required_priv')}:</Box>
                                       </Grid>
                                       <Grid item xs={12} sm={8} md={9} lg={4}>
                                         {api.required_priv.map((ptype, pidx) => {
@@ -312,7 +312,7 @@ export default function ApiDoc() {
                                               color={privColor[ptype]}
                                               type="square"
                                               size="tiny"
-                                              label={t(`page.help.api.priv.${ptype}`)}
+                                              label={t(`priv.${ptype}`)}
                                             />
                                           );
                                         })}
@@ -321,7 +321,7 @@ export default function ApiDoc() {
                                   ) : null}
                                   <>
                                     <Grid item xs={12} sm={4} md={3} lg={2}>
-                                      <Box fontWeight="fontWeightMedium">{t('page.help.api.methods')}:</Box>
+                                      <Box fontWeight="fontWeightMedium">{t('methods')}:</Box>
                                     </Grid>
                                     <Grid item xs={12} sm={8} md={9} lg={4}>
                                       {api.methods.map((met, metid) => {
@@ -339,7 +339,7 @@ export default function ApiDoc() {
                                   </>
                                   <>
                                     <Grid item xs={12} sm={4} md={3} lg={2}>
-                                      <Box fontWeight="fontWeightMedium">{t('page.help.api.path')}:</Box>
+                                      <Box fontWeight="fontWeightMedium">{t('path')}:</Box>
                                     </Grid>
                                     <Grid item xs={12} sm={8} md={9} lg={4}>
                                       <Box lineHeight={2} fontFamily="Monospace" style={{ wordBreak: 'break-word' }}>
@@ -350,7 +350,7 @@ export default function ApiDoc() {
                                   <>
                                     <Grid item xs={12}>
                                       <Box fontWeight="fontWeightMedium" lineHeight={2}>
-                                        {t('page.help.api.description')}:
+                                        {t('description')}:
                                       </Box>
                                     </Grid>
                                     <Grid item xs={12}>

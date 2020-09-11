@@ -1,12 +1,14 @@
 import i18n from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import Error403EN from 'locales/en/403.json';
-import Error404EN from 'locales/en/404.json';
+import error403EN from 'locales/en/403.json';
+import error404EN from 'locales/en/404.json';
+import helpAPIEN from 'locales/en/help/api.json';
 import helpServicesEN from 'locales/en/help/services.json';
 import tosEN from 'locales/en/tos.json';
 import translationEN from 'locales/en/translation.json';
-import Error403FR from 'locales/fr/403.json';
-import Error404FR from 'locales/fr/404.json';
+import error403FR from 'locales/fr/403.json';
+import error404FR from 'locales/fr/404.json';
+import helpAPIFR from 'locales/fr/help/api.json';
 import helpServicesFR from 'locales/fr/help/services.json';
 import tosFR from 'locales/fr/tos.json';
 import translationFR from 'locales/fr/translation.json';
@@ -14,15 +16,17 @@ import { initReactI18next } from 'react-i18next';
 
 const resources = {
   en: {
-    error403: Error403EN,
-    error404: Error404EN,
+    error403: error403EN,
+    error404: error404EN,
     helpServices: helpServicesEN,
+    helpAPI: helpAPIEN,
     translation: translationEN,
     tos: tosEN
   },
   fr: {
-    error403: Error403FR,
-    error404: Error404FR,
+    error403: error403FR,
+    error404: error404FR,
+    helpAPI: helpAPIFR,
     helpServices: helpServicesFR,
     translation: translationFR,
     tos: tosFR
