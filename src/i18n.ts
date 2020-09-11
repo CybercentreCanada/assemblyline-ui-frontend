@@ -10,6 +10,7 @@ import lockedEN from 'locales/en/locked.json';
 import loginEN from 'locales/en/login.json';
 import settingsEN from 'locales/en/settings.json';
 import submissionEN from 'locales/en/submission.json';
+import submitEN from 'locales/en/submit.json';
 import tosEN from 'locales/en/tos.json';
 import translationEN from 'locales/en/translation.json';
 import userEN from 'locales/en/user.json';
@@ -23,6 +24,7 @@ import lockedFR from 'locales/fr/locked.json';
 import loginFR from 'locales/fr/login.json';
 import settingsFR from 'locales/fr/settings.json';
 import submissionFR from 'locales/fr/submission.json';
+import submitFR from 'locales/fr/submit.json';
 import tosFR from 'locales/fr/tos.json';
 import translationFR from 'locales/fr/translation.json';
 import userFR from 'locales/fr/user.json';
@@ -40,6 +42,7 @@ const resources = {
     login: loginEN,
     settings: settingsEN,
     submission: submissionEN,
+    submit: submitEN,
     translation: translationEN,
     tos: tosEN,
     user: userEN
@@ -55,6 +58,7 @@ const resources = {
     login: loginFR,
     settings: settingsFR,
     submission: submissionFR,
+    submit: submitFR,
     translation: translationFR,
     tos: tosFR,
     user: userFR
