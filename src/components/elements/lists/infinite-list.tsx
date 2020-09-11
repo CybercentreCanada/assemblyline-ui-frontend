@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import { Box, CircularProgress, Divider, makeStyles } from '@material-ui/core';
 import { isArrowDown, isArrowUp, isEnter, isEscape } from 'components/elements/utils/keyboard';
@@ -131,6 +132,15 @@ export default function InfiniteList<I extends InfiniteListItem>({
     return { displayItems, sT, rH, fH };
   };
 
+  //
+  const onFocus = (event: React.FocusEvent<HTMLDivElement>) => {
+    if (cursor === -1) {
+      setCursor(0);
+    } else {
+      scrollSelection(event.currentTarget, cursor, 'start');
+    }
+  };
+
   // Handler::OnScroll
   const onScroll = (event: React.UIEvent<HTMLElement>) => {
     const _frame = computeFrame(items, rowHeight);
@@ -180,10 +190,10 @@ export default function InfiniteList<I extends InfiniteListItem>({
   };
 
   // Ensure the list element at specified position is into view.
-  const scrollSelection = (target: HTMLDivElement, position: number, direction: 'up' | 'down') => {
+  const scrollSelection = (target: HTMLDivElement, position: number, direction: 'up' | 'down' | 'start') => {
     const scrollToEl = target.querySelector(`[data-listposition="${position}"]`);
     if (scrollToEl) {
-      scrollToEl.scrollIntoView({ block: 'nearest' });
+      scrollToEl.scrollIntoView({ block: direction === 'start' ? 'start' : 'nearest' });
     } else {
       // Items might not be rendered yet because of we only render what's
       //  within visual range.
@@ -249,7 +259,14 @@ export default function InfiniteList<I extends InfiniteListItem>({
   }, [items, rowHeight]);
 
   return (
-    <div ref={containerEl} className={classes.infiniteListCt} tabIndex={-1} onScroll={onScroll} onKeyDown={onKeyDown}>
+    <div
+      ref={containerEl}
+      className={classes.infiniteListCt}
+      tabIndex={0}
+      onScroll={onScroll}
+      onKeyDown={onKeyDown}
+      onFocus={onFocus}
+    >
       {loading ? (
         <div className={classes.progressCt} style={{ top: frame.sT, height: frame.fH }}>
           <CircularProgress className={classes.progressSpinner} />
