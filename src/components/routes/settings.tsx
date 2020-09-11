@@ -39,7 +39,7 @@ type SettingsProps = {
 };
 
 function Settings<SettingsProps>({ width }) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['settings']);
   const theme = useTheme();
   const [drawerType, setDrawerType] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -171,7 +171,7 @@ function Settings<SettingsProps>({ width }) {
         body: settings,
         onSuccess: () => {
           setModified(false);
-          enqueueSnackbar(t('page.settings.success_save'), snackBarSuccessOptions);
+          enqueueSnackbar(t('success_save'), snackBarSuccessOptions);
         },
         onEnter: () => setButtonLoading(true),
         onExit: () => setButtonLoading(false)
@@ -211,9 +211,9 @@ function Settings<SettingsProps>({ width }) {
               ? {
                   ttl: (
                     <>
-                      <Typography variant="h4">{t('page.settings.submissions.ttl')}</Typography>
+                      <Typography variant="h4">{t('submissions.ttl')}</Typography>
                       <Typography variant="caption" color="textSecondary" gutterBottom>
-                        {t('page.settings.submissions.ttl_desc')}
+                        {t('submissions.ttl_desc')}
                       </Typography>
                       <TextField
                         autoFocus
@@ -228,9 +228,9 @@ function Settings<SettingsProps>({ width }) {
                   ),
                   view: (
                     <>
-                      <Typography variant="h4">{t('page.settings.interface.view')}</Typography>
+                      <Typography variant="h4">{t('interface.view')}</Typography>
                       <Typography variant="caption" color="textSecondary" gutterBottom>
-                        {t('page.settings.interface.view_desc')}
+                        {t('interface.view_desc')}
                       </Typography>
                       <Box pt={2} width="100%">
                         <Select
@@ -241,17 +241,17 @@ function Settings<SettingsProps>({ width }) {
                           variant="outlined"
                           style={{ width: '100%' }}
                         >
-                          <MenuItem value="report">{t('page.settings.interface.view_report')}</MenuItem>
-                          <MenuItem value="details">{t('page.settings.interface.view_details')}</MenuItem>
+                          <MenuItem value="report">{t('interface.view_report')}</MenuItem>
+                          <MenuItem value="details">{t('interface.view_details')}</MenuItem>
                         </Select>
                       </Box>
                     </>
                   ),
                   encoding: (
                     <>
-                      <Typography variant="h4">{t('page.settings.interface.encoding')}</Typography>
+                      <Typography variant="h4">{t('interface.encoding')}</Typography>
                       <Typography variant="caption" color="textSecondary" gutterBottom>
-                        {t('page.settings.interface.encoding_desc')}
+                        {t('interface.encoding_desc')}
                       </Typography>
                       <Box pt={2} width="100%">
                         <Select
@@ -262,17 +262,17 @@ function Settings<SettingsProps>({ width }) {
                           variant="outlined"
                           style={{ width: '100%' }}
                         >
-                          <MenuItem value="raw">{t('page.settings.interface.encoding_raw')}</MenuItem>
-                          <MenuItem value="cart">{t('page.settings.interface.encoding_cart')}</MenuItem>
+                          <MenuItem value="raw">{t('interface.encoding_raw')}</MenuItem>
+                          <MenuItem value="cart">{t('interface.encoding_cart')}</MenuItem>
                         </Select>
                       </Box>
                     </>
                   ),
                   score: (
                     <>
-                      <Typography variant="h4">{t('page.settings.interface.score')}</Typography>
+                      <Typography variant="h4">{t('interface.score')}</Typography>
                       <Typography variant="caption" color="textSecondary" gutterBottom>
-                        {t('page.settings.interface.score_desc')}
+                        {t('interface.score_desc')}
                       </Typography>
                       <Box pt={2} width="100%">
                         <Select
@@ -283,12 +283,12 @@ function Settings<SettingsProps>({ width }) {
                           variant="outlined"
                           style={{ width: '100%' }}
                         >
-                          <MenuItem value="-1000000">{t('page.settings.interface.score_-1000000')}</MenuItem>
-                          <MenuItem value="0">{t('page.settings.interface.score_0')}</MenuItem>
-                          <MenuItem value="100">{t('page.settings.interface.score_100')}</MenuItem>
-                          <MenuItem value="500">{t('page.settings.interface.score_500')}</MenuItem>
-                          <MenuItem value="2000">{t('page.settings.interface.score_2000')}</MenuItem>
-                          <MenuItem value="100000000">{t('page.settings.interface.score_100000000')}</MenuItem>
+                          <MenuItem value="-1000000">{t('interface.score_-1000000')}</MenuItem>
+                          <MenuItem value="0">{t('interface.score_0')}</MenuItem>
+                          <MenuItem value="100">{t('interface.score_100')}</MenuItem>
+                          <MenuItem value="500">{t('interface.score_500')}</MenuItem>
+                          <MenuItem value="2000">{t('interface.score_2000')}</MenuItem>
+                          <MenuItem value="100000000">{t('interface.score_100000000')}</MenuItem>
                         </Select>
                       </Box>
                     </>
@@ -301,12 +301,12 @@ function Settings<SettingsProps>({ width }) {
 
       <Box className={classes.page} py={6} display="inline-block" textAlign="center">
         <TableContainer className={classes.group} component={Paper}>
-          <Table aria-label={t('page.settings.submissions')}>
+          <Table aria-label={t('submissions')}>
             <TableHead>
               <TableRow>
                 <TableCell colSpan={isWidthDown('xs', width) ? 2 : 3}>
                   <Typography variant="h6" gutterBottom>
-                    {t('page.settings.submissions')}
+                    {t('submissions')}
                   </Typography>
                 </TableCell>
               </TableRow>
@@ -314,8 +314,8 @@ function Settings<SettingsProps>({ width }) {
             <TableBody>
               <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDynamicPrevention()}>
                 <TableCell colSpan={2} width="100%">
-                  <Typography variant="body1">{t('page.settings.submissions.dynamic_recursion')}</Typography>
-                  <Typography variant="caption">{t('page.settings.submissions.dynamic_recursion_desc')}</Typography>
+                  <Typography variant="body1">{t('submissions.dynamic_recursion')}</Typography>
+                  <Typography variant="caption">{t('submissions.dynamic_recursion_desc')}</Typography>
                 </TableCell>
                 <TableCell align="right">
                   <Switch
@@ -329,8 +329,8 @@ function Settings<SettingsProps>({ width }) {
               </TableRow>
               <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleFiltering()}>
                 <TableCell colSpan={2} width="100%">
-                  <Typography variant="body1">{t('page.settings.submissions.filtering')}</Typography>
-                  <Typography variant="caption">{t('page.settings.submissions.filtering_desc')}</Typography>
+                  <Typography variant="body1">{t('submissions.filtering')}</Typography>
+                  <Typography variant="caption">{t('submissions.filtering_desc')}</Typography>
                 </TableCell>
                 <TableCell align="right">
                   <Switch
@@ -344,8 +344,8 @@ function Settings<SettingsProps>({ width }) {
               </TableRow>
               <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleCaching()}>
                 <TableCell colSpan={2} width="100%">
-                  <Typography variant="body1">{t('page.settings.submissions.result_caching')}</Typography>
-                  <Typography variant="caption">{t('page.settings.submissions.result_caching_desc')}</Typography>
+                  <Typography variant="body1">{t('submissions.result_caching')}</Typography>
+                  <Typography variant="caption">{t('submissions.result_caching_desc')}</Typography>
                 </TableCell>
                 <TableCell align="right">
                   <Switch
@@ -359,8 +359,8 @@ function Settings<SettingsProps>({ width }) {
               </TableRow>
               <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDeepScan()}>
                 <TableCell colSpan={2} width="100%">
-                  <Typography variant="body1">{t('page.settings.submissions.deep_scan')}</Typography>
-                  <Typography variant="caption">{t('page.settings.submissions.deep_scan_desc')}</Typography>
+                  <Typography variant="body1">{t('submissions.deep_scan')}</Typography>
+                  <Typography variant="caption">{t('submissions.deep_scan_desc')}</Typography>
                 </TableCell>
                 <TableCell align="right">
                   <Switch
@@ -374,8 +374,8 @@ function Settings<SettingsProps>({ width }) {
               </TableRow>
               <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleProfile()}>
                 <TableCell colSpan={2} width="100%">
-                  <Typography variant="body1">{t('page.settings.submissions.profile')}</Typography>
-                  <Typography variant="caption">{t('page.settings.submissions.profile_desc')}</Typography>
+                  <Typography variant="body1">{t('submissions.profile')}</Typography>
+                  <Typography variant="caption">{t('submissions.profile_desc')}</Typography>
                 </TableCell>
                 <TableCell align="right">
                   <Switch
@@ -390,24 +390,24 @@ function Settings<SettingsProps>({ width }) {
               <TableRow hover style={{ cursor: 'pointer' }} onClick={event => toggleDrawer('ttl')}>
                 {isWidthDown('xs', width) ? null : (
                   <TableCell>
-                    <Typography variant="body1">{t('page.settings.submissions.ttl')}</Typography>
-                    <Typography variant="caption">{t('page.settings.submissions.ttl_desc')}</Typography>
+                    <Typography variant="body1">{t('submissions.ttl')}</Typography>
+                    <Typography variant="caption">{t('submissions.ttl_desc')}</Typography>
                   </TableCell>
                 )}
                 <TableCell colSpan={isWidthDown('xs', width) ? 2 : 1}>
                   {!isWidthDown('xs', width) ? null : (
                     <>
-                      <Typography variant="body1">{t('page.settings.submissions.ttl')}</Typography>
+                      <Typography variant="body1">{t('submissions.ttl')}</Typography>
                       <Typography variant="caption" gutterBottom>
-                        {t('page.settings.submissions.ttl_desc')}
+                        {t('submissions.ttl_desc')}
                       </Typography>
                     </>
                   )}
                   {settings ? (
                     <Typography variant="subtitle2" color="primary">
                       {settings.ttl === 0
-                        ? t('page.settings.submissions.ttl_forever')
-                        : `${settings.ttl} ${t('page.settings.submissions.ttl_days')}`}
+                        ? t('submissions.ttl_forever')
+                        : `${settings.ttl} ${t('submissions.ttl_days')}`}
                     </Typography>
                   ) : (
                     <Skeleton />
@@ -422,12 +422,12 @@ function Settings<SettingsProps>({ width }) {
         </TableContainer>
 
         <TableContainer className={classes.group} component={Paper}>
-          <Table aria-label={t('page.settings.interface')}>
+          <Table aria-label={t('interface')}>
             <TableHead>
               <TableRow>
                 <TableCell colSpan={3}>
                   <Typography variant="h6" gutterBottom>
-                    {t('page.settings.interface')}
+                    {t('interface')}
                   </Typography>
                 </TableCell>
               </TableRow>
@@ -436,22 +436,22 @@ function Settings<SettingsProps>({ width }) {
               <TableRow hover style={{ cursor: 'pointer' }} onClick={event => toggleDrawer('view')}>
                 {isWidthDown('xs', width) ? null : (
                   <TableCell>
-                    <Typography variant="body1">{t('page.settings.interface.view')}</Typography>
-                    <Typography variant="caption">{t('page.settings.interface.view_desc')}</Typography>
+                    <Typography variant="body1">{t('interface.view')}</Typography>
+                    <Typography variant="caption">{t('interface.view_desc')}</Typography>
                   </TableCell>
                 )}
                 <TableCell colSpan={isWidthDown('xs', width) ? 2 : 1}>
                   {!isWidthDown('xs', width) ? null : (
                     <>
-                      <Typography variant="body1">{t('page.settings.interface.view')}</Typography>
+                      <Typography variant="body1">{t('interface.view')}</Typography>
                       <Typography variant="caption" gutterBottom>
-                        {t('page.settings.interface.view_desc')}
+                        {t('interface.view_desc')}
                       </Typography>
                     </>
                   )}
                   {settings ? (
                     <Typography variant="subtitle2" color="primary">
-                      {t(`page.settings.interface.view_${settings.submission_view}`)}
+                      {t(`interface.view_${settings.submission_view}`)}
                     </Typography>
                   ) : (
                     <Skeleton />
@@ -464,22 +464,22 @@ function Settings<SettingsProps>({ width }) {
               <TableRow hover style={{ cursor: 'pointer' }} onClick={event => toggleDrawer('encoding')}>
                 {isWidthDown('xs', width) ? null : (
                   <TableCell>
-                    <Typography variant="body1">{t('page.settings.interface.encoding')}</Typography>
-                    <Typography variant="caption">{t('page.settings.interface.encoding_desc')}</Typography>
+                    <Typography variant="body1">{t('interface.encoding')}</Typography>
+                    <Typography variant="caption">{t('interface.encoding_desc')}</Typography>
                   </TableCell>
                 )}
                 <TableCell colSpan={isWidthDown('xs', width) ? 2 : 1}>
                   {!isWidthDown('xs', width) ? null : (
                     <>
-                      <Typography variant="body1">{t('page.settings.interface.encoding')}</Typography>
+                      <Typography variant="body1">{t('interface.encoding')}</Typography>
                       <Typography variant="caption" gutterBottom>
-                        {t('page.settings.interface.encoding_desc')}
+                        {t('interface.encoding_desc')}
                       </Typography>
                     </>
                   )}
                   {settings ? (
                     <Typography variant="subtitle2" color="primary">
-                      {t(`page.settings.interface.encoding_${settings.download_encoding}`)}
+                      {t(`interface.encoding_${settings.download_encoding}`)}
                     </Typography>
                   ) : (
                     <Skeleton />
@@ -492,22 +492,22 @@ function Settings<SettingsProps>({ width }) {
               <TableRow hover style={{ cursor: 'pointer' }} onClick={event => toggleDrawer('score')}>
                 {isWidthDown('xs', width) ? null : (
                   <TableCell>
-                    <Typography variant="body1">{t('page.settings.interface.score')}</Typography>
-                    <Typography variant="caption">{t('page.settings.interface.score_desc')}</Typography>
+                    <Typography variant="body1">{t('interface.score')}</Typography>
+                    <Typography variant="caption">{t('interface.score_desc')}</Typography>
                   </TableCell>
                 )}
                 <TableCell colSpan={isWidthDown('xs', width) ? 2 : 1}>
                   {!isWidthDown('xs', width) ? null : (
                     <>
-                      <Typography variant="body1">{t('page.settings.interface.score')}</Typography>
+                      <Typography variant="body1">{t('interface.score')}</Typography>
                       <Typography variant="caption" gutterBottom>
-                        {t('page.settings.interface.score_desc')}
+                        {t('interface.score_desc')}
                       </Typography>
                     </>
                   )}
                   {settings ? (
                     <Typography variant="subtitle2" color="primary">
-                      {t(`page.settings.interface.score_${settings.expand_min_score}`)}
+                      {t(`interface.score_${settings.expand_min_score}`)}
                     </Typography>
                   ) : (
                     <Skeleton />
@@ -524,7 +524,7 @@ function Settings<SettingsProps>({ width }) {
         <Paper className={classes.group}>
           <Box p={2} textAlign="left">
             <Typography variant="h6" gutterBottom>
-              {t('page.settings.service')}
+              {t('service')}
             </Typography>
             <ServiceTree settings={settings} setSettings={setSettings} setModified={setModified} />
           </Box>
@@ -543,7 +543,7 @@ function Settings<SettingsProps>({ width }) {
             }}
           >
             <Button variant="contained" color="primary" disabled={buttonLoading || !modified} onClick={saveSettings}>
-              {t('page.settings.save')}
+              {t('save')}
               {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
             </Button>
           </Box>
