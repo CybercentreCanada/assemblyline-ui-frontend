@@ -4,7 +4,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 type LinkGridProps = {
-  items: any[];
+  items: {
+    route: string;
+    icon?: React.ReactElement<any>;
+    name?: string;
+    text?: string;
+  }[];
 };
 
 export default function LinkGrid({ items }: LinkGridProps) {
