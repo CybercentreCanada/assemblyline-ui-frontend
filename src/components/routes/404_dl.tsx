@@ -5,14 +5,14 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 const NotFoundPage = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['error404']);
   return (
     <PageCenter width="65%">
       <Box pt={10} pb={6}>
-        <img alt={t('page.404_dl.alt')} src="/images/dead_link.png" style={{ maxHeight: '300px', maxWidth: '90%' }} />
+        <img alt={t('dl.alt')} src="/images/dead_link.png" style={{ maxHeight: '300px', maxWidth: '90%' }} />
       </Box>
       <Box>
-        <Typography variant="h6">{t('page.404_dl.description')}</Typography>
+        <Typography variant="h6">{t('dl.description')}</Typography>
       </Box>
     </PageCenter>
   );
