@@ -1,29 +1,53 @@
 import { Box, Drawer, Typography, useTheme } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import InfiniteList from 'components/elements/lists/infinite-list';
 import SplitPanel from 'components/elements/panels/split-panel';
 import Viewport from 'components/elements/panels/viewport';
+import SearchBar from 'components/elements/search/search-bar';
 import React, { useState } from 'react';
 import AlertActionsMenu from './alert-actions-menu';
 import AlertDetails from './alert-details';
 import AlertListItem from './alert-list-item';
 import AlertsFilters from './alerts-filters';
-import AlertsHeader from './alerts-header';
 import useAlerts, { AlertItem } from './useAlerts';
 
+//
 const Alerts: React.FC = () => {
   const theme = useTheme();
   const { loading, items, onNextPage } = useAlerts();
-  const [state, setState] = useState<{ open: boolean; selectedItem: AlertItem }>({ open: false, selectedItem: null });
+  const [searching, setSearching] = useState<boolean>(false);
+  const [splitPanel, setSplitPanel] = useState<{ open: boolean; item: AlertItem }>({ open: false, item: null });
   const [drawer, setDrawer] = useState<{ open: boolean; type: 'filter' }>({ open: false, type: null });
+
+  const onSearching = (filterValue: string = '', inputEl: HTMLInputElement = null) => {
+    setSearching(true);
+    if (drawer.open) {
+      setDrawer({ open: false, type: null });
+    }
+    setTimeout(() => {
+      setSearching(false);
+      if (inputEl) {
+        inputEl.focus();
+      }
+    }, 2000);
+  };
 
   return (
     <Box>
       <Box pb={theme.spacing(0.25)}>
-        <AlertsHeader
-          onFilterBtnClick={() => console.log('filter...')}
-          onExpandBtnClick={() => setDrawer({ open: true, type: 'filter' })}
+        <SearchBar
+          searching={searching}
+          onSearching={onSearching}
+          buttons={[
+            {
+              icon: <ExpandMoreIcon />,
+              props: {
+                onClick: () => setDrawer({ open: true, type: 'filter' })
+              }
+            }
+          ]}
         />
       </Box>
       <Viewport>
@@ -34,46 +58,48 @@ const Alerts: React.FC = () => {
           rightDrawerBreakpoint={1100}
           rightDrawerWidth={900}
           rightDrawerBackgroundColor={theme.palette.background.default}
-          rightOpen={state.open}
+          rightOpen={splitPanel.open}
           left={
             <InfiniteList
               items={items}
-              loading={loading}
+              loading={loading || searching}
               rowHeight={97}
-              selected={state.open && state.selectedItem ? state.selectedItem : null}
-              onItemSelected={(item: AlertItem) => setState({ open: true, selectedItem: item })}
+              selected={splitPanel.open && splitPanel.item ? splitPanel.item : null}
+              onItemSelected={(item: AlertItem) => setSplitPanel({ open: true, item })}
               onMoreItems={onNextPage}
               onRenderItem={(item: AlertItem) => <AlertListItem item={item} />}
             />
           }
           right={
-            state.selectedItem ? (
+            splitPanel.item ? (
               <Box p={2} pt={0} width="100%">
                 <PageHeader
                   mode="provided"
                   title={
                     <Box display="flex" alignItems="center">
                       <AlertActionsMenu />
-                      <Typography variant="h6">{state.selectedItem.alert_id}</Typography>
+                      <Typography variant="h6">{splitPanel.item.alert_id}</Typography>
                     </Box>
                   }
-                  actions={[{ icon: <CloseIcon />, action: () => setState({ ...state, open: false }) }]}
+                  actions={[
+                    { icon: <CloseIcon />, action: () => setSplitPanel({ open: false, item: splitPanel.item }) }
+                  ]}
                   backgroundColor={theme.palette.background.default}
                   elevation={0}
                   isSticky
                 />
-                <AlertDetails item={state.selectedItem} />
+                <AlertDetails item={splitPanel.item} />
               </Box>
             ) : null
           }
         />
       </Viewport>
-      <Drawer open={drawer.open} anchor="right" onClose={() => setDrawer({ ...drawer, open: false })}>
+      <Drawer open={drawer.open} anchor="right" onClose={() => setDrawer({ open: false, type: null })}>
         {
           {
             filter: (
               <Box minWidth={600} p={theme.spacing(0.5)}>
-                <AlertsFilters onApplyBtnClick={() => setDrawer({ ...drawer, open: false })} />
+                <AlertsFilters onApplyBtnClick={onSearching} />
               </Box>
             )
           }[drawer.type]
