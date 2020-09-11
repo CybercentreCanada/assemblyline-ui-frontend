@@ -113,7 +113,7 @@ export default function useMySitemap() {
         icon: <AccountTreeOutlinedIcon />,
         breadcrumbs: ['/help']
       },
-      { path: '/tos', title: t('page.tos'), isRoot: true, icon: <ReceiptOutlinedIcon /> },
+      { path: '/tos', title: t('breadcrumbs.tos'), isRoot: true, icon: <ReceiptOutlinedIcon /> },
       { path: '/account', title: t('usermenu.account'), isRoot: true, icon: <AccountCircleOutlinedIcon /> },
       { path: '/settings', title: t('usermenu.settings'), isRoot: true, icon: <SettingsOutlinedIcon /> },
       { path: '/admin', title: t('adminmenu'), isRoot: true, icon: <BusinessOutlinedIcon /> },
