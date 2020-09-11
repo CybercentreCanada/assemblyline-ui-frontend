@@ -8,6 +8,7 @@ import helpServicesEN from 'locales/en/help/services.json';
 import settingsEN from 'locales/en/settings.json';
 import tosEN from 'locales/en/tos.json';
 import translationEN from 'locales/en/translation.json';
+import userEN from 'locales/en/user.json';
 import error403FR from 'locales/fr/403.json';
 import error404FR from 'locales/fr/404.json';
 import helpAPIFR from 'locales/fr/help/api.json';
@@ -16,6 +17,7 @@ import helpServicesFR from 'locales/fr/help/services.json';
 import settingsFR from 'locales/fr/settings.json';
 import tosFR from 'locales/fr/tos.json';
 import translationFR from 'locales/fr/translation.json';
+import userFR from 'locales/fr/user.json';
 import { initReactI18next } from 'react-i18next';
 
 const resources = {
@@ -27,7 +29,8 @@ const resources = {
     helpServices: helpServicesEN,
     settings: settingsEN,
     translation: translationEN,
-    tos: tosEN
+    tos: tosEN,
+    user: userEN
   },
   fr: {
     error403: error403FR,
@@ -37,7 +40,8 @@ const resources = {
     helpServices: helpServicesFR,
     settings: settingsFR,
     translation: translationFR,
-    tos: tosFR
+    tos: tosFR,
+    user: userFR
   }
 };
 

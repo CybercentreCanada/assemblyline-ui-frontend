@@ -43,10 +43,10 @@ type UserProps = {
   username: string;
 };
 
-function User<UserProps>({ width, username }) {
+function User({ width, username }: UserProps) {
   const { id } = useParams();
   const inputRef = useRef(null);
-  const { t } = useTranslation();
+  const { t } = useTranslation(['user']);
   const theme = useTheme();
   const [drawerType, setDrawerType] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -114,7 +114,7 @@ function User<UserProps>({ width, username }) {
       body: user,
       onSuccess: () => {
         setModified(false);
-        enqueueSnackbar(t('page.user.success_save'), snackBarSuccessOptions);
+        enqueueSnackbar(t('success_save'), snackBarSuccessOptions);
       },
       onEnter: () => setButtonLoading(true),
       onExit: () => setButtonLoading(false)
@@ -153,15 +153,15 @@ function User<UserProps>({ width, username }) {
 
   function set2FAEnabled(value) {
     if (value && user['2fa_enabled']) {
-      enqueueSnackbar(t('page.user.2fa_already_enabled'), {
+      enqueueSnackbar(t('2fa_already_enabled'), {
         ...snackBarSuccessOptions,
         variant: 'error',
         autoHideDuration: 3000
       });
     } else if (value) {
-      enqueueSnackbar(t('page.user.2fa_enabled'), snackBarSuccessOptions);
+      enqueueSnackbar(t('2fa_enabled'), snackBarSuccessOptions);
     } else {
-      enqueueSnackbar(t('page.user.2fa_disabled'), {
+      enqueueSnackbar(t('2fa_disabled'), {
         ...snackBarSuccessOptions,
         variant: 'warning',
         autoHideDuration: 3000
@@ -251,9 +251,9 @@ function User<UserProps>({ width, username }) {
               ? {
                   api_quota: (
                     <>
-                      <Typography variant="h4">{t('page.user.api_quota')}</Typography>
+                      <Typography variant="h4">{t('api_quota')}</Typography>
                       <Typography variant="caption" color="textSecondary" gutterBottom>
-                        {t('page.user.api_quota_edit_title')}
+                        {t('api_quota_edit_title')}
                       </Typography>
                       <TextField
                         autoFocus
@@ -268,30 +268,30 @@ function User<UserProps>({ width, username }) {
                   change_password: (
                     <>
                       <Typography variant="h4" gutterBottom>
-                        {t('page.user.change_password')}
+                        {t('change_password')}
                       </Typography>
                       <TextField
                         autoFocus
                         type="password"
                         margin="normal"
                         variant="outlined"
-                        label={t('page.user.new_password')}
+                        label={t('new_password')}
                         onChange={event => setNewPassword(event.target.value)}
                       />
                       <TextField
                         type="password"
                         margin="normal"
                         variant="outlined"
-                        label={t('page.user.confirm_password')}
+                        label={t('confirm_password')}
                         onChange={event => setConfirmPassword(event.target.value)}
                       />
                     </>
                   ),
                   groups: (
                     <>
-                      <Typography variant="h4">{t('page.user.groups')}</Typography>
+                      <Typography variant="h4">{t('groups')}</Typography>
                       <Typography variant="caption" color="textSecondary" gutterBottom>
-                        {t('page.user.groups_edit_title')}
+                        {t('groups_edit_title')}
                       </Typography>
                       <ChipInput
                         margin="normal"
@@ -303,9 +303,9 @@ function User<UserProps>({ width, username }) {
                   ),
                   name: (
                     <>
-                      <Typography variant="h4">{t('page.user.name')}</Typography>
+                      <Typography variant="h4">{t('name')}</Typography>
                       <Typography variant="caption" color="textSecondary" gutterBottom>
-                        {t('page.user.name_edit_title')}
+                        {t('name_edit_title')}
                       </Typography>
                       <TextField
                         autoFocus
@@ -318,9 +318,9 @@ function User<UserProps>({ width, username }) {
                   ),
                   submission_quota: (
                     <>
-                      <Typography variant="h4">{t('page.user.submission_quota')}</Typography>
+                      <Typography variant="h4">{t('submission_quota')}</Typography>
                       <Typography variant="caption" color="textSecondary" gutterBottom>
-                        {t('page.user.submission_quota_edit_title')}
+                        {t('submission_quota_edit_title')}
                       </Typography>
                       <TextField
                         autoFocus
@@ -408,7 +408,7 @@ function User<UserProps>({ width, username }) {
                   <CustomChip
                     color={user.is_active ? 'primary' : 'default'}
                     onClick={currentUser.username !== user.uname ? toggleAccountEnabled : null}
-                    label={user.is_active ? t('page.user.enabled') : t('page.user.disabled')}
+                    label={user.is_active ? t('enabled') : t('disabled')}
                     type="square"
                   />
                 ) : (
@@ -420,12 +420,12 @@ function User<UserProps>({ width, username }) {
 
           <Grid item sm={12} md={9} style={{ width: '100%' }}>
             <TableContainer className={classes.group} component={Paper}>
-              <Table aria-label={t('page.user.profile')}>
+              <Table aria-label={t('profile')}>
                 <TableHead>
                   <TableRow>
                     <TableCell colSpan={isWidthDown('xs', width) ? 2 : 3}>
                       <Typography variant="h6" gutterBottom>
-                        {t('page.user.profile')}
+                        {t('profile')}
                       </Typography>
                     </TableCell>
                   </TableRow>
@@ -433,24 +433,20 @@ function User<UserProps>({ width, username }) {
                 <TableBody>
                   <TableRow className={classes.row}>
                     {isWidthDown('xs', width) ? null : (
-                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.user.uname')}</TableCell>
+                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('uname')}</TableCell>
                     )}
                     <TableCell width="100%">
-                      {!isWidthDown('xs', width) ? null : (
-                        <Typography variant="caption">{t('page.user.uname')}</Typography>
-                      )}
+                      {!isWidthDown('xs', width) ? null : <Typography variant="caption">{t('uname')}</Typography>}
                       {user ? <Box>{user.uname}</Box> : <Skeleton />}
                     </TableCell>
                     <TableCell align="right" />
                   </TableRow>
                   <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('name')}>
                     {isWidthDown('xs', width) ? null : (
-                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.user.name')}</TableCell>
+                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('name')}</TableCell>
                     )}
                     <TableCell width="100%">
-                      {!isWidthDown('xs', width) ? null : (
-                        <Typography variant="caption">{t('page.user.name')}</Typography>
-                      )}
+                      {!isWidthDown('xs', width) ? null : <Typography variant="caption">{t('name')}</Typography>}
                       {user ? <Box>{user.name}</Box> : <Skeleton />}
                     </TableCell>
                     <TableCell align="right">
@@ -459,12 +455,10 @@ function User<UserProps>({ width, username }) {
                   </TableRow>
                   <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('groups')}>
                     {isWidthDown('xs', width) ? null : (
-                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.user.groups')}</TableCell>
+                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('groups')}</TableCell>
                     )}
                     <TableCell width="100%">
-                      {!isWidthDown('xs', width) ? null : (
-                        <Typography variant="caption">{t('page.user.groups')}</Typography>
-                      )}
+                      {!isWidthDown('xs', width) ? null : <Typography variant="caption">{t('groups')}</Typography>}
                       {user ? <Box>{user.groups.join(' | ')}</Box> : <Skeleton />}
                     </TableCell>
                     <TableCell align="right">
@@ -473,12 +467,10 @@ function User<UserProps>({ width, username }) {
                   </TableRow>
                   <TableRow className={classes.row}>
                     {isWidthDown('xs', width) ? null : (
-                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.user.email')}</TableCell>
+                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('email')}</TableCell>
                     )}
                     <TableCell width="100%">
-                      {!isWidthDown('xs', width) ? null : (
-                        <Typography variant="caption">{t('page.user.email')}</Typography>
-                      )}
+                      {!isWidthDown('xs', width) ? null : <Typography variant="caption">{t('email')}</Typography>}
                       {user ? <Box>{user.email}</Box> : <Skeleton />}
                     </TableCell>
                     <TableCell align="right" />
@@ -488,12 +480,12 @@ function User<UserProps>({ width, username }) {
             </TableContainer>
 
             <TableContainer className={classes.group} component={Paper}>
-              <Table aria-label={t('page.user.options')}>
+              <Table aria-label={t('options')}>
                 <TableHead>
                   <TableRow>
                     <TableCell colSpan={3}>
                       <Typography variant="h6" gutterBottom>
-                        {t('page.user.options')}
+                        {t('options')}
                       </Typography>
                     </TableCell>
                   </TableRow>
@@ -501,12 +493,10 @@ function User<UserProps>({ width, username }) {
                 <TableBody>
                   <TableRow>
                     {isWidthDown('xs', width) ? null : (
-                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.user.roles')}</TableCell>
+                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('roles')}</TableCell>
                     )}
                     <TableCell width="100%">
-                      {!isWidthDown('xs', width) ? null : (
-                        <Typography variant="caption">{t('page.user.roles')}</Typography>
-                      )}
+                      {!isWidthDown('xs', width) ? null : <Typography variant="caption">{t('roles')}</Typography>}
                       {user ? (
                         <Box>
                           <CustomChip
@@ -518,7 +508,7 @@ function User<UserProps>({ width, username }) {
                                 ? () => toggleRole('user')
                                 : null
                             }
-                            label={t('page.user.normal_user')}
+                            label={t('normal_user')}
                           />
                           <CustomChip
                             type="square"
@@ -529,21 +519,21 @@ function User<UserProps>({ width, username }) {
                                 ? () => toggleRole('admin')
                                 : null
                             }
-                            label={t('page.user.admin')}
+                            label={t('admin')}
                           />
                           <CustomChip
                             type="square"
                             size="small"
                             color={user.type.includes('signature_manager') ? 'primary' : 'default'}
                             onClick={currentUser.is_admin ? () => toggleRole('signature_manager') : null}
-                            label={t('page.user.signature_manager')}
+                            label={t('signature_manager')}
                           />
                           <CustomChip
                             type="square"
                             size="small"
                             color={user.type.includes('signature_importer') ? 'primary' : 'default'}
                             onClick={currentUser.is_admin ? () => toggleRole('signature_importer') : null}
-                            label={t('page.user.signature_importer')}
+                            label={t('signature_importer')}
                           />
                         </Box>
                       ) : (
@@ -558,12 +548,10 @@ function User<UserProps>({ width, username }) {
                     onClick={currentUser.is_admin ? event => toggleDrawer('api_quota') : null}
                   >
                     {isWidthDown('xs', width) ? null : (
-                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.user.api_quota')}</TableCell>
+                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('api_quota')}</TableCell>
                     )}
                     <TableCell width="100%">
-                      {!isWidthDown('xs', width) ? null : (
-                        <Typography variant="caption">{t('page.user.api_quota')}</Typography>
-                      )}
+                      {!isWidthDown('xs', width) ? null : <Typography variant="caption">{t('api_quota')}</Typography>}
                       {user ? <Box>{user.api_quota}</Box> : <Skeleton />}
                     </TableCell>
                     <TableCell align="right">{currentUser.is_admin ? <ChevronRightOutlinedIcon /> : null}</TableCell>
@@ -574,11 +562,11 @@ function User<UserProps>({ width, username }) {
                     onClick={currentUser.is_admin ? event => toggleDrawer('submission_quota') : null}
                   >
                     {isWidthDown('xs', width) ? null : (
-                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('page.user.submission_quota')}</TableCell>
+                      <TableCell style={{ whiteSpace: 'nowrap' }}>{t('submission_quota')}</TableCell>
                     )}
                     <TableCell width="100%">
                       {!isWidthDown('xs', width) ? null : (
-                        <Typography variant="caption">{t('page.user.submission_quota')}</Typography>
+                        <Typography variant="caption">{t('submission_quota')}</Typography>
                       )}
                       {user ? <Box>{user.submission_quota}</Box> : <Skeleton />}
                     </TableCell>
@@ -589,19 +577,19 @@ function User<UserProps>({ width, username }) {
             </TableContainer>
 
             <TableContainer className={classes.group} component={Paper}>
-              <Table aria-label={t('page.user.security')}>
+              <Table aria-label={t('security')}>
                 <TableHead>
                   <TableRow>
                     <TableCell colSpan={2}>
                       <Typography variant="h6" gutterBottom>
-                        {t('page.user.security')}
+                        {t('security')}
                       </Typography>
                     </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('change_password')}>
-                    <TableCell width="100%">{user ? t('page.user.change_password') : <Skeleton />}</TableCell>
+                    <TableCell width="100%">{user ? t('change_password') : <Skeleton />}</TableCell>
                     <TableCell align="right">
                       <ChevronRightOutlinedIcon />
                     </TableCell>
@@ -613,7 +601,7 @@ function User<UserProps>({ width, username }) {
                       onClick={() => toggleDrawer(user && user['2fa_enabled'] ? 'disable_otp' : 'otp')}
                     >
                       <TableCell width="100%">
-                        {user ? user['2fa_enabled'] ? t('page.user.2fa_off') : t('page.user.2fa_on') : <Skeleton />}
+                        {user ? user['2fa_enabled'] ? t('2fa_off') : t('2fa_on') : <Skeleton />}
                       </TableCell>
                       <TableCell align="right">
                         <ChevronRightOutlinedIcon />
@@ -623,7 +611,7 @@ function User<UserProps>({ width, username }) {
                   {user ? (
                     user['2fa_enabled'] && currentUser.allow_security_tokens ? (
                       <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('token')}>
-                        <TableCell width="100%">{user ? t('page.user.token') : <Skeleton />}</TableCell>
+                        <TableCell width="100%">{user ? t('token') : <Skeleton />}</TableCell>
                         <TableCell align="right">
                           <ChevronRightOutlinedIcon />
                         </TableCell>
@@ -632,7 +620,7 @@ function User<UserProps>({ width, username }) {
                   ) : null}
                   {currentUser.allow_apikeys ? (
                     <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('api_key')}>
-                      <TableCell width="100%">{user ? t('page.user.apikeys') : <Skeleton />}</TableCell>
+                      <TableCell width="100%">{user ? t('apikeys') : <Skeleton />}</TableCell>
                       <TableCell align="right">
                         <ChevronRightOutlinedIcon />
                       </TableCell>
@@ -655,7 +643,7 @@ function User<UserProps>({ width, username }) {
                 }}
               >
                 <Button variant="contained" color="primary" disabled={buttonLoading || !modified} onClick={saveUser}>
-                  {t('page.user.save')}
+                  {t('save')}
                   {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
                 </Button>
               </Box>

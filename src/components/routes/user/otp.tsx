@@ -11,11 +11,11 @@ type OTPProps = {
   set2FAEnabled: (value: boolean) => void;
 };
 
-export default function OTP<OTPProps>({ setDrawerOpen, set2FAEnabled }) {
+export default function OTP({ setDrawerOpen, set2FAEnabled }: OTPProps) {
   const apiCall = useMyAPI();
   const [response, setResponse] = useState(null);
   const [tempOTP, setTempOTP] = useState('');
-  const { t } = useTranslation();
+  const { t } = useTranslation(['user']);
   const regex = RegExp('^[0-9]{1,6}$');
 
   function handleOTPChange(event) {
@@ -56,10 +56,10 @@ export default function OTP<OTPProps>({ setDrawerOpen, set2FAEnabled }) {
   return (
     <>
       <Typography variant="h4" gutterBottom>
-        {t('page.user.2fa_setup_title')}
+        {t('2fa_setup_title')}
       </Typography>
       <Box textAlign="center">
-        <Typography>{t('page.user.2fa_scan')}</Typography>
+        <Typography>{t('2fa_scan')}</Typography>
         <Box py={4} display="flex" flexDirection="row" justifyContent="center">
           {response ? (
             <div
@@ -74,7 +74,7 @@ export default function OTP<OTPProps>({ setDrawerOpen, set2FAEnabled }) {
           )}
         </Box>
         <TextDivider forcePaper />
-        <Typography gutterBottom>{t('page.user.2fa_manual')}</Typography>
+        <Typography gutterBottom>{t('2fa_manual')}</Typography>
         <Box py={4}>
           <Typography variant="caption">{response ? response.secret_key : <Skeleton />}</Typography>
         </Box>
@@ -83,14 +83,14 @@ export default function OTP<OTPProps>({ setDrawerOpen, set2FAEnabled }) {
           style={{ width: '100%' }}
           margin="normal"
           variant="outlined"
-          label={t('page.user.2fa_temp_otp')}
+          label={t('2fa_temp_otp')}
           onChange={handleOTPChange}
           value={tempOTP}
         />
 
         <Box textAlign="end" pt={6}>
           <Button style={{ marginRight: '8px' }} variant="contained" onClick={() => setDrawerOpen(false)}>
-            {t('page.user.cancel')}
+            {t('cancel')}
           </Button>
           <Button
             disabled={isNull(response) || tempOTP === ''}
@@ -98,7 +98,7 @@ export default function OTP<OTPProps>({ setDrawerOpen, set2FAEnabled }) {
             color="primary"
             onClick={() => validateOTP()}
           >
-            {t('page.user.validate')}
+            {t('validate')}
           </Button>
         </Box>
       </Box>
