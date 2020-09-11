@@ -23,7 +23,7 @@ export function SecurityTokenLogin({
   setWebAuthNResponse,
   snackBarOptions
 }: SecTokenProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['login']);
   const apiCall = useMyAPI();
 
   useEffect(() => {
@@ -51,11 +51,11 @@ export function SecurityTokenLogin({
               // eslint-disable-next-line no-console
               console.log(`${ex.name}: ${ex.message}`);
               setShownControls('otp');
-              enqueueSnackbar(t('page.login.securitytoken.error'), snackBarOptions);
+              enqueueSnackbar(t('securitytoken.error'), snackBarOptions);
             });
         } else {
           setShownControls('otp');
-          enqueueSnackbar(t('page.login.securitytoken.unavailable'), snackBarOptions);
+          enqueueSnackbar(t('securitytoken.unavailable'), snackBarOptions);
         }
       }
     });
@@ -68,7 +68,7 @@ export function SecurityTokenLogin({
         <LockOutlinedIcon style={{ fontSize: '108pt' }} color="action" />
       </Box>
       <Typography variant="h6" color="textSecondary">
-        {t('page.login.securitytoken')}
+        {t('securitytoken')}
       </Typography>
     </Box>
   );

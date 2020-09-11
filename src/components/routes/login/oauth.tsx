@@ -36,7 +36,7 @@ type OAuthProps = {
 };
 
 export function OAuthLogin({ avatar, username, oAuthToken, buttonLoading, onSubmit, reset }: OAuthProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['login']);
   const classes = useStyles();
   const theme = useTheme();
 
@@ -61,7 +61,7 @@ export function OAuthLogin({ avatar, username, oAuthToken, buttonLoading, onSubm
             color="primary"
             disabled={buttonLoading}
           >
-            {t('page.login.button')}
+            {t('button')}
             {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
           </Button>
         )}
@@ -69,7 +69,7 @@ export function OAuthLogin({ avatar, username, oAuthToken, buttonLoading, onSubm
           <Skeleton />
         ) : (
           <Link variant="body2" href="#" onClick={reset}>
-            {t('page.login.other')}
+            {t('other')}
           </Link>
         )}
       </Box>

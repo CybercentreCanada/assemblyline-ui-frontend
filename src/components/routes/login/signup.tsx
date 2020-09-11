@@ -21,7 +21,7 @@ type SignUpProps = {
 };
 
 export function SignUp({ buttonLoading, setButtonLoading }: SignUpProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['login']);
   const classes = useStyles();
   const apiCall = useMyAPI();
   const [username, setUsername] = useState('');
@@ -52,7 +52,7 @@ export function SignUp({ buttonLoading, setButtonLoading }: SignUpProps) {
       <Box display="flex" flexDirection="column">
         {done ? (
           <>
-            <Typography align="center">{t('page.login.signup.done')}</Typography>
+            <Typography align="center">{t('signup.done')}</Typography>
           </>
         ) : (
           <>
@@ -61,7 +61,7 @@ export function SignUp({ buttonLoading, setButtonLoading }: SignUpProps) {
               inputProps={{ autoCorrect: 'off', autoCapitalize: 'off' }}
               variant="outlined"
               size="small"
-              label={t('page.login.signup.username')}
+              label={t('signup.username')}
               onChange={event => setUsername(event.target.value)}
             />
             <TextField
@@ -69,7 +69,7 @@ export function SignUp({ buttonLoading, setButtonLoading }: SignUpProps) {
               type="password"
               variant="outlined"
               size="small"
-              label={t('page.login.signup.password')}
+              label={t('signup.password')}
               onChange={event => setPassword(event.target.value)}
             />
             <TextField
@@ -77,7 +77,7 @@ export function SignUp({ buttonLoading, setButtonLoading }: SignUpProps) {
               type="password"
               variant="outlined"
               size="small"
-              label={t('page.login.signup.password_confirm')}
+              label={t('signup.password_confirm')}
               onChange={event => setPasswordConfirm(event.target.value)}
             />
             <TextField
@@ -85,7 +85,7 @@ export function SignUp({ buttonLoading, setButtonLoading }: SignUpProps) {
               style={{ marginTop: '.5rem' }}
               variant="outlined"
               size="small"
-              label={t('page.login.signup.email')}
+              label={t('signup.email')}
               onChange={event => setEmail(event.target.value)}
             />
             <Button
@@ -95,7 +95,7 @@ export function SignUp({ buttonLoading, setButtonLoading }: SignUpProps) {
               color="primary"
               disabled={buttonLoading}
             >
-              {t('page.login.signup.button')}
+              {t('signup.button')}
               {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
             </Button>
           </>

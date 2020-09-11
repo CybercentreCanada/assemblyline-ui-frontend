@@ -22,7 +22,7 @@ type UserPassLoginProps = {
 };
 
 export function UserPassLogin({ onSubmit, buttonLoading, setPassword, setUsername }: UserPassLoginProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['login']);
   const classes = useStyles();
 
   return (
@@ -33,7 +33,7 @@ export function UserPassLogin({ onSubmit, buttonLoading, setPassword, setUsernam
           inputProps={{ autoCorrect: 'off', autoCapitalize: 'off' }}
           variant="outlined"
           size="small"
-          label={t('page.login.username')}
+          label={t('username')}
           onChange={event => setUsername(event.target.value)}
         />
         <TextField
@@ -41,7 +41,7 @@ export function UserPassLogin({ onSubmit, buttonLoading, setPassword, setUsernam
           variant="outlined"
           size="small"
           type="password"
-          label={t('page.login.password')}
+          label={t('password')}
           onChange={event => setPassword(event.target.value)}
         />
         <Button
@@ -51,7 +51,7 @@ export function UserPassLogin({ onSubmit, buttonLoading, setPassword, setUsernam
           color="primary"
           disabled={buttonLoading}
         >
-          {t('page.login.button')}
+          {t('button')}
           {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
         </Button>
       </Box>

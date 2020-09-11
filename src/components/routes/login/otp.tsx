@@ -21,7 +21,7 @@ type OTPProps = {
 };
 
 export function OneTimePassLogin({ onSubmit, buttonLoading, setOneTimePass }: OTPProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['login']);
   const classes = useStyles();
 
   return (
@@ -32,7 +32,7 @@ export function OneTimePassLogin({ onSubmit, buttonLoading, setOneTimePass }: OT
           autoFocus
           variant="outlined"
           size="small"
-          label={t('page.login.otp')}
+          label={t('otp')}
           onChange={event => setOneTimePass(event.target.value)}
         />
         <Button
@@ -42,7 +42,7 @@ export function OneTimePassLogin({ onSubmit, buttonLoading, setOneTimePass }: OT
           color="primary"
           disabled={buttonLoading}
         >
-          {t('page.login.button')}
+          {t('button')}
           {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
         </Button>
       </Box>

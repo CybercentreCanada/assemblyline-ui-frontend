@@ -5,6 +5,7 @@ import error404EN from 'locales/en/404.json';
 import helpAPIEN from 'locales/en/help/api.json';
 import helpConfigurationEN from 'locales/en/help/configuration.json';
 import helpServicesEN from 'locales/en/help/services.json';
+import loginEN from 'locales/en/login.json';
 import settingsEN from 'locales/en/settings.json';
 import tosEN from 'locales/en/tos.json';
 import translationEN from 'locales/en/translation.json';
@@ -14,6 +15,7 @@ import error404FR from 'locales/fr/404.json';
 import helpAPIFR from 'locales/fr/help/api.json';
 import helpConfigurationFR from 'locales/fr/help/configuration.json';
 import helpServicesFR from 'locales/fr/help/services.json';
+import loginFR from 'locales/fr/login.json';
 import settingsFR from 'locales/fr/settings.json';
 import tosFR from 'locales/fr/tos.json';
 import translationFR from 'locales/fr/translation.json';
@@ -27,6 +29,7 @@ const resources = {
     helpAPI: helpAPIEN,
     helpConfiguration: helpConfigurationEN,
     helpServices: helpServicesEN,
+    login: loginEN,
     settings: settingsEN,
     translation: translationEN,
     tos: tosEN,
@@ -38,6 +41,7 @@ const resources = {
     helpAPI: helpAPIFR,
     helpConfiguration: helpConfigurationFR,
     helpServices: helpServicesFR,
+    login: loginFR,
     settings: settingsFR,
     translation: translationFR,
     tos: tosFR,

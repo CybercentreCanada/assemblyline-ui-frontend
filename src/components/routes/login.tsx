@@ -48,7 +48,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
   const location = useLocation();
   const history = useHistory();
   const params = new URLSearchParams(location.search);
-  const { t } = useTranslation();
+  const { t } = useTranslation(['login']);
   const theme = useTheme();
   const classes = useStyles();
   const apiCall = useMyAPI();
@@ -141,7 +141,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
           setShownControls('otp');
         } else if (api_data.api_error_message === 'Wrong Security Token' && shownControls === 'sectoken') {
           setShownControls('otp');
-          enqueueSnackbar(t('page.login.securitytoken.error'), snackBarOptions);
+          enqueueSnackbar(t('securitytoken.error'), snackBarOptions);
         } else if (api_data.api_error_message === 'Wrong Security Token' && shownControls !== 'sectoken') {
           setShownControls('sectoken');
         } else {
@@ -187,7 +187,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
         url: '/api/v4/auth/signup_validate/',
         method: 'POST',
         body: { registration_key: params.get('registration_key') },
-        onSuccess: () => enqueueSnackbar(t('page.login.signup.completed'), snackBarSuccessOptions),
+        onSuccess: () => enqueueSnackbar(t('signup.completed'), snackBarSuccessOptions),
         onFinalize: () => history.push('/')
       });
     }
@@ -213,17 +213,17 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
               ) : null}
               {allowSignup ? (
                 <Typography align="center" variant="caption" style={{ marginTop: theme.spacing(2) }}>
-                  {t('page.login.signup')}&nbsp;&nbsp;
+                  {t('signup')}&nbsp;&nbsp;
                   <Link href="#" onClick={signup}>
-                    {t('page.login.signup.link')}
+                    {t('signup.link')}
                   </Link>
                 </Typography>
               ) : null}
               {allowPWReset ? (
                 <Typography align="center" variant="caption" style={{ marginTop: theme.spacing(pwPadding) }}>
-                  {t('page.login.reset.desc')}&nbsp;&nbsp;
+                  {t('reset.desc')}&nbsp;&nbsp;
                   <Link href="#" onClick={resetPW}>
-                    {t('page.login.reset.link')}
+                    {t('reset.link')}
                   </Link>
                 </Typography>
               ) : null}
@@ -241,7 +241,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
                         onClick={() => localStorage.setItem('nextLocation', `${location.pathname}${location.search}`)}
                         href={`/api/v4/auth/login/?oauth_provider=${item}`}
                       >
-                        {`${t('page.login.button_oauth')} ${item}`}
+                        {`${t('button_oauth')} ${item}`}
                         {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
                       </Button>
                     ))}
