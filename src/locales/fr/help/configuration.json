@@ -1,0 +1,16 @@
+{
+  "tags": "Balises",
+  "tags.desc": "Assemblyline extrait des identifiants potentiellement intéressants et leur attribue un type. Assemblyline appelle ceux-ci des balises.",
+  "tags.desc_list": "Voici les différents types de balises que vous pouvez trouver dans tout le système:",
+  "priorities": "Priorités",
+  "priorities.desc": "Chaque soumission dans Assemblyline se voit attribuer une priorité. Les soumissions sont traitées par ordre décroissant de priorité, les soumissions de priorité plus élevée étant traitées en premier. Si deux soumissions ont la même priorité, elles sont exécutées dans l'ordre où elles ont été reçues. Le champ de priorité est un nombre qui permet un contrôle très fin sur les priorités.",
+  "priorities.desc_list": "Pour plus de commodité, nous avons défini un certain nombre de priorités, celles-ci sont énumérées ci-dessous:",
+  "priorities.max": "maximum",
+  "file_types": "Types de fichier",
+  "file_types.desc": "Assemblyline attribue un type à tous les fichiers en analysant la structure du fichier et utilise ce type pour acheminer le fichier vers le service approprié.",
+  "file_types.specific": "Certains types de fichiers seront acheminés vers des services spécifiques:",
+  "file_types.non_specific": "D'autres types de fichiers sont identifiés mais ne sont pas acheminés vers des services spécifiques:",
+  "file_types.non_specific_service": "Les services suivants traitent tous les types de fichiers:",
+  "config": "Variables de configuration",
+  "config.desc": "Chaque instance d'assemblyline a une configuration unique. Certains paramètres de configuration sont particulièrement utiles pour comprendre le fonctionnement du système:"
+}

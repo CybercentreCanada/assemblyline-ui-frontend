@@ -10,7 +10,7 @@ export default function Configuration() {
   const apiCall = useMyAPI();
   const [configuration, setConfiguration] = useState(null);
   const [constants, setConstants] = useState(null);
-  const { t } = useTranslation();
+  const { t } = useTranslation(['helpConfiguration']);
 
   function isArrayOfArray(val) {
     if (Array.isArray(val)) {
@@ -43,13 +43,13 @@ export default function Configuration() {
       <Box textAlign="left">
         <Box display="flex" flexDirection="column">
           <Typography variant="h6" gutterBottom>
-            {t('page.help.configuration.tags')}
+            {t('tags')}
           </Typography>
           <Typography variant="body2" gutterBottom>
-            {t('page.help.configuration.tags.desc')}
+            {t('tags.desc')}
           </Typography>
           <Typography variant="body2" gutterBottom>
-            {t('page.help.configuration.tags.desc_list')}
+            {t('tags.desc_list')}
           </Typography>
           <Box pt={1} pb={2} display="flex" flexDirection="row" flexWrap="wrap">
             {constants
@@ -62,13 +62,13 @@ export default function Configuration() {
           </Box>
 
           <Typography variant="h6" gutterBottom>
-            {t('page.help.configuration.priorities')}
+            {t('priorities')}
           </Typography>
           <Typography variant="body2" gutterBottom>
-            {t('page.help.configuration.priorities.desc')}
+            {t('priorities.desc')}
           </Typography>
           <Typography variant="body2" gutterBottom>
-            {t('page.help.configuration.priorities.desc_list')}
+            {t('priorities.desc_list')}
           </Typography>
           <Box pt={1} pb={2}>
             <Grid container>
@@ -89,7 +89,7 @@ export default function Configuration() {
 
                   <Grid item xs={12} sm={6} md={4} lg={3}>
                     <Box display="inline-block" fontWeight={500}>
-                      {t('page.help.configuration.priorities.max')}:&nbsp;&nbsp;
+                      {t('priorities.max')}:&nbsp;&nbsp;
                     </Box>
                     <Box display="inline-block" fontWeight="fontWeightLight">
                       {constants.max_priority}
@@ -114,13 +114,13 @@ export default function Configuration() {
           </Box>
 
           <Typography variant="h6" gutterBottom>
-            {t('page.help.configuration.file_types')}
+            {t('file_types')}
           </Typography>
           <Typography variant="body2" gutterBottom>
-            {t('page.help.configuration.file_types.desc')}
+            {t('file_types.desc')}
           </Typography>
           <Typography variant="body2" gutterBottom>
-            {t('page.help.configuration.file_types.specific')}
+            {t('file_types.specific')}
           </Typography>
           <Box pt={1} pb={2}>
             <Grid container>
@@ -152,7 +152,7 @@ export default function Configuration() {
             </Grid>
           </Box>
           <Typography variant="body2" gutterBottom>
-            {t('page.help.configuration.file_types.non_specific')}
+            {t('file_types.non_specific')}
           </Typography>
           <Box pt={1} pb={2}>
             <Grid container>
@@ -178,7 +178,7 @@ export default function Configuration() {
             </Grid>
           </Box>
           <Typography variant="body2" gutterBottom>
-            {t('page.help.configuration.file_types.non_specific_service')}
+            {t('file_types.non_specific_service')}
           </Typography>
           <Box pt={1} pb={2}>
             {constants ? (
@@ -189,10 +189,10 @@ export default function Configuration() {
           </Box>
 
           <Typography variant="h6" gutterBottom>
-            {t('page.help.configuration.config')}
+            {t('config')}
           </Typography>
           <Typography variant="body2" gutterBottom>
-            {t('page.help.configuration.config.desc')}
+            {t('config.desc')}
           </Typography>
           <Box pt={1} pb={2}>
             {configuration
