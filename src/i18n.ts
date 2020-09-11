@@ -8,6 +8,7 @@ import helpConfigurationEN from 'locales/en/help/configuration.json';
 import helpServicesEN from 'locales/en/help/services.json';
 import lockedEN from 'locales/en/locked.json';
 import loginEN from 'locales/en/login.json';
+import logoutEN from 'locales/en/logout.json';
 import settingsEN from 'locales/en/settings.json';
 import submissionEN from 'locales/en/submission.json';
 import submitEN from 'locales/en/submit.json';
@@ -22,6 +23,7 @@ import helpConfigurationFR from 'locales/fr/help/configuration.json';
 import helpServicesFR from 'locales/fr/help/services.json';
 import lockedFR from 'locales/fr/locked.json';
 import loginFR from 'locales/fr/login.json';
+import logoutFR from 'locales/fr/logout.json';
 import settingsFR from 'locales/fr/settings.json';
 import submissionFR from 'locales/fr/submission.json';
 import submitFR from 'locales/fr/submit.json';
@@ -40,6 +42,7 @@ const resources = {
     helpServices: helpServicesEN,
     locked: lockedEN,
     login: loginEN,
+    logout: logoutEN,
     settings: settingsEN,
     submission: submissionEN,
     submit: submitEN,
@@ -56,6 +59,7 @@ const resources = {
     helpServices: helpServicesFR,
     locked: lockedFR,
     login: loginFR,
+    logout: logoutFR,
     settings: settingsFR,
     submission: submissionFR,
     submit: submitFR,
