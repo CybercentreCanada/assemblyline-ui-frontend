@@ -1,0 +1,13 @@
+{
+  "title": "Soumissions",
+  "detail": "Détail",
+  "report": "Rapport",
+  "subtitle": "soumission(s) au total",
+  "header.starttime": "Heure de début",
+  "header.verdict": "Verdicte",
+  "header.description": "Description",
+  "header.user": "Utilisateur",
+  "header.numfiles": "# Fichiers",
+  "header.classification": "Classification",
+  "header.status": "Status"
+}

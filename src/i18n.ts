@@ -7,6 +7,7 @@ import helpConfigurationEN from 'locales/en/help/configuration.json';
 import helpServicesEN from 'locales/en/help/services.json';
 import loginEN from 'locales/en/login.json';
 import settingsEN from 'locales/en/settings.json';
+import submissionEN from 'locales/en/submission.json';
 import tosEN from 'locales/en/tos.json';
 import translationEN from 'locales/en/translation.json';
 import userEN from 'locales/en/user.json';
@@ -17,6 +18,7 @@ import helpConfigurationFR from 'locales/fr/help/configuration.json';
 import helpServicesFR from 'locales/fr/help/services.json';
 import loginFR from 'locales/fr/login.json';
 import settingsFR from 'locales/fr/settings.json';
+import submissionFR from 'locales/fr/submission.json';
 import tosFR from 'locales/fr/tos.json';
 import translationFR from 'locales/fr/translation.json';
 import userFR from 'locales/fr/user.json';
@@ -31,6 +33,7 @@ const resources = {
     helpServices: helpServicesEN,
     login: loginEN,
     settings: settingsEN,
+    submission: submissionEN,
     translation: translationEN,
     tos: tosEN,
     user: userEN
@@ -43,6 +46,7 @@ const resources = {
     helpServices: helpServicesFR,
     login: loginFR,
     settings: settingsFR,
+    submission: submissionFR,
     translation: translationFR,
     tos: tosFR,
     user: userFR

@@ -47,14 +47,14 @@ for (let x = 0; x < Math.floor(Math.random() * 270 + 30); x++) {
 
 export default function Submissions() {
   const classes = useStyles();
-  const { t } = useTranslation();
+  const { t } = useTranslation(['submission']);
 
   return (
     <PageFullWidth>
       <Box pb={8}>
-        <Typography variant="h4">{t('page.submission')}</Typography>
+        <Typography variant="h4">{t('title')}</Typography>
         <Typography variant="subtitle1" color="secondary">
-          {rows.length} {t('page.submission.subtitle')}
+          {rows.length} {t('subtitle')}
         </Typography>
       </Box>
 
@@ -62,13 +62,13 @@ export default function Submissions() {
         <Table size="small" className={classes.table} stickyHeader>
           <TableHead>
             <TableRow style={{ whiteSpace: 'nowrap' }}>
-              <TableCell>{t('page.submission.header.starttime')}</TableCell>
-              <TableCell>{t('page.submission.header.verdict')}</TableCell>
-              <TableCell>{t('page.submission.header.description')}</TableCell>
-              <TableCell>{t('page.submission.header.user')}</TableCell>
-              <TableCell>{t('page.submission.header.numfiles')}</TableCell>
-              <TableCell>{t('page.submission.header.classification')}</TableCell>
-              <TableCell>{t('page.submission.header.status')}</TableCell>
+              <TableCell>{t('header.starttime')}</TableCell>
+              <TableCell>{t('header.verdict')}</TableCell>
+              <TableCell>{t('header.description')}</TableCell>
+              <TableCell>{t('header.user')}</TableCell>
+              <TableCell>{t('header.numfiles')}</TableCell>
+              <TableCell>{t('header.classification')}</TableCell>
+              <TableCell>{t('header.status')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
