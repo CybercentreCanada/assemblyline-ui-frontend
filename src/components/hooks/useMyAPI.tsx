@@ -36,8 +36,17 @@ export default function useMyAPI() {
     onFinalize?: (api_data: APIResponseProps) => void;
   };
 
-  function apiCall(props: APICallProps) {
-    const { url, method, body, reloadOnUnauthorize, onSuccess, onFailure, onEnter, onExit, onFinalize } = props;
+  function apiCall({
+    url,
+    method,
+    body,
+    reloadOnUnauthorize,
+    onSuccess,
+    onFailure,
+    onEnter,
+    onExit,
+    onFinalize
+  }: APICallProps) {
     const allowReload = reloadOnUnauthorize === undefined || reloadOnUnauthorize;
     const requestOptions: RequestInit = {
       method: method || 'GET',

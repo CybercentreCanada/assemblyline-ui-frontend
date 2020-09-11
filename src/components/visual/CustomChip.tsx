@@ -60,9 +60,8 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function CustomChip(props: CustomChipProps) {
+export default function CustomChip({ className, type, size, color, variant, ...otherProps }: CustomChipProps) {
   const classes = useStyles();
-  const { className, type, size, color, variant, ...otherProps } = props;
 
   // Define classnames maps
   const typeClassMap = {

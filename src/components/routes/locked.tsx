@@ -11,8 +11,7 @@ type LockedPageProps = {
   hasTOS: boolean;
 };
 
-const LockedPage = (props: LockedPageProps) => {
-  const { autoNotify, hasTOS } = props;
+const LockedPage = ({ autoNotify, hasTOS }: LockedPageProps) => {
   const { t } = useTranslation();
   return (
     <>
