@@ -10,7 +10,7 @@ type ForbiddenPageProps = {
   disabled?: boolean;
 };
 
-export default function ForbiddenPage({ disabled = false }: ForbiddenPageProps) {
+const ForbiddenPage: React.FC<ForbiddenPageProps> = ({ disabled = false }) => {
   const { t } = useTranslation(['error403']);
   const theme = useTheme();
   return (
@@ -35,8 +35,6 @@ export default function ForbiddenPage({ disabled = false }: ForbiddenPageProps) 
       )}
     </PageCenter>
   );
-}
-
-ForbiddenPage.defaultProps = {
-  disabled: false
 };
+
+export default ForbiddenPage;
