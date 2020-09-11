@@ -1,7 +1,7 @@
 {
-  "disabled": "Disabled",
   "accepts": "Accepts",
-  "rejects": "Rejects",
   "category": "Category",
+  "disabled": "Disabled",
+  "rejects": "Rejects",
   "stage": "Stage"
 }

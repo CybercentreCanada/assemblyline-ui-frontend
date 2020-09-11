@@ -1,6 +1,6 @@
 {
-  "title": "404: Not found",
   "description": "The page you are looking for cannot be found...",
+  "dl.alt": "Dead Link",
   "dl.description": "Looks like this 'Link' is dead...",
-  "dl.alt": "Dead Link"
+  "title": "404: Not found"
 }

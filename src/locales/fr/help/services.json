@@ -1,7 +1,7 @@
 {
-  "disabled": "Désactivé",
   "accepts": "Accepte",
-  "rejects": "Rejette",
   "category": "Catégorie",
+  "disabled": "Désactivé",
+  "rejects": "Rejette",
   "stage": "Stage"
 }

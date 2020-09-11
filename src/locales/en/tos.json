@@ -1,6 +1,6 @@
 {
-  "title": "Terms of Service",
-  "button": "Accept terms",
   "agreed": "You've already agreed to the terms of service...",
-  "logout": "Logout"
+  "button": "Accept terms",
+  "logout": "Logout",
+  "title": "Terms of Service"
 }

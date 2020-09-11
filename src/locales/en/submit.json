@@ -1,14 +1,14 @@
 {
   "file": "File",
-  "file.dragzone": "Select a file to scan",
-  "file.dragzon.byte": "bytes",
   "file.button": "Upload and Scan",
-  "url": "URL",
-  "url.input": "URL to Scan",
-  "url.button": "Scan",
+  "file.dragzon.byte": "bytes",
+  "file.dragzone": "Select a file to scan",
   "options": "Options",
   "options.desc": "Submission options",
   "terms1": "By pressing ",
   "terms2": ", you consent to our ",
-  "terms3": "Terms of Service"
+  "terms3": "Terms of Service",
+  "url": "URL",
+  "url.button": "Scan",
+  "url.input": "URL to Scan"
 }

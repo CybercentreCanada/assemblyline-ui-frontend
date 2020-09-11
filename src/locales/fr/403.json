@@ -1,5 +1,5 @@
 {
-  "page.403.title": "403: Interdit",
-  "page.403.disabled": "Votre compte utilisateur à été désactivé ...",
-  "page.403.not_allowed": "Vous n'êtes pas autorisé à afficher cette page ..."
+  "disabled": "Votre compte utilisateur à été désactivé ...",
+  "not_allowed": "Vous n'êtes pas autorisé à afficher cette page ...",
+  "title": "403: Interdit"
 }
