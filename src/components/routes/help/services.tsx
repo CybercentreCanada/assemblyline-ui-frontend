@@ -10,7 +10,7 @@ export default function Services() {
   const apiCall = useMyAPI();
   const [services, setServices] = useState(null);
   const theme = useTheme();
-  const { t } = useTranslation();
+  const { t } = useTranslation(['helpServices']);
   const isDark = theme.palette.type === 'dark';
   const minCardHeight = '240px';
   const darkBCRed = '#543838';
@@ -50,7 +50,7 @@ export default function Services() {
                                 backgroundColor: isDark ? theme.palette.error.dark : theme.palette.error.light,
                                 color: theme.palette.common.white
                               }}
-                              label={t('page.help.services.disabled')}
+                              label={t('disabled')}
                             />
                           </Box>
                         )
@@ -64,7 +64,7 @@ export default function Services() {
                       <Grid container>
                         <Grid item xs={12} sm={6}>
                           <Box display="flex" flexDirection="row">
-                            <Typography variant="subtitle2">{t('page.help.services.accepts')}:&nbsp;&nbsp;</Typography>
+                            <Typography variant="subtitle2">{t('accepts')}:&nbsp;&nbsp;</Typography>
                             <Box alignSelf="center">
                               <Typography variant="body2">{s.accepts}</Typography>
                             </Box>
@@ -72,7 +72,7 @@ export default function Services() {
                         </Grid>
                         <Grid item xs={12} sm={6}>
                           <Box display="flex" flexDirection="row">
-                            <Typography variant="subtitle2">{t('page.help.services.rejects')}:&nbsp;&nbsp;</Typography>
+                            <Typography variant="subtitle2">{t('rejects')}:&nbsp;&nbsp;</Typography>
                             <Box alignSelf="center">
                               <Typography variant="body2">{s.rejects}</Typography>
                             </Box>
@@ -80,7 +80,7 @@ export default function Services() {
                         </Grid>
                         <Grid item xs={12} sm={6}>
                           <Box display="flex" flexDirection="row">
-                            <Typography variant="subtitle2">{t('page.help.services.category')}:&nbsp;&nbsp;</Typography>
+                            <Typography variant="subtitle2">{t('category')}:&nbsp;&nbsp;</Typography>
                             <Box alignSelf="center">
                               <Typography variant="body2">{s.category}</Typography>
                             </Box>
@@ -88,7 +88,7 @@ export default function Services() {
                         </Grid>
                         <Grid item xs={12} sm={6}>
                           <Box display="flex" flexDirection="row">
-                            <Typography variant="subtitle2">{t('page.help.services.stage')}:&nbsp;&nbsp;</Typography>
+                            <Typography variant="subtitle2">{t('stage')}:&nbsp;&nbsp;</Typography>
                             <Box alignSelf="center">
                               <Typography variant="body2">{s.stage}</Typography>
                             </Box>
