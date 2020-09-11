@@ -2,6 +2,7 @@ import i18n from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import error403EN from 'locales/en/403.json';
 import error404EN from 'locales/en/404.json';
+import dashboardEN from 'locales/en/dashboard.json';
 import helpAPIEN from 'locales/en/help/api.json';
 import helpConfigurationEN from 'locales/en/help/configuration.json';
 import helpServicesEN from 'locales/en/help/services.json';
@@ -14,6 +15,7 @@ import translationEN from 'locales/en/translation.json';
 import userEN from 'locales/en/user.json';
 import error403FR from 'locales/fr/403.json';
 import error404FR from 'locales/fr/404.json';
+import dashboardFR from 'locales/fr/dashboard.json';
 import helpAPIFR from 'locales/fr/help/api.json';
 import helpConfigurationFR from 'locales/fr/help/configuration.json';
 import helpServicesFR from 'locales/fr/help/services.json';
@@ -28,6 +30,7 @@ import { initReactI18next } from 'react-i18next';
 
 const resources = {
   en: {
+    dashboard: dashboardEN,
     error403: error403EN,
     error404: error404EN,
     helpAPI: helpAPIEN,
@@ -42,6 +45,7 @@ const resources = {
     user: userEN
   },
   fr: {
+    dashboard: dashboardFR,
     error403: error403FR,
     error404: error404FR,
     helpAPI: helpAPIFR,
