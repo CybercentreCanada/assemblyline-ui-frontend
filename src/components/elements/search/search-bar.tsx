@@ -1,4 +1,13 @@
-import { Box, CircularProgress, IconButton, IconButtonProps, makeStyles, TextField } from '@material-ui/core';
+import {
+  Box,
+  CircularProgress,
+  Divider,
+  IconButton,
+  IconButtonProps,
+  makeStyles,
+  TextField,
+  useTheme
+} from '@material-ui/core';
 import BackspaceIcon from '@material-ui/icons/Backspace';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import FilterListIcon from '@material-ui/icons/FilterList';
@@ -9,7 +18,7 @@ import { isEnter, isEscape } from '../utils/keyboard';
 const useStyles = makeStyles(theme => ({
   header: {
     paddingTop: theme.spacing(1),
-    paddingRight: theme.spacing(2),
+    // paddingRight: theme.spacing(2),
     paddingBottom: theme.spacing(1),
     paddingLeft: theme.spacing(2),
     backgroundColor: theme.palette.type === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200],
@@ -31,7 +40,7 @@ interface SearchBarProps {
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ searching = false, buttons = [], onSearching }) => {
-  // const theme = useTheme();
+  const theme = useTheme();
   const classes = useStyles();
   const textFieldEl = useRef<HTMLInputElement>();
   const [filter, setFilter] = useState<string>('');
@@ -45,7 +54,6 @@ const SearchBar: React.FC<SearchBarProps> = ({ searching = false, buttons = [], 
   // add some keyboard key listeners to search text field.
   const onFilterKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     const { keyCode } = event;
-    console.log(`k[${keyCode}]`);
     if (isEnter(keyCode)) {
       _onSearching();
     } else if (isEscape(keyCode)) {
@@ -82,12 +90,6 @@ const SearchBar: React.FC<SearchBarProps> = ({ searching = false, buttons = [], 
           <SearchIcon color="primary" fontSize="large" />
         )}
       </Box>
-      {/* <Divider
-        orientation="vertical"
-        flexItem
-        color="primary"
-        style={{ marginLeft: theme.spacing(1), marginRight: theme.spacing(1) }}
-      /> */}
       <Box flex={1}>
         <TextField
           ref={textFieldEl}
@@ -102,17 +104,17 @@ const SearchBar: React.FC<SearchBarProps> = ({ searching = false, buttons = [], 
           fullWidth
         />
       </Box>
-      {/* <Divider
-        orientation="vertical"
-        flexItem
-        style={{ marginLeft: theme.spacing(1), marginRight: theme.spacing(1) }}
-      /> */}
       <IconButton onClick={onSearchBtnClick} edge="end" color="primary">
         <FilterListIcon />
       </IconButton>
       <IconButton onClick={onFilterClear} edge="end" color="primary">
         <BackspaceIcon />
       </IconButton>
+      <Divider
+        orientation="vertical"
+        flexItem
+        style={{ marginLeft: theme.spacing(1), marginRight: theme.spacing(1) }}
+      />
       {buttons.map((b, i) => (
         <IconButton key={`searchbar-button-${i}`} {...b.props} edge="end" color="primary">
           <ExpandMoreIcon />

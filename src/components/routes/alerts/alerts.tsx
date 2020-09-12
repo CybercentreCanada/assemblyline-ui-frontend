@@ -1,4 +1,4 @@
-import { Box, Drawer, Typography, useTheme } from '@material-ui/core';
+import { Box, Drawer, makeStyles, Typography, useTheme } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
@@ -13,8 +13,20 @@ import AlertListItem from './alert-list-item';
 import AlertsFilters from './alerts-filters';
 import useAlerts, { AlertItem } from './useAlerts';
 
-//
+const useStyles = makeStyles(theme => ({
+  drawer: {
+    [theme.breakpoints.down('sm')]: {
+      position: 'fixed',
+      width: '100vw',
+      top: 0,
+      right: 0,
+      bottom: 0
+    }
+  }
+}));
+
 const Alerts: React.FC = () => {
+  const classes = useStyles();
   const theme = useTheme();
   const { loading, items, onNextPage } = useAlerts();
   const [searching, setSearching] = useState<boolean>(false);
@@ -94,7 +106,12 @@ const Alerts: React.FC = () => {
           }
         />
       </Viewport>
-      <Drawer open={drawer.open} anchor="right" onClose={() => setDrawer({ open: false, type: null })}>
+      <Drawer
+        open={drawer.open}
+        anchor="right"
+        onClose={() => setDrawer({ open: false, type: null })}
+        className={classes.drawer}
+      >
         {
           {
             filter: (
