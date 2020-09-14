@@ -229,7 +229,7 @@ export default function Configuration() {
                 })
               : [...Array(10)].map((_, i) => {
                   return (
-                    <Grid container spacing={1}>
+                    <Grid key={i} container spacing={1}>
                       <Grid key={i} item xs={12} sm={5} md={4}>
                         <Skeleton style={{ height: '2rem' }} />
                       </Grid>
