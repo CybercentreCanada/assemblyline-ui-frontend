@@ -2,7 +2,9 @@ import { ListItem, ListItemIcon, ListItemText, Tooltip } from '@material-ui/core
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import withWidth, { isWidthDown } from '@material-ui/core/withWidth';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
+import useAppUser from 'commons/components/hooks/useAppUser';
 import { LeftNavItemProps } from 'commons/components/layout/leftnav/LeftNavDrawer';
+import { CustomUser } from 'components/hooks/useMyUser';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -17,7 +19,8 @@ const useStyles = makeStyles((theme: Theme) =>
 const LeftNavItem: React.FC<LeftNavItemProps> = props => {
   const classes = useStyles();
   const { drawerState, hideNestedIcons, toggleDrawer } = useAppLayout();
-  const { text, icon, nested, route } = props;
+  const { text, icon, nested, route, userPropsValidator } = props;
+  const { validateProps } = useAppUser<CustomUser>();
 
   const onCloseDrawerIfOpen = () => {
     if (isWidthDown('sm', props.width) && drawerState) {
@@ -40,13 +43,15 @@ const LeftNavItem: React.FC<LeftNavItemProps> = props => {
     </ListItem>
   );
 
-  return drawerState || nested ? (
-    item
-  ) : (
-    <Tooltip title={text} aria-label={text} placement="right">
-      {item}
-    </Tooltip>
-  );
+  return validateProps(userPropsValidator) ? (
+    drawerState || nested ? (
+      item
+    ) : (
+      <Tooltip title={text} aria-label={text} placement="right">
+        {item}
+      </Tooltip>
+    )
+  ) : null;
 };
 
 export default withWidth()(LeftNavItem);

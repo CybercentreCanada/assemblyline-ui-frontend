@@ -8,10 +8,16 @@ export type UserProfileProps = {
   is_admin: boolean;
 };
 
+export type ValidatedProp = {
+  prop: string;
+  value: any;
+};
+
 export interface UserContextProps<U extends UserProfileProps> {
   user: U;
   setUser: (user: U) => void;
   isReady: () => boolean;
+  validateProps: (props: ValidatedProp[]) => boolean;
 }
 
 export interface UserProviderProps<U extends UserProfileProps> extends UserContextProps<U> {
