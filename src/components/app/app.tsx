@@ -5,7 +5,7 @@ import SiteMapProvider from 'commons/components/sitemap/SitemapProvider';
 import UserProvider from 'commons/components/user/UserProvider';
 import useMyLayout from 'components/hooks/useMyLayout';
 import useMySitemap from 'components/hooks/useMySitemap';
-import useMyUser from 'components/hooks/useMyUser';
+import useMyUser, { CustomUser } from 'components/hooks/useMyUser';
 import LoadingScreen from 'components/routes/loading';
 import LockedPage from 'components/routes/locked';
 import LoginScreen from 'components/routes/login';
@@ -23,7 +23,6 @@ const ALLOW_USERPASS_LOGIN = true;
 const ALLOW_SIGNUP = true;
 const ALLOW_PW_RESET = true;
 const LOCKOUT_AUTO_NOTIFY = true;
-const HAS_TOS = true;
 // END TODO
 
 const MyApp = () => {
@@ -31,7 +30,7 @@ const MyApp = () => {
   const [renderedApp, setRenderedApp] = useState(params.get('provider') ? 'login' : 'load');
 
   const { t } = useTranslation();
-  const { setUser } = useAppUser();
+  const { user: currentUser, setUser } = useAppUser<CustomUser>();
   const { setReady } = useAppLayout();
 
   useEffect(() => {
@@ -69,7 +68,7 @@ const MyApp = () => {
         } else {
           setUser(api_data.api_response);
           setReady(true);
-          if (!api_data.api_response.agrees_with_tos) {
+          if (!api_data.api_response.agrees_with_tos && api_data.api_response.has_tos) {
             setRenderedApp('tos');
           } else {
             setRenderedApp('routes');
@@ -80,7 +79,7 @@ const MyApp = () => {
   }, []);
   return {
     load: <LoadingScreen />,
-    locked: <LockedPage hasTOS={HAS_TOS} autoNotify={LOCKOUT_AUTO_NOTIFY} />,
+    locked: <LockedPage hasTOS={currentUser && currentUser.has_tos} autoNotify={LOCKOUT_AUTO_NOTIFY} />,
     login: (
       <LoginScreen
         oAuthProviders={OAUTH_PROVIDERS}

@@ -419,6 +419,13 @@ function User({ width, username }: UserProps) {
           </Grid>
 
           <Grid item sm={12} md={9} style={{ width: '100%' }}>
+            {currentUser.c12n_enforcing ? (
+              user ? (
+                <CustomChip type="classification" label={user.classification} />
+              ) : (
+                <Skeleton style={{ height: '3rem' }} />
+              )
+            ) : null}
             <TableContainer className={classes.group} component={Paper}>
               <Table aria-label={t('profile')}>
                 <TableHead>

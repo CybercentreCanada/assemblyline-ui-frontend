@@ -10,6 +10,7 @@ export interface CustomUser extends UserProfileProps {
   c12n_enforcing: boolean;
   classification: string;
   groups: string[];
+  has_tos: boolean;
   is_active: boolean;
   read_only: boolean;
   type: string[];
@@ -33,7 +34,7 @@ export default function useMyUser(): UserContextProps<CustomUser> {
   };
 
   const isReady = () => {
-    if (user === null || !user.agrees_with_tos || !user.is_active) {
+    if (user === null || (!user.agrees_with_tos && user.has_tos) || !user.is_active) {
       return false;
     }
 
