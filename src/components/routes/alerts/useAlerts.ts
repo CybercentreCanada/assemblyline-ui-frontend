@@ -1,4 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { InfiniteListItem } from 'components/elements/lists/infinite-list';
+import useMyAPI from 'components/hooks/useMyAPI';
 import { useEffect, useState } from 'react';
 
 export type AlertFile = {
@@ -51,50 +53,38 @@ export interface AlertItem extends InfiniteListItem {
 interface UsingAlerts {
   loading: boolean;
   items: AlertItem[];
-  onNextPage: (startIndex: number, stopIndex: number) => Promise<any>;
+  onNextPage: (startIndex: number, stopIndex: number) => void;
 }
 
 export default function useAlerts(): UsingAlerts {
+  const apiCall = useMyAPI();
   const [state, setState] = useState<{ loading: boolean; items: AlertItem[] }>({
     loading: true,
     items: []
   });
 
-  useEffect(() => {
-    fetch('/api/v4/alert/grouped/<group_by>/')
-      .then(res => res.json())
-      .then(api_data => {
-        const _sliced = api_data.api_response.items.slice(0, 12);
+  const formatUrl = (startIndex: number, endIndex: number) =>
+    `/api/v4/alert/grouped/file.sha256/?offset=${startIndex}&rows=${endIndex - startIndex}`;
 
-        _sliced.forEach((item, i) => {
-          // eslint-disable-next-line no-param-reassign
-          item.id = i;
-        });
-
-        setState({ loading: false, items: _sliced });
-      });
-  }, []);
-
-  const onNextPage = (startIndex: number, stopIndex: number): Promise<any> => {
-    console.log(`fetching[${startIndex},${stopIndex}]`);
+  const onNextPage = (startIndex: number, endIndex: number) => {
     setState({ ...state, loading: true });
-    return fetch('/api/v4/alert/grouped/<group_by>/')
-      .then(res => res.json())
-      .then(api_data => {
-        const size = stopIndex - startIndex;
-
-        const _sliced = api_data.api_response.items.slice(0, size);
-
-        _sliced.forEach((item, i) => {
-          // eslint-disable-next-line no-param-reassign
-          item.id = startIndex + i;
+    apiCall({
+      url: formatUrl(startIndex, endIndex),
+      onSuccess: api_data => {
+        const { items: _items } = api_data.api_response;
+        console.log(_items);
+        setState({
+          loading: false,
+          items: [...state.items, ..._items.map((item, index) => ({ ...item, index: index + startIndex }))]
         });
-
-        setTimeout(() => {
-          setState({ loading: false, items: [...state.items, ..._sliced] });
-        }, 1000);
-      });
+        // console.log(api_data);
+      }
+    });
   };
+
+  useEffect(() => {
+    onNextPage(0, 5);
+  }, []);
 
   return { ...state, onNextPage };
 }

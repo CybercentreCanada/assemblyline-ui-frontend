@@ -60,11 +60,11 @@ interface InfiniteListFrame<I extends InfiniteListItem> {
   sT: number;
   fH: number;
   rH: number;
-  displayItems: { index: number; item: I }[];
+  displayItems: { index: number; isLoaded: boolean; item: I }[];
 }
 
 export interface InfiniteListItem {
-  id: number | string;
+  index: number;
 }
 
 interface InfiniteListProps<I extends InfiniteListItem> {
@@ -75,7 +75,7 @@ interface InfiniteListProps<I extends InfiniteListItem> {
   pageSize?: number;
   onItemSelected: (item: I) => void;
   onRenderItem: (item: InfiniteListItem) => React.ReactNode;
-  onMoreItems: (startIndex: number, stopIndex: number) => Promise<any>;
+  onMoreItems: (startIndex: number, stopIndex: number) => void;
 }
 
 InfiniteList.defaultProps = {
@@ -126,29 +126,31 @@ export default function InfiniteList<I extends InfiniteListItem>({
     const itemCount = Math.ceil(fH / _rowHeight) + 1;
     // the total index of the first element shown.
     const topIndex = Math.floor(sT / _rowHeight);
-    console.log(topIndex);
-    // extract all the elements that we'll show in a frame.
-    const displayItems = _items
-      .slice(topIndex, topIndex + itemCount)
-      .map((item, index) => ({ index: topIndex + index, item }));
-    // Give it back ... someone or something, needs to know!
-    return { displayItems, sT, rH, fH };
-  };
 
-  //
-  const onFocus = (event: React.FocusEvent<HTMLDivElement>) => {
-    setFrame(computeFrame(items, rowHeight));
-    // if (cursor === -1) {
-    //   setCursor(0);
-    // } else {
-    //   scrollSelection(event.currentTarget, cursor, 'start');
-    // }
+    console.log(`itemcount[${itemCount}]:topindex[${topIndex}]`);
+
+    const displayItems = [];
+    for (let i = topIndex; i < topIndex + itemCount; i++) {
+      if (_items.some(item => item.index === i)) {
+        displayItems.push({ index: i, isLoaded: true, item: _items[i] });
+      } else {
+        displayItems.push({ index: i, isLoaded: false, item: null });
+      }
+    }
+
+    // extract all the elements that we'll show in a frame..
+    // const displayItems = _items
+    //   .slice(topIndex, topIndex + itemCount)
+    //   .map((item, index) => ({ index: topIndex + index, isLoaded: topIndex + index < _items.length, item }));
+    // Give it back ... someone, or something, needs to know!
+    return { displayItems, sT, rH, fH };
   };
 
   // Handler::OnScroll
   const onScroll = (event: React.UIEvent<HTMLElement>) => {
     const _frame = computeFrame(items, rowHeight);
     setFrame(_frame);
+
     if (_frame.rH === 0) {
       onMoreItems(items.length, items.length + pageSize);
     }
@@ -214,11 +216,11 @@ export default function InfiniteList<I extends InfiniteListItem>({
   // Row renderer.
   // Each item is absolutely positioned relative to the top of the innerContainer
   //  in order to ensure that it lines up with the current scrolling range.
-  const rowRenderer = (displayItem: { index: number; item: I }) => {
+  const rowRenderer = (displayItem: { index: number; isLoaded: boolean; item: I }) => {
     return (
       <Box
         mr={0}
-        key={`listitem[${displayItem.index}].id[${displayItem.item.id}]`}
+        key={`listitem[${displayItem.index}]`}
         onClick={() => onItemClick(displayItem)}
         style={{
           top: displayItem.index * rowHeight,
@@ -231,10 +233,10 @@ export default function InfiniteList<I extends InfiniteListItem>({
         <Box
           className={classes.listItem}
           data-listposition={displayItem.index}
-          data-listitemselected={displayItem.item === selected}
+          data-listitemselected={displayItem.item && displayItem.item === selected}
           data-listitemfocus={displayItem.index === cursor}
         >
-          {onRenderItem(displayItem.item)}
+          {displayItem.isLoaded ? onRenderItem(displayItem.item) : '...loading'}
         </Box>
         <Divider />
       </Box>
@@ -262,15 +264,10 @@ export default function InfiniteList<I extends InfiniteListItem>({
     };
   }, [items, rowHeight]);
 
+  // console.log(frame);
+
   return (
-    <div
-      ref={containerEl}
-      className={classes.infiniteListCt}
-      tabIndex={0}
-      onScroll={onScroll}
-      onKeyDown={onKeyDown}
-      onFocus={onFocus}
-    >
+    <div ref={containerEl} className={classes.infiniteListCt} tabIndex={0} onScroll={onScroll} onKeyDown={onKeyDown}>
       {loading ? (
         <div className={classes.progressCt} style={{ top: frame.sT, height: frame.fH }}>
           <CircularProgress className={classes.progressSpinner} />

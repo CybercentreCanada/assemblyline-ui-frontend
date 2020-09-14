@@ -26,6 +26,8 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Alerts: React.FC = () => {
+  console.log('alerts...');
+
   const classes = useStyles();
   const theme = useTheme();
   const { loading, items, onNextPage } = useAlerts();
