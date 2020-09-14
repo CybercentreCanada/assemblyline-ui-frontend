@@ -1,5 +1,5 @@
 {
-  "agrees_with_tos": "2020-08-21T13:56:45.718604Z",
+  "agrees_with_tos": null,
   "allow_2fa": true,
   "allow_apikeys": true,
   "allow_security_tokens": true,
@@ -8,6 +8,7 @@
   "classification": "TLP:W",
   "email": "user@assemblyline.local",
   "groups": ["USERS"],
+  "has_tos": false,
   "is_active": true,
   "is_admin": false,
   "name": "Default User",
