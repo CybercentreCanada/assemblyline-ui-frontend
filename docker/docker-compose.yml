@@ -72,6 +72,7 @@ services:
       DEV_USER_PASS: $DEV_USER_PASS
     volumes:
       - ./config.yml:/etc/assemblyline/config.yml:ro
+      - ./classification.yml:/etc/assemblyline/classification.yml:ro
     restart: on-failure
     command: python -m assemblyline.odm.random_data.create_test_data full
     depends_on:
@@ -85,6 +86,7 @@ services:
       - '5000:5000'
     volumes:
       - ./config.yml:/etc/assemblyline/config.yml:ro
+      - ./classification.yml:/etc/assemblyline/classification.yml:ro
     restart: on-failure
     depends_on:
       elasticsearch:
@@ -97,6 +99,7 @@ services:
       - '5002:5002'
     volumes:
       - ./config.yml:/etc/assemblyline/config.yml:ro
+      - ./classification.yml:/etc/assemblyline/classification.yml:ro
     restart: on-failure
     depends_on:
       elasticsearch:

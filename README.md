@@ -73,6 +73,12 @@ From the `docker` directory, copy the file `config.yml.template` to `config.yml`
 
 Change the `<YOUR_IP>` in the newly created `config.yml`file to the IP of your dev machine.
 
+#### Setup Assemblyline classification engine file
+
+From the `docker` directory, copy the file `classification.yml.template` to `classification.yml` in the same directory.
+
+Change the `enforce` value to `true` in the `classification.yml` file to turn on the classification engine.
+
 ## Launch the dev environment
 
 ### Dependencies
