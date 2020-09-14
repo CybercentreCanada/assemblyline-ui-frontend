@@ -13,7 +13,7 @@ export default function Help() {
     if (item.type === 'group' && item.element.id === 'help') {
       // eslint-disable-next-line @typescript-eslint/dot-notation
       items = item.element['items'].filter(obj => {
-        return validateProps(obj.userPropsValidator);
+        return validateProps(obj.userPropValidators);
       });
     }
   }

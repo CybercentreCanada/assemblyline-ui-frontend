@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme: Theme) =>
 const LeftNavItem: React.FC<LeftNavItemProps> = props => {
   const classes = useStyles();
   const { drawerState, hideNestedIcons, toggleDrawer } = useAppLayout();
-  const { text, icon, nested, route, userPropsValidator } = props;
+  const { text, icon, nested, route, userPropValidators } = props;
   const { validateProps } = useAppUser<CustomUser>();
 
   const onCloseDrawerIfOpen = () => {
@@ -43,7 +43,7 @@ const LeftNavItem: React.FC<LeftNavItemProps> = props => {
     </ListItem>
   );
 
-  return validateProps(userPropsValidator) ? (
+  return validateProps(userPropValidators) ? (
     drawerState || nested ? (
       item
     ) : (

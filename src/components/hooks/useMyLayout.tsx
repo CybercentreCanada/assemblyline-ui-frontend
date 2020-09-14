@@ -175,7 +175,7 @@ const useMyLayout = (): AppLayoutProps => {
           {
             id: 'help.classification',
             text: t('drawer.help.classification'),
-            userPropsValidator: [{ prop: 'c12n_enforcing', value: true }],
+            userPropValidators: [{ prop: 'c12n_enforcing', value: true }],
             icon: <LabelOutlinedIcon />,
             route: '/help/classification',
             nested: true

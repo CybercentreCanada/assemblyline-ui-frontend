@@ -79,7 +79,7 @@ export type LeftNavElement = {
 export type LeftNavItemProps = {
   id: number | string;
   text: string;
-  userPropsValidator?: ValidatedProp[];
+  userPropValidators?: ValidatedProp[];
   icon?: React.ReactElement<any>;
   route?: string;
   nested?: boolean;
