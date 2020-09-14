@@ -1,4 +1,3 @@
-import { Chip } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import Paper from '@material-ui/core/Paper';
 import makeStyles from '@material-ui/core/styles/makeStyles';
@@ -10,6 +9,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
+import CustomChip from 'components/visual/CustomChip';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -47,14 +47,14 @@ for (let x = 0; x < Math.floor(Math.random() * 270 + 30); x++) {
 
 export default function Submissions() {
   const classes = useStyles();
-  const { t } = useTranslation();
+  const { t } = useTranslation(['submission']);
 
   return (
     <PageFullWidth>
       <Box pb={8}>
-        <Typography variant="h4">{t('page.submission')}</Typography>
+        <Typography variant="h4">{t('title')}</Typography>
         <Typography variant="subtitle1" color="secondary">
-          {rows.length} {t('page.submission.subtitle')}
+          {rows.length} {t('subtitle')}
         </Typography>
       </Box>
 
@@ -62,13 +62,13 @@ export default function Submissions() {
         <Table size="small" className={classes.table} stickyHeader>
           <TableHead>
             <TableRow style={{ whiteSpace: 'nowrap' }}>
-              <TableCell>{t('page.submission.header.starttime')}</TableCell>
-              <TableCell>{t('page.submission.header.verdict')}</TableCell>
-              <TableCell>{t('page.submission.header.description')}</TableCell>
-              <TableCell>{t('page.submission.header.user')}</TableCell>
-              <TableCell>{t('page.submission.header.numfiles')}</TableCell>
-              <TableCell>{t('page.submission.header.classification')}</TableCell>
-              <TableCell>{t('page.submission.header.status')}</TableCell>
+              <TableCell>{t('header.starttime')}</TableCell>
+              <TableCell>{t('header.verdict')}</TableCell>
+              <TableCell>{t('header.description')}</TableCell>
+              <TableCell>{t('header.user')}</TableCell>
+              <TableCell>{t('header.numfiles')}</TableCell>
+              <TableCell>{t('header.classification')}</TableCell>
+              <TableCell>{t('header.status')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -78,13 +78,13 @@ export default function Submissions() {
                   {row.start_time}
                 </TableCell>
                 <TableCell>
-                  <Chip color="primary" size="small" label={row.verdict} />
+                  <CustomChip type="square" color="primary" size="tiny" label={row.verdict} />
                 </TableCell>
                 <TableCell style={{ wordBreak: 'break-all' }}>{row.description}</TableCell>
                 <TableCell>{row.user}</TableCell>
                 <TableCell>{row.num_files}</TableCell>
                 <TableCell>
-                  <Chip size="small" label={row.classification} variant="outlined" />
+                  <CustomChip type="classification" size="tiny" label={row.classification} variant="outlined" />
                 </TableCell>
                 <TableCell>{row.status}</TableCell>
               </TableRow>

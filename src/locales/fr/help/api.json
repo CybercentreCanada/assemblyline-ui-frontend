@@ -1,0 +1,19 @@
+{
+  "complete": "Entièrement documenté",
+  "description": "Description",
+  "function": "Fonction interne",
+  "methods": "Méthodes autorisées",
+  "path": "Chemin d'API",
+  "priv.E": "Étendu",
+  "priv.R": "Lecture",
+  "priv.W": "Écriture",
+  "protected": "Nécessite une authentification",
+  "require_type": "Types d'utilisateurs requis",
+  "required_priv": "Privilèges requis",
+  "user_type.admin": "Administrateur",
+  "user_type.signature_importer": "Importateur de signature",
+  "user_type.signature_manager": "Gestionaire de signature",
+  "user_type.user": "Utilisateur",
+  "version": "Version ",
+  "version_end": " de l'API Assemblyline"
+}

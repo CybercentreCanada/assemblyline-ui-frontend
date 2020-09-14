@@ -1,4 +1,4 @@
-import { UserContextProps, UserProfileProps } from 'commons/components/user/UserProvider';
+import { UserContextProps, UserProfileProps, ValidatedProp } from 'commons/components/user/UserProvider';
 import { useState } from 'react';
 
 export interface CustomUser extends UserProfileProps {
@@ -23,6 +23,15 @@ export default function useMyUser(): UserContextProps<CustomUser> {
     setState(curUser);
   };
 
+  const validateProp = (propDef: ValidatedProp) => {
+    return user[propDef.prop] === propDef.value;
+  };
+
+  const validateProps = (props: ValidatedProp[]) => {
+    if (props === undefined) return true;
+    return props.every(validateProp);
+  };
+
   const isReady = () => {
     if (user === null || !user.agrees_with_tos || !user.is_active) {
       return false;
@@ -34,6 +43,7 @@ export default function useMyUser(): UserContextProps<CustomUser> {
   return {
     user,
     setUser,
-    isReady
+    isReady,
+    validateProps
   };
 }

@@ -1,0 +1,14 @@
+{
+  "file": "Fichier",
+  "file.button": "Téléverser et Analyser",
+  "file.dragzon.byte": "octets",
+  "file.dragzone": "Sélectioner un fichier à analyser",
+  "options": "Options",
+  "options.desc": "Options de soumission",
+  "terms1": "En appuyant sur ",
+  "terms2": ", vous acceptez nos ",
+  "terms3": "Conditions d'utilisation",
+  "url": "URL",
+  "url.button": "Analyser",
+  "url.input": "URL à Analyser"
+}

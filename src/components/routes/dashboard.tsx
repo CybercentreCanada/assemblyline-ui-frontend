@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function Dashboard() {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['dashboard']);
   const classes = useStyles();
 
   const cards = [];
@@ -34,22 +34,20 @@ function Dashboard() {
   }
 
   return (
-    <>
-      <PageFullscreen>
-        <Typography gutterBottom color="primary" variant="h2" align="center">
-          {t('page.dashboard.title')}
-        </Typography>
-        <Box display="flex" flexDirection="row" flexWrap="wrap" width="100%">
-          {cards.map((a, i) => (
-            <Card key={i} className={classes.card}>
-              <Typography variant="h4" className={classes.watermark}>
-                # {a.id}
-              </Typography>
-            </Card>
-          ))}
-        </Box>
-      </PageFullscreen>
-    </>
+    <PageFullscreen>
+      <Typography gutterBottom color="primary" variant="h2" align="center">
+        {t('title')}
+      </Typography>
+      <Box display="flex" flexDirection="row" flexWrap="wrap" width="100%">
+        {cards.map((a, i) => (
+          <Card key={i} className={classes.card}>
+            <Typography variant="h4" className={classes.watermark}>
+              # {a.id}
+            </Typography>
+          </Card>
+        ))}
+      </Box>
+    </PageFullscreen>
   );
 }
 

@@ -19,6 +19,7 @@ import clsx from 'clsx';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import LeftNavGroup from 'commons/components/layout/leftnav/LeftNavGroup';
 import LeftNavItem from 'commons/components/layout/leftnav/LeftNavItem';
+import { ValidatedProp } from 'commons/components/user/UserProvider';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -78,6 +79,7 @@ export type LeftNavElement = {
 export type LeftNavItemProps = {
   id: number | string;
   text: string;
+  userPropValidators?: ValidatedProp[];
   icon?: React.ReactElement<any>;
   route?: string;
   nested?: boolean;

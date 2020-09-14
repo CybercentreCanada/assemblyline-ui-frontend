@@ -2,11 +2,11 @@ import { makeStyles } from '@material-ui/core';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-type TextDividerProps = {
-  forcePaper?: (value: boolean) => void;
-};
+interface TextDividerProps {
+  forcePaper?: boolean;
+}
 
-export default function TextDividerProps<TextDividerProps>({ forcePaper = false }) {
+const TextDivider: React.FC<TextDividerProps> = ({ forcePaper = false }) => {
   const { t } = useTranslation();
   const useStyles = makeStyles(theme => ({
     divider: {
@@ -37,4 +37,6 @@ export default function TextDividerProps<TextDividerProps>({ forcePaper = false 
       </div>
     </div>
   );
-}
+};
+
+export default TextDivider;

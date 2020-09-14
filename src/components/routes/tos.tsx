@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 const Markdown = require('react-markdown');
 
 export default function Tos() {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['tos']);
   const theme = useTheme();
   const [tos, setTos] = useState('');
   const [buttonLoading, setButtonLoading] = useState(false);
@@ -74,7 +74,7 @@ export default function Tos() {
         <Box>{getBanner(theme)}</Box>
         <Box mb={6} textAlign="left">
           <Typography variant="h3" gutterBottom>
-            {t('page.tos')}
+            {t('title')}
           </Typography>
         </Box>
         {tos ? (
@@ -85,7 +85,7 @@ export default function Tos() {
             {currentUser.agrees_with_tos ? (
               <Box mt={6}>
                 <Typography variant="subtitle1" color="secondary">
-                  {t('page.tos.agreed')}
+                  {t('agreed')}
                 </Typography>
               </Box>
             ) : (
@@ -97,7 +97,7 @@ export default function Tos() {
                   disabled={buttonLoading}
                   onClick={acceptTOS}
                 >
-                  {t('page.tos.button')}
+                  {t('button')}
                   {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
                 </Button>
                 <Button
@@ -107,7 +107,7 @@ export default function Tos() {
                   disabled={buttonLoading}
                   onClick={cancelTOS}
                 >
-                  {t('page.tos.logout')}
+                  {t('logout')}
                   {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
                 </Button>
               </Box>

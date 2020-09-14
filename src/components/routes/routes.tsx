@@ -3,7 +3,13 @@ import Account from 'components/routes/account';
 import Admin from 'components/routes/admin';
 import Users from 'components/routes/admin/users';
 import Dashboard from 'components/routes/dashboard';
+import Help from 'components/routes/help';
+import ApiDoc from 'components/routes/help/api';
+import Configuration from 'components/routes/help/configuration';
+import Services from 'components/routes/help/services';
 import Logout from 'components/routes/logout';
+import Manage from 'components/routes/manage';
+import Settings from 'components/routes/settings';
 import Submissions from 'components/routes/submission';
 import Submit from 'components/routes/submit';
 import Tos from 'components/routes/tos';
@@ -16,17 +22,22 @@ const Routes = () => {
   return (
     <Switch>
       <Route exact path="/" component={Submit} />
-      <Route exact path="/submit" component={Submit} />
-      <Route exact path="/submissions" component={Submissions} />
-      <Route exact path="/dashboard" component={Dashboard} />
-      <Route exact path="/logout" component={Logout} />
-      <Route exact path="/tos" component={Tos} />
       <Route exact path="/account" component={Account} />
       <Route exact path="/alerts" component={Alerts} />
       <Route exact path="/admin" component={Admin} />
       <Route exact path="/admin/users" component={Users} />
       <Route exact path="/admin/users/:id" component={User} />
-
+      <Route exact path="/dashboard" component={Dashboard} />
+      <Route exact path="/help" component={Help} />
+      <Route exact path="/help/api" component={ApiDoc} />
+      <Route exact path="/help/configuration" component={Configuration} />
+      <Route exact path="/help/services" component={Services} />
+      <Route exact path="/logout" component={Logout} />
+      <Route exact path="/manage" component={Manage} />
+      <Route exact path="/settings" component={Settings} />
+      <Route exact path="/submit" component={Submit} />
+      <Route exact path="/submissions" component={Submissions} />
+      <Route exact path="/tos" component={Tos} />
       <Route component={NotFoundPage} />
     </Switch>
   );

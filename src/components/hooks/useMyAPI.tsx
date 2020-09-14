@@ -13,13 +13,48 @@ export type APIResponseProps = {
 export default function useMyAPI() {
   const { t } = useTranslation();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-  return useMemo(() => {
-    const snackBarOptions: OptionsObject = {
-      variant: 'error',
-      autoHideDuration: 5000,
-      anchorOrigin: {
-        vertical: 'bottom',
-        horizontal: 'center'
+  const snackBarOptions: OptionsObject = {
+    variant: 'error',
+    autoHideDuration: 5000,
+    anchorOrigin: {
+      vertical: 'bottom',
+      horizontal: 'center'
+    },
+    onClick: snack => {
+      closeSnackbar();
+    }
+  };
+
+  type APICallProps = {
+    url: string;
+    method?: string;
+    body?: any;
+    reloadOnUnauthorize?: boolean;
+    onSuccess?: (api_data: APIResponseProps) => void;
+    onFailure?: (api_data: APIResponseProps) => void;
+    onEnter?: () => void;
+    onExit?: () => void;
+    onFinalize?: (api_data: APIResponseProps) => void;
+  };
+
+  function apiCall({
+    url,
+    method,
+    body,
+    reloadOnUnauthorize,
+    onSuccess,
+    onFailure,
+    onEnter,
+    onExit,
+    onFinalize
+  }: APICallProps) {
+    const allowReload = reloadOnUnauthorize === undefined || reloadOnUnauthorize;
+    const requestOptions: RequestInit = {
+      method: method || 'GET',
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-XSRF-TOKEN': getXSRFCookie()
       },
       onClick: snack => {
         closeSnackbar();

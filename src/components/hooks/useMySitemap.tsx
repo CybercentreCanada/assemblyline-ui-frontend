@@ -1,21 +1,29 @@
 import AccountCircleOutlinedIcon from '@material-ui/icons/AccountCircleOutlined';
 import AccountTreeOutlinedIcon from '@material-ui/icons/AccountTreeOutlined';
 import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
+import AssignmentOutlinedIcon from '@material-ui/icons/AssignmentOutlined';
 import BuildOutlinedIcon from '@material-ui/icons/BuildOutlined';
+import BusinessOutlinedIcon from '@material-ui/icons/BusinessOutlined';
 import ChromeReaderModeOutlinedIcon from '@material-ui/icons/ChromeReaderModeOutlined';
+import CodeOutlinedIcon from '@material-ui/icons/CodeOutlined';
 import DashboardOutlinedIcon from '@material-ui/icons/DashboardOutlined';
 import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
+import FingerprintOutlinedIcon from '@material-ui/icons/FingerprintOutlined';
 import HelpOutlineOutlinedIcon from '@material-ui/icons/HelpOutlineOutlined';
+import LabelOutlinedIcon from '@material-ui/icons/LabelOutlined';
 import ListAltOutlinedIcon from '@material-ui/icons/ListAltOutlined';
 import MapOutlinedIcon from '@material-ui/icons/MapOutlined';
 import NotificationImportantOutlinedIcon from '@material-ui/icons/NotificationImportantOutlined';
 import PublishOutlinedIcon from '@material-ui/icons/PublishOutlined';
 import ReceiptOutlinedIcon from '@material-ui/icons/ReceiptOutlined';
 import SearchIcon from '@material-ui/icons/Search';
+import SettingsApplicationsOutlinedIcon from '@material-ui/icons/SettingsApplicationsOutlined';
 import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
+import SimCardOutlinedIcon from '@material-ui/icons/SimCardOutlined';
 import SupervisorAccountOutlinedIcon from '@material-ui/icons/SupervisorAccountOutlined';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { BiNetworkChart } from 'react-icons/bi';
 
 // SiteMapContextProps configuration properties.
 // exceptLast: boolean = false (default),
@@ -54,26 +62,61 @@ export default function useMySitemap() {
       { path: '/alerts', title: t('drawer.alerts'), isRoot: true, icon: <NotificationImportantOutlinedIcon /> },
       { path: '/dashboard', title: t('drawer.dashboard'), isRoot: true, icon: <DashboardOutlinedIcon /> },
       { path: '/manage', title: t('drawer.manage'), isRoot: true, icon: <BuildOutlinedIcon /> },
-      { path: '/manage/heuristics', title: t('drawer.manage.heuristics'), breadcrumbs: ['/manage'] },
-      { path: '/manage/signatures', title: t('drawer.manage.signatures'), breadcrumbs: ['/manage'] },
-      { path: '/manage/sources', title: t('drawer.manage.source'), breadcrumbs: ['/manage'] },
-      { path: '/manage/workflows', title: t('drawer.manage.workflow'), breadcrumbs: ['/manage'] },
+      {
+        path: '/manage/heuristics',
+        title: t('drawer.manage.heuristics'),
+        icon: <SimCardOutlinedIcon />,
+        breadcrumbs: ['/manage']
+      },
+      {
+        path: '/manage/signatures',
+        title: t('drawer.manage.signatures'),
+        icon: <FingerprintOutlinedIcon />,
+        breadcrumbs: ['/manage']
+      },
+      {
+        path: '/manage/sources',
+        title: t('drawer.manage.source'),
+        icon: <CodeOutlinedIcon />,
+        breadcrumbs: ['/manage']
+      },
+      {
+        path: '/manage/workflows',
+        title: t('drawer.manage.workflow'),
+        icon: <BiNetworkChart />,
+        breadcrumbs: ['/manage']
+      },
       { path: '/search', title: t('drawer.search'), isRoot: true, icon: <SearchIcon /> },
-      { path: '/search?index=alert', title: t('drawer.search.alert'), breadcrumbs: ['/search'] },
-      { path: '/search?index=file', title: t('drawer.search.file'), breadcrumbs: ['/search'] },
-      { path: '/search?index=result', title: t('drawer.search.result'), breadcrumbs: ['/search'] },
-      { path: '/search?index=signature', title: t('drawer.search.signature'), breadcrumbs: ['/search'] },
-      { path: '/search?index=submission', title: t('drawer.search.submission'), breadcrumbs: ['/search'] },
+      { path: '/search/alert', title: t('drawer.search.alert'), breadcrumbs: ['/search'] },
+      { path: '/search/file', title: t('drawer.search.file'), breadcrumbs: ['/search'] },
+      { path: '/search/result', title: t('drawer.search.result'), breadcrumbs: ['/search'] },
+      { path: '/search/signature', title: t('drawer.search.signature'), breadcrumbs: ['/search'] },
+      { path: '/search/submission', title: t('drawer.search.submission'), breadcrumbs: ['/search'] },
       { path: '/help', title: t('drawer.help'), isRoot: true, icon: <HelpOutlineOutlinedIcon /> },
-      { path: '/help/api', title: t('drawer.help.api'), breadcrumbs: ['/help'] },
-      { path: '/help/classification', title: t('drawer.help.classification'), breadcrumbs: ['/help'] },
-      { path: '/help/configuration', title: t('drawer.help.configuration'), breadcrumbs: ['/help'] },
-      { path: '/help/search', title: t('drawer.help.search'), breadcrumbs: ['/help'] },
-      { path: '/help/service', title: t('drawer.help.service'), breadcrumbs: ['/help'] },
-      { path: '/tos', title: t('page.tos'), isRoot: true, icon: <ReceiptOutlinedIcon /> },
+      { path: '/help/api', title: t('drawer.help.api'), icon: <AssignmentOutlinedIcon />, breadcrumbs: ['/help'] },
+      {
+        path: '/help/classification',
+        title: t('drawer.help.classification'),
+        icon: <LabelOutlinedIcon />,
+        breadcrumbs: ['/help']
+      },
+      {
+        path: '/help/configuration',
+        title: t('drawer.help.configuration'),
+        icon: <SettingsApplicationsOutlinedIcon />,
+        breadcrumbs: ['/help']
+      },
+      { path: '/help/search', title: t('drawer.help.search'), icon: <SearchIcon />, breadcrumbs: ['/help'] },
+      {
+        path: '/help/services',
+        title: t('drawer.help.services'),
+        icon: <AccountTreeOutlinedIcon />,
+        breadcrumbs: ['/help']
+      },
+      { path: '/tos', title: t('breadcrumbs.tos'), isRoot: true, icon: <ReceiptOutlinedIcon /> },
       { path: '/account', title: t('usermenu.account'), isRoot: true, icon: <AccountCircleOutlinedIcon /> },
       { path: '/settings', title: t('usermenu.settings'), isRoot: true, icon: <SettingsOutlinedIcon /> },
-      { path: '/admin', title: t('adminmenu'), isRoot: true },
+      { path: '/admin', title: t('adminmenu'), isRoot: true, icon: <BusinessOutlinedIcon /> },
       {
         path: '/admin/errors',
         title: t('adminmenu.errors'),

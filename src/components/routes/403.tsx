@@ -1,3 +1,4 @@
+import { useTheme } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import BlockIcon from '@material-ui/icons/Block';
@@ -6,27 +7,30 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 type ForbiddenPageProps = {
-  disabled: boolean;
+  disabled?: boolean;
 };
 
-const ForbiddenPage = (props: ForbiddenPageProps) => {
-  const { disabled } = props;
-  const { t } = useTranslation();
+const ForbiddenPage: React.FC<ForbiddenPageProps> = ({ disabled = false }) => {
+  const { t } = useTranslation(['error403']);
+  const theme = useTheme();
   return (
-    <PageCenter width={65}>
+    <PageCenter width="65%">
       <Box pt={6} textAlign="center" fontSize={200}>
-        <BlockIcon color="secondary" fontSize="inherit" />
+        <BlockIcon
+          style={{ color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark }}
+          fontSize="inherit"
+        />
       </Box>
       <Box pb={2}>
-        <Typography variant="h3">{t('page.403.title')}</Typography>
+        <Typography variant="h3">{t('title')}</Typography>
       </Box>
       {disabled ? (
         <Box>
-          <Typography variant="h6">{t('page.403.disabled')}</Typography>
+          <Typography variant="h6">{t('disabled')}</Typography>
         </Box>
       ) : (
         <Box>
-          <Typography variant="h6">{t('page.403.not_allowed')}</Typography>
+          <Typography variant="h6">{t('not_allowed')}</Typography>
         </Box>
       )}
     </PageCenter>

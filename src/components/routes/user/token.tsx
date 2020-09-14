@@ -26,8 +26,8 @@ type SecurityTokenProps = {
   snackBarOptions: OptionsObject;
 };
 
-export default function SecurityToken<SecurityTokenProps>({ user, toggleToken, enqueueSnackbar, snackBarOptions }) {
-  const { t } = useTranslation();
+export default function SecurityToken({ user, toggleToken, enqueueSnackbar, snackBarOptions }: SecurityTokenProps) {
+  const { t } = useTranslation(['user']);
   const [selectedToken, setSelectedToken] = useState(null);
   const [tempToken, setTempToken] = useState('');
   const apiCall = useMyAPI();
@@ -47,7 +47,7 @@ export default function SecurityToken<SecurityTokenProps>({ user, toggleToken, e
       onSuccess: () => {
         toggleToken(selectedToken);
         setSelectedToken(null);
-        enqueueSnackbar(t('page.user.token.removed'), snackBarOptions);
+        enqueueSnackbar(t('token.removed'), snackBarOptions);
       }
     });
   }
@@ -76,7 +76,7 @@ export default function SecurityToken<SecurityTokenProps>({ user, toggleToken, e
                 onSuccess: () => {
                   toggleToken(tempToken);
                   setTempToken('');
-                  enqueueSnackbar(t('page.user.token.added'), snackBarOptions);
+                  enqueueSnackbar(t('token.added'), snackBarOptions);
                 }
               });
             })
@@ -101,14 +101,14 @@ export default function SecurityToken<SecurityTokenProps>({ user, toggleToken, e
   return (
     <>
       <Typography variant="h4" gutterBottom>
-        {t('page.user.token.title')}
+        {t('token.title')}
       </Typography>
       <Typography variant="caption" gutterBottom>
-        {t('page.user.token.desc')}
+        {t('token.desc')}
       </Typography>
       <Box py={4}>
         <Typography variant="subtitle1" gutterBottom>
-          {t('page.user.token.list')}
+          {t('token.list')}
         </Typography>
         {user.security_tokens.length !== 0 ? (
           user.security_tokens.map((e, i) => (
@@ -119,7 +119,7 @@ export default function SecurityToken<SecurityTokenProps>({ user, toggleToken, e
         ) : (
           <Box py={2}>
             <Typography variant="subtitle2" color="secondary">
-              {t('page.user.token.none')}
+              {t('token.none')}
             </Typography>
           </Box>
         )}
@@ -131,14 +131,14 @@ export default function SecurityToken<SecurityTokenProps>({ user, toggleToken, e
           size="small"
           margin="normal"
           variant="outlined"
-          label={t('page.user.token.temp_token')}
+          label={t('token.temp_token')}
           onChange={handleTokenChange}
           value={tempToken}
         />
       </Box>
       <Box alignSelf="flex-end">
         <Button disabled={tempToken === ''} onClick={() => handleNew()} color="primary" variant="contained">
-          {t('page.user.token.add')}
+          {t('token.add')}
         </Button>
       </Box>
 
@@ -149,17 +149,17 @@ export default function SecurityToken<SecurityTokenProps>({ user, toggleToken, e
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          {t('page.user.token.remove_title')}: {selectedToken}
+          {t('token.remove_title')}: {selectedToken}
         </DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">{t('page.user.token.remove_text')}</DialogContentText>
+          <DialogContentText id="alert-dialog-description">{t('token.remove_text')}</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setSelectedToken(null)} color="primary" autoFocus>
-            {t('page.user.cancel')}
+            {t('cancel')}
           </Button>
           <Button onClick={() => handleDelete()} color="primary">
-            {t('page.user.token.remove')}
+            {t('token.remove')}
           </Button>
         </DialogActions>
       </Dialog>

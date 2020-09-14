@@ -1,4 +1,4 @@
-import { makeStyles, useTheme } from '@material-ui/core';
+import { makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
@@ -17,7 +17,7 @@ import { AiOutlineSecurityScan } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
 
 function FileDropper(props) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['submit']);
   const { acceptedFiles, getRootProps, getInputProps, isDragActive } = useDropzone();
   const useStyles = makeStyles(theme => ({
     drop_zone: {
@@ -54,14 +54,14 @@ function FileDropper(props) {
           <b>{acceptedFiles[0].name}</b>
         </Typography>
         <Typography variant="body2" align="center">
-          {acceptedFiles[0].size} {t('page.submit.file.dragzon.byte')}
+          {acceptedFiles[0].size} {t('file.dragzon.byte')}
         </Typography>
       </Box>
     );
   } else {
     dropperText = (
       <Typography variant="body1">
-        <b>{t('page.submit.file.dragzone')}</b>
+        <b>{t('file.dragzone')}</b>
       </Typography>
     );
   }
@@ -83,7 +83,7 @@ function FileDropper(props) {
           ''
         ) : (
           <Button color="primary" variant="contained">
-            {t('page.submit.file.button')}
+            {t('file.button')}
           </Button>
         )}
       </Box>
@@ -92,10 +92,12 @@ function FileDropper(props) {
 }
 
 function Submit() {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['submit']);
   const theme = useTheme();
   const { getBanner } = useAppLayout();
   const [value, setValue] = React.useState('0');
+  const downSM = useMediaQuery(theme.breakpoints.down('sm'));
+  const md = useMediaQuery(theme.breakpoints.only('md'));
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -104,31 +106,21 @@ function Submit() {
   const useStyles = makeStyles(curTheme => ({
     no_pad: {
       padding: 0
-    },
-    page: {
-      maxWidth: '960px',
-      width: '100%',
-      [curTheme.breakpoints.down('sm')]: {
-        maxWidth: '100%'
-      },
-      [curTheme.breakpoints.only('md')]: {
-        maxWidth: '630px'
-      }
     }
   }));
   const classes = useStyles();
   return (
-    <PageCenter>
-      <Box className={classes.page} display="inline-block" textAlign="center">
+    <PageCenter maxWidth={md ? '630px' : downSM ? '100%' : '960px'}>
+      <Box display="inline-block" textAlign="center" width="100%">
         <Box display="inline-block" marginBottom="2rem">
           {getBanner(theme)}
         </Box>
         <TabContext value={value}>
           <Paper square>
             <TabList centered onChange={handleChange} indicatorColor="primary" textColor="primary">
-              <Tab label={t('page.submit.file')} value="0" />
-              <Tab label={t('page.submit.url')} value="1" />
-              <Tab label={t('page.submit.options')} value="2" />
+              <Tab label={t('file')} value="0" />
+              <Tab label={t('url')} value="1" />
+              <Tab label={t('options')} value="2" />
             </TabList>
           </Paper>
           <TabPanel value="0" className={classes.no_pad}>
@@ -136,11 +128,11 @@ function Submit() {
               <FileDropper />
               <Box mt="50px" textAlign="center">
                 <Typography variant="body2">
-                  {t('page.submit.terms1')}
-                  <i>{t('page.submit.file.button')}</i>
-                  {t('page.submit.terms2')}
+                  {t('terms1')}
+                  <i>{t('file.button')}</i>
+                  {t('terms2')}
                   <Link style={{ textDecoration: 'none', color: theme.palette.primary.main }} to="/tos">
-                    {t('page.submit.terms3')}
+                    {t('terms3')}
                   </Link>
                   .
                 </Typography>
@@ -150,22 +142,22 @@ function Submit() {
           <TabPanel value="1" className={classes.no_pad}>
             <Box display="flex" flexDirection="row" marginTop="30px">
               <TextField
-                label={t('page.submit.url.input')}
+                label={t('url.input')}
                 size="small"
                 variant="outlined"
                 style={{ flexGrow: 1, marginRight: '1rem' }}
               />
               <Button color="primary" variant="contained">
-                {t('page.submit.url.button')}
+                {t('url.button')}
               </Button>
             </Box>
             <Box mt="50px" textAlign="center">
               <Typography variant="body2">
-                {t('page.submit.terms1')}
-                <i>{t('page.submit.url.button')}</i>
-                {t('page.submit.terms2')}
+                {t('terms1')}
+                <i>{t('url.button')}</i>
+                {t('terms2')}
                 <Link style={{ textDecoration: 'none', color: theme.palette.primary.main }} to="/tos">
-                  {t('page.submit.terms3')}
+                  {t('terms3')}
                 </Link>
                 .
               </Typography>
@@ -173,7 +165,7 @@ function Submit() {
           </TabPanel>
           <TabPanel value="2" className={classes.no_pad}>
             <Box marginTop="30px">
-              <p>{t('page.submit.options.desc')}</p>
+              <p>{t('options.desc')}</p>
             </Box>
           </TabPanel>
         </TabContext>

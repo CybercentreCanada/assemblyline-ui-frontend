@@ -6,7 +6,7 @@ import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 function Logout() {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['logout']);
   const theme = useTheme();
   const apiCall = useMyAPI();
   const { getBanner, hideMenus } = useAppLayout();
@@ -30,7 +30,7 @@ function Logout() {
       <Box textAlign="center">
         {getBanner(theme)}
         <Box mb={3}>
-          <Typography>{t('page.logout')}</Typography>
+          <Typography>{t('title')}</Typography>
         </Box>
         <CircularProgress size={24} />
       </Box>

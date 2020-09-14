@@ -24,7 +24,7 @@ type ResetPasswordNowProps = {
 export function ResetPasswordNow({ buttonLoading, setButtonLoading }: ResetPasswordNowProps) {
   const location = useLocation();
   const history = useHistory();
-  const { t } = useTranslation();
+  const { t } = useTranslation(['login']);
   const classes = useStyles();
   const apiCall = useMyAPI();
   const params = new URLSearchParams(location.search);
@@ -67,10 +67,10 @@ export function ResetPasswordNow({ buttonLoading, setButtonLoading }: ResetPassw
         {done ? (
           <>
             <Typography align="center" variant="h6" gutterBottom>
-              {t('page.login.reset_now.done')}
+              {t('reset_now.done')}
             </Typography>
             <Typography align="center" variant="caption">
-              {t('page.login.reset_now.redirect')}
+              {t('reset_now.redirect')}
             </Typography>
           </>
         ) : (
@@ -80,7 +80,7 @@ export function ResetPasswordNow({ buttonLoading, setButtonLoading }: ResetPassw
               type="password"
               variant="outlined"
               size="small"
-              label={t('page.login.reset_now.password')}
+              label={t('reset_now.password')}
               onChange={event => setPassword(event.target.value)}
             />
             <TextField
@@ -88,7 +88,7 @@ export function ResetPasswordNow({ buttonLoading, setButtonLoading }: ResetPassw
               type="password"
               variant="outlined"
               size="small"
-              label={t('page.login.reset_now.password_confirm')}
+              label={t('reset_now.password_confirm')}
               onChange={event => setPasswordConfirm(event.target.value)}
             />
             <Button
@@ -98,7 +98,7 @@ export function ResetPasswordNow({ buttonLoading, setButtonLoading }: ResetPassw
               color="primary"
               disabled={buttonLoading}
             >
-              {t('page.login.reset_now.button')}
+              {t('reset_now.button')}
               {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
             </Button>
           </>
@@ -136,7 +136,7 @@ export function ResetPassword({ buttonLoading, setButtonLoading }: ResetPassword
     <form onSubmit={onSubmit}>
       <Box display="flex" flexDirection="column">
         {done ? (
-          <Typography align="center">{t('page.login.reset.done')}</Typography>
+          <Typography align="center">{t('reset.done')}</Typography>
         ) : (
           <>
             <TextField
@@ -144,7 +144,7 @@ export function ResetPassword({ buttonLoading, setButtonLoading }: ResetPassword
               type="email"
               variant="outlined"
               size="small"
-              label={t('page.login.reset.email')}
+              label={t('reset.email')}
               onChange={event => setEmail(event.target.value)}
             />
             <Button
@@ -154,7 +154,7 @@ export function ResetPassword({ buttonLoading, setButtonLoading }: ResetPassword
               color="primary"
               disabled={buttonLoading}
             >
-              {t('page.login.reset.button')}
+              {t('reset.button')}
               {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
             </Button>
           </>
