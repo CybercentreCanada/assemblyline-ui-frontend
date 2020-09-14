@@ -56,6 +56,12 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+// Function throttler to streamline keydown event handlers.
+const KEYBOARD_THROTTLER = new Throttler(10);
+
+// Function throttler to streamline scroll event handlers.
+const SCROLL_THROTTLER = new Throttler(1000);
+
 interface InfiniteListFrame<I extends InfiniteListItem> {
   sT: number;
   fH: number;
@@ -106,9 +112,6 @@ export default function InfiniteList<I extends InfiniteListItem>({
   // Track cursor index position for keyboard navigation.
   const [cursor, setCursor] = useState<number>(-1);
 
-  // Function throttler to streamline keydown event handlers.
-  const throttler = new Throttler(10);
-
   // Compute the frame of items within visual range.
   const computeFrame = (_items: I[], _rowHeight: number): InfiniteListFrame<I> => {
     // extract some requirement dom element for measurements.
@@ -148,8 +151,14 @@ export default function InfiniteList<I extends InfiniteListItem>({
 
   // Handler::OnScroll
   const onScroll = (event: React.UIEvent<HTMLElement>) => {
+    console.log('scrolling...');
     const _frame = computeFrame(items, rowHeight);
     setFrame(_frame);
+
+    // use this to issue fetches for items with [isLoaded=false]
+    SCROLL_THROTTLER.throttle(() => {
+      console.log('done scrolling.....');
+    });
 
     if (_frame.rH === 0) {
       onMoreItems(items.length, items.length + pageSize);
@@ -178,7 +187,7 @@ export default function InfiniteList<I extends InfiniteListItem>({
     // This will ensure that users who hold down UP/DOWN arrow key don't overload
     //  react with constant stream of keydown events.
     // We'll process on event every 10ms and throw away the rest.
-    throttler.throttle(() => {
+    KEYBOARD_THROTTLER.throttle(() => {
       if (isArrowUp(keyCode)) {
         const nextIndex = cursor - 1;
         if (nextIndex > -1) {

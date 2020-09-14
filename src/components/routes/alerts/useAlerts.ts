@@ -64,7 +64,7 @@ export default function useAlerts(): UsingAlerts {
   });
 
   const formatUrl = (startIndex: number, endIndex: number) =>
-    `/api/v4/alert/grouped/file.sha256/?offset=${startIndex}&rows=${endIndex - startIndex}`;
+    `/api/v4/alert/grouped/file.sha256/?offset=${startIndex}&rows=${endIndex - startIndex}&q=&tc=1000d`;
 
   const onNextPage = (startIndex: number, endIndex: number) => {
     setState({ ...state, loading: true });
@@ -83,7 +83,7 @@ export default function useAlerts(): UsingAlerts {
   };
 
   useEffect(() => {
-    onNextPage(0, 5);
+    onNextPage(0, 25);
   }, []);
 
   return { ...state, onNextPage };
