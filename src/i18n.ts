@@ -2,6 +2,7 @@ import i18n from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import error403EN from 'locales/en/403.json';
 import error404EN from 'locales/en/404.json';
+import alertsEN from 'locales/en/alerts.json';
 import dashboardEN from 'locales/en/dashboard.json';
 import helpAPIEN from 'locales/en/help/api.json';
 import helpConfigurationEN from 'locales/en/help/configuration.json';
@@ -17,6 +18,7 @@ import translationEN from 'locales/en/translation.json';
 import userEN from 'locales/en/user.json';
 import error403FR from 'locales/fr/403.json';
 import error404FR from 'locales/fr/404.json';
+import alertsFR from 'locales/fr/alerts.json';
 import dashboardFR from 'locales/fr/dashboard.json';
 import helpAPIFR from 'locales/fr/help/api.json';
 import helpConfigurationFR from 'locales/fr/help/configuration.json';
@@ -48,7 +50,8 @@ const resources = {
     submit: submitEN,
     translation: translationEN,
     tos: tosEN,
-    user: userEN
+    user: userEN,
+    alerts: alertsEN
   },
   fr: {
     dashboard: dashboardFR,
@@ -65,7 +68,8 @@ const resources = {
     submit: submitFR,
     translation: translationFR,
     tos: tosFR,
-    user: userFR
+    user: userFR,
+    alerts: alertsFR
   }
 };
 

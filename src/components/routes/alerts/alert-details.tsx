@@ -33,7 +33,7 @@ type AlertDetailsProps = {
 };
 
 const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('alerts');
   const theme = useTheme();
   const isLteSm = useMediaQuery(theme.breakpoints.down('sm'));
   const classes = useStyles();
