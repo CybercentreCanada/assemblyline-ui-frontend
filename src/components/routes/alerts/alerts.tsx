@@ -33,6 +33,7 @@ const Alerts: React.FC = () => {
   const [splitPanel, setSplitPanel] = useState<{ open: boolean; item: AlertItem }>({ open: false, item: null });
   const [drawer, setDrawer] = useState<{ open: boolean; type: 'filter' }>({ open: false, type: null });
 
+  // faking it for now.
   const onSearching = (filterValue: string = '', inputEl: HTMLInputElement = null) => {
     setSearching(true);
     if (drawer.open) {
