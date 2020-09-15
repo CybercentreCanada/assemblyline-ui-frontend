@@ -17,6 +17,9 @@ core:
 
 datastore:
   hosts: [http://elastic:devpass@elasticsearch]
+  ilm:
+    enabled: false
+
 
 filestore:
   cache: ["s3://al_storage_key:Ch@ngeTh!sPa33w0rd@minio:9000?s3_bucket=al-cache&use_ssl=False"]
