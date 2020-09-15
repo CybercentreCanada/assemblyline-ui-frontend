@@ -2,7 +2,7 @@
 import { Box, Divider, makeStyles, useTheme } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 import Throttler from 'components/elements/utils/throttler';
-import React, { useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import { isArrowDown, isArrowUp, isEnter } from '../utils/keyboard';
 
 const useStyles = makeStyles(theme => ({
@@ -45,6 +45,8 @@ export interface ListPage<I extends ListItemProps> {
 interface ListProps<I extends ListItemProps> {
   loading?: boolean;
   selected?: number | string;
+  noDivider?: boolean;
+  focus?: boolean;
   items: I[];
   onKeyDown?: (keyCode: number, items: I[], selectedId: string | number) => void;
   onItemSelected: (item: I) => void;
@@ -54,6 +56,8 @@ interface ListProps<I extends ListItemProps> {
 List.defaultProps = {
   selected: null,
   loading: false,
+  noDivider: false,
+  focus: false,
   onKeyDown: () => null
 };
 
@@ -61,6 +65,8 @@ export default function List<I extends ListItemProps>({
   loading,
   selected,
   items,
+  noDivider,
+  focus,
   onRenderItem,
   onItemSelected,
   onKeyDown
@@ -126,10 +132,12 @@ export default function List<I extends ListItemProps>({
     onItemSelected(item);
   };
 
-  // If its loading show skeleton of list.
-  if (loading) {
-    return <ListSkeleton />;
-  }
+  useLayoutEffect(() => {
+    if (focus) {
+      console.log('focusing...');
+      listEl.current.focus();
+    }
+  }, [focus]);
 
   // Render the List component.
   return (
@@ -147,7 +155,7 @@ export default function List<I extends ListItemProps>({
               >
                 {onRenderItem(item)}
               </Box>
-              <Divider />
+              {!noDivider ? <Divider /> : null}
             </Box>
           ))}
         </div>

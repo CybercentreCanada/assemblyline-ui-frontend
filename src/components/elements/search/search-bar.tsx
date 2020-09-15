@@ -14,7 +14,8 @@ import FilterListIcon from '@material-ui/icons/FilterList';
 import SearchIcon from '@material-ui/icons/Search';
 import StarIcon from '@material-ui/icons/Star';
 import React, { useRef, useState } from 'react';
-import { isEnter, isEscape } from '../utils/keyboard';
+import { isArrowDown, isEnter, isEscape } from '../utils/keyboard';
+import SearchSuggestions from './search-suggestions';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -48,16 +49,25 @@ export interface SearchBarButton {
 
 interface SearchBarProps {
   searching?: boolean;
+  buttons?: SearchBarButton[];
+  suggestions?: string[];
   onSearching: (filterValue: string, inputElement: HTMLInputElement) => void;
   onClear: () => void;
-  buttons?: SearchBarButton[];
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ children, searching = false, buttons = [], onSearching, onClear }) => {
+const SearchBar: React.FC<SearchBarProps> = ({
+  children,
+  searching = false,
+  suggestions = [],
+  buttons = [],
+  onSearching,
+  onClear
+}) => {
   const theme = useTheme();
   const classes = useStyles();
   const textFieldEl = useRef<HTMLInputElement>();
   const [filter, setFilter] = useState<string>('');
+  const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
 
   // handler[onclick]: search button click handler.
   const onSearchBtnClick = () => {
@@ -67,11 +77,20 @@ const SearchBar: React.FC<SearchBarProps> = ({ children, searching = false, butt
   // hander[onkeydown]: textfield key_down handler.
   // add some keyboard key listeners to search text field.
   const onFilterKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    //
+    // event.stopPropagation();
     const { keyCode } = event;
     if (isEnter(keyCode)) {
       _onSearching();
     } else if (isEscape(keyCode)) {
-      onFilterClear();
+      if (showSuggestions) {
+        onSuggestionClose();
+      } else {
+        onFilterClear();
+      }
+    } else if (isArrowDown(keyCode)) {
+      event.preventDefault();
+      setShowSuggestions(true);
     }
   };
 
@@ -81,19 +100,32 @@ const SearchBar: React.FC<SearchBarProps> = ({ children, searching = false, butt
     setFilter(event.target.value);
   };
 
+  // When clearing the filter value.
   const onFilterClear = () => {
     textFieldEl.current.querySelector('input').focus();
     setFilter('');
     onClear();
   };
 
-  //
+  // When requesting a search.
   const _onSearching = () => {
     if (filter && filter.length > 0) {
       onSearching(filter, textFieldEl.current.querySelector('input'));
     } else {
       onClear();
     }
+  };
+
+  // When the search suggestion box closes.
+  const onSuggestionClose = () => {
+    setShowSuggestions(false);
+    textFieldEl.current.querySelector('input').focus();
+  };
+
+  // When a search selection has been selected.
+  const onSugestionSelection = (text: string) => {
+    setFilter(text);
+    onSuggestionClose();
   };
 
   return (
@@ -108,7 +140,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ children, searching = false, butt
             <SearchIcon color="primary" fontSize="large" />
           )}
         </Box>
-        <Box flex={1}>
+        <Box flex={1} display="relative">
           <TextField
             ref={textFieldEl}
             placeholder="Filter..."
@@ -120,6 +152,12 @@ const SearchBar: React.FC<SearchBarProps> = ({ children, searching = false, butt
             onKeyDown={onFilterKeyDown}
             autoFocus
             fullWidth
+          />
+          <SearchSuggestions
+            items={suggestions}
+            open={showSuggestions}
+            onSelection={onSugestionSelection}
+            onClose={onSuggestionClose}
           />
         </Box>
         <IconButton onClick={onSearchBtnClick} edge="end" color="primary">
