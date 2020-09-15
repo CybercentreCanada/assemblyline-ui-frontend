@@ -24,30 +24,30 @@ const useStyles = makeStyles(theme => ({
       right: 0,
       bottom: 0
     }
+  },
+  searchresult: {
+    fontStyle: 'italic'
   }
 }));
 
 const Alerts: React.FC = () => {
-  console.log('alerts...');
-
   const classes = useStyles();
   const theme = useTheme();
-  const { loading, items, onLoad, onLoadMore, onSearch, onGet } = useAlerts();
-  const [searching] = useState<boolean>(false);
+  const { loading, items, total, onLoad, onLoadMore, onSearch, onGet } = useAlerts();
+  const [searching, setSearching] = useState<boolean>(false);
   const [splitPanel, setSplitPanel] = useState<{ open: boolean; item: AlertItem }>({ open: false, item: null });
   const [drawer, setDrawer] = useState<{ open: boolean; type: 'filter' }>({ open: false, type: null });
 
-  // faking it for now.
+  //
   const onSearching = (filterValue: string = '', inputEl: HTMLInputElement = null) => {
-    // setSearching(true);
+    setSearching(true);
     if (drawer.open) {
       setDrawer({ open: false, type: null });
     }
 
     onSearch(filterValue);
-
     setTimeout(() => {
-      // setSearching(false);
+      setSearching(false);
 
       if (inputEl) {
         inputEl.focus();
@@ -82,7 +82,11 @@ const Alerts: React.FC = () => {
               }
             }
           ]}
-        />
+        >
+          <Box className={classes.searchresult}>
+            {searching || loading ? (searching ? '...searching' : '...loading') : `${total} matching results.`}
+          </Box>
+        </SearchBar>
       </Box>
       <Viewport>
         <SplitPanel
@@ -96,7 +100,7 @@ const Alerts: React.FC = () => {
           left={
             <InfiniteList
               items={items}
-              loading={loading || searching}
+              loading={items.length && (loading || searching)}
               pageSize={PAGE_SIZE}
               rowHeight={97}
               selected={splitPanel.open && splitPanel.item ? splitPanel.item : null}

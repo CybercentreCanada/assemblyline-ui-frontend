@@ -1,10 +1,9 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import { Box, CircularProgress, Divider, makeStyles, Typography } from '@material-ui/core';
+import { Box, CircularProgress, Divider, makeStyles } from '@material-ui/core';
 import { isArrowDown, isArrowUp, isEnter, isEscape } from 'components/elements/utils/keyboard';
 import Throttler from 'components/elements/utils/throttler';
 import React, { useLayoutEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(theme => ({
   infiniteListCt: {
@@ -283,17 +282,8 @@ export default function InfiniteList<I extends InfiniteListItem>({
         </div>
       ) : null}
       <div ref={innerEl} className={classes.infiniteListInnerCt}>
-        {!loading && !items.length ? <EmptyList /> : frame.displayItems.map(item => rowRenderer(item))}
+        {frame.displayItems.map(item => rowRenderer(item))}
       </div>
     </div>
   );
 }
-
-const EmptyList = () => {
-  const { t } = useTranslation();
-  return (
-    <Box>
-      <Typography>{t('infinitelist.noresult')}</Typography>
-    </Box>
-  );
-};

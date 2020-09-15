@@ -63,6 +63,7 @@ export interface AlertItem extends InfiniteListItem {
 interface UsingAlerts {
   loading: boolean;
   fields: ALField[];
+  total: number;
   items: AlertItem[];
   onLoad: (startIndex: number, stopIndex: number) => void;
   onLoadMore: (startIndex: number, stopIndex: number) => void;
@@ -78,8 +79,9 @@ interface UsingAlerts {
 export default function useAlerts(): UsingAlerts {
   const apiCall = useMyAPI();
   const [fields, setFields] = useState<ALField[]>([]);
-  const [state, setState] = useState<{ loading: boolean; items: AlertItem[] }>({
+  const [state, setState] = useState<{ loading: boolean; items: AlertItem[]; total: number }>({
     loading: true,
+    total: 0,
     items: []
   });
 
@@ -98,9 +100,11 @@ export default function useAlerts(): UsingAlerts {
     apiCall({
       url: formatUrl(startIndex, endIndex),
       onSuccess: api_data => {
-        const { items: _items } = api_data.api_response;
+        const { items: _items, total } = api_data.api_response;
+        console.log(_items);
         setState({
           loading: false,
+          total,
           items: parseResult(_items, startIndex)
         });
       }
@@ -113,9 +117,10 @@ export default function useAlerts(): UsingAlerts {
     apiCall({
       url: formatUrl(startIndex, endIndex),
       onSuccess: api_data => {
-        const { items: _items } = api_data.api_response;
+        const { items: _items, total } = api_data.api_response;
         setState({
           loading: false,
+          total,
           items: [...state.items, ...parseResult(_items, startIndex)]
         });
       }
@@ -128,9 +133,10 @@ export default function useAlerts(): UsingAlerts {
     apiCall({
       url,
       onSuccess: api_data => {
-        const { items } = api_data.api_response;
+        const { items, total } = api_data.api_response;
         setState({
           loading: false,
+          total,
           items: parseResult(items, 0)
         });
       }
