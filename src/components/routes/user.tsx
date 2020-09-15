@@ -31,6 +31,7 @@ import APIKeys from 'components/routes/user/api_keys';
 import DisableOTP from 'components/routes/user/disable_otp';
 import OTP from 'components/routes/user/otp';
 import SecurityToken from 'components/routes/user/token';
+import ClassificationPicker from 'components/visual/ClassificationPicker';
 import CustomChip from 'components/visual/CustomChip';
 import ChipInput from 'material-ui-chip-input';
 import { OptionsObject, useSnackbar } from 'notistack';
@@ -420,11 +421,7 @@ function User({ width, username }: UserProps) {
 
           <Grid item sm={12} md={9} style={{ width: '100%' }}>
             {currentUser.c12n_enforcing ? (
-              user ? (
-                <CustomChip type="classification" label={user.classification} />
-              ) : (
-                <Skeleton style={{ height: '3rem' }} />
-              )
+              <ClassificationPicker currentClassification={user && user.classification} />
             ) : null}
             <TableContainer className={classes.group} component={Paper}>
               <Table aria-label={t('profile')}>
