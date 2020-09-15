@@ -132,19 +132,20 @@ export default function InfiniteList<I extends InfiniteListItem>({
 
     console.log(`itemcount[${itemCount}]:topindex[${topIndex}]`);
 
-    const displayItems = [];
-    for (let i = topIndex; i < topIndex + itemCount; i++) {
-      if (_items.some(item => item.index === i)) {
-        displayItems.push({ index: i, isLoaded: true, item: _items[i] });
-      } else {
-        displayItems.push({ index: i, isLoaded: false, item: null });
-      }
-    }
+    //
+    // const displayItems = [];
+    // for (let i = topIndex; i < topIndex + itemCount; i++) {
+    //   if (_items.some(item => item.index === i)) {
+    //     displayItems.push({ index: i, isLoaded: true, item: _items[i] });
+    //   } else {
+    //     displayItems.push({ index: i, isLoaded: false, item: null });
+    //   }
+    // }
 
     // extract all the elements that we'll show in a frame..
-    // const displayItems = _items
-    //   .slice(topIndex, topIndex + itemCount)
-    //   .map((item, index) => ({ index: topIndex + index, isLoaded: topIndex + index < _items.length, item }));
+    const displayItems = _items
+      .slice(topIndex, topIndex + itemCount)
+      .map((item, index) => ({ index: topIndex + index, isLoaded: topIndex + index < _items.length, item }));
     // Give it back ... someone, or something, needs to know!
     return { displayItems, sT, rH, fH };
   };

@@ -12,6 +12,7 @@ import BackspaceIcon from '@material-ui/icons/Backspace';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import SearchIcon from '@material-ui/icons/Search';
+import StarIcon from '@material-ui/icons/Star';
 import React, { useRef, useState } from 'react';
 import { isEnter, isEscape } from '../utils/keyboard';
 
@@ -109,6 +110,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ searching = false, buttons = [], 
       </IconButton>
       <IconButton onClick={onFilterClear} edge="end" color="primary">
         <BackspaceIcon />
+      </IconButton>
+      <IconButton edge="end" color="primary">
+        <StarIcon />
       </IconButton>
       <Divider
         orientation="vertical"

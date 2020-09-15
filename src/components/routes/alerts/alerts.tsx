@@ -30,23 +30,37 @@ const Alerts: React.FC = () => {
 
   const classes = useStyles();
   const theme = useTheme();
-  const { loading, items, onNextPage } = useAlerts();
-  const [searching, setSearching] = useState<boolean>(false);
+  const { loading, items, onNextPage, onSearch, onGet } = useAlerts();
+  const [searching] = useState<boolean>(false);
   const [splitPanel, setSplitPanel] = useState<{ open: boolean; item: AlertItem }>({ open: false, item: null });
   const [drawer, setDrawer] = useState<{ open: boolean; type: 'filter' }>({ open: false, type: null });
 
   // faking it for now.
   const onSearching = (filterValue: string = '', inputEl: HTMLInputElement = null) => {
-    setSearching(true);
+    // setSearching(true);
     if (drawer.open) {
       setDrawer({ open: false, type: null });
     }
+
+    onSearch(filterValue);
+
     setTimeout(() => {
-      setSearching(false);
+      // setSearching(false);
+
       if (inputEl) {
         inputEl.focus();
       }
     }, 2000);
+  };
+
+  const onItemSelected = (item: AlertItem) => {
+    if (item) {
+      onGet(item.alert_id, alert => {
+        setSplitPanel({ open: true, item: alert });
+      });
+    } else {
+      setSplitPanel({ ...splitPanel, open: false });
+    }
   };
 
   return (
@@ -80,7 +94,7 @@ const Alerts: React.FC = () => {
               loading={loading || searching}
               rowHeight={97}
               selected={splitPanel.open && splitPanel.item ? splitPanel.item : null}
-              onItemSelected={(item: AlertItem) => setSplitPanel({ open: true, item })}
+              onItemSelected={onItemSelected}
               onMoreItems={onNextPage}
               onRenderItem={(item: AlertItem) => <AlertListItem item={item} />}
             />
