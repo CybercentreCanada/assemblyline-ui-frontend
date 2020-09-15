@@ -128,6 +128,13 @@ const SearchBar: React.FC<SearchBarProps> = ({
     onSuggestionClose();
   };
 
+  const filterSuggestions = () => {
+    // Split filter value by whitespace.
+    // Grab nearest group to the left of cursor.
+    // Filter entire list with that value.
+    return suggestions;
+  };
+
   return (
     <Box className={classes.root}>
       <Box display="flex" flexDirection="row" className={classes.searchbar} alignItems="center">
@@ -154,7 +161,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             fullWidth
           />
           <SearchSuggestions
-            items={suggestions}
+            items={filterSuggestions()}
             open={showSuggestions}
             onSelection={onSugestionSelection}
             onClose={onSuggestionClose}
