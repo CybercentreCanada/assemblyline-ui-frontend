@@ -1,9 +1,10 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import { Box, CircularProgress, Divider, makeStyles } from '@material-ui/core';
+import { Box, CircularProgress, Divider, makeStyles, Typography } from '@material-ui/core';
 import { isArrowDown, isArrowUp, isEnter, isEscape } from 'components/elements/utils/keyboard';
 import Throttler from 'components/elements/utils/throttler';
 import React, { useLayoutEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(theme => ({
   infiniteListCt: {
@@ -256,7 +257,7 @@ export default function InfiniteList<I extends InfiniteListItem>({
   // Compute new frame and innerContainer height each time we receive new items.
   useLayoutEffect(() => {
     // initialize/update scrolling container height.
-    innerEl.current.style.height = `${items.length * rowHeight}px`;
+    innerEl.current.style.height = items.length ? `${items.length * rowHeight}px` : 'auto';
 
     // compute which items are within visual frame.
     const updateFrame = () => {
@@ -274,8 +275,6 @@ export default function InfiniteList<I extends InfiniteListItem>({
     };
   }, [items, rowHeight]);
 
-  // console.log(frame);
-
   return (
     <div ref={containerEl} className={classes.infiniteListCt} tabIndex={0} onScroll={onScroll} onKeyDown={onKeyDown}>
       {loading ? (
@@ -284,8 +283,17 @@ export default function InfiniteList<I extends InfiniteListItem>({
         </div>
       ) : null}
       <div ref={innerEl} className={classes.infiniteListInnerCt}>
-        {frame.displayItems.map(item => rowRenderer(item))}
+        {!loading && !items.length ? <EmptyList /> : frame.displayItems.map(item => rowRenderer(item))}
       </div>
     </div>
   );
 }
+
+const EmptyList = () => {
+  const { t } = useTranslation();
+  return (
+    <Box>
+      <Typography>{t('infinitelist.noresult')}</Typography>
+    </Box>
+  );
+};

@@ -51,5 +51,6 @@
   "usermenu": "Menu de l'utilisateur",
   "usermenu.account": "Gérer votre compte",
   "usermenu.logout": "Déconnexion",
-  "usermenu.settings": "Paramètres"
+  "usermenu.settings": "Paramètres",
+  "infinitelist.noresult": "0 résultats correspondants"
 }

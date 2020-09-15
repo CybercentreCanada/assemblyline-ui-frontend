@@ -64,7 +64,8 @@ interface UsingAlerts {
   loading: boolean;
   fields: ALField[];
   items: AlertItem[];
-  onNextPage: (startIndex: number, stopIndex: number) => void;
+  onLoad: (startIndex: number, stopIndex: number) => void;
+  onLoadMore: (startIndex: number, stopIndex: number) => void;
   onSearch: (query: string) => void;
   onGet: (id: string, onSuccess: (alert: AlertItem) => void) => void;
 }
@@ -89,10 +90,25 @@ export default function useAlerts(): UsingAlerts {
 
   // format alert api url using specified indexes.
   const formatUrl = (startIndex: number, endIndex: number) =>
-    `/api/v4/alert/grouped/file.sha256/?offset=${startIndex}&rows=${endIndex - startIndex}&q=&tc=1000d`;
+    `/api/v4/alert/grouped/file.sha256/?offset=${startIndex}&rows=${endIndex - startIndex}&q=`;
+
+  //
+  const onLoad = (startIndex: number, endIndex: number) => {
+    setState({ ...state, loading: true });
+    apiCall({
+      url: formatUrl(startIndex, endIndex),
+      onSuccess: api_data => {
+        const { items: _items } = api_data.api_response;
+        setState({
+          loading: false,
+          items: parseResult(_items, startIndex)
+        });
+      }
+    });
+  };
 
   // Hook API: get alerts for specified index.
-  const onNextPage = (startIndex: number, endIndex: number) => {
+  const onLoadMore = (startIndex: number, endIndex: number) => {
     setState({ ...state, loading: true });
     apiCall({
       url: formatUrl(startIndex, endIndex),
@@ -148,10 +164,10 @@ export default function useAlerts(): UsingAlerts {
   };
 
   useEffect(() => {
-    onNextPage(0, 25);
+    onLoad(0, 25);
     onFields();
   }, []);
 
   // UseAlert Hook API.
-  return { ...state, fields, onNextPage, onSearch, onGet };
+  return { ...state, fields, onLoad, onLoadMore, onSearch, onGet };
 }

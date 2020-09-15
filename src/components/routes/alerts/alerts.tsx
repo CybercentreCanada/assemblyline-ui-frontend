@@ -13,6 +13,8 @@ import AlertListItem from './alert-list-item';
 import AlertsFilters from './alerts-filters';
 import useAlerts, { AlertItem } from './useAlerts';
 
+const PAGE_SIZE = 25;
+
 const useStyles = makeStyles(theme => ({
   drawer: {
     [theme.breakpoints.down('sm')]: {
@@ -30,7 +32,7 @@ const Alerts: React.FC = () => {
 
   const classes = useStyles();
   const theme = useTheme();
-  const { loading, items, onNextPage, onSearch, onGet } = useAlerts();
+  const { loading, items, onLoad, onLoadMore, onSearch, onGet } = useAlerts();
   const [searching] = useState<boolean>(false);
   const [splitPanel, setSplitPanel] = useState<{ open: boolean; item: AlertItem }>({ open: false, item: null });
   const [drawer, setDrawer] = useState<{ open: boolean; type: 'filter' }>({ open: false, type: null });
@@ -53,6 +55,8 @@ const Alerts: React.FC = () => {
     }, 2000);
   };
 
+  const onClearSearch = () => onLoad(0, PAGE_SIZE);
+
   const onItemSelected = (item: AlertItem) => {
     if (item) {
       onGet(item.alert_id, alert => {
@@ -68,6 +72,7 @@ const Alerts: React.FC = () => {
       <Box pb={theme.spacing(0.25)}>
         <SearchBar
           searching={searching}
+          onClear={onClearSearch}
           onSearching={onSearching}
           buttons={[
             {
@@ -92,10 +97,11 @@ const Alerts: React.FC = () => {
             <InfiniteList
               items={items}
               loading={loading || searching}
+              pageSize={PAGE_SIZE}
               rowHeight={97}
               selected={splitPanel.open && splitPanel.item ? splitPanel.item : null}
               onItemSelected={onItemSelected}
-              onMoreItems={onNextPage}
+              onMoreItems={onLoadMore}
               onRenderItem={(item: AlertItem) => <AlertListItem item={item} />}
             />
           }
@@ -126,7 +132,7 @@ const Alerts: React.FC = () => {
       <Drawer
         open={drawer.open}
         anchor="right"
-        onClose={() => setDrawer({ open: false, type: null })}
+        onClose={() => setDrawer({ ...drawer, open: false })}
         className={classes.drawer}
       >
         {

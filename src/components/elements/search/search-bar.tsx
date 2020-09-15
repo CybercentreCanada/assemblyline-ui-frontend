@@ -37,10 +37,11 @@ export interface SearchBarButton {
 interface SearchBarProps {
   searching?: boolean;
   onSearching: (filterValue: string, inputElement: HTMLInputElement) => void;
+  onClear: () => void;
   buttons?: SearchBarButton[];
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ searching = false, buttons = [], onSearching }) => {
+const SearchBar: React.FC<SearchBarProps> = ({ searching = false, buttons = [], onSearching, onClear }) => {
   const theme = useTheme();
   const classes = useStyles();
   const textFieldEl = useRef<HTMLInputElement>();
@@ -69,14 +70,17 @@ const SearchBar: React.FC<SearchBarProps> = ({ searching = false, buttons = [], 
   };
 
   const onFilterClear = () => {
-    setFilter('');
     textFieldEl.current.querySelector('input').focus();
+    setFilter('');
+    onClear();
   };
 
   //
   const _onSearching = () => {
     if (filter && filter.length > 0) {
       onSearching(filter, textFieldEl.current.querySelector('input'));
+    } else {
+      onClear();
     }
   };
 

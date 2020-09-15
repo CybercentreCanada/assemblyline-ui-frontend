@@ -51,5 +51,6 @@
   "usermenu": "User Menu",
   "usermenu.account": "Manage Account",
   "usermenu.logout": "Logout",
-  "usermenu.settings": "Settings"
+  "usermenu.settings": "Settings",
+  "infinitelist.noresult": "0 matching results"
 }
