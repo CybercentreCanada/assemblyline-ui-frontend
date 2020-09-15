@@ -3,11 +3,13 @@ import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import React from 'react';
 
+export type PossibleColors = 'default' | 'primary' | 'secondary' | 'info' | 'success' | 'warning' | 'error';
+
 interface CustomChipProps {
   className?: string;
   type?: 'round' | 'square' | 'classification';
   size?: 'tiny' | 'small' | 'medium';
-  color?: 'default' | 'primary' | 'secondary' | 'info' | 'success' | 'warning' | 'error';
+  color?: PossibleColors;
   variant?: 'default' | 'outlined';
   [propName: string]: any;
 }
