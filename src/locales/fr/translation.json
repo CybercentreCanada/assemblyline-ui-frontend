@@ -5,7 +5,7 @@
   "adminmenu.sitemap": "Carte du site",
   "adminmenu.users": "Utilisateurs",
   "api.invalid": "Données non valides renvoyées par le serveur API",
-  "api.unreachable": "Serveur API inaccessible",
+  "api.unreachable": "Serveur API inaccessible. Réessayez plus tard...",
   "app.language": "Langue",
   "banner.alt": "Banière d'Assemblyline",
   "breadcrumbs.tos": "Conditions d'utilisation",
