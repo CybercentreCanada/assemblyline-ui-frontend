@@ -12,26 +12,48 @@ import LoginScreen from 'components/routes/login';
 import Routes from 'components/routes/routes';
 import Tos from 'components/routes/tos';
 import getXSRFCookie from 'helpers/xsrf';
-import { SnackbarProvider } from 'notistack';
+import { OptionsObject, SnackbarProvider, useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter } from 'react-router-dom';
 
-// TODO: This should be defined from an outside source
-const OAUTH_PROVIDERS = ['azure_ad'];
-const ALLOW_USERPASS_LOGIN = true;
-const ALLOW_SIGNUP = true;
-const ALLOW_PW_RESET = true;
-const LOCKOUT_AUTO_NOTIFY = true;
-// END TODO
+type LoginParamsProps = {
+  oauth_providers: string[];
+  allow_userpass_login: boolean;
+  allow_signup: boolean;
+  allow_pw_rest: boolean;
+};
 
 const MyApp = () => {
+  const storedLoginParams = localStorage.getItem('loginParams');
+  const defaultLoginParams = storedLoginParams ? JSON.parse(storedLoginParams) : null;
+
   const params = new URLSearchParams(window.location.search);
   const [renderedApp, setRenderedApp] = useState(params.get('provider') ? 'login' : 'load');
+  const [loginParams, setLoginParams] = useState<LoginParamsProps | null>(defaultLoginParams);
 
   const { t } = useTranslation();
   const { user: currentUser, setUser } = useAppUser<CustomUser>();
   const { setReady } = useAppLayout();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+
+  const snackBarOptions: OptionsObject = {
+    variant: 'error',
+    autoHideDuration: 30000,
+    anchorOrigin: {
+      vertical: 'bottom',
+      horizontal: 'center'
+    },
+    onClick: snack => {
+      closeSnackbar();
+    }
+  };
+
+  const switchRenderedApp = (value: 'load' | 'locked' | 'login' | 'routes' | 'tos') => {
+    if (renderedApp !== value) {
+      setRenderedApp(value);
+    }
+  };
 
   useEffect(() => {
     if (params.get('provider')) {
@@ -60,33 +82,45 @@ const MyApp = () => {
       .then(api_data => {
         // eslint-disable-next-line no-prototype-builtins
         if (api_data === undefined || !api_data.hasOwnProperty('api_response')) {
-          setRenderedApp('login');
+          enqueueSnackbar(t('api.unreachable'), snackBarOptions);
+          switchRenderedApp('load');
         } else if (api_data.api_status_code === 403) {
-          setRenderedApp('locked');
-        } else if (api_data.api_status_code !== 200) {
-          setRenderedApp('login');
-        } else {
+          switchRenderedApp('locked');
+        } else if (api_data.api_status_code === 401) {
+          localStorage.setItem('loginParams', JSON.stringify(api_data.api_response));
+          setLoginParams(api_data.api_response);
+          switchRenderedApp('login');
+        } else if (api_data.api_status_code === 200) {
           setUser(api_data.api_response);
           setReady(true);
           if (!api_data.api_response.agrees_with_tos && api_data.api_response.has_tos) {
-            setRenderedApp('tos');
+            switchRenderedApp('tos');
           } else {
-            setRenderedApp('routes');
+            switchRenderedApp('routes');
           }
+        } else {
+          enqueueSnackbar(t('api.unreachable'), snackBarOptions);
+          switchRenderedApp('load');
         }
       });
     // eslint-disable-next-line
   }, []);
   return {
     load: <LoadingScreen />,
-    locked: <LockedPage hasTOS={currentUser && currentUser.has_tos} autoNotify={LOCKOUT_AUTO_NOTIFY} />,
-    login: (
+    locked: currentUser ? (
+      <LockedPage hasTOS={currentUser.has_tos} autoNotify={currentUser.tos_auto_notify} />
+    ) : (
+      <LoadingScreen />
+    ),
+    login: loginParams ? (
       <LoginScreen
-        oAuthProviders={OAUTH_PROVIDERS}
-        allowUserPass={ALLOW_USERPASS_LOGIN}
-        allowSignup={ALLOW_SIGNUP}
-        allowPWReset={ALLOW_PW_RESET}
+        oAuthProviders={loginParams.oauth_providers}
+        allowUserPass={loginParams.allow_userpass_login}
+        allowSignup={loginParams.allow_signup}
+        allowPWReset={loginParams.allow_pw_rest}
       />
+    ) : (
+      <LoadingScreen />
     ),
     routes: <Routes />,
     tos: <Tos />

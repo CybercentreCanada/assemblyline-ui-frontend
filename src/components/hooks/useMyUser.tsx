@@ -13,6 +13,7 @@ export interface CustomUser extends UserProfileProps {
   has_tos: boolean;
   is_active: boolean;
   read_only: boolean;
+  tos_auto_notify: boolean;
   type: string[];
 }
 
