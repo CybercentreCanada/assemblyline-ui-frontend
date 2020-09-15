@@ -114,7 +114,7 @@ type ResetPasswordProps = {
 };
 
 export function ResetPassword({ buttonLoading, setButtonLoading }: ResetPasswordProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['login']);
   const classes = useStyles();
   const apiCall = useMyAPI();
   const [email, setEmail] = useState('');

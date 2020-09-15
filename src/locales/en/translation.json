@@ -5,7 +5,7 @@
   "adminmenu.sitemap": "Site Map",
   "adminmenu.users": "Users",
   "api.invalid": "Invalid data returned by API server",
-  "api.unreachable": "API server unreachable",
+  "api.unreachable": "API server unreachable. Try again later...",
   "app.language": "Language",
   "banner.alt": "Assemblyline Banner",
   "breadcrumbs.tos": "Terms of Service",
