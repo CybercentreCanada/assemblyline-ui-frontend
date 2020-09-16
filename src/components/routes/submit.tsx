@@ -11,95 +11,22 @@ import TabPanel from '@material-ui/lab/TabPanel';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import useUser from 'commons/components/hooks/useAppUser';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
+import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import Classification from 'components/visual/Classification';
-import React from 'react';
-import { useDropzone } from 'react-dropzone';
+import FileDropper from 'components/visual/FileDropper';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AiOutlineSecurityScan } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
 
-function FileDropper(props) {
-  const { t } = useTranslation(['submit']);
-  const { acceptedFiles, getRootProps, getInputProps, isDragActive } = useDropzone();
-  const useStyles = makeStyles(theme => ({
-    drop_zone: {
-      flex: '1',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      padding: theme.spacing(3),
-      backgroundColor: theme.palette.action.hover,
-      outline: 'none',
-      border: `2px ${theme.palette.action.disabled} dashed`,
-      borderRadius: '6px',
-      color: theme.palette.action.disabled,
-      '&:hover': {
-        border: `2px ${theme.palette.text.disabled} dashed`,
-        backgroundColor: theme.palette.action.selected,
-        color: theme.palette.text.disabled,
-        cursor: 'pointer'
-      }
-    },
-    drag_enter: {
-      border: `2px ${theme.palette.text.disabled} dashed`,
-      backgroundColor: theme.palette.action.selected,
-      color: theme.palette.text.disabled
-    }
-  }));
-  const classes = useStyles();
-
-  let dropperText;
-  if (acceptedFiles.length > 0) {
-    dropperText = (
-      <Box textAlign="center">
-        <Typography variant="body1">
-          <b>{acceptedFiles[0].name}</b>
-        </Typography>
-        <Typography variant="body2" align="center">
-          {acceptedFiles[0].size} {t('file.dragzon.byte')}
-        </Typography>
-      </Box>
-    );
-  } else {
-    dropperText = (
-      <Typography variant="body1">
-        <b>{t('file.dragzone')}</b>
-      </Typography>
-    );
-  }
-
-  return (
-    <Box>
-      <div
-        {...getRootProps()}
-        className={
-          acceptedFiles.length > 0 || isDragActive ? `${classes.drop_zone} ${classes.drag_enter}` : classes.drop_zone
-        }
-      >
-        <input {...getInputProps()} />
-        <AiOutlineSecurityScan style={{ fontSize: '140px' }} />
-        {dropperText}
-      </div>
-      <Box marginTop="2rem">
-        {acceptedFiles.length === 0 ? (
-          ''
-        ) : (
-          <Button color="primary" variant="contained">
-            {t('file.button')}
-          </Button>
-        )}
-      </Box>
-    </Box>
-  );
-}
-
 function Submit() {
+  const { getBanner } = useAppLayout();
+  const apiCall = useMyAPI();
   const { t } = useTranslation(['submit']);
   const theme = useTheme();
-  const { getBanner } = useAppLayout();
   const { user: currentUser } = useUser<CustomUser>();
-  const [value, setValue] = React.useState('0');
+  const [settings, setSettings] = useState(null);
+  const [value, setValue] = useState('0');
   const downSM = useMediaQuery(theme.breakpoints.down('sm'));
   const md = useMediaQuery(theme.breakpoints.only('md'));
 
@@ -113,6 +40,24 @@ function Submit() {
     }
   }));
   const classes = useStyles();
+
+  function setClassification(c12n) {
+    if (settings) {
+      setSettings({ ...settings, classification: c12n });
+    }
+  }
+
+  useEffect(() => {
+    // Load user on start
+    apiCall({
+      url: `/api/v4/user/settings/${currentUser.username}/`,
+      onSuccess: api_data => {
+        setSettings(api_data.api_response);
+      }
+    });
+    // eslint-disable-next-line
+  }, []);
+
   return (
     <PageCenter maxWidth={md ? '630px' : downSM ? '100%' : '960px'}>
       <Box display="inline-block" textAlign="center" width="100%">
@@ -120,11 +65,16 @@ function Submit() {
           {getBanner(theme)}
         </Box>
         {currentUser.c12n_enforcing ? (
-          <Box pb={5}>
+          <Box pb={8}>
             <Box p={1} fontSize={16}>
               {t('classification')}
             </Box>
-            <Classification format="long" type="picker" c12n={currentUser.classification} />
+            <Classification
+              format="long"
+              type="picker"
+              c12n={settings ? settings.classification : null}
+              setClassification={setClassification}
+            />
           </Box>
         ) : null}
         <TabContext value={value}>
@@ -138,17 +88,19 @@ function Submit() {
           <TabPanel value="0" className={classes.no_pad}>
             <Box marginTop="30px">
               <FileDropper />
-              <Box mt="50px" textAlign="center">
-                <Typography variant="body2">
-                  {t('terms1')}
-                  <i>{t('file.button')}</i>
-                  {t('terms2')}
-                  <Link style={{ textDecoration: 'none', color: theme.palette.primary.main }} to="/tos">
-                    {t('terms3')}
-                  </Link>
-                  .
-                </Typography>
-              </Box>
+              {currentUser.has_tos ? (
+                <Box mt="50px" textAlign="center">
+                  <Typography variant="body2">
+                    {t('terms1')}
+                    <i>{t('file.button')}</i>
+                    {t('terms2')}
+                    <Link style={{ textDecoration: 'none', color: theme.palette.primary.main }} to="/tos">
+                      {t('terms3')}
+                    </Link>
+                    .
+                  </Typography>
+                </Box>
+              ) : null}
             </Box>
           </TabPanel>
           <TabPanel value="1" className={classes.no_pad}>
@@ -163,17 +115,19 @@ function Submit() {
                 {t('url.button')}
               </Button>
             </Box>
-            <Box mt="50px" textAlign="center">
-              <Typography variant="body2">
-                {t('terms1')}
-                <i>{t('url.button')}</i>
-                {t('terms2')}
-                <Link style={{ textDecoration: 'none', color: theme.palette.primary.main }} to="/tos">
-                  {t('terms3')}
-                </Link>
-                .
-              </Typography>
-            </Box>
+            {currentUser.has_tos ? (
+              <Box mt="50px" textAlign="center">
+                <Typography variant="body2">
+                  {t('terms1')}
+                  <i>{t('url.button')}</i>
+                  {t('terms2')}
+                  <Link style={{ textDecoration: 'none', color: theme.palette.primary.main }} to="/tos">
+                    {t('terms3')}
+                  </Link>
+                  .
+                </Typography>
+              </Box>
+            ) : null}
           </TabPanel>
           <TabPanel value="2" className={classes.no_pad}>
             <Box marginTop="30px">
