@@ -1,13 +1,4 @@
-import {
-  Box,
-  CircularProgress,
-  Divider,
-  IconButton,
-  IconButtonProps,
-  makeStyles,
-  TextField,
-  useTheme
-} from '@material-ui/core';
+import { Box, CircularProgress, Divider, IconButton, IconButtonProps, makeStyles, useTheme } from '@material-ui/core';
 import BackspaceIcon from '@material-ui/icons/Backspace';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import FilterListIcon from '@material-ui/icons/FilterList';
@@ -15,7 +6,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import StarIcon from '@material-ui/icons/Star';
 import React, { useRef, useState } from 'react';
 import { isArrowDown, isEnter, isEscape } from '../utils/keyboard';
-import SearchSuggestions from './search-suggestions';
+import SearchTextField from './search-textfield';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -95,9 +86,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   // handler[onchange]: textfield change handler.
-  // track value of filter.
-  const onFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFilter(event.target.value);
+  // track value of filter..
+  const onFilterChange = (value: string, items: []) => {
+    setFilter(value);
   };
 
   // When clearing the filter value.
@@ -122,19 +113,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
     textFieldEl.current.querySelector('input').focus();
   };
 
-  // When a search selection has been selected.
-  const onSugestionSelection = (text: string) => {
-    setFilter(text);
-    onSuggestionClose();
-  };
-
-  const filterSuggestions = () => {
-    // Split filter value by whitespace.
-    // Grab nearest group to the left of cursor.
-    // Filter entire list with that value.
-    return suggestions;
-  };
-
   return (
     <Box className={classes.root}>
       <Box display="flex" flexDirection="row" className={classes.searchbar} alignItems="center">
@@ -148,7 +126,13 @@ const SearchBar: React.FC<SearchBarProps> = ({
           )}
         </Box>
         <Box flex={1} display="relative">
-          <TextField
+          <SearchTextField
+            value={filter}
+            options={suggestions}
+            onChange={onFilterChange}
+            onSelection={onSugestionSelection}
+          />
+          {/* <TextField
             ref={textFieldEl}
             placeholder="Filter..."
             value={filter}
@@ -165,7 +149,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             open={showSuggestions}
             onSelection={onSugestionSelection}
             onClose={onSuggestionClose}
-          />
+          /> */}
         </Box>
         <IconButton onClick={onSearchBtnClick} edge="end" color="primary">
           <FilterListIcon />
