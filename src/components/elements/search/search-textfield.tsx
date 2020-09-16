@@ -1,4 +1,4 @@
-import { makeStyles, TextField } from '@material-ui/core';
+import { Box, makeStyles, TextField } from '@material-ui/core';
 import React, { useRef, useState } from 'react';
 import { isArrowDown, isArrowUp, isEnter, isEscape } from '../utils/keyboard';
 import Throttler from '../utils/throttler';
@@ -19,7 +19,13 @@ const useStyles = makeStyles(theme => ({
   searchTextFieldItem: {
     padding: theme.spacing(1),
     color: theme.palette.primary.light,
-    '&[data-listitem-select="true"]': {}
+    '&:hover': {
+      cursor: 'pointer',
+      backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 17%)' : 'hsl(0, 0%, 95%)'
+    },
+    '&[data-searchtextfieldoption-selected="true"]': {
+      backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 15%)' : 'hsl(0, 0%, 92%)'
+    }
   }
 }));
 
@@ -46,7 +52,7 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
   const classes = useStyles();
   const [cursor, setCursor] = useState<number>(-1);
   const [open, setOpen] = useState<boolean>(false);
-  const element = useRef<HTMLDivElement>();
+  const optionsElement = useRef<HTMLDivElement>();
 
   const _onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value: _value } = event.currentTarget;
@@ -64,15 +70,23 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
       setOpen(false);
     } else if (isArrowUp(keyCode)) {
       console.log('arrowup');
-      setCursor(cursor - 1);
+      const nextIndex = cursor - 1 > -1 ? cursor - 1 : options.length - 1;
+      setCursor(nextIndex);
+      scrollTo(nextIndex);
     } else if (isArrowDown(keyCode)) {
       if (open) {
-        setCursor(cursor + 1);
+        const nextIndex = cursor + 1 < options.length ? cursor + 1 : 0;
+        setCursor(nextIndex);
+        scrollTo(nextIndex);
       } else {
         setOpen(true);
       }
       console.log('arrowdown');
     }
+  };
+
+  const onOptionSelection = (option: string) => {
+    onChange(option, filterOptions(option));
   };
 
   const filterOptions = (filter: string) => {
@@ -81,6 +95,15 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
     // Filter entire list with that value.
     return options;
   };
+
+  //
+  const scrollTo = (position: number) => {
+    optionsElement.current
+      .querySelector(`[data-searchtextfieldoption-position="${position}"`)
+      .scrollIntoView({ block: 'nearest' });
+  };
+
+  console.log(cursor);
 
   return (
     <>
@@ -96,10 +119,16 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
         fullWidth
       />
       {open ? (
-        <div ref={element} className={classes.searchTextFieldCt} tabIndex={-1}>
+        <div ref={optionsElement} className={classes.searchTextFieldCt} tabIndex={-1}>
           <div className={classes.searchTextFieldInner}>
             {options.map((item, index) => (
-              <SearchTextOption key={`SearchTextField-item-${index}`} text={item} />
+              <SearchTextOption
+                key={`SearchTextField-item-${index}`}
+                text={item}
+                position={index}
+                onSelection={onOptionSelection}
+                selected={index === cursor}
+              />
             ))}
           </div>
         </div>
@@ -108,12 +137,22 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
   );
 };
 
-const SearchTextOption = ({ text, selected = false }) => {
+const SearchTextOption: React.FC<{
+  text: string;
+  position: number;
+  selected: boolean;
+  onSelection: (text: string) => void;
+}> = ({ text, position, selected = false, onSelection }) => {
   const classes = useStyles();
   return (
-    <div className={classes.searchTextFieldItem} data-SearchTextFielditem-selected={selected}>
+    <Box
+      className={classes.searchTextFieldItem}
+      data-searchtextfieldoption-position={position}
+      data-searchtextfieldoption-selected={selected}
+      onClick={() => onSelection(text)}
+    >
       {text}
-    </div>
+    </Box>
   );
 };
 
