@@ -9,7 +9,10 @@ import TabContext from '@material-ui/lab/TabContext';
 import TabList from '@material-ui/lab/TabList';
 import TabPanel from '@material-ui/lab/TabPanel';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
+import useUser from 'commons/components/hooks/useAppUser';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
+import { CustomUser } from 'components/hooks/useMyUser';
+import Classification from 'components/visual/Classification';
 import React from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
@@ -95,6 +98,7 @@ function Submit() {
   const { t } = useTranslation(['submit']);
   const theme = useTheme();
   const { getBanner } = useAppLayout();
+  const { user: currentUser } = useUser<CustomUser>();
   const [value, setValue] = React.useState('0');
   const downSM = useMediaQuery(theme.breakpoints.down('sm'));
   const md = useMediaQuery(theme.breakpoints.only('md'));
@@ -115,6 +119,14 @@ function Submit() {
         <Box display="inline-block" marginBottom="2rem">
           {getBanner(theme)}
         </Box>
+        {currentUser.c12n_enforcing ? (
+          <Box pb={5}>
+            <Box p={1} fontSize={16}>
+              {t('classification')}
+            </Box>
+            <Classification format="long" type="picker" c12n={currentUser.classification} />
+          </Box>
+        ) : null}
         <TabContext value={value}>
           <Paper square>
             <TabList centered onChange={handleChange} indicatorColor="primary" textColor="primary">

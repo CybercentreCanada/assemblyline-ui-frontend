@@ -22,7 +22,7 @@ const useStyles = hasClick => {
       margin: '2px 4px 2px 0'
     },
     classification: {
-      borderRadius: '2px',
+      borderRadius: '3px',
       margin: '2px 4px 2px 0',
       width: '100%'
     },

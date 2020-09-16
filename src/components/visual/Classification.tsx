@@ -1,10 +1,25 @@
-import { makeStyles } from '@material-ui/core/styles';
+import {
+  Box,
+  Button,
+  Card,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  List,
+  ListItem,
+  ListItemText,
+  useMediaQuery
+} from '@material-ui/core';
+import Grid from '@material-ui/core/Grid/Grid';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Skeleton from '@material-ui/lab/Skeleton';
 import useUser from 'commons/components/hooks/useAppUser';
 import useALContext from 'components/hooks/useALContext';
 import { CustomUser } from 'components/hooks/useMyUser';
 import CustomChip, { ColorArray, PossibleColors } from 'components/visual/CustomChip';
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface ClassificationProps {
   c12n: string;
@@ -23,19 +38,72 @@ const useStyles = makeStyles(theme => ({
 
 export default function Classification({ c12n, format, setClassification, size, type }: ClassificationProps) {
   const classes = useStyles();
+  const { t } = useTranslation();
+  const theme = useTheme();
   const { user: currentUser } = useUser<CustomUser>();
   const { classification: c12nDef } = useALContext();
-  const parts =
-    currentUser.c12n_enforcing && c12n
-      ? getParts()
-      : {
-          lvlIdx: '',
-          req: [],
-          groups: [],
-          subgroups: []
-        };
-  const levelText = currentUser.c12n_enforcing && c12n ? getLevelText(parts.lvlIdx) : '';
-  const textType = type === 'text';
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [showPicker, setShowPicker] = React.useState(false);
+  const defaultParts = {
+    lvlIdx: '',
+    lvl: '',
+    req: [],
+    groups: [],
+    subgroups: []
+  };
+  const [parts, setParts] = React.useState(defaultParts);
+
+  useEffect(() => {
+    if (c12nDef && currentUser.c12n_enforcing && c12n) {
+      setParts(getParts());
+    }
+    // eslint-disable-next-line
+  }, [c12nDef, c12n, currentUser, isMobile]);
+
+  function toggleGroups(grp) {
+    // TODO: Selection dependencies
+    const newGrp = parts.groups;
+    if (newGrp.indexOf(grp.name) === -1 && newGrp.indexOf(grp.short_name) === -1) {
+      newGrp.push(format === 'long' && !isMobile ? grp.name : grp.short_name);
+    } else if (newGrp.indexOf(grp.name) !== -1) {
+      newGrp.splice(newGrp.indexOf(grp.name), 1);
+    } else {
+      newGrp.splice(newGrp.indexOf(grp.short_name), 1);
+    }
+    setParts({ ...parts, groups: newGrp });
+  }
+
+  function toggleSubGroups(sgrp) {
+    // TODO: Selection dependencies
+    const newSGrp = parts.subgroups;
+    if (newSGrp.indexOf(sgrp.name) === -1 && newSGrp.indexOf(sgrp.short_name) === -1) {
+      newSGrp.push(format === 'long' && !isMobile ? sgrp.name : sgrp.short_name);
+    } else if (newSGrp.indexOf(sgrp.name) !== -1) {
+      newSGrp.splice(newSGrp.indexOf(sgrp.name), 1);
+    } else {
+      newSGrp.splice(newSGrp.indexOf(sgrp.short_name), 1);
+    }
+    setParts({ ...parts, subgroups: newSGrp });
+  }
+
+  function toggleRequired(req) {
+    // TODO: Selection dependencies
+    const newReq = parts.req;
+    if (newReq.indexOf(req.name) === -1 && newReq.indexOf(req.short_name) === -1) {
+      newReq.push(format === 'long' && !isMobile ? req.name : req.short_name);
+    } else if (newReq.indexOf(req.name) !== -1) {
+      newReq.splice(newReq.indexOf(req.name), 1);
+    } else {
+      newReq.splice(newReq.indexOf(req.short_name), 1);
+    }
+    setParts({ ...parts, req: newReq });
+  }
+
+  function selectLevel(lvl) {
+    // TODO: Selection dependencies
+    const lvlIdx = lvl.toString();
+    setParts({ ...parts, lvlIdx, lvl: getLevelText(lvlIdx) });
+  }
 
   function getLevelText(lvl) {
     let text = null;
@@ -47,7 +115,7 @@ export default function Classification({ c12n, format, setClassification, size, 
       text = '';
     }
 
-    if (format === 'long') {
+    if (format === 'long' && !isMobile) {
       return c12nDef.levels_map_stl[text];
     }
 
@@ -88,7 +156,7 @@ export default function Classification({ c12n, format, setClassification, size, 
       }
     }
 
-    if (format === 'long') {
+    if (format === 'long' && !isMobile) {
       const out = [];
       for (const r of returnSet) {
         out.push(c12nDef.access_req_map_stl[r]);
@@ -109,8 +177,8 @@ export default function Classification({ c12n, format, setClassification, size, 
     for (let grpPart of groupParts) {
       grpPart = grpPart.replace('REL TO ', '');
       const tempGroup = grpPart.split(',');
-      for (const t of tempGroup) {
-        groups = groups.concat(t.trim().split('/'));
+      for (const tg of tempGroup) {
+        groups = groups.concat(tg.trim().split('/'));
       }
     }
 
@@ -134,7 +202,7 @@ export default function Classification({ c12n, format, setClassification, size, 
       }
     }
 
-    if (format === 'long') {
+    if (format === 'long' && !isMobile) {
       const g1Out = [];
       for (const gr of g1) {
         g1Out.push(c12nDef.groups_map_stl[gr]);
@@ -153,19 +221,21 @@ export default function Classification({ c12n, format, setClassification, size, 
 
   function getParts() {
     const grps = getGroups();
+    const lvlIdx = getLevelIndex();
     return {
-      lvlIdx: getLevelIndex(),
+      lvlIdx,
+      lvl: getLevelText(lvlIdx),
       req: getRequired(),
       groups: grps.groups,
       subgroups: grps.subgroups
     };
   }
 
-  function normalizeClassification() {
-    const { req, subgroups } = parts;
+  function normalizedClassification() {
+    const { lvl, req, subgroups } = parts;
     let { groups } = parts;
 
-    let out = levelText;
+    let out = lvl;
 
     const reqGrp = [];
     for (const r of req) {
@@ -208,7 +278,7 @@ export default function Classification({ c12n, format, setClassification, size, 
           out += `REL TO ${group}`;
         }
       } else {
-        if (format === 'short') {
+        if (format === 'short' || isMobile) {
           for (const alias in c12nDef.groups_aliases) {
             if ({}.hasOwnProperty.call(c12nDef.groups_aliases, alias)) {
               const values = c12nDef.groups_aliases[alias];
@@ -237,7 +307,7 @@ export default function Classification({ c12n, format, setClassification, size, 
   }
 
   const computeColor = (): PossibleColors => {
-    const colorMap = c12nDef.levels_styles_map[levelText];
+    const colorMap = c12nDef.levels_styles_map[parts.lvl];
     if (colorMap === undefined || colorMap === null) {
       return 'default';
     }
@@ -255,22 +325,121 @@ export default function Classification({ c12n, format, setClassification, size, 
     tiny: '1.5rem'
   };
 
-  const showPicker = event => {
-    // Obvisouly do more!
-    setClassification('TLP:GREEN');
+  const useClassification = () => {
+    const newC12n = normalizedClassification();
+    if (setClassification && newC12n !== c12n) {
+      setClassification(newC12n);
+    }
+    setShowPicker(false);
   };
   // Build chip based on computed values
   return currentUser.c12n_enforcing ? (
     c12nDef && c12n ? (
-      <CustomChip
-        type="classification"
-        variant={textType ? 'outlined' : 'default'}
-        size={size}
-        color={computeColor()}
-        className={classes.classification}
-        label={normalizeClassification()}
-        onClick={type === 'picker' ? showPicker : null}
-      />
+      <>
+        <CustomChip
+          type="classification"
+          variant={type === 'text' ? 'outlined' : 'default'}
+          size={size}
+          color={computeColor()}
+          className={classes.classification}
+          label={normalizedClassification()}
+          onClick={type === 'picker' ? () => setShowPicker(true) : null}
+        />
+
+        <Dialog fullScreen={isMobile} fullWidth open={showPicker} onClose={useClassification}>
+          <DialogTitle>
+            <CustomChip
+              type="classification"
+              variant={type === 'text' ? 'outlined' : 'default'}
+              size={size}
+              color={computeColor()}
+              className={classes.classification}
+              label={normalizedClassification()}
+            />
+          </DialogTitle>
+          <DialogContent>
+            <Grid container spacing={1}>
+              <Grid item xs={12} sm={4}>
+                <Card variant="outlined">
+                  <List disablePadding style={{ borderRadius: '6px' }}>
+                    {c12nDef.original_definition.levels.map((lvl, idx) => {
+                      return (
+                        <ListItem
+                          key={idx}
+                          button
+                          selected={parts.lvl === lvl.name || parts.lvl === lvl.short_name}
+                          onClick={() => selectLevel(lvl.lvl)}
+                        >
+                          <ListItemText style={{ textAlign: 'center' }} primary={lvl.name} />
+                        </ListItem>
+                      );
+                    })}
+                  </List>
+                </Card>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Card variant="outlined">
+                  <List disablePadding>
+                    {c12nDef.original_definition.required.map((req, idx) => {
+                      return (
+                        <ListItem
+                          key={idx}
+                          button
+                          selected={parts.req.includes(req.name) || parts.req.includes(req.short_name)}
+                          onClick={() => toggleRequired(req)}
+                        >
+                          <ListItemText style={{ textAlign: 'center' }} primary={req.name} />
+                        </ListItem>
+                      );
+                    })}
+                  </List>
+                </Card>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Box pb={1}>
+                  <Card variant="outlined">
+                    <List disablePadding>
+                      {c12nDef.original_definition.groups.map((grp, idx) => {
+                        return (
+                          <ListItem
+                            key={idx}
+                            button
+                            selected={parts.groups.includes(grp.name) || parts.groups.includes(grp.short_name)}
+                            onClick={() => toggleGroups(grp)}
+                          >
+                            <ListItemText style={{ textAlign: 'center' }} primary={grp.name} />
+                          </ListItem>
+                        );
+                      })}
+                    </List>
+                  </Card>
+                </Box>
+                <Card variant="outlined">
+                  <List disablePadding>
+                    {c12nDef.original_definition.subgroups.map((sgrp, idx) => {
+                      return (
+                        <ListItem
+                          key={idx}
+                          button
+                          selected={parts.subgroups.includes(sgrp.name) || parts.subgroups.includes(sgrp.short_name)}
+                          onClick={() => toggleSubGroups(sgrp)}
+                        >
+                          <ListItemText style={{ textAlign: 'center' }} primary={sgrp.name} />
+                        </ListItem>
+                      );
+                    })}
+                  </List>
+                </Card>
+              </Grid>
+            </Grid>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={useClassification} color="primary" autoFocus>
+              {t('classification.done')}
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </>
     ) : (
       <Skeleton style={{ height: skelheight[size] }} />
     )
