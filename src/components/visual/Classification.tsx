@@ -1,6 +1,8 @@
 import { makeStyles } from '@material-ui/core/styles';
 import Skeleton from '@material-ui/lab/Skeleton';
+import useUser from 'commons/components/hooks/useAppUser';
 import useALContext from 'components/hooks/useALContext';
+import { CustomUser } from 'components/hooks/useMyUser';
 import CustomChip, { ColorArray, PossibleColors } from 'components/visual/CustomChip';
 import React from 'react';
 
@@ -21,16 +23,18 @@ const useStyles = makeStyles(theme => ({
 
 export default function Classification({ c12n, format, setClassification, size, type }: ClassificationProps) {
   const classes = useStyles();
+  const { user: currentUser } = useUser<CustomUser>();
   const { classification: c12nDef } = useALContext();
-  const parts = c12n
-    ? getParts()
-    : {
-        lvlIdx: '',
-        req: [],
-        groups: [],
-        subgroups: []
-      };
-  const levelText = c12n ? getLevelText(parts.lvlIdx) : '';
+  const parts =
+    currentUser.c12n_enforcing && c12n
+      ? getParts()
+      : {
+          lvlIdx: '',
+          req: [],
+          groups: [],
+          subgroups: []
+        };
+  const levelText = currentUser.c12n_enforcing && c12n ? getLevelText(parts.lvlIdx) : '';
   const textType = type === 'text';
 
   function getLevelText(lvl) {
@@ -256,19 +260,21 @@ export default function Classification({ c12n, format, setClassification, size, 
     setClassification('TLP:GREEN');
   };
   // Build chip based on computed values
-  return c12nDef && c12n ? (
-    <CustomChip
-      type="classification"
-      variant={textType ? 'outlined' : 'default'}
-      size={size}
-      color={computeColor()}
-      className={classes.classification}
-      label={normalizeClassification()}
-      onClick={type === 'picker' ? showPicker : null}
-    />
-  ) : (
-    <Skeleton style={{ height: skelheight[size] }} />
-  );
+  return currentUser.c12n_enforcing ? (
+    c12nDef && c12n ? (
+      <CustomChip
+        type="classification"
+        variant={textType ? 'outlined' : 'default'}
+        size={size}
+        color={computeColor()}
+        className={classes.classification}
+        label={normalizeClassification()}
+        onClick={type === 'picker' ? showPicker : null}
+      />
+    ) : (
+      <Skeleton style={{ height: skelheight[size] }} />
+    )
+  ) : null;
 }
 
 Classification.defaultProps = {

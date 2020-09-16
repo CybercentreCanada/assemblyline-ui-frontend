@@ -429,15 +429,13 @@ function User({ width, username }: UserProps) {
           </Grid>
 
           <Grid item sm={12} md={9} style={{ width: '100%' }}>
-            {currentUser.c12n_enforcing ? (
-              <Classification
-                type={currentUser.is_admin ? 'picker' : 'pill'}
-                size="medium"
-                format="long"
-                c12n={user && user.classification}
-                setClassification={setClassification}
-              />
-            ) : null}
+            <Classification
+              type={currentUser.is_admin ? 'picker' : 'pill'}
+              size="medium"
+              format="long"
+              c12n={user && user.classification}
+              setClassification={setClassification}
+            />
             <TableContainer className={classes.group} component={Paper}>
               <Table aria-label={t('profile')}>
                 <TableHead>
