@@ -29,6 +29,7 @@ import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import ServiceTree from 'components/layout/serviceTree';
+import Classification from 'components/visual/Classification';
 import { OptionsObject, useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -99,6 +100,13 @@ function Settings<SettingsProps>({ width }) {
       closeSnackbar();
     }
   };
+
+  function setClassification(value) {
+    if (settings) {
+      setModified(true);
+      setSettings({ ...settings, classification: value });
+    }
+  }
 
   function setTTL(value) {
     if (settings) {
@@ -417,6 +425,32 @@ function Settings<SettingsProps>({ width }) {
                   <ChevronRightOutlinedIcon />
                 </TableCell>
               </TableRow>
+              {currentUser.c12n_enforcing ? (
+                <TableRow style={{ cursor: 'pointer' }}>
+                  {isWidthDown('xs', width) ? null : (
+                    <TableCell>
+                      <Typography variant="body1">{t('submissions.classification')}</Typography>
+                      <Typography variant="caption">{t('submissions.classification_desc')}</Typography>
+                    </TableCell>
+                  )}
+                  <TableCell colSpan={isWidthDown('xs', width) ? 3 : 2}>
+                    {!isWidthDown('xs', width) ? null : (
+                      <>
+                        <Typography variant="body1">{t('submissions.classification')}</Typography>
+                        <Typography variant="caption" gutterBottom>
+                          {t('submissions.classification_desc')}
+                        </Typography>
+                      </>
+                    )}
+                    <Classification
+                      type="picker"
+                      size="small"
+                      c12n={settings ? settings.classification : null}
+                      setClassification={setClassification}
+                    />
+                  </TableCell>
+                </TableRow>
+              ) : null}
             </TableBody>
           </Table>
         </TableContainer>
