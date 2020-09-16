@@ -1,7 +1,8 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import { Box, makeStyles, TextField, Typography } from '@material-ui/core';
 import React, { useEffect, useRef, useState } from 'react';
-import { isArrowDown, isArrowUp, isEnter, isEscape } from '../utils/keyboard';
+import { insertText } from '../utils/brower';
+import { isArrowDown, isArrowLeft, isArrowRight, isArrowUp, isEnter, isEscape } from '../utils/keyboard';
 import Throttler from '../utils/throttler';
 
 const useStyles = makeStyles(theme => ({
@@ -60,10 +61,11 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
   onClear
 }) => {
   const classes = useStyles();
-  const [precursor, setPrecursor] = useState<string>(value);
+
   const [cursor, setCursor] = useState<number>(-1);
-  const [open, setOpen] = useState<boolean>(false);
+  const [precursor, setPrecursor] = useState<string>('');
   const [filteredOptions, setFilteredOptions] = useState<string[]>(options);
+  const [open, setOpen] = useState<boolean>(false);
   const element = useRef<HTMLDivElement>();
   const optionsElement = useRef<HTMLDivElement>();
 
@@ -81,17 +83,13 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
     onChange(_value, options);
 
     //
-    const inputEl = getInputEl();
-    const thisCursor = inputEl.selectionStart;
-    setPrecursor(_value.substr(0, thisCursor));
-
-    //
     filterOptions(_value);
   };
 
   // Handler for KeyDown event on either the text input of the options menu.
   const _onKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
     const { keyCode } = event;
+    console.log(`key[${keyCode}]`);
     if (isEnter(keyCode)) {
       if (open) {
         onOptionSelection(options[cursor]);
@@ -120,6 +118,10 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
       } else {
         setOpen(true);
       }
+    } else if (isArrowLeft(keyCode)) {
+      filterOptions(value);
+    } else if (isArrowRight(keyCode)) {
+      filterOptions(value);
     }
   };
 
@@ -136,10 +138,13 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
       const inputEl = getInputEl();
       const thisCursor = inputEl.selectionStart;
       const nextCursor = thisCursor + option.length;
-      inputEl.setRangeText(option);
-      inputEl.setSelectionRange(nextCursor, nextCursor);
+      insertText(inputEl, nextCursor, nextCursor, option);
+
+      // inputEl.setSelectionRange(nextCursor, nextCursor);
+      // inputEl.setRangeText(option);
+      // document.execCommand('insertText', false, option);
       onOptionsClose();
-      onChange(getInputEl().value, options);
+      onChange(inputEl.value, options);
     }
   };
 
@@ -156,14 +161,17 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
   // Grab nearest group to the left of cursor.
   // Filter entire list with that value if not empty.
   const filterOptions = (inputValue: string) => {
+    //
     let _options = options;
-    const inputEl = getInputEl();
-    const thisCursor = inputEl.selectionStart;
+    const thisCursor = getInputEl().selectionStart;
+    const _precursor = inputValue.substr(0, thisCursor);
     const parts = inputValue.substr(0, thisCursor).split(' ');
     if (parts[parts.length - 1] !== '') {
       const filterValue = parts[parts.length - 1];
       _options = _options.filter(option => option.includes(filterValue));
     }
+
+    setPrecursor(_precursor);
     setFilteredOptions(_options.length > 0 ? _options : options);
   };
 
@@ -182,8 +190,8 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
       />
       {open ? (
         <div ref={optionsElement} className={classes.searchTextFieldOptionsCt} tabIndex={-1} onKeyDown={_onKeyDown}>
-          <div style={{ display: 'inline-block', height: 0, lineHeight: 0, overflow: 'hidden' }}>
-            <Typography> {precursor}</Typography>
+          <div style={{ display: 'inline-block', height: 0, lineHeight: 0, overflow: 'hidden', whiteSpace: 'pre' }}>
+            <Typography>{precursor}</Typography>
           </div>
           <div style={{ display: 'inline-block' }} className={classes.searchTextFieldOptionsInner}>
             {filteredOptions.map((item, index) => (
