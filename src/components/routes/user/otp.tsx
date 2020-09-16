@@ -1,7 +1,7 @@
 import { Box, Button, TextField, Typography } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 import useMyAPI from 'components/hooks/useMyAPI';
-import TextDivider from 'components/visual/text_divider';
+import TextDivider from 'components/visual/TextDivider';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { isNull } from 'util';

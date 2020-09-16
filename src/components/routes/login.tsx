@@ -19,7 +19,7 @@ import { ResetPassword, ResetPasswordNow } from 'components/routes/login/reset';
 import { SecurityTokenLogin } from 'components/routes/login/sectoken';
 import { SignUp } from 'components/routes/login/signup';
 import { UserPassLogin } from 'components/routes/login/userpass';
-import TextDivider from 'components/visual/text_divider';
+import TextDivider from 'components/visual/TextDivider';
 import { OptionsObject, useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
