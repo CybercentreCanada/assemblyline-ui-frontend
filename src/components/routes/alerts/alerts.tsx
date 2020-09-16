@@ -39,7 +39,7 @@ const Alerts: React.FC = () => {
   const [drawer, setDrawer] = useState<{ open: boolean; type: 'filter' }>({ open: false, type: null });
 
   //
-  const onSearching = (filterValue: string = '', inputEl: HTMLInputElement = null) => {
+  const _onSearch = (filterValue: string = '', inputEl: HTMLInputElement = null) => {
     setSearching(true);
     if (drawer.open) {
       setDrawer({ open: false, type: null });
@@ -74,7 +74,7 @@ const Alerts: React.FC = () => {
           searching={searching}
           suggestions={fields.map(f => f.name)}
           onClear={onClearSearch}
-          onSearching={onSearching}
+          onSearch={_onSearch}
           buttons={[
             {
               icon: <ExpandMoreIcon />,
@@ -144,7 +144,7 @@ const Alerts: React.FC = () => {
           {
             filter: (
               <Box minWidth={600} p={theme.spacing(0.5)}>
-                <AlertsFilters onApplyBtnClick={onSearching} />
+                <AlertsFilters onApplyBtnClick={_onSearch} />
               </Box>
             )
           }[drawer.type]

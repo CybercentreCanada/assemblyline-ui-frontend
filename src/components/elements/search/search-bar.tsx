@@ -41,7 +41,7 @@ interface SearchBarProps {
   searching?: boolean;
   buttons?: SearchBarButton[];
   suggestions?: string[];
-  onSearching: (filterValue: string, inputElement: HTMLInputElement) => void;
+  onSearch: (filterValue: string, inputElement: HTMLInputElement) => void;
   onClear: () => void;
 }
 
@@ -50,7 +50,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   searching = false,
   suggestions = [],
   buttons = [],
-  onSearching,
+  onSearch,
   onClear
 }) => {
   const theme = useTheme();
@@ -66,28 +66,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   // handler[onclick]: search button click handler.
   const onSearchBtnClick = () => {
-    _onSearching();
+    _onSearch();
   };
-
-  // // hander[onkeydown]: textfield key_down handler.
-  // // add some keyboard key listeners to search text field.
-  // const onFilterKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-  //   //
-  //   // event.stopPropagation();
-  //   const { keyCode } = event;
-  //   if (isEnter(keyCode)) {
-  //     _onSearching();
-  //   } else if (isEscape(keyCode)) {
-  //     if (showSuggestions) {
-  //       onSuggestionClose();
-  //     } else {
-  //       onFilterClear();
-  //     }
-  //   } else if (isArrowDown(keyCode)) {
-  //     event.preventDefault();
-  //     setShowSuggestions(true);
-  //   }
-  // };
 
   // handler[onchange]: textfield change handler.
   // track value of filter..
@@ -103,9 +83,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   // When requesting a search.
-  const _onSearching = () => {
+  const _onSearch = () => {
     if (value && value.length > 0) {
-      onSearching(value, getInputEl());
+      onSearch(value, getInputEl());
     } else {
       onClear();
     }
@@ -130,25 +110,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
           )}
         </Box>
         <Box flex={1} display="relative">
-          <SearchTextField value={value} options={suggestions} onChange={onValueChange} />
-          {/* <TextField
-            ref={textFieldEl}
-            placeholder="Filter..."
-            value={filter}
-            color="secondary"
-            InputProps={{ disableUnderline: true }}
+          <SearchTextField
+            value={value}
+            options={suggestions}
             disabled={searching}
-            onChange={onFilterChange}
-            onKeyDown={onFilterKeyDown}
-            autoFocus
-            fullWidth
+            onChange={onValueChange}
+            onSearch={_onSearch}
+            onClear={onValueClear}
           />
-          <SearchSuggestions
-            items={filterSuggestions()}
-            open={showSuggestions}
-            onSelection={onSugestionSelection}
-            onClose={onSuggestionClose}
-          /> */}
         </Box>
         <IconButton onClick={onSearchBtnClick} edge="end" color="primary">
           <FilterListIcon />
