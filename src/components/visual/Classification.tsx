@@ -42,6 +42,7 @@ export default function Classification({ c12n, format, setClassification, size, 
   const theme = useTheme();
   const { user: currentUser } = useUser<CustomUser>();
   const { classification: c12nDef } = useALContext();
+  const isPhone = useMediaQuery(theme.breakpoints.down('xs'));
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [showPicker, setShowPicker] = React.useState(false);
   const defaultParts = {
@@ -346,7 +347,7 @@ export default function Classification({ c12n, format, setClassification, size, 
           onClick={type === 'picker' ? () => setShowPicker(true) : null}
         />
 
-        <Dialog fullScreen={isMobile} fullWidth open={showPicker} onClose={useClassification}>
+        <Dialog fullScreen={isPhone} fullWidth maxWidth="md" open={showPicker} onClose={useClassification}>
           <DialogTitle>
             <CustomChip
               type="classification"
@@ -359,7 +360,7 @@ export default function Classification({ c12n, format, setClassification, size, 
           </DialogTitle>
           <DialogContent>
             <Grid container spacing={1}>
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={12} md={4}>
                 <Card variant="outlined">
                   <List disablePadding style={{ borderRadius: '6px' }}>
                     {c12nDef.original_definition.levels.map((lvl, idx) => {
@@ -377,7 +378,7 @@ export default function Classification({ c12n, format, setClassification, size, 
                   </List>
                 </Card>
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={12} md={4}>
                 <Card variant="outlined">
                   <List disablePadding>
                     {c12nDef.original_definition.required.map((req, idx) => {
@@ -395,7 +396,7 @@ export default function Classification({ c12n, format, setClassification, size, 
                   </List>
                 </Card>
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={12} md={4}>
                 <Box pb={1}>
                   <Card variant="outlined">
                     <List disablePadding>
