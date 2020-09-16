@@ -139,10 +139,6 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
       const thisCursor = inputEl.selectionStart;
       const nextCursor = thisCursor + option.length;
       insertText(inputEl, nextCursor, nextCursor, option);
-
-      // inputEl.setSelectionRange(nextCursor, nextCursor);
-      // inputEl.setRangeText(option);
-      // document.execCommand('insertText', false, option);
       onOptionsClose();
       onChange(inputEl.value, options);
     }
@@ -162,12 +158,17 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
   // Filter entire list with that value if not empty.
   const filterOptions = (inputValue: string) => {
     //
+
+    // FIXME -> filter value and precursor not quite keeping up
+    asdfa;
+
     let _options = options;
     const thisCursor = getInputEl().selectionStart;
     const _precursor = inputValue.substr(0, thisCursor);
     const parts = inputValue.substr(0, thisCursor).split(' ');
     if (parts[parts.length - 1] !== '') {
       const filterValue = parts[parts.length - 1];
+      console.log(`precursor: ${precursor}, filterValue: ${filterValue}, cursor: ${thisCursor}`);
       _options = _options.filter(option => option.includes(filterValue));
     }
 
