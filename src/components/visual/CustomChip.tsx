@@ -3,6 +3,7 @@ import { darken, makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import React from 'react';
 
+export const ColorArray = ['default', 'primary', 'secondary', 'info', 'success', 'warning', 'error'];
 export type PossibleColors = 'default' | 'primary' | 'secondary' | 'info' | 'success' | 'warning' | 'error';
 
 interface CustomChipProps {

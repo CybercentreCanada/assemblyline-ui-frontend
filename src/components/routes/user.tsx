@@ -41,11 +41,15 @@ import { useParams } from 'react-router-dom';
 
 type UserProps = {
   width: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-  username: string;
+  username?: string | null;
+};
+
+type ParamProps = {
+  id: string;
 };
 
 function User({ width, username }: UserProps) {
-  const { id } = useParams();
+  const { id } = useParams<ParamProps>();
   const inputRef = useRef(null);
   const { t } = useTranslation(['user']);
   const theme = useTheme();
@@ -429,7 +433,8 @@ function User({ width, username }: UserProps) {
               <Classification
                 type={currentUser.is_admin ? 'picker' : 'pill'}
                 size="medium"
-                currentClassification={user && user.classification}
+                format="long"
+                c12n={user && user.classification}
                 setClassification={setClassification}
               />
             ) : null}
@@ -668,5 +673,9 @@ function User({ width, username }: UserProps) {
     </PageCenter>
   );
 }
+
+User.defaultProps = {
+  username: null
+};
 
 export default withWidth()(User);
