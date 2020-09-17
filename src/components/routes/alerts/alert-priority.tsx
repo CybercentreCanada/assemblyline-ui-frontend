@@ -1,7 +1,7 @@
 import { Box, makeStyles, Typography, useTheme } from '@material-ui/core';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
-import { Chip } from 'components/elements/mui/chips';
+import CustomChip from 'components/visual/CustomChip';
 import React from 'react';
 
 const useStyles = makeStyles({
@@ -26,7 +26,7 @@ const AlertPriority = ({ name, withText = false, withChip = false }) => {
   const { icon } = makeStyles({ icon: { color: theme.palette.getContrastText(color) } })();
   if (withChip) {
     return (
-      <Chip
+      <CustomChip
         classes={{ icon }}
         size="small"
         label={name}

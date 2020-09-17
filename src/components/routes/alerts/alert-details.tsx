@@ -1,8 +1,10 @@
 import { Box, Divider, Grid, makeStyles, Typography, useMediaQuery, useTheme } from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
 import useClipboard from 'commons/components/hooks/useClipboard';
-import { Chip, ChipList } from 'components/elements/mui/chips';
+import { ChipList } from 'components/elements/mui/chips';
 import { AlertItem } from 'components/routes/alerts/useAlerts';
+import Classification from 'components/visual/Classification';
+import CustomChip from 'components/visual/CustomChip';
 import { format } from 'date-fns';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -40,7 +42,10 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
   const { copy } = useClipboard();
 
   return (
-    <Box overflow="auto">
+    <Box>
+      <Box mb={1}>
+        <Classification c12n={item.classification} type="text" />
+      </Box>
       {item.filtered ? (
         <Box mb={2}>
           <Alert severity="warning">{t('page.alerts.details.data_filtered_msg')}</Alert>
@@ -75,7 +80,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
             <Typography className={classes.sectionTitle}>{t('page.alerts.details.status')}</Typography>
             <Divider />
             <Box className={classes.sectionContent}>
-              <Chip label={item.status} variant="outlined" />
+              <CustomChip type="round" variant="outlined" label={item.status} size="small" />
             </Box>
           </Box>
         </Grid>
@@ -129,7 +134,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
           <Grid container spacing={1}>
             <Grid item xs={12}>
               <Typography variant="caption">{t('page.alerts.details.file_type')}</Typography>&nbsp;
-              <Chip label={item.file.type} variant="outlined" /> -
+              <CustomChip label={item.file.type} variant="outlined" size="small" /> -
               <Box component="span" ml={1} mr={1}>
                 {item.file.name}
               </Box>
@@ -187,7 +192,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
                 <Typography variant="caption" style={{ marginRight: theme.spacing(1) }}>
                   <i>{t('page.alerts.details.attack_type')}</i>
                 </Typography>
-                <Chip label={item.attack.category} variant="outlined" />
+                <CustomChip label={item.attack.category} variant="outlined" size="small" />
               </Grid>
               <Grid item xs={isLteSm ? 12 : 8}>
                 <Typography variant="caption" style={{ marginRight: theme.spacing(1) }}>

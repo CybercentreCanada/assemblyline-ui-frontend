@@ -1,5 +1,5 @@
-import { ChipProps, makeStyles, Theme } from '@material-ui/core';
-import MuiChip from '@material-ui/core/Chip';
+import { ChipProps, makeStyles, Theme, useTheme } from '@material-ui/core';
+import CustomChip from 'components/visual/CustomChip';
 import React from 'react';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -7,7 +7,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: 'flex',
     flexWrap: 'wrap',
     listStyle: 'none',
-    marginLeft: -theme.spacing(0.5),
     padding: 0,
     boxShadow: 'inherit',
     margin: 0
@@ -22,22 +21,21 @@ type ChipListProps = {
 };
 
 const ChipList: React.FC<ChipListProps> = ({ items }) => {
+  const theme = useTheme();
   const classes = useStyles();
   return (
     <ul className={classes.chiplist}>
       {items.map((cp, i) => (
         <li key={`chiplist-${i}`}>
-          <Chip {...cp} />
+          <CustomChip
+            size="small"
+            {...cp}
+            style={{ marginBottom: theme.spacing(0.5), marginRight: theme.spacing(0.5) }}
+          />
         </li>
       ))}
     </ul>
   );
 };
 
-//
-const Chip: React.FC<ChipProps> = props => {
-  const classes = useStyles();
-  return <MuiChip size="small" {...props} className={classes.chip} />;
-};
-
-export { ChipList, Chip };
+export { ChipList };

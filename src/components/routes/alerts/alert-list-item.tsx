@@ -1,7 +1,8 @@
 import { Box, Grid, Typography, useMediaQuery, useTheme } from '@material-ui/core';
 import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
-import { Chip, ChipList } from 'components/elements/mui/chips';
+import { ChipList } from 'components/elements/mui/chips';
 import { AlertItem } from 'components/routes/alerts/useAlerts';
+import CustomChip from 'components/visual/CustomChip';
 import { formatDistanceToNowStrict } from 'date-fns';
 import React from 'react';
 import AlertPriority from './alert-priority';
@@ -25,9 +26,10 @@ const AlertListItem: React.FC<AlertListItemProps> = props => {
 };
 
 const AlertItemDefault: React.FC<AlertListItemProps> = ({ item }) => {
+  const theme = useTheme();
   return (
     <Box>
-      <Grid container style={{ alignItems: 'center' }}>
+      <Grid container style={{ alignItems: 'center', paddingBottom: theme.spacing(1) }}>
         <Grid item xs={4}>
           <AlertPriority name={item.priority} />
           <Box component="span" ml={1} mr={1}>
@@ -41,7 +43,7 @@ const AlertItemDefault: React.FC<AlertListItemProps> = ({ item }) => {
           <AlertScore score={item.al.score} />
         </Grid>
         <Grid item xs={2}>
-          <Chip size="small" variant="outlined" label={item.status} />
+          <CustomChip size="small" variant="outlined" label={item.status} />
         </Grid>
         <Grid item xs={2}>
           <Box display="flex" alignItems="center">
@@ -85,7 +87,7 @@ const AlertItemSmall: React.FC<AlertListItemProps> = ({ item }) => {
           </Typography>
         </Grid>
         <Grid item xs={2}>
-          <Chip label={item.status} variant="outlined" />
+          <CustomChip label={item.status} variant="outlined" />
         </Grid>
         <Grid item xs={2}>
           <Box display="flex" alignItems="center">
@@ -141,7 +143,7 @@ const AlertItemXSmall: React.FC<AlertListItemProps> = ({ item }) => {
           </Box>
         </Grid>
         <Grid item xs={4}>
-          <Chip label={item.status} variant="outlined" />
+          <CustomChip label={item.status} variant="outlined" />
         </Grid>
         <Grid item xs={2}>
           <Box display="flex" alignItems="center">

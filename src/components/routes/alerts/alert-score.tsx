@@ -1,5 +1,5 @@
 import { Avatar, ChipProps, useTheme } from '@material-ui/core';
-import { Chip } from 'components/elements/mui/chips';
+import CustomChip from 'components/visual/CustomChip';
 import React from 'react';
 
 const ALERT_SCORE_MAP = {
@@ -55,7 +55,8 @@ const AlertScore: React.FC<AlertScoreProps> = props => {
   const { text, color, avatar } = ALERT_SCORE_MAP[scoreKey];
 
   return (
-    <Chip
+    <CustomChip
+      size="small"
       {...chipProps}
       label={withText ? text : ''}
       avatar={

@@ -103,7 +103,7 @@ const Alerts: React.FC = () => {
               items={items}
               loading={items.length && (loading || searching)}
               pageSize={PAGE_SIZE}
-              rowHeight={97}
+              rowHeight={93}
               selected={splitPanel.open && splitPanel.item ? splitPanel.item : null}
               onItemSelected={onItemSelected}
               onMoreItems={onLoadMore}
