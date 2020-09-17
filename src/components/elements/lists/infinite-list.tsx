@@ -62,6 +62,8 @@ const KEYBOARD_THROTTLER = new Throttler(10);
 // Function throttler to streamline scroll event handlers.
 const SCROLL_THROTTLER = new Throttler(1000);
 
+// Specification interface representing the metadata required to render to visible frame
+//  of the InfiniteList.
 interface InfiniteListFrame<I extends InfiniteListItem> {
   sT: number;
   fH: number;
@@ -69,10 +71,12 @@ interface InfiniteListFrame<I extends InfiniteListItem> {
   displayItems: { index: number; isLoaded: boolean; item: I }[];
 }
 
+// Specification interface modelling an InfiniteList item.
 export interface InfiniteListItem {
   index: number;
 }
 
+// Specification interface of this component's properties.
 interface InfiniteListProps<I extends InfiniteListItem> {
   loading: boolean;
   items: I[];
@@ -84,11 +88,13 @@ interface InfiniteListProps<I extends InfiniteListItem> {
   onMoreItems: (startIndex: number, stopIndex: number) => void;
 }
 
+// Default values for optional properties.
 InfiniteList.defaultProps = {
   pageSize: 10,
   selected: null
 };
 
+// The component.
 export default function InfiniteList<I extends InfiniteListItem>({
   loading,
   items,
@@ -130,8 +136,6 @@ export default function InfiniteList<I extends InfiniteListItem>({
     // the total index of the first element shown.
     const topIndex = Math.floor(sT / _rowHeight);
 
-    console.log(`itemcount[${itemCount}]:topindex[${topIndex}]`);
-
     //
     // const displayItems = [];
     // for (let i = topIndex; i < topIndex + itemCount; i++) {
@@ -152,14 +156,12 @@ export default function InfiniteList<I extends InfiniteListItem>({
 
   // Handler::OnScroll
   const onScroll = (event: React.UIEvent<HTMLElement>) => {
-    console.log('scrolling...');
     const _frame = computeFrame(items, rowHeight);
     setFrame(_frame);
 
     // use this to issue fetches for items with [isLoaded=false]
-    SCROLL_THROTTLER.throttle(() => {
-      console.log('done scrolling.....');
-    });
+    // SCROLL_THROTTLER.throttle(() => {
+    // });
 
     if (_frame.rH === 0) {
       onMoreItems(items.length, items.length + pageSize);
