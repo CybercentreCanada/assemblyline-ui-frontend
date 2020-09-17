@@ -5,6 +5,7 @@ import FilterListIcon from '@material-ui/icons/FilterList';
 import SearchIcon from '@material-ui/icons/Search';
 import StarIcon from '@material-ui/icons/Star';
 import React, { useRef, useState } from 'react';
+import SearchQuery from './search-query';
 import SearchTextField from './search-textfield';
 
 const useStyles = makeStyles(theme => ({
@@ -38,6 +39,7 @@ export interface SearchBarButton {
 }
 
 interface SearchBarProps {
+  query: SearchQuery;
   searching?: boolean;
   buttons?: SearchBarButton[];
   suggestions?: string[];
@@ -46,6 +48,7 @@ interface SearchBarProps {
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
+  query,
   children,
   searching = false,
   suggestions = [],
@@ -56,7 +59,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const theme = useTheme();
   const classes = useStyles();
   const element = useRef<HTMLInputElement>();
-  const [value, setValue] = useState<string>('');
+  const [value, setValue] = useState<string>(query.getQuery());
   // const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
 
   //

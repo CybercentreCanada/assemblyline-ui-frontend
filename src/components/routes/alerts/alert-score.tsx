@@ -64,7 +64,7 @@ const AlertScore: React.FC<AlertScoreProps> = props => {
           {withText ? ' ' : avatar}
         </Avatar>
       }
-      style={{ backgroundColor: 'transparent' }}
+      style={{ backgroundColor: 'transparent', color: theme.palette.text.primary }}
     />
   );
 };

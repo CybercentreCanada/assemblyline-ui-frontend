@@ -1,7 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { InfiniteListItem } from 'components/elements/lists/infinite-list';
+import SearchQuery from 'components/elements/search/search-query';
+import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 interface ALField {
   name: string;
@@ -65,6 +68,7 @@ interface UsingAlerts {
   fields: ALField[];
   total: number;
   items: AlertItem[];
+  query: SearchQuery;
   onLoad: (startIndex: number, stopIndex: number) => void;
   onLoadMore: (startIndex: number, stopIndex: number) => void;
   onSearch: (query: string) => void;
@@ -77,7 +81,10 @@ interface UsingAlerts {
 
 // Custom Hook implementation for dealing with alerts.
 export default function useAlerts(): UsingAlerts {
+  const location = useLocation();
   const apiCall = useMyAPI();
+  const { index: fieldIndexes } = useALContext();
+  const [query, searchQuery] = useState<SearchQuery>(new SearchQuery(location.pathname, location.search));
   const [fields, setFields] = useState<ALField[]>([]);
   const [state, setState] = useState<{ loading: boolean; items: AlertItem[]; total: number }>({
     loading: true,
@@ -101,7 +108,6 @@ export default function useAlerts(): UsingAlerts {
       url: formatUrl(startIndex, endIndex),
       onSuccess: api_data => {
         const { items: _items, total } = api_data.api_response;
-        console.log(_items);
         setState({
           loading: false,
           total,
@@ -128,8 +134,8 @@ export default function useAlerts(): UsingAlerts {
   };
 
   // Hook API: search alert bucket with specified query.
-  const onSearch = (query: string) => {
-    const url = `/api/v4/search/alert/?query=${query}`;
+  const onSearch = (_query: string) => {
+    const url = `/api/v4/search/alert/?query=${_query}`;
     apiCall({
       url,
       onSuccess: api_data => {
@@ -154,26 +160,22 @@ export default function useAlerts(): UsingAlerts {
     });
   };
 
-  const onFields = () => {
-    const url = '/api/v4/search/fields/alert/';
-    apiCall({
-      url,
-      onSuccess: api_data => {
-        const rFields = api_data.api_response;
-        const aFields = Object.keys(rFields).map(name => {
-          const o = rFields[name];
-          return { ...o, name };
-        });
-        setFields(aFields);
-      }
-    });
-  };
-
+  // By default load 25 items with no search crit.
   useEffect(() => {
     onLoad(0, 25);
-    onFields();
   }, []);
 
+  // transform alert fields into array.
+  useEffect(() => {
+    if (fieldIndexes) {
+      const aFields = Object.keys(fieldIndexes.alert).map(name => {
+        const o = fieldIndexes.alert[name];
+        return { ...o, name };
+      });
+      setFields(aFields);
+    }
+  }, [fieldIndexes]);
+
   // UseAlert Hook API.
-  return { ...state, fields, onLoad, onLoadMore, onSearch, onGet };
+  return { ...state, fields, query, onLoad, onLoadMore, onSearch, onGet };
 }
