@@ -435,6 +435,7 @@ function User({ width, username }: UserProps) {
               format="long"
               c12n={user && user.classification}
               setClassification={setClassification}
+              isUser
             />
             <TableContainer className={classes.group} component={Paper}>
               <Table aria-label={t('profile')}>

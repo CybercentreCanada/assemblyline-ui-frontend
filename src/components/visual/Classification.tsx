@@ -19,13 +19,14 @@ import useALContext from 'components/hooks/useALContext';
 import { CustomUser } from 'components/hooks/useMyUser';
 import CustomChip, { ColorMap, PossibleColors } from 'components/visual/CustomChip';
 import {
-  defaultParts,
+  applyClassificationRules,
+  defaultClassificationValidator,
   FormatProp,
   getLevelText,
   getParts,
   normalizedClassification
 } from 'helpers/classificationParser';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface ClassificationProps {
@@ -34,6 +35,7 @@ interface ClassificationProps {
   size?: 'medium' | 'small' | 'tiny';
   type?: 'picker' | 'pill' | 'text';
   format?: FormatProp;
+  isUser: boolean;
 }
 
 const useStyles = makeStyles(theme => ({
@@ -43,7 +45,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function Classification({ c12n, format, setClassification, size, type }: ClassificationProps) {
+export default function Classification({ c12n, format, setClassification, size, type, isUser }: ClassificationProps) {
   const classes = useStyles();
   const { t } = useTranslation();
   const theme = useTheme();
@@ -51,19 +53,21 @@ export default function Classification({ c12n, format, setClassification, size, 
   const { classification: c12nDef } = useALContext();
   const isPhone = useMediaQuery(theme.breakpoints.down('xs'));
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const [showPicker, setShowPicker] = React.useState(false);
-  const [parts, setParts] = React.useState(defaultParts);
+  const [showPicker, setShowPicker] = useState(false);
+  const [validated, setValidated] = useState(defaultClassificationValidator);
 
   useEffect(() => {
     if (c12nDef && currentUser.c12n_enforcing && c12n) {
-      setParts(getParts(c12n, c12nDef, format, isMobile));
+      setValidated(
+        applyClassificationRules(getParts(c12n, c12nDef, format, isMobile), c12nDef, format, isMobile, isUser)
+      );
     }
     // eslint-disable-next-line
   }, [c12nDef, c12n, currentUser, isMobile]);
 
   function toggleGroups(grp) {
-    // TODO: Selection dependencies
-    const newGrp = parts.groups;
+    const newGrp = validated.parts.groups;
+
     if (newGrp.indexOf(grp.name) === -1 && newGrp.indexOf(grp.short_name) === -1) {
       newGrp.push(format === 'long' && !isMobile ? grp.name : grp.short_name);
     } else if (newGrp.indexOf(grp.name) !== -1) {
@@ -71,12 +75,13 @@ export default function Classification({ c12n, format, setClassification, size, 
     } else {
       newGrp.splice(newGrp.indexOf(grp.short_name), 1);
     }
-    setParts({ ...parts, groups: newGrp });
+
+    setValidated(applyClassificationRules({ ...validated.parts, groups: newGrp }, c12nDef, format, isMobile, isUser));
   }
 
   function toggleSubGroups(sgrp) {
-    // TODO: Selection dependencies
-    const newSGrp = parts.subgroups;
+    const newSGrp = validated.parts.subgroups;
+
     if (newSGrp.indexOf(sgrp.name) === -1 && newSGrp.indexOf(sgrp.short_name) === -1) {
       newSGrp.push(format === 'long' && !isMobile ? sgrp.name : sgrp.short_name);
     } else if (newSGrp.indexOf(sgrp.name) !== -1) {
@@ -84,12 +89,15 @@ export default function Classification({ c12n, format, setClassification, size, 
     } else {
       newSGrp.splice(newSGrp.indexOf(sgrp.short_name), 1);
     }
-    setParts({ ...parts, subgroups: newSGrp });
+
+    setValidated(
+      applyClassificationRules({ ...validated.parts, subgroups: newSGrp }, c12nDef, format, isMobile, isUser)
+    );
   }
 
   function toggleRequired(req) {
-    // TODO: Selection dependencies
-    const newReq = parts.req;
+    const newReq = validated.parts.req;
+
     if (newReq.indexOf(req.name) === -1 && newReq.indexOf(req.short_name) === -1) {
       newReq.push(format === 'long' && !isMobile ? req.name : req.short_name);
     } else if (newReq.indexOf(req.name) !== -1) {
@@ -97,17 +105,24 @@ export default function Classification({ c12n, format, setClassification, size, 
     } else {
       newReq.splice(newReq.indexOf(req.short_name), 1);
     }
-    setParts({ ...parts, req: newReq });
+
+    setValidated(applyClassificationRules({ ...validated.parts, req: newReq }, c12nDef, format, isMobile, isUser));
   }
 
-  function selectLevel(lvl) {
-    // TODO: Selection dependencies
-    const lvlIdx = lvl.toString();
-    setParts({ ...parts, lvlIdx, lvl: getLevelText(lvlIdx, c12nDef, format, isMobile) });
+  function selectLevel(lvlIdx) {
+    setValidated(
+      applyClassificationRules(
+        { ...validated.parts, lvlIdx, lvl: getLevelText(lvlIdx, c12nDef, format, isMobile) },
+        c12nDef,
+        format,
+        isMobile,
+        isUser
+      )
+    );
   }
 
   const computeColor = (): PossibleColors => {
-    const levelStyles = c12nDef.levels_styles_map[parts.lvl];
+    const levelStyles = c12nDef.levels_styles_map[validated.parts.lvl];
     if (!levelStyles) {
       return 'default' as 'default';
     }
@@ -121,7 +136,7 @@ export default function Classification({ c12n, format, setClassification, size, 
   };
 
   const useClassification = () => {
-    const newC12n = normalizedClassification(parts, c12nDef, format, isMobile);
+    const newC12n = normalizedClassification(validated.parts, c12nDef, format, isMobile);
     if (setClassification && newC12n !== c12n) {
       setClassification(newC12n);
     }
@@ -137,7 +152,7 @@ export default function Classification({ c12n, format, setClassification, size, 
           size={size}
           color={computeColor()}
           className={classes.classification}
-          label={normalizedClassification(parts, c12nDef, format, isMobile)}
+          label={normalizedClassification(validated.parts, c12nDef, format, isMobile)}
           onClick={type === 'picker' ? () => setShowPicker(true) : null}
         />
 
@@ -149,7 +164,7 @@ export default function Classification({ c12n, format, setClassification, size, 
               size={size}
               color={computeColor()}
               className={classes.classification}
-              label={normalizedClassification(parts, c12nDef, format, isMobile)}
+              label={normalizedClassification(validated.parts, c12nDef, format, isMobile)}
             />
           </DialogTitle>
           <DialogContent>
@@ -162,7 +177,11 @@ export default function Classification({ c12n, format, setClassification, size, 
                         <ListItem
                           key={idx}
                           button
-                          selected={parts.lvl === lvl.name || parts.lvl === lvl.short_name}
+                          disabled={
+                            validated.disabled.levels.includes(lvl.name) ||
+                            validated.disabled.levels.includes(lvl.short_name)
+                          }
+                          selected={validated.parts.lvlIdx === lvl.lvl}
                           onClick={() => selectLevel(lvl.lvl)}
                         >
                           <ListItemText style={{ textAlign: 'center' }} primary={lvl.name} />
@@ -180,7 +199,9 @@ export default function Classification({ c12n, format, setClassification, size, 
                         <ListItem
                           key={idx}
                           button
-                          selected={parts.req.includes(req.name) || parts.req.includes(req.short_name)}
+                          selected={
+                            validated.parts.req.includes(req.name) || validated.parts.req.includes(req.short_name)
+                          }
                           onClick={() => toggleRequired(req)}
                         >
                           <ListItemText style={{ textAlign: 'center' }} primary={req.name} />
@@ -199,7 +220,14 @@ export default function Classification({ c12n, format, setClassification, size, 
                           <ListItem
                             key={idx}
                             button
-                            selected={parts.groups.includes(grp.name) || parts.groups.includes(grp.short_name)}
+                            disabled={
+                              validated.disabled.groups.includes(grp.name) ||
+                              validated.disabled.groups.includes(grp.short_name)
+                            }
+                            selected={
+                              validated.parts.groups.includes(grp.name) ||
+                              validated.parts.groups.includes(grp.short_name)
+                            }
                             onClick={() => toggleGroups(grp)}
                           >
                             <ListItemText style={{ textAlign: 'center' }} primary={grp.name} />
@@ -216,7 +244,10 @@ export default function Classification({ c12n, format, setClassification, size, 
                         <ListItem
                           key={idx}
                           button
-                          selected={parts.subgroups.includes(sgrp.name) || parts.subgroups.includes(sgrp.short_name)}
+                          selected={
+                            validated.parts.subgroups.includes(sgrp.name) ||
+                            validated.parts.subgroups.includes(sgrp.short_name)
+                          }
                           onClick={() => toggleSubGroups(sgrp)}
                         >
                           <ListItemText style={{ textAlign: 'center' }} primary={sgrp.name} />
@@ -245,5 +276,6 @@ Classification.defaultProps = {
   setClassification: null,
   size: 'medium' as 'medium',
   type: 'pill' as 'pill',
-  format: 'short' as 'short'
+  format: 'short' as 'short',
+  isUser: false
 };
