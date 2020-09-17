@@ -166,7 +166,13 @@ export default function Classification({ c12n, format, setClassification, size, 
           onClick={type === 'picker' ? () => setShowPicker(true) : null}
         />
         {type === 'picker' ? (
-          <Dialog fullScreen={isPhone} fullWidth maxWidth="md" open={showPicker} onClose={useClassification}>
+          <Dialog
+            fullScreen={isPhone}
+            fullWidth
+            maxWidth={isMobile ? 'xs' : 'md'}
+            open={showPicker}
+            onClose={useClassification}
+          >
             <DialogTitle>
               <CustomChip
                 type="classification"
@@ -178,7 +184,7 @@ export default function Classification({ c12n, format, setClassification, size, 
               />
             </DialogTitle>
             <DialogContent>
-              <Grid container spacing={1}>
+              <Grid container spacing={2}>
                 <Grid item xs={12} md>
                   <Card variant="outlined">
                     <List disablePadding style={{ borderRadius: '6px' }}>
@@ -226,7 +232,7 @@ export default function Classification({ c12n, format, setClassification, size, 
                 {isUser || uParts.groups.length !== 0 || uParts.subgroups.length !== 0 ? (
                   <Grid item xs={12} md>
                     {isUser || uParts.groups.length !== 0 ? (
-                      <Box pb={1}>
+                      <Box pb={2}>
                         <Card variant="outlined">
                           <List disablePadding>
                             {c12nDef.original_definition.groups.map((grp, idx) => {
