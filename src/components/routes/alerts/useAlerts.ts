@@ -69,8 +69,8 @@ interface UsingAlerts {
   total: number;
   items: AlertItem[];
   query: SearchQuery;
-  onLoad: (startIndex: number, stopIndex: number) => void;
-  onLoadMore: (startIndex: number, stopIndex: number) => void;
+  onLoad: () => void;
+  onLoadMore: () => void;
   onGet: (id: string, onSuccess: (alert: AlertItem) => void) => void;
 }
 

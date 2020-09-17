@@ -40,26 +40,34 @@ const Alerts: React.FC = () => {
 
   //
   const _onSearch = (filterValue: string = '', inputEl: HTMLInputElement = null) => {
+    // Tell the world we're searching for it...
     setSearching(true);
+
+    // Close drawer if its open.
     if (drawer.open) {
       setDrawer({ open: false, type: null });
     }
 
-    // console.log(filterValue);
-    query.setQuery(filterValue).update();
-    onLoad(0, PAGE_SIZE);
+    // Update query and url before reloading data.
+    query.setOffset('0').setQuery(filterValue).update();
+
+    // Reload.
+    onLoad();
+
+    // Artificial delay, cause we like spinning...
     setTimeout(() => {
       setSearching(false);
 
       if (inputEl) {
         inputEl.focus();
       }
-    }, 2000);
+    }, 1000);
   };
 
   const onClearSearch = () => {
-    query.setQuery('').update();
-    onLoad(0, PAGE_SIZE);
+    // TODO: scroll to top.
+    query.setOffset('0').setQuery('').update();
+    onLoad();
   };
 
   const onItemSelected = (item: AlertItem) => {
