@@ -9,6 +9,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
+import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -84,7 +85,7 @@ export default function Submissions() {
                 <TableCell>{row.user}</TableCell>
                 <TableCell>{row.num_files}</TableCell>
                 <TableCell>
-                  <CustomChip type="classification" size="tiny" label={row.classification} variant="outlined" />
+                  <Classification type="text" size="tiny" c12n={row.classification} format="short" />
                 </TableCell>
                 <TableCell>{row.status}</TableCell>
               </TableRow>
