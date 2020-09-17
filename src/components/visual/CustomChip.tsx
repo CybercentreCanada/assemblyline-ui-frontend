@@ -3,7 +3,22 @@ import { darken, makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import React from 'react';
 
-export const ColorArray = ['default', 'primary', 'secondary', 'info', 'success', 'warning', 'error'];
+export const ColorMap = {
+  'label-default': 'default' as 'default',
+  'label-primary': 'primary' as 'primary',
+  'label-secondary': 'secondary' as 'secondary',
+  'label-info': 'info' as 'info',
+  'label-success': 'success' as 'success',
+  'label-warning': 'warning' as 'warning',
+  'label-error': 'error' as 'error',
+  default: 'default' as 'default',
+  primary: 'primary' as 'primary',
+  secondary: 'secondary' as 'secondary',
+  info: 'info' as 'info',
+  success: 'success' as 'success',
+  warning: 'warning' as 'warning',
+  error: 'error' as 'error'
+};
 export type PossibleColors = 'default' | 'primary' | 'secondary' | 'info' | 'success' | 'warning' | 'error';
 
 interface CustomChipProps {

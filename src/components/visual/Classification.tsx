@@ -17,7 +17,14 @@ import Skeleton from '@material-ui/lab/Skeleton';
 import useUser from 'commons/components/hooks/useAppUser';
 import useALContext from 'components/hooks/useALContext';
 import { CustomUser } from 'components/hooks/useMyUser';
-import CustomChip, { ColorArray, PossibleColors } from 'components/visual/CustomChip';
+import CustomChip, { ColorMap, PossibleColors } from 'components/visual/CustomChip';
+import {
+  defaultParts,
+  FormatProp,
+  getLevelText,
+  getParts,
+  normalizedClassification
+} from 'helpers/classificationParser';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -26,7 +33,7 @@ interface ClassificationProps {
   setClassification?: (classification: string) => void;
   size?: 'medium' | 'small' | 'tiny';
   type?: 'picker' | 'pill' | 'text';
-  format?: 'long' | 'short';
+  format?: FormatProp;
 }
 
 const useStyles = makeStyles(theme => ({
@@ -45,18 +52,11 @@ export default function Classification({ c12n, format, setClassification, size, 
   const isPhone = useMediaQuery(theme.breakpoints.down('xs'));
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [showPicker, setShowPicker] = React.useState(false);
-  const defaultParts = {
-    lvlIdx: '',
-    lvl: '',
-    req: [],
-    groups: [],
-    subgroups: []
-  };
   const [parts, setParts] = React.useState(defaultParts);
 
   useEffect(() => {
     if (c12nDef && currentUser.c12n_enforcing && c12n) {
-      setParts(getParts());
+      setParts(getParts(c12n, c12nDef, format, isMobile));
     }
     // eslint-disable-next-line
   }, [c12nDef, c12n, currentUser, isMobile]);
@@ -103,221 +103,15 @@ export default function Classification({ c12n, format, setClassification, size, 
   function selectLevel(lvl) {
     // TODO: Selection dependencies
     const lvlIdx = lvl.toString();
-    setParts({ ...parts, lvlIdx, lvl: getLevelText(lvlIdx) });
-  }
-
-  function getLevelText(lvl) {
-    let text = null;
-    if (c12nDef != null) {
-      text = c12nDef.levels_map[lvl.toString()];
-    }
-
-    if (text === undefined || text == null) {
-      text = '';
-    }
-
-    if (format === 'long' && !isMobile) {
-      return c12nDef.levels_map_stl[text];
-    }
-
-    return text;
-  }
-
-  function getLevelIndex() {
-    let retIndex = null;
-    const splitIdx = c12n.indexOf('//');
-    let c12nLvl = c12n;
-    if (splitIdx !== -1) {
-      c12nLvl = c12n.slice(0, splitIdx);
-    }
-
-    if (c12nDef.levels_map[c12nLvl] !== undefined) {
-      retIndex = c12nDef.levels_map[c12nLvl];
-    } else if (c12nDef.levels_map_lts[c12nLvl] !== undefined) {
-      retIndex = c12nDef.levels_map[c12nDef.levels_map_lts[c12nLvl]];
-    } else if (c12nDef.levels_aliases[c12nLvl] !== undefined) {
-      retIndex = c12nDef.levels_map[c12nDef.levels_aliases[c12nLvl]];
-    }
-
-    return retIndex;
-  }
-
-  function getRequired() {
-    const returnSet = [];
-    const partSet = c12n.split('/');
-    for (const p of partSet) {
-      if (p in c12nDef.access_req_map_lts) {
-        returnSet.push(c12nDef.access_req_map_lts[p]);
-      } else if (p in c12nDef.access_req_map_stl) {
-        returnSet.push(p);
-      } else if (p in c12nDef.access_req_aliases) {
-        for (const a of c12nDef.access_req_aliases[p]) {
-          returnSet.push(a);
-        }
-      }
-    }
-
-    if (format === 'long' && !isMobile) {
-      const out = [];
-      for (const r of returnSet) {
-        out.push(c12nDef.access_req_map_stl[r]);
-      }
-
-      return out.sort();
-    }
-
-    return returnSet.sort();
-  }
-
-  function getGroups() {
-    const g1 = [];
-    const g2 = [];
-
-    const groupParts = c12n.split('//');
-    let groups = [];
-    for (let grpPart of groupParts) {
-      grpPart = grpPart.replace('REL TO ', '');
-      const tempGroup = grpPart.split(',');
-      for (const tg of tempGroup) {
-        groups = groups.concat(tg.trim().split('/'));
-      }
-    }
-
-    for (const g of groups) {
-      if (g in c12nDef.groups_map_lts) {
-        g1.push(c12nDef.groups_map_lts[g]);
-      } else if (g in c12nDef.groups_map_stl) {
-        g1.push(g);
-      } else if (g in c12nDef.groups_aliases) {
-        for (const a of c12nDef.groups_aliases[g]) {
-          g1.push(a);
-        }
-      } else if (g in c12nDef.subgroups_map_lts) {
-        g2.push(c12nDef.subgroups_map_lts[g]);
-      } else if (g in c12nDef.subgroups_map_stl) {
-        g2.push(g);
-      } else if (g in c12nDef.subgroups_aliases) {
-        for (const sa of c12nDef.subgroups_aliases[g]) {
-          g2.push(sa);
-        }
-      }
-    }
-
-    if (format === 'long' && !isMobile) {
-      const g1Out = [];
-      for (const gr of g1) {
-        g1Out.push(c12nDef.groups_map_stl[gr]);
-      }
-
-      const g2Out = [];
-      for (const sgr of g2) {
-        g2Out.push(c12nDef.subgroups_map_stl[sgr]);
-      }
-
-      return { groups: g1Out.sort(), subgroups: g2Out.sort() };
-    }
-
-    return { groups: g1.sort(), subgroups: g2.sort() };
-  }
-
-  function getParts() {
-    const grps = getGroups();
-    const lvlIdx = getLevelIndex();
-    return {
-      lvlIdx,
-      lvl: getLevelText(lvlIdx),
-      req: getRequired(),
-      groups: grps.groups,
-      subgroups: grps.subgroups
-    };
-  }
-
-  function normalizedClassification() {
-    const { lvl, req, subgroups } = parts;
-    let { groups } = parts;
-
-    let out = lvl;
-
-    const reqGrp = [];
-    for (const r of req) {
-      if (c12nDef.params_map[r] !== undefined) {
-        if (c12nDef.params_map[r].is_required_group !== undefined) {
-          if (c12nDef.params_map[r].is_required_group) {
-            reqGrp.push(r);
-          }
-        }
-      }
-    }
-
-    for (const rg of reqGrp) {
-      req.splice(req.indexOf(rg), 1);
-    }
-
-    if (req.length > 0) {
-      out += `//${req.join('/')}`;
-    }
-    if (reqGrp.length > 0) {
-      out += `//${reqGrp.join('/')}`;
-    }
-
-    if (groups.length > 0) {
-      if (reqGrp.length > 0) {
-        out += '/';
-      } else {
-        out += '//';
-      }
-
-      if (groups.length === 1) {
-        const group = groups[0];
-        if (c12nDef.params_map[group] !== undefined) {
-          if (c12nDef.params_map[group].solitary_display_name !== undefined) {
-            out += c12nDef.params_map[group].solitary_display_name;
-          } else {
-            out += `REL TO ${group}`;
-          }
-        } else {
-          out += `REL TO ${group}`;
-        }
-      } else {
-        if (format === 'short' || isMobile) {
-          for (const alias in c12nDef.groups_aliases) {
-            if ({}.hasOwnProperty.call(c12nDef.groups_aliases, alias)) {
-              const values = c12nDef.groups_aliases[alias];
-              if (values.length > 1) {
-                if (JSON.stringify(values.sort()) === JSON.stringify(groups)) {
-                  groups = [alias];
-                }
-              }
-            }
-          }
-        }
-        out += `REL TO ${groups.join(', ')}`;
-      }
-    }
-
-    if (subgroups.length > 0) {
-      if (groups.length > 0 || reqGrp.length > 0) {
-        out += '/';
-      } else {
-        out += '//';
-      }
-      out += subgroups.join('/');
-    }
-
-    return out;
+    setParts({ ...parts, lvlIdx, lvl: getLevelText(lvlIdx, c12nDef, format, isMobile) });
   }
 
   const computeColor = (): PossibleColors => {
-    const colorMap = c12nDef.levels_styles_map[parts.lvl];
-    if (colorMap === undefined || colorMap === null) {
-      return 'default';
+    const levelStyles = c12nDef.levels_styles_map[parts.lvl];
+    if (!levelStyles) {
+      return 'default' as 'default';
     }
-    const color = colorMap.color || colorMap.label.replace('label-', '');
-    if (!ColorArray.includes(color)) {
-      return 'default';
-    }
-
-    return color;
+    return ColorMap[levelStyles.color || levelStyles.label.replace('label-', '')] || ('default' as 'default');
   };
 
   const skelheight = {
@@ -327,7 +121,7 @@ export default function Classification({ c12n, format, setClassification, size, 
   };
 
   const useClassification = () => {
-    const newC12n = normalizedClassification();
+    const newC12n = normalizedClassification(parts, c12nDef, format, isMobile);
     if (setClassification && newC12n !== c12n) {
       setClassification(newC12n);
     }
@@ -343,7 +137,7 @@ export default function Classification({ c12n, format, setClassification, size, 
           size={size}
           color={computeColor()}
           className={classes.classification}
-          label={normalizedClassification()}
+          label={normalizedClassification(parts, c12nDef, format, isMobile)}
           onClick={type === 'picker' ? () => setShowPicker(true) : null}
         />
 
@@ -355,7 +149,7 @@ export default function Classification({ c12n, format, setClassification, size, 
               size={size}
               color={computeColor()}
               className={classes.classification}
-              label={normalizedClassification()}
+              label={normalizedClassification(parts, c12nDef, format, isMobile)}
             />
           </DialogTitle>
           <DialogContent>

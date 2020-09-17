@@ -1,6 +1,7 @@
 import useAppUser from 'commons/components/hooks/useAppUser';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
+import { ClassificationDefinition } from 'helpers/classificationParser';
 import React, { useEffect, useState } from 'react';
 
 type ALField = {
@@ -24,10 +25,6 @@ type IndexDefinitionMap = {
   signature: IndexDefinition;
   submission: IndexDefinition;
   workflow: IndexDefinition;
-};
-
-type ClassificationDefinition = {
-  [propName: string]: any;
 };
 
 export type ALAppContextProps = {
