@@ -71,7 +71,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   // handler[onchange]: textfield change handler.
   // track value of filter..
-  const onValueChange = (_value: string, items: []) => {
+  const onValueChange = (_value: string) => {
     setValue(_value);
   };
 

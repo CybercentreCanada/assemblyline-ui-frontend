@@ -45,7 +45,7 @@ interface SearchTextFieldProps {
   value: string;
   options: string[];
   disabled?: boolean;
-  onChange: (value: string, filteredItems: string[]) => void;
+  onChange: (value: string) => void;
   onClear: () => void;
   onSearch: (query: string) => void;
   onSelection?: (selected: string) => void;
@@ -64,14 +64,18 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
   const classes = useStyles();
   const [cursor, setCursor] = useState<number>(-1);
   const [precursor, setPrecursor] = useState<string>('');
-  const [filteredOptions, setFilteredOptions] = useState<string[]>(options);
+  const [filteredOptions, setFilteredOptions] = useState<{ start: number; end: number; items: string[] }>({
+    start: 0,
+    end: 0,
+    items: options
+  });
   const [open, setOpen] = useState<boolean>(false);
   const element = useRef<HTMLDivElement>();
   const optionsElement = useRef<HTMLDivElement>();
   const isLTEMedium = useMediaQuery(theme.breakpoints.up('md'));
 
   // Ensure we update options if a new list is provided.
-  useEffect(() => setFilteredOptions(options), [options]);
+  useEffect(() => setFilteredOptions({ start: 0, end: 0, items: options }), [options]);
 
   // Get the the text input element.
   const getInputEl = () => {
@@ -81,7 +85,7 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
   // Handler for when the value of the text input changes.
   const _onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value: _value } = event.currentTarget;
-    onChange(_value, options);
+    onChange(_value);
     filterOptions(_value);
   };
 
@@ -92,7 +96,7 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
     if (isEnter(keyCode)) {
       // key[ENTER ]: handler
       if (open) {
-        onOptionSelection(filteredOptions[cursor]);
+        onOptionSelection(filteredOptions.start, filteredOptions.end, filteredOptions.items[cursor]);
       } else {
         onSearch(value);
       }
@@ -107,7 +111,7 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
       // key[ARROW_UP]: handler
       event.preventDefault();
       if (open) {
-        const nextIndex = cursor - 1 > -1 ? cursor - 1 : filteredOptions.length - 1;
+        const nextIndex = cursor - 1 > -1 ? cursor - 1 : filteredOptions.items.length - 1;
         setCursor(nextIndex);
         scrollTo(nextIndex);
       }
@@ -115,7 +119,7 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
       // key[ARROW_DOWN]: handler
       event.preventDefault();
       if (open) {
-        const nextIndex = cursor + 1 < filteredOptions.length ? cursor + 1 : 0;
+        const nextIndex = cursor + 1 < filteredOptions.items.length ? cursor + 1 : 0;
         setCursor(nextIndex);
         scrollTo(nextIndex);
       } else {
@@ -144,13 +148,13 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
   };
 
   // Handler for when an option is selected.
-  const onOptionSelection = (option: string) => {
+  const onOptionSelection = (startIndex: number, endIndex: number, option: string) => {
     if (option) {
       const inputEl = getInputEl();
-      const thisCursor = inputEl.selectionStart;
-      insertText(inputEl, thisCursor, thisCursor, option);
+      // const thisCursor = inputEl.selectionStart;
+      insertText(inputEl, startIndex, endIndex, option);
       onOptionsClose();
-      onChange(inputEl.value, options);
+      onChange(inputEl.value);
       if (onSelection) {
         onSelection(option);
       }
@@ -174,20 +178,33 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
     // Grab the part of the text before the precursor.
     const _precursor = extractPrecursor(inputValue, selectionOffset);
 
+    //
+    let insertStartIndex = _precursor.length - 1;
+    let insertEndIndex = insertStartIndex;
+
     // Split that with a single whitespace.
     const parts = _precursor.split(' ');
+
     // The the part just before the cursor isn't empty,
     //  then we use that to filter the options.
     if (parts[parts.length - 1] !== '') {
       const filterValue = parts[parts.length - 1];
+      insertStartIndex -= filterValue.length - 1;
+      insertEndIndex += filterValue.length;
       _options = _options.filter(option => option.includes(filterValue));
     }
+
+    //
 
     // Update states...
     setPrecursor(_precursor);
 
     // If filtered options is empty, then we return all options..
-    setFilteredOptions(_options.length > 0 ? _options : options);
+    setFilteredOptions({
+      start: insertStartIndex,
+      end: insertEndIndex,
+      items: _options.length > 0 ? _options : options
+    });
   };
 
   const extractPrecursor = (inputValue: string, offset = 0) => {
@@ -220,12 +237,12 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
             <Typography>{precursor}</Typography>
           </div>
           <div className={classes.searchTextFieldOptionsInner}>
-            {filteredOptions.map((item, index) => (
+            {filteredOptions.items.map((item, index) => (
               <SearchTextOption
                 key={`SearchTextField-item-${index}`}
                 text={item}
                 position={index}
-                onSelection={onOptionSelection}
+                onSelection={() => onOptionSelection(filteredOptions.start, filteredOptions.end, item)}
                 selected={index === cursor}
               />
             ))}
@@ -240,7 +257,7 @@ const SearchTextOption: React.FC<{
   text: string;
   position: number;
   selected: boolean;
-  onSelection: (text: string) => void;
+  onSelection: () => void;
 }> = ({ text, position, selected = false, onSelection }) => {
   const classes = useStyles();
   return (
@@ -248,7 +265,7 @@ const SearchTextOption: React.FC<{
       className={classes.searchTextFieldItem}
       data-searchtextfieldoption-position={position}
       data-searchtextfieldoption-selected={selected}
-      onClick={() => onSelection(text)}
+      onClick={() => onSelection()}
     >
       {text}
     </Box>
