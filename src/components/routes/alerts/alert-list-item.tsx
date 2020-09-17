@@ -2,6 +2,7 @@ import { Box, Grid, Typography, useMediaQuery, useTheme } from '@material-ui/cor
 import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
 import { ChipList } from 'components/elements/mui/chips';
 import { AlertItem } from 'components/routes/alerts/useAlerts';
+import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
 import { formatDistanceToNowStrict } from 'date-fns';
 import React from 'react';
@@ -40,10 +41,13 @@ const AlertItemDefault: React.FC<AlertListItemProps> = ({ item }) => {
           </Typography>
         </Grid>
         <Grid item xs={4}>
+          {item.index}
           <AlertScore score={item.al.score} />
         </Grid>
         <Grid item xs={2}>
-          <CustomChip size="small" variant="outlined" label={item.status} />
+          <Box display="inline-block">
+            <Classification c12n={item.classification} type="pill" size="tiny" format="short" />
+          </Box>
         </Grid>
         <Grid item xs={2}>
           <Box display="flex" alignItems="center">
@@ -53,8 +57,13 @@ const AlertItemDefault: React.FC<AlertListItemProps> = ({ item }) => {
         </Grid>
       </Grid>
       <Grid container style={{ alignItems: 'center' }}>
-        <Grid item xs={8}>
+        <Grid item xs={4}>
           <ChipList items={item.label.map(label => ({ label, size: 'small', variant: 'outlined' }))} />
+        </Grid>
+        <Grid item xs={4}>
+          <Box alignItems="center" display="flex">
+            <CustomChip size="small" variant="outlined" label={item.status} />
+          </Box>
         </Grid>
         <Grid item xs={2}>
           <Box alignItems="center" display="flex">

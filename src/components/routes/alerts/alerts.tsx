@@ -33,7 +33,7 @@ const useStyles = makeStyles(theme => ({
 const Alerts: React.FC = () => {
   const classes = useStyles();
   const theme = useTheme();
-  const { loading, items, total, fields, query, onLoad, onLoadMore, onSearch, onGet } = useAlerts();
+  const { loading, items, total, fields, query, onLoad, onLoadMore, onGet } = useAlerts();
   const [searching, setSearching] = useState<boolean>(false);
   const [splitPanel, setSplitPanel] = useState<{ open: boolean; item: AlertItem }>({ open: false, item: null });
   const [drawer, setDrawer] = useState<{ open: boolean; type: 'filter' }>({ open: false, type: null });
@@ -44,8 +44,9 @@ const Alerts: React.FC = () => {
     if (drawer.open) {
       setDrawer({ open: false, type: null });
     }
+    console.log(filterValue);
     query.setQuery(filterValue).update();
-    onSearch(filterValue);
+    onLoad(0, 25);
     setTimeout(() => {
       setSearching(false);
 
@@ -55,7 +56,10 @@ const Alerts: React.FC = () => {
     }, 2000);
   };
 
-  const onClearSearch = () => onLoad(0, PAGE_SIZE);
+  const onClearSearch = () => {
+    query.setQuery('').update();
+    onLoad(0, PAGE_SIZE);
+  };
 
   const onItemSelected = (item: AlertItem) => {
     if (item) {
@@ -71,7 +75,7 @@ const Alerts: React.FC = () => {
     <Box>
       <Box pb={theme.spacing(0.25)}>
         <SearchBar
-          query={query}
+          initValue={query.getQuery()}
           searching={searching}
           suggestions={fields.map(f => f.name)}
           onClear={onClearSearch}

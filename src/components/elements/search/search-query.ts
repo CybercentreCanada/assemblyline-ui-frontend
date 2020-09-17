@@ -11,12 +11,16 @@ export default class SearchQuery {
   }
 
   public setQuery(query: string): SearchQuery {
-    this.params.set('query', query);
+    this.params.set('q', query);
     return this;
   }
 
+  public hasQuery(): boolean {
+    return this.params.has('q');
+  }
+
   public getQuery(): string {
-    return this.params.get('query');
+    return this.hasQuery() ? this.params.get('q') : '';
   }
 
   public build(): string {
@@ -24,6 +28,7 @@ export default class SearchQuery {
   }
 
   public update(): void {
+    console.log(this.build());
     window.history.pushState(null, '', this.build());
   }
 }

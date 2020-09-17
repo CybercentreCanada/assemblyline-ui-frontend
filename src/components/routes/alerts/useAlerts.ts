@@ -71,7 +71,6 @@ interface UsingAlerts {
   query: SearchQuery;
   onLoad: (startIndex: number, stopIndex: number) => void;
   onLoadMore: (startIndex: number, stopIndex: number) => void;
-  onSearch: (query: string) => void;
   onGet: (id: string, onSuccess: (alert: AlertItem) => void) => void;
 }
 
@@ -99,7 +98,7 @@ export default function useAlerts(): UsingAlerts {
 
   // format alert api url using specified indexes.
   const formatUrl = (startIndex: number, endIndex: number) =>
-    `/api/v4/alert/grouped/file.sha256/?offset=${startIndex}&rows=${endIndex - startIndex}&q=`;
+    `/api/v4/alert/grouped/file.sha256/?offset=${startIndex}&rows=${endIndex - startIndex}&q=${query.getQuery()}`;
 
   //
   const onLoad = (startIndex: number, endIndex: number) => {
@@ -133,22 +132,6 @@ export default function useAlerts(): UsingAlerts {
     });
   };
 
-  // Hook API: search alert bucket with specified query.
-  const onSearch = (_query: string) => {
-    const url = `/api/v4/search/alert/?query=${_query}`;
-    apiCall({
-      url,
-      onSuccess: api_data => {
-        const { items, total } = api_data.api_response;
-        setState({
-          loading: false,
-          total,
-          items: parseResult(items, 0)
-        });
-      }
-    });
-  };
-
   // Hook API: fetch the alert for the specified alert_id.
   const onGet = (id: string, onSuccess: (alert: AlertItem) => void) => {
     const url = `/api/v4/alert/${id}/`;
@@ -177,5 +160,5 @@ export default function useAlerts(): UsingAlerts {
   }, [fieldIndexes]);
 
   // UseAlert Hook API.
-  return { ...state, fields, query, onLoad, onLoadMore, onSearch, onGet };
+  return { ...state, fields, query, onLoad, onLoadMore, onGet };
 }
