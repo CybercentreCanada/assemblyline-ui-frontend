@@ -59,10 +59,15 @@ export default function Classification({ c12n, format, setClassification, size, 
 
   useEffect(() => {
     if (c12nDef && currentUser.c12n_enforcing && c12n) {
-      setValidated({
-        disabled: defaultDisabled,
-        parts: getParts(c12n, c12nDef, format, isMobile)
-      });
+      const parts = getParts(c12n, c12nDef, format, isMobile);
+      if (type === 'picker') {
+        setValidated(applyClassificationRules(parts, c12nDef, format, isMobile, isUser));
+      } else {
+        setValidated({
+          disabled: defaultDisabled,
+          parts
+        });
+      }
     }
     // eslint-disable-next-line
   }, [c12nDef, c12n, currentUser, isMobile]);
