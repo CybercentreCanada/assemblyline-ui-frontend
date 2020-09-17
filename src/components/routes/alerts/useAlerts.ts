@@ -75,15 +75,15 @@ interface UsingAlerts {
 }
 
 //
-// /api/v4/search/fields/alert
+// /api/v4/search/fields/alert.
 // /api/v4/search/alert/
 
 // Custom Hook implementation for dealing with alerts.
-export default function useAlerts(): UsingAlerts {
+export default function useAlerts(pageSize): UsingAlerts {
   const location = useLocation();
   const apiCall = useMyAPI();
   const { index: fieldIndexes } = useALContext();
-  const [query, searchQuery] = useState<SearchQuery>(new SearchQuery(location.pathname, location.search));
+  const [query] = useState<SearchQuery>(new SearchQuery(location.pathname, location.search, pageSize));
   const [fields, setFields] = useState<ALField[]>([]);
   const [state, setState] = useState<{ loading: boolean; items: AlertItem[]; total: number }>({
     loading: true,
@@ -97,36 +97,39 @@ export default function useAlerts(): UsingAlerts {
   };
 
   // format alert api url using specified indexes.
-  const formatUrl = (startIndex: number, endIndex: number) =>
-    `/api/v4/alert/grouped/file.sha256/?offset=${startIndex}&rows=${endIndex - startIndex}&q=${query.getQuery()}`;
+  const formatUrl = () => {
+    return `/api/v4/alert/grouped/file.sha256/?offset=${query.getOffset()}&rows=${query.getRows()}&q=${query.getQuery()}`;
+  };
 
   //
-  const onLoad = (startIndex: number, endIndex: number) => {
+  const onLoad = () => {
     setState({ ...state, loading: true });
     apiCall({
-      url: formatUrl(startIndex, endIndex),
+      url: formatUrl(),
       onSuccess: api_data => {
         const { items: _items, total } = api_data.api_response;
         setState({
           loading: false,
           total,
-          items: parseResult(_items, startIndex)
+          items: parseResult(_items, query.getOffsetNumber())
         });
       }
     });
   };
 
   // Hook API: get alerts for specified index.
-  const onLoadMore = (startIndex: number, endIndex: number) => {
+  const onLoadMore = () => {
     setState({ ...state, loading: true });
+
+    query.tickOffset().update();
     apiCall({
-      url: formatUrl(startIndex, endIndex),
+      url: formatUrl(),
       onSuccess: api_data => {
         const { items: _items, total } = api_data.api_response;
         setState({
           loading: false,
           total,
-          items: [...state.items, ...parseResult(_items, startIndex)]
+          items: [...state.items, ...parseResult(_items, query.getOffsetNumber())]
         });
       }
     });
@@ -145,7 +148,7 @@ export default function useAlerts(): UsingAlerts {
 
   // By default load 25 items with no search crit.
   useEffect(() => {
-    onLoad(0, 25);
+    onLoad();
   }, []);
 
   // transform alert fields into array.

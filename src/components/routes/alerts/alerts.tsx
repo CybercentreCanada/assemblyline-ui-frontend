@@ -33,7 +33,7 @@ const useStyles = makeStyles(theme => ({
 const Alerts: React.FC = () => {
   const classes = useStyles();
   const theme = useTheme();
-  const { loading, items, total, fields, query, onLoad, onLoadMore, onGet } = useAlerts();
+  const { loading, items, total, fields, query, onLoad, onLoadMore, onGet } = useAlerts(PAGE_SIZE);
   const [searching, setSearching] = useState<boolean>(false);
   const [splitPanel, setSplitPanel] = useState<{ open: boolean; item: AlertItem }>({ open: false, item: null });
   const [drawer, setDrawer] = useState<{ open: boolean; type: 'filter' }>({ open: false, type: null });
@@ -44,9 +44,10 @@ const Alerts: React.FC = () => {
     if (drawer.open) {
       setDrawer({ open: false, type: null });
     }
-    console.log(filterValue);
+
+    // console.log(filterValue);
     query.setQuery(filterValue).update();
-    onLoad(0, 25);
+    onLoad(0, PAGE_SIZE);
     setTimeout(() => {
       setSearching(false);
 
