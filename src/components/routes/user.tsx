@@ -414,16 +414,18 @@ function User({ width, username }: UserProps) {
                 <Typography gutterBottom>{user ? user.uname : <Skeleton />}</Typography>
               </Grid>
               <Grid item style={{ marginTop: '2rem' }} xs={12}>
-                {user ? (
-                  <CustomChip
-                    color={user.is_active ? 'primary' : 'default'}
-                    onClick={currentUser.username !== user.uname ? toggleAccountEnabled : null}
-                    label={user.is_active ? t('enabled') : t('disabled')}
-                    type="square"
-                  />
-                ) : (
-                  <Skeleton className={classes.skelButton} />
-                )}
+                <Box pb={4}>
+                  {user ? (
+                    <CustomChip
+                      color={user.is_active ? 'primary' : 'default'}
+                      onClick={currentUser.username !== user.uname ? toggleAccountEnabled : null}
+                      label={user.is_active ? t('enabled') : t('disabled')}
+                      type="square"
+                    />
+                  ) : (
+                    <Skeleton className={classes.skelButton} />
+                  )}
+                </Box>
               </Grid>
             </Grid>
           </Grid>
@@ -435,6 +437,7 @@ function User({ width, username }: UserProps) {
               format="long"
               c12n={user && user.classification}
               setClassification={setClassification}
+              isUser
             />
             <TableContainer className={classes.group} component={Paper}>
               <Table aria-label={t('profile')}>
