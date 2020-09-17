@@ -162,116 +162,117 @@ export default function Classification({ c12n, format, setClassification, size, 
           label={normalizedClassification(validated.parts, c12nDef, format, isMobile)}
           onClick={type === 'picker' ? () => setShowPicker(true) : null}
         />
-
-        <Dialog fullScreen={isPhone} fullWidth maxWidth="md" open={showPicker} onClose={useClassification}>
-          <DialogTitle>
-            <CustomChip
-              type="classification"
-              variant={type === 'text' ? 'outlined' : 'default'}
-              size={size}
-              color={computeColor()}
-              className={classes.classification}
-              label={normalizedClassification(validated.parts, c12nDef, format, isMobile)}
-            />
-          </DialogTitle>
-          <DialogContent>
-            <Grid container spacing={1}>
-              <Grid item xs={12} md={4}>
-                <Card variant="outlined">
-                  <List disablePadding style={{ borderRadius: '6px' }}>
-                    {c12nDef.original_definition.levels.map((lvl, idx) => {
-                      return (
-                        <ListItem
-                          key={idx}
-                          button
-                          disabled={
-                            validated.disabled.levels.includes(lvl.name) ||
-                            validated.disabled.levels.includes(lvl.short_name)
-                          }
-                          selected={validated.parts.lvlIdx === lvl.lvl}
-                          onClick={() => selectLevel(lvl.lvl)}
-                        >
-                          <ListItemText style={{ textAlign: 'center' }} primary={lvl.name} />
-                        </ListItem>
-                      );
-                    })}
-                  </List>
-                </Card>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <Card variant="outlined">
-                  <List disablePadding>
-                    {c12nDef.original_definition.required.map((req, idx) => {
-                      return (
-                        <ListItem
-                          key={idx}
-                          button
-                          selected={
-                            validated.parts.req.includes(req.name) || validated.parts.req.includes(req.short_name)
-                          }
-                          onClick={() => toggleRequired(req)}
-                        >
-                          <ListItemText style={{ textAlign: 'center' }} primary={req.name} />
-                        </ListItem>
-                      );
-                    })}
-                  </List>
-                </Card>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <Box pb={1}>
+        {type === 'picker' ? (
+          <Dialog fullScreen={isPhone} fullWidth maxWidth="md" open={showPicker} onClose={useClassification}>
+            <DialogTitle>
+              <CustomChip
+                type="classification"
+                variant="default"
+                size={size}
+                color={computeColor()}
+                className={classes.classification}
+                label={normalizedClassification(validated.parts, c12nDef, format, isMobile)}
+              />
+            </DialogTitle>
+            <DialogContent>
+              <Grid container spacing={1}>
+                <Grid item xs={12} md={4}>
                   <Card variant="outlined">
-                    <List disablePadding>
-                      {c12nDef.original_definition.groups.map((grp, idx) => {
+                    <List disablePadding style={{ borderRadius: '6px' }}>
+                      {c12nDef.original_definition.levels.map((lvl, idx) => {
                         return (
                           <ListItem
                             key={idx}
                             button
                             disabled={
-                              validated.disabled.groups.includes(grp.name) ||
-                              validated.disabled.groups.includes(grp.short_name)
+                              validated.disabled.levels.includes(lvl.name) ||
+                              validated.disabled.levels.includes(lvl.short_name)
                             }
-                            selected={
-                              validated.parts.groups.includes(grp.name) ||
-                              validated.parts.groups.includes(grp.short_name)
-                            }
-                            onClick={() => toggleGroups(grp)}
+                            selected={validated.parts.lvlIdx === lvl.lvl}
+                            onClick={() => selectLevel(lvl.lvl)}
                           >
-                            <ListItemText style={{ textAlign: 'center' }} primary={grp.name} />
+                            <ListItemText style={{ textAlign: 'center' }} primary={lvl.name} />
                           </ListItem>
                         );
                       })}
                     </List>
                   </Card>
-                </Box>
-                <Card variant="outlined">
-                  <List disablePadding>
-                    {c12nDef.original_definition.subgroups.map((sgrp, idx) => {
-                      return (
-                        <ListItem
-                          key={idx}
-                          button
-                          selected={
-                            validated.parts.subgroups.includes(sgrp.name) ||
-                            validated.parts.subgroups.includes(sgrp.short_name)
-                          }
-                          onClick={() => toggleSubGroups(sgrp)}
-                        >
-                          <ListItemText style={{ textAlign: 'center' }} primary={sgrp.name} />
-                        </ListItem>
-                      );
-                    })}
-                  </List>
-                </Card>
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <Card variant="outlined">
+                    <List disablePadding>
+                      {c12nDef.original_definition.required.map((req, idx) => {
+                        return (
+                          <ListItem
+                            key={idx}
+                            button
+                            selected={
+                              validated.parts.req.includes(req.name) || validated.parts.req.includes(req.short_name)
+                            }
+                            onClick={() => toggleRequired(req)}
+                          >
+                            <ListItemText style={{ textAlign: 'center' }} primary={req.name} />
+                          </ListItem>
+                        );
+                      })}
+                    </List>
+                  </Card>
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <Box pb={1}>
+                    <Card variant="outlined">
+                      <List disablePadding>
+                        {c12nDef.original_definition.groups.map((grp, idx) => {
+                          return (
+                            <ListItem
+                              key={idx}
+                              button
+                              disabled={
+                                validated.disabled.groups.includes(grp.name) ||
+                                validated.disabled.groups.includes(grp.short_name)
+                              }
+                              selected={
+                                validated.parts.groups.includes(grp.name) ||
+                                validated.parts.groups.includes(grp.short_name)
+                              }
+                              onClick={() => toggleGroups(grp)}
+                            >
+                              <ListItemText style={{ textAlign: 'center' }} primary={grp.name} />
+                            </ListItem>
+                          );
+                        })}
+                      </List>
+                    </Card>
+                  </Box>
+                  <Card variant="outlined">
+                    <List disablePadding>
+                      {c12nDef.original_definition.subgroups.map((sgrp, idx) => {
+                        return (
+                          <ListItem
+                            key={idx}
+                            button
+                            selected={
+                              validated.parts.subgroups.includes(sgrp.name) ||
+                              validated.parts.subgroups.includes(sgrp.short_name)
+                            }
+                            onClick={() => toggleSubGroups(sgrp)}
+                          >
+                            <ListItemText style={{ textAlign: 'center' }} primary={sgrp.name} />
+                          </ListItem>
+                        );
+                      })}
+                    </List>
+                  </Card>
+                </Grid>
               </Grid>
-            </Grid>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={useClassification} color="primary" autoFocus>
-              {t('classification.done')}
-            </Button>
-          </DialogActions>
-        </Dialog>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={useClassification} color="primary" autoFocus>
+                {t('classification.done')}
+              </Button>
+            </DialogActions>
+          </Dialog>
+        ) : null}
       </>
     ) : (
       <Skeleton style={{ height: skelheight[size] }} />
