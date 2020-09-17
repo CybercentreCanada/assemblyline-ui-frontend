@@ -31,6 +31,7 @@ import APIKeys from 'components/routes/user/api_keys';
 import DisableOTP from 'components/routes/user/disable_otp';
 import OTP from 'components/routes/user/otp';
 import SecurityToken from 'components/routes/user/token';
+import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
 import ChipInput from 'material-ui-chip-input';
 import { OptionsObject, useSnackbar } from 'notistack';
@@ -40,11 +41,15 @@ import { useParams } from 'react-router-dom';
 
 type UserProps = {
   width: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-  username: string;
+  username?: string | null;
+};
+
+type ParamProps = {
+  id: string;
 };
 
 function User({ width, username }: UserProps) {
-  const { id } = useParams();
+  const { id } = useParams<ParamProps>();
   const inputRef = useRef(null);
   const { t } = useTranslation(['user']);
   const theme = useTheme();
@@ -168,6 +173,11 @@ function User({ width, username }: UserProps) {
       });
     }
     setUser({ ...user, '2fa_enabled': value });
+  }
+
+  function setClassification(value) {
+    setModified(true);
+    setUser({ ...user, classification: value });
   }
 
   function setConfirmPassword(value) {
@@ -419,13 +429,13 @@ function User({ width, username }: UserProps) {
           </Grid>
 
           <Grid item sm={12} md={9} style={{ width: '100%' }}>
-            {currentUser.c12n_enforcing ? (
-              user ? (
-                <CustomChip type="classification" label={user.classification} />
-              ) : (
-                <Skeleton style={{ height: '3rem' }} />
-              )
-            ) : null}
+            <Classification
+              type={currentUser.is_admin ? 'picker' : 'pill'}
+              size="medium"
+              format="long"
+              c12n={user && user.classification}
+              setClassification={setClassification}
+            />
             <TableContainer className={classes.group} component={Paper}>
               <Table aria-label={t('profile')}>
                 <TableHead>
@@ -661,5 +671,9 @@ function User({ width, username }: UserProps) {
     </PageCenter>
   );
 }
+
+User.defaultProps = {
+  username: null
+};
 
 export default withWidth()(User);

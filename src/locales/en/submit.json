@@ -1,4 +1,5 @@
 {
+  "classification": "The following classification will be applied to your submission:",
   "file": "File",
   "file.button": "Upload and Scan",
   "file.dragzon.byte": "bytes",

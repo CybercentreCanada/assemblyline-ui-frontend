@@ -19,6 +19,8 @@
   "save": "Save settings",
   "service": "Service Selection",
   "submissions": "Submission Options",
+  "submissions.classification": "Classification",
+  "submissions.classification_desc": "Default classification used for new submissions.",
   "submissions.deep_scan": "Deep analysis",
   "submissions.deep_scan_desc": "Perform deeper analysis of the file by turning on more checks. Slower and not recommended for bulk analysis.",
   "submissions.dynamic_recursion": "Dynamic recursion prevention",

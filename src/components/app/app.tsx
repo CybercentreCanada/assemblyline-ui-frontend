@@ -6,6 +6,7 @@ import UserProvider from 'commons/components/user/UserProvider';
 import useMyLayout from 'components/hooks/useMyLayout';
 import useMySitemap from 'components/hooks/useMySitemap';
 import useMyUser, { CustomUser } from 'components/hooks/useMyUser';
+import ALContextProvider from 'components/providers/ALContextProvider';
 import LoadingScreen from 'components/routes/loading';
 import LockedPage from 'components/routes/locked';
 import LoginScreen from 'components/routes/login';
@@ -145,7 +146,9 @@ const App: React.FC = () => {
         <UserProvider {...userProps}>
           <AppLayoutProvider {...layoutProps}>
             <SnackbarProvider>
-              <MyApp />
+              <ALContextProvider>
+                <MyApp />
+              </ALContextProvider>
             </SnackbarProvider>
           </AppLayoutProvider>
         </UserProvider>
