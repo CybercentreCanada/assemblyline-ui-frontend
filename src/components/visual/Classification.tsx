@@ -21,6 +21,7 @@ import CustomChip, { ColorMap, PossibleColors } from 'components/visual/CustomCh
 import {
   applyClassificationRules,
   defaultClassificationValidator,
+  defaultDisabled,
   FormatProp,
   getLevelText,
   getParts,
@@ -58,9 +59,10 @@ export default function Classification({ c12n, format, setClassification, size, 
 
   useEffect(() => {
     if (c12nDef && currentUser.c12n_enforcing && c12n) {
-      setValidated(
-        applyClassificationRules(getParts(c12n, c12nDef, format, isMobile), c12nDef, format, isMobile, isUser)
-      );
+      setValidated({
+        disabled: defaultDisabled,
+        parts: getParts(c12n, c12nDef, format, isMobile)
+      });
     }
     // eslint-disable-next-line
   }, [c12nDef, c12n, currentUser, isMobile]);
