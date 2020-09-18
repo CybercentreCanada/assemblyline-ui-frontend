@@ -117,11 +117,11 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
           </Box>
         </Grid>
         <Grid item xs={isLteSm ? 12 : 3}>
-          {/* Group Count Section */}
+          {/* Group Count Section - group_count is not included with endpoint /api/v4/alert/${id} */}
           <Box className={classes.section}>
             <Typography className={classes.sectionTitle}>{t('page.alerts.details.group_count')}</Typography>
             <Divider />
-            <Box className={classes.sectionContent}>{item.group_count}x</Box>
+            <Box className={classes.sectionContent}>{item.group_count}?x</Box>
           </Box>
         </Grid>
       </Grid>

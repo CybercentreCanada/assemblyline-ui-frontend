@@ -18,7 +18,7 @@ const useStyles = makeStyles(theme => ({
     top: 0,
     minWidth: 400,
     maxHeight: 250,
-    backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 10%)' : 'hsl(0, 0%, 90%)',
+    backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 10%)' : 'hsl(0, 0%, 95%)',
     boxShadow: theme.shadows[4]
   },
   serachTextFieldOptionsInnerSpacer: {
@@ -33,7 +33,7 @@ const useStyles = makeStyles(theme => ({
     color: theme.palette.primary.light,
     '&:hover': {
       cursor: 'pointer',
-      backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 17%)' : 'hsl(0, 0%, 95%)'
+      backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 17%)' : 'hsl(0, 0%, 90%)'
     },
     '&[data-searchtextfieldoption-selected="true"]': {
       backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 15%)' : 'hsl(0, 0%, 92%)'

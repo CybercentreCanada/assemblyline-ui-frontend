@@ -88,6 +88,7 @@ interface InfiniteListProps<I extends InfiniteListItem> {
   selected?: I;
   rowHeight: number;
   pageSize?: number;
+  scrollReset?: boolean;
   onItemSelected: (item: I) => void;
   onRenderItem: (item: InfiniteListItem) => React.ReactNode;
   onMoreItems: (startIndex: number, stopIndex: number) => void;
@@ -96,6 +97,7 @@ interface InfiniteListProps<I extends InfiniteListItem> {
 // Default values for optional properties.
 InfiniteList.defaultProps = {
   pageSize: 10,
+  scrollReset: false,
   selected: null
 };
 
@@ -106,6 +108,7 @@ export default function InfiniteList<I extends InfiniteListItem>({
   selected,
   rowHeight,
   pageSize,
+  scrollReset,
   onItemSelected,
   onRenderItem,
   onMoreItems
@@ -234,7 +237,19 @@ export default function InfiniteList<I extends InfiniteListItem>({
   // Each item is is relatively positioned withing the absolutely position [infiniteListFrame] container.
   const rowRenderer = (displayItem: { index: number; isLoaded: boolean; item: I }) => {
     return (
-      <Box mr={0} key={`listitem[${displayItem.index}]`} onClick={() => onItemClick(displayItem)} position="relative">
+      <Box
+        mr={0}
+        key={`listitem[${displayItem.index}]`}
+        onClick={() => onItemClick(displayItem)}
+        display="relative"
+        // style={{
+        //   top: displayItem.index * rowHeight,
+        //   left: 0,
+        //   position: 'absolute',
+        //   width: '100%',
+        //   height: rowHeight
+        // }}
+      >
         <Box
           className={classes.listItem}
           data-listposition={displayItem.index}
@@ -253,10 +268,13 @@ export default function InfiniteList<I extends InfiniteListItem>({
     // initialize/update scrolling container height.
     innerEl.current.style.height = items.length ? `${items.length * rowHeight}px` : 'auto';
 
+    // reset scroll?
+    if (scrollReset) {
+      containerEl.current.scrollTo({ top: 0 });
+    }
+
     // compute which items are within visual frame.
-    const updateFrame = () => {
-      setFrame(computeFrame(items, rowHeight));
-    };
+    const updateFrame = () => setFrame(computeFrame(items, rowHeight));
 
     // Recompute the frame each time this component mounts or receives update to properties.
     updateFrame();
@@ -267,7 +285,7 @@ export default function InfiniteList<I extends InfiniteListItem>({
       // Deregister window event listener.
       window.removeEventListener('resize', updateFrame);
     };
-  }, [items, rowHeight]);
+  }, [items, rowHeight, scrollReset]);
 
   return (
     <div ref={containerEl} className={classes.infiniteListCt} tabIndex={0} onScroll={onScroll} onKeyDown={onKeyDown}>

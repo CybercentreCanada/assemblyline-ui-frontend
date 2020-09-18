@@ -141,6 +141,7 @@ export default function useAlerts(pageSize): UsingAlerts {
     apiCall({
       url,
       onSuccess: api_data => {
+        console.log(api_data.api_response);
         onSuccess(api_data.api_response);
       }
     });

@@ -35,6 +35,7 @@ const Alerts: React.FC = () => {
   const theme = useTheme();
   const { loading, items, total, fields, query, onLoad, onLoadMore, onGet } = useAlerts(PAGE_SIZE);
   const [searching, setSearching] = useState<boolean>(false);
+  const [scrollReset, setScrollReset] = useState<boolean>(false);
   const [splitPanel, setSplitPanel] = useState<{ open: boolean; item: AlertItem }>({ open: false, item: null });
   const [drawer, setDrawer] = useState<{ open: boolean; type: 'filter' }>({ open: false, type: null });
 
@@ -43,13 +44,16 @@ const Alerts: React.FC = () => {
     // Tell the world we're searching for it...
     setSearching(true);
 
+    // Reset scroll for each new search.
+    setScrollReset(true);
+
     // Close drawer if its open.
     if (drawer.open) {
       setDrawer({ open: false, type: null });
     }
 
     // Update query and url before reloading data.
-    query.setOffset('0').setQuery(filterValue).apply();
+    query.setOffset('0').reset();
 
     // Reload.
     onLoad();
@@ -65,8 +69,11 @@ const Alerts: React.FC = () => {
   };
 
   const onClearSearch = () => {
-    // TODO: scroll to top.
-    query.setOffset('0').setQuery('').apply();
+    // Reset the query.
+    query.reset();
+    // Reset scroll for each new search.
+    setScrollReset(true);
+    // Refetch initial data.
     onLoad();
   };
 
@@ -78,6 +85,11 @@ const Alerts: React.FC = () => {
     } else {
       setSplitPanel({ ...splitPanel, open: false });
     }
+  };
+
+  const _onLoadMore = () => {
+    setScrollReset(false);
+    onLoadMore();
   };
 
   return (
@@ -119,8 +131,9 @@ const Alerts: React.FC = () => {
               pageSize={PAGE_SIZE}
               rowHeight={93}
               selected={splitPanel.open && splitPanel.item ? splitPanel.item : null}
+              scrollReset={scrollReset}
               onItemSelected={onItemSelected}
-              onMoreItems={onLoadMore}
+              onMoreItems={_onLoadMore}
               onRenderItem={(item: AlertItem) => <AlertListItem item={item} />}
             />
           }

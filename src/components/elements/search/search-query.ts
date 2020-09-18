@@ -45,7 +45,7 @@ export default class SearchQuery {
   }
 
   public tickOffset(): SearchQuery {
-    this.setOffset(`${this.getOffsetNumber() + this.pageSize}`);
+    this.setOffset(`${this.getOffsetNumber() + this.pageSize}`).setRows(this.getRows());
     return this;
   }
 
@@ -62,11 +62,17 @@ export default class SearchQuery {
     return this.hasQuery() ? this.params.get('q') : '';
   }
 
+  public reset(): SearchQuery {
+    this.setOffset('0').setRows(`${this.pageSize}`).setQuery('');
+    return this;
+  }
+
   public build(): string {
     return `${this.path}?${this.params.toString()}`;
   }
 
   public apply(): void {
+    console.log(this.build());
     window.history.pushState(null, '', this.build());
   }
 }
