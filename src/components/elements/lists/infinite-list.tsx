@@ -237,19 +237,7 @@ export default function InfiniteList<I extends InfiniteListItem>({
   // Each item is is relatively positioned withing the absolutely position [infiniteListFrame] container.
   const rowRenderer = (displayItem: { index: number; isLoaded: boolean; item: I }) => {
     return (
-      <Box
-        mr={0}
-        key={`listitem[${displayItem.index}]`}
-        onClick={() => onItemClick(displayItem)}
-        display="relative"
-        // style={{
-        //   top: displayItem.index * rowHeight,
-        //   left: 0,
-        //   position: 'absolute',
-        //   width: '100%',
-        //   height: rowHeight
-        // }}
-      >
+      <Box mr={0} key={`listitem[${displayItem.index}]`} onClick={() => onItemClick(displayItem)} display="relative">
         <Box
           className={classes.listItem}
           data-listposition={displayItem.index}
@@ -269,6 +257,7 @@ export default function InfiniteList<I extends InfiniteListItem>({
     innerEl.current.style.height = items.length ? `${items.length * rowHeight}px` : 'auto';
 
     // reset scroll?
+    // TODO: ideally there would be a way to infer this withhow in this component.
     if (scrollReset) {
       containerEl.current.scrollTo({ top: 0 });
     }
