@@ -101,7 +101,8 @@ export default function useAlerts(pageSize): UsingAlerts {
     return `/api/v4/alert/grouped/file.sha256/?offset=${query.getOffset()}&rows=${query.getRows()}&q=${query.getQuery()}`;
   };
 
-  //
+  // Hook API: load/reload all the alerts from start.
+  // resets the accumulated list.
   const onLoad = () => {
     setState({ ...state, loading: true });
     apiCall({
@@ -120,8 +121,7 @@ export default function useAlerts(pageSize): UsingAlerts {
   // Hook API: get alerts for specified index.
   const onLoadMore = () => {
     setState({ ...state, loading: true });
-
-    query.tickOffset().update();
+    query.tickOffset();
     apiCall({
       url: formatUrl(),
       onSuccess: api_data => {

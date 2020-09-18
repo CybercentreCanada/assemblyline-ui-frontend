@@ -49,7 +49,7 @@ const Alerts: React.FC = () => {
     }
 
     // Update query and url before reloading data.
-    query.setOffset('0').setQuery(filterValue).update();
+    query.setOffset('0').setQuery(filterValue).apply();
 
     // Reload.
     onLoad();
@@ -66,7 +66,7 @@ const Alerts: React.FC = () => {
 
   const onClearSearch = () => {
     // TODO: scroll to top.
-    query.setOffset('0').setQuery('').update();
+    query.setOffset('0').setQuery('').apply();
     onLoad();
   };
 

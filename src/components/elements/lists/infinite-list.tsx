@@ -22,7 +22,12 @@ const useStyles = makeStyles(theme => ({
     overflow: 'hidden',
     width: '100%'
   },
-
+  infiniteListFrame: {
+    top: 0,
+    left: 0,
+    position: 'absolute',
+    width: '100%'
+  },
   listItem: {
     padding: theme.spacing(2),
     wordBreak: 'break-all',
@@ -226,22 +231,10 @@ export default function InfiniteList<I extends InfiniteListItem>({
   };
 
   // Row renderer.
-  // Each item is absolutely positioned relative to the top of the innerContainer
-  //  in order to ensure that it lines up with the current scrolling range.
+  // Each item is is relatively positioned withing the absolutely position [infiniteListFrame] container.
   const rowRenderer = (displayItem: { index: number; isLoaded: boolean; item: I }) => {
     return (
-      <Box
-        mr={0}
-        key={`listitem[${displayItem.index}]`}
-        onClick={() => onItemClick(displayItem)}
-        style={{
-          top: displayItem.index * rowHeight,
-          left: 0,
-          position: 'absolute',
-          width: '100%',
-          height: rowHeight
-        }}
-      >
+      <Box mr={0} key={`listitem[${displayItem.index}]`} onClick={() => onItemClick(displayItem)} position="relative">
         <Box
           className={classes.listItem}
           data-listposition={displayItem.index}
@@ -284,7 +277,15 @@ export default function InfiniteList<I extends InfiniteListItem>({
         </div>
       ) : null}
       <div ref={innerEl} className={classes.infiniteListInnerCt}>
-        {frame.displayItems.map(item => rowRenderer(item))}
+        {/* Absolutely position the frame container at the current [scrollTop] value of container.  */}
+        <div
+          className={classes.infiniteListFrame}
+          style={{
+            top: frame.sT
+          }}
+        >
+          {frame.displayItems.map(item => rowRenderer(item))}
+        </div>
       </div>
     </div>
   );

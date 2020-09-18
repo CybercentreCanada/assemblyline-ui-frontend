@@ -7,10 +7,7 @@ export default class SearchQuery {
   private params: URLSearchParams = null;
 
   constructor(private path: string, baseSearch: string, private pageSize: number) {
-    //
-    console.log(baseSearch);
     this.params = new URLSearchParams(baseSearch);
-    console.log(this.getOffset());
   }
 
   public setRows(rows: string): SearchQuery {
@@ -23,7 +20,7 @@ export default class SearchQuery {
   }
 
   public getRows(): string {
-    return this.hasRows() ? this.params.get('rows') : '';
+    return this.hasRows() ? this.params.get('rows') : `${this.pageSize}`;
   }
 
   public getRowsNumber(): number {
@@ -40,7 +37,7 @@ export default class SearchQuery {
   }
 
   public getOffset(): string {
-    return this.hasOffset() ? this.params.get('offset') : '';
+    return this.hasOffset() ? this.params.get('offset') : '0';
   }
 
   public getOffsetNumber(): number {
@@ -69,8 +66,7 @@ export default class SearchQuery {
     return `${this.path}?${this.params.toString()}`;
   }
 
-  public update(): void {
-    console.log(this.build());
+  public apply(): void {
     window.history.pushState(null, '', this.build());
   }
 }
