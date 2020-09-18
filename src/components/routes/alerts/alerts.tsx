@@ -53,7 +53,7 @@ const Alerts: React.FC = () => {
     }
 
     // Update query and url before reloading data.
-    query.setOffset('0').reset();
+    query.setQuery(filterValue).apply();
 
     // Reload.
     onLoad();
@@ -70,7 +70,7 @@ const Alerts: React.FC = () => {
 
   const onClearSearch = () => {
     // Reset the query.
-    query.reset();
+    query.reset().apply();
     // Reset scroll for each new search.
     setScrollReset(true);
     // Refetch initial data.
