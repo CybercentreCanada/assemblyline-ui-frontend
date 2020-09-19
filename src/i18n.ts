@@ -2,13 +2,24 @@ import i18n from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import error403EN from 'locales/en/403.json';
 import error404EN from 'locales/en/404.json';
+import adminErrorViewerEN from 'locales/en/admin/error_viewer.json';
+import adminServicesEN from 'locales/en/admin/services.json';
+import adminSiteMapEN from 'locales/en/admin/site_map.json';
+import adminUsersEN from 'locales/en/admin/users.json';
 import dashboardEN from 'locales/en/dashboard.json';
 import helpAPIEN from 'locales/en/help/api.json';
+import helpClassificationEN from 'locales/en/help/classification.json';
 import helpConfigurationEN from 'locales/en/help/configuration.json';
+import helpSearchEN from 'locales/en/help/search.json';
 import helpServicesEN from 'locales/en/help/services.json';
 import lockedEN from 'locales/en/locked.json';
 import loginEN from 'locales/en/login.json';
 import logoutEN from 'locales/en/logout.json';
+import manageHeuristicsEN from 'locales/en/manage/heuristics.json';
+import manageSignaturesEN from 'locales/en/manage/signatures.json';
+import manageSignatureSourcesEN from 'locales/en/manage/signature_sources.json';
+import manageWorkflowsEN from 'locales/en/manage/workflows.json';
+import searchEN from 'locales/en/search.json';
 import settingsEN from 'locales/en/settings.json';
 import submissionEN from 'locales/en/submission.json';
 import submitEN from 'locales/en/submit.json';
@@ -17,13 +28,24 @@ import translationEN from 'locales/en/translation.json';
 import userEN from 'locales/en/user.json';
 import error403FR from 'locales/fr/403.json';
 import error404FR from 'locales/fr/404.json';
+import adminErrorViewerFR from 'locales/fr/admin/error_viewer.json';
+import adminServicesFR from 'locales/fr/admin/services.json';
+import adminSiteMapFR from 'locales/fr/admin/site_map.json';
+import adminUsersFR from 'locales/fr/admin/users.json';
 import dashboardFR from 'locales/fr/dashboard.json';
 import helpAPIFR from 'locales/fr/help/api.json';
+import helpClassificationFR from 'locales/fr/help/classification.json';
 import helpConfigurationFR from 'locales/fr/help/configuration.json';
+import helpSearchFR from 'locales/fr/help/search.json';
 import helpServicesFR from 'locales/fr/help/services.json';
 import lockedFR from 'locales/fr/locked.json';
 import loginFR from 'locales/fr/login.json';
 import logoutFR from 'locales/fr/logout.json';
+import manageHeuristicsFR from 'locales/fr/manage/heuristics.json';
+import manageSignaturesFR from 'locales/fr/manage/signatures.json';
+import manageSignatureSourcesFR from 'locales/fr/manage/signature_sources.json';
+import manageWorkflowsFR from 'locales/fr/manage/workflows.json';
+import searchFR from 'locales/fr/search.json';
 import settingsFR from 'locales/fr/settings.json';
 import submissionFR from 'locales/fr/submission.json';
 import submitFR from 'locales/fr/submit.json';
@@ -34,15 +56,26 @@ import { initReactI18next } from 'react-i18next';
 
 const resources = {
   en: {
+    adminErrorViewer: adminErrorViewerEN,
+    adminServices: adminServicesEN,
+    adminSiteMap: adminSiteMapEN,
+    adminUsers: adminUsersEN,
     dashboard: dashboardEN,
     error403: error403EN,
     error404: error404EN,
     helpAPI: helpAPIEN,
+    helpClassification: helpClassificationEN,
     helpConfiguration: helpConfigurationEN,
+    helpSearch: helpSearchEN,
     helpServices: helpServicesEN,
     locked: lockedEN,
     login: loginEN,
     logout: logoutEN,
+    manageHeuristics: manageHeuristicsEN,
+    manageSignatures: manageSignaturesEN,
+    manageSignatureSources: manageSignatureSourcesEN,
+    manageWorkflows: manageWorkflowsEN,
+    search: searchEN,
     settings: settingsEN,
     submission: submissionEN,
     submit: submitEN,
@@ -51,15 +84,26 @@ const resources = {
     user: userEN
   },
   fr: {
+    adminErrorViewer: adminErrorViewerFR,
+    adminServices: adminServicesFR,
+    adminSiteMap: adminSiteMapFR,
+    adminUsers: adminUsersFR,
     dashboard: dashboardFR,
     error403: error403FR,
     error404: error404FR,
     helpAPI: helpAPIFR,
+    helpClassification: helpClassificationFR,
     helpConfiguration: helpConfigurationFR,
+    helpSearch: helpSearchFR,
     helpServices: helpServicesFR,
     locked: lockedFR,
     login: loginFR,
     logout: logoutFR,
+    manageHeuristics: manageHeuristicsFR,
+    manageSignatures: manageSignaturesFR,
+    manageSignatureSources: manageSignatureSourcesFR,
+    manageWorkflows: manageWorkflowsFR,
+    search: searchFR,
     settings: settingsFR,
     submission: submissionFR,
     submit: submitFR,

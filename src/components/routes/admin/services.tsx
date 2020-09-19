@@ -6,13 +6,13 @@ import ForbiddenPage from 'components/routes/403';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-export default function Users() {
-  const { t } = useTranslation(['adminUsers']);
+export default function Services() {
+  const { t } = useTranslation(['adminServices']);
   const { user: currentUser } = useUser<CustomUser>();
 
   return currentUser.is_admin ? (
     <PageCenter>
-      <Box>{t('Users')}</Box>
+      <Box>{t('Services')}</Box>
     </PageCenter>
   ) : (
     <ForbiddenPage />
