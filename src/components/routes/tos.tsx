@@ -5,6 +5,7 @@ import useUser from 'commons/components/hooks/useAppUser';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
+import NotFoundPage from 'components/routes/404_dl';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -61,14 +62,16 @@ export default function Tos() {
   }
 
   useEffect(() => {
-    apiCall({
-      url: '/api/v4/help/tos/',
-      onSuccess: api_data => setTos(api_data.api_response)
-    });
+    if (currentUser.has_tos) {
+      apiCall({
+        url: '/api/v4/help/tos/',
+        onSuccess: api_data => setTos(api_data.api_response)
+      });
+    }
     // eslint-disable-next-line
   }, []);
 
-  return (
+  return currentUser.has_tos ? (
     <PageCenter>
       <Box className={classes.page} display="inline-block" textAlign="center">
         <Box>{getBanner(theme)}</Box>
@@ -125,5 +128,7 @@ export default function Tos() {
         )}
       </Box>
     </PageCenter>
+  ) : (
+    <NotFoundPage />
   );
 }
