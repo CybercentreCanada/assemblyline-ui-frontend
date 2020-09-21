@@ -86,18 +86,10 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
         </Grid>
       </Grid>
 
-      {/*  Type, Reporting Date, Owner and GroupCount */}
+      {/*  Reporting Date, Type and Owner */}
       <Grid container spacing={2}>
-        {/* Type Section */}
-        <Grid item xs={isLteSm ? 12 : 3}>
-          <Box className={classes.section}>
-            <Typography className={classes.sectionTitle}>{t('page.alerts.details.type')}</Typography>
-            <Divider />
-            <Box className={classes.sectionContent}>{item.type}</Box>
-          </Box>
-        </Grid>
-        <Grid item xs={isLteSm ? 12 : 3}>
-          {/* Priority Section. */}
+        {/* Reporting Tyupe Section */}
+        <Grid item xs={isLteSm ? 12 : 6}>
           <Box className={classes.section}>
             <Typography className={classes.sectionTitle}>{t('page.alerts.details.reporting_date')}</Typography>
             <Divider />
@@ -106,22 +98,22 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
             </Box>
           </Box>
         </Grid>
+        {/* Type Section. */}
         <Grid item xs={isLteSm ? 12 : 3}>
-          {/* Priority Section. */}
+          <Box className={classes.section}>
+            <Typography className={classes.sectionTitle}>{t('page.alerts.details.type')}</Typography>
+            <Divider />
+            <Box className={classes.sectionContent}>{item.type}</Box>
+          </Box>
+        </Grid>
+        {/* Owner Section. */}
+        <Grid item xs={isLteSm ? 12 : 3}>
           <Box className={classes.section}>
             <Typography className={classes.sectionTitle}>{t('page.alerts.details.ownership')}</Typography>
             <Divider />
             <Box className={classes.sectionContent}>
               {item.owner ? item.owner : item.hint_owner ? 'assigned' : 'none'}
             </Box>
-          </Box>
-        </Grid>
-        <Grid item xs={isLteSm ? 12 : 3}>
-          {/* Group Count Section - group_count is not included with endpoint /api/v4/alert/${id} */}
-          <Box className={classes.section}>
-            <Typography className={classes.sectionTitle}>{t('page.alerts.details.group_count')}</Typography>
-            <Divider />
-            <Box className={classes.sectionContent}>{item.group_count}?x</Box>
           </Box>
         </Grid>
       </Grid>

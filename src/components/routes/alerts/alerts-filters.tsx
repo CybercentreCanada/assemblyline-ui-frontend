@@ -12,6 +12,7 @@ import {
 import AddIcon from '@material-ui/icons/Add';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import { PageHeaderAction } from 'commons/components/layout/pages/PageHeader';
+import MultiSelectList from 'components/elements/mui/multiselect-list';
 import React from 'react';
 
 const useStyles = makeStyles(theme => ({
@@ -49,12 +50,16 @@ const actions: PageHeaderAction[] = [
 ];
 
 type AlertsFiltersProps = {
+  statuses: any;
+  priorities: any;
+  labels: any;
   onApplyBtnClick: () => void;
 };
 
-const AlertsFilters: React.FC<AlertsFiltersProps> = ({ onApplyBtnClick }) => {
+const AlertsFilters: React.FC<AlertsFiltersProps> = ({ statuses, priorities, labels, onApplyBtnClick }) => {
   const theme = useTheme();
   const classes = useStyles();
+  // console.log(labels);
   return (
     <Box>
       <Typography variant="h6">Filter</Typography>
@@ -99,16 +104,33 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({ onApplyBtnClick }) => {
           </FormControl>
         </Box>
         <Box mt={2}>
-          <Typography>Status</Typography>
-          <Divider />
+          <MultiSelectList
+            label="Statuses"
+            items={Object.keys(statuses).map((l, i) => ({
+              id: i,
+              label: `${statuses[l]}x ${l}`,
+              value: `label:"${l}"`
+            }))}
+            onChange={selections => console.log(selections)}
+          />
         </Box>
         <Box mt={2}>
-          <Typography>Priority</Typography>
-          <Divider />
+          <MultiSelectList
+            label="Priorities"
+            items={Object.keys(priorities).map((l, i) => ({
+              id: i,
+              label: `${priorities[l]}x ${l}`,
+              value: `label:"${l}"`
+            }))}
+            onChange={selections => console.log(selections)}
+          />
         </Box>
         <Box mt={2}>
-          <Typography>Labels</Typography>
-          <Divider />
+          <MultiSelectList
+            label="Labels"
+            items={Object.keys(labels).map((l, i) => ({ id: i, label: `${labels[l]}x ${l}`, value: `label:"${l}"` }))}
+            onChange={selections => console.log(selections)}
+          />
         </Box>
         <Box mt={2}>
           <Typography>Personal Filters</Typography>

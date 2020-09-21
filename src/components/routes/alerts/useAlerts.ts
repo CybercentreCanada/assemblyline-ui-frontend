@@ -69,6 +69,9 @@ interface UsingAlerts {
   total: number;
   items: AlertItem[];
   query: SearchQuery;
+  labelFilters: any;
+  priorityFilters: any;
+  statusFilters: any;
   onLoad: () => void;
   onLoadMore: () => void;
   onGet: (id: string, onSuccess: (alert: AlertItem) => void) => void;
@@ -79,12 +82,16 @@ interface UsingAlerts {
 // /api/v4/search/alert/
 
 // Custom Hook implementation for dealing with alerts.
+
 export default function useAlerts(pageSize): UsingAlerts {
   const location = useLocation();
   const apiCall = useMyAPI();
   const { index: fieldIndexes } = useALContext();
   const [query] = useState<SearchQuery>(new SearchQuery(location.pathname, location.search, pageSize));
   const [fields, setFields] = useState<ALField[]>([]);
+  const [statusFilters, setStatuses] = useState<any>();
+  const [priorityFilters, setPriorities] = useState<any>();
+  const [labelFilters, setLabels] = useState<any>();
   const [state, setState] = useState<{ loading: boolean; items: AlertItem[]; total: number }>({
     loading: true,
     total: 0,
@@ -135,6 +142,36 @@ export default function useAlerts(pageSize): UsingAlerts {
     });
   };
 
+  const onLoadStatuses = () => {
+    apiCall({
+      url: '/api/v4/alert/statuses/?offset=0&rows=25&q=&tc=4d&fq=file.sha256:*',
+      onSuccess: api_data => {
+        console.log(api_data);
+        setStatuses(api_data.api_response);
+      }
+    });
+  };
+
+  const onLoadPriorities = () => {
+    apiCall({
+      url: '/api/v4/alert/priorities/?offset=0&rows=25&q=&tc=4d&fq=file.sha256:*',
+      onSuccess: api_data => {
+        console.log(api_data);
+        setPriorities(api_data.api_response);
+      }
+    });
+  };
+
+  const onLoadLabels = () => {
+    apiCall({
+      url: '/api/v4/alert/labels/?offset=0&rows=25&q=&tc=4d&fq=file.sha256:*',
+      onSuccess: api_data => {
+        console.log(api_data);
+        setLabels(api_data.api_response);
+      }
+    });
+  };
+
   // Hook API: fetch the alert for the specified alert_id.
   const onGet = (id: string, onSuccess: (alert: AlertItem) => void) => {
     const url = `/api/v4/alert/${id}/`;
@@ -150,6 +187,9 @@ export default function useAlerts(pageSize): UsingAlerts {
   // By default load 25 items with no search crit.
   useEffect(() => {
     onLoad();
+    onLoadStatuses();
+    onLoadPriorities();
+    onLoadLabels();
   }, []);
 
   // transform alert fields into array.
@@ -164,5 +204,5 @@ export default function useAlerts(pageSize): UsingAlerts {
   }, [fieldIndexes]);
 
   // UseAlert Hook API.
-  return { ...state, fields, query, onLoad, onLoadMore, onGet };
+  return { ...state, fields, query, statusFilters, priorityFilters, labelFilters, onLoad, onLoadMore, onGet };
 }

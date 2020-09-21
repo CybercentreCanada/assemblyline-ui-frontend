@@ -73,7 +73,9 @@ interface InfiniteListFrame<I extends InfiniteListItem> {
   sT: number;
   fH: number;
   rH: number;
-  displayItems: { index: number; isLoaded: boolean; item: I }[];
+  startIndex: number;
+  endIndex: number;
+  displayItems: { index: number; item: I }[];
 }
 
 // Specification interface modelling an InfiniteList item.
@@ -121,7 +123,14 @@ export default function InfiniteList<I extends InfiniteListItem>({
   const innerEl = useRef<HTMLDivElement>();
 
   // Store the current frame in state.
-  const [frame, setFrame] = useState<InfiniteListFrame<I>>({ displayItems: [], sT: -1, fH: -1, rH: -1 });
+  const [frame, setFrame] = useState<InfiniteListFrame<I>>({
+    displayItems: [],
+    startIndex: -1,
+    endIndex: -1,
+    sT: -1,
+    fH: -1,
+    rH: -1
+  });
 
   // Track cursor index position for keyboard navigation.
   const [cursor, setCursor] = useState<number>(-1);
@@ -135,31 +144,27 @@ export default function InfiniteList<I extends InfiniteListItem>({
     const tH = _innerEl.getBoundingClientRect().height;
     const fH = _containerEl.getBoundingClientRect().height;
     const sT = _containerEl.scrollTop;
+
     // current position of scroll at bottom of frame.
     const cP = fH + sT;
+
     // remaining height, hidden height, i.e. what's overflowing under scroll.
     const rH = tH - cP;
+
     // given the specified row height, how many items we can show in a frame.
     const itemCount = Math.ceil(fH / _rowHeight) + 1;
-    // the total index of the first element shown.
-    const topIndex = Math.floor(sT / _rowHeight);
 
-    //
-    // const displayItems = [];
-    // for (let i = topIndex; i < topIndex + itemCount; i++) {
-    //   if (_items.some(item => item.index === i)) {
-    //     displayItems.push({ index: i, isLoaded: true, item: _items[i] });
-    //   } else {
-    //     displayItems.push({ index: i, isLoaded: false, item: null });
-    //   }
-    // }
+    // the total index of the first element shown.
+    const startIndex = Math.floor(sT / _rowHeight);
+    const endIndex = startIndex + itemCount;
 
     // extract all the elements that we'll show in a frame..
     const displayItems = _items
-      .slice(topIndex, topIndex + itemCount)
-      .map((item, index) => ({ index: topIndex + index, isLoaded: topIndex + index < _items.length, item }));
+      .slice(startIndex, endIndex + 1)
+      .map((item, index) => ({ index: startIndex + index, item }));
+
     // Give it back ... someone, or something, needs to know!
-    return { displayItems, sT, rH, fH };
+    return { displayItems, sT, rH, fH, startIndex, endIndex };
   };
 
   // Handler::OnScroll
@@ -235,7 +240,7 @@ export default function InfiniteList<I extends InfiniteListItem>({
 
   // Row renderer.
   // Each item is is relatively positioned withing the absolutely position [infiniteListFrame] container.
-  const rowRenderer = (displayItem: { index: number; isLoaded: boolean; item: I }) => {
+  const rowRenderer = (displayItem: { index: number; item: I }) => {
     return (
       <Box mr={0} key={`listitem[${displayItem.index}]`} onClick={() => onItemClick(displayItem)} display="relative">
         <Box
@@ -244,7 +249,7 @@ export default function InfiniteList<I extends InfiniteListItem>({
           data-listitemselected={displayItem.item && displayItem.item === selected}
           data-listitemfocus={displayItem.index === cursor}
         >
-          {displayItem.isLoaded ? onRenderItem(displayItem.item) : '...loading'}
+          {onRenderItem(displayItem.item)}
         </Box>
         <Divider />
       </Box>
@@ -288,7 +293,7 @@ export default function InfiniteList<I extends InfiniteListItem>({
         <div
           className={classes.infiniteListFrame}
           style={{
-            top: frame.sT
+            top: frame.startIndex * rowHeight
           }}
         >
           {frame.displayItems.map(item => rowRenderer(item))}

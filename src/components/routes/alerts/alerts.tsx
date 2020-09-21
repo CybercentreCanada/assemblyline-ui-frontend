@@ -33,7 +33,19 @@ const useStyles = makeStyles(theme => ({
 const Alerts: React.FC = () => {
   const classes = useStyles();
   const theme = useTheme();
-  const { loading, items, total, fields, query, onLoad, onLoadMore, onGet } = useAlerts(PAGE_SIZE);
+  const {
+    loading,
+    items,
+    total,
+    fields,
+    query,
+    statusFilters,
+    priorityFilters,
+    labelFilters,
+    onLoad,
+    onLoadMore,
+    onGet
+  } = useAlerts(PAGE_SIZE);
   const [searching, setSearching] = useState<boolean>(false);
   const [scrollReset, setScrollReset] = useState<boolean>(false);
   const [splitPanel, setSplitPanel] = useState<{ open: boolean; item: AlertItem }>({ open: false, item: null });
@@ -53,7 +65,7 @@ const Alerts: React.FC = () => {
     }
 
     // Update query and url before reloading data.
-    query.setQuery(filterValue).apply();
+    query.reset().setQuery(filterValue).apply();
 
     // Reload.
     onLoad();
@@ -171,7 +183,12 @@ const Alerts: React.FC = () => {
           {
             filter: (
               <Box minWidth={600} p={theme.spacing(0.5)}>
-                <AlertsFilters onApplyBtnClick={_onSearch} />
+                <AlertsFilters
+                  statuses={statusFilters}
+                  priorities={priorityFilters}
+                  labels={labelFilters}
+                  onApplyBtnClick={_onSearch}
+                />
               </Box>
             )
           }[drawer.type]
