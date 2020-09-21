@@ -35,8 +35,9 @@ interface ClassificationProps {
   c12n: string;
   setClassification?: (classification: string) => void;
   size?: 'medium' | 'small' | 'tiny';
-  type?: 'picker' | 'pill' | 'text';
+  type?: 'picker' | 'pill' | 'outlined' | 'text';
   format?: FormatProp;
+  inline: boolean;
   isUser: boolean;
 }
 
@@ -44,10 +45,52 @@ const useStyles = makeStyles(theme => ({
   classification: {
     fontWeight: 500,
     width: '100%'
+  },
+  inlineSkel: {
+    display: 'inline-block',
+    width: '8rem',
+    verticalAlign: 'bottom'
+  },
+  // Text Color
+  default: {
+    fontWeight: 500,
+    color: theme.palette.type === 'dark' ? '#AAA' : '#888'
+  },
+  primary: {
+    fontWeight: 500,
+    color: theme.palette.primary.main
+  },
+  secondary: {
+    fontWeight: 500,
+    color: theme.palette.secondary.main
+  },
+  success: {
+    fontWeight: 500,
+    color: theme.palette.type !== 'dark' ? theme.palette.success.dark : theme.palette.success.light
+  },
+  info: {
+    fontWeight: 500,
+    color: theme.palette.type !== 'dark' ? theme.palette.info.dark : theme.palette.info.light
+  },
+  warning: {
+    fontWeight: 500,
+    color: theme.palette.type !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
+  },
+  error: {
+    fontWeight: 500,
+    color: theme.palette.type !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
   }
 }));
 
-export default function Classification({ c12n, format, setClassification, size, type, isUser }: ClassificationProps) {
+export default function Classification({
+  c12n,
+  format,
+  inline,
+  setClassification,
+  size,
+  type,
+  isUser
+}: ClassificationProps) {
   const classes = useStyles();
   const { t } = useTranslation();
   const theme = useTheme();
@@ -156,15 +199,21 @@ export default function Classification({ c12n, format, setClassification, size, 
   return currentUser.c12n_enforcing ? (
     c12nDef && c12n ? (
       <>
-        <CustomChip
-          type="classification"
-          variant={type === 'text' ? 'outlined' : 'default'}
-          size={size}
-          color={computeColor()}
-          className={classes.classification}
-          label={normalizedClassification(validated.parts, c12nDef, format, isMobile)}
-          onClick={type === 'picker' ? () => setShowPicker(true) : null}
-        />
+        <Box display={inline ? 'inline-block' : null} className={type === 'text' ? classes[computeColor()] : null}>
+          {type === 'text' ? (
+            normalizedClassification(validated.parts, c12nDef, format, isMobile)
+          ) : (
+            <CustomChip
+              type="classification"
+              variant={type === 'outlined' ? 'outlined' : 'default'}
+              size={size}
+              color={computeColor()}
+              className={classes.classification}
+              label={normalizedClassification(validated.parts, c12nDef, format, isMobile)}
+              onClick={type === 'picker' ? () => setShowPicker(true) : null}
+            />
+          )}
+        </Box>
         {type === 'picker' ? (
           <Dialog
             fullScreen={isPhone}
@@ -292,7 +341,7 @@ export default function Classification({ c12n, format, setClassification, size, 
         ) : null}
       </>
     ) : (
-      <Skeleton style={{ height: skelheight[size] }} />
+      <Skeleton className={inline ? classes.inlineSkel : null} style={{ height: skelheight[size] }} />
     )
   ) : null;
 }
@@ -302,5 +351,6 @@ Classification.defaultProps = {
   size: 'medium' as 'medium',
   type: 'pill' as 'pill',
   format: 'short' as 'short',
+  inline: false,
   isUser: false
 };
