@@ -10,18 +10,18 @@ import UserProfile from 'commons/components/layout/topnav/UserProfile';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-function HideOnScroll(props) {
-  const { children, window, enabled } = props;
+function HideOnScroll({ children, enabled }) {
   const trigger = useScrollTrigger({
     disableHysteresis: true,
-    threshold: 0,
-    target: window ? window() : undefined
+    threshold: 0
   });
 
-  return (
-    <Slide appear={false} direction="down" in={!trigger || !enabled}>
+  return enabled ? (
+    <Slide appear={false} direction="down" in={!trigger}>
       {children}
     </Slide>
+  ) : (
+    <>{children}</>
   );
 }
 

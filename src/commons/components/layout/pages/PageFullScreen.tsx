@@ -25,11 +25,11 @@ const useStyles = (isFullscreen, topbarShown) => {
     toggle: {
       position: 'fixed',
       right: isFullscreen ? '30px' : '20px',
-      top: isFullscreen || !topbarShown ? '20px' : '70px',
+      top: isFullscreen || !topbarShown ? '20px' : '84px',
       zIndex: theme.zIndex.appBar + 1,
       transition: theme.transitions.create('top', {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen
+        easing: theme.transitions.easing.easeInOut,
+        duration: '0.15s'
       }),
       [theme.breakpoints.down('xs')]: {
         right: '16px',
@@ -39,12 +39,10 @@ const useStyles = (isFullscreen, topbarShown) => {
   }))();
 };
 
-function MoveOnScroll(props) {
-  const { children, window, enabled, isFullscreen } = props;
+function MoveOnScroll({ children, enabled, isFullscreen }) {
   const trigger = useScrollTrigger({
     disableHysteresis: true,
-    threshold: 0,
-    target: window ? window() : undefined
+    threshold: 0
   });
 
   const classes = useStyles(isFullscreen, !trigger || !enabled);
