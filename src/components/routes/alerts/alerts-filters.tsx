@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import { Box, Button, Divider, TextField, Typography, useTheme } from '@material-ui/core';
+import { Box, Button, Divider, makeStyles, TextField, Typography, useTheme } from '@material-ui/core';
 import { Autocomplete } from '@material-ui/lab';
 import MultiSelect, { MultiSelectItem } from 'components/elements/mui/multiselect';
 import React, { useEffect, useState } from 'react';
@@ -7,6 +7,12 @@ import React, { useEffect, useState } from 'react';
 const DEFAULT_TC = { value: '4d', label: '4 Days' };
 
 const DEFAULT_GROUPBY = { value: 'file.sha256', label: 'file.sha256' };
+
+const useStyles = makeStyles(theme => ({
+  option: {
+    backgroundColor: theme.palette.background.default
+  }
+}));
 
 export interface AlertFilterSelections {
   tc: { value: string; label: string };
@@ -34,6 +40,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
   onClearBtnClick
 }) => {
   const theme = useTheme();
+  const classes = useStyles();
   const [selectedTc, setSelectedTc] = useState<{ value: string; label: string }>(selectedFilters.tc);
   const [selectedGroupBy, setSelectedGroupBy] = useState<{ value: string; label: string }>(selectedFilters.groupBy);
   const [selectedStatusFilters, setSelectedStatusFilters] = useState<MultiSelectItem[]>(selectedFilters.statuses);
@@ -86,6 +93,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
         <Box>
           <Autocomplete
             fullWidth
+            classes={{ option: classes.option }}
             options={[
               { value: '', label: 'None (slow)' },
               { value: '24h', label: '24 hours' },
@@ -101,6 +109,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
         <Box mt={2}>
           <Autocomplete
             fullWidth
+            classes={{ option: classes.option }}
             options={[
               DEFAULT_GROUPBY,
               { value: 'file.md5', label: 'file.md5' },
@@ -149,11 +158,11 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
         </Box>
       </Box>
       <Box mt={1}>
-        <Button variant="contained" color="primary" onClick={_onApplyBtnClick} size="small">
+        <Button variant="contained" color="primary" onClick={_onApplyBtnClick}>
           Apply
         </Button>
         <Box mr={1} display="inline-block" />
-        <Button variant="contained" onClick={onClearBtnClick} size="small">
+        <Button variant="contained" onClick={onClearBtnClick}>
           Clear
         </Button>
       </Box>

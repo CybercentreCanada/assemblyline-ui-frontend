@@ -26,19 +26,19 @@ const useStyles = makeStyles(theme => ({
     flex: '0 0 auto',
     overflow: 'auto',
     transition: 'width 0.2s ease 0'
-  },
-  // Maybe move this to App.tsx to truely make it global?
-  '@global': {
-    '*::-webkit-scrollbar': {
-      width: '0.8em'
-    },
-    '*::-webkit-scrollbar-track': {
-      '-webkit-box-shadow': 'inset 0 0 6px rgba(0,0,0,0.00)'
-    },
-    '*::-webkit-scrollbar-thumb': {
-      backgroundColor: 'rgba(0,0,0,.25)'
-    }
   }
+  // Maybe move this to App.tsx to truely make it global?
+  // '@global': {
+  //   '*::-webkit-scrollbar': {
+  //     width: '0.8em'
+  //   },
+  //   '*::-webkit-scrollbar-track': {
+  //     '-webkit-box-shadow': 'inset 0 0 6px rgba(0,0,0,0.00)'
+  //   },
+  //   '*::-webkit-scrollbar-thumb': {
+  //     backgroundColor: 'rgba(0,0,0,.25)'
+  //   }
+  // }
 }));
 
 type SplitPanelProps = {
