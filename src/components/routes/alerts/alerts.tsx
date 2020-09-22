@@ -52,6 +52,8 @@ const Alerts: React.FC = () => {
   const [splitPanel, setSplitPanel] = useState<{ open: boolean; item: AlertItem }>({ open: false, item: null });
   const [drawer, setDrawer] = useState<{ open: boolean; type: 'filter' }>({ open: false, type: null });
   const [selectedFilters, setSelectedFilters] = useState<AlertFilterSelections>({
+    tc: null,
+    groupBy: null,
     statuses: [],
     priorities: [],
     labels: []
@@ -115,7 +117,7 @@ const Alerts: React.FC = () => {
 
   // Hanlder for when clicking one the AlertsFilters 'Apply' button.
   const onApplyFilters = (filters: AlertFilterSelections) => {
-    console.log('applying filters...');
+    // console.log('applying filters...');
     console.log(filters);
 
     // update the state of the selected filters so they are intialized next time drawer opens.
@@ -137,6 +139,10 @@ const Alerts: React.FC = () => {
 
     // Close the Filters drawer.
     setDrawer({ ...drawer, open: false });
+  };
+
+  const onClearFilters = () => {
+    setSelectedFilters({ tc: null, groupBy: null, statuses: [], priorities: [], labels: [] });
   };
 
   return (
@@ -224,6 +230,7 @@ const Alerts: React.FC = () => {
                   priorityFilters={priorityFilters}
                   labelFilters={labelFilters}
                   onApplyBtnClick={onApplyFilters}
+                  onClearBtnClick={onClearFilters}
                 />
               </Box>
             )

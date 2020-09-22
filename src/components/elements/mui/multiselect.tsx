@@ -1,6 +1,12 @@
-import { TextField } from '@material-ui/core';
+import { makeStyles, TextField } from '@material-ui/core';
 import { Autocomplete } from '@material-ui/lab';
 import React from 'react';
+
+const useStyles = makeStyles(theme => ({
+  option: {
+    backgroundColor: theme.palette.background.default
+  }
+}));
 
 export interface MultiSelectItem {
   id: number | string;
@@ -16,8 +22,10 @@ interface MultiSelectProps {
 }
 
 const MultiSelect: React.FC<MultiSelectProps> = ({ label, selections, items, onChange }) => {
+  const classes = useStyles();
   return (
     <Autocomplete
+      classes={{ option: classes.option }}
       multiple
       options={items}
       value={selections}

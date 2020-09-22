@@ -1,20 +1,11 @@
 /* eslint-disable no-param-reassign */
-import {
-  Box,
-  Button,
-  Divider,
-  FormControl,
-  InputLabel,
-  makeStyles,
-  Select,
-  Typography,
-  useTheme
-} from '@material-ui/core';
+import { Box, Button, Divider, makeStyles, TextField, Typography, useTheme } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import FilterListIcon from '@material-ui/icons/FilterList';
+import { Autocomplete } from '@material-ui/lab';
 import { PageHeaderAction } from 'commons/components/layout/pages/PageHeader';
 import MultiSelect, { MultiSelectItem } from 'components/elements/mui/multiselect';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const useStyles = makeStyles(theme => ({
   formControl: {
@@ -50,7 +41,13 @@ const actions: PageHeaderAction[] = [
   }
 ];
 
+export const DEFAULT_TC = { value: '4d', label: '4 Days' };
+
+export const DEFAULT_GROUPBY = { value: 'file.sha256', label: 'file.sha256' };
+
 export interface AlertFilterSelections {
+  tc: { value: string; label: string };
+  groupBy: { value: string; label: string };
   statuses: MultiSelectItem[];
   priorities: MultiSelectItem[];
   labels: MultiSelectItem[];
@@ -62,6 +59,7 @@ interface AlertsFiltersProps {
   priorityFilters: MultiSelectItem[];
   labelFilters: MultiSelectItem[];
   onApplyBtnClick: (filters: AlertFilterSelections) => void;
+  onClearBtnClick: () => void;
 }
 
 const AlertsFilters: React.FC<AlertsFiltersProps> = ({
@@ -69,14 +67,25 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
   statusFilters,
   priorityFilters,
   labelFilters,
-  onApplyBtnClick
+  onApplyBtnClick,
+  onClearBtnClick
 }) => {
   const theme = useTheme();
   const classes = useStyles();
 
+  const [selectedTc, setSelectedTc] = useState<{ value: string; label: string }>(selectedFilters.tc);
+  const [selectedGroupBy, setSelectedGroupBy] = useState<{ value: string; label: string }>(selectedFilters.groupBy);
   const [selectedStatusFilters, setSelectedStatusFilters] = useState<MultiSelectItem[]>(selectedFilters.statuses);
   const [selectedPriorityFilters, setSelectedPriorityFilters] = useState<MultiSelectItem[]>(selectedFilters.priorities);
   const [selectedLabelFilters, setSelectedLabelFilters] = useState<MultiSelectItem[]>(selectedFilters.labels);
+
+  const onTcFilterChange = (value: { value: string; label: string }) => {
+    setSelectedTc(value);
+  };
+
+  const onGroupByFilterChange = (value: { value: string; label: string }) => {
+    setSelectedGroupBy(value);
+  };
 
   const onStatusFilterChange = (selections: MultiSelectItem[]) => {
     setSelectedStatusFilters(selections);
@@ -90,56 +99,58 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
     setSelectedLabelFilters(selections);
   };
 
-  const _onApplyBntClick = () => {
+  const _onApplyBtnClick = () => {
     onApplyBtnClick({
+      tc: selectedTc,
+      groupBy: selectedGroupBy,
       statuses: selectedStatusFilters,
       priorities: selectedPriorityFilters,
       labels: selectedLabelFilters
     });
   };
 
+  useEffect(() => {
+    setSelectedTc(selectedFilters.tc);
+    setSelectedGroupBy(selectedFilters.groupBy);
+    setSelectedStatusFilters(selectedFilters.statuses);
+    setSelectedPriorityFilters(selectedFilters.priorities);
+    setSelectedLabelFilters(selectedFilters.labels);
+  }, [selectedFilters]);
+
   return (
     <Box>
-      <Typography variant="h6">Filter</Typography>
+      <Typography variant="h6">Filters</Typography>
       <Divider />
       <Box mt={theme.spacing(0.4)} p={theme.spacing(0.1)}>
         <Box>
-          <FormControl variant="outlined" className={classes.formControl}>
-            <InputLabel htmlFor="timeconstraits-native-required">Time Constraint</InputLabel>
-            <Select
-              value={1}
-              label="Time Constraint"
-              onChange={event => console.log(event.target.value)}
-              name="age"
-              inputProps={{
-                id: 'timeconstraits-native-required'
-              }}
-            >
-              <option value={1}>None (slow)</option>
-              <option value={2}>24 4ours</option>
-              <option value={3}>4 Days</option>
-              <option value={4}>1 Week</option>
-            </Select>
-          </FormControl>
-          <FormControl variant="outlined" className={classes.formControl}>
-            <InputLabel htmlFor="groupby-native-required">Group By</InputLabel>
-            <Select
-              value={1}
-              label="Group By"
-              onChange={event => console.log(event.target.value)}
-              name="age"
-              inputProps={{
-                id: 'groupby-native-required'
-              }}
-            >
-              <option value={1}>file.sha256</option>
-              <option value={2}>file.md5</option>
-              <option value={3}>file.name</option>
-              <option value={4}>file.sha1</option>
-              <option value={5}>priority</option>
-              <option value={6}>status</option>
-            </Select>
-          </FormControl>
+          <Autocomplete
+            options={[
+              { value: '', label: 'None (slow)' },
+              { value: '24h', label: '24 hours' },
+              { value: '4d', label: '4 Days' },
+              { value: '1w', label: '1 Week' }
+            ]}
+            value={selectedTc || DEFAULT_TC}
+            getOptionLabel={option => option.label}
+            renderInput={params => <TextField {...params} label="Time Constraint" variant="outlined" />}
+            onChange={(event, value) => onTcFilterChange(value as { value: string; label: string })}
+          />
+        </Box>
+        <Box mt={2}>
+          <Autocomplete
+            options={[
+              { value: 'file.sha256', label: 'file.sha256' },
+              { value: 'file.md5', label: 'file.md5' },
+              { value: 'file.name', label: 'file.name' },
+              { value: 'file.sha1', label: 'file.sha1' },
+              { value: 'priority', label: 'priority' },
+              { value: 'status', label: 'status' }
+            ]}
+            value={selectedGroupBy || DEFAULT_GROUPBY}
+            getOptionLabel={option => option.label}
+            renderInput={params => <TextField {...params} label="Group By" variant="outlined" />}
+            onChange={(event, value) => onGroupByFilterChange(value as { value: string; label: string })}
+          />
         </Box>
         <Box mt={2}>
           <MultiSelect
@@ -175,8 +186,12 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
         </Box>
       </Box>
       <Box mt={1}>
-        <Button variant="contained" color="primary" onClick={_onApplyBntClick}>
+        <Button variant="contained" color="primary" onClick={_onApplyBtnClick} size="small">
           Apply
+        </Button>
+        <Box mr={1} display="inline-block" />
+        <Button variant="contained" onClick={onClearBtnClick} size="small">
+          Clear
         </Button>
       </Box>
     </Box>
