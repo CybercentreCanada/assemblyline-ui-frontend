@@ -86,7 +86,6 @@ export default class SearchQuery {
 
   public addFq(fq: string): SearchQuery {
     this.params.append('fq', fq);
-    console.log(`appending fq[${fq}]`);
     return this;
   }
 
@@ -100,7 +99,7 @@ export default class SearchQuery {
   }
 
   public reset(): SearchQuery {
-    this.setOffset('0').setRows(`${this.pageSize}`).setQuery('').setTc('4d');
+    this.setOffset('0').setRows(`${this.pageSize}`).setQuery('').setTc('4d').clearFq();
     return this;
   }
 
@@ -113,7 +112,6 @@ export default class SearchQuery {
   }
 
   public apply(): void {
-    console.log(this.build());
     window.history.pushState(null, '', this.build());
   }
 }
