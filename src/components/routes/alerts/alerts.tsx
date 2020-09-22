@@ -124,6 +124,7 @@ const Alerts: React.FC = () => {
 
     // Add a [fq] parameter for status/priority/label.
     query.clearFq();
+    query.setTc(filters.tc.value);
     const addFq = (item: MultiSelectItem) => query.addFq(item.value);
     filters.statuses.forEach(addFq);
     filters.priorities.forEach(addFq);

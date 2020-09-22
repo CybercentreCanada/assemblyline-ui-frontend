@@ -23,6 +23,9 @@ interface MultiSelectProps {
 
 const MultiSelect: React.FC<MultiSelectProps> = ({ label, selections, items, onChange }) => {
   const classes = useStyles();
+  const isSelected = (option: MultiSelectItem, value: MultiSelectItem): boolean => {
+    return option.value === value.value;
+  };
   return (
     <Autocomplete
       fullWidth
@@ -31,6 +34,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({ label, selections, items, onC
       options={items}
       value={selections}
       getOptionLabel={option => option.label}
+      getOptionSelected={isSelected}
       renderInput={params => <TextField {...params} label={label} variant="outlined" />}
       onChange={(event, value) => onChange(value as MultiSelectItem[])}
     />

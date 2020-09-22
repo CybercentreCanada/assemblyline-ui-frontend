@@ -85,6 +85,10 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
     setSelectedLabelFilters(selectedFilters.labels);
   }, [selectedFilters]);
 
+  const isSelected = (option, value): boolean => {
+    return option.value === value.value;
+  };
+
   return (
     <Box>
       <Typography variant="h6">Filters</Typography>
@@ -102,6 +106,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
             ]}
             value={selectedTc || DEFAULT_TC}
             getOptionLabel={option => option.label}
+            getOptionSelected={isSelected}
             renderInput={params => <TextField {...params} label="Time Constraint" variant="outlined" />}
             onChange={(event, value) => onTcFilterChange(value as { value: string; label: string })}
           />
@@ -120,6 +125,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
             ]}
             value={selectedGroupBy || DEFAULT_GROUPBY}
             getOptionLabel={option => option.label}
+            getOptionSelected={isSelected}
             renderInput={params => <TextField {...params} label="Group By" variant="outlined" />}
             onChange={(event, value) => onGroupByFilterChange(value as { value: string; label: string })}
           />
