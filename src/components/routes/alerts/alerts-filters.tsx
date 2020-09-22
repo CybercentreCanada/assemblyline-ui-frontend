@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import {
   Box,
   Button,
@@ -12,8 +13,8 @@ import {
 import AddIcon from '@material-ui/icons/Add';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import { PageHeaderAction } from 'commons/components/layout/pages/PageHeader';
-import MultiSelectList from 'components/elements/mui/multiselect-list';
-import React from 'react';
+import MultiSelect, { MultiSelectItem } from 'components/elements/mui/multiselect';
+import React, { useState } from 'react';
 
 const useStyles = makeStyles(theme => ({
   formControl: {
@@ -49,17 +50,54 @@ const actions: PageHeaderAction[] = [
   }
 ];
 
-type AlertsFiltersProps = {
-  statuses: any;
-  priorities: any;
-  labels: any;
-  onApplyBtnClick: () => void;
-};
+export interface AlertFilterSelections {
+  statuses: MultiSelectItem[];
+  priorities: MultiSelectItem[];
+  labels: MultiSelectItem[];
+}
 
-const AlertsFilters: React.FC<AlertsFiltersProps> = ({ statuses, priorities, labels, onApplyBtnClick }) => {
+interface AlertsFiltersProps {
+  selectedFilters: AlertFilterSelections;
+  statusFilters: MultiSelectItem[];
+  priorityFilters: MultiSelectItem[];
+  labelFilters: MultiSelectItem[];
+  onApplyBtnClick: (filters: AlertFilterSelections) => void;
+}
+
+const AlertsFilters: React.FC<AlertsFiltersProps> = ({
+  selectedFilters,
+  statusFilters,
+  priorityFilters,
+  labelFilters,
+  onApplyBtnClick
+}) => {
   const theme = useTheme();
   const classes = useStyles();
-  // console.log(labels);
+
+  const [selectedStatusFilters, setSelectedStatusFilters] = useState<MultiSelectItem[]>(selectedFilters.statuses);
+  const [selectedPriorityFilters, setSelectedPriorityFilters] = useState<MultiSelectItem[]>(selectedFilters.priorities);
+  const [selectedLabelFilters, setSelectedLabelFilters] = useState<MultiSelectItem[]>(selectedFilters.labels);
+
+  const onStatusFilterChange = (selections: MultiSelectItem[]) => {
+    setSelectedStatusFilters(selections);
+  };
+
+  const onPriorityFilterChange = (selections: MultiSelectItem[]) => {
+    setSelectedPriorityFilters(selections);
+  };
+
+  const onLabelFilterChange = (selections: MultiSelectItem[]) => {
+    setSelectedLabelFilters(selections);
+  };
+
+  const _onApplyBntClick = () => {
+    onApplyBtnClick({
+      statuses: selectedStatusFilters,
+      priorities: selectedPriorityFilters,
+      labels: selectedLabelFilters
+    });
+  };
+
   return (
     <Box>
       <Typography variant="h6">Filter</Typography>
@@ -104,32 +142,27 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({ statuses, priorities, lab
           </FormControl>
         </Box>
         <Box mt={2}>
-          <MultiSelectList
+          <MultiSelect
             label="Statuses"
-            items={Object.keys(statuses).map((l, i) => ({
-              id: i,
-              label: `${statuses[l]}x ${l}`,
-              value: `label:"${l}"`
-            }))}
-            onChange={selections => console.log(selections)}
+            selections={selectedStatusFilters}
+            items={statusFilters}
+            onChange={onStatusFilterChange}
           />
         </Box>
         <Box mt={2}>
-          <MultiSelectList
+          <MultiSelect
             label="Priorities"
-            items={Object.keys(priorities).map((l, i) => ({
-              id: i,
-              label: `${priorities[l]}x ${l}`,
-              value: `label:"${l}"`
-            }))}
-            onChange={selections => console.log(selections)}
+            selections={selectedPriorityFilters}
+            items={priorityFilters}
+            onChange={onPriorityFilterChange}
           />
         </Box>
         <Box mt={2}>
-          <MultiSelectList
+          <MultiSelect
             label="Labels"
-            items={Object.keys(labels).map((l, i) => ({ id: i, label: `${labels[l]}x ${l}`, value: `label:"${l}"` }))}
-            onChange={selections => console.log(selections)}
+            selections={selectedLabelFilters}
+            items={labelFilters}
+            onChange={onLabelFilterChange}
           />
         </Box>
         <Box mt={2}>
@@ -142,7 +175,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({ statuses, priorities, lab
         </Box>
       </Box>
       <Box mt={1}>
-        <Button variant="contained" color="primary" onClick={onApplyBtnClick}>
+        <Button variant="contained" color="primary" onClick={_onApplyBntClick}>
           Apply
         </Button>
       </Box>

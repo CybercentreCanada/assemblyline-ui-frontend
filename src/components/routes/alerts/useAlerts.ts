@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { InfiniteListItem } from 'components/elements/lists/infinite-list';
+import { MultiSelectItem } from 'components/elements/mui/multiselect';
 import SearchQuery from 'components/elements/search/search-query';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -89,9 +90,9 @@ export default function useAlerts(pageSize): UsingAlerts {
   const { index: fieldIndexes } = useALContext();
   const [query] = useState<SearchQuery>(new SearchQuery(location.pathname, location.search, pageSize));
   const [fields, setFields] = useState<ALField[]>([]);
-  const [statusFilters, setStatuses] = useState<any>();
-  const [priorityFilters, setPriorities] = useState<any>();
-  const [labelFilters, setLabels] = useState<any>();
+  const [statusFilters, setStatusFilters] = useState<MultiSelectItem[]>();
+  const [priorityFilters, setPriorityFilters] = useState<MultiSelectItem[]>();
+  const [labelFilters, setLabelFilters] = useState<MultiSelectItem[]>();
   const [state, setState] = useState<{ loading: boolean; items: AlertItem[]; total: number }>({
     loading: true,
     total: 0,
@@ -104,8 +105,8 @@ export default function useAlerts(pageSize): UsingAlerts {
   };
 
   // format alert api url using specified indexes.
-  const formatUrl = () => {
-    return `/api/v4/alert/grouped/file.sha256/?offset=${query.getOffset()}&rows=${query.getRows()}&q=${query.getQuery()}`;
+  const buildUrl = () => {
+    return `/api/v4/alert/grouped/file.sha256/?${query.buildQueryString()}`;
   };
 
   // Hook API: load/reload all the alerts from start.
@@ -113,7 +114,7 @@ export default function useAlerts(pageSize): UsingAlerts {
   const onLoad = () => {
     setState({ ...state, loading: true });
     apiCall({
-      url: formatUrl(),
+      url: buildUrl(),
       onSuccess: api_data => {
         const { items: _items, total } = api_data.api_response;
         setState({
@@ -130,7 +131,7 @@ export default function useAlerts(pageSize): UsingAlerts {
     setState({ ...state, loading: true });
     query.tickOffset();
     apiCall({
-      url: formatUrl(),
+      url: query.build(),
       onSuccess: api_data => {
         const { items: _items, total } = api_data.api_response;
         setState({
@@ -142,32 +143,51 @@ export default function useAlerts(pageSize): UsingAlerts {
     });
   };
 
+  // Fetch the Status Filters.
   const onLoadStatuses = () => {
     apiCall({
       url: '/api/v4/alert/statuses/?offset=0&rows=25&q=&tc=4d&fq=file.sha256:*',
       onSuccess: api_data => {
-        console.log(api_data);
-        setStatuses(api_data.api_response);
+        const { api_response: statuses } = api_data;
+        const msItems = Object.keys(statuses).map((k, i) => ({
+          id: i,
+          label: `${statuses[k]}x ${k}`,
+          value: `status:${k}`
+        }));
+        setStatusFilters(msItems);
       }
     });
   };
 
+  // Fetch the Priority Filters.
   const onLoadPriorities = () => {
     apiCall({
       url: '/api/v4/alert/priorities/?offset=0&rows=25&q=&tc=4d&fq=file.sha256:*',
       onSuccess: api_data => {
-        console.log(api_data);
-        setPriorities(api_data.api_response);
+        const { api_response: priorities } = api_data;
+        const msItems = Object.keys(priorities).map((k, i) => ({
+          id: i,
+          label: `${priorities[k]}x ${k}`,
+          value: `priority:${k}`
+        }));
+        setPriorityFilters(msItems);
       }
     });
   };
 
+  // Fetch the Label Filters.
   const onLoadLabels = () => {
     apiCall({
       url: '/api/v4/alert/labels/?offset=0&rows=25&q=&tc=4d&fq=file.sha256:*',
       onSuccess: api_data => {
-        console.log(api_data);
-        setLabels(api_data.api_response);
+        const { api_response: labels } = api_data;
+        console.log(labels);
+        const msItems = Object.keys(labels).map((k, i) => ({
+          id: i,
+          label: `${labels[k]}x ${k}`,
+          value: `label:${k}`
+        }));
+        setLabelFilters(msItems);
       }
     });
   };
@@ -178,7 +198,6 @@ export default function useAlerts(pageSize): UsingAlerts {
     apiCall({
       url,
       onSuccess: api_data => {
-        console.log(api_data.api_response);
         onSuccess(api_data.api_response);
       }
     });
@@ -204,5 +223,15 @@ export default function useAlerts(pageSize): UsingAlerts {
   }, [fieldIndexes]);
 
   // UseAlert Hook API.
-  return { ...state, fields, query, statusFilters, priorityFilters, labelFilters, onLoad, onLoadMore, onGet };
+  return {
+    ...state,
+    fields,
+    query,
+    statusFilters,
+    priorityFilters,
+    labelFilters,
+    onLoad,
+    onLoadMore,
+    onGet
+  };
 }

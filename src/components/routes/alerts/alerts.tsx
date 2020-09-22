@@ -3,6 +3,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import InfiniteList from 'components/elements/lists/infinite-list';
+import { MultiSelectItem } from 'components/elements/mui/multiselect';
 import SplitPanel from 'components/elements/panels/split-panel';
 import Viewport from 'components/elements/panels/viewport';
 import SearchBar from 'components/elements/search/search-bar';
@@ -10,7 +11,7 @@ import React, { useState } from 'react';
 import AlertActionsMenu from './alert-actions-menu';
 import AlertDetails from './alert-details';
 import AlertListItem from './alert-list-item';
-import AlertsFilters from './alerts-filters';
+import AlertsFilters, { AlertFilterSelections } from './alerts-filters';
 import useAlerts, { AlertItem } from './useAlerts';
 
 const PAGE_SIZE = 25;
@@ -50,6 +51,11 @@ const Alerts: React.FC = () => {
   const [scrollReset, setScrollReset] = useState<boolean>(false);
   const [splitPanel, setSplitPanel] = useState<{ open: boolean; item: AlertItem }>({ open: false, item: null });
   const [drawer, setDrawer] = useState<{ open: boolean; type: 'filter' }>({ open: false, type: null });
+  const [selectedFilters, setSelectedFilters] = useState<AlertFilterSelections>({
+    statuses: [],
+    priorities: [],
+    labels: []
+  });
 
   //
   const _onSearch = (filterValue: string = '', inputEl: HTMLInputElement = null) => {
@@ -80,6 +86,7 @@ const Alerts: React.FC = () => {
     }, 1000);
   };
 
+  // Handler for when clearing the SearchBar.
   const onClearSearch = () => {
     // Reset the query.
     query.reset().apply();
@@ -89,6 +96,7 @@ const Alerts: React.FC = () => {
     onLoad();
   };
 
+  // Handler for when an item of the InfiniteList is selected.
   const onItemSelected = (item: AlertItem) => {
     if (item) {
       onGet(item.alert_id, alert => {
@@ -99,9 +107,36 @@ const Alerts: React.FC = () => {
     }
   };
 
+  // Handler for when loading more alerts [read bottom of scroll area]
   const _onLoadMore = () => {
     setScrollReset(false);
     onLoadMore();
+  };
+
+  // Hanlder for when clicking one the AlertsFilters 'Apply' button.
+  const onApplyFilters = (filters: AlertFilterSelections) => {
+    console.log('applying filters...');
+    console.log(filters);
+
+    // update the state of the selected filters so they are intialized next time drawer opens.
+    setSelectedFilters(filters);
+
+    // Add a [fq] parameter for status/priority/label.
+    query.clearFq();
+    const addFq = (item: MultiSelectItem) => query.addFq(item.value);
+    filters.statuses.forEach(addFq);
+    filters.priorities.forEach(addFq);
+    filters.labels.forEach(addFq);
+    query.apply();
+
+    // Reinitialize the scroll.
+    setScrollReset(true);
+
+    // Fetch result based on new/updated query.
+    onLoad();
+
+    // Close the Filters drawer.
+    setDrawer({ ...drawer, open: false });
   };
 
   return (
@@ -184,10 +219,11 @@ const Alerts: React.FC = () => {
             filter: (
               <Box minWidth={600} p={theme.spacing(0.5)}>
                 <AlertsFilters
-                  statuses={statusFilters}
-                  priorities={priorityFilters}
-                  labels={labelFilters}
-                  onApplyBtnClick={_onSearch}
+                  selectedFilters={selectedFilters}
+                  statusFilters={statusFilters}
+                  priorityFilters={priorityFilters}
+                  labelFilters={labelFilters}
+                  onApplyBtnClick={onApplyFilters}
                 />
               </Box>
             )

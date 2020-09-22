@@ -8,6 +8,15 @@ export default class SearchQuery {
 
   constructor(private path: string, baseSearch: string, private pageSize: number) {
     this.params = new URLSearchParams(baseSearch);
+    if (!this.hasOffset()) {
+      this.setOffset('0');
+    }
+    if (!this.hasTc()) {
+      this.setTc('4d');
+    }
+    if (!this.hasRows()) {
+      this.setRows(`${pageSize}`);
+    }
   }
 
   public setRows(rows: string): SearchQuery {
@@ -62,9 +71,41 @@ export default class SearchQuery {
     return this.hasQuery() ? this.params.get('q') : '';
   }
 
-  public reset(): SearchQuery {
-    this.setOffset('0').setRows(`${this.pageSize}`).setQuery('');
+  public setTc(tc: string): SearchQuery {
+    this.params.set('tc', tc);
     return this;
+  }
+
+  public hasTc(): boolean {
+    return this.params.has('tc');
+  }
+
+  public getTc(): string {
+    return this.hasTc() ? this.params.get('tc') : '';
+  }
+
+  public addFq(fq: string): SearchQuery {
+    this.params.append('fq', fq);
+    console.log(`appending fq[${fq}]`);
+    return this;
+  }
+
+  public getFqList(): string[] {
+    return this.params.getAll('fq');
+  }
+
+  public clearFq(): SearchQuery {
+    this.params.delete('fq');
+    return this;
+  }
+
+  public reset(): SearchQuery {
+    this.setOffset('0').setRows(`${this.pageSize}`).setQuery('').setTc('4d');
+    return this;
+  }
+
+  public buildQueryString(): string {
+    return this.params.toString();
   }
 
   public build(): string {
