@@ -1,10 +1,20 @@
-import { makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
+import {
+  Checkbox,
+  FormControlLabel,
+  Grid,
+  makeStyles,
+  MenuItem,
+  Select,
+  useMediaQuery,
+  useTheme
+} from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Tab from '@material-ui/core/Tab';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
+import { Skeleton } from '@material-ui/lab';
 import TabContext from '@material-ui/lab/TabContext';
 import TabList from '@material-ui/lab/TabList';
 import TabPanel from '@material-ui/lab/TabPanel';
@@ -13,6 +23,7 @@ import useUser from 'commons/components/hooks/useAppUser';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
+import ServiceTree from 'components/layout/serviceTree';
 import Classification from 'components/visual/Classification';
 import FileDropper from 'components/visual/FileDropper';
 import React, { useEffect, useState } from 'react';
@@ -26,6 +37,8 @@ function Submit() {
   const theme = useTheme();
   const { user: currentUser } = useUser<CustomUser>();
   const [settings, setSettings] = useState(null);
+  const [url, setUrl] = useState('');
+  const [file, setFile] = useState(null);
   const [value, setValue] = useState('0');
   const downSM = useMediaQuery(theme.breakpoints.down('sm'));
   const md = useMediaQuery(theme.breakpoints.only('md'));
@@ -37,9 +50,21 @@ function Submit() {
   const useStyles = makeStyles(curTheme => ({
     no_pad: {
       padding: 0
+    },
+    item: {
+      width: '100%',
+      '&:hover': {
+        background: theme.palette.action.hover
+      }
     }
   }));
   const classes = useStyles();
+
+  function setSettingValue(field, fieldValue) {
+    if (settings) {
+      setSettings({ ...settings, [field]: fieldValue });
+    }
+  }
 
   function setClassification(c12n) {
     if (settings) {
@@ -59,7 +84,7 @@ function Submit() {
   }, []);
 
   return (
-    <PageCenter maxWidth={md ? '630px' : downSM ? '100%' : '960px'}>
+    <PageCenter maxWidth={md ? '800px' : downSM ? '100%' : '1024px'}>
       <Box display="inline-block" textAlign="center" width="100%">
         <Box display="inline-block" marginBottom="2rem">
           {getBanner(theme)}
@@ -87,7 +112,7 @@ function Submit() {
           </Paper>
           <TabPanel value="0" className={classes.no_pad}>
             <Box marginTop="30px">
-              <FileDropper />
+              <FileDropper file={file} setFile={setFile} />
               {currentUser.has_tos ? (
                 <Box mt="50px" textAlign="center">
                   <Typography variant="body2">
@@ -108,7 +133,10 @@ function Submit() {
               <TextField
                 label={t('url.input')}
                 size="small"
+                type="url"
                 variant="outlined"
+                value={url}
+                onChange={event => setUrl(event.target.value)}
                 style={{ flexGrow: 1, marginRight: '1rem' }}
               />
               <Button color="primary" variant="contained">
@@ -130,9 +158,192 @@ function Submit() {
             ) : null}
           </TabPanel>
           <TabPanel value="2" className={classes.no_pad}>
-            <Box marginTop="30px">
-              <p>{t('options.desc')}</p>
-            </Box>
+            <Grid container spacing={1}>
+              <Grid item xs={12} md>
+                <Box pl={2} textAlign="left" mt={5}>
+                  <Typography variant="h6" gutterBottom>
+                    {t('options.service')}
+                  </Typography>
+                  <ServiceTree size="small" settings={settings} setSettings={setSettings} useMasonery={false} />
+                </Box>
+              </Grid>
+              <Grid item xs={12} md>
+                <Box textAlign="left" mt={5}>
+                  <Typography variant="h6" gutterBottom>
+                    {t('options.submission')}
+                  </Typography>
+                  <Box py={1}>
+                    <Typography variant="caption" color="textSecondary" gutterBottom>
+                      {t('options.submission.desc')}
+                    </Typography>
+                    {settings ? (
+                      <TextField
+                        id="desc"
+                        size="small"
+                        type="text"
+                        value={settings.description}
+                        onChange={event => setSettingValue('description', event.target.value)}
+                        InputLabelProps={{
+                          shrink: true
+                        }}
+                        variant="outlined"
+                        fullWidth
+                      />
+                    ) : (
+                      <Skeleton style={{ height: '3rem' }} />
+                    )}
+                  </Box>
+                  <Box py={1}>
+                    <Typography variant="caption" color="textSecondary" gutterBottom>
+                      {t('options.submission.priority')}
+                    </Typography>
+                    {settings ? (
+                      <Select
+                        id="priority"
+                        margin="dense"
+                        value={settings.priority}
+                        variant="outlined"
+                        onChange={event => setSettingValue('priority', event.target.value)}
+                        fullWidth
+                      >
+                        <MenuItem value="500">{t('options.submission.priority.low')}</MenuItem>
+                        <MenuItem value="1000">{t('options.submission.priority.medium')}</MenuItem>
+                        <MenuItem value="1500">{t('options.submission.priority.high')}</MenuItem>
+                      </Select>
+                    ) : (
+                      <Skeleton style={{ height: '3rem' }} />
+                    )}
+                  </Box>
+                  <Box py={1}>
+                    <Box>
+                      <FormControlLabel
+                        control={
+                          settings ? (
+                            <Checkbox
+                              size="small"
+                              checked={settings.ignore_filtering}
+                              name="label"
+                              onChange={event => setSettingValue('ignore_filtering', event.target.checked)}
+                            />
+                          ) : (
+                            <Skeleton
+                              style={{ height: '2rem', width: '1.5rem', marginLeft: '16px', marginRight: '16px' }}
+                            />
+                          )
+                        }
+                        label={<Typography variant="body2">{t('options.submission.ignore_filtering')}</Typography>}
+                        className={settings ? classes.item : null}
+                      />
+                    </Box>
+                    <Box>
+                      <FormControlLabel
+                        control={
+                          settings ? (
+                            <Checkbox
+                              size="small"
+                              checked={settings.ignore_cache}
+                              name="label"
+                              onChange={event => setSettingValue('ignore_cache', event.target.checked)}
+                            />
+                          ) : (
+                            <Skeleton
+                              style={{ height: '2rem', width: '1.5rem', marginLeft: '16px', marginRight: '16px' }}
+                            />
+                          )
+                        }
+                        label={<Typography variant="body2">{t('options.submission.ignore_cache')}</Typography>}
+                        className={settings ? classes.item : null}
+                      />
+                    </Box>
+                    <Box>
+                      <FormControlLabel
+                        control={
+                          settings ? (
+                            <Checkbox
+                              size="small"
+                              checked={settings.ignore_dynamic_recursion_prevention}
+                              name="label"
+                              onChange={event =>
+                                setSettingValue('ignore_dynamic_recursion_prevention', event.target.checked)
+                              }
+                            />
+                          ) : (
+                            <Skeleton
+                              style={{ height: '2rem', width: '1.5rem', marginLeft: '16px', marginRight: '16px' }}
+                            />
+                          )
+                        }
+                        label={
+                          <Typography variant="body2">
+                            {t('options.submission.ignore_dynamic_recursion_prevention')}
+                          </Typography>
+                        }
+                        className={settings ? classes.item : null}
+                      />
+                    </Box>
+                    <Box>
+                      <FormControlLabel
+                        control={
+                          settings ? (
+                            <Checkbox
+                              size="small"
+                              checked={settings.profile}
+                              name="label"
+                              onChange={event => setSettingValue('profile', event.target.checked)}
+                            />
+                          ) : (
+                            <Skeleton
+                              style={{ height: '2rem', width: '1.5rem', marginLeft: '16px', marginRight: '16px' }}
+                            />
+                          )
+                        }
+                        label={<Typography variant="body2">{t('options.submission.profile')}</Typography>}
+                        className={settings ? classes.item : null}
+                      />
+                    </Box>
+                    <Box>
+                      <FormControlLabel
+                        control={
+                          settings ? (
+                            <Checkbox
+                              size="small"
+                              checked={settings.deep_scan}
+                              name="label"
+                              onChange={event => setSettingValue('deep_scan', event.target.checked)}
+                            />
+                          ) : (
+                            <Skeleton
+                              style={{ height: '2rem', width: '1.5rem', marginLeft: '16px', marginRight: '16px' }}
+                            />
+                          )
+                        }
+                        label={<Typography variant="body2">{t('options.submission.deep_scan')}</Typography>}
+                        className={settings ? classes.item : null}
+                      />
+                    </Box>
+                  </Box>
+                  <Box py={1}>
+                    <Typography variant="caption" color="textSecondary" gutterBottom>
+                      {t('options.submission.ttl')}
+                    </Typography>
+                    {settings ? (
+                      <TextField
+                        id="ttl"
+                        size="small"
+                        type="number"
+                        inputProps={{ min: 0, max: 365 }}
+                        value={settings.ttl}
+                        onChange={event => setSettingValue('ttl', event.target.value)}
+                        variant="outlined"
+                        fullWidth
+                      />
+                    ) : (
+                      <Skeleton style={{ height: '3rem' }} />
+                    )}
+                  </Box>
+                </Box>
+              </Grid>
+            </Grid>
           </TabPanel>
         </TabContext>
       </Box>
