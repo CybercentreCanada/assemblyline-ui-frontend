@@ -17,13 +17,12 @@ import useAlerts, { AlertItem } from './useAlerts';
 const PAGE_SIZE = 25;
 
 const useStyles = makeStyles(theme => ({
-  drawer: {
-    [theme.breakpoints.down('sm')]: {
-      position: 'fixed',
-      width: '100vw',
-      top: 0,
-      right: 0,
-      bottom: 0
+  drawerInner: {
+    display: 'flex',
+    flexDirection: 'column',
+    width: '600px',
+    [theme.breakpoints.down('xs')]: {
+      width: '100vw'
     }
   },
   searchresult: {
@@ -141,6 +140,7 @@ const Alerts: React.FC = () => {
     setDrawer({ ...drawer, open: false });
   };
 
+  // Handler for when clicking the 'Clear' button on AlertsFilter.
   const onClearFilters = () => {
     setSelectedFilters({ tc: null, groupBy: null, statuses: [], priorities: [], labels: [] });
   };
@@ -214,16 +214,11 @@ const Alerts: React.FC = () => {
           }
         />
       </Viewport>
-      <Drawer
-        open={drawer.open}
-        anchor="right"
-        onClose={() => setDrawer({ ...drawer, open: false })}
-        className={classes.drawer}
-      >
+      <Drawer open={drawer.open} anchor="right" onClose={() => setDrawer({ ...drawer, open: false })}>
         {
           {
             filter: (
-              <Box minWidth={600} p={theme.spacing(0.5)}>
+              <Box p={theme.spacing(0.5)} className={classes.drawerInner}>
                 <AlertsFilters
                   selectedFilters={selectedFilters}
                   statusFilters={statusFilters}

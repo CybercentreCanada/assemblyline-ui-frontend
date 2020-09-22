@@ -25,6 +25,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({ label, selections, items, onC
   const classes = useStyles();
   return (
     <Autocomplete
+      fullWidth
       classes={{ option: classes.option }}
       multiple
       options={items}

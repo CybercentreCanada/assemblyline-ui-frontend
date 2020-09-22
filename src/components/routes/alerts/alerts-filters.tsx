@@ -1,49 +1,12 @@
 /* eslint-disable no-param-reassign */
-import { Box, Button, Divider, makeStyles, TextField, Typography, useTheme } from '@material-ui/core';
-import AddIcon from '@material-ui/icons/Add';
-import FilterListIcon from '@material-ui/icons/FilterList';
+import { Box, Button, Divider, TextField, Typography, useTheme } from '@material-ui/core';
 import { Autocomplete } from '@material-ui/lab';
-import { PageHeaderAction } from 'commons/components/layout/pages/PageHeader';
 import MultiSelect, { MultiSelectItem } from 'components/elements/mui/multiselect';
 import React, { useEffect, useState } from 'react';
 
-const useStyles = makeStyles(theme => ({
-  formControl: {
-    marginRight: theme.spacing(1),
-    minWidth: 300
-    // width: '100%'
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2)
-  }
-}));
+const DEFAULT_TC = { value: '4d', label: '4 Days' };
 
-const actions: PageHeaderAction[] = [
-  {
-    action: () => console.log(''),
-    icon: <FilterListIcon />,
-    btnProp: {
-      title: 'Filter',
-      color: 'primary',
-      size: 'small',
-      variant: 'contained'
-    }
-  },
-  {
-    action: () => console.log(''),
-    icon: <AddIcon />,
-    btnProp: {
-      title: 'Workflow Filters',
-      color: 'primary',
-      size: 'small',
-      variant: 'contained'
-    }
-  }
-];
-
-export const DEFAULT_TC = { value: '4d', label: '4 Days' };
-
-export const DEFAULT_GROUPBY = { value: 'file.sha256', label: 'file.sha256' };
+const DEFAULT_GROUPBY = { value: 'file.sha256', label: 'file.sha256' };
 
 export interface AlertFilterSelections {
   tc: { value: string; label: string };
@@ -71,8 +34,6 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
   onClearBtnClick
 }) => {
   const theme = useTheme();
-  const classes = useStyles();
-
   const [selectedTc, setSelectedTc] = useState<{ value: string; label: string }>(selectedFilters.tc);
   const [selectedGroupBy, setSelectedGroupBy] = useState<{ value: string; label: string }>(selectedFilters.groupBy);
   const [selectedStatusFilters, setSelectedStatusFilters] = useState<MultiSelectItem[]>(selectedFilters.statuses);
@@ -124,10 +85,11 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
       <Box mt={theme.spacing(0.4)} p={theme.spacing(0.1)}>
         <Box>
           <Autocomplete
+            fullWidth
             options={[
               { value: '', label: 'None (slow)' },
               { value: '24h', label: '24 hours' },
-              { value: '4d', label: '4 Days' },
+              DEFAULT_TC,
               { value: '1w', label: '1 Week' }
             ]}
             value={selectedTc || DEFAULT_TC}
@@ -138,8 +100,9 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
         </Box>
         <Box mt={2}>
           <Autocomplete
+            fullWidth
             options={[
-              { value: 'file.sha256', label: 'file.sha256' },
+              DEFAULT_GROUPBY,
               { value: 'file.md5', label: 'file.md5' },
               { value: 'file.name', label: 'file.name' },
               { value: 'file.sha1', label: 'file.sha1' },
