@@ -2,7 +2,7 @@
 import { Box, Button, Divider, makeStyles, TextField, Typography, useTheme } from '@material-ui/core';
 import { Autocomplete } from '@material-ui/lab';
 import MultiSelect, { MultiSelectItem } from 'components/elements/mui/multiselect';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 const DEFAULT_TC = { value: '4d', label: '4 Days' };
 
@@ -41,8 +41,10 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
 }) => {
   const theme = useTheme();
   const classes = useStyles();
-  const [selectedTc, setSelectedTc] = useState<{ value: string; label: string }>(selectedFilters.tc);
-  const [selectedGroupBy, setSelectedGroupBy] = useState<{ value: string; label: string }>(selectedFilters.groupBy);
+  const [selectedTc, setSelectedTc] = useState<{ value: string; label: string }>(selectedFilters.tc || DEFAULT_TC);
+  const [selectedGroupBy, setSelectedGroupBy] = useState<{ value: string; label: string }>(
+    selectedFilters.groupBy || DEFAULT_GROUPBY
+  );
   const [selectedStatusFilters, setSelectedStatusFilters] = useState<MultiSelectItem[]>(selectedFilters.statuses);
   const [selectedPriorityFilters, setSelectedPriorityFilters] = useState<MultiSelectItem[]>(selectedFilters.priorities);
   const [selectedLabelFilters, setSelectedLabelFilters] = useState<MultiSelectItem[]>(selectedFilters.labels);
@@ -76,14 +78,6 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
       labels: selectedLabelFilters
     });
   };
-
-  useEffect(() => {
-    setSelectedTc(selectedFilters.tc);
-    setSelectedGroupBy(selectedFilters.groupBy);
-    setSelectedStatusFilters(selectedFilters.statuses);
-    setSelectedPriorityFilters(selectedFilters.priorities);
-    setSelectedLabelFilters(selectedFilters.labels);
-  }, [selectedFilters]);
 
   const isSelected = (option, value): boolean => {
     return option.value === value.value;

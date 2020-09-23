@@ -41,7 +41,7 @@ const AlertItemDefault: React.FC<AlertListItemProps> = ({ item }) => {
           </Typography>
         </Grid>
         <Grid item xs={4}>
-          {item.index}
+          {/* {item.index} */}
           <AlertScore score={item.al.score} />
         </Grid>
         <Grid item xs={2}>
