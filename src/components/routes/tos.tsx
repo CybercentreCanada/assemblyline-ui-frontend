@@ -62,7 +62,7 @@ export default function Tos() {
   }
 
   useEffect(() => {
-    if (currentUser.has_tos) {
+    if (currentUser.configuration.ui.tos) {
       apiCall({
         url: '/api/v4/help/tos/',
         onSuccess: api_data => setTos(api_data.api_response)
@@ -71,7 +71,7 @@ export default function Tos() {
     // eslint-disable-next-line
   }, []);
 
-  return currentUser.has_tos ? (
+  return currentUser.configuration.ui.tos ? (
     <PageCenter>
       <Box className={classes.page} display="inline-block" textAlign="center">
         <Box>{getBanner(theme)}</Box>

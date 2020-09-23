@@ -614,7 +614,7 @@ function User({ width, username }: UserProps) {
                       <ChevronRightOutlinedIcon />
                     </TableCell>
                   </TableRow>
-                  {currentUser.allow_2fa ? (
+                  {currentUser.configuration.auth.allow_2fa ? (
                     <TableRow
                       hover
                       style={{ cursor: 'pointer' }}
@@ -629,7 +629,7 @@ function User({ width, username }: UserProps) {
                     </TableRow>
                   ) : null}
                   {user ? (
-                    user['2fa_enabled'] && currentUser.allow_security_tokens ? (
+                    user['2fa_enabled'] && currentUser.configuration.auth.allow_security_tokens ? (
                       <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('token')}>
                         <TableCell width="100%">{user ? t('token') : <Skeleton />}</TableCell>
                         <TableCell align="right">
@@ -638,7 +638,7 @@ function User({ width, username }: UserProps) {
                       </TableRow>
                     ) : null
                   ) : null}
-                  {currentUser.allow_apikeys ? (
+                  {currentUser.configuration.auth.allow_apikeys ? (
                     <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('api_key')}>
                       <TableCell width="100%">{user ? t('apikeys') : <Skeleton />}</TableCell>
                       <TableCell align="right">

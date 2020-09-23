@@ -425,7 +425,7 @@ function Settings<SettingsProps>({ width }) {
                   <ChevronRightOutlinedIcon />
                 </TableCell>
               </TableRow>
-              {currentUser.c12n_enforcing ? (
+              {currentUser.c12nDef.enforce ? (
                 <TableRow style={{ cursor: 'pointer' }}>
                   {isWidthDown('xs', width) ? null : (
                     <TableCell>

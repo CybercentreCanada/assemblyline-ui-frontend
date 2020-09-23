@@ -6,7 +6,6 @@ import UserProvider from 'commons/components/user/UserProvider';
 import useMyLayout from 'components/hooks/useMyLayout';
 import useMySitemap from 'components/hooks/useMySitemap';
 import useMyUser, { CustomUser } from 'components/hooks/useMyUser';
-import ALContextProvider from 'components/providers/ALContextProvider';
 import LoadingScreen from 'components/routes/loading';
 import LockedPage from 'components/routes/locked';
 import LoginScreen from 'components/routes/login';
@@ -109,7 +108,10 @@ const MyApp = () => {
   return {
     load: <LoadingScreen />,
     locked: currentUser ? (
-      <LockedPage hasTOS={currentUser.has_tos} autoNotify={currentUser.tos_auto_notify} />
+      <LockedPage
+        hasTOS={currentUser.configuration.ui.tos}
+        autoNotify={currentUser.configuration.ui.tos_lockout_notify}
+      />
     ) : (
       <LoadingScreen />
     ),
@@ -146,9 +148,7 @@ const App: React.FC = () => {
         <UserProvider {...userProps}>
           <AppLayoutProvider {...layoutProps}>
             <SnackbarProvider>
-              <ALContextProvider>
-                <MyApp />
-              </ALContextProvider>
+              <MyApp />
             </SnackbarProvider>
           </AppLayoutProvider>
         </UserProvider>

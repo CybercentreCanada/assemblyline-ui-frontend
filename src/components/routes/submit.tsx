@@ -89,7 +89,7 @@ function Submit() {
         <Box display="inline-block" marginBottom="2rem">
           {getBanner(theme)}
         </Box>
-        {currentUser.c12n_enforcing ? (
+        {currentUser.c12nDef.enforce ? (
           <Box pb={8}>
             <Box p={1} fontSize={16}>
               {t('classification')}
@@ -113,7 +113,7 @@ function Submit() {
           <TabPanel value="0" className={classes.no_pad}>
             <Box marginTop="30px">
               <FileDropper file={file} setFile={setFile} />
-              {currentUser.has_tos ? (
+              {currentUser.configuration.ui.tos ? (
                 <Box mt="50px" textAlign="center">
                   <Typography variant="body2">
                     {t('terms1')}
@@ -143,7 +143,7 @@ function Submit() {
                 {t('url.button')}
               </Button>
             </Box>
-            {currentUser.has_tos ? (
+            {currentUser.configuration.ui.tos ? (
               <Box mt="50px" textAlign="center">
                 <Typography variant="body2">
                   {t('terms1')}

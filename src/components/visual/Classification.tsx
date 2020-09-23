@@ -15,7 +15,6 @@ import Grid from '@material-ui/core/Grid/Grid';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Skeleton from '@material-ui/lab/Skeleton';
 import useUser from 'commons/components/hooks/useAppUser';
-import useALContext from 'components/hooks/useALContext';
 import { CustomUser } from 'components/hooks/useMyUser';
 import CustomChip, { ColorMap, PossibleColors } from 'components/visual/CustomChip';
 import {
@@ -95,7 +94,6 @@ export default function Classification({
   const { t } = useTranslation();
   const theme = useTheme();
   const { user: currentUser } = useUser<CustomUser>();
-  const { classification: c12nDef } = useALContext();
   const isPhone = useMediaQuery(theme.breakpoints.down('xs'));
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [showPicker, setShowPicker] = useState(false);
@@ -103,11 +101,11 @@ export default function Classification({
   const [validated, setValidated] = useState(defaultClassificationValidator);
 
   useEffect(() => {
-    if (c12nDef && currentUser.c12n_enforcing && c12n) {
-      const parts = getParts(c12n, c12nDef, format, isMobile);
+    if (currentUser.c12nDef.enforce && c12n) {
+      const parts = getParts(c12n, currentUser.c12nDef, format, isMobile);
       if (type === 'picker') {
-        setUserParts(getParts(currentUser.classification, c12nDef, format, isMobile));
-        setValidated(applyClassificationRules(parts, c12nDef, format, isMobile, isUser));
+        setUserParts(getParts(currentUser.classification, currentUser.c12nDef, format, isMobile));
+        setValidated(applyClassificationRules(parts, currentUser.c12nDef, format, isMobile, isUser));
       } else {
         setValidated({
           disabled: defaultDisabled,
@@ -116,7 +114,7 @@ export default function Classification({
       }
     }
     // eslint-disable-next-line
-  }, [c12nDef, c12n, currentUser, isMobile]);
+  }, [c12n, currentUser, isMobile]);
 
   function toggleGroups(grp) {
     const newGrp = validated.parts.groups;
@@ -129,7 +127,9 @@ export default function Classification({
       newGrp.splice(newGrp.indexOf(grp.short_name), 1);
     }
 
-    setValidated(applyClassificationRules({ ...validated.parts, groups: newGrp }, c12nDef, format, isMobile, isUser));
+    setValidated(
+      applyClassificationRules({ ...validated.parts, groups: newGrp }, currentUser.c12nDef, format, isMobile, isUser)
+    );
   }
 
   function toggleSubGroups(sgrp) {
@@ -144,7 +144,13 @@ export default function Classification({
     }
 
     setValidated(
-      applyClassificationRules({ ...validated.parts, subgroups: newSGrp }, c12nDef, format, isMobile, isUser)
+      applyClassificationRules(
+        { ...validated.parts, subgroups: newSGrp },
+        currentUser.c12nDef,
+        format,
+        isMobile,
+        isUser
+      )
     );
   }
 
@@ -159,14 +165,16 @@ export default function Classification({
       newReq.splice(newReq.indexOf(req.short_name), 1);
     }
 
-    setValidated(applyClassificationRules({ ...validated.parts, req: newReq }, c12nDef, format, isMobile, isUser));
+    setValidated(
+      applyClassificationRules({ ...validated.parts, req: newReq }, currentUser.c12nDef, format, isMobile, isUser)
+    );
   }
 
   function selectLevel(lvlIdx) {
     setValidated(
       applyClassificationRules(
-        { ...validated.parts, lvlIdx, lvl: getLevelText(lvlIdx, c12nDef, format, isMobile) },
-        c12nDef,
+        { ...validated.parts, lvlIdx, lvl: getLevelText(lvlIdx, currentUser.c12nDef, format, isMobile) },
+        currentUser.c12nDef,
         format,
         isMobile,
         isUser
@@ -175,7 +183,7 @@ export default function Classification({
   }
 
   const computeColor = (): PossibleColors => {
-    const levelStyles = c12nDef.levels_styles_map[validated.parts.lvl];
+    const levelStyles = currentUser.c12nDef.levels_styles_map[validated.parts.lvl];
     if (!levelStyles) {
       return 'default' as 'default';
     }
@@ -189,19 +197,19 @@ export default function Classification({
   };
 
   const useClassification = () => {
-    const newC12n = normalizedClassification(validated.parts, c12nDef, format, isMobile);
+    const newC12n = normalizedClassification(validated.parts, currentUser.c12nDef, format, isMobile);
     if (setClassification && newC12n !== c12n) {
       setClassification(newC12n);
     }
     setShowPicker(false);
   };
   // Build chip based on computed values
-  return currentUser.c12n_enforcing ? (
-    c12nDef && c12n ? (
+  return currentUser.c12nDef.enforce ? (
+    c12n ? (
       <>
         <Box display={inline ? 'inline-block' : null} className={type === 'text' ? classes[computeColor()] : null}>
           {type === 'text' ? (
-            normalizedClassification(validated.parts, c12nDef, format, isMobile)
+            normalizedClassification(validated.parts, currentUser.c12nDef, format, isMobile)
           ) : (
             <CustomChip
               type="classification"
@@ -209,7 +217,7 @@ export default function Classification({
               size={size}
               color={computeColor()}
               className={classes.classification}
-              label={normalizedClassification(validated.parts, c12nDef, format, isMobile)}
+              label={normalizedClassification(validated.parts, currentUser.c12nDef, format, isMobile)}
               onClick={type === 'picker' ? () => setShowPicker(true) : null}
             />
           )}
@@ -229,7 +237,7 @@ export default function Classification({
                 size={size}
                 color={computeColor()}
                 className={classes.classification}
-                label={normalizedClassification(validated.parts, c12nDef, format, isMobile)}
+                label={normalizedClassification(validated.parts, currentUser.c12nDef, format, isMobile)}
               />
             </DialogTitle>
             <DialogContent>
@@ -237,7 +245,7 @@ export default function Classification({
                 <Grid item xs={12} md>
                   <Card variant="outlined">
                     <List disablePadding style={{ borderRadius: '6px' }}>
-                      {c12nDef.original_definition.levels.map((lvl, idx) => {
+                      {currentUser.c12nDef.original_definition.levels.map((lvl, idx) => {
                         return isUser || lvl.lvl <= uParts.lvlIdx ? (
                           <ListItem
                             key={idx}
@@ -260,7 +268,7 @@ export default function Classification({
                   <Grid item xs={12} md>
                     <Card variant="outlined">
                       <List disablePadding>
-                        {c12nDef.original_definition.required.map((req, idx) => {
+                        {currentUser.c12nDef.original_definition.required.map((req, idx) => {
                           return isUser || [req.name, req.short_name].some(r => uParts.req.includes(r)) ? (
                             <ListItem
                               key={idx}
@@ -284,7 +292,7 @@ export default function Classification({
                       <Box pb={2}>
                         <Card variant="outlined">
                           <List disablePadding>
-                            {c12nDef.original_definition.groups.map((grp, idx) => {
+                            {currentUser.c12nDef.original_definition.groups.map((grp, idx) => {
                               return isUser || [grp.name, grp.short_name].some(g => uParts.groups.includes(g)) ? (
                                 <ListItem
                                   key={idx}
@@ -310,7 +318,7 @@ export default function Classification({
                     {isUser || uParts.subgroups.length !== 0 ? (
                       <Card variant="outlined">
                         <List disablePadding>
-                          {c12nDef.original_definition.subgroups.map((sgrp, idx) => {
+                          {currentUser.c12nDef.original_definition.subgroups.map((sgrp, idx) => {
                             return isUser || [sgrp.name, sgrp.short_name].some(sg => uParts.subgroups.includes(sg)) ? (
                               <ListItem
                                 key={idx}
