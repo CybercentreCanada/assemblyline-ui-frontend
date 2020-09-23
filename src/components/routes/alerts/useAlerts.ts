@@ -106,7 +106,7 @@ export default function useAlerts(pageSize): UsingAlerts {
 
   // format alert api url using specified indexes.
   const buildUrl = () => {
-    return `/api/v4/alert/grouped/file.sha256/?${query.buildQueryString()}`;
+    return `/api/v4/alert/grouped/${query.getGroupBy()}/?${query.buildQueryString()}`;
   };
 
   // Hook API: load/reload all the alerts from start.
@@ -131,7 +131,7 @@ export default function useAlerts(pageSize): UsingAlerts {
     setState({ ...state, loading: true });
     query.tickOffset();
     apiCall({
-      url: query.build(),
+      url: buildUrl(),
       onSuccess: api_data => {
         const { items: _items, total } = api_data.api_response;
         setState({

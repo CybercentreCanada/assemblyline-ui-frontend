@@ -96,7 +96,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
               { value: '', label: 'None (slow)' },
               { value: '24h', label: '24 hours' },
               DEFAULT_TC,
-              { value: '1w', label: '1 Week' }
+              { value: '7d', label: '1 Week' }
             ]}
             value={selectedTc || DEFAULT_TC}
             getOptionLabel={option => option.label}

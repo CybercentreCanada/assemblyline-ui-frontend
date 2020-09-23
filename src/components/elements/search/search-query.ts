@@ -17,6 +17,9 @@ export default class SearchQuery {
     if (!this.hasRows()) {
       this.setRows(`${pageSize}`);
     }
+    if (!this.hasGroupBy()) {
+      this.setGroupBy('file.sha256');
+    }
   }
 
   public setRows(rows: string): SearchQuery {
@@ -98,17 +101,32 @@ export default class SearchQuery {
     return this;
   }
 
+  public setGroupBy(groupBy: string): SearchQuery {
+    this.params.set('group_by', groupBy);
+    return this;
+  }
+
+  public hasGroupBy(): boolean {
+    return this.params.has('group_by');
+  }
+
+  public getGroupBy(): string {
+    return this.hasGroupBy() ? this.params.get('group_by') : 'file.sha256';
+  }
+
   public reset(): SearchQuery {
-    this.setOffset('0').setRows(`${this.pageSize}`).setQuery('').setTc('4d').clearFq();
+    this.setOffset('0').setRows(`${this.pageSize}`).setQuery('').setTc('4d').setGroupBy('file.sha256').clearFq();
     return this;
   }
 
   public buildQueryString(): string {
-    return this.params.toString();
+    const params = new URLSearchParams(this.params.toString());
+    params.delete('group_by');
+    return params.toString();
   }
 
   public build(): string {
-    return `${this.path}?${this.params.toString()}`;
+    return `${this.path}?${this.buildQueryString()}`;
   }
 
   public apply(): void {
