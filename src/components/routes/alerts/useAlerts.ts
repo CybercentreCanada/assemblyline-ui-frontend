@@ -1,12 +1,17 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { InfiniteListItem } from 'components/elements/lists/infinite-list';
-import { MultiSelectItem } from 'components/elements/mui/multiselect';
 import SearchQuery from 'components/elements/search/search-query';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { ALField } from 'components/providers/ALContextProvider';
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+
+export interface AlertFilterItem {
+  id: number | string;
+  label: string;
+  value: any;
+}
 
 export interface AlertFile {
   md5: string;
@@ -62,10 +67,10 @@ interface UsingAlerts {
   total: number;
   items: AlertItem[];
   query: SearchQuery;
-  labelFilters: MultiSelectItem[];
-  priorityFilters: MultiSelectItem[];
-  statusFilters: MultiSelectItem[];
-  valueFilters: MultiSelectItem[];
+  labelFilters: AlertFilterItem[];
+  priorityFilters: AlertFilterItem[];
+  statusFilters: AlertFilterItem[];
+  valueFilters: AlertFilterItem[];
   onLoad: () => void;
   onLoadMore: () => void;
   onGet: (id: string, onSuccess: (alert: AlertItem) => void) => void;
@@ -83,10 +88,10 @@ export default function useAlerts(pageSize): UsingAlerts {
   const { index: fieldIndexes } = useALContext();
   const [query] = useState<SearchQuery>(new SearchQuery(location.pathname, location.search, pageSize));
   const [fields, setFields] = useState<ALField[]>([]);
-  const [valueFilters, setValueFilters] = useState<MultiSelectItem[]>();
-  const [statusFilters, setStatusFilters] = useState<MultiSelectItem[]>();
-  const [priorityFilters, setPriorityFilters] = useState<MultiSelectItem[]>();
-  const [labelFilters, setLabelFilters] = useState<MultiSelectItem[]>();
+  const [valueFilters, setValueFilters] = useState<AlertFilterItem[]>();
+  const [statusFilters, setStatusFilters] = useState<AlertFilterItem[]>();
+  const [priorityFilters, setPriorityFilters] = useState<AlertFilterItem[]>();
+  const [labelFilters, setLabelFilters] = useState<AlertFilterItem[]>();
   const [state, setState] = useState<{ loading: boolean; items: AlertItem[]; total: number }>({
     loading: true,
     total: 0,
@@ -175,7 +180,6 @@ export default function useAlerts(pageSize): UsingAlerts {
       url: '/api/v4/alert/labels/?offset=0&rows=25&q=&tc=4d&fq=file.sha256:*',
       onSuccess: api_data => {
         const { api_response: labels } = api_data;
-        console.log(labels);
         const msItems = Object.keys(labels).map((k, i) => ({
           id: i,
           label: `${labels[k]}x ${k}`,
@@ -191,14 +195,11 @@ export default function useAlerts(pageSize): UsingAlerts {
       url: `/api/v4/alert/statistics/?tc=${query.getTc()}&q=${query.getQuery()}`,
       onSuccess: api_data => {
         const { api_response: statistics } = api_data;
-        console.log(statistics);
         const msItems = [];
         Object.keys(statistics).forEach((k, ki) => {
           const value = statistics[k];
-
           Object.keys(value).forEach((vk, vki) => {
             const vkv = value[vk];
-            const crit = `${k}:"${vk}"`;
             msItems.push({
               id: `${ki}.${vki}}`,
               label: `${k}:${vk} x${vkv}`,

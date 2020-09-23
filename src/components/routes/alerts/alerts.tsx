@@ -3,7 +3,6 @@ import CloseIcon from '@material-ui/icons/Close';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import InfiniteList from 'components/elements/lists/infinite-list';
-import { MultiSelectItem } from 'components/elements/mui/multiselect';
 import SplitPanel from 'components/elements/panels/split-panel';
 import Viewport from 'components/elements/panels/viewport';
 import SearchBar from 'components/elements/search/search-bar';
@@ -12,7 +11,7 @@ import AlertActionsMenu from './alert-actions-menu';
 import AlertDetails from './alert-details';
 import AlertListItem from './alert-list-item';
 import AlertsFilters, { AlertFilterSelections } from './alerts-filters';
-import useAlerts, { AlertItem } from './useAlerts';
+import useAlerts, { AlertFilterItem, AlertItem } from './useAlerts';
 
 const PAGE_SIZE = 25;
 
@@ -125,7 +124,7 @@ const Alerts: React.FC = () => {
     setSelectedFilters(filters);
 
     // Add a [fq] parameter for status/priority/label.
-    const addFq = (item: MultiSelectItem) => query.addFq(item.value);
+    const addFq = (item: AlertFilterItem) => query.addFq(item.value);
     query.clearFq();
     query.setTc(filters.tc.value);
     query.setGroupBy(filters.groupBy.value);

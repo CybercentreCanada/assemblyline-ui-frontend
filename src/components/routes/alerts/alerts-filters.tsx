@@ -1,8 +1,8 @@
 /* eslint-disable no-param-reassign */
 import { Box, Button, Divider, makeStyles, TextField, Typography, useTheme } from '@material-ui/core';
 import { Autocomplete } from '@material-ui/lab';
-import { MultiSelectItem } from 'components/elements/mui/multiselect';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { AlertFilterItem } from './useAlerts';
 
 const DEFAULT_TC = { value: '4d', label: '4 Days' };
 
@@ -17,18 +17,18 @@ const useStyles = makeStyles(theme => ({
 export interface AlertFilterSelections {
   tc: { value: string; label: string };
   groupBy: { value: string; label: string };
-  values: MultiSelectItem[];
-  statuses: MultiSelectItem[];
-  priorities: MultiSelectItem[];
-  labels: MultiSelectItem[];
+  values: AlertFilterItem[];
+  statuses: AlertFilterItem[];
+  priorities: AlertFilterItem[];
+  labels: AlertFilterItem[];
 }
 
 interface AlertsFiltersProps {
   selectedFilters: AlertFilterSelections;
-  valueFilters: MultiSelectItem[];
-  statusFilters: MultiSelectItem[];
-  priorityFilters: MultiSelectItem[];
-  labelFilters: MultiSelectItem[];
+  valueFilters: AlertFilterItem[];
+  statusFilters: AlertFilterItem[];
+  priorityFilters: AlertFilterItem[];
+  labelFilters: AlertFilterItem[];
   onApplyBtnClick: (filters: AlertFilterSelections) => void;
   onClearBtnClick: () => void;
 }
@@ -48,10 +48,10 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
   const [selectedGroupBy, setSelectedGroupBy] = useState<{ value: string; label: string }>(
     selectedFilters.groupBy || DEFAULT_GROUPBY
   );
-  const [selectedStatusFilters, setSelectedStatusFilters] = useState<MultiSelectItem[]>(selectedFilters.statuses);
-  const [selectedPriorityFilters, setSelectedPriorityFilters] = useState<MultiSelectItem[]>(selectedFilters.priorities);
-  const [selectedLabelFilters, setSelectedLabelFilters] = useState<MultiSelectItem[]>(selectedFilters.labels);
-  const [selectedValueFilters, setSelectedValueFilters] = useState<MultiSelectItem[]>(selectedFilters.values);
+  const [selectedStatusFilters, setSelectedStatusFilters] = useState<AlertFilterItem[]>(selectedFilters.statuses);
+  const [selectedPriorityFilters, setSelectedPriorityFilters] = useState<AlertFilterItem[]>(selectedFilters.priorities);
+  const [selectedLabelFilters, setSelectedLabelFilters] = useState<AlertFilterItem[]>(selectedFilters.labels);
+  const [selectedValueFilters, setSelectedValueFilters] = useState<AlertFilterItem[]>(selectedFilters.values);
 
   const onTcFilterChange = (value: { value: string; label: string }) => {
     setSelectedTc(value);
@@ -61,19 +61,19 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
     setSelectedGroupBy(value);
   };
 
-  const onStatusFilterChange = (selections: MultiSelectItem[]) => {
+  const onStatusFilterChange = (selections: AlertFilterItem[]) => {
     setSelectedStatusFilters(selections);
   };
 
-  const onPriorityFilterChange = (selections: MultiSelectItem[]) => {
+  const onPriorityFilterChange = (selections: AlertFilterItem[]) => {
     setSelectedPriorityFilters(selections);
   };
 
-  const onLabelFilterChange = (selections: MultiSelectItem[]) => {
+  const onLabelFilterChange = (selections: AlertFilterItem[]) => {
     setSelectedLabelFilters(selections);
   };
 
-  const onValueFilterChange = (selections: MultiSelectItem[]) => {
+  const onValueFilterChange = (selections: AlertFilterItem[]) => {
     setSelectedValueFilters(selections);
   };
 
@@ -92,10 +92,20 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
     return option.value === value.value;
   };
 
-  const renderOption = (item: MultiSelectItem) => {
+  const renderOption = (item: AlertFilterItem) => {
     // return <Chip label={item.} />;
     return item.label;
   };
+
+  // Apply updates to selected filters when compoonent is mounted.
+  useEffect(() => {
+    setSelectedTc(selectedFilters.tc || DEFAULT_TC);
+    setSelectedGroupBy(selectedFilters.groupBy || DEFAULT_GROUPBY);
+    setSelectedStatusFilters(selectedFilters.statuses);
+    setSelectedPriorityFilters(selectedFilters.priorities);
+    setSelectedLabelFilters(selectedFilters.labels);
+    setSelectedValueFilters(selectedFilters.values);
+  }, [selectedFilters]);
 
   return (
     <Box>
@@ -148,15 +158,8 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
             getOptionLabel={option => option.label}
             getOptionSelected={isSelected}
             renderInput={params => <TextField {...params} label="Statuses" variant="outlined" />}
-            onChange={(event, value) => onStatusFilterChange(value as MultiSelectItem[])}
+            onChange={(event, value) => onStatusFilterChange(value as AlertFilterItem[])}
           />
-
-          {/* <MultiSelect
-            label="Statuses"
-            selections={selectedStatusFilters}
-            items={statusFilters}
-            onChange={onStatusFilterChange}
-          /> */}
         </Box>
         <Box mt={2}>
           <Autocomplete
@@ -168,15 +171,8 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
             getOptionLabel={option => option.label}
             getOptionSelected={isSelected}
             renderInput={params => <TextField {...params} label="Priorities" variant="outlined" />}
-            onChange={(event, value) => onPriorityFilterChange(value as MultiSelectItem[])}
+            onChange={(event, value) => onPriorityFilterChange(value as AlertFilterItem[])}
           />
-
-          {/* <MultiSelect
-            label="Priorities"
-            selections={selectedPriorityFilters}
-            items={priorityFilters}
-            onChange={onPriorityFilterChange}
-          /> */}
         </Box>
         <Box mt={2}>
           <Autocomplete
@@ -189,23 +185,10 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
             getOptionSelected={isSelected}
             renderOption={renderOption}
             renderInput={params => <TextField {...params} label="Labels" variant="outlined" />}
-            onChange={(event, value) => onLabelFilterChange(value as MultiSelectItem[])}
+            onChange={(event, value) => onLabelFilterChange(value as AlertFilterItem[])}
           />
-
-          {/* <MultiSelect
-            label="Labels"
-            selections={selectedLabelFilters}
-            items={labelFilters}
-            onChange={onLabelFilterChange}
-          /> */}
         </Box>
         <Box mt={2}>
-          {/* <MultiSelect
-            label="Values"
-            selections={selectedValueFilters}
-            items={valueFilters}
-            onChange={onValueFilterChange}
-          /> */}
           <Autocomplete
             fullWidth
             multiple
@@ -215,17 +198,17 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
             getOptionLabel={option => option.label}
             getOptionSelected={isSelected}
             renderInput={params => <TextField {...params} label="Values" variant="outlined" />}
-            onChange={(event, value) => onValueFilterChange(value as MultiSelectItem[])}
+            onChange={(event, value) => onValueFilterChange(value as AlertFilterItem[])}
           />
         </Box>
-        <Box mt={2}>
+        {/* <Box mt={2}>
           <Typography>Personal Filters</Typography>
           <Divider />
         </Box>
         <Box mt={2}>
           <Typography>Global Filters</Typography>
           <Divider />
-        </Box>
+        </Box> */}
       </Box>
       <Box mt={1}>
         <Button variant="contained" color="primary" onClick={_onApplyBtnClick}>
