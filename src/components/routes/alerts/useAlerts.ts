@@ -88,10 +88,10 @@ export default function useAlerts(pageSize): UsingAlerts {
   const { index: fieldIndexes } = useALContext();
   const [query] = useState<SearchQuery>(new SearchQuery(location.pathname, location.search, pageSize));
   const [fields, setFields] = useState<ALField[]>([]);
-  const [valueFilters, setValueFilters] = useState<AlertFilterItem[]>();
-  const [statusFilters, setStatusFilters] = useState<AlertFilterItem[]>();
-  const [priorityFilters, setPriorityFilters] = useState<AlertFilterItem[]>();
-  const [labelFilters, setLabelFilters] = useState<AlertFilterItem[]>();
+  const [valueFilters, setValueFilters] = useState<AlertFilterItem[]>([]);
+  const [statusFilters, setStatusFilters] = useState<AlertFilterItem[]>([]);
+  const [priorityFilters, setPriorityFilters] = useState<AlertFilterItem[]>([]);
+  const [labelFilters, setLabelFilters] = useState<AlertFilterItem[]>([]);
   const [state, setState] = useState<{ loading: boolean; items: AlertItem[]; total: number }>({
     loading: true,
     total: 0,

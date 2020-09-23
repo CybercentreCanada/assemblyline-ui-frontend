@@ -1,0 +1,110 @@
+import { Box, ClickAwayListener, Fade, IconButton, List, ListItem, Paper, Popper } from '@material-ui/core';
+import AddIcon from '@material-ui/icons/Add';
+import { ChipList } from 'components/elements/mui/chips';
+import React, { useState } from 'react';
+import { AlertFilterSelections } from './alerts-filters2';
+import { AlertFilterItem } from './useAlerts';
+
+interface AlertFiltersSelectedProps {
+  filters: AlertFilterSelections;
+  onChange: (filters: AlertFilterSelections) => void;
+}
+
+const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({ filters, onChange }) => {
+  const { tc, groupBy, statuses, priorities, labels, values } = filters;
+
+  const [popperEl, setPopperEl] = useState();
+
+  const onDeleteStatus = (item: AlertFilterItem) => {
+    const _statuses = filters.statuses.filter(s => s.value !== item.value);
+    onChange({ ...filters, statuses: _statuses });
+  };
+  const onDeletePriority = (item: AlertFilterItem) => {
+    const _priorities = filters.priorities.filter(s => s.value !== item.value);
+    onChange({ ...filters, priorities: _priorities });
+  };
+  const onDeleteLabel = (item: AlertFilterItem) => {
+    const _labels = filters.labels.filter(s => s.value !== item.value);
+    onChange({ ...filters, labels: _labels });
+  };
+  const onDeleteValue = (item: AlertFilterItem) => {
+    const _values = filters.values.filter(s => s.value !== item.value);
+    onChange({ ...filters, values: _values });
+  };
+
+  //
+  const onAddFilter = event => setPopperEl(event.currentTarget);
+
+  return (
+    <Box>
+      <Box>
+        Time Contrait = {tc.label}, GroupBy = {groupBy.label}
+      </Box>
+      <Box>
+        {statuses.length ? (
+          <Box display="inline-block" mt={1}>
+            <ChipList
+              items={statuses.map(v => ({
+                label: v.value,
+                onDelete: () => onDeleteStatus(v)
+              }))}
+            />
+          </Box>
+        ) : null}
+        {priorities.length ? (
+          <Box display="inline-block" mt={1}>
+            <ChipList
+              items={priorities.map(v => ({
+                label: v.value,
+                onDelete: () => onDeletePriority(v)
+              }))}
+            />
+          </Box>
+        ) : null}
+        {labels.length ? (
+          <Box display="inline-block" mt={1}>
+            <ChipList
+              items={labels.map(v => ({
+                label: v.value,
+                onDelete: () => onDeleteLabel(v)
+              }))}
+            />
+          </Box>
+        ) : null}
+        {values.length ? (
+          <Box display="inline-block" mt={1}>
+            <ChipList
+              items={values.map(v => ({
+                label: v.value,
+                onDelete: () => onDeleteValue(v)
+              }))}
+            />
+          </Box>
+        ) : null}
+        <Box display="inline-block" mt={1}>
+          <IconButton edge="end" color="primary" size="small" onClick={onAddFilter}>
+            <AddIcon />
+          </IconButton>
+          <Popper open={!!popperEl} anchorEl={popperEl} placement="right-start" transition>
+            {({ TransitionProps }) => (
+              <ClickAwayListener onClickAway={() => setPopperEl(null)}>
+                <Fade {...TransitionProps} timeout={250}>
+                  <Paper>
+                    <List>
+                      <ListItem>Status</ListItem>
+                      <ListItem>Priority</ListItem>
+                      <ListItem>Label</ListItem>
+                      <ListItem>Value</ListItem>
+                    </List>
+                  </Paper>
+                </Fade>
+              </ClickAwayListener>
+            )}
+          </Popper>
+        </Box>
+      </Box>
+    </Box>
+  );
+};
+
+export default AlertsFiltersSelected;

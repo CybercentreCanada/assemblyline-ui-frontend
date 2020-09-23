@@ -4,9 +4,9 @@ import { Autocomplete } from '@material-ui/lab';
 import React, { useEffect, useState } from 'react';
 import { AlertFilterItem } from './useAlerts';
 
-const DEFAULT_TC = { value: '4d', label: '4 Days' };
+export const DEFAULT_TC = { value: '4d', label: '4 Days' };
 
-const DEFAULT_GROUPBY = { value: 'file.sha256', label: 'file.sha256' };
+export const DEFAULT_GROUPBY = { value: 'file.sha256', label: 'file.sha256' };
 
 const useStyles = makeStyles(theme => ({
   option: {

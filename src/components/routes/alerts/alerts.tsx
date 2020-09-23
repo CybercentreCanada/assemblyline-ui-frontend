@@ -1,6 +1,6 @@
 import { Box, Drawer, makeStyles, Typography, useTheme } from '@material-ui/core';
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import CloseIcon from '@material-ui/icons/Close';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import InfiniteList from 'components/elements/lists/infinite-list';
 import SplitPanel from 'components/elements/panels/split-panel';
@@ -10,7 +10,8 @@ import React, { useState } from 'react';
 import AlertActionsMenu from './alert-actions-menu';
 import AlertDetails from './alert-details';
 import AlertListItem from './alert-list-item';
-import AlertsFilters, { AlertFilterSelections } from './alerts-filters';
+import AlertsFilters, { AlertFilterSelections, DEFAULT_GROUPBY, DEFAULT_TC } from './alerts-filters';
+import AlertsFiltersSelected from './alerts-filters-selected';
 import useAlerts, { AlertFilterItem, AlertItem } from './useAlerts';
 
 const PAGE_SIZE = 25;
@@ -51,8 +52,8 @@ const Alerts: React.FC = () => {
   const [splitPanel, setSplitPanel] = useState<{ open: boolean; item: AlertItem }>({ open: false, item: null });
   const [drawer, setDrawer] = useState<{ open: boolean; type: 'filter' }>({ open: false, type: null });
   const [selectedFilters, setSelectedFilters] = useState<AlertFilterSelections>({
-    tc: null,
-    groupBy: null,
+    tc: DEFAULT_TC,
+    groupBy: DEFAULT_GROUPBY,
     values: [],
     statuses: [],
     priorities: [],
@@ -148,6 +149,8 @@ const Alerts: React.FC = () => {
     setSelectedFilters({ tc: null, groupBy: null, values: [], statuses: [], priorities: [], labels: [] });
   };
 
+  console.log(statusFilters);
+
   return (
     <Box>
       <Box pb={theme.spacing(0.25)}>
@@ -159,7 +162,7 @@ const Alerts: React.FC = () => {
           onSearch={_onSearch}
           buttons={[
             {
-              icon: <ExpandMoreIcon />,
+              icon: <ChevronLeftIcon />,
               props: {
                 onClick: () => setDrawer({ open: true, type: 'filter' })
               }
@@ -167,7 +170,10 @@ const Alerts: React.FC = () => {
           ]}
         >
           <Box className={classes.searchresult}>
-            {searching || loading ? (searching ? '...searching' : '...loading') : `${total} matching results.`}
+            <AlertsFiltersSelected filters={selectedFilters} onChange={onApplyFilters} />
+            <Box mt={1}>
+              {searching || loading ? (searching ? '...searching' : '...loading') : `${total} matching results.`}
+            </Box>
           </Box>
         </SearchBar>
       </Box>

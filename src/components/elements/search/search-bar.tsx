@@ -1,6 +1,5 @@
 import { Box, CircularProgress, Divider, IconButton, IconButtonProps, makeStyles, useTheme } from '@material-ui/core';
 import BackspaceIcon from '@material-ui/icons/Backspace';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import SearchIcon from '@material-ui/icons/Search';
 import StarIcon from '@material-ui/icons/Star';
@@ -137,7 +136,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         />
         {buttons.map((b, i) => (
           <IconButton key={`searchbar-button-${i}`} {...b.props} edge="end" color="primary">
-            <ExpandMoreIcon />
+            {b.icon}
           </IconButton>
         ))}
       </Box>
