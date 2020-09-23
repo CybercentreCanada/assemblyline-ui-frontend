@@ -39,6 +39,7 @@ const Alerts: React.FC = () => {
     total,
     fields,
     query,
+    valueFilters,
     statusFilters,
     priorityFilters,
     labelFilters,
@@ -53,6 +54,7 @@ const Alerts: React.FC = () => {
   const [selectedFilters, setSelectedFilters] = useState<AlertFilterSelections>({
     tc: null,
     groupBy: null,
+    values: [],
     statuses: [],
     priorities: [],
     labels: []
@@ -144,7 +146,7 @@ const Alerts: React.FC = () => {
 
   // Handler for when clicking the 'Clear' button on AlertsFilter.
   const onClearFilters = () => {
-    setSelectedFilters({ tc: null, groupBy: null, statuses: [], priorities: [], labels: [] });
+    setSelectedFilters({ tc: null, groupBy: null, values: [], statuses: [], priorities: [], labels: [] });
   };
 
   return (
@@ -223,6 +225,7 @@ const Alerts: React.FC = () => {
               <Box p={theme.spacing(0.5)} className={classes.drawerInner}>
                 <AlertsFilters
                   selectedFilters={selectedFilters}
+                  valueFilters={valueFilters}
                   statusFilters={statusFilters}
                   priorityFilters={priorityFilters}
                   labelFilters={labelFilters}

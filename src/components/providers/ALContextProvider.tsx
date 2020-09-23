@@ -4,7 +4,7 @@ import { CustomUser } from 'components/hooks/useMyUser';
 import { ClassificationDefinition } from 'helpers/classificationParser';
 import React, { useEffect, useState } from 'react';
 
-type ALField = {
+export type ALField = {
   name: string;
   indexed: boolean;
   stored: boolean;

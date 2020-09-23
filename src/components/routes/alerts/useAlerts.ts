@@ -4,17 +4,9 @@ import { MultiSelectItem } from 'components/elements/mui/multiselect';
 import SearchQuery from 'components/elements/search/search-query';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
+import { ALField } from 'components/providers/ALContextProvider';
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-
-interface ALField {
-  name: string;
-  indexed: boolean;
-  stored: boolean;
-  type: string;
-  default: boolean;
-  list: boolean;
-}
 
 export interface AlertFile {
   md5: string;
@@ -70,9 +62,10 @@ interface UsingAlerts {
   total: number;
   items: AlertItem[];
   query: SearchQuery;
-  labelFilters: any;
-  priorityFilters: any;
-  statusFilters: any;
+  labelFilters: MultiSelectItem[];
+  priorityFilters: MultiSelectItem[];
+  statusFilters: MultiSelectItem[];
+  valueFilters: MultiSelectItem[];
   onLoad: () => void;
   onLoadMore: () => void;
   onGet: (id: string, onSuccess: (alert: AlertItem) => void) => void;
@@ -90,6 +83,7 @@ export default function useAlerts(pageSize): UsingAlerts {
   const { index: fieldIndexes } = useALContext();
   const [query] = useState<SearchQuery>(new SearchQuery(location.pathname, location.search, pageSize));
   const [fields, setFields] = useState<ALField[]>([]);
+  const [valueFilters, setValueFilters] = useState<MultiSelectItem[]>();
   const [statusFilters, setStatusFilters] = useState<MultiSelectItem[]>();
   const [priorityFilters, setPriorityFilters] = useState<MultiSelectItem[]>();
   const [labelFilters, setLabelFilters] = useState<MultiSelectItem[]>();
@@ -192,6 +186,31 @@ export default function useAlerts(pageSize): UsingAlerts {
     });
   };
 
+  const onLoadStatisics = () => {
+    apiCall({
+      url: `/api/v4/alert/statistics/?tc=${query.getTc()}&q=${query.getQuery()}`,
+      onSuccess: api_data => {
+        const { api_response: statistics } = api_data;
+        console.log(statistics);
+        const msItems = [];
+        Object.keys(statistics).forEach((k, ki) => {
+          const value = statistics[k];
+
+          Object.keys(value).forEach((vk, vki) => {
+            const vkv = value[vk];
+            const crit = `${k}:"${vk}"`;
+            msItems.push({
+              id: `${ki}.${vki}}`,
+              label: `${k}:${vk} x${vkv}`,
+              value: `${k}:"${vk}"`
+            });
+          });
+        });
+        setValueFilters(msItems);
+      }
+    });
+  };
+
   // Hook API: fetch the alert for the specified alert_id.
   const onGet = (id: string, onSuccess: (alert: AlertItem) => void) => {
     const url = `/api/v4/alert/${id}/`;
@@ -209,6 +228,7 @@ export default function useAlerts(pageSize): UsingAlerts {
     onLoadStatuses();
     onLoadPriorities();
     onLoadLabels();
+    onLoadStatisics();
   }, []);
 
   // transform alert fields into array.
@@ -230,6 +250,7 @@ export default function useAlerts(pageSize): UsingAlerts {
     statusFilters,
     priorityFilters,
     labelFilters,
+    valueFilters,
     onLoad,
     onLoadMore,
     onGet

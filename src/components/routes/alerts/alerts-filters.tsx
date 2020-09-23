@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import { Box, Button, Divider, makeStyles, TextField, Typography, useTheme } from '@material-ui/core';
 import { Autocomplete } from '@material-ui/lab';
-import MultiSelect, { MultiSelectItem } from 'components/elements/mui/multiselect';
+import { MultiSelectItem } from 'components/elements/mui/multiselect';
 import React, { useState } from 'react';
 
 const DEFAULT_TC = { value: '4d', label: '4 Days' };
@@ -17,6 +17,7 @@ const useStyles = makeStyles(theme => ({
 export interface AlertFilterSelections {
   tc: { value: string; label: string };
   groupBy: { value: string; label: string };
+  values: MultiSelectItem[];
   statuses: MultiSelectItem[];
   priorities: MultiSelectItem[];
   labels: MultiSelectItem[];
@@ -24,6 +25,7 @@ export interface AlertFilterSelections {
 
 interface AlertsFiltersProps {
   selectedFilters: AlertFilterSelections;
+  valueFilters: MultiSelectItem[];
   statusFilters: MultiSelectItem[];
   priorityFilters: MultiSelectItem[];
   labelFilters: MultiSelectItem[];
@@ -33,6 +35,7 @@ interface AlertsFiltersProps {
 
 const AlertsFilters: React.FC<AlertsFiltersProps> = ({
   selectedFilters,
+  valueFilters,
   statusFilters,
   priorityFilters,
   labelFilters,
@@ -48,6 +51,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
   const [selectedStatusFilters, setSelectedStatusFilters] = useState<MultiSelectItem[]>(selectedFilters.statuses);
   const [selectedPriorityFilters, setSelectedPriorityFilters] = useState<MultiSelectItem[]>(selectedFilters.priorities);
   const [selectedLabelFilters, setSelectedLabelFilters] = useState<MultiSelectItem[]>(selectedFilters.labels);
+  const [selectedValueFilters, setSelectedValueFilters] = useState<MultiSelectItem[]>(selectedFilters.values);
 
   const onTcFilterChange = (value: { value: string; label: string }) => {
     setSelectedTc(value);
@@ -69,10 +73,15 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
     setSelectedLabelFilters(selections);
   };
 
+  const onValueFilterChange = (selections: MultiSelectItem[]) => {
+    setSelectedValueFilters(selections);
+  };
+
   const _onApplyBtnClick = () => {
     onApplyBtnClick({
       tc: selectedTc,
       groupBy: selectedGroupBy,
+      values: selectedValueFilters,
       statuses: selectedStatusFilters,
       priorities: selectedPriorityFilters,
       labels: selectedLabelFilters
@@ -81,6 +90,11 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
 
   const isSelected = (option, value): boolean => {
     return option.value === value.value;
+  };
+
+  const renderOption = (item: MultiSelectItem) => {
+    // return <Chip label={item.} />;
+    return item.label;
   };
 
   return (
@@ -125,27 +139,83 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
           />
         </Box>
         <Box mt={2}>
-          <MultiSelect
+          <Autocomplete
+            fullWidth
+            multiple
+            classes={{ option: classes.option }}
+            options={statusFilters}
+            value={selectedStatusFilters}
+            getOptionLabel={option => option.label}
+            getOptionSelected={isSelected}
+            renderInput={params => <TextField {...params} label="Statuses" variant="outlined" />}
+            onChange={(event, value) => onStatusFilterChange(value as MultiSelectItem[])}
+          />
+
+          {/* <MultiSelect
             label="Statuses"
             selections={selectedStatusFilters}
             items={statusFilters}
             onChange={onStatusFilterChange}
-          />
+          /> */}
         </Box>
         <Box mt={2}>
-          <MultiSelect
+          <Autocomplete
+            fullWidth
+            multiple
+            classes={{ option: classes.option }}
+            options={priorityFilters}
+            value={selectedPriorityFilters}
+            getOptionLabel={option => option.label}
+            getOptionSelected={isSelected}
+            renderInput={params => <TextField {...params} label="Priorities" variant="outlined" />}
+            onChange={(event, value) => onPriorityFilterChange(value as MultiSelectItem[])}
+          />
+
+          {/* <MultiSelect
             label="Priorities"
             selections={selectedPriorityFilters}
             items={priorityFilters}
             onChange={onPriorityFilterChange}
-          />
+          /> */}
         </Box>
         <Box mt={2}>
-          <MultiSelect
+          <Autocomplete
+            fullWidth
+            multiple
+            classes={{ option: classes.option }}
+            options={labelFilters}
+            value={selectedLabelFilters}
+            getOptionLabel={option => option.label}
+            getOptionSelected={isSelected}
+            renderOption={renderOption}
+            renderInput={params => <TextField {...params} label="Labels" variant="outlined" />}
+            onChange={(event, value) => onLabelFilterChange(value as MultiSelectItem[])}
+          />
+
+          {/* <MultiSelect
             label="Labels"
             selections={selectedLabelFilters}
             items={labelFilters}
             onChange={onLabelFilterChange}
+          /> */}
+        </Box>
+        <Box mt={2}>
+          {/* <MultiSelect
+            label="Values"
+            selections={selectedValueFilters}
+            items={valueFilters}
+            onChange={onValueFilterChange}
+          /> */}
+          <Autocomplete
+            fullWidth
+            multiple
+            classes={{ option: classes.option }}
+            options={valueFilters}
+            value={selectedValueFilters}
+            getOptionLabel={option => option.label}
+            getOptionSelected={isSelected}
+            renderInput={params => <TextField {...params} label="Values" variant="outlined" />}
+            onChange={(event, value) => onValueFilterChange(value as MultiSelectItem[])}
           />
         </Box>
         <Box mt={2}>
