@@ -112,8 +112,8 @@ export default function SecurityToken({ user, toggleToken, enqueueSnackbar, snac
         </Typography>
         {user.security_tokens.length !== 0 ? (
           user.security_tokens.map((e, i) => (
-            <Box py={1}>
-              <Chip key={i} label={e} onDelete={() => askForDelete(e)} />
+            <Box key={i} py={1}>
+              <Chip label={e} onDelete={() => askForDelete(e)} />
             </Box>
           ))
         ) : (
