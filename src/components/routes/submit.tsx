@@ -167,7 +167,7 @@ function Submit() {
           <TabPanel value="2" className={classes.no_pad}>
             <Grid container spacing={1}>
               <Grid item xs={12} md>
-                <Box pl={2} textAlign="left" mt={5}>
+                <Box pl={2} textAlign="left" mt={4}>
                   <Typography variant="h6" gutterBottom>
                     {t('options.service')}
                   </Typography>
@@ -175,7 +175,7 @@ function Submit() {
                 </Box>
               </Grid>
               <Grid item xs={12} md>
-                <Box textAlign="left" mt={5}>
+                <Box textAlign="left" mt={4}>
                   <Typography variant="h6" gutterBottom>
                     {t('options.submission')}
                   </Typography>
@@ -351,7 +351,7 @@ function Submit() {
                 </Box>
 
                 {settings && settings.service_spec.length !== 0 ? (
-                  <Box textAlign="left" mt={5}>
+                  <Box textAlign="left" mt={4}>
                     <Typography variant="h6" gutterBottom>
                       {t('options.service_spec')}
                     </Typography>
