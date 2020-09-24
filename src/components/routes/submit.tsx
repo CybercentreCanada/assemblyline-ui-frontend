@@ -19,10 +19,9 @@ import TabContext from '@material-ui/lab/TabContext';
 import TabList from '@material-ui/lab/TabList';
 import TabPanel from '@material-ui/lab/TabPanel';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
-import useUser from 'commons/components/hooks/useAppUser';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
+import useAppContext from 'components/hooks/useAppContext';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { CustomUser } from 'components/hooks/useMyUser';
 import ServiceTree from 'components/layout/serviceTree';
 import Classification from 'components/visual/Classification';
 import FileDropper from 'components/visual/FileDropper';
@@ -35,7 +34,7 @@ function Submit() {
   const apiCall = useMyAPI();
   const { t } = useTranslation(['submit']);
   const theme = useTheme();
-  const { user: currentUser } = useUser<CustomUser>();
+  const { user: currentUser, c12nDef, configuration } = useAppContext();
   const [settings, setSettings] = useState(null);
   const [url, setUrl] = useState('');
   const [file, setFile] = useState(null);
@@ -89,7 +88,7 @@ function Submit() {
         <Box display="inline-block" marginBottom="2rem">
           {getBanner(theme)}
         </Box>
-        {currentUser.c12nDef.enforce ? (
+        {c12nDef.enforce ? (
           <Box pb={8}>
             <Box p={1} fontSize={16}>
               {t('classification')}
@@ -113,7 +112,7 @@ function Submit() {
           <TabPanel value="0" className={classes.no_pad}>
             <Box marginTop="30px">
               <FileDropper file={file} setFile={setFile} />
-              {currentUser.configuration.ui.tos ? (
+              {configuration.ui.tos ? (
                 <Box mt="50px" textAlign="center">
                   <Typography variant="body2">
                     {t('terms1')}
@@ -143,7 +142,7 @@ function Submit() {
                 {t('url.button')}
               </Button>
             </Box>
-            {currentUser.configuration.ui.tos ? (
+            {configuration.ui.tos ? (
               <Box mt="50px" textAlign="center">
                 <Typography variant="body2">
                   {t('terms1')}

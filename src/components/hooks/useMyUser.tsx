@@ -43,18 +43,31 @@ export type ConfigurationDefinition = {
 export interface CustomUser extends UserProfileProps {
   // Al specific props
   agrees_with_tos: boolean;
-  c12nDef: ClassificationDefinition;
   classification: string;
-  configuration: ConfigurationDefinition;
   groups: string[];
-  indexes: IndexDefinitionMap;
   is_active: boolean;
   type: string[];
 }
 
+export interface CustomUserContextProps extends UserContextProps<CustomUser> {
+  c12nDef: ClassificationDefinition;
+  configuration: ConfigurationDefinition;
+  indexes: IndexDefinitionMap;
+}
+
+interface WhoAmIProps extends CustomUser {
+  c12nDef: ClassificationDefinition;
+  configuration: ConfigurationDefinition;
+  indexes: IndexDefinitionMap;
+}
+
 // Application specific hook that will provide configuration to commons [useUser] hook.
-export default function useMyUser(): UserContextProps<CustomUser> {
+export default function useMyUser(): CustomUserContextProps {
   const [user, setState] = useState<CustomUser>(null);
+  const [c12nDef, setC12nDef] = useState<ClassificationDefinition>(null);
+  const [configuration, setConfiguration] = useState<ConfigurationDefinition>(null);
+  const [indexes, setIndexes] = useState<IndexDefinitionMap>(null);
+  const [flattenedProps, setFlattenedProps] = useState(null);
 
   function flatten(ob) {
     const toReturn = {};
@@ -76,13 +89,17 @@ export default function useMyUser(): UserContextProps<CustomUser> {
     return toReturn;
   }
 
-  const setUser = (curUser: CustomUser) => {
+  const setUser = (whoAmIData: WhoAmIProps) => {
+    const { configuration: cfg, c12nDef: c12n, indexes: idx, ...curUser } = whoAmIData;
+    setC12nDef(c12n);
+    setConfiguration(cfg);
+    setIndexes(idx);
     setState(curUser);
+    setFlattenedProps(flatten({ user: curUser, c12nDef: c12n, configuration: cfg, indexes: idx }));
   };
 
   const validateProp = (propDef: ValidatedProp) => {
-    const flattenedUser = flatten(user);
-    return flattenedUser[propDef.prop] === propDef.value;
+    return flattenedProps[propDef.prop] === propDef.value;
   };
 
   const validateProps = (props: ValidatedProp[]) => {
@@ -91,7 +108,7 @@ export default function useMyUser(): UserContextProps<CustomUser> {
   };
 
   const isReady = () => {
-    if (user === null || (!user.agrees_with_tos && user.configuration.ui.tos) || !user.is_active) {
+    if (user === null || (!user.agrees_with_tos && configuration.ui.tos) || !user.is_active) {
       return false;
     }
 
@@ -99,6 +116,9 @@ export default function useMyUser(): UserContextProps<CustomUser> {
   };
 
   return {
+    c12nDef,
+    configuration,
+    indexes,
     user,
     setUser,
     isReady,

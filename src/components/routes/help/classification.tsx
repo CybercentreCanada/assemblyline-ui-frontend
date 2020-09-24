@@ -1,8 +1,7 @@
 import { Box, Typography } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
-import useAppUser from 'commons/components/hooks/useAppUser';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
-import { CustomUser } from 'components/hooks/useMyUser';
+import useAppContext from 'components/hooks/useAppContext';
 import NotFoundPage from 'components/routes/404_dl';
 import Classification from 'components/visual/Classification';
 import React from 'react';
@@ -10,9 +9,9 @@ import { Trans, useTranslation } from 'react-i18next';
 
 export default function HelpClassification() {
   const { t } = useTranslation(['helpClassification']);
-  const { user: currentUser } = useAppUser<CustomUser>();
+  const { c12nDef } = useAppContext();
 
-  return currentUser.c12nDef.enforce ? (
+  return c12nDef.enforce ? (
     <PageCenter>
       <Box textAlign="left" pb={4}>
         <Typography variant="h5" gutterBottom>
@@ -42,13 +41,7 @@ export default function HelpClassification() {
           <ul>
             <li>
               <Trans ns="helpClassification" i18nKey="submission_a_1" components={{ bold: <strong /> }} />
-              <Classification
-                inline
-                size="tiny"
-                type="text"
-                c12n={currentUser.c12nDef ? currentUser.c12nDef.RESTRICTED : null}
-                format="long"
-              />
+              <Classification inline size="tiny" type="text" c12n={c12nDef ? c12nDef.RESTRICTED : null} format="long" />
             </li>
             <li>
               <Trans ns="helpClassification" i18nKey="submission_a_2" components={{ bold: <strong /> }} />
@@ -56,7 +49,7 @@ export default function HelpClassification() {
                 inline
                 size="tiny"
                 type="text"
-                c12n={currentUser.c12nDef ? currentUser.c12nDef.UNRESTRICTED : null}
+                c12n={c12nDef ? c12nDef.UNRESTRICTED : null}
                 format="long"
               />
             </li>
@@ -66,13 +59,7 @@ export default function HelpClassification() {
           </ul>
           <Typography variant="body2" gutterBottom>
             <Trans ns="helpClassification" i18nKey="submission_a_res_1_p1" components={{ bold: <strong /> }} />
-            <Classification
-              inline
-              size="tiny"
-              type="text"
-              c12n={currentUser.c12nDef ? currentUser.c12nDef.UNRESTRICTED : null}
-              format="long"
-            />
+            <Classification inline size="tiny" type="text" c12n={c12nDef ? c12nDef.UNRESTRICTED : null} format="long" />
             <Trans ns="helpClassification" i18nKey="submission_a_res_1_p2" components={{ bold: <strong /> }} />
           </Typography>
           <Typography variant="body2" gutterBottom>
@@ -81,13 +68,7 @@ export default function HelpClassification() {
               i18nKey="submission_a_res_2_p1"
               components={{ italic: <i />, bold: <strong /> }}
             />
-            <Classification
-              inline
-              size="tiny"
-              type="text"
-              c12n={currentUser.c12nDef ? currentUser.c12nDef.RESTRICTED : null}
-              format="long"
-            />
+            <Classification inline size="tiny" type="text" c12n={c12nDef ? c12nDef.RESTRICTED : null} format="long" />
             <Trans
               ns="helpClassification"
               i18nKey="submission_a_res_2_p2"
@@ -113,13 +94,7 @@ export default function HelpClassification() {
           <ul>
             <li>
               <Trans ns="helpClassification" i18nKey="result_a_1" components={{ bold: <strong /> }} />
-              <Classification
-                inline
-                size="tiny"
-                type="text"
-                c12n={currentUser.c12nDef ? currentUser.c12nDef.RESTRICTED : null}
-                format="long"
-              />
+              <Classification inline size="tiny" type="text" c12n={c12nDef ? c12nDef.RESTRICTED : null} format="long" />
             </li>
             <li>
               <Trans ns="helpClassification" i18nKey="result_a_2" components={{ bold: <strong /> }} />
@@ -127,7 +102,7 @@ export default function HelpClassification() {
                 inline
                 size="tiny"
                 type="text"
-                c12n={currentUser.c12nDef ? currentUser.c12nDef.UNRESTRICTED : null}
+                c12n={c12nDef ? c12nDef.UNRESTRICTED : null}
                 format="long"
               />
             </li>
@@ -137,49 +112,25 @@ export default function HelpClassification() {
                 inline
                 size="tiny"
                 type="text"
-                c12n={currentUser.c12nDef ? currentUser.c12nDef.UNRESTRICTED : null}
+                c12n={c12nDef ? c12nDef.UNRESTRICTED : null}
                 format="long"
               />
             </li>
             <li>
               <Trans ns="helpClassification" i18nKey="result_a_4" components={{ bold: <strong /> }} />
-              <Classification
-                inline
-                size="tiny"
-                type="text"
-                c12n={currentUser.c12nDef ? currentUser.c12nDef.RESTRICTED : null}
-                format="long"
-              />
+              <Classification inline size="tiny" type="text" c12n={c12nDef ? c12nDef.RESTRICTED : null} format="long" />
             </li>
           </ul>
           <Typography variant="body2" gutterBottom>
             <Trans ns="helpClassification" i18nKey="result_a_res_1_p1" components={{ bold: <strong /> }} />
-            <Classification
-              inline
-              size="tiny"
-              type="text"
-              c12n={currentUser.c12nDef ? currentUser.c12nDef.RESTRICTED : null}
-              format="long"
-            />
+            <Classification inline size="tiny" type="text" c12n={c12nDef ? c12nDef.RESTRICTED : null} format="long" />
             <Trans ns="helpClassification" i18nKey="result_a_res_1_p2" components={{ bold: <strong /> }} />
-            <Classification
-              inline
-              size="tiny"
-              type="text"
-              c12n={currentUser.c12nDef ? currentUser.c12nDef.UNRESTRICTED : null}
-              format="long"
-            />
+            <Classification inline size="tiny" type="text" c12n={c12nDef ? c12nDef.UNRESTRICTED : null} format="long" />
             <Trans ns="helpClassification" i18nKey="result_a_res_1_p3" components={{ bold: <strong /> }} />
           </Typography>
           <Typography variant="body2" gutterBottom>
             <Trans ns="helpClassification" i18nKey="result_a_res_2_p1" components={{ bold: <strong /> }} />
-            <Classification
-              inline
-              size="tiny"
-              type="text"
-              c12n={currentUser.c12nDef ? currentUser.c12nDef.RESTRICTED : null}
-              format="long"
-            />
+            <Classification inline size="tiny" type="text" c12n={c12nDef ? c12nDef.RESTRICTED : null} format="long" />
             <Trans ns="helpClassification" i18nKey="result_a_res_2_p2" components={{ bold: <strong /> }} />
           </Typography>
         </Box>
@@ -200,8 +151,8 @@ export default function HelpClassification() {
           {t('validation_level_supported')}
         </Typography>
         <ul>
-          {currentUser.c12nDef
-            ? currentUser.c12nDef.original_definition.levels.map((lvl, idx) => {
+          {c12nDef
+            ? c12nDef.original_definition.levels.map((lvl, idx) => {
                 return (
                   <li key={idx}>
                     <Classification inline size="tiny" type="text" c12n={lvl.name} format="long" /> :: {lvl.description}
@@ -228,9 +179,9 @@ export default function HelpClassification() {
           {t('validation_required_supported')}
         </Typography>
         <ul>
-          {currentUser.c12nDef ? (
-            currentUser.c12nDef.original_definition.required.length !== 0 ? (
-              currentUser.c12nDef.original_definition.required.map((req, idx) => {
+          {c12nDef ? (
+            c12nDef.original_definition.required.length !== 0 ? (
+              c12nDef.original_definition.required.map((req, idx) => {
                 return (
                   <li key={idx}>
                     <Box display="inline-block" fontWeight={700}>
@@ -267,9 +218,9 @@ export default function HelpClassification() {
           {t('validation_groups_supported')}
         </Typography>
         <ul>
-          {currentUser.c12nDef ? (
-            currentUser.c12nDef.original_definition.groups.length !== 0 ? (
-              currentUser.c12nDef.original_definition.groups.map((grp, idx) => {
+          {c12nDef ? (
+            c12nDef.original_definition.groups.length !== 0 ? (
+              c12nDef.original_definition.groups.map((grp, idx) => {
                 return (
                   <li key={idx}>
                     <Box display="inline-block" fontWeight={700}>
@@ -309,9 +260,9 @@ export default function HelpClassification() {
           {t('validation_subgroups_supported')}
         </Typography>
         <ul>
-          {currentUser.c12nDef ? (
-            currentUser.c12nDef.original_definition.subgroups.length !== 0 ? (
-              currentUser.c12nDef.original_definition.subgroups.map((sgrp, idx) => {
+          {c12nDef ? (
+            c12nDef.original_definition.subgroups.length !== 0 ? (
+              c12nDef.original_definition.subgroups.map((sgrp, idx) => {
                 return (
                   <li key={idx}>
                     <Box display="inline-block" fontWeight={700}>

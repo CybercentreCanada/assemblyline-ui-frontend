@@ -23,10 +23,9 @@ import {
 import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
 import CloseIcon from '@material-ui/icons/Close';
 import Skeleton from '@material-ui/lab/Skeleton';
-import useUser from 'commons/components/hooks/useAppUser';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
+import useAppContext from 'components/hooks/useAppContext';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { CustomUser } from 'components/hooks/useMyUser';
 import APIKeys from 'components/routes/user/api_keys';
 import DisableOTP from 'components/routes/user/disable_otp';
 import OTP from 'components/routes/user/otp';
@@ -58,7 +57,7 @@ function User({ width, username }: UserProps) {
   const [user, setUser] = useState(null);
   const [modified, setModified] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
-  const { user: currentUser } = useUser<CustomUser>();
+  const { user: currentUser, configuration } = useAppContext();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   const apiCall = useMyAPI();
@@ -614,7 +613,7 @@ function User({ width, username }: UserProps) {
                       <ChevronRightOutlinedIcon />
                     </TableCell>
                   </TableRow>
-                  {currentUser.configuration.auth.allow_2fa ? (
+                  {configuration.auth.allow_2fa ? (
                     <TableRow
                       hover
                       style={{ cursor: 'pointer' }}
@@ -629,7 +628,7 @@ function User({ width, username }: UserProps) {
                     </TableRow>
                   ) : null}
                   {user ? (
-                    user['2fa_enabled'] && currentUser.configuration.auth.allow_security_tokens ? (
+                    user['2fa_enabled'] && configuration.auth.allow_security_tokens ? (
                       <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('token')}>
                         <TableCell width="100%">{user ? t('token') : <Skeleton />}</TableCell>
                         <TableCell align="right">
@@ -638,7 +637,7 @@ function User({ width, username }: UserProps) {
                       </TableRow>
                     ) : null
                   ) : null}
-                  {currentUser.configuration.auth.allow_apikeys ? (
+                  {configuration.auth.allow_apikeys ? (
                     <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('api_key')}>
                       <TableCell width="100%">{user ? t('apikeys') : <Skeleton />}</TableCell>
                       <TableCell align="right">
