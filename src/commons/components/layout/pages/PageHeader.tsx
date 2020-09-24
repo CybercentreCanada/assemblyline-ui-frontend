@@ -14,6 +14,8 @@ export type PageHeaderAction = {
 
 type PageHeaderProps = {
   mode?: 'title' | 'breadcrumbs' | 'provided';
+  left?: React.ReactNode;
+  right?: React.ReactNode;
   actions?: PageHeaderAction[];
   title?: React.ReactNode;
   isSticky?: boolean;
@@ -24,6 +26,8 @@ type PageHeaderProps = {
 const PageHeader: React.FC<PageHeaderProps> = ({
   mode,
   title,
+  left,
+  right,
   actions,
   isSticky = false,
   backgroundColor = 'inherit',
@@ -55,6 +59,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
       color="inherit"
     >
       <Toolbar disableGutters>
+        <Box>{left}</Box>
         <Box flexGrow={1}>{comp}</Box>
         <Box>
           {actions
@@ -87,6 +92,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
               })
             : null}
         </Box>
+        <Box>{right}</Box>
       </Toolbar>
     </AppBar>
   );
