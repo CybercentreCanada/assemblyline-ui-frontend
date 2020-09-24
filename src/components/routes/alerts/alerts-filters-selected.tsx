@@ -1,7 +1,6 @@
-import { Box, ClickAwayListener, Fade, IconButton, List, ListItem, Paper, Popper } from '@material-ui/core';
-import AddIcon from '@material-ui/icons/Add';
+import { Box } from '@material-ui/core';
 import { ChipList } from 'components/elements/mui/chips';
-import React, { useState } from 'react';
+import React from 'react';
 import { AlertFilterSelections } from './alerts-filters2';
 import { AlertFilterItem } from './useAlerts';
 
@@ -12,8 +11,6 @@ interface AlertFiltersSelectedProps {
 
 const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({ filters, onChange }) => {
   const { tc, groupBy, statuses, priorities, labels, values } = filters;
-
-  const [popperEl, setPopperEl] = useState();
 
   const onDeleteStatus = (item: AlertFilterItem) => {
     const _statuses = filters.statuses.filter(s => s.value !== item.value);
@@ -31,9 +28,6 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({ filters, o
     const _values = filters.values.filter(s => s.value !== item.value);
     onChange({ ...filters, values: _values });
   };
-
-  //
-  const onAddFilter = event => setPopperEl(event.currentTarget);
 
   return (
     <Box>
@@ -81,27 +75,6 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({ filters, o
             />
           </Box>
         ) : null}
-        <Box display="inline-block" mt={1}>
-          <IconButton edge="end" color="primary" size="small" onClick={onAddFilter}>
-            <AddIcon />
-          </IconButton>
-          <Popper open={!!popperEl} anchorEl={popperEl} placement="right-start" transition>
-            {({ TransitionProps }) => (
-              <ClickAwayListener onClickAway={() => setPopperEl(null)}>
-                <Fade {...TransitionProps} timeout={250}>
-                  <Paper>
-                    <List>
-                      <ListItem>Status</ListItem>
-                      <ListItem>Priority</ListItem>
-                      <ListItem>Label</ListItem>
-                      <ListItem>Value</ListItem>
-                    </List>
-                  </Paper>
-                </Fade>
-              </ClickAwayListener>
-            )}
-          </Popper>
-        </Box>
       </Box>
     </Box>
   );

@@ -14,10 +14,21 @@ const useStyles = makeStyles({
   }
 });
 
-const Viewport = ({ children }) => {
+interface ViewportProps {
+  children: React.ReactNode;
+}
+
+const Viewport: React.FC<ViewportProps> = ({ children }) => {
+  // Some styles...
   const classes = useStyles();
+
+  // Some references...
   const ref = useRef<HTMLDivElement>();
+
+  // Some states...
   const [height, setHeight] = useState<number>(0);
+
+  // recompute height with each render and when the window resizes.
   useLayoutEffect(() => {
     const updateHeight = () => {
       const { current: element } = ref;
@@ -25,12 +36,13 @@ const Viewport = ({ children }) => {
       const _height = window.innerHeight - rect.top;
       setHeight(_height);
     };
-    window.addEventListener('resize', updateHeight);
     updateHeight();
+    window.addEventListener('resize', updateHeight);
     return () => {
       window.removeEventListener('resize', updateHeight);
     };
-  }, []);
+  });
+
   return (
     <div ref={ref} style={{ height }} className={classes.viewportCt}>
       <div className={classes.viewport}>{children}</div>
