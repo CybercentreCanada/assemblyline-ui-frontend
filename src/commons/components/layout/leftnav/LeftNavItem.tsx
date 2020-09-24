@@ -4,7 +4,6 @@ import withWidth, { isWidthDown } from '@material-ui/core/withWidth';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import useAppUser from 'commons/components/hooks/useAppUser';
 import { LeftNavItemProps } from 'commons/components/layout/leftnav/LeftNavDrawer';
-import { CustomUser } from 'components/hooks/useMyUser';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -20,7 +19,7 @@ const LeftNavItem: React.FC<LeftNavItemProps> = props => {
   const classes = useStyles();
   const { drawerState, hideNestedIcons, toggleDrawer } = useAppLayout();
   const { text, icon, nested, route, userPropValidators } = props;
-  const { validateProps } = useAppUser<CustomUser>();
+  const { validateProps } = useAppUser();
 
   const onCloseDrawerIfOpen = () => {
     if (isWidthDown('sm', props.width) && drawerState) {

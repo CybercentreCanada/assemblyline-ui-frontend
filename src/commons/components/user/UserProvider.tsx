@@ -17,7 +17,7 @@ export interface UserContextProps<U extends UserProfileProps> {
   user: U;
   setUser: (user: U) => void;
   isReady: () => boolean;
-  validateProps: (props: ValidatedProp[]) => boolean;
+  validateProps?: (props: ValidatedProp[]) => boolean;
 }
 
 export interface UserProviderProps<U extends UserProfileProps> extends UserContextProps<U> {
@@ -30,5 +30,9 @@ function UserProvider<U extends UserProfileProps>(props: UserProviderProps<U>) {
   const { children, ...contextProps } = props;
   return <UserContext.Provider value={contextProps}>{children}</UserContext.Provider>;
 }
+
+UserProvider.defaultProps = {
+  validateProps: () => true
+};
 
 export default UserProvider;
