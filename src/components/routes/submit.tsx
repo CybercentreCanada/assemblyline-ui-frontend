@@ -59,6 +59,14 @@ function Submit() {
   }));
   const classes = useStyles();
 
+  function setParam(service_idx, param_idx, p_value) {
+    if (settings) {
+      const newSettings = { ...settings };
+      newSettings.service_spec[service_idx].params[param_idx].value = p_value;
+      setSettings(newSettings);
+    }
+  }
+
   function setSettingValue(field, fieldValue) {
     if (settings) {
       setSettings({ ...settings, [field]: fieldValue });
@@ -214,7 +222,7 @@ function Submit() {
                     )}
                   </Box>
                   <Box py={1}>
-                    <Box>
+                    <Box pl={1}>
                       <FormControlLabel
                         control={
                           settings ? (
@@ -234,7 +242,7 @@ function Submit() {
                         className={settings ? classes.item : null}
                       />
                     </Box>
-                    <Box>
+                    <Box pl={1}>
                       <FormControlLabel
                         control={
                           settings ? (
@@ -254,7 +262,7 @@ function Submit() {
                         className={settings ? classes.item : null}
                       />
                     </Box>
-                    <Box>
+                    <Box pl={1}>
                       <FormControlLabel
                         control={
                           settings ? (
@@ -280,7 +288,7 @@ function Submit() {
                         className={settings ? classes.item : null}
                       />
                     </Box>
-                    <Box>
+                    <Box pl={1}>
                       <FormControlLabel
                         control={
                           settings ? (
@@ -300,7 +308,7 @@ function Submit() {
                         className={settings ? classes.item : null}
                       />
                     </Box>
-                    <Box>
+                    <Box pl={1}>
                       <FormControlLabel
                         control={
                           settings ? (
@@ -341,6 +349,87 @@ function Submit() {
                     )}
                   </Box>
                 </Box>
+
+                {settings && settings.service_spec.length !== 0 ? (
+                  <Box textAlign="left" mt={5}>
+                    <Typography variant="h6" gutterBottom>
+                      {t('options.service_spec')}
+                    </Typography>
+                    {settings.service_spec.map((service, idx) => {
+                      return (
+                        <Box key={idx} py={1}>
+                          <Typography variant="subtitle1" gutterBottom>
+                            {service.name}
+                          </Typography>
+                          {service.params.map((param, pidx) => {
+                            return (
+                              <Box key={pidx} pb={1}>
+                                {param.type === 'bool' ? (
+                                  <Box pl={1}>
+                                    <FormControlLabel
+                                      control={
+                                        <Checkbox
+                                          size="small"
+                                          checked={param.value === 'true' || param.value === true}
+                                          name="label"
+                                          onChange={() => setParam(idx, pidx, !param.value)}
+                                        />
+                                      }
+                                      label={
+                                        <Typography variant="body2" style={{ textTransform: 'capitalize' }}>
+                                          {param.name.replace('_', ' ')}
+                                        </Typography>
+                                      }
+                                      className={classes.item}
+                                    />
+                                  </Box>
+                                ) : (
+                                  <>
+                                    <Box>
+                                      <Typography
+                                        variant="caption"
+                                        gutterBottom
+                                        style={{ textTransform: 'capitalize' }}
+                                      >
+                                        {param.name.replace('_', ' ')}
+                                      </Typography>
+                                    </Box>
+                                    {param.type === 'list' ? (
+                                      <Select
+                                        margin="dense"
+                                        value={param.value}
+                                        variant="outlined"
+                                        onChange={event => setParam(idx, pidx, event.target.value)}
+                                        fullWidth
+                                      >
+                                        {param.list.map((item, i) => {
+                                          return (
+                                            <MenuItem key={i} value={item}>
+                                              {item}
+                                            </MenuItem>
+                                          );
+                                        })}
+                                      </Select>
+                                    ) : (
+                                      <TextField
+                                        variant="outlined"
+                                        type={param.type === 'int' ? 'number' : 'text'}
+                                        size="small"
+                                        fullWidth
+                                        value={param.value}
+                                        onChange={event => setParam(idx, pidx, event.target.value)}
+                                      />
+                                    )}
+                                  </>
+                                )}
+                              </Box>
+                            );
+                          })}
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                ) : null}
               </Grid>
             </Grid>
           </TabPanel>

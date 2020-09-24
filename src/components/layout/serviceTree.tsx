@@ -38,7 +38,7 @@ type ServiceTreeItemProps = {
 function ServiceTreeItem({ item, onChange, size = 'medium' as 'medium' }: ServiceTreeItemProps) {
   const classes = useStyles();
   return (
-    <Box display="block">
+    <Box display="block" pl={1}>
       <FormControlLabel
         control={
           <Checkbox

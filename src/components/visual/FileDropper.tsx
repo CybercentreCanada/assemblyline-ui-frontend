@@ -63,7 +63,7 @@ export default function FileDropper({ file, setFile }: FileDropperProps) {
               <b>{file.name}</b>
             </Typography>
             <Typography variant="body2" align="center">
-              {file.size} {t('file.dragzon.byte')}
+              {file.size} {t('file.dragzone.byte')}
             </Typography>
           </Box>
         ) : (
