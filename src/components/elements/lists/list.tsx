@@ -48,7 +48,7 @@ interface ListProps<I extends ListItemProps> {
   noDivider?: boolean;
   focus?: boolean;
   items: I[];
-  onKeyDown?: (keyCode: number, items: I[], selectedId: string | number) => void;
+  onKeyDown?: (keyCode: string, items: I[], selectedId: string | number) => void;
   onItemSelected: (item: I) => void;
   onRenderItem: (item: I) => React.ReactNode;
 }
@@ -91,7 +91,7 @@ export default function List<I extends ListItemProps>({
     // Don't do anything while loading.
     if (!loading) {
       // Custom key handlers.
-      const { keyCode } = event;
+      const { key: keyCode } = event;
       if (isArrowUp(keyCode) || isArrowDown(keyCode)) {
         // Here we handle our custom scrolls and cursor item selection.
         _onKeyDownThrottled(keyCode, event.currentTarget as HTMLDivElement);
@@ -104,7 +104,7 @@ export default function List<I extends ListItemProps>({
   };
 
   // throttled keydown handler.
-  const _onKeyDownThrottled = (keyCode: number, target: HTMLDivElement) => {
+  const _onKeyDownThrottled = (keyCode: string, target: HTMLDivElement) => {
     // This will ensure that users who hold down UP/DOWN arrow key don't overload
     //  react with constant stream of keydown events.
     // We'll process on event every 10ms and throw away the rest.

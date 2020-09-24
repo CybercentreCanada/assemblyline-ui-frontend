@@ -184,7 +184,7 @@ export default function InfiniteList<I extends InfiniteListItem>({
   // Handler::OnScroll
   const onKeyDown = (event: React.KeyboardEvent) => {
     event.preventDefault();
-    const { keyCode } = event;
+    const { key: keyCode } = event;
     if (isArrowUp(keyCode) || isArrowDown(keyCode)) {
       // Here we handle our custom scrolls and cursor item selection.
       _onKeyDownThrottled(keyCode, event.currentTarget as HTMLDivElement);
@@ -199,7 +199,7 @@ export default function InfiniteList<I extends InfiniteListItem>({
   };
 
   //
-  const _onKeyDownThrottled = (keyCode: number, target: HTMLDivElement) => {
+  const _onKeyDownThrottled = (keyCode: string, target: HTMLDivElement) => {
     // This will ensure that users who hold down UP/DOWN arrow key don't overload
     //  react with constant stream of keydown events.
     // We'll process on event every 10ms and throw away the rest.

@@ -44,7 +44,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
   return (
     <Box>
       <Box mb={1}>
-        <Classification c12n={item.classification} type="text" />
+        <Classification c12n={item.classification} type="outlined" />
       </Box>
       {item.filtered ? (
         <Box mb={2}>

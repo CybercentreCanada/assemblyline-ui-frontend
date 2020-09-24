@@ -1,34 +1,34 @@
-export const ENTER = 13;
-export const ESCAPE = 27;
-export const ARROW_LEFT = 37;
-export const ARROW_UP = 38;
-export const ARROW_RIGHT = 39;
-export const ARROW_DOWN = 40;
+export const ENTER = 'Enter';
+export const ESCAPE = 'Escape';
+export const ARROW_LEFT = 'ArrowLeft';
+export const ARROW_UP = 'ArrowUp';
+export const ARROW_RIGHT = 'ArrowRight';
+export const ARROW_DOWN = 'ArrowDown';
 
-export function is(keyCode: number, checkCode: number) {
-  return keyCode === checkCode;
+export function is(key: string, checkCode: string) {
+  return key === checkCode;
 }
 
-export function isArrowUp(keyCode: number) {
-  return is(keyCode, ARROW_UP);
+export function isArrowUp(key: string) {
+  return is(key, ARROW_UP);
 }
 
-export function isArrowDown(keyCode: number) {
-  return is(keyCode, ARROW_DOWN);
+export function isArrowDown(key: string) {
+  return is(key, ARROW_DOWN);
 }
 
-export function isArrowLeft(keyCode: number) {
-  return is(keyCode, ARROW_LEFT);
+export function isArrowLeft(key: string) {
+  return is(key, ARROW_LEFT);
 }
 
-export function isArrowRight(keyCode: number) {
-  return is(keyCode, ARROW_RIGHT);
+export function isArrowRight(key: string) {
+  return is(key, ARROW_RIGHT);
 }
 
-export function isEscape(keyCode: number) {
-  return is(keyCode, ESCAPE);
+export function isEscape(key: string) {
+  return is(key, ESCAPE);
 }
 
-export function isEnter(keyCode: number) {
-  return is(keyCode, ENTER);
+export function isEnter(key: string) {
+  return is(key, ENTER);
 }

@@ -91,8 +91,8 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
 
   // Handler for KeyDown event on either the text input of the options menu.
   const _onKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
-    const { keyCode } = event;
-    // console.log(`key[${keyCode}]`);
+    const { key: keyCode } = event;
+
     if (isEnter(keyCode)) {
       // key[ENTER ]: handler
       if (open) {
@@ -136,7 +136,7 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
 
   // Handler for when the options box opens.
   const onOptionsOpen = () => {
-    setPrecursor(extractPrecursor(value));
+    setPrecursor(parseFilter(value).precursor);
     setOpen(true);
   };
 
@@ -151,8 +151,7 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
   const onOptionSelection = (startIndex: number, endIndex: number, option: string) => {
     if (option) {
       const inputEl = getInputEl();
-      // const thisCursor = inputEl.selectionStart;
-      insertText(inputEl, startIndex, endIndex, option);
+      insertText(inputEl, startIndex, endIndex + 1, option);
       onOptionsClose();
       onChange(inputEl.value);
       if (onSelection) {
@@ -173,49 +172,106 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
   // Grab nearest group to the left of cursor.
   // Filter entire list with that value if not empty.
   const filterOptions = (inputValue: string, selectionOffset = 0) => {
-    let _options = options;
+    //
+    const {
+      value: filterValue,
+      cursor: thisCursor,
+      startIndex: insertStartIndex,
+      endIndex: insertEndIndex,
+      precursor: _precursor
+    } = parseFilter(inputValue, selectionOffset);
 
     // Grab the part of the text before the precursor.
-    const _precursor = extractPrecursor(inputValue, selectionOffset);
+    // const _precursor = extractPrecursor(inputValue, selectionOffset);
+    // const _postcursor =
+
+    // //
+    // let insertStartIndex = _precursor.length - 1;
+    // const insertEndIndex = insertStartIndex;
+
+    // // Split that with a single whitespace.
+    // const parts = _precursor.split(' ');
+
+    // // If the part just before the cursor isn't empty,
+    // //  then we use that to filter the options.
+    // if (parts[parts.length - 1] !== '') {
+    //   const filterValue = parts[parts.length - 1];
+
+    //   insertStartIndex -= filterValue.length - 1;
+    //   insertEndIndex += (insertEndIndex - filterValue.length);
+    //   console.log(`[${filterValue}, ${insertStartIndex}, ${insertEndIndex}]`);
+
+    //   _options = _options.filter(option => option.includes(filterValue));
+    // }
 
     //
-    let insertStartIndex = _precursor.length - 1;
-    let insertEndIndex = insertStartIndex;
 
-    // Split that with a single whitespace.
-    const parts = _precursor.split(' ');
-
-    // The the part just before the cursor isn't empty,
-    //  then we use that to filter the options.
-    if (parts[parts.length - 1] !== '') {
-      const filterValue = parts[parts.length - 1];
-      insertStartIndex -= filterValue.length - 1;
-      insertEndIndex += filterValue.length;
-      _options = _options.filter(option => option.includes(filterValue));
-    }
-
-    //
+    // Filter options.
+    const _options = filterValue.length > 0 ? options.filter(option => option.includes(filterValue)) : options;
 
     // Update states...
     setPrecursor(_precursor);
 
     // If filtered options is empty, then we return all options..
     setFilteredOptions({
-      start: insertStartIndex,
-      end: insertEndIndex,
-      items: _options.length > 0 ? _options : options
+      start: insertStartIndex > -1 ? insertStartIndex : thisCursor,
+      end: insertEndIndex > -1 ? insertEndIndex : thisCursor,
+      items: _options.length ? _options : options
     });
   };
 
-  const extractPrecursor = (inputValue: string, offset = 0) => {
-    // Extract text up to position of cursor in input element.
-    // with left/right arrow keys, the cursor isn't yet updated to new position
+  const parseFilter = (
+    inputValue: string,
+    offset = 0
+  ): { value: string; cursor: number; startIndex: number; endIndex: number; precursor: string; postcursor: string } => {
+    // With left/right arrow keys, the cursor isn't yet updated to new position
     //  when the event is received, therefore we use offset.
     //  +1 for right arrow, -1 for left arrow.
     const thisCursor = getInputEl().selectionStart + offset;
 
-    // Grab only the part of the text before the cursor.
-    return inputValue.substr(0, thisCursor);
+    // We'll split the inptu text in two parts, before and after cursor.
+    const _precursor = inputValue.substr(0, thisCursor);
+    const _postcursor = inputValue.substr(thisCursor);
+
+    // Intialize the start and end indexes of filter value.
+    let filterStartIndex = -1;
+    let filterEndIndex = -1;
+
+    // Grab the last substring of text from precursor.
+    const _preParts = _precursor.split(' ');
+    const _prePartsLast = _preParts[_preParts.length - 1];
+
+    // Grab the first substring of text from postcursor.
+    const _postParts = _postcursor.split(' ');
+    const _postPartsFirst = _postParts[0];
+
+    // If what preceeds the cursor isn't an empty string, we compute the new start position of filterValue.
+    if (_prePartsLast !== '') {
+      filterStartIndex = thisCursor - _prePartsLast.length;
+    }
+
+    // If what fallows the cursor isn't an empty string, we compute the new end position of filterValue.
+    if (_postPartsFirst !== '') {
+      filterEndIndex = thisCursor + _postPartsFirst.length - 1;
+    } else {
+      // Ensure that if we have a what preceed cursor isn't empty, to set end position to cursor.
+      filterEndIndex = filterStartIndex > -1 ? thisCursor - 1 : -1;
+    }
+
+    // If the preceeding part of cursor is empty but not the folowing part, then set start position to cursor.
+    if (filterStartIndex === -1 && filterEndIndex > -1) {
+      filterStartIndex = thisCursor;
+    }
+
+    // Give it back.
+    return {
+      value: _prePartsLast,
+      cursor: thisCursor,
+      startIndex: filterStartIndex,
+      endIndex: filterEndIndex,
+      precursor: _precursor,
+      postcursor: _postcursor
+    };
   };
 
   return (

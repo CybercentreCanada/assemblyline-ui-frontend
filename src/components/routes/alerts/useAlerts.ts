@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { InfiniteListItem } from 'components/elements/lists/infinite-list';
 import SearchQuery from 'components/elements/search/search-query';
-import useALContext from 'components/hooks/useALContext';
+import useAppContext from 'components/hooks/useAppContext';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { ALField } from 'components/providers/ALContextProvider';
+import { ALField } from 'components/hooks/useMyUser';
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
@@ -85,7 +85,7 @@ interface UsingAlerts {
 export default function useAlerts(pageSize): UsingAlerts {
   const location = useLocation();
   const apiCall = useMyAPI();
-  const { index: fieldIndexes } = useALContext();
+  const { indexes: fieldIndexes } = useAppContext();
   const [query] = useState<SearchQuery>(new SearchQuery(location.pathname, location.search, pageSize));
   const [fields, setFields] = useState<ALField[]>([]);
   const [valueFilters, setValueFilters] = useState<AlertFilterItem[]>([]);
