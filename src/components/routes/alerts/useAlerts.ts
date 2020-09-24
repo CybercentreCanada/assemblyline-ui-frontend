@@ -77,12 +77,7 @@ interface UsingAlerts {
   onGet: (id: string, onSuccess: (alert: AlertItem) => void) => void;
 }
 
-//
-// /api/v4/search/fields/alert.
-// /api/v4/search/alert/
-
 // Custom Hook implementation for dealing with alerts.
-
 export default function useAlerts(pageSize): UsingAlerts {
   const location = useLocation();
   const apiCall = useMyAPI();
