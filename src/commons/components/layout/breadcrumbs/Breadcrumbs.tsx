@@ -66,6 +66,7 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ disableStyle }) => {
       items={items}
       disableStyle={disableStyle}
       allLinks={allLinks}
+      isStatic={isStatic}
       itemsBefore={isExpanded ? itemsBefore : 0}
       itemsAfter={isExpanded ? itemsAfter : 1}
     />

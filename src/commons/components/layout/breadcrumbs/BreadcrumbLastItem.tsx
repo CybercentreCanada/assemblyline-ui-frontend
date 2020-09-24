@@ -11,12 +11,10 @@ type BreadcrumbLastItemProps = {
 
 const BreadcrumbLastItem: React.FC<BreadcrumbLastItemProps> = ({ item, textOnly = false }) => {
   const classes = useStyles();
-  const {
-    route,
-    matcher: { url }
-  } = item;
+  const { route, matcher } = item;
   const linkClasses = useLinkStyle();
   const { resolveTitle } = useAppSitemap();
+  const url = matcher ? matcher.url : route.path;
 
   return (
     <Typography

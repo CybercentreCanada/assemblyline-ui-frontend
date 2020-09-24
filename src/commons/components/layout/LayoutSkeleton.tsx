@@ -23,7 +23,7 @@ import React from 'react';
 const useStyles = makeStyles(theme => ({
   container: {
     position: 'absolute',
-    zIndex: theme.zIndex.appBar + 100,
+    zIndex: theme.zIndex.appBar + 150,
     top: 0,
     left: 0,
     right: 0,
@@ -46,7 +46,6 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.palette.background.default
   },
   contentLeft: {
-    // borderRight: theme.palette.type === "light" ? "1px solid" : 0,
     border: theme.palette.type === 'light' ? '1px solid rgba(0, 0, 0, 0.12)' : '1px solid rgba(255, 255, 255, 0.12)',
     backgroundColor: theme.palette.background.paper,
     marginRight: 5,
