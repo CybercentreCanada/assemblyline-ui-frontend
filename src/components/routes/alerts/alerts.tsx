@@ -4,7 +4,6 @@ import CloseIcon from '@material-ui/icons/Close';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import InfiniteList from 'components/elements/lists/infinite-list';
 import SplitPanel from 'components/elements/panels/split-panel';
-import useViewport from 'components/elements/panels/useViewport';
 import Viewport from 'components/elements/panels/viewport';
 import SearchBar from 'components/elements/search/search-bar';
 import React, { useState } from 'react';
@@ -48,7 +47,7 @@ const Alerts: React.FC = () => {
     onLoadMore,
     onGet
   } = useAlerts(PAGE_SIZE);
-  const { resize: resizeViewport } = useViewport();
+  // Define required states...
   const [searching, setSearching] = useState<boolean>(false);
   const [scrollReset, setScrollReset] = useState<boolean>(false);
   const [splitPanel, setSplitPanel] = useState<{ open: boolean; item: AlertItem }>({ open: false, item: null });
@@ -180,7 +179,7 @@ const Alerts: React.FC = () => {
           </Box>
         </SearchBar>
       </Box>
-      <Viewport id="alert-viewport">
+      <Viewport>
         <SplitPanel
           leftMinWidth={500}
           leftInitWidthPerc={60}

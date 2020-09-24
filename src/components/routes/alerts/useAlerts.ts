@@ -11,6 +11,7 @@ export interface AlertFilterItem {
   id: number | string;
   label: string;
   value: any;
+  object: any;
 }
 
 export interface AlertFile {
@@ -150,8 +151,9 @@ export default function useAlerts(pageSize): UsingAlerts {
         const { api_response: statuses } = api_data;
         const msItems = Object.keys(statuses).map((k, i) => ({
           id: i,
-          label: `${statuses[k]}x ${k}`,
-          value: `status:${k}`
+          label: k,
+          value: `status:${k}`,
+          object: { count: statuses[k] }
         }));
         setStatusFilters(msItems);
       }
@@ -166,8 +168,9 @@ export default function useAlerts(pageSize): UsingAlerts {
         const { api_response: priorities } = api_data;
         const msItems = Object.keys(priorities).map((k, i) => ({
           id: i,
-          label: `${priorities[k]}x ${k}`,
-          value: `priority:${k}`
+          label: k,
+          value: `priority:${k}`,
+          object: { count: priorities[k] }
         }));
         setPriorityFilters(msItems);
       }
@@ -182,8 +185,9 @@ export default function useAlerts(pageSize): UsingAlerts {
         const { api_response: labels } = api_data;
         const msItems = Object.keys(labels).map((k, i) => ({
           id: i,
-          label: `${labels[k]}x ${k}`,
-          value: `label:${k}`
+          label: k,
+          value: `label:${k}`,
+          object: { count: labels[k] }
         }));
         setLabelFilters(msItems);
       }
@@ -202,8 +206,9 @@ export default function useAlerts(pageSize): UsingAlerts {
             const vkv = value[vk];
             msItems.push({
               id: `${ki}.${vki}}`,
-              label: `${k}:${vk} x${vkv}`,
-              value: `${k}:"${vk}"`
+              label: `${k}:${vk}`,
+              value: `${k}:"${vk}"`,
+              object: { count: vkv }
             });
           });
         });

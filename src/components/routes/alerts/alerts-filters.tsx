@@ -1,6 +1,7 @@
 /* eslint-disable no-param-reassign */
 import { Box, Button, Divider, makeStyles, TextField, Typography, useTheme } from '@material-ui/core';
 import { Autocomplete } from '@material-ui/lab';
+import CustomChip from 'components/visual/CustomChip';
 import React, { useEffect, useState } from 'react';
 import { AlertFilterItem } from './useAlerts';
 
@@ -94,7 +95,11 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
 
   const renderOption = (item: AlertFilterItem) => {
     // return <Chip label={item.} />;
-    return item.label;
+    return (
+      <Box>
+        <CustomChip label={item.object.count} size="tiny" /> {item.label}
+      </Box>
+    );
   };
 
   // Apply updates to selected filters when compoonent is mounted.
@@ -157,6 +162,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
             value={selectedStatusFilters}
             getOptionLabel={option => option.label}
             getOptionSelected={isSelected}
+            renderOption={renderOption}
             renderInput={params => <TextField {...params} label="Statuses" variant="outlined" />}
             onChange={(event, value) => onStatusFilterChange(value as AlertFilterItem[])}
           />
@@ -170,6 +176,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
             value={selectedPriorityFilters}
             getOptionLabel={option => option.label}
             getOptionSelected={isSelected}
+            renderOption={renderOption}
             renderInput={params => <TextField {...params} label="Priorities" variant="outlined" />}
             onChange={(event, value) => onPriorityFilterChange(value as AlertFilterItem[])}
           />
@@ -197,6 +204,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
             value={selectedValueFilters}
             getOptionLabel={option => option.label}
             getOptionSelected={isSelected}
+            renderOption={renderOption}
             renderInput={params => <TextField {...params} label="Values" variant="outlined" />}
             onChange={(event, value) => onValueFilterChange(value as AlertFilterItem[])}
           />

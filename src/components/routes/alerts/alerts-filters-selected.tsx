@@ -39,6 +39,7 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({ filters, o
           <Box display="inline-block" mt={1}>
             <ChipList
               items={statuses.map(v => ({
+                variant: 'outlined',
                 label: v.value,
                 onDelete: () => onDeleteStatus(v)
               }))}
@@ -49,6 +50,7 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({ filters, o
           <Box display="inline-block" mt={1}>
             <ChipList
               items={priorities.map(v => ({
+                variant: 'outlined',
                 label: v.value,
                 onDelete: () => onDeletePriority(v)
               }))}
@@ -59,6 +61,7 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({ filters, o
           <Box display="inline-block" mt={1}>
             <ChipList
               items={labels.map(v => ({
+                variant: 'outlined',
                 label: v.value,
                 onDelete: () => onDeleteLabel(v)
               }))}
@@ -69,6 +72,7 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({ filters, o
           <Box display="inline-block" mt={1}>
             <ChipList
               items={values.map(v => ({
+                variant: 'outlined',
                 label: v.value,
                 onDelete: () => onDeleteValue(v)
               }))}
