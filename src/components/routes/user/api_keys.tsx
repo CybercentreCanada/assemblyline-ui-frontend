@@ -97,8 +97,8 @@ export default function APIKeys({ user, toggleAPIKey, enqueueSnackbar, snackBarO
         </Typography>
         {user.apikeys.length !== 0 ? (
           user.apikeys.map((e, i) => (
-            <Box py={1}>
-              <Chip key={i} label={e} onDelete={() => askForDelete(e)} />
+            <Box key={i} py={1}>
+              <Chip label={e} onDelete={() => askForDelete(e)} />
             </Box>
           ))
         ) : (

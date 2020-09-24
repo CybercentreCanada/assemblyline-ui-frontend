@@ -1,4 +1,4 @@
-import { Box, Checkbox, createStyles, FormControlLabel, makeStyles } from '@material-ui/core';
+import { Box, Checkbox, createStyles, FormControlLabel, makeStyles, Typography } from '@material-ui/core';
 import { useTheme } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import Skeleton from '@material-ui/lab/Skeleton';
@@ -16,22 +16,33 @@ const useStyles = makeStyles(theme =>
   })
 );
 
-function ServiceTreeItemSkel() {
+type ServiceTreeItemSkelProps = {
+  size: 'medium' | 'small';
+};
+
+function ServiceTreeItemSkel({ size = 'medium' }: ServiceTreeItemSkelProps) {
   return (
-    <Box display="flex" flexDirection="row">
-      <Skeleton style={{ height: '2rem', width: '1.5rem' }} />
-      <Skeleton style={{ marginLeft: '1rem', height: '2rem', width: '100%' }} />
+    <Box display="flex" flexDirection="row" pb={1}>
+      <Skeleton style={{ height: size === 'medium' ? '2.5rem' : '2rem', width: '1.5rem' }} />
+      <Skeleton style={{ marginLeft: '1rem', height: size === 'medium' ? '2.5rem' : '2rem', width: '100%' }} />
     </Box>
   );
 }
 
-function ServiceTreeItem({ item, onChange }) {
+type ServiceTreeItemProps = {
+  item: any;
+  onChange: (name: string, category: string) => void;
+  size: 'medium' | 'small';
+};
+
+function ServiceTreeItem({ item, onChange, size = 'medium' as 'medium' }: ServiceTreeItemProps) {
   const classes = useStyles();
   return (
     <Box display="block">
       <FormControlLabel
         control={
           <Checkbox
+            size={size}
             indeterminate={
               item.services ? !item.services.every(e => e.selected) && !item.services.every(e => !e.selected) : false
             }
@@ -40,13 +51,13 @@ function ServiceTreeItem({ item, onChange }) {
             onChange={() => onChange(item.name, item.category)}
           />
         }
-        label={item.name}
+        label={<Typography variant={size === 'small' ? 'body2' : 'body1'}>{item.name}</Typography>}
         className={classes.item}
       />
       <Box pl={4}>
         {item.services
           ? item.services.map((service, service_id) => {
-              return <ServiceTreeItem key={service_id} item={service} onChange={onChange} />;
+              return <ServiceTreeItem size={size} key={service_id} item={service} onChange={onChange} />;
             })
           : null}
       </Box>
@@ -54,7 +65,58 @@ function ServiceTreeItem({ item, onChange }) {
   );
 }
 
-export default function ServiceTree({ settings, setSettings, setModified = null }) {
+type SkelItemsProps = {
+  size: 'medium' | 'small';
+};
+
+function SkelItems({ size }: SkelItemsProps) {
+  return (
+    <>
+      <Box>
+        <ServiceTreeItemSkel size={size} />
+        <Box pl={4}>
+          <ServiceTreeItemSkel size={size} />
+          <ServiceTreeItemSkel size={size} />
+          <ServiceTreeItemSkel size={size} />
+          <ServiceTreeItemSkel size={size} />
+        </Box>
+      </Box>
+      <Box>
+        <ServiceTreeItemSkel size={size} />
+        <Box pl={4}>
+          <ServiceTreeItemSkel size={size} />
+          <ServiceTreeItemSkel size={size} />
+        </Box>
+      </Box>
+      <Box>
+        <ServiceTreeItemSkel size={size} />
+        <Box pl={4}>
+          <ServiceTreeItemSkel size={size} />
+          <ServiceTreeItemSkel size={size} />
+          <ServiceTreeItemSkel size={size} />
+          <ServiceTreeItemSkel size={size} />
+          <ServiceTreeItemSkel size={size} />
+        </Box>
+      </Box>
+    </>
+  );
+}
+
+type ServiceTreeProps = {
+  settings: any;
+  setSettings: (settings: any) => void;
+  setModified?: (isModified: boolean) => void;
+  useMasonery?: boolean;
+  size?: 'medium' | 'small';
+};
+
+export default function ServiceTree({
+  settings,
+  setSettings,
+  setModified = null,
+  useMasonery = true,
+  size = 'medium' as 'medium'
+}: ServiceTreeProps) {
   const theme = useTheme();
   const sm = useMediaQuery(theme.breakpoints.only('sm'));
   const xs = useMediaQuery(theme.breakpoints.only('xs'));
@@ -95,39 +157,24 @@ export default function ServiceTree({ settings, setSettings, setModified = null 
   }
 
   return settings ? (
+    useMasonery ? (
+      <Masonry breakpointCols={bp} className="m-grid" columnClassName="m-grid_column">
+        {settings.services.map((category, cat_id) => {
+          return <ServiceTreeItem size={size} key={cat_id} item={category} onChange={handleServiceChange} />;
+        })}
+      </Masonry>
+    ) : (
+      <Box>
+        {settings.services.map((category, cat_id) => {
+          return <ServiceTreeItem size={size} key={cat_id} item={category} onChange={handleServiceChange} />;
+        })}
+      </Box>
+    )
+  ) : useMasonery ? (
     <Masonry breakpointCols={bp} className="m-grid" columnClassName="m-grid_column">
-      {settings.services.map((category, cat_id) => {
-        return <ServiceTreeItem key={cat_id} item={category} onChange={handleServiceChange} />;
-      })}
+      <SkelItems size={size} />
     </Masonry>
   ) : (
-    <Masonry breakpointCols={bp} className="m-grid" columnClassName="m-grid_column">
-      <Box>
-        <ServiceTreeItemSkel />
-        <Box pl={4}>
-          <ServiceTreeItemSkel />
-          <ServiceTreeItemSkel />
-          <ServiceTreeItemSkel />
-          <ServiceTreeItemSkel />
-        </Box>
-      </Box>
-      <Box>
-        <ServiceTreeItemSkel />
-        <Box pl={4}>
-          <ServiceTreeItemSkel />
-          <ServiceTreeItemSkel />
-        </Box>
-      </Box>
-      <Box>
-        <ServiceTreeItemSkel />
-        <Box pl={4}>
-          <ServiceTreeItemSkel />
-          <ServiceTreeItemSkel />
-          <ServiceTreeItemSkel />
-          <ServiceTreeItemSkel />
-          <ServiceTreeItemSkel />
-        </Box>
-      </Box>
-    </Masonry>
+    <SkelItems size={size} />
   );
 }

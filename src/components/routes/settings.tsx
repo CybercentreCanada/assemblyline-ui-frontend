@@ -24,10 +24,9 @@ import {
 import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
 import CloseIcon from '@material-ui/icons/Close';
 import Skeleton from '@material-ui/lab/Skeleton';
-import useUser from 'commons/components/hooks/useAppUser';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
+import useAppContext from 'components/hooks/useAppContext';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { CustomUser } from 'components/hooks/useMyUser';
 import ServiceTree from 'components/layout/serviceTree';
 import Classification from 'components/visual/Classification';
 import { OptionsObject, useSnackbar } from 'notistack';
@@ -47,7 +46,7 @@ function Settings<SettingsProps>({ width }) {
   const [settings, setSettings] = useState(null);
   const [modified, setModified] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
-  const { user: currentUser } = useUser<CustomUser>();
+  const { user: currentUser, c12nDef } = useAppContext();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   const apiCall = useMyAPI();
@@ -425,7 +424,7 @@ function Settings<SettingsProps>({ width }) {
                   <ChevronRightOutlinedIcon />
                 </TableCell>
               </TableRow>
-              {currentUser.c12n_enforcing ? (
+              {c12nDef.enforce ? (
                 <TableRow style={{ cursor: 'pointer' }}>
                   {isWidthDown('xs', width) ? null : (
                     <TableCell>

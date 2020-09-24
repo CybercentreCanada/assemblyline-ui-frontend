@@ -4,13 +4,15 @@ import PageCenter from 'commons/components/layout/pages/PageCenter';
 import { CustomUser } from 'components/hooks/useMyUser';
 import ForbiddenPage from 'components/routes/403';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function Users() {
+  const { t } = useTranslation(['adminUsers']);
   const { user: currentUser } = useUser<CustomUser>();
 
   return currentUser.is_admin ? (
     <PageCenter>
-      <Box>Users</Box>
+      <Box>{t('Users')}</Box>
     </PageCenter>
   ) : (
     <ForbiddenPage />

@@ -1,12 +1,11 @@
 import useAppLayout from 'commons/components/hooks/useAppLayout';
-import useAppUser from 'commons/components/hooks/useAppUser';
 import AppLayoutProvider from 'commons/components/layout/LayoutProvider';
 import SiteMapProvider from 'commons/components/sitemap/SitemapProvider';
 import UserProvider from 'commons/components/user/UserProvider';
+import useAppContext from 'components/hooks/useAppContext';
 import useMyLayout from 'components/hooks/useMyLayout';
 import useMySitemap from 'components/hooks/useMySitemap';
-import useMyUser, { CustomUser } from 'components/hooks/useMyUser';
-import ALContextProvider from 'components/providers/ALContextProvider';
+import useMyUser from 'components/hooks/useMyUser';
 import LoadingScreen from 'components/routes/loading';
 import LockedPage from 'components/routes/locked';
 import LoginScreen from 'components/routes/login';
@@ -25,16 +24,18 @@ type LoginParamsProps = {
   allow_pw_rest: boolean;
 };
 
+type PossibleApps = 'load' | 'locked' | 'login' | 'routes' | 'tos';
+
 const MyApp = () => {
   const storedLoginParams = localStorage.getItem('loginParams');
   const defaultLoginParams = storedLoginParams ? JSON.parse(storedLoginParams) : null;
 
   const params = new URLSearchParams(window.location.search);
-  const [renderedApp, setRenderedApp] = useState(params.get('provider') ? 'login' : 'load');
+  const [renderedApp, setRenderedApp] = useState<PossibleApps>(params.get('provider') ? 'login' : 'load');
   const [loginParams, setLoginParams] = useState<LoginParamsProps | null>(defaultLoginParams);
 
   const { t } = useTranslation();
-  const { user: currentUser, setUser } = useAppUser<CustomUser>();
+  const { user: currentUser, configuration, setUser } = useAppContext();
   const { setReady } = useAppLayout();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
@@ -50,7 +51,7 @@ const MyApp = () => {
     }
   };
 
-  const switchRenderedApp = (value: 'load' | 'locked' | 'login' | 'routes' | 'tos') => {
+  const switchRenderedApp = (value: PossibleApps) => {
     if (renderedApp !== value) {
       setRenderedApp(value);
     }
@@ -94,7 +95,7 @@ const MyApp = () => {
         } else if (api_data.api_status_code === 200) {
           setUser(api_data.api_response);
           setReady(true);
-          if (!api_data.api_response.agrees_with_tos && api_data.api_response.has_tos) {
+          if (!api_data.api_response.agrees_with_tos && api_data.api_response.configuration.ui.tos) {
             switchRenderedApp('tos');
           } else {
             switchRenderedApp('routes');
@@ -109,7 +110,7 @@ const MyApp = () => {
   return {
     load: <LoadingScreen />,
     locked: currentUser ? (
-      <LockedPage hasTOS={currentUser.has_tos} autoNotify={currentUser.tos_auto_notify} />
+      <LockedPage hasTOS={configuration.ui.tos} autoNotify={configuration.ui.tos_lockout_notify} />
     ) : (
       <LoadingScreen />
     ),
@@ -146,9 +147,7 @@ const App: React.FC = () => {
         <UserProvider {...userProps}>
           <AppLayoutProvider {...layoutProps}>
             <SnackbarProvider>
-              <ALContextProvider>
-                <MyApp />
-              </ALContextProvider>
+              <MyApp />
             </SnackbarProvider>
           </AppLayoutProvider>
         </UserProvider>

@@ -20,7 +20,6 @@ const useStyles = (layout, showSpacing) => {
       paddingTop: showSpacing ? (layout === 'top' ? theme.spacing(9) : theme.spacing(8)) : theme.spacing(3),
       paddingLeft: theme.spacing(3),
       paddingRight: theme.spacing(3),
-      // paddingBottom: theme.spacing(3),
       [theme.breakpoints.only('sm')]: {
         paddingLeft: showSpacing ? theme.spacing(10) : theme.spacing(3)
       },

@@ -1,32 +1,105 @@
 import { UserContextProps, UserProfileProps, ValidatedProp } from 'commons/components/user/UserProvider';
+import { ClassificationDefinition } from 'helpers/classificationParser';
 import { useState } from 'react';
+
+type ALField = {
+  name: string;
+  indexed: boolean;
+  stored: boolean;
+  type: string;
+  default: boolean;
+  list: boolean;
+};
+
+type IndexDefinition = {
+  [propName: string]: ALField;
+};
+
+type IndexDefinitionMap = {
+  alert: IndexDefinition;
+  file: IndexDefinition;
+  heuristic: IndexDefinition;
+  result: IndexDefinition;
+  signature: IndexDefinition;
+  submission: IndexDefinition;
+  workflow: IndexDefinition;
+};
+
+export type ConfigurationDefinition = {
+  auth: {
+    allow_2fa: boolean;
+    allow_apikeys: boolean;
+    allow_security_tokens: boolean;
+  };
+  ui: {
+    allow_url_submission: boolean;
+    read_only: boolean;
+    tos: boolean;
+    tos_lockout: boolean;
+    tos_lockout_notify: boolean;
+  };
+};
 
 export interface CustomUser extends UserProfileProps {
   // Al specific props
   agrees_with_tos: boolean;
-  allow_2fa: boolean;
-  allow_apikeys: boolean;
-  allow_security_tokens: boolean;
-  c12n_enforcing: boolean;
   classification: string;
   groups: string[];
-  has_tos: boolean;
   is_active: boolean;
-  read_only: boolean;
-  tos_auto_notify: boolean;
   type: string[];
 }
 
-// Application specific hook that will provide configuration to commons [useUser] hook.
-export default function useMyUser(): UserContextProps<CustomUser> {
-  const [user, setState] = useState<CustomUser>(null);
+export interface CustomUserContextProps extends UserContextProps<CustomUser> {
+  c12nDef: ClassificationDefinition;
+  configuration: ConfigurationDefinition;
+  indexes: IndexDefinitionMap;
+}
 
-  const setUser = (curUser: CustomUser) => {
+interface WhoAmIProps extends CustomUser {
+  c12nDef: ClassificationDefinition;
+  configuration: ConfigurationDefinition;
+  indexes: IndexDefinitionMap;
+}
+
+// Application specific hook that will provide configuration to commons [useUser] hook.
+export default function useMyUser(): CustomUserContextProps {
+  const [user, setState] = useState<CustomUser>(null);
+  const [c12nDef, setC12nDef] = useState<ClassificationDefinition>(null);
+  const [configuration, setConfiguration] = useState<ConfigurationDefinition>(null);
+  const [indexes, setIndexes] = useState<IndexDefinitionMap>(null);
+  const [flattenedProps, setFlattenedProps] = useState(null);
+
+  function flatten(ob) {
+    const toReturn = {};
+
+    for (const i in ob) {
+      if ({}.hasOwnProperty.call(ob, i)) {
+        if (typeof ob[i] == 'object') {
+          const flatObject = flatten(ob[i]);
+          for (const x in flatObject) {
+            if ({}.hasOwnProperty.call(flatObject, x)) {
+              toReturn[`${i}.${x}`] = flatObject[x];
+            }
+          }
+        } else {
+          toReturn[i] = ob[i];
+        }
+      }
+    }
+    return toReturn;
+  }
+
+  const setUser = (whoAmIData: WhoAmIProps) => {
+    const { configuration: cfg, c12nDef: c12n, indexes: idx, ...curUser } = whoAmIData;
+    setC12nDef(c12n);
+    setConfiguration(cfg);
+    setIndexes(idx);
     setState(curUser);
+    setFlattenedProps(flatten({ user: curUser, c12nDef: c12n, configuration: cfg, indexes: idx }));
   };
 
   const validateProp = (propDef: ValidatedProp) => {
-    return user[propDef.prop] === propDef.value;
+    return flattenedProps[propDef.prop] === propDef.value;
   };
 
   const validateProps = (props: ValidatedProp[]) => {
@@ -35,7 +108,7 @@ export default function useMyUser(): UserContextProps<CustomUser> {
   };
 
   const isReady = () => {
-    if (user === null || (!user.agrees_with_tos && user.has_tos) || !user.is_active) {
+    if (user === null || (!user.agrees_with_tos && configuration.ui.tos) || !user.is_active) {
       return false;
     }
 
@@ -43,6 +116,9 @@ export default function useMyUser(): UserContextProps<CustomUser> {
   };
 
   return {
+    c12nDef,
+    configuration,
+    indexes,
     user,
     setUser,
     isReady,

@@ -1,10 +1,10 @@
 import { Box, Button, CircularProgress, Link, makeStyles, Typography, useTheme } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
-import useUser from 'commons/components/hooks/useAppUser';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
+import useAppContext from 'components/hooks/useAppContext';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { CustomUser } from 'components/hooks/useMyUser';
+import NotFoundPage from 'components/routes/404_dl';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -16,7 +16,7 @@ export default function Tos() {
   const [tos, setTos] = useState('');
   const [buttonLoading, setButtonLoading] = useState(false);
   const { getBanner } = useAppLayout();
-  const { user: currentUser } = useUser<CustomUser>();
+  const { user: currentUser, configuration } = useAppContext();
   const apiCall = useMyAPI();
   const useStyles = makeStyles(curTheme => ({
     no_pad: {
@@ -61,14 +61,16 @@ export default function Tos() {
   }
 
   useEffect(() => {
-    apiCall({
-      url: '/api/v4/help/tos/',
-      onSuccess: api_data => setTos(api_data.api_response)
-    });
+    if (configuration.ui.tos) {
+      apiCall({
+        url: '/api/v4/help/tos/',
+        onSuccess: api_data => setTos(api_data.api_response)
+      });
+    }
     // eslint-disable-next-line
   }, []);
 
-  return (
+  return configuration.ui.tos ? (
     <PageCenter>
       <Box className={classes.page} display="inline-block" textAlign="center">
         <Box>{getBanner(theme)}</Box>
@@ -125,5 +127,7 @@ export default function Tos() {
         )}
       </Box>
     </PageCenter>
+  ) : (
+    <NotFoundPage />
   );
 }

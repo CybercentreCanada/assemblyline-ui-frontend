@@ -2,12 +2,17 @@ import { makeStyles } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
 import { AiOutlineSecurityScan } from 'react-icons/ai';
 
-export default function FileDropper() {
+type FileDropperProps = {
+  file: File;
+  setFile: (file: File) => void;
+};
+
+export default function FileDropper({ file, setFile }: FileDropperProps) {
   const { t } = useTranslation(['submit']);
   const { acceptedFiles, getRootProps, getInputProps, isDragActive } = useDropzone();
   const useStyles = makeStyles(theme => ({
@@ -37,46 +42,42 @@ export default function FileDropper() {
   }));
   const classes = useStyles();
 
-  let dropperText;
-  if (acceptedFiles.length > 0) {
-    dropperText = (
-      <Box textAlign="center">
-        <Typography variant="body1">
-          <b>{acceptedFiles[0].name}</b>
-        </Typography>
-        <Typography variant="body2" align="center">
-          {acceptedFiles[0].size} {t('file.dragzon.byte')}
-        </Typography>
-      </Box>
-    );
-  } else {
-    dropperText = (
-      <Typography variant="body1">
-        <b>{t('file.dragzone')}</b>
-      </Typography>
-    );
-  }
+  useEffect(() => {
+    if (acceptedFiles.length !== 0) {
+      setFile(acceptedFiles[0]);
+    }
+    // eslint-disable-next-line
+  }, [acceptedFiles]);
 
   return (
     <Box>
       <div
         {...getRootProps()}
-        className={
-          acceptedFiles.length > 0 || isDragActive ? `${classes.drop_zone} ${classes.drag_enter}` : classes.drop_zone
-        }
+        className={file || isDragActive ? `${classes.drop_zone} ${classes.drag_enter}` : classes.drop_zone}
       >
         <input {...getInputProps()} />
         <AiOutlineSecurityScan style={{ fontSize: '140px' }} />
-        {dropperText}
+        {file ? (
+          <Box textAlign="center">
+            <Typography variant="body1">
+              <b>{file.name}</b>
+            </Typography>
+            <Typography variant="body2" align="center">
+              {file.size} {t('file.dragzon.byte')}
+            </Typography>
+          </Box>
+        ) : (
+          <Typography variant="body1">
+            <b>{t('file.dragzone')}</b>
+          </Typography>
+        )}
       </div>
       <Box marginTop="2rem">
-        {acceptedFiles.length === 0 ? (
-          ''
-        ) : (
+        {file ? (
           <Button color="primary" variant="contained">
             {t('file.button')}
           </Button>
-        )}
+        ) : null}
       </Box>
     </Box>
   );
