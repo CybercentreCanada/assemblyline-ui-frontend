@@ -78,7 +78,7 @@ interface UsingAlerts {
 }
 
 // Custom Hook implementation for dealing with alerts.
-export default function useAlerts(): UsingAlerts {
+export default function useAlerts(pageSize: number): UsingAlerts {
   const location = useLocation();
   const apiCall = useMyAPI();
   const { indexes: fieldIndexes } = useAppContext();
