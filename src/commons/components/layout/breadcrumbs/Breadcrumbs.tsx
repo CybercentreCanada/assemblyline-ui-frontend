@@ -1,7 +1,6 @@
 import { makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import useAppSitemap from 'commons/components/hooks/useAppSitemap';
-import BreadcrumbLastItem from 'commons/components/layout/breadcrumbs/BreadcrumbLastItem';
 import BreadcrumbList from 'commons/components/layout/breadcrumbs/BreadcrumbList';
 import React from 'react';
 
@@ -43,18 +42,17 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ disableStyle }) => {
     breadcrumbs,
     props: { lastOnly, exceptLast, allLinks, itemsBefore = 1, itemsAfter = 1 },
     getSiteRoute,
-    last
+    last,
+    is404
   } = useAppSitemap();
 
   const current = last();
   const isStatic = !!current.route.breadcrumbs;
 
-  if (lastOnly) {
-    return <BreadcrumbLastItem item={current} />;
-  }
-
   let items = null;
-  if (isStatic) {
+  if (lastOnly || is404(current)) {
+    items = [current];
+  } else if (isStatic) {
     const staticBreadcrumbs = current.route.breadcrumbs.map(path => getSiteRoute(path));
     items = [...staticBreadcrumbs, current];
   } else {

@@ -11,6 +11,7 @@ type SitemapProps = {
   getSiteRoute: (path: string) => BreadcrumbItem;
   last: () => BreadcrumbItem;
   first: () => BreadcrumbItem;
+  is404: (breadcrumb: BreadcrumbItem) => boolean;
 };
 
 export const getRoute = (route: string, siteMap: SiteMapRoute[]): BreadcrumbItem => {
@@ -67,6 +68,10 @@ const resolveTitle = (breadcrumb: BreadcrumbItem, siteMap: SiteMapRoute[]) => {
   return title;
 };
 
+const is404 = (breadcrumb: BreadcrumbItem) => {
+  return breadcrumb.route.title === '404';
+};
+
 export default function useAppSitemap(): SitemapProps {
   const { breadcrumbs, ...props } = useContext(SiteMapContext);
   return {
@@ -75,6 +80,7 @@ export default function useAppSitemap(): SitemapProps {
     resolveTitle: (breadcrumb: BreadcrumbItem) => resolveTitle(breadcrumb, props.routes),
     getSiteRoute: (path: string) => getRoute(path, props.routes),
     last: () => (breadcrumbs.length > 0 ? breadcrumbs[breadcrumbs.length - 1] : breadcrumbs[0]),
-    first: () => breadcrumbs[0]
+    first: () => breadcrumbs[0],
+    is404
   };
 }
