@@ -59,17 +59,29 @@ function Submit() {
   }));
   const classes = useStyles();
 
-  function setParam(service_idx, param_idx, p_value) {
+  const setParam = (service_idx, param_idx, p_value) => {
     if (settings) {
       const newSettings = { ...settings };
       newSettings.service_spec[service_idx].params[param_idx].value = p_value;
       setSettings(newSettings);
+    }
+  };
+
+  function setParamAsync(service_idx, param_idx, p_value) {
+    if (settings) {
+      settings.service_spec[service_idx].params[param_idx].value = p_value;
     }
   }
 
   function setSettingValue(field, fieldValue) {
     if (settings) {
       setSettings({ ...settings, [field]: fieldValue });
+    }
+  }
+
+  function setSettingAsyncValue(field, fieldValue) {
+    if (settings) {
+      settings[field] = fieldValue;
     }
   }
 
@@ -146,7 +158,7 @@ function Submit() {
                 onChange={event => setUrl(event.target.value)}
                 style={{ flexGrow: 1, marginRight: '1rem' }}
               />
-              <Button color="primary" variant="contained">
+              <Button color="primary" variant="contained" onClick={() => console.log(settings)}>
                 {t('url.button')}
               </Button>
             </Box>
@@ -188,8 +200,8 @@ function Submit() {
                         id="desc"
                         size="small"
                         type="text"
-                        value={settings.description}
-                        onChange={event => setSettingValue('description', event.target.value)}
+                        defaultValue={settings.description}
+                        onChange={event => setSettingAsyncValue('description', event.target.value)}
                         InputLabelProps={{
                           shrink: true
                         }}
@@ -339,8 +351,8 @@ function Submit() {
                         size="small"
                         type="number"
                         inputProps={{ min: 0, max: 365 }}
-                        value={settings.ttl}
-                        onChange={event => setSettingValue('ttl', event.target.value)}
+                        defaultValue={settings.ttl}
+                        onChange={event => setSettingAsyncValue('ttl', event.target.value)}
                         variant="outlined"
                         fullWidth
                       />
@@ -416,8 +428,8 @@ function Submit() {
                                         type={param.type === 'int' ? 'number' : 'text'}
                                         size="small"
                                         fullWidth
-                                        value={param.value}
-                                        onChange={event => setParam(idx, pidx, event.target.value)}
+                                        defaultValue={param.value}
+                                        onChange={event => setParamAsync(idx, pidx, event.target.value)}
                                       />
                                     )}
                                   </>
