@@ -25,9 +25,10 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import ServiceTree from 'components/layout/serviceTree';
 import Classification from 'components/visual/Classification';
 import FileDropper from 'components/visual/FileDropper';
+import { OptionsObject, useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 
 function Submit() {
   const { getBanner } = useAppLayout();
@@ -37,10 +38,25 @@ function Submit() {
   const { user: currentUser, c12nDef, configuration } = useAppContext();
   const [settings, setSettings] = useState(null);
   const [url, setUrl] = useState('');
+  const [urlHasError, setUrlHasError] = useState(false);
+  const [allowClick, setAllowClick] = useState(true);
   const [file, setFile] = useState(null);
   const [value, setValue] = useState('0');
   const downSM = useMediaQuery(theme.breakpoints.down('sm'));
   const md = useMediaQuery(theme.breakpoints.only('md'));
+  const history = useHistory();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const snackBarOptions: OptionsObject = {
+    variant: 'error',
+    autoHideDuration: 5000,
+    anchorOrigin: {
+      vertical: 'bottom',
+      horizontal: 'center'
+    },
+    onClick: snack => {
+      closeSnackbar();
+    }
+  };
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -89,6 +105,48 @@ function Submit() {
     if (settings) {
       setSettings({ ...settings, classification: c12n });
     }
+  }
+
+  function handleUrlChange(event) {
+    closeSnackbar();
+    setUrlHasError(false);
+    setUrl(event.target.value);
+  }
+
+  function analyseUrl() {
+    const urlParseRE = /^(((([^:/#?]+:)?(?:(\/\/)((?:(([^:@/#?]+)(?::([^:@/#?]+))?)@)?(([^:/#?\][]+|\[[^/\]@#?]+])(?::([0-9]+))?))?)?)?((\/?(?:[^/?#]+\/+)*)([^?#]*)))?(\?[^#]+)?)(#.*)?/;
+    const matches = urlParseRE.exec(url);
+
+    if (matches[15] === undefined || matches[15] === '') {
+      matches[15] = 'file';
+    }
+
+    const data = {
+      name: matches[15],
+      url,
+      ui_params: settings
+    };
+
+    setUrlHasError(false);
+    apiCall({
+      url: '/api/v4/submit/',
+      method: 'POST',
+      body: data,
+      onSuccess: api_data => {
+        setAllowClick(false);
+        enqueueSnackbar(`${t('submit.success')} ${api_data.api_response.sid}`, {
+          ...snackBarOptions,
+          variant: 'success'
+        });
+        setTimeout(() => {
+          history.push(`/submissions/${api_data.api_response.sid}`);
+        }, 500);
+      },
+      onFailure: api_data => {
+        enqueueSnackbar(t('submit.failure'), snackBarOptions);
+        setUrlHasError(true);
+      }
+    });
   }
 
   useEffect(() => {
@@ -148,17 +206,18 @@ function Submit() {
             </Box>
           </TabPanel>
           <TabPanel value="1" className={classes.no_pad}>
-            <Box display="flex" flexDirection="row" marginTop="30px">
+            <Box display="flex" flexDirection="row" marginTop="30px" alignItems="flex-start">
               <TextField
                 label={t('url.input')}
+                error={urlHasError}
                 size="small"
                 type="url"
                 variant="outlined"
                 value={url}
-                onChange={event => setUrl(event.target.value)}
+                onChange={handleUrlChange}
                 style={{ flexGrow: 1, marginRight: '1rem' }}
               />
-              <Button color="primary" variant="contained" onClick={() => console.log(settings)}>
+              <Button disabled={!url || !allowClick} color="primary" variant="contained" onClick={() => analyseUrl()}>
                 {t('url.button')}
               </Button>
             </Box>

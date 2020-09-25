@@ -19,6 +19,8 @@
   "options.submission.priority.medium": "Medium: 1000",
   "options.submission.profile": "Profile current scan",
   "options.submission.ttl": "Days to live (0: Forever)",
+  "submit.failure": "Submitted URL is either invalid or unreachable...",
+  "submit.success": "Successfully submitted, redirecting you to submission ID:",
   "terms1": "By pressing ",
   "terms2": ", you consent to our ",
   "terms3": "Terms of Service",
