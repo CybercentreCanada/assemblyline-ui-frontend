@@ -6,7 +6,7 @@ import InfiniteList from 'components/elements/lists/infinite-list';
 import SplitPanel from 'components/elements/panels/split-panel';
 import Viewport from 'components/elements/panels/viewport';
 import SearchBar from 'components/elements/search/search-bar';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AlertActionsMenu from './alert-actions-menu';
 import AlertDetails from './alert-details';
 import AlertListItem from './alert-list-item';
@@ -60,6 +60,32 @@ const Alerts: React.FC = () => {
     priorities: [],
     labels: []
   });
+
+  useEffect(() => {
+    const statuses = [];
+    const priorities = [];
+    const labels = [];
+    const values = [];
+    query.getFqList().forEach(fq => {
+      if (statusFilters.length && fq.startsWith('status')) {
+        statuses.push(statusFilters.find(f => f.value === fq));
+      } else if (priorityFilters.length && fq.startsWith('priority')) {
+        priorities.push(priorityFilters.find(f => f.value === fq));
+      } else if (labelFilters.length && fq.startsWith('label')) {
+        labels.push(labelFilters.find(f => f.value === fq));
+      } else if (valueFilters.length) {
+        values.push(valueFilters.find(f => f.value === fq));
+      }
+    });
+    //
+    setSelectedFilters(filters => ({
+      ...filters,
+      statuses: statuses || filters.statuses,
+      priorities: priorities || filters.priorities,
+      labels: labels || filters.labels,
+      values: values || filters.labels
+    }));
+  }, [statusFilters, priorityFilters, labelFilters, valueFilters, query]);
 
   //
   const _onSearch = (filterValue: string = '', inputEl: HTMLInputElement = null) => {

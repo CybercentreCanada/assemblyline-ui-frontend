@@ -1,3 +1,18 @@
+enum SearchFilterType {
+  STATUS = 'status',
+  PRIORITY = 'priorty',
+  LABEL = 'label',
+  VALUE = 'value'
+}
+
+export interface SearchFilter {
+  id: number | string;
+  type: SearchFilterType;
+  label: string;
+  value: any;
+  object: any;
+}
+
 export interface SearchQueryParameter {
   name: string;
   value: string;
@@ -131,5 +146,23 @@ export default class SearchQuery {
 
   public apply(): void {
     window.history.pushState(null, '', this.build());
+  }
+
+  public parseFilters(): SearchFilter[] {
+    if (this.getFqList().length) {
+      console.log('test');
+    }
+    return [];
+  }
+
+  public static parseFilterValue(id: string | number, filter: string): SearchFilter {
+    const [type, qualifier] = filter.split(':');
+    return {
+      id,
+      type: SearchFilterType[type],
+      label: filter,
+      value: filter,
+      object: null
+    };
   }
 }

@@ -1,7 +1,7 @@
 import { Box } from '@material-ui/core';
 import { ChipList } from 'components/elements/mui/chips';
 import React from 'react';
-import { AlertFilterSelections } from './alerts-filters2';
+import { AlertFilterSelections } from './alerts-filters';
 import { AlertFilterItem } from './useAlerts';
 
 interface AlertFiltersSelectedProps {
@@ -32,7 +32,7 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({ filters, o
   return (
     <Box>
       <Box>
-        Time Contrait = {tc.label}, GroupBy = {groupBy.label}
+        Time Constraint = {tc.label}, Group by = {groupBy.label}
       </Box>
       <Box>
         {statuses.length ? (
