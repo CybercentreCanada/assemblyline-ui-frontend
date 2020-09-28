@@ -9,6 +9,15 @@ export const DEFAULT_TC = { value: '4d', label: '4 Days' };
 
 export const DEFAULT_GROUPBY = { value: 'file.sha256', label: 'file.sha256' };
 
+export const DEFAULT_FILTERS = {
+  tc: DEFAULT_TC,
+  groupBy: DEFAULT_GROUPBY,
+  values: [],
+  statuses: [],
+  priorities: [],
+  labels: []
+};
+
 const useStyles = makeStyles(theme => ({
   option: {
     backgroundColor: theme.palette.background.default

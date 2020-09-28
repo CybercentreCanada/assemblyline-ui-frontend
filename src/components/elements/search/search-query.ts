@@ -1,13 +1,13 @@
-enum SearchFilterType {
-  STATUS = 'status',
-  PRIORITY = 'priorty',
-  LABEL = 'label',
-  VALUE = 'value'
-}
+// enum SearchFilterType {
+//   STATUS = 'status',
+//   PRIORITY = 'priority',
+//   LABEL = 'label',
+//   VALUE = 'value'
+// }
 
 export interface SearchFilter {
   id: number | string;
-  type: SearchFilterType;
+  type: string;
   label: string;
   value: any;
   object: any;
@@ -145,21 +145,33 @@ export default class SearchQuery {
   }
 
   public apply(): void {
-    window.history.pushState(null, '', this.build());
+    const params = new URLSearchParams(this.params.toString());
+    params.delete('group_by');
+    params.delete('rows');
+    params.delete('offset');
+    window.history.pushState(null, '', `${this.path}?${params.toString()}`);
   }
 
   public parseFilters(): SearchFilter[] {
     if (this.getFqList().length) {
-      console.log('test');
+      return this.getFqList().map((fq, i) => SearchQuery.parseFilterValue(i, fq));
     }
     return [];
   }
 
   public static parseFilterValue(id: string | number, filter: string): SearchFilter {
-    const [type, qualifier] = filter.split(':');
+    const [type] = filter.split(':');
+
+    const resolveType = () => {
+      if (type === 'status' || type === 'priority' || type === 'label') {
+        return type;
+      }
+      return 'value';
+    };
+
     return {
       id,
-      type: SearchFilterType[type],
+      type: resolveType(),
       label: filter,
       value: filter,
       object: null

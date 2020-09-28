@@ -10,7 +10,7 @@ import React, { useEffect, useState } from 'react';
 import AlertActionsMenu from './alert-actions-menu';
 import AlertDetails from './alert-details';
 import AlertListItem from './alert-list-item';
-import AlertsFilters, { AlertFilterSelections, DEFAULT_GROUPBY, DEFAULT_TC } from './alerts-filters';
+import AlertsFilters, { AlertFilterSelections, DEFAULT_FILTERS } from './alerts-filters';
 import AlertsFiltersSelected from './alerts-filters-selected';
 import useAlerts, { AlertFilterItem, AlertItem } from './useAlerts';
 
@@ -52,32 +52,14 @@ const Alerts: React.FC = () => {
   const [scrollReset, setScrollReset] = useState<boolean>(false);
   const [splitPanel, setSplitPanel] = useState<{ open: boolean; item: AlertItem }>({ open: false, item: null });
   const [drawer, setDrawer] = useState<{ open: boolean; type: 'filter' }>({ open: false, type: null });
-  const [selectedFilters, setSelectedFilters] = useState<AlertFilterSelections>({
-    tc: DEFAULT_TC,
-    groupBy: DEFAULT_GROUPBY,
-    values: [],
-    statuses: [],
-    priorities: [],
-    labels: []
-  });
+  const [selectedFilters, setSelectedFilters] = useState<AlertFilterSelections>(DEFAULT_FILTERS);
 
   useEffect(() => {
-    const statuses = [];
-    const priorities = [];
-    const labels = [];
-    const values = [];
-    query.getFqList().forEach(fq => {
-      if (statusFilters.length && fq.startsWith('status')) {
-        statuses.push(statusFilters.find(f => f.value === fq));
-      } else if (priorityFilters.length && fq.startsWith('priority')) {
-        priorities.push(priorityFilters.find(f => f.value === fq));
-      } else if (labelFilters.length && fq.startsWith('label')) {
-        labels.push(labelFilters.find(f => f.value === fq));
-      } else if (valueFilters.length) {
-        values.push(valueFilters.find(f => f.value === fq));
-      }
-    });
-    //
+    const searchQueryFilters = query.parseFilters();
+    const statuses = searchQueryFilters.filter(f => f.type === 'status');
+    const priorities = searchQueryFilters.filter(f => f.type === 'priority');
+    const labels = searchQueryFilters.filter(f => f.type === 'label');
+    const values = searchQueryFilters.filter(f => f.type === 'value');
     setSelectedFilters(filters => ({
       ...filters,
       statuses: statuses || filters.statuses,
@@ -85,7 +67,7 @@ const Alerts: React.FC = () => {
       labels: labels || filters.labels,
       values: values || filters.labels
     }));
-  }, [statusFilters, priorityFilters, labelFilters, valueFilters, query]);
+  }, [query]);
 
   //
   const _onSearch = (filterValue: string = '', inputEl: HTMLInputElement = null) => {
@@ -94,6 +76,11 @@ const Alerts: React.FC = () => {
 
     // Reset scroll for each new search.
     setScrollReset(true);
+
+    // Close right of split panel if open.
+    if (splitPanel.open) {
+      setSplitPanel({ ...splitPanel, open: false });
+    }
 
     // Close drawer if its open.
     if (drawer.open) {
@@ -120,8 +107,14 @@ const Alerts: React.FC = () => {
   const onClearSearch = () => {
     // Reset the query.
     query.reset().apply();
+    //
+    setSelectedFilters(DEFAULT_FILTERS);
     // Reset scroll for each new search.
     setScrollReset(true);
+    // Close right of split panel if open.
+    if (splitPanel.open) {
+      setSplitPanel({ ...splitPanel, open: false });
+    }
     // Refetch initial data.
     onLoad();
   };
@@ -156,6 +149,7 @@ const Alerts: React.FC = () => {
     filters.statuses.forEach(addFq);
     filters.priorities.forEach(addFq);
     filters.labels.forEach(addFq);
+    filters.values.forEach(addFq);
     query.apply();
 
     // Reinitialize the scroll.
@@ -175,8 +169,6 @@ const Alerts: React.FC = () => {
   const onClearFilters = () => {
     setSelectedFilters({ tc: null, groupBy: null, values: [], statuses: [], priorities: [], labels: [] });
   };
-
-  console.log(buffer);
 
   return (
     <Box>
