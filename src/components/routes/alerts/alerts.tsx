@@ -218,11 +218,13 @@ const Alerts: React.FC = () => {
               loading={buffer.total() > 0 && (loading || searching)}
               buffer={buffer}
               rowHeight={93}
+              scrollReset={scrollReset}
+              onSelection={onItemSelected}
               onNext={_onLoadMore}
               onRenderItem={(item: AlertItem) => <AlertListItem item={item} />}
             />
             // <InfiniteList
-            //   items={items}
+            //   items={items}..
             //   loading={items.length && (loading || searching)}
             //   pageSize={PAGE_SIZE}
             //   rowHeight={93}

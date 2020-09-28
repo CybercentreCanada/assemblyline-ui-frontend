@@ -28,12 +28,23 @@ interface MetaListProps {
   loading: boolean;
   buffer: MetaListBuffer;
   rowHeight: number;
+  scrollReset?: boolean;
+  onSelection: (item: MetaListItem) => void;
   onRenderItem: (item: MetaListItem) => React.ReactNode;
   onNext: () => void;
   onLoad?: (from: number, to: number) => void;
 }
 
-const MetaList: React.FC<MetaListProps> = ({ loading, buffer, rowHeight, onRenderItem, onNext, onLoad }) => {
+const MetaList: React.FC<MetaListProps> = ({
+  loading,
+  buffer,
+  rowHeight,
+  scrollReset,
+  onSelection,
+  onRenderItem,
+  onNext,
+  onLoad
+}) => {
   // Styles.
   const { metaListClasses: classes } = useListStyles();
 
@@ -98,6 +109,7 @@ const MetaList: React.FC<MetaListProps> = ({ loading, buffer, rowHeight, onRende
         item={item.item}
         selected={item.item.index === cursor}
         rowHeight={rowHeight}
+        onSelection={onSelection}
         onRenderRow={onRenderItem}
       />
     );
@@ -109,8 +121,6 @@ const MetaList: React.FC<MetaListProps> = ({ loading, buffer, rowHeight, onRende
 
     // update frame state.
     setFrame(_frame);
-
-    console.log(frame);
 
     //
     const unloaded = _frame.items.filter(item => !item.loaded);
@@ -135,7 +145,11 @@ const MetaList: React.FC<MetaListProps> = ({ loading, buffer, rowHeight, onRende
     // Adjust the inner container height each time we receive an updated list of items.
     innerEL.current.style.height = `${buffer.total() * rowHeight}px`;
 
-    console.log(buffer.total());
+    // reset scroll?
+    // TODO: ideally there would be a way to infer this withhow in this component.
+    if (scrollReset) {
+      outerEL.current.scrollTo({ top: 0 });
+    }
 
     // compute which items are within visual frame.
     const updateFrame = () => setFrame(computeFrame(buffer, rowHeight));
@@ -149,7 +163,7 @@ const MetaList: React.FC<MetaListProps> = ({ loading, buffer, rowHeight, onRende
       // Deregister window event listener.
       window.removeEventListener('resize', updateFrame);
     };
-  }, [buffer, rowHeight]);
+  }, [buffer, rowHeight, scrollReset]);
 
   return (
     <div ref={outerEL} tabIndex={0} className={classes.outer} onScroll={onScroll} onKeyDown={onKeyDown}>

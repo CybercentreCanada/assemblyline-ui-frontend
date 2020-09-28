@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 import { Divider } from '@material-ui/core';
 import React from 'react';
 import useListStyles from './hooks/useListStyles';
@@ -12,10 +14,11 @@ interface ListRowProps {
   item: LineItem;
   selected: boolean;
   rowHeight?: number;
+  onSelection?: (item: LineItem) => void;
   onRenderRow: (item: LineItem) => React.ReactNode;
 }
 
-const ListRow: React.FC<ListRowProps> = ({ loaded, selected, item, index, rowHeight, onRenderRow }) => {
+const ListRow: React.FC<ListRowProps> = ({ loaded, selected, item, index, rowHeight, onSelection, onRenderRow }) => {
   const { listItemClasses: classes } = useListStyles();
   return (
     <div
@@ -23,6 +26,7 @@ const ListRow: React.FC<ListRowProps> = ({ loaded, selected, item, index, rowHei
       data-listitem-position={index}
       data-listitem-selected={selected}
       data-listitem-focus="false"
+      onClick={() => onSelection(item)}
     >
       <div className={classes.itemOuter} style={{ height: rowHeight }}>
         <div className={classes.itemInner}>{loaded ? onRenderRow(item) : '...loading'}</div>
