@@ -25,9 +25,10 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import ServiceTree from 'components/layout/serviceTree';
 import Classification from 'components/visual/Classification';
 import FileDropper from 'components/visual/FileDropper';
+import { OptionsObject, useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 
 function Submit() {
   const { getBanner } = useAppLayout();
@@ -37,10 +38,25 @@ function Submit() {
   const { user: currentUser, c12nDef, configuration } = useAppContext();
   const [settings, setSettings] = useState(null);
   const [url, setUrl] = useState('');
+  const [urlHasError, setUrlHasError] = useState(false);
+  const [allowClick, setAllowClick] = useState(true);
   const [file, setFile] = useState(null);
   const [value, setValue] = useState('0');
   const downSM = useMediaQuery(theme.breakpoints.down('sm'));
   const md = useMediaQuery(theme.breakpoints.only('md'));
+  const history = useHistory();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const snackBarOptions: OptionsObject = {
+    variant: 'error',
+    autoHideDuration: 5000,
+    anchorOrigin: {
+      vertical: 'bottom',
+      horizontal: 'center'
+    },
+    onClick: snack => {
+      closeSnackbar();
+    }
+  };
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -59,9 +75,29 @@ function Submit() {
   }));
   const classes = useStyles();
 
+  const setParam = (service_idx, param_idx, p_value) => {
+    if (settings) {
+      const newSettings = { ...settings };
+      newSettings.service_spec[service_idx].params[param_idx].value = p_value;
+      setSettings(newSettings);
+    }
+  };
+
+  function setParamAsync(service_idx, param_idx, p_value) {
+    if (settings) {
+      settings.service_spec[service_idx].params[param_idx].value = p_value;
+    }
+  }
+
   function setSettingValue(field, fieldValue) {
     if (settings) {
       setSettings({ ...settings, [field]: fieldValue });
+    }
+  }
+
+  function setSettingAsyncValue(field, fieldValue) {
+    if (settings) {
+      settings[field] = fieldValue;
     }
   }
 
@@ -69,6 +105,48 @@ function Submit() {
     if (settings) {
       setSettings({ ...settings, classification: c12n });
     }
+  }
+
+  function handleUrlChange(event) {
+    closeSnackbar();
+    setUrlHasError(false);
+    setUrl(event.target.value);
+  }
+
+  function analyseUrl() {
+    const urlParseRE = /^(((([^:/#?]+:)?(?:(\/\/)((?:(([^:@/#?]+)(?::([^:@/#?]+))?)@)?(([^:/#?\][]+|\[[^/\]@#?]+])(?::([0-9]+))?))?)?)?((\/?(?:[^/?#]+\/+)*)([^?#]*)))?(\?[^#]+)?)(#.*)?/;
+    const matches = urlParseRE.exec(url);
+
+    if (matches[15] === undefined || matches[15] === '') {
+      matches[15] = 'file';
+    }
+
+    const data = {
+      name: matches[15],
+      url,
+      ui_params: settings
+    };
+
+    setUrlHasError(false);
+    apiCall({
+      url: '/api/v4/submit/',
+      method: 'POST',
+      body: data,
+      onSuccess: api_data => {
+        setAllowClick(false);
+        enqueueSnackbar(`${t('submit.success')} ${api_data.api_response.sid}`, {
+          ...snackBarOptions,
+          variant: 'success'
+        });
+        setTimeout(() => {
+          history.push(`/submissions/${api_data.api_response.sid}`);
+        }, 500);
+      },
+      onFailure: api_data => {
+        enqueueSnackbar(t('submit.failure'), snackBarOptions);
+        setUrlHasError(true);
+      }
+    });
   }
 
   useEffect(() => {
@@ -128,17 +206,18 @@ function Submit() {
             </Box>
           </TabPanel>
           <TabPanel value="1" className={classes.no_pad}>
-            <Box display="flex" flexDirection="row" marginTop="30px">
+            <Box display="flex" flexDirection="row" marginTop="30px" alignItems="flex-start">
               <TextField
                 label={t('url.input')}
+                error={urlHasError}
                 size="small"
                 type="url"
                 variant="outlined"
                 value={url}
-                onChange={event => setUrl(event.target.value)}
+                onChange={handleUrlChange}
                 style={{ flexGrow: 1, marginRight: '1rem' }}
               />
-              <Button color="primary" variant="contained">
+              <Button disabled={!url || !allowClick} color="primary" variant="contained" onClick={() => analyseUrl()}>
                 {t('url.button')}
               </Button>
             </Box>
@@ -159,7 +238,7 @@ function Submit() {
           <TabPanel value="2" className={classes.no_pad}>
             <Grid container spacing={1}>
               <Grid item xs={12} md>
-                <Box pl={2} textAlign="left" mt={5}>
+                <Box pl={2} textAlign="left" mt={4}>
                   <Typography variant="h6" gutterBottom>
                     {t('options.service')}
                   </Typography>
@@ -167,7 +246,7 @@ function Submit() {
                 </Box>
               </Grid>
               <Grid item xs={12} md>
-                <Box textAlign="left" mt={5}>
+                <Box textAlign="left" mt={4}>
                   <Typography variant="h6" gutterBottom>
                     {t('options.submission')}
                   </Typography>
@@ -180,8 +259,8 @@ function Submit() {
                         id="desc"
                         size="small"
                         type="text"
-                        value={settings.description}
-                        onChange={event => setSettingValue('description', event.target.value)}
+                        defaultValue={settings.description}
+                        onChange={event => setSettingAsyncValue('description', event.target.value)}
                         InputLabelProps={{
                           shrink: true
                         }}
@@ -214,7 +293,7 @@ function Submit() {
                     )}
                   </Box>
                   <Box py={1}>
-                    <Box>
+                    <Box pl={1}>
                       <FormControlLabel
                         control={
                           settings ? (
@@ -234,7 +313,7 @@ function Submit() {
                         className={settings ? classes.item : null}
                       />
                     </Box>
-                    <Box>
+                    <Box pl={1}>
                       <FormControlLabel
                         control={
                           settings ? (
@@ -254,7 +333,7 @@ function Submit() {
                         className={settings ? classes.item : null}
                       />
                     </Box>
-                    <Box>
+                    <Box pl={1}>
                       <FormControlLabel
                         control={
                           settings ? (
@@ -280,7 +359,7 @@ function Submit() {
                         className={settings ? classes.item : null}
                       />
                     </Box>
-                    <Box>
+                    <Box pl={1}>
                       <FormControlLabel
                         control={
                           settings ? (
@@ -300,7 +379,7 @@ function Submit() {
                         className={settings ? classes.item : null}
                       />
                     </Box>
-                    <Box>
+                    <Box pl={1}>
                       <FormControlLabel
                         control={
                           settings ? (
@@ -331,8 +410,8 @@ function Submit() {
                         size="small"
                         type="number"
                         inputProps={{ min: 0, max: 365 }}
-                        value={settings.ttl}
-                        onChange={event => setSettingValue('ttl', event.target.value)}
+                        defaultValue={settings.ttl}
+                        onChange={event => setSettingAsyncValue('ttl', event.target.value)}
                         variant="outlined"
                         fullWidth
                       />
@@ -341,6 +420,87 @@ function Submit() {
                     )}
                   </Box>
                 </Box>
+
+                {settings && settings.service_spec.length !== 0 ? (
+                  <Box textAlign="left" mt={4}>
+                    <Typography variant="h6" gutterBottom>
+                      {t('options.service_spec')}
+                    </Typography>
+                    {settings.service_spec.map((service, idx) => {
+                      return (
+                        <Box key={idx} py={1}>
+                          <Typography variant="subtitle1" gutterBottom>
+                            {service.name}
+                          </Typography>
+                          {service.params.map((param, pidx) => {
+                            return (
+                              <Box key={pidx} pb={1}>
+                                {param.type === 'bool' ? (
+                                  <Box pl={1}>
+                                    <FormControlLabel
+                                      control={
+                                        <Checkbox
+                                          size="small"
+                                          checked={param.value === 'true' || param.value === true}
+                                          name="label"
+                                          onChange={() => setParam(idx, pidx, !param.value)}
+                                        />
+                                      }
+                                      label={
+                                        <Typography variant="body2" style={{ textTransform: 'capitalize' }}>
+                                          {param.name.replace('_', ' ')}
+                                        </Typography>
+                                      }
+                                      className={classes.item}
+                                    />
+                                  </Box>
+                                ) : (
+                                  <>
+                                    <Box>
+                                      <Typography
+                                        variant="caption"
+                                        gutterBottom
+                                        style={{ textTransform: 'capitalize' }}
+                                      >
+                                        {param.name.replace('_', ' ')}
+                                      </Typography>
+                                    </Box>
+                                    {param.type === 'list' ? (
+                                      <Select
+                                        margin="dense"
+                                        value={param.value}
+                                        variant="outlined"
+                                        onChange={event => setParam(idx, pidx, event.target.value)}
+                                        fullWidth
+                                      >
+                                        {param.list.map((item, i) => {
+                                          return (
+                                            <MenuItem key={i} value={item}>
+                                              {item}
+                                            </MenuItem>
+                                          );
+                                        })}
+                                      </Select>
+                                    ) : (
+                                      <TextField
+                                        variant="outlined"
+                                        type={param.type === 'int' ? 'number' : 'text'}
+                                        size="small"
+                                        fullWidth
+                                        defaultValue={param.value}
+                                        onChange={event => setParamAsync(idx, pidx, event.target.value)}
+                                      />
+                                    )}
+                                  </>
+                                )}
+                              </Box>
+                            );
+                          })}
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                ) : null}
               </Grid>
             </Grid>
           </TabPanel>

@@ -30,7 +30,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   right,
   actions,
   isSticky = false,
-  backgroundColor = 'inherit',
+  backgroundColor = null,
   elevation = 0
 }) => {
   const theme = useTheme();
@@ -41,7 +41,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
       comp = <Breadcrumbs disableStyle />;
       break;
     case 'provided':
-      comp = <Box display="inline-block">{title}</Box>;
+      comp = title;
       break;
     default:
       comp = (
@@ -54,11 +54,11 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   return (
     <AppBar
       position={isSticky ? 'sticky' : 'relative'}
-      style={{ backgroundColor }}
+      style={{ backgroundColor: backgroundColor || theme.palette.background.default }}
       elevation={elevation}
       color="inherit"
     >
-      <Toolbar disableGutters>
+      <Toolbar disableGutters style={{ minHeight: mode === 'provided' ? 0 : null }}>
         <Box>{left}</Box>
         <Box flexGrow={1}>{comp}</Box>
         <Box>
