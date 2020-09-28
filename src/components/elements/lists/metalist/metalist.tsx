@@ -107,6 +107,11 @@ const MetaList: React.FC<MetaListProps> = ({
       endIndex,
       items: _buffer.get(startIndex, endIndex)
     };
+
+    // console.log(_frame);
+    console.log(`${_frame.items.length}: ${_frame.startIndex}: ${_frame.endIndex}`);
+    console.log(_frame.items);
+
     return _frame;
   };
 
@@ -114,7 +119,7 @@ const MetaList: React.FC<MetaListProps> = ({
   const rowRenderer = (item: { loaded: boolean; item: MetaListItem }) => {
     return (
       <ListRow
-        key={`list.rowitem[${item.item.id}]`}
+        key={`list.rowitem[${item.item.index}]`}
         index={item.item.index}
         loaded={item.loaded}
         item={item.item}
@@ -135,7 +140,7 @@ const MetaList: React.FC<MetaListProps> = ({
 
     //
     const unloaded = _frame.items.filter(item => !item.loaded);
-    if (unloaded.length) {
+    if (buffer.size && unloaded.length) {
       // TODO: throttle this to ensure we dont' fetch things we're just scrolling by.
       // fetch the missing items.
       THROTTLER.delay(() => {

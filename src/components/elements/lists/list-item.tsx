@@ -20,6 +20,7 @@ interface ListRowProps {
 
 const ListRow: React.FC<ListRowProps> = ({ loaded, selected, item, index, rowHeight, onClick, onRenderRow }) => {
   const { listItemClasses: classes } = useListStyles();
+  console.log(`rendering: ${item.id}`);
   return (
     <div
       className={classes.itemCt}

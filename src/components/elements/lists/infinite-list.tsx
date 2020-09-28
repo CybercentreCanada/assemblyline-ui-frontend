@@ -239,7 +239,13 @@ export default function InfiniteList<I extends InfiniteListItem>({
   // Each item is is relatively positioned withing the absolutely position [infiniteListFrame] container.
   const rowRenderer = (displayItem: { index: number; item: I }) => {
     return (
-      <Box mr={0} key={`listitem[${displayItem.index}]`} onClick={() => onItemClick(displayItem)} display="relative">
+      <Box
+        mr={0}
+        key={`listitem[${displayItem.index}]`}
+        onClick={() => onItemClick(displayItem)}
+        display="relative"
+        data-listx={displayItem.index}
+      >
         <Box
           className={classes.listItem}
           data-listposition={displayItem.index}

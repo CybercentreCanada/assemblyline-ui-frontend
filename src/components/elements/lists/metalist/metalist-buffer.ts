@@ -3,9 +3,9 @@ import { MetaListItem } from './metalist';
 export default class MetaListBuffer {
   private _total: number = 0;
 
-  private items: MetaListItem[] = [];
+  public items: MetaListItem[] = [];
 
-  constructor(private size?: number) {}
+  constructor(public readonly size?: number) {}
 
   public inc(by: number): MetaListBuffer {
     this._total += by;

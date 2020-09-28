@@ -216,8 +216,8 @@ const Alerts: React.FC = () => {
               onRenderItem={(item: AlertItem) => <AlertListItem item={item} />}
             />
             // <InfiniteList
-            //   items={items}..
-            //   loading={items.length && (loading || searching)}
+            //   items={buffer.items}
+            //   loading={buffer.items.length && (loading || searching)}
             //   pageSize={PAGE_SIZE}
             //   rowHeight={93}
             //   selected={splitPanel.open && splitPanel.item ? splitPanel.item : null}
