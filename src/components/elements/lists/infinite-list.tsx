@@ -64,9 +64,6 @@ const useStyles = makeStyles(theme => ({
 // Function throttler to streamline keydown event handlers.
 const KEYBOARD_THROTTLER = new Throttler(10);
 
-// Function throttler to streamline scroll event handlers.
-const SCROLL_THROTTLER = new Throttler(1000);
-
 // Specification interface representing the metadata required to render to visible frame
 //  of the InfiniteList.
 interface InfiniteListFrame<I extends InfiniteListItem> {
@@ -203,7 +200,7 @@ export default function InfiniteList<I extends InfiniteListItem>({
     // This will ensure that users who hold down UP/DOWN arrow key don't overload
     //  react with constant stream of keydown events.
     // We'll process on event every 10ms and throw away the rest.
-    KEYBOARD_THROTTLER.throttle(() => {
+    KEYBOARD_THROTTLER.delay(() => {
       if (isArrowUp(keyCode)) {
         const nextIndex = cursor - 1;
         if (nextIndex > -1) {

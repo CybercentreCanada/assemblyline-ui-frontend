@@ -1,5 +1,6 @@
+import { MetaListItem } from 'components/elements/lists/metalist/metalist';
 /* eslint-disable react-hooks/exhaustive-deps */
-import { InfiniteListItem } from 'components/elements/lists/infinite-list';
+import MetaListBuffer from 'components/elements/lists/metalist/metalist-buffer';
 import SearchQuery from 'components/elements/search/search-query';
 import useAppContext from 'components/hooks/useAppContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -23,7 +24,7 @@ export interface AlertFile {
   type: string;
 }
 
-export interface AlertItem extends InfiniteListItem {
+export interface AlertItem extends MetaListItem {
   sid: string;
   alert_id: string;
   type: string;
@@ -66,7 +67,8 @@ interface UsingAlerts {
   loading: boolean;
   fields: ALField[];
   total: number;
-  items: AlertItem[];
+  // items: AlertItem[];
+  buffer: MetaListBuffer;
   query: SearchQuery;
   labelFilters: AlertFilterItem[];
   priorityFilters: AlertFilterItem[];
@@ -88,15 +90,18 @@ export default function useAlerts(pageSize: number): UsingAlerts {
   const [statusFilters, setStatusFilters] = useState<AlertFilterItem[]>([]);
   const [priorityFilters, setPriorityFilters] = useState<AlertFilterItem[]>([]);
   const [labelFilters, setLabelFilters] = useState<AlertFilterItem[]>([]);
-  const [state, setState] = useState<{ loading: boolean; items: AlertItem[]; total: number }>({
+  const [state, setState] = useState<{ loading: boolean; buffer: MetaListBuffer; total: number }>({
     loading: true,
     total: 0,
-    items: []
+    // items: [],
+    buffer: new MetaListBuffer()
   });
 
   // parse list of alert result: add an index field.
   const parseResult = (responseItems, offset) => {
-    return responseItems.map((item, index) => ({ ...item, index: index + offset }));
+    const items = responseItems.map((item, index) => ({ ...item, id: item.alert_id, index: index + offset }));
+    console.log(items);
+    return items;
   };
 
   // format alert api url using specified indexes.
@@ -115,7 +120,8 @@ export default function useAlerts(pageSize: number): UsingAlerts {
         setState({
           loading: false,
           total,
-          items: parseResult(_items, query.getOffsetNumber())
+          buffer: new MetaListBuffer().push(parseResult(_items, query.getOffsetNumber()))
+          // items: parseResult(_items, query.getOffsetNumber())
         });
       }
     });
@@ -132,7 +138,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
         setState({
           loading: false,
           total,
-          items: [...state.items, ...parseResult(_items, query.getOffsetNumber())]
+          buffer: state.buffer.push(parseResult(_items, query.getOffsetNumber())).build()
         });
       }
     });

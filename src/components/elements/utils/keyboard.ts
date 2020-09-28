@@ -5,8 +5,8 @@ export const ARROW_UP = 'ArrowUp';
 export const ARROW_RIGHT = 'ArrowRight';
 export const ARROW_DOWN = 'ArrowDown';
 
-export function is(key: string, checkCode: string) {
-  return key === checkCode;
+export function is(key: string, check: string) {
+  return key === check;
 }
 
 export function isArrowUp(key: string) {

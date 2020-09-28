@@ -29,7 +29,7 @@ const AlertListItem: React.FC<AlertListItemProps> = props => {
 const AlertItemDefault: React.FC<AlertListItemProps> = ({ item }) => {
   const theme = useTheme();
   return (
-    <Box overflow="auto">
+    <Box overflow="auto" p={1}>
       <Grid container style={{ alignItems: 'center', paddingBottom: theme.spacing(1) }}>
         <Grid item xs={4}>
           <AlertPriority name={item.priority} />

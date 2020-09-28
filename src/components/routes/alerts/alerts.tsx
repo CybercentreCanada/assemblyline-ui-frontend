@@ -2,7 +2,7 @@ import { Box, Drawer, makeStyles, Typography, useTheme } from '@material-ui/core
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import CloseIcon from '@material-ui/icons/Close';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
-import InfiniteList from 'components/elements/lists/infinite-list';
+import MetaList from 'components/elements/lists/metalist/metalist';
 import SplitPanel from 'components/elements/panels/split-panel';
 import Viewport from 'components/elements/panels/viewport';
 import SearchBar from 'components/elements/search/search-bar';
@@ -35,7 +35,7 @@ const Alerts: React.FC = () => {
   const theme = useTheme();
   const {
     loading,
-    items,
+    buffer,
     total,
     fields,
     query,
@@ -176,6 +176,8 @@ const Alerts: React.FC = () => {
     setSelectedFilters({ tc: null, groupBy: null, values: [], statuses: [], priorities: [], labels: [] });
   };
 
+  console.log(buffer);
+
   return (
     <Box>
       <Box pb={theme.spacing(0.25)}>
@@ -212,17 +214,24 @@ const Alerts: React.FC = () => {
           rightDrawerBackgroundColor={theme.palette.background.default}
           rightOpen={splitPanel.open}
           left={
-            <InfiniteList
-              items={items}
-              loading={items.length && (loading || searching)}
-              pageSize={PAGE_SIZE}
+            <MetaList
+              loading={buffer.total() > 0 && (loading || searching)}
+              buffer={buffer}
               rowHeight={93}
-              selected={splitPanel.open && splitPanel.item ? splitPanel.item : null}
-              scrollReset={scrollReset}
-              onItemSelected={onItemSelected}
-              onMoreItems={_onLoadMore}
+              onNext={_onLoadMore}
               onRenderItem={(item: AlertItem) => <AlertListItem item={item} />}
             />
+            // <InfiniteList
+            //   items={items}
+            //   loading={items.length && (loading || searching)}
+            //   pageSize={PAGE_SIZE}
+            //   rowHeight={93}
+            //   selected={splitPanel.open && splitPanel.item ? splitPanel.item : null}
+            //   scrollReset={scrollReset}
+            //   onItemSelected={onItemSelected}
+            //   onMoreItems={_onLoadMore}
+            //   onRenderItem={(item: AlertItem) => <AlertListItem item={item} />}
+            // />
           }
           right={
             splitPanel.item ? (
