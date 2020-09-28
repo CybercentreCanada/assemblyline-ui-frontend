@@ -1,6 +1,5 @@
 import { makeStyles } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import React, { useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
@@ -72,13 +71,6 @@ export default function FileDropper({ file, setFile }: FileDropperProps) {
           </Typography>
         )}
       </div>
-      <Box marginTop="2rem">
-        {file ? (
-          <Button color="primary" variant="contained">
-            {t('file.button')}
-          </Button>
-        ) : null}
-      </Box>
     </Box>
   );
 }

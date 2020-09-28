@@ -25,6 +25,8 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import ServiceTree from 'components/layout/serviceTree';
 import Classification from 'components/visual/Classification';
 import FileDropper from 'components/visual/FileDropper';
+import Flow from 'helpers/flow';
+import generateUUID from 'helpers/uuid';
 import { OptionsObject, useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -36,7 +38,9 @@ function Submit() {
   const { t } = useTranslation(['submit']);
   const theme = useTheme();
   const { user: currentUser, c12nDef, configuration } = useAppContext();
+  const [uuid, setUUID] = useState(null);
   const [settings, setSettings] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(null);
   const [url, setUrl] = useState('');
   const [urlHasError, setUrlHasError] = useState(false);
   const [allowClick, setAllowClick] = useState(true);
@@ -74,6 +78,64 @@ function Submit() {
     }
   }));
   const classes = useStyles();
+
+  const getFileUUID = selectedFile => {
+    const relativePath =
+      selectedFile.relativePath || selectedFile.webkitRelativePath || selectedFile.fileName || selectedFile.name;
+    return `${uuid}_${file.size}_${relativePath.replace(/[^0-9a-zA-Z_-]/gim, '')}`;
+  };
+
+  const uploadAndScan = () => {
+    setAllowClick(false);
+    setUploadProgress(0);
+    const flow = new Flow({
+      target: '/api/v4/ui/flowjs/',
+      permanentErrors: [412, 404, 500],
+      maxChunkRetries: 1,
+      chunkRetryInterval: 2000,
+      simultaneousUploads: 4,
+      generateUniqueIdentifier: getFileUUID
+    });
+    flow.on('progress', () => {
+      setUploadProgress(Math.trunc(flow.progress() * 100));
+    });
+    flow.on('complete', () => {
+      if (flow.files.length === 0) {
+        return;
+      }
+
+      for (let x = 0; x < flow.files.length; x++) {
+        if (flow.files[x].error) {
+          return;
+        }
+      }
+      apiCall({
+        url: `/api/v4/ui/start/${uuid}/`,
+        method: 'POST',
+        body: settings,
+        onSuccess: api_data => {
+          enqueueSnackbar(`${t('submit.success')} ${api_data.api_response.sid}`, {
+            ...snackBarOptions,
+            variant: 'success'
+          });
+          setTimeout(() => {
+            history.push(`/submissions/${api_data.api_response.sid}`);
+          }, 500);
+        },
+        onFailure: api_data => {
+          enqueueSnackbar(t('submit.file.failure'), snackBarOptions);
+          setAllowClick(true);
+        }
+      });
+    });
+
+    flow.addFile(file);
+    flow.upload();
+  };
+
+  const setFileDropperFile = selectedFile => {
+    setFile(selectedFile);
+  };
 
   const setParam = (service_idx, param_idx, p_value) => {
     if (settings) {
@@ -143,7 +205,7 @@ function Submit() {
         }, 500);
       },
       onFailure: api_data => {
-        enqueueSnackbar(t('submit.failure'), snackBarOptions);
+        enqueueSnackbar(t('submit.url.failure'), snackBarOptions);
         setUrlHasError(true);
       }
     });
@@ -157,6 +219,7 @@ function Submit() {
         setSettings(api_data.api_response);
       }
     });
+    setUUID(generateUUID());
     // eslint-disable-next-line
   }, []);
 
@@ -188,38 +251,63 @@ function Submit() {
             </TabList>
           </Paper>
           <TabPanel value="0" className={classes.no_pad}>
-            <Box marginTop="30px">
-              <FileDropper file={file} setFile={setFile} />
-              {configuration.ui.tos ? (
-                <Box mt="50px" textAlign="center">
-                  <Typography variant="body2">
-                    {t('terms1')}
-                    <i>{t('file.button')}</i>
-                    {t('terms2')}
-                    <Link style={{ textDecoration: 'none', color: theme.palette.primary.main }} to="/tos">
-                      {t('terms3')}
-                    </Link>
-                    .
-                  </Typography>
+            {settings ? (
+              <Box marginTop="30px">
+                <FileDropper file={file} setFile={setFileDropperFile} />
+                <Box marginTop="2rem">
+                  {file ? (
+                    <Button disabled={!allowClick} color="primary" variant="contained" onClick={uploadAndScan}>
+                      {uploadProgress === null ? t('file.button') : `${uploadProgress}${t('submit.progress')}`}
+                    </Button>
+                  ) : null}
                 </Box>
-              ) : null}
-            </Box>
+              </Box>
+            ) : (
+              <Skeleton style={{ height: '280px' }} />
+            )}
+            {configuration.ui.tos ? (
+              <Box mt="50px" textAlign="center">
+                <Typography variant="body2">
+                  {t('terms1')}
+                  <i>{t('file.button')}</i>
+                  {t('terms2')}
+                  <Link style={{ textDecoration: 'none', color: theme.palette.primary.main }} to="/tos">
+                    {t('terms3')}
+                  </Link>
+                  .
+                </Typography>
+              </Box>
+            ) : null}
           </TabPanel>
           <TabPanel value="1" className={classes.no_pad}>
             <Box display="flex" flexDirection="row" marginTop="30px" alignItems="flex-start">
-              <TextField
-                label={t('url.input')}
-                error={urlHasError}
-                size="small"
-                type="url"
-                variant="outlined"
-                value={url}
-                onChange={handleUrlChange}
-                style={{ flexGrow: 1, marginRight: '1rem' }}
-              />
-              <Button disabled={!url || !allowClick} color="primary" variant="contained" onClick={() => analyseUrl()}>
-                {t('url.button')}
-              </Button>
+              {settings ? (
+                <>
+                  <TextField
+                    label={t('url.input')}
+                    error={urlHasError}
+                    size="small"
+                    type="url"
+                    variant="outlined"
+                    value={url}
+                    onChange={handleUrlChange}
+                    style={{ flexGrow: 1, marginRight: '1rem' }}
+                  />
+                  <Button
+                    disabled={!url || !allowClick}
+                    color="primary"
+                    variant="contained"
+                    onClick={() => analyseUrl()}
+                  >
+                    {t('url.button')}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Skeleton style={{ flexGrow: 1, height: '3rem' }} />
+                  <Skeleton style={{ marginLeft: '16px', height: '3rem', width: '5rem' }} />
+                </>
+              )}
             </Box>
             {configuration.ui.tos ? (
               <Box mt="50px" textAlign="center">
