@@ -100,7 +100,7 @@ export default function Classification({
   const [validated, setValidated] = useState(defaultClassificationValidator);
 
   useEffect(() => {
-    if (c12nDef.enforce && c12n) {
+    if (c12nDef && c12nDef.enforce && c12n) {
       const parts = getParts(c12n, c12nDef, format, isMobile);
       if (type === 'picker') {
         setUserParts(getParts(currentUser.classification, c12nDef, format, isMobile));
@@ -193,7 +193,7 @@ export default function Classification({
     setShowPicker(false);
   };
   // Build chip based on computed values
-  return c12nDef.enforce ? (
+  return c12nDef && c12nDef.enforce ? (
     c12n ? (
       <>
         <Box display={inline ? 'inline-block' : null} className={type === 'text' ? classes[computeColor()] : null}>
