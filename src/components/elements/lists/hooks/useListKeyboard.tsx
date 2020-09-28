@@ -25,6 +25,7 @@ const selectionScroller = (target: HTMLDivElement, position: number, rowHeight?:
 // Specification interface return by custom hook
 interface UsingListKeyboard {
   cursor: number;
+  setCursor: (cursor: number) => void;
   onKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => void;
 }
 
@@ -33,9 +34,17 @@ interface UseListKeyboard {
   count: number;
   infinite?: boolean;
   rowHeight?: number;
+  onEscape?: (cursor: number) => void;
+  onEnter?: (cursor: number) => void;
 }
 
-export default function useListKeyboard({ count, infinite, rowHeight }: UseListKeyboard): UsingListKeyboard {
+export default function useListKeyboard({
+  count,
+  infinite,
+  rowHeight,
+  onEscape,
+  onEnter
+}: UseListKeyboard): UsingListKeyboard {
   const [cursor, setCursor] = useState<number>(0);
 
   // hander:keydown
@@ -51,8 +60,10 @@ export default function useListKeyboard({ count, infinite, rowHeight }: UseListK
       // Handle each keys.
       if (isEnter(key)) {
         // key[ENTER ]: handler
+        onEnter(cursor);
       } else if (isEscape(key)) {
         // key[ESCAPE]: handler
+        onEscape(cursor);
       } else if (isArrowUp(key)) {
         // key[ARROW_UP]: handler
         const nextCursor = cursor - 1 > -1 ? cursor - 1 : infinite ? 0 : count - 1;
@@ -67,5 +78,5 @@ export default function useListKeyboard({ count, infinite, rowHeight }: UseListK
     });
   };
 
-  return { cursor, onKeyDown };
+  return { cursor, setCursor, onKeyDown };
 }

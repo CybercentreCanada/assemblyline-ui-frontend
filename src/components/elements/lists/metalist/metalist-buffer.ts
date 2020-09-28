@@ -45,6 +45,11 @@ export default class MetaListBuffer {
     return items;
   }
 
+  public one(index: number): { loaded: boolean; item: MetaListItem } {
+    const _item = this.items.find(i => i.index === index);
+    return { loaded: !!_item, item: _item };
+  }
+
   public build(): MetaListBuffer {
     const buffer = new MetaListBuffer(this.size);
     buffer._total = this._total;

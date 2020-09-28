@@ -14,11 +14,11 @@ interface ListRowProps {
   item: LineItem;
   selected: boolean;
   rowHeight?: number;
-  onSelection?: (item: LineItem) => void;
+  onClick?: (item: LineItem) => void;
   onRenderRow: (item: LineItem) => React.ReactNode;
 }
 
-const ListRow: React.FC<ListRowProps> = ({ loaded, selected, item, index, rowHeight, onSelection, onRenderRow }) => {
+const ListRow: React.FC<ListRowProps> = ({ loaded, selected, item, index, rowHeight, onClick, onRenderRow }) => {
   const { listItemClasses: classes } = useListStyles();
   return (
     <div
@@ -26,7 +26,7 @@ const ListRow: React.FC<ListRowProps> = ({ loaded, selected, item, index, rowHei
       data-listitem-position={index}
       data-listitem-selected={selected}
       data-listitem-focus="false"
-      onClick={() => onSelection(item)}
+      onClick={() => onClick(item)}
     >
       <div className={classes.itemOuter} style={{ height: rowHeight }}>
         <div className={classes.itemInner}>{loaded ? onRenderRow(item) : '...loading'}</div>

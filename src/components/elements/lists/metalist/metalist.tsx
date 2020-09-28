@@ -48,13 +48,24 @@ const MetaList: React.FC<MetaListProps> = ({
   // Styles.
   const { metaListClasses: classes } = useListStyles();
 
-  // Custom hooks.
-  const { cursor, onKeyDown } = useListKeyboard({ count: buffer.total(), rowHeight, infinite: true });
+  // Custom hooks
+  const { cursor, setCursor, onKeyDown } = useListKeyboard({
+    count: buffer.total(),
+    rowHeight,
+    infinite: true,
+    onEscape: () => onSelection(null),
+    onEnter: (_cursor: number) => onSelection(buffer.one(_cursor).item)
+  });
 
   // References.
   const outerEL = useRef<HTMLDivElement>();
   const innerEL = useRef<HTMLDivElement>();
   const frameEL = useRef<HTMLDivElement>();
+
+  const onListItemClick = (item: MetaListItem) => {
+    setCursor(item.index);
+    onSelection(item);
+  };
 
   // States.
   const [frame, setFrame] = useState<MetaListFrame>({
@@ -109,7 +120,7 @@ const MetaList: React.FC<MetaListProps> = ({
         item={item.item}
         selected={item.item.index === cursor}
         rowHeight={rowHeight}
-        onSelection={onSelection}
+        onClick={onListItemClick}
         onRenderRow={onRenderItem}
       />
     );
