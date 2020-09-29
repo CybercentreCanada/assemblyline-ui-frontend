@@ -92,9 +92,27 @@ function Submit() {
       target: '/api/v4/ui/flowjs/',
       permanentErrors: [412, 404, 500],
       maxChunkRetries: 1,
-      chunkRetryInterval: 2000,
+      chunkRetryInterval: 500,
       simultaneousUploads: 4,
       generateUniqueIdentifier: getFileUUID
+    });
+    flow.on('fileError', (event, api_data) => {
+      try {
+        const data = JSON.parse(api_data);
+        if (Object.hasOwnProperty.call(data, 'api_status_code')) {
+          if (data.api_status_code === 401) {
+            window.location.reload(false);
+          }
+        }
+      } catch (ex) {
+        setAllowClick(true);
+        setUploadProgress(null);
+        flow.cancel();
+        flow.off('complete');
+        flow.off('fileError');
+        flow.off('progress');
+        enqueueSnackbar(t('submit.file.upload_fail'), snackBarOptions);
+      }
     });
     flow.on('progress', () => {
       setUploadProgress(Math.trunc(flow.progress() * 100));
@@ -253,7 +271,7 @@ function Submit() {
           <TabPanel value="0" className={classes.no_pad}>
             {settings ? (
               <Box marginTop="30px">
-                <FileDropper file={file} setFile={setFileDropperFile} />
+                <FileDropper file={file} setFile={setFileDropperFile} disabled={!allowClick} />
                 <Box marginTop="2rem">
                   {file ? (
                     <Button disabled={!allowClick} color="primary" variant="contained" onClick={uploadAndScan}>
