@@ -14,7 +14,7 @@ type FileDropperProps = {
 
 export default function FileDropper({ file, setFile, disabled }: FileDropperProps) {
   const { t } = useTranslation(['submit']);
-  const { acceptedFiles, getRootProps, getInputProps, isDragActive } = useDropzone();
+  const { acceptedFiles, getRootProps, getInputProps, isDragActive } = useDropzone({ disabled });
   const useStyles = ctrlDisabled => {
     return makeStyles(theme => ({
       drop_zone: {
@@ -54,27 +54,21 @@ export default function FileDropper({ file, setFile, disabled }: FileDropperProp
   return (
     <Box>
       <div
-        {...getRootProps({ disabled })}
-        className={
-          (file || isDragActive) && !disabled ? `${classes.drop_zone} ${classes.drag_enter}` : classes.drop_zone
-        }
+        {...getRootProps()}
+        className={isDragActive && !disabled ? `${classes.drop_zone} ${classes.drag_enter}` : classes.drop_zone}
       >
-        <input {...getInputProps({ disabled })} />
+        <input {...getInputProps()} />
         <AiOutlineSecurityScan style={{ fontSize: '140px' }} />
-        {file ? (
-          <Box textAlign="center">
-            <Typography variant="body1">
-              <b>{file.name}</b>
-            </Typography>
+        <Box height="44px" textAlign="center">
+          <Typography variant="body1">
+            <b>{isDragActive && !disabled ? t('file.drophere') : file ? file.name : t('file.dragzone')}</b>
+          </Typography>
+          {file && (!isDragActive || disabled) ? (
             <Typography variant="body2" align="center">
               {file.size} {t('file.dragzone.byte')}
             </Typography>
-          </Box>
-        ) : (
-          <Typography variant="body1">
-            <b>{t('file.dragzone')}</b>
-          </Typography>
-        )}
+          ) : null}
+        </Box>
       </div>
     </Box>
   );
