@@ -32,6 +32,14 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory } from 'react-router-dom';
 
+const flow = new Flow({
+  target: '/api/v4/ui/flowjs/',
+  permanentErrors: [412, 404, 500],
+  maxChunkRetries: 1,
+  chunkRetryInterval: 500,
+  simultaneousUploads: 4
+});
+
 function Submit() {
   const { getBanner } = useAppLayout();
   const apiCall = useMyAPI();
@@ -85,17 +93,20 @@ function Submit() {
     return `${uuid}_${file.size}_${relativePath.replace(/[^0-9a-zA-Z_-]/gim, '')}`;
   };
 
+  const cancelUpload = () => {
+    setFile(null);
+    setAllowClick(true);
+    setUploadProgress(null);
+    flow.cancel();
+    flow.off('complete');
+    flow.off('fileError');
+    flow.off('progress');
+  };
+
   const uploadAndScan = () => {
+    flow.opts.generateUniqueIdentifier = getFileUUID;
     setAllowClick(false);
     setUploadProgress(0);
-    const flow = new Flow({
-      target: '/api/v4/ui/flowjs/',
-      permanentErrors: [412, 404, 500],
-      maxChunkRetries: 1,
-      chunkRetryInterval: 500,
-      simultaneousUploads: 4,
-      generateUniqueIdentifier: getFileUUID
-    });
     flow.on('fileError', (event, api_data) => {
       try {
         const data = JSON.parse(api_data);
@@ -105,12 +116,7 @@ function Submit() {
           }
         }
       } catch (ex) {
-        setAllowClick(true);
-        setUploadProgress(null);
-        flow.cancel();
-        flow.off('complete');
-        flow.off('fileError');
-        flow.off('progress');
+        cancelUpload();
         enqueueSnackbar(t('submit.file.upload_fail'), snackBarOptions);
       }
     });
@@ -274,9 +280,19 @@ function Submit() {
                 <FileDropper file={file} setFile={setFileDropperFile} disabled={!allowClick} />
                 <Box marginTop="2rem">
                   {file ? (
-                    <Button disabled={!allowClick} color="primary" variant="contained" onClick={uploadAndScan}>
-                      {uploadProgress === null ? t('file.button') : `${uploadProgress}${t('submit.progress')}`}
-                    </Button>
+                    <>
+                      <Button disabled={!allowClick} color="primary" variant="contained" onClick={uploadAndScan}>
+                        {uploadProgress === null ? t('file.button') : `${uploadProgress}${t('submit.progress')}`}
+                      </Button>
+                      <Button
+                        style={{ marginLeft: '16px' }}
+                        color="secondary"
+                        variant="contained"
+                        onClick={cancelUpload}
+                      >
+                        {t('file.cancel')}
+                      </Button>
+                    </>
                   ) : null}
                 </Box>
               </Box>

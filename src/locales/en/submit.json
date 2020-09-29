@@ -2,6 +2,7 @@
   "classification": "The following classification will be applied to your submission:",
   "file": "File",
   "file.button": "Upload and Scan",
+  "file.cancel": "Cancel",
   "file.dragzone": "Select a file to scan",
   "file.dragzone.byte": "bytes",
   "file.drophere": "Drop your file here!",

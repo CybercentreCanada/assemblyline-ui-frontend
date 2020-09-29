@@ -2,6 +2,7 @@
   "classification": "La classification suivante sera appliquée à votre soumission:",
   "file": "Fichier",
   "file.button": "Téléverser et Analyser",
+  "file.cancel": "Annuler",
   "file.dragzone": "Sélectioner un fichier à analyser",
   "file.dragzone.byte": "octets",
   "file.drophere": "Déposez votre fichier ici!",
