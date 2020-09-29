@@ -143,7 +143,7 @@ function Submit() {
             variant: 'success'
           });
           setTimeout(() => {
-            history.push(`/submissions/${api_data.api_response.sid}`);
+            history.push(`/submission/detail/${api_data.api_response.sid}`);
           }, 500);
         },
         onFailure: api_data => {

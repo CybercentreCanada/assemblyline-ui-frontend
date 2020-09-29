@@ -9,6 +9,8 @@
   "app.language": "Language",
   "banner.alt": "Assemblyline Banner",
   "breadcrumbs.tos": "Terms of Service",
+  "breadcrumbs.submission.detail": "Detail",
+  "breadcrumbs.submission.report": "Report",
   "classification.done": "Done",
   "divider": "OR",
   "drawer.alerts": "Alerts",

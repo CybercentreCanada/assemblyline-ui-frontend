@@ -21,7 +21,9 @@ import manageSignatureSourcesEN from 'locales/en/manage/signature_sources.json';
 import manageWorkflowsEN from 'locales/en/manage/workflows.json';
 import searchEN from 'locales/en/search.json';
 import settingsEN from 'locales/en/settings.json';
-import submissionEN from 'locales/en/submission.json';
+import submissionDetailEN from 'locales/en/submission/detail.json';
+import submissionReportEN from 'locales/en/submission/report.json';
+import submissionsEN from 'locales/en/submissions.json';
 import submitEN from 'locales/en/submit.json';
 import tosEN from 'locales/en/tos.json';
 import translationEN from 'locales/en/translation.json';
@@ -47,7 +49,9 @@ import manageSignatureSourcesFR from 'locales/fr/manage/signature_sources.json';
 import manageWorkflowsFR from 'locales/fr/manage/workflows.json';
 import searchFR from 'locales/fr/search.json';
 import settingsFR from 'locales/fr/settings.json';
-import submissionFR from 'locales/fr/submission.json';
+import submissionDetailFR from 'locales/fr/submission/detail.json';
+import submissionReportFR from 'locales/fr/submission/report.json';
+import submissionsFR from 'locales/fr/submissions.json';
 import submitFR from 'locales/fr/submit.json';
 import tosFR from 'locales/fr/tos.json';
 import translationFR from 'locales/fr/translation.json';
@@ -77,7 +81,9 @@ const resources = {
     manageWorkflows: manageWorkflowsEN,
     search: searchEN,
     settings: settingsEN,
-    submission: submissionEN,
+    submissions: submissionsEN,
+    submissionDetail: submissionDetailEN,
+    submissionReport: submissionReportEN,
     submit: submitEN,
     translation: translationEN,
     tos: tosEN,
@@ -105,7 +111,9 @@ const resources = {
     manageWorkflows: manageWorkflowsFR,
     search: searchFR,
     settings: settingsFR,
-    submission: submissionFR,
+    submissions: submissionsFR,
+    submissionDetail: submissionDetailFR,
+    submissionReport: submissionReportFR,
     submit: submitFR,
     translation: translationFR,
     tos: tosFR,
