@@ -100,7 +100,6 @@ export default function useAlerts(pageSize: number): UsingAlerts {
   // parse list of alert result: add an index field.
   const parseResult = (responseItems, offset) => {
     const items = responseItems.map((item, index) => ({ ...item, id: item.alert_id, index: index + offset }));
-    console.log(items);
     return items;
   };
 

@@ -167,9 +167,6 @@ const Alerts: React.FC = () => {
     if (drawer.open) {
       setDrawer({ ...drawer, open: false });
     }
-
-    //
-    // setTimeout(() => resizeViewport('alert-viewport'), 1000);
   };
 
   // Handler for when clicking the 'Clear' button on AlertsFilter.
