@@ -8,9 +8,9 @@
   "api.unreachable": "Serveur API inaccessible. Réessayez plus tard...",
   "app.language": "Langue",
   "banner.alt": "Banière d'Assemblyline",
-  "breadcrumbs.tos": "Conditions d'utilisation",
   "breadcrumbs.submission.detail": "Détail",
   "breadcrumbs.submission.report": "Rapport",
+  "breadcrumbs.tos": "Conditions d'utilisation",
   "classification.done": "Terminé",
   "divider": "OU",
   "drawer.alerts": "Alertes",
@@ -54,5 +54,15 @@
   "usermenu": "Menu de l'utilisateur",
   "usermenu.account": "Gérer votre compte",
   "usermenu.logout": "Déconnexion",
-  "usermenu.settings": "Paramètres"
+  "usermenu.settings": "Paramètres",
+  "verdict.highly_suspicious": "Très Suspect",
+  "verdict.highly_suspicious.short": "TS",
+  "verdict.malicious": "Malicieux",
+  "verdict.malicious.short": "MA",
+  "verdict.non_malicious": "Non Malveillant",
+  "verdict.non_malicious.short": "NM",
+  "verdict.safe": "Sans Danger",
+  "verdict.safe.short": "SD",
+  "verdict.suspicious": "Suspect",
+  "verdict.suspicious.short": "SU"
 }

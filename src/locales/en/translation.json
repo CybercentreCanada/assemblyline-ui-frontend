@@ -8,9 +8,9 @@
   "api.unreachable": "API server unreachable. Try again later...",
   "app.language": "Language",
   "banner.alt": "Assemblyline Banner",
-  "breadcrumbs.tos": "Terms of Service",
   "breadcrumbs.submission.detail": "Detail",
   "breadcrumbs.submission.report": "Report",
+  "breadcrumbs.tos": "Terms of Service",
   "classification.done": "Done",
   "divider": "OR",
   "drawer.alerts": "Alerts",
@@ -54,5 +54,15 @@
   "usermenu": "User Menu",
   "usermenu.account": "Manage Account",
   "usermenu.logout": "Logout",
-  "usermenu.settings": "Settings"
+  "usermenu.settings": "Settings",
+  "verdict.highly_suspicious": "Highly Suspicious",
+  "verdict.highly_suspicious.short": "HS",
+  "verdict.malicious": "Malicious",
+  "verdict.malicious.short": "MA",
+  "verdict.non_malicious": "Non-Malicious",
+  "verdict.non_malicious.short": "NM",
+  "verdict.safe": "Safe",
+  "verdict.safe.short": "SA",
+  "verdict.suspicious": "Suspicious",
+  "verdict.suspicious.short": "SU"
 }
