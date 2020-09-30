@@ -1,1 +1,24 @@
-{}
+{
+  "submission.date": "Analysis Date",
+  "submission.user": "Submitted By",
+  "submission.services": "Selected Services",
+  "submission.services.errors": "Service Errors",
+  "file.name": "File Name",
+  "file.description": "Description",
+  "file.verdict": "Verdict",
+  "file.type": "File Type",
+  "file.mime": "MIME Type",
+  "file.magic": "Magic",
+  "file.size": "Size",
+  "file.md5": "MD5",
+  "file.sha1": "SHA1",
+  "file.sha256": "SHA256",
+  "file.ssdeep": "SSDEEP",
+  "user.verdict": "User's Verdicts",
+  "malicious": "Malicious",
+  "non_malicious": "Non-Malicious",
+  "title": "Submission Report",
+  "general": "General Information",
+  "metadata": "Metadata",
+  "attack": "Att&ck Matrix"
+}
