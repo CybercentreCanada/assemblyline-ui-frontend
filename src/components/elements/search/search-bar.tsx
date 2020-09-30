@@ -1,8 +1,6 @@
 import { Box, CircularProgress, Divider, IconButton, IconButtonProps, makeStyles, useTheme } from '@material-ui/core';
 import BackspaceIcon from '@material-ui/icons/Backspace';
-import FilterListIcon from '@material-ui/icons/FilterList';
 import SearchIcon from '@material-ui/icons/Search';
-import StarIcon from '@material-ui/icons/Star';
 import React, { useRef, useState } from 'react';
 import SearchTextField from './search-textfield';
 
@@ -37,6 +35,7 @@ interface SearchBarProps {
   searching?: boolean;
   buttons?: SearchBarButton[];
   suggestions?: string[];
+  onValueChange?: (filterValue: string) => void;
   onSearch: (filterValue: string, inputElement: HTMLInputElement) => void;
   onClear: () => void;
 }
@@ -47,6 +46,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   searching = false,
   suggestions = [],
   buttons = [],
+  onValueChange,
   onSearch,
   onClear
 }) => {
@@ -61,18 +61,19 @@ const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   // handler[onclick]: search button click handler.
-  const onSearchBtnClick = () => {
-    _onSearch();
-  };
+  // const _onSearchBtnClick = () => {
+  //   _onSearch();
+  // };
 
   // handler[onchange]: textfield change handler.
   // track value of filter..
-  const onValueChange = (_value: string) => {
+  const _onValueChange = (_value: string) => {
     setValue(_value);
+    onValueChange(_value);
   };
 
   // When clearing the filter value.
-  const onValueClear = () => {
+  const _onValueClear = () => {
     // textFieldEl.current.querySelector('input').focus();
     setValue('');
     onClear();
@@ -104,19 +105,16 @@ const SearchBar: React.FC<SearchBarProps> = ({
             value={value}
             options={suggestions}
             disabled={searching}
-            onChange={onValueChange}
+            onChange={_onValueChange}
             onSearch={_onSearch}
-            onClear={onValueClear}
+            onClear={_onValueClear}
           />
         </Box>
-        <IconButton onClick={onSearchBtnClick} edge="end" color="primary">
+        {/* <IconButton onClick={onSearchBtnClick} edge="end" color="primary">
           <FilterListIcon />
-        </IconButton>
-        <IconButton onClick={onValueClear} edge="end" color="primary">
+        </IconButton> */}
+        <IconButton onClick={_onValueClear} edge="end" color="primary">
           <BackspaceIcon />
-        </IconButton>
-        <IconButton edge="end" color="primary">
-          <StarIcon />
         </IconButton>
         <Divider
           orientation="vertical"

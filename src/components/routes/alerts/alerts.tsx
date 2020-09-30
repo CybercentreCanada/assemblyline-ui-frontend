@@ -1,20 +1,22 @@
 import { Box, Drawer, makeStyles, Typography, useTheme } from '@material-ui/core';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import CloseIcon from '@material-ui/icons/Close';
+import FilterListIcon from '@material-ui/icons/FilterList';
+import StarIcon from '@material-ui/icons/Star';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import MetaList from 'components/elements/lists/metalist/metalist';
 import SplitPanel from 'components/elements/panels/split-panel';
 import Viewport from 'components/elements/panels/viewport';
 import SearchBar from 'components/elements/search/search-bar';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import AlertActionsMenu from './alert-actions-menu';
 import AlertDetails from './alert-details';
 import AlertListItem from './alert-list-item';
 import AlertsFilters, { AlertFilterSelections, DEFAULT_FILTERS } from './alerts-filters';
+import AlertsFiltersFavorites from './alerts-filters-favorites';
 import AlertsFiltersSelected from './alerts-filters-selected';
 import useAlerts, { AlertFilterItem, AlertItem } from './useAlerts';
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 50;
 
 const useStyles = makeStyles(theme => ({
   drawerInner: {
@@ -51,8 +53,10 @@ const Alerts: React.FC = () => {
   const [searching, setSearching] = useState<boolean>(false);
   const [scrollReset, setScrollReset] = useState<boolean>(false);
   const [splitPanel, setSplitPanel] = useState<{ open: boolean; item: AlertItem }>({ open: false, item: null });
-  const [drawer, setDrawer] = useState<{ open: boolean; type: 'filter' }>({ open: false, type: null });
+  const [drawer, setDrawer] = useState<{ open: boolean; type: 'filter' | 'favorites' }>({ open: false, type: null });
   const [selectedFilters, setSelectedFilters] = useState<AlertFilterSelections>(DEFAULT_FILTERS);
+  // Define some references.
+  const searchTextValue = useRef<string>(query.getQuery());
 
   useEffect(() => {
     const searchQueryFilters = query.parseFilters();
@@ -175,6 +179,10 @@ const Alerts: React.FC = () => {
     onClearSearch();
   };
 
+  const onFilterValueChange = (inputValue: string) => {
+    searchTextValue.current = inputValue;
+  };
+
   // The SearchBar contentassist suggesions.
   const buildSearchSuggestions = () => {
     const _fields = fields.map(f => f.name);
@@ -189,11 +197,19 @@ const Alerts: React.FC = () => {
           initValue={query.getQuery()}
           searching={searching}
           suggestions={buildSearchSuggestions()}
+          onValueChange={onFilterValueChange}
           onClear={onClearSearch}
           onSearch={onSearch}
           buttons={[
             {
-              icon: <ChevronLeftIcon />,
+              icon: <StarIcon />,
+              props: {
+                onClick: () => setDrawer({ open: true, type: 'favorites' })
+              }
+            },
+
+            {
+              icon: <FilterListIcon />,
               props: {
                 onClick: () => setDrawer({ open: true, type: 'filter' })
               }
@@ -221,7 +237,7 @@ const Alerts: React.FC = () => {
             <MetaList
               loading={buffer.total() > 0 && (loading || searching)}
               buffer={buffer}
-              rowHeight={108}
+              rowHeight={92}
               scrollReset={scrollReset}
               onSelection={onItemSelected}
               onNext={_onLoadMore}
@@ -264,10 +280,10 @@ const Alerts: React.FC = () => {
         />
       </Viewport>
       <Drawer open={drawer.open} anchor="right" onClose={() => setDrawer({ ...drawer, open: false })}>
-        {
+        <Box p={theme.spacing(0.5)} className={classes.drawerInner}>
           {
-            filter: (
-              <Box p={theme.spacing(0.5)} className={classes.drawerInner}>
+            {
+              filter: (
                 <AlertsFilters
                   selectedFilters={selectedFilters}
                   valueFilters={valueFilters}
@@ -277,10 +293,11 @@ const Alerts: React.FC = () => {
                   onApplyBtnClick={onApplyFilters}
                   onClearBtnClick={onClearFilters}
                 />
-              </Box>
-            )
-          }[drawer.type]
-        }
+              ),
+              favorites: <AlertsFiltersFavorites query={searchTextValue.current} />
+            }[drawer.type]
+          }
+        </Box>
       </Drawer>
     </Box>
   );

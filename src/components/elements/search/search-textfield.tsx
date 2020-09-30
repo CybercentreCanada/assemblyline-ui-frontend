@@ -199,7 +199,7 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
     setFilteredOptions({
       start: insertStartIndex > -1 ? insertStartIndex : thisCursor,
       end: insertEndIndex > -1 ? insertEndIndex : thisCursor,
-      items: _options.length ? _options : options
+      items: _options
     });
   };
 

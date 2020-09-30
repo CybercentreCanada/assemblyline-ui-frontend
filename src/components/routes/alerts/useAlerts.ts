@@ -228,6 +228,15 @@ export default function useAlerts(pageSize: number): UsingAlerts {
     });
   };
 
+  const addFavorite = () => {
+    // https://192.168.0.13.nip.io:8443/api/v4/user/favorites/admin/alert/ [PUT]
+    // PAYLOAD:
+    // {
+    //    name: "testing_favorite"
+    //    query: "owner:admin"
+    //  }
+  };
+
   // By default load 25 items with no search crit.
   useEffect(() => {
     onLoad();
