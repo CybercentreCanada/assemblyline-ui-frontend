@@ -48,14 +48,14 @@ export default function useMySitemap() {
       { path: '/submit', title: t('drawer.submit'), isRoot: true, icon: <PublishOutlinedIcon /> },
       { path: '/submissions', title: t('drawer.submissions'), isRoot: true, icon: <AmpStoriesOutlinedIcon /> },
       {
-        path: '/submission/detail',
-        title: t('page.submission.detail'),
+        path: '/submission/detail/:id',
+        title: `${t('breadcrumbs.submission.detail')}: {:id}`,
         icon: <ListAltOutlinedIcon />,
         breadcrumbs: ['/submissions']
       },
       {
-        path: '/submission/report',
-        title: t('page.submission.report'),
+        path: '/submission/report/:id',
+        title: `${t('breadcrumbs.submission.report')}: {:id}`,
         icon: <ChromeReaderModeOutlinedIcon />,
         breadcrumbs: ['/submissions']
       },

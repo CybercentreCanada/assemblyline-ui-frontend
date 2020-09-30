@@ -1,3 +1,4 @@
+import useAppContext from 'components/hooks/useAppContext';
 import NotFoundPage from 'components/routes/404_dl';
 import Account from 'components/routes/account';
 import Admin from 'components/routes/admin';
@@ -20,15 +21,17 @@ import ManageSignatureSources from 'components/routes/manage/signature_sources';
 import ManageWorkflows from 'components/routes/manage/workflows';
 import Search from 'components/routes/search';
 import Settings from 'components/routes/settings';
-import Submissions from 'components/routes/submission';
+import SubmissionDetail from 'components/routes/submission/detail';
+import SubmissionReport from 'components/routes/submission/report';
+import Submissions from 'components/routes/submissions';
 import Submit from 'components/routes/submit';
 import Tos from 'components/routes/tos';
 import User from 'components/routes/user';
 import React from 'react';
-import { Route, Switch } from 'react-router-dom';
-import Alerts from './alerts/alerts';
+import { Redirect, Route, Switch } from 'react-router-dom';
 
 const Routes = () => {
+  const { user: currentUser } = useAppContext();
   return (
     <Switch>
       <Route exact path="/" component={Submit} />
@@ -57,6 +60,13 @@ const Routes = () => {
       <Route exact path="/search/:id" component={Search} />
       <Route exact path="/settings" component={Settings} />
       <Route exact path="/submit" component={Submit} />
+      <Route exact path="/submission/detail/:id" component={SubmissionDetail} />
+      <Route exact path="/submission/report/:id" component={SubmissionReport} />
+      {currentUser.default_view === 'detail' ? (
+        <Redirect from="/submission/:id" to="/submission/detail/:id" />
+      ) : (
+        <Redirect from="/submission/:id" to="/submission/report/:id" />
+      )}
       <Route exact path="/submissions" component={Submissions} />
       <Route exact path="/tos" component={Tos} />
       <Route component={NotFoundPage} />

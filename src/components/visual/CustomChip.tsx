@@ -21,7 +21,7 @@ export const ColorMap = {
 };
 export type PossibleColors = 'default' | 'primary' | 'secondary' | 'info' | 'success' | 'warning' | 'error';
 
-interface CustomChipProps {
+export interface CustomChipProps {
   className?: string;
   type?: 'round' | 'square' | 'classification';
   size?: 'tiny' | 'small' | 'medium';

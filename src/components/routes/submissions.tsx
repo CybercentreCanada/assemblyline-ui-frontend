@@ -48,7 +48,7 @@ for (let x = 0; x < Math.floor(Math.random() * 270 + 30); x++) {
 
 export default function Submissions() {
   const classes = useStyles();
-  const { t } = useTranslation(['submission']);
+  const { t } = useTranslation(['submissions']);
 
   return (
     <PageFullWidth>

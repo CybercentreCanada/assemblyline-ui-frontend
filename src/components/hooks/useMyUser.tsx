@@ -44,6 +44,7 @@ export interface CustomUser extends UserProfileProps {
   // Al specific props
   agrees_with_tos: boolean;
   classification: string;
+  default_view?: string;
   groups: string[];
   is_active: boolean;
   type: string[];
@@ -94,7 +95,7 @@ export default function useMyUser(): CustomUserContextProps {
     setC12nDef(c12n);
     setConfiguration(cfg);
     setIndexes(idx);
-    setState(curUser);
+    setState({ default_view: 'detail', ...curUser });
     setFlattenedProps(flatten({ user: curUser, c12nDef: c12n, configuration: cfg, indexes: idx }));
   };
 
