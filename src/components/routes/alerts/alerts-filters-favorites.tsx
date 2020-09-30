@@ -3,10 +3,21 @@ import React from 'react';
 
 interface AlertsFiltersFavoritesProps {
   query?: string;
+  onSaveBtnClick: (filter: { name: string; query: string }) => void;
+  onCancelBtnClick: () => void;
 }
 
-const AlertsFiltersFavorites = ({ query }) => {
+const AlertsFiltersFavorites = ({ query, onSaveBtnClick, onCancelBtnClick }) => {
   const theme = useTheme();
+
+  const _onSaveBtnClick = () => {
+    onSaveBtnClick({ query: 'query', name: 'name' });
+  };
+
+  const _onCancelBtnClick = () => {
+    onCancelBtnClick();
+  };
+
   return (
     <Box>
       <Typography variant="h6">Favorites</Typography>
@@ -20,11 +31,13 @@ const AlertsFiltersFavorites = ({ query }) => {
         </Box>
       </Box>
       <Box mt={1}>
-        <Button variant="contained" color="primary">
-          Add
+        <Button variant="contained" color="primary" onClick={_onSaveBtnClick}>
+          Save
         </Button>
         <Box mr={1} display="inline-block" />
-        <Button variant="contained">Cancel</Button>
+        <Button variant="contained" onClick={_onCancelBtnClick}>
+          Cancel
+        </Button>
       </Box>
     </Box>
   );

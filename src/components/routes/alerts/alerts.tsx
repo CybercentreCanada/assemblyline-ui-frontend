@@ -294,7 +294,13 @@ const Alerts: React.FC = () => {
                   onClearBtnClick={onClearFilters}
                 />
               ),
-              favorites: <AlertsFiltersFavorites query={searchTextValue.current} />
+              favorites: (
+                <AlertsFiltersFavorites
+                  query={searchTextValue.current}
+                  onSaveBtnClick={() => console.log('save')}
+                  onCancelBtnClick={() => console.log('cancel')}
+                />
+              )
             }[drawer.type]
           }
         </Box>
