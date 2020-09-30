@@ -4,6 +4,7 @@ import { ChipList } from 'components/elements/mui/chips';
 import { AlertItem } from 'components/routes/alerts/useAlerts';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
+import Verdict from 'components/visual/Verdict';
 import { formatDistanceToNowStrict } from 'date-fns';
 import React from 'react';
 import AlertPriority from './alert-priority';
@@ -42,7 +43,8 @@ const AlertItemDefault: React.FC<AlertListItemProps> = ({ item }) => {
         </Grid>
         <Grid item xs={4}>
           {/* {item.index} */}
-          <AlertScore score={item.al.score} />
+          {/* <AlertScore score={item.al.score} /> */}
+          <Verdict score={item.al.score} />
         </Grid>
         <Grid item xs={2}>
           <Box display="inline-block">
