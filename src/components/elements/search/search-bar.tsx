@@ -1,7 +1,7 @@
 import { Box, CircularProgress, Divider, IconButton, IconButtonProps, makeStyles, useTheme } from '@material-ui/core';
 import BackspaceIcon from '@material-ui/icons/Backspace';
 import SearchIcon from '@material-ui/icons/Search';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import SearchTextField from './search-textfield';
 
 const useStyles = makeStyles(theme => ({
@@ -87,6 +87,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
       onClear();
     }
   };
+
+  //
+  useEffect(() => {
+    setValue(initValue);
+  }, [initValue]);
 
   return (
     <div ref={element} className={classes.root}>

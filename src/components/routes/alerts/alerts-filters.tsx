@@ -41,6 +41,7 @@ interface AlertsFiltersProps {
   labelFilters: AlertFilterItem[];
   onApplyBtnClick: (filters: AlertFilterSelections) => void;
   onClearBtnClick: () => void;
+  onCancelBtnClick: () => void;
 }
 
 const AlertsFilters: React.FC<AlertsFiltersProps> = ({
@@ -50,7 +51,8 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
   priorityFilters,
   labelFilters,
   onApplyBtnClick,
-  onClearBtnClick
+  onClearBtnClick,
+  onCancelBtnClick
 }) => {
   const theme = useTheme();
   const classes = useStyles();
@@ -227,13 +229,17 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
           <Divider />
         </Box> */}
       </Box>
-      <Box mt={1}>
+      <Box mt={1} display="flex" flexDirection="row">
         <Button variant="contained" color="primary" onClick={_onApplyBtnClick}>
           Apply
         </Button>
-        <Box mr={1} display="inline-block" />
-        <Button variant="contained" onClick={onClearBtnClick}>
+        <Box mr={1} />
+        <Button variant="contained" onClick={onClearBtnClick} size="small">
           Clear
+        </Button>
+        <Box flex={1} />
+        <Button variant="contained" onClick={onCancelBtnClick} size="small">
+          Cancel
         </Button>
       </Box>
     </Box>

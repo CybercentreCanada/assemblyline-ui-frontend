@@ -41,13 +41,16 @@ const Alerts: React.FC = () => {
     total,
     fields,
     query,
+    favorites,
     valueFilters,
     statusFilters,
     priorityFilters,
     labelFilters,
     onLoad,
     onLoadMore,
-    onGet
+    onGet,
+    onAddFavorite,
+    onDeleteFavorite
   } = useAlerts(PAGE_SIZE);
   // Define required states...
   const [searching, setSearching] = useState<boolean>(false);
@@ -58,6 +61,7 @@ const Alerts: React.FC = () => {
   // Define some references.
   const searchTextValue = useRef<string>(query.getQuery());
 
+  //
   useEffect(() => {
     const searchQueryFilters = query.parseFilters();
     const statuses = searchQueryFilters.filter(f => f.type === 'status');
@@ -179,6 +183,13 @@ const Alerts: React.FC = () => {
     onClearSearch();
   };
 
+  // Handler for when clicking the 'Cancel' button on AlertsFiltersFilters
+  const onCancelFilters = () => {
+    setDrawer({ ...drawer, open: false });
+  };
+
+  // Handler for when the value of the search bar input field changes.
+  // We don't track it in state as that is being done in SearchBar component itself.
   const onFilterValueChange = (inputValue: string) => {
     searchTextValue.current = inputValue;
   };
@@ -188,6 +199,45 @@ const Alerts: React.FC = () => {
     const _fields = fields.map(f => f.name);
     const words = ['OR', 'AND', 'NOT', 'TO', 'now', 'd', 'M', 'y', 'h', 'm'];
     return [..._fields, ...words];
+  };
+
+  //
+  const onFavoriteAdd = (filter: { query: string; name: string }) => {
+    onAddFavorite(filter);
+    setDrawer({ ...drawer, open: false });
+  };
+
+  //
+  const onFavoriteCancel = () => {
+    setDrawer({ ...drawer, open: false });
+  };
+
+  //
+  const onFavoriteDelete = (favorite: { name: string; query: string }) => {
+    console.log(favorite);
+    onDeleteFavorite(favorite);
+  };
+
+  //
+  const onFavoriteSelected = (favorite: { name: string; query: string }) => {
+    // Update the query parameter.
+    query.reset().setQuery(favorite.query);
+
+    // Reinitialize the scroll.
+    setScrollReset(true);
+
+    // Fetch result based on new/updated query.
+    onLoad();
+
+    // Close right of split panel if open.
+    if (splitPanel.open) {
+      setSplitPanel({ ...splitPanel, open: false });
+    }
+
+    // Close the Filters drawer.
+    if (drawer.open) {
+      setDrawer({ ...drawer, open: false });
+    }
   };
 
   return (
@@ -235,7 +285,7 @@ const Alerts: React.FC = () => {
           rightOpen={splitPanel.open}
           left={
             <MetaList
-              loading={buffer.total() > 0 && (loading || searching)}
+              loading={loading || searching}
               buffer={buffer}
               rowHeight={92}
               scrollReset={scrollReset}
@@ -292,13 +342,17 @@ const Alerts: React.FC = () => {
                   labelFilters={labelFilters}
                   onApplyBtnClick={onApplyFilters}
                   onClearBtnClick={onClearFilters}
+                  onCancelBtnClick={onCancelFilters}
                 />
               ),
               favorites: (
                 <AlertsFiltersFavorites
-                  query={searchTextValue.current}
-                  onSaveBtnClick={() => console.log('save')}
-                  onCancelBtnClick={() => console.log('cancel')}
+                  initValue={searchTextValue.current}
+                  favorites={favorites}
+                  onFavoriteSelected={onFavoriteSelected}
+                  onFavoriteDelete={onFavoriteDelete}
+                  onSaveBtnClick={onFavoriteAdd}
+                  onCancelBtnClick={onFavoriteCancel}
                 />
               )
             }[drawer.type]

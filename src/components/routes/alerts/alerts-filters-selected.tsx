@@ -16,20 +16,21 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({ filters, o
     const _statuses = filters.statuses.filter(s => s.value !== item.value);
     onChange({ ...filters, statuses: _statuses });
   };
+
   const onDeletePriority = (item: AlertFilterItem) => {
     const _priorities = filters.priorities.filter(s => s.value !== item.value);
     onChange({ ...filters, priorities: _priorities });
   };
+
   const onDeleteLabel = (item: AlertFilterItem) => {
     const _labels = filters.labels.filter(s => s.value !== item.value);
     onChange({ ...filters, labels: _labels });
   };
+
   const onDeleteValue = (item: AlertFilterItem) => {
     const _values = filters.values.filter(s => s.value !== item.value);
     onChange({ ...filters, values: _values });
   };
-
-  console.log(filters);
 
   return (
     <Box>

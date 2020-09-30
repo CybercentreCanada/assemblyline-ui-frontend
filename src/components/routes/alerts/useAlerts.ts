@@ -8,6 +8,13 @@ import { ALField } from 'components/hooks/useMyUser';
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
+export interface AlertFavorite {
+  classifiction: string;
+  name: string;
+  query: string;
+  created_by: string;
+}
+
 export interface AlertFilterItem {
   id: number | string;
   label: string;
@@ -70,6 +77,7 @@ interface UsingAlerts {
   // items: AlertItem[];
   buffer: MetaListBuffer;
   query: SearchQuery;
+  favorites: AlertFavorite[];
   labelFilters: AlertFilterItem[];
   priorityFilters: AlertFilterItem[];
   statusFilters: AlertFilterItem[];
@@ -77,13 +85,16 @@ interface UsingAlerts {
   onLoad: () => void;
   onLoadMore: () => void;
   onGet: (id: string, onSuccess: (alert: AlertItem) => void) => void;
+  onAddFavorite: (filter: { query: string; name: string }) => void;
+  onDeleteFavorite: (favorite: { query: string; name: string }) => void;
 }
 
 // Custom Hook implementation for dealing with alerts.
 export default function useAlerts(pageSize: number): UsingAlerts {
   const location = useLocation();
   const apiCall = useMyAPI();
-  const { indexes: fieldIndexes } = useAppContext();
+  const { user, indexes: fieldIndexes, configuration } = useAppContext();
+  const [favorites, setFavorites] = useState<AlertFavorite[]>([]);
   const [query] = useState<SearchQuery>(new SearchQuery(location.pathname, location.search, pageSize));
   const [fields, setFields] = useState<ALField[]>([]);
   const [valueFilters, setValueFilters] = useState<AlertFilterItem[]>([]);
@@ -228,13 +239,49 @@ export default function useAlerts(pageSize: number): UsingAlerts {
     });
   };
 
-  const addFavorite = () => {
+  const onAddFavorite = (favorite: { query: string; name: string }) => {
+    // https://192.168.0.13.nip.io:8443/api/v4/user/favorites/admin/
     // https://192.168.0.13.nip.io:8443/api/v4/user/favorites/admin/alert/ [PUT]
-    // PAYLOAD:
-    // {
-    //    name: "testing_favorite"
-    //    query: "owner:admin"
-    //  }
+    const url = '/api/v4/user/favorites/admin/alert/';
+    apiCall({
+      url,
+      method: 'put',
+      body: favorite,
+      onSuccess: api_data => {
+        if (api_data.api_response.success) {
+          onLoadFavorites();
+        }
+      }
+    });
+  };
+
+  const onDeleteFavorite = (favorite: { query: string; name: string }) => {
+    // https://192.168.0.13.nip.io:8443/api/v4/user/favorites/admin/
+    // https://192.168.0.13.nip.io:8443/api/v4/user/favorites/admin/alert/ [PUT]
+    const url = `/api/v4/user/favorites/${user.username}/alert/`;
+    apiCall({
+      url,
+      method: 'delete',
+      body: 'new_query',
+      onSuccess: api_data => {
+        if (api_data.api_response.success) {
+          onLoadFavorites();
+        }
+      }
+    });
+  };
+
+  const onLoadFavorites = () => {
+    // https://192.168.0.13.nip.io:8443/api/v4/user/favorites/admin/
+    // https://192.168.0.13.nip.io:8443/api/v4/user/favorites/admin/alert/ [PUT]
+    const url = `/api/v4/user/favorites/${user.username}/`;
+    apiCall({
+      url,
+      onSuccess: api_data => {
+        console.log(api_data);
+        setFavorites(api_data.api_response.alert);
+      }
+    });
   };
 
   // By default load 25 items with no search crit.
@@ -244,6 +291,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
     onLoadPriorities();
     onLoadLabels();
     onLoadStatisics();
+    onLoadFavorites();
   }, []);
 
   // transform alert fields into array.
@@ -257,17 +305,22 @@ export default function useAlerts(pageSize: number): UsingAlerts {
     }
   }, [fieldIndexes]);
 
+  // console.log(configuration);
+
   // UseAlert Hook API.
   return {
     ...state,
     fields,
     query,
+    favorites,
     statusFilters,
     priorityFilters,
     labelFilters,
     valueFilters,
     onLoad,
     onLoadMore,
-    onGet
+    onGet,
+    onAddFavorite,
+    onDeleteFavorite
   };
 }

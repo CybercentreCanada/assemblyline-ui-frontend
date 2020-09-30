@@ -8,7 +8,6 @@ import Verdict from 'components/visual/Verdict';
 import { formatDistanceToNowStrict } from 'date-fns';
 import React from 'react';
 import AlertPriority from './alert-priority';
-import AlertScore from './alert-score';
 
 type AlertListItemProps = {
   item: AlertItem;
@@ -27,6 +26,7 @@ const AlertListItem: React.FC<AlertListItemProps> = props => {
   return <AlertItemDefault {...props} />;
 };
 
+//
 const AlertItemDefault: React.FC<AlertListItemProps> = ({ item }) => {
   const theme = useTheme();
   return (
@@ -42,8 +42,6 @@ const AlertItemDefault: React.FC<AlertListItemProps> = ({ item }) => {
           </Typography>
         </Grid>
         <Grid item xs={4}>
-          {/* {item.index} */}
-          {/* <AlertScore score={item.al.score} /> */}
           <Verdict score={item.al.score} />
         </Grid>
         <Grid item xs={2}>
@@ -110,7 +108,7 @@ const AlertItemSmall: React.FC<AlertListItemProps> = ({ item }) => {
       <Grid container style={{ alignItems: 'center' }}>
         <Grid item xs={8}>
           <Box ml={-1}>
-            <AlertScore score={item.al.score} />
+            <Verdict score={item.al.score} />
           </Box>
         </Grid>
         <Grid item xs={2}>
@@ -150,7 +148,7 @@ const AlertItemXSmall: React.FC<AlertListItemProps> = ({ item }) => {
       <Grid container style={{ alignItems: 'center' }}>
         <Grid item xs={6}>
           <Box ml={-1}>
-            <AlertScore score={item.al.score} />
+            <Verdict score={item.al.score} />
           </Box>
         </Grid>
         <Grid item xs={4}>
