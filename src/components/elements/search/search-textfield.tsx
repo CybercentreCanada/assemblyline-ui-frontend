@@ -82,6 +82,12 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
     return element.current.querySelector('input');
   };
 
+  //
+  const _onBlur = () => {
+    console.log('blurring...');
+    setOpen(false);
+  };
+
   // Handler for when the value of the text input changes.
   const _onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value: _value } = event.currentTarget;
@@ -181,31 +187,6 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
       precursor: _precursor
     } = parseFilter(inputValue, selectionOffset);
 
-    // Grab the part of the text before the precursor.
-    // const _precursor = extractPrecursor(inputValue, selectionOffset);
-    // const _postcursor =
-
-    // //
-    // let insertStartIndex = _precursor.length - 1;
-    // const insertEndIndex = insertStartIndex;
-
-    // // Split that with a single whitespace.
-    // const parts = _precursor.split(' ');
-
-    // // If the part just before the cursor isn't empty,
-    // //  then we use that to filter the options.
-    // if (parts[parts.length - 1] !== '') {
-    //   const filterValue = parts[parts.length - 1];
-
-    //   insertStartIndex -= filterValue.length - 1;
-    //   insertEndIndex += (insertEndIndex - filterValue.length);
-    //   console.log(`[${filterValue}, ${insertStartIndex}, ${insertEndIndex}]`);
-
-    //   _options = _options.filter(option => option.includes(filterValue));
-    // }
-
-    //
-
     // Filter options.
     const _options = filterValue.length > 0 ? options.filter(option => option.includes(filterValue)) : options;
 
@@ -284,11 +265,12 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
         disabled={disabled}
         onChange={_onChange}
         onKeyDown={_onKeyDown}
+        onBlur={_onBlur}
         autoFocus
         fullWidth
       />
       {open && isLTEMedium ? (
-        <div ref={optionsElement} className={classes.searchTextFieldOptionsCt} tabIndex={-1} onKeyDown={_onKeyDown}>
+        <div ref={optionsElement} className={classes.searchTextFieldOptionsCt}>
           <div className={classes.serachTextFieldOptionsInnerSpacer}>
             <Typography>{precursor}</Typography>
           </div>

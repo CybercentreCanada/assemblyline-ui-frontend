@@ -1,5 +1,5 @@
 export default class Throttler {
-  private id: NodeJS.Timeout = null;
+  private throttleId: NodeJS.Timeout = null;
 
   private delayId: NodeJS.Timeout = null;
 
@@ -8,6 +8,15 @@ export default class Throttler {
   constructor(msec: number) {
     this.msec = msec;
     this.delay = this.delay.bind(this);
+  }
+
+  public throttle(fn: () => void): void {
+    if (!this.throttleId) {
+      this.throttleId = setTimeout(() => {
+        fn();
+        this.throttleId = null;
+      }, this.msec);
+    }
   }
 
   public delay(fn: () => void): void {

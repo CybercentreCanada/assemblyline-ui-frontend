@@ -29,6 +29,8 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({ filters, o
     onChange({ ...filters, values: _values });
   };
 
+  console.log(filters);
+
   return (
     <Box>
       <Box>

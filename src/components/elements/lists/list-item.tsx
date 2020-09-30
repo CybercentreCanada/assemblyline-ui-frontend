@@ -20,7 +20,6 @@ interface ListRowProps {
 
 const ListRow: React.FC<ListRowProps> = ({ loaded, selected, item, index, rowHeight, onClick, onRenderRow }) => {
   const { listItemClasses: classes } = useListStyles();
-  console.log(`rendering: ${item.id}`);
   return (
     <div
       className={classes.itemCt}
@@ -29,7 +28,7 @@ const ListRow: React.FC<ListRowProps> = ({ loaded, selected, item, index, rowHei
       data-listitem-focus="false"
       onClick={() => onClick(item)}
     >
-      <div className={classes.itemOuter} style={{ height: rowHeight }}>
+      <div className={classes.itemOuter}>
         <div className={classes.itemInner}>{loaded ? onRenderRow(item) : '...loading'}</div>
       </div>
       <div className={classes.itemDivider}>

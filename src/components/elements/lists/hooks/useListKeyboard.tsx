@@ -56,7 +56,8 @@ export default function useListKeyboard({
     const { key, currentTarget } = event;
 
     // Only run events after 10ms after receiving last one.
-    THROTTLER.delay(() => {
+    THROTTLER.throttle(() => {
+      // console.log('running...');
       // Handle each keys.
       if (isEnter(key)) {
         // key[ENTER ]: handler
@@ -71,7 +72,7 @@ export default function useListKeyboard({
         selectionScroller(currentTarget, nextCursor, rowHeight);
       } else if (isArrowDown(key)) {
         // key[ARROW_DOWN]: handler
-        const nextCursor = cursor + 1 < count ? cursor + 1 : infinite ? cursor : 0;
+        const nextCursor = cursor + 1 < count || infinite ? cursor + 1 : 0;
         setCursor(nextCursor);
         selectionScroller(currentTarget, nextCursor, rowHeight);
       }

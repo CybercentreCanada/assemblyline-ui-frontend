@@ -102,7 +102,8 @@ const useListItemStyles = makeStyles(theme => ({
   },
   itemOuter: {
     position: 'relative',
-    overflow: 'auto'
+    overflow: 'auto',
+    padding: theme.spacing(2)
   },
   itemInner: {},
   itemDivider: {

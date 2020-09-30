@@ -70,7 +70,7 @@ const Alerts: React.FC = () => {
   }, [query]);
 
   //
-  const _onSearch = (filterValue: string = '', inputEl: HTMLInputElement = null) => {
+  const onSearch = (filterValue: string = '', inputEl: HTMLInputElement = null) => {
     // Tell the world we're searching for it...
     setSearching(true);
 
@@ -158,8 +158,15 @@ const Alerts: React.FC = () => {
     // Fetch result based on new/updated query.
     onLoad();
 
+    // Close right of split panel if open.
+    if (splitPanel.open) {
+      setSplitPanel({ ...splitPanel, open: false });
+    }
+
     // Close the Filters drawer.
-    setDrawer({ ...drawer, open: false });
+    if (drawer.open) {
+      setDrawer({ ...drawer, open: false });
+    }
 
     //
     // setTimeout(() => resizeViewport('alert-viewport'), 1000);
@@ -167,7 +174,8 @@ const Alerts: React.FC = () => {
 
   // Handler for when clicking the 'Clear' button on AlertsFilter.
   const onClearFilters = () => {
-    setSelectedFilters({ tc: null, groupBy: null, values: [], statuses: [], priorities: [], labels: [] });
+    setDrawer({ ...drawer, open: false });
+    onClearSearch();
   };
 
   return (
@@ -178,7 +186,7 @@ const Alerts: React.FC = () => {
           searching={searching}
           suggestions={fields.map(f => f.name)}
           onClear={onClearSearch}
-          onSearch={_onSearch}
+          onSearch={onSearch}
           buttons={[
             {
               icon: <ChevronLeftIcon />,
@@ -209,7 +217,7 @@ const Alerts: React.FC = () => {
             <MetaList
               loading={buffer.total() > 0 && (loading || searching)}
               buffer={buffer}
-              rowHeight={93}
+              rowHeight={108}
               scrollReset={scrollReset}
               onSelection={onItemSelected}
               onNext={_onLoadMore}
