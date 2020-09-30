@@ -15,8 +15,6 @@ const useStyles = makeStyles(theme => ({
   },
   searchbar: {
     paddingTop: theme.spacing(1),
-    // paddingRight: theme.spacing(2),.
-    // paddingBottom: theme.spacing(1),
     paddingLeft: theme.spacing(2),
     '& input': {
       color: theme.palette.text.secondary
@@ -26,8 +24,6 @@ const useStyles = makeStyles(theme => ({
     color: theme.palette.primary.light,
     paddingLeft: theme.spacing(1),
     paddingBottom: theme.spacing(1)
-    // paddingLeft: theme.spacing(1)
-    // backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 15%)' : 'hsl(0, 0%, 95%)'
   }
 }));
 
@@ -58,7 +54,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const classes = useStyles();
   const element = useRef<HTMLInputElement>();
   const [value, setValue] = useState<string>(initValue);
-  // const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
 
   //
   const getInputEl = () => {
@@ -91,12 +86,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
       onClear();
     }
   };
-
-  // When the search suggestion box closes.
-  // const onSuggestionClose = () => {
-  //   setShowSuggestions(false);
-  //   textFieldEl.current.querySelector('input').focus();
-  // };
 
   return (
     <div ref={element} className={classes.root}>

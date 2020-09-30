@@ -62,7 +62,7 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
 }) => {
   const theme = useTheme();
   const classes = useStyles();
-  const [cursor, setCursor] = useState<number>(-1);
+  const [cursor, setCursor] = useState<number>(0);
   const [precursor, setPrecursor] = useState<string>('');
   const [filteredOptions, setFilteredOptions] = useState<{ start: number; end: number; items: string[] }>({
     start: 0,
@@ -82,9 +82,8 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
     return element.current.querySelector('input');
   };
 
-  //
+  // Automatically close the options box with losing focus.
   const _onBlur = () => {
-    console.log('blurring...');
     setOpen(false);
   };
 
@@ -188,7 +187,10 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
     } = parseFilter(inputValue, selectionOffset);
 
     // Filter options.
-    const _options = filterValue.length > 0 ? options.filter(option => option.includes(filterValue)) : options;
+    const _options =
+      filterValue.length > 0
+        ? options.filter(option => option.toLowerCase().includes(filterValue.toLowerCase()))
+        : options;
 
     // Update states...
     setPrecursor(_precursor);

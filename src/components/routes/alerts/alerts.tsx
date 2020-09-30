@@ -178,13 +178,20 @@ const Alerts: React.FC = () => {
     onClearSearch();
   };
 
+  // The SearchBar contentassist suggesions.
+  const buildSearchSuggestions = () => {
+    const _fields = fields.map(f => f.name);
+    const words = ['OR', 'AND', 'NOT', 'TO', 'now', 'd', 'M', 'y', 'h', 'm'];
+    return [..._fields, ...words];
+  };
+
   return (
     <Box>
       <Box pb={theme.spacing(0.25)}>
         <SearchBar
           initValue={query.getQuery()}
           searching={searching}
-          suggestions={fields.map(f => f.name)}
+          suggestions={buildSearchSuggestions()}
           onClear={onClearSearch}
           onSearch={onSearch}
           buttons={[
