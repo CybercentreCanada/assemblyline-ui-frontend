@@ -1,6 +1,5 @@
 import {
   Avatar,
-  Box,
   Button,
   CircularProgress,
   Drawer,
@@ -59,6 +58,9 @@ function User({ width, username }: UserProps) {
   const [buttonLoading, setButtonLoading] = useState(false);
   const { user: currentUser, configuration } = useAppContext();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const sp1 = theme.spacing(1);
+  const sp4 = theme.spacing(4);
+  const sp6 = theme.spacing(6);
 
   const apiCall = useMyAPI();
   const useStyles = makeStyles(curTheme => ({
@@ -250,12 +252,22 @@ function User({ width, username }: UserProps) {
     <PageCenter>
       <React.Fragment key="right">
         <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
-          <Box alignSelf="flex-end">
+          <div style={{ alignSelf: 'flex-end' }}>
             <IconButton onClick={() => setDrawerOpen(false)}>
               <CloseIcon />
             </IconButton>
-          </Box>
-          <Box pt={4} pb={6} px={4} className={classes.drawer} display="flex" flexDirection="column">
+          </div>
+          <div
+            style={{
+              paddingTop: sp4,
+              paddingBottom: sp6,
+              paddingLeft: sp4,
+              paddingRight: sp4,
+              display: 'flex',
+              flexDirection: 'column'
+            }}
+            className={classes.drawer}
+          >
             {drawerType && user
               ? {
                   api_quota: (
@@ -361,11 +373,14 @@ function User({ width, username }: UserProps) {
                   )
                 }[drawerType]
               : null}
-          </Box>
+          </div>
         </Drawer>
       </React.Fragment>
 
-      <Box className={classes.page} py={6} display="inline-block" textAlign="center">
+      <div
+        className={classes.page}
+        style={{ paddingTop: sp6, paddingBottom: sp6, display: 'inline-block', textAlign: 'center' }}
+      >
         <Grid container spacing={2} justify="center">
           <Grid item sm={12} md={3}>
             <Grid container className={classes.group}>
@@ -413,7 +428,7 @@ function User({ width, username }: UserProps) {
                 <Typography gutterBottom>{user ? user.uname : <Skeleton />}</Typography>
               </Grid>
               <Grid item style={{ marginTop: '2rem' }} xs={12}>
-                <Box pb={4}>
+                <div style={{ paddingBottom: sp4 }}>
                   {user ? (
                     <CustomChip
                       color={user.is_active ? 'primary' : 'default'}
@@ -424,7 +439,7 @@ function User({ width, username }: UserProps) {
                   ) : (
                     <Skeleton className={classes.skelButton} />
                   )}
-                </Box>
+                </div>
               </Grid>
             </Grid>
           </Grid>
@@ -456,7 +471,7 @@ function User({ width, username }: UserProps) {
                     )}
                     <TableCell width="100%">
                       {!isWidthDown('xs', width) ? null : <Typography variant="caption">{t('uname')}</Typography>}
-                      {user ? <Box>{user.uname}</Box> : <Skeleton />}
+                      {user ? <div>{user.uname}</div> : <Skeleton />}
                     </TableCell>
                     <TableCell align="right" />
                   </TableRow>
@@ -466,7 +481,7 @@ function User({ width, username }: UserProps) {
                     )}
                     <TableCell width="100%">
                       {!isWidthDown('xs', width) ? null : <Typography variant="caption">{t('name')}</Typography>}
-                      {user ? <Box>{user.name}</Box> : <Skeleton />}
+                      {user ? <div>{user.name}</div> : <Skeleton />}
                     </TableCell>
                     <TableCell align="right">
                       <ChevronRightOutlinedIcon />
@@ -478,7 +493,7 @@ function User({ width, username }: UserProps) {
                     )}
                     <TableCell width="100%">
                       {!isWidthDown('xs', width) ? null : <Typography variant="caption">{t('groups')}</Typography>}
-                      {user ? <Box>{user.groups.join(' | ')}</Box> : <Skeleton />}
+                      {user ? <div>{user.groups.join(' | ')}</div> : <Skeleton />}
                     </TableCell>
                     <TableCell align="right">
                       <ChevronRightOutlinedIcon />
@@ -490,7 +505,7 @@ function User({ width, username }: UserProps) {
                     )}
                     <TableCell width="100%">
                       {!isWidthDown('xs', width) ? null : <Typography variant="caption">{t('email')}</Typography>}
-                      {user ? <Box>{user.email}</Box> : <Skeleton />}
+                      {user ? <div>{user.email}</div> : <Skeleton />}
                     </TableCell>
                     <TableCell align="right" />
                   </TableRow>
@@ -517,7 +532,7 @@ function User({ width, username }: UserProps) {
                     <TableCell width="100%">
                       {!isWidthDown('xs', width) ? null : <Typography variant="caption">{t('roles')}</Typography>}
                       {user ? (
-                        <Box>
+                        <div>
                           <CustomChip
                             type="square"
                             size="small"
@@ -554,7 +569,7 @@ function User({ width, username }: UserProps) {
                             onClick={currentUser.is_admin ? () => toggleRole('signature_importer') : null}
                             label={t('signature_importer')}
                           />
-                        </Box>
+                        </div>
                       ) : (
                         <Skeleton />
                       )}
@@ -571,7 +586,7 @@ function User({ width, username }: UserProps) {
                     )}
                     <TableCell width="100%">
                       {!isWidthDown('xs', width) ? null : <Typography variant="caption">{t('api_quota')}</Typography>}
-                      {user ? <Box>{user.api_quota}</Box> : <Skeleton />}
+                      {user ? <div>{user.api_quota}</div> : <Skeleton />}
                     </TableCell>
                     <TableCell align="right">{currentUser.is_admin ? <ChevronRightOutlinedIcon /> : null}</TableCell>
                   </TableRow>
@@ -587,7 +602,7 @@ function User({ width, username }: UserProps) {
                       {!isWidthDown('xs', width) ? null : (
                         <Typography variant="caption">{t('submission_quota')}</Typography>
                       )}
-                      {user ? <Box>{user.submission_quota}</Box> : <Skeleton />}
+                      {user ? <div>{user.submission_quota}</div> : <Skeleton />}
                     </TableCell>
                     <TableCell align="right">{currentUser.is_admin ? <ChevronRightOutlinedIcon /> : null}</TableCell>
                   </TableRow>
@@ -650,9 +665,10 @@ function User({ width, username }: UserProps) {
             </TableContainer>
 
             {user && modified ? (
-              <Box
-                py={1}
+              <div
                 style={{
+                  paddingTop: sp1,
+                  paddingBottom: sp1,
                   position: 'fixed',
                   bottom: 0,
                   left: 0,
@@ -665,11 +681,11 @@ function User({ width, username }: UserProps) {
                   {t('save')}
                   {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
                 </Button>
-              </Box>
+              </div>
             ) : null}
           </Grid>
         </Grid>
-      </Box>
+      </div>
     </PageCenter>
   );
 }

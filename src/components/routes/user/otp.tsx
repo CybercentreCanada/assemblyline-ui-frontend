@@ -1,10 +1,9 @@
-import { Box, Button, TextField, Typography } from '@material-ui/core';
+import { Button, TextField, Typography, useTheme } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 import useMyAPI from 'components/hooks/useMyAPI';
 import TextDivider from 'components/visual/TextDivider';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { isNull } from 'util';
 
 type OTPProps = {
   setDrawerOpen: (value: boolean) => void;
@@ -17,6 +16,9 @@ export default function OTP({ setDrawerOpen, set2FAEnabled }: OTPProps) {
   const [tempOTP, setTempOTP] = useState('');
   const { t } = useTranslation(['user']);
   const regex = RegExp('^[0-9]{1,6}$');
+  const theme = useTheme();
+  const sp4 = theme.spacing(4);
+  const sp6 = theme.spacing(6);
 
   function handleOTPChange(event) {
     if (regex.test(event.target.value) || event.target.value === '') {
@@ -58,9 +60,17 @@ export default function OTP({ setDrawerOpen, set2FAEnabled }: OTPProps) {
       <Typography variant="h4" gutterBottom>
         {t('2fa_setup_title')}
       </Typography>
-      <Box textAlign="center">
+      <div style={{ textAlign: 'center' }}>
         <Typography>{t('2fa_scan')}</Typography>
-        <Box py={4} display="flex" flexDirection="row" justifyContent="center">
+        <div
+          style={{
+            paddingTop: sp4,
+            paddingBottom: sp4,
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'center'
+          }}
+        >
           {response ? (
             <div
               style={{ backgroundColor: 'white' }}
@@ -72,14 +82,14 @@ export default function OTP({ setDrawerOpen, set2FAEnabled }: OTPProps) {
           ) : (
             <Skeleton variant="rect" style={{ width: '195px', height: '195px' }} />
           )}
-        </Box>
+        </div>
         <TextDivider forcePaper />
         <Typography gutterBottom>{t('2fa_manual')}</Typography>
-        <Box py={4}>
+        <div style={{ paddingTop: sp4, paddingBottom: sp4 }}>
           <Typography variant="caption">{response ? response.secret_key : <Skeleton />}</Typography>
-        </Box>
+        </div>
         <TextField
-          disabled={isNull(response)}
+          disabled={response === null}
           style={{ width: '100%' }}
           margin="normal"
           variant="outlined"
@@ -88,20 +98,20 @@ export default function OTP({ setDrawerOpen, set2FAEnabled }: OTPProps) {
           value={tempOTP}
         />
 
-        <Box textAlign="end" pt={6}>
+        <div style={{ paddingTop: sp6, textAlign: 'end' }}>
           <Button style={{ marginRight: '8px' }} variant="contained" onClick={() => setDrawerOpen(false)}>
             {t('cancel')}
           </Button>
           <Button
-            disabled={isNull(response) || tempOTP === ''}
+            disabled={response === null || tempOTP === ''}
             variant="contained"
             color="primary"
             onClick={() => validateOTP()}
           >
             {t('validate')}
           </Button>
-        </Box>
-      </Box>
+        </div>
+      </div>
     </>
   );
 }

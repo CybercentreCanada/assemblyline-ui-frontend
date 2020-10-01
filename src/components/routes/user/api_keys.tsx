@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   Card,
   Chip,
@@ -19,7 +18,6 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import { OptionsObject } from 'notistack';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { isNull } from 'util';
 
 type APIKeysProps = {
   user: any;
@@ -38,6 +36,9 @@ export default function APIKeys({ user, toggleAPIKey, enqueueSnackbar, snackBarO
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const regex = RegExp('^[a-zA-Z][a-zA-Z0-9_]*$');
+  const sp1 = theme.spacing(1);
+  const sp2 = theme.spacing(2);
+  const sp4 = theme.spacing(4);
 
   function handleDelete() {
     apiCall({
@@ -91,26 +92,22 @@ export default function APIKeys({ user, toggleAPIKey, enqueueSnackbar, snackBarO
       <Typography variant="caption" gutterBottom>
         {t('apikeys.desc')}
       </Typography>
-      <Box py={4}>
+      <div style={{ paddingTop: sp4, paddingBottom: sp4 }}>
         <Typography variant="subtitle1" gutterBottom>
           {t('apikeys.list')}
         </Typography>
         {user.apikeys.length !== 0 ? (
           user.apikeys.map((e, i) => (
-            <Box key={i} py={1}>
-              <Chip label={e} onDelete={() => askForDelete(e)} />
-            </Box>
+            <Chip key={i} label={e} onDelete={() => askForDelete(e)} style={{ marginRight: sp1, marginBottom: sp1 }} />
           ))
         ) : (
-          <Box py={2}>
-            <Typography variant="subtitle2" color="secondary">
-              {t('apikeys.none')}
-            </Typography>
-          </Box>
+          <Typography variant="subtitle2" color="secondary">
+            {t('apikeys.none')}
+          </Typography>
         )}
-      </Box>
+      </div>
 
-      <Box pt={4}>
+      <div style={{ paddingTop: sp4 }}>
         <TextField
           style={{ width: '100%' }}
           size="small"
@@ -120,46 +117,46 @@ export default function APIKeys({ user, toggleAPIKey, enqueueSnackbar, snackBarO
           onChange={handleKeyNameChange}
           value={tempKeyName}
         />
-      </Box>
-      <Box display="flex" flexDirection="row" width="100%">
-        <Box alignSelf="center" flexGrow={2}>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
+        <div style={{ alignSelf: 'center', flexGrow: 2 }}>
           <Select id="priv" value={tempKeyPriv} onChange={handleSelectChange} variant="outlined" margin="dense">
             <MenuItem value="READ">{t('apikeys.r_token')}</MenuItem>
             <MenuItem value="READ_WRITE">{t('apikeys.rw_token')}</MenuItem>
             <MenuItem value="WRITE">{t('apikeys.w_token')}</MenuItem>
           </Select>
-        </Box>
-        <Box alignSelf="flex-end" pl={1}>
+        </div>
+        <div style={{ alignSelf: 'flex-end', paddingLeft: sp1 }}>
           <Button disabled={tempKeyName === ''} onClick={() => handleCreate()} color="primary" variant="contained">
             {t('apikeys.add')}
           </Button>
-        </Box>
-      </Box>
+        </div>
+      </div>
 
       <Dialog
         fullScreen={fullScreen}
-        open={!isNull(tempAPIKey)}
+        open={tempAPIKey !== null}
         onClose={() => handleNew()}
         aria-labelledby="new-dialog-title"
         aria-describedby="new-dialog-description"
       >
         <DialogTitle id="new-dialog-title">{t('apikeys.new_title')}</DialogTitle>
         <DialogContent>
-          <DialogContentText id="new-dialog-description">
-            <Box pt={2} pb={4}>
+          <DialogContentText id="new-dialog-description" component="div">
+            <div style={{ paddingTop: sp2, paddingBottom: sp4 }}>
               <Card variant="outlined" style={{ backgroundColor: theme.palette.background.default }}>
-                <Box p={2}>
+                <div style={{ padding: sp2 }}>
                   <Typography style={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>{tempAPIKey}</Typography>
-                </Box>
+                </div>
               </Card>
-            </Box>
+            </div>
           </DialogContentText>
-          <DialogContentText id="new-dialog-notice-title">
+          <DialogContentText id="new-dialog-notice-title" component="div">
             <Typography variant="subtitle2" color="textPrimary">
               {t('apikeys.new_notice_title')}
             </Typography>
           </DialogContentText>
-          <DialogContentText id="new-dialog-notice-texte">
+          <DialogContentText id="new-dialog-notice-texte" component="div">
             <Typography variant="body2">{t('apikeys.new_notice_text')}</Typography>
           </DialogContentText>
         </DialogContent>
@@ -172,7 +169,7 @@ export default function APIKeys({ user, toggleAPIKey, enqueueSnackbar, snackBarO
 
       <Dialog
         fullScreen={fullScreen}
-        open={!isNull(selectedAPIKey)}
+        open={selectedAPIKey !== null}
         onClose={() => setSelectedAPIKey(null)}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"

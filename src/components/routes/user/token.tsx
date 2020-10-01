@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   Chip,
   Dialog,
@@ -8,14 +7,14 @@ import {
   DialogContentText,
   DialogTitle,
   TextField,
-  Typography
+  Typography,
+  useTheme
 } from '@material-ui/core';
 import useMyAPI from 'components/hooks/useMyAPI';
 import toArrayBuffer from 'helpers/toArrayBuffer';
 import { OptionsObject } from 'notistack';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { isNull } from 'util';
 
 const CBOR = require('helpers/cbor.js');
 
@@ -32,6 +31,9 @@ export default function SecurityToken({ user, toggleToken, enqueueSnackbar, snac
   const [tempToken, setTempToken] = useState('');
   const apiCall = useMyAPI();
   const regex = RegExp('^[a-zA-Z][a-zA-Z0-9_ ]*$');
+  const theme = useTheme();
+  const sp1 = theme.spacing(1);
+  const sp4 = theme.spacing(4);
 
   function handleTokenChange(event) {
     if (regex.test(event.target.value) || event.target.value === '') {
@@ -106,26 +108,22 @@ export default function SecurityToken({ user, toggleToken, enqueueSnackbar, snac
       <Typography variant="caption" gutterBottom>
         {t('token.desc')}
       </Typography>
-      <Box py={4}>
+      <div style={{ paddingTop: sp4, paddingBottom: sp4 }}>
         <Typography variant="subtitle1" gutterBottom>
           {t('token.list')}
         </Typography>
         {user.security_tokens.length !== 0 ? (
           user.security_tokens.map((e, i) => (
-            <Box key={i} py={1}>
-              <Chip label={e} onDelete={() => askForDelete(e)} />
-            </Box>
+            <Chip key={i} label={e} onDelete={() => askForDelete(e)} style={{ marginRight: sp1, marginBottom: sp1 }} />
           ))
         ) : (
-          <Box py={2}>
-            <Typography variant="subtitle2" color="secondary">
-              {t('token.none')}
-            </Typography>
-          </Box>
+          <Typography variant="subtitle2" color="secondary">
+            {t('token.none')}
+          </Typography>
         )}
-      </Box>
+      </div>
 
-      <Box width="100%">
+      <div style={{ width: '100%' }}>
         <TextField
           style={{ width: '100%' }}
           size="small"
@@ -135,15 +133,15 @@ export default function SecurityToken({ user, toggleToken, enqueueSnackbar, snac
           onChange={handleTokenChange}
           value={tempToken}
         />
-      </Box>
-      <Box alignSelf="flex-end">
+      </div>
+      <div style={{ alignSelf: 'flex-end' }}>
         <Button disabled={tempToken === ''} onClick={() => handleNew()} color="primary" variant="contained">
           {t('token.add')}
         </Button>
-      </Box>
+      </div>
 
       <Dialog
-        open={!isNull(selectedToken)}
+        open={selectedToken !== null}
         onClose={() => setSelectedToken(null)}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
