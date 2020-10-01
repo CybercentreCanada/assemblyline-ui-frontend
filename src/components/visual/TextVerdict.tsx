@@ -13,15 +13,23 @@ type TextVerdictProps = {
   verdict: string;
   variant?: 'outlined' | 'default';
   size?: 'tiny' | 'small' | 'medium';
+  mono?: boolean;
 };
 
-const TextVerdict: React.FC<TextVerdictProps> = ({ verdict, variant = 'default', size = 'tiny' }) => {
+const TextVerdict: React.FC<TextVerdictProps> = ({ verdict, variant = 'default', size = 'tiny', mono = false }) => {
   const color = VERDICT_COLOR_MAP[verdict];
 
   return (
     <Tooltip title={verdict}>
       <Box display="inline">
-        <CustomChip type="square" variant={variant} size={size} label={verdict[0].toUpperCase()} color={color} />
+        <CustomChip
+          type="square"
+          variant={variant}
+          size={size}
+          label={verdict[0].toUpperCase()}
+          color={color}
+          mono={mono}
+        />
       </Box>
     </Tooltip>
   );
