@@ -1,4 +1,3 @@
-import { Box } from '@material-ui/core';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,7 +7,7 @@ export default function Workflows() {
 
   return (
     <PageCenter>
-      <Box textAlign="left">{t('Workflows')}</Box>
+      <div style={{ textAlign: 'left' }}>{t('Workflows')}</div>
     </PageCenter>
   );
 }
