@@ -1,4 +1,4 @@
-import { Box, Typography } from '@material-ui/core';
+import { Typography, useTheme } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useAppContext from 'components/hooks/useAppContext';
@@ -10,10 +10,14 @@ import { Trans, useTranslation } from 'react-i18next';
 export default function HelpClassification() {
   const { t } = useTranslation(['helpClassification']);
   const { c12nDef } = useAppContext();
+  const theme = useTheme();
+  const sp1 = theme.spacing(1);
+  const sp2 = theme.spacing(2);
+  const sp4 = theme.spacing(4);
 
   return c12nDef.enforce ? (
     <PageCenter>
-      <Box textAlign="left" pb={4}>
+      <div style={{ textAlign: 'left', paddingBottom: sp4 }}>
         <Typography variant="h5" gutterBottom>
           {t('desc_title')}
         </Typography>
@@ -23,8 +27,8 @@ export default function HelpClassification() {
         <Typography variant="body2" gutterBottom>
           {t('desc_2')}
         </Typography>
-      </Box>
-      <Box textAlign="left" pb={4}>
+      </div>
+      <div style={{ textAlign: 'left', paddingBottom: sp4 }}>
         <Typography variant="h5" gutterBottom>
           {t('submission_title')}
         </Typography>
@@ -34,7 +38,7 @@ export default function HelpClassification() {
         <Typography variant="subtitle2" gutterBottom>
           {t('ex_title')}
         </Typography>
-        <Box pl={2}>
+        <div style={{ paddingLeft: sp2 }}>
           <Typography variant="body2" gutterBottom>
             {t('assumptions')}
           </Typography>
@@ -75,9 +79,9 @@ export default function HelpClassification() {
               components={{ italic: <i />, bold: <strong /> }}
             />
           </Typography>
-        </Box>
-      </Box>
-      <Box textAlign="left" pb={4}>
+        </div>
+      </div>
+      <div style={{ textAlign: 'left', paddingBottom: sp4 }}>
         <Typography variant="h5" gutterBottom>
           {t('result_title')}
         </Typography>
@@ -87,7 +91,7 @@ export default function HelpClassification() {
         <Typography variant="subtitle2" gutterBottom>
           {t('ex_title')}
         </Typography>
-        <Box pl={2}>
+        <div style={{ paddingLeft: sp2 }}>
           <Typography variant="body2" gutterBottom>
             {t('assumptions')}
           </Typography>
@@ -133,14 +137,14 @@ export default function HelpClassification() {
             <Classification inline size="tiny" type="text" c12n={c12nDef ? c12nDef.RESTRICTED : null} format="long" />
             <Trans ns="helpClassification" i18nKey="result_a_res_2_p2" components={{ bold: <strong /> }} />
           </Typography>
-        </Box>
-      </Box>
-      <Box textAlign="left">
+        </div>
+      </div>
+      <div style={{ textAlign: 'left' }}>
         <Typography variant="h5" gutterBottom>
           {t('validation_title')}
         </Typography>
-      </Box>
-      <Box textAlign="left" pb={1}>
+      </div>
+      <div style={{ textAlign: 'left', paddingBottom: sp1 }}>
         <Typography variant="h6" gutterBottom>
           {t('validation_level')}
         </Typography>
@@ -167,8 +171,8 @@ export default function HelpClassification() {
                 );
               })}
         </ul>
-      </Box>
-      <Box textAlign="left" pb={1}>
+      </div>
+      <div style={{ textAlign: 'left', paddingBottom: sp1 }}>
         <Typography variant="h6" gutterBottom>
           {t('validation_required')}
         </Typography>
@@ -184,10 +188,8 @@ export default function HelpClassification() {
               c12nDef.original_definition.required.map((req, idx) => {
                 return (
                   <li key={idx}>
-                    <Box display="inline-block" fontWeight={700}>
-                      {req.name}
-                    </Box>{' '}
-                    :: {req.description}
+                    <div style={{ display: 'inline-block', fontWeight: 700 }}>{req.name}</div>
+                    {` :: ${req.description}`}
                   </li>
                 );
               })
@@ -206,8 +208,8 @@ export default function HelpClassification() {
             })
           )}
         </ul>
-      </Box>
-      <Box textAlign="left" pb={1}>
+      </div>
+      <div style={{ textAlign: 'left', paddingBottom: sp1 }}>
         <Typography variant="h6" gutterBottom>
           {t('validation_groups')}
         </Typography>
@@ -223,10 +225,8 @@ export default function HelpClassification() {
               c12nDef.original_definition.groups.map((grp, idx) => {
                 return (
                   <li key={idx}>
-                    <Box display="inline-block" fontWeight={700}>
-                      {grp.name}
-                    </Box>{' '}
-                    :: {grp.description}
+                    <div style={{ display: 'inline-block', fontWeight: 700 }}>{grp.name}</div>
+                    {` :: ${grp.description}`}
                   </li>
                 );
               })
@@ -248,8 +248,8 @@ export default function HelpClassification() {
         <Typography variant="subtitle2" gutterBottom color="error">
           <Trans ns="helpClassification" i18nKey="validation_groups_note" components={{ bold: <strong /> }} />
         </Typography>
-      </Box>
-      <Box textAlign="left" pb={1}>
+      </div>
+      <div style={{ textAlign: 'left', paddingBottom: sp1 }}>
         <Typography variant="h6" gutterBottom>
           {t('validation_subgroups')}
         </Typography>
@@ -265,10 +265,8 @@ export default function HelpClassification() {
               c12nDef.original_definition.subgroups.map((sgrp, idx) => {
                 return (
                   <li key={idx}>
-                    <Box display="inline-block" fontWeight={700}>
-                      {sgrp.name}
-                    </Box>{' '}
-                    :: {sgrp.description}
+                    <div style={{ display: 'inline-block', fontWeight: 700 }}>{sgrp.name}</div>
+                    {` :: ${sgrp.description}`}
                   </li>
                 );
               })
@@ -290,7 +288,7 @@ export default function HelpClassification() {
         <Typography variant="subtitle2" gutterBottom color="error">
           <Trans ns="helpClassification" i18nKey="validation_subgroups_note" components={{ bold: <strong /> }} />
         </Typography>
-      </Box>
+      </div>
     </PageCenter>
   ) : (
     <NotFoundPage />
