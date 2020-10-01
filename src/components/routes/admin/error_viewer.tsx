@@ -1,4 +1,3 @@
-import { Box } from '@material-ui/core';
 import useUser from 'commons/components/hooks/useAppUser';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import { CustomUser } from 'components/hooks/useMyUser';
@@ -12,7 +11,7 @@ export default function ErrorViewer() {
 
   return currentUser.is_admin ? (
     <PageCenter>
-      <Box>{t('Error Viewer')}</Box>
+      <div>{t('Error Viewer')}</div>
     </PageCenter>
   ) : (
     <ForbiddenPage />
