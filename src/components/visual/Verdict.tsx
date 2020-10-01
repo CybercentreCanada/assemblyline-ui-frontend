@@ -1,4 +1,4 @@
-import { Box, Tooltip } from '@material-ui/core';
+import { Tooltip } from '@material-ui/core';
 import CustomChip from 'components/visual/CustomChip';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -65,7 +65,7 @@ const Verdict: React.FC<VerdictProps> = ({
 
   return (
     <Tooltip title={`${text} [Score: ${score}]`}>
-      <Box display="inline">
+      <span>
         <CustomChip
           type="square"
           variant={variant}
@@ -74,7 +74,7 @@ const Verdict: React.FC<VerdictProps> = ({
           color={color}
           mono={mono}
         />
-      </Box>
+      </span>
     </Tooltip>
   );
 };

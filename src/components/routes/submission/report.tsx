@@ -1,4 +1,4 @@
-import { Box, Divider, Grid, IconButton, Typography, useTheme } from '@material-ui/core';
+import { Divider, Grid, IconButton, Typography, useTheme } from '@material-ui/core';
 import ListAltOutlinedIcon from '@material-ui/icons/ListAltOutlined';
 import PrintOutlinedIcon from '@material-ui/icons/PrintOutlined';
 import { Skeleton } from '@material-ui/lab';
@@ -22,6 +22,8 @@ export default function SubmissionReport() {
   const theme = useTheme();
   const [report, setReport] = useState(null);
   const apiCall = useMyAPI();
+  const sp2 = theme.spacing(2);
+  const sp4 = theme.spacing(4);
 
   useEffect(() => {
     apiCall({
@@ -35,23 +37,23 @@ export default function SubmissionReport() {
 
   return (
     <PageCenter>
-      <Box textAlign="left">
-        <Box pt={2} pb={4}>
+      <div style={{ textAlign: 'left' }}>
+        <div style={{ paddingBottom: sp4, paddingTop: sp2 }}>
           <Classification size="tiny" c12n={report ? report.classification : null} />
-        </Box>
+        </div>
 
-        <Box pb={4}>
+        <div style={{ paddingBottom: sp4 }}>
           <Grid container>
             <Grid item xs={12} sm>
-              <Box>
+              <div>
                 <Typography variant="h4">{t('title')}</Typography>
                 <Typography variant="caption">
                   {report ? report.sid : <Skeleton style={{ width: '10rem' }} />}
                 </Typography>
-              </Box>
+              </div>
             </Grid>
             <Grid item xs={12} sm>
-              <Box textAlign="right">
+              <div style={{ textAlign: 'right' }}>
                 <IconButton>
                   <PrintOutlinedIcon />
                 </IconButton>
@@ -60,175 +62,178 @@ export default function SubmissionReport() {
                     <ListAltOutlinedIcon />
                   </IconButton>
                 </Link>
-              </Box>
+              </div>
             </Grid>
           </Grid>
-        </Box>
+        </div>
 
-        <Box pb={2}>
+        <div style={{ paddingBottom: sp2 }}>
           <Typography variant="h6">{t('general')}</Typography>
           <Divider />
-          <Box py={2}>
+          <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
             <Grid container spacing={1}>
               <Grid item xs={4} md={3} lg={2}>
-                <Box fontWeight={500}>{t('file.name')}</Box>
+                <span style={{ fontWeight: 500 }}>{t('file.name')}</span>
               </Grid>
               <Grid item xs={8} md={9} lg={10}>
                 {report ? report.files[0].name : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} md={3} lg={2}>
-                <Box fontWeight={500}>{t('file.description')}</Box>
+                <span style={{ fontWeight: 500 }}>{t('file.description')}</span>
               </Grid>
               <Grid item xs={8} md={9} lg={10}>
                 {report ? report.params.description : <Skeleton />}
               </Grid>
 
               <Grid item xs={12}>
-                <Box p={1} />
+                <div style={{ height: sp2 }} />
               </Grid>
 
               <Grid item xs={4} md={3} lg={2}>
-                <Box fontWeight={500}>{t('file.verdict')}</Box>
+                <span style={{ fontWeight: 500 }}>{t('file.verdict')}</span>
               </Grid>
               <Grid item xs={8} md={9} lg={10}>
                 {report ? <Verdict score={report.max_score} /> : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} md={3} lg={2}>
-                <Box fontWeight={500}>{t('user.verdict')}</Box>
+                <span style={{ fontWeight: 500 }}>{t('user.verdict')}</span>
               </Grid>
               <Grid item xs={8} md={9} lg={10}>
                 {report ? (
-                  <Box>
+                  <>
                     {`${t('malicious')}: `}
-                    <Box
-                      component="span"
-                      fontWeight={600}
-                      color={theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark}
+                    <span
+                      style={{
+                        fontWeight: 600,
+                        color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                      }}
                     >
                       {report.verdict.malicious.length}
-                    </Box>
+                    </span>
                     {` / ${t('non_malicious')}: `}
-                    <Box
-                      component="span"
-                      fontWeight={600}
-                      color={theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark}
+                    <span
+                      style={{
+                        fontWeight: 600,
+                        color: theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark
+                      }}
                     >
                       {report.verdict.non_malicious.length}
-                    </Box>
-                  </Box>
+                    </span>
+                  </>
                 ) : (
                   <Skeleton />
                 )}
               </Grid>
 
               <Grid item xs={4} md={3} lg={2}>
-                <Box fontWeight={500}>{t('submission.date')}</Box>
+                <span style={{ fontWeight: 500 }}>{t('submission.date')}</span>
               </Grid>
               <Grid item xs={8} md={9} lg={10}>
                 {report ? <Moment date={report.times.submitted} /> : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} md={3} lg={2}>
-                <Box fontWeight={500}>{t('submission.user')}</Box>
+                <span style={{ fontWeight: 500 }}>{t('submission.user')}</span>
               </Grid>
               <Grid item xs={8} md={9} lg={10}>
                 {report ? report.params.submitter : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} md={3} lg={2}>
-                <Box fontWeight={500}>{t('submission.services')}</Box>
+                <span style={{ fontWeight: 500 }}>{t('submission.services')}</span>
               </Grid>
               <Grid item xs={8} md={9} lg={10}>
                 {report ? report.params.services.selected.join(' | ') : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} md={3} lg={2}>
-                <Box fontWeight={500}>{t('submission.services.errors')}</Box>
+                <span style={{ fontWeight: 500 }}>{t('submission.services.errors')}</span>
               </Grid>
               <Grid item xs={8} md={9} lg={10}>
-                <Box
-                  component="span"
-                  color={theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark}
+                <span
+                  style={{
+                    color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                  }}
                 >
                   {report ? report.params.services.errors.join(' | ') : <Skeleton />}
-                </Box>
+                </span>
               </Grid>
 
               <Grid item xs={12}>
-                <Box p={1} />
+                <div style={{ height: sp2 }} />
               </Grid>
 
               <Grid item xs={4} md={3} lg={2}>
-                <Box fontWeight={500}>{t('file.type')}</Box>
+                <span style={{ fontWeight: 500 }}>{t('file.type')}</span>
               </Grid>
               <Grid item xs={8} md={9} lg={10}>
                 {report ? report.file_info.type : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} md={3} lg={2}>
-                <Box fontWeight={500}>{t('file.mime')}</Box>
+                <span style={{ fontWeight: 500 }}>{t('file.mime')}</span>
               </Grid>
               <Grid item xs={8} md={9} lg={10}>
                 {report ? report.file_info.mime : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} md={3} lg={2}>
-                <Box fontWeight={500}>{t('file.magic')}</Box>
+                <span style={{ fontWeight: 500 }}>{t('file.magic')}</span>
               </Grid>
               <Grid item xs={8} md={9} lg={10}>
                 {report ? report.file_info.magic : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} md={3} lg={2}>
-                <Box fontWeight={500}>{t('file.size')}</Box>
+                <span style={{ fontWeight: 500 }}>{t('file.size')}</span>
               </Grid>
               <Grid item xs={8} md={9} lg={10}>
                 {report ? report.file_info.size : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} md={3} lg={2}>
-                <Box fontWeight={500}>{t('file.md5')}</Box>
+                <span style={{ fontWeight: 500 }}>{t('file.md5')}</span>
               </Grid>
               <Grid item xs={8} md={9} lg={10} style={{ fontFamily: 'monospace', fontSize: 'larger' }}>
                 {report ? report.file_info.md5 : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} md={3} lg={2}>
-                <Box fontWeight={500}>{t('file.sha1')}</Box>
+                <span style={{ fontWeight: 500 }}>{t('file.sha1')}</span>
               </Grid>
               <Grid item xs={8} md={9} lg={10} style={{ fontFamily: 'monospace', fontSize: 'larger' }}>
                 {report ? report.file_info.sha1 : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} md={3} lg={2}>
-                <Box fontWeight={500}>{t('file.sha256')}</Box>
+                <span style={{ fontWeight: 500 }}>{t('file.sha256')}</span>
               </Grid>
               <Grid item xs={8} md={9} lg={10} style={{ fontFamily: 'monospace', fontSize: 'larger' }}>
                 {report ? report.file_info.sha256 : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} md={3} lg={2}>
-                <Box fontWeight={500}>{t('file.ssdeep')}</Box>
+                <span style={{ fontWeight: 500 }}>{t('file.ssdeep')}</span>
               </Grid>
               <Grid item xs={8} md={9} lg={10} style={{ fontFamily: 'monospace', fontSize: 'larger' }}>
                 {report ? report.file_info.ssdeep : <Skeleton />}
               </Grid>
             </Grid>
-          </Box>
-        </Box>
+          </div>
+        </div>
 
         {report && report.metadata ? (
-          <Box pb={2}>
+          <div style={{ paddingBottom: sp2 }}>
             <Typography variant="h6">{t('metadata')}</Typography>
             <Divider />
-            <Box py={2}>
+            <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
               {Object.keys(report.metadata).map((meta, i) => {
                 return (
                   <Grid key={i} container spacing={1}>
                     <Grid item xs={4} md={3} lg={2}>
-                      <Box fontWeight={500}>{meta}</Box>
+                      <span style={{ fontWeight: 500 }}>{meta}</span>
                     </Grid>
                     <Grid item xs={8} md={9} lg={10}>
                       {report.metadata[meta]}
@@ -236,13 +241,13 @@ export default function SubmissionReport() {
                   </Grid>
                 );
               })}
-            </Box>
-          </Box>
+            </div>
+          </div>
         ) : (
-          <Box pb={2}>
+          <div style={{ paddingBottom: sp2 }}>
             <Typography variant="h6">{t('metadata')}</Typography>
             <Divider />
-            <Box py={2}>
+            <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
               {[...Array(3)].map((_, i) => {
                 return (
                   <Grid key={i} container spacing={1}>
@@ -255,17 +260,18 @@ export default function SubmissionReport() {
                   </Grid>
                 );
               })}
-            </Box>
-          </Box>
+            </div>
+          </div>
         )}
 
         {report && report.attack_matrix ? (
-          <Box pb={2}>
+          <div style={{ paddingBottom: sp2 }}>
             <Typography variant="h6">{t('attack')}</Typography>
             <Divider />
-            <Box
-              py={2}
+            <div
               style={{
+                paddingTop: sp2,
+                paddingBottom: sp2,
                 columnWidth: '21rem',
                 columnGap: '1rem',
                 columnRuleWidth: '1px',
@@ -275,42 +281,43 @@ export default function SubmissionReport() {
             >
               {Object.keys(report.attack_matrix).map((att, i) => {
                 return (
-                  <Box
+                  <div
                     key={i}
-                    height="100%"
-                    width="100%"
-                    display="inline-block"
-                    pb={2}
-                    style={{ pageBreakInside: 'avoid' }}
+                    style={{
+                      height: '100%',
+                      width: '100%',
+                      display: 'inline-block',
+                      pageBreakInside: 'avoid',
+                      paddingBottom: sp2
+                    }}
                   >
-                    <Box fontSize="1.2rem">{att}</Box>
+                    <span style={{ fontSize: '1.2rem' }}>{att}</span>
                     {Object.keys(report.attack_matrix[att]).map((cat, idx) => {
                       return (
-                        <Box key={idx}>
+                        <div key={idx}>
                           <TextVerdict verdict={report.attack_matrix[att][cat].h_type} mono />
-                          <Box display="inline" fontSize="1rem" style={{ verticalAlign: 'middle' }}>
-                            {cat}
-                          </Box>
+                          <span style={{ fontSize: '1rem', verticalAlign: 'middle' }}>{cat}</span>
                           <ul style={{ marginBlockStart: 0, fontSize: '80%' }}>
                             {report.attack_matrix[att][cat].files.map((file, fidx) => {
                               return <li key={fidx}>{file[0]}</li>;
                             })}
                           </ul>
-                        </Box>
+                        </div>
                       );
                     })}
-                  </Box>
+                  </div>
                 );
               })}
-            </Box>
-          </Box>
+            </div>
+          </div>
         ) : (
-          <Box pb={2}>
+          <div style={{ paddingBottom: sp2 }}>
             <Typography variant="h6">{t('attack')}</Typography>
             <Divider />
-            <Box
-              py={2}
+            <div
               style={{
+                paddingBottom: sp2,
+                paddingTop: sp2,
                 columnWidth: '21rem',
                 columnGap: '1rem',
                 columnRuleWidth: '1px',
@@ -320,27 +327,27 @@ export default function SubmissionReport() {
             >
               {[...Array(5)].map((_, i) => {
                 return (
-                  <Box key={i} pb={2} height="100%" width="100%" display="inline-block">
+                  <div key={i} style={{ paddingBottom: sp2, height: '100%', width: '100%', display: 'inline-block' }}>
                     <Skeleton style={{ height: '2rem' }} />
-                    <Box display="flex" flexDirection="row">
+                    <div style={{ display: 'flex', flexDirection: 'row' }}>
                       <Skeleton style={{ height: '2rem', width: '1.5rem', marginRight: '8px' }} />
                       <Skeleton style={{ height: '2rem', flexGrow: 1 }} />
-                    </Box>
+                    </div>
                     <Skeleton style={{ marginLeft: '2rem' }} />
                     <Skeleton style={{ marginLeft: '2rem' }} />
                     <Skeleton style={{ marginLeft: '2rem' }} />
-                    <Box display="flex" flexDirection="row">
+                    <div style={{ display: 'flex', flexDirection: 'row' }}>
                       <Skeleton style={{ height: '2rem', width: '1.5rem', marginRight: '8px' }} />
                       <Skeleton style={{ height: '2rem', flexGrow: 1 }} />
-                    </Box>
+                    </div>
                     <Skeleton style={{ marginLeft: '2rem' }} />
-                  </Box>
+                  </div>
                 );
               })}
-            </Box>
-          </Box>
+            </div>
+          </div>
         )}
-      </Box>
+      </div>
     </PageCenter>
   );
 }
