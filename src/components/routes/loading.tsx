@@ -1,4 +1,4 @@
-import { Box, CircularProgress, useTheme } from '@material-ui/core';
+import { CircularProgress, useTheme } from '@material-ui/core';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import React from 'react';
 
@@ -7,7 +7,7 @@ function LoadingScreen() {
   const { getBanner } = useAppLayout();
 
   return (
-    <Box
+    <div
       style={{
         textAlign: 'center',
         position: 'fixed',
@@ -18,7 +18,7 @@ function LoadingScreen() {
     >
       {getBanner(theme)}
       <CircularProgress variant="indeterminate" />
-    </Box>
+    </div>
   );
 }
 

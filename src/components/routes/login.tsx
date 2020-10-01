@@ -230,7 +230,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
               {oAuthProviders !== undefined && oAuthProviders.length !== 0 ? (
                 <>
                   {allowUserPass ? <TextDivider /> : null}
-                  <Box display="flex" flexDirection="column" justifyContent="space-between">
+                  <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                     {oAuthProviders.map((item, idx) => (
                       <Button
                         key={idx}
@@ -245,7 +245,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
                         {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
                       </Button>
                     ))}
-                  </Box>
+                  </div>
                 </>
               ) : null}
             </>

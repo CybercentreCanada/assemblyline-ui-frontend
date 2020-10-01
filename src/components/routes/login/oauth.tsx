@@ -1,7 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import {
   Avatar,
-  Box,
   Button,
   CircularProgress,
   createStyles,
@@ -42,7 +41,7 @@ export function OAuthLogin({ avatar, username, oAuthToken, buttonLoading, onSubm
 
   return (
     <form onSubmit={onSubmit}>
-      <Box display="flex" flexDirection="column" textAlign="center" justifyContent="center">
+      <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'center', justifyContent: 'center' }}>
         {!oAuthToken ? (
           <Skeleton variant="circle" style={{ alignSelf: 'center' }} width={144} height={144} />
         ) : (
@@ -72,7 +71,7 @@ export function OAuthLogin({ avatar, username, oAuthToken, buttonLoading, onSubm
             {t('other')}
           </Link>
         )}
-      </Box>
+      </div>
     </form>
   );
 }

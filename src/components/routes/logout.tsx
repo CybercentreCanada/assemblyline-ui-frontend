@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Typography, useTheme } from '@material-ui/core';
+import { CircularProgress, Typography, useTheme } from '@material-ui/core';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import CardCentered from 'commons/components/layout/pages/CardCentered';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -27,13 +27,13 @@ function Logout() {
 
   return (
     <CardCentered>
-      <Box textAlign="center">
+      <div style={{ textAlign: 'center' }}>
         {getBanner(theme)}
-        <Box mb={3}>
+        <div style={{ marginBottom: theme.spacing(3) }}>
           <Typography>{t('title')}</Typography>
-        </Box>
+        </div>
         <CircularProgress size={24} />
-      </Box>
+      </div>
     </CardCentered>
   );
 }

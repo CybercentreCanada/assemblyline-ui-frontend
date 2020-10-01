@@ -63,7 +63,7 @@ export function ResetPasswordNow({ buttonLoading, setButtonLoading }: ResetPassw
 
   return (
     <form onSubmit={onSubmit}>
-      <Box display="flex" flexDirection="column">
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
         {done ? (
           <>
             <Typography align="center" variant="h6" gutterBottom>
@@ -103,7 +103,7 @@ export function ResetPasswordNow({ buttonLoading, setButtonLoading }: ResetPassw
             </Button>
           </>
         )}
-      </Box>
+      </div>
     </form>
   );
 }
