@@ -3,7 +3,7 @@ import { Box, Button, Divider, makeStyles, TextField, Typography, useTheme } fro
 import { Autocomplete } from '@material-ui/lab';
 import CustomChip from 'components/visual/CustomChip';
 import React, { useEffect, useState } from 'react';
-import { AlertFilterItem } from './useAlerts';
+import { AlertFilterItem } from './hooks/useAlerts';
 
 export const DEFAULT_TC = { value: '4d', label: '4 Days' };
 

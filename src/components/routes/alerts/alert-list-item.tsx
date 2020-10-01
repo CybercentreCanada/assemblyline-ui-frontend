@@ -1,7 +1,7 @@
 import { Box, Grid, Typography, useMediaQuery, useTheme } from '@material-ui/core';
 import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
 import { ChipList } from 'components/elements/mui/chips';
-import { AlertItem } from 'components/routes/alerts/useAlerts';
+import { AlertItem } from 'components/routes/alerts/hooks/useAlerts';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
 import Verdict from 'components/visual/Verdict';

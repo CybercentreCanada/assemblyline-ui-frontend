@@ -2,7 +2,7 @@ import { Box, Divider, Grid, makeStyles, Typography, useMediaQuery, useTheme } f
 import Alert from '@material-ui/lab/Alert';
 import useClipboard from 'commons/components/hooks/useClipboard';
 import { ChipList } from 'components/elements/mui/chips';
-import { AlertItem } from 'components/routes/alerts/useAlerts';
+import { AlertItem } from 'components/routes/alerts/hooks/useAlerts';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
 import { format } from 'date-fns';

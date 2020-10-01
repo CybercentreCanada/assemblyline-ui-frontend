@@ -2,7 +2,7 @@ import { Box } from '@material-ui/core';
 import { ChipList } from 'components/elements/mui/chips';
 import React from 'react';
 import { AlertFilterSelections } from './alerts-filters';
-import { AlertFilterItem } from './useAlerts';
+import { AlertFilterItem } from './hooks/useAlerts';
 
 interface AlertFiltersSelectedProps {
   filters: AlertFilterSelections;

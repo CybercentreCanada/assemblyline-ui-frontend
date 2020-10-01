@@ -14,7 +14,7 @@ import AlertListItem from './alert-list-item';
 import AlertsFilters, { AlertFilterSelections, DEFAULT_FILTERS } from './alerts-filters';
 import AlertsFiltersFavorites from './alerts-filters-favorites';
 import AlertsFiltersSelected from './alerts-filters-selected';
-import useAlerts, { AlertFilterItem, AlertItem } from './useAlerts';
+import useAlerts, { AlertFilterItem, AlertItem } from './hooks/useAlerts';
 
 const PAGE_SIZE = 50;
 
@@ -41,16 +41,13 @@ const Alerts: React.FC = () => {
     total,
     fields,
     query,
-    favorites,
     valueFilters,
     statusFilters,
     priorityFilters,
     labelFilters,
     onLoad,
     onLoadMore,
-    onGet,
-    onAddFavorite,
-    onDeleteFavorite
+    onGet
   } = useAlerts(PAGE_SIZE);
   // Define required states...
   const [searching, setSearching] = useState<boolean>(false);
@@ -99,16 +96,10 @@ const Alerts: React.FC = () => {
     query.reset().setQuery(filterValue).apply();
 
     // Reload.
-    onLoad();
-
-    // Artificial delay, cause we like spinning...
-    setTimeout(() => {
+    onLoad(() => {
       setSearching(false);
-
-      if (inputEl) {
-        inputEl.focus();
-      }
-    }, 1000);
+      inputEl.focus();
+    });
   };
 
   // Handler for when clearing the SearchBar.
@@ -203,7 +194,6 @@ const Alerts: React.FC = () => {
 
   //
   const onFavoriteAdd = (filter: { query: string; name: string }) => {
-    onAddFavorite(filter);
     setDrawer({ ...drawer, open: false });
   };
 
@@ -215,7 +205,6 @@ const Alerts: React.FC = () => {
   //
   const onFavoriteDelete = (favorite: { name: string; query: string }) => {
     console.log(favorite);
-    onDeleteFavorite(favorite);
   };
 
   //
@@ -348,11 +337,10 @@ const Alerts: React.FC = () => {
               favorites: (
                 <AlertsFiltersFavorites
                   initValue={searchTextValue.current}
-                  favorites={favorites}
-                  onFavoriteSelected={onFavoriteSelected}
-                  onFavoriteDelete={onFavoriteDelete}
-                  onSaveBtnClick={onFavoriteAdd}
-                  onCancelBtnClick={onFavoriteCancel}
+                  onSelected={onFavoriteSelected}
+                  onDeleted={onFavoriteDelete}
+                  onSaved={onFavoriteAdd}
+                  onCancel={onFavoriteCancel}
                 />
               )
             }[drawer.type]

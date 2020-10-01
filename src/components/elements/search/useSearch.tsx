@@ -1,7 +1,7 @@
 import useAppContext from 'components/hooks/useAppContext';
 import useMyAPI, { APIResponseProps } from 'components/hooks/useMyAPI';
 import { ALField } from 'components/hooks/useMyUser';
-import { AlertItem } from 'components/routes/alerts/useAlerts';
+import { AlertItem } from 'components/routes/alerts/hooks/useAlerts';
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import SearchQuery from './search-query';
