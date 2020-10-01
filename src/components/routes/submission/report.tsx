@@ -327,7 +327,16 @@ export default function SubmissionReport() {
             >
               {[...Array(5)].map((_, i) => {
                 return (
-                  <div key={i} style={{ paddingBottom: sp2, height: '100%', width: '100%', display: 'inline-block' }}>
+                  <div
+                    key={i}
+                    style={{
+                      paddingBottom: sp2,
+                      height: '100%',
+                      width: '100%',
+                      display: 'inline-block',
+                      pageBreakInside: 'avoid'
+                    }}
+                  >
                     <Skeleton style={{ height: '2rem' }} />
                     <div style={{ display: 'flex', flexDirection: 'row' }}>
                       <Skeleton style={{ height: '2rem', width: '1.5rem', marginRight: '8px' }} />
