@@ -1,4 +1,4 @@
-import { Box, Grid, IconButton, Typography } from '@material-ui/core';
+import { Grid, IconButton, Typography, useTheme } from '@material-ui/core';
 import ChromeReaderModeOutlinedIcon from '@material-ui/icons/ChromeReaderModeOutlined';
 import { Skeleton } from '@material-ui/lab';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
@@ -15,8 +15,11 @@ type ParamProps = {
 export default function SubmissionDetail() {
   const { t } = useTranslation(['submissionDetail']);
   const { id } = useParams<ParamProps>();
+  const theme = useTheme();
   const [submission, setSubmission] = useState(null);
   const apiCall = useMyAPI();
+  const sp2 = theme.spacing(2);
+  const sp4 = theme.spacing(4);
 
   useEffect(() => {
     apiCall({
@@ -30,32 +33,32 @@ export default function SubmissionDetail() {
 
   return (
     <PageCenter>
-      <Box textAlign="left">
-        <Box py={2}>
+      <div style={{ textAlign: 'left' }}>
+        <div style={{ paddingBottom: sp4, paddingTop: sp2 }}>
           <Classification size="tiny" c12n={submission ? submission.classification : null} />
-        </Box>
-        <Box pb={4}>
+        </div>
+        <div style={{ paddingBottom: sp4 }}>
           <Grid container>
             <Grid item xs={12} sm>
-              <Box>
+              <div>
                 <Typography variant="h4">{t('title')}</Typography>
                 <Typography variant="caption">
                   {submission ? submission.sid : <Skeleton style={{ width: '10rem' }} />}
                 </Typography>
-              </Box>
+              </div>
             </Grid>
             <Grid item xs={12} sm>
-              <Box textAlign="right">
+              <div style={{ textAlign: 'right' }}>
                 <Link to={`/submission/report/${submission ? submission.sid : id}`}>
                   <IconButton>
                     <ChromeReaderModeOutlinedIcon />
                   </IconButton>
                 </Link>
-              </Box>
+              </div>
             </Grid>
           </Grid>
-        </Box>
-      </Box>
+        </div>
+      </div>
     </PageCenter>
   );
 }
