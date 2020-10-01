@@ -559,7 +559,7 @@ function Settings<SettingsProps>({ width }) {
             <Typography variant="h6" gutterBottom>
               {t('service')}
             </Typography>
-            <ServiceTree settings={settings} setSettings={setSettings} setModified={setModified} />
+            <ServiceTree settings={settings} setSettings={setSettings} setModified={setModified} compressed />
           </Box>
         </Paper>
 
