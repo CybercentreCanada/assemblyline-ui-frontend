@@ -47,7 +47,6 @@ export default function useMySitemap() {
   return {
     routes: [
       { path: '/forbidden', title: t('forbidden'), isRoot: true, icon: <BlockIcon /> },
-      { path: '/disabled', title: t('forbidden'), isRoot: true, icon: <BlockIcon /> },
       { path: '/notfound', title: t('notfound'), isRoot: true, icon: <LinkOffIcon /> },
 
       { path: '/', title: t('drawer.submit'), isRoot: true, icon: <PublishOutlinedIcon /> },

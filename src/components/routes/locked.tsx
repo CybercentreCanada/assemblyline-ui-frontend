@@ -3,9 +3,9 @@ import Typography from '@material-ui/core/Typography';
 import HourglassEmptyOutlinedIcon from '@material-ui/icons/HourglassEmptyOutlined';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useAppContext from 'components/hooks/useAppContext';
+import ForbiddenPage from 'components/routes/403';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Redirect } from 'react-router-dom';
 
 const LockedPage = () => {
   const { t } = useTranslation(['locked']);
@@ -33,7 +33,7 @@ const LockedPage = () => {
           )}
         </PageCenter>
       ) : (
-        <Redirect to="/disabled" />
+        <ForbiddenPage disabled />
       )}
     </>
   );

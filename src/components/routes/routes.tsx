@@ -31,10 +31,6 @@ import User from 'components/routes/user';
 import React from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 
-const Disabled = () => {
-  return <ForbiddenPage disabled />;
-};
-
 const Routes = () => {
   const { user: currentUser } = useAppContext();
   return (
@@ -74,7 +70,6 @@ const Routes = () => {
       <Route exact path="/submissions" component={Submissions} />
       <Route exact path="/tos" component={Tos} />
 
-      <Route exact path="/disabled" component={Disabled} />
       <Route exact path="/forbidden" component={ForbiddenPage} />
       <Route exact path="/notfound" component={NotFoundPage} />
 
