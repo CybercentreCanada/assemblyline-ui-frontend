@@ -1,7 +1,8 @@
-import { AppBar, Box, IconButton, makeStyles, Slide, Toolbar, useScrollTrigger, useTheme } from '@material-ui/core';
+import { AppBar, Box, IconButton, makeStyles, Slide, Toolbar, useTheme } from '@material-ui/core';
 import withWidth, { isWidthUp } from '@material-ui/core/withWidth';
 import MenuIcon from '@material-ui/icons/Menu';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
+import useTopBarScrollTrigger from 'commons/components/hooks/useTopBarScrollTrigger';
 import Breadcrumbs from 'commons/components/layout/breadcrumbs/Breadcrumbs';
 import AppSwitcher from 'commons/components/layout/topnav/AppSwitcher';
 import QuickSearch from 'commons/components/layout/topnav/QuickSearch';
@@ -11,11 +12,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 function HideOnScroll({ children, enabled }) {
-  const trigger = useScrollTrigger({
-    disableHysteresis: true,
-    threshold: 0
-  });
-
+  const trigger = useTopBarScrollTrigger();
   return enabled ? (
     <Slide appear={false} direction="down" in={!trigger}>
       {children}
@@ -25,8 +22,7 @@ function HideOnScroll({ children, enabled }) {
   );
 }
 
-//
-const useStyles = layout => {
+const useStyles = (layout, drawerState) => {
   return makeStyles(theme => ({
     appBar: {
       zIndex: layout === 'top' ? theme.zIndex.drawer + 1 : theme.zIndex.drawer - 1,
@@ -64,6 +60,17 @@ const useStyles = layout => {
       [theme.breakpoints.down('xs')]: {
         display: 'none'
       }
+    },
+    leftSpacer: {
+      transition: theme.transitions.create('margin-left', {
+        easing: theme.transitions.easing.easeInOut,
+        duration: theme.transitions.duration.short
+      }),
+      marginLeft: layout === 'side' ? (drawerState ? theme.spacing(7) + 240 - 56 : theme.spacing(7)) : theme.spacing(3),
+      overflow: 'auto',
+      [theme.breakpoints.down('xs')]: {
+        marginLeft: 0
+      }
     }
   }))();
 };
@@ -81,10 +88,11 @@ const TopBar: React.FC<AppBarProps> = ({ width }) => {
     autoHideAppbar,
     breadcrumbsEnabled,
     breadcrumbsPlacement,
+    drawerState,
     getLogo,
     toggleDrawer
   } = useAppLayout();
-  const classes = useStyles(currentLayout);
+  const classes = useStyles(currentLayout, drawerState);
   const isTopLayout = currentLayout === 'top';
 
   const renderTitle = () => {
@@ -105,7 +113,7 @@ const TopBar: React.FC<AppBarProps> = ({ width }) => {
 
   return (
     <HideOnScroll enabled={!isTopLayout && autoHideAppbar}>
-      <AppBar elevation={isTopLayout ? 2 : 0} position="fixed" className={classes.appBar}>
+      <AppBar elevation={isTopLayout ? 2 : 0} position="fixed" className={classes.appBar} id="appbar">
         <Toolbar disableGutters={isTopLayout} className={classes.toolbar}>
           <IconButton
             color="inherit"
@@ -117,9 +125,12 @@ const TopBar: React.FC<AppBarProps> = ({ width }) => {
             <MenuIcon />
           </IconButton>
           {renderTitle()}
+          <Box className={classes.leftSpacer} />
+          {layoutProps.topnav.left}
           {layoutProps.allowBreadcrumbs && breadcrumbsEnabled && breadcrumbsPlacement === 'topbar' ? (
             <Breadcrumbs />
           ) : null}
+
           {layoutProps.allowQuickSearch && showQuickSearch && isWidthUp('sm', width) ? (
             <QuickSearch />
           ) : (
@@ -128,6 +139,7 @@ const TopBar: React.FC<AppBarProps> = ({ width }) => {
           {layoutProps.topnav.themeSelectionUnder === 'icon' ? <ThemeSelectionIcon /> : null}
           <AppSwitcher />
           <UserProfile />
+          {layoutProps.topnav.right}
         </Toolbar>
       </AppBar>
     </HideOnScroll>
