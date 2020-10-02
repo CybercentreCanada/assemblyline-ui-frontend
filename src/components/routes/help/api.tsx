@@ -255,13 +255,15 @@ export default function ApiDoc() {
                               </div>
                             </Box>
                             <Collapse in={expandMap[api.name]} timeout="auto" unmountOnExit>
-                              <Box
-                                border={1}
-                                borderTop={0}
-                                borderBottom={0}
-                                p={1}
-                                borderColor={isDark ? theme.palette.grey[900] : theme.palette.grey[100]}
-                                bgcolor={theme.palette.background.default}
+                              <div
+                                style={{
+                                  border: 1,
+                                  borderTop: 0,
+                                  borderBottom: 0,
+                                  padding: sp1,
+                                  borderColor: isDark ? theme.palette.grey[900] : theme.palette.grey[100],
+                                  backgroundColor: theme.palette.background.default
+                                }}
                               >
                                 <Grid container alignItems="center">
                                   <>
@@ -365,7 +367,7 @@ export default function ApiDoc() {
                                     </Grid>
                                   </>
                                 </Grid>
-                              </Box>
+                              </div>
                             </Collapse>
                           </div>
                         );

@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   CircularProgress,
   Drawer,
@@ -48,6 +47,10 @@ function Settings<SettingsProps>({ width }) {
   const [buttonLoading, setButtonLoading] = useState(false);
   const { user: currentUser, c12nDef } = useAppContext();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const sp1 = theme.spacing(1);
+  const sp2 = theme.spacing(2);
+  const sp4 = theme.spacing(4);
+  const sp6 = theme.spacing(6);
 
   const apiCall = useMyAPI();
   const useStyles = makeStyles(curTheme => ({
@@ -208,105 +211,118 @@ function Settings<SettingsProps>({ width }) {
     <PageCenter>
       <React.Fragment key="right">
         <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
-          <Box alignSelf="flex-end">
+          <div style={{ alignSelf: 'flex-end' }}>
             <IconButton onClick={() => setDrawerOpen(false)}>
               <CloseIcon />
             </IconButton>
-          </Box>
-          <Box pt={4} pb={6} px={4} className={classes.drawer} display="flex" flexDirection="column">
-            {drawerType && settings
-              ? {
-                  ttl: (
-                    <>
-                      <Typography variant="h4">{t('submissions.ttl')}</Typography>
-                      <Typography variant="caption" color="textSecondary" gutterBottom>
-                        {t('submissions.ttl_desc')}
-                      </Typography>
-                      <TextField
-                        autoFocus
-                        type="number"
-                        margin="normal"
+          </div>
+          <div
+            className={classes.drawer}
+            style={{
+              paddingTop: sp4,
+              paddingBottom: sp6,
+              paddingLeft: sp4,
+              paddingRight: sp4,
+              display: 'flex',
+              flexDirection: 'column'
+            }}
+          >
+            {drawerType &&
+              settings &&
+              {
+                ttl: (
+                  <>
+                    <Typography variant="h4">{t('submissions.ttl')}</Typography>
+                    <Typography variant="caption" color="textSecondary" gutterBottom>
+                      {t('submissions.ttl_desc')}
+                    </Typography>
+                    <TextField
+                      autoFocus
+                      type="number"
+                      margin="normal"
+                      variant="outlined"
+                      onChange={event => setTTL(event.target.value)}
+                      value={settings.ttl}
+                      inputProps={{ min: 0, max: 365 }}
+                    />
+                  </>
+                ),
+                view: (
+                  <>
+                    <Typography variant="h4">{t('interface.view')}</Typography>
+                    <Typography variant="caption" color="textSecondary" gutterBottom>
+                      {t('interface.view_desc')}
+                    </Typography>
+                    <div style={{ paddingTop: sp2, width: '100%' }}>
+                      <Select
+                        id="view"
+                        margin="dense"
+                        value={settings.submission_view}
+                        onChange={handleViewChange}
                         variant="outlined"
-                        onChange={event => setTTL(event.target.value)}
-                        value={settings.ttl}
-                        inputProps={{ min: 0, max: 365 }}
-                      />
-                    </>
-                  ),
-                  view: (
-                    <>
-                      <Typography variant="h4">{t('interface.view')}</Typography>
-                      <Typography variant="caption" color="textSecondary" gutterBottom>
-                        {t('interface.view_desc')}
-                      </Typography>
-                      <Box pt={2} width="100%">
-                        <Select
-                          id="view"
-                          margin="dense"
-                          value={settings.submission_view}
-                          onChange={handleViewChange}
-                          variant="outlined"
-                          style={{ width: '100%' }}
-                        >
-                          <MenuItem value="report">{t('interface.view_report')}</MenuItem>
-                          <MenuItem value="details">{t('interface.view_details')}</MenuItem>
-                        </Select>
-                      </Box>
-                    </>
-                  ),
-                  encoding: (
-                    <>
-                      <Typography variant="h4">{t('interface.encoding')}</Typography>
-                      <Typography variant="caption" color="textSecondary" gutterBottom>
-                        {t('interface.encoding_desc')}
-                      </Typography>
-                      <Box pt={2} width="100%">
-                        <Select
-                          id="view"
-                          margin="dense"
-                          value={settings.download_encoding}
-                          onChange={handleEncodingChange}
-                          variant="outlined"
-                          style={{ width: '100%' }}
-                        >
-                          <MenuItem value="raw">{t('interface.encoding_raw')}</MenuItem>
-                          <MenuItem value="cart">{t('interface.encoding_cart')}</MenuItem>
-                        </Select>
-                      </Box>
-                    </>
-                  ),
-                  score: (
-                    <>
-                      <Typography variant="h4">{t('interface.score')}</Typography>
-                      <Typography variant="caption" color="textSecondary" gutterBottom>
-                        {t('interface.score_desc')}
-                      </Typography>
-                      <Box pt={2} width="100%">
-                        <Select
-                          id="view"
-                          margin="dense"
-                          value={settings.expand_min_score}
-                          onChange={handleScoreChange}
-                          variant="outlined"
-                          style={{ width: '100%' }}
-                        >
-                          <MenuItem value="-1000000">{t('interface.score_-1000000')}</MenuItem>
-                          <MenuItem value="0">{t('interface.score_0')}</MenuItem>
-                          <MenuItem value="100">{t('interface.score_100')}</MenuItem>
-                          <MenuItem value="500">{t('interface.score_500')}</MenuItem>
-                          <MenuItem value="2000">{t('interface.score_2000')}</MenuItem>
-                          <MenuItem value="100000000">{t('interface.score_100000000')}</MenuItem>
-                        </Select>
-                      </Box>
-                    </>
-                  )
-                }[drawerType]
-              : null}
-          </Box>
+                        style={{ width: '100%' }}
+                      >
+                        <MenuItem value="report">{t('interface.view_report')}</MenuItem>
+                        <MenuItem value="details">{t('interface.view_details')}</MenuItem>
+                      </Select>
+                    </div>
+                  </>
+                ),
+                encoding: (
+                  <>
+                    <Typography variant="h4">{t('interface.encoding')}</Typography>
+                    <Typography variant="caption" color="textSecondary" gutterBottom>
+                      {t('interface.encoding_desc')}
+                    </Typography>
+                    <div style={{ paddingTop: sp2, width: '100%' }}>
+                      <Select
+                        id="view"
+                        margin="dense"
+                        value={settings.download_encoding}
+                        onChange={handleEncodingChange}
+                        variant="outlined"
+                        style={{ width: '100%' }}
+                      >
+                        <MenuItem value="raw">{t('interface.encoding_raw')}</MenuItem>
+                        <MenuItem value="cart">{t('interface.encoding_cart')}</MenuItem>
+                      </Select>
+                    </div>
+                  </>
+                ),
+                score: (
+                  <>
+                    <Typography variant="h4">{t('interface.score')}</Typography>
+                    <Typography variant="caption" color="textSecondary" gutterBottom>
+                      {t('interface.score_desc')}
+                    </Typography>
+                    <div style={{ paddingTop: sp2, width: '100%' }}>
+                      <Select
+                        id="view"
+                        margin="dense"
+                        value={settings.expand_min_score}
+                        onChange={handleScoreChange}
+                        variant="outlined"
+                        style={{ width: '100%' }}
+                      >
+                        <MenuItem value="-1000000">{t('interface.score_-1000000')}</MenuItem>
+                        <MenuItem value="0">{t('interface.score_0')}</MenuItem>
+                        <MenuItem value="100">{t('interface.score_100')}</MenuItem>
+                        <MenuItem value="500">{t('interface.score_500')}</MenuItem>
+                        <MenuItem value="2000">{t('interface.score_2000')}</MenuItem>
+                        <MenuItem value="100000000">{t('interface.score_100000000')}</MenuItem>
+                      </Select>
+                    </div>
+                  </>
+                )
+              }[drawerType]}
+          </div>
         </Drawer>
       </React.Fragment>
 
-      <Box className={classes.page} py={6} display="inline-block" textAlign="center">
+      <div
+        className={classes.page}
+        style={{ paddingTop: sp6, paddingBottom: sp6, display: 'inline-block', textAlign: 'center' }}
+      >
         <TableContainer className={classes.group} component={Paper}>
           <Table aria-label={t('submissions')}>
             <TableHead>
@@ -424,7 +440,7 @@ function Settings<SettingsProps>({ width }) {
                   <ChevronRightOutlinedIcon />
                 </TableCell>
               </TableRow>
-              {c12nDef.enforce ? (
+              {c12nDef.enforce && (
                 <TableRow style={{ cursor: 'pointer' }}>
                   {isWidthDown('xs', width) ? null : (
                     <TableCell>
@@ -449,7 +465,7 @@ function Settings<SettingsProps>({ width }) {
                     />
                   </TableCell>
                 </TableRow>
-              ) : null}
+              )}
             </TableBody>
           </Table>
         </TableContainer>
@@ -555,18 +571,19 @@ function Settings<SettingsProps>({ width }) {
         </TableContainer>
 
         <Paper className={classes.group}>
-          <Box p={2} textAlign="left">
+          <div style={{ padding: sp2, textAlign: 'left' }}>
             <Typography variant="h6" gutterBottom>
               {t('service')}
             </Typography>
             <ServiceTree settings={settings} setSettings={setSettings} setModified={setModified} compressed />
-          </Box>
+          </div>
         </Paper>
 
-        {settings && modified ? (
-          <Box
-            py={1}
+        {settings && modified && (
+          <div
             style={{
+              paddingTop: sp1,
+              paddingBottom: sp1,
               position: 'fixed',
               bottom: 0,
               left: 0,
@@ -579,9 +596,9 @@ function Settings<SettingsProps>({ width }) {
               {t('save')}
               {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
             </Button>
-          </Box>
-        ) : null}
-      </Box>
+          </div>
+        )}
+      </div>
     </PageCenter>
   );
 }

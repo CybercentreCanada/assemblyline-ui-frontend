@@ -1,4 +1,4 @@
-import { Box, Button, Typography } from '@material-ui/core';
+import { Button, Typography, useTheme } from '@material-ui/core';
 import useMyAPI from 'components/hooks/useMyAPI';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -11,6 +11,7 @@ type DisableOTPProps = {
 export default function DisableOTP({ setDrawerOpen, set2FAEnabled }: DisableOTPProps) {
   const apiCall = useMyAPI();
   const { t } = useTranslation(['user']);
+  const theme = useTheme();
 
   function disableOTP() {
     apiCall({
@@ -28,14 +29,14 @@ export default function DisableOTP({ setDrawerOpen, set2FAEnabled }: DisableOTPP
         {t('2fa_disable_title')}
       </Typography>
       <Typography>{t('2fa_disable_desc')}</Typography>
-      <Box textAlign="end" pt={6}>
+      <div style={{ textAlign: 'end', paddingTop: theme.spacing(6) }}>
         <Button style={{ marginRight: '8px' }} variant="contained" onClick={() => setDrawerOpen(false)}>
           {t('cancel')}
         </Button>
         <Button variant="contained" color="primary" onClick={() => disableOTP()}>
           {t('2fa_disable')}
         </Button>
-      </Box>
+      </div>
     </>
   );
 }

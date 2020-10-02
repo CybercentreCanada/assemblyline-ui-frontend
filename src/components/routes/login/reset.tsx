@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, createStyles, makeStyles, TextField, Typography } from '@material-ui/core';
+import { Button, CircularProgress, createStyles, makeStyles, TextField, Typography } from '@material-ui/core';
 import useMyAPI from 'components/hooks/useMyAPI';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -134,7 +134,7 @@ export function ResetPassword({ buttonLoading, setButtonLoading }: ResetPassword
 
   return (
     <form onSubmit={onSubmit}>
-      <Box display="flex" flexDirection="column">
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
         {done ? (
           <Typography align="center">{t('reset.done')}</Typography>
         ) : (
@@ -159,7 +159,7 @@ export function ResetPassword({ buttonLoading, setButtonLoading }: ResetPassword
             </Button>
           </>
         )}
-      </Box>
+      </div>
     </form>
   );
 }
