@@ -1,0 +1,11 @@
+{
+  "favorites.addfavorites": "Add Favorite",
+  "favorites.query": "Query",
+  "favorites.name": "Name",
+  "favorites.private": "Private",
+  "favorites.public": "Public",
+  "favorites.save": "Save",
+  "favorites.cancel": "Cancel",
+  "favorites.yourfavorites": "Your Favorites",
+  "favorites.globalfavorites": "Public Favorites"
+}

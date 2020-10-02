@@ -2,12 +2,13 @@ import i18n from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import error403EN from 'locales/en/403.json';
 import error404EN from 'locales/en/404.json';
-import alertsEN from 'locales/en/alerts.json';
 import adminErrorViewerEN from 'locales/en/admin/error_viewer.json';
 import adminServicesEN from 'locales/en/admin/services.json';
 import adminSiteMapEN from 'locales/en/admin/site_map.json';
 import adminUsersEN from 'locales/en/admin/users.json';
+import alertsEN from 'locales/en/alerts.json';
 import dashboardEN from 'locales/en/dashboard.json';
+import favoritesEN from 'locales/en/favorites.json';
 import helpAPIEN from 'locales/en/help/api.json';
 import helpClassificationEN from 'locales/en/help/classification.json';
 import helpConfigurationEN from 'locales/en/help/configuration.json';
@@ -31,12 +32,13 @@ import translationEN from 'locales/en/translation.json';
 import userEN from 'locales/en/user.json';
 import error403FR from 'locales/fr/403.json';
 import error404FR from 'locales/fr/404.json';
-import alertsFR from 'locales/fr/alerts.json';
 import adminErrorViewerFR from 'locales/fr/admin/error_viewer.json';
 import adminServicesFR from 'locales/fr/admin/services.json';
 import adminSiteMapFR from 'locales/fr/admin/site_map.json';
 import adminUsersFR from 'locales/fr/admin/users.json';
+import alertsFR from 'locales/fr/alerts.json';
 import dashboardFR from 'locales/fr/dashboard.json';
+import favoritesFR from 'locales/fr/favorites.json';
 import helpAPIFR from 'locales/fr/help/api.json';
 import helpClassificationFR from 'locales/fr/help/classification.json';
 import helpConfigurationFR from 'locales/fr/help/configuration.json';
@@ -90,7 +92,8 @@ const resources = {
     translation: translationEN,
     tos: tosEN,
     user: userEN,
-    alerts: alertsEN
+    alerts: alertsEN,
+    favorites: favoritesEN
   },
   fr: {
     adminErrorViewer: adminErrorViewerFR,
@@ -121,7 +124,8 @@ const resources = {
     translation: translationFR,
     tos: tosFR,
     user: userFR,
-    alerts: alertsFR
+    alerts: alertsFR,
+    favorites: favoritesFR
   }
 };
 

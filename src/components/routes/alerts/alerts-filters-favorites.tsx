@@ -33,7 +33,7 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
   onDeleted
 }) => {
   const theme = useTheme();
-  const { t } = useTranslation();
+  const { t } = useTranslation('favorites');
   const {
     userFavorites,
     globalFavorites,
@@ -140,10 +140,22 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
       </div>
       <div style={{ margin: theme.spacing(1) }}>
         <div>
-          <TextField label="Query" variant="outlined" value={queryValue} onChange={onQueryChange} fullWidth />
+          <TextField
+            label={t('favorites.query')}
+            variant="outlined"
+            value={queryValue}
+            onChange={onQueryChange}
+            fullWidth
+          />
         </div>
         <div style={{ marginTop: theme.spacing(2) }}>
-          <TextField label="Name" variant="outlined" value={nameValue} onChange={onNameChange} fullWidth />
+          <TextField
+            label={t('favorites.name')}
+            variant="outlined"
+            value={nameValue}
+            onChange={onNameChange}
+            fullWidth
+          />
         </div>
       </div>
       <div style={{ marginTop: theme.spacing(2), display: 'flex', flexDirection: 'row' }}>
