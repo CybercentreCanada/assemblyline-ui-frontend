@@ -35,7 +35,7 @@ import ChipInput from 'material-ui-chip-input';
 import { OptionsObject, useSnackbar } from 'notistack';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { Redirect, useLocation, useParams } from 'react-router-dom';
 
 type UserProps = {
   width: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -48,6 +48,7 @@ type ParamProps = {
 
 function User({ width, username }: UserProps) {
   const { id } = useParams<ParamProps>();
+  const location = useLocation();
   const inputRef = useRef(null);
   const { t } = useTranslation(['user']);
   const theme = useTheme();
@@ -239,16 +240,20 @@ function User({ width, username }: UserProps) {
 
   useEffect(() => {
     // Load user on start
-    apiCall({
-      url: `/api/v4/user/${username || id}/?load_avatar`,
-      onSuccess: api_data => {
-        setUser(api_data.api_response);
-      }
-    });
+    if (currentUser.is_admin || !location.pathname.includes('/admin/')) {
+      apiCall({
+        url: `/api/v4/user/${username || id}/?load_avatar`,
+        onSuccess: api_data => {
+          setUser(api_data.api_response);
+        }
+      });
+    }
     // eslint-disable-next-line
   }, []);
 
-  return (
+  return !currentUser.is_admin && location.pathname.includes('/admin/') ? (
+    <Redirect to="/forbidden" />
+  ) : (
     <PageCenter>
       <React.Fragment key="right">
         <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
