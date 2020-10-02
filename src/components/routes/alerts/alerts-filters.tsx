@@ -109,7 +109,6 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
   };
 
   const renderOption = (item: AlertFilterItem) => {
-    // return <Chip label={item.} />;
     return (
       <Box>
         <CustomChip label={item.object.count} size="tiny" /> {item.label}

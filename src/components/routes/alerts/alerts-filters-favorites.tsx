@@ -42,7 +42,6 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
     onAddGlobalFavorite,
     onDeleteGlobalFavorite
   } = useFavorites();
-
   const [queryValue, setQueryValue] = useState<string>(initValue);
   const [nameValue, setNameValue] = useState<string>();
   const [publicSwitch, setPublicSwitch] = useState<boolean>(false);
@@ -198,7 +197,6 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
         disableBackdropClick
         disableEscapeKeyDown
         maxWidth="xs"
-        // onEntering={handleEntering}
         aria-labelledby="confirmation-dialog-title"
         open={confirmation.open}
       >
@@ -208,19 +206,19 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
           >
             <WarningIcon fontSize="large" />{' '}
             <Typography style={{ marginLeft: theme.spacing(2) }} variant="h6">
-              Warning
+              {t('favorites.confirmdiag.header')}
             </Typography>
           </div>
         </DialogTitle>
         <DialogContent dividers>
-          <div>Are you sure you want to delete this favorite?</div>
+          <div>{t('favorites.confirmdiag.content')}</div>
         </DialogContent>
         <DialogActions>
           <Button onClick={_onConfirmOkClick} variant="contained" color="primary" size="small">
-            Ok
+            {t('favorites.ok')}
           </Button>
           <Button autoFocus onClick={_onConfirmCancelClick} variant="contained" size="small">
-            Cancel
+            {t('favorites.cancel')}
           </Button>
         </DialogActions>
       </Dialog>

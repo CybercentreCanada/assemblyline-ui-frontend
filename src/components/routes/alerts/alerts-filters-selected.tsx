@@ -6,11 +6,12 @@ import { AlertFilterItem } from './hooks/useAlerts';
 import { Favorite } from './hooks/useFavorites';
 
 interface AlertFiltersSelectedProps {
+  disableActions?: boolean;
   filters: AlertFilterSelections;
   onChange: (filters: AlertFilterSelections) => void;
 }
 
-const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({ filters, onChange }) => {
+const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({ disableActions = false, filters, onChange }) => {
   const { tc, groupBy, statuses, priorities, labels, values, favorites } = filters;
 
   const onDeleteStatus = (item: AlertFilterItem) => {
@@ -50,7 +51,7 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({ filters, o
               items={statuses.map(v => ({
                 variant: 'outlined',
                 label: v.value,
-                onDelete: () => onDeleteStatus(v)
+                onDelete: !disableActions ? () => onDeleteStatus(v) : null
               }))}
             />
           </Box>
@@ -61,7 +62,7 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({ filters, o
               items={priorities.map(v => ({
                 variant: 'outlined',
                 label: v.value,
-                onDelete: () => onDeletePriority(v)
+                onDelete: !disableActions ? () => onDeletePriority(v) : null
               }))}
             />
           </Box>
@@ -72,7 +73,7 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({ filters, o
               items={labels.map(v => ({
                 variant: 'outlined',
                 label: v.value,
-                onDelete: () => onDeleteLabel(v)
+                onDelete: !disableActions ? () => onDeleteLabel(v) : null
               }))}
             />
           </Box>
@@ -83,7 +84,7 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({ filters, o
               items={values.map(v => ({
                 variant: 'outlined',
                 label: v.value,
-                onDelete: () => onDeleteValue(v)
+                onDelete: !disableActions ? () => onDeleteValue(v) : null
               }))}
             />
           </Box>
@@ -94,7 +95,7 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({ filters, o
               items={favorites.map(f => ({
                 variant: 'outlined',
                 label: f.query,
-                onDelete: () => onDeleteFavorite(f)
+                onDelete: !disableActions ? () => onDeleteFavorite(f) : null
               }))}
             />
           </Box>

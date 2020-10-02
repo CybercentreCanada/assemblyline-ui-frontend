@@ -9,12 +9,14 @@ import Viewport from 'components/elements/panels/viewport';
 import SearchBar from 'components/elements/search/search-bar';
 import SearchQuery from 'components/elements/search/search-query';
 import React, { useEffect, useRef, useState } from 'react';
+import { FcWorkflow } from 'react-icons/fc';
 import AlertActionsMenu from './alert-actions-menu';
 import AlertDetails from './alert-details';
 import AlertListItem from './alert-list-item';
 import AlertsFilters, { AlertFilterSelections, DEFAULT_FILTERS } from './alerts-filters';
 import AlertsFiltersFavorites from './alerts-filters-favorites';
 import AlertsFiltersSelected from './alerts-filters-selected';
+import AlertsWorkflowActions from './alerts-workflow-actions';
 import useAlerts, { AlertFilterItem, AlertItem } from './hooks/useAlerts';
 
 const PAGE_SIZE = 50;
@@ -54,7 +56,10 @@ const Alerts: React.FC = () => {
   const [searching, setSearching] = useState<boolean>(false);
   const [scrollReset, setScrollReset] = useState<boolean>(false);
   const [splitPanel, setSplitPanel] = useState<{ open: boolean; item: AlertItem }>({ open: false, item: null });
-  const [drawer, setDrawer] = useState<{ open: boolean; type: 'filter' | 'favorites' }>({ open: false, type: null });
+  const [drawer, setDrawer] = useState<{ open: boolean; type: 'filter' | 'favorites' | 'actions' }>({
+    open: false,
+    type: null
+  });
   const [selectedFilters, setSelectedFilters] = useState<AlertFilterSelections>(DEFAULT_FILTERS);
 
   // Define some references.
@@ -254,11 +259,16 @@ const Alerts: React.FC = () => {
                 onClick: () => setDrawer({ open: true, type: 'favorites' })
               }
             },
-
             {
               icon: <FilterListIcon />,
               props: {
                 onClick: () => setDrawer({ open: true, type: 'filter' })
+              }
+            },
+            {
+              icon: <FcWorkflow />,
+              props: {
+                onClick: () => setDrawer({ open: true, type: 'actions' })
               }
             }
           ]}
@@ -349,6 +359,15 @@ const Alerts: React.FC = () => {
                   onDeleted={onFavoriteDelete}
                   onSaved={onFavoriteAdd}
                   onCancel={onFavoriteCancel}
+                />
+              ),
+              actions: (
+                <AlertsWorkflowActions
+                  affectedItemCount={buffer.total()}
+                  selectedFilters={selectedFilters}
+                  statusFilters={statusFilters}
+                  priorityFilters={priorityFilters}
+                  labelFilters={labelFilters}
                 />
               )
             }[drawer.type]
