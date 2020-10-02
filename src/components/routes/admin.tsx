@@ -3,8 +3,8 @@ import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useMyLayout from 'components/hooks/useMyLayout';
 import { CustomUser } from 'components/hooks/useMyUser';
 import LinkGrid from 'components/layout/linkgrid';
-import ForbiddenPage from 'components/routes/403';
 import React from 'react';
+import { Redirect } from 'react-router-dom';
 
 export default function Admin() {
   const layout = useMyLayout();
@@ -15,6 +15,6 @@ export default function Admin() {
       <LinkGrid items={layout.topnav.adminMenu} />
     </PageCenter>
   ) : (
-    <ForbiddenPage />
+    <Redirect to="/forbidden" />
   );
 }

@@ -1,9 +1,9 @@
 import useUser from 'commons/components/hooks/useAppUser';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import { CustomUser } from 'components/hooks/useMyUser';
-import ForbiddenPage from 'components/routes/403';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { Redirect } from 'react-router-dom';
 
 export default function Services() {
   const { t } = useTranslation(['adminServices']);
@@ -14,6 +14,6 @@ export default function Services() {
       <div>{t('Services')}</div>
     </PageCenter>
   ) : (
-    <ForbiddenPage />
+    <Redirect to="/forbidden" />
   );
 }

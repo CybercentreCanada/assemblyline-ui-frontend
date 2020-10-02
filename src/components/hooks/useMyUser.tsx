@@ -54,6 +54,7 @@ export interface CustomUserContextProps extends UserContextProps<CustomUser> {
   c12nDef: ClassificationDefinition;
   configuration: ConfigurationDefinition;
   indexes: IndexDefinitionMap;
+  setConfiguration: (cfg: ConfigurationDefinition) => void;
 }
 
 interface WhoAmIProps extends CustomUser {
@@ -122,6 +123,7 @@ export default function useMyUser(): CustomUserContextProps {
     indexes,
     user,
     setUser,
+    setConfiguration,
     isReady,
     validateProps
   };

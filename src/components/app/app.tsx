@@ -35,7 +35,7 @@ const MyApp = () => {
   const [loginParams, setLoginParams] = useState<LoginParamsProps | null>(defaultLoginParams);
 
   const { t } = useTranslation();
-  const { user: currentUser, configuration, setUser } = useAppContext();
+  const { setUser, setConfiguration } = useAppContext();
   const { setReady } = useAppLayout();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
@@ -87,6 +87,7 @@ const MyApp = () => {
           enqueueSnackbar(t('api.unreachable'), snackBarOptions);
           switchRenderedApp('load');
         } else if (api_data.api_status_code === 403) {
+          setConfiguration(api_data.api_response);
           switchRenderedApp('locked');
         } else if (api_data.api_status_code === 401) {
           localStorage.setItem('loginParams', JSON.stringify(api_data.api_response));
@@ -109,11 +110,7 @@ const MyApp = () => {
   }, []);
   return {
     load: <LoadingScreen />,
-    locked: currentUser ? (
-      <LockedPage hasTOS={configuration.ui.tos} autoNotify={configuration.ui.tos_lockout_notify} />
-    ) : (
-      <LoadingScreen />
-    ),
+    locked: <LockedPage />,
     login: loginParams ? (
       <LoginScreen
         oAuthProviders={loginParams.oauth_providers}
