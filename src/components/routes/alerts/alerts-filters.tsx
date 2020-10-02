@@ -4,6 +4,7 @@ import { Autocomplete } from '@material-ui/lab';
 import CustomChip from 'components/visual/CustomChip';
 import React, { useEffect, useState } from 'react';
 import { AlertFilterItem } from './hooks/useAlerts';
+import { Favorite } from './hooks/useFavorites';
 
 export const DEFAULT_TC = { value: '4d', label: '4 Days' };
 
@@ -15,7 +16,8 @@ export const DEFAULT_FILTERS = {
   values: [],
   statuses: [],
   priorities: [],
-  labels: []
+  labels: [],
+  favorites: []
 };
 
 const useStyles = makeStyles(theme => ({
@@ -31,6 +33,7 @@ export interface AlertFilterSelections {
   statuses: AlertFilterItem[];
   priorities: AlertFilterItem[];
   labels: AlertFilterItem[];
+  favorites: Favorite[];
 }
 
 interface AlertsFiltersProps {
@@ -96,7 +99,8 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
       values: selectedValueFilters,
       statuses: selectedStatusFilters,
       priorities: selectedPriorityFilters,
-      labels: selectedLabelFilters
+      labels: selectedLabelFilters,
+      favorites: selectedFilters.favorites
     });
   };
 

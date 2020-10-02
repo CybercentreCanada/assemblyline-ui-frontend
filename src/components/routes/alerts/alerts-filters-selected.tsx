@@ -3,6 +3,7 @@ import { ChipList } from 'components/elements/mui/chips';
 import React from 'react';
 import { AlertFilterSelections } from './alerts-filters';
 import { AlertFilterItem } from './hooks/useAlerts';
+import { Favorite } from './hooks/useFavorites';
 
 interface AlertFiltersSelectedProps {
   filters: AlertFilterSelections;
@@ -10,7 +11,7 @@ interface AlertFiltersSelectedProps {
 }
 
 const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({ filters, onChange }) => {
-  const { tc, groupBy, statuses, priorities, labels, values } = filters;
+  const { tc, groupBy, statuses, priorities, labels, values, favorites } = filters;
 
   const onDeleteStatus = (item: AlertFilterItem) => {
     const _statuses = filters.statuses.filter(s => s.value !== item.value);
@@ -30,6 +31,11 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({ filters, o
   const onDeleteValue = (item: AlertFilterItem) => {
     const _values = filters.values.filter(s => s.value !== item.value);
     onChange({ ...filters, values: _values });
+  };
+
+  const onDeleteFavorite = (item: Favorite) => {
+    const _values = filters.favorites.filter(s => s.name !== item.name);
+    onChange({ ...filters, favorites: _values });
   };
 
   return (
@@ -78,6 +84,17 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({ filters, o
                 variant: 'outlined',
                 label: v.value,
                 onDelete: () => onDeleteValue(v)
+              }))}
+            />
+          </Box>
+        ) : null}
+        {values.length ? (
+          <Box display="inline-block" mt={1}>
+            <ChipList
+              items={favorites.map(f => ({
+                variant: 'outlined',
+                label: f.query,
+                onDelete: () => onDeleteFavorite(f)
               }))}
             />
           </Box>

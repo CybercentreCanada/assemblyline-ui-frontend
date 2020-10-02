@@ -7,6 +7,7 @@ import MetaList from 'components/elements/lists/metalist/metalist';
 import SplitPanel from 'components/elements/panels/split-panel';
 import Viewport from 'components/elements/panels/viewport';
 import SearchBar from 'components/elements/search/search-bar';
+import SearchQuery from 'components/elements/search/search-query';
 import React, { useEffect, useRef, useState } from 'react';
 import AlertActionsMenu from './alert-actions-menu';
 import AlertDetails from './alert-details';
@@ -55,12 +56,13 @@ const Alerts: React.FC = () => {
   const [splitPanel, setSplitPanel] = useState<{ open: boolean; item: AlertItem }>({ open: false, item: null });
   const [drawer, setDrawer] = useState<{ open: boolean; type: 'filter' | 'favorites' }>({ open: false, type: null });
   const [selectedFilters, setSelectedFilters] = useState<AlertFilterSelections>(DEFAULT_FILTERS);
+
   // Define some references.
   const searchTextValue = useRef<string>(query.getQuery());
 
-  //
-  useEffect(() => {
-    const searchQueryFilters = query.parseFilters();
+  // Parse the filters [fq: param] and set them as  the 'selectedFilters'.
+  const setQueryFilters = (_query: SearchQuery) => {
+    const searchQueryFilters = _query.parseFilters();
     const statuses = searchQueryFilters.filter(f => f.type === 'status');
     const priorities = searchQueryFilters.filter(f => f.type === 'priority');
     const labels = searchQueryFilters.filter(f => f.type === 'label');
@@ -72,7 +74,7 @@ const Alerts: React.FC = () => {
       labels: labels || filters.labels,
       values: values || filters.labels
     }));
-  }, [query]);
+  };
 
   //
   const onSearch = (filterValue: string = '', inputEl: HTMLInputElement = null) => {
@@ -210,7 +212,10 @@ const Alerts: React.FC = () => {
   //
   const onFavoriteSelected = (favorite: { name: string; query: string }) => {
     // Update the query parameter.
-    query.reset().setQuery(favorite.query);
+    query.addFq(favorite.query).apply();
+
+    // Set query filters to selectedFilters state.
+    setQueryFilters(query);
 
     // Reinitialize the scroll.
     setScrollReset(true);
@@ -228,6 +233,9 @@ const Alerts: React.FC = () => {
       setDrawer({ ...drawer, open: false });
     }
   };
+
+  // Load up the filters already present in the URL.
+  useEffect(() => setQueryFilters(query), [query]);
 
   return (
     <Box>
