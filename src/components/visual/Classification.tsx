@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   Card,
   Dialog,
@@ -98,6 +97,7 @@ export default function Classification({
   const [showPicker, setShowPicker] = useState(false);
   const [uParts, setUserParts] = useState(defaultParts);
   const [validated, setValidated] = useState(defaultClassificationValidator);
+  const sp2 = theme.spacing(2);
 
   useEffect(() => {
     if (c12nDef && c12nDef.enforce && c12n) {
@@ -196,7 +196,10 @@ export default function Classification({
   return c12nDef && c12nDef.enforce ? (
     c12n ? (
       <>
-        <Box display={inline ? 'inline-block' : null} className={type === 'text' ? classes[computeColor()] : null}>
+        <div
+          className={type === 'text' ? classes[computeColor()] : null}
+          style={{ display: inline ? 'inline-block' : null }}
+        >
           {type === 'text' ? (
             normalizedClassification(validated.parts, c12nDef, format, isMobile)
           ) : (
@@ -210,7 +213,7 @@ export default function Classification({
               onClick={type === 'picker' ? () => setShowPicker(true) : null}
             />
           )}
-        </Box>
+        </div>
         {type === 'picker' ? (
           <Dialog
             fullScreen={isPhone}
@@ -278,7 +281,7 @@ export default function Classification({
                 {isUser || uParts.groups.length !== 0 || uParts.subgroups.length !== 0 ? (
                   <Grid item xs={12} md>
                     {isUser || uParts.groups.length !== 0 ? (
-                      <Box pb={2}>
+                      <div style={{ paddingBottom: sp2 }}>
                         <Card variant="outlined">
                           <List disablePadding>
                             {c12nDef.original_definition.groups.map((grp, idx) => {
@@ -302,7 +305,7 @@ export default function Classification({
                             })}
                           </List>
                         </Card>
-                      </Box>
+                      </div>
                     ) : null}
                     {isUser || uParts.subgroups.length !== 0 ? (
                       <Card variant="outlined">
