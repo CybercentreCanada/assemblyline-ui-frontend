@@ -1,4 +1,4 @@
-import { Box, Card, makeStyles, Typography } from '@material-ui/core';
+import { Card, makeStyles, Typography } from '@material-ui/core';
 import PageFullscreen from 'commons/components/layout/pages/PageFullScreen';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -38,7 +38,7 @@ function Dashboard() {
       <Typography gutterBottom color="primary" variant="h2" align="center">
         {t('title')}
       </Typography>
-      <Box display="flex" flexDirection="row" flexWrap="wrap" width="100%">
+      <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', width: '100%' }}>
         {cards.map((a, i) => (
           <Card key={i} className={classes.card}>
             <Typography variant="h4" className={classes.watermark}>
@@ -46,7 +46,7 @@ function Dashboard() {
             </Typography>
           </Card>
         ))}
-      </Box>
+      </div>
     </PageFullscreen>
   );
 }

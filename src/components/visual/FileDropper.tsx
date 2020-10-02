@@ -1,5 +1,4 @@
 import { makeStyles } from '@material-ui/core';
-import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import React, { useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
@@ -52,24 +51,22 @@ export default function FileDropper({ file, setFile, disabled }: FileDropperProp
   }, [acceptedFiles]);
 
   return (
-    <Box>
-      <div
-        {...getRootProps()}
-        className={isDragActive && !disabled ? `${classes.drop_zone} ${classes.drag_enter}` : classes.drop_zone}
-      >
-        <input {...getInputProps()} />
-        <AiOutlineSecurityScan style={{ fontSize: '140px' }} />
-        <Box height="44px" textAlign="center">
-          <Typography variant="body1">
-            <b>{isDragActive && !disabled ? t('file.drophere') : file ? file.name : t('file.dragzone')}</b>
+    <div
+      {...getRootProps()}
+      className={isDragActive && !disabled ? `${classes.drop_zone} ${classes.drag_enter}` : classes.drop_zone}
+    >
+      <input {...getInputProps()} />
+      <AiOutlineSecurityScan style={{ fontSize: '140px' }} />
+      <div style={{ height: '44px', textAlign: 'center' }}>
+        <Typography variant="body1">
+          <b>{isDragActive && !disabled ? t('file.drophere') : file ? file.name : t('file.dragzone')}</b>
+        </Typography>
+        {file && (!isDragActive || disabled) && (
+          <Typography variant="body2" align="center">
+            {file.size} {t('file.dragzone.byte')}
           </Typography>
-          {file && (!isDragActive || disabled) ? (
-            <Typography variant="body2" align="center">
-              {file.size} {t('file.dragzone.byte')}
-            </Typography>
-          ) : null}
-        </Box>
+        )}
       </div>
-    </Box>
+    </div>
   );
 }

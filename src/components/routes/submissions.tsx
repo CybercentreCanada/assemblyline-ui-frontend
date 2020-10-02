@@ -1,4 +1,4 @@
-import Box from '@material-ui/core/Box';
+import { useTheme } from '@material-ui/core';
 import Paper from '@material-ui/core/Paper';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Table from '@material-ui/core/Table';
@@ -49,15 +49,16 @@ for (let x = 0; x < Math.floor(Math.random() * 270 + 30); x++) {
 export default function Submissions() {
   const classes = useStyles();
   const { t } = useTranslation(['submissions']);
+  const theme = useTheme();
 
   return (
     <PageFullWidth>
-      <Box pb={8}>
+      <div style={{ paddingBottom: theme.spacing(8) }}>
         <Typography variant="h4">{t('title')}</Typography>
         <Typography variant="subtitle1" color="secondary">
           {rows.length} {t('subtitle')}
         </Typography>
-      </Box>
+      </div>
 
       <TableContainer component={Paper} className={classes.container}>
         <Table size="small" className={classes.table} stickyHeader>
