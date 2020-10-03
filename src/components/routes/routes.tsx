@@ -1,4 +1,5 @@
 import useAppContext from 'components/hooks/useAppContext';
+import ForbiddenPage from 'components/routes/403';
 import NotFoundPage from 'components/routes/404_dl';
 import Account from 'components/routes/account';
 import Admin from 'components/routes/admin';
@@ -70,7 +71,11 @@ const Routes = () => {
       )}
       <Route exact path="/submissions" component={Submissions} />
       <Route exact path="/tos" component={Tos} />
-      <Route component={NotFoundPage} />
+
+      <Route exact path="/forbidden" component={ForbiddenPage} />
+      <Route exact path="/notfound" component={NotFoundPage} />
+
+      <Redirect to="/notfound" />
     </Switch>
   );
 };

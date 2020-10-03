@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, Link, makeStyles, Typography, useTheme } from '@material-ui/core';
+import { Button, CircularProgress, Link, makeStyles, Typography, useTheme } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
@@ -41,6 +41,7 @@ export default function Tos() {
     }
   }));
   const classes = useStyles();
+  const sp6 = theme.spacing(6);
 
   function acceptTOS() {
     apiCall({
@@ -72,26 +73,26 @@ export default function Tos() {
 
   return configuration.ui.tos ? (
     <PageCenter>
-      <Box className={classes.page} display="inline-block" textAlign="center">
-        <Box>{getBanner(theme)}</Box>
-        <Box mb={6} textAlign="left">
+      <div className={classes.page} style={{ display: 'inline-block', textAlign: 'center' }}>
+        <div>{getBanner(theme)}</div>
+        <div style={{ marginBottom: sp6, textAlign: 'left' }}>
           <Typography variant="h3" gutterBottom>
             {t('title')}
           </Typography>
-        </Box>
+        </div>
         {tos ? (
           <>
-            <Box textAlign="left">
+            <div style={{ textAlign: 'left' }}>
               <Markdown source={tos} renderers={{ link: Link }} />
-            </Box>
+            </div>
             {currentUser.agrees_with_tos ? (
-              <Box mt={6}>
+              <div style={{ marginTop: sp6 }}>
                 <Typography variant="subtitle1" color="secondary">
                   {t('agreed')}
                 </Typography>
-              </Box>
+              </div>
             ) : (
-              <Box>
+              <div>
                 <Button
                   style={{ marginTop: '3rem', marginBottom: '3rem' }}
                   variant="contained"
@@ -112,7 +113,7 @@ export default function Tos() {
                   {t('logout')}
                   {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
                 </Button>
-              </Box>
+              </div>
             )}
           </>
         ) : (
@@ -125,7 +126,7 @@ export default function Tos() {
             <Skeleton />
           </>
         )}
-      </Box>
+      </div>
     </PageCenter>
   ) : (
     <NotFoundPage />

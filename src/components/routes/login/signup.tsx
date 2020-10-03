@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, createStyles, makeStyles, TextField, Typography } from '@material-ui/core';
+import { Button, CircularProgress, createStyles, makeStyles, TextField, Typography } from '@material-ui/core';
 import useMyAPI from 'components/hooks/useMyAPI';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -49,7 +49,7 @@ export function SignUp({ buttonLoading, setButtonLoading }: SignUpProps) {
 
   return (
     <form onSubmit={onSubmit}>
-      <Box display="flex" flexDirection="column">
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
         {done ? (
           <>
             <Typography align="center">{t('signup.done')}</Typography>
@@ -100,7 +100,7 @@ export function SignUp({ buttonLoading, setButtonLoading }: SignUpProps) {
             </Button>
           </>
         )}
-      </Box>
+      </div>
     </form>
   );
 }

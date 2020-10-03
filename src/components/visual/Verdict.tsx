@@ -1,4 +1,4 @@
-import { Box, Tooltip } from '@material-ui/core';
+import { Tooltip } from '@material-ui/core';
 import CustomChip from 'components/visual/CustomChip';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,9 +8,16 @@ type VerdictProps = {
   short?: boolean;
   variant?: 'outlined' | 'default';
   size?: 'tiny' | 'small' | 'medium';
+  mono?: boolean;
 };
 
-const Verdict: React.FC<VerdictProps> = ({ score, variant = 'default', size = 'tiny', short = false }) => {
+const Verdict: React.FC<VerdictProps> = ({
+  score,
+  variant = 'default',
+  size = 'tiny',
+  short = false,
+  mono = false
+}) => {
   const { t } = useTranslation();
 
   const VERDICT_SCORE_MAP = {
@@ -58,9 +65,16 @@ const Verdict: React.FC<VerdictProps> = ({ score, variant = 'default', size = 't
 
   return (
     <Tooltip title={`${text} [Score: ${score}]`}>
-      <Box display="inline">
-        <CustomChip type="square" variant={variant} size={size} label={short ? shortText : text} color={color} />
-      </Box>
+      <span>
+        <CustomChip
+          type="square"
+          variant={variant}
+          size={size}
+          label={short ? shortText : text}
+          color={color}
+          mono={mono}
+        />
+      </span>
     </Tooltip>
   );
 };

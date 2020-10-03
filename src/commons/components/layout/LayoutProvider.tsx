@@ -17,7 +17,7 @@ const useStyles = (layout, showSpacing) => {
     },
     container: {
       display: 'block',
-      paddingTop: showSpacing ? (layout === 'top' ? theme.spacing(9) : theme.spacing(8)) : theme.spacing(3),
+      paddingTop: showSpacing ? theme.spacing(8) : theme.spacing(3),
       paddingLeft: theme.spacing(3),
       paddingRight: theme.spacing(3),
       [theme.breakpoints.only('sm')]: {
@@ -83,6 +83,8 @@ export interface AppLayoutProps {
     quickSearchURI?: string;
     quickSearchParam?: string;
     themeSelectionUnder: 'profile' | 'icon';
+    left?: React.ReactNode;
+    right?: React.ReactNode;
   };
   leftnav: {
     elements: LeftNavElement[];

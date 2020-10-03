@@ -1,6 +1,9 @@
 import { SiteMapContext, SiteMapContextProps, SiteMapRoute } from 'commons/components/sitemap/SitemapProvider';
+import i18n from 'i18n';
 import { useContext } from 'react';
 import { match, matchPath } from 'react-router-dom';
+
+const TITLE_404 = i18n.t('breadcrumb.404');
 
 export type BreadcrumbItem = { route: SiteMapRoute; matcher: match };
 
@@ -29,7 +32,7 @@ export const getRoute = (route: string, siteMap: SiteMapRoute[]): BreadcrumbItem
     // eslint-disable-next-line no-console
     console.warn(`Found more than one sitemap route match for: ${route}`);
   }
-  return matched && matched[0] ? matched[0] : { route: { path: route, title: '404' }, matcher: null };
+  return matched && matched[0] ? matched[0] : { route: { path: route, title: TITLE_404 }, matcher: null };
 };
 
 export const appendRoute = (breadcrumbs: BreadcrumbItem[], breadcrumb: BreadcrumbItem): BreadcrumbItem[] => {
@@ -69,7 +72,7 @@ const resolveTitle = (breadcrumb: BreadcrumbItem, siteMap: SiteMapRoute[]) => {
 };
 
 const is404 = (breadcrumb: BreadcrumbItem) => {
-  return breadcrumb.route.title === '404';
+  return breadcrumb.route.title === TITLE_404;
 };
 
 export default function useAppSitemap(): SitemapProps {

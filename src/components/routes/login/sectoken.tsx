@@ -1,4 +1,4 @@
-import { Box, Typography } from '@material-ui/core';
+import { Typography } from '@material-ui/core';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import useMyAPI from 'components/hooks/useMyAPI';
 import toArrayBuffer from 'helpers/toArrayBuffer';
@@ -63,13 +63,13 @@ export function SecurityTokenLogin({
   }, []);
 
   return (
-    <Box display="flex" flexDirection="column" textAlign="center">
-      <Box>
+    <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'center' }}>
+      <div>
         <LockOutlinedIcon style={{ fontSize: '108pt' }} color="action" />
-      </Box>
+      </div>
       <Typography variant="h6" color="textSecondary">
         {t('securitytoken')}
       </Typography>
-    </Box>
+    </div>
   );
 }

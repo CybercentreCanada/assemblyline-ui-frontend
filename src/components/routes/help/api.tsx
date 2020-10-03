@@ -65,6 +65,8 @@ export default function ApiDoc() {
   const [expandMap, setExpandMap] = useState({});
   const theme = useTheme();
   const { t } = useTranslation(['helpAPI']);
+  const sp1 = theme.spacing(1);
+  const sp2 = theme.spacing(2);
 
   const downSM = useMediaQuery(theme.breakpoints.down('sm'));
   const xs = useMediaQuery(theme.breakpoints.only('xs'));
@@ -141,7 +143,7 @@ export default function ApiDoc() {
 
   return (
     <PageCenter>
-      <Box textAlign="left">
+      <div style={{ textAlign: 'left' }}>
         {apiList && apiSelected ? (
           <Select
             id="api"
@@ -162,10 +164,10 @@ export default function ApiDoc() {
           <Skeleton variant="rect" style={{ height: '2rem', width: '14rem' }} />
         )}
         {apiDefinition ? (
-          <Box display="flex" flexDirection="column">
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
             {Object.keys(apiDefinition.blueprints).map((bp, i) => {
               return (
-                <Box key={i}>
+                <div key={i}>
                   <Box
                     display="flex"
                     flexDirection="row"
@@ -178,12 +180,12 @@ export default function ApiDoc() {
                     <Typography variant="body2" color="textSecondary" style={{ fontWeight: 800, lineHeight: 2 }}>
                       {`/api/${apiSelected}/`}&nbsp;
                     </Typography>
-                    <Box flexGrow={1}>
+                    <div style={{ flexGrow: 1 }}>
                       <Typography variant="h6" style={{ fontWeight: 800, lineHeight: 2 }} color="secondary">
                         {bp}
                       </Typography>
-                    </Box>
-                    <Box display="inline-flex" width={downSM ? '100%' : null} justifyContent="flex-end">
+                    </div>
+                    <div style={{ display: 'inline-flex', width: downSM ? '100%' : null, justifyContent: 'flex-end' }}>
                       <Typography variant="body2" color="textSecondary" align="right" style={{ lineHeight: 2 }}>
                         {apiDefinition.blueprints[bp]}
                       </Typography>
@@ -192,18 +194,17 @@ export default function ApiDoc() {
                           [classes.expandOpen]: expandMap[bp]
                         })}
                       />
-                    </Box>
+                    </div>
                   </Box>
                   <Collapse in={expandMap[bp]} timeout="auto" unmountOnExit>
-                    <Box
-                      py={1}
+                    <div
                       style={{
                         backgroundColor: isDark ? theme.palette.grey[900] : theme.palette.grey[100]
                       }}
                     >
                       {blueprintAPIs(bp).map((api, idx) => {
                         return (
-                          <Box key={idx}>
+                          <div key={idx}>
                             <Box
                               className={classes.api}
                               px={1}
@@ -213,7 +214,7 @@ export default function ApiDoc() {
                               alignItems={xs ? 'flex-start' : 'center'}
                               onClick={() => toggleBlueprintExpand(api.name)}
                             >
-                              <Box>
+                              <div>
                                 {api.methods.map((method, midx) => {
                                   return (
                                     <CustomChip
@@ -225,8 +226,8 @@ export default function ApiDoc() {
                                     />
                                   );
                                 })}
-                              </Box>
-                              <Box flexGrow={1}>
+                              </div>
+                              <div style={{ flexGrow: 1 }}>
                                 <Typography
                                   variant="body2"
                                   color="textSecondary"
@@ -234,8 +235,14 @@ export default function ApiDoc() {
                                 >
                                   {api.path}
                                 </Typography>
-                              </Box>
-                              <Box display="inline-flex" width={downSM ? '100%' : null} justifyContent="flex-end">
+                              </div>
+                              <div
+                                style={{
+                                  display: 'inline-flex',
+                                  width: downSM ? '100%' : null,
+                                  justifyContent: 'flex-end'
+                                }}
+                              >
                                 <Typography align="right" variant="caption" style={{ lineHeight: 2 }}>
                                   {api.name}
                                 </Typography>
@@ -245,21 +252,23 @@ export default function ApiDoc() {
                                     [classes.expandOpen]: expandMap[api.name]
                                   })}
                                 />
-                              </Box>
+                              </div>
                             </Box>
                             <Collapse in={expandMap[api.name]} timeout="auto" unmountOnExit>
-                              <Box
-                                border={1}
-                                borderTop={0}
-                                borderBottom={0}
-                                p={1}
-                                borderColor={isDark ? theme.palette.grey[900] : theme.palette.grey[100]}
-                                bgcolor={theme.palette.background.default}
+                              <div
+                                style={{
+                                  border: 1,
+                                  borderTop: 0,
+                                  borderBottom: 0,
+                                  padding: sp1,
+                                  borderColor: isDark ? theme.palette.grey[900] : theme.palette.grey[100],
+                                  backgroundColor: theme.palette.background.default
+                                }}
                               >
                                 <Grid container alignItems="center">
                                   <>
                                     <Grid item xs={8} sm={4} md={3} lg={2}>
-                                      <Box fontWeight="fontWeightMedium">{t('complete')}:</Box>
+                                      <div style={{ fontWeight: 500 }}>{t('complete')}:</div>
                                     </Grid>
                                     <Grid item xs={4} sm={8} md={9} lg={4}>
                                       {api.complete ? (
@@ -271,7 +280,7 @@ export default function ApiDoc() {
                                   </>
                                   <>
                                     <Grid item xs={8} sm={4} md={3} lg={2}>
-                                      <Box fontWeight="fontWeightMedium">{t('protected')}:</Box>
+                                      <div style={{ fontWeight: 500 }}>{t('protected')}:</div>
                                     </Grid>
                                     <Grid item xs={4} sm={8} md={9} lg={4}>
                                       {api.protected ? (
@@ -283,7 +292,7 @@ export default function ApiDoc() {
                                   </>
                                   <>
                                     <Grid item xs={12} sm={4} md={3} lg={2}>
-                                      <Box fontWeight="fontWeightMedium">{t('require_type')}:</Box>
+                                      <div style={{ fontWeight: 500 }}>{t('require_type')}:</div>
                                     </Grid>
                                     <Grid item xs={12} sm={8} md={9} lg={4}>
                                       {api.require_type.map((utype, uidx) => {
@@ -302,7 +311,7 @@ export default function ApiDoc() {
                                   {api.required_priv ? (
                                     <>
                                       <Grid item xs={12} sm={4} md={3} lg={2}>
-                                        <Box fontWeight="fontWeightMedium">{t('required_priv')}:</Box>
+                                        <div style={{ fontWeight: 500 }}>{t('required_priv')}:</div>
                                       </Grid>
                                       <Grid item xs={12} sm={8} md={9} lg={4}>
                                         {api.required_priv.map((ptype, pidx) => {
@@ -321,7 +330,7 @@ export default function ApiDoc() {
                                   ) : null}
                                   <>
                                     <Grid item xs={12} sm={4} md={3} lg={2}>
-                                      <Box fontWeight="fontWeightMedium">{t('methods')}:</Box>
+                                      <div style={{ fontWeight: 500 }}>{t('methods')}:</div>
                                     </Grid>
                                     <Grid item xs={12} sm={8} md={9} lg={4}>
                                       {api.methods.map((met, metid) => {
@@ -339,73 +348,72 @@ export default function ApiDoc() {
                                   </>
                                   <>
                                     <Grid item xs={12} sm={4} md={3} lg={2}>
-                                      <Box fontWeight="fontWeightMedium">{t('path')}:</Box>
+                                      <div style={{ fontWeight: 500 }}>{t('path')}:</div>
                                     </Grid>
                                     <Grid item xs={12} sm={8} md={9} lg={4}>
-                                      <Box lineHeight={2} fontFamily="Monospace" style={{ wordBreak: 'break-word' }}>
+                                      <div style={{ lineHeight: 2, fontFamily: 'Monospace', wordBreak: 'break-word' }}>
                                         {api.path}
-                                      </Box>
+                                      </div>
                                     </Grid>
                                   </>
                                   <>
                                     <Grid item xs={12}>
-                                      <Box fontWeight="fontWeightMedium" lineHeight={2}>
-                                        {t('description')}:
-                                      </Box>
+                                      <div style={{ fontWeight: 500, lineHeight: 2 }}>{t('description')}:</div>
                                     </Grid>
                                     <Grid item xs={12}>
                                       <Card variant="outlined" style={{ overflowX: 'auto' }}>
-                                        <Box component="pre" px={2}>
-                                          {api.description}
-                                        </Box>
+                                        <pre style={{ paddingLeft: sp2, paddingRight: sp2 }}>{api.description}</pre>
                                       </Card>
                                     </Grid>
                                   </>
                                 </Grid>
-                              </Box>
+                              </div>
                             </Collapse>
-                          </Box>
+                          </div>
                         );
                       })}
-                    </Box>
+                    </div>
                   </Collapse>
-                </Box>
+                </div>
               );
             })}
-          </Box>
+          </div>
         ) : (
-          <Box display="flex" flexDirection="column">
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
             {[...Array(21)].map((_, i) => {
               return (
-                <Box
+                <div
                   key={i}
-                  display="flex"
-                  flexDirection="row"
-                  flexWrap="wrap"
+                  style={{
+                    paddingLeft: sp1,
+                    paddingRight: sp1,
+                    display: 'flex',
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
+                    borderBottom: 1
+                  }}
                   className={classes.blueprintSkel}
-                  borderBottom={1}
-                  px={1}
                 >
                   <Typography variant="body2" style={{ paddingRight: '8px' }}>
                     <Skeleton width="2rem" />
                   </Typography>
-                  <Box flexGrow={1}>
+                  <div style={{ flexGrow: 1 }}>
                     <Typography variant="h6">
                       <Skeleton width="12rem" />
                     </Typography>
-                  </Box>
-                  <Box display="inline-flex" width={downSM ? '100%' : null} justifyContent="flex-end">
+                  </div>
+                  <div style={{ display: 'inline-flex', width: downSM ? '100%' : null, justifyContent: 'flex-end' }}>
                     <Typography variant="body2" style={{ paddingRight: '16px', lineHeight: 2 }}>
                       <Skeleton width="14rem" />
                     </Typography>
                     <Skeleton width="1rem" />
-                  </Box>
-                </Box>
+                  </div>
+                </div>
               );
             })}
-          </Box>
+          </div>
         )}
-      </Box>
+      </div>
     </PageCenter>
   );
 }

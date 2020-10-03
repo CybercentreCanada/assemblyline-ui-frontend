@@ -1,9 +1,6 @@
-import { Box, Checkbox, createStyles, FormControlLabel, makeStyles, Typography } from '@material-ui/core';
-import { useTheme } from '@material-ui/core/styles';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { Checkbox, createStyles, FormControlLabel, makeStyles, Typography, useTheme } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 import React from 'react';
-import Masonry from 'react-masonry-css';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -22,10 +19,10 @@ type ServiceTreeItemSkelProps = {
 
 function ServiceTreeItemSkel({ size = 'medium' }: ServiceTreeItemSkelProps) {
   return (
-    <Box display="flex" flexDirection="row" pb={1}>
+    <div style={{ display: 'flex', flexDirection: 'row', paddingBottom: '8px' }}>
       <Skeleton style={{ height: size === 'medium' ? '2.5rem' : '2rem', width: '1.5rem' }} />
       <Skeleton style={{ marginLeft: '1rem', height: size === 'medium' ? '2.5rem' : '2rem', width: '100%' }} />
-    </Box>
+    </div>
   );
 }
 
@@ -37,8 +34,19 @@ type ServiceTreeItemProps = {
 
 function ServiceTreeItem({ item, onChange, size = 'medium' as 'medium' }: ServiceTreeItemProps) {
   const classes = useStyles();
+  const theme = useTheme();
+  const sp1 = theme.spacing(1);
+  const sp4 = theme.spacing(4);
   return (
-    <Box display="block" pl={1}>
+    <div
+      style={{
+        paddingLeft: sp1,
+        height: '100%',
+        width: '100%',
+        display: 'inline-block',
+        pageBreakInside: 'avoid'
+      }}
+    >
       <FormControlLabel
         control={
           <Checkbox
@@ -54,50 +62,72 @@ function ServiceTreeItem({ item, onChange, size = 'medium' as 'medium' }: Servic
         label={<Typography variant={size === 'small' ? 'body2' : 'body1'}>{item.name}</Typography>}
         className={classes.item}
       />
-      <Box pl={4}>
+      <div style={{ paddingLeft: sp4 }}>
         {item.services
           ? item.services.map((service, service_id) => {
               return <ServiceTreeItem size={size} key={service_id} item={service} onChange={onChange} />;
             })
           : null}
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 }
 
 type SkelItemsProps = {
   size: 'medium' | 'small';
+  spacing: number;
 };
 
-function SkelItems({ size }: SkelItemsProps) {
+function SkelItems({ size, spacing }: SkelItemsProps) {
   return (
     <>
-      <Box>
+      <div
+        style={{
+          height: '100%',
+          width: '100%',
+          display: 'inline-block',
+          pageBreakInside: 'avoid'
+        }}
+      >
         <ServiceTreeItemSkel size={size} />
-        <Box pl={4}>
+        <div style={{ paddingLeft: spacing }}>
           <ServiceTreeItemSkel size={size} />
           <ServiceTreeItemSkel size={size} />
           <ServiceTreeItemSkel size={size} />
           <ServiceTreeItemSkel size={size} />
-        </Box>
-      </Box>
-      <Box>
+        </div>
+      </div>
+      <div
+        style={{
+          height: '100%',
+          width: '100%',
+          display: 'inline-block',
+          pageBreakInside: 'avoid'
+        }}
+      >
         <ServiceTreeItemSkel size={size} />
-        <Box pl={4}>
+        <div style={{ paddingLeft: spacing }}>
           <ServiceTreeItemSkel size={size} />
           <ServiceTreeItemSkel size={size} />
-        </Box>
-      </Box>
-      <Box>
+        </div>
+      </div>
+      <div
+        style={{
+          height: '100%',
+          width: '100%',
+          display: 'inline-block',
+          pageBreakInside: 'avoid'
+        }}
+      >
         <ServiceTreeItemSkel size={size} />
-        <Box pl={4}>
+        <div style={{ paddingLeft: spacing }}>
           <ServiceTreeItemSkel size={size} />
           <ServiceTreeItemSkel size={size} />
           <ServiceTreeItemSkel size={size} />
           <ServiceTreeItemSkel size={size} />
           <ServiceTreeItemSkel size={size} />
-        </Box>
-      </Box>
+        </div>
+      </div>
     </>
   );
 }
@@ -106,22 +136,20 @@ type ServiceTreeProps = {
   settings: any;
   setSettings: (settings: any) => void;
   setModified?: (isModified: boolean) => void;
-  useMasonery?: boolean;
+  compressed?: boolean;
   size?: 'medium' | 'small';
 };
 
-export default function ServiceTree({
+const ServiceTree: React.FC<ServiceTreeProps> = ({
   settings,
   setSettings,
   setModified = null,
-  useMasonery = true,
+  compressed = false,
   size = 'medium' as 'medium'
-}: ServiceTreeProps) {
+}) => {
   const theme = useTheme();
-  const sm = useMediaQuery(theme.breakpoints.only('sm'));
-  const xs = useMediaQuery(theme.breakpoints.only('xs'));
-  const bp = xs ? 1 : sm ? 2 : 3;
-
+  const sp2 = theme.spacing(2);
+  const sp4 = theme.spacing(4);
   function handleServiceChange(name, category) {
     if (settings) {
       const newServices = settings.services;
@@ -156,25 +184,47 @@ export default function ServiceTree({
     }
   }
 
-  return settings ? (
-    useMasonery ? (
-      <Masonry breakpointCols={bp} className="m-grid" columnClassName="m-grid_column">
-        {settings.services.map((category, cat_id) => {
+  function sortFunc(a, b) {
+    const nameA = a.name.toUpperCase(); // ignore upper and lowercase
+    const nameB = b.name.toUpperCase(); // ignore upper and lowercase
+    if (nameA < nameB) {
+      return -1;
+    }
+    if (nameA > nameB) {
+      return 1;
+    }
+
+    // names must be equal
+    return 0;
+  }
+
+  return compressed ? (
+    <div
+      style={{
+        paddingTop: sp2,
+        paddingBottom: sp2,
+        columnWidth: '18rem',
+        columnGap: '1rem',
+        columnRuleWidth: '1px',
+        columnRuleStyle: 'dotted',
+        columnRuleColor: theme.palette.divider
+      }}
+    >
+      {settings ? (
+        settings.services.sort(sortFunc).map((category, cat_id) => {
           return <ServiceTreeItem size={size} key={cat_id} item={category} onChange={handleServiceChange} />;
-        })}
-      </Masonry>
-    ) : (
-      <Box>
-        {settings.services.map((category, cat_id) => {
-          return <ServiceTreeItem size={size} key={cat_id} item={category} onChange={handleServiceChange} />;
-        })}
-      </Box>
-    )
-  ) : useMasonery ? (
-    <Masonry breakpointCols={bp} className="m-grid" columnClassName="m-grid_column">
-      <SkelItems size={size} />
-    </Masonry>
+        })
+      ) : (
+        <SkelItems size={size} spacing={sp4} />
+      )}
+    </div>
+  ) : settings ? (
+    settings.services.sort(sortFunc).map((category, cat_id) => {
+      return <ServiceTreeItem size={size} key={cat_id} item={category} onChange={handleServiceChange} />;
+    })
   ) : (
-    <SkelItems size={size} />
+    <SkelItems size={size} spacing={sp4} />
   );
-}
+};
+
+export default ServiceTree;

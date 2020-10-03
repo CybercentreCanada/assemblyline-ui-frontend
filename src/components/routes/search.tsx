@@ -1,4 +1,3 @@
-import { Box } from '@material-ui/core';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -18,7 +17,7 @@ function Search({ index }: SearchProps) {
 
   return (
     <PageCenter>
-      <Box textAlign="Left">{t(`Search ${index || id || 'all'}`)}</Box>
+      <div style={{ textAlign: 'left' }}>{t(`Search ${index || id || 'all'}`)}</div>
     </PageCenter>
   );
 }

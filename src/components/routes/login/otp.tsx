@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, createStyles, makeStyles, TextField } from '@material-ui/core';
+import { Button, CircularProgress, createStyles, makeStyles, TextField } from '@material-ui/core';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -26,7 +26,7 @@ export function OneTimePassLogin({ onSubmit, buttonLoading, setOneTimePass }: OT
 
   return (
     <form onSubmit={onSubmit}>
-      <Box display="flex" flexDirection="column">
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
         <TextField
           inputProps={{ maxLength: 6 }}
           autoFocus
@@ -45,7 +45,7 @@ export function OneTimePassLogin({ onSubmit, buttonLoading, setOneTimePass }: OT
           {t('button')}
           {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
         </Button>
-      </Box>
+      </div>
     </form>
   );
 }

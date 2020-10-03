@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   Card,
   Dialog,
@@ -98,6 +97,7 @@ export default function Classification({
   const [showPicker, setShowPicker] = useState(false);
   const [uParts, setUserParts] = useState(defaultParts);
   const [validated, setValidated] = useState(defaultClassificationValidator);
+  const sp2 = theme.spacing(2);
 
   useEffect(() => {
     if (c12nDef && c12nDef.enforce && c12n) {
@@ -193,10 +193,15 @@ export default function Classification({
     setShowPicker(false);
   };
   // Build chip based on computed values
-  return c12nDef && c12nDef.enforce ? (
-    c12n ? (
+  return (
+    c12nDef &&
+    c12nDef.enforce &&
+    (c12n ? (
       <>
-        <Box display={inline ? 'inline-block' : null} className={type === 'text' ? classes[computeColor()] : null}>
+        <div
+          className={type === 'text' ? classes[computeColor()] : null}
+          style={{ display: inline ? 'inline-block' : null }}
+        >
           {type === 'text' ? (
             normalizedClassification(validated.parts, c12nDef, format, isMobile)
           ) : (
@@ -210,7 +215,7 @@ export default function Classification({
               onClick={type === 'picker' ? () => setShowPicker(true) : null}
             />
           )}
-        </Box>
+        </div>
         {type === 'picker' ? (
           <Dialog
             fullScreen={isPhone}
@@ -235,98 +240,106 @@ export default function Classification({
                   <Card variant="outlined">
                     <List disablePadding style={{ borderRadius: '6px' }}>
                       {c12nDef.original_definition.levels.map((lvl, idx) => {
-                        return isUser || lvl.lvl <= uParts.lvlIdx ? (
-                          <ListItem
-                            key={idx}
-                            button
-                            disabled={
-                              validated.disabled.levels.includes(lvl.name) ||
-                              validated.disabled.levels.includes(lvl.short_name)
-                            }
-                            selected={validated.parts.lvlIdx === lvl.lvl}
-                            onClick={() => selectLevel(lvl.lvl)}
-                          >
-                            <ListItemText style={{ textAlign: 'center' }} primary={lvl.name} />
-                          </ListItem>
-                        ) : null;
+                        return (
+                          (isUser || lvl.lvl <= uParts.lvlIdx) && (
+                            <ListItem
+                              key={idx}
+                              button
+                              disabled={
+                                validated.disabled.levels.includes(lvl.name) ||
+                                validated.disabled.levels.includes(lvl.short_name)
+                              }
+                              selected={validated.parts.lvlIdx === lvl.lvl}
+                              onClick={() => selectLevel(lvl.lvl)}
+                            >
+                              <ListItemText style={{ textAlign: 'center' }} primary={lvl.name} />
+                            </ListItem>
+                          )
+                        );
                       })}
                     </List>
                   </Card>
                 </Grid>
-                {isUser || uParts.req.length !== 0 ? (
+                {(isUser || uParts.req.length !== 0) && (
                   <Grid item xs={12} md>
                     <Card variant="outlined">
                       <List disablePadding>
                         {c12nDef.original_definition.required.map((req, idx) => {
-                          return isUser || [req.name, req.short_name].some(r => uParts.req.includes(r)) ? (
-                            <ListItem
-                              key={idx}
-                              button
-                              selected={
-                                validated.parts.req.includes(req.name) || validated.parts.req.includes(req.short_name)
-                              }
-                              onClick={() => toggleRequired(req)}
-                            >
-                              <ListItemText style={{ textAlign: 'center' }} primary={req.name} />
-                            </ListItem>
-                          ) : null;
-                        })}
-                      </List>
-                    </Card>
-                  </Grid>
-                ) : null}
-                {isUser || uParts.groups.length !== 0 || uParts.subgroups.length !== 0 ? (
-                  <Grid item xs={12} md>
-                    {isUser || uParts.groups.length !== 0 ? (
-                      <Box pb={2}>
-                        <Card variant="outlined">
-                          <List disablePadding>
-                            {c12nDef.original_definition.groups.map((grp, idx) => {
-                              return isUser || [grp.name, grp.short_name].some(g => uParts.groups.includes(g)) ? (
-                                <ListItem
-                                  key={idx}
-                                  button
-                                  disabled={
-                                    validated.disabled.groups.includes(grp.name) ||
-                                    validated.disabled.groups.includes(grp.short_name)
-                                  }
-                                  selected={
-                                    validated.parts.groups.includes(grp.name) ||
-                                    validated.parts.groups.includes(grp.short_name)
-                                  }
-                                  onClick={() => toggleGroups(grp)}
-                                >
-                                  <ListItemText style={{ textAlign: 'center' }} primary={grp.name} />
-                                </ListItem>
-                              ) : null;
-                            })}
-                          </List>
-                        </Card>
-                      </Box>
-                    ) : null}
-                    {isUser || uParts.subgroups.length !== 0 ? (
-                      <Card variant="outlined">
-                        <List disablePadding>
-                          {c12nDef.original_definition.subgroups.map((sgrp, idx) => {
-                            return isUser || [sgrp.name, sgrp.short_name].some(sg => uParts.subgroups.includes(sg)) ? (
+                          return (
+                            (isUser || [req.name, req.short_name].some(r => uParts.req.includes(r))) && (
                               <ListItem
                                 key={idx}
                                 button
                                 selected={
-                                  validated.parts.subgroups.includes(sgrp.name) ||
-                                  validated.parts.subgroups.includes(sgrp.short_name)
+                                  validated.parts.req.includes(req.name) || validated.parts.req.includes(req.short_name)
                                 }
-                                onClick={() => toggleSubGroups(sgrp)}
+                                onClick={() => toggleRequired(req)}
                               >
-                                <ListItemText style={{ textAlign: 'center' }} primary={sgrp.name} />
+                                <ListItemText style={{ textAlign: 'center' }} primary={req.name} />
                               </ListItem>
-                            ) : null;
+                            )
+                          );
+                        })}
+                      </List>
+                    </Card>
+                  </Grid>
+                )}
+                {(isUser || uParts.groups.length !== 0 || uParts.subgroups.length !== 0) && (
+                  <Grid item xs={12} md>
+                    {(isUser || uParts.groups.length !== 0) && (
+                      <div style={{ paddingBottom: sp2 }}>
+                        <Card variant="outlined">
+                          <List disablePadding>
+                            {c12nDef.original_definition.groups.map((grp, idx) => {
+                              return (
+                                (isUser || [grp.name, grp.short_name].some(g => uParts.groups.includes(g))) && (
+                                  <ListItem
+                                    key={idx}
+                                    button
+                                    disabled={
+                                      validated.disabled.groups.includes(grp.name) ||
+                                      validated.disabled.groups.includes(grp.short_name)
+                                    }
+                                    selected={
+                                      validated.parts.groups.includes(grp.name) ||
+                                      validated.parts.groups.includes(grp.short_name)
+                                    }
+                                    onClick={() => toggleGroups(grp)}
+                                  >
+                                    <ListItemText style={{ textAlign: 'center' }} primary={grp.name} />
+                                  </ListItem>
+                                )
+                              );
+                            })}
+                          </List>
+                        </Card>
+                      </div>
+                    )}
+                    {(isUser || uParts.subgroups.length !== 0) && (
+                      <Card variant="outlined">
+                        <List disablePadding>
+                          {c12nDef.original_definition.subgroups.map((sgrp, idx) => {
+                            return (
+                              (isUser || [sgrp.name, sgrp.short_name].some(sg => uParts.subgroups.includes(sg))) && (
+                                <ListItem
+                                  key={idx}
+                                  button
+                                  selected={
+                                    validated.parts.subgroups.includes(sgrp.name) ||
+                                    validated.parts.subgroups.includes(sgrp.short_name)
+                                  }
+                                  onClick={() => toggleSubGroups(sgrp)}
+                                >
+                                  <ListItemText style={{ textAlign: 'center' }} primary={sgrp.name} />
+                                </ListItem>
+                              )
+                            );
                           })}
                         </List>
                       </Card>
-                    ) : null}
+                    )}
                   </Grid>
-                ) : null}
+                )}
               </Grid>
             </DialogContent>
             <DialogActions>
@@ -339,8 +352,8 @@ export default function Classification({
       </>
     ) : (
       <Skeleton className={inline ? classes.inlineSkel : null} style={{ height: skelheight[size] }} />
-    )
-  ) : null;
+    ))
+  );
 }
 
 Classification.defaultProps = {

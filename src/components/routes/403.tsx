@@ -1,5 +1,4 @@
 import { useTheme } from '@material-ui/core';
-import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import BlockIcon from '@material-ui/icons/Block';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
@@ -15,23 +14,23 @@ const ForbiddenPage: React.FC<ForbiddenPageProps> = ({ disabled = false }) => {
   const theme = useTheme();
   return (
     <PageCenter width="65%">
-      <Box pt={6} textAlign="center" fontSize={200}>
+      <div style={{ paddingTop: theme.spacing(10), fontSize: 200 }}>
         <BlockIcon
           style={{ color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark }}
           fontSize="inherit"
         />
-      </Box>
-      <Box pb={2}>
+      </div>
+      <div style={{ paddingBottom: theme.spacing(2) }}>
         <Typography variant="h3">{t('title')}</Typography>
-      </Box>
+      </div>
       {disabled ? (
-        <Box>
+        <div>
           <Typography variant="h6">{t('disabled')}</Typography>
-        </Box>
+        </div>
       ) : (
-        <Box>
+        <div>
           <Typography variant="h6">{t('not_allowed')}</Typography>
-        </Box>
+        </div>
       )}
     </PageCenter>
   );

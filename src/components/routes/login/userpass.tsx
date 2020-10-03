@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, createStyles, makeStyles, TextField } from '@material-ui/core';
+import { Button, CircularProgress, createStyles, makeStyles, TextField } from '@material-ui/core';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -27,7 +27,7 @@ export function UserPassLogin({ onSubmit, buttonLoading, setPassword, setUsernam
 
   return (
     <form onSubmit={onSubmit}>
-      <Box display="flex" flexDirection="column">
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
         <TextField
           autoFocus
           inputProps={{ autoCorrect: 'off', autoCapitalize: 'off' }}
@@ -54,7 +54,7 @@ export function UserPassLogin({ onSubmit, buttonLoading, setPassword, setUsernam
           {t('button')}
           {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
         </Button>
-      </Box>
+      </div>
     </form>
   );
 }

@@ -1,36 +1,35 @@
-import Box from '@material-ui/core/Box';
+import { useTheme } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 import HourglassEmptyOutlinedIcon from '@material-ui/icons/HourglassEmptyOutlined';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
+import useAppContext from 'components/hooks/useAppContext';
 import ForbiddenPage from 'components/routes/403';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-type LockedPageProps = {
-  autoNotify: boolean;
-  hasTOS: boolean;
-};
-
-const LockedPage = ({ autoNotify, hasTOS }: LockedPageProps) => {
+const LockedPage = () => {
   const { t } = useTranslation(['locked']);
+  const { configuration } = useAppContext();
+  const theme = useTheme();
+
   return (
     <>
-      {hasTOS ? (
+      {configuration.ui.tos ? (
         <PageCenter width="65%">
-          <Box pt={6} textAlign="center" fontSize={200}>
+          <div style={{ paddingTop: theme.spacing(10), fontSize: 200 }}>
             <HourglassEmptyOutlinedIcon color="secondary" fontSize="inherit" />
-          </Box>
-          <Box pb={2}>
+          </div>
+          <div style={{ paddingBottom: theme.spacing(2) }}>
             <Typography variant="h3">{t('title')}</Typography>
-          </Box>
-          {autoNotify ? (
-            <Box>
+          </div>
+          {configuration.ui.tos_lockout_notify ? (
+            <div>
               <Typography variant="h6">{t('auto_notify')}</Typography>
-            </Box>
+            </div>
           ) : (
-            <Box>
+            <div>
               <Typography variant="h6">{t('contact_admin')}</Typography>
-            </Box>
+            </div>
           )}
         </PageCenter>
       ) : (

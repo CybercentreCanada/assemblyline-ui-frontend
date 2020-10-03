@@ -2,6 +2,7 @@ import AccountCircleOutlinedIcon from '@material-ui/icons/AccountCircleOutlined'
 import AccountTreeOutlinedIcon from '@material-ui/icons/AccountTreeOutlined';
 import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
 import AssignmentOutlinedIcon from '@material-ui/icons/AssignmentOutlined';
+import BlockIcon from '@material-ui/icons/Block';
 import BuildOutlinedIcon from '@material-ui/icons/BuildOutlined';
 import BusinessOutlinedIcon from '@material-ui/icons/BusinessOutlined';
 import ChromeReaderModeOutlinedIcon from '@material-ui/icons/ChromeReaderModeOutlined';
@@ -11,6 +12,7 @@ import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
 import FingerprintOutlinedIcon from '@material-ui/icons/FingerprintOutlined';
 import HelpOutlineOutlinedIcon from '@material-ui/icons/HelpOutlineOutlined';
 import LabelOutlinedIcon from '@material-ui/icons/LabelOutlined';
+import LinkOffIcon from '@material-ui/icons/LinkOff';
 import ListAltOutlinedIcon from '@material-ui/icons/ListAltOutlined';
 import MapOutlinedIcon from '@material-ui/icons/MapOutlined';
 import NotificationImportantOutlinedIcon from '@material-ui/icons/NotificationImportantOutlined';
@@ -44,6 +46,9 @@ export default function useMySitemap() {
   const { t } = useTranslation();
   return {
     routes: [
+      { path: '/forbidden', title: t('forbidden'), isRoot: true, icon: <BlockIcon /> },
+      { path: '/notfound', title: t('notfound'), isRoot: true, icon: <LinkOffIcon /> },
+
       { path: '/', title: t('drawer.submit'), isRoot: true, icon: <PublishOutlinedIcon /> },
       { path: '/submit', title: t('drawer.submit'), isRoot: true, icon: <PublishOutlinedIcon /> },
       { path: '/submissions', title: t('drawer.submissions'), isRoot: true, icon: <AmpStoriesOutlinedIcon /> },

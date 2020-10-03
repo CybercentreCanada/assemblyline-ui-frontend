@@ -27,10 +27,11 @@ export interface CustomChipProps {
   size?: 'tiny' | 'small' | 'medium';
   color?: PossibleColors;
   variant?: 'default' | 'outlined';
+  mono?: boolean;
   [propName: string]: any;
 }
 
-const useStyles = hasClick => {
+const useStyles = (hasClick, tiny) => {
   return makeStyles(theme => ({
     square: {
       borderRadius: '3px',
@@ -44,6 +45,14 @@ const useStyles = hasClick => {
     tiny: {
       height: '20px',
       fontSize: '0.75rem'
+    },
+    label_tiny: {
+      paddingLeft: '6px',
+      paddingRight: '6px'
+    },
+    mono: {
+      fontFamily: 'monospace',
+      fontSize: tiny ? '1rem' : '1.15rem'
     },
     // Filled
     default: {
@@ -112,15 +121,20 @@ const useStyles = hasClick => {
   }))();
 };
 
-export default function CustomChip({ className, type, size, color, variant, ...otherProps }: CustomChipProps) {
+export default function CustomChip({ className, type, size, color, variant, mono, ...otherProps }: CustomChipProps) {
   const hasClick = otherProps.onClick !== undefined && otherProps.onClick !== null;
-  const classes = useStyles(hasClick);
+  const classes = useStyles(hasClick, size === 'tiny');
 
   // Define classnames maps
   const typeClassMap = {
     square: classes.square,
     classification: classes.classification,
     round: null
+  };
+  const sizeLabelClassMap = {
+    tiny: classes.label_tiny,
+    small: null,
+    medium: null
   };
   const sizeClassMap = {
     tiny: classes.tiny,
@@ -154,12 +168,20 @@ export default function CustomChip({ className, type, size, color, variant, ...o
     typeClassMap[type],
     sizeClassMap[size],
     variant === 'outlined' ? colorClassMap[`${color}_outlined`] : colorClassMap[color],
+    mono ? classes.mono : null,
     className
   );
 
   // Build chip based on computed values
   return (
-    <Chip className={appliedClassName} size={sizeMap[size]} color={colorMap[color]} variant={variant} {...otherProps} />
+    <Chip
+      classes={{ label: sizeLabelClassMap[size] }}
+      className={appliedClassName}
+      size={sizeMap[size]}
+      color={colorMap[color]}
+      variant={variant}
+      {...otherProps}
+    />
   );
 }
 
@@ -168,5 +190,6 @@ CustomChip.defaultProps = {
   type: 'round' as 'round',
   size: 'medium' as 'medium',
   color: 'default' as 'default',
-  variant: 'default' as 'default'
+  variant: 'default' as 'default',
+  mono: false
 };
