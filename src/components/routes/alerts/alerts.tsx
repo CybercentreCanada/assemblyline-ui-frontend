@@ -19,7 +19,7 @@ import AlertsFiltersSelected from './alerts-filters-selected';
 import AlertsWorkflowActions from './alerts-workflow-actions';
 import useAlerts, { AlertItem } from './hooks/useAlerts';
 
-const PAGE_SIZE = 50;
+const PAGE_SIZE = 10;
 
 const useStyles = makeStyles(theme => ({
   drawerInner: {
@@ -138,7 +138,7 @@ const Alerts: React.FC = () => {
 
   // Handler for when loading more alerts [read bottom of scroll area]
   const _onLoadMore = () => {
-    setScrollReset(false);
+    // setScrollReset(false);
     onLoadMore();
   };
 
@@ -330,7 +330,6 @@ const Alerts: React.FC = () => {
                   ]}
                   backgroundColor={theme.palette.background.default}
                   elevation={0}
-                  isSticky
                 />
                 <AlertDetails item={splitPanel.item} />
               </Box>

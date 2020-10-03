@@ -7,7 +7,8 @@ const useMetaListStyles = makeStyles(theme => ({
     flexDirection: 'row',
     overflow: 'auto',
     width: '100%',
-    height: '100%'
+    height: '100%',
+    outline: 'none'
   },
   inner: {
     position: 'relative',

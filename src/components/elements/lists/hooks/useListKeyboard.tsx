@@ -5,19 +5,32 @@ import { useState } from 'react';
 const THROTTLER = new Throttler(10);
 
 // Ensure the list element at specified position is into view.
-const selectionScroller = (target: HTMLDivElement, position: number, rowHeight?: number) => {
+const selectionScroller = (target: HTMLDivElement, position: number, rowHeight: number) => {
+  // We take care of all scrolling. [impl. is same has same behaviour as 'block:nearest'].
+
   const scrollToEl = target.querySelector(`[data-listitem-position="${position}"]`);
+  const { top: targetTop, bottom: targetBottom, height: targetHeight } = target.getBoundingClientRect();
+
+  // We compute the scrolling factor based on whether the next element to scroll to is already render
+  //  in the DOM.
   if (scrollToEl) {
-    scrollToEl.scrollIntoView({ block: 'nearest' });
+    // If there's already an element rendered we use that to compute srolling factor.
+    const { top, height } = scrollToEl.getBoundingClientRect();
+    if (top < targetTop) {
+      target.scrollBy({ top: top - targetTop });
+    } else if (top + height > targetBottom) {
+      target.scrollBy({ top: top + height - targetBottom });
+    }
   } else {
-    // Items might not be rendered yet because of we might have only rendered what's
-    //  within visual range. e.g. metalist.
-    // Compute scrollby relative to current position.
-    const sT = target.scrollTop;
-    const tP = position * rowHeight;
-    const scrollBy = tP - sT;
-    if (scrollBy !== 0) {
-      target.scrollBy({ top: scrollBy });
+    // If the next element isn't already rnedered then we fallback on the specified rowHeight.
+    const frameTop = target.scrollTop;
+    const frameBottom = frameTop + targetHeight;
+    const top = position * rowHeight;
+    const bottom = top + rowHeight;
+    if (top < frameTop) {
+      target.scrollBy({ top: top - frameTop });
+    } else if (bottom > frameBottom) {
+      target.scrollBy({ top: bottom - frameBottom });
     }
   }
 };
@@ -57,7 +70,6 @@ export default function useListKeyboard({
 
     // Only run events after 10ms after receiving last one.
     THROTTLER.throttle(() => {
-      // console.log('running...');
       // Handle each keys.
       if (isEnter(key)) {
         // key[ENTER ]: handler

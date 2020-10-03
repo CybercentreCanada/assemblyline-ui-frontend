@@ -111,8 +111,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
         setState({
           loading: false,
           total,
-          buffer: new MetaListBuffer().push(parseResult(_items, query.getOffsetNumber()))
-          // items: parseResult(_items, query.getOffsetNumber())
+          buffer: new MetaListBuffer().push(parseResult(_items, 0))
         });
         if (onSuccess) {
           onSuccess();
@@ -123,8 +122,12 @@ export default function useAlerts(pageSize: number): UsingAlerts {
 
   // Hook API: get alerts for specified index.
   const onLoadMore = (onSuccess?: () => void) => {
-    setState({ ...state, loading: true });
+    console.log('loading more...');
+    // Move offset by one increment.
     query.tickOffset();
+    // reference the current offset now incase it changes again before callback is executed
+    const _offset = query.getOffsetNumber();
+    setState({ ...state, loading: true });
     apiCall({
       url: buildUrl(),
       onSuccess: api_data => {
@@ -132,7 +135,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
         setState({
           loading: false,
           total,
-          buffer: state.buffer.push(parseResult(_items, query.getOffsetNumber())).build()
+          buffer: state.buffer.push(parseResult(_items, _offset)).build()
         });
         if (onSuccess) {
           onSuccess();
