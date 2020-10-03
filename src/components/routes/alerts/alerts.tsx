@@ -19,7 +19,7 @@ import AlertsFiltersSelected from './alerts-filters-selected';
 import AlertsWorkflowActions from './alerts-workflow-actions';
 import useAlerts, { AlertItem } from './hooks/useAlerts';
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 50;
 
 const useStyles = makeStyles(theme => ({
   drawerInner: {
