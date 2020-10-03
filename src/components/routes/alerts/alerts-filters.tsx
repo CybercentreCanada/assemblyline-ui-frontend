@@ -4,7 +4,6 @@ import { Autocomplete } from '@material-ui/lab';
 import { SearchFilter } from 'components/elements/search/search-query';
 import CustomChip from 'components/visual/CustomChip';
 import React, { useEffect, useState } from 'react';
-// import { AlertFilterItem } from './hooks/useAlerts';
 
 export const DEFAULT_TC = { value: '4d', label: '4 Days' };
 
@@ -75,13 +74,6 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
   const [selectedQueryFilters, setSelectedQueryFilters] = useState<{ filter: SearchFilter; isValue: boolean }[]>(
     decorateQueryFilters(selectedFilters.queries, valueFilters)
   );
-
-  // const [selectedValueFilters, setSelectedValueFilters] = useState<AlertFilterItem[]>(
-  //   selectedFilters.queries.filter(svf => valueFilters.some(vf => vf.value === svf.value))
-  // );
-  // const [nonValueFilters] = useState<AlertFilterItem[]>(
-  //   selectedFilters.queries.filter(svf => valueFilters.some(vf => vf.value !== svf.value))
-  // );
 
   const onTcFilterChange = (value: { value: string; label: string }) => {
     setSelectedTc(value);

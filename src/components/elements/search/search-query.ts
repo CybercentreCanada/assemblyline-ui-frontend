@@ -1,13 +1,13 @@
-// enum SearchFilterType {
-//   STATUS = 'status',
-//   PRIORITY = 'priority',
-//   LABEL = 'label',
-//   VALUE = 'value'
-// }
+export enum SearchFilterType {
+  STATUS = 'status',
+  PRIORITY = 'priority',
+  LABEL = 'label',
+  QUERY = 'query'
+}
 
 export interface SearchFilter {
   id: number | string;
-  type: string;
+  type: SearchFilterType;
   label: string;
   value: any;
   object: any;
@@ -164,11 +164,17 @@ export default class SearchQuery {
 
     // TODO: need a way to differentiate value/favorite filters!
 
-    const resolveType = () => {
-      if (type === 'status' || type === 'priority' || type === 'label') {
-        return type;
+    const resolveType = (): SearchFilterType => {
+      switch (type) {
+        case 'status':
+          return SearchFilterType.STATUS;
+        case 'priority':
+          return SearchFilterType.PRIORITY;
+        case 'label':
+          return SearchFilterType.LABEL;
+        default:
+          return SearchFilterType.QUERY;
       }
-      return 'query';
     };
 
     return {
