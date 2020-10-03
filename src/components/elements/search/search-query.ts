@@ -162,6 +162,9 @@ export default class SearchQuery {
   public static parseFilterValue(id: string | number, filter: string): SearchFilter {
     const [type] = filter.split(':');
 
+    // TODO: need a way to differentiate value/favorite filters!
+    sdfsd;
+
     const resolveType = () => {
       if (type === 'status' || type === 'priority' || type === 'label') {
         return type;
