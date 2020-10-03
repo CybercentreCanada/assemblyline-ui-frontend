@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import { Box, Button, Divider, makeStyles, TextField, Typography, useTheme } from '@material-ui/core';
+import { Button, Divider, makeStyles, TextField, Typography, useTheme } from '@material-ui/core';
 import { Autocomplete } from '@material-ui/lab';
 import { SearchFilter } from 'components/elements/search/search-query';
 import CustomChip from 'components/visual/CustomChip';
@@ -127,9 +127,9 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
 
   const renderOption = (item: SearchFilter) => {
     return (
-      <Box>
+      <div>
         <CustomChip label={item.object.count} size="tiny" /> {item.label}
-      </Box>
+      </div>
     );
   };
 
@@ -144,11 +144,11 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
   }, [selectedFilters, valueFilters]);
 
   return (
-    <Box>
+    <div>
       <Typography variant="h6">Filters</Typography>
       <Divider />
-      <Box mt={theme.spacing(0.4)} p={theme.spacing(0.1)}>
-        <Box>
+      <div style={{ margin: theme.spacing(1) }}>
+        <div style={{ marginBottom: theme.spacing(1) }}>
           <Autocomplete
             fullWidth
             classes={{ option: classes.option }}
@@ -164,8 +164,8 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
             renderInput={params => <TextField {...params} label="Time Constraint" variant="outlined" />}
             onChange={(event, value) => onTcFilterChange(value as { value: string; label: string })}
           />
-        </Box>
-        <Box mt={2}>
+        </div>
+        <div style={{ marginBottom: theme.spacing(1) }}>
           <Autocomplete
             fullWidth
             classes={{ option: classes.option }}
@@ -183,8 +183,8 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
             renderInput={params => <TextField {...params} label="Group By" variant="outlined" />}
             onChange={(event, value) => onGroupByFilterChange(value as { value: string; label: string })}
           />
-        </Box>
-        <Box mt={2}>
+        </div>
+        <div style={{ marginBottom: theme.spacing(1) }}>
           <Autocomplete
             fullWidth
             multiple
@@ -197,8 +197,8 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
             renderInput={params => <TextField {...params} label="Statuses" variant="outlined" />}
             onChange={(event, value) => onStatusFilterChange(value as SearchFilter[])}
           />
-        </Box>
-        <Box mt={2}>
+        </div>
+        <div style={{ marginBottom: theme.spacing(1) }}>
           <Autocomplete
             fullWidth
             multiple
@@ -211,8 +211,8 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
             renderInput={params => <TextField {...params} label="Priorities" variant="outlined" />}
             onChange={(event, value) => onPriorityFilterChange(value as SearchFilter[])}
           />
-        </Box>
-        <Box mt={2}>
+        </div>
+        <div style={{ marginBottom: theme.spacing(1) }}>
           <Autocomplete
             fullWidth
             multiple
@@ -225,47 +225,36 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
             renderInput={params => <TextField {...params} label="Labels" variant="outlined" />}
             onChange={(event, value) => onLabelFilterChange(value as SearchFilter[])}
           />
-        </Box>
-        <Box mt={2}>
+        </div>
+        <div style={{ marginBottom: theme.spacing(1) }}>
           <Autocomplete
             fullWidth
             multiple
             classes={{ option: classes.option }}
             options={valueFilters}
             value={selectedQueryFilters.filter(filter => filter.isValue).map(f => f.filter)}
-            getOptionLabel={option => {
-              console.log(option);
-              return option.label;
-            }}
+            getOptionLabel={option => option.label}
             getOptionSelected={isSelected}
             renderOption={renderOption}
             renderInput={params => <TextField {...params} label="Values" variant="outlined" />}
             onChange={(event, value) => onValueFilterChange(value as SearchFilter[])}
           />
-        </Box>
-        {/* <Box mt={2}>
-          <Typography>Personal Filters</Typography>
-          <Divider />
-        </Box>
-        <Box mt={2}>
-          <Typography>Global Filters</Typography>
-          <Divider />
-        </Box> */}
-      </Box>
-      <Box mt={1} display="flex" flexDirection="row">
+        </div>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'row', marginTop: theme.spacing(1) }}>
         <Button variant="contained" color="primary" onClick={_onApplyBtnClick}>
           Apply
         </Button>
-        <Box mr={1} />
+        <div style={{ marginRight: theme.spacing(1) }} />
         <Button variant="contained" onClick={onClearBtnClick} size="small">
           Clear
         </Button>
-        <Box flex={1} />
+        <div style={{ flex: 1 }} />
         <Button variant="contained" onClick={onCancelBtnClick} size="small">
           Cancel
         </Button>
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 };
 

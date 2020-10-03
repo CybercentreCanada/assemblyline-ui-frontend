@@ -35,6 +35,11 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({ disableAct
     onChange({ ...filters, queries: _queries });
   };
 
+  // const onDeleteFavorite = (item: Favorite) => {
+  //   const _values = filters.favorites.filter(s => s.name !== item.name);
+  //   onChange({ ...filters, favorites: _values });
+  // };
+
   return (
     <div>
       <div>

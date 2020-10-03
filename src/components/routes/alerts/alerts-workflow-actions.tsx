@@ -113,15 +113,15 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
           />
         </div>
       </div>
-      <div style={{ margin: theme.spacing(1), display: 'flex', flexDirection: 'row' }}>
+      <div style={{ display: 'flex', flexDirection: 'row', marginTop: theme.spacing(1) }}>
         {/* <Button variant="contained" color="primary" onClick={_onApplyBtnClick}>
           Apply
         </Button>
-        <div mr={1} />
+        <div style={{ marginRight: theme.spacing(1) }} />
         <Button variant="contained" onClick={onClearBtnClick} size="small">
           Clear
         </Button>
-        <div flex={1} />
+        <div style={{ flex: 1 }} />
         <Button variant="contained" onClick={onCancelBtnClick} size="small">
           Cancel
         </Button> */}
