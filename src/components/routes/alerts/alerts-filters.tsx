@@ -5,10 +5,13 @@ import { SearchFilter } from 'components/elements/search/search-query';
 import CustomChip from 'components/visual/CustomChip';
 import React, { useEffect, useState } from 'react';
 
+// Default TimeConstraint(TC) value..
 export const DEFAULT_TC = { value: '4d', label: '4 Days' };
 
+// Default GroupBy value.
 export const DEFAULT_GROUPBY = { value: 'file.sha256', label: 'file.sha256' };
 
+// Default filters.
 export const DEFAULT_FILTERS = {
   tc: DEFAULT_TC,
   groupBy: DEFAULT_GROUPBY,
@@ -18,6 +21,7 @@ export const DEFAULT_FILTERS = {
   queries: []
 };
 
+// Decorate each filter in the specified 'queryFilters' list and indicate whether they are a valueFilter.
 const decorateQueryFilters = (queryFilters: SearchFilter[], valueFilters) => {
   return queryFilters.map(qf => ({
     filter: qf,
@@ -25,12 +29,14 @@ const decorateQueryFilters = (queryFilters: SearchFilter[], valueFilters) => {
   }));
 };
 
+// Some styles.
 const useStyles = makeStyles(theme => ({
   option: {
     backgroundColor: theme.palette.background.default
   }
 }));
 
+// Specification interface defining the state of the current filter selections.
 export interface AlertFilterSelections {
   tc: { value: string; label: string };
   groupBy: { value: string; label: string };
@@ -40,6 +46,7 @@ export interface AlertFilterSelections {
   queries: SearchFilter[];
 }
 
+// Specificatino interface of this component's properties.
 interface AlertsFiltersProps {
   selectedFilters: AlertFilterSelections;
   valueFilters: SearchFilter[];
@@ -51,6 +58,7 @@ interface AlertsFiltersProps {
   onCancelBtnClick: () => void;
 }
 
+// Implementation of th AlertsFilter component.
 const AlertsFilters: React.FC<AlertsFiltersProps> = ({
   selectedFilters,
   valueFilters,
@@ -61,9 +69,11 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
   onClearBtnClick,
   onCancelBtnClick
 }) => {
+  // Hooks...
   const theme = useTheme();
   const classes = useStyles();
 
+  // Define some states for controlled components..
   const [selectedTc, setSelectedTc] = useState<{ value: string; label: string }>(selectedFilters.tc || DEFAULT_TC);
   const [selectedGroupBy, setSelectedGroupBy] = useState<{ value: string; label: string }>(
     selectedFilters.groupBy || DEFAULT_GROUPBY
@@ -75,34 +85,40 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
     decorateQueryFilters(selectedFilters.queries, valueFilters)
   );
 
+  // Handler[onChange]: for the 'TC' Autocomplete component.
   const onTcFilterChange = (value: { value: string; label: string }) => {
     setSelectedTc(value);
   };
 
+  // Handler[onChange]: for the 'Group By' Autocomplete component.
   const onGroupByFilterChange = (value: { value: string; label: string }) => {
     setSelectedGroupBy(value);
   };
 
+  // Handler[onChange]: for the 'Status' Autocomplete component.
   const onStatusFilterChange = (selections: SearchFilter[]) => {
     setSelectedStatusFilters(selections);
   };
 
+  // Handler[onChange]: for the 'Priority' Autocomplete component.
   const onPriorityFilterChange = (selections: SearchFilter[]) => {
     setSelectedPriorityFilters(selections);
   };
 
+  // Handler[onChange]: for the 'Label' Autocomplete component.
   const onLabelFilterChange = (selections: SearchFilter[]) => {
     setSelectedLabelFilters(selections);
   };
 
+  // Handler[onChange]: for the 'Value' Autocomplete component.
   const onValueFilterChange = (selections: SearchFilter[]) => {
     const _selections = selections.map(filter => ({ filter, isValue: true }));
     const nonValueFilters = selectedQueryFilters.filter(sf => !sf.isValue);
     setSelectedQueryFilters([..._selections, ...nonValueFilters]);
   };
 
+  // Handler: when clicking on 'Apply' button.
   const _onApplyBtnClick = () => {
-    console.log(selectedFilters);
     onApplyBtnClick({
       tc: selectedTc,
       groupBy: selectedGroupBy,
@@ -113,10 +129,12 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
     });
   };
 
+  // Indicates if an Autocomplete option is selected.
   const isSelected = (option, value): boolean => {
     return option.value === value.value;
   };
 
+  // Render method of a single Autocomplete component option.
   const renderOption = (item: SearchFilter) => {
     return (
       <div>
