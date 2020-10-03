@@ -163,13 +163,12 @@ export default class SearchQuery {
     const [type] = filter.split(':');
 
     // TODO: need a way to differentiate value/favorite filters!
-    sdfsd;
 
     const resolveType = () => {
       if (type === 'status' || type === 'priority' || type === 'label') {
         return type;
       }
-      return 'value';
+      return 'query';
     };
 
     return {

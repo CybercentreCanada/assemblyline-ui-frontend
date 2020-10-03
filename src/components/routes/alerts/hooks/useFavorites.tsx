@@ -4,7 +4,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import { useEffect, useState } from 'react';
 
 export interface Favorite {
-  classifiction: string;
+  classification: string;
   name: string;
   query: string;
   created_by: string;

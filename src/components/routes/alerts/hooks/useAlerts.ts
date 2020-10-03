@@ -1,19 +1,19 @@
 import { MetaListItem } from 'components/elements/lists/metalist/metalist';
 /* eslint-disable react-hooks/exhaustive-deps */
 import MetaListBuffer from 'components/elements/lists/metalist/metalist-buffer';
-import SearchQuery from 'components/elements/search/search-query';
+import SearchQuery, { SearchFilter } from 'components/elements/search/search-query';
 import useAppContext from 'components/hooks/useAppContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { ALField } from 'components/hooks/useMyUser';
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
-export interface AlertFilterItem {
-  id: number | string;
-  label: string;
-  value: any;
-  object: any;
-}
+// export interface AlertFilterItem {
+//   id: number | string;
+//   label: string;
+//   value: any;
+//   object: any;
+// }
 
 export interface AlertFile {
   md5: string;
@@ -69,10 +69,10 @@ interface UsingAlerts {
   total: number;
   buffer: MetaListBuffer;
   query: SearchQuery;
-  labelFilters: AlertFilterItem[];
-  priorityFilters: AlertFilterItem[];
-  statusFilters: AlertFilterItem[];
-  valueFilters: AlertFilterItem[];
+  labelFilters: SearchFilter[];
+  priorityFilters: SearchFilter[];
+  statusFilters: SearchFilter[];
+  valueFilters: SearchFilter[];
   onLoad: (onSuccess?: () => void) => void;
   onLoadMore: (onSuccess?: () => void) => void;
   onGet: (id: string, onSuccess: (alert: AlertItem) => void) => void;
@@ -85,10 +85,10 @@ export default function useAlerts(pageSize: number): UsingAlerts {
   const { user, indexes: fieldIndexes, configuration } = useAppContext();
   const [query] = useState<SearchQuery>(new SearchQuery(location.pathname, location.search, pageSize));
   const [fields, setFields] = useState<ALField[]>([]);
-  const [valueFilters, setValueFilters] = useState<AlertFilterItem[]>([]);
-  const [statusFilters, setStatusFilters] = useState<AlertFilterItem[]>([]);
-  const [priorityFilters, setPriorityFilters] = useState<AlertFilterItem[]>([]);
-  const [labelFilters, setLabelFilters] = useState<AlertFilterItem[]>([]);
+  const [valueFilters, setValueFilters] = useState<SearchFilter[]>([]);
+  const [statusFilters, setStatusFilters] = useState<SearchFilter[]>([]);
+  const [priorityFilters, setPriorityFilters] = useState<SearchFilter[]>([]);
+  const [labelFilters, setLabelFilters] = useState<SearchFilter[]>([]);
   const [state, setState] = useState<{ loading: boolean; buffer: MetaListBuffer; total: number }>({
     loading: true,
     total: 0,
@@ -156,6 +156,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
         const { api_response: statuses } = api_data;
         const msItems = Object.keys(statuses).map((k, i) => ({
           id: i,
+          type: 'status',
           label: k,
           value: `status:${k}`,
           object: { count: statuses[k] }
@@ -173,6 +174,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
         const { api_response: priorities } = api_data;
         const msItems = Object.keys(priorities).map((k, i) => ({
           id: i,
+          type: 'priority',
           label: k,
           value: `priority:${k}`,
           object: { count: priorities[k] }
@@ -190,6 +192,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
         const { api_response: labels } = api_data;
         const msItems = Object.keys(labels).map((k, i) => ({
           id: i,
+          type: 'label',
           label: k,
           value: `label:${k}`,
           object: { count: labels[k] }
@@ -211,6 +214,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
             const vkv = value[vk];
             msItems.push({
               id: `${ki}.${vki}}`,
+              type: 'query',
               label: `${k}:${vk}`,
               value: `${k}:"${vk}"`,
               object: { count: vkv }

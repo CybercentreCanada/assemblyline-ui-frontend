@@ -1,10 +1,9 @@
-import { Box, Divider, makeStyles, TextField, Typography, useTheme } from '@material-ui/core';
+import { Divider, makeStyles, TextField, Typography, useTheme } from '@material-ui/core';
 import { Alert, Autocomplete } from '@material-ui/lab';
-import CustomChip from 'components/visual/CustomChip';
+import { SearchFilter } from 'components/elements/search/search-query';
 import React, { useState } from 'react';
 import { AlertFilterSelections } from './alerts-filters';
 import AlertsFiltersSelected from './alerts-filters-selected';
-import { AlertFilterItem } from './hooks/useAlerts';
 
 const useStyles = makeStyles(theme => ({
   option: {
@@ -15,9 +14,9 @@ const useStyles = makeStyles(theme => ({
 interface AlertsWorkflowActionsProps {
   affectedItemCount: number;
   selectedFilters: AlertFilterSelections;
-  statusFilters: AlertFilterItem[];
-  priorityFilters: AlertFilterItem[];
-  labelFilters: AlertFilterItem[];
+  statusFilters: SearchFilter[];
+  priorityFilters: SearchFilter[];
+  labelFilters: SearchFilter[];
 }
 
 const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
@@ -29,19 +28,19 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
 }) => {
   const classes = useStyles();
   const theme = useTheme();
-  const [selectedStatuses, setSelectedStatuses] = useState<AlertFilterItem[]>([]);
-  const [selectedPriorities, setSelectedPriorities] = useState<AlertFilterItem[]>([]);
-  const [selectedLabels, setSelectedLabels] = useState<AlertFilterItem[]>([]);
+  const [selectedStatuses, setSelectedStatuses] = useState<SearchFilter[]>([]);
+  const [selectedPriorities, setSelectedPriorities] = useState<SearchFilter[]>([]);
+  const [selectedLabels, setSelectedLabels] = useState<SearchFilter[]>([]);
 
-  const onStatusChange = (selections: AlertFilterItem[]) => {
+  const onStatusChange = (selections: SearchFilter[]) => {
     setSelectedStatuses(selections);
   };
 
-  const onPriorityChange = (selections: AlertFilterItem[]) => {
+  const onPriorityChange = (selections: SearchFilter[]) => {
     setSelectedPriorities(selections);
   };
 
-  const onLabelChange = (selections: AlertFilterItem[]) => {
+  const onLabelChange = (selections: SearchFilter[]) => {
     setSelectedLabels(selections);
   };
 
@@ -49,11 +48,12 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
     return option.value === value.value;
   };
 
-  const renderOption = (item: AlertFilterItem) => {
+  const renderOption = (item: SearchFilter) => {
     return (
-      <Box>
-        <CustomChip label={item.object.count} size="tiny" /> {item.label}
-      </Box>
+      <div>
+        {/* <CustomChip label={item.object.count} size="tiny" /> {item.label} */}
+        {item.label}
+      </div>
     );
   };
 
@@ -81,7 +81,7 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
             getOptionSelected={isSelected}
             renderOption={renderOption}
             renderInput={params => <TextField {...params} label="Statuses" variant="outlined" />}
-            onChange={(event, value) => onStatusChange(value as AlertFilterItem[])}
+            onChange={(event, value) => onStatusChange(value as SearchFilter[])}
           />
         </div>
         <div style={{ marginBottom: theme.spacing(1) }}>
@@ -95,7 +95,7 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
             getOptionSelected={isSelected}
             renderOption={renderOption}
             renderInput={params => <TextField {...params} label="Priorities" variant="outlined" />}
-            onChange={(event, value) => onPriorityChange(value as AlertFilterItem[])}
+            onChange={(event, value) => onPriorityChange(value as SearchFilter[])}
           />
         </div>
         <div style={{ marginBottom: theme.spacing(1) }}>
@@ -109,7 +109,7 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
             getOptionSelected={isSelected}
             renderOption={renderOption}
             renderInput={params => <TextField {...params} label="Labels" variant="outlined" />}
-            onChange={(event, value) => onLabelChange(value as AlertFilterItem[])}
+            onChange={(event, value) => onLabelChange(value as SearchFilter[])}
           />
         </div>
       </div>

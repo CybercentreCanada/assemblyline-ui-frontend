@@ -1,9 +1,8 @@
-import { Box } from '@material-ui/core';
+import { useTheme } from '@material-ui/core';
 import { ChipList } from 'components/elements/mui/chips';
+import { SearchFilter } from 'components/elements/search/search-query';
 import React from 'react';
 import { AlertFilterSelections } from './alerts-filters';
-import { AlertFilterItem } from './hooks/useAlerts';
-import { Favorite } from './hooks/useFavorites';
 
 interface AlertFiltersSelectedProps {
   disableActions?: boolean;
@@ -12,41 +11,38 @@ interface AlertFiltersSelectedProps {
 }
 
 const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({ disableActions = false, filters, onChange }) => {
-  const { tc, groupBy, statuses, priorities, labels, values, favorites } = filters;
+  const theme = useTheme();
 
-  const onDeleteStatus = (item: AlertFilterItem) => {
+  const { tc, groupBy, statuses, priorities, labels, queries } = filters;
+
+  const onDeleteStatus = (item: SearchFilter) => {
     const _statuses = filters.statuses.filter(s => s.value !== item.value);
     onChange({ ...filters, statuses: _statuses });
   };
 
-  const onDeletePriority = (item: AlertFilterItem) => {
+  const onDeletePriority = (item: SearchFilter) => {
     const _priorities = filters.priorities.filter(s => s.value !== item.value);
     onChange({ ...filters, priorities: _priorities });
   };
 
-  const onDeleteLabel = (item: AlertFilterItem) => {
+  const onDeleteLabel = (item: SearchFilter) => {
     const _labels = filters.labels.filter(s => s.value !== item.value);
     onChange({ ...filters, labels: _labels });
   };
 
-  const onDeleteValue = (item: AlertFilterItem) => {
-    const _values = filters.values.filter(s => s.value !== item.value);
-    onChange({ ...filters, values: _values });
-  };
-
-  const onDeleteFavorite = (item: Favorite) => {
-    const _values = filters.favorites.filter(s => s.name !== item.name);
-    onChange({ ...filters, favorites: _values });
+  const onDeleteQuery = (item: SearchFilter) => {
+    const _queries = filters.queries.filter(s => s.value !== item.value);
+    onChange({ ...filters, queries: _queries });
   };
 
   return (
-    <Box>
-      <Box>
+    <div>
+      <div>
         Time Constraint = {tc.label}, Group by = {groupBy.label}
-      </Box>
-      <Box>
+      </div>
+      <div style={{ marginTop: theme.spacing(1) }}>
         {statuses.length ? (
-          <Box display="inline-block" mt={1}>
+          <div style={{ display: 'inline-block' }}>
             <ChipList
               items={statuses.map(v => ({
                 variant: 'outlined',
@@ -54,10 +50,10 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({ disableAct
                 onDelete: !disableActions ? () => onDeleteStatus(v) : null
               }))}
             />
-          </Box>
+          </div>
         ) : null}
         {priorities.length ? (
-          <Box display="inline-block" mt={1}>
+          <div style={{ display: 'inline-block' }}>
             <ChipList
               items={priorities.map(v => ({
                 variant: 'outlined',
@@ -65,10 +61,10 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({ disableAct
                 onDelete: !disableActions ? () => onDeletePriority(v) : null
               }))}
             />
-          </Box>
+          </div>
         ) : null}
         {labels.length ? (
-          <Box display="inline-block" mt={1}>
+          <div style={{ display: 'inline-block' }}>
             <ChipList
               items={labels.map(v => ({
                 variant: 'outlined',
@@ -76,21 +72,21 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({ disableAct
                 onDelete: !disableActions ? () => onDeleteLabel(v) : null
               }))}
             />
-          </Box>
+          </div>
         ) : null}
-        {values.length ? (
-          <Box display="inline-block" mt={1}>
+        {queries.length ? (
+          <div style={{ display: 'inline-block' }}>
             <ChipList
-              items={values.map(v => ({
+              items={queries.map(v => ({
                 variant: 'outlined',
                 label: v.value,
-                onDelete: !disableActions ? () => onDeleteValue(v) : null
+                onDelete: !disableActions ? () => onDeleteQuery(v) : null
               }))}
             />
-          </Box>
+          </div>
         ) : null}
-        {values.length ? (
-          <Box display="inline-block" mt={1}>
+        {/* {values.length ? (
+          <div display="inline-block" mt={1}>
             <ChipList
               items={favorites.map(f => ({
                 variant: 'outlined',
@@ -98,10 +94,10 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({ disableAct
                 onDelete: !disableActions ? () => onDeleteFavorite(f) : null
               }))}
             />
-          </Box>
-        ) : null}
-      </Box>
-    </Box>
+          </div>
+        ) : null} */}
+      </div>
+    </div>
   );
 };
 

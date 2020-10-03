@@ -1,10 +1,10 @@
 /* eslint-disable no-param-reassign */
 import { Box, Button, Divider, makeStyles, TextField, Typography, useTheme } from '@material-ui/core';
 import { Autocomplete } from '@material-ui/lab';
+import { SearchFilter } from 'components/elements/search/search-query';
 import CustomChip from 'components/visual/CustomChip';
 import React, { useEffect, useState } from 'react';
-import { AlertFilterItem } from './hooks/useAlerts';
-import { Favorite } from './hooks/useFavorites';
+// import { AlertFilterItem } from './hooks/useAlerts';
 
 export const DEFAULT_TC = { value: '4d', label: '4 Days' };
 
@@ -13,11 +13,17 @@ export const DEFAULT_GROUPBY = { value: 'file.sha256', label: 'file.sha256' };
 export const DEFAULT_FILTERS = {
   tc: DEFAULT_TC,
   groupBy: DEFAULT_GROUPBY,
-  values: [],
   statuses: [],
   priorities: [],
   labels: [],
-  favorites: []
+  queries: []
+};
+
+const decorateQueryFilters = (queryFilters: SearchFilter[], valueFilters) => {
+  return queryFilters.map(qf => ({
+    filter: qf,
+    isValue: valueFilters.some(vf => vf.value === qf.value)
+  }));
 };
 
 const useStyles = makeStyles(theme => ({
@@ -29,19 +35,18 @@ const useStyles = makeStyles(theme => ({
 export interface AlertFilterSelections {
   tc: { value: string; label: string };
   groupBy: { value: string; label: string };
-  values: AlertFilterItem[];
-  statuses: AlertFilterItem[];
-  priorities: AlertFilterItem[];
-  labels: AlertFilterItem[];
-  favorites: Favorite[];
+  statuses: SearchFilter[];
+  priorities: SearchFilter[];
+  labels: SearchFilter[];
+  queries: SearchFilter[];
 }
 
 interface AlertsFiltersProps {
   selectedFilters: AlertFilterSelections;
-  valueFilters: AlertFilterItem[];
-  statusFilters: AlertFilterItem[];
-  priorityFilters: AlertFilterItem[];
-  labelFilters: AlertFilterItem[];
+  valueFilters: SearchFilter[];
+  statusFilters: SearchFilter[];
+  priorityFilters: SearchFilter[];
+  labelFilters: SearchFilter[];
   onApplyBtnClick: (filters: AlertFilterSelections) => void;
   onClearBtnClick: () => void;
   onCancelBtnClick: () => void;
@@ -59,14 +64,24 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
 }) => {
   const theme = useTheme();
   const classes = useStyles();
+
   const [selectedTc, setSelectedTc] = useState<{ value: string; label: string }>(selectedFilters.tc || DEFAULT_TC);
   const [selectedGroupBy, setSelectedGroupBy] = useState<{ value: string; label: string }>(
     selectedFilters.groupBy || DEFAULT_GROUPBY
   );
-  const [selectedStatusFilters, setSelectedStatusFilters] = useState<AlertFilterItem[]>(selectedFilters.statuses);
-  const [selectedPriorityFilters, setSelectedPriorityFilters] = useState<AlertFilterItem[]>(selectedFilters.priorities);
-  const [selectedLabelFilters, setSelectedLabelFilters] = useState<AlertFilterItem[]>(selectedFilters.labels);
-  const [selectedValueFilters, setSelectedValueFilters] = useState<AlertFilterItem[]>(selectedFilters.values);
+  const [selectedStatusFilters, setSelectedStatusFilters] = useState<SearchFilter[]>(selectedFilters.statuses);
+  const [selectedPriorityFilters, setSelectedPriorityFilters] = useState<SearchFilter[]>(selectedFilters.priorities);
+  const [selectedLabelFilters, setSelectedLabelFilters] = useState<SearchFilter[]>(selectedFilters.labels);
+  const [selectedQueryFilters, setSelectedQueryFilters] = useState<{ filter: SearchFilter; isValue: boolean }[]>(
+    decorateQueryFilters(selectedFilters.queries, valueFilters)
+  );
+
+  // const [selectedValueFilters, setSelectedValueFilters] = useState<AlertFilterItem[]>(
+  //   selectedFilters.queries.filter(svf => valueFilters.some(vf => vf.value === svf.value))
+  // );
+  // const [nonValueFilters] = useState<AlertFilterItem[]>(
+  //   selectedFilters.queries.filter(svf => valueFilters.some(vf => vf.value !== svf.value))
+  // );
 
   const onTcFilterChange = (value: { value: string; label: string }) => {
     setSelectedTc(value);
@@ -76,31 +91,33 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
     setSelectedGroupBy(value);
   };
 
-  const onStatusFilterChange = (selections: AlertFilterItem[]) => {
+  const onStatusFilterChange = (selections: SearchFilter[]) => {
     setSelectedStatusFilters(selections);
   };
 
-  const onPriorityFilterChange = (selections: AlertFilterItem[]) => {
+  const onPriorityFilterChange = (selections: SearchFilter[]) => {
     setSelectedPriorityFilters(selections);
   };
 
-  const onLabelFilterChange = (selections: AlertFilterItem[]) => {
+  const onLabelFilterChange = (selections: SearchFilter[]) => {
     setSelectedLabelFilters(selections);
   };
 
-  const onValueFilterChange = (selections: AlertFilterItem[]) => {
-    setSelectedValueFilters(selections);
+  const onValueFilterChange = (selections: SearchFilter[]) => {
+    const _selections = selections.map(filter => ({ filter, isValue: true }));
+    const nonValueFilters = selectedQueryFilters.filter(sf => !sf.isValue);
+    setSelectedQueryFilters([..._selections, ...nonValueFilters]);
   };
 
   const _onApplyBtnClick = () => {
+    console.log(selectedFilters);
     onApplyBtnClick({
       tc: selectedTc,
       groupBy: selectedGroupBy,
-      values: selectedValueFilters,
       statuses: selectedStatusFilters,
       priorities: selectedPriorityFilters,
       labels: selectedLabelFilters,
-      favorites: selectedFilters.favorites
+      queries: selectedQueryFilters.map(f => f.filter)
     });
   };
 
@@ -108,7 +125,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
     return option.value === value.value;
   };
 
-  const renderOption = (item: AlertFilterItem) => {
+  const renderOption = (item: SearchFilter) => {
     return (
       <Box>
         <CustomChip label={item.object.count} size="tiny" /> {item.label}
@@ -123,8 +140,8 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
     setSelectedStatusFilters(selectedFilters.statuses);
     setSelectedPriorityFilters(selectedFilters.priorities);
     setSelectedLabelFilters(selectedFilters.labels);
-    setSelectedValueFilters(selectedFilters.values);
-  }, [selectedFilters]);
+    setSelectedQueryFilters(decorateQueryFilters(selectedFilters.queries, valueFilters));
+  }, [selectedFilters, valueFilters]);
 
   return (
     <Box>
@@ -178,7 +195,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
             getOptionSelected={isSelected}
             renderOption={renderOption}
             renderInput={params => <TextField {...params} label="Statuses" variant="outlined" />}
-            onChange={(event, value) => onStatusFilterChange(value as AlertFilterItem[])}
+            onChange={(event, value) => onStatusFilterChange(value as SearchFilter[])}
           />
         </Box>
         <Box mt={2}>
@@ -192,7 +209,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
             getOptionSelected={isSelected}
             renderOption={renderOption}
             renderInput={params => <TextField {...params} label="Priorities" variant="outlined" />}
-            onChange={(event, value) => onPriorityFilterChange(value as AlertFilterItem[])}
+            onChange={(event, value) => onPriorityFilterChange(value as SearchFilter[])}
           />
         </Box>
         <Box mt={2}>
@@ -206,7 +223,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
             getOptionSelected={isSelected}
             renderOption={renderOption}
             renderInput={params => <TextField {...params} label="Labels" variant="outlined" />}
-            onChange={(event, value) => onLabelFilterChange(value as AlertFilterItem[])}
+            onChange={(event, value) => onLabelFilterChange(value as SearchFilter[])}
           />
         </Box>
         <Box mt={2}>
@@ -215,12 +232,15 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
             multiple
             classes={{ option: classes.option }}
             options={valueFilters}
-            value={selectedValueFilters}
-            getOptionLabel={option => option.label}
+            value={selectedQueryFilters.filter(filter => filter.isValue).map(f => f.filter)}
+            getOptionLabel={option => {
+              console.log(option);
+              return option.label;
+            }}
             getOptionSelected={isSelected}
             renderOption={renderOption}
             renderInput={params => <TextField {...params} label="Values" variant="outlined" />}
-            onChange={(event, value) => onValueFilterChange(value as AlertFilterItem[])}
+            onChange={(event, value) => onValueFilterChange(value as SearchFilter[])}
           />
         </Box>
         {/* <Box mt={2}>

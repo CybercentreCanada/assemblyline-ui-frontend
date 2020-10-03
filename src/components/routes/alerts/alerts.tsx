@@ -7,7 +7,7 @@ import MetaList from 'components/elements/lists/metalist/metalist';
 import SplitPanel from 'components/elements/panels/split-panel';
 import Viewport from 'components/elements/panels/viewport';
 import SearchBar from 'components/elements/search/search-bar';
-import SearchQuery from 'components/elements/search/search-query';
+import SearchQuery, { SearchFilter } from 'components/elements/search/search-query';
 import React, { useEffect, useRef, useState } from 'react';
 import { FcWorkflow } from 'react-icons/fc';
 import AlertActionsMenu from './alert-actions-menu';
@@ -17,7 +17,7 @@ import AlertsFilters, { AlertFilterSelections, DEFAULT_FILTERS } from './alerts-
 import AlertsFiltersFavorites from './alerts-filters-favorites';
 import AlertsFiltersSelected from './alerts-filters-selected';
 import AlertsWorkflowActions from './alerts-workflow-actions';
-import useAlerts, { AlertFilterItem, AlertItem } from './hooks/useAlerts';
+import useAlerts, { AlertItem } from './hooks/useAlerts';
 
 const PAGE_SIZE = 50;
 
@@ -71,13 +71,13 @@ const Alerts: React.FC = () => {
     const statuses = searchQueryFilters.filter(f => f.type === 'status');
     const priorities = searchQueryFilters.filter(f => f.type === 'priority');
     const labels = searchQueryFilters.filter(f => f.type === 'label');
-    const values = searchQueryFilters.filter(f => f.type === 'value');
+    const queries = searchQueryFilters.filter(f => f.type === 'query');
     setSelectedFilters(filters => ({
       ...filters,
       statuses: statuses || filters.statuses,
       priorities: priorities || filters.priorities,
       labels: labels || filters.labels,
-      values: values || filters.labels
+      queries: queries || filters.queries
     }));
   };
 
@@ -144,18 +144,20 @@ const Alerts: React.FC = () => {
 
   // Hanlder for when clicking one the AlertsFilters 'Apply' button.
   const onApplyFilters = (filters: AlertFilterSelections) => {
+    console.log(filters);
+
     // update the state of the selected filters so they are intialized next time drawer opens.
     setSelectedFilters(filters);
 
     // Add a [fq] parameter for status/priority/label.
-    const addFq = (item: AlertFilterItem) => query.addFq(item.value);
+    const addFq = (item: SearchFilter) => query.addFq(item.value);
     query.clearFq();
     query.setTc(filters.tc.value);
     query.setGroupBy(filters.groupBy.value);
     filters.statuses.forEach(addFq);
     filters.priorities.forEach(addFq);
     filters.labels.forEach(addFq);
-    filters.values.forEach(addFq);
+    filters.queries.forEach(addFq);
     query.apply();
 
     // Reinitialize the scroll.
