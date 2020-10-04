@@ -26,9 +26,9 @@ const ListRow: React.FC<ListRowProps> = ({ loaded, selected, item, index, rowHei
       data-listitem-position={index}
       data-listitem-selected={selected}
       data-listitem-focus="false"
-      onClick={() => onClick(item)}
+      onClick={onClick ? () => onClick(item) : null}
     >
-      <div className={classes.itemOuter}>
+      <div className={classes.itemOuter} style={{ height: !loaded ? rowHeight : null }}>
         <div className={classes.itemInner}>{loaded ? onRenderRow(item) : '...loading'}</div>
       </div>
       <div className={classes.itemDivider}>

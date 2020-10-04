@@ -15,11 +15,13 @@ const selectionScroller = (target: HTMLDivElement, position: number, rowHeight: 
   //  in the DOM.
   if (scrollToEl) {
     // If there's already an element rendered we use that to compute srolling factor.
-    const { top, height } = scrollToEl.getBoundingClientRect();
-    if (top < targetTop) {
-      target.scrollBy({ top: top - targetTop });
-    } else if (top + height > targetBottom) {
-      target.scrollBy({ top: top + height - targetBottom });
+    const { top: nextTop, bottom: nextBottom, height: nextHeight } = scrollToEl.getBoundingClientRect();
+    if (nextTop < targetTop) {
+      const scrollBy = nextTop - targetTop;
+      target.scrollBy({ top: scrollBy });
+    } else if (nextTop + nextHeight > targetBottom) {
+      const scrollBy = nextBottom - targetBottom;
+      target.scrollBy({ top: scrollBy });
     }
   } else {
     // If the next element isn't already rnedered then we fallback on the specified rowHeight.

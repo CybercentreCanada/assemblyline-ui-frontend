@@ -72,6 +72,7 @@ interface MetaListProps {
   buffer: MetaListBuffer;
   rowHeight: number;
   scrollReset?: boolean;
+  threshold?: number;
   onSelection: (item: MetaListItem) => void;
   onRenderItem: (item: MetaListItem) => React.ReactNode;
   onNext: () => void;
@@ -83,6 +84,7 @@ const MetaList: React.FC<MetaListProps> = ({
   buffer,
   rowHeight,
   scrollReset,
+  threshold = 0,
   onSelection,
   onRenderItem,
   onNext,
@@ -157,7 +159,7 @@ const MetaList: React.FC<MetaListProps> = ({
     }
 
     // load more if at bottom.
-    if (_frame.rH === 0) {
+    if (_frame.rH < threshold && !loading) {
       console.log('...fetching more.');
       onNext();
     }

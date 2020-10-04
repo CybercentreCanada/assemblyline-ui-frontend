@@ -7,7 +7,7 @@ import Book from './book';
 
 interface BooklistPagerProps {
   book: Book;
-  onLoadNext: () => void;
+  onLoadNext?: () => void;
   onChange: (book: Book) => void;
 }
 
@@ -22,13 +22,12 @@ const BooklistPager: React.FC<BooklistPagerProps> = ({ book, onLoadNext, onChang
     onChange(book.build());
   };
 
-  //
   return (
     <div className={classes.pager}>
       <div className={classes.pagerSpacer} />
       <div className={classes.pagerItems}>
         <Pagination count={pageCount} page={current + 1} onChange={onPageChange} hideNextButton={isOnLastPage} />
-        {isOnLastPage ? (
+        {isOnLastPage && onLoadNext ? (
           <IconButton size="small" onClick={onLoadNext} color="inherit">
             <MoreHorizIcon />
           </IconButton>
