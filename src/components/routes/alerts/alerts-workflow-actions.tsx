@@ -63,7 +63,7 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
     <div>
       <Typography variant="h6">Workflow Actions</Typography>
       <Divider />
-      <div style={{ margin: theme.spacing(1), marginTop: theme.spacing(2) }}>
+      <div style={{ margin: theme.spacing(1) }}>
         <Alert severity="info">
           {`The workflow action will be applied to all ${affectedItemCount} alerts in the current view matching to following filters:`}
         </Alert>
@@ -72,7 +72,7 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
       <div style={{ margin: theme.spacing(1) }}>
         <div
           style={{
-            marginTop: theme.spacing(2),
+            marginTop: theme.spacing(1),
             padding: theme.spacing(2),
             color: theme.palette.primary.light,
             backgroundColor: theme.palette.type === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
