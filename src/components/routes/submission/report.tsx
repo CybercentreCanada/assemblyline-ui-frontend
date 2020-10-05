@@ -1,4 +1,21 @@
-import { Divider, Grid, IconButton, Typography, useTheme } from '@material-ui/core';
+import {
+  createStyles,
+  Divider,
+  Grid,
+  IconButton,
+  makeStyles,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Theme,
+  Tooltip,
+  Typography,
+  useTheme,
+  withStyles
+} from '@material-ui/core';
 import ListAltOutlinedIcon from '@material-ui/icons/ListAltOutlined';
 import PrintOutlinedIcon from '@material-ui/icons/PrintOutlined';
 import { Skeleton } from '@material-ui/lab';
@@ -16,6 +33,220 @@ type ParamProps = {
   id: string;
 };
 
+const StyledTableCell = withStyles((theme: Theme) =>
+  createStyles({
+    head: {
+      backgroundColor: '#6e6e6e25 !important',
+      borderBottom: '1px solid #aaa !important'
+    }
+  })
+)(TableCell);
+
+const useStyles = makeStyles({
+  malicious_heur: {
+    textTransform: 'capitalize',
+    fontWeight: 700,
+    padding: '5px',
+    WebkitPrintColorAdjust: 'exact',
+    backgroundColor: '#f2000025 !important',
+    borderBottom: '1px solid #d9534f !important'
+  },
+  suspicious_heur: {
+    textTransform: 'capitalize',
+    fontWeight: 700,
+    padding: '5px',
+    WebkitPrintColorAdjust: 'exact',
+    backgroundColor: '#ff970025 !important',
+    borderBottom: '1px solid #f0ad4e !important'
+  },
+  info_heur: {
+    textTransform: 'capitalize',
+    fontWeight: 700,
+    padding: '5px',
+    WebkitPrintColorAdjust: 'exact',
+    backgroundColor: '#6e6e6e25 !important',
+    borderBottom: '1px solid #aaa !important'
+  }
+});
+
+function TagTable({ group, items }) {
+  const { t } = useTranslation(['submissionReport']);
+  const theme = useTheme();
+  const sp2 = theme.spacing(2);
+  return (
+    <div style={{ paddingBottom: sp2 }}>
+      <Typography variant="h6">{t(`tag.${group}`)}</Typography>
+      <Divider />
+      <div
+        style={{
+          paddingTop: sp2,
+          paddingBottom: sp2
+        }}
+      >
+        <TableContainer>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <StyledTableCell />
+                <StyledTableCell>{t('tag.table.type')}</StyledTableCell>
+                <StyledTableCell>{t('tag.table.value')}</StyledTableCell>
+                <StyledTableCell>{t('tag.table.files')}</StyledTableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {Object.keys(items).map((tagType, typeIdx) =>
+                Object.keys(items[tagType]).map((tagValue, valueIdx) => (
+                  <TableRow key={`${typeIdx}_${valueIdx}`} style={{ verticalAlign: 'top' }}>
+                    <TableCell>
+                      <TextVerdict verdict={items[tagType][tagValue].h_type} mono />
+                    </TableCell>
+                    <TableCell style={{ whiteSpace: 'nowrap', textTransform: 'capitalize' }}>
+                      <Tooltip title={tagType}>
+                        <span>{tagType.split('.').pop().replace('_', ' ')}</span>
+                      </Tooltip>
+                    </TableCell>
+                    <TableCell>{tagValue}</TableCell>
+                    <TableCell>
+                      <ul
+                        style={{
+                          fontSize: '80%',
+                          margin: 0,
+                          paddingInlineStart: '12px',
+                          overflowWrap: 'anywhere'
+                        }}
+                      >
+                        {items[tagType][tagValue].files.map((f, fidx) => {
+                          return <li key={fidx}>{f[0]}</li>;
+                        })}
+                      </ul>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </div>
+    </div>
+  );
+}
+
+function AttackMatrixBlock({ attack, items }) {
+  const theme = useTheme();
+  const sp2 = theme.spacing(2);
+  return (
+    <div
+      style={{
+        height: '100%',
+        width: '100%',
+        display: 'inline-block',
+        pageBreakInside: 'avoid',
+        paddingBottom: sp2
+      }}
+    >
+      <span style={{ fontSize: '1.2rem', textTransform: 'capitalize' }}>{attack.replaceAll('-', ' ')}</span>
+      {Object.keys(items).map((cat, idx) => {
+        return (
+          <div key={idx}>
+            <TextVerdict verdict={items[cat].h_type} mono />
+            <span style={{ fontSize: '1rem', verticalAlign: 'middle' }}>{cat}</span>
+            <ul style={{ marginBlockStart: 0, fontSize: '80%', overflowWrap: 'anywhere' }}>
+              {items[cat].files.map((file, fidx) => {
+                return <li key={fidx}>{file[0]}</li>;
+              })}
+            </ul>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function AttackMatrixSkel() {
+  return (
+    <div
+      style={{
+        paddingBottom: '1rem',
+        height: '100%',
+        width: '100%',
+        display: 'inline-block',
+        pageBreakInside: 'avoid'
+      }}
+    >
+      <Skeleton style={{ height: '2rem' }} />
+      <div style={{ display: 'flex', flexDirection: 'row' }}>
+        <Skeleton style={{ height: '2rem', width: '1.5rem', marginRight: '8px' }} />
+        <Skeleton style={{ height: '2rem', flexGrow: 1 }} />
+      </div>
+      <Skeleton style={{ marginLeft: '2rem' }} />
+      <Skeleton style={{ marginLeft: '2rem' }} />
+      <Skeleton style={{ marginLeft: '2rem' }} />
+      <div style={{ display: 'flex', flexDirection: 'row' }}>
+        <Skeleton style={{ height: '2rem', width: '1.5rem', marginRight: '8px' }} />
+        <Skeleton style={{ height: '2rem', flexGrow: 1 }} />
+      </div>
+      <Skeleton style={{ marginLeft: '2rem' }} />
+    </div>
+  );
+}
+
+function HeuristicsList({ verdict, items }) {
+  const theme = useTheme();
+  const { t } = useTranslation();
+  const classes = useStyles();
+  const sp2 = theme.spacing(2);
+  const classMap = {
+    malicious: classes.malicious_heur,
+    suspicious: classes.suspicious_heur,
+    info: classes.info_heur
+  };
+
+  return (
+    <div
+      style={{
+        flexGrow: 1
+      }}
+    >
+      <div className={classMap[verdict]} style={{ marginBottom: sp2, marginTop: sp2, fontSize: '1.2rem' }}>
+        {t(`verdict.${verdict}`)}
+      </div>
+      {Object.keys(items).map((heur, idx) => {
+        return (
+          <div key={idx}>
+            <span style={{ fontSize: '1rem', verticalAlign: 'middle' }}>{heur}</span>
+            <ul style={{ marginBlockStart: 0, fontSize: '80%', overflowWrap: 'anywhere' }}>
+              {items[heur].map((file, fidx) => {
+                return <li key={fidx}>{file[0]}</li>;
+              })}
+            </ul>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function HeuristicsListSkel() {
+  return (
+    <div
+      style={{
+        flexGrow: 1,
+        margin: 5
+      }}
+    >
+      <Skeleton style={{ height: '3.5rem' }} />
+
+      <Skeleton style={{ height: '2rem' }} />
+      <Skeleton style={{ marginLeft: '2rem' }} />
+      <Skeleton style={{ marginLeft: '2rem' }} />
+      <Skeleton style={{ marginLeft: '2rem' }} />
+
+      <Skeleton style={{ height: '2rem' }} />
+      <Skeleton style={{ marginLeft: '2rem' }} />
+    </div>
+  );
+}
+
 export default function SubmissionReport() {
   const { t } = useTranslation(['submissionReport']);
   const { id } = useParams<ParamProps>();
@@ -29,7 +260,9 @@ export default function SubmissionReport() {
     apiCall({
       url: `/api/v4/submission/report/${id}/`,
       onSuccess: api_data => {
+        // setTimeout(() => {
         setReport(api_data.api_response);
+        // }, 5000);
       }
     });
     // eslint-disable-next-line
@@ -148,18 +381,22 @@ export default function SubmissionReport() {
                 {report ? report.params.services.selected.join(' | ') : <Skeleton />}
               </Grid>
 
-              <Grid item xs={4} md={3} lg={2}>
-                <span style={{ fontWeight: 500 }}>{t('submission.services.errors')}</span>
-              </Grid>
-              <Grid item xs={8} md={9} lg={10}>
-                <span
-                  style={{
-                    color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                  }}
-                >
-                  {report ? report.params.services.errors.join(' | ') : <Skeleton />}
-                </span>
-              </Grid>
+              {report && report.params.services.errors.length !== 0 && (
+                <>
+                  <Grid item xs={4} md={3} lg={2}>
+                    <span style={{ fontWeight: 500 }}>{t('submission.services.errors')}</span>
+                  </Grid>
+                  <Grid item xs={8} md={9} lg={10}>
+                    <span
+                      style={{
+                        color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                      }}
+                    >
+                      {report.params.services.errors.join(' | ')}
+                    </span>
+                  </Grid>
+                </>
+              )}
 
               <Grid item xs={12}>
                 <div style={{ height: sp2 }} />
@@ -224,47 +461,41 @@ export default function SubmissionReport() {
           </div>
         </div>
 
-        {report && report.metadata ? (
+        {(!report || report.metadata) && (
           <div style={{ paddingBottom: sp2 }}>
             <Typography variant="h6">{t('metadata')}</Typography>
             <Divider />
             <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
-              {Object.keys(report.metadata).map((meta, i) => {
-                return (
-                  <Grid key={i} container spacing={1}>
-                    <Grid item xs={4} md={3} lg={2}>
-                      <span style={{ fontWeight: 500 }}>{meta}</span>
-                    </Grid>
-                    <Grid item xs={8} md={9} lg={10}>
-                      {report.metadata[meta]}
-                    </Grid>
-                  </Grid>
-                );
-              })}
-            </div>
-          </div>
-        ) : (
-          <div style={{ paddingBottom: sp2 }}>
-            <Typography variant="h6">{t('metadata')}</Typography>
-            <Divider />
-            <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
-              {[...Array(3)].map((_, i) => {
-                return (
-                  <Grid key={i} container spacing={1}>
-                    <Grid item xs={4} md={3} lg={2}>
-                      <Skeleton />
-                    </Grid>
-                    <Grid item xs={8} md={9} lg={10}>
-                      <Skeleton />
-                    </Grid>
-                  </Grid>
-                );
-              })}
+              {report
+                ? Object.keys(report.metadata).map((meta, i) => {
+                    return (
+                      <Grid key={i} container spacing={1}>
+                        <Grid item xs={4} md={3} lg={2}>
+                          <span style={{ fontWeight: 500 }}>{meta}</span>
+                        </Grid>
+                        <Grid item xs={8} md={9} lg={10}>
+                          {report.metadata[meta]}
+                        </Grid>
+                      </Grid>
+                    );
+                  })
+                : [...Array(3)].map((_, i) => {
+                    return (
+                      <Grid key={i} container spacing={1}>
+                        <Grid item xs={4} md={3} lg={2}>
+                          <Skeleton />
+                        </Grid>
+                        <Grid item xs={8} md={9} lg={10}>
+                          <Skeleton />
+                        </Grid>
+                      </Grid>
+                    );
+                  })}
             </div>
           </div>
         )}
 
-        {report && report.attack_matrix ? (
+        {(!report || report.attack_matrix) && (
           <div style={{ paddingBottom: sp2 }}>
             <Typography variant="h6">{t('attack')}</Typography>
             <Divider />
@@ -279,83 +510,56 @@ export default function SubmissionReport() {
                 columnRuleColor: theme.palette.divider
               }}
             >
-              {Object.keys(report.attack_matrix).map((att, i) => {
-                return (
-                  <div
-                    key={i}
-                    style={{
-                      height: '100%',
-                      width: '100%',
-                      display: 'inline-block',
-                      pageBreakInside: 'avoid',
-                      paddingBottom: sp2
-                    }}
-                  >
-                    <span style={{ fontSize: '1.2rem' }}>{att}</span>
-                    {Object.keys(report.attack_matrix[att]).map((cat, idx) => {
-                      return (
-                        <div key={idx}>
-                          <TextVerdict verdict={report.attack_matrix[att][cat].h_type} mono />
-                          <span style={{ fontSize: '1rem', verticalAlign: 'middle' }}>{cat}</span>
-                          <ul style={{ marginBlockStart: 0, fontSize: '80%' }}>
-                            {report.attack_matrix[att][cat].files.map((file, fidx) => {
-                              return <li key={fidx}>{file[0]}</li>;
-                            })}
-                          </ul>
-                        </div>
-                      );
-                    })}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        ) : (
-          <div style={{ paddingBottom: sp2 }}>
-            <Typography variant="h6">{t('attack')}</Typography>
-            <Divider />
-            <div
-              style={{
-                paddingBottom: sp2,
-                paddingTop: sp2,
-                columnWidth: '21rem',
-                columnGap: '1rem',
-                columnRuleWidth: '1px',
-                columnRuleStyle: 'dotted',
-                columnRuleColor: theme.palette.divider
-              }}
-            >
-              {[...Array(5)].map((_, i) => {
-                return (
-                  <div
-                    key={i}
-                    style={{
-                      paddingBottom: sp2,
-                      height: '100%',
-                      width: '100%',
-                      display: 'inline-block',
-                      pageBreakInside: 'avoid'
-                    }}
-                  >
-                    <Skeleton style={{ height: '2rem' }} />
-                    <div style={{ display: 'flex', flexDirection: 'row' }}>
-                      <Skeleton style={{ height: '2rem', width: '1.5rem', marginRight: '8px' }} />
-                      <Skeleton style={{ height: '2rem', flexGrow: 1 }} />
-                    </div>
-                    <Skeleton style={{ marginLeft: '2rem' }} />
-                    <Skeleton style={{ marginLeft: '2rem' }} />
-                    <Skeleton style={{ marginLeft: '2rem' }} />
-                    <div style={{ display: 'flex', flexDirection: 'row' }}>
-                      <Skeleton style={{ height: '2rem', width: '1.5rem', marginRight: '8px' }} />
-                      <Skeleton style={{ height: '2rem', flexGrow: 1 }} />
-                    </div>
-                    <Skeleton style={{ marginLeft: '2rem' }} />
-                  </div>
-                );
-              })}
+              {report
+                ? Object.keys(report.attack_matrix).map((att, i) => {
+                    return <AttackMatrixBlock key={i} attack={att} items={report.attack_matrix[att]} />;
+                  })
+                : [...Array(5)].map((_, i) => {
+                    return <AttackMatrixSkel key={i} />;
+                  })}
             </div>
           </div>
         )}
+
+        {(!report ||
+          Object.keys(report.heuristics.malicious).length !== 0 ||
+          Object.keys(report.heuristics.suspicious).length !== 0 ||
+          Object.keys(report.heuristics.info.length !== 0)) && (
+          <div style={{ paddingBottom: sp2 }}>
+            <Typography variant="h6">{t('heuristics')}</Typography>
+            <Divider />
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap'
+              }}
+            >
+              {report ? (
+                <>
+                  {Object.keys(report.heuristics.malicious).length !== 0 && (
+                    <HeuristicsList verdict="malicious" items={report.heuristics.malicious} />
+                  )}
+                  {Object.keys(report.heuristics.suspicious).length !== 0 && (
+                    <HeuristicsList verdict="suspicious" items={report.heuristics.suspicious} />
+                  )}
+                  {Object.keys(report.heuristics.info).length !== 0 && (
+                    <HeuristicsList verdict="info" items={report.heuristics.info} />
+                  )}
+                </>
+              ) : (
+                [...Array(3)].map((_, i) => {
+                  return <HeuristicsListSkel key={i} />;
+                })
+              )}
+            </div>
+          </div>
+        )}
+
+        {report &&
+          report.tags &&
+          Object.keys(report.tags).map((tagGroup, groupIdx) => {
+            return <TagTable key={groupIdx} group={tagGroup} items={report.tags[tagGroup]} />;
+          })}
       </div>
     </PageCenter>
   );

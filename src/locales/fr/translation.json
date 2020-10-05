@@ -59,13 +59,15 @@
   "usermenu.logout": "Déconnexion",
   "usermenu.settings": "Paramètres",
   "verdict.highly_suspicious": "Très Suspect",
-  "verdict.highly_suspicious.short": "TS",
-  "verdict.malicious": "Malicieux",
-  "verdict.malicious.short": "MA",
-  "verdict.non_malicious": "Non Malveillant",
-  "verdict.non_malicious.short": "NM",
+  "verdict.highly_suspicious.short": "T",
+  "verdict.malicious": "Malveillant",
+  "verdict.malicious.short": "M",
+  "verdict.non_malicious": "Non-Malveillant",
+  "verdict.non_malicious.short": "N",
   "verdict.safe": "Sans Danger",
-  "verdict.safe.short": "SD",
+  "verdict.safe.short": "S",
   "verdict.suspicious": "Suspect",
-  "verdict.suspicious.short": "SU"
+  "verdict.suspicious.short": "S",
+  "verdict.info": "Informationel",
+  "verdict.info.short": "I"
 }

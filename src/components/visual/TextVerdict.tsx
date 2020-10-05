@@ -1,6 +1,7 @@
 import { Tooltip } from '@material-ui/core';
 import CustomChip from 'components/visual/CustomChip';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const VERDICT_COLOR_MAP = {
   info: 'default',
@@ -17,16 +18,17 @@ type TextVerdictProps = {
 };
 
 const TextVerdict: React.FC<TextVerdictProps> = ({ verdict, variant = 'default', size = 'tiny', mono = false }) => {
+  const { t } = useTranslation();
   const color = VERDICT_COLOR_MAP[verdict];
 
   return (
-    <Tooltip title={verdict}>
+    <Tooltip title={t(`verdict.${verdict}`)}>
       <span>
         <CustomChip
           type="square"
           variant={variant}
           size={size}
-          label={verdict[0].toUpperCase()}
+          label={t(`verdict.${verdict}.short`)}
           color={color}
           mono={mono}
         />
