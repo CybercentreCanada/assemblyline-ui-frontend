@@ -155,10 +155,10 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
 
   return (
     <div>
-      <Typography variant="h6">Filters</Typography>
+      <Typography variant="h6">Filterss</Typography>
       <Divider />
-      <div style={{ margin: theme.spacing(1) }}>
-        <div style={{ marginBottom: theme.spacing(1) }}>
+      <div style={{ margin: theme.spacing(1), marginTop: theme.spacing(2) }}>
+        <div style={{ marginBottom: theme.spacing(2) }}>
           <Autocomplete
             fullWidth
             classes={{ option: classes.option }}
@@ -175,7 +175,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
             onChange={(event, value) => onTcFilterChange(value as { value: string; label: string })}
           />
         </div>
-        <div style={{ marginBottom: theme.spacing(1) }}>
+        <div style={{ marginBottom: theme.spacing(2) }}>
           <Autocomplete
             fullWidth
             classes={{ option: classes.option }}
@@ -194,7 +194,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
             onChange={(event, value) => onGroupByFilterChange(value as { value: string; label: string })}
           />
         </div>
-        <div style={{ marginBottom: theme.spacing(1) }}>
+        <div style={{ marginBottom: theme.spacing(2) }}>
           <Autocomplete
             fullWidth
             multiple
@@ -208,7 +208,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
             onChange={(event, value) => onStatusFilterChange(value as SearchFilter[])}
           />
         </div>
-        <div style={{ marginBottom: theme.spacing(1) }}>
+        <div style={{ marginBottom: theme.spacing(2) }}>
           <Autocomplete
             fullWidth
             multiple
@@ -222,7 +222,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
             onChange={(event, value) => onPriorityFilterChange(value as SearchFilter[])}
           />
         </div>
-        <div style={{ marginBottom: theme.spacing(1) }}>
+        <div style={{ marginBottom: theme.spacing(2) }}>
           <Autocomplete
             fullWidth
             multiple
@@ -236,7 +236,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
             onChange={(event, value) => onLabelFilterChange(value as SearchFilter[])}
           />
         </div>
-        <div style={{ marginBottom: theme.spacing(1) }}>
+        <div style={{ marginBottom: theme.spacing(2) }}>
           <Autocomplete
             fullWidth
             multiple

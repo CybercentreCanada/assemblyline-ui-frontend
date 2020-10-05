@@ -60,11 +60,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
     return element.current.querySelector('input');
   };
 
-  // handler[onclick]: search button click handler.
-  // const _onSearchBtnClick = () => {
-  //   _onSearch();
-  // };
-
   // handler[onchange]: textfield change handler.
   // track value of filter..
   const _onValueChange = (_value: string) => {
@@ -81,11 +76,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   // When requesting a search.
   const _onSearch = () => {
-    if (value && value.length > 0) {
-      onSearch(value, getInputEl());
-    } else {
-      onClear();
-    }
+    onSearch(value, getInputEl());
   };
 
   //

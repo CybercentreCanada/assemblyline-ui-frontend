@@ -5,12 +5,18 @@ import React from 'react';
 import { AlertFilterSelections } from './alerts-filters';
 
 interface AlertFiltersSelectedProps {
+  query?: string;
   disableActions?: boolean;
   filters: AlertFilterSelections;
   onChange: (filters: AlertFilterSelections) => void;
 }
 
-const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({ disableActions = false, filters, onChange }) => {
+const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
+  query,
+  disableActions = false,
+  filters,
+  onChange
+}) => {
   const theme = useTheme();
 
   const { tc, groupBy, statuses, priorities, labels, queries } = filters;
@@ -35,15 +41,10 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({ disableAct
     onChange({ ...filters, queries: _queries });
   };
 
-  // const onDeleteFavorite = (item: Favorite) => {
-  //   const _values = filters.favorites.filter(s => s.name !== item.name);
-  //   onChange({ ...filters, favorites: _values });
-  // };
-
   return (
     <div>
       <div>
-        Time Constraint = {tc.label}, Group by = {groupBy.label}
+        {query && <span>Query = {query}, </span>}Time Constraint = {tc.label}, Group by = {groupBy.label}
       </div>
       <div style={{ marginTop: theme.spacing(1) }}>
         {statuses.length ? (

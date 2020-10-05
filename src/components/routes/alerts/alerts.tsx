@@ -42,7 +42,7 @@ const Alerts: React.FC = () => {
   const {
     loading,
     buffer,
-    book,
+    // book,
     total,
     fields,
     query,
@@ -50,7 +50,7 @@ const Alerts: React.FC = () => {
     statusFilters,
     priorityFilters,
     labelFilters,
-    updateBook,
+    // updateBook,
     onLoad,
     onLoadMore,
     onGet
@@ -103,7 +103,7 @@ const Alerts: React.FC = () => {
     }
 
     // Update query and url before reloading data.
-    query.reset().setQuery(filterValue).apply();
+    query.setQuery(filterValue).apply();
 
     // Reload.
     onLoad(() => {
@@ -381,6 +381,7 @@ const Alerts: React.FC = () => {
               ),
               actions: (
                 <AlertsWorkflowActions
+                  query={query.getQuery()}
                   affectedItemCount={buffer.total()}
                   selectedFilters={selectedFilters}
                   statusFilters={statusFilters}

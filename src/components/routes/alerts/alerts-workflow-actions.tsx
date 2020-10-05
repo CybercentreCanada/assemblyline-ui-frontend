@@ -12,6 +12,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 interface AlertsWorkflowActionsProps {
+  query: string;
   affectedItemCount: number;
   selectedFilters: AlertFilterSelections;
   statusFilters: SearchFilter[];
@@ -20,6 +21,7 @@ interface AlertsWorkflowActionsProps {
 }
 
 const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
+  query,
   affectedItemCount,
   selectedFilters,
   statusFilters,
@@ -61,16 +63,27 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
     <div>
       <Typography variant="h6">Workflow Actions</Typography>
       <Divider />
-      <div style={{ margin: theme.spacing(1) }}>
+      <div style={{ margin: theme.spacing(1), marginTop: theme.spacing(2) }}>
         <Alert severity="info">
           {`The workflow action will be applied to all ${affectedItemCount} alerts in the current view matching to following filters:`}
-          <Divider style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(1) }} />
-          <AlertsFiltersSelected filters={selectedFilters} onChange={() => null} disableActions />
         </Alert>
       </div>
 
       <div style={{ margin: theme.spacing(1) }}>
-        <div style={{ marginBottom: theme.spacing(1) }}>
+        <div
+          style={{
+            marginTop: theme.spacing(2),
+            padding: theme.spacing(2),
+            color: theme.palette.primary.light,
+            backgroundColor: theme.palette.type === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
+          }}
+        >
+          <AlertsFiltersSelected query={query} filters={selectedFilters} onChange={() => null} disableActions />
+        </div>
+      </div>
+
+      <div style={{ margin: theme.spacing(1), marginTop: theme.spacing(2) }}>
+        <div style={{ marginBottom: theme.spacing(2) }}>
           <Autocomplete
             fullWidth
             multiple
@@ -84,7 +97,7 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
             onChange={(event, value) => onStatusChange(value as SearchFilter[])}
           />
         </div>
-        <div style={{ marginBottom: theme.spacing(1) }}>
+        <div style={{ marginBottom: theme.spacing(2) }}>
           <Autocomplete
             fullWidth
             multiple
@@ -98,7 +111,7 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
             onChange={(event, value) => onPriorityChange(value as SearchFilter[])}
           />
         </div>
-        <div style={{ marginBottom: theme.spacing(1) }}>
+        <div style={{ marginBottom: theme.spacing(2) }}>
           <Autocomplete
             fullWidth
             multiple
