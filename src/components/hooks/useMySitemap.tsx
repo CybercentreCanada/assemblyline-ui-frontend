@@ -54,13 +54,13 @@ export default function useMySitemap() {
       { path: '/submissions', title: t('drawer.submissions'), isRoot: true, icon: <AmpStoriesOutlinedIcon /> },
       {
         path: '/submission/detail/:id',
-        title: `${t('breadcrumbs.submission.detail')}: {:id}`,
+        title: `${t('breadcrumb.submission.detail')}: {:id}`,
         icon: <ListAltOutlinedIcon />,
         breadcrumbs: ['/submissions']
       },
       {
         path: '/submission/report/:id',
-        title: `${t('breadcrumbs.submission.report')}: {:id}`,
+        title: `${t('breadcrumb.submission.report')}: {:id}`,
         icon: <ChromeReaderModeOutlinedIcon />,
         breadcrumbs: ['/submissions']
       },
@@ -118,7 +118,7 @@ export default function useMySitemap() {
         icon: <AccountTreeOutlinedIcon />,
         breadcrumbs: ['/help']
       },
-      { path: '/tos', title: t('breadcrumbs.tos'), isRoot: true, icon: <ReceiptOutlinedIcon /> },
+      { path: '/tos', title: t('breadcrumb.tos'), isRoot: true, icon: <ReceiptOutlinedIcon /> },
       { path: '/account', title: t('usermenu.account'), isRoot: true, icon: <AccountCircleOutlinedIcon /> },
       { path: '/settings', title: t('usermenu.settings'), isRoot: true, icon: <SettingsOutlinedIcon /> },
       { path: '/admin', title: t('adminmenu'), isRoot: true, icon: <BusinessOutlinedIcon /> },

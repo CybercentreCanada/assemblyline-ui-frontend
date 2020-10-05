@@ -1,15 +1,4 @@
-import {
-  AppBar,
-  Avatar,
-  Box,
-  BoxProps,
-  Divider,
-  List,
-  makeStyles,
-  Toolbar,
-  useMediaQuery,
-  useTheme
-} from '@material-ui/core';
+import { AppBar, Avatar, Divider, List, makeStyles, Toolbar, useMediaQuery, useTheme } from '@material-ui/core';
 import AppsIcon from '@material-ui/icons/Apps';
 import Skeleton from '@material-ui/lab/Skeleton';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
@@ -96,30 +85,50 @@ const SideLayoutSkeleton = () => {
   const showBreadcrumbs = layoutProps.allowBreadcrumbs && breadcrumbsEnabled;
   const showTopBarBreadcrumbs = showBreadcrumbs && !isSm;
   const showQuicksearch = layoutProps.allowQuickSearch && _showQuickSearch;
+  const sp1 = theme.spacing(1);
+  const sp2 = theme.spacing(2);
+  const sp3 = theme.spacing(3);
   return (
-    <Box className={classes.container}>
-      <Box className={classes.leftlayout}>
-        <Box className={classes.content}>
-          <Box className={classes.contentLeft} width={drawerState ? 240 : 57}>
+    <div className={classes.container}>
+      <div className={classes.leftlayout}>
+        <div className={classes.content}>
+          <div className={classes.contentLeft} style={{ width: drawerState ? 240 : 57 }}>
             <Toolbar disableGutters>
-              <ButtonSkeleton withText={drawerState} pt={1} pb={1} pl={2} pr={2} flexGrow={1} />
+              <ButtonSkeleton
+                withText={drawerState}
+                style={{ paddingTop: sp1, paddingBottom: sp1, paddingLeft: sp2, paddingRight: sp2, flexGrow: 1 }}
+              />
             </Toolbar>
             <Divider />
             <List disablePadding>
               <LeftNavElementsSkeleton elements={layoutProps.leftnav.elements} withText={drawerState} />
               <Divider />
-              <ButtonSkeleton withText={drawerState} pt={1} pb={1} pl={2} pr={2} />
+              <ButtonSkeleton
+                withText={drawerState}
+                style={{ paddingTop: sp1, paddingBottom: sp1, paddingLeft: sp2, paddingRight: sp2 }}
+              />
             </List>
-          </Box>
-          <Box className={classes.contentRight}>
+          </div>
+          <div className={classes.contentRight}>
             <AppBar position="relative" elevation={0} style={{ backgroundColor: theme.palette.background.default }}>
-              <Toolbar disableGutters style={{ paddingLeft: theme.spacing(2), paddingRight: theme.spacing(3) }}>
-                {isXs ? <ButtonSkeleton withText={drawerState} pt={1} pb={1} pl={2} pr={2} flexGrow={1} /> : null}
-                {showTopBarBreadcrumbs ? (
+              <Toolbar disableGutters style={{ paddingLeft: sp2, paddingRight: sp3 }}>
+                {isXs && (
+                  <ButtonSkeleton
+                    withText={drawerState}
+                    style={{
+                      paddingTop: sp1,
+                      paddingBottom: sp1,
+                      paddingLeft: sp2,
+                      paddingRight: sp2,
+                      flexGrow: 1
+                    }}
+                  />
+                )}
+                {showTopBarBreadcrumbs && (
                   <Skeleton variant="text" animation="wave" width={100} className={classes.breadcrumbs} />
-                ) : null}
-                {showTopBarBreadcrumbs ? <Box flexGrow={1} /> : null}
-                {showQuicksearch ? (
+                )}
+                {showTopBarBreadcrumbs && <div style={{ flexGrow: 1 }} />}
+                {showQuicksearch && (
                   <Skeleton
                     variant="text"
                     animation="wave"
@@ -127,26 +136,36 @@ const SideLayoutSkeleton = () => {
                     style={{ flexGrow: !showTopBarBreadcrumbs ? 1 : 0 }}
                     className={classes.quickSearch}
                   />
-                ) : null}
-                <ButtonSkeleton withText={false} pt={1} pb={1} pl={2} pr={2} ml={1} mr={1} />
+                )}
+                <ButtonSkeleton
+                  withText={false}
+                  style={{
+                    paddingTop: sp1,
+                    paddingBottom: sp1,
+                    paddingLeft: sp2,
+                    paddingRight: sp2,
+                    marginLeft: sp1,
+                    marginRight: sp1
+                  }}
+                />
                 <Skeleton animation="wave" variant="circle">
                   <Avatar className={userProfileClasses.iconButton} />
                 </Skeleton>
               </Toolbar>
             </AppBar>
-            {showBreadcrumbs && isSm ? (
+            {showBreadcrumbs && isSm && (
               <Skeleton
-                style={{ marginLeft: theme.spacing(2) }}
+                style={{ marginLeft: sp2 }}
                 variant="text"
                 animation="wave"
                 width={100}
                 className={classes.breadcrumbs}
               />
-            ) : null}
-          </Box>
-        </Box>
-      </Box>
-    </Box>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
@@ -162,22 +181,26 @@ const TopLayoutSkeleton = () => {
   const showBreadcrumbs = layoutProps.allowBreadcrumbs && breadcrumbsEnabled;
   const showTopBarBreadcrumbs = showBreadcrumbs && !isSm;
   const showQuicksearch = layoutProps.allowQuickSearch && _showQuickSearch;
+  const sp1 = theme.spacing(1);
+  const sp2 = theme.spacing(2);
+  const sp3 = theme.spacing(3);
   return (
-    <Box className={classes.container}>
-      <Box className={classes.toplayout}>
+    <div className={classes.container}>
+      <div className={classes.toplayout}>
         <AppBar position="relative" elevation={2} style={{ backgroundColor: theme.palette.background.default }}>
-          <Toolbar style={{ paddingRight: theme.spacing(3) }} disableGutters>
-            <ButtonSkeleton withText={false} pt={1} pb={1} pl={2} pr={2} />
-            <Skeleton variant="text" animation="wave" style={{ marginRight: theme.spacing(3) }}>
-              <Box fontSize="1.5rem" letterSpacing="-1px">
-                {layoutProps.appName}
-              </Box>
+          <Toolbar style={{ paddingRight: sp3 }} disableGutters>
+            <ButtonSkeleton
+              withText={false}
+              style={{ paddingTop: sp1, paddingBottom: sp1, paddingLeft: sp2, paddingRight: sp2 }}
+            />
+            <Skeleton variant="text" animation="wave" style={{ marginRight: sp3 }}>
+              <div style={{ fontSize: '1.5rem', letterSpacing: '-1px' }}>{layoutProps.appName}</div>
             </Skeleton>
-            {showTopBarBreadcrumbs ? (
+            {showTopBarBreadcrumbs && (
               <Skeleton variant="text" animation="wave" width={100} className={classes.breadcrumbs} />
-            ) : null}
-            {showTopBarBreadcrumbs && !isSm ? <Box flexGrow={1} /> : null}
-            {showQuicksearch ? (
+            )}
+            {showTopBarBreadcrumbs && !isSm && <div style={{ flexGrow: 1 }} />}
+            {showQuicksearch && (
               <Skeleton
                 variant="text"
                 animation="wave"
@@ -185,35 +208,48 @@ const TopLayoutSkeleton = () => {
                 style={{ flexGrow: !showTopBarBreadcrumbs ? 1 : 0 }}
                 className={classes.quickSearch}
               />
-            ) : null}
-            <ButtonSkeleton withText={false} pt={1} pb={1} pl={2} pr={2} ml={1} mr={1} />
+            )}
+            <ButtonSkeleton
+              withText={false}
+              style={{
+                paddingTop: sp1,
+                paddingBottom: sp1,
+                paddingLeft: sp2,
+                paddingRight: sp2,
+                marginLeft: sp1,
+                marginRight: sp1
+              }}
+            />
             <Skeleton animation="wave" variant="circle">
               <Avatar className={userProfileClasses.iconButton} />
             </Skeleton>
           </Toolbar>
         </AppBar>
-        <Box className={classes.content}>
-          <Box className={classes.contentLeft} width={drawerState ? 240 : 57}>
+        <div className={classes.content}>
+          <div className={classes.contentLeft} style={{ width: drawerState ? 240 : 57 }}>
             <List disablePadding>
               <LeftNavElementsSkeleton elements={layoutProps.leftnav.elements} withText={drawerState} />
               <Divider />
-              <ButtonSkeleton withText={drawerState} pt={1} pb={1} pl={2} pr={2} />
+              <ButtonSkeleton
+                withText={drawerState}
+                style={{ paddingTop: sp1, paddingBottom: sp1, paddingLeft: sp2, paddingRight: sp2 }}
+              />
             </List>
-          </Box>
-          <Box className={classes.contentRight}>
-            {showBreadcrumbs && isSm ? (
+          </div>
+          <div className={classes.contentRight}>
+            {showBreadcrumbs && isSm && (
               <Skeleton
-                style={{ marginLeft: theme.spacing(2), marginTop: theme.spacing(1) }}
+                style={{ marginLeft: sp2, marginTop: sp1 }}
                 variant="text"
                 animation="wave"
                 width={100}
                 className={classes.breadcrumbs}
               />
-            ) : null}
-          </Box>
-        </Box>
-      </Box>
-    </Box>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
@@ -226,56 +262,59 @@ const TopLayoutSkeleton = () => {
  *
  * @param props
  */
-interface LeftNavElementsSkeletonProps extends BoxProps {
+interface LeftNavElementsSkeletonProps {
   // eslint-disable-next-line react/require-default-props
   withText?: boolean;
   elements: LeftNavElement[];
 }
-const LeftNavElementsSkeleton = (props: LeftNavElementsSkeletonProps) => {
-  const { elements, ...boxProps } = props;
+const LeftNavElementsSkeleton = ({ elements, withText }: LeftNavElementsSkeletonProps) => {
+  const theme = useTheme();
   return (
     <>
       {elements.map((element, i) => {
         if (element.type === 'divider') {
           return <Divider key={`leftnav-sklt-divider-${i}`} />;
         }
-        return <ButtonSkeleton {...boxProps} pt={1} pb={1} pl={2} pr={2} key={`leftnav-sklt-${element.element.id}`} />;
+        return (
+          <ButtonSkeleton
+            withText={withText}
+            style={{
+              paddingTop: theme.spacing(1),
+              paddingBottom: theme.spacing(1),
+              paddingLeft: theme.spacing(2),
+              paddingRight: theme.spacing(2)
+            }}
+            key={`leftnav-sklt-${element.element.id}`}
+          />
+        );
       })}
     </>
   );
 };
 
-/**
- * Skeleton component for a button.
- *
- * Properties:
- *  This component will simply destructure the properties to the wrapping MUI Box component.
- *  Therefore you can specify any properties support by that component.
- *  - withText: indicates wether to add a text skeleton on the left of the icon skeleton.
- *
- * @param props
- */
-interface ButtonSkeletonProps extends BoxProps {
+interface ButtonSkeletonProps {
+  style: { [styleAttr: string]: any };
   // eslint-disable-next-line react/require-default-props
   withText?: boolean;
+  [propName: string]: any;
 }
-const ButtonSkeleton = (props: ButtonSkeletonProps) => {
+const ButtonSkeleton = ({ style, withText, ...boxProps }: ButtonSkeletonProps) => {
   const theme = useTheme();
   const isXs = useMediaQuery(theme.breakpoints.only('xs'));
-  const { withText, ...boxProps } = props;
+
   return (
-    <Box height={48} display="flex" flexDirection="row" {...boxProps}>
+    <div style={{ ...style, height: 48, display: 'flex', flexDirection: 'row' }} {...boxProps}>
       <Skeleton variant="text" animation="wave">
         <AppsIcon />
       </Skeleton>
-      {withText ? (
+      {withText && (
         <Skeleton
           variant="text"
           animation="wave"
           style={{ flexGrow: 1, marginLeft: isXs ? theme.spacing(2) : theme.spacing(4) }}
         />
-      ) : null}
-    </Box>
+      )}
+    </div>
   );
 };
 

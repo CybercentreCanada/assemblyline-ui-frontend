@@ -1,4 +1,4 @@
-import { Box, makeStyles } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core';
 import React from 'react';
 
 const useStyles = makeStyles(theme => ({
@@ -16,5 +16,5 @@ const useStyles = makeStyles(theme => ({
 
 export default function PageFullWidth({ children }) {
   const classes = useStyles();
-  return <Box className={classes.page}>{children}</Box>;
+  return <div className={classes.page}>{children}</div>;
 }

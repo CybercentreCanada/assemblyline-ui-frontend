@@ -20,5 +20,12 @@
   "title": "Submission Report",
   "general": "General Information",
   "metadata": "Metadata",
-  "attack": "Att&ck Matrix"
+  "attack": "Att&ck Matrix",
+  "heuristics": "Heuristics",
+  "tag.table.type": "Type",
+  "tag.table.value": "Value",
+  "tag.table.files": "Related Files",
+  "tag.attributions": "Attributions",
+  "tag.indicators_of_compromise": "Indicators of Compromise",
+  "tag.behaviors": "Behaviors"
 }

@@ -1,4 +1,4 @@
-import { Box, makeStyles } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core';
 import React from 'react';
 
 const useStyles = (w, mxw) => {
@@ -24,7 +24,7 @@ type PageCenterProps = {
 
 const PageCenter: React.FC<PageCenterProps> = ({ width = '95%', maxWidth = '1200px', children }) => {
   const classes = useStyles(width, maxWidth);
-  return <Box className={classes.page}>{children}</Box>;
+  return <div className={classes.page}>{children}</div>;
 };
 
 export default PageCenter;

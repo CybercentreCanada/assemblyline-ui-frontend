@@ -1,5 +1,4 @@
 import {
-  Box,
   Divider,
   List,
   ListItem,
@@ -53,16 +52,19 @@ const ThemeSelection = ({ width }) => {
   };
 
   return (
-    <Box>
+    <div>
       <List dense subheader={<ListSubheader disableSticky>{t('app.language')}</ListSubheader>}>
         <ListItem dense button onClick={onToggleLanguage}>
           <ListItemText style={{ margin: 0 }}>
-            <Box
-              display="flex"
-              alignItems="center"
-              flexDirection="row"
-              width="100%"
-              style={{ textAlign: 'center', cursor: 'pointer' }}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                flexDirection: 'row',
+                width: '100%',
+                textAlign: 'center',
+                cursor: 'pointer'
+              }}
             >
               <Typography component="div" variant="body2">
                 English
@@ -73,7 +75,7 @@ const ThemeSelection = ({ width }) => {
               <Typography component="div" variant="body2">
                 Français
               </Typography>
-            </Box>
+            </div>
           </ListItemText>
         </ListItem>
       </List>
@@ -91,7 +93,7 @@ const ThemeSelection = ({ width }) => {
             <Switch edge="end" checked={currentLayout === 'top'} />
           </ListItemSecondaryAction>
         </ListItem>
-        {layoutProps.allowQuickSearch ? (
+        {layoutProps.allowQuickSearch && (
           <ListItem button disabled={isWidthDown('xs', width)} onClick={toggleQuickSearch}>
             <ListItemText>{t('personalization.quicksearch')}</ListItemText>
             <ListItemSecondaryAction>
@@ -103,7 +105,7 @@ const ThemeSelection = ({ width }) => {
               />
             </ListItemSecondaryAction>
           </ListItem>
-        ) : null}
+        )}
         <ListItem button disabled={currentLayout === 'top'} onClick={toggleAutoHideAppbar}>
           <ListItemText>{t('personalization.autohideappbar')}</ListItemText>
           <ListItemSecondaryAction>
@@ -115,7 +117,7 @@ const ThemeSelection = ({ width }) => {
             />
           </ListItemSecondaryAction>
         </ListItem>
-        {layoutProps.allowBreadcrumbs ? (
+        {layoutProps.allowBreadcrumbs && (
           <>
             <ListItem button disabled={isWidthDown('xs', width)} onClick={toggleShowBreadcrumbs}>
               <ListItemText>{t('personalization.showbreadcrumbs')}</ListItemText>
@@ -128,7 +130,7 @@ const ThemeSelection = ({ width }) => {
                 />
               </ListItemSecondaryAction>
             </ListItem>
-            {layoutProps.allowBreadcrumbsMinimize ? (
+            {layoutProps.allowBreadcrumbsMinimize && (
               <ListItem
                 button
                 disabled={!breadcrumbsEnabled || isWidthDown('xs', width)}
@@ -144,21 +146,21 @@ const ThemeSelection = ({ width }) => {
                   />
                 </ListItemSecondaryAction>
               </ListItem>
-            ) : null}
+            )}
           </>
-        ) : null}
+        )}
       </List>
-      {layoutProps.allowReset ? (
-        <Box>
+      {layoutProps.allowReset && (
+        <div>
           <Divider />
           <List dense>
             <ListItem dense button onClick={clearStorage}>
               <ListItemText>{t('personalization.reset_text')}</ListItemText>
             </ListItem>
           </List>
-        </Box>
-      ) : null}
-    </Box>
+        </div>
+      )}
+    </div>
   );
 };
 

@@ -1,4 +1,4 @@
-import { Box, CssBaseline, makeStyles, ThemeProvider, useMediaQuery, useTheme } from '@material-ui/core';
+import { CssBaseline, makeStyles, ThemeProvider, useMediaQuery, useTheme } from '@material-ui/core';
 import useAppTheme, { AppThemeColorProps } from 'commons/components/hooks/useAppTheme';
 import useAppUser from 'commons/components/hooks/useAppUser';
 import LeftNavDrawer, { LeftNavElement } from 'commons/components/layout/leftnav/LeftNavDrawer';
@@ -246,19 +246,17 @@ function AppLayoutProvider(props: LayoutProviderProps) {
           setReady: (isReady: boolean) => setAppReady(isReady)
         }}
       >
-        <Box className={classes.app}>
+        <div className={classes.app}>
           <CssBaseline />
-          {isUserReady() && appReady && showMenus ? <TopBar /> : null}
-          {isUserReady() && appReady && showMenus ? <LeftNavDrawer /> : null}
-          <Box className={classes.container}>
+          {isUserReady() && appReady && showMenus && <TopBar />}
+          {isUserReady() && appReady && showMenus && <LeftNavDrawer />}
+          <div className={classes.container}>
             {layoutProps.allowBreadcrumbs &&
-            breadcrumbsEnabled &&
-            (breadcrumbsPlacement === 'page' || showBreadcrumbsOnPage) ? (
-              <PageHeader mode="breadcrumbs" />
-            ) : null}
+              breadcrumbsEnabled &&
+              (breadcrumbsPlacement === 'page' || showBreadcrumbsOnPage) && <PageHeader mode="breadcrumbs" />}
             {children}
-          </Box>
-        </Box>
+          </div>
+        </div>
       </AppLayoutContext.Provider>
     </ThemeProvider>
   );

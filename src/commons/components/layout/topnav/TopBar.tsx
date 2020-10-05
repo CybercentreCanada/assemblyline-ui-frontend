@@ -1,4 +1,4 @@
-import { AppBar, Box, IconButton, makeStyles, Slide, Toolbar, useTheme } from '@material-ui/core';
+import { AppBar, IconButton, makeStyles, Slide, Toolbar, useTheme } from '@material-ui/core';
 import withWidth, { isWidthUp } from '@material-ui/core/withWidth';
 import MenuIcon from '@material-ui/icons/Menu';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
@@ -99,12 +99,8 @@ const TopBar: React.FC<AppBarProps> = ({ width }) => {
     if (currentLayout === 'top') {
       return (
         <Link className={classes.title} to="/">
-          <Box component="div" className={classes.icon}>
-            {getLogo(theme)}
-          </Box>
-          <Box component="div" display="flex">
-            {layoutProps.appName}
-          </Box>
+          <div className={classes.icon}>{getLogo(theme)}</div>
+          <div style={{ display: 'flex' }}>{layoutProps.appName}</div>
         </Link>
       );
     }
@@ -125,18 +121,16 @@ const TopBar: React.FC<AppBarProps> = ({ width }) => {
             <MenuIcon />
           </IconButton>
           {renderTitle()}
-          <Box className={classes.leftSpacer} />
+          <div className={classes.leftSpacer} />
           {layoutProps.topnav.left}
-          {layoutProps.allowBreadcrumbs && breadcrumbsEnabled && breadcrumbsPlacement === 'topbar' ? (
-            <Breadcrumbs />
-          ) : null}
+          {layoutProps.allowBreadcrumbs && breadcrumbsEnabled && breadcrumbsPlacement === 'topbar' && <Breadcrumbs />}
 
           {layoutProps.allowQuickSearch && showQuickSearch && isWidthUp('sm', width) ? (
             <QuickSearch />
           ) : (
-            <Box flexGrow={1} />
+            <div style={{ flexGrow: 1 }} />
           )}
-          {layoutProps.topnav.themeSelectionUnder === 'icon' ? <ThemeSelectionIcon /> : null}
+          {layoutProps.topnav.themeSelectionUnder === 'icon' && <ThemeSelectionIcon />}
           <AppSwitcher />
           <UserProfile />
           {layoutProps.topnav.right}
