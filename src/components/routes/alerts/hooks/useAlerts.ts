@@ -128,7 +128,6 @@ export default function useAlerts(pageSize: number): UsingAlerts {
 
   // Hook API: get alerts for specified index.
   const onLoadMore = (onSuccess?: () => void) => {
-    console.log('loading more...');
     // Move offset by one increment.
     query.tickOffset();
     // reference the current offset now incase it changes again before callback is executed

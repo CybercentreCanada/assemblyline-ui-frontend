@@ -136,14 +136,12 @@ const MetaList: React.FC<MetaListProps> = React.memo(
 
       // load more if at bottom.
       if (_frame.rH <= threshold && !loading) {
-        console.log('...fetching more.');
         onNext();
       }
     };
 
     // Adjust things each time we receive an updated list of items.
     useLayoutEffect(() => {
-      console.log('useeffect...');
       // Adjust the inner container height each time we receive an updated list of items.
       innerEL.current.style.height = `${buffer.total() * rowHeight}px`;
 
