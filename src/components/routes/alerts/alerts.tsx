@@ -3,12 +3,12 @@ import CloseIcon from '@material-ui/icons/Close';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import StarIcon from '@material-ui/icons/Star';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
-import MetaList from 'components/elements/lists/metalist/metalist';
+import Booklist from 'components/elements/lists/booklist/booklist';
 import SplitPanel from 'components/elements/panels/split-panel';
 import Viewport from 'components/elements/panels/viewport';
 import SearchBar from 'components/elements/search/search-bar';
 import SearchQuery, { SearchFilter } from 'components/elements/search/search-query';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FcWorkflow } from 'react-icons/fc';
 import AlertActionsMenu from './alert-actions-menu';
 import AlertDetails from './alert-details';
@@ -41,6 +41,7 @@ const Alerts: React.FC = () => {
   const {
     loading,
     buffer,
+    book,
     total,
     fields,
     query,
@@ -48,6 +49,7 @@ const Alerts: React.FC = () => {
     statusFilters,
     priorityFilters,
     labelFilters,
+    updateBook,
     onLoad,
     onLoadMore,
     onGet
@@ -126,15 +128,18 @@ const Alerts: React.FC = () => {
   };
 
   // Handler for when an item of the InfiniteList is selected.
-  const onItemSelected = (item: AlertItem) => {
-    if (item) {
-      onGet(item.alert_id, alert => {
-        setSplitPanel({ open: true, item: alert });
-      });
-    } else {
-      setSplitPanel({ ...splitPanel, open: false });
-    }
-  };
+  const onItemSelected = useCallback(
+    (item: AlertItem) => {
+      if (item) {
+        onGet(item.alert_id, alert => {
+          setSplitPanel({ open: true, item: alert });
+        });
+      } else {
+        setSplitPanel(_sp => ({ ..._sp, open: false }));
+      }
+    },
+    [onGet]
+  );
 
   // Handler for when loading more alerts [read bottom of scroll area]
   const _onLoadMore = () => {
@@ -241,6 +246,9 @@ const Alerts: React.FC = () => {
     }
   };
 
+  // Memoized callback to render one line-item of the list.
+  const onRenderListRow = useCallback((item: AlertItem) => <AlertListItem item={item} />, []);
+
   // Load up the filters already present in the URL.
   useEffect(() => setQueryFilters(query), [query]);
 
@@ -293,14 +301,22 @@ const Alerts: React.FC = () => {
           rightDrawerBackgroundColor={theme.palette.background.default}
           rightOpen={splitPanel.open}
           left={
-            <MetaList
+            // <MetaList
+            //   loading={loading || searching}
+            //   buffer={buffer}
+            //   rowHeight={92}
+            //   scrollReset={scrollReset}
+            //   onSelection={onItemSelected}
+            //   onNext={_onLoadMore}
+            //   onRenderItem={(item: AlertItem) => <AlertListItem item={item} />}
+            // />
+            <Booklist
               loading={loading || searching}
-              buffer={buffer}
-              rowHeight={92}
-              scrollReset={scrollReset}
-              onSelection={onItemSelected}
-              onNext={_onLoadMore}
-              onRenderItem={(item: AlertItem) => <AlertListItem item={item} />}
+              book={book}
+              onItemSelected={onItemSelected}
+              onPageChange={updateBook}
+              onRenderRow={onRenderListRow}
+              onLoadNext={_onLoadMore}
             />
             // <InfiniteList
             //   items={buffer.items}

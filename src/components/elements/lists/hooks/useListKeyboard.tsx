@@ -18,9 +18,11 @@ const selectionScroller = (target: HTMLDivElement, position: number, rowHeight: 
     const { top: nextTop, bottom: nextBottom, height: nextHeight } = scrollToEl.getBoundingClientRect();
     if (nextTop < targetTop) {
       const scrollBy = nextTop - targetTop;
+      // console.log(`scrollBy: ${scrollBy}`);
       target.scrollBy({ top: scrollBy });
     } else if (nextTop + nextHeight > targetBottom) {
       const scrollBy = nextBottom - targetBottom;
+      // console.log(`scrollBy: ${scrollBy}`);
       target.scrollBy({ top: scrollBy });
     }
   } else {
@@ -75,10 +77,14 @@ export default function useListKeyboard({
       // Handle each keys.
       if (isEnter(key)) {
         // key[ENTER ]: handler
-        onEnter(cursor);
+        if (onEnter) {
+          onEnter(cursor);
+        }
       } else if (isEscape(key)) {
         // key[ESCAPE]: handler
-        onEscape(cursor);
+        if (onEscape) {
+          onEscape(cursor);
+        }
       } else if (isArrowUp(key)) {
         // key[ARROW_UP]: handler
         const nextCursor = cursor - 1 > -1 ? cursor - 1 : infinite ? 0 : count - 1;

@@ -17,8 +17,6 @@ const computeFrame = (
   outerEL: HTMLDivElement,
   innerEL: HTMLDivElement
 ): MetaListFrame => {
-  // const { current: _outerEL } = outerEL;
-  // const { current: _innerEL } = innerEL;
   const fH = outerEL.getBoundingClientRect().height;
   const tH = innerEL.getBoundingClientRect().height;
   const sT = outerEL.scrollTop;
@@ -159,7 +157,7 @@ const MetaList: React.FC<MetaListProps> = ({
     }
 
     // load more if at bottom.
-    if (_frame.rH < threshold && !loading) {
+    if (_frame.rH <= threshold && !loading) {
       console.log('...fetching more.');
       onNext();
     }

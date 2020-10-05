@@ -1,3 +1,4 @@
+import Book from 'components/elements/lists/booklist/book';
 /* eslint-disable react-hooks/exhaustive-deps */
 import { MetaListItem } from 'components/elements/lists/metalist/metalist';
 import MetaListBuffer from 'components/elements/lists/metalist/metalist-buffer';
@@ -5,7 +6,7 @@ import SearchQuery, { SearchFilter, SearchFilterType } from 'components/elements
 import useAppContext from 'components/hooks/useAppContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { ALField } from 'components/hooks/useMyUser';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 export interface AlertFile {
@@ -61,11 +62,13 @@ interface UsingAlerts {
   fields: ALField[];
   total: number;
   buffer: MetaListBuffer;
+  book: Book;
   query: SearchQuery;
   labelFilters: SearchFilter[];
   priorityFilters: SearchFilter[];
   statusFilters: SearchFilter[];
   valueFilters: SearchFilter[];
+  updateBook: (book: Book) => void;
   onLoad: (onSuccess?: () => void) => void;
   onLoadMore: (onSuccess?: () => void) => void;
   onGet: (id: string, onSuccess: (alert: AlertItem) => void) => void;
@@ -82,11 +85,12 @@ export default function useAlerts(pageSize: number): UsingAlerts {
   const [priorityFilters, setPriorityFilters] = useState<SearchFilter[]>([]);
   const [labelFilters, setLabelFilters] = useState<SearchFilter[]>([]);
   const [valueFilters, setValueFilters] = useState<SearchFilter[]>([]);
-  const [state, setState] = useState<{ loading: boolean; buffer: MetaListBuffer; total: number }>({
+  const [state, setState] = useState<{ loading: boolean; total: number; buffer: MetaListBuffer; book: Book }>({
     loading: true,
     total: 0,
     // items: [],
-    buffer: new MetaListBuffer()
+    buffer: new MetaListBuffer(),
+    book: new Book([], pageSize)
   });
 
   // parse list of alert result: add an index field.
@@ -108,10 +112,12 @@ export default function useAlerts(pageSize: number): UsingAlerts {
       url: buildUrl(),
       onSuccess: api_data => {
         const { items: _items, total } = api_data.api_response;
+        const items = parseResult(_items, 0);
         setState({
           loading: false,
           total,
-          buffer: new MetaListBuffer().push(parseResult(_items, 0))
+          buffer: new MetaListBuffer().push(items),
+          book: new Book(items, pageSize)
         });
         if (onSuccess) {
           onSuccess();
@@ -132,10 +138,12 @@ export default function useAlerts(pageSize: number): UsingAlerts {
       url: buildUrl(),
       onSuccess: api_data => {
         const { items: _items, total } = api_data.api_response;
+        const parsedItems = parseResult(_items, _offset);
         setState({
           loading: false,
           total,
-          buffer: state.buffer.push(parseResult(_items, _offset)).build()
+          buffer: state.buffer.push(parsedItems).build(),
+          book: state.book.addAll(parsedItems)
         });
         if (onSuccess) {
           onSuccess();
@@ -223,7 +231,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
   };
 
   // Hook API: fetch the alert for the specified alert_id.
-  const onGet = (id: string, onSuccess: (alert: AlertItem) => void) => {
+  const onGet = useCallback((id: string, onSuccess: (alert: AlertItem) => void) => {
     const url = `/api/v4/alert/${id}/`;
     apiCall({
       url,
@@ -231,7 +239,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
         onSuccess(api_data.api_response);
       }
     });
-  };
+  }, []);
 
   // Load it up!
   useEffect(() => {
@@ -264,6 +272,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
     priorityFilters,
     labelFilters,
     valueFilters,
+    updateBook: (book: Book) => setState({ ...state, book }),
     onLoad,
     onLoadMore,
     onGet

@@ -45,12 +45,12 @@ const useBooklistStyles = makeStyles(theme => ({
     position: 'relative',
     display: 'flex',
     flexDirection: 'column',
-    height: '100%',
-    outline: 'none'
+    height: '100%'
   },
   inner: {
     position: 'relative',
-    overflow: 'auto'
+    overflow: 'auto',
+    outline: 'none'
   },
   pager: {
     position: 'relative',

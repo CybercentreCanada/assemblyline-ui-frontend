@@ -20,11 +20,10 @@ export default class Book {
   constructor(lines: LineItem[], pageSize: number = DEFAULT_PAGESIZE) {
     this.pageSize = pageSize;
     this.addAll(lines);
-    this.add = this.add.bind(this);
   }
 
   public addAll(lines: LineItem[]): Book {
-    lines.forEach(this.add);
+    lines.forEach(line => this.add(line));
     return this;
   }
 
