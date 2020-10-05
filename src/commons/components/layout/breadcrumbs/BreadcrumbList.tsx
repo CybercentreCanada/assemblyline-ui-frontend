@@ -61,16 +61,14 @@ const BreadcrumbList: React.FC<BreadcrumbListProps> = ({
   const last = after.length > 0 && !allLinks ? after.pop() : before ? before.pop() : null;
   return (
     <MuiBreadcrumbs aria-label="breadcrumb" className={!disableStyle ? classes.breadcrumbs : ''} maxItems={1000}>
-      {before
-        ? before.map(item => <BreadcrumbLinkItem key={`bcrumb-${item.route.path}`} item={item} textOnly={textOnly} />)
-        : null}
-      {hasEllipsis ? (
+      {before &&
+        before.map(item => <BreadcrumbLinkItem key={`bcrumb-${item.route.path}`} item={item} textOnly={textOnly} />)}
+      {hasEllipsis && (
         <BreadcrumbsEllipsis expanded={expanded} onClick={() => setExpanded(!expanded)} css={classes.moreicon} />
-      ) : null}
-      {after
-        ? after.map(item => <BreadcrumbLinkItem key={`bcrumb-${item.route.path}`} item={item} textOnly={textOnly} />)
-        : null}
-      {last ? <BreadcrumbLastItem item={last} textOnly={textOnly} /> : null}
+      )}
+      {after &&
+        after.map(item => <BreadcrumbLinkItem key={`bcrumb-${item.route.path}`} item={item} textOnly={textOnly} />)}
+      {last && <BreadcrumbLastItem item={last} textOnly={textOnly} />}
     </MuiBreadcrumbs>
   );
 };

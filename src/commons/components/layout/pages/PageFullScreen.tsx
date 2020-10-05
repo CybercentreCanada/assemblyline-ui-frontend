@@ -1,4 +1,4 @@
-import { Box, IconButton, makeStyles, useScrollTrigger } from '@material-ui/core';
+import { IconButton, makeStyles, useScrollTrigger } from '@material-ui/core';
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
@@ -46,7 +46,7 @@ function MoveOnScroll({ children, enabled, isFullscreen }) {
   });
 
   const classes = useStyles(isFullscreen, !trigger || !enabled);
-  return <Box className={classes.toggle}>{children}</Box>;
+  return <div className={classes.toggle}>{children}</div>;
 }
 
 export default function PageFullscreen({ children }) {
@@ -77,7 +77,7 @@ export default function PageFullscreen({ children }) {
 
   return (
     <div ref={maximizableElement} className={classes.root}>
-      <Box className={classes.page}>
+      <div className={classes.page}>
         <MoveOnScroll enabled={!isTopLayout && autoHideAppbar} isFullscreen={isFullscreen}>
           {fullscreenSupported ? null : isFullscreen ? (
             <IconButton onClick={handleExitFullscreen}>
@@ -90,7 +90,7 @@ export default function PageFullscreen({ children }) {
           )}
         </MoveOnScroll>
         {children}
-      </Box>
+      </div>
     </div>
   );
 }

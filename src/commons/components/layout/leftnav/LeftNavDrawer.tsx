@@ -111,15 +111,15 @@ const LeftNavDrawer: React.FC<LeftNavDrawerProps> = props => {
   };
 
   const header = (
-    <Box>
+    <div>
       <Toolbar className={classes.toolbar}>
         <Link to="/" className={classes.title} onClick={onCloseDrawerIfOpen}>
-          <Box style={{ display: 'flex', padding: '0 10px' }}>{getLogo(theme)}</Box>
-          <Box style={{ display: 'flex' }}>{layoutProps.appName}</Box>
+          <div style={{ display: 'flex', padding: '0 10px' }}>{getLogo(theme)}</div>
+          <div style={{ display: 'flex' }}>{layoutProps.appName}</div>
         </Link>
       </Toolbar>
       <Divider />
-    </Box>
+    </div>
   );
 
   const hide = (

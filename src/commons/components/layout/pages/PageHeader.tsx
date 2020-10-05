@@ -1,6 +1,5 @@
 import {
   AppBar,
-  Box,
   Button,
   ButtonProps,
   IconButton,
@@ -81,9 +80,9 @@ const PageHeader: React.FC<PageHeaderProps> = ({
         return title;
       default:
         return (
-          <Box component="span">
+          <span>
             <BreadcrumbLastItem item={last()} />
-          </Box>
+          </span>
         );
     }
   };
@@ -101,40 +100,39 @@ const PageHeader: React.FC<PageHeaderProps> = ({
         color="inherit"
       >
         <Toolbar style={{ minHeight: mode === 'provided' && (title || left || right) ? 0 : '' }} disableGutters>
-          <Box>{left}</Box>
-          <Box flexGrow={1}>{renderTitle()}</Box>
-          <Box>
-            {actions
-              ? actions.map((a, i) => {
-                  if (a.title) {
-                    return (
-                      <Button
-                        key={`ph-action-${i}`}
-                        startIcon={a.icon}
-                        color={a.color}
-                        onClick={a.action}
-                        {...(a.btnProp as ButtonProps)}
-                        style={{ marginRight: theme.spacing(1) }}
-                      >
-                        {a.title}
-                      </Button>
-                    );
-                  }
+          <div>{left}</div>
+          <div style={{ flexGrow: 1 }}>{renderTitle()}</div>
+          <div>
+            {actions &&
+              actions.map((a, i) => {
+                if (a.title) {
                   return (
-                    <IconButton
+                    <Button
                       key={`ph-action-${i}`}
+                      startIcon={a.icon}
                       color={a.color}
                       onClick={a.action}
-                      {...(a.btnProp as IconButtonProps)}
+                      {...(a.btnProp as ButtonProps)}
                       style={{ marginRight: theme.spacing(1) }}
                     >
-                      {a.icon}
-                    </IconButton>
+                      {a.title}
+                    </Button>
                   );
-                })
-              : null}
-          </Box>
-          <Box>{right}</Box>
+                }
+                return (
+                  <IconButton
+                    key={`ph-action-${i}`}
+                    color={a.color}
+                    onClick={a.action}
+                    {...(a.btnProp as IconButtonProps)}
+                    style={{ marginRight: theme.spacing(1) }}
+                  >
+                    {a.icon}
+                  </IconButton>
+                );
+              })}
+          </div>
+          <div>{right}</div>
         </Toolbar>
       </AppBar>
     </RootRef>

@@ -1,4 +1,4 @@
-import { Box, Collapse, List, ListItem, ListItemIcon, ListItemText, Popover, Tooltip } from '@material-ui/core';
+import { Collapse, List, ListItem, ListItemIcon, ListItemText, Popover, Tooltip } from '@material-ui/core';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
@@ -32,7 +32,7 @@ const LeftNavGroup: React.FC<LeftNavGroupProps> = ({ open = true, id, title, ico
   );
 
   return (
-    <Box>
+    <div>
       {drawerState ? (
         groupItem
       ) : (
@@ -67,7 +67,7 @@ const LeftNavGroup: React.FC<LeftNavGroupProps> = ({ open = true, id, title, ico
           ))}
         </List>
       </Popover>
-    </Box>
+    </div>
   );
 };
 

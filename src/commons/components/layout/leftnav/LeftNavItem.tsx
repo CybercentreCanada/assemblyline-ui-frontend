@@ -37,7 +37,7 @@ const LeftNavItem: React.FC<LeftNavItemProps> = props => {
       key={text}
       onClick={onCloseDrawerIfOpen}
     >
-      {(icon && !nested) || (!hideNestedIcons && icon && nested) ? <ListItemIcon>{icon}</ListItemIcon> : null}
+      {((icon && !nested) || (!hideNestedIcons && icon && nested)) && <ListItemIcon>{icon}</ListItemIcon>}
       <ListItemText primary={text} />
     </ListItem>
   );

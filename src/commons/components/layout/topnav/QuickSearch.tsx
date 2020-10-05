@@ -1,4 +1,4 @@
-import { Box, fade, InputBase, makeStyles } from '@material-ui/core';
+import { fade, InputBase, makeStyles } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import React, { useState } from 'react';
@@ -80,11 +80,11 @@ const QuickSearch = () => {
   };
 
   return (
-    <Box className={classes.search}>
+    <div className={classes.search}>
       <form autoComplete="off" onSubmit={submit}>
-        <Box className={classes.searchIcon}>
+        <div className={classes.searchIcon}>
           <SearchIcon />
-        </Box>
+        </div>
         <InputBase
           onChange={event => setValue(event.target.value)}
           placeholder={t('quicksearch.placeholder')}
@@ -96,7 +96,7 @@ const QuickSearch = () => {
           inputProps={{ 'aria-label': t('quicksearch.aria') }}
         />
       </form>
-    </Box>
+    </div>
   );
 };
 

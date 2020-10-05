@@ -1,6 +1,5 @@
 import {
   Avatar,
-  Box,
   Button,
   ClickAwayListener,
   Fade,
@@ -47,6 +46,7 @@ const AppSwitcher: React.FC<AppsSwitcherProps> = props => {
     setPopperAnchorEl(popperAnchorEl ? null : event.currentTarget);
   };
   const onClickAway = () => setPopperAnchorEl(null);
+  const sp1 = theme.spacing(1);
 
   if (layoutProps.topnav.apps.length === 0) {
     return null;
@@ -66,14 +66,16 @@ const AppSwitcher: React.FC<AppsSwitcherProps> = props => {
           {({ TransitionProps }) => (
             <Fade {...TransitionProps} timeout={250}>
               <Paper style={{ textAlign: 'center', padding: theme.spacing(1) }} elevation={4}>
-                <Box
-                  maxWidth={layoutProps.topnav.apps.length <= 4 || isWidthDown('xs', props.width) ? '240px' : '360px'}
-                  display="flex"
-                  flexDirection="row"
-                  flexWrap="wrap"
+                <div
+                  style={{
+                    maxWidth: layoutProps.topnav.apps.length <= 4 || isWidthDown('xs', props.width) ? '240px' : '360px',
+                    display: 'flex',
+                    flexDirection: 'row',
+                    flexWrap: 'wrap'
+                  }}
                 >
                   {layoutProps.topnav.apps.map((a, i) => (
-                    <Box key={`box-${i}`} width="120px" p={1} overflow="hidden">
+                    <div key={`box-${i}`} style={{ width: '120px', padding: sp1, overflow: 'hidden' }}>
                       <Button
                         component={Link}
                         target={a.newWindow ? '_blank' : null}
@@ -81,7 +83,7 @@ const AppSwitcher: React.FC<AppsSwitcherProps> = props => {
                         key={`button-${i}`}
                         style={{ display: 'inherit', textDecoration: 'none', fontWeight: 400 }}
                       >
-                        <Box display="inline-flex">
+                        <div style={{ display: 'inline-flex' }}>
                           <Avatar
                             key={`avatar-${i}`}
                             variant="rounded"
@@ -109,14 +111,14 @@ const AppSwitcher: React.FC<AppsSwitcherProps> = props => {
                               ? a.img_l
                               : a.alt}
                           </Avatar>
-                        </Box>
+                        </div>
                         <Typography key={`text-${i}`} variant="caption">
                           {a.name}
                         </Typography>
                       </Button>
-                    </Box>
+                    </div>
                   ))}
-                </Box>
+                </div>
               </Paper>
             </Fade>
           )}

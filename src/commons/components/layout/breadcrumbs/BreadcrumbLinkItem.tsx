@@ -36,7 +36,7 @@ const BreadcrumbLinkItem: React.FC<BreadcrumbLinkItemProps> = ({ item, textOnly 
       to={url}
       className={classes.link}
     >
-      {!textOnly ? <BreadcrumbIcon item={item} /> : null}
+      {!textOnly && <BreadcrumbIcon item={item} />}
       <Tooltip title={url}>
         <span className={classes.text}>{resolveTitle(item)}</span>
       </Tooltip>

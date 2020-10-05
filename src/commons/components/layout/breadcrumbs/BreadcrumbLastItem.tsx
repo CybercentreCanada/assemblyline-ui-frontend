@@ -23,7 +23,7 @@ const BreadcrumbLastItem: React.FC<BreadcrumbLastItemProps> = ({ item, textOnly 
       color="textPrimary"
       className={linkClasses.link}
     >
-      {!textOnly ? <BreadcrumbIcon item={item} /> : null}
+      {!textOnly && <BreadcrumbIcon item={item} />}
       <Tooltip title={url}>
         <span className={classes.text}>{resolveTitle(item)}</span>
       </Tooltip>
