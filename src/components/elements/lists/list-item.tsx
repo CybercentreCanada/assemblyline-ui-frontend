@@ -21,7 +21,6 @@ interface ListRowProps {
 const ListRow: React.FC<ListRowProps> = React.memo(
   ({ loaded, selected, item, index, rowHeight, onClick, onRenderRow }) => {
     const { listItemClasses: classes } = useListStyles();
-    console.log(`rendering: ${index}`);
 
     const _onClick = useCallback(() => {
       if (onClick) {
@@ -47,28 +46,5 @@ const ListRow: React.FC<ListRowProps> = React.memo(
     );
   }
 );
-
-// const ListRow: React.FC<ListRowProps> =
-//   ({ loaded, selected, item, index, rowHeight, onClick, onRenderRow }) => {
-//     const { listItemClasses: classes } = useListStyles();
-//     console.log(`rendering: ${index}`);
-//     return (
-//       <div
-//         className={classes.itemCt}
-//         data-listitem-position={index}
-//         data-listitem-selected={selected}
-//         data-listitem-focus="false"
-//         onClick={onClick ? () => onClick(item, index) : null}
-//       >
-//         <div className={classes.itemOuter} style={{ height: !loaded ? rowHeight : null }}>
-//           <div className={classes.itemInner}>{loaded ? onRenderRow(item) : '...loading'}</div>
-//         </div>
-//         <div className={classes.itemDivider}>
-//           <Divider />
-//         </div>
-//       </div>
-//     );
-//   }
-// ;
 
 export default ListRow;

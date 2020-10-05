@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import { CircularProgress } from '@material-ui/core';
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import Throttler from '../../utils/throttler';
 import useListKeyboard from '../hooks/useListKeyboard';
 import useListStyles from '../hooks/useListStyles';
@@ -77,133 +77,123 @@ interface MetaListProps {
   onLoad?: (from: number, to: number) => void;
 }
 
-const MetaList: React.FC<MetaListProps> = ({
-  loading,
-  buffer,
-  rowHeight,
-  scrollReset,
-  threshold = 0,
-  onSelection,
-  onRenderItem,
-  onNext,
-  onLoad
-}) => {
-  // Styles.
-  const { metaListClasses: classes } = useListStyles();
+const MetaList: React.FC<MetaListProps> = React.memo(
+  ({ loading, buffer, rowHeight, scrollReset, threshold = 0, onSelection, onRenderItem, onNext, onLoad }) => {
+    // Styles.
+    const { metaListClasses: classes } = useListStyles();
 
-  // Custom hooks
-  const { cursor, setCursor, onKeyDown } = useListKeyboard({
-    count: buffer.total(),
-    rowHeight,
-    infinite: true,
-    onEscape: () => onSelection(null),
-    onEnter: (_cursor: number) => onSelection(buffer.one(_cursor).item)
-  });
+    // Custom hooks
+    const { cursor, setCursor, onKeyDown } = useListKeyboard({
+      count: buffer.total(),
+      rowHeight,
+      infinite: true,
+      onEscape: () => onSelection(null),
+      onEnter: (_cursor: number) => onSelection(buffer.one(_cursor).item)
+    });
 
-  // References.
-  const outerEL = useRef<HTMLDivElement>();
-  const innerEL = useRef<HTMLDivElement>();
-  const frameEL = useRef<HTMLDivElement>();
+    // References.
+    const outerEL = useRef<HTMLDivElement>();
+    const innerEL = useRef<HTMLDivElement>();
+    const frameEL = useRef<HTMLDivElement>();
 
-  const onListItemClick = (item: MetaListItem) => {
-    setCursor(item.index);
-    onSelection(item);
-  };
-
-  // States.
-  const [frame, setFrame] = useState<MetaListFrame>({
-    sT: 0,
-    rH: 0,
-    cP: 0,
-    fH: 0,
-    startIndex: 0,
-    endIndex: 0,
-    items: []
-  });
-
-  // Row Renderer
-  const rowRenderer = (item: { loaded: boolean; item: MetaListItem }) => {
-    return (
-      <ListRow
-        key={`list.rowitem[${item.item.index}]`}
-        index={item.item.index}
-        loaded={item.loaded}
-        item={item.item}
-        selected={item.item.index === cursor}
-        rowHeight={rowHeight}
-        onClick={onListItemClick}
-        onRenderRow={onRenderItem}
-      />
+    const _onRowClick = useCallback(
+      (item: MetaListItem) => {
+        setCursor(item.index);
+        onSelection(item);
+      },
+      [setCursor, onSelection]
     );
-  };
 
-  const onScroll = () => {
-    // compute frame.
-    const _frame = computeFrame(buffer, rowHeight, outerEL.current, innerEL.current);
+    // States.
+    const [frame, setFrame] = useState<MetaListFrame>({
+      sT: 0,
+      rH: 0,
+      cP: 0,
+      fH: 0,
+      startIndex: 0,
+      endIndex: 0,
+      items: []
+    });
 
-    // update frame state.
-    setFrame(_frame);
+    const onScroll = () => {
+      // compute frame.
+      const _frame = computeFrame(buffer, rowHeight, outerEL.current, innerEL.current);
 
-    //
-    const unloaded = _frame.items.filter(item => !item.loaded);
-    if (buffer.size && unloaded.length) {
-      // TODO: throttle this to ensure we dont' fetch things we're just scrolling by.
-      // fetch the missing items.
-      THROTTLER.delay(() => {
-        const start = unloaded[0].item.index;
-        const end = unloaded[unloaded.length - 1].item.index;
-        onLoad(start, end);
-      });
-    }
+      // update frame state.
+      setFrame(_frame);
 
-    // load more if at bottom.
-    if (_frame.rH <= threshold && !loading) {
-      console.log('...fetching more.');
-      onNext();
-    }
-  };
+      //
+      const unloaded = _frame.items.filter(item => !item.loaded);
+      if (buffer.size && unloaded.length) {
+        // TODO: throttle this to ensure we dont' fetch things we're just scrolling by.
+        // fetch the missing items.
+        THROTTLER.delay(() => {
+          const start = unloaded[0].item.index;
+          const end = unloaded[unloaded.length - 1].item.index;
+          onLoad(start, end);
+        });
+      }
 
-  // Adjust things each time we receive an updated list of items.
-  useLayoutEffect(() => {
-    console.log('useeffect...');
-    // Adjust the inner container height each time we receive an updated list of items.
-    innerEL.current.style.height = `${buffer.total() * rowHeight}px`;
-
-    // reset scroll?
-    // TODO: ideally there would be a way to infer this withhow in this component
-    if (scrollReset) {
-      outerEL.current.scrollTo({ top: 0 });
-    }
-
-    // compute which items are within visual frame.
-    const updateFrame = () => setFrame(computeFrame(buffer, rowHeight, outerEL.current, innerEL.current));
-
-    // Recompute the frame each time this component mounts or receives update to properties.
-    updateFrame();
-
-    // Register a windows resize event to ensure frame measurement remain in line with window size.
-    window.addEventListener('resize', updateFrame);
-    return () => {
-      // Deregister window event listener.
-      window.removeEventListener('resize', updateFrame);
+      // load more if at bottom.
+      if (_frame.rH <= threshold && !loading) {
+        console.log('...fetching more.');
+        onNext();
+      }
     };
-  }, [buffer, rowHeight, scrollReset]);
 
-  return (
-    <div ref={outerEL} tabIndex={0} className={classes.outer} onScroll={onScroll} onKeyDown={onKeyDown}>
-      {loading ? (
-        <div className={classes.progressCt} style={{ top: frame.sT, height: frame.fH }}>
-          <CircularProgress className={classes.progressSpinner} />
-        </div>
-      ) : null}
+    // Adjust things each time we receive an updated list of items.
+    useLayoutEffect(() => {
+      console.log('useeffect...');
+      // Adjust the inner container height each time we receive an updated list of items.
+      innerEL.current.style.height = `${buffer.total() * rowHeight}px`;
 
-      <div ref={innerEL} className={classes.inner}>
-        <div ref={frameEL} className={classes.frame} style={{ top: frame.startIndex * rowHeight }}>
-          {frame.items.map(rowRenderer)}
+      // reset scroll?
+      // TODO: ideally there would be a way to infer this withhow in this component
+      if (scrollReset) {
+        outerEL.current.scrollTo({ top: 0 });
+      }
+
+      // compute which items are within visual frame.
+      const updateFrame = () => setFrame(computeFrame(buffer, rowHeight, outerEL.current, innerEL.current));
+
+      // Recompute the frame each time this component mounts or receives update to properties.
+      updateFrame();
+
+      // Register a windows resize event to ensure frame measurement remain in line with window size.
+      window.addEventListener('resize', updateFrame);
+      return () => {
+        // Deregister window event listener.
+        window.removeEventListener('resize', updateFrame);
+      };
+    }, [buffer, rowHeight, scrollReset]);
+
+    return (
+      <div ref={outerEL} tabIndex={0} className={classes.outer} onScroll={onScroll} onKeyDown={onKeyDown}>
+        {loading ? (
+          <div className={classes.progressCt} style={{ top: frame.sT, height: frame.fH }}>
+            <CircularProgress className={classes.progressSpinner} />
+          </div>
+        ) : null}
+
+        <div ref={innerEL} className={classes.inner}>
+          <div ref={frameEL} className={classes.frame} style={{ top: frame.startIndex * rowHeight }}>
+            {frame.items.map(item => (
+              <ListRow
+                key={`list.rowitem[${item.item.index}]`}
+                index={item.item.index}
+                loaded={item.loaded}
+                item={item.item}
+                selected={item.item.index === cursor}
+                rowHeight={rowHeight}
+                onClick={_onRowClick}
+                onRenderRow={onRenderItem}
+              />
+            ))}
+          </div>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  }
+);
 
 export default MetaList;

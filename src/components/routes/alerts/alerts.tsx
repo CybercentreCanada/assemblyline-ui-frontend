@@ -3,7 +3,8 @@ import CloseIcon from '@material-ui/icons/Close';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import StarIcon from '@material-ui/icons/Star';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
-import Booklist from 'components/elements/lists/booklist/booklist';
+import MetaList from 'components/elements/lists/metalist/metalist';
+// import Booklist from 'components/elements/lists/booklist/booklist';
 import SplitPanel from 'components/elements/panels/split-panel';
 import Viewport from 'components/elements/panels/viewport';
 import SearchBar from 'components/elements/search/search-bar';
@@ -142,10 +143,10 @@ const Alerts: React.FC = () => {
   );
 
   // Handler for when loading more alerts [read bottom of scroll area]
-  const _onLoadMore = () => {
-    // setScrollReset(false);
+  const _onLoadMore = useCallback(() => {
+    setScrollReset(false);
     onLoadMore();
-  };
+  }, [setScrollReset, onLoadMore]);
 
   // Hanlder for when clicking one the AlertsFilters 'Apply' button.
   const onApplyFilters = (filters: AlertFilterSelections) => {
@@ -301,23 +302,23 @@ const Alerts: React.FC = () => {
           rightDrawerBackgroundColor={theme.palette.background.default}
           rightOpen={splitPanel.open}
           left={
-            // <MetaList
-            //   loading={loading || searching}
-            //   buffer={buffer}
-            //   rowHeight={92}
-            //   scrollReset={scrollReset}
-            //   onSelection={onItemSelected}
-            //   onNext={_onLoadMore}
-            //   onRenderItem={(item: AlertItem) => <AlertListItem item={item} />}
-            // />
-            <Booklist
+            <MetaList
               loading={loading || searching}
-              book={book}
-              onItemSelected={onItemSelected}
-              onPageChange={updateBook}
-              onRenderRow={onRenderListRow}
-              onLoadNext={_onLoadMore}
+              buffer={buffer}
+              rowHeight={92}
+              scrollReset={scrollReset}
+              onSelection={onItemSelected}
+              onNext={_onLoadMore}
+              onRenderItem={onRenderListRow}
             />
+            // <Booklist
+            //   loading={loading || searching}
+            //   book={book}
+            //   onItemSelected={onItemSelected}
+            //   onPageChange={updateBook}
+            //   onRenderRow={onRenderListRow}
+            //   onLoadNext={_onLoadMore}
+            // />
             // <InfiniteList
             //   items={buffer.items}
             //   loading={buffer.items.length && (loading || searching)}

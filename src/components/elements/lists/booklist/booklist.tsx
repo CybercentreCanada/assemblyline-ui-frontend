@@ -17,52 +17,104 @@ interface BooklistProps {
   onLoadNext: () => void;
 }
 
-const Booklist: React.FC<BooklistProps> = React.memo(
-  ({ loading, book, onItemSelected, onPageChange, onRenderRow, onLoadNext }) => {
-    const { booklistClasses: classes } = useListStyles();
-    const element = useRef<HTMLDivElement>();
-    const { cursor, setCursor, onKeyDown } = useListKeyboard({
-      count: book.currentPageLineCount(),
-      onEscape: () => onItemSelected(null),
-      onEnter: (_cursor: number) => onItemSelected(book.currentPage().lines[_cursor])
-    });
+// const Booklist: React.FC<BooklistProps> = React.memo(
+//   ({ loading, book, onItemSelected, onPageChange, onRenderRow, onLoadNext }) => {
+//     const { booklistClasses: classes } = useListStyles();
+//     const element = useRef<HTMLDivElement>();
+//     const { cursor, setCursor, onKeyDown } = useListKeyboard({
+//       count: book.currentPageLineCount(),
+//       onEscape: () => onItemSelected(null),
+//       onEnter: (_cursor: number) => onItemSelected(book.currentPage().lines[_cursor])
+//     });
 
-    const _onRowClick = useCallback(
-      (item: LineItem, index: number) => {
-        setCursor(index);
-        onItemSelected(item);
-      },
-      [setCursor, onItemSelected]
-    );
+//     const _onRowClick = useCallback(
+//       (item: LineItem, index: number) => {
+//         setCursor(index);
+//         onItemSelected(item);
+//       },
+//       [setCursor, onItemSelected]
+//     );
 
-    return (
-      <div ref={element} className={classes.outer}>
-        {loading ? (
-          <div className={classes.progressCt}>
-            <CircularProgress className={classes.progressSpinner} />
-          </div>
-        ) : null}
-        <BooklistPager book={book} onChange={onPageChange} onLoadNext={onLoadNext} />
-        <div className={classes.inner} tabIndex={0} onKeyDown={onKeyDown}>
-          {!book.isCurrentPageEmpty()
-            ? book
-                .currentPage()
-                .lines.map((item, index) => (
-                  <ListRow
-                    key={`list.rowitem[${index}]`}
-                    loaded
-                    index={index}
-                    selected={cursor === index}
-                    item={item}
-                    onClick={_onRowClick}
-                    onRenderRow={onRenderRow}
-                  />
-                ))
-            : null}
+//     return (
+//       <div ref={element} className={classes.outer}>
+//         {loading ? (
+//           <div className={classes.progressCt}>
+//             <CircularProgress className={classes.progressSpinner} />
+//           </div>
+//         ) : null}
+//         <BooklistPager book={book} onChange={onPageChange} onLoadNext={onLoadNext} />
+//         <div className={classes.inner} tabIndex={0} onKeyDown={onKeyDown}>
+//           {!book.isCurrentPageEmpty()
+//             ? book
+//                 .currentPage()
+//                 .lines.map((item, index) => (
+//                   <ListRow
+//                     key={`list.rowitem[${index}]`}
+//                     loaded
+//                     index={index}
+//                     selected={cursor === index}
+//                     item={item}
+//                     onClick={_onRowClick}
+//                     onRenderRow={onRenderRow}
+//                   />
+//                 ))
+//             : null}
+//         </div>
+//       </div>
+//     );
+//   }
+// );
+
+const Booklist: React.FC<BooklistProps> = ({
+  loading,
+  book,
+  onItemSelected,
+  onPageChange,
+  onRenderRow,
+  onLoadNext
+}) => {
+  const { booklistClasses: classes } = useListStyles();
+  const element = useRef<HTMLDivElement>();
+  const { cursor, setCursor, onKeyDown } = useListKeyboard({
+    count: book.currentPageLineCount(),
+    onEscape: () => onItemSelected(null),
+    onEnter: (_cursor: number) => onItemSelected(book.currentPage().lines[_cursor])
+  });
+
+  const _onRowClick = useCallback(
+    (item: LineItem, index: number) => {
+      setCursor(index);
+      onItemSelected(item);
+    },
+    [setCursor, onItemSelected]
+  );
+
+  return (
+    <div ref={element} className={classes.outer}>
+      {loading ? (
+        <div className={classes.progressCt}>
+          <CircularProgress className={classes.progressSpinner} />
         </div>
+      ) : null}
+      <BooklistPager book={book} onChange={onPageChange} onLoadNext={onLoadNext} />
+      <div className={classes.inner} tabIndex={0} onKeyDown={onKeyDown}>
+        {!book.isCurrentPageEmpty()
+          ? book
+              .currentPage()
+              .lines.map((item, index) => (
+                <ListRow
+                  key={`list.rowitem[${index}]`}
+                  loaded
+                  index={index}
+                  selected={cursor === index}
+                  item={item}
+                  onClick={_onRowClick}
+                  onRenderRow={onRenderRow}
+                />
+              ))
+          : null}
       </div>
-    );
-  }
-);
-
+    </div>
+  );
+};
 export default Booklist;
