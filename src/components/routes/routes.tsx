@@ -30,6 +30,7 @@ import Tos from 'components/routes/tos';
 import User from 'components/routes/user';
 import React from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
+import Alerts from './alerts/alerts';
 
 const Routes = () => {
   const { user: currentUser } = useAppContext();
@@ -37,6 +38,7 @@ const Routes = () => {
     <Switch>
       <Route exact path="/" component={Submit} />
       <Route exact path="/account" component={Account} />
+      <Route exact path="/alerts" component={Alerts} />
       <Route exact path="/admin" component={Admin} />
       <Route exact path="/admin/errors" component={AdminErrorViewer} />
       <Route exact path="/admin/services" component={AdminServices} />

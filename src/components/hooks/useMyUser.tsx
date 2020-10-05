@@ -2,7 +2,7 @@ import { UserContextProps, UserProfileProps, ValidatedProp } from 'commons/compo
 import { ClassificationDefinition } from 'helpers/classificationParser';
 import { useState } from 'react';
 
-type ALField = {
+export type ALField = {
   name: string;
   indexed: boolean;
   stored: boolean;
