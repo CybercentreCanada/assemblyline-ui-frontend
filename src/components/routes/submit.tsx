@@ -18,12 +18,12 @@ import useAppLayout from 'commons/components/hooks/useAppLayout';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useAppContext from 'components/hooks/useAppContext';
 import useMyAPI from 'components/hooks/useMyAPI';
+import useMySnackbar from 'components/hooks/useMySnackbar';
 import ServiceTree from 'components/layout/serviceTree';
 import Classification from 'components/visual/Classification';
 import FileDropper from 'components/visual/FileDropper';
 import Flow from 'helpers/flow';
 import generateUUID from 'helpers/uuid';
-import { OptionsObject, useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory } from 'react-router-dom';
@@ -52,23 +52,12 @@ function Submit() {
   const [value, setValue] = useState('0');
   const downSM = useMediaQuery(theme.breakpoints.down('sm'));
   const md = useMediaQuery(theme.breakpoints.only('md'));
+  const { showErrorMessage, showSuccessMessage, closeSnackbar } = useMySnackbar();
   const history = useHistory();
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
   const sp8 = theme.spacing(8);
-  const snackBarOptions: OptionsObject = {
-    variant: 'error',
-    autoHideDuration: 5000,
-    anchorOrigin: {
-      vertical: 'bottom',
-      horizontal: 'center'
-    },
-    onClick: snack => {
-      closeSnackbar();
-    }
-  };
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -117,7 +106,7 @@ function Submit() {
         }
       } catch (ex) {
         cancelUpload();
-        enqueueSnackbar(t('submit.file.upload_fail'), snackBarOptions);
+        showErrorMessage(t('submit.file.upload_fail'));
       }
     });
     flow.on('progress', () => {
@@ -138,16 +127,13 @@ function Submit() {
         method: 'POST',
         body: settings,
         onSuccess: api_data => {
-          enqueueSnackbar(`${t('submit.success')} ${api_data.api_response.sid}`, {
-            ...snackBarOptions,
-            variant: 'success'
-          });
+          showSuccessMessage(`${t('submit.success')} ${api_data.api_response.sid}`);
           setTimeout(() => {
             history.push(`/submission/detail/${api_data.api_response.sid}`);
           }, 500);
         },
         onFailure: api_data => {
-          enqueueSnackbar(t('submit.file.failure'), snackBarOptions);
+          showErrorMessage(t('submit.file.failure'));
           setAllowClick(true);
         }
       });
@@ -220,16 +206,13 @@ function Submit() {
       body: data,
       onSuccess: api_data => {
         setAllowClick(false);
-        enqueueSnackbar(`${t('submit.success')} ${api_data.api_response.sid}`, {
-          ...snackBarOptions,
-          variant: 'success'
-        });
+        showSuccessMessage(`${t('submit.success')} ${api_data.api_response.sid}`);
         setTimeout(() => {
           history.push(`/submissions/${api_data.api_response.sid}`);
         }, 500);
       },
       onFailure: api_data => {
-        enqueueSnackbar(t('submit.url.failure'), snackBarOptions);
+        showErrorMessage(t('submit.url.failure'));
         setUrlHasError(true);
       }
     });

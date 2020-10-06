@@ -26,12 +26,11 @@ import Skeleton from '@material-ui/lab/Skeleton';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useAppContext from 'components/hooks/useAppContext';
 import useMyAPI from 'components/hooks/useMyAPI';
+import useMySnackbar from 'components/hooks/useMySnackbar';
 import ServiceTree from 'components/layout/serviceTree';
 import Classification from 'components/visual/Classification';
-import { OptionsObject, useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { isNull } from 'util';
 
 type SettingsProps = {
   width: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -46,7 +45,7 @@ function Settings<SettingsProps>({ width }) {
   const [modified, setModified] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
   const { user: currentUser, c12nDef } = useAppContext();
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const { showSuccessMessage } = useMySnackbar();
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
@@ -90,18 +89,6 @@ function Settings<SettingsProps>({ width }) {
     }
   }));
   const classes = useStyles();
-
-  const snackBarSuccessOptions: OptionsObject = {
-    variant: 'success',
-    autoHideDuration: 3000,
-    anchorOrigin: {
-      vertical: 'bottom',
-      horizontal: 'center'
-    },
-    onClick: snack => {
-      closeSnackbar();
-    }
-  };
 
   function setClassification(value) {
     if (settings) {
@@ -181,7 +168,7 @@ function Settings<SettingsProps>({ width }) {
         body: settings,
         onSuccess: () => {
           setModified(false);
-          enqueueSnackbar(t('success_save'), snackBarSuccessOptions);
+          showSuccessMessage(t('success_save'));
         },
         onEnter: () => setButtonLoading(true),
         onExit: () => setButtonLoading(false)
@@ -343,7 +330,7 @@ function Settings<SettingsProps>({ width }) {
                 <TableCell align="right">
                   <Switch
                     checked={settings ? !settings.ignore_dynamic_recursion_prevention : true}
-                    disabled={isNull(settings)}
+                    disabled={settings === null}
                     onChange={() => toggleDynamicPrevention()}
                     color="secondary"
                     name="dynamic_resursion"
@@ -358,7 +345,7 @@ function Settings<SettingsProps>({ width }) {
                 <TableCell align="right">
                   <Switch
                     checked={settings ? !settings.ignore_filtering : true}
-                    disabled={isNull(settings)}
+                    disabled={settings === null}
                     onChange={() => toggleFiltering()}
                     color="secondary"
                     name="filtering"
@@ -373,7 +360,7 @@ function Settings<SettingsProps>({ width }) {
                 <TableCell align="right">
                   <Switch
                     checked={settings ? !settings.ignore_cache : true}
-                    disabled={isNull(settings)}
+                    disabled={settings === null}
                     onChange={() => toggleCaching()}
                     color="secondary"
                     name="result_caching"
@@ -388,7 +375,7 @@ function Settings<SettingsProps>({ width }) {
                 <TableCell align="right">
                   <Switch
                     checked={settings ? settings.deep_scan : true}
-                    disabled={isNull(settings)}
+                    disabled={settings === null}
                     onChange={() => toggleDeepScan()}
                     color="secondary"
                     name="deep_scan"
@@ -403,7 +390,7 @@ function Settings<SettingsProps>({ width }) {
                 <TableCell align="right">
                   <Switch
                     checked={settings ? !settings.profile : true}
-                    disabled={isNull(settings)}
+                    disabled={settings === null}
                     onChange={() => toggleProfile()}
                     color="secondary"
                     name="profile"

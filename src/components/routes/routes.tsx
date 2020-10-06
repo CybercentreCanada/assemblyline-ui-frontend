@@ -33,7 +33,7 @@ import { Redirect, Route, Switch } from 'react-router-dom';
 import Alerts from './alerts/alerts';
 
 const Routes = () => {
-  const { user: currentUser } = useAppContext();
+  const { settings } = useAppContext();
   return (
     <Switch>
       <Route exact path="/" component={Submit} />
@@ -64,7 +64,7 @@ const Routes = () => {
       <Route exact path="/submit" component={Submit} />
       <Route exact path="/submission/detail/:id" component={SubmissionDetail} />
       <Route exact path="/submission/report/:id" component={SubmissionReport} />
-      {currentUser.default_view === 'detail' ? (
+      {settings.submission_view === 'detail' ? (
         <Redirect from="/submission/:id" to="/submission/detail/:id" />
       ) : (
         <Redirect from="/submission/:id" to="/submission/report/:id" />

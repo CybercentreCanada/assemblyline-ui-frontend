@@ -11,8 +11,8 @@ import {
   useTheme
 } from '@material-ui/core';
 import useMyAPI from 'components/hooks/useMyAPI';
+import useMySnackbar from 'components/hooks/useMySnackbar';
 import toArrayBuffer from 'helpers/toArrayBuffer';
-import { OptionsObject } from 'notistack';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -21,14 +21,13 @@ const CBOR = require('helpers/cbor.js');
 type SecurityTokenProps = {
   user: any;
   toggleToken: (token: string) => void;
-  enqueueSnackbar: (message: string, options: OptionsObject) => void;
-  snackBarOptions: OptionsObject;
 };
 
-export default function SecurityToken({ user, toggleToken, enqueueSnackbar, snackBarOptions }: SecurityTokenProps) {
+export default function SecurityToken({ user, toggleToken }: SecurityTokenProps) {
   const { t } = useTranslation(['user']);
   const [selectedToken, setSelectedToken] = useState(null);
   const [tempToken, setTempToken] = useState('');
+  const { showSuccessMessage, showErrorMessage } = useMySnackbar();
   const apiCall = useMyAPI();
   const regex = RegExp('^[a-zA-Z][a-zA-Z0-9_ ]*$');
   const theme = useTheme();
@@ -49,7 +48,7 @@ export default function SecurityToken({ user, toggleToken, enqueueSnackbar, snac
       onSuccess: () => {
         toggleToken(selectedToken);
         setSelectedToken(null);
-        enqueueSnackbar(t('token.removed'), snackBarOptions);
+        showSuccessMessage(t('token.removed'));
       }
     });
   }
@@ -78,18 +77,14 @@ export default function SecurityToken({ user, toggleToken, enqueueSnackbar, snac
                 onSuccess: () => {
                   toggleToken(tempToken);
                   setTempToken('');
-                  enqueueSnackbar(t('token.added'), snackBarOptions);
+                  showSuccessMessage(t('token.added'));
                 }
               });
             })
             .catch(ex => {
               // eslint-disable-next-line no-console
               setTempToken('');
-              enqueueSnackbar(`${ex.name}: ${ex.message}`, {
-                ...snackBarOptions,
-                variant: 'error',
-                autoHideDuration: 5000
-              });
+              showErrorMessage(`${ex.name}: ${ex.message}`);
             });
         }
       }

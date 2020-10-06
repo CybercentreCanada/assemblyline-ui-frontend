@@ -15,18 +15,16 @@ import {
   useTheme
 } from '@material-ui/core';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { OptionsObject } from 'notistack';
+import useMySnackbar from 'components/hooks/useMySnackbar';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type APIKeysProps = {
   user: any;
   toggleAPIKey: (apiKey: string) => void;
-  enqueueSnackbar: (message: string, options: OptionsObject) => void;
-  snackBarOptions: OptionsObject;
 };
 
-export default function APIKeys({ user, toggleAPIKey, enqueueSnackbar, snackBarOptions }: APIKeysProps) {
+export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
   const { t } = useTranslation(['user']);
   const [selectedAPIKey, setSelectedAPIKey] = useState(null);
   const [tempAPIKey, setTempAPIKey] = useState(null);
@@ -35,6 +33,7 @@ export default function APIKeys({ user, toggleAPIKey, enqueueSnackbar, snackBarO
   const apiCall = useMyAPI();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const { showSuccessMessage } = useMySnackbar();
   const regex = RegExp('^[a-zA-Z][a-zA-Z0-9_]*$');
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
@@ -47,7 +46,7 @@ export default function APIKeys({ user, toggleAPIKey, enqueueSnackbar, snackBarO
       onSuccess: () => {
         toggleAPIKey(selectedAPIKey);
         setSelectedAPIKey(null);
-        enqueueSnackbar(t('apikeys.removed'), snackBarOptions);
+        showSuccessMessage(t('apikeys.removed'));
       }
     });
   }

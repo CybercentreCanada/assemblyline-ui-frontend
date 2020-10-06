@@ -5,6 +5,7 @@ import UserProvider from 'commons/components/user/UserProvider';
 import useAppContext from 'components/hooks/useAppContext';
 import useMyLayout from 'components/hooks/useMyLayout';
 import useMySitemap from 'components/hooks/useMySitemap';
+import useMySnackbar from 'components/hooks/useMySnackbar';
 import useMyUser from 'components/hooks/useMyUser';
 import LoadingScreen from 'components/routes/loading';
 import LockedPage from 'components/routes/locked';
@@ -12,7 +13,7 @@ import LoginScreen from 'components/routes/login';
 import Routes from 'components/routes/routes';
 import Tos from 'components/routes/tos';
 import getXSRFCookie from 'helpers/xsrf';
-import { OptionsObject, SnackbarProvider, useSnackbar } from 'notistack';
+import { SnackbarProvider } from 'notistack';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter } from 'react-router-dom';
@@ -37,19 +38,7 @@ const MyApp = () => {
   const { t } = useTranslation();
   const { setUser, setConfiguration } = useAppContext();
   const { setReady } = useAppLayout();
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-
-  const snackBarOptions: OptionsObject = {
-    variant: 'error',
-    autoHideDuration: 30000,
-    anchorOrigin: {
-      vertical: 'bottom',
-      horizontal: 'center'
-    },
-    onClick: snack => {
-      closeSnackbar();
-    }
-  };
+  const { showErrorMessage } = useMySnackbar();
 
   const switchRenderedApp = (value: PossibleApps) => {
     if (renderedApp !== value) {
@@ -84,7 +73,7 @@ const MyApp = () => {
       .then(api_data => {
         // eslint-disable-next-line no-prototype-builtins
         if (api_data === undefined || !api_data.hasOwnProperty('api_response')) {
-          enqueueSnackbar(t('api.unreachable'), snackBarOptions);
+          showErrorMessage(t('api.unreachable'), 30000);
           switchRenderedApp('load');
         } else if (api_data.api_status_code === 403) {
           setConfiguration(api_data.api_response);
@@ -102,7 +91,7 @@ const MyApp = () => {
             switchRenderedApp('routes');
           }
         } else {
-          enqueueSnackbar(t('api.unreachable'), snackBarOptions);
+          showErrorMessage(t('api.unreachable'), 30000);
           switchRenderedApp('load');
         }
       });
