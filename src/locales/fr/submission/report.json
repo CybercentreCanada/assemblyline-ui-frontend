@@ -3,6 +3,7 @@
   "submission.user": "Soumis par",
   "submission.services": "Services Sélectionnés",
   "submission.services.errors": "Erreurs de Service",
+  "error.too_early": "Il est trop tôt pour générer le rapport car la soumission n'est pas terminée. Vous serez rediriger vers la vue détaillée ...",
   "file.name": "Nom du Fichier",
   "file.description": "Description",
   "file.verdict": "Verdicte",

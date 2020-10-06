@@ -25,6 +25,23 @@ type IndexDefinitionMap = {
   workflow: IndexDefinition;
 };
 
+type SettingsDefinition = {
+  classification: string;
+  deep_scan: boolean;
+  description: string;
+  download_encoding: string;
+  expand_min_score: number;
+  ignore_cache: boolean;
+  ignore_dynamic_recursion_prevention: boolean;
+  ignore_filtering: boolean;
+  priority: number;
+  profile: boolean;
+  service_spec: any[];
+  services: any[];
+  submission_view: string;
+  ttl: number;
+};
+
 export type ConfigurationDefinition = {
   auth: {
     allow_2fa: boolean;
@@ -54,6 +71,7 @@ export interface CustomUserContextProps extends UserContextProps<CustomUser> {
   c12nDef: ClassificationDefinition;
   configuration: ConfigurationDefinition;
   indexes: IndexDefinitionMap;
+  settings: SettingsDefinition;
   setConfiguration: (cfg: ConfigurationDefinition) => void;
 }
 
@@ -61,6 +79,7 @@ interface WhoAmIProps extends CustomUser {
   c12nDef: ClassificationDefinition;
   configuration: ConfigurationDefinition;
   indexes: IndexDefinitionMap;
+  settings: SettingsDefinition;
 }
 
 // Application specific hook that will provide configuration to commons [useUser] hook.
@@ -69,6 +88,7 @@ export default function useMyUser(): CustomUserContextProps {
   const [c12nDef, setC12nDef] = useState<ClassificationDefinition>(null);
   const [configuration, setConfiguration] = useState<ConfigurationDefinition>(null);
   const [indexes, setIndexes] = useState<IndexDefinitionMap>(null);
+  const [settings, setSettings] = useState<SettingsDefinition>(null);
   const [flattenedProps, setFlattenedProps] = useState(null);
 
   function flatten(ob) {
@@ -92,12 +112,15 @@ export default function useMyUser(): CustomUserContextProps {
   }
 
   const setUser = (whoAmIData: WhoAmIProps) => {
-    const { configuration: cfg, c12nDef: c12n, indexes: idx, ...curUser } = whoAmIData;
+    const { configuration: cfg, c12nDef: c12n, indexes: idx, settings: userSettings, ...curUser } = whoAmIData;
     setC12nDef(c12n);
     setConfiguration(cfg);
     setIndexes(idx);
-    setState({ default_view: 'detail', ...curUser });
-    setFlattenedProps(flatten({ user: curUser, c12nDef: c12n, configuration: cfg, indexes: idx }));
+    setState(curUser);
+    setSettings(userSettings);
+    setFlattenedProps(
+      flatten({ user: curUser, c12nDef: c12n, configuration: cfg, indexes: idx, settings: userSettings })
+    );
   };
 
   const validateProp = (propDef: ValidatedProp) => {
@@ -121,6 +144,7 @@ export default function useMyUser(): CustomUserContextProps {
     c12nDef,
     configuration,
     indexes,
+    settings,
     user,
     setUser,
     setConfiguration,

@@ -21,13 +21,14 @@ import PrintOutlinedIcon from '@material-ui/icons/PrintOutlined';
 import { Skeleton } from '@material-ui/lab';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useMyAPI from 'components/hooks/useMyAPI';
+import useMySnackbar from 'components/hooks/useMySnackbar';
 import Classification from 'components/visual/Classification';
 import TextVerdict from 'components/visual/TextVerdict';
 import Verdict from 'components/visual/Verdict';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useHistory, useParams } from 'react-router-dom';
 
 type ParamProps = {
   id: string;
@@ -250,11 +251,13 @@ function HeuristicsListSkel() {
 export default function SubmissionReport() {
   const { t } = useTranslation(['submissionReport']);
   const { id } = useParams<ParamProps>();
+  const history = useHistory();
   const theme = useTheme();
   const [report, setReport] = useState(null);
   const apiCall = useMyAPI();
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
+  const { showErrorMessage, showWarningMessage } = useMySnackbar();
 
   useEffect(() => {
     apiCall({
@@ -263,6 +266,14 @@ export default function SubmissionReport() {
         // setTimeout(() => {
         setReport(api_data.api_response);
         // }, 5000);
+      },
+      onFailure: api_data => {
+        if (api_data.api_status_code === 425) {
+          showWarningMessage(t('error.too_early'));
+          history.replace(`/submission/detail/${id}`);
+        } else {
+          showErrorMessage(api_data.api_error_message);
+        }
       }
     });
     // eslint-disable-next-line
@@ -461,7 +472,7 @@ export default function SubmissionReport() {
           </div>
         </div>
 
-        {(!report || report.metadata) && (
+        {(!report || Object.keys(report.metadata).length !== 0) && (
           <div style={{ paddingBottom: sp2 }}>
             <Typography variant="h6">{t('metadata')}</Typography>
             <Divider />
@@ -495,7 +506,7 @@ export default function SubmissionReport() {
           </div>
         )}
 
-        {(!report || report.attack_matrix) && (
+        {(!report || Object.keys(report.attack_matrix).length !== 0) && (
           <div style={{ paddingBottom: sp2 }}>
             <Typography variant="h6">{t('attack')}</Typography>
             <Divider />
@@ -556,7 +567,7 @@ export default function SubmissionReport() {
         )}
 
         {report &&
-          report.tags &&
+          Object.keys(report.tags).length !== 0 &&
           Object.keys(report.tags).map((tagGroup, groupIdx) => {
             return <TagTable key={groupIdx} group={tagGroup} items={report.tags[tagGroup]} />;
           })}

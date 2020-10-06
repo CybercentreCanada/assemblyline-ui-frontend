@@ -25,6 +25,7 @@ import Skeleton from '@material-ui/lab/Skeleton';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useAppContext from 'components/hooks/useAppContext';
 import useMyAPI from 'components/hooks/useMyAPI';
+import useMySnackbar from 'components/hooks/useMySnackbar';
 import APIKeys from 'components/routes/user/api_keys';
 import DisableOTP from 'components/routes/user/disable_otp';
 import OTP from 'components/routes/user/otp';
@@ -32,7 +33,6 @@ import SecurityToken from 'components/routes/user/token';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
 import ChipInput from 'material-ui-chip-input';
-import { OptionsObject, useSnackbar } from 'notistack';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Redirect, useLocation, useParams } from 'react-router-dom';
@@ -58,7 +58,7 @@ function User({ width, username }: UserProps) {
   const [modified, setModified] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
   const { user: currentUser, configuration } = useAppContext();
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const { showErrorMessage, showSuccessMessage, showWarningMessage } = useMySnackbar();
   const sp1 = theme.spacing(1);
   const sp4 = theme.spacing(4);
   const sp6 = theme.spacing(6);
@@ -102,18 +102,6 @@ function User({ width, username }: UserProps) {
   }));
   const classes = useStyles();
 
-  const snackBarSuccessOptions: OptionsObject = {
-    variant: 'success',
-    autoHideDuration: 3000,
-    anchorOrigin: {
-      vertical: 'bottom',
-      horizontal: 'center'
-    },
-    onClick: snack => {
-      closeSnackbar();
-    }
-  };
-
   function saveUser() {
     apiCall({
       url: `/api/v4/user/${username || id}/`,
@@ -121,7 +109,7 @@ function User({ width, username }: UserProps) {
       body: user,
       onSuccess: () => {
         setModified(false);
-        enqueueSnackbar(t('success_save'), snackBarSuccessOptions);
+        showSuccessMessage(t('success_save'));
       },
       onEnter: () => setButtonLoading(true),
       onExit: () => setButtonLoading(false)
@@ -160,19 +148,11 @@ function User({ width, username }: UserProps) {
 
   function set2FAEnabled(value) {
     if (value && user['2fa_enabled']) {
-      enqueueSnackbar(t('2fa_already_enabled'), {
-        ...snackBarSuccessOptions,
-        variant: 'error',
-        autoHideDuration: 3000
-      });
+      showErrorMessage(t('2fa_already_enabled'));
     } else if (value) {
-      enqueueSnackbar(t('2fa_enabled'), snackBarSuccessOptions);
+      showSuccessMessage(t('2fa_enabled'));
     } else {
-      enqueueSnackbar(t('2fa_disabled'), {
-        ...snackBarSuccessOptions,
-        variant: 'warning',
-        autoHideDuration: 3000
-      });
+      showWarningMessage(t('2fa_disabled'));
     }
     setUser({ ...user, '2fa_enabled': value });
   }
@@ -360,22 +340,8 @@ function User({ width, username }: UserProps) {
                   ),
                   otp: <OTP setDrawerOpen={setDrawerOpen} set2FAEnabled={set2FAEnabled} />,
                   disable_otp: <DisableOTP setDrawerOpen={setDrawerOpen} set2FAEnabled={set2FAEnabled} />,
-                  token: (
-                    <SecurityToken
-                      user={user}
-                      toggleToken={toggleToken}
-                      enqueueSnackbar={enqueueSnackbar}
-                      snackBarOptions={snackBarSuccessOptions}
-                    />
-                  ),
-                  api_key: (
-                    <APIKeys
-                      user={user}
-                      toggleAPIKey={toggleAPIKey}
-                      enqueueSnackbar={enqueueSnackbar}
-                      snackBarOptions={snackBarSuccessOptions}
-                    />
-                  )
+                  token: <SecurityToken user={user} toggleToken={toggleToken} />,
+                  api_key: <APIKeys user={user} toggleAPIKey={toggleAPIKey} />
                 }[drawerType]
               : null}
           </div>

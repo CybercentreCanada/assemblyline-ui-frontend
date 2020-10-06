@@ -13,6 +13,7 @@ import {
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import CardCentered from 'commons/components/layout/pages/CardCentered';
 import useMyAPI from 'components/hooks/useMyAPI';
+import useMySnackbar from 'components/hooks/useMySnackbar';
 import { OAuthLogin } from 'components/routes/login/oauth';
 import { OneTimePassLogin } from 'components/routes/login/otp';
 import { ResetPassword, ResetPasswordNow } from 'components/routes/login/reset';
@@ -20,7 +21,6 @@ import { SecurityTokenLogin } from 'components/routes/login/sectoken';
 import { SignUp } from 'components/routes/login/signup';
 import { UserPassLogin } from 'components/routes/login/userpass';
 import TextDivider from 'components/visual/TextDivider';
-import { OptionsObject, useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -56,7 +56,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
   const [shownControls, setShownControls] = useState(
     params.get('provider') ? 'oauth' : params.get('reset_id') ? 'reset_now' : 'login'
   );
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const { showErrorMessage, showSuccessMessage } = useMySnackbar();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [avatar, setAvatar] = useState('');
@@ -65,28 +65,6 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
   const [webAuthNResponse, setWebAuthNResponse] = useState(null);
   const [buttonLoading, setButtonLoading] = useState(false);
   const pwPadding = allowSignup ? 1 : 2;
-  const snackBarOptions: OptionsObject = {
-    variant: 'error',
-    autoHideDuration: 5000,
-    anchorOrigin: {
-      vertical: 'bottom',
-      horizontal: 'center'
-    },
-    onClick: snack => {
-      closeSnackbar();
-    }
-  };
-  const snackBarSuccessOptions: OptionsObject = {
-    variant: 'success',
-    autoHideDuration: 10000,
-    anchorOrigin: {
-      vertical: 'bottom',
-      horizontal: 'center'
-    },
-    onClick: snack => {
-      closeSnackbar();
-    }
-  };
 
   function onSubmit(event) {
     login(event.target[0]);
@@ -141,11 +119,11 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
           setShownControls('otp');
         } else if (api_data.api_error_message === 'Wrong Security Token' && shownControls === 'sectoken') {
           setShownControls('otp');
-          enqueueSnackbar(t('securitytoken.error'), snackBarOptions);
+          showErrorMessage(t('securitytoken.error'));
         } else if (api_data.api_error_message === 'Wrong Security Token' && shownControls !== 'sectoken') {
           setShownControls('sectoken');
         } else {
-          enqueueSnackbar(api_data.api_error_message, snackBarOptions);
+          showErrorMessage(api_data.api_error_message);
           if (focusTarget !== null) {
             // eslint-disable-next-line no-prototype-builtins
             if (focusTarget.hasOwnProperty('select')) {
@@ -173,7 +151,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
           setOAuthToken(api_data.api_response.oauth_token);
         },
         onFailure: api_data => {
-          enqueueSnackbar(api_data.api_error_message, snackBarOptions);
+          showErrorMessage(api_data.api_error_message);
           setShownControls('login');
         },
         onFinalize: () => {
@@ -187,7 +165,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
         url: '/api/v4/auth/signup_validate/',
         method: 'POST',
         body: { registration_key: params.get('registration_key') },
-        onSuccess: () => enqueueSnackbar(t('signup.completed'), snackBarSuccessOptions),
+        onSuccess: () => showSuccessMessage(t('signup.completed'), 10000),
         onFinalize: () => history.push('/')
       });
     }
@@ -267,8 +245,6 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
           sectoken: (
             <SecurityTokenLogin
               setShownControls={setShownControls}
-              enqueueSnackbar={enqueueSnackbar}
-              snackBarOptions={snackBarOptions}
               setWebAuthNResponse={setWebAuthNResponse}
               username={username}
             />

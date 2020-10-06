@@ -28,55 +28,66 @@ import Submissions from 'components/routes/submissions';
 import Submit from 'components/routes/submit';
 import Tos from 'components/routes/tos';
 import User from 'components/routes/user';
-import React from 'react';
-import { Redirect, Route, Switch } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Redirect, Route, Switch, useLocation } from 'react-router-dom';
 import Alerts from './alerts/alerts';
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
+
 const Routes = () => {
-  const { user: currentUser } = useAppContext();
+  const { settings } = useAppContext();
   return (
-    <Switch>
-      <Route exact path="/" component={Submit} />
-      <Route exact path="/account" component={Account} />
-      <Route exact path="/alerts" component={Alerts} />
-      <Route exact path="/admin" component={Admin} />
-      <Route exact path="/admin/errors" component={AdminErrorViewer} />
-      <Route exact path="/admin/services" component={AdminServices} />
-      <Route exact path="/admin/sitemap" component={AdminSiteMap} />
-      <Route exact path="/admin/users" component={AdminUsers} />
-      <Route exact path="/admin/users/:id" component={User} />
-      <Route exact path="/dashboard" component={Dashboard} />
-      <Route exact path="/help" component={Help} />
-      <Route exact path="/help/api" component={HelpApiDoc} />
-      <Route exact path="/help/classification" component={HelpClassification} />
-      <Route exact path="/help/configuration" component={HelpConfiguration} />
-      <Route exact path="/help/search" component={HelpSearch} />
-      <Route exact path="/help/services" component={HelpServices} />
-      <Route exact path="/logout" component={Logout} />
-      <Route exact path="/manage/heuristics" component={ManageHeuristics} />
-      <Route exact path="/manage/signatures" component={ManageSignatures} />
-      <Route exact path="/manage/sources" component={ManageSignatureSources} />
-      <Route exact path="/manage/workflows" component={ManageWorkflows} />
-      <Route exact path="/manage" component={Manage} />
-      <Route exact path="/search" component={Search} />
-      <Route exact path="/search/:id" component={Search} />
-      <Route exact path="/settings" component={Settings} />
-      <Route exact path="/submit" component={Submit} />
-      <Route exact path="/submission/detail/:id" component={SubmissionDetail} />
-      <Route exact path="/submission/report/:id" component={SubmissionReport} />
-      {currentUser.default_view === 'detail' ? (
-        <Redirect from="/submission/:id" to="/submission/detail/:id" />
-      ) : (
-        <Redirect from="/submission/:id" to="/submission/report/:id" />
-      )}
-      <Route exact path="/submissions" component={Submissions} />
-      <Route exact path="/tos" component={Tos} />
-
-      <Route exact path="/forbidden" component={ForbiddenPage} />
-      <Route exact path="/notfound" component={NotFoundPage} />
-
-      <Redirect to="/notfound" />
-    </Switch>
+    <>
+      <ScrollToTop />
+      <Switch>
+        <Route exact path="/" component={Submit} />
+        <Route exact path="/account" component={Account} />
+        <Route exact path="/alerts" component={Alerts} />
+        <Route exact path="/admin" component={Admin} />
+        <Route exact path="/admin/errors" component={AdminErrorViewer} />
+        <Route exact path="/admin/services" component={AdminServices} />
+        <Route exact path="/admin/sitemap" component={AdminSiteMap} />
+        <Route exact path="/admin/users" component={AdminUsers} />
+        <Route exact path="/admin/users/:id" component={User} />
+        <Route exact path="/dashboard" component={Dashboard} />
+        <Route exact path="/help" component={Help} />
+        <Route exact path="/help/api" component={HelpApiDoc} />
+        <Route exact path="/help/classification" component={HelpClassification} />
+        <Route exact path="/help/configuration" component={HelpConfiguration} />
+        <Route exact path="/help/search" component={HelpSearch} />
+        <Route exact path="/help/services" component={HelpServices} />
+        <Route exact path="/logout" component={Logout} />
+        <Route exact path="/manage/heuristics" component={ManageHeuristics} />
+        <Route exact path="/manage/signatures" component={ManageSignatures} />
+        <Route exact path="/manage/sources" component={ManageSignatureSources} />
+        <Route exact path="/manage/workflows" component={ManageWorkflows} />
+        <Route exact path="/manage" component={Manage} />
+        <Route exact path="/search" component={Search} />
+        <Route exact path="/search/:id" component={Search} />
+        <Route exact path="/settings" component={Settings} />
+        <Route exact path="/submit" component={Submit} />
+        <Route exact path="/submission/detail/:id" component={SubmissionDetail} />
+        <Route exact path="/submission/report/:id" component={SubmissionReport} />
+        {settings.submission_view === 'detail' ? (
+          <Redirect from="/submission/:id" to="/submission/detail/:id" />
+        ) : (
+          <Redirect from="/submission/:id" to="/submission/report/:id" />
+        )}
+        <Route exact path="/submissions" component={Submissions} />
+        <Route exact path="/tos" component={Tos} />
+        <Route exact path="/forbidden" component={ForbiddenPage} />
+        <Route exact path="/notfound" component={NotFoundPage} />
+        <Redirect to="/notfound" />
+      </Switch>
+    </>
   );
 };
 

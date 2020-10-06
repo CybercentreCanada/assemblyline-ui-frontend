@@ -1,6 +1,6 @@
 import getXSRFCookie from 'helpers/xsrf';
-import { OptionsObject, useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
+import useMySnackbar from './useMySnackbar';
 
 export type APIResponseProps = {
   api_error_message: string;
@@ -11,18 +11,7 @@ export type APIResponseProps = {
 
 export default function useMyAPI() {
   const { t } = useTranslation();
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-  const snackBarOptions: OptionsObject = {
-    variant: 'error',
-    autoHideDuration: 5000,
-    anchorOrigin: {
-      vertical: 'bottom',
-      horizontal: 'center'
-    },
-    onClick: snack => {
-      closeSnackbar();
-    }
-  };
+  const { showErrorMessage } = useMySnackbar();
 
   type APICallProps = {
     url: string;
@@ -85,7 +74,7 @@ export default function useMyAPI() {
         // Check Api response validity
         // eslint-disable-next-line no-prototype-builtins
         if (api_data === undefined || !api_data.hasOwnProperty('api_status_code')) {
-          enqueueSnackbar(t('api.invalid'), snackBarOptions);
+          showErrorMessage(t('api.invalid'));
         } else if (api_data.api_status_code === 401 && allowReload) {
           // Detect login request
           // Do nothing... we are reloading the page
@@ -97,7 +86,7 @@ export default function useMyAPI() {
             onFailure(api_data);
           } else {
             // Default failure handler, show toast error
-            enqueueSnackbar(api_data.api_error_message, snackBarOptions);
+            showErrorMessage(api_data.api_error_message);
           }
         } else if (onSuccess) {
           // Handle success

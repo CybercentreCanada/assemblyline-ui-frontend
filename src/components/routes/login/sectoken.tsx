@@ -1,30 +1,23 @@
 import { Typography } from '@material-ui/core';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import useMyAPI from 'components/hooks/useMyAPI';
+import useMySnackbar from 'components/hooks/useMySnackbar';
 import toArrayBuffer from 'helpers/toArrayBuffer';
-import { OptionsObject } from 'notistack';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const CBOR = require('helpers/cbor.js');
 
 type SecTokenProps = {
-  enqueueSnackbar: (message: string, options: OptionsObject) => void;
   setShownControls: (value: string) => void;
   setWebAuthNResponse: (value) => void;
-  snackBarOptions: OptionsObject;
   username: string;
 };
 
-export function SecurityTokenLogin({
-  username,
-  enqueueSnackbar,
-  setShownControls,
-  setWebAuthNResponse,
-  snackBarOptions
-}: SecTokenProps) {
+export function SecurityTokenLogin({ username, setShownControls, setWebAuthNResponse }: SecTokenProps) {
   const { t } = useTranslation(['login']);
   const apiCall = useMyAPI();
+  const { showErrorMessage } = useMySnackbar();
 
   useEffect(() => {
     apiCall({
@@ -51,11 +44,11 @@ export function SecurityTokenLogin({
               // eslint-disable-next-line no-console
               console.log(`${ex.name}: ${ex.message}`);
               setShownControls('otp');
-              enqueueSnackbar(t('securitytoken.error'), snackBarOptions);
+              showErrorMessage(t('securitytoken.error'));
             });
         } else {
           setShownControls('otp');
-          enqueueSnackbar(t('securitytoken.unavailable'), snackBarOptions);
+          showErrorMessage(t('securitytoken.unavailable'));
         }
       }
     });
