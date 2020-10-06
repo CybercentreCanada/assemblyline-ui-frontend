@@ -87,6 +87,45 @@ const useBooklistStyles = makeStyles(theme => ({
   }
 }));
 
+const useInfinitelistStyles = makeStyles(theme => ({
+  outer: {
+    position: 'relative',
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%'
+  },
+  inner: {
+    position: 'relative',
+    overflow: 'auto',
+    outline: 'none',
+    height: '100%'
+  },
+  pagerItems: {
+    display: 'flex',
+    flexDirection: 'row'
+  },
+  pagerItem: {
+    marginLeft: theme.spacing(1),
+    display: 'inline-block'
+  },
+  progressCt: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    opacity: 0.7,
+    zIndex: 1,
+    alignItems: 'center',
+    backgroundColor: theme.palette.background.default
+  },
+  progressSpinner: {
+    position: 'absolute',
+    left: '50%',
+    top: '50%'
+  }
+}));
+
 const useListItemStyles = makeStyles(theme => ({
   itemCt: {
     position: 'relative',
@@ -118,6 +157,7 @@ export default function useListStyles() {
   return {
     listItemClasses: useListItemStyles(),
     metaListClasses: useMetaListStyles(),
-    booklistClasses: useBooklistStyles()
+    booklistClasses: useBooklistStyles(),
+    infinitelistClases: useInfinitelistStyles()
   };
 }

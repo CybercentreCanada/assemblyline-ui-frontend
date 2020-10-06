@@ -29,8 +29,9 @@ const computeFrame = (
   const itemCount = Math.ceil(fH / rowHeight) + 1;
 
   // compute index of first element in frame.
-  const startIndex = Math.floor(sT / rowHeight);
-  const endIndex = startIndex + itemCount;
+  let startIndex = Math.floor(sT / rowHeight);
+  startIndex = startIndex > 10 ? startIndex - 10 : 0;
+  const endIndex = startIndex + itemCount + 10;
 
   // Here's your frame of reference.
   const _frame = {
@@ -78,7 +79,7 @@ interface MetaListProps {
 }
 
 const MetaList: React.FC<MetaListProps> = React.memo(
-  ({ loading, buffer, rowHeight, scrollReset, threshold = 0, onSelection, onRenderItem, onNext, onLoad }) => {
+  ({ loading, buffer, rowHeight, scrollReset, threshold = 10, onSelection, onRenderItem, onNext, onLoad }) => {
     // Styles.
     const { metaListClasses: classes } = useListStyles();
 
@@ -135,6 +136,8 @@ const MetaList: React.FC<MetaListProps> = React.memo(
       }
 
       // load more if at bottom.
+
+      console.log(_frame.rH);
       if (_frame.rH <= threshold && !loading) {
         onNext();
       }
