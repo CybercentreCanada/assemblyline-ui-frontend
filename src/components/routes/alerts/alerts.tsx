@@ -250,6 +250,16 @@ const Alerts: React.FC = () => {
   // Memoized callback to render one line-item of the list.
   const onRenderListRow = useCallback((item: AlertItem) => <AlertListItem item={item} />, []);
 
+  //
+  const onDrawerClose = () => {
+    setDrawer({ ...drawer, open: false });
+  };
+
+  //
+  const onSplitPanelRightClose = () => {
+    setSplitPanel({ open: false, item: splitPanel.item });
+  };
+
   // Load up the filters already present in the URL.
   useEffect(() => setQueryFilters(query), [query]);
 
@@ -350,9 +360,7 @@ const Alerts: React.FC = () => {
                       <Typography variant="h6">{splitPanel.item.alert_id}</Typography>
                     </Box>
                   }
-                  actions={[
-                    { icon: <CloseIcon />, action: () => setSplitPanel({ open: false, item: splitPanel.item }) }
-                  ]}
+                  actions={[{ icon: <CloseIcon />, action: onSplitPanelRightClose }]}
                   backgroundColor={theme.palette.background.default}
                   elevation={0}
                 />
@@ -362,7 +370,7 @@ const Alerts: React.FC = () => {
           }
         />
       </Viewport>
-      <Drawer open={drawer.open} anchor="right" onClose={() => setDrawer({ ...drawer, open: false })}>
+      <Drawer open={drawer.open} anchor="right" onClose={onDrawerClose}>
         <Box p={theme.spacing(0.5)} className={classes.drawerInner}>
           {
             {

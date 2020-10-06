@@ -236,7 +236,7 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
     return (
       <div ref={containerEl} className={classes.container}>
         <div ref={leftEl} className={classes.left}>
-          {left}
+          <div style={{ width: '100%' }}>{left}</div>
         </div>
         <Drawer open={rightOpen} anchor="right" classes={{ paper: drawerClasses.paper }}>
           {right}
