@@ -3,7 +3,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import StarIcon from '@material-ui/icons/Star';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
-import MetaList from 'components/elements/lists/metalist/metalist';
+import Infinitelist from 'components/elements/lists/infinitelist/infinitelist';
 // import Booklist from 'components/elements/lists/booklist/booklist';
 import SplitPanel from 'components/elements/panels/split-panel';
 import Viewport from 'components/elements/panels/viewport';
@@ -302,15 +302,23 @@ const Alerts: React.FC = () => {
           rightDrawerBackgroundColor={theme.palette.background.default}
           rightOpen={splitPanel.open}
           left={
-            <MetaList
+            // <MetaList
+            //   loading={loading || searching}
+            //   buffer={buffer}
+            //   rowHeight={92}
+            //   scrollReset={scrollReset}
+            //   onSelection={onItemSelected}
+            //   onNext={_onLoadMore}
+            //   onRenderItem={onRenderListRow}
+            // />
+            <Infinitelist
               loading={loading || searching}
-              buffer={buffer}
-              rowHeight={92}
-              scrollReset={scrollReset}
-              onSelection={onItemSelected}
-              onNext={_onLoadMore}
-              onRenderItem={onRenderListRow}
+              items={buffer.items}
+              onItemSelected={onItemSelected}
+              onRenderRow={onRenderListRow}
+              onLoadNext={_onLoadMore}
             />
+
             // <Booklist
             //   loading={loading || searching}
             //   book={book}

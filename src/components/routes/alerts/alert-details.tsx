@@ -112,6 +112,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
             <Typography className={classes.sectionTitle}>{t('page.alerts.details.ownership')}</Typography>
             <Divider />
             <Box className={classes.sectionContent}>
+              {/* TODO: don't display user when none. */}
               {item.owner ? item.owner : item.hint_owner ? 'assigned' : 'none'}
             </Box>
           </Box>
