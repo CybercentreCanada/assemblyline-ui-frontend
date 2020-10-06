@@ -3,7 +3,6 @@ import Alert from '@material-ui/lab/Alert';
 import useClipboard from 'commons/components/hooks/useClipboard';
 import { ChipList } from 'components/elements/mui/chips';
 import { AlertItem } from 'components/routes/alerts/hooks/useAlerts';
-import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
 import { format } from 'date-fns';
 import React from 'react';
@@ -43,9 +42,9 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ item }) => {
 
   return (
     <Box>
-      <Box mb={1}>
+      {/* <Box mb={1}>
         <Classification c12n={item.classification} type="outlined" />
-      </Box>
+      </Box> */}
       {item.filtered ? (
         <Box mb={2}>
           <Alert severity="warning">{t('page.alerts.details.data_filtered_msg')}</Alert>
