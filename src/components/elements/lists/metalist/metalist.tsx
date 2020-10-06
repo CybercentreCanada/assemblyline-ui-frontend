@@ -44,6 +44,8 @@ const computeFrame = (
     items: buffer.get(startIndex, endIndex)
   };
 
+  // console.log(endIndex - startIndex);
+
   // console.log(_frame);
   // console.log(buffer.items);
   // console.log(`${_frame.items.length}: ${_frame.startIndex}: ${_frame.endIndex}`);
@@ -137,7 +139,7 @@ const MetaList: React.FC<MetaListProps> = React.memo(
 
       // load more if at bottom.
 
-      console.log(_frame.rH);
+      // console.log(_frame.rH);
       if (_frame.rH <= threshold && !loading) {
         onNext();
       }

@@ -1,4 +1,13 @@
-import { Box, CircularProgress, Divider, IconButton, IconButtonProps, makeStyles, useTheme } from '@material-ui/core';
+import {
+  Box,
+  CircularProgress,
+  Divider,
+  IconButton,
+  IconButtonProps,
+  makeStyles,
+  useMediaQuery,
+  useTheme
+} from '@material-ui/core';
 import BackspaceIcon from '@material-ui/icons/Backspace';
 import SearchIcon from '@material-ui/icons/Search';
 import React, { useEffect, useRef, useState } from 'react';
@@ -54,6 +63,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const classes = useStyles();
   const element = useRef<HTMLInputElement>();
   const [value, setValue] = useState<string>(initValue);
+  const isLTEMd = useMediaQuery(theme.breakpoints.up('md'));
 
   //
   const getInputEl = () => {
@@ -106,22 +116,23 @@ const SearchBar: React.FC<SearchBarProps> = ({
             onClear={_onValueClear}
           />
         </Box>
-        {/* <IconButton onClick={onSearchBtnClick} edge="end" color="primary">
-          <FilterListIcon />
-        </IconButton> */}
-        <IconButton onClick={_onValueClear} edge="end" color="primary">
-          <BackspaceIcon />
-        </IconButton>
-        <Divider
-          orientation="vertical"
-          flexItem
-          style={{ marginLeft: theme.spacing(1), marginRight: theme.spacing(1) }}
-        />
-        {buttons.map((b, i) => (
-          <IconButton key={`searchbar-button-${i}`} {...b.props} edge="end" color="primary">
-            {b.icon}
-          </IconButton>
-        ))}
+        {isLTEMd && (
+          <>
+            <IconButton onClick={_onValueClear} edge="end" color="primary">
+              <BackspaceIcon />
+            </IconButton>
+            <Divider
+              orientation="vertical"
+              flexItem
+              style={{ marginLeft: theme.spacing(1), marginRight: theme.spacing(1) }}
+            />
+            {buttons.map((b, i) => (
+              <IconButton key={`searchbar-button-${i}`} {...b.props} edge="end" color="primary">
+                {b.icon}
+              </IconButton>
+            ))}
+          </>
+        )}
       </Box>
       <Box className={classes.searchresult}>{children}</Box>
     </div>
