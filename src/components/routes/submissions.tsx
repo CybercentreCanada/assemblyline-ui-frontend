@@ -7,6 +7,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
+import useAppLayout from 'commons/components/hooks/useAppLayout';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import useMyAPI from 'components/hooks/useMyAPI';
 import Classification from 'components/visual/Classification';
@@ -22,8 +23,10 @@ export default function Submissions() {
   const { t, i18n } = useTranslation(['submissions']);
   const [submissions, setSubmissions] = useState(null);
   const history = useHistory();
+  const layout = useAppLayout();
   const theme = useTheme();
   const apiCall = useMyAPI();
+  const topBarShown = !layout.autoHideAppbar || layout.currentLayout === 'top';
 
   function handleClick(submission) {
     if (submission.state === 'completed') {
@@ -55,17 +58,17 @@ export default function Submissions() {
       </div>
 
       {submissions !== null ? (
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} style={{ display: 'inline-table' }}>
           <Table size="small" stickyHeader>
             <TableHead>
               <TableRow style={{ whiteSpace: 'nowrap' }}>
-                <TableCell>{t('header.starttime')}</TableCell>
-                <TableCell>{t('header.verdict')}</TableCell>
-                <TableCell>{t('header.description')}</TableCell>
-                <TableCell>{t('header.user')}</TableCell>
-                <TableCell>{t('header.numfiles')}</TableCell>
-                <TableCell>{t('header.classification')}</TableCell>
-                <TableCell>{t('header.status')}</TableCell>
+                <TableCell style={{ top: topBarShown ? '64px' : 0 }}>{t('header.starttime')}</TableCell>
+                <TableCell style={{ top: topBarShown ? '64px' : 0 }}>{t('header.verdict')}</TableCell>
+                <TableCell style={{ top: topBarShown ? '64px' : 0 }}>{t('header.description')}</TableCell>
+                <TableCell style={{ top: topBarShown ? '64px' : 0 }}>{t('header.user')}</TableCell>
+                <TableCell style={{ top: topBarShown ? '64px' : 0 }}>{t('header.numfiles')}</TableCell>
+                <TableCell style={{ top: topBarShown ? '64px' : 0 }}>{t('header.classification')}</TableCell>
+                <TableCell style={{ top: topBarShown ? '64px' : 0 }}>{t('header.status')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
