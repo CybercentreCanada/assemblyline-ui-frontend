@@ -151,7 +151,7 @@ const Alerts: React.FC = () => {
 
   // Hanlder for when clicking one the AlertsFilters 'Apply' button.
   const onApplyFilters = (filters: AlertFilterSelections) => {
-    // console.log(filters);
+    console.log(filters);
 
     // update the state of the selected filters so they are intialized next time drawer opens.
     setSelectedFilters(filters);
@@ -266,7 +266,7 @@ const Alerts: React.FC = () => {
 
   return (
     <Box>
-      <Box pb={theme.spacing(0.25)}>
+      {/* <Box pb={theme.spacing(0.25)}>
         <SearchBar
           initValue={query.getQuery()}
           searching={searching || loading}
@@ -302,7 +302,7 @@ const Alerts: React.FC = () => {
             </Box>
           </Box>
         </SearchBar>
-      </Box>
+      </Box> */}
       <Viewport>
         <SplitPanel
           leftMinWidth={500}
@@ -322,16 +322,67 @@ const Alerts: React.FC = () => {
             //   onNext={_onLoadMore}
             //   onRenderItem={onRenderListRow}
             // />
-            <Infinitelist
-              loading={loading || searching}
-              items={buffer.items}
-              scrollReset={scrollReset}
-              threshold={100}
-              onItemSelected={onItemSelected}
-              onRenderRow={onRenderListRow}
-              onLoadNext={_onLoadMore}
-              disableProgress
-            />
+            <div
+              style={{
+                position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%',
+                overflow: 'hidden'
+              }}
+            >
+              <div style={{ position: 'relative', width: '100%' }}>
+                <SearchBar
+                  initValue={query.getQuery()}
+                  searching={searching || loading}
+                  suggestions={buildSearchSuggestions()}
+                  onValueChange={onFilterValueChange}
+                  onClear={onClearSearch}
+                  onSearch={onSearch}
+                  buttons={[
+                    {
+                      icon: <StarIcon />,
+                      props: {
+                        onClick: () => setDrawer({ open: true, type: 'favorites' })
+                      }
+                    },
+                    {
+                      icon: <FilterListIcon />,
+                      props: {
+                        onClick: () => setDrawer({ open: true, type: 'filter' })
+                      }
+                    },
+                    {
+                      icon: <FcWorkflow />,
+                      props: {
+                        onClick: () => setDrawer({ open: true, type: 'actions' })
+                      }
+                    }
+                  ]}
+                >
+                  <Box className={classes.searchresult}>
+                    <AlertsFiltersSelected filters={selectedFilters} onChange={onApplyFilters} />
+                    <Box mt={1}>
+                      {searching || loading
+                        ? searching
+                          ? '...searching'
+                          : '...loading'
+                        : `${total} matching results.`}
+                    </Box>
+                  </Box>
+                </SearchBar>
+              </div>
+              <Infinitelist
+                loading={loading || searching}
+                items={buffer.items}
+                scrollReset={scrollReset}
+                threshold={100}
+                onItemSelected={onItemSelected}
+                onRenderRow={onRenderListRow}
+                onLoadNext={_onLoadMore}
+                disableProgress
+              />
+            </div>
 
             // <Booklist
             //   loading={loading || searching}

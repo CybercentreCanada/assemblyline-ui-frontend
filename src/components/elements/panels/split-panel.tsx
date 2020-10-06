@@ -27,18 +27,6 @@ const useStyles = makeStyles(theme => ({
     overflow: 'auto',
     transition: 'width 0.2s ease 0'
   }
-  // Maybe move this to App.tsx to truely make it global?
-  // '@global': {
-  //   '*::-webkit-scrollbar': {
-  //     width: '0.8em'
-  //   },
-  //   '*::-webkit-scrollbar-track': {
-  //     '-webkit-box-shadow': 'inset 0 0 6px rgba(0,0,0,0.00)'
-  //   },
-  //   '*::-webkit-scrollbar-thumb': {
-  //     backgroundColor: 'rgba(0,0,0,.25)'
-  //   }
-  // }
 }));
 
 type SplitPanelProps = {
@@ -201,7 +189,7 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
 
       // Update the left and right widths.
       // We update the DOM directly to minimize the amount of re-render and state updates.
-      console.log(`left:${_leftWidth}:right:${_rightWidth}`);
+      // console.log(`left:${_leftWidth}:right:${_rightWidth}`);
       if (_leftEl) {
         _leftEl.style.width = `${_leftWidth}px`;
       }
