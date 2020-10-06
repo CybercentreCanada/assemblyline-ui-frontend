@@ -28,6 +28,8 @@ const ListRow: React.FC<ListRowProps> = React.memo(
       }
     }, [onClick, item, index]);
 
+    // console.log(`rendering: ${index}`);
+
     return (
       <div
         className={classes.itemCt}
