@@ -1,4 +1,4 @@
-import { Box, Drawer, makeStyles, Typography, useTheme } from '@material-ui/core';
+import { Box, Drawer, makeStyles, useTheme } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import StarIcon from '@material-ui/icons/Star';
@@ -9,6 +9,7 @@ import SplitPanel from 'components/elements/panels/split-panel';
 import Viewport from 'components/elements/panels/viewport';
 import SearchBar from 'components/elements/search/search-bar';
 import SearchQuery, { SearchFilter } from 'components/elements/search/search-query';
+import Classification from 'components/visual/Classification';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FcWorkflow } from 'react-icons/fc';
 import AlertActionsMenu from './alert-actions-menu';
@@ -255,7 +256,7 @@ const Alerts: React.FC = () => {
     setDrawer({ ...drawer, open: false });
   };
 
-  //
+  // Handler for with close the right side of split panel.
   const onSplitPanelRightClose = () => {
     setSplitPanel({ open: false, item: splitPanel.item });
   };
@@ -357,7 +358,9 @@ const Alerts: React.FC = () => {
                   title={
                     <Box display="flex" alignItems="center">
                       <AlertActionsMenu />
-                      <Typography variant="h6">{splitPanel.item.alert_id}</Typography>
+                      <Box flex={1}>
+                        <Classification c12n={splitPanel.item.classification} type="outlined" />
+                      </Box>
                     </Box>
                   }
                   actions={[{ icon: <CloseIcon />, action: onSplitPanelRightClose }]}
