@@ -21,13 +21,14 @@ import PrintOutlinedIcon from '@material-ui/icons/PrintOutlined';
 import { Skeleton } from '@material-ui/lab';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useMyAPI from 'components/hooks/useMyAPI';
+import useMySnackbar from 'components/hooks/useMySnackbar';
 import Classification from 'components/visual/Classification';
 import TextVerdict from 'components/visual/TextVerdict';
 import Verdict from 'components/visual/Verdict';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useHistory, useParams } from 'react-router-dom';
 
 type ParamProps = {
   id: string;
@@ -250,11 +251,13 @@ function HeuristicsListSkel() {
 export default function SubmissionReport() {
   const { t } = useTranslation(['submissionReport']);
   const { id } = useParams<ParamProps>();
+  const history = useHistory();
   const theme = useTheme();
   const [report, setReport] = useState(null);
   const apiCall = useMyAPI();
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
+  const { showErrorMessage, showWarningMessage } = useMySnackbar();
 
   useEffect(() => {
     apiCall({
@@ -263,6 +266,14 @@ export default function SubmissionReport() {
         // setTimeout(() => {
         setReport(api_data.api_response);
         // }, 5000);
+      },
+      onFailure: api_data => {
+        if (api_data.api_status_code === 425) {
+          showWarningMessage(t('error.too_early'));
+          history.replace(`/submission/detail/${id}`);
+        } else {
+          showErrorMessage(api_data.api_error_message);
+        }
       }
     });
     // eslint-disable-next-line
