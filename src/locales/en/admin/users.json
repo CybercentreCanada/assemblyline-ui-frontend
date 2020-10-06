@@ -1,1 +1,10 @@
-{}
+{
+  "header.classification": "Classification",
+  "header.active": "Active",
+  "header.admin": "Admin",
+  "header.groups": "Groups",
+  "header.uid": "Username",
+  "header.fullname": "Fullname",
+  "subtitle": "total users(s)",
+  "title": "Users"
+}
