@@ -263,8 +263,6 @@ const Alerts: React.FC = () => {
   // Load up the filters already present in the URL.
   useEffect(() => setQueryFilters(query), [query]);
 
-  console.log(splitPanel);
-
   return (
     <Box>
       <Box pb={theme.spacing(0.25)}>
