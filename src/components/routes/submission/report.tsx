@@ -472,7 +472,7 @@ export default function SubmissionReport() {
           </div>
         </div>
 
-        {(!report || report.metadata) && (
+        {(!report || Object.keys(report.metadata).length !== 0) && (
           <div style={{ paddingBottom: sp2 }}>
             <Typography variant="h6">{t('metadata')}</Typography>
             <Divider />
@@ -506,7 +506,7 @@ export default function SubmissionReport() {
           </div>
         )}
 
-        {(!report || report.attack_matrix) && (
+        {(!report || Object.keys(report.attack_matrix).length !== 0) && (
           <div style={{ paddingBottom: sp2 }}>
             <Typography variant="h6">{t('attack')}</Typography>
             <Divider />
@@ -567,7 +567,7 @@ export default function SubmissionReport() {
         )}
 
         {report &&
-          report.tags &&
+          Object.keys(report.tags).length !== 0 &&
           Object.keys(report.tags).map((tagGroup, groupIdx) => {
             return <TagTable key={groupIdx} group={tagGroup} items={report.tags[tagGroup]} />;
           })}
