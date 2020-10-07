@@ -87,7 +87,7 @@ const useBooklistStyles = makeStyles(theme => ({
   }
 }));
 
-const useInfinitelistStyles = makeStyles(theme => ({
+const useSimpleListStyles = makeStyles(theme => ({
   outer: {
     position: 'relative',
     display: 'flex',
@@ -158,6 +158,6 @@ export default function useListStyles() {
     listItemClasses: useListItemStyles(),
     metaListClasses: useMetaListStyles(),
     booklistClasses: useBooklistStyles(),
-    infinitelistClases: useInfinitelistStyles()
+    simpleListStyles: useSimpleListStyles()
   };
 }

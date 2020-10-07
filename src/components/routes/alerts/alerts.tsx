@@ -3,7 +3,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import StarIcon from '@material-ui/icons/Star';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
-import Infinitelist from 'components/elements/lists/infinitelist/infinitelist';
+import SimpleList from 'components/elements/lists/simplelist/simplelist';
 // import Booklist from 'components/elements/lists/booklist/booklist';
 import SplitPanel from 'components/elements/panels/split-panel';
 import Viewport from 'components/elements/panels/viewport';
@@ -321,19 +321,19 @@ const Alerts: React.FC = () => {
             //   onSelection={onItemSelected}
             //   onNext={_onLoadMore}
             //   onRenderItem={onRenderListRow}
-            // />
-            <Infinitelist
+            // />.
+            <SimpleList
               loading={loading || searching}
               items={buffer.items}
               scrollReset={scrollReset}
-              threshold={100}
+              scrollLoadNextThreshold={75}
               onItemSelected={onItemSelected}
               onRenderRow={onRenderListRow}
               onLoadNext={_onLoadMore}
               disableProgress
             />
 
-            // <Booklist
+            // <Booklist.
             //   loading={loading || searching}
             //   book={book}
             //   onItemSelected={onItemSelected}
