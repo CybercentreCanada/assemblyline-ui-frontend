@@ -116,11 +116,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
             onClear={_onValueClear}
           />
         </Box>
+        <IconButton onClick={_onValueClear} edge="end" color="primary">
+          <BackspaceIcon />
+        </IconButton>
         {isLTEMd && (
           <>
-            <IconButton onClick={_onValueClear} edge="end" color="primary">
-              <BackspaceIcon />
-            </IconButton>
             <Divider
               orientation="vertical"
               flexItem
@@ -134,7 +134,19 @@ const SearchBar: React.FC<SearchBarProps> = ({
           </>
         )}
       </Box>
-      <Box className={classes.searchresult}>{children}</Box>
+      {isLTEMd ? (
+        <Box className={classes.searchresult}>{children}</Box>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'row' }}>
+          <div className={classes.searchresult}>{children}</div>
+          <div style={{ flex: 1 }} />
+          {buttons.map((b, i) => (
+            <IconButton key={`searchbar-button-${i}`} {...b.props} edge="end" color="primary">
+              {b.icon}
+            </IconButton>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

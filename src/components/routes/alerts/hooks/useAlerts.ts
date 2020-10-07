@@ -122,7 +122,8 @@ export default function useAlerts(pageSize: number): UsingAlerts {
         if (onSuccess) {
           onSuccess();
         }
-      }
+      },
+      onFailure: () => setState({ ...state, loading: false })
     });
   };
 
@@ -147,7 +148,8 @@ export default function useAlerts(pageSize: number): UsingAlerts {
         if (onSuccess) {
           onSuccess();
         }
-      }
+      },
+      onFailure: () => setState({ ...state, loading: false })
     });
   };
 

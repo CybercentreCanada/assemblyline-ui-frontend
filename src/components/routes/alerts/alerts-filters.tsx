@@ -118,7 +118,6 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
   // Handler[onChange]: for the 'TC' Autocomplete component.
   const onTcFilterChange = (value: string) => {
     const selectedValue = TC_OPTIONS.find(o => o.value === value);
-    console.log(selectedValue);
     setSelectedTc(selectedValue);
   };
 

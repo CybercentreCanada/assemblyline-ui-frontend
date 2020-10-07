@@ -1,4 +1,4 @@
-import { Box, Drawer, makeStyles, useTheme } from '@material-ui/core';
+import { Box, Drawer, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import StarIcon from '@material-ui/icons/Star';
@@ -69,6 +69,9 @@ const Alerts: React.FC = () => {
   // Define some references.
   const searchTextValue = useRef<string>(query.getQuery());
 
+  // Media quries.
+  const isLTEMd = useMediaQuery(theme.breakpoints.up('md'));
+
   // Parse the filters [fq: param] and set them as  the 'selectedFilters'.
   const setQueryFilters = (_query: SearchQuery) => {
     const searchQueryFilters = _query.parseFilters();
@@ -117,7 +120,9 @@ const Alerts: React.FC = () => {
   const onClearSearch = () => {
     // Reset the query.
     query.reset().apply();
-    //
+    // Update the search text field reference.
+    searchTextValue.current = '';
+    // Reset filters.
     setSelectedFilters(DEFAULT_FILTERS);
     // Reset scroll for each new search.
     setScrollReset(true);
@@ -294,10 +299,22 @@ const Alerts: React.FC = () => {
           ]}
         >
           <Box className={classes.searchresult}>
-            <AlertsFiltersSelected filters={selectedFilters} onChange={onApplyFilters} />
-            <Box mt={1}>
-              {searching || loading ? (searching ? '...searching' : '...loading') : `${total} matching results.`}
-            </Box>
+            {isLTEMd ? (
+              <SearchResultLarge
+                loading={loading}
+                searching={searching}
+                total={total}
+                selectedFilters={selectedFilters}
+                onApplyFilters={onApplyFilters}
+              />
+            ) : (
+              <SearchResultSmall
+                loading={loading}
+                searching={searching}
+                total={total}
+                selectedFilters={selectedFilters}
+              />
+            )}
           </Box>
         </SearchBar>
       </Box>
@@ -403,6 +420,28 @@ const Alerts: React.FC = () => {
         </Box>
       </Drawer>
     </Box>
+  );
+};
+
+const SearchResultLarge = ({ searching, loading, total, selectedFilters, onApplyFilters }) => {
+  const theme = useTheme();
+  const _searching = searching || loading;
+  return (
+    <div style={{ position: 'relative' }}>
+      <AlertsFiltersSelected filters={selectedFilters} onChange={onApplyFilters} />
+      <div style={{ position: 'absolute', top: theme.spacing(0), right: theme.spacing(1) }}>
+        {_searching ? '' : <span>{`${total} matching results.`}</span>}
+      </div>
+    </div>
+  );
+};
+
+const SearchResultSmall = ({ searching, loading, total, selectedFilters }) => {
+  const _searching = searching || loading;
+  return (
+    <>
+      <Box mt={3}>{_searching ? '' : `${total} matching results.`}</Box>
+    </>
   );
 };
 

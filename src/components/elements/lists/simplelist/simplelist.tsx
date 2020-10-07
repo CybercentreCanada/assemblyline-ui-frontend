@@ -78,7 +78,7 @@ const SimpleList: React.FC<SimpleListProps> = ({
           <CircularProgress className={classes.progressSpinner} />
         </div>
       )}
-      <div ref={innerEL} className={classes.inner} tabIndex={0} onKeyDown={onKeyDown}>
+      <div ref={innerEL} className={classes.inner} tabIndex={0} onKeyDown={!loading ? onKeyDown : null}>
         {items.map((item, index) => (
           <ListRow
             key={`list.rowitem[${index}]`}

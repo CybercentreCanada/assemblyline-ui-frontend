@@ -100,12 +100,9 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
 
     if (isEnter(keyCode)) {
       // key[ENTER ]: handler
-      console.log(open);
       if (open) {
-        console.log('selection...');
         onOptionSelection(filteredOptions.start, filteredOptions.end, filteredOptions.items[cursor]);
       } else {
-        console.log('searching...');
         onSearch(value);
       }
     } else if (isEscape(keyCode)) {
