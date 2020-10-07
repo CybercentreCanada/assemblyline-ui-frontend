@@ -151,7 +151,7 @@ const Alerts: React.FC = () => {
 
   // Hanlder for when clicking one the AlertsFilters 'Apply' button.
   const onApplyFilters = (filters: AlertFilterSelections) => {
-    // console.log(filters);
+    console.log(filters);
 
     // update the state of the selected filters so they are intialized next time drawer opens.
     setSelectedFilters(filters);
@@ -393,7 +393,7 @@ const Alerts: React.FC = () => {
               actions: (
                 <AlertsWorkflowActions
                   query={query.getQuery()}
-                  affectedItemCount={buffer.total()}
+                  affectedItemCount={total}
                   selectedFilters={selectedFilters}
                   statusFilters={statusFilters}
                   priorityFilters={priorityFilters}

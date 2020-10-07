@@ -1,15 +1,44 @@
 /* eslint-disable no-param-reassign */
-import { Button, Divider, makeStyles, TextField, Typography, useTheme } from '@material-ui/core';
+import {
+  Button,
+  Divider,
+  FormControl,
+  InputLabel,
+  makeStyles,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+  useTheme
+} from '@material-ui/core';
 import { Autocomplete } from '@material-ui/lab';
 import { SearchFilter } from 'components/elements/search/search-query';
 import CustomChip from 'components/visual/CustomChip';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 // Default TimeConstraint(TC) value..
 export const DEFAULT_TC = { value: '4d', label: '4 Days' };
 
 // Default GroupBy value.
 export const DEFAULT_GROUPBY = { value: 'file.sha256', label: 'file.sha256' };
+
+//
+const GROUPBY_OPTIONS = [
+  { value: 'file.md5', label: 'file.md5' },
+  { value: 'file.name', label: 'file.name' },
+  DEFAULT_GROUPBY,
+  { value: 'priority', label: 'priority' },
+  { value: 'status', label: 'status' }
+];
+
+//
+const TC_OPTIONS = [
+  { value: '', label: 'None (slow)' },
+  { value: '24h', label: '24 hours' },
+  DEFAULT_TC,
+  { value: '7d', label: '1 Week' }
+];
 
 // Default filters.
 export const DEFAULT_FILTERS = {
@@ -72,6 +101,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
   // Hooks...
   const theme = useTheme();
   const classes = useStyles();
+  const { t } = useTranslation('alerts');
 
   // Define some states for controlled components..
   const [selectedTc, setSelectedTc] = useState<{ value: string; label: string }>(selectedFilters.tc || DEFAULT_TC);
@@ -86,13 +116,16 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
   );
 
   // Handler[onChange]: for the 'TC' Autocomplete component.
-  const onTcFilterChange = (value: { value: string; label: string }) => {
-    setSelectedTc(value);
+  const onTcFilterChange = (value: string) => {
+    const selectedValue = TC_OPTIONS.find(o => o.value === value);
+    console.log(selectedValue);
+    setSelectedTc(selectedValue);
   };
 
   // Handler[onChange]: for the 'Group By' Autocomplete component.
-  const onGroupByFilterChange = (value: { value: string; label: string }) => {
-    setSelectedGroupBy(value);
+  const onGroupByFilterChange = (value: string) => {
+    const selectedValue = GROUPBY_OPTIONS.find(o => o.value === value);
+    setSelectedGroupBy(selectedValue);
   };
 
   // Handler[onChange]: for the 'Status' Autocomplete component.
@@ -153,12 +186,14 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
     setSelectedQueryFilters(decorateQueryFilters(selectedFilters.queries, valueFilters));
   }, [selectedFilters, valueFilters]);
 
+  console.log(selectedTc);
+
   return (
     <div>
-      <Typography variant="h6">Filterss</Typography>
+      <Typography variant="h6">{t('page.alerts.filters')}</Typography>
       <Divider />
       <div style={{ margin: theme.spacing(1), marginTop: theme.spacing(2) }}>
-        <div style={{ marginBottom: theme.spacing(2) }}>
+        {/* <div style={{ marginBottom: theme.spacing(2) }}>
           <Autocomplete
             fullWidth
             classes={{ option: classes.option }}
@@ -174,25 +209,39 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
             renderInput={params => <TextField {...params} label="Time Constraint" variant="outlined" />}
             onChange={(event, value) => onTcFilterChange(value as { value: string; label: string })}
           />
+        </div> */}
+        <div style={{ marginBottom: theme.spacing(2) }}>
+          <FormControl fullWidth variant="outlined">
+            <InputLabel>Time Constraint</InputLabel>
+            <Select
+              label="Time Constraint"
+              displayEmpty
+              value={selectedTc ? selectedTc.value : DEFAULT_TC.value}
+              onChange={event => onTcFilterChange(event.target.value as string)}
+            >
+              {TC_OPTIONS.map(o => (
+                <MenuItem className={classes.option} value={o.value}>
+                  {o.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </div>
         <div style={{ marginBottom: theme.spacing(2) }}>
-          <Autocomplete
-            fullWidth
-            classes={{ option: classes.option }}
-            options={[
-              DEFAULT_GROUPBY,
-              { value: 'file.md5', label: 'file.md5' },
-              { value: 'file.name', label: 'file.name' },
-              { value: 'file.sha1', label: 'file.sha1' },
-              { value: 'priority', label: 'priority' },
-              { value: 'status', label: 'status' }
-            ]}
-            value={selectedGroupBy || DEFAULT_GROUPBY}
-            getOptionLabel={option => option.label}
-            getOptionSelected={isSelected}
-            renderInput={params => <TextField {...params} label="Group By" variant="outlined" />}
-            onChange={(event, value) => onGroupByFilterChange(value as { value: string; label: string })}
-          />
+          <FormControl fullWidth variant="outlined">
+            <InputLabel>Group By</InputLabel>
+            <Select
+              label="Group By"
+              value={selectedGroupBy ? selectedGroupBy.value : DEFAULT_GROUPBY.value}
+              onChange={event => onGroupByFilterChange(event.target.value as string)}
+            >
+              {GROUPBY_OPTIONS.map(o => (
+                <MenuItem className={classes.option} value={o.value}>
+                  {o.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </div>
         <div style={{ marginBottom: theme.spacing(2) }}>
           <Autocomplete
@@ -253,15 +302,15 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
       </div>
       <div style={{ display: 'flex', flexDirection: 'row', marginTop: theme.spacing(1) }}>
         <Button variant="contained" color="primary" onClick={_onApplyBtnClick}>
-          Apply
+          {t('page.alerts.filters.apply')}
         </Button>
         <div style={{ marginRight: theme.spacing(1) }} />
         <Button variant="contained" onClick={onClearBtnClick} size="small">
-          Clear
+          {t('page.alerts.filters.clear')}
         </Button>
         <div style={{ flex: 1 }} />
         <Button variant="contained" onClick={onCancelBtnClick} size="small">
-          Cancel
+          {t('page.alerts.filters.cancel')}
         </Button>
       </div>
     </div>

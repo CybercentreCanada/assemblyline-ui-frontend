@@ -26,5 +26,9 @@
   "page.alerts.details.domain_static": "Static",
   "page.alerts.details.yara_hits": "Yara Hits",
   "page.alerts.details.data_filtered_msg": "Alert data filtered because submitter does not have the privileges to see all the results",
-  "page.alerts.tooltip.actions": "Alert actions"
+  "page.alerts.tooltip.actions": "Alert actions",
+  "page.alerts.filters": "Filters",
+  "page.alerts.filters.apply": "Apply",
+  "page.alerts.filters.clear": "Clear",
+  "page.alerts.filters.cancel": "Cancel"
 }

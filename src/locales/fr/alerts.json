@@ -25,5 +25,9 @@
   "page.alerts.details.domain_dynamic": "Dynamique",
   "page.alerts.details.domain_static": "Statique",
   "page.alerts.details.yara": "La Yara Hits",
-  "page.alerts.tooltip.actions": "Action d'alerte"
+  "page.alerts.tooltip.actions": "Action d'alerte",
+  "page.alerts.filters": "Filtre",
+  "page.alerts.filters.apply": "Appliquer",
+  "page.alerts.filters.clear": "Effacer",
+  "page.alerts.filters.cancel": "Annuler"
 }
