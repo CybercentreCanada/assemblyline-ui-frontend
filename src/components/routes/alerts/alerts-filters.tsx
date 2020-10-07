@@ -193,23 +193,6 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
       <Typography variant="h6">{t('page.alerts.filters')}</Typography>
       <Divider />
       <div style={{ margin: theme.spacing(1), marginTop: theme.spacing(2) }}>
-        {/* <div style={{ marginBottom: theme.spacing(2) }}>
-          <Autocomplete
-            fullWidth
-            classes={{ option: classes.option }}
-            options={[
-              { value: '', label: 'None (slow)' },
-              { value: '24h', label: '24 hours' },
-              DEFAULT_TC,
-              { value: '7d', label: '1 Week' }
-            ]}
-            value={selectedTc || DEFAULT_TC}
-            getOptionLabel={option => option.label}
-            getOptionSelected={isSelected}
-            renderInput={params => <TextField {...params} label="Time Constraint" variant="outlined" />}
-            onChange={(event, value) => onTcFilterChange(value as { value: string; label: string })}
-          />
-        </div> */}
         <div style={{ marginBottom: theme.spacing(2) }}>
           <FormControl fullWidth variant="outlined">
             <InputLabel>Time Constraint</InputLabel>
@@ -220,7 +203,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
               onChange={event => onTcFilterChange(event.target.value as string)}
             >
               {TC_OPTIONS.map(o => (
-                <MenuItem className={classes.option} value={o.value}>
+                <MenuItem key={o.value} className={classes.option} value={o.value}>
                   {o.label}
                 </MenuItem>
               ))}
@@ -236,7 +219,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
               onChange={event => onGroupByFilterChange(event.target.value as string)}
             >
               {GROUPBY_OPTIONS.map(o => (
-                <MenuItem className={classes.option} value={o.value}>
+                <MenuItem key={o.value} className={classes.option} value={o.value}>
                   {o.label}
                 </MenuItem>
               ))}

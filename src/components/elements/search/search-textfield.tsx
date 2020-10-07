@@ -100,9 +100,12 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
 
     if (isEnter(keyCode)) {
       // key[ENTER ]: handler
+      console.log(open);
       if (open) {
+        console.log('selection...');
         onOptionSelection(filteredOptions.start, filteredOptions.end, filteredOptions.items[cursor]);
       } else {
+        console.log('searching...');
         onSearch(value);
       }
     } else if (isEscape(keyCode)) {
@@ -201,6 +204,11 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
       end: insertEndIndex > -1 ? insertEndIndex : thisCursor,
       items: _options
     });
+
+    // Update state of content assist opptions if no options are avaiable.
+    if (_options.length === 0) {
+      setOpen(false);
+    }
   };
 
   const parseFilter = (
