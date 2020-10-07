@@ -12,6 +12,7 @@ import SearchQuery, { SearchFilter } from 'components/elements/search/search-que
 import Classification from 'components/visual/Classification';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FcWorkflow } from 'react-icons/fc';
+import { FiFilter } from 'react-icons/fi';
 import AlertActionsMenu from './alert-actions-menu';
 import AlertDetails from './alert-details';
 import AlertListItem from './alert-list-item';
@@ -22,6 +23,12 @@ import AlertsWorkflowActions from './alerts-workflow-actions';
 import useAlerts, { AlertItem } from './hooks/useAlerts';
 
 const PAGE_SIZE = 50;
+
+const hasFilters = (filters: AlertFilterSelections): boolean => {
+  const { statuses, priorities, labels, queries } = filters;
+  console.log(filters);
+  return statuses.length > 0 || priorities.length > 0 || labels.length > 0 || queries.length > 0;
+};
 
 const useStyles = makeStyles(theme => ({
   drawerInner: {
@@ -437,10 +444,20 @@ const SearchResultLarge = ({ searching, loading, total, selectedFilters, onApply
 };
 
 const SearchResultSmall = ({ searching, loading, total, selectedFilters }) => {
+  const theme = useTheme();
   const _searching = searching || loading;
+  const filtered = hasFilters(selectedFilters);
   return (
     <>
-      <Box mt={2}>{_searching ? '' : `${total} matching results.`}</Box>
+      <div style={{ marginTop: theme.spacing(2), alignItems: 'center' }}>
+        {!_searching && filtered && (
+          <>
+            <FiFilter />
+            &nbsp;
+          </>
+        )}
+        {_searching ? '' : `${total} matching results.`}
+      </div>
     </>
   );
 };
