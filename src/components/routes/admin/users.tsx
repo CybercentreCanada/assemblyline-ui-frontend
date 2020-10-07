@@ -9,7 +9,6 @@ import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
 import ClearIcon from '@material-ui/icons/Clear';
 import DoneIcon from '@material-ui/icons/Done';
-import useAppLayout from 'commons/components/hooks/useAppLayout';
 import useUser from 'commons/components/hooks/useAppUser';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -25,10 +24,8 @@ export default function Users() {
   const { user: currentUser } = useUser<CustomUser>();
   const [users, setUsers] = useState(null);
   const history = useHistory();
-  const layout = useAppLayout();
   const theme = useTheme();
   const apiCall = useMyAPI();
-  const topBarShown = !layout.autoHideAppbar || layout.currentLayout === 'top';
 
   useEffect(() => {
     if (currentUser.is_admin) {
@@ -53,21 +50,21 @@ export default function Users() {
       </div>
 
       {users !== null ? (
-        <TableContainer component={Paper} style={{ display: 'inline-table' }}>
-          <Table size="small" stickyHeader>
+        <TableContainer component={Paper}>
+          <Table size="small">
             <TableHead>
               <TableRow style={{ whiteSpace: 'nowrap' }}>
-                <TableCell style={{ top: topBarShown ? '64px' : 0 }}>{t('header.uid')}</TableCell>
-                <TableCell style={{ top: topBarShown ? '64px' : 0 }}>{t('header.fullname')}</TableCell>
-                <TableCell style={{ top: topBarShown ? '64px' : 0 }}>{t('header.groups')}</TableCell>
-                <TableCell style={{ top: topBarShown ? '64px' : 0 }}>{t('header.classification')}</TableCell>
-                <TableCell style={{ top: topBarShown ? '64px' : 0 }}>{t('header.active')}</TableCell>
-                <TableCell style={{ top: topBarShown ? '64px' : 0 }}>{t('header.admin')}</TableCell>
+                <TableCell>{t('header.uid')}</TableCell>
+                <TableCell>{t('header.fullname')}</TableCell>
+                <TableCell>{t('header.groups')}</TableCell>
+                <TableCell>{t('header.classification')}</TableCell>
+                <TableCell>{t('header.active')}</TableCell>
+                <TableCell>{t('header.admin')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {users.map(user => (
-                <TableRow key={user.id} onClick={event => history.push(`/admin/users/${user.uname}`)} hover>
+                <TableRow key={user.id} onClick={() => history.push(`/admin/users/${user.uname}`)} hover>
                   <TableCell style={{ whiteSpace: 'nowrap' }}>{user.uname}</TableCell>
                   <TableCell>{user.name}</TableCell>
                   <TableCell>{user.groups.join(' | ')}</TableCell>
