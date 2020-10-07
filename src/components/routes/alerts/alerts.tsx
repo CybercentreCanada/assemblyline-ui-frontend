@@ -440,7 +440,7 @@ const SearchResultSmall = ({ searching, loading, total, selectedFilters }) => {
   const _searching = searching || loading;
   return (
     <>
-      <Box mt={3}>{_searching ? '' : `${total} matching results.`}</Box>
+      <Box mt={2}>{_searching ? '' : `${total} matching results.`}</Box>
     </>
   );
 };
