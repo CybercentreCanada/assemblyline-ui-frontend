@@ -22,6 +22,7 @@ export interface AlertItem extends MetaListItem {
   sid: string;
   alert_id: string;
   type: string;
+  extended_scan: string;
   reporting_ts: string;
   label: string[];
   priority: string;
@@ -53,6 +54,10 @@ export interface AlertItem extends MetaListItem {
     request_end_time: string[];
     score: number;
     yara: string[];
+  };
+  verdict: {
+    malicious: string[];
+    non_malicious: string[];
   };
 }
 
