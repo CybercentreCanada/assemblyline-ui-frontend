@@ -262,8 +262,6 @@ export default function useAlerts(pageSize: number): UsingAlerts {
     }
   }, [fieldIndexes]);
 
-  // console.log(configuration);
-
   // UseAlert Hook API.
   return {
     ...state,
