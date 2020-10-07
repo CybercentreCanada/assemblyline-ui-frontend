@@ -124,8 +124,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function CustomChip({ className, type, size, color, variant, mono, ...otherProps }: CustomChipProps) {
-  const hasClick = otherProps.onClick !== undefined && otherProps.onClick !== null;
-  const classes = useStyles(hasClick);
+  const classes = useStyles();
 
   // Define classnames maps
   const typeClassMap = {
