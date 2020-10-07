@@ -31,99 +31,101 @@ export interface CustomChipProps {
   [propName: string]: any;
 }
 
-const useStyles = (hasClick, tiny) => {
-  return makeStyles(theme => ({
-    square: {
-      borderRadius: '3px',
-      margin: '2px 4px 2px 0'
-    },
-    classification: {
-      borderRadius: '3px',
-      margin: '2px 4px 2px 0',
-      width: '100%'
-    },
-    tiny: {
-      height: '20px',
-      fontSize: '0.75rem'
-    },
-    label_tiny: {
-      paddingLeft: '6px',
-      paddingRight: '6px'
-    },
-    mono: {
-      fontFamily: 'monospace',
-      fontSize: tiny ? '1rem' : '1.15rem'
-    },
-    // Filled
-    default: {
-      backgroundColor: theme.palette.type === 'dark' ? '#616161' : '#999',
-      color: theme.palette.common.white,
-      '&:hover, &:focus': {
-        backgroundColor: hasClick ? darken(theme.palette.type === 'dark' ? '#616161' : '#999', 0.15) : null
-      }
-    },
-    primary: {
-      '&:hover, &:focus': {
-        backgroundColor: hasClick ? darken(theme.palette.primary.main, 0.15) : null
-      }
-    },
-    secondary: {
-      color: theme.palette.common.white,
-      '&:hover, &:focus': {
-        backgroundColor: hasClick ? darken(theme.palette.secondary.main, 0.15) : null
-      }
-    },
-    success: {
-      backgroundColor: theme.palette.success.main,
-      color: theme.palette.common.white,
-      '&:hover, &:focus': {
-        backgroundColor: hasClick ? darken(theme.palette.success.main, 0.15) : null
-      }
-    },
-    info: {
-      backgroundColor: theme.palette.type === 'dark' ? '#28abd2' : '#00baf1',
-      color: theme.palette.common.white,
-      '&:hover, &:focus': {
-        backgroundColor: hasClick ? darken(theme.palette.type === 'dark' ? '#28abd2' : '#00baf1', 0.15) : null
-      }
-    },
-    warning: {
-      backgroundColor: theme.palette.type === 'dark' ? '#ed8b00' : '#ff9d12',
-      color: theme.palette.common.white,
-      '&:hover, &:focus': {
-        backgroundColor: hasClick ? darken(theme.palette.type === 'dark' ? '#ed8b00' : '#ff9d12', 0.15) : null
-      }
-    },
-    error: {
-      backgroundColor: theme.palette.error.dark,
-      color: theme.palette.common.white,
-      '&:hover, &:focus': {
-        backgroundColor: hasClick ? darken(theme.palette.error.dark, 0.15) : null
-      }
-    },
-    // Outlined
-    success_outlined: {
-      borderColor: theme.palette.type !== 'dark' ? theme.palette.success.dark : theme.palette.success.light,
-      color: theme.palette.type !== 'dark' ? theme.palette.success.dark : theme.palette.success.light
-    },
-    info_outlined: {
-      borderColor: theme.palette.type !== 'dark' ? theme.palette.info.dark : theme.palette.info.light,
-      color: theme.palette.type !== 'dark' ? theme.palette.info.dark : theme.palette.info.light
-    },
-    warning_outlined: {
-      borderColor: theme.palette.type !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light,
-      color: theme.palette.type !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
-    },
-    error_outlined: {
-      borderColor: theme.palette.type !== 'dark' ? theme.palette.error.dark : theme.palette.error.light,
-      color: theme.palette.type !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
+const useStyles = makeStyles(theme => ({
+  square: {
+    borderRadius: '3px',
+    margin: '2px 4px 2px 0'
+  },
+  classification: {
+    borderRadius: '3px',
+    margin: '2px 4px 2px 0',
+    width: '100%'
+  },
+  tiny: {
+    height: '20px',
+    fontSize: '80%'
+  },
+  label_tiny: {
+    paddingLeft: '6px',
+    paddingRight: '6px'
+  },
+  mono: {
+    fontFamily: 'monospace',
+    fontSize: '1.15rem'
+  },
+  tiny_mono: {
+    fontFamily: 'monospace',
+    fontSize: '1rem'
+  },
+  // Filled
+  default: {
+    backgroundColor: theme.palette.type === 'dark' ? '#616161' : '#999',
+    color: theme.palette.common.white,
+    '[role=button]&:hover, [role=button]&:focus': {
+      backgroundColor: darken(theme.palette.type === 'dark' ? '#616161' : '#999', 0.15)
     }
-  }))();
-};
+  },
+  primary: {
+    '[role=button]&:hover, [role=button]&:focus': {
+      backgroundColor: darken(theme.palette.primary.main, 0.15)
+    }
+  },
+  secondary: {
+    color: theme.palette.common.white,
+    '[role=button]&:hover, [role=button]&:focus': {
+      backgroundColor: darken(theme.palette.secondary.main, 0.15)
+    }
+  },
+  success: {
+    backgroundColor: theme.palette.success.main,
+    color: theme.palette.common.white,
+    '[role=button]&:hover, [role=button]&:focus': {
+      backgroundColor: darken(theme.palette.success.main, 0.15)
+    }
+  },
+  info: {
+    backgroundColor: theme.palette.type === 'dark' ? '#28abd2' : '#00baf1',
+    color: theme.palette.common.white,
+    '[role=button]&:hover, [role=button]&:focus': {
+      backgroundColor: darken(theme.palette.type === 'dark' ? '#28abd2' : '#00baf1', 0.15)
+    }
+  },
+  warning: {
+    backgroundColor: theme.palette.type === 'dark' ? '#ed8b00' : '#ff9d12',
+    color: theme.palette.common.white,
+    '[role=button]&:hover, [role=button]&:focus': {
+      backgroundColor: darken(theme.palette.type === 'dark' ? '#ed8b00' : '#ff9d12', 0.15)
+    }
+  },
+  error: {
+    backgroundColor: theme.palette.error.dark,
+    color: theme.palette.common.white,
+    '[role=button]&:hover, [role=button]&:focus': {
+      backgroundColor: darken(theme.palette.error.dark, 0.15)
+    }
+  },
+  // Outlined
+  success_outlined: {
+    borderColor: theme.palette.type !== 'dark' ? theme.palette.success.dark : theme.palette.success.light,
+    color: theme.palette.type !== 'dark' ? theme.palette.success.dark : theme.palette.success.light
+  },
+  info_outlined: {
+    borderColor: theme.palette.type !== 'dark' ? theme.palette.info.dark : theme.palette.info.light,
+    color: theme.palette.type !== 'dark' ? theme.palette.info.dark : theme.palette.info.light
+  },
+  warning_outlined: {
+    borderColor: theme.palette.type !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light,
+    color: theme.palette.type !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
+  },
+  error_outlined: {
+    borderColor: theme.palette.type !== 'dark' ? theme.palette.error.dark : theme.palette.error.light,
+    color: theme.palette.type !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
+  }
+}));
 
 export default function CustomChip({ className, type, size, color, variant, mono, ...otherProps }: CustomChipProps) {
   const hasClick = otherProps.onClick !== undefined && otherProps.onClick !== null;
-  const classes = useStyles(hasClick, size === 'tiny');
+  const classes = useStyles(hasClick);
 
   // Define classnames maps
   const typeClassMap = {
@@ -165,10 +167,10 @@ export default function CustomChip({ className, type, size, color, variant, mono
 
   // Compute values applied to the original chip component
   const appliedClassName = clsx(
+    mono ? (size === 'tiny' ? classes.tiny_mono : classes.mono) : null,
     typeClassMap[type],
     sizeClassMap[size],
     variant === 'outlined' ? colorClassMap[`${color}_outlined`] : colorClassMap[color],
-    mono ? classes.mono : null,
     className
   );
 
