@@ -65,7 +65,8 @@ const Alerts: React.FC = () => {
     // updateBook,
     onLoad,
     onLoadMore,
-    onGet
+    onGet,
+    onApplyWorflowAction
   } = useAlerts(PAGE_SIZE);
   // Define required states...
   const [searching, setSearching] = useState<boolean>(false);
@@ -262,6 +263,20 @@ const Alerts: React.FC = () => {
     }
   };
 
+  // Handler/callback for when clicking the 'Apply' btn on the AlertsWorkflowActions component.
+  const onWorkflowActionsApply = (selectedStatus: string, selectedPriority: string, selectedLabels: string[]) => {
+    //
+    onApplyWorflowAction(selectedStatus, selectedPriority, selectedLabels).then(() => {
+      setDrawer({ ...drawer, open: false });
+      onLoad();
+    });
+  };
+
+  // Handler/callback for when clicking the 'Cancel' btn on the AlertsWorkflowActions component.
+  const onWorkflowActionCancel = () => {
+    setDrawer({ ...drawer, open: false });
+  };
+
   // Memoized callback to render one line-item of the list.
   const onRenderListRow = useCallback((item: AlertItem) => <AlertListItem item={item} />, []);
 
@@ -287,7 +302,7 @@ const Alerts: React.FC = () => {
 
   return (
     <Box>
-      <Box pb={theme.spacing(0.25)}>
+      <Box>
         <SearchBar
           initValue={query.getQuery()}
           searching={searching || loading}
@@ -368,7 +383,7 @@ const Alerts: React.FC = () => {
               disableProgress
             />
 
-            // <Booklist.
+            // <Booklist..
             //   loading={loading || searching}
             //   book={book}
             //   onItemSelected={onItemSelected}
@@ -433,6 +448,8 @@ const Alerts: React.FC = () => {
                   statusFilters={statusFilters}
                   priorityFilters={priorityFilters}
                   labelFilters={labelFilters}
+                  onApplyBtnClick={onWorkflowActionsApply}
+                  onCancelBtnClick={onWorkflowActionCancel}
                 />
               )
             }[drawer.type]

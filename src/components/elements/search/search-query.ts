@@ -1,16 +1,24 @@
 export enum SearchFilterType {
+  BLANK = 'blank',
   STATUS = 'status',
   PRIORITY = 'priority',
   LABEL = 'label',
   QUERY = 'query'
 }
 
+export const EMPTY_SEARCHFILTER = {
+  id: 'emtpy_search_filter',
+  type: SearchFilterType.BLANK,
+  label: '',
+  value: null
+};
+
 export interface SearchFilter {
   id: number | string;
   type: SearchFilterType;
   label: string;
   value: any;
-  object: any;
+  object?: any;
 }
 
 export interface SearchQueryParameter {

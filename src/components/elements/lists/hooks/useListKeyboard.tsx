@@ -78,37 +78,39 @@ export default function useListKeyboard({
 
   // hander:keydown
   const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    // Prevent default behaviors.
-    event.preventDefault();
-
-    console.log('test');
-
     // What key was hit?
     const { key, currentTarget } = event;
 
-    // Only run events after 10ms after receiving last one.
-    THROTTLER.throttle(() => {
-      // Handle each keys.
-      if (isEnter(key)) {
-        // key[ENTER ]: handler
-        if (onEnter) {
-          onEnter(cursor);
+    // Check to see if we should schedule throttled event.
+    const accepts = isEnter(key) || isEscape(key) || isArrowUp(key) || isArrowDown(key);
+
+    if (accepts) {
+      // Prevent default behaviors.
+      event.preventDefault();
+      // Only run events after 10ms after receiving last one.
+      THROTTLER.throttle(() => {
+        // Handle each keys.
+        if (isEnter(key)) {
+          // key[ENTER ]: handler
+          if (onEnter) {
+            onEnter(cursor);
+          }
+        } else if (isEscape(key)) {
+          // key[ESCAPE]: handler
+          if (onEscape) {
+            onEscape(cursor);
+          }
+        } else if (isArrowUp(key)) {
+          // key[ARROW_UP]: handler
+          const nextCursor = cursor - 1 > -1 ? cursor - 1 : infinite ? 0 : count - 1;
+          updateState(nextCursor, currentTarget);
+        } else if (isArrowDown(key)) {
+          // key[ARROW_DOWN]: handler
+          const nextCursor = cursor + 1 < count || infinite ? cursor + 1 : 0;
+          updateState(nextCursor, currentTarget);
         }
-      } else if (isEscape(key)) {
-        // key[ESCAPE]: handler
-        if (onEscape) {
-          onEscape(cursor);
-        }
-      } else if (isArrowUp(key)) {
-        // key[ARROW_UP]: handler
-        const nextCursor = cursor - 1 > -1 ? cursor - 1 : infinite ? 0 : count - 1;
-        updateState(nextCursor, currentTarget);
-      } else if (isArrowDown(key)) {
-        // key[ARROW_DOWN]: handler
-        const nextCursor = cursor + 1 < count || infinite ? cursor + 1 : 0;
-        updateState(nextCursor, currentTarget);
-      }
-    });
+      });
+    }
   };
 
   return { cursor, setCursor, onKeyDown };

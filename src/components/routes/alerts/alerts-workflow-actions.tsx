@@ -1,7 +1,8 @@
-import { Divider, makeStyles, TextField, Typography, useTheme } from '@material-ui/core';
+import { Button, Divider, makeStyles, TextField, Typography, useTheme } from '@material-ui/core';
 import { Alert, Autocomplete } from '@material-ui/lab';
-import { SearchFilter } from 'components/elements/search/search-query';
+import { EMPTY_SEARCHFILTER, SearchFilter, SearchFilterType } from 'components/elements/search/search-query';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AlertFilterSelections } from './alerts-filters';
 import AlertsFiltersSelected from './alerts-filters-selected';
 
@@ -18,6 +19,8 @@ interface AlertsWorkflowActionsProps {
   statusFilters: SearchFilter[];
   priorityFilters: SearchFilter[];
   labelFilters: SearchFilter[];
+  onApplyBtnClick: (status: string, selectedPriority: string, selectedLabels: string[]) => void;
+  onCancelBtnClick: () => void;
 }
 
 const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
@@ -26,20 +29,23 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
   selectedFilters,
   statusFilters,
   priorityFilters,
-  labelFilters
+  labelFilters,
+  onApplyBtnClick,
+  onCancelBtnClick
 }) => {
+  const { t } = useTranslation('alerts');
   const classes = useStyles();
   const theme = useTheme();
-  const [selectedStatuses, setSelectedStatuses] = useState<SearchFilter[]>([]);
-  const [selectedPriorities, setSelectedPriorities] = useState<SearchFilter[]>([]);
+  const [selectedStatus, setSelectedStatus] = useState<SearchFilter>(EMPTY_SEARCHFILTER);
+  const [selectedPriority, setSelectedPriority] = useState<SearchFilter>(EMPTY_SEARCHFILTER);
   const [selectedLabels, setSelectedLabels] = useState<SearchFilter[]>([]);
 
-  const onStatusChange = (selections: SearchFilter[]) => {
-    setSelectedStatuses(selections);
+  const onStatusChange = (selection: SearchFilter) => {
+    setSelectedStatus(selection);
   };
 
-  const onPriorityChange = (selections: SearchFilter[]) => {
-    setSelectedPriorities(selections);
+  const onPriorityChange = (selection: SearchFilter) => {
+    setSelectedPriority(selection);
   };
 
   const onLabelChange = (selections: SearchFilter[]) => {
@@ -50,13 +56,31 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
     return option.value === value.value;
   };
 
-  const renderOption = (item: SearchFilter) => {
-    return (
-      <div>
-        {/* <CustomChip label={item.object.count} size="tiny" /> {item.label} */}
-        {item.label}
-      </div>
+  const _onApplyBtnClick = () => {
+    const extractValue = (filter: SearchFilter): string => {
+      if (filter.type === SearchFilterType.BLANK) {
+        return null;
+      }
+      return filter.value.split(':')[1];
+    };
+    onApplyBtnClick(
+      extractValue(selectedStatus),
+      extractValue(selectedPriority),
+      selectedLabels.map(l => extractValue(l))
     );
+  };
+
+  const onClearBtnClick = () => {
+    setSelectedStatus(null);
+    setSelectedPriority(null);
+    setSelectedLabels([]);
+  };
+
+  const renderOption = (item: SearchFilter) => {
+    if (item.type === SearchFilterType.BLANK) {
+      return <div>&nbsp;</div>;
+    }
+    return <div>{item.label}</div>;
   };
 
   return (
@@ -86,29 +110,27 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
         <div style={{ marginBottom: theme.spacing(2) }}>
           <Autocomplete
             fullWidth
-            multiple
             classes={{ option: classes.option }}
-            options={statusFilters}
-            value={selectedStatuses}
+            options={[EMPTY_SEARCHFILTER, ...statusFilters]}
+            value={selectedStatus}
             getOptionLabel={option => option.label}
             getOptionSelected={isSelected}
             renderOption={renderOption}
             renderInput={params => <TextField {...params} label="Statuses" variant="outlined" />}
-            onChange={(event, value) => onStatusChange(value as SearchFilter[])}
+            onChange={(event, value) => onStatusChange(value as SearchFilter)}
           />
         </div>
         <div style={{ marginBottom: theme.spacing(2) }}>
           <Autocomplete
             fullWidth
-            multiple
             classes={{ option: classes.option }}
-            options={priorityFilters}
-            value={selectedPriorities}
+            options={[EMPTY_SEARCHFILTER, ...priorityFilters]}
+            value={selectedPriority}
             getOptionLabel={option => option.label}
             getOptionSelected={isSelected}
             renderOption={renderOption}
             renderInput={params => <TextField {...params} label="Priorities" variant="outlined" />}
-            onChange={(event, value) => onPriorityChange(value as SearchFilter[])}
+            onChange={(event, value) => onPriorityChange(value as SearchFilter)}
           />
         </div>
         <div style={{ marginBottom: theme.spacing(2) }}>
@@ -127,17 +149,17 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
         </div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'row', marginTop: theme.spacing(1) }}>
-        {/* <Button variant="contained" color="primary" onClick={_onApplyBtnClick}>
-          Apply
+        <Button variant="contained" color="primary" onClick={_onApplyBtnClick}>
+          {t('page.alerts.filters.apply')}
         </Button>
         <div style={{ marginRight: theme.spacing(1) }} />
         <Button variant="contained" onClick={onClearBtnClick} size="small">
-          Clear
+          {t('page.alerts.filters.clear')}
         </Button>
         <div style={{ flex: 1 }} />
         <Button variant="contained" onClick={onCancelBtnClick} size="small">
-          Cancel
-        </Button> */}
+          {t('page.alerts.filters.cancel')}
+        </Button>
       </div>
     </div>
   );

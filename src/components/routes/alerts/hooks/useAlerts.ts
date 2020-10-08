@@ -72,6 +72,7 @@ interface UsingAlerts {
   onLoad: (onSuccess?: () => void) => void;
   onLoadMore: (onSuccess?: () => void) => void;
   onGet: (id: string, onSuccess: (alert: AlertItem) => void) => void;
+  onApplyWorflowAction: (status: string, selectedPriority: string, selectedLabels: string[]) => Promise<void>;
 }
 
 // Custom Hook implementation for dealing with alerts.
@@ -85,8 +86,15 @@ export default function useAlerts(pageSize: number): UsingAlerts {
   const [priorityFilters, setPriorityFilters] = useState<SearchFilter[]>([]);
   const [labelFilters, setLabelFilters] = useState<SearchFilter[]>([]);
   const [valueFilters, setValueFilters] = useState<SearchFilter[]>([]);
-  const [state, setState] = useState<{ loading: boolean; total: number; buffer: MetaListBuffer; book: Book }>({
+  const [state, setState] = useState<{
+    loading: boolean;
+    loadStartTime: string;
+    total: number;
+    buffer: MetaListBuffer;
+    book: Book;
+  }>({
     loading: true,
+    loadStartTime: null,
     total: 0,
     // items: [],
     buffer: new MetaListBuffer(),
@@ -111,10 +119,13 @@ export default function useAlerts(pageSize: number): UsingAlerts {
     apiCall({
       url: buildUrl(),
       onSuccess: api_data => {
-        const { items: _items, total } = api_data.api_response;
+        console.log(api_data.api_response);
+
+        const { items: _items, tc_start: loadStartTime, total } = api_data.api_response;
         const items = parseResult(_items, 0);
         setState({
           loading: false,
+          loadStartTime,
           total,
           buffer: new MetaListBuffer().push(items),
           book: new Book(items, pageSize)
@@ -141,6 +152,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
         const parsedItems = parseResult(_items, _offset);
         setState({
           loading: false,
+          loadStartTime: state.loadStartTime,
           total,
           buffer: state.buffer.push(parsedItems).build(),
           book: state.book.addAll(parsedItems)
@@ -242,6 +254,78 @@ export default function useAlerts(pageSize: number): UsingAlerts {
     });
   }, []);
 
+  // Hooke API:
+  const onApplyWorflowAction = async (
+    selectedStatus: string,
+    selectedPriority: string,
+    selectedLabels: string[]
+  ): Promise<any> => {
+    // https://192.168.0.13.nip.io:8443/api/v4/alert/priority/batch/?q=testing_constantly.pdf&tc=4d&tc_start=2020-10-08T17:04:38.359618Z
+    // https://192.168.0.13.nip.io:8443/api/v4/alert/status/batch/?q=testing_constantly.pdf&tc=4d&tc_start=2020-10-08T17:04:38.359618Z
+    // https://192.168.0.13.nip.io:8443/api/v4/alert/label/batch/?q=testing_constantly.pdf&tc=4d&tc_start=2020-10-08T17:04:38.359618Z
+
+    console.log(selectedStatus);
+    console.log(selectedPriority);
+
+    const statusPromise = new Promise((resolve, reject) => {
+      console.log('statuses');
+      if (selectedStatus) {
+        apiCall({
+          url: `/api/v4/alert/status/batch/?${query.buildQueryString()}&tc_start=${state.loadStartTime}`,
+          method: 'post',
+          body: selectedStatus,
+          onSuccess: api_data => {
+            console.log('added priority batch.');
+            resolve(true);
+          },
+          onFailure: () => resolve(false)
+        });
+      } else {
+        resolve(false);
+      }
+    });
+
+    const priorityPromise = new Promise((resolve, reject) => {
+      console.log('priorities');
+
+      if (selectedPriority) {
+        apiCall({
+          url: `/api/v4/alert/priority/batch/?${query.buildQueryString()}&tc_start=${state.loadStartTime}`,
+          method: 'post',
+          body: selectedPriority,
+          onSuccess: api_data => {
+            console.log('added priority batch.');
+            resolve(true);
+          },
+          onFailure: () => resolve(false)
+        });
+      } else {
+        resolve(false);
+      }
+    });
+
+    const labelPromise = new Promise((resolve, reject) => {
+      console.log('label');
+
+      if (selectedLabels && selectedLabels.length > 0) {
+        apiCall({
+          url: `/api/v4/alert/label/batch/?${query.buildQueryString()}&tc_start=${state.loadStartTime}`,
+          method: 'post',
+          body: selectedLabels,
+          onSuccess: api_data => {
+            console.log('added priority batch.');
+            resolve(api_data);
+          },
+          onFailure: () => resolve(false)
+        });
+      } else {
+        resolve();
+      }
+    });
+
+    return Promise.all([statusPromise, priorityPromise, labelPromise]);
+  };
+
   // Load it up!
   useEffect(() => {
     onLoad();
@@ -274,6 +358,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
     updateBook: (book: Book) => setState({ ...state, book }),
     onLoad,
     onLoadMore,
-    onGet
+    onGet,
+    onApplyWorflowAction
   };
 }

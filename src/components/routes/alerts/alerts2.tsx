@@ -18,7 +18,6 @@ import AlertListItem from './alert-list-item';
 import AlertsFilters, { AlertFilterSelections, DEFAULT_FILTERS } from './alerts-filters';
 import AlertsFiltersFavorites from './alerts-filters-favorites';
 import AlertsFiltersSelected from './alerts-filters-selected';
-import AlertsWorkflowActions from './alerts-workflow-actions';
 import useAlerts, { AlertItem } from './hooks/useAlerts';
 
 const PAGE_SIZE = 50;
@@ -429,17 +428,17 @@ const Alerts: React.FC = () => {
                   onSaved={onFavoriteAdd}
                   onCancel={onFavoriteCancel}
                 />
-              ),
-              actions: (
-                <AlertsWorkflowActions
-                  query={query.getQuery()}
-                  affectedItemCount={buffer.total()}
-                  selectedFilters={selectedFilters}
-                  statusFilters={statusFilters}
-                  priorityFilters={priorityFilters}
-                  labelFilters={labelFilters}
-                />
               )
+              // actions: (
+              //   <AlertsWorkflowActions
+              //     query={query.getQuery()}
+              //     affectedItemCount={buffer.total()}
+              //     selectedFilters={selectedFilters}
+              //     statusFilters={statusFilters}
+              //     priorityFilters={priorityFilters}
+              //     labelFilters={labelFilters}
+              //   />
+              // )
             }[drawer.type]
           }
         </Box>
