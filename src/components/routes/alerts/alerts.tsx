@@ -277,8 +277,9 @@ const Alerts: React.FC = () => {
     setDrawer({ ...drawer, open: false });
   };
 
-  // Memoized callback to render one line-item of the list.
+  // Memoized callback to render one line-item of the list....
   const onRenderListRow = useCallback((item: AlertItem) => <AlertListItem item={item} />, []);
+  // const onRenderListRow = useCallback((item: AlertItem) => <AlertCardItem item={item} />, []);
 
   //
   const onDrawerClose = () => {
