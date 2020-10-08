@@ -16,7 +16,6 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useFavorites, { Favorite } from './hooks/useFavorites';
 
-//
 interface AlertsFiltersFavoritesProps {
   initValue?: string;
   onSaved: (favorite: { name: string; query: string }) => void;
@@ -98,15 +97,15 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
     onCancel();
   };
 
-  const onQueryChange = event => {
+  const onQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setQueryValue(event.currentTarget.value);
   };
 
-  const onNameChange = event => {
+  const onNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNameValue(event.currentTarget.value);
   };
 
-  const onSwitchChange = isPublic => {
+  const onSwitchChange = (isPublic: boolean) => {
     setPublicSwitch(isPublic);
   };
 
@@ -174,7 +173,8 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
           items={userFavorites.map(f => ({
             size: 'medium',
             variant: 'outlined',
-            label: f.query,
+            label: f.name,
+            tooltip: f.query,
             onClick: () => _onSelect(f),
             onDelete: () => _onDeleteClick(f, false)
           }))}
@@ -187,7 +187,8 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
           items={globalFavorites.map(f => ({
             size: 'medium',
             variant: 'outlined',
-            label: f.query,
+            label: f.name,
+            tooltip: f.query,
             onClick: () => _onSelect(f),
             onDelete: () => _onDeleteClick(f, true)
           }))}

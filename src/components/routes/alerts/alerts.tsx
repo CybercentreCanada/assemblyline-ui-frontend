@@ -22,14 +22,17 @@ import AlertsFiltersSelected from './alerts-filters-selected';
 import AlertsWorkflowActions from './alerts-workflow-actions';
 import useAlerts, { AlertItem } from './hooks/useAlerts';
 
+// Default size of a page to be used by the useAlert hook when fetching next load of data
+//  when scrolling has hit threshold.
 const PAGE_SIZE = 50;
 
+// Just indicates whether there are any filters currently set..
 const hasFilters = (filters: AlertFilterSelections): boolean => {
   const { statuses, priorities, labels, queries } = filters;
-  console.log(filters);
   return statuses.length > 0 || priorities.length > 0 || labels.length > 0 || queries.length > 0;
 };
 
+// Some generated style classes
 const useStyles = makeStyles(theme => ({
   drawerInner: {
     display: 'flex',
@@ -44,6 +47,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+// The Alerts functional component.
 const Alerts: React.FC = () => {
   const classes = useStyles();
   const theme = useTheme();
@@ -218,17 +222,17 @@ const Alerts: React.FC = () => {
     return [..._fields, ...words];
   };
 
-  //
+  // Handler/callback for when clicking the 'Add' btn on the AlertsFavorite component.
   const onFavoriteAdd = (filter: { query: string; name: string }) => {
     setDrawer({ ...drawer, open: false });
   };
 
-  //
+  // Handler/callback for when clicking the 'Cancel' btn on the AlertsFavorite component.
   const onFavoriteCancel = () => {
     setDrawer({ ...drawer, open: false });
   };
 
-  //
+  // Handler/callback for when deleting a favorite on the AlertsFavorite component.
   const onFavoriteDelete = (favorite: { name: string; query: string }) => {
     // console.log(favorite);
   };
@@ -244,7 +248,7 @@ const Alerts: React.FC = () => {
     // Reinitialize the scroll.
     setScrollReset(true);
 
-    // Fetch result based on new/updated query.
+    // Fetch result based on new/updated query
     onLoad();
 
     // Close right of split panel if open.

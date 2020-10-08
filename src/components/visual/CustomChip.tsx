@@ -1,3 +1,4 @@
+import { Tooltip } from '@material-ui/core';
 import Chip from '@material-ui/core/Chip';
 import { darken, makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
@@ -28,6 +29,7 @@ export interface CustomChipProps {
   color?: PossibleColors;
   variant?: 'default' | 'outlined';
   mono?: boolean;
+  tooltip?: string;
   [propName: string]: any;
 }
 
@@ -121,7 +123,16 @@ const useStyles = (hasClick, tiny) => {
   }))();
 };
 
-export default function CustomChip({ className, type, size, color, variant, mono, ...otherProps }: CustomChipProps) {
+export default function CustomChip({
+  className,
+  type,
+  size,
+  color,
+  variant,
+  mono,
+  tooltip,
+  ...otherProps
+}: CustomChipProps) {
   const hasClick = otherProps.onClick !== undefined && otherProps.onClick !== null;
   const classes = useStyles(hasClick, size === 'tiny');
 
@@ -173,7 +184,7 @@ export default function CustomChip({ className, type, size, color, variant, mono
   );
 
   // Build chip based on computed values
-  return (
+  const chip = (
     <Chip
       classes={{ label: sizeLabelClassMap[size] }}
       className={appliedClassName}
@@ -183,6 +194,9 @@ export default function CustomChip({ className, type, size, color, variant, mono
       {...otherProps}
     />
   );
+
+  // Do we have a tooltip?
+  return tooltip ? <Tooltip title={tooltip}>{chip}</Tooltip> : chip;
 }
 
 CustomChip.defaultProps = {

@@ -1,4 +1,3 @@
-import { Tooltip } from '@material-ui/core';
 import CustomChip from 'components/visual/CustomChip';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -64,18 +63,15 @@ const Verdict: React.FC<VerdictProps> = ({
   const { text, color, shortText } = VERDICT_SCORE_MAP[scoreKey];
 
   return (
-    <Tooltip title={`${text} [Score: ${score}]`}>
-      <span>
-        <CustomChip
-          type="square"
-          variant={variant}
-          size={size}
-          label={short ? shortText : text}
-          color={color}
-          mono={mono}
-        />
-      </span>
-    </Tooltip>
+    <CustomChip
+      type="square"
+      variant={variant}
+      size={size}
+      label={short ? shortText : text}
+      color={color}
+      mono={mono}
+      tooltip={`${text} [Score: ${score}]`}
+    />
   );
 };
 
