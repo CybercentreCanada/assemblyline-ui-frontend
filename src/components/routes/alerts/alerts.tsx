@@ -275,6 +275,13 @@ const Alerts: React.FC = () => {
     setSplitPanel({ open: false, item: splitPanel.item });
   };
 
+  // Handler for when the cursor on the list changes via keybaord event.
+  const onListCursorChanges = (cursor: number, item: AlertItem) => {
+    if (splitPanel.open) {
+      onItemSelected(item);
+    }
+  };
+
   // Load up the filters already present in the URL.
   useEffect(() => setQueryFilters(query), [query]);
 
@@ -338,6 +345,7 @@ const Alerts: React.FC = () => {
           rightDrawerWidth={900}
           rightDrawerBackgroundColor={theme.palette.background.default}
           rightOpen={splitPanel.open}
+          onRightDrawerClose={onSplitPanelRightClose}
           left={
             // <MetaList
             //   loading={loading || searching}
@@ -356,6 +364,7 @@ const Alerts: React.FC = () => {
               onItemSelected={onItemSelected}
               onRenderRow={onRenderListRow}
               onLoadNext={_onLoadMore}
+              onCursorChange={onListCursorChanges}
               disableProgress
             />
 

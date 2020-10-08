@@ -65,8 +65,17 @@ const AlertItemDefault: React.FC<AlertListItemProps> = ({ item }) => {
         </Grid>
         <Grid item xs={2}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            <AssignmentIndIcon />
-            &nbsp;{item.owner ? item.owner : item.hint_owner ? 'assigned' : 'none'}
+            {item.owner ? (
+              <>
+                <AssignmentIndIcon />
+                &nbsp; {item.owner}
+              </>
+            ) : item.hint_owner ? (
+              <>
+                <AssignmentIndIcon />
+                &nbsp; assigned
+              </>
+            ) : null}
           </div>
         </Grid>
         <Grid item xs={2}>
