@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 const STATE_ICON_MAP = {
   incomplete: <ClearIcon color="error" />,
   completed: <DoneIcon color="primary" />,
-  submitted: <TimerIcon color="action" />,
+  submitted: <TimerIcon color="secondary" />,
   skipped: <BlockIcon color="action" />
 };
 

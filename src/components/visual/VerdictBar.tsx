@@ -1,4 +1,4 @@
-import { Tooltip } from '@material-ui/core';
+import { Tooltip, useTheme } from '@material-ui/core';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -12,6 +12,7 @@ type VerdictBarProps = {
 
 const VerdictBar: React.FC<VerdictBarProps> = ({ verdicts, width = '100%' }) => {
   const { t } = useTranslation();
+  const theme = useTheme();
 
   return (
     <Tooltip
@@ -19,8 +20,12 @@ const VerdictBar: React.FC<VerdictBarProps> = ({ verdicts, width = '100%' }) => 
         verdicts.non_malicious.length
       }`}
     >
-      <svg height="10" width={width}>
-        <rect height="10" width="100%" style={{ fill: 'transparent', stroke: 'lightgrey' }} />
+      <svg height="15" width={width}>
+        <rect
+          height="15"
+          width="100%"
+          style={{ fill: theme.palette.background.default, stroke: theme.palette.divider }}
+        />
         <rect
           y="1"
           height="13"
@@ -29,7 +34,7 @@ const VerdictBar: React.FC<VerdictBarProps> = ({ verdicts, width = '100%' }) => 
           width={`${verdicts.malicious.length * 5}%`}
         />
         <rect x="50%" y="1" height="13" fill="#5cb85c" width={`${verdicts.non_malicious.length * 5}%`} />
-        <rect x="50%" y="0" height="10" width="1%" fill="lightgrey" />
+        <rect x="50%" y="1" height="13" width="1%" fill="lightgrey" />
       </svg>
     </Tooltip>
   );
