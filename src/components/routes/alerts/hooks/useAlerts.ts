@@ -71,7 +71,7 @@ interface UsingAlerts {
   updateBook: (book: Book) => void;
   onLoad: (onSuccess?: () => void) => void;
   onLoadMore: (onSuccess?: () => void) => void;
-  onGet: (id: string, onSuccess: (alert: AlertItem) => void) => void;
+  onGet: (id: string) => Promise<AlertItem>;
   onApplyWorflowAction: (status: string, selectedPriority: string, selectedLabels: string[]) => Promise<void>;
 }
 
@@ -244,38 +244,33 @@ export default function useAlerts(pageSize: number): UsingAlerts {
   };
 
   // Hook API: fetch the alert for the specified alert_id.
-  const onGet = useCallback((id: string, onSuccess: (alert: AlertItem) => void) => {
-    const url = `/api/v4/alert/${id}/`;
-    apiCall({
-      url,
-      onSuccess: api_data => {
-        onSuccess(api_data.api_response);
-      }
+  const onGet = useCallback((id: string) => {
+    return new Promise<AlertItem>((resolve, reject) => {
+      const url = `/api/v4/alert/${id}/`;
+      apiCall({
+        url,
+        onSuccess: api_data => {
+          resolve(api_data.api_response);
+        },
+        onFailure: () => reject()
+      });
     });
   }, []);
 
-  // Hooke API:
+  // Hook API:
   const onApplyWorflowAction = async (
     selectedStatus: string,
     selectedPriority: string,
     selectedLabels: string[]
   ): Promise<any> => {
     // https://192.168.0.13.nip.io:8443/api/v4/alert/priority/batch/?q=testing_constantly.pdf&tc=4d&tc_start=2020-10-08T17:04:38.359618Z
-    // https://192.168.0.13.nip.io:8443/api/v4/alert/status/batch/?q=testing_constantly.pdf&tc=4d&tc_start=2020-10-08T17:04:38.359618Z
-    // https://192.168.0.13.nip.io:8443/api/v4/alert/label/batch/?q=testing_constantly.pdf&tc=4d&tc_start=2020-10-08T17:04:38.359618Z
-
-    console.log(selectedStatus);
-    console.log(selectedPriority);
-
     const statusPromise = new Promise((resolve, reject) => {
-      console.log('statuses');
       if (selectedStatus) {
         apiCall({
           url: `/api/v4/alert/status/batch/?${query.buildQueryString()}&tc_start=${state.loadStartTime}`,
           method: 'post',
           body: selectedStatus,
           onSuccess: api_data => {
-            console.log('added priority batch.');
             resolve(true);
           },
           onFailure: () => resolve(false)
@@ -285,16 +280,14 @@ export default function useAlerts(pageSize: number): UsingAlerts {
       }
     });
 
+    // https://192.168.0.13.nip.io:8443/api/v4/alert/priority/batch/?q=testing_constantly.pdf&tc=4d&tc_start=2020-10-08T17:04:38.359618Z
     const priorityPromise = new Promise((resolve, reject) => {
-      console.log('priorities');
-
       if (selectedPriority) {
         apiCall({
           url: `/api/v4/alert/priority/batch/?${query.buildQueryString()}&tc_start=${state.loadStartTime}`,
           method: 'post',
           body: selectedPriority,
           onSuccess: api_data => {
-            console.log('added priority batch.');
             resolve(true);
           },
           onFailure: () => resolve(false)
@@ -304,16 +297,14 @@ export default function useAlerts(pageSize: number): UsingAlerts {
       }
     });
 
+    // https://192.168.0.13.nip.io:8443/api/v4/alert/status/batch/?q=testing_constantly.pdf&tc=4d&tc_start=2020-10-08T17:04:38.359618Z
     const labelPromise = new Promise((resolve, reject) => {
-      console.log('label');
-
       if (selectedLabels && selectedLabels.length > 0) {
         apiCall({
           url: `/api/v4/alert/label/batch/?${query.buildQueryString()}&tc_start=${state.loadStartTime}`,
           method: 'post',
           body: selectedLabels,
           onSuccess: api_data => {
-            console.log('added priority batch.');
             resolve(api_data);
           },
           onFailure: () => resolve(false)

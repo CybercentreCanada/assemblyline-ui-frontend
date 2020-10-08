@@ -132,7 +132,7 @@ const Alerts: React.FC = () => {
   const onItemSelected = useCallback(
     (item: AlertItem) => {
       if (item) {
-        onGet(item.alert_id, alert => {
+        onGet(item.alert_id).then(alert => {
           setSplitPanel({ open: true, item: alert });
         });
       } else {
