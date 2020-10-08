@@ -56,7 +56,7 @@ export default function Submissions() {
 
       {submissions !== null ? (
         <TableContainer component={Paper}>
-          <Table size="small" stickyHeader>
+          <Table size="small">
             <TableHead>
               <TableRow style={{ whiteSpace: 'nowrap' }}>
                 <TableCell>{t('header.starttime')}</TableCell>
@@ -70,7 +70,7 @@ export default function Submissions() {
             </TableHead>
             <TableBody>
               {submissions.map(submission => (
-                <TableRow key={submission.id} onClick={event => handleClick(submission)} hover>
+                <TableRow key={submission.id} onClick={() => handleClick(submission)} hover>
                   <TableCell style={{ whiteSpace: 'nowrap' }}>
                     <Tooltip title={submission.times.submitted}>
                       <Moment fromNow locale={i18n.language}>

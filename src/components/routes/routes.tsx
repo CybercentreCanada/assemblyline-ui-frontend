@@ -7,6 +7,8 @@ import AdminErrorViewer from 'components/routes/admin/error_viewer';
 import AdminServices from 'components/routes/admin/services';
 import AdminSiteMap from 'components/routes/admin/site_map';
 import AdminUsers from 'components/routes/admin/users';
+import Alerts from 'components/routes/alerts/alerts';
+import AlertsLegacy from 'components/routes/alerts/legacy-alert';
 import Dashboard from 'components/routes/dashboard';
 import Help from 'components/routes/help';
 import HelpApiDoc from 'components/routes/help/api';
@@ -30,7 +32,6 @@ import Tos from 'components/routes/tos';
 import User from 'components/routes/user';
 import React, { useEffect } from 'react';
 import { Redirect, Route, Switch, useLocation } from 'react-router-dom';
-import Alerts from './alerts/alerts';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -51,6 +52,7 @@ const Routes = () => {
         <Route exact path="/" component={Submit} />
         <Route exact path="/account" component={Account} />
         <Route exact path="/alerts" component={Alerts} />
+        <Route exact path="/alerts/legacy" component={AlertsLegacy} />
         <Route exact path="/admin" component={Admin} />
         <Route exact path="/admin/errors" component={AdminErrorViewer} />
         <Route exact path="/admin/services" component={AdminServices} />
