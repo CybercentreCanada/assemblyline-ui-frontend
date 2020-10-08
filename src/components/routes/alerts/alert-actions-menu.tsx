@@ -12,7 +12,7 @@ const AlertActionsMenu = () => {
   };
   return (
     <>
-      <Tooltip title={t('page.alerts.tooltip.actions')}>
+      <Tooltip title={t('tooltip.actions')}>
         <IconButton aria-controls="simple-menu" aria-haspopup="true" onClick={onClick}>
           <MenuIcon />
         </IconButton>

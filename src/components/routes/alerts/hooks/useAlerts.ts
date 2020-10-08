@@ -19,28 +19,6 @@ export interface AlertFile {
 }
 
 export interface AlertItem extends MetaListItem {
-  sid: string;
-  alert_id: string;
-  type: string;
-  extended_scan: string;
-  reporting_ts: string;
-  label: string[];
-  priority: string;
-  status: string;
-  file: AlertFile;
-  owner: string;
-  hint_owner: boolean;
-  group_count: number;
-  classification: string;
-  filtered: boolean;
-  heuristic: { name: string[] };
-  metadata: {
-    [key: string]: any;
-  }[];
-  attack: {
-    category: string;
-    pattern: string[];
-  };
   al: {
     attrib: string[];
     av: string[];
@@ -55,6 +33,29 @@ export interface AlertItem extends MetaListItem {
     score: number;
     yara: string[];
   };
+  alert_id: string;
+  attack: {
+    category: string[];
+    pattern: string[];
+  };
+  extended_scan: string;
+  classification: string;
+  file: AlertFile;
+  filtered: boolean;
+  label: string[];
+  group_count: number;
+  heuristic: { name: string[] };
+  hint_owner: boolean;
+  metadata: {
+    [key: string]: any;
+  }[];
+  owner: string;
+  priority: string;
+  reporting_ts: string;
+  sid: string;
+  status: string;
+  ts: string;
+  type: string;
   verdict: {
     malicious: string[];
     non_malicious: string[];
