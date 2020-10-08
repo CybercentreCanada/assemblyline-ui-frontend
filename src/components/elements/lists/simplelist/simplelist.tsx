@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
-import { CircularProgress } from '@material-ui/core';
+import { CircularProgress, useScrollTrigger } from '@material-ui/core';
 import React, { useCallback, useLayoutEffect, useRef } from 'react';
 import useListKeyboard from '../hooks/useListKeyboard';
 import useListStyles from '../hooks/useListStyles';
@@ -29,7 +29,7 @@ const SimpleList: React.FC<SimpleListProps> = ({
   onRenderRow,
   onLoadNext
 }) => {
-  // Some styles.
+  // Hooks.
   const { simpleListStyles: classes } = useListStyles();
 
   // Configure the list keyboard custom hook.
@@ -50,6 +50,8 @@ const SimpleList: React.FC<SimpleListProps> = ({
   const outerEL = useRef<HTMLDivElement>();
   const innerEL = useRef<HTMLDivElement>();
   const nextScrollThreshold = useRef<number>(scrollLoadNextThreshold);
+  const trigger = useScrollTrigger({ target: innerEL.current });
+  console.log(trigger);
 
   // Enable scroll event handler?
   const onScrollEnabled = !loading && onLoadNext;
