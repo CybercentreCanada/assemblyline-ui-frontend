@@ -248,6 +248,72 @@ function HeuristicsListSkel() {
   );
 }
 
+function FileTree({ tree, important_files, spacing = 0 }) {
+  const theme = useTheme();
+  const { t } = useTranslation(['submissionReport']);
+  return (
+    <div>
+      {Object.keys(tree).map((f, i) => {
+        return important_files.indexOf(f) !== -1 ? (
+          <div key={i} style={{ marginLeft: theme.spacing(spacing) }}>
+            <Verdict score={tree[f].score} short mono />
+            <b style={{ fontSize: '110%' }}>{tree[f].name}</b>
+            <table
+              style={{
+                fontFamily: 'monospace',
+                color: theme.palette.text.secondary,
+                borderSpacing: 0,
+                paddingBottom: theme.spacing(1)
+              }}
+            >
+              <tbody>
+                <tr>
+                  <td>{t('file.type')}: </td>
+                  <td>{tree[f].type}</td>
+                </tr>
+                <tr>
+                  <td>{t('file.sha256')}: </td>
+                  <td>{tree[f].sha256}</td>
+                </tr>
+                <tr>
+                  <td>{t('file.size')}: </td>
+                  <td>{tree[f].size}</td>
+                </tr>
+              </tbody>
+            </table>
+            <FileTree tree={tree[f].children} important_files={important_files} spacing={spacing + 4} />
+          </div>
+        ) : null;
+      })}
+    </div>
+  );
+}
+
+function FileTreeSkel() {
+  function FileItemSkel() {
+    return (
+      <>
+        <div style={{ display: 'flex' }}>
+          <Skeleton style={{ height: '2rem', width: '2rem' }} />
+          <Skeleton style={{ height: '2rem', marginLeft: '1rem', flexGrow: 1 }} />
+        </div>
+        <Skeleton />
+        <Skeleton />
+        <Skeleton />
+      </>
+    );
+  }
+
+  return (
+    <div>
+      <FileItemSkel />
+      <div style={{ marginLeft: '2rem' }}>
+        <FileItemSkel />
+      </div>
+    </div>
+  );
+}
+
 export default function SubmissionReport() {
   const { t } = useTranslation(['submissionReport']);
   const { id } = useParams<ParamProps>();
@@ -263,14 +329,15 @@ export default function SubmissionReport() {
     apiCall({
       url: `/api/v4/submission/report/${id}/`,
       onSuccess: api_data => {
-        // setTimeout(() => {
         setReport(api_data.api_response);
-        // }, 5000);
       },
       onFailure: api_data => {
         if (api_data.api_status_code === 425) {
           showWarningMessage(t('error.too_early'));
           history.replace(`/submission/detail/${id}`);
+        } else if (api_data.api_status_code === 404) {
+          showErrorMessage(t('error.notfound'));
+          history.replace('/notfound');
         } else {
           showErrorMessage(api_data.api_error_message);
         }
@@ -298,14 +365,16 @@ export default function SubmissionReport() {
             </Grid>
             <Grid item xs={12} sm>
               <div style={{ textAlign: 'right' }}>
-                <IconButton>
-                  <PrintOutlinedIcon />
-                </IconButton>
-                <Link to={`/submission/detail/${report ? report.sid : id}`}>
+                <Tooltip title={t('print')}>
                   <IconButton>
+                    <PrintOutlinedIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title={t('detail_view')}>
+                  <IconButton component={Link} to={`/submission/detail/${report ? report.sid : id}`}>
                     <ListAltOutlinedIcon />
                   </IconButton>
-                </Link>
+                </Tooltip>
               </div>
             </Grid>
           </Grid>
@@ -571,6 +640,28 @@ export default function SubmissionReport() {
           Object.keys(report.tags).map((tagGroup, groupIdx) => {
             return <TagTable key={groupIdx} group={tagGroup} items={report.tags[tagGroup]} />;
           })}
+
+        {(!report || report.important_files.length !== 0) && (
+          <div style={{ paddingBottom: sp2 }}>
+            <Typography variant="h6">{t('important_files')}</Typography>
+            <Divider />
+            <div
+              style={{
+                paddingTop: sp2,
+                paddingBottom: sp2
+              }}
+            >
+              {report ? (
+                <FileTree
+                  tree={report.file_tree[report.files[0].sha256].children}
+                  important_files={report.important_files}
+                />
+              ) : (
+                <FileTreeSkel />
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </PageCenter>
   );
