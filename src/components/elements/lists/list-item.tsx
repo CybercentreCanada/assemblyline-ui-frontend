@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import { Button, ButtonProps, Divider, IconButton, IconButtonProps, useTheme } from '@material-ui/core';
+import { Divider, IconButtonProps, useTheme } from '@material-ui/core';
 import React, { useCallback } from 'react';
 import useListStyles from './hooks/useListStyles';
 
@@ -9,11 +9,8 @@ export interface LineItem {
 }
 
 export interface LineItemAction {
-  title?: string;
-  icon?: React.ReactNode;
-  color?: 'primary' | 'secondary';
-  action?: () => void;
-  btnProp?: ButtonProps | IconButtonProps;
+  icon: React.ReactNode;
+  props: IconButtonProps;
 }
 
 interface ListRowProps {
@@ -22,13 +19,13 @@ interface ListRowProps {
   item: LineItem;
   selected: boolean;
   rowHeight?: number;
-  actions?: LineItemAction[];
   onClick: (item: LineItem, index: number) => void;
   onRenderRow: (item: LineItem) => React.ReactNode;
+  onRenderActions?: (item: LineItem) => React.ReactNode;
 }
 
 const ListRow: React.FC<ListRowProps> = React.memo(
-  ({ loaded, selected, item, index, rowHeight, actions, onClick, onRenderRow }) => {
+  ({ loaded, selected, item, index, rowHeight, onRenderActions, onClick, onRenderRow }) => {
     const theme = useTheme();
     const { listItemClasses: classes } = useListStyles();
 
@@ -38,7 +35,9 @@ const ListRow: React.FC<ListRowProps> = React.memo(
       }
     }, [onClick, item, index]);
 
-    // console.log(`rendering: ${index}`);
+    console.log(`rendering: ${index}`);
+
+    const onItemActionsClick = useCallback(event => event.stopPropagation(), []);
 
     return (
       <div
@@ -54,35 +53,8 @@ const ListRow: React.FC<ListRowProps> = React.memo(
         <div className={classes.itemDivider}>
           <Divider />
         </div>
-        <div className={classes.itemActions}>
-          {actions &&
-            actions.map((a, i) => {
-              if (a.title) {
-                return (
-                  <Button
-                    key={`ph-action-${i}`}
-                    startIcon={a.icon}
-                    color={a.color}
-                    onClick={a.action}
-                    {...(a.btnProp as ButtonProps)}
-                    style={{ marginRight: theme.spacing(1) }}
-                  >
-                    {a.title}
-                  </Button>
-                );
-              }
-              return (
-                <IconButton
-                  key={`ph-action-${i}`}
-                  color={a.color}
-                  onClick={a.action}
-                  {...(a.btnProp as IconButtonProps)}
-                  style={{ marginRight: theme.spacing(1) }}
-                >
-                  {a.icon}
-                </IconButton>
-              );
-            })}
+        <div className={classes.itemActions} onClick={onItemActionsClick}>
+          {onRenderActions && onRenderActions(item)}
         </div>
       </div>
     );

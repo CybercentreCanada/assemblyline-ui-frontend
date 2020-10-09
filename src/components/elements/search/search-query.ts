@@ -21,6 +21,16 @@ export interface SearchFilter {
   object?: any;
 }
 
+export interface SearchFilters {
+  tc: string;
+  tcStart: string;
+  groupBy: string;
+  statuses: SearchFilter[];
+  priorities: SearchFilter[];
+  labels: SearchFilter[];
+  queries: SearchFilter[];
+}
+
 export interface SearchQueryParameter {
   name: string;
   value: string;
@@ -110,6 +120,19 @@ export default class SearchQuery {
     return this.hasTc() ? this.params.get('tc') : '';
   }
 
+  public setTcStart(tcStart: string): SearchQuery {
+    this.params.set('tc_start', tcStart);
+    return this;
+  }
+
+  public hasTcStart(): boolean {
+    return this.params.has('tc_start');
+  }
+
+  public getTcStart(): string {
+    return this.hasTcStart() ? this.params.get('tc_start') : '';
+  }
+
   public addFq(fq: string): SearchQuery {
     this.params.append('fq', fq);
     return this;
@@ -157,14 +180,33 @@ export default class SearchQuery {
     params.delete('group_by');
     params.delete('rows');
     params.delete('offset');
+    params.delete('tc_start');
     window.history.pushState(null, '', `${this.path}?${params.toString()}`);
   }
 
-  public parseFilters(): SearchFilter[] {
+  public parseFilters(): SearchFilters {
+    let fqs = [];
+    let statuses = [];
+    let priorities = [];
+    let labels = [];
+    let queries = [];
+
     if (this.getFqList().length) {
-      return this.getFqList().map((fq, i) => SearchQuery.parseFilterValue(i, fq));
+      fqs = this.getFqList().map((fq, i) => SearchQuery.parseFilterValue(i, fq));
+      statuses = fqs.filter(f => f.type === SearchFilterType.STATUS);
+      priorities = fqs.filter(f => f.type === SearchFilterType.PRIORITY);
+      labels = fqs.filter(f => f.type === SearchFilterType.LABEL);
+      queries = fqs.filter(f => f.type === SearchFilterType.QUERY);
     }
-    return [];
+    return {
+      tc: this.getTc()},
+      tcStart: this.getTcStart(),
+      groupBy: this.getGroupBy(),
+      statuses,
+      priorities,
+      labels,
+      queries
+    };
   }
 
   public static parseFilterValue(id: string | number, filter: string): SearchFilter {

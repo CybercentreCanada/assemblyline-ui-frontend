@@ -15,6 +15,7 @@ interface SimpleListProps {
   onCursorChange?: (cursor: number, item: LineItem) => void;
   onItemSelected: (item: LineItem) => void;
   onRenderRow: (item: LineItem) => React.ReactNode;
+  onRenderActions?: (item: LineItem) => React.ReactNode;
   onLoadNext?: () => void;
 }
 
@@ -27,6 +28,7 @@ const SimpleList: React.FC<SimpleListProps> = ({
   onCursorChange,
   onItemSelected,
   onRenderRow,
+  onRenderActions,
   onLoadNext
 }) => {
   // Hooks.
@@ -99,6 +101,7 @@ const SimpleList: React.FC<SimpleListProps> = ({
             index={index}
             selected={cursor === index}
             item={item}
+            onRenderActions={onRenderActions}
             onClick={_onRowClick}
             onRenderRow={onRenderRow}
           />

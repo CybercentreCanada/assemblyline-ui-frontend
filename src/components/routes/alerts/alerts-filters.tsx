@@ -41,7 +41,7 @@ const TC_OPTIONS = [
 ];
 
 // Default filters.
-export const DEFAULT_FILTERS = {
+const DEFAULT_FILTERS = {
   tc: DEFAULT_TC,
   groupBy: DEFAULT_GROUPBY,
   statuses: [],
@@ -65,19 +65,9 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-// Specification interface defining the state of the current filter selections.
-export interface AlertFilterSelections {
-  tc: { value: string; label: string };
-  groupBy: { value: string; label: string };
-  statuses: SearchFilter[];
-  priorities: SearchFilter[];
-  labels: SearchFilter[];
-  queries: SearchFilter[];
-}
-
 // Specificatino interface of this component's properties.
 interface AlertsFiltersProps {
-  selectedFilters: AlertFilterSelections;
+  query: SearchFilter;
   valueFilters: SearchFilter[];
   statusFilters: SearchFilter[];
   priorityFilters: SearchFilter[];
@@ -89,7 +79,7 @@ interface AlertsFiltersProps {
 
 // Implementation of th AlertsFilter component.
 const AlertsFilters: React.FC<AlertsFiltersProps> = ({
-  selectedFilters,
+  query,
   valueFilters,
   statusFilters,
   priorityFilters,

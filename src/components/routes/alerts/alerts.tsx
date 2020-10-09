@@ -1,4 +1,4 @@
-import { Box, Drawer, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
+import { Box, Button, Drawer, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import StarIcon from '@material-ui/icons/Star';
@@ -44,6 +44,11 @@ const useStyles = makeStyles(theme => ({
   },
   searchresult: {
     fontStyle: 'italic'
+  },
+  listactions: {
+    '& button': {
+      marginRight: theme.spacing(1)
+    }
   }
 }));
 
@@ -66,7 +71,8 @@ const Alerts: React.FC = () => {
     onLoad,
     onLoadMore,
     onGet,
-    onApplyWorflowAction
+    onApplyWorflowAction,
+    newQuery
   } = useAlerts(PAGE_SIZE);
   // Define required states...
   const [searching, setSearching] = useState<boolean>(false);
@@ -77,6 +83,11 @@ const Alerts: React.FC = () => {
     type: null
   });
   const [selectedFilters, setSelectedFilters] = useState<AlertFilterSelections>(DEFAULT_FILTERS);
+  const [workflowAction, setWorkflowAction] = useState<{
+    query: SearchQuery;
+    filters: AlertFilterSelections;
+    total: number;
+  }>();
 
   // Define some references.
   const searchTextValue = useRef<string>(query.getQuery());
@@ -84,7 +95,7 @@ const Alerts: React.FC = () => {
   // Media quries.
   const isLTEMd = useMediaQuery(theme.breakpoints.up('md'));
 
-  // Parse the filters [fq: param] and set them as  the 'selectedFilters'.
+  // Parse the filters [fq: param] and set them as  the 'selectedFilters'
   const setQueryFilters = (_query: SearchQuery) => {
     const searchQueryFilters = _query.parseFilters();
     const statuses = searchQueryFilters.filter(f => f.type === 'status');
@@ -265,8 +276,7 @@ const Alerts: React.FC = () => {
 
   // Handler/callback for when clicking the 'Apply' btn on the AlertsWorkflowActions component.
   const onWorkflowActionsApply = (selectedStatus: string, selectedPriority: string, selectedLabels: string[]) => {
-    //
-    onApplyWorflowAction(selectedStatus, selectedPriority, selectedLabels).then(() => {
+    onApplyWorflowAction(query, selectedStatus, selectedPriority, selectedLabels).then(() => {
       setDrawer({ ...drawer, open: false });
       onLoad();
     });
@@ -297,6 +307,40 @@ const Alerts: React.FC = () => {
       onItemSelected(item);
     }
   };
+
+  //
+  const onRenderListActions = useCallback((item: AlertItem) => {
+    return (
+      <div className={classes.listactions}>
+        <Button
+          title="Workflow Action"
+          onClick={() => {
+            console.log('workflow action');
+            const q = newQuery()
+              .setQuery(`file.sha256:${item.file.sha256}`)
+              .setTc(query.getTc())
+              .setTcStart(query.getTcStart());
+            setWorkflowAction({ query: q, total: 1, filters: q.parseFilters() });
+            setDrawer({ open: true, type: 'actions' });
+          }}
+          color="primary"
+          size="small"
+          variant="outlined"
+        >
+          Workflow Action
+        </Button>
+        <Button
+          title="Take Ownership"
+          onClick={() => console.log('click')}
+          color="primary"
+          size="small"
+          variant="outlined"
+        >
+          Take Ownership
+        </Button>
+      </div>
+    );
+  }, []);
 
   // Load up the filters already present in the URL.
   useEffect(() => setQueryFilters(query), [query]);
@@ -379,6 +423,7 @@ const Alerts: React.FC = () => {
               scrollLoadNextThreshold={75}
               onItemSelected={onItemSelected}
               onRenderRow={onRenderListRow}
+              onRenderActions={onRenderListActions}
               onLoadNext={_onLoadMore}
               onCursorChange={onListCursorChanges}
               disableProgress
@@ -441,11 +486,11 @@ const Alerts: React.FC = () => {
                   onCancel={onFavoriteCancel}
                 />
               ),
-              actions: (
+              actions: workflowAction && (
                 <AlertsWorkflowActions
-                  query={query.getQuery()}
-                  affectedItemCount={total}
-                  selectedFilters={selectedFilters}
+                  query={workflowAction.query.getQuery()}
+                  selectedFilters={workflowAction.filters}
+                  affectedItemCount={workflowAction.total}
                   statusFilters={statusFilters}
                   priorityFilters={priorityFilters}
                   labelFilters={labelFilters}

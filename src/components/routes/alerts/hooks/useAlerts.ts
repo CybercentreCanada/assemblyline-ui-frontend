@@ -74,11 +74,17 @@ interface UsingAlerts {
   priorityFilters: SearchFilter[];
   statusFilters: SearchFilter[];
   valueFilters: SearchFilter[];
+  newQuery: () => SearchQuery;
   updateBook: (book: Book) => void;
   onLoad: (onSuccess?: () => void) => void;
   onLoadMore: (onSuccess?: () => void) => void;
   onGet: (id: string) => Promise<AlertItem>;
-  onApplyWorflowAction: (status: string, selectedPriority: string, selectedLabels: string[]) => Promise<void>;
+  onApplyWorflowAction: (
+    query: SearchQuery,
+    status: string,
+    selectedPriority: string,
+    selectedLabels: string[]
+  ) => Promise<void>;
 }
 
 // Custom Hook implementation for dealing with alerts.
@@ -94,13 +100,11 @@ export default function useAlerts(pageSize: number): UsingAlerts {
   const [valueFilters, setValueFilters] = useState<SearchFilter[]>([]);
   const [state, setState] = useState<{
     loading: boolean;
-    loadStartTime: string;
     total: number;
     buffer: MetaListBuffer;
     book: Book;
   }>({
     loading: true,
-    loadStartTime: null,
     total: 0,
     // items: [],
     buffer: new MetaListBuffer(),
@@ -111,6 +115,11 @@ export default function useAlerts(pageSize: number): UsingAlerts {
   const parseResult = (responseItems, offset) => {
     const items = responseItems.map((item, index) => ({ ...item, id: item.alert_id, index: index + offset }));
     return items;
+  };
+
+  // Hook API: create a new query with same pathname.
+  const newQuery = (): SearchQuery => {
+    return new SearchQuery(location.pathname, '', pageSize);
   };
 
   // format alert api url using specified indexes.
@@ -127,11 +136,11 @@ export default function useAlerts(pageSize: number): UsingAlerts {
       onSuccess: api_data => {
         console.log(api_data.api_response);
 
-        const { items: _items, tc_start: loadStartTime, total } = api_data.api_response;
+        const { items: _items, tc_start: executionTime, total } = api_data.api_response;
         const items = parseResult(_items, 0);
+        query.setTcStart(executionTime);
         setState({
           loading: false,
-          loadStartTime,
           total,
           buffer: new MetaListBuffer().push(items),
           book: new Book(items, pageSize)
@@ -158,7 +167,6 @@ export default function useAlerts(pageSize: number): UsingAlerts {
         const parsedItems = parseResult(_items, _offset);
         setState({
           loading: false,
-          loadStartTime: state.loadStartTime,
           total,
           buffer: state.buffer.push(parsedItems).build(),
           book: state.book.addAll(parsedItems)
@@ -265,6 +273,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
 
   // Hook API:
   const onApplyWorflowAction = async (
+    searchQuery: SearchQuery,
     selectedStatus: string,
     selectedPriority: string,
     selectedLabels: string[]
@@ -273,7 +282,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
     const statusPromise = new Promise((resolve, reject) => {
       if (selectedStatus) {
         apiCall({
-          url: `/api/v4/alert/status/batch/?${query.buildQueryString()}&tc_start=${state.loadStartTime}`,
+          url: `/api/v4/alert/status/batch/?${searchQuery.buildQueryString()}`,
           method: 'post',
           body: selectedStatus,
           onSuccess: api_data => {
@@ -290,7 +299,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
     const priorityPromise = new Promise((resolve, reject) => {
       if (selectedPriority) {
         apiCall({
-          url: `/api/v4/alert/priority/batch/?${query.buildQueryString()}&tc_start=${state.loadStartTime}`,
+          url: `/api/v4/alert/priority/batch/?${query.buildQueryString()}`,
           method: 'post',
           body: selectedPriority,
           onSuccess: api_data => {
@@ -307,7 +316,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
     const labelPromise = new Promise((resolve, reject) => {
       if (selectedLabels && selectedLabels.length > 0) {
         apiCall({
-          url: `/api/v4/alert/label/batch/?${query.buildQueryString()}&tc_start=${state.loadStartTime}`,
+          url: `/api/v4/alert/label/batch/?${query.buildQueryString()}`,
           method: 'post',
           body: selectedLabels,
           onSuccess: api_data => {
@@ -356,6 +365,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
     onLoad,
     onLoadMore,
     onGet,
-    onApplyWorflowAction
+    onApplyWorflowAction,
+    newQuery
   };
 }

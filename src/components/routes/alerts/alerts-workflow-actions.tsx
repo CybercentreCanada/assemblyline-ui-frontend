@@ -1,9 +1,12 @@
 import { Button, Divider, makeStyles, TextField, Typography, useTheme } from '@material-ui/core';
 import { Alert, Autocomplete } from '@material-ui/lab';
-import { EMPTY_SEARCHFILTER, SearchFilter, SearchFilterType } from 'components/elements/search/search-query';
+import SearchQuery, {
+  EMPTY_SEARCHFILTER,
+  SearchFilter,
+  SearchFilterType
+} from 'components/elements/search/search-query';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AlertFilterSelections } from './alerts-filters';
 import AlertsFiltersSelected from './alerts-filters-selected';
 
 const useStyles = makeStyles(theme => ({
@@ -13,9 +16,8 @@ const useStyles = makeStyles(theme => ({
 }));
 
 interface AlertsWorkflowActionsProps {
-  query: string;
+  query: SearchQuery;
   affectedItemCount: number;
-  selectedFilters: AlertFilterSelections;
   statusFilters: SearchFilter[];
   priorityFilters: SearchFilter[];
   labelFilters: SearchFilter[];
