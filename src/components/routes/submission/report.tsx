@@ -1,21 +1,4 @@
-import {
-  createStyles,
-  Divider,
-  Grid,
-  IconButton,
-  makeStyles,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Theme,
-  Tooltip,
-  Typography,
-  useTheme,
-  withStyles
-} from '@material-ui/core';
+import { Divider, Grid, IconButton, makeStyles, Tooltip, Typography, useTheme } from '@material-ui/core';
 import ListAltOutlinedIcon from '@material-ui/icons/ListAltOutlined';
 import PrintOutlinedIcon from '@material-ui/icons/PrintOutlined';
 import { Skeleton } from '@material-ui/lab';
@@ -33,15 +16,6 @@ import { Link, useHistory, useParams } from 'react-router-dom';
 type ParamProps = {
   id: string;
 };
-
-const StyledTableCell = withStyles((theme: Theme) =>
-  createStyles({
-    head: {
-      backgroundColor: '#6e6e6e25 !important',
-      borderBottom: '1px solid #aaa !important'
-    }
-  })
-)(TableCell);
 
 const useStyles = makeStyles({
   malicious_heur: {
@@ -73,7 +47,20 @@ const useStyles = makeStyles({
 function TagTable({ group, items }) {
   const { t } = useTranslation(['submissionReport']);
   const theme = useTheme();
+  const orderedItems = {};
   const sp2 = theme.spacing(2);
+
+  Object.keys(items).map(tagType =>
+    Object.keys(items[tagType]).map(tagValue => {
+      const key = `${items[tagType][tagValue].h_type}_${tagType}`;
+      if (!Object.hasOwnProperty.call(orderedItems, key)) {
+        orderedItems[key] = { verdict: items[tagType][tagValue].h_type, type: tagType, values: [] };
+      }
+      orderedItems[key].values.push(tagValue);
+      return null;
+    })
+  );
+
   return (
     <div style={{ paddingBottom: sp2 }}>
       <Typography variant="h6">{t(`tag.${group}`)}</Typography>
@@ -84,49 +71,31 @@ function TagTable({ group, items }) {
           paddingBottom: sp2
         }}
       >
-        <TableContainer>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <StyledTableCell />
-                <StyledTableCell>{t('tag.table.type')}</StyledTableCell>
-                <StyledTableCell>{t('tag.table.value')}</StyledTableCell>
-                <StyledTableCell>{t('tag.table.files')}</StyledTableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {Object.keys(items).map((tagType, typeIdx) =>
-                Object.keys(items[tagType]).map((tagValue, valueIdx) => (
-                  <TableRow key={`${typeIdx}_${valueIdx}`} style={{ verticalAlign: 'top' }}>
-                    <TableCell>
-                      <TextVerdict verdict={items[tagType][tagValue].h_type} mono />
-                    </TableCell>
-                    <TableCell style={{ whiteSpace: 'nowrap', textTransform: 'capitalize' }}>
-                      <Tooltip title={tagType}>
-                        <span>{tagType.split('.').pop().replace('_', ' ')}</span>
-                      </Tooltip>
-                    </TableCell>
-                    <TableCell>{tagValue}</TableCell>
-                    <TableCell>
-                      <ul
-                        style={{
-                          fontSize: '80%',
-                          margin: 0,
-                          paddingInlineStart: '12px',
-                          overflowWrap: 'anywhere'
-                        }}
-                      >
-                        {items[tagType][tagValue].files.map((f, fidx) => {
-                          return <li key={fidx}>{f[0]}</li>;
-                        })}
-                      </ul>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        {Object.keys(orderedItems).map((k, idx) => {
+          return (
+            <Grid key={idx} container spacing={2} style={{ marginBottom: sp2 }}>
+              <Grid item xs={12} sm={3} md={2}>
+                <div style={{ display: 'flex' }}>
+                  <TextVerdict verdict={orderedItems[k].verdict} mono />
+                  <Tooltip title={orderedItems[k].type}>
+                    <span style={{ flexGrow: 1, wordBreak: 'break-all', textTransform: 'capitalize' }}>
+                      {orderedItems[k].type.split('.').pop().replace('_', ' ')}
+                    </span>
+                  </Tooltip>
+                </div>
+              </Grid>
+              <Grid item xs={12} sm={9} md={10}>
+                {orderedItems[k].values.map((v, vidx) => {
+                  return (
+                    <div key={vidx} style={{ display: 'inline-block', width: '100%', paddingBottom: '4px' }}>
+                      {v}
+                    </div>
+                  );
+                })}
+              </Grid>
+            </Grid>
+          );
+        })}
       </div>
     </div>
   );
@@ -145,17 +114,12 @@ function AttackMatrixBlock({ attack, items }) {
         paddingBottom: sp2
       }}
     >
-      <span style={{ fontSize: '1.2rem', textTransform: 'capitalize' }}>{attack.replaceAll('-', ' ')}</span>
+      <span style={{ fontSize: '1rem', textTransform: 'capitalize' }}>{attack.replaceAll('-', ' ')}</span>
       {Object.keys(items).map((cat, idx) => {
         return (
           <div key={idx}>
             <TextVerdict verdict={items[cat].h_type} mono />
-            <span style={{ fontSize: '1rem', verticalAlign: 'middle' }}>{cat}</span>
-            <ul style={{ marginBlockStart: 0, fontSize: '80%', overflowWrap: 'anywhere' }}>
-              {items[cat].files.map((file, fidx) => {
-                return <li key={fidx}>{file[0]}</li>;
-              })}
-            </ul>
+            <span style={{ verticalAlign: 'middle' }}>{cat}</span>
           </div>
         );
       })}
@@ -179,14 +143,10 @@ function AttackMatrixSkel() {
         <Skeleton style={{ height: '2rem', width: '1.5rem', marginRight: '8px' }} />
         <Skeleton style={{ height: '2rem', flexGrow: 1 }} />
       </div>
-      <Skeleton style={{ marginLeft: '2rem' }} />
-      <Skeleton style={{ marginLeft: '2rem' }} />
-      <Skeleton style={{ marginLeft: '2rem' }} />
       <div style={{ display: 'flex', flexDirection: 'row' }}>
         <Skeleton style={{ height: '2rem', width: '1.5rem', marginRight: '8px' }} />
         <Skeleton style={{ height: '2rem', flexGrow: 1 }} />
       </div>
-      <Skeleton style={{ marginLeft: '2rem' }} />
     </div>
   );
 }
@@ -211,18 +171,15 @@ function HeuristicsList({ verdict, items }) {
       <div className={classMap[verdict]} style={{ marginBottom: sp2, marginTop: sp2, fontSize: '1.2rem' }}>
         {t(`verdict.${verdict}`)}
       </div>
-      {Object.keys(items).map((heur, idx) => {
-        return (
-          <div key={idx}>
-            <span style={{ fontSize: '1rem', verticalAlign: 'middle' }}>{heur}</span>
-            <ul style={{ marginBlockStart: 0, fontSize: '80%', overflowWrap: 'anywhere' }}>
-              {items[heur].map((file, fidx) => {
-                return <li key={fidx}>{file[0]}</li>;
-              })}
-            </ul>
-          </div>
-        );
-      })}
+      <div style={{ paddingLeft: sp2 }}>
+        {Object.keys(items).map((heur, idx) => {
+          return (
+            <div key={idx} style={{ fontSize: '1rem', verticalAlign: 'middle' }}>
+              {heur}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -238,12 +195,8 @@ function HeuristicsListSkel() {
       <Skeleton style={{ height: '3.5rem' }} />
 
       <Skeleton style={{ height: '2rem' }} />
-      <Skeleton style={{ marginLeft: '2rem' }} />
-      <Skeleton style={{ marginLeft: '2rem' }} />
-      <Skeleton style={{ marginLeft: '2rem' }} />
-
       <Skeleton style={{ height: '2rem' }} />
-      <Skeleton style={{ marginLeft: '2rem' }} />
+      <Skeleton style={{ height: '2rem' }} />
     </div>
   );
 }
@@ -255,7 +208,7 @@ function FileTree({ tree, important_files, spacing = 0 }) {
     <div>
       {Object.keys(tree).map((f, i) => {
         return important_files.indexOf(f) !== -1 ? (
-          <div key={i} style={{ marginLeft: theme.spacing(spacing) }}>
+          <div key={i} style={{ marginLeft: theme.spacing(spacing), wordBreak: 'break-all' }}>
             <Verdict score={tree[f].score} short mono />
             <b style={{ fontSize: '110%' }}>{tree[f].name}</b>
             <table
@@ -268,15 +221,15 @@ function FileTree({ tree, important_files, spacing = 0 }) {
             >
               <tbody>
                 <tr>
-                  <td>{t('file.type')}: </td>
+                  <td style={{ wordBreak: 'normal', verticalAlign: 'top' }}>{t('file.type')}:&nbsp;</td>
                   <td>{tree[f].type}</td>
                 </tr>
                 <tr>
-                  <td>{t('file.sha256')}: </td>
+                  <td style={{ wordBreak: 'normal', verticalAlign: 'top' }}>{t('file.sha256')}:&nbsp;</td>
                   <td>{tree[f].sha256}</td>
                 </tr>
                 <tr>
-                  <td>{t('file.size')}: </td>
+                  <td style={{ wordBreak: 'normal', verticalAlign: 'top' }}>{t('file.size')}:&nbsp;</td>
                   <td>{tree[f].size}</td>
                 </tr>
               </tbody>
@@ -388,14 +341,14 @@ export default function SubmissionReport() {
               <Grid item xs={4} md={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.name')}</span>
               </Grid>
-              <Grid item xs={8} md={9} lg={10}>
+              <Grid item xs={8} md={9} lg={10} style={{ wordBreak: 'break-all' }}>
                 {report ? report.files[0].name : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} md={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.description')}</span>
               </Grid>
-              <Grid item xs={8} md={9} lg={10}>
+              <Grid item xs={8} md={9} lg={10} style={{ wordBreak: 'break-all' }}>
                 {report ? report.params.description : <Skeleton />}
               </Grid>
 
@@ -513,28 +466,52 @@ export default function SubmissionReport() {
               <Grid item xs={4} md={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.md5')}</span>
               </Grid>
-              <Grid item xs={8} md={9} lg={10} style={{ fontFamily: 'monospace', fontSize: 'larger' }}>
+              <Grid
+                item
+                xs={8}
+                md={9}
+                lg={10}
+                style={{ wordBreak: 'break-all', fontFamily: 'monospace', fontSize: 'larger' }}
+              >
                 {report ? report.file_info.md5 : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} md={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.sha1')}</span>
               </Grid>
-              <Grid item xs={8} md={9} lg={10} style={{ fontFamily: 'monospace', fontSize: 'larger' }}>
+              <Grid
+                item
+                xs={8}
+                md={9}
+                lg={10}
+                style={{ wordBreak: 'break-all', fontFamily: 'monospace', fontSize: 'larger' }}
+              >
                 {report ? report.file_info.sha1 : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} md={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.sha256')}</span>
               </Grid>
-              <Grid item xs={8} md={9} lg={10} style={{ fontFamily: 'monospace', fontSize: 'larger' }}>
+              <Grid
+                item
+                xs={8}
+                md={9}
+                lg={10}
+                style={{ wordBreak: 'break-all', fontFamily: 'monospace', fontSize: 'larger' }}
+              >
                 {report ? report.file_info.sha256 : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} md={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.ssdeep')}</span>
               </Grid>
-              <Grid item xs={8} md={9} lg={10} style={{ fontFamily: 'monospace', fontSize: 'larger' }}>
+              <Grid
+                item
+                xs={8}
+                md={9}
+                lg={10}
+                style={{ wordBreak: 'break-all', fontFamily: 'monospace', fontSize: 'larger' }}
+              >
                 {report ? report.file_info.ssdeep : <Skeleton />}
               </Grid>
             </Grid>
@@ -550,10 +527,10 @@ export default function SubmissionReport() {
                 ? Object.keys(report.metadata).map((meta, i) => {
                     return (
                       <Grid key={i} container spacing={1}>
-                        <Grid item xs={4} md={3} lg={2}>
+                        <Grid item xs={12} sm={4} md={3} lg={2}>
                           <span style={{ fontWeight: 500 }}>{meta}</span>
                         </Grid>
-                        <Grid item xs={8} md={9} lg={10}>
+                        <Grid item xs={12} sm={8} md={9} lg={10}>
                           {report.metadata[meta]}
                         </Grid>
                       </Grid>
@@ -562,10 +539,10 @@ export default function SubmissionReport() {
                 : [...Array(3)].map((_, i) => {
                     return (
                       <Grid key={i} container spacing={1}>
-                        <Grid item xs={4} md={3} lg={2}>
+                        <Grid item xs={12} sm={4} md={3} lg={2}>
                           <Skeleton />
                         </Grid>
-                        <Grid item xs={8} md={9} lg={10}>
+                        <Grid item xs={12} sm={8} md={9} lg={10}>
                           <Skeleton />
                         </Grid>
                       </Grid>
