@@ -1,6 +1,10 @@
-import { Button, makeStyles } from '@material-ui/core';
+import { IconButton, makeStyles } from '@material-ui/core';
+import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
 import SearchQuery from 'components/elements/search/search-query';
 import React from 'react';
+import { FcWorkflow } from 'react-icons/fc';
+import { AlertDrawerState } from './alerts';
+import { AlertItem } from './hooks/useAlerts';
 
 // Some generated style classes
 const useStyles = makeStyles(theme => ({
@@ -19,41 +23,30 @@ const useStyles = makeStyles(theme => ({
 }));
 
 interface AlertListItemActionsProps {
+  item: AlertItem;
   searchQuery: SearchQuery;
-  updateQuery: (query: SearchQuery) => void;
-  setDrawer: (drawer: { open: boolean; type: 'filter' | 'favorites' | 'actions' }) => void;
+  setDrawer: (state: AlertDrawerState) => void;
 }
 
-const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(({ updateQuery, setDrawer }) => {
+const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(({ item, searchQuery, setDrawer }) => {
   const classes = useStyles();
   return (
     <div className={classes.listactions}>
-      <Button
+      <IconButton title="Take Ownership" onClick={() => console.log('click')}>
+        <AssignmentIndIcon />
+      </IconButton>
+      <IconButton
         title="Workflow Action"
         onClick={() => {
-          console.log('workflow action');
-          // const q = newQuery()
-          //   .setQuery(`file.sha256:${item.file.sha256}`)
-          //   .setTc(query.getTc())
-          //   .setTcStart(query.getTcStart());
-          // setWorkflowAction({ query: q, total: 1, filters: q.parseFilters() });
-          // setDrawer({ open: true, type: 'actions' });
+          console.log('workflow action.');
+
+          const actionQuery = searchQuery.newBase();
+          actionQuery.setTcStart(searchQuery.getTcStart()).setQuery(`file.sha256:${item.file.sha256}`);
+          setDrawer({ open: true, type: 'actions', actionData: { query: actionQuery, total: 1 } });
         }}
-        color="primary"
-        size="small"
-        variant="outlined"
       >
-        Workflow Action
-      </Button>
-      <Button
-        title="Take Ownership"
-        onClick={() => console.log('click')}
-        color="primary"
-        size="small"
-        variant="outlined"
-      >
-        Take Ownership
-      </Button>
+        <FcWorkflow />
+      </IconButton>
     </div>
   );
 });

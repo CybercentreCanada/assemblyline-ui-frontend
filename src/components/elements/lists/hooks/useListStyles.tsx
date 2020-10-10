@@ -159,10 +159,13 @@ const useListItemStyles = makeStyles(theme => ({
     top: theme.spacing(1),
     right: theme.spacing(1),
     display: 'none',
-    // backgroundColor: theme.palette.background.default
+    // backgroundColor: theme.palette.background.default,
     backgroundColor: 'inherit',
+    // minWidth: 400,
+    // border: '1px solid hsl(0, 0%, 80%)',
     '& button': {
-      marginRight: theme.spacing(1)
+      marginRight: theme.spacing(1),
+      boxShadow: theme.shadows[2]
     }
   }
 }));

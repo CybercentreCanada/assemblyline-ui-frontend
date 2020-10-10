@@ -27,6 +27,15 @@ import useAlerts, { AlertItem } from './hooks/useAlerts';
 //  when scrolling has hit threshold.
 const PAGE_SIZE = 50;
 
+export interface AlertDrawerState {
+  open: boolean;
+  type: 'filter' | 'favorites' | 'actions';
+  actionData?: {
+    query: SearchQuery;
+    total: number;
+  };
+}
+
 // Just indicates whether there are any filters currently set..
 const hasFilters = (filters: SearchQueryFilters): boolean => {
   const { statuses, priorities, labels, queries } = filters;
@@ -74,15 +83,15 @@ const Alerts: React.FC = () => {
   const [searching, setSearching] = useState<boolean>(false);
   const [scrollReset, setScrollReset] = useState<boolean>(false);
   const [splitPanel, setSplitPanel] = useState<{ open: boolean; item: AlertItem }>({ open: false, item: null });
-  const [drawer, setDrawer] = useState<{ open: boolean; type: 'filter' | 'favorites' | 'actions' }>({
+  const [drawer, setDrawer] = useState<AlertDrawerState>({
     open: false,
     type: null
   });
-  // const [selectedFilters, setSelectedFilters] = useState<AlertFilterSelections>(DEFAULT_FILTERS);
-  const [workflowAction, setWorkflowAction] = useState<{
-    query: SearchQuery;
-    total: number;
-  }>();
+  // // const [selectedFilters, setSelectedFilters] = useState<AlertFilterSelections>(DEFAULT_FILTERS);
+  // const [workflowAction, setWorkflowAction] = useState<{
+  //   query: SearchQuery;
+  //   total: number;
+  // }>();
 
   // Define some references.
   const searchTextValue = useRef<string>(searchQuery.getQuery());
@@ -211,12 +220,6 @@ const Alerts: React.FC = () => {
     }
   };
 
-  // Handler for when clicking the 'Clear' button on AlertsFilter.
-  const onClearFilters = () => {
-    setDrawer({ ...drawer, open: false });
-    onClearSearch();
-  };
-
   // Handler for when clicking the 'Cancel' button on AlertsFiltersFilters
   const onCancelFilters = () => {
     setDrawer({ ...drawer, open: false });
@@ -306,13 +309,13 @@ const Alerts: React.FC = () => {
     }
   };
 
-  //
+  // ...
   const onRenderListActions = useCallback(
-    (item: AlertItem) => <AlertListItemActions updateQuery={updateQuery} setDrawer={setDrawer} />,
+    (item: AlertItem) => <AlertListItemActions item={item} searchQuery={searchQuery} setDrawer={setDrawer} />,
     []
   );
 
-  // Load up the filters already present in the URL.
+  // Load up the filters already present in the URL..
   // useEffect(() => setQueryFilters(query), [query]);
 
   return (
@@ -341,7 +344,7 @@ const Alerts: React.FC = () => {
             {
               icon: <FcWorkflow />,
               props: {
-                onClick: () => setDrawer({ open: true, type: 'actions' })
+                onClick: () => setDrawer({ open: true, type: 'actions', actionData: { query: searchQuery, total } })
               }
             }
           ]}
@@ -450,10 +453,10 @@ const Alerts: React.FC = () => {
                   onCancel={onFavoriteCancel}
                 />
               ),
-              actions: (
+              actions: drawer.actionData && (
                 <AlertsWorkflowActions
-                  query={searchQuery}
-                  affectedItemCount={total}
+                  query={drawer.actionData.query}
+                  affectedItemCount={drawer.actionData.total}
                   statusFilters={statusFilters}
                   priorityFilters={priorityFilters}
                   labelFilters={labelFilters}
