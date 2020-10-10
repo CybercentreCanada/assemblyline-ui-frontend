@@ -160,7 +160,10 @@ const useListItemStyles = makeStyles(theme => ({
     right: theme.spacing(1),
     display: 'none',
     // backgroundColor: theme.palette.background.default
-    backgroundColor: 'inherit'
+    backgroundColor: 'inherit',
+    '& button': {
+      marginRight: theme.spacing(1)
+    }
   }
 }));
 

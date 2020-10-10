@@ -10,6 +10,9 @@ import {
   Typography,
   useTheme
 } from '@material-ui/core';
+import ClearAllIcon from '@material-ui/icons/ClearAll';
+import CloseIcon from '@material-ui/icons/ExitToApp';
+import SaveIcon from '@material-ui/icons/Save';
 import WarningIcon from '@material-ui/icons/Warning';
 import { ChipList } from 'components/elements/mui/chips';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -43,6 +46,7 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
     onDeleteGlobalFavorite
   } = useFavorites();
   const { showErrorMessage } = useMySnackbar();
+  const [formValid, setFormValid] = useState<boolean>(false);
   const [queryValue, setQueryValue] = useState<{ valid: boolean; value: string }>({ valid: true, value: initValue });
   const [nameValue, setNameValue] = useState<{ valid: boolean; value: string }>({ valid: true, value: '' });
   const [publicSwitch, setPublicSwitch] = useState<boolean>(false);
@@ -51,6 +55,13 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
     favorite: null,
     isPublic: false
   });
+
+  const validateForm = (
+    _queryValue: { valid: boolean; value: string },
+    _nameValue: { valid: boolean; value: string }
+  ) => {
+    setFormValid(!!_queryValue.value && !!_nameValue.value);
+  };
 
   const _onDelete = (favorite: Favorite, isPublic: boolean) => {
     if (isPublic) {
@@ -105,16 +116,26 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
 
   const onQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.currentTarget;
-    setQueryValue({ valid: !!value, value });
+    const _queryValue = { valid: !!value, value };
+    setQueryValue(_queryValue);
+    validateForm(_queryValue, nameValue);
   };
 
   const onNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.currentTarget;
+    const _nameValue = { valid: !!value, value };
     setNameValue({ valid: !!value, value });
+    validateForm(queryValue, _nameValue);
   };
 
   const onSwitchChange = (isPublic: boolean) => {
     setPublicSwitch(isPublic);
+  };
+
+  const onClearBtnClick = () => {
+    setFormValid(false);
+    setQueryValue({ valid: false, value: '' });
+    setNameValue({ valid: false, value: '' });
   };
 
   return (
@@ -169,11 +190,16 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
         </div>
       </div>
       <div style={{ marginTop: theme.spacing(2), display: 'flex', flexDirection: 'row' }}>
-        <Button variant="contained" color="primary" onClick={_onSave}>
+        <Button variant="contained" color="primary" onClick={_onSave} disabled={!formValid} startIcon={<SaveIcon />}>
           {t('favorites.save')}
         </Button>
+        <div style={{ marginRight: theme.spacing(1) }} />
+        <Button variant="contained" onClick={onClearBtnClick} startIcon={<ClearAllIcon />}>
+          {t('favorites.clear')}
+        </Button>
+
         <div style={{ flex: 1 }} />
-        <Button variant="contained" onClick={_onCancel} size="small">
+        <Button variant="contained" onClick={_onCancel} size="small" startIcon={<CloseIcon />}>
           {t('favorites.cancel')}
         </Button>
       </div>

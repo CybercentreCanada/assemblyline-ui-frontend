@@ -46,23 +46,23 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
   const [selectedPriority, setSelectedPriority] = useState<SearchFilter>(null);
   const [selectedLabels, setSelectedLabels] = useState<SearchFilter[]>([]);
 
-  const validate = (status: SearchFilter, priority: SearchFilter, labels: SearchFilter[]) => {
+  const validateForm = (status: SearchFilter, priority: SearchFilter, labels: SearchFilter[]) => {
     const valid = (status || priority || (labels && labels.length > 0)) as boolean;
     setFormValid(valid);
   };
 
   const onStatusChange = (selection: SearchFilter) => {
-    validate(selection, selectedPriority, selectedLabels);
+    validateForm(selection, selectedPriority, selectedLabels);
     setSelectedStatus(selection);
   };
 
   const onPriorityChange = (selection: SearchFilter) => {
-    validate(selectedStatus, selection, selectedLabels);
+    validateForm(selectedStatus, selection, selectedLabels);
     setSelectedPriority(selection);
   };
 
   const onLabelChange = (selections: SearchFilter[]) => {
-    validate(selectedStatus, selectedPriority, selections);
+    validateForm(selectedStatus, selectedPriority, selections);
     setSelectedLabels(selections);
   };
 

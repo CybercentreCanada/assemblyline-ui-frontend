@@ -45,11 +45,7 @@ const useStyles = makeStyles(theme => ({
   searchresult: {
     fontStyle: 'italic'
   },
-  listactions: {
-    '& button': {
-      marginRight: theme.spacing(1)
-    }
-  }
+  listactions: {}
 }));
 
 // The Alerts functional component.
@@ -471,7 +467,6 @@ const Alerts: React.FC = () => {
                   priorityFilters={priorityFilters}
                   labelFilters={labelFilters}
                   onApplyBtnClick={onApplyFilters}
-                  onClearBtnClick={onClearFilters}
                   onCancelBtnClick={onCancelFilters}
                 />
               ),

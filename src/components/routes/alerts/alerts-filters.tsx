@@ -11,6 +11,9 @@ import {
   Typography,
   useTheme
 } from '@material-ui/core';
+import ClearAllIcon from '@material-ui/icons/ClearAll';
+import CloseIcon from '@material-ui/icons/ExitToApp';
+import FilterListIcon from '@material-ui/icons/FilterList';
 import { Autocomplete } from '@material-ui/lab';
 import SearchQuery, { SearchFilter, SearchQueryFilters } from 'components/elements/search/search-query';
 import CustomChip from 'components/visual/CustomChip';
@@ -68,7 +71,6 @@ interface AlertsFiltersProps {
   priorityFilters: SearchFilter[];
   labelFilters: SearchFilter[];
   onApplyBtnClick: (filters: SearchQueryFilters) => void;
-  onClearBtnClick: () => void;
   onCancelBtnClick: () => void;
 }
 
@@ -80,7 +82,6 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
   priorityFilters,
   labelFilters,
   onApplyBtnClick,
-  onClearBtnClick,
   onCancelBtnClick
 }) => {
   // Hooks...
@@ -137,6 +138,16 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
     const _selections = selections.map(filter => ({ filter, isValue: true }));
     const nonValueFilters = selectedQueryFilters.filter(sf => !sf.isValue);
     setSelectedQueryFilters([..._selections, ...nonValueFilters]);
+  };
+
+  //
+  const onClearBtnClick = () => {
+    setSelectedTc(tcOption);
+    setSelectedGroupBy(groupByOption);
+    setSelectedStatusFilters([]);
+    setSelectedPriorityFilters([]);
+    setSelectedLabelFilters([]);
+    setSelectedQueryFilters([]);
   };
 
   // Handler: when clicking on 'Apply' button.
@@ -273,15 +284,15 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
         </div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'row', marginTop: theme.spacing(1) }}>
-        <Button variant="contained" color="primary" onClick={_onApplyBtnClick}>
+        <Button variant="contained" color="primary" onClick={_onApplyBtnClick} startIcon={<FilterListIcon />}>
           {t('page.alerts.filters.apply')}
         </Button>
         <div style={{ marginRight: theme.spacing(1) }} />
-        <Button variant="contained" onClick={onClearBtnClick} size="small">
+        <Button variant="contained" onClick={onClearBtnClick} size="small" startIcon={<ClearAllIcon />}>
           {t('page.alerts.filters.clear')}
         </Button>
         <div style={{ flex: 1 }} />
-        <Button variant="contained" onClick={onCancelBtnClick} size="small">
+        <Button variant="contained" onClick={onCancelBtnClick} size="small" startIcon={<CloseIcon />}>
           {t('page.alerts.filters.cancel')}
         </Button>
       </div>
