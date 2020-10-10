@@ -178,6 +178,10 @@ export default class SearchQuery {
     return params.toString();
   }
 
+  public newBase(): SearchQuery {
+    return new SearchQuery(this.path, '', this.pageSize);
+  }
+
   public build(): SearchQuery {
     return new SearchQuery(this.path, this.params.toString(), this.pageSize);
   }

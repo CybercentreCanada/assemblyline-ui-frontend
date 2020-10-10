@@ -1,4 +1,4 @@
-import { Box, Button, Drawer, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
+import { Box, Drawer, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import StarIcon from '@material-ui/icons/Star';
@@ -16,6 +16,7 @@ import { FiFilter } from 'react-icons/fi';
 import AlertActionsMenu from './alert-actions-menu';
 import AlertDetails from './alert-details';
 import AlertListItem from './alert-list-item';
+import AlertListItemActions from './alert-list-item-actions';
 import AlertsFilters from './alerts-filters';
 import AlertsFiltersFavorites from './alerts-filters-favorites';
 import AlertsFiltersSelected from './alerts-filters-selected';
@@ -44,8 +45,7 @@ const useStyles = makeStyles(theme => ({
   },
   searchresult: {
     fontStyle: 'italic'
-  },
-  listactions: {}
+  }
 }));
 
 // The Alerts functional component.
@@ -68,8 +68,7 @@ const Alerts: React.FC = () => {
     onLoad,
     onLoadMore,
     onGet,
-    onApplyWorflowAction,
-    newQuery
+    onApplyWorflowAction
   } = useAlerts(PAGE_SIZE);
   // Define required states...
   const [searching, setSearching] = useState<boolean>(false);
@@ -308,38 +307,10 @@ const Alerts: React.FC = () => {
   };
 
   //
-  const onRenderListActions = useCallback((item: AlertItem) => {
-    return (
-      <div className={classes.listactions}>
-        <Button
-          title="Workflow Action"
-          onClick={() => {
-            console.log('workflow action');
-            // const q = newQuery()
-            //   .setQuery(`file.sha256:${item.file.sha256}`)
-            //   .setTc(query.getTc())
-            //   .setTcStart(query.getTcStart());
-            // setWorkflowAction({ query: q, total: 1, filters: q.parseFilters() });
-            // setDrawer({ open: true, type: 'actions' });
-          }}
-          color="primary"
-          size="small"
-          variant="outlined"
-        >
-          Workflow Action
-        </Button>
-        <Button
-          title="Take Ownership"
-          onClick={() => console.log('click')}
-          color="primary"
-          size="small"
-          variant="outlined"
-        >
-          Take Ownership
-        </Button>
-      </div>
-    );
-  }, []);
+  const onRenderListActions = useCallback(
+    (item: AlertItem) => <AlertListItemActions updateQuery={updateQuery} setDrawer={setDrawer} />,
+    []
+  );
 
   // Load up the filters already present in the URL.
   // useEffect(() => setQueryFilters(query), [query]);

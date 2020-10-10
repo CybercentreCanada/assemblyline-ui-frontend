@@ -1,5 +1,5 @@
-import Book from 'components/elements/lists/booklist/book';
 /* eslint-disable react-hooks/exhaustive-deps */
+import Book from 'components/elements/lists/booklist/book';
 import { MetaListItem } from 'components/elements/lists/metalist/metalist';
 import MetaListBuffer from 'components/elements/lists/metalist/metalist-buffer';
 import SearchQuery, { SearchFilter, SearchFilterType } from 'components/elements/search/search-query';
@@ -74,7 +74,6 @@ interface UsingAlerts {
   priorityFilters: SearchFilter[];
   statusFilters: SearchFilter[];
   valueFilters: SearchFilter[];
-  newQuery: () => SearchQuery;
   updateQuery: (searchQuery: SearchQuery) => void;
   updateBook: (book: Book) => void;
   onLoad: (onSuccess?: () => void) => void;
@@ -113,11 +112,6 @@ export default function useAlerts(pageSize: number): UsingAlerts {
   const parseResult = (responseItems, offset) => {
     const items = responseItems.map((item, index) => ({ ...item, id: item.alert_id, index: index + offset }));
     return items;
-  };
-
-  // Hook API: create a new query with same pathname.
-  const newQuery = (): SearchQuery => {
-    return new SearchQuery(location.pathname, '', pageSize);
   };
 
   // format alert api url using specified indexes.
@@ -363,7 +357,6 @@ export default function useAlerts(pageSize: number): UsingAlerts {
     onLoad,
     onLoadMore,
     onGet,
-    onApplyWorflowAction,
-    newQuery
+    onApplyWorflowAction
   };
 }
