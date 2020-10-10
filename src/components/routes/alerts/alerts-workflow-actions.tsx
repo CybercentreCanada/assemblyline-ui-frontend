@@ -28,7 +28,6 @@ interface AlertsWorkflowActionsProps {
 const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
   query,
   affectedItemCount,
-  selectedFilters,
   statusFilters,
   priorityFilters,
   labelFilters,
@@ -104,7 +103,7 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
             backgroundColor: theme.palette.type === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
           }}
         >
-          <AlertsFiltersSelected query={query} filters={selectedFilters} onChange={() => null} disableActions />
+          <AlertsFiltersSelected searchQuery={query} disableActions />
         </div>
       </div>
 

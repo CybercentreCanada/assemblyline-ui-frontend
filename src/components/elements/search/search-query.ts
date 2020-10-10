@@ -18,12 +18,11 @@ export interface SearchFilter {
   type: SearchFilterType;
   label: string;
   value: any;
-  object?: any;
+  other?: any;
 }
 
-export interface SearchFilters {
+export interface SearchQueryFilters {
   tc: string;
-  tcStart: string;
   groupBy: string;
   statuses: SearchFilter[];
   priorities: SearchFilter[];
@@ -160,6 +159,14 @@ export default class SearchQuery {
     return this.hasGroupBy() ? this.params.get('group_by') : 'file.sha256';
   }
 
+  public set(filters: SearchQueryFilters): SearchQuery {
+    this.reset().setTc(filters.tc).setGroupBy(filters.groupBy);
+    [...filters.statuses, ...filters.priorities, ...filters.labels, ...filters.queries].forEach(filter =>
+      this.addFq(filter.value)
+    );
+    return this;
+  }
+
   public reset(): SearchQuery {
     this.setOffset('0').setRows(`${this.pageSize}`).setQuery('').setTc('4d').setGroupBy('file.sha256').clearFq();
     return this;
@@ -171,20 +178,21 @@ export default class SearchQuery {
     return params.toString();
   }
 
-  public build(): string {
-    return `${this.path}?${this.buildQueryString()}`;
+  public build(): SearchQuery {
+    return new SearchQuery(this.path, this.params.toString(), this.pageSize);
   }
 
-  public apply(): void {
+  public apply(): SearchQuery {
     const params = new URLSearchParams(this.params.toString());
     params.delete('group_by');
     params.delete('rows');
     params.delete('offset');
     params.delete('tc_start');
     window.history.pushState(null, '', `${this.path}?${params.toString()}`);
+    return this;
   }
 
-  public parseFilters(): SearchFilters {
+  public parseFilters(): SearchQueryFilters {
     let fqs = [];
     let statuses = [];
     let priorities = [];
@@ -199,8 +207,7 @@ export default class SearchQuery {
       queries = fqs.filter(f => f.type === SearchFilterType.QUERY);
     }
     return {
-      tc: this.getTc()},
-      tcStart: this.getTcStart(),
+      tc: this.getTc(),
       groupBy: this.getGroupBy(),
       statuses,
       priorities,
@@ -211,9 +218,6 @@ export default class SearchQuery {
 
   public static parseFilterValue(id: string | number, filter: string): SearchFilter {
     const [type] = filter.split(':');
-
-    // TODO: need a way to differentiate value/favorite filters!
-
     const resolveType = (): SearchFilterType => {
       switch (type) {
         case 'status':
@@ -226,13 +230,12 @@ export default class SearchQuery {
           return SearchFilterType.QUERY;
       }
     };
-
     return {
       id,
       type: resolveType(),
       label: filter,
       value: filter,
-      object: null
+      other: null
     };
   }
 }

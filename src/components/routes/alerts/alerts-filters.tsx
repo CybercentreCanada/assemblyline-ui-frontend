@@ -12,7 +12,7 @@ import {
   useTheme
 } from '@material-ui/core';
 import { Autocomplete } from '@material-ui/lab';
-import { SearchFilter } from 'components/elements/search/search-query';
+import SearchQuery, { SearchFilter, SearchQueryFilters } from 'components/elements/search/search-query';
 import CustomChip from 'components/visual/CustomChip';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -40,14 +40,9 @@ const TC_OPTIONS = [
   { value: '7d', label: '1 Week' }
 ];
 
-// Default filters.
-const DEFAULT_FILTERS = {
-  tc: DEFAULT_TC,
-  groupBy: DEFAULT_GROUPBY,
-  statuses: [],
-  priorities: [],
-  labels: [],
-  queries: []
+//
+const findOption = (value: string, options: { value: string; label: string }[]) => {
+  return options.find(o => o.value === value);
 };
 
 // Decorate each filter in the specified 'queryFilters' list and indicate whether they are a valueFilter.
@@ -67,19 +62,19 @@ const useStyles = makeStyles(theme => ({
 
 // Specificatino interface of this component's properties.
 interface AlertsFiltersProps {
-  query: SearchFilter;
+  searchQuery: SearchQuery;
   valueFilters: SearchFilter[];
   statusFilters: SearchFilter[];
   priorityFilters: SearchFilter[];
   labelFilters: SearchFilter[];
-  onApplyBtnClick: (filters: AlertFilterSelections) => void;
+  onApplyBtnClick: (filters: SearchQueryFilters) => void;
   onClearBtnClick: () => void;
   onCancelBtnClick: () => void;
 }
 
 // Implementation of th AlertsFilter component.
 const AlertsFilters: React.FC<AlertsFiltersProps> = ({
-  query,
+  searchQuery,
   valueFilters,
   statusFilters,
   priorityFilters,
@@ -93,16 +88,21 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
   const classes = useStyles();
   const { t } = useTranslation('alerts');
 
+  //
+  const filters = searchQuery.parseFilters();
+  const tcOption = findOption(filters.tc, TC_OPTIONS);
+  const groupByOption = findOption(filters.groupBy, GROUPBY_OPTIONS);
+
   // Define some states for controlled components..
-  const [selectedTc, setSelectedTc] = useState<{ value: string; label: string }>(selectedFilters.tc || DEFAULT_TC);
+  const [selectedTc, setSelectedTc] = useState<{ value: string; label: string }>(tcOption || DEFAULT_TC);
   const [selectedGroupBy, setSelectedGroupBy] = useState<{ value: string; label: string }>(
-    selectedFilters.groupBy || DEFAULT_GROUPBY
+    groupByOption || DEFAULT_GROUPBY
   );
-  const [selectedStatusFilters, setSelectedStatusFilters] = useState<SearchFilter[]>(selectedFilters.statuses);
-  const [selectedPriorityFilters, setSelectedPriorityFilters] = useState<SearchFilter[]>(selectedFilters.priorities);
-  const [selectedLabelFilters, setSelectedLabelFilters] = useState<SearchFilter[]>(selectedFilters.labels);
+  const [selectedStatusFilters, setSelectedStatusFilters] = useState<SearchFilter[]>(filters.statuses);
+  const [selectedPriorityFilters, setSelectedPriorityFilters] = useState<SearchFilter[]>(filters.priorities);
+  const [selectedLabelFilters, setSelectedLabelFilters] = useState<SearchFilter[]>(filters.labels);
   const [selectedQueryFilters, setSelectedQueryFilters] = useState<{ filter: SearchFilter; isValue: boolean }[]>(
-    decorateQueryFilters(selectedFilters.queries, valueFilters)
+    decorateQueryFilters(filters.queries, valueFilters)
   );
 
   // Handler[onChange]: for the 'TC' Autocomplete component.
@@ -142,8 +142,9 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
   // Handler: when clicking on 'Apply' button.
   const _onApplyBtnClick = () => {
     onApplyBtnClick({
-      tc: selectedTc,
-      groupBy: selectedGroupBy,
+      ...filters,
+      tc: selectedTc.value,
+      groupBy: selectedGroupBy.value,
       statuses: selectedStatusFilters,
       priorities: selectedPriorityFilters,
       labels: selectedLabelFilters,
@@ -160,22 +161,21 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
   const renderOption = (item: SearchFilter) => {
     return (
       <div>
-        <CustomChip label={item.object.count} size="tiny" /> {item.label}
+        <CustomChip label={item.other.count} size="tiny" /> {item.label}
       </div>
     );
   };
 
   // Apply updates to selected filters when compoonent is mounted.
   useEffect(() => {
-    setSelectedTc(selectedFilters.tc || DEFAULT_TC);
-    setSelectedGroupBy(selectedFilters.groupBy || DEFAULT_GROUPBY);
-    setSelectedStatusFilters(selectedFilters.statuses);
-    setSelectedPriorityFilters(selectedFilters.priorities);
-    setSelectedLabelFilters(selectedFilters.labels);
-    setSelectedQueryFilters(decorateQueryFilters(selectedFilters.queries, valueFilters));
-  }, [selectedFilters, valueFilters]);
-
-  console.log(selectedTc);
+    const _filters = searchQuery.parseFilters();
+    setSelectedTc(findOption(_filters.tc, TC_OPTIONS) || DEFAULT_TC);
+    setSelectedGroupBy(findOption(_filters.groupBy, GROUPBY_OPTIONS) || DEFAULT_GROUPBY);
+    setSelectedStatusFilters(_filters.statuses);
+    setSelectedPriorityFilters(_filters.priorities);
+    setSelectedLabelFilters(_filters.labels);
+    setSelectedQueryFilters(decorateQueryFilters(_filters.queries, valueFilters));
+  }, [searchQuery, valueFilters]);
 
   return (
     <div>

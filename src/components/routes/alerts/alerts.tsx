@@ -8,15 +8,15 @@ import SimpleList from 'components/elements/lists/simplelist/simplelist';
 import SplitPanel from 'components/elements/panels/split-panel';
 import Viewport from 'components/elements/panels/viewport';
 import SearchBar from 'components/elements/search/search-bar';
-import SearchQuery, { SearchFilter } from 'components/elements/search/search-query';
+import SearchQuery, { SearchQueryFilters } from 'components/elements/search/search-query';
 import Classification from 'components/visual/Classification';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { FcWorkflow } from 'react-icons/fc';
 import { FiFilter } from 'react-icons/fi';
 import AlertActionsMenu from './alert-actions-menu';
 import AlertDetails from './alert-details';
 import AlertListItem from './alert-list-item';
-import AlertsFilters, { AlertFilterSelections, DEFAULT_FILTERS } from './alerts-filters';
+import AlertsFilters from './alerts-filters';
 import AlertsFiltersFavorites from './alerts-filters-favorites';
 import AlertsFiltersSelected from './alerts-filters-selected';
 import AlertsWorkflowActions from './alerts-workflow-actions';
@@ -27,7 +27,7 @@ import useAlerts, { AlertItem } from './hooks/useAlerts';
 const PAGE_SIZE = 50;
 
 // Just indicates whether there are any filters currently set..
-const hasFilters = (filters: AlertFilterSelections): boolean => {
+const hasFilters = (filters: SearchQueryFilters): boolean => {
   const { statuses, priorities, labels, queries } = filters;
   return statuses.length > 0 || priorities.length > 0 || labels.length > 0 || queries.length > 0;
 };
@@ -62,12 +62,13 @@ const Alerts: React.FC = () => {
     // book,
     total,
     fields,
-    query,
+    searchQuery,
     valueFilters,
     statusFilters,
     priorityFilters,
     labelFilters,
     // updateBook,
+    updateQuery,
     onLoad,
     onLoadMore,
     onGet,
@@ -82,34 +83,33 @@ const Alerts: React.FC = () => {
     open: false,
     type: null
   });
-  const [selectedFilters, setSelectedFilters] = useState<AlertFilterSelections>(DEFAULT_FILTERS);
+  // const [selectedFilters, setSelectedFilters] = useState<AlertFilterSelections>(DEFAULT_FILTERS);
   const [workflowAction, setWorkflowAction] = useState<{
     query: SearchQuery;
-    filters: AlertFilterSelections;
     total: number;
   }>();
 
   // Define some references.
-  const searchTextValue = useRef<string>(query.getQuery());
+  const searchTextValue = useRef<string>(searchQuery.getQuery());
 
   // Media quries.
   const isLTEMd = useMediaQuery(theme.breakpoints.up('md'));
 
   // Parse the filters [fq: param] and set them as  the 'selectedFilters'
-  const setQueryFilters = (_query: SearchQuery) => {
-    const searchQueryFilters = _query.parseFilters();
-    const statuses = searchQueryFilters.filter(f => f.type === 'status');
-    const priorities = searchQueryFilters.filter(f => f.type === 'priority');
-    const labels = searchQueryFilters.filter(f => f.type === 'label');
-    const queries = searchQueryFilters.filter(f => f.type === 'query');
-    setSelectedFilters(filters => ({
-      ...filters,
-      statuses: statuses || filters.statuses,
-      priorities: priorities || filters.priorities,
-      labels: labels || filters.labels,
-      queries: queries || filters.queries
-    }));
-  };
+  // const setQueryFilters = (_query: SearchQuery) => {
+  //   const searchQueryFilters = _query.parseFilters();
+  //   const statuses = searchQueryFilters.filter(f => f.type === 'status');
+  //   const priorities = searchQueryFilters.filter(f => f.type === 'priority');
+  //   const labels = searchQueryFilters.filter(f => f.type === 'label');
+  //   const queries = searchQueryFilters.filter(f => f.type === 'query');
+  //   setSelectedFilters(filters => ({
+  //     ...filters,
+  //     statuses: statuses || filters.statuses,
+  //     priorities: priorities || filters.priorities,
+  //     labels: labels || filters.labels,
+  //     queries: queries || filters.queries
+  //   }));
+  // };
 
   //
   const onSearch = (filterValue: string = '', inputEl: HTMLInputElement = null) => {
@@ -130,7 +130,7 @@ const Alerts: React.FC = () => {
     }
 
     // Update query and url before reloading data.
-    query.setQuery(filterValue).apply();
+    searchQuery.setQuery(filterValue).apply();
 
     // Reload.
     onLoad(() => {
@@ -142,11 +142,14 @@ const Alerts: React.FC = () => {
   // Handler for when clearing the SearchBar.
   const onClearSearch = () => {
     // Reset the query.
-    query.reset().apply();
+    searchQuery.reset().apply();
+
     // Update the search text field reference.
     searchTextValue.current = '';
+
     // Reset filters.
-    setSelectedFilters(DEFAULT_FILTERS);
+    // setSelectedFilters(DEFAULT_FILTERS);
+
     // Reset scroll for each new search.
     setScrollReset(true);
     // Close right of split panel if open.
@@ -178,20 +181,23 @@ const Alerts: React.FC = () => {
   }, [setScrollReset, onLoadMore]);
 
   // Hanlder for when clicking one the AlertsFilters 'Apply' button.
-  const onApplyFilters = (filters: AlertFilterSelections) => {
+  const onApplyFilters = (filters: SearchQueryFilters) => {
     // update the state of the selected filters so they are intialized next time drawer opens.
-    setSelectedFilters(filters);
+    // setSelectedFilters(filters);
+
+    searchQuery.set(filters).build();
 
     // Add a [fq] parameter for status/priority/label.
-    const addFq = (item: SearchFilter) => query.addFq(item.value);
-    query.clearFq();
-    query.setTc(filters.tc.value);
-    query.setGroupBy(filters.groupBy.value);
-    filters.statuses.forEach(addFq);
-    filters.priorities.forEach(addFq);
-    filters.labels.forEach(addFq);
-    filters.queries.forEach(addFq);
-    query.apply();
+    // const addFq = (item: SearchFilter) => query.addFq(item.value);
+    // query.clearFq();
+    // query.setTc(filters.tc.value);
+    // query.setGroupBy(filters.groupBy.value);
+    // filters.statuses.forEach(addFq);
+    // filters.priorities.forEach(addFq);
+    // filters.labels.forEach(addFq);
+    // filters.queries.forEach(addFq);
+
+    searchQuery.apply();
 
     // Reinitialize the scroll.
     setScrollReset(true);
@@ -251,11 +257,8 @@ const Alerts: React.FC = () => {
 
   //
   const onFavoriteSelected = (favorite: { name: string; query: string }) => {
-    // Update the query parameter.
-    query.addFq(favorite.query).apply();
-
-    // Set query filters to selectedFilters state.
-    setQueryFilters(query);
+    // Update query with selected favorite.
+    updateQuery(searchQuery.addFq(favorite.query).apply().build());
 
     // Reinitialize the scroll.
     setScrollReset(true);
@@ -276,7 +279,7 @@ const Alerts: React.FC = () => {
 
   // Handler/callback for when clicking the 'Apply' btn on the AlertsWorkflowActions component.
   const onWorkflowActionsApply = (selectedStatus: string, selectedPriority: string, selectedLabels: string[]) => {
-    onApplyWorflowAction(query, selectedStatus, selectedPriority, selectedLabels).then(() => {
+    onApplyWorflowAction(selectedStatus, selectedPriority, selectedLabels).then(() => {
       setDrawer({ ...drawer, open: false });
       onLoad();
     });
@@ -316,12 +319,12 @@ const Alerts: React.FC = () => {
           title="Workflow Action"
           onClick={() => {
             console.log('workflow action');
-            const q = newQuery()
-              .setQuery(`file.sha256:${item.file.sha256}`)
-              .setTc(query.getTc())
-              .setTcStart(query.getTcStart());
-            setWorkflowAction({ query: q, total: 1, filters: q.parseFilters() });
-            setDrawer({ open: true, type: 'actions' });
+            // const q = newQuery()
+            //   .setQuery(`file.sha256:${item.file.sha256}`)
+            //   .setTc(query.getTc())
+            //   .setTcStart(query.getTcStart());
+            // setWorkflowAction({ query: q, total: 1, filters: q.parseFilters() });
+            // setDrawer({ open: true, type: 'actions' });
           }}
           color="primary"
           size="small"
@@ -343,13 +346,13 @@ const Alerts: React.FC = () => {
   }, []);
 
   // Load up the filters already present in the URL.
-  useEffect(() => setQueryFilters(query), [query]);
+  // useEffect(() => setQueryFilters(query), [query]);
 
   return (
     <Box>
       <Box>
         <SearchBar
-          initValue={query.getQuery()}
+          initValue={searchQuery.getQuery()}
           searching={searching || loading}
           suggestions={buildSearchSuggestions()}
           onValueChange={onFilterValueChange}
@@ -382,16 +385,11 @@ const Alerts: React.FC = () => {
                 loading={loading}
                 searching={searching}
                 total={total}
-                selectedFilters={selectedFilters}
+                query={searchQuery}
                 onApplyFilters={onApplyFilters}
               />
             ) : (
-              <SearchResultSmall
-                loading={loading}
-                searching={searching}
-                total={total}
-                selectedFilters={selectedFilters}
-              />
+              <SearchResultSmall loading={loading} searching={searching} total={total} query={searchQuery} />
             )}
           </Box>
         </SearchBar>
@@ -467,7 +465,7 @@ const Alerts: React.FC = () => {
             {
               filter: (
                 <AlertsFilters
-                  selectedFilters={selectedFilters}
+                  searchQuery={searchQuery}
                   valueFilters={valueFilters}
                   statusFilters={statusFilters}
                   priorityFilters={priorityFilters}
@@ -488,9 +486,8 @@ const Alerts: React.FC = () => {
               ),
               actions: workflowAction && (
                 <AlertsWorkflowActions
-                  query={workflowAction.query.getQuery()}
-                  selectedFilters={workflowAction.filters}
-                  affectedItemCount={workflowAction.total}
+                  query={searchQuery}
+                  affectedItemCount={total}
                   statusFilters={statusFilters}
                   priorityFilters={priorityFilters}
                   labelFilters={labelFilters}
@@ -506,12 +503,12 @@ const Alerts: React.FC = () => {
   );
 };
 
-const SearchResultLarge = ({ searching, loading, total, selectedFilters, onApplyFilters }) => {
+const SearchResultLarge = ({ searching, loading, total, query, onApplyFilters }) => {
   const theme = useTheme();
   const _searching = searching || loading;
   return (
     <div style={{ position: 'relative' }}>
-      <AlertsFiltersSelected filters={selectedFilters} onChange={onApplyFilters} />
+      <AlertsFiltersSelected searchQuery={query} onChange={onApplyFilters} />
       <div style={{ position: 'absolute', top: theme.spacing(0), right: theme.spacing(1) }}>
         {_searching ? '' : <span>{`${total} matching results.`}</span>}
       </div>
@@ -519,10 +516,10 @@ const SearchResultLarge = ({ searching, loading, total, selectedFilters, onApply
   );
 };
 
-const SearchResultSmall = ({ searching, loading, total, selectedFilters }) => {
+const SearchResultSmall = ({ searching, loading, total, query }) => {
   const theme = useTheme();
   const _searching = searching || loading;
-  const filtered = hasFilters(selectedFilters);
+  const filtered = hasFilters(query.parseFilters());
   return (
     <>
       <div style={{ marginTop: theme.spacing(2), alignItems: 'center' }}>

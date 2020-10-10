@@ -1,19 +1,23 @@
 import { useTheme } from '@material-ui/core';
 import { ChipList } from 'components/elements/mui/chips';
-import SearchQuery, { SearchFilter } from 'components/elements/search/search-query';
+import SearchQuery, { SearchFilter, SearchQueryFilters } from 'components/elements/search/search-query';
 import React from 'react';
-import { AlertFilterSelections } from './alerts-filters';
 
 interface AlertFiltersSelectedProps {
-  query: SearchQuery;
+  searchQuery: SearchQuery;
   disableActions?: boolean;
-  onChange: (filters: AlertFilterSelections) => void;
+  onChange?: (filters: SearchQueryFilters) => void;
 }
 
-const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({ query, disableActions = false, onChange }) => {
+const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
+  searchQuery,
+  disableActions = false,
+  onChange = () => null
+}) => {
   const theme = useTheme();
 
-  const filters = query.parseFilters();
+  const filters = searchQuery.parseFilters();
+  const query = searchQuery.getQuery();
 
   const onDeleteStatus = (item: SearchFilter) => {
     const _statuses = filters.statuses.filter(s => s.value !== item.value);
@@ -41,7 +45,7 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({ query, dis
         {query && <span>Query = {query}, </span>}
         {filters && (
           <span>
-            Time Constraint = {filters.tc.label}, Group by = {filters.groupBy.label}
+            Time Constraint = {filters.tc}, Group by = {filters.groupBy}
           </span>
         )}
       </div>
