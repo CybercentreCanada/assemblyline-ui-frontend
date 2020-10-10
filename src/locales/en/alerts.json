@@ -39,6 +39,5 @@
   "page.alerts.filters": "Filters",
   "page.alerts.filters.apply": "Apply",
   "page.alerts.filters.clear": "Clear",
-  "page.alerts.filters.cancel": "Cancel"
-  
+  "page.alerts.filters.cancel": "Close"
 }

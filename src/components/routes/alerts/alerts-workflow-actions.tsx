@@ -1,4 +1,7 @@
-import { Button, Divider, makeStyles, TextField, Typography, useTheme } from '@material-ui/core';
+import { Button, CircularProgress, Divider, makeStyles, TextField, Typography, useTheme } from '@material-ui/core';
+import ClearAllIcon from '@material-ui/icons/ClearAll';
+import CloseIcon from '@material-ui/icons/ExitToApp';
+import SaveIcon from '@material-ui/icons/Save';
 import { Alert, Autocomplete } from '@material-ui/lab';
 import SearchQuery, {
   EMPTY_SEARCHFILTER,
@@ -37,19 +40,29 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
   const { t } = useTranslation('alerts');
   const classes = useStyles();
   const theme = useTheme();
-  const [selectedStatus, setSelectedStatus] = useState<SearchFilter>(EMPTY_SEARCHFILTER);
-  const [selectedPriority, setSelectedPriority] = useState<SearchFilter>(EMPTY_SEARCHFILTER);
+  const [formValid, setFormValid] = useState<boolean>(false);
+  const [applying, setApplying] = useState<boolean>(false);
+  const [selectedStatus, setSelectedStatus] = useState<SearchFilter>(null);
+  const [selectedPriority, setSelectedPriority] = useState<SearchFilter>(null);
   const [selectedLabels, setSelectedLabels] = useState<SearchFilter[]>([]);
 
+  const validate = (status: SearchFilter, priority: SearchFilter, labels: SearchFilter[]) => {
+    const valid = (status || priority || (labels && labels.length > 0)) as boolean;
+    setFormValid(valid);
+  };
+
   const onStatusChange = (selection: SearchFilter) => {
+    validate(selection, selectedPriority, selectedLabels);
     setSelectedStatus(selection);
   };
 
   const onPriorityChange = (selection: SearchFilter) => {
+    validate(selectedStatus, selection, selectedLabels);
     setSelectedPriority(selection);
   };
 
   const onLabelChange = (selections: SearchFilter[]) => {
+    validate(selectedStatus, selectedPriority, selections);
     setSelectedLabels(selections);
   };
 
@@ -57,21 +70,26 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
     return option.value === value.value;
   };
 
+  const extractFilterValue = (filter: SearchFilter): string => {
+    if (filter.type === SearchFilterType.BLANK) {
+      return null;
+    }
+    return filter.value.split(':')[1];
+  };
+
   const _onApplyBtnClick = () => {
-    const extractValue = (filter: SearchFilter): string => {
-      if (filter.type === SearchFilterType.BLANK) {
-        return null;
-      }
-      return filter.value.split(':')[1];
-    };
-    onApplyBtnClick(
-      extractValue(selectedStatus),
-      extractValue(selectedPriority),
-      selectedLabels.map(l => extractValue(l))
-    );
+    if (formValid) {
+      setApplying(true);
+      onApplyBtnClick(
+        extractFilterValue(selectedStatus),
+        extractFilterValue(selectedPriority),
+        selectedLabels.map(l => extractFilterValue(l))
+      );
+    }
   };
 
   const onClearBtnClick = () => {
+    setFormValid(false);
     setSelectedStatus(null);
     setSelectedPriority(null);
     setSelectedLabels([]);
@@ -83,6 +101,8 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
     }
     return <div>{item.label}</div>;
   };
+
+  console.log('hello?????');
 
   return (
     <div>
@@ -150,15 +170,21 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
         </div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'row', marginTop: theme.spacing(1) }}>
-        <Button variant="contained" color="primary" onClick={_onApplyBtnClick}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={_onApplyBtnClick}
+          startIcon={applying ? <CircularProgress size={20} /> : <SaveIcon />}
+          disabled={applying || !formValid}
+        >
           {t('page.alerts.filters.apply')}
         </Button>
         <div style={{ marginRight: theme.spacing(1) }} />
-        <Button variant="contained" onClick={onClearBtnClick} size="small">
+        <Button variant="contained" onClick={onClearBtnClick} disabled={applying} startIcon={<ClearAllIcon />}>
           {t('page.alerts.filters.clear')}
         </Button>
         <div style={{ flex: 1 }} />
-        <Button variant="contained" onClick={onCancelBtnClick} size="small">
+        <Button variant="contained" onClick={onCancelBtnClick} startIcon={<CloseIcon />}>
           {t('page.alerts.filters.cancel')}
         </Button>
       </div>

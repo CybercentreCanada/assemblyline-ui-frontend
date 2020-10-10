@@ -5,12 +5,14 @@ import React from 'react';
 
 interface AlertFiltersSelectedProps {
   searchQuery: SearchQuery;
+  hideQuery?: boolean;
   disableActions?: boolean;
   onChange?: (filters: SearchQueryFilters) => void;
 }
 
 const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
   searchQuery,
+  hideQuery = false,
   disableActions = false,
   onChange = () => null
 }) => {
@@ -42,7 +44,7 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
   return (
     <div>
       <div>
-        {query && <span>Query = {query}, </span>}
+        {query && !hideQuery && <span>Query = {query}, </span>}
         {filters && (
           <span>
             Time Constraint = {filters.tc}, Group by = {filters.groupBy}

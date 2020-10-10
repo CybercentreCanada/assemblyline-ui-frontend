@@ -484,7 +484,7 @@ const Alerts: React.FC = () => {
                   onCancel={onFavoriteCancel}
                 />
               ),
-              actions: workflowAction && (
+              actions: (
                 <AlertsWorkflowActions
                   query={searchQuery}
                   affectedItemCount={total}
@@ -508,7 +508,7 @@ const SearchResultLarge = ({ searching, loading, total, query, onApplyFilters })
   const _searching = searching || loading;
   return (
     <div style={{ position: 'relative' }}>
-      <AlertsFiltersSelected searchQuery={query} onChange={onApplyFilters} />
+      <AlertsFiltersSelected searchQuery={query} onChange={onApplyFilters} hideQuery />
       <div style={{ position: 'absolute', top: theme.spacing(0), right: theme.spacing(1) }}>
         {_searching ? '' : <span>{`${total} matching results.`}</span>}
       </div>
