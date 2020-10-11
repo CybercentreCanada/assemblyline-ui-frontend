@@ -9,11 +9,9 @@ import SplitPanel from 'components/elements/panels/split-panel';
 import Viewport from 'components/elements/panels/viewport';
 import SearchBar from 'components/elements/search/search-bar';
 import SearchQuery, { SearchQueryFilters } from 'components/elements/search/search-query';
-import Classification from 'components/visual/Classification';
 import React, { useCallback, useRef, useState } from 'react';
 import { FcWorkflow } from 'react-icons/fc';
 import { FiFilter } from 'react-icons/fi';
-import AlertActionsMenu from './alert-actions-menu';
 import AlertDetails from './alert-details';
 import AlertListItem from './alert-list-item';
 import AlertListItemActions from './alert-list-item-actions';
@@ -280,6 +278,9 @@ const Alerts: React.FC = () => {
     onApplyWorkflowAction(drawer.actionData.query, selectedStatus, selectedPriority, selectedLabels).then(() => {
       setDrawer({ ...drawer, open: false });
       onLoad();
+      if (splitPanel.open) {
+        onItemSelected(splitPanel.item);
+      }
     });
   };
 
@@ -412,11 +413,12 @@ const Alerts: React.FC = () => {
                 <PageHeader
                   mode="provided"
                   title={
-                    <Box display="flex" alignItems="center">
-                      <AlertActionsMenu />
+                    <Box display="flex" alignItems="center" mb={1}>
+                      <AlertListItemActions item={splitPanel.item} currentQuery={searchQuery} setDrawer={setDrawer} />
+                      {/* <AlertActionsMenu />
                       <Box flex={1}>
                         <Classification c12n={splitPanel.item.classification} type="outlined" />
-                      </Box>
+                      </Box> */}
                     </Box>
                   }
                   actions={[{ icon: <CloseIcon />, action: onSplitPanelRightClose }]}

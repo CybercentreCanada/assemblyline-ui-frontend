@@ -38,6 +38,8 @@ const useStyles = makeStyles(theme => ({
   listactions: {
     '& button': {
       // backgroundColor: 'silver'
+      marginRight: theme.spacing(1),
+      boxShadow: theme.shadows[2]
     }
   }
 }));

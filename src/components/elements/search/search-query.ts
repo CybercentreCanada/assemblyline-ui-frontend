@@ -168,7 +168,13 @@ export default class SearchQuery {
   }
 
   public reset(): SearchQuery {
-    this.setOffset('0').setRows(`${this.pageSize}`).setQuery('').setTc('4d').setGroupBy('file.sha256').clearFq();
+    this.setOffset('0')
+      .setRows(`${this.pageSize}`)
+      .setQuery('')
+      .setTc('4d')
+      .setGroupBy('file.sha256')
+      .setTcStart('')
+      .clearFq();
     return this;
   }
 
