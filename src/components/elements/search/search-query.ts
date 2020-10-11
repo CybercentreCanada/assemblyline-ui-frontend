@@ -178,8 +178,18 @@ export default class SearchQuery {
     return params.toString();
   }
 
-  public newBase(): SearchQuery {
-    return new SearchQuery(this.path, '', this.pageSize);
+  public newBase(accept?: (name: string) => boolean): SearchQuery {
+    const q = new SearchQuery(this.path, '', this.pageSize);
+    const params = new URLSearchParams();
+    if (accept) {
+      this.params.forEach((value: string, key: string) => {
+        if (accept(key)) {
+          params.set(key, value);
+        }
+      });
+    }
+    q.params = params;
+    return q;
   }
 
   public build(): SearchQuery {

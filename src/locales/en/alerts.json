@@ -39,5 +39,9 @@
   "page.alerts.filters": "Filters",
   "page.alerts.filters.apply": "Apply",
   "page.alerts.filters.clear": "Clear",
-  "page.alerts.filters.cancel": "Close"
+  "page.alerts.filters.cancel": "Close",
+  "page.alerts.actions.ok": "Ok",
+  "page.alerts.actions.cancel": "Cancel",
+  "page.alerts.actions.takeownershipdiag.header": "Take Ownership",
+  "page.alerts.actions.takeownershipdiag.content": "Do you want to take ownership of {0} alert(s) related to this {1}"
 }

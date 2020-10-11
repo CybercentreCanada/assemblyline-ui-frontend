@@ -294,7 +294,7 @@ const Alerts: React.FC = () => {
 
   //
   const onDrawerClose = () => {
-    setDrawer({ ...drawer, open: false });
+    setDrawer({ ...drawer, open: false, actionData: null });
   };
 
   // Handler for with close the right side of split panel.

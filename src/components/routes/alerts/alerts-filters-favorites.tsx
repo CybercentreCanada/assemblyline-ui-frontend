@@ -253,11 +253,11 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
           <div>{t('favorites.confirmdiag.content')}</div>
         </DialogContent>
         <DialogActions>
-          <Button onClick={_onConfirmOkClick} variant="contained" color="primary" size="small">
-            {t('favorites.ok')}
-          </Button>
           <Button autoFocus onClick={_onConfirmCancelClick} variant="contained" size="small">
             {t('favorites.cancel')}
+          </Button>
+          <Button onClick={_onConfirmOkClick} variant="contained" color="primary" size="small">
+            {t('favorites.ok')}
           </Button>
         </DialogActions>
       </Dialog>
