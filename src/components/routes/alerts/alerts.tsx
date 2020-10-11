@@ -22,6 +22,7 @@ import AlertsFiltersFavorites from './alerts-filters-favorites';
 import AlertsFiltersSelected from './alerts-filters-selected';
 import AlertsWorkflowActions from './alerts-workflow-actions';
 import useAlerts, { AlertItem } from './hooks/useAlerts';
+import usePromiseAPI from './hooks/usePromiseAPI';
 
 // Default size of a page to be used by the useAlert hook when fetching next load of data
 //  when scrolling has hit threshold.
@@ -75,10 +76,9 @@ const Alerts: React.FC = () => {
     // updateBook,
     updateQuery,
     onLoad,
-    onLoadMore,
-    onGet,
-    onApplyWorflowAction
+    onLoadMore
   } = useAlerts(PAGE_SIZE);
+  const { onGetAlert, onApplyWorkflowAction } = usePromiseAPI();
   // Define required states...
   const [searching, setSearching] = useState<boolean>(false);
   const [scrollReset, setScrollReset] = useState<boolean>(false);
@@ -137,7 +137,7 @@ const Alerts: React.FC = () => {
     searchQuery.setQuery(filterValue).apply();
 
     // Reload.
-    onLoad(() => {
+    onLoad((success: boolean) => {
       setSearching(false);
       inputEl.focus();
     });
@@ -168,14 +168,14 @@ const Alerts: React.FC = () => {
   const onItemSelected = useCallback(
     (item: AlertItem) => {
       if (item) {
-        onGet(item.alert_id).then(alert => {
+        onGetAlert(item.alert_id).then(alert => {
           setSplitPanel({ open: true, item: alert });
         });
       } else {
         setSplitPanel(_sp => ({ ..._sp, open: false }));
       }
     },
-    [onGet]
+    [onGetAlert]
   );
 
   // Handler for when loading more alerts [read bottom of scroll area]
@@ -277,7 +277,7 @@ const Alerts: React.FC = () => {
 
   // Handler/callback for when clicking the 'Apply' btn on the AlertsWorkflowActions component.
   const onWorkflowActionsApply = (selectedStatus: string, selectedPriority: string, selectedLabels: string[]) => {
-    onApplyWorflowAction(drawer.actionData.query, selectedStatus, selectedPriority, selectedLabels).then(() => {
+    onApplyWorkflowAction(drawer.actionData.query, selectedStatus, selectedPriority, selectedLabels).then(() => {
       setDrawer({ ...drawer, open: false });
       onLoad();
     });
@@ -311,7 +311,7 @@ const Alerts: React.FC = () => {
 
   // ...
   const onRenderListActions = useCallback(
-    (item: AlertItem) => <AlertListItemActions item={item} searchQuery={searchQuery} setDrawer={setDrawer} />,
+    (item: AlertItem) => <AlertListItemActions item={item} currentQuery={searchQuery} setDrawer={setDrawer} />,
     []
   );
 

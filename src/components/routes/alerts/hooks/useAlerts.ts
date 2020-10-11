@@ -6,7 +6,7 @@ import SearchQuery, { SearchFilter, SearchFilterType } from 'components/elements
 import useAppContext from 'components/hooks/useAppContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { ALField } from 'components/hooks/useMyUser';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 export interface AlertFile {
@@ -76,15 +76,8 @@ interface UsingAlerts {
   valueFilters: SearchFilter[];
   updateQuery: (searchQuery: SearchQuery) => void;
   updateBook: (book: Book) => void;
-  onLoad: (onSuccess?: () => void) => void;
-  onLoadMore: (onSuccess?: () => void) => void;
-  onGet: (id: string) => Promise<AlertItem>;
-  onApplyWorflowAction: (
-    query: SearchQuery,
-    status: string,
-    selectedPriority: string,
-    selectedLabels: string[]
-  ) => Promise<void>;
+  onLoad: (onComplete?: (success: boolean) => void) => void;
+  onLoadMore: (onComplete?: (success: boolean) => void) => void;
 }
 
 // Custom Hook implementation for dealing with alerts.
@@ -126,7 +119,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
 
   // Hook API: load/reload all the alerts from start.
   // resets the accumulated list.
-  const onLoad = (onSuccess?: () => void) => {
+  const onLoad = (onComplete?: (success: boolean) => void) => {
     setState({ ...state, loading: true });
     apiCall({
       url: buildUrl(),
@@ -142,16 +135,21 @@ export default function useAlerts(pageSize: number): UsingAlerts {
           buffer: new MetaListBuffer().push(items),
           book: new Book(items, pageSize)
         });
-        if (onSuccess) {
-          onSuccess();
+        if (onComplete) {
+          onComplete(true);
         }
       },
-      onFailure: () => setState({ ...state, loading: false })
+      onFailure: () => {
+        setState({ ...state, loading: false });
+        if (onComplete) {
+          onComplete(false);
+        }
+      }
     });
   };
 
   // Hook API: get alerts for specified index.
-  const onLoadMore = (onSuccess?: () => void) => {
+  const onLoadMore = (onComplete?: (success: boolean) => void) => {
     // Move offset by one increment.
     searchQuery.tickOffset();
     // reference the current offset now incase it changes again before callback is executed
@@ -168,11 +166,16 @@ export default function useAlerts(pageSize: number): UsingAlerts {
           buffer: state.buffer.push(parsedItems).build(),
           book: state.book.addAll(parsedItems)
         });
-        if (onSuccess) {
-          onSuccess();
+        if (onComplete) {
+          onComplete(true);
         }
       },
-      onFailure: () => setState({ ...state, loading: false })
+      onFailure: () => {
+        setState({ ...state, loading: false });
+        if (onComplete) {
+          onComplete(false);
+        }
+      }
     });
   };
 
@@ -254,96 +257,6 @@ export default function useAlerts(pageSize: number): UsingAlerts {
     });
   };
 
-  // Hook API: fetch the alert for the specified alert_id.
-  const onGet = useCallback((id: string) => {
-    return new Promise<AlertItem>((resolve, reject) => {
-      const url = `/api/v4/alert/${id}/`;
-      apiCall({
-        url,
-        onSuccess: api_data => {
-          resolve(api_data.api_response);
-        },
-        onFailure: () => reject()
-      });
-    });
-  }, []);
-
-  // Hook API: apply workflow actions
-  const onApplyWorflowAction = async (
-    query: SearchQuery,
-    selectedStatus: string,
-    selectedPriority: string,
-    selectedLabels: string[]
-  ): Promise<any> => {
-    // https://192.168.0.13.nip.io:8443/api/v4/alert/priority/batch/?q=testing_constantly.pdf&tc=4d&tc_start=2020-10-08T17:04:38.359618Z
-    const statusPromise = new Promise((resolve, reject) => {
-      if (selectedStatus) {
-        apiCall({
-          url: `/api/v4/alert/status/batch/?${query.buildQueryString()}`,
-          method: 'post',
-          body: selectedStatus,
-          onSuccess: api_data => {
-            resolve(true);
-          },
-          onFailure: () => resolve(false)
-        });
-      } else {
-        resolve(false);
-      }
-    });
-
-    // https://192.168.0.13.nip.io:8443/api/v4/alert/priority/batch/?q=testing_constantly.pdf&tc=4d&tc_start=2020-10-08T17:04:38.359618Z
-    const priorityPromise = new Promise((resolve, reject) => {
-      if (selectedPriority) {
-        apiCall({
-          url: `/api/v4/alert/priority/batch/?${query.buildQueryString()}`,
-          method: 'post',
-          body: selectedPriority,
-          onSuccess: api_data => {
-            resolve(true);
-          },
-          onFailure: () => resolve(false)
-        });
-      } else {
-        resolve(false);
-      }
-    });
-
-    // https://192.168.0.13.nip.io:8443/api/v4/alert/status/batch/?q=testing_constantly.pdf&tc=4d&tc_start=2020-10-08T17:04:38.359618Z
-    const labelPromise = new Promise((resolve, reject) => {
-      if (selectedLabels && selectedLabels.length > 0) {
-        apiCall({
-          url: `/api/v4/alert/label/batch/?${query.buildQueryString()}`,
-          method: 'post',
-          body: selectedLabels,
-          onSuccess: api_data => {
-            resolve(api_data);
-          },
-          onFailure: () => resolve(false)
-        });
-      } else {
-        resolve();
-      }
-    });
-
-    return Promise.all([statusPromise, priorityPromise, labelPromise]);
-  };
-
-  // Hook API: take ownership of alerts matching specified query.
-  const onTakeOwnership = async (query: SearchQuery) => {
-    // /api/v4/alert/ownership/batch/?fq=file.sha256:330d097ec18396485d51d62ab21fdf30ece74879fb94a1a920a75a58afebbdde&q=&tc=4d&tc_start=2020-10-11T20:32:34.613842Z
-
-    return new Promise((resolve, reject) => {
-      apiCall({
-        url: `/api/v4/alert/ownership/batch/?${query.buildQueryString()}`,
-        onSuccess: api_data => {
-          resolve(api_data);
-        },
-        onFailure: () => resolve(false)
-      });
-    });
-  };
-
   // Load it up!
   useEffect(() => {
     onLoad();
@@ -376,8 +289,6 @@ export default function useAlerts(pageSize: number): UsingAlerts {
     updateQuery: setSearchQuery,
     updateBook: (book: Book) => setState({ ...state, book }),
     onLoad,
-    onLoadMore,
-    onGet,
-    onApplyWorflowAction
+    onLoadMore
   };
 }
