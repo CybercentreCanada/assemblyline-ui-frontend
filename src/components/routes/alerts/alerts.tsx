@@ -277,7 +277,7 @@ const Alerts: React.FC = () => {
 
   // Handler/callback for when clicking the 'Apply' btn on the AlertsWorkflowActions component.
   const onWorkflowActionsApply = (selectedStatus: string, selectedPriority: string, selectedLabels: string[]) => {
-    onApplyWorflowAction(selectedStatus, selectedPriority, selectedLabels).then(() => {
+    onApplyWorflowAction(drawer.actionData.query, selectedStatus, selectedPriority, selectedLabels).then(() => {
       setDrawer({ ...drawer, open: false });
       onLoad();
     });

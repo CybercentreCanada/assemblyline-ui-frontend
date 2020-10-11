@@ -31,7 +31,11 @@ const useStyles = makeStyles(theme => ({
   searchresult: {
     fontStyle: 'italic'
   },
-  listactions: {}
+  listactions: {
+    '& button': {
+      // backgroundColor: 'silver'
+    }
+  }
 }));
 
 interface AlertListItemActionsProps {
@@ -92,6 +96,7 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(({ 
           </IconButton>
         )}
         <IconButton
+          color="inherit"
           title="Workflow Action"
           onClick={() => {
             console.log('workflow action.');

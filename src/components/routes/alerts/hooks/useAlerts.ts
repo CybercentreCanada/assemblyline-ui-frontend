@@ -79,7 +79,12 @@ interface UsingAlerts {
   onLoad: (onSuccess?: () => void) => void;
   onLoadMore: (onSuccess?: () => void) => void;
   onGet: (id: string) => Promise<AlertItem>;
-  onApplyWorflowAction: (status: string, selectedPriority: string, selectedLabels: string[]) => Promise<void>;
+  onApplyWorflowAction: (
+    query: SearchQuery,
+    status: string,
+    selectedPriority: string,
+    selectedLabels: string[]
+  ) => Promise<void>;
 }
 
 // Custom Hook implementation for dealing with alerts.
@@ -263,8 +268,9 @@ export default function useAlerts(pageSize: number): UsingAlerts {
     });
   }, []);
 
-  // Hook API:
+  // Hook API: apply workflow actions
   const onApplyWorflowAction = async (
+    query: SearchQuery,
     selectedStatus: string,
     selectedPriority: string,
     selectedLabels: string[]
@@ -273,7 +279,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
     const statusPromise = new Promise((resolve, reject) => {
       if (selectedStatus) {
         apiCall({
-          url: `/api/v4/alert/status/batch/?${searchQuery.buildQueryString()}`,
+          url: `/api/v4/alert/status/batch/?${query.buildQueryString()}`,
           method: 'post',
           body: selectedStatus,
           onSuccess: api_data => {
@@ -290,7 +296,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
     const priorityPromise = new Promise((resolve, reject) => {
       if (selectedPriority) {
         apiCall({
-          url: `/api/v4/alert/priority/batch/?${searchQuery.buildQueryString()}`,
+          url: `/api/v4/alert/priority/batch/?${query.buildQueryString()}`,
           method: 'post',
           body: selectedPriority,
           onSuccess: api_data => {
@@ -307,7 +313,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
     const labelPromise = new Promise((resolve, reject) => {
       if (selectedLabels && selectedLabels.length > 0) {
         apiCall({
-          url: `/api/v4/alert/label/batch/?${searchQuery.buildQueryString()}`,
+          url: `/api/v4/alert/label/batch/?${query.buildQueryString()}`,
           method: 'post',
           body: selectedLabels,
           onSuccess: api_data => {
@@ -321,6 +327,21 @@ export default function useAlerts(pageSize: number): UsingAlerts {
     });
 
     return Promise.all([statusPromise, priorityPromise, labelPromise]);
+  };
+
+  // Hook API: take ownership of alerts matching specified query.
+  const onTakeOwnership = async (query: SearchQuery) => {
+    // /api/v4/alert/ownership/batch/?fq=file.sha256:330d097ec18396485d51d62ab21fdf30ece74879fb94a1a920a75a58afebbdde&q=&tc=4d&tc_start=2020-10-11T20:32:34.613842Z
+
+    return new Promise((resolve, reject) => {
+      apiCall({
+        url: `/api/v4/alert/ownership/batch/?${query.buildQueryString()}`,
+        onSuccess: api_data => {
+          resolve(api_data);
+        },
+        onFailure: () => resolve(false)
+      });
+    });
   };
 
   // Load it up!

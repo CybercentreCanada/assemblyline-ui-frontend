@@ -71,7 +71,7 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
   };
 
   const extractFilterValue = (filter: SearchFilter): string => {
-    if (filter.type === SearchFilterType.BLANK) {
+    if (!filter || filter.type === SearchFilterType.BLANK) {
       return null;
     }
     return filter.value.split(':')[1];
