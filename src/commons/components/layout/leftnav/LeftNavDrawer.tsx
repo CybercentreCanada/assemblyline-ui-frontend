@@ -30,7 +30,10 @@ export const useStyles = makeStyles(theme => ({
   drawer: {
     width: drawerWidth,
     flexShrink: 0,
-    whiteSpace: 'nowrap'
+    whiteSpace: 'nowrap',
+    '@media print': {
+      display: 'none !important'
+    }
   },
   drawerOpen: {
     width: drawerWidth,

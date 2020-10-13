@@ -31,6 +31,9 @@ const useStyles = (layout, drawerState) => {
       [theme.breakpoints.up('sm')]: {
         color: theme.palette.action.active,
         marginLeft: theme.spacing(7) + 1
+      },
+      '@media print': {
+        display: 'none !important'
       }
     },
     toolbar: {

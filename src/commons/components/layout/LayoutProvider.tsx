@@ -25,6 +25,9 @@ const useStyles = (layout, showSpacing) => {
       },
       [theme.breakpoints.up('md')]: {
         flexGrow: 1
+      },
+      '@media print': {
+        padding: 0
       }
     }
   }))();
@@ -253,7 +256,11 @@ function AppLayoutProvider(props: LayoutProviderProps) {
           <div className={classes.container}>
             {layoutProps.allowBreadcrumbs &&
               breadcrumbsEnabled &&
-              (breadcrumbsPlacement === 'page' || showBreadcrumbsOnPage) && <PageHeader mode="breadcrumbs" />}
+              (breadcrumbsPlacement === 'page' || showBreadcrumbsOnPage) && (
+                <div className="no-print">
+                  <PageHeader mode="breadcrumbs" />
+                </div>
+              )}
             {children}
           </div>
         </div>
