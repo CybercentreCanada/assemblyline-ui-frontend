@@ -49,6 +49,7 @@ function TagTable({ group, items }) {
   const theme = useTheme();
   const orderedItems = {};
   const sp2 = theme.spacing(2);
+  const sp1 = theme.spacing(1);
 
   Object.keys(items).map(tagType =>
     Object.keys(items[tagType]).map(tagValue => {
@@ -62,7 +63,7 @@ function TagTable({ group, items }) {
   );
 
   return (
-    <div style={{ paddingBottom: sp2 }}>
+    <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
       <Typography variant="h6">{t(`tag.${group}`)}</Typography>
       <Divider />
       <div
@@ -71,31 +72,41 @@ function TagTable({ group, items }) {
           paddingBottom: sp2
         }}
       >
-        {Object.keys(orderedItems).map((k, idx) => {
-          return (
-            <Grid key={idx} container spacing={2} style={{ marginBottom: sp2 }}>
-              <Grid item xs={12} sm={3} md={2}>
-                <div style={{ display: 'flex' }}>
-                  <TextVerdict verdict={orderedItems[k].verdict} mono />
-                  <Tooltip title={orderedItems[k].type}>
-                    <span style={{ flexGrow: 1, wordBreak: 'break-all', textTransform: 'capitalize' }}>
-                      {orderedItems[k].type.split('.').pop().replace('_', ' ')}
-                    </span>
-                  </Tooltip>
-                </div>
-              </Grid>
-              <Grid item xs={12} sm={9} md={10}>
-                {orderedItems[k].values.map((v, vidx) => {
-                  return (
-                    <div key={vidx} style={{ display: 'inline-block', width: '100%', paddingBottom: '4px' }}>
-                      {v}
+        <table>
+          <tbody>
+            {Object.keys(orderedItems).map((k, idx) => {
+              return (
+                <tr key={idx} style={{ marginBottom: sp2 }}>
+                  <td style={{ verticalAlign: 'top' }}>
+                    <div style={{ display: 'flex' }}>
+                      <TextVerdict verdict={orderedItems[k].verdict} mono />
+                      <Tooltip title={orderedItems[k].type}>
+                        <span style={{ fontSize: '110%', flexGrow: 1, textTransform: 'capitalize' }}>
+                          {orderedItems[k].type.split('.').pop().replace('_', ' ')}
+                        </span>
+                      </Tooltip>
                     </div>
-                  );
-                })}
-              </Grid>
-            </Grid>
-          );
-        })}
+                  </td>
+                  <td style={{ paddingLeft: sp1 }}>
+                    {orderedItems[k].values.map((v, vidx) => {
+                      return (
+                        <div
+                          key={vidx}
+                          style={{
+                            wordBreak: 'break-all',
+                            paddingBottom: '5px'
+                          }}
+                        >
+                          {v}
+                        </div>
+                      );
+                    })}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
     </div>
   );
@@ -156,6 +167,7 @@ function HeuristicsList({ verdict, items }) {
   const { t } = useTranslation();
   const classes = useStyles();
   const sp2 = theme.spacing(2);
+  const sp1 = theme.spacing(1);
   const classMap = {
     malicious: classes.malicious_heur,
     suspicious: classes.suspicious_heur,
@@ -165,13 +177,14 @@ function HeuristicsList({ verdict, items }) {
   return (
     <div
       style={{
-        flexGrow: 1
+        flexGrow: 1,
+        minWidth: '200px'
       }}
     >
       <div className={classMap[verdict]} style={{ marginBottom: sp2, marginTop: sp2, fontSize: '1.2rem' }}>
         {t(`verdict.${verdict}`)}
       </div>
-      <div style={{ paddingLeft: sp2 }}>
+      <div style={{ paddingLeft: sp1, paddingRight: sp1 }}>
         {Object.keys(items).map((heur, idx) => {
           return (
             <div key={idx} style={{ fontSize: '1rem', verticalAlign: 'middle' }}>
@@ -208,7 +221,7 @@ function FileTree({ tree, important_files, spacing = 0 }) {
     <div>
       {Object.keys(tree).map((f, i) => {
         return important_files.indexOf(f) !== -1 ? (
-          <div key={i} style={{ marginLeft: theme.spacing(spacing), wordBreak: 'break-all' }}>
+          <div key={i} style={{ marginLeft: theme.spacing(spacing), wordBreak: 'break-all', pageBreakInside: 'avoid' }}>
             <Verdict score={tree[f].score} short mono />
             <b style={{ fontSize: '110%' }}>{tree[f].name}</b>
             <table
@@ -274,6 +287,7 @@ export default function SubmissionReport() {
   const theme = useTheme();
   const [report, setReport] = useState(null);
   const apiCall = useMyAPI();
+  const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
   const { showErrorMessage, showWarningMessage } = useMySnackbar();
@@ -306,9 +320,13 @@ export default function SubmissionReport() {
           <Classification size="tiny" c12n={report ? report.classification : null} />
         </div>
 
-        <div style={{ paddingBottom: sp4 }}>
+        <div className="print-footer print-only">
+          {`${t('title')} :: ${id} :: `}
+          <Classification type="text" size="tiny" c12n={report ? report.classification : null} inline />
+        </div>
+        <div style={{ paddingBottom: sp2 }}>
           <Grid container>
-            <Grid item xs={12} sm>
+            <Grid item xs>
               <div>
                 <Typography variant="h4">{t('title')}</Typography>
                 <Typography variant="caption">
@@ -316,10 +334,13 @@ export default function SubmissionReport() {
                 </Typography>
               </div>
             </Grid>
-            <Grid item xs={12} sm>
+            <Grid item xs={4} className="print-only">
+              <img src="/images/banner.svg" alt="Assemblyline Banner" style={{ width: '100%' }} />
+            </Grid>
+            <Grid item xs={12} sm className="no-print">
               <div style={{ textAlign: 'right' }}>
                 <Tooltip title={t('print')}>
-                  <IconButton>
+                  <IconButton onClick={() => window.print()}>
                     <PrintOutlinedIcon />
                   </IconButton>
                 </Tooltip>
@@ -333,7 +354,7 @@ export default function SubmissionReport() {
           </Grid>
         </div>
 
-        <div style={{ paddingBottom: sp2 }}>
+        <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
           <Typography variant="h6">{t('general')}</Typography>
           <Divider />
           <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
@@ -519,41 +540,41 @@ export default function SubmissionReport() {
         </div>
 
         {(!report || Object.keys(report.metadata).length !== 0) && (
-          <div style={{ paddingBottom: sp2 }}>
+          <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
             <Typography variant="h6">{t('metadata')}</Typography>
             <Divider />
-            <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
-              {report
-                ? Object.keys(report.metadata).map((meta, i) => {
-                    return (
-                      <Grid key={i} container spacing={1}>
-                        <Grid item xs={12} sm={4} md={3} lg={2}>
-                          <span style={{ fontWeight: 500 }}>{meta}</span>
-                        </Grid>
-                        <Grid item xs={12} sm={8} md={9} lg={10}>
-                          {report.metadata[meta]}
-                        </Grid>
-                      </Grid>
-                    );
-                  })
-                : [...Array(3)].map((_, i) => {
-                    return (
-                      <Grid key={i} container spacing={1}>
-                        <Grid item xs={12} sm={4} md={3} lg={2}>
-                          <Skeleton />
-                        </Grid>
-                        <Grid item xs={12} sm={8} md={9} lg={10}>
-                          <Skeleton />
-                        </Grid>
-                      </Grid>
-                    );
-                  })}
-            </div>
+            <table style={{ paddingBottom: sp2, paddingTop: sp2, width: '100%' }}>
+              <tbody>
+                {report
+                  ? Object.keys(report.metadata).map((meta, i) => {
+                      return (
+                        <tr key={i}>
+                          <td style={{ wordBreak: 'break-all' }}>
+                            <span style={{ fontWeight: 500 }}>{meta}</span>
+                          </td>
+                          <td style={{ paddingLeft: sp1, wordBreak: 'break-all' }}>{report.metadata[meta]}</td>
+                        </tr>
+                      );
+                    })
+                  : [...Array(3)].map((_, i) => {
+                      return (
+                        <tr key={i} style={{ width: '100%' }}>
+                          <td width="33%">
+                            <Skeleton />
+                          </td>
+                          <td width="67%">
+                            <Skeleton />
+                          </td>
+                        </tr>
+                      );
+                    })}
+              </tbody>
+            </table>
           </div>
         )}
 
         {(!report || Object.keys(report.attack_matrix).length !== 0) && (
-          <div style={{ paddingBottom: sp2 }}>
+          <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
             <Typography variant="h6">{t('attack')}</Typography>
             <Divider />
             <div
@@ -561,10 +582,7 @@ export default function SubmissionReport() {
                 paddingTop: sp2,
                 paddingBottom: sp2,
                 columnWidth: '21rem',
-                columnGap: '1rem',
-                columnRuleWidth: '1px',
-                columnRuleStyle: 'dotted',
-                columnRuleColor: theme.palette.divider
+                columnGap: '1rem'
               }}
             >
               {report
@@ -582,7 +600,7 @@ export default function SubmissionReport() {
           Object.keys(report.heuristics.malicious).length !== 0 ||
           Object.keys(report.heuristics.suspicious).length !== 0 ||
           Object.keys(report.heuristics.info.length !== 0)) && (
-          <div style={{ paddingBottom: sp2 }}>
+          <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
             <Typography variant="h6">{t('heuristics')}</Typography>
             <Divider />
             <div
@@ -619,7 +637,7 @@ export default function SubmissionReport() {
           })}
 
         {(!report || report.important_files.length !== 0) && (
-          <div style={{ paddingBottom: sp2 }}>
+          <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
             <Typography variant="h6">{t('important_files')}</Typography>
             <Divider />
             <div
