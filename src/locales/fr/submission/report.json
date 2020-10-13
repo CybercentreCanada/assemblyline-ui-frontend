@@ -1,8 +1,10 @@
 {
+  "actor": "Utilisé par",
   "attack": "Matrice Att&ck",
   "detail_view": "Afficher la vue détaillée",
   "error.notfound": "La soumission n'a pas été trouvée",
   "error.too_early": "Il est trop tôt pour générer le rapport car la soumission n'est pas terminée. Vous serez rediriger vers la vue détaillée ...",
+  "family": "Famille",
   "file.description": "Description",
   "file.magic": "Magic",
   "file.md5": "MD5",
@@ -14,6 +16,7 @@
   "file.ssdeep": "SSDEEP",
   "file.type": "Type",
   "file.verdict": "Verdicte",
+  "implant": "Implant",
   "general": "Informations Générales",
   "heuristics": "Heuristiques",
   "important_files": "Fichiers extraits importants",

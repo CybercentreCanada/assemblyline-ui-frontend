@@ -1,5 +1,9 @@
-import { Divider, Grid, IconButton, makeStyles, Tooltip, Typography, useTheme } from '@material-ui/core';
+import { Avatar, Divider, Grid, IconButton, makeStyles, Tooltip, Typography, useTheme } from '@material-ui/core';
+import BugReportIcon from '@material-ui/icons/BugReport';
+import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import ListAltOutlinedIcon from '@material-ui/icons/ListAltOutlined';
+import MoodIcon from '@material-ui/icons/Mood';
+import MoodBadIcon from '@material-ui/icons/MoodBad';
 import PrintOutlinedIcon from '@material-ui/icons/PrintOutlined';
 import { Skeleton } from '@material-ui/lab';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
@@ -17,7 +21,31 @@ type ParamProps = {
   id: string;
 };
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
+  avatar: {
+    display: 'inline-flex',
+    width: theme.spacing(16),
+    height: theme.spacing(16),
+    marginRight: theme.spacing(2),
+    [theme.breakpoints.down('xs')]: {
+      width: theme.spacing(12),
+      height: theme.spacing(12),
+      marginRight: 0
+    }
+  },
+  banner_title: {
+    fontWeight: 500,
+    fontSize: '200%',
+    [theme.breakpoints.down('xs')]: {
+      fontSize: '180%'
+    }
+  },
+  icon: {
+    fontSize: '200%',
+    [theme.breakpoints.down('xs')]: {
+      fontSize: '180%'
+    }
+  },
   malicious_heur: {
     textTransform: 'capitalize',
     fontWeight: 700,
@@ -42,7 +70,136 @@ const useStyles = makeStyles({
     backgroundColor: '#6e6e6e25 !important',
     borderBottom: '1px solid #aaa !important'
   }
-});
+}));
+
+function AttributionBanner({ report }) {
+  const { t } = useTranslation(['submissionReport']);
+  const theme = useTheme();
+  const sp2 = theme.spacing(2);
+  const classes = useStyles();
+  const score = report ? report.max_score : 0;
+
+  const BANNER_COLOR_MAP = {
+    0: {
+      icon: <HelpOutlineIcon className={classes.icon} />,
+      bgColor: '#6e6e6e25',
+      textColor: theme.palette.type === 'dark' ? '#AAA' : '#888'
+    },
+    1: {
+      icon: <MoodIcon className={classes.icon} />,
+      bgColor: '#00f20025',
+      textColor: theme.palette.type !== 'dark' ? theme.palette.success.dark : theme.palette.success.light
+    },
+    2: {
+      icon: <MoodBadIcon className={classes.icon} />,
+      bgColor: '#4b96fe25',
+      textColor: theme.palette.type !== 'dark' ? theme.palette.info.dark : theme.palette.info.light
+    },
+    3: {
+      icon: <MoodBadIcon className={classes.icon} />,
+      bgColor: '#ff970025',
+      textColor: theme.palette.type !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
+    },
+    4: {
+      icon: <BugReportIcon className={classes.icon} />,
+      bgColor: '#f2000025',
+      textColor: theme.palette.type !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
+    }
+  };
+
+  let scoreKey = null;
+  if (score >= 2000) {
+    scoreKey = 4;
+  } else if (score >= 500) {
+    scoreKey = 3;
+  } else if (score >= 100) {
+    scoreKey = 2;
+  } else if (score < 0) {
+    scoreKey = 1;
+  } else {
+    scoreKey = 0;
+  }
+
+  const { bgColor, icon, textColor } = BANNER_COLOR_MAP[scoreKey];
+  const implant =
+    report && report.tags && report.tags.attributions && report.tags.attributions['attribution.implant']
+      ? Object.keys(report.tags.attributions['attribution.implant']).join(' | ')
+      : null;
+  const family =
+    report && report.tags && report.tags.attributions && report.tags.attributions['attribution.family']
+      ? Object.keys(report.tags.attributions['attribution.family']).join(' | ')
+      : null;
+  const actor =
+    report && report.tags && report.tags.attributions && report.tags.attributions['attribution.actor']
+      ? Object.keys(report.tags.attributions['attribution.actor']).join(' | ')
+      : null;
+
+  return (
+    <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+      {report ? (
+        <Grid container spacing={2}>
+          <Grid item style={{ textAlign: 'center' }}>
+            <Avatar
+              className={classes.avatar}
+              style={{ color: textColor, backgroundColor: bgColor, border: `solid 2px ${textColor}` }}
+            >
+              {icon}
+            </Avatar>
+          </Grid>
+          <Grid item style={{ wordBreak: 'break-all', alignSelf: 'center' }}>
+            <div className={classes.banner_title}>
+              {report ? <Verdict type="text" size="medium" score={report.max_score} /> : <Skeleton />}
+            </div>
+            <div>
+              {report ? (
+                implant && (
+                  <>
+                    <span>{`${t('implant')}: `}</span>
+                    <span style={{ fontWeight: 500 }}>
+                      {Object.keys(report.tags.attributions['attribution.implant']).join(' | ')}
+                    </span>
+                  </>
+                )
+              ) : (
+                <Skeleton />
+              )}
+            </div>
+            <div>
+              {report ? (
+                family && (
+                  <>
+                    <span>{`${t('family')}: `}</span>
+                    <span style={{ fontWeight: 500 }}>
+                      {Object.keys(report.tags.attributions['attribution.family']).join(' | ')}
+                    </span>
+                  </>
+                )
+              ) : (
+                <Skeleton />
+              )}
+            </div>
+            <div>
+              {report ? (
+                actor && (
+                  <>
+                    <span>{`${t('actor')}: `}</span>
+                    <span style={{ fontWeight: 500 }}>
+                      {Object.keys(report.tags.attributions['attribution.actor']).join(' | ')}
+                    </span>
+                  </>
+                )
+              ) : (
+                <Skeleton />
+              )}
+            </div>
+          </Grid>
+        </Grid>
+      ) : (
+        <Skeleton />
+      )}
+    </div>
+  );
+}
 
 function TagTable({ group, items }) {
   const { t } = useTranslation(['submissionReport']);
@@ -326,7 +483,7 @@ export default function SubmissionReport() {
         </div>
         <div style={{ paddingBottom: sp2 }}>
           <Grid container>
-            <Grid item xs>
+            <Grid item xs={12} sm={9}>
               <div>
                 <Typography variant="h4">{t('title')}</Typography>
                 <Typography variant="caption">
@@ -337,7 +494,7 @@ export default function SubmissionReport() {
             <Grid item xs={4} className="print-only">
               <img src="/images/banner.svg" alt="Assemblyline Banner" style={{ width: '100%' }} />
             </Grid>
-            <Grid item xs={12} sm className="no-print">
+            <Grid item xs={12} sm={3} className="no-print">
               <div style={{ textAlign: 'right' }}>
                 <Tooltip title={t('print')}>
                   <IconButton onClick={() => window.print()}>
@@ -354,22 +511,24 @@ export default function SubmissionReport() {
           </Grid>
         </div>
 
+        <AttributionBanner report={report} />
+
         <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
           <Typography variant="h6">{t('general')}</Typography>
           <Divider />
           <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
             <Grid container spacing={1}>
-              <Grid item xs={4} md={3} lg={2}>
+              <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.name')}</span>
               </Grid>
-              <Grid item xs={8} md={9} lg={10} style={{ wordBreak: 'break-all' }}>
+              <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-all' }}>
                 {report ? report.files[0].name : <Skeleton />}
               </Grid>
 
-              <Grid item xs={4} md={3} lg={2}>
+              <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.description')}</span>
               </Grid>
-              <Grid item xs={8} md={9} lg={10} style={{ wordBreak: 'break-all' }}>
+              <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-all' }}>
                 {report ? report.params.description : <Skeleton />}
               </Grid>
 
@@ -377,17 +536,17 @@ export default function SubmissionReport() {
                 <div style={{ height: sp2 }} />
               </Grid>
 
-              <Grid item xs={4} md={3} lg={2}>
+              <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.verdict')}</span>
               </Grid>
-              <Grid item xs={8} md={9} lg={10}>
+              <Grid item xs={8} sm={9} lg={10}>
                 {report ? <Verdict score={report.max_score} /> : <Skeleton />}
               </Grid>
 
-              <Grid item xs={4} md={3} lg={2}>
+              <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('user.verdict')}</span>
               </Grid>
-              <Grid item xs={8} md={9} lg={10}>
+              <Grid item xs={8} sm={9} lg={10}>
                 {report ? (
                   <>
                     {`${t('malicious')}: `}
@@ -414,33 +573,33 @@ export default function SubmissionReport() {
                 )}
               </Grid>
 
-              <Grid item xs={4} md={3} lg={2}>
+              <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('submission.date')}</span>
               </Grid>
-              <Grid item xs={8} md={9} lg={10}>
+              <Grid item xs={8} sm={9} lg={10}>
                 {report ? <Moment date={report.times.submitted} /> : <Skeleton />}
               </Grid>
 
-              <Grid item xs={4} md={3} lg={2}>
+              <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('submission.user')}</span>
               </Grid>
-              <Grid item xs={8} md={9} lg={10}>
+              <Grid item xs={8} sm={9} lg={10}>
                 {report ? report.params.submitter : <Skeleton />}
               </Grid>
 
-              <Grid item xs={4} md={3} lg={2}>
+              <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('submission.services')}</span>
               </Grid>
-              <Grid item xs={8} md={9} lg={10}>
+              <Grid item xs={8} sm={9} lg={10}>
                 {report ? report.params.services.selected.join(' | ') : <Skeleton />}
               </Grid>
 
               {report && report.params.services.errors.length !== 0 && (
                 <>
-                  <Grid item xs={4} md={3} lg={2}>
+                  <Grid item xs={4} sm={3} lg={2}>
                     <span style={{ fontWeight: 500 }}>{t('submission.services.errors')}</span>
                   </Grid>
-                  <Grid item xs={8} md={9} lg={10}>
+                  <Grid item xs={8} sm={9} lg={10}>
                     <span
                       style={{
                         color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
@@ -456,35 +615,35 @@ export default function SubmissionReport() {
                 <div style={{ height: sp2 }} />
               </Grid>
 
-              <Grid item xs={4} md={3} lg={2}>
+              <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.type')}</span>
               </Grid>
-              <Grid item xs={8} md={9} lg={10}>
+              <Grid item xs={8} sm={9} lg={10}>
                 {report ? report.file_info.type : <Skeleton />}
               </Grid>
 
-              <Grid item xs={4} md={3} lg={2}>
+              <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.mime')}</span>
               </Grid>
-              <Grid item xs={8} md={9} lg={10}>
+              <Grid item xs={8} sm={9} lg={10}>
                 {report ? report.file_info.mime : <Skeleton />}
               </Grid>
 
-              <Grid item xs={4} md={3} lg={2}>
+              <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.magic')}</span>
               </Grid>
-              <Grid item xs={8} md={9} lg={10}>
+              <Grid item xs={8} sm={9} lg={10}>
                 {report ? report.file_info.magic : <Skeleton />}
               </Grid>
 
-              <Grid item xs={4} md={3} lg={2}>
+              <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.size')}</span>
               </Grid>
-              <Grid item xs={8} md={9} lg={10}>
+              <Grid item xs={8} sm={9} lg={10}>
                 {report ? report.file_info.size : <Skeleton />}
               </Grid>
 
-              <Grid item xs={4} md={3} lg={2}>
+              <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.md5')}</span>
               </Grid>
               <Grid
@@ -497,7 +656,7 @@ export default function SubmissionReport() {
                 {report ? report.file_info.md5 : <Skeleton />}
               </Grid>
 
-              <Grid item xs={4} md={3} lg={2}>
+              <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.sha1')}</span>
               </Grid>
               <Grid
@@ -510,7 +669,7 @@ export default function SubmissionReport() {
                 {report ? report.file_info.sha1 : <Skeleton />}
               </Grid>
 
-              <Grid item xs={4} md={3} lg={2}>
+              <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.sha256')}</span>
               </Grid>
               <Grid
@@ -523,7 +682,7 @@ export default function SubmissionReport() {
                 {report ? report.file_info.sha256 : <Skeleton />}
               </Grid>
 
-              <Grid item xs={4} md={3} lg={2}>
+              <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.ssdeep')}</span>
               </Grid>
               <Grid
