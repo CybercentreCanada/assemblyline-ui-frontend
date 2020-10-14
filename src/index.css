@@ -1,4 +1,8 @@
 @media print {
+  body {
+    color: rgba(0, 0, 0, 0.87) !important;
+  }
+
   @page {
     size: auto;
     margin: 15mm;

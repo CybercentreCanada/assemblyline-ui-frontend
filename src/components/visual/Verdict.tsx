@@ -1,5 +1,6 @@
 import { Tooltip, useTheme } from '@material-ui/core';
 import CustomChip from 'components/visual/CustomChip';
+import { scoreToVerdict } from 'helpers/utils';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -24,52 +25,39 @@ const Verdict: React.FC<VerdictProps> = ({
   const theme = useTheme();
 
   const VERDICT_SCORE_MAP = {
-    0: {
+    unknown: {
       shortText: t('verdict.non_malicious.short'),
       text: t('verdict.non_malicious'),
-      color: 'default',
+      color: 'default' as 'default',
       textColor: theme.palette.type === 'dark' ? '#AAA' : '#888'
     },
-    1: {
+    safe: {
       shortText: t('verdict.safe.short'),
       text: t('verdict.safe'),
-      color: 'success',
+      color: 'success' as 'success',
       textColor: theme.palette.type !== 'dark' ? theme.palette.success.dark : theme.palette.success.light
     },
-    2: {
+    suspicious: {
       shortText: t('verdict.suspicious.short'),
       text: t('verdict.suspicious'),
-      color: 'info',
+      color: 'info' as 'info',
       textColor: theme.palette.type !== 'dark' ? theme.palette.info.dark : theme.palette.info.light
     },
-    3: {
+    highly_suspicious: {
       shortText: t('verdict.highly_suspicious.short'),
       text: t('verdict.highly_suspicious'),
-      color: 'warning',
+      color: 'warning' as 'warning',
       textColor: theme.palette.type !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
     },
-    4: {
+    malicious: {
       shortText: t('verdict.malicious.short'),
       text: t('verdict.malicious'),
-      color: 'error',
+      color: 'error' as 'error',
       textColor: theme.palette.type !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
     }
   };
 
-  let scoreKey = null;
-  if (score >= 2000) {
-    scoreKey = 4;
-  } else if (score >= 500) {
-    scoreKey = 3;
-  } else if (score >= 100) {
-    scoreKey = 2;
-  } else if (score < 0) {
-    scoreKey = 1;
-  } else {
-    scoreKey = 0;
-  }
-
-  const { text, color, shortText, textColor } = VERDICT_SCORE_MAP[scoreKey];
+  const { text, color, shortText, textColor } = VERDICT_SCORE_MAP[scoreToVerdict(score)];
 
   return (
     <Tooltip title={`${text} [Score: ${score}]`}>

@@ -1,10 +1,10 @@
-import { Avatar, Divider, Grid, IconButton, makeStyles, Tooltip, Typography, useTheme } from '@material-ui/core';
-import BugReportIcon from '@material-ui/icons/BugReport';
+import { Divider, Grid, IconButton, makeStyles, Tooltip, Typography, useTheme } from '@material-ui/core';
+import BugReportOutlinedIcon from '@material-ui/icons/BugReportOutlined';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import ListAltOutlinedIcon from '@material-ui/icons/ListAltOutlined';
-import MoodIcon from '@material-ui/icons/Mood';
 import MoodBadIcon from '@material-ui/icons/MoodBad';
 import PrintOutlinedIcon from '@material-ui/icons/PrintOutlined';
+import VerifiedUserOutlinedIcon from '@material-ui/icons/VerifiedUserOutlined';
 import { Skeleton } from '@material-ui/lab';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -12,6 +12,8 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import Classification from 'components/visual/Classification';
 import TextVerdict from 'components/visual/TextVerdict';
 import Verdict from 'components/visual/Verdict';
+import VerdictGauge from 'components/visual/VerdictGauge';
+import { scoreToVerdict } from 'helpers/utils';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
@@ -41,9 +43,18 @@ const useStyles = makeStyles(theme => ({
     }
   },
   icon: {
-    fontSize: '200%',
+    marginLeft: '24px',
+    marginRight: '36px',
+    fontSize: '400%',
     [theme.breakpoints.down('xs')]: {
-      fontSize: '180%'
+      marginLeft: '16px',
+      marginRight: '20px',
+      fontSize: '350%'
+    },
+    '@media print': {
+      marginLeft: '24px',
+      marginRight: '36px',
+      fontSize: '400%'
     }
   },
   malicious_heur: {
@@ -51,7 +62,7 @@ const useStyles = makeStyles(theme => ({
     fontWeight: 700,
     padding: '5px',
     WebkitPrintColorAdjust: 'exact',
-    backgroundColor: '#f2000025 !important',
+    backgroundColor: '#f2000015 !important',
     borderBottom: '1px solid #d9534f !important'
   },
   suspicious_heur: {
@@ -59,7 +70,7 @@ const useStyles = makeStyles(theme => ({
     fontWeight: 700,
     padding: '5px',
     WebkitPrintColorAdjust: 'exact',
-    backgroundColor: '#ff970025 !important',
+    backgroundColor: '#ff970015 !important',
     borderBottom: '1px solid #f0ad4e !important'
   },
   info_heur: {
@@ -67,7 +78,7 @@ const useStyles = makeStyles(theme => ({
     fontWeight: 700,
     padding: '5px',
     WebkitPrintColorAdjust: 'exact',
-    backgroundColor: '#6e6e6e25 !important',
+    backgroundColor: '#6e6e6e15 !important',
     borderBottom: '1px solid #aaa !important'
   }
 }));
@@ -76,51 +87,39 @@ function AttributionBanner({ report }) {
   const { t } = useTranslation(['submissionReport']);
   const theme = useTheme();
   const sp2 = theme.spacing(2);
+  const sp1 = theme.spacing(1);
   const classes = useStyles();
   const score = report ? report.max_score : 0;
 
   const BANNER_COLOR_MAP = {
-    0: {
+    unknown: {
       icon: <HelpOutlineIcon className={classes.icon} />,
-      bgColor: '#6e6e6e25',
+      bgColor: '#6e6e6e15',
       textColor: theme.palette.type === 'dark' ? '#AAA' : '#888'
     },
-    1: {
-      icon: <MoodIcon className={classes.icon} />,
-      bgColor: '#00f20025',
+    safe: {
+      icon: <VerifiedUserOutlinedIcon className={classes.icon} />,
+      bgColor: '#00f20015',
       textColor: theme.palette.type !== 'dark' ? theme.palette.success.dark : theme.palette.success.light
     },
-    2: {
+    suspicious: {
       icon: <MoodBadIcon className={classes.icon} />,
-      bgColor: '#4b96fe25',
+      bgColor: '#4b96fe15',
       textColor: theme.palette.type !== 'dark' ? theme.palette.info.dark : theme.palette.info.light
     },
-    3: {
+    highly_suspicious: {
       icon: <MoodBadIcon className={classes.icon} />,
-      bgColor: '#ff970025',
+      bgColor: '#ff970015',
       textColor: theme.palette.type !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
     },
-    4: {
-      icon: <BugReportIcon className={classes.icon} />,
-      bgColor: '#f2000025',
+    malicious: {
+      icon: <BugReportOutlinedIcon className={classes.icon} />,
+      bgColor: '#f2000015',
       textColor: theme.palette.type !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
     }
   };
 
-  let scoreKey = null;
-  if (score >= 2000) {
-    scoreKey = 4;
-  } else if (score >= 500) {
-    scoreKey = 3;
-  } else if (score >= 100) {
-    scoreKey = 2;
-  } else if (score < 0) {
-    scoreKey = 1;
-  } else {
-    scoreKey = 0;
-  }
-
-  const { bgColor, icon, textColor } = BANNER_COLOR_MAP[scoreKey];
+  const { bgColor, icon, textColor } = BANNER_COLOR_MAP[scoreToVerdict(score)];
   const implant =
     report && report.tags && report.tags.attributions && report.tags.attributions['attribution.implant']
       ? Object.keys(report.tags.attributions['attribution.implant']).join(' | ')
@@ -135,68 +134,86 @@ function AttributionBanner({ report }) {
       : null;
 
   return (
-    <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
-      {report ? (
-        <Grid container spacing={2}>
-          <Grid item style={{ textAlign: 'center' }}>
-            <Avatar
-              className={classes.avatar}
-              style={{ color: textColor, backgroundColor: bgColor, border: `solid 2px ${textColor}` }}
-            >
-              {icon}
-            </Avatar>
-          </Grid>
-          <Grid item style={{ wordBreak: 'break-all', alignSelf: 'center' }}>
-            <div className={classes.banner_title}>
-              {report ? <Verdict type="text" size="medium" score={report.max_score} /> : <Skeleton />}
-            </div>
-            <div>
-              {report ? (
-                implant && (
-                  <>
-                    <span>{`${t('implant')}: `}</span>
-                    <span style={{ fontWeight: 500 }}>
-                      {Object.keys(report.tags.attributions['attribution.implant']).join(' | ')}
-                    </span>
-                  </>
-                )
-              ) : (
-                <Skeleton />
-              )}
-            </div>
-            <div>
-              {report ? (
-                family && (
-                  <>
-                    <span>{`${t('family')}: `}</span>
-                    <span style={{ fontWeight: 500 }}>
-                      {Object.keys(report.tags.attributions['attribution.family']).join(' | ')}
-                    </span>
-                  </>
-                )
-              ) : (
-                <Skeleton />
-              )}
-            </div>
-            <div>
-              {report ? (
-                actor && (
-                  <>
-                    <span>{`${t('actor')}: `}</span>
-                    <span style={{ fontWeight: 500 }}>
-                      {Object.keys(report.tags.attributions['attribution.actor']).join(' | ')}
-                    </span>
-                  </>
-                )
-              ) : (
-                <Skeleton />
-              )}
-            </div>
-          </Grid>
+    <div
+      style={{
+        marginBottom: sp2,
+        marginTop: sp2,
+        paddingBottom: sp1,
+        paddingTop: sp1,
+        backgroundColor: bgColor,
+        border: `solid 1px ${textColor}`,
+        borderRadius: '4px'
+      }}
+    >
+      <Grid container alignItems="center" justify="center">
+        <Grid item xs style={{ color: textColor }}>
+          {icon}
         </Grid>
-      ) : (
-        <Skeleton />
-      )}
+        <Grid item xs style={{ flexGrow: 10 }}>
+          <div className={classes.banner_title}>
+            {report ? <Verdict type="text" size="medium" score={report.max_score} /> : <Skeleton />}
+          </div>
+          <table width={report ? null : '100%'} style={{ borderSpacing: 0 }}>
+            <tbody>
+              <tr>
+                {report ? (
+                  implant && (
+                    <>
+                      <td style={{ fontStyle: 'italic', verticalAlign: 'top' }}>{`${t('implant')}: `}</td>
+                      <td style={{ fontWeight: 500, paddingLeft: sp1 }}>
+                        {Object.keys(report.tags.attributions['attribution.implant']).join(' | ')}
+                      </td>
+                    </>
+                  )
+                ) : (
+                  <td>
+                    <Skeleton />
+                  </td>
+                )}
+              </tr>
+              <tr>
+                {report ? (
+                  family && (
+                    <>
+                      <td style={{ fontStyle: 'italic', verticalAlign: 'top' }}>{`${t('family')}: `}</td>
+                      <td style={{ fontWeight: 500, paddingLeft: sp1 }}>
+                        {Object.keys(report.tags.attributions['attribution.family']).join(' | ')}
+                      </td>
+                    </>
+                  )
+                ) : (
+                  <td>
+                    <Skeleton />
+                  </td>
+                )}
+              </tr>
+              <tr>
+                {report ? (
+                  actor && (
+                    <>
+                      <td style={{ fontStyle: 'italic', verticalAlign: 'top' }}>{`${t('actor')}: `}</td>
+                      <td style={{ fontWeight: 500, paddingLeft: sp1 }}>
+                        {Object.keys(report.tags.attributions['attribution.actor']).join(' | ')}
+                      </td>
+                    </>
+                  )
+                ) : (
+                  <td>
+                    <Skeleton />
+                  </td>
+                )}
+              </tr>
+            </tbody>
+          </table>
+        </Grid>
+        <Grid item xs style={{ color: textColor, paddingLeft: sp1, paddingRight: sp1 }}>
+          {report ? (
+            <VerdictGauge verdicts={report.verdict} />
+          ) : (
+            <Skeleton variant="circle" height="100px" width="100px" />
+          )}
+        </Grid>
+      </Grid>
     </div>
   );
 }
@@ -229,7 +246,7 @@ function TagTable({ group, items }) {
           paddingBottom: sp2
         }}
       >
-        <table>
+        <table style={{ borderSpacing: '0 8px' }}>
           <tbody>
             {Object.keys(orderedItems).map((k, idx) => {
               return (
@@ -282,7 +299,7 @@ function AttackMatrixBlock({ attack, items }) {
         paddingBottom: sp2
       }}
     >
-      <span style={{ fontSize: '1rem', textTransform: 'capitalize' }}>{attack.replaceAll('-', ' ')}</span>
+      <span style={{ fontSize: '1rem', textTransform: 'capitalize' }}>{attack.replace(/-/g, ' ')}</span>
       {Object.keys(items).map((cat, idx) => {
         return (
           <div key={idx}>
@@ -344,7 +361,7 @@ function HeuristicsList({ verdict, items }) {
       <div style={{ paddingLeft: sp1, paddingRight: sp1 }}>
         {Object.keys(items).map((heur, idx) => {
           return (
-            <div key={idx} style={{ fontSize: '1rem', verticalAlign: 'middle' }}>
+            <div key={idx} style={{ fontSize: '1rem', verticalAlign: 'middle', paddingBottom: '2px' }}>
               {heur}
             </div>
           );
@@ -482,8 +499,8 @@ export default function SubmissionReport() {
           <Classification type="text" size="tiny" c12n={report ? report.classification : null} inline />
         </div>
         <div style={{ paddingBottom: sp2 }}>
-          <Grid container>
-            <Grid item xs={12} sm={9}>
+          <Grid container alignItems="center">
+            <Grid item xs>
               <div>
                 <Typography variant="h4">{t('title')}</Typography>
                 <Typography variant="caption">
@@ -491,8 +508,8 @@ export default function SubmissionReport() {
                 </Typography>
               </div>
             </Grid>
-            <Grid item xs={4} className="print-only">
-              <img src="/images/banner.svg" alt="Assemblyline Banner" style={{ width: '100%' }} />
+            <Grid item className="print-only">
+              <img src="/images/banner.svg" alt="Assemblyline Banner" style={{ height: '72px' }} />
             </Grid>
             <Grid item xs={12} sm={3} className="no-print">
               <div style={{ textAlign: 'right' }}>
@@ -534,43 +551,6 @@ export default function SubmissionReport() {
 
               <Grid item xs={12}>
                 <div style={{ height: sp2 }} />
-              </Grid>
-
-              <Grid item xs={4} sm={3} lg={2}>
-                <span style={{ fontWeight: 500 }}>{t('file.verdict')}</span>
-              </Grid>
-              <Grid item xs={8} sm={9} lg={10}>
-                {report ? <Verdict score={report.max_score} /> : <Skeleton />}
-              </Grid>
-
-              <Grid item xs={4} sm={3} lg={2}>
-                <span style={{ fontWeight: 500 }}>{t('user.verdict')}</span>
-              </Grid>
-              <Grid item xs={8} sm={9} lg={10}>
-                {report ? (
-                  <>
-                    {`${t('malicious')}: `}
-                    <span
-                      style={{
-                        fontWeight: 600,
-                        color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                      }}
-                    >
-                      {report.verdict.malicious.length}
-                    </span>
-                    {` / ${t('non_malicious')}: `}
-                    <span
-                      style={{
-                        fontWeight: 600,
-                        color: theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark
-                      }}
-                    >
-                      {report.verdict.non_malicious.length}
-                    </span>
-                  </>
-                ) : (
-                  <Skeleton />
-                )}
               </Grid>
 
               <Grid item xs={4} sm={3} lg={2}>
@@ -708,10 +688,12 @@ export default function SubmissionReport() {
                   ? Object.keys(report.metadata).map((meta, i) => {
                       return (
                         <tr key={i}>
-                          <td style={{ wordBreak: 'break-all' }}>
+                          <td style={{ width: '20%' }}>
                             <span style={{ fontWeight: 500 }}>{meta}</span>
                           </td>
-                          <td style={{ paddingLeft: sp1, wordBreak: 'break-all' }}>{report.metadata[meta]}</td>
+                          <td style={{ paddingLeft: sp1, wordBreak: 'break-all', width: '80%' }}>
+                            {report.metadata[meta]}
+                          </td>
                         </tr>
                       );
                     })
