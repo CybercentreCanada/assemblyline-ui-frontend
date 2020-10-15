@@ -173,7 +173,9 @@ function AttributionBanner({ report }) {
                 {report ? (
                   implant && (
                     <>
-                      <td style={{ fontStyle: 'italic', verticalAlign: 'top' }}>{`${t('implant')}: `}</td>
+                      <td style={{ whiteSpace: 'nowrap', fontStyle: 'italic', verticalAlign: 'top' }}>
+                        {`${t('implant')}: `}
+                      </td>
                       <td style={{ fontWeight: 500, paddingLeft: sp1 }}>
                         {Object.keys(report.tags.attributions['attribution.implant']).join(' | ')}
                       </td>
@@ -189,7 +191,9 @@ function AttributionBanner({ report }) {
                 {report ? (
                   family && (
                     <>
-                      <td style={{ fontStyle: 'italic', verticalAlign: 'top' }}>{`${t('family')}: `}</td>
+                      <td style={{ whiteSpace: 'nowrap', fontStyle: 'italic', verticalAlign: 'top' }}>
+                        {`${t('family')}: `}
+                      </td>
                       <td style={{ fontWeight: 500, paddingLeft: sp1 }}>
                         {Object.keys(report.tags.attributions['attribution.family']).join(' | ')}
                       </td>
@@ -205,7 +209,9 @@ function AttributionBanner({ report }) {
                 {report ? (
                   actor && (
                     <>
-                      <td style={{ fontStyle: 'italic', verticalAlign: 'top' }}>{`${t('actor')}: `}</td>
+                      <td style={{ whiteSpace: 'nowrap', fontStyle: 'italic', verticalAlign: 'top' }}>
+                        {`${t('actor')}: `}
+                      </td>
                       <td style={{ fontWeight: 500, paddingLeft: sp1 }}>
                         {Object.keys(report.tags.attributions['attribution.actor']).join(' | ')}
                       </td>
