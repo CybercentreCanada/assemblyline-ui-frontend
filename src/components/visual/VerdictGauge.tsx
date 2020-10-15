@@ -23,8 +23,17 @@ const useStyles = makeStyles(theme => ({
   text: {
     fontSize: '30px',
     lineHeight: '30px',
-    paddingTop: '20px',
+    paddingTop: '15px',
     fontWeight: 900,
+    color: theme.palette.text.secondary,
+    '@media print': {
+      color: '#00000066'
+    }
+  },
+  under_text: {
+    fontSize: '13px',
+    lineHeight: '13px',
+    fontWeight: 300,
     color: theme.palette.text.secondary,
     '@media print': {
       color: '#00000066'
@@ -50,30 +59,24 @@ const VerdictGauge: React.FC<VerdictGaugeProps> = ({ verdicts, max = 20, colorBa
 
   const backgroundArc = arc()
     .innerRadius(0.7)
-    .outerRadius(1)
-    .startAngle((-Math.PI / 4) * 3)
-    .endAngle((Math.PI / 4) * 3)
+    .outerRadius(0.95)
+    .startAngle(-Math.PI)
+    .endAngle(Math.PI)
     .cornerRadius(0)();
   const percentScale = scaleLinear().domain([0, max]).range([0, 1]);
 
-  const angleScaleRight = scaleLinear()
-    .domain([0, 1])
-    .range([0, (Math.PI / 4) * 3])
-    .clamp(true);
+  const angleScaleRight = scaleLinear().domain([0, 1]).range([0, Math.PI]).clamp(true);
   const filledArcRight = arc()
     .innerRadius(0.7)
-    .outerRadius(1)
+    .outerRadius(0.95)
     .startAngle(0)
     .endAngle(angleScaleRight(percentScale(verdicts.malicious.length)))
     .cornerRadius(0)();
 
-  const angleScaleLeft = scaleLinear()
-    .domain([0, 1])
-    .range([0, (-Math.PI / 4) * 3])
-    .clamp(true);
+  const angleScaleLeft = scaleLinear().domain([0, 1]).range([0, -Math.PI]).clamp(true);
   const filledArcLeft = arc()
     .innerRadius(0.7)
-    .outerRadius(1)
+    .outerRadius(0.95)
     .startAngle(angleScaleLeft(percentScale(verdicts.non_malicious.length)))
     .endAngle(0)
     .cornerRadius(0)();
@@ -106,9 +109,10 @@ const VerdictGauge: React.FC<VerdictGaugeProps> = ({ verdicts, max = 20, colorBa
               }}
             >
               {verdicts.non_malicious.length > verdicts.malicious.length
-                ? verdicts.non_malicious.length - verdicts.malicious.length
-                : verdicts.malicious.length - verdicts.non_malicious.length}
+                ? verdicts.non_malicious.length
+                : verdicts.malicious.length}
             </div>
+            <div className={classes.under_text}>{`/ ${verdicts.non_malicious.length + verdicts.malicious.length}`}</div>
           </div>
         </div>
       </Tooltip>
