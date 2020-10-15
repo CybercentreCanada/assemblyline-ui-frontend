@@ -1,8 +1,36 @@
-import { Tooltip, useTheme } from '@material-ui/core';
+import { makeStyles, Tooltip, useTheme } from '@material-ui/core';
 import { scaleLinear } from 'd3-scale';
 import { arc } from 'd3-shape';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+
+const useStyles = makeStyles(theme => ({
+  circle: {
+    position: 'relative',
+    zIndex: 1,
+    top: '-90px',
+    left: '15px',
+    borderRadius: '50%',
+    width: '70px',
+    height: '70px',
+    boxShadow: theme.shadows[2],
+    backgroundColor: theme.palette.background.paper,
+    textAlign: 'center',
+    '@media print': {
+      backgroundColor: '#FFFFFF'
+    }
+  },
+  text: {
+    fontSize: '30px',
+    lineHeight: '30px',
+    paddingTop: '20px',
+    fontWeight: 900,
+    color: theme.palette.text.secondary,
+    '@media print': {
+      color: '#00000066'
+    }
+  }
+}));
 
 type VerdictGaugeProps = {
   verdicts: {
@@ -15,10 +43,10 @@ type VerdictGaugeProps = {
 
 const VerdictGauge: React.FC<VerdictGaugeProps> = ({ verdicts, max = 20, colorBack = '#68686815' }) => {
   const { t } = useTranslation();
+  const classes = useStyles();
   const theme = useTheme();
   const colorMalicious = theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark;
   const colorNonMalicious = theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark;
-  const colorNeutral = theme.palette.text.secondary;
 
   const backgroundArc = arc()
     .innerRadius(0.7)
@@ -65,32 +93,16 @@ const VerdictGauge: React.FC<VerdictGaugeProps> = ({ verdicts, max = 20, colorBa
               <path d={filledArcRight} fill={colorMalicious} />
             </g>
           </svg>
-          <div
-            style={{
-              position: 'relative',
-              zIndex: 1,
-              top: '-90px',
-              left: '15px',
-              borderRadius: '50%',
-              width: '70px',
-              height: '70px',
-              boxShadow: theme.shadows[2],
-              backgroundColor: theme.palette.background.paper,
-              textAlign: 'center'
-            }}
-          >
+          <div className={classes.circle}>
             <div
+              className={classes.text}
               style={{
-                fontSize: '30px',
-                lineHeight: '30px',
-                paddingTop: '20px',
-                fontWeight: 900,
                 color:
                   verdicts.non_malicious.length > verdicts.malicious.length
                     ? colorNonMalicious
                     : verdicts.malicious.length > verdicts.non_malicious.length
                     ? colorMalicious
-                    : colorNeutral
+                    : null
               }}
             >
               {verdicts.non_malicious.length > verdicts.malicious.length

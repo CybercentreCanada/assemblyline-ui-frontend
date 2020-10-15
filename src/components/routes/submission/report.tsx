@@ -1,4 +1,4 @@
-import { Divider, Grid, IconButton, makeStyles, Tooltip, Typography, useTheme } from '@material-ui/core';
+import { Divider, Grid, Hidden, IconButton, makeStyles, Tooltip, Typography, useTheme } from '@material-ui/core';
 import BugReportOutlinedIcon from '@material-ui/icons/BugReportOutlined';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import ListAltOutlinedIcon from '@material-ui/icons/ListAltOutlined';
@@ -13,7 +13,7 @@ import Classification from 'components/visual/Classification';
 import TextVerdict from 'components/visual/TextVerdict';
 import Verdict from 'components/visual/Verdict';
 import VerdictGauge from 'components/visual/VerdictGauge';
-import { scoreToVerdict } from 'helpers/utils';
+import { bytesToSize, scoreToVerdict } from 'helpers/utils';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
@@ -40,6 +40,19 @@ const useStyles = makeStyles(theme => ({
     fontSize: '200%',
     [theme.breakpoints.down('xs')]: {
       fontSize: '180%'
+    }
+  },
+  divider: {
+    '@media print': {
+      backgroundColor: '#0000001f !important'
+    }
+  },
+  file_details: {
+    fontFamily: 'monospace',
+    color: theme.palette.text.secondary,
+    paddingBottom: '4px',
+    '@media print': {
+      color: 'rgba(0, 0, 0, 0.54)'
     }
   },
   icon: {
@@ -138,17 +151,18 @@ function AttributionBanner({ report }) {
       style={{
         marginBottom: sp2,
         marginTop: sp2,
-        paddingBottom: sp1,
-        paddingTop: sp1,
+        padding: sp1,
         backgroundColor: bgColor,
         border: `solid 1px ${textColor}`,
         borderRadius: '4px'
       }}
     >
       <Grid container alignItems="center" justify="center">
-        <Grid item xs style={{ color: textColor }}>
-          {icon}
-        </Grid>
+        <Hidden smDown>
+          <Grid item xs style={{ color: textColor }}>
+            {icon}
+          </Grid>
+        </Hidden>
         <Grid item xs style={{ flexGrow: 10 }}>
           <div className={classes.banner_title}>
             {report ? <Verdict type="text" size="medium" score={report.max_score} /> : <Skeleton />}
@@ -224,6 +238,7 @@ function TagTable({ group, items }) {
   const orderedItems = {};
   const sp2 = theme.spacing(2);
   const sp1 = theme.spacing(1);
+  const classes = useStyles();
 
   Object.keys(items).map(tagType =>
     Object.keys(items[tagType]).map(tagValue => {
@@ -239,20 +254,22 @@ function TagTable({ group, items }) {
   return (
     <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
       <Typography variant="h6">{t(`tag.${group}`)}</Typography>
-      <Divider />
+      <Divider className={classes.divider} />
       <div
         style={{
           paddingTop: sp2,
-          paddingBottom: sp2
+          paddingBottom: sp2,
+          paddingLeft: sp1,
+          paddingRight: sp1
         }}
       >
-        <table style={{ borderSpacing: '0 8px' }}>
-          <tbody>
-            {Object.keys(orderedItems).map((k, idx) => {
-              return (
-                <tr key={idx} style={{ marginBottom: sp2 }}>
-                  <td style={{ verticalAlign: 'top' }}>
-                    <div style={{ display: 'flex' }}>
+        <Grid container spacing={1}>
+          {Object.keys(orderedItems).map((k, idx) => {
+            return (
+              <Grid key={idx} style={{ marginBottom: sp2, paddingLeft: sp1, paddingRight: sp1, minWidth: '21rem' }}>
+                <Grid container spacing={1}>
+                  <Grid item>
+                    <div style={{ display: 'flex', minWidth: '5rem' }}>
                       <TextVerdict verdict={orderedItems[k].verdict} mono />
                       <Tooltip title={orderedItems[k].type}>
                         <span style={{ fontSize: '110%', flexGrow: 1, textTransform: 'capitalize' }}>
@@ -260,8 +277,8 @@ function TagTable({ group, items }) {
                         </span>
                       </Tooltip>
                     </div>
-                  </td>
-                  <td style={{ paddingLeft: sp1 }}>
+                  </Grid>
+                  <Grid item>
                     {orderedItems[k].values.map((v, vidx) => {
                       return (
                         <div
@@ -275,12 +292,12 @@ function TagTable({ group, items }) {
                         </div>
                       );
                     })}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                  </Grid>
+                </Grid>
+              </Grid>
+            );
+          })}
+        </Grid>
       </div>
     </div>
   );
@@ -388,40 +405,42 @@ function HeuristicsListSkel() {
   );
 }
 
-function FileTree({ tree, important_files, spacing = 0 }) {
-  const theme = useTheme();
-  const { t } = useTranslation(['submissionReport']);
+function FileTree({ tree, important_files }) {
+  const classes = useStyles();
+
   return (
     <div>
       {Object.keys(tree).map((f, i) => {
         return important_files.indexOf(f) !== -1 ? (
-          <div key={i} style={{ marginLeft: theme.spacing(spacing), wordBreak: 'break-all', pageBreakInside: 'avoid' }}>
-            <Verdict score={tree[f].score} short mono />
-            <b style={{ fontSize: '110%' }}>{tree[f].name}</b>
-            <table
-              style={{
-                fontFamily: 'monospace',
-                color: theme.palette.text.secondary,
-                borderSpacing: 0,
-                paddingBottom: theme.spacing(1)
-              }}
-            >
+          <div key={i} style={{ wordBreak: 'break-all', pageBreakInside: 'avoid' }}>
+            <table style={{ borderSpacing: 0 }}>
               <tbody>
                 <tr>
-                  <td style={{ wordBreak: 'normal', verticalAlign: 'top' }}>{t('file.type')}:&nbsp;</td>
-                  <td>{tree[f].type}</td>
+                  <td style={{ verticalAlign: 'top' }}>
+                    <Verdict score={tree[f].score} short mono />
+                  </td>
+                  <td>
+                    <b style={{ fontSize: '110%' }}>{tree[f].name}</b>
+                  </td>
                 </tr>
                 <tr>
-                  <td style={{ wordBreak: 'normal', verticalAlign: 'top' }}>{t('file.sha256')}:&nbsp;</td>
-                  <td>{tree[f].sha256}</td>
+                  <td />
+                  <td>
+                    <div className={classes.file_details}>
+                      {`${tree[f].sha256} - ${tree[f].type} - `}
+                      <b>{tree[f].size}</b>
+                      <span style={{ fontWeight: 300 }}> ({bytesToSize(tree[f].size)})</span>
+                    </div>
+                  </td>
                 </tr>
                 <tr>
-                  <td style={{ wordBreak: 'normal', verticalAlign: 'top' }}>{t('file.size')}:&nbsp;</td>
-                  <td>{tree[f].size}</td>
+                  <td />
+                  <td>
+                    <FileTree tree={tree[f].children} important_files={important_files} />
+                  </td>
                 </tr>
               </tbody>
             </table>
-            <FileTree tree={tree[f].children} important_files={important_files} spacing={spacing + 4} />
           </div>
         ) : null;
       })}
@@ -464,6 +483,7 @@ export default function SubmissionReport() {
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
+  const classes = useStyles();
   const { showErrorMessage, showWarningMessage } = useMySnackbar();
 
   useEffect(() => {
@@ -489,7 +509,7 @@ export default function SubmissionReport() {
 
   return (
     <PageCenter>
-      <div style={{ textAlign: 'left' }}>
+      <div style={{ textAlign: 'left', paddingBottom: sp2 }}>
         <div style={{ paddingBottom: sp4, paddingTop: sp2 }}>
           <Classification size="tiny" c12n={report ? report.classification : null} />
         </div>
@@ -532,7 +552,7 @@ export default function SubmissionReport() {
 
         <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
           <Typography variant="h6">{t('general')}</Typography>
-          <Divider />
+          <Divider className={classes.divider} />
           <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
             <Grid container spacing={1}>
               <Grid item xs={4} sm={3} lg={2}>
@@ -681,7 +701,7 @@ export default function SubmissionReport() {
         {(!report || Object.keys(report.metadata).length !== 0) && (
           <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
             <Typography variant="h6">{t('metadata')}</Typography>
-            <Divider />
+            <Divider className={classes.divider} />
             <table style={{ paddingBottom: sp2, paddingTop: sp2, width: '100%' }}>
               <tbody>
                 {report
@@ -717,7 +737,7 @@ export default function SubmissionReport() {
         {(!report || Object.keys(report.attack_matrix).length !== 0) && (
           <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
             <Typography variant="h6">{t('attack')}</Typography>
-            <Divider />
+            <Divider className={classes.divider} />
             <div
               style={{
                 paddingTop: sp2,
@@ -743,7 +763,7 @@ export default function SubmissionReport() {
           Object.keys(report.heuristics.info.length !== 0)) && (
           <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
             <Typography variant="h6">{t('heuristics')}</Typography>
-            <Divider />
+            <Divider className={classes.divider} />
             <div
               style={{
                 display: 'flex',
@@ -780,7 +800,7 @@ export default function SubmissionReport() {
         {(!report || report.important_files.length !== 0) && (
           <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
             <Typography variant="h6">{t('important_files')}</Typography>
-            <Divider />
+            <Divider className={classes.divider} />
             <div
               style={{
                 paddingTop: sp2,
