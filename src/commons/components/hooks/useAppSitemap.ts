@@ -51,7 +51,7 @@ export const appendRoute = (breadcrumbs: BreadcrumbItem[], breadcrumb: Breadcrum
     const index = breadcrumbs.findIndex(_breadcrumb => _breadcrumb.route.path === breadcrumb.route.path);
     // If the route is already in breacrumbs, then we slice off what comes after,
     //  if not then we append it to the end.
-    return index > -1 ? breadcrumbs.slice(0, index + 1) : [...breadcrumbs, breadcrumb];
+    return index > -1 ? [...breadcrumbs.slice(0, index), breadcrumb] : [...breadcrumbs, breadcrumb];
   }
   return breadcrumbs;
 };

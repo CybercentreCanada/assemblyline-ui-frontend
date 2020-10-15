@@ -43,7 +43,7 @@ function SiteMapProvider(props: SiteMapProviderProps) {
     //  is unmounted.  Failure to do this will result in an event handler
     //  being registered each time this component renders.
     return history.listen(location => {
-      const _matchedRoute = getRoute(location.pathname + location.search, contextProps.routes);
+      const _matchedRoute = getRoute(location.pathname, contextProps.routes);
       const _breadcrumbs = appendRoute(breadcrumbs, _matchedRoute);
       setBreadcrumbs(_breadcrumbs);
     });
