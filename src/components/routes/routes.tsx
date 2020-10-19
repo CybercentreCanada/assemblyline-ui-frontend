@@ -30,14 +30,22 @@ import Submissions from 'components/routes/submissions';
 import Submit from 'components/routes/submit';
 import Tos from 'components/routes/tos';
 import User from 'components/routes/user';
-import React, { useEffect } from 'react';
-import { Redirect, Route, Switch, useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { matchPath, Redirect, Route, Switch, useLocation } from 'react-router-dom';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
+  const [oldID, setOldID] = useState(null);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    const { params } = { params: { id: null }, ...matchPath(pathname, { path: '/submission/detail/:id' }) };
+    // eslint-disable-next-line prefer-destructuring, @typescript-eslint/dot-notation
+    const id = params['id'];
+    if (id === null || id === undefined || id === oldID) {
+      window.scrollTo(0, 0);
+      setOldID(id);
+    }
+    // eslint-disable-next-line
   }, [pathname]);
 
   return null;
@@ -76,6 +84,7 @@ const Routes = () => {
         <Route exact path="/search/:id" component={Search} />
         <Route exact path="/settings" component={Settings} />
         <Route exact path="/submit" component={Submit} />
+        <Route exact path="/submission/detail/:id/:fid" component={SubmissionDetail} />
         <Route exact path="/submission/detail/:id" component={SubmissionDetail} />
         <Route exact path="/submission/report/:id" component={SubmissionReport} />
         {settings.submission_view === 'detail' ? (

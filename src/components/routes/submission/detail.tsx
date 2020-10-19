@@ -1,6 +1,18 @@
-import { Divider, Grid, IconButton, Link as MaterialLink, Tooltip, Typography, useTheme } from '@material-ui/core';
+import {
+  Box,
+  Divider,
+  Drawer,
+  Grid,
+  IconButton,
+  Link as MaterialLink,
+  makeStyles,
+  Tooltip,
+  Typography,
+  useTheme
+} from '@material-ui/core';
 import ChromeReaderModeOutlinedIcon from '@material-ui/icons/ChromeReaderModeOutlined';
 import ClearOutlinedIcon from '@material-ui/icons/ClearOutlined';
+import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
 import CloudDownloadOutlinedIcon from '@material-ui/icons/CloudDownloadOutlined';
 import DoneOutlinedIcon from '@material-ui/icons/DoneOutlined';
 import ReplayOutlinedIcon from '@material-ui/icons/ReplayOutlined';
@@ -11,6 +23,7 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import Attack from 'components/visual/Attack';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
+import FileDetail from 'components/visual/FileDetail';
 import Heuristic from 'components/visual/Heuristic';
 import Tag from 'components/visual/Tag';
 import Verdict from 'components/visual/Verdict';
@@ -20,23 +33,44 @@ import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { Link, useHistory, useParams } from 'react-router-dom';
 
+const useStyles = makeStyles(theme => ({
+  file_item: {
+    cursor: 'pointer',
+    '&:hover, &:focus': {
+      backgroundColor: theme.palette.action.hover
+    }
+  },
+  drawerPaper: {
+    width: '85%',
+    maxWidth: '1200px',
+    [theme.breakpoints.down('sm')]: {
+      width: '100%'
+    }
+  }
+}));
+
 type ParamProps = {
   id: string;
+  fid?: string;
 };
 
 export default function SubmissionDetail() {
   const { t } = useTranslation(['submissionDetail']);
-  const { id } = useParams<ParamProps>();
+  const { id, fid } = useParams<ParamProps>();
   const theme = useTheme();
   const [submission, setSubmission] = useState(null);
+  const [drawer, setDrawer] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
   const [summary, setSummary] = useState(null);
   const [tree, setTree] = useState(null);
   const [deleteDialog, setDeleteDialog] = useState(false);
   const apiCall = useMyAPI();
+  const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
   const { showSuccessMessage } = useMySnackbar();
   const history = useHistory();
+  const classes = useStyles();
 
   const resubmit = () => {
     if (submission != null) {
@@ -87,11 +121,15 @@ export default function SubmissionDetail() {
     apiCall({
       url: `/api/v4/submission/tree/${id}/`,
       onSuccess: api_data => {
-        // setTree(api_data.api_response);
+        setTree(api_data.api_response);
       }
     });
     // eslint-disable-next-line
   }, [id]);
+
+  useEffect(() => {
+    setDrawer(fid !== undefined);
+  }, [fid]);
 
   return (
     <PageCenter>
@@ -105,6 +143,19 @@ export default function SubmissionDetail() {
         text={t('delete.text')}
       />
 
+      <Drawer
+        anchor="right"
+        classes={{ paper: classes.drawerPaper }}
+        open={drawer}
+        onClose={() => history.push(`/submission/detail/${id}`)}
+      >
+        <div style={{ padding: sp1 }}>
+          <IconButton onClick={() => history.push(`/submission/detail/${id}`)}>
+            <CloseOutlinedIcon />
+          </IconButton>
+        </div>
+        {drawer && <FileDetail sha256={fid} sid={id} name={selectedFile} />}
+      </Drawer>
       <div style={{ textAlign: 'left' }}>
         <div style={{ paddingBottom: sp4, paddingTop: sp2 }}>
           <Classification size="tiny" c12n={submission ? submission.classification : null} />
@@ -367,18 +418,18 @@ export default function SubmissionDetail() {
             <Typography variant="h6">{t('tree')}</Typography>
             <Divider />
             <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
-              {tree
-                ? Object.keys(tree.tree).map((sha256, i) => {
-                    return <div key={i}>{sha256}</div>;
-                  })
-                : [...Array(3)].map((_, i) => {
-                    return (
-                      <div style={{ display: 'flex' }} key={i}>
-                        <Skeleton style={{ height: '2rem', width: '1.5rem', marginRight: '0.5rem' }} />
-                        <Skeleton style={{ flexGrow: 1 }} />
-                      </div>
-                    );
-                  })}
+              {tree ? (
+                <FileTree tree={tree.tree} sid={id} setSelectedFile={setSelectedFile} />
+              ) : (
+                [...Array(3)].map((_, i) => {
+                  return (
+                    <div style={{ display: 'flex' }} key={i}>
+                      <Skeleton style={{ height: '2rem', width: '1.5rem', marginRight: '0.5rem' }} />
+                      <Skeleton style={{ flexGrow: 1 }} />
+                    </div>
+                  );
+                })
+              )}
             </div>
           </div>
         </div>
@@ -386,3 +437,56 @@ export default function SubmissionDetail() {
     </PageCenter>
   );
 }
+
+type FileItemProps = {
+  children: {
+    [key: string]: FileItemProps;
+  };
+  name: string[];
+  score: number;
+  sha256: string;
+  size: number;
+  truncated: boolean;
+  type: string;
+};
+
+type FileTreeProps = {
+  tree: {
+    [key: string]: FileItemProps;
+  };
+  sid: string;
+  setSelectedFile: (name: string) => void;
+};
+
+const FileTree = ({ tree, sid, setSelectedFile }: FileTreeProps) => {
+  const theme = useTheme();
+  const classes = useStyles();
+  const history = useHistory();
+
+  return (
+    <>
+      {Object.keys(tree).map((sha256, i) => {
+        const item = tree[sha256];
+        return (
+          <div key={i}>
+            <Box
+              className={classes.file_item}
+              onClick={() => {
+                setSelectedFile(item.name[0]);
+                history.push(`/submission/detail/${sid}/${item.sha256}`);
+              }}
+              style={{ wordBreak: 'break-all' }}
+            >
+              <Verdict score={item.score} mono short />
+              {`:: ${item.name.join(' | ')} `}
+              <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{`[${item.type}]`}</span>
+            </Box>
+            <div style={{ marginLeft: theme.spacing(3) }}>
+              <FileTree tree={item.children} sid={sid} setSelectedFile={setSelectedFile} />
+            </div>
+          </div>
+        );
+      })}
+    </>
+  );
+};

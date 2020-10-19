@@ -1,0 +1,483 @@
+import { Divider, Grid, IconButton, Link as MaterialLink, Tooltip, Typography, useTheme } from '@material-ui/core';
+import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
+import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
+import PageviewOutlinedIcon from '@material-ui/icons/PageviewOutlined';
+import ReplayOutlinedIcon from '@material-ui/icons/ReplayOutlined';
+import { Skeleton } from '@material-ui/lab';
+import useMyAPI from 'components/hooks/useMyAPI';
+import { bytesToSize } from 'helpers/utils';
+import getXSRFCookie from 'helpers/xsrf';
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import Moment from 'react-moment';
+import { Link } from 'react-router-dom';
+import Attack from './Attack';
+import Classification from './Classification';
+import CustomChip from './CustomChip';
+import Heuristic from './Heuristic';
+import Tag from './Tag';
+
+type ExtractedFile = {
+  classification: string;
+  description: string;
+  name: string;
+  sha256: string;
+};
+
+type Section = {
+  body: any;
+  body_format: string;
+  classification: string;
+  depth: number;
+  heuristic: {
+    attack: any;
+    heur_id: string;
+    name: string;
+    score: number;
+    signature: {
+      frequency: number;
+      name: string;
+    }[];
+  };
+  tags: {
+    type: string;
+    short_type: string;
+    value: string;
+  }[];
+  title_text: string;
+};
+
+type SectionItem = {
+  children: SectionItem[];
+  id: number;
+};
+
+type Result = {
+  archive_ts: string;
+  classification: string;
+  created: string;
+  drop_file: boolean;
+  expiry_ts: string | null;
+  response: {
+    extracted: ExtractedFile[];
+    milestones: {
+      service_completed: string;
+      service_started: string;
+    };
+    service_context: string;
+    service_debug_info: string;
+    service_name: string;
+    service_tool_version: string;
+    supplementary: ExtractedFile[];
+  };
+  result: {
+    score: number;
+    sections: Section[];
+  };
+  section_hierarchy: SectionItem[];
+  sha256: string;
+};
+
+type FileInfo = {
+  archive_ts: string;
+  ascii: string;
+  classification: string;
+  entropy: number;
+  expiry_ts: string | null;
+  hex: string;
+  magic: string;
+  md5: string;
+  mime: string;
+  seen: {
+    count: number;
+    first: string;
+    last: string;
+  };
+  sha1: string;
+  sha256: string;
+  size: number;
+  ssdeep: string;
+  type: string;
+};
+
+type File = {
+  attack_matrix: {
+    [category: string]: string[][];
+  };
+  errors: any;
+  file_info: FileInfo;
+  heuristics: {
+    [category: string]: string[][];
+  };
+  metadata: {
+    [level: string]: {
+      [key: string]: any;
+    };
+  };
+  results: Result[];
+  signatures: string[][];
+  tags: {
+    [type: string]: string[][];
+  };
+};
+
+type FileDetailProps = {
+  sha256: string;
+  sid?: string;
+  name?: string;
+};
+
+const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, name = null }) => {
+  const { t } = useTranslation(['fileDetail']);
+  const [file, setFile] = useState<File | null>(null);
+  const apiCall = useMyAPI();
+  const theme = useTheme();
+  const sp2 = theme.spacing(2);
+  const sp4 = theme.spacing(4);
+
+  useEffect(() => {
+    if (sid && sha256) {
+      apiCall({
+        url: `/api/v4/submission/${sid}/file/${sha256}/`,
+        onSuccess: api_data => {
+          setFile(api_data.api_response);
+        }
+      });
+    } else if (sha256) {
+      apiCall({
+        url: `/api/v4/file/result/${sha256}/`,
+        onSuccess: api_data => {
+          setFile(api_data.api_response);
+        }
+      });
+    } else {
+      setFile(null);
+    }
+    // eslint-disable-next-line
+  }, [sha256, sid]);
+
+  return (
+    <div style={{ textAlign: 'left', padding: sp2 }}>
+      <div style={{ paddingBottom: sp4, paddingTop: sp2 }}>
+        <Classification size="tiny" c12n={file ? file.file_info.classification : null} />
+      </div>
+      <div style={{ paddingBottom: sp4 }}>
+        <Grid container alignItems="center">
+          <Grid item xs>
+            <div>
+              <Typography variant="h4">{t('title')}</Typography>
+              <Typography variant="caption" style={{ wordBreak: 'break-all' }}>
+                {file ? name || file.file_info.sha256 : <Skeleton style={{ width: '10rem' }} />}
+              </Typography>
+            </div>
+          </Grid>
+          <Grid item xs={12} sm>
+            <div style={{ textAlign: 'right' }}>
+              <Tooltip title={t('related')}>
+                <IconButton
+                  component={Link}
+                  to={`/search/submission?q=files.sha256:${file && file.file_info.sha256} OR results:${
+                    file && file.file_info.sha256
+                  }*`}
+                >
+                  <AmpStoriesOutlinedIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={t('download')}>
+                <IconButton
+                  component={MaterialLink}
+                  href={`/api/v4/file/download/${file && file.file_info.sha256}/?XSRF_TOKEN=${getXSRFCookie()}`}
+                >
+                  <GetAppOutlinedIcon color="action" />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={t('file_viewer')}>
+                <IconButton component={Link} to={`/file/viewer/${file && file.file_info.sha256}`}>
+                  <PageviewOutlinedIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={t('resubmit_dynamic')}>
+                <IconButton onClick={() => {}}>
+                  <ReplayOutlinedIcon />
+                </IconButton>
+              </Tooltip>
+            </div>
+          </Grid>
+        </Grid>
+      </div>
+
+      <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+        <Typography variant="h6">{t('identification')}</Typography>
+        <Divider />
+        <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+          <Grid container>
+            <Grid item xs={4} sm={3} lg={2}>
+              <span style={{ fontWeight: 500 }}>MD5</span>
+            </Grid>
+            <Grid
+              item
+              xs={8}
+              sm={9}
+              lg={10}
+              style={{ wordBreak: 'break-all', fontSize: '110%', fontFamily: 'monospace' }}
+            >
+              {file ? file.file_info.md5 : <Skeleton />}
+            </Grid>
+
+            <Grid item xs={4} sm={3} lg={2}>
+              <span style={{ fontWeight: 500 }}>SHA1</span>
+            </Grid>
+            <Grid
+              item
+              xs={8}
+              sm={9}
+              lg={10}
+              style={{ wordBreak: 'break-all', fontSize: '110%', fontFamily: 'monospace' }}
+            >
+              {file ? file.file_info.sha1 : <Skeleton />}
+            </Grid>
+
+            <Grid item xs={4} sm={3} lg={2}>
+              <span style={{ fontWeight: 500 }}>SHA256</span>
+            </Grid>
+            <Grid
+              item
+              xs={8}
+              sm={9}
+              lg={10}
+              style={{ wordBreak: 'break-all', fontSize: '110%', fontFamily: 'monospace' }}
+            >
+              {file ? file.file_info.sha256 : <Skeleton />}
+            </Grid>
+
+            <Grid item xs={4} sm={3} lg={2}>
+              <span style={{ fontWeight: 500 }}>SSDEEP</span>
+            </Grid>
+            <Grid
+              item
+              xs={8}
+              sm={9}
+              lg={10}
+              style={{ wordBreak: 'break-all', fontSize: '110%', fontFamily: 'monospace' }}
+            >
+              {file ? file.file_info.ssdeep : <Skeleton />}
+            </Grid>
+
+            <Grid item xs={4} sm={3} lg={2}>
+              <span style={{ fontWeight: 500 }}>{t('size')}</span>
+            </Grid>
+            <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-all' }}>
+              {file ? (
+                <span>
+                  {file.file_info.size}
+                  <span style={{ fontWeight: 300 }}> ({bytesToSize(file.file_info.size)})</span>
+                </span>
+              ) : (
+                <Skeleton />
+              )}
+            </Grid>
+
+            <Grid item xs={4} sm={3} lg={2}>
+              <span style={{ fontWeight: 500 }}>{t('mime')}</span>
+            </Grid>
+            <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-all' }}>
+              {file ? file.file_info.mime : <Skeleton />}
+            </Grid>
+
+            <Grid item xs={4} sm={3} lg={2}>
+              <span style={{ fontWeight: 500 }}>{t('magic')}</span>
+            </Grid>
+            <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-all' }}>
+              {file ? file.file_info.magic : <Skeleton />}
+            </Grid>
+
+            <Grid item xs={4} sm={3} lg={2}>
+              <span style={{ fontWeight: 500 }}>{t('entropy')}</span>
+            </Grid>
+            <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-all' }}>
+              {file ? file.file_info.entropy : <Skeleton />}
+            </Grid>
+          </Grid>
+        </div>
+      </div>
+
+      <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+        <Typography variant="h6">{t('frequency')}</Typography>
+        <Divider />
+        <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+          <Grid container>
+            <Grid item xs={4} sm={3} lg={2}>
+              <span style={{ fontWeight: 500 }}>{t('seen.first')}</span>
+            </Grid>
+            <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-all' }}>
+              {file ? (
+                <div>
+                  <Moment fromNow>{file.file_info.seen.first}</Moment> (
+                  <Moment format="YYYY-MM-DD HH:mm:ss">{file.file_info.seen.first}</Moment>)
+                </div>
+              ) : (
+                <Skeleton />
+              )}
+            </Grid>
+
+            <Grid item xs={4} sm={3} lg={2}>
+              <span style={{ fontWeight: 500 }}>{t('seen.last')}</span>
+            </Grid>
+            <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-all' }}>
+              {file ? (
+                <div>
+                  <Moment fromNow>{file.file_info.seen.last}</Moment> (
+                  <Moment format="YYYY-MM-DD HH:mm:ss">{file.file_info.seen.last}</Moment>)
+                </div>
+              ) : (
+                <Skeleton />
+              )}
+            </Grid>
+
+            <Grid item xs={4} sm={3} lg={2}>
+              <span style={{ fontWeight: 500 }}>{t('seen.count')}</span>
+            </Grid>
+            <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-all' }}>
+              {file ? file.file_info.seen.count : <Skeleton />}
+            </Grid>
+          </Grid>
+        </div>
+      </div>
+
+      {(!file || Object.keys(file.metadata).length !== 0) && (
+        <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
+          <Typography variant="h6">{t('metadata')}</Typography>
+          <Divider />
+          <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+            {file
+              ? Object.keys(file.metadata).map((meta, i) => {
+                  return (
+                    <Grid container key={i}>
+                      <Grid item xs={12} sm={3} lg={2}>
+                        <span style={{ fontWeight: 500, wordBreak: 'break-all', textTransform: 'capitalize' }}>
+                          {meta}
+                        </span>
+                      </Grid>
+                      <Grid item xs={12} sm={9} lg={10}>
+                        {Object.keys(file.metadata[meta]).map((item, key) => {
+                          return <CustomChip size="tiny" key={key} label={`${file.metadata[meta][item]}x ${item}`} />;
+                        })}
+                      </Grid>
+                    </Grid>
+                  );
+                })
+              : [...Array(3)].map((_, i) => {
+                  return (
+                    <Grid container key={i} spacing={1}>
+                      <Grid item xs={12} sm={3} lg={2}>
+                        <Skeleton style={{ height: '2rem' }} />
+                      </Grid>
+                      <Grid item xs={12} sm={9} lg={10}>
+                        <Skeleton style={{ height: '2rem' }} />
+                      </Grid>
+                    </Grid>
+                  );
+                })}
+          </div>
+        </div>
+      )}
+
+      {(!file || Object.keys(file.attack_matrix).length !== 0) && (
+        <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
+          <Typography variant="h6">{t('attack_matrix')}</Typography>
+          <Divider />
+          <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+            {file
+              ? Object.keys(file.attack_matrix).map((cat, i) => {
+                  return (
+                    <Grid container key={i}>
+                      <Grid item xs={12} sm={3} lg={2}>
+                        <span style={{ fontWeight: 500, textTransform: 'capitalize' }}>{cat.replace(/-/g, ' ')}</span>
+                      </Grid>
+                      <Grid item xs={12} sm={9} lg={10}>
+                        {file.attack_matrix[cat].map(([cid, mat, lvl], idx) => {
+                          return <Attack key={`${cid}_${idx}`} text={mat} lvl={lvl} />;
+                        })}
+                      </Grid>
+                    </Grid>
+                  );
+                })
+              : [...Array(3)].map((_, i) => {
+                  return (
+                    <Grid container key={i} spacing={1}>
+                      <Grid item xs={12} sm={3} lg={2}>
+                        <Skeleton style={{ height: '2rem' }} />
+                      </Grid>
+                      <Grid item xs={12} sm={9} lg={10}>
+                        <Skeleton style={{ height: '2rem' }} />
+                      </Grid>
+                    </Grid>
+                  );
+                })}
+          </div>
+        </div>
+      )}
+
+      {(!file || Object.keys(file.heuristics).length !== 0) && (
+        <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
+          <Typography variant="h6">{t('heuristics')}</Typography>
+          <Divider />
+          <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+            {file
+              ? Object.keys(file.heuristics).map((lvl, i) => {
+                  return (
+                    <Grid container key={i}>
+                      <Grid item xs={12} sm={3} lg={2}>
+                        <span style={{ fontWeight: 500, wordBreak: 'break-all' }}>{t(`verdict.${lvl}`)}</span>
+                      </Grid>
+                      <Grid item xs={12} sm={9} lg={10}>
+                        {file.heuristics[lvl].map(([cid, hname], idx) => {
+                          return <Heuristic key={`${cid}_${idx}`} text={hname} lvl={lvl} />;
+                        })}
+                      </Grid>
+                    </Grid>
+                  );
+                })
+              : [...Array(3)].map((_, i) => {
+                  return (
+                    <Grid container key={i} spacing={1}>
+                      <Grid item xs={12} sm={3} lg={2}>
+                        <Skeleton style={{ height: '2rem' }} />
+                      </Grid>
+                      <Grid item xs={12} sm={9} lg={10}>
+                        <Skeleton style={{ height: '2rem' }} />
+                      </Grid>
+                    </Grid>
+                  );
+                })}
+          </div>
+        </div>
+      )}
+
+      {file && Object.keys(file.tags).length !== 0 && (
+        <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
+          <Typography variant="h6">{t('generated_tags')}</Typography>
+          <Divider />
+          <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+            {Object.keys(file.tags).map((tag_type, i) => {
+              return (
+                <Grid container key={i}>
+                  <Grid item xs={12} sm={3} lg={2}>
+                    <span style={{ fontWeight: 500 }}>{tag_type}</span>
+                  </Grid>
+                  <Grid item xs={12} sm={9} lg={10}>
+                    {file.tags[tag_type].map(([value, lvl], idx) => {
+                      return <Tag key={idx} value={value} type={tag_type} lvl={lvl} />;
+                    })}
+                  </Grid>
+                </Grid>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default FileDetail;

@@ -18,12 +18,14 @@ const Tag: React.FC<TagProps> = ({ lvl, type, value }) => {
 
   return (
     <CustomChip
+      wrap
       size="tiny"
       type="square"
       color={{ info: 'default' as 'default', suspicious: 'warning' as 'warning', malicious: 'error' as 'error' }[lvl]}
       label={value}
       onDelete={searchAttack}
       deleteIcon={<SearchOutlinedIcon style={{ marginLeft: '2px', height: '18px', width: '18px' }} />}
+      style={{ height: 'auto' }}
     />
   );
 };

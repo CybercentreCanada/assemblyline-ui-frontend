@@ -9,6 +9,8 @@ import adminUsersEN from 'locales/en/admin/users.json';
 import alertsEN from 'locales/en/alerts.json';
 import dashboardEN from 'locales/en/dashboard.json';
 import favoritesEN from 'locales/en/favorites.json';
+import fileDetailEN from 'locales/en/file/detail.json';
+import fileViewerEN from 'locales/en/file/viewer.json';
 import helpAPIEN from 'locales/en/help/api.json';
 import helpClassificationEN from 'locales/en/help/classification.json';
 import helpConfigurationEN from 'locales/en/help/configuration.json';
@@ -39,6 +41,8 @@ import adminUsersFR from 'locales/fr/admin/users.json';
 import alertsFR from 'locales/fr/alerts.json';
 import dashboardFR from 'locales/fr/dashboard.json';
 import favoritesFR from 'locales/fr/favorites.json';
+import fileDetailFR from 'locales/fr/file/detail.json';
+import fileViewerFR from 'locales/fr/file/viewer.json';
 import helpAPIFR from 'locales/fr/help/api.json';
 import helpClassificationFR from 'locales/fr/help/classification.json';
 import helpConfigurationFR from 'locales/fr/help/configuration.json';
@@ -71,6 +75,8 @@ const resources = {
     dashboard: dashboardEN,
     error403: error403EN,
     error404: error404EN,
+    fileDetail: fileDetailEN,
+    fileViewer: fileViewerEN,
     helpAPI: helpAPIEN,
     helpClassification: helpClassificationEN,
     helpConfiguration: helpConfigurationEN,
@@ -103,6 +109,8 @@ const resources = {
     dashboard: dashboardFR,
     error403: error403FR,
     error404: error404FR,
+    fileDetail: fileDetailFR,
+    fileViewer: fileViewerFR,
     helpAPI: helpAPIFR,
     helpClassification: helpClassificationFR,
     helpConfiguration: helpConfigurationFR,

@@ -59,6 +59,12 @@ export default function useMySitemap() {
         breadcrumbs: ['/submissions']
       },
       {
+        path: '/submission/detail/:id/:fid',
+        title: t('breadcrumb.submission.detail'),
+        icon: <ListAltOutlinedIcon />,
+        breadcrumbs: ['/submissions']
+      },
+      {
         path: '/submission/report/:id',
         title: t('breadcrumb.submission.report'),
         icon: <ChromeReaderModeOutlinedIcon />,

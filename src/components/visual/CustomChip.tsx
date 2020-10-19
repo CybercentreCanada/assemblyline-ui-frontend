@@ -28,10 +28,15 @@ export interface CustomChipProps {
   color?: PossibleColors;
   variant?: 'default' | 'outlined';
   mono?: boolean;
+  wrap?: boolean;
   [propName: string]: any;
 }
 
 const useStyles = makeStyles(theme => ({
+  wrap: {
+    whiteSpace: 'pre-wrap',
+    wordBreak: 'break-all'
+  },
   square: {
     borderRadius: '3px',
     margin: '2px 4px 2px 0'
@@ -123,7 +128,16 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function CustomChip({ className, type, size, color, variant, mono, ...otherProps }: CustomChipProps) {
+export default function CustomChip({
+  className,
+  type,
+  size,
+  color,
+  variant,
+  mono,
+  wrap,
+  ...otherProps
+}: CustomChipProps) {
   const classes = useStyles();
 
   // Define classnames maps
@@ -172,11 +186,12 @@ export default function CustomChip({ className, type, size, color, variant, mono
     variant === 'outlined' ? colorClassMap[`${color}_outlined`] : colorClassMap[color],
     className
   );
+  const labelClassName = clsx(sizeLabelClassMap[size], wrap ? classes.wrap : null);
 
   // Build chip based on computed values
   return (
     <Chip
-      classes={{ label: sizeLabelClassMap[size] }}
+      classes={{ label: labelClassName }}
       className={appliedClassName}
       size={sizeMap[size]}
       color={colorMap[color]}
@@ -192,5 +207,6 @@ CustomChip.defaultProps = {
   size: 'medium' as 'medium',
   color: 'default' as 'default',
   variant: 'default' as 'default',
-  mono: false
+  mono: false,
+  wrap: false
 };

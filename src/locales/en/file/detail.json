@@ -1,0 +1,23 @@
+{
+  "title": "File Details",
+  "related": "Related Submissions",
+  "download": "Download File",
+  "file_viewer": "File Viewer",
+  "resubmit_dynamic": "Resubmit for Dynamic Analysis",
+  "size": "Size",
+  "mime": "Mimetype",
+  "magic": "Magic",
+  "entropy": "Entropy",
+  "identification": "File Identification",
+  "frequency": "File Frequency",
+  "seen.first": "First Seen",
+  "seen.last": "Last Seen",
+  "seen.count": "Count",
+  "heuristics": "Heuristics",
+  "metadata": "Submissions Summary",
+  "attack_matrix": "Att&ck Matrix",
+  "verdict.malicious": "Malicious",
+  "verdict.suspicious": "Suspicious",
+  "verdict.info": "Informational",
+  "generated_tags": "Generated Tags"
+}
