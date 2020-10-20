@@ -20,6 +20,7 @@ import Attack from 'components/visual/Attack';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
 import Heuristic from 'components/visual/Heuristic';
+import ResultCard, { Result } from 'components/visual/ResultCard';
 import Tag from 'components/visual/Tag';
 import { bytesToSize } from 'helpers/utils';
 import getXSRFCookie from 'helpers/xsrf';
@@ -27,67 +28,6 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { Link, useHistory } from 'react-router-dom';
-
-type ExtractedFile = {
-  classification: string;
-  description: string;
-  name: string;
-  sha256: string;
-};
-
-type Section = {
-  body: any;
-  body_format: string;
-  classification: string;
-  depth: number;
-  heuristic: {
-    attack: any;
-    heur_id: string;
-    name: string;
-    score: number;
-    signature: {
-      frequency: number;
-      name: string;
-    }[];
-  };
-  tags: {
-    type: string;
-    short_type: string;
-    value: string;
-  }[];
-  title_text: string;
-};
-
-type SectionItem = {
-  children: SectionItem[];
-  id: number;
-};
-
-type Result = {
-  archive_ts: string;
-  classification: string;
-  created: string;
-  drop_file: boolean;
-  expiry_ts: string | null;
-  response: {
-    extracted: ExtractedFile[];
-    milestones: {
-      service_completed: string;
-      service_started: string;
-    };
-    service_context: string;
-    service_debug_info: string;
-    service_name: string;
-    service_tool_version: string;
-    supplementary: ExtractedFile[];
-  };
-  result: {
-    score: number;
-    sections: Section[];
-  };
-  section_hierarchy: SectionItem[];
-  sha256: string;
-};
 
 type FileInfo = {
   archive_ts: string;
@@ -550,6 +490,31 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, name = null
                       </Grid>
                     </Grid>
                   );
+                })
+              : [...Array(3)].map((_, i) => {
+                  return (
+                    <Grid container key={i} spacing={1}>
+                      <Grid item xs={12} sm={3} lg={2}>
+                        <Skeleton style={{ height: '2rem' }} />
+                      </Grid>
+                      <Grid item xs={12} sm={9} lg={10}>
+                        <Skeleton style={{ height: '2rem' }} />
+                      </Grid>
+                    </Grid>
+                  );
+                })}
+          </div>
+        </div>
+      )}
+
+      {(!file || file.results.length !== 0) && (
+        <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
+          <Typography variant="h6">{t('results')}</Typography>
+          <Divider />
+          <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+            {file
+              ? file.results.map((result, i) => {
+                  return <ResultCard key={i} result={result} />;
                 })
               : [...Array(3)].map((_, i) => {
                   return (
