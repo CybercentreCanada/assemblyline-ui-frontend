@@ -99,7 +99,10 @@ const PageHeader: React.FC<PageHeaderProps> = ({
         elevation={elevation}
         color="inherit"
       >
-        <Toolbar style={{ minHeight: mode === 'provided' && (title || left || right) ? 0 : '' }} disableGutters>
+        <Toolbar
+          style={{ minHeight: mode === 'provided' && (title || left || right || actions) ? 0 : '' }}
+          disableGutters
+        >
           <div>{left}</div>
           <div style={{ flexGrow: 1 }}>{renderTitle()}</div>
           <div>

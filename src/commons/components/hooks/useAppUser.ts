@@ -2,5 +2,13 @@ import { UserContext, UserContextProps, UserProfileProps } from 'commons/compone
 import { useContext } from 'react';
 
 export default function useAppUser<U extends UserProfileProps>(): UserContextProps<U> {
-  return useContext(UserContext) as UserContextProps<U>;
+  const context = useContext(UserContext) as UserContextProps<U>;
+  if (context) {
+    return context;
+  }
+  return {
+    user: null,
+    setUser: user => null,
+    isReady: () => false
+  };
 }

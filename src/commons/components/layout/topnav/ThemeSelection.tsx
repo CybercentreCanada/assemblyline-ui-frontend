@@ -10,6 +10,7 @@ import {
   useTheme
 } from '@material-ui/core';
 import withWidth, { isWidthDown, isWidthUp } from '@material-ui/core/withWidth';
+import useApp from 'commons/components/hooks/useAppContext';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import i18n from 'i18next';
 import React from 'react';
@@ -27,6 +28,7 @@ const isLang = (lang: Lang): boolean => {
 const ThemeSelection = ({ width }) => {
   const theme = useTheme();
   const { t } = useTranslation();
+  const { toggleTheme } = useApp();
   const {
     currentLayout,
     showQuickSearch,
@@ -35,7 +37,6 @@ const ThemeSelection = ({ width }) => {
     breadcrumbsEnabled,
     breadcrumbsState,
     toggleLayout,
-    toggleTheme,
     toggleQuickSearch,
     toggleAutoHideAppbar,
     toggleShowBreadcrumbs,

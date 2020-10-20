@@ -1,3 +1,4 @@
+import AppContextProvider from 'commons/components/app/AppContextProvider';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import AppLayoutProvider from 'commons/components/layout/LayoutProvider';
 import SiteMapProvider from 'commons/components/sitemap/SitemapProvider';
@@ -13,7 +14,6 @@ import LoginScreen from 'components/routes/login';
 import Routes from 'components/routes/routes';
 import Tos from 'components/routes/tos';
 import getXSRFCookie from 'helpers/xsrf';
-import { SnackbarProvider } from 'notistack';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter } from 'react-router-dom';
@@ -115,7 +115,7 @@ const MyApp = () => {
   }[renderedApp];
 };
 
-const App: React.FC = () => {
+const AppInit: React.FC = () => {
   // WARNING: do not use these hooks any other places than here.
   // Each of these hooks have corresponding hooks in the commons
   //  that accesses they global state stored in react context providers.
@@ -132,13 +132,28 @@ const App: React.FC = () => {
       <SiteMapProvider {...sitemapProps}>
         <UserProvider {...userProps}>
           <AppLayoutProvider {...layoutProps}>
-            <SnackbarProvider>
-              <MyApp />
-            </SnackbarProvider>
+            <MyApp />
           </AppLayoutProvider>
         </UserProvider>
       </SiteMapProvider>
     </BrowserRouter>
+  );
+};
+
+// Main Application entry component.
+// This will initialize things like theme and snackar providers which will then be available
+//  from this point on.
+const App = () => {
+  const colors = {
+    darkPrimary: '#7c93b9',
+    darkSecondary: '#929cad',
+    lightPrimary: '#0b65a1',
+    lightSecondary: '#939dac'
+  };
+  return (
+    <AppContextProvider defaultTheme="light" colors={colors}>
+      <AppInit />
+    </AppContextProvider>
   );
 };
 

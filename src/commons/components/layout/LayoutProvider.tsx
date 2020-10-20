@@ -1,5 +1,4 @@
-import { CssBaseline, makeStyles, ThemeProvider, useMediaQuery, useTheme } from '@material-ui/core';
-import useAppTheme, { AppThemeColorProps } from 'commons/components/hooks/useAppTheme';
+import { CssBaseline, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
 import useAppUser from 'commons/components/hooks/useAppUser';
 import LeftNavDrawer, { LeftNavElement } from 'commons/components/layout/leftnav/LeftNavDrawer';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
@@ -47,7 +46,6 @@ export type AppLayoutContextProps = {
   getLogo: (theme) => React.ReactElement<any>;
   hideMenus: () => void;
   toggleLayout: () => void;
-  toggleTheme: () => void;
   toggleDrawer: () => void;
   toggleQuickSearch: () => void;
   toggleAutoHideAppbar: () => void;
@@ -68,8 +66,6 @@ export interface AppLayoutProps {
   appIconLight: React.ReactElement<any>;
   bannerDark: React.ReactElement<any>;
   bannerLight: React.ReactElement<any>;
-  colors: AppThemeColorProps;
-  defaultTheme: 'dark' | 'light';
   defaultLayout: 'top' | 'side';
   defaultDrawerOpen?: boolean;
   defaultShowQuickSearch?: boolean;
@@ -105,21 +101,6 @@ function AppLayoutProvider(props: LayoutProviderProps) {
   const { children, ...layoutProps } = props;
   const muiTheme = useTheme();
   const { isReady: isUserReady } = useAppUser();
-
-  // Load DarkMode defaults
-  let initialTheme;
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  const storedDarkMode = localStorage.getItem('darkMode');
-  const darkMode = storedDarkMode ? !!JSON.parse(storedDarkMode) : null;
-  if (darkMode !== null && darkMode === true) {
-    initialTheme = 'dark' as 'dark';
-  } else if (darkMode !== null && darkMode === false) {
-    initialTheme = 'light' as 'light';
-  } else if (prefersDarkMode) {
-    initialTheme = 'dark' as 'dark';
-  } else {
-    initialTheme = layoutProps.defaultTheme;
-  }
 
   // Load Initial Layout Default
   let initialLayout;
@@ -164,14 +145,12 @@ function AppLayoutProvider(props: LayoutProviderProps) {
   // Hooks...
   const [appReady, setAppReady] = useState<boolean>(false);
   const [showMenus, setShowMenus] = useState<boolean>(true);
-  const [theme, setTheme] = useState<string>(initialTheme);
   const [drawer, setDrawer] = useState<boolean>(initialDrawer);
   const [breadcrumbsEnabled, setBreadcrumbsEnabled] = useState<boolean>(initialBreadcrumbsEnabled);
   const [breadcrumbsState, setBreadcrumbsState] = useState<boolean>(initialBreadcrumbsState);
   const [quickSearch, setQuickSearch] = useState<boolean>(initialQuickSearch);
   const [autoHideAppbar, setAutoHideAppbar] = useState<boolean>(initialAutoHideAppbar);
   const [layout, setLayout] = useState<'top' | 'side'>(initialLayout);
-  const [appTheme] = useAppTheme(theme === 'dark', layoutProps.colors);
   const classes = useStyles(layout, isUserReady() && appReady && showMenus);
   const showBreadcrumbsOnPage =
     useMediaQuery(muiTheme.breakpoints.only('sm')) &&
@@ -185,12 +164,6 @@ function AppLayoutProvider(props: LayoutProviderProps) {
     const newLayout = layout === 'top' ? 'side' : 'top';
     localStorage.setItem('navLayout', newLayout);
     setLayout(newLayout);
-  };
-
-  const onToggleTheme = () => {
-    const newTheme = theme === 'dark' ? 'light' : 'dark';
-    localStorage.setItem('darkMode', JSON.stringify(newTheme === 'dark'));
-    setTheme(newTheme);
   };
 
   const onToggleDrawer = () => {
@@ -219,53 +192,50 @@ function AppLayoutProvider(props: LayoutProviderProps) {
   };
 
   return (
-    <ThemeProvider theme={appTheme}>
-      <AppLayoutContext.Provider
-        value={{
-          autoHideAppbar,
-          currentLayout: layout,
-          drawerState: drawer,
-          breadcrumbsEnabled,
-          breadcrumbsState,
-          breadcrumbsPlacement: layoutProps.breadcrumbsPlacement ? layoutProps.breadcrumbsPlacement : 'topbar',
-          hideNestedIcons: !!layoutProps.leftnav.hideNestedIcons,
-          layoutProps,
-          showQuickSearch: quickSearch,
-          getBanner: curTheme => {
-            return curTheme.palette.type === 'dark' ? layoutProps.bannerDark : layoutProps.bannerLight;
-          },
-          getLogo: curTheme => {
-            return curTheme.palette.type === 'dark' ? layoutProps.appIconDark : layoutProps.appIconLight;
-          },
-          hideMenus: () => setShowMenus(false),
-          toggleLayout: onToggleLayout,
-          toggleTheme: onToggleTheme,
-          toggleDrawer: onToggleDrawer,
-          toggleQuickSearch: onToggleQuickSearch,
-          toggleAutoHideAppbar: onToggleAutoHideAppbar,
-          toggleShowBreadcrumbs: onToggleShowBreadcrumbs,
-          toggleBreadcrumbsState: onToggleBreadcrumbsState,
-          isReady: () => appReady,
-          setReady: (isReady: boolean) => setAppReady(isReady)
-        }}
-      >
-        <div className={classes.app}>
-          <CssBaseline />
-          {isUserReady() && appReady && showMenus && <TopBar />}
-          {isUserReady() && appReady && showMenus && <LeftNavDrawer />}
-          <div className={classes.container}>
-            {layoutProps.allowBreadcrumbs &&
-              breadcrumbsEnabled &&
-              (breadcrumbsPlacement === 'page' || showBreadcrumbsOnPage) && (
-                <div className="no-print">
-                  <PageHeader mode="breadcrumbs" />
-                </div>
-              )}
-            {children}
-          </div>
+    <AppLayoutContext.Provider
+      value={{
+        autoHideAppbar,
+        currentLayout: layout,
+        drawerState: drawer,
+        breadcrumbsEnabled,
+        breadcrumbsState,
+        breadcrumbsPlacement: layoutProps.breadcrumbsPlacement ? layoutProps.breadcrumbsPlacement : 'topbar',
+        hideNestedIcons: !!layoutProps.leftnav.hideNestedIcons,
+        layoutProps,
+        showQuickSearch: quickSearch,
+        getBanner: curTheme => {
+          return curTheme.palette.type === 'dark' ? layoutProps.bannerDark : layoutProps.bannerLight;
+        },
+        getLogo: curTheme => {
+          return curTheme.palette.type === 'dark' ? layoutProps.appIconDark : layoutProps.appIconLight;
+        },
+        hideMenus: () => setShowMenus(false),
+        toggleLayout: onToggleLayout,
+        toggleDrawer: onToggleDrawer,
+        toggleQuickSearch: onToggleQuickSearch,
+        toggleAutoHideAppbar: onToggleAutoHideAppbar,
+        toggleShowBreadcrumbs: onToggleShowBreadcrumbs,
+        toggleBreadcrumbsState: onToggleBreadcrumbsState,
+        isReady: () => appReady,
+        setReady: (isReady: boolean) => setAppReady(isReady)
+      }}
+    >
+      <div className={classes.app}>
+        <CssBaseline />
+        {isUserReady() && appReady && showMenus && <TopBar />}
+        {isUserReady() && appReady && showMenus && <LeftNavDrawer />}
+        <div className={classes.container}>
+          {layoutProps.allowBreadcrumbs &&
+            breadcrumbsEnabled &&
+            (breadcrumbsPlacement === 'page' || showBreadcrumbsOnPage) && (
+              <div className="no-print">
+                <PageHeader mode="breadcrumbs" />
+              </div>
+            )}
+          {children}
         </div>
-      </AppLayoutContext.Provider>
-    </ThemeProvider>
+      </div>
+    </AppLayoutContext.Provider>
   );
 }
 
