@@ -9,6 +9,8 @@
   "app.language": "Language",
   "banner.alt": "Assemblyline Banner",
   "breadcrumb.404": "Not Found",
+  "breadcrumb.file.detail": "File Details",
+  "breadcrumb.file.viewer": "File Viewer",
   "breadcrumb.submission.detail": "Details",
   "breadcrumb.submission.detail.file": "File",
   "breadcrumb.submission.report": "Report",

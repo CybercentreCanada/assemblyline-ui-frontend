@@ -9,6 +9,8 @@
   "app.language": "Langue",
   "banner.alt": "Banière d'Assemblyline",
   "breadcrumb.404": "Non disponible",
+  "breadcrumb.file.detail": "Détails du Fichier",
+  "breadcrumb.file.viewer": "Visualisateur de Fichier",
   "breadcrumb.submission.detail": "Détails",
   "breadcrumb.submission.detail.file": "Fichiers",
   "breadcrumb.submission.report": "Rapport",

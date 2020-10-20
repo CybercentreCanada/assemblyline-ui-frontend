@@ -10,6 +10,8 @@ import AdminUsers from 'components/routes/admin/users';
 import Alerts from 'components/routes/alerts/alerts';
 import AlertsLegacy from 'components/routes/alerts/legacy-alert';
 import Dashboard from 'components/routes/dashboard';
+import FileFullDetail from 'components/routes/file/detail';
+import FileViewer from 'components/routes/file/viewer';
 import Help from 'components/routes/help';
 import HelpApiDoc from 'components/routes/help/api';
 import HelpClassification from 'components/routes/help/classification';
@@ -68,6 +70,8 @@ const Routes = () => {
         <Route exact path="/admin/users" component={AdminUsers} />
         <Route exact path="/admin/users/:id" component={User} />
         <Route exact path="/dashboard" component={Dashboard} />
+        <Route exact path="/file/detail/:id" component={FileFullDetail} />
+        <Route exact path="/file/viewer/:id" component={FileViewer} />
         <Route exact path="/help" component={Help} />
         <Route exact path="/help/api" component={HelpApiDoc} />
         <Route exact path="/help/classification" component={HelpClassification} />
