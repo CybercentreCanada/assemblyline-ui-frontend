@@ -4,15 +4,16 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 
 type HeuristicProps = {
-  text: string;
   lvl: string;
+  text: string;
+  signature?: boolean;
 };
 
-const Heuristic: React.FC<HeuristicProps> = ({ text, lvl }) => {
+const Heuristic: React.FC<HeuristicProps> = ({ lvl, text, signature = false }) => {
   const history = useHistory();
 
   const searchAttack = () => {
-    history.push(`/search/result?q=result.sections.heuristic.name:"${text}"`);
+    history.push(`/search/result?q=result.sections.heuristic${signature ? '.signature' : ''}.name:"${text}"`);
   };
 
   return (

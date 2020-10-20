@@ -19,5 +19,7 @@
   "verdict.malicious": "Malicious",
   "verdict.suspicious": "Suspicious",
   "verdict.info": "Informational",
-  "generated_tags": "Generated Tags"
+  "generated_tags": "Generated Tags",
+  "childrens": "Possible Childrens",
+  "resubmit.success": "File successfully resubmitted for dynamic analysis. You will be redirected..."
 }

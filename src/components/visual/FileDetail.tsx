@@ -1,21 +1,32 @@
-import { Divider, Grid, IconButton, Link as MaterialLink, Tooltip, Typography, useTheme } from '@material-ui/core';
+import {
+  Box,
+  Divider,
+  Grid,
+  IconButton,
+  Link as MaterialLink,
+  makeStyles,
+  Tooltip,
+  Typography,
+  useTheme
+} from '@material-ui/core';
 import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
 import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
 import PageviewOutlinedIcon from '@material-ui/icons/PageviewOutlined';
-import ReplayOutlinedIcon from '@material-ui/icons/ReplayOutlined';
+import RotateLeftOutlinedIcon from '@material-ui/icons/RotateLeftOutlined';
 import { Skeleton } from '@material-ui/lab';
 import useMyAPI from 'components/hooks/useMyAPI';
+import useMySnackbar from 'components/hooks/useMySnackbar';
+import Attack from 'components/visual/Attack';
+import Classification from 'components/visual/Classification';
+import CustomChip from 'components/visual/CustomChip';
+import Heuristic from 'components/visual/Heuristic';
+import Tag from 'components/visual/Tag';
 import { bytesToSize } from 'helpers/utils';
 import getXSRFCookie from 'helpers/xsrf';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
-import { Link } from 'react-router-dom';
-import Attack from './Attack';
-import Classification from './Classification';
-import CustomChip from './CustomChip';
-import Heuristic from './Heuristic';
-import Tag from './Tag';
+import { Link, useHistory } from 'react-router-dom';
 
 type ExtractedFile = {
   classification: string;
@@ -104,6 +115,10 @@ type File = {
   attack_matrix: {
     [category: string]: string[][];
   };
+  childrens: {
+    name: string;
+    sha256: string;
+  }[];
   errors: any;
   file_info: FileInfo;
   heuristics: {
@@ -127,13 +142,37 @@ type FileDetailProps = {
   name?: string;
 };
 
+const useStyles = makeStyles(theme => ({
+  file_item: {
+    cursor: 'pointer',
+    '&:hover, &:focus': {
+      backgroundColor: theme.palette.action.hover
+    }
+  }
+}));
+
 const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, name = null }) => {
   const { t } = useTranslation(['fileDetail']);
   const [file, setFile] = useState<File | null>(null);
   const apiCall = useMyAPI();
+  const classes = useStyles();
   const theme = useTheme();
+  const history = useHistory();
+  const { showSuccessMessage } = useMySnackbar();
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
+
+  const resubmit = () => {
+    apiCall({
+      url: `/api/v4/submit/dynamic/${sha256}/`,
+      onSuccess: api_data => {
+        showSuccessMessage(t('resubmit.success'));
+        setTimeout(() => {
+          history.push(`/submission/detail/${api_data.api_response.sid}`);
+        }, 500);
+      }
+    });
+  };
 
   useEffect(() => {
     if (sid && sha256) {
@@ -197,8 +236,8 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, name = null
                 </IconButton>
               </Tooltip>
               <Tooltip title={t('resubmit_dynamic')}>
-                <IconButton onClick={() => {}}>
-                  <ReplayOutlinedIcon />
+                <IconButton onClick={resubmit}>
+                  <RotateLeftOutlinedIcon />
                 </IconButton>
               </Tooltip>
             </div>
@@ -382,6 +421,32 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, name = null
         </div>
       )}
 
+      {file && file.childrens && file.childrens.length !== 0 && (
+        <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
+          <Typography variant="h6">{t('childrens')}</Typography>
+          <Divider />
+          <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+            {file.childrens.map((fileItem, i) => {
+              return (
+                <Box
+                  key={i}
+                  className={classes.file_item}
+                  onClick={() => {
+                    history.push(`/file/detail/${fileItem.sha256}`);
+                  }}
+                  style={{ wordBreak: 'break-all' }}
+                >
+                  <span>{fileItem.name}</span>
+                  <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>
+                    {` :: ${fileItem.sha256}`}
+                  </span>
+                </Box>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {(!file || Object.keys(file.attack_matrix).length !== 0) && (
         <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
           <Typography variant="h6">{t('attack_matrix')}</Typography>
@@ -454,25 +519,50 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, name = null
         </div>
       )}
 
-      {file && Object.keys(file.tags).length !== 0 && (
+      {(!file || Object.keys(file.tags).length !== 0 || file.signatures.length !== 0) && (
         <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
           <Typography variant="h6">{t('generated_tags')}</Typography>
           <Divider />
           <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
-            {Object.keys(file.tags).map((tag_type, i) => {
-              return (
-                <Grid container key={i}>
-                  <Grid item xs={12} sm={3} lg={2}>
-                    <span style={{ fontWeight: 500 }}>{tag_type}</span>
-                  </Grid>
-                  <Grid item xs={12} sm={9} lg={10}>
-                    {file.tags[tag_type].map(([value, lvl], idx) => {
-                      return <Tag key={idx} value={value} type={tag_type} lvl={lvl} />;
-                    })}
-                  </Grid>
+            {file && file.signatures.length !== 0 && (
+              <Grid container>
+                <Grid item xs={12} sm={3} lg={2}>
+                  <span style={{ fontWeight: 500 }}>heuristic.signature</span>
                 </Grid>
-              );
-            })}
+                <Grid item xs={12} sm={9} lg={10}>
+                  {file.signatures.map(([value, lvl], idx) => {
+                    return <Heuristic key={idx} signature text={value} lvl={lvl} />;
+                  })}
+                </Grid>
+              </Grid>
+            )}
+            {file
+              ? Object.keys(file.tags).map((tag_type, i) => {
+                  return (
+                    <Grid container key={i}>
+                      <Grid item xs={12} sm={3} lg={2}>
+                        <span style={{ fontWeight: 500 }}>{tag_type}</span>
+                      </Grid>
+                      <Grid item xs={12} sm={9} lg={10}>
+                        {file.tags[tag_type].map(([value, lvl], idx) => {
+                          return <Tag key={idx} value={value} type={tag_type} lvl={lvl} />;
+                        })}
+                      </Grid>
+                    </Grid>
+                  );
+                })
+              : [...Array(3)].map((_, i) => {
+                  return (
+                    <Grid container key={i} spacing={1}>
+                      <Grid item xs={12} sm={3} lg={2}>
+                        <Skeleton style={{ height: '2rem' }} />
+                      </Grid>
+                      <Grid item xs={12} sm={9} lg={10}>
+                        <Skeleton style={{ height: '2rem' }} />
+                      </Grid>
+                    </Grid>
+                  );
+                })}
           </div>
         </div>
       )}
