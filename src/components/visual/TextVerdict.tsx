@@ -7,6 +7,7 @@ const VERDICT_COLOR_MAP = {
   info: 'default',
   safe: 'success',
   suspicious: 'warning',
+  highly_suspicious: 'warning',
   malicious: 'error'
 };
 

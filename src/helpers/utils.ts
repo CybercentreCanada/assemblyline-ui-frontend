@@ -6,13 +6,13 @@ export function bytesToSize(bytes: number | null) {
 }
 
 export function scoreToVerdict(score: number | null) {
-  // More then 2000 => Malicious
-  if (score >= 2000) {
+  // More then 1000 => Malicious
+  if (score >= 1000) {
     return 'malicious';
   }
 
-  // Between 1000 - 1999 => highly suspicious
-  if (score >= 1000) {
+  // Between 500 - 999 => highly suspicious
+  if (score >= 500) {
     return 'highly_suspicious';
   }
 
@@ -27,5 +27,5 @@ export function scoreToVerdict(score: number | null) {
   }
 
   // Between 0 and 99 => Unknown
-  return 'unknown';
+  return 'info';
 }

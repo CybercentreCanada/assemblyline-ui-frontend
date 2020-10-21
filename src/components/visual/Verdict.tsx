@@ -25,9 +25,9 @@ const Verdict: React.FC<VerdictProps> = ({
   const theme = useTheme();
 
   const VERDICT_SCORE_MAP = {
-    unknown: {
-      shortText: t('verdict.non_malicious.short'),
-      text: t('verdict.non_malicious'),
+    info: {
+      shortText: t('verdict.info.short'),
+      text: t('verdict.info'),
       color: 'default' as 'default',
       textColor: theme.palette.type === 'dark' ? '#AAA' : '#888'
     },
@@ -40,8 +40,8 @@ const Verdict: React.FC<VerdictProps> = ({
     suspicious: {
       shortText: t('verdict.suspicious.short'),
       text: t('verdict.suspicious'),
-      color: 'info' as 'info',
-      textColor: theme.palette.type !== 'dark' ? theme.palette.info.dark : theme.palette.info.light
+      color: 'warning' as 'warning',
+      textColor: theme.palette.type !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
     },
     highly_suspicious: {
       shortText: t('verdict.highly_suspicious.short'),

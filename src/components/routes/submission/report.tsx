@@ -105,7 +105,7 @@ function AttributionBanner({ report }) {
   const score = report ? report.max_score : 0;
 
   const BANNER_COLOR_MAP = {
-    unknown: {
+    info: {
       icon: <HelpOutlineIcon className={classes.icon} />,
       bgColor: '#6e6e6e15',
       textColor: theme.palette.type === 'dark' ? '#AAA' : '#888'

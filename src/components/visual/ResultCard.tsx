@@ -1,5 +1,9 @@
 import { makeStyles, useTheme } from '@material-ui/core';
+import Attack from 'components/visual/Attack';
 import Classification from 'components/visual/Classification';
+import Heuristic from 'components/visual/Heuristic';
+import SectionHighlight from 'components/visual/SectionHighlight';
+import Tag from 'components/visual/Tag';
 import Verdict from 'components/visual/Verdict';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -68,6 +72,13 @@ type Section = {
   title_text: string;
 };
 
+type ResultSectionProps = {
+  section_list: Section[];
+  id: number;
+  sub_sections: SectionItem[];
+  indent: number;
+};
+
 type ResultCardProps = {
   result: Result;
 };
@@ -99,33 +110,71 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-type ResultSectionProps = {
-  section_list: Section[];
-  id: number;
-  sub_sections: SectionItem[];
-  indent: number;
-};
-
 const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sections, indent }) => {
   const theme = useTheme();
   const section = section_list[id];
 
   return (
-    <div>
-      {section.title_text}
-      {sub_sections.map(item => {
-        return (
-          <div style={{ marginLeft: theme.spacing(indent) }}>
-            <ResultSection
-              key={item.id}
-              section_list={section_list}
-              id={item.id}
-              sub_sections={item.children}
-              indent={indent + 1}
-            />
-          </div>
-        );
-      })}
+    <div style={{ display: 'flex', flexWrap: 'nowrap', marginLeft: '1rem' }}>
+      <SectionHighlight score={section.heuristic ? section.heuristic.score : 0} indent={indent} />
+      <div style={{ flexGrow: 1 }}>
+        <div>
+          <span>
+            <Classification c12n={section.classification} type="text" inline />
+            &nbsp;&nbsp;::&nbsp;&nbsp;
+          </span>
+          {section.heuristic && (
+            <span>
+              <Verdict score={section.heuristic.score} mono short size="tiny" />
+              &nbsp;::&nbsp;&nbsp;
+            </span>
+          )}
+          {section.title_text}
+        </div>
+        <div style={{ marginLeft: '1rem', marginBottom: '0.5rem' }}>
+          {(() => {
+            switch (section.body_format) {
+              case 'TEXT':
+                return <div style={{ whiteSpace: 'pre-wrap' }}>{section.body}</div>;
+              default:
+                return <div style={{ margin: '2rem' }}>INVALID SECTION TYPE</div>;
+            }
+          })()}
+          {section.heuristic && <Heuristic text={section.heuristic.name} score={section.heuristic.score} show_type />}
+          {section.heuristic &&
+            section.heuristic.attack.map((attack, idx) => {
+              return <Attack key={idx} text={attack.pattern} score={section.heuristic.score} show_type />;
+            })}
+          {section.heuristic &&
+            section.heuristic.signature.map((signature, idx) => {
+              return <Heuristic key={idx} text={signature.name} score={section.heuristic.score} signature show_type />;
+            })}
+          {section.tags.map((tag, idx) => {
+            return (
+              <Tag
+                key={idx}
+                type={tag.type}
+                value={tag.value}
+                short_type={tag.short_type}
+                score={section.heuristic ? section.heuristic.score : 0}
+              />
+            );
+          })}
+        </div>
+        <div>
+          {sub_sections.map(item => {
+            return (
+              <ResultSection
+                key={item.id}
+                section_list={section_list}
+                id={item.id}
+                sub_sections={item.children}
+                indent={indent + 1}
+              />
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 };
