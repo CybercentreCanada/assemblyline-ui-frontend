@@ -5,6 +5,7 @@ import Heuristic from 'components/visual/Heuristic';
 import SectionHighlight from 'components/visual/SectionHighlight';
 import Tag from 'components/visual/Tag';
 import Verdict from 'components/visual/Verdict';
+import { scaleLinear } from 'd3-scale';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
@@ -102,13 +103,118 @@ const useStyles = makeStyles(theme => ({
     }
   },
   content: {
-    padding: '6px'
+    padding: '6px',
+    fontSize: '85%'
   },
   muted: {
     color: theme.palette.text.secondary,
-    fontSize: '90%'
+    fontSize: '85%'
   }
 }));
+
+const TextBody = ({ body }) => {
+  return <div style={{ whiteSpace: 'pre-wrap' }}>{body}</div>;
+};
+
+const MemDumpBody = ({ body }) => {
+  const theme = useTheme();
+  return (
+    <pre
+      style={{
+        backgroundColor: theme.palette.type === 'dark' ? '#ffffff10' : '#00000010',
+        border: `1px solid ${theme.palette.divider}`,
+        borderRadius: '4px',
+        padding: '4px',
+        whiteSpace: 'pre-wrap',
+        wordBreak: 'break-all',
+        fontSize: '0.85rem'
+      }}
+    >
+      {body}
+    </pre>
+  );
+};
+
+const KVBody = ({ body }) => {
+  return (
+    <table>
+      <tbody>
+        {Object.keys(body).map((key, id) => {
+          let value = body[key];
+          if (value instanceof Array) {
+            value = value.join(' | ');
+          } else if (value === true) {
+            value = 'true';
+          } else if (value === false) {
+            value = 'false';
+          } else if (typeof value === 'object') {
+            value = JSON.stringify(value);
+          }
+          return (
+            <tr key={id}>
+              <td style={{ fontWeight: 500, textTransform: 'capitalize', paddingRight: '16px' }}>
+                {key.replace(/_/g, ' ')}
+              </td>
+              <td style={{ wordBreak: 'break-all' }}>{value}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  );
+};
+
+const GraphBody = ({ body }) => {
+  const theme = useTheme();
+  if (body.type === 'colormap') {
+    const colorRange = ['#87c6fb', '#111920'];
+    const itemWidthPct = 100 / body.data.values.length;
+    const colorScale = scaleLinear().domain(body.data.domain).range(colorRange);
+    return (
+      <svg width="100%" height="70">
+        <rect y={10} x={0} width={15} height={15} fill={colorRange[0]} />
+        <text y={22} x={20} fill={theme.palette.text.primary}>{`: ${body.data.domain[0]}`}</text>
+        <rect y={10} x={80} width={15} height={15} fill={colorRange[1]} />
+        <text y={22} x={100} fill={theme.palette.text.primary}>{`: ${body.data.domain[1]}`}</text>
+        {body.data.values.map((value, i) => {
+          return (
+            <rect
+              key={i}
+              y={30}
+              x={`${i * itemWidthPct}%`}
+              width={`${itemWidthPct}%`}
+              height={40}
+              stroke={colorScale(value)}
+              fill={colorScale(value)}
+            />
+          );
+        })}
+      </svg>
+    );
+  }
+  return <div style={{ margin: '2rem' }}>Unsupported graph...</div>;
+};
+
+const URLBody = ({ body }) => {
+  return <div style={{ margin: '2rem' }}>URL under construction...</div>;
+};
+
+const JSONBody = ({ body }) => {
+  return <div style={{ margin: '2rem' }}>JSON under construction...</div>;
+};
+
+const ProcessTreeBody = ({ body }) => {
+  return <div style={{ margin: '2rem' }}>PROCESS_TREE under construction...</div>;
+};
+
+const TableBody = ({ body }) => {
+  const data = JSON.parse(body);
+  const headers = [];
+
+  console.log(data);
+
+  return <div style={{ margin: '2rem' }}>TABLE under construction...</div>;
+};
 
 const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sections, indent }) => {
   const theme = useTheme();
@@ -129,13 +235,27 @@ const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sec
               &nbsp;::&nbsp;&nbsp;
             </span>
           )}
-          {section.title_text}
+          <span style={{ fontWeight: 500 }}>{section.title_text}</span>
         </div>
         <div style={{ marginLeft: '1rem', marginBottom: '0.5rem' }}>
           {(() => {
             switch (section.body_format) {
               case 'TEXT':
-                return <div style={{ whiteSpace: 'pre-wrap' }}>{section.body}</div>;
+                return <TextBody body={section.body} />;
+              case 'MEMORY_DUMP':
+                return <MemDumpBody body={section.body} />;
+              case 'GRAPH_DATA':
+                return <GraphBody body={section.body} />;
+              case 'URL':
+                return <URLBody body={section.body} />;
+              case 'JSON':
+                return <JSONBody body={section.body} />;
+              case 'KEY_VALUE':
+                return <KVBody body={section.body} />;
+              case 'PROCESS_TREE':
+                return <ProcessTreeBody body={section.body} />;
+              case 'TABLE':
+                return <TableBody body={section.body} />;
               default:
                 return <div style={{ margin: '2rem' }}>INVALID SECTION TYPE</div>;
             }
