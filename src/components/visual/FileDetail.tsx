@@ -301,7 +301,7 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, name = null
       </div>
 
       {(!file || Object.keys(file.metadata).length !== 0) && (
-        <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
+        <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
           <Typography variant="h6">{t('metadata')}</Typography>
           <Divider />
           <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
@@ -337,7 +337,7 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, name = null
       )}
 
       {file && file.childrens && file.childrens.length !== 0 && (
-        <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
+        <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
           <Typography variant="h6">{t('childrens')}</Typography>
           <Divider />
           <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
@@ -362,7 +362,7 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, name = null
       )}
 
       {(!file || Object.keys(file.attack_matrix).length !== 0) && (
-        <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
+        <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
           <Typography variant="h6">{t('attack_matrix')}</Typography>
           <Divider />
           <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
@@ -398,7 +398,7 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, name = null
       )}
 
       {(!file || Object.keys(file.heuristics).length !== 0) && (
-        <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
+        <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
           <Typography variant="h6">{t('heuristics')}</Typography>
           <Divider />
           <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
@@ -434,7 +434,7 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, name = null
       )}
 
       {(!file || Object.keys(file.tags).length !== 0 || file.signatures.length !== 0) && (
-        <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
+        <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
           <Typography variant="h6">{t('generated_tags')}</Typography>
           <Divider />
           <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
@@ -482,7 +482,7 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, name = null
       )}
 
       {(!file || file.results.length !== 0) && (
-        <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
+        <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
           <Typography variant="h6">{t('results')}</Typography>
           <Divider />
           <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
