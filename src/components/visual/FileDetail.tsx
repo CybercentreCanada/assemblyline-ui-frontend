@@ -22,7 +22,6 @@ import CustomChip from 'components/visual/CustomChip';
 import Heuristic from 'components/visual/Heuristic';
 import ResultCard, { Result } from 'components/visual/ResultCard';
 import Tag from 'components/visual/Tag';
-import { BreakableStr } from 'helpers/breakableStr';
 import { bytesToSize } from 'helpers/utils';
 import getXSRFCookie from 'helpers/xsrf';
 import React, { useEffect, useState } from 'react';
@@ -146,8 +145,8 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, name = null
           <Grid item xs>
             <div>
               <Typography variant="h4">{t('title')}</Typography>
-              <Typography variant="caption">
-                {file ? new BreakableStr(name || file.file_info.sha256) : <Skeleton style={{ width: '10rem' }} />}
+              <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
+                {file ? name || file.file_info.sha256 : <Skeleton style={{ width: '10rem' }} />}
               </Typography>
             </div>
           </Grid>
@@ -194,29 +193,53 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, name = null
             <Grid item xs={4} sm={3} lg={2}>
               <span style={{ fontWeight: 500 }}>MD5</span>
             </Grid>
-            <Grid item xs={8} sm={9} lg={10} style={{ fontSize: '110%', fontFamily: 'monospace' }}>
-              {file ? new BreakableStr(file.file_info.md5) : <Skeleton />}
+            <Grid
+              item
+              xs={8}
+              sm={9}
+              lg={10}
+              style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
+            >
+              {file ? file.file_info.md5 : <Skeleton />}
             </Grid>
 
             <Grid item xs={4} sm={3} lg={2}>
               <span style={{ fontWeight: 500 }}>SHA1</span>
             </Grid>
-            <Grid item xs={8} sm={9} lg={10} style={{ fontSize: '110%', fontFamily: 'monospace' }}>
-              {file ? new BreakableStr(file.file_info.sha1) : <Skeleton />}
+            <Grid
+              item
+              xs={8}
+              sm={9}
+              lg={10}
+              style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
+            >
+              {file ? file.file_info.sha1 : <Skeleton />}
             </Grid>
 
             <Grid item xs={4} sm={3} lg={2}>
               <span style={{ fontWeight: 500 }}>SHA256</span>
             </Grid>
-            <Grid item xs={8} sm={9} lg={10} style={{ fontSize: '110%', fontFamily: 'monospace' }}>
-              {file ? new BreakableStr(file.file_info.sha256) : <Skeleton />}
+            <Grid
+              item
+              xs={8}
+              sm={9}
+              lg={10}
+              style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
+            >
+              {file ? file.file_info.sha256 : <Skeleton />}
             </Grid>
 
             <Grid item xs={4} sm={3} lg={2}>
               <span style={{ fontWeight: 500 }}>SSDEEP</span>
             </Grid>
-            <Grid item xs={8} sm={9} lg={10} style={{ fontSize: '110%', fontFamily: 'monospace' }}>
-              {file ? new BreakableStr(file.file_info.ssdeep) : <Skeleton />}
+            <Grid
+              item
+              xs={8}
+              sm={9}
+              lg={10}
+              style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
+            >
+              {file ? file.file_info.ssdeep : <Skeleton />}
             </Grid>
 
             <Grid item xs={4} sm={3} lg={2}>
@@ -236,15 +259,15 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, name = null
             <Grid item xs={4} sm={3} lg={2}>
               <span style={{ fontWeight: 500 }}>{t('mime')}</span>
             </Grid>
-            <Grid item xs={8} sm={9} lg={10}>
-              {file ? new BreakableStr(file.file_info.mime) : <Skeleton />}
+            <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+              {file ? file.file_info.mime : <Skeleton />}
             </Grid>
 
             <Grid item xs={4} sm={3} lg={2}>
               <span style={{ fontWeight: 500 }}>{t('magic')}</span>
             </Grid>
-            <Grid item xs={8} sm={9} lg={10}>
-              {file ? new BreakableStr(file.file_info.magic) : <Skeleton />}
+            <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+              {file ? file.file_info.magic : <Skeleton />}
             </Grid>
 
             <Grid item xs={4} sm={3} lg={2}>
@@ -310,7 +333,7 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, name = null
                   return (
                     <Grid container key={i}>
                       <Grid item xs={12} sm={3} lg={2}>
-                        <span style={{ fontWeight: 500 }}>{new BreakableStr(meta)}</span>
+                        <span style={{ fontWeight: 500, wordBreak: 'break-word' }}>{meta}</span>
                       </Grid>
                       <Grid item xs={12} sm={9} lg={10}>
                         {Object.keys(file.metadata[meta]).map((item, key) => {
@@ -349,10 +372,11 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, name = null
                   onClick={() => {
                     history.push(`/file/detail/${fileItem.sha256}`);
                   }}
+                  style={{ wordBreak: 'break-word' }}
                 >
-                  <span>{new BreakableStr(fileItem.name)}</span>
+                  <span>{fileItem.name}</span>
                   <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>
-                    {new BreakableStr(` :: ${fileItem.sha256}`)}
+                    {` :: ${fileItem.sha256}`}
                   </span>
                 </Box>
               );
@@ -407,7 +431,7 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, name = null
                   return (
                     <Grid container key={i}>
                       <Grid item xs={12} sm={3} lg={2}>
-                        <span style={{ fontWeight: 500 }}>{new BreakableStr(t(`verdict.${lvl}`))}</span>
+                        <span style={{ fontWeight: 500, wordBreak: 'break-word' }}>{t(`verdict.${lvl}`)}</span>
                       </Grid>
                       <Grid item xs={12} sm={9} lg={10}>
                         {file.heuristics[lvl].map(([cid, hname], idx) => {

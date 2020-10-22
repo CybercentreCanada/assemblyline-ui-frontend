@@ -13,7 +13,6 @@ import Classification from 'components/visual/Classification';
 import TextVerdict from 'components/visual/TextVerdict';
 import Verdict from 'components/visual/Verdict';
 import VerdictGauge from 'components/visual/VerdictGauge';
-import { BreakableStr } from 'helpers/breakableStr';
 import { bytesToSize, scoreToVerdict } from 'helpers/utils';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -51,6 +50,7 @@ const useStyles = makeStyles(theme => ({
   file_details: {
     fontFamily: 'monospace',
     color: theme.palette.text.secondary,
+    wordBreak: 'break-word',
     paddingBottom: '4px',
     '@media print': {
       color: 'rgba(0, 0, 0, 0.54)'
@@ -291,10 +291,11 @@ function TagTable({ group, items }) {
                         <div
                           key={vidx}
                           style={{
-                            paddingBottom: '5px'
+                            paddingBottom: '5px',
+                            wordBreak: 'break-word'
                           }}
                         >
-                          {new BreakableStr(v)}
+                          {v}
                         </div>
                       );
                     })}
@@ -426,14 +427,14 @@ function FileTree({ tree, important_files }) {
                     <Verdict score={tree[f].score} short mono />
                   </td>
                   <td>
-                    <b style={{ fontSize: '110%' }}>{new BreakableStr(tree[f].name.join(' | '))}</b>
+                    <b style={{ fontSize: '110%', wordBreak: 'break-word' }}>{tree[f].name.join(' | ')}</b>
                   </td>
                 </tr>
                 <tr>
                   <td />
                   <td>
                     <div className={classes.file_details}>
-                      {new BreakableStr(`${tree[f].sha256} - ${tree[f].type} - `)}
+                      {`${tree[f].sha256} - ${tree[f].type} - `}
                       <b>{tree[f].size}</b>
                       <span style={{ fontWeight: 300 }}> ({bytesToSize(tree[f].size)})</span>
                     </div>
@@ -564,15 +565,15 @@ export default function SubmissionReport() {
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.name')}</span>
               </Grid>
-              <Grid item xs={8} sm={9} lg={10}>
-                {report ? new BreakableStr(report.files[0].name) : <Skeleton />}
+              <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                {report ? report.files[0].name : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.description')}</span>
               </Grid>
-              <Grid item xs={8} sm={9} lg={10}>
-                {report ? new BreakableStr(report.params.description) : <Skeleton />}
+              <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                {report ? report.params.description : <Skeleton />}
               </Grid>
 
               <Grid item xs={12}>
@@ -652,29 +653,53 @@ export default function SubmissionReport() {
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.md5')}</span>
               </Grid>
-              <Grid item xs={8} md={9} lg={10} style={{ fontFamily: 'monospace', fontSize: 'larger' }}>
-                {report ? new BreakableStr(report.file_info.md5) : <Skeleton />}
+              <Grid
+                item
+                xs={8}
+                md={9}
+                lg={10}
+                style={{ fontFamily: 'monospace', fontSize: 'larger', wordBreak: 'break-word' }}
+              >
+                {report ? report.file_info.md5 : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.sha1')}</span>
               </Grid>
-              <Grid item xs={8} md={9} lg={10} style={{ fontFamily: 'monospace', fontSize: 'larger' }}>
-                {report ? new BreakableStr(report.file_info.sha1) : <Skeleton />}
+              <Grid
+                item
+                xs={8}
+                md={9}
+                lg={10}
+                style={{ fontFamily: 'monospace', fontSize: 'larger', wordBreak: 'break-word' }}
+              >
+                {report ? report.file_info.sha1 : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.sha256')}</span>
               </Grid>
-              <Grid item xs={8} md={9} lg={10} style={{ fontFamily: 'monospace', fontSize: 'larger' }}>
-                {report ? new BreakableStr(report.file_info.sha256) : <Skeleton />}
+              <Grid
+                item
+                xs={8}
+                md={9}
+                lg={10}
+                style={{ fontFamily: 'monospace', fontSize: 'larger', wordBreak: 'break-word' }}
+              >
+                {report ? report.file_info.sha256 : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.ssdeep')}</span>
               </Grid>
-              <Grid item xs={8} md={9} lg={10} style={{ fontFamily: 'monospace', fontSize: 'larger' }}>
-                {report ? new BreakableStr(report.file_info.ssdeep) : <Skeleton />}
+              <Grid
+                item
+                xs={8}
+                md={9}
+                lg={10}
+                style={{ fontFamily: 'monospace', fontSize: 'larger', wordBreak: 'break-word' }}
+              >
+                {report ? report.file_info.ssdeep : <Skeleton />}
               </Grid>
             </Grid>
           </div>
@@ -693,7 +718,9 @@ export default function SubmissionReport() {
                           <td style={{ width: '20%' }}>
                             <span style={{ fontWeight: 500 }}>{meta}</span>
                           </td>
-                          <td style={{ paddingLeft: sp1, width: '80%' }}>{new BreakableStr(report.metadata[meta])}</td>
+                          <td style={{ paddingLeft: sp1, width: '80%', wordBreak: 'break-word' }}>
+                            {report.metadata[meta]}
+                          </td>
                         </tr>
                       );
                     })

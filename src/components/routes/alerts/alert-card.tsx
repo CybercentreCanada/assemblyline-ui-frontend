@@ -10,7 +10,6 @@ import CustomChip from 'components/visual/CustomChip';
 import ExtendedScan from 'components/visual/ExtendedScan';
 import Verdict from 'components/visual/Verdict';
 import VerdictBar from 'components/visual/VerdictBar';
-import { BreakableStr } from 'helpers/breakableStr';
 import { bytesToSize } from 'helpers/utils';
 import 'moment-timezone';
 import React from 'react';
@@ -233,7 +232,7 @@ const AlertCardItem: React.FC<AlertCardItemProps> = ({ item, setItem = null }) =
               </Grid>
             </Hidden>
             <Grid item xs={12} md={10}>
-              <span style={{ fontFamily: 'monospace' }}>{new BreakableStr(item.file.md5)}</span>
+              <span style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>{item.file.md5}</span>
             </Grid>
             <Hidden smDown>
               <Grid item md={2}>
@@ -241,7 +240,7 @@ const AlertCardItem: React.FC<AlertCardItemProps> = ({ item, setItem = null }) =
               </Grid>
             </Hidden>
             <Grid item xs={12} md={10}>
-              <span style={{ fontFamily: 'monospace' }}>{new BreakableStr(item.file.sha1)}</span>
+              <span style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>{item.file.sha1}</span>
             </Grid>
             <Hidden smDown>
               <Grid item md={2}>
@@ -249,7 +248,7 @@ const AlertCardItem: React.FC<AlertCardItemProps> = ({ item, setItem = null }) =
               </Grid>
             </Hidden>
             <Grid item xs={12} md={10}>
-              <span style={{ fontFamily: 'monospace' }}>{new BreakableStr(item.file.sha256)}</span>
+              <span style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>{item.file.sha256}</span>
             </Grid>
           </Grid>
 

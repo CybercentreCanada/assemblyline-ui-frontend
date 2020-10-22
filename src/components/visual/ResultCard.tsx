@@ -14,12 +14,10 @@ import {
 import Attack from 'components/visual/Attack';
 import Classification from 'components/visual/Classification';
 import Heuristic from 'components/visual/Heuristic';
-import SectionHighlight from 'components/visual/SectionHighlight';
 import Tag from 'components/visual/Tag';
 import TitleKey from 'components/visual/TitleKey';
 import Verdict from 'components/visual/Verdict';
 import { scaleLinear } from 'd3-scale';
-import { BreakableStr } from 'helpers/breakableStr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
@@ -127,7 +125,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const TextBody = ({ body }) => {
-  return <div style={{ whiteSpace: 'pre-wrap' }}>{new BreakableStr(body)}</div>;
+  return <div style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{body}</div>;
 };
 
 const MemDumpBody = ({ body }) => {
@@ -140,10 +138,11 @@ const MemDumpBody = ({ body }) => {
         borderRadius: '4px',
         padding: '4px',
         whiteSpace: 'pre-wrap',
-        fontSize: '0.85rem'
+        fontSize: '0.85rem',
+        wordBreak: 'break-word'
       }}
     >
-      {new BreakableStr(body)}
+      {body}
     </pre>
   );
 };
@@ -165,10 +164,10 @@ const KVBody = ({ body }) => {
           }
           return (
             <tr key={id}>
-              <td style={{ paddingRight: '16px' }}>
+              <td style={{ paddingRight: '16px', wordBreak: 'normal' }}>
                 <TitleKey title={key} />
               </td>
-              <td>{new BreakableStr(value)}</td>
+              <td style={{ wordBreak: 'break-word' }}>{value}</td>
             </tr>
           );
         })}
@@ -227,6 +226,9 @@ const StyledTableCell = withStyles((theme: Theme) =>
     },
     head: {
       backgroundColor: theme.palette.type === 'dark' ? '#404040' : '#EEE'
+    },
+    body: {
+      wordBreak: 'break-word'
     }
   })
 )(TableCell);
@@ -289,10 +291,8 @@ const TblBody = ({ body }) => {
               <StyledTableRow key={id}>
                 {headers.map((key, hid) => {
                   let value = row[key];
-                  if (typeof value === 'string') {
-                    value = new BreakableStr(value);
-                  } else if (value instanceof Array) {
-                    value = new BreakableStr(value.join(' | '));
+                  if (value instanceof Array) {
+                    value = value.join(' | ');
                   } else if (value === true) {
                     value = 'true';
                   } else if (value === false) {
@@ -316,8 +316,10 @@ const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sec
   const section = section_list[id];
 
   return (
-    <div style={{ display: 'flex', flexWrap: 'nowrap', marginLeft: '1rem' }}>
-      <SectionHighlight score={section.heuristic ? section.heuristic.score : 0} indent={indent} />
+    <div>
+      {
+        // <SectionHighlight score={section.heuristic ? section.heuristic.score : 0} indent={indent} />
+      }
       <div style={{ width: '100%' }}>
         <div>
           <span>
@@ -330,7 +332,7 @@ const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sec
               &nbsp;::&nbsp;&nbsp;
             </span>
           )}
-          <span style={{ fontWeight: 500 }}>{new BreakableStr(section.title_text)}</span>
+          <span style={{ fontWeight: 500, wordBreak: 'break-word' }}>{section.title_text}</span>
         </div>
         <div style={{ marginLeft: '1rem', marginBottom: '0.5rem' }}>
           {(() => {

@@ -27,7 +27,6 @@ import FileDetail from 'components/visual/FileDetail';
 import Heuristic from 'components/visual/Heuristic';
 import Tag from 'components/visual/Tag';
 import Verdict from 'components/visual/Verdict';
-import { BreakableStr } from 'helpers/breakableStr';
 import getXSRFCookie from 'helpers/xsrf';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -213,22 +212,22 @@ export default function SubmissionDetail() {
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('params.description')}</span>
               </Grid>
-              <Grid item xs={8} sm={9} lg={10}>
-                {submission ? new BreakableStr(submission.params.description) : <Skeleton />}
+              <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                {submission ? submission.params.description : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('params.groups')}</span>
               </Grid>
-              <Grid item xs={8} sm={9} lg={10}>
-                {submission ? new BreakableStr(submission.params.groups.join(' | ')) : <Skeleton />}
+              <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                {submission ? submission.params.groups.join(' | ') : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('params.services.selected')}</span>
               </Grid>
-              <Grid item xs={8} sm={9} lg={10}>
-                {submission ? new BreakableStr(submission.params.services.selected.join(' | ')) : <Skeleton />}
+              <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                {submission ? submission.params.services.selected.join(' | ') : <Skeleton />}
               </Grid>
 
               {['deep_scan', 'ignore_cache', 'ignore_dynamic_recursion_prevention', 'ignore_filtering'].map((k, i) => {
@@ -255,8 +254,8 @@ export default function SubmissionDetail() {
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('params.submitter')}</span>
               </Grid>
-              <Grid item xs={8} sm={9} lg={10}>
-                {submission ? new BreakableStr(submission.params.submitter) : <Skeleton />}
+              <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                {submission ? submission.params.submitter : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} sm={3} lg={2}>
@@ -292,10 +291,10 @@ export default function SubmissionDetail() {
                       return (
                         <Grid container key={i}>
                           <Grid item xs={12} sm={3} lg={2}>
-                            <span style={{ fontWeight: 500 }}>{new BreakableStr(meta)}</span>
+                            <span style={{ fontWeight: 500 }}>{meta}</span>
                           </Grid>
-                          <Grid item xs={12} sm={9} lg={10}>
-                            {new BreakableStr(submission.metadata[meta])}
+                          <Grid item xs={12} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                            {submission.metadata[meta]}
                           </Grid>
                         </Grid>
                       );
@@ -364,7 +363,7 @@ export default function SubmissionDetail() {
                       return (
                         <Grid container key={i}>
                           <Grid item xs={12} sm={3} lg={2}>
-                            <span style={{ fontWeight: 500 }}>{new BreakableStr(t(`verdict.${lvl}`))}</span>
+                            <span style={{ fontWeight: 500, wordBreak: 'break-word' }}>{t(`verdict.${lvl}`)}</span>
                           </Grid>
                           <Grid item xs={12} sm={9} lg={10}>
                             {summary.heuristics[lvl].map(([cid, name], idx) => {
@@ -480,12 +479,11 @@ const FileTree = ({ tree, sid, setSelectedFile }: FileTreeProps) => {
                 setSelectedFile(item.name[0]);
                 history.push(`/submission/detail/${sid}/${item.sha256}`);
               }}
+              style={{ wordBreak: 'break-word' }}
             >
               <Verdict score={item.score} mono short />
-              {new BreakableStr(`:: ${item.name.join(' | ')} `)}
-              <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>
-                {new BreakableStr(`[${item.type}]`)}
-              </span>
+              {`:: ${item.name.join(' | ')} `}
+              <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{`[${item.type}]`}</span>
             </Box>
             <div style={{ marginLeft: theme.spacing(3) }}>
               <FileTree tree={item.children} sid={sid} setSelectedFile={setSelectedFile} />

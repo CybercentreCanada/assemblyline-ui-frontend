@@ -35,7 +35,7 @@ export interface CustomChipProps {
 const useStyles = makeStyles(theme => ({
   wrap: {
     whiteSpace: 'pre-wrap',
-    wordBreak: 'break-all'
+    wordBreak: 'break-word'
   },
   square: {
     borderRadius: '3px',
