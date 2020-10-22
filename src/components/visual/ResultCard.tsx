@@ -14,6 +14,7 @@ import {
 import Attack from 'components/visual/Attack';
 import Classification from 'components/visual/Classification';
 import Heuristic from 'components/visual/Heuristic';
+import SectionHighlight from 'components/visual/SectionHighlight';
 import Tag from 'components/visual/Tag';
 import TitleKey from 'components/visual/TitleKey';
 import Verdict from 'components/visual/Verdict';
@@ -316,10 +317,9 @@ const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sec
   const section = section_list[id];
 
   return (
-    <div>
-      {
-        // <SectionHighlight score={section.heuristic ? section.heuristic.score : 0} indent={indent} />
-      }
+    <div style={{ display: 'flex', flexWrap: 'nowrap', marginLeft: '1rem' }}>
+      <SectionHighlight score={section.heuristic ? section.heuristic.score : 0} indent={indent} />
+
       <div style={{ width: '100%' }}>
         <div>
           <span>

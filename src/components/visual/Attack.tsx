@@ -37,12 +37,14 @@ const Attack: React.FC<AttackProps> = ({ text, lvl = null, score = null, show_ty
 
   return (
     <CustomChip
+      wrap
       size="tiny"
       type="square"
       color={color}
       label={show_type ? `[ATT&CK] ${text}` : text}
       onDelete={searchAttack}
       deleteIcon={<SearchOutlinedIcon style={{ marginLeft: '2px', height: '18px', width: '18px' }} />}
+      style={{ height: 'auto', minHeight: '20px' }}
     />
   );
 };
