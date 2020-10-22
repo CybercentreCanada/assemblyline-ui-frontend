@@ -767,7 +767,7 @@ export default function SubmissionReport() {
         {(!report ||
           Object.keys(report.heuristics.malicious).length !== 0 ||
           Object.keys(report.heuristics.suspicious).length !== 0 ||
-          Object.keys(report.heuristics.info.length !== 0)) && (
+          Object.keys(report.heuristics.info).length !== 0) && (
           <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
             <Typography variant="h6">{t('heuristics')}</Typography>
             <Divider className={classes.divider} />

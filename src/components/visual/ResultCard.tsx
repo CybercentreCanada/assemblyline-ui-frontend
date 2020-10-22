@@ -258,8 +258,6 @@ const TblBody = ({ body }) => {
   const data = JSON.parse(body);
   const headers = [];
 
-  console.log(data);
-
   for (const line of data) {
     // eslint-disable-next-line guard-for-in
     for (const th in line) {
@@ -313,7 +311,6 @@ const TblBody = ({ body }) => {
 };
 
 const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sections, indent }) => {
-  const theme = useTheme();
   const section = section_list[id];
 
   return (
