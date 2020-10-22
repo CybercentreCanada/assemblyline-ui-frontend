@@ -27,6 +27,7 @@ import FileDetail from 'components/visual/FileDetail';
 import Heuristic from 'components/visual/Heuristic';
 import Tag from 'components/visual/Tag';
 import Verdict from 'components/visual/Verdict';
+import { BreakableStr } from 'helpers/breakableStr';
 import getXSRFCookie from 'helpers/xsrf';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -154,7 +155,11 @@ export default function SubmissionDetail() {
             <CloseOutlinedIcon />
           </IconButton>
         </div>
-        {drawer && <FileDetail sha256={fid} sid={id} name={selectedFile} />}
+        {drawer && (
+          <div style={{ paddingLeft: sp2, paddingRight: sp2 }}>
+            <FileDetail sha256={fid} sid={id} name={selectedFile} />
+          </div>
+        )}
       </Drawer>
       <div style={{ textAlign: 'left' }}>
         <div style={{ paddingBottom: sp4, paddingTop: sp2 }}>
@@ -208,22 +213,22 @@ export default function SubmissionDetail() {
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('params.description')}</span>
               </Grid>
-              <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-all' }}>
-                {submission ? submission.params.description : <Skeleton />}
+              <Grid item xs={8} sm={9} lg={10}>
+                {submission ? new BreakableStr(submission.params.description) : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('params.groups')}</span>
               </Grid>
-              <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-all' }}>
-                {submission ? submission.params.groups.join(' | ') : <Skeleton />}
+              <Grid item xs={8} sm={9} lg={10}>
+                {submission ? new BreakableStr(submission.params.groups.join(' | ')) : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('params.services.selected')}</span>
               </Grid>
-              <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-all' }}>
-                {submission ? submission.params.services.selected.join(' | ') : <Skeleton />}
+              <Grid item xs={8} sm={9} lg={10}>
+                {submission ? new BreakableStr(submission.params.services.selected.join(' | ')) : <Skeleton />}
               </Grid>
 
               {['deep_scan', 'ignore_cache', 'ignore_dynamic_recursion_prevention', 'ignore_filtering'].map((k, i) => {
@@ -232,7 +237,7 @@ export default function SubmissionDetail() {
                     <Grid item xs={4} sm={3} lg={2}>
                       <span style={{ fontWeight: 500 }}>{t(`params.${k}`)}</span>
                     </Grid>
-                    <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-all' }}>
+                    <Grid item xs={8} sm={9} lg={10}>
                       {submission ? (
                         submission.params[k] ? (
                           <DoneOutlinedIcon color="primary" />
@@ -250,28 +255,28 @@ export default function SubmissionDetail() {
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('params.submitter')}</span>
               </Grid>
-              <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-all' }}>
-                {submission ? submission.params.submitter : <Skeleton />}
+              <Grid item xs={8} sm={9} lg={10}>
+                {submission ? new BreakableStr(submission.params.submitter) : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('max_score')}</span>
               </Grid>
-              <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-all' }}>
+              <Grid item xs={8} sm={9} lg={10}>
                 {submission ? <Verdict score={submission.max_score} /> : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('times.submitted')}</span>
               </Grid>
-              <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-all' }}>
+              <Grid item xs={8} sm={9} lg={10}>
                 {submission ? <Moment format="YYYY-MM-DD HH:mm:ss">{submission.times.submitted}</Moment> : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('times.completed')}</span>
               </Grid>
-              <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-all' }}>
+              <Grid item xs={8} sm={9} lg={10}>
                 {submission ? <Moment format="YYYY-MM-DD HH:mm:ss">{submission.times.completed}</Moment> : <Skeleton />}
               </Grid>
             </Grid>
@@ -287,10 +292,10 @@ export default function SubmissionDetail() {
                       return (
                         <Grid container key={i}>
                           <Grid item xs={12} sm={3} lg={2}>
-                            <span style={{ fontWeight: 500, wordBreak: 'break-all' }}>{meta}</span>
+                            <span style={{ fontWeight: 500 }}>{new BreakableStr(meta)}</span>
                           </Grid>
                           <Grid item xs={12} sm={9} lg={10}>
-                            {submission.metadata[meta]}
+                            {new BreakableStr(submission.metadata[meta])}
                           </Grid>
                         </Grid>
                       );
@@ -359,7 +364,7 @@ export default function SubmissionDetail() {
                       return (
                         <Grid container key={i}>
                           <Grid item xs={12} sm={3} lg={2}>
-                            <span style={{ fontWeight: 500, wordBreak: 'break-all' }}>{t(`verdict.${lvl}`)}</span>
+                            <span style={{ fontWeight: 500 }}>{new BreakableStr(t(`verdict.${lvl}`))}</span>
                           </Grid>
                           <Grid item xs={12} sm={9} lg={10}>
                             {summary.heuristics[lvl].map(([cid, name], idx) => {
@@ -475,11 +480,12 @@ const FileTree = ({ tree, sid, setSelectedFile }: FileTreeProps) => {
                 setSelectedFile(item.name[0]);
                 history.push(`/submission/detail/${sid}/${item.sha256}`);
               }}
-              style={{ wordBreak: 'break-all' }}
             >
               <Verdict score={item.score} mono short />
-              {`:: ${item.name.join(' | ')} `}
-              <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{`[${item.type}]`}</span>
+              {new BreakableStr(`:: ${item.name.join(' | ')} `)}
+              <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>
+                {new BreakableStr(`[${item.type}]`)}
+              </span>
             </Box>
             <div style={{ marginLeft: theme.spacing(3) }}>
               <FileTree tree={item.children} sid={sid} setSelectedFile={setSelectedFile} />

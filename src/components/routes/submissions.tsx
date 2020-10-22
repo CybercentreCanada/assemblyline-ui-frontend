@@ -12,6 +12,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import Classification from 'components/visual/Classification';
 import SubmissionState from 'components/visual/SubmissionState';
 import Verdict from 'components/visual/Verdict';
+import { BreakableStr } from 'helpers/breakableStr';
 import 'moment/locale/fr';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -81,7 +82,7 @@ export default function Submissions() {
                   <TableCell>
                     <Verdict score={submission.max_score} />
                   </TableCell>
-                  <TableCell style={{ wordBreak: 'break-all' }}>{submission.params.description}</TableCell>
+                  <TableCell>{new BreakableStr(submission.params.description)}</TableCell>
                   <TableCell style={{ whiteSpace: 'nowrap' }}>{submission.params.submitter}</TableCell>
                   <TableCell>{submission.file_count}</TableCell>
                   <TableCell>

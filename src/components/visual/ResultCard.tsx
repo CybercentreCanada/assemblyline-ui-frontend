@@ -1,11 +1,25 @@
-import { makeStyles, useTheme } from '@material-ui/core';
+import {
+  createStyles,
+  makeStyles,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Theme,
+  useTheme,
+  withStyles
+} from '@material-ui/core';
 import Attack from 'components/visual/Attack';
 import Classification from 'components/visual/Classification';
 import Heuristic from 'components/visual/Heuristic';
 import SectionHighlight from 'components/visual/SectionHighlight';
 import Tag from 'components/visual/Tag';
+import TitleKey from 'components/visual/TitleKey';
 import Verdict from 'components/visual/Verdict';
 import { scaleLinear } from 'd3-scale';
+import { BreakableStr } from 'helpers/breakableStr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
@@ -113,7 +127,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const TextBody = ({ body }) => {
-  return <div style={{ whiteSpace: 'pre-wrap' }}>{body}</div>;
+  return <div style={{ whiteSpace: 'pre-wrap' }}>{new BreakableStr(body)}</div>;
 };
 
 const MemDumpBody = ({ body }) => {
@@ -126,11 +140,10 @@ const MemDumpBody = ({ body }) => {
         borderRadius: '4px',
         padding: '4px',
         whiteSpace: 'pre-wrap',
-        wordBreak: 'break-all',
         fontSize: '0.85rem'
       }}
     >
-      {body}
+      {new BreakableStr(body)}
     </pre>
   );
 };
@@ -152,10 +165,10 @@ const KVBody = ({ body }) => {
           }
           return (
             <tr key={id}>
-              <td style={{ fontWeight: 500, textTransform: 'capitalize', paddingRight: '16px' }}>
-                {key.replace(/_/g, ' ')}
+              <td style={{ paddingRight: '16px' }}>
+                <TitleKey title={key} />
               </td>
-              <td style={{ wordBreak: 'break-all' }}>{value}</td>
+              <td>{new BreakableStr(value)}</td>
             </tr>
           );
         })}
@@ -207,13 +220,95 @@ const ProcessTreeBody = ({ body }) => {
   return <div style={{ margin: '2rem' }}>PROCESS_TREE under construction...</div>;
 };
 
-const TableBody = ({ body }) => {
+const StyledTableCell = withStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      fontSize: 'inherit'
+    },
+    head: {
+      backgroundColor: theme.palette.type === 'dark' ? '#404040' : '#EEE'
+    }
+  })
+)(TableCell);
+
+const StyledTableRow = withStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      '&:nth-of-type(odd)': {
+        backgroundColor: theme.palette.type === 'dark' ? '#ffffff08' : '#00000008'
+      }
+    }
+  })
+)(TableRow);
+
+const StyledTable = withStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      [theme.breakpoints.down('sm')]: {
+        width: 'max-content'
+      }
+    }
+  })
+)(Table);
+
+const TblBody = ({ body }) => {
   const data = JSON.parse(body);
   const headers = [];
 
   console.log(data);
 
-  return <div style={{ margin: '2rem' }}>TABLE under construction...</div>;
+  for (const line of data) {
+    // eslint-disable-next-line guard-for-in
+    for (const th in line) {
+      const val = line[th];
+      if (val !== null && val !== '') {
+        if (!headers.includes(th)) {
+          headers.push(th);
+        }
+      }
+    }
+  }
+
+  return (
+    <TableContainer style={{ fontSize: '85%', maxHeight: '500px' }}>
+      <StyledTable stickyHeader size="small">
+        <TableHead>
+          <TableRow>
+            {headers.map((th, id) => {
+              return (
+                <StyledTableCell key={id}>
+                  <TitleKey title={th} />
+                </StyledTableCell>
+              );
+            })}
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {data.map((row, id) => {
+            return (
+              <StyledTableRow key={id}>
+                {headers.map((key, hid) => {
+                  let value = row[key];
+                  if (typeof value === 'string') {
+                    value = new BreakableStr(value);
+                  } else if (value instanceof Array) {
+                    value = new BreakableStr(value.join(' | '));
+                  } else if (value === true) {
+                    value = 'true';
+                  } else if (value === false) {
+                    value = 'false';
+                  } else if (typeof value === 'object' && value !== null && value !== undefined) {
+                    value = <KVBody body={value} />;
+                  }
+                  return <StyledTableCell key={hid}>{value}</StyledTableCell>;
+                })}
+              </StyledTableRow>
+            );
+          })}
+        </TableBody>
+      </StyledTable>
+    </TableContainer>
+  );
 };
 
 const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sections, indent }) => {
@@ -223,7 +318,7 @@ const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sec
   return (
     <div style={{ display: 'flex', flexWrap: 'nowrap', marginLeft: '1rem' }}>
       <SectionHighlight score={section.heuristic ? section.heuristic.score : 0} indent={indent} />
-      <div style={{ flexGrow: 1 }}>
+      <div style={{ width: '100%' }}>
         <div>
           <span>
             <Classification c12n={section.classification} type="text" inline />
@@ -235,7 +330,7 @@ const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sec
               &nbsp;::&nbsp;&nbsp;
             </span>
           )}
-          <span style={{ fontWeight: 500 }}>{section.title_text}</span>
+          <span style={{ fontWeight: 500 }}>{new BreakableStr(section.title_text)}</span>
         </div>
         <div style={{ marginLeft: '1rem', marginBottom: '0.5rem' }}>
           {(() => {
@@ -255,7 +350,7 @@ const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sec
               case 'PROCESS_TREE':
                 return <ProcessTreeBody body={section.body} />;
               case 'TABLE':
-                return <TableBody body={section.body} />;
+                return <TblBody body={section.body} />;
               default:
                 return <div style={{ margin: '2rem' }}>INVALID SECTION TYPE</div>;
             }
