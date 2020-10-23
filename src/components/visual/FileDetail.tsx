@@ -514,17 +514,8 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, name = null
               ? file.results.map((result, i) => {
                   return <ResultCard key={i} result={result} />;
                 })
-              : [...Array(3)].map((_, i) => {
-                  return (
-                    <Grid container key={i} spacing={1}>
-                      <Grid item xs={12} sm={3} lg={2}>
-                        <Skeleton style={{ height: '2rem' }} />
-                      </Grid>
-                      <Grid item xs={12} sm={9} lg={10}>
-                        <Skeleton style={{ height: '2rem' }} />
-                      </Grid>
-                    </Grid>
-                  );
+              : [...Array(2)].map((_, i) => {
+                  return <Skeleton style={{ height: '12rem' }} />;
                 })}
           </div>
         </div>
