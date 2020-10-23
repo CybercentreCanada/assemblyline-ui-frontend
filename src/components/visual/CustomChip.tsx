@@ -48,7 +48,7 @@ const useStyles = makeStyles(theme => ({
   },
   tiny: {
     height: '20px',
-    fontSize: '80%'
+    fontSize: '0.725rem'
   },
   label_tiny: {
     paddingLeft: '6px',

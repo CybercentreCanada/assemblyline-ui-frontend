@@ -9,9 +9,11 @@ import {
   TableHead,
   TableRow,
   Theme,
+  Tooltip,
   useTheme,
   withStyles
 } from '@material-ui/core';
+import FingerprintOutlinedIcon from '@material-ui/icons/FingerprintOutlined';
 import Attack from 'components/visual/Attack';
 import Classification from 'components/visual/Classification';
 import Heuristic from 'components/visual/Heuristic';
@@ -20,6 +22,7 @@ import Tag from 'components/visual/Tag';
 import TitleKey from 'components/visual/TitleKey';
 import Verdict from 'components/visual/Verdict';
 import { scaleLinear } from 'd3-scale';
+import { scoreToVerdict } from 'helpers/utils';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactJson from 'react-json-view';
@@ -118,12 +121,17 @@ const useStyles = makeStyles(theme => ({
     }
   },
   content: {
-    padding: '6px',
-    fontSize: '85%'
+    padding: '6px'
   },
   muted: {
     color: theme.palette.text.secondary,
     fontSize: '85%'
+  },
+  suspicious: {
+    backgroundColor: theme.palette.type === 'dark' ? '#654312' : '#ffedd4'
+  },
+  malicious: {
+    backgroundColor: theme.palette.type === 'dark' ? '#4e2525' : '#ffd0d0'
   }
 }));
 
@@ -141,8 +149,9 @@ const MemDumpBody = ({ body }) => {
         borderRadius: '4px',
         padding: '4px',
         whiteSpace: 'pre-wrap',
-        fontSize: '0.85rem',
-        wordBreak: 'break-word'
+        fontSize: '1rem',
+        wordBreak: 'break-word',
+        margin: '0.25rem 0'
       }}
     >
       {body}
@@ -152,7 +161,7 @@ const MemDumpBody = ({ body }) => {
 
 const KVBody = ({ body }) => {
   return (
-    <table>
+    <table cellSpacing={0}>
       <tbody>
         {Object.keys(body).map((key, id) => {
           let value = body[key];
@@ -219,7 +228,14 @@ const URLBody = ({ body }) => {
   }
 
   return (
-    <ul style={{ listStyleType: 'none', paddingInlineStart: 0 }}>
+    <ul
+      style={{
+        listStyleType: 'none',
+        paddingInlineStart: 0,
+        marginBlockStart: '0.25rem',
+        marginBlockEnd: '0.25rem'
+      }}
+    >
       {arr.map((item, id) => {
         return (
           <li key={id}>
@@ -246,7 +262,7 @@ const JSONBody = ({ body }) => {
         backgroundColor: theme.palette.type === 'dark' ? '#FFFFFF05' : '#00000005',
         border: `1px solid ${theme.palette.divider}`,
         borderRadius: '4px',
-        fontSize: '0.875rem',
+        fontSize: '1rem',
         padding: '4px'
       }}
     />
@@ -254,13 +270,102 @@ const JSONBody = ({ body }) => {
 };
 
 const ProcessTreeBody = ({ body }) => {
-  return <div style={{ margin: '2rem' }}>PROCESS_TREE under construction...</div>;
+  const { t } = useTranslation(['fileDetail']);
+  const theme = useTheme();
+  const classes = useStyles();
+
+  const classMap = {
+    suspicious: classes.suspicious,
+    highly_suspicious: classes.suspicious,
+    malicious: classes.malicious
+  };
+
+  let data = null;
+  try {
+    data = JSON.parse(body);
+  } catch (ex) {
+    data = body;
+  }
+
+  return (
+    <ul
+      style={{
+        fontSize: '0.875rem',
+        listStyleType: 'none',
+        paddingInlineStart: 0,
+        marginBlockStart: '0.25rem',
+        marginBlockEnd: '0.25rem'
+      }}
+    >
+      {data.map((process, id) => {
+        return (
+          <li key={id}>
+            <div
+              className={
+                classMap[
+                  scoreToVerdict(
+                    Object.keys(process.signatures).reduce(
+                      (sum, key) => sum + parseFloat(process.signatures[key] || 0),
+                      0
+                    )
+                  )
+                ]
+              }
+              style={{
+                border: `1px solid ${theme.palette.divider}`,
+                margin: '0.2em 0em',
+                borderRadius: '4px',
+                display: 'flex',
+                maxWidth: '50em'
+              }}
+            >
+              <div
+                style={{
+                  padding: '5px',
+                  backgroundColor: theme.palette.type === 'dark' ? '#FFFFFF10' : '#00000010',
+                  borderRadius: '4px 0px 0px 4px'
+                }}
+              >
+                {process.process_pid}
+              </div>
+              <div style={{ padding: '5px', flexGrow: 1, wordBreak: 'break-word' }}>
+                <div style={{ paddingBottom: '5px' }}>
+                  <b>{process.process_name}</b>
+                </div>
+                <div>
+                  <samp>
+                    <small>{process.command_line}</small>
+                  </samp>
+                </div>
+              </div>
+              <div style={{ alignSelf: 'center', color: theme.palette.text.secondary }}>
+                {Object.keys(process.signatures).length !== 0 && (
+                  <div>
+                    <Tooltip title={`${t('process_signatures')}: ${Object.keys(process.signatures).join(' | ')}`}>
+                      <span>
+                        {Object.keys(process.signatures).length}x
+                        <FingerprintOutlinedIcon style={{ verticalAlign: 'middle' }} />
+                      </span>
+                    </Tooltip>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div style={{ marginLeft: '1.5rem' }}>
+              <ProcessTreeBody body={process.children} />
+            </div>
+          </li>
+        );
+      })}
+    </ul>
+  );
 };
 
 const StyledTableCell = withStyles((theme: Theme) =>
   createStyles({
     root: {
-      fontSize: 'inherit'
+      fontSize: 'inherit',
+      lineHeight: 'inherit'
     },
     head: {
       backgroundColor: theme.palette.type === 'dark' ? '#404040' : '#EEE'
@@ -308,7 +413,7 @@ const TblBody = ({ body }) => {
   }
 
   return (
-    <TableContainer style={{ fontSize: '85%', maxHeight: '500px' }}>
+    <TableContainer style={{ fontSize: '90%', maxHeight: '500px' }}>
       <StyledTable stickyHeader size="small">
         <TableHead>
           <TableRow>
@@ -368,7 +473,7 @@ const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sec
           )}
           <span style={{ fontWeight: 500, wordBreak: 'break-word' }}>{section.title_text}</span>
         </div>
-        <div style={{ marginLeft: '1rem', marginBottom: '0.5rem' }}>
+        <div style={{ marginLeft: '1rem', marginBottom: '0.75rem' }}>
           {(() => {
             switch (section.body_format) {
               case 'TEXT':
@@ -431,7 +536,6 @@ const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sec
 };
 
 const ResultCard: React.FC<ResultCardProps> = ({ result }) => {
-  const { t } = useTranslation(['section']);
   const classes = useStyles();
   const theme = useTheme();
   const history = useHistory();
@@ -442,7 +546,9 @@ const ResultCard: React.FC<ResultCardProps> = ({ result }) => {
     <div className={classes.card} style={{ marginBottom: sp2 }}>
       <div className={classes.card_title}>
         <Classification c12n={result.classification} type="text" inline />
-        <span>&nbsp;::&nbsp;{result.response.service_name}&nbsp;</span>
+        <span>
+          &nbsp;::&nbsp;<b>{result.response.service_name}</b>&nbsp;
+        </span>
         <Verdict score={result.result.score} mono short size="tiny" />
         <span className={classes.muted}>{` :: ${result.response.service_version}`}</span>
         <span className={classes.muted} style={{ flexGrow: 1 }}>

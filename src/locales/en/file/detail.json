@@ -22,5 +22,6 @@
   "generated_tags": "Generated Tags",
   "childrens": "Possible Childrens",
   "resubmit.success": "File successfully resubmitted for dynamic analysis. You will be redirected...",
-  "results": "Service Results"
+  "results": "Service Results",
+  "process_signatures": "Signature hits"
 }
