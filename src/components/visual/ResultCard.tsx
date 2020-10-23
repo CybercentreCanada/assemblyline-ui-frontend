@@ -1,5 +1,6 @@
 import {
   createStyles,
+  Link,
   makeStyles,
   Table,
   TableBody,
@@ -209,7 +210,24 @@ const GraphBody = ({ body }) => {
 };
 
 const URLBody = ({ body }) => {
-  return <div style={{ margin: '2rem' }}>URL under construction...</div>;
+  const arr = [];
+  if (!(body instanceof Array)) {
+    arr.push(body);
+  } else {
+    Array.prototype.push.apply(arr, body);
+  }
+
+  return (
+    <ul style={{ listStyleType: 'none', paddingInlineStart: 0 }}>
+      {arr.map((item, id) => {
+        return (
+          <li key={id}>
+            <Link href={item.url}>{item.name ? item.name : item.url}</Link>
+          </li>
+        );
+      })}
+    </ul>
+  );
 };
 
 const JSONBody = ({ body }) => {
