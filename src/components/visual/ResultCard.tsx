@@ -1,4 +1,6 @@
 import {
+  Box,
+  Collapse,
   createStyles,
   Link,
   makeStyles,
@@ -13,6 +15,8 @@ import {
   useTheme,
   withStyles
 } from '@material-ui/core';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
 import FingerprintOutlinedIcon from '@material-ui/icons/FingerprintOutlined';
 import Attack from 'components/visual/Attack';
 import Classification from 'components/visual/Classification';
@@ -27,7 +31,6 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactJson from 'react-json-view';
 import Moment from 'react-moment';
-import { useHistory } from 'react-router-dom';
 
 type ExtractedFile = {
   classification: string;
@@ -120,12 +123,17 @@ const useStyles = makeStyles(theme => ({
       cursor: 'pointer'
     }
   },
+  section_title: {
+    '&:hover': {
+      backgroundColor: theme.palette.action.hover,
+      cursor: 'pointer'
+    }
+  },
   content: {
     padding: '6px'
   },
   muted: {
-    color: theme.palette.text.secondary,
-    fontSize: '85%'
+    color: theme.palette.text.secondary
   },
   suspicious: {
     backgroundColor: theme.palette.type === 'dark' ? '#654312' : '#ffedd4'
@@ -453,14 +461,20 @@ const TblBody = ({ body }) => {
 };
 
 const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sections, indent }) => {
+  const classes = useStyles();
   const section = section_list[id];
+  const [open, setOpen] = React.useState(true);
+
+  const handleClick = () => {
+    setOpen(!open);
+  };
 
   return (
     <div style={{ display: 'flex', flexWrap: 'nowrap', marginLeft: '1rem' }}>
       <SectionHighlight score={section.heuristic ? section.heuristic.score : 0} indent={indent} />
 
       <div style={{ width: '100%' }}>
-        <div>
+        <Box className={classes.section_title} onClick={handleClick}>
           <span>
             <Classification c12n={section.classification} type="text" inline />
             &nbsp;&nbsp;::&nbsp;&nbsp;
@@ -472,64 +486,68 @@ const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sec
             </span>
           )}
           <span style={{ fontWeight: 500, wordBreak: 'break-word' }}>{section.title_text}</span>
-        </div>
-        <div style={{ marginLeft: '1rem', marginBottom: '0.75rem' }}>
-          {(() => {
-            switch (section.body_format) {
-              case 'TEXT':
-                return <TextBody body={section.body} />;
-              case 'MEMORY_DUMP':
-                return <MemDumpBody body={section.body} />;
-              case 'GRAPH_DATA':
-                return <GraphBody body={section.body} />;
-              case 'URL':
-                return <URLBody body={section.body} />;
-              case 'JSON':
-                return <JSONBody body={section.body} />;
-              case 'KEY_VALUE':
-                return <KVBody body={section.body} />;
-              case 'PROCESS_TREE':
-                return <ProcessTreeBody body={section.body} />;
-              case 'TABLE':
-                return <TblBody body={section.body} />;
-              default:
-                return <div style={{ margin: '2rem' }}>INVALID SECTION TYPE</div>;
-            }
-          })()}
-          {section.heuristic && <Heuristic text={section.heuristic.name} score={section.heuristic.score} show_type />}
-          {section.heuristic &&
-            section.heuristic.attack.map((attack, idx) => {
-              return <Attack key={idx} text={attack.pattern} score={section.heuristic.score} show_type />;
+        </Box>
+        <Collapse in={open} timeout="auto">
+          <div style={{ marginLeft: '1rem', marginBottom: '0.75rem' }}>
+            {(() => {
+              switch (section.body_format) {
+                case 'TEXT':
+                  return <TextBody body={section.body} />;
+                case 'MEMORY_DUMP':
+                  return <MemDumpBody body={section.body} />;
+                case 'GRAPH_DATA':
+                  return <GraphBody body={section.body} />;
+                case 'URL':
+                  return <URLBody body={section.body} />;
+                case 'JSON':
+                  return <JSONBody body={section.body} />;
+                case 'KEY_VALUE':
+                  return <KVBody body={section.body} />;
+                case 'PROCESS_TREE':
+                  return <ProcessTreeBody body={section.body} />;
+                case 'TABLE':
+                  return <TblBody body={section.body} />;
+                default:
+                  return <div style={{ margin: '2rem' }}>INVALID SECTION TYPE</div>;
+              }
+            })()}
+            {section.heuristic && <Heuristic text={section.heuristic.name} score={section.heuristic.score} show_type />}
+            {section.heuristic &&
+              section.heuristic.attack.map((attack, idx) => {
+                return <Attack key={idx} text={attack.pattern} score={section.heuristic.score} show_type />;
+              })}
+            {section.heuristic &&
+              section.heuristic.signature.map((signature, idx) => {
+                return (
+                  <Heuristic key={idx} text={signature.name} score={section.heuristic.score} signature show_type />
+                );
+              })}
+            {section.tags.map((tag, idx) => {
+              return (
+                <Tag
+                  key={idx}
+                  type={tag.type}
+                  value={tag.value}
+                  short_type={tag.short_type}
+                  score={section.heuristic ? section.heuristic.score : 0}
+                />
+              );
             })}
-          {section.heuristic &&
-            section.heuristic.signature.map((signature, idx) => {
-              return <Heuristic key={idx} text={signature.name} score={section.heuristic.score} signature show_type />;
+          </div>
+          <div>
+            {sub_sections.map(item => {
+              return (
+                <ResultSection
+                  key={item.id}
+                  section_list={section_list}
+                  id={item.id}
+                  sub_sections={item.children}
+                  indent={indent + 1}
+                />
+              );
             })}
-          {section.tags.map((tag, idx) => {
-            return (
-              <Tag
-                key={idx}
-                type={tag.type}
-                value={tag.value}
-                short_type={tag.short_type}
-                score={section.heuristic ? section.heuristic.score : 0}
-              />
-            );
-          })}
-        </div>
-        <div>
-          {sub_sections.map(item => {
-            return (
-              <ResultSection
-                key={item.id}
-                section_list={section_list}
-                id={item.id}
-                sub_sections={item.children}
-                indent={indent + 1}
-              />
-            );
-          })}
-        </div>
+          </div>
+        </Collapse>
       </div>
     </div>
   );
@@ -538,39 +556,47 @@ const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sec
 const ResultCard: React.FC<ResultCardProps> = ({ result }) => {
   const classes = useStyles();
   const theme = useTheme();
-  const history = useHistory();
   const sp2 = theme.spacing(2);
-  const sp4 = theme.spacing(4);
+  const [open, setOpen] = React.useState(true);
+
+  const handleClick = () => {
+    setOpen(!open);
+  };
 
   return (
     <div className={classes.card} style={{ marginBottom: sp2 }}>
-      <div className={classes.card_title}>
+      <Box className={classes.card_title} onClick={handleClick}>
         <Classification c12n={result.classification} type="text" inline />
         <span>
           &nbsp;::&nbsp;<b>{result.response.service_name}</b>&nbsp;
         </span>
         <Verdict score={result.result.score} mono short size="tiny" />
-        <span className={classes.muted}>{` :: ${result.response.service_version}`}</span>
-        <span className={classes.muted} style={{ flexGrow: 1 }}>
+        <small className={classes.muted}>{` :: ${result.response.service_version}`}</small>
+        <small className={classes.muted} style={{ flexGrow: 1 }}>
           &nbsp;{result.response.service_tool_version ? `(${result.response.service_tool_version})` : ''}
-        </span>
-        <Moment className={classes.muted} fromNow>
-          {result.created}
-        </Moment>
-      </div>
-      <div className={classes.content}>
-        {result.section_hierarchy.map(item => {
-          return (
-            <ResultSection
-              key={item.id}
-              section_list={result.result.sections}
-              id={item.id}
-              sub_sections={item.children}
-              indent={1}
-            />
-          );
-        })}
-      </div>
+        </small>
+        <small>
+          <Moment className={classes.muted} fromNow>
+            {result.created}
+          </Moment>
+        </small>
+        {open ? <ExpandLess className={classes.muted} /> : <ExpandMore className={classes.muted} />}
+      </Box>
+      <Collapse in={open} timeout="auto">
+        <div className={classes.content}>
+          {result.section_hierarchy.map(item => {
+            return (
+              <ResultSection
+                key={item.id}
+                section_list={result.result.sections}
+                id={item.id}
+                sub_sections={item.children}
+                indent={1}
+              />
+            );
+          })}
+        </div>
+      </Collapse>
     </div>
   );
 };
