@@ -238,6 +238,8 @@ const JSONBody = ({ body }) => {
       src={body}
       theme={theme.palette.type === 'dark' ? 'bright' : 'bright:inverted'}
       enableClipboard={false}
+      collapsed
+      groupArraysAfterLength={10}
       displayDataTypes={false}
       displayObjectSize={false}
       style={{
