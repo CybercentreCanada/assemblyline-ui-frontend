@@ -22,6 +22,7 @@ import Verdict from 'components/visual/Verdict';
 import { scaleLinear } from 'd3-scale';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import ReactJson from 'react-json-view';
 import Moment from 'react-moment';
 import { useHistory } from 'react-router-dom';
 
@@ -135,7 +136,7 @@ const MemDumpBody = ({ body }) => {
   return (
     <pre
       style={{
-        backgroundColor: theme.palette.type === 'dark' ? '#ffffff10' : '#00000010',
+        backgroundColor: theme.palette.type === 'dark' ? '#ffffff05' : '#00000005',
         border: `1px solid ${theme.palette.divider}`,
         borderRadius: '4px',
         padding: '4px',
@@ -231,7 +232,23 @@ const URLBody = ({ body }) => {
 };
 
 const JSONBody = ({ body }) => {
-  return <div style={{ margin: '2rem' }}>JSON under construction...</div>;
+  const theme = useTheme();
+  return (
+    <ReactJson
+      src={body}
+      theme={theme.palette.type === 'dark' ? 'bright' : 'bright:inverted'}
+      enableClipboard={false}
+      displayDataTypes={false}
+      displayObjectSize={false}
+      style={{
+        backgroundColor: theme.palette.type === 'dark' ? '#FFFFFF05' : '#00000005',
+        border: `1px solid ${theme.palette.divider}`,
+        borderRadius: '4px',
+        fontSize: '0.875rem',
+        padding: '4px'
+      }}
+    />
+  );
 };
 
 const ProcessTreeBody = ({ body }) => {
