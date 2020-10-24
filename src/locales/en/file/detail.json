@@ -23,5 +23,7 @@
   "childrens": "Possible Childrens",
   "resubmit.success": "File successfully resubmitted for dynamic analysis. You will be redirected...",
   "results": "Service Results",
-  "process_signatures": "Signature hits"
+  "process_signatures": "Signature hits",
+  "supplementary": "Supplementary files",
+  "extracted": "Extracted files"
 }

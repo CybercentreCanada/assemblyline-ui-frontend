@@ -512,10 +512,10 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, name = null
           <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
             {file
               ? file.results.map((result, i) => {
-                  return <ResultCard key={i} result={result} />;
+                  return <ResultCard key={i} result={result} sid={sid} />;
                 })
               : [...Array(2)].map((_, i) => {
-                  return <Skeleton style={{ height: '12rem' }} />;
+                  return <Skeleton key={i} style={{ height: '16rem' }} />;
                 })}
           </div>
         </div>

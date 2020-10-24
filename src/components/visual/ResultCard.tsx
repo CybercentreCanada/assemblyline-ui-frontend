@@ -18,6 +18,7 @@ import {
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import FingerprintOutlinedIcon from '@material-ui/icons/FingerprintOutlined';
+import PageviewOutlinedIcon from '@material-ui/icons/PageviewOutlined';
 import Attack from 'components/visual/Attack';
 import Classification from 'components/visual/Classification';
 import Heuristic from 'components/visual/Heuristic';
@@ -31,8 +32,9 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactJson from 'react-json-view';
 import Moment from 'react-moment';
+import { Link as RouterLink } from 'react-router-dom';
 
-type ExtractedFile = {
+type ExtractedFiles = {
   classification: string;
   description: string;
   name: string;
@@ -51,7 +53,7 @@ export type Result = {
   drop_file: boolean;
   expiry_ts: string | null;
   response: {
-    extracted: ExtractedFile[];
+    extracted: ExtractedFiles[];
     milestones: {
       service_completed: string;
       service_started: string;
@@ -61,7 +63,7 @@ export type Result = {
     service_name: string;
     service_tool_version: string;
     service_version: string;
-    supplementary: ExtractedFile[];
+    supplementary: ExtractedFiles[];
   };
   result: {
     score: number;
@@ -103,6 +105,7 @@ type ResultSectionProps = {
 
 type ResultCardProps = {
   result: Result;
+  sid: string | null;
 };
 
 const useStyles = makeStyles(theme => ({
@@ -553,7 +556,37 @@ const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sec
   );
 };
 
-const ResultCard: React.FC<ResultCardProps> = ({ result }) => {
+type ExtractedFileProps = {
+  file: ExtractedFiles;
+  download?: boolean;
+  sid?: string;
+};
+
+const ExtractedFile: React.FC<ExtractedFileProps> = ({ file, download = false, sid = null }) => {
+  const classes = useStyles();
+  return (
+    <div>
+      {download ? (
+        <Link href={`/api/v4/file/download/${file.sha256}/?name=${file.name}`}>{file.name}</Link>
+      ) : (
+        <Link
+          component={RouterLink}
+          to={sid ? `/submission/detail/${sid}/${file.sha256}` : `/file/detail/${file.sha256}`}
+        >
+          {file.name}
+        </Link>
+      )}
+      <small className={classes.muted}>{` :: ${file.description}`}</small>
+
+      <Link component={RouterLink} to={`/file/viewer/${file.sha256}`}>
+        <PageviewOutlinedIcon style={{ fontSize: '1.4em', marginLeft: '0.5rem', verticalAlign: 'bottom' }} />
+      </Link>
+    </div>
+  );
+};
+
+const ResultCard: React.FC<ResultCardProps> = ({ result, sid }) => {
+  const { t } = useTranslation(['fileDetail']);
   const classes = useStyles();
   const theme = useTheme();
   const sp2 = theme.spacing(2);
@@ -563,6 +596,7 @@ const ResultCard: React.FC<ResultCardProps> = ({ result }) => {
     setOpen(!open);
   };
 
+  console.log(result);
   return (
     <div className={classes.card} style={{ marginBottom: sp2 }}>
       <Box className={classes.card_title} onClick={handleClick}>
@@ -595,6 +629,22 @@ const ResultCard: React.FC<ResultCardProps> = ({ result }) => {
               />
             );
           })}
+          {result.response.supplementary.length !== 0 && (
+            <div>
+              <h3>{t('supplementary')}</h3>
+              {result.response.supplementary.map((file, id) => {
+                return <ExtractedFile key={id} file={file} download />;
+              })}
+            </div>
+          )}
+          {result.response.extracted.length !== 0 && (
+            <div>
+              <h3>{t('extracted')}</h3>
+              {result.response.extracted.map((file, id) => {
+                return <ExtractedFile key={id} file={file} sid={sid} />;
+              })}
+            </div>
+          )}
         </div>
       </Collapse>
     </div>
