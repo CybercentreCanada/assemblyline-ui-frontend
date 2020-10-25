@@ -25,5 +25,6 @@
   "results": "Service Results",
   "process_signatures": "Signature hits",
   "supplementary": "Supplementary files",
-  "extracted": "Extracted files"
+  "extracted": "Extracted files",
+  "view_file": "View file"
 }

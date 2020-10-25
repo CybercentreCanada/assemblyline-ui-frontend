@@ -563,6 +563,7 @@ type ExtractedFileProps = {
 };
 
 const ExtractedFile: React.FC<ExtractedFileProps> = ({ file, download = false, sid = null }) => {
+  const { t } = useTranslation(['fileDetail']);
   const classes = useStyles();
   return (
     <div>
@@ -577,10 +578,11 @@ const ExtractedFile: React.FC<ExtractedFileProps> = ({ file, download = false, s
         </Link>
       )}
       <small className={classes.muted}>{` :: ${file.description}`}</small>
-
-      <Link component={RouterLink} to={`/file/viewer/${file.sha256}`}>
-        <PageviewOutlinedIcon style={{ fontSize: '1.4em', marginLeft: '0.5rem', verticalAlign: 'bottom' }} />
-      </Link>
+      <Tooltip title={t('view_file')}>
+        <Link component={RouterLink} to={`/file/viewer/${file.sha256}`}>
+          <PageviewOutlinedIcon style={{ fontSize: '1.4em', marginLeft: '0.5rem', verticalAlign: 'bottom' }} />
+        </Link>
+      </Tooltip>
     </div>
   );
 };
@@ -596,7 +598,6 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid }) => {
     setOpen(!open);
   };
 
-  console.log(result);
   return (
     <div className={classes.card} style={{ marginBottom: sp2 }}>
       <Box className={classes.card_title} onClick={handleClick}>
