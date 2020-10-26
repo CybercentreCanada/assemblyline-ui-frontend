@@ -21,6 +21,7 @@
   "verdict.info": "Informational",
   "generated_tags": "Generated Tags",
   "childrens": "Possible Childrens",
+  "parents": "Possible Parents",
   "resubmit.success": "File successfully resubmitted for dynamic analysis. You will be redirected...",
   "results": "Service Results",
   "process_signatures": "Signature hits",

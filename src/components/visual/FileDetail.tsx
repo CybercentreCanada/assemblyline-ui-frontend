@@ -69,6 +69,7 @@ type File = {
       [key: string]: any;
     };
   };
+  parents: string[];
   results: Result[];
   signatures: string[][];
   tags: {
@@ -393,6 +394,31 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null }) => {
                   <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>
                     {` :: ${fileItem.sha256}`}
                   </span>
+                </Box>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {file && file.parents && file.parents.length !== 0 && (
+        <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+          <Typography variant="h6">{t('parents')}</Typography>
+          <Divider />
+          <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+            {file.parents.map((resultKey, i) => {
+              const [parentSHA256, service] = resultKey.split('.', 2);
+              return (
+                <Box
+                  key={i}
+                  className={classes.file_item}
+                  onClick={() => {
+                    history.push(`/file/detail/${parentSHA256}`);
+                  }}
+                  style={{ wordBreak: 'break-word' }}
+                >
+                  <span>{parentSHA256}</span>
+                  <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{` :: ${service}`}</span>
                 </Box>
               );
             })}
