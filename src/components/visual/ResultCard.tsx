@@ -568,11 +568,15 @@ const ExtractedFile: React.FC<ExtractedFileProps> = ({ file, download = false, s
   return (
     <div>
       {download ? (
-        <Link href={`/api/v4/file/download/${file.sha256}/?name=${file.name}`}>{file.name}</Link>
+        <Link href={`/api/v4/file/download/${file.sha256}/?name=${encodeURI(file.name)}`}>{file.name}</Link>
       ) : (
         <Link
           component={RouterLink}
-          to={sid ? `/submission/detail/${sid}/${file.sha256}` : `/file/detail/${file.sha256}`}
+          to={
+            sid
+              ? `/submission/detail/${sid}/${file.sha256}?name=${encodeURI(file.name)}`
+              : `/file/detail/${file.sha256}?name=${encodeURI(file.name)}`
+          }
         >
           {file.name}
         </Link>

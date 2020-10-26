@@ -60,7 +60,6 @@ export default function SubmissionDetail() {
   const theme = useTheme();
   const [submission, setSubmission] = useState(null);
   const [drawer, setDrawer] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
   const [summary, setSummary] = useState(null);
   const [tree, setTree] = useState(null);
   const [deleteDialog, setDeleteDialog] = useState(false);
@@ -149,14 +148,14 @@ export default function SubmissionDetail() {
         open={drawer}
         onClose={() => history.push(`/submission/detail/${id}`)}
       >
-        <div style={{ padding: sp1 }}>
+        <div id="drawerTop" style={{ padding: sp1 }}>
           <IconButton onClick={() => history.push(`/submission/detail/${id}`)}>
             <CloseOutlinedIcon />
           </IconButton>
         </div>
         {drawer && (
           <div style={{ paddingLeft: sp2, paddingRight: sp2 }}>
-            <FileDetail sha256={fid} sid={id} name={selectedFile} />
+            <FileDetail sha256={fid} sid={id} />
           </div>
         )}
       </Drawer>
@@ -423,7 +422,7 @@ export default function SubmissionDetail() {
             <Divider />
             <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
               {tree ? (
-                <FileTree tree={tree.tree} sid={id} setSelectedFile={setSelectedFile} />
+                <FileTree tree={tree.tree} sid={id} />
               ) : (
                 [...Array(3)].map((_, i) => {
                   return (
@@ -459,10 +458,9 @@ type FileTreeProps = {
     [key: string]: FileItemProps;
   };
   sid: string;
-  setSelectedFile: (name: string) => void;
 };
 
-const FileTree = ({ tree, sid, setSelectedFile }: FileTreeProps) => {
+const FileTree = ({ tree, sid }: FileTreeProps) => {
   const theme = useTheme();
   const classes = useStyles();
   const history = useHistory();
@@ -476,8 +474,7 @@ const FileTree = ({ tree, sid, setSelectedFile }: FileTreeProps) => {
             <Box
               className={classes.file_item}
               onClick={() => {
-                setSelectedFile(item.name[0]);
-                history.push(`/submission/detail/${sid}/${item.sha256}`);
+                history.push(`/submission/detail/${sid}/${item.sha256}?name=${encodeURI(item.name[0])}`);
               }}
               style={{ wordBreak: 'break-word' }}
             >
@@ -486,7 +483,7 @@ const FileTree = ({ tree, sid, setSelectedFile }: FileTreeProps) => {
               <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{`[${item.type}]`}</span>
             </Box>
             <div style={{ marginLeft: theme.spacing(3) }}>
-              <FileTree tree={item.children} sid={sid} setSelectedFile={setSelectedFile} />
+              <FileTree tree={item.children} sid={sid} />
             </div>
           </div>
         );

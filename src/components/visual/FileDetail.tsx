@@ -27,7 +27,7 @@ import getXSRFCookie from 'helpers/xsrf';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useHistory, useLocation } from 'react-router-dom';
 
 type FileInfo = {
   archive_ts: string;
@@ -79,7 +79,10 @@ type File = {
 type FileDetailProps = {
   sha256: string;
   sid?: string;
-  name?: string;
+};
+
+type ParamProps = {
+  name: string;
 };
 
 const useStyles = makeStyles(theme => ({
@@ -91,7 +94,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, name = null }) => {
+const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null }) => {
   const { t } = useTranslation(['fileDetail']);
   const [file, setFile] = useState<File | null>(null);
   const apiCall = useMyAPI();
@@ -101,6 +104,16 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, name = null
   const { showSuccessMessage } = useMySnackbar();
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
+
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+
+  const scrollToTop = scrollToItem => {
+    const element = document.getElementById(scrollToItem);
+    if (element) {
+      element.scrollIntoView();
+    }
+  };
 
   const resubmit = () => {
     apiCall({
@@ -115,10 +128,13 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, name = null
   };
 
   useEffect(() => {
+    setFile(null);
+
     if (sid && sha256) {
       apiCall({
         url: `/api/v4/submission/${sid}/file/${sha256}/`,
         onSuccess: api_data => {
+          scrollToTop('drawerTop');
           setFile(api_data.api_response);
         }
       });
@@ -126,17 +142,16 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, name = null
       apiCall({
         url: `/api/v4/file/result/${sha256}/`,
         onSuccess: api_data => {
+          scrollToTop('fileDetailTop');
           setFile(api_data.api_response);
         }
       });
-    } else {
-      setFile(null);
     }
     // eslint-disable-next-line
   }, [sha256, sid]);
 
   return (
-    <div style={{ textAlign: 'left' }}>
+    <div id="fileDetailTop" style={{ textAlign: 'left' }}>
       <div style={{ paddingBottom: sp4, paddingTop: sp2 }}>
         <Classification size="tiny" c12n={file ? file.file_info.classification : null} />
       </div>
@@ -146,7 +161,7 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, name = null
             <div>
               <Typography variant="h4">{t('title')}</Typography>
               <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
-                {file ? name || file.file_info.sha256 : <Skeleton style={{ width: '10rem' }} />}
+                {file ? params.get('name') || file.file_info.sha256 : <Skeleton style={{ width: '10rem' }} />}
               </Typography>
             </div>
           </Grid>
@@ -370,7 +385,7 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, name = null
                   key={i}
                   className={classes.file_item}
                   onClick={() => {
-                    history.push(`/file/detail/${fileItem.sha256}`);
+                    history.push(`/file/detail/${fileItem.sha256}?name=${encodeURI(fileItem.name)}`);
                   }}
                   style={{ wordBreak: 'break-word' }}
                 >
