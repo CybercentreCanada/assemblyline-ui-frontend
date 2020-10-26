@@ -306,7 +306,12 @@ const ProcessTreeBody = ({ body }) => {
     data = body;
   }
 
-  return (
+  if (!(data instanceof Object)) {
+    // eslint-disable-next-line no-console
+    console.log('[WARNING] Could not parse ProcessTree body. The section will be skipped...');
+  }
+
+  return data instanceof Object ? (
     <ul
       style={{
         fontSize: '0.875rem',
@@ -377,7 +382,7 @@ const ProcessTreeBody = ({ body }) => {
         );
       })}
     </ul>
-  );
+  ) : null;
 };
 
 const StyledTableCell = withStyles((theme: Theme) =>
@@ -421,7 +426,7 @@ const TblBody = ({ body }) => {
     data = JSON.parse(body);
   } catch (ex) {
     // eslint-disable-next-line no-console
-    console.log('[WARNING] Could not parse table body. The section will be skipped...');
+    console.log('[WARNING] Could not parse Table body. The section will be skipped...');
   }
 
   const headers = [];
