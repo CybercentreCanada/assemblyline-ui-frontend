@@ -19,6 +19,7 @@ import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import FingerprintOutlinedIcon from '@material-ui/icons/FingerprintOutlined';
 import PageviewOutlinedIcon from '@material-ui/icons/PageviewOutlined';
+import useAppContext from 'components/hooks/useAppContext';
 import Attack from 'components/visual/Attack';
 import Classification from 'components/visual/Classification';
 import Heuristic from 'components/visual/Heuristic';
@@ -608,7 +609,8 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid }) => {
   const classes = useStyles();
   const theme = useTheme();
   const sp2 = theme.spacing(2);
-  const [open, setOpen] = React.useState(true);
+  const { settings } = useAppContext();
+  const [open, setOpen] = React.useState(result.result.score >= settings.expand_min_score);
 
   if (result.section_hierarchy === undefined) {
     // eslint-disable-next-line no-console
