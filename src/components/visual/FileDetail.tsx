@@ -19,6 +19,7 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import Attack from 'components/visual/Attack';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
+import ErrorCard from 'components/visual/ErrorCard';
 import Heuristic from 'components/visual/Heuristic';
 import ResultCard, { Result } from 'components/visual/ResultCard';
 import Tag from 'components/visual/Tag';
@@ -558,6 +559,19 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null }) => {
               : [...Array(2)].map((_, i) => {
                   return <Skeleton key={i} style={{ height: '16rem' }} />;
                 })}
+          </div>
+        </div>
+      )}
+
+      {file && file.errors.length !== 0 && (
+        <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+          <Typography variant="h6">{t('errors')}</Typography>
+          <Divider />
+          <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+            {file &&
+              file.errors.map((error, i) => {
+                return <ErrorCard key={i} error={error} />;
+              })}
           </div>
         </div>
       )}

@@ -24,6 +24,7 @@
   "parents": "Possible Parents",
   "resubmit.success": "File successfully resubmitted for dynamic analysis. You will be redirected...",
   "results": "Service Results",
+  "errors": "Errors",
   "process_signatures": "Signature hits",
   "supplementary": "Supplementary files",
   "extracted": "Extracted files",
