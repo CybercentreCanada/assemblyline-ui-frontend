@@ -91,7 +91,7 @@ const Routes = () => {
         <Route exact path="/submission/detail/:id/:fid" component={SubmissionDetail} />
         <Route exact path="/submission/detail/:id" component={SubmissionDetail} />
         <Route exact path="/submission/report/:id" component={SubmissionReport} />
-        {settings.submission_view === 'detail' ? (
+        {settings.submission_view === 'details' ? (
           <Redirect from="/submission/:id" to="/submission/detail/:id" />
         ) : (
           <Redirect from="/submission/:id" to="/submission/report/:id" />
