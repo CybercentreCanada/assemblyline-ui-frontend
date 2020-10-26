@@ -84,10 +84,6 @@ type FileDetailProps = {
   sid?: string;
 };
 
-type ParamProps = {
-  name: string;
-};
-
 const useStyles = makeStyles(theme => ({
   clickable: {
     cursor: 'pointer',
@@ -127,9 +123,25 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null }) => {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
 
+  const elementInViewport = element => {
+    const bounding = element.getBoundingClientRect();
+    const myElementHeight = element.offsetHeight;
+    const myElementWidth = element.offsetWidth;
+
+    if (
+      bounding.top >= -myElementHeight &&
+      bounding.left >= -myElementWidth &&
+      bounding.right <= (window.innerWidth || document.documentElement.clientWidth) + myElementWidth &&
+      bounding.bottom <= (window.innerHeight || document.documentElement.clientHeight) + myElementHeight
+    ) {
+      return true;
+    }
+    return false;
+  };
+
   const scrollToTop = scrollToItem => {
     const element = document.getElementById(scrollToItem);
-    if (element) {
+    if (element && !elementInViewport(element)) {
       element.scrollIntoView();
     }
   };
