@@ -134,6 +134,12 @@ const useStyles = makeStyles(theme => ({
       cursor: 'pointer'
     }
   },
+  title: {
+    '&:hover': {
+      color: theme.palette.text.secondary,
+      cursor: 'pointer'
+    }
+  },
   content: {
     padding: '6px'
   },
@@ -611,6 +617,8 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid }) => {
   const sp2 = theme.spacing(2);
   const { settings } = useAppContext();
   const [open, setOpen] = React.useState(result.result.score >= settings.expand_min_score);
+  const [openSupp, setOpenSupp] = React.useState(true);
+  const [openExt, setOpenExt] = React.useState(true);
 
   if (result.section_hierarchy === undefined) {
     // eslint-disable-next-line no-console
@@ -668,18 +676,36 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid }) => {
               })}
           {result.response.supplementary.length !== 0 && (
             <div>
-              <h3>{t('supplementary')}</h3>
-              {result.response.supplementary.map((file, id) => {
-                return <ExtractedFile key={id} file={file} download />;
-              })}
+              <Box
+                className={classes.title}
+                onClick={() => {
+                  setOpenSupp(!openSupp);
+                }}
+              >
+                <h3>{t('supplementary')}</h3>
+              </Box>
+              <Collapse in={openSupp} timeout="auto">
+                {result.response.supplementary.map((file, id) => {
+                  return <ExtractedFile key={id} file={file} download />;
+                })}
+              </Collapse>
             </div>
           )}
           {result.response.extracted.length !== 0 && (
             <div>
-              <h3>{t('extracted')}</h3>
-              {result.response.extracted.map((file, id) => {
-                return <ExtractedFile key={id} file={file} sid={sid} />;
-              })}
+              <Box
+                className={classes.title}
+                onClick={() => {
+                  setOpenExt(!openExt);
+                }}
+              >
+                <h3>{t('extracted')}</h3>
+              </Box>
+              <Collapse in={openExt} timeout="auto">
+                {result.response.extracted.map((file, id) => {
+                  return <ExtractedFile key={id} file={file} sid={sid} />;
+                })}{' '}
+              </Collapse>
             </div>
           )}
         </div>
