@@ -101,6 +101,7 @@ type ResultSectionProps = {
   id: number;
   sub_sections: SectionItem[];
   indent: number;
+  depth?: number;
 };
 
 type ResultCardProps = {
@@ -408,62 +409,73 @@ const StyledTable = withStyles((theme: Theme) =>
 )(Table);
 
 const TblBody = ({ body }) => {
-  const data = JSON.parse(body);
+  let data = null;
+  try {
+    data = JSON.parse(body);
+  } catch (ex) {
+    // eslint-disable-next-line no-console
+    console.log('[WARNING] Could not parse table body. The section will be skipped...');
+  }
+
   const headers = [];
 
-  for (const line of data) {
-    // eslint-disable-next-line guard-for-in
-    for (const th in line) {
-      const val = line[th];
-      if (val !== null && val !== '') {
-        if (!headers.includes(th)) {
-          headers.push(th);
+  if (data) {
+    for (const line of data) {
+      // eslint-disable-next-line guard-for-in
+      for (const th in line) {
+        const val = line[th];
+        if (val !== null && val !== '') {
+          if (!headers.includes(th)) {
+            headers.push(th);
+          }
         }
       }
     }
   }
 
   return (
-    <TableContainer style={{ fontSize: '90%', maxHeight: '500px' }}>
-      <StyledTable stickyHeader size="small">
-        <TableHead>
-          <TableRow>
-            {headers.map((th, id) => {
+    data && (
+      <TableContainer style={{ fontSize: '90%', maxHeight: '500px' }}>
+        <StyledTable stickyHeader size="small">
+          <TableHead>
+            <TableRow>
+              {headers.map((th, id) => {
+                return (
+                  <StyledTableCell key={id}>
+                    <TitleKey title={th} />
+                  </StyledTableCell>
+                );
+              })}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {data.map((row, id) => {
               return (
-                <StyledTableCell key={id}>
-                  <TitleKey title={th} />
-                </StyledTableCell>
+                <StyledTableRow key={id}>
+                  {headers.map((key, hid) => {
+                    let value = row[key];
+                    if (value instanceof Array) {
+                      value = value.join(' | ');
+                    } else if (value === true) {
+                      value = 'true';
+                    } else if (value === false) {
+                      value = 'false';
+                    } else if (typeof value === 'object' && value !== null && value !== undefined) {
+                      value = <KVBody body={value} />;
+                    }
+                    return <StyledTableCell key={hid}>{value}</StyledTableCell>;
+                  })}
+                </StyledTableRow>
               );
             })}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {data.map((row, id) => {
-            return (
-              <StyledTableRow key={id}>
-                {headers.map((key, hid) => {
-                  let value = row[key];
-                  if (value instanceof Array) {
-                    value = value.join(' | ');
-                  } else if (value === true) {
-                    value = 'true';
-                  } else if (value === false) {
-                    value = 'false';
-                  } else if (typeof value === 'object' && value !== null && value !== undefined) {
-                    value = <KVBody body={value} />;
-                  }
-                  return <StyledTableCell key={hid}>{value}</StyledTableCell>;
-                })}
-              </StyledTableRow>
-            );
-          })}
-        </TableBody>
-      </StyledTable>
-    </TableContainer>
+          </TableBody>
+        </StyledTable>
+      </TableContainer>
+    )
   );
 };
 
-const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sections, indent }) => {
+const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sections, indent, depth = 1 }) => {
   const classes = useStyles();
   const section = section_list[id];
   const [open, setOpen] = React.useState(true);
@@ -473,8 +485,8 @@ const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sec
   };
 
   return (
-    <div style={{ display: 'flex', flexWrap: 'nowrap', marginLeft: '1rem' }}>
-      <SectionHighlight score={section.heuristic ? section.heuristic.score : 0} indent={indent} />
+    <div style={{ display: 'flex', flexWrap: 'nowrap', marginLeft: `${depth}rem` }}>
+      <SectionHighlight score={section.heuristic ? section.heuristic.score : 0} indent={indent} depth={depth} />
 
       <div style={{ width: '100%' }}>
         <Box className={classes.section_title} onClick={handleClick}>
@@ -598,6 +610,11 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid }) => {
   const sp2 = theme.spacing(2);
   const [open, setOpen] = React.useState(true);
 
+  if (result.section_hierarchy === undefined) {
+    // eslint-disable-next-line no-console
+    console.log('[WARNING] Using old rendering method because the section hierarchy is missing...');
+  }
+
   const handleClick = () => {
     setOpen(!open);
   };
@@ -623,17 +640,30 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid }) => {
       </Box>
       <Collapse in={open} timeout="auto">
         <div className={classes.content}>
-          {result.section_hierarchy.map(item => {
-            return (
-              <ResultSection
-                key={item.id}
-                section_list={result.result.sections}
-                id={item.id}
-                sub_sections={item.children}
-                indent={1}
-              />
-            );
-          })}
+          {result.section_hierarchy
+            ? result.section_hierarchy.map(item => {
+                return (
+                  <ResultSection
+                    key={item.id}
+                    section_list={result.result.sections}
+                    id={item.id}
+                    sub_sections={item.children}
+                    indent={1}
+                  />
+                );
+              })
+            : result.result.sections.map((section, id) => {
+                return (
+                  <ResultSection
+                    key={id}
+                    section_list={result.result.sections}
+                    id={id}
+                    sub_sections={[]}
+                    indent={section.depth}
+                    depth={section.depth}
+                  />
+                );
+              })}
           {result.response.supplementary.length !== 0 && (
             <div>
               <h3>{t('supplementary')}</h3>

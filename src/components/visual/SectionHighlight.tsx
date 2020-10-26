@@ -5,9 +5,10 @@ import React from 'react';
 type SectionHighlightProps = {
   score: number;
   indent: number;
+  depth?: number;
 };
 
-const SectionHighlight: React.FC<SectionHighlightProps> = ({ score, indent }) => {
+const SectionHighlight: React.FC<SectionHighlightProps> = ({ score, indent, depth = 1 }) => {
   const theme = useTheme();
 
   const VERDICT_SCORE_MAP = {
@@ -24,8 +25,8 @@ const SectionHighlight: React.FC<SectionHighlightProps> = ({ score, indent }) =>
       style={{
         backgroundColor: VERDICT_SCORE_MAP[scoreToVerdict(score)],
         minWidth: '0.5rem',
-        marginLeft: `${-1 * indent + -0.5 * (indent - 1)}rem`,
-        marginRight: `${1 * indent + 0.5 * (indent - 1)}rem`
+        marginLeft: `${-1 * indent + -0.5 * (indent - depth)}rem`,
+        marginRight: `${1 * indent + 0.5 * (indent - depth)}rem`
       }}
     />
   );
