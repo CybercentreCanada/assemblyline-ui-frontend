@@ -546,7 +546,16 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, navHighligh
                           </Grid>
                           <Grid item xs={12} sm={9} lg={10}>
                             {file.attack_matrix[cat].map(([cid, mat, lvl], idx) => {
-                              return <Attack key={`${cid}_${idx}`} text={mat} lvl={lvl} />;
+                              const key = navHighlighter.getKey('attack_pattern', cid);
+                              return (
+                                <Attack
+                                  key={`${cid}_${idx}`}
+                                  text={mat}
+                                  lvl={lvl}
+                                  highlighted={navHighlighter.isHighlighted(key)}
+                                  onClick={() => navHighlighter.triggerHighlight(key)}
+                                />
+                              );
                             })}
                           </Grid>
                         </Grid>
@@ -592,7 +601,16 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, navHighligh
                           </Grid>
                           <Grid item xs={12} sm={9} lg={10}>
                             {file.heuristics[lvl].map(([cid, hname], idx) => {
-                              return <Heuristic key={`${cid}_${idx}`} text={hname} lvl={lvl} />;
+                              const key = navHighlighter.getKey('heuristic', cid);
+                              return (
+                                <Heuristic
+                                  key={`${cid}_${idx}`}
+                                  text={hname}
+                                  lvl={lvl}
+                                  highlighted={navHighlighter.isHighlighted(key)}
+                                  onClick={() => navHighlighter.triggerHighlight(key)}
+                                />
+                              );
                             })}
                           </Grid>
                         </Grid>
@@ -636,7 +654,17 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, navHighligh
                     </Grid>
                     <Grid item xs={12} sm={9} lg={10}>
                       {file.signatures.map(([value, lvl], idx) => {
-                        return <Heuristic key={idx} signature text={value} lvl={lvl} />;
+                        const key = navHighlighter.getKey('heuristic.signature', value);
+                        return (
+                          <Heuristic
+                            key={idx}
+                            signature
+                            text={value}
+                            lvl={lvl}
+                            highlighted={navHighlighter.isHighlighted(key)}
+                            onClick={() => navHighlighter.triggerHighlight(key)}
+                          />
+                        );
                       })}
                     </Grid>
                   </Grid>
@@ -650,7 +678,17 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, navHighligh
                           </Grid>
                           <Grid item xs={12} sm={9} lg={10}>
                             {file.tags[tag_type].map(([value, lvl], idx) => {
-                              return <Tag key={idx} value={value} type={tag_type} lvl={lvl} />;
+                              const key = navHighlighter.getKey(tag_type, value);
+                              return (
+                                <Tag
+                                  key={idx}
+                                  value={value}
+                                  type={tag_type}
+                                  lvl={lvl}
+                                  highlighted={navHighlighter.isHighlighted(key)}
+                                  onClick={() => navHighlighter.triggerHighlight(key)}
+                                />
+                              );
                             })}
                           </Grid>
                         </Grid>
@@ -689,7 +727,7 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, navHighligh
               <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
                 {file
                   ? file.results.map((result, i) => {
-                      return <ResultCard key={i} result={result} sid={sid} />;
+                      return <ResultCard key={i} result={result} sid={sid} navHighlighter={navHighlighter} />;
                     })
                   : [...Array(2)].map((_, i) => {
                       return <Skeleton key={i} style={{ height: '16rem' }} />;

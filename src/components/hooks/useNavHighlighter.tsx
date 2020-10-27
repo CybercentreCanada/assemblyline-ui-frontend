@@ -13,6 +13,7 @@ export type NavHighlighterProps = {
   getKey: (type: string, value: string) => string;
   triggerHighlight: (key: string) => void;
   isHighlighted: (key: string) => boolean;
+  hasHighlightedKeys: (keyList: string[]) => boolean;
   setHighlightMap: (map: HighlighMapProps) => void;
 };
 
@@ -30,6 +31,10 @@ export default function useNavHighlighter(): NavHighlighterProps {
       return highlighted.has(key) || relatedHighlighted.has(key);
     }
     return highlighted.has(key);
+  }
+
+  function hasHighlightedKeys(keyList: string[]) {
+    return keyList.some(item => isHighlighted(item));
   }
 
   function triggerHighlight(key) {
@@ -59,6 +64,7 @@ export default function useNavHighlighter(): NavHighlighterProps {
     getKey,
     triggerHighlight,
     isHighlighted,
+    hasHighlightedKeys,
     setHighlightMap
   };
 }

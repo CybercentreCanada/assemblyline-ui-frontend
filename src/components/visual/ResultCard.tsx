@@ -20,6 +20,7 @@ import ExpandMore from '@material-ui/icons/ExpandMore';
 import FingerprintOutlinedIcon from '@material-ui/icons/FingerprintOutlined';
 import PageviewOutlinedIcon from '@material-ui/icons/PageviewOutlined';
 import useAppContext from 'components/hooks/useAppContext';
+import { NavHighlighterProps } from 'components/hooks/useNavHighlighter';
 import Attack from 'components/visual/Attack';
 import Classification from 'components/visual/Classification';
 import Heuristic from 'components/visual/Heuristic';
@@ -108,6 +109,7 @@ type ResultSectionProps = {
 type ResultCardProps = {
   result: Result;
   sid: string | null;
+  navHighlighter?: NavHighlighterProps;
 };
 
 const useStyles = makeStyles(theme => ({
@@ -624,7 +626,7 @@ export const emptyResult = (result: Result) => {
   );
 };
 
-const ResultCard: React.FC<ResultCardProps> = ({ result, sid }) => {
+const ResultCard: React.FC<ResultCardProps> = ({ result, sid, navHighlighter = null }) => {
   const { t } = useTranslation(['fileDetail']);
   const classes = useStyles();
   const theme = useTheme();
