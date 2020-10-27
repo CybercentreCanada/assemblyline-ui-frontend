@@ -16,9 +16,12 @@ import ClearOutlinedIcon from '@material-ui/icons/ClearOutlined';
 import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
 import CloudDownloadOutlinedIcon from '@material-ui/icons/CloudDownloadOutlined';
 import DoneOutlinedIcon from '@material-ui/icons/DoneOutlined';
+import MoodIcon from '@material-ui/icons/Mood';
+import MoodBadIcon from '@material-ui/icons/MoodBad';
 import ReplayOutlinedIcon from '@material-ui/icons/ReplayOutlined';
 import { Skeleton } from '@material-ui/lab';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
+import useAppContext from 'components/hooks/useAppContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import Attack from 'components/visual/Attack';
@@ -28,6 +31,7 @@ import FileDetail from 'components/visual/FileDetail';
 import Heuristic from 'components/visual/Heuristic';
 import Tag from 'components/visual/Tag';
 import Verdict from 'components/visual/Verdict';
+import VerdictBar from 'components/visual/VerdictBar';
 import getXSRFCookie from 'helpers/xsrf';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -77,6 +81,7 @@ export default function SubmissionDetail() {
   const { showSuccessMessage } = useMySnackbar();
   const history = useHistory();
   const classes = useStyles();
+  const { user: currentUser } = useAppContext();
 
   const [openInfo, setOpenInfo] = React.useState(true);
   const [openMeta, setOpenMeta] = React.useState(true);
@@ -120,6 +125,40 @@ export default function SubmissionDetail() {
           setTimeout(() => {
             history.push('/submissions');
           }, 500);
+        }
+      });
+    }
+  };
+
+  const setVerdict = verdict => {
+    if (submission != null && submission.verdict[verdict].indexOf(currentUser.username) === -1) {
+      apiCall({
+        method: 'PUT',
+        url: `/api/v4/submission/verdict/${submission.sid}/${verdict}/`,
+        onSuccess: api_data => {
+          if (!api_data.api_response.success) {
+            return;
+          }
+          const newSubmission = { ...submission };
+          if (verdict === 'malicious') {
+            if (newSubmission.verdict.malicious.indexOf(currentUser.username) === -1) {
+              newSubmission.verdict.malicious.push(currentUser.username);
+            }
+            if (newSubmission.verdict.non_malicious.indexOf(currentUser.username) !== -1) {
+              newSubmission.verdict.non_malicious.splice(
+                newSubmission.verdict.non_malicious.indexOf(currentUser.username),
+                1
+              );
+            }
+          } else {
+            if (newSubmission.verdict.non_malicious.indexOf(currentUser.username) === -1) {
+              newSubmission.verdict.non_malicious.push(currentUser.username);
+            }
+            if (newSubmission.verdict.malicious.indexOf(currentUser.username) !== -1) {
+              newSubmission.verdict.malicious.splice(submission.verdict.malicious.indexOf(currentUser.username), 1);
+            }
+          }
+          setSubmission(newSubmission);
         }
       });
     }
@@ -219,6 +258,62 @@ export default function SubmissionDetail() {
                     <ChromeReaderModeOutlinedIcon />
                   </IconButton>
                 </Tooltip>
+              </div>
+              <div
+                style={{
+                  textAlign: 'right',
+                  width: '164px',
+                  marginTop: '8px',
+                  marginLeft: 'auto',
+                  marginRight: '12px'
+                }}
+              >
+                {submission ? <VerdictBar verdicts={submission.verdict} /> : <Skeleton />}
+                <Grid container>
+                  <Grid item xs={5} style={{ textAlign: 'left' }}>
+                    <Tooltip
+                      title={t(
+                        `verdict.${
+                          submission && submission.verdict.malicious.indexOf(currentUser.username) !== -1 ? 'is' : 'set'
+                        }.malicious`
+                      )}
+                    >
+                      <IconButton size="small" onClick={() => setVerdict('malicious')}>
+                        <MoodBadIcon
+                          style={{
+                            color:
+                              submission && submission.verdict.malicious.indexOf(currentUser.username) !== -1
+                                ? theme.palette.error.dark
+                                : null
+                          }}
+                        />
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
+                  <Grid item xs={2} />
+                  <Grid item xs={5} style={{ textAlign: 'right' }}>
+                    <Tooltip
+                      title={t(
+                        `verdict.${
+                          submission && submission.verdict.non_malicious.indexOf(currentUser.username) !== -1
+                            ? 'is'
+                            : 'set'
+                        }.non_malicious`
+                      )}
+                    >
+                      <IconButton size="small" onClick={() => setVerdict('non_malicious')}>
+                        <MoodIcon
+                          style={{
+                            color:
+                              submission && submission.verdict.non_malicious.indexOf(currentUser.username) !== -1
+                                ? theme.palette.success.dark
+                                : null
+                          }}
+                        />
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
+                </Grid>
               </div>
             </Grid>
           </Grid>
