@@ -615,13 +615,23 @@ const ExtractedFile: React.FC<ExtractedFileProps> = ({ file, download = false, s
   );
 };
 
+export const emptyResult = (result: Result) => {
+  return (
+    result.result.score === 0 &&
+    result.result.sections.length === 0 &&
+    result.response.extracted.length === 0 &&
+    result.response.supplementary.length === 0
+  );
+};
+
 const ResultCard: React.FC<ResultCardProps> = ({ result, sid }) => {
   const { t } = useTranslation(['fileDetail']);
   const classes = useStyles();
   const theme = useTheme();
   const sp2 = theme.spacing(2);
   const { settings } = useAppContext();
-  const [open, setOpen] = React.useState(result.result.score >= settings.expand_min_score);
+  const empty = emptyResult(result);
+  const [open, setOpen] = React.useState(!empty && result.result.score >= settings.expand_min_score);
   const [openSupp, setOpenSupp] = React.useState(true);
   const [openExt, setOpenExt] = React.useState(true);
 
@@ -641,79 +651,87 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid }) => {
         <span>
           &nbsp;::&nbsp;<b>{result.response.service_name}</b>&nbsp;
         </span>
-        <Verdict score={result.result.score} mono short size="tiny" />
-        <small className={classes.muted}>{` :: ${result.response.service_version}`}</small>
+        {!empty && <Verdict score={result.result.score} mono short size="tiny" />}
+        <small className={classes.muted}>{` :: ${result.response.service_version.replace(/_/g, '.')}`}</small>
         <small className={classes.muted} style={{ flexGrow: 1 }}>
           &nbsp;{result.response.service_tool_version ? `(${result.response.service_tool_version})` : ''}
         </small>
-        <small>
-          <Moment className={classes.muted} fromNow>
-            {result.created}
-          </Moment>
-        </small>
+        {!empty && (
+          <small>
+            <Moment className={classes.muted} fromNow>
+              {result.created}
+            </Moment>
+          </small>
+        )}
         {open ? <ExpandLess className={classes.muted} /> : <ExpandMore className={classes.muted} />}
       </Box>
       <Collapse in={open} timeout="auto">
-        <div className={classes.content}>
-          {result.section_hierarchy
-            ? result.section_hierarchy.map(item => {
-                return (
-                  <ResultSection
-                    key={item.id}
-                    section_list={result.result.sections}
-                    id={item.id}
-                    sub_sections={item.children}
-                    indent={1}
-                  />
-                );
-              })
-            : result.result.sections.map((section, id) => {
-                return (
-                  <ResultSection
-                    key={id}
-                    section_list={result.result.sections}
-                    id={id}
-                    sub_sections={[]}
-                    indent={section.depth}
-                    depth={section.depth}
-                  />
-                );
-              })}
-          {result.response.supplementary.length !== 0 && (
-            <div>
-              <Box
-                className={classes.title}
-                onClick={() => {
-                  setOpenSupp(!openSupp);
-                }}
-              >
-                <h3>{t('supplementary')}</h3>
-              </Box>
-              <Collapse in={openSupp} timeout="auto">
-                {result.response.supplementary.map((file, id) => {
-                  return <ExtractedFile key={id} file={file} download />;
+        {empty ? (
+          <div className={classes.content} style={{ color: theme.palette.text.secondary }}>
+            {t('nothing_to_report')}
+          </div>
+        ) : (
+          <div className={classes.content}>
+            {result.section_hierarchy
+              ? result.section_hierarchy.map(item => {
+                  return (
+                    <ResultSection
+                      key={item.id}
+                      section_list={result.result.sections}
+                      id={item.id}
+                      sub_sections={item.children}
+                      indent={1}
+                    />
+                  );
+                })
+              : result.result.sections.map((section, id) => {
+                  return (
+                    <ResultSection
+                      key={id}
+                      section_list={result.result.sections}
+                      id={id}
+                      sub_sections={[]}
+                      indent={section.depth}
+                      depth={section.depth}
+                    />
+                  );
                 })}
-              </Collapse>
-            </div>
-          )}
-          {result.response.extracted.length !== 0 && (
-            <div>
-              <Box
-                className={classes.title}
-                onClick={() => {
-                  setOpenExt(!openExt);
-                }}
-              >
-                <h3>{t('extracted')}</h3>
-              </Box>
-              <Collapse in={openExt} timeout="auto">
-                {result.response.extracted.map((file, id) => {
-                  return <ExtractedFile key={id} file={file} sid={sid} />;
-                })}{' '}
-              </Collapse>
-            </div>
-          )}
-        </div>
+            {result.response.supplementary.length !== 0 && (
+              <div>
+                <Box
+                  className={classes.title}
+                  onClick={() => {
+                    setOpenSupp(!openSupp);
+                  }}
+                >
+                  <h3>{t('supplementary')}</h3>
+                </Box>
+                <Collapse in={openSupp} timeout="auto">
+                  {result.response.supplementary.map((file, id) => {
+                    return <ExtractedFile key={id} file={file} download />;
+                  })}
+                </Collapse>
+              </div>
+            )}
+            {result.response.extracted.length !== 0 && (
+              <div>
+                <Box
+                  className={classes.title}
+                  onClick={() => {
+                    setOpenExt(!openExt);
+                  }}
+                >
+                  <h3>{t('extracted')}</h3>
+                </Box>
+                <Collapse in={openExt} timeout="auto">
+                  {result.response.extracted.map((file, id) => {
+                    return <ExtractedFile key={id} file={file} sid={sid} />;
+                  })}{' '}
+                </Collapse>
+              </div>
+            )}
+          </div>
+        )}
       </Collapse>
     </div>
   );

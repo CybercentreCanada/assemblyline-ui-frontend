@@ -20,9 +20,9 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import Attack from 'components/visual/Attack';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
-import ErrorCard from 'components/visual/ErrorCard';
+import ErrorCard, { Error } from 'components/visual/ErrorCard';
 import Heuristic from 'components/visual/Heuristic';
-import ResultCard, { Result } from 'components/visual/ResultCard';
+import ResultCard, { emptyResult, Result } from 'components/visual/ResultCard';
 import Tag from 'components/visual/Tag';
 import { bytesToSize } from 'helpers/utils';
 import getXSRFCookie from 'helpers/xsrf';
@@ -61,7 +61,8 @@ type File = {
     name: string;
     sha256: string;
   }[];
-  errors: any;
+  emptys: Result[];
+  errors: Error[];
   file_info: FileInfo;
   heuristics: {
     [category: string]: string[][];
@@ -118,6 +119,7 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null }) => {
   const [openHeuristic, setOpenHeuristic] = React.useState(true);
   const [openTags, setOpenTags] = React.useState(true);
   const [openResult, setOpenResult] = React.useState(true);
+  const [openEmptys, setOpenEmptys] = React.useState(true);
   const [openError, setOpenError] = React.useState(true);
 
   const location = useLocation();
@@ -146,6 +148,14 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null }) => {
     }
   };
 
+  const patchFileDetails = (data: File) => {
+    const newData = { ...data };
+    newData.results.sort((a, b) => (a.response.service_name > b.response.service_name ? 1 : -1));
+    newData.emptys = data.results.filter(result => emptyResult(result));
+    newData.results = data.results.filter(result => !emptyResult(result));
+    return newData;
+  };
+
   const resubmit = () => {
     apiCall({
       url: `/api/v4/submit/dynamic/${sha256}/`,
@@ -166,7 +176,7 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null }) => {
         url: `/api/v4/submission/${sid}/file/${sha256}/`,
         onSuccess: api_data => {
           scrollToTop('drawerTop');
-          setFile(api_data.api_response);
+          setFile(patchFileDetails(api_data.api_response));
         }
       });
     } else if (sha256) {
@@ -174,7 +184,7 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null }) => {
         url: `/api/v4/file/result/${sha256}/`,
         onSuccess: api_data => {
           scrollToTop('fileDetailTop');
-          setFile(api_data.api_response);
+          setFile(patchFileDetails(api_data.api_response));
         }
       });
     }
@@ -677,6 +687,32 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null }) => {
               <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
                 {file
                   ? file.results.map((result, i) => {
+                      return <ResultCard key={i} result={result} sid={sid} />;
+                    })
+                  : [...Array(2)].map((_, i) => {
+                      return <Skeleton key={i} style={{ height: '16rem' }} />;
+                    })}
+              </div>
+            </Collapse>
+          </div>
+        )}
+
+        {(!file || file.emptys.length !== 0) && (
+          <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+            <Typography
+              variant="h6"
+              onClick={() => {
+                setOpenEmptys(!openEmptys);
+              }}
+              className={classes.title}
+            >
+              {t('emptys')}
+            </Typography>
+            <Divider />
+            <Collapse in={openEmptys} timeout="auto">
+              <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+                {file
+                  ? file.emptys.map((result, i) => {
                       return <ResultCard key={i} result={result} sid={sid} />;
                     })
                   : [...Array(2)].map((_, i) => {

@@ -28,5 +28,7 @@
   "process_signatures": "Signature hits",
   "supplementary": "Supplementary files",
   "extracted": "Extracted files",
-  "view_file": "View file"
+  "view_file": "View file",
+  "nothing_to_report": "The service had nothing to report for this file.",
+  "emptys": "Empty Results"
 }
