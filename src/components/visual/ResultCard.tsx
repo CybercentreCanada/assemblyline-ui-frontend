@@ -654,9 +654,9 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid }) => {
         {!empty && <Verdict score={result.result.score} mono short size="tiny" />}
         <small className={classes.muted}>{` :: ${result.response.service_version.replace(/_/g, '.')}`}</small>
         <small className={classes.muted} style={{ flexGrow: 1 }}>
-          &nbsp;{result.response.service_tool_version ? `(${result.response.service_tool_version})` : ''}
+          &nbsp;{result.response.service_context ? `(${result.response.service_context})` : ''}
         </small>
-        {!empty && (
+        {!empty && !sid && (
           <small>
             <Moment className={classes.muted} fromNow>
               {result.created}
