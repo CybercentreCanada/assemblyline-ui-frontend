@@ -9,9 +9,18 @@ type AttackProps = {
   lvl?: string | null;
   score?: number | null;
   show_type?: boolean;
+  onClick?: () => void;
+  highlighted?: boolean;
 };
 
-const Attack: React.FC<AttackProps> = ({ text, lvl = null, score = null, show_type = false }) => {
+const Attack: React.FC<AttackProps> = ({
+  text,
+  lvl = null,
+  score = null,
+  show_type = false,
+  onClick = null,
+  highlighted = false
+}) => {
   const history = useHistory();
 
   const searchAttack = () => {
@@ -40,11 +49,12 @@ const Attack: React.FC<AttackProps> = ({ text, lvl = null, score = null, show_ty
       wrap
       size="tiny"
       type="square"
-      color={color}
+      color={highlighted ? ('primary' as 'info') : color}
       label={show_type ? `[ATT&CK] ${text}` : text}
       onDelete={searchAttack}
       deleteIcon={<SearchOutlinedIcon style={{ marginLeft: '2px', height: '18px', width: '18px' }} />}
       style={{ height: 'auto', minHeight: '20px' }}
+      onClick={onClick}
     />
   );
 };

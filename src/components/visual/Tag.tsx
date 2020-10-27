@@ -10,9 +10,19 @@ type TagProps = {
   lvl?: string | null;
   score?: number | null;
   short_type?: string | null;
+  onClick?: () => void;
+  highlighted?: boolean;
 };
 
-const Tag: React.FC<TagProps> = ({ type, value, lvl = null, score = null, short_type = null }) => {
+const Tag: React.FC<TagProps> = ({
+  type,
+  value,
+  lvl = null,
+  score = null,
+  short_type = null,
+  onClick = null,
+  highlighted = false
+}) => {
   const history = useHistory();
 
   const searchAttack = () => {
@@ -41,11 +51,12 @@ const Tag: React.FC<TagProps> = ({ type, value, lvl = null, score = null, short_
       wrap
       size="tiny"
       type="square"
-      color={color}
+      color={highlighted ? ('primary' as 'info') : color}
       label={short_type ? `[${short_type.toUpperCase()}] ${value}` : value}
       onDelete={searchAttack}
       deleteIcon={<SearchOutlinedIcon style={{ marginLeft: '2px', height: '18px', width: '18px' }} />}
       style={{ height: 'auto', minHeight: '20px' }}
+      onClick={onClick}
     />
   );
 };

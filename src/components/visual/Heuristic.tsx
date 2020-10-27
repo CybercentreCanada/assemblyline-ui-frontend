@@ -10,6 +10,8 @@ type HeuristicProps = {
   score?: number | null;
   signature?: boolean;
   show_type?: boolean;
+  onClick?: () => void;
+  highlighted?: boolean;
 };
 
 const Heuristic: React.FC<HeuristicProps> = ({
@@ -17,7 +19,9 @@ const Heuristic: React.FC<HeuristicProps> = ({
   lvl = null,
   score = null,
   signature = false,
-  show_type = false
+  show_type = false,
+  onClick = null,
+  highlighted = false
 }) => {
   const history = useHistory();
 
@@ -47,11 +51,12 @@ const Heuristic: React.FC<HeuristicProps> = ({
       wrap
       size="tiny"
       type="square"
-      color={color}
+      color={highlighted ? ('primary' as 'info') : color}
       label={show_type ? (signature ? `[SIGNATURE] ${text}` : `[HEURISTIC] ${text}`) : text}
       onDelete={searchAttack}
       deleteIcon={<SearchOutlinedIcon style={{ marginLeft: '2px', height: '18px', width: '18px' }} />}
       style={{ height: 'auto', minHeight: '20px' }}
+      onClick={onClick}
     />
   );
 };

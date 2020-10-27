@@ -24,6 +24,7 @@ import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useAppContext from 'components/hooks/useAppContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import useNavHighlighter, { NavHighlighterProps } from 'components/hooks/useNavHighlighter';
 import Attack from 'components/visual/Attack';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
@@ -82,6 +83,7 @@ export default function SubmissionDetail() {
   const history = useHistory();
   const classes = useStyles();
   const { user: currentUser } = useAppContext();
+  const navHighlighter = useNavHighlighter();
 
   const [openInfo, setOpenInfo] = React.useState(true);
   const [openMeta, setOpenMeta] = React.useState(true);
@@ -174,6 +176,7 @@ export default function SubmissionDetail() {
     apiCall({
       url: `/api/v4/submission/summary/${id}/`,
       onSuccess: api_data => {
+        navHighlighter.setHighlightMap(api_data.api_response.map);
         setSummary(api_data.api_response);
       }
     });
@@ -215,7 +218,7 @@ export default function SubmissionDetail() {
         </div>
         {drawer && (
           <div style={{ paddingLeft: sp2, paddingRight: sp2 }}>
-            <FileDetail sha256={fid} sid={id} />
+            <FileDetail sha256={fid} sid={id} navHighlighter={navHighlighter} />
           </div>
         )}
       </Drawer>
@@ -487,7 +490,16 @@ export default function SubmissionDetail() {
                             </Grid>
                             <Grid item xs={12} sm={9} lg={10}>
                               {summary.attack_matrix[cat].map(([cid, name, lvl], idx) => {
-                                return <Attack key={`${cid}_${idx}`} text={name} lvl={lvl} />;
+                                const key = navHighlighter.getKey('attack_pattern', cid);
+                                return (
+                                  <Attack
+                                    key={`${cid}_${idx}`}
+                                    text={name}
+                                    lvl={lvl}
+                                    highlighted={navHighlighter.isHighlighted(key)}
+                                    onClick={() => navHighlighter.triggerHighlight(key)}
+                                  />
+                                );
                               })}
                             </Grid>
                           </Grid>
@@ -533,7 +545,16 @@ export default function SubmissionDetail() {
                             </Grid>
                             <Grid item xs={12} sm={9} lg={10}>
                               {summary.heuristics[lvl].map(([cid, name], idx) => {
-                                return <Heuristic key={`${cid}_${idx}`} text={name} lvl={lvl} />;
+                                const key = navHighlighter.getKey('heuristic', cid);
+                                return (
+                                  <Heuristic
+                                    key={`${cid}_${idx}`}
+                                    text={name}
+                                    lvl={lvl}
+                                    highlighted={navHighlighter.isHighlighted(key)}
+                                    onClick={() => navHighlighter.triggerHighlight(key)}
+                                  />
+                                );
                               })}
                             </Grid>
                           </Grid>
@@ -585,7 +606,17 @@ export default function SubmissionDetail() {
                               </Grid>
                               <Grid item xs={12} sm={9} lg={10}>
                                 {summary.tags[tag_group][tag_type].map(([value, lvl], idx) => {
-                                  return <Tag key={idx} value={value} type={tag_type} lvl={lvl} />;
+                                  const key = navHighlighter.getKey(tag_type, value);
+                                  return (
+                                    <Tag
+                                      key={idx}
+                                      value={value}
+                                      type={tag_type}
+                                      lvl={lvl}
+                                      highlighted={navHighlighter.isHighlighted(key)}
+                                      onClick={() => navHighlighter.triggerHighlight(key)}
+                                    />
+                                  );
                                 })}
                               </Grid>
                             </Grid>
@@ -612,7 +643,7 @@ export default function SubmissionDetail() {
             <Collapse in={openFiles} timeout="auto">
               <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
                 {tree ? (
-                  <FileTree tree={tree.tree} sid={id} />
+                  <FileTree tree={tree.tree} sid={id} navHighlighter={navHighlighter} />
                 ) : (
                   [...Array(3)].map((_, i) => {
                     return (
@@ -649,9 +680,10 @@ type FileTreeProps = {
     [key: string]: FileItemProps;
   };
   sid: string;
+  navHighlighter: NavHighlighterProps;
 };
 
-const FileTree = ({ tree, sid }: FileTreeProps) => {
+const FileTree = ({ tree, sid, navHighlighter }: FileTreeProps) => {
   const theme = useTheme();
   const classes = useStyles();
   const history = useHistory();
@@ -667,14 +699,17 @@ const FileTree = ({ tree, sid }: FileTreeProps) => {
               onClick={() => {
                 history.push(`/submission/detail/${sid}/${item.sha256}?name=${encodeURI(item.name[0])}`);
               }}
-              style={{ wordBreak: 'break-word' }}
+              style={{
+                wordBreak: 'break-word',
+                backgroundColor: navHighlighter.isHighlighted(sha256) ? `${theme.palette.primary.main}32` : null
+              }}
             >
               <Verdict score={item.score} mono short />
               {`:: ${item.name.join(' | ')} `}
               <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{`[${item.type}]`}</span>
             </Box>
             <div style={{ marginLeft: theme.spacing(3) }}>
-              <FileTree tree={item.children} sid={sid} />
+              <FileTree tree={item.children} sid={sid} navHighlighter={navHighlighter} />
             </div>
           </div>
         );

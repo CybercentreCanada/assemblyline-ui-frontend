@@ -17,6 +17,7 @@ import RotateLeftOutlinedIcon from '@material-ui/icons/RotateLeftOutlined';
 import { Skeleton } from '@material-ui/lab';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import { NavHighlighterProps } from 'components/hooks/useNavHighlighter';
 import Attack from 'components/visual/Attack';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
@@ -83,6 +84,7 @@ type File = {
 type FileDetailProps = {
   sha256: string;
   sid?: string;
+  navHighlighter: NavHighlighterProps;
 };
 
 const useStyles = makeStyles(theme => ({
@@ -100,7 +102,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null }) => {
+const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, navHighlighter }) => {
   const { t } = useTranslation(['fileDetail']);
   const [file, setFile] = useState<File | null>(null);
   const apiCall = useMyAPI();
