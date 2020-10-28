@@ -6,9 +6,10 @@ type SectionHighlightProps = {
   score: number;
   indent: number;
   depth?: number;
+  highlighted?: boolean;
 };
 
-const SectionHighlight: React.FC<SectionHighlightProps> = ({ score, indent, depth = 1 }) => {
+const SectionHighlight: React.FC<SectionHighlightProps> = ({ score, indent, depth = 1, highlighted = false }) => {
   const theme = useTheme();
 
   const VERDICT_SCORE_MAP = {
@@ -23,7 +24,11 @@ const SectionHighlight: React.FC<SectionHighlightProps> = ({ score, indent, dept
   return (
     <div
       style={{
-        backgroundColor: VERDICT_SCORE_MAP[scoreToVerdict(score)],
+        backgroundColor: highlighted
+          ? theme.palette.type === 'dark'
+            ? '#343a44'
+            : '#d8e3ea'
+          : VERDICT_SCORE_MAP[scoreToVerdict(score)],
         minWidth: '0.5rem',
         marginLeft: `${-1 * indent + -0.5 * (indent - depth)}rem`,
         marginRight: `${1 * indent + 0.5 * (indent - depth)}rem`

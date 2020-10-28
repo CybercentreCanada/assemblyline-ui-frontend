@@ -216,7 +216,7 @@ export default function SubmissionDetail() {
             <CloseOutlinedIcon />
           </IconButton>
         </div>
-        {drawer && (
+        {id && fid && (
           <div style={{ paddingLeft: sp2, paddingRight: sp2 }}>
             <FileDetail sha256={fid} sid={id} navHighlighter={navHighlighter} />
           </div>
@@ -701,7 +701,11 @@ const FileTree = ({ tree, sid, navHighlighter }: FileTreeProps) => {
               }}
               style={{
                 wordBreak: 'break-word',
-                backgroundColor: navHighlighter.isHighlighted(sha256) ? `${theme.palette.primary.main}32` : null
+                backgroundColor: navHighlighter.isHighlighted(sha256)
+                  ? theme.palette.type === 'dark'
+                    ? '#343a44'
+                    : '#d8e3ea'
+                  : null
               }}
             >
               <Verdict score={item.score} mono short />

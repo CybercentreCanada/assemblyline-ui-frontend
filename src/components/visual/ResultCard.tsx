@@ -30,7 +30,7 @@ import TitleKey from 'components/visual/TitleKey';
 import Verdict from 'components/visual/Verdict';
 import { scaleLinear } from 'd3-scale';
 import { scoreToVerdict } from 'helpers/utils';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactJson from 'react-json-view';
 import Moment from 'react-moment';
@@ -81,7 +81,11 @@ type Section = {
   classification: string;
   depth: number;
   heuristic: {
-    attack: any;
+    attack: {
+      attack_id: string;
+      categories: string[];
+      pattern: string;
+    }[];
     heur_id: string;
     name: string;
     score: number;
@@ -104,6 +108,7 @@ type ResultSectionProps = {
   sub_sections: SectionItem[];
   indent: number;
   depth?: number;
+  navHighlighter?: NavHighlighterProps;
 };
 
 type ResultCardProps = {
@@ -489,18 +494,67 @@ const TblBody = ({ body }) => {
   );
 };
 
-const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sections, indent, depth = 1 }) => {
+const ResultSection: React.FC<ResultSectionProps> = ({
+  section_list,
+  id,
+  sub_sections,
+  indent,
+  depth = 1,
+  navHighlighter
+}) => {
   const classes = useStyles();
+  const theme = useTheme();
   const section = section_list[id];
   const [open, setOpen] = React.useState(true);
+
+  const allTags = useMemo(() => {
+    const tagList = [];
+    if (navHighlighter) {
+      for (const tag of section.tags) {
+        tagList.push(navHighlighter.getKey(tag.type, tag.value));
+      }
+
+      if (section.heuristic !== undefined && section.heuristic !== null) {
+        if (section.heuristic.attack !== undefined && section.heuristic.attack.length !== 0) {
+          for (const attack of section.heuristic.attack) {
+            tagList.push(navHighlighter.getKey('attack_pattern', attack.attack_id));
+          }
+        }
+        if (section.heuristic.heur_id !== undefined && section.heuristic.heur_id !== null) {
+          tagList.push(navHighlighter.getKey('heuristic', section.heuristic.heur_id));
+        }
+        if (section.heuristic.signature !== undefined && section.heuristic.signature.length !== 0) {
+          for (const signature of section.heuristic.signature) {
+            tagList.push(navHighlighter.getKey('heuristic.signature', signature.name));
+          }
+        }
+      }
+    }
+    return tagList;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [section]);
+
+  const highlighted = navHighlighter.hasHighlightedKeys(allTags);
 
   const handleClick = () => {
     setOpen(!open);
   };
 
   return (
-    <div style={{ display: 'flex', flexWrap: 'nowrap', marginLeft: `${depth}rem` }}>
-      <SectionHighlight score={section.heuristic ? section.heuristic.score : 0} indent={indent} depth={depth} />
+    <div
+      style={{
+        display: 'flex',
+        flexWrap: 'nowrap',
+        marginLeft: `${depth}rem`,
+        backgroundColor: highlighted ? (theme.palette.type === 'dark' ? '#343a44' : '#d8e3ea') : null
+      }}
+    >
+      <SectionHighlight
+        score={section.heuristic ? section.heuristic.score : 0}
+        indent={indent}
+        depth={depth}
+        highlighted={highlighted}
+      />
 
       <div style={{ width: '100%' }}>
         <Box className={classes.section_title} onClick={handleClick}>
@@ -540,18 +594,50 @@ const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sec
                   return <div style={{ margin: '2rem' }}>INVALID SECTION TYPE</div>;
               }
             })()}
-            {section.heuristic && <Heuristic text={section.heuristic.name} score={section.heuristic.score} show_type />}
+            {section.heuristic && (
+              <Heuristic
+                text={section.heuristic.name}
+                score={section.heuristic.score}
+                show_type
+                highlighted={navHighlighter.isHighlighted(
+                  navHighlighter.getKey('heuristic', section.heuristic.heur_id)
+                )}
+                onClick={() =>
+                  navHighlighter.triggerHighlight(navHighlighter.getKey('heuristic', section.heuristic.heur_id))
+                }
+              />
+            )}
             {section.heuristic &&
               section.heuristic.attack.map((attack, idx) => {
-                return <Attack key={idx} text={attack.pattern} score={section.heuristic.score} show_type />;
+                const key = navHighlighter.getKey('attack_pattern', attack.attack_id);
+                return (
+                  <Attack
+                    key={idx}
+                    text={attack.pattern}
+                    score={section.heuristic.score}
+                    show_type
+                    highlighted={navHighlighter.isHighlighted(key)}
+                    onClick={() => navHighlighter.triggerHighlight(key)}
+                  />
+                );
               })}
             {section.heuristic &&
               section.heuristic.signature.map((signature, idx) => {
+                const key = navHighlighter.getKey('heuristic.signature', signature.name);
                 return (
-                  <Heuristic key={idx} text={signature.name} score={section.heuristic.score} signature show_type />
+                  <Heuristic
+                    key={idx}
+                    text={signature.name}
+                    score={section.heuristic.score}
+                    signature
+                    show_type
+                    highlighted={navHighlighter.isHighlighted(key)}
+                    onClick={() => navHighlighter.triggerHighlight(key)}
+                  />
                 );
               })}
             {section.tags.map((tag, idx) => {
+              const key = navHighlighter.getKey(tag.type, tag.value);
               return (
                 <Tag
                   key={idx}
@@ -559,6 +645,8 @@ const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sec
                   value={tag.value}
                   short_type={tag.short_type}
                   score={section.heuristic ? section.heuristic.score : 0}
+                  highlighted={navHighlighter.isHighlighted(key)}
+                  onClick={() => navHighlighter.triggerHighlight(key)}
                 />
               );
             })}
@@ -572,6 +660,7 @@ const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sec
                   id={item.id}
                   sub_sections={item.children}
                   indent={indent + 1}
+                  navHighlighter={navHighlighter}
                 />
               );
             })}
@@ -637,6 +726,34 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid, navHighlighter = n
   const [openSupp, setOpenSupp] = React.useState(true);
   const [openExt, setOpenExt] = React.useState(true);
 
+  const allTags = useMemo(() => {
+    const tagList = [];
+    navHighlighter &&
+      result.result.sections.forEach(section => {
+        for (const tag of section.tags) {
+          tagList.push(navHighlighter.getKey(tag.type, tag.value));
+        }
+
+        if (section.heuristic !== undefined && section.heuristic !== null) {
+          if (section.heuristic.attack !== undefined && section.heuristic.attack.length !== 0) {
+            for (const attack of section.heuristic.attack) {
+              tagList.push(navHighlighter.getKey('attack_pattern', attack.attack_id));
+            }
+          }
+          if (section.heuristic.heur_id !== undefined && section.heuristic.heur_id !== null) {
+            tagList.push(navHighlighter.getKey('heuristic', section.heuristic.heur_id));
+          }
+          if (section.heuristic.signature !== undefined && section.heuristic.signature.length !== 0) {
+            for (const signature of section.heuristic.signature) {
+              tagList.push(navHighlighter.getKey('heuristic.signature', signature.name));
+            }
+          }
+        }
+      });
+    return tagList;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [result]);
+
   if (result.section_hierarchy === undefined) {
     // eslint-disable-next-line no-console
     console.log('[WARNING] Using old rendering method because the section hierarchy is missing...');
@@ -648,7 +765,18 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid, navHighlighter = n
 
   return (
     <div className={classes.card} style={{ marginBottom: sp2 }}>
-      <Box className={classes.card_title} onClick={handleClick}>
+      <Box
+        className={classes.card_title}
+        onClick={handleClick}
+        style={{
+          backgroundColor:
+            navHighlighter && navHighlighter.hasHighlightedKeys(allTags)
+              ? theme.palette.type === 'dark'
+                ? '#343a44'
+                : '#d8e3ea'
+              : null
+        }}
+      >
         <Classification c12n={result.classification} type="text" inline />
         <span>
           &nbsp;::&nbsp;<b>{result.response.service_name}</b>&nbsp;
@@ -683,6 +811,7 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid, navHighlighter = n
                       id={item.id}
                       sub_sections={item.children}
                       indent={1}
+                      navHighlighter={navHighlighter}
                     />
                   );
                 })
@@ -695,6 +824,7 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid, navHighlighter = n
                       sub_sections={[]}
                       indent={section.depth}
                       depth={section.depth}
+                      navHighlighter={navHighlighter}
                     />
                   );
                 })}
