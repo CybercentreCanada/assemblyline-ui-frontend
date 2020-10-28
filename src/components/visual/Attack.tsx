@@ -9,8 +9,9 @@ type AttackProps = {
   lvl?: string | null;
   score?: number | null;
   show_type?: boolean;
-  onClick?: () => void;
+  onClick?: (event: any) => void;
   highlighted?: boolean;
+  triggerkey?: string;
 };
 
 const Attack: React.FC<AttackProps> = ({
@@ -19,7 +20,8 @@ const Attack: React.FC<AttackProps> = ({
   score = null,
   show_type = false,
   onClick = null,
-  highlighted = false
+  highlighted = false,
+  triggerkey = null
 }) => {
   const history = useHistory();
 
@@ -46,6 +48,7 @@ const Attack: React.FC<AttackProps> = ({
 
   return (
     <CustomChip
+      data-triggerkey={triggerkey}
       wrap
       size="tiny"
       type="square"

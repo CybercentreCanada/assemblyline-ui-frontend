@@ -1,9 +1,4 @@
-import { useState } from 'react';
-
-type NavHighlightProps = {
-  type: string;
-  value: string;
-};
+import { useCallback, useState } from 'react';
 
 type HighlighMapProps = {
   [key: string]: string[];
@@ -22,43 +17,52 @@ export default function useNavHighlighter(): NavHighlighterProps {
   const [relatedHighlighted, setRelatedHighlighted] = useState<Set<any>>(new Set());
   const [highlightMap, setHighlightMap] = useState<HighlighMapProps>({});
 
-  function getKey(type: string, value: string) {
+  const getKey = useCallback((type: string, value: string) => {
     return `${type}__${value}`;
-  }
+  }, []);
 
-  function isHighlighted(key) {
-    if (highlightMap) {
-      return highlighted.has(key) || relatedHighlighted.has(key);
-    }
-    return highlighted.has(key);
-  }
+  const isHighlighted = useCallback(
+    key => {
+      if (highlightMap) {
+        return highlighted.has(key) || relatedHighlighted.has(key);
+      }
+      return highlighted.has(key);
+    },
+    [highlighted, relatedHighlighted, highlightMap]
+  );
 
-  function hasHighlightedKeys(keyList: string[]) {
-    return keyList.some(item => isHighlighted(item));
-  }
+  const hasHighlightedKeys = useCallback(
+    (keyList: string[]) => {
+      return keyList.some(item => isHighlighted(item));
+    },
+    [isHighlighted]
+  );
 
-  function triggerHighlight(key) {
-    const newHighlighted = new Set(highlighted);
-    if (!newHighlighted.has(key)) {
-      newHighlighted.add(key);
-    } else {
-      newHighlighted.delete(key);
-    }
+  const triggerHighlight = useCallback(
+    key => {
+      const newHighlighted = new Set(highlighted);
+      if (!newHighlighted.has(key)) {
+        newHighlighted.add(key);
+      } else {
+        newHighlighted.delete(key);
+      }
 
-    if (highlightMap) {
-      const newRelatedHighlighted = new Set();
-      newHighlighted.forEach(item => {
-        const items = highlightMap[item];
-        if (items) {
-          for (const val of items) {
-            newRelatedHighlighted.add(val);
+      if (highlightMap) {
+        const newRelatedHighlighted = new Set();
+        newHighlighted.forEach(item => {
+          const items = highlightMap[item];
+          if (items) {
+            for (const val of items) {
+              newRelatedHighlighted.add(val);
+            }
           }
-        }
-      });
-      setRelatedHighlighted(newRelatedHighlighted);
-    }
-    setHighlighted(newHighlighted);
-  }
+        });
+        setRelatedHighlighted(newRelatedHighlighted);
+      }
+      setHighlighted(newHighlighted);
+    },
+    [highlighted, highlightMap, setRelatedHighlighted, setHighlighted]
+  );
 
   return {
     getKey,

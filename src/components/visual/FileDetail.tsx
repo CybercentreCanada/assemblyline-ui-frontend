@@ -124,6 +124,8 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, navHighligh
   const [openEmptys, setOpenEmptys] = React.useState(true);
   const [openError, setOpenError] = React.useState(true);
 
+  console.log(`drawing file detail (${sha256}, ${sid}, file=${file !== null})`);
+
   const location = useLocation();
   const params = new URLSearchParams(location.search);
 

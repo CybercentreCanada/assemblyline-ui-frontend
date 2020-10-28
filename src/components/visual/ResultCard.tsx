@@ -507,6 +507,8 @@ const ResultSection: React.FC<ResultSectionProps> = ({
   const section = section_list[id];
   const [open, setOpen] = React.useState(true);
 
+  console.log(`drawing section (${id})`);
+
   const allTags = useMemo(() => {
     const tagList = [];
     if (navHighlighter) {
@@ -725,6 +727,8 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid, navHighlighter = n
   const [open, setOpen] = React.useState(!empty && result.result.score >= settings.expand_min_score);
   const [openSupp, setOpenSupp] = React.useState(true);
   const [openExt, setOpenExt] = React.useState(true);
+
+  console.log(`drawing result (${result.response.service_name})`);
 
   const allTags = useMemo(() => {
     const tagList = [];
