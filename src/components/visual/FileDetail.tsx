@@ -91,7 +91,7 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null }) => {
 
   const location = useLocation();
   const params = new URLSearchParams(location.search);
-  const fileName = params.get('name') || file.file_info.sha256;
+  const fileName = file ? params.get('name') || sha256 : null;
 
   const elementInViewport = element => {
     const bounding = element.getBoundingClientRect();
