@@ -20,7 +20,7 @@ import ExpandMore from '@material-ui/icons/ExpandMore';
 import FingerprintOutlinedIcon from '@material-ui/icons/FingerprintOutlined';
 import PageviewOutlinedIcon from '@material-ui/icons/PageviewOutlined';
 import useAppContext from 'components/hooks/useAppContext';
-import { NavHighlighterProps } from 'components/hooks/useNavHighlighter';
+import useHighlighter from 'components/hooks/useHighlighter';
 import Attack from 'components/visual/Attack';
 import Classification from 'components/visual/Classification';
 import Heuristic from 'components/visual/Heuristic';
@@ -108,13 +108,11 @@ type ResultSectionProps = {
   sub_sections: SectionItem[];
   indent: number;
   depth?: number;
-  navHighlighter?: NavHighlighterProps;
 };
 
 type ResultCardProps = {
   result: Result;
   sid: string | null;
-  navHighlighter?: NavHighlighterProps;
 };
 
 const useStyles = makeStyles(theme => ({
@@ -494,41 +492,33 @@ const TblBody = ({ body }) => {
   );
 };
 
-const ResultSection: React.FC<ResultSectionProps> = ({
-  section_list,
-  id,
-  sub_sections,
-  indent,
-  depth = 1,
-  navHighlighter
-}) => {
+const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sections, indent, depth = 1 }) => {
   const classes = useStyles();
   const theme = useTheme();
   const section = section_list[id];
   const [open, setOpen] = React.useState(true);
+  const { getKey, hasHighlightedKeys } = useHighlighter();
 
   console.log(`drawing section (${id})`);
 
   const allTags = useMemo(() => {
     const tagList = [];
-    if (navHighlighter) {
-      for (const tag of section.tags) {
-        tagList.push(navHighlighter.getKey(tag.type, tag.value));
-      }
+    for (const tag of section.tags) {
+      tagList.push(getKey(tag.type, tag.value));
+    }
 
-      if (section.heuristic !== undefined && section.heuristic !== null) {
-        if (section.heuristic.attack !== undefined && section.heuristic.attack.length !== 0) {
-          for (const attack of section.heuristic.attack) {
-            tagList.push(navHighlighter.getKey('attack_pattern', attack.attack_id));
-          }
+    if (section.heuristic !== undefined && section.heuristic !== null) {
+      if (section.heuristic.attack !== undefined && section.heuristic.attack.length !== 0) {
+        for (const attack of section.heuristic.attack) {
+          tagList.push(getKey('attack_pattern', attack.attack_id));
         }
-        if (section.heuristic.heur_id !== undefined && section.heuristic.heur_id !== null) {
-          tagList.push(navHighlighter.getKey('heuristic', section.heuristic.heur_id));
-        }
-        if (section.heuristic.signature !== undefined && section.heuristic.signature.length !== 0) {
-          for (const signature of section.heuristic.signature) {
-            tagList.push(navHighlighter.getKey('heuristic.signature', signature.name));
-          }
+      }
+      if (section.heuristic.heur_id !== undefined && section.heuristic.heur_id !== null) {
+        tagList.push(getKey('heuristic', section.heuristic.heur_id));
+      }
+      if (section.heuristic.signature !== undefined && section.heuristic.signature.length !== 0) {
+        for (const signature of section.heuristic.signature) {
+          tagList.push(getKey('heuristic.signature', signature.name));
         }
       }
     }
@@ -536,7 +526,7 @@ const ResultSection: React.FC<ResultSectionProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [section]);
 
-  const highlighted = navHighlighter.hasHighlightedKeys(allTags);
+  const highlighted = hasHighlightedKeys(allTags);
 
   const handleClick = () => {
     setOpen(!open);
@@ -601,31 +591,23 @@ const ResultSection: React.FC<ResultSectionProps> = ({
                 text={section.heuristic.name}
                 score={section.heuristic.score}
                 show_type
-                highlighted={navHighlighter.isHighlighted(
-                  navHighlighter.getKey('heuristic', section.heuristic.heur_id)
-                )}
-                onClick={() =>
-                  navHighlighter.triggerHighlight(navHighlighter.getKey('heuristic', section.heuristic.heur_id))
-                }
+                highlight_key={getKey('heuristic', section.heuristic.heur_id)}
               />
             )}
             {section.heuristic &&
               section.heuristic.attack.map((attack, idx) => {
-                const key = navHighlighter.getKey('attack_pattern', attack.attack_id);
                 return (
                   <Attack
                     key={idx}
                     text={attack.pattern}
                     score={section.heuristic.score}
                     show_type
-                    highlighted={navHighlighter.isHighlighted(key)}
-                    onClick={() => navHighlighter.triggerHighlight(key)}
+                    highlight_key={getKey('attack_pattern', attack.attack_id)}
                   />
                 );
               })}
             {section.heuristic &&
               section.heuristic.signature.map((signature, idx) => {
-                const key = navHighlighter.getKey('heuristic.signature', signature.name);
                 return (
                   <Heuristic
                     key={idx}
@@ -633,13 +615,11 @@ const ResultSection: React.FC<ResultSectionProps> = ({
                     score={section.heuristic.score}
                     signature
                     show_type
-                    highlighted={navHighlighter.isHighlighted(key)}
-                    onClick={() => navHighlighter.triggerHighlight(key)}
+                    highlight_key={getKey('heuristic.signature', signature.name)}
                   />
                 );
               })}
             {section.tags.map((tag, idx) => {
-              const key = navHighlighter.getKey(tag.type, tag.value);
               return (
                 <Tag
                   key={idx}
@@ -647,8 +627,7 @@ const ResultSection: React.FC<ResultSectionProps> = ({
                   value={tag.value}
                   short_type={tag.short_type}
                   score={section.heuristic ? section.heuristic.score : 0}
-                  highlighted={navHighlighter.isHighlighted(key)}
-                  onClick={() => navHighlighter.triggerHighlight(key)}
+                  highlight_key={getKey(tag.type, tag.value)}
                 />
               );
             })}
@@ -662,7 +641,6 @@ const ResultSection: React.FC<ResultSectionProps> = ({
                   id={item.id}
                   sub_sections={item.children}
                   indent={indent + 1}
-                  navHighlighter={navHighlighter}
                 />
               );
             })}
@@ -717,7 +695,7 @@ export const emptyResult = (result: Result) => {
   );
 };
 
-const ResultCard: React.FC<ResultCardProps> = ({ result, sid, navHighlighter = null }) => {
+const ResultCard: React.FC<ResultCardProps> = ({ result, sid }) => {
   const { t } = useTranslation(['fileDetail']);
   const classes = useStyles();
   const theme = useTheme();
@@ -727,33 +705,33 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid, navHighlighter = n
   const [open, setOpen] = React.useState(!empty && result.result.score >= settings.expand_min_score);
   const [openSupp, setOpenSupp] = React.useState(true);
   const [openExt, setOpenExt] = React.useState(true);
+  const { getKey, hasHighlightedKeys } = useHighlighter();
 
   console.log(`drawing result (${result.response.service_name})`);
 
   const allTags = useMemo(() => {
     const tagList = [];
-    navHighlighter &&
-      result.result.sections.forEach(section => {
-        for (const tag of section.tags) {
-          tagList.push(navHighlighter.getKey(tag.type, tag.value));
-        }
+    result.result.sections.forEach(section => {
+      for (const tag of section.tags) {
+        tagList.push(getKey(tag.type, tag.value));
+      }
 
-        if (section.heuristic !== undefined && section.heuristic !== null) {
-          if (section.heuristic.attack !== undefined && section.heuristic.attack.length !== 0) {
-            for (const attack of section.heuristic.attack) {
-              tagList.push(navHighlighter.getKey('attack_pattern', attack.attack_id));
-            }
-          }
-          if (section.heuristic.heur_id !== undefined && section.heuristic.heur_id !== null) {
-            tagList.push(navHighlighter.getKey('heuristic', section.heuristic.heur_id));
-          }
-          if (section.heuristic.signature !== undefined && section.heuristic.signature.length !== 0) {
-            for (const signature of section.heuristic.signature) {
-              tagList.push(navHighlighter.getKey('heuristic.signature', signature.name));
-            }
+      if (section.heuristic !== undefined && section.heuristic !== null) {
+        if (section.heuristic.attack !== undefined && section.heuristic.attack.length !== 0) {
+          for (const attack of section.heuristic.attack) {
+            tagList.push(getKey('attack_pattern', attack.attack_id));
           }
         }
-      });
+        if (section.heuristic.heur_id !== undefined && section.heuristic.heur_id !== null) {
+          tagList.push(getKey('heuristic', section.heuristic.heur_id));
+        }
+        if (section.heuristic.signature !== undefined && section.heuristic.signature.length !== 0) {
+          for (const signature of section.heuristic.signature) {
+            tagList.push(getKey('heuristic.signature', signature.name));
+          }
+        }
+      }
+    });
     return tagList;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [result]);
@@ -773,12 +751,7 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid, navHighlighter = n
         className={classes.card_title}
         onClick={handleClick}
         style={{
-          backgroundColor:
-            navHighlighter && navHighlighter.hasHighlightedKeys(allTags)
-              ? theme.palette.type === 'dark'
-                ? '#343a44'
-                : '#d8e3ea'
-              : null
+          backgroundColor: hasHighlightedKeys(allTags) ? (theme.palette.type === 'dark' ? '#343a44' : '#d8e3ea') : null
         }}
       >
         <Classification c12n={result.classification} type="text" inline />
@@ -815,7 +788,6 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid, navHighlighter = n
                       id={item.id}
                       sub_sections={item.children}
                       indent={1}
-                      navHighlighter={navHighlighter}
                     />
                   );
                 })
@@ -828,7 +800,6 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid, navHighlighter = n
                       sub_sections={[]}
                       indent={section.depth}
                       depth={section.depth}
-                      navHighlighter={navHighlighter}
                     />
                   );
                 })}

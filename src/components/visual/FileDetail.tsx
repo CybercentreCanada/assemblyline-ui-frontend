@@ -15,9 +15,9 @@ import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
 import PageviewOutlinedIcon from '@material-ui/icons/PageviewOutlined';
 import RotateLeftOutlinedIcon from '@material-ui/icons/RotateLeftOutlined';
 import { Skeleton } from '@material-ui/lab';
+import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { NavHighlighterProps } from 'components/hooks/useNavHighlighter';
 import Attack from 'components/visual/Attack';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
@@ -84,7 +84,6 @@ type File = {
 type FileDetailProps = {
   sha256: string;
   sid?: string;
-  navHighlighter: NavHighlighterProps;
 };
 
 const useStyles = makeStyles(theme => ({
@@ -102,7 +101,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, navHighlighter }) => {
+const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null }) => {
   const { t } = useTranslation(['fileDetail']);
   const [file, setFile] = useState<File | null>(null);
   const apiCall = useMyAPI();
@@ -123,6 +122,8 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, navHighligh
   const [openResult, setOpenResult] = React.useState(true);
   const [openEmptys, setOpenEmptys] = React.useState(true);
   const [openError, setOpenError] = React.useState(true);
+
+  const { getKey } = useHighlighter();
 
   console.log(`drawing file detail (${sha256}, ${sid}, file=${file !== null})`);
 
@@ -548,14 +549,12 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, navHighligh
                           </Grid>
                           <Grid item xs={12} sm={9} lg={10}>
                             {file.attack_matrix[cat].map(([cid, mat, lvl], idx) => {
-                              const key = navHighlighter.getKey('attack_pattern', cid);
                               return (
                                 <Attack
                                   key={`${cid}_${idx}`}
                                   text={mat}
                                   lvl={lvl}
-                                  highlighted={navHighlighter.isHighlighted(key)}
-                                  onClick={() => navHighlighter.triggerHighlight(key)}
+                                  highlight_key={getKey('attack_pattern', cid)}
                                 />
                               );
                             })}
@@ -603,14 +602,12 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, navHighligh
                           </Grid>
                           <Grid item xs={12} sm={9} lg={10}>
                             {file.heuristics[lvl].map(([cid, hname], idx) => {
-                              const key = navHighlighter.getKey('heuristic', cid);
                               return (
                                 <Heuristic
                                   key={`${cid}_${idx}`}
                                   text={hname}
                                   lvl={lvl}
-                                  highlighted={navHighlighter.isHighlighted(key)}
-                                  onClick={() => navHighlighter.triggerHighlight(key)}
+                                  highlight_key={getKey('heuristic', cid)}
                                 />
                               );
                             })}
@@ -656,15 +653,13 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, navHighligh
                     </Grid>
                     <Grid item xs={12} sm={9} lg={10}>
                       {file.signatures.map(([value, lvl], idx) => {
-                        const key = navHighlighter.getKey('heuristic.signature', value);
                         return (
                           <Heuristic
                             key={idx}
                             signature
                             text={value}
                             lvl={lvl}
-                            highlighted={navHighlighter.isHighlighted(key)}
-                            onClick={() => navHighlighter.triggerHighlight(key)}
+                            highlight_key={getKey('heuristic.signature', value)}
                           />
                         );
                       })}
@@ -680,15 +675,13 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, navHighligh
                           </Grid>
                           <Grid item xs={12} sm={9} lg={10}>
                             {file.tags[tag_type].map(([value, lvl], idx) => {
-                              const key = navHighlighter.getKey(tag_type, value);
                               return (
                                 <Tag
                                   key={idx}
                                   value={value}
                                   type={tag_type}
                                   lvl={lvl}
-                                  highlighted={navHighlighter.isHighlighted(key)}
-                                  onClick={() => navHighlighter.triggerHighlight(key)}
+                                  highlight_key={getKey(tag_type, value)}
                                 />
                               );
                             })}
@@ -729,7 +722,7 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null, navHighligh
               <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
                 {file
                   ? file.results.map((result, i) => {
-                      return <ResultCard key={i} result={result} sid={sid} navHighlighter={navHighlighter} />;
+                      return <ResultCard key={i} result={result} sid={sid} />;
                     })
                   : [...Array(2)].map((_, i) => {
                       return <Skeleton key={i} style={{ height: '16rem' }} />;

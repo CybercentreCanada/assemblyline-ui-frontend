@@ -1,5 +1,6 @@
 import { Collapse, Divider, Grid, makeStyles, Typography, useTheme } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
+import useHighlighter from 'components/hooks/useHighlighter';
 import Heuristic from 'components/visual/Heuristic';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -15,22 +16,16 @@ const useStyles = makeStyles(theme => ({
 
 type HeuristicSectionProps = {
   heuristics: any;
-  isHighlighted: (key: string) => boolean;
-  triggerHighlight: (key: string) => void;
-  getKey: (type: string, value: string) => string;
 };
 
-const WrappedHeuristicSection: React.FC<HeuristicSectionProps> = ({
-  heuristics,
-  isHighlighted,
-  triggerHighlight,
-  getKey
-}) => {
+const WrappedHeuristicSection: React.FC<HeuristicSectionProps> = ({ heuristics }) => {
   const { t } = useTranslation(['submissionDetail']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
   const classes = useStyles();
   const sp2 = theme.spacing(2);
+  const { getKey } = useHighlighter();
+
   return (
     <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
       <Typography
@@ -56,14 +51,12 @@ const WrappedHeuristicSection: React.FC<HeuristicSectionProps> = ({
                         </Grid>
                         <Grid item xs={12} sm={9} lg={10}>
                           {heuristics[lvl].map(([cid, name], idx) => {
-                            const key = getKey('heuristic', cid);
                             return (
                               <Heuristic
                                 key={`${cid}_${idx}`}
                                 text={name}
                                 lvl={lvl}
-                                highlighted={isHighlighted(key)}
-                                onClick={() => triggerHighlight(key)}
+                                highlight_key={getKey('heuristic', cid)}
                               />
                             );
                           })}
@@ -86,7 +79,7 @@ const WrappedHeuristicSection: React.FC<HeuristicSectionProps> = ({
             </div>
           ),
           // eslint-disable-next-line react-hooks/exhaustive-deps
-          [getKey, isHighlighted, heuristics, triggerHighlight]
+          [getKey, heuristics]
         )}
       </Collapse>
     </div>

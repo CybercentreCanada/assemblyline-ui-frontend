@@ -1,4 +1,5 @@
 import { Collapse, Divider, Grid, makeStyles, Typography, useTheme } from '@material-ui/core';
+import useHighlighter from 'components/hooks/useHighlighter';
 import Tag from 'components/visual/Tag';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -15,17 +16,15 @@ const useStyles = makeStyles(theme => ({
 type TagSectionProps = {
   tag_group: string;
   tags: any;
-  isHighlighted: (key: string) => boolean;
-  triggerHighlight: (key: string) => void;
-  getKey: (type: string, value: string) => string;
 };
 
-const WrappedTagSection: React.FC<TagSectionProps> = ({ tag_group, tags, isHighlighted, triggerHighlight, getKey }) => {
+const WrappedTagSection: React.FC<TagSectionProps> = ({ tag_group, tags }) => {
   const { t } = useTranslation(['submissionDetail']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
   const classes = useStyles();
   const sp2 = theme.spacing(2);
+  const { getKey } = useHighlighter();
 
   return (
     <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
@@ -45,15 +44,13 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ tag_group, tags, isHighl
                     </Grid>
                     <Grid item xs={12} sm={9} lg={10}>
                       {tags[tag_type].map(([value, lvl], idx) => {
-                        const key = getKey(tag_type, value);
                         return (
                           <Tag
                             key={idx}
                             value={value}
                             type={tag_type}
                             lvl={lvl}
-                            highlighted={isHighlighted(key)}
-                            onClick={() => triggerHighlight(key)}
+                            highlight_key={getKey(tag_type, value)}
                           />
                         );
                       })}
@@ -64,7 +61,7 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ tag_group, tags, isHighl
             </div>
           ),
           // eslint-disable-next-line react-hooks/exhaustive-deps
-          [getKey, isHighlighted, tags, triggerHighlight]
+          [getKey, tags]
         )}
       </Collapse>
     </div>

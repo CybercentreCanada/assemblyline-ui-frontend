@@ -18,9 +18,9 @@ import ReplayOutlinedIcon from '@material-ui/icons/ReplayOutlined';
 import { Skeleton } from '@material-ui/lab';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useAppContext from 'components/hooks/useAppContext';
+import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import useNavHighlighter from 'components/hooks/useNavHighlighter';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDetail from 'components/visual/FileDetail';
@@ -73,7 +73,7 @@ export default function SubmissionDetail() {
   const history = useHistory();
   const classes = useStyles();
   const { user: currentUser } = useAppContext();
-  const navHighlighter = useNavHighlighter();
+  const { setHighlightMap } = useHighlighter();
 
   console.log(
     `drawing submission detail (${id}, sub=${submission !== null}, sum=${summary !== null}, tree=${tree !== null}})`
@@ -159,7 +159,7 @@ export default function SubmissionDetail() {
     apiCall({
       url: `/api/v4/submission/summary/${id}/`,
       onSuccess: api_data => {
-        navHighlighter.setHighlightMap(api_data.api_response.map);
+        setHighlightMap(api_data.api_response.map);
         setSummary(api_data.api_response);
       }
     });
@@ -197,7 +197,7 @@ export default function SubmissionDetail() {
         </div>
         {id && fid && (
           <div style={{ paddingLeft: sp2, paddingRight: sp2 }}>
-            <FileDetail sha256={fid} sid={id} navHighlighter={navHighlighter} />
+            <FileDetail sha256={fid} sid={id} />
           </div>
         )}
       </Drawer>
@@ -319,21 +319,11 @@ export default function SubmissionDetail() {
           )}
 
           {(!summary || Object.keys(summary.attack_matrix).length !== 0) && (
-            <AttackSection
-              attack_matrix={summary ? summary.attack_matrix : null}
-              isHighlighted={navHighlighter.isHighlighted}
-              triggerHighlight={navHighlighter.triggerHighlight}
-              getKey={navHighlighter.getKey}
-            />
+            <AttackSection attack_matrix={summary ? summary.attack_matrix : null} />
           )}
 
           {(!summary || Object.keys(summary.heuristics).length !== 0) && (
-            <HeuristicSection
-              heuristics={summary ? summary.heuristics : null}
-              isHighlighted={navHighlighter.isHighlighted}
-              triggerHighlight={navHighlighter.triggerHighlight}
-              getKey={navHighlighter.getKey}
-            />
+            <HeuristicSection heuristics={summary ? summary.heuristics : null} />
           )}
 
           {summary &&
@@ -341,19 +331,12 @@ export default function SubmissionDetail() {
             Object.keys(summary.tags).map((tag_group, group_idx) => {
               return (
                 Object.keys(summary.tags[tag_group]).length !== 0 && (
-                  <TagSection
-                    key={group_idx}
-                    tag_group={tag_group}
-                    tags={summary.tags[tag_group]}
-                    isHighlighted={navHighlighter.isHighlighted}
-                    triggerHighlight={navHighlighter.triggerHighlight}
-                    getKey={navHighlighter.getKey}
-                  />
+                  <TagSection key={group_idx} tag_group={tag_group} tags={summary.tags[tag_group]} />
                 )
               );
             })}
 
-          <FileTreeSection tree={tree ? tree.tree : null} sid={id} isHighlighted={navHighlighter.isHighlighted} />
+          <FileTreeSection tree={tree ? tree.tree : null} sid={id} />
         </div>
       </div>
     </PageCenter>

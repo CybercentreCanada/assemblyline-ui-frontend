@@ -1,7 +1,8 @@
 import { Collapse, Divider, Grid, makeStyles, Typography, useTheme } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
+import useHighlighter from 'components/hooks/useHighlighter';
 import Attack from 'components/visual/Attack';
-import React, { useCallback, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(theme => ({
@@ -15,29 +16,15 @@ const useStyles = makeStyles(theme => ({
 
 type AttackSectionProps = {
   attack_matrix: any;
-  isHighlighted: (key: string) => boolean;
-  triggerHighlight: (key: string) => void;
-  getKey: (type: string, value: string) => string;
 };
 
-const WrappedAttackSection: React.FC<AttackSectionProps> = ({
-  attack_matrix,
-  isHighlighted,
-  triggerHighlight,
-  getKey
-}) => {
+const WrappedAttackSection: React.FC<AttackSectionProps> = ({ attack_matrix }) => {
   const { t } = useTranslation(['submissionDetail']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
   const classes = useStyles();
   const sp2 = theme.spacing(2);
-
-  const trigger = useCallback(
-    event => {
-      triggerHighlight(event.currentTarget.dataset.triggerkey);
-    },
-    [triggerHighlight]
-  );
+  const { getKey } = useHighlighter();
 
   return (
     <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
@@ -64,15 +51,12 @@ const WrappedAttackSection: React.FC<AttackSectionProps> = ({
                         </Grid>
                         <Grid item xs={12} sm={9} lg={10}>
                           {attack_matrix[cat].map(([cid, name, lvl], idx) => {
-                            const key = getKey('attack_pattern', cid);
                             return (
                               <Attack
                                 key={`${cid}_${idx}`}
-                                triggerkey={key}
                                 text={name}
                                 lvl={lvl}
-                                highlighted={isHighlighted(key)}
-                                onClick={trigger}
+                                highlight_key={getKey('attack_pattern', cid)}
                               />
                             );
                           })}
@@ -95,7 +79,7 @@ const WrappedAttackSection: React.FC<AttackSectionProps> = ({
             </div>
           ),
           // eslint-disable-next-line react-hooks/exhaustive-deps
-          [attack_matrix, getKey, isHighlighted, trigger]
+          [attack_matrix, getKey]
         )}
       </Collapse>
     </div>

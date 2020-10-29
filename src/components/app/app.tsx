@@ -13,6 +13,7 @@ import LockedPage from 'components/routes/locked';
 import LoginScreen from 'components/routes/login';
 import Routes from 'components/routes/routes';
 import Tos from 'components/routes/tos';
+import HighlightProvider from 'components/visual/HighlightProvider';
 import getXSRFCookie from 'helpers/xsrf';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -132,7 +133,9 @@ const AppInit: React.FC = () => {
       <SiteMapProvider {...sitemapProps}>
         <UserProvider {...userProps}>
           <AppLayoutProvider {...layoutProps}>
-            <MyApp />
+            <HighlightProvider>
+              <MyApp />
+            </HighlightProvider>
           </AppLayoutProvider>
         </UserProvider>
       </SiteMapProvider>

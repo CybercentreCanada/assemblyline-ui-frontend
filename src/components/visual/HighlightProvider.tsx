@@ -1,10 +1,10 @@
-import { useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 type HighlighMapProps = {
   [key: string]: string[];
 };
 
-export type NavHighlighterProps = {
+export type HighlightContextProps = {
   getKey: (type: string, value: string) => string;
   triggerHighlight: (key: string) => void;
   isHighlighted: (key: string) => boolean;
@@ -12,7 +12,14 @@ export type NavHighlighterProps = {
   setHighlightMap: (map: HighlighMapProps) => void;
 };
 
-export default function useNavHighlighter(): NavHighlighterProps {
+export interface HighlightProviderProps {
+  children: React.ReactNode;
+}
+
+export const HighlightContext = React.createContext<HighlightContextProps>(null);
+
+function HighlightProvider(props: HighlightProviderProps) {
+  const { children } = props;
   const [highlighted, setHighlighted] = useState<Set<any>>(new Set());
   const [relatedHighlighted, setRelatedHighlighted] = useState<Set<any>>(new Set());
   const [highlightMap, setHighlightMap] = useState<HighlighMapProps>({});
@@ -64,11 +71,19 @@ export default function useNavHighlighter(): NavHighlighterProps {
     [highlighted, highlightMap, setRelatedHighlighted, setHighlighted]
   );
 
-  return {
-    getKey,
-    triggerHighlight,
-    isHighlighted,
-    hasHighlightedKeys,
-    setHighlightMap
-  };
+  return (
+    <HighlightContext.Provider
+      value={{
+        getKey,
+        triggerHighlight,
+        isHighlighted,
+        hasHighlightedKeys,
+        setHighlightMap
+      }}
+    >
+      {children}
+    </HighlightContext.Provider>
+  );
 }
+
+export default HighlightProvider;

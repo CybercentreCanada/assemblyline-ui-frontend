@@ -1,5 +1,6 @@
 import { Box, Collapse, Divider, makeStyles, Typography, useTheme } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
+import useHighlighter from 'components/hooks/useHighlighter';
 import Verdict from 'components/visual/Verdict';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -37,10 +38,9 @@ type FileTreeProps = {
     [key: string]: FileItemProps;
   };
   sid: string;
-  isHighlighted: any;
 };
 
-const WrappedFileTreeSection: React.FC<FileTreeProps> = ({ tree, sid, isHighlighted }) => {
+const WrappedFileTreeSection: React.FC<FileTreeProps> = ({ tree, sid }) => {
   const { t } = useTranslation(['submissionDetail']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
@@ -62,7 +62,7 @@ const WrappedFileTreeSection: React.FC<FileTreeProps> = ({ tree, sid, isHighligh
       <Collapse in={open} timeout="auto">
         <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
           {tree !== null ? (
-            <FileTree tree={tree} sid={sid} isHighlighted={isHighlighted} />
+            <FileTree tree={tree} sid={sid} />
           ) : (
             [...Array(3)].map((_, i) => {
               return (
@@ -79,10 +79,11 @@ const WrappedFileTreeSection: React.FC<FileTreeProps> = ({ tree, sid, isHighligh
   );
 };
 
-const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, isHighlighted }) => {
+const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid }) => {
   const theme = useTheme();
   const classes = useStyles();
   const history = useHistory();
+  const { isHighlighted } = useHighlighter();
 
   console.log('Render tree');
 
@@ -107,7 +108,7 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, isHighlighted }) 
               <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{`[${item.type}]`}</span>
             </Box>
             <div style={{ marginLeft: theme.spacing(3) }}>
-              <FileTree tree={item.children} sid={sid} isHighlighted={isHighlighted} />
+              <FileTree tree={item.children} sid={sid} />
             </div>
           </div>
         );
