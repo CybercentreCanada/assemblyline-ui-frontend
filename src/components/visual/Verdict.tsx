@@ -13,7 +13,7 @@ type VerdictProps = {
   mono?: boolean;
 };
 
-const Verdict: React.FC<VerdictProps> = ({
+const WrappedVerdict: React.FC<VerdictProps> = ({
   score,
   type = 'square',
   variant = 'default',
@@ -79,4 +79,5 @@ const Verdict: React.FC<VerdictProps> = ({
   );
 };
 
+const Verdict = React.memo(WrappedVerdict);
 export default Verdict;

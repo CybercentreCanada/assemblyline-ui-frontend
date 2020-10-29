@@ -125,8 +125,6 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null }) => {
 
   const { getKey } = useHighlighter();
 
-  console.log(`drawing file detail (${sha256}, ${sid}, file=${file !== null})`);
-
   const location = useLocation();
   const params = new URLSearchParams(location.search);
 

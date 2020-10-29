@@ -85,8 +85,6 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid }) => {
   const history = useHistory();
   const { isHighlighted } = useHighlighter();
 
-  console.log('Render tree');
-
   return (
     <>
       {Object.keys(tree).map((sha256, i) => {

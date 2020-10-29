@@ -128,16 +128,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function CustomChip({
-  className,
-  type,
-  size,
-  color,
-  variant,
-  mono,
-  wrap,
-  ...otherProps
-}: CustomChipProps) {
+function WrappedCustomChip({ className, type, size, color, variant, mono, wrap, ...otherProps }: CustomChipProps) {
   const classes = useStyles();
 
   // Define classnames maps
@@ -201,7 +192,7 @@ export default function CustomChip({
   );
 }
 
-CustomChip.defaultProps = {
+WrappedCustomChip.defaultProps = {
   className: null,
   type: 'round' as 'round',
   size: 'medium' as 'medium',
@@ -210,3 +201,6 @@ CustomChip.defaultProps = {
   mono: false,
   wrap: false
 };
+
+const CustomChip = React.memo(WrappedCustomChip);
+export default CustomChip;

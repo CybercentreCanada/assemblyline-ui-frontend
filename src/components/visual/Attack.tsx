@@ -2,8 +2,11 @@ import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 import useHighlighter from 'components/hooks/useHighlighter';
 import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
 import { scoreToVerdict } from 'helpers/utils';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
+
+const STYLE = { height: 'auto', minHeight: '20px' };
+const SEARCH_ICON = <SearchOutlinedIcon style={{ marginLeft: '2px', height: '18px', width: '18px' }} />;
 
 type AttackProps = {
   text: string;
@@ -17,9 +20,13 @@ const Attack: React.FC<AttackProps> = ({ text, lvl = null, score = null, show_ty
   const history = useHistory();
   const { isHighlighted, triggerHighlight } = useHighlighter();
 
-  const searchAttack = () => {
-    history.push(`/search/result?q=result.sections.heuristic.attack.pattern:"${text}"`);
-  };
+  const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
+
+  const searchAttack = useCallback(
+    () => history.push(`/search/result?q=result.sections.heuristic.attack.pattern:"${text}"`),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [text]
+  );
 
   let color: PossibleColors = 'default' as 'default';
   if (lvl) {
@@ -46,9 +53,9 @@ const Attack: React.FC<AttackProps> = ({ text, lvl = null, score = null, show_ty
       color={highlight_key && isHighlighted(highlight_key) ? ('primary' as 'info') : color}
       label={show_type ? `[ATT&CK] ${text}` : text}
       onDelete={searchAttack}
-      deleteIcon={<SearchOutlinedIcon style={{ marginLeft: '2px', height: '18px', width: '18px' }} />}
-      style={{ height: 'auto', minHeight: '20px' }}
-      onClick={highlight_key ? () => triggerHighlight(highlight_key) : null}
+      deleteIcon={SEARCH_ICON}
+      style={STYLE}
+      onClick={highlight_key ? handleClick : null}
     />
   );
 };

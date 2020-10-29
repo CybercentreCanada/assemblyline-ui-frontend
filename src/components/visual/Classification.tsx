@@ -79,15 +79,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function Classification({
-  c12n,
-  format,
-  inline,
-  setClassification,
-  size,
-  type,
-  isUser
-}: ClassificationProps) {
+function WrappedClassification({ c12n, format, inline, setClassification, size, type, isUser }: ClassificationProps) {
   const classes = useStyles();
   const { t } = useTranslation();
   const theme = useTheme();
@@ -356,7 +348,7 @@ export default function Classification({
   );
 }
 
-Classification.defaultProps = {
+WrappedClassification.defaultProps = {
   setClassification: null,
   size: 'medium' as 'medium',
   type: 'pill' as 'pill',
@@ -364,3 +356,6 @@ Classification.defaultProps = {
   inline: false,
   isUser: false
 };
+
+const Classification = React.memo(WrappedClassification);
+export default Classification;

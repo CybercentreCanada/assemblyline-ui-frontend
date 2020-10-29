@@ -499,8 +499,6 @@ const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sec
   const [open, setOpen] = React.useState(true);
   const { getKey, hasHighlightedKeys } = useHighlighter();
 
-  console.log(`drawing section (${id})`);
-
   const allTags = useMemo(() => {
     const tagList = [];
     for (const tag of section.tags) {
@@ -706,8 +704,6 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid }) => {
   const [openSupp, setOpenSupp] = React.useState(true);
   const [openExt, setOpenExt] = React.useState(true);
   const { getKey, hasHighlightedKeys } = useHighlighter();
-
-  console.log(`drawing result (${result.response.service_name})`);
 
   const allTags = useMemo(() => {
     const tagList = [];

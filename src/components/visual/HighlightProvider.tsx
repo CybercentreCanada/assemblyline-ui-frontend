@@ -1,7 +1,11 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 type HighlighMapProps = {
   [key: string]: string[];
+};
+
+type EventProps = {
+  key: string;
 };
 
 export type HighlightContextProps = {
@@ -45,8 +49,13 @@ function HighlightProvider(props: HighlightProviderProps) {
     [isHighlighted]
   );
 
-  const triggerHighlight = useCallback(
-    key => {
+  const triggerHighlight = useCallback((data: string) => {
+    window.dispatchEvent(new CustomEvent('tiggerHighlight', { detail: data }));
+  }, []);
+
+  useEffect(() => {
+    function handleTrigger(event: CustomEvent) {
+      const { detail: key } = event;
       const newHighlighted = new Set(highlighted);
       if (!newHighlighted.has(key)) {
         newHighlighted.add(key);
@@ -67,9 +76,14 @@ function HighlightProvider(props: HighlightProviderProps) {
         setRelatedHighlighted(newRelatedHighlighted);
       }
       setHighlighted(newHighlighted);
-    },
-    [highlighted, highlightMap, setRelatedHighlighted, setHighlighted]
-  );
+    }
+
+    window.addEventListener('tiggerHighlight', handleTrigger);
+
+    return () => {
+      window.removeEventListener('tiggerHighlight', handleTrigger);
+    };
+  }, [highlightMap, highlighted]);
 
   return (
     <HighlightContext.Provider

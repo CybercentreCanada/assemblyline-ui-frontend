@@ -75,10 +75,6 @@ export default function SubmissionDetail() {
   const { user: currentUser } = useAppContext();
   const { setHighlightMap } = useHighlighter();
 
-  console.log(
-    `drawing submission detail (${id}, sub=${submission !== null}, sum=${summary !== null}, tree=${tree !== null}})`
-  );
-
   const resubmit = useCallback(() => {
     if (submission != null) {
       apiCall({
