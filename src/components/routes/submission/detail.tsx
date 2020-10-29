@@ -65,6 +65,7 @@ export default function SubmissionDetail() {
   const [summary, setSummary] = useState(null);
   const [tree, setTree] = useState(null);
   const [deleteDialog, setDeleteDialog] = useState(false);
+  const [drawer, setDrawer] = useState(false);
   const apiCall = useMyAPI();
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
@@ -145,6 +146,11 @@ export default function SubmissionDetail() {
     [apiCall, currentUser.username, submission]
   );
 
+  const closeDrawer = () => {
+    setDrawer(false);
+    setTimeout(() => history.push(`/submission/detail/${id}`), 150);
+  };
+
   useEffect(() => {
     apiCall({
       url: `/api/v4/submission/${id}/`,
@@ -168,6 +174,13 @@ export default function SubmissionDetail() {
     // eslint-disable-next-line
   }, [id]);
 
+  useEffect(() => {
+    if (!drawer && fid) {
+      setDrawer(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fid]);
+
   return (
     <PageCenter>
       <ConfirmationDialog
@@ -180,14 +193,9 @@ export default function SubmissionDetail() {
         text={t('delete.text')}
       />
 
-      <Drawer
-        anchor="right"
-        classes={{ paper: classes.drawerPaper }}
-        open={!!fid}
-        onClose={() => history.push(`/submission/detail/${id}`)}
-      >
+      <Drawer anchor="right" classes={{ paper: classes.drawerPaper }} open={drawer} onClose={closeDrawer}>
         <div id="drawerTop" style={{ padding: sp1 }}>
-          <IconButton onClick={() => history.push(`/submission/detail/${id}`)}>
+          <IconButton onClick={closeDrawer}>
             <CloseOutlinedIcon />
           </IconButton>
         </div>
