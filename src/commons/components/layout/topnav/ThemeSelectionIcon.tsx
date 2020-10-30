@@ -1,5 +1,6 @@
 import { ClickAwayListener, Fade, IconButton, makeStyles, Paper, Popper, useTheme } from '@material-ui/core';
 import TuneIcon from '@material-ui/icons/Tune';
+import useAppLayout from 'commons/components/hooks/useAppLayout';
 import ThemeSelection from 'commons/components/layout/topnav/ThemeSelection';
 import React, { useState } from 'react';
 
@@ -16,6 +17,7 @@ const ThemeSelectionIcon = () => {
   const theme = useTheme();
   const classes = useStyles();
   const [popperAnchorEl, setPopperAnchorEl] = useState(null);
+  const { layoutProps } = useAppLayout();
 
   const onThemeSelectionClick = (event: React.MouseEvent) => {
     setPopperAnchorEl(popperAnchorEl ? null : event.currentTarget);
@@ -24,7 +26,15 @@ const ThemeSelectionIcon = () => {
   const onClickAway = () => setPopperAnchorEl(null);
   const isPopperOpen = !!popperAnchorEl;
 
-  return (
+  const allowPersonalization =
+    layoutProps.allowAutoHideTopbar ||
+    layoutProps.allowBreadcrumbs ||
+    layoutProps.allowQuickSearch ||
+    layoutProps.allowReset ||
+    layoutProps.allowThemeSelection ||
+    layoutProps.allowTopbarModeSelection;
+
+  return allowPersonalization || layoutProps.allowTranslate || layoutProps.allowReset ? (
     <ClickAwayListener onClickAway={onClickAway}>
       <IconButton color="inherit" aria-label="open drawer" onClick={onThemeSelectionClick} edge="start">
         <TuneIcon />
@@ -45,7 +55,7 @@ const ThemeSelectionIcon = () => {
         </Popper>
       </IconButton>
     </ClickAwayListener>
-  );
+  ) : null;
 };
 
 export default ThemeSelectionIcon;

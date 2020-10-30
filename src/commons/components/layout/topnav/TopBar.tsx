@@ -129,13 +129,9 @@ const TopBar: React.FC<AppBarProps> = ({ width }) => {
           {renderTitle()}
           <div className={classes.leftSpacer} />
           {layoutProps.topnav.left}
-          {layoutProps.allowBreadcrumbs && breadcrumbsEnabled && breadcrumbsPlacement === 'topbar' && <Breadcrumbs />}
+          {breadcrumbsEnabled && breadcrumbsPlacement === 'topbar' && <Breadcrumbs />}
 
-          {layoutProps.allowQuickSearch && showQuickSearch && isWidthUp('sm', width) ? (
-            <QuickSearch />
-          ) : (
-            <div style={{ flexGrow: 1 }} />
-          )}
+          {showQuickSearch && isWidthUp('sm', width) ? <QuickSearch /> : <div style={{ flexGrow: 1 }} />}
           {layoutProps.topnav.themeSelectionUnder === 'icon' && <ThemeSelectionIcon />}
           <AppSwitcher />
           <UserProfile />

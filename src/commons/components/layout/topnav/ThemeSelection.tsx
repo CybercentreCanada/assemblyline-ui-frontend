@@ -9,7 +9,7 @@ import {
   Typography,
   useTheme
 } from '@material-ui/core';
-import withWidth, { isWidthDown, isWidthUp } from '@material-ui/core/withWidth';
+import withWidth, { isWidthDown } from '@material-ui/core/withWidth';
 import useApp from 'commons/components/hooks/useAppContext';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import i18n from 'i18next';
@@ -52,114 +52,118 @@ const ThemeSelection = ({ width }) => {
     window.location.reload();
   };
 
+  const allowPersonalization =
+    layoutProps.allowAutoHideTopbar ||
+    layoutProps.allowBreadcrumbs ||
+    layoutProps.allowQuickSearch ||
+    layoutProps.allowReset ||
+    layoutProps.allowThemeSelection ||
+    layoutProps.allowTopbarModeSelection;
+
   return (
     <div>
-      <List dense subheader={<ListSubheader disableSticky>{t('app.language')}</ListSubheader>}>
-        <ListItem dense button onClick={onToggleLanguage}>
-          <ListItemText style={{ margin: 0 }}>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                flexDirection: 'row',
-                width: '100%',
-                textAlign: 'center',
-                cursor: 'pointer'
-              }}
-            >
-              <Typography component="div" variant="body2">
-                English
-              </Typography>
-              <div style={{ flexGrow: 1 }}>
-                <Switch checked={isLang(Lang.FR)} name="langSwitch" />
+      {layoutProps.allowTranslate && (
+        <List dense subheader={<ListSubheader disableSticky>{t('app.language')}</ListSubheader>}>
+          <ListItem dense button onClick={onToggleLanguage}>
+            <ListItemText style={{ margin: 0 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  flexDirection: 'row',
+                  width: '100%',
+                  textAlign: 'center',
+                  cursor: 'pointer'
+                }}
+              >
+                <Typography component="div" variant="body2">
+                  English
+                </Typography>
+                <div style={{ flexGrow: 1 }}>
+                  <Switch checked={isLang(Lang.FR)} name="langSwitch" />
+                </div>
+                <Typography component="div" variant="body2">
+                  Français
+                </Typography>
               </div>
-              <Typography component="div" variant="body2">
-                Français
-              </Typography>
-            </div>
-          </ListItemText>
-        </ListItem>
-      </List>
-      <Divider />
-      <List dense subheader={<ListSubheader disableSticky>{t('personalization')}</ListSubheader>}>
-        <ListItem button onClick={toggleTheme}>
-          <ListItemText>{t('personalization.dark')}</ListItemText>
-          <ListItemSecondaryAction>
-            <Switch edge="end" onChange={toggleTheme} checked={theme.palette.type === 'dark'} />
-          </ListItemSecondaryAction>
-        </ListItem>
-        <ListItem button onClick={toggleLayout}>
-          <ListItemText>{t('personalization.sticky')}</ListItemText>
-          <ListItemSecondaryAction onClick={toggleLayout}>
-            <Switch edge="end" checked={currentLayout === 'top'} />
-          </ListItemSecondaryAction>
-        </ListItem>
-        {layoutProps.allowQuickSearch && (
-          <ListItem button disabled={isWidthDown('xs', width)} onClick={toggleQuickSearch}>
-            <ListItemText>{t('personalization.quicksearch')}</ListItemText>
-            <ListItemSecondaryAction>
-              <Switch
-                edge="end"
-                disabled={isWidthDown('xs', width)}
-                checked={showQuickSearch === true && isWidthUp('xs', width)}
-                onClick={toggleQuickSearch}
-              />
-            </ListItemSecondaryAction>
+            </ListItemText>
           </ListItem>
-        )}
-        <ListItem button disabled={currentLayout === 'top'} onClick={toggleAutoHideAppbar}>
-          <ListItemText>{t('personalization.autohideappbar')}</ListItemText>
-          <ListItemSecondaryAction>
-            <Switch
-              disabled={currentLayout === 'top'}
-              edge="end"
-              checked={autoHideAppbar === true && currentLayout !== 'top'}
-              onClick={toggleAutoHideAppbar}
-            />
-          </ListItemSecondaryAction>
-        </ListItem>
-        {layoutProps.allowBreadcrumbs && (
-          <>
-            <ListItem button disabled={isWidthDown('xs', width)} onClick={toggleShowBreadcrumbs}>
-              <ListItemText>{t('personalization.showbreadcrumbs')}</ListItemText>
+        </List>
+      )}
+      {layoutProps.allowTranslate && allowPersonalization && <Divider />}
+      {allowPersonalization && (
+        <List dense subheader={<ListSubheader disableSticky>{t('personalization')}</ListSubheader>}>
+          {layoutProps.allowThemeSelection && (
+            <ListItem button onClick={toggleTheme}>
+              <ListItemText>{t('personalization.dark')}</ListItemText>
+              <ListItemSecondaryAction>
+                <Switch edge="end" onChange={toggleTheme} checked={theme.palette.type === 'dark'} />
+              </ListItemSecondaryAction>
+            </ListItem>
+          )}
+          {layoutProps.allowTopbarModeSelection && (
+            <ListItem button onClick={toggleLayout}>
+              <ListItemText>{t('personalization.sticky')}</ListItemText>
+              <ListItemSecondaryAction onClick={toggleLayout}>
+                <Switch edge="end" checked={currentLayout === 'top'} />
+              </ListItemSecondaryAction>
+            </ListItem>
+          )}
+          {layoutProps.allowQuickSearch && !isWidthDown('xs', width) && (
+            <ListItem button onClick={toggleQuickSearch}>
+              <ListItemText>{t('personalization.quicksearch')}</ListItemText>
+              <ListItemSecondaryAction>
+                <Switch edge="end" checked={showQuickSearch} onClick={toggleQuickSearch} />
+              </ListItemSecondaryAction>
+            </ListItem>
+          )}
+          {layoutProps.allowAutoHideTopbar && (
+            <ListItem button disabled={currentLayout === 'top'} onClick={toggleAutoHideAppbar}>
+              <ListItemText>{t('personalization.autohideappbar')}</ListItemText>
               <ListItemSecondaryAction>
                 <Switch
                   edge="end"
-                  disabled={isWidthDown('xs', width)}
-                  checked={breadcrumbsEnabled && isWidthUp('xs', width)}
-                  onClick={toggleShowBreadcrumbs}
+                  disabled={currentLayout === 'top'}
+                  checked={autoHideAppbar && currentLayout !== 'top'}
+                  onClick={toggleAutoHideAppbar}
                 />
               </ListItemSecondaryAction>
             </ListItem>
-            {layoutProps.allowBreadcrumbsMinimize && (
-              <ListItem
-                button
-                disabled={!breadcrumbsEnabled || isWidthDown('xs', width)}
-                onClick={toggleBreadcrumbsState}
-              >
-                <ListItemText>{t('personalization.minimizebreadcrumbs')}</ListItemText>
+          )}
+          {layoutProps.allowBreadcrumbs && !isWidthDown('xs', width) && (
+            <>
+              <ListItem button onClick={toggleShowBreadcrumbs}>
+                <ListItemText>{t('personalization.showbreadcrumbs')}</ListItemText>
                 <ListItemSecondaryAction>
-                  <Switch
-                    edge="end"
-                    disabled={!breadcrumbsEnabled || isWidthDown('xs', width)}
-                    checked={breadcrumbsEnabled && !breadcrumbsState && isWidthUp('xs', width)}
-                    onClick={toggleBreadcrumbsState}
-                  />
+                  <Switch edge="end" checked={breadcrumbsEnabled} onClick={toggleShowBreadcrumbs} />
                 </ListItemSecondaryAction>
               </ListItem>
-            )}
-          </>
-        )}
-      </List>
+              {layoutProps.allowBreadcrumbsMinimize && (
+                <ListItem button onClick={toggleBreadcrumbsState} disabled={!breadcrumbsEnabled}>
+                  <ListItemText>{t('personalization.minimizebreadcrumbs')}</ListItemText>
+                  <ListItemSecondaryAction>
+                    <Switch
+                      edge="end"
+                      disabled={!breadcrumbsEnabled}
+                      checked={breadcrumbsEnabled && !breadcrumbsState}
+                      onClick={toggleBreadcrumbsState}
+                    />
+                  </ListItemSecondaryAction>
+                </ListItem>
+              )}
+            </>
+          )}
+        </List>
+      )}
+
+      {(layoutProps.allowTranslate || allowPersonalization) && layoutProps.allowReset && <Divider />}
+
       {layoutProps.allowReset && (
-        <div>
-          <Divider />
-          <List dense>
-            <ListItem dense button onClick={clearStorage}>
-              <ListItemText>{t('personalization.reset_text')}</ListItemText>
-            </ListItem>
-          </List>
-        </div>
+        <List dense>
+          <ListItem dense button onClick={clearStorage}>
+            <ListItemText>{t('personalization.reset_text')}</ListItemText>
+          </ListItem>
+        </List>
       )}
     </div>
   );

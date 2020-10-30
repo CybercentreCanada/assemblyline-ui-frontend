@@ -57,11 +57,15 @@ export type AppLayoutContextProps = {
 
 export interface AppLayoutProps {
   appName: string;
+  allowAutoHideTopbar?: boolean;
   allowBreadcrumbs?: boolean;
   allowBreadcrumbsMinimize?: boolean;
   allowGravatar?: boolean;
   allowQuickSearch?: boolean;
   allowReset?: boolean;
+  allowTopbarModeSelection?: boolean;
+  allowThemeSelection?: boolean;
+  allowTranslate?: boolean;
   appIconDark: React.ReactElement<any>;
   appIconLight: React.ReactElement<any>;
   bannerDark: React.ReactElement<any>;
@@ -201,7 +205,17 @@ function AppLayoutProvider(props: LayoutProviderProps) {
         breadcrumbsState,
         breadcrumbsPlacement: layoutProps.breadcrumbsPlacement ? layoutProps.breadcrumbsPlacement : 'topbar',
         hideNestedIcons: !!layoutProps.leftnav.hideNestedIcons,
-        layoutProps,
+        layoutProps: {
+          allowAutoHideTopbar: true,
+          allowBreadcrumbs: true,
+          allowBreadcrumbsMinimize: true,
+          allowQuickSearch: true,
+          allowReset: true,
+          allowTopbarModeSelection: true,
+          allowThemeSelection: true,
+          allowTranslate: true,
+          ...layoutProps
+        },
         showQuickSearch: quickSearch,
         getBanner: curTheme => {
           return curTheme.palette.type === 'dark' ? layoutProps.bannerDark : layoutProps.bannerLight;

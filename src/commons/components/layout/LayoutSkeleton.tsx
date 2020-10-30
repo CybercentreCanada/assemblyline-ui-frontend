@@ -82,9 +82,9 @@ const SideLayoutSkeleton = () => {
   const isSm = useMediaQuery(theme.breakpoints.only('sm'));
   const userProfileClasses = userProfileStyles();
   const { layoutProps, showQuickSearch: _showQuickSearch, breadcrumbsEnabled, drawerState } = useAppLayout();
-  const showBreadcrumbs = layoutProps.allowBreadcrumbs && breadcrumbsEnabled;
+  const showBreadcrumbs = breadcrumbsEnabled;
   const showTopBarBreadcrumbs = showBreadcrumbs && !isSm;
-  const showQuicksearch = layoutProps.allowQuickSearch && _showQuickSearch;
+  const showQuicksearch = _showQuickSearch;
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
   const sp3 = theme.spacing(3);
@@ -178,9 +178,9 @@ const TopLayoutSkeleton = () => {
   const isSm = useMediaQuery(theme.breakpoints.only('sm'));
   const userProfileClasses = userProfileStyles();
   const { layoutProps, showQuickSearch: _showQuickSearch, breadcrumbsEnabled, drawerState } = useAppLayout();
-  const showBreadcrumbs = layoutProps.allowBreadcrumbs && breadcrumbsEnabled;
+  const showBreadcrumbs = breadcrumbsEnabled;
   const showTopBarBreadcrumbs = showBreadcrumbs && !isSm;
-  const showQuicksearch = layoutProps.allowQuickSearch && _showQuickSearch;
+  const showQuicksearch = _showQuickSearch;
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
   const sp3 = theme.spacing(3);

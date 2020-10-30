@@ -58,6 +58,14 @@ const UserProfile = () => {
   const sp2 = theme.spacing(2);
   const sp3 = theme.spacing(3);
 
+  const allowPersonalization =
+    layoutProps.allowAutoHideTopbar ||
+    layoutProps.allowBreadcrumbs ||
+    layoutProps.allowQuickSearch ||
+    layoutProps.allowReset ||
+    layoutProps.allowThemeSelection ||
+    layoutProps.allowTopbarModeSelection;
+
   const onProfileClick = (event: React.MouseEvent) => {
     setPopperAnchorEl(popperAnchorEl ? null : event.currentTarget);
   };
@@ -66,7 +74,7 @@ const UserProfile = () => {
   const isPopperOpen = !!popperAnchorEl;
 
   const renderThemeSelection = enabled => {
-    if (enabled) {
+    if (enabled && (allowPersonalization || layoutProps.allowTranslate || layoutProps.allowReset)) {
       return (
         <div>
           <Divider />
