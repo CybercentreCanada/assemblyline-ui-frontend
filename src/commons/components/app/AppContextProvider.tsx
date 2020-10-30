@@ -15,6 +15,8 @@ interface AppProviderProps {
 export interface AppContextProps {
   context?: any;
   theme: 'light' | 'dark';
+  isDarkTheme: boolean;
+  isLightTheme: boolean;
   toggleTheme: () => void;
   setContext: (context: any) => void;
 }
@@ -68,7 +70,9 @@ const AppContextProvider: React.FC<AppProviderProps> = ({ defaultTheme, colors, 
         context,
         theme,
         toggleTheme,
-        setContext
+        setContext,
+        isDarkTheme: theme === 'dark',
+        isLightTheme: theme === 'light'
       }}
     >
       <ThemeProvider theme={appTheme}>

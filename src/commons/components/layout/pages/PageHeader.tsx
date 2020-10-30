@@ -16,6 +16,7 @@ import Breadcrumbs from 'commons/components/layout/breadcrumbs/Breadcrumbs';
 import React, { useLayoutEffect, useRef, useState } from 'react';
 
 export type PageHeaderAction = {
+  key?: string;
   title?: string;
   icon?: React.ReactNode;
   color?: 'primary' | 'secondary';
@@ -111,7 +112,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                 if (a.title) {
                   return (
                     <Button
-                      key={`ph-action-${i}`}
+                      key={a.key ? a.key : `ph-action-${i}`}
                       startIcon={a.icon}
                       color={a.color}
                       onClick={a.action}
@@ -124,7 +125,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                 }
                 return (
                   <IconButton
-                    key={`ph-action-${i}`}
+                    key={a.key ? a.key : `ph-action-${i}`}
                     color={a.color}
                     onClick={a.action}
                     {...(a.btnProp as IconButtonProps)}
