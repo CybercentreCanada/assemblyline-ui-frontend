@@ -71,6 +71,9 @@ const useStyles = (layout, drawerState) => {
       }),
       marginLeft: layout === 'side' ? (drawerState ? theme.spacing(7) + 240 - 56 : theme.spacing(7)) : theme.spacing(3),
       overflow: 'auto',
+      [theme.breakpoints.down('sm')]: {
+        marginLeft: theme.spacing(7)
+      },
       [theme.breakpoints.down('xs')]: {
         marginLeft: 0
       }

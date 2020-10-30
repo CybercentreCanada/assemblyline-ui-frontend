@@ -7,7 +7,7 @@ import React from 'react';
 export const useStyles = (layout, open, hasQuickSearch) => {
   return makeStyles(theme => ({
     breadcrumbs: {
-      flexGrow: 1,
+      flexGrow: 2,
       [theme.breakpoints.down(hasQuickSearch ? 'sm' : 'xs')]: {
         display: 'none'
       }
