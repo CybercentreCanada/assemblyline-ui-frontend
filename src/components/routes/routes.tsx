@@ -53,7 +53,7 @@ function ScrollToTop() {
   return null;
 }
 
-const Routes = () => {
+const WrappedRoutes = () => {
   const { settings } = useAppContext();
   return (
     <>
@@ -106,4 +106,5 @@ const Routes = () => {
   );
 };
 
+const Routes = React.memo(WrappedRoutes);
 export default Routes;
