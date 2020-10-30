@@ -475,7 +475,7 @@ const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sec
       <div style={{ width: '100%' }}>
         <Box className={classes.section_title} onClick={handleClick}>
           <span>
-            <Classification c12n={section.classification} type="text" inline />
+            <Classification c12n={section.classification} type="text" />
             &nbsp;&nbsp;::&nbsp;&nbsp;
           </span>
           {section.heuristic && (

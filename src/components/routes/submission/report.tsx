@@ -523,7 +523,7 @@ export default function SubmissionReport() {
 
         <div className="print-footer print-only">
           {`${t('title')} :: ${id} :: `}
-          <Classification type="text" size="tiny" c12n={report ? report.classification : null} inline />
+          <Classification type="text" size="tiny" c12n={report ? report.classification : null} />
         </div>
         <div style={{ paddingBottom: sp2 }}>
           <Grid container alignItems="center">

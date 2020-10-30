@@ -135,7 +135,7 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid }) => {
           backgroundColor: hasHighlightedKeys(allTags) ? (theme.palette.type === 'dark' ? '#343a44' : '#d8e3ea') : null
         }}
       >
-        <Classification c12n={result.classification} type="text" inline />
+        <Classification c12n={result.classification} type="text" />
         <span>
           &nbsp;::&nbsp;<b>{result.response.service_name}</b>&nbsp;
         </span>

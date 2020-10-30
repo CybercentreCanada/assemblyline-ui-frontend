@@ -190,13 +190,12 @@ function WrappedClassification({ c12n, format, inline, setClassification, size, 
     c12nDef.enforce &&
     (c12n ? (
       <>
-        <div
-          className={type === 'text' ? classes[computeColor()] : null}
-          style={{ display: inline ? 'inline-block' : null }}
-        >
-          {type === 'text' ? (
-            normalizedClassification(validated.parts, c12nDef, format, isMobile)
-          ) : (
+        {type === 'text' ? (
+          <span className={classes[computeColor()]}>
+            {normalizedClassification(validated.parts, c12nDef, format, isMobile)}
+          </span>
+        ) : (
+          <div style={{ display: inline ? 'inline-block' : null }}>
             <CustomChip
               type="classification"
               variant={type === 'outlined' ? 'outlined' : 'default'}
@@ -206,8 +205,8 @@ function WrappedClassification({ c12n, format, inline, setClassification, size, 
               label={normalizedClassification(validated.parts, c12nDef, format, isMobile)}
               onClick={type === 'picker' ? () => setShowPicker(true) : null}
             />
-          )}
-        </div>
+          </div>
+        )}
         {type === 'picker' ? (
           <Dialog
             fullScreen={isPhone}
