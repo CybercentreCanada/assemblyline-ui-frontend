@@ -43,7 +43,7 @@ export default function Configuration() {
 
   return (
     <PageCenter>
-      <div style={{ textAlign: 'left' }}>
+      <div style={{ textAlign: 'left', paddingBottom: sp2 }}>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <Typography variant="h6" gutterBottom>
             {t('tags')}
@@ -190,8 +190,18 @@ export default function Configuration() {
               ? Object.keys(configuration).map((key, idx) => {
                   return (
                     <Grid key={idx} container spacing={1}>
-                      <Grid item xs={12} sm={5} md={4}>
-                        <div style={{ display: 'inline-block', fontWeight: 500 }}>{key}</div>
+                      <Grid
+                        item
+                        xs={12}
+                        sm={5}
+                        md={4}
+                        style={{
+                          overflowX: 'hidden',
+                          whiteSpace: 'nowrap',
+                          textOverflow: 'ellipsis'
+                        }}
+                      >
+                        <span style={{ fontWeight: 500 }}>{key}</span>
                       </Grid>
                       <Grid item xs={12} sm={7} md={8}>
                         <div style={{ fontWeight: 300 }}>
@@ -200,9 +210,9 @@ export default function Configuration() {
                           ) : isArrayOfArray(configuration[key]) ? (
                             configuration[key].map((sub_key, sub_idx) => {
                               return (
-                                <div key={sub_idx}>
-                                  <div style={{ display: 'inline-block', fontWeight: 500 }}>{sub_key[0]}</div>
-                                  <div style={{ display: 'inline-block' }}>: {sub_key[1].join(', ')}</div>
+                                <div key={sub_idx} style={{ display: 'flex' }}>
+                                  <div style={{ fontWeight: 500, whiteSpace: 'nowrap' }}>{sub_key[0]}:&nbsp;</div>
+                                  <div>{sub_key[1].join(', ')}</div>
                                 </div>
                               );
                             })

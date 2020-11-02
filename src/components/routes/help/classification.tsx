@@ -249,7 +249,7 @@ export default function HelpClassification() {
           <Trans ns="helpClassification" i18nKey="validation_groups_note" components={{ bold: <strong /> }} />
         </Typography>
       </div>
-      <div style={{ textAlign: 'left', paddingBottom: sp1 }}>
+      <div style={{ textAlign: 'left', paddingBottom: sp2 }}>
         <Typography variant="h6" gutterBottom>
           {t('validation_subgroups')}
         </Typography>

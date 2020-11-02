@@ -9,6 +9,11 @@ const useStyles = makeStyles(theme => ({
     '&:hover, &:focus': {
       color: theme.palette.text.secondary
     }
+  },
+  meta_key: {
+    overflowX: 'hidden',
+    whiteSpace: 'nowrap',
+    textOverflow: 'ellipsis'
   }
 }));
 
@@ -42,7 +47,7 @@ const WrappedMetaSection: React.FC<MetaSectionProps> = ({ metadata }) => {
                 ? Object.keys(metadata).map((meta, i) => {
                     return (
                       <Grid container key={i}>
-                        <Grid item xs={12} sm={3} lg={2}>
+                        <Grid className={classes.meta_key} item xs={12} sm={3} lg={2}>
                           <span style={{ fontWeight: 500 }}>{meta}</span>
                         </Grid>
                         <Grid item xs={12} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>

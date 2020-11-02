@@ -12,6 +12,11 @@ const useStyles = makeStyles(theme => ({
     '&:hover, &:focus': {
       color: theme.palette.text.secondary
     }
+  },
+  meta_key: {
+    overflowX: 'hidden',
+    whiteSpace: 'nowrap',
+    textOverflow: 'ellipsis'
   }
 }));
 
@@ -46,7 +51,7 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ signatures, tags }) => {
             <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
               {signatures && signatures.length !== 0 && (
                 <Grid container>
-                  <Grid item xs={12} sm={3} lg={2}>
+                  <Grid className={classes.meta_key} item xs={12} sm={3} lg={2}>
                     <span style={{ fontWeight: 500 }}>heuristic.signature</span>
                   </Grid>
                   <Grid item xs={12} sm={9} lg={10}>
@@ -68,8 +73,14 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ signatures, tags }) => {
                 ? Object.keys(tags).map((tag_type, i) => {
                     return (
                       <Grid container key={i}>
-                        <Grid item xs={12} sm={3} lg={2}>
-                          <span style={{ fontWeight: 500 }}>{tag_type}</span>
+                        <Grid className={classes.meta_key} item xs={12} sm={3} lg={2}>
+                          <span
+                            style={{
+                              fontWeight: 500
+                            }}
+                          >
+                            {tag_type}
+                          </span>
                         </Grid>
                         <Grid item xs={12} sm={9} lg={10}>
                           {tags[tag_type].map(([value, lvl], idx) => {

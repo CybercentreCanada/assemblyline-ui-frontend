@@ -100,7 +100,7 @@ export default function Services() {
   }, []);
   return (
     <PageCenter>
-      <div style={{ textAlign: 'left' }}>
+      <div style={{ textAlign: 'left', paddingBottom: '1rem' }}>
         {services ? (
           <Grid container spacing={2}>
             {services.map((s, i) => (
