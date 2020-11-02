@@ -46,6 +46,7 @@
   "extended_scan.skipped": "Extended Scan was skipped for this alert",
   "extended_scan.completed": "Extended Scan completed successfully",
   "extended_scan.incomplete": "Extended Scan completed with errors that where not present in original scan",
+  "filter": "Filter...",
   "forbidden": "Forbidden",
   "locked": "Locked",
   "logo.alt": "Assemblyline Logo",

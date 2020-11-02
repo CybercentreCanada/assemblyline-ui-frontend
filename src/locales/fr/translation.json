@@ -46,6 +46,7 @@
   "extended_scan.skipped": "L'analyse étendu a été ignoré pour cette alerte",
   "extended_scan.completed": "Analyse étendue terminée avec succès",
   "extended_scan.incomplete": "Analyse étendue terminée avec des erreurs qui n'étaient pas présentes dans l'analyse d'origine",
+  "filter": "Filtrer...",
   "forbidden": "Interdit",
   "locked": "Vérouillé",
   "logo.alt": "Logo d'Assemblyline",

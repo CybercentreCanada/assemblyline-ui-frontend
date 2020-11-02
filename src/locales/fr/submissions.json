@@ -1,5 +1,6 @@
 {
   "detail": "Détail",
+  "filter": "Filtrer les soumissions...",
   "header.classification": "Classification",
   "header.description": "Description",
   "header.numfiles": "# Fichiers",

@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import { Box, makeStyles, TextField, Typography, useMediaQuery, useTheme } from '@material-ui/core';
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { insertText } from '../utils/browser';
 import { isArrowDown, isArrowLeft, isArrowRight, isArrowUp, isEnter, isEscape } from '../utils/keyboard';
 
@@ -44,6 +45,7 @@ const useStyles = makeStyles(theme => ({
 interface SearchTextFieldProps {
   value: string;
   options: string[];
+  placeholder?: string;
   disabled?: boolean;
   onChange: (value: string) => void;
   onClear: () => void;
@@ -54,6 +56,7 @@ interface SearchTextFieldProps {
 const SearchTextField: React.FC<SearchTextFieldProps> = ({
   value,
   options,
+  placeholder = null,
   disabled = false,
   onSearch,
   onChange,
@@ -69,6 +72,7 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
     end: 0,
     items: options
   });
+  const { t } = useTranslation();
   const [open, setOpen] = useState<boolean>(false);
   const element = useRef<HTMLDivElement>();
   const optionsElement = useRef<HTMLDivElement>();
@@ -260,7 +264,7 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
   return (
     <div ref={element}>
       <TextField
-        placeholder="Filter..."
+        placeholder={placeholder || t('filter')}
         value={value}
         color="secondary"
         InputProps={{ disableUnderline: true }}
