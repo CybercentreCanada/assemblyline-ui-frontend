@@ -8,8 +8,8 @@ import React from 'react';
 const useStyles = (isFullscreen, topbarShown) => {
   return makeStyles(theme => ({
     root: {
-      backgroundColor: isFullscreen ? theme.palette.background.default : theme.palette.background.default,
-      overflow: 'auto'
+      backgroundColor: isFullscreen ? theme.palette.background.default : theme.palette.background.default
+      // overflow: 'auto'
     },
     page: {
       marginLeft: 'auto',
@@ -23,9 +23,10 @@ const useStyles = (isFullscreen, topbarShown) => {
       }
     },
     toggle: {
-      position: 'fixed',
+      position: 'sticky',
       right: isFullscreen ? '30px' : '20px',
-      top: isFullscreen || !topbarShown ? '20px' : '84px',
+      top: 0,
+      // top: isFullscreen || !topbarShown ? '20px' : '84px',
       zIndex: theme.zIndex.appBar + 1,
       transition: theme.transitions.create('top', {
         easing: theme.transitions.easing.easeInOut,

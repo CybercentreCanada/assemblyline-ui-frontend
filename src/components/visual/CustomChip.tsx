@@ -30,6 +30,7 @@ export interface CustomChipProps {
   variant?: 'default' | 'outlined';
   mono?: boolean;
   wrap?: boolean;
+  tooltip?: string;
   [propName: string]: any;
 }
 
@@ -129,7 +130,17 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function WrappedCustomChip({ className, type, size, color, variant, mono, wrap, ...otherProps }: CustomChipProps) {
+function WrappedCustomChip({
+  className,
+  type,
+  size,
+  color,
+  variant,
+  mono,
+  wrap,
+  tooltip,
+  ...otherProps
+}: CustomChipProps) {
   const classes = useStyles();
 
   // Define classnames maps
