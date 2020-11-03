@@ -6,12 +6,14 @@ import {
   IconButton,
   IconButtonProps,
   makeStyles,
+  Tooltip,
   useMediaQuery,
   useTheme
 } from '@material-ui/core';
 import BackspaceIcon from '@material-ui/icons/Backspace';
 import SearchIcon from '@material-ui/icons/Search';
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import SearchTextField from './search-textfield';
 
 const useStyles = makeStyles(theme => ({
@@ -65,6 +67,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   onSearch,
   onClear
 }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const classes = useStyles();
   const element = useRef<HTMLInputElement>();
@@ -126,7 +129,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
         {isLTEMd && (
           <>
             <IconButton onClick={_onValueClear} edge="end">
-              <BackspaceIcon />
+              <Tooltip title={t('clear_filter')}>
+                <BackspaceIcon />
+              </Tooltip>
             </IconButton>
             {buttons.length !== 0 && (
               <Divider

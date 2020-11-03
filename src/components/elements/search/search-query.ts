@@ -21,20 +21,38 @@ export interface SearchQueryParameter {
 export default class SearchQuery {
   private params: URLSearchParams = null;
 
-  constructor(private path: string, baseSearch: string, private pageSize: number) {
+  constructor(private path: string, baseSearch: string, private pageSize: number, private setDefaults: boolean = true) {
     this.params = new URLSearchParams(baseSearch);
-    if (!this.hasOffset()) {
-      this.setOffset('0');
+    if (setDefaults) {
+      if (!this.hasOffset()) {
+        this.setOffset('0');
+      }
+      if (!this.hasTc()) {
+        this.setTc('4d');
+      }
+      if (!this.hasRows()) {
+        this.setRows(`${pageSize}`);
+      }
+      if (!this.hasGroupBy()) {
+        this.setGroupBy('file.sha256');
+      }
     }
-    if (!this.hasTc()) {
-      this.setTc('4d');
-    }
-    if (!this.hasRows()) {
-      this.setRows(`${pageSize}`);
-    }
-    if (!this.hasGroupBy()) {
-      this.setGroupBy('file.sha256');
-    }
+  }
+
+  public getParams() {
+    const output = {};
+    this.params.forEach((value, key) => {
+      if (!(key in output)) {
+        if (key !== 'fq') {
+          output[key] = value;
+        } else {
+          output[key] = [value];
+        }
+      } else if (key === 'fq') {
+        output[key].push(value);
+      }
+    });
+    return output;
   }
 
   public setRows(rows: string): SearchQuery {
@@ -78,15 +96,16 @@ export default class SearchQuery {
 
   public setQuery(query: string): SearchQuery {
     this.params.set('q', query);
+    this.params.set('query', query);
     return this;
   }
 
   public hasQuery(): boolean {
-    return this.params.has('q');
+    return this.params.has('q') || this.params.has('query');
   }
 
   public getQuery(): string {
-    return this.hasQuery() ? this.params.get('q') : '';
+    return this.params.has('q') ? this.params.get('q') : this.params.has('query') ? this.params.get('query') : '';
   }
 
   public setTc(tc: string): SearchQuery {
