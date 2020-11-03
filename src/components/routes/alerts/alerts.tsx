@@ -79,7 +79,10 @@ const Alerts: React.FC = () => {
     onLoad,
     onLoadMore
   } = useAlerts(PAGE_SIZE);
+
+  // API Promise hook
   const { onGetAlert, onApplyWorkflowAction } = usePromiseAPI();
+
   // Define required states...
   const [searching, setSearching] = useState<boolean>(false);
   const [scrollReset, setScrollReset] = useState<boolean>(false);
@@ -88,11 +91,6 @@ const Alerts: React.FC = () => {
     open: false,
     type: null
   });
-  // // const [selectedFilters, setSelectedFilters] = useState<AlertFilterSelections>(DEFAULT_FILTERS);
-  // const [workflowAction, setWorkflowAction] = useState<{
-  //   query: SearchQuery;
-  //   total: number;
-  // }>();
 
   // Define some references.
   const searchTextValue = useRef<string>(searchQuery.getQuery());
@@ -100,23 +98,7 @@ const Alerts: React.FC = () => {
   // Media quries.
   const isLTEMd = useMediaQuery(theme.breakpoints.up('md'));
 
-  // Parse the filters [fq: param] and set them as  the 'selectedFilters'
-  // const setQueryFilters = (_query: SearchQuery) => {
-  //   const searchQueryFilters = _query.parseFilters();
-  //   const statuses = searchQueryFilters.filter(f => f.type === 'status');
-  //   const priorities = searchQueryFilters.filter(f => f.type === 'priority');
-  //   const labels = searchQueryFilters.filter(f => f.type === 'label');
-  //   const queries = searchQueryFilters.filter(f => f.type === 'query');
-  //   setSelectedFilters(filters => ({
-  //     ...filters,
-  //     statuses: statuses || filters.statuses,
-  //     priorities: priorities || filters.priorities,
-  //     labels: labels || filters.labels,
-  //     queries: queries || filters.queries
-  //   }));
-  // };
-
-  //
+  // Handler searchbar onSearch callback
   const onSearch = (filterValue: string = '', inputEl: HTMLInputElement = null) => {
     // Tell the world we're searching for it...
     setSearching(true);
@@ -152,9 +134,6 @@ const Alerts: React.FC = () => {
     // Update the search text field reference.
     searchTextValue.current = '';
 
-    // Reset filters.
-    // setSelectedFilters(DEFAULT_FILTERS);
-
     // Reset scroll for each new search.
     setScrollReset(true);
     // Close right of split panel if open.
@@ -187,22 +166,8 @@ const Alerts: React.FC = () => {
 
   // Hanlder for when clicking one the AlertsFilters 'Apply' button.
   const onApplyFilters = (filters: SearchQueryFilters) => {
-    // update the state of the selected filters so they are intialized next time drawer opens.
-    // setSelectedFilters(filters);
-
-    searchQuery.set(filters).build();
-
-    // Add a [fq] parameter for status/priority/label.
-    // const addFq = (item: SearchFilter) => query.addFq(item.value);
-    // query.clearFq();
-    // query.setTc(filters.tc.value);
-    // query.setGroupBy(filters.groupBy.value);
-    // filters.statuses.forEach(addFq);
-    // filters.priorities.forEach(addFq);
-    // filters.labels.forEach(addFq);
-    // filters.queries.forEach(addFq);
-
-    searchQuery.apply();
+    // Set the newly selected filters and up location url bar.
+    searchQuery.set(filters).apply();
 
     // Reinitialize the scroll.
     setScrollReset(true);
