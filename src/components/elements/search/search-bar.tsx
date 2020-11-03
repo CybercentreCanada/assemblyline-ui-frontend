@@ -126,9 +126,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
             onClear={_onValueClear}
           />
         </Box>
-        <IconButton onClick={_onValueClear} edge="end" color="primary">
-          <BackspaceIcon />
-        </IconButton>
         {isLTEMd && (
           <>
             <IconButton onClick={_onValueClear} edge="end">
@@ -158,7 +155,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           <div className={classes.searchresult}>{children}</div>
           <div style={{ flex: 1 }} />
           {buttons.map((b, i) => (
-            <IconButton key={`searchbar-button-${i}`} {...b.props} edge="end" color="primary">
+            <IconButton key={`searchbar-button-${i}`} {...b.props} edge="end">
               {b.icon}
             </IconButton>
           ))}

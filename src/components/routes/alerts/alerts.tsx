@@ -2,6 +2,7 @@ import { Box, Drawer, makeStyles, useMediaQuery, useTheme } from '@material-ui/c
 import CloseIcon from '@material-ui/icons/Close';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import StarIcon from '@material-ui/icons/Star';
+import PageContent from 'commons/components/layout/pages/PageContent';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import SimpleList from 'components/elements/lists/simplelist/simplelist';
 // import Booklist from 'components/elements/lists/booklist/booklist';
@@ -324,48 +325,50 @@ const Alerts: React.FC = () => {
   return (
     <Box>
       <Box>
-        <SearchBar
-          initValue={searchQuery.getQuery()}
-          searching={searching || loading}
-          suggestions={buildSearchSuggestions()}
-          onValueChange={onFilterValueChange}
-          onClear={onClearSearch}
-          onSearch={onSearch}
-          buttons={[
-            {
-              icon: <StarIcon />,
-              props: {
-                onClick: () => setDrawer({ open: true, type: 'favorites' })
+        <PageContent>
+          <SearchBar
+            initValue={searchQuery.getQuery()}
+            searching={searching || loading}
+            suggestions={buildSearchSuggestions()}
+            onValueChange={onFilterValueChange}
+            onClear={onClearSearch}
+            onSearch={onSearch}
+            buttons={[
+              {
+                icon: <StarIcon />,
+                props: {
+                  onClick: () => setDrawer({ open: true, type: 'favorites' })
+                }
+              },
+              {
+                icon: <FilterListIcon />,
+                props: {
+                  onClick: () => setDrawer({ open: true, type: 'filter' })
+                }
+              },
+              {
+                icon: <FcWorkflow />,
+                props: {
+                  onClick: () => setDrawer({ open: true, type: 'actions', actionData: { query: searchQuery, total } })
+                }
               }
-            },
-            {
-              icon: <FilterListIcon />,
-              props: {
-                onClick: () => setDrawer({ open: true, type: 'filter' })
-              }
-            },
-            {
-              icon: <FcWorkflow />,
-              props: {
-                onClick: () => setDrawer({ open: true, type: 'actions', actionData: { query: searchQuery, total } })
-              }
-            }
-          ]}
-        >
-          <Box className={classes.searchresult}>
-            {isLTEMd ? (
-              <SearchResultLarge
-                loading={loading}
-                searching={searching}
-                total={total}
-                query={searchQuery}
-                onApplyFilters={onApplyFilters}
-              />
-            ) : (
-              <SearchResultSmall loading={loading} searching={searching} total={total} query={searchQuery} />
-            )}
-          </Box>
-        </SearchBar>
+            ]}
+          >
+            <Box className={classes.searchresult}>
+              {isLTEMd ? (
+                <SearchResultLarge
+                  loading={loading}
+                  searching={searching}
+                  total={total}
+                  query={searchQuery}
+                  onApplyFilters={onApplyFilters}
+                />
+              ) : (
+                <SearchResultSmall loading={loading} searching={searching} total={total} query={searchQuery} />
+              )}
+            </Box>
+          </SearchBar>
+        </PageContent>
       </Box>
       <Viewport>
         <SplitPanel
@@ -378,15 +381,6 @@ const Alerts: React.FC = () => {
           rightOpen={splitPanel.open}
           onRightDrawerClose={onSplitPanelRightClose}
           left={
-            // <MetaList
-            //   loading={loading || searching}
-            //   buffer={buffer}
-            //   rowHeight={92}
-            //   scrollReset={scrollReset}
-            //   onSelection={onItemSelected}
-            //   onNext={_onLoadMore}
-            //   onRenderItem={onRenderListRow}
-            // />.
             <SimpleList
               loading={loading || searching}
               items={buffer.items}
@@ -399,15 +393,6 @@ const Alerts: React.FC = () => {
               onCursorChange={onListCursorChanges}
               disableProgress
             />
-
-            // <Booklist..
-            //   loading={loading || searching}
-            //   book={book}
-            //   onItemSelected={onItemSelected}
-            //   onPageChange={updateBook}
-            //   onRenderRow={onRenderListRow}
-            //   onLoadNext={_onLoadMore}
-            // />
           }
           right={
             splitPanel.item ? (
