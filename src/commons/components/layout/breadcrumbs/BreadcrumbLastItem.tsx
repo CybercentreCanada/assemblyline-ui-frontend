@@ -20,7 +20,7 @@ const BreadcrumbLastItem: React.FC<BreadcrumbLastItemProps> = ({ item, textOnly 
     <Typography
       style={route.icon ? { paddingTop: '3px' } : null}
       key={`bcrumb-${url}`}
-      color="textPrimary"
+      // color="textPrimary"
       className={linkClasses.link}
     >
       {!textOnly && <BreadcrumbIcon item={item} />}

@@ -1,7 +1,7 @@
 import { createMuiTheme, PaletteType } from '@material-ui/core';
 import { useMemo } from 'react';
 
-export type AppThemeColorProps = {
+export type AppThemeProps = {
   background?: {
     dark?: {
       default: string;
@@ -16,9 +16,20 @@ export type AppThemeColorProps = {
   darkSecondary?: string;
   lightPrimary?: string;
   lightSecondary?: string;
+  appbar?: {
+    sticky?: {
+      elevation?: number;
+      dark?: {
+        backgroundColor: string;
+      };
+      light?: {
+        backgroundColor: string;
+      };
+    };
+  };
 };
 
-const useAppTheme = (isDark: boolean, colors: AppThemeColorProps) => {
+const useAppTheme = (isDark: boolean, colors: AppThemeProps) => {
   const theme = useMemo(() => {
     const { background, darkPrimary, darkSecondary, lightPrimary, lightSecondary } = colors;
 
@@ -46,6 +57,25 @@ const useAppTheme = (isDark: boolean, colors: AppThemeColorProps) => {
     }
 
     return createMuiTheme({
+      overrides: {
+        MuiCssBaseline: {
+          '@global': {
+            body: {
+              width: '100%',
+              height: '100%'
+            },
+            '#root': {
+              // overflow: 'auto',
+              // height: 'auto',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0
+            }
+          }
+        }
+      },
       palette
     });
   }, [colors, isDark]);

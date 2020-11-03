@@ -49,8 +49,8 @@ const useStyles = breadcrumbsEnabled => {
 
 const QuickSearch = () => {
   const { t } = useTranslation();
-  const { layoutProps, breadcrumbsEnabled, breadcrumbsPlacement } = useAppLayout();
-  const classes = useStyles(layoutProps.allowBreadcrumbs && breadcrumbsEnabled && breadcrumbsPlacement === 'topbar');
+  const { layoutProps, breadcrumbsEnabled } = useAppLayout();
+  const classes = useStyles(layoutProps.allowBreadcrumbs && breadcrumbsEnabled);
   const [value, setValue] = useState('');
   const history = useHistory();
 

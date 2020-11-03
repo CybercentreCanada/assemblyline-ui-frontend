@@ -4,24 +4,22 @@ import useAppSitemap from 'commons/components/hooks/useAppSitemap';
 import BreadcrumbList from 'commons/components/layout/breadcrumbs/BreadcrumbList';
 import React from 'react';
 
-export const useStyles = (layout, open, hasQuickSearch) => {
-  return makeStyles(theme => ({
-    breadcrumbs: {
-      flexGrow: 2,
-      [theme.breakpoints.down(hasQuickSearch ? 'sm' : 'xs')]: {
-        display: 'none'
-      }
-    },
-    moreicon: {
-      verticalAlign: 'bottom',
-      marginTop: '5px',
-      display: 'inline-flex',
-      '&:hover': {
-        cursor: 'pointer'
-      }
+export const useStyles = makeStyles(theme => ({
+  breadcrumbs: {
+    color: 'inherit',
+    display: 'flex',
+    alignItems: 'center',
+    flexGrow: 2
+  },
+  moreicon: {
+    verticalAlign: 'bottom',
+    marginTop: '5px',
+    display: 'inline-flex',
+    '&:hover': {
+      cursor: 'pointer'
     }
-  }))();
-};
+  }
+}));
 
 type BreadcrumbsProps = {
   disableStyle?: boolean;

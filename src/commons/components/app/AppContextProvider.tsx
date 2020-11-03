@@ -1,12 +1,19 @@
 import { ThemeProvider, useMediaQuery } from '@material-ui/core';
-import useAppTheme, { AppThemeColorProps } from 'commons/components/hooks/useAppTheme';
+import useAppTheme, { AppThemeProps } from 'commons/components/hooks/useAppTheme';
 import { SnackbarProvider } from 'notistack';
 import React, { useState } from 'react';
+
+//
+interface AppbarStyles {
+  color: string;
+  backgroundColor: string;
+  elevation: number;
+}
 
 // Specification interface of the component properties.
 interface AppProviderProps {
   children: React.ReactNode;
-  colors: AppThemeColorProps;
+  colors: AppThemeProps;
   defaultTheme: 'light' | 'dark';
   defaultContext?: any;
 }
@@ -15,10 +22,12 @@ interface AppProviderProps {
 export interface AppContextProps {
   context?: any;
   theme: 'light' | 'dark';
+  colors: AppThemeProps;
   isDarkTheme: boolean;
   isLightTheme: boolean;
   toggleTheme: () => void;
   setContext: (context: any) => void;
+  getAppbarStyles: (currentLayout: 'side' | 'top') => AppbarStyles;
 }
 
 // React context instantiation.
@@ -62,6 +71,38 @@ const AppContextProvider: React.FC<AppProviderProps> = ({ defaultTheme, colors, 
   // Build the theme.
   const [appTheme] = useAppTheme(theme === 'dark', colors);
 
+  // Compute appbar styles for specified layout.
+  const getAppbarStyles = (layout: 'side' | 'top'): AppbarStyles => {
+    const isTopLayout = layout === 'top';
+    const isDarkTheme = theme === 'dark';
+    const isLightTheme = theme === 'light';
+
+    // Compute background color.
+    let backgroundColor = isTopLayout ? appTheme.palette.primary.dark : appTheme.palette.background.default;
+    if (isTopLayout) {
+      if (isDarkTheme && colors.appbar?.sticky?.dark) {
+        backgroundColor = colors.appbar.sticky.dark.backgroundColor;
+      }
+      if (isLightTheme && colors.appbar?.sticky?.light) {
+        backgroundColor = colors.appbar.sticky.light.backgroundColor;
+      }
+    }
+
+    // Compute elevation.
+    const elevation = isTopLayout
+      ? colors.appbar?.sticky?.elevation !== undefined
+        ? colors.appbar?.sticky?.elevation
+        : 2
+      : 0;
+
+    // Wrap it up and send-it!
+    return {
+      color: appTheme.palette.getContrastText(backgroundColor),
+      backgroundColor,
+      elevation
+    };
+  };
+
   // Initialize app context provider, theme, snackbar and render children component.
   // Snackbar needs to be rendered as child of theme provider.  CSS glitches ensues if not the case.
   return (
@@ -69,10 +110,12 @@ const AppContextProvider: React.FC<AppProviderProps> = ({ defaultTheme, colors, 
       value={{
         context,
         theme,
+        colors,
+        isDarkTheme: theme === 'dark',
+        isLightTheme: theme === 'light',
         toggleTheme,
         setContext,
-        isDarkTheme: theme === 'dark',
-        isLightTheme: theme === 'light'
+        getAppbarStyles
       }}
     >
       <ThemeProvider theme={appTheme}>
