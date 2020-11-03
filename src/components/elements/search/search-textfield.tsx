@@ -171,9 +171,10 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
 
   // Scroll options element to the element at specified position.
   const scrollTo = (position: number) => {
-    optionsElement.current
-      .querySelector(`[data-searchtextfieldoption-position="${position}"`)
-      .scrollIntoView({ block: 'nearest' });
+    const _target = optionsElement.current.querySelector(`[data-searchtextfieldoption-position="${position}"`);
+    if (_target) {
+      _target.scrollIntoView({ block: 'nearest' });
+    }
   };
 
   // Filter the options.
