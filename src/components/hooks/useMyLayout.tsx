@@ -282,7 +282,6 @@ const useMyLayout = (): AppLayoutProps => {
     appIconLight: lightLogo,
     bannerLight: lightBanner,
     bannerDark: darkBanner,
-    breadcrumbsPlacement: 'topbar',
     defaultLayout: 'side' as 'side',
     defaultDrawerOpen: false,
     defaultShowQuickSearch: true,

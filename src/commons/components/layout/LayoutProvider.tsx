@@ -1,44 +1,113 @@
-import { CssBaseline, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
+import { CssBaseline, makeStyles } from '@material-ui/core';
 import useAppUser from 'commons/components/hooks/useAppUser';
 import LeftNavDrawer, { LeftNavElement } from 'commons/components/layout/leftnav/LeftNavDrawer';
-import PageHeader from 'commons/components/layout/pages/PageHeader';
 import { AppElement } from 'commons/components/layout/topnav/AppSwitcher';
 import TopBar from 'commons/components/layout/topnav/TopBar';
 import { UserMenuElement } from 'commons/components/layout/topnav/UserProfile';
 import React, { useState } from 'react';
 
-const useStyles = (layout, showSpacing) => {
-  return makeStyles(theme => ({
-    app: {
-      [theme.breakpoints.up('md')]: {
-        display: 'flex'
-      }
+const useNewStyles = makeStyles(theme => ({
+  appVertical: {
+    [theme.breakpoints.up('md')]: {
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'row'
     },
-    container: {
-      display: 'block',
-      paddingTop: showSpacing ? theme.spacing(8) : theme.spacing(3),
-      paddingLeft: theme.spacing(3),
-      paddingRight: theme.spacing(3),
-      [theme.breakpoints.only('sm')]: {
-        paddingLeft: showSpacing ? theme.spacing(10) : theme.spacing(3)
-      },
-      [theme.breakpoints.up('md')]: {
-        flexGrow: 1
-      },
-      '@media print': {
-        padding: 0
-      }
+    [theme.breakpoints.down('sm')]: {
+      position: 'relative',
+      height: '100%'
     }
-  }))();
-};
+  },
+  appVerticalLeft: {
+    [theme.breakpoints.up('md')]: {
+      height: '100%'
+    },
+    [theme.breakpoints.down('sm')]: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      bottom: 0
+    }
+  },
+  appVerticalRight: {
+    overflow: 'auto',
+    [theme.breakpoints.up('md')]: {
+      position: 'relative',
+      display: 'flex',
+      flexDirection: 'column',
+      flex: 1,
+      height: '100%'
+    },
+    [theme.breakpoints.down('sm')]: {
+      position: 'absolute',
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0
+    },
+    [theme.breakpoints.only('sm')]: {
+      left: theme.spacing(7)
+    }
+  },
+  appVerticalRightContent: {
+    height: 'auto',
+    position: 'relative',
+    display: 'flex',
+    flexDirection: 'column',
+    [theme.breakpoints.up('md')]: {
+      flexGrow: 1
+    },
+    [theme.breakpoints.down('sm')]: {}
+  },
+  appHorizontal: {
+    overflow: 'auto',
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    position: 'relative'
+  },
+  appHorizontalBottom: {
+    height: 'auto',
+    [theme.breakpoints.up('md')]: {
+      flexGrow: 1,
+      display: 'flex',
+      flexDirection: 'row'
+    },
+    [theme.breakpoints.down('sm')]: {
+      position: 'relative'
+    }
+  },
+  appHorizontalBottomLeft: {
+    height: 'auto',
+    [theme.breakpoints.down('sm')]: {
+      position: 'absolute',
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0
+    }
+  },
+  appHorizontalBottomRight: {
+    height: 'auto',
+    position: 'relative',
+    display: 'flex',
+    flexDirection: 'column',
+    [theme.breakpoints.up('md')]: {
+      flexGrow: 1
+    },
+    [theme.breakpoints.only('sm')]: {
+      paddingLeft: theme.spacing(7)
+    }
+  }
+}));
 
 export type AppLayoutContextProps = {
   autoHideAppbar: boolean;
+  appbarState: boolean;
   currentLayout: string;
   drawerState: boolean;
   breadcrumbsEnabled: boolean;
   breadcrumbsState: boolean;
-  breadcrumbsPlacement: string;
   hideNestedIcons: boolean;
   layoutProps: AppLayoutProps;
   showQuickSearch: boolean;
@@ -53,6 +122,7 @@ export type AppLayoutContextProps = {
   toggleBreadcrumbsState: () => void;
   isReady: () => boolean;
   setReady: (isReady: boolean) => void;
+  setAppbarState: (show: boolean) => void;
 };
 
 export interface AppLayoutProps {
@@ -76,7 +146,6 @@ export interface AppLayoutProps {
   defaultAutoHideAppbar?: boolean;
   defaultShowBreadcrumbs?: boolean;
   defaultBreadcrumbsOpen?: boolean;
-  breadcrumbsPlacement?: 'topbar' | 'page';
   topnav: {
     apps?: AppElement[];
     userMenu?: UserMenuElement[];
@@ -87,6 +156,7 @@ export interface AppLayoutProps {
     quickSearchParam?: string;
     themeSelectionUnder: 'profile' | 'icon';
     left?: React.ReactNode;
+    leftAfterBreadcrumbs?: React.ReactNode;
     right?: React.ReactNode;
   };
   leftnav: {
@@ -103,7 +173,6 @@ export const AppLayoutContext = React.createContext<AppLayoutContextProps>(null)
 
 function AppLayoutProvider(props: LayoutProviderProps) {
   const { children, ...layoutProps } = props;
-  const muiTheme = useTheme();
   const { isReady: isUserReady } = useAppUser();
 
   // Load Initial Layout Default
@@ -143,26 +212,16 @@ function AppLayoutProvider(props: LayoutProviderProps) {
     ? !!JSON.parse(storedBreadcrumbs)
     : layoutProps.defaultBreadcrumbsOpen;
 
-  // Breadcrumb placement.
-  const breadcrumbsPlacement = layoutProps.breadcrumbsPlacement ? layoutProps.breadcrumbsPlacement : 'topbar';
-
   // Hooks...
   const [appReady, setAppReady] = useState<boolean>(false);
   const [showMenus, setShowMenus] = useState<boolean>(true);
   const [drawer, setDrawer] = useState<boolean>(initialDrawer);
+  const [appbarState, setAppbarState] = useState<boolean>(true);
   const [breadcrumbsEnabled, setBreadcrumbsEnabled] = useState<boolean>(initialBreadcrumbsEnabled);
   const [breadcrumbsState, setBreadcrumbsState] = useState<boolean>(initialBreadcrumbsState);
   const [quickSearch, setQuickSearch] = useState<boolean>(initialQuickSearch);
   const [autoHideAppbar, setAutoHideAppbar] = useState<boolean>(initialAutoHideAppbar);
   const [layout, setLayout] = useState<'top' | 'side'>(initialLayout);
-  const classes = useStyles(layout, isUserReady() && appReady && showMenus);
-  const showBreadcrumbsOnPage =
-    useMediaQuery(muiTheme.breakpoints.only('sm')) &&
-    layoutProps.allowQuickSearch &&
-    quickSearch &&
-    isUserReady() &&
-    appReady &&
-    showMenus;
 
   const onToggleLayout = () => {
     const newLayout = layout === 'top' ? 'side' : 'top';
@@ -195,15 +254,17 @@ function AppLayoutProvider(props: LayoutProviderProps) {
     setBreadcrumbsState(!breadcrumbsState);
   };
 
+  const newClasses = useNewStyles();
+
   return (
     <AppLayoutContext.Provider
       value={{
         autoHideAppbar,
+        appbarState,
         currentLayout: layout,
         drawerState: drawer,
         breadcrumbsEnabled,
         breadcrumbsState,
-        breadcrumbsPlacement: layoutProps.breadcrumbsPlacement ? layoutProps.breadcrumbsPlacement : 'topbar',
         hideNestedIcons: !!layoutProps.leftnav.hideNestedIcons,
         layoutProps: {
           allowAutoHideTopbar: true,
@@ -231,24 +292,34 @@ function AppLayoutProvider(props: LayoutProviderProps) {
         toggleShowBreadcrumbs: onToggleShowBreadcrumbs,
         toggleBreadcrumbsState: onToggleBreadcrumbsState,
         isReady: () => appReady,
-        setReady: (isReady: boolean) => setAppReady(isReady)
+        setReady: (isReady: boolean) => setAppReady(isReady),
+        setAppbarState
       }}
     >
-      <div className={classes.app}>
+      <>
         <CssBaseline />
-        {isUserReady() && appReady && showMenus && <TopBar />}
-        {isUserReady() && appReady && showMenus && <LeftNavDrawer />}
-        <div className={classes.container}>
-          {layoutProps.allowBreadcrumbs &&
-            breadcrumbsEnabled &&
-            (breadcrumbsPlacement === 'page' || showBreadcrumbsOnPage) && (
-              <div className="no-print">
-                <PageHeader mode="breadcrumbs" />
+        {layout === 'side' ? (
+          <div className={newClasses.appVertical}>
+            <div className={newClasses.appVerticalLeft}>
+              {isUserReady() && appReady && showMenus && <LeftNavDrawer />}
+            </div>
+            <div className={newClasses.appVerticalRight} id="app-scrollparent">
+              {isUserReady() && appReady && showMenus && <TopBar />}
+              <div className={newClasses.appVerticalRightContent}>{children}</div>
+            </div>
+          </div>
+        ) : (
+          <div className={newClasses.appHorizontal} id="app-scrollparent">
+            {isUserReady() && appReady && showMenus && <TopBar />}
+            <div className={newClasses.appHorizontalBottom}>
+              <div className={newClasses.appHorizontalBottomLeft}>
+                {isUserReady() && appReady && showMenus && <LeftNavDrawer />}
               </div>
-            )}
-          {children}
-        </div>
-      </div>
+              <div className={newClasses.appHorizontalBottomRight}>{children}</div>
+            </div>
+          </div>
+        )}
+      </>
     </AppLayoutContext.Provider>
   );
 }

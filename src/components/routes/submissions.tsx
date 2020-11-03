@@ -127,60 +127,55 @@ export default function Submissions() {
 
   return (
     <PageFullWidth>
-      <PageHeader
-        isSticky
-        mode="provided"
-        title={
-          <SearchBar
-            initValue={query ? query.getQuery() : ''}
-            placeholder={t('filter')}
-            searching={searching}
-            suggestions={buildSearchSuggestions()}
-            onValueChange={onFilterValueChange}
-            onClear={onClear}
-            onSearch={onSearch}
-            buttons={[
-              {
-                icon: (
-                  <Tooltip title={t('my_submission')}>
-                    <PersonIcon />
-                  </Tooltip>
-                ),
-                props: {
-                  onClick: () => {
-                    history.push(`/submissions?query=params.submitter:"${currentUser.username}"`);
-                  }
+      <PageHeader isSticky>
+        <SearchBar
+          initValue={query ? query.getQuery() : ''}
+          placeholder={t('filter')}
+          searching={searching}
+          suggestions={buildSearchSuggestions()}
+          onValueChange={onFilterValueChange}
+          onClear={onClear}
+          onSearch={onSearch}
+          buttons={[
+            {
+              icon: (
+                <Tooltip title={t('my_submission')}>
+                  <PersonIcon />
+                </Tooltip>
+              ),
+              props: {
+                onClick: () => {
+                  history.push(`/submissions?query=params.submitter:"${currentUser.username}"`);
                 }
               }
-            ]}
-          >
-            {submissions !== null && (
-              <div className={classes.searchresult}>
-                <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
-                  {searching ? (
-                    <span>{t('searching')}</span>
-                  ) : (
-                    <span>
-                      {total}&nbsp;{query.getQuery() ? t('filtered') : t('total')}
-                    </span>
-                  )}
-                </Typography>
+            }
+          ]}
+        >
+          {submissions !== null && (
+            <div className={classes.searchresult}>
+              <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
+                {searching ? (
+                  <span>{t('searching')}</span>
+                ) : (
+                  <span>
+                    {total}&nbsp;{query.getQuery() ? t('filtered') : t('total')}
+                  </span>
+                )}
+              </Typography>
 
-                <SearchPager
-                  total={total}
-                  setTotal={setTotal}
-                  pageSize={PAGE_SIZE}
-                  index="submission"
-                  query={query}
-                  setData={setSubmissions}
-                  setSearching={setSearching}
-                />
-              </div>
-            )}
-          </SearchBar>
-        }
-      />
-
+              <SearchPager
+                total={total}
+                setTotal={setTotal}
+                pageSize={PAGE_SIZE}
+                index="submission"
+                query={query}
+                setData={setSubmissions}
+                setSearching={setSearching}
+              />
+            </div>
+          )}
+        </SearchBar>
+      </PageHeader>
       <div style={{ paddingBottom: '1rem', paddingLeft: '4px', paddingRight: '4px' }}>
         {submissions !== null ? (
           <TableContainer component={Paper}>

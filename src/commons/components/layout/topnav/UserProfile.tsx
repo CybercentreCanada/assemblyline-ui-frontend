@@ -24,7 +24,7 @@ import { Link } from 'react-router-dom';
 
 export const useStyles = makeStyles(theme => ({
   popper: {
-    zIndex: theme.zIndex.drawer + 2,
+    zIndex: theme.zIndex.appBar + 200,
     minWidth: '280px'
   },
   avatarButton: {
@@ -122,6 +122,7 @@ const UserProfile = () => {
           anchorEl={popperAnchorEl}
           className={classes.popper}
           placement="bottom-end"
+          container={document.getElementById('app-scrollparent')}
           transition
         >
           {({ TransitionProps }) => (
