@@ -102,8 +102,6 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
     return <div>{item.label}</div>;
   };
 
-  console.log('hello?????');
-
   return (
     <div>
       <Typography variant="h6">Workflow Actions</Typography>

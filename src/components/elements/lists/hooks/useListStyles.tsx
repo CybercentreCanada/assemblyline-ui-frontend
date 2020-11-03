@@ -164,8 +164,8 @@ const useListItemStyles = makeStyles(theme => ({
     // minWidth: 400,
     // border: '1px solid hsl(0, 0%, 80%)',
     '& button': {
-      marginRight: theme.spacing(1),
-      boxShadow: theme.shadows[2]
+      marginRight: theme.spacing(1)
+      // boxShadow: theme.shadows[2]
     }
   }
 }));

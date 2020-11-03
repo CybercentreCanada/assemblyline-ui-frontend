@@ -1,4 +1,5 @@
 import { Box, Drawer, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
+import AccountTreeIcon from '@material-ui/icons/AccountTree';
 import CloseIcon from '@material-ui/icons/Close';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import StarIcon from '@material-ui/icons/Star';
@@ -12,7 +13,6 @@ import SearchBar from 'components/elements/search/search-bar';
 import SearchQuery, { SearchQueryFilters } from 'components/elements/search/search-query';
 import Classification from 'components/visual/Classification';
 import React, { useCallback, useRef, useState } from 'react';
-import { FcWorkflow } from 'react-icons/fc';
 import { FiFilter } from 'react-icons/fi';
 import AlertActionsMenu from './alert-actions-menu';
 import AlertDetails from './alert-details';
@@ -312,7 +312,7 @@ const Alerts: React.FC = () => {
                 }
               },
               {
-                icon: <FcWorkflow />,
+                icon: <AccountTreeIcon />,
                 props: {
                   onClick: () => setDrawer({ open: true, type: 'actions', actionData: { query: searchQuery, total } })
                 }

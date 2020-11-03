@@ -5,11 +5,11 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  IconButton,
   makeStyles,
   Typography,
   useTheme
 } from '@material-ui/core';
+import AccountTreeIcon from '@material-ui/icons/AccountTree';
 import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
@@ -17,7 +17,6 @@ import WarningIcon from '@material-ui/icons/Warning';
 import SearchQuery from 'components/elements/search/search-query';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FcWorkflow } from 'react-icons/fc';
 import { AlertDrawerState } from './alerts';
 import { AlertItem } from './hooks/useAlerts';
 import usePromiseAPI from './hooks/usePromiseAPI';
@@ -36,11 +35,11 @@ const useStyles = makeStyles(theme => ({
     fontStyle: 'italic'
   },
   listactions: {
-    '& button': {
-      // backgroundColor: 'silver'
-      marginRight: theme.spacing(1),
-      boxShadow: theme.shadows[2]
-    }
+    // '& button': {
+    //   // backgroundColor: 'silver'
+    //   marginRight: theme.spacing(1),
+    //   boxShadow: theme.shadows[2]
+    // }
   }
 }));
 
@@ -86,6 +85,7 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
 
       const groupBy = currentQuery.getGroupBy();
 
+      //
       if (groupBy === 'file.sha256') {
         _actionQuery.setQuery(`file.sha256:${item.file.sha256}`);
       } else if (groupBy === 'file.sha1') {
@@ -106,17 +106,22 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
       <>
         <div className={classes.listactions}>
           {!item.owner && (
-            <IconButton
+            <Button
+              // size="small"
+              // color="inherit"
+              variant="outlined"
               title="Take Ownership"
               onClick={() => {
                 setTakeOwnershipConfirmation({ open: true, query: buildActionQuery() });
               }}
             >
               <AssignmentIndIcon />
-            </IconButton>
+            </Button>
           )}
-          <IconButton
-            color="inherit"
+          <Button
+            // size="small"
+            // color="inherit"
+            variant="outlined"
             title="Workflow Action"
             onClick={() => {
               console.log('workflow action.');
@@ -124,8 +129,8 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
               setDrawer({ open: true, type: 'actions', actionData: { query: actionQuery, total: 1 } });
             }}
           >
-            <FcWorkflow />
-          </IconButton>
+            <AccountTreeIcon />
+          </Button>
         </div>
         {takeOwnershipConfirmation.open && (
           <TakeOwnershipConfirmDialog
