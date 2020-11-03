@@ -1,0 +1,68 @@
+import { Pagination } from '@material-ui/lab';
+import SearchQuery from 'components/elements/search/search-query';
+import useMyAPI from 'components/hooks/useMyAPI';
+import React from 'react';
+
+export interface SearchPagerProps {
+  total: number;
+  pageSize: number;
+  index: string;
+  query: SearchQuery;
+  setData: (data: any) => void;
+  setTotal: (value: number) => void;
+  scrollToTop?: boolean;
+  size?: 'small' | 'large' | null;
+  setSearching?: (value: boolean) => void | null;
+  [propName: string]: any;
+}
+
+const WrappedSearchPager: React.FC<SearchPagerProps> = ({
+  total,
+  pageSize,
+  index,
+  query,
+  setData,
+  setTotal,
+  scrollToTop = true,
+  size = 'small',
+  setSearching = null,
+  children,
+  ...otherProps
+}) => {
+  const apiCall = useMyAPI();
+  const count = Math.ceil(total / pageSize);
+
+  const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    if (setSearching) {
+      setSearching(true);
+    }
+    const body = { query: '*', ...query.getParams(), rows: pageSize, offset: (value - 1) * pageSize };
+    apiCall({
+      method: 'POST',
+      url: `/api/v4/search/${index}/`,
+      body,
+      onSuccess: api_data => {
+        const { total: newTotal, items } = api_data.api_response;
+        if (total !== newTotal) {
+          setTotal(newTotal);
+        }
+        setData(items);
+        if (scrollToTop) {
+          window.scrollTo(0, 0);
+        }
+      },
+      onFinalize: () => {
+        if (setSearching) {
+          setSearching(false);
+        }
+      }
+    });
+  };
+
+  return count > 1 ? (
+    <Pagination {...otherProps} count={count} onChange={handleChange} shape="rounded" size={size} />
+  ) : null;
+};
+
+const SearchPager = React.memo(WrappedSearchPager);
+export default SearchPager;
