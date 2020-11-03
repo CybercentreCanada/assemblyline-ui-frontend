@@ -1,4 +1,4 @@
-import { Link, makeStyles, Tooltip } from '@material-ui/core';
+import { Link, makeStyles } from '@material-ui/core';
 import useAppSitemap, { BreadcrumbItem } from 'commons/components/hooks/useAppSitemap';
 import BreadcrumbIcon from 'commons/components/layout/breadcrumbs/BreadcrumbIcon';
 import React from 'react';
@@ -7,6 +7,7 @@ import { Link as RouterLink } from 'react-router-dom';
 export const useStyles = makeStyles({
   link: {
     display: 'flex'
+    // alignItems: 'center'
   },
   text: {
     maxWidth: '200px',
@@ -37,9 +38,9 @@ const BreadcrumbLinkItem: React.FC<BreadcrumbLinkItemProps> = ({ item, textOnly 
       className={classes.link}
     >
       {!textOnly && <BreadcrumbIcon item={item} />}
-      <Tooltip title={url}>
-        <span className={classes.text}>{resolveTitle(item)}</span>
-      </Tooltip>
+      {/* <Tooltip title={url}> */}
+      <span className={classes.text}>{resolveTitle(item)}</span>
+      {/* </Tooltip> */}
     </LinkRouter>
   );
 };

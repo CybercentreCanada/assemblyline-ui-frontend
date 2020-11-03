@@ -24,7 +24,7 @@ import { Link } from 'react-router-dom';
 
 export const useStyles = makeStyles(theme => ({
   popper: {
-    zIndex: theme.zIndex.drawer + 2,
+    zIndex: theme.zIndex.appBar + 200,
     minWidth: '280px'
   },
   avatarButton: {
@@ -58,6 +58,14 @@ const UserProfile = () => {
   const sp2 = theme.spacing(2);
   const sp3 = theme.spacing(3);
 
+  const allowPersonalization =
+    layoutProps.allowAutoHideTopbar ||
+    layoutProps.allowBreadcrumbs ||
+    layoutProps.allowQuickSearch ||
+    layoutProps.allowReset ||
+    layoutProps.allowThemeSelection ||
+    layoutProps.allowTopbarModeSelection;
+
   const onProfileClick = (event: React.MouseEvent) => {
     setPopperAnchorEl(popperAnchorEl ? null : event.currentTarget);
   };
@@ -66,7 +74,7 @@ const UserProfile = () => {
   const isPopperOpen = !!popperAnchorEl;
 
   const renderThemeSelection = enabled => {
-    if (enabled) {
+    if (enabled && (allowPersonalization || layoutProps.allowTranslate || layoutProps.allowReset)) {
       return (
         <div>
           <Divider />
@@ -114,6 +122,7 @@ const UserProfile = () => {
           anchorEl={popperAnchorEl}
           className={classes.popper}
           placement="bottom-end"
+          container={document.getElementById('app-scrollparent')}
           transition
         >
           {({ TransitionProps }) => (

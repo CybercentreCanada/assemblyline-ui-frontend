@@ -8,6 +8,7 @@ import BusinessOutlinedIcon from '@material-ui/icons/BusinessOutlined';
 import ChromeReaderModeOutlinedIcon from '@material-ui/icons/ChromeReaderModeOutlined';
 import CodeOutlinedIcon from '@material-ui/icons/CodeOutlined';
 import DashboardOutlinedIcon from '@material-ui/icons/DashboardOutlined';
+import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
 import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
 import FingerprintOutlinedIcon from '@material-ui/icons/FingerprintOutlined';
 import HelpOutlineOutlinedIcon from '@material-ui/icons/HelpOutlineOutlined';
@@ -16,6 +17,7 @@ import LinkOffIcon from '@material-ui/icons/LinkOff';
 import ListAltOutlinedIcon from '@material-ui/icons/ListAltOutlined';
 import MapOutlinedIcon from '@material-ui/icons/MapOutlined';
 import NotificationImportantOutlinedIcon from '@material-ui/icons/NotificationImportantOutlined';
+import PageviewOutlinedIcon from '@material-ui/icons/PageviewOutlined';
 import PublishOutlinedIcon from '@material-ui/icons/PublishOutlined';
 import ReceiptOutlinedIcon from '@material-ui/icons/ReceiptOutlined';
 import SearchIcon from '@material-ui/icons/Search';
@@ -54,13 +56,31 @@ export default function useMySitemap() {
       { path: '/submissions', title: t('drawer.submissions'), isRoot: true, icon: <AmpStoriesOutlinedIcon /> },
       {
         path: '/submission/detail/:id',
-        title: `${t('breadcrumb.submission.detail')}: {:id}`,
+        title: t('breadcrumb.submission.detail'),
+        icon: <ListAltOutlinedIcon />,
+        breadcrumbs: ['/submissions']
+      },
+      {
+        path: '/file/detail/:id',
+        title: t('breadcrumb.file.detail'),
+        icon: <DescriptionOutlinedIcon />,
+        isRoot: true
+      },
+      {
+        path: '/file/viewer/:id',
+        title: t('breadcrumb.file.viewer'),
+        icon: <PageviewOutlinedIcon />,
+        isRoot: true
+      },
+      {
+        path: '/submission/detail/:id/:fid',
+        title: t('breadcrumb.submission.detail'),
         icon: <ListAltOutlinedIcon />,
         breadcrumbs: ['/submissions']
       },
       {
         path: '/submission/report/:id',
-        title: `${t('breadcrumb.submission.report')}: {:id}`,
+        title: t('breadcrumb.submission.report'),
         icon: <ChromeReaderModeOutlinedIcon />,
         breadcrumbs: ['/submissions']
       },

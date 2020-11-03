@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 import {
   Box,
   ClickAwayListener,
@@ -10,6 +11,7 @@ import {
   makeStyles,
   Toolbar,
   Tooltip,
+  useMediaQuery,
   useTheme
 } from '@material-ui/core';
 import withWidth, { isWidthDown } from '@material-ui/core/withWidth';
@@ -22,7 +24,7 @@ import LeftNavItem from 'commons/components/layout/leftnav/LeftNavItem';
 import { ValidatedProp } from 'commons/components/user/UserProvider';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import AppTitle from '../topnav/AppTitle';
 
 const drawerWidth = 240;
 
@@ -30,7 +32,10 @@ export const useStyles = makeStyles(theme => ({
   drawer: {
     width: drawerWidth,
     flexShrink: 0,
-    whiteSpace: 'nowrap'
+    whiteSpace: 'nowrap',
+    '@media print': {
+      display: 'none !important'
+    }
   },
   drawerOpen: {
     width: drawerWidth,
@@ -48,10 +53,15 @@ export const useStyles = makeStyles(theme => ({
     width: 0,
     [theme.breakpoints.up('sm')]: {
       width: theme.spacing(7) + 1
+    },
+    [theme.breakpoints.only('xs')]: {
+      border: 'none'
     }
   },
   toolbar: {
-    padding: 0
+    [theme.breakpoints.up('xs')]: {
+      padding: 0
+    }
   },
   title: {
     alignItems: 'center',
@@ -101,8 +111,10 @@ type LeftNavDrawerProps = {
 const LeftNavDrawer: React.FC<LeftNavDrawerProps> = props => {
   const { t } = useTranslation();
   const theme = useTheme();
-  const { layoutProps, getLogo, drawerState, toggleDrawer } = useAppLayout();
   const classes = useStyles();
+  const { layoutProps, drawerState, currentLayout, toggleDrawer } = useAppLayout();
+  const isTopLayout = currentLayout === 'top';
+  const isXs = useMediaQuery(theme.breakpoints.only('xs'));
 
   const onCloseDrawerIfOpen = () => {
     if (isWidthDown('sm', props.width) && drawerState) {
@@ -113,12 +125,9 @@ const LeftNavDrawer: React.FC<LeftNavDrawerProps> = props => {
   const header = (
     <div>
       <Toolbar className={classes.toolbar}>
-        <Link to="/" className={classes.title} onClick={onCloseDrawerIfOpen}>
-          <div style={{ display: 'flex', padding: '0 10px' }}>{getLogo(theme)}</div>
-          <div style={{ display: 'flex' }}>{layoutProps.appName}</div>
-        </Link>
+        <AppTitle />
       </Toolbar>
-      <Divider />
+      <Divider style={{ backgroundColor: isTopLayout && !isXs ? 'transparent' : null }} />
     </div>
   );
 

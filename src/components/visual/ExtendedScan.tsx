@@ -18,11 +18,12 @@ type ExtendedScanProps = {
   error_count?: number;
 };
 
-const ExtendedScan: React.FC<ExtendedScanProps> = ({ state }) => {
+const WrappedExtendedScan: React.FC<ExtendedScanProps> = ({ state }) => {
   const { t } = useTranslation();
   const icon = STATE_ICON_MAP[state];
 
   return <Tooltip title={t(`extended_scan.${state}`)}>{icon}</Tooltip>;
 };
 
+const ExtendedScan = React.memo(WrappedExtendedScan);
 export default ExtendedScan;

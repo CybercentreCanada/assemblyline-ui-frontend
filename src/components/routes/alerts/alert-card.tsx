@@ -232,7 +232,7 @@ const AlertCardItem: React.FC<AlertCardItemProps> = ({ item, setItem = null }) =
               </Grid>
             </Hidden>
             <Grid item xs={12} md={10}>
-              <span style={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>{item.file.md5}</span>
+              <span style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>{item.file.md5}</span>
             </Grid>
             <Hidden smDown>
               <Grid item md={2}>
@@ -240,7 +240,7 @@ const AlertCardItem: React.FC<AlertCardItemProps> = ({ item, setItem = null }) =
               </Grid>
             </Hidden>
             <Grid item xs={12} md={10}>
-              <span style={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>{item.file.sha1}</span>
+              <span style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>{item.file.sha1}</span>
             </Grid>
             <Hidden smDown>
               <Grid item md={2}>
@@ -248,7 +248,7 @@ const AlertCardItem: React.FC<AlertCardItemProps> = ({ item, setItem = null }) =
               </Grid>
             </Hidden>
             <Grid item xs={12} md={10}>
-              <span style={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>{item.file.sha256}</span>
+              <span style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>{item.file.sha256}</span>
             </Grid>
           </Grid>
 

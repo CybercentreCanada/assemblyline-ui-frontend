@@ -411,20 +411,17 @@ const Alerts: React.FC = () => {
             splitPanel.item ? (
               <Box p={2} pt={0} width="100%">
                 <PageHeader
-                  mode="provided"
-                  title={
-                    <Box display="flex" alignItems="center" mb={1}>
-                      <AlertListItemActions item={splitPanel.item} currentQuery={searchQuery} setDrawer={setDrawer} />
-                      {/* <AlertActionsMenu />
-                      <Box flex={1}>
-                        <Classification c12n={splitPanel.item.classification} type="outlined" />
-                      </Box> */}
-                    </Box>
-                  }
                   actions={[{ icon: <CloseIcon />, action: onSplitPanelRightClose }]}
                   backgroundColor={theme.palette.background.default}
                   elevation={0}
-                />
+                >
+                  <Box display="flex" alignItems="center">
+                    <AlertActionsMenu />
+                    <Box flex={1}>
+                      <Classification c12n={splitPanel.item.classification} type="outlined" />
+                    </Box>
+                  </Box>
+                </PageHeader>
                 <AlertDetails item={splitPanel.item} />
               </Box>
             ) : null

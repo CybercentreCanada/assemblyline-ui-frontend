@@ -276,23 +276,12 @@ const useMyLayout = (): AppLayoutProps => {
 
   return {
     appName: 'Assemblyline',
-    allowBreadcrumbs: true,
     allowBreadcrumbsMinimize: false,
-    allowGravatar: false,
-    allowQuickSearch: true,
     allowReset: false,
     appIconDark: darkLogo,
     appIconLight: lightLogo,
     bannerLight: lightBanner,
     bannerDark: darkBanner,
-    breadcrumbsPlacement: 'topbar',
-    colors: {
-      darkPrimary: '#7c93b9',
-      darkSecondary: '#929cad',
-      lightPrimary: '#0b65a1',
-      lightSecondary: '#939dac'
-    },
-    defaultTheme: 'light' as 'light',
     defaultLayout: 'side' as 'side',
     defaultDrawerOpen: false,
     defaultShowQuickSearch: true,

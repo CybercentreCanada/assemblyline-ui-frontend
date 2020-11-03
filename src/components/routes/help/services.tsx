@@ -41,8 +41,8 @@ function ServiceCard({ service }) {
         style={{ padding: theme.spacing(1) }}
       />
       <div style={{ padding: sp1 }}>
-        <div style={{ minHeight: '110px' }}>
-          <Typography variant="overline">{service.description}</Typography>
+        <div style={{ minHeight: '110px', whiteSpace: 'pre-wrap', paddingBottom: theme.spacing(1) }}>
+          {service.description}
         </div>
         <Grid container>
           <Grid item xs={12} sm={6}>
@@ -100,7 +100,7 @@ export default function Services() {
   }, []);
   return (
     <PageCenter>
-      <div style={{ textAlign: 'left' }}>
+      <div style={{ textAlign: 'left', paddingBottom: '1rem' }}>
         {services ? (
           <Grid container spacing={2}>
             {services.map((s, i) => (

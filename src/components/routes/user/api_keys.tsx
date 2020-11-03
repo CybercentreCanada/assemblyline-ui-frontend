@@ -145,7 +145,7 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
             <div style={{ paddingTop: sp2, paddingBottom: sp4 }}>
               <Card variant="outlined" style={{ backgroundColor: theme.palette.background.default }}>
                 <div style={{ padding: sp2 }}>
-                  <Typography style={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>{tempAPIKey}</Typography>
+                  <Typography style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>{tempAPIKey}</Typography>
                 </div>
               </Card>
             </div>

@@ -1,5 +1,6 @@
 {
   "detail": "Detail",
+  "filter": "Filter submissions...",
   "header.classification": "Classification",
   "header.description": "Description",
   "header.numfiles": "# Files",
@@ -8,6 +9,8 @@
   "header.user": "User",
   "header.verdict": "Verdict",
   "report": "Report",
-  "subtitle": "total submission(s)",
-  "title": "Submissions"
+  "total": "total submission(s)",
+  "filtered": "submission(s) matching filter",
+  "searching": "Searching...",
+  "my_submission": "Show my submissions"
 }

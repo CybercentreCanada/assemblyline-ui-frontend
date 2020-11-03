@@ -79,15 +79,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function Classification({
-  c12n,
-  format,
-  inline,
-  setClassification,
-  size,
-  type,
-  isUser
-}: ClassificationProps) {
+function WrappedClassification({ c12n, format, inline, setClassification, size, type, isUser }: ClassificationProps) {
   const classes = useStyles();
   const { t } = useTranslation();
   const theme = useTheme();
@@ -198,13 +190,12 @@ export default function Classification({
     c12nDef.enforce &&
     (c12n ? (
       <>
-        <div
-          className={type === 'text' ? classes[computeColor()] : null}
-          style={{ display: inline ? 'inline-block' : null }}
-        >
-          {type === 'text' ? (
-            normalizedClassification(validated.parts, c12nDef, format, isMobile)
-          ) : (
+        {type === 'text' ? (
+          <span className={classes[computeColor()]}>
+            {normalizedClassification(validated.parts, c12nDef, format, isMobile)}
+          </span>
+        ) : (
+          <div style={{ display: inline ? 'inline-block' : null }}>
             <CustomChip
               type="classification"
               variant={type === 'outlined' ? 'outlined' : 'default'}
@@ -214,8 +205,8 @@ export default function Classification({
               label={normalizedClassification(validated.parts, c12nDef, format, isMobile)}
               onClick={type === 'picker' ? () => setShowPicker(true) : null}
             />
-          )}
-        </div>
+          </div>
+        )}
         {type === 'picker' ? (
           <Dialog
             fullScreen={isPhone}
@@ -356,7 +347,7 @@ export default function Classification({
   );
 }
 
-Classification.defaultProps = {
+WrappedClassification.defaultProps = {
   setClassification: null,
   size: 'medium' as 'medium',
   type: 'pill' as 'pill',
@@ -364,3 +355,6 @@ Classification.defaultProps = {
   inline: false,
   isUser: false
 };
+
+const Classification = React.memo(WrappedClassification);
+export default Classification;

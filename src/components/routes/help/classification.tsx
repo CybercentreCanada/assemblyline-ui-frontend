@@ -45,7 +45,7 @@ export default function HelpClassification() {
           <ul>
             <li>
               <Trans ns="helpClassification" i18nKey="submission_a_1" components={{ bold: <strong /> }} />
-              <Classification inline size="tiny" type="text" c12n={c12nDef ? c12nDef.RESTRICTED : null} format="long" />
+              <Classification size="tiny" type="text" c12n={c12nDef ? c12nDef.RESTRICTED : null} format="long" />
             </li>
             <li>
               <Trans ns="helpClassification" i18nKey="submission_a_2" components={{ bold: <strong /> }} />
@@ -63,7 +63,7 @@ export default function HelpClassification() {
           </ul>
           <Typography variant="body2" gutterBottom>
             <Trans ns="helpClassification" i18nKey="submission_a_res_1_p1" components={{ bold: <strong /> }} />
-            <Classification inline size="tiny" type="text" c12n={c12nDef ? c12nDef.UNRESTRICTED : null} format="long" />
+            <Classification size="tiny" type="text" c12n={c12nDef ? c12nDef.UNRESTRICTED : null} format="long" />
             <Trans ns="helpClassification" i18nKey="submission_a_res_1_p2" components={{ bold: <strong /> }} />
           </Typography>
           <Typography variant="body2" gutterBottom>
@@ -72,7 +72,7 @@ export default function HelpClassification() {
               i18nKey="submission_a_res_2_p1"
               components={{ italic: <i />, bold: <strong /> }}
             />
-            <Classification inline size="tiny" type="text" c12n={c12nDef ? c12nDef.RESTRICTED : null} format="long" />
+            <Classification size="tiny" type="text" c12n={c12nDef ? c12nDef.RESTRICTED : null} format="long" />
             <Trans
               ns="helpClassification"
               i18nKey="submission_a_res_2_p2"
@@ -98,7 +98,7 @@ export default function HelpClassification() {
           <ul>
             <li>
               <Trans ns="helpClassification" i18nKey="result_a_1" components={{ bold: <strong /> }} />
-              <Classification inline size="tiny" type="text" c12n={c12nDef ? c12nDef.RESTRICTED : null} format="long" />
+              <Classification size="tiny" type="text" c12n={c12nDef ? c12nDef.RESTRICTED : null} format="long" />
             </li>
             <li>
               <Trans ns="helpClassification" i18nKey="result_a_2" components={{ bold: <strong /> }} />
@@ -122,19 +122,19 @@ export default function HelpClassification() {
             </li>
             <li>
               <Trans ns="helpClassification" i18nKey="result_a_4" components={{ bold: <strong /> }} />
-              <Classification inline size="tiny" type="text" c12n={c12nDef ? c12nDef.RESTRICTED : null} format="long" />
+              <Classification size="tiny" type="text" c12n={c12nDef ? c12nDef.RESTRICTED : null} format="long" />
             </li>
           </ul>
           <Typography variant="body2" gutterBottom>
             <Trans ns="helpClassification" i18nKey="result_a_res_1_p1" components={{ bold: <strong /> }} />
-            <Classification inline size="tiny" type="text" c12n={c12nDef ? c12nDef.RESTRICTED : null} format="long" />
+            <Classification size="tiny" type="text" c12n={c12nDef ? c12nDef.RESTRICTED : null} format="long" />
             <Trans ns="helpClassification" i18nKey="result_a_res_1_p2" components={{ bold: <strong /> }} />
-            <Classification inline size="tiny" type="text" c12n={c12nDef ? c12nDef.UNRESTRICTED : null} format="long" />
+            <Classification size="tiny" type="text" c12n={c12nDef ? c12nDef.UNRESTRICTED : null} format="long" />
             <Trans ns="helpClassification" i18nKey="result_a_res_1_p3" components={{ bold: <strong /> }} />
           </Typography>
           <Typography variant="body2" gutterBottom>
             <Trans ns="helpClassification" i18nKey="result_a_res_2_p1" components={{ bold: <strong /> }} />
-            <Classification inline size="tiny" type="text" c12n={c12nDef ? c12nDef.RESTRICTED : null} format="long" />
+            <Classification size="tiny" type="text" c12n={c12nDef ? c12nDef.RESTRICTED : null} format="long" />
             <Trans ns="helpClassification" i18nKey="result_a_res_2_p2" components={{ bold: <strong /> }} />
           </Typography>
         </div>
@@ -159,7 +159,7 @@ export default function HelpClassification() {
             ? c12nDef.original_definition.levels.map((lvl, idx) => {
                 return (
                   <li key={idx}>
-                    <Classification inline size="tiny" type="text" c12n={lvl.name} format="long" /> :: {lvl.description}
+                    <Classification size="tiny" type="text" c12n={lvl.name} format="long" /> :: {lvl.description}
                   </li>
                 );
               })
@@ -249,7 +249,7 @@ export default function HelpClassification() {
           <Trans ns="helpClassification" i18nKey="validation_groups_note" components={{ bold: <strong /> }} />
         </Typography>
       </div>
-      <div style={{ textAlign: 'left', paddingBottom: sp1 }}>
+      <div style={{ textAlign: 'left', paddingBottom: sp2 }}>
         <Typography variant="h6" gutterBottom>
           {t('validation_subgroups')}
         </Typography>

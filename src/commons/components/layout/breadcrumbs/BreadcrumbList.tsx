@@ -1,7 +1,6 @@
 import { Tooltip } from '@material-ui/core';
 import MuiBreadcrumbs from '@material-ui/core/Breadcrumbs';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
-import useAppLayout from 'commons/components/hooks/useAppLayout';
 import { BreadcrumbItem } from 'commons/components/hooks/useAppSitemap';
 import BreadcrumbLastItem from 'commons/components/layout/breadcrumbs/BreadcrumbLastItem';
 import BreadcrumbLinkItem from 'commons/components/layout/breadcrumbs/BreadcrumbLinkItem';
@@ -49,8 +48,7 @@ const BreadcrumbList: React.FC<BreadcrumbListProps> = ({
   isStatic = false
 }) => {
   const [expanded, setExpanded] = useState<boolean>(false);
-  const { currentLayout, drawerState, showQuickSearch } = useAppLayout();
-  const classes = useBreadcrumbStyles(currentLayout, drawerState, showQuickSearch);
+  const classes = useBreadcrumbStyles();
   const { before, after, hasEllipsis } = splitItems(
     exceptLast ? items.slice(0, items.length - 1) : items,
     itemsBefore,
@@ -60,7 +58,12 @@ const BreadcrumbList: React.FC<BreadcrumbListProps> = ({
   );
   const last = after.length > 0 && !allLinks ? after.pop() : before ? before.pop() : null;
   return (
-    <MuiBreadcrumbs aria-label="breadcrumb" className={!disableStyle ? classes.breadcrumbs : ''} maxItems={1000}>
+    <MuiBreadcrumbs
+      aria-label="breadcrumb"
+      className={!disableStyle ? classes.breadcrumbs : ''}
+      maxItems={1000}
+      // classes={{ root: { color: 'inherit' } }}
+    >
       {before &&
         before.map(item => <BreadcrumbLinkItem key={`bcrumb-${item.route.path}`} item={item} textOnly={textOnly} />)}
       {hasEllipsis && (

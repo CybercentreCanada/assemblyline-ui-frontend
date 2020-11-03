@@ -1,5 +1,6 @@
 {
   "detail": "Détail",
+  "filter": "Filtrer les soumissions...",
   "header.classification": "Classification",
   "header.description": "Description",
   "header.numfiles": "# Fichiers",
@@ -8,6 +9,8 @@
   "header.user": "Utilisateur",
   "header.verdict": "Verdicte",
   "report": "Rapport",
-  "subtitle": "soumission(s) au total",
-  "title": "Soumissions"
+  "total": "soumission(s) au total",
+  "filtered": "soumission(s) correspondant au filtre",
+  "searching": "Recherche en cours...",
+  "my_submission": "Voir mes soumissions"
 }

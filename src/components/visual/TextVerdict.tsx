@@ -7,6 +7,7 @@ const VERDICT_COLOR_MAP = {
   info: 'default',
   safe: 'success',
   suspicious: 'warning',
+  highly_suspicious: 'warning',
   malicious: 'error'
 };
 
@@ -17,7 +18,12 @@ type TextVerdictProps = {
   mono?: boolean;
 };
 
-const TextVerdict: React.FC<TextVerdictProps> = ({ verdict, variant = 'default', size = 'tiny', mono = false }) => {
+const WrappedTextVerdict: React.FC<TextVerdictProps> = ({
+  verdict,
+  variant = 'default',
+  size = 'tiny',
+  mono = false
+}) => {
   const { t } = useTranslation();
   const color = VERDICT_COLOR_MAP[verdict];
 
@@ -37,4 +43,5 @@ const TextVerdict: React.FC<TextVerdictProps> = ({ verdict, variant = 'default',
   );
 };
 
+const TextVerdict = React.memo(WrappedTextVerdict);
 export default TextVerdict;

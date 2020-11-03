@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   AppBar,
   Button,
@@ -8,14 +9,12 @@ import {
   Toolbar,
   useTheme
 } from '@material-ui/core';
+import useAppBarHeight from 'commons/components/hooks/useAppBarHeight';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
-import useAppSitemap from 'commons/components/hooks/useAppSitemap';
-import useTopBarScrollTrigger from 'commons/components/hooks/useTopBarScrollTrigger';
-import BreadcrumbLastItem from 'commons/components/layout/breadcrumbs/BreadcrumbLastItem';
-import Breadcrumbs from 'commons/components/layout/breadcrumbs/Breadcrumbs';
 import React, { useLayoutEffect, useRef, useState } from 'react';
 
 export type PageHeaderAction = {
+  key?: string;
   title?: string;
   icon?: React.ReactNode;
   color?: 'primary' | 'secondary';
@@ -24,20 +23,16 @@ export type PageHeaderAction = {
 };
 
 type PageHeaderProps = {
-  mode?: 'title' | 'breadcrumbs' | 'provided';
-  left?: React.ReactNode;
+  children?: React.ReactNode;
   right?: React.ReactNode;
   actions?: PageHeaderAction[];
-  title?: React.ReactNode;
   isSticky?: boolean;
   elevation?: number;
   backgroundColor?: string;
 };
 
 const PageHeader: React.FC<PageHeaderProps> = ({
-  mode,
-  title,
-  left,
+  children,
   right,
   actions,
   isSticky = false,
@@ -45,70 +40,54 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   elevation = 0
 }) => {
   const theme = useTheme();
-  const { last } = useAppSitemap();
   const { currentLayout, autoHideAppbar } = useAppLayout();
-  const topBarScrollTrigger = useTopBarScrollTrigger();
+  const appBarHeight = useAppBarHeight();
   const [top, setTop] = useState<number>(-1);
-  const [initialTop, setInitialTop] = useState<number>(-1);
+  const [initialTop, setInitialTop] = useState<number>();
   const containerEL = useRef<HTMLDivElement>();
-  const isSideLayout = currentLayout === 'side';
-
+  //
   useLayoutEffect(() => {
-    const appBar = document.getElementById('appbar');
-    if (isSticky && appBar) {
-      const appBarRect = appBar.getBoundingClientRect();
-      if (topBarScrollTrigger && isSideLayout && autoHideAppbar) {
-        setTop(initialTop - appBarRect.height);
-      } else {
-        setTop(initialTop);
+    if (isSticky && initialTop !== undefined) {
+      let _top = initialTop;
+      if (currentLayout === 'top' || !autoHideAppbar) {
+        _top += appBarHeight;
       }
+      // console.log(`updatetop: ${_top}`);
+      setTop(_top);
     }
-  }, [isSticky, isSideLayout, initialTop, topBarScrollTrigger, autoHideAppbar]);
+  }, [initialTop, currentLayout, autoHideAppbar, appBarHeight]);
 
   useLayoutEffect(() => {
     if (isSticky && containerEL.current) {
-      const rect = containerEL.current.getBoundingClientRect();
-      setInitialTop(rect.top);
+      const _initialTop = containerEL.current.offsetTop;
+      // console.log(`inittop: ${_initialTop}`);
+      setInitialTop(_initialTop);
     }
-  }, [isSticky, containerEL, currentLayout]);
-
-  const renderTitle = () => {
-    switch (mode) {
-      case 'breadcrumbs':
-        return <Breadcrumbs disableStyle />;
-      case 'provided':
-        return title;
-      default:
-        return (
-          <span>
-            <BreadcrumbLastItem item={last()} />
-          </span>
-        );
-    }
-  };
+  }, [containerEL]);
 
   return (
     <RootRef rootRef={containerEL}>
       <AppBar
+        id="header1"
         position={isSticky ? 'sticky' : 'relative'}
         style={{
           top: top > -1 ? top : null,
           backgroundColor: backgroundColor || theme.palette.background.default,
-          paddingTop: theme.spacing(0.5)
+          paddingTop: theme.spacing(0.5),
+          zIndex: !isSticky ? theme.zIndex.appBar - 100 : null
         }}
         elevation={elevation}
         color="inherit"
       >
-        <Toolbar style={{ minHeight: mode === 'provided' && (title || left || right) ? 0 : '' }} disableGutters>
-          <div>{left}</div>
-          <div style={{ flexGrow: 1 }}>{renderTitle()}</div>
+        <Toolbar style={{ minHeight: 0 }} disableGutters>
+          <div style={{ flexGrow: 1 }}>{children}</div>
           <div>
             {actions &&
               actions.map((a, i) => {
                 if (a.title) {
                   return (
                     <Button
-                      key={`ph-action-${i}`}
+                      key={a.key ? a.key : `ph-action-${i}`}
                       startIcon={a.icon}
                       color={a.color}
                       onClick={a.action}
@@ -121,7 +100,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                 }
                 return (
                   <IconButton
-                    key={`ph-action-${i}`}
+                    key={a.key ? a.key : `ph-action-${i}`}
                     color={a.color}
                     onClick={a.action}
                     {...(a.btnProp as IconButtonProps)}

@@ -29,11 +29,15 @@ export interface CustomChipProps {
   color?: PossibleColors;
   variant?: 'default' | 'outlined';
   mono?: boolean;
-  tooltip?: string;
+  wrap?: boolean;
   [propName: string]: any;
 }
 
 const useStyles = makeStyles(theme => ({
+  wrap: {
+    whiteSpace: 'pre-wrap',
+    wordBreak: 'break-word'
+  },
   square: {
     borderRadius: '3px',
     margin: '2px 4px 2px 0'
@@ -45,7 +49,7 @@ const useStyles = makeStyles(theme => ({
   },
   tiny: {
     height: '20px',
-    fontSize: '80%'
+    fontSize: '0.725rem'
   },
   label_tiny: {
     paddingLeft: '6px',
@@ -125,7 +129,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function CustomChip({ className, type, size, color, variant, mono, tooltip, ...otherProps }: CustomChipProps) {
+function WrappedCustomChip({ className, type, size, color, variant, mono, wrap, ...otherProps }: CustomChipProps) {
   const classes = useStyles();
 
   // Define classnames maps
@@ -174,11 +178,12 @@ export default function CustomChip({ className, type, size, color, variant, mono
     variant === 'outlined' ? colorClassMap[`${color}_outlined`] : colorClassMap[color],
     className
   );
+  const labelClassName = clsx(sizeLabelClassMap[size], wrap ? classes.wrap : null);
 
   // Build chip based on computed values
   const chip = (
     <Chip
-      classes={{ label: sizeLabelClassMap[size] }}
+      classes={{ label: labelClassName }}
       className={appliedClassName}
       size={sizeMap[size]}
       color={colorMap[color]}
@@ -191,11 +196,15 @@ export default function CustomChip({ className, type, size, color, variant, mono
   return tooltip ? <Tooltip title={tooltip}>{chip}</Tooltip> : chip;
 }
 
-CustomChip.defaultProps = {
+WrappedCustomChip.defaultProps = {
   className: null,
   type: 'round' as 'round',
   size: 'medium' as 'medium',
   color: 'default' as 'default',
   variant: 'default' as 'default',
-  mono: false
+  mono: false,
+  wrap: false
 };
+
+const CustomChip = React.memo(WrappedCustomChip);
+export default CustomChip;

@@ -10,6 +10,8 @@ import AdminUsers from 'components/routes/admin/users';
 import Alerts from 'components/routes/alerts/alerts';
 import AlertsLegacy from 'components/routes/alerts/legacy-alert';
 import Dashboard from 'components/routes/dashboard';
+import FileFullDetail from 'components/routes/file/detail';
+import FileViewer from 'components/routes/file/viewer';
 import Help from 'components/routes/help';
 import HelpApiDoc from 'components/routes/help/api';
 import HelpClassification from 'components/routes/help/classification';
@@ -30,20 +32,28 @@ import Submissions from 'components/routes/submissions';
 import Submit from 'components/routes/submit';
 import Tos from 'components/routes/tos';
 import User from 'components/routes/user';
-import React, { useEffect } from 'react';
-import { Redirect, Route, Switch, useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { matchPath, Redirect, Route, Switch, useLocation } from 'react-router-dom';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
+  const [oldID, setOldID] = useState(null);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    const { params } = { params: { id: null }, ...matchPath(pathname, { path: '/submission/detail/:id' }) };
+    // eslint-disable-next-line prefer-destructuring, @typescript-eslint/dot-notation
+    const id = params['id'];
+    if (id === null || id === undefined || id === oldID) {
+      window.scrollTo(0, 0);
+      setOldID(id);
+    }
+    // eslint-disable-next-line
   }, [pathname]);
 
   return null;
 }
 
-const Routes = () => {
+const WrappedRoutes = () => {
   const { settings } = useAppContext();
   return (
     <>
@@ -60,6 +70,8 @@ const Routes = () => {
         <Route exact path="/admin/users" component={AdminUsers} />
         <Route exact path="/admin/users/:id" component={User} />
         <Route exact path="/dashboard" component={Dashboard} />
+        <Route exact path="/file/detail/:id" component={FileFullDetail} />
+        <Route exact path="/file/viewer/:id" component={FileViewer} />
         <Route exact path="/help" component={Help} />
         <Route exact path="/help/api" component={HelpApiDoc} />
         <Route exact path="/help/classification" component={HelpClassification} />
@@ -76,9 +88,10 @@ const Routes = () => {
         <Route exact path="/search/:id" component={Search} />
         <Route exact path="/settings" component={Settings} />
         <Route exact path="/submit" component={Submit} />
+        <Route exact path="/submission/detail/:id/:fid" component={SubmissionDetail} />
         <Route exact path="/submission/detail/:id" component={SubmissionDetail} />
         <Route exact path="/submission/report/:id" component={SubmissionReport} />
-        {settings.submission_view === 'detail' ? (
+        {settings.submission_view === 'details' ? (
           <Redirect from="/submission/:id" to="/submission/detail/:id" />
         ) : (
           <Redirect from="/submission/:id" to="/submission/report/:id" />
@@ -93,4 +106,5 @@ const Routes = () => {
   );
 };
 
+const Routes = React.memo(WrappedRoutes);
 export default Routes;

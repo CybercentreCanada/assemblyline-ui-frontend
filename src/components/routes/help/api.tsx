@@ -143,7 +143,7 @@ export default function ApiDoc() {
 
   return (
     <PageCenter>
-      <div style={{ textAlign: 'left' }}>
+      <div style={{ textAlign: 'left', paddingBottom: sp2 }}>
         {apiList && apiSelected ? (
           <Select
             id="api"

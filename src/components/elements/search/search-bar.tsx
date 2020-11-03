@@ -2,27 +2,33 @@ import {
   Box,
   CircularProgress,
   Divider,
+  fade,
   IconButton,
   IconButtonProps,
   makeStyles,
+  Tooltip,
   useMediaQuery,
   useTheme
 } from '@material-ui/core';
 import BackspaceIcon from '@material-ui/icons/Backspace';
 import SearchIcon from '@material-ui/icons/Search';
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import SearchTextField from './search-textfield';
 
 const useStyles = makeStyles(theme => ({
   root: {
-    backgroundColor: theme.palette.type === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200],
     '& button': {
       marginRight: theme.spacing(1)
     }
   },
   searchbar: {
-    paddingTop: theme.spacing(1),
+    borderRadius: '4px',
     paddingLeft: theme.spacing(2),
+    backgroundColor: fade(theme.palette.text.primary, 0.04),
+    '&:hover': {
+      backgroundColor: fade(theme.palette.text.primary, 0.06)
+    },
     '& input': {
       color: theme.palette.text.secondary
     }
@@ -41,6 +47,7 @@ export interface SearchBarButton {
 
 interface SearchBarProps {
   initValue: string;
+  placeholder?: string;
   searching?: boolean;
   buttons?: SearchBarButton[];
   suggestions?: string[];
@@ -52,6 +59,7 @@ interface SearchBarProps {
 const SearchBar: React.FC<SearchBarProps> = ({
   initValue,
   children,
+  placeholder,
   searching = false,
   suggestions = [],
   buttons = [],
@@ -59,6 +67,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   onSearch,
   onClear
 }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const classes = useStyles();
   const element = useRef<HTMLInputElement>();
@@ -97,18 +106,19 @@ const SearchBar: React.FC<SearchBarProps> = ({
   return (
     <div ref={element} className={classes.root}>
       <Box display="flex" flexDirection="row" className={classes.searchbar} alignItems="center">
-        <Box mr={2}>
+        <div style={{ lineHeight: 'normal', marginRight: theme.spacing(2) }}>
           {searching ? (
-            <Box style={{ width: 35, height: 35 }}>
-              <CircularProgress color="primary" size={30} />
-            </Box>
+            <span style={{ width: 35, height: 35 }}>
+              <CircularProgress size={24} />
+            </span>
           ) : (
-            <SearchIcon color="primary" fontSize="large" />
+            <SearchIcon />
           )}
-        </Box>
+        </div>
         <Box flex={1} display="relative">
           <SearchTextField
             value={value}
+            placeholder={placeholder}
             options={suggestions}
             disabled={searching}
             onChange={_onValueChange}
@@ -121,13 +131,20 @@ const SearchBar: React.FC<SearchBarProps> = ({
         </IconButton>
         {isLTEMd && (
           <>
-            <Divider
-              orientation="vertical"
-              flexItem
-              style={{ marginLeft: theme.spacing(1), marginRight: theme.spacing(1) }}
-            />
+            <IconButton onClick={_onValueClear} edge="end">
+              <Tooltip title={t('clear_filter')}>
+                <BackspaceIcon />
+              </Tooltip>
+            </IconButton>
+            {buttons.length !== 0 && (
+              <Divider
+                orientation="vertical"
+                flexItem
+                style={{ marginLeft: theme.spacing(1), marginRight: theme.spacing(1) }}
+              />
+            )}
             {buttons.map((b, i) => (
-              <IconButton key={`searchbar-button-${i}`} {...b.props} edge="end" color="primary">
+              <IconButton key={`searchbar-button-${i}`} {...b.props} edge="end">
                 {b.icon}
               </IconButton>
             ))}

@@ -5,14 +5,15 @@ import useAppLayout from 'commons/components/hooks/useAppLayout';
 import { LeftNavElement } from 'commons/components/layout/leftnav/LeftNavDrawer';
 import { useStyles as userProfileStyles } from 'commons/components/layout/topnav/UserProfile';
 import React from 'react';
+import useAppContext from '../hooks/useAppContext';
 
 /**
  * MaterialUI dynamic style classes for layout skeleton component.
  */
 const useStyles = makeStyles(theme => ({
   container: {
-    position: 'absolute',
-    zIndex: theme.zIndex.appBar + 150,
+    position: 'fixed',
+    zIndex: theme.zIndex.appBar + 1000,
     top: 0,
     left: 0,
     right: 0,
@@ -36,6 +37,7 @@ const useStyles = makeStyles(theme => ({
   },
   contentLeft: {
     border: theme.palette.type === 'light' ? '1px solid rgba(0, 0, 0, 0.12)' : '1px solid rgba(255, 255, 255, 0.12)',
+    borderTopColor: 'transparent',
     backgroundColor: theme.palette.background.paper,
     marginRight: 5,
     flex: '0 0 auto',
@@ -78,16 +80,18 @@ const LayoutSkeleton: React.FC = () => {
 const SideLayoutSkeleton = () => {
   const theme = useTheme();
   const classes = useStyles();
+  const { getAppbarStyles } = useAppContext();
   const isXs = useMediaQuery(theme.breakpoints.only('xs'));
   const isSm = useMediaQuery(theme.breakpoints.only('sm'));
   const userProfileClasses = userProfileStyles();
   const { layoutProps, showQuickSearch: _showQuickSearch, breadcrumbsEnabled, drawerState } = useAppLayout();
-  const showBreadcrumbs = layoutProps.allowBreadcrumbs && breadcrumbsEnabled;
+  const showBreadcrumbs = breadcrumbsEnabled;
   const showTopBarBreadcrumbs = showBreadcrumbs && !isSm;
-  const showQuicksearch = layoutProps.allowQuickSearch && _showQuickSearch;
+  const showQuicksearch = _showQuickSearch;
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
-  const sp3 = theme.spacing(3);
+  const { backgroundColor } = getAppbarStyles('side');
+
   return (
     <div className={classes.container}>
       <div className={classes.leftlayout}>
@@ -110,8 +114,8 @@ const SideLayoutSkeleton = () => {
             </List>
           </div>
           <div className={classes.contentRight}>
-            <AppBar position="relative" elevation={0} style={{ backgroundColor: theme.palette.background.default }}>
-              <Toolbar disableGutters style={{ paddingLeft: sp2, paddingRight: sp3 }}>
+            <AppBar position="relative" elevation={0} style={{ backgroundColor }}>
+              <Toolbar disableGutters style={{ paddingRight: sp2, paddingLeft: !isXs ? sp2 : null }}>
                 {isXs && (
                   <ButtonSkeleton
                     withText={drawerState}
@@ -153,15 +157,6 @@ const SideLayoutSkeleton = () => {
                 </Skeleton>
               </Toolbar>
             </AppBar>
-            {showBreadcrumbs && isSm && (
-              <Skeleton
-                style={{ marginLeft: sp2 }}
-                variant="text"
-                animation="wave"
-                width={100}
-                className={classes.breadcrumbs}
-              />
-            )}
           </div>
         </div>
       </div>
@@ -175,23 +170,27 @@ const SideLayoutSkeleton = () => {
 const TopLayoutSkeleton = () => {
   const theme = useTheme();
   const classes = useStyles();
+  const { getAppbarStyles } = useAppContext();
   const isSm = useMediaQuery(theme.breakpoints.only('sm'));
   const userProfileClasses = userProfileStyles();
   const { layoutProps, showQuickSearch: _showQuickSearch, breadcrumbsEnabled, drawerState } = useAppLayout();
-  const showBreadcrumbs = layoutProps.allowBreadcrumbs && breadcrumbsEnabled;
+  const showBreadcrumbs = breadcrumbsEnabled;
   const showTopBarBreadcrumbs = showBreadcrumbs && !isSm;
-  const showQuicksearch = layoutProps.allowQuickSearch && _showQuickSearch;
+  const showQuicksearch = _showQuickSearch;
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
   const sp3 = theme.spacing(3);
+  const sp4 = theme.spacing(4);
+  const { elevation, backgroundColor } = getAppbarStyles('top');
+
   return (
     <div className={classes.container}>
       <div className={classes.toplayout}>
-        <AppBar position="relative" elevation={2} style={{ backgroundColor: theme.palette.background.default }}>
-          <Toolbar style={{ paddingRight: sp3 }} disableGutters>
+        <AppBar position="relative" elevation={elevation} style={{ backgroundColor }}>
+          <Toolbar style={{ paddingRight: sp2 }} disableGutters>
             <ButtonSkeleton
               withText={false}
-              style={{ paddingTop: sp1, paddingBottom: sp1, paddingLeft: sp2, paddingRight: sp2 }}
+              style={{ paddingTop: sp1, paddingBottom: sp1, paddingLeft: sp2, paddingRight: sp4 }}
             />
             <Skeleton variant="text" animation="wave" style={{ marginRight: sp3 }}>
               <div style={{ fontSize: '1.5rem', letterSpacing: '-1px' }}>{layoutProps.appName}</div>
@@ -236,17 +235,7 @@ const TopLayoutSkeleton = () => {
               />
             </List>
           </div>
-          <div className={classes.contentRight}>
-            {showBreadcrumbs && isSm && (
-              <Skeleton
-                style={{ marginLeft: sp2, marginTop: sp1 }}
-                variant="text"
-                animation="wave"
-                width={100}
-                className={classes.breadcrumbs}
-              />
-            )}
-          </div>
+          <div className={classes.contentRight} />
         </div>
       </div>
     </div>

@@ -16,7 +16,7 @@ type SubmissionStateProps = {
   error_count?: number;
 };
 
-const SubmissionState: React.FC<SubmissionStateProps> = ({ state, error_count = 0 }) => {
+const WrappedSubmissionState: React.FC<SubmissionStateProps> = ({ state, error_count = 0 }) => {
   const { t } = useTranslation();
   const curState = error_count !== 0 ? 'error' : state;
   const icon = STATE_ICON_MAP[curState];
@@ -24,4 +24,5 @@ const SubmissionState: React.FC<SubmissionStateProps> = ({ state, error_count = 
   return <Tooltip title={t(`submission.state.${curState}`)}>{icon}</Tooltip>;
 };
 
+const SubmissionState = React.memo(WrappedSubmissionState);
 export default SubmissionState;

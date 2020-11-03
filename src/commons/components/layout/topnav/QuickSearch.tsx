@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 
-const useStyles = (layout, open, breadcrumbsEnabled) => {
+const useStyles = breadcrumbsEnabled => {
   return makeStyles(theme => ({
     search: {
       flexGrow: 1,
@@ -19,22 +19,10 @@ const useStyles = (layout, open, breadcrumbsEnabled) => {
       marginLeft: 0,
       width: '100%',
       [theme.breakpoints.up('sm')]: {
-        marginLeft: layout === 'side' ? theme.spacing(7) : theme.spacing(3),
         width: 'auto'
       },
       [theme.breakpoints.up('md')]: {
-        // marginLeft: layout === "side" ? open ? theme.spacing(7) + 240 - 56 : theme.spacing(7) : theme.spacing(3),
-        maxWidth: breadcrumbsEnabled ? 300 : 'inherit',
-        marginLeft:
-          layout === 'side'
-            ? open
-              ? !breadcrumbsEnabled
-                ? theme.spacing(7) + 240 - 56
-                : theme.spacing(3)
-              : breadcrumbsEnabled
-              ? theme.spacing(3)
-              : theme.spacing(7)
-            : theme.spacing(3)
+        maxWidth: breadcrumbsEnabled ? 300 : 'inherit'
       }
     },
     searchIcon: {
@@ -61,12 +49,8 @@ const useStyles = (layout, open, breadcrumbsEnabled) => {
 
 const QuickSearch = () => {
   const { t } = useTranslation();
-  const { currentLayout, drawerState, layoutProps, breadcrumbsEnabled, breadcrumbsPlacement } = useAppLayout();
-  const classes = useStyles(
-    currentLayout,
-    drawerState,
-    layoutProps.allowBreadcrumbs && breadcrumbsEnabled && breadcrumbsPlacement === 'topbar'
-  );
+  const { layoutProps, breadcrumbsEnabled } = useAppLayout();
+  const classes = useStyles(layoutProps.allowBreadcrumbs && breadcrumbsEnabled);
   const [value, setValue] = useState('');
   const history = useHistory();
 
