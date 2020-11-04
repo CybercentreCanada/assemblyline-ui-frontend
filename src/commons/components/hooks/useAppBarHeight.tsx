@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
+
+export const APPBAR_READY_EVENT = 'tui.event.appbar.ready';
 
 export default function useAppBarHeight(): number {
   const [height, setHeight] = useState<number>(-1);
@@ -11,13 +13,15 @@ export default function useAppBarHeight(): number {
     }
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     updateHeight();
     window.addEventListener('resize', updateHeight);
+    window.addEventListener(APPBAR_READY_EVENT, updateHeight);
     return () => {
       window.removeEventListener('resize', updateHeight);
+      window.removeEventListener(APPBAR_READY_EVENT, updateHeight);
     };
-  });
+  }, []);
 
   return height;
 }

@@ -19,16 +19,38 @@ const useStyles = (w, mxw) => {
 type PageCenterProps = {
   children: React.ReactNode;
   margin?: number;
+  mb?: number;
+  ml?: number;
+  mr?: number;
+  mt?: number;
   maxWidth?: string;
   width?: string;
 };
 
-const PageCenter: React.FC<PageCenterProps> = ({ children, margin = 2, maxWidth = '1200px', width = '95%' }) => {
+const PageCenter: React.FC<PageCenterProps> = ({
+  children,
+  margin = null,
+  maxWidth = '1200px',
+  mb = 2,
+  ml = 2,
+  mr = 2,
+  mt = 2,
+  width = '95%'
+}) => {
   const classes = useStyles(width, maxWidth);
   const theme = useTheme();
   return (
     <div className={classes.page}>
-      <div style={{ margin: theme.spacing(margin) }}>{children}</div>
+      <div
+        style={{
+          marginBottom: theme.spacing(margin || mb),
+          marginLeft: theme.spacing(margin || ml),
+          marginRight: theme.spacing(margin || mr),
+          marginTop: theme.spacing(margin || mt)
+        }}
+      >
+        {children}
+      </div>
     </div>
   );
 };

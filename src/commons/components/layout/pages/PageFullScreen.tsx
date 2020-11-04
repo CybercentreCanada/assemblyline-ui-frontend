@@ -22,8 +22,12 @@ const useStyles = makeStyles(theme => ({
 interface PageFullscreenProps {
   children: React.ReactNode;
   margin?: number;
+  mb?: number;
+  ml?: number;
+  mr?: number;
+  mt?: number;
 }
-const PageFullscreen: React.FC<PageFullscreenProps> = ({ children, margin = 2 }) => {
+const PageFullscreen: React.FC<PageFullscreenProps> = ({ children, margin = null, mb = 2, ml = 2, mr = 2, mt = 2 }) => {
   const maximizableElement = React.useRef(null);
   const appBarHeight = useAppBarHeight();
   const { currentLayout, autoHideAppbar } = useAppLayout();
@@ -54,7 +58,7 @@ const PageFullscreen: React.FC<PageFullscreenProps> = ({ children, margin = 2 })
 
   return (
     <div ref={maximizableElement} className={classes.root}>
-      <div className={classes.toggle} style={{ top: barWillHide ? 0 : appBarHeight }}>
+      <div className={classes.toggle} style={{ top: barWillHide || isFullscreen ? 0 : appBarHeight }}>
         {fullscreenSupported ? null : isFullscreen ? (
           <IconButton onClick={handleExitFullscreen}>
             <FullscreenExitIcon />
@@ -65,7 +69,16 @@ const PageFullscreen: React.FC<PageFullscreenProps> = ({ children, margin = 2 })
           </IconButton>
         )}
       </div>
-      <div style={{ margin: theme.spacing(margin) }}>{children}</div>
+      <div
+        style={{
+          marginBottom: theme.spacing(margin || mb),
+          marginLeft: theme.spacing(margin || ml),
+          marginRight: theme.spacing(margin || mr),
+          marginTop: theme.spacing(margin || mt)
+        }}
+      >
+        {children}
+      </div>
     </div>
   );
 };
