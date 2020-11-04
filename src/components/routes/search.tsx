@@ -16,7 +16,7 @@ function Search({ index }: SearchProps) {
   const { t } = useTranslation(['search']);
 
   return (
-    <PageCenter>
+    <PageCenter margin={4}>
       <div style={{ textAlign: 'left' }}>{t(`Search ${index || id || 'all'}`)}</div>
     </PageCenter>
   );

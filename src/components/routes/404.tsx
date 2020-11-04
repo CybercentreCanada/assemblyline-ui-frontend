@@ -9,7 +9,7 @@ const NotFoundPage = () => {
   const { t } = useTranslation(['error404']);
   const theme = useTheme();
   return (
-    <PageCenter width="65%">
+    <PageCenter width="65%" margin={4}>
       <div style={{ paddingTop: theme.spacing(10), fontSize: 200 }}>
         <LinkOffIcon color="secondary" fontSize="inherit" />
       </div>

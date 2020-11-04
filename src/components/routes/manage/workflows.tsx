@@ -6,7 +6,7 @@ export default function Workflows() {
   const { t } = useTranslation(['manageWorkflows']);
 
   return (
-    <PageCenter>
+    <PageCenter margin={4}>
       <div style={{ textAlign: 'left' }}>{t('Workflows')}</div>
     </PageCenter>
   );

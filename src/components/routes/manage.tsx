@@ -14,7 +14,7 @@ export default function Manage() {
   }
 
   return (
-    <PageCenter>
+    <PageCenter margin={4}>
       <LinkGrid items={items} />
     </PageCenter>
   );

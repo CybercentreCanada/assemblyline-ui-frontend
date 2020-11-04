@@ -231,7 +231,7 @@ function Submit() {
   }, []);
 
   return (
-    <PageCenter maxWidth={md ? '800px' : downSM ? '100%' : '1024px'}>
+    <PageCenter maxWidth={md ? '800px' : downSM ? '100%' : '1024px'} margin={4}>
       <div style={{ display: 'inline-block', textAlign: 'center', width: '100%', paddingBottom: sp2 }}>
         <div style={{ display: 'inline-block', marginBottom: '2rem' }}>{getBanner(theme)}</div>
         {c12nDef.enforce ? (

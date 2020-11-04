@@ -1,4 +1,4 @@
-import { CircularProgress, createStyles, makeStyles, Theme, Tooltip, withStyles } from '@material-ui/core';
+import { CircularProgress, createStyles, makeStyles, Theme, Tooltip, useTheme, withStyles } from '@material-ui/core';
 import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -69,6 +69,7 @@ export default function Submissions() {
   const history = useHistory();
   const apiCall = useMyAPI();
   const classes = useStyles();
+  const theme = useTheme();
   const location = useLocation();
   const [query, setQuery] = useState<SearchQuery>(null);
   const [fields] = useState<ALField[]>(
@@ -126,7 +127,10 @@ export default function Submissions() {
   }, [query]);
 
   return (
-    <PageFullWidth>
+    <PageFullWidth margin={4}>
+      <div style={{ paddingBottom: theme.spacing(4) }}>
+        <Typography variant="h4">{t('title')}</Typography>
+      </div>
       <PageHeader isSticky>
         <SearchBar
           initValue={query ? query.getQuery() : ''}
@@ -176,7 +180,7 @@ export default function Submissions() {
           )}
         </SearchBar>
       </PageHeader>
-      <div style={{ paddingBottom: '1rem', paddingLeft: '4px', paddingRight: '4px' }}>
+      <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         {submissions !== null ? (
           <TableContainer component={Paper}>
             <Table component="div" size="small">

@@ -15,7 +15,7 @@ const LockedPage = () => {
   return (
     <>
       {configuration.ui.tos ? (
-        <PageCenter width="65%">
+        <PageCenter width="65%" margin={4}>
           <div style={{ paddingTop: theme.spacing(10), fontSize: 200 }}>
             <HourglassEmptyOutlinedIcon color="secondary" fontSize="inherit" />
           </div>

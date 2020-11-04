@@ -10,7 +10,7 @@ export default function SiteMap() {
   const { user: currentUser } = useUser<CustomUser>();
 
   return currentUser.is_admin ? (
-    <PageCenter>
+    <PageCenter margin={4}>
       <div>{t('Site Map')}</div>
     </PageCenter>
   ) : (

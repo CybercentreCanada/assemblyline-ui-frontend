@@ -41,7 +41,7 @@ export default function Users() {
   }, []);
 
   return currentUser.is_admin ? (
-    <PageFullWidth>
+    <PageFullWidth margin={4}>
       <div style={{ paddingBottom: theme.spacing(8) }}>
         <Typography variant="h4">{t('title')}</Typography>
         <Typography variant="subtitle1" color="secondary">

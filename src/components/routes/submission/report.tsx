@@ -515,7 +515,7 @@ export default function SubmissionReport() {
   }, []);
 
   return (
-    <PageCenter>
+    <PageCenter margin={4}>
       <div style={{ textAlign: 'left' }}>
         <div style={{ paddingBottom: sp4, paddingTop: sp2 }}>
           <Classification size="tiny" c12n={report ? report.classification : null} />
@@ -805,7 +805,7 @@ export default function SubmissionReport() {
           })}
 
         {(!report || report.important_files.length !== 0) && (
-          <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
+          <div style={{ paddingTop: sp2, pageBreakInside: 'avoid' }}>
             <Typography variant="h6">{t('important_files')}</Typography>
             <Divider className={classes.divider} />
             <div

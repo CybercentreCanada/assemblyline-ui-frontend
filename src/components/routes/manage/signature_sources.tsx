@@ -6,7 +6,7 @@ export default function SignatureSources() {
   const { t } = useTranslation(['manageSignatureSources']);
 
   return (
-    <PageCenter>
+    <PageCenter margin={4}>
       <div style={{ textAlign: 'left' }}>{t('Signature Sources')}</div>
     </PageCenter>
   );

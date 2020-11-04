@@ -6,7 +6,7 @@ export default function Search() {
   const { t } = useTranslation(['helpSearch']);
 
   return (
-    <PageCenter>
+    <PageCenter margin={4}>
       <div style={{ textAlign: 'left' }}>{t('Search')}</div>
     </PageCenter>
   );
