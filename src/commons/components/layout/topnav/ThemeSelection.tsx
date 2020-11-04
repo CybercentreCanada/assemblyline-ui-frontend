@@ -130,7 +130,7 @@ const ThemeSelection = ({ width }) => {
               </ListItemSecondaryAction>
             </ListItem>
           )}
-          {layoutProps.allowBreadcrumbs && !isWidthDown('xs', width) && (
+          {layoutProps.allowBreadcrumbs && !isWidthDown('sm', width) && (
             <>
               <ListItem button onClick={toggleShowBreadcrumbs}>
                 <ListItemText>{t('personalization.showbreadcrumbs')}</ListItemText>
