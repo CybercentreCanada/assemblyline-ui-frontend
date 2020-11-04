@@ -1,4 +1,4 @@
-import { CssBaseline, makeStyles } from '@material-ui/core';
+import { CssBaseline, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
 import useAppUser from 'commons/components/hooks/useAppUser';
 import LeftNavDrawer, { LeftNavElement } from 'commons/components/layout/leftnav/LeftNavDrawer';
 import { AppElement } from 'commons/components/layout/topnav/AppSwitcher';
@@ -44,14 +44,10 @@ const useNewStyles = makeStyles(theme => ({
       right: 0,
       bottom: 0,
       left: 0
-    },
-    [theme.breakpoints.only('sm')]: {
-      left: theme.spacing(7)
     }
   },
   appVerticalRightContent: {
     height: 'auto',
-    position: 'relative',
     display: 'flex',
     flexDirection: 'column',
     [theme.breakpoints.up('md')]: {
@@ -63,18 +59,13 @@ const useNewStyles = makeStyles(theme => ({
     overflow: 'auto',
     height: '100%',
     display: 'flex',
-    flexDirection: 'column',
-    position: 'relative'
+    flexDirection: 'column'
   },
   appHorizontalBottom: {
-    height: 'auto',
     [theme.breakpoints.up('md')]: {
       flexGrow: 1,
       display: 'flex',
       flexDirection: 'row'
-    },
-    [theme.breakpoints.down('sm')]: {
-      position: 'relative'
     }
   },
   appHorizontalBottomLeft: {
@@ -82,21 +73,16 @@ const useNewStyles = makeStyles(theme => ({
     [theme.breakpoints.down('sm')]: {
       position: 'absolute',
       top: 0,
-      right: 0,
       bottom: 0,
       left: 0
     }
   },
   appHorizontalBottomRight: {
     height: 'auto',
-    position: 'relative',
     display: 'flex',
     flexDirection: 'column',
     [theme.breakpoints.up('md')]: {
       flexGrow: 1
-    },
-    [theme.breakpoints.only('sm')]: {
-      paddingLeft: theme.spacing(7)
     }
   }
 }));
@@ -222,6 +208,8 @@ function AppLayoutProvider(props: LayoutProviderProps) {
   const [quickSearch, setQuickSearch] = useState<boolean>(initialQuickSearch);
   const [autoHideAppbar, setAutoHideAppbar] = useState<boolean>(initialAutoHideAppbar);
   const [layout, setLayout] = useState<'top' | 'side'>(initialLayout);
+  const theme = useTheme();
+  const isSM = useMediaQuery(theme.breakpoints.only('sm'));
 
   const onToggleLayout = () => {
     const newLayout = layout === 'top' ? 'side' : 'top';
@@ -303,7 +291,11 @@ function AppLayoutProvider(props: LayoutProviderProps) {
             <div className={newClasses.appVerticalLeft}>
               {isUserReady() && appReady && showMenus && <LeftNavDrawer />}
             </div>
-            <div className={newClasses.appVerticalRight} id="app-scrollparent">
+            <div
+              className={newClasses.appVerticalRight}
+              id="app-scrollparent"
+              style={{ paddingLeft: showMenus && isSM ? theme.spacing(7) : 0 }}
+            >
               {isUserReady() && appReady && showMenus && <TopBar />}
               <div className={newClasses.appVerticalRightContent}>{children}</div>
             </div>
@@ -315,7 +307,12 @@ function AppLayoutProvider(props: LayoutProviderProps) {
               <div className={newClasses.appHorizontalBottomLeft}>
                 {isUserReady() && appReady && showMenus && <LeftNavDrawer />}
               </div>
-              <div className={newClasses.appHorizontalBottomRight}>{children}</div>
+              <div
+                className={newClasses.appHorizontalBottomRight}
+                style={{ paddingLeft: showMenus && isSM ? theme.spacing(7) : 0 }}
+              >
+                {children}
+              </div>
             </div>
           </div>
         )}
