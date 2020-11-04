@@ -2,6 +2,7 @@ import { IconButton, makeStyles, useMediaQuery, useTheme } from '@material-ui/co
 import MenuIcon from '@material-ui/icons/Menu';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
   topBarTitle: {
@@ -9,17 +10,17 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     flex: '0 0 auto',
     fontSize: '1.5rem',
-    letterSpacing: '-1px',
-    textDecoration: 'none'
-    // color: theme.palette.text.primary
+    letterSpacing: '-1px'
   },
   icon: {
     display: 'flex',
     alignItems: 'center',
     padding: '0',
-    [theme.breakpoints.down('xs')]: {
-      display: 'none'
-    }
+    minWidth: theme.spacing(7)
+  },
+  title: {
+    color: 'inherit',
+    textDecoration: 'none'
   }
 }));
 
@@ -29,24 +30,27 @@ export default function AppTitle({ disabled = false, noTitle = false }) {
   const isXs = useMediaQuery(theme.breakpoints.only('xs'));
   const { layoutProps, getLogo, toggleDrawer } = useAppLayout();
 
-  const renderIcon = () => {
-    if (isXs) {
-      return (
-        <IconButton aria-label="open drawer" onClick={toggleDrawer} edge="start" color="inherit">
-          <MenuIcon />
-        </IconButton>
-      );
-    }
-    return <div className={classes.icon}>{getLogo(theme)}</div>;
-  };
-
-  //
   if (!disabled) {
-    return (
+    return isXs ? (
       <div className={classes.topBarTitle} style={{ paddingLeft: theme.spacing(2) }}>
-        {renderIcon()}
-        {!noTitle && <div style={{ marginLeft: theme.spacing(isXs ? 2 : 4) }}>{layoutProps.appName}</div>}
+        <div className={classes.icon}>
+          <IconButton aria-label="open drawer" edge="start" color="inherit" onClick={toggleDrawer}>
+            <MenuIcon />
+          </IconButton>
+        </div>
+        {!noTitle && (
+          <Link to="/" className={classes.title} onClick={toggleDrawer}>
+            {layoutProps.appName}
+          </Link>
+        )}
       </div>
+    ) : (
+      <Link to="/" className={classes.title} style={{ paddingLeft: theme.spacing(2) }}>
+        <div className={classes.topBarTitle}>
+          <div className={classes.icon}>{getLogo(theme)}</div>
+          {!noTitle && <div>{layoutProps.appName}</div>}
+        </div>
+      </Link>
     );
   }
   return null;
