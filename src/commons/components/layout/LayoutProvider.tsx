@@ -31,6 +31,9 @@ const useNewStyles = makeStyles(theme => ({
   },
   appVerticalRight: {
     overflow: 'auto',
+    '@media print': {
+      overflow: 'unset'
+    },
     [theme.breakpoints.up('md')]: {
       position: 'relative',
       display: 'flex',
@@ -57,6 +60,9 @@ const useNewStyles = makeStyles(theme => ({
   },
   appHorizontal: {
     overflow: 'auto',
+    '@media print': {
+      overflow: 'unset'
+    },
     height: '100%',
     display: 'flex',
     flexDirection: 'column'

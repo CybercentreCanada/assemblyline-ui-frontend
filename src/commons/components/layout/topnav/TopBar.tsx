@@ -16,6 +16,9 @@ const useStyles = makeStyles(theme => ({
     zIndex: theme.zIndex.drawer + 1
   },
   appBar: {
+    '@media print': {
+      display: 'none !important'
+    },
     [theme.breakpoints.only('xs')]: {
       zIndex: theme.zIndex.drawer - 1
     }
