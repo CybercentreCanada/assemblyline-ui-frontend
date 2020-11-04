@@ -515,7 +515,7 @@ export default function SubmissionReport() {
   }, []);
 
   return (
-    <PageCenter margin={4}>
+    <PageCenter ml={4} mr={4} width="100%">
       <div style={{ textAlign: 'left' }}>
         <div style={{ paddingBottom: sp4, paddingTop: sp2 }}>
           <Classification size="tiny" c12n={report ? report.classification : null} />

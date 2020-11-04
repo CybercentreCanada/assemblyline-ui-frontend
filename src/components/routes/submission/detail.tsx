@@ -182,7 +182,7 @@ export default function SubmissionDetail() {
   }, [fid]);
 
   return (
-    <PageCenter margin={4}>
+    <PageCenter ml={4} mr={4} width="100%">
       <ConfirmationDialog
         open={deleteDialog}
         handleClose={() => setDeleteDialog(false)}
