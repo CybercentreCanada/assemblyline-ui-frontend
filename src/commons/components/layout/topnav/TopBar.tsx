@@ -89,7 +89,12 @@ const TopBar: React.FC<AppBarProps> = ({ width }) => {
           style={{ paddingLeft: !isXs && !isTopLayout ? theme.spacing(2) : null, paddingRight: theme.spacing(1) }}
         >
           {renderLeft()}
-          {(isXs || !isSm || left || leftAfterBreadcrumbs) && <div style={{ flexGrow: 1 }} />}
+          {(isXs ||
+            left ||
+            leftAfterBreadcrumbs ||
+            (breadcrumbsEnabled && !isSm) ||
+            (!showQuickSearch && !breadcrumbsEnabled) ||
+            (!showQuickSearch && breadcrumbsEnabled && isSm)) && <div style={{ flexGrow: 1 }} />}
           {showQuickSearch && isWidthUp('sm', width) && <QuickSearch />}
           {layoutProps.topnav.themeSelectionUnder === 'icon' && <ThemeSelectionIcon />}
           {layoutProps.topnav.right}
