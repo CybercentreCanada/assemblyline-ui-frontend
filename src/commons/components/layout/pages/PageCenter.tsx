@@ -1,4 +1,4 @@
-import { makeStyles } from '@material-ui/core';
+import { makeStyles, useTheme } from '@material-ui/core';
 import React from 'react';
 
 const useStyles = (w, mxw) => {
@@ -17,14 +17,20 @@ const useStyles = (w, mxw) => {
 };
 
 type PageCenterProps = {
-  width?: string;
-  maxWidth?: string;
   children: React.ReactNode;
+  margin?: number;
+  maxWidth?: string;
+  width?: string;
 };
 
-const PageCenter: React.FC<PageCenterProps> = ({ width = '95%', maxWidth = '1200px', children }) => {
+const PageCenter: React.FC<PageCenterProps> = ({ children, margin = 2, maxWidth = '1200px', width = '95%' }) => {
   const classes = useStyles(width, maxWidth);
-  return <div className={classes.page}>{children}</div>;
+  const theme = useTheme();
+  return (
+    <div className={classes.page}>
+      <div style={{ margin: theme.spacing(margin) }}>{children}</div>
+    </div>
+  );
 };
 
 export default PageCenter;
