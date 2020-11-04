@@ -11,7 +11,7 @@ import {
 } from '@material-ui/core';
 import useAppBarHeight from 'commons/components/hooks/useAppBarHeight';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 
 export type PageHeaderAction = {
   key?: string;
@@ -42,28 +42,9 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   const theme = useTheme();
   const { currentLayout, autoHideAppbar } = useAppLayout();
   const appBarHeight = useAppBarHeight();
-  const [top, setTop] = useState<number>(-1);
-  const [initialTop, setInitialTop] = useState<number>();
   const containerEL = useRef<HTMLDivElement>();
-  //
-  useLayoutEffect(() => {
-    if (isSticky && initialTop !== undefined) {
-      let _top = initialTop;
-      if (currentLayout === 'top' || !autoHideAppbar) {
-        _top += appBarHeight;
-      }
-      // console.log(`updatetop: ${_top}`);
-      setTop(_top);
-    }
-  }, [initialTop, currentLayout, autoHideAppbar, appBarHeight]);
 
-  useLayoutEffect(() => {
-    if (isSticky && containerEL.current) {
-      const _initialTop = containerEL.current.offsetTop;
-      // console.log(`inittop: ${_initialTop}`);
-      setInitialTop(_initialTop);
-    }
-  }, [containerEL]);
+  const barWillHide = currentLayout !== 'top' && autoHideAppbar;
 
   return (
     <RootRef rootRef={containerEL}>
@@ -71,7 +52,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
         id="header1"
         position={isSticky ? 'sticky' : 'relative'}
         style={{
-          top: top > -1 ? top : null,
+          top: barWillHide ? 0 : appBarHeight,
           backgroundColor: backgroundColor || theme.palette.background.default,
           paddingTop: theme.spacing(0.5),
           zIndex: !isSticky ? theme.zIndex.appBar - 100 : null
