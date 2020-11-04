@@ -37,6 +37,9 @@ export const useStyles = makeStyles(theme => ({
       display: 'none !important'
     }
   },
+  drawerOver: {
+    overflowX: 'hidden'
+  },
   drawerOpen: {
     width: drawerWidth,
     transition: theme.transitions.create('width', {
@@ -149,7 +152,7 @@ const LeftNavDrawer: React.FC<LeftNavDrawerProps> = props => {
           [classes.drawerClose]: !drawerState
         })}
         classes={{
-          paper: clsx({
+          paper: clsx(classes.drawerOver, {
             [classes.drawerOpen]: drawerState,
             [classes.drawerClose]: !drawerState
           })
