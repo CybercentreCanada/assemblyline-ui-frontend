@@ -13,5 +13,7 @@
   "filtered": "submission(s) matching filter",
   "searching": "Searching...",
   "title": "Submissions",
-  "my_submission": "Show my submissions"
+  "my_submission": "Show my submissions",
+  "no_results_title": "No submissions found!",
+  "no_results_desc": "The query that you ran did not return any results."
 }

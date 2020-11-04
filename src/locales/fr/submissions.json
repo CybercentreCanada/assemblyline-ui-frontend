@@ -13,5 +13,7 @@
   "filtered": "soumission(s) correspondant au filtre",
   "searching": "Recherche en cours...",
   "title": "Soumissions",
-  "my_submission": "Voir mes soumissions"
+  "my_submission": "Voir mes soumissions",
+  "no_results_title": "Aucune soumission trouvée!",
+  "no_results_desc": "La requête que vous avez exécutée n'a renvoyé aucun résultat."
 }
