@@ -43,7 +43,6 @@ const PageHeader: React.FC<PageHeaderProps> = ({
       style={{
         top: isSticky ? (barWillHide ? 0 : appBarHeight) : null,
         backgroundColor: backgroundColor || theme.palette.background.default,
-        paddingTop: theme.spacing(0.5),
         zIndex: !isSticky ? theme.zIndex.appBar - 100 : null
       }}
       elevation={elevation}
