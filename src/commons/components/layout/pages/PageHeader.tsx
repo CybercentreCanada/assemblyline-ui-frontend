@@ -48,7 +48,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
       elevation={elevation}
       color="inherit"
     >
-      <Toolbar style={{ minHeight: 0 }} disableGutters>
+      <Toolbar style={{ minHeight: 0, display: 'block' }} disableGutters>
         <div style={{ flexGrow: 1 }}>{children}</div>
         <div>
           {actions &&
