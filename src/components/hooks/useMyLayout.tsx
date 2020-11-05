@@ -301,6 +301,7 @@ const useMyLayout = (): AppLayoutProps => {
       adminMenuTitle: t('adminmenu'),
       apps: APP_SWITCHER_ITEMS,
       quickSearchURI: '/search',
+      quickSearchParam: 'query',
       themeSelectionUnder: 'icon' as 'icon',
       userMenu: USER_MENU_ITEMS,
       userMenuTitle: t('usermenu')

@@ -30,15 +30,20 @@ export type SubmissionResult = {
   };
 };
 
-type SubmissionsTableProps = {
-  submissions: SubmissionResult[];
+type SearchResults = {
+  items: SubmissionResult[];
+  total: number;
 };
 
-const SubmissionsTable: React.FC<SubmissionsTableProps> = ({ submissions }) => {
+type SubmissionsTableProps = {
+  submissionResults: SearchResults;
+};
+
+const WrappedSubmissionsTable: React.FC<SubmissionsTableProps> = ({ submissionResults }) => {
   const { t, i18n } = useTranslation(['submissions']);
 
-  return submissions ? (
-    submissions.length !== 0 ? (
+  return submissionResults ? (
+    submissionResults.total !== 0 ? (
       <TableContainer component={Paper}>
         <DivTable>
           <DivTableHead>
@@ -53,7 +58,7 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({ submissions }) => {
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
-            {submissions.map(submission => (
+            {submissionResults.items.map(submission => (
               <LinkRow
                 key={submission.id}
                 component={Link}
@@ -106,4 +111,5 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({ submissions }) => {
   );
 };
 
+const SubmissionsTable = React.memo(WrappedSubmissionsTable);
 export default SubmissionsTable;

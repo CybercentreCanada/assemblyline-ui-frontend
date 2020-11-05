@@ -26,11 +26,15 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+type SearchResults = {
+  items: SubmissionResult[];
+  total: number;
+};
+
 export default function Submissions() {
   const { t } = useTranslation(['submissions']);
-  const [submissions, setSubmissions] = useState<SubmissionResult[]>(null);
   const [pageSize] = useState(PAGE_SIZE);
-  const [total, setTotal] = useState(null);
+  const [submissionResults, setSubmissionResults] = useState<SearchResults>(null);
   const [searching, setSearching] = useState(false);
   const { user: currentUser, indexes } = useAppContext();
   const history = useHistory();
@@ -57,6 +61,7 @@ export default function Submissions() {
   const onClear = () => {
     history.push('/submissions');
   };
+
   const onSearch = () => {
     if (filterValue.current !== '') {
       history.push(`/submissions?query=${filterValue.current}`);
@@ -64,6 +69,7 @@ export default function Submissions() {
       onClear();
     }
   };
+
   const onFilterValueChange = (inputValue: string) => {
     filterValue.current = inputValue;
   };
@@ -82,9 +88,7 @@ export default function Submissions() {
         url: '/api/v4/search/submission/',
         body: { query: '*', ...query.getParams(), rows: pageSize, offset: 0 },
         onSuccess: api_data => {
-          const { items, total: newTotal } = api_data.api_response;
-          setTotal(newTotal);
-          setSubmissions(items);
+          setSubmissionResults(api_data.api_response);
         },
         onFinalize: () => {
           setSearching(false);
@@ -124,27 +128,26 @@ export default function Submissions() {
               }
             ]}
           >
-            {submissions !== null && (
+            {submissionResults !== null && (
               <div className={classes.searchresult}>
-                {submissions.length !== 0 && (
+                {submissionResults.total !== 0 && (
                   <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
                     {searching ? (
                       <span>{t('searching')}</span>
                     ) : (
                       <span>
-                        {total}&nbsp;{query.getQuery() ? t('filtered') : t('total')}
+                        {submissionResults.total}&nbsp;{query.getQuery() ? t('filtered') : t('total')}
                       </span>
                     )}
                   </Typography>
                 )}
 
                 <SearchPager
-                  total={total}
-                  setTotal={setTotal}
+                  total={submissionResults.total}
+                  setResults={setSubmissionResults}
                   pageSize={PAGE_SIZE}
                   index="submission"
                   query={query}
-                  setData={setSubmissions}
                   setSearching={setSearching}
                 />
               </div>
@@ -153,7 +156,7 @@ export default function Submissions() {
         </div>
       </PageHeader>
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
-        <SubmissionsTable submissions={submissions} />
+        <SubmissionsTable submissionResults={submissionResults} />
       </div>
     </PageFullWidth>
   );

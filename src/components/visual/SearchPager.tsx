@@ -3,13 +3,17 @@ import SearchQuery from 'components/elements/search/search-query';
 import useMyAPI from 'components/hooks/useMyAPI';
 import React from 'react';
 
+type SearchResults = {
+  items: any[];
+  total: number;
+};
+
 export interface SearchPagerProps {
   total: number;
   pageSize: number;
   index: string;
   query: SearchQuery;
-  setData: (data: any) => void;
-  setTotal: (value: number) => void;
+  setResults: (data: SearchResults) => void;
   scrollToTop?: boolean;
   size?: 'small' | 'large' | null;
   setSearching?: (value: boolean) => void | null;
@@ -21,8 +25,7 @@ const WrappedSearchPager: React.FC<SearchPagerProps> = ({
   pageSize,
   index,
   query,
-  setData,
-  setTotal,
+  setResults,
   scrollToTop = true,
   size = 'small',
   setSearching = null,
@@ -42,11 +45,7 @@ const WrappedSearchPager: React.FC<SearchPagerProps> = ({
       url: `/api/v4/search/${index}/`,
       body,
       onSuccess: api_data => {
-        const { total: newTotal, items } = api_data.api_response;
-        if (total !== newTotal) {
-          setTotal(newTotal);
-        }
-        setData(items);
+        setResults(api_data.api_response);
         if (scrollToTop) {
           window.scrollTo(0, 0);
         }

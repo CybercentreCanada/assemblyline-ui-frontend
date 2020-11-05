@@ -1,1 +1,14 @@
-{}
+{
+  "title_all": "Search",
+  "title_alert": "Search Alerts",
+  "title_file": "Search Files",
+  "title_result": "Search Results",
+  "title_signature": "Search Signatures",
+  "title_submission": "Search Submissions",
+  "search_all": "Search all indexes...",
+  "search_alert": "Search alert index...",
+  "search_file": "Search file index...",
+  "search_result": "Search result index...",
+  "search_signature": "Search signature index...",
+  "search_submission": "Search submission index..."
+}
