@@ -1,4 +1,4 @@
-import { IconButton, makeStyles, useTheme } from '@material-ui/core';
+import { IconButton, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
 import useAppBarHeight from 'commons/components/hooks/useAppBarHeight';
@@ -47,6 +47,7 @@ const PageFullscreen: React.FC<PageFullscreenProps> = ({ children, margin = null
 
   const classes = useStyles();
   const theme = useTheme();
+  const divider = useMediaQuery(theme.breakpoints.up('md')) ? 1 : 2;
 
   const handleEnterFullscreen = () => {
     setIsFullscreen();
@@ -71,10 +72,10 @@ const PageFullscreen: React.FC<PageFullscreenProps> = ({ children, margin = null
       </div>
       <div
         style={{
-          marginBottom: theme.spacing(margin || mb),
-          marginLeft: theme.spacing(margin || ml),
-          marginRight: theme.spacing(margin || mr),
-          marginTop: theme.spacing(margin || mt)
+          marginBottom: theme.spacing(margin / divider || mb / divider),
+          marginLeft: theme.spacing(margin / divider || ml / divider),
+          marginRight: theme.spacing(margin / divider || mr / divider),
+          marginTop: theme.spacing(margin / divider || mt / divider)
         }}
       >
         {children}
