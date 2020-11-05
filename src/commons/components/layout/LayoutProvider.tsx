@@ -216,6 +216,7 @@ function AppLayoutProvider(props: LayoutProviderProps) {
   const [layout, setLayout] = useState<'top' | 'side'>(initialLayout);
   const theme = useTheme();
   const isSM = useMediaQuery(theme.breakpoints.only('sm'));
+  const isPrinting = useMediaQuery('print');
 
   const onToggleLayout = () => {
     const newLayout = layout === 'top' ? 'side' : 'top';
@@ -300,7 +301,7 @@ function AppLayoutProvider(props: LayoutProviderProps) {
             <div
               className={newClasses.appVerticalRight}
               id="app-scrollparent"
-              style={{ paddingLeft: showMenus && isSM ? theme.spacing(7) : 0 }}
+              style={{ paddingLeft: showMenus && isSM && !isPrinting ? theme.spacing(7) : 0 }}
             >
               {isUserReady() && appReady && showMenus && <TopBar />}
               <div className={newClasses.appVerticalRightContent}>{children}</div>
@@ -315,7 +316,7 @@ function AppLayoutProvider(props: LayoutProviderProps) {
               </div>
               <div
                 className={newClasses.appHorizontalBottomRight}
-                style={{ paddingLeft: showMenus && isSM ? theme.spacing(7) : 0 }}
+                style={{ paddingLeft: showMenus && isSM && !isPrinting ? theme.spacing(7) : 0 }}
               >
                 {children}
               </div>
