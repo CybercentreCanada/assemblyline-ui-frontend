@@ -95,7 +95,7 @@ export default function Submissions() {
   }, [query]);
 
   return (
-    <PageFullWidth margin={upMD ? 4 : 2}>
+    <PageFullWidth margin={4}>
       <div style={{ paddingBottom: theme.spacing(2) }}>
         <Typography variant="h4">{t('title')}</Typography>
       </div>

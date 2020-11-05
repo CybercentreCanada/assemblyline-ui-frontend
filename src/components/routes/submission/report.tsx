@@ -1,4 +1,14 @@
-import { Divider, Grid, Hidden, IconButton, makeStyles, Tooltip, Typography, useTheme } from '@material-ui/core';
+import {
+  Divider,
+  Grid,
+  Hidden,
+  IconButton,
+  makeStyles,
+  Tooltip,
+  Typography,
+  useMediaQuery,
+  useTheme
+} from '@material-ui/core';
 import BugReportOutlinedIcon from '@material-ui/icons/BugReportOutlined';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import ListAltOutlinedIcon from '@material-ui/icons/ListAltOutlined';
@@ -492,6 +502,7 @@ export default function SubmissionReport() {
   const sp4 = theme.spacing(4);
   const classes = useStyles();
   const { showErrorMessage, showWarningMessage } = useMySnackbar();
+  const isPrinting = useMediaQuery('print');
 
   useEffect(() => {
     apiCall({
@@ -515,7 +526,7 @@ export default function SubmissionReport() {
   }, []);
 
   return (
-    <PageCenter ml={4} mr={4} width="100%">
+    <PageCenter ml={isPrinting ? 2 : 4} mr={isPrinting ? 2 : 4} width="100%">
       <div style={{ textAlign: 'left' }}>
         <div style={{ paddingBottom: sp4, paddingTop: sp2 }}>
           <Classification size="tiny" c12n={report ? report.classification : null} />
