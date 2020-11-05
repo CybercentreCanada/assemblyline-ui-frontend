@@ -1,4 +1,4 @@
-import { CircularProgress, makeStyles, Tooltip, useTheme } from '@material-ui/core';
+import { makeStyles, Tooltip, useMediaQuery, useTheme } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 import PersonIcon from '@material-ui/icons/Person';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
@@ -39,6 +39,7 @@ export default function Submissions() {
   const theme = useTheme();
   const location = useLocation();
   const [query, setQuery] = useState<SearchQuery>(null);
+  const upMD = useMediaQuery(theme.breakpoints.up('md'));
   const [fields] = useState<ALField[]>(
     Object.keys(indexes.submission).map(name => {
       return { ...indexes.submission[name], name };
@@ -94,7 +95,7 @@ export default function Submissions() {
   }, [query]);
 
   return (
-    <PageFullWidth margin={4}>
+    <PageFullWidth margin={upMD ? 4 : 2}>
       <div style={{ paddingBottom: theme.spacing(2) }}>
         <Typography variant="h4">{t('title')}</Typography>
       </div>
@@ -112,7 +113,7 @@ export default function Submissions() {
               {
                 icon: (
                   <Tooltip title={t('my_submission')}>
-                    <PersonIcon />
+                    <PersonIcon fontSize={upMD ? 'default' : 'small'} />
                   </Tooltip>
                 ),
                 props: {
@@ -152,13 +153,7 @@ export default function Submissions() {
         </div>
       </PageHeader>
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
-        {submissions !== null ? (
-          <SubmissionsTable submissions={submissions} />
-        ) : (
-          <div style={{ width: '100%', textAlign: 'center' }}>
-            <CircularProgress />
-          </div>
-        )}
+        <SubmissionsTable submissions={submissions} />
       </div>
     </PageFullWidth>
   );
