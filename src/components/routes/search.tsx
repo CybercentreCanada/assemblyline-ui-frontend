@@ -122,7 +122,7 @@ function Search({ index }: SearchProps) {
   };
 
   useEffect(() => {
-    const currentIndex = index || id || 'submissions';
+    const currentIndex = index || id || 'submission';
     if (currentIndex !== tab) {
       setTab(currentIndex);
       setFields(
