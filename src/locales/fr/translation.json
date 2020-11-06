@@ -9,6 +9,7 @@
   "app.language": "Langue",
   "banner.alt": "Banière d'Assemblyline",
   "breadcrumb.404": "Non disponible",
+  "breadcrumb.alert.detail": "Détails d'alerte",
   "breadcrumb.file.detail": "Détails du Fichier",
   "breadcrumb.file.viewer": "Visualisateur de Fichier",
   "breadcrumb.submission.detail": "Détails",

@@ -67,7 +67,7 @@ const WrappedAlertsTable: React.FC<AlertsTableProps> = ({ alertResults }) => {
               <LinkRow
                 key={alert.id}
                 component={Link}
-                to={`/alert/${alert.id}`}
+                to={`/alerts/${alert.id}`}
                 hover
                 style={{ textDecoration: 'none' }}
               >
