@@ -1,19 +1,10 @@
 {
   "detail": "Détail",
   "filter": "Filtrer les soumissions...",
-  "header.classification": "Classification",
-  "header.description": "Description",
-  "header.numfiles": "# Fichiers",
-  "header.starttime": "Heure de début",
-  "header.status": "Status",
-  "header.user": "Utilisateur",
-  "header.verdict": "Verdicte",
   "report": "Rapport",
   "total": "soumission(s) au total",
   "filtered": "soumission(s) correspondant au filtre",
   "searching": "Recherche en cours...",
   "title": "Soumissions",
-  "my_submission": "Voir mes soumissions",
-  "no_results_title": "Aucune soumission trouvée!",
-  "no_results_desc": "La requête que vous avez exécutée n'a renvoyé aucun résultat."
+  "my_submission": "Voir mes soumissions"
 }

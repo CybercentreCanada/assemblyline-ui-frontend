@@ -1,4 +1,4 @@
-import { Paper, Tab, Tabs, Typography, useTheme } from '@material-ui/core';
+import { createStyles, makeStyles, Paper, Tab, Tabs, Theme, Typography, useTheme } from '@material-ui/core';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import SearchBar from 'components/elements/search/search-bar';
@@ -7,13 +7,38 @@ import useAppContext from 'components/hooks/useAppContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { ALField } from 'components/hooks/useMyUser';
 import SearchPager from 'components/visual/SearchPager';
-import SubmissionsTable, { SubmissionResult } from 'components/visual/SearchResult/submissions';
+import AlertsTable from 'components/visual/SearchResult/alerts';
+import SubmissionsTable from 'components/visual/SearchResult/submissions';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 
 const PAGE_SIZE = 25;
 const DEFAULT_SUGGESTION = ['OR', 'AND', 'NOT', 'TO', 'now', 'd', 'M', 'y', 'h', 'm'];
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    tweaked_tabs: {
+      minHeight: 'unset',
+      [theme.breakpoints.up('md')]: {
+        '& [role=tab]': {
+          padding: '8px 20px',
+          fontSize: '13px',
+          minHeight: 'unset',
+          minWidth: 'unset'
+        }
+      },
+      [theme.breakpoints.down('sm')]: {
+        minHeight: 'unset',
+        '& [role=tab]': {
+          fontSize: '12px',
+          minHeight: 'unset',
+          minWidth: 'unset'
+        }
+      }
+    }
+  })
+);
 
 type SearchProps = {
   index?: string | null;
@@ -24,7 +49,7 @@ type ParamProps = {
 };
 
 type SearchResults = {
-  items: SubmissionResult[];
+  items: any[];
   total: number;
 };
 
@@ -37,6 +62,7 @@ function Search({ index }: SearchProps) {
   const location = useLocation();
   const history = useHistory();
   const theme = useTheme();
+  const classes = useStyles();
   const apiCall = useMyAPI();
   const [query, setQuery] = useState<SearchQuery>(null);
   const [fields, setFields] = useState<ALField[]>(null);
@@ -46,6 +72,18 @@ function Search({ index }: SearchProps) {
 
   // Result lists
   const [submissionResults, setSubmissionResults] = useState<SearchResults>(null);
+  const [fileResults, setFileResults] = useState<SearchResults>(null);
+  const [resultResults, setResultResults] = useState<SearchResults>(null);
+  const [signatureResults, setSignatureResults] = useState<SearchResults>(null);
+  const [alertResults, setAlertResults] = useState<SearchResults>(null);
+
+  const stateMap = {
+    submission: setSubmissionResults,
+    file: setFileResults,
+    result: setResultResults,
+    signature: setSignatureResults,
+    alert: setAlertResults
+  };
 
   const queryValue = useRef<string>('');
 
@@ -100,14 +138,20 @@ function Search({ index }: SearchProps) {
     if (query) {
       queryValue.current = query.getQuery() || '';
       if (query.getQuery()) {
-        if (usedIndex === 'submission' || usedIndex === 'all') {
-          if (!searching && usedIndex !== 'all') setSearching(true);
+        const searchList = [];
+        if (usedIndex === 'all') {
+          searchList.push(...Object.keys(stateMap));
+        } else {
+          searchList.push(usedIndex);
+          if (!searching) setSearching(true);
+        }
+        for (const searchIndex of searchList) {
           apiCall({
             method: 'POST',
-            url: '/api/v4/search/submission/',
+            url: `/api/v4/search/${searchIndex}/`,
             body: { ...query.getParams(), rows: pageSize, offset: 0 },
             onSuccess: api_data => {
-              setSubmissionResults(api_data.api_response);
+              stateMap[searchIndex](api_data.api_response);
             },
             onFinalize: () => {
               if (usedIndex !== 'all') {
@@ -136,27 +180,12 @@ function Search({ index }: SearchProps) {
             onValueChange={onFilterValueChange}
             onClear={onClear}
             onSearch={onSearch}
-            buttons={
-              [
-                // {
-                //   icon: (
-                //     <Tooltip title={t('my_submission')}>
-                //       <PersonIcon fontSize={upMD ? 'default' : 'small'} />
-                //     </Tooltip>
-                //   ),
-                //   props: {
-                //     onClick: () => {
-                //       history.push(`/submissions?query=params.submitter:"${currentUser.username}"`);
-                //     }
-                //   }
-                // }
-              ]
-            }
           />
 
           {usedIndex === 'all' && query && query.getQuery() !== '' && (
             <Paper square style={{ marginBottom: theme.spacing(0.5) }}>
               <Tabs
+                className={classes.tweaked_tabs}
                 value={tab}
                 onChange={handleChangeTab}
                 indicatorColor="primary"
@@ -164,35 +193,59 @@ function Search({ index }: SearchProps) {
                 scrollButtons="auto"
                 variant="scrollable"
               >
-                <Tab label={t('submission')} value="submission" />
-                <Tab label={t('file')} value="file" />
-                <Tab label={t('result')} value="result" />
-                <Tab label={t('signature')} value="signature" />
-                <Tab label={t('alert')} value="alert" />
+                <Tab
+                  label={`${t('submission')} (${submissionResults ? submissionResults.total : '...'})`}
+                  value="submission"
+                />
+                <Tab label={`${t('file')} (${fileResults ? fileResults.total : '...'})`} value="file" />
+                <Tab label={`${t('result')} (${resultResults ? resultResults.total : '...'})`} value="result" />
+                <Tab
+                  label={`${t('signature')} (${signatureResults ? signatureResults.total : '...'})`}
+                  value="signature"
+                />
+                <Tab label={`${t('alert')} (${alertResults ? alertResults.total : '...'})`} value="alert" />
               </Tabs>
             </Paper>
           )}
-          {tab === 'submission' && submissionResults && (
-            <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', marginBottom: theme.spacing(0.5) }}>
-              <div style={{ flexGrow: 1 }} />
-              <div>
-                <SearchPager
-                  total={submissionResults.total}
-                  setResults={setSubmissionResults}
-                  pageSize={PAGE_SIZE}
-                  index="submission"
-                  query={query}
-                  setSearching={setSearching}
-                />
-              </div>
-            </div>
-          )}
+          <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', marginBottom: theme.spacing(0.5) }}>
+            <div style={{ flexGrow: 1 }} />
+            {tab === 'submission' && submissionResults && (
+              <SearchPager
+                total={submissionResults.total}
+                setResults={setSubmissionResults}
+                pageSize={PAGE_SIZE}
+                index="submission"
+                query={query}
+                setSearching={setSearching}
+              />
+            )}
+            {tab === 'alert' && alertResults && (
+              <SearchPager
+                total={alertResults.total}
+                setResults={setAlertResults}
+                pageSize={PAGE_SIZE}
+                index="alert"
+                query={query}
+                setSearching={setSearching}
+              />
+            )}
+          </div>
         </div>
       </PageHeader>
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         {tab === 'submission' && query && query.getQuery() !== '' && (
           <SubmissionsTable submissionResults={submissionResults} />
         )}
+        {tab === 'file' && query && query.getQuery() !== '' && (
+          <SubmissionsTable submissionResults={submissionResults} />
+        )}
+        {tab === 'result' && query && query.getQuery() !== '' && (
+          <SubmissionsTable submissionResults={submissionResults} />
+        )}
+        {tab === 'signature' && query && query.getQuery() !== '' && (
+          <SubmissionsTable submissionResults={submissionResults} />
+        )}
+        {tab === 'alert' && query && query.getQuery() !== '' && <AlertsTable alertResults={alertResults} />}
       </div>
     </PageCenter>
   );

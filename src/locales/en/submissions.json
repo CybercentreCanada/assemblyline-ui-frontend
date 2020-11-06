@@ -1,19 +1,10 @@
 {
   "detail": "Detail",
   "filter": "Filter submissions...",
-  "header.classification": "Classification",
-  "header.description": "Description",
-  "header.numfiles": "# Files",
-  "header.starttime": "Start Time",
-  "header.status": "Status",
-  "header.user": "User",
-  "header.verdict": "Verdict",
   "report": "Report",
   "total": "total submission(s)",
   "filtered": "submission(s) matching filter",
   "searching": "Searching...",
   "title": "Submissions",
-  "my_submission": "Show my submissions",
-  "no_results_title": "No submissions found!",
-  "no_results_desc": "The query that you ran did not return any results."
+  "my_submission": "Show my submissions"
 }

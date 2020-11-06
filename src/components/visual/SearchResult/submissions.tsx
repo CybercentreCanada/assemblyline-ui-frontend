@@ -40,7 +40,7 @@ type SubmissionsTableProps = {
 };
 
 const WrappedSubmissionsTable: React.FC<SubmissionsTableProps> = ({ submissionResults }) => {
-  const { t, i18n } = useTranslation(['submissions']);
+  const { t, i18n } = useTranslation(['search']);
 
   return submissionResults ? (
     submissionResults.total !== 0 ? (
@@ -101,7 +101,7 @@ const WrappedSubmissionsTable: React.FC<SubmissionsTableProps> = ({ submissionRe
     ) : (
       <div style={{ width: '100%' }}>
         <InformativeAlert>
-          <AlertTitle>{t('no_results_title')}</AlertTitle>
+          <AlertTitle>{t('no_submissions_title')}</AlertTitle>
           {t('no_results_desc')}
         </InformativeAlert>
       </div>
