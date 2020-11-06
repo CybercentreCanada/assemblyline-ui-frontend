@@ -56,7 +56,9 @@ const useNewStyles = makeStyles(theme => ({
     [theme.breakpoints.up('md')]: {
       flexGrow: 1
     },
-    [theme.breakpoints.down('sm')]: {}
+    [theme.breakpoints.down('sm')]: {
+      height: '100%'
+    }
   },
   appHorizontal: {
     overflow: 'auto',
@@ -72,6 +74,9 @@ const useNewStyles = makeStyles(theme => ({
       flexGrow: 1,
       display: 'flex',
       flexDirection: 'row'
+    },
+    [theme.breakpoints.down('sm')]: {
+      height: '100%'
     }
   },
   appHorizontalBottomLeft: {
@@ -89,6 +94,9 @@ const useNewStyles = makeStyles(theme => ({
     flexDirection: 'column',
     [theme.breakpoints.up('md')]: {
       flexGrow: 1
+    },
+    [theme.breakpoints.down('sm')]: {
+      height: '100%'
     }
   }
 }));
