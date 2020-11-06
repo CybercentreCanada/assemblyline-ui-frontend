@@ -123,12 +123,15 @@ function Search({ index }: SearchProps) {
 
   useEffect(() => {
     const currentIndex = index || id || 'submissions';
-    if (currentIndex !== tab) setTab(currentIndex);
-    setFields(
-      Object.keys(indexes[index || id] || {}).map(name => {
-        return { ...indexes[index || id][name], name };
-      })
-    );
+    if (currentIndex !== tab) {
+      setTab(currentIndex);
+      setFields(
+        Object.keys(indexes[index || id] || {}).map(name => {
+          return { ...indexes[index || id][name], name };
+        })
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [index, id, indexes]);
 
   useEffect(() => {
