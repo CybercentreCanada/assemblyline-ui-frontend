@@ -21,7 +21,12 @@
   "header.user": "User",
   "header.verdict": "Verdict",
   "header.classification": "Classification",
+  "header.source": "Source",
+  "header.id": "ID",
+  "header.name": "Name",
+  "header.rev": "Revision",
   "no_alerts_title": "No alerts found!",
   "no_results_desc": "The query that you ran did not return any results.",
-  "no_submissions_title": "No submissions found!"
+  "no_submissions_title": "No submissions found!",
+  "no_signatures_title": "No signatures found!"
 }

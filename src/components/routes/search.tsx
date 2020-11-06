@@ -8,6 +8,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import { ALField } from 'components/hooks/useMyUser';
 import SearchPager from 'components/visual/SearchPager';
 import AlertsTable from 'components/visual/SearchResult/alerts';
+import SignaturesTable from 'components/visual/SearchResult/signatures';
 import SubmissionsTable from 'components/visual/SearchResult/submissions';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -219,6 +220,16 @@ function Search({ index }: SearchProps) {
                 setSearching={setSearching}
               />
             )}
+            {tab === 'signature' && signatureResults && (
+              <SearchPager
+                total={signatureResults.total}
+                setResults={setSignatureResults}
+                pageSize={PAGE_SIZE}
+                index="signature"
+                query={query}
+                setSearching={setSearching}
+              />
+            )}
             {tab === 'alert' && alertResults && (
               <SearchPager
                 total={alertResults.total}
@@ -243,7 +254,7 @@ function Search({ index }: SearchProps) {
           <SubmissionsTable submissionResults={submissionResults} />
         )}
         {tab === 'signature' && query && query.getQuery() !== '' && (
-          <SubmissionsTable submissionResults={submissionResults} />
+          <SignaturesTable signatureResults={signatureResults} />
         )}
         {tab === 'alert' && query && query.getQuery() !== '' && <AlertsTable alertResults={alertResults} />}
       </div>
