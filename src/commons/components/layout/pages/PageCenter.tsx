@@ -9,7 +9,6 @@ const useStyles = (w, mxw) => {
       width: w,
       maxWidth: mxw,
       [theme.breakpoints.down('xs')]: {
-        width: 'auto',
         maxWidth: '100%'
       }
     }
