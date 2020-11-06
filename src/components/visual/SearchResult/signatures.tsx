@@ -59,7 +59,7 @@ const WrappedSignaturesTable: React.FC<SignaturesTableProps> = ({ signatureResul
               >
                 <DivTableCell>{signature.type}</DivTableCell>
                 <DivTableCell>{signature.source}</DivTableCell>
-                <DivTableCell>{signature.id}</DivTableCell>
+                <DivTableCell>{signature.signature_id}</DivTableCell>
                 <DivTableCell>{signature.name}</DivTableCell>
                 <DivTableCell>{signature.revision}</DivTableCell>
                 <DivTableCell>

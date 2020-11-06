@@ -12,80 +12,68 @@ import { Link } from 'react-router-dom';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from '../DivTable';
 import InformativeAlert from '../InformativeAlert';
 
-export type AlertResult = {
-  al: {
-    av: string[];
+export type ResultResult = {
+  classification: string;
+  created: number;
+  drop_file: boolean;
+  id: string;
+  response: {
+    service_name: string;
+    service_tool_version: string;
+  };
+  result: {
     score: number;
   };
-  alert_id: string;
-  classification: string;
-  file: {
-    md5: string;
-    sha1: string;
-    sha256: string;
-    type: string;
-  };
-  filtered: boolean;
-  id: string;
-  label: string[];
-  owner: string;
-  priority: string;
-  reporting_ts: string;
-  status: string;
-  ts: string;
-  type: string;
 };
 
 type SearchResults = {
-  items: AlertResult[];
+  items: ResultResult[];
   total: number;
 };
 
-type AlertsTableProps = {
-  alertResults: SearchResults;
+type ResultsTableProps = {
+  resultResults: SearchResults;
 };
 
-const WrappedAlertsTable: React.FC<AlertsTableProps> = ({ alertResults }) => {
+const WrappedResultsTable: React.FC<ResultsTableProps> = ({ resultResults }) => {
   const { t, i18n } = useTranslation(['search']);
 
-  return alertResults ? (
-    alertResults.total !== 0 ? (
+  return resultResults ? (
+    resultResults.total !== 0 ? (
       <TableContainer component={Paper}>
         <DivTable>
           <DivTableHead>
             <DivTableRow>
-              <DivTableCell>{t('header.reporting_ts')}</DivTableCell>
+              <DivTableCell>{t('header.created')}</DivTableCell>
               <DivTableCell>{t('header.verdict')}</DivTableCell>
               <DivTableCell>{t('header.sha256')}</DivTableCell>
-              <DivTableCell>{t('header.status')}</DivTableCell>
-              <DivTableCell>{t('header.type')}</DivTableCell>
+              <DivTableCell>{t('header.service')}</DivTableCell>
               <DivTableCell>{t('header.classification')}</DivTableCell>
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
-            {alertResults.items.map(alert => (
+            {resultResults.items.map(result => (
               <LinkRow
-                key={alert.id}
+                key={result.id}
                 component={Link}
-                to={`/alert/${alert.id}`}
+                to={`/file/detail/${result.id.substring(0, 64)}`}
                 hover
                 style={{ textDecoration: 'none' }}
               >
                 <DivTableCell>
-                  <Tooltip title={alert.reporting_ts}>
+                  <Tooltip title={result.created}>
                     <Moment fromNow locale={i18n.language}>
-                      {alert.reporting_ts}
+                      {result.created}
                     </Moment>
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell>
-                  <Verdict score={alert.al.score} />
+                  <Verdict score={result.result.score} />
                 </DivTableCell>
-                <DivTableCell style={{ wordBreak: 'break-word' }}>{alert.file.sha256}</DivTableCell>
-                <DivTableCell>{alert.status}</DivTableCell>
-                <DivTableCell>{alert.type}</DivTableCell>
+                <DivTableCell style={{ wordBreak: 'break-word' }}>{result.id.substring(0, 64)}</DivTableCell>
+                <DivTableCell>{result.response.service_name}</DivTableCell>
                 <DivTableCell>
-                  <Classification type="text" size="tiny" c12n={alert.classification} format="short" />
+                  <Classification type="text" size="tiny" c12n={result.classification} format="short" />
                 </DivTableCell>
               </LinkRow>
             ))}
@@ -95,7 +83,7 @@ const WrappedAlertsTable: React.FC<AlertsTableProps> = ({ alertResults }) => {
     ) : (
       <div style={{ width: '100%' }}>
         <InformativeAlert>
-          <AlertTitle>{t('no_alerts_title')}</AlertTitle>
+          <AlertTitle>{t('no_results_title')}</AlertTitle>
           {t('no_results_desc')}
         </InformativeAlert>
       </div>
@@ -105,5 +93,5 @@ const WrappedAlertsTable: React.FC<AlertsTableProps> = ({ alertResults }) => {
   );
 };
 
-const AlertsTable = React.memo(WrappedAlertsTable);
-export default AlertsTable;
+const ResultsTable = React.memo(WrappedResultsTable);
+export default ResultsTable;

@@ -8,6 +8,8 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import { ALField } from 'components/hooks/useMyUser';
 import SearchPager from 'components/visual/SearchPager';
 import AlertsTable from 'components/visual/SearchResult/alerts';
+import FilesTable from 'components/visual/SearchResult/files';
+import ResultsTable from 'components/visual/SearchResult/results';
 import SignaturesTable from 'components/visual/SearchResult/signatures';
 import SubmissionsTable from 'components/visual/SearchResult/submissions';
 import React, { useEffect, useRef, useState } from 'react';
@@ -68,8 +70,7 @@ function Search({ index }: SearchProps) {
   const [query, setQuery] = useState<SearchQuery>(null);
   const [fields, setFields] = useState<ALField[]>(null);
   const [searchSuggestion, setSearchSuggestion] = useState<string[]>(null);
-  const usedIndex = index || id || 'all';
-  const [tab, setTab] = useState(usedIndex !== 'all' ? usedIndex : 'submission');
+  const [tab, setTab] = useState(index || id || 'submission');
 
   // Result lists
   const [submissionResults, setSubmissionResults] = useState<SearchResults>(null);
@@ -84,6 +85,14 @@ function Search({ index }: SearchProps) {
     result: setResultResults,
     signature: setSignatureResults,
     alert: setAlertResults
+  };
+
+  const resMap = {
+    submission: submissionResults,
+    file: fileResults,
+    result: resultResults,
+    signature: signatureResults,
+    alert: alertResults
   };
 
   const queryValue = useRef<string>('');
@@ -113,6 +122,8 @@ function Search({ index }: SearchProps) {
   };
 
   useEffect(() => {
+    const currentIndex = index || id || 'submissions';
+    if (currentIndex !== tab) setTab(currentIndex);
     setFields(
       Object.keys(indexes[index || id] || {}).map(name => {
         return { ...indexes[index || id][name], name };
@@ -140,10 +151,10 @@ function Search({ index }: SearchProps) {
       queryValue.current = query.getQuery() || '';
       if (query.getQuery()) {
         const searchList = [];
-        if (usedIndex === 'all') {
+        if (!(index || id)) {
           searchList.push(...Object.keys(stateMap));
         } else {
-          searchList.push(usedIndex);
+          searchList.push(tab);
           if (!searching) setSearching(true);
         }
         for (const searchIndex of searchList) {
@@ -155,7 +166,7 @@ function Search({ index }: SearchProps) {
               stateMap[searchIndex](api_data.api_response);
             },
             onFinalize: () => {
-              if (usedIndex !== 'all') {
+              if (index || id) {
                 setSearching(false);
               }
             }
@@ -169,21 +180,21 @@ function Search({ index }: SearchProps) {
   return (
     <PageCenter margin={4} width="100%">
       <div style={{ paddingBottom: theme.spacing(2), textAlign: 'left', width: '100%' }}>
-        <Typography variant="h4">{t(`title_${usedIndex}`)}</Typography>
+        <Typography variant="h4">{t(`title_${index || id || 'all'}`)}</Typography>
       </div>
       <PageHeader isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchBar
             initValue={query ? query.getQuery() : ''}
             searching={searching}
-            placeholder={t(`search_${usedIndex}`)}
+            placeholder={t(`search_${index || id || 'all'}`)}
             suggestions={searchSuggestion}
             onValueChange={onFilterValueChange}
             onClear={onClear}
             onSearch={onSearch}
           />
 
-          {usedIndex === 'all' && query && query.getQuery() !== '' && (
+          {!(index || id) && query && query.getQuery() !== '' && (
             <Paper square style={{ marginBottom: theme.spacing(0.5) }}>
               <Tabs
                 className={classes.tweaked_tabs}
@@ -210,32 +221,12 @@ function Search({ index }: SearchProps) {
           )}
           <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', marginBottom: theme.spacing(0.5) }}>
             <div style={{ flexGrow: 1 }} />
-            {tab === 'submission' && submissionResults && (
+            {resMap[tab] && (
               <SearchPager
-                total={submissionResults.total}
-                setResults={setSubmissionResults}
+                total={resMap[tab].total}
+                setResults={stateMap[tab]}
                 pageSize={PAGE_SIZE}
-                index="submission"
-                query={query}
-                setSearching={setSearching}
-              />
-            )}
-            {tab === 'signature' && signatureResults && (
-              <SearchPager
-                total={signatureResults.total}
-                setResults={setSignatureResults}
-                pageSize={PAGE_SIZE}
-                index="signature"
-                query={query}
-                setSearching={setSearching}
-              />
-            )}
-            {tab === 'alert' && alertResults && (
-              <SearchPager
-                total={alertResults.total}
-                setResults={setAlertResults}
-                pageSize={PAGE_SIZE}
-                index="alert"
+                index={tab}
                 query={query}
                 setSearching={setSearching}
               />
@@ -247,12 +238,8 @@ function Search({ index }: SearchProps) {
         {tab === 'submission' && query && query.getQuery() !== '' && (
           <SubmissionsTable submissionResults={submissionResults} />
         )}
-        {tab === 'file' && query && query.getQuery() !== '' && (
-          <SubmissionsTable submissionResults={submissionResults} />
-        )}
-        {tab === 'result' && query && query.getQuery() !== '' && (
-          <SubmissionsTable submissionResults={submissionResults} />
-        )}
+        {tab === 'file' && query && query.getQuery() !== '' && <FilesTable fileResults={fileResults} />}
+        {tab === 'result' && query && query.getQuery() !== '' && <ResultsTable resultResults={resultResults} />}
         {tab === 'signature' && query && query.getQuery() !== '' && (
           <SignaturesTable signatureResults={signatureResults} />
         )}

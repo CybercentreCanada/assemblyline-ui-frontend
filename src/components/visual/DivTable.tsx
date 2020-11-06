@@ -12,9 +12,6 @@ const StyledTableCell = withStyles((theme: Theme) =>
     head: {
       backgroundColor: theme.palette.type === 'dark' ? '#404040' : '#EEE',
       whiteSpace: 'nowrap'
-    },
-    body: {
-      wordBreak: 'break-word'
     }
   })
 )(TableCell);

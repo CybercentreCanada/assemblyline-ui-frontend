@@ -3,7 +3,6 @@ import Paper from '@material-ui/core/Paper';
 import TableContainer from '@material-ui/core/TableContainer';
 import { AlertTitle, Skeleton } from '@material-ui/lab';
 import Classification from 'components/visual/Classification';
-import Verdict from 'components/visual/Verdict';
 import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,80 +11,70 @@ import { Link } from 'react-router-dom';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from '../DivTable';
 import InformativeAlert from '../InformativeAlert';
 
-export type AlertResult = {
-  al: {
-    av: string[];
-    score: number;
-  };
-  alert_id: string;
+export type FileResult = {
   classification: string;
-  file: {
-    md5: string;
-    sha1: string;
-    sha256: string;
-    type: string;
-  };
-  filtered: boolean;
+  entropy: number;
   id: string;
-  label: string[];
-  owner: string;
-  priority: string;
-  reporting_ts: string;
-  status: string;
-  ts: string;
+  md5: string;
+  seen: {
+    count: number;
+    first: string;
+    last: string;
+  };
+  sha1: string;
+  sha256: string;
+  size: number;
   type: string;
 };
 
 type SearchResults = {
-  items: AlertResult[];
+  items: FileResult[];
   total: number;
 };
 
-type AlertsTableProps = {
-  alertResults: SearchResults;
+type FilesTableProps = {
+  fileResults: SearchResults;
 };
 
-const WrappedAlertsTable: React.FC<AlertsTableProps> = ({ alertResults }) => {
+const WrappedFilesTable: React.FC<FilesTableProps> = ({ fileResults }) => {
   const { t, i18n } = useTranslation(['search']);
 
-  return alertResults ? (
-    alertResults.total !== 0 ? (
+  return fileResults ? (
+    fileResults.total !== 0 ? (
       <TableContainer component={Paper}>
         <DivTable>
           <DivTableHead>
             <DivTableRow>
-              <DivTableCell>{t('header.reporting_ts')}</DivTableCell>
-              <DivTableCell>{t('header.verdict')}</DivTableCell>
+              <DivTableCell>{t('header.lasttimeseen')}</DivTableCell>
+              <DivTableCell>{t('header.count')}</DivTableCell>
               <DivTableCell>{t('header.sha256')}</DivTableCell>
-              <DivTableCell>{t('header.status')}</DivTableCell>
-              <DivTableCell>{t('header.type')}</DivTableCell>
+              <DivTableCell>{t('header.filetype')}</DivTableCell>
+              <DivTableCell>{t('header.size')}</DivTableCell>
               <DivTableCell>{t('header.classification')}</DivTableCell>
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
-            {alertResults.items.map(alert => (
+            {fileResults.items.map(file => (
               <LinkRow
-                key={alert.id}
+                key={file.id}
                 component={Link}
-                to={`/alert/${alert.id}`}
+                to={`/file/detail/${file.sha256}`}
                 hover
                 style={{ textDecoration: 'none' }}
               >
                 <DivTableCell>
-                  <Tooltip title={alert.reporting_ts}>
+                  <Tooltip title={file.seen.last}>
                     <Moment fromNow locale={i18n.language}>
-                      {alert.reporting_ts}
+                      {file.seen.last}
                     </Moment>
                   </Tooltip>
                 </DivTableCell>
+                <DivTableCell>{file.seen.count}</DivTableCell>
+                <DivTableCell style={{ wordBreak: 'break-word' }}>{file.sha256}</DivTableCell>
+                <DivTableCell>{file.type}</DivTableCell>
+                <DivTableCell>{file.size}</DivTableCell>
                 <DivTableCell>
-                  <Verdict score={alert.al.score} />
-                </DivTableCell>
-                <DivTableCell style={{ wordBreak: 'break-word' }}>{alert.file.sha256}</DivTableCell>
-                <DivTableCell>{alert.status}</DivTableCell>
-                <DivTableCell>{alert.type}</DivTableCell>
-                <DivTableCell>
-                  <Classification type="text" size="tiny" c12n={alert.classification} format="short" />
+                  <Classification type="text" size="tiny" c12n={file.classification} format="short" />
                 </DivTableCell>
               </LinkRow>
             ))}
@@ -95,7 +84,7 @@ const WrappedAlertsTable: React.FC<AlertsTableProps> = ({ alertResults }) => {
     ) : (
       <div style={{ width: '100%' }}>
         <InformativeAlert>
-          <AlertTitle>{t('no_alerts_title')}</AlertTitle>
+          <AlertTitle>{t('no_files_title')}</AlertTitle>
           {t('no_results_desc')}
         </InformativeAlert>
       </div>
@@ -105,5 +94,5 @@ const WrappedAlertsTable: React.FC<AlertsTableProps> = ({ alertResults }) => {
   );
 };
 
-const AlertsTable = React.memo(WrappedAlertsTable);
-export default AlertsTable;
+const FilesTable = React.memo(WrappedFilesTable);
+export default FilesTable;
