@@ -1,5 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { AppBar, Button, ButtonProps, IconButton, IconButtonProps, Toolbar, useTheme } from '@material-ui/core';
+import {
+  AppBar,
+  Button,
+  ButtonProps,
+  IconButton,
+  IconButtonProps,
+  Toolbar,
+  Tooltip,
+  useTheme
+} from '@material-ui/core';
 import useAppBarHeight from 'commons/components/hooks/useAppBarHeight';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import React from 'react';
@@ -7,6 +16,7 @@ import React from 'react';
 export type PageHeaderAction = {
   key?: string;
   title?: string;
+  tooltip?: string;
   icon?: React.ReactNode;
   color?: 'primary' | 'secondary';
   action?: () => void;
@@ -57,10 +67,11 @@ const PageHeader: React.FC<PageHeaderProps> = ({
           <div>
             {actions &&
               actions.map((a, i) => {
+                let act = null;
                 if (a.title) {
-                  return (
+                  act = (
                     <Button
-                      key={a.key ? a.key : `ph-action-${i}`}
+                      key={a.tooltip ? null : a.key ? a.key : `ph-action-${i}`}
                       startIcon={a.icon}
                       color={a.color}
                       onClick={a.action}
@@ -70,17 +81,25 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                       {a.title}
                     </Button>
                   );
+                } else {
+                  act = (
+                    <IconButton
+                      key={a.tooltip ? null : a.key ? a.key : `ph-action-${i}`}
+                      color={a.color}
+                      onClick={a.action}
+                      {...(a.btnProp as IconButtonProps)}
+                      style={{ marginRight: theme.spacing(1) }}
+                    >
+                      {a.icon}
+                    </IconButton>
+                  );
                 }
-                return (
-                  <IconButton
-                    key={a.key ? a.key : `ph-action-${i}`}
-                    color={a.color}
-                    onClick={a.action}
-                    {...(a.btnProp as IconButtonProps)}
-                    style={{ marginRight: theme.spacing(1) }}
-                  >
-                    {a.icon}
-                  </IconButton>
+                return a.tooltip ? (
+                  <Tooltip key={a.key ? a.key : `ph-action-${i}`} title={a.tooltip}>
+                    {act}
+                  </Tooltip>
+                ) : (
+                  act
                 );
               })}
           </div>
