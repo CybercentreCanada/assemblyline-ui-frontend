@@ -15,6 +15,7 @@ export type PageHeaderAction = {
 
 type PageHeaderProps = {
   children?: React.ReactNode;
+  left?: React.ReactNode;
   right?: React.ReactNode;
   actions?: PageHeaderAction[];
   isSticky?: boolean;
@@ -24,6 +25,7 @@ type PageHeaderProps = {
 
 const PageHeader: React.FC<PageHeaderProps> = ({
   children,
+  left,
   right,
   actions,
   isSticky = false,
@@ -48,40 +50,43 @@ const PageHeader: React.FC<PageHeaderProps> = ({
       elevation={elevation}
       color="inherit"
     >
-      <Toolbar style={{ minHeight: 0, display: 'block' }} disableGutters>
-        <div style={{ flexGrow: 1 }}>{children}</div>
-        <div>
-          {actions &&
-            actions.map((a, i) => {
-              if (a.title) {
+      {children}
+      {(left || right || actions) && (
+        <Toolbar style={{ minHeight: 0 }} disableGutters>
+          <div style={{ flexGrow: 1 }}>{left}</div>
+          <div>
+            {actions &&
+              actions.map((a, i) => {
+                if (a.title) {
+                  return (
+                    <Button
+                      key={a.key ? a.key : `ph-action-${i}`}
+                      startIcon={a.icon}
+                      color={a.color}
+                      onClick={a.action}
+                      {...(a.btnProp as ButtonProps)}
+                      style={{ marginRight: theme.spacing(1) }}
+                    >
+                      {a.title}
+                    </Button>
+                  );
+                }
                 return (
-                  <Button
+                  <IconButton
                     key={a.key ? a.key : `ph-action-${i}`}
-                    startIcon={a.icon}
                     color={a.color}
                     onClick={a.action}
-                    {...(a.btnProp as ButtonProps)}
+                    {...(a.btnProp as IconButtonProps)}
                     style={{ marginRight: theme.spacing(1) }}
                   >
-                    {a.title}
-                  </Button>
+                    {a.icon}
+                  </IconButton>
                 );
-              }
-              return (
-                <IconButton
-                  key={a.key ? a.key : `ph-action-${i}`}
-                  color={a.color}
-                  onClick={a.action}
-                  {...(a.btnProp as IconButtonProps)}
-                  style={{ marginRight: theme.spacing(1) }}
-                >
-                  {a.icon}
-                </IconButton>
-              );
-            })}
-        </div>
-        <div>{right}</div>
-      </Toolbar>
+              })}
+          </div>
+          <div>{right}</div>
+        </Toolbar>
+      )}
     </AppBar>
   );
 };
