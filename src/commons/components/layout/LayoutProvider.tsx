@@ -8,20 +8,13 @@ import React, { useState } from 'react';
 
 const useNewStyles = makeStyles(theme => ({
   appVertical: {
-    [theme.breakpoints.up('md')]: {
-      height: '100%',
-      display: 'flex',
-      flexDirection: 'row'
-    },
-    [theme.breakpoints.down('sm')]: {
-      position: 'relative',
-      height: '100%'
-    }
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'row',
+    position: 'relative'
   },
   appVerticalLeft: {
-    [theme.breakpoints.up('md')]: {
-      height: '100%'
-    },
+    height: '100%',
     [theme.breakpoints.down('sm')]: {
       position: 'absolute',
       top: 0,
@@ -30,74 +23,28 @@ const useNewStyles = makeStyles(theme => ({
     }
   },
   appVerticalRight: {
-    overflow: 'auto',
     '@media print': {
       overflow: 'unset'
     },
-    [theme.breakpoints.up('md')]: {
-      position: 'relative',
-      display: 'flex',
-      flexDirection: 'column',
-      flex: 1,
-      height: '100%'
-    },
-    [theme.breakpoints.down('sm')]: {
-      position: 'absolute',
-      top: 0,
-      right: 0,
-      bottom: 0,
-      left: 0
-    }
+    display: 'flex',
+    flexDirection: 'column',
+    position: 'relative',
+    flex: 1,
+    height: '100%'
   },
   appVerticalRightContent: {
     height: 'auto',
     display: 'flex',
     flexDirection: 'column',
-    [theme.breakpoints.up('md')]: {
-      flexGrow: 1
-    },
-    [theme.breakpoints.down('sm')]: {
-      height: '100%'
-    }
+    flexGrow: 1
   },
   appHorizontal: {
-    overflow: 'auto',
     '@media print': {
       overflow: 'unset'
     },
     height: '100%',
     display: 'flex',
     flexDirection: 'column'
-  },
-  appHorizontalBottom: {
-    [theme.breakpoints.up('md')]: {
-      flexGrow: 1,
-      display: 'flex',
-      flexDirection: 'row'
-    },
-    [theme.breakpoints.down('sm')]: {
-      height: '100%'
-    }
-  },
-  appHorizontalBottomLeft: {
-    height: 'auto',
-    [theme.breakpoints.down('sm')]: {
-      position: 'absolute',
-      top: 0,
-      bottom: 0,
-      left: 0
-    }
-  },
-  appHorizontalBottomRight: {
-    height: 'auto',
-    display: 'flex',
-    flexDirection: 'column',
-    [theme.breakpoints.up('md')]: {
-      flexGrow: 1
-    },
-    [theme.breakpoints.down('sm')]: {
-      height: '100%'
-    }
   }
 }));
 
@@ -308,22 +255,21 @@ function AppLayoutProvider(props: LayoutProviderProps) {
             </div>
             <div
               className={newClasses.appVerticalRight}
-              id="app-scrollparent"
-              style={{ paddingLeft: showMenus && isSM && !isPrinting ? theme.spacing(7) : 0 }}
+              style={{ overflow: 'auto', paddingLeft: showMenus && isSM && !isPrinting ? theme.spacing(7) : 0 }}
             >
               {isUserReady() && appReady && showMenus && <TopBar />}
-              <div className={newClasses.appVerticalRightContent}>{children}</div>
+              {children}
             </div>
           </div>
         ) : (
-          <div className={newClasses.appHorizontal} id="app-scrollparent">
+          <div className={newClasses.appHorizontal} style={{ overflow: 'auto' }}>
             {isUserReady() && appReady && showMenus && <TopBar />}
-            <div className={newClasses.appHorizontalBottom}>
-              <div className={newClasses.appHorizontalBottomLeft}>
+            <div className={newClasses.appVertical}>
+              <div className={newClasses.appVerticalLeft}>
                 {isUserReady() && appReady && showMenus && <LeftNavDrawer />}
               </div>
               <div
-                className={newClasses.appHorizontalBottomRight}
+                className={newClasses.appVerticalRight}
                 style={{ paddingLeft: showMenus && isSM && !isPrinting ? theme.spacing(7) : 0 }}
               >
                 {children}
