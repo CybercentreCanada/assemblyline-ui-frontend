@@ -216,7 +216,9 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
                         variant="contained"
                         color="primary"
                         disabled={buttonLoading}
-                        onClick={() => localStorage.setItem('nextLocation', `${location.pathname}${location.search}`)}
+                        onClick={() =>
+                          localStorage.setItem('nextLocation', `${location.pathname}${location.search}${location.hash}`)
+                        }
                         href={`/api/v4/auth/login/?oauth_provider=${item}`}
                       >
                         {`${t('button_oauth')} ${item}`}
