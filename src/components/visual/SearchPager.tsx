@@ -5,6 +5,8 @@ import React from 'react';
 
 type SearchResults = {
   items: any[];
+  offset: number;
+  rows: number;
   total: number;
 };
 
