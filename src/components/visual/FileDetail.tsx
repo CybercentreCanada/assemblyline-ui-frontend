@@ -183,7 +183,7 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null }) => {
                     <Tooltip title={t('related')}>
                       <IconButton
                         component={Link}
-                        to={`/search/submission?q=files.sha256:${file && file.file_info.sha256} OR results:${
+                        to={`/search/submission?query=files.sha256:${file && file.file_info.sha256} OR results:${
                           file && file.file_info.sha256
                         }*`}
                       >

@@ -31,7 +31,7 @@ const Heuristic: React.FC<HeuristicProps> = ({
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
 
   const searchAttack = useCallback(
-    () => history.push(`/search/result?q=result.sections.heuristic${signature ? '.signature' : ''}.name:"${text}"`),
+    () => history.push(`/search/result?query=result.sections.heuristic${signature ? '.signature' : ''}.name:"${text}"`),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [signature, text]
   );

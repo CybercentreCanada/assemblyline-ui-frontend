@@ -31,7 +31,7 @@ const Tag: React.FC<TagProps> = ({
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
 
   const searchAttack = useCallback(
-    () => history.push(`/search/result?q=result.sections.tags.${type}:"${value}"`),
+    () => history.push(`/search/result?query=result.sections.tags.${type}:"${value}"`),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [type, value]
   );

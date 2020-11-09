@@ -369,7 +369,7 @@ const AlertCardItem: React.FC<AlertCardItemProps> = ({ item, setItem = null }) =
               size="small"
               variant="outlined"
               style={{ fontSize: '80%', marginBottom: '4px', marginRight: '4px' }}
-              to={`/search/?q=${item.file.sha256}`}
+              to={`/search/?query=${item.file.sha256}`}
             >
               {t('btn.sha256')}
             </Button>

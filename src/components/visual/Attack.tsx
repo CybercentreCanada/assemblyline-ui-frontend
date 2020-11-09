@@ -23,7 +23,7 @@ const Attack: React.FC<AttackProps> = ({ text, lvl = null, score = null, show_ty
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
 
   const searchAttack = useCallback(
-    () => history.push(`/search/result?q=result.sections.heuristic.attack.pattern:"${text}"`),
+    () => history.push(`/search/result?query=result.sections.heuristic.attack.pattern:"${text}"`),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [text]
   );
