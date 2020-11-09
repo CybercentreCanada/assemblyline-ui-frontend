@@ -65,8 +65,6 @@ const useAppTheme = (isDark: boolean, colors: AppThemeProps) => {
               height: '100%'
             },
             '#root': {
-              // overflow: 'auto',
-              // height: 'auto',
               position: 'absolute',
               top: 0,
               left: 0,

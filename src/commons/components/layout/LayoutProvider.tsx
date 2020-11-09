@@ -24,7 +24,7 @@ const useNewStyles = makeStyles(theme => ({
   },
   appVerticalRight: {
     '@media print': {
-      overflow: 'unset'
+      overflow: 'unset !important'
     },
     display: 'flex',
     flexDirection: 'column',
@@ -40,7 +40,7 @@ const useNewStyles = makeStyles(theme => ({
   },
   appHorizontal: {
     '@media print': {
-      overflow: 'unset'
+      overflow: 'unset !important'
     },
     height: '100%',
     display: 'flex',
