@@ -281,7 +281,7 @@ const Alerts: React.FC = () => {
   // ...
   const onRenderListActions = useCallback(
     (item: AlertItem) => <AlertListItemActions item={item} currentQuery={searchQuery} setDrawer={setDrawer} />,
-    []
+    [searchQuery]
   );
 
   // Load up the filters already present in the URL..

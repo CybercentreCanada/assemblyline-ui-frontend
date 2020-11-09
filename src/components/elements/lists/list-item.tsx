@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import { Divider, IconButtonProps, useTheme } from '@material-ui/core';
+import { Divider, IconButtonProps } from '@material-ui/core';
 import React, { useCallback } from 'react';
 import useListStyles from './hooks/useListStyles';
 
@@ -26,7 +26,6 @@ interface ListRowProps {
 
 const ListRow: React.FC<ListRowProps> = React.memo(
   ({ loaded, selected, item, index, rowHeight, onRenderActions, onClick, onRenderRow }) => {
-    const theme = useTheme();
     const { listItemClasses: classes } = useListStyles();
 
     const _onClick = useCallback(() => {
