@@ -6,46 +6,18 @@ import useAppLayout from 'commons/components/hooks/useAppLayout';
 import useFullscreenStatus from 'commons/components/hooks/useFullscreenStatus';
 import React from 'react';
 
-const useStyles = (isFullscreen, topbarShown) => {
-  return makeStyles(theme => ({
-    root: {
-      backgroundColor: isFullscreen ? theme.palette.background.default : theme.palette.background.default
-      // overflow: 'auto'
-    },
-    page: {
-      marginLeft: 'auto',
-      marginRight: 'auto',
-      marginBottom: isFullscreen ? theme.spacing(2) : 'auto',
-      marginTop: isFullscreen ? theme.spacing(3) : theme.spacing(6),
-      width: '100%',
-      [theme.breakpoints.up('sm')]: {
-        paddingLeft: isFullscreen ? theme.spacing(2) : 0,
-        paddingRight: isFullscreen ? theme.spacing(2) : 0
-      }
-    },
-    toggle: {
-      position: 'sticky',
-      right: isFullscreen ? '30px' : '20px',
-      top: 0,
-      // top: isFullscreen || !topbarShown ? '20px' : '84px',
-      zIndex: theme.zIndex.appBar + 1,
-      transition: theme.transitions.create('top', {
-        easing: theme.transitions.easing.easeInOut,
-        duration: '0.15s'
-      }),
-      [theme.breakpoints.down('xs')]: {
-        right: '16px',
-        top: isFullscreen || !topbarShown ? '8px' : '60px'
-      }
-    }
-  }))();
-};
-
-function MoveOnScroll({ children, enabled, isFullscreen }) {
-  const trigger = useScrollTrigger({
-    disableHysteresis: true,
-    threshold: 0
-  });
+const useStyles = makeStyles(theme => ({
+  root: {
+    backgroundColor: theme.palette.background.default
+  },
+  toggle: {
+    float: 'right',
+    paddingTop: theme.spacing(2),
+    position: 'sticky',
+    right: theme.spacing(2),
+    zIndex: theme.zIndex.appBar + 1
+  }
+}));
 
 interface PageFullscreenProps {
   children: React.ReactNode;
