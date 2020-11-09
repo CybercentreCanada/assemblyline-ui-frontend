@@ -5,7 +5,7 @@ import SearchBar from 'components/elements/search/search-bar';
 import SearchQuery from 'components/elements/search/search-query';
 import useAppContext from 'components/hooks/useAppContext';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { ALField } from 'components/hooks/useMyUser';
+import useMySnackbar from 'components/hooks/useMySnackbar';
 import SearchPager from 'components/visual/SearchPager';
 import AlertsTable from 'components/visual/SearchResult/alerts';
 import FilesTable from 'components/visual/SearchResult/files';
@@ -53,6 +53,8 @@ type ParamProps = {
 
 type SearchResults = {
   items: any[];
+  offset: number;
+  rows: number;
   total: number;
 };
 
@@ -61,16 +63,16 @@ function Search({ index }: SearchProps) {
   const { t } = useTranslation(['search']);
   const [pageSize] = useState(PAGE_SIZE);
   const [searching, setSearching] = useState(false);
-  const { user: currentUser, indexes } = useAppContext();
+  const { indexes } = useAppContext();
   const location = useLocation();
   const history = useHistory();
   const theme = useTheme();
   const classes = useStyles();
   const apiCall = useMyAPI();
   const [query, setQuery] = useState<SearchQuery>(null);
-  const [fields, setFields] = useState<ALField[]>(null);
   const [searchSuggestion, setSearchSuggestion] = useState<string[]>(null);
-  const [tab, setTab] = useState(index || id || 'submission');
+  const [tab, setTab] = useState(null);
+  const { showErrorMessage } = useMySnackbar();
 
   // Result lists
   const [submissionResults, setSubmissionResults] = useState<SearchResults>(null);
@@ -98,7 +100,7 @@ function Search({ index }: SearchProps) {
   const queryValue = useRef<string>('');
 
   const handleChangeTab = (event, newTab) => {
-    setTab(newTab);
+    history.push(`${location.pathname}?query=${query.getQuery()}#${newTab}`);
   };
 
   const onClear = () => {
@@ -107,7 +109,7 @@ function Search({ index }: SearchProps) {
 
   const onSearch = () => {
     if (queryValue.current !== '') {
-      history.push(`${location.pathname}?query=${queryValue.current}`);
+      history.push(`${location.pathname}?query=${queryValue.current}${location.hash}`);
     } else {
       onClear();
     }
@@ -119,35 +121,34 @@ function Search({ index }: SearchProps) {
 
   const resetResults = () => {
     setSubmissionResults(null);
+    setFileResults(null);
+    setResultResults(null);
+    setSignatureResults(null);
+    setAlertResults(null);
   };
 
   useEffect(() => {
-    const currentIndex = index || id || 'submission';
-    if (currentIndex !== tab) {
-      setTab(currentIndex);
-      setFields(
-        Object.keys(indexes[index || id] || {}).map(name => {
-          return { ...indexes[index || id][name], name };
-        })
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // On index change we need to update the search suggestion
+    const newSuggestion = [
+      ...Object.keys(indexes[index || id] || {}).map(name => {
+        return name;
+      }),
+      ...DEFAULT_SUGGESTION
+    ];
+    setSearchSuggestion(newSuggestion);
   }, [index, id, indexes]);
 
   useEffect(() => {
-    if (fields && fields.length !== 0) {
-      const _fields = fields.map(f => f.name);
-      setSearchSuggestion([..._fields, ...DEFAULT_SUGGESTION]);
-    } else {
-      setSearchSuggestion(DEFAULT_SUGGESTION);
-    }
-  }, [fields]);
-
-  useEffect(() => {
+    // On location.search change we need to change the query object and reset the results
     setQuery(new SearchQuery(location.pathname, location.search, pageSize, false));
     resetResults();
-    // eslint-disable-next-line
-  }, [location.search]);
+  }, [location.pathname, location.search, pageSize]);
+
+  useEffect(() => {
+    // On location.hash change, we need to change the tab
+    const newTab = location.hash.substring(1, location.hash.length) || index || id || 'submission';
+    setTab(newTab);
+  }, [id, index, location.hash]);
 
   useEffect(() => {
     if (query) {
@@ -167,6 +168,13 @@ function Search({ index }: SearchProps) {
             body: { ...query.getParams(), rows: pageSize, offset: 0 },
             onSuccess: api_data => {
               stateMap[searchIndex](api_data.api_response);
+            },
+            onFailure: api_data => {
+              if (index || id || !api_data.api_error_message.includes('Rewrite first')) {
+                showErrorMessage(api_data.api_error_message);
+              } else {
+                stateMap[searchIndex]({ total: 0, offset: 0, items: [], rows: PAGE_SIZE });
+              }
             },
             onFinalize: () => {
               if (index || id) {
@@ -228,6 +236,7 @@ function Search({ index }: SearchProps) {
               <SearchPager
                 total={resMap[tab].total}
                 setResults={stateMap[tab]}
+                page={resMap[tab].offset / resMap[tab].rows + 1}
                 pageSize={PAGE_SIZE}
                 index={tab}
                 query={query}
