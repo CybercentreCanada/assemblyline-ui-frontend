@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from '../DivTable';
 import InformativeAlert from '../InformativeAlert';
+import SignatureStatus from '../SignatureStatus';
 
 export type SignatureResult = {
   classification: string;
@@ -17,7 +18,7 @@ export type SignatureResult = {
   revision: string;
   signature_id: string;
   source: string;
-  status: string;
+  status: 'DEPLOYED' | 'NOISY' | 'DISALBED';
   type: string;
 };
 
@@ -65,7 +66,9 @@ const WrappedSignaturesTable: React.FC<SignaturesTableProps> = ({ signatureResul
                 <DivTableCell>
                   <Classification type="text" size="tiny" c12n={signature.classification} format="short" />
                 </DivTableCell>
-                <DivTableCell>{signature.status}</DivTableCell>
+                <DivTableCell>
+                  <SignatureStatus status={signature.status} />
+                </DivTableCell>
               </LinkRow>
             ))}
           </DivTableBody>
