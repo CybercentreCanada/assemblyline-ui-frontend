@@ -29,6 +29,7 @@ type PageHeaderProps = {
   right?: React.ReactNode;
   actions?: PageHeaderAction[];
   isSticky?: boolean;
+  top?: number;
   elevation?: number;
   backgroundColor?: string;
 };
@@ -39,6 +40,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   right,
   actions,
   isSticky = false,
+  top,
   backgroundColor = null,
   elevation = 0
 }) => {
@@ -53,7 +55,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
       id="header1"
       position={isSticky ? 'sticky' : 'relative'}
       style={{
-        top: isSticky ? (barWillHide ? 0 : appBarHeight) : null,
+        top: top || (isSticky ? (barWillHide ? 0 : appBarHeight) : null),
         backgroundColor: backgroundColor || theme.palette.background.default,
         zIndex: !isSticky ? theme.zIndex.appBar - 100 : null
       }}
