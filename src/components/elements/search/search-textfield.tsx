@@ -7,6 +7,7 @@ import { isArrowDown, isArrowLeft, isArrowRight, isArrowUp, isEnter, isEscape } 
 
 const useStyles = makeStyles(theme => ({
   searchTextFieldOptionsCt: {
+    textAlign: 'left',
     position: 'relative',
     height: 0,
     outline: 'none'
