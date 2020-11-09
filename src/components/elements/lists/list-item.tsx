@@ -1,11 +1,16 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import { Divider } from '@material-ui/core';
+import { Divider, IconButtonProps, useTheme } from '@material-ui/core';
 import React, { useCallback } from 'react';
 import useListStyles from './hooks/useListStyles';
 
 export interface LineItem {
   id: number | string;
+}
+
+export interface LineItemAction {
+  icon: React.ReactNode;
+  props: IconButtonProps;
 }
 
 interface ListRowProps {
@@ -16,10 +21,12 @@ interface ListRowProps {
   rowHeight?: number;
   onClick: (item: LineItem, index: number) => void;
   onRenderRow: (item: LineItem) => React.ReactNode;
+  onRenderActions?: (item: LineItem) => React.ReactNode;
 }
 
 const ListRow: React.FC<ListRowProps> = React.memo(
-  ({ loaded, selected, item, index, rowHeight, onClick, onRenderRow }) => {
+  ({ loaded, selected, item, index, rowHeight, onRenderActions, onClick, onRenderRow }) => {
+    const theme = useTheme();
     const { listItemClasses: classes } = useListStyles();
 
     const _onClick = useCallback(() => {
@@ -28,7 +35,9 @@ const ListRow: React.FC<ListRowProps> = React.memo(
       }
     }, [onClick, item, index]);
 
-    // console.log(`rendering: ${index}`);
+    console.log(`rendering: ${index}`);
+
+    const onItemActionsClick = useCallback(event => event.stopPropagation(), []);
 
     return (
       <div
@@ -43,6 +52,9 @@ const ListRow: React.FC<ListRowProps> = React.memo(
         </div>
         <div className={classes.itemDivider}>
           <Divider />
+        </div>
+        <div className={classes.itemActions} onClick={onItemActionsClick}>
+          {onRenderActions && onRenderActions(item)}
         </div>
       </div>
     );

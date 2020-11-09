@@ -57,6 +57,10 @@ export default class Book {
     return this.pages[pageNumber];
   }
 
+  public get(index: number): LineItem {
+    return this.currentPage().index[index];
+  }
+
   public lastPage(): BookPage {
     return this.pages[this.pages.length - 1];
   }

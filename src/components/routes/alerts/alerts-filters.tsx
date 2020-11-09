@@ -1,9 +1,24 @@
 /* eslint-disable no-param-reassign */
-import { Button, Divider, makeStyles, TextField, Typography, useTheme } from '@material-ui/core';
+import {
+  Button,
+  Divider,
+  FormControl,
+  InputLabel,
+  makeStyles,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+  useTheme
+} from '@material-ui/core';
+import ClearAllIcon from '@material-ui/icons/ClearAll';
+import CloseIcon from '@material-ui/icons/ExitToApp';
+import FilterListIcon from '@material-ui/icons/FilterList';
 import { Autocomplete } from '@material-ui/lab';
-import { SearchFilter } from 'components/elements/search/search-query';
+import SearchQuery, { SearchFilter, SearchQueryFilters } from 'components/elements/search/search-query';
 import CustomChip from 'components/visual/CustomChip';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 // Default TimeConstraint(TC) value..
 export const DEFAULT_TC = { value: '4d', label: '4 Days' };
@@ -11,14 +26,26 @@ export const DEFAULT_TC = { value: '4d', label: '4 Days' };
 // Default GroupBy value.
 export const DEFAULT_GROUPBY = { value: 'file.sha256', label: 'file.sha256' };
 
-// Default filters.
-export const DEFAULT_FILTERS = {
-  tc: DEFAULT_TC,
-  groupBy: DEFAULT_GROUPBY,
-  statuses: [],
-  priorities: [],
-  labels: [],
-  queries: []
+//
+const GROUPBY_OPTIONS = [
+  { value: 'file.md5', label: 'file.md5' },
+  { value: 'file.name', label: 'file.name' },
+  DEFAULT_GROUPBY,
+  { value: 'priority', label: 'priority' },
+  { value: 'status', label: 'status' }
+];
+
+//
+const TC_OPTIONS = [
+  { value: '', label: 'None (slow)' },
+  { value: '24h', label: '24 hours' },
+  DEFAULT_TC,
+  { value: '7d', label: '1 Week' }
+];
+
+//
+const findOption = (value: string, options: { value: string; label: string }[]) => {
+  return options.find(o => o.value === value);
 };
 
 // Decorate each filter in the specified 'queryFilters' list and indicate whether they are a valueFilter.
@@ -36,63 +63,59 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-// Specification interface defining the state of the current filter selections.
-export interface AlertFilterSelections {
-  tc: { value: string; label: string };
-  groupBy: { value: string; label: string };
-  statuses: SearchFilter[];
-  priorities: SearchFilter[];
-  labels: SearchFilter[];
-  queries: SearchFilter[];
-}
-
 // Specificatino interface of this component's properties.
 interface AlertsFiltersProps {
-  selectedFilters: AlertFilterSelections;
+  searchQuery: SearchQuery;
   valueFilters: SearchFilter[];
   statusFilters: SearchFilter[];
   priorityFilters: SearchFilter[];
   labelFilters: SearchFilter[];
-  onApplyBtnClick: (filters: AlertFilterSelections) => void;
-  onClearBtnClick: () => void;
+  onApplyBtnClick: (filters: SearchQueryFilters) => void;
   onCancelBtnClick: () => void;
 }
 
 // Implementation of th AlertsFilter component.
 const AlertsFilters: React.FC<AlertsFiltersProps> = ({
-  selectedFilters,
+  searchQuery,
   valueFilters,
   statusFilters,
   priorityFilters,
   labelFilters,
   onApplyBtnClick,
-  onClearBtnClick,
   onCancelBtnClick
 }) => {
   // Hooks...
   const theme = useTheme();
   const classes = useStyles();
+  const { t } = useTranslation('alerts');
+
+  //
+  const filters = searchQuery.parseFilters();
+  const tcOption = findOption(filters.tc, TC_OPTIONS);
+  const groupByOption = findOption(filters.groupBy, GROUPBY_OPTIONS);
 
   // Define some states for controlled components..
-  const [selectedTc, setSelectedTc] = useState<{ value: string; label: string }>(selectedFilters.tc || DEFAULT_TC);
+  const [selectedTc, setSelectedTc] = useState<{ value: string; label: string }>(tcOption || DEFAULT_TC);
   const [selectedGroupBy, setSelectedGroupBy] = useState<{ value: string; label: string }>(
-    selectedFilters.groupBy || DEFAULT_GROUPBY
+    groupByOption || DEFAULT_GROUPBY
   );
-  const [selectedStatusFilters, setSelectedStatusFilters] = useState<SearchFilter[]>(selectedFilters.statuses);
-  const [selectedPriorityFilters, setSelectedPriorityFilters] = useState<SearchFilter[]>(selectedFilters.priorities);
-  const [selectedLabelFilters, setSelectedLabelFilters] = useState<SearchFilter[]>(selectedFilters.labels);
+  const [selectedStatusFilters, setSelectedStatusFilters] = useState<SearchFilter[]>(filters.statuses);
+  const [selectedPriorityFilters, setSelectedPriorityFilters] = useState<SearchFilter[]>(filters.priorities);
+  const [selectedLabelFilters, setSelectedLabelFilters] = useState<SearchFilter[]>(filters.labels);
   const [selectedQueryFilters, setSelectedQueryFilters] = useState<{ filter: SearchFilter; isValue: boolean }[]>(
-    decorateQueryFilters(selectedFilters.queries, valueFilters)
+    decorateQueryFilters(filters.queries, valueFilters)
   );
 
   // Handler[onChange]: for the 'TC' Autocomplete component.
-  const onTcFilterChange = (value: { value: string; label: string }) => {
-    setSelectedTc(value);
+  const onTcFilterChange = (value: string) => {
+    const selectedValue = TC_OPTIONS.find(o => o.value === value);
+    setSelectedTc(selectedValue);
   };
 
   // Handler[onChange]: for the 'Group By' Autocomplete component.
-  const onGroupByFilterChange = (value: { value: string; label: string }) => {
-    setSelectedGroupBy(value);
+  const onGroupByFilterChange = (value: string) => {
+    const selectedValue = GROUPBY_OPTIONS.find(o => o.value === value);
+    setSelectedGroupBy(selectedValue);
   };
 
   // Handler[onChange]: for the 'Status' Autocomplete component.
@@ -117,11 +140,22 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
     setSelectedQueryFilters([..._selections, ...nonValueFilters]);
   };
 
+  //
+  const onClearBtnClick = () => {
+    setSelectedTc(tcOption);
+    setSelectedGroupBy(groupByOption);
+    setSelectedStatusFilters([]);
+    setSelectedPriorityFilters([]);
+    setSelectedLabelFilters([]);
+    setSelectedQueryFilters([]);
+  };
+
   // Handler: when clicking on 'Apply' button.
   const _onApplyBtnClick = () => {
     onApplyBtnClick({
-      tc: selectedTc,
-      groupBy: selectedGroupBy,
+      ...filters,
+      tc: selectedTc.value,
+      groupBy: selectedGroupBy.value,
       statuses: selectedStatusFilters,
       priorities: selectedPriorityFilters,
       labels: selectedLabelFilters,
@@ -138,61 +172,59 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
   const renderOption = (item: SearchFilter) => {
     return (
       <div>
-        <CustomChip label={item.object.count} size="tiny" /> {item.label}
+        <CustomChip label={item.other.count} size="tiny" /> {item.label}
       </div>
     );
   };
 
   // Apply updates to selected filters when compoonent is mounted.
   useEffect(() => {
-    setSelectedTc(selectedFilters.tc || DEFAULT_TC);
-    setSelectedGroupBy(selectedFilters.groupBy || DEFAULT_GROUPBY);
-    setSelectedStatusFilters(selectedFilters.statuses);
-    setSelectedPriorityFilters(selectedFilters.priorities);
-    setSelectedLabelFilters(selectedFilters.labels);
-    setSelectedQueryFilters(decorateQueryFilters(selectedFilters.queries, valueFilters));
-  }, [selectedFilters, valueFilters]);
+    const _filters = searchQuery.parseFilters();
+    setSelectedTc(findOption(_filters.tc, TC_OPTIONS) || DEFAULT_TC);
+    setSelectedGroupBy(findOption(_filters.groupBy, GROUPBY_OPTIONS) || DEFAULT_GROUPBY);
+    setSelectedStatusFilters(_filters.statuses);
+    setSelectedPriorityFilters(_filters.priorities);
+    setSelectedLabelFilters(_filters.labels);
+    setSelectedQueryFilters(decorateQueryFilters(_filters.queries, valueFilters));
+  }, [searchQuery, valueFilters]);
 
   return (
     <div>
-      <Typography variant="h6">Filterss</Typography>
+      <Typography variant="h6">{t('page.alerts.filters')}</Typography>
       <Divider />
       <div style={{ margin: theme.spacing(1), marginTop: theme.spacing(2) }}>
         <div style={{ marginBottom: theme.spacing(2) }}>
-          <Autocomplete
-            fullWidth
-            classes={{ option: classes.option }}
-            options={[
-              { value: '', label: 'None (slow)' },
-              { value: '24h', label: '24 hours' },
-              DEFAULT_TC,
-              { value: '7d', label: '1 Week' }
-            ]}
-            value={selectedTc || DEFAULT_TC}
-            getOptionLabel={option => option.label}
-            getOptionSelected={isSelected}
-            renderInput={params => <TextField {...params} label="Time Constraint" variant="outlined" />}
-            onChange={(event, value) => onTcFilterChange(value as { value: string; label: string })}
-          />
+          <FormControl fullWidth variant="outlined">
+            <InputLabel>Time Constraint</InputLabel>
+            <Select
+              label="Time Constraint"
+              displayEmpty
+              value={selectedTc ? selectedTc.value : DEFAULT_TC.value}
+              onChange={event => onTcFilterChange(event.target.value as string)}
+            >
+              {TC_OPTIONS.map(o => (
+                <MenuItem key={o.value} className={classes.option} value={o.value}>
+                  {o.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </div>
         <div style={{ marginBottom: theme.spacing(2) }}>
-          <Autocomplete
-            fullWidth
-            classes={{ option: classes.option }}
-            options={[
-              DEFAULT_GROUPBY,
-              { value: 'file.md5', label: 'file.md5' },
-              { value: 'file.name', label: 'file.name' },
-              { value: 'file.sha1', label: 'file.sha1' },
-              { value: 'priority', label: 'priority' },
-              { value: 'status', label: 'status' }
-            ]}
-            value={selectedGroupBy || DEFAULT_GROUPBY}
-            getOptionLabel={option => option.label}
-            getOptionSelected={isSelected}
-            renderInput={params => <TextField {...params} label="Group By" variant="outlined" />}
-            onChange={(event, value) => onGroupByFilterChange(value as { value: string; label: string })}
-          />
+          <FormControl fullWidth variant="outlined">
+            <InputLabel>Group By</InputLabel>
+            <Select
+              label="Group By"
+              value={selectedGroupBy ? selectedGroupBy.value : DEFAULT_GROUPBY.value}
+              onChange={event => onGroupByFilterChange(event.target.value as string)}
+            >
+              {GROUPBY_OPTIONS.map(o => (
+                <MenuItem key={o.value} className={classes.option} value={o.value}>
+                  {o.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </div>
         <div style={{ marginBottom: theme.spacing(2) }}>
           <Autocomplete
@@ -252,16 +284,16 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
         </div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'row', marginTop: theme.spacing(1) }}>
-        <Button variant="contained" color="primary" onClick={_onApplyBtnClick}>
-          Apply
+        <Button variant="contained" color="primary" onClick={_onApplyBtnClick} startIcon={<FilterListIcon />}>
+          {t('page.alerts.filters.apply')}
         </Button>
         <div style={{ marginRight: theme.spacing(1) }} />
-        <Button variant="contained" onClick={onClearBtnClick} size="small">
-          Clear
+        <Button variant="contained" onClick={onClearBtnClick} size="small" startIcon={<ClearAllIcon />}>
+          {t('page.alerts.filters.clear')}
         </Button>
         <div style={{ flex: 1 }} />
-        <Button variant="contained" onClick={onCancelBtnClick} size="small">
-          Cancel
+        <Button variant="contained" onClick={onCancelBtnClick} size="small" startIcon={<CloseIcon />}>
+          {t('page.alerts.filters.cancel')}
         </Button>
       </div>
     </div>

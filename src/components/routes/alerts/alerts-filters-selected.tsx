@@ -1,25 +1,25 @@
 import { useTheme } from '@material-ui/core';
 import { ChipList } from 'components/elements/mui/chips';
-import { SearchFilter } from 'components/elements/search/search-query';
+import SearchQuery, { SearchFilter, SearchQueryFilters } from 'components/elements/search/search-query';
 import React from 'react';
-import { AlertFilterSelections } from './alerts-filters';
 
 interface AlertFiltersSelectedProps {
-  query?: string;
+  searchQuery: SearchQuery;
+  hideQuery?: boolean;
   disableActions?: boolean;
-  filters: AlertFilterSelections;
-  onChange: (filters: AlertFilterSelections) => void;
+  onChange?: (filters: SearchQueryFilters) => void;
 }
 
 const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
-  query,
+  searchQuery,
+  hideQuery = false,
   disableActions = false,
-  filters,
-  onChange
+  onChange = () => null
 }) => {
   const theme = useTheme();
 
-  const { tc, groupBy, statuses, priorities, labels, queries } = filters;
+  const filters = searchQuery.parseFilters();
+  const query = searchQuery.getQuery();
 
   const onDeleteStatus = (item: SearchFilter) => {
     const _statuses = filters.statuses.filter(s => s.value !== item.value);
@@ -44,13 +44,18 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
   return (
     <div>
       <div>
-        {query && <span>Query = {query}, </span>}Time Constraint = {tc.label}, Group by = {groupBy.label}
+        {query && !hideQuery && <span>Query = {query}, </span>}
+        {filters && (
+          <span>
+            Time Constraint = {filters.tc}, Group by = {filters.groupBy}
+          </span>
+        )}
       </div>
       <div style={{ marginTop: theme.spacing(1) }}>
-        {statuses.length ? (
+        {filters && filters.statuses.length ? (
           <div style={{ display: 'inline-block' }}>
             <ChipList
-              items={statuses.map(v => ({
+              items={filters.statuses.map(v => ({
                 variant: 'outlined',
                 label: v.value,
                 onDelete: !disableActions ? () => onDeleteStatus(v) : null
@@ -58,10 +63,10 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
             />
           </div>
         ) : null}
-        {priorities.length ? (
+        {filters && filters.priorities.length ? (
           <div style={{ display: 'inline-block' }}>
             <ChipList
-              items={priorities.map(v => ({
+              items={filters.priorities.map(v => ({
                 variant: 'outlined',
                 label: v.value,
                 onDelete: !disableActions ? () => onDeletePriority(v) : null
@@ -69,10 +74,10 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
             />
           </div>
         ) : null}
-        {labels.length ? (
+        {filters && filters.labels.length ? (
           <div style={{ display: 'inline-block' }}>
             <ChipList
-              items={labels.map(v => ({
+              items={filters.labels.map(v => ({
                 variant: 'outlined',
                 label: v.value,
                 onDelete: !disableActions ? () => onDeleteLabel(v) : null
@@ -80,10 +85,10 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
             />
           </div>
         ) : null}
-        {queries.length ? (
+        {filters && filters.queries.length ? (
           <div style={{ display: 'inline-block' }}>
             <ChipList
-              items={queries.map(v => ({
+              items={filters.queries.map(v => ({
                 variant: 'outlined',
                 label: v.value,
                 onDelete: !disableActions ? () => onDeleteQuery(v) : null

@@ -5,10 +5,12 @@
   "favorites.private": "Private",
   "favorites.public": "Public",
   "favorites.save": "Save",
-  "favorites.cancel": "Cancel",
+  "favorites.clear": "Clear",
+  "favorites.cancel": "Close",
   "favorites.yourfavorites": "Your Favorites",
   "favorites.globalfavorites": "Public Favorites",
   "favorites.confirmdiag.header": "Warning",
   "favorites.confirmdiag.content": "Are you sure you want to delete this favorite?",
-  "favorites.ok": "Ok"
+  "favorites.ok": "Ok",
+  "favorites.form.field.required": "The Query and Name value are required."
 }

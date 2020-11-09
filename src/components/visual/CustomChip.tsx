@@ -1,3 +1,4 @@
+import { Tooltip } from '@material-ui/core';
 import Chip from '@material-ui/core/Chip';
 import { darken, makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
@@ -29,6 +30,7 @@ export interface CustomChipProps {
   variant?: 'default' | 'outlined';
   mono?: boolean;
   wrap?: boolean;
+  tooltip?: string;
   [propName: string]: any;
 }
 
@@ -128,7 +130,17 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function WrappedCustomChip({ className, type, size, color, variant, mono, wrap, ...otherProps }: CustomChipProps) {
+function WrappedCustomChip({
+  className,
+  type,
+  size,
+  color,
+  variant,
+  mono,
+  wrap,
+  tooltip,
+  ...otherProps
+}: CustomChipProps) {
   const classes = useStyles();
 
   // Define classnames maps
@@ -180,7 +192,7 @@ function WrappedCustomChip({ className, type, size, color, variant, mono, wrap, 
   const labelClassName = clsx(sizeLabelClassMap[size], wrap ? classes.wrap : null);
 
   // Build chip based on computed values
-  return (
+  const chip = (
     <Chip
       classes={{ label: labelClassName }}
       className={appliedClassName}
@@ -190,6 +202,9 @@ function WrappedCustomChip({ className, type, size, color, variant, mono, wrap, 
       {...otherProps}
     />
   );
+
+  // Do we have a tooltip?
+  return tooltip ? <Tooltip title={tooltip}>{chip}</Tooltip> : chip;
 }
 
 WrappedCustomChip.defaultProps = {

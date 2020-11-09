@@ -207,6 +207,11 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
       end: insertEndIndex > -1 ? insertEndIndex : thisCursor,
       items: _options
     });
+
+    // Update state of content assist opptions if no options are avaiable.
+    if (_options.length === 0) {
+      setOpen(false);
+    }
   };
 
   const parseFilter = (
