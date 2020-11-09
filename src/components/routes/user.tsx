@@ -234,7 +234,7 @@ function User({ width, username }: UserProps) {
   return !currentUser.is_admin && location.pathname.includes('/admin/') ? (
     <Redirect to="/forbidden" />
   ) : (
-    <PageCenter>
+    <PageCenter margin={4}>
       <React.Fragment key="right">
         <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
           <div style={{ alignSelf: 'flex-end' }}>
@@ -348,10 +348,7 @@ function User({ width, username }: UserProps) {
         </Drawer>
       </React.Fragment>
 
-      <div
-        className={classes.page}
-        style={{ paddingTop: sp6, paddingBottom: sp6, display: 'inline-block', textAlign: 'center' }}
-      >
+      <div className={classes.page} style={{ display: 'inline-block', textAlign: 'center' }}>
         <Grid container spacing={2} justify="center">
           <Grid item sm={12} md={3}>
             <Grid container className={classes.group}>
@@ -374,8 +371,10 @@ function User({ width, username }: UserProps) {
                       >
                         <Avatar
                           style={{
-                            width: theme.spacing(16),
-                            height: theme.spacing(16)
+                            width: '100%',
+                            height: '100%',
+                            maxWidth: theme.spacing(16),
+                            maxHeight: theme.spacing(16)
                           }}
                           alt={user.name}
                           src={user.avatar}

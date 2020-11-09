@@ -16,7 +16,7 @@ export default function HelpClassification() {
   const sp4 = theme.spacing(4);
 
   return c12nDef.enforce ? (
-    <PageCenter>
+    <PageCenter margin={4}>
       <div style={{ textAlign: 'left', paddingBottom: sp4 }}>
         <Typography variant="h5" gutterBottom>
           {t('desc_title')}
@@ -249,7 +249,7 @@ export default function HelpClassification() {
           <Trans ns="helpClassification" i18nKey="validation_groups_note" components={{ bold: <strong /> }} />
         </Typography>
       </div>
-      <div style={{ textAlign: 'left', paddingBottom: sp2 }}>
+      <div style={{ textAlign: 'left' }}>
         <Typography variant="h6" gutterBottom>
           {t('validation_subgroups')}
         </Typography>

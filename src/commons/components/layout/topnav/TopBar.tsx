@@ -1,5 +1,6 @@
 import { AppBar, makeStyles, Slide, Toolbar, useMediaQuery, useTheme } from '@material-ui/core';
 import withWidth, { isWidthUp } from '@material-ui/core/withWidth';
+import { APPBAR_READY_EVENT } from 'commons/components/hooks/useAppBarHeight';
 import useAppContext from 'commons/components/hooks/useAppContext';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import Breadcrumbs from 'commons/components/layout/breadcrumbs/Breadcrumbs';
@@ -7,7 +8,7 @@ import AppSwitcher from 'commons/components/layout/topnav/AppSwitcher';
 import QuickSearch from 'commons/components/layout/topnav/QuickSearch';
 import ThemeSelectionIcon from 'commons/components/layout/topnav/ThemeSelectionIcon';
 import UserProfile from 'commons/components/layout/topnav/UserProfile';
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 import AppTitle from './AppTitle';
 
 const useStyles = makeStyles(theme => ({
@@ -15,6 +16,9 @@ const useStyles = makeStyles(theme => ({
     zIndex: theme.zIndex.drawer + 1
   },
   appBar: {
+    '@media print': {
+      display: 'none !important'
+    },
     [theme.breakpoints.only('xs')]: {
       zIndex: theme.zIndex.drawer - 1
     }
@@ -60,6 +64,16 @@ const TopBar: React.FC<AppBarProps> = ({ width }) => {
   const { elevation, ...appbarStyles } = getAppbarStyles(currentLayout as 'side' | 'top');
   const { left, leftAfterBreadcrumbs } = layoutProps.topnav;
 
+  // Once the dom is mounted, dispatch event to let listeners know
+  //  that the apppbar/topbar dom is available.
+  // Primary usecase if to initialize the 'useAppBarHeight' hook
+  //  which didn't initialize properly because it will typically be
+  //  call before the appbar is ready, because the appbar/top bar
+  //  is conditionally rendered on app/user ready state.
+  useLayoutEffect(() => {
+    window.dispatchEvent(new CustomEvent(APPBAR_READY_EVENT));
+  }, []);
+
   const renderLeft = () => {
     return (
       <div className={classes.topBarLeft}>
@@ -89,7 +103,12 @@ const TopBar: React.FC<AppBarProps> = ({ width }) => {
           style={{ paddingLeft: !isXs && !isTopLayout ? theme.spacing(2) : null, paddingRight: theme.spacing(1) }}
         >
           {renderLeft()}
-          {(isXs || !isSm || left || leftAfterBreadcrumbs) && <div style={{ flexGrow: 1 }} />}
+          {(isXs ||
+            left ||
+            leftAfterBreadcrumbs ||
+            (breadcrumbsEnabled && !isSm) ||
+            (!showQuickSearch && !breadcrumbsEnabled) ||
+            (!showQuickSearch && breadcrumbsEnabled && isSm)) && <div style={{ flexGrow: 1 }} />}
           {showQuickSearch && isWidthUp('sm', width) && <QuickSearch />}
           {layoutProps.topnav.themeSelectionUnder === 'icon' && <ThemeSelectionIcon />}
           {layoutProps.topnav.right}

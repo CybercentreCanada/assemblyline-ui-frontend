@@ -13,7 +13,7 @@ const ForbiddenPage: React.FC<ForbiddenPageProps> = ({ disabled = false }) => {
   const { t } = useTranslation(['error403']);
   const theme = useTheme();
   return (
-    <PageCenter width="65%">
+    <PageCenter width="65%" margin={4}>
       <div style={{ paddingTop: theme.spacing(10), fontSize: 200 }}>
         <BlockIcon
           style={{ color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark }}

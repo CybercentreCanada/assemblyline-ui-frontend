@@ -34,7 +34,7 @@ function Dashboard() {
   }
 
   return (
-    <PageFullscreen>
+    <PageFullscreen margin={4}>
       <Typography gutterBottom color="primary" variant="h2" align="center">
         {t('title')}
       </Typography>

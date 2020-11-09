@@ -99,8 +99,8 @@ export default function Services() {
     // eslint-disable-next-line
   }, []);
   return (
-    <PageCenter>
-      <div style={{ textAlign: 'left', paddingBottom: '1rem' }}>
+    <PageCenter margin={4}>
+      <div style={{ textAlign: 'left' }}>
         {services ? (
           <Grid container spacing={2}>
             {services.map((s, i) => (

@@ -5,17 +5,18 @@ import {
   ButtonProps,
   IconButton,
   IconButtonProps,
-  RootRef,
   Toolbar,
+  Tooltip,
   useTheme
 } from '@material-ui/core';
 import useAppBarHeight from 'commons/components/hooks/useAppBarHeight';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React from 'react';
 
 export type PageHeaderAction = {
   key?: string;
   title?: string;
+  tooltip?: string;
   icon?: React.ReactNode;
   color?: 'primary' | 'secondary';
   action?: () => void;
@@ -24,6 +25,7 @@ export type PageHeaderAction = {
 
 type PageHeaderProps = {
   children?: React.ReactNode;
+  left?: React.ReactNode;
   right?: React.ReactNode;
   actions?: PageHeaderAction[];
   isSticky?: boolean;
@@ -33,6 +35,7 @@ type PageHeaderProps = {
 
 const PageHeader: React.FC<PageHeaderProps> = ({
   children,
+  left,
   right,
   actions,
   isSticky = false,
@@ -42,52 +45,33 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   const theme = useTheme();
   const { currentLayout, autoHideAppbar } = useAppLayout();
   const appBarHeight = useAppBarHeight();
-  const [top, setTop] = useState<number>(-1);
-  const [initialTop, setInitialTop] = useState<number>();
-  const containerEL = useRef<HTMLDivElement>();
-  //
-  useLayoutEffect(() => {
-    if (isSticky && initialTop !== undefined) {
-      let _top = initialTop;
-      if (currentLayout === 'top' || !autoHideAppbar) {
-        _top += appBarHeight;
-      }
-      // console.log(`updatetop: ${_top}`);
-      setTop(_top);
-    }
-  }, [initialTop, currentLayout, autoHideAppbar, appBarHeight]);
 
-  useLayoutEffect(() => {
-    if (isSticky && containerEL.current) {
-      const _initialTop = containerEL.current.offsetTop;
-      // console.log(`inittop: ${_initialTop}`);
-      setInitialTop(_initialTop);
-    }
-  }, [containerEL]);
+  const barWillHide = currentLayout !== 'top' && autoHideAppbar;
 
   return (
-    <RootRef rootRef={containerEL}>
-      <AppBar
-        id="header1"
-        position={isSticky ? 'sticky' : 'relative'}
-        style={{
-          top: top > -1 ? top : null,
-          backgroundColor: backgroundColor || theme.palette.background.default,
-          paddingTop: theme.spacing(0.5),
-          zIndex: !isSticky ? theme.zIndex.appBar - 100 : null
-        }}
-        elevation={elevation}
-        color="inherit"
-      >
+    <AppBar
+      id="header1"
+      position={isSticky ? 'sticky' : 'relative'}
+      style={{
+        top: isSticky ? (barWillHide ? 0 : appBarHeight) : null,
+        backgroundColor: backgroundColor || theme.palette.background.default,
+        zIndex: !isSticky ? theme.zIndex.appBar - 100 : null
+      }}
+      elevation={elevation}
+      color="inherit"
+    >
+      {children}
+      {(left || right || actions) && (
         <Toolbar style={{ minHeight: 0 }} disableGutters>
-          <div style={{ flexGrow: 1 }}>{children}</div>
+          <div style={{ flexGrow: 1 }}>{left}</div>
           <div>
             {actions &&
               actions.map((a, i) => {
+                let act = null;
                 if (a.title) {
-                  return (
+                  act = (
                     <Button
-                      key={a.key ? a.key : `ph-action-${i}`}
+                      key={a.tooltip ? null : a.key ? a.key : `ph-action-${i}`}
                       startIcon={a.icon}
                       color={a.color}
                       onClick={a.action}
@@ -97,24 +81,32 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                       {a.title}
                     </Button>
                   );
+                } else {
+                  act = (
+                    <IconButton
+                      key={a.tooltip ? null : a.key ? a.key : `ph-action-${i}`}
+                      color={a.color}
+                      onClick={a.action}
+                      {...(a.btnProp as IconButtonProps)}
+                      style={{ marginRight: theme.spacing(1) }}
+                    >
+                      {a.icon}
+                    </IconButton>
+                  );
                 }
-                return (
-                  <IconButton
-                    key={a.key ? a.key : `ph-action-${i}`}
-                    color={a.color}
-                    onClick={a.action}
-                    {...(a.btnProp as IconButtonProps)}
-                    style={{ marginRight: theme.spacing(1) }}
-                  >
-                    {a.icon}
-                  </IconButton>
+                return a.tooltip ? (
+                  <Tooltip key={a.key ? a.key : `ph-action-${i}`} title={a.tooltip}>
+                    {act}
+                  </Tooltip>
+                ) : (
+                  act
                 );
               })}
           </div>
           <div>{right}</div>
         </Toolbar>
-      </AppBar>
-    </RootRef>
+      )}
+    </AppBar>
   );
 };
 

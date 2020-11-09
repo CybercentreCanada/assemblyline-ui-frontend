@@ -1,4 +1,4 @@
-import { CssBaseline, makeStyles } from '@material-ui/core';
+import { CssBaseline, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
 import useAppUser from 'commons/components/hooks/useAppUser';
 import LeftNavDrawer, { LeftNavElement } from 'commons/components/layout/leftnav/LeftNavDrawer';
 import { AppElement } from 'commons/components/layout/topnav/AppSwitcher';
@@ -8,20 +8,13 @@ import React, { useState } from 'react';
 
 const useNewStyles = makeStyles(theme => ({
   appVertical: {
-    [theme.breakpoints.up('md')]: {
-      height: '100%',
-      display: 'flex',
-      flexDirection: 'row'
-    },
-    [theme.breakpoints.down('sm')]: {
-      position: 'relative',
-      height: '100%'
-    }
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'row',
+    position: 'relative'
   },
   appVerticalLeft: {
-    [theme.breakpoints.up('md')]: {
-      height: '100%'
-    },
+    height: '100%',
     [theme.breakpoints.down('sm')]: {
       position: 'absolute',
       top: 0,
@@ -30,74 +23,28 @@ const useNewStyles = makeStyles(theme => ({
     }
   },
   appVerticalRight: {
-    overflow: 'auto',
-    [theme.breakpoints.up('md')]: {
-      position: 'relative',
-      display: 'flex',
-      flexDirection: 'column',
-      flex: 1,
-      height: '100%'
+    '@media print': {
+      overflow: 'unset'
     },
-    [theme.breakpoints.down('sm')]: {
-      position: 'absolute',
-      top: 0,
-      right: 0,
-      bottom: 0,
-      left: 0
-    },
-    [theme.breakpoints.only('sm')]: {
-      left: theme.spacing(7)
-    }
+    display: 'flex',
+    flexDirection: 'column',
+    position: 'relative',
+    flex: 1,
+    height: '100%'
   },
   appVerticalRightContent: {
     height: 'auto',
-    position: 'relative',
     display: 'flex',
     flexDirection: 'column',
-    [theme.breakpoints.up('md')]: {
-      flexGrow: 1
-    },
-    [theme.breakpoints.down('sm')]: {}
+    flexGrow: 1
   },
   appHorizontal: {
-    overflow: 'auto',
+    '@media print': {
+      overflow: 'unset'
+    },
     height: '100%',
     display: 'flex',
-    flexDirection: 'column',
-    position: 'relative'
-  },
-  appHorizontalBottom: {
-    height: 'auto',
-    [theme.breakpoints.up('md')]: {
-      flexGrow: 1,
-      display: 'flex',
-      flexDirection: 'row'
-    },
-    [theme.breakpoints.down('sm')]: {
-      position: 'relative'
-    }
-  },
-  appHorizontalBottomLeft: {
-    height: 'auto',
-    [theme.breakpoints.down('sm')]: {
-      position: 'absolute',
-      top: 0,
-      right: 0,
-      bottom: 0,
-      left: 0
-    }
-  },
-  appHorizontalBottomRight: {
-    height: 'auto',
-    position: 'relative',
-    display: 'flex',
-    flexDirection: 'column',
-    [theme.breakpoints.up('md')]: {
-      flexGrow: 1
-    },
-    [theme.breakpoints.only('sm')]: {
-      paddingLeft: theme.spacing(7)
-    }
+    flexDirection: 'column'
   }
 }));
 
@@ -222,6 +169,9 @@ function AppLayoutProvider(props: LayoutProviderProps) {
   const [quickSearch, setQuickSearch] = useState<boolean>(initialQuickSearch);
   const [autoHideAppbar, setAutoHideAppbar] = useState<boolean>(initialAutoHideAppbar);
   const [layout, setLayout] = useState<'top' | 'side'>(initialLayout);
+  const theme = useTheme();
+  const isSM = useMediaQuery(theme.breakpoints.only('sm'));
+  const isPrinting = useMediaQuery('print');
 
   const onToggleLayout = () => {
     const newLayout = layout === 'top' ? 'side' : 'top';
@@ -303,19 +253,27 @@ function AppLayoutProvider(props: LayoutProviderProps) {
             <div className={newClasses.appVerticalLeft}>
               {isUserReady() && appReady && showMenus && <LeftNavDrawer />}
             </div>
-            <div className={newClasses.appVerticalRight} id="app-scrollparent">
+            <div
+              className={newClasses.appVerticalRight}
+              style={{ overflow: 'auto', paddingLeft: showMenus && isSM && !isPrinting ? theme.spacing(7) : 0 }}
+            >
               {isUserReady() && appReady && showMenus && <TopBar />}
-              <div className={newClasses.appVerticalRightContent}>{children}</div>
+              {children}
             </div>
           </div>
         ) : (
-          <div className={newClasses.appHorizontal} id="app-scrollparent">
+          <div className={newClasses.appHorizontal} style={{ overflow: 'auto' }}>
             {isUserReady() && appReady && showMenus && <TopBar />}
-            <div className={newClasses.appHorizontalBottom}>
-              <div className={newClasses.appHorizontalBottomLeft}>
+            <div className={newClasses.appVertical}>
+              <div className={newClasses.appVerticalLeft}>
                 {isUserReady() && appReady && showMenus && <LeftNavDrawer />}
               </div>
-              <div className={newClasses.appHorizontalBottomRight}>{children}</div>
+              <div
+                className={newClasses.appVerticalRight}
+                style={{ paddingLeft: showMenus && isSM && !isPrinting ? theme.spacing(7) : 0 }}
+              >
+                {children}
+              </div>
             </div>
           </div>
         )}

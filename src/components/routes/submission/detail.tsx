@@ -182,7 +182,7 @@ export default function SubmissionDetail() {
   }, [fid]);
 
   return (
-    <PageCenter>
+    <PageCenter ml={4} mr={4} width="100%">
       <ConfirmationDialog
         open={deleteDialog}
         handleClose={() => setDeleteDialog(false)}
@@ -315,33 +315,31 @@ export default function SubmissionDetail() {
           [submission, id]
         )}
 
-        <div style={{ paddingBottom: sp2 }}>
-          <InfoSection submission={submission} />
+        <InfoSection submission={submission} />
 
-          {(!submission || Object.keys(submission.metadata).length !== 0) && (
-            <MetaSection metadata={submission ? submission.metadata : null} />
-          )}
+        {(!submission || Object.keys(submission.metadata).length !== 0) && (
+          <MetaSection metadata={submission ? submission.metadata : null} />
+        )}
 
-          {(!summary || Object.keys(summary.attack_matrix).length !== 0) && (
-            <AttackSection attack_matrix={summary ? summary.attack_matrix : null} />
-          )}
+        {(!summary || Object.keys(summary.attack_matrix).length !== 0) && (
+          <AttackSection attack_matrix={summary ? summary.attack_matrix : null} />
+        )}
 
-          {(!summary || Object.keys(summary.heuristics).length !== 0) && (
-            <HeuristicSection heuristics={summary ? summary.heuristics : null} />
-          )}
+        {(!summary || Object.keys(summary.heuristics).length !== 0) && (
+          <HeuristicSection heuristics={summary ? summary.heuristics : null} />
+        )}
 
-          {summary &&
-            Object.keys(summary.tags).length !== 0 &&
-            Object.keys(summary.tags).map((tag_group, group_idx) => {
-              return (
-                Object.keys(summary.tags[tag_group]).length !== 0 && (
-                  <TagSection key={group_idx} tag_group={tag_group} tags={summary.tags[tag_group]} />
-                )
-              );
-            })}
+        {summary &&
+          Object.keys(summary.tags).length !== 0 &&
+          Object.keys(summary.tags).map((tag_group, group_idx) => {
+            return (
+              Object.keys(summary.tags[tag_group]).length !== 0 && (
+                <TagSection key={group_idx} tag_group={tag_group} tags={summary.tags[tag_group]} />
+              )
+            );
+          })}
 
-          <FileTreeSection tree={tree ? tree.tree : null} sid={id} />
-        </div>
+        <FileTreeSection tree={tree ? tree.tree : null} sid={id} />
       </div>
     </PageCenter>
   );

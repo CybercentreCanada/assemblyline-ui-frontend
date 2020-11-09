@@ -1,11 +1,4 @@
-import { CircularProgress, createStyles, makeStyles, Theme, Tooltip, withStyles } from '@material-ui/core';
-import Paper from '@material-ui/core/Paper';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
+import { makeStyles, Tooltip, useMediaQuery, useTheme } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 import PersonIcon from '@material-ui/icons/Person';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
@@ -15,15 +8,12 @@ import SearchQuery from 'components/elements/search/search-query';
 import useAppContext from 'components/hooks/useAppContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { ALField } from 'components/hooks/useMyUser';
-import Classification from 'components/visual/Classification';
 import SearchPager from 'components/visual/SearchPager';
-import SubmissionState from 'components/visual/SubmissionState';
-import Verdict from 'components/visual/Verdict';
+import SubmissionsTable, { SubmissionResult } from 'components/visual/SearchResult/submissions';
 import 'moment/locale/fr';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from 'react-moment';
-import { Link, useHistory, useLocation } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 
 const PAGE_SIZE = 25;
 
@@ -36,41 +26,24 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const StyledTableCell = withStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      paddingRight: '8px',
-      paddingLeft: '8px'
-    },
-    head: {
-      backgroundColor: theme.palette.type === 'dark' ? '#404040' : '#EEE'
-    },
-    body: {
-      wordBreak: 'break-word'
-    }
-  })
-)(TableCell);
-
-const DivTD = ({ children, ...other }) => {
-  return (
-    <StyledTableCell {...other} component="div">
-      {children}
-    </StyledTableCell>
-  );
+type SearchResults = {
+  items: SubmissionResult[];
+  total: number;
 };
 
 export default function Submissions() {
-  const { t, i18n } = useTranslation(['submissions']);
-  const [submissions, setSubmissions] = useState(null);
+  const { t } = useTranslation(['submissions']);
   const [pageSize] = useState(PAGE_SIZE);
-  const [total, setTotal] = useState(null);
+  const [submissionResults, setSubmissionResults] = useState<SearchResults>(null);
   const [searching, setSearching] = useState(false);
   const { user: currentUser, indexes } = useAppContext();
   const history = useHistory();
   const apiCall = useMyAPI();
   const classes = useStyles();
+  const theme = useTheme();
   const location = useLocation();
   const [query, setQuery] = useState<SearchQuery>(null);
+  const upMD = useMediaQuery(theme.breakpoints.up('md'));
   const [fields] = useState<ALField[]>(
     Object.keys(indexes.submission).map(name => {
       return { ...indexes.submission[name], name };
@@ -88,6 +61,7 @@ export default function Submissions() {
   const onClear = () => {
     history.push('/submissions');
   };
+
   const onSearch = () => {
     if (filterValue.current !== '') {
       history.push(`/submissions?query=${filterValue.current}`);
@@ -95,6 +69,7 @@ export default function Submissions() {
       onClear();
     }
   };
+
   const onFilterValueChange = (inputValue: string) => {
     filterValue.current = inputValue;
   };
@@ -113,9 +88,7 @@ export default function Submissions() {
         url: '/api/v4/search/submission/',
         body: { query: '*', ...query.getParams(), rows: pageSize, offset: 0 },
         onSuccess: api_data => {
-          const { items, total: newTotal } = api_data.api_response;
-          setTotal(newTotal);
-          setSubmissions(items);
+          setSubmissionResults(api_data.api_response);
         },
         onFinalize: () => {
           setSearching(false);
@@ -126,117 +99,64 @@ export default function Submissions() {
   }, [query]);
 
   return (
-    <PageFullWidth>
+    <PageFullWidth margin={4}>
+      <div style={{ paddingBottom: theme.spacing(2) }}>
+        <Typography variant="h4">{t('title')}</Typography>
+      </div>
       <PageHeader isSticky>
-        <SearchBar
-          initValue={query ? query.getQuery() : ''}
-          placeholder={t('filter')}
-          searching={searching}
-          suggestions={buildSearchSuggestions()}
-          onValueChange={onFilterValueChange}
-          onClear={onClear}
-          onSearch={onSearch}
-          buttons={[
-            {
-              icon: (
-                <Tooltip title={t('my_submission')}>
-                  <PersonIcon />
-                </Tooltip>
-              ),
-              props: {
-                onClick: () => {
-                  history.push(`/submissions?query=params.submitter:"${currentUser.username}"`);
+        <div style={{ paddingTop: theme.spacing(1) }}>
+          <SearchBar
+            initValue={query ? query.getQuery() : ''}
+            placeholder={t('filter')}
+            searching={searching}
+            suggestions={buildSearchSuggestions()}
+            onValueChange={onFilterValueChange}
+            onClear={onClear}
+            onSearch={onSearch}
+            buttons={[
+              {
+                icon: (
+                  <Tooltip title={t('my_submission')}>
+                    <PersonIcon fontSize={upMD ? 'default' : 'small'} />
+                  </Tooltip>
+                ),
+                props: {
+                  onClick: () => {
+                    history.push(`/submissions?query=params.submitter:"${currentUser.username}"`);
+                  }
                 }
               }
-            }
-          ]}
-        >
-          {submissions !== null && (
-            <div className={classes.searchresult}>
-              <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
-                {searching ? (
-                  <span>{t('searching')}</span>
-                ) : (
-                  <span>
-                    {total}&nbsp;{query.getQuery() ? t('filtered') : t('total')}
-                  </span>
+            ]}
+          >
+            {submissionResults !== null && (
+              <div className={classes.searchresult}>
+                {submissionResults.total !== 0 && (
+                  <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
+                    {searching ? (
+                      <span>{t('searching')}</span>
+                    ) : (
+                      <span>
+                        {submissionResults.total}&nbsp;{query.getQuery() ? t('filtered') : t('total')}
+                      </span>
+                    )}
+                  </Typography>
                 )}
-              </Typography>
 
-              <SearchPager
-                total={total}
-                setTotal={setTotal}
-                pageSize={PAGE_SIZE}
-                index="submission"
-                query={query}
-                setData={setSubmissions}
-                setSearching={setSearching}
-              />
-            </div>
-          )}
-        </SearchBar>
+                <SearchPager
+                  total={submissionResults.total}
+                  setResults={setSubmissionResults}
+                  pageSize={PAGE_SIZE}
+                  index="submission"
+                  query={query}
+                  setSearching={setSearching}
+                />
+              </div>
+            )}
+          </SearchBar>
+        </div>
       </PageHeader>
-      <div style={{ paddingBottom: '1rem', paddingLeft: '4px', paddingRight: '4px' }}>
-        {submissions !== null ? (
-          <TableContainer component={Paper}>
-            <Table component="div" size="small">
-              <TableHead component="div">
-                <TableRow component="div" style={{ whiteSpace: 'nowrap' }}>
-                  <DivTD>{t('header.starttime')}</DivTD>
-                  <DivTD>{t('header.verdict')}</DivTD>
-                  <DivTD>{t('header.description')}</DivTD>
-                  <DivTD>{t('header.user')}</DivTD>
-                  <DivTD>{t('header.numfiles')}</DivTD>
-                  <DivTD>{t('header.classification')}</DivTD>
-                  <DivTD>{t('header.status')}</DivTD>
-                </TableRow>
-              </TableHead>
-              <TableBody component="div">
-                {submissions.map(submission => (
-                  <TableRow
-                    key={submission.id}
-                    component={Link}
-                    to={
-                      submission.state === 'completed'
-                        ? `/submission/${submission.id}`
-                        : `/submission/detail/${submission.id}`
-                    }
-                    hover
-                    style={{ textDecoration: 'none' }}
-                  >
-                    <DivTD>
-                      <Tooltip title={submission.times.submitted}>
-                        <Moment fromNow locale={i18n.language}>
-                          {submission.times.submitted}
-                        </Moment>
-                      </Tooltip>
-                    </DivTD>
-                    <DivTD>
-                      <Verdict score={submission.max_score} />
-                    </DivTD>
-                    <DivTD>
-                      {submission.params.description.length > 150
-                        ? `${submission.params.description.substr(0, 147)}...`
-                        : submission.params.description}
-                    </DivTD>
-                    <DivTD style={{ whiteSpace: 'nowrap' }}>{submission.params.submitter}</DivTD>
-                    <DivTD>{submission.file_count}</DivTD>
-                    <DivTD>
-                      <Classification type="text" size="tiny" c12n={submission.classification} format="short" />
-                    </DivTD>
-                    <DivTD style={{ textAlign: 'center' }}>
-                      <SubmissionState state={submission.state} error_count={submission.error_count} />
-                    </DivTD>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        ) : (
-          <div style={{ width: '100%', textAlign: 'center' }}>
-            <CircularProgress />
-          </div>
-        )}
+      <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
+        <SubmissionsTable submissionResults={submissionResults} />
       </div>
     </PageFullWidth>
   );

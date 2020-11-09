@@ -11,7 +11,7 @@ export default function Admin() {
   const { user: currentUser } = useUser<CustomUser>();
 
   return currentUser.is_admin ? (
-    <PageCenter>
+    <PageCenter margin={4}>
       <LinkGrid items={layout.topnav.adminMenu} />
     </PageCenter>
   ) : (

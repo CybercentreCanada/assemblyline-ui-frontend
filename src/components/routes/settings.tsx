@@ -195,7 +195,7 @@ function Settings<SettingsProps>({ width }) {
   }, []);
 
   return (
-    <PageCenter>
+    <PageCenter margin={4}>
       <React.Fragment key="right">
         <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
           <div style={{ alignSelf: 'flex-end' }}>
@@ -306,10 +306,7 @@ function Settings<SettingsProps>({ width }) {
         </Drawer>
       </React.Fragment>
 
-      <div
-        className={classes.page}
-        style={{ paddingTop: sp6, paddingBottom: sp6, display: 'inline-block', textAlign: 'center' }}
-      >
+      <div className={classes.page} style={{ display: 'inline-block', textAlign: 'center' }}>
         <TableContainer className={classes.group} component={Paper}>
           <Table aria-label={t('submissions')}>
             <TableHead>

@@ -1,17 +1,16 @@
 import {
   Box,
-  CircularProgress,
   Divider,
   fade,
   IconButton,
   IconButtonProps,
+  LinearProgress,
   makeStyles,
   Tooltip,
   useMediaQuery,
   useTheme
 } from '@material-ui/core';
 import BackspaceIcon from '@material-ui/icons/Backspace';
-import SearchIcon from '@material-ui/icons/Search';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import SearchTextField from './search-textfield';
@@ -25,6 +24,7 @@ const useStyles = makeStyles(theme => ({
   searchbar: {
     borderRadius: '4px',
     paddingLeft: theme.spacing(2),
+    paddingRight: theme.spacing(0.5),
     backgroundColor: fade(theme.palette.text.primary, 0.04),
     '&:hover': {
       backgroundColor: fade(theme.palette.text.primary, 0.06)
@@ -72,7 +72,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const classes = useStyles();
   const element = useRef<HTMLInputElement>();
   const [value, setValue] = useState<string>(initValue);
-  const isLTEMd = useMediaQuery(theme.breakpoints.up('md'));
+  const upMD = useMediaQuery(theme.breakpoints.up('md'));
 
   //
   const getInputEl = () => {
@@ -106,15 +106,15 @@ const SearchBar: React.FC<SearchBarProps> = ({
   return (
     <div ref={element} className={classes.root}>
       <Box display="flex" flexDirection="row" className={classes.searchbar} alignItems="center">
-        <div style={{ lineHeight: 'normal', marginRight: theme.spacing(2) }}>
+        {/* <div style={{ lineHeight: 'normal', marginRight: theme.spacing(2) }}>
           {searching ? (
             <span style={{ width: 35, height: 35 }}>
               <CircularProgress size={24} />
             </span>
           ) : (
-            <SearchIcon />
+            <SearchIcon color="action" fontSize="large" />
           )}
-        </div>
+        </div> */}
         <Box flex={1} display="relative">
           <SearchTextField
             value={value}
@@ -126,41 +126,47 @@ const SearchBar: React.FC<SearchBarProps> = ({
             onClear={_onValueClear}
           />
         </Box>
-        {isLTEMd && (
-          <>
-            <IconButton onClick={_onValueClear} edge="end">
-              <Tooltip title={t('clear_filter')}>
-                <BackspaceIcon />
-              </Tooltip>
-            </IconButton>
-            {buttons.length !== 0 && (
-              <Divider
-                orientation="vertical"
-                flexItem
-                style={{ marginLeft: theme.spacing(1), marginRight: theme.spacing(1) }}
-              />
-            )}
-            {buttons.map((b, i) => (
-              <IconButton key={`searchbar-button-${i}`} {...b.props} edge="end">
-                {b.icon}
-              </IconButton>
-            ))}
-          </>
+        <IconButton
+          onClick={_onValueClear}
+          edge="end"
+          size={!upMD ? 'small' : null}
+          style={{ marginRight: theme.spacing(upMD ? 1 : 0.5) }}
+        >
+          <Tooltip title={t('clear_filter')}>
+            <BackspaceIcon fontSize={!upMD ? 'small' : 'default'} />
+          </Tooltip>
+        </IconButton>
+        {buttons.length !== 0 && (
+          <Divider
+            orientation="vertical"
+            flexItem
+            style={{ marginLeft: theme.spacing(upMD ? 0 : 0.5), marginRight: theme.spacing(upMD ? 1 : 0.5) }}
+          />
         )}
+        {buttons.map((b, i) => (
+          <IconButton
+            key={`searchbar-button-${i}`}
+            {...b.props}
+            edge="end"
+            size={!upMD ? 'small' : null}
+            style={{ marginRight: theme.spacing(upMD ? 1 : 0.5) }}
+          >
+            {b.icon}
+          </IconButton>
+        ))}
       </Box>
-      {isLTEMd ? (
-        <Box className={classes.searchresult}>{children}</Box>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'row' }}>
-          <div className={classes.searchresult}>{children}</div>
-          <div style={{ flex: 1 }} />
-          {buttons.map((b, i) => (
-            <IconButton key={`searchbar-button-${i}`} {...b.props} edge="end">
-              {b.icon}
-            </IconButton>
-          ))}
-        </div>
+      {searching && (
+        <LinearProgress
+          style={{
+            position: 'absolute',
+            height: theme.spacing(upMD ? 0.5 : 0.25),
+            marginTop: theme.spacing(upMD ? -0.5 : -0.25),
+            width: '100%',
+            borderRadius: '0 0 4px 4px'
+          }}
+        />
       )}
+      <div className={classes.searchresult}>{children}</div>
     </div>
   );
 };

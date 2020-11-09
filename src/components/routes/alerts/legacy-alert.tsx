@@ -19,7 +19,7 @@ export default function AlertsLegacy() {
   }, []);
 
   return (
-    <PageCenter>
+    <PageCenter margin={4}>
       <h1>Alert Legacy Test</h1>
       <div style={{ textAlign: 'left' }}>
         {alerts &&

@@ -42,8 +42,8 @@ export default function Configuration() {
   }, []);
 
   return (
-    <PageCenter>
-      <div style={{ textAlign: 'left', paddingBottom: sp2 }}>
+    <PageCenter margin={4}>
+      <div style={{ textAlign: 'left' }}>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <Typography variant="h6" gutterBottom>
             {t('tags')}

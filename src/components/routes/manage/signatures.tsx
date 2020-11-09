@@ -6,7 +6,7 @@ export default function Signatures() {
   const { t } = useTranslation(['manageSignatures']);
 
   return (
-    <PageCenter>
+    <PageCenter margin={4}>
       <div style={{ textAlign: 'left' }}>{t('Signatures')}</div>
     </PageCenter>
   );

@@ -1,4 +1,14 @@
-import { Divider, Grid, Hidden, IconButton, makeStyles, Tooltip, Typography, useTheme } from '@material-ui/core';
+import {
+  Divider,
+  Grid,
+  Hidden,
+  IconButton,
+  makeStyles,
+  Tooltip,
+  Typography,
+  useMediaQuery,
+  useTheme
+} from '@material-ui/core';
 import BugReportOutlinedIcon from '@material-ui/icons/BugReportOutlined';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import ListAltOutlinedIcon from '@material-ui/icons/ListAltOutlined';
@@ -492,6 +502,7 @@ export default function SubmissionReport() {
   const sp4 = theme.spacing(4);
   const classes = useStyles();
   const { showErrorMessage, showWarningMessage } = useMySnackbar();
+  const isPrinting = useMediaQuery('print');
 
   useEffect(() => {
     apiCall({
@@ -515,7 +526,7 @@ export default function SubmissionReport() {
   }, []);
 
   return (
-    <PageCenter>
+    <PageCenter ml={isPrinting ? 2 : 4} mr={isPrinting ? 2 : 4} width="100%">
       <div style={{ textAlign: 'left' }}>
         <div style={{ paddingBottom: sp4, paddingTop: sp2 }}>
           <Classification size="tiny" c12n={report ? report.classification : null} />
@@ -805,7 +816,7 @@ export default function SubmissionReport() {
           })}
 
         {(!report || report.important_files.length !== 0) && (
-          <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
+          <div style={{ paddingTop: sp2, pageBreakInside: 'avoid' }}>
             <Typography variant="h6">{t('important_files')}</Typography>
             <Divider className={classes.divider} />
             <div

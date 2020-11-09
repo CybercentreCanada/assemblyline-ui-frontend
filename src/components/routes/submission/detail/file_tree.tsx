@@ -1,4 +1,4 @@
-import { Box, Collapse, Divider, makeStyles, Typography, useTheme } from '@material-ui/core';
+import { Box, Collapse, Divider, makeStyles, Tooltip, Typography, useTheme } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
 import useHighlighter from 'components/hooks/useHighlighter';
 import Verdict from 'components/visual/Verdict';
@@ -18,6 +18,9 @@ const useStyles = makeStyles(theme => ({
     '&:hover, &:focus': {
       color: theme.palette.text.secondary
     }
+  },
+  noMaxWidth: {
+    maxWidth: 'none'
   }
 }));
 
@@ -48,7 +51,7 @@ const WrappedFileTreeSection: React.FC<FileTreeProps> = ({ tree, sid }) => {
   const sp2 = theme.spacing(2);
 
   return (
-    <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+    <div style={{ paddingTop: sp2 }}>
       <Typography
         variant="h6"
         onClick={() => {
@@ -101,9 +104,13 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid }) => {
                 backgroundColor: isHighlighted(sha256) ? (theme.palette.type === 'dark' ? '#343a44' : '#d8e3ea') : null
               }}
             >
-              <Verdict score={item.score} mono short />
-              {`:: ${item.name.join(' | ')} `}
-              <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{`[${item.type}]`}</span>
+              <Tooltip title={item.sha256} placement="right" classes={{ tooltip: classes.noMaxWidth }}>
+                <span>
+                  <Verdict score={item.score} mono short />
+                  {`:: ${item.name.join(' | ')} `}
+                  <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{`[${item.type}]`}</span>
+                </span>
+              </Tooltip>
             </Box>
             <div style={{ marginLeft: theme.spacing(3) }}>
               <FileTree tree={item.children} sid={sid} />

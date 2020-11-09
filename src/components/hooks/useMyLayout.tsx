@@ -1,3 +1,4 @@
+import { useMediaQuery, useTheme } from '@material-ui/core';
 import AccountCircleOutlinedIcon from '@material-ui/icons/AccountCircleOutlined';
 import AccountTreeOutlinedIcon from '@material-ui/icons/AccountTreeOutlined';
 import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
@@ -25,6 +26,8 @@ import { BiNetworkChart } from 'react-icons/bi';
 
 const useMyLayout = (): AppLayoutProps => {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const isXS = useMediaQuery(theme.breakpoints.only('xs'));
   const MENU_ITEMS = [
     {
       type: 'item' as 'item',
@@ -257,18 +260,22 @@ const useMyLayout = (): AppLayoutProps => {
     }
   ];
 
-  const darkLogo = <img alt={t('logo.alt')} src="/images/al_dark.svg" width="40" height="32" />;
-  const lightLogo = <img alt={t('logo.alt')} src="/images/al.svg" width="40" height="32" />;
+  const darkLogo = (
+    <img alt={t('logo.alt')} src="/images/al_dark.svg" width="40" height="32" style={{ marginLeft: '-5px' }} />
+  );
+  const lightLogo = (
+    <img alt={t('logo.alt')} src="/images/al.svg" width="40" height="32" style={{ marginLeft: '-5px' }} />
+  );
   const darkBanner = (
     <img
-      style={{ display: 'inline-block', width: '100%', margin: '3rem 0' }}
+      style={{ display: 'inline-block', width: '100%', margin: `${isXS ? 2 : 3}rem 0` }}
       src="/images/banner_dark.svg"
       alt={t('banner.alt')}
     />
   );
   const lightBanner = (
     <img
-      style={{ display: 'inline-block', width: '100%', margin: '3rem 0' }}
+      style={{ display: 'inline-block', width: '100%', margin: `${isXS ? 2 : 3}rem 0` }}
       src="/images/banner.svg"
       alt={t('banner.alt')}
     />
@@ -297,6 +304,7 @@ const useMyLayout = (): AppLayoutProps => {
       adminMenuTitle: t('adminmenu'),
       apps: APP_SWITCHER_ITEMS,
       quickSearchURI: '/search',
+      quickSearchParam: 'query',
       themeSelectionUnder: 'icon' as 'icon',
       userMenu: USER_MENU_ITEMS,
       userMenuTitle: t('usermenu')

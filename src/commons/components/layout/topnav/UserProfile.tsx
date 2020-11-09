@@ -122,7 +122,6 @@ const UserProfile = () => {
           anchorEl={popperAnchorEl}
           className={classes.popper}
           placement="bottom-end"
-          container={document.getElementById('app-scrollparent')}
           transition
         >
           {({ TransitionProps }) => (

@@ -1,1 +1,11 @@
-{}
+{
+  "header.classification": "Classification",
+  "header.description": "Description",
+  "header.numfiles": "# Fichiers",
+  "header.starttime": "Heure de début",
+  "header.status": "Status",
+  "header.user": "Utilisateur",
+  "header.verdict": "Verdicte",
+  "no_submissions_title": "Aucune soumission trouvée!",
+  "no_results_desc": "La requête que vous avez exécutée n'a renvoyé aucun résultat."
+}

@@ -6,7 +6,7 @@ export default function Heuristics() {
   const { t } = useTranslation(['manageHeuristics']);
 
   return (
-    <PageCenter>
+    <PageCenter margin={4}>
       <div style={{ textAlign: 'left' }}>{t('Heuristics')}</div>
     </PageCenter>
   );

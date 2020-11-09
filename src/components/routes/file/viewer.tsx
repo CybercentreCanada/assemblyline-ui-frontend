@@ -12,7 +12,7 @@ function FileViewer() {
   const { t } = useTranslation(['fileViewer']);
 
   return (
-    <PageCenter>
+    <PageCenter margin={4}>
       <div style={{ textAlign: 'left' }}>{t(`File Viewer ${id}`)}</div>
     </PageCenter>
   );
