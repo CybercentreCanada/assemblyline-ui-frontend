@@ -147,8 +147,7 @@ export default function SubmissionDetail() {
   );
 
   const closeDrawer = () => {
-    setDrawer(false);
-    setTimeout(() => history.push(`/submission/detail/${id}`), 150);
+    history.push(`/submission/detail/${id}`);
   };
 
   useEffect(() => {
@@ -177,6 +176,8 @@ export default function SubmissionDetail() {
   useEffect(() => {
     if (!drawer && fid) {
       setDrawer(true);
+    } else if (drawer && !fid) {
+      setDrawer(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fid]);
