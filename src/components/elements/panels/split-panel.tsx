@@ -39,6 +39,7 @@ type SplitPanelProps = {
   rightOpen?: boolean;
   left: React.ReactNode;
   right: React.ReactNode;
+  onRightDrawerClose?: () => void;
 };
 
 const SplitPanel: React.FC<SplitPanelProps> = ({
@@ -50,7 +51,8 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
   rightOpen = true,
   rightDrawerBreakpoint = 500,
   rightDrawerBackgroundColor,
-  rightDrawerWidth = 400
+  rightDrawerWidth = 400,
+  onRightDrawerClose
 }) => {
   const classes = useStyles();
   const drawerClasses = makeStyles(theme => ({
@@ -230,7 +232,7 @@ const SplitPanel: React.FC<SplitPanelProps> = ({
         <div ref={leftEl} className={classes.left}>
           <div style={{ width: '100%' }}>{left}</div>
         </div>
-        <Drawer open={rightOpen} anchor="right" classes={{ paper: drawerClasses.paper }}>
+        <Drawer open={rightOpen} anchor="right" classes={{ paper: drawerClasses.paper }} onClose={onRightDrawerClose}>
           {right}
         </Drawer>
       </div>

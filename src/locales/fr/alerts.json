@@ -35,5 +35,13 @@
   "type": "Type",
   "verdict.success.malicious": "Le verdict malveillant a été appliqué avec succès à l'alerte.",
   "verdict.success.non_malicious": "Le verdict non malveillant a été appliqué avec succès à l'alerte.",
-  "yara": "Yara Hits"
+  "yara": "Yara Hits",
+  "page.alerts.filters": "Filtre",
+  "page.alerts.filters.apply": "Appliquer",
+  "page.alerts.filters.clear": "Effacer",
+  "page.alerts.filters.cancel": "Ferme",
+  "page.alerts.actions.ok": "Ok",
+  "page.alerts.actions.cancel": "Annuler",
+  "page.alerts.actions.takeownershipdiag.header": "Prendre possession",
+  "page.alerts.actions.takeownershipdiag.content": "Voulez-vous devenir propriétaire de {0} alerte(s) liée à ce {1}"
 }

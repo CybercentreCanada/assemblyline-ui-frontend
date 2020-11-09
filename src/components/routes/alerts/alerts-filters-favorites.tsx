@@ -10,13 +10,16 @@ import {
   Typography,
   useTheme
 } from '@material-ui/core';
+import ClearAllIcon from '@material-ui/icons/ClearAll';
+import CloseIcon from '@material-ui/icons/ExitToApp';
+import SaveIcon from '@material-ui/icons/Save';
 import WarningIcon from '@material-ui/icons/Warning';
 import { ChipList } from 'components/elements/mui/chips';
+import useMySnackbar from 'components/hooks/useMySnackbar';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useFavorites, { Favorite } from './hooks/useFavorites';
 
-//
 interface AlertsFiltersFavoritesProps {
   initValue?: string;
   onSaved: (favorite: { name: string; query: string }) => void;
@@ -42,14 +45,23 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
     onAddGlobalFavorite,
     onDeleteGlobalFavorite
   } = useFavorites();
-  const [queryValue, setQueryValue] = useState<string>(initValue);
-  const [nameValue, setNameValue] = useState<string>();
+  const { showErrorMessage } = useMySnackbar();
+  const [formValid, setFormValid] = useState<boolean>(false);
+  const [queryValue, setQueryValue] = useState<{ valid: boolean; value: string }>({ valid: true, value: initValue });
+  const [nameValue, setNameValue] = useState<{ valid: boolean; value: string }>({ valid: true, value: '' });
   const [publicSwitch, setPublicSwitch] = useState<boolean>(false);
   const [confirmation, setConfirmation] = useState<{ open: boolean; favorite: Favorite; isPublic: boolean }>({
     open: false,
     favorite: null,
     isPublic: false
   });
+
+  const validateForm = (
+    _queryValue: { valid: boolean; value: string },
+    _nameValue: { valid: boolean; value: string }
+  ) => {
+    setFormValid(!!_queryValue.value && !!_nameValue.value);
+  };
 
   const _onDelete = (favorite: Favorite, isPublic: boolean) => {
     if (isPublic) {
@@ -64,15 +76,19 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
   };
 
   const _onSave = () => {
-    const favorite = { query: queryValue, name: nameValue };
-    if (publicSwitch) {
-      onAddGlobalFavorite(favorite, () => {
-        onSaved(favorite);
-      });
+    if (queryValue.value && nameValue.value) {
+      const favorite = { query: queryValue.value, name: nameValue.value };
+      if (publicSwitch) {
+        onAddGlobalFavorite(favorite, () => {
+          onSaved(favorite);
+        });
+      } else {
+        onAddUserFavorite(favorite, () => {
+          onSaved(favorite);
+        });
+      }
     } else {
-      onAddUserFavorite(favorite, () => {
-        onSaved(favorite);
-      });
+      showErrorMessage(t('favorites.form.field.required'));
     }
   };
 
@@ -98,16 +114,28 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
     onCancel();
   };
 
-  const onQueryChange = event => {
-    setQueryValue(event.currentTarget.value);
+  const onQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.currentTarget;
+    const _queryValue = { valid: !!value, value };
+    setQueryValue(_queryValue);
+    validateForm(_queryValue, nameValue);
   };
 
-  const onNameChange = event => {
-    setNameValue(event.currentTarget.value);
+  const onNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.currentTarget;
+    const _nameValue = { valid: !!value, value };
+    setNameValue({ valid: !!value, value });
+    validateForm(queryValue, _nameValue);
   };
 
-  const onSwitchChange = isPublic => {
+  const onSwitchChange = (isPublic: boolean) => {
     setPublicSwitch(isPublic);
+  };
+
+  const onClearBtnClick = () => {
+    setFormValid(false);
+    setQueryValue({ valid: false, value: '' });
+    setNameValue({ valid: false, value: '' });
   };
 
   return (
@@ -140,29 +168,38 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
       <div style={{ margin: theme.spacing(1) }}>
         <div>
           <TextField
+            error={!queryValue.valid}
             label={t('favorites.query')}
             variant="outlined"
-            value={queryValue}
+            value={queryValue.value}
             onChange={onQueryChange}
+            onBlur={() => setQueryValue({ ...queryValue, valid: !!queryValue.value })}
             fullWidth
           />
         </div>
         <div style={{ marginTop: theme.spacing(2) }}>
           <TextField
+            error={!nameValue.valid}
             label={t('favorites.name')}
             variant="outlined"
-            value={nameValue}
+            value={nameValue.value}
             onChange={onNameChange}
+            onBlur={() => setNameValue({ ...nameValue, valid: !!nameValue.value })}
             fullWidth
           />
         </div>
       </div>
       <div style={{ marginTop: theme.spacing(2), display: 'flex', flexDirection: 'row' }}>
-        <Button variant="contained" color="primary" onClick={_onSave}>
+        <Button variant="contained" color="primary" onClick={_onSave} disabled={!formValid} startIcon={<SaveIcon />}>
           {t('favorites.save')}
         </Button>
+        <div style={{ marginRight: theme.spacing(1) }} />
+        <Button variant="contained" onClick={onClearBtnClick} startIcon={<ClearAllIcon />}>
+          {t('favorites.clear')}
+        </Button>
+
         <div style={{ flex: 1 }} />
-        <Button variant="contained" onClick={_onCancel} size="small">
+        <Button variant="contained" onClick={_onCancel} size="small" startIcon={<CloseIcon />}>
           {t('favorites.cancel')}
         </Button>
       </div>
@@ -174,7 +211,8 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
           items={userFavorites.map(f => ({
             size: 'medium',
             variant: 'outlined',
-            label: f.query,
+            label: f.name,
+            tooltip: f.query,
             onClick: () => _onSelect(f),
             onDelete: () => _onDeleteClick(f, false)
           }))}
@@ -187,7 +225,8 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
           items={globalFavorites.map(f => ({
             size: 'medium',
             variant: 'outlined',
-            label: f.query,
+            label: f.name,
+            tooltip: f.query,
             onClick: () => _onSelect(f),
             onDelete: () => _onDeleteClick(f, true)
           }))}
@@ -214,11 +253,11 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
           <div>{t('favorites.confirmdiag.content')}</div>
         </DialogContent>
         <DialogActions>
-          <Button onClick={_onConfirmOkClick} variant="contained" color="primary" size="small">
-            {t('favorites.ok')}
-          </Button>
           <Button autoFocus onClick={_onConfirmCancelClick} variant="contained" size="small">
             {t('favorites.cancel')}
+          </Button>
+          <Button onClick={_onConfirmOkClick} variant="contained" color="primary" size="small">
+            {t('favorites.ok')}
           </Button>
         </DialogActions>
       </Dialog>

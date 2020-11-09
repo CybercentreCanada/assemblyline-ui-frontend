@@ -87,7 +87,7 @@ const useBooklistStyles = makeStyles(theme => ({
   }
 }));
 
-const useInfinitelistStyles = makeStyles(theme => ({
+const useSimpleListStyles = makeStyles(theme => ({
   outer: {
     position: 'relative',
     display: 'flex',
@@ -138,6 +138,9 @@ const useListItemStyles = makeStyles(theme => ({
     },
     '&[data-listitem-selected="true"]': {
       backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 15%)' : 'hsl(0, 0%, 92%)'
+    },
+    '&:hover $itemActions': {
+      display: 'inherit'
     }
   },
   itemOuter: {
@@ -150,6 +153,20 @@ const useListItemStyles = makeStyles(theme => ({
     bottom: 0,
     left: 0,
     right: 0
+  },
+  itemActions: {
+    position: 'absolute',
+    top: theme.spacing(1),
+    right: theme.spacing(1),
+    display: 'none',
+    // backgroundColor: theme.palette.background.default,
+    backgroundColor: 'inherit',
+    // minWidth: 400,
+    // border: '1px solid hsl(0, 0%, 80%)',
+    '& button': {
+      marginRight: theme.spacing(1)
+      // boxShadow: theme.shadows[2]
+    }
   }
 }));
 
@@ -158,6 +175,6 @@ export default function useListStyles() {
     listItemClasses: useListItemStyles(),
     metaListClasses: useMetaListStyles(),
     booklistClasses: useBooklistStyles(),
-    infinitelistClases: useInfinitelistStyles()
+    simpleListStyles: useSimpleListStyles()
   };
 }

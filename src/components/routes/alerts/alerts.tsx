@@ -1,28 +1,50 @@
-import { Box, Drawer, makeStyles, useTheme } from '@material-ui/core';
+import { Box, Drawer, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
+import AccountTreeIcon from '@material-ui/icons/AccountTree';
 import CloseIcon from '@material-ui/icons/Close';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import StarIcon from '@material-ui/icons/Star';
+import PageContent from 'commons/components/layout/pages/PageContent';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
-import Infinitelist from 'components/elements/lists/infinitelist/infinitelist';
+import SimpleList from 'components/elements/lists/simplelist/simplelist';
 // import Booklist from 'components/elements/lists/booklist/booklist';
 import SplitPanel from 'components/elements/panels/split-panel';
 import Viewport from 'components/elements/panels/viewport';
 import SearchBar from 'components/elements/search/search-bar';
-import SearchQuery, { SearchFilter } from 'components/elements/search/search-query';
+import SearchQuery, { SearchQueryFilters } from 'components/elements/search/search-query';
 import Classification from 'components/visual/Classification';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { FcWorkflow } from 'react-icons/fc';
+import React, { useCallback, useRef, useState } from 'react';
+import { FiFilter } from 'react-icons/fi';
 import AlertActionsMenu from './alert-actions-menu';
 import AlertDetails from './alert-details';
 import AlertListItem from './alert-list-item';
-import AlertsFilters, { AlertFilterSelections, DEFAULT_FILTERS } from './alerts-filters';
+import AlertListItemActions from './alert-list-item-actions';
+import AlertsFilters from './alerts-filters';
 import AlertsFiltersFavorites from './alerts-filters-favorites';
 import AlertsFiltersSelected from './alerts-filters-selected';
 import AlertsWorkflowActions from './alerts-workflow-actions';
 import useAlerts, { AlertItem } from './hooks/useAlerts';
+import usePromiseAPI from './hooks/usePromiseAPI';
 
+// Default size of a page to be used by the useAlert hook when fetching next load of data
+//  when scrolling has hit threshold.
 const PAGE_SIZE = 50;
 
+export interface AlertDrawerState {
+  open: boolean;
+  type: 'filter' | 'favorites' | 'actions';
+  actionData?: {
+    query: SearchQuery;
+    total: number;
+  };
+}
+
+// Just indicates whether there are any filters currently set..
+const hasFilters = (filters: SearchQueryFilters): boolean => {
+  const { statuses, priorities, labels, queries } = filters;
+  return statuses.length > 0 || priorities.length > 0 || labels.length > 0 || queries.length > 0;
+};
+
+// Some generated style classes
 const useStyles = makeStyles(theme => ({
   drawerInner: {
     display: 'flex',
@@ -37,6 +59,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+// The Alerts functional component.
 const Alerts: React.FC = () => {
   const classes = useStyles();
   const theme = useTheme();
@@ -46,46 +69,36 @@ const Alerts: React.FC = () => {
     // book,
     total,
     fields,
-    query,
+    searchQuery,
     valueFilters,
     statusFilters,
     priorityFilters,
     labelFilters,
     // updateBook,
+    updateQuery,
     onLoad,
-    onLoadMore,
-    onGet
+    onLoadMore
   } = useAlerts(PAGE_SIZE);
+
+  // API Promise hook
+  const { onGetAlert, onApplyWorkflowAction } = usePromiseAPI();
+
   // Define required states...
   const [searching, setSearching] = useState<boolean>(false);
   const [scrollReset, setScrollReset] = useState<boolean>(false);
   const [splitPanel, setSplitPanel] = useState<{ open: boolean; item: AlertItem }>({ open: false, item: null });
-  const [drawer, setDrawer] = useState<{ open: boolean; type: 'filter' | 'favorites' | 'actions' }>({
+  const [drawer, setDrawer] = useState<AlertDrawerState>({
     open: false,
     type: null
   });
-  const [selectedFilters, setSelectedFilters] = useState<AlertFilterSelections>(DEFAULT_FILTERS);
 
   // Define some references.
-  const searchTextValue = useRef<string>(query.getQuery());
+  const searchTextValue = useRef<string>(searchQuery.getQuery());
 
-  // Parse the filters [fq: param] and set them as  the 'selectedFilters'.
-  const setQueryFilters = (_query: SearchQuery) => {
-    const searchQueryFilters = _query.parseFilters();
-    const statuses = searchQueryFilters.filter(f => f.type === 'status');
-    const priorities = searchQueryFilters.filter(f => f.type === 'priority');
-    const labels = searchQueryFilters.filter(f => f.type === 'label');
-    const queries = searchQueryFilters.filter(f => f.type === 'query');
-    setSelectedFilters(filters => ({
-      ...filters,
-      statuses: statuses || filters.statuses,
-      priorities: priorities || filters.priorities,
-      labels: labels || filters.labels,
-      queries: queries || filters.queries
-    }));
-  };
+  // Media quries.
+  const isLTEMd = useMediaQuery(theme.breakpoints.up('md'));
 
-  //
+  // Handler searchbar onSearch callback
   const onSearch = (filterValue: string = '', inputEl: HTMLInputElement = null) => {
     // Tell the world we're searching for it...
     setSearching(true);
@@ -104,10 +117,10 @@ const Alerts: React.FC = () => {
     }
 
     // Update query and url before reloading data.
-    query.setQuery(filterValue).apply();
+    searchQuery.setQuery(filterValue).apply();
 
     // Reload.
-    onLoad(() => {
+    onLoad((success: boolean) => {
       setSearching(false);
       inputEl.focus();
     });
@@ -116,9 +129,11 @@ const Alerts: React.FC = () => {
   // Handler for when clearing the SearchBar.
   const onClearSearch = () => {
     // Reset the query.
-    query.reset().apply();
-    //
-    setSelectedFilters(DEFAULT_FILTERS);
+    searchQuery.reset().apply();
+
+    // Update the search text field reference.
+    searchTextValue.current = '';
+
     // Reset scroll for each new search.
     setScrollReset(true);
     // Close right of split panel if open.
@@ -133,14 +148,14 @@ const Alerts: React.FC = () => {
   const onItemSelected = useCallback(
     (item: AlertItem) => {
       if (item) {
-        onGet(item.alert_id, alert => {
+        onGetAlert(item.alert_id).then(alert => {
           setSplitPanel({ open: true, item: alert });
         });
       } else {
         setSplitPanel(_sp => ({ ..._sp, open: false }));
       }
     },
-    [onGet]
+    [onGetAlert]
   );
 
   // Handler for when loading more alerts [read bottom of scroll area]
@@ -150,22 +165,9 @@ const Alerts: React.FC = () => {
   }, [setScrollReset, onLoadMore]);
 
   // Hanlder for when clicking one the AlertsFilters 'Apply' button.
-  const onApplyFilters = (filters: AlertFilterSelections) => {
-    // console.log(filters);
-
-    // update the state of the selected filters so they are intialized next time drawer opens.
-    setSelectedFilters(filters);
-
-    // Add a [fq] parameter for status/priority/label.
-    const addFq = (item: SearchFilter) => query.addFq(item.value);
-    query.clearFq();
-    query.setTc(filters.tc.value);
-    query.setGroupBy(filters.groupBy.value);
-    filters.statuses.forEach(addFq);
-    filters.priorities.forEach(addFq);
-    filters.labels.forEach(addFq);
-    filters.queries.forEach(addFq);
-    query.apply();
+  const onApplyFilters = (filters: SearchQueryFilters) => {
+    // Set the newly selected filters and up location url bar.
+    searchQuery.set(filters).apply();
 
     // Reinitialize the scroll.
     setScrollReset(true);
@@ -182,12 +184,6 @@ const Alerts: React.FC = () => {
     if (drawer.open) {
       setDrawer({ ...drawer, open: false });
     }
-  };
-
-  // Handler for when clicking the 'Clear' button on AlertsFilter.
-  const onClearFilters = () => {
-    setDrawer({ ...drawer, open: false });
-    onClearSearch();
   };
 
   // Handler for when clicking the 'Cancel' button on AlertsFiltersFilters
@@ -208,33 +204,30 @@ const Alerts: React.FC = () => {
     return [..._fields, ...words];
   };
 
-  //
+  // Handler/callback for when clicking the 'Add' btn on the AlertsFavorite component.
   const onFavoriteAdd = (filter: { query: string; name: string }) => {
     setDrawer({ ...drawer, open: false });
   };
 
-  //
+  // Handler/callback for when clicking the 'Cancel' btn on the AlertsFavorite component.
   const onFavoriteCancel = () => {
     setDrawer({ ...drawer, open: false });
   };
 
-  //
+  // Handler/callback for when deleting a favorite on the AlertsFavorite component.
   const onFavoriteDelete = (favorite: { name: string; query: string }) => {
     // console.log(favorite);
   };
 
   //
   const onFavoriteSelected = (favorite: { name: string; query: string }) => {
-    // Update the query parameter.
-    query.addFq(favorite.query).apply();
-
-    // Set query filters to selectedFilters state.
-    setQueryFilters(query);
+    // Update query with selected favorite.
+    updateQuery(searchQuery.addFq(favorite.query).apply().build());
 
     // Reinitialize the scroll.
     setScrollReset(true);
 
-    // Fetch result based on new/updated query.
+    // Fetch result based on new/updated query
     onLoad();
 
     // Close right of split panel if open.
@@ -248,12 +241,29 @@ const Alerts: React.FC = () => {
     }
   };
 
-  // Memoized callback to render one line-item of the list.
+  // Handler/callback for when clicking the 'Apply' btn on the AlertsWorkflowActions component.
+  const onWorkflowActionsApply = (selectedStatus: string, selectedPriority: string, selectedLabels: string[]) => {
+    onApplyWorkflowAction(drawer.actionData.query, selectedStatus, selectedPriority, selectedLabels).then(() => {
+      setDrawer({ ...drawer, open: false });
+      onLoad();
+      if (splitPanel.open) {
+        onItemSelected(splitPanel.item);
+      }
+    });
+  };
+
+  // Handler/callback for when clicking the 'Cancel' btn on the AlertsWorkflowActions component.
+  const onWorkflowActionCancel = () => {
+    setDrawer({ ...drawer, open: false });
+  };
+
+  // Memoized callback to render one line-item of the list....
   const onRenderListRow = useCallback((item: AlertItem) => <AlertListItem item={item} />, []);
+  // const onRenderListRow = useCallback((item: AlertItem) => <AlertCardItem item={item} />, []);
 
   //
   const onDrawerClose = () => {
-    setDrawer({ ...drawer, open: false });
+    setDrawer({ ...drawer, open: false, actionData: null });
   };
 
   // Handler for with close the right side of split panel.
@@ -261,47 +271,69 @@ const Alerts: React.FC = () => {
     setSplitPanel({ open: false, item: splitPanel.item });
   };
 
-  // Load up the filters already present in the URL.
-  useEffect(() => setQueryFilters(query), [query]);
+  // Handler for when the cursor on the list changes via keybaord event.
+  const onListCursorChanges = (cursor: number, item: AlertItem) => {
+    if (splitPanel.open) {
+      onItemSelected(item);
+    }
+  };
+
+  // ...
+  const onRenderListActions = useCallback(
+    (item: AlertItem) => <AlertListItemActions item={item} currentQuery={searchQuery} setDrawer={setDrawer} />,
+    []
+  );
+
+  // Load up the filters already present in the URL..
+  // useEffect(() => setQueryFilters(query), [query]);
 
   return (
     <Box>
-      <Box pb={theme.spacing(0.25)}>
-        <SearchBar
-          initValue={query.getQuery()}
-          searching={searching || loading}
-          suggestions={buildSearchSuggestions()}
-          onValueChange={onFilterValueChange}
-          onClear={onClearSearch}
-          onSearch={onSearch}
-          buttons={[
-            {
-              icon: <StarIcon />,
-              props: {
-                onClick: () => setDrawer({ open: true, type: 'favorites' })
+      <Box>
+        <PageContent>
+          <SearchBar
+            initValue={searchQuery.getQuery()}
+            searching={searching || loading}
+            suggestions={buildSearchSuggestions()}
+            onValueChange={onFilterValueChange}
+            onClear={onClearSearch}
+            onSearch={onSearch}
+            buttons={[
+              {
+                icon: <StarIcon />,
+                props: {
+                  onClick: () => setDrawer({ open: true, type: 'favorites' })
+                }
+              },
+              {
+                icon: <FilterListIcon />,
+                props: {
+                  onClick: () => setDrawer({ open: true, type: 'filter' })
+                }
+              },
+              {
+                icon: <AccountTreeIcon />,
+                props: {
+                  onClick: () => setDrawer({ open: true, type: 'actions', actionData: { query: searchQuery, total } })
+                }
               }
-            },
-            {
-              icon: <FilterListIcon />,
-              props: {
-                onClick: () => setDrawer({ open: true, type: 'filter' })
-              }
-            },
-            {
-              icon: <FcWorkflow />,
-              props: {
-                onClick: () => setDrawer({ open: true, type: 'actions' })
-              }
-            }
-          ]}
-        >
-          <Box className={classes.searchresult}>
-            <AlertsFiltersSelected filters={selectedFilters} onChange={onApplyFilters} />
-            <Box mt={1}>
-              {searching || loading ? (searching ? '...searching' : '...loading') : `${total} matching results.`}
+            ]}
+          >
+            <Box className={classes.searchresult}>
+              {isLTEMd ? (
+                <SearchResultLarge
+                  loading={loading}
+                  searching={searching}
+                  total={total}
+                  query={searchQuery}
+                  onApplyFilters={onApplyFilters}
+                />
+              ) : (
+                <SearchResultSmall loading={loading} searching={searching} total={total} query={searchQuery} />
+              )}
             </Box>
-          </Box>
-        </SearchBar>
+          </SearchBar>
+        </PageContent>
       </Box>
       <Viewport>
         <SplitPanel
@@ -312,35 +344,20 @@ const Alerts: React.FC = () => {
           rightDrawerWidth={900}
           rightDrawerBackgroundColor={theme.palette.background.default}
           rightOpen={splitPanel.open}
+          onRightDrawerClose={onSplitPanelRightClose}
           left={
-            // <MetaList
-            //   loading={loading || searching}
-            //   buffer={buffer}
-            //   rowHeight={92}
-            //   scrollReset={scrollReset}
-            //   onSelection={onItemSelected}
-            //   onNext={_onLoadMore}
-            //   onRenderItem={onRenderListRow}
-            // />
-            <Infinitelist
+            <SimpleList
               loading={loading || searching}
               items={buffer.items}
               scrollReset={scrollReset}
-              threshold={100}
+              scrollLoadNextThreshold={75}
               onItemSelected={onItemSelected}
               onRenderRow={onRenderListRow}
+              onRenderActions={onRenderListActions}
               onLoadNext={_onLoadMore}
+              onCursorChange={onListCursorChanges}
               disableProgress
             />
-
-            // <Booklist
-            //   loading={loading || searching}
-            //   book={book}
-            //   onItemSelected={onItemSelected}
-            //   onPageChange={updateBook}
-            //   onRenderRow={onRenderListRow}
-            //   onLoadNext={_onLoadMore}
-            // />
           }
           right={
             splitPanel.item ? (
@@ -369,13 +386,12 @@ const Alerts: React.FC = () => {
             {
               filter: (
                 <AlertsFilters
-                  selectedFilters={selectedFilters}
+                  searchQuery={searchQuery}
                   valueFilters={valueFilters}
                   statusFilters={statusFilters}
                   priorityFilters={priorityFilters}
                   labelFilters={labelFilters}
                   onApplyBtnClick={onApplyFilters}
-                  onClearBtnClick={onClearFilters}
                   onCancelBtnClick={onCancelFilters}
                 />
               ),
@@ -388,14 +404,15 @@ const Alerts: React.FC = () => {
                   onCancel={onFavoriteCancel}
                 />
               ),
-              actions: (
+              actions: drawer.actionData && (
                 <AlertsWorkflowActions
-                  query={query.getQuery()}
-                  affectedItemCount={buffer.total()}
-                  selectedFilters={selectedFilters}
+                  query={drawer.actionData.query}
+                  affectedItemCount={drawer.actionData.total}
                   statusFilters={statusFilters}
                   priorityFilters={priorityFilters}
                   labelFilters={labelFilters}
+                  onApplyBtnClick={onWorkflowActionsApply}
+                  onCancelBtnClick={onWorkflowActionCancel}
                 />
               )
             }[drawer.type]
@@ -403,6 +420,38 @@ const Alerts: React.FC = () => {
         </Box>
       </Drawer>
     </Box>
+  );
+};
+
+const SearchResultLarge = ({ searching, loading, total, query, onApplyFilters }) => {
+  const theme = useTheme();
+  const _searching = searching || loading;
+  return (
+    <div style={{ position: 'relative' }}>
+      <AlertsFiltersSelected searchQuery={query} onChange={onApplyFilters} hideQuery />
+      <div style={{ position: 'absolute', top: theme.spacing(0), right: theme.spacing(1) }}>
+        {_searching ? '' : <span>{`${total} matching results.`}</span>}
+      </div>
+    </div>
+  );
+};
+
+const SearchResultSmall = ({ searching, loading, total, query }) => {
+  const theme = useTheme();
+  const _searching = searching || loading;
+  const filtered = hasFilters(query.parseFilters());
+  return (
+    <>
+      <div style={{ marginTop: theme.spacing(2), alignItems: 'center' }}>
+        {!_searching && filtered && (
+          <>
+            <FiFilter />
+            &nbsp;
+          </>
+        )}
+        {_searching ? '' : `${total} matching results.`}
+      </div>
+    </>
   );
 };
 

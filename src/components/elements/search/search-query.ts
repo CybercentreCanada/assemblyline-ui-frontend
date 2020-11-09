@@ -1,16 +1,33 @@
 export enum SearchFilterType {
+  BLANK = 'blank',
   STATUS = 'status',
   PRIORITY = 'priority',
   LABEL = 'label',
   QUERY = 'query'
 }
 
+export const EMPTY_SEARCHFILTER = {
+  id: 'emtpy_search_filter',
+  type: SearchFilterType.BLANK,
+  label: '',
+  value: null
+};
+
 export interface SearchFilter {
   id: number | string;
   type: SearchFilterType;
   label: string;
   value: any;
-  object: any;
+  other?: any;
+}
+
+export interface SearchQueryFilters {
+  tc: string;
+  groupBy: string;
+  statuses: SearchFilter[];
+  priorities: SearchFilter[];
+  labels: SearchFilter[];
+  queries: SearchFilter[];
 }
 
 export interface SearchQueryParameter {
@@ -121,6 +138,19 @@ export default class SearchQuery {
     return this.hasTc() ? this.params.get('tc') : '';
   }
 
+  public setTcStart(tcStart: string): SearchQuery {
+    this.params.set('tc_start', tcStart);
+    return this;
+  }
+
+  public hasTcStart(): boolean {
+    return this.params.has('tc_start');
+  }
+
+  public getTcStart(): string {
+    return this.hasTcStart() ? this.params.get('tc_start') : '';
+  }
+
   public addFq(fq: string): SearchQuery {
     this.params.append('fq', fq);
     return this;
@@ -148,8 +178,22 @@ export default class SearchQuery {
     return this.hasGroupBy() ? this.params.get('group_by') : 'file.sha256';
   }
 
+  public set(filters: SearchQueryFilters): SearchQuery {
+    this.reset().setTc(filters.tc).setGroupBy(filters.groupBy);
+    [...filters.statuses, ...filters.priorities, ...filters.labels, ...filters.queries].forEach(filter =>
+      this.addFq(filter.value)
+    );
+    return this;
+  }
+
   public reset(): SearchQuery {
-    this.setOffset('0').setRows(`${this.pageSize}`).setQuery('').setTc('4d').setGroupBy('file.sha256').clearFq();
+    this.setOffset('0')
+      .setRows(`${this.pageSize}`)
+      .setQuery('')
+      .setTc('4d')
+      .setGroupBy('file.sha256')
+      .setTcStart('')
+      .clearFq();
     return this;
   }
 
@@ -159,30 +203,60 @@ export default class SearchQuery {
     return params.toString();
   }
 
-  public build(): string {
-    return `${this.path}?${this.buildQueryString()}`;
+  public newBase(accept?: (name: string) => boolean): SearchQuery {
+    const q = new SearchQuery(this.path, '', this.pageSize);
+    const params = new URLSearchParams();
+    if (accept) {
+      this.params.forEach((value: string, key: string) => {
+        if (accept(key)) {
+          params.set(key, value);
+        }
+      });
+    }
+    q.params = params;
+    return q;
   }
 
-  public apply(): void {
+  public build(): SearchQuery {
+    return new SearchQuery(this.path, this.params.toString(), this.pageSize);
+  }
+
+  public apply(): SearchQuery {
     const params = new URLSearchParams(this.params.toString());
     params.delete('group_by');
     params.delete('rows');
     params.delete('offset');
+    params.delete('tc_start');
     window.history.pushState(null, '', `${this.path}?${params.toString()}`);
+    return this;
   }
 
-  public parseFilters(): SearchFilter[] {
+  public parseFilters(): SearchQueryFilters {
+    let fqs = [];
+    let statuses = [];
+    let priorities = [];
+    let labels = [];
+    let queries = [];
+
     if (this.getFqList().length) {
-      return this.getFqList().map((fq, i) => SearchQuery.parseFilterValue(i, fq));
+      fqs = this.getFqList().map((fq, i) => SearchQuery.parseFilterValue(i, fq));
+      statuses = fqs.filter(f => f.type === SearchFilterType.STATUS);
+      priorities = fqs.filter(f => f.type === SearchFilterType.PRIORITY);
+      labels = fqs.filter(f => f.type === SearchFilterType.LABEL);
+      queries = fqs.filter(f => f.type === SearchFilterType.QUERY);
     }
-    return [];
+    return {
+      tc: this.getTc(),
+      groupBy: this.getGroupBy(),
+      statuses,
+      priorities,
+      labels,
+      queries
+    };
   }
 
   public static parseFilterValue(id: string | number, filter: string): SearchFilter {
     const [type] = filter.split(':');
-
-    // TODO: need a way to differentiate value/favorite filters!
-
     const resolveType = (): SearchFilterType => {
       switch (type) {
         case 'status':
@@ -195,13 +269,12 @@ export default class SearchQuery {
           return SearchFilterType.QUERY;
       }
     };
-
     return {
       id,
       type: resolveType(),
       label: filter,
       value: filter,
-      object: null
+      other: null
     };
   }
 }

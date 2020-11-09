@@ -1,12 +1,12 @@
-import Book from 'components/elements/lists/booklist/book';
 /* eslint-disable react-hooks/exhaustive-deps */
+import Book from 'components/elements/lists/booklist/book';
 import { MetaListItem } from 'components/elements/lists/metalist/metalist';
 import MetaListBuffer from 'components/elements/lists/metalist/metalist-buffer';
 import SearchQuery, { SearchFilter, SearchFilterType } from 'components/elements/search/search-query';
 import useAppContext from 'components/hooks/useAppContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { ALField } from 'components/hooks/useMyUser';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 export interface AlertFile {
@@ -69,15 +69,15 @@ interface UsingAlerts {
   total: number;
   buffer: MetaListBuffer;
   book: Book;
-  query: SearchQuery;
+  searchQuery: SearchQuery;
   labelFilters: SearchFilter[];
   priorityFilters: SearchFilter[];
   statusFilters: SearchFilter[];
   valueFilters: SearchFilter[];
+  updateQuery: (searchQuery: SearchQuery) => void;
   updateBook: (book: Book) => void;
-  onLoad: (onSuccess?: () => void) => void;
-  onLoadMore: (onSuccess?: () => void) => void;
-  onGet: (id: string, onSuccess: (alert: AlertItem) => void) => void;
+  onLoad: (onComplete?: (success: boolean) => void) => void;
+  onLoadMore: (onComplete?: (success: boolean) => void) => void;
 }
 
 // Custom Hook implementation for dealing with alerts.
@@ -85,13 +85,20 @@ export default function useAlerts(pageSize: number): UsingAlerts {
   const location = useLocation();
   const apiCall = useMyAPI();
   const { indexes: fieldIndexes } = useAppContext();
-  const [query] = useState<SearchQuery>(new SearchQuery(location.pathname, location.search, pageSize));
+  const [searchQuery, setSearchQuery] = useState<SearchQuery>(
+    new SearchQuery(location.pathname, location.search, pageSize)
+  );
   const [fields, setFields] = useState<ALField[]>([]);
   const [statusFilters, setStatusFilters] = useState<SearchFilter[]>([]);
   const [priorityFilters, setPriorityFilters] = useState<SearchFilter[]>([]);
   const [labelFilters, setLabelFilters] = useState<SearchFilter[]>([]);
   const [valueFilters, setValueFilters] = useState<SearchFilter[]>([]);
-  const [state, setState] = useState<{ loading: boolean; total: number; buffer: MetaListBuffer; book: Book }>({
+  const [state, setState] = useState<{
+    loading: boolean;
+    total: number;
+    buffer: MetaListBuffer;
+    book: Book;
+  }>({
     loading: true,
     total: 0,
     // items: [],
@@ -107,37 +114,46 @@ export default function useAlerts(pageSize: number): UsingAlerts {
 
   // format alert api url using specified indexes.
   const buildUrl = () => {
-    return `/api/v4/alert/grouped/${query.getGroupBy()}/?${query.buildQueryString()}`;
+    return `/api/v4/alert/grouped/${searchQuery.getGroupBy()}/?${searchQuery.buildQueryString()}`;
   };
 
   // Hook API: load/reload all the alerts from start.
   // resets the accumulated list.
-  const onLoad = (onSuccess?: () => void) => {
+  const onLoad = (onComplete?: (success: boolean) => void) => {
     setState({ ...state, loading: true });
     apiCall({
       url: buildUrl(),
       onSuccess: api_data => {
-        const { items: _items, total } = api_data.api_response;
+        console.log(api_data.api_response);
+
+        const { items: _items, tc_start: executionTime, total } = api_data.api_response;
         const items = parseResult(_items, 0);
+        searchQuery.setTcStart(executionTime);
         setState({
           loading: false,
           total,
           buffer: new MetaListBuffer().push(items),
           book: new Book(items, pageSize)
         });
-        if (onSuccess) {
-          onSuccess();
+        if (onComplete) {
+          onComplete(true);
+        }
+      },
+      onFailure: () => {
+        setState({ ...state, loading: false });
+        if (onComplete) {
+          onComplete(false);
         }
       }
     });
   };
 
   // Hook API: get alerts for specified index.
-  const onLoadMore = (onSuccess?: () => void) => {
+  const onLoadMore = (onComplete?: (success: boolean) => void) => {
     // Move offset by one increment.
-    query.tickOffset();
+    searchQuery.tickOffset();
     // reference the current offset now incase it changes again before callback is executed
-    const _offset = query.getOffsetNumber();
+    const _offset = searchQuery.getOffsetNumber();
     setState({ ...state, loading: true });
     apiCall({
       url: buildUrl(),
@@ -150,8 +166,14 @@ export default function useAlerts(pageSize: number): UsingAlerts {
           buffer: state.buffer.push(parsedItems).build(),
           book: state.book.addAll(parsedItems)
         });
-        if (onSuccess) {
-          onSuccess();
+        if (onComplete) {
+          onComplete(true);
+        }
+      },
+      onFailure: () => {
+        setState({ ...state, loading: false });
+        if (onComplete) {
+          onComplete(false);
         }
       }
     });
@@ -163,12 +185,12 @@ export default function useAlerts(pageSize: number): UsingAlerts {
       url: '/api/v4/alert/statuses/?offset=0&rows=25&q=&tc=4d&fq=file.sha256:*',
       onSuccess: api_data => {
         const { api_response: statuses } = api_data;
-        const msItems = Object.keys(statuses).map((k, i) => ({
+        const msItems: SearchFilter[] = Object.keys(statuses).map((k, i) => ({
           id: i,
           type: SearchFilterType.STATUS,
           label: k,
           value: `status:${k}`,
-          object: { count: statuses[k] }
+          other: { count: statuses[k] }
         }));
         setStatusFilters(msItems);
       }
@@ -181,12 +203,12 @@ export default function useAlerts(pageSize: number): UsingAlerts {
       url: '/api/v4/alert/priorities/?offset=0&rows=25&q=&tc=4d&fq=file.sha256:*',
       onSuccess: api_data => {
         const { api_response: priorities } = api_data;
-        const msItems = Object.keys(priorities).map((k, i) => ({
+        const msItems: SearchFilter[] = Object.keys(priorities).map((k, i) => ({
           id: i,
           type: SearchFilterType.PRIORITY,
           label: k,
           value: `priority:${k}`,
-          object: { count: priorities[k] }
+          other: { count: priorities[k] }
         }));
         setPriorityFilters(msItems);
       }
@@ -199,12 +221,12 @@ export default function useAlerts(pageSize: number): UsingAlerts {
       url: '/api/v4/alert/labels/?offset=0&rows=25&q=&tc=4d&fq=file.sha256:*',
       onSuccess: api_data => {
         const { api_response: labels } = api_data;
-        const msItems = Object.keys(labels).map((k, i) => ({
+        const msItems: SearchFilter[] = Object.keys(labels).map((k, i) => ({
           id: i,
           type: SearchFilterType.LABEL,
           label: k,
           value: `label:${k}`,
-          object: { count: labels[k] }
+          other: { count: labels[k] }
         }));
         setLabelFilters(msItems);
       }
@@ -213,7 +235,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
 
   const onLoadStatisics = () => {
     apiCall({
-      url: `/api/v4/alert/statistics/?tc=${query.getTc()}&q=${query.getQuery()}`,
+      url: `/api/v4/alert/statistics/?tc=${searchQuery.getTc()}&q=${searchQuery.getQuery()}`,
       onSuccess: api_data => {
         const { api_response: statistics } = api_data;
         const msItems: SearchFilter[] = [];
@@ -226,7 +248,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
               type: SearchFilterType.QUERY,
               label: `${k}:${vk}`,
               value: `${k}:"${vk}"`,
-              object: { count: vkv }
+              other: { count: vkv }
             });
           });
         });
@@ -234,17 +256,6 @@ export default function useAlerts(pageSize: number): UsingAlerts {
       }
     });
   };
-
-  // Hook API: fetch the alert for the specified alert_id.
-  const onGet = useCallback((id: string, onSuccess: (alert: AlertItem) => void) => {
-    const url = `/api/v4/alert/${id}/`;
-    apiCall({
-      url,
-      onSuccess: api_data => {
-        onSuccess(api_data.api_response);
-      }
-    });
-  }, []);
 
   // Load it up!
   useEffect(() => {
@@ -266,20 +277,18 @@ export default function useAlerts(pageSize: number): UsingAlerts {
     }
   }, [fieldIndexes]);
 
-  // console.log(configuration);
-
   // UseAlert Hook API.
   return {
     ...state,
     fields,
-    query,
+    searchQuery,
     statusFilters,
     priorityFilters,
     labelFilters,
     valueFilters,
+    updateQuery: setSearchQuery,
     updateBook: (book: Book) => setState({ ...state, book }),
     onLoad,
-    onLoadMore,
-    onGet
+    onLoadMore
   };
 }
