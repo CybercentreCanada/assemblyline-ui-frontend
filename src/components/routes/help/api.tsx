@@ -219,7 +219,7 @@ export default function ApiDoc() {
                                   return (
                                     <CustomChip
                                       color={methodColor[method]}
-                                      type="square"
+                                      type="rounded"
                                       size="small"
                                       key={midx}
                                       label={method}
@@ -300,7 +300,7 @@ export default function ApiDoc() {
                                           <CustomChip
                                             key={uidx}
                                             color={userColor[utype]}
-                                            type="square"
+                                            type="rounded"
                                             size="tiny"
                                             label={t(`user_type.${utype}`)}
                                           />
@@ -319,7 +319,7 @@ export default function ApiDoc() {
                                             <CustomChip
                                               key={pidx}
                                               color={privColor[ptype]}
-                                              type="square"
+                                              type="rounded"
                                               size="tiny"
                                               label={t(`priv.${ptype}`)}
                                             />
@@ -338,7 +338,7 @@ export default function ApiDoc() {
                                           <CustomChip
                                             key={metid}
                                             color={methodColor[met]}
-                                            type="square"
+                                            type="rounded"
                                             size="tiny"
                                             label={t(met)}
                                           />

@@ -15,6 +15,7 @@ type TagProps = {
   score?: number | null;
   short_type?: string | null;
   highlight_key?: string;
+  fullWidth?: boolean;
 };
 
 const Tag: React.FC<TagProps> = ({
@@ -23,7 +24,8 @@ const Tag: React.FC<TagProps> = ({
   lvl = null,
   score = null,
   short_type = null,
-  highlight_key = null
+  highlight_key = null,
+  fullWidth = false
 }) => {
   const history = useHistory();
   const { isHighlighted, triggerHighlight } = useHighlighter();
@@ -57,13 +59,14 @@ const Tag: React.FC<TagProps> = ({
     <CustomChip
       wrap
       size="tiny"
-      type="square"
+      type="rounded"
       color={highlight_key && isHighlighted(highlight_key) ? ('primary' as 'info') : color}
       label={short_type ? `[${short_type.toUpperCase()}] ${value}` : value}
       onDelete={searchAttack}
       deleteIcon={SEARCH_ICON}
       style={STYLE}
       onClick={highlight_key ? handleClick : null}
+      fullWidth={fullWidth}
     />
   );
 };

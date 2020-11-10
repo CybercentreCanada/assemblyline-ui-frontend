@@ -16,13 +16,15 @@ type TextVerdictProps = {
   variant?: 'outlined' | 'default';
   size?: 'tiny' | 'small' | 'medium';
   mono?: boolean;
+  fullWidth?: boolean;
 };
 
 const WrappedTextVerdict: React.FC<TextVerdictProps> = ({
   verdict,
   variant = 'default',
   size = 'tiny',
-  mono = false
+  mono = false,
+  fullWidth = false
 }) => {
   const { t } = useTranslation();
   const color = VERDICT_COLOR_MAP[verdict];
@@ -31,12 +33,13 @@ const WrappedTextVerdict: React.FC<TextVerdictProps> = ({
     <Tooltip title={t(`verdict.${verdict}`)}>
       <span>
         <CustomChip
-          type="square"
+          type="rounded"
           variant={variant}
           size={size}
           label={t(`verdict.${verdict}.short`)}
           color={color}
           mono={mono}
+          fullWidth={fullWidth}
         />
       </span>
     </Tooltip>

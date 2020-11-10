@@ -14,9 +14,17 @@ type AttackProps = {
   score?: number | null;
   show_type?: boolean;
   highlight_key?: string;
+  fullWidth?: boolean;
 };
 
-const Attack: React.FC<AttackProps> = ({ text, lvl = null, score = null, show_type = false, highlight_key = null }) => {
+const Attack: React.FC<AttackProps> = ({
+  text,
+  lvl = null,
+  score = null,
+  show_type = false,
+  highlight_key = null,
+  fullWidth = false
+}) => {
   const history = useHistory();
   const { isHighlighted, triggerHighlight } = useHighlighter();
 
@@ -49,13 +57,14 @@ const Attack: React.FC<AttackProps> = ({ text, lvl = null, score = null, show_ty
     <CustomChip
       wrap
       size="tiny"
-      type="square"
+      type="rounded"
       color={highlight_key && isHighlighted(highlight_key) ? ('primary' as 'info') : color}
       label={show_type ? `[ATT&CK] ${text}` : text}
       onDelete={searchAttack}
       deleteIcon={SEARCH_ICON}
       style={STYLE}
       onClick={highlight_key ? handleClick : null}
+      fullWidth={fullWidth}
     />
   );
 };

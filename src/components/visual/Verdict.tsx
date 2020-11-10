@@ -9,17 +9,19 @@ type VerdictProps = {
   short?: boolean;
   variant?: 'outlined' | 'default';
   size?: 'tiny' | 'small' | 'medium';
-  type?: 'square' | 'text';
+  type?: 'rounded' | 'text';
   mono?: boolean;
+  fullWidth?: boolean;
 };
 
 const WrappedVerdict: React.FC<VerdictProps> = ({
   score,
-  type = 'square',
+  type = 'rounded',
   variant = 'default',
   size = 'tiny',
   short = false,
-  mono = false
+  mono = false,
+  fullWidth = false
 }) => {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -66,12 +68,13 @@ const WrappedVerdict: React.FC<VerdictProps> = ({
           <span style={{ fontWeight: 500, color: textColor }}>{text}</span>
         ) : (
           <CustomChip
-            type="square"
+            type="rounded"
             variant={variant}
             size={size}
             label={short ? shortText : text}
             color={color}
             mono={mono}
+            fullWidth={fullWidth}
           />
         )}
       </span>

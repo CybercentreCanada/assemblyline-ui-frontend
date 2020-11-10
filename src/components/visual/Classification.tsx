@@ -36,12 +36,12 @@ interface ClassificationProps {
   format?: FormatProp;
   inline: boolean;
   isUser: boolean;
+  fullWidth?: boolean;
 }
 
 const useStyles = makeStyles(theme => ({
   classification: {
-    fontWeight: 500,
-    width: '100%'
+    fontWeight: 500
   },
   inlineSkel: {
     display: 'inline-block',
@@ -79,7 +79,16 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function WrappedClassification({ c12n, format, inline, setClassification, size, type, isUser }: ClassificationProps) {
+function WrappedClassification({
+  c12n,
+  format,
+  inline,
+  setClassification,
+  size,
+  type,
+  isUser,
+  fullWidth
+}: ClassificationProps) {
   const classes = useStyles();
   const { t } = useTranslation();
   const theme = useTheme();
@@ -197,13 +206,14 @@ function WrappedClassification({ c12n, format, inline, setClassification, size, 
         ) : (
           <div style={{ display: inline ? 'inline-block' : null }}>
             <CustomChip
-              type="classification"
+              type="rounded"
               variant={type === 'outlined' ? 'outlined' : 'default'}
               size={size}
               color={computeColor()}
               className={classes.classification}
               label={normalizedClassification(validated.parts, c12nDef, format, isMobile)}
               onClick={type === 'picker' ? () => setShowPicker(true) : null}
+              fullWidth={fullWidth}
             />
           </div>
         )}
@@ -217,12 +227,13 @@ function WrappedClassification({ c12n, format, inline, setClassification, size, 
           >
             <DialogTitle>
               <CustomChip
-                type="classification"
+                type="rounded"
                 variant="outlined"
                 size={size}
                 color={computeColor()}
                 className={classes.classification}
                 label={normalizedClassification(validated.parts, c12nDef, format, isMobile)}
+                fullWidth={fullWidth}
               />
             </DialogTitle>
             <DialogContent>
@@ -353,7 +364,8 @@ WrappedClassification.defaultProps = {
   type: 'pill' as 'pill',
   format: 'short' as 'short',
   inline: false,
-  isUser: false
+  isUser: false,
+  fullWidth: true
 };
 
 const Classification = React.memo(WrappedClassification);

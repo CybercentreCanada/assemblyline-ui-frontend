@@ -191,7 +191,7 @@ const AlertCardItem: React.FC<AlertCardItemProps> = ({ item, setItem = null }) =
             </Grid>
             <Grid item xs={9} md={10}>
               {item.label.map((l, i) => {
-                return <CustomChip key={i} label={l} size="tiny" type="square" />;
+                return <CustomChip key={i} label={l} size="tiny" type="rounded" />;
               })}
             </Grid>
 
@@ -199,14 +199,14 @@ const AlertCardItem: React.FC<AlertCardItemProps> = ({ item, setItem = null }) =
               <b>{t('priority')}</b>
             </Grid>
             <Grid item xs={9} md={10}>
-              <CustomChip label={item.priority} size="tiny" type="square" />
+              <CustomChip label={item.priority} size="tiny" type="rounded" />
             </Grid>
 
             <Grid item xs={3} md={2}>
               <b>{t('status')}</b>
             </Grid>
             <Grid item xs={9} md={10}>
-              <CustomChip label={item.status} size="tiny" type="square" />
+              <CustomChip label={item.status} size="tiny" type="rounded" />
             </Grid>
           </Grid>
 

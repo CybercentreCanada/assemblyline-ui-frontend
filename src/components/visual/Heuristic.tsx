@@ -15,6 +15,7 @@ type HeuristicProps = {
   signature?: boolean;
   show_type?: boolean;
   highlight_key?: string;
+  fullWidth?: boolean;
 };
 
 const Heuristic: React.FC<HeuristicProps> = ({
@@ -23,7 +24,8 @@ const Heuristic: React.FC<HeuristicProps> = ({
   score = null,
   signature = false,
   show_type = false,
-  highlight_key = null
+  highlight_key = null,
+  fullWidth = false
 }) => {
   const history = useHistory();
   const { isHighlighted, triggerHighlight } = useHighlighter();
@@ -57,13 +59,14 @@ const Heuristic: React.FC<HeuristicProps> = ({
     <CustomChip
       wrap
       size="tiny"
-      type="square"
+      type="rounded"
       color={highlight_key && isHighlighted(highlight_key) ? ('primary' as 'info') : color}
       label={show_type ? (signature ? `[SIGNATURE] ${text}` : `[HEURISTIC] ${text}`) : text}
       onDelete={searchAttack}
       deleteIcon={SEARCH_ICON}
       style={STYLE}
       onClick={highlight_key ? handleClick : null}
+      fullWidth={fullWidth}
     />
   );
 };

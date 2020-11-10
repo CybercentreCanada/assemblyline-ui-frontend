@@ -10,12 +10,15 @@ const COLOR_MAP = {
 
 type SignatureStatusProps = {
   status: 'DEPLOYED' | 'NOISY' | 'DISALBED';
+  fullWidth?: boolean;
 };
 
-const WrappedSignatureStatus: React.FC<SignatureStatusProps> = ({ status }) => {
+const WrappedSignatureStatus: React.FC<SignatureStatusProps> = ({ status, fullWidth = true }) => {
   const { t } = useTranslation();
 
-  return <CustomChip size="tiny" color={COLOR_MAP[status]} label={t(`signature.status.${status}`)} />;
+  return (
+    <CustomChip size="tiny" fullWidth={fullWidth} color={COLOR_MAP[status]} label={t(`signature.status.${status}`)} />
+  );
 };
 
 const SignatureStatus = React.memo(WrappedSignatureStatus);

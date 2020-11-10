@@ -404,7 +404,7 @@ function User({ width, username }: UserProps) {
                       color={user.is_active ? 'primary' : 'default'}
                       onClick={currentUser.username !== user.uname ? toggleAccountEnabled : null}
                       label={user.is_active ? t('enabled') : t('disabled')}
-                      type="square"
+                      type="rounded"
                     />
                   ) : (
                     <Skeleton className={classes.skelButton} />
@@ -504,7 +504,7 @@ function User({ width, username }: UserProps) {
                       {user ? (
                         <div>
                           <CustomChip
-                            type="square"
+                            type="rounded"
                             size="small"
                             color={user.type.includes('user') ? 'primary' : 'default'}
                             onClick={
@@ -515,7 +515,7 @@ function User({ width, username }: UserProps) {
                             label={t('normal_user')}
                           />
                           <CustomChip
-                            type="square"
+                            type="rounded"
                             size="small"
                             color={user.type.includes('admin') ? 'primary' : 'default'}
                             onClick={
@@ -526,14 +526,14 @@ function User({ width, username }: UserProps) {
                             label={t('admin')}
                           />
                           <CustomChip
-                            type="square"
+                            type="rounded"
                             size="small"
                             color={user.type.includes('signature_manager') ? 'primary' : 'default'}
                             onClick={currentUser.is_admin ? () => toggleRole('signature_manager') : null}
                             label={t('signature_manager')}
                           />
                           <CustomChip
-                            type="square"
+                            type="rounded"
                             size="small"
                             color={user.type.includes('signature_importer') ? 'primary' : 'default'}
                             onClick={currentUser.is_admin ? () => toggleRole('signature_importer') : null}

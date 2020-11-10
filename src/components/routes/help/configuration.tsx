@@ -57,7 +57,7 @@ export default function Configuration() {
           <div style={{ paddingTop: sp1, paddingBottom: sp2, display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
             {constants
               ? constants.tag_types.map((tag, id) => {
-                  return <CustomChip type="square" size="tiny" key={id} label={tag} style={{ padding: '5px' }} />;
+                  return <CustomChip type="rounded" size="tiny" key={id} label={tag} style={{ padding: '5px' }} />;
                 })
               : [...Array(192)].map((_, i) => {
                   return <Skeleton key={i} style={{ height: '2rem', width: '8rem', marginRight: '3px' }} />;
