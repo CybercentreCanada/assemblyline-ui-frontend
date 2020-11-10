@@ -36,5 +36,7 @@
   "no_submissions_title": "No submissions found!",
   "no_signatures_title": "No signatures found!",
   "no_results_title": "No results found!",
-  "no_files_title": "No files found!"
+  "no_files_title": "No files found!",
+  "focus_search": "Focus on selected tab",
+  "matching_results": "matching results"
 }

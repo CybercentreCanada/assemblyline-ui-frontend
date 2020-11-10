@@ -1,4 +1,17 @@
-import { createStyles, makeStyles, Paper, Tab, Tabs, Theme, Typography, useTheme } from '@material-ui/core';
+import {
+  createStyles,
+  IconButton,
+  makeStyles,
+  Paper,
+  Tab,
+  Tabs,
+  Theme,
+  Tooltip,
+  Typography,
+  useMediaQuery,
+  useTheme
+} from '@material-ui/core';
+import CenterFocusStrongOutlinedIcon from '@material-ui/icons/CenterFocusStrongOutlined';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import SearchBar from 'components/elements/search/search-bar';
@@ -14,7 +27,7 @@ import SignaturesTable from 'components/visual/SearchResult/signatures';
 import SubmissionsTable from 'components/visual/SearchResult/submissions';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useHistory, useLocation, useParams } from 'react-router-dom';
+import { Link, useHistory, useLocation, useParams } from 'react-router-dom';
 
 const PAGE_SIZE = 25;
 const DEFAULT_SUGGESTION = ['OR', 'AND', 'NOT', 'TO', 'now', 'd', 'M', 'y', 'h', 'm'];
@@ -39,6 +52,11 @@ const useStyles = makeStyles((theme: Theme) =>
           minWidth: 'unset'
         }
       }
+    },
+    searchresult: {
+      paddingLeft: theme.spacing(1),
+      color: theme.palette.primary.main,
+      fontStyle: 'italic'
     }
   })
 );
@@ -73,6 +91,7 @@ function Search({ index }: SearchProps) {
   const [searchSuggestion, setSearchSuggestion] = useState<string[]>(null);
   const [tab, setTab] = useState(null);
   const { showErrorMessage } = useMySnackbar();
+  const downSM = useMediaQuery(theme.breakpoints.down('sm'));
 
   // Result lists
   const [submissionResults, setSubmissionResults] = useState<SearchResults>(null);
@@ -188,6 +207,14 @@ function Search({ index }: SearchProps) {
     // eslint-disable-next-line
   }, [query]);
 
+  const TabSpacer = props => {
+    return <div style={{ flexGrow: 1 }} />;
+  };
+
+  const SpecialTab = ({ children, ...otherProps }) => {
+    return children;
+  };
+
   return (
     <PageCenter margin={4} width="100%">
       <div style={{ paddingBottom: theme.spacing(2), textAlign: 'left', width: '100%' }}>
@@ -227,10 +254,25 @@ function Search({ index }: SearchProps) {
                   value="signature"
                 />
                 <Tab label={`${t('alert')} (${alertResults ? alertResults.total : '...'})`} value="alert" />
+                <TabSpacer />
+                <SpecialTab>
+                  <Tooltip title={t('focus_search')}>
+                    <IconButton
+                      size={downSM ? 'small' : 'medium'}
+                      component={Link}
+                      to={`/search/${tab}${location.search}`}
+                    >
+                      <CenterFocusStrongOutlinedIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </SpecialTab>
               </Tabs>
             </Paper>
           )}
           <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', marginBottom: theme.spacing(0.5) }}>
+            {resMap[tab] && resMap[tab].total !== 0 && (index || id) && (
+              <div className={classes.searchresult}>{`${resMap[tab].total} ${t('matching_results')}`}</div>
+            )}
             <div style={{ flexGrow: 1 }} />
             {resMap[tab] && (
               <SearchPager
