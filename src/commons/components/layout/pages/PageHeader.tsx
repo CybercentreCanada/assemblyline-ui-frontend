@@ -55,7 +55,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
       id="header1"
       position={isSticky ? 'sticky' : 'relative'}
       style={{
-        top: top || (isSticky ? (barWillHide ? 0 : appBarHeight) : null),
+        top: top !== undefined ? top : isSticky ? (barWillHide ? 0 : appBarHeight) : null,
         backgroundColor: backgroundColor || theme.palette.background.default,
         zIndex: !isSticky ? theme.zIndex.appBar - 100 : null
       }}

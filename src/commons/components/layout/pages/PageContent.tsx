@@ -2,9 +2,7 @@ import { makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
 import React from 'react';
 
 const useStyles = makeStyles(theme => ({
-  pagecontent: {
-    height: '100%'
-  }
+  pagecontent: {}
 }));
 
 interface PageContentProps {
