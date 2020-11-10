@@ -28,6 +28,8 @@ const useStyles = makeStyles(theme => ({
 
 type SearchResults = {
   items: SubmissionResult[];
+  offset: number;
+  rows: number;
   total: number;
 };
 
@@ -53,13 +55,13 @@ export default function Submissions() {
   ]);
 
   const onClear = () => {
-    history.push('/submissions');
+    history.push(location.pathname);
   };
 
   const onSearch = () => {
     if (filterValue.current !== '') {
       query.set('query', filterValue.current);
-      history.push(`/submissions?${query.buildQueryString()}`);
+      history.push(`${location.pathname}?${query.buildQueryString()}`);
     } else {
       onClear();
     }
@@ -89,7 +91,7 @@ export default function Submissions() {
         }
       });
     }
-    // eslint-disable-next-line
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
   return (
@@ -116,7 +118,8 @@ export default function Submissions() {
                 ),
                 props: {
                   onClick: () => {
-                    history.push(`/submissions?query=params.submitter:"${currentUser.username}"`);
+                    query.set('query', `params.submitter:"${currentUser.username}"`);
+                    history.push(`${location.pathname}?${query.buildQueryString()}`);
                   }
                 }
               }
@@ -130,7 +133,10 @@ export default function Submissions() {
                       <span>{t('searching')}</span>
                     ) : (
                       <span>
-                        {submissionResults.total}&nbsp;{query.getQuery() ? t('filtered') : t('total')}
+                        {submissionResults.total}&nbsp;
+                        {query.getQuery()
+                          ? t(`filtered${submissionResults.total === 1 ? '' : 's'}`)
+                          : t(`total${submissionResults.total === 1 ? '' : 's'}`)}
                       </span>
                     )}
                   </Typography>
