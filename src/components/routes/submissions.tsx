@@ -7,7 +7,6 @@ import SearchBar from 'components/elements/search/search-bar';
 import SearchQuery from 'components/elements/search/search-query';
 import useAppContext from 'components/hooks/useAppContext';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { ALField } from 'components/hooks/useMyUser';
 import SearchPager from 'components/visual/SearchPager';
 import SubmissionsTable, { SubmissionResult } from 'components/visual/SearchResult/submissions';
 import 'moment/locale/fr';
@@ -16,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
 
 const PAGE_SIZE = 25;
+const DEFAULT_SUGGESTION = ['OR', 'AND', 'NOT', 'TO', 'now', 'd', 'M', 'y', 'h', 'm'];
 
 const useStyles = makeStyles(theme => ({
   searchresult: {
@@ -39,24 +39,18 @@ export default function Submissions() {
   const { user: currentUser, indexes } = useAppContext();
   const history = useHistory();
   const apiCall = useMyAPI();
-  const classes = useStyles();
   const theme = useTheme();
   const location = useLocation();
   const [query, setQuery] = useState<SearchQuery>(null);
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
-  const [fields] = useState<ALField[]>(
-    Object.keys(indexes.submission).map(name => {
-      return { ...indexes.submission[name], name };
-    })
-  );
   const filterValue = useRef<string>('');
-
-  // The SearchBar contentassist suggesions.
-  const buildSearchSuggestions = () => {
-    const _fields = fields.map(f => f.name);
-    const words = ['OR', 'AND', 'NOT', 'TO', 'now', 'd', 'M', 'y', 'h', 'm'];
-    return [..._fields, ...words];
-  };
+  const classes = useStyles();
+  const [suggestions] = useState([
+    ...Object.keys(indexes.submission).map(name => {
+      return name;
+    }),
+    ...DEFAULT_SUGGESTION
+  ]);
 
   const onClear = () => {
     history.push('/submissions');
@@ -64,7 +58,8 @@ export default function Submissions() {
 
   const onSearch = () => {
     if (filterValue.current !== '') {
-      history.push(`/submissions?query=${filterValue.current}`);
+      query.set('query', filterValue.current);
+      history.push(`/submissions?${query.buildQueryString()}`);
     } else {
       onClear();
     }
@@ -77,8 +72,7 @@ export default function Submissions() {
   useEffect(() => {
     setSearching(true);
     setQuery(new SearchQuery(location.pathname, location.search, pageSize, false));
-    // eslint-disable-next-line
-  }, [location.search]);
+  }, [location.pathname, location.search, pageSize]);
 
   useEffect(() => {
     if (query) {
@@ -109,7 +103,7 @@ export default function Submissions() {
             initValue={query ? query.getQuery() : ''}
             placeholder={t('filter')}
             searching={searching}
-            suggestions={buildSearchSuggestions()}
+            suggestions={suggestions}
             onValueChange={onFilterValueChange}
             onClear={onClear}
             onSearch={onSearch}
