@@ -41,5 +41,10 @@
   "matching_results": "matching results",
   "matching_result": "matching result",
   "use_archive.turn_off": "Turn off achive search",
-  "use_archive.turn_on": "Turn on archive search"
+  "use_archive.turn_on": "Turn on archive search",
+  "submission": "Submission",
+  "file": "File",
+  "result": "Result",
+  "signature": "Signature",
+  "alert": "Alert"
 }
