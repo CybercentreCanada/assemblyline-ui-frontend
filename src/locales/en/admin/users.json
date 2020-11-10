@@ -1,10 +1,19 @@
 {
+  "admins": "Show administrators",
+  "disabled": "Show disabled accounts",
+  "filtered": "user matching filter",
+  "filtereds": "users matching filter",
   "header.active": "Active",
   "header.admin": "Admin",
   "header.classification": "Classification",
   "header.fullname": "Fullname",
   "header.groups": "Groups",
   "header.uid": "Username",
+  "no_results_desc": "The query that you ran did not return any results.",
+  "no_users_title": "No users found!",
+  "searching": "Searching...",
   "subtitle": "total users(s)",
-  "title": "Users"
+  "title": "Users",
+  "total": "user",
+  "totals": "users"
 }

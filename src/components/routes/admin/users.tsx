@@ -1,15 +1,6 @@
-import { CircularProgress, makeStyles, Tooltip, useMediaQuery, useTheme } from '@material-ui/core';
-import Paper from '@material-ui/core/Paper';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
+import { makeStyles, Tooltip, useMediaQuery, useTheme } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 import BlockIcon from '@material-ui/icons/Block';
-import ClearIcon from '@material-ui/icons/Clear';
-import DoneIcon from '@material-ui/icons/Done';
 import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
@@ -17,8 +8,8 @@ import SearchBar from 'components/elements/search/search-bar';
 import SearchQuery from 'components/elements/search/search-query';
 import useAppContext from 'components/hooks/useAppContext';
 import useMyAPI from 'components/hooks/useMyAPI';
-import Classification from 'components/visual/Classification';
 import SearchPager from 'components/visual/SearchPager';
+import UsersTable from 'components/visual/SearchResult/users';
 import 'moment/locale/fr';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -151,6 +142,7 @@ export default function Users() {
                       <span>{t('searching')}</span>
                     ) : (
                       <span>
+                        {userResults.total}&nbsp;
                         {query.getQuery()
                           ? t(`filtered${userResults.total === 1 ? '' : 's'}`)
                           : t(`total${userResults.total === 1 ? '' : 's'}`)}
@@ -174,42 +166,7 @@ export default function Users() {
       </PageHeader>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
-        {userResults !== null ? (
-          <TableContainer component={Paper}>
-            <Table size="small">
-              <TableHead>
-                <TableRow style={{ whiteSpace: 'nowrap' }}>
-                  <TableCell>{t('header.uid')}</TableCell>
-                  <TableCell>{t('header.fullname')}</TableCell>
-                  <TableCell>{t('header.groups')}</TableCell>
-                  <TableCell>{t('header.classification')}</TableCell>
-                  <TableCell>{t('header.active')}</TableCell>
-                  <TableCell>{t('header.admin')}</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {userResults.items.map(user => (
-                  <TableRow key={user.id} onClick={() => history.push(`/admin/users/${user.uname}`)} hover>
-                    <TableCell style={{ whiteSpace: 'nowrap' }}>{user.uname}</TableCell>
-                    <TableCell>{user.name}</TableCell>
-                    <TableCell>{user.groups.join(' | ')}</TableCell>
-                    <TableCell style={{ whiteSpace: 'nowrap' }}>
-                      <Classification type="text" size="tiny" c12n={user.classification} format="short" />
-                    </TableCell>
-                    <TableCell>{user.is_active ? <DoneIcon color="primary" /> : <ClearIcon color="error" />}</TableCell>
-                    <TableCell>
-                      {user.type.indexOf('admin') !== -1 ? <DoneIcon color="primary" /> : <ClearIcon color="error" />}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        ) : (
-          <div style={{ width: '100%', textAlign: 'center' }}>
-            <CircularProgress />
-          </div>
-        )}
+        <UsersTable userResults={userResults} />
       </div>
     </PageFullWidth>
   ) : (

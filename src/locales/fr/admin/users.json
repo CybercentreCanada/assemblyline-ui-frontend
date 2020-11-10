@@ -1,10 +1,19 @@
 {
+  "admins": "Afficher les administrateurs",
+  "disabled": "Afficher les comptes désactivés",
+  "filtered": "utilisateur correspondant au filtre",
+  "filtereds": "utilisateurs correspondants au filtre",
   "header.active": "Actif",
   "header.admin": "Admin",
   "header.classification": "Classification",
   "header.fullname": "Nom Complet",
   "header.groups": "Groupes",
   "header.uid": "Nom d'utilisateur",
+  "no_results_desc": "La requête que vous avez exécutée n'a renvoyé aucun résultat.",
+  "no_users_title": "Aucun utilisateur trouvé!",
+  "searching": "Recherche en cours...",
   "subtitle": "nombre total d'utilisateur(s)",
-  "title": "Utilisateurs"
+  "title": "Utilisateurs",
+  "total": "utilisateur",
+  "totals": "utilisateurs"
 }
