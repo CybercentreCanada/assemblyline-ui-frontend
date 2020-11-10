@@ -78,7 +78,7 @@ const WrappedSubmissionsTable: React.FC<SubmissionsTableProps> = ({ submissionRe
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell>
-                  <Verdict score={submission.max_score} />
+                  <Verdict score={submission.max_score} fullWidth />
                 </DivTableCell>
                 <DivTableCell>
                   {submission.params.description.length > 150

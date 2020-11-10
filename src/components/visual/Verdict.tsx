@@ -68,7 +68,7 @@ const WrappedVerdict: React.FC<VerdictProps> = ({
           <span style={{ fontWeight: 500, color: textColor }}>{text}</span>
         ) : (
           <CustomChip
-            type="rounded"
+            type={type}
             variant={variant}
             size={size}
             label={short ? shortText : text}

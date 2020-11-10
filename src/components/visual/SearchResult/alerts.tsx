@@ -79,7 +79,7 @@ const WrappedAlertsTable: React.FC<AlertsTableProps> = ({ alertResults }) => {
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell>
-                  <Verdict score={alert.al.score} />
+                  <Verdict score={alert.al.score} fullWidth />
                 </DivTableCell>
                 <DivTableCell style={{ wordBreak: 'break-word' }}>{alert.file.sha256}</DivTableCell>
                 <DivTableCell>{alert.status}</DivTableCell>

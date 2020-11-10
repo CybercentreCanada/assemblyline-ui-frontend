@@ -68,7 +68,7 @@ const WrappedResultsTable: React.FC<ResultsTableProps> = ({ resultResults }) => 
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell>
-                  <Verdict score={result.result.score} />
+                  <Verdict score={result.result.score} fullWidth />
                 </DivTableCell>
                 <DivTableCell style={{ wordBreak: 'break-word' }}>{result.id.substring(0, 64)}</DivTableCell>
                 <DivTableCell>{result.response.service_name}</DivTableCell>
