@@ -2,7 +2,7 @@ import { Tooltip } from '@material-ui/core';
 import Chip from '@material-ui/core/Chip';
 import { darken, makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
-import React from 'react';
+import React, { ReactNode } from 'react';
 
 export const ColorMap = {
   'label-default': 'default' as 'default',
@@ -24,13 +24,15 @@ export type PossibleColors = 'default' | 'primary' | 'secondary' | 'info' | 'suc
 
 export interface CustomChipProps {
   className?: string;
-  type?: 'round' | 'square' | 'classification';
+  type?: 'round' | 'square' | 'rounded';
   size?: 'tiny' | 'small' | 'medium';
   color?: PossibleColors;
   variant?: 'default' | 'outlined';
   mono?: boolean;
   wrap?: boolean;
   tooltip?: string;
+  fullWidth?: boolean;
+  children?: ReactNode;
   [propName: string]: any;
 }
 
@@ -40,12 +42,14 @@ const useStyles = makeStyles(theme => ({
     wordBreak: 'break-word'
   },
   square: {
+    borderRadius: '0px',
+    margin: '2px 4px 2px 0'
+  },
+  rounded: {
     borderRadius: '3px',
     margin: '2px 4px 2px 0'
   },
-  classification: {
-    borderRadius: '3px',
-    margin: '2px 4px 2px 0',
+  fullWidth: {
     width: '100%'
   },
   tiny: {
@@ -130,23 +134,25 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function WrappedCustomChip({
-  className,
-  type,
-  size,
-  color,
-  variant,
-  mono,
-  wrap,
-  tooltip,
+const WrappedCustomChip: React.FC<CustomChipProps> = ({
+  className = null,
+  type = 'round',
+  size = 'medium',
+  color = 'default',
+  variant = 'default',
+  mono = false,
+  wrap = false,
+  tooltip = null,
+  fullWidth = false,
+  children,
   ...otherProps
-}: CustomChipProps) {
+}) => {
   const classes = useStyles();
 
   // Define classnames maps
   const typeClassMap = {
     square: classes.square,
-    classification: classes.classification,
+    rounded: classes.rounded,
     round: null
   };
   const sizeLabelClassMap = {
@@ -184,6 +190,7 @@ function WrappedCustomChip({
   // Compute values applied to the original chip component
   const appliedClassName = clsx(
     mono ? (size === 'tiny' ? classes.tiny_mono : classes.mono) : null,
+    fullWidth ? classes.fullWidth : null,
     typeClassMap[type],
     sizeClassMap[size],
     variant === 'outlined' ? colorClassMap[`${color}_outlined`] : colorClassMap[color],
@@ -205,16 +212,6 @@ function WrappedCustomChip({
 
   // Do we have a tooltip?
   return tooltip ? <Tooltip title={tooltip}>{chip}</Tooltip> : chip;
-}
-
-WrappedCustomChip.defaultProps = {
-  className: null,
-  type: 'round' as 'round',
-  size: 'medium' as 'medium',
-  color: 'default' as 'default',
-  variant: 'default' as 'default',
-  mono: false,
-  wrap: false
 };
 
 const CustomChip = React.memo(WrappedCustomChip);
