@@ -72,6 +72,22 @@ export default class SearchQuery {
     return output;
   }
 
+  public get(key: string, defaultVal = null) {
+    return this.params.get(key) || defaultVal;
+  }
+
+  public set(key: string, value) {
+    this.params.set(key, value);
+  }
+
+  public getAll(key: string, defaultVal = null) {
+    return this.params.getAll(key) || defaultVal;
+  }
+
+  public clear(key: string) {
+    this.params.delete(key);
+  }
+
   public setRows(rows: string): SearchQuery {
     this.params.set('rows', rows);
     return this;
@@ -178,7 +194,7 @@ export default class SearchQuery {
     return this.hasGroupBy() ? this.params.get('group_by') : 'file.sha256';
   }
 
-  public set(filters: SearchQueryFilters): SearchQuery {
+  public setFilters(filters: SearchQueryFilters): SearchQuery {
     this.reset().setTc(filters.tc).setGroupBy(filters.groupBy);
     [...filters.statuses, ...filters.priorities, ...filters.labels, ...filters.queries].forEach(filter =>
       this.addFq(filter.value)

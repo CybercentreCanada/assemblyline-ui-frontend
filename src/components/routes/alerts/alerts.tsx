@@ -166,7 +166,7 @@ const Alerts: React.FC = () => {
   // Hanlder for when clicking one the AlertsFilters 'Apply' button.
   const onApplyFilters = (filters: SearchQueryFilters) => {
     // Set the newly selected filters and up location url bar.
-    searchQuery.set(filters).apply();
+    searchQuery.setFilters(filters).apply();
 
     // Reinitialize the scroll.
     setScrollReset(true);
