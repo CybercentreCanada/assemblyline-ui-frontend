@@ -14,11 +14,13 @@ export interface SearchPagerProps {
   total: number;
   pageSize: number;
   index: string;
+  method?: 'POST' | 'GET';
   query: SearchQuery;
   setResults: (data: SearchResults) => void;
   scrollToTop?: boolean;
   size?: 'small' | 'large' | null;
   setSearching?: (value: boolean) => void | null;
+  url?: string;
   [propName: string]: any;
 }
 
@@ -26,11 +28,13 @@ const WrappedSearchPager: React.FC<SearchPagerProps> = ({
   total,
   pageSize,
   index,
+  method = 'POST',
   query,
   setResults,
   scrollToTop = true,
   size = 'small',
   setSearching = null,
+  url = null,
   children,
   ...otherProps
 }) => {
@@ -41,11 +45,16 @@ const WrappedSearchPager: React.FC<SearchPagerProps> = ({
     if (setSearching) {
       setSearching(true);
     }
-    const body = { query: '*', ...query.getParams(), rows: pageSize, offset: (value - 1) * pageSize };
+    query.set('rows', pageSize);
+    query.set('offset', (value - 1) * pageSize);
+    if (!query.get('query')) {
+      query.set('query', '*');
+    }
+
     apiCall({
-      method: 'POST',
-      url: `/api/v4/search/${index}/`,
-      body,
+      method,
+      url: `${url || `/api/v4/search/${index}/`}${method === 'GET' ? `?${query.buildQueryString()}` : ''}`,
+      body: method === 'POST' ? query.getParams() : null,
       onSuccess: api_data => {
         setResults(api_data.api_response);
         if (scrollToTop) {

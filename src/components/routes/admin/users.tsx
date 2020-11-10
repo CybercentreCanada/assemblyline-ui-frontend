@@ -56,6 +56,8 @@ export default function Users() {
 
   useEffect(() => {
     if (query && currentUser.is_admin) {
+      query.set('rows', PAGE_SIZE);
+      query.set('offset', 0);
       setSearching(true);
       apiCall({
         url: `/api/v4/user/list/?${query.buildQueryString()}`,
@@ -152,8 +154,10 @@ export default function Users() {
                 )}
 
                 <SearchPager
+                  method="GET"
+                  url="/api/v4/user/list/"
                   total={userResults.total}
-                  setResults={userResults}
+                  setResults={setUserResults}
                   pageSize={PAGE_SIZE}
                   index="user"
                   query={query}
