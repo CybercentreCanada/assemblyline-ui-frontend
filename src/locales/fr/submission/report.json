@@ -1,6 +1,6 @@
 {
   "actor": "Utilisé par",
-  "attack": "Matrice Att&ck",
+  "attack": "Matrice d'Att&ck",
   "detail_view": "Afficher la vue détaillée",
   "error.notfound": "La soumission n'a pas été trouvée",
   "error.too_early": "Il est trop tôt pour générer le rapport car la soumission n'est pas terminée. Vous serez rediriger vers la vue détaillée ...",
