@@ -1,10 +1,10 @@
 {
   "detail": "Detail",
   "filter": "Filter submissions...",
-  "report": "Report",
-  "total": "total submission(s)",
   "filtered": "submission(s) matching filter",
+  "my_submission": "Show my submissions",
+  "report": "Report",
   "searching": "Searching...",
   "title": "Submissions",
-  "my_submission": "Show my submissions"
+  "total": "total submission(s)"
 }

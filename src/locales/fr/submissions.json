@@ -1,10 +1,10 @@
 {
   "detail": "Détail",
   "filter": "Filtrer les soumissions...",
-  "report": "Rapport",
-  "total": "soumission(s) au total",
   "filtered": "soumission(s) correspondant au filtre",
+  "my_submission": "Voir mes soumissions",
+  "report": "Rapport",
   "searching": "Recherche en cours...",
   "title": "Soumissions",
-  "my_submission": "Voir mes soumissions"
+  "total": "soumission(s) au total"
 }

@@ -1,10 +1,10 @@
 {
-  "header.classification": "Classification",
   "header.active": "Actif",
   "header.admin": "Admin",
+  "header.classification": "Classification",
+  "header.fullname": "Nom Complet",
   "header.groups": "Groupes",
   "header.uid": "Nom d'utilisateur",
-  "header.fullname": "Nom Complet",
   "subtitle": "nombre total d'utilisateur(s)",
   "title": "Utilisateurs"
 }
