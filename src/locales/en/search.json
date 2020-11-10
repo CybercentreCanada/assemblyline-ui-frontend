@@ -38,5 +38,8 @@
   "no_results_title": "No results found!",
   "no_files_title": "No files found!",
   "focus_search": "Focus on selected tab",
-  "matching_results": "matching results"
+  "matching_results": "matching results",
+  "matching_result": "matching result",
+  "use_archive.turn_off": "Turn off achive search",
+  "use_archive.turn_on": "Turn on archive search"
 }

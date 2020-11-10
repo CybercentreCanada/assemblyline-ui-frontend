@@ -12,6 +12,8 @@ import {
   useTheme
 } from '@material-ui/core';
 import CenterFocusStrongOutlinedIcon from '@material-ui/icons/CenterFocusStrongOutlined';
+import FolderIcon from '@material-ui/icons/Folder';
+import FolderOutlinedIcon from '@material-ui/icons/FolderOutlined';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import SearchBar from 'components/elements/search/search-bar';
@@ -119,16 +121,18 @@ function Search({ index }: SearchProps) {
   const queryValue = useRef<string>('');
 
   const handleChangeTab = (event, newTab) => {
-    history.push(`${location.pathname}?query=${query.getQuery()}#${newTab}`);
+    history.push(`${location.pathname}?${query.buildQueryString()}#${newTab}`);
   };
 
   const onClear = () => {
-    history.push(location.pathname);
+    query.clear('query');
+    history.push(`${location.pathname}?${query.buildQueryString()}${location.hash}`);
   };
 
   const onSearch = () => {
     if (queryValue.current !== '') {
-      history.push(`${location.pathname}?query=${queryValue.current}${location.hash}`);
+      query.set('query', queryValue.current);
+      history.push(`${location.pathname}?${query.buildQueryString()}${location.hash}`);
     } else {
       onClear();
     }
@@ -230,6 +234,31 @@ function Search({ index }: SearchProps) {
             onValueChange={onFilterValueChange}
             onClear={onClear}
             onSearch={onSearch}
+            buttons={[
+              {
+                icon: (
+                  <Tooltip
+                    title={
+                      query && query.get('use_archive') === 'false'
+                        ? t('use_archive.turn_on')
+                        : t('use_archive.turn_off')
+                    }
+                  >
+                    {query && query.get('use_archive') === 'false' ? (
+                      <FolderOutlinedIcon fontSize={downSM ? 'small' : 'default'} />
+                    ) : (
+                      <FolderIcon fontSize={downSM ? 'small' : 'default'} />
+                    )}
+                  </Tooltip>
+                ),
+                props: {
+                  onClick: () => {
+                    query.set('use_archive', query.get('use_archive') === 'false');
+                    history.push(`${location.pathname}?${query.buildQueryString()}${location.hash}`);
+                  }
+                }
+              }
+            ]}
           />
 
           {!(index || id) && query && query.getQuery() !== '' && (
@@ -271,7 +300,9 @@ function Search({ index }: SearchProps) {
           )}
           <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', marginBottom: theme.spacing(0.5) }}>
             {resMap[tab] && resMap[tab].total !== 0 && (index || id) && (
-              <div className={classes.searchresult}>{`${resMap[tab].total} ${t('matching_results')}`}</div>
+              <div className={classes.searchresult}>
+                {`${resMap[tab].total} ${t(resMap[tab].total === 1 ? 'matching_result' : 'matching_results')}`}
+              </div>
             )}
             <div style={{ flexGrow: 1 }} />
             {resMap[tab] && (
