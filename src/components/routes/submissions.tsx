@@ -48,8 +48,8 @@ export default function Submissions() {
   const filterValue = useRef<string>('');
   const classes = useStyles();
   const [suggestions] = useState([
-    ...Object.keys(indexes.submission).map(name => {
-      return name;
+    ...Object.keys(indexes.submission).filter(name => {
+      return indexes.submission[name].indexed;
     }),
     ...DEFAULT_SUGGESTION
   ]);
