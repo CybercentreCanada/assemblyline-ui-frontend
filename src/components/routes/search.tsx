@@ -14,7 +14,7 @@ import {
 import CenterFocusStrongOutlinedIcon from '@material-ui/icons/CenterFocusStrongOutlined';
 import FolderIcon from '@material-ui/icons/Folder';
 import FolderOutlinedIcon from '@material-ui/icons/FolderOutlined';
-import PageCenter from 'commons/components/layout/pages/PageCenter';
+import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import SearchBar from 'components/elements/search/search-bar';
 import SearchQuery from 'components/elements/search/search-query';
@@ -219,7 +219,7 @@ function Search({ index }: SearchProps) {
   };
 
   return (
-    <PageCenter margin={4} width="100%">
+    <PageFullWidth margin={4}>
       <div style={{ paddingBottom: theme.spacing(2), textAlign: 'left', width: '100%' }}>
         <Typography variant="h4">{t(`title_${index || id || 'all'}`)}</Typography>
       </div>
@@ -329,7 +329,7 @@ function Search({ index }: SearchProps) {
         )}
         {tab === 'alert' && query && query.getQuery() !== '' && <AlertsTable alertResults={alertResults} />}
       </div>
-    </PageCenter>
+    </PageFullWidth>
   );
 }
 

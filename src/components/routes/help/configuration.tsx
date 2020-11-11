@@ -1,6 +1,6 @@
 import { Grid, Typography, useTheme } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
-import PageCenter from 'commons/components/layout/pages/PageCenter';
+import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import useMyAPI from 'components/hooks/useMyAPI';
 import CustomChip from 'components/visual/CustomChip';
 import React, { useEffect, useState } from 'react';
@@ -42,7 +42,7 @@ export default function Configuration() {
   }, []);
 
   return (
-    <PageCenter margin={4}>
+    <PageFullWidth margin={4}>
       <div style={{ textAlign: 'left' }}>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <Typography variant="h6" gutterBottom>
@@ -79,14 +79,14 @@ export default function Configuration() {
                 <>
                   {Object.keys(constants.priorities).map((priority, id) => {
                     return (
-                      <Grid key={id} item xs={12} sm={6} md={4} lg={3}>
+                      <Grid key={id} item xs={12} sm={6} md={4} lg={3} xl={2}>
                         <div style={{ display: 'inline-block', fontWeight: 500 }}>{priority}:&nbsp;&nbsp;</div>
                         <div style={{ display: 'inline-block', fontWeight: 300 }}>{constants.priorities[priority]}</div>
                       </Grid>
                     );
                   })}
 
-                  <Grid item xs={12} sm={6} md={4} lg={3}>
+                  <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
                     <div style={{ display: 'inline-block', fontWeight: 500 }}>{t('priorities.max')}:&nbsp;&nbsp;</div>
                     <div style={{ display: 'inline-block', fontWeight: 300 }}>{constants.max_priority}</div>
                   </Grid>
@@ -94,7 +94,7 @@ export default function Configuration() {
               ) : (
                 [...Array(8)].map((_, i) => {
                   return (
-                    <Grid item key={i} xs={12} sm={6} md={4} lg={3}>
+                    <Grid item key={i} xs={12} sm={6} md={4} lg={3} xl={2}>
                       <div style={{ display: 'inline-block', fontWeight: 500 }}>
                         <Skeleton key={i} style={{ height: '2rem', width: '5rem', margin: '2px' }} />
                       </div>
@@ -122,7 +122,7 @@ export default function Configuration() {
               {constants
                 ? constants.file_types.map((type, id) => {
                     return type[0] !== '*' && type[1].length !== 0 ? (
-                      <Grid key={id} item xs={12} md={6} lg={4}>
+                      <Grid key={id} item xs={12} md={6} lg={4} xl={3}>
                         <div style={{ display: 'inline-block', fontWeight: 500 }}>{type[0]}</div>
                         <div style={{ display: 'inline-block', fontWeight: 300 }}>
                           &nbsp;::&nbsp;{type[1].join(', ')}
@@ -132,7 +132,7 @@ export default function Configuration() {
                   })
                 : [...Array(40)].map((_, i) => {
                     return (
-                      <Grid key={i} item xs={12} md={6} lg={4}>
+                      <Grid key={i} item xs={12} md={6} lg={4} xl={3}>
                         <div style={{ display: 'inline-block', fontWeight: 500 }}>
                           <Skeleton style={{ height: '2rem', width: '4rem', margin: '2px' }} />
                         </div>
@@ -152,14 +152,14 @@ export default function Configuration() {
               {constants
                 ? constants.file_types.map((type, id) => {
                     return type[0] !== '*' && type[1].length === 0 ? (
-                      <Grid key={id} item xs={12} sm={6} md={4}>
+                      <Grid key={id} item xs={12} sm={6} md={4} lg={3}>
                         <div style={{ display: 'inline-block', fontWeight: 500 }}>{type[0]}</div>
                       </Grid>
                     ) : null;
                   })
                 : [...Array(60)].map((_, i) => {
                     return (
-                      <Grid key={i} item xs={12} sm={6} md={4}>
+                      <Grid key={i} item xs={12} sm={6} md={4} lg={3}>
                         <div style={{ display: 'inline-block', fontWeight: 500 }}>
                           <Skeleton style={{ height: '2rem', width: '8rem', margin: '2px' }} />
                         </div>
@@ -195,6 +195,7 @@ export default function Configuration() {
                         xs={12}
                         sm={5}
                         md={4}
+                        lg={3}
                         style={{
                           overflowX: 'hidden',
                           whiteSpace: 'nowrap',
@@ -203,7 +204,7 @@ export default function Configuration() {
                       >
                         <span style={{ fontWeight: 500 }}>{key}</span>
                       </Grid>
-                      <Grid item xs={12} sm={7} md={8}>
+                      <Grid item xs={12} sm={7} md={8} lg={9}>
                         <div style={{ fontWeight: 300 }}>
                           {typeof configuration[key] !== 'object' ? (
                             <div>{String(configuration[key])}</div>
@@ -227,10 +228,10 @@ export default function Configuration() {
               : [...Array(10)].map((_, i) => {
                   return (
                     <Grid key={i} container spacing={1}>
-                      <Grid key={i} item xs={12} sm={5} md={4}>
+                      <Grid key={i} item xs={12} sm={5} md={4} lg={3}>
                         <Skeleton style={{ height: '2rem' }} />
                       </Grid>
-                      <Grid item xs={12} sm={7} md={8}>
+                      <Grid item xs={12} sm={7} md={8} lg={9}>
                         <Skeleton style={{ height: '2rem' }} />
                       </Grid>
                     </Grid>
@@ -239,6 +240,6 @@ export default function Configuration() {
           </div>
         </div>
       </div>
-    </PageCenter>
+    </PageFullWidth>
   );
 }

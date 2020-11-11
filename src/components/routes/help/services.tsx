@@ -1,7 +1,7 @@
 import { Card, CardHeader, Chip, Grid, Typography, useTheme } from '@material-ui/core';
 import red from '@material-ui/core/colors/red';
 import Skeleton from '@material-ui/lab/Skeleton';
-import PageCenter from 'commons/components/layout/pages/PageCenter';
+import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import useMyAPI from 'components/hooks/useMyAPI';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -99,12 +99,12 @@ export default function Services() {
     // eslint-disable-next-line
   }, []);
   return (
-    <PageCenter margin={4}>
+    <PageFullWidth margin={4}>
       <div style={{ textAlign: 'left' }}>
         {services ? (
           <Grid container spacing={2}>
             {services.map((s, i) => (
-              <Grid key={i} item xs={12} md={6} xl={4}>
+              <Grid key={i} item xs={12} md={6} lg={4} xl={3}>
                 <ServiceCard service={s} />
               </Grid>
             ))}
@@ -112,13 +112,13 @@ export default function Services() {
         ) : (
           <Grid container spacing={2}>
             {[...Array(8)].map((_, i) => (
-              <Grid key={i} item xs={12} md={6} xl={4}>
+              <Grid key={i} item xs={12} md={6} lg={4} xl={3}>
                 <Skeleton variant="rect" style={{ height: minCardHeight }} />
               </Grid>
             ))}
           </Grid>
         )}
       </div>
-    </PageCenter>
+    </PageFullWidth>
   );
 }
