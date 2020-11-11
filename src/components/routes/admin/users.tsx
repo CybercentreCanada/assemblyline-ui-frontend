@@ -73,6 +73,22 @@ export default function Users() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
+  useEffect(() => {
+    apiCall({
+      url: '/api/v4/search/fields/user/',
+      onSuccess: api_data => {
+        setSuggestions([
+          ...Object.keys(api_data.api_response).filter(name => {
+            return api_data.api_response[name].indexed;
+          }),
+          ...DEFAULT_SUGGESTION
+        ]);
+      }
+    });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const onClear = () => {
     history.push(location.pathname);
   };
