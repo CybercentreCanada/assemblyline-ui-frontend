@@ -106,7 +106,7 @@ export default function Signatures() {
       <PageHeader isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchBar
-            initValue={query ? query.get('query') : ''}
+            initValue={query ? query.get('query', '') : ''}
             placeholder={t('filter')}
             searching={searching}
             suggestions={suggestions}

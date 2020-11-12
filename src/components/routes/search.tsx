@@ -174,7 +174,7 @@ function Search({ index }: SearchProps) {
 
   useEffect(() => {
     if (query) {
-      queryValue.current = query.get('query') || '';
+      queryValue.current = query.get('query', '');
       if (query.get('query')) {
         const searchList = [];
         if (!(index || id)) {
@@ -226,7 +226,7 @@ function Search({ index }: SearchProps) {
       <PageHeader isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchBar
-            initValue={query ? query.get('query') : ''}
+            initValue={query ? query.get('query', '') : ''}
             searching={searching}
             placeholder={t(`search_${index || id || 'all'}`)}
             suggestions={searchSuggestion}
@@ -260,7 +260,7 @@ function Search({ index }: SearchProps) {
             ]}
           />
 
-          {!(index || id) && query && query.get('query') !== '' && (
+          {!(index || id) && query && query.get('query') && (
             <Paper square style={{ marginBottom: theme.spacing(0.5) }}>
               <Tabs
                 className={classes.tweaked_tabs}
@@ -319,15 +319,13 @@ function Search({ index }: SearchProps) {
         </div>
       </PageHeader>
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
-        {tab === 'submission' && query && query.get('query') !== '' && (
+        {tab === 'submission' && query && query.get('query') && (
           <SubmissionsTable submissionResults={submissionResults} />
         )}
-        {tab === 'file' && query && query.get('query') !== '' && <FilesTable fileResults={fileResults} />}
-        {tab === 'result' && query && query.get('query') !== '' && <ResultsTable resultResults={resultResults} />}
-        {tab === 'signature' && query && query.get('query') !== '' && (
-          <SignaturesTable signatureResults={signatureResults} />
-        )}
-        {tab === 'alert' && query && query.get('query') !== '' && <AlertsTable alertResults={alertResults} />}
+        {tab === 'file' && query && query.get('query') && <FilesTable fileResults={fileResults} />}
+        {tab === 'result' && query && query.get('query') && <ResultsTable resultResults={resultResults} />}
+        {tab === 'signature' && query && query.get('query') && <SignaturesTable signatureResults={signatureResults} />}
+        {tab === 'alert' && query && query.get('query') && <AlertsTable alertResults={alertResults} />}
       </div>
     </PageFullWidth>
   );

@@ -45,13 +45,14 @@ const WrappedSearchPager: React.FC<SearchPagerProps> = ({
     if (setSearching) {
       setSearching(true);
     }
-    query.set('rows', pageSize);
-    query.set('offset', (value - 1) * pageSize);
+    const pageQuery = new SimpleSearchQuery(query.toString());
+    pageQuery.set('rows', pageSize);
+    pageQuery.set('offset', (value - 1) * pageSize);
 
     apiCall({
       method,
-      url: `${url || `/api/v4/search/${index}/`}${method === 'GET' ? `?${query.toString()}` : ''}`,
-      body: method === 'POST' ? query.getParams() : null,
+      url: `${url || `/api/v4/search/${index}/`}${method === 'GET' ? `?${pageQuery.toString()}` : ''}`,
+      body: method === 'POST' ? pageQuery.getParams() : null,
       onSuccess: api_data => {
         setResults(api_data.api_response);
         if (scrollToTop) {
