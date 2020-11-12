@@ -67,7 +67,7 @@ export default function Signatures() {
       apiCall({
         method: 'POST',
         url: '/api/v4/search/signature/',
-        body: { query: '*', ...query.getParams() },
+        body: query.getParams(),
         onSuccess: api_data => {
           setSignatureResults(api_data.api_response);
         },

@@ -1,1 +1,11 @@
-{}
+{
+  "disabled": "Show disabled signatures",
+  "filter": "Filter signatures...",
+  "filtered": "signature matching filter",
+  "filtereds": "signatures matching filter",
+  "noisy": "Show noisy signatures",
+  "searching": "Searching...",
+  "title": "Signatures",
+  "total": "signature",
+  "totals": "signatures"
+}

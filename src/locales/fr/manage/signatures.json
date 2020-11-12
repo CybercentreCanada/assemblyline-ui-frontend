@@ -1,1 +1,11 @@
-{}
+{
+  "disabled": "Afficher les signatures désactivées",
+  "filter": "Filtrer les signatures ...",
+  "filtered": "signature correspondant au filtre",
+  "filtereds": "signatures correspondant au filtre",
+  "noisy": "Afficher les signatures bruyantes",
+  "searching": "Recherche en cours...",
+  "title": "Signatures",
+  "total": "signature",
+  "totals": "signatures"
+}
