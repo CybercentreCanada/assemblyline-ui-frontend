@@ -54,7 +54,7 @@ const WrappedSignaturesTable: React.FC<SignaturesTableProps> = ({ signatureResul
               <LinkRow
                 key={signature.signature_id}
                 component={Link}
-                to={`/signature/${signature.id}`}
+                to={`/manage/signature/${signature.id}`}
                 hover
                 style={{ textDecoration: 'none' }}
               >

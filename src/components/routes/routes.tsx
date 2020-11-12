@@ -35,6 +35,7 @@ import User from 'components/routes/user';
 import React, { useEffect, useState } from 'react';
 import { matchPath, Redirect, Route, Switch, useLocation } from 'react-router-dom';
 import AlertFullDetails from './alert';
+import SignatureDetail from './manage/signature_detail';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -83,6 +84,7 @@ const WrappedRoutes = () => {
         <Route exact path="/logout" component={Logout} />
         <Route exact path="/manage/heuristics" component={ManageHeuristics} />
         <Route exact path="/manage/signatures" component={ManageSignatures} />
+        <Route exact path="/manage/signature/:id" component={SignatureDetail} />
         <Route exact path="/manage/sources" component={ManageSignatureSources} />
         <Route exact path="/manage/workflows" component={ManageWorkflows} />
         <Route exact path="/manage" component={Manage} />

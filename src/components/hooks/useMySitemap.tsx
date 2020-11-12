@@ -16,6 +16,7 @@ import HelpOutlineOutlinedIcon from '@material-ui/icons/HelpOutlineOutlined';
 import LabelOutlinedIcon from '@material-ui/icons/LabelOutlined';
 import LinkOffIcon from '@material-ui/icons/LinkOff';
 import ListAltOutlinedIcon from '@material-ui/icons/ListAltOutlined';
+import ListOutlinedIcon from '@material-ui/icons/ListOutlined';
 import MapOutlinedIcon from '@material-ui/icons/MapOutlined';
 import NotificationImportantOutlinedIcon from '@material-ui/icons/NotificationImportantOutlined';
 import PageviewOutlinedIcon from '@material-ui/icons/PageviewOutlined';
@@ -105,6 +106,12 @@ export default function useMySitemap() {
         title: t('drawer.manage.signatures'),
         icon: <FingerprintOutlinedIcon />,
         breadcrumbs: ['/manage']
+      },
+      {
+        path: '/manage/signature/:id',
+        title: t('breadcrumb.signature.detail'),
+        icon: <ListOutlinedIcon />,
+        breadcrumbs: ['/manage', '/manage/signatures']
       },
       {
         path: '/manage/sources',
