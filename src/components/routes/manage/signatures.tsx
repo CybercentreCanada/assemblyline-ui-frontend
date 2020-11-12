@@ -1,6 +1,7 @@
-import { makeStyles, Tooltip, useMediaQuery, useTheme } from '@material-ui/core';
+import { Grid, IconButton, Link, makeStyles, Tooltip, useMediaQuery, useTheme } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 import BlockIcon from '@material-ui/icons/Block';
+import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
 import RecordVoiceOverOutlinedIcon from '@material-ui/icons/RecordVoiceOverOutlined';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
@@ -99,8 +100,23 @@ export default function Signatures() {
 
   return (
     <PageFullWidth margin={4}>
-      <div style={{ paddingBottom: theme.spacing(8) }}>
-        <Typography variant="h4">{t('title')}</Typography>
+      <div style={{ paddingBottom: theme.spacing(2) }}>
+        <Grid container alignItems="center">
+          <Grid item xs>
+            <Typography variant="h4">{t('title')}</Typography>
+          </Grid>
+          <Grid item xs style={{ textAlign: 'right' }}>
+            <Tooltip title={t('download_desc')}>
+              <IconButton
+                component={Link}
+                style={{ color: theme.palette.action.active }}
+                href={`/api/v4/signature/download/?query=${query ? query.get('query', '*') : '*'}`}
+              >
+                <GetAppOutlinedIcon />
+              </IconButton>
+            </Tooltip>
+          </Grid>
+        </Grid>
       </div>
 
       <PageHeader isSticky>

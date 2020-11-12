@@ -1,5 +1,6 @@
 {
   "disabled": "Show disabled signatures",
+  "download_desc": "Download current set of signatures",
   "filter": "Filter signatures...",
   "filtered": "signature matching filter",
   "filtereds": "signatures matching filter",

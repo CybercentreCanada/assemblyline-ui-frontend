@@ -1,5 +1,6 @@
 {
   "disabled": "Afficher les signatures désactivées",
+  "download_desc": "Télécharger la liste de signatures actuelle",
   "filter": "Filtrer les signatures ...",
   "filtered": "signature correspondant au filtre",
   "filtereds": "signatures correspondant au filtre",
