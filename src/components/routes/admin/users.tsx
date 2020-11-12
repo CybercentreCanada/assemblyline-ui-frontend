@@ -5,7 +5,7 @@ import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import SearchBar from 'components/elements/search/search-bar';
-import SearchQuery from 'components/elements/search/search-query';
+import SimpleSearchQuery from 'components/elements/search/simple-search-query';
 import useAppContext from 'components/hooks/useAppContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import SearchPager from 'components/visual/SearchPager';
@@ -41,7 +41,7 @@ export default function Users() {
   const { user: currentUser } = useAppContext();
   const [userResults, setUserResults] = useState(null);
   const location = useLocation();
-  const [query, setQuery] = useState<SearchQuery>(null);
+  const [query, setQuery] = useState<SimpleSearchQuery>(null);
   const history = useHistory();
   const theme = useTheme();
   const apiCall = useMyAPI();
@@ -51,16 +51,16 @@ export default function Users() {
   const filterValue = useRef<string>('');
 
   useEffect(() => {
-    setQuery(new SearchQuery(location.pathname, location.search, pageSize, false));
-  }, [location.pathname, location.search, pageSize]);
+    setQuery(new SimpleSearchQuery(location.search, `rows=${pageSize}&offset=0`));
+  }, [location.search, pageSize]);
 
   useEffect(() => {
     if (query && currentUser.is_admin) {
-      query.set('rows', PAGE_SIZE);
+      query.set('rows', pageSize);
       query.set('offset', 0);
       setSearching(true);
       apiCall({
-        url: `/api/v4/user/list/?${query.buildQueryString()}`,
+        url: `/api/v4/user/list/?${query.toString()}`,
         onSuccess: api_data => {
           setUserResults(api_data.api_response);
         },
@@ -96,7 +96,7 @@ export default function Users() {
   const onSearch = () => {
     if (filterValue.current !== '') {
       query.set('query', filterValue.current);
-      history.push(`${location.pathname}?${query.buildQueryString()}`);
+      history.push(`${location.pathname}?${query.toString()}`);
     } else {
       onClear();
     }
@@ -115,7 +115,7 @@ export default function Users() {
       <PageHeader isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchBar
-            initValue={query ? query.getQuery() : ''}
+            initValue={query ? query.get('query') : ''}
             placeholder={t('filter')}
             searching={searching}
             suggestions={suggestions}
@@ -132,7 +132,7 @@ export default function Users() {
                 props: {
                   onClick: () => {
                     query.set('query', 'type:admin');
-                    history.push(`${location.pathname}?${query.buildQueryString()}`);
+                    history.push(`${location.pathname}?${query.toString()}`);
                   }
                 }
               },
@@ -146,7 +146,7 @@ export default function Users() {
                 props: {
                   onClick: () => {
                     query.set('query', 'is_active:false');
-                    history.push(`${location.pathname}?${query.buildQueryString()}`);
+                    history.push(`${location.pathname}?${query.toString()}`);
                   }
                 }
               }
@@ -161,7 +161,7 @@ export default function Users() {
                     ) : (
                       <span>
                         {userResults.total}&nbsp;
-                        {query.getQuery()
+                        {query.get('query')
                           ? t(`filtered${userResults.total === 1 ? '' : 's'}`)
                           : t(`total${userResults.total === 1 ? '' : 's'}`)}
                       </span>
@@ -174,7 +174,7 @@ export default function Users() {
                   url="/api/v4/user/list/"
                   total={userResults.total}
                   setResults={setUserResults}
-                  pageSize={PAGE_SIZE}
+                  pageSize={pageSize}
                   index="user"
                   query={query}
                   setSearching={setSearching}

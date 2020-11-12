@@ -4,7 +4,7 @@ import PersonIcon from '@material-ui/icons/Person';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import SearchBar from 'components/elements/search/search-bar';
-import SearchQuery from 'components/elements/search/search-query';
+import SimpleSearchQuery from 'components/elements/search/simple-search-query';
 import useAppContext from 'components/hooks/useAppContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import SearchPager from 'components/visual/SearchPager';
@@ -43,7 +43,7 @@ export default function Submissions() {
   const apiCall = useMyAPI();
   const theme = useTheme();
   const location = useLocation();
-  const [query, setQuery] = useState<SearchQuery>(null);
+  const [query, setQuery] = useState<SimpleSearchQuery>(null);
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
   const filterValue = useRef<string>('');
   const classes = useStyles();
@@ -61,7 +61,7 @@ export default function Submissions() {
   const onSearch = () => {
     if (filterValue.current !== '') {
       query.set('query', filterValue.current);
-      history.push(`${location.pathname}?${query.buildQueryString()}`);
+      history.push(`${location.pathname}?${query.toString()}`);
     } else {
       onClear();
     }
@@ -73,16 +73,17 @@ export default function Submissions() {
 
   useEffect(() => {
     setSearching(true);
-    setQuery(new SearchQuery(location.pathname, location.search, pageSize, false));
-  }, [location.pathname, location.search, pageSize]);
+    setQuery(new SimpleSearchQuery(location.search, `query=*&rows=${pageSize}&offset=0`));
+  }, [location.search, pageSize]);
 
   useEffect(() => {
     if (query) {
-      filterValue.current = query.getQuery() || '';
+      query.set('rows', pageSize);
+      query.set('offset', 0);
       apiCall({
         method: 'POST',
         url: '/api/v4/search/submission/',
-        body: { query: '*', ...query.getParams(), rows: pageSize, offset: 0 },
+        body: query.getParams(),
         onSuccess: api_data => {
           setSubmissionResults(api_data.api_response);
         },
@@ -102,7 +103,7 @@ export default function Submissions() {
       <PageHeader isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchBar
-            initValue={query ? query.getQuery() : ''}
+            initValue={query ? query.get('query') : ''}
             placeholder={t('filter')}
             searching={searching}
             suggestions={suggestions}
@@ -119,7 +120,7 @@ export default function Submissions() {
                 props: {
                   onClick: () => {
                     query.set('query', `params.submitter:"${currentUser.username}"`);
-                    history.push(`${location.pathname}?${query.buildQueryString()}`);
+                    history.push(`${location.pathname}?${query.toString()}`);
                   }
                 }
               }
@@ -134,7 +135,7 @@ export default function Submissions() {
                     ) : (
                       <span>
                         {submissionResults.total}&nbsp;
-                        {query.getQuery()
+                        {query.get('query')
                           ? t(`filtered${submissionResults.total === 1 ? '' : 's'}`)
                           : t(`total${submissionResults.total === 1 ? '' : 's'}`)}
                       </span>
@@ -145,7 +146,7 @@ export default function Submissions() {
                 <SearchPager
                   total={submissionResults.total}
                   setResults={setSubmissionResults}
-                  pageSize={PAGE_SIZE}
+                  pageSize={pageSize}
                   index="submission"
                   query={query}
                   setSearching={setSearching}

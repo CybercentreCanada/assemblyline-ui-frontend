@@ -38,7 +38,7 @@ export interface SearchQueryParameter {
 export default class SearchQuery {
   private params: URLSearchParams = null;
 
-  constructor(private path: string, baseSearch: string, private pageSize: number, private setDefaults: boolean = true) {
+  constructor(private path: string, baseSearch: string, private pageSize: number, setDefaults: boolean = true) {
     this.params = new URLSearchParams(baseSearch);
     if (setDefaults) {
       if (!this.hasOffset()) {
@@ -54,38 +54,6 @@ export default class SearchQuery {
         this.setGroupBy('file.sha256');
       }
     }
-  }
-
-  public getParams() {
-    const output = {};
-    this.params.forEach((value, key) => {
-      if (!(key in output)) {
-        if (key !== 'fq') {
-          output[key] = value;
-        } else {
-          output[key] = [value];
-        }
-      } else if (key === 'fq') {
-        output[key].push(value);
-      }
-    });
-    return output;
-  }
-
-  public get(key: string, defaultVal = null) {
-    return this.params.get(key) || defaultVal;
-  }
-
-  public set(key: string, value) {
-    this.params.set(key, value);
-  }
-
-  public getAll(key: string, defaultVal = null) {
-    return this.params.getAll(key) || defaultVal;
-  }
-
-  public clear(key: string) {
-    this.params.delete(key);
   }
 
   public setRows(rows: string): SearchQuery {

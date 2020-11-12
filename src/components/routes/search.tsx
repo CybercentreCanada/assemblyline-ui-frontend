@@ -17,7 +17,7 @@ import FolderOutlinedIcon from '@material-ui/icons/FolderOutlined';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import SearchBar from 'components/elements/search/search-bar';
-import SearchQuery from 'components/elements/search/search-query';
+import SimpleSearchQuery from 'components/elements/search/simple-search-query';
 import useAppContext from 'components/hooks/useAppContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -89,7 +89,7 @@ function Search({ index }: SearchProps) {
   const theme = useTheme();
   const classes = useStyles();
   const apiCall = useMyAPI();
-  const [query, setQuery] = useState<SearchQuery>(null);
+  const [query, setQuery] = useState<SimpleSearchQuery>(null);
   const [searchSuggestion, setSearchSuggestion] = useState<string[]>(null);
   const [tab, setTab] = useState(null);
   const { showErrorMessage } = useMySnackbar();
@@ -121,18 +121,18 @@ function Search({ index }: SearchProps) {
   const queryValue = useRef<string>('');
 
   const handleChangeTab = (event, newTab) => {
-    history.push(`${location.pathname}?${query.buildQueryString()}#${newTab}`);
+    history.push(`${location.pathname}?${query.toString()}#${newTab}`);
   };
 
   const onClear = () => {
-    query.clear('query');
-    history.push(`${location.pathname}?${query.buildQueryString()}${location.hash}`);
+    query.delete('query');
+    history.push(`${location.pathname}?${query.toString()}${location.hash}`);
   };
 
   const onSearch = () => {
     if (queryValue.current !== '') {
       query.set('query', queryValue.current);
-      history.push(`${location.pathname}?${query.buildQueryString()}${location.hash}`);
+      history.push(`${location.pathname}?${query.toString()}${location.hash}`);
     } else {
       onClear();
     }
@@ -162,9 +162,9 @@ function Search({ index }: SearchProps) {
 
   useEffect(() => {
     // On location.search change we need to change the query object and reset the results
-    setQuery(new SearchQuery(location.pathname, location.search, pageSize, false));
+    setQuery(new SimpleSearchQuery(location.search, `rows=${pageSize}&offset=0`));
     resetResults();
-  }, [location.pathname, location.search, pageSize]);
+  }, [location.search, pageSize]);
 
   useEffect(() => {
     // On location.hash change, we need to change the tab
@@ -174,8 +174,8 @@ function Search({ index }: SearchProps) {
 
   useEffect(() => {
     if (query) {
-      queryValue.current = query.getQuery() || '';
-      if (query.getQuery()) {
+      queryValue.current = query.get('query') || '';
+      if (query.get('query')) {
         const searchList = [];
         if (!(index || id)) {
           searchList.push(...Object.keys(stateMap));
@@ -195,7 +195,7 @@ function Search({ index }: SearchProps) {
               if (index || id || !api_data.api_error_message.includes('Rewrite first')) {
                 showErrorMessage(api_data.api_error_message);
               } else {
-                stateMap[searchIndex]({ total: 0, offset: 0, items: [], rows: PAGE_SIZE });
+                stateMap[searchIndex]({ total: 0, offset: 0, items: [], rows: pageSize });
               }
             },
             onFinalize: () => {
@@ -226,7 +226,7 @@ function Search({ index }: SearchProps) {
       <PageHeader isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchBar
-            initValue={query ? query.getQuery() : ''}
+            initValue={query ? query.get('query') : ''}
             searching={searching}
             placeholder={t(`search_${index || id || 'all'}`)}
             suggestions={searchSuggestion}
@@ -253,14 +253,14 @@ function Search({ index }: SearchProps) {
                 props: {
                   onClick: () => {
                     query.set('use_archive', query.get('use_archive') === 'false');
-                    history.push(`${location.pathname}?${query.buildQueryString()}${location.hash}`);
+                    history.push(`${location.pathname}?${query.toString()}${location.hash}`);
                   }
                 }
               }
             ]}
           />
 
-          {!(index || id) && query && query.getQuery() !== '' && (
+          {!(index || id) && query && query.get('query') !== '' && (
             <Paper square style={{ marginBottom: theme.spacing(0.5) }}>
               <Tabs
                 className={classes.tweaked_tabs}
@@ -309,7 +309,7 @@ function Search({ index }: SearchProps) {
                 total={resMap[tab].total}
                 setResults={stateMap[tab]}
                 page={resMap[tab].offset / resMap[tab].rows + 1}
-                pageSize={PAGE_SIZE}
+                pageSize={pageSize}
                 index={tab}
                 query={query}
                 setSearching={setSearching}
@@ -319,15 +319,15 @@ function Search({ index }: SearchProps) {
         </div>
       </PageHeader>
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
-        {tab === 'submission' && query && query.getQuery() !== '' && (
+        {tab === 'submission' && query && query.get('query') !== '' && (
           <SubmissionsTable submissionResults={submissionResults} />
         )}
-        {tab === 'file' && query && query.getQuery() !== '' && <FilesTable fileResults={fileResults} />}
-        {tab === 'result' && query && query.getQuery() !== '' && <ResultsTable resultResults={resultResults} />}
-        {tab === 'signature' && query && query.getQuery() !== '' && (
+        {tab === 'file' && query && query.get('query') !== '' && <FilesTable fileResults={fileResults} />}
+        {tab === 'result' && query && query.get('query') !== '' && <ResultsTable resultResults={resultResults} />}
+        {tab === 'signature' && query && query.get('query') !== '' && (
           <SignaturesTable signatureResults={signatureResults} />
         )}
-        {tab === 'alert' && query && query.getQuery() !== '' && <AlertsTable alertResults={alertResults} />}
+        {tab === 'alert' && query && query.get('query') !== '' && <AlertsTable alertResults={alertResults} />}
       </div>
     </PageFullWidth>
   );

@@ -1,5 +1,5 @@
 import { Pagination } from '@material-ui/lab';
-import SearchQuery from 'components/elements/search/search-query';
+import SimpleSearchQuery from 'components/elements/search/simple-search-query';
 import useMyAPI from 'components/hooks/useMyAPI';
 import React from 'react';
 
@@ -15,7 +15,7 @@ export interface SearchPagerProps {
   pageSize: number;
   index: string;
   method?: 'POST' | 'GET';
-  query: SearchQuery;
+  query: SimpleSearchQuery;
   setResults: (data: SearchResults) => void;
   scrollToTop?: boolean;
   size?: 'small' | 'large' | null;
@@ -47,13 +47,10 @@ const WrappedSearchPager: React.FC<SearchPagerProps> = ({
     }
     query.set('rows', pageSize);
     query.set('offset', (value - 1) * pageSize);
-    if (!query.get('query')) {
-      query.set('query', '*');
-    }
 
     apiCall({
       method,
-      url: `${url || `/api/v4/search/${index}/`}${method === 'GET' ? `?${query.buildQueryString()}` : ''}`,
+      url: `${url || `/api/v4/search/${index}/`}${method === 'GET' ? `?${query.toString()}` : ''}`,
       body: method === 'POST' ? query.getParams() : null,
       onSuccess: api_data => {
         setResults(api_data.api_response);
