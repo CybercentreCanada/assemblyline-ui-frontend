@@ -8,6 +8,10 @@ export default class SimpleSearchQuery {
     this.defaultParams = new URLSearchParams(defaults);
   }
 
+  public getDefaultString() {
+    return this.defaultParams.toString();
+  }
+
   public getParams() {
     const output = {};
     this.defaultParams.forEach((value, key) => {

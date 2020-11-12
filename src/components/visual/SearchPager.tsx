@@ -45,7 +45,7 @@ const WrappedSearchPager: React.FC<SearchPagerProps> = ({
     if (setSearching) {
       setSearching(true);
     }
-    const pageQuery = new SimpleSearchQuery(query.toString());
+    const pageQuery = new SimpleSearchQuery(query.toString(), query.getDefaultString());
     pageQuery.set('rows', pageSize);
     pageQuery.set('offset', (value - 1) * pageSize);
 
