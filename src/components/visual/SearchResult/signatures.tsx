@@ -18,7 +18,7 @@ export type SignatureResult = {
   revision: string;
   signature_id: string;
   source: string;
-  status: 'DEPLOYED' | 'NOISY' | 'DISALBED';
+  status: 'DEPLOYED' | 'NOISY' | 'DISABLED';
   type: string;
 };
 

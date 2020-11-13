@@ -1,5 +1,19 @@
 {
+  "change.save": "Save",
+  "change.success": "The state of the signature was successfully changed",
+  "change.title": "Changing the status of a signature",
+  "change.warning": "Before changing the signature state take note of the following:",
+  "change.warning.1": "After a signature has been either DEPLOYED, marked NOISY or DISABLED, it cannot go back in TESTING or STAGING status.",
+  "change.warning.2": "Only one revision of a signature can run at the same time in the system.",
+  "change.warning.action": "Choose the new signature state:",
+  "delete.acceptText": "Yes, delete it!",
+  "delete.cancelText": "Cancel",
+  "delete.text": "Are you sure you want to delete the current signature? There will be no way to recover it once it's done.",
+  "delete.title": "Delete Signature",
   "remove": "Remove signature",
+  "status.DEPLOYED": "Deployed",
+  "status.DISABLED": "Disabled",
+  "status.NOISY": "Noisy",
   "title": "Signature Details",
   "usage": "Show signature usage"
 }
