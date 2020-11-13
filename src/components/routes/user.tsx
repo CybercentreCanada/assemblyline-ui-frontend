@@ -15,11 +15,14 @@ import {
   TableHead,
   TableRow,
   TextField,
+  Theme,
   Typography,
   useMediaQuery,
   useTheme,
+  withStyles,
   withWidth
 } from '@material-ui/core';
+import { red } from '@material-ui/core/colors';
 import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
 import CloseIcon from '@material-ui/icons/Close';
 import Skeleton from '@material-ui/lab/Skeleton';
@@ -32,11 +35,12 @@ import DisableOTP from 'components/routes/user/disable_otp';
 import OTP from 'components/routes/user/otp';
 import SecurityToken from 'components/routes/user/token';
 import Classification from 'components/visual/Classification';
+import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
 import ChipInput from 'material-ui-chip-input';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Redirect, useLocation, useParams } from 'react-router-dom';
+import { Redirect, useHistory, useLocation, useParams } from 'react-router-dom';
 
 type UserProps = {
   width: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -47,14 +51,27 @@ type ParamProps = {
   id: string;
 };
 
+const DeleteButton = withStyles((theme: Theme) => ({
+  root: {
+    color: theme.palette.getContrastText(red[500]),
+    backgroundColor: red[500],
+    '&:hover': {
+      backgroundColor: red[700]
+    },
+    minWidth: theme.spacing(16)
+  }
+}))(Button);
+
 function User({ width, username }: UserProps) {
   const { id } = useParams<ParamProps>();
   const location = useLocation();
   const inputRef = useRef(null);
   const { t } = useTranslation(['user']);
   const theme = useTheme();
+  const history = useHistory();
   const [drawerType, setDrawerType] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [deleteDialog, setDeleteDialog] = useState(false);
   const [user, setUser] = useState(null);
   const [modified, setModified] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
@@ -96,6 +113,23 @@ function User({ width, username }: UserProps) {
     }
   }));
   const classes = useStyles();
+
+  const doDeleteUser = () => {
+    apiCall({
+      url: `/api/v4/user/${username || id}/`,
+      method: 'DELETE',
+      onSuccess: () => {
+        showSuccessMessage(t('delete.success'));
+        history.push('/admin/users');
+      },
+      onEnter: () => setButtonLoading(true),
+      onExit: () => setButtonLoading(false)
+    });
+  };
+
+  const handleDeleteUser = () => {
+    setDeleteDialog(true);
+  };
 
   function saveUser() {
     apiCall({
@@ -343,9 +377,41 @@ function User({ width, username }: UserProps) {
         </Drawer>
       </React.Fragment>
 
+      <ConfirmationDialog
+        open={deleteDialog}
+        handleClose={() => setDeleteDialog(false)}
+        handleAccept={doDeleteUser}
+        title={t('delete.title')}
+        cancelText={t('delete.cancelText')}
+        acceptText={t('delete.acceptText')}
+        text={t('delete.text')}
+      />
+
       <Grid container spacing={2} justify="center">
-        <Grid item sm={12} md={3}>
+        <Grid item xs={12} sm={12} md={3}>
           <Grid container className={classes.group}>
+            {id && (
+              <Grid item xs={12}>
+                <div style={{ paddingBottom: sp4 }}>
+                  {user ? (
+                    <DeleteButton
+                      fullWidth={downSM}
+                      disabled={buttonLoading}
+                      variant="contained"
+                      onClick={handleDeleteUser}
+                    >
+                      {t('remove')}
+                      {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                    </DeleteButton>
+                  ) : (
+                    <Skeleton
+                      className={classes.skelButton}
+                      style={{ minWidth: theme.spacing(16), width: downSM ? '100%' : null }}
+                    />
+                  )}
+                </div>
+              </Grid>
+            )}
             <Grid item xs={12}>
               {user ? (
                 <>
@@ -390,16 +456,21 @@ function User({ width, username }: UserProps) {
               <Typography gutterBottom>{user ? user.uname : <Skeleton />}</Typography>
             </Grid>
             <Grid item style={{ marginTop: '2rem' }} xs={12}>
-              <div style={{ paddingBottom: sp4 }}>
+              <div style={{ paddingBottom: id ? 0 : sp4 }}>
                 {user ? (
                   <CustomChip
+                    fullWidth={downSM}
                     color={user.is_active ? 'primary' : 'default'}
                     onClick={currentUser.username !== user.uname ? toggleAccountEnabled : null}
                     label={user.is_active ? t('enabled') : t('disabled')}
                     type="rounded"
+                    style={{ minWidth: theme.spacing(16) }}
                   />
                 ) : (
-                  <Skeleton className={classes.skelButton} />
+                  <Skeleton
+                    className={classes.skelButton}
+                    style={{ minWidth: theme.spacing(16), width: downSM ? '100%' : null }}
+                  />
                 )}
               </div>
             </Grid>
