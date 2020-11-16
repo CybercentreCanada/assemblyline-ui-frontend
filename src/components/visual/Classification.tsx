@@ -188,7 +188,9 @@ function WrappedClassification({
 
   const useClassification = () => {
     const newC12n = normalizedClassification(validated.parts, c12nDef, format, isMobile);
-    if (setClassification && newC12n !== c12n) {
+    const originalParts = getParts(c12n, c12nDef, format, isMobile);
+    const originalC12n = normalizedClassification(originalParts, c12nDef, format, isMobile);
+    if (setClassification && newC12n !== originalC12n) {
       setClassification(newC12n);
     }
     setShowPicker(false);
