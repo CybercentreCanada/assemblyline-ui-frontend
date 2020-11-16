@@ -102,6 +102,12 @@ export default function useMySitemap() {
         breadcrumbs: ['/manage']
       },
       {
+        path: '/manage/heuristic/:id',
+        title: t('breadcrumb.heuristic.detail'),
+        icon: <ListOutlinedIcon />,
+        breadcrumbs: ['/manage', '/manage/heuristics']
+      },
+      {
         path: '/manage/signatures',
         title: t('drawer.manage.signatures'),
         icon: <FingerprintOutlinedIcon />,

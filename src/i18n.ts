@@ -20,6 +20,7 @@ import lockedEN from 'locales/en/locked.json';
 import loginEN from 'locales/en/login.json';
 import logoutEN from 'locales/en/logout.json';
 import manageHeuristicsEN from 'locales/en/manage/heuristics.json';
+import manageHeuristicDetailEN from 'locales/en/manage/heuristic_detail.json';
 import manageSignaturesEN from 'locales/en/manage/signatures.json';
 import manageSignatureDetailEN from 'locales/en/manage/signature_detail.json';
 import manageSignatureSourcesEN from 'locales/en/manage/signature_sources.json';
@@ -53,6 +54,7 @@ import lockedFR from 'locales/fr/locked.json';
 import loginFR from 'locales/fr/login.json';
 import logoutFR from 'locales/fr/logout.json';
 import manageHeuristicsFR from 'locales/fr/manage/heuristics.json';
+import manageHeuristicDetailFR from 'locales/fr/manage/heuristic_detail.json';
 import manageSignaturesFR from 'locales/fr/manage/signatures.json';
 import manageSignatureDetailFR from 'locales/fr/manage/signature_detail.json';
 import manageSignatureSourcesFR from 'locales/fr/manage/signature_sources.json';
@@ -88,6 +90,7 @@ const resources = {
     login: loginEN,
     logout: logoutEN,
     manageHeuristics: manageHeuristicsEN,
+    manageHeuristicDetail: manageHeuristicDetailEN,
     manageSignatures: manageSignaturesEN,
     manageSignatureDetail: manageSignatureDetailEN,
     manageSignatureSources: manageSignatureSourcesEN,
@@ -123,6 +126,7 @@ const resources = {
     login: loginFR,
     logout: logoutFR,
     manageHeuristics: manageHeuristicsFR,
+    manageHeuristicDetail: manageHeuristicDetailFR,
     manageSignatures: manageSignaturesFR,
     manageSignatureDetail: manageSignatureDetailFR,
     manageSignatureSources: manageSignatureSourcesFR,

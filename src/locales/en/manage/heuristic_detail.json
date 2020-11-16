@@ -1,0 +1,19 @@
+{
+  "title": "Heuristic Details",
+  "name": "Name",
+  "filetype": "Associated file type",
+  "desc": "Description",
+  "score": "Score",
+  "max_score": "Maximum allowed score",
+  "attack_id": "Associated Att&ck IDs",
+  "signature_score_map": "Scores of the different signatures",
+  "section_stat_contrib": "Statistics on sections' contributions",
+  "count": "Hit Count",
+  "min": "Min Section Score",
+  "avg": "Average Section Score",
+  "max": "Max Section Score",
+  "no_max": "No maximum score enforced",
+  "no_attack_id": "None",
+  "no_sigs": "No signature score overrides",
+  "usage": "Show heuristic usage"
+}
