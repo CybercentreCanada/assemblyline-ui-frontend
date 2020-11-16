@@ -1,1 +1,10 @@
-{}
+{
+  "filter": "Filter workflows...",
+  "filtered": "workflow matching filter",
+  "filtereds": "workflows matching filter",
+  "noisy": "Show noisy workflows",
+  "searching": "Searching...",
+  "title": "Workflows",
+  "total": "workflow",
+  "totals": "workflows"
+}
