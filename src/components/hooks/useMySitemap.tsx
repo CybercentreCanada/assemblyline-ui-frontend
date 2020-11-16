@@ -126,6 +126,12 @@ export default function useMySitemap() {
         breadcrumbs: ['/manage']
       },
       {
+        path: '/manage/workflow/:id',
+        title: t('breadcrumb.workflow.detail'),
+        icon: <ListOutlinedIcon />,
+        breadcrumbs: ['/manage', '/manage/workflows']
+      },
+      {
         path: '/manage/workflows',
         title: t('drawer.manage.workflow'),
         icon: <BiNetworkChart />,

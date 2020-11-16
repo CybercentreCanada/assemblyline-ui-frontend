@@ -25,6 +25,7 @@ import manageSignaturesEN from 'locales/en/manage/signatures.json';
 import manageSignatureDetailEN from 'locales/en/manage/signature_detail.json';
 import manageSignatureSourcesEN from 'locales/en/manage/signature_sources.json';
 import manageWorkflowsEN from 'locales/en/manage/workflows.json';
+import manageWorkflowDetailEN from 'locales/en/manage/workflow_detail.json';
 import searchEN from 'locales/en/search.json';
 import settingsEN from 'locales/en/settings.json';
 import submissionDetailEN from 'locales/en/submission/detail.json';
@@ -59,6 +60,7 @@ import manageSignaturesFR from 'locales/fr/manage/signatures.json';
 import manageSignatureDetailFR from 'locales/fr/manage/signature_detail.json';
 import manageSignatureSourcesFR from 'locales/fr/manage/signature_sources.json';
 import manageWorkflowsFR from 'locales/fr/manage/workflows.json';
+import manageWorkflowDetailFR from 'locales/fr/manage/workflow_detail.json';
 import searchFR from 'locales/fr/search.json';
 import settingsFR from 'locales/fr/settings.json';
 import submissionDetailFR from 'locales/fr/submission/detail.json';
@@ -94,6 +96,7 @@ const resources = {
     manageSignatures: manageSignaturesEN,
     manageSignatureDetail: manageSignatureDetailEN,
     manageSignatureSources: manageSignatureSourcesEN,
+    manageWorkflowDetail: manageWorkflowDetailEN,
     manageWorkflows: manageWorkflowsEN,
     search: searchEN,
     settings: settingsEN,
@@ -130,6 +133,7 @@ const resources = {
     manageSignatures: manageSignaturesFR,
     manageSignatureDetail: manageSignatureDetailFR,
     manageSignatureSources: manageSignatureSourcesFR,
+    manageWorkflowDetail: manageWorkflowDetailFR,
     manageWorkflows: manageWorkflowsFR,
     search: searchFR,
     settings: settingsFR,

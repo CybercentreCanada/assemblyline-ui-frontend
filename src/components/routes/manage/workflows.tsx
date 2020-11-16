@@ -1,5 +1,7 @@
-import { makeStyles, useTheme } from '@material-ui/core';
+import { Drawer, Grid, IconButton, makeStyles, Tooltip, useTheme } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
+import AddCircleOutlineOutlinedIcon from '@material-ui/icons/AddCircleOutlineOutlined';
+import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import SearchBar from 'components/elements/search/search-bar';
@@ -12,6 +14,7 @@ import 'moment/locale/fr';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
+import WorkflowDetail from './workflow_detail';
 
 const PAGE_SIZE = 25;
 const DEFAULT_SUGGESTION = ['OR', 'AND', 'NOT', 'TO', 'now', 'd', 'M', 'y', 'h', 'm'];
@@ -22,6 +25,13 @@ const useStyles = makeStyles(theme => ({
     paddingTop: theme.spacing(0.5),
     display: 'flex',
     flexWrap: 'wrap'
+  },
+  drawerPaper: {
+    width: '80%',
+    maxWidth: '800px',
+    [theme.breakpoints.down('sm')]: {
+      width: '100%'
+    }
   }
 }));
 
@@ -36,6 +46,7 @@ export default function Workflows() {
   const { t } = useTranslation(['manageWorkflows']);
   const [pageSize] = useState(PAGE_SIZE);
   const [searching, setSearching] = useState(false);
+  const [drawer, setDrawer] = useState(false);
   const { indexes } = useAppContext();
   const [workflowResults, setWorkflowResults] = useState<SearchResults>(null);
   const location = useLocation();
@@ -51,6 +62,10 @@ export default function Workflows() {
     ...DEFAULT_SUGGESTION
   ]);
   const filterValue = useRef<string>('');
+
+  const closeDrawer = () => {
+    setDrawer(false);
+  };
 
   useEffect(() => {
     setQuery(new SimpleSearchQuery(location.search, `query=*&rows=${pageSize}&offset=0`));
@@ -96,8 +111,35 @@ export default function Workflows() {
 
   return (
     <PageFullWidth margin={4}>
+      <Drawer anchor="right" classes={{ paper: classes.drawerPaper }} open={drawer} onClose={closeDrawer}>
+        <div id="drawerTop" style={{ padding: theme.spacing(1) }}>
+          <IconButton onClick={closeDrawer}>
+            <CloseOutlinedIcon />
+          </IconButton>
+        </div>
+        <div style={{ paddingLeft: theme.spacing(2), paddingRight: theme.spacing(2) }}>
+          <WorkflowDetail />
+        </div>
+      </Drawer>
+
       <div style={{ paddingBottom: theme.spacing(2) }}>
-        <Typography variant="h4">{t('title')}</Typography>
+        <Grid container alignItems="center">
+          <Grid item xs>
+            <Typography variant="h4">{t('title')}</Typography>
+          </Grid>
+          <Grid item xs style={{ textAlign: 'right' }}>
+            <Tooltip title={t('add_workflow')}>
+              <IconButton
+                style={{ color: theme.palette.action.active }}
+                onClick={() => {
+                  setDrawer(true);
+                }}
+              >
+                <AddCircleOutlineOutlinedIcon />
+              </IconButton>
+            </Tooltip>
+          </Grid>
+        </Grid>
       </div>
 
       <PageHeader isSticky>
