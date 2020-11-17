@@ -22,5 +22,9 @@
   "delete.title": "Supprimer le flu de travail?",
   "delete.text": "Voulez-vous vraiment supprimer le flux de travail actuel?",
   "delete.cancelText": "Annuler",
-  "delete.acceptText": "Oui, supprimez-le!"
+  "delete.acceptText": "Yes, remove it!",
+  "delete.success": "Le flu de travail a été supprimer avec succès.",
+  "add.title": "Ajouter un flu de travail",
+  "add.button": "Ajouter",
+  "add.success": "Le flu de travail a été ajouter avec succès."
 }

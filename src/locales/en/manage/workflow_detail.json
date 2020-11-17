@@ -22,5 +22,9 @@
   "delete.title": "Remove workflow?",
   "delete.text": "Do you really want to remove the current workflow?",
   "delete.cancelText": "Cancel",
-  "delete.acceptText": "Yes, remove it!"
+  "delete.acceptText": "Yes, remove it!",
+  "delete.success": "Workflow was successfully deleted.",
+  "add.title": "Adding a workflow",
+  "add.button": "Add workflow",
+  "add.success": "Successfully added the new workflow."
 }

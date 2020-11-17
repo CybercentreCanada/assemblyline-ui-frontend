@@ -35,9 +35,10 @@ type SearchResults = {
 
 type WorkflowTableProps = {
   workflowResults: SearchResults;
+  setWorkflowID?: (id: string) => void;
 };
 
-const WrappedWorflowTable: React.FC<WorkflowTableProps> = ({ workflowResults }) => {
+const WrappedWorflowTable: React.FC<WorkflowTableProps> = ({ workflowResults, setWorkflowID = null }) => {
   const { t, i18n } = useTranslation(['search']);
 
   return workflowResults ? (
@@ -59,10 +60,10 @@ const WrappedWorflowTable: React.FC<WorkflowTableProps> = ({ workflowResults }) 
             {workflowResults.items.map(workflow => (
               <LinkRow
                 key={workflow.workflow_id}
-                component={Link}
-                to={`/manage/workflow/${workflow.workflow_id}`}
+                component={setWorkflowID ? 'div' : Link}
+                to={setWorkflowID ? '' : `/manage/workflow/${workflow.workflow_id}`}
+                onClick={() => setWorkflowID && setWorkflowID(workflow.workflow_id)}
                 hover
-                style={{ textDecoration: 'none' }}
               >
                 <DivTableCell>
                   <Moment fromNow locale={i18n.language}>

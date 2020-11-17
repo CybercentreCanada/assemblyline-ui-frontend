@@ -6,5 +6,7 @@
   "searching": "Searching...",
   "title": "Workflows",
   "total": "workflow",
-  "totals": "workflows"
+  "totals": "workflows",
+  "never_used": "Workflows that were never used",
+  "old": "Workflows not used in the past 3 months"
 }

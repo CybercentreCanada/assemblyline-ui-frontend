@@ -47,6 +47,11 @@ type ParamProps = {
   id: string;
 };
 
+type WorkflowDetailProps = {
+  workflow_id?: string;
+  close?: () => void;
+};
+
 const MyMenuItem = withStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -65,7 +70,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function WorkflowDetail() {
+const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
   const { t } = useTranslation(['manageWorkflowDetail']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
@@ -90,11 +95,15 @@ export default function WorkflowDetail() {
   };
 
   useEffect(() => {
-    if (id) {
+    if (workflow_id || id) {
       apiCall({
-        url: `/api/v4/workflow/${id}/`,
+        url: `/api/v4/workflow/${workflow_id || id}/`,
         onSuccess: api_data => {
-          setWorkflow(api_data.api_response);
+          setWorkflow({
+            ...api_data.api_response,
+            status: api_data.api_response.status || '',
+            priority: api_data.api_response.priority || ''
+          });
         }
       });
     } else {
@@ -102,7 +111,7 @@ export default function WorkflowDetail() {
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [workflow_id, id]);
 
   const handleNameChange = event => {
     setModified(true);
@@ -136,23 +145,30 @@ export default function WorkflowDetail() {
 
   const removeWorkflow = () => {
     apiCall({
-      url: `/api/v4/workflow/${id}/`,
+      url: `/api/v4/workflow/${workflow_id || id}/`,
       method: 'DELETE',
       onSuccess: () => {
+        setDeleteDialog(false);
         showSuccessMessage(t('delete.success'));
-        history.push('/manage/workflows');
+        if (id) setTimeout(() => history.push('/manage/workflows'), 1000);
+        close();
       }
     });
   };
 
   const saveWorkflow = () => {
     apiCall({
-      url: id ? `/api/v4/workflow/${id}/` : '/api/v4/workflow/',
-      method: id ? 'POST' : 'PUT',
-      body: workflow,
+      url: workflow_id || id ? `/api/v4/workflow/${workflow_id || id}/` : '/api/v4/workflow/',
+      method: workflow_id || id ? 'POST' : 'PUT',
+      body: {
+        ...workflow,
+        priority: workflow.priority === '' ? null : workflow.priority,
+        status: workflow.status === '' ? null : workflow.status
+      },
       onSuccess: () => {
-        showSuccessMessage(t('save.success'));
+        showSuccessMessage(t(workflow_id || id ? 'save.success' : 'add.success'));
         setModified(false);
+        close();
       },
       onEnter: () => setButtonLoading(true),
       onExit: () => setButtonLoading(false)
@@ -160,7 +176,7 @@ export default function WorkflowDetail() {
   };
 
   return (
-    <PageCenter margin={4}>
+    <PageCenter margin={!id ? 2 : 4} width="100%">
       <ConfirmationDialog
         open={deleteDialog}
         handleClose={() => setDeleteDialog(false)}
@@ -183,22 +199,24 @@ export default function WorkflowDetail() {
         <div style={{ paddingBottom: theme.spacing(4) }}>
           <Grid container alignItems="center">
             <Grid item xs>
-              <Typography variant="h4">{t('title')}</Typography>
+              <Typography variant="h4">{t(workflow_id || id ? 'title' : 'add.title')}</Typography>
               <Typography variant="caption">
                 {workflow ? workflow.workflow_id : <Skeleton style={{ width: '10rem' }} />}
               </Typography>
             </Grid>
-            <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
-              {workflow ? (
-                <Tooltip title={t('remove')}>
-                  <IconButton style={{ color: theme.palette.action.active }} onClick={() => setDeleteDialog(true)}>
-                    <RemoveOutlinedIcon />
-                  </IconButton>
-                </Tooltip>
-              ) : (
-                <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-              )}
-            </Grid>
+            {(workflow_id || id) && (
+              <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
+                {workflow ? (
+                  <Tooltip title={t('remove')}>
+                    <IconButton style={{ color: theme.palette.action.active }} onClick={() => setDeleteDialog(true)}>
+                      <RemoveOutlinedIcon />
+                    </IconButton>
+                  </Tooltip>
+                ) : (
+                  <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+                )}
+              </Grid>
+            )}
           </Grid>
         </div>
         <Grid container spacing={2}>
@@ -287,10 +305,23 @@ export default function WorkflowDetail() {
               <Skeleton style={{ height: '2.5rem' }} />
             )}
           </Grid>
+          {!id && (
+            <Grid item xs={12} style={{ paddingTop: theme.spacing(2), textAlign: 'right' }}>
+              <Button
+                variant="contained"
+                color="primary"
+                disabled={buttonLoading || !modified || !workflow.name || !workflow.query}
+                onClick={saveWorkflow}
+              >
+                {t(workflow_id || id ? 'save' : 'add.button')}
+                {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+              </Button>
+            </Grid>
+          )}
         </Grid>
       </div>
 
-      {workflow && modified ? (
+      {workflow && id && modified && workflow.name && workflow.query ? (
         <div
           style={{
             paddingTop: theme.spacing(1),
@@ -303,12 +334,19 @@ export default function WorkflowDetail() {
             boxShadow: theme.shadows[4]
           }}
         >
-          <Button variant="contained" color="primary" disabled={buttonLoading || !modified} onClick={saveWorkflow}>
-            {t('save')}
+          <Button variant="contained" color="primary" disabled={buttonLoading} onClick={saveWorkflow}>
+            {t(workflow_id || id ? 'save' : 'add.button')}
             {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
           </Button>
         </div>
       ) : null}
     </PageCenter>
   );
-}
+};
+
+WorkflowDetail.defaultProps = {
+  workflow_id: null,
+  close: () => {}
+};
+
+export default WorkflowDetail;

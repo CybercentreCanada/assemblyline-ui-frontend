@@ -1,7 +1,9 @@
-import { Drawer, Grid, IconButton, makeStyles, Tooltip, useTheme } from '@material-ui/core';
+import { Drawer, Grid, IconButton, makeStyles, Tooltip, useMediaQuery, useTheme } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 import AddCircleOutlineOutlinedIcon from '@material-ui/icons/AddCircleOutlineOutlined';
 import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
+import EventBusyOutlinedIcon from '@material-ui/icons/EventBusyOutlined';
+import EventOutlinedIcon from '@material-ui/icons/EventOutlined';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import SearchBar from 'components/elements/search/search-bar';
@@ -47,12 +49,14 @@ export default function Workflows() {
   const [pageSize] = useState(PAGE_SIZE);
   const [searching, setSearching] = useState(false);
   const [drawer, setDrawer] = useState(false);
+  const [wid, setWid] = useState(null);
   const { indexes } = useAppContext();
   const [workflowResults, setWorkflowResults] = useState<SearchResults>(null);
   const location = useLocation();
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
   const history = useHistory();
   const theme = useTheme();
+  const upMD = useMediaQuery(theme.breakpoints.up('md'));
   const apiCall = useMyAPI();
   const classes = useStyles();
   const [suggestions] = useState([
@@ -73,24 +77,34 @@ export default function Workflows() {
 
   useEffect(() => {
     if (query) {
-      query.set('rows', PAGE_SIZE);
-      query.set('offset', 0);
-      setSearching(true);
-      apiCall({
-        method: 'POST',
-        url: '/api/v4/search/workflow/',
-        body: query.getParams(),
-        onSuccess: api_data => {
-          setWorkflowResults(api_data.api_response);
-        },
-        onFinalize: () => {
-          setSearching(false);
-        }
-      });
+      reload(0);
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
+
+  const reload = offset => {
+    query.set('rows', PAGE_SIZE);
+    query.set('offset', offset);
+    apiCall({
+      method: 'POST',
+      url: '/api/v4/search/workflow/',
+      body: query.getParams(),
+      onSuccess: api_data => {
+        if (
+          api_data.api_response.items.length === 0 &&
+          api_data.api_response.offset !== 0 &&
+          api_data.api_response.offset >= api_data.api_response.total
+        ) {
+          reload(Math.max(0, api_data.api_response.offset - api_data.api_response.rows));
+        } else {
+          setWorkflowResults(api_data.api_response);
+        }
+      },
+      onEnter: () => setSearching(true),
+      onExit: () => setSearching(false)
+    });
+  };
 
   const onClear = () => {
     history.push(location.pathname);
@@ -109,6 +123,17 @@ export default function Workflows() {
     filterValue.current = inputValue;
   };
 
+  const setWorkflowID = (wf_id: string) => {
+    setDrawer(true);
+    setWid(wf_id);
+  };
+
+  const handleWorkflowDone = () => {
+    setDrawer(false);
+    setWid(null);
+    setTimeout(() => reload(workflowResults ? workflowResults.offset : 0), 1000);
+  };
+
   return (
     <PageFullWidth margin={4}>
       <Drawer anchor="right" classes={{ paper: classes.drawerPaper }} open={drawer} onClose={closeDrawer}>
@@ -118,7 +143,7 @@ export default function Workflows() {
           </IconButton>
         </div>
         <div style={{ paddingLeft: theme.spacing(2), paddingRight: theme.spacing(2) }}>
-          <WorkflowDetail />
+          <WorkflowDetail workflow_id={wid} close={handleWorkflowDone} />
         </div>
       </Drawer>
 
@@ -132,6 +157,7 @@ export default function Workflows() {
               <IconButton
                 style={{ color: theme.palette.action.active }}
                 onClick={() => {
+                  setWid(null);
                   setDrawer(true);
                 }}
               >
@@ -152,6 +178,34 @@ export default function Workflows() {
             onValueChange={onFilterValueChange}
             onClear={onClear}
             onSearch={onSearch}
+            buttons={[
+              {
+                icon: (
+                  <Tooltip title={t('never_used')}>
+                    <EventBusyOutlinedIcon fontSize={upMD ? 'default' : 'small'} />
+                  </Tooltip>
+                ),
+                props: {
+                  onClick: () => {
+                    query.set('query', 'hit_count:0');
+                    history.push(`${location.pathname}?${query.toString()}`);
+                  }
+                }
+              },
+              {
+                icon: (
+                  <Tooltip title={t('old')}>
+                    <EventOutlinedIcon fontSize={upMD ? 'default' : 'small'} />
+                  </Tooltip>
+                ),
+                props: {
+                  onClick: () => {
+                    query.set('query', 'last_seen:[* TO now-3m]');
+                    history.push(`${location.pathname}?${query.toString()}`);
+                  }
+                }
+              }
+            ]}
           >
             {workflowResults !== null && (
               <div className={classes.searchresult}>
@@ -185,7 +239,7 @@ export default function Workflows() {
       </PageHeader>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
-        <WorkflowTable workflowResults={workflowResults} />
+        <WorkflowTable workflowResults={workflowResults} setWorkflowID={setWorkflowID} />
       </div>
     </PageFullWidth>
   );
