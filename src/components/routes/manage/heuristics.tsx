@@ -1,5 +1,6 @@
-import { makeStyles, useTheme } from '@material-ui/core';
+import { Drawer, IconButton, makeStyles, useTheme } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
+import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import SearchBar from 'components/elements/search/search-bar';
@@ -12,6 +13,7 @@ import 'moment/locale/fr';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
+import HeuristicDetail from './heuristic_detail';
 
 const PAGE_SIZE = 25;
 const DEFAULT_SUGGESTION = ['OR', 'AND', 'NOT', 'TO', 'now', 'd', 'M', 'y', 'h', 'm'];
@@ -22,6 +24,13 @@ const useStyles = makeStyles(theme => ({
     paddingTop: theme.spacing(0.5),
     display: 'flex',
     flexWrap: 'wrap'
+  },
+  drawerPaper: {
+    width: '80%',
+    maxWidth: '800px',
+    [theme.breakpoints.down('sm')]: {
+      width: '100%'
+    }
   }
 }));
 
@@ -36,6 +45,8 @@ export default function Heuristics() {
   const { t } = useTranslation(['manageHeuristics']);
   const [pageSize] = useState(PAGE_SIZE);
   const [searching, setSearching] = useState(false);
+  const [drawer, setDrawer] = useState(false);
+  const [heurid, setHeurid] = useState(null);
   const { indexes } = useAppContext();
   const [heuristicResults, setHeuristicResults] = useState<SearchResults>(null);
   const location = useLocation();
@@ -51,6 +62,10 @@ export default function Heuristics() {
     ...DEFAULT_SUGGESTION
   ]);
   const filterValue = useRef<string>('');
+
+  const closeDrawer = () => {
+    setDrawer(false);
+  };
 
   useEffect(() => {
     setQuery(new SimpleSearchQuery(location.search, `query=*&rows=${pageSize}&offset=0`));
@@ -94,8 +109,24 @@ export default function Heuristics() {
     filterValue.current = inputValue;
   };
 
+  const setHeuristicID = (heur_id: string) => {
+    setDrawer(true);
+    setHeurid(heur_id);
+  };
+
   return (
     <PageFullWidth margin={4}>
+      <Drawer anchor="right" classes={{ paper: classes.drawerPaper }} open={drawer} onClose={closeDrawer}>
+        <div id="drawerTop" style={{ padding: theme.spacing(1) }}>
+          <IconButton onClick={closeDrawer}>
+            <CloseOutlinedIcon />
+          </IconButton>
+        </div>
+        <div style={{ paddingLeft: theme.spacing(2), paddingRight: theme.spacing(2) }}>
+          <HeuristicDetail heur_id={heurid} />
+        </div>
+      </Drawer>
+
       <div style={{ paddingBottom: theme.spacing(2) }}>
         <Typography variant="h4">{t('title')}</Typography>
       </div>
@@ -143,7 +174,7 @@ export default function Heuristics() {
       </PageHeader>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
-        <HeuristicsTable heuristicResults={heuristicResults} />
+        <HeuristicsTable heuristicResults={heuristicResults} setHeuristicID={setHeuristicID} />
       </div>
     </PageFullWidth>
   );

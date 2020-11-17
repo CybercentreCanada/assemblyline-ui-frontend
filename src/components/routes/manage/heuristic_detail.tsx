@@ -30,6 +30,10 @@ type ParamProps = {
   id: string;
 };
 
+type HeuristicDetailProps = {
+  heur_id?: string;
+};
+
 const useStyles = makeStyles(theme => ({
   preview: {
     margin: 0,
@@ -42,10 +46,17 @@ const useStyles = makeStyles(theme => ({
     [theme.breakpoints.down('sm')]: {
       width: '100%'
     }
+  },
+  buttonProgress: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginTop: -12,
+    marginLeft: -12
   }
 }));
 
-export default function HeuristicDetail() {
+const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
   const { t } = useTranslation(['manageHeuristicDetail']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
@@ -55,16 +66,16 @@ export default function HeuristicDetail() {
 
   useEffect(() => {
     apiCall({
-      url: `/api/v4/heuristics/${id}/`,
+      url: `/api/v4/heuristics/${heur_id || id}/`,
       onSuccess: api_data => {
         setHeuristic(api_data.api_response);
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [heur_id, id]);
 
   return (
-    <PageCenter margin={4}>
+    <PageCenter margin={!id ? 2 : 4} width="100%">
       <div style={{ paddingBottom: theme.spacing(4), paddingTop: theme.spacing(2) }}>
         <Classification size="tiny" c12n={heuristic ? heuristic.classification : null} />
       </div>
@@ -228,4 +239,10 @@ export default function HeuristicDetail() {
       </div>
     </PageCenter>
   );
-}
+};
+
+HeuristicDetail.defaultProps = {
+  heur_id: null
+};
+
+export default HeuristicDetail;

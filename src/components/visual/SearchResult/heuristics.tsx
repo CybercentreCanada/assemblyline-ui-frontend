@@ -30,9 +30,10 @@ type SearchResults = {
 
 type HeuristicsTableProps = {
   heuristicResults: SearchResults;
+  setHeuristicID?: (id: string) => void;
 };
 
-const WrappedHeuristicsTable: React.FC<HeuristicsTableProps> = ({ heuristicResults }) => {
+const WrappedHeuristicsTable: React.FC<HeuristicsTableProps> = ({ heuristicResults, setHeuristicID = null }) => {
   const { t } = useTranslation(['search']);
 
   return heuristicResults ? (
@@ -55,8 +56,13 @@ const WrappedHeuristicsTable: React.FC<HeuristicsTableProps> = ({ heuristicResul
                 key={heuristic.heur_id}
                 component={Link}
                 to={`/manage/heuristic/${heuristic.heur_id}`}
+                onClick={event => {
+                  if (setHeuristicID) {
+                    event.preventDefault();
+                    setHeuristicID(heuristic.heur_id);
+                  }
+                }}
                 hover
-                style={{ textDecoration: 'none' }}
               >
                 <DivTableCell>{heuristic.heur_id}</DivTableCell>
                 <DivTableCell>{heuristic.name}</DivTableCell>
