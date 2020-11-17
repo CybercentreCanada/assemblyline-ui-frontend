@@ -60,9 +60,14 @@ const WrappedWorflowTable: React.FC<WorkflowTableProps> = ({ workflowResults, se
             {workflowResults.items.map(workflow => (
               <LinkRow
                 key={workflow.workflow_id}
-                component={setWorkflowID ? 'div' : Link}
-                to={setWorkflowID ? '' : `/manage/workflow/${workflow.workflow_id}`}
-                onClick={() => setWorkflowID && setWorkflowID(workflow.workflow_id)}
+                component={Link}
+                to={`/manage/workflow/${workflow.workflow_id}`}
+                onClick={event => {
+                  if (setWorkflowID) {
+                    event.preventDefault();
+                    setWorkflowID(workflow.workflow_id);
+                  }
+                }}
                 hover
               >
                 <DivTableCell>
