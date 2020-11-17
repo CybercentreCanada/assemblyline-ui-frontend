@@ -190,7 +190,6 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
       <div style={{ paddingBottom: theme.spacing(4), paddingTop: theme.spacing(2) }}>
         <Classification
           type="picker"
-          size="tiny"
           c12n={workflow ? workflow.classification : null}
           setClassification={setClassification}
         />
