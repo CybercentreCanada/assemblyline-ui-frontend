@@ -26,7 +26,7 @@ export const DivTableCell = ({ children, ...other }) => {
 
 export const LinkRow = ({ children, to, ...other }) => {
   return (
-    <TableRow {...other} component={Link} to={to}>
+    <TableRow component={Link} {...other} to={to} style={{ cursor: 'pointer', textDecoration: 'none' }}>
       {children}
     </TableRow>
   );
