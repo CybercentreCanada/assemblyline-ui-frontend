@@ -16,7 +16,7 @@ export default function HelpClassification() {
   const sp4 = theme.spacing(4);
 
   return c12nDef.enforce ? (
-    <PageCenter margin={4}>
+    <PageCenter margin={4} width="100%">
       <div style={{ textAlign: 'left', paddingBottom: sp4 }}>
         <Typography variant="h5" gutterBottom>
           {t('desc_title')}
