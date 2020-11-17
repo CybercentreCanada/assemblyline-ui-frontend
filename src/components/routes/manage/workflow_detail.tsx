@@ -14,7 +14,7 @@ import {
   useTheme,
   withStyles
 } from '@material-ui/core';
-import RemoveOutlinedIcon from '@material-ui/icons/RemoveOutlined';
+import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
 import { Skeleton } from '@material-ui/lab';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useAppContext from 'components/hooks/useAppContext';
@@ -209,7 +209,7 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
                 {workflow ? (
                   <Tooltip title={t('remove')}>
                     <IconButton style={{ color: theme.palette.action.active }} onClick={() => setDeleteDialog(true)}>
-                      <RemoveOutlinedIcon />
+                      <RemoveCircleOutlineOutlinedIcon />
                     </IconButton>
                   </Tooltip>
                 ) : (
