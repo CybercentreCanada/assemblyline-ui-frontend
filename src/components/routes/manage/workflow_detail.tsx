@@ -305,33 +305,21 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
               <Skeleton style={{ height: '2.5rem' }} />
             )}
           </Grid>
-          {!id && (
-            <Grid item xs={12} style={{ paddingTop: theme.spacing(2), textAlign: 'right' }}>
-              <Button
-                variant="contained"
-                color="primary"
-                disabled={buttonLoading || !modified || !workflow.name || !workflow.query}
-                onClick={saveWorkflow}
-              >
-                {t(workflow_id || id ? 'save' : 'add.button')}
-                {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
-              </Button>
-            </Grid>
-          )}
         </Grid>
       </div>
 
-      {workflow && id && modified && workflow.name && workflow.query ? (
+      {workflow && modified && workflow.name && workflow.query ? (
         <div
           style={{
-            paddingTop: theme.spacing(1),
-            paddingBottom: theme.spacing(1),
-            position: 'fixed',
-            bottom: 0,
-            left: 0,
-            width: '100%',
-            backgroundColor: theme.palette.background.default,
-            boxShadow: theme.shadows[4]
+            paddingTop: id ? theme.spacing(1) : theme.spacing(2),
+            paddingBottom: id ? theme.spacing(1) : theme.spacing(2),
+            position: id ? 'fixed' : 'inherit',
+            bottom: id ? 0 : 'inherit',
+            left: id ? 0 : 'inherit',
+            width: id ? '100%' : 'inherit',
+            textAlign: id ? 'center' : 'right',
+            backgroundColor: id ? theme.palette.background.default : 'inherit',
+            boxShadow: id ? theme.shadows[4] : 'inherit'
           }}
         >
           <Button variant="contained" color="primary" disabled={buttonLoading} onClick={saveWorkflow}>

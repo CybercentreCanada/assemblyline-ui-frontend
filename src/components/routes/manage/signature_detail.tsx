@@ -245,7 +245,7 @@ const SignatureDetail = ({ signature_id, close }: SignatureDetailProps) => {
           <Skeleton variant="rect" height="6rem" />
         )}
 
-        {(signature && id && modified) || !id ? (
+        {signature && modified ? (
           <div
             style={{
               paddingTop: id ? theme.spacing(1) : theme.spacing(2),
@@ -259,12 +259,7 @@ const SignatureDetail = ({ signature_id, close }: SignatureDetailProps) => {
               boxShadow: id ? theme.shadows[4] : 'inherit'
             }}
           >
-            <Button
-              variant="contained"
-              color="primary"
-              disabled={buttonLoading || !modified}
-              onClick={handleStateSaveButtonClick}
-            >
+            <Button variant="contained" color="primary" disabled={buttonLoading} onClick={handleStateSaveButtonClick}>
               {t('change.save')}
               {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
             </Button>
