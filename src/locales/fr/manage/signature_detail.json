@@ -1,5 +1,6 @@
 {
-  "change.save": "Sauvegarder",
+  "change.save": "Enregistrer les modifications",
+  "change.close": "Annuler",
   "change.success": "L'état de la signature a été modifié avec succès",
   "change.title": "Changer le statut d'une signature",
   "change.warning": "Avant de modifier l'état de la signature, tenez compte des points suivants:",
@@ -9,6 +10,7 @@
   "delete.acceptText": "Oui, supprimer la!",
   "delete.cancelText": "Annuler",
   "delete.text": "Voulez-vous vraiment supprimer la signature actuelle? Il n'y aura aucun moyen de le récupérer une fois que c'est fait.",
+  "delete.success": "La signature a été supprimer avec succès.",
   "delete.title": "Supprimer la signature",
   "remove": "Supprimer la signature",
   "status.DEPLOYED": "Déployée",

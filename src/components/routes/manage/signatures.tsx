@@ -1,6 +1,7 @@
-import { Grid, IconButton, Link, makeStyles, Tooltip, useMediaQuery, useTheme } from '@material-ui/core';
+import { Drawer, Grid, IconButton, Link, makeStyles, Tooltip, useMediaQuery, useTheme } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 import BlockIcon from '@material-ui/icons/Block';
+import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
 import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
 import RecordVoiceOverOutlinedIcon from '@material-ui/icons/RecordVoiceOverOutlined';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
@@ -15,6 +16,7 @@ import 'moment/locale/fr';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
+import SignatureDetail from './signature_detail';
 
 const PAGE_SIZE = 25;
 const DEFAULT_SUGGESTION = ['OR', 'AND', 'NOT', 'TO', 'now', 'd', 'M', 'y', 'h', 'm'];
@@ -25,6 +27,13 @@ const useStyles = makeStyles(theme => ({
     paddingTop: theme.spacing(0.5),
     display: 'flex',
     flexWrap: 'wrap'
+  },
+  drawerPaper: {
+    width: '80%',
+    maxWidth: '800px',
+    [theme.breakpoints.down('sm')]: {
+      width: '100%'
+    }
   }
 }));
 
@@ -39,6 +48,8 @@ export default function Signatures() {
   const { t } = useTranslation(['manageSignatures']);
   const [pageSize] = useState(PAGE_SIZE);
   const [searching, setSearching] = useState(false);
+  const [drawer, setDrawer] = useState(false);
+  const [sid, setSid] = useState(null);
   const { indexes } = useAppContext();
   const [signatureResults, setSignatureResults] = useState<SearchResults>(null);
   const location = useLocation();
@@ -62,24 +73,34 @@ export default function Signatures() {
 
   useEffect(() => {
     if (query) {
-      query.set('rows', PAGE_SIZE);
-      query.set('offset', 0);
-      setSearching(true);
-      apiCall({
-        method: 'POST',
-        url: '/api/v4/search/signature/',
-        body: query.getParams(),
-        onSuccess: api_data => {
-          setSignatureResults(api_data.api_response);
-        },
-        onFinalize: () => {
-          setSearching(false);
-        }
-      });
+      reload(0);
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
+
+  const reload = offset => {
+    query.set('rows', PAGE_SIZE);
+    query.set('offset', offset);
+    apiCall({
+      method: 'POST',
+      url: '/api/v4/search/signature/',
+      body: query.getParams(),
+      onSuccess: api_data => {
+        if (
+          api_data.api_response.items.length === 0 &&
+          api_data.api_response.offset !== 0 &&
+          api_data.api_response.offset >= api_data.api_response.total
+        ) {
+          reload(Math.max(0, api_data.api_response.offset - api_data.api_response.rows));
+        } else {
+          setSignatureResults(api_data.api_response);
+        }
+      },
+      onEnter: () => setSearching(true),
+      onExit: () => setSearching(false)
+    });
+  };
 
   const onClear = () => {
     history.push(location.pathname);
@@ -98,8 +119,34 @@ export default function Signatures() {
     filterValue.current = inputValue;
   };
 
+  const setSignatureID = (sig_id: string) => {
+    setDrawer(true);
+    setSid(sig_id);
+  };
+
+  const handleSignatureDone = () => {
+    setDrawer(false);
+    setSid(null);
+    setTimeout(() => reload(signatureResults ? signatureResults.offset : 0), 1000);
+  };
+
+  const closeDrawer = () => {
+    setDrawer(false);
+  };
+
   return (
     <PageFullWidth margin={4}>
+      <Drawer anchor="right" classes={{ paper: classes.drawerPaper }} open={drawer} onClose={closeDrawer}>
+        <div id="drawerTop" style={{ padding: theme.spacing(1) }}>
+          <IconButton onClick={closeDrawer}>
+            <CloseOutlinedIcon />
+          </IconButton>
+        </div>
+        <div style={{ paddingLeft: theme.spacing(2), paddingRight: theme.spacing(2) }}>
+          <SignatureDetail signature_id={sid} close={handleSignatureDone} />
+        </div>
+      </Drawer>
+
       <div style={{ paddingBottom: theme.spacing(2) }}>
         <Grid container alignItems="center">
           <Grid item xs>
@@ -191,7 +238,7 @@ export default function Signatures() {
       </PageHeader>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
-        <SignaturesTable signatureResults={signatureResults} />
+        <SignaturesTable signatureResults={signatureResults} setSignatureID={setSignatureID} />
       </div>
     </PageFullWidth>
   );

@@ -29,9 +29,10 @@ type SearchResults = {
 
 type SignaturesTableProps = {
   signatureResults: SearchResults;
+  setSignatureID?: (id: string) => void;
 };
 
-const WrappedSignaturesTable: React.FC<SignaturesTableProps> = ({ signatureResults }) => {
+const WrappedSignaturesTable: React.FC<SignaturesTableProps> = ({ signatureResults, setSignatureID = null }) => {
   const { t } = useTranslation(['search']);
 
   return signatureResults ? (
@@ -55,8 +56,13 @@ const WrappedSignaturesTable: React.FC<SignaturesTableProps> = ({ signatureResul
                 key={signature.signature_id}
                 component={Link}
                 to={`/manage/signature/${signature.id}`}
+                onClick={event => {
+                  if (setSignatureID) {
+                    event.preventDefault();
+                    setSignatureID(signature.id);
+                  }
+                }}
                 hover
-                style={{ textDecoration: 'none' }}
               >
                 <DivTableCell>{signature.type}</DivTableCell>
                 <DivTableCell>{signature.source}</DivTableCell>

@@ -1,6 +1,10 @@
 import {
   Button,
-  Drawer,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Grid,
   IconButton,
   makeStyles,
@@ -11,8 +15,7 @@ import {
   Typography,
   useTheme
 } from '@material-ui/core';
-import ClearOutlinedIcon from '@material-ui/icons/ClearOutlined';
-import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
+import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
 import YoutubeSearchedForIcon from '@material-ui/icons/YoutubeSearchedFor';
 import { Skeleton } from '@material-ui/lab';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
@@ -44,83 +47,100 @@ type ParamProps = {
   id: string;
 };
 
+type SignatureDetailProps = {
+  signature_id?: string;
+  close?: () => void;
+};
+
 const useStyles = makeStyles(theme => ({
   preview: {
     padding: theme.spacing(2),
     whiteSpace: 'pre-wrap',
     wordBreak: 'break-word'
   },
-  drawerPaper: {
+  openPaper: {
     maxWidth: '1200px',
     [theme.breakpoints.down('sm')]: {
       width: '100%'
     }
+  },
+  buttonProgress: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginTop: -12,
+    marginLeft: -12
   }
 }));
 
-export default function SignatureDetail() {
+const SignatureDetail = ({ signature_id, close }: SignatureDetailProps) => {
   const { t } = useTranslation(['manageSignatureDetail']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
   const [signature, setSignature] = useState<Signature>(null);
-  const [tempStatus, setTempStatus] = useState(null);
-  const [drawer, setDrawer] = useState(false);
+  const [open, setOpen] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState(false);
-  const [changing, setChanging] = useState(false);
+  const [buttonLoading, setButtonLoading] = useState(false);
+  const [modified, setModified] = useState(false);
   const history = useHistory();
   const { showSuccessMessage } = useMySnackbar();
   const apiCall = useMyAPI();
   const classes = useStyles();
 
   useEffect(() => {
-    apiCall({
-      url: `/api/v4/signature/${id}/`,
-      onSuccess: api_data => {
-        setSignature(api_data.api_response);
-      }
-    });
+    if (signature_id || id) {
+      apiCall({
+        url: `/api/v4/signature/${signature_id || id}/`,
+        onSuccess: api_data => {
+          setSignature(api_data.api_response);
+        }
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [signature_id, id]);
 
   const closeDrawer = () => {
-    setDrawer(false);
-    setTempStatus(null);
-    setChanging(false);
+    setOpen(false);
   };
 
   const handleSelectChange = event => {
-    setTempStatus(event.target.value);
+    setModified(true);
+    setSignature({ ...signature, status: event.target.value });
+    closeDrawer();
   };
 
   const handleStateSaveButtonClick = () => {
-    setChanging(true);
     apiCall({
-      url: `/api/v4/signature/change_status/${id}/${tempStatus}/`,
-      onSuccess: api_data => {
-        setSignature({ ...signature, status: tempStatus });
-        closeDrawer();
+      url: `/api/v4/signature/change_status/${signature_id || id}/${signature.status}/`,
+      onSuccess: () => {
         showSuccessMessage(t('change.success'));
-      }
+        setModified(false);
+        close();
+      },
+      onEnter: () => setButtonLoading(true),
+      onExit: () => setButtonLoading(false)
     });
   };
 
-  const handleExecuteDeleteButtonClick = event => {
+  const handleExecuteDeleteButtonClick = () => {
+    closeDrawer();
     apiCall({
-      url: `/api/v4/signature/${id}/`,
+      url: `/api/v4/signature/${signature_id || id}/`,
       method: 'DELETE',
       onSuccess: () => {
         showSuccessMessage(t('delete.success'));
-        history.push('/manage/signatures');
+        if (id) setTimeout(() => history.push('/manage/signatures'), 1000);
+        close();
       }
     });
   };
 
-  const handleDeleteButtonClick = event => {
+  const handleDeleteButtonClick = () => {
     setDeleteDialog(true);
   };
 
   return (
-    <PageCenter margin={4}>
+    <PageCenter margin={!id ? 2 : 4} width="100%">
       <ConfirmationDialog
         open={deleteDialog}
         handleClose={() => setDeleteDialog(false)}
@@ -131,52 +151,36 @@ export default function SignatureDetail() {
         text={t('delete.text')}
       />
 
-      <Drawer anchor="right" classes={{ paper: classes.drawerPaper }} open={drawer} onClose={closeDrawer}>
-        <div id="drawerTop" style={{ padding: theme.spacing(1) }}>
-          <IconButton onClick={closeDrawer}>
-            <CloseOutlinedIcon />
-          </IconButton>
-        </div>
-        <div style={{ paddingLeft: theme.spacing(2), paddingRight: theme.spacing(2) }}>
-          <div>
-            <Typography variant="h5">{t('change.title')}</Typography>
-            <p>{t('change.warning')}</p>
-            <ul>
-              <li>{t('change.warning.1')}</li>
-              <li>{t('change.warning.2')}</li>
-            </ul>
-            <div>{t('change.warning.action')}</div>
-            <Grid container alignItems="center">
-              <Grid item xs>
-                {signature ? (
-                  <Select
-                    onChange={handleSelectChange}
-                    variant="outlined"
-                    margin="dense"
-                    value={tempStatus || signature.status}
-                  >
-                    <MenuItem value="DEPLOYED">{t('status.DEPLOYED')}</MenuItem>
-                    <MenuItem value="NOISY">{t('status.NOISY')}</MenuItem>
-                    <MenuItem value="DISABLED">{t('status.DISABLED')}</MenuItem>
-                  </Select>
-                ) : (
-                  <Skeleton height={2} />
-                )}
-              </Grid>
-              <Grid item xs style={{ textAlign: 'right' }}>
-                <Button
-                  disabled={tempStatus === null || changing}
-                  variant="contained"
-                  color="primary"
-                  onClick={handleStateSaveButtonClick}
-                >
-                  {t('change.save')}
-                </Button>
-              </Grid>
-            </Grid>
-          </div>
-        </div>
-      </Drawer>
+      <Dialog
+        open={open}
+        onClose={closeDrawer}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{t('change.title')}</DialogTitle>
+        <DialogContent>
+          <p>{t('change.warning')}</p>
+          <ul>
+            <li>{t('change.warning.1')}</li>
+            <li>{t('change.warning.2')}</li>
+          </ul>
+          <div>{t('change.warning.action')}</div>
+          {signature ? (
+            <Select fullWidth onChange={handleSelectChange} variant="outlined" margin="dense" value={signature.status}>
+              <MenuItem value="DEPLOYED">{t('status.DEPLOYED')}</MenuItem>
+              <MenuItem value="NOISY">{t('status.NOISY')}</MenuItem>
+              <MenuItem value="DISABLED">{t('status.DISABLED')}</MenuItem>
+            </Select>
+          ) : (
+            <Skeleton height={2} />
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeDrawer} color="primary">
+            {t('change.close')}
+          </Button>
+        </DialogActions>
+      </Dialog>
       <div style={{ paddingBottom: theme.spacing(4), paddingTop: theme.spacing(2) }}>
         <Classification size="tiny" c12n={signature ? signature.classification : null} />
       </div>
@@ -207,11 +211,11 @@ export default function SignatureDetail() {
                   </Tooltip>
                   <Tooltip title={t('remove')}>
                     <IconButton style={{ color: theme.palette.action.active }} onClick={handleDeleteButtonClick}>
-                      <ClearOutlinedIcon />
+                      <RemoveCircleOutlineOutlinedIcon />
                     </IconButton>
                   </Tooltip>
                 </div>
-                <SignatureStatus status={signature.status} onClick={() => setDrawer(true)} />
+                <SignatureStatus status={signature.status} onClick={() => setOpen(true)} />
               </>
             ) : (
               <>
@@ -240,7 +244,40 @@ export default function SignatureDetail() {
         ) : (
           <Skeleton variant="rect" height="6rem" />
         )}
+
+        {(signature && id && modified) || !id ? (
+          <div
+            style={{
+              paddingTop: id ? theme.spacing(1) : theme.spacing(2),
+              paddingBottom: id ? theme.spacing(1) : theme.spacing(2),
+              position: id ? 'fixed' : 'inherit',
+              bottom: id ? 0 : 'inherit',
+              left: id ? 0 : 'inherit',
+              width: id ? '100%' : 'inherit',
+              textAlign: id ? 'center' : 'right',
+              backgroundColor: id ? theme.palette.background.default : 'inherit',
+              boxShadow: id ? theme.shadows[4] : 'inherit'
+            }}
+          >
+            <Button
+              variant="contained"
+              color="primary"
+              disabled={buttonLoading || !modified}
+              onClick={handleStateSaveButtonClick}
+            >
+              {t('change.save')}
+              {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+            </Button>
+          </div>
+        ) : null}
       </div>
     </PageCenter>
   );
-}
+};
+
+SignatureDetail.defaultProps = {
+  signature_id: null,
+  close: () => {}
+};
+
+export default SignatureDetail;
