@@ -1,26 +1,26 @@
-import { Card, makeStyles, Typography } from '@material-ui/core';
+import { Card, Grid, makeStyles, Typography, useTheme } from '@material-ui/core';
+import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
 import PageFullscreen from 'commons/components/layout/pages/PageFullScreen';
-import React from 'react';
+import React, { useEffect, useReducer } from 'react';
 import { useTranslation } from 'react-i18next';
+import io from 'socket.io-client';
 
-function createData(id) {
-  return { id };
-}
+const NAMESPACE = '/status';
 
 const useStyles = makeStyles(theme => ({
   card: {
     flexGrow: 1,
-    minHeight: '175px',
-    minWidth: '320px',
-    padding: theme.spacing(2),
-    margin: theme.spacing(1)
+    padding: theme.spacing(1)
+    // minHeight: '175px'
   },
-  watermark: {
-    color: theme.palette.action.disabledBackground,
-    margin: 'auto',
-    width: '275px',
-    lineHeight: '155px',
-    textAlign: 'center'
+  core_card: {
+    flexGrow: 1,
+    padding: theme.spacing(1),
+    minHeight: '150px'
+  },
+  title: {
+    fontWeight: 800,
+    fontSize: '120%'
   }
 }));
 
@@ -29,10 +29,8 @@ const IngestCard = () => {
   const classes = useStyles();
 
   return (
-    <Card className={classes.card}>
-      <Typography variant="h4" className={classes.watermark}>
-        {t('ingest')}
-      </Typography>
+    <Card className={classes.core_card}>
+      <div className={classes.title}>{t('ingest')}</div>
     </Card>
   );
 };
@@ -42,10 +40,8 @@ const DispatcherCard = () => {
   const classes = useStyles();
 
   return (
-    <Card className={classes.card}>
-      <Typography variant="h4" className={classes.watermark}>
-        {t('dispatcher')}
-      </Typography>
+    <Card className={classes.core_card}>
+      <div className={classes.title}>{t('dispatcher')}</div>
     </Card>
   );
 };
@@ -55,10 +51,8 @@ const ExpiryCard = () => {
   const classes = useStyles();
 
   return (
-    <Card className={classes.card}>
-      <Typography variant="h4" className={classes.watermark}>
-        {t('expiry')}
-      </Typography>
+    <Card className={classes.core_card}>
+      <div className={classes.title}>{t('expiry')}</div>
     </Card>
   );
 };
@@ -68,10 +62,8 @@ const AlerterCard = () => {
   const classes = useStyles();
 
   return (
-    <Card className={classes.card}>
-      <Typography variant="h4" className={classes.watermark}>
-        {t('alerter')}
-      </Typography>
+    <Card className={classes.core_card}>
+      <div className={classes.title}>{t('alerter')}</div>
     </Card>
   );
 };
@@ -81,50 +73,109 @@ const ScalerResourcesCard = () => {
   const classes = useStyles();
 
   return (
-    <Card className={classes.card}>
-      <Typography variant="h4" className={classes.watermark}>
-        {t('resources')}
-      </Typography>
+    <Card className={classes.core_card}>
+      <div className={classes.title}>{t('resources')}</div>
     </Card>
   );
 };
 
 const ServiceCard = ({ service = null }) => {
   const { t } = useTranslation(['dashboard']);
+  const theme = useTheme();
   const classes = useStyles();
 
   return (
     <Card className={classes.card}>
-      <Typography variant="h4" className={classes.watermark}>
-        {t(service)}
-      </Typography>
+      <div>
+        <div style={{ float: 'right' }}>
+          <ErrorOutlineOutlinedIcon />
+        </div>
+        <div className={classes.title} style={{ paddingBottom: theme.spacing(2) }}>
+          {`${service.service_name} :: ${service.instances} / ${service.total || 0}`}
+        </div>
+        <Grid container>
+          <Grid item xs={6}>
+            <span>{`Q: ${service.queue}`}</span>
+          </Grid>
+          <Grid item xs={6}>
+            <span>{`B: ${service.activity.busy}`}</span>
+          </Grid>
+          <Grid item xs={6}>
+            <span>{`P: ${service.metrics.execute}`}</span>
+          </Grid>
+          <Grid item xs={6}>
+            <span>{`F: ${service.metrics.fail_nonrecoverable}`}</span>
+          </Grid>
+        </Grid>
+      </div>
     </Card>
   );
 };
 
+const serviceReducer = (state, newState) => {
+  return { ...state, ...newState };
+};
+
 const Dashboard = () => {
   const { t } = useTranslation(['dashboard']);
+  const [services, setServices] = useReducer(serviceReducer, {});
 
-  const cards = [];
-  for (let x = 0; x < 12; x++) {
-    cards.push(createData(x + 1));
-  }
+  const handleServiceHeartbeat = hb => {
+    // eslint-disable-next-line no-console
+    console.log(`Socket-IO :: ServiceHeartbeat ${hb.service_name}`, hb);
+    const newServices = {};
+    newServices[hb.service_name] = hb;
+    setServices(newServices);
+  };
+
+  useEffect(() => {
+    const socket = io(NAMESPACE);
+
+    socket.on('connect', () => {
+      socket.emit('monitor', { status: 'start' });
+      // eslint-disable-next-line no-console
+      console.log('Socket-IO :: Connecting to socketIO server...');
+    });
+    // eslint-disable-next-line no-console
+    socket.on('monitoring', data => console.log('Socket-IO :: Connected to socket server', data));
+
+    socket.on('DispatcherHeartbeat', data => console.log('DispatcherHeartbeat', data));
+    socket.on('AlerterHeartbeat', data => console.log('AlerterHeartbeat', data));
+    socket.on('ExpiryHeartbeat', data => console.log('ExpiryHeartbeat', data));
+    socket.on('ArchiveHeartbeat', data => console.log('ArchiveHeartbeat', data));
+    socket.on('ScalerHeartbeat', data => console.log('ScalerHeartbeat', data));
+    socket.on('ScalerStatusHeartbeat', data => console.log('ScalerStatusHeartbeat', data));
+    socket.on('IngestHeartbeat', data => console.log('IngestHeartbeat', data));
+    socket.on('ServiceHeartbeat', handleServiceHeartbeat);
+  }, []);
 
   return (
     <PageFullscreen margin={4}>
       <Typography gutterBottom color="primary" variant="h2" align="center">
         {t('title')}
       </Typography>
-      <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', width: '100%' }}>
-        <IngestCard />
-        <DispatcherCard />
-        <ExpiryCard />
-        <AlerterCard />
-        <ScalerResourcesCard />
-        {cards.map((a, i) => (
-          <ServiceCard key={i} service={`service_${a.id}`} />
+      <Grid container spacing={2}>
+        <Grid item xs={12} xl={6}>
+          <IngestCard />
+        </Grid>
+        <Grid item xs={12} xl={6}>
+          <DispatcherCard />
+        </Grid>
+        <Grid item xs={12} xl={5}>
+          <ExpiryCard />
+        </Grid>
+        <Grid item xs={12} md={8} xl={4}>
+          <AlerterCard />
+        </Grid>
+        <Grid item xs={12} md={4} xl={3}>
+          <ScalerResourcesCard />
+        </Grid>
+        {Object.keys(services).map(key => (
+          <Grid key={key} item xs={12} md={4} xl={3}>
+            <ServiceCard service={services[key]} />
+          </Grid>
         ))}
-      </div>
+      </Grid>
     </PageFullscreen>
   );
 };
