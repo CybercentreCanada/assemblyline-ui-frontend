@@ -537,8 +537,7 @@ const serviceReducer = (state, serviceState) => {
   newState[hb.service_name] = {
     ...DEFAULT_SERVICE,
     ...current,
-    ...hb,
-    last_hb: Math.floor(new Date().getTime() / 1000)
+    ...hb
   };
   return { ...state, ...newState };
 };
