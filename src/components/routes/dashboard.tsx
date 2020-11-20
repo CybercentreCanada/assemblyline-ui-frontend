@@ -1,4 +1,4 @@
-import { Card, Grid, makeStyles, Tooltip, Typography, useTheme } from '@material-ui/core';
+import { Card, Grid, makeStyles, Theme, Tooltip, Typography } from '@material-ui/core';
 import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
 import SpeedOutlinedIcon from '@material-ui/icons/SpeedOutlined';
 import PageFullscreen from 'commons/components/layout/pages/PageFullScreen';
@@ -10,11 +10,11 @@ import io from 'socket.io-client';
 
 const NAMESPACE = '/status';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme: Theme) => ({
   card: {
     flexGrow: 1,
     padding: theme.spacing(1),
-    minHeight: '116px',
+    minHeight: '120px',
     '&:hover': {
       boxShadow: theme.shadows[6]
     }
@@ -26,6 +26,14 @@ const useStyles = makeStyles(theme => ({
     '&:hover': {
       boxShadow: theme.shadows[6]
     }
+  },
+  error: {
+    backgroundColor: theme.palette.type === 'dark' ? '#ff000017' : '#FFE4E4',
+    border: `solid 1px ${theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark}`
+  },
+  error_icon: {
+    color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark,
+    float: 'right'
   },
   icon: {
     marginRight: '4px',
@@ -39,6 +47,9 @@ const useStyles = makeStyles(theme => ({
   },
   muted: {
     color: theme.palette.text.secondary
+  },
+  ok: {
+    border: `solid 1px ${theme.palette.divider}`
   },
   title: {
     fontWeight: 500,
@@ -65,13 +76,16 @@ const WrappedIngestCard = ({ ingester }) => {
   const classes = useStyles();
 
   return (
-    <Card className={classes.core_card}>
-      <div style={{ float: 'right' }}>
-        <ErrorOutlineOutlinedIcon />
-      </div>
-      <div className={classes.title}>{`${t('ingester')} :: x${ingester.instances}`}</div>
-
-      <Grid container>
+    <Card className={`${classes.core_card} ${ingester.error ? classes.error : classes.ok}`}>
+      <Grid container spacing={1}>
+        <Grid item xs={12}>
+          {ingester.error && (
+            <div className={classes.error_icon}>
+              <ErrorOutlineOutlinedIcon />
+            </div>
+          )}
+          <div className={classes.title}>{`${t('ingester')} :: x${ingester.instances}`}</div>
+        </Grid>
         <Grid item xs={12} sm={3}>
           <div>
             <label>{t('ingest')}</label>
@@ -145,12 +159,16 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
   const classes = useStyles();
 
   return (
-    <Card className={classes.core_card}>
-      <div style={{ float: 'right' }}>
-        <ErrorOutlineOutlinedIcon />
-      </div>
-      <div className={classes.title}>{`${t('dispatcher')} :: x${dispatcher.instances}`}</div>
+    <Card className={`${classes.core_card} ${dispatcher.error ? classes.error : classes.ok}`}>
       <Grid container spacing={1}>
+        <Grid item xs={12}>
+          {dispatcher.error && (
+            <div className={classes.error_icon}>
+              <ErrorOutlineOutlinedIcon />
+            </div>
+          )}
+          <div className={classes.title}>{`${t('dispatcher')} :: x${dispatcher.instances}`}</div>
+        </Grid>
         <Grid item xs={12}>
           <div>
             <label>{t('services')}</label>
@@ -213,12 +231,16 @@ const WrappedExpiryCard = ({ expiry }) => {
   const classes = useStyles();
 
   return (
-    <Card className={classes.core_card}>
-      <div style={{ float: 'right' }}>
-        <ErrorOutlineOutlinedIcon />
-      </div>
-      <div className={classes.title}>{`${t('expiry')} :: x${expiry.instances}`}</div>
+    <Card className={`${classes.core_card} ${expiry.error ? classes.error : classes.ok}`}>
       <Grid container spacing={1}>
+        <Grid item xs={12}>
+          {expiry.error && (
+            <div className={classes.error_icon}>
+              <ErrorOutlineOutlinedIcon />
+            </div>
+          )}
+          <div className={classes.title}>{`${t('expiry')} :: x${expiry.instances}`}</div>
+        </Grid>
         <Grid item xs={12} sm={6}>
           <div>
             <label>{t('queues')}</label>
@@ -302,12 +324,16 @@ const WrappedAlerterCard = ({ alerter }) => {
   const classes = useStyles();
 
   return (
-    <Card className={classes.core_card}>
-      <div style={{ float: 'right' }}>
-        <ErrorOutlineOutlinedIcon />
-      </div>
-      <div className={classes.title}>{`${t('alerter')} :: x${alerter.instances}`}</div>
+    <Card className={`${classes.core_card} ${alerter.error ? classes.error : classes.ok}`}>
       <Grid container spacing={1}>
+        <Grid item xs={12}>
+          {alerter.error && (
+            <div className={classes.error_icon}>
+              <ErrorOutlineOutlinedIcon />
+            </div>
+          )}
+          <div className={classes.title}>{`${t('alerter')} :: x${alerter.instances}`}</div>
+        </Grid>
         <Grid item xs={12} sm={4}>
           <div>
             <label>{t('queues')}</label>
@@ -337,54 +363,60 @@ const WrappedScalerResourcesCard = ({ scaler }) => {
   const classes = useStyles();
 
   return (
-    <Card className={classes.core_card}>
-      <div className={classes.title}>{t('resources')}</div>
-      <div style={{ paddingTop: '8px', textAlign: 'center' }}>
-        <Grid container>
-          <Grid item xs={6}>
-            <div style={{ display: 'inline-block' }}>
-              <ArcGauge
-                pctValue={scaler.cpu_total === 0 ? 0 : ((scaler.cpu_total - scaler.cpu_free) / scaler.cpu_total) * 100}
-                title={t('cpu')}
-                caption={`${scaler.cpu_total - scaler.cpu_free} / ${scaler.cpu_total} ${t('cores')}`}
-                width="120px"
-              />
+    <Card className={`${classes.core_card} ${scaler.error ? classes.error : classes.ok}`}>
+      <Grid container spacing={1}>
+        <Grid item xs={12}>
+          {scaler.error && (
+            <div className={classes.error_icon}>
+              <ErrorOutlineOutlinedIcon />
             </div>
-          </Grid>
-          <Grid item xs={6}>
-            <div style={{ display: 'inline-block' }}>
-              <ArcGauge
-                pctValue={
-                  scaler.memory_total === 0
-                    ? 0
-                    : ((scaler.memory_total - scaler.memory_free) / scaler.memory_total) * 100
-                }
-                title={t('ram')}
-                caption={`${scaler.memory_total - scaler.memory_free} / ${scaler.memory_total} ${t('gbs')}`}
-                width="120px"
-              />
-            </div>
-          </Grid>
+          )}
+          <div className={classes.title}>{t('resources')}</div>
         </Grid>
-      </div>
+        <Grid item xs={6} style={{ textAlign: 'center' }}>
+          <div style={{ display: 'inline-block' }}>
+            <ArcGauge
+              pctValue={scaler.cpu_total === 0 ? 0 : ((scaler.cpu_total - scaler.cpu_free) / scaler.cpu_total) * 100}
+              title={t('cpu')}
+              caption={`${scaler.cpu_total - scaler.cpu_free} / ${scaler.cpu_total} ${t('cores')}`}
+              width="120px"
+            />
+          </div>
+        </Grid>
+        <Grid item xs={6} style={{ textAlign: 'center' }}>
+          <div style={{ display: 'inline-block' }}>
+            <ArcGauge
+              pctValue={
+                scaler.memory_total === 0 ? 0 : ((scaler.memory_total - scaler.memory_free) / scaler.memory_total) * 100
+              }
+              title={t('ram')}
+              caption={`${scaler.memory_total - scaler.memory_free} / ${scaler.memory_total} ${t('gb')}`}
+              width="120px"
+            />
+          </div>
+        </Grid>
+      </Grid>
     </Card>
   );
 };
 
 const WrappedServiceCard = ({ service }) => {
   const { t } = useTranslation(['dashboard']);
-  const theme = useTheme();
   const classes = useStyles();
 
   return (
-    <Card className={classes.card}>
-      <div style={{ float: 'right' }}>
-        <ErrorOutlineOutlinedIcon />
-      </div>
-      <div className={classes.title} style={{ paddingBottom: theme.spacing(2) }}>
-        {`${service.service_name} :: ${service.instances} / ${service.total || 0}`}
-      </div>
+    <Card className={service.error ? `${classes.card} ${classes.error}` : `${classes.card} ${classes.ok}`}>
       <Grid container spacing={1}>
+        <Grid item xs={12}>
+          {service.error && (
+            <div className={classes.error_icon}>
+              <ErrorOutlineOutlinedIcon />
+            </div>
+          )}
+          <div className={classes.title}>
+            {`${service.service_name} :: ${service.instances} / ${service.total || 0}`}
+          </div>
+        </Grid>
         <Grid item xs={6}>
           <MetricCounter value={service.queue} title="Q" tooltip={t('service.queue')} />
         </Grid>
@@ -460,7 +492,8 @@ const DEFAULT_ALERTER = {
     error: 0,
     received: 0,
     updated: 0
-  }
+  },
+  error: null
 };
 
 const DEFAULT_DISPATCHER = {
@@ -475,7 +508,8 @@ const DEFAULT_DISPATCHER = {
   metrics: {
     files_completed: 0,
     submissions_completed: 0
-  }
+  },
+  error: null
 };
 
 const DEFAULT_EXPIRY = {
@@ -515,7 +549,8 @@ const DEFAULT_EXPIRY = {
     submission: 0,
     submission_tree: 0,
     submission_summary: 0
-  }
+  },
+  error: null
 };
 
 const DEFAULT_INGESTER = {
@@ -552,14 +587,16 @@ const DEFAULT_INGESTER = {
     high: 0,
     medium: 0,
     low: 0
-  }
+  },
+  error: null
 };
 
 const DEFAULT_SCALER = {
   memory_total: 0,
   memory_free: 0,
   cpu_total: 0,
-  cpu_free: 0
+  cpu_free: 0,
+  error: null
 };
 
 const DEFAULT_SERVICE = {
@@ -591,7 +628,8 @@ const DEFAULT_SERVICE = {
     busy: 0,
     idle: 0
   },
-  service_name: null
+  service_name: null,
+  error: null
 };
 
 const DEFAULT_SERVICE_LIST = {
