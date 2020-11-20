@@ -2,6 +2,7 @@ import { Card, Grid, makeStyles, Tooltip, Typography, useTheme } from '@material
 import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
 import SpeedOutlinedIcon from '@material-ui/icons/SpeedOutlined';
 import PageFullscreen from 'commons/components/layout/pages/PageFullScreen';
+import ArcGauge from 'components/visual/ArcGauge';
 import CustomChip from 'components/visual/CustomChip';
 import React, { useEffect, useReducer } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -21,7 +22,7 @@ const useStyles = makeStyles(theme => ({
   core_card: {
     flexGrow: 1,
     padding: theme.spacing(1),
-    minHeight: '150px',
+    minHeight: '170px',
     '&:hover': {
       boxShadow: theme.shadows[6]
     }
@@ -33,6 +34,7 @@ const useStyles = makeStyles(theme => ({
     color: theme.palette.action.active
   },
   metric: {
+    display: 'inline-block',
     marginRight: theme.spacing(1)
   },
   muted: {
@@ -43,6 +45,20 @@ const useStyles = makeStyles(theme => ({
     fontSize: '120%'
   }
 }));
+
+const WrappedMetricCounter = ({ value, title, tooltip }) => {
+  const classes = useStyles();
+
+  return (
+    <Tooltip title={tooltip}>
+      <span className={classes.metric}>
+        <CustomChip size="tiny" type="rounded" mono label={title} />
+        {value}
+      </span>
+    </Tooltip>
+  );
+};
+const MetricCounter = React.memo(WrappedMetricCounter);
 
 const WrappedIngestCard = ({ ingester }) => {
   const { t } = useTranslation(['dashboard']);
@@ -61,12 +77,7 @@ const WrappedIngestCard = ({ ingester }) => {
             <label>{t('ingest')}</label>
           </div>
           <div>
-            <Tooltip title={t('ingest.queue')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('Q')} />
-                {ingester.queues.ingest}
-              </span>
-            </Tooltip>
+            <MetricCounter value={ingester.queues.ingest} title="Q" tooltip={t('ingest.queue')} />
           </div>
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -74,30 +85,10 @@ const WrappedIngestCard = ({ ingester }) => {
             <label>{t('queued')}</label>
           </div>
           <div>
-            <Tooltip title={t('queue.critical')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('C')} />
-                {ingester.queues.critical}
-              </span>
-            </Tooltip>
-            <Tooltip title={t('queue.high')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('H')} />
-                {ingester.queues.high}
-              </span>
-            </Tooltip>
-            <Tooltip title={t('queue.medium')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('M')} />
-                {ingester.queues.medium}
-              </span>
-            </Tooltip>
-            <Tooltip title={t('queue.low')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('L')} />
-                {ingester.queues.low}
-              </span>
-            </Tooltip>
+            <MetricCounter value={ingester.queues.critical} title="C" tooltip={t('ingest.critical')} />
+            <MetricCounter value={ingester.queues.high} title="H" tooltip={t('ingest.high')} />
+            <MetricCounter value={ingester.queues.medium} title="M" tooltip={t('ingest.medium')} />
+            <MetricCounter value={ingester.queues.low} title="L" tooltip={t('ingest.low')} />
           </div>
         </Grid>
         <Grid item xs={12} sm={3}>
@@ -105,12 +96,7 @@ const WrappedIngestCard = ({ ingester }) => {
             <label>{t('processing')}</label>
           </div>
           <div>
-            <Tooltip title={t('processing.inflight')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('I')} />
-                {ingester.processing.inflight}
-              </span>
-            </Tooltip>
+            <MetricCounter value={ingester.processing.inflight} title="I" tooltip={t('processing.inflight')} />
           </div>
         </Grid>
         <Grid item xs={12} sm={3}>
@@ -118,62 +104,30 @@ const WrappedIngestCard = ({ ingester }) => {
             <label>{t('caching')}</label>
           </div>
           <div>
-            <Tooltip title={t('caching.hits')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('H')} />
-                {ingester.metrics.cache_hit}
-              </span>
-            </Tooltip>
-            <Tooltip title={t('caching.miss')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('M')} />
-                {ingester.metrics.cache_miss}
-              </span>
-            </Tooltip>
+            <MetricCounter value={ingester.metrics.cache_hit} title="H" tooltip={t('caching.hits')} />
+            <MetricCounter value={ingester.metrics.cache_miss} title="M" tooltip={t('caching.miss')} />
           </div>
         </Grid>
         <Grid item xs={12} sm={9}>
           <div>
-            <label>{t('throuput')}</label>
+            <label>{t('throughput')}</label>
           </div>
           <div>
-            <Tooltip title={t('throuput.files_completed')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('F')} />
-                {ingester.metrics.files_completed}
-              </span>
-            </Tooltip>
-            <Tooltip title={t('throuput.submissions_completed')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('C')} />
-                {ingester.metrics.submissions_completed}
-              </span>
-            </Tooltip>
-            <Tooltip title={t('throuput.whitelisted')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('W')} />
-                {ingester.metrics.whitelisted}
-              </span>
-            </Tooltip>
-            <Tooltip title={t('throuput.skipped')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('S')} />
-                {ingester.metrics.skipped}
-              </span>
-            </Tooltip>
-            <Tooltip title={t('throuput.duplicates')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('D')} />
-                {ingester.metrics.duplicates}
-              </span>
-            </Tooltip>
-            <Tooltip title={t('throuput.error')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('E')} />
-                {ingester.metrics.error}
-              </span>
-            </Tooltip>
-            <Tooltip title={t('throuput.bytes')}>
+            <MetricCounter
+              value={ingester.metrics.files_completed}
+              title="F"
+              tooltip={t('throughput.files_completed')}
+            />
+            <MetricCounter
+              value={ingester.metrics.submissions_completed}
+              title="C"
+              tooltip={t('throughput.submissions_completed')}
+            />
+            <MetricCounter value={ingester.metrics.whitelisted} title="W" tooltip={t('throughput.whitelisted')} />
+            <MetricCounter value={ingester.metrics.skipped} title="S" tooltip={t('throughput.skipped')} />
+            <MetricCounter value={ingester.metrics.duplicates} title="D" tooltip={t('throughput.duplicates')} />
+            <MetricCounter value={ingester.metrics.error} title="E" tooltip={t('throughput.error')} />
+            <Tooltip title={t('throughput.bytes')}>
               <span style={{ marginLeft: '8px' }}>
                 <SpeedOutlinedIcon className={classes.icon} />
                 {`${ingester.metrics.bytes_completed} / ${ingester.metrics.bytes_ingested} Mbps`}
@@ -213,12 +167,15 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
             <label>{t('submissions')}</label>
           </div>
           <div>
-            <Tooltip title={t('submissions.outstanding')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('O')} />
-                {dispatcher.inflight.outstanding} / {dispatcher.inflight.max}
-              </span>
-            </Tooltip>
+            <MetricCounter
+              value={
+                <span>
+                  {dispatcher.inflight.outstanding} / {dispatcher.inflight.max}
+                </span>
+              }
+              title="O"
+              tooltip={t('submissions.outstanding')}
+            />
           </div>
         </Grid>
         <Grid item xs={12} sm={3}>
@@ -226,12 +183,7 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
             <label>{t('queues')}</label>
           </div>
           <div>
-            <Tooltip title={t('queues.ingest')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('I')} />
-                {dispatcher.queues.ingest}
-              </span>
-            </Tooltip>
+            <MetricCounter value={dispatcher.queues.ingest} title="I" tooltip={t('queues.ingest')} />
           </div>
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -239,18 +191,16 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
             <label>{t('throughput')}</label>
           </div>
           <div>
-            <Tooltip title={t('throughput.files_completed')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('F')} />
-                {dispatcher.metrics.files_completed}
-              </span>
-            </Tooltip>
-            <Tooltip title={t('throughput.submissions_completed')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('S')} />
-                {dispatcher.metrics.submissions_completed}
-              </span>
-            </Tooltip>
+            <MetricCounter
+              value={dispatcher.metrics.files_completed}
+              title="F"
+              tooltip={t('throughput.files_completed')}
+            />
+            <MetricCounter
+              value={dispatcher.metrics.submissions_completed}
+              title="S"
+              tooltip={t('throughput.submissions_completed')}
+            />
           </div>
         </Grid>
       </Grid>
@@ -274,36 +224,23 @@ const WrappedExpiryCard = ({ expiry }) => {
             <label>{t('queues')}</label>
           </div>
           <div>
-            <Tooltip title={t('queues.alert')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('A')} />
-                {expiry.queues.alert}
-              </span>
-            </Tooltip>
-            <Tooltip title={t('queues.error')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('E')} />
-                {expiry.queues.error}
-              </span>
-            </Tooltip>
-            <Tooltip title={t('queues.file')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('F')} />
-                {expiry.queues.cached_file + expiry.queues.file + expiry.queues.filescore}
-              </span>
-            </Tooltip>
-            <Tooltip title={t('queues.result')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('R')} />
-                {expiry.queues.result + expiry.queues.emptyresult}
-              </span>
-            </Tooltip>
-            <Tooltip title={t('queues.submission')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('S')} />
-                {expiry.queues.submission + expiry.queues.submission_summary + expiry.queues.submission_tree}
-              </span>
-            </Tooltip>
+            <MetricCounter value={expiry.queues.alert} title="A" tooltip={t('queues.alert')} />
+            <MetricCounter value={expiry.queues.error} title="E" tooltip={t('queues.error')} />
+            <MetricCounter
+              value={expiry.queues.cached_file + expiry.queues.file + expiry.queues.filescore}
+              title="F"
+              tooltip={t('queues.file')}
+            />
+            <MetricCounter
+              value={expiry.queues.result + expiry.queues.emptyresult}
+              title="R"
+              tooltip={t('queues.result')}
+            />
+            <MetricCounter
+              value={expiry.queues.submission + expiry.queues.submission_summary + expiry.queues.submission_tree}
+              title="S"
+              tooltip={t('queues.submission')}
+            />
           </div>
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -311,36 +248,23 @@ const WrappedExpiryCard = ({ expiry }) => {
             <label>{t('expired')}</label>
           </div>
           <div>
-            <Tooltip title={t('expired.alert')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('A')} />
-                {expiry.metrics.alert}
-              </span>
-            </Tooltip>
-            <Tooltip title={t('expired.error')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('E')} />
-                {expiry.metrics.error}
-              </span>
-            </Tooltip>
-            <Tooltip title={t('expired.file')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('F')} />
-                {expiry.metrics.cached_file + expiry.metrics.file + expiry.metrics.filescore}
-              </span>
-            </Tooltip>
-            <Tooltip title={t('expired.result')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('R')} />
-                {expiry.metrics.result + expiry.metrics.emptyresult}
-              </span>
-            </Tooltip>
-            <Tooltip title={t('expired.submission')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('S')} />
-                {expiry.metrics.submission + expiry.metrics.submission_summary + expiry.metrics.submission_tree}
-              </span>
-            </Tooltip>
+            <MetricCounter value={expiry.metrics.alert} title="A" tooltip={t('expired.alert')} />
+            <MetricCounter value={expiry.metrics.error} title="E" tooltip={t('expired.error')} />
+            <MetricCounter
+              value={expiry.metrics.cached_file + expiry.metrics.file + expiry.metrics.filescore}
+              title="F"
+              tooltip={t('expired.file')}
+            />
+            <MetricCounter
+              value={expiry.metrics.result + expiry.metrics.emptyresult}
+              title="R"
+              tooltip={t('expired.result')}
+            />
+            <MetricCounter
+              value={expiry.metrics.submission + expiry.metrics.submission_summary + expiry.metrics.submission_tree}
+              title="S"
+              tooltip={t('expired.submission')}
+            />
           </div>
         </Grid>
         <Grid item xs={12} sm={6} />
@@ -349,36 +273,23 @@ const WrappedExpiryCard = ({ expiry }) => {
             <label>{t('archived')}</label>
           </div>
           <div>
-            <Tooltip title={t('archived.alert')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('A')} />
-                {expiry.archive.alert}
-              </span>
-            </Tooltip>
-            <Tooltip title={t('archived.error')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('E')} />
-                {expiry.archive.error}
-              </span>
-            </Tooltip>
-            <Tooltip title={t('archived.file')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('F')} />
-                {expiry.archive.cached_file + expiry.archive.file + expiry.archive.filescore}
-              </span>
-            </Tooltip>
-            <Tooltip title={t('archived.result')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('R')} />
-                {expiry.archive.result + expiry.archive.emptyresult}
-              </span>
-            </Tooltip>
-            <Tooltip title={t('archived.submission')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('S')} />
-                {expiry.archive.submission + expiry.archive.submission_summary + expiry.archive.submission_tree}
-              </span>
-            </Tooltip>
+            <MetricCounter value={expiry.archive.alert} title="A" tooltip={t('archived.alert')} />
+            <MetricCounter value={expiry.archive.error} title="E" tooltip={t('archived.error')} />
+            <MetricCounter
+              value={expiry.archive.cached_file + expiry.archive.file + expiry.archive.filescore}
+              title="F"
+              tooltip={t('archived.file')}
+            />
+            <MetricCounter
+              value={expiry.archive.result + expiry.archive.emptyresult}
+              title="R"
+              tooltip={t('archived.result')}
+            />
+            <MetricCounter
+              value={expiry.archive.submission + expiry.archive.submission_summary + expiry.archive.submission_tree}
+              title="S"
+              tooltip={t('archived.submission')}
+            />
           </div>
         </Grid>
       </Grid>
@@ -402,43 +313,18 @@ const WrappedAlerterCard = ({ alerter }) => {
             <label>{t('queues')}</label>
           </div>
           <div>
-            <Tooltip title={t('queues.alert')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('A')} />
-                {alerter.queues.alert}
-              </span>
-            </Tooltip>
+            <MetricCounter value={alerter.queues.alert} title="A" tooltip={t('queues.alert')} />
           </div>
         </Grid>
         <Grid item xs={12} sm={8}>
           <div>
-            <label>{t('throuput')}</label>
+            <label>{t('throughput')}</label>
           </div>
           <div>
-            <Tooltip title={t('throuput.created')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('C')} />
-                {alerter.metrics.created}
-              </span>
-            </Tooltip>
-            <Tooltip title={t('throuput.error')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('E')} />
-                {alerter.metrics.error}
-              </span>
-            </Tooltip>
-            <Tooltip title={t('throuput.received')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('R')} />
-                {alerter.metrics.received}
-              </span>
-            </Tooltip>
-            <Tooltip title={t('throuput.updated')}>
-              <span className={classes.metric}>
-                <CustomChip size="tiny" type="rounded" mono label={t('U')} />
-                {alerter.metrics.updated}
-              </span>
-            </Tooltip>
+            <MetricCounter value={alerter.metrics.created} title="C" tooltip={t('throughput.created')} />
+            <MetricCounter value={alerter.metrics.error} title="E" tooltip={t('throughput.error')} />
+            <MetricCounter value={alerter.metrics.received} title="R" tooltip={t('throughput.received')} />
+            <MetricCounter value={alerter.metrics.updated} title="U" tooltip={t('throughput.updated')} />
           </div>
         </Grid>
       </Grid>
@@ -453,6 +339,34 @@ const WrappedScalerResourcesCard = ({ scaler }) => {
   return (
     <Card className={classes.core_card}>
       <div className={classes.title}>{t('resources')}</div>
+      <div style={{ paddingTop: '8px', textAlign: 'center' }}>
+        <Grid container>
+          <Grid item xs={6}>
+            <div style={{ display: 'inline-block' }}>
+              <ArcGauge
+                pctValue={scaler.cpu_total === 0 ? 0 : ((scaler.cpu_total - scaler.cpu_free) / scaler.cpu_total) * 100}
+                title={t('cpu')}
+                caption={`${scaler.cpu_total - scaler.cpu_free} / ${scaler.cpu_total} ${t('cores')}`}
+                width="120px"
+              />
+            </div>
+          </Grid>
+          <Grid item xs={6}>
+            <div style={{ display: 'inline-block' }}>
+              <ArcGauge
+                pctValue={
+                  scaler.memory_total === 0
+                    ? 0
+                    : ((scaler.memory_total - scaler.memory_free) / scaler.memory_total) * 100
+                }
+                title={t('ram')}
+                caption={`${scaler.memory_total - scaler.memory_free} / ${scaler.memory_total} ${t('gbs')}`}
+                width="120px"
+              />
+            </div>
+          </Grid>
+        </Grid>
+      </div>
     </Card>
   );
 };
@@ -472,36 +386,16 @@ const WrappedServiceCard = ({ service }) => {
       </div>
       <Grid container spacing={1}>
         <Grid item xs={6}>
-          <Tooltip title={t('service.queue')}>
-            <span>
-              <CustomChip size="tiny" type="rounded" mono label={t('Q')} />
-              {service.queue}
-            </span>
-          </Tooltip>
+          <MetricCounter value={service.queue} title="Q" tooltip={t('service.queue')} />
         </Grid>
         <Grid item xs={6}>
-          <Tooltip title={t('service.busy')}>
-            <span>
-              <CustomChip size="tiny" type="rounded" mono label={t('B')} />
-              {service.activity.busy}
-            </span>
-          </Tooltip>
+          <MetricCounter value={service.activity.busy} title="B" tooltip={t('service.busy')} />
         </Grid>
         <Grid item xs={6}>
-          <Tooltip title={t('service.processed')}>
-            <span>
-              <CustomChip size="tiny" type="rounded" mono label={t('P')} />
-              {service.metrics.execute}
-            </span>
-          </Tooltip>
+          <MetricCounter value={service.metrics.execute} title="P" tooltip={t('service.processed')} />
         </Grid>
         <Grid item xs={6}>
-          <Tooltip title={t('service.failed')}>
-            <span>
-              <CustomChip size="tiny" type="rounded" mono label={t('F')} />
-              {service.metrics.fail_nonrecoverable}
-            </span>
-          </Tooltip>
+          <MetricCounter value={service.metrics.fail_nonrecoverable} title="F" tooltip={t('service.failed')} />
         </Grid>
       </Grid>
     </Card>
