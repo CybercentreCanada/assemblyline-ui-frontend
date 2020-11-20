@@ -405,7 +405,7 @@ const WrappedServiceCard = ({ service }) => {
   const classes = useStyles();
 
   return (
-    <Card className={service.error ? `${classes.card} ${classes.error}` : `${classes.card} ${classes.ok}`}>
+    <Card className={`${classes.card} ${service.error ? classes.error : classes.ok}`}>
       <Grid container spacing={1}>
         <Grid item xs={12}>
           {service.error && (
@@ -493,7 +493,8 @@ const DEFAULT_ALERTER = {
     received: 0,
     updated: 0
   },
-  error: null
+  error: null,
+  initialized: false
 };
 
 const DEFAULT_DISPATCHER = {
@@ -509,7 +510,8 @@ const DEFAULT_DISPATCHER = {
     files_completed: 0,
     submissions_completed: 0
   },
-  error: null
+  error: null,
+  initialized: false
 };
 
 const DEFAULT_EXPIRY = {
@@ -550,7 +552,8 @@ const DEFAULT_EXPIRY = {
     submission_tree: 0,
     submission_summary: 0
   },
-  error: null
+  error: null,
+  initialized: false
 };
 
 const DEFAULT_INGESTER = {
@@ -588,7 +591,8 @@ const DEFAULT_INGESTER = {
     medium: 0,
     low: 0
   },
-  error: null
+  error: null,
+  initialized: false
 };
 
 const DEFAULT_SCALER = {
@@ -596,7 +600,8 @@ const DEFAULT_SCALER = {
   memory_free: 0,
   cpu_total: 0,
   cpu_free: 0,
-  error: null
+  error: null,
+  initialized: false
 };
 
 const DEFAULT_SERVICE = {
@@ -651,37 +656,37 @@ const Dashboard = () => {
   const handleAlerterHeartbeat = hb => {
     // eslint-disable-next-line no-console
     console.log('Socket-IO :: AlerterHeartbeat', hb);
-    setAlerter(hb);
+    setAlerter({ ...hb, initialized: true });
   };
 
   const handleArchiveHeartbeat = hb => {
     // eslint-disable-next-line no-console
     console.log('Socket-IO :: ArchiveHeartbeat', hb);
-    setExpiry({ archive: hb.metrics });
+    setExpiry({ archive: hb.metrics, initialized: true });
   };
 
   const handleDispatcherHeartbeat = hb => {
     // eslint-disable-next-line no-console
     console.log('Socket-IO :: DispatcherHeartbeat', hb);
-    setDispatcher(hb);
+    setDispatcher({ ...hb, initialized: true });
   };
 
   const handleExpiryHeartbeat = hb => {
     // eslint-disable-next-line no-console
     console.log('Socket-IO :: ExpiryHeartbeat', hb);
-    setExpiry(hb);
+    setExpiry({ ...hb, initialized: true });
   };
 
   const handleIngestHeartbeat = hb => {
     // eslint-disable-next-line no-console
     console.log('Socket-IO :: IngestHeartbeat', hb);
-    setIngester(hb);
+    setIngester({ ...hb, initialized: true });
   };
 
   const handleScalerHeartbeat = hb => {
     // eslint-disable-next-line no-console
     console.log('Socket-IO :: ScalerHeartbeat', hb);
-    setScaler(hb);
+    setScaler({ ...hb, initialized: true });
   };
 
   const handleServiceHeartbeat = hb => {
