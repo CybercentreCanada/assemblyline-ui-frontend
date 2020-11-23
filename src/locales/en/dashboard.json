@@ -62,5 +62,11 @@
   "service.busy": "Number of busy service instance",
   "service.processed": "Processed files in the last minute",
   "service.failed": "Failed files in the last minute",
-  "timeout": "Were are not receiving any heartbeat for this component"
+  "timeout": "Were are not receiving any heartbeat for this component",
+  "ingest.error.chance.critical": "Critical queue is too full and being sampled",
+  "ingest.error.chance.high": "High queue is too full and being sampled",
+  "ingest.error.chance.medium": "Medium queue is too full and being sampled",
+  "ingest.error.chance.low": "Low queue is too full and being sampled",
+  "ingest.error.bytes": "Submissions are being ingested but none are completing",
+  "ingest.error.queue": "Ingestion queue is getting too full"
 }

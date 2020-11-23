@@ -62,5 +62,11 @@
   "service.busy": "Nombre d'instances de service occupées",
   "service.processed": "Fichiers traités dans la dernière minute",
   "service.failed": "Fichiers échoués au cours de la dernière minute",
-  "timeout": "Nous ne recevons aucun messages pour cette composante"
+  "timeout": "Nous ne recevons aucun messages pour cette composante",
+  "ingest.error.chance.critical": "La file d'attente critique est trop pleine et en cours d'échantillonnage",
+  "ingest.error.chance.high": "La file d'attente haute est trop pleine et en cours d'échantillonnage",
+  "ingest.error.chance.medium": "La file d'attente moyenne est trop pleine et en cours d'échantillonnage",
+  "ingest.error.chance.low": "La file d'attente basse est trop pleine et en cours d'échantillonnage",
+  "ingest.error.bytes": "Les soumissions sont en cours d'ingestion, mais aucune ne se termine",
+  "ingest.error.queue": "La file d'attente d'ingestion est trop pleine"
 }

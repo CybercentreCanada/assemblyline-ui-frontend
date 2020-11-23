@@ -86,7 +86,19 @@ const WrappedIngestCard = ({ ingester }) => {
   const classes = useStyles();
 
   useEffect(() => {
-    if ((timer !== null && ingester.initialized) || (timer === null && !ingester.initilized)) {
+    if (ingester.processing_chance.critical !== 1) {
+      setError(t('ingest.error.chance.critical'));
+    } else if (ingester.processing_chance.high !== 1) {
+      setError(t('ingest.error.chance.high'));
+    } else if (ingester.processing_chance.medium !== 1) {
+      setError(t('ingest.error.chance.medium'));
+    } else if (ingester.processing_chance.low !== 1) {
+      setError(t('ingest.error.chance.low'));
+    } else if (ingester.metrics.bytes_completed === 0 && ingester.metrics.bytes_ingested !== 0) {
+      setError(t('ingest.error.bytes'));
+    } else if (ingester.ingest > 100000) {
+      setError(t('ingest.error.queue'));
+    } else if ((timer !== null && ingester.initialized) || (timer === null && !ingester.initilized)) {
       if (error !== null) setError(null);
       if (timer !== null) clearTimeout(timer);
       setTimer(
