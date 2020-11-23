@@ -637,21 +637,37 @@ const WrappedScalerResourcesCard = ({ scaler }) => {
   );
 };
 
-const WrappedServiceCard = ({ service }) => {
+const WrappedServiceCard = ({ service, max_inflight }) => {
   const { t } = useTranslation(['dashboard']);
+  const [error, setError] = useState(null);
   const classes = useStyles();
 
+  useEffect(() => {
+    if (service.total !== 0 && service.instances === 0) {
+      setError(t('service.error.none'));
+    } else if (service.metrics.fail_nonrecoverable > 0) {
+      setError(t('service.error.fail_nonrecoverable'));
+    } else if (service.queue > max_inflight / 4) {
+      setError(t('service.error.queue'));
+    } else if (error !== null) {
+      setError(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [service]);
+
   return (
-    <Card className={`${classes.card} ${service.error ? classes.error : classes.ok}`}>
+    <Card className={`${classes.card} ${error || service.error ? classes.error : classes.ok}`}>
       <Grid container spacing={1}>
         <Grid item xs={12}>
-          {service.error && (
-            <div className={classes.error_icon}>
-              <ErrorOutlineOutlinedIcon />
-            </div>
+          {(error || service.error) && (
+            <Tooltip title={error || service.error}>
+              <div className={classes.error_icon}>
+                <ErrorOutlineOutlinedIcon />
+              </div>
+            </Tooltip>
           )}
           <div className={classes.title}>
-            {`${service.service_name} :: ${service.instances} / ${service.total || 0}`}
+            {`${service.service_name} :: ${service.instances} / ${service.total || '-'}`}
           </div>
         </Grid>
         <Grid item xs={6}>
@@ -992,7 +1008,7 @@ const Dashboard = () => {
         </Grid>
         {Object.keys(services).map(key => (
           <Grid key={key} item xs={12} md={4} xl={3}>
-            <ServiceCard service={services[key]} />
+            <ServiceCard service={services[key]} max_inflight={dispatcher.inflight.max} />
           </Grid>
         ))}
       </Grid>
