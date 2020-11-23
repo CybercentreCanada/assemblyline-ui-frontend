@@ -58,5 +58,6 @@
   "service.queue": "Number of files in service queue",
   "service.busy": "Number of busy service instance",
   "service.processed": "Processed files in the last minute",
-  "service.failed": "Failed files in the last minute"
+  "service.failed": "Failed files in the last minute",
+  "timeout": "Were are not receiving any heartbeat for this component"
 }

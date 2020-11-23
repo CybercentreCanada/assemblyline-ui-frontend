@@ -58,5 +58,6 @@
   "service.queue": "Nombre de fichiers dans la file d'attente de service",
   "service.busy": "Nombre d'instances de service occupées",
   "service.processed": "Fichiers traités dans la dernière minute",
-  "service.failed": "Fichiers échoués au cours de la dernière minute"
+  "service.failed": "Fichiers échoués au cours de la dernière minute",
+  "timeout": "Nous ne recevons aucun messages pour cette composante"
 }

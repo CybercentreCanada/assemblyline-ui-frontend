@@ -1,10 +1,11 @@
 import { Card, Grid, makeStyles, Theme, Tooltip, Typography } from '@material-ui/core';
 import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
 import SpeedOutlinedIcon from '@material-ui/icons/SpeedOutlined';
+import { Skeleton } from '@material-ui/lab';
 import PageFullscreen from 'commons/components/layout/pages/PageFullScreen';
 import ArcGauge from 'components/visual/ArcGauge';
 import CustomChip from 'components/visual/CustomChip';
-import React, { useEffect, useReducer } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import io from 'socket.io-client';
 
@@ -57,10 +58,17 @@ const useStyles = makeStyles((theme: Theme) => ({
   }
 }));
 
-const WrappedMetricCounter = ({ value, title, tooltip }) => {
+const WrappedMetricCounter = ({ value, title, tooltip, init = false }) => {
   const classes = useStyles();
 
-  return (
+  return !init ? (
+    <Skeleton
+      variant="rect"
+      height="1.5rem"
+      width="2rem"
+      style={{ borderRadius: '4px', marginRight: '8px', display: 'inline-block', verticalAlign: 'middle' }}
+    />
+  ) : (
     <Tooltip title={tooltip}>
       <span className={classes.metric}>
         <CustomChip size="tiny" type="rounded" mono label={title} />
@@ -91,7 +99,12 @@ const WrappedIngestCard = ({ ingester }) => {
             <label>{t('ingest')}</label>
           </div>
           <div>
-            <MetricCounter value={ingester.queues.ingest} title="Q" tooltip={t('ingest.queue')} />
+            <MetricCounter
+              init={ingester.initialized}
+              value={ingester.queues.ingest}
+              title="Q"
+              tooltip={t('ingest.queue')}
+            />
           </div>
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -99,10 +112,30 @@ const WrappedIngestCard = ({ ingester }) => {
             <label>{t('queued')}</label>
           </div>
           <div>
-            <MetricCounter value={ingester.queues.critical} title="C" tooltip={t('ingest.critical')} />
-            <MetricCounter value={ingester.queues.high} title="H" tooltip={t('ingest.high')} />
-            <MetricCounter value={ingester.queues.medium} title="M" tooltip={t('ingest.medium')} />
-            <MetricCounter value={ingester.queues.low} title="L" tooltip={t('ingest.low')} />
+            <MetricCounter
+              init={ingester.initialized}
+              value={ingester.queues.critical}
+              title="C"
+              tooltip={t('ingest.critical')}
+            />
+            <MetricCounter
+              init={ingester.initialized}
+              value={ingester.queues.high}
+              title="H"
+              tooltip={t('ingest.high')}
+            />
+            <MetricCounter
+              init={ingester.initialized}
+              value={ingester.queues.medium}
+              title="M"
+              tooltip={t('ingest.medium')}
+            />
+            <MetricCounter
+              init={ingester.initialized}
+              value={ingester.queues.low}
+              title="L"
+              tooltip={t('ingest.low')}
+            />
           </div>
         </Grid>
         <Grid item xs={12} sm={3}>
@@ -110,7 +143,12 @@ const WrappedIngestCard = ({ ingester }) => {
             <label>{t('processing')}</label>
           </div>
           <div>
-            <MetricCounter value={ingester.processing.inflight} title="I" tooltip={t('processing.inflight')} />
+            <MetricCounter
+              init={ingester.initialized}
+              value={ingester.processing.inflight}
+              title="I"
+              tooltip={t('processing.inflight')}
+            />
           </div>
         </Grid>
         <Grid item xs={12} sm={3}>
@@ -118,8 +156,18 @@ const WrappedIngestCard = ({ ingester }) => {
             <label>{t('caching')}</label>
           </div>
           <div>
-            <MetricCounter value={ingester.metrics.cache_hit} title="H" tooltip={t('caching.hits')} />
-            <MetricCounter value={ingester.metrics.cache_miss} title="M" tooltip={t('caching.miss')} />
+            <MetricCounter
+              init={ingester.initialized}
+              value={ingester.metrics.cache_hit}
+              title="H"
+              tooltip={t('caching.hits')}
+            />
+            <MetricCounter
+              init={ingester.initialized}
+              value={ingester.metrics.cache_miss}
+              title="M"
+              tooltip={t('caching.miss')}
+            />
           </div>
         </Grid>
         <Grid item xs={12} sm={9}>
@@ -128,23 +176,49 @@ const WrappedIngestCard = ({ ingester }) => {
           </div>
           <div>
             <MetricCounter
+              init={ingester.initialized}
               value={ingester.metrics.files_completed}
               title="F"
               tooltip={t('throughput.files_completed')}
             />
             <MetricCounter
+              init={ingester.initialized}
               value={ingester.metrics.submissions_completed}
               title="C"
               tooltip={t('throughput.submissions_completed')}
             />
-            <MetricCounter value={ingester.metrics.whitelisted} title="W" tooltip={t('throughput.whitelisted')} />
-            <MetricCounter value={ingester.metrics.skipped} title="S" tooltip={t('throughput.skipped')} />
-            <MetricCounter value={ingester.metrics.duplicates} title="D" tooltip={t('throughput.duplicates')} />
-            <MetricCounter value={ingester.metrics.error} title="E" tooltip={t('throughput.error')} />
+            <MetricCounter
+              init={ingester.initialized}
+              value={ingester.metrics.whitelisted}
+              title="W"
+              tooltip={t('throughput.whitelisted')}
+            />
+            <MetricCounter
+              init={ingester.initialized}
+              value={ingester.metrics.skipped}
+              title="S"
+              tooltip={t('throughput.skipped')}
+            />
+            <MetricCounter
+              init={ingester.initialized}
+              value={ingester.metrics.duplicates}
+              title="D"
+              tooltip={t('throughput.duplicates')}
+            />
+            <MetricCounter
+              init={ingester.initialized}
+              value={ingester.metrics.error}
+              title="E"
+              tooltip={t('throughput.error')}
+            />
             <Tooltip title={t('throughput.bytes')}>
               <span style={{ marginLeft: '8px' }}>
                 <SpeedOutlinedIcon className={classes.icon} />
-                {`${ingester.metrics.bytes_completed} / ${ingester.metrics.bytes_ingested} Mbps`}
+                {ingester.initialized ? (
+                  `${ingester.metrics.bytes_completed} / ${ingester.metrics.bytes_ingested} Mbps`
+                ) : (
+                  <Skeleton height="1.5rem" width="3rem" style={{ display: 'inline-block' }} />
+                )}
               </span>
             </Tooltip>
           </div>
@@ -173,12 +247,18 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
           <div>
             <label>{t('services')}</label>
           </div>
-          <div>
-            {up.length === 0 && down.length === 0 && <span className={classes.muted}>{t('no_services')}</span>}
-            {up.length !== 0 && <span>{up.join(' | ')}</span>}
-            {up.length !== 0 && down.length !== 0 && <span> :: </span>}
-            {down.length !== 0 && <span>{down.join(' | ')}</span>}
-          </div>
+          {dispatcher.initialized ? (
+            <div>
+              {up.length === 0 && down.length === 0 && <span className={classes.muted}>{t('no_services')}</span>}
+              {up.length !== 0 && <span>{up.join(' | ')}</span>}
+              {up.length !== 0 && down.length !== 0 && <span> :: </span>}
+              {down.length !== 0 && <span>{down.join(' | ')}</span>}
+            </div>
+          ) : (
+            <div>
+              <Skeleton />
+            </div>
+          )}
         </Grid>
         <Grid item xs={12} sm={3}>
           <div>
@@ -186,6 +266,7 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
           </div>
           <div>
             <MetricCounter
+              init={dispatcher.initialized}
               value={
                 <span>
                   {dispatcher.inflight.outstanding} / {dispatcher.inflight.max}
@@ -201,7 +282,12 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
             <label>{t('queues')}</label>
           </div>
           <div>
-            <MetricCounter value={dispatcher.queues.ingest} title="I" tooltip={t('queues.ingest')} />
+            <MetricCounter
+              init={dispatcher.initialized}
+              value={dispatcher.queues.ingest}
+              title="I"
+              tooltip={t('queues.ingest')}
+            />
           </div>
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -210,11 +296,13 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
           </div>
           <div>
             <MetricCounter
+              init={dispatcher.initialized}
               value={dispatcher.metrics.files_completed}
               title="F"
               tooltip={t('throughput.files_completed')}
             />
             <MetricCounter
+              init={dispatcher.initialized}
               value={dispatcher.metrics.submissions_completed}
               title="S"
               tooltip={t('throughput.submissions_completed')}
@@ -246,19 +334,32 @@ const WrappedExpiryCard = ({ expiry }) => {
             <label>{t('queues')}</label>
           </div>
           <div>
-            <MetricCounter value={expiry.queues.alert} title="A" tooltip={t('queues.alert')} />
-            <MetricCounter value={expiry.queues.error} title="E" tooltip={t('queues.error')} />
             <MetricCounter
+              init={expiry.initialized}
+              value={expiry.queues.alert}
+              title="A"
+              tooltip={t('queues.alert')}
+            />
+            <MetricCounter
+              init={expiry.initialized}
+              value={expiry.queues.error}
+              title="E"
+              tooltip={t('queues.error')}
+            />
+            <MetricCounter
+              init={expiry.initialized}
               value={expiry.queues.cached_file + expiry.queues.file + expiry.queues.filescore}
               title="F"
               tooltip={t('queues.file')}
             />
             <MetricCounter
+              init={expiry.initialized}
               value={expiry.queues.result + expiry.queues.emptyresult}
               title="R"
               tooltip={t('queues.result')}
             />
             <MetricCounter
+              init={expiry.initialized}
               value={expiry.queues.submission + expiry.queues.submission_summary + expiry.queues.submission_tree}
               title="S"
               tooltip={t('queues.submission')}
@@ -270,19 +371,32 @@ const WrappedExpiryCard = ({ expiry }) => {
             <label>{t('expired')}</label>
           </div>
           <div>
-            <MetricCounter value={expiry.metrics.alert} title="A" tooltip={t('expired.alert')} />
-            <MetricCounter value={expiry.metrics.error} title="E" tooltip={t('expired.error')} />
             <MetricCounter
+              init={expiry.initialized}
+              value={expiry.metrics.alert}
+              title="A"
+              tooltip={t('expired.alert')}
+            />
+            <MetricCounter
+              init={expiry.initialized}
+              value={expiry.metrics.error}
+              title="E"
+              tooltip={t('expired.error')}
+            />
+            <MetricCounter
+              init={expiry.initialized}
               value={expiry.metrics.cached_file + expiry.metrics.file + expiry.metrics.filescore}
               title="F"
               tooltip={t('expired.file')}
             />
             <MetricCounter
+              init={expiry.initialized}
               value={expiry.metrics.result + expiry.metrics.emptyresult}
               title="R"
               tooltip={t('expired.result')}
             />
             <MetricCounter
+              init={expiry.initialized}
               value={expiry.metrics.submission + expiry.metrics.submission_summary + expiry.metrics.submission_tree}
               title="S"
               tooltip={t('expired.submission')}
@@ -295,19 +409,32 @@ const WrappedExpiryCard = ({ expiry }) => {
             <label>{t('archived')}</label>
           </div>
           <div>
-            <MetricCounter value={expiry.archive.alert} title="A" tooltip={t('archived.alert')} />
-            <MetricCounter value={expiry.archive.error} title="E" tooltip={t('archived.error')} />
             <MetricCounter
+              init={expiry.initialized}
+              value={expiry.archive.alert}
+              title="A"
+              tooltip={t('archived.alert')}
+            />
+            <MetricCounter
+              init={expiry.initialized}
+              value={expiry.archive.error}
+              title="E"
+              tooltip={t('archived.error')}
+            />
+            <MetricCounter
+              init={expiry.initialized}
               value={expiry.archive.cached_file + expiry.archive.file + expiry.archive.filescore}
               title="F"
               tooltip={t('archived.file')}
             />
             <MetricCounter
+              init={expiry.initialized}
               value={expiry.archive.result + expiry.archive.emptyresult}
               title="R"
               tooltip={t('archived.result')}
             />
             <MetricCounter
+              init={expiry.initialized}
               value={expiry.archive.submission + expiry.archive.submission_summary + expiry.archive.submission_tree}
               title="S"
               tooltip={t('archived.submission')}
@@ -339,7 +466,12 @@ const WrappedAlerterCard = ({ alerter }) => {
             <label>{t('queues')}</label>
           </div>
           <div>
-            <MetricCounter value={alerter.queues.alert} title="A" tooltip={t('queues.alert')} />
+            <MetricCounter
+              init={alerter.initialized}
+              value={alerter.queues.alert}
+              title="A"
+              tooltip={t('queues.alert')}
+            />
           </div>
         </Grid>
         <Grid item xs={12} sm={8}>
@@ -347,10 +479,30 @@ const WrappedAlerterCard = ({ alerter }) => {
             <label>{t('throughput')}</label>
           </div>
           <div>
-            <MetricCounter value={alerter.metrics.created} title="C" tooltip={t('throughput.created')} />
-            <MetricCounter value={alerter.metrics.error} title="E" tooltip={t('throughput.error')} />
-            <MetricCounter value={alerter.metrics.received} title="R" tooltip={t('throughput.received')} />
-            <MetricCounter value={alerter.metrics.updated} title="U" tooltip={t('throughput.updated')} />
+            <MetricCounter
+              init={alerter.initialized}
+              value={alerter.metrics.created}
+              title="C"
+              tooltip={t('throughput.created')}
+            />
+            <MetricCounter
+              init={alerter.initialized}
+              value={alerter.metrics.error}
+              title="E"
+              tooltip={t('throughput.error')}
+            />
+            <MetricCounter
+              init={alerter.initialized}
+              value={alerter.metrics.received}
+              title="R"
+              tooltip={t('throughput.received')}
+            />
+            <MetricCounter
+              init={alerter.initialized}
+              value={alerter.metrics.updated}
+              title="U"
+              tooltip={t('throughput.updated')}
+            />
           </div>
         </Grid>
       </Grid>
@@ -360,16 +512,32 @@ const WrappedAlerterCard = ({ alerter }) => {
 
 const WrappedScalerResourcesCard = ({ scaler }) => {
   const { t } = useTranslation(['dashboard']);
+  const [timer, setTimer] = useState(null);
+  const [error, setError] = useState(null);
   const classes = useStyles();
 
+  useEffect(() => {
+    if (timer !== null && scaler.initialized) clearTimeout(timer);
+    if (timer === null && !scaler.initilized) {
+      setTimer(
+        setTimeout(() => {
+          setError(t('timeout'));
+        }, 10000)
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scaler]);
+
   return (
-    <Card className={`${classes.core_card} ${scaler.error ? classes.error : classes.ok}`}>
+    <Card className={`${classes.core_card} ${error || scaler.error ? classes.error : classes.ok}`}>
       <Grid container spacing={1}>
         <Grid item xs={12}>
-          {scaler.error && (
-            <div className={classes.error_icon}>
-              <ErrorOutlineOutlinedIcon />
-            </div>
+          {(error || scaler.error) && (
+            <Tooltip title={error || scaler.error}>
+              <div className={classes.error_icon}>
+                <ErrorOutlineOutlinedIcon />
+              </div>
+            </Tooltip>
           )}
           <div className={classes.title}>{t('resources')}</div>
         </Grid>
@@ -418,16 +586,16 @@ const WrappedServiceCard = ({ service }) => {
           </div>
         </Grid>
         <Grid item xs={6}>
-          <MetricCounter value={service.queue} title="Q" tooltip={t('service.queue')} />
+          <MetricCounter init value={service.queue} title="Q" tooltip={t('service.queue')} />
         </Grid>
         <Grid item xs={6}>
-          <MetricCounter value={service.activity.busy} title="B" tooltip={t('service.busy')} />
+          <MetricCounter init value={service.activity.busy} title="B" tooltip={t('service.busy')} />
         </Grid>
         <Grid item xs={6}>
-          <MetricCounter value={service.metrics.execute} title="P" tooltip={t('service.processed')} />
+          <MetricCounter init value={service.metrics.execute} title="P" tooltip={t('service.processed')} />
         </Grid>
         <Grid item xs={6}>
-          <MetricCounter value={service.metrics.fail_nonrecoverable} title="F" tooltip={t('service.failed')} />
+          <MetricCounter init value={service.metrics.fail_nonrecoverable} title="F" tooltip={t('service.failed')} />
         </Grid>
       </Grid>
     </Card>
@@ -710,6 +878,11 @@ const Dashboard = () => {
       // eslint-disable-next-line no-console
       console.log('Socket-IO :: Connecting to socketIO server...');
     });
+
+    socket.on('disconnect', () => {
+      // eslint-disable-next-line no-console
+      console.log('Socket-IO :: Disconnected from socketIO server.');
+    });
     // eslint-disable-next-line no-console
     socket.on('monitoring', data => console.log('Socket-IO :: Connected to socket server', data));
 
@@ -721,6 +894,10 @@ const Dashboard = () => {
     socket.on('ScalerHeartbeat', handleScalerHeartbeat);
     socket.on('ScalerStatusHeartbeat', handleScalerStatusHeartbeat);
     socket.on('ServiceHeartbeat', handleServiceHeartbeat);
+
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   return (
