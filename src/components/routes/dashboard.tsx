@@ -264,7 +264,11 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
   const classes = useStyles();
 
   useEffect(() => {
-    if ((timer !== null && dispatcher.initialized) || (timer === null && !dispatcher.initilized)) {
+    if (dispatcher.queues.ingest >= dispatcher.inflight.max) {
+      setError(t('dispatcher.error.queue'));
+    } else if (dispatcher.inflight.outstanding / dispatcher.inflight.max > 0.9) {
+      setError(t('dispatcher.error.inflight'));
+    } else if ((timer !== null && dispatcher.initialized) || (timer === null && !dispatcher.initilized)) {
       if (error !== null) setError(null);
       if (timer !== null) clearTimeout(timer);
       setTimer(

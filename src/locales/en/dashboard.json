@@ -68,5 +68,7 @@
   "ingest.error.chance.medium": "Medium queue is too full and being sampled",
   "ingest.error.chance.low": "Low queue is too full and being sampled",
   "ingest.error.bytes": "Submissions are being ingested but none are completing",
-  "ingest.error.queue": "Ingestion queue is getting too full"
+  "ingest.error.queue": "Ingestion queue is getting too full",
+  "dispatcher.error.queue": "Dispatcher message queue is getting too full",
+  "dispatcher.error.inflight": "Number of submissions being processed is getting too high"
 }
