@@ -70,5 +70,6 @@
   "ingest.error.bytes": "Submissions are being ingested but none are completing",
   "ingest.error.queue": "Ingestion queue is getting too full",
   "dispatcher.error.queue": "Dispatcher message queue is getting too full",
-  "dispatcher.error.inflight": "Number of submissions being processed is getting too high"
+  "dispatcher.error.inflight": "Number of submissions being processed is getting too high",
+  "alerter.error": "Alerter is generating errors"
 }

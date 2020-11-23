@@ -264,7 +264,7 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
   const classes = useStyles();
 
   useEffect(() => {
-    if (dispatcher.queues.ingest >= dispatcher.inflight.max) {
+    if (dispatcher.initialized && dispatcher.queues.ingest >= dispatcher.inflight.max) {
       setError(t('dispatcher.error.queue'));
     } else if (dispatcher.inflight.outstanding / dispatcher.inflight.max > 0.9) {
       setError(t('dispatcher.error.inflight'));
@@ -520,7 +520,9 @@ const WrappedAlerterCard = ({ alerter }) => {
   const classes = useStyles();
 
   useEffect(() => {
-    if ((timer !== null && alerter.initialized) || (timer === null && !alerter.initilized)) {
+    if (alerter.metrics.error > 0) {
+      setError(t('alerter.error'));
+    } else if ((timer !== null && alerter.initialized) || (timer === null && !alerter.initilized)) {
       if (error !== null) setError(null);
       if (timer !== null) clearTimeout(timer);
       setTimer(

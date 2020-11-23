@@ -70,5 +70,6 @@
   "ingest.error.bytes": "Les soumissions sont en cours d'ingestion, mais aucune ne se termine",
   "ingest.error.queue": "La file d'attente d'ingestion est trop pleine",
   "dispatcher.error.queue": "La file d'attente des messages du répartiteur est trop pleine",
-  "dispatcher.error.inflight": "Le nombre de soumissions en cours de traitement devient trop élevé"
+  "dispatcher.error.inflight": "Le nombre de soumissions en cours de traitement devient trop élevé",
+  "alerter.error": "Le générateur d'alertes produit des erreurs"
 }
