@@ -81,16 +81,33 @@ const MetricCounter = React.memo(WrappedMetricCounter);
 
 const WrappedIngestCard = ({ ingester }) => {
   const { t } = useTranslation(['dashboard']);
+  const [timer, setTimer] = useState(null);
+  const [error, setError] = useState(null);
   const classes = useStyles();
 
+  useEffect(() => {
+    if ((timer !== null && ingester.initialized) || (timer === null && !ingester.initilized)) {
+      if (error !== null) setError(null);
+      if (timer !== null) clearTimeout(timer);
+      setTimer(
+        setTimeout(() => {
+          setError(t('timeout'));
+        }, 10000)
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ingester]);
+
   return (
-    <Card className={`${classes.core_card} ${ingester.error ? classes.error : classes.ok}`}>
+    <Card className={`${classes.core_card} ${error || ingester.error ? classes.error : classes.ok}`}>
       <Grid container spacing={1}>
         <Grid item xs={12}>
-          {ingester.error && (
-            <div className={classes.error_icon}>
-              <ErrorOutlineOutlinedIcon />
-            </div>
+          {(error || ingester.error) && (
+            <Tooltip title={error || ingester.error}>
+              <div className={classes.error_icon}>
+                <ErrorOutlineOutlinedIcon />
+              </div>
+            </Tooltip>
           )}
           <div className={classes.title}>{`${t('ingester')} :: x${ingester.instances}`}</div>
         </Grid>
@@ -230,16 +247,33 @@ const WrappedIngestCard = ({ ingester }) => {
 
 const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
   const { t } = useTranslation(['dashboard']);
+  const [timer, setTimer] = useState(null);
+  const [error, setError] = useState(null);
   const classes = useStyles();
 
+  useEffect(() => {
+    if ((timer !== null && dispatcher.initialized) || (timer === null && !dispatcher.initilized)) {
+      if (error !== null) setError(null);
+      if (timer !== null) clearTimeout(timer);
+      setTimer(
+        setTimeout(() => {
+          setError(t('timeout'));
+        }, 10000)
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatcher]);
+
   return (
-    <Card className={`${classes.core_card} ${dispatcher.error ? classes.error : classes.ok}`}>
+    <Card className={`${classes.core_card} ${error || dispatcher.error ? classes.error : classes.ok}`}>
       <Grid container spacing={1}>
         <Grid item xs={12}>
-          {dispatcher.error && (
-            <div className={classes.error_icon}>
-              <ErrorOutlineOutlinedIcon />
-            </div>
+          {(error || dispatcher.error) && (
+            <Tooltip title={error || dispatcher.error}>
+              <div className={classes.error_icon}>
+                <ErrorOutlineOutlinedIcon />
+              </div>
+            </Tooltip>
           )}
           <div className={classes.title}>{`${t('dispatcher')} :: x${dispatcher.instances}`}</div>
         </Grid>
@@ -316,16 +350,33 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
 
 const WrappedExpiryCard = ({ expiry }) => {
   const { t } = useTranslation(['dashboard']);
+  const [timer, setTimer] = useState(null);
+  const [error, setError] = useState(null);
   const classes = useStyles();
 
+  useEffect(() => {
+    if ((timer !== null && expiry.initialized) || (timer === null && !expiry.initilized)) {
+      if (error !== null) setError(null);
+      if (timer !== null) clearTimeout(timer);
+      setTimer(
+        setTimeout(() => {
+          setError(t('timeout'));
+        }, 10000)
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [expiry]);
+
   return (
-    <Card className={`${classes.core_card} ${expiry.error ? classes.error : classes.ok}`}>
+    <Card className={`${classes.core_card} ${error || expiry.error ? classes.error : classes.ok}`}>
       <Grid container spacing={1}>
         <Grid item xs={12}>
-          {expiry.error && (
-            <div className={classes.error_icon}>
-              <ErrorOutlineOutlinedIcon />
-            </div>
+          {(error || expiry.error) && (
+            <Tooltip title={error || expiry.error}>
+              <div className={classes.error_icon}>
+                <ErrorOutlineOutlinedIcon />
+              </div>
+            </Tooltip>
           )}
           <div className={classes.title}>{`${t('expiry')} :: x${expiry.instances}`}</div>
         </Grid>
@@ -448,16 +499,33 @@ const WrappedExpiryCard = ({ expiry }) => {
 
 const WrappedAlerterCard = ({ alerter }) => {
   const { t } = useTranslation(['dashboard']);
+  const [timer, setTimer] = useState(null);
+  const [error, setError] = useState(null);
   const classes = useStyles();
 
+  useEffect(() => {
+    if ((timer !== null && alerter.initialized) || (timer === null && !alerter.initilized)) {
+      if (error !== null) setError(null);
+      if (timer !== null) clearTimeout(timer);
+      setTimer(
+        setTimeout(() => {
+          setError(t('timeout'));
+        }, 10000)
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [alerter]);
+
   return (
-    <Card className={`${classes.core_card} ${alerter.error ? classes.error : classes.ok}`}>
+    <Card className={`${classes.core_card} ${error || alerter.error ? classes.error : classes.ok}`}>
       <Grid container spacing={1}>
         <Grid item xs={12}>
-          {alerter.error && (
-            <div className={classes.error_icon}>
-              <ErrorOutlineOutlinedIcon />
-            </div>
+          {(error || alerter.error) && (
+            <Tooltip title={error || alerter.error}>
+              <div className={classes.error_icon}>
+                <ErrorOutlineOutlinedIcon />
+              </div>
+            </Tooltip>
           )}
           <div className={classes.title}>{`${t('alerter')} :: x${alerter.instances}`}</div>
         </Grid>
@@ -517,8 +585,9 @@ const WrappedScalerResourcesCard = ({ scaler }) => {
   const classes = useStyles();
 
   useEffect(() => {
-    if (timer !== null && scaler.initialized) clearTimeout(timer);
-    if (timer === null && !scaler.initilized) {
+    if ((timer !== null && scaler.initialized) || (timer === null && !scaler.initilized)) {
+      if (error !== null) setError(null);
+      if (timer !== null) clearTimeout(timer);
       setTimer(
         setTimeout(() => {
           setError(t('timeout'));
