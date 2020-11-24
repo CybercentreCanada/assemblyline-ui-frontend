@@ -1,1 +1,12 @@
-{}
+{
+  "title": "Signature sources",
+  "caption": "Services allowed to generate signatures",
+  "filename": "Output filename",
+  "pattern": "Matching pattern",
+  "username": "Username",
+  "password": "Password",
+  "classification": "Default Classification",
+  "private_key": "A private key will be used to connect to the source",
+  "headers": "Headers",
+  "add_source": "Add a source for this service"
+}
