@@ -9,11 +9,11 @@ import {
   useTheme
 } from '@material-ui/core';
 import ChromeReaderModeOutlinedIcon from '@material-ui/icons/ChromeReaderModeOutlined';
-import ClearOutlinedIcon from '@material-ui/icons/ClearOutlined';
 import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
 import CloudDownloadOutlinedIcon from '@material-ui/icons/CloudDownloadOutlined';
 import MoodIcon from '@material-ui/icons/Mood';
 import MoodBadIcon from '@material-ui/icons/MoodBad';
+import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
 import ReplayOutlinedIcon from '@material-ui/icons/ReplayOutlined';
 import { Skeleton } from '@material-ui/lab';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
@@ -227,7 +227,7 @@ export default function SubmissionDetail() {
                     <div style={{ textAlign: 'right' }}>
                       <Tooltip title={t('delete')}>
                         <IconButton onClick={() => setDeleteDialog(true)}>
-                          <ClearOutlinedIcon />
+                          <RemoveCircleOutlineOutlinedIcon />
                         </IconButton>
                       </Tooltip>
                       <Tooltip title={t('download')}>
