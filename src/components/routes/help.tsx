@@ -19,7 +19,7 @@ export default function Help() {
   }
 
   return (
-    <PageCenter margin={4}>
+    <PageCenter margin={4} width="100%">
       <LinkGrid items={items} />
     </PageCenter>
   );

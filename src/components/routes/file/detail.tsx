@@ -11,7 +11,7 @@ function FileFullDetail() {
   const { id } = useParams<ParamProps>();
 
   return (
-    <PageCenter margin={4}>
+    <PageCenter margin={4} width="100%">
       <FileDetail sha256={id} />
     </PageCenter>
   );

@@ -72,7 +72,7 @@ export default function Tos() {
   }, []);
 
   return configuration.ui.tos ? (
-    <PageCenter margin={4}>
+    <PageCenter margin={4} width="100%">
       <div className={classes.page} style={{ display: 'inline-block', textAlign: 'center' }}>
         <div>{getBanner(theme)}</div>
         <div style={{ marginBottom: sp6, textAlign: 'left' }}>

@@ -188,7 +188,7 @@ function Settings<SettingsProps>({ width }) {
   }, []);
 
   return (
-    <PageCenter margin={4}>
+    <PageCenter margin={4} width="100%">
       <React.Fragment key="right">
         <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
           <div style={{ alignSelf: 'flex-end' }}>

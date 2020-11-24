@@ -10,7 +10,7 @@ export default function ErrorViewer() {
   const { user: currentUser } = useUser<CustomUser>();
 
   return currentUser.is_admin ? (
-    <PageCenter margin={4}>
+    <PageCenter margin={4} width="100%">
       <div>{t('Error Viewer')}</div>
     </PageCenter>
   ) : (
