@@ -115,7 +115,7 @@ const SourceDetail = ({ service, base }) => {
         <Grid item xs={12} md={6}>
           <div>
             <div className={classes.label}>{t('filename')}</div>
-            <TextField disabled={base} size="small" value={source.name} fullWidth variant="outlined" />
+            <TextField disabled={!!base} size="small" value={source.name} fullWidth variant="outlined" />
           </div>
           <div style={{ paddingTop: theme.spacing(1) }}>
             <div className={classes.label}>{t('pattern')}</div>
