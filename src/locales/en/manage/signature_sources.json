@@ -2,11 +2,18 @@
   "title": "Signature sources",
   "caption": "Services allowed to generate signatures",
   "filename": "Output filename",
+  "uri": "URI",
   "pattern": "Matching pattern",
   "username": "Username",
   "password": "Password",
   "classification": "Default Classification",
-  "private_key": "A private key will be used to connect to the source",
+  "private_key": "Private key",
+  "private_key_used": "A private key will be used to connect to the source",
   "headers": "Headers",
-  "add_source": "Add a source for this service"
+  "ca": "CA Certificate",
+  "ignore_ssl": "Ignore SSL Errors",
+  "ca_used": "A CA Certificate will be used to connect to the source",
+  "ignore_ssl_used": "SSL Errors will be ignored when connecting to this source",
+  "adding_source": "Add a signature source",
+  "editing_source": "Edit a signature source"
 }
