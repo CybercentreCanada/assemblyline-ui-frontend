@@ -226,7 +226,12 @@ export default function SubmissionDetail() {
                   <Grid item xs={12} sm>
                     <div style={{ textAlign: 'right' }}>
                       <Tooltip title={t('delete')}>
-                        <IconButton onClick={() => setDeleteDialog(true)}>
+                        <IconButton
+                          onClick={() => setDeleteDialog(true)}
+                          style={{
+                            color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                          }}
+                        >
                           <RemoveCircleOutlineOutlinedIcon />
                         </IconButton>
                       </Tooltip>

@@ -207,7 +207,12 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
               <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
                 {workflow ? (
                   <Tooltip title={t('remove')}>
-                    <IconButton style={{ color: theme.palette.action.active }} onClick={() => setDeleteDialog(true)}>
+                    <IconButton
+                      style={{
+                        color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                      }}
+                      onClick={() => setDeleteDialog(true)}
+                    >
                       <RemoveCircleOutlineOutlinedIcon />
                     </IconButton>
                   </Tooltip>

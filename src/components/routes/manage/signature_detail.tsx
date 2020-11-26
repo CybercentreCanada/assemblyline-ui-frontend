@@ -210,7 +210,12 @@ const SignatureDetail = ({ signature_id, close }: SignatureDetailProps) => {
                     </IconButton>
                   </Tooltip>
                   <Tooltip title={t('remove')}>
-                    <IconButton style={{ color: theme.palette.action.active }} onClick={handleDeleteButtonClick}>
+                    <IconButton
+                      style={{
+                        color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                      }}
+                      onClick={handleDeleteButtonClick}
+                    >
                       <RemoveCircleOutlineOutlinedIcon />
                     </IconButton>
                   </Tooltip>

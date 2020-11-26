@@ -155,7 +155,9 @@ export default function Workflows() {
           <Grid item xs style={{ textAlign: 'right' }}>
             <Tooltip title={t('add_workflow')}>
               <IconButton
-                style={{ color: theme.palette.action.active }}
+                style={{
+                  color: theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark
+                }}
                 onClick={() => {
                   setWid(null);
                   setDrawer(true);
