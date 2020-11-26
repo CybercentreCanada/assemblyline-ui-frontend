@@ -322,6 +322,7 @@ const SourceDetail = ({ service, base, close, reload }) => {
             rows={6}
             fullWidth
             variant="outlined"
+            InputProps={{ style: { fontFamily: 'monospace' } }}
             onChange={handlePrivateKeyChange}
           />
         </Grid>
@@ -405,6 +406,7 @@ const SourceDetail = ({ service, base, close, reload }) => {
             rows={6}
             fullWidth
             variant="outlined"
+            InputProps={{ style: { fontFamily: 'monospace' } }}
             onChange={handleCAChange}
           />
         </Grid>
