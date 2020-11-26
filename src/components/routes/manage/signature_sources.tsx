@@ -1,8 +1,12 @@
 import {
+  Button,
   Card,
+  Checkbox,
+  CircularProgress,
   Collapse,
   Divider,
   Drawer,
+  FormControlLabel,
   Grid,
   IconButton,
   makeStyles,
@@ -12,16 +16,29 @@ import {
   useTheme
 } from '@material-ui/core';
 import AddCircleOutlineOutlinedIcon from '@material-ui/icons/AddCircleOutlineOutlined';
+import CardMembershipOutlinedIcon from '@material-ui/icons/CardMembershipOutlined';
 import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
+import NoEncryptionOutlinedIcon from '@material-ui/icons/NoEncryptionOutlined';
+import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
+import VpnKeyOutlinedIcon from '@material-ui/icons/VpnKeyOutlined';
 import { Skeleton } from '@material-ui/lab';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useAppContext from 'components/hooks/useAppContext';
 import useMyAPI from 'components/hooks/useMyAPI';
+import useMySnackbar from 'components/hooks/useMySnackbar';
 import Classification from 'components/visual/Classification';
+import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(theme => ({
+  buttonProgress: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginTop: -12,
+    marginLeft: -12
+  },
   card: {
     border: `1px solid ${theme.palette.divider}`,
     borderRadius: '4px',
@@ -34,6 +51,17 @@ const useStyles = makeStyles(theme => ({
       cursor: 'pointer'
     }
   },
+  checkbox: {
+    marginLeft: 0,
+    width: '100%',
+    '&:hover': {
+      background: theme.palette.action.hover
+    }
+  },
+  card_title: {
+    fontSize: 'large',
+    fontFamily: 'monospace'
+  },
   drawerPaper: {
     width: '80%',
     maxWidth: '800px',
@@ -42,7 +70,7 @@ const useStyles = makeStyles(theme => ({
     }
   },
   label: {
-    fontWeight: 600
+    fontWeight: 500
   },
   mono: {
     fontSize: 'larger',
@@ -59,16 +87,11 @@ const useStyles = makeStyles(theme => ({
     '&:hover, &:focus': {
       color: theme.palette.text.secondary
     }
-  },
-  uri: {
-    fontSize: 'large',
-    fontFamily: 'monospace',
-    paddingBottom: theme.spacing(2)
   }
 }));
 
 const DEFAULT_HEADER = {
-  key: '',
+  name: '',
   value: ''
 };
 
@@ -85,71 +108,285 @@ const DEFAULT_SOURCE = {
   username: ''
 };
 
-const SourceDetail = ({ service, base }) => {
+const SourceDetail = ({ service, base, close, reload }) => {
   const { t } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
   const { c12nDef } = useAppContext();
+  const [modified, setModified] = useState(false);
+  const [deleteDialog, setDeleteDialog] = useState(false);
+  const [buttonLoading, setButtonLoading] = useState(false);
+  const apiCall = useMyAPI();
+  const { showSuccessMessage } = useMySnackbar();
   const [tempHeader, setTempHeader] = useState({ ...DEFAULT_HEADER });
   const [source, setSource] = useState(
-    base ? { ...base } : { ...DEFAULT_SOURCE, default_classification: c12nDef.UNRESTRICTED }
+    base
+      ? { ...DEFAULT_SOURCE, default_classification: c12nDef.UNRESTRICTED, ...base }
+      : { ...DEFAULT_SOURCE, default_classification: c12nDef.UNRESTRICTED }
   );
   const classes = useStyles();
 
-  const addHeader = () => {};
+  const handleURIChange = event => {
+    setSource({ ...source, uri: event.target.value });
+    setModified(true);
+  };
+
+  const handleNameChange = event => {
+    setSource({ ...source, name: event.target.value });
+    setModified(true);
+  };
+
+  const handlePasswordChange = event => {
+    setSource({ ...source, password: event.target.value });
+    setModified(true);
+  };
+
+  const handlePatternChange = event => {
+    setSource({ ...source, pattern: event.target.value });
+    setModified(true);
+  };
+
+  const handleCAChange = event => {
+    setSource({ ...source, ca_cert: event.target.value });
+    setModified(true);
+  };
+
+  const handlePrivateKeyChange = event => {
+    setSource({ ...source, private_key: event.target.value });
+    setModified(true);
+  };
+
+  const handleUsernameChange = event => {
+    setSource({ ...source, username: event.target.value });
+    setModified(true);
+  };
+
+  const handleSSLChange = event => {
+    setSource({ ...source, ssl_ignore_errors: event.target.checked });
+    setModified(true);
+  };
+
+  const handleClassificationChange = c12n => {
+    setSource({ ...source, default_classification: c12n });
+    setModified(true);
+  };
+
+  const handleTempHeaderName = event => {
+    setTempHeader({ ...tempHeader, name: event.target.value });
+  };
+  const handleTempHeaderValue = event => {
+    setTempHeader({ ...tempHeader, value: event.target.value });
+  };
+
+  const addHeader = () => {
+    const newHeaders = [...source.headers];
+    newHeaders.push(tempHeader);
+    setSource({ ...source, headers: newHeaders });
+    setTempHeader({ ...DEFAULT_HEADER });
+    setModified(true);
+  };
+  const removeHeader = id => {
+    const newHeaders = [...source.headers];
+    newHeaders.splice(id, 1);
+    setSource({ ...source, headers: newHeaders });
+    setModified(true);
+  };
+
+  const saveChanges = () => {
+    apiCall({
+      method: base ? 'POST' : 'PUT',
+      url: base ? `/api/v4/signature/sources/${service}/${source.name}/` : `/api/v4/signature/sources/${service}/`,
+      body: source,
+      onSuccess: () => {
+        showSuccessMessage(t(base ? 'change.success' : 'add.success'));
+        setModified(false);
+        close();
+        reload();
+      },
+      onEnter: () => setButtonLoading(true),
+      onExit: () => setButtonLoading(false)
+    });
+  };
+
+  const deleteSource = () => setDeleteDialog(true);
+
+  const executeDeleteSource = () => {
+    close();
+    apiCall({
+      url: `/api/v4/signature/sources/${service}/${source.name}/`,
+      method: 'DELETE',
+      onSuccess: () => {
+        showSuccessMessage(t('delete.success'));
+        reload();
+      }
+    });
+  };
 
   return (
     <div style={{ paddingTop: theme.spacing(2) }}>
+      <ConfirmationDialog
+        open={deleteDialog}
+        handleClose={() => setDeleteDialog(false)}
+        handleAccept={executeDeleteSource}
+        title={t('delete.title')}
+        cancelText={t('delete.cancelText')}
+        acceptText={t('delete.acceptText')}
+        text={t('delete.text')}
+      />
+
       <div style={{ paddingBottom: theme.spacing(2) }}>
-        <Typography variant="h4">{t(base ? 'editing_source' : 'adding_source')}</Typography>
-        <Typography variant="caption">{`${service}${base ? ` - ${base.name}` : ''}`}</Typography>
+        <Grid container alignItems="center">
+          <Grid item xs>
+            <Typography variant="h4">{t(base ? 'editing_source' : 'adding_source')}</Typography>
+            <Typography variant="caption">{`${service}${base ? ` - ${base.name}` : ''}`}</Typography>
+          </Grid>
+          {base && (
+            <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
+              <Tooltip title={t('delete')}>
+                <IconButton
+                  style={{
+                    color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                  }}
+                  onClick={deleteSource}
+                >
+                  <RemoveCircleOutlineOutlinedIcon />
+                </IconButton>
+              </Tooltip>
+            </Grid>
+          )}
+        </Grid>
       </div>
       <Grid container spacing={1}>
         <Grid item xs={12}>
           <div className={classes.label}>{t('uri')}</div>
-          <TextField size="small" value={source.uri} fullWidth variant="outlined" />
+          <TextField size="small" value={source.uri} fullWidth variant="outlined" onChange={handleURIChange} />
         </Grid>
         <Grid item xs={12}>
           <div className={classes.label}>{t('classification')}</div>
-          <Classification c12n={source.default_classification} type="picker" />
+          <Classification
+            c12n={source.default_classification}
+            type="picker"
+            setClassification={handleClassificationChange}
+          />
         </Grid>
         <Grid item xs={12} md={6}>
           <div>
-            <div className={classes.label}>{t('filename')}</div>
-            <TextField disabled={!!base} size="small" value={source.name} fullWidth variant="outlined" />
+            <div className={classes.label}>{t('name')}</div>
+            <TextField
+              disabled={!!base}
+              size="small"
+              value={source.name}
+              fullWidth
+              variant="outlined"
+              onChange={handleNameChange}
+            />
           </div>
           <div style={{ paddingTop: theme.spacing(1) }}>
             <div className={classes.label}>{t('pattern')}</div>
-            <TextField size="small" value={source.pattern} fullWidth variant="outlined" />
+            <TextField
+              size="small"
+              value={source.pattern}
+              fullWidth
+              variant="outlined"
+              onChange={handlePatternChange}
+            />
           </div>
         </Grid>
         <Grid item xs={12} md={6}>
           <div>
             <div className={classes.label}>{t('username')}</div>
-            <TextField size="small" value={source.username} fullWidth variant="outlined" />
+            <TextField
+              size="small"
+              value={source.username}
+              fullWidth
+              variant="outlined"
+              onChange={handleUsernameChange}
+            />
           </div>
           <div style={{ paddingTop: theme.spacing(1) }}>
             <div className={classes.label}>{t('password')}</div>
-            <TextField size="small" value={source.password} fullWidth variant="outlined" />
+            <TextField
+              size="small"
+              value={source.password}
+              fullWidth
+              variant="outlined"
+              onChange={handlePasswordChange}
+            />
           </div>
         </Grid>
         <Grid item xs={12}>
           <div className={classes.label}>{t('private_key')}</div>
-          <TextField size="small" value={source.username} multiline rows={6} fullWidth variant="outlined" />
+          <TextField
+            size="small"
+            value={source.private_key}
+            multiline
+            rows={6}
+            fullWidth
+            variant="outlined"
+            onChange={handlePrivateKeyChange}
+          />
         </Grid>
         <Grid item xs={12}>
           <div className={classes.label}>{t('headers')}</div>
         </Grid>
+        {source.headers.map((header, id) => {
+          return (
+            <Grid key={id} item xs={12}>
+              <Grid container spacing={1} alignItems="center">
+                <Grid item xs={10} md={3}>
+                  <div className={classes.label}>{header.name}</div>
+                </Grid>
+                <Grid item xs={10} md={8}>
+                  <TextField size="small" value={header.value} fullWidth variant="outlined" />
+                </Grid>
+                <Grid item xs={2} md={1} style={{ textAlign: 'end' }}>
+                  <IconButton
+                    style={{
+                      color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark,
+                      margin: '-4px 0'
+                    }}
+                    onClick={() => {
+                      removeHeader(id);
+                    }}
+                  >
+                    <RemoveCircleOutlineOutlinedIcon />
+                  </IconButton>
+                </Grid>
+              </Grid>
+            </Grid>
+          );
+        })}
         <Grid item xs={12}>
           <Grid container spacing={1}>
-            <Grid item xs={10} sm={3}>
-              <TextField size="small" value={tempHeader.key} fullWidth variant="outlined" />
+            <Grid item xs={10} md={3}>
+              <TextField
+                size="small"
+                value={tempHeader.name}
+                fullWidth
+                variant="outlined"
+                onChange={handleTempHeaderName}
+              />
             </Grid>
-            <Grid item xs={10} sm={8}>
-              <TextField size="small" value={tempHeader.value} fullWidth variant="outlined" />
+            <Grid item xs={10} md={8}>
+              <TextField
+                size="small"
+                value={tempHeader.value}
+                fullWidth
+                variant="outlined"
+                onChange={handleTempHeaderValue}
+              />
             </Grid>
-            <Grid item xs={2} sm={1} style={{ textAlign: 'end' }}>
+            <Grid item xs={2} md={1} style={{ textAlign: 'end' }}>
               <IconButton
-                style={{ color: theme.palette.action.active, margin: '-4px 0' }}
+                style={{
+                  color:
+                    !tempHeader.name || !tempHeader.value
+                      ? theme.palette.action.disabled
+                      : theme.palette.type === 'dark'
+                      ? theme.palette.success.light
+                      : theme.palette.success.dark,
+                  margin: '-4px 0'
+                }}
+                disabled={!tempHeader.name || !tempHeader.value}
                 onClick={() => {
                   addHeader();
                 }}
@@ -161,13 +398,37 @@ const SourceDetail = ({ service, base }) => {
         </Grid>
         <Grid item xs={12}>
           <div className={classes.label}>{t('ca')}</div>
-          <TextField size="small" value={source.ca_cert} multiline rows={6} fullWidth variant="outlined" />
+          <TextField
+            size="small"
+            value={source.ca_cert}
+            multiline
+            rows={6}
+            fullWidth
+            variant="outlined"
+            onChange={handleCAChange}
+          />
         </Grid>
         <Grid item xs={12}>
-          <div className={classes.label}>{t('ignore_ssl')}</div>
-          <TextField size="small" value={source.ssl_ignore_errors} fullWidth variant="outlined" />
+          <FormControlLabel
+            control={
+              <Checkbox size="small" checked={source.ssl_ignore_errors} name="label" onChange={handleSSLChange} />
+            }
+            label={<Typography variant="body2">{t('ignore_ssl')}</Typography>}
+            className={classes.checkbox}
+          />
         </Grid>
       </Grid>
+      <div style={{ paddingTop: theme.spacing(2), paddingBottom: theme.spacing(2), textAlign: 'right' }}>
+        <Button
+          variant="contained"
+          color="primary"
+          disabled={!source.name || !source.uri || !modified || buttonLoading}
+          onClick={saveChanges}
+        >
+          {t(base ? 'change.save' : 'add.save')}
+          {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+        </Button>
+      </div>
     </div>
   );
 };
@@ -175,66 +436,64 @@ const SourceDetail = ({ service, base }) => {
 const SourceCard = ({ source, onClick }) => {
   const { t } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
+  const { c12nDef } = useAppContext();
   const classes = useStyles();
 
   return (
     <div style={{ paddingTop: theme.spacing(1) }}>
       <Card className={classes.card} onClick={onClick}>
-        <div className={classes.uri}>{source.uri}</div>
-        <table style={{ borderSpacing: 0 }}>
-          <tbody>
-            <tr>
-              <td className={classes.label}>{`${t('filename')}:`}&nbsp;</td>
-              <td className={classes.mono}>{source.name}&nbsp;</td>
-            </tr>
-            {source.command && (
-              <tr>
-                <td className={classes.label}>{`${t('command')}:`}&nbsp;</td>
-                <td className={classes.mono}>{source.command}</td>
-              </tr>
+        <div style={{ paddingBottom: theme.spacing(2) }}>
+          <div style={{ float: 'right' }}>
+            {source.private_key && (
+              <Tooltip title={t('private_key_used')}>
+                <VpnKeyOutlinedIcon color="action" style={{ marginLeft: theme.spacing(0.5) }} />
+              </Tooltip>
             )}
-            {source.pattern && (
-              <tr>
-                <td className={classes.label}>{`${t('pattern')}:`}&nbsp;</td>
-                <td className={classes.mono}>{source.pattern}</td>
-              </tr>
+            {source.ca_cert && (
+              <Tooltip title={t('ca_used')}>
+                <CardMembershipOutlinedIcon color="action" style={{ marginLeft: theme.spacing(0.5) }} />
+              </Tooltip>
             )}
-            {source.username && (
-              <tr>
-                <td className={classes.label}>{`${t('username')}:`}&nbsp;</td>
-                <td className={classes.mono}>{source.username}</td>
-              </tr>
+            {source.ssl_ignore_errors && (
+              <Tooltip title={t('ignore_ssl_used')}>
+                <NoEncryptionOutlinedIcon color="action" style={{ marginLeft: theme.spacing(0.5) }} />
+              </Tooltip>
             )}
-            {source.password && (
-              <tr>
-                <td className={classes.label}>{`${t('password')}:`}&nbsp;</td>
-                <td className={classes.mono}>******</td>
-              </tr>
-            )}
-            <tr>
-              <td className={classes.label}>{`${t('classification')}:`}&nbsp;</td>
-              <td>
-                <Classification type="text" c12n={source.default_classification} />
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        {source.private_key && (
-          <div className={classes.label}>
-            <label>{`${t('private_key_used')}`}</label>
           </div>
-        )}
-        {source.ca_cert && (
-          <div className={classes.label}>
-            <label>{`${t('ca_used')}`}</label>
-          </div>
-        )}
-        {source.ssl_ignore_errors && (
-          <div className={classes.label}>
-            <label>{`${t('ignore_ssl_used')}`}</label>
-          </div>
-        )}
-        {source.headers && (
+          <span className={classes.card_title}>{source.name}&nbsp;</span>
+          <span className={classes.mono}>({source.uri})</span>
+        </div>
+        <Grid container>
+          {source.pattern && (
+            <>
+              <Grid item xs={5} sm={4} md={2} lg={1} className={classes.label}>{`${t('pattern')}:`}</Grid>
+              <Grid item xs={7} sm={8} md={10} lg={11} className={classes.mono}>
+                {source.pattern}
+              </Grid>
+            </>
+          )}
+          {source.username && (
+            <>
+              <Grid item xs={5} sm={4} md={2} lg={1} className={classes.label}>{`${t('username')}:`}</Grid>
+              <Grid item xs={7} sm={8} md={10} lg={11} className={classes.mono}>
+                {source.username}
+              </Grid>
+            </>
+          )}
+          {source.password && (
+            <>
+              <Grid item xs={5} sm={4} md={2} lg={1} className={classes.label}>{`${t('password')}:`}</Grid>
+              <Grid item xs={7} sm={8} md={10} lg={11} className={classes.mono}>
+                ******
+              </Grid>
+            </>
+          )}
+          <Grid item xs={5} sm={4} md={2} lg={1} className={classes.label}>{`${t('classification')}:`}</Grid>
+          <Grid item xs={7} sm={8} md={10} lg={11}>
+            <Classification type="text" c12n={source.default_classification || c12nDef.UNRESTRICTED} />
+          </Grid>
+        </Grid>
+        {source.headers && source.headers.length !== 0 && (
           <div>
             <div className={classes.label}>{`${t('headers')}:`}&nbsp;</div>
             {source.headers.map((item, id) => {
@@ -251,7 +510,7 @@ const SourceCard = ({ source, onClick }) => {
   );
 };
 
-const ServiceDetail = ({ service, sources }) => {
+const ServiceDetail = ({ service, sources, reload }) => {
   const { t } = useTranslation(['manageSignatureSources']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
@@ -272,7 +531,7 @@ const ServiceDetail = ({ service, sources }) => {
           </IconButton>
         </div>
         <div style={{ paddingLeft: theme.spacing(2), paddingRight: theme.spacing(2) }}>
-          <SourceDetail service={service} base={editSource} />
+          <SourceDetail service={service} base={editSource} close={closeDrawer} reload={reload} />
         </div>
       </Drawer>
       <Grid container>
@@ -290,7 +549,10 @@ const ServiceDetail = ({ service, sources }) => {
         <Grid item xs={2} style={{ textAlign: 'right' }}>
           <Tooltip title={t('add_source')}>
             <IconButton
-              style={{ color: theme.palette.action.active, margin: '-4px 0' }}
+              style={{
+                color: theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark,
+                margin: '-4px 0'
+              }}
               onClick={() => {
                 setEditSource(null);
                 setDrawer(true);
@@ -318,7 +580,9 @@ const ServiceDetail = ({ service, sources }) => {
               );
             })
           ) : (
-            <div>{t('no_sources')}</div>
+            <Typography variant="subtitle1" color="textSecondary" style={{ marginTop: theme.spacing(1) }}>
+              {t('no_sources')}
+            </Typography>
           )}
         </div>
       </Collapse>
@@ -332,13 +596,17 @@ export default function SignatureSources() {
   const [sources, setSources] = useState(null);
   const apiCall = useMyAPI();
 
-  useEffect(() => {
+  const reload = () => {
     apiCall({
       url: '/api/v4/signature/sources/',
       onSuccess: api_data => {
         setSources(api_data.api_response);
       }
     });
+  };
+
+  useEffect(() => {
+    reload();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -354,7 +622,7 @@ export default function SignatureSources() {
 
         {sources
           ? Object.keys(sources).map((key, id) => {
-              return <ServiceDetail key={id} service={key} sources={sources[key]} />;
+              return <ServiceDetail key={id} service={key} sources={sources[key]} reload={reload} />;
             })
           : [...Array(2)].map((item, i) => {
               return (
