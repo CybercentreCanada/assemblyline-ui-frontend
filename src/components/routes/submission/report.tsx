@@ -128,8 +128,8 @@ function AttributionBanner({ report }) {
     },
     suspicious: {
       icon: <MoodBadIcon className={classes.icon} />,
-      bgColor: '#4b96fe15',
-      textColor: theme.palette.type !== 'dark' ? theme.palette.info.dark : theme.palette.info.light
+      bgColor: '#ff970015',
+      textColor: theme.palette.type !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
     },
     highly_suspicious: {
       icon: <MoodBadIcon className={classes.icon} />,
