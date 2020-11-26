@@ -2,7 +2,7 @@
   "adminmenu": "Administration",
   "adminmenu.errors": "Visualisateur d'erreurs",
   "adminmenu.services": "Services",
-  "adminmenu.sitemap": "Carte du site",
+  "adminmenu.sitemap": "Plan du site",
   "adminmenu.users": "Utilisateurs",
   "api.invalid": "Données non valides renvoyées par le serveur API",
   "api.unreachable": "Serveur API inaccessible. Réessayez plus tard...",

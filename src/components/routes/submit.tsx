@@ -68,6 +68,7 @@ function Submit() {
       padding: 0
     },
     item: {
+      marginLeft: 0,
       width: '100%',
       '&:hover': {
         background: theme.palette.action.hover
@@ -383,112 +384,102 @@ function Submit() {
                   )}
                 </div>
                 <div style={{ paddingTop: sp1, paddingBottom: sp1 }}>
-                  <div style={{ paddingLeft: sp1 }}>
-                    <FormControlLabel
-                      control={
-                        settings ? (
-                          <Checkbox
-                            size="small"
-                            checked={settings.ignore_filtering}
-                            name="label"
-                            onChange={event => setSettingValue('ignore_filtering', event.target.checked)}
-                          />
-                        ) : (
-                          <Skeleton
-                            style={{ height: '2rem', width: '1.5rem', marginLeft: '16px', marginRight: '16px' }}
-                          />
-                        )
-                      }
-                      label={<Typography variant="body2">{t('options.submission.ignore_filtering')}</Typography>}
-                      className={settings ? classes.item : null}
-                    />
-                  </div>
-                  <div style={{ paddingLeft: sp1 }}>
-                    <FormControlLabel
-                      control={
-                        settings ? (
-                          <Checkbox
-                            size="small"
-                            checked={settings.ignore_cache}
-                            name="label"
-                            onChange={event => setSettingValue('ignore_cache', event.target.checked)}
-                          />
-                        ) : (
-                          <Skeleton
-                            style={{ height: '2rem', width: '1.5rem', marginLeft: '16px', marginRight: '16px' }}
-                          />
-                        )
-                      }
-                      label={<Typography variant="body2">{t('options.submission.ignore_cache')}</Typography>}
-                      className={settings ? classes.item : null}
-                    />
-                  </div>
-                  <div style={{ paddingLeft: sp1 }}>
-                    <FormControlLabel
-                      control={
-                        settings ? (
-                          <Checkbox
-                            size="small"
-                            checked={settings.ignore_dynamic_recursion_prevention}
-                            name="label"
-                            onChange={event =>
-                              setSettingValue('ignore_dynamic_recursion_prevention', event.target.checked)
-                            }
-                          />
-                        ) : (
-                          <Skeleton
-                            style={{ height: '2rem', width: '1.5rem', marginLeft: '16px', marginRight: '16px' }}
-                          />
-                        )
-                      }
-                      label={
-                        <Typography variant="body2">
-                          {t('options.submission.ignore_dynamic_recursion_prevention')}
-                        </Typography>
-                      }
-                      className={settings ? classes.item : null}
-                    />
-                  </div>
-                  <div style={{ paddingLeft: sp1 }}>
-                    <FormControlLabel
-                      control={
-                        settings ? (
-                          <Checkbox
-                            size="small"
-                            checked={settings.profile}
-                            name="label"
-                            onChange={event => setSettingValue('profile', event.target.checked)}
-                          />
-                        ) : (
-                          <Skeleton
-                            style={{ height: '2rem', width: '1.5rem', marginLeft: '16px', marginRight: '16px' }}
-                          />
-                        )
-                      }
-                      label={<Typography variant="body2">{t('options.submission.profile')}</Typography>}
-                      className={settings ? classes.item : null}
-                    />
-                  </div>
-                  <div style={{ paddingLeft: sp1 }}>
-                    <FormControlLabel
-                      control={
-                        settings ? (
-                          <Checkbox
-                            size="small"
-                            checked={settings.deep_scan}
-                            name="label"
-                            onChange={event => setSettingValue('deep_scan', event.target.checked)}
-                          />
-                        ) : (
-                          <Skeleton
-                            style={{ height: '2rem', width: '1.5rem', marginLeft: '16px', marginRight: '16px' }}
-                          />
-                        )
-                      }
-                      label={<Typography variant="body2">{t('options.submission.deep_scan')}</Typography>}
-                      className={settings ? classes.item : null}
-                    />
-                  </div>
+                  <FormControlLabel
+                    control={
+                      settings ? (
+                        <Checkbox
+                          size="small"
+                          checked={settings.ignore_filtering}
+                          name="label"
+                          onChange={event => setSettingValue('ignore_filtering', event.target.checked)}
+                        />
+                      ) : (
+                        <Skeleton
+                          style={{ height: '2rem', width: '1.5rem', marginLeft: '16px', marginRight: '16px' }}
+                        />
+                      )
+                    }
+                    label={<Typography variant="body2">{t('options.submission.ignore_filtering')}</Typography>}
+                    className={settings ? classes.item : null}
+                  />
+                  <FormControlLabel
+                    control={
+                      settings ? (
+                        <Checkbox
+                          size="small"
+                          checked={settings.ignore_cache}
+                          name="label"
+                          onChange={event => setSettingValue('ignore_cache', event.target.checked)}
+                        />
+                      ) : (
+                        <Skeleton
+                          style={{ height: '2rem', width: '1.5rem', marginLeft: '16px', marginRight: '16px' }}
+                        />
+                      )
+                    }
+                    label={<Typography variant="body2">{t('options.submission.ignore_cache')}</Typography>}
+                    className={settings ? classes.item : null}
+                  />
+                  <FormControlLabel
+                    control={
+                      settings ? (
+                        <Checkbox
+                          size="small"
+                          checked={settings.ignore_dynamic_recursion_prevention}
+                          name="label"
+                          onChange={event =>
+                            setSettingValue('ignore_dynamic_recursion_prevention', event.target.checked)
+                          }
+                        />
+                      ) : (
+                        <Skeleton
+                          style={{ height: '2rem', width: '1.5rem', marginLeft: '16px', marginRight: '16px' }}
+                        />
+                      )
+                    }
+                    label={
+                      <Typography variant="body2">
+                        {t('options.submission.ignore_dynamic_recursion_prevention')}
+                      </Typography>
+                    }
+                    className={settings ? classes.item : null}
+                  />
+                  <FormControlLabel
+                    control={
+                      settings ? (
+                        <Checkbox
+                          size="small"
+                          checked={settings.profile}
+                          name="label"
+                          onChange={event => setSettingValue('profile', event.target.checked)}
+                        />
+                      ) : (
+                        <Skeleton
+                          style={{ height: '2rem', width: '1.5rem', marginLeft: '16px', marginRight: '16px' }}
+                        />
+                      )
+                    }
+                    label={<Typography variant="body2">{t('options.submission.profile')}</Typography>}
+                    className={settings ? classes.item : null}
+                  />
+                  <FormControlLabel
+                    control={
+                      settings ? (
+                        <Checkbox
+                          size="small"
+                          checked={settings.deep_scan}
+                          name="label"
+                          onChange={event => setSettingValue('deep_scan', event.target.checked)}
+                        />
+                      ) : (
+                        <Skeleton
+                          style={{ height: '2rem', width: '1.5rem', marginLeft: '16px', marginRight: '16px' }}
+                        />
+                      )
+                    }
+                    label={<Typography variant="body2">{t('options.submission.deep_scan')}</Typography>}
+                    className={settings ? classes.item : null}
+                  />
                 </div>
                 <div style={{ paddingTop: sp1, paddingBottom: sp1 }}>
                   <Typography variant="caption" color="textSecondary" gutterBottom>

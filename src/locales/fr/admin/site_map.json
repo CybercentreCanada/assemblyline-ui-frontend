@@ -1,1 +1,20 @@
-{}
+{
+  "E": "Élargie",
+  "R": "Lecture",
+  "W": "Écriture",
+  "admin": "A",
+  "admin_label": "Administrateur",
+  "caption": "chemins disponibles",
+  "header.function": "Fonction",
+  "header.methods": "Méthodes",
+  "header.permissions": "Autorisations",
+  "header.protected": "Protégé",
+  "header.url": "URL",
+  "signature_importer": "I",
+  "signature_importer_label": "Importateur de signatures",
+  "signature_manager": "M",
+  "signature_manager_label": "Gestionnaire de signatures",
+  "title": "Plan du site",
+  "user": "U",
+  "user_label": "Utilisateur"
+}
