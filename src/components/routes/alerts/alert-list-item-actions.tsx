@@ -5,6 +5,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  IconButton,
   makeStyles,
   Typography,
   useTheme
@@ -106,22 +107,20 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
       <>
         <div className={classes.listactions}>
           {!item.owner && (
-            <Button
-              // size="small"
-              // color="inherit"
-              variant="outlined"
+            <IconButton
+              size="small"
+              color="primary"
               title="Take Ownership"
               onClick={() => {
                 setTakeOwnershipConfirmation({ open: true, query: buildActionQuery() });
               }}
             >
               <AssignmentIndIcon />
-            </Button>
+            </IconButton>
           )}
-          <Button
-            // size="small"
-            // color="inherit"
-            variant="outlined"
+          <IconButton
+            size="small"
+            color="primary"
             title="Workflow Action"
             onClick={() => {
               console.log('workflow action.');
@@ -130,7 +129,7 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
             }}
           >
             <AccountTreeIcon />
-          </Button>
+          </IconButton>
         </div>
         {takeOwnershipConfirmation.open && (
           <TakeOwnershipConfirmDialog
@@ -180,15 +179,6 @@ const TakeOwnershipConfirmDialog: React.FC<{
       </DialogContent>
       <DialogActions>
         <Button
-          autoFocus
-          onClick={onTakeOwnershipCancelClick}
-          variant="contained"
-          size="small"
-          startIcon={<CloseIcon />}
-        >
-          {t('page.alerts.actions.cancel')}
-        </Button>
-        <Button
           onClick={onTakeOwnershipOkClick}
           variant="contained"
           color="primary"
@@ -197,6 +187,15 @@ const TakeOwnershipConfirmDialog: React.FC<{
           disabled={progress}
         >
           {t('page.alerts.actions.ok')}
+        </Button>
+        <Button
+          autoFocus
+          onClick={onTakeOwnershipCancelClick}
+          variant="contained"
+          size="small"
+          startIcon={<CloseIcon />}
+        >
+          {t('page.alerts.actions.cancel')}
         </Button>
       </DialogActions>
     </Dialog>

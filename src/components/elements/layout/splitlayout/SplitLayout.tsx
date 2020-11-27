@@ -171,21 +171,24 @@ const SplitLayout: React.FC<SplitLayoutProps> = React.memo(
 
     const renderLeftDock = () => {
       return (
-        <>
-          <div className={classes.splitLayoutDock}>
-            <FlexVertical>
-              <IconButton onClick={onToggleLeft}>
-                <MenuOpenIcon style={{ transform: !state.leftOpen ? 'rotate(180deg)' : null }} />
-              </IconButton>
-              {onRenderLeftDock && onRenderLeftDock()}
-            </FlexVertical>
-          </div>
-        </>
+        !disableManualResize && (
+          <>
+            <div className={classes.splitLayoutDock}>
+              <FlexVertical>
+                <IconButton onClick={onToggleLeft}>
+                  <MenuOpenIcon style={{ transform: !state.leftOpen ? 'rotate(180deg)' : null }} />
+                </IconButton>
+                {onRenderLeftDock && onRenderLeftDock()}
+              </FlexVertical>
+            </div>
+          </>
+        )
       );
     };
 
     const renderRightDock = () => {
       return (
+        !disableManualResize &&
         rightNode && (
           <>
             <div className={classes.splitLayoutDock}>

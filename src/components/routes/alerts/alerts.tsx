@@ -1,4 +1,15 @@
-import { Box, Drawer, makeStyles, RootRef, useMediaQuery, useScrollTrigger, useTheme } from '@material-ui/core';
+import {
+  Box,
+  Drawer,
+  IconButton,
+  makeStyles,
+  RootRef,
+  Slide,
+  Typography,
+  useMediaQuery,
+  useScrollTrigger,
+  useTheme
+} from '@material-ui/core';
 import AccountTreeIcon from '@material-ui/icons/AccountTree';
 import CloseIcon from '@material-ui/icons/Close';
 import FilterListIcon from '@material-ui/icons/FilterList';
@@ -10,13 +21,13 @@ import FlexVertical from 'components/elements/layout/flexers/FlexVertical';
 import useSplitLayout from 'components/elements/layout/hooks/useSplitLayout';
 // import Booklist from 'components/elements/lists/booklist/booklist';
 import SplitLayout from 'components/elements/layout/splitlayout/SplitLayout';
+import ListNavigator from 'components/elements/lists/navigator/ListNavigator';
 import SimpleList from 'components/elements/lists/simplelist/SimpleList';
 import SearchBar from 'components/elements/search/search-bar';
 import SearchQuery, { SearchQueryFilters } from 'components/elements/search/search-query';
 import Classification from 'components/visual/Classification';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FiFilter } from 'react-icons/fi';
-import AlertActionsMenu from './alert-actions-menu';
 import AlertDetails from './alert-details';
 import AlertListItem from './alert-list-item';
 import AlertListItemActions from './alert-list-item-actions';
@@ -52,6 +63,10 @@ const hasFilters = (filters: SearchQueryFilters): boolean => {
 
 // Some generated style classes
 const useStyles = makeStyles(theme => ({
+  pageTitle: {
+    paddingTop: theme.spacing(3),
+    paddingBottom: theme.spacing(3)
+  },
   drawerInner: {
     display: 'flex',
     flexDirection: 'column',
@@ -61,6 +76,7 @@ const useStyles = makeStyles(theme => ({
     }
   },
   searchresult: {
+    marginTop: theme.spacing(1),
     fontStyle: 'italic'
   }
 }));
@@ -299,11 +315,25 @@ const Alerts: React.FC = () => {
 
   return (
     <FlexVertical>
-      <div style={{ marginRight: theme.spacing(2), marginLeft: theme.spacing(2), position: 'relative' }}>
+      <div
+        style={{
+          marginTop: theme.spacing(1),
+          marginRight: theme.spacing(4),
+          marginLeft: theme.spacing(4),
+          position: 'relative'
+        }}
+      >
+        <Slide appear={false} direction="down" in={!scrollTrigger} mountOnEnter unmountOnExit>
+          <div className={classes.pageTitle}>
+            <Typography variant="h4">Alerts</Typography>
+          </div>
+        </Slide>
+
         <SearchBar
           initValue={searchQuery.getQuery()}
           searching={searching || loading}
           suggestions={buildSearchSuggestions()}
+          placeholder="Filter alerts..."
           onValueChange={onFilterValueChange}
           onClear={onClearSearch}
           onSearch={onSearch}
@@ -344,50 +374,57 @@ const Alerts: React.FC = () => {
         </SearchBar>
       </div>
       <FlexPort>
-        <SplitLayout
-          id={ALERT_SPLITLAYOUT_ID}
-          disableManualResize
-          initLeftWidthPerc={50}
-          leftMinWidth={500}
-          rightMinWidth={500}
-          left={
-            <RootRef rootRef={listRef}>
-              <SimpleList
-                id={ALERT_SIMPLELIST_ID}
-                scrollInfinite
-                scrollReset={scrollReset}
-                scrollLoadNextThreshold={75}
-                loading={loading || searching}
-                items={alerts}
-                onItemSelected={onItemSelected}
-                onRenderRow={onRenderListRow}
-                onRenderActions={onRenderListActions}
-                onLoadNext={_onLoadMore}
-                onCursorChange={onListCursorChanges}
-                disableProgress
-              />
-            </RootRef>
-          }
-          right={
-            splitPanel.item ? (
-              <Box p={2} pt={0} width="100%">
-                <PageHeader
-                  actions={[{ icon: <CloseIcon />, action: onSplitLayoutCloseRight }]}
-                  backgroundColor={theme.palette.background.default}
-                  elevation={0}
+        <Box style={{ marginLeft: theme.spacing(4), marginRight: theme.spacing(4), height: '100%' }}>
+          <SplitLayout
+            id={ALERT_SPLITLAYOUT_ID}
+            disableManualResize
+            initLeftWidthPerc={50}
+            leftMinWidth={500}
+            rightMinWidth={500}
+            left={
+              <RootRef rootRef={listRef}>
+                <SimpleList
+                  id={ALERT_SIMPLELIST_ID}
+                  scrollInfinite
+                  scrollReset={scrollReset}
+                  scrollLoadNextThreshold={75}
+                  loading={loading || searching}
+                  items={alerts}
+                  onItemSelected={onItemSelected}
+                  onRenderRow={onRenderListRow}
+                  onRenderActions={onRenderListActions}
+                  onLoadNext={_onLoadMore}
+                  onCursorChange={onListCursorChanges}
+                  disableProgress
+                />
+              </RootRef>
+            }
+            right={
+              splitPanel.item && (
+                <div
+                  style={{
+                    width: '100%',
+                    padding: theme.spacing(2),
+                    paddingTop: 0
+                  }}
                 >
-                  <Box display="flex" alignItems="center">
-                    <AlertActionsMenu />
-                    <Box flex={1}>
-                      <Classification c12n={splitPanel.item.classification} type="outlined" />
+                  <PageHeader backgroundColor={theme.palette.background.default}>
+                    <Box display="flex" alignItems="center" marginBottom={2}>
+                      <ListNavigator id={ALERT_SIMPLELIST_ID} />
+                      <Box flex={1}>
+                        <Classification c12n={splitPanel.item.classification} type="outlined" />
+                      </Box>
+                      <IconButton onClick={onSplitLayoutCloseRight}>
+                        <CloseIcon />
+                      </IconButton>
                     </Box>
-                  </Box>
-                </PageHeader>
-                <AlertDetails item={splitPanel.item} />
-              </Box>
-            ) : null
-          }
-        />
+                  </PageHeader>
+                  <AlertDetails item={splitPanel.item} />
+                </div>
+              )
+            }
+          />
+        </Box>
       </FlexPort>
       <Drawer open={drawer.open} anchor="right" onClose={onDrawerClose}>
         <Box p={theme.spacing(0.5)} className={classes.drawerInner}>

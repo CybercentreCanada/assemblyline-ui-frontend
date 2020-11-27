@@ -5,14 +5,14 @@ export const LIST_SELECT_EVENTNAME = 'mui.elements.list.cursor.set';
 export const LIST_SELECT_NEXT_EVENTNAME = 'mui.elements.list.cursor.next';
 export const LIST_SELECT_PREVIOUS_EVENTNAME = 'mui.elements.list.cursor.previous';
 
-interface UsingList {
+interface UsingListNavigator {
   select: (index: number) => void;
   selectNext: () => void;
   selectPrevious: () => void;
   register: (handers: { onSelect; onSelectNext; onSelectPrevious }) => void;
 }
 
-export default function useList(listId: string): UsingList {
+export default function useListNavigator(listId: string): UsingListNavigator {
   const select = (cursor: number) => {
     window.dispatchEvent(new CustomEvent(`${LIST_SELECT_EVENTNAME}.${listId}`, { detail: { cursor } }));
   };

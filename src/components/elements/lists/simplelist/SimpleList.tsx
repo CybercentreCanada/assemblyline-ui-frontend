@@ -2,9 +2,10 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { CircularProgress } from '@material-ui/core';
 import useListKeyboard from 'components/elements/lists/hooks/useListKeyboard';
+import useListNavigator from 'components/elements/lists/hooks/useListNavigator';
 import useListStyles from 'components/elements/lists/hooks/useListStyles';
 import ListItemBase, { LineItem } from 'components/elements/lists/item/ListItemBase';
-import React, { useCallback, useLayoutEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 
 interface SimpleListProps {
   id: string;
@@ -39,7 +40,7 @@ const SimpleList: React.FC<SimpleListProps> = ({
   const { simpleListStyles: classes } = useListStyles();
 
   // Configure the list keyboard custom hook.
-  const { cursor, setCursor, onKeyDown } = useListKeyboard({
+  const { cursor, next, previous, setCursor, onKeyDown } = useListKeyboard({
     id,
     infinite: scrollInfinite,
     count: items.length,
@@ -52,6 +53,9 @@ const SimpleList: React.FC<SimpleListProps> = ({
       }
     }
   });
+
+  // List Navigator hook to register event handling.
+  const { register } = useListNavigator(id);
 
   // Some refs.
   const outerEL = useRef<HTMLDivElement>();
@@ -89,6 +93,14 @@ const SimpleList: React.FC<SimpleListProps> = ({
       innerEL.current.scrollTo({ top: 0 });
     }
   }, [scrollReset, scrollLoadNextThreshold]);
+
+  useEffect(() => {
+    return register({
+      onSelect: () => null,
+      onSelectNext: () => next(),
+      onSelectPrevious: () => previous()
+    });
+  });
 
   return (
     <div
