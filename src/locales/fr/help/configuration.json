@@ -12,5 +12,6 @@
   "priorities.max": "maximum",
   "tags": "Balises",
   "tags.desc": "Assemblyline extrait des identifiants potentiellement intéressants et leur attribue un type. Assemblyline appelle ceux-ci des balises.",
-  "tags.desc_list": "Voici les différents types de balises que vous pouvez trouver dans tout le système:"
+  "tags.desc_list": "Voici les différents types de balises que vous pouvez trouver dans tout le système:",
+  "title": "Configuration courante"
 }

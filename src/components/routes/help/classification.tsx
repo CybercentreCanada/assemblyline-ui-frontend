@@ -17,6 +17,9 @@ export default function HelpClassification() {
 
   return c12nDef.enforce ? (
     <PageCenter margin={4} width="100%">
+      <div style={{ marginBottom: theme.spacing(4), textAlign: 'left' }}>
+        <Typography variant="h4">{t('title')}</Typography>
+      </div>
       <div style={{ textAlign: 'left', paddingBottom: sp4 }}>
         <Typography variant="h5" gutterBottom>
           {t('desc_title')}

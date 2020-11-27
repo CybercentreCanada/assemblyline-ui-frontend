@@ -44,6 +44,9 @@ export default function Configuration() {
   return (
     <PageFullWidth margin={4}>
       <div style={{ textAlign: 'left' }}>
+        <div style={{ marginBottom: theme.spacing(4) }}>
+          <Typography variant="h4">{t('title')}</Typography>
+        </div>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <Typography variant="h6" gutterBottom>
             {t('tags')}

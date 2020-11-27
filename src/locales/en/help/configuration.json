@@ -12,5 +12,6 @@
   "priorities.max": "maximum",
   "tags": "Tags",
   "tags.desc": "Assemblyline pulls potentially interesting identifiers and assign them a type. Assemblyline calls these tags.",
-  "tags.desc_list": "Below are the different tag types that you can find throughout the system:"
+  "tags.desc_list": "Below are the different tag types that you can find throughout the system:",
+  "title": "Current Configuration"
 }

@@ -10,6 +10,7 @@
   "protected": "Nécessite une authentification",
   "require_type": "Types d'utilisateurs requis",
   "required_priv": "Privilèges requis",
+  "title": "Documentation de l'API",
   "user_type.admin": "Administrateur",
   "user_type.signature_importer": "Importateur de signature",
   "user_type.signature_manager": "Gestionaire de signature",

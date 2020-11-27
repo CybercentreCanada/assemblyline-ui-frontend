@@ -15,6 +15,7 @@
   "result_a_res_2_p2": " car la classification des résultats est supérieure à la classification du fichier lui-même.",
   "result_desc": "Les différents services Assemblyline produiront leurs résultats à différents niveaux de classification en fonction de la technique / de l'outil utilisé pour fournir le résultat. Pour empêcher le moteur de recherche d'afficher les résultats des fichiers classifiés aux utilisateurs non classés, le système appliquera la classification maximale entre la classification des fichiers et la classification des résultats du service aux résultats du fichier.",
   "result_title": "Les résultats des services ont également une classification!",
+  "title": "Aide à la Classification",
   "submission_a_1": "<bold>Soumission1</bold> est classée ",
   "submission_a_2": "<bold>Soumission2</bold> est classée ",
   "submission_a_3": "<bold>Fichier1</bold> est dans les deux soumissions.",

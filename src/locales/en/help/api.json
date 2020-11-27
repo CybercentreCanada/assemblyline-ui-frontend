@@ -10,6 +10,7 @@
   "protected": "Requires login",
   "require_type": "Required user types",
   "required_priv": "Required priviledges",
+  "title": "API Documentation",
   "user_type.admin": "Administrator",
   "user_type.signature_importer": "Signature Importer",
   "user_type.signature_manager": "Signature Manager",

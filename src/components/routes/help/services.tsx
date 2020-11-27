@@ -85,6 +85,8 @@ function ServiceCard({ service }) {
 
 export default function Services() {
   const apiCall = useMyAPI();
+  const { t } = useTranslation(['helpServices']);
+  const theme = useTheme();
   const [services, setServices] = useState(null);
   const minCardHeight = '240px';
 
@@ -100,25 +102,26 @@ export default function Services() {
   }, []);
   return (
     <PageFullWidth margin={4}>
-      <div style={{ textAlign: 'left' }}>
-        {services ? (
-          <Grid container spacing={2}>
-            {services.map((s, i) => (
-              <Grid key={i} item xs={12} md={6} lg={4} xl={3}>
-                <ServiceCard service={s} />
-              </Grid>
-            ))}
-          </Grid>
-        ) : (
-          <Grid container spacing={2}>
-            {[...Array(8)].map((_, i) => (
-              <Grid key={i} item xs={12} md={6} lg={4} xl={3}>
-                <Skeleton variant="rect" style={{ height: minCardHeight }} />
-              </Grid>
-            ))}
-          </Grid>
-        )}
+      <div style={{ marginBottom: theme.spacing(4) }}>
+        <Typography variant="h4">{t('title')}</Typography>
       </div>
+      {services ? (
+        <Grid container spacing={2}>
+          {services.map((s, i) => (
+            <Grid key={i} item xs={12} md={6} lg={4} xl={3}>
+              <ServiceCard service={s} />
+            </Grid>
+          ))}
+        </Grid>
+      ) : (
+        <Grid container spacing={2}>
+          {[...Array(8)].map((_, i) => (
+            <Grid key={i} item xs={12} md={6} lg={4} xl={3}>
+              <Skeleton variant="rect" style={{ height: minCardHeight }} />
+            </Grid>
+          ))}
+        </Grid>
+      )}
     </PageFullWidth>
   );
 }

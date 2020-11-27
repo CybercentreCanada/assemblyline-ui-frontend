@@ -144,25 +144,34 @@ export default function ApiDoc() {
   return (
     <PageCenter margin={4} width="100%">
       <div style={{ textAlign: 'left' }}>
-        {apiList && apiSelected ? (
-          <Select
-            id="api"
-            value={apiSelected}
-            onChange={event => setApiSelected(event.target.value)}
-            variant="outlined"
-            margin="dense"
-          >
-            {apiList.map((version, index) => {
-              return (
-                <MenuItem key={index} value={version}>
-                  {version.replace('v', t('version')) + t('version_end')}
-                </MenuItem>
-              );
-            })}
-          </Select>
-        ) : (
-          <Skeleton variant="rect" style={{ height: '2rem', width: '14rem' }} />
-        )}
+        <div style={{ marginBottom: theme.spacing(4) }}>
+          <Grid container>
+            <Grid item xs={12} sm>
+              <Typography variant="h4">{t('title')}</Typography>
+            </Grid>
+            <Grid item xs={12} sm style={{ textAlign: 'end' }}>
+              {apiList && apiSelected ? (
+                <Select
+                  id="api"
+                  value={apiSelected}
+                  onChange={event => setApiSelected(event.target.value)}
+                  variant="outlined"
+                  margin="dense"
+                >
+                  {apiList.map((version, index) => {
+                    return (
+                      <MenuItem key={index} value={version}>
+                        {version.replace('v', t('version')) + t('version_end')}
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              ) : (
+                <Skeleton variant="rect" style={{ display: 'inline-block', height: '2rem', width: '14rem' }} />
+              )}
+            </Grid>
+          </Grid>
+        </div>
         {apiDefinition ? (
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             {Object.keys(apiDefinition.blueprints).map((bp, i) => {
