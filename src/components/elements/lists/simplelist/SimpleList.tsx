@@ -72,9 +72,8 @@ const SimpleList: React.FC<SimpleListProps> = ({
 
   // Scroll handler to track scroll position in order check if it has hit the scrollThreshold.
   const onScroll = () => {
-    console.log('scrolling...');
     const fH = outerEL.current.getBoundingClientRect().height;
-    const sT = innerEL.current.scrollTop;
+    const sT = outerEL.current.scrollTop;
     const tH = innerEL.current.scrollHeight;
     const cP = sT + fH;
     const scrollPerc = Math.ceil((cP / tH) * 100);
@@ -92,13 +91,20 @@ const SimpleList: React.FC<SimpleListProps> = ({
   }, [scrollReset, scrollLoadNextThreshold]);
 
   return (
-    <div ref={outerEL} className={classes.outer} onScroll={onScrollEnabled ? onScroll : null}>
+    <div
+      id={id}
+      tabIndex={0}
+      ref={outerEL}
+      className={classes.outer}
+      onScroll={onScrollEnabled ? onScroll : null}
+      onKeyDown={!loading ? onKeyDown : null}
+    >
       {loading && !disableProgress && (
         <div className={classes.progressCt}>
           <CircularProgress className={classes.progressSpinner} />
         </div>
       )}
-      <div ref={innerEL} className={classes.inner} tabIndex={0} onKeyDown={!loading ? onKeyDown : null}>
+      <div ref={innerEL} className={classes.inner}>
         {items.map((item, index) => (
           <ListItemBase
             key={`list.rowitem[${index}]`}

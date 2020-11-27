@@ -1,8 +1,9 @@
-import { Box, Drawer, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
+import { Box, Drawer, makeStyles, RootRef, useMediaQuery, useScrollTrigger, useTheme } from '@material-ui/core';
 import AccountTreeIcon from '@material-ui/icons/AccountTree';
 import CloseIcon from '@material-ui/icons/Close';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import StarIcon from '@material-ui/icons/Star';
+import useAppLayout from 'commons/components/hooks/useAppLayout';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import FlexPort from 'components/elements/layout/flexers/FlexPort';
 import FlexVertical from 'components/elements/layout/flexers/FlexVertical';
@@ -13,7 +14,7 @@ import SimpleList from 'components/elements/lists/simplelist/SimpleList';
 import SearchBar from 'components/elements/search/search-bar';
 import SearchQuery, { SearchQueryFilters } from 'components/elements/search/search-query';
 import Classification from 'components/visual/Classification';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FiFilter } from 'react-icons/fi';
 import AlertActionsMenu from './alert-actions-menu';
 import AlertDetails from './alert-details';
@@ -85,6 +86,7 @@ const Alerts: React.FC = () => {
 
   // API Promise hook
   const { onGetAlert, onApplyWorkflowAction } = usePromiseAPI();
+  const { setAppbarState } = useAppLayout();
 
   // Define required states...
   const [searching, setSearching] = useState<boolean>(false);
@@ -94,6 +96,20 @@ const Alerts: React.FC = () => {
     open: false,
     type: null
   });
+
+  // Watch scroll of left panel and hide appbar on scrolltrigger.
+
+  // Root ref to use as target of scrolltrigger hook.
+  const listRef = useRef<HTMLDivElement>();
+  // Follow the simply list scrollbar and get notified when is reaches trigger.
+  const scrollTrigger = useScrollTrigger({
+    disableHysteresis: true,
+    target: listRef.current
+  });
+  // Watch for scrollTrigger changes and hide the topbar if trigger reached.
+  useEffect(() => {
+    setAppbarState(!scrollTrigger);
+  }, [setAppbarState, scrollTrigger]);
 
   // splitlayout hook
   const { openRight, closeRight } = useSplitLayout(ALERT_SPLITLAYOUT_ID);
@@ -114,10 +130,6 @@ const Alerts: React.FC = () => {
 
     // Close right of split panel if open.
     closeRight();
-    // if (splitPanel.open) {
-
-    //   setSplitPanel({ ...splitPanel, open: false });
-    // }
 
     // Close drawer if its open.
     if (drawer.open) {
@@ -333,26 +345,28 @@ const Alerts: React.FC = () => {
       </div>
       <FlexPort>
         <SplitLayout
-          id="al.alerts.splitlayout"
+          id={ALERT_SPLITLAYOUT_ID}
           disableManualResize
           initLeftWidthPerc={50}
           leftMinWidth={500}
           rightMinWidth={500}
           left={
-            <SimpleList
-              id="al.alerts.simplelist"
-              scrollInfinite
-              scrollReset={scrollReset}
-              scrollLoadNextThreshold={75}
-              loading={loading || searching}
-              items={alerts}
-              onItemSelected={onItemSelected}
-              onRenderRow={onRenderListRow}
-              onRenderActions={onRenderListActions}
-              onLoadNext={_onLoadMore}
-              onCursorChange={onListCursorChanges}
-              disableProgress
-            />
+            <RootRef rootRef={listRef}>
+              <SimpleList
+                id={ALERT_SIMPLELIST_ID}
+                scrollInfinite
+                scrollReset={scrollReset}
+                scrollLoadNextThreshold={75}
+                loading={loading || searching}
+                items={alerts}
+                onItemSelected={onItemSelected}
+                onRenderRow={onRenderListRow}
+                onRenderActions={onRenderListActions}
+                onLoadNext={_onLoadMore}
+                onCursorChange={onListCursorChanges}
+                disableProgress
+              />
+            </RootRef>
           }
           right={
             splitPanel.item ? (

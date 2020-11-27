@@ -91,14 +91,15 @@ const useSimpleListStyles = makeStyles(theme => ({
   outer: {
     position: 'relative',
     display: 'flex',
-    flexDirection: 'column',
-    height: '100%'
+    flexDirection: 'row',
+    overflow: 'auto',
+    height: '100%',
+    width: '100%',
+    outline: 'none'
   },
   inner: {
     position: 'relative',
-    overflow: 'auto',
-    outline: 'none',
-    height: '100%'
+    width: '100%'
   },
   pagerItems: {
     display: 'flex',
