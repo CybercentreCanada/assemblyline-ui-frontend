@@ -155,19 +155,21 @@ export default function SubmissionDetail() {
       url: `/api/v4/submission/${id}/`,
       onSuccess: api_data => {
         setSubmission(api_data.api_response);
-      }
-    });
-    apiCall({
-      url: `/api/v4/submission/summary/${id}/`,
-      onSuccess: api_data => {
-        setHighlightMap(api_data.api_response.map);
-        setSummary(api_data.api_response);
-      }
-    });
-    apiCall({
-      url: `/api/v4/submission/tree/${id}/`,
-      onSuccess: api_data => {
-        setTree(api_data.api_response);
+        if (api_data.api_response.state === 'completed') {
+          apiCall({
+            url: `/api/v4/submission/summary/${id}/`,
+            onSuccess: summ_data => {
+              setHighlightMap(summ_data.api_response.map);
+              setSummary(summ_data.api_response);
+            }
+          });
+          apiCall({
+            url: `/api/v4/submission/tree/${id}/`,
+            onSuccess: tree_data => {
+              setTree(tree_data.api_response);
+            }
+          });
+        }
       }
     });
     // eslint-disable-next-line
