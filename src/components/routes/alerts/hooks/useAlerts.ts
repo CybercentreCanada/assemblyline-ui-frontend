@@ -71,6 +71,7 @@ interface UsingAlerts {
   priorityFilters: SearchFilter[];
   statusFilters: SearchFilter[];
   valueFilters: SearchFilter[];
+  updateQuery: (query: SearchQuery) => void;
   onLoad: (onComplete?: (success: boolean) => void) => void;
   onLoadMore: (onComplete?: (success: boolean) => void) => void;
 }
@@ -80,7 +81,9 @@ export default function useAlerts(pageSize: number): UsingAlerts {
   const location = useLocation();
   const apiCall = useMyAPI();
   const { indexes: fieldIndexes } = useAppContext();
-  const [searchQuery] = useState<SearchQuery>(new SearchQuery(location.pathname, location.search, pageSize));
+  const [searchQuery, setSearchQuery] = useState<SearchQuery>(
+    new SearchQuery(location.pathname, location.search, pageSize)
+  );
   const [fields, setFields] = useState<ALField[]>([]);
   const [statusFilters, setStatusFilters] = useState<SearchFilter[]>([]);
   const [priorityFilters, setPriorityFilters] = useState<SearchFilter[]>([]);
@@ -139,6 +142,8 @@ export default function useAlerts(pageSize: number): UsingAlerts {
 
   // Hook API: get alerts for specified index.
   const onLoadMore = (onComplete?: (success: boolean) => void) => {
+    console.log('loading more...');
+
     // Move offset by one increment.
     searchQuery.tickOffset();
     // reference the current offset now incase it changes again before callback is executed
@@ -274,6 +279,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
     priorityFilters,
     labelFilters,
     valueFilters,
+    updateQuery: setSearchQuery,
     onLoad,
     onLoadMore
   };

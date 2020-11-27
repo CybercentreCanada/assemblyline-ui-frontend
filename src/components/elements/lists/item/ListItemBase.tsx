@@ -35,7 +35,7 @@ const ListItemBase: React.FC<ListItemBaseProps> = React.memo(
       }
     }, [onClick, item, index]);
 
-    // console.log(`rendering: ${index}`);
+    console.log(`rendering: ${index}`);
 
     const onItemActionsClick = useCallback(event => event.stopPropagation(), []);
 

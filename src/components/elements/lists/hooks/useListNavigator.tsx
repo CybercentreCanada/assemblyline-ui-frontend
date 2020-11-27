@@ -1,3 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useCallback } from 'react';
+
 export const LIST_SELECT_EVENTNAME = 'mui.elements.list.cursor.set';
 export const LIST_SELECT_NEXT_EVENTNAME = 'mui.elements.list.cursor.next';
 export const LIST_SELECT_PREVIOUS_EVENTNAME = 'mui.elements.list.cursor.previous';
@@ -30,6 +33,10 @@ export default function useList(listId: string): UsingList {
       window.removeEventListener(`${LIST_SELECT_PREVIOUS_EVENTNAME}.${listId}`, handlers.onSelectPrevious);
     };
   };
-
-  return { select, selectNext, selectPrevious, register };
+  return {
+    select: useCallback(select, []),
+    selectNext: useCallback(selectNext, []),
+    selectPrevious: useCallback(selectPrevious, []),
+    register: useCallback(register, [])
+  };
 }

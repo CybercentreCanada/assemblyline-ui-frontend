@@ -1,3 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useCallback } from 'react';
+
 export const SPLITLAYOUT_LEFT_OPEN_EVENTNAME = 'mui.elements.splitview.left.open';
 export const SPLITLAYOUT_LEFT_CLOSE_EVENTNAME = 'mui.elements.splitview.left.close';
 export const SPLITLAYOUT_LEFT_TOGGLE_EVENTNAME = 'mui.elements.splitview.left.toggle';
@@ -67,12 +70,12 @@ export default function useSplitLayout(id: string): UsingSplitLayout {
   };
 
   return {
-    openLeft,
-    closeLeft,
-    toggleLeft,
-    openRight,
-    closeRight,
-    toggleRight,
-    register
+    openLeft: useCallback(openLeft, []),
+    closeLeft: useCallback(closeLeft, []),
+    toggleLeft: useCallback(toggleLeft, []),
+    openRight: useCallback(openRight, []),
+    closeRight: useCallback(closeRight, []),
+    toggleRight: useCallback(toggleRight, []),
+    register: useCallback(register, [])
   };
 }

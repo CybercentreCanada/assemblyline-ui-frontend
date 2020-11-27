@@ -6,6 +6,7 @@ import StarIcon from '@material-ui/icons/Star';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import FlexPort from 'components/elements/layout/flexers/FlexPort';
 import FlexVertical from 'components/elements/layout/flexers/FlexVertical';
+import useSplitLayout from 'components/elements/layout/hooks/useSplitLayout';
 // import Booklist from 'components/elements/lists/booklist/booklist';
 import SplitLayout from 'components/elements/layout/splitlayout/SplitLayout';
 import SimpleList from 'components/elements/lists/simplelist/SimpleList';
@@ -38,6 +39,10 @@ export interface AlertDrawerState {
   };
 }
 
+//
+const ALERT_SPLITLAYOUT_ID = 'al.alerts.splitlayout';
+const ALERT_SIMPLELIST_ID = 'al.alerts.simplelist';
+
 // Just indicates whether there are any filters currently set..
 const hasFilters = (filters: SearchQueryFilters): boolean => {
   const { statuses, priorities, labels, queries } = filters;
@@ -65,8 +70,7 @@ const Alerts: React.FC = () => {
   const theme = useTheme();
   const {
     loading,
-    buffer,
-    // book,
+    alerts,
     total,
     fields,
     searchQuery,
@@ -74,7 +78,6 @@ const Alerts: React.FC = () => {
     statusFilters,
     priorityFilters,
     labelFilters,
-    // updateBook,
     updateQuery,
     onLoad,
     onLoadMore
@@ -86,11 +89,14 @@ const Alerts: React.FC = () => {
   // Define required states...
   const [searching, setSearching] = useState<boolean>(false);
   const [scrollReset, setScrollReset] = useState<boolean>(false);
-  const [splitPanel, setSplitPanel] = useState<{ open: boolean; item: AlertItem }>({ open: false, item: null });
+  const [splitPanel, setSplitPanel] = useState<{ item: AlertItem }>({ item: null });
   const [drawer, setDrawer] = useState<AlertDrawerState>({
     open: false,
     type: null
   });
+
+  // splitlayout hook
+  const { openRight, closeRight } = useSplitLayout(ALERT_SPLITLAYOUT_ID);
 
   // Define some references.
   const searchTextValue = useRef<string>(searchQuery.getQuery());
@@ -107,9 +113,11 @@ const Alerts: React.FC = () => {
     setScrollReset(true);
 
     // Close right of split panel if open.
-    if (splitPanel.open) {
-      setSplitPanel({ ...splitPanel, open: false });
-    }
+    closeRight();
+    // if (splitPanel.open) {
+
+    //   setSplitPanel({ ...splitPanel, open: false });
+    // }
 
     // Close drawer if its open.
     if (drawer.open) {
@@ -136,10 +144,10 @@ const Alerts: React.FC = () => {
 
     // Reset scroll for each new search.
     setScrollReset(true);
+
     // Close right of split panel if open.
-    if (splitPanel.open) {
-      setSplitPanel({ ...splitPanel, open: false });
-    }
+    closeRight();
+
     // Refetch initial data.
     onLoad();
   };
@@ -149,13 +157,12 @@ const Alerts: React.FC = () => {
     (item: AlertItem) => {
       if (item) {
         onGetAlert(item.alert_id).then(alert => {
-          setSplitPanel({ open: true, item: alert });
+          openRight();
+          setSplitPanel({ item: alert });
         });
-      } else {
-        setSplitPanel(_sp => ({ ..._sp, open: false }));
       }
     },
-    [onGetAlert]
+    [onGetAlert, openRight]
   );
 
   // Handler for when loading more alerts [read bottom of scroll area]
@@ -176,9 +183,7 @@ const Alerts: React.FC = () => {
     onLoad();
 
     // Close right of split panel if open.
-    if (splitPanel.open) {
-      setSplitPanel({ ...splitPanel, open: false });
-    }
+    closeRight();
 
     // Close the Filters drawer.
     if (drawer.open) {
@@ -231,9 +236,7 @@ const Alerts: React.FC = () => {
     onLoad();
 
     // Close right of split panel if open.
-    if (splitPanel.open) {
-      setSplitPanel({ ...splitPanel, open: false });
-    }
+    closeRight();
 
     // Close the Filters drawer.
     if (drawer.open) {
@@ -246,9 +249,6 @@ const Alerts: React.FC = () => {
     onApplyWorkflowAction(drawer.actionData.query, selectedStatus, selectedPriority, selectedLabels).then(() => {
       setDrawer({ ...drawer, open: false });
       onLoad();
-      if (splitPanel.open) {
-        onItemSelected(splitPanel.item);
-      }
     });
   };
 
@@ -267,18 +267,16 @@ const Alerts: React.FC = () => {
   };
 
   // Handler for with close the right side of split panel.
-  const onSplitPanelRightClose = () => {
-    setSplitPanel({ open: false, item: splitPanel.item });
+  const onSplitLayoutCloseRight = () => {
+    closeRight();
   };
 
   // Handler for when the cursor on the list changes via keybaord event.
   const onListCursorChanges = (cursor: number, item: AlertItem) => {
-    if (splitPanel.open) {
-      onItemSelected(item);
-    }
+    onItemSelected(item);
   };
 
-  // ...
+  // Handler to render the action buttons of each list item.
   const onRenderListActions = useCallback(
     (item: AlertItem) => <AlertListItemActions item={item} currentQuery={searchQuery} setDrawer={setDrawer} />,
     [searchQuery]
@@ -336,19 +334,18 @@ const Alerts: React.FC = () => {
       <FlexPort>
         <SplitLayout
           id="al.alerts.splitlayout"
+          disableManualResize
           initLeftWidthPerc={50}
           leftMinWidth={500}
           rightMinWidth={500}
-          // rightDrawerBackgroundColor={theme.palette.background.default}
-          // rightOpen={splitPanel.open}
-          // onRightDrawerClose={onSplitPanelRightClose}
           left={
             <SimpleList
               id="al.alerts.simplelist"
-              loading={loading || searching}
-              items={buffer.items}
+              scrollInfinite
               scrollReset={scrollReset}
               scrollLoadNextThreshold={75}
+              loading={loading || searching}
+              items={alerts}
               onItemSelected={onItemSelected}
               onRenderRow={onRenderListRow}
               onRenderActions={onRenderListActions}
@@ -361,7 +358,7 @@ const Alerts: React.FC = () => {
             splitPanel.item ? (
               <Box p={2} pt={0} width="100%">
                 <PageHeader
-                  actions={[{ icon: <CloseIcon />, action: onSplitPanelRightClose }]}
+                  actions={[{ icon: <CloseIcon />, action: onSplitLayoutCloseRight }]}
                   backgroundColor={theme.palette.background.default}
                   elevation={0}
                 >

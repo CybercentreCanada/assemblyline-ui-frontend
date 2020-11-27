@@ -72,6 +72,7 @@ const SimpleList: React.FC<SimpleListProps> = ({
 
   // Scroll handler to track scroll position in order check if it has hit the scrollThreshold.
   const onScroll = () => {
+    console.log('scrolling...');
     const fH = outerEL.current.getBoundingClientRect().height;
     const sT = innerEL.current.scrollTop;
     const tH = innerEL.current.scrollHeight;
