@@ -1,1 +1,21 @@
-{}
+{
+  "canceled": "Afficher les tâches annulées",
+  "debug_info": "Informations de débogage:",
+  "exception": "Afficher les exceptions non gérées",
+  "file_info": "Fichier connexe:",
+  "filter": "Filtrer les erreurs...",
+  "filtered": "erreur qui correspond au filtre",
+  "filtereds": "erreurs qui correspondent au filtre",
+  "header.time": "Créé",
+  "header.service": "Service",
+  "header.message": "Message d'erreur",
+  "header.type": "Type",
+  "maxed": "Afficher la profondeur, les fichiers et les tentatives maximales",
+  "message": "Message d'erreur:",
+  "no_results_desc": "La requête que vous avez exécutée n'a renvoyé aucun résultat.",
+  "no_errors_title": "Aucune erreur trouvée!",
+  "searching": "Recherche en cours...",
+  "title": "Visualisateur d'erreurs",
+  "total": "erreur",
+  "totals": "erreurs"
+}

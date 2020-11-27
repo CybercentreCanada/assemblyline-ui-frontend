@@ -1,1 +1,21 @@
-{}
+{
+  "canceled": "Show cancelled tasks",
+  "debug_info": "Debug Information:",
+  "exception": "Show unhandled exceptions",
+  "file_info": "Related file:",
+  "filter": "Filter errors ...",
+  "filtered": "error matching filter",
+  "filtereds": "errors matching filter",
+  "header.time": "Created",
+  "header.service": "Service",
+  "header.message": "Error Message",
+  "header.type": "Type",
+  "maxed": "Show maximum depth, files and retries",
+  "message": "Error message:",
+  "no_results_desc": "The query that you ran did not return any results.",
+  "no_errors_title": "No errors found!",
+  "searching": "Searching...",
+  "title": "Error Viewer",
+  "total": "error",
+  "totals": "errors"
+}
