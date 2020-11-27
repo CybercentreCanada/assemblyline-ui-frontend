@@ -1,14 +1,16 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { CircularProgress } from '@material-ui/core';
+import useListKeyboard from 'commons/components/elements/lists/hooks/useListKeyboard';
+import useListStyles from 'commons/components/elements/lists/hooks/useListStyles';
+import ListItemBase, { LineItem } from 'commons/components/elements/lists/item/ListItemBase';
 import React, { useCallback, useLayoutEffect, useRef } from 'react';
-import useListKeyboard from '../hooks/useListKeyboard';
-import useListStyles from '../hooks/useListStyles';
-import ListRow, { LineItem } from '../list-item';
 
 interface SimpleListProps {
+  id: string;
   loading: boolean;
   disableProgress?: boolean;
+  scrollInfinite?: boolean;
   scrollReset?: boolean;
   scrollLoadNextThreshold?: number;
   items: LineItem[];
@@ -20,9 +22,11 @@ interface SimpleListProps {
 }
 
 const SimpleList: React.FC<SimpleListProps> = ({
+  id,
   loading,
   items,
   disableProgress = false,
+  scrollInfinite = false,
   scrollLoadNextThreshold = 75,
   scrollReset = false,
   onCursorChange,
@@ -36,7 +40,8 @@ const SimpleList: React.FC<SimpleListProps> = ({
 
   // Configure the list keyboard custom hook.
   const { cursor, setCursor, onKeyDown } = useListKeyboard({
-    infinite: true,
+    id,
+    infinite: scrollInfinite,
     count: items.length,
     onEscape: () => onItemSelected(null),
     onEnter: (_cursor: number) => onItemSelected(items[_cursor]),
@@ -54,7 +59,7 @@ const SimpleList: React.FC<SimpleListProps> = ({
   const nextScrollThreshold = useRef<number>(scrollLoadNextThreshold);
 
   // Enable scroll event handler?
-  const onScrollEnabled = !loading && onLoadNext;
+  const onScrollEnabled = !loading && onLoadNext && scrollInfinite;
 
   // Memoized callback for when clicking on an item.
   const _onRowClick = useCallback(
@@ -78,7 +83,6 @@ const SimpleList: React.FC<SimpleListProps> = ({
     }
   };
 
-  //
   useLayoutEffect(() => {
     if (scrollReset) {
       nextScrollThreshold.current = scrollLoadNextThreshold;
@@ -95,16 +99,16 @@ const SimpleList: React.FC<SimpleListProps> = ({
       )}
       <div ref={innerEL} className={classes.inner} tabIndex={0} onKeyDown={!loading ? onKeyDown : null}>
         {items.map((item, index) => (
-          <ListRow
+          <ListItemBase
             key={`list.rowitem[${index}]`}
-            loaded
             index={index}
             selected={cursor === index}
             item={item}
             onRenderActions={onRenderActions}
             onClick={_onRowClick}
-            onRenderRow={onRenderRow}
-          />
+          >
+            {onRenderRow}
+          </ListItemBase>
         ))}
       </div>
     </div>

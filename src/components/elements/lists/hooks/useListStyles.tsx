@@ -128,6 +128,7 @@ const useSimpleListStyles = makeStyles(theme => ({
 
 const useListItemStyles = makeStyles(theme => ({
   itemCt: {
+    // height: '100%',
     position: 'relative',
     '&:hover': {
       cursor: 'pointer',
@@ -145,9 +146,12 @@ const useListItemStyles = makeStyles(theme => ({
   },
   itemOuter: {
     position: 'relative',
+    // height: '100%',
     overflow: 'auto'
   },
-  itemInner: {},
+  itemInner: {
+    // height: '100%'
+  },
   itemDivider: {
     position: 'absolute',
     bottom: 0,
@@ -164,8 +168,8 @@ const useListItemStyles = makeStyles(theme => ({
     // minWidth: 400,
     // border: '1px solid hsl(0, 0%, 80%)',
     '& button': {
-      marginRight: theme.spacing(1)
-      // boxShadow: theme.shadows[2]
+      marginRight: theme.spacing(1),
+      boxShadow: theme.shadows[2]
     }
   }
 }));
