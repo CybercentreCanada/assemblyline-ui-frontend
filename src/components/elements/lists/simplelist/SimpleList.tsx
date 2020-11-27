@@ -1,9 +1,9 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { CircularProgress } from '@material-ui/core';
-import useListKeyboard from 'commons/components/elements/lists/hooks/useListKeyboard';
-import useListStyles from 'commons/components/elements/lists/hooks/useListStyles';
-import ListItemBase, { LineItem } from 'commons/components/elements/lists/item/ListItemBase';
+import useListKeyboard from 'components/elements/lists/hooks/useListKeyboard';
+import useListStyles from 'components/elements/lists/hooks/useListStyles';
+import ListItemBase, { LineItem } from 'components/elements/lists/item/ListItemBase';
 import React, { useCallback, useLayoutEffect, useRef } from 'react';
 
 interface SimpleListProps {

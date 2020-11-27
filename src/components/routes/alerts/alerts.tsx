@@ -4,10 +4,11 @@ import CloseIcon from '@material-ui/icons/Close';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import StarIcon from '@material-ui/icons/Star';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
-import SimpleList from 'components/elements/lists/simplelist/simplelist';
+import FlexPort from 'components/elements/layout/flexers/FlexPort';
+import FlexVertical from 'components/elements/layout/flexers/FlexVertical';
 // import Booklist from 'components/elements/lists/booklist/booklist';
-import SplitPanel from 'components/elements/panels/split-panel';
-import Viewport from 'components/elements/panels/viewport';
+import SplitLayout from 'components/elements/layout/splitlayout/SplitLayout';
+import SimpleList from 'components/elements/lists/simplelist/SimpleList';
 import SearchBar from 'components/elements/search/search-bar';
 import SearchQuery, { SearchQueryFilters } from 'components/elements/search/search-query';
 import Classification from 'components/visual/Classification';
@@ -287,7 +288,7 @@ const Alerts: React.FC = () => {
   // useEffect(() => setQueryFilters(query), [query]);
 
   return (
-    <Box>
+    <FlexVertical>
       <div style={{ marginRight: theme.spacing(2), marginLeft: theme.spacing(2), position: 'relative' }}>
         <SearchBar
           initValue={searchQuery.getQuery()}
@@ -332,18 +333,18 @@ const Alerts: React.FC = () => {
           </Box>
         </SearchBar>
       </div>
-      <Viewport>
-        <SplitPanel
+      <FlexPort>
+        <SplitLayout
+          id="al.alerts.splitlayout"
+          initLeftWidthPerc={50}
           leftMinWidth={500}
-          leftInitWidthPerc={60}
-          rightMinWidth={600}
-          rightDrawerBreakpoint={1100}
-          rightDrawerWidth={900}
-          rightDrawerBackgroundColor={theme.palette.background.default}
-          rightOpen={splitPanel.open}
-          onRightDrawerClose={onSplitPanelRightClose}
+          rightMinWidth={500}
+          // rightDrawerBackgroundColor={theme.palette.background.default}
+          // rightOpen={splitPanel.open}
+          // onRightDrawerClose={onSplitPanelRightClose}
           left={
             <SimpleList
+              id="al.alerts.simplelist"
               loading={loading || searching}
               items={buffer.items}
               scrollReset={scrollReset}
@@ -376,7 +377,7 @@ const Alerts: React.FC = () => {
             ) : null
           }
         />
-      </Viewport>
+      </FlexPort>
       <Drawer open={drawer.open} anchor="right" onClose={onDrawerClose}>
         <Box p={theme.spacing(0.5)} className={classes.drawerInner}>
           {
@@ -416,7 +417,7 @@ const Alerts: React.FC = () => {
           }
         </Box>
       </Drawer>
-    </Box>
+    </FlexVertical>
   );
 };
 

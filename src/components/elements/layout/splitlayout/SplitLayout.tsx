@@ -3,7 +3,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { IconButton, makeStyles } from '@material-ui/core';
 import MenuOpenIcon from '@material-ui/icons/MenuOpen';
-import useSplitLayout from 'commons/components/elements/layout/hooks/useSplitLayout';
+import useSplitLayout from 'components/elements/layout/hooks/useSplitLayout';
 import React, { useEffect, useRef, useState } from 'react';
 import ReactResizeDetector from 'react-resize-detector';
 import FlexHorizontal from '../flexers/FlexHorizontal';

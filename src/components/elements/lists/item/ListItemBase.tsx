@@ -2,7 +2,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 
 import { Divider, IconButtonProps } from '@material-ui/core';
-import useListStyles from 'commons/components/elements/lists/hooks/useListStyles';
+import useListStyles from 'components/elements/lists/hooks/useListStyles';
 import React, { useCallback } from 'react';
 
 export interface LineItem {

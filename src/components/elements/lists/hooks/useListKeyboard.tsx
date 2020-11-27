@@ -1,5 +1,5 @@
-import { isArrowDown, isArrowUp, isEnter, isEscape } from 'commons/components/elements/utils/keyboard';
-import Throttler from 'commons/components/elements/utils/throttler';
+import { isArrowDown, isArrowUp, isEnter, isEscape } from 'components/elements/utils/keyboard';
+import Throttler from 'components/elements/utils/throttler';
 import { useState } from 'react';
 
 const THROTTLER = new Throttler(10);
