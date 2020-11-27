@@ -1,4 +1,4 @@
-import { ThemeProvider, useMediaQuery } from '@material-ui/core';
+import { makeStyles, ThemeProvider, useMediaQuery } from '@material-ui/core';
 import useAppTheme, { AppThemeProps } from 'commons/components/hooks/useAppTheme';
 import { SnackbarProvider } from 'notistack';
 import React, { useState } from 'react';
@@ -51,11 +51,18 @@ const getInitialTheme = (defaultTheme, prefersDarkMode) => {
   return initialTheme;
 };
 
+const useStyles = makeStyles(theme => ({
+  snackroot: {
+    [theme.breakpoints.only('xs')]: { wordBreak: 'break-all' }
+  }
+}));
+
 // Implementation of the AppContext provider component.
 // This should be the root application component renderered by the index.tsx into the dom element-id 'root'
 const AppContextProvider: React.FC<AppProviderProps> = ({ defaultTheme, colors, defaultContext, children }) => {
   // Application provided context.
   const [context, setContext] = useState<any>(defaultContext);
+  const classes = useStyles();
 
   // Theme state.
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -119,7 +126,7 @@ const AppContextProvider: React.FC<AppProviderProps> = ({ defaultTheme, colors, 
       }}
     >
       <ThemeProvider theme={appTheme}>
-        <SnackbarProvider>{children}</SnackbarProvider>
+        <SnackbarProvider classes={{ root: classes.snackroot }}>{children}</SnackbarProvider>
       </ThemeProvider>
     </AppContext.Provider>
   );
