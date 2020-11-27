@@ -15,11 +15,11 @@ import CloseIcon from '@material-ui/icons/Close';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import StarIcon from '@material-ui/icons/Star';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
+import PageContent from 'commons/components/layout/pages/PageContent';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import FlexPort from 'components/elements/layout/flexers/FlexPort';
 import FlexVertical from 'components/elements/layout/flexers/FlexVertical';
 import useSplitLayout from 'components/elements/layout/hooks/useSplitLayout';
-// import Booklist from 'components/elements/lists/booklist/booklist';
 import SplitLayout from 'components/elements/layout/splitlayout/SplitLayout';
 import ListNavigator from 'components/elements/lists/navigator/ListNavigator';
 import SimpleList from 'components/elements/lists/simplelist/SimpleList';
@@ -27,6 +27,7 @@ import SearchBar from 'components/elements/search/search-bar';
 import SearchQuery, { SearchQueryFilters } from 'components/elements/search/search-query';
 import Classification from 'components/visual/Classification';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FiFilter } from 'react-icons/fi';
 import AlertDetails from './alert-details';
 import AlertListItem from './alert-list-item';
@@ -64,7 +65,7 @@ const hasFilters = (filters: SearchQueryFilters): boolean => {
 // Some generated style classes
 const useStyles = makeStyles(theme => ({
   pageTitle: {
-    paddingTop: theme.spacing(3),
+    // paddingTop: theme.spacing(3),
     paddingBottom: theme.spacing(3)
   },
   drawerInner: {
@@ -83,6 +84,7 @@ const useStyles = makeStyles(theme => ({
 
 // The Alerts functional component.
 const Alerts: React.FC = () => {
+  const { t } = useTranslation('alerts');
   const classes = useStyles();
   const theme = useTheme();
   const {
@@ -102,7 +104,7 @@ const Alerts: React.FC = () => {
 
   // API Promise hook
   const { onGetAlert, onApplyWorkflowAction } = usePromiseAPI();
-  const { setAppbarState } = useAppLayout();
+  const { setAppbarState, currentLayout, autoHideAppbar } = useAppLayout();
 
   // Define required states...
   const [searching, setSearching] = useState<boolean>(false);
@@ -122,10 +124,11 @@ const Alerts: React.FC = () => {
     disableHysteresis: true,
     target: listRef.current
   });
-  // Watch for scrollTrigger changes and hide the topbar if trigger reached.
+  // Watch for hideTopBar changes and hide the topbar if trigger reached.
+  const hideTopBar = currentLayout === 'side' && autoHideAppbar && scrollTrigger;
   useEffect(() => {
-    setAppbarState(!scrollTrigger);
-  }, [setAppbarState, scrollTrigger]);
+    setAppbarState(!hideTopBar);
+  }, [setAppbarState, hideTopBar]);
 
   // splitlayout hook
   const { openRight, closeRight } = useSplitLayout(ALERT_SPLITLAYOUT_ID);
@@ -315,66 +318,61 @@ const Alerts: React.FC = () => {
 
   return (
     <FlexVertical>
-      <div
-        style={{
-          marginTop: theme.spacing(1),
-          marginRight: theme.spacing(4),
-          marginLeft: theme.spacing(4),
-          position: 'relative'
-        }}
-      >
-        <Slide appear={false} direction="down" in={!scrollTrigger} mountOnEnter unmountOnExit>
-          <div className={classes.pageTitle}>
-            <Typography variant="h4">Alerts</Typography>
-          </div>
-        </Slide>
+      <PageContent mt={4} mr={4} mb={0} ml={4}>
+        <div style={{ position: 'relative' }}>
+          <Slide appear={false} direction="down" in={!hideTopBar} mountOnEnter unmountOnExit>
+            <div className={classes.pageTitle}>
+              <Typography variant="h4">{t('alerts')}</Typography>
+            </div>
+          </Slide>
 
-        <SearchBar
-          initValue={searchQuery.getQuery()}
-          searching={searching || loading}
-          suggestions={buildSearchSuggestions()}
-          placeholder="Filter alerts..."
-          onValueChange={onFilterValueChange}
-          onClear={onClearSearch}
-          onSearch={onSearch}
-          buttons={[
-            {
-              icon: <StarIcon />,
-              props: {
-                onClick: () => setDrawer({ open: true, type: 'favorites' })
+          <SearchBar
+            initValue={searchQuery.getQuery()}
+            searching={searching || loading}
+            suggestions={buildSearchSuggestions()}
+            placeholder="Filter alerts..."
+            onValueChange={onFilterValueChange}
+            onClear={onClearSearch}
+            onSearch={onSearch}
+            buttons={[
+              {
+                icon: <StarIcon />,
+                props: {
+                  onClick: () => setDrawer({ open: true, type: 'favorites' })
+                }
+              },
+              {
+                icon: <FilterListIcon />,
+                props: {
+                  onClick: () => setDrawer({ open: true, type: 'filter' })
+                }
+              },
+              {
+                icon: <AccountTreeIcon />,
+                props: {
+                  onClick: () => setDrawer({ open: true, type: 'actions', actionData: { query: searchQuery, total } })
+                }
               }
-            },
-            {
-              icon: <FilterListIcon />,
-              props: {
-                onClick: () => setDrawer({ open: true, type: 'filter' })
-              }
-            },
-            {
-              icon: <AccountTreeIcon />,
-              props: {
-                onClick: () => setDrawer({ open: true, type: 'actions', actionData: { query: searchQuery, total } })
-              }
-            }
-          ]}
-        >
-          <Box className={classes.searchresult}>
-            {isLTEMd ? (
-              <SearchResultLarge
-                loading={loading}
-                searching={searching}
-                total={total}
-                query={searchQuery}
-                onApplyFilters={onApplyFilters}
-              />
-            ) : (
-              <SearchResultSmall loading={loading} searching={searching} total={total} query={searchQuery} />
-            )}
-          </Box>
-        </SearchBar>
-      </div>
+            ]}
+          >
+            <Box className={classes.searchresult}>
+              {isLTEMd ? (
+                <SearchResultLarge
+                  loading={loading}
+                  searching={searching}
+                  total={total}
+                  query={searchQuery}
+                  onApplyFilters={onApplyFilters}
+                />
+              ) : (
+                <SearchResultSmall loading={loading} searching={searching} total={total} query={searchQuery} />
+              )}
+            </Box>
+          </SearchBar>
+        </div>
+      </PageContent>
       <FlexPort>
-        <Box style={{ marginLeft: theme.spacing(4), marginRight: theme.spacing(4), height: '100%' }}>
+        <PageContent mt={0} mr={4} mb={0} ml={4} height="100%">
           <SplitLayout
             id={ALERT_SPLITLAYOUT_ID}
             disableManualResize
@@ -424,7 +422,7 @@ const Alerts: React.FC = () => {
               )
             }
           />
-        </Box>
+        </PageContent>
       </FlexPort>
       <Drawer open={drawer.open} anchor="right" onClose={onDrawerClose}>
         <Box p={theme.spacing(0.5)} className={classes.drawerInner}>

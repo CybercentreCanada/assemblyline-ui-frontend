@@ -36,11 +36,11 @@ const useStyles = makeStyles(theme => ({
     fontStyle: 'italic'
   },
   listactions: {
-    // '& button': {
-    //   // backgroundColor: 'silver'
-    //   marginRight: theme.spacing(1),
-    //   boxShadow: theme.shadows[2]
-    // }
+    '& button': {
+      // backgroundColor: 'silver'
+      marginRight: theme.spacing(1),
+      boxShadow: theme.shadows[2]
+    }
   }
 }));
 
@@ -108,8 +108,6 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
         <div className={classes.listactions}>
           {!item.owner && (
             <IconButton
-              size="small"
-              color="primary"
               title="Take Ownership"
               onClick={() => {
                 setTakeOwnershipConfirmation({ open: true, query: buildActionQuery() });
@@ -119,8 +117,6 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
             </IconButton>
           )}
           <IconButton
-            size="small"
-            color="primary"
             title="Workflow Action"
             onClick={() => {
               console.log('workflow action.');
