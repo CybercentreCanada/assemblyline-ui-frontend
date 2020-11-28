@@ -25,11 +25,10 @@ function AlertFullDetails() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
+  //
   return (
     <PageCenter margin={4} width="100%">
-      <div style={{ textAlign: 'left' }}>
-        {alert ? <AlertDetails item={alert} /> : <Skeleton variant="rect" height={8} />}
-      </div>
+      <div style={{ textAlign: 'left' }}>{alert ? <AlertDetails id="" /> : <Skeleton variant="rect" height={8} />}</div>
     </PageCenter>
   );
 }

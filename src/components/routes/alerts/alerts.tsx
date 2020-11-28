@@ -87,6 +87,9 @@ const Alerts: React.FC = () => {
   const { t } = useTranslation('alerts');
   const classes = useStyles();
   const theme = useTheme();
+  const upMD = useMediaQuery(theme.breakpoints.up('md'));
+
+  // Alerts hook.
   const {
     loading,
     alerts,
@@ -103,7 +106,7 @@ const Alerts: React.FC = () => {
   } = useAlerts(PAGE_SIZE);
 
   // API Promise hook
-  const { onGetAlert, onApplyWorkflowAction } = usePromiseAPI();
+  const { fetchAlert: onGetAlert, onApplyWorkflowAction } = usePromiseAPI();
   const { setAppbarState, currentLayout, autoHideAppbar } = useAppLayout();
 
   // Define required states...
@@ -336,19 +339,19 @@ const Alerts: React.FC = () => {
             onSearch={onSearch}
             buttons={[
               {
-                icon: <StarIcon />,
+                icon: <StarIcon fontSize={upMD ? 'default' : 'small'} />,
                 props: {
                   onClick: () => setDrawer({ open: true, type: 'favorites' })
                 }
               },
               {
-                icon: <FilterListIcon />,
+                icon: <FilterListIcon fontSize={upMD ? 'default' : 'small'} />,
                 props: {
                   onClick: () => setDrawer({ open: true, type: 'filter' })
                 }
               },
               {
-                icon: <AccountTreeIcon />,
+                icon: <AccountTreeIcon fontSize={upMD ? 'default' : 'small'} />,
                 props: {
                   onClick: () => setDrawer({ open: true, type: 'actions', actionData: { query: searchQuery, total } })
                 }
@@ -417,7 +420,7 @@ const Alerts: React.FC = () => {
                       </IconButton>
                     </Box>
                   </PageHeader>
-                  <AlertDetails item={splitPanel.item} />
+                  <AlertDetails id={splitPanel.item.alert_id} />
                 </div>
               )
             }

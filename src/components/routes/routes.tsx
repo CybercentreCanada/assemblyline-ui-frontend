@@ -34,7 +34,7 @@ import Tos from 'components/routes/tos';
 import User from 'components/routes/user';
 import React, { useEffect, useState } from 'react';
 import { matchPath, Redirect, Route, Switch, useLocation } from 'react-router-dom';
-import AlertFullDetails from './alert';
+import AlertDetails from './alerts/alert-details';
 import HeuristicDetail from './manage/heuristic_detail';
 import SignatureDetail from './manage/signature_detail';
 import WorkflowDetail from './manage/workflow_detail';
@@ -67,7 +67,7 @@ const WrappedRoutes = () => {
         <Route exact path="/account" component={Account} />
         <Route exact path="/alerts" component={Alerts} />
         <Route exact path="/alerts/legacy" component={AlertsLegacy} />
-        <Route exact path="/alerts/:id" component={AlertFullDetails} />
+        <Route exact path="/alerts/:id" component={AlertDetails} />
         <Route exact path="/admin" component={Admin} />
         <Route exact path="/admin/errors" component={AdminErrorViewer} />
         <Route exact path="/admin/services" component={AdminServices} />

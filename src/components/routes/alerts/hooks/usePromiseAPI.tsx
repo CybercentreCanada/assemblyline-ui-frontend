@@ -6,7 +6,7 @@ import { AlertItem } from './useAlerts';
 
 // Specification interface of this hook.
 export interface UsingPromiseAPI {
-  onGetAlert: (alertId: string) => Promise<AlertItem>;
+  fetchAlert: (alertId: string) => Promise<AlertItem>;
   onApplyWorkflowAction: (
     query: SearchQuery,
     selectedStatus: string,
@@ -22,7 +22,7 @@ export default function usePromiseAPI(): UsingPromiseAPI {
   const apiCall = useMyAPI();
 
   // Hook API: fetch the alert for the specified alert_id.
-  const onGetAlert = async (alertId: string): Promise<AlertItem> => {
+  const fetchAlert = async (alertId: string): Promise<AlertItem> => {
     return new Promise<AlertItem>((resolve, reject) => {
       const url = `/api/v4/alert/${alertId}/`;
       apiCall({
@@ -113,12 +113,8 @@ export default function usePromiseAPI(): UsingPromiseAPI {
   // Wrap each exposed method in 'useCallback' hook in order to ensure they are memoized and do not
   //  cause re-renders.
   return {
-    onGetAlert: useCallback((alertId: string) => onGetAlert(alertId), []),
-    onApplyWorkflowAction: useCallback(
-      (query: SearchQuery, selectedStatus: string, selectedPriority: string, selectedLabels: string[]) =>
-        onApplyWorkflowAction(query, selectedStatus, selectedPriority, selectedLabels),
-      []
-    ),
-    onTakeOwnership: useCallback((query: SearchQuery) => onTakeOwnership(query), [])
+    fetchAlert: useCallback(fetchAlert, []),
+    onApplyWorkflowAction: useCallback(onApplyWorkflowAction, []),
+    onTakeOwnership: useCallback(onTakeOwnership, [])
   };
 }
