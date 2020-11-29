@@ -11,15 +11,13 @@ interface SimpleListProps {
   id: string;
   loading: boolean;
   disableProgress?: boolean;
-  disableBackgrounds?: boolean;
-  noDivider?: boolean;
   scrollInfinite?: boolean;
   scrollReset?: boolean;
   scrollLoadNextThreshold?: number;
   items: LineItem[];
-  onCursorChange?: (cursor: number, item: LineItem) => void;
-  onItemSelected: (item: LineItem) => void;
-  onRenderRow: (item: LineItem) => React.ReactNode;
+  children: (item: LineItem) => React.ReactNode;
+  onCursorChange?: (item: LineItem, cursor?: number) => void;
+  onItemSelected?: (item: LineItem) => void;
   onRenderActions?: (item: LineItem) => React.ReactNode;
   onLoadNext?: () => void;
 }
@@ -28,35 +26,18 @@ const SimpleList: React.FC<SimpleListProps> = ({
   id,
   loading,
   items,
-  disableProgress,
-  disableBackgrounds,
-  noDivider,
-  scrollInfinite,
+  disableProgress = false,
+  scrollInfinite = false,
   scrollLoadNextThreshold = 75,
-  scrollReset,
+  scrollReset = false,
+  children,
   onCursorChange,
   onItemSelected,
-  onRenderRow,
   onRenderActions,
   onLoadNext
 }) => {
   // Hooks.
   const { simpleListStyles: classes } = useListStyles();
-
-  // Configure the list keyboard custom hook.
-  const { cursor, next, previous, setCursor, onKeyDown } = useListKeyboard({
-    id,
-    infinite: scrollInfinite,
-    count: items.length,
-    onEscape: () => onItemSelected(null),
-    onEnter: (_cursor: number) => onItemSelected(items[_cursor]),
-    onCursorChange: (_cursor: number) => {
-      const item = items[_cursor];
-      if (onCursorChange) {
-        onCursorChange(_cursor, item);
-      }
-    }
-  });
 
   // List Navigator hook to register event handling.
   const { register } = useListNavigator(id);
@@ -66,6 +47,29 @@ const SimpleList: React.FC<SimpleListProps> = ({
   const innerEL = useRef<HTMLDivElement>();
   const nextScrollThreshold = useRef<number>(scrollLoadNextThreshold);
 
+  // Configure the list keyboard custom hook.
+  const { cursor, next, previous, setCursor, onKeyDown } = useListKeyboard({
+    id,
+    infinite: scrollInfinite,
+    count: items.length,
+    onEscape: () => {
+      if (onItemSelected) {
+        onItemSelected(null);
+      }
+    },
+    onEnter: (_cursor: number) => {
+      if (onItemSelected) {
+        onItemSelected(items[_cursor]);
+      }
+    },
+    onCursorChange: (_cursor: number) => {
+      const item = items[_cursor];
+      if (onCursorChange) {
+        onCursorChange(item, _cursor);
+      }
+    }
+  });
+
   // Enable scroll event handler?
   const onScrollEnabled = !loading && onLoadNext && scrollInfinite;
 
@@ -73,7 +77,9 @@ const SimpleList: React.FC<SimpleListProps> = ({
   const _onRowClick = useCallback(
     (_item: LineItem, index: number) => {
       setCursor(index);
-      onItemSelected(_item);
+      if (onItemSelected) {
+        onItemSelected(_item);
+      }
     },
     [setCursor, onItemSelected]
   );
@@ -125,14 +131,12 @@ const SimpleList: React.FC<SimpleListProps> = ({
           <ListItemBase
             key={`list.rowitem[${index}]`}
             index={index}
-            disableBackgrounds={disableBackgrounds}
-            noDivider={noDivider}
             selected={cursor === index}
             item={item}
             onRenderActions={onRenderActions}
             onClick={_onRowClick}
           >
-            {onRenderRow}
+            {children}
           </ListItemBase>
         ))}
       </div>

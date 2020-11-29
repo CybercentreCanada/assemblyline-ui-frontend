@@ -16,44 +16,24 @@ const useStyles = makeStyles(theme => ({
     overflow: 'hidden',
     flexGrow: 1
   },
-  splitLayoutLeft: {
+  splitLayoutLeftCt: {
+    height: '100%',
     display: 'inline-block',
-    verticalAlign: 'top',
-    width: '25%',
-    height: '100%'
+    backgroundColor: theme.palette.background.default
   },
-  splitLayoutLeftContent: {
-    flexGrow: 1,
-    overflow: 'auto'
+  splitLayoutRightCt: {
+    height: '100%',
+    display: 'inline-block',
+    backgroundColor: theme.palette.background.default
   },
+  splitLayoutDock: {},
   splitLayoutLeftAnchor: {
     width: '10px',
     '&:hover': {
       cursor: 'col-resize'
     }
-  },
-  splitLayoutRight: {
-    display: 'inline-block',
-    verticalAlign: 'top',
-    width: '75%',
-    height: '100%'
-  },
-  splitLayoutRightContent: {
-    flexGrow: 1,
-    overflow: 'auto'
-  },
-  splitLayoutDock: {}
+  }
 }));
-
-interface SplitLayoutState {
-  leftOpen: boolean;
-  rightOpen: boolean;
-  widths: {
-    container: number;
-    left: number;
-    right: number;
-  };
-}
 
 interface SplitLayoutProps {
   id: string;
@@ -214,6 +194,7 @@ const SplitLayout: React.FC<SplitLayoutProps> = React.memo(
       return register({ onOpenLeft, onCloseLeft, onOpenRight, onCloseRight, onToggleLeft, onToggleRight });
     });
 
+    //
     return (
       <FlexVertical>
         <Flexport>
@@ -228,16 +209,17 @@ const SplitLayout: React.FC<SplitLayoutProps> = React.memo(
                   onMouseLeave={onContainerMouseLeave}
                 >
                   <div
-                    ref={leftRef}
-                    className={classes.splitLayoutLeft}
+                    className={classes.splitLayoutLeftCt}
                     style={{
-                      width: !state.leftOpen ? 0 : state.leftWidth ? state.leftWidth : null,
-                      overflow: !state.leftOpen ? 'hidden' : null
+                      position: 'absolute',
+                      width: state.leftOpen ? state.leftWidth : leftMinWidth,
+                      zIndex: state.leftOpen ? 1 : -1,
+                      overflow: state.leftOpen ? 'auto' : 'hidden'
                     }}
                   >
                     <FlexHorizontal>
                       {persistentMenu && persistentMenuDock === 'left' && renderLeftDock()}
-                      <div className={classes.splitLayoutLeftContent}>{leftNode}</div>
+                      <div style={{ flexGrow: 1 }}>{leftNode}</div>
                       {!state.rightOpen && renderRightDock()}
                       {!disableManualResize && (
                         <div
@@ -249,13 +231,18 @@ const SplitLayout: React.FC<SplitLayoutProps> = React.memo(
                     </FlexHorizontal>
                   </div>
                   <div
-                    ref={rightRef}
-                    className={classes.splitLayoutRight}
-                    style={{ width: state.rightWidth ? state.rightWidth : null }}
+                    className={classes.splitLayoutRightCt}
+                    style={{
+                      position: 'absolute',
+                      width: state.rightOpen ? state.rightWidth : rightMinWidth,
+                      zIndex: state.rightOpen ? 1 : -1,
+                      left: state.rightOpen ? state.leftWidth : 0,
+                      overflow: state.rightOpen ? 'auto' : 'hidden'
+                    }}
                   >
                     <FlexHorizontal>
                       {!state.leftOpen && renderLeftDock()}
-                      <div className={classes.splitLayoutRightContent}>{state.rightOpen && rightNode}</div>
+                      <div style={{ flexGrow: 1 }}>{rightNode}</div>
                       {persistentMenu && persistentMenuDock === 'right' && renderRightDock()}
                     </FlexHorizontal>
                   </div>

@@ -330,7 +330,7 @@ const Alerts: React.FC = () => {
   };
 
   // Handler for when the cursor on the list changes via keybaord event.
-  const onListCursorChanges = (cursor: number, item: AlertItem) => {
+  const onListCursorChanges = (item: AlertItem) => {
     onItemSelected(item);
   };
 
@@ -432,16 +432,17 @@ const Alerts: React.FC = () => {
                   scrollInfinite
                   scrollReset={scrollReset}
                   scrollLoadNextThreshold={75}
-                  disableBackgrounds={mode === 'legacy'}
-                  noDivider={mode === 'legacy'}
+                  // disableBackgrounds={mode === 'legacy'}
+                  // noDivider={mode === 'legacy'}
                   loading={loading || searching}
                   items={alerts}
                   onItemSelected={onItemSelected}
-                  onRenderRow={onRenderListRow}
                   onRenderActions={onRenderListActions}
                   onLoadNext={_onLoadMore}
                   onCursorChange={onListCursorChanges}
-                />
+                >
+                  {onRenderListRow}
+                </SimpleList>
               </RootRef>
             }
             right={
