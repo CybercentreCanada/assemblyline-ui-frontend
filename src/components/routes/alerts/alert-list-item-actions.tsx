@@ -24,24 +24,24 @@ import usePromiseAPI from './hooks/usePromiseAPI';
 
 // Some generated style classes
 const useStyles = makeStyles(theme => ({
-  drawerInner: {
-    display: 'flex',
-    flexDirection: 'column',
-    width: '600px',
-    [theme.breakpoints.down('xs')]: {
-      width: '100vw'
-    }
-  },
-  searchresult: {
-    fontStyle: 'italic'
-  },
-  listactions: {
-    '& button': {
-      // backgroundColor: 'silver'
-      marginRight: theme.spacing(1),
-      boxShadow: theme.shadows[2]
-    }
-  }
+  // drawerInner: {
+  //   display: 'flex',
+  //   flexDirection: 'column',
+  //   width: '600px',
+  //   [theme.breakpoints.down('xs')]: {
+  //     width: '100vw'
+  //   }
+  // },
+  // searchresult: {
+  //   fontStyle: 'italic'
+  // },
+  // listactions: {
+  //   '& button': {
+  //     // backgroundColor: 'silver'
+  //     marginRight: theme.spacing(1),
+  //     boxShadow: theme.shadows[2]
+  //   }
+  // }
 }));
 
 interface AlertListItemActionsProps {
@@ -105,7 +105,7 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
 
     return (
       <>
-        <div className={classes.listactions}>
+        <div>
           {!item.owner && (
             <IconButton
               title="Take Ownership"

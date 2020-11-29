@@ -115,6 +115,7 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
       <div style={{ margin: theme.spacing(1) }}>
         <div
           style={{
+            wordBreak: 'break-all',
             marginTop: theme.spacing(1),
             padding: theme.spacing(2),
             color: theme.palette.primary.light,

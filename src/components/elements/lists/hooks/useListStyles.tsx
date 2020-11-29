@@ -129,10 +129,16 @@ const useSimpleListStyles = makeStyles(theme => ({
 
 const useListItemStyles = makeStyles(theme => ({
   itemCt: {
-    // height: '100%',
     position: 'relative',
     '&:hover': {
-      cursor: 'pointer',
+      cursor: 'pointer'
+    },
+    '&:hover $itemActions': {
+      display: 'inherit'
+    }
+  },
+  itemDefaultBackgrounds: {
+    '&:hover': {
       backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 17%)' : 'hsl(0, 0%, 95%)'
     },
     '&[data-listitem-focus="true"]': {
@@ -140,14 +146,11 @@ const useListItemStyles = makeStyles(theme => ({
     },
     '&[data-listitem-selected="true"]': {
       backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 15%)' : 'hsl(0, 0%, 92%)'
-    },
-    '&:hover $itemActions': {
-      display: 'inherit'
     }
   },
   itemOuter: {
     position: 'relative',
-    // height: '100%',
+    // height: '100%',  ...
     overflow: 'auto'
   },
   itemInner: {
@@ -164,10 +167,7 @@ const useListItemStyles = makeStyles(theme => ({
     top: theme.spacing(1),
     right: theme.spacing(1),
     display: 'none',
-    // backgroundColor: theme.palette.background.default,
     backgroundColor: 'inherit',
-    // minWidth: 400,
-    // border: '1px solid hsl(0, 0%, 80%)',
     '& button': {
       marginRight: theme.spacing(1),
       boxShadow: theme.shadows[2]

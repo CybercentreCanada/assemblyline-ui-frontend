@@ -11,6 +11,8 @@ interface SimpleListProps {
   id: string;
   loading: boolean;
   disableProgress?: boolean;
+  disableBackgrounds?: boolean;
+  noDivider?: boolean;
   scrollInfinite?: boolean;
   scrollReset?: boolean;
   scrollLoadNextThreshold?: number;
@@ -26,10 +28,12 @@ const SimpleList: React.FC<SimpleListProps> = ({
   id,
   loading,
   items,
-  disableProgress = false,
-  scrollInfinite = false,
+  disableProgress,
+  disableBackgrounds,
+  noDivider,
+  scrollInfinite,
   scrollLoadNextThreshold = 75,
-  scrollReset = false,
+  scrollReset,
   onCursorChange,
   onItemSelected,
   onRenderRow,
@@ -90,7 +94,7 @@ const SimpleList: React.FC<SimpleListProps> = ({
   useLayoutEffect(() => {
     if (scrollReset) {
       nextScrollThreshold.current = scrollLoadNextThreshold;
-      innerEL.current.scrollTo({ top: 0 });
+      outerEL.current.scrollTo({ top: 0 });
     }
   }, [scrollReset, scrollLoadNextThreshold]);
 
@@ -121,6 +125,8 @@ const SimpleList: React.FC<SimpleListProps> = ({
           <ListItemBase
             key={`list.rowitem[${index}]`}
             index={index}
+            disableBackgrounds={disableBackgrounds}
+            noDivider={noDivider}
             selected={cursor === index}
             item={item}
             onRenderActions={onRenderActions}

@@ -12,8 +12,10 @@ import {
 } from '@material-ui/core';
 import AccountTreeIcon from '@material-ui/icons/AccountTree';
 import CloseIcon from '@material-ui/icons/Close';
+import DetailsIcon from '@material-ui/icons/Details';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import StarIcon from '@material-ui/icons/Star';
+import { ToggleButton } from '@material-ui/lab';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import PageContent from 'commons/components/layout/pages/PageContent';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
@@ -29,6 +31,7 @@ import Classification from 'components/visual/Classification';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FiFilter } from 'react-icons/fi';
+import AlertCardItem from './alert-card';
 import AlertDetails from './alert-details';
 import AlertListItem from './alert-list-item';
 import AlertListItemActions from './alert-list-item-actions';
@@ -79,6 +82,10 @@ const useStyles = makeStyles(theme => ({
   searchresult: {
     marginTop: theme.spacing(1),
     fontStyle: 'italic'
+  },
+  modeToggler: {
+    border: 'none',
+    marginRight: '0px !important'
   }
 }));
 
@@ -88,6 +95,7 @@ const Alerts: React.FC = () => {
   const classes = useStyles();
   const theme = useTheme();
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
+  const { setAppbarState, currentLayout, autoHideAppbar } = useAppLayout();
 
   // Alerts hook.
   const {
@@ -107,9 +115,9 @@ const Alerts: React.FC = () => {
 
   // API Promise hook
   const { fetchAlert: onGetAlert, onApplyWorkflowAction } = usePromiseAPI();
-  const { setAppbarState, currentLayout, autoHideAppbar } = useAppLayout();
 
   // Define required states...
+  const [mode, setMode] = useState<'default' | 'legacy'>('default');
   const [searching, setSearching] = useState<boolean>(false);
   const [scrollReset, setScrollReset] = useState<boolean>(false);
   const [splitPanel, setSplitPanel] = useState<{ item: AlertItem }>({ item: null });
@@ -189,14 +197,12 @@ const Alerts: React.FC = () => {
   // Handler for when an item of the InfiniteList is selected.
   const onItemSelected = useCallback(
     (item: AlertItem) => {
-      if (item) {
-        onGetAlert(item.alert_id).then(alert => {
-          openRight();
-          setSplitPanel({ item: alert });
-        });
+      if (item && mode === 'default') {
+        openRight();
+        setSplitPanel({ item });
       }
     },
-    [onGetAlert, openRight]
+    [mode, openRight]
   );
 
   // Handler for when loading more alerts [read bottom of scroll area]
@@ -292,8 +298,15 @@ const Alerts: React.FC = () => {
   };
 
   // Memoized callback to render one line-item of the list....
-  const onRenderListRow = useCallback((item: AlertItem) => <AlertListItem item={item} />, []);
-  // const onRenderListRow = useCallback((item: AlertItem) => <AlertCardItem item={item} />, []);
+  const onRenderListRow = useCallback(
+    (item: AlertItem) => {
+      if (mode === 'legacy') {
+        return <AlertCardItem item={item} />;
+      }
+      return <AlertListItem item={item} />;
+    },
+    [mode]
+  );
 
   //
   const onDrawerClose = () => {
@@ -315,6 +328,12 @@ const Alerts: React.FC = () => {
     (item: AlertItem) => <AlertListItemActions item={item} currentQuery={searchQuery} setDrawer={setDrawer} />,
     [searchQuery]
   );
+
+  // Handler for when toggling from default and legacy list view.
+  const onToggleMode = () => {
+    closeRight();
+    setMode(mode === 'default' ? 'legacy' : 'default');
+  };
 
   // Load up the filters already present in the URL..
   // useEffect(() => setQueryFilters(query), [query]);
@@ -357,6 +376,16 @@ const Alerts: React.FC = () => {
                 }
               }
             ]}
+            extras={
+              <ToggleButton
+                value="legacy"
+                selected={mode === 'legacy'}
+                className={classes.modeToggler}
+                onChange={onToggleMode}
+              >
+                <DetailsIcon />
+              </ToggleButton>
+            }
           >
             <Box className={classes.searchresult}>
               {isLTEMd ? (
@@ -396,6 +425,7 @@ const Alerts: React.FC = () => {
                   onRenderActions={onRenderListActions}
                   onLoadNext={_onLoadMore}
                   onCursorChange={onListCursorChanges}
+                  disableBackgrounds={mode === 'legacy'}
                   disableProgress
                 />
               </RootRef>
@@ -409,7 +439,7 @@ const Alerts: React.FC = () => {
                     paddingTop: 0
                   }}
                 >
-                  <PageHeader backgroundColor={theme.palette.background.default}>
+                  <PageHeader isSticky top={0} backgroundColor={theme.palette.background.default}>
                     <Box display="flex" alignItems="center" marginBottom={2}>
                       <ListNavigator id={ALERT_SIMPLELIST_ID} />
                       <Box flex={1}>

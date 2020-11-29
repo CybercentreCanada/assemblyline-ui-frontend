@@ -20,13 +20,24 @@ export interface ListItemBaseProps {
   height?: string | number;
   selected: boolean;
   noDivider?: boolean;
+  disableBackgrounds?: boolean;
   children: (item: LineItem) => React.ReactNode;
   onClick: (item: LineItem, index: number) => void;
   onRenderActions?: (item: LineItem) => React.ReactNode;
 }
 
 const ListItemBase: React.FC<ListItemBaseProps> = React.memo(
-  ({ selected, item, index, height, noDivider = false, children, onRenderActions, onClick }) => {
+  ({
+    selected,
+    item,
+    index,
+    height,
+    noDivider = false,
+    disableBackgrounds = false,
+    children,
+    onRenderActions,
+    onClick
+  }) => {
     const { listItemClasses: classes } = useListStyles();
 
     const _onClick = useCallback(() => {
@@ -41,7 +52,7 @@ const ListItemBase: React.FC<ListItemBaseProps> = React.memo(
 
     return (
       <div
-        className={classes.itemCt}
+        className={`${classes.itemCt} ${!disableBackgrounds && classes.itemDefaultBackgrounds}`}
         data-listitem-position={index}
         data-listitem-selected={selected}
         data-listitem-focus="false"

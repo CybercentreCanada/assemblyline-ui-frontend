@@ -1,5 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Box, Divider, Grid, makeStyles, Typography, useMediaQuery, useTheme } from '@material-ui/core';
+import {
+  Box,
+  CircularProgress,
+  Divider,
+  Grid,
+  makeStyles,
+  Typography,
+  useMediaQuery,
+  useTheme
+} from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
 import useClipboard from 'commons/components/hooks/useClipboard';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
@@ -57,9 +66,12 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id }) => {
     });
   }, [id, paramId]);
 
-  // go on...
   if (!item) {
-    return <div>...loading</div>;
+    return (
+      <PageCenter margin={4} width="100%">
+        <CircularProgress />
+      </PageCenter>
+    );
   }
   return (
     <PageCenter margin={4} width="100%">
