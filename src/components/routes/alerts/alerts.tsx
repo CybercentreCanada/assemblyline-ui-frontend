@@ -42,6 +42,9 @@ import AlertsWorkflowActions from './alerts-workflow-actions';
 import useAlerts, { AlertItem } from './hooks/useAlerts';
 import usePromiseAPI from './hooks/usePromiseAPI';
 
+// The key in local storage where user select list view mode is stored.
+const LOCAL_STORAGE_KEY_VIEWMODE = 'alert.view.mode';
+
 // Default size of a page to be used by the useAlert hook when fetching next load of data
 //  when scrolling has hit threshold.
 const PAGE_SIZE = 50;
@@ -117,7 +120,6 @@ const Alerts: React.FC = () => {
   const { onApplyWorkflowAction } = usePromiseAPI();
 
   // Define required states...
-  const [mode, setMode] = useState<'default' | 'legacy'>('default');
   const [searching, setSearching] = useState<boolean>(false);
   const [scrollReset, setScrollReset] = useState<boolean>(false);
   const [splitPanel, setSplitPanel] = useState<{ item: AlertItem }>({ item: null });
@@ -125,6 +127,9 @@ const Alerts: React.FC = () => {
     open: false,
     type: null
   });
+  const [mode, setMode] = useState<'default' | 'legacy'>(
+    (localStorage.getItem(LOCAL_STORAGE_KEY_VIEWMODE) as 'default' | 'legacy') || 'default'
+  );
 
   // ------ Start: TopBar autohide with custom scrolltrigger ref ------ //
 
@@ -335,8 +340,10 @@ const Alerts: React.FC = () => {
 
   // Handler for when toggling from default and legacy list view.
   const onToggleMode = () => {
+    const nextMode = mode === 'default' ? 'legacy' : 'default';
     closeRight();
-    setMode(mode === 'default' ? 'legacy' : 'default');
+    localStorage.setItem(LOCAL_STORAGE_KEY_VIEWMODE, nextMode);
+    setMode(nextMode);
   };
 
   // Load up the filters already present in the URL..
