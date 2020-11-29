@@ -114,7 +114,7 @@ const Alerts: React.FC = () => {
   } = useAlerts(PAGE_SIZE);
 
   // API Promise hook
-  const { fetchAlert: onGetAlert, onApplyWorkflowAction } = usePromiseAPI();
+  const { onApplyWorkflowAction } = usePromiseAPI();
 
   // Define required states...
   const [mode, setMode] = useState<'default' | 'legacy'>('default');
@@ -125,6 +125,8 @@ const Alerts: React.FC = () => {
     open: false,
     type: null
   });
+
+  // ------ Start: TopBar autohide with custom scrolltrigger ref ------ //
 
   // Watch scroll of left panel and hide appbar on scrolltrigger.
 
@@ -140,6 +142,8 @@ const Alerts: React.FC = () => {
   useEffect(() => {
     setAppbarState(!hideTopBar);
   }, [setAppbarState, hideTopBar]);
+
+  // ------ END: TopBar autohide with custom scrolltrigger ref ------ //
 
   // splitlayout hook
   const { openRight, closeRight } = useSplitLayout(ALERT_SPLITLAYOUT_ID);
@@ -415,9 +419,12 @@ const Alerts: React.FC = () => {
               <RootRef rootRef={listRef}>
                 <SimpleList
                   id={ALERT_SIMPLELIST_ID}
+                  disableProgress
                   scrollInfinite
                   scrollReset={scrollReset}
                   scrollLoadNextThreshold={75}
+                  disableBackgrounds={mode === 'legacy'}
+                  noDivider={mode === 'legacy'}
                   loading={loading || searching}
                   items={alerts}
                   onItemSelected={onItemSelected}
@@ -425,8 +432,6 @@ const Alerts: React.FC = () => {
                   onRenderActions={onRenderListActions}
                   onLoadNext={_onLoadMore}
                   onCursorChange={onListCursorChanges}
-                  disableBackgrounds={mode === 'legacy'}
-                  disableProgress
                 />
               </RootRef>
             }
