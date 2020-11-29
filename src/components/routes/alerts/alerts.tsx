@@ -88,6 +88,8 @@ const useStyles = makeStyles(theme => ({
   },
   modeToggler: {
     border: 'none',
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0,
     marginRight: '0px !important'
   }
 }));
@@ -394,7 +396,7 @@ const Alerts: React.FC = () => {
                 className={classes.modeToggler}
                 onChange={onToggleMode}
               >
-                <DetailsIcon />
+                <DetailsIcon fontSize={upMD ? 'default' : 'small'} />
               </ToggleButton>
             }
           >
