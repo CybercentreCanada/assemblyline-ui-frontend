@@ -53,17 +53,6 @@ services:
       - MAX_BODY_SIZE=100M
       - TEMPLATE=minimal
 
-  nginx_old:
-    image: cccs/nginx-ssl
-    ports:
-      - '8443:443'
-    environment:
-      - UI_HOST=${EXTERNAL_IP}
-      - SOCKET_HOST=${EXTERNAL_IP}
-      - FQDN=${EXTERNAL_IP}.nip.io
-      - MAX_BODY_SIZE=100M
-      - TEMPLATE=minimal
-
   # Create test data
   create_test_data:
     image: cccs/assemblyline-core

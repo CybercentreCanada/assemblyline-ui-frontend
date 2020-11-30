@@ -18,10 +18,10 @@ server {
     access_log    off;
 
     location / {
-        try_files    ${DOLLAR}uri @alfrontend;
+        try_files    ${DOLLAR}uri @alui;
     }
 
-    location /api/ {
+    location /next/ {
         add_header            X-Frame-Options            SAMEORIGIN;
         add_header            Strict-Transport-Security  "max-age=31536000; includeSubDomains";
 
@@ -32,22 +32,7 @@ server {
         proxy_set_header      Scheme                     ${DOLLAR}scheme;
         proxy_set_header      Server-Port                ${DOLLAR}server_port;
 
-        proxy_pass            http://${UI_HOST}:5000;
-    }
-
-    location /socket.io/ {
-        add_header            Strict-Transport-Security    "max-age=31536000; includeSubDomains";
-
-        proxy_set_header      X-Remote-User   ${DOLLAR}remote_user;
-        proxy_set_header      X-Forwarded-For ${DOLLAR}proxy_add_x_forwarded_for;
-        proxy_set_header      Host            ${DOLLAR}http_host;
-        proxy_redirect        off;
-        proxy_buffering       off;
-        proxy_http_version    1.1;
-        proxy_set_header      Upgrade         ${DOLLAR}http_upgrade;
-        proxy_set_header      Connection      "upgrade";
-
-        proxy_pass            http://${SOCKET_HOST}:5002;
+        proxy_pass            http://${FRONTEND_HOST}:3000;
     }
 
     location /sockjs-node {
@@ -65,7 +50,22 @@ server {
         proxy_pass            http://${FRONTEND_HOST}:3000/sockjs-node;
     }
 
-    location @alfrontend {
+    location /socket.io/ {
+        add_header            Strict-Transport-Security    "max-age=31536000; includeSubDomains";
+
+        proxy_set_header      X-Remote-User   ${DOLLAR}remote_user;
+        proxy_set_header      X-Forwarded-For ${DOLLAR}proxy_add_x_forwarded_for;
+        proxy_set_header      Host            ${DOLLAR}http_host;
+        proxy_redirect        off;
+        proxy_buffering       off;
+        proxy_http_version    1.1;
+        proxy_set_header      Upgrade         ${DOLLAR}http_upgrade;
+        proxy_set_header      Connection      "upgrade";
+
+        proxy_pass            http://${SOCKET_HOST}:5002;
+    }
+
+    location @alui {
         add_header            X-Frame-Options            SAMEORIGIN;
         add_header            Strict-Transport-Security  "max-age=31536000; includeSubDomains";
 
@@ -76,6 +76,6 @@ server {
         proxy_set_header      Scheme                     ${DOLLAR}scheme;
         proxy_set_header      Server-Port                ${DOLLAR}server_port;
 
-        proxy_pass            http://${FRONTEND_HOST}:3000;
+        proxy_pass            http://${UI_HOST}:5000;
     }
 }
