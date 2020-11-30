@@ -261,22 +261,22 @@ const useMyLayout = (): AppLayoutProps => {
   ];
 
   const darkLogo = (
-    <img alt={t('logo.alt')} src="/images/al_dark.svg" width="40" height="32" style={{ marginLeft: '-5px' }} />
+    <img alt={t('logo.alt')} src="images/al_dark.svg" width="40" height="32" style={{ marginLeft: '-5px' }} />
   );
   const lightLogo = (
-    <img alt={t('logo.alt')} src="/images/al.svg" width="40" height="32" style={{ marginLeft: '-5px' }} />
+    <img alt={t('logo.alt')} src="images/al.svg" width="40" height="32" style={{ marginLeft: '-5px' }} />
   );
   const darkBanner = (
     <img
       style={{ display: 'inline-block', width: '100%', margin: `${isXS ? 2 : 3}rem 0` }}
-      src="/images/banner_dark.svg"
+      src="images/banner_dark.svg"
       alt={t('banner.alt')}
     />
   );
   const lightBanner = (
     <img
       style={{ display: 'inline-block', width: '100%', margin: `${isXS ? 2 : 3}rem 0` }}
-      src="/images/banner.svg"
+      src="images/banner.svg"
       alt={t('banner.alt')}
     />
   );
