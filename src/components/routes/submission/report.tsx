@@ -547,7 +547,11 @@ export default function SubmissionReport() {
               </div>
             </Grid>
             <Grid item className="print-only">
-              <img src="images/banner.svg" alt="Assemblyline Banner" style={{ height: '72px' }} />
+              <img
+                src={`${process.env.PUBLIC_URL}/images/banner.svg`}
+                alt="Assemblyline Banner"
+                style={{ height: '72px' }}
+              />
             </Grid>
             <Grid item xs={12} sm={3} className="no-print">
               <div style={{ textAlign: 'right' }}>
