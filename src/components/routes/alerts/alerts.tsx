@@ -1,19 +1,37 @@
-import { Box, Drawer, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
+import {
+  Box,
+  Drawer,
+  IconButton,
+  makeStyles,
+  RootRef,
+  Slide,
+  Typography,
+  useMediaQuery,
+  useScrollTrigger,
+  useTheme
+} from '@material-ui/core';
 import AccountTreeIcon from '@material-ui/icons/AccountTree';
 import CloseIcon from '@material-ui/icons/Close';
+import DetailsIcon from '@material-ui/icons/Details';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import StarIcon from '@material-ui/icons/Star';
+import { ToggleButton } from '@material-ui/lab';
+import useAppLayout from 'commons/components/hooks/useAppLayout';
+import PageContent from 'commons/components/layout/pages/PageContent';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
-import SimpleList from 'components/elements/lists/simplelist/simplelist';
-// import Booklist from 'components/elements/lists/booklist/booklist';
-import SplitPanel from 'components/elements/panels/split-panel';
-import Viewport from 'components/elements/panels/viewport';
+import FlexPort from 'components/elements/layout/flexers/FlexPort';
+import FlexVertical from 'components/elements/layout/flexers/FlexVertical';
+import useSplitLayout from 'components/elements/layout/hooks/useSplitLayout';
+import SplitLayout from 'components/elements/layout/splitlayout/SplitLayout';
+import ListNavigator from 'components/elements/lists/navigator/ListNavigator';
+import SimpleList from 'components/elements/lists/simplelist/SimpleList';
 import SearchBar from 'components/elements/search/search-bar';
 import SearchQuery, { SearchQueryFilters } from 'components/elements/search/search-query';
 import Classification from 'components/visual/Classification';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FiFilter } from 'react-icons/fi';
-import AlertActionsMenu from './alert-actions-menu';
+import AlertCardItem from './alert-card';
 import AlertDetails from './alert-details';
 import AlertListItem from './alert-list-item';
 import AlertListItemActions from './alert-list-item-actions';
@@ -23,6 +41,9 @@ import AlertsFiltersSelected from './alerts-filters-selected';
 import AlertsWorkflowActions from './alerts-workflow-actions';
 import useAlerts, { AlertItem } from './hooks/useAlerts';
 import usePromiseAPI from './hooks/usePromiseAPI';
+
+// The key in local storage where user select list view mode is stored.
+const LOCAL_STORAGE_KEY_VIEWMODE = 'alert.view.mode';
 
 // Default size of a page to be used by the useAlert hook when fetching next load of data
 //  when scrolling has hit threshold.
@@ -37,6 +58,10 @@ export interface AlertDrawerState {
   };
 }
 
+//
+const ALERT_SPLITLAYOUT_ID = 'al.alerts.splitlayout';
+const ALERT_SIMPLELIST_ID = 'al.alerts.simplelist';
+
 // Just indicates whether there are any filters currently set..
 const hasFilters = (filters: SearchQueryFilters): boolean => {
   const { statuses, priorities, labels, queries } = filters;
@@ -45,6 +70,10 @@ const hasFilters = (filters: SearchQueryFilters): boolean => {
 
 // Some generated style classes
 const useStyles = makeStyles(theme => ({
+  pageTitle: {
+    // paddingTop: theme.spacing(3),
+    paddingBottom: theme.spacing(3)
+  },
   drawerInner: {
     display: 'flex',
     flexDirection: 'column',
@@ -54,18 +83,29 @@ const useStyles = makeStyles(theme => ({
     }
   },
   searchresult: {
+    marginTop: theme.spacing(1),
     fontStyle: 'italic'
+  },
+  modeToggler: {
+    border: 'none',
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0,
+    marginRight: '0px !important'
   }
 }));
 
 // The Alerts functional component.
 const Alerts: React.FC = () => {
+  const { t } = useTranslation('alerts');
   const classes = useStyles();
   const theme = useTheme();
+  const upMD = useMediaQuery(theme.breakpoints.up('md'));
+  const { setAppbarState, currentLayout, autoHideAppbar } = useAppLayout();
+
+  // Alerts hook.
   const {
     loading,
-    buffer,
-    // book,
+    alerts,
     total,
     fields,
     searchQuery,
@@ -73,23 +113,47 @@ const Alerts: React.FC = () => {
     statusFilters,
     priorityFilters,
     labelFilters,
-    // updateBook,
     updateQuery,
     onLoad,
     onLoadMore
   } = useAlerts(PAGE_SIZE);
 
   // API Promise hook
-  const { onGetAlert, onApplyWorkflowAction } = usePromiseAPI();
+  const { onApplyWorkflowAction } = usePromiseAPI();
 
   // Define required states...
   const [searching, setSearching] = useState<boolean>(false);
   const [scrollReset, setScrollReset] = useState<boolean>(false);
-  const [splitPanel, setSplitPanel] = useState<{ open: boolean; item: AlertItem }>({ open: false, item: null });
+  const [splitPanel, setSplitPanel] = useState<{ item: AlertItem }>({ item: null });
   const [drawer, setDrawer] = useState<AlertDrawerState>({
     open: false,
     type: null
   });
+  const [mode, setMode] = useState<'default' | 'legacy'>(
+    (localStorage.getItem(LOCAL_STORAGE_KEY_VIEWMODE) as 'default' | 'legacy') || 'default'
+  );
+
+  // ------ Start: TopBar autohide with custom scrolltrigger ref ------ //
+
+  // Watch scroll of left panel and hide appbar on scrolltrigger.
+
+  // Root ref to use as target of scrolltrigger hook.
+  const listRef = useRef<HTMLDivElement>();
+  // Follow the simply list scrollbar and get notified when is reaches trigger.
+  const scrollTrigger = useScrollTrigger({
+    disableHysteresis: true,
+    target: listRef.current
+  });
+  // Watch for hideTopBar changes and hide the topbar if trigger reached.
+  const hideTopBar = currentLayout === 'side' && autoHideAppbar && scrollTrigger;
+  useEffect(() => {
+    setAppbarState(!hideTopBar);
+  }, [setAppbarState, hideTopBar]);
+
+  // ------ END: TopBar autohide with custom scrolltrigger ref ------ //
+
+  // splitlayout hook
+  const { openRight, closeRight } = useSplitLayout(ALERT_SPLITLAYOUT_ID);
 
   // Define some references.
   const searchTextValue = useRef<string>(searchQuery.getQuery());
@@ -106,9 +170,7 @@ const Alerts: React.FC = () => {
     setScrollReset(true);
 
     // Close right of split panel if open.
-    if (splitPanel.open) {
-      setSplitPanel({ ...splitPanel, open: false });
-    }
+    closeRight();
 
     // Close drawer if its open.
     if (drawer.open) {
@@ -135,10 +197,10 @@ const Alerts: React.FC = () => {
 
     // Reset scroll for each new search.
     setScrollReset(true);
+
     // Close right of split panel if open.
-    if (splitPanel.open) {
-      setSplitPanel({ ...splitPanel, open: false });
-    }
+    closeRight();
+
     // Refetch initial data.
     onLoad();
   };
@@ -146,15 +208,12 @@ const Alerts: React.FC = () => {
   // Handler for when an item of the InfiniteList is selected.
   const onItemSelected = useCallback(
     (item: AlertItem) => {
-      if (item) {
-        onGetAlert(item.alert_id).then(alert => {
-          setSplitPanel({ open: true, item: alert });
-        });
-      } else {
-        setSplitPanel(_sp => ({ ..._sp, open: false }));
+      if (item && mode === 'default') {
+        openRight();
+        setSplitPanel({ item });
       }
     },
-    [onGetAlert]
+    [mode, openRight]
   );
 
   // Handler for when loading more alerts [read bottom of scroll area]
@@ -175,9 +234,7 @@ const Alerts: React.FC = () => {
     onLoad();
 
     // Close right of split panel if open.
-    if (splitPanel.open) {
-      setSplitPanel({ ...splitPanel, open: false });
-    }
+    closeRight();
 
     // Close the Filters drawer.
     if (drawer.open) {
@@ -230,9 +287,7 @@ const Alerts: React.FC = () => {
     onLoad();
 
     // Close right of split panel if open.
-    if (splitPanel.open) {
-      setSplitPanel({ ...splitPanel, open: false });
-    }
+    closeRight();
 
     // Close the Filters drawer.
     if (drawer.open) {
@@ -245,9 +300,6 @@ const Alerts: React.FC = () => {
     onApplyWorkflowAction(drawer.actionData.query, selectedStatus, selectedPriority, selectedLabels).then(() => {
       setDrawer({ ...drawer, open: false });
       onLoad();
-      if (splitPanel.open) {
-        onItemSelected(splitPanel.item);
-      }
     });
   };
 
@@ -257,8 +309,15 @@ const Alerts: React.FC = () => {
   };
 
   // Memoized callback to render one line-item of the list....
-  const onRenderListRow = useCallback((item: AlertItem) => <AlertListItem item={item} />, []);
-  // const onRenderListRow = useCallback((item: AlertItem) => <AlertCardItem item={item} />, []);
+  const onRenderListRow = useCallback(
+    (item: AlertItem) => {
+      if (mode === 'legacy') {
+        return <AlertCardItem item={item} />;
+      }
+      return <AlertListItem item={item} />;
+    },
+    [mode]
+  );
 
   //
   const onDrawerClose = () => {
@@ -266,117 +325,153 @@ const Alerts: React.FC = () => {
   };
 
   // Handler for with close the right side of split panel.
-  const onSplitPanelRightClose = () => {
-    setSplitPanel({ open: false, item: splitPanel.item });
+  const onSplitLayoutCloseRight = () => {
+    closeRight();
   };
 
   // Handler for when the cursor on the list changes via keybaord event.
-  const onListCursorChanges = (cursor: number, item: AlertItem) => {
-    if (splitPanel.open) {
-      onItemSelected(item);
-    }
+  const onListCursorChanges = (item: AlertItem) => {
+    onItemSelected(item);
   };
 
-  // ...
+  // Handler to render the action buttons of each list item.
   const onRenderListActions = useCallback(
     (item: AlertItem) => <AlertListItemActions item={item} currentQuery={searchQuery} setDrawer={setDrawer} />,
     [searchQuery]
   );
 
+  // Handler for when toggling from default and legacy list view.
+  const onToggleMode = () => {
+    const nextMode = mode === 'default' ? 'legacy' : 'default';
+    closeRight();
+    localStorage.setItem(LOCAL_STORAGE_KEY_VIEWMODE, nextMode);
+    setMode(nextMode);
+  };
+
   // Load up the filters already present in the URL..
   // useEffect(() => setQueryFilters(query), [query]);
 
   return (
-    <Box>
-      <div style={{ marginRight: theme.spacing(2), marginLeft: theme.spacing(2), position: 'relative' }}>
-        <SearchBar
-          initValue={searchQuery.getQuery()}
-          searching={searching || loading}
-          suggestions={buildSearchSuggestions()}
-          onValueChange={onFilterValueChange}
-          onClear={onClearSearch}
-          onSearch={onSearch}
-          buttons={[
-            {
-              icon: <StarIcon />,
-              props: {
-                onClick: () => setDrawer({ open: true, type: 'favorites' })
+    <FlexVertical>
+      <PageContent mt={4} mr={4} mb={0} ml={4}>
+        <div style={{ position: 'relative' }}>
+          <Slide appear={false} direction="down" in={!hideTopBar} mountOnEnter unmountOnExit>
+            <div className={classes.pageTitle}>
+              <Typography variant="h4">{t('alerts')}</Typography>
+            </div>
+          </Slide>
+
+          <SearchBar
+            initValue={searchQuery.getQuery()}
+            searching={searching || loading}
+            suggestions={buildSearchSuggestions()}
+            placeholder="Filter alerts..."
+            onValueChange={onFilterValueChange}
+            onClear={onClearSearch}
+            onSearch={onSearch}
+            buttons={[
+              {
+                icon: <StarIcon fontSize={upMD ? 'default' : 'small'} />,
+                props: {
+                  onClick: () => setDrawer({ open: true, type: 'favorites' })
+                }
+              },
+              {
+                icon: <FilterListIcon fontSize={upMD ? 'default' : 'small'} />,
+                props: {
+                  onClick: () => setDrawer({ open: true, type: 'filter' })
+                }
+              },
+              {
+                icon: <AccountTreeIcon fontSize={upMD ? 'default' : 'small'} />,
+                props: {
+                  onClick: () => setDrawer({ open: true, type: 'actions', actionData: { query: searchQuery, total } })
+                }
               }
-            },
-            {
-              icon: <FilterListIcon />,
-              props: {
-                onClick: () => setDrawer({ open: true, type: 'filter' })
-              }
-            },
-            {
-              icon: <AccountTreeIcon />,
-              props: {
-                onClick: () => setDrawer({ open: true, type: 'actions', actionData: { query: searchQuery, total } })
-              }
+            ]}
+            extras={
+              <ToggleButton
+                value="legacy"
+                selected={mode === 'legacy'}
+                className={classes.modeToggler}
+                onChange={onToggleMode}
+              >
+                <DetailsIcon fontSize={upMD ? 'default' : 'small'} />
+              </ToggleButton>
             }
-          ]}
-        >
-          <Box className={classes.searchresult}>
-            {isLTEMd ? (
-              <SearchResultLarge
-                loading={loading}
-                searching={searching}
-                total={total}
-                query={searchQuery}
-                onApplyFilters={onApplyFilters}
-              />
-            ) : (
-              <SearchResultSmall loading={loading} searching={searching} total={total} query={searchQuery} />
-            )}
-          </Box>
-        </SearchBar>
-      </div>
-      <Viewport>
-        <SplitPanel
-          leftMinWidth={500}
-          leftInitWidthPerc={60}
-          rightMinWidth={600}
-          rightDrawerBreakpoint={1100}
-          rightDrawerWidth={900}
-          rightDrawerBackgroundColor={theme.palette.background.default}
-          rightOpen={splitPanel.open}
-          onRightDrawerClose={onSplitPanelRightClose}
-          left={
-            <SimpleList
-              loading={loading || searching}
-              items={buffer.items}
-              scrollReset={scrollReset}
-              scrollLoadNextThreshold={75}
-              onItemSelected={onItemSelected}
-              onRenderRow={onRenderListRow}
-              onRenderActions={onRenderListActions}
-              onLoadNext={_onLoadMore}
-              onCursorChange={onListCursorChanges}
-              disableProgress
-            />
-          }
-          right={
-            splitPanel.item ? (
-              <Box p={2} pt={0} width="100%">
-                <PageHeader
-                  actions={[{ icon: <CloseIcon />, action: onSplitPanelRightClose }]}
-                  backgroundColor={theme.palette.background.default}
-                  elevation={0}
+          >
+            <Box className={classes.searchresult}>
+              {isLTEMd ? (
+                <SearchResultLarge
+                  loading={loading}
+                  searching={searching}
+                  total={total}
+                  query={searchQuery}
+                  onApplyFilters={onApplyFilters}
+                />
+              ) : (
+                <SearchResultSmall loading={loading} searching={searching} total={total} query={searchQuery} />
+              )}
+            </Box>
+          </SearchBar>
+        </div>
+      </PageContent>
+      <FlexPort>
+        <PageContent mt={0} mr={4} mb={0} ml={4} height="100%">
+          <SplitLayout
+            id={ALERT_SPLITLAYOUT_ID}
+            disableManualResize
+            initLeftWidthPerc={50}
+            leftMinWidth={500}
+            rightMinWidth={500}
+            left={
+              <RootRef rootRef={listRef}>
+                <SimpleList
+                  id={ALERT_SIMPLELIST_ID}
+                  disableProgress
+                  scrollInfinite
+                  scrollReset={scrollReset}
+                  scrollLoadNextThreshold={75}
+                  disableBackgrounds={mode === 'legacy'}
+                  noDivider={mode === 'legacy'}
+                  loading={loading || searching}
+                  items={alerts}
+                  onItemSelected={onItemSelected}
+                  onRenderActions={onRenderListActions}
+                  onLoadNext={_onLoadMore}
+                  onCursorChange={onListCursorChanges}
                 >
-                  <Box display="flex" alignItems="center">
-                    <AlertActionsMenu />
-                    <Box flex={1}>
-                      <Classification c12n={splitPanel.item.classification} type="outlined" />
+                  {onRenderListRow}
+                </SimpleList>
+              </RootRef>
+            }
+            right={
+              splitPanel.item && (
+                <div
+                  style={{
+                    width: '100%',
+                    padding: theme.spacing(2),
+                    paddingTop: 0
+                  }}
+                >
+                  <PageHeader isSticky top={0} backgroundColor={theme.palette.background.default}>
+                    <Box display="flex" alignItems="center" marginBottom={2}>
+                      <ListNavigator id={ALERT_SIMPLELIST_ID} />
+                      <Box flex={1}>
+                        <Classification c12n={splitPanel.item.classification} type="outlined" />
+                      </Box>
+                      <IconButton onClick={onSplitLayoutCloseRight}>
+                        <CloseIcon />
+                      </IconButton>
                     </Box>
-                  </Box>
-                </PageHeader>
-                <AlertDetails item={splitPanel.item} />
-              </Box>
-            ) : null
-          }
-        />
-      </Viewport>
+                  </PageHeader>
+                  <AlertDetails id={splitPanel.item.alert_id} />
+                </div>
+              )
+            }
+          />
+        </PageContent>
+      </FlexPort>
       <Drawer open={drawer.open} anchor="right" onClose={onDrawerClose}>
         <Box p={theme.spacing(0.5)} className={classes.drawerInner}>
           {
@@ -416,7 +511,7 @@ const Alerts: React.FC = () => {
           }
         </Box>
       </Drawer>
-    </Box>
+    </FlexVertical>
   );
 };
 

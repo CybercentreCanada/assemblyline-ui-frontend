@@ -92,13 +92,14 @@ const useSimpleListStyles = makeStyles(theme => ({
     position: 'relative',
     display: 'flex',
     flexDirection: 'column',
-    height: '100%'
+    overflow: 'auto',
+    height: '100%',
+    width: '100%',
+    outline: 'none'
   },
   inner: {
     position: 'relative',
-    overflow: 'auto',
-    outline: 'none',
-    height: '100%'
+    width: '100%'
   },
   pagerItems: {
     display: 'flex',
@@ -130,7 +131,14 @@ const useListItemStyles = makeStyles(theme => ({
   itemCt: {
     position: 'relative',
     '&:hover': {
-      cursor: 'pointer',
+      cursor: 'pointer'
+    },
+    '&:hover $itemActions': {
+      display: 'inherit'
+    }
+  },
+  itemDefaultBackgrounds: {
+    '&:hover': {
       backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 17%)' : 'hsl(0, 0%, 95%)'
     },
     '&[data-listitem-focus="true"]': {
@@ -138,16 +146,16 @@ const useListItemStyles = makeStyles(theme => ({
     },
     '&[data-listitem-selected="true"]': {
       backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 15%)' : 'hsl(0, 0%, 92%)'
-    },
-    '&:hover $itemActions': {
-      display: 'inherit'
     }
   },
   itemOuter: {
     position: 'relative',
+    // height: '100%',  ...
     overflow: 'auto'
   },
-  itemInner: {},
+  itemInner: {
+    // height: '100%'
+  },
   itemDivider: {
     position: 'absolute',
     bottom: 0,
@@ -159,13 +167,10 @@ const useListItemStyles = makeStyles(theme => ({
     top: theme.spacing(1),
     right: theme.spacing(1),
     display: 'none',
-    // backgroundColor: theme.palette.background.default,
     backgroundColor: 'inherit',
-    // minWidth: 400,
-    // border: '1px solid hsl(0, 0%, 80%)',
     '& button': {
-      marginRight: theme.spacing(1)
-      // boxShadow: theme.shadows[2]
+      marginRight: theme.spacing(1),
+      boxShadow: theme.shadows[2]
     }
   }
 }));

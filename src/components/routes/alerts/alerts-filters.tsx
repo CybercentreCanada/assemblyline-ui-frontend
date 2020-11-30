@@ -63,7 +63,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-// Specificatino interface of this component's properties.
+// Specification interface of this component's properties.
 interface AlertsFiltersProps {
   searchQuery: SearchQuery;
   valueFilters: SearchFilter[];
@@ -177,7 +177,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
     );
   };
 
-  // Apply updates to selected filters when compoonent is mounted.
+  // Apply updates to selected filters if required.
   useEffect(() => {
     const _filters = searchQuery.parseFilters();
     setSelectedTc(findOption(_filters.tc, TC_OPTIONS) || DEFAULT_TC);

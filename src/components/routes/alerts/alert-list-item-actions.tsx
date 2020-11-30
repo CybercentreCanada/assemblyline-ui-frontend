@@ -5,6 +5,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  IconButton,
   makeStyles,
   Typography,
   useTheme
@@ -23,24 +24,24 @@ import usePromiseAPI from './hooks/usePromiseAPI';
 
 // Some generated style classes
 const useStyles = makeStyles(theme => ({
-  drawerInner: {
-    display: 'flex',
-    flexDirection: 'column',
-    width: '600px',
-    [theme.breakpoints.down('xs')]: {
-      width: '100vw'
-    }
-  },
-  searchresult: {
-    fontStyle: 'italic'
-  },
-  listactions: {
-    // '& button': {
-    //   // backgroundColor: 'silver'
-    //   marginRight: theme.spacing(1),
-    //   boxShadow: theme.shadows[2]
-    // }
-  }
+  // drawerInner: {
+  //   display: 'flex',
+  //   flexDirection: 'column',
+  //   width: '600px',
+  //   [theme.breakpoints.down('xs')]: {
+  //     width: '100vw'
+  //   }
+  // },
+  // searchresult: {
+  //   fontStyle: 'italic'
+  // },
+  // listactions: {
+  //   '& button': {
+  //     // backgroundColor: 'silver'
+  //     marginRight: theme.spacing(1),
+  //     boxShadow: theme.shadows[2]
+  //   }
+  // }
 }));
 
 interface AlertListItemActionsProps {
@@ -104,24 +105,18 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
 
     return (
       <>
-        <div className={classes.listactions}>
+        <div>
           {!item.owner && (
-            <Button
-              // size="small"
-              // color="inherit"
-              variant="outlined"
+            <IconButton
               title="Take Ownership"
               onClick={() => {
                 setTakeOwnershipConfirmation({ open: true, query: buildActionQuery() });
               }}
             >
               <AssignmentIndIcon />
-            </Button>
+            </IconButton>
           )}
-          <Button
-            // size="small"
-            // color="inherit"
-            variant="outlined"
+          <IconButton
             title="Workflow Action"
             onClick={() => {
               console.log('workflow action.');
@@ -130,7 +125,7 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
             }}
           >
             <AccountTreeIcon />
-          </Button>
+          </IconButton>
         </div>
         {takeOwnershipConfirmation.open && (
           <TakeOwnershipConfirmDialog
@@ -180,15 +175,6 @@ const TakeOwnershipConfirmDialog: React.FC<{
       </DialogContent>
       <DialogActions>
         <Button
-          autoFocus
-          onClick={onTakeOwnershipCancelClick}
-          variant="contained"
-          size="small"
-          startIcon={<CloseIcon />}
-        >
-          {t('page.alerts.actions.cancel')}
-        </Button>
-        <Button
           onClick={onTakeOwnershipOkClick}
           variant="contained"
           color="primary"
@@ -197,6 +183,15 @@ const TakeOwnershipConfirmDialog: React.FC<{
           disabled={progress}
         >
           {t('page.alerts.actions.ok')}
+        </Button>
+        <Button
+          autoFocus
+          onClick={onTakeOwnershipCancelClick}
+          variant="contained"
+          size="small"
+          startIcon={<CloseIcon />}
+        >
+          {t('page.alerts.actions.cancel')}
         </Button>
       </DialogActions>
     </Dialog>

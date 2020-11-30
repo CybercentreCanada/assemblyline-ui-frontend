@@ -1,7 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import Book from 'components/elements/lists/booklist/book';
-import { MetaListItem } from 'components/elements/lists/metalist/metalist';
-import MetaListBuffer from 'components/elements/lists/metalist/metalist-buffer';
+import { LineItem } from 'components/elements/lists/item/ListItemBase';
 import SearchQuery, { SearchFilter, SearchFilterType } from 'components/elements/search/search-query';
 import useAppContext from 'components/hooks/useAppContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -18,7 +16,7 @@ export interface AlertFile {
   type: string;
 }
 
-export interface AlertItem extends MetaListItem {
+export interface AlertItem extends LineItem {
   al: {
     attrib: string[];
     av: string[];
@@ -67,15 +65,13 @@ interface UsingAlerts {
   loading: boolean;
   fields: ALField[];
   total: number;
-  buffer: MetaListBuffer;
-  book: Book;
+  alerts: AlertItem[];
   searchQuery: SearchQuery;
   labelFilters: SearchFilter[];
   priorityFilters: SearchFilter[];
   statusFilters: SearchFilter[];
   valueFilters: SearchFilter[];
-  updateQuery: (searchQuery: SearchQuery) => void;
-  updateBook: (book: Book) => void;
+  updateQuery: (query: SearchQuery) => void;
   onLoad: (onComplete?: (success: boolean) => void) => void;
   onLoadMore: (onComplete?: (success: boolean) => void) => void;
 }
@@ -96,14 +92,11 @@ export default function useAlerts(pageSize: number): UsingAlerts {
   const [state, setState] = useState<{
     loading: boolean;
     total: number;
-    buffer: MetaListBuffer;
-    book: Book;
+    alerts: AlertItem[];
   }>({
     loading: true,
     total: 0,
-    // items: [],
-    buffer: new MetaListBuffer(),
-    book: new Book([], pageSize)
+    alerts: []
   });
 
   // parse list of alert result: add an index field.
@@ -132,8 +125,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
         setState({
           loading: false,
           total,
-          buffer: new MetaListBuffer().push(items),
-          book: new Book(items, pageSize)
+          alerts: items
         });
         if (onComplete) {
           onComplete(true);
@@ -150,6 +142,8 @@ export default function useAlerts(pageSize: number): UsingAlerts {
 
   // Hook API: get alerts for specified index.
   const onLoadMore = (onComplete?: (success: boolean) => void) => {
+    console.log('loading more...');
+
     // Move offset by one increment.
     searchQuery.tickOffset();
     // reference the current offset now incase it changes again before callback is executed
@@ -163,8 +157,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
         setState({
           loading: false,
           total,
-          buffer: state.buffer.push(parsedItems).build(),
-          book: state.book.addAll(parsedItems)
+          alerts: state.alerts.concat(parsedItems)
         });
         if (onComplete) {
           onComplete(true);
@@ -287,7 +280,6 @@ export default function useAlerts(pageSize: number): UsingAlerts {
     labelFilters,
     valueFilters,
     updateQuery: setSearchQuery,
-    updateBook: (book: Book) => setState({ ...state, book }),
     onLoad,
     onLoadMore
   };

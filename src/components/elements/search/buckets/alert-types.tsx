@@ -1,4 +1,4 @@
-import { MetaListItem } from 'components/elements/lists/metalist/metalist';
+import { LineItem } from 'components/elements/lists/item/ListItemBase';
 
 export interface AlertFile {
   md5: string;
@@ -9,7 +9,7 @@ export interface AlertFile {
   type: string;
 }
 
-export interface AlertSearchItem extends MetaListItem {
+export interface AlertSearchItem extends LineItem {
   alert_id: string;
   file: {
     name: string;
