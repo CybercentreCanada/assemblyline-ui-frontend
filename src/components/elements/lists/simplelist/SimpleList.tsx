@@ -11,9 +11,11 @@ interface SimpleListProps {
   id: string;
   loading: boolean;
   disableProgress?: boolean;
+  disableBackgrounds?: boolean;
   scrollInfinite?: boolean;
   scrollReset?: boolean;
   scrollLoadNextThreshold?: number;
+  noDivider?: boolean;
   items: LineItem[];
   children: (item: LineItem) => React.ReactNode;
   onCursorChange?: (item: LineItem, cursor?: number) => void;
@@ -26,10 +28,12 @@ const SimpleList: React.FC<SimpleListProps> = ({
   id,
   loading,
   items,
-  disableProgress = false,
-  scrollInfinite = false,
+  disableProgress,
+  scrollInfinite,
   scrollLoadNextThreshold = 75,
-  scrollReset = false,
+  scrollReset,
+  disableBackgrounds,
+  noDivider,
   children,
   onCursorChange,
   onItemSelected,
@@ -133,6 +137,8 @@ const SimpleList: React.FC<SimpleListProps> = ({
             index={index}
             selected={cursor === index}
             item={item}
+            disableBackgrounds={disableBackgrounds}
+            noDivider={noDivider}
             onRenderActions={onRenderActions}
             onClick={_onRowClick}
           >

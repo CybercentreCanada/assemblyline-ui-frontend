@@ -91,7 +91,7 @@ const useSimpleListStyles = makeStyles(theme => ({
   outer: {
     position: 'relative',
     display: 'flex',
-    flexDirection: 'row',
+    flexDirection: 'column',
     overflow: 'auto',
     height: '100%',
     width: '100%',

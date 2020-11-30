@@ -432,8 +432,8 @@ const Alerts: React.FC = () => {
                   scrollInfinite
                   scrollReset={scrollReset}
                   scrollLoadNextThreshold={75}
-                  // disableBackgrounds={mode === 'legacy'}
-                  // noDivider={mode === 'legacy'}
+                  disableBackgrounds={mode === 'legacy'}
+                  noDivider={mode === 'legacy'}
                   loading={loading || searching}
                   items={alerts}
                   onItemSelected={onItemSelected}
