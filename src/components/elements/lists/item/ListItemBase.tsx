@@ -1,8 +1,9 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
+
 import { Divider, IconButtonProps } from '@material-ui/core';
+import useListStyles from 'components/elements/lists/hooks/useListStyles';
 import React, { useCallback } from 'react';
-import useListStyles from './hooks/useListStyles';
 
 export interface LineItem {
   id: number | string;
@@ -13,19 +14,30 @@ export interface LineItemAction {
   props: IconButtonProps;
 }
 
-interface ListRowProps {
+export interface ListItemBaseProps {
   index: number;
-  loaded: boolean;
   item: LineItem;
+  height?: string | number;
   selected: boolean;
-  rowHeight?: number;
+  noDivider?: boolean;
+  disableBackgrounds?: boolean;
+  children: (item: LineItem) => React.ReactNode;
   onClick: (item: LineItem, index: number) => void;
-  onRenderRow: (item: LineItem) => React.ReactNode;
   onRenderActions?: (item: LineItem) => React.ReactNode;
 }
 
-const ListRow: React.FC<ListRowProps> = React.memo(
-  ({ loaded, selected, item, index, rowHeight, onRenderActions, onClick, onRenderRow }) => {
+const ListItemBase: React.FC<ListItemBaseProps> = React.memo(
+  ({
+    selected,
+    item,
+    index,
+    height,
+    noDivider = false,
+    disableBackgrounds = false,
+    children,
+    onRenderActions,
+    onClick
+  }) => {
     const { listItemClasses: classes } = useListStyles();
 
     const _onClick = useCallback(() => {
@@ -40,16 +52,15 @@ const ListRow: React.FC<ListRowProps> = React.memo(
 
     return (
       <div
-        className={classes.itemCt}
+        className={`${classes.itemCt} ${!disableBackgrounds && classes.itemDefaultBackgrounds}`}
         data-listitem-position={index}
         data-listitem-selected={selected}
         data-listitem-focus="false"
         onClick={_onClick}
+        style={{ height }}
       >
-        <div className={classes.itemOuter} style={{ height: !loaded ? rowHeight : null }}>
-          <div className={classes.itemInner}>{loaded ? onRenderRow(item) : '...loading'}</div>
-        </div>
-        <div className={classes.itemDivider}>
+        {children(item)}
+        <div className={classes.itemDivider} style={{ display: noDivider ? 'none' : null }}>
           <Divider />
         </div>
         <div className={classes.itemActions} onClick={onItemActionsClick}>
@@ -60,4 +71,4 @@ const ListRow: React.FC<ListRowProps> = React.memo(
   }
 );
 
-export default ListRow;
+export default ListItemBase;

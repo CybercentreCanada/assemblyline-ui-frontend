@@ -1,5 +1,5 @@
 import { Grid, Typography, useMediaQuery, useTheme } from '@material-ui/core';
-import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
+import PersonIcon from '@material-ui/icons/Person';
 import { ChipList } from 'components/elements/mui/chips';
 import { AlertItem } from 'components/routes/alerts/hooks/useAlerts';
 import Classification from 'components/visual/Classification';
@@ -67,12 +67,12 @@ const AlertItemDefault: React.FC<AlertListItemProps> = ({ item }) => {
           <div style={{ display: 'flex', alignItems: 'center' }}>
             {item.owner ? (
               <>
-                <AssignmentIndIcon />
+                <PersonIcon />
                 &nbsp; {item.owner}
               </>
             ) : item.hint_owner ? (
               <>
-                <AssignmentIndIcon />
+                <PersonIcon />
                 &nbsp; assigned
               </>
             ) : null}
@@ -119,7 +119,7 @@ const AlertItemSmall: React.FC<AlertListItemProps> = ({ item }) => {
         </Grid>
         <Grid item xs={2}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            <AssignmentIndIcon />
+            <PersonIcon />
             &nbsp;{item.owner ? item.owner : item.hint_owner ? 'assigned' : 'none'}
           </div>
         </Grid>

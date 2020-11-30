@@ -24,7 +24,7 @@ const useStyles = makeStyles(theme => ({
   searchbar: {
     borderRadius: '4px',
     paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(0.5),
+    // paddingRight: theme.spacing(0.5),
     backgroundColor: fade(theme.palette.text.primary, 0.04),
     '&:hover': {
       backgroundColor: fade(theme.palette.text.primary, 0.06)
@@ -50,6 +50,7 @@ interface SearchBarProps {
   placeholder?: string;
   searching?: boolean;
   buttons?: SearchBarButton[];
+  extras?: React.ReactNode;
   suggestions?: string[];
   onValueChange?: (filterValue: string) => void;
   onSearch: (filterValue: string, inputElement: HTMLInputElement) => void;
@@ -63,6 +64,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   searching = false,
   suggestions = [],
   buttons = [],
+  extras,
   onValueChange,
   onSearch,
   onClear
@@ -105,7 +107,13 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   return (
     <div ref={element} className={classes.root}>
-      <Box display="flex" flexDirection="row" className={classes.searchbar} alignItems="center">
+      <Box
+        display="flex"
+        flexDirection="row"
+        className={classes.searchbar}
+        alignItems="center"
+        style={{ paddingRight: !extras ? theme.spacing(0.5) : null }}
+      >
         {/* <div style={{ lineHeight: 'normal', marginRight: theme.spacing(2) }}>
           {searching ? (
             <span style={{ width: 35, height: 35 }}>
@@ -154,6 +162,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             {b.icon}
           </IconButton>
         ))}
+        {extras}
       </Box>
       {searching && (
         <LinearProgress

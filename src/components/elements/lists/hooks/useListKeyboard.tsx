@@ -5,7 +5,7 @@ import { useState } from 'react';
 const THROTTLER = new Throttler(10);
 
 // Ensure the list element at specified position is into view.
-const selectionScroller = (target: HTMLDivElement, position: number, rowHeight: number) => {
+const selectionScroller = (target: HTMLElement, position: number, rowHeight: number) => {
   // We take care of all scrolling. [impl. is same has same behaviour as 'block:nearest'].
 
   const scrollToEl = target.querySelector(`[data-listitem-position="${position}"]`);
@@ -16,17 +16,20 @@ const selectionScroller = (target: HTMLDivElement, position: number, rowHeight: 
   if (scrollToEl) {
     // If there's already an element rendered we use that to compute srolling factor.
     const { top: nextTop, bottom: nextBottom, height: nextHeight } = scrollToEl.getBoundingClientRect();
+
     if (nextTop < targetTop) {
+      // going up.
       const scrollBy = nextTop - targetTop;
       // console.log(`scrollBy: ${scrollBy}`);
       target.scrollBy({ top: scrollBy });
     } else if (nextTop + nextHeight > targetBottom) {
+      // going down.
       const scrollBy = nextBottom - targetBottom;
       // console.log(`scrollBy: ${scrollBy}`);
       target.scrollBy({ top: scrollBy });
     }
   } else {
-    // If the next element isn't already rnedered then we fallback on the specified rowHeight.
+    // If the next element isn't already rendered then we fallback on the specified rowHeight.
     const frameTop = target.scrollTop;
     const frameBottom = frameTop + targetHeight;
     const top = position * rowHeight;
@@ -43,23 +46,29 @@ const selectionScroller = (target: HTMLDivElement, position: number, rowHeight: 
 interface UsingListKeyboard {
   cursor: number;
   setCursor: (cursor: number) => void;
+  next: () => void;
+  previous: () => void;
   onKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => void;
 }
 
 // Specification interface to configure custom hook.
 interface UseListKeyboard {
+  id: string;
   count: number;
   infinite?: boolean;
   rowHeight?: number;
+  scrollElementId?: string;
   onCursorChange?: (cursor: number) => void;
   onEscape?: (cursor: number) => void;
   onEnter?: (cursor: number) => void;
 }
 
 export default function useListKeyboard({
+  id,
   count,
   infinite,
   rowHeight,
+  scrollElementId,
   onCursorChange,
   onEscape,
   onEnter
@@ -69,11 +78,26 @@ export default function useListKeyboard({
 
   // Update the cursor state and invoke callback if provided.
   const updateState = (nextCursor: number, target: HTMLDivElement) => {
+    const scrollTarget = scrollElementId ? document.getElementById(scrollElementId) : target;
     setCursor(nextCursor);
-    selectionScroller(target, nextCursor, rowHeight);
+    selectionScroller(scrollTarget, nextCursor, rowHeight);
     if (onCursorChange) {
       onCursorChange(nextCursor);
     }
+  };
+
+  //
+  const next = (currentTarget = null) => {
+    const _target = currentTarget || document.getElementById(id);
+    const nextCursor = cursor + 1 < count || infinite ? cursor + 1 : 0;
+    updateState(nextCursor, _target);
+  };
+
+  //
+  const previous = (currentTarget = null) => {
+    const _target = currentTarget || document.getElementById(id);
+    const nextCursor = cursor - 1 > -1 ? cursor - 1 : infinite ? 0 : count - 1;
+    updateState(nextCursor, _target);
   };
 
   // hander:keydown
@@ -102,16 +126,18 @@ export default function useListKeyboard({
           }
         } else if (isArrowUp(key)) {
           // key[ARROW_UP]: handler
-          const nextCursor = cursor - 1 > -1 ? cursor - 1 : infinite ? 0 : count - 1;
-          updateState(nextCursor, currentTarget);
+          previous(currentTarget);
+          // const nextCursor = cursor - 1 > -1 ? cursor - 1 : infinite ? 0 : count - 1;
+          // updateState(nextCursor, currentTarget);
         } else if (isArrowDown(key)) {
           // key[ARROW_DOWN]: handler
-          const nextCursor = cursor + 1 < count || infinite ? cursor + 1 : 0;
-          updateState(nextCursor, currentTarget);
+          next(currentTarget);
+          // const nextCursor = cursor + 1 < count || infinite ? cursor + 1 : 0;
+          // updateState(nextCursor, currentTarget);
         }
       });
     }
   };
 
-  return { cursor, setCursor, onKeyDown };
+  return { cursor, setCursor, next, previous, onKeyDown };
 }

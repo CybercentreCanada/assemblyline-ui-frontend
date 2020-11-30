@@ -122,17 +122,7 @@ const TopBar: React.FC<AppBarProps> = ({ width }) => {
 
 function SlideIn({ children, show }) {
   return (
-    <Slide
-      appear={false}
-      direction="down"
-      in={show}
-      mountOnEnter
-      unmountOnExit
-      onEntered={() => {
-        window.dispatchEvent(new CustomEvent('mui.elements.viewport.resize', { detail: { delta: -64 } }));
-      }}
-      onExited={() => window.dispatchEvent(new CustomEvent('mui.elements.viewport.resize', { detail: { delta: 64 } }))}
-    >
+    <Slide appear={false} direction="down" in={show} mountOnEnter unmountOnExit>
       {children}
     </Slide>
   );
