@@ -56,7 +56,6 @@ Create a file named `.env.local` at the root of the assemblyline-ui-frontend dir
 The file should only contain the following where `<YOUR_IP>` is replaced by your dev computer IP.
 
     HOST=<YOUR_IP>.nip.io
-    PUBLIC_URL=next/
 
 ### Setup docker compose environment
 
