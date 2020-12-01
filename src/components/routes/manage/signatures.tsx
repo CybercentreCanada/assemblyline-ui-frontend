@@ -13,7 +13,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import SearchPager from 'components/visual/SearchPager';
 import SignaturesTable from 'components/visual/SearchResult/signatures';
 import 'moment/locale/fr';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
 import SignatureDetail from './signature_detail';
@@ -102,28 +102,40 @@ export default function Signatures() {
     });
   };
 
-  const onClear = () => {
-    history.push(location.pathname);
-  };
+  const onClear = useCallback(
+    () => {
+      history.push(location.pathname);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [location.pathname]
+  );
 
-  const onSearch = () => {
-    if (filterValue.current !== '') {
-      query.set('query', filterValue.current);
-      history.push(`${location.pathname}?${query.toString()}`);
-    } else {
-      onClear();
-    }
-  };
+  const onSearch = useCallback(
+    () => {
+      if (filterValue.current !== '') {
+        query.set('query', filterValue.current);
+        history.push(`${location.pathname}?${query.toString()}`);
+      } else {
+        onClear();
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [query, location.pathname, onClear]
+  );
 
   const onFilterValueChange = (inputValue: string) => {
     filterValue.current = inputValue;
   };
 
-  const setSignatureID = (sig_id: string) => {
-    setGlobalDrawer(
-      <SignatureDetail signature_id={sig_id} onUpdated={handleSignatureUpdated} onDeleted={handleSignatureDeleted} />
-    );
-  };
+  const setSignatureID = useCallback(
+    (sig_id: string) => {
+      setGlobalDrawer(
+        <SignatureDetail signature_id={sig_id} onUpdated={handleSignatureUpdated} onDeleted={handleSignatureDeleted} />
+      );
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
   const handleSignatureUpdated = () => {
     if (!isXL) closeGlobalDrawer();
@@ -137,95 +149,115 @@ export default function Signatures() {
 
   return (
     <PageFullWidth margin={4}>
-      <div style={{ paddingBottom: theme.spacing(2) }}>
-        <Grid container alignItems="center">
-          <Grid item xs>
-            <Typography variant="h4">{t('title')}</Typography>
-          </Grid>
-          <Grid item xs style={{ textAlign: 'right' }}>
-            <Tooltip title={t('download_desc')}>
-              <IconButton
-                component={Link}
-                style={{ color: theme.palette.action.active }}
-                href={`/api/v4/signature/download/?query=${query ? query.get('query', '*') : '*'}`}
-              >
-                <GetAppOutlinedIcon />
-              </IconButton>
-            </Tooltip>
-          </Grid>
-        </Grid>
-      </div>
-
-      <PageHeader isSticky>
-        <div style={{ paddingTop: theme.spacing(1) }}>
-          <SearchBar
-            initValue={query ? query.get('query', '') : ''}
-            placeholder={t('filter')}
-            searching={searching}
-            suggestions={suggestions}
-            onValueChange={onFilterValueChange}
-            onClear={onClear}
-            onSearch={onSearch}
-            buttons={[
-              {
-                icon: (
-                  <Tooltip title={t('noisy')}>
-                    <RecordVoiceOverOutlinedIcon fontSize={upMD ? 'default' : 'small'} />
+      {useMemo(() => {
+        return (
+          <>
+            <div style={{ paddingBottom: theme.spacing(2) }}>
+              <Grid container alignItems="center">
+                <Grid item xs>
+                  <Typography variant="h4">{t('title')}</Typography>
+                </Grid>
+                <Grid item xs style={{ textAlign: 'right' }}>
+                  <Tooltip title={t('download_desc')}>
+                    <IconButton
+                      component={Link}
+                      style={{ color: theme.palette.action.active }}
+                      href={`/api/v4/signature/download/?query=${query ? query.get('query', '*') : '*'}`}
+                    >
+                      <GetAppOutlinedIcon />
+                    </IconButton>
                   </Tooltip>
-                ),
-                props: {
-                  onClick: () => {
-                    query.set('query', 'status:NOISY');
-                    history.push(`${location.pathname}?${query.toString()}`);
-                  }
-                }
-              },
+                </Grid>
+              </Grid>
+            </div>
 
-              {
-                icon: (
-                  <Tooltip title={t('disabled')}>
-                    <BlockIcon fontSize={upMD ? 'default' : 'small'} />
-                  </Tooltip>
-                ),
-                props: {
-                  onClick: () => {
-                    query.set('query', 'status:DISABLED');
-                    history.push(`${location.pathname}?${query.toString()}`);
-                  }
-                }
-              }
-            ]}
-          >
-            {signatureResults !== null && (
-              <div className={classes.searchresult}>
-                {signatureResults.total !== 0 && (
-                  <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
-                    {searching ? (
-                      <span>{t('searching')}</span>
-                    ) : (
-                      <span>
-                        {signatureResults.total}&nbsp;
-                        {query.get('query')
-                          ? t(`filtered${signatureResults.total === 1 ? '' : 's'}`)
-                          : t(`total${signatureResults.total === 1 ? '' : 's'}`)}
-                      </span>
-                    )}
-                  </Typography>
-                )}
+            <PageHeader isSticky>
+              <div style={{ paddingTop: theme.spacing(1) }}>
+                <SearchBar
+                  initValue={query ? query.get('query', '') : ''}
+                  placeholder={t('filter')}
+                  searching={searching}
+                  suggestions={suggestions}
+                  onValueChange={onFilterValueChange}
+                  onClear={onClear}
+                  onSearch={onSearch}
+                  buttons={[
+                    {
+                      icon: (
+                        <Tooltip title={t('noisy')}>
+                          <RecordVoiceOverOutlinedIcon fontSize={upMD ? 'default' : 'small'} />
+                        </Tooltip>
+                      ),
+                      props: {
+                        onClick: () => {
+                          query.set('query', 'status:NOISY');
+                          history.push(`${location.pathname}?${query.toString()}`);
+                        }
+                      }
+                    },
 
-                <SearchPager
-                  total={signatureResults.total}
-                  setResults={setSignatureResults}
-                  pageSize={pageSize}
-                  index="signature"
-                  query={query}
-                  setSearching={setSearching}
-                />
+                    {
+                      icon: (
+                        <Tooltip title={t('disabled')}>
+                          <BlockIcon fontSize={upMD ? 'default' : 'small'} />
+                        </Tooltip>
+                      ),
+                      props: {
+                        onClick: () => {
+                          query.set('query', 'status:DISABLED');
+                          history.push(`${location.pathname}?${query.toString()}`);
+                        }
+                      }
+                    }
+                  ]}
+                >
+                  {signatureResults !== null && (
+                    <div className={classes.searchresult}>
+                      {signatureResults.total !== 0 && (
+                        <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
+                          {searching ? (
+                            <span>{t('searching')}</span>
+                          ) : (
+                            <span>
+                              {signatureResults.total}&nbsp;
+                              {query.get('query')
+                                ? t(`filtered${signatureResults.total === 1 ? '' : 's'}`)
+                                : t(`total${signatureResults.total === 1 ? '' : 's'}`)}
+                            </span>
+                          )}
+                        </Typography>
+                      )}
+
+                      <SearchPager
+                        total={signatureResults.total}
+                        setResults={setSignatureResults}
+                        pageSize={pageSize}
+                        index="signature"
+                        query={query}
+                        setSearching={setSearching}
+                      />
+                    </div>
+                  )}
+                </SearchBar>
               </div>
-            )}
-          </SearchBar>
-        </div>
-      </PageHeader>
+            </PageHeader>
+          </>
+        );
+      }, [
+        classes.searchresult,
+        history,
+        location.pathname,
+        onClear,
+        onSearch,
+        pageSize,
+        query,
+        searching,
+        signatureResults,
+        suggestions,
+        t,
+        theme,
+        upMD
+      ])}
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         <SignaturesTable signatureResults={signatureResults} setSignatureID={setSignatureID} />
