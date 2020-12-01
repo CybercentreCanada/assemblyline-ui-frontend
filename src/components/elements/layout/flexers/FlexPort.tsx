@@ -1,4 +1,4 @@
-import { makeStyles} from '@material-ui/core';
+import { makeStyles } from '@material-ui/core';
 import React from 'react';
 
 const useStyles = makeStyles({
@@ -16,13 +16,19 @@ const useStyles = makeStyles({
   }
 });
 
-const FlexPort = ({ mt = 0, mr = 0, mb = 0, ml = 0, children }) => {
+const FlexPort: React.FC<{
+  mt?: number;
+  mr?: number;
+  mb?: number;
+  ml?: number;
+  children: React.ReactNode;
+}> = React.memo(({ mt = 0, mr = 0, mb = 0, ml = 0, children }) => {
   const classes = useStyles();
   return (
     <div className={classes.flexPortOuter}>
       <div className={classes.flexPortInner}>{children}</div>
     </div>
   );
-};
+});
 
 export default FlexPort;
