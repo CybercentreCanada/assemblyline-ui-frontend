@@ -1,7 +1,6 @@
-import { Drawer, Grid, IconButton, Link, makeStyles, Tooltip, useMediaQuery, useTheme } from '@material-ui/core';
+import { Grid, IconButton, Link, makeStyles, Tooltip, useMediaQuery, useTheme } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 import BlockIcon from '@material-ui/icons/Block';
-import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
 import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
 import RecordVoiceOverOutlinedIcon from '@material-ui/icons/RecordVoiceOverOutlined';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
@@ -9,6 +8,7 @@ import PageHeader from 'commons/components/layout/pages/PageHeader';
 import SearchBar from 'components/elements/search/search-bar';
 import SimpleSearchQuery from 'components/elements/search/simple-search-query';
 import useAppContext from 'components/hooks/useAppContext';
+import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import SearchPager from 'components/visual/SearchPager';
 import SignaturesTable from 'components/visual/SearchResult/signatures';
@@ -48,8 +48,6 @@ export default function Signatures() {
   const { t } = useTranslation(['manageSignatures']);
   const [pageSize] = useState(PAGE_SIZE);
   const [searching, setSearching] = useState(false);
-  const [drawer, setDrawer] = useState(false);
-  const [sid, setSid] = useState(null);
   const { indexes } = useAppContext();
   const [signatureResults, setSignatureResults] = useState<SearchResults>(null);
   const location = useLocation();
@@ -58,7 +56,9 @@ export default function Signatures() {
   const theme = useTheme();
   const apiCall = useMyAPI();
   const classes = useStyles();
+  const { closeGlobalDrawer, setGlobalDrawer } = useDrawer();
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
+  const isXL = useMediaQuery(theme.breakpoints.only('xl'));
   const [suggestions] = useState([
     ...Object.keys(indexes.signature).filter(name => {
       return indexes.signature[name].indexed;
@@ -120,33 +120,23 @@ export default function Signatures() {
   };
 
   const setSignatureID = (sig_id: string) => {
-    setDrawer(true);
-    setSid(sig_id);
+    setGlobalDrawer(
+      <SignatureDetail signature_id={sig_id} onUpdated={handleSignatureUpdated} onDeleted={handleSignatureDeleted} />
+    );
   };
 
-  const handleSignatureDone = () => {
-    setDrawer(false);
-    setSid(null);
+  const handleSignatureUpdated = () => {
+    if (!isXL) closeGlobalDrawer();
     setTimeout(() => reload(signatureResults ? signatureResults.offset : 0), 1000);
   };
 
-  const closeDrawer = () => {
-    setDrawer(false);
+  const handleSignatureDeleted = () => {
+    closeGlobalDrawer();
+    setTimeout(() => reload(signatureResults ? signatureResults.offset : 0), 1000);
   };
 
   return (
     <PageFullWidth margin={4}>
-      <Drawer anchor="right" classes={{ paper: classes.drawerPaper }} open={drawer} onClose={closeDrawer}>
-        <div id="drawerTop" style={{ padding: theme.spacing(1) }}>
-          <IconButton onClick={closeDrawer}>
-            <CloseOutlinedIcon />
-          </IconButton>
-        </div>
-        <div style={{ paddingLeft: theme.spacing(2), paddingRight: theme.spacing(2) }}>
-          <SignatureDetail signature_id={sid} close={handleSignatureDone} />
-        </div>
-      </Drawer>
-
       <div style={{ paddingBottom: theme.spacing(2) }}>
         <Grid container alignItems="center">
           <Grid item xs>

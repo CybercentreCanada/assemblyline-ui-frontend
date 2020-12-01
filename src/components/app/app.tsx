@@ -13,6 +13,7 @@ import LockedPage from 'components/routes/locked';
 import LoginScreen from 'components/routes/login';
 import Routes from 'components/routes/routes';
 import Tos from 'components/routes/tos';
+import DrawerProvider from 'components/visual/DrawerProvider';
 import HighlightProvider from 'components/visual/HighlightProvider';
 import getXSRFCookie from 'helpers/xsrf';
 import React, { useEffect, useState } from 'react';
@@ -132,11 +133,13 @@ const AppInit: React.FC = () => {
     <BrowserRouter basename={process.env.PUBLIC_URL}>
       <SiteMapProvider {...sitemapProps}>
         <UserProvider {...userProps}>
-          <AppLayoutProvider {...layoutProps}>
-            <HighlightProvider>
-              <MyApp />
-            </HighlightProvider>
-          </AppLayoutProvider>
+          <DrawerProvider>
+            <AppLayoutProvider {...layoutProps}>
+              <HighlightProvider>
+                <MyApp />
+              </HighlightProvider>
+            </AppLayoutProvider>
+          </DrawerProvider>
         </UserProvider>
       </SiteMapProvider>
     </BrowserRouter>

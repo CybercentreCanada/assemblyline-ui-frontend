@@ -49,7 +49,8 @@ type ParamProps = {
 
 type SignatureDetailProps = {
   signature_id?: string;
-  close?: () => void;
+  onUpdated?: () => void;
+  onDeleted?: () => void;
 };
 
 const useStyles = makeStyles(theme => ({
@@ -73,7 +74,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const SignatureDetail = ({ signature_id, close }: SignatureDetailProps) => {
+const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetailProps) => {
   const { t } = useTranslation(['manageSignatureDetail']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
@@ -99,14 +100,14 @@ const SignatureDetail = ({ signature_id, close }: SignatureDetailProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [signature_id, id]);
 
-  const closeDrawer = () => {
+  const closeDialog = () => {
     setOpen(false);
   };
 
   const handleSelectChange = event => {
     setModified(true);
     setSignature({ ...signature, status: event.target.value });
-    closeDrawer();
+    closeDialog();
   };
 
   const handleStateSaveButtonClick = () => {
@@ -115,7 +116,7 @@ const SignatureDetail = ({ signature_id, close }: SignatureDetailProps) => {
       onSuccess: () => {
         showSuccessMessage(t('change.success'));
         setModified(false);
-        close();
+        onUpdated();
       },
       onEnter: () => setButtonLoading(true),
       onExit: () => setButtonLoading(false)
@@ -123,14 +124,14 @@ const SignatureDetail = ({ signature_id, close }: SignatureDetailProps) => {
   };
 
   const handleExecuteDeleteButtonClick = () => {
-    closeDrawer();
+    closeDialog();
     apiCall({
       url: `/api/v4/signature/${signature_id || id}/`,
       method: 'DELETE',
       onSuccess: () => {
         showSuccessMessage(t('delete.success'));
         if (id) setTimeout(() => history.push('/manage/signatures'), 1000);
-        close();
+        onDeleted();
       }
     });
   };
@@ -153,7 +154,7 @@ const SignatureDetail = ({ signature_id, close }: SignatureDetailProps) => {
 
       <Dialog
         open={open}
-        onClose={closeDrawer}
+        onClose={closeDialog}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
@@ -176,7 +177,7 @@ const SignatureDetail = ({ signature_id, close }: SignatureDetailProps) => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={closeDrawer} color="primary">
+          <Button onClick={closeDialog} color="primary">
             {t('change.close')}
           </Button>
         </DialogActions>
@@ -277,7 +278,8 @@ const SignatureDetail = ({ signature_id, close }: SignatureDetailProps) => {
 
 SignatureDetail.defaultProps = {
   signature_id: null,
-  close: () => {}
+  onUpdated: () => {},
+  onDeleted: () => {}
 };
 
 export default SignatureDetail;
