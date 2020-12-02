@@ -19,6 +19,7 @@ import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutl
 import YoutubeSearchedForIcon from '@material-ui/icons/YoutubeSearchedFor';
 import { Skeleton } from '@material-ui/lab';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
+import useAppContext from 'components/hooks/useAppContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import Classification from 'components/visual/Classification';
@@ -87,6 +88,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
   const { showSuccessMessage } = useMySnackbar();
   const apiCall = useMyAPI();
   const classes = useStyles();
+  const { user: currentUser } = useAppContext();
 
   useEffect(() => {
     if (signature_id || id) {
@@ -200,7 +202,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
           <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
             {signature ? (
               <>
-                <div style={{ display: 'flex', marginBottom: theme.spacing(1) }}>
+                <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
                   <Tooltip title={t('usage')}>
                     <IconButton
                       component={Link}
@@ -210,18 +212,27 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
                       <YoutubeSearchedForIcon />
                     </IconButton>
                   </Tooltip>
-                  <Tooltip title={t('remove')}>
-                    <IconButton
-                      style={{
-                        color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                      }}
-                      onClick={handleDeleteButtonClick}
-                    >
-                      <RemoveCircleOutlineOutlinedIcon />
-                    </IconButton>
-                  </Tooltip>
+                  {(currentUser.is_admin || currentUser.roles.indexOf('signature_manager') !== -1) && (
+                    <Tooltip title={t('remove')}>
+                      <IconButton
+                        style={{
+                          color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                        }}
+                        onClick={handleDeleteButtonClick}
+                      >
+                        <RemoveCircleOutlineOutlinedIcon />
+                      </IconButton>
+                    </Tooltip>
+                  )}
                 </div>
-                <SignatureStatus status={signature.status} onClick={() => setOpen(true)} />
+                <SignatureStatus
+                  status={signature.status}
+                  onClick={
+                    currentUser.is_admin || currentUser.roles.indexOf('signature_manager') !== -1
+                      ? () => setOpen(true)
+                      : null
+                  }
+                />
               </>
             ) : (
               <>
