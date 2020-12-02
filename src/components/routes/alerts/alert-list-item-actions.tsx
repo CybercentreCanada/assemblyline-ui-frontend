@@ -6,7 +6,6 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
-  makeStyles,
   Typography,
   useTheme
 } from '@material-ui/core';
@@ -21,28 +20,6 @@ import { useTranslation } from 'react-i18next';
 import { AlertDrawerState } from './alerts';
 import { AlertItem } from './hooks/useAlerts';
 import usePromiseAPI from './hooks/usePromiseAPI';
-
-// Some generated style classes
-const useStyles = makeStyles(theme => ({
-  // drawerInner: {
-  //   display: 'flex',
-  //   flexDirection: 'column',
-  //   width: '600px',
-  //   [theme.breakpoints.down('xs')]: {
-  //     width: '100vw'
-  //   }
-  // },
-  // searchresult: {
-  //   fontStyle: 'italic'
-  // },
-  // listactions: {
-  //   '& button': {
-  //     // backgroundColor: 'silver'
-  //     marginRight: theme.spacing(1),
-  //     boxShadow: theme.shadows[2]
-  //   }
-  // }
-}));
 
 interface AlertListItemActionsProps {
   item: AlertItem;
@@ -59,7 +36,6 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
       open: false,
       query: null
     });
-    const classes = useStyles();
 
     const onTakeOwnershipOkClick = async () => {
       setProgress(true);
@@ -119,7 +95,6 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
           <IconButton
             title="Workflow Action"
             onClick={() => {
-              console.log('workflow action.');
               const actionQuery = buildActionQuery();
               setDrawer({ open: true, type: 'actions', actionData: { query: actionQuery, total: 1 } });
             }}

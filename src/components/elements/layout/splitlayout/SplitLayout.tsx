@@ -87,8 +87,8 @@ const SplitLayout: React.FC<SplitLayoutProps> = React.memo(
 
     // Some DOM refs
     const containerRef = useRef<HTMLDivElement>();
-    const leftRef = useRef<HTMLDivElement>();
-    const rightRef = useRef<HTMLDivElement>();
+    // const leftRef = useRef<HTMLDivElement>();
+    // const rightRef = useRef<HTMLDivElement>();
     const anchorRef = useRef<HTMLDivElement>();
 
     // Utility function the get the current width of container.
