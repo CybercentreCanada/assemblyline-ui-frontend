@@ -75,9 +75,21 @@ export default function Signatures() {
     if (query) {
       reload(0);
     }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
+
+  useEffect(() => {
+    function handleReload() {
+      reload(signatureResults ? signatureResults.offset : 0);
+    }
+
+    window.addEventListener('reloadSignatures', handleReload);
+
+    return () => {
+      window.removeEventListener('reloadSignatures', handleReload);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query, signatureResults]);
 
   const reload = offset => {
     query.set('rows', PAGE_SIZE);
@@ -139,12 +151,12 @@ export default function Signatures() {
 
   const handleSignatureUpdated = () => {
     if (!isXL) closeGlobalDrawer();
-    setTimeout(() => reload(signatureResults ? signatureResults.offset : 0), 1000);
+    setTimeout(() => window.dispatchEvent(new CustomEvent('reloadSignatures')), 1000);
   };
 
   const handleSignatureDeleted = () => {
     closeGlobalDrawer();
-    setTimeout(() => reload(signatureResults ? signatureResults.offset : 0), 1000);
+    setTimeout(() => window.dispatchEvent(new CustomEvent('reloadSignatures')), 1000);
   };
 
   return (
