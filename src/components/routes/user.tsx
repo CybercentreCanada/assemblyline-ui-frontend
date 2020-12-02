@@ -661,7 +661,7 @@ function User({ width, username }: UserProps) {
                     <ChevronRightOutlinedIcon />
                   </TableCell>
                 </TableRow>
-                {configuration.auth.allow_2fa ? (
+                {user && currentUser.username === user.uname && configuration.auth.allow_2fa && (
                   <TableRow
                     hover
                     style={{ cursor: 'pointer' }}
@@ -674,25 +674,26 @@ function User({ width, username }: UserProps) {
                       <ChevronRightOutlinedIcon />
                     </TableCell>
                   </TableRow>
-                ) : null}
-                {user ? (
-                  user['2fa_enabled'] && configuration.auth.allow_security_tokens ? (
+                )}
+                {user &&
+                  currentUser.username === user.uname &&
+                  user['2fa_enabled'] &&
+                  configuration.auth.allow_security_tokens && (
                     <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('token')}>
                       <TableCell width="100%">{user ? t('token') : <Skeleton />}</TableCell>
                       <TableCell align="right">
                         <ChevronRightOutlinedIcon />
                       </TableCell>
                     </TableRow>
-                  ) : null
-                ) : null}
-                {configuration.auth.allow_apikeys ? (
+                  )}
+                {user && currentUser.username === user.uname && configuration.auth.allow_apikeys && (
                   <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('api_key')}>
                     <TableCell width="100%">{user ? t('apikeys') : <Skeleton />}</TableCell>
                     <TableCell align="right">
                       <ChevronRightOutlinedIcon />
                     </TableCell>
                   </TableRow>
-                ) : null}
+                )}
               </TableBody>
             </Table>
           </TableContainer>
