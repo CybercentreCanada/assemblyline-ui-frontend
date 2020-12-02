@@ -134,7 +134,7 @@ export default function Signatures() {
       );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [query]
   );
 
   const handleSignatureUpdated = () => {
