@@ -64,7 +64,7 @@ export interface CustomUser extends UserProfileProps {
   default_view?: string;
   groups: string[];
   is_active: boolean;
-  type: string[];
+  roles: string[];
 }
 
 export interface CustomUserContextProps extends UserContextProps<CustomUser> {
