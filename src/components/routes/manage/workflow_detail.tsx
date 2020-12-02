@@ -150,7 +150,10 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
       onSuccess: () => {
         setDeleteDialog(false);
         showSuccessMessage(t('delete.success'));
-        if (id) setTimeout(() => history.push('/manage/workflows'), 1000);
+        if (id) {
+          setTimeout(() => history.push('/manage/workflows'), 1000);
+        }
+        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadWorkflows')), 1000);
         close();
       }
     });
@@ -168,7 +171,8 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
       onSuccess: () => {
         showSuccessMessage(t(workflow_id || id ? 'save.success' : 'add.success'));
         setModified(false);
-        close();
+        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadWorkflows')), 1000);
+        if (!(workflow_id || id)) close();
       },
       onEnter: () => setButtonLoading(true),
       onExit: () => setButtonLoading(false)
