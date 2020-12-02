@@ -15,7 +15,7 @@ import ClearOutlinedIcon from '@material-ui/icons/ClearOutlined';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Skeleton from '@material-ui/lab/Skeleton';
 import clsx from 'clsx';
-import PageCenter from 'commons/components/layout/pages/PageCenter';
+import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import useMyAPI from 'components/hooks/useMyAPI';
 import CustomChip from 'components/visual/CustomChip';
 import React, { useEffect, useState } from 'react';
@@ -142,7 +142,7 @@ export default function ApiDoc() {
   }, [apiSelected]);
 
   return (
-    <PageCenter margin={4} width="100%">
+    <PageFullWidth margin={4}>
       <div style={{ textAlign: 'left' }}>
         <div style={{ marginBottom: theme.spacing(4) }}>
           <Grid container>
@@ -423,6 +423,6 @@ export default function ApiDoc() {
           </div>
         )}
       </div>
-    </PageCenter>
+    </PageFullWidth>
   );
 }
