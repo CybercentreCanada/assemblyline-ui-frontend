@@ -562,6 +562,7 @@ function Settings<SettingsProps>({ width }) {
             bottom: 0,
             left: 0,
             width: '100%',
+            zIndex: theme.zIndex.drawer - 1,
             backgroundColor: theme.palette.background.default,
             boxShadow: theme.shadows[4]
           }}

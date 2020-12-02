@@ -88,7 +88,10 @@ function DrawerProvider(props: HighlightProviderProps) {
         <Drawer
           open={globalDrawer !== null}
           className={classes.appRightDrawer}
-          style={{ width: globalDrawer ? drawerWidth : 0 }}
+          style={{
+            width: globalDrawer ? drawerWidth : 0,
+            zIndex: isXL ? theme.zIndex.appBar + 1 : theme.zIndex.drawer
+          }}
           classes={{ paper: classes.paper }}
           anchor="right"
           variant={isXL ? 'persistent' : 'temporary'}

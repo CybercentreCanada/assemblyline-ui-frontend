@@ -326,6 +326,7 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
             left: id ? 0 : 'inherit',
             width: id ? '100%' : 'inherit',
             textAlign: id ? 'center' : 'right',
+            zIndex: id ? theme.zIndex.drawer - 1 : 'auto',
             backgroundColor: id ? theme.palette.background.default : 'inherit',
             boxShadow: id ? theme.shadows[4] : 'inherit'
           }}
