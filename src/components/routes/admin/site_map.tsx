@@ -16,7 +16,7 @@ import HttpsOutlinedIcon from '@material-ui/icons/HttpsOutlined';
 import NoEncryptionOutlinedIcon from '@material-ui/icons/NoEncryptionOutlined';
 import { Skeleton } from '@material-ui/lab';
 import useUser from 'commons/components/hooks/useAppUser';
-import PageCenter from 'commons/components/layout/pages/PageCenter';
+import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import CustomChip from 'components/visual/CustomChip';
@@ -70,7 +70,7 @@ export default function SiteMap() {
   }, []);
 
   return currentUser.is_admin ? (
-    <PageCenter margin={4} width="100%">
+    <PageFullWidth margin={4}>
       <div style={{ marginBottom: theme.spacing(2), textAlign: 'left' }}>
         <Typography variant="h4">{t('title')}</Typography>
         {siteMap ? (
@@ -93,7 +93,7 @@ export default function SiteMap() {
             </TableHead>
             <TableBody>
               {siteMap.map((path, id) => (
-                <TableRow key={id}>
+                <TableRow key={id} hover>
                   <StyledTableCell>{path.url}</StyledTableCell>
                   <StyledTableCell>{path.function}</StyledTableCell>
                   <StyledTableCell>
@@ -149,7 +149,7 @@ export default function SiteMap() {
       ) : (
         <Skeleton variant="rect" height="10rem" style={{ borderRadius: '4px' }} />
       )}
-    </PageCenter>
+    </PageFullWidth>
   ) : (
     <Redirect to="/forbidden" />
   );
