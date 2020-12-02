@@ -124,12 +124,16 @@ export default function useMyUser(): CustomUserContextProps {
   };
 
   const validateProp = (propDef: ValidatedProp) => {
-    return flattenedProps[propDef.prop] === propDef.value;
+    const obj = flattenedProps[propDef.prop];
+    if (Array.isArray(obj)) {
+      return obj.indexOf(propDef.value) !== -1;
+    }
+    return obj === propDef.value;
   };
 
   const validateProps = (props: ValidatedProp[]) => {
     if (props === undefined) return true;
-    return props.every(validateProp);
+    return props.some(validateProp);
   };
 
   const isReady = () => {

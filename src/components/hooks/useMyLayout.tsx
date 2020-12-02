@@ -88,7 +88,7 @@ const useMyLayout = (): AppLayoutProps => {
             nested: true
           },
           {
-            id: 'manage.manage',
+            id: 'manage.signatures',
             text: t('drawer.manage.signatures'),
             icon: <FingerprintOutlinedIcon />,
             route: '/manage/signatures',
@@ -97,6 +97,10 @@ const useMyLayout = (): AppLayoutProps => {
           {
             id: 'manage.source',
             text: t('drawer.manage.source'),
+            userPropValidators: [
+              { prop: 'user.is_admin', value: true },
+              { prop: 'user.roles', value: 'signature_manager' }
+            ],
             icon: <CodeOutlinedIcon />,
             route: '/manage/sources',
             nested: true
