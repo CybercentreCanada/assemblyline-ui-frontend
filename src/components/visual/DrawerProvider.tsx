@@ -98,7 +98,15 @@ function DrawerProvider(props: DrawerProviderProps) {
           {useMemo(
             () => (
               <>
-                <div id="drawerTop" style={{ padding: theme.spacing(1) }}>
+                <div
+                  id="drawerTop"
+                  style={{
+                    padding: theme.spacing(1),
+                    position: 'sticky',
+                    top: 0,
+                    backgroundColor: theme.palette.background.paper
+                  }}
+                >
                   <IconButton onClick={closeGlobalDrawer}>
                     <CloseOutlinedIcon />
                   </IconButton>
