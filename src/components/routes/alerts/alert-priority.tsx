@@ -25,7 +25,6 @@ const AlertPriority = ({ name, withText = false, withChip = false }) => {
   return name ? (
     withChip ? (
       <CustomChip
-        classes={makeStyles({ icon: { color: theme.palette.getContrastText(COLOR_MAP[name].color) } })()}
         size="small"
         label={name}
         icon={COLOR_MAP[name].arrow}
