@@ -74,7 +74,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id }) => {
     );
   }
   return (
-    <PageCenter margin={4} width="100%">
+    <PageCenter margin={!id ? 4 : 0} mr={0} ml={0} mb={0} mt={0} width="100%">
       <div style={{ textAlign: 'left' }}>
         {item.filtered ? (
           <Box mb={2}>

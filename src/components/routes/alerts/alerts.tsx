@@ -1,34 +1,18 @@
-import {
-  Box,
-  Drawer,
-  IconButton,
-  makeStyles,
-  RootRef,
-  Slide,
-  Typography,
-  useMediaQuery,
-  useScrollTrigger,
-  useTheme
-} from '@material-ui/core';
+import { Box, Drawer, makeStyles, Typography, useMediaQuery, useTheme } from '@material-ui/core';
 import AccountTreeIcon from '@material-ui/icons/AccountTree';
-import CloseIcon from '@material-ui/icons/Close';
 import DetailsIcon from '@material-ui/icons/Details';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import StarIcon from '@material-ui/icons/Star';
 import { ToggleButton } from '@material-ui/lab';
-import useAppLayout from 'commons/components/hooks/useAppLayout';
-import PageContent from 'commons/components/layout/pages/PageContent';
+import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
-import FlexPort from 'components/elements/layout/flexers/FlexPort';
-import FlexVertical from 'components/elements/layout/flexers/FlexVertical';
-import useSplitLayout from 'components/elements/layout/hooks/useSplitLayout';
-import SplitLayout from 'components/elements/layout/splitlayout/SplitLayout';
 import ListNavigator from 'components/elements/lists/navigator/ListNavigator';
 import SimpleList from 'components/elements/lists/simplelist/SimpleList';
 import SearchBar from 'components/elements/search/search-bar';
 import SearchQuery, { SearchQueryFilters } from 'components/elements/search/search-query';
+import useDrawer from 'components/hooks/useDrawer';
 import Classification from 'components/visual/Classification';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FiFilter } from 'react-icons/fi';
 import AlertCardItem from './alert-card';
@@ -58,8 +42,6 @@ export interface AlertDrawerState {
   };
 }
 
-//
-const ALERT_SPLITLAYOUT_ID = 'al.alerts.splitlayout';
 const ALERT_SIMPLELIST_ID = 'al.alerts.simplelist';
 
 // Just indicates whether there are any filters currently set..
@@ -100,7 +82,7 @@ const Alerts: React.FC = () => {
   const classes = useStyles();
   const theme = useTheme();
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
-  const { setAppbarState, currentLayout, autoHideAppbar } = useAppLayout();
+  const { setGlobalDrawer } = useDrawer();
 
   // Alerts hook.
   const {
@@ -124,7 +106,6 @@ const Alerts: React.FC = () => {
   // Define required states...
   const [searching, setSearching] = useState<boolean>(false);
   const [scrollReset, setScrollReset] = useState<boolean>(false);
-  const [splitPanel, setSplitPanel] = useState<{ item: AlertItem }>({ item: null });
   const [drawer, setDrawer] = useState<AlertDrawerState>({
     open: false,
     type: null
@@ -132,28 +113,6 @@ const Alerts: React.FC = () => {
   const [mode, setMode] = useState<'default' | 'legacy'>(
     (localStorage.getItem(LOCAL_STORAGE_KEY_VIEWMODE) as 'default' | 'legacy') || 'default'
   );
-
-  // ------ Start: TopBar autohide with custom scrolltrigger ref ------ //
-
-  // Watch scroll of left panel and hide appbar on scrolltrigger.
-
-  // Root ref to use as target of scrolltrigger hook.
-  const listRef = useRef<HTMLDivElement>();
-  // Follow the simply list scrollbar and get notified when is reaches trigger.
-  const scrollTrigger = useScrollTrigger({
-    disableHysteresis: true,
-    target: listRef.current
-  });
-  // Watch for hideTopBar changes and hide the topbar if trigger reached.
-  const hideTopBar = currentLayout === 'side' && autoHideAppbar && scrollTrigger;
-  useEffect(() => {
-    setAppbarState(!hideTopBar);
-  }, [setAppbarState, hideTopBar]);
-
-  // ------ END: TopBar autohide with custom scrolltrigger ref ------ //
-
-  // splitlayout hook
-  const { openRight, closeRight } = useSplitLayout(ALERT_SPLITLAYOUT_ID);
 
   // Define some references.
   const searchTextValue = useRef<string>(searchQuery.getQuery());
@@ -168,9 +127,6 @@ const Alerts: React.FC = () => {
 
     // Reset scroll for each new search.
     setScrollReset(true);
-
-    // Close right of split panel if open.
-    closeRight();
 
     // Close drawer if its open.
     if (drawer.open) {
@@ -198,9 +154,6 @@ const Alerts: React.FC = () => {
     // Reset scroll for each new search.
     setScrollReset(true);
 
-    // Close right of split panel if open.
-    closeRight();
-
     // Refetch initial data.
     onLoad();
   };
@@ -208,12 +161,32 @@ const Alerts: React.FC = () => {
   // Handler for when an item of the InfiniteList is selected.
   const onItemSelected = useCallback(
     (item: AlertItem) => {
-      if (item && mode === 'default') {
-        openRight();
-        setSplitPanel({ item });
-      }
+      setGlobalDrawer(
+        <div>
+          <div
+            style={{
+              position: 'sticky',
+              top: 0,
+              paddingTop: theme.spacing(1),
+              marginTop: -theme.spacing(8),
+              marginRight: -theme.spacing(1),
+              float: 'right',
+              backgroundColor: theme.palette.background.paper
+            }}
+          >
+            <ListNavigator id={ALERT_SIMPLELIST_ID} />
+          </div>
+          <Box display="flex" alignItems="center" marginBottom={2}>
+            <Box flex={1}>
+              <Classification c12n={item.classification} type="outlined" />
+            </Box>
+          </Box>
+
+          <AlertDetails id={item.alert_id} />
+        </div>
+      );
     },
-    [mode, openRight]
+    [setGlobalDrawer]
   );
 
   // Handler for when loading more alerts [read bottom of scroll area]
@@ -232,9 +205,6 @@ const Alerts: React.FC = () => {
 
     // Fetch result based on new/updated query.
     onLoad();
-
-    // Close right of split panel if open.
-    closeRight();
 
     // Close the Filters drawer.
     if (drawer.open) {
@@ -286,9 +256,6 @@ const Alerts: React.FC = () => {
     // Fetch result based on new/updated query
     onLoad();
 
-    // Close right of split panel if open.
-    closeRight();
-
     // Close the Filters drawer.
     if (drawer.open) {
       setDrawer({ ...drawer, open: false });
@@ -324,11 +291,6 @@ const Alerts: React.FC = () => {
     setDrawer({ ...drawer, open: false, actionData: null });
   };
 
-  // Handler for with close the right side of split panel.
-  const onSplitLayoutCloseRight = () => {
-    closeRight();
-  };
-
   // Handler for when the cursor on the list changes via keybaord event.
   const onListCursorChanges = (item: AlertItem) => {
     onItemSelected(item);
@@ -343,7 +305,6 @@ const Alerts: React.FC = () => {
   // Handler for when toggling from default and legacy list view.
   const onToggleMode = () => {
     const nextMode = mode === 'default' ? 'legacy' : 'default';
-    closeRight();
     localStorage.setItem(LOCAL_STORAGE_KEY_VIEWMODE, nextMode);
     setMode(nextMode);
   };
@@ -352,15 +313,53 @@ const Alerts: React.FC = () => {
   // useEffect(() => setQueryFilters(query), [query]);
 
   return (
-    <FlexVertical>
-      <PageContent mt={4} mr={4} mb={0} ml={4}>
-        <div style={{ position: 'relative' }}>
-          <Slide appear={false} direction="down" in={!hideTopBar} mountOnEnter unmountOnExit>
-            <div className={classes.pageTitle}>
-              <Typography variant="h4">{t('alerts')}</Typography>
-            </div>
-          </Slide>
+    <PageFullWidth margin={4}>
+      <Drawer open={drawer.open} anchor="right" onClose={onDrawerClose}>
+        <Box p={theme.spacing(0.5)} className={classes.drawerInner}>
+          {
+            {
+              filter: (
+                <AlertsFilters
+                  searchQuery={searchQuery}
+                  valueFilters={valueFilters}
+                  statusFilters={statusFilters}
+                  priorityFilters={priorityFilters}
+                  labelFilters={labelFilters}
+                  onApplyBtnClick={onApplyFilters}
+                  onCancelBtnClick={onCancelFilters}
+                />
+              ),
+              favorites: (
+                <AlertsFiltersFavorites
+                  initValue={searchTextValue.current}
+                  onSelected={onFavoriteSelected}
+                  onDeleted={onFavoriteDelete}
+                  onSaved={onFavoriteAdd}
+                  onCancel={onFavoriteCancel}
+                />
+              ),
+              actions: drawer.actionData && (
+                <AlertsWorkflowActions
+                  query={drawer.actionData.query}
+                  affectedItemCount={drawer.actionData.total}
+                  statusFilters={statusFilters}
+                  priorityFilters={priorityFilters}
+                  labelFilters={labelFilters}
+                  onApplyBtnClick={onWorkflowActionsApply}
+                  onCancelBtnClick={onWorkflowActionCancel}
+                />
+              )
+            }[drawer.type]
+          }
+        </Box>
+      </Drawer>
 
+      <div style={{ paddingBottom: theme.spacing(2) }}>
+        <Typography variant="h4">{t('alerts')}</Typography>
+      </div>
+
+      <PageHeader isSticky>
+        <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchBar
             initValue={searchQuery.getQuery()}
             searching={searching || loading}
@@ -415,103 +414,26 @@ const Alerts: React.FC = () => {
             </Box>
           </SearchBar>
         </div>
-      </PageContent>
-      <FlexPort>
-        <PageContent mt={0} mr={4} mb={0} ml={4} height="100%">
-          <SplitLayout
-            id={ALERT_SPLITLAYOUT_ID}
-            disableManualResize
-            initLeftWidthPerc={50}
-            leftMinWidth={500}
-            rightMinWidth={500}
-            left={
-              <RootRef rootRef={listRef}>
-                <SimpleList
-                  id={ALERT_SIMPLELIST_ID}
-                  disableProgress
-                  scrollInfinite
-                  scrollReset={scrollReset}
-                  scrollLoadNextThreshold={75}
-                  disableBackgrounds={mode === 'legacy'}
-                  noDivider={mode === 'legacy'}
-                  loading={loading || searching}
-                  items={alerts}
-                  onItemSelected={onItemSelected}
-                  onRenderActions={onRenderListActions}
-                  onLoadNext={_onLoadMore}
-                  onCursorChange={onListCursorChanges}
-                >
-                  {onRenderListRow}
-                </SimpleList>
-              </RootRef>
-            }
-            right={
-              splitPanel.item && (
-                <div
-                  style={{
-                    width: '100%',
-                    padding: theme.spacing(2),
-                    paddingTop: 0
-                  }}
-                >
-                  <PageHeader isSticky top={0} backgroundColor={theme.palette.background.default}>
-                    <Box display="flex" alignItems="center" marginBottom={2}>
-                      <ListNavigator id={ALERT_SIMPLELIST_ID} />
-                      <Box flex={1}>
-                        <Classification c12n={splitPanel.item.classification} type="outlined" />
-                      </Box>
-                      <IconButton onClick={onSplitLayoutCloseRight}>
-                        <CloseIcon />
-                      </IconButton>
-                    </Box>
-                  </PageHeader>
-                  <AlertDetails id={splitPanel.item.alert_id} />
-                </div>
-              )
-            }
-          />
-        </PageContent>
-      </FlexPort>
-      <Drawer open={drawer.open} anchor="right" onClose={onDrawerClose}>
-        <Box p={theme.spacing(0.5)} className={classes.drawerInner}>
-          {
-            {
-              filter: (
-                <AlertsFilters
-                  searchQuery={searchQuery}
-                  valueFilters={valueFilters}
-                  statusFilters={statusFilters}
-                  priorityFilters={priorityFilters}
-                  labelFilters={labelFilters}
-                  onApplyBtnClick={onApplyFilters}
-                  onCancelBtnClick={onCancelFilters}
-                />
-              ),
-              favorites: (
-                <AlertsFiltersFavorites
-                  initValue={searchTextValue.current}
-                  onSelected={onFavoriteSelected}
-                  onDeleted={onFavoriteDelete}
-                  onSaved={onFavoriteAdd}
-                  onCancel={onFavoriteCancel}
-                />
-              ),
-              actions: drawer.actionData && (
-                <AlertsWorkflowActions
-                  query={drawer.actionData.query}
-                  affectedItemCount={drawer.actionData.total}
-                  statusFilters={statusFilters}
-                  priorityFilters={priorityFilters}
-                  labelFilters={labelFilters}
-                  onApplyBtnClick={onWorkflowActionsApply}
-                  onCancelBtnClick={onWorkflowActionCancel}
-                />
-              )
-            }[drawer.type]
-          }
-        </Box>
-      </Drawer>
-    </FlexVertical>
+      </PageHeader>
+
+      <SimpleList
+        id={ALERT_SIMPLELIST_ID}
+        disableProgress
+        scrollInfinite
+        scrollReset={scrollReset}
+        scrollLoadNextThreshold={75}
+        disableBackgrounds={mode === 'legacy'}
+        noDivider={mode === 'legacy'}
+        loading={loading || searching}
+        items={alerts}
+        onItemSelected={onItemSelected}
+        onRenderActions={onRenderListActions}
+        onLoadNext={_onLoadMore}
+        onCursorChange={onListCursorChanges}
+      >
+        {onRenderListRow}
+      </SimpleList>
+    </PageFullWidth>
   );
 };
 
