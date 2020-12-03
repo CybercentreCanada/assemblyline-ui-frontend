@@ -22,24 +22,21 @@ const COLOR_MAP = {
 const AlertPriority = ({ name, withText = false, withChip = false }) => {
   const theme = useTheme();
   const classes = useStyles();
-  const { color, arrow } = COLOR_MAP[name];
-  const { icon } = makeStyles({ icon: { color: theme.palette.getContrastText(color) } })();
-  if (withChip) {
-    return (
+  return name ? (
+    withChip ? (
       <CustomChip
-        classes={{ icon }}
+        classes={makeStyles({ icon: { color: theme.palette.getContrastText(COLOR_MAP[name].color) } })()}
         size="small"
         label={name}
-        icon={arrow}
-        style={{ backgroundColor: color, color: theme.palette.getContrastText(color) }}
+        icon={COLOR_MAP[name].arrow}
+        style={{ backgroundColor: COLOR_MAP[name].color, color: theme.palette.getContrastText(COLOR_MAP[name].color) }}
       />
-    );
-  }
-  return (
-    <Box style={{ color }} display="inline-block" className={classes.priority}>
-      {arrow} {withText ? <Typography>{name}</Typography> : ''}
-    </Box>
-  );
+    ) : (
+      <Box style={{ color: COLOR_MAP[name].color }} display="inline-block" className={classes.priority}>
+        {COLOR_MAP[name].arrow} {withText ? <Typography>{name}</Typography> : ''}
+      </Box>
+    )
+  ) : null;
 };
 
 export default AlertPriority;
