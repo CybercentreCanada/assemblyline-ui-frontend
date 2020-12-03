@@ -1,15 +1,5 @@
-import {
-  Drawer,
-  Grid,
-  IconButton,
-  Link as MaterialLink,
-  makeStyles,
-  Tooltip,
-  Typography,
-  useTheme
-} from '@material-ui/core';
+import { Grid, IconButton, Link as MaterialLink, Tooltip, Typography, useTheme } from '@material-ui/core';
 import ChromeReaderModeOutlinedIcon from '@material-ui/icons/ChromeReaderModeOutlined';
-import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
 import CloudDownloadOutlinedIcon from '@material-ui/icons/CloudDownloadOutlined';
 import MoodIcon from '@material-ui/icons/Mood';
 import MoodBadIcon from '@material-ui/icons/MoodBad';
@@ -18,6 +8,7 @@ import ReplayOutlinedIcon from '@material-ui/icons/ReplayOutlined';
 import { Skeleton } from '@material-ui/lab';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useAppContext from 'components/hooks/useAppContext';
+import useDrawer from 'components/hooks/useDrawer';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -36,22 +27,6 @@ import InfoSection from './detail/info';
 import MetaSection from './detail/meta';
 import TagSection from './detail/tags';
 
-const useStyles = makeStyles(theme => ({
-  drawerPaper: {
-    width: '85%',
-    maxWidth: '1200px',
-    [theme.breakpoints.down('sm')]: {
-      width: '100%'
-    }
-  },
-  title: {
-    cursor: 'pointer',
-    '&:hover, &:focus': {
-      color: theme.palette.text.secondary
-    }
-  }
-}));
-
 type ParamProps = {
   id: string;
   fid?: string;
@@ -65,16 +40,14 @@ export default function SubmissionDetail() {
   const [summary, setSummary] = useState(null);
   const [tree, setTree] = useState(null);
   const [deleteDialog, setDeleteDialog] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const apiCall = useMyAPI();
-  const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
   const { showSuccessMessage } = useMySnackbar();
   const history = useHistory();
-  const classes = useStyles();
   const { user: currentUser } = useAppContext();
   const { setHighlightMap } = useHighlighter();
+  const { setGlobalDrawer, globalDrawer } = useDrawer();
 
   const resubmit = useCallback(() => {
     if (submission != null) {
@@ -146,10 +119,6 @@ export default function SubmissionDetail() {
     [apiCall, currentUser.username, submission]
   );
 
-  const closeDrawer = () => {
-    history.push(`/submission/detail/${id}`);
-  };
-
   useEffect(() => {
     apiCall({
       url: `/api/v4/submission/${id}/`,
@@ -176,10 +145,15 @@ export default function SubmissionDetail() {
   }, [id]);
 
   useEffect(() => {
-    if (!drawer && fid) {
-      setDrawer(true);
-    } else if (drawer && !fid) {
-      setDrawer(false);
+    if (submission !== null && globalDrawer === null && fid !== undefined) {
+      history.push(`/submission/detail/${id}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [globalDrawer]);
+
+  useEffect(() => {
+    if (fid) {
+      setGlobalDrawer(<FileDetail sha256={fid} sid={id} />);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fid]);
@@ -195,19 +169,6 @@ export default function SubmissionDetail() {
         acceptText={t('delete.acceptText')}
         text={t('delete.text')}
       />
-
-      <Drawer anchor="right" classes={{ paper: classes.drawerPaper }} open={drawer} onClose={closeDrawer}>
-        <div id="drawerTop" style={{ padding: sp1 }}>
-          <IconButton onClick={closeDrawer}>
-            <CloseOutlinedIcon />
-          </IconButton>
-        </div>
-        {id && fid && (
-          <div style={{ paddingLeft: sp2, paddingRight: sp2 }}>
-            <FileDetail sha256={fid} sid={id} />
-          </div>
-        )}
-      </Drawer>
       <div style={{ textAlign: 'left' }}>
         {useMemo(
           () => (

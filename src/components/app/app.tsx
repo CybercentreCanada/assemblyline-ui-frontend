@@ -133,13 +133,13 @@ const AppInit: React.FC = () => {
     <BrowserRouter basename={process.env.PUBLIC_URL}>
       <SiteMapProvider {...sitemapProps}>
         <UserProvider {...userProps}>
-          <DrawerProvider>
-            <AppLayoutProvider {...layoutProps}>
-              <HighlightProvider>
+          <HighlightProvider>
+            <DrawerProvider>
+              <AppLayoutProvider {...layoutProps}>
                 <MyApp />
-              </HighlightProvider>
-            </AppLayoutProvider>
-          </DrawerProvider>
+              </AppLayoutProvider>
+            </DrawerProvider>
+          </HighlightProvider>
         </UserProvider>
       </SiteMapProvider>
     </BrowserRouter>

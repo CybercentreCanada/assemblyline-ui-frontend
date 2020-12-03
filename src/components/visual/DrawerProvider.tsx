@@ -44,19 +44,18 @@ const useStyles = makeStyles(theme => ({
 export type DrawerContextProps = {
   closeGlobalDrawer: () => void;
   setGlobalDrawer: (elements: React.ReactElement<any>) => void;
-  setGlobalDrawerCallback: (callback: () => void) => void;
+  globalDrawer: React.ReactElement<any>;
 };
 
-export interface HighlightProviderProps {
+export interface DrawerProviderProps {
   children: React.ReactNode;
 }
 
 export const DrawerContext = React.createContext<DrawerContextProps>(null);
 
-function DrawerProvider(props: HighlightProviderProps) {
+function DrawerProvider(props: DrawerProviderProps) {
   const { children } = props;
   const [globalDrawer, setGlobalDrawer] = useState(null);
-  const [globalDrawerCallback, setGlobalDrawerCallback] = useState(undefined);
   const theme = useTheme();
   const classes = useStyles();
   const isMD = useMediaQuery(theme.breakpoints.only('md'));
@@ -65,7 +64,6 @@ function DrawerProvider(props: HighlightProviderProps) {
 
   const drawerWidth = isXL ? '42vw' : isLG ? '960px' : isMD ? '800px' : '100vw';
   const closeGlobalDrawer = () => {
-    if (globalDrawerCallback) globalDrawerCallback();
     setGlobalDrawer(null);
   };
 
@@ -74,7 +72,7 @@ function DrawerProvider(props: HighlightProviderProps) {
       value={{
         closeGlobalDrawer,
         setGlobalDrawer,
-        setGlobalDrawerCallback
+        globalDrawer
       }}
     >
       <div className={classes.appMain}>
@@ -97,12 +95,19 @@ function DrawerProvider(props: HighlightProviderProps) {
           variant={isXL ? 'persistent' : 'temporary'}
           onClose={closeGlobalDrawer}
         >
-          <div id="drawerTop" style={{ padding: theme.spacing(1) }}>
-            <IconButton onClick={closeGlobalDrawer}>
-              <CloseOutlinedIcon />
-            </IconButton>
-          </div>
-          <div style={{ paddingLeft: theme.spacing(2), paddingRight: theme.spacing(2) }}>{globalDrawer}</div>
+          {useMemo(
+            () => (
+              <>
+                <div id="drawerTop" style={{ padding: theme.spacing(1) }}>
+                  <IconButton onClick={closeGlobalDrawer}>
+                    <CloseOutlinedIcon />
+                  </IconButton>
+                </div>
+                <div style={{ paddingLeft: theme.spacing(2), paddingRight: theme.spacing(2) }}>{globalDrawer}</div>
+              </>
+            ),
+            [globalDrawer, theme]
+          )}
         </Drawer>
       </div>
     </DrawerContext.Provider>

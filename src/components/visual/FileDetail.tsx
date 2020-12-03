@@ -79,7 +79,7 @@ type FileDetailProps = {
   sid?: string;
 };
 
-const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null }) => {
+const WrappedFileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null }) => {
   const { t } = useTranslation(['fileDetail']);
   const [file, setFile] = useState<File | null>(null);
   const apiCall = useMyAPI();
@@ -251,5 +251,7 @@ const FileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null }) => {
     </div>
   );
 };
+
+const FileDetail = React.memo(WrappedFileDetail);
 
 export default FileDetail;
