@@ -181,9 +181,9 @@ function WrappedClassification({
   };
 
   const skelheight = {
-    medium: '3rem',
-    small: '2rem',
-    tiny: '1.5rem'
+    medium: theme.spacing(4),
+    small: theme.spacing(3.5),
+    tiny: theme.spacing(3)
   };
 
   const useClassification = () => {
@@ -355,7 +355,12 @@ function WrappedClassification({
         ) : null}
       </>
     ) : (
-      <Skeleton className={inline ? classes.inlineSkel : null} style={{ height: skelheight[size] }} />
+      <Skeleton
+        variant={type === 'text' ? 'text' : 'rect'}
+        className={inline ? classes.inlineSkel : null}
+        height={type !== 'text' ? skelheight[size] : null}
+        style={{ borderRadius: theme.spacing(0.5) }}
+      />
     ))
   );
 }
