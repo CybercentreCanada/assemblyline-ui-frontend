@@ -21,6 +21,21 @@ type ChipListProps = {
   items: ChipProps[];
 };
 
+const ChipSkeleton = () => {
+  return <Skeleton variant="rect" height="24px" width="3rem" style={{ borderRadius: '16px', marginRight: '4px' }} />;
+};
+
+const ChipSkeletonInline = () => {
+  return (
+    <Skeleton
+      variant="rect"
+      height="24px"
+      width="3rem"
+      style={{ borderRadius: '16px', marginRight: '4px', display: 'inline-block', verticalAlign: 'middle' }}
+    />
+  );
+};
+
 const ChipList: React.FC<ChipListProps> = ({ items }) => {
   const theme = useTheme();
   const classes = useStyles();
@@ -39,12 +54,12 @@ const ChipList: React.FC<ChipListProps> = ({ items }) => {
               <Skeleton
                 key={`chiplist-${i}`}
                 variant="rect"
-                height="1rem"
+                height={theme.spacing(3)}
                 width="3rem"
                 style={{
                   verticalAlign: 'middle',
                   display: 'inline-block',
-                  borderRadius: theme.spacing(0.5),
+                  borderRadius: theme.spacing(2),
                   marginRight: theme.spacing(0.5)
                 }}
               />
@@ -54,4 +69,4 @@ const ChipList: React.FC<ChipListProps> = ({ items }) => {
   );
 };
 
-export { ChipList };
+export { ChipList, ChipSkeleton, ChipSkeletonInline };

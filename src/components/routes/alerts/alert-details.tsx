@@ -4,7 +4,7 @@ import { Skeleton } from '@material-ui/lab';
 import Alert from '@material-ui/lab/Alert';
 import useClipboard from 'commons/components/hooks/useClipboard';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
-import { ChipList } from 'components/elements/mui/chips';
+import { ChipList, ChipSkeleton, ChipSkeletonInline } from 'components/elements/mui/chips';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { AlertItem } from 'components/routes/alerts/hooks/useAlerts';
 import Classification from 'components/visual/Classification';
@@ -37,6 +37,10 @@ const useStyles = makeStyles(theme => ({
 
 type AlertDetailsProps = {
   id?: string;
+};
+
+const SkeletonInline = () => {
+  return <Skeleton style={{ display: 'inline-block', width: '10rem' }} />;
 };
 
 const AlertDetails: React.FC<AlertDetailsProps> = ({ id }) => {
@@ -90,16 +94,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id }) => {
               <Divider />
               <Box className={classes.sectionContent}>
                 <Box display="flex">
-                  {item ? (
-                    <AlertPriority name={item ? item.priority : null} withText withChip />
-                  ) : (
-                    <Skeleton
-                      variant="rect"
-                      height="1rem"
-                      width="3rem"
-                      style={{ borderRadius: theme.spacing(0.5), marginRight: theme.spacing(0.5) }}
-                    />
-                  )}
+                  {item ? <AlertPriority name={item ? item.priority : null} withText withChip /> : <ChipSkeleton />}
                 </Box>
               </Box>
             </Box>
@@ -113,12 +108,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id }) => {
                 {item ? (
                   <CustomChip type="round" variant="outlined" label={item.status} size="small" />
                 ) : (
-                  <Skeleton
-                    variant="rect"
-                    height="1rem"
-                    width="3rem"
-                    style={{ borderRadius: theme.spacing(0.5), marginRight: theme.spacing(0.5) }}
-                  />
+                  <ChipSkeleton />
                 )}
               </Box>
             </Box>
@@ -166,24 +156,9 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id }) => {
             <Grid container spacing={1}>
               <Grid item xs={12}>
                 <Typography variant="caption">{t('file_type')}</Typography>&nbsp;
-                {item ? (
-                  <CustomChip label={item.file.type} variant="outlined" size="small" />
-                ) : (
-                  <Skeleton
-                    variant="rect"
-                    height="1rem"
-                    width="3rem"
-                    style={{
-                      display: 'inline-block',
-                      verticalAlign: 'middle',
-                      borderRadius: theme.spacing(0.5),
-                      marginRight: theme.spacing(0.5)
-                    }}
-                  />
-                )}
-                -
+                {item ? <CustomChip label={item.file.type} variant="outlined" size="small" /> : <ChipSkeletonInline />}-
                 <Box component="span" ml={1} mr={1}>
-                  {item ? item.file.name : <Skeleton style={{ display: 'inline-block', width: '10rem' }} />}
+                  {item ? item.file.name : <SkeletonInline />}
                 </Box>
                 <Typography variant="caption">
                   {item ? `${item.file.size} (${(item.file.size / 1024).toFixed(2)} Kb)` : <Skeleton />}
@@ -195,7 +170,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id }) => {
                   &nbsp;
                   <Typography variant="caption">
                     MD5:&nbsp;&nbsp;&nbsp;&nbsp;
-                    {item ? item.file.md5 : <Skeleton style={{ display: 'inline-block', width: '10rem' }} />}
+                    {item ? item.file.md5 : <SkeletonInline />}
                   </Typography>
                 </div>
                 <div style={{ wordBreak: 'break-all' }}>
@@ -203,7 +178,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id }) => {
                   &nbsp;
                   <Typography variant="caption">
                     SHA1:&nbsp;&nbsp;&nbsp;
-                    {item ? item.file.sha1 : <Skeleton style={{ display: 'inline-block', width: '14rem' }} />}
+                    {item ? item.file.sha1 : <SkeletonInline />}
                   </Typography>
                 </div>
                 <div style={{ wordBreak: 'break-all' }}>
@@ -211,7 +186,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id }) => {
                   &nbsp;
                   <Typography variant="caption">
                     SHA256:&nbsp;
-                    {item ? item.file.sha256 : <Skeleton style={{ display: 'inline-block', width: '18rem' }} />}
+                    {item ? item.file.sha256 : <SkeletonInline />}
                   </Typography>
                 </div>
               </Grid>
@@ -259,17 +234,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id }) => {
                   {item ? (
                     <CustomChip label={item ? item.attack.category : null} variant="outlined" size="small" />
                   ) : (
-                    <Skeleton
-                      variant="rect"
-                      height="1rem"
-                      width="3rem"
-                      style={{
-                        display: 'inline-block',
-                        verticalAlign: 'middle',
-                        borderRadius: theme.spacing(0.5),
-                        marginRight: theme.spacing(0.5)
-                      }}
-                    />
+                    <ChipSkeleton />
                   )}
                 </Grid>
                 <Grid item xs={12} md={8}>
