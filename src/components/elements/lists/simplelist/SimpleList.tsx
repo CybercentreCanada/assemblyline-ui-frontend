@@ -60,6 +60,7 @@ const SimpleList: React.FC<SimpleListProps> = ({
     scrollTargetId,
     infinite: scrollInfinite,
     count: items.length,
+    pause: loading,
     onEscape: () => {
       if (onItemSelected) {
         onItemSelected(null);
