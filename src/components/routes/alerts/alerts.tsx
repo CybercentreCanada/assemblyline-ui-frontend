@@ -422,7 +422,7 @@ const Alerts: React.FC = () => {
         scrollInfinite
         scrollReset={scrollReset}
         scrollLoadNextThreshold={75}
-        srollTarget="app-scrollct"
+        scrollTargetId="app-scrollct"
         disableBackgrounds={mode === 'legacy'}
         noDivider={mode === 'legacy'}
         loading={loading || searching}

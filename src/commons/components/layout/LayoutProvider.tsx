@@ -254,6 +254,7 @@ function AppLayoutProvider(props: LayoutProviderProps) {
               {isUserReady() && appReady && showMenus && <LeftNavDrawer />}
             </div>
             <div
+              id="app-scrollct"
               className={newClasses.appVerticalRight}
               style={{ overflow: 'auto', paddingLeft: showMenus && isSM && !isPrinting ? theme.spacing(7) : 0 }}
             >
@@ -262,7 +263,7 @@ function AppLayoutProvider(props: LayoutProviderProps) {
             </div>
           </div>
         ) : (
-          <div className={newClasses.appHorizontal} style={{ overflow: 'auto' }}>
+          <div id="app-scrollct" className={newClasses.appHorizontal} style={{ overflow: 'auto' }}>
             {isUserReady() && appReady && showMenus && <TopBar />}
             <div className={newClasses.appVertical}>
               <div className={newClasses.appVerticalLeft}>
