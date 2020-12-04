@@ -65,6 +65,7 @@ interface UsingAlerts {
   loading: boolean;
   fields: ALField[];
   total: number;
+  countedTotal: number;
   alerts: AlertItem[];
   searchQuery: SearchQuery;
   labelFilters: SearchFilter[];
@@ -92,10 +93,12 @@ export default function useAlerts(pageSize: number): UsingAlerts {
   const [state, setState] = useState<{
     loading: boolean;
     total: number;
+    countedTotal: number;
     alerts: AlertItem[];
   }>({
     loading: true,
     total: 0,
+    countedTotal: 0,
     alerts: []
   });
 
@@ -119,12 +122,13 @@ export default function useAlerts(pageSize: number): UsingAlerts {
       onSuccess: api_data => {
         console.log(api_data.api_response);
 
-        const { items: _items, tc_start: executionTime, total } = api_data.api_response;
+        const { items: _items, tc_start: executionTime, total, counted_total: countedTotal } = api_data.api_response;
         const items = parseResult(_items, 0);
         searchQuery.setTcStart(executionTime);
         setState({
           loading: false,
           total,
+          countedTotal,
           alerts: items
         });
         if (onComplete) {
@@ -152,11 +156,12 @@ export default function useAlerts(pageSize: number): UsingAlerts {
     apiCall({
       url: buildUrl(),
       onSuccess: api_data => {
-        const { items: _items, total } = api_data.api_response;
+        const { items: _items, total, counted_total: countedTotal } = api_data.api_response;
         const parsedItems = parseResult(_items, _offset);
         setState({
           loading: false,
           total,
+          countedTotal: state.countedTotal + countedTotal,
           alerts: state.alerts.concat(parsedItems)
         });
         if (onComplete) {

@@ -89,6 +89,7 @@ const Alerts: React.FC = () => {
     loading,
     alerts,
     total,
+    countedTotal,
     fields,
     searchQuery,
     valueFilters,
@@ -419,7 +420,7 @@ const Alerts: React.FC = () => {
       <SimpleList
         id={ALERT_SIMPLELIST_ID}
         disableProgress
-        scrollInfinite
+        scrollInfinite={countedTotal > total}
         scrollReset={scrollReset}
         scrollLoadNextThreshold={75}
         scrollTargetId="app-scrollct"
