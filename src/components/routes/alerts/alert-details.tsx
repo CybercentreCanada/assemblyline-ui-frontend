@@ -130,7 +130,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id }) => {
                     {item ? `${item.ts.replace('T', ' ').replace('Z', '')} (UTC)` : <Skeleton />}
                   </Grid>
                   <Grid item xs={4}>
-                    {t('reported_date')}
+                    {t('alerted_date')}
                   </Grid>
                   <Grid item xs={8}>
                     {item ? `${item.reporting_ts.replace('T', ' ').replace('Z', '')} (UTC)` : <Skeleton />}
