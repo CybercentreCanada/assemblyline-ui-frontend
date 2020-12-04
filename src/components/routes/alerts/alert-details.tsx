@@ -9,7 +9,6 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import { AlertItem } from 'components/routes/alerts/hooks/useAlerts';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
-import { format } from 'date-fns';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
@@ -18,7 +17,7 @@ import AlertPriority from './alert-priority';
 
 const useStyles = makeStyles(theme => ({
   section: {
-    marginBottom: theme.spacing(3),
+    marginBottom: theme.spacing(2),
     '& > hr': {
       marginBottom: theme.spacing(1)
     }
@@ -65,11 +64,11 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id }) => {
 
   return (
     <PageCenter margin={!id ? 4 : 0} mr={0} ml={0} mb={0} mt={0} width="100%">
-      <Box display="flex" alignItems="center" marginBottom={2}>
-        <Box flex={1}>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: theme.spacing(2) }}>
+        <div style={{ flex: 1 }}>
           <Classification c12n={item ? item.classification : null} type="outlined" />
-        </Box>
-      </Box>
+        </div>
+      </div>
       <div style={{ textAlign: 'left' }}>
         {item && item.filtered && (
           <Box mb={2}>
@@ -79,89 +78,105 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id }) => {
         <Grid container spacing={2}>
           <Grid item xs={12} md={6}>
             {/* Labels Section */}
-            <Box className={classes.section}>
+            <div className={classes.section}>
               <Typography className={classes.sectionTitle}>{t('label')}</Typography>
               <Divider />
-              <Box className={classes.sectionContent}>
+              <div className={classes.sectionContent}>
                 <ChipList items={item ? item.label.map(label => ({ label, variant: 'outlined' })) : null} />
-              </Box>
-            </Box>
+              </div>
+            </div>
           </Grid>
           <Grid item xs={12} md={3}>
             {/* Priority Section. */}
-            <Box className={classes.section}>
+            <div className={classes.section}>
               <Typography className={classes.sectionTitle}>{t('priority')}</Typography>
               <Divider />
-              <Box className={classes.sectionContent}>
+              <div className={classes.sectionContent}>
                 <Box display="flex">
                   {item ? <AlertPriority name={item ? item.priority : null} withText withChip /> : <ChipSkeleton />}
                 </Box>
-              </Box>
-            </Box>
+              </div>
+            </div>
           </Grid>
           <Grid item xs={12} md={3}>
             {/* Status Section */}
-            <Box className={classes.section}>
+            <div className={classes.section}>
               <Typography className={classes.sectionTitle}>{t('status')}</Typography>
               <Divider />
-              <Box className={classes.sectionContent}>
+              <div className={classes.sectionContent}>
                 {item ? (
                   <CustomChip type="round" variant="outlined" label={item.status} size="small" />
                 ) : (
                   <ChipSkeleton />
                 )}
-              </Box>
-            </Box>
+              </div>
+            </div>
           </Grid>
         </Grid>
 
         {/*  Reporting Date, Type and Owner */}
         <Grid container spacing={2}>
-          {/* Reporting Tyupe Section */}
+          {/* Reporting Type Section */}
           <Grid item xs={12} md={6}>
-            <Box className={classes.section}>
-              <Typography className={classes.sectionTitle}>{t('reporting_date')}</Typography>
+            <div className={classes.section}>
+              <Typography className={classes.sectionTitle}>{t('dates')}</Typography>
               <Divider />
-              <Box className={classes.sectionContent}>
-                {item ? format(new Date(item.reporting_ts), 'yyyy-MM-dd HH:mm:ss.SSSSSS') : <Skeleton />}
-              </Box>
-            </Box>
+              <div className={classes.sectionContent}>
+                <Grid container>
+                  <Grid item xs={4}>
+                    {t('received_date')}
+                  </Grid>
+                  <Grid item xs={8}>
+                    {item ? `${item.ts.replace('T', ' ').replace('Z', '')} (UTC)` : <Skeleton />}
+                  </Grid>
+                  <Grid item xs={4}>
+                    {t('reported_date')}
+                  </Grid>
+                  <Grid item xs={8}>
+                    {item ? `${item.reporting_ts.replace('T', ' ').replace('Z', '')} (UTC)` : <Skeleton />}
+                  </Grid>
+                </Grid>
+              </div>
+            </div>
           </Grid>
           {/* Type Section. */}
           <Grid item xs={12} md={3}>
-            <Box className={classes.section}>
+            <div className={classes.section}>
               <Typography className={classes.sectionTitle}>{t('type')}</Typography>
               <Divider />
-              <Box className={classes.sectionContent}>{item ? item.type : <Skeleton />}</Box>
-            </Box>
+              <div className={classes.sectionContent}>{item ? item.type : <Skeleton />}</div>
+            </div>
           </Grid>
           {/* Owner Section. */}
           <Grid item xs={12} md={3}>
-            <Box className={classes.section}>
+            <div className={classes.section}>
               <Typography className={classes.sectionTitle}>{t('ownership')}</Typography>
               <Divider />
-              <Box className={classes.sectionContent}>
+              <div className={classes.sectionContent}>
                 {/* TODO: don't display user when none. */}
-                {item ? item.owner ? item.owner : item.hint_owner ? 'assigned' : 'none' : <Skeleton />}
-              </Box>
-            </Box>
+                {item ? item.owner ? item.owner : item.hint_owner ? 'assigned' : null : <Skeleton />}
+              </div>
+            </div>
           </Grid>
         </Grid>
 
         {/* File Info */}
-        <Box className={classes.section}>
+        <div className={classes.section}>
           <Typography className={classes.sectionTitle}>{t('file_info')}</Typography>
           <Divider />
-          <Box className={classes.sectionContent}>
+          <div className={classes.sectionContent}>
             <Grid container spacing={1}>
               <Grid item xs={12}>
-                <Typography variant="caption">{t('file_type')}</Typography>&nbsp;
-                {item ? <CustomChip label={item.file.type} variant="outlined" size="small" /> : <ChipSkeletonInline />}-
-                <Box component="span" ml={1} mr={1}>
-                  {item ? item.file.name : <SkeletonInline />}
-                </Box>
+                <span>{item ? item.file.name : <SkeletonInline />}</span>
+                <span style={{ marginLeft: theme.spacing(1), marginRight: theme.spacing(1), wordBreak: 'break-all' }}>
+                  {item ? (
+                    <CustomChip label={item.file.type} variant="outlined" size="small" />
+                  ) : (
+                    <ChipSkeletonInline />
+                  )}
+                </span>
                 <Typography variant="caption">
-                  {item ? `${item.file.size} (${(item.file.size / 1024).toFixed(2)} Kb)` : <Skeleton />}
+                  {item ? `${item.file.size} (${(item.file.size / 1024).toFixed(2)} Kb)` : <SkeletonInline />}
                 </Typography>
               </Grid>
               <Grid item xs={12}>
@@ -191,15 +206,15 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id }) => {
                 </div>
               </Grid>
             </Grid>
-          </Box>
-        </Box>
+          </div>
+        </div>
 
         {/* Metadata Section */}
         {!item || (item.metadata && Object.keys(item.metadata).length > 0) ? (
-          <Box className={classes.section}>
+          <div className={classes.section}>
             <Typography className={classes.sectionTitle}>{t('metadata')}</Typography>
             <Divider />
-            <Box className={classes.sectionContent}>
+            <div className={classes.sectionContent}>
               <pre style={{ margin: 0 }}>
                 {item ? (
                   Object.keys(item.metadata).map(k => (
@@ -216,16 +231,16 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id }) => {
                   </>
                 )}
               </pre>
-            </Box>
-          </Box>
+            </div>
+          </div>
         ) : null}
 
         {/* Attack Section */}
         {!item || item.attack.category ? (
-          <Box className={classes.section}>
+          <div className={classes.section}>
             <Typography className={classes.sectionTitle}>{t('attack')}</Typography>
             <Divider />
-            <Box className={classes.sectionContent}>
+            <div className={classes.sectionContent}>
               <Grid container spacing={1}>
                 <Grid item xs={12} md={4}>
                   <Typography variant="caption" style={{ marginRight: theme.spacing(1) }}>
@@ -248,59 +263,59 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id }) => {
                   </Box>
                 </Grid>
               </Grid>
-            </Box>
-          </Box>
+            </div>
+          </div>
         ) : null}
 
         {/* Heuristics Section */}
         {!item || (item.heuristic && item.heuristic.name && item.heuristic.name.length > 0) ? (
-          <Box className={classes.section}>
+          <div className={classes.section}>
             <Typography className={classes.sectionTitle}>{t('heuristic')}</Typography>
             <Divider />
-            <Box className={classes.sectionContent}>
+            <div className={classes.sectionContent}>
               <ChipList items={item ? item.heuristic.name.map(label => ({ label, variant: 'outlined' })) : null} />
-            </Box>
-          </Box>
+            </div>
+          </div>
         ) : null}
 
         {/* AL Behaviours Section */}
         {!item || item.al.behavior ? (
-          <Box className={classes.section}>
+          <div className={classes.section}>
             <Typography className={classes.sectionTitle}>{t('behaviors')}</Typography>
             <Divider />
-            <Box className={classes.sectionContent}>
+            <div className={classes.sectionContent}>
               <ChipList items={item ? item.al.behavior.map(label => ({ label, variant: 'outlined' })) : null} />
-            </Box>
-          </Box>
+            </div>
+          </div>
         ) : null}
 
         {/* AL Attributions Section */}
         {!item || item.al.attrib ? (
-          <Box className={classes.section}>
+          <div className={classes.section}>
             <Typography className={classes.sectionTitle}>{t('attributions')}</Typography>
             <Divider />
-            <Box className={classes.sectionContent}>
+            <div className={classes.sectionContent}>
               <ChipList items={item ? item.al.attrib.map(label => ({ label, variant: 'outlined' })) : null} />
-            </Box>
-          </Box>
+            </div>
+          </div>
         ) : null}
 
         {/* AL AV Hits */}
         {!item || item.al.av ? (
-          <Box className={classes.section}>
+          <div className={classes.section}>
             <Typography className={classes.sectionTitle}>{t('avhits')}</Typography>
             <Divider />
-            <Box className={classes.sectionContent}>
+            <div className={classes.sectionContent}>
               <ChipList items={item ? item.al.av.map(label => ({ label, variant: 'outlined' })) : null} />
-            </Box>
-          </Box>
+            </div>
+          </div>
         ) : null}
 
         {/* IPs sections */}
-        <Box className={classes.section}>
+        <div className={classes.section}>
           <Typography className={classes.sectionTitle}>{t('ip')}</Typography>
           <Divider />
-          <Box className={classes.sectionContent}>
+          <div className={classes.sectionContent}>
             <Grid container spacing={3}>
               <Grid item xs={12} md={6}>
                 <Grid container spacing={1}>
@@ -343,14 +358,14 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id }) => {
                 </Grid>
               </Grid>
             </Grid>
-          </Box>
-        </Box>
+          </div>
+        </div>
 
         {/* Domains sections */}
-        <Box className={classes.section}>
+        <div className={classes.section}>
           <Typography className={classes.sectionTitle}>{t('domain')}</Typography>
           <Divider />
-          <Box className={classes.sectionContent}>
+          <div className={classes.sectionContent}>
             <Grid container spacing={3}>
               <Grid item xs={12} md={6}>
                 <Grid container spacing={1}>
@@ -393,18 +408,18 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id }) => {
                 </Grid>
               </Grid>
             </Grid>
-          </Box>
-        </Box>
+          </div>
+        </div>
 
         {/* YARA Hits */}
         {!item || item.al.yara ? (
-          <Box className={classes.section}>
-            <Typography className={classes.sectionTitle}>{t('yara_hits')}</Typography>
+          <div className={classes.section}>
+            <Typography className={classes.sectionTitle}>{t('yara')}</Typography>
             <Divider />
-            <Box className={classes.sectionContent}>
+            <div className={classes.sectionContent}>
               <ChipList items={item ? item.al.yara.map(label => ({ label, variant: 'outlined' })) : null} />
-            </Box>
-          </Box>
+            </div>
+          </div>
         ) : null}
       </div>
     </PageCenter>

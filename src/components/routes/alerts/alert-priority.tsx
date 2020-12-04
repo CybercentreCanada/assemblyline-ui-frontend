@@ -1,4 +1,4 @@
-import { Box, makeStyles, Typography, useTheme } from '@material-ui/core';
+import { Box, makeStyles, Typography } from '@material-ui/core';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import CustomChip from 'components/visual/CustomChip';
@@ -9,26 +9,27 @@ const useStyles = makeStyles({
     '& > svg': {
       verticalAlign: 'bottom'
     }
-  }
+  },
+  icon: { color: 'white' }
 });
 
 const COLOR_MAP = {
-  CRITICAL: { color: 'hsl(0, 100%, 50%)', arrow: <ArrowUpwardIcon fontSize="small" color="inherit" /> },
-  HIGH: { color: 'hsl(39, 100%, 50%)', arrow: <ArrowUpwardIcon fontSize="small" color="inherit" /> },
-  MEDIUM: { color: 'hsl(39, 100%, 50%)', arrow: <ArrowDownwardIcon fontSize="small" color="inherit" /> },
-  LOW: { color: 'hsl(120, 100%, 25%)', arrow: <ArrowDownwardIcon fontSize="small" color="inherit" /> }
+  CRITICAL: { color: 'hsl(0, 100%, 40%)', arrow: <ArrowUpwardIcon fontSize="small" color="inherit" /> },
+  HIGH: { color: 'hsl(39, 100%, 40%)', arrow: <ArrowUpwardIcon fontSize="small" color="inherit" /> },
+  MEDIUM: { color: 'hsl(39, 100%, 40%)', arrow: <ArrowDownwardIcon fontSize="small" color="inherit" /> },
+  LOW: { color: 'hsl(120, 100%, 30%)', arrow: <ArrowDownwardIcon fontSize="small" color="inherit" /> }
 };
 
 const AlertPriority = ({ name, withText = false, withChip = false }) => {
-  const theme = useTheme();
   const classes = useStyles();
   return name ? (
     withChip ? (
       <CustomChip
         size="small"
+        classes={{ icon: classes.icon }}
         label={name}
         icon={COLOR_MAP[name].arrow}
-        style={{ backgroundColor: COLOR_MAP[name].color, color: theme.palette.getContrastText(COLOR_MAP[name].color) }}
+        style={{ backgroundColor: COLOR_MAP[name].color, color: 'white' }}
       />
     ) : (
       <Box style={{ color: COLOR_MAP[name].color }} display="inline-block" className={classes.priority}>
