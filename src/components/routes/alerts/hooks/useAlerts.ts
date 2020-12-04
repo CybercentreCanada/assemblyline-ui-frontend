@@ -4,8 +4,15 @@ import SearchQuery, { SearchFilter, SearchFilterType } from 'components/elements
 import useAppContext from 'components/hooks/useAppContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { ALField } from 'components/hooks/useMyUser';
-import { useEffect, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+
+const DEFAULT_ALERT = {
+  loading: true,
+  total: 0,
+  countedTotal: 0,
+  alerts: []
+};
 
 export interface AlertFile {
   md5: string;
@@ -77,6 +84,17 @@ interface UsingAlerts {
   onLoadMore: (onComplete?: (success: boolean) => void) => void;
 }
 
+interface AlertResponse {
+  loading: boolean;
+  total: number;
+  countedTotal: number;
+  alerts: AlertItem[];
+}
+
+const alertStateReducer = (state, newState) => {
+  return { ...state, ...newState };
+};
+
 // Custom Hook implementation for dealing with alerts.
 export default function useAlerts(pageSize: number): UsingAlerts {
   const location = useLocation();
@@ -90,17 +108,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
   const [priorityFilters, setPriorityFilters] = useState<SearchFilter[]>([]);
   const [labelFilters, setLabelFilters] = useState<SearchFilter[]>([]);
   const [valueFilters, setValueFilters] = useState<SearchFilter[]>([]);
-  const [state, setState] = useState<{
-    loading: boolean;
-    total: number;
-    countedTotal: number;
-    alerts: AlertItem[];
-  }>({
-    loading: true,
-    total: 0,
-    countedTotal: 0,
-    alerts: []
-  });
+  const [state, setState] = useReducer(alertStateReducer, DEFAULT_ALERT);
 
   // parse list of alert result: add an index field.
   const parseResult = (responseItems, offset) => {
