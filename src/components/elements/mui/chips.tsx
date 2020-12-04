@@ -1,4 +1,5 @@
 import { ChipProps, makeStyles, Theme, useTheme } from '@material-ui/core';
+import { Skeleton } from '@material-ui/lab';
 import CustomChip from 'components/visual/CustomChip';
 import React from 'react';
 
@@ -25,15 +26,30 @@ const ChipList: React.FC<ChipListProps> = ({ items }) => {
   const classes = useStyles();
   return (
     <ul className={classes.chiplist}>
-      {items.map((cp, i) => (
-        <li key={`chiplist-${i}`}>
-          <CustomChip
-            size="small"
-            {...cp}
-            style={{ marginBottom: theme.spacing(0.5), marginRight: theme.spacing(0.5) }}
-          />
-        </li>
-      ))}
+      {items
+        ? items.map((cp, i) => {
+            return (
+              <li key={`chiplist-${i}`}>
+                <CustomChip size="small" className={classes.chip} {...cp} />
+              </li>
+            );
+          })
+        : [...Array(3)].map((k, i) => {
+            return (
+              <Skeleton
+                key={`chiplist-${i}`}
+                variant="rect"
+                height="1rem"
+                width="3rem"
+                style={{
+                  verticalAlign: 'middle',
+                  display: 'inline-block',
+                  borderRadius: theme.spacing(0.5),
+                  marginRight: theme.spacing(0.5)
+                }}
+              />
+            );
+          })}
     </ul>
   );
 };

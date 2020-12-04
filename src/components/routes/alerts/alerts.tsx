@@ -11,7 +11,6 @@ import SimpleList from 'components/elements/lists/simplelist/SimpleList';
 import SearchBar from 'components/elements/search/search-bar';
 import SearchQuery, { SearchQueryFilters } from 'components/elements/search/search-query';
 import useDrawer from 'components/hooks/useDrawer';
-import Classification from 'components/visual/Classification';
 import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FiFilter } from 'react-icons/fi';
@@ -171,23 +170,16 @@ const Alerts: React.FC = () => {
               paddingTop: theme.spacing(1),
               marginTop: -theme.spacing(8),
               marginRight: -theme.spacing(1),
-              float: 'right',
-              backgroundColor: theme.palette.background.paper
+              float: 'right'
             }}
           >
             <ListNavigator id={ALERT_SIMPLELIST_ID} />
           </div>
-          <Box display="flex" alignItems="center" marginBottom={2}>
-            <Box flex={1}>
-              <Classification c12n={item.classification} type="outlined" />
-            </Box>
-          </Box>
-
           <AlertDetails id={item.alert_id} />
         </div>
       );
     },
-    [setGlobalDrawer]
+    [setGlobalDrawer, theme]
   );
 
   // Handler for when loading more alerts [read bottom of scroll area]
