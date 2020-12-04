@@ -313,6 +313,8 @@ const Alerts: React.FC = () => {
   // Load up the filters already present in the URL..
   // useEffect(() => setQueryFilters(query), [query]);.
 
+  console.log(`countedTotal:${countedTotal}, total: ${total}`);
+
   return (
     <PageFullWidth margin={4}>
       <Drawer open={drawer.open} anchor="right" onClose={onDrawerClose}>
