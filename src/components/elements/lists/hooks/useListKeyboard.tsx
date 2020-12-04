@@ -57,7 +57,7 @@ interface UseListKeyboard {
   count: number;
   infinite?: boolean;
   rowHeight?: number;
-  scrollElementId?: string;
+  scrollTargetId?: string;
   onCursorChange?: (cursor: number) => void;
   onEscape?: (cursor: number) => void;
   onEnter?: (cursor: number) => void;
@@ -68,7 +68,7 @@ export default function useListKeyboard({
   count,
   infinite,
   rowHeight,
-  scrollElementId,
+  scrollTargetId,
   onCursorChange,
   onEscape,
   onEnter
@@ -78,7 +78,7 @@ export default function useListKeyboard({
 
   // Update the cursor state and invoke callback if provided.
   const updateState = (nextCursor: number, target: HTMLDivElement) => {
-    const scrollTarget = scrollElementId ? document.getElementById(scrollElementId) : target;
+    const scrollTarget = scrollTargetId ? document.getElementById(scrollTargetId) : target;
     setCursor(nextCursor);
     selectionScroller(scrollTarget, nextCursor, rowHeight);
     if (onCursorChange) {
