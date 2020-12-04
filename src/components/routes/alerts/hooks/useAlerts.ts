@@ -128,8 +128,6 @@ export default function useAlerts(pageSize: number): UsingAlerts {
     apiCall({
       url: buildUrl(),
       onSuccess: api_data => {
-        console.log(api_data.api_response);
-
         const { items: _items, tc_start: executionTime, total, counted_total: countedTotal } = api_data.api_response;
         const items = parseResult(_items, 0);
         searchQuery.setTcStart(executionTime);
@@ -154,8 +152,6 @@ export default function useAlerts(pageSize: number): UsingAlerts {
 
   // Hook API: get alerts for specified index.
   const onLoadMore = (onComplete?: (success: boolean) => void) => {
-    console.log('loading more...');
-
     // Move offset by one increment.
     searchQuery.tickOffset();
     // reference the current offset now incase it changes again before callback is executed

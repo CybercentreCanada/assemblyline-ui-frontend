@@ -1,9 +1,7 @@
 import { Box, Drawer, makeStyles, Typography, useMediaQuery, useTheme } from '@material-ui/core';
 import AccountTreeIcon from '@material-ui/icons/AccountTree';
-import DetailsIcon from '@material-ui/icons/Details';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import StarIcon from '@material-ui/icons/Star';
-import { ToggleButton } from '@material-ui/lab';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import ListNavigator from 'components/elements/lists/navigator/ListNavigator';
@@ -14,7 +12,6 @@ import useDrawer from 'components/hooks/useDrawer';
 import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FiFilter } from 'react-icons/fi';
-import AlertCardItem from './alert-card';
 import AlertDetails from './alert-details';
 import AlertListItem from './alert-list-item';
 import AlertListItemActions from './alert-list-item-actions';
@@ -24,9 +21,6 @@ import AlertsFiltersSelected from './alerts-filters-selected';
 import AlertsWorkflowActions from './alerts-workflow-actions';
 import useAlerts, { AlertItem } from './hooks/useAlerts';
 import usePromiseAPI from './hooks/usePromiseAPI';
-
-// The key in local storage where user select list view mode is stored.
-const LOCAL_STORAGE_KEY_VIEWMODE = 'alert.view.mode';
 
 // Default size of a page to be used by the useAlert hook when fetching next load of data
 //  when scrolling has hit threshold.
@@ -110,9 +104,6 @@ const Alerts: React.FC = () => {
     open: false,
     type: null
   });
-  const [mode, setMode] = useState<'default' | 'legacy'>(
-    (localStorage.getItem(LOCAL_STORAGE_KEY_VIEWMODE) as 'default' | 'legacy') || 'default'
-  );
 
   // Define some references.
   const searchTextValue = useRef<string>(searchQuery.getQuery());
@@ -269,15 +260,9 @@ const Alerts: React.FC = () => {
   };
 
   // Memoized callback to render one line-item of the list....
-  const onRenderListRow = useCallback(
-    (item: AlertItem) => {
-      if (mode === 'legacy') {
-        return <AlertCardItem item={item} />;
-      }
-      return <AlertListItem item={item} />;
-    },
-    [mode]
-  );
+  const onRenderListRow = useCallback((item: AlertItem) => {
+    return <AlertListItem item={item} />;
+  }, []);
 
   //
   const onDrawerClose = () => {
@@ -294,18 +279,6 @@ const Alerts: React.FC = () => {
     (item: AlertItem) => <AlertListItemActions item={item} currentQuery={searchQuery} setDrawer={setDrawer} />,
     [searchQuery]
   );
-
-  // Handler for when toggling from default and legacy list view.
-  const onToggleMode = () => {
-    const nextMode = mode === 'default' ? 'legacy' : 'default';
-    localStorage.setItem(LOCAL_STORAGE_KEY_VIEWMODE, nextMode);
-    setMode(nextMode);
-  };
-
-  // Load up the filters already present in the URL..
-  // useEffect(() => setQueryFilters(query), [query]);.
-
-  console.log(`countedTotal:${countedTotal}, total: ${total}`);
 
   return (
     <PageFullWidth margin={4}>
@@ -383,16 +356,6 @@ const Alerts: React.FC = () => {
                 }
               }
             ]}
-            extras={
-              <ToggleButton
-                value="legacy"
-                selected={mode === 'legacy'}
-                className={classes.modeToggler}
-                onChange={onToggleMode}
-              >
-                <DetailsIcon fontSize={upMD ? 'default' : 'small'} />
-              </ToggleButton>
-            }
           >
             <Box className={classes.searchresult}>
               {isLTEMd ? (
@@ -418,8 +381,6 @@ const Alerts: React.FC = () => {
         scrollReset={scrollReset}
         scrollLoadNextThreshold={75}
         scrollTargetId="app-scrollct"
-        disableBackgrounds={mode === 'legacy'}
-        noDivider={mode === 'legacy'}
         loading={loading || searching}
         items={alerts}
         onItemSelected={onItemSelected}
