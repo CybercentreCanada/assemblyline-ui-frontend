@@ -311,7 +311,7 @@ const Alerts: React.FC = () => {
   };
 
   // Load up the filters already present in the URL..
-  // useEffect(() => setQueryFilters(query), [query]);
+  // useEffect(() => setQueryFilters(query), [query]);.
 
   return (
     <PageFullWidth margin={4}>
@@ -420,7 +420,7 @@ const Alerts: React.FC = () => {
       <SimpleList
         id={ALERT_SIMPLELIST_ID}
         disableProgress
-        scrollInfinite={countedTotal > total}
+        scrollInfinite={countedTotal < total}
         scrollReset={scrollReset}
         scrollLoadNextThreshold={75}
         scrollTargetId="app-scrollct"
