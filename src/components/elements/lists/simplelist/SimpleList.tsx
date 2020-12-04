@@ -15,6 +15,7 @@ interface SimpleListProps {
   scrollInfinite?: boolean;
   scrollReset?: boolean;
   scrollLoadNextThreshold?: number;
+  scrollTargetId?: string;
   noDivider?: boolean;
   items: LineItem[];
   children: (item: LineItem) => React.ReactNode;
@@ -29,6 +30,7 @@ const SimpleList: React.FC<SimpleListProps> = ({
   loading,
   items,
   disableProgress,
+  scrollTargetId,
   scrollInfinite,
   scrollLoadNextThreshold = 75,
   scrollReset,
@@ -48,12 +50,14 @@ const SimpleList: React.FC<SimpleListProps> = ({
 
   // Some refs.
   const outerEL = useRef<HTMLDivElement>();
+  const scrollEL = useRef<HTMLElement>();
   const innerEL = useRef<HTMLDivElement>();
   const nextScrollThreshold = useRef<number>(scrollLoadNextThreshold);
 
   // Configure the list keyboard custom hook.
   const { cursor, next, previous, setCursor, onKeyDown } = useListKeyboard({
     id,
+    scrollTargetId,
     infinite: scrollInfinite,
     count: items.length,
     onEscape: () => {
@@ -90,8 +94,8 @@ const SimpleList: React.FC<SimpleListProps> = ({
 
   // Scroll handler to track scroll position in order check if it has hit the scrollThreshold.
   const onScroll = () => {
-    const fH = outerEL.current.getBoundingClientRect().height;
-    const sT = outerEL.current.scrollTop;
+    const fH = scrollEL.current.getBoundingClientRect().height;
+    const sT = scrollEL.current.scrollTop;
     const tH = innerEL.current.scrollHeight;
     const cP = sT + fH;
     const scrollPerc = Math.ceil((cP / tH) * 100);
@@ -109,6 +113,20 @@ const SimpleList: React.FC<SimpleListProps> = ({
   }, [scrollReset, scrollLoadNextThreshold]);
 
   useEffect(() => {
+    if (scrollTargetId) {
+      scrollEL.current = document.getElementById(scrollTargetId);
+    } else {
+      scrollEL.current = outerEL.current;
+    }
+    if (scrollEL.current && onScrollEnabled) {
+      scrollEL.current.addEventListener('scroll', onScroll);
+    }
+    return () => {
+      scrollEL.current.removeEventListener('scroll', onScroll);
+    };
+  }, [outerEL, scrollTargetId, onScrollEnabled]);
+
+  useEffect(() => {
     return register({
       onSelect: () => null,
       onSelectNext: () => next(),
@@ -122,8 +140,8 @@ const SimpleList: React.FC<SimpleListProps> = ({
       tabIndex={0}
       ref={outerEL}
       className={classes.outer}
-      onScroll={onScrollEnabled ? onScroll : null}
       onKeyDown={!loading ? onKeyDown : null}
+      style={{ overflow: !scrollTargetId ? 'auto' : null }}
     >
       {loading && !disableProgress && (
         <div className={classes.progressCt}>
