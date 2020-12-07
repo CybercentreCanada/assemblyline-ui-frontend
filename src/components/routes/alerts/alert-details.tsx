@@ -54,7 +54,6 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id }) => {
 
   useEffect(() => {
     const alertId = id || paramId;
-    if (item !== null) setItem(null);
     apiCall({
       url: `/api/v4/alert/${alertId}/`,
       onSuccess: api_data => {
