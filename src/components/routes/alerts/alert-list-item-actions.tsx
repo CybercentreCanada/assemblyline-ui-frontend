@@ -10,7 +10,6 @@ import {
   Typography,
   useTheme
 } from '@material-ui/core';
-import AccountTreeIcon from '@material-ui/icons/AccountTree';
 import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
@@ -18,6 +17,7 @@ import WarningIcon from '@material-ui/icons/Warning';
 import SearchQuery from 'components/elements/search/search-query';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { BiNetworkChart } from 'react-icons/bi';
 import { AlertDrawerState } from './alerts';
 import { AlertItem } from './hooks/useAlerts';
 import usePromiseAPI from './hooks/usePromiseAPI';
@@ -34,7 +34,8 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.palette.background.paper,
     borderRadius: '50%',
     display: 'inline-block',
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
+    boxShadow: theme.shadows[8]
   }
 }));
 
@@ -100,9 +101,7 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
                 onClick={() => {
                   setTakeOwnershipConfirmation({ open: true, query: buildActionQuery() });
                 }}
-                style={{
-                  marginRight: 0
-                }}
+                style={{ marginRight: 0 }}
               >
                 <AssignmentIndIcon />
               </IconButton>
@@ -115,11 +114,9 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
                 const actionQuery = buildActionQuery();
                 setDrawer({ open: true, type: 'actions', actionData: { query: actionQuery, total: 1 } });
               }}
-              style={{
-                marginRight: 0
-              }}
+              style={{ marginRight: 0 }}
             >
-              <AccountTreeIcon />
+              <BiNetworkChart />
             </IconButton>
           </div>
         </div>

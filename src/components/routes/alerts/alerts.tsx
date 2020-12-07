@@ -1,5 +1,4 @@
 import { Box, Drawer, makeStyles, Typography, useMediaQuery, useTheme } from '@material-ui/core';
-import AccountTreeIcon from '@material-ui/icons/AccountTree';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import StarIcon from '@material-ui/icons/Star';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
@@ -11,6 +10,7 @@ import SearchQuery, { SearchQueryFilters } from 'components/elements/search/sear
 import useDrawer from 'components/hooks/useDrawer';
 import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { BiNetworkChart } from 'react-icons/bi';
 import { FiFilter } from 'react-icons/fi';
 import AlertDetails from './alert-details';
 import AlertListItem from './alert-list-item';
@@ -350,7 +350,7 @@ const Alerts: React.FC = () => {
                 }
               },
               {
-                icon: <AccountTreeIcon fontSize={upMD ? 'default' : 'small'} />,
+                icon: <BiNetworkChart fontSize={upMD ? 'default' : 'small'} />,
                 props: {
                   onClick: () => setDrawer({ open: true, type: 'actions', actionData: { query: searchQuery, total } })
                 }
