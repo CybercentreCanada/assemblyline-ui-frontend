@@ -23,7 +23,7 @@ const useStyles = makeStyles(theme => ({
 }));
 const AlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
   const theme = useTheme();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation('alerts');
   const classes = useStyles();
 
   return (
@@ -38,12 +38,12 @@ const AlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
           {item.owner ? (
             <>
               <PersonIcon />
-              &nbsp; {item.owner}
+              <span style={{ verticalAlign: 'top', marginLeft: theme.spacing(0.5) }}>{item.owner}</span>
             </>
           ) : item.hint_owner ? (
             <>
               <PersonIcon />
-              &nbsp; assigned
+              <span style={{ verticalAlign: 'top', marginLeft: theme.spacing(0.5) }}>{t('assigned')}</span>
             </>
           ) : null}
         </Grid>
