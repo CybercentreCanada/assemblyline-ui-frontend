@@ -416,8 +416,7 @@ const SearchResultSmall = ({ searching, loading, total, query }) => {
       <div style={{ marginTop: theme.spacing(2), alignItems: 'center' }}>
         {!_searching && filtered && (
           <>
-            <FiFilter />
-            &nbsp;
+            <FiFilter style={{ marginRight: theme.spacing(1) }} />
           </>
         )}
         {_searching ? '' : `${total} matching results.`}

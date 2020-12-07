@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
 import { useParams } from 'react-router-dom';
 import AlertPriority from './alert-priority';
+import AlertStatus from './alert-status';
 
 const useStyles = makeStyles(theme => ({
   section: {
@@ -104,11 +105,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id }) => {
               <Typography className={classes.sectionTitle}>{t('status')}</Typography>
               <Divider />
               <div className={classes.sectionContent}>
-                {item ? (
-                  <CustomChip type="round" variant="outlined" label={item.status} size="small" />
-                ) : (
-                  <ChipSkeleton />
-                )}
+                {item ? <AlertStatus name={item.status} /> : <ChipSkeleton />}
               </div>
             </div>
           </Grid>
