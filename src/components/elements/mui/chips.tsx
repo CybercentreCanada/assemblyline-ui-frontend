@@ -13,7 +13,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     margin: 0
   },
   chip: {
-    margin: theme.spacing(0.5)
+    marginBottom: theme.spacing(0.5),
+    marginRight: theme.spacing(1)
   }
 }));
 
