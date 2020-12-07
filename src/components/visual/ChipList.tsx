@@ -1,6 +1,6 @@
-import { ChipProps, makeStyles, Theme, useTheme } from '@material-ui/core';
+import { makeStyles, Theme, useTheme } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
-import CustomChip from 'components/visual/CustomChip';
+import CustomChip, { CustomChipProps } from 'components/visual/CustomChip';
 import React from 'react';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -13,12 +13,13 @@ const useStyles = makeStyles((theme: Theme) => ({
     margin: 0
   },
   chip: {
-    margin: theme.spacing(0.5)
+    marginBottom: theme.spacing(0.5),
+    marginRight: theme.spacing(1)
   }
 }));
 
 type ChipListProps = {
-  items: ChipProps[];
+  items: CustomChipProps[];
 };
 
 const ChipSkeleton = () => {
@@ -45,7 +46,7 @@ const ChipList: React.FC<ChipListProps> = ({ items }) => {
         ? items.map((cp, i) => {
             return (
               <li key={`chiplist-${i}`}>
-                <CustomChip size="small" className={classes.chip} {...cp} />
+                <CustomChip size="small" className={classes.chip} wrap {...cp} />
               </li>
             );
           })

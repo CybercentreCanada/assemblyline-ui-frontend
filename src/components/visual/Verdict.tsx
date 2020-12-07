@@ -12,6 +12,7 @@ type VerdictProps = {
   type?: 'rounded' | 'text';
   mono?: boolean;
   fullWidth?: boolean;
+  wrap?: boolean;
 };
 
 const WrappedVerdict: React.FC<VerdictProps> = ({
@@ -21,7 +22,8 @@ const WrappedVerdict: React.FC<VerdictProps> = ({
   size = 'tiny',
   short = false,
   mono = false,
-  fullWidth = false
+  fullWidth = false,
+  wrap = false
 }) => {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -75,6 +77,7 @@ const WrappedVerdict: React.FC<VerdictProps> = ({
             color={color}
             mono={mono}
             fullWidth={fullWidth}
+            wrap={wrap}
           />
         )}
       </span>

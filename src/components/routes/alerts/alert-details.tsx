@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
 import { useParams } from 'react-router-dom';
 import AlertPriority from './alert-priority';
+import AlertStatus from './alert-status';
 
 const useStyles = makeStyles(theme => ({
   section: {
@@ -86,7 +87,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id }) => {
               </div>
             </div>
           </Grid>
-          <Grid item xs={12} md={3}>
+          <Grid item xs={6} md={3}>
             {/* Priority Section. */}
             <div className={classes.section}>
               <Typography className={classes.sectionTitle}>{t('priority')}</Typography>
@@ -98,17 +99,13 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id }) => {
               </div>
             </div>
           </Grid>
-          <Grid item xs={12} md={3}>
+          <Grid item xs={6} md={3}>
             {/* Status Section */}
             <div className={classes.section}>
               <Typography className={classes.sectionTitle}>{t('status')}</Typography>
               <Divider />
               <div className={classes.sectionContent}>
-                {item ? (
-                  <CustomChip type="round" variant="outlined" label={item.status} size="small" />
-                ) : (
-                  <ChipSkeleton />
-                )}
+                {item ? <AlertStatus name={item.status} /> : <ChipSkeleton />}
               </div>
             </div>
           </Grid>
@@ -140,7 +137,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id }) => {
             </div>
           </Grid>
           {/* Type Section. */}
-          <Grid item xs={12} md={3}>
+          <Grid item xs={6} md={3}>
             <div className={classes.section}>
               <Typography className={classes.sectionTitle}>{t('type')}</Typography>
               <Divider />
@@ -148,7 +145,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id }) => {
             </div>
           </Grid>
           {/* Owner Section. */}
-          <Grid item xs={12} md={3}>
+          <Grid item xs={6} md={3}>
             <div className={classes.section}>
               <Typography className={classes.sectionTitle}>{t('ownership')}</Typography>
               <Divider />

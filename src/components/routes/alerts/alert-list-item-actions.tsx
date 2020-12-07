@@ -6,10 +6,10 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
+  makeStyles,
   Typography,
   useTheme
 } from '@material-ui/core';
-import AccountTreeIcon from '@material-ui/icons/AccountTree';
 import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
@@ -17,6 +17,7 @@ import WarningIcon from '@material-ui/icons/Warning';
 import SearchQuery from 'components/visual/SearchBar/search-query';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { BiNetworkChart } from 'react-icons/bi';
 import { AlertDrawerState } from './alerts';
 import { AlertItem } from './hooks/useAlerts';
 import usePromiseAPI from './hooks/usePromiseAPI';
@@ -28,9 +29,20 @@ interface AlertListItemActionsProps {
   onTakeOwnershipComplete?: () => void;
 }
 
+const useStyles = makeStyles(theme => ({
+  iconBackground: {
+    backgroundColor: theme.palette.background.paper,
+    borderRadius: '50%',
+    display: 'inline-block',
+    marginRight: theme.spacing(1),
+    boxShadow: theme.shadows[8]
+  }
+}));
+
 const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
   ({ item, currentQuery, setDrawer, onTakeOwnershipComplete }) => {
     const { onTakeOwnership } = usePromiseAPI();
+    const classes = useStyles();
     const [progress, setProgress] = useState<boolean>(false);
     const [takeOwnershipConfirmation, setTakeOwnershipConfirmation] = useState<{ open: boolean; query: SearchQuery }>({
       open: false,
@@ -83,24 +95,30 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
       <>
         <div>
           {!item.owner && (
+            <div className={classes.iconBackground}>
+              <IconButton
+                title="Take Ownership"
+                onClick={() => {
+                  setTakeOwnershipConfirmation({ open: true, query: buildActionQuery() });
+                }}
+                style={{ marginRight: 0 }}
+              >
+                <AssignmentIndIcon />
+              </IconButton>
+            </div>
+          )}{' '}
+          <div className={classes.iconBackground}>
             <IconButton
-              title="Take Ownership"
+              title="Workflow Action"
               onClick={() => {
-                setTakeOwnershipConfirmation({ open: true, query: buildActionQuery() });
+                const actionQuery = buildActionQuery();
+                setDrawer({ open: true, type: 'actions', actionData: { query: actionQuery, total: 1 } });
               }}
+              style={{ marginRight: 0 }}
             >
-              <AssignmentIndIcon />
+              <BiNetworkChart />
             </IconButton>
-          )}
-          <IconButton
-            title="Workflow Action"
-            onClick={() => {
-              const actionQuery = buildActionQuery();
-              setDrawer({ open: true, type: 'actions', actionData: { query: actionQuery, total: 1 } });
-            }}
-          >
-            <AccountTreeIcon />
-          </IconButton>
+          </div>
         </div>
         {takeOwnershipConfirmation.open && (
           <TakeOwnershipConfirmDialog

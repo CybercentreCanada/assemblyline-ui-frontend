@@ -1,5 +1,4 @@
 import { Box, Drawer, makeStyles, Typography, useMediaQuery, useTheme } from '@material-ui/core';
-import AccountTreeIcon from '@material-ui/icons/AccountTree';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import StarIcon from '@material-ui/icons/Star';
 import ListCarousel from 'commons/addons/elements/lists/carousel/ListCarousel';
@@ -12,6 +11,7 @@ import SearchBar from 'components/visual/SearchBar/search-bar';
 import SearchQuery, { SearchQueryFilters } from 'components/visual/SearchBar/search-query';
 import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { BiNetworkChart } from 'react-icons/bi';
 import { FiFilter } from 'react-icons/fi';
 import AlertDetails from './alert-details';
 import AlertListItem from './alert-list-item';
@@ -353,7 +353,7 @@ const Alerts: React.FC = () => {
                 }
               },
               {
-                icon: <AccountTreeIcon fontSize={upMD ? 'default' : 'small'} />,
+                icon: <BiNetworkChart fontSize={upMD ? 'default' : 'small'} />,
                 props: {
                   onClick: () => setDrawer({ open: true, type: 'actions', actionData: { query: searchQuery, total } })
                 }
@@ -419,8 +419,7 @@ const SearchResultSmall = ({ searching, loading, total, query }) => {
       <div style={{ marginTop: theme.spacing(2), alignItems: 'center' }}>
         {!_searching && filtered && (
           <>
-            <FiFilter />
-            &nbsp;
+            <FiFilter style={{ marginRight: theme.spacing(1) }} />
           </>
         )}
         {_searching ? '' : `${total} matching results.`}
