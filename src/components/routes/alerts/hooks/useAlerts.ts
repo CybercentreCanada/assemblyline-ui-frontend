@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { LineItem } from 'components/elements/lists/item/ListItemBase';
-import SearchQuery, { SearchFilter, SearchFilterType } from 'components/elements/search/search-query';
+import { LineItem } from 'commons/addons/elements/lists/item/ListItemBase';
 import useAppContext from 'components/hooks/useAppContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { ALField } from 'components/hooks/useMyUser';
+import SearchQuery, { SearchFilter, SearchFilterType } from 'components/visual/SearchBar/search-query';
 import { useEffect, useReducer, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 

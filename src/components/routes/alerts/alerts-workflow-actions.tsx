@@ -7,7 +7,7 @@ import SearchQuery, {
   EMPTY_SEARCHFILTER,
   SearchFilter,
   SearchFilterType
-} from 'components/elements/search/search-query';
+} from 'components/visual/SearchBar/search-query';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import AlertsFiltersSelected from './alerts-filters-selected';

@@ -7,9 +7,9 @@ import ListNavigator from 'commons/addons/elements/lists/navigator/ListNavigator
 import SimpleList from 'commons/addons/elements/lists/simplelist/SimpleList';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
-import SearchBar from 'components/elements/search/search-bar';
-import SearchQuery, { SearchQueryFilters } from 'components/elements/search/search-query';
 import useDrawer from 'components/hooks/useDrawer';
+import SearchBar from 'components/visual/SearchBar/search-bar';
+import SearchQuery, { SearchQueryFilters } from 'components/visual/SearchBar/search-query';
 import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FiFilter } from 'react-icons/fi';

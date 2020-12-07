@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import SearchQuery from 'components/elements/search/search-query';
 import useMyAPI from 'components/hooks/useMyAPI';
+import SearchQuery from 'components/visual/SearchBar/search-query';
 import { useCallback } from 'react';
 import { AlertItem } from './useAlerts';
 
