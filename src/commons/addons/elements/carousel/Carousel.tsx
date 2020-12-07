@@ -39,7 +39,7 @@ const Carousel: React.FC<CarouselProps> = ({
     const { key } = event;
     if ((!disableArrowLeft && isArrowLeft(key)) || (!disableArrowUp && isArrowUp(key))) {
       onPrevious();
-    } else if ((!disableArrowRight && isArrowRight(key)) || (!disableArrowLeft && isArrowDown(key))) {
+    } else if ((!disableArrowRight && isArrowRight(key)) || (!disableArrowDown && isArrowDown(key))) {
       onNext();
     }
   };
