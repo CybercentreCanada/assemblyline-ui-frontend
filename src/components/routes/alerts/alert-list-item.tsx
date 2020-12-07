@@ -1,4 +1,4 @@
-import { Grid, makeStyles, useTheme } from '@material-ui/core';
+import { Grid, useTheme } from '@material-ui/core';
 import PersonIcon from '@material-ui/icons/Person';
 import { ChipList } from 'components/elements/mui/chips';
 import { AlertItem } from 'components/routes/alerts/hooks/useAlerts';
@@ -13,18 +13,9 @@ import AlertStatus from './alert-status';
 type AlertListItemProps = {
   item: AlertItem;
 };
-
-const useStyles = makeStyles(() => ({
-  file_info: {
-    whiteSpace: 'nowrap',
-    overflowX: 'hidden',
-    textOverflow: 'ellipsis'
-  }
-}));
 const AlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
   const theme = useTheme();
   const { t, i18n } = useTranslation('alerts');
-  const classes = useStyles();
   const infoItems = [];
 
   if (item.al.av.length !== 0) {
@@ -42,12 +33,12 @@ const AlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
   return (
     <div style={{ padding: theme.spacing(2) }}>
       <Grid container spacing={1}>
-        <Grid item xs={8} className={classes.file_info}>
+        <Grid item xs={12} md={8}>
           <AlertPriority name={item.priority} />
           <span style={{ marginLeft: theme.spacing(1) }}>{item.group_count}x</span>
-          <span style={{ marginLeft: theme.spacing(1) }}>{item.file.name}</span>
+          <span style={{ marginLeft: theme.spacing(1), wordBreak: 'break-all' }}>{item.file.name}</span>
         </Grid>
-        <Grid item xs={2}>
+        <Grid item xs={6} md={2}>
           {item.owner ? (
             <>
               <PersonIcon />
@@ -60,15 +51,15 @@ const AlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
             </>
           ) : null}
         </Grid>
-        <Grid item xs={2} style={{ textAlign: 'right' }}>
+        <Grid item xs={6} md={2} style={{ textAlign: 'right' }}>
           <Moment fromNow locale={i18n.language}>
             {item.reporting_ts}
           </Moment>
         </Grid>
-        <Grid item xs={2}>
+        <Grid item xs={12} md={2}>
           <AlertStatus name={item.status} size={'tiny' as 'tiny'} />
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={12} md={6}>
           <ChipList
             items={item.label
               .map(label => ({ label, size: 'tiny' as 'tiny', variant: 'outlined' as 'outlined' }))
@@ -82,11 +73,11 @@ const AlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
               )}
           />
         </Grid>
-        <Grid item xs={2}>
+        <Grid item xs={12} md={2}>
           <ChipList items={infoItems} />
         </Grid>
-        <Grid item xs={2} style={{ textAlign: 'right' }}>
-          <Verdict score={item.al.score} wrap />
+        <Grid item xs={12} md={2} style={{ textAlign: 'right' }}>
+          <Verdict score={item.al.score} />
         </Grid>
       </Grid>
     </div>

@@ -87,7 +87,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id }) => {
               </div>
             </div>
           </Grid>
-          <Grid item xs={12} md={3}>
+          <Grid item xs={6} md={3}>
             {/* Priority Section. */}
             <div className={classes.section}>
               <Typography className={classes.sectionTitle}>{t('priority')}</Typography>
@@ -99,7 +99,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id }) => {
               </div>
             </div>
           </Grid>
-          <Grid item xs={12} md={3}>
+          <Grid item xs={6} md={3}>
             {/* Status Section */}
             <div className={classes.section}>
               <Typography className={classes.sectionTitle}>{t('status')}</Typography>
@@ -137,7 +137,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id }) => {
             </div>
           </Grid>
           {/* Type Section. */}
-          <Grid item xs={12} md={3}>
+          <Grid item xs={6} md={3}>
             <div className={classes.section}>
               <Typography className={classes.sectionTitle}>{t('type')}</Typography>
               <Divider />
@@ -145,7 +145,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id }) => {
             </div>
           </Grid>
           {/* Owner Section. */}
-          <Grid item xs={12} md={3}>
+          <Grid item xs={6} md={3}>
             <div className={classes.section}>
               <Typography className={classes.sectionTitle}>{t('ownership')}</Typography>
               <Divider />
