@@ -9,9 +9,14 @@ const COLOR_MAP = {
   ASSESS: 'primary'
 };
 
-const AlertStatus = ({ name }) => {
+type AlertStatusProps = {
+  name: string;
+  size?: 'tiny' | 'small' | 'medium';
+};
+
+const AlertStatus: React.FC<AlertStatusProps> = ({ name, size = 'small' as 'small' }) => {
   const { t } = useTranslation('alerts');
-  return <CustomChip size="small" variant="outlined" color={COLOR_MAP[name]} label={t(`status_${name}`)} />;
+  return <CustomChip wrap size={size} variant="outlined" color={COLOR_MAP[name]} label={t(`status_${name}`)} />;
 };
 
 export default AlertStatus;

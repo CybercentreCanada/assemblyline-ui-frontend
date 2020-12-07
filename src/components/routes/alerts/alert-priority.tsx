@@ -43,12 +43,20 @@ const COLOR_MAP = {
   null: { color: 'inherit', chip_color: 'default', arrow: <RemoveOutlinedIcon fontSize="small" color="inherit" /> }
 };
 
-const AlertPriority = ({ name, withText = false, withChip = false }) => {
+type AlertPriorityProps = {
+  name: string;
+  withText?: boolean;
+  withChip?: boolean;
+  size?: 'tiny' | 'small' | 'medium';
+};
+
+const AlertPriority: React.FC<AlertPriorityProps> = ({ name, withText = false, withChip = false, size = 'small' }) => {
   const { t } = useTranslation('alerts');
   const classes = useStyles();
   return withChip ? (
     <CustomChip
-      size="small"
+      wrap
+      size={size}
       variant="outlined"
       color={COLOR_MAP[name].chip_color}
       label={name ? t(`priority_${name}`) : t('priority_unset')}

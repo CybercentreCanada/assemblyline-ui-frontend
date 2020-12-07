@@ -14,7 +14,7 @@ type AlertListItemProps = {
   item: AlertItem;
 };
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   file_info: {
     whiteSpace: 'nowrap',
     overflowX: 'hidden',
@@ -25,6 +25,19 @@ const AlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
   const theme = useTheme();
   const { t, i18n } = useTranslation('alerts');
   const classes = useStyles();
+  const infoItems = [];
+
+  if (item.al.av.length !== 0) {
+    infoItems.push({ label: `${item.al.av.length}x AV`, color: 'warning', size: 'tiny', variant: 'outlined' });
+  }
+  if (item.al.domain.length !== 0 || item.al.ip.length !== 0) {
+    infoItems.push({
+      label: `${item.al.domain.length + item.al.ip.length}x IOC`,
+      color: 'primary',
+      size: 'tiny',
+      variant: 'outlined'
+    });
+  }
 
   return (
     <div style={{ padding: theme.spacing(2) }}>
@@ -48,18 +61,19 @@ const AlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
           ) : null}
         </Grid>
         <Grid item xs={2} style={{ textAlign: 'right' }}>
-          <Verdict score={item.al.score} />
+          <Verdict score={item.al.score} wrap />
         </Grid>
         <Grid item xs={2}>
-          <AlertStatus name={item.status} />
+          <AlertStatus name={item.status} size={'tiny' as 'tiny'} />
         </Grid>
         <Grid item xs={6}>
           <ChipList
             items={item.label
-              .map(label => ({ label, variant: 'outlined' as 'outlined' }))
+              .map(label => ({ label, size: 'tiny' as 'tiny', variant: 'outlined' as 'outlined' }))
               .concat(
                 item.al.attrib.map(label => ({
                   label,
+                  size: 'tiny' as 'tiny',
                   color: 'error',
                   variant: 'outlined' as 'outlined'
                 }))
@@ -67,12 +81,7 @@ const AlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
           />
         </Grid>
         <Grid item xs={2}>
-          <ChipList
-            items={[
-              { label: `${item.al.av.length}x AVs`, variant: 'outlined' },
-              { label: `${item.al.domain.length + item.al.ip.length}x IOCs`, variant: 'outlined' }
-            ]}
-          />
+          <ChipList items={infoItems} />
         </Grid>
         <Grid item xs={2} style={{ textAlign: 'right' }}>
           <Moment fromNow locale={i18n.language}>
