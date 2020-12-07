@@ -22,7 +22,7 @@ type ChipListProps = {
 };
 
 const ChipSkeleton = () => {
-  return <Skeleton variant="rect" height="24px" width="3rem" style={{ borderRadius: '16px', marginRight: '4px' }} />;
+  return <Skeleton variant="rect" height="24px" width="4rem" style={{ borderRadius: '16px', marginRight: '4px' }} />;
 };
 
 const ChipSkeletonInline = () => {
@@ -30,7 +30,7 @@ const ChipSkeletonInline = () => {
     <Skeleton
       variant="rect"
       height="24px"
-      width="3rem"
+      width="4rem"
       style={{ borderRadius: '16px', marginRight: '4px', display: 'inline-block', verticalAlign: 'middle' }}
     />
   );
@@ -55,7 +55,7 @@ const ChipList: React.FC<ChipListProps> = ({ items }) => {
                 key={`chiplist-${i}`}
                 variant="rect"
                 height={theme.spacing(3)}
-                width="3rem"
+                width="4rem"
                 style={{
                   verticalAlign: 'middle',
                   display: 'inline-block',

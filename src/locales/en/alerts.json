@@ -1,8 +1,8 @@
 {
   "alerts": "Alerts",
   "attack": "Att&ck",
-  "attack_pattern": "Pattern",
-  "attack_type": "Type",
+  "attack_pattern": "Patterns",
+  "attack_category": "Categories",
   "attributions": "Attributions",
   "avhits": "AV Hits",
   "behaviors": "Behaviors",

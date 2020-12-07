@@ -2,7 +2,7 @@
   "alerts": "Alertes",
   "attack": "Att&ck",
   "attack_pattern": "Modèles",
-  "attack_type": "Type",
+  "attack_category": "Catégories",
   "attributions": "Attribution",
   "avhits": "AV Hits",
   "behaviors": "Comportements",
