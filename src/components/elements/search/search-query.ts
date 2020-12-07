@@ -211,7 +211,7 @@ export default class SearchQuery {
     params.delete('rows');
     params.delete('offset');
     params.delete('tc_start');
-    window.history.pushState(null, '', `${this.path}?${params.toString()}`);
+    window.history.pushState(null, '', `${process.env.PUBLIC_URL}${this.path}?${params.toString()}`);
     return this;
   }
 
