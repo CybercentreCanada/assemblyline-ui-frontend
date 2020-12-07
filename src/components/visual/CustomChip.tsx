@@ -131,7 +131,8 @@ const useStyles = makeStyles(theme => ({
   error_outlined: {
     borderColor: theme.palette.type !== 'dark' ? theme.palette.error.dark : theme.palette.error.light,
     color: theme.palette.type !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
-  }
+  },
+  icon: { color: theme.palette.common.white }
 }));
 
 const WrappedCustomChip: React.FC<CustomChipProps> = ({
@@ -201,7 +202,7 @@ const WrappedCustomChip: React.FC<CustomChipProps> = ({
   // Build chip based on computed values
   const chip = (
     <Chip
-      classes={{ label: labelClassName }}
+      classes={{ label: labelClassName, icon: variant !== 'outlined' ? classes.icon : null }}
       className={appliedClassName}
       size={sizeMap[size]}
       color={colorMap[color]}
