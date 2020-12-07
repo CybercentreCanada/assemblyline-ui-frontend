@@ -61,7 +61,9 @@ const AlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
           ) : null}
         </Grid>
         <Grid item xs={2} style={{ textAlign: 'right' }}>
-          <Verdict score={item.al.score} wrap />
+          <Moment fromNow locale={i18n.language}>
+            {item.reporting_ts}
+          </Moment>
         </Grid>
         <Grid item xs={2}>
           <AlertStatus name={item.status} size={'tiny' as 'tiny'} />
@@ -84,9 +86,7 @@ const AlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
           <ChipList items={infoItems} />
         </Grid>
         <Grid item xs={2} style={{ textAlign: 'right' }}>
-          <Moment fromNow locale={i18n.language}>
-            {item.reporting_ts}
-          </Moment>
+          <Verdict score={item.al.score} wrap />
         </Grid>
       </Grid>
     </div>
