@@ -9,10 +9,11 @@ import PageHeader from 'commons/components/layout/pages/PageHeader';
 import useDrawer from 'components/hooks/useDrawer';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import SearchQuery, { SearchQueryFilters } from 'components/visual/SearchBar/search-query';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 import { FiFilter } from 'react-icons/fi';
+import { useHistory, useLocation } from 'react-router-dom';
 import AlertDetails from './alert-details';
 import AlertListItem from './alert-list-item';
 import AlertListItemActions from './alert-list-item-actions';
@@ -90,7 +91,6 @@ const Alerts: React.FC = () => {
     statusFilters,
     priorityFilters,
     labelFilters,
-    updateQuery,
     onLoad,
     onLoadMore
   } = useAlerts(PAGE_SIZE);
@@ -99,55 +99,45 @@ const Alerts: React.FC = () => {
   const { onApplyWorkflowAction } = usePromiseAPI();
 
   // Define required states...
-  const [searching, setSearching] = useState<boolean>(false);
   const [scrollReset, setScrollReset] = useState<boolean>(false);
   const [drawer, setDrawer] = useState<AlertDrawerState>({
     open: false,
     type: null
   });
+  const history = useHistory();
+  const location = useLocation();
 
   // Define some references.
-  const searchTextValue = useRef<string>(searchQuery.getQuery());
+  const searchTextValue = useRef<string>('');
+
+  useEffect(() => {
+    if (searchQuery) {
+      searchTextValue.current = searchQuery.getQuery();
+    }
+  }, [searchQuery]);
 
   // Media quries.
   const isLTEMd = useMediaQuery(theme.breakpoints.up('md'));
 
   // Handler searchbar onSearch callback
   const onSearch = (filterValue: string = '', inputEl: HTMLInputElement = null) => {
-    // Tell the world we're searching for it...
-    setSearching(true);
-
-    // Reset scroll for each new search.
-    setScrollReset(true);
-
-    // Close drawer if its open.
-    if (drawer.open) {
-      setDrawer({ open: false, type: null });
-    }
-
     // Update query and url before reloading data.
-    searchQuery.setQuery(filterValue).apply();
+    searchQuery.setQuery(filterValue);
+    history.push(`${location.pathname}?${searchQuery.buildURLQueryString()}`);
 
-    // Reload.
-    onLoad((success: boolean) => {
-      setSearching(false);
-      inputEl.focus();
-    });
+    if (inputEl) inputEl.focus();
   };
 
   // Handler for when clearing the SearchBar.
-  const onClearSearch = () => {
+  const onClearSearch = (inputEl: HTMLInputElement = null) => {
     // Reset the query.
-    searchQuery.reset().apply();
+    searchQuery.deleteQuery();
+    history.push(`${location.pathname}?${searchQuery.buildURLQueryString()}`);
 
     // Update the search text field reference.
     searchTextValue.current = '';
 
-    // Reset scroll for each new search.
-    setScrollReset(true);
-
-    // Refetch initial data.
-    onLoad();
+    if (inputEl) inputEl.focus();
   };
 
   // Handler for when an item of the InfiniteList is selected
@@ -185,13 +175,8 @@ const Alerts: React.FC = () => {
   // Hanlder for when clicking one the AlertsFilters 'Apply' button.
   const onApplyFilters = (filters: SearchQueryFilters) => {
     // Set the newly selected filters and up location url bar.
-    searchQuery.setFilters(filters).apply();
-
-    // Reinitialize the scroll.
-    setScrollReset(true);
-
-    // Fetch result based on new/updated query.
-    onLoad();
+    searchQuery.setFilters(filters);
+    history.push(`${location.pathname}?${searchQuery.buildURLQueryString()}`);
 
     // Close the Filters drawer.
     if (drawer.open) {
@@ -235,13 +220,8 @@ const Alerts: React.FC = () => {
   //
   const onFavoriteSelected = (favorite: { name: string; query: string }) => {
     // Update query with selected favorite.
-    updateQuery(searchQuery.addFq(favorite.query).apply().build());
-
-    // Reinitialize the scroll.
-    setScrollReset(true);
-
-    // Fetch result based on new/updated query
-    onLoad();
+    searchQuery.addFq(favorite.query);
+    history.push(`${location.pathname}?${searchQuery.buildURLQueryString()}`);
 
     // Close the Filters drawer.
     if (drawer.open) {
@@ -332,8 +312,8 @@ const Alerts: React.FC = () => {
       <PageHeader isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchBar
-            initValue={searchQuery.getQuery()}
-            searching={searching || loading}
+            initValue={searchQuery ? searchQuery.getQuery() : ''}
+            searching={loading}
             suggestions={buildSearchSuggestions()}
             placeholder="Filter alerts..."
             onValueChange={onFilterValueChange}
@@ -366,14 +346,13 @@ const Alerts: React.FC = () => {
             <Box className={classes.searchresult}>
               {isLTEMd ? (
                 <SearchResultLarge
-                  loading={loading}
-                  searching={searching}
+                  searching={loading}
                   total={total}
                   query={searchQuery}
                   onApplyFilters={onApplyFilters}
                 />
               ) : (
-                <SearchResultSmall loading={loading} searching={searching} total={total} query={searchQuery} />
+                <SearchResultSmall searching={loading} total={total} query={searchQuery} />
               )}
             </Box>
           </SearchBar>
@@ -387,7 +366,7 @@ const Alerts: React.FC = () => {
         scrollReset={scrollReset}
         scrollLoadNextThreshold={75}
         scrollTargetId="app-scrollct"
-        loading={loading || searching}
+        loading={loading}
         items={alerts}
         onItemSelected={onItemSelected}
         onRenderActions={onRenderListActions}
@@ -400,32 +379,30 @@ const Alerts: React.FC = () => {
   );
 };
 
-const SearchResultLarge = ({ searching, loading, total, query, onApplyFilters }) => {
+const SearchResultLarge = ({ searching, total, query, onApplyFilters }) => {
   const theme = useTheme();
-  const _searching = searching || loading;
   return (
     <div style={{ position: 'relative' }}>
       <AlertsFiltersSelected searchQuery={query} onChange={onApplyFilters} hideQuery />
       <div style={{ position: 'absolute', top: theme.spacing(0), right: theme.spacing(1) }}>
-        {_searching ? '' : <span>{`${total} matching results.`}</span>}
+        {searching ? '' : <span>{`${total} matching results.`}</span>}
       </div>
     </div>
   );
 };
 
-const SearchResultSmall = ({ searching, loading, total, query }) => {
+const SearchResultSmall = ({ searching, total, query }) => {
   const theme = useTheme();
-  const _searching = searching || loading;
-  const filtered = hasFilters(query.parseFilters());
+  const filtered = query ? hasFilters(query.parseFilters()) : false;
   return (
     <>
       <div style={{ marginTop: theme.spacing(2), alignItems: 'center' }}>
-        {!_searching && filtered && (
+        {!searching && filtered && (
           <>
             <FiFilter style={{ marginRight: theme.spacing(1) }} />
           </>
         )}
-        {_searching ? '' : `${total} matching results.`}
+        {searching ? '' : `${total} matching results.`}
       </div>
     </>
   );

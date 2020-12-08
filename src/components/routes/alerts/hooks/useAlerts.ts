@@ -8,6 +8,7 @@ import { useEffect, useReducer, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 const DEFAULT_ALERT = {
+  reset: false,
   loading: true,
   total: 0,
   countedTotal: 0,
@@ -85,6 +86,7 @@ interface UsingAlerts {
 }
 
 interface AlertResponse {
+  reset: boolean;
   loading: boolean;
   total: number;
   countedTotal: number;
@@ -92,8 +94,10 @@ interface AlertResponse {
 }
 
 const alertStateReducer = (state, newState) => {
-  const { loading, total, countedTotal, alerts } = newState;
+  const { reset, loading, total, countedTotal, alerts } = newState;
+  if (reset) return newState;
   return {
+    reset: false,
     loading,
     total: total || state.total,
     countedTotal: countedTotal ? state.countedTotal + countedTotal : state.countedTotal,
@@ -106,9 +110,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
   const location = useLocation();
   const apiCall = useMyAPI();
   const { indexes: fieldIndexes } = useAppContext();
-  const [searchQuery, setSearchQuery] = useState<SearchQuery>(
-    new SearchQuery(location.pathname, location.search, pageSize)
-  );
+  const [searchQuery, setSearchQuery] = useState<SearchQuery>(null);
   const [fields, setFields] = useState<ALField[]>([]);
   const [statusFilters, setStatusFilters] = useState<SearchFilter[]>([]);
   const [priorityFilters, setPriorityFilters] = useState<SearchFilter[]>([]);
@@ -124,7 +126,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
 
   // format alert api url using specified indexes.
   const buildUrl = () => {
-    return `/api/v4/alert/grouped/${searchQuery.getGroupBy()}/?${searchQuery.buildQueryString()}`;
+    return `/api/v4/alert/grouped/${searchQuery.getGroupBy()}/?${searchQuery.buildAPIQueryString()}`;
   };
 
   // Hook API: load/reload all the alerts from start.
@@ -138,6 +140,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
         const items = parseResult(_items, 0);
         searchQuery.setTcStart(executionTime);
         setState({
+          reset: true,
           loading: false,
           total,
           countedTotal,
@@ -190,7 +193,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
   // Fetch the Status Filters.
   const onLoadStatuses = () => {
     apiCall({
-      url: '/api/v4/alert/statuses/?offset=0&rows=25&q=&tc=4d&fq=file.sha256:*',
+      url: `/api/v4/alert/statuses/?${searchQuery.buildAPIQueryString()}&fq=${searchQuery.getGroupBy()}:*`,
       onSuccess: api_data => {
         const { api_response: statuses } = api_data;
         const msItems: SearchFilter[] = Object.keys(statuses).map((k, i) => ({
@@ -208,7 +211,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
   // Fetch the Priority Filters.
   const onLoadPriorities = () => {
     apiCall({
-      url: '/api/v4/alert/priorities/?offset=0&rows=25&q=&tc=4d&fq=file.sha256:*',
+      url: `/api/v4/alert/priorities/?${searchQuery.buildAPIQueryString()}&fq=${searchQuery.getGroupBy()}:*`,
       onSuccess: api_data => {
         const { api_response: priorities } = api_data;
         const msItems: SearchFilter[] = Object.keys(priorities).map((k, i) => ({
@@ -226,7 +229,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
   // Fetch the Label Filters.
   const onLoadLabels = () => {
     apiCall({
-      url: '/api/v4/alert/labels/?offset=0&rows=25&q=&tc=4d&fq=file.sha256:*',
+      url: `/api/v4/alert/labels/?${searchQuery.buildAPIQueryString()}&fq=${searchQuery.getGroupBy()}:*`,
       onSuccess: api_data => {
         const { api_response: labels } = api_data;
         const msItems: SearchFilter[] = Object.keys(labels).map((k, i) => ({
@@ -243,7 +246,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
 
   const onLoadStatisics = () => {
     apiCall({
-      url: `/api/v4/alert/statistics/?tc=${searchQuery.getTc()}&q=${searchQuery.getQuery()}`,
+      url: `/api/v4/alert/statistics/?${searchQuery.buildAPIQueryString()}&fq=${searchQuery.getGroupBy()}:*`,
       onSuccess: api_data => {
         const { api_response: statistics } = api_data;
         const msItems: SearchFilter[] = [];
@@ -267,12 +270,18 @@ export default function useAlerts(pageSize: number): UsingAlerts {
 
   // Load it up!
   useEffect(() => {
-    onLoad();
-    onLoadStatuses();
-    onLoadPriorities();
-    onLoadLabels();
-    onLoadStatisics();
-  }, []);
+    if (searchQuery) {
+      onLoad();
+      onLoadStatuses();
+      onLoadPriorities();
+      onLoadLabels();
+      onLoadStatisics();
+    }
+  }, [searchQuery]);
+
+  useEffect(() => {
+    setSearchQuery(new SearchQuery(location.pathname, location.search, pageSize));
+  }, [location.pathname, location.search, pageSize]);
 
   // transform alert fields into array.
   useEffect(() => {

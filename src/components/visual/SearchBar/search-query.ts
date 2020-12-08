@@ -35,6 +35,10 @@ export interface SearchQueryParameter {
   value: string;
 }
 
+const DEFAULT_TC = '4d';
+const DEFAULT_OFFSET = 0;
+const DEFAULT_GROUPBY = 'file.sha256';
+
 export default class SearchQuery {
   private params: URLSearchParams = null;
 
@@ -42,16 +46,16 @@ export default class SearchQuery {
     this.params = new URLSearchParams(baseSearch);
     if (setDefaults) {
       if (!this.hasOffset()) {
-        this.setOffset('0');
+        this.setOffset(`${DEFAULT_OFFSET}`);
       }
       if (!this.hasTc()) {
-        this.setTc('4d');
+        this.setTc(DEFAULT_TC);
       }
       if (!this.hasRows()) {
         this.setRows(`${pageSize}`);
       }
       if (!this.hasGroupBy()) {
-        this.setGroupBy('file.sha256');
+        this.setGroupBy(DEFAULT_GROUPBY);
       }
     }
   }
@@ -169,6 +173,16 @@ export default class SearchQuery {
     return this;
   }
 
+  public deleteQuery() {
+    this.params.delete('q');
+    return this;
+  }
+
+  public deleteTCStart() {
+    this.params.delete('tc_start');
+    return this;
+  }
+
   public reset(): SearchQuery {
     this.setOffset('0')
       .setRows(`${this.pageSize}`)
@@ -180,9 +194,22 @@ export default class SearchQuery {
     return this;
   }
 
-  public buildQueryString(): string {
+  public buildURLQueryString(): string {
+    const params = new URLSearchParams(this.params.toString());
+    params.delete('tc_start');
+    if (this.getRowsNumber() === this.pageSize) params.delete('rows');
+    if (this.getTc() === DEFAULT_TC) params.delete('tc');
+    if (this.getOffsetNumber() === DEFAULT_OFFSET) params.delete('offset');
+    if (this.getGroupBy() === DEFAULT_GROUPBY) params.delete('group_by');
+    if (this.getQuery() === '') params.delete('q');
+    return params.toString();
+  }
+
+  public buildAPIQueryString(): string {
     const params = new URLSearchParams(this.params.toString());
     params.delete('group_by');
+    if (this.getTc() === '') params.delete('tc');
+    if (this.getQuery() === '') params.delete('q');
     return params.toString();
   }
 
@@ -202,16 +229,6 @@ export default class SearchQuery {
 
   public build(): SearchQuery {
     return new SearchQuery(this.path, this.params.toString(), this.pageSize);
-  }
-
-  public apply(): SearchQuery {
-    const params = new URLSearchParams(this.params.toString());
-    params.delete('group_by');
-    params.delete('rows');
-    params.delete('offset');
-    params.delete('tc_start');
-    window.history.pushState(null, '', `${process.env.PUBLIC_URL}${this.path}?${params.toString()}`);
-    return this;
   }
 
   public parseFilters(): SearchQueryFilters {

@@ -46,7 +46,7 @@ export default function usePromiseAPI(): UsingPromiseAPI {
     const statusPromise = new Promise((resolve, reject) => {
       if (selectedStatus) {
         apiCall({
-          url: `/api/v4/alert/status/batch/?${query.buildQueryString()}`,
+          url: `/api/v4/alert/status/batch/?${query.buildAPIQueryString()}`,
           method: 'post',
           body: selectedStatus,
           onSuccess: api_data => {
@@ -63,7 +63,7 @@ export default function usePromiseAPI(): UsingPromiseAPI {
     const priorityPromise = new Promise((resolve, reject) => {
       if (selectedPriority) {
         apiCall({
-          url: `/api/v4/alert/priority/batch/?${query.buildQueryString()}`,
+          url: `/api/v4/alert/priority/batch/?${query.buildAPIQueryString()}`,
           method: 'post',
           body: selectedPriority,
           onSuccess: api_data => {
@@ -80,7 +80,7 @@ export default function usePromiseAPI(): UsingPromiseAPI {
     const labelPromise = new Promise((resolve, reject) => {
       if (selectedLabels && selectedLabels.length > 0) {
         apiCall({
-          url: `/api/v4/alert/label/batch/?${query.buildQueryString()}`,
+          url: `/api/v4/alert/label/batch/?${query.buildAPIQueryString()}`,
           method: 'post',
           body: selectedLabels,
           onSuccess: api_data => {
@@ -101,7 +101,7 @@ export default function usePromiseAPI(): UsingPromiseAPI {
     // /api/v4/alert/ownership/batch/?fq=file.sha256:330d097ec18396485d51d62ab21fdf30ece74879fb94a1a920a75a58afebbdde&q=&tc=4d&tc_start=2020-10-11T20:32:34.613842Z
     return new Promise((resolve, reject) => {
       apiCall({
-        url: `/api/v4/alert/ownership/batch/?${query.buildQueryString()}`,
+        url: `/api/v4/alert/ownership/batch/?${query.buildAPIQueryString()}`,
         onSuccess: api_data => {
           resolve(true);
         },

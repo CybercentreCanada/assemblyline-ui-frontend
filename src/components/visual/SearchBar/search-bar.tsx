@@ -55,7 +55,7 @@ interface SearchBarProps {
   suggestions?: string[];
   onValueChange?: (filterValue: string) => void;
   onSearch: (filterValue: string, inputElement: HTMLInputElement) => void;
-  onClear: () => void;
+  onClear: (inputElement: HTMLInputElement) => void;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
@@ -93,7 +93,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const _onValueClear = () => {
     // textFieldEl.current.querySelector('input').focus();
     setValue('');
-    onClear();
+    onClear(getInputEl());
   };
 
   // When requesting a search.
