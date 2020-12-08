@@ -100,7 +100,7 @@ const SimpleList: React.FC<SimpleListProps> = ({
   useLayoutEffect(() => {
     if (scrollReset) {
       nextScrollThreshold.current = scrollLoadNextThreshold;
-      outerEL.current.scrollTo({ top: 0 });
+      scrollEL.current.scrollTo({ top: 0 });
     }
   }, [scrollReset, scrollLoadNextThreshold]);
 
