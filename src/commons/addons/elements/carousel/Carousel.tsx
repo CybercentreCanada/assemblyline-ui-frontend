@@ -32,7 +32,10 @@ const Carousel: React.FC<CarouselProps> = ({
 }) => {
   const classes = useStyles();
   const touchX = useRef<number>(-1);
-  const touchDirection = useRef<'left' | 'right'>();
+  const touchY = useRef<number>(-1);
+  const touchStartX = useRef<number>(-1);
+  const touchStartY = useRef<number>(-1);
+  const touchDirection = useRef<'left' | 'right' | 'scroll'>();
   const touchStale = useRef<boolean>(false);
 
   const onKeyDown = (event: React.KeyboardEvent) => {
@@ -46,22 +49,40 @@ const Carousel: React.FC<CarouselProps> = ({
 
   const onTouchStart = (event: React.TouchEvent) => {
     touchX.current = event.touches[0].clientX;
+    touchY.current = event.touches[0].clientY;
+    touchStartX.current = event.touches[0].clientX;
+    touchStartY.current = event.touches[0].clientY;
   };
 
   const onTouchMove = (event: React.TouchEvent) => {
     if (!touchStale.current) {
       // Where it's at.
       const moveX = event.touches[0].clientX;
+      const moveY = event.touches[0].clientY;
 
       // Touch direction..
       let nextDirection = null;
-      if (moveX > touchX.current) {
-        nextDirection = 'right';
+      const xDistance = Math.abs(moveX - touchStartX.current);
+      const yDistance = Math.abs(moveY - touchStartY.current);
+
+      if (xDistance > yDistance) {
+        if (moveX > touchX.current) {
+          nextDirection = 'right';
+        } else if (moveX < touchX.current) {
+          nextDirection = 'left';
+        } else {
+          nextDirection = 'scroll';
+        }
       } else {
-        nextDirection = 'left';
+        nextDirection = 'scroll';
       }
 
-      if (touchDirection.current && nextDirection !== touchDirection.current) {
+      if (
+        touchDirection.current !== 'scroll' &&
+        nextDirection !== 'scroll' &&
+        touchDirection.current &&
+        nextDirection !== touchDirection.current
+      ) {
         // if there is a change in direction, we mark the touch as stale.
         // this will let users scroll left-right when there is overflow.
         touchStale.current = true;
@@ -73,6 +94,7 @@ const Carousel: React.FC<CarouselProps> = ({
 
       // Track last touch position to detect direction change next time around.
       touchX.current = moveX;
+      touchY.current = moveY;
     }
   };
 
