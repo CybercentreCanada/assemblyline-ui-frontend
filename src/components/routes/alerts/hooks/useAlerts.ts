@@ -92,7 +92,13 @@ interface AlertResponse {
 }
 
 const alertStateReducer = (state, newState) => {
-  return { ...state, ...newState };
+  const { loading, total, countedTotal, alerts } = newState;
+  return {
+    loading,
+    total: total || state.total,
+    countedTotal: countedTotal ? state.countedTotal + countedTotal : state.countedTotal,
+    alerts: alerts ? state.alerts.concat(alerts) : state.alerts
+  };
 };
 
 // Custom Hook implementation for dealing with alerts.
@@ -124,7 +130,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
   // Hook API: load/reload all the alerts from start.
   // resets the accumulated list.
   const onLoad = (onComplete?: (success: boolean) => void) => {
-    setState({ ...state, loading: true });
+    setState({ loading: true });
     apiCall({
       url: buildUrl(),
       onSuccess: api_data => {
@@ -142,7 +148,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
         }
       },
       onFailure: () => {
-        setState({ ...state, loading: false });
+        setState({ loading: false });
         if (onComplete) {
           onComplete(false);
         }
@@ -156,7 +162,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
     searchQuery.tickOffset();
     // reference the current offset now incase it changes again before callback is executed
     const _offset = searchQuery.getOffsetNumber();
-    setState({ ...state, loading: true });
+    setState({ loading: true });
     apiCall({
       url: buildUrl(),
       onSuccess: api_data => {
@@ -165,15 +171,15 @@ export default function useAlerts(pageSize: number): UsingAlerts {
         setState({
           loading: false,
           total,
-          countedTotal: state.countedTotal + countedTotal,
-          alerts: state.alerts.concat(parsedItems)
+          countedTotal,
+          alerts: parsedItems
         });
         if (onComplete) {
           onComplete(true);
         }
       },
       onFailure: () => {
-        setState({ ...state, loading: false });
+        setState({ loading: false });
         if (onComplete) {
           onComplete(false);
         }
