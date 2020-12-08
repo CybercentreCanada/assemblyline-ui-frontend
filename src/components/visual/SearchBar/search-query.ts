@@ -97,16 +97,15 @@ export default class SearchQuery {
 
   public setQuery(query: string): SearchQuery {
     this.params.set('q', query);
-    this.params.set('query', query);
     return this;
   }
 
   public hasQuery(): boolean {
-    return this.params.has('q') || this.params.has('query');
+    return this.params.has('q');
   }
 
   public getQuery(): string {
-    return this.params.has('q') ? this.params.get('q') : this.params.has('query') ? this.params.get('query') : '';
+    return this.params.has('q') ? this.params.get('q') : '';
   }
 
   public setTc(tc: string): SearchQuery {
