@@ -14,7 +14,7 @@ import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
 import WarningIcon from '@material-ui/icons/Warning';
-import SearchQuery from 'components/elements/search/search-query';
+import SearchQuery from 'components/visual/SearchBar/search-query';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';

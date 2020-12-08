@@ -1,6 +1,6 @@
 import { Pagination } from '@material-ui/lab';
-import SimpleSearchQuery from 'components/elements/search/simple-search-query';
 import useMyAPI from 'components/hooks/useMyAPI';
+import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React from 'react';
 
 type SearchResults = {

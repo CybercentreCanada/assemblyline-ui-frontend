@@ -15,8 +15,8 @@ import ClearAllIcon from '@material-ui/icons/ClearAll';
 import CloseIcon from '@material-ui/icons/ExitToApp';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import { Autocomplete } from '@material-ui/lab';
-import SearchQuery, { SearchFilter, SearchQueryFilters } from 'components/elements/search/search-query';
 import CustomChip from 'components/visual/CustomChip';
+import SearchQuery, { SearchFilter, SearchQueryFilters } from 'components/visual/SearchBar/search-query';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

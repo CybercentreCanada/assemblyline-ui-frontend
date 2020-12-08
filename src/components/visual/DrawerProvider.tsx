@@ -111,7 +111,15 @@ function DrawerProvider(props: DrawerProviderProps) {
                     <CloseOutlinedIcon />
                   </IconButton>
                 </div>
-                <div style={{ paddingLeft: theme.spacing(2), paddingRight: theme.spacing(2) }}>{globalDrawer}</div>
+                <div
+                  style={{
+                    paddingLeft: theme.spacing(2),
+                    paddingRight: theme.spacing(2),
+                    height: '100%'
+                  }}
+                >
+                  {globalDrawer}
+                </div>
               </>
             ),
             [globalDrawer, theme]

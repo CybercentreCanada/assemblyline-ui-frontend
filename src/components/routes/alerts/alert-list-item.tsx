@@ -1,7 +1,9 @@
 import { Grid, useTheme } from '@material-ui/core';
 import PersonIcon from '@material-ui/icons/Person';
-import { ChipList } from 'components/elements/mui/chips';
 import { AlertItem } from 'components/routes/alerts/hooks/useAlerts';
+import { ChipList } from 'components/visual/ChipList';
+import Classification from 'components/visual/Classification';
+import CustomChip from 'components/visual/CustomChip';
 import Verdict from 'components/visual/Verdict';
 import 'moment/locale/fr';
 import React from 'react';

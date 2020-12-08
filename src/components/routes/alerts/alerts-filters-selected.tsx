@@ -1,6 +1,6 @@
 import { useTheme } from '@material-ui/core';
-import { ChipList } from 'components/elements/mui/chips';
-import SearchQuery, { SearchFilter, SearchQueryFilters } from 'components/elements/search/search-query';
+import { ChipList } from 'components/visual/ChipList';
+import SearchQuery, { SearchFilter, SearchQueryFilters } from 'components/visual/SearchBar/search-query';
 import React from 'react';
 
 interface AlertFiltersSelectedProps {
