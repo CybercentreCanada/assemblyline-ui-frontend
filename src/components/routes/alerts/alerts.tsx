@@ -160,7 +160,8 @@ const Alerts: React.FC = () => {
           <ListCarousel id={ALERT_SIMPLELIST_ID} disableArrowUp disableArrowDown enableSwipe>
             <AlertDetails id={item.alert_id} />
           </ListCarousel>
-        </div>
+        </div>,
+        ALERT_SIMPLELIST_ID
       );
     },
     [setGlobalDrawer, theme]
