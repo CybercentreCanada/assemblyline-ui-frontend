@@ -1,6 +1,6 @@
 import { Drawer, IconButton, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
 import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 const useStyles = makeStyles(theme => ({
   appMain: {
@@ -65,12 +65,12 @@ function DrawerProvider(props: DrawerProviderProps) {
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
 
   const drawerWidth = isXL ? '42vw' : isLG ? '960px' : isMD ? '800px' : '100vw';
-  const closeGlobalDrawer = () => {
+  const closeGlobalDrawer = useCallback(() => {
     if (globalDrawer.restoreFocusId) {
       document.getElementById(globalDrawer.restoreFocusId).focus({ preventScroll: true });
     }
     setGlobalDrawer({ elements: null });
-  };
+  }, [globalDrawer.restoreFocusId]);
 
   return (
     <DrawerContext.Provider
@@ -131,7 +131,7 @@ function DrawerProvider(props: DrawerProviderProps) {
                 </div>
               </>
             ),
-            [globalDrawer, theme]
+            [closeGlobalDrawer, globalDrawer.elements, theme]
           )}
         </Drawer>
       </div>
