@@ -145,9 +145,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
         )}
         {buttons.map((b, i) => {
           return b.tooltip ? (
-            <Tooltip title={b.tooltip}>
+            <Tooltip key={`searchbar-button-${i}`} title={b.tooltip}>
               <IconButton
-                key={`searchbar-button-${i}`}
                 {...b.props}
                 edge="end"
                 size={!upMD ? 'small' : null}
