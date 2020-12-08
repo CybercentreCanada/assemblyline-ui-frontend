@@ -43,7 +43,7 @@ const useStyles = makeStyles(theme => ({
 
 export type DrawerContextProps = {
   closeGlobalDrawer: () => void;
-  setGlobalDrawer: (elements: React.ReactElement<any>) => void;
+  setGlobalDrawer: (elements: React.ReactElement<any>, restoreFocusId?: string) => void;
   globalDrawer: React.ReactElement<any>;
 };
 
@@ -55,7 +55,9 @@ export const DrawerContext = React.createContext<DrawerContextProps>(null);
 
 function DrawerProvider(props: DrawerProviderProps) {
   const { children } = props;
-  const [globalDrawer, setGlobalDrawer] = useState(null);
+  const [globalDrawer, setGlobalDrawer] = useState<{ elements: React.ReactElement<any>; restoreFocusId?: string }>({
+    elements: null
+  });
   const theme = useTheme();
   const classes = useStyles();
   const isMD = useMediaQuery(theme.breakpoints.only('md'));
@@ -64,15 +66,20 @@ function DrawerProvider(props: DrawerProviderProps) {
 
   const drawerWidth = isXL ? '42vw' : isLG ? '960px' : isMD ? '800px' : '100vw';
   const closeGlobalDrawer = () => {
-    setGlobalDrawer(null);
+    if (globalDrawer.restoreFocusId) {
+      document.getElementById(globalDrawer.restoreFocusId).focus({ preventScroll: true });
+    }
+    setGlobalDrawer({ elements: null });
   };
 
   return (
     <DrawerContext.Provider
       value={{
         closeGlobalDrawer,
-        setGlobalDrawer,
-        globalDrawer
+        setGlobalDrawer: (elements: React.ReactElement<any>, restoreFocusId?: string) => {
+          setGlobalDrawer({ elements, restoreFocusId });
+        },
+        globalDrawer: globalDrawer.elements
       }}
     >
       <div className={classes.appMain}>
@@ -84,7 +91,9 @@ function DrawerProvider(props: DrawerProviderProps) {
           [children]
         )}
         <Drawer
-          open={globalDrawer !== null}
+          disableRestoreFocus
+          disableEnforceFocus
+          open={globalDrawer.elements !== null}
           className={classes.appRightDrawer}
           style={{
             width: globalDrawer ? drawerWidth : 0,
@@ -118,7 +127,7 @@ function DrawerProvider(props: DrawerProviderProps) {
                     height: '100%'
                   }}
                 >
-                  {globalDrawer}
+                  {globalDrawer.elements}
                 </div>
               </>
             ),
