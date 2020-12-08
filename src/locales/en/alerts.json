@@ -50,10 +50,12 @@
   "status_NON-MALICIOUS": "NON-MALICIOUS",
   "status_ASSESS": "ASSESS",
   "status_TRIAGE": "TRIAGE",
+  "take_ownership": "Take ownership",
   "take_ownership.success": "You are now the owner of this alert!",
   "tooltip.actions": "Alert Actions",
   "type": "Type",
   "verdict.success.malicious": "Successfully applied malicious verdict to the alert.",
   "verdict.success.non_malicious": "Successfully applied non-malicious verdict to the alert.",
+  "workflow_action": "Perform a workflow action",
   "yara": "Yara Hits"
 }

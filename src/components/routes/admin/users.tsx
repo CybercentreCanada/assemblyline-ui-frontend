@@ -389,11 +389,8 @@ export default function Users() {
             onSearch={onSearch}
             buttons={[
               {
-                icon: (
-                  <Tooltip title={t('admins')}>
-                    <SupervisorAccountIcon fontSize={upMD ? 'default' : 'small'} />
-                  </Tooltip>
-                ),
+                icon: <SupervisorAccountIcon fontSize={upMD ? 'default' : 'small'} />,
+                tooltip: t('admins'),
                 props: {
                   onClick: () => {
                     query.set('query', 'type:admin');
@@ -403,11 +400,8 @@ export default function Users() {
               },
 
               {
-                icon: (
-                  <Tooltip title={t('disabled')}>
-                    <BlockIcon fontSize={upMD ? 'default' : 'small'} />
-                  </Tooltip>
-                ),
+                icon: <BlockIcon fontSize={upMD ? 'default' : 'small'} />,
+                tooltip: t('disabled'),
                 props: {
                   onClick: () => {
                     query.set('query', 'is_active:false');

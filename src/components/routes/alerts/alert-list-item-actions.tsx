@@ -7,6 +7,7 @@ import {
   DialogTitle,
   IconButton,
   makeStyles,
+  Tooltip,
   Typography,
   useTheme
 } from '@material-ui/core';
@@ -43,6 +44,7 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
   ({ item, currentQuery, setDrawer, onTakeOwnershipComplete }) => {
     const { onTakeOwnership } = usePromiseAPI();
     const classes = useStyles();
+    const { t } = useTranslation('alerts');
     const [progress, setProgress] = useState<boolean>(false);
     const [takeOwnershipConfirmation, setTakeOwnershipConfirmation] = useState<{ open: boolean; query: SearchQuery }>({
       open: false,
@@ -96,28 +98,30 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
         <div>
           {!item.owner && (
             <div className={classes.iconBackground}>
-              <IconButton
-                title="Take Ownership"
-                onClick={() => {
-                  setTakeOwnershipConfirmation({ open: true, query: buildActionQuery() });
-                }}
-                style={{ marginRight: 0 }}
-              >
-                <AssignmentIndIcon />
-              </IconButton>
+              <Tooltip title={t('take_ownership')}>
+                <IconButton
+                  onClick={() => {
+                    setTakeOwnershipConfirmation({ open: true, query: buildActionQuery() });
+                  }}
+                  style={{ marginRight: 0 }}
+                >
+                  <AssignmentIndIcon />
+                </IconButton>
+              </Tooltip>
             </div>
           )}{' '}
           <div className={classes.iconBackground}>
-            <IconButton
-              title="Workflow Action"
-              onClick={() => {
-                const actionQuery = buildActionQuery();
-                setDrawer({ open: true, type: 'actions', actionData: { query: actionQuery, total: 1 } });
-              }}
-              style={{ marginRight: 0 }}
-            >
-              <BiNetworkChart />
-            </IconButton>
+            <Tooltip title={t('workflow_action')}>
+              <IconButton
+                onClick={() => {
+                  const actionQuery = buildActionQuery();
+                  setDrawer({ open: true, type: 'actions', actionData: { query: actionQuery, total: 1 } });
+                }}
+                style={{ marginRight: 0 }}
+              >
+                <BiNetworkChart />
+              </IconButton>
+            </Tooltip>
           </div>
         </div>
         {takeOwnershipConfirmation.open && (

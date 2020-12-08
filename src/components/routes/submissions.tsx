@@ -1,4 +1,4 @@
-import { makeStyles, Tooltip, useMediaQuery, useTheme } from '@material-ui/core';
+import { makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 import PersonIcon from '@material-ui/icons/Person';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
@@ -112,11 +112,8 @@ export default function Submissions() {
             onSearch={onSearch}
             buttons={[
               {
-                icon: (
-                  <Tooltip title={t('my_submission')}>
-                    <PersonIcon fontSize={upMD ? 'default' : 'small'} />
-                  </Tooltip>
-                ),
+                icon: <PersonIcon fontSize={upMD ? 'default' : 'small'} />,
+                tooltip: t('my_submission'),
                 props: {
                   onClick: () => {
                     query.set('query', `params.submitter:"${currentUser.username}"`);

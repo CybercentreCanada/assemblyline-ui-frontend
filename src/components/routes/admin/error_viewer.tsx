@@ -1,4 +1,4 @@
-import { Card, Grid, makeStyles, Tooltip, Typography, useMediaQuery, useTheme } from '@material-ui/core';
+import { Card, Grid, makeStyles, Typography, useMediaQuery, useTheme } from '@material-ui/core';
 import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
 import PanToolOutlinedIcon from '@material-ui/icons/PanToolOutlined';
 import ReportProblemOutlinedIcon from '@material-ui/icons/ReportProblemOutlined';
@@ -249,11 +249,8 @@ export default function ErrorViewer() {
             onSearch={onSearch}
             buttons={[
               {
-                icon: (
-                  <Tooltip title={t('exception')}>
-                    <ReportProblemOutlinedIcon fontSize={upMD ? 'default' : 'small'} />
-                  </Tooltip>
-                ),
+                icon: <ReportProblemOutlinedIcon fontSize={upMD ? 'default' : 'small'} />,
+                tooltip: t('exception'),
                 props: {
                   onClick: () => {
                     query.set('query', 'type:EXCEPTION OR type:UNKNOWN');
@@ -262,11 +259,8 @@ export default function ErrorViewer() {
                 }
               },
               {
-                icon: (
-                  <Tooltip title={t('canceled')}>
-                    <CancelOutlinedIcon fontSize={upMD ? 'default' : 'small'} />
-                  </Tooltip>
-                ),
+                icon: <CancelOutlinedIcon fontSize={upMD ? 'default' : 'small'} />,
+                tooltip: t('canceled'),
                 props: {
                   onClick: () => {
                     query.set('query', 'type:SERVICE* OR type:TASK*');
@@ -275,11 +269,8 @@ export default function ErrorViewer() {
                 }
               },
               {
-                icon: (
-                  <Tooltip title={t('maxed')}>
-                    <PanToolOutlinedIcon fontSize={upMD ? 'default' : 'small'} />
-                  </Tooltip>
-                ),
+                icon: <PanToolOutlinedIcon fontSize={upMD ? 'default' : 'small'} />,
+                tooltip: t('maxed'),
                 props: {
                   onClick: () => {
                     query.set('query', 'type:MAX*');

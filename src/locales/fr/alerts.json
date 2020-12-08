@@ -50,10 +50,12 @@
   "status_NON-MALICIOUS": "NON-MALVEILLANT",
   "status_ASSESS": "ÉVALUER",
   "status_TRIAGE": "TRIER",
+  "take_ownership": "Prendre possession",
   "take_ownership.success": "Vous etes maintenant le propriétaire de l'alerte!",
   "tooltip.actions": "Action d'alerte",
   "type": "Type",
   "verdict.success.malicious": "Le verdict malveillant a été appliqué avec succès à l'alerte.",
   "verdict.success.non_malicious": "Le verdict non malveillant a été appliqué avec succès à l'alerte.",
+  "workflow_action": "Effectuer une action de flu de travail",
   "yara": "Yara Hits"
 }

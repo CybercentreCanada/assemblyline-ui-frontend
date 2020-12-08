@@ -43,6 +43,7 @@ const useStyles = makeStyles(theme => ({
 export interface SearchBarButton {
   icon: React.ReactNode;
   props: IconButtonProps;
+  tooltip?: string;
 }
 
 interface SearchBarProps {
@@ -114,15 +115,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
         alignItems="center"
         style={{ paddingRight: !extras ? theme.spacing(0.5) : null }}
       >
-        {/* <div style={{ lineHeight: 'normal', marginRight: theme.spacing(2) }}>
-          {searching ? (
-            <span style={{ width: 35, height: 35 }}>
-              <CircularProgress size={24} />
-            </span>
-          ) : (
-            <SearchIcon color="action" fontSize="large" />
-          )}
-        </div> */}
         <Box flex={1} display="relative">
           <SearchTextField
             value={value}
@@ -151,17 +143,31 @@ const SearchBar: React.FC<SearchBarProps> = ({
             style={{ marginLeft: theme.spacing(upMD ? 0 : 0.5), marginRight: theme.spacing(upMD ? 1 : 0.5) }}
           />
         )}
-        {buttons.map((b, i) => (
-          <IconButton
-            key={`searchbar-button-${i}`}
-            {...b.props}
-            edge="end"
-            size={!upMD ? 'small' : null}
-            style={{ marginRight: theme.spacing(upMD ? 1 : 0.5) }}
-          >
-            {b.icon}
-          </IconButton>
-        ))}
+        {buttons.map((b, i) => {
+          return b.tooltip ? (
+            <Tooltip title={b.tooltip}>
+              <IconButton
+                key={`searchbar-button-${i}`}
+                {...b.props}
+                edge="end"
+                size={!upMD ? 'small' : null}
+                style={{ marginRight: theme.spacing(upMD ? 1 : 0.5) }}
+              >
+                {b.icon}
+              </IconButton>
+            </Tooltip>
+          ) : (
+            <IconButton
+              key={`searchbar-button-${i}`}
+              {...b.props}
+              edge="end"
+              size={!upMD ? 'small' : null}
+              style={{ marginRight: theme.spacing(upMD ? 1 : 0.5) }}
+            >
+              {b.icon}
+            </IconButton>
+          );
+        })}
         {extras}
       </Box>
       {searching && (

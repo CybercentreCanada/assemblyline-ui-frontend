@@ -181,11 +181,8 @@ export default function Workflows() {
             onSearch={onSearch}
             buttons={[
               {
-                icon: (
-                  <Tooltip title={t('never_used')}>
-                    <EventBusyOutlinedIcon fontSize={upMD ? 'default' : 'small'} />
-                  </Tooltip>
-                ),
+                icon: <EventBusyOutlinedIcon fontSize={upMD ? 'default' : 'small'} />,
+                tooltip: t('never_used'),
                 props: {
                   onClick: () => {
                     query.set('query', 'hit_count:0');
@@ -194,11 +191,8 @@ export default function Workflows() {
                 }
               },
               {
-                icon: (
-                  <Tooltip title={t('old')}>
-                    <EventOutlinedIcon fontSize={upMD ? 'default' : 'small'} />
-                  </Tooltip>
-                ),
+                icon: <EventOutlinedIcon fontSize={upMD ? 'default' : 'small'} />,
+                tooltip: t('old'),
                 props: {
                   onClick: () => {
                     query.set('query', 'last_seen:[* TO now-3m]');

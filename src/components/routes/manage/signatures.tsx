@@ -195,11 +195,8 @@ export default function Signatures() {
                   onSearch={onSearch}
                   buttons={[
                     {
-                      icon: (
-                        <Tooltip title={t('noisy')}>
-                          <RecordVoiceOverOutlinedIcon fontSize={upMD ? 'default' : 'small'} />
-                        </Tooltip>
-                      ),
+                      icon: <RecordVoiceOverOutlinedIcon fontSize={upMD ? 'default' : 'small'} />,
+                      tooltip: t('noisy'),
                       props: {
                         onClick: () => {
                           query.set('query', 'status:NOISY');
@@ -209,11 +206,8 @@ export default function Signatures() {
                     },
 
                     {
-                      icon: (
-                        <Tooltip title={t('disabled')}>
-                          <BlockIcon fontSize={upMD ? 'default' : 'small'} />
-                        </Tooltip>
-                      ),
+                      icon: <BlockIcon fontSize={upMD ? 'default' : 'small'} />,
+                      tooltip: t('disabled'),
                       props: {
                         onClick: () => {
                           query.set('query', 'status:DISABLED');

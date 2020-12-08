@@ -235,21 +235,14 @@ function Search({ index }: SearchProps) {
             onSearch={onSearch}
             buttons={[
               {
-                icon: (
-                  <Tooltip
-                    title={
-                      query && query.get('use_archive') === 'false'
-                        ? t('use_archive.turn_on')
-                        : t('use_archive.turn_off')
-                    }
-                  >
-                    {query && query.get('use_archive') === 'false' ? (
-                      <FolderOutlinedIcon fontSize={downSM ? 'small' : 'default'} />
-                    ) : (
-                      <FolderIcon fontSize={downSM ? 'small' : 'default'} />
-                    )}
-                  </Tooltip>
-                ),
+                icon:
+                  query && query.get('use_archive') === 'false' ? (
+                    <FolderOutlinedIcon fontSize={downSM ? 'small' : 'default'} />
+                  ) : (
+                    <FolderIcon fontSize={downSM ? 'small' : 'default'} />
+                  ),
+                tooltip:
+                  query && query.get('use_archive') === 'false' ? t('use_archive.turn_on') : t('use_archive.turn_off'),
                 props: {
                   onClick: () => {
                     query.set('use_archive', query.get('use_archive') === 'false');
