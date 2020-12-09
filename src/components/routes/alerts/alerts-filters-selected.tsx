@@ -2,6 +2,7 @@ import { useTheme } from '@material-ui/core';
 import { ChipList } from 'components/visual/ChipList';
 import SearchQuery, { SearchFilter, SearchQueryFilters } from 'components/visual/SearchBar/search-query';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface AlertFiltersSelectedProps {
   searchQuery: SearchQuery;
@@ -17,9 +18,18 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
   onChange = () => null
 }) => {
   const theme = useTheme();
+  const { t } = useTranslation('alerts');
 
   const filters = searchQuery.parseFilters();
   const query = searchQuery.getQuery();
+
+  const onDeleteTC = () => {
+    onChange({ ...filters, tc: '' });
+  };
+
+  const onDeleteGroupBy = () => {
+    onChange({ ...filters, groupBy: '' });
+  };
 
   const onDeleteStatus = (item: SearchFilter) => {
     const _statuses = filters.statuses.filter(s => s.value !== item.value);
@@ -43,16 +53,31 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
 
   return (
     <div>
+      <div style={{ marginBottom: theme.spacing(1) }}>{query && !hideQuery && <span>Query = {query}, </span>}</div>
       <div>
-        {query && !hideQuery && <span>Query = {query}, </span>}
-        {filters && (
-          <span>
-            Time Constraint = {filters.tc}, Group by = {filters.groupBy}
-          </span>
+        {filters && filters.tc && (
+          <div style={{ display: 'inline-block' }}>
+            <ChipList
+              items={[filters.tc].map(v => ({
+                variant: 'outlined',
+                label: `${t('tc')}: ${v}`,
+                onDelete: !disableActions ? () => onDeleteTC() : null
+              }))}
+            />
+          </div>
         )}
-      </div>
-      <div style={{ marginTop: theme.spacing(1) }}>
-        {filters && filters.statuses.length ? (
+        {filters && filters.groupBy && (
+          <div style={{ display: 'inline-block' }}>
+            <ChipList
+              items={[filters.groupBy].map(v => ({
+                variant: 'outlined',
+                label: `${t('groupBy')}: ${v}`,
+                onDelete: !disableActions ? () => onDeleteGroupBy() : null
+              }))}
+            />
+          </div>
+        )}
+        {filters && filters.statuses.length !== 0 && (
           <div style={{ display: 'inline-block' }}>
             <ChipList
               items={filters.statuses.map(v => ({
@@ -62,8 +87,8 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
               }))}
             />
           </div>
-        ) : null}
-        {filters && filters.priorities.length ? (
+        )}
+        {filters && filters.priorities.length !== 0 && (
           <div style={{ display: 'inline-block' }}>
             <ChipList
               items={filters.priorities.map(v => ({
@@ -73,8 +98,8 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
               }))}
             />
           </div>
-        ) : null}
-        {filters && filters.labels.length ? (
+        )}
+        {filters && filters.labels.length !== 0 && (
           <div style={{ display: 'inline-block' }}>
             <ChipList
               items={filters.labels.map(v => ({
@@ -84,8 +109,8 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
               }))}
             />
           </div>
-        ) : null}
-        {filters && filters.queries.length ? (
+        )}
+        {filters && filters.queries.length !== 0 && (
           <div style={{ display: 'inline-block' }}>
             <ChipList
               items={filters.queries.map(v => ({
@@ -95,18 +120,7 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
               }))}
             />
           </div>
-        ) : null}
-        {/* {values.length ? (
-          <div display="inline-block" mt={1}>
-            <ChipList
-              items={favorites.map(f => ({
-                variant: 'outlined',
-                label: f.query,
-                onDelete: !disableActions ? () => onDeleteFavorite(f) : null
-              }))}
-            />
-          </div>
-        ) : null} */}
+        )}
       </div>
     </div>
   );
