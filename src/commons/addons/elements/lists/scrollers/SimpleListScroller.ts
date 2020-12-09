@@ -1,12 +1,22 @@
 import ListScroller from './ListScroller';
 
+function elementInViewport(el, offset, listElement) {
+  const top = el.offsetTop;
+  const height = el.offsetHeight;
+  const listElementRect = listElement.getBoundingClientRect();
+
+  return top >= -listElementRect.top + offset && top + height <= -listElementRect.top + window.innerHeight;
+}
+
 export default class SimpleListScroller implements ListScroller {
   constructor(private scrollTarget: HTMLElement, private listElement: HTMLElement, private rowHeight?: number) {}
 
   public scrollTo(position: number) {
     const scrollElement = this.scrollElement(position);
     const offset = this.offset();
-    scrollElement.scrollIntoView({ block: offset > 0 ? 'end' : 'nearest' });
+    if (!elementInViewport(scrollElement, offset, this.listElement)) {
+      scrollElement.scrollIntoView({ block: offset > 0 ? 'end' : 'nearest' });
+    }
   }
 
   private scrollElement(position: number): HTMLElement {
