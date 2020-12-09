@@ -14,8 +14,10 @@ export default class SimpleListScroller implements ListScroller {
   public scrollTo(position: number) {
     const scrollElement = this.scrollElement(position);
     const offset = this.offset();
-    if (!elementInViewport(scrollElement, offset, this.listElement)) {
-      scrollElement.scrollIntoView({ block: offset > 0 ? 'end' : 'nearest' });
+    if (offset > 0 && !elementInViewport(scrollElement, offset, this.listElement)) {
+      scrollElement.scrollIntoView({ block: 'end' });
+    } else {
+      scrollElement.scrollIntoView({ block: 'nearest' });
     }
   }
 
