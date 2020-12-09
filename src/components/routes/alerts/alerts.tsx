@@ -117,7 +117,8 @@ const Alerts: React.FC = () => {
   }, [searchQuery]);
 
   // Media quries.
-  const isLTEMd = useMediaQuery(theme.breakpoints.up('md'));
+  const isMDUp = useMediaQuery(theme.breakpoints.up('md'));
+  const isLGDown = useMediaQuery(theme.breakpoints.down('lg'));
 
   // Handler searchbar onSearch callback
   const onSearch = (filterValue: string = '', inputEl: HTMLInputElement = null) => {
@@ -143,8 +144,10 @@ const Alerts: React.FC = () => {
   // Handler for when an item of the InfiniteList is selected
   const onItemSelected = useCallback(
     (item: AlertItem) => {
-      // Unfocus the simple list so the drawer does not try to refocus it when closing...
-      document.getElementById(ALERT_SIMPLELIST_ID).blur();
+      if (isLGDown) {
+        // Unfocus the simple list so the drawer does not try to refocus it when closing...
+        document.getElementById(ALERT_SIMPLELIST_ID).blur();
+      }
       setGlobalDrawer(
         <div>
           <div
@@ -165,7 +168,7 @@ const Alerts: React.FC = () => {
         </div>
       );
     },
-    [setGlobalDrawer, theme]
+    [setGlobalDrawer, theme, isLGDown]
   );
 
   // Handler for when loading more alerts [read bottom of scroll area]
@@ -346,7 +349,7 @@ const Alerts: React.FC = () => {
             ]}
           >
             <Box className={classes.searchresult}>
-              {isLTEMd ? (
+              {isMDUp ? (
                 <SearchResultLarge
                   searching={loading}
                   total={total}
