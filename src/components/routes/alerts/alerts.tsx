@@ -144,29 +144,33 @@ const Alerts: React.FC = () => {
   // Handler for when an item of the InfiniteList is selected
   const onItemSelected = useCallback(
     (item: AlertItem) => {
-      if (isLGDown) {
-        // Unfocus the simple list so the drawer does not try to refocus it when closing...
-        document.getElementById(ALERT_SIMPLELIST_ID).blur();
-      }
-      setGlobalDrawer(
-        <div>
-          <div
-            style={{
-              position: 'sticky',
-              top: 0,
-              paddingTop: theme.spacing(1),
-              marginTop: -theme.spacing(8),
-              marginRight: -theme.spacing(1),
-              float: 'right'
-            }}
-          >
-            <ListNavigator id={ALERT_SIMPLELIST_ID} />
+      if (item === null) {
+        setGlobalDrawer(null);
+      } else {
+        if (isLGDown) {
+          // Unfocus the simple list so the drawer does not try to refocus it when closing...
+          document.getElementById(ALERT_SIMPLELIST_ID).blur();
+        }
+        setGlobalDrawer(
+          <div>
+            <div
+              style={{
+                position: 'sticky',
+                top: 0,
+                paddingTop: theme.spacing(1),
+                marginTop: -theme.spacing(8),
+                marginRight: -theme.spacing(1),
+                float: 'right'
+              }}
+            >
+              <ListNavigator id={ALERT_SIMPLELIST_ID} />
+            </div>
+            <ListCarousel id={ALERT_SIMPLELIST_ID} disableArrowUp disableArrowDown enableSwipe>
+              <AlertDetails id={item.alert_id} />
+            </ListCarousel>
           </div>
-          <ListCarousel id={ALERT_SIMPLELIST_ID} disableArrowUp disableArrowDown enableSwipe>
-            <AlertDetails id={item.alert_id} />
-          </ListCarousel>
-        </div>
-      );
+        );
+      }
     },
     [setGlobalDrawer, theme, isLGDown]
   );
