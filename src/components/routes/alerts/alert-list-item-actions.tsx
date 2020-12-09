@@ -11,6 +11,7 @@ import {
   Typography,
   useTheme
 } from '@material-ui/core';
+import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
 import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
@@ -19,6 +20,7 @@ import SearchQuery from 'components/visual/SearchBar/search-query';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
+import { Link } from 'react-router-dom';
 import { AlertDrawerState } from './alerts';
 import { AlertItem } from './hooks/useAlerts';
 import usePromiseAPI from './hooks/usePromiseAPI';
@@ -109,7 +111,14 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
                 </IconButton>
               </Tooltip>
             </div>
-          )}{' '}
+          )}
+          <div className={classes.iconBackground}>
+            <Tooltip title={t('submission')}>
+              <IconButton component={Link} to={`/submission/${item.sid}`} style={{ marginRight: 0 }}>
+                <AmpStoriesOutlinedIcon />
+              </IconButton>
+            </Tooltip>
+          </div>
           <div className={classes.iconBackground}>
             <Tooltip title={t('workflow_action')}>
               <IconButton
