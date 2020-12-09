@@ -398,7 +398,7 @@ const SearchResultLarge = ({ searching, total, query, onApplyFilters }) => {
   return (
     <div style={{ position: 'relative' }}>
       <AlertsFiltersSelected searchQuery={query} onChange={onApplyFilters} hideQuery />
-      <div style={{ position: 'absolute', top: theme.spacing(0), right: theme.spacing(1) }}>
+      <div style={{ position: 'absolute', top: theme.spacing(0.5), right: theme.spacing(1) }}>
         {searching ? '' : <span>{`${total} ${total > 1 ? t('results') : t('result')}`}</span>}
       </div>
     </div>

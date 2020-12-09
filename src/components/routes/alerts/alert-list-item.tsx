@@ -35,7 +35,7 @@ const AlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
       <Grid container spacing={1}>
         <Grid item xs={12} md={8}>
           <AlertPriority name={item.priority} />
-          <span style={{ marginLeft: theme.spacing(1) }}>{item.group_count}x</span>
+          {item.group_count && <span style={{ marginLeft: theme.spacing(1) }}>{item.group_count}x</span>}
           <span style={{ marginLeft: theme.spacing(1), wordBreak: 'break-all' }}>{item.file.name}</span>
         </Grid>
         <Grid item xs={6} md={2}>

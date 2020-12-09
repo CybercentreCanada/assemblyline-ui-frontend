@@ -126,7 +126,10 @@ export default function useAlerts(pageSize: number): UsingAlerts {
 
   // format alert api url using specified indexes.
   const buildUrl = () => {
-    return `/api/v4/alert/grouped/${searchQuery.getGroupBy()}/?${searchQuery.buildAPIQueryString()}`;
+    if (searchQuery.getGroupBy()) {
+      return `/api/v4/alert/grouped/${searchQuery.getGroupBy()}/?${searchQuery.buildAPIQueryString()}`;
+    }
+    return `/api/v4/alert/list/?${searchQuery.buildAPIQueryString()}`;
   };
 
   // Hook API: load/reload all the alerts from start.
@@ -138,12 +141,12 @@ export default function useAlerts(pageSize: number): UsingAlerts {
       onSuccess: api_data => {
         const { items: _items, tc_start: executionTime, total, counted_total: countedTotal } = api_data.api_response;
         const items = parseResult(_items, 0);
-        searchQuery.setTcStart(executionTime);
+        if (executionTime) searchQuery.setTcStart(executionTime);
         setState({
           reset: true,
           loading: false,
           total,
-          countedTotal,
+          countedTotal: searchQuery.getGroupBy() ? countedTotal : _items.length,
           alerts: items
         });
         if (onComplete) {
@@ -174,7 +177,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
         setState({
           loading: false,
           total,
-          countedTotal,
+          countedTotal: searchQuery.getGroupBy() ? countedTotal : _items.length,
           alerts: parsedItems
         });
         if (onComplete) {
@@ -193,7 +196,9 @@ export default function useAlerts(pageSize: number): UsingAlerts {
   // Fetch the Status Filters.
   const onLoadStatuses = () => {
     apiCall({
-      url: `/api/v4/alert/statuses/?${searchQuery.buildAPIQueryString()}&fq=${searchQuery.getGroupBy()}:*`,
+      url: `/api/v4/alert/statuses/?${searchQuery.buildAPIQueryString()}${
+        searchQuery.getGroupBy() ? `&fq=${searchQuery.getGroupBy()}:*` : ''
+      }`,
       onSuccess: api_data => {
         const { api_response: statuses } = api_data;
         const msItems: SearchFilter[] = Object.keys(statuses).map((k, i) => ({
@@ -211,7 +216,9 @@ export default function useAlerts(pageSize: number): UsingAlerts {
   // Fetch the Priority Filters.
   const onLoadPriorities = () => {
     apiCall({
-      url: `/api/v4/alert/priorities/?${searchQuery.buildAPIQueryString()}&fq=${searchQuery.getGroupBy()}:*`,
+      url: `/api/v4/alert/priorities/?${searchQuery.buildAPIQueryString()}${
+        searchQuery.getGroupBy() ? `&fq=${searchQuery.getGroupBy()}:*` : ''
+      }`,
       onSuccess: api_data => {
         const { api_response: priorities } = api_data;
         const msItems: SearchFilter[] = Object.keys(priorities).map((k, i) => ({
@@ -229,7 +236,9 @@ export default function useAlerts(pageSize: number): UsingAlerts {
   // Fetch the Label Filters.
   const onLoadLabels = () => {
     apiCall({
-      url: `/api/v4/alert/labels/?${searchQuery.buildAPIQueryString()}&fq=${searchQuery.getGroupBy()}:*`,
+      url: `/api/v4/alert/labels/?${searchQuery.buildAPIQueryString()}${
+        searchQuery.getGroupBy() ? `&fq=${searchQuery.getGroupBy()}:*` : ''
+      }`,
       onSuccess: api_data => {
         const { api_response: labels } = api_data;
         const msItems: SearchFilter[] = Object.keys(labels).map((k, i) => ({
@@ -246,7 +255,9 @@ export default function useAlerts(pageSize: number): UsingAlerts {
 
   const onLoadStatisics = () => {
     apiCall({
-      url: `/api/v4/alert/statistics/?${searchQuery.buildAPIQueryString()}&fq=${searchQuery.getGroupBy()}:*`,
+      url: `/api/v4/alert/statistics/?${searchQuery.buildAPIQueryString()}${
+        searchQuery.getGroupBy() ? `&fq=${searchQuery.getGroupBy()}:*` : ''
+      }`,
       onSuccess: api_data => {
         const { api_response: statistics } = api_data;
         const msItems: SearchFilter[] = [];

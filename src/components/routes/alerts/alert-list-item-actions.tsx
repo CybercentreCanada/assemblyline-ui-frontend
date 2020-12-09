@@ -91,6 +91,8 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
         _actionQuery.setQuery(`priority:${item.priority}`);
       } else if (groupBy === 'status') {
         _actionQuery.setQuery(`status:${item.status}`);
+      } else {
+        _actionQuery.setQuery(`alert_id:${item.alert_id}`);
       }
       return _actionQuery;
     };
