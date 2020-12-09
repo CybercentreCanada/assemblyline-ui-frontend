@@ -43,7 +43,7 @@ const useStyles = makeStyles(theme => ({
 
 export type DrawerContextProps = {
   closeGlobalDrawer: () => void;
-  setGlobalDrawer: (elements: React.ReactElement<any>, restoreFocusId?: string) => void;
+  setGlobalDrawer: (elements: React.ReactElement<any>) => void;
   globalDrawer: React.ReactElement<any>;
 };
 
@@ -55,9 +55,7 @@ export const DrawerContext = React.createContext<DrawerContextProps>(null);
 
 function DrawerProvider(props: DrawerProviderProps) {
   const { children } = props;
-  const [globalDrawer, setGlobalDrawer] = useState<{ elements: React.ReactElement<any>; restoreFocusId?: string }>({
-    elements: null
-  });
+  const [globalDrawer, setGlobalDrawer] = useState(null);
   const theme = useTheme();
   const classes = useStyles();
   const isMD = useMediaQuery(theme.breakpoints.only('md'));
@@ -66,10 +64,7 @@ function DrawerProvider(props: DrawerProviderProps) {
 
   const drawerWidth = isXL ? '42vw' : isLG ? '960px' : isMD ? '800px' : '100vw';
   const closeGlobalDrawer = () => {
-    if (globalDrawer.restoreFocusId) {
-      document.getElementById(globalDrawer.restoreFocusId).focus({ preventScroll: true });
-    }
-    setGlobalDrawer({ elements: null });
+    setGlobalDrawer(null);
   };
 
   const drawerContent = useMemo(
@@ -106,10 +101,8 @@ function DrawerProvider(props: DrawerProviderProps) {
     <DrawerContext.Provider
       value={{
         closeGlobalDrawer,
-        setGlobalDrawer: (elements: React.ReactElement<any>, restoreFocusId?: string) => {
-          setGlobalDrawer({ elements, restoreFocusId });
-        },
-        globalDrawer: globalDrawer.elements
+        setGlobalDrawer,
+        globalDrawer
       }}
     >
       <div className={classes.appMain}>
