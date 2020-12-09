@@ -197,9 +197,9 @@ export default class SearchQuery {
   public buildURLQueryString(): string {
     const params = new URLSearchParams(this.params.toString());
     params.delete('tc_start');
-    if (this.getRowsNumber() === this.pageSize) params.delete('rows');
+    params.delete('offset');
+    params.delete('rows');
     if (this.getTc() === DEFAULT_TC) params.delete('tc');
-    if (this.getOffsetNumber() === DEFAULT_OFFSET) params.delete('offset');
     if (this.getGroupBy() === DEFAULT_GROUPBY) params.delete('group_by');
     if (this.getQuery() === '') params.delete('q');
     return params.toString();
