@@ -1,6 +1,6 @@
 import { Drawer, IconButton, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
 import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 const useStyles = makeStyles(theme => ({
   appMain: {
@@ -43,7 +43,7 @@ const useStyles = makeStyles(theme => ({
 
 export type DrawerContextProps = {
   closeGlobalDrawer: () => void;
-  setGlobalDrawer: (elements: React.ReactElement<any>, restoreFocusId?: string) => void;
+  setGlobalDrawer: (elements: React.ReactElement<any>) => void;
   globalDrawer: React.ReactElement<any>;
 };
 
@@ -55,9 +55,7 @@ export const DrawerContext = React.createContext<DrawerContextProps>(null);
 
 function DrawerProvider(props: DrawerProviderProps) {
   const { children } = props;
-  const [globalDrawer, setGlobalDrawer] = useState<{ elements: React.ReactElement<any>; restoreFocusId?: string }>({
-    elements: null
-  });
+  const [globalDrawer, setGlobalDrawer] = useState(null);
   const theme = useTheme();
   const classes = useStyles();
   const isMD = useMediaQuery(theme.breakpoints.only('md'));
@@ -65,21 +63,16 @@ function DrawerProvider(props: DrawerProviderProps) {
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
 
   const drawerWidth = isXL ? '42vw' : isLG ? '960px' : isMD ? '800px' : '100vw';
-  const closeGlobalDrawer = useCallback(() => {
-    if (globalDrawer.restoreFocusId) {
-      document.getElementById(globalDrawer.restoreFocusId).focus({ preventScroll: true });
-    }
-    setGlobalDrawer({ elements: null });
-  }, [globalDrawer.restoreFocusId]);
+  const closeGlobalDrawer = () => {
+    setGlobalDrawer(null);
+  };
 
   return (
     <DrawerContext.Provider
       value={{
         closeGlobalDrawer,
-        setGlobalDrawer: (elements: React.ReactElement<any>, restoreFocusId?: string) => {
-          setGlobalDrawer({ elements, restoreFocusId });
-        },
-        globalDrawer: globalDrawer.elements
+        setGlobalDrawer,
+        globalDrawer
       }}
     >
       <div className={classes.appMain}>
@@ -91,9 +84,7 @@ function DrawerProvider(props: DrawerProviderProps) {
           [children]
         )}
         <Drawer
-          disableRestoreFocus
-          disableEnforceFocus
-          open={globalDrawer.elements !== null}
+          open={globalDrawer !== null}
           className={classes.appRightDrawer}
           style={{
             width: globalDrawer ? drawerWidth : 0,
@@ -127,11 +118,11 @@ function DrawerProvider(props: DrawerProviderProps) {
                     height: '100%'
                   }}
                 >
-                  {globalDrawer.elements}
+                  {globalDrawer}
                 </div>
               </>
             ),
-            [closeGlobalDrawer, globalDrawer.elements, theme]
+            [globalDrawer, theme]
           )}
         </Drawer>
       </div>

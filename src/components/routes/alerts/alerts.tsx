@@ -143,6 +143,8 @@ const Alerts: React.FC = () => {
   // Handler for when an item of the InfiniteList is selected
   const onItemSelected = useCallback(
     (item: AlertItem) => {
+      // Unfocus the simple list so the drawer does not try to refocus it when closing...
+      document.getElementById(ALERT_SIMPLELIST_ID).blur();
       setGlobalDrawer(
         <div>
           <div
@@ -160,8 +162,7 @@ const Alerts: React.FC = () => {
           <ListCarousel id={ALERT_SIMPLELIST_ID} disableArrowUp disableArrowDown enableSwipe>
             <AlertDetails id={item.alert_id} />
           </ListCarousel>
-        </div>,
-        ALERT_SIMPLELIST_ID
+        </div>
       );
     },
     [setGlobalDrawer, theme]
