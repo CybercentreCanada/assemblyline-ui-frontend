@@ -32,7 +32,8 @@ const GROUPBY_OPTIONS = [
   { value: 'file.name', label: 'file.name' },
   DEFAULT_GROUPBY,
   { value: 'priority', label: 'priority' },
-  { value: 'status', label: 'status' }
+  { value: 'status', label: 'status' },
+  { value: '', label: '' }
 ];
 
 //
