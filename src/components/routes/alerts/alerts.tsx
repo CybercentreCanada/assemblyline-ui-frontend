@@ -114,6 +114,7 @@ const Alerts: React.FC = () => {
 
   useEffect(() => {
     if (searchQuery) {
+      setScrollReset(true);
       searchTextValue.current = searchQuery.getQuery();
     }
   }, [searchQuery]);
@@ -239,6 +240,7 @@ const Alerts: React.FC = () => {
   const onWorkflowActionsApply = (selectedStatus: string, selectedPriority: string, selectedLabels: string[]) => {
     onApplyWorkflowAction(drawer.actionData.query, selectedStatus, selectedPriority, selectedLabels).then(() => {
       setDrawer({ ...drawer, open: false });
+      setScrollReset(true);
       onLoad();
     });
   };
