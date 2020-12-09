@@ -45,11 +45,14 @@
   "received_date": "Received",
   "alerted_date": "Alerted",
   "dates": "Dates",
+  "result": "alert",
+  "results": "alerts",
   "status": "Status",
   "status_MALICIOUS": "MALICIOUS",
   "status_NON-MALICIOUS": "NON-MALICIOUS",
   "status_ASSESS": "ASSESS",
   "status_TRIAGE": "TRIAGE",
+  "submission": "Got to related submission",
   "take_ownership": "Take ownership",
   "take_ownership.success": "You are now the owner of this alert!",
   "tooltip.actions": "Alert Actions",
@@ -57,5 +60,7 @@
   "verdict.success.malicious": "Successfully applied malicious verdict to the alert.",
   "verdict.success.non_malicious": "Successfully applied non-malicious verdict to the alert.",
   "workflow_action": "Perform a workflow action",
-  "yara": "Yara Hits"
+  "yara": "Yara Hits",
+  "tc": "Time Constraint",
+  "groupBy": "Grouped By"
 }

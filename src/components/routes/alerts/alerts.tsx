@@ -63,7 +63,8 @@ const useStyles = makeStyles(theme => ({
   },
   searchresult: {
     marginTop: theme.spacing(1),
-    fontStyle: 'italic'
+    fontStyle: 'italic',
+    minHeight: theme.spacing(3)
   },
   modeToggler: {
     border: 'none',
@@ -393,11 +394,12 @@ const Alerts: React.FC = () => {
 
 const SearchResultLarge = ({ searching, total, query, onApplyFilters }) => {
   const theme = useTheme();
+  const { t } = useTranslation('alerts');
   return (
     <div style={{ position: 'relative' }}>
       <AlertsFiltersSelected searchQuery={query} onChange={onApplyFilters} hideQuery />
       <div style={{ position: 'absolute', top: theme.spacing(0), right: theme.spacing(1) }}>
-        {searching ? '' : <span>{`${total} matching results.`}</span>}
+        {searching ? '' : <span>{`${total} ${total > 1 ? t('results') : t('result')}`}</span>}
       </div>
     </div>
   );
@@ -405,6 +407,7 @@ const SearchResultLarge = ({ searching, total, query, onApplyFilters }) => {
 
 const SearchResultSmall = ({ searching, total, query }) => {
   const theme = useTheme();
+  const { t } = useTranslation('alerts');
   const filtered = query ? hasFilters(query.parseFilters()) : false;
   return (
     <>
@@ -414,7 +417,7 @@ const SearchResultSmall = ({ searching, total, query }) => {
             <FiFilter style={{ marginRight: theme.spacing(1) }} />
           </>
         )}
-        {searching ? '' : `${total} matching results.`}
+        {searching ? '' : `${total} ${total > 1 ? t('results') : t('result')}`}
       </div>
     </>
   );
