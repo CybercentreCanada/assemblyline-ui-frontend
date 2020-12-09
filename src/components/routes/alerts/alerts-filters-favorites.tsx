@@ -1,21 +1,9 @@
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Divider,
-  Switch,
-  TextField,
-  Typography,
-  useTheme
-} from '@material-ui/core';
-import ClearAllIcon from '@material-ui/icons/ClearAll';
-import CloseIcon from '@material-ui/icons/ExitToApp';
-import SaveIcon from '@material-ui/icons/Save';
-import WarningIcon from '@material-ui/icons/Warning';
+import { Button, Divider, Switch, TextField, Typography, useTheme } from '@material-ui/core';
+import useAppContext from 'components/hooks/useAppContext';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { ChipList } from 'components/visual/ChipList';
+import Classification from 'components/visual/Classification';
+import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useFavorites, { Favorite } from './hooks/useFavorites';
@@ -23,7 +11,6 @@ import useFavorites, { Favorite } from './hooks/useFavorites';
 interface AlertsFiltersFavoritesProps {
   initValue?: string;
   onSaved: (favorite: { name: string; query: string }) => void;
-  onCancel: () => void;
   onSelected: (favorite: Favorite) => void;
   onDeleted: (favorite: Favorite) => void;
 }
@@ -31,7 +18,6 @@ interface AlertsFiltersFavoritesProps {
 const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
   initValue,
   onSaved,
-  onCancel,
   onSelected,
   onDeleted
 }) => {
@@ -45,8 +31,10 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
     onAddGlobalFavorite,
     onDeleteGlobalFavorite
   } = useFavorites();
-  const { showErrorMessage } = useMySnackbar();
+  const { showErrorMessage, showSuccessMessage } = useMySnackbar();
+  const { c12nDef, user: currentUser } = useAppContext();
   const [formValid, setFormValid] = useState<boolean>(false);
+  const [classification, setClassification] = useState<string>(c12nDef.UNRESTRICTED);
   const [queryValue, setQueryValue] = useState<{ valid: boolean; value: string }>({ valid: true, value: initValue });
   const [nameValue, setNameValue] = useState<{ valid: boolean; value: string }>({ valid: true, value: '' });
   const [publicSwitch, setPublicSwitch] = useState<boolean>(false);
@@ -77,18 +65,26 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
 
   const _onSave = () => {
     if (queryValue.value && nameValue.value) {
-      const favorite = { query: queryValue.value, name: nameValue.value };
+      const favorite: Favorite = {
+        query: queryValue.value,
+        name: nameValue.value,
+        classification: publicSwitch ? classification : c12nDef.UNRESTRICTED,
+        created_by: currentUser.username
+      };
+
       if (publicSwitch) {
         onAddGlobalFavorite(favorite, () => {
+          showSuccessMessage(t('added.global'));
           onSaved(favorite);
         });
       } else {
         onAddUserFavorite(favorite, () => {
+          showSuccessMessage(t('added.personal'));
           onSaved(favorite);
         });
       }
     } else {
-      showErrorMessage(t('favorites.form.field.required'));
+      showErrorMessage(t('form.field.required'));
     }
   };
 
@@ -110,10 +106,6 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
     onSelected(favorite);
   };
 
-  const _onCancel = () => {
-    onCancel();
-  };
-
   const onQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.currentTarget;
     const _queryValue = { valid: !!value, value };
@@ -132,25 +124,12 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
     setPublicSwitch(isPublic);
   };
 
-  const onClearBtnClick = () => {
-    setFormValid(false);
-    setQueryValue({ valid: false, value: '' });
-    setNameValue({ valid: false, value: '' });
-  };
-
   return (
     <div>
-      <Typography variant="h6">{t('favorites.addfavorites')}</Typography>
-      <Divider />
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          margin: theme.spacing(1)
-        }}
-      >
-        <div style={{ flex: 1 }} />
+      <div style={{ paddingBottom: theme.spacing(2) }}>
+        <Typography variant="h4">{t('addfavorites')}</Typography>
+      </div>
+      <div style={{ textAlign: 'right' }}>
         <Button
           onClick={() => onSwitchChange(!publicSwitch)}
           size="small"
@@ -158,18 +137,23 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
           disableElevation
           disableRipple
         >
-          <div>{t('favorites.private')}</div>
+          <div>{t('private')}</div>
           <div style={{ flex: 1 }}>
             <Switch checked={publicSwitch} onChange={event => onSwitchChange(event.target.checked)} color="primary" />
           </div>
-          <div>{t('favorites.public')}</div>
+          <div>{t('public')}</div>
         </Button>
       </div>
-      <div style={{ margin: theme.spacing(1) }}>
+      {publicSwitch ? (
+        <Classification type="picker" c12n={classification} setClassification={setClassification} />
+      ) : (
+        <div style={{ padding: theme.spacing(2.25) }} />
+      )}
+      <div style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(2) }}>
         <div>
+          <Typography variant="subtitle2">{t('query')}</Typography>
           <TextField
             error={!queryValue.valid}
-            label={t('favorites.query')}
             variant="outlined"
             value={queryValue.value}
             onChange={onQueryChange}
@@ -178,9 +162,9 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
           />
         </div>
         <div style={{ marginTop: theme.spacing(2) }}>
+          <Typography variant="subtitle2">{t('name')}</Typography>
           <TextField
             error={!nameValue.valid}
-            label={t('favorites.name')}
             variant="outlined"
             value={nameValue.value}
             onChange={onNameChange}
@@ -189,24 +173,17 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
           />
         </div>
       </div>
-      <div style={{ marginTop: theme.spacing(2), display: 'flex', flexDirection: 'row' }}>
-        <Button variant="contained" color="primary" onClick={_onSave} disabled={!formValid} startIcon={<SaveIcon />}>
-          {t('favorites.save')}
-        </Button>
-        <div style={{ marginRight: theme.spacing(1) }} />
-        <Button variant="contained" onClick={onClearBtnClick} startIcon={<ClearAllIcon />}>
-          {t('favorites.clear')}
-        </Button>
 
-        <div style={{ flex: 1 }} />
-        <Button variant="contained" onClick={_onCancel} size="small" startIcon={<CloseIcon />}>
-          {t('favorites.cancel')}
+      <div style={{ paddingTop: theme.spacing(2), paddingBottom: theme.spacing(4), textAlign: 'right' }}>
+        <Button variant="contained" color="primary" onClick={_onSave} disabled={!formValid}>
+          {t('save')}
         </Button>
       </div>
-      <div style={{ marginBottom: theme.spacing(2) }} />
-      <Typography variant="h6">{t('favorites.yourfavorites')}</Typography>
+
+      {/* Your personnal favorites  */}
+      <Typography variant="h6">{t('yourfavorites')}</Typography>
       <Divider />
-      <div style={{ margin: theme.spacing(1) }}>
+      <div style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(4) }}>
         <ChipList
           items={userFavorites.map(f => ({
             size: 'medium',
@@ -218,9 +195,11 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
           }))}
         />
       </div>
-      <Typography variant="h6">{t('favorites.globalfavorites')}</Typography>
+
+      {/* The global favorites */}
+      <Typography variant="h6">{t('globalfavorites')}</Typography>
       <Divider />
-      <div style={{ margin: theme.spacing(1) }}>
+      <div style={{ marginTop: theme.spacing(1) }}>
         <ChipList
           items={globalFavorites.map(f => ({
             size: 'medium',
@@ -232,35 +211,23 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
           }))}
         />
       </div>
-      <Dialog
-        disableBackdropClick
-        disableEscapeKeyDown
-        maxWidth="xs"
-        aria-labelledby="confirmation-dialog-title"
+
+      <ConfirmationDialog
         open={confirmation.open}
-      >
-        <DialogTitle>
-          <div
-            style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', color: theme.palette.warning.main }}
-          >
-            <WarningIcon fontSize="large" />{' '}
-            <Typography style={{ marginLeft: theme.spacing(2) }} variant="h6">
-              {t('favorites.confirmdiag.header')}
-            </Typography>
-          </div>
-        </DialogTitle>
-        <DialogContent dividers>
-          <div>{t('favorites.confirmdiag.content')}</div>
-        </DialogContent>
-        <DialogActions>
-          <Button autoFocus onClick={_onConfirmCancelClick} variant="contained" size="small">
-            {t('favorites.cancel')}
-          </Button>
-          <Button onClick={_onConfirmOkClick} variant="contained" color="primary" size="small">
-            {t('favorites.ok')}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        handleClose={_onConfirmCancelClick}
+        handleAccept={_onConfirmOkClick}
+        title={t('confirmdiag.header')}
+        cancelText={t('cancel')}
+        acceptText={t('ok')}
+        text={
+          <>
+            <span style={{ display: 'block', paddingBottom: theme.spacing(1) }}>{t('confirmdiag.content')}</span>
+            <span style={{ display: 'block', fontWeight: 500 }}>
+              {confirmation.favorite ? confirmation.favorite.name : null}
+            </span>
+          </>
+        }
+      />
     </div>
   );
 };

@@ -1,4 +1,5 @@
-import { Box, Drawer, makeStyles, Typography, useMediaQuery, useTheme } from '@material-ui/core';
+import { Box, Drawer, IconButton, makeStyles, Typography, useMediaQuery, useTheme } from '@material-ui/core';
+import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import StarIcon from '@material-ui/icons/Star';
 import ListCarousel from 'commons/addons/elements/lists/carousel/ListCarousel';
@@ -54,9 +55,10 @@ const useStyles = makeStyles(theme => ({
   drawerInner: {
     display: 'flex',
     flexDirection: 'column',
+    padding: theme.spacing(3),
     width: '600px',
     [theme.breakpoints.down('xs')]: {
-      width: '100vw'
+      width: '100%'
     }
   },
   searchresult: {
@@ -216,11 +218,6 @@ const Alerts: React.FC = () => {
     setDrawer({ ...drawer, open: false });
   };
 
-  // Handler/callback for when clicking the 'Cancel' btn on the AlertsFavorite component.
-  const onFavoriteCancel = () => {
-    setDrawer({ ...drawer, open: false });
-  };
-
   // Handler/callback for when deleting a favorite on the AlertsFavorite component.
   const onFavoriteDelete = (favorite: { name: string; query: string }) => {
     // console.log(favorite);
@@ -275,7 +272,12 @@ const Alerts: React.FC = () => {
   return (
     <PageFullWidth margin={4}>
       <Drawer open={drawer.open} anchor="right" onClose={onDrawerClose}>
-        <Box p={theme.spacing(0.5)} className={classes.drawerInner}>
+        <div style={{ padding: theme.spacing(1) }}>
+          <IconButton onClick={onDrawerClose}>
+            <CloseOutlinedIcon />
+          </IconButton>
+        </div>
+        <div className={classes.drawerInner}>
           {
             {
               filter: (
@@ -295,7 +297,6 @@ const Alerts: React.FC = () => {
                   onSelected={onFavoriteSelected}
                   onDeleted={onFavoriteDelete}
                   onSaved={onFavoriteAdd}
-                  onCancel={onFavoriteCancel}
                 />
               ),
               actions: drawer.actionData && (
@@ -311,7 +312,7 @@ const Alerts: React.FC = () => {
               )
             }[drawer.type]
           }
-        </Box>
+        </div>
       </Drawer>
 
       <div style={{ paddingBottom: theme.spacing(2) }}>

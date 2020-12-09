@@ -45,8 +45,6 @@ export default function useFavorites(): UsingFavorites {
     favorite: { query: string; name: string },
     onSuccess: (favorite: { query: string; name: string }) => void
   ) => {
-    // https://192.168.0.13.nip.io:8443/api/v4/user/favorites/admin/
-    // https://192.168.0.13.nip.io:8443/api/v4/user/favorites/admin/alert/ [PUT]
     const url = `/api/v4/user/favorites/${user.username}/alert/`;
     apiCall({
       url,
@@ -65,8 +63,6 @@ export default function useFavorites(): UsingFavorites {
 
   // Hook API:
   const onDeleteUserFavorite = (favorite: Favorite, onSuccess: (favorite: Favorite) => void) => {
-    // https://192.168.0.13.nip.io:8443/api/v4/user/favorites/admin/
-    // https://192.168.0.13.nip.io:8443/api/v4/user/favorites/admin/alert/ [PUT]
     const url = `/api/v4/user/favorites/${user.username}/alert/`;
     apiCall({
       url,
@@ -85,8 +81,6 @@ export default function useFavorites(): UsingFavorites {
 
   // Hook API:
   const onLoadUserFavorites = () => {
-    // https://192.168.0.13.nip.io:8443/api/v4/user/favorites/admin/
-    // https://192.168.0.13.nip.io:8443/api/v4/user/favorites/admin/alert/ [PUT]
     const url = `/api/v4/user/favorites/${user.username}/`;
     apiCall({
       url,
@@ -98,7 +92,6 @@ export default function useFavorites(): UsingFavorites {
 
   // Hook API:
   const onLoadGlobalFavorites = () => {
-    // https://192.168.0.13.nip.io:8443/api/v4/user/favorites/__global__/
     const url = '/api/v4/user/favorites/__global__/';
     apiCall({
       url,
@@ -108,7 +101,6 @@ export default function useFavorites(): UsingFavorites {
     });
   };
 
-  // /api/v4/user/favorites/__global__/alert/
   const onAddGlobalFavorite = (
     favorite: { query: string; name: string },
     onSuccess: (favorite: { query: string; name: string }) => void
