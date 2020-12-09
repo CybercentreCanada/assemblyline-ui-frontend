@@ -72,6 +72,36 @@ function DrawerProvider(props: DrawerProviderProps) {
     setGlobalDrawer({ elements: null });
   };
 
+  const drawerContent = useMemo(
+    () => (
+      <>
+        <div
+          id="drawerTop"
+          style={{
+            padding: theme.spacing(1),
+            position: 'sticky',
+            top: 0,
+            backgroundColor: theme.palette.background.paper
+          }}
+        >
+          <IconButton onClick={closeGlobalDrawer}>
+            <CloseOutlinedIcon />
+          </IconButton>
+        </div>
+        <div
+          style={{
+            paddingLeft: theme.spacing(2),
+            paddingRight: theme.spacing(2),
+            height: '100%'
+          }}
+        >
+          {globalDrawer.elements}
+        </div>
+      </>
+    ),
+    [globalDrawer, theme]
+  );
+
   return (
     <DrawerContext.Provider
       value={{
@@ -90,50 +120,39 @@ function DrawerProvider(props: DrawerProviderProps) {
           // eslint-disable-next-line react-hooks/exhaustive-deps
           [children]
         )}
-        <Drawer
-          disableRestoreFocus
-          disableEnforceFocus
-          open={globalDrawer.elements !== null}
-          className={classes.appRightDrawer}
-          style={{
-            width: globalDrawer ? drawerWidth : 0,
-            zIndex: isXL ? theme.zIndex.appBar + 1 : theme.zIndex.drawer
-          }}
-          classes={{ paper: classes.paper }}
-          anchor="right"
-          variant={isXL ? 'persistent' : 'temporary'}
-          onClose={closeGlobalDrawer}
-        >
-          {useMemo(
-            () => (
-              <>
-                <div
-                  id="drawerTop"
-                  style={{
-                    padding: theme.spacing(1),
-                    position: 'sticky',
-                    top: 0,
-                    backgroundColor: theme.palette.background.paper
-                  }}
-                >
-                  <IconButton onClick={closeGlobalDrawer}>
-                    <CloseOutlinedIcon />
-                  </IconButton>
-                </div>
-                <div
-                  style={{
-                    paddingLeft: theme.spacing(2),
-                    paddingRight: theme.spacing(2),
-                    height: '100%'
-                  }}
-                >
-                  {globalDrawer.elements}
-                </div>
-              </>
-            ),
-            [globalDrawer, theme]
-          )}
-        </Drawer>
+        {isXL ? (
+          <Drawer
+            open={globalDrawer.elements !== null}
+            className={classes.appRightDrawer}
+            style={{
+              width: globalDrawer.elements ? drawerWidth : 0,
+              zIndex: theme.zIndex.appBar + 1
+            }}
+            classes={{ paper: classes.paper }}
+            anchor="right"
+            variant="persistent"
+            onClose={closeGlobalDrawer}
+          >
+            {drawerContent}
+          </Drawer>
+        ) : (
+          <Drawer
+            disableRestoreFocus
+            disableEnforceFocus
+            open={globalDrawer.elements !== null}
+            className={classes.appRightDrawer}
+            style={{
+              width: globalDrawer.elements ? drawerWidth : 0,
+              zIndex: theme.zIndex.drawer
+            }}
+            classes={{ paper: classes.paper }}
+            anchor="right"
+            variant="temporary"
+            onClose={closeGlobalDrawer}
+          >
+            {drawerContent}
+          </Drawer>
+        )}
       </div>
     </DrawerContext.Provider>
   );
