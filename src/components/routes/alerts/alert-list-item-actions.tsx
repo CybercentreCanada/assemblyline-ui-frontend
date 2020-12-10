@@ -1,22 +1,10 @@
-import {
-  Button,
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-  makeStyles,
-  Tooltip,
-  Typography,
-  useTheme
-} from '@material-ui/core';
+import { IconButton, makeStyles, Tooltip, Typography, useTheme } from '@material-ui/core';
 import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
 import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
-import CheckIcon from '@material-ui/icons/Check';
-import CloseIcon from '@material-ui/icons/Close';
-import WarningIcon from '@material-ui/icons/Warning';
+import CenterFocusStrongOutlinedIcon from '@material-ui/icons/CenterFocusStrongOutlined';
+import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import SearchQuery from 'components/visual/SearchBar/search-query';
+import { getValueFromPath } from 'helpers/utils';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
@@ -46,18 +34,17 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
   ({ item, currentQuery, setDrawer, onTakeOwnershipComplete }) => {
     const { onTakeOwnership } = usePromiseAPI();
     const classes = useStyles();
+    const groupBy = currentQuery.getGroupBy();
     const { t } = useTranslation('alerts');
-    const [progress, setProgress] = useState<boolean>(false);
+    const theme = useTheme();
     const [takeOwnershipConfirmation, setTakeOwnershipConfirmation] = useState<{ open: boolean; query: SearchQuery }>({
       open: false,
       query: null
     });
 
     const onTakeOwnershipOkClick = async () => {
-      setProgress(true);
       try {
         await onTakeOwnership(takeOwnershipConfirmation.query);
-        setProgress(false);
         setTakeOwnershipConfirmation({ open: false, query: null });
         if (onTakeOwnershipComplete) {
           onTakeOwnershipComplete();
@@ -72,29 +59,21 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
     };
 
     const buildActionQuery = (): SearchQuery => {
-      const _actionQuery = currentQuery.newBase(name => {
-        return name === 'tc_start';
-      });
+      const _actionQuery = currentQuery.newBase(name => name === 'tc_start');
 
-      const groupBy = currentQuery.getGroupBy();
-
-      //
-      if (groupBy === 'file.sha256') {
-        _actionQuery.setQuery(`file.sha256:${item.file.sha256}`);
-      } else if (groupBy === 'file.sha1') {
-        _actionQuery.setQuery(`file.sha1:${item.file.sha1}`);
-      } else if (groupBy === 'file.md5') {
-        _actionQuery.setQuery(`file.md5:${item.file.md5}`);
-      } else if (groupBy === 'file.name') {
-        _actionQuery.setQuery(`file.name:${item.file.name}`);
-      } else if (groupBy === 'priority') {
-        _actionQuery.setQuery(`priority:${item.priority}`);
-      } else if (groupBy === 'status') {
-        _actionQuery.setQuery(`status:${item.status}`);
+      if (groupBy) {
+        _actionQuery.setQuery(`${groupBy}:${getValueFromPath(item, groupBy)}`);
       } else {
         _actionQuery.setQuery(`alert_id:${item.alert_id}`);
       }
       return _actionQuery;
+    };
+
+    const buildFocusQuery = (): SearchQuery => {
+      const focusQuery = currentQuery.build();
+      focusQuery.setGroupBy('');
+      focusQuery.addFq(`${groupBy}:${getValueFromPath(item, groupBy)}`);
+      return focusQuery;
     };
 
     return (
@@ -110,6 +89,19 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
                   style={{ marginRight: 0 }}
                 >
                   <AssignmentIndIcon />
+                </IconButton>
+              </Tooltip>
+            </div>
+          )}
+          {item.group_count && (
+            <div className={classes.iconBackground}>
+              <Tooltip title={t('focus')}>
+                <IconButton
+                  component={Link}
+                  to={`/alerts/?${buildFocusQuery().buildURLQueryString()}`}
+                  style={{ marginRight: 0 }}
+                >
+                  <CenterFocusStrongOutlinedIcon />
                 </IconButton>
               </Tooltip>
             </div>
@@ -136,74 +128,30 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
           </div>
         </div>
         {takeOwnershipConfirmation.open && (
-          <TakeOwnershipConfirmDialog
-            item={item}
-            progress={progress}
+          <ConfirmationDialog
             open={takeOwnershipConfirmation.open}
-            actionQuery={takeOwnershipConfirmation.query}
-            onTakeOwnershipOkClick={onTakeOwnershipOkClick}
-            onTakeOwnershipCancelClick={onTakeOwnershipCancelClick}
+            handleClose={onTakeOwnershipCancelClick}
+            handleAccept={onTakeOwnershipOkClick}
+            title={t('actions.takeownershipdiag.header')}
+            cancelText={t('actions.cancel')}
+            acceptText={t('actions.ok')}
+            text={
+              groupBy ? (
+                <>
+                  <span style={{ display: 'inline-block' }}>{t('actions.takeownershipdiag.content.grouped')}</span>
+                  <span style={{ display: 'inline-block', padding: theme.spacing(1), wordBreak: 'break-all' }}>
+                    <Typography variant="caption">{`${groupBy}: ${getValueFromPath(item, groupBy)}`}</Typography>
+                  </span>
+                </>
+              ) : (
+                t('actions.takeownershipdiag.content.single')
+              )
+            }
           />
         )}
       </>
     );
   }
 );
-
-const TakeOwnershipConfirmDialog: React.FC<{
-  open: boolean;
-  progress: boolean;
-  actionQuery: SearchQuery;
-  item: AlertItem;
-  onTakeOwnershipOkClick: () => void;
-  onTakeOwnershipCancelClick: () => void;
-}> = ({ open, progress, actionQuery, item, onTakeOwnershipOkClick, onTakeOwnershipCancelClick }) => {
-  const { t } = useTranslation('alerts');
-  const theme = useTheme();
-  let content = t('page.alerts.actions.takeownershipdiag.content');
-  content = content.replace('{0}', `${item.group_count}`);
-  content = content.replace('{1}', actionQuery.getGroupBy());
-  const groupByValue = actionQuery.getQuery().split(':')[1];
-
-  return (
-    <Dialog disableBackdropClick disableEscapeKeyDown maxWidth="xs" open={open}>
-      <DialogTitle>
-        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', color: theme.palette.warning.main }}>
-          <WarningIcon fontSize="large" />
-          <Typography style={{ marginLeft: theme.spacing(2) }} variant="h6">
-            {t('page.alerts.actions.takeownershipdiag.header')}
-          </Typography>
-        </div>
-      </DialogTitle>
-      <DialogContent dividers>
-        <div>{content}:</div>
-        <div style={{ padding: theme.spacing(1), wordBreak: 'break-all' }}>
-          <Typography variant="caption">{groupByValue}</Typography>
-        </div>
-      </DialogContent>
-      <DialogActions>
-        <Button
-          onClick={onTakeOwnershipOkClick}
-          variant="contained"
-          color="primary"
-          size="small"
-          startIcon={progress ? <CircularProgress size={20} /> : <CheckIcon />}
-          disabled={progress}
-        >
-          {t('page.alerts.actions.ok')}
-        </Button>
-        <Button
-          autoFocus
-          onClick={onTakeOwnershipCancelClick}
-          variant="contained"
-          size="small"
-          startIcon={<CloseIcon />}
-        >
-          {t('page.alerts.actions.cancel')}
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
-};
 
 export default AlertListItemActions;
