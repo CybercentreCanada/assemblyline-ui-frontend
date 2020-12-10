@@ -29,3 +29,17 @@ export function scoreToVerdict(score: number | null) {
   // Between 0 and 99 => Unknown
   return 'info';
 }
+
+export function getValueFromPath(obj: object, path: string) {
+  const paths = path.split('.');
+  let current = obj;
+  let i;
+
+  for (i = 0; i < paths.length; ++i) {
+    if (current[paths[i]] === undefined) {
+      return undefined;
+    }
+    current = current[paths[i]];
+  }
+  return current;
+}
