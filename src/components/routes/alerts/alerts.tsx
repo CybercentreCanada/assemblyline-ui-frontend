@@ -7,6 +7,7 @@ import ListNavigator from 'commons/addons/elements/lists/navigator/ListNavigator
 import SimpleList from 'commons/addons/elements/lists/simplelist/SimpleList';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
+import useAppContext from 'components/hooks/useAppContext';
 import useDrawer from 'components/hooks/useDrawer';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import SearchQuery, { SearchQueryFilters } from 'components/visual/SearchBar/search-query';
@@ -79,6 +80,7 @@ const Alerts: React.FC = () => {
   const { t } = useTranslation('alerts');
   const classes = useStyles();
   const theme = useTheme();
+  const { user: currentUser } = useAppContext();
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
   const { setGlobalDrawer } = useDrawer();
 
@@ -95,7 +97,8 @@ const Alerts: React.FC = () => {
     priorityFilters,
     labelFilters,
     onLoad,
-    onLoadMore
+    onLoadMore,
+    updateAlert
   } = useAlerts(PAGE_SIZE);
 
   // API Promise hook
@@ -170,7 +173,7 @@ const Alerts: React.FC = () => {
               <ListNavigator id={ALERT_SIMPLELIST_ID} />
             </div>
             <ListCarousel id={ALERT_SIMPLELIST_ID} disableArrowUp disableArrowDown enableSwipe>
-              <AlertDetails id={item.alert_id} />
+              <AlertDetails alert={item} />
             </ListCarousel>
           </div>
         );
@@ -268,8 +271,17 @@ const Alerts: React.FC = () => {
 
   // Handler to render the action buttons of each list item.
   const onRenderListActions = useCallback(
-    (item: AlertItem) => <AlertListItemActions item={item} currentQuery={searchQuery} setDrawer={setDrawer} />,
-    [searchQuery]
+    (item: AlertItem, index: number) => (
+      <AlertListItemActions
+        item={item}
+        currentQuery={searchQuery}
+        setDrawer={setDrawer}
+        onTakeOwnershipComplete={() => {
+          updateAlert(index, { owner: currentUser.username });
+        }}
+      />
+    ),
+    [currentUser.username, searchQuery, updateAlert]
   );
 
   return (
