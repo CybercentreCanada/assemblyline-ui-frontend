@@ -1,4 +1,3 @@
-import { useTheme } from '@material-ui/core';
 import { ChipList } from 'components/visual/ChipList';
 import SearchQuery, { SearchFilter, SearchQueryFilters } from 'components/visual/SearchBar/search-query';
 import React from 'react';
@@ -17,7 +16,6 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
   disableActions = false,
   onChange = () => null
 }) => {
-  const theme = useTheme();
   const { t } = useTranslation('alerts');
 
   const filters = searchQuery.parseFilters();
@@ -53,14 +51,24 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
 
   return (
     <div>
-      <div style={{ marginBottom: theme.spacing(1) }}>{query && !hideQuery && <span>Query = {query}, </span>}</div>
       <div>
+        {query && !hideQuery && (
+          <div style={{ display: 'inline-block' }}>
+            <ChipList
+              items={[query].map(v => ({
+                variant: 'outlined',
+                label: `${t('query')} => ${v}`,
+                onDelete: !disableActions ? () => onDeleteTC() : null
+              }))}
+            />
+          </div>
+        )}
         {filters && filters.tc && (
           <div style={{ display: 'inline-block' }}>
             <ChipList
               items={[filters.tc].map(v => ({
                 variant: 'outlined',
-                label: `${t('tc')}: ${v}`,
+                label: `${t('tc')} => ${v}`,
                 onDelete: !disableActions ? () => onDeleteTC() : null
               }))}
             />
@@ -71,7 +79,7 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
             <ChipList
               items={[filters.groupBy].map(v => ({
                 variant: 'outlined',
-                label: `${t('groupBy')}: ${v}`,
+                label: `${t('groupBy')} => ${v}`,
                 onDelete: !disableActions ? () => onDeleteGroupBy() : null
               }))}
             />
