@@ -23,7 +23,7 @@ export interface ListItemBaseProps {
   disableBackgrounds?: boolean;
   children: (item: LineItem) => React.ReactNode;
   onClick: (item: LineItem, index: number) => void;
-  onRenderActions?: (item: LineItem) => React.ReactNode;
+  onRenderActions?: (item: LineItem, index: number) => React.ReactNode;
 }
 
 const ListItemBase: React.FC<ListItemBaseProps> = React.memo(
@@ -54,7 +54,7 @@ const ListItemBase: React.FC<ListItemBaseProps> = React.memo(
           <Divider />
         </div>
         <div className={classes.itemActions} onClick={onItemActionsClick}>
-          {onRenderActions && onRenderActions(item)}
+          {onRenderActions && onRenderActions(item, index)}
         </div>
       </div>
     );

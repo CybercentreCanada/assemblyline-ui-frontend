@@ -23,7 +23,7 @@ interface SimpleListProps {
   children: (item: LineItem) => React.ReactNode;
   onCursorChange?: (item: LineItem, cursor?: number) => void;
   onItemSelected?: (item: LineItem) => void;
-  onRenderActions?: (item: LineItem) => React.ReactNode;
+  onRenderActions?: (item: LineItem, index: number) => React.ReactNode;
   onLoadNext?: () => void;
 }
 
