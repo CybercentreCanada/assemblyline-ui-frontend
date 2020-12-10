@@ -191,7 +191,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
 
   return (
     <div>
-      <Typography variant="h6">{t('page.alerts.filters')}</Typography>
+      <Typography variant="h6">{t('filters')}</Typography>
       <Divider />
       <div style={{ margin: theme.spacing(1), marginTop: theme.spacing(2) }}>
         <div style={{ marginBottom: theme.spacing(2) }}>
@@ -286,15 +286,15 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
       </div>
       <div style={{ display: 'flex', flexDirection: 'row', marginTop: theme.spacing(1) }}>
         <Button variant="contained" color="primary" onClick={_onApplyBtnClick} startIcon={<FilterListIcon />}>
-          {t('page.alerts.filters.apply')}
+          {t('filters.apply')}
         </Button>
         <div style={{ marginRight: theme.spacing(1) }} />
         <Button variant="contained" onClick={onClearBtnClick} size="small" startIcon={<ClearAllIcon />}>
-          {t('page.alerts.filters.clear')}
+          {t('filters.clear')}
         </Button>
         <div style={{ flex: 1 }} />
         <Button variant="contained" onClick={onCancelBtnClick} size="small" startIcon={<CloseIcon />}>
-          {t('page.alerts.filters.cancel')}
+          {t('filters.cancel')}
         </Button>
       </div>
     </div>
