@@ -1,14 +1,12 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { LineItem } from 'commons/addons/elements/lists/item/ListItemBase';
 import useAppContext from 'components/hooks/useAppContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { ALField } from 'components/hooks/useMyUser';
 import SearchQuery, { SearchFilter, SearchFilterType } from 'components/visual/SearchBar/search-query';
-import { useEffect, useReducer, useState } from 'react';
+import { useCallback, useEffect, useReducer, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
-const DEFAULT_ALERT = {
-  reset: false,
+const DEFAULT_STATE = {
   loading: true,
   total: 0,
   countedTotal: 0,
@@ -22,6 +20,17 @@ export interface AlertFile {
   sha256: string;
   size: number;
   type: string;
+}
+
+export interface AlertUpdateItem {
+  label?: string[];
+  owner?: string;
+  priority?: string;
+  status?: string;
+  verdict?: {
+    malicious: string[];
+    non_malicious: string[];
+  };
 }
 
 export interface AlertItem extends LineItem {
@@ -80,25 +89,54 @@ interface UsingAlerts {
   priorityFilters: SearchFilter[];
   statusFilters: SearchFilter[];
   valueFilters: SearchFilter[];
+  updateAlert: (alertIndex: number, alertChanges: AlertUpdateItem) => void;
   updateQuery: (query: SearchQuery) => void;
   onLoad: (onComplete?: (success: boolean) => void) => void;
   onLoadMore: (onComplete?: (success: boolean) => void) => void;
 }
 
-interface AlertResponse {
-  reset: boolean;
+interface AlertState {
   loading: boolean;
   total: number;
   countedTotal: number;
   alerts: AlertItem[];
 }
 
-const alertStateReducer = (state, newState) => {
-  const { reset, loading, total, countedTotal, alerts } = newState;
-  if (reset) return newState;
+interface AlertMessage {
+  action: 'set' | 'append' | 'update';
+  loading?: boolean;
+  total?: number;
+  countedTotal?: number;
+  alerts?: AlertItem[];
+  updateAlert?: {
+    alertIndex: number;
+    alertChanges: AlertUpdateItem;
+  };
+}
+
+const alertStateReducer = (state: AlertState, newState: AlertMessage) => {
+  const { action, loading, total, countedTotal, alerts, updateAlert } = newState;
+  if (action === 'update') {
+    const newAlertList = [...state.alerts];
+    newAlertList[updateAlert.alertIndex] = { ...newAlertList[updateAlert.alertIndex], ...updateAlert.alertChanges };
+    return {
+      loading: state.loading,
+      total: state.total,
+      countedTotal: state.countedTotal,
+      alerts: newAlertList
+    };
+  }
+  if (action === 'set') {
+    return {
+      loading: loading !== undefined ? loading : state.loading,
+      total: total || state.total,
+      countedTotal: countedTotal || state.countedTotal,
+      alerts: alerts || state.alerts
+    };
+  }
+
   return {
-    reset: false,
-    loading,
+    loading: loading !== undefined ? loading : state.loading,
     total: total || state.total,
     countedTotal: countedTotal ? state.countedTotal + countedTotal : state.countedTotal,
     alerts: alerts ? state.alerts.concat(alerts) : state.alerts
@@ -116,7 +154,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
   const [priorityFilters, setPriorityFilters] = useState<SearchFilter[]>([]);
   const [labelFilters, setLabelFilters] = useState<SearchFilter[]>([]);
   const [valueFilters, setValueFilters] = useState<SearchFilter[]>([]);
-  const [state, setState] = useReducer(alertStateReducer, DEFAULT_ALERT);
+  const [state, setState] = useReducer(alertStateReducer, DEFAULT_STATE);
 
   // parse list of alert result: add an index field.
   const parseResult = (responseItems, offset) => {
@@ -125,76 +163,90 @@ export default function useAlerts(pageSize: number): UsingAlerts {
   };
 
   // format alert api url using specified indexes.
-  const buildUrl = () => {
+  const buildUrl = useCallback(() => {
     if (searchQuery.getGroupBy()) {
       return `/api/v4/alert/grouped/${searchQuery.getGroupBy()}/?${searchQuery.buildAPIQueryString()}`;
     }
     return `/api/v4/alert/list/?${searchQuery.buildAPIQueryString()}`;
-  };
+  }, [searchQuery]);
+
+  // Hook API: update an alert in the list
+  const updateAlert = useCallback((alertIndex: number, alertChanges: AlertUpdateItem) => {
+    setState({ action: 'update', updateAlert: { alertIndex, alertChanges } });
+  }, []);
 
   // Hook API: load/reload all the alerts from start.
   // resets the accumulated list.
-  const onLoad = (onComplete?: (success: boolean) => void) => {
-    setState({ loading: true });
-    apiCall({
-      url: buildUrl(),
-      onSuccess: api_data => {
-        const { items: _items, tc_start: executionTime, total, counted_total: countedTotal } = api_data.api_response;
-        const items = parseResult(_items, 0);
-        if (executionTime) searchQuery.setTcStart(executionTime);
-        setState({
-          reset: true,
-          loading: false,
-          total,
-          countedTotal: searchQuery.getGroupBy() ? countedTotal : _items.length,
-          alerts: items
-        });
-        if (onComplete) {
-          onComplete(true);
+  const onLoad = useCallback(
+    (onComplete?: (success: boolean) => void) => {
+      setState({ action: 'set', loading: true });
+      apiCall({
+        url: buildUrl(),
+        onSuccess: api_data => {
+          const { items: _items, tc_start: executionTime, total, counted_total: countedTotal } = api_data.api_response;
+          const items = parseResult(_items, 0);
+          if (executionTime) searchQuery.setTcStart(executionTime);
+          setState({
+            action: 'set',
+            loading: false,
+            total,
+            countedTotal: searchQuery.getGroupBy() ? countedTotal : _items.length,
+            alerts: items
+          });
+          if (onComplete) {
+            onComplete(true);
+          }
+        },
+        onFailure: () => {
+          setState({ action: 'set', loading: false });
+          if (onComplete) {
+            onComplete(false);
+          }
         }
-      },
-      onFailure: () => {
-        setState({ loading: false });
-        if (onComplete) {
-          onComplete(false);
-        }
-      }
-    });
-  };
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [searchQuery]
+  );
 
   // Hook API: get alerts for specified index.
-  const onLoadMore = (onComplete?: (success: boolean) => void) => {
-    // Move offset by one increment.
-    searchQuery.tickOffset();
-    // reference the current offset now incase it changes again before callback is executed
-    const _offset = searchQuery.getOffsetNumber();
-    setState({ loading: true });
-    apiCall({
-      url: buildUrl(),
-      onSuccess: api_data => {
-        const { items: _items, total, counted_total: countedTotal } = api_data.api_response;
-        const parsedItems = parseResult(_items, _offset);
-        setState({
-          loading: false,
-          total,
-          countedTotal: searchQuery.getGroupBy() ? countedTotal : _items.length,
-          alerts: parsedItems
-        });
-        if (onComplete) {
-          onComplete(true);
+  const onLoadMore = useCallback(
+    (onComplete?: (success: boolean) => void) => {
+      // Move offset by one increment.
+      searchQuery.tickOffset();
+      // reference the current offset now incase it changes again before callback is executed
+      const _offset = searchQuery.getOffsetNumber();
+      setState({ action: 'set', loading: true });
+      apiCall({
+        url: buildUrl(),
+        onSuccess: api_data => {
+          const { items: _items, total, counted_total: countedTotal } = api_data.api_response;
+          const parsedItems = parseResult(_items, _offset);
+          setState({
+            action: 'append',
+            loading: false,
+            total,
+            countedTotal: searchQuery.getGroupBy() ? countedTotal : _items.length,
+            alerts: parsedItems
+          });
+          if (onComplete) {
+            onComplete(true);
+          }
+        },
+        onFailure: () => {
+          setState({ action: 'set', loading: false });
+          if (onComplete) {
+            onComplete(false);
+          }
         }
-      },
-      onFailure: () => {
-        setState({ loading: false });
-        if (onComplete) {
-          onComplete(false);
-        }
-      }
-    });
-  };
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [searchQuery]
+  );
 
   // Fetch the Status Filters.
-  const onLoadStatuses = () => {
+  const onLoadStatuses = useCallback(() => {
     apiCall({
       url: `/api/v4/alert/statuses/?${searchQuery.buildAPIQueryString()}${
         searchQuery.getGroupBy() ? `&fq=${searchQuery.getGroupBy()}:*` : ''
@@ -211,10 +263,11 @@ export default function useAlerts(pageSize: number): UsingAlerts {
         setStatusFilters(msItems);
       }
     });
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery]);
 
   // Fetch the Priority Filters.
-  const onLoadPriorities = () => {
+  const onLoadPriorities = useCallback(() => {
     apiCall({
       url: `/api/v4/alert/priorities/?${searchQuery.buildAPIQueryString()}${
         searchQuery.getGroupBy() ? `&fq=${searchQuery.getGroupBy()}:*` : ''
@@ -231,10 +284,11 @@ export default function useAlerts(pageSize: number): UsingAlerts {
         setPriorityFilters(msItems);
       }
     });
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery]);
 
   // Fetch the Label Filters.
-  const onLoadLabels = () => {
+  const onLoadLabels = useCallback(() => {
     apiCall({
       url: `/api/v4/alert/labels/?${searchQuery.buildAPIQueryString()}${
         searchQuery.getGroupBy() ? `&fq=${searchQuery.getGroupBy()}:*` : ''
@@ -251,9 +305,10 @@ export default function useAlerts(pageSize: number): UsingAlerts {
         setLabelFilters(msItems);
       }
     });
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery]);
 
-  const onLoadStatisics = () => {
+  const onLoadStatisics = useCallback(() => {
     apiCall({
       url: `/api/v4/alert/statistics/?${searchQuery.buildAPIQueryString()}${
         searchQuery.getGroupBy() ? `&fq=${searchQuery.getGroupBy()}:*` : ''
@@ -277,7 +332,8 @@ export default function useAlerts(pageSize: number): UsingAlerts {
         setValueFilters(msItems);
       }
     });
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery]);
 
   // Load it up!
   useEffect(() => {
@@ -288,6 +344,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
       onLoadLabels();
       onLoadStatisics();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery]);
 
   useEffect(() => {
@@ -314,6 +371,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
     priorityFilters,
     labelFilters,
     valueFilters,
+    updateAlert,
     updateQuery: setSearchQuery,
     onLoad,
     onLoadMore
