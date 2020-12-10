@@ -37,13 +37,14 @@ const useStyles = makeStyles(theme => ({
 
 type AlertDetailsProps = {
   id?: string;
+  alert?: AlertItem;
 };
 
 const SkeletonInline = () => {
   return <Skeleton style={{ display: 'inline-block', width: '10rem' }} />;
 };
 
-const AlertDetails: React.FC<AlertDetailsProps> = ({ id }) => {
+const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
   const { t } = useTranslation('alerts');
   const theme = useTheme();
   const classes = useStyles();
@@ -54,16 +55,22 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id }) => {
 
   useEffect(() => {
     const alertId = id || paramId;
-    apiCall({
-      url: `/api/v4/alert/${alertId}/`,
-      onSuccess: api_data => {
-        setItem(api_data.api_response);
-      }
-    });
+    if (alertId) {
+      apiCall({
+        url: `/api/v4/alert/${alertId}/`,
+        onSuccess: api_data => {
+          setItem(api_data.api_response);
+        }
+      });
+    }
   }, [id, paramId]);
 
+  useEffect(() => {
+    setItem(alert);
+  }, [alert]);
+
   return (
-    <PageCenter margin={!id ? 4 : 0} mr={0} ml={0} mb={0} mt={0} width="100%">
+    <PageCenter margin={!id && !alert ? 4 : 0} mr={0} ml={0} mb={0} mt={0} width="100%">
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: theme.spacing(2) }}>
         <div style={{ flex: 1 }}>
           <Classification c12n={item ? item.classification : null} type="outlined" />
