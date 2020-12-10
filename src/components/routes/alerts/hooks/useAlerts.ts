@@ -116,6 +116,7 @@ interface AlertMessage {
 
 const alertStateReducer = (state: AlertState, newState: AlertMessage) => {
   const { action, loading, total, countedTotal, alerts, updateAlert } = newState;
+
   if (action === 'update') {
     const newAlertList = [...state.alerts];
     newAlertList[updateAlert.alertIndex] = { ...newAlertList[updateAlert.alertIndex], ...updateAlert.alertChanges };
@@ -126,19 +127,20 @@ const alertStateReducer = (state: AlertState, newState: AlertMessage) => {
       alerts: newAlertList
     };
   }
+
   if (action === 'set') {
     return {
       loading: loading !== undefined ? loading : state.loading,
-      total: total || state.total,
-      countedTotal: countedTotal || state.countedTotal,
+      total: total !== undefined ? total : state.total,
+      countedTotal: countedTotal !== undefined ? countedTotal : state.countedTotal,
       alerts: alerts || state.alerts
     };
   }
 
   return {
     loading: loading !== undefined ? loading : state.loading,
-    total: total || state.total,
-    countedTotal: countedTotal ? state.countedTotal + countedTotal : state.countedTotal,
+    total: total !== undefined ? total : state.total,
+    countedTotal: countedTotal !== undefined ? state.countedTotal + countedTotal : state.countedTotal,
     alerts: alerts ? state.alerts.concat(alerts) : state.alerts
   };
 };
