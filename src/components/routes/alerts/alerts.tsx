@@ -24,6 +24,7 @@ import AlertsFiltersFavorites from './alerts-filters-favorites';
 import AlertsFiltersSelected from './alerts-filters-selected';
 import AlertsWorkflowActions from './alerts-workflow-actions';
 import useAlerts, { AlertItem } from './hooks/useAlerts';
+import useFavorites from './hooks/useFavorites';
 import usePromiseAPI from './hooks/usePromiseAPI';
 
 // Default size of a page to be used by the useAlert hook when fetching next load of data
@@ -112,6 +113,7 @@ const Alerts: React.FC = () => {
   });
   const history = useHistory();
   const location = useLocation();
+  const { userFavorites, globalFavorites } = useFavorites();
 
   // Define some references.
   const searchTextValue = useRef<string>('');
@@ -302,6 +304,8 @@ const Alerts: React.FC = () => {
                   statusFilters={statusFilters}
                   priorityFilters={priorityFilters}
                   labelFilters={labelFilters}
+                  userFavorites={userFavorites}
+                  globalFavorites={globalFavorites}
                   onApplyBtnClick={onApplyFilters}
                   onCancelBtnClick={onCancelFilters}
                 />

@@ -1,7 +1,4 @@
 import { Button, CircularProgress, Divider, makeStyles, TextField, Typography, useTheme } from '@material-ui/core';
-import ClearAllIcon from '@material-ui/icons/ClearAll';
-import CloseIcon from '@material-ui/icons/ExitToApp';
-import SaveIcon from '@material-ui/icons/Save';
 import { Alert, Autocomplete } from '@material-ui/lab';
 import SearchQuery, {
   EMPTY_SEARCHFILTER,
@@ -173,18 +170,14 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
           variant="contained"
           color="primary"
           onClick={_onApplyBtnClick}
-          startIcon={applying ? <CircularProgress size={20} /> : <SaveIcon />}
+          startIcon={applying ? <CircularProgress size={20} /> : null}
           disabled={applying || !formValid}
         >
-          {t('page.alerts.filters.apply')}
+          {t('workflow.apply')}
         </Button>
         <div style={{ marginRight: theme.spacing(1) }} />
-        <Button variant="contained" onClick={onClearBtnClick} disabled={applying} startIcon={<ClearAllIcon />}>
-          {t('page.alerts.filters.clear')}
-        </Button>
-        <div style={{ flex: 1 }} />
-        <Button variant="contained" onClick={onCancelBtnClick} startIcon={<CloseIcon />}>
-          {t('page.alerts.filters.cancel')}
+        <Button variant="contained" onClick={onClearBtnClick} disabled={applying}>
+          {t('workflow.clear')}
         </Button>
       </div>
     </div>
