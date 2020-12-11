@@ -144,7 +144,6 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
                 type: 'actions',
                 actionData: {
                   query: actionQuery,
-                  total: 1,
                   alert: {
                     index,
                     alert_id: item.alert_id,

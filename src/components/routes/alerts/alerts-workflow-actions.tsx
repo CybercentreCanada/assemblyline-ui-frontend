@@ -16,14 +16,14 @@ const useStyles = makeStyles(theme => ({
 
 interface AlertsWorkflowActionsProps {
   searchQuery: SearchQuery;
-  affectedItemCount: number;
+  alert: any;
   labelFilters: SearchFilter[];
   onApplyBtnClick: (status: string, selectedPriority: string, selectedLabels: string[]) => void;
 }
 
 const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
   searchQuery,
-  affectedItemCount,
+  alert,
   labelFilters,
   onApplyBtnClick
 }) => {
@@ -64,16 +64,16 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
     }
   };
 
+  const query = searchQuery.getQuery();
+
   return (
     <div>
       <div style={{ margin: theme.spacing(1), marginBottom: theme.spacing(2) }}>
         <Typography variant="h4">{t('workflow.title')}</Typography>
       </div>
       <div style={{ margin: theme.spacing(1) }}>
-        <Alert severity={affectedItemCount > 1 ? 'warning' : 'info'}>
-          {affectedItemCount > 1
-            ? t('workflow.impact.high').replace('{affectedItemCount}', affectedItemCount.toString())
-            : t('workflow.impact.low')}
+        <Alert severity={query && query.startsWith('alert_id') && alert ? 'info' : 'warning'}>
+          {query && query.startsWith('alert_id') && alert ? t('workflow.impact.low') : t('workflow.impact.high')}
         </Alert>
       </div>
 
