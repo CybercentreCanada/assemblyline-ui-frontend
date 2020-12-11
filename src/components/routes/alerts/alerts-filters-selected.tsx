@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 interface AlertFiltersSelectedProps {
   searchQuery: SearchQuery;
   hideQuery?: boolean;
+  hideGroupBy?: boolean;
   disableActions?: boolean;
   onChange?: (filters: SearchQueryFilters) => void;
 }
@@ -13,6 +14,7 @@ interface AlertFiltersSelectedProps {
 const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
   searchQuery,
   hideQuery = false,
+  hideGroupBy = false,
   disableActions = false,
   onChange = () => null
 }) => {
@@ -74,7 +76,7 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
             />
           </div>
         )}
-        {filters && filters.groupBy && (
+        {filters && filters.groupBy && !hideGroupBy && (
           <div style={{ display: 'inline-block' }}>
             <ChipList
               items={[filters.groupBy].map(v => ({

@@ -20,6 +20,7 @@ import usePromiseAPI from './hooks/usePromiseAPI';
 
 interface AlertListItemActionsProps {
   item: AlertItem;
+  index: number;
   currentQuery: SearchQuery;
   setDrawer: (state: AlertDrawerState) => void;
   onTakeOwnershipComplete?: () => void;
@@ -54,7 +55,7 @@ const DEFAULT_OWNER = {
 };
 
 const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
-  ({ item, currentQuery, setDrawer, onTakeOwnershipComplete, vertical = false }) => {
+  ({ item, index, currentQuery, setDrawer, onTakeOwnershipComplete, vertical = false }) => {
     const { onTakeOwnership } = usePromiseAPI();
     const classes = useStyles();
     const groupBy = currentQuery.getGroupBy();
@@ -138,7 +139,21 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
             tooltipPlacement={vertical ? 'left' : 'bottom'}
             onClick={() => {
               const actionQuery = buildActionQuery();
-              setDrawer({ open: true, type: 'actions', actionData: { query: actionQuery, total: 1 } });
+              setDrawer({
+                open: true,
+                type: 'actions',
+                actionData: {
+                  query: actionQuery,
+                  total: 1,
+                  alert: {
+                    index,
+                    alert_id: item.alert_id,
+                    priority: item.priority,
+                    status: item.status,
+                    labels: item.label
+                  }
+                }
+              });
             }}
           />
           <SpeedDialAction

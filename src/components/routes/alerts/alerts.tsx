@@ -37,6 +37,13 @@ export interface AlertDrawerState {
   actionData?: {
     query: SearchQuery;
     total: number;
+    alert?: {
+      index: number;
+      alert_id: string;
+      priority: string;
+      status: string;
+      labels: string[];
+    };
   };
 }
 
@@ -174,6 +181,7 @@ const Alerts: React.FC = () => {
               <ListNavigator id={ALERT_SIMPLELIST_ID} />
               <AlertListItemActions
                 item={item}
+                index={index}
                 currentQuery={searchQuery}
                 setDrawer={setDrawer}
                 onTakeOwnershipComplete={() => {
@@ -256,14 +264,20 @@ const Alerts: React.FC = () => {
   const onWorkflowActionsApply = (selectedStatus: string, selectedPriority: string, selectedLabels: string[]) => {
     onApplyWorkflowAction(drawer.actionData.query, selectedStatus, selectedPriority, selectedLabels).then(() => {
       setDrawer({ ...drawer, open: false });
-      setScrollReset(true);
-      onLoad();
+      const { alert } = drawer.actionData;
+      if (alert) {
+        const changes = {
+          status: selectedStatus || alert.status,
+          priority: selectedPriority || alert.priority,
+          label: [...Array.from(new Set([...alert.labels, ...selectedLabels]))]
+        };
+        updateAlert(alert.index, changes);
+        window.dispatchEvent(new CustomEvent('alertUpdate', { detail: { id: alert.alert_id, changes } }));
+      } else {
+        setScrollReset(true);
+        onLoad();
+      }
     });
-  };
-
-  // Handler/callback for when clicking the 'Cancel' btn on the AlertsWorkflowActions component.
-  const onWorkflowActionCancel = () => {
-    setDrawer({ ...drawer, open: false });
   };
 
   // Memoized callback to render one line-item of the list....
@@ -286,6 +300,7 @@ const Alerts: React.FC = () => {
     (item: AlertItem, index: number) => (
       <AlertListItemActions
         item={item}
+        index={index}
         currentQuery={searchQuery}
         setDrawer={setDrawer}
         onTakeOwnershipComplete={() => {
@@ -332,13 +347,10 @@ const Alerts: React.FC = () => {
               ),
               actions: drawer.actionData && (
                 <AlertsWorkflowActions
-                  query={drawer.actionData.query}
+                  searchQuery={drawer.actionData.query}
                   affectedItemCount={drawer.actionData.total}
-                  statusFilters={statusFilters}
-                  priorityFilters={priorityFilters}
                   labelFilters={labelFilters}
                   onApplyBtnClick={onWorkflowActionsApply}
-                  onCancelBtnClick={onWorkflowActionCancel}
                 />
               )
             }[drawer.type]

@@ -79,5 +79,9 @@
   "labels": "Étiquettes",
   "favorites": "Favoris",
   "others": "Autres filtres",
-  "query": "Requête"
+  "query": "Requête",
+  "workflow.apply": "Appliquer les actions du flu de travail",
+  "workflow.title": "Effectuer une action de flu de travail",
+  "workflow.impact": "L'action de flu de travail sera appliquée à toutes les alertes {affectedItemCount} de la vue actuelle correspondant aux filtres suivants:",
+  "workflow.impact.low": "L'action de flu de travail affectera uniquement l'alerte actuellement sélectionnée qui correspond aux filtres suivants:"
 }

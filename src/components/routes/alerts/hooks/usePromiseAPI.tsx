@@ -42,7 +42,6 @@ export default function usePromiseAPI(): UsingPromiseAPI {
     selectedPriority: string,
     selectedLabels: string[]
   ): Promise<boolean> => {
-    // https://192.168.0.13.nip.io:8443/api/v4/alert/priority/batch/?q=testing_constantly.pdf&tc=4d&tc_start=2020-10-08T17:04:38.359618Z
     const statusPromise = new Promise((resolve, reject) => {
       if (selectedStatus) {
         apiCall({
@@ -59,7 +58,6 @@ export default function usePromiseAPI(): UsingPromiseAPI {
       }
     });
 
-    // https://192.168.0.13.nip.io:8443/api/v4/alert/priority/batch/?q=testing_constantly.pdf&tc=4d&tc_start=2020-10-08T17:04:38.359618Z
     const priorityPromise = new Promise((resolve, reject) => {
       if (selectedPriority) {
         apiCall({
@@ -76,7 +74,6 @@ export default function usePromiseAPI(): UsingPromiseAPI {
       }
     });
 
-    // https://192.168.0.13.nip.io:8443/api/v4/alert/status/batch/?q=testing_constantly.pdf&tc=4d&tc_start=2020-10-08T17:04:38.359618Z
     const labelPromise = new Promise((resolve, reject) => {
       if (selectedLabels && selectedLabels.length > 0) {
         apiCall({
@@ -98,7 +95,6 @@ export default function usePromiseAPI(): UsingPromiseAPI {
 
   // Hook API: take ownership of alerts matching specified query.
   const onTakeOwnership = async (query: SearchQuery): Promise<boolean> => {
-    // /api/v4/alert/ownership/batch/?fq=file.sha256:330d097ec18396485d51d62ab21fdf30ece74879fb94a1a920a75a58afebbdde&q=&tc=4d&tc_start=2020-10-11T20:32:34.613842Z
     return new Promise((resolve, reject) => {
       apiCall({
         url: `/api/v4/alert/ownership/batch/?${query.buildAPIQueryString()}`,

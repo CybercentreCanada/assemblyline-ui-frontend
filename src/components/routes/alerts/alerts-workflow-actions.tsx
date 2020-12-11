@@ -1,13 +1,12 @@
-import { Button, CircularProgress, Divider, makeStyles, TextField, Typography, useTheme } from '@material-ui/core';
+import { Button, CircularProgress, makeStyles, TextField, Typography, useTheme } from '@material-ui/core';
 import { Alert, Autocomplete } from '@material-ui/lab';
-import SearchQuery, {
-  EMPTY_SEARCHFILTER,
-  SearchFilter,
-  SearchFilterType
-} from 'components/visual/SearchBar/search-query';
+import SearchQuery, { SearchFilter } from 'components/visual/SearchBar/search-query';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import AlertsFiltersSelected from './alerts-filters-selected';
+
+const POSSIBLE_STATUS = ['ASSESS', 'MALICIOUS', 'NON-MALICIOUS'];
+const POSSIBLE_PRIORITY = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'];
 
 const useStyles = makeStyles(theme => ({
   option: {
@@ -16,96 +15,65 @@ const useStyles = makeStyles(theme => ({
 }));
 
 interface AlertsWorkflowActionsProps {
-  query: SearchQuery;
+  searchQuery: SearchQuery;
   affectedItemCount: number;
-  statusFilters: SearchFilter[];
-  priorityFilters: SearchFilter[];
   labelFilters: SearchFilter[];
   onApplyBtnClick: (status: string, selectedPriority: string, selectedLabels: string[]) => void;
-  onCancelBtnClick: () => void;
 }
 
 const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
-  query,
+  searchQuery,
   affectedItemCount,
-  statusFilters,
-  priorityFilters,
   labelFilters,
-  onApplyBtnClick,
-  onCancelBtnClick
+  onApplyBtnClick
 }) => {
   const { t } = useTranslation('alerts');
   const classes = useStyles();
   const theme = useTheme();
   const [formValid, setFormValid] = useState<boolean>(false);
   const [applying, setApplying] = useState<boolean>(false);
-  const [selectedStatus, setSelectedStatus] = useState<SearchFilter>(null);
-  const [selectedPriority, setSelectedPriority] = useState<SearchFilter>(null);
-  const [selectedLabels, setSelectedLabels] = useState<SearchFilter[]>([]);
+  const [possibleLabels] = useState<string[]>(labelFilters.map(val => val.label));
+  const [selectedStatus, setSelectedStatus] = useState<string>(null);
+  const [selectedPriority, setSelectedPriority] = useState<string>(null);
+  const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
 
-  const validateForm = (status: SearchFilter, priority: SearchFilter, labels: SearchFilter[]) => {
+  const validateForm = (status: string, priority: string, labels: string[]) => {
     const valid = (status || priority || (labels && labels.length > 0)) as boolean;
     setFormValid(valid);
   };
 
-  const onStatusChange = (selection: SearchFilter) => {
+  const onStatusChange = (selection: string) => {
     validateForm(selection, selectedPriority, selectedLabels);
     setSelectedStatus(selection);
   };
 
-  const onPriorityChange = (selection: SearchFilter) => {
+  const onPriorityChange = (selection: string) => {
     validateForm(selectedStatus, selection, selectedLabels);
     setSelectedPriority(selection);
   };
 
-  const onLabelChange = (selections: SearchFilter[]) => {
+  const onLabelChange = (selections: string[]) => {
     validateForm(selectedStatus, selectedPriority, selections);
-    setSelectedLabels(selections);
-  };
-
-  const isSelected = (option, value): boolean => {
-    return option.value === value.value;
-  };
-
-  const extractFilterValue = (filter: SearchFilter): string => {
-    if (!filter || filter.type === SearchFilterType.BLANK) {
-      return null;
-    }
-    return filter.value.split(':')[1];
+    setSelectedLabels(selections.map(val => val.toUpperCase()));
   };
 
   const _onApplyBtnClick = () => {
     if (formValid) {
       setApplying(true);
-      onApplyBtnClick(
-        extractFilterValue(selectedStatus),
-        extractFilterValue(selectedPriority),
-        selectedLabels.map(l => extractFilterValue(l))
-      );
+      onApplyBtnClick(selectedStatus, selectedPriority, selectedLabels);
     }
-  };
-
-  const onClearBtnClick = () => {
-    setFormValid(false);
-    setSelectedStatus(null);
-    setSelectedPriority(null);
-    setSelectedLabels([]);
-  };
-
-  const renderOption = (item: SearchFilter) => {
-    if (item.type === SearchFilterType.BLANK) {
-      return <div>&nbsp;</div>;
-    }
-    return <div>{item.label}</div>;
   };
 
   return (
     <div>
-      <Typography variant="h6">Workflow Actions</Typography>
-      <Divider />
+      <div style={{ margin: theme.spacing(1), marginBottom: theme.spacing(2) }}>
+        <Typography variant="h4">{t('workflow.title')}</Typography>
+      </div>
       <div style={{ margin: theme.spacing(1) }}>
-        <Alert severity="info">
-          {`The workflow action will be applied to all ${affectedItemCount} alerts in the current view matching to following filters:`}
+        <Alert severity={affectedItemCount > 1 ? 'warning' : 'info'}>
+          {affectedItemCount > 1
+            ? t('workflow.impact.high').replace('{affectedItemCount}', affectedItemCount.toString())
+            : t('workflow.impact.low')}
         </Alert>
       </div>
 
@@ -119,7 +87,7 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
             backgroundColor: theme.palette.type === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
           }}
         >
-          <AlertsFiltersSelected searchQuery={query} disableActions />
+          <AlertsFiltersSelected searchQuery={searchQuery} disableActions hideGroupBy />
         </div>
       </div>
 
@@ -128,44 +96,36 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
           <Autocomplete
             fullWidth
             classes={{ option: classes.option }}
-            options={[EMPTY_SEARCHFILTER, ...statusFilters]}
+            options={POSSIBLE_STATUS}
             value={selectedStatus}
-            getOptionLabel={option => option.label}
-            getOptionSelected={isSelected}
-            renderOption={renderOption}
             renderInput={params => <TextField {...params} label="Statuses" variant="outlined" />}
-            onChange={(event, value) => onStatusChange(value as SearchFilter)}
+            onChange={(event, value) => onStatusChange(value as string)}
           />
         </div>
         <div style={{ marginBottom: theme.spacing(2) }}>
           <Autocomplete
             fullWidth
             classes={{ option: classes.option }}
-            options={[EMPTY_SEARCHFILTER, ...priorityFilters]}
+            options={POSSIBLE_PRIORITY}
             value={selectedPriority}
-            getOptionLabel={option => option.label}
-            getOptionSelected={isSelected}
-            renderOption={renderOption}
             renderInput={params => <TextField {...params} label="Priorities" variant="outlined" />}
-            onChange={(event, value) => onPriorityChange(value as SearchFilter)}
+            onChange={(event, value) => onPriorityChange(value as string)}
           />
         </div>
         <div style={{ marginBottom: theme.spacing(2) }}>
           <Autocomplete
             fullWidth
             multiple
+            freeSolo
             classes={{ option: classes.option }}
-            options={labelFilters}
+            options={possibleLabels}
             value={selectedLabels}
-            getOptionLabel={option => option.label}
-            getOptionSelected={isSelected}
-            renderOption={renderOption}
             renderInput={params => <TextField {...params} label="Labels" variant="outlined" />}
-            onChange={(event, value) => onLabelChange(value as SearchFilter[])}
+            onChange={(event, value) => onLabelChange(value as string[])}
           />
         </div>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'row', marginTop: theme.spacing(1) }}>
+      <div style={{ textAlign: 'right', marginTop: theme.spacing(1) }}>
         <Button
           variant="contained"
           color="primary"
@@ -174,10 +134,6 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
           disabled={applying || !formValid}
         >
           {t('workflow.apply')}
-        </Button>
-        <div style={{ marginRight: theme.spacing(1) }} />
-        <Button variant="contained" onClick={onClearBtnClick} disabled={applying}>
-          {t('workflow.clear')}
         </Button>
       </div>
     </div>
