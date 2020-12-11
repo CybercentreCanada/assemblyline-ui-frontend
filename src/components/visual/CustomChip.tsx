@@ -37,9 +37,14 @@ export interface CustomChipProps {
 }
 
 const useStyles = makeStyles(theme => ({
+  auto_height: {
+    height: 'auto'
+  },
   wrap: {
     whiteSpace: 'pre-wrap',
-    wordBreak: 'break-word'
+    wordBreak: 'break-word',
+    paddingTop: '2px',
+    paddingBottom: '2px'
   },
   square: {
     borderRadius: '0px',
@@ -191,6 +196,7 @@ const WrappedCustomChip: React.FC<CustomChipProps> = ({
   // Compute values applied to the original chip component
   const appliedClassName = clsx(
     mono ? (size === 'tiny' ? classes.tiny_mono : classes.mono) : null,
+    wrap ? classes.auto_height : null,
     fullWidth ? classes.fullWidth : null,
     typeClassMap[type],
     sizeClassMap[size],
