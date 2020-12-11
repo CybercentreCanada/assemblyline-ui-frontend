@@ -57,7 +57,7 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
             <ChipList
               items={[query].map(v => ({
                 variant: 'outlined',
-                label: `${t('query')} => ${v}`,
+                label: `${v}`,
                 onDelete: !disableActions ? () => onDeleteTC() : null
               }))}
             />
@@ -68,7 +68,7 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
             <ChipList
               items={[filters.tc].map(v => ({
                 variant: 'outlined',
-                label: `${t('tc')} => ${v}`,
+                label: `${t('tc')}=${v}`,
                 onDelete: !disableActions ? () => onDeleteTC() : null
               }))}
             />
@@ -79,7 +79,7 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
             <ChipList
               items={[filters.groupBy].map(v => ({
                 variant: 'outlined',
-                label: `${t('groupBy')} => ${v}`,
+                label: `${t('groupBy')}=${v}`,
                 onDelete: !disableActions ? () => onDeleteGroupBy() : null
               }))}
             />
