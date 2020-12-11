@@ -66,8 +66,21 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
   }, [id, paramId]);
 
   useEffect(() => {
-    setItem(alert);
+    if (alert) setItem(alert);
   }, [alert]);
+
+  useEffect(() => {
+    function handleAlertUpdate(event: CustomEvent) {
+      const { detail } = event;
+      if (detail.id === item.id) {
+        setItem({ ...item, ...detail.changes });
+      }
+    }
+    window.addEventListener('alertUpdate', handleAlertUpdate);
+    return () => {
+      window.removeEventListener('alertUpdate', handleAlertUpdate);
+    };
+  }, [item]);
 
   return (
     <PageCenter margin={!id && !alert ? 4 : 0} mr={0} ml={0} mb={0} mt={0} width="100%">

@@ -152,7 +152,7 @@ const Alerts: React.FC = () => {
 
   // Handler for when an item of the InfiniteList is selected
   const onItemSelected = useCallback(
-    (item: AlertItem) => {
+    (item: AlertItem, index: number) => {
       if (item === null) {
         setGlobalDrawer(null);
       } else {
@@ -164,15 +164,25 @@ const Alerts: React.FC = () => {
           <div>
             <div
               style={{
-                position: 'sticky',
-                top: 0,
-                paddingTop: theme.spacing(1),
-                marginTop: -theme.spacing(8),
-                marginRight: -theme.spacing(1),
-                float: 'right'
+                display: 'flex',
+                alignItems: 'start',
+                position: 'absolute',
+                top: theme.spacing(1),
+                right: theme.spacing(2)
               }}
             >
               <ListNavigator id={ALERT_SIMPLELIST_ID} />
+              <AlertListItemActions
+                item={item}
+                currentQuery={searchQuery}
+                setDrawer={setDrawer}
+                onTakeOwnershipComplete={() => {
+                  const changes = { owner: currentUser.username };
+                  updateAlert(index, changes);
+                  window.dispatchEvent(new CustomEvent('alertUpdate', { detail: { id: item.id, changes } }));
+                }}
+                vertical
+              />
             </div>
             <ListCarousel id={ALERT_SIMPLELIST_ID} disableArrowUp disableArrowDown enableSwipe>
               <AlertDetails alert={item} />
@@ -181,7 +191,7 @@ const Alerts: React.FC = () => {
         );
       }
     },
-    [setGlobalDrawer, theme, isLGDown]
+    [setGlobalDrawer, isLGDown, theme, searchQuery, updateAlert, currentUser.username]
   );
 
   // Handler for when loading more alerts [read bottom of scroll area]
@@ -267,8 +277,8 @@ const Alerts: React.FC = () => {
   };
 
   // Handler for when the cursor on the list changes via keybaord event.
-  const onListCursorChanges = (item: AlertItem) => {
-    onItemSelected(item);
+  const onListCursorChanges = (item: AlertItem, index: number) => {
+    onItemSelected(item, index);
   };
 
   // Handler to render the action buttons of each list item.
@@ -279,7 +289,9 @@ const Alerts: React.FC = () => {
         currentQuery={searchQuery}
         setDrawer={setDrawer}
         onTakeOwnershipComplete={() => {
-          updateAlert(index, { owner: currentUser.username });
+          const changes = { owner: currentUser.username };
+          updateAlert(index, changes);
+          window.dispatchEvent(new CustomEvent('alertUpdate', { detail: { id: item.id, changes } }));
         }}
       />
     ),
