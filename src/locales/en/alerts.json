@@ -81,6 +81,6 @@
   "query": "Query",
   "workflow.apply": "Apply workflow actions",
   "workflow.title": "Perform a workflow action",
-  "workflow.impact.high": "The workflow action will be applied to all {affectedItemCount} alerts in the current view matching to following filters:",
+  "workflow.impact.high": "The workflow action will be applied to all alerts matching to following filters:",
   "workflow.impact.low": "The workflow action will only affect the currently selected alert which matches the following filters:"
 }

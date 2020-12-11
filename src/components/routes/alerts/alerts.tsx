@@ -36,7 +36,6 @@ export interface AlertDrawerState {
   type: 'filter' | 'favorites' | 'actions';
   actionData?: {
     query: SearchQuery;
-    total: number;
     alert?: {
       index: number;
       alert_id: string;
@@ -348,7 +347,7 @@ const Alerts: React.FC = () => {
               actions: drawer.actionData && (
                 <AlertsWorkflowActions
                   searchQuery={drawer.actionData.query}
-                  affectedItemCount={drawer.actionData.total}
+                  alert={drawer.actionData.alert}
                   labelFilters={labelFilters}
                   onApplyBtnClick={onWorkflowActionsApply}
                 />
@@ -391,7 +390,7 @@ const Alerts: React.FC = () => {
                 icon: <BiNetworkChart fontSize={upMD ? 'default' : 'small'} />,
                 tooltip: t('workflows'),
                 props: {
-                  onClick: () => setDrawer({ open: true, type: 'actions', actionData: { query: searchQuery, total } })
+                  onClick: () => setDrawer({ open: true, type: 'actions', actionData: { query: searchQuery } })
                 }
               }
             ]}
