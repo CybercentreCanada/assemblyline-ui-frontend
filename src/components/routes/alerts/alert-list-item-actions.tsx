@@ -1,14 +1,19 @@
-import { IconButton, makeStyles, Tooltip, Typography, useTheme } from '@material-ui/core';
+import { makeStyles, Typography, useTheme } from '@material-ui/core';
 import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
 import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
 import CenterFocusStrongOutlinedIcon from '@material-ui/icons/CenterFocusStrongOutlined';
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import ExpandLessIcon from '@material-ui/icons/ExpandLess';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import { SpeedDial, SpeedDialAction, SpeedDialIcon } from '@material-ui/lab';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import SearchQuery from 'components/visual/SearchBar/search-query';
 import { getValueFromPath } from 'helpers/utils';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
-import { Link } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { AlertDrawerState } from './alerts';
 import { AlertItem } from './hooks/useAlerts';
 import usePromiseAPI from './hooks/usePromiseAPI';
@@ -18,29 +23,46 @@ interface AlertListItemActionsProps {
   currentQuery: SearchQuery;
   setDrawer: (state: AlertDrawerState) => void;
   onTakeOwnershipComplete?: () => void;
+  vertical?: boolean;
 }
 
 const useStyles = makeStyles(theme => ({
-  iconBackground: {
+  verticalSpeedDial: {
     backgroundColor: theme.palette.background.paper,
-    borderRadius: '50%',
-    display: 'inline-block',
-    marginRight: theme.spacing(1),
-    boxShadow: theme.shadows[8]
+    boxShadow: theme.shadows[0],
+    '&.MuiFab-primary': {
+      backgroundColor: theme.palette.background.paper
+    },
+    '&.MuiFab-primary:hover': {
+      backgroundColor: theme.palette.action.hover
+    },
+    color: theme.palette.text.secondary
+  },
+  actionsClosed: {
+    width: 0
   }
 }));
 
+interface OwnerProps {
+  open: boolean;
+  query: SearchQuery;
+}
+
+const DEFAULT_OWNER = {
+  open: false,
+  query: null
+};
+
 const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
-  ({ item, currentQuery, setDrawer, onTakeOwnershipComplete }) => {
+  ({ item, currentQuery, setDrawer, onTakeOwnershipComplete, vertical = false }) => {
     const { onTakeOwnership } = usePromiseAPI();
     const classes = useStyles();
     const groupBy = currentQuery.getGroupBy();
     const { t } = useTranslation('alerts');
     const theme = useTheme();
-    const [takeOwnershipConfirmation, setTakeOwnershipConfirmation] = useState<{ open: boolean; query: SearchQuery }>({
-      open: false,
-      query: null
-    });
+    const [takeOwnershipConfirmation, setTakeOwnershipConfirmation] = useState<OwnerProps>(DEFAULT_OWNER);
+    const [open, setOpen] = useState(false);
+    const history = useHistory();
 
     const onTakeOwnershipOkClick = async () => {
       try {
@@ -76,57 +98,77 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
       return focusQuery;
     };
 
+    const handleClose = () => {
+      setOpen(false);
+    };
+
+    const handleOpen = () => {
+      setOpen(true);
+    };
+
     return (
-      <>
-        <div>
+      <div
+        style={{
+          marginTop: vertical ? null : theme.spacing(-1),
+          marginRight: vertical ? null : theme.spacing(-1)
+        }}
+      >
+        <SpeedDial
+          ariaLabel={t('action_menu')}
+          icon={
+            <SpeedDialIcon
+              icon={vertical ? <ExpandMoreIcon /> : <ChevronLeftIcon />}
+              openIcon={vertical ? <ExpandLessIcon /> : <ChevronRightIcon />}
+            />
+          }
+          classes={{ actionsClosed: vertical ? null : classes.actionsClosed }}
+          onClose={handleClose}
+          onOpen={handleOpen}
+          open={open}
+          FabProps={{
+            size: vertical ? 'medium' : 'small',
+            className: vertical ? classes.verticalSpeedDial : null
+          }}
+          direction={vertical ? 'down' : 'left'}
+        >
+          <SpeedDialAction
+            icon={<BiNetworkChart style={{ height: '1.3rem', width: '1.3rem' }} />}
+            tooltipTitle={t('workflow_action')}
+            tooltipPlacement={vertical ? 'left' : 'bottom'}
+            onClick={() => {
+              const actionQuery = buildActionQuery();
+              setDrawer({ open: true, type: 'actions', actionData: { query: actionQuery, total: 1 } });
+            }}
+          />
+          <SpeedDialAction
+            icon={<AmpStoriesOutlinedIcon />}
+            tooltipTitle={t('submission')}
+            tooltipPlacement={vertical ? 'left' : 'bottom'}
+            onClick={() => {
+              history.push(`/submission/${item.sid}`);
+            }}
+          />
           {!item.owner && (
-            <div className={classes.iconBackground}>
-              <Tooltip title={t('take_ownership')}>
-                <IconButton
-                  onClick={() => {
-                    setTakeOwnershipConfirmation({ open: true, query: buildActionQuery() });
-                  }}
-                  style={{ marginRight: 0 }}
-                >
-                  <AssignmentIndIcon />
-                </IconButton>
-              </Tooltip>
-            </div>
+            <SpeedDialAction
+              icon={<AssignmentIndIcon />}
+              tooltipTitle={t('take_ownership')}
+              tooltipPlacement={vertical ? 'left' : 'bottom'}
+              onClick={() => {
+                setTakeOwnershipConfirmation({ open: true, query: buildActionQuery() });
+              }}
+            />
           )}
           {item.group_count && (
-            <div className={classes.iconBackground}>
-              <Tooltip title={t('focus')}>
-                <IconButton
-                  component={Link}
-                  to={`/alerts/?${buildFocusQuery().buildURLQueryString()}`}
-                  style={{ marginRight: 0 }}
-                >
-                  <CenterFocusStrongOutlinedIcon />
-                </IconButton>
-              </Tooltip>
-            </div>
+            <SpeedDialAction
+              icon={<CenterFocusStrongOutlinedIcon />}
+              tooltipTitle={t('focus')}
+              tooltipPlacement={vertical ? 'left' : 'bottom'}
+              onClick={() => {
+                history.push(`/alerts/?${buildFocusQuery().buildURLQueryString()}`);
+              }}
+            />
           )}
-          <div className={classes.iconBackground}>
-            <Tooltip title={t('submission')}>
-              <IconButton component={Link} to={`/submission/${item.sid}`} style={{ marginRight: 0 }}>
-                <AmpStoriesOutlinedIcon />
-              </IconButton>
-            </Tooltip>
-          </div>
-          <div className={classes.iconBackground}>
-            <Tooltip title={t('workflow_action')}>
-              <IconButton
-                onClick={() => {
-                  const actionQuery = buildActionQuery();
-                  setDrawer({ open: true, type: 'actions', actionData: { query: actionQuery, total: 1 } });
-                }}
-                style={{ marginRight: 0 }}
-              >
-                <BiNetworkChart />
-              </IconButton>
-            </Tooltip>
-          </div>
-        </div>
+        </SpeedDial>
         {takeOwnershipConfirmation.open && (
           <ConfirmationDialog
             open={takeOwnershipConfirmation.open}
@@ -149,7 +191,7 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
             }
           />
         )}
-      </>
+      </div>
     );
   }
 );
