@@ -22,8 +22,8 @@ interface SimpleListProps {
   items: LineItem[];
   children: (item: LineItem) => React.ReactNode;
   onCursorChange?: (item: LineItem, cursor?: number) => void;
-  onItemSelected?: (item: LineItem) => void;
-  onRenderActions?: (item: LineItem, index: number) => React.ReactNode;
+  onItemSelected?: (item: LineItem, index?: number) => void;
+  onRenderActions?: (item: LineItem, index?: number) => React.ReactNode;
   onLoadNext?: () => void;
 }
 
@@ -91,7 +91,7 @@ const SimpleList: React.FC<SimpleListProps> = ({
     (_item: LineItem, index: number) => {
       setCursor(index);
       if (onItemSelected) {
-        onItemSelected(_item);
+        onItemSelected(_item, index);
       }
     },
     [setCursor, onItemSelected]
