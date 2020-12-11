@@ -82,6 +82,7 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
 
     const buildActionQuery = (): SearchQuery => {
       const _actionQuery = currentQuery.newBase(name => name === 'tc_start');
+      _actionQuery.setGroupBy('');
 
       if (groupBy) {
         _actionQuery.setQuery(`${groupBy}:${getValueFromPath(item, groupBy)}`);
