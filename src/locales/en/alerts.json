@@ -81,7 +81,7 @@
   "query": "Query",
   "workflow.apply": "Apply workflow actions",
   "workflow.title": "Perform a workflow action",
-  "workflow.impact.high": "The workflow action will be applied to all alerts matching to following filters:",
+  "workflow.impact.high": "The workflow action will be applied to all alerts matching the following filters:",
   "workflow.impact.low": "The workflow action will only affect the currently selected alert which matches the following filters:",
   "verdict.failed": "The system was unable to set the verdict.",
   "verdict.malicious": "Set alert verdict to malicious",
