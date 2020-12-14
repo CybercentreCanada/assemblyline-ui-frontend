@@ -1,10 +1,10 @@
 import { Grid, IconButton, Link as MaterialLink, Tooltip, Typography, useTheme } from '@material-ui/core';
+import BugReportOutlinedIcon from '@material-ui/icons/BugReportOutlined';
 import ChromeReaderModeOutlinedIcon from '@material-ui/icons/ChromeReaderModeOutlined';
 import CloudDownloadOutlinedIcon from '@material-ui/icons/CloudDownloadOutlined';
-import MoodIcon from '@material-ui/icons/Mood';
-import MoodBadIcon from '@material-ui/icons/MoodBad';
 import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
 import ReplayOutlinedIcon from '@material-ui/icons/ReplayOutlined';
+import VerifiedUserOutlinedIcon from '@material-ui/icons/VerifiedUserOutlined';
 import { Skeleton } from '@material-ui/lab';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useAppContext from 'components/hooks/useAppContext';
@@ -239,7 +239,7 @@ export default function SubmissionDetail() {
                             )}
                           >
                             <IconButton size="small" onClick={() => setVerdict('malicious')}>
-                              <MoodBadIcon
+                              <BugReportOutlinedIcon
                                 style={{
                                   color:
                                     submission && submission.verdict.malicious.indexOf(currentUser.username) !== -1
@@ -262,7 +262,7 @@ export default function SubmissionDetail() {
                             )}
                           >
                             <IconButton size="small" onClick={() => setVerdict('non_malicious')}>
-                              <MoodIcon
+                              <VerifiedUserOutlinedIcon
                                 style={{
                                   color:
                                     submission && submission.verdict.non_malicious.indexOf(currentUser.username) !== -1
