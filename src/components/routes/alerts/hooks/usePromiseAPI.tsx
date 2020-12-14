@@ -14,6 +14,7 @@ export interface UsingPromiseAPI {
     selectedLabels: string[]
   ) => Promise<boolean>;
   onTakeOwnership: (query: SearchQuery) => Promise<boolean>;
+  setVerdict: (alert_id: string, verdict: 'malicious' | 'non_malicious') => Promise<boolean>;
 }
 
 // Stateless hook that returns promise wrappers around AL's rest api.
@@ -48,7 +49,7 @@ export default function usePromiseAPI(): UsingPromiseAPI {
           url: `/api/v4/alert/status/batch/?${query.buildAPIQueryString()}`,
           method: 'post',
           body: selectedStatus,
-          onSuccess: api_data => {
+          onSuccess: () => {
             resolve(true);
           },
           onFailure: api_data => reject(api_data)
@@ -64,7 +65,7 @@ export default function usePromiseAPI(): UsingPromiseAPI {
           url: `/api/v4/alert/priority/batch/?${query.buildAPIQueryString()}`,
           method: 'post',
           body: selectedPriority,
-          onSuccess: api_data => {
+          onSuccess: () => {
             resolve(true);
           },
           onFailure: api_data => reject(api_data)
@@ -80,7 +81,7 @@ export default function usePromiseAPI(): UsingPromiseAPI {
           url: `/api/v4/alert/label/batch/?${query.buildAPIQueryString()}`,
           method: 'post',
           body: selectedLabels,
-          onSuccess: api_data => {
+          onSuccess: () => {
             resolve(true);
           },
           onFailure: api_data => reject(api_data)
@@ -98,10 +99,24 @@ export default function usePromiseAPI(): UsingPromiseAPI {
     return new Promise((resolve, reject) => {
       apiCall({
         url: `/api/v4/alert/ownership/batch/?${query.buildAPIQueryString()}`,
-        onSuccess: api_data => {
+        onSuccess: () => {
           resolve(true);
         },
-        onFailure: () => resolve(false)
+        onFailure: api_data => reject(api_data)
+      });
+    });
+  };
+
+  // Hook API: set the verdict on a selected alert
+  const setVerdict = async (alert_id: string, verdict: 'malicious' | 'non_malicious'): Promise<boolean> => {
+    return new Promise((resolve, reject) => {
+      apiCall({
+        method: 'PUT',
+        url: `/api/v4/alert/verdict/${alert_id}/${verdict}/`,
+        onSuccess: () => {
+          resolve(true);
+        },
+        onFailure: api_data => reject(api_data)
       });
     });
   };
@@ -111,6 +126,7 @@ export default function usePromiseAPI(): UsingPromiseAPI {
   return {
     fetchAlert: useCallback(fetchAlert, []),
     onApplyWorkflowAction: useCallback(onApplyWorkflowAction, []),
-    onTakeOwnership: useCallback(onTakeOwnership, [])
+    onTakeOwnership: useCallback(onTakeOwnership, []),
+    setVerdict: useCallback(setVerdict, [])
   };
 }

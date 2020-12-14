@@ -1,12 +1,16 @@
 import { makeStyles, Typography, useTheme } from '@material-ui/core';
 import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
 import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
+import BugReportOutlinedIcon from '@material-ui/icons/BugReportOutlined';
 import CenterFocusStrongOutlinedIcon from '@material-ui/icons/CenterFocusStrongOutlined';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import VerifiedUserOutlinedIcon from '@material-ui/icons/VerifiedUserOutlined';
 import { SpeedDial, SpeedDialAction, SpeedDialIcon } from '@material-ui/lab';
+import useAppContext from 'components/hooks/useAppContext';
+import useMySnackbar from 'components/hooks/useMySnackbar';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import SearchQuery from 'components/visual/SearchBar/search-query';
 import { getValueFromPath } from 'helpers/utils';
@@ -18,12 +22,15 @@ import { AlertDrawerState } from './alerts';
 import { AlertItem } from './hooks/useAlerts';
 import usePromiseAPI from './hooks/usePromiseAPI';
 
+export type PossibleVerdict = 'malicious' | 'non_malicious';
+
 interface AlertListItemActionsProps {
   item: AlertItem;
   index: number;
   currentQuery: SearchQuery;
   setDrawer: (state: AlertDrawerState) => void;
   onTakeOwnershipComplete?: () => void;
+  onVerdictComplete?: (verdict: PossibleVerdict) => void;
   vertical?: boolean;
 }
 
@@ -55,15 +62,31 @@ const DEFAULT_OWNER = {
 };
 
 const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
-  ({ item, index, currentQuery, setDrawer, onTakeOwnershipComplete, vertical = false }) => {
-    const { onTakeOwnership } = usePromiseAPI();
+  ({ item, index, currentQuery, setDrawer, onTakeOwnershipComplete, onVerdictComplete, vertical = false }) => {
+    const { onTakeOwnership, setVerdict } = usePromiseAPI();
     const classes = useStyles();
     const groupBy = currentQuery.getGroupBy();
     const { t } = useTranslation('alerts');
     const theme = useTheme();
+    const { showErrorMessage, showSuccessMessage } = useMySnackbar();
     const [takeOwnershipConfirmation, setTakeOwnershipConfirmation] = useState<OwnerProps>(DEFAULT_OWNER);
     const [open, setOpen] = useState(false);
     const history = useHistory();
+    const { user: currentUser } = useAppContext();
+    const hasSetMalicious = item.verdict.malicious.indexOf(currentUser.username) !== -1;
+    const hasSetNonMalicious = item.verdict.non_malicious.indexOf(currentUser.username) !== -1;
+
+    const handleVerdict = async (verdict: PossibleVerdict) => {
+      try {
+        await setVerdict(item.alert_id, verdict);
+        showSuccessMessage(t(`verdict.${verdict}.success`));
+        if (onVerdictComplete) {
+          onVerdictComplete(verdict);
+        }
+      } catch (api_data) {
+        showErrorMessage(t('verdict.failed'));
+      }
+    };
 
     const onTakeOwnershipOkClick = async () => {
       try {
@@ -133,6 +156,36 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
           }}
           direction={vertical ? 'down' : 'left'}
         >
+          <SpeedDialAction
+            icon={<BugReportOutlinedIcon />}
+            tooltipTitle={t(hasSetMalicious ? 'verdict.malicious.set' : 'verdict.malicious')}
+            tooltipPlacement={vertical ? 'left' : 'bottom'}
+            FabProps={{
+              style: {
+                color: hasSetMalicious
+                  ? theme.palette.type === 'dark'
+                    ? theme.palette.error.light
+                    : theme.palette.error.dark
+                  : null
+              }
+            }}
+            onClick={!hasSetMalicious ? () => handleVerdict('malicious') : null}
+          />
+          <SpeedDialAction
+            icon={<VerifiedUserOutlinedIcon />}
+            tooltipTitle={t(hasSetNonMalicious ? 'verdict.non_malicious.set' : 'verdict.non_malicious')}
+            tooltipPlacement={vertical ? 'left' : 'bottom'}
+            FabProps={{
+              style: {
+                color: hasSetNonMalicious
+                  ? theme.palette.type === 'dark'
+                    ? theme.palette.success.light
+                    : theme.palette.success.dark
+                  : null
+              }
+            }}
+            onClick={!hasSetNonMalicious ? () => handleVerdict('non_malicious') : null}
+          />
           <SpeedDialAction
             icon={<BiNetworkChart style={{ height: '1.3rem', width: '1.3rem' }} />}
             tooltipTitle={t('workflow_action')}

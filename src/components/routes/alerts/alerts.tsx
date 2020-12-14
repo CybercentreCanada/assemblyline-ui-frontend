@@ -18,7 +18,7 @@ import { FiFilter } from 'react-icons/fi';
 import { useHistory, useLocation } from 'react-router-dom';
 import AlertDetails from './alert-details';
 import AlertListItem from './alert-list-item';
-import AlertListItemActions from './alert-list-item-actions';
+import AlertListItemActions, { PossibleVerdict } from './alert-list-item-actions';
 import AlertsFilters from './alerts-filters';
 import AlertsFiltersFavorites from './alerts-filters-favorites';
 import AlertsFiltersSelected from './alerts-filters-selected';
@@ -156,6 +156,39 @@ const Alerts: React.FC = () => {
     if (inputEl) inputEl.focus();
   };
 
+  const onVerdictComplete = useCallback(
+    (index: number, item: AlertItem, verdict: PossibleVerdict) => {
+      const changes = { verdict: { ...item.verdict } };
+      if (verdict === 'malicious') {
+        if (changes.verdict.malicious.indexOf(currentUser.username) === -1) {
+          changes.verdict.malicious.push(currentUser.username);
+        }
+        if (changes.verdict.non_malicious.indexOf(currentUser.username) !== -1) {
+          changes.verdict.non_malicious.splice(changes.verdict.non_malicious.indexOf(currentUser.username), 1);
+        }
+      } else {
+        if (changes.verdict.non_malicious.indexOf(currentUser.username) === -1) {
+          changes.verdict.non_malicious.push(currentUser.username);
+        }
+        if (changes.verdict.malicious.indexOf(currentUser.username) !== -1) {
+          changes.verdict.malicious.splice(changes.verdict.malicious.indexOf(currentUser.username), 1);
+        }
+      }
+      updateAlert(index, changes);
+      window.dispatchEvent(new CustomEvent('alertUpdate', { detail: { id: item.id, changes } }));
+    },
+    [currentUser.username, updateAlert]
+  );
+
+  const onTakeOwnershipComplete = useCallback(
+    (index: number, item: AlertItem) => {
+      const changes = { owner: currentUser.username };
+      updateAlert(index, changes);
+      window.dispatchEvent(new CustomEvent('alertUpdate', { detail: { id: item.id, changes } }));
+    },
+    [currentUser.username, updateAlert]
+  );
+
   // Handler for when an item of the InfiniteList is selected
   const onItemSelected = useCallback(
     (item: AlertItem, index: number) => {
@@ -183,11 +216,8 @@ const Alerts: React.FC = () => {
                 index={index}
                 currentQuery={searchQuery}
                 setDrawer={setDrawer}
-                onTakeOwnershipComplete={() => {
-                  const changes = { owner: currentUser.username };
-                  updateAlert(index, changes);
-                  window.dispatchEvent(new CustomEvent('alertUpdate', { detail: { id: item.id, changes } }));
-                }}
+                onTakeOwnershipComplete={() => onTakeOwnershipComplete(index, item)}
+                onVerdictComplete={verdict => onVerdictComplete(index, item, verdict)}
                 vertical
               />
             </div>
@@ -198,7 +228,7 @@ const Alerts: React.FC = () => {
         );
       }
     },
-    [setGlobalDrawer, isLGDown, theme, searchQuery, updateAlert, currentUser.username]
+    [setGlobalDrawer, isLGDown, theme, searchQuery, onTakeOwnershipComplete, onVerdictComplete]
   );
 
   // Handler for when loading more alerts [read bottom of scroll area]
@@ -298,14 +328,11 @@ const Alerts: React.FC = () => {
         index={index}
         currentQuery={searchQuery}
         setDrawer={setDrawer}
-        onTakeOwnershipComplete={() => {
-          const changes = { owner: currentUser.username };
-          updateAlert(index, changes);
-          window.dispatchEvent(new CustomEvent('alertUpdate', { detail: { id: item.id, changes } }));
-        }}
+        onTakeOwnershipComplete={() => onTakeOwnershipComplete(index, item)}
+        onVerdictComplete={verdict => onVerdictComplete(index, item, verdict)}
       />
     ),
-    [currentUser.username, searchQuery, updateAlert]
+    [onTakeOwnershipComplete, onVerdictComplete, searchQuery]
   );
 
   return (
