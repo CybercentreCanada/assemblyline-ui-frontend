@@ -187,7 +187,14 @@ export default function useAlerts(pageSize: number): UsingAlerts {
         onSuccess: api_data => {
           const { items: _items, tc_start: executionTime, total, counted_total: countedTotal } = api_data.api_response;
           const items = parseResult(_items, 0);
-          if (executionTime) searchQuery.setTcStart(executionTime);
+
+          // Set time constraint start
+          if (executionTime) {
+            searchQuery.setTcStart(executionTime);
+          } else if (!searchQuery.getTcStart() && items.length > 0) {
+            searchQuery.setTcStart(items[0].reporting_ts);
+          }
+
           setState({
             action: 'set',
             loading: false,
