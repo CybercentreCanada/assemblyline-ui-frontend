@@ -90,8 +90,8 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
     { value: '', label: t('tc.none') },
     { value: '24h', label: t('tc.24h') },
     { value: '4d', label: t('tc.4d') },
-    { value: '7d', label: t('tc.1week') },
-    { value: '1m', label: t('tc.1month') }
+    { value: '1w', label: t('tc.1week') },
+    { value: '1M', label: t('tc.1month') }
   ];
 
   const filters = searchQuery.parseFilters();
