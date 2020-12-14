@@ -8,7 +8,7 @@ interface AlertFiltersSelectedProps {
   hideQuery?: boolean;
   hideGroupBy?: boolean;
   disableActions?: boolean;
-  onChange?: (filters: SearchQueryFilters) => void;
+  onChange?: (filters: SearchQueryFilters, query?: string) => void;
 }
 
 const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
@@ -22,6 +22,10 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
 
   const filters = searchQuery.parseFilters();
   const query = searchQuery.getQuery();
+
+  const onDeleteMainQuery = () => {
+    onChange(filters, '');
+  };
 
   const onDeleteTC = () => {
     onChange({ ...filters, tc: '' });
@@ -60,7 +64,7 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
               items={[query].map(v => ({
                 variant: 'outlined',
                 label: `${v}`,
-                onDelete: !disableActions ? () => onDeleteTC() : null
+                onDelete: !disableActions ? () => onDeleteMainQuery() : null
               }))}
             />
           </div>

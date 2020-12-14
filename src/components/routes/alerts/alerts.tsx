@@ -208,8 +208,9 @@ const Alerts: React.FC = () => {
   }, [setScrollReset, onLoadMore]);
 
   // Hanlder for when clicking one the AlertsFilters 'Apply' button.
-  const onApplyFilters = (filters: SearchQueryFilters) => {
+  const onApplyFilters = (filters: SearchQueryFilters, query?: string) => {
     // Set the newly selected filters and up location url bar.
+    if (query !== undefined && query !== null) searchQuery.setQuery(query);
     searchQuery.setFilters(filters);
     history.push(`${location.pathname}?${searchQuery.buildURLQueryString()}`);
 
@@ -217,11 +218,6 @@ const Alerts: React.FC = () => {
     if (drawer.open) {
       setDrawer({ ...drawer, open: false });
     }
-  };
-
-  // Handler for when clicking the 'Cancel' button on AlertsFiltersFilters
-  const onCancelFilters = () => {
-    setDrawer({ ...drawer, open: false });
   };
 
   // Handler for when the value of the search bar input field changes.
@@ -333,7 +329,6 @@ const Alerts: React.FC = () => {
                   userFavorites={userFavorites}
                   globalFavorites={globalFavorites}
                   onApplyBtnClick={onApplyFilters}
-                  onCancelBtnClick={onCancelFilters}
                 />
               ),
               favorites: (
