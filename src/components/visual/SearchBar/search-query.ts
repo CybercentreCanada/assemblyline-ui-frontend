@@ -166,7 +166,7 @@ export default class SearchQuery {
   }
 
   public setFilters(filters: SearchQueryFilters): SearchQuery {
-    this.reset().setTc(filters.tc).setGroupBy(filters.groupBy);
+    this.reset(false).setTc(filters.tc).setGroupBy(filters.groupBy);
     [...filters.statuses, ...filters.priorities, ...filters.labels, ...filters.queries].forEach(filter =>
       this.addFq(filter.value)
     );
@@ -183,14 +183,9 @@ export default class SearchQuery {
     return this;
   }
 
-  public reset(): SearchQuery {
-    this.setOffset('0')
-      .setRows(`${this.pageSize}`)
-      .setQuery('')
-      .setTc('4d')
-      .setGroupBy('file.sha256')
-      .setTcStart('')
-      .clearFq();
+  public reset(clearQuery = true): SearchQuery {
+    this.setOffset('0').setRows(`${this.pageSize}`).setTc('4d').setGroupBy('file.sha256').setTcStart('').clearFq();
+    if (clearQuery) this.setQuery('');
     return this;
   }
 
