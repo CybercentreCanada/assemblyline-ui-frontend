@@ -53,8 +53,7 @@ interface AlertsFiltersProps {
   labelFilters: SearchFilter[];
   userFavorites: Favorite[];
   globalFavorites: Favorite[];
-  onApplyBtnClick: (filters: SearchQueryFilters) => void;
-  onCancelBtnClick: () => void;
+  onApplyBtnClick: (filters: SearchQueryFilters, query?: string) => void;
 }
 
 interface QueryFilter {
@@ -71,8 +70,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
   labelFilters,
   userFavorites,
   globalFavorites,
-  onApplyBtnClick,
-  onCancelBtnClick
+  onApplyBtnClick
 }) => {
   // Hooks...
   const theme = useTheme();
