@@ -1,5 +1,8 @@
-import { Grid, useTheme } from '@material-ui/core';
-import PersonIcon from '@material-ui/icons/Person';
+import { Grid, Tooltip, useTheme } from '@material-ui/core';
+import BugReportOutlinedIcon from '@material-ui/icons/BugReportOutlined';
+import GroupOutlinedIcon from '@material-ui/icons/GroupOutlined';
+import PersonOutlineOutlinedIcon from '@material-ui/icons/PersonOutlineOutlined';
+import VerifiedUserOutlinedIcon from '@material-ui/icons/VerifiedUserOutlined';
 import { AlertItem } from 'components/routes/alerts/hooks/useAlerts';
 import { ChipList } from 'components/visual/ChipList';
 import Verdict from 'components/visual/Verdict';
@@ -39,15 +42,35 @@ const AlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
           <span style={{ marginLeft: theme.spacing(1), wordBreak: 'break-all' }}>{item.file.name}</span>
         </Grid>
         <Grid item xs={6} md={2}>
+          {item.verdict.malicious.length > item.verdict.non_malicious.length ? (
+            <Tooltip
+              title={`${item.verdict.malicious.length}/${
+                item.verdict.malicious.length + item.verdict.non_malicious.length
+              } ${t('verdict.user.malicious')}`}
+            >
+              <BugReportOutlinedIcon />
+            </Tooltip>
+          ) : null}
+          {item.verdict.non_malicious.length > item.verdict.malicious.length ? (
+            <Tooltip
+              title={`${item.verdict.non_malicious.length}/${
+                item.verdict.malicious.length + item.verdict.non_malicious.length
+              } ${t('verdict.user.non_malicious')}`}
+            >
+              <VerifiedUserOutlinedIcon />
+            </Tooltip>
+          ) : null}
           {item.owner ? (
             <>
-              <PersonIcon />
-              <span style={{ verticalAlign: 'top', marginLeft: theme.spacing(0.5) }}>{item.owner}</span>
+              <Tooltip title={`${t('owned_by')} ${item.owner}`}>
+                <PersonOutlineOutlinedIcon />
+              </Tooltip>
             </>
           ) : item.hint_owner ? (
             <>
-              <PersonIcon />
-              <span style={{ verticalAlign: 'top', marginLeft: theme.spacing(0.5) }}>{t('assigned')}</span>
+              <Tooltip title={t('hint_owned_by')}>
+                <GroupOutlinedIcon />
+              </Tooltip>
             </>
           ) : null}
         </Grid>
