@@ -633,6 +633,7 @@ const WrappedScalerResourcesCard = ({ scaler }) => {
         <Grid item xs={6} style={{ textAlign: 'center' }}>
           <div style={{ display: 'inline-block' }}>
             <ArcGauge
+              initialized={scaler.initilized}
               pctValue={
                 scaler.metrics.cpu_total === 0
                   ? 0
@@ -649,6 +650,7 @@ const WrappedScalerResourcesCard = ({ scaler }) => {
         <Grid item xs={6} style={{ textAlign: 'center' }}>
           <div style={{ display: 'inline-block' }}>
             <ArcGauge
+              initialized={scaler.initilized}
               pctValue={
                 scaler.metrics.memory_total === 0
                   ? 0
