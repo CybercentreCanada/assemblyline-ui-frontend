@@ -24,10 +24,18 @@ const AlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
   if (item.al.av.length !== 0) {
     infoItems.push({ label: `${item.al.av.length}x AV`, color: 'warning', size: 'tiny', variant: 'outlined' });
   }
-  if (item.al.domain.length !== 0 || item.al.ip.length !== 0) {
+  if (item.al.ip.length !== 0) {
     infoItems.push({
-      label: `${item.al.domain.length + item.al.ip.length}x IOC`,
+      label: `${item.al.ip.length}x IP`,
       color: 'primary',
+      size: 'tiny',
+      variant: 'outlined'
+    });
+  }
+  if (item.al.domain.length !== 0) {
+    infoItems.push({
+      label: `${item.al.domain.length}x DOM`,
+      color: 'success',
       size: 'tiny',
       variant: 'outlined'
     });
