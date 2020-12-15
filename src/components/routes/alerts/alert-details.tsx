@@ -1,5 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Box, Divider, Grid, makeStyles, Typography, useTheme } from '@material-ui/core';
+import { Box, Divider, Grid, IconButton, makeStyles, Tooltip, Typography, useTheme } from '@material-ui/core';
+import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
+import BugReportOutlinedIcon from '@material-ui/icons/BugReportOutlined';
+import VerifiedUserOutlinedIcon from '@material-ui/icons/VerifiedUserOutlined';
 import { Skeleton } from '@material-ui/lab';
 import Alert from '@material-ui/lab/Alert';
 import useClipboard from 'commons/components/hooks/useClipboard';
@@ -9,10 +12,11 @@ import { AlertItem } from 'components/routes/alerts/hooks/useAlerts';
 import { ChipList, ChipSkeleton, ChipSkeletonInline } from 'components/visual/ChipList';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
+import Verdict from 'components/visual/Verdict';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import AlertPriority from './alert-priority';
 import AlertStatus from './alert-status';
 
@@ -83,27 +87,90 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
   }, [item]);
 
   return (
-    <PageCenter margin={!id && !alert ? 4 : 0} mr={0} ml={0} mb={0} mt={0} width="100%">
+    <PageCenter margin={!alert ? 4 : 1} width="100%">
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: theme.spacing(2) }}>
         <div style={{ flex: 1 }}>
           <Classification c12n={item ? item.classification : null} type="outlined" />
         </div>
       </div>
+      {!alert && (
+        <div style={{ paddingBottom: theme.spacing(3), textAlign: 'left' }}>
+          <Grid container alignItems="center">
+            <Grid item xs>
+              <Typography variant="h4">{t('detail.title')}</Typography>
+            </Grid>
+            <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
+              {item ? (
+                <Tooltip title={t('submission')}>
+                  <IconButton
+                    component={Link}
+                    style={{ color: theme.palette.action.active }}
+                    to={`/submission/"${item.sid}"`}
+                  >
+                    <AmpStoriesOutlinedIcon />
+                  </IconButton>
+                </Tooltip>
+              ) : (
+                <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+              )}
+            </Grid>
+          </Grid>
+        </div>
+      )}
       <div style={{ textAlign: 'left' }}>
         {item && item.filtered && (
-          <Box mb={2}>
+          <div style={{ marginBottom: theme.spacing(3) }}>
             <Alert severity="warning">{t('data_filtered_msg')}</Alert>
-          </Box>
+          </div>
         )}
-        <Grid container spacing={2}>
+        <Grid container spacing={1}>
           <Grid item xs={12} md={6}>
-            {/* Labels Section */}
+            {/* Alert ID Section */}
             <div className={classes.section}>
-              <Typography className={classes.sectionTitle}>{t('label')}</Typography>
+              <Typography className={classes.sectionTitle}>{t('alert_id')}</Typography>
+              <Divider />
+              {item ? item.alert_id : <Skeleton />}
+            </div>
+          </Grid>
+          <Grid item xs={6} md={3}>
+            {/* Score Section. */}
+            <div className={classes.section}>
+              <Typography className={classes.sectionTitle}>{t('score')}</Typography>
               <Divider />
               <div className={classes.sectionContent}>
-                <ChipList items={item ? item.label.map(label => ({ label, variant: 'outlined' })) : null} />
+                {item ? <Verdict size="tiny" score={item.al.score} /> : <Skeleton />}
               </div>
+            </div>
+          </Grid>
+          <Grid item xs={6} md={3}>
+            {/* User Verdict Section */}
+            <div className={classes.section}>
+              <Typography className={classes.sectionTitle}>{t('user_verdict')}</Typography>
+              <Divider />
+              {item ? (
+                <div style={{ display: 'flex' }}>
+                  <div style={{ flexGrow: 1 }}>
+                    <div>{`${item.verdict.malicious.length}x ${t('malicious')}`}</div>
+                    <div>{`${item.verdict.non_malicious.length}x ${t('non_malicious')}`}</div>
+                  </div>
+                  <div
+                    style={{
+                      flexGrow: 0,
+                      alignSelf: 'center',
+                      paddingLeft: theme.spacing(2),
+                      paddingRight: theme.spacing(2)
+                    }}
+                  >
+                    {item.verdict.malicious.length > item.verdict.non_malicious.length && <BugReportOutlinedIcon />}
+                    {item.verdict.non_malicious.length > item.verdict.malicious.length && <VerifiedUserOutlinedIcon />}
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <Skeleton />
+                  <Skeleton />
+                </>
+              )}
             </div>
           </Grid>
           <Grid item xs={6} md={3}>
@@ -128,6 +195,16 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
               </div>
             </div>
           </Grid>
+          <Grid item xs={12} md={6}>
+            {/* Labels Section */}
+            <div className={classes.section}>
+              <Typography className={classes.sectionTitle}>{t('label')}</Typography>
+              <Divider />
+              <div className={classes.sectionContent}>
+                <ChipList items={item ? item.label.map(label => ({ label, variant: 'outlined' })) : null} />
+              </div>
+            </div>
+          </Grid>
         </Grid>
 
         {/*  Reporting Date, Type and Owner */}
@@ -139,16 +216,16 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
               <Divider />
               <div className={classes.sectionContent}>
                 <Grid container>
-                  <Grid item xs={4}>
+                  <Grid item xs={3} sm={2} md={4}>
                     {t('received_date')}
                   </Grid>
-                  <Grid item xs={8}>
+                  <Grid item xs={9} sm={10} md={8}>
                     {item ? `${item.ts.replace('T', ' ').replace('Z', '')} (UTC)` : <Skeleton />}
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid item xs={3} sm={2} md={4}>
                     {t('alerted_date')}
                   </Grid>
-                  <Grid item xs={8}>
+                  <Grid item xs={9} sm={10} md={8}>
                     {item ? `${item.reporting_ts.replace('T', ' ').replace('Z', '')} (UTC)` : <Skeleton />}
                   </Grid>
                 </Grid>
@@ -256,6 +333,120 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
           </div>
         ) : null}
 
+        {/* AL Attributions Section */}
+        {!item || item.al.attrib.length !== 0 ? (
+          <div className={classes.section}>
+            <Typography className={classes.sectionTitle}>{t('attributions')}</Typography>
+            <Divider />
+            <div className={classes.sectionContent}>
+              <ChipList
+                items={item ? item.al.attrib.map(label => ({ label, variant: 'outlined', color: 'error' })) : null}
+              />
+            </div>
+          </div>
+        ) : null}
+
+        {/* AL AV Hits */}
+        {!item || item.al.av.length !== 0 ? (
+          <div className={classes.section}>
+            <Typography className={classes.sectionTitle}>{t('avhits')}</Typography>
+            <Divider />
+            <div className={classes.sectionContent}>
+              <ChipList
+                items={item ? item.al.av.map(label => ({ label, variant: 'outlined', color: 'warning' })) : null}
+              />
+            </div>
+          </div>
+        ) : null}
+
+        {/* IPs sections */}
+        {!item || item.al.ip.length !== 0 ? (
+          <div className={classes.section}>
+            <Typography className={classes.sectionTitle}>{t('ip')}</Typography>
+            <Divider />
+            <div className={classes.sectionContent}>
+              <Grid container spacing={1}>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="caption">
+                    <i>{t('ip_dynamic')}</i>
+                  </Typography>
+                  <ChipList
+                    items={
+                      item
+                        ? item.al.ip_dynamic.map(label => ({
+                            label,
+                            variant: 'outlined',
+                            color: 'primary'
+                          }))
+                        : null
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="caption">
+                    <i>{t('ip_static')}</i>
+                  </Typography>
+                  <ChipList
+                    items={
+                      item
+                        ? item.al.ip_static.map(label => ({
+                            label,
+                            variant: 'outlined',
+                            color: 'primary'
+                          }))
+                        : null
+                    }
+                  />{' '}
+                </Grid>
+              </Grid>
+            </div>
+          </div>
+        ) : null}
+
+        {/* Domains sections */}
+        {!item || item.al.domain.length !== 0 ? (
+          <div className={classes.section}>
+            <Typography className={classes.sectionTitle}>{t('domain')}</Typography>
+            <Divider />
+            <div className={classes.sectionContent}>
+              <Grid container spacing={1}>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="caption">
+                    <i>{t('domain_dynamic')}</i>
+                  </Typography>
+                  <ChipList
+                    items={
+                      item
+                        ? item.al.domain_dynamic.map(label => ({
+                            label,
+                            variant: 'outlined',
+                            color: 'success'
+                          }))
+                        : null
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="caption">
+                    <i>{t('domain_static')}</i>
+                  </Typography>
+                  <ChipList
+                    items={
+                      item
+                        ? item.al.domain_static.map(label => ({
+                            label,
+                            variant: 'outlined',
+                            color: 'success'
+                          }))
+                        : null
+                    }
+                  />{' '}
+                </Grid>
+              </Grid>
+            </div>
+          </div>
+        ) : null}
+
         {/* Attack Section */}
         {!item || item.attack.category.length !== 0 ? (
           <div className={classes.section}>
@@ -306,132 +497,6 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
             <Divider />
             <div className={classes.sectionContent}>
               <ChipList items={item ? item.al.behavior.map(label => ({ label, variant: 'outlined' })) : null} />
-            </div>
-          </div>
-        ) : null}
-
-        {/* AL Attributions Section */}
-        {!item || item.al.attrib.length !== 0 ? (
-          <div className={classes.section}>
-            <Typography className={classes.sectionTitle}>{t('attributions')}</Typography>
-            <Divider />
-            <div className={classes.sectionContent}>
-              <ChipList items={item ? item.al.attrib.map(label => ({ label, variant: 'outlined' })) : null} />
-            </div>
-          </div>
-        ) : null}
-
-        {/* AL AV Hits */}
-        {!item || item.al.av.length !== 0 ? (
-          <div className={classes.section}>
-            <Typography className={classes.sectionTitle}>{t('avhits')}</Typography>
-            <Divider />
-            <div className={classes.sectionContent}>
-              <ChipList items={item ? item.al.av.map(label => ({ label, variant: 'outlined' })) : null} />
-            </div>
-          </div>
-        ) : null}
-
-        {/* IPs sections */}
-        {!item || item.al.ip.length !== 0 ? (
-          <div className={classes.section}>
-            <Typography className={classes.sectionTitle}>{t('ip')}</Typography>
-            <Divider />
-            <div className={classes.sectionContent}>
-              <Grid container spacing={3}>
-                <Grid item xs={12} md={6}>
-                  <Grid container spacing={1}>
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="caption">
-                        <i>{t('ip_dynamic')}</i>
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} md={9}>
-                      {item ? (
-                        item.al.ip_dynamic.map((ip, i) => <div key={`alert-ipdynamic-${i}`}>{ip}</div>)
-                      ) : (
-                        <>
-                          <Skeleton />
-                          <Skeleton />
-                          <Skeleton />
-                        </>
-                      )}
-                    </Grid>
-                  </Grid>
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <Grid container spacing={0}>
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="caption">
-                        <i>{t('ip_static')}</i>
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} md={9}>
-                      {item ? (
-                        item.al.ip_static.map((ip, i) => <div key={`alert-ipdynamic-${i}`}>{ip}</div>)
-                      ) : (
-                        <>
-                          <Skeleton />
-                          <Skeleton />
-                          <Skeleton />
-                        </>
-                      )}
-                    </Grid>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </div>
-          </div>
-        ) : null}
-
-        {/* Domains sections */}
-        {!item || item.al.domain.length !== 0 ? (
-          <div className={classes.section}>
-            <Typography className={classes.sectionTitle}>{t('domain')}</Typography>
-            <Divider />
-            <div className={classes.sectionContent}>
-              <Grid container spacing={3}>
-                <Grid item xs={12} md={6}>
-                  <Grid container spacing={1}>
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="caption">
-                        <i>{t('domain_dynamic')}</i>
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} md={9}>
-                      {item ? (
-                        item.al.domain_dynamic.map((d, i) => <div key={`alert-domain-${i}`}>{d}</div>)
-                      ) : (
-                        <>
-                          <Skeleton />
-                          <Skeleton />
-                          <Skeleton />
-                        </>
-                      )}
-                    </Grid>
-                  </Grid>
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <Grid container spacing={0}>
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="caption">
-                        <i>{t('domain_static')}</i>
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} md={9}>
-                      {item ? (
-                        item.al.domain_static.map((d, i) => <div key={`alert-domain-${i}`}>{d}</div>)
-                      ) : (
-                        <>
-                          <Skeleton />
-                          <Skeleton />
-                          <Skeleton />
-                        </>
-                      )}
-                    </Grid>
-                  </Grid>
-                </Grid>
-              </Grid>
             </div>
           </div>
         ) : null}
