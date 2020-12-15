@@ -244,9 +244,9 @@ const WrappedIngestCard = ({ ingester }) => {
               <span style={{ marginLeft: '8px' }}>
                 <SpeedOutlinedIcon className={classes.icon} />
                 {ingester.initialized ? (
-                  `${(1.0 * ingester.metrics.bytes_completed) / ((1024 * 1024 * 60) / 8)} / ${
-                    (1.0 * ingester.metrics.bytes_ingested) / ((1024 * 1024 * 60) / 8)
-                  } Mbps`
+                  `${Number(
+                    ((1.0 * ingester.metrics.bytes_completed) / ((1024 * 1024 * 60) / 8)).toFixed(2)
+                  )} / ${Number(((1.0 * ingester.metrics.bytes_ingested) / ((1024 * 1024 * 60) / 8)).toFixed(2))} Mbps`
                 ) : (
                   <Skeleton height="1.5rem" width="3rem" style={{ display: 'inline-block' }} />
                 )}
@@ -639,9 +639,9 @@ const WrappedScalerResourcesCard = ({ scaler }) => {
                   : ((scaler.metrics.cpu_total - scaler.metrics.cpu_free) / scaler.metrics.cpu_total) * 100
               }
               title={t('cpu')}
-              caption={`${scaler.metrics.cpu_total - scaler.metrics.cpu_free} / ${scaler.metrics.cpu_total} ${t(
-                'cores'
-              )}`}
+              caption={`${Number((scaler.metrics.cpu_total - scaler.metrics.cpu_free).toFixed(1))} / ${Number(
+                scaler.metrics.cpu_total.toFixed(1)
+              )} ${t('cores')}`}
               width="120px"
             />
           </div>
@@ -655,9 +655,9 @@ const WrappedScalerResourcesCard = ({ scaler }) => {
                   : ((scaler.metrics.memory_total - scaler.metrics.memory_free) / scaler.metrics.memory_total) * 100
               }
               title={t('ram')}
-              caption={`${scaler.metrics.memory_total - scaler.metrics.memory_free} / ${
-                scaler.metrics.memory_total
-              } ${t('gb')}`}
+              caption={`${Number((scaler.metrics.memory_total - scaler.metrics.memory_free).toFixed(1))} / ${Number(
+                scaler.metrics.memory_total.toFixed(1)
+              )} ${t('gb')}`}
               width="120px"
             />
           </div>
