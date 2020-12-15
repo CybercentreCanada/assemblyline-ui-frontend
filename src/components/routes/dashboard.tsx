@@ -731,7 +731,7 @@ const basicReducer = (state, newState) => {
 };
 
 const serviceReducer = (state, serviceState) => {
-  const { hbType, hb } = serviceState;
+  const { type: hbType, hb } = serviceState;
   const current = state[hb.service_name] || {};
   if (hbType === 'scaler') {
     const newState = {};
