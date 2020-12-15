@@ -959,7 +959,7 @@ const Dashboard = () => {
   const handleScalerHeartbeat = hb => {
     // eslint-disable-next-line no-console
     console.log('Socket-IO :: ScalerHeartbeat', hb);
-    setScaler({ ...hb, initialized: true });
+    setScaler({ ...hb.metrics, initialized: true });
   };
 
   const handleServiceHeartbeat = hb => {
