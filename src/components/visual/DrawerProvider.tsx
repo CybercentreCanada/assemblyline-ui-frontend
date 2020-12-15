@@ -2,6 +2,11 @@ import { Drawer, IconButton, makeStyles, useMediaQuery, useTheme } from '@materi
 import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
 import React, { useMemo, useState } from 'react';
 
+const XLWidth = '45vw';
+const LGWidth = '85%';
+const MDWidth = '85%';
+const SMWidth = '100%';
+
 const useStyles = makeStyles(theme => ({
   appMain: {
     height: '100%',
@@ -27,16 +32,16 @@ const useStyles = makeStyles(theme => ({
   },
   paper: {
     [theme.breakpoints.only('xl')]: {
-      width: '42vw'
+      width: XLWidth
     },
     [theme.breakpoints.only('lg')]: {
-      width: '960px'
+      width: LGWidth
     },
     [theme.breakpoints.only('md')]: {
-      width: '800px'
+      width: MDWidth
     },
     [theme.breakpoints.down('sm')]: {
-      width: '100vw'
+      width: SMWidth
     }
   }
 }));
@@ -62,7 +67,7 @@ function DrawerProvider(props: DrawerProviderProps) {
   const isLG = useMediaQuery(theme.breakpoints.only('lg'));
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
 
-  const drawerWidth = isXL ? '42vw' : isLG ? '960px' : isMD ? '800px' : '100vw';
+  const drawerWidth = isXL ? XLWidth : isLG ? LGWidth : isMD ? MDWidth : SMWidth;
   const closeGlobalDrawer = () => {
     setGlobalDrawer(null);
   };
@@ -114,8 +119,7 @@ function DrawerProvider(props: DrawerProviderProps) {
                 <div
                   style={{
                     paddingLeft: theme.spacing(2),
-                    paddingRight: theme.spacing(2),
-                    height: '100%'
+                    paddingRight: theme.spacing(2)
                   }}
                 >
                   {globalDrawer}
