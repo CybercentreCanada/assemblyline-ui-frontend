@@ -150,8 +150,8 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
               {item ? (
                 <div style={{ display: 'flex' }}>
                   <div style={{ flexGrow: 1 }}>
-                    <div>{`${item.verdict.malicious.length}x ${t('malicious')}`}</div>
-                    <div>{`${item.verdict.non_malicious.length}x ${t('non_malicious')}`}</div>
+                    <div>{`${item.verdict.malicious.length}x ${t('verdict.malicious')}`}</div>
+                    <div>{`${item.verdict.non_malicious.length}x ${t('verdict.non_malicious')}`}</div>
                   </div>
                   <div
                     style={{
