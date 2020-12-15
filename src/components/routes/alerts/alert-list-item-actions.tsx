@@ -158,7 +158,7 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
         >
           <SpeedDialAction
             icon={<BugReportOutlinedIcon />}
-            tooltipTitle={t(hasSetMalicious ? 'verdict.malicious.set' : 'verdict.malicious')}
+            tooltipTitle={t(hasSetMalicious ? 'verdict.malicious.set' : 'verdict.malicious.action')}
             tooltipPlacement={vertical ? 'left' : 'bottom'}
             FabProps={{
               style: {
@@ -173,7 +173,7 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
           />
           <SpeedDialAction
             icon={<VerifiedUserOutlinedIcon />}
-            tooltipTitle={t(hasSetNonMalicious ? 'verdict.non_malicious.set' : 'verdict.non_malicious')}
+            tooltipTitle={t(hasSetNonMalicious ? 'verdict.non_malicious.set' : 'verdict.non_malicious.action')}
             tooltipPlacement={vertical ? 'left' : 'bottom'}
             FabProps={{
               style: {
