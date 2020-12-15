@@ -15,7 +15,7 @@
   "file.size": "Taille",
   "file.ssdeep": "SSDEEP",
   "file.type": "Type",
-  "file.verdict": "Verdicte",
+  "file.verdict": "Verdict",
   "general": "Informations Générales",
   "heuristics": "Heuristiques",
   "implant": "Implant",
@@ -35,5 +35,5 @@
   "tag.table.type": "Type",
   "tag.table.value": "Valeur",
   "title": "Rapport de Soumission",
-  "user.verdict": "Verdicte des Utilisateurs"
+  "user.verdict": "Verdict des Utilisateurs"
 }
