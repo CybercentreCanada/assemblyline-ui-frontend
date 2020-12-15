@@ -244,7 +244,9 @@ const WrappedIngestCard = ({ ingester }) => {
               <span style={{ marginLeft: '8px' }}>
                 <SpeedOutlinedIcon className={classes.icon} />
                 {ingester.initialized ? (
-                  `${ingester.metrics.bytes_completed} / ${ingester.metrics.bytes_ingested} Mbps`
+                  `${(1.0 * ingester.metrics.bytes_completed) / ((1024 * 1024 * 60) / 8)} / ${
+                    (1.0 * ingester.metrics.bytes_ingested) / ((1024 * 1024 * 60) / 8)
+                  } Mbps`
                 ) : (
                   <Skeleton height="1.5rem" width="3rem" style={{ display: 'inline-block' }} />
                 )}
