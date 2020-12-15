@@ -50,6 +50,8 @@
   "label": "Étiquettes",
   "labels": "Étiquettes",
   "metadata": "Métadonnées",
+  "no_alerts_desc": "La requête actuelle en combinaison avec les filtres sélectionnés ne correspond à aucune alerte.",
+  "no_alerts_title": "Aucune alerte trouvée",
   "others": "Autres filtres",
   "owned_by": "Alerte appartenant à:",
   "ownership": "Propriétaire",
