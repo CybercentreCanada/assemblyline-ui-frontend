@@ -206,9 +206,8 @@ const Alerts: React.FC = () => {
                 display: 'flex',
                 alignItems: 'start',
                 position: 'sticky',
-                top: 0,
+                top: theme.spacing(1),
                 float: 'right',
-                paddingTop: theme.spacing(1),
                 marginTop: theme.spacing(-8),
                 marginRight: theme.spacing(-1),
                 height: theme.spacing(8)
