@@ -655,9 +655,9 @@ const WrappedScalerResourcesCard = ({ scaler }) => {
                   : ((scaler.metrics.memory_total - scaler.metrics.memory_free) / scaler.metrics.memory_total) * 100
               }
               title={t('ram')}
-              caption={`${Number((scaler.metrics.memory_total - scaler.metrics.memory_free).toFixed(1))} / ${Number(
-                scaler.metrics.memory_total.toFixed(1)
-              )} ${t('gb')}`}
+              caption={`${Number(
+                ((scaler.metrics.memory_total - scaler.metrics.memory_free) / 1024).toFixed(1)
+              )} / ${Number((scaler.metrics.memory_total / 1024).toFixed(1))} ${t('gb')}`}
               width="120px"
             />
           </div>
