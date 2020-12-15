@@ -2,6 +2,7 @@ import { Box, Drawer, IconButton, makeStyles, Typography, useMediaQuery, useThem
 import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import StarIcon from '@material-ui/icons/Star';
+import { AlertTitle } from '@material-ui/lab';
 import ListCarousel from 'commons/addons/elements/lists/carousel/ListCarousel';
 import ListNavigator from 'commons/addons/elements/lists/navigator/ListNavigator';
 import SimpleList from 'commons/addons/elements/lists/simplelist/SimpleList';
@@ -9,6 +10,7 @@ import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import useAppContext from 'components/hooks/useAppContext';
 import useDrawer from 'components/hooks/useDrawer';
+import InformativeAlert from 'components/visual/InformativeAlert';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import SearchQuery, { SearchQueryFilters } from 'components/visual/SearchBar/search-query';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -443,6 +445,14 @@ const Alerts: React.FC = () => {
         scrollTargetId="app-scrollct"
         loading={loading}
         items={alerts}
+        emptyValue={
+          <div style={{ width: '100%' }}>
+            <InformativeAlert>
+              <AlertTitle>{t('no_alerts_title')}</AlertTitle>
+              {t('no_alerts_desc')}
+            </InformativeAlert>
+          </div>
+        }
         onItemSelected={onItemSelected}
         onRenderActions={onRenderListActions}
         onLoadNext={_onLoadMore}
