@@ -101,5 +101,6 @@
   "workflow.impact.low": "The workflow action will only affect the currently selected alert which matches the following filters:",
   "workflow.title": "Perform a workflow action",
   "workflow_action": "Perform a workflow action",
+  "workflows": "Workflow actions",
   "yara": "Yara rules triggered"
 }
