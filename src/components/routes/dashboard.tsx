@@ -699,7 +699,7 @@ const WrappedServiceCard = ({ service, max_inflight }) => {
             </Tooltip>
           )}
           <div className={classes.title}>
-            {`${service.service_name} :: ${service.instances} / ${service.total || '-'}`}
+            {`${service.service_name} :: ${service.instances} / ${service.scaler.target || '-'}`}
           </div>
         </Grid>
         <Grid item xs={6}>
