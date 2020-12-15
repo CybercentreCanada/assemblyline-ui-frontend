@@ -98,7 +98,7 @@ const WrappedIngestCard = ({ ingester }) => {
       setError(t('ingest.error.bytes'));
     } else if (ingester.ingest > 100000) {
       setError(t('ingest.error.queue'));
-    } else if ((timer !== null && ingester.initialized) || (timer === null && !ingester.initilized)) {
+    } else if ((timer !== null && ingester.initialized) || (timer === null && !ingester.initialized)) {
       if (error !== null) setError(null);
       if (timer !== null) clearTimeout(timer);
       setTimer(
@@ -270,7 +270,7 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
       setError(t('dispatcher.error.queue'));
     } else if (dispatcher.inflight.outstanding / dispatcher.inflight.max > 0.9) {
       setError(t('dispatcher.error.inflight'));
-    } else if ((timer !== null && dispatcher.initialized) || (timer === null && !dispatcher.initilized)) {
+    } else if ((timer !== null && dispatcher.initialized) || (timer === null && !dispatcher.initialized)) {
       if (error !== null) setError(null);
       if (timer !== null) clearTimeout(timer);
       setTimer(
@@ -373,7 +373,7 @@ const WrappedExpiryCard = ({ expiry }) => {
   const classes = useStyles();
 
   useEffect(() => {
-    if ((timer !== null && expiry.initialized) || (timer === null && !expiry.initilized)) {
+    if ((timer !== null && expiry.initialized) || (timer === null && !expiry.initialized)) {
       if (error !== null) setError(null);
       if (timer !== null) clearTimeout(timer);
       setTimer(
@@ -524,7 +524,7 @@ const WrappedAlerterCard = ({ alerter }) => {
   useEffect(() => {
     if (alerter.metrics.error > 0) {
       setError(t('alerter.error'));
-    } else if ((timer !== null && alerter.initialized) || (timer === null && !alerter.initilized)) {
+    } else if ((timer !== null && alerter.initialized) || (timer === null && !alerter.initialized)) {
       if (error !== null) setError(null);
       if (timer !== null) clearTimeout(timer);
       setTimer(
@@ -605,7 +605,7 @@ const WrappedScalerResourcesCard = ({ scaler }) => {
   const classes = useStyles();
 
   useEffect(() => {
-    if ((timer !== null && scaler.initialized) || (timer === null && !scaler.initilized)) {
+    if ((timer !== null && scaler.initialized) || (timer === null && !scaler.initialized)) {
       if (error !== null) setError(null);
       if (timer !== null) clearTimeout(timer);
       setTimer(
@@ -633,7 +633,7 @@ const WrappedScalerResourcesCard = ({ scaler }) => {
         <Grid item xs={6} style={{ textAlign: 'center' }}>
           <div style={{ display: 'inline-block' }}>
             <ArcGauge
-              initialized={scaler.initilized}
+              initialized={scaler ? scaler.initialized : false}
               pctValue={
                 scaler.metrics.cpu_total === 0
                   ? 0
@@ -650,7 +650,7 @@ const WrappedScalerResourcesCard = ({ scaler }) => {
         <Grid item xs={6} style={{ textAlign: 'center' }}>
           <div style={{ display: 'inline-block' }}>
             <ArcGauge
-              initialized={scaler.initilized}
+              initialized={scaler ? scaler.initialized : false}
               pctValue={
                 scaler.metrics.memory_total === 0
                   ? 0
