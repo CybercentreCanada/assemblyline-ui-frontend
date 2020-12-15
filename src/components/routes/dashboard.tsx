@@ -633,9 +633,15 @@ const WrappedScalerResourcesCard = ({ scaler }) => {
         <Grid item xs={6} style={{ textAlign: 'center' }}>
           <div style={{ display: 'inline-block' }}>
             <ArcGauge
-              pctValue={scaler.cpu_total === 0 ? 0 : ((scaler.cpu_total - scaler.cpu_free) / scaler.cpu_total) * 100}
+              pctValue={
+                scaler.metrics.cpu_total === 0
+                  ? 0
+                  : ((scaler.metrics.cpu_total - scaler.metrics.cpu_free) / scaler.metrics.cpu_total) * 100
+              }
               title={t('cpu')}
-              caption={`${scaler.cpu_total - scaler.cpu_free} / ${scaler.cpu_total} ${t('cores')}`}
+              caption={`${scaler.metrics.cpu_total - scaler.metrics.cpu_free} / ${scaler.metrics.cpu_total} ${t(
+                'cores'
+              )}`}
               width="120px"
             />
           </div>
@@ -644,10 +650,14 @@ const WrappedScalerResourcesCard = ({ scaler }) => {
           <div style={{ display: 'inline-block' }}>
             <ArcGauge
               pctValue={
-                scaler.memory_total === 0 ? 0 : ((scaler.memory_total - scaler.memory_free) / scaler.memory_total) * 100
+                scaler.metrics.memory_total === 0
+                  ? 0
+                  : ((scaler.metrics.memory_total - scaler.metrics.memory_free) / scaler.metrics.memory_total) * 100
               }
               title={t('ram')}
-              caption={`${scaler.memory_total - scaler.memory_free} / ${scaler.memory_total} ${t('gb')}`}
+              caption={`${scaler.metrics.memory_total - scaler.metrics.memory_free} / ${
+                scaler.metrics.memory_total
+              } ${t('gb')}`}
               width="120px"
             />
           </div>
@@ -869,10 +879,13 @@ const DEFAULT_INGESTER = {
 };
 
 const DEFAULT_SCALER = {
-  memory_total: 0,
-  memory_free: 0,
-  cpu_total: 0,
-  cpu_free: 0,
+  instances: 0,
+  metrics: {
+    memory_total: 0,
+    memory_free: 0,
+    cpu_total: 0,
+    cpu_free: 0
+  },
   error: null,
   initialized: false
 };
@@ -959,7 +972,7 @@ const Dashboard = () => {
   const handleScalerHeartbeat = hb => {
     // eslint-disable-next-line no-console
     console.log('Socket-IO :: ScalerHeartbeat', hb);
-    setScaler({ ...hb.metrics, initialized: true });
+    setScaler({ ...hb, initialized: true });
   };
 
   const handleServiceHeartbeat = hb => {
