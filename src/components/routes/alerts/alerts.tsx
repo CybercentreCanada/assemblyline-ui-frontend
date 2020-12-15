@@ -192,9 +192,7 @@ const Alerts: React.FC = () => {
   // Handler for when an item of the InfiniteList is selected
   const onItemSelected = useCallback(
     (item: AlertItem, index: number) => {
-      if (item === null) {
-        setGlobalDrawer(null);
-      } else {
+      if (item !== null && item !== undefined) {
         if (isLGDown) {
           // Unfocus the simple list so the drawer does not try to refocus it when closing...
           document.getElementById(ALERT_SIMPLELIST_ID).blur();
