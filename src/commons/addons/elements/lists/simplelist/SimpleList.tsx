@@ -19,6 +19,7 @@ interface SimpleListProps {
   scrollLoadNextThreshold?: number;
   scrollTargetId?: string;
   noDivider?: boolean;
+  emptyValue?: React.ReactNode;
   items: LineItem[];
   children: (item: LineItem) => React.ReactNode;
   onCursorChange?: (item: LineItem, cursor?: number) => void;
@@ -39,6 +40,7 @@ const SimpleList: React.FC<SimpleListProps> = ({
   disableBackgrounds,
   noDivider,
   children,
+  emptyValue,
   onCursorChange,
   onItemSelected,
   onRenderActions,
@@ -160,20 +162,26 @@ const SimpleList: React.FC<SimpleListProps> = ({
         </div>
       )}
       <div ref={innerEL} className={classes.inner}>
-        {items.map((item, index) => (
-          <ListItemBase
-            key={`list.rowitem[${index}]`}
-            index={index}
-            selected={cursor === index}
-            item={item}
-            disableBackgrounds={disableBackgrounds}
-            noDivider={noDivider}
-            onRenderActions={onRenderActions}
-            onClick={_onRowClick}
-          >
-            {children}
-          </ListItemBase>
-        ))}
+        {items && items.length !== 0
+          ? items.map((item, index) => {
+              return (
+                <ListItemBase
+                  key={`list.rowitem[${index}]`}
+                  index={index}
+                  selected={cursor === index}
+                  item={item}
+                  disableBackgrounds={disableBackgrounds}
+                  noDivider={noDivider}
+                  onRenderActions={onRenderActions}
+                  onClick={_onRowClick}
+                >
+                  {children}
+                </ListItemBase>
+              );
+            })
+          : !loading
+          ? emptyValue
+          : null}
       </div>
     </div>
   );
