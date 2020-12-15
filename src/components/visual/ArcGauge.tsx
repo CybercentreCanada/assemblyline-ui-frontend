@@ -84,7 +84,7 @@ const ArcGauge: React.FC<ArcGaugeProps> = ({
       {title && <div className={classes.title}>{title}</div>}
       <div className={classes.outer} style={{ fontSize, lineHeight: fontSize, width }}>
         {initialized ? (
-          <span className={classes.text}>{`${pctValue}%`}</span>
+          <span className={classes.text}>{`${Number(pctValue).toFixed(0)}%`}</span>
         ) : (
           <span className={classes.text}>
             <Skeleton variant="rect" width="2rem" style={{ borderRadius: '4px', display: 'inline-block' }} />
