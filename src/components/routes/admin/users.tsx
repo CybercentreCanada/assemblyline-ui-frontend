@@ -394,18 +394,17 @@ export default function Users() {
                 props: {
                   onClick: () => {
                     query.set('query', 'type:admin');
-                    history.push(`${location.pathname}?${query.toString()}`);
+                    history.push(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
               },
-
               {
                 icon: <BlockIcon fontSize={upMD ? 'default' : 'small'} />,
                 tooltip: t('disabled'),
                 props: {
                   onClick: () => {
                     query.set('query', 'is_active:false');
-                    history.push(`${location.pathname}?${query.toString()}`);
+                    history.push(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
               }

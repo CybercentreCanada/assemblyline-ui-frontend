@@ -246,7 +246,7 @@ function Search({ index }: SearchProps) {
                 props: {
                   onClick: () => {
                     query.set('use_archive', query.get('use_archive') === 'false');
-                    history.push(`${location.pathname}?${query.toString()}${location.hash}`);
+                    history.push(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
                   }
                 }
               }
