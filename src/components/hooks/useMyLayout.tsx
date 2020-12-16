@@ -4,6 +4,7 @@ import AccountTreeOutlinedIcon from '@material-ui/icons/AccountTreeOutlined';
 import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
 import AssignmentOutlinedIcon from '@material-ui/icons/AssignmentOutlined';
 import BuildOutlinedIcon from '@material-ui/icons/BuildOutlined';
+import CancelPresentationIcon from '@material-ui/icons/CancelPresentation';
 import CodeOutlinedIcon from '@material-ui/icons/CodeOutlined';
 import DashboardOutlinedIcon from '@material-ui/icons/DashboardOutlined';
 import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
@@ -233,6 +234,11 @@ const useMyLayout = (): AppLayoutProps => {
       name: t('usermenu.settings'),
       route: '/settings',
       icon: <SettingsOutlinedIcon />
+    },
+    {
+      name: t('usermenu.optout'),
+      route: '/optout',
+      icon: <CancelPresentationIcon />
     },
     {
       name: t('usermenu.logout'),

@@ -44,7 +44,7 @@ export default function useMyAPI() {
         'Content-Type': 'application/json',
         'X-XSRF-TOKEN': getXSRFCookie()
       },
-      body: body ? JSON.stringify(body) : null
+      body: body !== null ? JSON.stringify(body) : null
     };
 
     // Run enter callback

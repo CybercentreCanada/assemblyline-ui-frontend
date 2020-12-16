@@ -216,9 +216,15 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
                         variant="contained"
                         color="primary"
                         disabled={buttonLoading}
-                        onClick={() =>
-                          localStorage.setItem('nextLocation', `${location.pathname}${location.search}${location.hash}`)
-                        }
+                        onClick={() => {
+                          const date = new Date();
+                          date.setTime(date.getTime() + 5 * 60 * 1000);
+                          document.cookie = `ui4_path=${process.env.PUBLIC_URL}; expires=${date.toUTCString()}; path=/`;
+                          localStorage.setItem(
+                            'nextLocation',
+                            `${location.pathname}${location.search}${location.hash}`
+                          );
+                        }}
                         href={`/api/v4/auth/login/?oauth_provider=${item}`}
                       >
                         {`${t('button_oauth')} ${item}`}
