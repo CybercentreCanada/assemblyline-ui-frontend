@@ -1,8 +1,8 @@
-import { Card, CardHeader, Chip, Grid, Typography, useTheme } from '@material-ui/core';
-import red from '@material-ui/core/colors/red';
+import { Card, CardHeader, Grid, Typography, useTheme } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import useMyAPI from 'components/hooks/useMyAPI';
+import CustomChip from 'components/visual/CustomChip';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -11,7 +11,6 @@ function ServiceCard({ service }) {
   const theme = useTheme();
   const isDark = theme.palette.type === 'dark';
   const minCardHeight = '240px';
-  const darkBCRed = '#543838';
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
 
@@ -19,7 +18,10 @@ function ServiceCard({ service }) {
     <Card
       style={{
         minHeight: minCardHeight,
-        backgroundColor: service.enabled ? null : isDark ? darkBCRed : red[50]
+        backgroundColor: service.enabled ? null : isDark ? '#ff000017' : '#FFE4E4',
+        border: `solid 1px ${
+          service.enabled ? theme.palette.divider : isDark ? theme.palette.error.light : theme.palette.error.dark
+        }`
       }}
     >
       <CardHeader
@@ -28,13 +30,7 @@ function ServiceCard({ service }) {
         action={
           service.enabled ? null : (
             <div style={{ padding: sp2 }}>
-              <Chip
-                style={{
-                  backgroundColor: isDark ? theme.palette.error.dark : theme.palette.error.light,
-                  color: theme.palette.common.white
-                }}
-                label={t('disabled')}
-              />
+              <CustomChip type="rounded" variant="outlined" size="small" color="error" label={t('disabled')} />
             </div>
           )
         }
@@ -44,38 +40,30 @@ function ServiceCard({ service }) {
         <div style={{ minHeight: '110px', whiteSpace: 'pre-wrap', paddingBottom: theme.spacing(1) }}>
           {service.description}
         </div>
-        <Grid container>
+        <Grid container spacing={1}>
           <Grid item xs={12} sm={6}>
-            <div style={{ display: 'flex', flexDirection: 'row' }}>
-              <Typography variant="subtitle2">{t('accepts')}:&nbsp;&nbsp;</Typography>
-              <div style={{ alignSelf: 'center' }}>
-                <Typography variant="body2">{service.accepts}</Typography>
-              </div>
-            </div>
+            <label style={{ fontWeight: 500 }}>{t('accepts')}:&nbsp;&nbsp;</label>
+            <Typography variant="caption" style={{ overflowWrap: 'anywhere', display: 'inline-block' }}>
+              {service.accepts}
+            </Typography>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <div style={{ display: 'flex', flexDirection: 'row' }}>
-              <Typography variant="subtitle2">{t('rejects')}:&nbsp;&nbsp;</Typography>
-              <div style={{ alignSelf: 'center' }}>
-                <Typography variant="body2">{service.rejects}</Typography>
-              </div>
-            </div>
+            <label style={{ fontWeight: 500 }}>{t('rejects')}:&nbsp;&nbsp;</label>
+            <Typography variant="caption" style={{ overflowWrap: 'anywhere', display: 'inline-block' }}>
+              {service.rejects}
+            </Typography>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <div style={{ display: 'flex', flexDirection: 'row' }}>
-              <Typography variant="subtitle2">{t('category')}:&nbsp;&nbsp;</Typography>
-              <div style={{ alignSelf: 'center' }}>
-                <Typography variant="body2">{service.category}</Typography>
-              </div>
-            </div>
+            <label style={{ fontWeight: 500 }}>{t('category')}:&nbsp;&nbsp;</label>
+            <Typography variant="caption" style={{ overflowWrap: 'anywhere', display: 'inline-block' }}>
+              {service.category}
+            </Typography>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <div style={{ display: 'flex', flexDirection: 'row' }}>
-              <Typography variant="subtitle2">{t('stage')}:&nbsp;&nbsp;</Typography>
-              <div style={{ alignSelf: 'center' }}>
-                <Typography variant="body2">{service.stage}</Typography>
-              </div>
-            </div>
+            <label style={{ fontWeight: 500 }}>{t('stage')}:&nbsp;&nbsp;</label>
+            <Typography variant="caption" style={{ overflowWrap: 'anywhere', display: 'inline-block' }}>
+              {service.stage}
+            </Typography>
           </Grid>
         </Grid>
       </div>
@@ -108,7 +96,7 @@ export default function Services() {
       {services ? (
         <Grid container spacing={2}>
           {services.map((s, i) => (
-            <Grid key={i} item xs={12} md={6} lg={4} xl={3}>
+            <Grid key={i} item xs={12} md={6} xl={4}>
               <ServiceCard service={s} />
             </Grid>
           ))}
@@ -116,7 +104,7 @@ export default function Services() {
       ) : (
         <Grid container spacing={2}>
           {[...Array(8)].map((_, i) => (
-            <Grid key={i} item xs={12} md={6} lg={4} xl={3}>
+            <Grid key={i} item xs={12} md={6} xl={4}>
               <Skeleton variant="rect" style={{ height: minCardHeight }} />
             </Grid>
           ))}
