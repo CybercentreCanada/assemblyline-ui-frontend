@@ -38,6 +38,7 @@ import AlertDetails from './alerts/alert-details';
 import HeuristicDetail from './manage/heuristic_detail';
 import SignatureDetail from './manage/signature_detail';
 import WorkflowDetail from './manage/workflow_detail';
+import Optout from './optout';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -92,6 +93,7 @@ const WrappedRoutes = () => {
         <Route exact path="/manage/workflow/:id" component={WorkflowDetail} />
         <Route exact path="/manage/workflows" component={ManageWorkflows} />
         <Route exact path="/manage" component={Manage} />
+        <Route exact path="/optout" component={Optout} />
         <Route exact path="/search" component={Search} />
         <Route exact path="/search/:id" component={Search} />
         <Route exact path="/settings" component={Settings} />
