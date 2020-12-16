@@ -18,7 +18,7 @@ function Logout() {
       url: '/api/v4/auth/logout/',
       onSuccess: () => {
         setTimeout(() => {
-          window.location.replace('/');
+          window.location.replace(`${process.env.PUBLIC_URL}/`);
         }, 500);
       }
     });
