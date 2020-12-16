@@ -254,7 +254,7 @@ export default function ErrorViewer() {
                 props: {
                   onClick: () => {
                     query.set('query', 'type:EXCEPTION OR type:UNKNOWN');
-                    history.push(`${location.pathname}?${query.toString()}`);
+                    history.push(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
               },
@@ -264,7 +264,7 @@ export default function ErrorViewer() {
                 props: {
                   onClick: () => {
                     query.set('query', 'type:SERVICE* OR type:TASK*');
-                    history.push(`${location.pathname}?${query.toString()}`);
+                    history.push(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
               },
@@ -274,7 +274,7 @@ export default function ErrorViewer() {
                 props: {
                   onClick: () => {
                     query.set('query', 'type:MAX*');
-                    history.push(`${location.pathname}?${query.toString()}`);
+                    history.push(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
               }

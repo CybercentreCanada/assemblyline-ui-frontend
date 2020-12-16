@@ -186,7 +186,7 @@ export default function Workflows() {
                 props: {
                   onClick: () => {
                     query.set('query', 'hit_count:0');
-                    history.push(`${location.pathname}?${query.toString()}`);
+                    history.push(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
               },
@@ -196,7 +196,7 @@ export default function Workflows() {
                 props: {
                   onClick: () => {
                     query.set('query', 'last_seen:[* TO now-3m]');
-                    history.push(`${location.pathname}?${query.toString()}`);
+                    history.push(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
               }

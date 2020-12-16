@@ -200,7 +200,7 @@ export default function Signatures() {
                       props: {
                         onClick: () => {
                           query.set('query', 'status:NOISY');
-                          history.push(`${location.pathname}?${query.toString()}`);
+                          history.push(`${location.pathname}?${query.getDeltaString()}`);
                         }
                       }
                     },
@@ -211,7 +211,7 @@ export default function Signatures() {
                       props: {
                         onClick: () => {
                           query.set('query', 'status:DISABLED');
-                          history.push(`${location.pathname}?${query.toString()}`);
+                          history.push(`${location.pathname}?${query.getDeltaString()}`);
                         }
                       }
                     }
