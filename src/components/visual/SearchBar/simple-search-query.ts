@@ -12,6 +12,16 @@ export default class SimpleSearchQuery {
     return this.defaultParams.toString();
   }
 
+  public getDeltaString() {
+    const deltaParams = new URLSearchParams();
+    this.params.forEach((value, key) => {
+      if (this.defaultParams.get(key) !== value) {
+        deltaParams.append(key, value);
+      }
+    });
+    return deltaParams.toString();
+  }
+
   public getParams() {
     const output = {};
     this.defaultParams.forEach((value, key) => {
