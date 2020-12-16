@@ -1,5 +1,7 @@
 import { makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
+import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn';
+import BugReportIcon from '@material-ui/icons/BugReport';
 import PersonIcon from '@material-ui/icons/Person';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
@@ -117,7 +119,27 @@ export default function Submissions() {
                 props: {
                   onClick: () => {
                     query.set('query', `params.submitter:"${currentUser.username}"`);
-                    history.push(`${location.pathname}?${query.toString()}`);
+                    history.push(`${location.pathname}?${query.getDeltaString()}`);
+                  }
+                }
+              },
+              {
+                icon: <AssignmentTurnedInIcon fontSize={upMD ? 'default' : 'small'} />,
+                tooltip: t('completed_submissions'),
+                props: {
+                  onClick: () => {
+                    query.set('query', 'state:completed');
+                    history.push(`${location.pathname}?${query.getDeltaString()}`);
+                  }
+                }
+              },
+              {
+                icon: <BugReportIcon fontSize={upMD ? 'default' : 'small'} />,
+                tooltip: t('malicious_submissions'),
+                props: {
+                  onClick: () => {
+                    query.set('query', 'max_score:>1000');
+                    history.push(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
               }
