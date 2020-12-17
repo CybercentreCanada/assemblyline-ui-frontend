@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import { Box, makeStyles, TextField, Typography, useMediaQuery, useTheme } from '@material-ui/core';
+import { Box, makeStyles, TextField, useMediaQuery, useTheme } from '@material-ui/core';
 import { insertText } from 'commons/addons/elements/utils/browser';
 import {
   isArrowDown,
@@ -12,40 +12,36 @@ import {
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+export const DEFAULT_SUGGESTION = ['OR', 'AND', 'NOT', 'TO', 'now', 'd', 'M', 'y', 'h', 'm'];
+
 const useStyles = makeStyles(theme => ({
   searchTextFieldOptionsCt: {
     textAlign: 'left',
     position: 'relative',
     height: 0,
-    outline: 'none'
+    outline: 'none',
+    borderRadius: '0 0 4px 4px'
   },
   searchTextFieldOptionsInner: {
     display: 'inline-block',
     position: 'absolute',
     overflow: 'auto',
     zIndex: 1,
-    top: 0,
-    minWidth: 400,
+    top: theme.spacing(1),
+    minWidth: '100%',
     maxHeight: 250,
-    backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 10%)' : 'hsl(0, 0%, 95%)',
-    boxShadow: theme.shadows[4]
-  },
-  serachTextFieldOptionsInnerSpacer: {
-    display: 'inline-block',
-    height: 0,
-    lineHeight: 0,
-    overflow: 'hidden',
-    whiteSpace: 'pre'
+    backgroundColor: theme.palette.background.default,
+    boxShadow: theme.shadows[4],
+    borderRadius: '0 0 4px 4px'
   },
   searchTextFieldItem: {
     padding: theme.spacing(1),
-    color: theme.palette.primary.light,
     '&:hover': {
       cursor: 'pointer',
-      backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 17%)' : 'hsl(0, 0%, 90%)'
+      backgroundColor: theme.palette.action.hover
     },
     '&[data-searchtextfieldoption-selected="true"]': {
-      backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 15%)' : 'hsl(0, 0%, 92%)'
+      backgroundColor: theme.palette.action.selected
     }
   }
 }));
@@ -73,8 +69,7 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
 }) => {
   const theme = useTheme();
   const classes = useStyles();
-  const [cursor, setCursor] = useState<number>(0);
-  const [precursor, setPrecursor] = useState<string>('');
+  const [cursor, setCursor] = useState<number>(-1);
   const [filteredOptions, setFilteredOptions] = useState<{ start: number; end: number; items: string[] }>({
     start: 0,
     end: 0,
@@ -96,7 +91,7 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
 
   // Automatically close the options box with losing focus.
   const _onBlur = () => {
-    setOpen(false);
+    // setOpen(false);
   };
 
   // Handler for when the value of the text input changes.
@@ -112,10 +107,11 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
 
     if (isEnter(keyCode)) {
       // key[ENTER ]: handler
-      if (open) {
+      if (open && cursor !== -1) {
         onOptionSelection(filteredOptions.start, filteredOptions.end, filteredOptions.items[cursor]);
       } else {
         onSearch(value);
+        if (open) onOptionsClose();
       }
     } else if (isEscape(keyCode)) {
       // key[ESCAPE]: handler
@@ -148,19 +144,20 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
     } else if (isArrowRight(keyCode)) {
       // key[ARROW_RIGHT]: handler
       filterOptions(value, 1);
+    } else if (!open) {
+      onOptionsOpen();
     }
   };
 
   // Handler for when the options box opens.
   const onOptionsOpen = () => {
-    setPrecursor(parseFilter(value).precursor);
     setOpen(true);
   };
 
   // Handler for when the options box closes.
   const onOptionsClose = () => {
     setOpen(false);
-    setCursor(0);
+    setCursor(-1);
     getInputEl().focus();
   };
 
@@ -168,7 +165,7 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
   const onOptionSelection = (startIndex: number, endIndex: number, option: string) => {
     if (option) {
       const inputEl = getInputEl();
-      insertText(inputEl, startIndex, endIndex + 1, option);
+      insertText(inputEl, startIndex, endIndex + 1, `${option}${DEFAULT_SUGGESTION.indexOf(option) === -1 ? ':' : ''}`);
       onOptionsClose();
       onChange(inputEl.value);
       if (onSelection) {
@@ -195,8 +192,7 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
       value: filterValue,
       cursor: thisCursor,
       startIndex: insertStartIndex,
-      endIndex: insertEndIndex,
-      precursor: _precursor
+      endIndex: insertEndIndex
     } = parseFilter(inputValue, selectionOffset);
 
     // Filter options.
@@ -204,9 +200,6 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
       filterValue.length > 0
         ? options.filter(option => option.toLowerCase().includes(filterValue.toLowerCase()))
         : options;
-
-    // Update states...
-    setPrecursor(_precursor);
 
     // If filtered options is empty, then we return all options..
     setFilteredOptions({
@@ -224,7 +217,7 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
   const parseFilter = (
     inputValue: string,
     offset = 0
-  ): { value: string; cursor: number; startIndex: number; endIndex: number; precursor: string; postcursor: string } => {
+  ): { value: string; cursor: number; startIndex: number; endIndex: number } => {
     // With left/right arrow keys, the cursor isn't yet updated to new position
     //  when the event is received, therefore we use offset.
     //  +1 for right arrow, -1 for left arrow.
@@ -269,9 +262,7 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
       value: _prePartsLast,
       cursor: thisCursor,
       startIndex: filterStartIndex,
-      endIndex: filterEndIndex,
-      precursor: _precursor,
-      postcursor: _postcursor
+      endIndex: filterEndIndex
     };
   };
 
@@ -291,9 +282,6 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
       />
       {open && isLTEMedium ? (
         <div ref={optionsElement} className={classes.searchTextFieldOptionsCt}>
-          <div className={classes.serachTextFieldOptionsInnerSpacer}>
-            <Typography>{precursor}</Typography>
-          </div>
           <div className={classes.searchTextFieldOptionsInner}>
             {filteredOptions.items.map((item, index) => (
               <SearchTextOption
