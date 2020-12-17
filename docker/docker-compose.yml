@@ -93,20 +93,23 @@ services:
       elasticsearch:
         condition: service_healthy
 
-  # Hearbeat manager
-  al_heartbeat:
-    image: cccs/assemblyline-core
-    volumes:
-      - ./config.yml:/etc/assemblyline/config.yml:ro
-      - ./classification.yml:/etc/assemblyline/classification.yml:ro
-    command: python -m assemblyline_core.metrics.run_heartbeat_manager
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-
   # # #####################################
   # # Test Components
+  # # (Only to receive heartbeat
+  # #  message for the dashboard)
   # # #####################################
+
+  # Hearbeat manager
+  # al_heartbeat:
+  #   image: cccs/assemblyline-core
+  #   volumes:
+  #     - ./config.yml:/etc/assemblyline/config.yml:ro
+  #     - ./classification.yml:/etc/assemblyline/classification.yml:ro
+  #   command: python -m assemblyline_core.metrics.run_heartbeat_manager
+  #   depends_on:
+  #     elasticsearch:
+  #       condition: service_healthy
+
   # al_alerter:
   #   image: cccs/assemblyline-core
   #   volumes:

@@ -39,3 +39,4 @@ ui:
   email: dev@<YOUR_IP>.nip.io
   enforce_quota: false
   fqdn: <YOUR_IP>.nip.io
+  ui4_path: /next/
