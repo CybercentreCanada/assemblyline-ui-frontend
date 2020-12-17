@@ -13,6 +13,7 @@ import useDrawer from 'components/hooks/useDrawer';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import SearchQuery, { SearchQueryFilters } from 'components/visual/SearchBar/search-query';
+import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
@@ -262,8 +263,7 @@ const Alerts: React.FC = () => {
   // The SearchBar contentassist suggesions.
   const buildSearchSuggestions = () => {
     const _fields = fields.map(f => f.name);
-    const words = ['OR', 'AND', 'NOT', 'TO', 'now', 'd', 'M', 'y', 'h', 'm'];
-    return [..._fields, ...words];
+    return [..._fields, ...DEFAULT_SUGGESTION];
   };
 
   // Handler/callback for when clicking the 'Add' btn on the AlertsFavorite component.
