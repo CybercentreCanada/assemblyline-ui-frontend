@@ -10,6 +10,7 @@ import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import SearchBar from 'components/visual/SearchBar/search-bar';
+import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
 import ErrorsTable from 'components/visual/SearchResult/errors';
@@ -21,7 +22,6 @@ import Moment from 'react-moment';
 import { Redirect, useHistory, useLocation } from 'react-router-dom';
 
 const PAGE_SIZE = 25;
-const DEFAULT_SUGGESTION = ['OR', 'AND', 'NOT', 'TO', 'now', 'd', 'M', 'y', 'h', 'm'];
 
 const useStyles = makeStyles(theme => ({
   searchresult: {

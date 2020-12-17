@@ -24,6 +24,7 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
 import SearchBar from 'components/visual/SearchBar/search-bar';
+import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
 import UsersTable from 'components/visual/SearchResult/users';
@@ -34,7 +35,6 @@ import { useTranslation } from 'react-i18next';
 import { Redirect, useHistory, useLocation } from 'react-router-dom';
 
 const PAGE_SIZE = 25;
-const DEFAULT_SUGGESTION = ['OR', 'AND', 'NOT', 'TO', 'now', 'd', 'M', 'y', 'h', 'm'];
 const DEFAULT_USER = {
   avatar: null,
   groups: ['USERS'],

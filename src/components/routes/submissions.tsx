@@ -8,6 +8,7 @@ import PageHeader from 'commons/components/layout/pages/PageHeader';
 import useAppContext from 'components/hooks/useAppContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import SearchBar from 'components/visual/SearchBar/search-bar';
+import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
 import SubmissionsTable, { SubmissionResult } from 'components/visual/SearchResult/submissions';
@@ -17,7 +18,6 @@ import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
 
 const PAGE_SIZE = 25;
-const DEFAULT_SUGGESTION = ['OR', 'AND', 'NOT', 'TO', 'now', 'd', 'M', 'y', 'h', 'm'];
 
 const useStyles = makeStyles(theme => ({
   searchresult: {
