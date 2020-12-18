@@ -15,17 +15,29 @@ import {
   withStyles
 } from '@material-ui/core';
 import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
-import { Skeleton } from '@material-ui/lab';
+import { Autocomplete, Skeleton } from '@material-ui/lab';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useAppContext from 'components/hooks/useAppContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
-import ChipInput from 'material-ui-chip-input';
+import 'moment/locale/fr';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import Moment from 'react-moment';
 import { useHistory, useParams } from 'react-router-dom';
+
+const DEFAULT_LABELS = [
+  'PHISHING',
+  'CRIME',
+  'ATTRIBUTED',
+  'WHITELISTED',
+  'FALSE_POSITIVE',
+  'REPORTED',
+  'MITIGATED',
+  'PENDING'
+];
 
 export type Workflow = {
   classification: string;
@@ -71,7 +83,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
-  const { t } = useTranslation(['manageWorkflowDetail']);
+  const { t, i18n } = useTranslation(['manageWorkflowDetail']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
   const [workflow, setWorkflow] = useState<Workflow>(null);
@@ -125,7 +137,7 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
 
   const handleLabelsChange = labels => {
     setModified(true);
-    setWorkflow({ ...workflow, labels });
+    setWorkflow({ ...workflow, labels: labels.map(label => label.toUpperCase()) });
   };
 
   const handlePriorityChange = event => {
@@ -261,12 +273,14 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
           <Grid item xs={12}>
             <Typography variant="subtitle2">{t('labels')}</Typography>
             {workflow ? (
-              <ChipInput
-                style={{ display: 'block' }}
-                margin="dense"
-                defaultValue={workflow.labels}
-                onChange={handleLabelsChange}
-                variant="outlined"
+              <Autocomplete
+                fullWidth
+                multiple
+                freeSolo
+                options={DEFAULT_LABELS}
+                value={workflow.labels}
+                renderInput={params => <TextField {...params} variant="outlined" />}
+                onChange={(event, value) => handleLabelsChange(value as string[])}
               />
             ) : (
               <Skeleton style={{ height: '2.5rem' }} />
@@ -314,6 +328,28 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
             )}
           </Grid>
         </Grid>
+        <div style={{ textAlign: 'center', paddingTop: theme.spacing(3) }}>
+          {workflow ? (
+            <Typography variant="subtitle2" color="textSecondary">
+              {`${t('created_by')} ${workflow.creator} `}
+              <Moment fromNow locale={i18n.language}>
+                {workflow.creation_date}
+              </Moment>
+            </Typography>
+          ) : (
+            <Skeleton />
+          )}
+          {workflow ? (
+            <Typography variant="subtitle2" color="textSecondary">
+              {`${t('edited_by')} ${workflow.edited_by} `}
+              <Moment fromNow locale={i18n.language}>
+                {workflow.last_edit}
+              </Moment>
+            </Typography>
+          ) : (
+            <Skeleton />
+          )}{' '}
+        </div>
       </div>
 
       {workflow && modified && workflow.name && workflow.query ? (
