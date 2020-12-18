@@ -138,21 +138,29 @@ export default function SubmissionDetail() {
       url: `/api/v4/submission/${id}/`,
       onSuccess: api_data => {
         setSubmission(api_data.api_response);
-        if (api_data.api_response.state === 'completed') {
-          apiCall({
-            url: `/api/v4/submission/summary/${id}/`,
-            onSuccess: summ_data => {
-              setHighlightMap(summ_data.api_response.map);
-              setSummary(summ_data.api_response);
-            }
-          });
-          apiCall({
-            url: `/api/v4/submission/tree/${id}/`,
-            onSuccess: tree_data => {
-              setTree(tree_data.api_response);
-            }
-          });
-        } else {
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
+  useEffect(() => {
+    if (submission) {
+      if (submission.state === 'completed') {
+        apiCall({
+          url: `/api/v4/submission/summary/${id}/`,
+          onSuccess: summ_data => {
+            setHighlightMap(summ_data.api_response.map);
+            setSummary(summ_data.api_response);
+          }
+        });
+        apiCall({
+          url: `/api/v4/submission/tree/${id}/`,
+          onSuccess: tree_data => {
+            setTree(tree_data.api_response);
+          }
+        });
+      } else {
+        if (!socket) {
           // eslint-disable-next-line no-console
           console.log('SocketIO :: Init => Create SocketIO client...');
           const tempSocket = io(NAMESPACE);
@@ -165,18 +173,18 @@ export default function SubmissionDetail() {
             console.log('SocketIO :: Conn => Disconnected from socketIO server...');
           });
           setSocket(tempSocket);
-
-          apiCall({
-            url: `/api/v4/live/setup_watch_queue/${id}/`,
-            onSuccess: summ_data => {
-              setWatchQueue(summ_data.api_response.wq_id);
-            }
-          });
         }
+
+        apiCall({
+          url: `/api/v4/live/setup_watch_queue/${id}/`,
+          onSuccess: summ_data => {
+            setWatchQueue(summ_data.api_response.wq_id);
+          }
+        });
       }
-    });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [submission]);
 
   const handleErrorMessage = useCallback(
     data => {
@@ -198,16 +206,33 @@ export default function SubmissionDetail() {
     console.log(`SocketIO :: onStart => ${data.msg}`);
     setLiveMessages(['start']);
   };
-  const handleStopMessage = data => {
-    // eslint-disable-next-line no-console
-    console.log(`SocketIO :: onStop => ${data.msg}`);
-    setLiveMessages(['stop']);
-  };
+
+  const handleStopMessage = useCallback(
+    data => {
+      // eslint-disable-next-line no-console
+      console.log(`SocketIO :: onStop => ${data.msg}`);
+      setLiveMessages(['stop']);
+
+      setTimeout(() => {
+        // Loading final submission
+        apiCall({
+          url: `/api/v4/submission/${id}/`,
+          onSuccess: api_data => {
+            setSubmission(api_data.api_response);
+          }
+        });
+      }, 2000);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [id]
+  );
+
   const handleCacheKeyMessage = data => {
     // eslint-disable-next-line no-console
     console.log(`SocketIO :: onCacheKey => ${data.msg}`);
     setLiveMessages([data.msg]);
   };
+
   const handleCacheKeyErrrorMessage = data => {
     // eslint-disable-next-line no-console
     console.log(`SocketIO :: onCacheKeyError => ${data.msg}`);
@@ -228,12 +253,12 @@ export default function SubmissionDetail() {
     return () => {
       if (socket) socket.disconnect();
     };
-  }, [socket, handleErrorMessage]);
+  }, [socket, handleErrorMessage, handleStopMessage]);
 
   useEffect(() => {
     if (watchQueue) {
       // eslint-disable-next-line no-console
-      console.log(`SocketIO :: Send => Listen to watch queue '${watchQueue}' request...`);
+      console.log(`SocketIO :: emitListen => Listening for messages on watch queue: ${watchQueue}`);
       socket.emit('listen', { wq_id: watchQueue, from_start: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
