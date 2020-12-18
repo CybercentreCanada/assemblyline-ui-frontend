@@ -67,7 +67,7 @@ type WorkflowDetailProps = {
 const MyMenuItem = withStyles((theme: Theme) =>
   createStyles({
     root: {
-      minHeight: '48px'
+      minHeight: theme.spacing(4)
     }
   })
 )(MenuItem);
