@@ -100,7 +100,7 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
             fullWidth
             options={POSSIBLE_STATUS}
             value={selectedStatus}
-            renderInput={params => <TextField {...params} label="Statuses" variant="outlined" />}
+            renderInput={params => <TextField {...params} label={t('status')} variant="outlined" />}
             onChange={(event, value) => onStatusChange(value as string)}
           />
         </div>
@@ -109,7 +109,7 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
             fullWidth
             options={POSSIBLE_PRIORITY}
             value={selectedPriority}
-            renderInput={params => <TextField {...params} label="Priorities" variant="outlined" />}
+            renderInput={params => <TextField {...params} label={t('priority')} variant="outlined" />}
             onChange={(event, value) => onPriorityChange(value as string)}
           />
         </div>
@@ -120,7 +120,7 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
             freeSolo
             options={possibleLabels}
             value={selectedLabels}
-            renderInput={params => <TextField {...params} label="Labels" variant="outlined" />}
+            renderInput={params => <TextField {...params} label={t('labels')} variant="outlined" />}
             onChange={(event, value) => onLabelChange(value as string[])}
           />
         </div>
