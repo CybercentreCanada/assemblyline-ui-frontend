@@ -17,7 +17,7 @@ import { getValueFromPath } from 'helpers/utils';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
-import { useHistory } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { AlertDrawerState } from './alerts';
 import { AlertItem } from './hooks/useAlerts';
 import usePromiseAPI from './hooks/usePromiseAPI';
@@ -61,6 +61,16 @@ const DEFAULT_OWNER = {
   query: null
 };
 
+const SpeedDialActionLink = props => {
+  const { to, ...others } = props;
+
+  return (
+    <Link to={to}>
+      <SpeedDialAction {...others} />
+    </Link>
+  );
+};
+
 const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
   ({ item, index, currentQuery, setDrawer, onTakeOwnershipComplete, onVerdictComplete, vertical = false }) => {
     const { onTakeOwnership, setVerdict } = usePromiseAPI();
@@ -71,7 +81,6 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
     const { showErrorMessage, showSuccessMessage } = useMySnackbar();
     const [takeOwnershipConfirmation, setTakeOwnershipConfirmation] = useState<OwnerProps>(DEFAULT_OWNER);
     const [open, setOpen] = useState(false);
-    const history = useHistory();
     const { user: currentUser } = useAppContext();
     const hasSetMalicious = item.verdict.malicious.indexOf(currentUser.username) !== -1;
     const hasSetNonMalicious = item.verdict.non_malicious.indexOf(currentUser.username) !== -1;
@@ -208,13 +217,11 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
               });
             }}
           />
-          <SpeedDialAction
+          <SpeedDialActionLink
             icon={<AmpStoriesOutlinedIcon />}
+            to={`/submission/${item.sid}`}
             tooltipTitle={t('submission')}
             tooltipPlacement={vertical ? 'left' : 'bottom'}
-            onClick={() => {
-              history.push(`/submission/${item.sid}`);
-            }}
           />
           {!item.owner && (
             <SpeedDialAction
@@ -227,13 +234,11 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
             />
           )}
           {item.group_count && (
-            <SpeedDialAction
+            <SpeedDialActionLink
               icon={<CenterFocusStrongOutlinedIcon />}
+              to={`/alerts/?${buildFocusQuery().buildURLQueryString()}`}
               tooltipTitle={t('focus')}
               tooltipPlacement={vertical ? 'left' : 'bottom'}
-              onClick={() => {
-                history.push(`/alerts/?${buildFocusQuery().buildURLQueryString()}`);
-              }}
             />
           )}
         </SpeedDial>
