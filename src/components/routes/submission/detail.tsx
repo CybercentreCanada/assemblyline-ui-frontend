@@ -153,6 +153,19 @@ export default function SubmissionDetail() {
             }
           });
         } else {
+          // eslint-disable-next-line no-console
+          console.log('SocketIO :: Init => Create SocketIO client...');
+          const tempSocket = io(NAMESPACE);
+          tempSocket.on('connect', () => {
+            // eslint-disable-next-line no-console
+            console.log('SocketIO :: Conn => Connecting to socketIO server...');
+          });
+          tempSocket.on('disconnect', () => {
+            // eslint-disable-next-line no-console
+            console.log('SocketIO :: Conn => Disconnected from socketIO server...');
+          });
+          setSocket(tempSocket);
+
           apiCall({
             url: `/api/v4/live/setup_watch_queue/${id}/`,
             onSuccess: summ_data => {
@@ -168,7 +181,7 @@ export default function SubmissionDetail() {
   const handleErrorMessage = useCallback(
     data => {
       // eslint-disable-next-line no-console
-      console.log(`SocketIO ::  Error => ${data.msg}`);
+      console.log(`SocketIO :: onError => ${data.msg}`);
       apiCall({
         url: `/api/v4/live/setup_watch_queue/${id}/`,
         onSuccess: summ_data => {
@@ -182,55 +195,45 @@ export default function SubmissionDetail() {
 
   const handleStartMessage = data => {
     // eslint-disable-next-line no-console
-    console.log(`SocketIO ::  Start => ${data.msg}`);
+    console.log(`SocketIO :: onStart => ${data.msg}`);
     setLiveMessages(['start']);
   };
   const handleStopMessage = data => {
     // eslint-disable-next-line no-console
-    console.log(`SocketIO ::  Stop => ${data.msg}`);
+    console.log(`SocketIO :: onStop => ${data.msg}`);
     setLiveMessages(['stop']);
   };
   const handleCacheKeyMessage = data => {
     // eslint-disable-next-line no-console
-    console.log(`SocketIO ::  CacheKey => ${data.msg}`);
+    console.log(`SocketIO :: onCacheKey => ${data.msg}`);
     setLiveMessages([data.msg]);
   };
   const handleCacheKeyErrrorMessage = data => {
     // eslint-disable-next-line no-console
-    console.log(`SocketIO ::  CacheKeyError => ${data.msg}`);
+    console.log(`SocketIO :: onCacheKeyError => ${data.msg}`);
     setLiveMessages([data.msg]);
   };
 
   useEffect(() => {
-    // eslint-disable-next-line no-console
-    console.log('SocketIO ::  Setup => Create SocketIO client...');
-    setSocket(io(NAMESPACE));
-
-    return () => {
-      setSocket(null);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (watchQueue) {
+    if (socket) {
       // eslint-disable-next-line no-console
-      console.log('SocketIO ::  Setup => Cleaning up possible old Callbacks...');
-      socket.off('error');
-      socket.off('start');
-      socket.off('stop');
-      socket.off('cachekey');
-      socket.off('cachekeyerr');
-
-      // eslint-disable-next-line no-console
-      console.log('SocketIO ::  Setup => Registering SocketIO Callbacks...');
+      console.log('SocketIO :: Init => Registering SocketIO Callbacks...');
       socket.on('error', handleErrorMessage);
       socket.on('start', handleStartMessage);
       socket.on('stop', handleStopMessage);
       socket.on('cachekey', handleCacheKeyMessage);
       socket.on('cachekeyerr', handleCacheKeyErrrorMessage);
+    }
 
+    return () => {
+      if (socket) socket.disconnect();
+    };
+  }, [socket, handleErrorMessage]);
+
+  useEffect(() => {
+    if (watchQueue) {
       // eslint-disable-next-line no-console
-      console.log('SocketIO ::  Setup => Sending listening request...');
+      console.log(`SocketIO :: Send => Listen to watch queue '${watchQueue}' request...`);
       socket.emit('listen', { wq_id: watchQueue, from_start: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
