@@ -1,4 +1,4 @@
-import { Button, CircularProgress, makeStyles, TextField, Typography, useTheme } from '@material-ui/core';
+import { Button, CircularProgress, TextField, Typography, useTheme } from '@material-ui/core';
 import { Alert, Autocomplete } from '@material-ui/lab';
 import SearchQuery, { SearchFilter } from 'components/visual/SearchBar/search-query';
 import React, { useState } from 'react';
@@ -7,12 +7,16 @@ import AlertsFiltersSelected from './alerts-filters-selected';
 
 const POSSIBLE_STATUS = ['ASSESS', 'MALICIOUS', 'NON-MALICIOUS'];
 const POSSIBLE_PRIORITY = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'];
-
-const useStyles = makeStyles(theme => ({
-  option: {
-    backgroundColor: theme.palette.background.default
-  }
-}));
+const DEFAULT_LABELS = [
+  'PHISHING',
+  'CRIME',
+  'ATTRIBUTED',
+  'WHITELISTED',
+  'FALSE_POSITIVE',
+  'REPORTED',
+  'MITIGATED',
+  'PENDING'
+];
 
 interface AlertsWorkflowActionsProps {
   searchQuery: SearchQuery;
@@ -28,11 +32,10 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
   onApplyBtnClick
 }) => {
   const { t } = useTranslation('alerts');
-  const classes = useStyles();
   const theme = useTheme();
   const [formValid, setFormValid] = useState<boolean>(false);
   const [applying, setApplying] = useState<boolean>(false);
-  const [possibleLabels] = useState<string[]>(labelFilters.map(val => val.label));
+  const [possibleLabels] = useState<string[]>([...DEFAULT_LABELS, ...labelFilters.map(val => val.label)]);
   const [selectedStatus, setSelectedStatus] = useState<string>(null);
   const [selectedPriority, setSelectedPriority] = useState<string>(null);
   const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
@@ -95,7 +98,6 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
         <div style={{ marginBottom: theme.spacing(2) }}>
           <Autocomplete
             fullWidth
-            classes={{ option: classes.option }}
             options={POSSIBLE_STATUS}
             value={selectedStatus}
             renderInput={params => <TextField {...params} label="Statuses" variant="outlined" />}
@@ -105,7 +107,6 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
         <div style={{ marginBottom: theme.spacing(2) }}>
           <Autocomplete
             fullWidth
-            classes={{ option: classes.option }}
             options={POSSIBLE_PRIORITY}
             value={selectedPriority}
             renderInput={params => <TextField {...params} label="Priorities" variant="outlined" />}
@@ -117,7 +118,6 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
             fullWidth
             multiple
             freeSolo
-            classes={{ option: classes.option }}
             options={possibleLabels}
             value={selectedLabels}
             renderInput={params => <TextField {...params} label="Labels" variant="outlined" />}
