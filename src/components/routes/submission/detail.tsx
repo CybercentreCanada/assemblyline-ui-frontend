@@ -17,9 +17,10 @@ import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDetail from 'components/visual/FileDetail';
 import VerdictBar from 'components/visual/VerdictBar';
 import getXSRFCookie from 'helpers/xsrf';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory, useParams } from 'react-router-dom';
+import io from 'socket.io-client';
 import AttackSection from './detail/attack';
 import FileTreeSection from './detail/file_tree';
 import HeuristicSection from './detail/heuristics';
@@ -27,9 +28,19 @@ import InfoSection from './detail/info';
 import MetaSection from './detail/meta';
 import TagSection from './detail/tags';
 
+const NAMESPACE = '/live_submission';
+
 type ParamProps = {
   id: string;
   fid?: string;
+};
+
+const messageReducer = (messages: string[], receivedMessages: string[]) => {
+  const newMessages = receivedMessages.filter(item => messages.indexOf(item) === -1);
+  if (newMessages.length !== 0) {
+    return [...messages, ...newMessages];
+  }
+  return messages;
 };
 
 export default function SubmissionDetail() {
@@ -39,6 +50,9 @@ export default function SubmissionDetail() {
   const [submission, setSubmission] = useState(null);
   const [summary, setSummary] = useState(null);
   const [tree, setTree] = useState(null);
+  const [watchQueue, setWatchQueue] = useState(null);
+  const [liveMessages, setLiveMessages] = useReducer(messageReducer, []);
+  const [socket, setSocket] = useState(null);
   const [deleteDialog, setDeleteDialog] = useState(false);
   const apiCall = useMyAPI();
   const sp2 = theme.spacing(2);
@@ -138,11 +152,89 @@ export default function SubmissionDetail() {
               setTree(tree_data.api_response);
             }
           });
+        } else {
+          apiCall({
+            url: `/api/v4/live/setup_watch_queue/${id}/`,
+            onSuccess: summ_data => {
+              setWatchQueue(summ_data.api_response.wq_id);
+            }
+          });
         }
       }
     });
-    // eslint-disable-next-line
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
+
+  const handleErrorMessage = useCallback(
+    data => {
+      // eslint-disable-next-line no-console
+      console.log(`SocketIO ::  Error => ${data.msg}`);
+      apiCall({
+        url: `/api/v4/live/setup_watch_queue/${id}/`,
+        onSuccess: summ_data => {
+          setWatchQueue(summ_data.api_response.wq_id);
+        }
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [id]
+  );
+
+  const handleStartMessage = data => {
+    // eslint-disable-next-line no-console
+    console.log(`SocketIO ::  Start => ${data.msg}`);
+    setLiveMessages(['start']);
+  };
+  const handleStopMessage = data => {
+    // eslint-disable-next-line no-console
+    console.log(`SocketIO ::  Stop => ${data.msg}`);
+    setLiveMessages(['stop']);
+  };
+  const handleCacheKeyMessage = data => {
+    // eslint-disable-next-line no-console
+    console.log(`SocketIO ::  CacheKey => ${data.msg}`);
+    setLiveMessages([data.msg]);
+  };
+  const handleCacheKeyErrrorMessage = data => {
+    // eslint-disable-next-line no-console
+    console.log(`SocketIO ::  CacheKeyError => ${data.msg}`);
+    setLiveMessages([data.msg]);
+  };
+
+  useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.log('SocketIO ::  Setup => Create SocketIO client...');
+    setSocket(io(NAMESPACE));
+
+    return () => {
+      setSocket(null);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (watchQueue) {
+      // eslint-disable-next-line no-console
+      console.log('SocketIO ::  Setup => Cleaning up possible old Callbacks...');
+      socket.off('error');
+      socket.off('start');
+      socket.off('stop');
+      socket.off('cachekey');
+      socket.off('cachekeyerr');
+
+      // eslint-disable-next-line no-console
+      console.log('SocketIO ::  Setup => Registering SocketIO Callbacks...');
+      socket.on('error', handleErrorMessage);
+      socket.on('start', handleStartMessage);
+      socket.on('stop', handleStopMessage);
+      socket.on('cachekey', handleCacheKeyMessage);
+      socket.on('cachekeyerr', handleCacheKeyErrrorMessage);
+
+      // eslint-disable-next-line no-console
+      console.log('SocketIO ::  Setup => Sending listening request...');
+      socket.emit('listen', { wq_id: watchQueue, from_start: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [watchQueue, socket, handleErrorMessage]);
 
   useEffect(() => {
     if (submission !== null && globalDrawer === null && fid !== undefined) {
@@ -157,6 +249,13 @@ export default function SubmissionDetail() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fid]);
+
+  useEffect(() => {
+    // TODO: Do something with those messages
+    if (liveMessages.length !== 0) {
+      console.log(`Live Messages: ${liveMessages.join(' | ')}`);
+    }
+  }, [liveMessages]);
 
   return (
     <PageCenter ml={4} mr={4} width="100%">
