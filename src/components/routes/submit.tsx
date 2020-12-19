@@ -28,14 +28,6 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory } from 'react-router-dom';
 
-const flow = new Flow({
-  target: '/api/v4/ui/flowjs/',
-  permanentErrors: [412, 404, 500],
-  maxChunkRetries: 1,
-  chunkRetryInterval: 500,
-  simultaneousUploads: 4
-});
-
 function Submit() {
   const { getBanner } = useAppLayout();
   const apiCall = useMyAPI();
@@ -43,6 +35,7 @@ function Submit() {
   const theme = useTheme();
   const { user: currentUser, c12nDef, configuration } = useAppContext();
   const [uuid, setUUID] = useState(null);
+  const [flow, setFlow] = useState(null);
   const [settings, setSettings] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(null);
   const [url, setUrl] = useState('');
@@ -220,6 +213,17 @@ function Submit() {
   }
 
   useEffect(() => {
+    // Setup Flow
+    setFlow(
+      new Flow({
+        target: '/api/v4/ui/flowjs/',
+        permanentErrors: [412, 404, 500],
+        maxChunkRetries: 1,
+        chunkRetryInterval: 500,
+        simultaneousUploads: 4
+      })
+    );
+
     // Load user on start
     apiCall({
       url: `/api/v4/user/settings/${currentUser.username}/`,
