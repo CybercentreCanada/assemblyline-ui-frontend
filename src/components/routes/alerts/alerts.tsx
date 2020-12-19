@@ -204,14 +204,15 @@ const Alerts: React.FC = () => {
           <div>
             <div
               style={{
-                display: 'flex',
                 alignItems: 'start',
-                position: 'sticky',
-                top: theme.spacing(1),
+                display: 'flex',
                 float: 'right',
+                height: theme.spacing(8),
                 marginTop: theme.spacing(-8),
                 marginRight: theme.spacing(-1),
-                height: theme.spacing(8)
+                position: 'sticky',
+                top: theme.spacing(1),
+                zIndex: 1
               }}
             >
               <ListNavigator id={ALERT_SIMPLELIST_ID} />

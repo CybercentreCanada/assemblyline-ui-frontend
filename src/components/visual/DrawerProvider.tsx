@@ -106,10 +106,11 @@ function DrawerProvider(props: DrawerProviderProps) {
                 <div
                   id="drawerTop"
                   style={{
+                    backgroundColor: theme.palette.background.paper,
                     padding: theme.spacing(1),
                     position: 'sticky',
                     top: 0,
-                    backgroundColor: theme.palette.background.paper
+                    zIndex: 1
                   }}
                 >
                   <IconButton onClick={closeGlobalDrawer}>
