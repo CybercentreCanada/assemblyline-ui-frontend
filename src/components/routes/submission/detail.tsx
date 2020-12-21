@@ -16,12 +16,14 @@ import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDetail from 'components/visual/FileDetail';
 import VerdictBar from 'components/visual/VerdictBar';
+import { getErrorIDFromKey, getServiceFromKey } from 'helpers/errors';
 import getXSRFCookie from 'helpers/xsrf';
 import React, { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import io from 'socket.io-client';
 import AttackSection from './detail/attack';
+import ErrorSection from './detail/errors';
 import FileTreeSection from './detail/file_tree';
 import HeuristicSection from './detail/heuristics';
 import InfoSection from './detail/info';
@@ -62,6 +64,72 @@ export default function SubmissionDetail() {
   const { user: currentUser } = useAppContext();
   const { setHighlightMap } = useHighlighter();
   const { setGlobalDrawer, globalDrawer } = useDrawer();
+
+  const parseSubmissionErrors = currentSubmission => {
+    const relevantErrors = errors => {
+      return errors.filter(error => {
+        let eID = error.substr(65, error.length);
+
+        if (eID.indexOf('.e') !== -1) {
+          eID = eID.substr(eID.indexOf('.e') + 2, eID.length);
+        }
+
+        return ['20', '21', '12', '10', '11'].indexOf(eID) === -1;
+      });
+    };
+    const futileErrors = errors => {
+      const out = {
+        depth: [],
+        files: [],
+        retry: [],
+        down: [],
+        busy: []
+      };
+      errors.forEach(error => {
+        const srv = getServiceFromKey(error);
+        const eID = getErrorIDFromKey(error);
+
+        if (eID === '20') {
+          if (out.busy.indexOf(srv) === -1) {
+            out.busy.push(srv);
+          }
+        }
+        if (eID === '21') {
+          if (out.down.indexOf(srv) === -1) {
+            out.down.push(srv);
+          }
+        } else if (eID === '12') {
+          if (out.retry.indexOf(srv) === -1) {
+            out.retry.push(srv);
+          }
+        } else if (eID === '10') {
+          if (out.depth.indexOf(srv) === -1) {
+            out.depth.push(srv);
+          }
+        } else if (eID === '11') {
+          if (out.files.indexOf(srv) === -1) {
+            out.files.push(srv);
+          }
+        }
+      });
+
+      out.busy.sort();
+      out.down.sort();
+      out.depth.sort();
+      out.files.sort();
+      out.retry.sort();
+
+      return out;
+    };
+
+    return {
+      ...currentSubmission,
+      parsed_errors: {
+        aggregated: futileErrors(currentSubmission.errors),
+        listed: relevantErrors(currentSubmission.errors)
+      }
+    };
+  };
 
   const resubmit = useCallback(() => {
     if (submission != null) {
@@ -137,7 +205,7 @@ export default function SubmissionDetail() {
     apiCall({
       url: `/api/v4/submission/${id}/`,
       onSuccess: api_data => {
-        setSubmission(api_data.api_response);
+        setSubmission(parseSubmissionErrors(api_data.api_response));
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -218,7 +286,7 @@ export default function SubmissionDetail() {
         apiCall({
           url: `/api/v4/submission/${id}/`,
           onSuccess: api_data => {
-            setSubmission(api_data.api_response);
+            setSubmission(parseSubmissionErrors(api_data.api_response));
           }
         });
       }, 2000);
@@ -434,6 +502,10 @@ export default function SubmissionDetail() {
               )
             );
           })}
+
+        {submission && Object.keys(submission.errors).length !== 0 && (
+          <ErrorSection sid={id} parsed_errors={submission.parsed_errors} />
+        )}
 
         <FileTreeSection tree={tree ? tree.tree : null} sid={id} />
       </div>
