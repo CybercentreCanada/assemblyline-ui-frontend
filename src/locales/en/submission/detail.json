@@ -11,7 +11,7 @@
   "download": "Download submission's bundle",
   "errors": "Errors",
   "errors.aggregated": "The following services generated {errorType} errors",
-  "errors.listed": " generated an error for file hash: ",
+  "errors.listed": " generated an error for file: ",
   "errors.type.busy": "SERVICE BUSY",
   "errors.type.down": "SERVICE DOWN",
   "errors.type.depth": "MAX DEPTH REACHED",
