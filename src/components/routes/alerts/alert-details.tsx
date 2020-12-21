@@ -273,7 +273,10 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                 </Typography>
               </Grid>
               <Grid item xs={3} sm={2}>
-                <BsClipboard className={classes.clipboardIcon} onClick={item ? () => copy(item.file.md5) : null} />
+                <BsClipboard
+                  className={classes.clipboardIcon}
+                  onClick={item ? () => copy(item.file.md5, 'drawerTop') : null}
+                />
                 <Typography variant="caption" style={{ marginLeft: theme.spacing(0.5) }}>
                   MD5:
                 </Typography>
@@ -282,7 +285,10 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                 {item ? item.file.md5 : <SkeletonInline />}
               </Grid>
               <Grid item xs={3} sm={2}>
-                <BsClipboard className={classes.clipboardIcon} onClick={item ? () => copy(item.file.sha1) : null} />
+                <BsClipboard
+                  className={classes.clipboardIcon}
+                  onClick={item ? () => copy(item.file.sha1, 'drawerTop') : null}
+                />
                 <Typography variant="caption" style={{ marginLeft: theme.spacing(0.5) }}>
                   SHA1:
                 </Typography>
@@ -291,7 +297,10 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                 {item ? item.file.sha1 : <SkeletonInline />}
               </Grid>
               <Grid item xs={3} sm={2}>
-                <BsClipboard className={classes.clipboardIcon} onClick={item ? () => copy(item.file.sha256) : null} />
+                <BsClipboard
+                  className={classes.clipboardIcon}
+                  onClick={item ? () => copy(item.file.sha256, 'drawerTop') : null}
+                />
                 <Typography variant="caption" style={{ marginLeft: theme.spacing(0.5) }}>
                   SHA256:
                 </Typography>
