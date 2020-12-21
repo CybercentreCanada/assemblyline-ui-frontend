@@ -116,7 +116,7 @@ const WrappedInfoSection: React.FC<InfoSectionProps> = ({ submission }) => {
                   <span style={{ fontWeight: 500 }}>{t('times.completed')}</span>
                 </Grid>
                 <Grid item xs={8} sm={9} lg={10}>
-                  {submission ? (
+                  {submission && submission.times.completed ? (
                     <Moment format="YYYY-MM-DD HH:mm:ss">{submission.times.completed}</Moment>
                   ) : (
                     <Skeleton />
