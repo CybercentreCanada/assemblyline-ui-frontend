@@ -106,7 +106,7 @@ const WrappedErrorSection: React.FC<ErrorSectionProps> = ({ sid, parsed_errors }
             </div>
           ),
           // eslint-disable-next-line react-hooks/exhaustive-deps
-          [parsed_errors]
+          [parsed_errors, sid, theme, t]
         )}
       </Collapse>
     </div>
