@@ -79,7 +79,7 @@ const WrappedErrorsTable: React.FC<ErrorsTableProps> = ({ errorResults, onClick 
                 <DivTableCell>{error.response.service_name}</DivTableCell>
                 <DivTableCell>{error.response.message}</DivTableCell>
                 <DivTableCell>
-                  <Tooltip title={error.type}>
+                  <Tooltip title={t(`type.${error.type}`)}>
                     <span>{errorMap[error.type]}</span>
                   </Tooltip>
                 </DivTableCell>

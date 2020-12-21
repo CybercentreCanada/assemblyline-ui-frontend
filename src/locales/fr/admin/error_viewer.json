@@ -2,6 +2,8 @@
   "canceled": "Afficher les tâches annulées",
   "debug_info": "Informations de débogage:",
   "exception": "Afficher les exceptions non gérées",
+  "fail.FAIL_NONRECOVERABLE": "Échec non récupérable",
+  "fail.FAIL_RECOVERABLE": "Échec récupérable",
   "file_info": "Fichier connexe:",
   "filter": "Filtrer les erreurs...",
   "filtered": "erreur qui correspond au filtre",
@@ -17,5 +19,13 @@
   "searching": "Recherche en cours...",
   "title": "Visualisateur d'erreurs",
   "total": "erreur",
-  "totals": "erreurs"
+  "totals": "erreurs",
+  "type.SERVICE BUSY": "SERVICE OCCUPÉ",
+  "type.SERVICE DOWN": "SERVICE EN PANNE",
+  "type.MAX DEPTH REACHED": "PROFONDEUR MAXIMALE ATTEINTE",
+  "type.EXCEPTION": "EXCEPTION",
+  "type.MAX FILES REACHED": "MAXIMUM DE FICHIERS ATTEINT",
+  "type.TASK PREEMPTED": "TÂCHE PRÉEMPTÉE",
+  "type.MAX RETRY REACHED": "MAXIMUM D'ESSAIS ATTEINT",
+  "type.UNKNOWN": "INCONNUE"
 }
