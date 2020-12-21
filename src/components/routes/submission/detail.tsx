@@ -1,7 +1,16 @@
-import { Grid, IconButton, Link as MaterialLink, Tooltip, Typography, useTheme } from '@material-ui/core';
+import {
+  Grid,
+  IconButton,
+  LinearProgress,
+  Link as MaterialLink,
+  Tooltip,
+  Typography,
+  useTheme
+} from '@material-ui/core';
 import BugReportOutlinedIcon from '@material-ui/icons/BugReportOutlined';
 import ChromeReaderModeOutlinedIcon from '@material-ui/icons/ChromeReaderModeOutlined';
 import CloudDownloadOutlinedIcon from '@material-ui/icons/CloudDownloadOutlined';
+import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
 import ReplayOutlinedIcon from '@material-ui/icons/ReplayOutlined';
 import VerifiedUserOutlinedIcon from '@material-ui/icons/VerifiedUserOutlined';
@@ -372,7 +381,7 @@ export default function SubmissionDetail() {
                 <Classification size="tiny" c12n={submission ? submission.classification : null} />
               </div>
               <div style={{ paddingBottom: sp4 }}>
-                <Grid container alignItems="center">
+                <Grid container>
                   <Grid item xs>
                     <div>
                       <Typography variant="h4">{t('title')}</Typography>
@@ -380,8 +389,29 @@ export default function SubmissionDetail() {
                         {submission ? submission.sid : <Skeleton style={{ width: '10rem' }} />}
                       </Typography>
                     </div>
+                    {socket && (
+                      <div
+                        style={{
+                          paddingBottom: theme.spacing(3),
+                          paddingTop: theme.spacing(2),
+                          color:
+                            theme.palette.type === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark
+                        }}
+                      >
+                        <PlayCircleOutlineIcon
+                          style={{
+                            height: theme.spacing(2),
+                            width: theme.spacing(2),
+                            verticalAlign: 'sub',
+                            marginRight: theme.spacing(1)
+                          }}
+                        />
+                        {t('live_mode')}
+                        <LinearProgress />
+                      </div>
+                    )}
                   </Grid>
-                  <Grid item xs={12} sm>
+                  <Grid item xs={12} sm={6} md={4}>
                     <div style={{ textAlign: 'right' }}>
                       <Tooltip title={t('delete')}>
                         <IconButton
@@ -476,7 +506,7 @@ export default function SubmissionDetail() {
             </>
           ),
           // eslint-disable-next-line react-hooks/exhaustive-deps
-          [submission, id]
+          [submission, id, socket]
         )}
 
         <InfoSection submission={submission} />

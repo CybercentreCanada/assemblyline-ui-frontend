@@ -23,6 +23,7 @@
   "heuristics": "Heuristiques",
   "information": "Informations de soumission",
   "ioc": "Indicateurs de compromis",
+  "live_mode": "La soumission est toujours en cours de traitement, réception des résultats en direct ...",
   "max_score": "Verdict",
   "metadata": "Métadonnées",
   "params.deep_scan": "Analyse approfondie",
