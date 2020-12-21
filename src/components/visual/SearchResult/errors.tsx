@@ -69,16 +69,16 @@ const WrappedErrorsTable: React.FC<ErrorsTableProps> = ({ errorResults, onClick 
           <DivTableBody>
             {errorResults.items.map(error => (
               <DivTableRow key={error.id} hover onClick={() => onClick(error)} style={{ cursor: 'pointer' }}>
-                <DivTableCell>
+                <DivTableCell style={{ whiteSpace: 'nowrap' }}>
                   <Tooltip title={error.created}>
                     <Moment fromNow locale={i18n.language}>
                       {error.created}
                     </Moment>
                   </Tooltip>
                 </DivTableCell>
-                <DivTableCell>{error.response.service_name}</DivTableCell>
+                <DivTableCell style={{ whiteSpace: 'nowrap' }}>{error.response.service_name}</DivTableCell>
                 <DivTableCell>{error.response.message}</DivTableCell>
-                <DivTableCell>
+                <DivTableCell style={{ whiteSpace: 'nowrap' }}>
                   <Tooltip title={t(`type.${error.type}`)}>
                     <span>{errorMap[error.type]}</span>
                   </Tooltip>
