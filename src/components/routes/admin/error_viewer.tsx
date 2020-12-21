@@ -91,10 +91,10 @@ function ErrorDetail({ error }) {
       <Grid container spacing={1} style={{ paddingBottom: theme.spacing(1) }}>
         <Grid item xs={6} sm={8}>
           <span style={{ verticalAlign: 'middle' }}>{errorMap[error.type]}&nbsp;</span>
-          <span style={{ verticalAlign: 'middle' }}>{error.type}</span>
+          <span style={{ verticalAlign: 'middle' }}>{t(`type.${error.type}`)}</span>
         </Grid>
         <Grid item xs={6} sm={4} style={{ alignSelf: 'center' }}>
-          <span style={{ verticalAlign: 'middle' }}>{error.response.status}</span>
+          <span style={{ verticalAlign: 'middle' }}>{t(`fail.${error.response.status}`)}</span>
         </Grid>
       </Grid>
 

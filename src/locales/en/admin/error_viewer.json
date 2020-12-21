@@ -2,6 +2,8 @@
   "canceled": "Show cancelled tasks",
   "debug_info": "Debug Information:",
   "exception": "Show unhandled exceptions",
+  "fail.FAIL_NONRECOVERABLE": "Non-recoverable failure",
+  "fail.FAIL_RECOVERABLE": "Recoverable Failure",
   "file_info": "Related file:",
   "filter": "Filter errors ...",
   "filtered": "error matching filter",
@@ -17,5 +19,13 @@
   "searching": "Searching...",
   "title": "Error Viewer",
   "total": "error",
-  "totals": "errors"
+  "totals": "errors",
+  "type.SERVICE BUSY": "SERVICE BUSY",
+  "type.SERVICE DOWN": "SERVICE DOWN",
+  "type.MAX DEPTH REACHED": "MAX DEPTH REACHED",
+  "type.EXCEPTION": "EXCEPTION",
+  "type.MAX FILES REACHED": "MAX FILES REACHED",
+  "type.TASK PREEMPTED": "TASK PREEMPTED",
+  "type.MAX RETRY REACHED": "MAX RETRY REACHED",
+  "type.UNKNOWN": "UNKNOWN"
 }
