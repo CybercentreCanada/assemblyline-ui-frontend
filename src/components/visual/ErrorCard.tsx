@@ -2,6 +2,7 @@ import { Box, Collapse, makeStyles, useTheme } from '@material-ui/core';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 
 export type Error = {
@@ -52,6 +53,7 @@ const useStyles = makeStyles(theme => ({
 
 const ErrorCard: React.FC<ErrorCardProps> = ({ error }) => {
   const classes = useStyles();
+  const { t } = useTranslation(['adminErrorViewer']);
   const theme = useTheme();
   const sp2 = theme.spacing(2);
   const [open, setOpen] = React.useState(true);
@@ -66,6 +68,7 @@ const ErrorCard: React.FC<ErrorCardProps> = ({ error }) => {
         <span>
           <b>{error.response.service_name}</b>&nbsp;
         </span>
+        <span>[{t(`type.${error.type}`)}]&nbsp;</span>
         <small className={classes.muted}>{` :: ${error.response.service_version}`}</small>
         <small className={classes.muted} style={{ flexGrow: 1 }}>
           &nbsp;{error.response.service_tool_version ? `(${error.response.service_tool_version})` : ''}
