@@ -437,7 +437,7 @@ export default function SubmissionDetail() {
       >
         {outstanding &&
           (Object.keys(outstanding).length > 0 ? (
-            <Alert severity="info" style={{ textAlign: 'left' }} onClose={resetOutstanding}>
+            <Alert elevation={6} severity="info" style={{ textAlign: 'left' }} onClose={resetOutstanding}>
               <b>{t('outstanding.title')}</b>
               <Grid container style={{ marginTop: theme.spacing(1) }}>
                 <Grid item xs={6}>
@@ -461,7 +461,7 @@ export default function SubmissionDetail() {
               })}
             </Alert>
           ) : (
-            <Alert severity="error" onClose={resetOutstanding}>
+            <Alert elevation={6} severity="error" onClose={resetOutstanding}>
               {t('outstanding.error')}
             </Alert>
           ))}
