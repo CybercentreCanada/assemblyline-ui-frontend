@@ -30,7 +30,7 @@
   "outstanding.error": "Nous n'avons pas pu déterminer quels services sont occupés à travailler sur votre soumission. Il peut y avoir des problèmes avec le système ...",
   "outstanding.files": "Fichiers restants",
   "outstanding.services": "Services",
-  "outstanding.title": "Vous attendez que les services suivants est terminer:",
+  "outstanding.title": "Vous attendez la fin du traitement des services suivants:",
   "params.deep_scan": "Analyse approfondie",
   "params.description": "Description",
   "params.groups": "Groupes",
