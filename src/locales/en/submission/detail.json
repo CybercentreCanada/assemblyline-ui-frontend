@@ -30,7 +30,7 @@
   "outstanding.error": "We could not determine which services are busy working on your submission. There might be issues with the system...",
   "outstanding.files": "Files remaining",
   "outstanding.services": "Services",
-  "outstanding.title": "You are waiting on the following services to finish:",
+  "outstanding.title": "You are waiting on the following services finish processing:",
   "params.deep_scan": "Deep Scan",
   "params.description": "Description",
   "params.groups": "Groups",
