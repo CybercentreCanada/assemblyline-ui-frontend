@@ -3,6 +3,7 @@ import {
   IconButton,
   LinearProgress,
   Link as MaterialLink,
+  Snackbar,
   Tooltip,
   Typography,
   useTheme
@@ -14,7 +15,7 @@ import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
 import ReplayOutlinedIcon from '@material-ui/icons/ReplayOutlined';
 import VerifiedUserOutlinedIcon from '@material-ui/icons/VerifiedUserOutlined';
-import { Skeleton } from '@material-ui/lab';
+import { Alert, Skeleton } from '@material-ui/lab';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useAppContext from 'components/hooks/useAppContext';
 import useDrawer from 'components/hooks/useDrawer';
@@ -41,6 +42,7 @@ import TagSection from './detail/tags';
 
 const NAMESPACE = '/live_submission';
 const MESSAGE_TIMEOUT = 5000;
+const OUTSTANDING_TRIGGER_COUNT = 4;
 
 type ParamProps = {
   id: string;
@@ -70,14 +72,16 @@ export default function SubmissionDetail() {
   const [liveResultKeys, setLiveResultKeys] = useReducer(messageReducer, []);
   const [liveErrorKeys, setLiveErrorKeys] = useReducer(messageReducer, []);
   const [processedKeys, setProcessedKeys] = useReducer(messageReducer, []);
+  const [outstanding, setOutstanding] = useState(null);
   const [loadTrigger, incrementLoadTrigger] = useReducer(incrementReducer, 0);
   const [socket, setSocket] = useState(null);
   const [loadInterval, setLoadInterval] = useState(null);
+  const [lastSuccessfulTrigger, setLastSuccessfulTrigger] = useState(0);
   const [deleteDialog, setDeleteDialog] = useState(false);
   const apiCall = useMyAPI();
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
-  const { showSuccessMessage } = useMySnackbar();
+  const { showSuccessMessage, showErrorMessage } = useMySnackbar();
   const history = useHistory();
   const { user: currentUser } = useAppContext();
   const { setHighlightMap } = useHighlighter();
@@ -261,7 +265,7 @@ export default function SubmissionDetail() {
           setSocket(tempSocket);
         }
         setLoadInterval(setInterval(() => incrementLoadTrigger(1), MESSAGE_TIMEOUT));
-        
+
         apiCall({
           url: `/api/v4/live/setup_watch_queue/${id}/`,
           onSuccess: summ_data => {
@@ -277,6 +281,7 @@ export default function SubmissionDetail() {
     data => {
       // eslint-disable-next-line no-console
       console.log(`SocketIO :: onError => ${data.msg}`);
+      showErrorMessage(t('dispatcher.not_responding'), 15000);
       apiCall({
         url: `/api/v4/live/setup_watch_queue/${id}/`,
         onSuccess: summ_data => {
@@ -327,6 +332,11 @@ export default function SubmissionDetail() {
     setLiveErrorKeys([data.msg]);
   };
 
+  const resetOutstanding = () => {
+    setLastSuccessfulTrigger(loadTrigger);
+    setOutstanding(null);
+  };
+
   useEffect(() => {
     return () => {
       if (loadInterval) clearInterval(loadInterval);
@@ -373,22 +383,34 @@ export default function SubmissionDetail() {
   }, [fid]);
 
   useEffect(() => {
-    // TODO: Do something with those messages
     if (loadTrigger === 0) return;
 
     console.log('LIVE :: Checking for new keys to load...');
     const newResults = liveResultKeys.filter(msg => processedKeys.indexOf(msg) === -1);
     const newErrors = liveErrorKeys.filter(msg => processedKeys.indexOf(msg) === -1);
     if (newResults.length !== 0 || newErrors.length !== 0) {
-      console.log(`New Results: ${newResults.join(' | ')} - New Errors: ${newErrors.join(' | ')}`);
+      console.log(`LIVE :: New Results: ${newResults.join(' | ')} - New Errors: ${newErrors.join(' | ')}`);
 
       apiCall({
         method: 'POST',
         url: '/api/v4/result/multiple_keys/',
         body: { error: newErrors, result: newResults },
         onSuccess: api_data => {
+          setLastSuccessfulTrigger(loadTrigger);
           setProcessedKeys([...newResults, ...newErrors]);
+
+          // TODO: Do something with those messages
           console.log(api_data);
+        }
+      });
+    } else if (loadTrigger >= lastSuccessfulTrigger + OUTSTANDING_TRIGGER_COUNT && !outstanding) {
+      console.log('LIVE :: Finding out oustanding services...');
+
+      apiCall({
+        url: `/api/v4/live/outstanding_services/${id}/`,
+        onSuccess: api_data => {
+          console.log(api_data);
+          setOutstanding(api_data.api_response);
         }
       });
     }
@@ -407,6 +429,43 @@ export default function SubmissionDetail() {
         acceptText={t('delete.acceptText')}
         text={t('delete.text')}
       />
+      <Snackbar
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        open={outstanding !== null}
+        key="outstanding"
+        style={{ top: theme.spacing(8) }}
+      >
+        {outstanding &&
+          (Object.keys(outstanding).length > 0 ? (
+            <Alert severity="info" style={{ textAlign: 'left' }} onClose={resetOutstanding}>
+              <b>{t('outstanding.title')}</b>
+              <Grid container style={{ marginTop: theme.spacing(1) }}>
+                <Grid item xs={6}>
+                  <b>{t('outstanding.services')}</b>
+                </Grid>
+                <Grid item xs={6}>
+                  <b>{t('outstanding.files')}</b>
+                </Grid>
+              </Grid>
+              {Object.keys(outstanding).map(service => {
+                return (
+                  <Grid key={service} container>
+                    <Grid item xs={6}>
+                      <b>{service}</b>
+                    </Grid>
+                    <Grid item xs={6}>
+                      {outstanding[service]}
+                    </Grid>
+                  </Grid>
+                );
+              })}
+            </Alert>
+          ) : (
+            <Alert severity="error" onClose={resetOutstanding}>
+              {t('outstanding.error')}
+            </Alert>
+          ))}
+      </Snackbar>
       <div style={{ textAlign: 'left' }}>
         {useMemo(
           () => (
@@ -540,7 +599,7 @@ export default function SubmissionDetail() {
             </>
           ),
           // eslint-disable-next-line react-hooks/exhaustive-deps
-          [submission, id, socket]
+          [submission, id, socket, theme, t]
         )}
 
         <InfoSection submission={submission} />
