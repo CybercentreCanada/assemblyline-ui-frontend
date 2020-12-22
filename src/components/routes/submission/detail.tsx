@@ -40,6 +40,7 @@ import MetaSection from './detail/meta';
 import TagSection from './detail/tags';
 
 const NAMESPACE = '/live_submission';
+const MESSAGE_TIMEOUT = 5000;
 
 type ParamProps = {
   id: string;
@@ -62,8 +63,11 @@ export default function SubmissionDetail() {
   const [summary, setSummary] = useState(null);
   const [tree, setTree] = useState(null);
   const [watchQueue, setWatchQueue] = useState(null);
-  const [liveMessages, setLiveMessages] = useReducer(messageReducer, []);
+  const [liveResultKeys, setLiveResultKeys] = useReducer(messageReducer, []);
+  const [liveErrorKeys, setLiveErrorKeys] = useReducer(messageReducer, []);
+  const [processedKeys, setProcessedKeys] = useReducer(messageReducer, []);
   const [socket, setSocket] = useState(null);
+  const [hasTimeout, setHasTimeout] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState(false);
   const apiCall = useMyAPI();
   const sp2 = theme.spacing(2);
@@ -281,14 +285,12 @@ export default function SubmissionDetail() {
   const handleStartMessage = data => {
     // eslint-disable-next-line no-console
     console.log(`SocketIO :: onStart => ${data.msg}`);
-    setLiveMessages(['start']);
   };
 
   const handleStopMessage = useCallback(
     data => {
       // eslint-disable-next-line no-console
       console.log(`SocketIO :: onStop => ${data.msg}`);
-      setLiveMessages(['stop']);
 
       setTimeout(() => {
         // Loading final submission
@@ -307,14 +309,29 @@ export default function SubmissionDetail() {
   const handleCacheKeyMessage = data => {
     // eslint-disable-next-line no-console
     console.log(`SocketIO :: onCacheKey => ${data.msg}`);
-    setLiveMessages([data.msg]);
+    setLiveResultKeys([data.msg]);
   };
 
   const handleCacheKeyErrrorMessage = data => {
     // eslint-disable-next-line no-console
     console.log(`SocketIO :: onCacheKeyError => ${data.msg}`);
-    setLiveMessages([data.msg]);
+    setLiveErrorKeys([data.msg]);
   };
+
+  const loadMessageData = useCallback((newResults: string[], newErrors: string[]) => {
+    console.log(`New Results: ${newResults.join(' | ')} - New Errors: ${newErrors.join(' | ')}`);
+
+    apiCall({
+      method: 'POST',
+      url: '/api/v4/result/multiple_keys/',
+      body: { errors: newErrors, results: newResults },
+      onSuccess: api_data => {
+        setProcessedKeys([...newResults, ...newErrors]);
+        console.log(api_data);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (socket) {
@@ -357,10 +374,19 @@ export default function SubmissionDetail() {
 
   useEffect(() => {
     // TODO: Do something with those messages
-    if (liveMessages.length !== 0) {
-      console.log(`Live Messages: ${liveMessages.join(' | ')}`);
+    const newResults = liveResultKeys.filter(msg => processedKeys.indexOf(msg) === -1);
+    const newErrors = liveErrorKeys.filter(msg => processedKeys.indexOf(msg) === -1);
+    if (newResults.length !== 0 || newErrors.length !== 0) {
+      if (!hasTimeout) {
+        setHasTimeout(true);
+        setTimeout(() => {
+          loadMessageData(newResults, newErrors);
+          setHasTimeout(false);
+        }, MESSAGE_TIMEOUT);
+      }
     }
-  }, [liveMessages]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [liveResultKeys, liveErrorKeys]);
 
   return (
     <PageCenter ml={4} mr={4} width="100%">
