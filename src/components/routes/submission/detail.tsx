@@ -55,6 +55,10 @@ const messageReducer = (messages: string[], receivedMessages: string[]) => {
   return messages;
 };
 
+const incrementReducer = (old: number, increment: number) => {
+  return old + increment;
+};
+
 export default function SubmissionDetail() {
   const { t } = useTranslation(['submissionDetail']);
   const { id, fid } = useParams<ParamProps>();
@@ -66,8 +70,9 @@ export default function SubmissionDetail() {
   const [liveResultKeys, setLiveResultKeys] = useReducer(messageReducer, []);
   const [liveErrorKeys, setLiveErrorKeys] = useReducer(messageReducer, []);
   const [processedKeys, setProcessedKeys] = useReducer(messageReducer, []);
+  const [loadTrigger, incrementLoadTrigger] = useReducer(incrementReducer, 0);
   const [socket, setSocket] = useState(null);
-  const [hasTimeout, setHasTimeout] = useState(false);
+  const [loadInterval, setLoadInterval] = useState(null);
   const [deleteDialog, setDeleteDialog] = useState(false);
   const apiCall = useMyAPI();
   const sp2 = theme.spacing(2);
@@ -255,7 +260,8 @@ export default function SubmissionDetail() {
           });
           setSocket(tempSocket);
         }
-
+        setLoadInterval(setInterval(() => incrementLoadTrigger(1), MESSAGE_TIMEOUT));
+        
         apiCall({
           url: `/api/v4/live/setup_watch_queue/${id}/`,
           onSuccess: summ_data => {
@@ -285,6 +291,7 @@ export default function SubmissionDetail() {
   const handleStartMessage = data => {
     // eslint-disable-next-line no-console
     console.log(`SocketIO :: onStart => ${data.msg}`);
+    setTimeout(() => incrementLoadTrigger(1), 500);
   };
 
   const handleStopMessage = useCallback(
@@ -293,6 +300,8 @@ export default function SubmissionDetail() {
       console.log(`SocketIO :: onStop => ${data.msg}`);
 
       setTimeout(() => {
+        if (loadInterval) clearInterval(loadInterval);
+        setLoadInterval(null);
         // Loading final submission
         apiCall({
           url: `/api/v4/submission/${id}/`,
@@ -318,20 +327,11 @@ export default function SubmissionDetail() {
     setLiveErrorKeys([data.msg]);
   };
 
-  const loadMessageData = useCallback((newResults: string[], newErrors: string[]) => {
-    console.log(`New Results: ${newResults.join(' | ')} - New Errors: ${newErrors.join(' | ')}`);
-
-    apiCall({
-      method: 'POST',
-      url: '/api/v4/result/multiple_keys/',
-      body: { errors: newErrors, results: newResults },
-      onSuccess: api_data => {
-        setProcessedKeys([...newResults, ...newErrors]);
-        console.log(api_data);
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  useEffect(() => {
+    return () => {
+      if (loadInterval) clearInterval(loadInterval);
+    };
+  }, [loadInterval]);
 
   useEffect(() => {
     if (socket) {
@@ -374,19 +374,27 @@ export default function SubmissionDetail() {
 
   useEffect(() => {
     // TODO: Do something with those messages
+    if (loadTrigger === 0) return;
+
+    console.log('LIVE :: Checking for new keys to load...');
     const newResults = liveResultKeys.filter(msg => processedKeys.indexOf(msg) === -1);
     const newErrors = liveErrorKeys.filter(msg => processedKeys.indexOf(msg) === -1);
     if (newResults.length !== 0 || newErrors.length !== 0) {
-      if (!hasTimeout) {
-        setHasTimeout(true);
-        setTimeout(() => {
-          loadMessageData(newResults, newErrors);
-          setHasTimeout(false);
-        }, MESSAGE_TIMEOUT);
-      }
+      console.log(`New Results: ${newResults.join(' | ')} - New Errors: ${newErrors.join(' | ')}`);
+
+      apiCall({
+        method: 'POST',
+        url: '/api/v4/result/multiple_keys/',
+        body: { error: newErrors, result: newResults },
+        onSuccess: api_data => {
+          setProcessedKeys([...newResults, ...newErrors]);
+          console.log(api_data);
+        }
+      });
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [liveResultKeys, liveErrorKeys]);
+  }, [loadTrigger]);
 
   return (
     <PageCenter ml={4} mr={4} width="100%">
