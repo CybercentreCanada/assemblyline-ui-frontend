@@ -366,7 +366,7 @@ export default function SubmissionDetail() {
   }, [socket, handleErrorMessage, handleStopMessage]);
 
   useEffect(() => {
-    if (watchQueue) {
+    if (watchQueue && socket) {
       // eslint-disable-next-line no-console
       console.log(`SocketIO :: emitListen => Listening for messages on watch queue: ${watchQueue}`);
       socket.emit('listen', { wq_id: watchQueue, from_start: true });
