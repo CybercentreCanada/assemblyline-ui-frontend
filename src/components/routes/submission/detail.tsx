@@ -404,7 +404,10 @@ export default function SubmissionDetail() {
           console.log(api_data);
         }
       });
-    } else if (loadTrigger >= lastSuccessfulTrigger + OUTSTANDING_TRIGGER_COUNT && !outstanding) {
+    } else if (
+      loadTrigger >= lastSuccessfulTrigger + OUTSTANDING_TRIGGER_COUNT &&
+      (!outstanding || loadTrigger % OUTSTANDING_TRIGGER_COUNT === 0)
+    ) {
       console.log('LIVE :: Finding out oustanding services...');
 
       apiCall({
