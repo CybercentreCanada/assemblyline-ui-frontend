@@ -10,6 +10,7 @@ import {
 } from '@material-ui/core';
 import BugReportOutlinedIcon from '@material-ui/icons/BugReportOutlined';
 import ChromeReaderModeOutlinedIcon from '@material-ui/icons/ChromeReaderModeOutlined';
+import CloseIcon from '@material-ui/icons/Close';
 import CloudDownloadOutlinedIcon from '@material-ui/icons/CloudDownloadOutlined';
 import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
@@ -437,8 +438,17 @@ export default function SubmissionDetail() {
       >
         {outstanding &&
           (Object.keys(outstanding).length > 0 ? (
-            <Alert elevation={6} severity="info" style={{ textAlign: 'left' }} onClose={resetOutstanding}>
-              <b>{t('outstanding.title')}</b>
+            <Alert
+              elevation={6}
+              severity="info"
+              style={{ textAlign: 'left', margin: '4px' }}
+              action={
+                <IconButton aria-label="close" color="inherit" size="small" onClick={resetOutstanding}>
+                  <CloseIcon fontSize="inherit" />
+                </IconButton>
+              }
+            >
+              <span style={{ fontWeight: 500, textAlign: 'left' }}>{t('outstanding.title')}</span>
               <Grid container style={{ marginTop: theme.spacing(1) }}>
                 <Grid item xs={6}>
                   <b>{t('outstanding.services')}</b>
@@ -461,8 +471,22 @@ export default function SubmissionDetail() {
               })}
             </Alert>
           ) : (
-            <Alert elevation={6} severity="error" onClose={resetOutstanding}>
-              {t('outstanding.error')}
+            <Alert
+              elevation={6}
+              severity="error"
+              action={
+                <IconButton
+                  aria-label="close"
+                  color="inherit"
+                  size="small"
+                  onClick={resetOutstanding}
+                  style={{ alignSelf: 'start', margin: '4px' }}
+                >
+                  <CloseIcon fontSize="inherit" />
+                </IconButton>
+              }
+            >
+              <div style={{ textAlign: 'left' }}>{t('outstanding.error')}</div>
             </Alert>
           ))}
       </Snackbar>
