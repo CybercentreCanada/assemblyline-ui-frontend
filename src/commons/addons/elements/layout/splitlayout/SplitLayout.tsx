@@ -154,7 +154,6 @@ const SplitLayout: React.FC<SplitLayoutProps> = React.memo(
     };
 
     const onOpenRight = () => {
-      console.log('splitlayout=openright');
       updateState(computerRef.current.onOpenRight());
     };
 
