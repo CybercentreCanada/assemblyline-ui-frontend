@@ -452,7 +452,7 @@ export default function SubmissionDetail() {
                   color="inherit"
                   size="small"
                   onClick={resetOutstanding}
-                  style={{ alignSelf: 'start', margin: '4px' }}
+                  style={{ alignSelf: 'start', margin: '6px 6px 0 0' }}
                 >
                   <CloseIcon fontSize="inherit" />
                 </IconButton>
@@ -490,7 +490,7 @@ export default function SubmissionDetail() {
                   color="inherit"
                   size="small"
                   onClick={resetOutstanding}
-                  style={{ alignSelf: 'start', margin: '4px' }}
+                  style={{ alignSelf: 'start', margin: '6px 6px 0 0' }}
                 >
                   <CloseIcon fontSize="inherit" />
                 </IconButton>
