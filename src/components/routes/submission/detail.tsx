@@ -445,9 +445,15 @@ export default function SubmissionDetail() {
             <Alert
               elevation={6}
               severity="info"
-              style={{ textAlign: 'left', margin: '4px' }}
+              style={{ textAlign: 'left' }}
               action={
-                <IconButton aria-label="close" color="inherit" size="small" onClick={resetOutstanding}>
+                <IconButton
+                  aria-label="close"
+                  color="inherit"
+                  size="small"
+                  onClick={resetOutstanding}
+                  style={{ alignSelf: 'start', margin: '4px' }}
+                >
                   <CloseIcon fontSize="inherit" />
                 </IconButton>
               }
