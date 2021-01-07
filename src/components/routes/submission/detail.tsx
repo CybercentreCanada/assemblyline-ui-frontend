@@ -250,6 +250,7 @@ export default function SubmissionDetail() {
             setTree(tree_data.api_response);
           }
         });
+        if (socket) socket.disconnect();
       } else {
         if (!socket) {
           // eslint-disable-next-line no-console
