@@ -50,6 +50,10 @@ type ParamProps = {
   fid?: string;
 };
 
+const resultReducer = (currentResutls, newResults) => {
+  return { ...currentResutls, ...newResults };
+};
+
 const messageReducer = (messages: string[], receivedMessages: string[]) => {
   const newMessages = receivedMessages.filter(item => messages.indexOf(item) === -1);
   if (newMessages.length !== 0) {
@@ -73,6 +77,8 @@ export default function SubmissionDetail() {
   const [liveResultKeys, setLiveResultKeys] = useReducer(messageReducer, []);
   const [liveErrorKeys, setLiveErrorKeys] = useReducer(messageReducer, []);
   const [processedKeys, setProcessedKeys] = useReducer(messageReducer, []);
+  const [liveResults, setLiveResults] = useReducer(resultReducer, null);
+  const [liveErrors, setLiveErrors] = useState(null);
   const [outstanding, setOutstanding] = useState(null);
   const [loadTrigger, incrementLoadTrigger] = useReducer(incrementReducer, 0);
   const [socket, setSocket] = useState(null);
@@ -88,7 +94,7 @@ export default function SubmissionDetail() {
   const { setHighlightMap } = useHighlighter();
   const { setGlobalDrawer, globalDrawer } = useDrawer();
 
-  const parseSubmissionErrors = currentSubmission => {
+  const getParsedErrors = errorList => {
     const relevantErrors = errors => {
       return errors.filter(error => {
         let eID = error.substr(65, error.length);
@@ -146,11 +152,15 @@ export default function SubmissionDetail() {
     };
 
     return {
+      aggregated: futileErrors(errorList),
+      listed: relevantErrors(errorList)
+    };
+  };
+
+  const parseSubmissionErrors = currentSubmission => {
+    return {
       ...currentSubmission,
-      parsed_errors: {
-        aggregated: futileErrors(currentSubmission.errors),
-        listed: relevantErrors(currentSubmission.errors)
-      }
+      parsed_errors: getParsedErrors(currentSubmission.errors)
     };
   };
 
@@ -383,6 +393,7 @@ export default function SubmissionDetail() {
 
   useEffect(() => {
     if (fid) {
+      // TODO: pass the liveResults variable to the file detail for partial results...
       setGlobalDrawer(<FileDetail sha256={fid} sid={id} />);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -391,11 +402,13 @@ export default function SubmissionDetail() {
   useEffect(() => {
     if (loadTrigger === 0) return;
 
+    // eslint-disable-next-line no-console
     console.log('LIVE :: Checking for new keys to load...');
     const newResults = liveResultKeys.filter(msg => processedKeys.indexOf(msg) === -1);
     const newErrors = liveErrorKeys.filter(msg => processedKeys.indexOf(msg) === -1);
     if (newResults.length !== 0 || newErrors.length !== 0) {
       console.log(`LIVE :: New Results: ${newResults.join(' | ')} - New Errors: ${newErrors.join(' | ')}`);
+      setLiveErrors(getParsedErrors(liveErrorKeys));
 
       apiCall({
         method: 'POST',
@@ -404,21 +417,23 @@ export default function SubmissionDetail() {
         onSuccess: api_data => {
           setLastSuccessfulTrigger(loadTrigger);
           setProcessedKeys([...newResults, ...newErrors]);
-
-          // TODO: Do something with those messages
-          console.log(api_data);
+          setLiveResults(api_data.api_response);
+          // TODO:
+          // #1 -> Generate partial Submission summary
+          // #2 -> Generate partial Submission file tree
+          // #3 -> Generate partial Error list
         }
       });
     } else if (
       loadTrigger >= lastSuccessfulTrigger + OUTSTANDING_TRIGGER_COUNT &&
       (!outstanding || loadTrigger % OUTSTANDING_TRIGGER_COUNT === 0)
     ) {
+      // eslint-disable-next-line no-console
       console.log('LIVE :: Finding out oustanding services...');
 
       apiCall({
         url: `/api/v4/live/outstanding_services/${id}/`,
         onSuccess: api_data => {
-          console.log(api_data);
           setOutstanding(api_data.api_response);
         }
       });
@@ -664,8 +679,12 @@ export default function SubmissionDetail() {
             );
           })}
 
-        {submission && Object.keys(submission.errors).length !== 0 && (
+        {submission && submission.state === 'completed' && Object.keys(submission.errors).length !== 0 && (
           <ErrorSection sid={id} parsed_errors={submission.parsed_errors} />
+        )}
+
+        {submission && submission.state !== 'completed' && liveErrorKeys.length !== 0 && liveErrors !== null && (
+          <ErrorSection sid={id} parsed_errors={liveErrors} />
         )}
 
         <FileTreeSection tree={tree ? tree.tree : null} sid={id} />
