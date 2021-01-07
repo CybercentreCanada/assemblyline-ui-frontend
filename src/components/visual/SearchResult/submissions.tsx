@@ -80,7 +80,7 @@ const WrappedSubmissionsTable: React.FC<SubmissionsTableProps> = ({ submissionRe
                 <DivTableCell>
                   <Verdict score={submission.max_score} fullWidth />
                 </DivTableCell>
-                <DivTableCell>
+                <DivTableCell style={{ wordBreak: 'break-word' }}>
                   {submission.params.description.length > 150
                     ? `${submission.params.description.substr(0, 147)}...`
                     : submission.params.description}
