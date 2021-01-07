@@ -250,7 +250,10 @@ export default function SubmissionDetail() {
             setTree(tree_data.api_response);
           }
         });
-        if (socket) socket.disconnect();
+        if (socket) {
+          socket.disconnect();
+          setSocket(null);
+        }
       } else {
         if (!socket) {
           // eslint-disable-next-line no-console
@@ -309,6 +312,7 @@ export default function SubmissionDetail() {
       setTimeout(() => {
         if (loadInterval) clearInterval(loadInterval);
         setLoadInterval(null);
+        setOutstanding(null);
         // Loading final submission
         apiCall({
           url: `/api/v4/submission/${id}/`,
