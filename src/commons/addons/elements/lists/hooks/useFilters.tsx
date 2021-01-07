@@ -1,5 +1,4 @@
-import lodash, { isString } from 'lodash';
-import { loadavg } from 'os';
+import lodash from 'lodash';
 import { FilterField, GLOBAL_FILTER } from '../filters/filter-selector';
 
 interface UsingFilters {
@@ -11,38 +10,30 @@ interface UsingFilters {
 }
 
 export default function useFilters(fields?: FilterField[]): UsingFilters {
-  //
   const GLOBAL_FILTERS = fields ? fields.filter(f => f.id !== GLOBAL_FILTER.id) : null;
 
-  //
   const isNumber = (value: any): boolean => {
     return !lodash.isNaN(value);
   };
 
-  //
   const extractValue = (object: any, path: string): any => {
-    return lodash.get(object, path, '')
+    return lodash.get(object, path, '');
   };
 
-
-  //
   const isString = (value: any): boolean => {
     return lodash.isString(value);
-  }
+  };
 
-  //
   const isArray = (value: any): boolean => {
     return lodash.isArray(value);
-  }
+  };
 
-  //
-  const normalizeString = (input: string ): string => {
-    let _input = input.trim();
+  const normalizeString = (input: string): string => {
+    const _input = input.trim();
     return _input.toLowerCase();
   };
 
-  //
-  const normalizeNumber = (input: number ): string => {
+  const normalizeNumber = (input: number): string => {
     return input.toString();
   };
 
@@ -59,19 +50,20 @@ export default function useFilters(fields?: FilterField[]): UsingFilters {
   // default string array comparator.
   const arrayComparator = (objectValue: any[], compareValue: string) => {
     return objectValue.some(v => defaultComparator(v, compareValue));
-  }
+  };
 
-  //
   const defaultComparator = (objectValue: any, compareValue: string) => {
-    if(isArray(objectValue)) {
+    if (isArray(objectValue)) {
       return arrayComparator(objectValue, compareValue);
-    } else if(isString(objectValue)) {
+    }
+    if (isString(objectValue)) {
       return stringComparator(objectValue, compareValue);
-    } else if(isNumber(objectValue)) {
+    }
+    if (isNumber(objectValue)) {
       return numberComparator(objectValue, compareValue);
     }
-    return stringComparator(objectValue.toString(), compareValue)
-  }
+    return stringComparator(objectValue.toString(), compareValue);
+  };
 
   // Main filter comparator logic for a single object and single filter.
   // If the specified filter has an id matching GLOBAL_FILTER.id, then we apply
