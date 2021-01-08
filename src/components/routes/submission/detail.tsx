@@ -50,8 +50,11 @@ type ParamProps = {
   fid?: string;
 };
 
-const resultReducer = (currentResutls, newResults) => {
-  return { ...currentResutls, ...newResults };
+const resultReducer = (currentResults, newResults) => {
+  return {
+    result: { ...currentResults.result, ...newResults.result },
+    error: { ...currentResults.error, ...newResults.error }
+  };
 };
 
 const messageReducer = (messages: string[], receivedMessages: string[]) => {
