@@ -1,4 +1,4 @@
-import { Box, Collapse, Divider, makeStyles, Tooltip, Typography, useTheme } from '@material-ui/core';
+import { Box, Collapse, Divider, makeStyles, Typography, useTheme } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
 import useHighlighter from 'components/hooks/useHighlighter';
 import Verdict from 'components/visual/Verdict';
@@ -108,17 +108,11 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid }) => {
                 backgroundColor: isHighlighted(sha256) ? (theme.palette.type === 'dark' ? '#343a44' : '#d8e3ea') : null
               }}
             >
-              <Tooltip
-                title={item.sha256 ? item.sha256 : 'N/A'}
-                placement="right"
-                classes={{ tooltip: classes.noMaxWidth }}
-              >
-                <span>
-                  <Verdict score={item.score} mono short />
-                  {`:: ${item.name.join(' | ')} `}
-                  <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{`[${item.type}]`}</span>
-                </span>
-              </Tooltip>
+              <span>
+                <Verdict score={item.score} mono short />
+                {`:: ${item.name.join(' | ')} `}
+                <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{`[${item.type}]`}</span>
+              </span>
             </Box>
             <div style={{ marginLeft: theme.spacing(3) }}>
               <FileTree tree={item.children} sid={sid} />
