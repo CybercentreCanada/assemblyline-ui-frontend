@@ -51,6 +51,8 @@ type ParamProps = {
 };
 
 const resultReducer = (currentResults, newResults) => {
+  if (currentResults === null) return newResults;
+
   return {
     result: { ...currentResults.result, ...newResults.result },
     error: { ...currentResults.error, ...newResults.error }
