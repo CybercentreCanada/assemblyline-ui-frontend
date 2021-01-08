@@ -56,7 +56,7 @@ const ErrorCard: React.FC<ErrorCardProps> = ({ error }) => {
   const { t } = useTranslation(['adminErrorViewer']);
   const theme = useTheme();
   const sp2 = theme.spacing(2);
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = React.useState(false);
 
   const handleClick = () => {
     setOpen(!open);
