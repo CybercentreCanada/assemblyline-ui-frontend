@@ -571,8 +571,25 @@ export default function SubmissionDetail() {
 
   useEffect(() => {
     if (fid) {
-      // TODO: pass the liveResults variable to the file detail for partial results...
-      setGlobalDrawer(<FileDetail sha256={fid} sid={id} />);
+      if (liveResults) {
+        const curFileLiveResults = [];
+        const curFileLiveErrors = [];
+        Object.entries(liveResults.result).forEach(([resultKey, result]) => {
+          if (resultKey.startsWith(fid)) {
+            curFileLiveResults.push(result);
+          }
+        });
+        Object.entries(liveResults.error).forEach(([errorKey, error]) => {
+          if (errorKey.startsWith(fid)) {
+            curFileLiveErrors.push(error);
+          }
+        });
+        setGlobalDrawer(
+          <FileDetail sha256={fid} sid={id} liveResults={curFileLiveResults} liveErrors={curFileLiveErrors} />
+        );
+      } else {
+        setGlobalDrawer(<FileDetail sha256={fid} sid={id} />);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fid]);
@@ -585,6 +602,7 @@ export default function SubmissionDetail() {
     const newResults = liveResultKeys.filter(msg => processedKeys.indexOf(msg) === -1);
     const newErrors = liveErrorKeys.filter(msg => processedKeys.indexOf(msg) === -1);
     if (newResults.length !== 0 || newErrors.length !== 0) {
+      // eslint-disable-next-line no-console
       console.log(`LIVE :: New Results: ${newResults.join(' | ')} - New Errors: ${newErrors.join(' | ')}`);
       setLiveErrors(getParsedErrors(liveErrorKeys));
 
