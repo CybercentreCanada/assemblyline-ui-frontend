@@ -121,6 +121,7 @@ export default function SubmissionDetail() {
         const section = result.result.sections[sectionID];
         let hType = 'info';
         if (section.heuristic !== null && section.heuristic !== undefined) {
+          // #1: Get heuristic score
           if (section.heuristic.score < 100) {
             hType = 'info';
           } else if (section.heuristic.score < 1000) {
@@ -128,12 +129,75 @@ export default function SubmissionDetail() {
           } else {
             hType = 'malicious';
           }
+
+          // #2: Parse heuristics
+          if (!Object.hasOwnProperty.call(tempSummary.heuristics, hType)) {
+            tempSummary.heuristics[hType] = [];
+          }
+
+          let heurExists = false;
+          const heurItem = [section.heuristic.heur_id, section.heuristic.name];
+          for (const i in tempSummary.heuristics[hType]) {
+            if (
+              tempSummary.heuristics[hType][i][0] === heurItem[0] &&
+              tempSummary.heuristics[hType][i][1] === heurItem[1]
+            ) {
+              heurExists = true;
+              break;
+            }
+          }
+
+          if (!heurExists) {
+            tempSummary.heuristics[hType].push(heurItem);
+
+            const heurKey = `heuristic__${section.heuristic.heur_id}`;
+            tempTagMap[key].push(heurKey);
+            if (!Object.hasOwnProperty.call(tempTagMap, heurKey)) {
+              tempTagMap[heurKey] = [];
+            }
+            tempTagMap[heurKey].push(key);
+          }
+
+          // #3: Parse Att&cks
+          if (section.heuristic.attack) {
+            // eslint-disable-next-line guard-for-in
+            for (const i in section.heuristic.attack) {
+              const attack = section.heuristic.attack[i];
+              // eslint-disable-next-line guard-for-in
+              for (const j in attack.categories) {
+                const cat = attack.categories[j];
+                if (!Object.hasOwnProperty.call(tempSummary.attack_matrix, cat)) {
+                  tempSummary.attack_matrix[cat] = [];
+                }
+
+                let attExists = false;
+                const attackItem = [attack.attack_id, attack.pattern, hType];
+                for (const k in tempSummary.attack_matrix[cat]) {
+                  if (
+                    tempSummary.attack_matrix[cat][k][0] === attackItem[0] &&
+                    tempSummary.attack_matrix[cat][k][1] === attackItem[1] &&
+                    tempSummary.attack_matrix[cat][k][2] === attackItem[2]
+                  ) {
+                    attExists = true;
+                    break;
+                  }
+                }
+                if (!attExists) {
+                  tempSummary.attack_matrix[cat].push(attackItem);
+
+                  const attKey = `attack_pattern__${attack.attack_id}`;
+                  tempTagMap[key].push(attKey);
+                  if (!Object.hasOwnProperty.call(tempTagMap, attKey)) {
+                    tempTagMap[attKey] = [];
+                  }
+                  tempTagMap[attKey].push(key);
+                }
+              }
+            }
+          }
         }
 
-        // TODO:
-        // #1: Parse heuristics
-        // #2: Parse Att&cks
-
+        // #3: Parse Tags
         // eslint-disable-next-line guard-for-in
         for (const tagID in section.tags) {
           const tag = section.tags[tagID];
@@ -169,14 +233,14 @@ export default function SubmissionDetail() {
 
             if (!exists) {
               tempSummary.tags[summaryType][tag.type].push(tagVal);
-            }
 
-            const tagKey = `${tag.type}__${tag.value}`;
-            tempTagMap[key].push(tagKey);
-            if (!Object.hasOwnProperty.call(tempTagMap, tagKey)) {
-              tempTagMap[tagKey] = [];
+              const tagKey = `${tag.type}__${tag.value}`;
+              tempTagMap[key].push(tagKey);
+              if (!Object.hasOwnProperty.call(tempTagMap, tagKey)) {
+                tempTagMap[tagKey] = [];
+              }
+              tempTagMap[tagKey].push(key);
             }
-            tempTagMap[tagKey].push(key);
           }
         }
       }
