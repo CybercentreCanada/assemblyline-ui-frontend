@@ -77,9 +77,16 @@ type File = {
 type FileDetailProps = {
   sha256: string;
   sid?: string;
+  liveResults?: Result[];
+  liveErrors?: Error[];
 };
 
-const WrappedFileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null }) => {
+const WrappedFileDetail: React.FC<FileDetailProps> = ({
+  sha256,
+  sid = null,
+  liveResults = null,
+  liveErrors = null
+}) => {
   const { t } = useTranslation(['fileDetail']);
   const [file, setFile] = useState<File | null>(null);
   const apiCall = useMyAPI();
@@ -119,8 +126,10 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({ sha256, sid = null }) =>
   const patchFileDetails = (data: File) => {
     const newData = { ...data };
     newData.results.sort((a, b) => (a.response.service_name > b.response.service_name ? 1 : -1));
-    newData.emptys = data.results.filter(result => emptyResult(result));
-    newData.results = data.results.filter(result => !emptyResult(result));
+    const tempResults = liveResults ? [...data.results, ...liveResults] : data.results;
+    newData.emptys = tempResults.filter(result => emptyResult(result));
+    newData.results = tempResults.filter(result => !emptyResult(result));
+    newData.errors = liveErrors ? [...data.errors, ...liveErrors] : data.errors;
     return newData;
   };
 
