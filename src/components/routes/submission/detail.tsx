@@ -78,7 +78,9 @@ export default function SubmissionDetail() {
   const [liveErrorKeys, setLiveErrorKeys] = useReducer(messageReducer, []);
   const [processedKeys, setProcessedKeys] = useReducer(messageReducer, []);
   const [liveResults, setLiveResults] = useReducer(resultReducer, null);
+  const [configuration, setConfiguration] = useState(null);
   const [liveErrors, setLiveErrors] = useState(null);
+  const [liveTagMap, setLiveTagMap] = useState(null);
   const [outstanding, setOutstanding] = useState(null);
   const [loadTrigger, incrementLoadTrigger] = useReducer(incrementReducer, 0);
   const [socket, setSocket] = useState(null);
@@ -93,6 +95,176 @@ export default function SubmissionDetail() {
   const { user: currentUser } = useAppContext();
   const { setHighlightMap } = useHighlighter();
   const { setGlobalDrawer, globalDrawer } = useDrawer();
+
+  const updateLiveSumary = (results: object) => {
+    const tempSummary = summary !== null ? summary : { tags: {}, heuristics: {}, attack_matrix: {} };
+    const tempTagMap = liveTagMap !== null ? liveTagMap : {};
+
+    Object.entries(results).forEach(([resultKey, result]) => {
+      const key = resultKey.substr(0, 64);
+
+      if (!Object.hasOwnProperty.call(tempTagMap, key)) {
+        tempTagMap[key] = [];
+      }
+
+      // eslint-disable-next-line guard-for-in
+      for (const sectionID in result.result.sections) {
+        const section = result.result.sections[sectionID];
+        let hType = 'info';
+        if (section.heuristic !== null && section.heuristic !== undefined) {
+          if (section.heuristic.score < 100) {
+            hType = 'info';
+          } else if (section.heuristic.score < 1000) {
+            hType = 'suspicious';
+          } else {
+            hType = 'malicious';
+          }
+        }
+
+        // TODO:
+        // #1: Parse heuristics
+        // #2: Parse Att&cks
+
+        // eslint-disable-next-line guard-for-in
+        for (const tagID in section.tags) {
+          const tag = section.tags[tagID];
+          let summaryType = null;
+          if (configuration['submission.tag_types.attribution'].indexOf(tag.type) !== -1) {
+            summaryType = 'attribution';
+          } else if (configuration['submission.tag_types.behavior'].indexOf(tag.type) !== -1) {
+            summaryType = 'behavior';
+          } else if (configuration['submission.tag_types.ioc'].indexOf(tag.type) !== -1) {
+            summaryType = 'ioc';
+          }
+
+          if (summaryType !== null) {
+            if (!Object.hasOwnProperty.call(tempSummary.tags, summaryType)) {
+              tempSummary.tags[summaryType] = {};
+            }
+
+            if (!Object.hasOwnProperty.call(tempSummary.tags[summaryType], tag.type)) {
+              tempSummary.tags[summaryType][tag.type] = [];
+            }
+
+            let exists = false;
+            const tagVal = [tag.value, hType];
+            for (const i in tempSummary.tags[summaryType][tag.type]) {
+              if (
+                tempSummary.tags[summaryType][tag.type][i][0] === tagVal[0] &&
+                tempSummary.tags[summaryType][tag.type][i][1] === tagVal[1]
+              ) {
+                exists = true;
+                break;
+              }
+            }
+
+            if (!exists) {
+              tempSummary.tags[summaryType][tag.type].push(tagVal);
+            }
+
+            const tagKey = `${tag.type}__${tag.value}`;
+            tempTagMap[key].push(tagKey);
+            if (!Object.hasOwnProperty.call(tempTagMap, tagKey)) {
+              tempTagMap[tagKey] = [];
+            }
+            tempTagMap[tagKey].push(key);
+          }
+        }
+      }
+    });
+    setLiveTagMap(tempTagMap);
+    setHighlightMap(tempTagMap);
+    setSummary(tempSummary);
+  };
+
+  const updateLiveFileTree = (results: object) => {
+    const tempTree = tree !== null ? tree : {};
+
+    const searchFileTree = (sha256: string, currentTree: object) => {
+      let output = [];
+      Object.entries(currentTree).forEach(([key, val]) => {
+        if (Object.keys(val.children).length !== 0) {
+          output = [...output, ...searchFileTree(sha256, val.children)];
+        }
+        if (key === sha256) {
+          output.push(val);
+        }
+      });
+      return output;
+    };
+
+    const getFilenameFromSHA256 = sha256 => {
+      if (submission !== null) {
+        for (const i in submission.files) {
+          if (submission.files[i].sha256 === sha256) {
+            return submission.files[i].name;
+          }
+        }
+      }
+
+      return null;
+    };
+    Object.entries(results).forEach(([resultKey, result]) => {
+      const key = resultKey.substr(0, 64);
+
+      const toUpdate = searchFileTree(key, tempTree);
+
+      if (toUpdate.length === 0) {
+        const fname = getFilenameFromSHA256(key);
+
+        if (fname != null) {
+          tempTree[key] = { children: {}, name: [fname], score: 0, sha256: key, type: 'N/A' };
+          toUpdate.push(tempTree[key]);
+        } else {
+          if (!Object.hasOwnProperty.call(tempTree, 'TBD')) {
+            tempTree.TBD = { children: {}, name: ['Undetermined Parent'], score: 0, type: 'N/A' };
+          }
+
+          tempTree.TBD.children[key] = { children: {}, name: [key], score: 0, sha256: key, type: 'N/A' };
+          toUpdate.push(tempTree.TBD.children[key]);
+        }
+      }
+      const toDelTDB = [];
+      for (const idx in toUpdate) {
+        if (Object.hasOwnProperty.call(toUpdate, idx)) {
+          const item = toUpdate[idx];
+          if (result.result.score !== undefined) {
+            item.score += result.result.score;
+          }
+
+          for (const i in result.response.extracted) {
+            if (Object.hasOwnProperty.call(result.response.extracted, i)) {
+              const { sha256, name } = result.response.extracted[i];
+
+              if (!Object.hasOwnProperty.call(item.children, sha256)) {
+                if (
+                  Object.hasOwnProperty.call(tempTree, 'TBD') &&
+                  Object.hasOwnProperty.call(tempTree.TBD.children, sha256)
+                ) {
+                  item.children[sha256] = tempTree.TBD.children[sha256];
+                  item.children[sha256].name = [name];
+                  if (toDelTDB.indexOf(sha256) === -1) toDelTDB.push(sha256);
+                } else {
+                  item.children[sha256] = { children: {}, name: [name], score: 0, sha256, type: 'N/A' };
+                }
+              } else {
+                item.children[sha256].name.push(name);
+              }
+            }
+          }
+        }
+      }
+
+      for (const idxDel in toDelTDB) {
+        if (Object.hasOwnProperty.call(toDelTDB, idxDel)) {
+          delete tempTree.TBD.children[toDelTDB[idxDel]];
+        }
+      }
+    });
+
+    if (tempTree.TBD && Object.keys(tempTree.TBD.children).length === 0) delete tempTree.TBD;
+    setTree(tempTree);
+  };
 
   const getParsedErrors = errorList => {
     const relevantErrors = errors => {
@@ -236,6 +408,12 @@ export default function SubmissionDetail() {
 
   useEffect(() => {
     apiCall({
+      url: '/api/v4/help/configuration/',
+      onSuccess: api_data => {
+        setConfiguration(api_data.api_response);
+      }
+    });
+    apiCall({
       url: `/api/v4/submission/${id}/`,
       onSuccess: api_data => {
         setSubmission(parseSubmissionErrors(api_data.api_response));
@@ -257,7 +435,7 @@ export default function SubmissionDetail() {
         apiCall({
           url: `/api/v4/submission/tree/${id}/`,
           onSuccess: tree_data => {
-            setTree(tree_data.api_response);
+            setTree(tree_data.api_response.tree);
           }
         });
         if (socket) {
@@ -418,10 +596,8 @@ export default function SubmissionDetail() {
           setLastSuccessfulTrigger(loadTrigger);
           setProcessedKeys([...newResults, ...newErrors]);
           setLiveResults(api_data.api_response);
-          // TODO:
-          // #1 -> Generate partial Submission summary
-          // #2 -> Generate partial Submission file tree
-          // #3 -> Generate partial Error list
+          updateLiveFileTree(api_data.api_response.result);
+          updateLiveSumary(api_data.api_response.result);
         }
       });
     } else if (
@@ -457,7 +633,7 @@ export default function SubmissionDetail() {
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         open={outstanding !== null}
         key="outstanding"
-        style={{ top: theme.spacing(8) }}
+        style={{ top: theme.spacing(8), zIndex: 100 }}
       >
         {outstanding &&
           (Object.keys(outstanding).length > 0 ? (
@@ -687,7 +863,7 @@ export default function SubmissionDetail() {
           <ErrorSection sid={id} parsed_errors={liveErrors} />
         )}
 
-        <FileTreeSection tree={tree ? tree.tree : null} sid={id} />
+        <FileTreeSection tree={tree} sid={id} />
       </div>
     </PageCenter>
   );

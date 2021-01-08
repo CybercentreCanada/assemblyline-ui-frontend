@@ -96,15 +96,23 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid }) => {
           <div key={i}>
             <Box
               className={classes.file_item}
-              onClick={() => {
-                history.push(`/submission/detail/${sid}/${item.sha256}?name=${encodeURI(item.name[0])}`);
-              }}
+              onClick={
+                item.sha256
+                  ? () => {
+                      history.push(`/submission/detail/${sid}/${item.sha256}?name=${encodeURI(item.name[0])}`);
+                    }
+                  : null
+              }
               style={{
                 wordBreak: 'break-word',
                 backgroundColor: isHighlighted(sha256) ? (theme.palette.type === 'dark' ? '#343a44' : '#d8e3ea') : null
               }}
             >
-              <Tooltip title={item.sha256} placement="right" classes={{ tooltip: classes.noMaxWidth }}>
+              <Tooltip
+                title={item.sha256 ? item.sha256 : 'N/A'}
+                placement="right"
+                classes={{ tooltip: classes.noMaxWidth }}
+              >
                 <span>
                   <Verdict score={item.score} mono short />
                   {`:: ${item.name.join(' | ')} `}
