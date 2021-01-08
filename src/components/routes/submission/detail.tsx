@@ -51,6 +51,7 @@ type ParamProps = {
 };
 
 const resultReducer = (currentResults, newResults) => {
+  if (newResults === null) return null;
   if (currentResults === null) return newResults;
 
   return {
@@ -60,6 +61,8 @@ const resultReducer = (currentResults, newResults) => {
 };
 
 const messageReducer = (messages: string[], receivedMessages: string[]) => {
+  if (receivedMessages === null) return [];
+
   const newMessages = receivedMessages.filter(item => messages.indexOf(item) === -1);
   if (newMessages.length !== 0) {
     return [...messages, ...newMessages];
@@ -68,6 +71,7 @@ const messageReducer = (messages: string[], receivedMessages: string[]) => {
 };
 
 const incrementReducer = (old: number, increment: number) => {
+  if (increment === null) return 0;
   return old + increment;
 };
 
@@ -341,12 +345,33 @@ export default function SubmissionDetail() {
     };
   };
 
+  const resetLiveMode = useCallback(() => {
+    if (socket) {
+      // Disconnect socket
+      socket.disconnect();
+
+      // Reset all live mode states
+      setLiveResultKeys(null);
+      setLiveErrorKeys(null);
+      setProcessedKeys(null);
+      setLiveResults(null);
+      setLiveErrors(null);
+      setLiveTagMap(null);
+      setSocket(null);
+      setOutstanding(null);
+      incrementLoadTrigger(null);
+      setLastSuccessfulTrigger(0);
+      setWatchQueue(null);
+    }
+  }, [socket]);
+
   const resubmit = useCallback(() => {
     if (submission != null) {
       apiCall({
         url: `/api/v4/submit/resubmit/${submission.sid}/`,
         onSuccess: api_data => {
           showSuccessMessage(t('submit.success'));
+          resetLiveMode();
           setSubmission(null);
           setSummary(null);
           setTree(null);
@@ -356,7 +381,7 @@ export default function SubmissionDetail() {
         }
       });
     }
-  }, [apiCall, history, showSuccessMessage, submission, t]);
+  }, [apiCall, history, resetLiveMode, showSuccessMessage, submission, t]);
 
   const deleteSubmission = () => {
     if (submission != null) {
@@ -430,6 +455,7 @@ export default function SubmissionDetail() {
   useEffect(() => {
     if (submission) {
       if (submission.state === 'completed') {
+        resetLiveMode();
         apiCall({
           url: `/api/v4/submission/summary/${id}/`,
           onSuccess: summ_data => {
@@ -443,10 +469,6 @@ export default function SubmissionDetail() {
             setTree(tree_data.api_response.tree);
           }
         });
-        if (socket) {
-          socket.disconnect();
-          setSocket(null);
-        }
       } else {
         if (!socket) {
           // eslint-disable-next-line no-console
