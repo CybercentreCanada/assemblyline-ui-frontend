@@ -88,7 +88,7 @@
   "verdict.malicious.action": "Set alert verdict to malicious",
   "verdict.malicious.set": "You've already set verdict to malicious",
   "verdict.malicious.success": "Alert verdict successfully set to malicious.",
-  "verdict.non_malicious": "Malicious",
+  "verdict.non_malicious": "Non-Malicious",
   "verdict.non_malicious.action": "Set alert verdict to non-malicious",
   "verdict.non_malicious.set": "You've already set verdict to non-malicious",
   "verdict.non_malicious.success": "Alert verdict successfully set to non-malicious.",
