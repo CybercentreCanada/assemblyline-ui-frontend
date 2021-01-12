@@ -59,7 +59,9 @@ export default function useMyAPI() {
         }
         return res.json();
       })
-      .catch(() => {
+      .catch(err => {
+        // eslint-disable-next-line no-console
+        console.error(err);
         return {
           api_error_message: t('api.unreachable'),
           api_response: '',
