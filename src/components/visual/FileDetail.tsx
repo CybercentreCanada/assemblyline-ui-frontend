@@ -77,14 +77,14 @@ type File = {
 type FileDetailProps = {
   sha256: string;
   sid?: string;
-  liveResults?: Result[];
+  liveResultKeys?: string[];
   liveErrors?: Error[];
 };
 
 const WrappedFileDetail: React.FC<FileDetailProps> = ({
   sha256,
   sid = null,
-  liveResults = null,
+  liveResultKeys = null,
   liveErrors = null
 }) => {
   const { t } = useTranslation(['fileDetail']);
@@ -126,9 +126,8 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
   const patchFileDetails = (data: File) => {
     const newData = { ...data };
     newData.results.sort((a, b) => (a.response.service_name > b.response.service_name ? 1 : -1));
-    const tempResults = liveResults ? [...data.results, ...liveResults] : data.results;
-    newData.emptys = tempResults.filter(result => emptyResult(result));
-    newData.results = tempResults.filter(result => !emptyResult(result));
+    newData.emptys = data.results.filter(result => emptyResult(result));
+    newData.results = data.results.filter(result => !emptyResult(result));
     newData.errors = liveErrors ? [...data.errors, ...liveErrors] : data.errors;
     return newData;
   };
@@ -151,7 +150,9 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
 
     if (sid && sha256) {
       apiCall({
+        method: liveResultKeys ? 'POST' : 'GET',
         url: `/api/v4/submission/${sid}/file/${sha256}/`,
+        body: liveResultKeys ? { extra_result_keys: liveResultKeys } : null,
         onSuccess: api_data => {
           scrollToTop('drawerTop');
           setFile(patchFileDetails(api_data.api_response));
