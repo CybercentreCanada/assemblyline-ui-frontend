@@ -676,7 +676,7 @@ export default function SubmissionDetail() {
           }
         });
         setGlobalDrawer(
-          <FileDetail sha256={fid} sid={id} liveResults={curFileLiveResults} liveErrors={curFileLiveErrors} />
+          <FileDetail sha256={fid} sid={id} liveResultKeys={liveResultKeys} liveErrors={curFileLiveErrors} />
         );
       } else {
         setGlobalDrawer(<FileDetail sha256={fid} sid={id} />);
