@@ -145,6 +145,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
     } else if (shownControls === 'oauth') {
       apiCall({
         url: `/api/v4/auth/oauth/${location.search}`,
+        reloadOnUnauthorize: false,
         onSuccess: api_data => {
           setAvatar(api_data.api_response.avatar);
           setUsername(api_data.api_response.username);
