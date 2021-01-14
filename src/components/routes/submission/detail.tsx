@@ -106,8 +106,8 @@ export default function SubmissionDetail() {
   const { setGlobalDrawer, globalDrawer } = useDrawer();
 
   const updateLiveSumary = (results: object) => {
-    const tempSummary = summary !== null ? summary : { tags: {}, heuristics: {}, attack_matrix: {} };
-    const tempTagMap = liveTagMap !== null ? liveTagMap : {};
+    const tempSummary = summary !== null ? { ...summary } : { tags: {}, heuristics: {}, attack_matrix: {} };
+    const tempTagMap = liveTagMap !== null ? { ...liveTagMap } : {};
 
     Object.entries(results).forEach(([resultKey, result]) => {
       const key = resultKey.substr(0, 64);
@@ -251,7 +251,7 @@ export default function SubmissionDetail() {
   };
 
   const updateLiveFileTree = (results: object) => {
-    const tempTree = tree !== null ? tree : {};
+    const tempTree = tree !== null ? { ...tree } : {};
 
     const searchFileTree = (sha256: string, currentTree: object) => {
       let output = [];
