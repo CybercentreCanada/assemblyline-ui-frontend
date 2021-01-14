@@ -24,7 +24,7 @@
   "heuristics": "Heuristics",
   "information": "Submission Information",
   "ioc": "Indicators of Compromise",
-  "live_mode": "Submission is still processing, receiveing results live...",
+  "live_mode": "Submission is still processing, receiving results live...",
   "max_score": "Verdict",
   "metadata": "Metadata",
   "outstanding.error": "We could not determine which services are busy working on your submission. There might be issues with the system...",
