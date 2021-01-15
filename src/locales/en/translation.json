@@ -74,6 +74,7 @@
   "submission.state.submitted": "Scanning...",
   "tooltip.breadcrumbs.max": "Expand Breadcrumbs",
   "tooltip.breadcrumbs.min": "Collapse Breadcrumbs",
+  "under_construction": "This page is still under development",
   "usermenu": "User Menu",
   "usermenu.account": "Manage Account",
   "usermenu.logout": "Logout",
