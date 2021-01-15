@@ -17,6 +17,8 @@
   "delete.title": "Supprimer la source de signature",
   "editing_source": "Modifier une source de signature",
   "headers": "En-têtes",
+  "headers.name": "Nom",
+  "headers.value": "Valeur",
   "ignore_ssl": "Ignorer les erreurs SSL",
   "ignore_ssl_used": "Les erreurs SSL seront ignorées lors de la connexion à cette source",
   "name": "Nom de la source (obligatoire)",
@@ -25,6 +27,9 @@
   "pattern": "Modèle Regex",
   "private_key": "Clé privée",
   "private_key_used": "Une clé privée sera utilisée pour se connecter à la source",
+  "proxy": "Serveur Proxy",
+  "proxy.placeholder": "scheme://utilisateur:mot_de_passe@serveur:port",
+  "proxy_used": "Un serveur proxy sera utilisé pour se connecter à la source",
   "title": "Sources de signature",
   "uri": "URI (obligatoire)",
   "username": "Nom d'utilisateur"
