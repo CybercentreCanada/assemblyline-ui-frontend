@@ -1,13 +1,9 @@
-import PageCenter from 'commons/components/layout/pages/PageCenter';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import UnderConstruction from '../under_construction';
 
 export default function Search() {
   const { t } = useTranslation(['helpSearch']);
 
-  return (
-    <PageCenter margin={4} width="100%">
-      <div style={{ textAlign: 'left' }}>{t('Search')}</div>
-    </PageCenter>
-  );
+  return <UnderConstruction page={t('title')} />;
 }
