@@ -29,6 +29,8 @@ import manageWorkflowDetailEN from 'locales/en/manage/workflow_detail.json';
 import optoutEN from 'locales/en/optout.json';
 import searchEN from 'locales/en/search.json';
 import settingsEN from 'locales/en/settings.json';
+import statisticsHeuristicsEN from 'locales/en/statistics/heuristics.json';
+import statisticsSignaturesEN from 'locales/en/statistics/signatures.json';
 import submissionDetailEN from 'locales/en/submission/detail.json';
 import submissionReportEN from 'locales/en/submission/report.json';
 import submissionsEN from 'locales/en/submissions.json';
@@ -65,6 +67,8 @@ import manageWorkflowDetailFR from 'locales/fr/manage/workflow_detail.json';
 import optoutFR from 'locales/fr/optout.json';
 import searchFR from 'locales/fr/search.json';
 import settingsFR from 'locales/fr/settings.json';
+import statisticsHeuristicsFR from 'locales/fr/statistics/heuristics.json';
+import statisticsSignaturesFR from 'locales/fr/statistics/signatures.json';
 import submissionDetailFR from 'locales/fr/submission/detail.json';
 import submissionReportFR from 'locales/fr/submission/report.json';
 import submissionsFR from 'locales/fr/submissions.json';
@@ -103,6 +107,8 @@ const resources = {
     optout: optoutEN,
     search: searchEN,
     settings: settingsEN,
+    statisticsHeuristics: statisticsHeuristicsEN,
+    statisticsSignatures: statisticsSignaturesEN,
     submissions: submissionsEN,
     submissionDetail: submissionDetailEN,
     submissionReport: submissionReportEN,
@@ -141,6 +147,8 @@ const resources = {
     optout: optoutFR,
     search: searchFR,
     settings: settingsFR,
+    statisticsHeuristics: statisticsHeuristicsFR,
+    statisticsSignatures: statisticsSignaturesFR,
     submissions: submissionsFR,
     submissionDetail: submissionDetailFR,
     submissionReport: submissionReportFR,
