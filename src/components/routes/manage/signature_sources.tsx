@@ -17,6 +17,7 @@ import {
 } from '@material-ui/core';
 import AddCircleOutlineOutlinedIcon from '@material-ui/icons/AddCircleOutlineOutlined';
 import CardMembershipOutlinedIcon from '@material-ui/icons/CardMembershipOutlined';
+import DnsOutlinedIcon from '@material-ui/icons/DnsOutlined';
 import NoEncryptionOutlinedIcon from '@material-ui/icons/NoEncryptionOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
 import VpnKeyOutlinedIcon from '@material-ui/icons/VpnKeyOutlined';
@@ -134,6 +135,11 @@ const WrappedSourceDetail = ({ service, base, close, reload }) => {
 
   const handleURIChange = event => {
     setSource({ ...source, uri: event.target.value });
+    setModified(true);
+  };
+
+  const handleProxyChange = event => {
+    setSource({ ...source, proxy: event.target.value });
     setModified(true);
   };
 
@@ -373,6 +379,7 @@ const WrappedSourceDetail = ({ service, base, close, reload }) => {
                   size="small"
                   value={tempHeader.name}
                   fullWidth
+                  placeholder={t('headers.name')}
                   variant="outlined"
                   onChange={handleTempHeaderName}
                 />
@@ -382,6 +389,7 @@ const WrappedSourceDetail = ({ service, base, close, reload }) => {
                   size="small"
                   value={tempHeader.value}
                   fullWidth
+                  placeholder={t('headers.value')}
                   variant="outlined"
                   onChange={handleTempHeaderValue}
                 />
@@ -406,6 +414,17 @@ const WrappedSourceDetail = ({ service, base, close, reload }) => {
                 </IconButton>
               </Grid>
             </Grid>
+          </Grid>
+          <Grid item xs={12}>
+            <div className={classes.label}>{t('proxy')}</div>
+            <TextField
+              size="small"
+              value={source.proxy}
+              placeholder={t('proxy.placeholder')}
+              fullWidth
+              variant="outlined"
+              onChange={handleProxyChange}
+            />
           </Grid>
           <Grid item xs={12}>
             <div className={classes.label}>{t('ca')}</div>
@@ -467,6 +486,11 @@ const SourceCard = ({ source, onClick }) => {
             {source.ca_cert && (
               <Tooltip title={t('ca_used')}>
                 <CardMembershipOutlinedIcon color="action" style={{ marginLeft: theme.spacing(0.5) }} />
+              </Tooltip>
+            )}
+            {source.proxy && (
+              <Tooltip title={t('proxy_used')}>
+                <DnsOutlinedIcon color="action" style={{ marginLeft: theme.spacing(0.5) }} />
               </Tooltip>
             )}
             {source.ssl_ignore_errors && (
