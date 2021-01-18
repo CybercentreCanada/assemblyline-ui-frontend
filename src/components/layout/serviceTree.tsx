@@ -1,6 +1,7 @@
 import { Checkbox, createStyles, FormControlLabel, makeStyles, Typography, useTheme } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 import React from 'react';
+import { HiOutlineExternalLink } from 'react-icons/hi';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -59,7 +60,16 @@ function ServiceTreeItem({ item, onChange, size = 'medium' as 'medium' }: Servic
             onChange={() => onChange(item.name, item.category)}
           />
         }
-        label={<Typography variant={size === 'small' ? 'body2' : 'body1'}>{item.name}</Typography>}
+        label={
+          <Typography variant={size === 'small' ? 'body2' : 'body1'}>
+            {item.name}
+            {item.is_external && (
+              <HiOutlineExternalLink
+                style={{ fontSize: 'large', verticalAlign: 'middle', marginLeft: theme.spacing(2) }}
+              />
+            )}
+          </Typography>
+        }
         className={classes.item}
       />
       <div style={{ paddingLeft: sp4 }}>
