@@ -21,6 +21,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import ServiceTree from 'components/layout/serviceTree';
 import Classification from 'components/visual/Classification';
+import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDropper from 'components/visual/FileDropper';
 import Flow from 'helpers/flow';
 import generateUUID from 'helpers/uuid';
@@ -40,6 +41,8 @@ function Submit() {
   const [uploadProgress, setUploadProgress] = useState(null);
   const [url, setUrl] = useState('');
   const [urlHasError, setUrlHasError] = useState(false);
+  const [validate, setValidate] = useState(false);
+  const [validateCB, setValidateCB] = useState(null);
   const [allowClick, setAllowClick] = useState(true);
   const [file, setFile] = useState(null);
   const [value, setValue] = useState('0');
@@ -84,6 +87,57 @@ function Submit() {
     flow.off('complete');
     flow.off('fileError');
     flow.off('progress');
+  };
+
+  const validateServiceSelection = cbType => {
+    let showPopup = false;
+
+    // Check if we need the popup, and if we do
+    settings.services.forEach(cat => {
+      cat.services.forEach(srv => {
+        if (srv.selected && srv.is_external) {
+          showPopup = true;
+        }
+      });
+    });
+
+    if (showPopup) {
+      // External service selected, show popup
+      setValidateCB(cbType);
+      setValidate(true);
+    } else if (cbType === 'file') {
+      // No external service and file submitted
+      uploadAndScan();
+    } else {
+      // No external service and url submitted
+      analyseUrl();
+    }
+  };
+
+  const cleanupServiceSelection = () => {
+    // eslint-disable-next-line guard-for-in
+    for (const i in settings.services) {
+      const cat = settings.services[i];
+      // eslint-disable-next-line guard-for-in
+      for (const j in settings.services[i].services) {
+        const srv = settings.services[i].services[j];
+        if (srv.selected && srv.is_external) {
+          srv.selected = false;
+        }
+      }
+      cat.selected = cat.services.every(e => e.selected);
+    }
+
+    executeCB();
+  };
+
+  const executeCB = () => {
+    setValidate(false);
+    if (validateCB === 'file') {
+      uploadAndScan();
+    } else {
+      analyseUrl();
+    }
   };
 
   const uploadAndScan = () => {
@@ -237,6 +291,15 @@ function Submit() {
 
   return (
     <PageCenter maxWidth={md ? '800px' : downSM ? '100%' : '1024px'} margin={4} width="100%">
+      <ConfirmationDialog
+        open={validate}
+        handleClose={cleanupServiceSelection}
+        handleAccept={executeCB}
+        title={t('validate.title')}
+        cancelText={t('validate.cancelText')}
+        acceptText={t('validate.acceptText')}
+        text={t('validate.text')}
+      />
       <div style={{ marginBottom: !downSM ? '2rem' : null }}>{getBanner(theme)}</div>
       {c12nDef.enforce ? (
         <div style={{ paddingBottom: sp8 }}>
@@ -264,7 +327,12 @@ function Submit() {
               <div style={{ marginTop: '2rem' }}>
                 {file ? (
                   <>
-                    <Button disabled={!allowClick} color="primary" variant="contained" onClick={uploadAndScan}>
+                    <Button
+                      disabled={!allowClick}
+                      color="primary"
+                      variant="contained"
+                      onClick={() => validateServiceSelection('file')}
+                    >
                       {uploadProgress === null ? t('file.button') : `${uploadProgress}${t('submit.progress')}`}
                     </Button>
                     <Button style={{ marginLeft: '16px' }} color="secondary" variant="contained" onClick={cancelUpload}>
@@ -305,7 +373,12 @@ function Submit() {
                   onChange={handleUrlChange}
                   style={{ flexGrow: 1, marginRight: '1rem' }}
                 />
-                <Button disabled={!url || !allowClick} color="primary" variant="contained" onClick={() => analyseUrl()}>
+                <Button
+                  disabled={!url || !allowClick}
+                  color="primary"
+                  variant="contained"
+                  onClick={() => validateServiceSelection('url')}
+                >
                   {t('url.button')}
                 </Button>
               </>

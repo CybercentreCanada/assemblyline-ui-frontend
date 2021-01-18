@@ -31,5 +31,9 @@
   "terms3": "Terms of Service",
   "url": "URL",
   "url.button": "Scan",
-  "url.input": "URL to Scan"
+  "url.input": "URL to Scan",
+  "validate.acceptText": "Continue",
+  "validate.cancelText": "Deselect external services",
+  "validate.text": "You are about to submit your file to a service outside Assemblyline's infrastructure. What do you want to do?",
+  "validate.title": "External Services Selected"
 }
