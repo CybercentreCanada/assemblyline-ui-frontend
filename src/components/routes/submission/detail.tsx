@@ -536,15 +536,15 @@ export default function SubmissionDetail() {
       } else {
         if (!socket) {
           // eslint-disable-next-line no-console
-          console.log('SocketIO :: Init => Create SocketIO client...');
+          console.debug('SocketIO :: Init => Create SocketIO client...');
           const tempSocket = io(NAMESPACE);
           tempSocket.on('connect', () => {
             // eslint-disable-next-line no-console
-            console.log('SocketIO :: Conn => Connecting to socketIO server...');
+            console.debug('SocketIO :: Conn => Connecting to socketIO server...');
           });
           tempSocket.on('disconnect', () => {
             // eslint-disable-next-line no-console
-            console.log('SocketIO :: Conn => Disconnected from socketIO server...');
+            console.debug('SocketIO :: Conn => Disconnected from socketIO server...');
           });
           setSocket(tempSocket);
         }
@@ -564,7 +564,7 @@ export default function SubmissionDetail() {
   const handleErrorMessage = useCallback(
     data => {
       // eslint-disable-next-line no-console
-      console.log(`SocketIO :: onError => ${data.msg}`);
+      console.debug(`SocketIO :: onError => ${data.msg}`);
       showErrorMessage(t('dispatcher.not_responding'), 15000);
       apiCall({
         url: `/api/v4/live/setup_watch_queue/${id}/`,
@@ -579,14 +579,14 @@ export default function SubmissionDetail() {
 
   const handleStartMessage = data => {
     // eslint-disable-next-line no-console
-    console.log(`SocketIO :: onStart => ${data.msg}`);
+    console.debug(`SocketIO :: onStart => ${data.msg}`);
     setTimeout(() => incrementLoadTrigger(1), 500);
   };
 
   const handleStopMessage = useCallback(
     data => {
       // eslint-disable-next-line no-console
-      console.log(`SocketIO :: onStop => ${data.msg}`);
+      console.debug(`SocketIO :: onStop => ${data.msg}`);
 
       setTimeout(() => {
         if (loadInterval) clearInterval(loadInterval);
@@ -607,13 +607,13 @@ export default function SubmissionDetail() {
 
   const handleCacheKeyMessage = data => {
     // eslint-disable-next-line no-console
-    console.log(`SocketIO :: onCacheKey => ${data.msg}`);
+    console.debug(`SocketIO :: onCacheKey => ${data.msg}`);
     setLiveResultKeys([data.msg]);
   };
 
   const handleCacheKeyErrrorMessage = data => {
     // eslint-disable-next-line no-console
-    console.log(`SocketIO :: onCacheKeyError => ${data.msg}`);
+    console.debug(`SocketIO :: onCacheKeyError => ${data.msg}`);
     setLiveErrorKeys([data.msg]);
   };
 
@@ -631,7 +631,7 @@ export default function SubmissionDetail() {
   useEffect(() => {
     if (socket) {
       // eslint-disable-next-line no-console
-      console.log('SocketIO :: Init => Registering SocketIO Callbacks...');
+      console.debug('SocketIO :: Init => Registering SocketIO Callbacks...');
       socket.on('error', handleErrorMessage);
       socket.on('start', handleStartMessage);
       socket.on('stop', handleStopMessage);
@@ -647,7 +647,7 @@ export default function SubmissionDetail() {
   useEffect(() => {
     if (watchQueue && socket) {
       // eslint-disable-next-line no-console
-      console.log(`SocketIO :: emitListen => Listening for messages on watch queue: ${watchQueue}`);
+      console.debug(`SocketIO :: emitListen => Listening for messages on watch queue: ${watchQueue}`);
       socket.emit('listen', { wq_id: watchQueue, from_start: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -689,12 +689,12 @@ export default function SubmissionDetail() {
     if (loadTrigger === 0) return;
 
     // eslint-disable-next-line no-console
-    console.log('LIVE :: Checking for new keys to load...');
+    console.debug('LIVE :: Checking for new keys to load...');
     const newResults = liveResultKeys.filter(msg => processedKeys.indexOf(msg) === -1);
     const newErrors = liveErrorKeys.filter(msg => processedKeys.indexOf(msg) === -1);
     if (newResults.length !== 0 || newErrors.length !== 0) {
       // eslint-disable-next-line no-console
-      console.log(`LIVE :: New Results: ${newResults.join(' | ')} - New Errors: ${newErrors.join(' | ')}`);
+      console.debug(`LIVE :: New Results: ${newResults.join(' | ')} - New Errors: ${newErrors.join(' | ')}`);
       setLiveErrors(getParsedErrors(liveErrorKeys));
 
       apiCall({
@@ -714,7 +714,7 @@ export default function SubmissionDetail() {
       (!outstanding || loadTrigger % OUTSTANDING_TRIGGER_COUNT === 0)
     ) {
       // eslint-disable-next-line no-console
-      console.log('LIVE :: Finding out oustanding services...');
+      console.debug('LIVE :: Finding out oustanding services...');
 
       apiCall({
         url: `/api/v4/live/outstanding_services/${id}/`,
