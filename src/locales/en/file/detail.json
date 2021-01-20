@@ -27,6 +27,7 @@
   "size": "Size",
   "supplementary": "Supplementary files",
   "title": "File Details",
+  "type": "Type",
   "verdict.info": "Informational",
   "verdict.malicious": "Malicious",
   "verdict.suspicious": "Suspicious",

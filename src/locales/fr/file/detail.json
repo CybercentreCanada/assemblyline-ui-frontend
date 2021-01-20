@@ -27,6 +27,7 @@
   "size": "Taille",
   "supplementary": "Fichiers supplémentaires",
   "title": "Détails du fichier",
+  "type": "Type",
   "verdict.info": "Informatif",
   "verdict.malicious": "Malveillant",
   "verdict.suspicious": "Suspect",
