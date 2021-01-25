@@ -181,8 +181,17 @@ function Submit() {
           }, 500);
         },
         onFailure: api_data => {
-          showErrorMessage(t('submit.file.failure'));
+          if (
+            api_data.api_status_code === 503 ||
+            api_data.api_status_code === 403 ||
+            api_data.api_status_code === 404
+          ) {
+            showErrorMessage(api_data.api_error_message);
+          } else {
+            showErrorMessage(t('submit.file.failure'));
+          }
           setAllowClick(true);
+          cancelUpload();
         }
       });
     });
