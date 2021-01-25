@@ -93,7 +93,7 @@ function DrawerProvider(props: DrawerProviderProps) {
           className={classes.appRightDrawer}
           style={{
             width: globalDrawer ? drawerWidth : 0,
-            zIndex: isXL ? theme.zIndex.appBar + 1 : theme.zIndex.drawer
+            zIndex: theme.zIndex.drawer + 100
           }}
           classes={{ paper: classes.paper }}
           anchor="right"
