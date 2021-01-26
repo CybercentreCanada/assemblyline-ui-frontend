@@ -1,4 +1,4 @@
-import { Box, Collapse, makeStyles, useTheme } from '@material-ui/core';
+import { Box, Button, Collapse, Fade, makeStyles, Paper, Popper, Typography, useTheme } from '@material-ui/core';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import useAppContext from 'components/hooks/useAppContext';
@@ -40,9 +40,24 @@ export type Result = {
   sha256: string;
 };
 
+export type AlternateResult = {
+  classification: string;
+  created: string;
+  drop_file: boolean;
+  id: string;
+  response: {
+    service_name: string;
+    service_version: string;
+  };
+  result: {
+    score: number;
+  };
+};
+
 type ResultCardProps = {
   result: Result;
   sid: string | null;
+  alternates?: AlternateResult[] | null;
 };
 
 const useStyles = makeStyles(theme => ({
@@ -80,7 +95,7 @@ export const emptyResult = (result: Result) => {
   );
 };
 
-const ResultCard: React.FC<ResultCardProps> = ({ result, sid }) => {
+const ResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates = null }) => {
   const { t } = useTranslation(['fileDetail']);
   const classes = useStyles();
   const theme = useTheme();
@@ -88,6 +103,7 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid }) => {
   const { settings } = useAppContext();
   const empty = emptyResult(result);
   const [open, setOpen] = React.useState(!empty && result.result.score >= settings.expand_min_score);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const { getKey, hasHighlightedKeys } = useHighlighter();
 
   const allTags = useMemo(() => {
@@ -126,8 +142,37 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid }) => {
     setOpen(!open);
   };
 
+  const handlePopperClick = (event: React.MouseEvent<HTMLElement>) => {
+    event.stopPropagation();
+    setAnchorEl(anchorEl ? null : event.currentTarget);
+  };
+
+  const popper = Boolean(anchorEl);
+
   return (
     <div className={classes.card} style={{ marginBottom: sp2 }}>
+      <Popper open={popper} anchorEl={anchorEl} placement="bottom-end" transition>
+        {/* TODO: We should have a clickaway listener */}
+        {({ TransitionProps }) => (
+          <Fade {...TransitionProps} timeout={350}>
+            <Paper style={{ padding: theme.spacing(2) }}>
+              {/* TODO: We should be using a clickable list like the menu */}
+              <div>
+                {`${result.response.service_name} :: ${result.response.service_version} :: [${result.result.score}] @ `}
+                <Moment format="YYYY-MM-DD HH:mm:ss">{result.created}</Moment>
+              </div>
+              {alternates.map(alt => {
+                return (
+                  <div key={alt.id}>
+                    {`${alt.response.service_name} :: ${alt.response.service_version} :: [${alt.result.score}] @ `}
+                    <Moment format="YYYY-MM-DD HH:mm:ss">{alt.created}</Moment>
+                  </div>
+                );
+              })}
+            </Paper>
+          </Fade>
+        )}
+      </Popper>
       <Box
         className={classes.card_title}
         onClick={handleClick}
@@ -145,11 +190,27 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid }) => {
           &nbsp;{result.response.service_context ? `(${result.response.service_context})` : ''}
         </small>
         {!empty && !sid && (
-          <small>
-            <Moment className={classes.muted} fromNow>
-              {result.created}
-            </Moment>
-          </small>
+          <div>
+            {alternates ? (
+              <Button
+                className={classes.muted}
+                variant="outlined"
+                size="small"
+                onClick={handlePopperClick}
+                style={{ fontSize: 'smaller' }}
+              >
+                <Moment fromNow>{result.created}</Moment>
+              </Button>
+            ) : (
+              <Typography
+                className={classes.muted}
+                variant="button"
+                style={{ fontSize: 'smaller', paddingRight: theme.spacing(1.4) }}
+              >
+                <Moment fromNow>{result.created}</Moment>
+              </Typography>
+            )}
+          </div>
         )}
         {open ? <ExpandLess className={classes.muted} /> : <ExpandMore className={classes.muted} />}
       </Box>
