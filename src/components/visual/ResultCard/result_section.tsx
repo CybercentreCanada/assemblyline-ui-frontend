@@ -15,7 +15,10 @@ import {
   useTheme,
   withStyles
 } from '@material-ui/core';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import FingerprintOutlinedIcon from '@material-ui/icons/FingerprintOutlined';
+import { TreeItem, TreeView } from '@material-ui/lab';
 import useHighlighter from 'components/hooks/useHighlighter';
 import Attack from 'components/visual/Attack';
 import Classification from 'components/visual/Classification';
@@ -35,6 +38,20 @@ const useStyles = makeStyles(theme => ({
     '&:hover': {
       backgroundColor: theme.palette.action.hover,
       cursor: 'pointer'
+    }
+  }
+}));
+
+const useTreeItemStyles = makeStyles((theme: Theme) => ({
+  root: {
+    '&:hover > .MuiTreeItem-content': {
+      backgroundColor: 'transparent'
+    },
+    '&:focus > .MuiTreeItem-content, &$root.Mui-selected > .MuiTreeItem-content': {
+      backgroundColor: 'transparent'
+    },
+    '&:focus > .MuiTreeItem-content .MuiTreeItem-label, &:hover > .MuiTreeItem-content .MuiTreeItem-label, &$root.Mui-selected > .MuiTreeItem-content .MuiTreeItem-label': {
+      backgroundColor: 'transparent'
     }
   },
   suspicious: {
@@ -179,101 +196,120 @@ const JSONBody = ({ body }) => {
   );
 };
 
-const ProcessTreeBody = ({ body }) => {
+const ProcessTreeItem = ({ process }) => {
   const { t } = useTranslation(['fileDetail']);
   const theme = useTheme();
-  const classes = useStyles();
-
+  const classes = useTreeItemStyles();
   const classMap = {
     suspicious: classes.suspicious,
     highly_suspicious: classes.suspicious,
     malicious: classes.malicious
   };
 
-  let data = null;
-  try {
-    data = JSON.parse(body);
-  } catch (ex) {
-    data = body;
-  }
+  return (
+    <TreeItem
+      nodeId={process.process_pid.toString()}
+      classes={{
+        root: classes.root
+      }}
+      label={
+        <div
+          className={
+            classMap[
+              scoreToVerdict(
+                Object.keys(process.signatures).reduce((sum, key) => sum + parseFloat(process.signatures[key] || 0), 0)
+              )
+            ]
+          }
+          style={{
+            border: `1px solid ${theme.palette.divider}`,
+            margin: '0.2em 0em',
+            borderRadius: '4px',
+            display: 'flex',
+            maxWidth: '50rem',
+            minWidth: '30rem'
+          }}
+        >
+          <div
+            style={{
+              padding: '5px',
+              backgroundColor: theme.palette.type === 'dark' ? '#FFFFFF10' : '#00000010',
+              borderRadius: '4px 0px 0px 4px'
+            }}
+          >
+            {process.process_pid}
+          </div>
+          <div style={{ padding: '5px', flexGrow: 1, wordBreak: 'break-word' }}>
+            <div style={{ paddingBottom: '5px' }}>
+              <b>{process.process_name}</b>
+            </div>
+            <div>
+              <samp>
+                <small>{process.command_line}</small>
+              </samp>
+            </div>
+          </div>
+          <div style={{ alignSelf: 'center', color: theme.palette.text.secondary }}>
+            {Object.keys(process.signatures).length !== 0 && (
+              <div>
+                <Tooltip title={`${t('process_signatures')}: ${Object.keys(process.signatures).join(' | ')}`}>
+                  <span>
+                    {Object.keys(process.signatures).length}x
+                    <FingerprintOutlinedIcon style={{ verticalAlign: 'middle' }} />
+                  </span>
+                </Tooltip>
+              </div>
+            )}
+          </div>
+        </div>
+      }
+    >
+      {process.children.length !== 0 && <ProcessTreeItemList processes={process.children} />}
+    </TreeItem>
+  );
+};
 
-  if (!(data instanceof Object)) {
+const ProcessTreeItemList = ({ processes }) => {
+  return processes.map((process, id) => {
+    return <ProcessTreeItem key={id} process={process} />;
+  });
+};
+
+const ProcessTreeBody = ({ body }) => {
+  try {
+    const data = JSON.parse(body);
+    const expanded = [];
+
+    // Auto-expand first two levels
+    data.forEach(process => {
+      if (process.process_pid !== undefined && process.process_pid !== null) {
+        expanded.push(process.process_pid.toString());
+      }
+      if (process.children !== undefined && process.children !== null && process.children.length !== 0) {
+        process.children.forEach(subprocess => {
+          if (subprocess.process_pid !== undefined && subprocess.process_pid !== null) {
+            expanded.push(subprocess.process_pid.toString());
+          }
+        });
+      }
+    });
+
+    return (
+      <div style={{ overflowX: 'auto' }}>
+        <TreeView
+          defaultExpanded={expanded}
+          defaultCollapseIcon={<ExpandMoreIcon />}
+          defaultExpandIcon={<ChevronRightIcon />}
+        >
+          <ProcessTreeItemList processes={data} />
+        </TreeView>
+      </div>
+    );
+  } catch (ex) {
     // eslint-disable-next-line no-console
     console.log('[WARNING] Could not parse ProcessTree body. The section will be skipped...');
   }
-
-  return data instanceof Object ? (
-    <ul
-      style={{
-        fontSize: '0.875rem',
-        listStyleType: 'none',
-        paddingInlineStart: 0,
-        marginBlockStart: '0.25rem',
-        marginBlockEnd: '0.25rem'
-      }}
-    >
-      {data.map((process, id) => {
-        return (
-          <li key={id}>
-            <div
-              className={
-                classMap[
-                  scoreToVerdict(
-                    Object.keys(process.signatures).reduce(
-                      (sum, key) => sum + parseFloat(process.signatures[key] || 0),
-                      0
-                    )
-                  )
-                ]
-              }
-              style={{
-                border: `1px solid ${theme.palette.divider}`,
-                margin: '0.2em 0em',
-                borderRadius: '4px',
-                display: 'flex',
-                maxWidth: '50em'
-              }}
-            >
-              <div
-                style={{
-                  padding: '5px',
-                  backgroundColor: theme.palette.type === 'dark' ? '#FFFFFF10' : '#00000010',
-                  borderRadius: '4px 0px 0px 4px'
-                }}
-              >
-                {process.process_pid}
-              </div>
-              <div style={{ padding: '5px', flexGrow: 1, wordBreak: 'break-word' }}>
-                <div style={{ paddingBottom: '5px' }}>
-                  <b>{process.process_name}</b>
-                </div>
-                <div>
-                  <samp>
-                    <small>{process.command_line}</small>
-                  </samp>
-                </div>
-              </div>
-              <div style={{ alignSelf: 'center', color: theme.palette.text.secondary }}>
-                {Object.keys(process.signatures).length !== 0 && (
-                  <div>
-                    <Tooltip title={`${t('process_signatures')}: ${Object.keys(process.signatures).join(' | ')}`}>
-                      <span>
-                        {Object.keys(process.signatures).length}x
-                        <FingerprintOutlinedIcon style={{ verticalAlign: 'middle' }} />
-                      </span>
-                    </Tooltip>
-                  </div>
-                )}
-              </div>
-            </div>
-            <div style={{ marginLeft: '1.5rem' }}>
-              <ProcessTreeBody body={process.children} />
-            </div>
-          </li>
-        );
-      })}
-    </ul>
-  ) : null;
+  return null;
 };
 
 const StyledTableCell = withStyles((theme: Theme) =>
