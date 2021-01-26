@@ -1,11 +1,25 @@
-import { Box, Button, Collapse, Fade, makeStyles, Paper, Popper, Typography, useTheme } from '@material-ui/core';
+import {
+  Box,
+  Button,
+  ClickAwayListener,
+  Collapse,
+  Fade,
+  makeStyles,
+  MenuItem,
+  MenuList,
+  Paper,
+  Popper,
+  Typography,
+  useTheme
+} from '@material-ui/core';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import useAppContext from 'components/hooks/useAppContext';
 import useHighlighter from 'components/hooks/useHighlighter';
+import useMyAPI from 'components/hooks/useMyAPI';
 import Classification from 'components/visual/Classification';
 import Verdict from 'components/visual/Verdict';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import ExtractedSection from './ResultCard/extracted';
@@ -99,16 +113,20 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates = null 
   const { t } = useTranslation(['fileDetail']);
   const classes = useStyles();
   const theme = useTheme();
+  const apiCall = useMyAPI();
   const sp2 = theme.spacing(2);
   const { settings } = useAppContext();
   const empty = emptyResult(result);
-  const [open, setOpen] = React.useState(!empty && result.result.score >= settings.expand_min_score);
+  const [displayedResult, setDisplayedResult] = React.useState<Result>(result);
+  const [open, setOpen] = React.useState(!empty && displayedResult.result.score >= settings.expand_min_score);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [selected, setSelected] = React.useState(null);
   const { getKey, hasHighlightedKeys } = useHighlighter();
+  const popper = Boolean(anchorEl);
 
   const allTags = useMemo(() => {
     const tagList = [];
-    result.result.sections.forEach(section => {
+    displayedResult.result.sections.forEach(section => {
       for (const tag of section.tags) {
         tagList.push(getKey(tag.type, tag.value));
       }
@@ -131,9 +149,9 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates = null 
     });
     return tagList;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [result]);
+  }, [displayedResult]);
 
-  if (result.section_hierarchy === undefined) {
+  if (displayedResult.section_hierarchy === undefined) {
     // eslint-disable-next-line no-console
     console.log('[WARNING] Using old rendering method because the section hierarchy is missing...');
   }
@@ -147,28 +165,50 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates = null 
     setAnchorEl(anchorEl ? null : event.currentTarget);
   };
 
-  const popper = Boolean(anchorEl);
+  useEffect(() => {
+    if (selected !== null) {
+      setAnchorEl(null);
+      apiCall({
+        url: `/api/v4/result/${selected}/`,
+        onSuccess: api_data => {
+          setDisplayedResult(api_data.api_response);
+          setOpen(true);
+        }
+      });
+    } else if (displayedResult !== result) {
+      setAnchorEl(null);
+      setDisplayedResult(result);
+      setOpen(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected]);
 
   return (
     <div className={classes.card} style={{ marginBottom: sp2 }}>
       <Popper open={popper} anchorEl={anchorEl} placement="bottom-end" transition>
-        {/* TODO: We should have a clickaway listener */}
         {({ TransitionProps }) => (
-          <Fade {...TransitionProps} timeout={350}>
-            <Paper style={{ padding: theme.spacing(2) }}>
-              {/* TODO: We should be using a clickable list like the menu */}
-              <div>
-                {`${result.response.service_name} :: ${result.response.service_version} :: [${result.result.score}] @ `}
-                <Moment format="YYYY-MM-DD HH:mm:ss">{result.created}</Moment>
-              </div>
-              {alternates.map(alt => {
-                return (
-                  <div key={alt.id}>
-                    {`${alt.response.service_name} :: ${alt.response.service_version} :: [${alt.result.score}] @ `}
-                    <Moment format="YYYY-MM-DD HH:mm:ss">{alt.created}</Moment>
-                  </div>
-                );
-              })}
+          <Fade {...TransitionProps}>
+            <Paper>
+              <ClickAwayListener onClickAway={() => setAnchorEl(null)}>
+                <MenuList dense>
+                  <MenuItem disabled={selected === null} onClick={() => setSelected(null)}>
+                    <span style={{ paddingRight: theme.spacing(2) }}>
+                      {`${displayedResult.response.service_version} :: [${displayedResult.result.score}]`}
+                    </span>
+                    <Moment format="YYYY-MM-DD HH:mm:ss">{displayedResult.created}</Moment>
+                  </MenuItem>
+                  {alternates.map(alt => {
+                    return (
+                      <MenuItem disabled={selected === alt.id} key={alt.id} onClick={() => setSelected(alt.id)}>
+                        <span style={{ paddingRight: theme.spacing(2) }}>
+                          {`${alt.response.service_version} :: [${alt.result.score}]`}
+                        </span>
+                        <Moment format="YYYY-MM-DD HH:mm:ss">{alt.created}</Moment>
+                      </MenuItem>
+                    );
+                  })}
+                </MenuList>
+              </ClickAwayListener>
             </Paper>
           </Fade>
         )}
@@ -180,14 +220,14 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates = null 
           backgroundColor: hasHighlightedKeys(allTags) ? (theme.palette.type === 'dark' ? '#343a44' : '#d8e3ea') : null
         }}
       >
-        <Classification c12n={result.classification} type="text" />
+        <Classification c12n={displayedResult.classification} type="text" />
         <span>
-          &nbsp;::&nbsp;<b>{result.response.service_name}</b>&nbsp;
+          &nbsp;::&nbsp;<b>{displayedResult.response.service_name}</b>&nbsp;
         </span>
-        {!empty && <Verdict score={result.result.score} mono short size="tiny" />}
-        <small className={classes.muted}>{` :: ${result.response.service_version.replace(/_/g, '.')}`}</small>
+        {!empty && <Verdict score={displayedResult.result.score} mono short size="tiny" />}
+        <small className={classes.muted}>{` :: ${displayedResult.response.service_version.replace(/_/g, '.')}`}</small>
         <small className={classes.muted} style={{ flexGrow: 1 }}>
-          &nbsp;{result.response.service_context ? `(${result.response.service_context})` : ''}
+          &nbsp;{displayedResult.response.service_context ? `(${displayedResult.response.service_context})` : ''}
         </small>
         {!empty && !sid && (
           <div>
@@ -199,7 +239,7 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates = null 
                 onClick={handlePopperClick}
                 style={{ fontSize: 'smaller' }}
               >
-                <Moment fromNow>{result.created}</Moment>
+                <Moment fromNow>{displayedResult.created}</Moment>
               </Button>
             ) : (
               <Typography
@@ -207,7 +247,7 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates = null 
                 variant="button"
                 style={{ fontSize: 'smaller', paddingRight: theme.spacing(1.4) }}
               >
-                <Moment fromNow>{result.created}</Moment>
+                <Moment fromNow>{displayedResult.created}</Moment>
               </Typography>
             )}
           </div>
@@ -223,23 +263,23 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates = null 
               </div>
             ) : (
               <div className={classes.content}>
-                {result.section_hierarchy
-                  ? result.section_hierarchy.map(item => {
+                {displayedResult.section_hierarchy
+                  ? displayedResult.section_hierarchy.map(item => {
                       return (
                         <ResultSection
                           key={item.id}
-                          section_list={result.result.sections}
+                          section_list={displayedResult.result.sections}
                           id={item.id}
                           sub_sections={item.children}
                           indent={1}
                         />
                       );
                     })
-                  : result.result.sections.map((section, id) => {
+                  : displayedResult.result.sections.map((section, id) => {
                       return (
                         <ResultSection
                           key={id}
-                          section_list={result.result.sections}
+                          section_list={displayedResult.result.sections}
                           id={id}
                           sub_sections={[]}
                           indent={section.depth}
@@ -247,21 +287,21 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates = null 
                         />
                       );
                     })}
-                {result.response.supplementary.length !== 0 && (
-                  <SupplementarySection extracted={result.response.supplementary} />
+                {displayedResult.response.supplementary.length !== 0 && (
+                  <SupplementarySection extracted={displayedResult.response.supplementary} />
                 )}
-                {result.response.extracted.length !== 0 && (
-                  <ExtractedSection extracted={result.response.extracted} sid={sid} />
+                {displayedResult.response.extracted.length !== 0 && (
+                  <ExtractedSection extracted={displayedResult.response.extracted} sid={sid} />
                 )}
               </div>
             ),
           // eslint-disable-next-line react-hooks/exhaustive-deps
           [
             empty,
-            result.response.extracted,
-            result.response.supplementary,
-            result.result.sections,
-            result.section_hierarchy,
+            displayedResult.response.extracted,
+            displayedResult.response.supplementary,
+            displayedResult.result.sections,
+            displayedResult.section_hierarchy,
             sid
           ]
         )}
