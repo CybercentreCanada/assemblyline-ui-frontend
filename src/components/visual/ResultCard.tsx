@@ -193,9 +193,9 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates = null 
                 <MenuList dense>
                   <MenuItem disabled={selected === null} onClick={() => setSelected(null)}>
                     <span style={{ paddingRight: theme.spacing(2) }}>
-                      {`${displayedResult.response.service_version} :: [${displayedResult.result.score}]`}
+                      {`${result.response.service_version} :: [${result.result.score}]`}
                     </span>
-                    <Moment format="YYYY-MM-DD HH:mm:ss">{displayedResult.created}</Moment>
+                    <Moment format="YYYY-MM-DD HH:mm:ss">{result.created}</Moment>
                   </MenuItem>
                   {alternates.map(alt => {
                     return (
