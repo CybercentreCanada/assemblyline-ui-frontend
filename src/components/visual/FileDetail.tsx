@@ -8,7 +8,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import Classification from 'components/visual/Classification';
 import { Error } from 'components/visual/ErrorCard';
-import { emptyResult, Result } from 'components/visual/ResultCard';
+import { AlternateResult, emptyResult, Result } from 'components/visual/ResultCard';
 import getXSRFCookie from 'helpers/xsrf';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -48,6 +48,9 @@ type FileInfo = {
 };
 
 type File = {
+  alternates: {
+    [serviceName: string]: AlternateResult[];
+  };
   attack_matrix: {
     [category: string]: string[][];
   };
@@ -252,7 +255,9 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
           <TagSection signatures={file ? file.signatures : null} tags={file ? file.tags : null} />
         )}
 
-        {(!file || file.results.length !== 0) && <ResultSection results={file ? file.results : null} sid={sid} />}
+        {(!file || file.results.length !== 0) && (
+          <ResultSection results={file ? file.results : null} sid={sid} alternates={file ? file.alternates : null} />
+        )}
 
         {(!file || file.emptys.length !== 0) && <EmptySection emptys={file ? file.emptys : null} sid={sid} />}
 

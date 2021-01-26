@@ -2,7 +2,7 @@ import { Collapse, Divider, makeStyles, Typography, useTheme } from '@material-u
 import { Skeleton } from '@material-ui/lab';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import ResultCard from '../ResultCard';
+import ResultCard, { AlternateResult } from '../ResultCard';
 
 const useStyles = makeStyles(theme => ({
   title: {
@@ -16,9 +16,12 @@ const useStyles = makeStyles(theme => ({
 type ResultSectionProps = {
   results: any;
   sid: string;
+  alternates?: {
+    [serviceName: string]: AlternateResult[];
+  };
 };
 
-const WrappedResultSection: React.FC<ResultSectionProps> = ({ results, sid }) => {
+const WrappedResultSection: React.FC<ResultSectionProps> = ({ results, sid, alternates }) => {
   const { t } = useTranslation(['fileDetail']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
@@ -43,7 +46,14 @@ const WrappedResultSection: React.FC<ResultSectionProps> = ({ results, sid }) =>
             <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
               {results
                 ? results.map((result, i) => {
-                    return <ResultCard key={i} result={result} sid={sid} />;
+                    return (
+                      <ResultCard
+                        key={i}
+                        result={result}
+                        sid={sid}
+                        alternates={alternates ? alternates[result.response.service_name] : null}
+                      />
+                    );
                   })
                 : [...Array(2)].map((_, i) => {
                     return <Skeleton key={i} style={{ height: '16rem' }} />;
