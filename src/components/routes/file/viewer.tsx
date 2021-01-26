@@ -13,7 +13,7 @@ import {
 import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
 import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
 import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
-import { TabContext, TabList, TabPanel } from '@material-ui/lab';
+import { Alert, TabContext, TabList, TabPanel } from '@material-ui/lab';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import getXSRFCookie from 'helpers/xsrf';
@@ -43,6 +43,7 @@ const useStyles = makeStyles(theme => ({
 
 const WrappedAsciiViewer = ({ sha256 }) => {
   const [ascii, setAscii] = useState(null);
+  const [error, setError] = useState(null);
   const classes = useStyles();
   const apiCall = useMyAPI();
 
@@ -51,16 +52,26 @@ const WrappedAsciiViewer = ({ sha256 }) => {
       url: `/api/v4/file/ascii/${sha256}/`,
       onSuccess: api_data => {
         setAscii(api_data.api_response);
+      },
+      onFailure: api_data => {
+        setError(api_data.api_error_message);
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sha256]);
 
-  return ascii ? <pre className={classes.pre}>{ascii}</pre> : <LinearProgress />;
+  return ascii ? (
+    <pre className={classes.pre}>{ascii}</pre>
+  ) : error ? (
+    <Alert severity="error">{error}</Alert>
+  ) : (
+    <LinearProgress />
+  );
 };
 
 const WrappedHexViewer = ({ sha256 }) => {
   const [hex, setHex] = useState(null);
+  const [error, setError] = useState(null);
   const classes = useStyles();
   const apiCall = useMyAPI();
 
@@ -69,6 +80,9 @@ const WrappedHexViewer = ({ sha256 }) => {
       url: `/api/v4/file/hex/${sha256}/`,
       onSuccess: api_data => {
         setHex(api_data.api_response);
+      },
+      onFailure: api_data => {
+        setError(api_data.api_error_message);
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -78,6 +92,8 @@ const WrappedHexViewer = ({ sha256 }) => {
     <pre className={classes.pre}>
       <div style={{ minWidth: '580px' }}>{hex}</div>
     </pre>
+  ) : error ? (
+    <Alert severity="error">{error}</Alert>
   ) : (
     <LinearProgress />
   );
@@ -85,6 +101,7 @@ const WrappedHexViewer = ({ sha256 }) => {
 
 const WrappedStringViewer = ({ sha256 }) => {
   const [string, setString] = useState(null);
+  const [error, setError] = useState(null);
   const classes = useStyles();
   const apiCall = useMyAPI();
 
@@ -93,12 +110,21 @@ const WrappedStringViewer = ({ sha256 }) => {
       url: `/api/v4/file/strings/${sha256}/`,
       onSuccess: api_data => {
         setString(api_data.api_response);
+      },
+      onFailure: api_data => {
+        setError(api_data.api_error_message);
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sha256]);
 
-  return string ? <pre className={classes.pre}>{string}</pre> : <LinearProgress />;
+  return string ? (
+    <pre className={classes.pre}>{string}</pre>
+  ) : error ? (
+    <Alert severity="error">{error}</Alert>
+  ) : (
+    <LinearProgress />
+  );
 };
 
 const AsciiViewer = React.memo(WrappedAsciiViewer);
