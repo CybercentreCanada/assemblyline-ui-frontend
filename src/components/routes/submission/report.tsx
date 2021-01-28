@@ -529,8 +529,8 @@ export default function SubmissionReport() {
 
   return (
     <PageCenter
-      mt={isPrinting ? 0 : 4}
-      mb={isPrinting ? 0 : 4}
+      mt={isPrinting ? 0 : c12nDef.enforce ? 2 : 4}
+      mb={isPrinting ? 0 : 2}
       ml={isPrinting ? 2 : 4}
       mr={isPrinting ? 2 : 4}
       width="100%"
