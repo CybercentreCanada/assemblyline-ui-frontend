@@ -18,7 +18,7 @@ import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
-import useAppContext from 'components/hooks/useAppContext';
+import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import Classification from 'components/visual/Classification';
@@ -99,7 +99,7 @@ export default function Users() {
   const [searching, setSearching] = useState(false);
   const [drawer, setDrawer] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
-  const { user: currentUser, c12nDef } = useAppContext();
+  const { user: currentUser, c12nDef } = useALContext();
   const [userResults, setUserResults] = useState(null);
   const [newUser, setNewUser] = useState<User>(DEFAULT_USER);
   const location = useLocation();

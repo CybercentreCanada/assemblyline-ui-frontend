@@ -2,14 +2,14 @@ import { useTheme } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 import HourglassEmptyOutlinedIcon from '@material-ui/icons/HourglassEmptyOutlined';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
-import useAppContext from 'components/hooks/useAppContext';
+import useALContext from 'components/hooks/useALContext';
 import ForbiddenPage from 'components/routes/403';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 const LockedPage = () => {
   const { t } = useTranslation(['locked']);
-  const { configuration } = useAppContext();
+  const { configuration } = useALContext();
   const theme = useTheme();
 
   return (

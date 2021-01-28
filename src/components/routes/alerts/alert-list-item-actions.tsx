@@ -9,7 +9,7 @@ import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import VerifiedUserOutlinedIcon from '@material-ui/icons/VerifiedUserOutlined';
 import { SpeedDial, SpeedDialAction, SpeedDialIcon } from '@material-ui/lab';
-import useAppContext from 'components/hooks/useAppContext';
+import useALContext from 'components/hooks/useALContext';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import SearchQuery from 'components/visual/SearchBar/search-query';
@@ -81,7 +81,7 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
     const { showErrorMessage, showSuccessMessage } = useMySnackbar();
     const [takeOwnershipConfirmation, setTakeOwnershipConfirmation] = useState<OwnerProps>(DEFAULT_OWNER);
     const [open, setOpen] = useState(false);
-    const { user: currentUser } = useAppContext();
+    const { user: currentUser } = useALContext();
     const hasSetMalicious = item.verdict.malicious.indexOf(currentUser.username) !== -1;
     const hasSetNonMalicious = item.verdict.non_malicious.indexOf(currentUser.username) !== -1;
 

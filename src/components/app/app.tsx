@@ -3,7 +3,7 @@ import useAppLayout from 'commons/components/hooks/useAppLayout';
 import AppLayoutProvider from 'commons/components/layout/LayoutProvider';
 import SiteMapProvider from 'commons/components/sitemap/SitemapProvider';
 import UserProvider from 'commons/components/user/UserProvider';
-import useAppContext from 'components/hooks/useAppContext';
+import useALContext from 'components/hooks/useALContext';
 import useMyLayout from 'components/hooks/useMyLayout';
 import useMySitemap from 'components/hooks/useMySitemap';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -38,7 +38,7 @@ const MyApp = () => {
   const [loginParams, setLoginParams] = useState<LoginParamsProps | null>(defaultLoginParams);
 
   const { t } = useTranslation();
-  const { setUser, setConfiguration } = useAppContext();
+  const { setUser, setConfiguration } = useALContext();
   const { setReady } = useAppLayout();
   const { showErrorMessage } = useMySnackbar();
 

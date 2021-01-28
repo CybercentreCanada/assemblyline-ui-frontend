@@ -1,7 +1,7 @@
 import { Button, Grid, Hidden, IconButton, Paper, Typography, useMediaQuery, useTheme } from '@material-ui/core';
 import MoodIcon from '@material-ui/icons/Mood';
 import MoodBadIcon from '@material-ui/icons/MoodBad';
-import useAppContext from 'components/hooks/useAppContext';
+import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { AlertItem } from 'components/routes/alerts/hooks/useAlerts';
@@ -31,7 +31,7 @@ const AlertCardItem: React.FC<AlertCardItemProps> = ({ item, setItem = null }) =
   const isDownSM = useMediaQuery(theme.breakpoints.down('sm'));
   const apiCall = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
-  const { user: currentUser } = useAppContext();
+  const { user: currentUser } = useALContext();
 
   function setVerdict(verdict) {
     if (item.verdict[verdict].indexOf(currentUser.username) !== -1) {

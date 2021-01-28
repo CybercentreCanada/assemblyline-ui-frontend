@@ -5,7 +5,7 @@ import BugReportIcon from '@material-ui/icons/BugReport';
 import PersonIcon from '@material-ui/icons/Person';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
-import useAppContext from 'components/hooks/useAppContext';
+import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
@@ -40,7 +40,7 @@ export default function Submissions() {
   const [pageSize] = useState(PAGE_SIZE);
   const [submissionResults, setSubmissionResults] = useState<SearchResults>(null);
   const [searching, setSearching] = useState(false);
-  const { user: currentUser, indexes } = useAppContext();
+  const { user: currentUser, indexes } = useALContext();
   const history = useHistory();
   const apiCall = useMyAPI();
   const theme = useTheme();

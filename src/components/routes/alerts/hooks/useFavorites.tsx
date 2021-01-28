@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import useAppContext from 'components/hooks/useAppContext';
+import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { useEffect, useState } from 'react';
 
@@ -34,7 +34,7 @@ interface UsingFavorites {
 export default function useFavorites(): UsingFavorites {
   // hooks.
   const apiCall = useMyAPI();
-  const { user } = useAppContext();
+  const { user } = useALContext();
 
   // states.
   const [userFavorites, setUserFavorites] = useState<Favorite[]>([]);

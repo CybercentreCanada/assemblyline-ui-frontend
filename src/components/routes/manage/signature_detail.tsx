@@ -19,7 +19,7 @@ import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutl
 import YoutubeSearchedForIcon from '@material-ui/icons/YoutubeSearchedFor';
 import { Skeleton } from '@material-ui/lab';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
-import useAppContext from 'components/hooks/useAppContext';
+import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import Classification from 'components/visual/Classification';
@@ -88,7 +88,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
   const { showSuccessMessage } = useMySnackbar();
   const apiCall = useMyAPI();
   const classes = useStyles();
-  const { user: currentUser } = useAppContext();
+  const { user: currentUser } = useALContext();
 
   useEffect(() => {
     if (signature_id || id) {

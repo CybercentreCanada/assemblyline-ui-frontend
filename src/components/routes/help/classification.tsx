@@ -1,7 +1,7 @@
 import { Typography, useTheme } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
-import useAppContext from 'components/hooks/useAppContext';
+import useALContext from 'components/hooks/useALContext';
 import NotFoundPage from 'components/routes/404_dl';
 import Classification from 'components/visual/Classification';
 import React from 'react';
@@ -9,7 +9,7 @@ import { Trans, useTranslation } from 'react-i18next';
 
 export default function HelpClassification() {
   const { t } = useTranslation(['helpClassification']);
-  const { c12nDef } = useAppContext();
+  const { c12nDef } = useALContext();
   const theme = useTheme();
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);

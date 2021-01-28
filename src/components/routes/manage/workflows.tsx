@@ -5,7 +5,7 @@ import EventBusyOutlinedIcon from '@material-ui/icons/EventBusyOutlined';
 import EventOutlinedIcon from '@material-ui/icons/EventOutlined';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
-import useAppContext from 'components/hooks/useAppContext';
+import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import SearchBar from 'components/visual/SearchBar/search-bar';
@@ -48,7 +48,7 @@ export default function Workflows() {
   const { t } = useTranslation(['manageWorkflows']);
   const [pageSize] = useState(PAGE_SIZE);
   const [searching, setSearching] = useState(false);
-  const { indexes } = useAppContext();
+  const { indexes } = useALContext();
   const [workflowResults, setWorkflowResults] = useState<SearchResults>(null);
   const location = useLocation();
   const [query, setQuery] = useState<SimpleSearchQuery>(null);

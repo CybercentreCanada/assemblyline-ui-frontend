@@ -8,7 +8,7 @@ import ListNavigator from 'commons/addons/elements/lists/navigator/ListNavigator
 import SimpleList from 'commons/addons/elements/lists/simplelist/SimpleList';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
-import useAppContext from 'components/hooks/useAppContext';
+import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import SearchBar from 'components/visual/SearchBar/search-bar';
@@ -90,7 +90,7 @@ const Alerts: React.FC = () => {
   const { t } = useTranslation('alerts');
   const classes = useStyles();
   const theme = useTheme();
-  const { user: currentUser } = useAppContext();
+  const { user: currentUser } = useALContext();
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
   const { setGlobalDrawer } = useDrawer();
 

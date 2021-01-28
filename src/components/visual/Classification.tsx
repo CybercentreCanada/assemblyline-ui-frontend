@@ -13,7 +13,7 @@ import {
 import Grid from '@material-ui/core/Grid/Grid';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Skeleton from '@material-ui/lab/Skeleton';
-import useAppContext from 'components/hooks/useAppContext';
+import useALContext from 'components/hooks/useALContext';
 import CustomChip, { ColorMap, PossibleColors } from 'components/visual/CustomChip';
 import {
   applyClassificationRules,
@@ -92,7 +92,7 @@ function WrappedClassification({
   const classes = useStyles();
   const { t } = useTranslation();
   const theme = useTheme();
-  const { user: currentUser, c12nDef } = useAppContext();
+  const { user: currentUser, c12nDef } = useALContext();
   const isPhone = useMediaQuery(theme.breakpoints.down('xs'));
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [showPicker, setShowPicker] = useState(false);

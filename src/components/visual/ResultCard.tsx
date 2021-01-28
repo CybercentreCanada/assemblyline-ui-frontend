@@ -14,7 +14,7 @@ import {
 } from '@material-ui/core';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
-import useAppContext from 'components/hooks/useAppContext';
+import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import Classification from 'components/visual/Classification';
@@ -115,7 +115,7 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates = null 
   const theme = useTheme();
   const apiCall = useMyAPI();
   const sp2 = theme.spacing(2);
-  const { settings } = useAppContext();
+  const { settings } = useALContext();
   const empty = emptyResult(result);
   const [displayedResult, setDisplayedResult] = React.useState<Result>(result);
   const [open, setOpen] = React.useState(!empty && displayedResult.result.score >= settings.expand_min_score);

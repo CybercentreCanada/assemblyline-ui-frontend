@@ -2,7 +2,7 @@ import { makeStyles, useTheme } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
-import useAppContext from 'components/hooks/useAppContext';
+import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import SearchBar from 'components/visual/SearchBar/search-bar';
@@ -45,7 +45,7 @@ export default function Heuristics() {
   const { t } = useTranslation(['manageHeuristics']);
   const [pageSize] = useState(PAGE_SIZE);
   const [searching, setSearching] = useState(false);
-  const { indexes } = useAppContext();
+  const { indexes } = useALContext();
   const [heuristicResults, setHeuristicResults] = useState<SearchResults>(null);
   const location = useLocation();
   const [query, setQuery] = useState<SimpleSearchQuery>(null);

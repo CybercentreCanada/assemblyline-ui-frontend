@@ -2,7 +2,7 @@ import { Button, CircularProgress, Link, makeStyles, Typography, useTheme } from
 import Skeleton from '@material-ui/lab/Skeleton';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
-import useAppContext from 'components/hooks/useAppContext';
+import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import NotFoundPage from 'components/routes/404_dl';
 import React, { useEffect, useState } from 'react';
@@ -16,7 +16,7 @@ export default function Tos() {
   const [tos, setTos] = useState('');
   const [buttonLoading, setButtonLoading] = useState(false);
   const { getBanner } = useAppLayout();
-  const { user: currentUser, configuration } = useAppContext();
+  const { user: currentUser, configuration } = useALContext();
   const apiCall = useMyAPI();
   const useStyles = makeStyles(curTheme => ({
     no_pad: {
