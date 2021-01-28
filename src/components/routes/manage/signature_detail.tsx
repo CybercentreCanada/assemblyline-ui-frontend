@@ -185,7 +185,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
         </DialogActions>
       </Dialog>
       {c12nDef.enforce && (
-        <div style={{ paddingBottom: theme.spacing(4), paddingTop: theme.spacing(2) }}>
+        <div style={{ paddingBottom: theme.spacing(4) }}>
           <Classification size="tiny" c12n={signature ? signature.classification : null} />
         </div>
       )}

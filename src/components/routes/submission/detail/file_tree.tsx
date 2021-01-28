@@ -63,7 +63,7 @@ const WrappedFileTreeSection: React.FC<FileTreeProps> = ({ tree, sid }) => {
       </Typography>
       <Divider />
       <Collapse in={open} timeout="auto">
-        <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+        <div style={{ paddingTop: sp2 }}>
           {tree !== null ? (
             <FileTree tree={tree} sid={sid} />
           ) : (

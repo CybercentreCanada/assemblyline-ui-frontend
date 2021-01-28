@@ -204,7 +204,7 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
       />
 
       {c12nDef.enforce && (
-        <div style={{ paddingBottom: theme.spacing(4), paddingTop: theme.spacing(2) }}>
+        <div style={{ paddingBottom: theme.spacing(4) }}>
           <Classification
             type="picker"
             c12n={workflow ? workflow.classification : null}
