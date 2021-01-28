@@ -332,22 +332,26 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
         </Grid>
         <div style={{ textAlign: 'center', paddingTop: theme.spacing(3) }}>
           {workflow ? (
-            <Typography variant="subtitle2" color="textSecondary">
-              {`${t('created_by')} ${workflow.creator} `}
-              <Moment fromNow locale={i18n.language}>
-                {workflow.creation_date}
-              </Moment>
-            </Typography>
+            workflow.creator && (
+              <Typography variant="subtitle2" color="textSecondary">
+                {`${t('created_by')} ${workflow.creator} `}
+                <Moment fromNow locale={i18n.language}>
+                  {workflow.creation_date}
+                </Moment>
+              </Typography>
+            )
           ) : (
             <Skeleton />
           )}
           {workflow ? (
-            <Typography variant="subtitle2" color="textSecondary">
-              {`${t('edited_by')} ${workflow.edited_by} `}
-              <Moment fromNow locale={i18n.language}>
-                {workflow.last_edit}
-              </Moment>
-            </Typography>
+            workflow.edited_by && (
+              <Typography variant="subtitle2" color="textSecondary">
+                {`${t('edited_by')} ${workflow.edited_by} `}
+                <Moment fromNow locale={i18n.language}>
+                  {workflow.last_edit}
+                </Moment>
+              </Typography>
+            )
           ) : (
             <Skeleton />
           )}{' '}
