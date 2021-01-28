@@ -728,7 +728,7 @@ export default function SubmissionDetail() {
   }, [loadTrigger]);
 
   return (
-    <PageCenter margin={4} width="100%">
+    <PageCenter mt={c12nDef.enforce ? 2 : 4} ml={4} mr={4} width="100%">
       <ConfirmationDialog
         open={deleteDialog}
         handleClose={() => setDeleteDialog(false)}
