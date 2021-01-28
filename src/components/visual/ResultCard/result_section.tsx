@@ -19,6 +19,7 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import FingerprintOutlinedIcon from '@material-ui/icons/FingerprintOutlined';
 import { TreeItem, TreeView } from '@material-ui/lab';
+import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
 import Attack from 'components/visual/Attack';
 import Classification from 'components/visual/Classification';
@@ -460,6 +461,7 @@ const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sec
   const section = section_list[id];
   const [open, setOpen] = React.useState(true);
   const { getKey, hasHighlightedKeys } = useHighlighter();
+  const { c12nDef } = useALContext();
 
   const allTags = useMemo(() => {
     const tagList = [];
@@ -510,10 +512,12 @@ const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sec
 
       <div style={{ width: '100%' }}>
         <Box className={classes.section_title} onClick={handleClick}>
-          <span>
-            <Classification c12n={section.classification} type="text" />
-            &nbsp;&nbsp;::&nbsp;&nbsp;
-          </span>
+          {c12nDef.enforce && (
+            <span>
+              <Classification c12n={section.classification} type="text" />
+              &nbsp;&nbsp;::&nbsp;&nbsp;
+            </span>
+          )}
           {section.heuristic && (
             <span>
               <Verdict score={section.heuristic.score} mono short size="tiny" />

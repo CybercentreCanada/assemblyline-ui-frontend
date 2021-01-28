@@ -203,13 +203,15 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
         text={t('delete.text')}
       />
 
-      <div style={{ paddingBottom: theme.spacing(4), paddingTop: theme.spacing(2) }}>
-        <Classification
-          type="picker"
-          c12n={workflow ? workflow.classification : null}
-          setClassification={setClassification}
-        />
-      </div>
+      {c12nDef.enforce && (
+        <div style={{ paddingBottom: theme.spacing(4), paddingTop: theme.spacing(2) }}>
+          <Classification
+            type="picker"
+            c12n={workflow ? workflow.classification : null}
+            setClassification={setClassification}
+          />
+        </div>
+      )}
       <div style={{ textAlign: 'left' }}>
         <div style={{ paddingBottom: theme.spacing(4) }}>
           <Grid container alignItems="center">

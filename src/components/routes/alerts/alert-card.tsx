@@ -31,7 +31,7 @@ const AlertCardItem: React.FC<AlertCardItemProps> = ({ item, setItem = null }) =
   const isDownSM = useMediaQuery(theme.breakpoints.down('sm'));
   const apiCall = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
-  const { user: currentUser } = useALContext();
+  const { user: currentUser, c12nDef } = useALContext();
 
   function setVerdict(verdict) {
     if (item.verdict[verdict].indexOf(currentUser.username) !== -1) {
@@ -89,9 +89,11 @@ const AlertCardItem: React.FC<AlertCardItemProps> = ({ item, setItem = null }) =
         backgroundColor: item.owner !== null ? '#00f2000f' : item.al.attrib.length !== 0 ? '#f200000f' : null
       }}
     >
-      <Hidden mdUp>
-        <Classification c12n={item.classification} size="tiny" type="outlined" />
-      </Hidden>
+      {c12nDef.enforce && (
+        <Hidden mdUp>
+          <Classification c12n={item.classification} size="tiny" type="outlined" />
+        </Hidden>
+      )}
       <Grid container spacing={2}>
         <Grid
           item
@@ -152,11 +154,13 @@ const AlertCardItem: React.FC<AlertCardItemProps> = ({ item, setItem = null }) =
                 {item.ts}
               </Moment>
             </Grid>
-            <Hidden smDown>
-              <Grid item md={4} style={{ textAlign: 'right' }}>
-                <Classification c12n={item.classification} size="tiny" type="outlined" inline />
-              </Grid>
-            </Hidden>
+            {c12nDef.enforce && (
+              <Hidden smDown>
+                <Grid item md={4} style={{ textAlign: 'right' }}>
+                  <Classification c12n={item.classification} size="tiny" type="outlined" inline />
+                </Grid>
+              </Hidden>
+            )}
 
             {item.filtered && (
               <>

@@ -1,6 +1,7 @@
 import Paper from '@material-ui/core/Paper';
 import TableContainer from '@material-ui/core/TableContainer';
 import { AlertTitle, Skeleton } from '@material-ui/lab';
+import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
 import 'moment/locale/fr';
 import React from 'react';
@@ -35,6 +36,7 @@ type HeuristicsTableProps = {
 
 const WrappedHeuristicsTable: React.FC<HeuristicsTableProps> = ({ heuristicResults, setHeuristicID = null }) => {
   const { t } = useTranslation(['search']);
+  const { c12nDef } = useALContext();
 
   return heuristicResults ? (
     heuristicResults.total !== 0 ? (
@@ -47,7 +49,7 @@ const WrappedHeuristicsTable: React.FC<HeuristicsTableProps> = ({ heuristicResul
               <DivTableCell>{t('header.filetype')}</DivTableCell>
               <DivTableCell>{t('header.score')}</DivTableCell>
               <DivTableCell>{t('header.attack_id')}</DivTableCell>
-              <DivTableCell>{t('header.classification')}</DivTableCell>
+              {c12nDef.enforce && <DivTableCell>{t('header.classification')}</DivTableCell>}
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
@@ -69,9 +71,11 @@ const WrappedHeuristicsTable: React.FC<HeuristicsTableProps> = ({ heuristicResul
                 <DivTableCell>{heuristic.filetype}</DivTableCell>
                 <DivTableCell>{heuristic.score}</DivTableCell>
                 <DivTableCell>{heuristic.attack_id ? heuristic.attack_id.join(', ') : ''}</DivTableCell>
-                <DivTableCell>
-                  <Classification type="text" size="tiny" c12n={heuristic.classification} format="short" />
-                </DivTableCell>
+                {c12nDef.enforce && (
+                  <DivTableCell>
+                    <Classification type="text" size="tiny" c12n={heuristic.classification} format="short" />
+                  </DivTableCell>
+                )}
               </LinkRow>
             ))}
           </DivTableBody>

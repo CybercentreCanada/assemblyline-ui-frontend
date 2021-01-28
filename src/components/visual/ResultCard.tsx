@@ -115,7 +115,7 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates = null 
   const theme = useTheme();
   const apiCall = useMyAPI();
   const sp2 = theme.spacing(2);
-  const { settings } = useALContext();
+  const { c12nDef, settings } = useALContext();
   const empty = emptyResult(result);
   const [displayedResult, setDisplayedResult] = React.useState<Result>(result);
   const [open, setOpen] = React.useState(!empty && displayedResult.result.score >= settings.expand_min_score);
@@ -220,9 +220,10 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates = null 
           backgroundColor: hasHighlightedKeys(allTags) ? (theme.palette.type === 'dark' ? '#343a44' : '#d8e3ea') : null
         }}
       >
-        <Classification c12n={displayedResult.classification} type="text" />
+        {c12nDef.enforce && <Classification c12n={displayedResult.classification} type="text" />}
         <span>
-          &nbsp;::&nbsp;<b>{displayedResult.response.service_name}</b>&nbsp;
+          {c12nDef.enforce && <span>&nbsp;::&nbsp;</span>}
+          <b>{displayedResult.response.service_name}</b>&nbsp;
         </span>
         {!empty && <Verdict score={displayedResult.result.score} mono short size="tiny" />}
         <small className={classes.muted}>{` :: ${displayedResult.response.service_version.replace(/_/g, '.')}`}</small>

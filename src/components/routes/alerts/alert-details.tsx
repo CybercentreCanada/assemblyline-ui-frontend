@@ -7,6 +7,7 @@ import { Skeleton } from '@material-ui/lab';
 import Alert from '@material-ui/lab/Alert';
 import useClipboard from 'commons/components/hooks/useClipboard';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
+import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { AlertItem } from 'components/routes/alerts/hooks/useAlerts';
 import { ChipList, ChipSkeleton, ChipSkeletonInline } from 'components/visual/ChipList';
@@ -53,6 +54,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
   const theme = useTheme();
   const classes = useStyles();
   const apiCall = useMyAPI();
+  const { c12nDef } = useALContext();
   const { copy } = useClipboard();
   const [item, setItem] = useState<AlertItem>(null);
   const { id: paramId } = useParams<{ id: string }>();
@@ -88,11 +90,13 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
 
   return (
     <PageCenter margin={!alert ? 4 : 1} width="100%">
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: theme.spacing(2) }}>
-        <div style={{ flex: 1 }}>
-          <Classification c12n={item ? item.classification : null} type="outlined" />
+      {c12nDef.enforce && (
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: theme.spacing(2) }}>
+          <div style={{ flex: 1 }}>
+            <Classification c12n={item ? item.classification : null} type="outlined" />
+          </div>
         </div>
-      </div>
+      )}
       {!alert && (
         <div style={{ paddingBottom: theme.spacing(3), textAlign: 'left' }}>
           <Grid container alignItems="center">

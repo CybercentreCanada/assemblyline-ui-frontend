@@ -88,7 +88,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
   const { showSuccessMessage } = useMySnackbar();
   const apiCall = useMyAPI();
   const classes = useStyles();
-  const { user: currentUser } = useALContext();
+  const { user: currentUser, c12nDef } = useALContext();
 
   useEffect(() => {
     if (signature_id || id) {
@@ -184,9 +184,11 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
           </Button>
         </DialogActions>
       </Dialog>
-      <div style={{ paddingBottom: theme.spacing(4), paddingTop: theme.spacing(2) }}>
-        <Classification size="tiny" c12n={signature ? signature.classification : null} />
-      </div>
+      {c12nDef.enforce && (
+        <div style={{ paddingBottom: theme.spacing(4), paddingTop: theme.spacing(2) }}>
+          <Classification size="tiny" c12n={signature ? signature.classification : null} />
+        </div>
+      )}
       <div style={{ textAlign: 'left' }}>
         <Grid container alignItems="center">
           <Grid item xs>

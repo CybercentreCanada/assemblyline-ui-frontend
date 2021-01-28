@@ -2,6 +2,7 @@ import { Tooltip } from '@material-ui/core';
 import Paper from '@material-ui/core/Paper';
 import TableContainer from '@material-ui/core/TableContainer';
 import { AlertTitle, Skeleton } from '@material-ui/lab';
+import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
 import SubmissionState from 'components/visual/SubmissionState';
 import Verdict from 'components/visual/Verdict';
@@ -41,6 +42,7 @@ type SubmissionsTableProps = {
 
 const WrappedSubmissionsTable: React.FC<SubmissionsTableProps> = ({ submissionResults }) => {
   const { t, i18n } = useTranslation(['search']);
+  const { c12nDef } = useALContext();
 
   return submissionResults ? (
     submissionResults.total !== 0 ? (
@@ -53,7 +55,7 @@ const WrappedSubmissionsTable: React.FC<SubmissionsTableProps> = ({ submissionRe
               <DivTableCell>{t('header.description')}</DivTableCell>
               <DivTableCell>{t('header.user')}</DivTableCell>
               <DivTableCell>{t('header.numfiles')}</DivTableCell>
-              <DivTableCell>{t('header.classification')}</DivTableCell>
+              {c12nDef && c12nDef.enforce && <DivTableCell>{t('header.classification')}</DivTableCell>}
               <DivTableCell>{t('header.status')}</DivTableCell>
             </DivTableRow>
           </DivTableHead>
@@ -87,9 +89,11 @@ const WrappedSubmissionsTable: React.FC<SubmissionsTableProps> = ({ submissionRe
                 </DivTableCell>
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>{submission.params.submitter}</DivTableCell>
                 <DivTableCell>{submission.file_count}</DivTableCell>
-                <DivTableCell>
-                  <Classification type="text" size="tiny" c12n={submission.classification} format="short" />
-                </DivTableCell>
+                {c12nDef && c12nDef.enforce && (
+                  <DivTableCell>
+                    <Classification type="text" size="tiny" c12n={submission.classification} format="short" />
+                  </DivTableCell>
+                )}
                 <DivTableCell style={{ textAlign: 'center' }}>
                   <SubmissionState state={submission.state} error_count={submission.error_count} />
                 </DivTableCell>

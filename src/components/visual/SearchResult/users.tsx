@@ -3,6 +3,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import ClearIcon from '@material-ui/icons/Clear';
 import DoneIcon from '@material-ui/icons/Done';
 import { AlertTitle, Skeleton } from '@material-ui/lab';
+import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from 'components/visual/DivTable';
 import 'moment/locale/fr';
@@ -34,6 +35,7 @@ type UsersTableProps = {
 
 const WrappedUsersTable: React.FC<UsersTableProps> = ({ userResults }) => {
   const { t } = useTranslation(['adminUsers']);
+  const { c12nDef } = useALContext();
 
   return userResults ? (
     userResults.total !== 0 ? (
@@ -44,7 +46,7 @@ const WrappedUsersTable: React.FC<UsersTableProps> = ({ userResults }) => {
               <DivTableCell>{t('header.uid')}</DivTableCell>
               <DivTableCell>{t('header.fullname')}</DivTableCell>
               <DivTableCell>{t('header.groups')}</DivTableCell>
-              <DivTableCell>{t('header.classification')}</DivTableCell>
+              {c12nDef.enforce && <DivTableCell>{t('header.classification')}</DivTableCell>}
               <DivTableCell>{t('header.active')}</DivTableCell>
               <DivTableCell>{t('header.admin')}</DivTableCell>
             </DivTableRow>
@@ -55,9 +57,11 @@ const WrappedUsersTable: React.FC<UsersTableProps> = ({ userResults }) => {
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>{user.uname}</DivTableCell>
                 <DivTableCell>{user.name}</DivTableCell>
                 <DivTableCell>{user.groups.join(' | ')}</DivTableCell>
-                <DivTableCell style={{ whiteSpace: 'nowrap' }}>
-                  <Classification type="text" size="tiny" c12n={user.classification} format="short" />
-                </DivTableCell>
+                {c12nDef.enforce && (
+                  <DivTableCell style={{ whiteSpace: 'nowrap' }}>
+                    <Classification type="text" size="tiny" c12n={user.classification} format="short" />
+                  </DivTableCell>
+                )}
                 <DivTableCell>
                   {user.is_active ? <DoneIcon color="primary" /> : <ClearIcon color="error" />}
                 </DivTableCell>

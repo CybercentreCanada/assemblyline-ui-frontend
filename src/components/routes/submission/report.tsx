@@ -17,6 +17,7 @@ import PrintOutlinedIcon from '@material-ui/icons/PrintOutlined';
 import VerifiedUserOutlinedIcon from '@material-ui/icons/VerifiedUserOutlined';
 import { Skeleton } from '@material-ui/lab';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
+import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import Classification from 'components/visual/Classification';
@@ -493,6 +494,7 @@ function FileTreeSkel() {
 export default function SubmissionReport() {
   const { t } = useTranslation(['submissionReport']);
   const { id } = useParams<ParamProps>();
+  const { c12nDef } = useALContext();
   const history = useHistory();
   const theme = useTheme();
   const [report, setReport] = useState(null);
@@ -528,14 +530,18 @@ export default function SubmissionReport() {
   return (
     <PageCenter ml={isPrinting ? 2 : 4} mr={isPrinting ? 2 : 4} width="100%">
       <div style={{ textAlign: 'left' }}>
-        <div style={{ paddingBottom: sp4, paddingTop: sp2 }}>
-          <Classification size="tiny" c12n={report ? report.classification : null} />
-        </div>
+        {c12nDef.enforce && (
+          <div style={{ paddingBottom: sp4, paddingTop: sp2 }}>
+            <Classification size="tiny" c12n={report ? report.classification : null} />
+          </div>
+        )}
 
-        <div className="print-footer print-only">
-          {`${t('title')} :: ${id} :: `}
-          <Classification type="text" size="tiny" c12n={report ? report.classification : null} />
-        </div>
+        {c12nDef.enforce && (
+          <div className="print-footer print-only">
+            {`${t('title')} :: ${id} :: `}
+            <Classification type="text" size="tiny" c12n={report ? report.classification : null} />
+          </div>
+        )}
         <div style={{ paddingBottom: sp2 }}>
           <Grid container alignItems="center">
             <Grid item xs>
