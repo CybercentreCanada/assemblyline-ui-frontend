@@ -23,7 +23,7 @@ import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutl
 import VpnKeyOutlinedIcon from '@material-ui/icons/VpnKeyOutlined';
 import { Skeleton } from '@material-ui/lab';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
-import useAppContext from 'components/hooks/useAppContext';
+import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -113,7 +113,7 @@ const DEFAULT_SOURCE = {
 const WrappedSourceDetail = ({ service, base, close, reload }) => {
   const { t } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
-  const { c12nDef } = useAppContext();
+  const { c12nDef } = useALContext();
   const [modified, setModified] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
@@ -470,7 +470,7 @@ const SourceDetail = React.memo(WrappedSourceDetail);
 const SourceCard = ({ source, onClick }) => {
   const { t } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
-  const { c12nDef } = useAppContext();
+  const { c12nDef } = useALContext();
   const classes = useStyles();
 
   return (
@@ -612,7 +612,7 @@ const ServiceDetail = ({ service, sources, reload }) => {
 export default function SignatureSources() {
   const { t } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
-  const { user: currentUser } = useAppContext();
+  const { user: currentUser } = useALContext();
   const [sources, setSources] = useState(null);
   const apiCall = useMyAPI();
 

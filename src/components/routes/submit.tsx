@@ -16,7 +16,7 @@ import {
 import { Skeleton, TabContext, TabList, TabPanel } from '@material-ui/lab';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
-import useAppContext from 'components/hooks/useAppContext';
+import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import ServiceTree from 'components/layout/serviceTree';
@@ -34,7 +34,7 @@ function Submit() {
   const apiCall = useMyAPI();
   const { t } = useTranslation(['submit']);
   const theme = useTheme();
-  const { user: currentUser, c12nDef, configuration } = useAppContext();
+  const { user: currentUser, c12nDef, configuration } = useALContext();
   const [uuid, setUUID] = useState(null);
   const [flow, setFlow] = useState(null);
   const [settings, setSettings] = useState(null);

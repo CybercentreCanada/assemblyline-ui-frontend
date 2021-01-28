@@ -27,7 +27,7 @@ import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
 import CloseIcon from '@material-ui/icons/Close';
 import Skeleton from '@material-ui/lab/Skeleton';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
-import useAppContext from 'components/hooks/useAppContext';
+import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import APIKeys from 'components/routes/user/api_keys';
@@ -75,7 +75,7 @@ function User({ width, username }: UserProps) {
   const [user, setUser] = useState(null);
   const [modified, setModified] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
-  const { user: currentUser, configuration } = useAppContext();
+  const { user: currentUser, configuration } = useALContext();
   const downSM = useMediaQuery(theme.breakpoints.down('sm'));
   const { showErrorMessage, showSuccessMessage, showWarningMessage } = useMySnackbar();
   const sp1 = theme.spacing(1);

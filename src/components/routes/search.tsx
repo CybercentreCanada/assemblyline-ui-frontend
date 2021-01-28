@@ -16,7 +16,7 @@ import FolderIcon from '@material-ui/icons/Folder';
 import FolderOutlinedIcon from '@material-ui/icons/FolderOutlined';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
-import useAppContext from 'components/hooks/useAppContext';
+import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import SearchBar from 'components/visual/SearchBar/search-bar';
@@ -83,7 +83,7 @@ function Search({ index }: SearchProps) {
   const { t } = useTranslation(['search']);
   const [pageSize] = useState(PAGE_SIZE);
   const [searching, setSearching] = useState(false);
-  const { indexes } = useAppContext();
+  const { indexes } = useALContext();
   const location = useLocation();
   const history = useHistory();
   const theme = useTheme();

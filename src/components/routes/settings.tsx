@@ -24,7 +24,7 @@ import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
 import CloseIcon from '@material-ui/icons/Close';
 import Skeleton from '@material-ui/lab/Skeleton';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
-import useAppContext from 'components/hooks/useAppContext';
+import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import ServiceTree from 'components/layout/serviceTree';
@@ -44,7 +44,7 @@ function Settings<SettingsProps>({ width }) {
   const [settings, setSettings] = useState(null);
   const [modified, setModified] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
-  const { user: currentUser, c12nDef } = useAppContext();
+  const { user: currentUser, c12nDef } = useALContext();
   const { showSuccessMessage } = useMySnackbar();
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);

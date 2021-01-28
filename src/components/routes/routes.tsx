@@ -1,4 +1,4 @@
-import useAppContext from 'components/hooks/useAppContext';
+import useALContext from 'components/hooks/useALContext';
 import ForbiddenPage from 'components/routes/403';
 import NotFoundPage from 'components/routes/404_dl';
 import Account from 'components/routes/account';
@@ -62,7 +62,7 @@ function ScrollToTop() {
 }
 
 const WrappedRoutes = () => {
-  const { settings } = useAppContext();
+  const { settings } = useALContext();
   return (
     <>
       <ScrollToTop />

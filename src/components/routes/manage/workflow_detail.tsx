@@ -17,7 +17,7 @@ import {
 import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
 import { Autocomplete, Skeleton } from '@material-ui/lab';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
-import useAppContext from 'components/hooks/useAppContext';
+import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import Classification from 'components/visual/Classification';
@@ -90,7 +90,7 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
   const [modified, setModified] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState(false);
-  const { c12nDef } = useAppContext();
+  const { c12nDef } = useALContext();
   const { showSuccessMessage } = useMySnackbar();
   const apiCall = useMyAPI();
   const classes = useStyles();
