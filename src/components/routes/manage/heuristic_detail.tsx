@@ -79,7 +79,7 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
   return (
     <PageCenter margin={!id ? 2 : 4} width="100%">
       {c12nDef.enforce && (
-        <div style={{ paddingBottom: theme.spacing(4), paddingTop: theme.spacing(2) }}>
+        <div style={{ paddingBottom: theme.spacing(4) }}>
           <Classification size="tiny" c12n={heuristic ? heuristic.classification : null} />
         </div>
       )}

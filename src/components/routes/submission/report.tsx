@@ -529,15 +529,15 @@ export default function SubmissionReport() {
 
   return (
     <PageCenter
-      mt={isPrinting ? 0 : c12nDef.enforce ? 2 : 4}
-      mb={isPrinting ? 0 : 2}
+      mt={isPrinting ? 0 : 4}
+      mb={isPrinting ? 0 : 4}
       ml={isPrinting ? 2 : 4}
       mr={isPrinting ? 2 : 4}
       width="100%"
     >
       <div style={{ textAlign: 'left' }}>
         {c12nDef.enforce && (
-          <div style={{ paddingBottom: sp4, paddingTop: sp2 }}>
+          <div style={{ paddingBottom: sp4 }}>
             <Classification size="tiny" c12n={report ? report.classification : null} />
           </div>
         )}
@@ -837,8 +837,7 @@ export default function SubmissionReport() {
             <Divider className={classes.divider} />
             <div
               style={{
-                paddingTop: sp2,
-                paddingBottom: sp2
+                paddingTop: sp2
               }}
             >
               {report ? (

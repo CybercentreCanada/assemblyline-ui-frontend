@@ -97,7 +97,6 @@ export default function SubmissionDetail() {
   const [lastSuccessfulTrigger, setLastSuccessfulTrigger] = useState(0);
   const [deleteDialog, setDeleteDialog] = useState(false);
   const apiCall = useMyAPI();
-  const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
   const history = useHistory();
@@ -728,7 +727,7 @@ export default function SubmissionDetail() {
   }, [loadTrigger]);
 
   return (
-    <PageCenter mt={c12nDef.enforce ? 2 : 4} ml={4} mr={4} width="100%">
+    <PageCenter margin={4} width="100%">
       <ConfirmationDialog
         open={deleteDialog}
         handleClose={() => setDeleteDialog(false)}
@@ -809,7 +808,7 @@ export default function SubmissionDetail() {
           () => (
             <>
               {c12nDef.enforce && (
-                <div style={{ paddingBottom: sp4, paddingTop: sp2 }}>
+                <div style={{ paddingBottom: sp4 }}>
                   <Classification size="tiny" c12n={submission ? submission.classification : null} />
                 </div>
               )}
