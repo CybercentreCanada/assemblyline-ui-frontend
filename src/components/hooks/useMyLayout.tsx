@@ -62,86 +62,6 @@ const useMyLayout = (): AppLayoutProps => {
       }
     },
     {
-      type: 'item' as 'item',
-      element: {
-        id: 'dashboard',
-        text: t('drawer.dashboard'),
-        icon: <DashboardOutlinedIcon />,
-        route: '/dashboard',
-        nested: false
-      }
-    },
-    {
-      type: 'divider' as 'divider',
-      element: null
-    },
-    {
-      type: 'group' as 'group',
-      element: {
-        id: 'manage',
-        title: t('drawer.manage'),
-        icon: <BuildOutlinedIcon />,
-        items: [
-          {
-            id: 'manage.heuristics',
-            text: t('drawer.manage.heuristics'),
-            icon: <SimCardOutlinedIcon />,
-            route: '/manage/heuristics',
-            nested: true
-          },
-          {
-            id: 'manage.signatures',
-            text: t('drawer.manage.signatures'),
-            icon: <FingerprintOutlinedIcon />,
-            route: '/manage/signatures',
-            nested: true
-          },
-          {
-            id: 'manage.source',
-            text: t('drawer.manage.source'),
-            userPropValidators: [
-              { prop: 'user.is_admin', value: true },
-              { prop: 'user.roles', value: 'signature_manager' }
-            ],
-            icon: <CodeOutlinedIcon />,
-            route: '/manage/sources',
-            nested: true
-          },
-          {
-            id: 'manage.workflow',
-            text: t('drawer.manage.workflow'),
-            icon: <BiNetworkChart />,
-            route: '/manage/workflows',
-            nested: true
-          }
-        ]
-      }
-    },
-    {
-      type: 'group' as 'group',
-      element: {
-        id: 'stats',
-        title: t('drawer.stats'),
-        icon: <EqualizerOutlinedIcon />,
-        items: [
-          {
-            id: 'stats.heuristics',
-            text: t('drawer.stats.heuristics'),
-            icon: <SimCardOutlinedIcon />,
-            route: '/stats/heuristics',
-            nested: true
-          },
-          {
-            id: 'stats.signatures',
-            text: t('drawer.stats.signatures'),
-            icon: <FingerprintOutlinedIcon />,
-            route: '/stats/signatures',
-            nested: true
-          }
-        ]
-      }
-    },
-    {
       type: 'group' as 'group',
       element: {
         id: 'search',
@@ -182,6 +102,86 @@ const useMyLayout = (): AppLayoutProps => {
             id: 'search.submission',
             text: t('drawer.search.submission'),
             route: '/search/submission',
+            nested: true
+          }
+        ]
+      }
+    },
+    {
+      type: 'divider' as 'divider',
+      element: null
+    },
+    {
+      type: 'item' as 'item',
+      element: {
+        id: 'dashboard',
+        text: t('drawer.dashboard'),
+        icon: <DashboardOutlinedIcon />,
+        route: '/dashboard',
+        nested: false
+      }
+    },
+    {
+      type: 'group' as 'group',
+      element: {
+        id: 'stats',
+        title: t('drawer.stats'),
+        icon: <EqualizerOutlinedIcon />,
+        items: [
+          {
+            id: 'stats.heuristics',
+            text: t('drawer.stats.heuristics'),
+            icon: <SimCardOutlinedIcon />,
+            route: '/stats/heuristics',
+            nested: true
+          },
+          {
+            id: 'stats.signatures',
+            text: t('drawer.stats.signatures'),
+            icon: <FingerprintOutlinedIcon />,
+            route: '/stats/signatures',
+            nested: true
+          }
+        ]
+      }
+    },
+    {
+      type: 'group' as 'group',
+      element: {
+        id: 'manage',
+        title: t('drawer.manage'),
+        icon: <BuildOutlinedIcon />,
+        items: [
+          {
+            id: 'manage.heuristics',
+            text: t('drawer.manage.heuristics'),
+            icon: <SimCardOutlinedIcon />,
+            route: '/manage/heuristics',
+            nested: true
+          },
+          {
+            id: 'manage.signatures',
+            text: t('drawer.manage.signatures'),
+            icon: <FingerprintOutlinedIcon />,
+            route: '/manage/signatures',
+            nested: true
+          },
+          {
+            id: 'manage.source',
+            text: t('drawer.manage.source'),
+            userPropValidators: [
+              { prop: 'user.is_admin', value: true },
+              { prop: 'user.roles', value: 'signature_manager' }
+            ],
+            icon: <CodeOutlinedIcon />,
+            route: '/manage/sources',
+            nested: true
+          },
+          {
+            id: 'manage.workflow',
+            text: t('drawer.manage.workflow'),
+            icon: <BiNetworkChart />,
+            route: '/manage/workflows',
             nested: true
           }
         ]
