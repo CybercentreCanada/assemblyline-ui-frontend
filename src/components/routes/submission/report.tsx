@@ -528,7 +528,13 @@ export default function SubmissionReport() {
   }, []);
 
   return (
-    <PageCenter ml={isPrinting ? 2 : 4} mr={isPrinting ? 2 : 4} width="100%">
+    <PageCenter
+      mt={isPrinting ? 0 : 4}
+      mb={isPrinting ? 0 : 4}
+      ml={isPrinting ? 2 : 4}
+      mr={isPrinting ? 2 : 4}
+      width="100%"
+    >
       <div style={{ textAlign: 'left' }}>
         {c12nDef.enforce && (
           <div style={{ paddingBottom: sp4, paddingTop: sp2 }}>
