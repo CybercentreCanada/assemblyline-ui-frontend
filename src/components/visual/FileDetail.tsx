@@ -4,6 +4,7 @@ import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
 import PageviewOutlinedIcon from '@material-ui/icons/PageviewOutlined';
 import RotateLeftOutlinedIcon from '@material-ui/icons/RotateLeftOutlined';
 import { Skeleton } from '@material-ui/lab';
+import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import Classification from 'components/visual/Classification';
@@ -93,6 +94,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
   const { t } = useTranslation(['fileDetail']);
   const [file, setFile] = useState<File | null>(null);
   const apiCall = useMyAPI();
+  const { c12nDef } = useALContext();
   const theme = useTheme();
   const history = useHistory();
   const { showSuccessMessage } = useMySnackbar();
@@ -178,9 +180,11 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
       {useMemo(
         () => (
           <>
-            <div style={{ paddingBottom: sp4, paddingTop: sp2 }}>
-              <Classification size="tiny" c12n={file ? file.file_info.classification : null} />
-            </div>
+            {c12nDef.enforce && (
+              <div style={{ paddingBottom: sp4, paddingTop: sp2 }}>
+                <Classification size="tiny" c12n={file ? file.file_info.classification : null} />
+              </div>
+            )}
             <div style={{ paddingBottom: sp4 }}>
               <Grid container alignItems="center">
                 <Grid item xs>

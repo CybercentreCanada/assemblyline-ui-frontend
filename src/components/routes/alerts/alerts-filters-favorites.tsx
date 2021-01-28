@@ -68,7 +68,7 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
       const favorite: Favorite = {
         query: queryValue.value,
         name: nameValue.value,
-        classification: publicSwitch ? classification : c12nDef.UNRESTRICTED,
+        classification: publicSwitch && c12nDef.enforce ? classification : c12nDef.UNRESTRICTED,
         created_by: currentUser.username
       };
 
@@ -144,7 +144,7 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
           <div>{t('public')}</div>
         </Button>
       </div>
-      {publicSwitch ? (
+      {publicSwitch && c12nDef.enforce ? (
         <Classification type="picker" c12n={classification} setClassification={setClassification} />
       ) : (
         <div style={{ padding: theme.spacing(2.25) }} />

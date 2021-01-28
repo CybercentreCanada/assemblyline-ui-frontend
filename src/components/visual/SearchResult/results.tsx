@@ -2,6 +2,7 @@ import { Tooltip } from '@material-ui/core';
 import Paper from '@material-ui/core/Paper';
 import TableContainer from '@material-ui/core/TableContainer';
 import { AlertTitle, Skeleton } from '@material-ui/lab';
+import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
 import Verdict from 'components/visual/Verdict';
 import 'moment/locale/fr';
@@ -37,6 +38,7 @@ type ResultsTableProps = {
 
 const WrappedResultsTable: React.FC<ResultsTableProps> = ({ resultResults }) => {
   const { t, i18n } = useTranslation(['search']);
+  const { c12nDef } = useALContext();
 
   return resultResults ? (
     resultResults.total !== 0 ? (
@@ -48,7 +50,7 @@ const WrappedResultsTable: React.FC<ResultsTableProps> = ({ resultResults }) => 
               <DivTableCell>{t('header.verdict')}</DivTableCell>
               <DivTableCell>{t('header.sha256')}</DivTableCell>
               <DivTableCell>{t('header.service')}</DivTableCell>
-              <DivTableCell>{t('header.classification')}</DivTableCell>
+              {c12nDef.enforce && <DivTableCell>{t('header.classification')}</DivTableCell>}
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
@@ -72,9 +74,11 @@ const WrappedResultsTable: React.FC<ResultsTableProps> = ({ resultResults }) => 
                 </DivTableCell>
                 <DivTableCell style={{ wordBreak: 'break-word' }}>{result.id.substring(0, 64)}</DivTableCell>
                 <DivTableCell>{result.response.service_name}</DivTableCell>
-                <DivTableCell>
-                  <Classification type="text" size="tiny" c12n={result.classification} format="short" />
-                </DivTableCell>
+                {c12nDef.enforce && (
+                  <DivTableCell>
+                    <Classification type="text" size="tiny" c12n={result.classification} format="short" />
+                  </DivTableCell>
+                )}
               </LinkRow>
             ))}
           </DivTableBody>

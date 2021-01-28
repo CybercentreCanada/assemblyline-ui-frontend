@@ -2,6 +2,7 @@ import { Grid, IconButton, makeStyles, Paper, Tooltip, Typography, useTheme } fr
 import YoutubeSearchedForIcon from '@material-ui/icons/YoutubeSearchedFor';
 import { Skeleton } from '@material-ui/lab';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
+import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import Classification from 'components/visual/Classification';
 import React, { useEffect, useState } from 'react';
@@ -63,6 +64,7 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
   const [heuristic, setHeuristic] = useState<Heuristic>(null);
   const apiCall = useMyAPI();
   const classes = useStyles();
+  const { c12nDef } = useALContext();
 
   useEffect(() => {
     apiCall({
@@ -76,9 +78,11 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
 
   return (
     <PageCenter margin={!id ? 2 : 4} width="100%">
-      <div style={{ paddingBottom: theme.spacing(4), paddingTop: theme.spacing(2) }}>
-        <Classification size="tiny" c12n={heuristic ? heuristic.classification : null} />
-      </div>
+      {c12nDef.enforce && (
+        <div style={{ paddingBottom: theme.spacing(4), paddingTop: theme.spacing(2) }}>
+          <Classification size="tiny" c12n={heuristic ? heuristic.classification : null} />
+        </div>
+      )}
       <div style={{ textAlign: 'left' }}>
         <div style={{ paddingBottom: theme.spacing(4) }}>
           <Grid container alignItems="center">

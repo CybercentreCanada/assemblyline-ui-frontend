@@ -219,16 +219,18 @@ export default function Users() {
           <Box mb={3}>
             <Typography variant="h5">{t('newuser.title')}</Typography>
           </Box>
-          <Box mb={1}>
-            <Classification
-              type="picker"
-              size="medium"
-              format="long"
-              c12n={newUser.classification}
-              setClassification={setClassification}
-              isUser
-            />
-          </Box>
+          {c12nDef.enforce && (
+            <Box mb={1}>
+              <Classification
+                type="picker"
+                size="medium"
+                format="long"
+                c12n={newUser.classification}
+                setClassification={setClassification}
+                isUser
+              />
+            </Box>
+          )}
           <Grid container spacing={2}>
             <Grid item xs={12} md={6}>
               <Typography variant="caption">{t('newuser.uname')}</Typography>

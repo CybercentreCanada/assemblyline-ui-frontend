@@ -101,7 +101,7 @@ export default function SubmissionDetail() {
   const sp4 = theme.spacing(4);
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
   const history = useHistory();
-  const { user: currentUser } = useALContext();
+  const { user: currentUser, c12nDef } = useALContext();
   const { setHighlightMap } = useHighlighter();
   const { setGlobalDrawer, globalDrawer } = useDrawer();
 
@@ -808,9 +808,11 @@ export default function SubmissionDetail() {
         {useMemo(
           () => (
             <>
-              <div style={{ paddingBottom: sp4, paddingTop: sp2 }}>
-                <Classification size="tiny" c12n={submission ? submission.classification : null} />
-              </div>
+              {c12nDef.enforce && (
+                <div style={{ paddingBottom: sp4, paddingTop: sp2 }}>
+                  <Classification size="tiny" c12n={submission ? submission.classification : null} />
+                </div>
+              )}
               <div style={{ paddingBottom: sp4 }}>
                 <Grid container>
                   <Grid item xs>

@@ -1,6 +1,7 @@
 import Paper from '@material-ui/core/Paper';
 import TableContainer from '@material-ui/core/TableContainer';
 import { AlertTitle, Skeleton } from '@material-ui/lab';
+import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
 import 'moment/locale/fr';
 import React from 'react';
@@ -40,6 +41,7 @@ type WorkflowTableProps = {
 
 const WrappedWorflowTable: React.FC<WorkflowTableProps> = ({ workflowResults, setWorkflowID = null }) => {
   const { t, i18n } = useTranslation(['search']);
+  const { c12nDef } = useALContext();
 
   return workflowResults ? (
     workflowResults.total !== 0 ? (
@@ -53,7 +55,7 @@ const WrappedWorflowTable: React.FC<WorkflowTableProps> = ({ workflowResults, se
               <DivTableCell>{t('header.priority')}</DivTableCell>
               <DivTableCell>{t('header.status')}</DivTableCell>
               <DivTableCell>{t('header.hit_count')}</DivTableCell>
-              <DivTableCell>{t('header.classification')}</DivTableCell>
+              {c12nDef.enforce && <DivTableCell>{t('header.classification')}</DivTableCell>}
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
@@ -86,9 +88,11 @@ const WrappedWorflowTable: React.FC<WorkflowTableProps> = ({ workflowResults, se
                 <DivTableCell>{workflow.priority}</DivTableCell>
                 <DivTableCell>{workflow.status}</DivTableCell>
                 <DivTableCell>{workflow.hit_count}</DivTableCell>
-                <DivTableCell>
-                  <Classification type="text" size="tiny" c12n={workflow.classification} format="short" />
-                </DivTableCell>
+                {c12nDef.enforce && (
+                  <DivTableCell>
+                    <Classification type="text" size="tiny" c12n={workflow.classification} format="short" />
+                  </DivTableCell>
+                )}
               </LinkRow>
             ))}
           </DivTableBody>

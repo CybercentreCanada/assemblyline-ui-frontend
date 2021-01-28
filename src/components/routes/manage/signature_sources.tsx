@@ -276,14 +276,16 @@ const WrappedSourceDetail = ({ service, base, close, reload }) => {
             <div className={classes.label}>{t('uri')}</div>
             <TextField size="small" value={source.uri} fullWidth variant="outlined" onChange={handleURIChange} />
           </Grid>
-          <Grid item xs={12}>
-            <div className={classes.label}>{t('classification')}</div>
-            <Classification
-              c12n={source.default_classification}
-              type="picker"
-              setClassification={handleClassificationChange}
-            />
-          </Grid>
+          {c12nDef.enforce && (
+            <Grid item xs={12}>
+              <div className={classes.label}>{t('classification')}</div>
+              <Classification
+                c12n={source.default_classification}
+                type="picker"
+                setClassification={handleClassificationChange}
+              />
+            </Grid>
+          )}
           <Grid item xs={12} md={6}>
             <div>
               <div className={classes.label}>{t('name')}</div>
@@ -527,10 +529,15 @@ const SourceCard = ({ source, onClick }) => {
               </Grid>
             </>
           )}
-          <Grid item xs={5} sm={4} md={2} className={classes.label}>{`${t('classification')}:`}</Grid>
-          <Grid item xs={7} sm={8} md={10}>
-            <Classification type="text" c12n={source.default_classification || c12nDef.UNRESTRICTED} />
-          </Grid>
+          {c12nDef.enforce && (
+            <>
+              <Grid item xs={5} sm={4} md={2} className={classes.label}>{`${t('classification')}:`}</Grid>
+
+              <Grid item xs={7} sm={8} md={10}>
+                <Classification type="text" c12n={source.default_classification || c12nDef.UNRESTRICTED} />
+              </Grid>
+            </>
+          )}
         </Grid>
         {source.headers && source.headers.length !== 0 && (
           <div>
