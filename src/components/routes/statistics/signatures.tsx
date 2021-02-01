@@ -38,17 +38,23 @@ export default function StatisticsSignatures() {
   }, []);
 
   const cells: Cell[] = [
-    { id: 'type', numeric: false, disablePadding: false, label: t('type') },
-    { id: 'source', numeric: false, disablePadding: false, label: t('source') },
-    { id: 'name', numeric: false, disablePadding: false, label: t('name') },
-    { id: 'count', numeric: true, disablePadding: false, label: t('count') },
-    { id: 'min', numeric: true, disablePadding: false, label: t('min') },
-    { id: 'avg', numeric: true, disablePadding: false, label: t('avg') },
-    { id: 'max', numeric: true, disablePadding: false, label: t('max') }
+    { id: 'type', break: false, numeric: false, disablePadding: false, label: t('type') },
+    { id: 'source', break: false, numeric: false, disablePadding: false, label: t('source') },
+    { id: 'name', break: true, numeric: false, disablePadding: false, label: t('name') },
+    { id: 'count', break: false, numeric: true, disablePadding: false, label: t('count') },
+    { id: 'min', break: false, numeric: true, disablePadding: false, label: t('min') },
+    { id: 'avg', break: false, numeric: true, disablePadding: false, label: t('avg') },
+    { id: 'max', break: false, numeric: true, disablePadding: false, label: t('max') }
   ];
 
   if (c12nDef.enforce) {
-    cells.push({ id: 'classification', numeric: false, disablePadding: false, label: t('classification') });
+    cells.push({
+      id: 'classification',
+      break: false,
+      numeric: false,
+      disablePadding: false,
+      label: t('classification')
+    });
   }
 
   return (
