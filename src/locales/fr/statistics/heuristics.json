@@ -1,3 +1,10 @@
 {
+  "avg": "Score Moy",
+  "classification": "Classification",
+  "count": "Nombre",
+  "heur_id": "ID",
+  "max": "Score Max",
+  "min": "Score Min",
+  "name": "Nom",
   "title": "Statistiques d'heuristiques"
 }
