@@ -226,8 +226,8 @@ const useStyles = makeStyles((theme: Theme) =>
     dense: {
       paddingLeft: theme.spacing(1),
       paddingRight: theme.spacing(1),
-      paddingTop: theme.spacing(1.5),
-      paddingBottom: theme.spacing(1.5)
+      paddingTop: theme.spacing(0.75),
+      paddingBottom: theme.spacing(0.75)
     },
     break: {
       wordBreak: 'break-word'
@@ -382,7 +382,7 @@ const WrappedEnhancedTable: React.FC<EnhancedTableProps> = ({
   const [filteredRows, setFilteredRows] = React.useState(rows);
   const [page, setPage] = React.useState(0);
   const [filter, setFilter] = React.useState('');
-  const [rowsPerPage, setRowsPerPage] = React.useState(15);
+  const [rowsPerPage, setRowsPerPage] = React.useState(25);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
