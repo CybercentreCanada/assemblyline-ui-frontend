@@ -172,7 +172,9 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
 
   return (
     <PageHeader isSticky>
-      <div style={{ display: 'flex' }}>
+      <div
+        style={{ display: 'flex', marginLeft: '-4px', marginRight: '-4px', paddingLeft: '4px', paddingRight: '4px' }}
+      >
         <div className={classes.search}>
           <div className={classes.searchIcon}>
             <FilterListIcon />
@@ -273,81 +275,83 @@ const WrappedEnhancedTableBody: React.FC<EnhancedTableBodyProps> = ({
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
   return (
-    <Paper className={classes.paper}>
-      <TableContainer style={{ paddingLeft: '8px', paddingRight: '8px' }}>
-        <DivTable className={classes.table} aria-labelledby="tableTitle" aria-label="enhanced table">
-          <EnhancedTableHead
-            dense={dense}
-            cells={cells}
-            order={order}
-            orderBy={orderBy}
-            onRequestSort={handleRequestSort}
-          />
-          <DivTableBody>
-            {stableSort(rows, getComparator(order, orderBy))
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row, index) => {
-                return linkField && linkPrefix ? (
-                  <LinkRow
-                    hover
-                    component={Link}
-                    to={`${linkPrefix}${row[linkField]}`}
-                    onClick={
-                      onClick
-                        ? event => {
-                            event.preventDefault();
-                            onClick(row);
-                          }
-                        : null
-                    }
-                    tabIndex={-1}
-                    key={index}
-                  >
-                    {cells.map(head => {
-                      return (
-                        <DivTableCell
-                          key={head.id}
-                          className={clsx(dense ? classes.dense : null, head.break ? classes.break : null)}
-                          align={head.numeric ? 'right' : 'inherit'}
-                        >
-                          {head.id === 'classification' ? (
-                            <Classification c12n={row[head.id]} type="text" />
-                          ) : (
-                            `${row[head.id]}`
-                          )}
-                        </DivTableCell>
-                      );
-                    })}
-                  </LinkRow>
-                ) : (
-                  <DivTableRow hover onClick={onClick ? () => onClick(row) : null} tabIndex={-1} key={index}>
-                    {cells.map(head => {
-                      return (
-                        <DivTableCell
-                          key={head.id}
-                          className={clsx(dense ? classes.dense : null, head.break ? classes.break : null)}
-                          align={head.numeric ? 'right' : 'inherit'}
-                        >
-                          {head.id === 'classification' ? (
-                            <Classification c12n={row[head.id]} type="text" />
-                          ) : (
-                            `${row[head.id]}`
-                          )}
-                        </DivTableCell>
-                      );
-                    })}
-                  </DivTableRow>
-                );
-              })}
-            {showEmpty && emptyRows > 0 && (
-              <DivTableRow style={{ height: (dense ? 45 : 53) * emptyRows }}>
-                <TableCell colSpan={cells.length} />
-              </DivTableRow>
-            )}
-          </DivTableBody>
-        </DivTable>
-      </TableContainer>
-    </Paper>
+    <div style={{ paddingTop: '16px', paddingLeft: '4px', paddingRight: '4px' }}>
+      <Paper className={classes.paper}>
+        <TableContainer>
+          <DivTable className={classes.table} aria-labelledby="tableTitle" aria-label="enhanced table">
+            <EnhancedTableHead
+              dense={dense}
+              cells={cells}
+              order={order}
+              orderBy={orderBy}
+              onRequestSort={handleRequestSort}
+            />
+            <DivTableBody>
+              {stableSort(rows, getComparator(order, orderBy))
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((row, index) => {
+                  return linkField && linkPrefix ? (
+                    <LinkRow
+                      hover
+                      component={Link}
+                      to={`${linkPrefix}${row[linkField]}`}
+                      onClick={
+                        onClick
+                          ? event => {
+                              event.preventDefault();
+                              onClick(row);
+                            }
+                          : null
+                      }
+                      tabIndex={-1}
+                      key={index}
+                    >
+                      {cells.map(head => {
+                        return (
+                          <DivTableCell
+                            key={head.id}
+                            className={clsx(dense ? classes.dense : null, head.break ? classes.break : null)}
+                            align={head.numeric ? 'right' : 'inherit'}
+                          >
+                            {head.id === 'classification' ? (
+                              <Classification c12n={row[head.id]} type="text" />
+                            ) : (
+                              `${row[head.id]}`
+                            )}
+                          </DivTableCell>
+                        );
+                      })}
+                    </LinkRow>
+                  ) : (
+                    <DivTableRow hover onClick={onClick ? () => onClick(row) : null} tabIndex={-1} key={index}>
+                      {cells.map(head => {
+                        return (
+                          <DivTableCell
+                            key={head.id}
+                            className={clsx(dense ? classes.dense : null, head.break ? classes.break : null)}
+                            align={head.numeric ? 'right' : 'inherit'}
+                          >
+                            {head.id === 'classification' ? (
+                              <Classification c12n={row[head.id]} type="text" />
+                            ) : (
+                              `${row[head.id]}`
+                            )}
+                          </DivTableCell>
+                        );
+                      })}
+                    </DivTableRow>
+                  );
+                })}
+              {showEmpty && emptyRows > 0 && (
+                <DivTableRow style={{ height: (dense ? 45 : 53) * emptyRows }}>
+                  <TableCell colSpan={cells.length} />
+                </DivTableRow>
+              )}
+            </DivTableBody>
+          </DivTable>
+        </TableContainer>
+      </Paper>
+    </div>
   );
 };
 
