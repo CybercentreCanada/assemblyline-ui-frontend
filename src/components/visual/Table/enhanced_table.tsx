@@ -4,11 +4,13 @@ import { createStyles, fade, makeStyles, Theme } from '@material-ui/core/styles'
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
-import Toolbar from '@material-ui/core/Toolbar';
 import FilterListIcon from '@material-ui/icons/FilterList';
+import clsx from 'clsx';
+import PageHeader from 'commons/components/layout/pages/PageHeader';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import Classification from '../Classification';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from '../DivTable';
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
@@ -46,6 +48,7 @@ export interface Cell {
   disablePadding: boolean;
   id: string;
   label: string;
+  break: boolean;
   numeric: boolean;
 }
 
@@ -120,11 +123,13 @@ const useToolbarStyles = makeStyles((theme: Theme) =>
     },
     search: {
       position: 'relative',
+      alignSelf: 'center',
       borderRadius: theme.shape.borderRadius,
       backgroundColor: fade(theme.palette.text.primary, 0.04),
       '&:hover': {
         backgroundColor: fade(theme.palette.text.primary, 0.06)
       },
+      height: 'fit-content',
       width: 300
     },
     searchIcon: {
@@ -163,39 +168,41 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
   const classes = useToolbarStyles();
 
   return (
-    <Toolbar className={classes.root}>
-      <div className={classes.search}>
-        <div className={classes.searchIcon}>
-          <FilterListIcon />
+    <PageHeader isSticky>
+      <div style={{ display: 'flex' }}>
+        <div className={classes.search}>
+          <div className={classes.searchIcon}>
+            <FilterListIcon />
+          </div>
+          <InputBase
+            onChange={handleFilter}
+            placeholder={t('filter')}
+            classes={{
+              root: classes.inputRoot,
+              input: classes.inputInput
+            }}
+            value={filter}
+          />
         </div>
-        <InputBase
-          onChange={handleFilter}
-          placeholder={t('filter')}
-          classes={{
-            root: classes.inputRoot,
-            input: classes.inputInput
-          }}
-          value={filter}
+
+        <TablePagination
+          className={classes.flexItem}
+          backIconButtonText={t('pager.back')}
+          nextIconButtonText={t('pager.next')}
+          labelRowsPerPage={t('pager.rows')}
+          labelDisplayedRows={({ from, to, count }) =>
+            `${from}-${to} ${t('pager.of')} ${count !== -1 ? count : `${t('pager.more')} ${to}`}`
+          }
+          rowsPerPageOptions={[15, 25, 50, 100]}
+          component="div"
+          count={itemCount}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onChangePage={handleChangePage}
+          onChangeRowsPerPage={handleChangeRowsPerPage}
         />
       </div>
-
-      <TablePagination
-        className={classes.flexItem}
-        backIconButtonText={t('pager.back')}
-        nextIconButtonText={t('pager.next')}
-        labelRowsPerPage={t('pager.rows')}
-        labelDisplayedRows={({ from, to, count }) =>
-          `${from}-${to} ${t('pager.of')} ${count !== -1 ? count : `${t('pager.more')} ${to}`}`
-        }
-        rowsPerPageOptions={[15, 25, 50, 100]}
-        component="div"
-        count={itemCount}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onChangePage={handleChangePage}
-        onChangeRowsPerPage={handleChangeRowsPerPage}
-      />
-    </Toolbar>
+    </PageHeader>
   );
 };
 
@@ -216,6 +223,9 @@ const useStyles = makeStyles((theme: Theme) =>
       paddingRight: theme.spacing(1),
       paddingTop: theme.spacing(1.5),
       paddingBottom: theme.spacing(1.5)
+    },
+    break: {
+      wordBreak: 'break-word'
     }
   })
 );
@@ -269,16 +279,16 @@ const WrappedEnhancedTable: React.FC<EnhancedTableProps> = ({
 
   return (
     <div className={classes.root}>
+      <EnhancedTableToolbar
+        itemCount={rows.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        filter={filter}
+        handleChangePage={handleChangePage}
+        handleChangeRowsPerPage={handleChangeRowsPerPage}
+        handleFilter={event => setFilter(event.target.value)}
+      />
       <Paper className={classes.paper}>
-        <EnhancedTableToolbar
-          itemCount={rows.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          filter={filter}
-          handleChangePage={handleChangePage}
-          handleChangeRowsPerPage={handleChangeRowsPerPage}
-          handleFilter={event => setFilter(event.target.value)}
-        />
         <TableContainer style={{ paddingLeft: '8px', paddingRight: '8px' }}>
           <DivTable className={classes.table} aria-labelledby="tableTitle" aria-label="enhanced table">
             <EnhancedTableHead
@@ -312,10 +322,14 @@ const WrappedEnhancedTable: React.FC<EnhancedTableProps> = ({
                         return (
                           <DivTableCell
                             key={head.id}
-                            className={dense ? classes.dense : null}
+                            className={clsx(dense ? classes.dense : null, head.break ? classes.break : null)}
                             align={head.numeric ? 'right' : 'inherit'}
                           >
-                            {`${row[head.id]}`}
+                            {head.id === 'classification' ? (
+                              <Classification c12n={row[head.id]} type="text" />
+                            ) : (
+                              `${row[head.id]}`
+                            )}
                           </DivTableCell>
                         );
                       })}
@@ -326,10 +340,14 @@ const WrappedEnhancedTable: React.FC<EnhancedTableProps> = ({
                         return (
                           <DivTableCell
                             key={head.id}
-                            className={dense ? classes.dense : null}
+                            className={clsx(dense ? classes.dense : null, head.break ? classes.break : null)}
                             align={head.numeric ? 'right' : 'inherit'}
                           >
-                            {`${row[head.id]}`}
+                            {head.id === 'classification' ? (
+                              <Classification c12n={row[head.id]} type="text" />
+                            ) : (
+                              `${row[head.id]}`
+                            )}
                           </DivTableCell>
                         );
                       })}
