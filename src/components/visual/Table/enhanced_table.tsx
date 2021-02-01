@@ -402,6 +402,7 @@ const WrappedEnhancedTable: React.FC<EnhancedTableProps> = ({
       }
     }
     setFilteredRows(filtered);
+    setPage(0);
   };
 
   useEffect(() => {
