@@ -1,18 +1,15 @@
-import { InputBase } from '@material-ui/core';
+import { InputBase, TablePagination } from '@material-ui/core';
 import Paper from '@material-ui/core/Paper';
 import { createStyles, fade, makeStyles, Theme } from '@material-ui/core/styles';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TablePagination from '@material-ui/core/TablePagination';
-import TableRow from '@material-ui/core/TableRow';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Toolbar from '@material-ui/core/Toolbar';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from '../DivTable';
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -88,10 +85,10 @@ const WrappedEnhancedTableHead: React.FC<EnhancedTableHeadProps> = ({
   };
 
   return (
-    <TableHead>
-      <TableRow>
+    <DivTableHead>
+      <DivTableRow>
         {cells.map(cell => (
-          <TableCell
+          <DivTableCell
             key={cell.id}
             className={dense ? classes.dense : classes.big}
             align={cell.numeric ? 'right' : 'left'}
@@ -105,10 +102,10 @@ const WrappedEnhancedTableHead: React.FC<EnhancedTableHeadProps> = ({
             >
               {cell.label}
             </TableSortLabel>
-          </TableCell>
+          </DivTableCell>
         ))}
-      </TableRow>
-    </TableHead>
+      </DivTableRow>
+    </DivTableHead>
   );
 };
 
@@ -151,7 +148,7 @@ const useToolbarStyles = makeStyles((theme: Theme) =>
 );
 
 interface EnhancedTableToolbarProps {
-  count: number;
+  itemCount: number;
   rowsPerPage: number;
   page: number;
   filter: string;
@@ -161,7 +158,7 @@ interface EnhancedTableToolbarProps {
 }
 
 const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
-  const { count, rowsPerPage, page, filter, handleChangePage, handleChangeRowsPerPage, handleFilter } = props;
+  const { itemCount, rowsPerPage, page, filter, handleChangePage, handleChangeRowsPerPage, handleFilter } = props;
   const { t } = useTranslation();
   const classes = useToolbarStyles();
 
@@ -184,9 +181,15 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
 
       <TablePagination
         className={classes.flexItem}
+        backIconButtonText={t('pager.back')}
+        nextIconButtonText={t('pager.next')}
+        labelRowsPerPage={t('pager.rows')}
+        labelDisplayedRows={({ from, to, count }) =>
+          `${from}-${to} ${t('pager.of')} ${count !== -1 ? count : `${t('pager.more')} ${to}`}`
+        }
         rowsPerPageOptions={[15, 25, 50, 100]}
         component="div"
-        count={count}
+        count={itemCount}
         rowsPerPage={rowsPerPage}
         page={page}
         onChangePage={handleChangePage}
@@ -220,6 +223,8 @@ const useStyles = makeStyles((theme: Theme) =>
 interface EnhancedTableProps {
   cells: Cell[];
   rows: any[];
+  linkField?: string;
+  linkPrefix?: string;
   onClick?: (row: any) => void;
   defaultOrderBy?: string;
   defaultOrderDirection?: Order;
@@ -230,6 +235,8 @@ interface EnhancedTableProps {
 const WrappedEnhancedTable: React.FC<EnhancedTableProps> = ({
   cells,
   rows,
+  linkField = null,
+  linkPrefix = null,
   onClick = null,
   dense = false,
   defaultOrderBy = 'name',
@@ -264,7 +271,7 @@ const WrappedEnhancedTable: React.FC<EnhancedTableProps> = ({
     <div className={classes.root}>
       <Paper className={classes.paper}>
         <EnhancedTableToolbar
-          count={rows.length}
+          itemCount={rows.length}
           rowsPerPage={rowsPerPage}
           page={page}
           filter={filter}
@@ -273,12 +280,7 @@ const WrappedEnhancedTable: React.FC<EnhancedTableProps> = ({
           handleFilter={event => setFilter(event.target.value)}
         />
         <TableContainer style={{ paddingLeft: '8px', paddingRight: '8px' }}>
-          <Table
-            className={classes.table}
-            aria-labelledby="tableTitle"
-            size={dense ? 'small' : 'medium'}
-            aria-label="enhanced table"
-          >
+          <DivTable className={classes.table} aria-labelledby="tableTitle" aria-label="enhanced table">
             <EnhancedTableHead
               dense={dense}
               cells={cells}
@@ -286,33 +288,61 @@ const WrappedEnhancedTable: React.FC<EnhancedTableProps> = ({
               orderBy={orderBy}
               onRequestSort={handleRequestSort}
             />
-            <TableBody>
+            <DivTableBody>
               {stableSort(rows, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
-                  return (
-                    <TableRow hover onClick={onClick ? () => onClick(row) : null} tabIndex={-1} key={index}>
+                  return linkField && linkPrefix ? (
+                    <LinkRow
+                      hover
+                      component={Link}
+                      to={`${linkPrefix}${row[linkField]}`}
+                      onClick={
+                        onClick
+                          ? event => {
+                              event.preventDefault();
+                              onClick(row);
+                            }
+                          : null
+                      }
+                      tabIndex={-1}
+                      key={index}
+                    >
                       {cells.map(head => {
                         return (
-                          <TableCell
+                          <DivTableCell
                             key={head.id}
                             className={dense ? classes.dense : null}
                             align={head.numeric ? 'right' : 'inherit'}
                           >
                             {`${row[head.id]}`}
-                          </TableCell>
+                          </DivTableCell>
                         );
                       })}
-                    </TableRow>
+                    </LinkRow>
+                  ) : (
+                    <DivTableRow hover onClick={onClick ? () => onClick(row) : null} tabIndex={-1} key={index}>
+                      {cells.map(head => {
+                        return (
+                          <DivTableCell
+                            key={head.id}
+                            className={dense ? classes.dense : null}
+                            align={head.numeric ? 'right' : 'inherit'}
+                          >
+                            {`${row[head.id]}`}
+                          </DivTableCell>
+                        );
+                      })}
+                    </DivTableRow>
                   );
                 })}
               {showEmpty && emptyRows > 0 && (
-                <TableRow style={{ height: (dense ? 45 : 53) * emptyRows }}>
+                <DivTableRow style={{ height: (dense ? 45 : 53) * emptyRows }}>
                   <TableCell colSpan={cells.length} />
-                </TableRow>
+                </DivTableRow>
               )}
-            </TableBody>
-          </Table>
+            </DivTableBody>
+          </DivTable>
         </TableContainer>
       </Paper>
     </div>
