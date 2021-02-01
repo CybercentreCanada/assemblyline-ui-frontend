@@ -395,12 +395,14 @@ const WrappedEnhancedTable: React.FC<EnhancedTableProps> = ({
 
   const filterData = () => {
     const filterText = filter.toLowerCase();
+    const filterItems = filterText.split(' ');
     const filtered = [];
-    for (const sig in rows) {
-      if (JSON.stringify(rows[sig]).toLowerCase().indexOf(filterText) > -1) {
-        filtered.push(rows[sig]);
+    rows.forEach(row => {
+      const jsonRow = JSON.stringify(row).toLowerCase();
+      if (filterItems.every(item => jsonRow.indexOf(item) > -1)) {
+        filtered.push(row);
       }
-    }
+    });
     setFilteredRows(filtered);
     setPage(0);
   };
