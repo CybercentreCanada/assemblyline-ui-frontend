@@ -1,3 +1,11 @@
 {
-  "title": "Statistiques des signatures"
+  "avg": "Score Moy",
+  "classification": "Classification",
+  "count": "Nombre",
+  "max": "Score Max",
+  "min": "Score Min",
+  "name": "Nom",
+  "source": "Source",
+  "title": "Statistiques des signatures",
+  "type": "Type"
 }
