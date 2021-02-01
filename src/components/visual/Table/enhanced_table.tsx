@@ -394,8 +394,7 @@ const WrappedEnhancedTable: React.FC<EnhancedTableProps> = ({
   };
 
   const filterData = () => {
-    const filterText = filter.toLowerCase();
-    const filterItems = filterText.split(' ');
+    const filterItems = filter.toLowerCase().split(' ');
     const filtered = [];
     rows.forEach(row => {
       const jsonRow = JSON.stringify(row).toLowerCase();
