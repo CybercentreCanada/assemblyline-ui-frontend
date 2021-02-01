@@ -14,14 +14,22 @@ export default function StatisticsSignatures() {
   const apiCall = useMyAPI();
   const theme = useTheme();
   const { c12nDef } = useALContext();
-  const { setGlobalDrawer } = useDrawer();
+  const { closeGlobalDrawer, setGlobalDrawer } = useDrawer();
   const [signatureStats, setSignatureStats] = useState(null);
 
-  const handleSignatureChange = () => {};
+  const handleSignatureDelete = () => {
+    closeGlobalDrawer();
+    setTimeout(() => window.dispatchEvent(new CustomEvent('reloadSignatures')), 1000);
+  };
 
   const handleRowClick = useCallback(row => {
     setGlobalDrawer(
-      <SignatureDetail signature_id={row.id} onUpdated={handleSignatureChange} onDeleted={handleSignatureChange} />
+      <SignatureDetail
+        stats={{ avg: row.avg, count: row.count, min: row.min, max: row.max }}
+        signature_id={row.id}
+        onUpdated={() => {}}
+        onDeleted={handleSignatureDelete}
+      />
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -39,7 +47,7 @@ export default function StatisticsSignatures() {
 
   const cells: Cell[] = [
     { id: 'type', break: false, numeric: false, disablePadding: false, label: t('type') },
-    { id: 'source', break: false, numeric: false, disablePadding: false, label: t('source') },
+    { id: 'source', break: true, numeric: false, disablePadding: false, label: t('source') },
     { id: 'name', break: true, numeric: false, disablePadding: false, label: t('name') },
     { id: 'count', break: false, numeric: true, disablePadding: false, label: t('count') },
     { id: 'min', break: false, numeric: true, disablePadding: false, label: t('min') },
@@ -74,7 +82,7 @@ export default function StatisticsSignatures() {
           onClick={handleRowClick}
         />
       ) : (
-        <Skeleton />
+        <Skeleton height="10rem" />
       )}
     </PageFullWidth>
   );

@@ -50,6 +50,12 @@ type ParamProps = {
 
 type SignatureDetailProps = {
   signature_id?: string;
+  stats?: {
+    avg: number;
+    count: number;
+    min: number;
+    max: number;
+  };
   onUpdated?: () => void;
   onDeleted?: () => void;
 };
@@ -59,6 +65,10 @@ const useStyles = makeStyles(theme => ({
     padding: theme.spacing(2),
     whiteSpace: 'pre-wrap',
     wordBreak: 'break-word'
+  },
+  stats: {
+    margin: 0,
+    padding: `${theme.spacing(0.75)}px ${theme.spacing(1)}px`
   },
   openPaper: {
     maxWidth: '1200px',
@@ -75,7 +85,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetailProps) => {
+const SignatureDetail = ({ signature_id, stats, onUpdated, onDeleted }: SignatureDetailProps) => {
   const { t } = useTranslation(['manageSignatureDetail']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
@@ -255,14 +265,47 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
               </>
             )}
           </Grid>
+          <Grid item xs={12}>
+            {signature ? (
+              <Paper component="pre" variant="outlined" className={classes.preview}>
+                {signature.data}
+              </Paper>
+            ) : (
+              <Skeleton variant="rect" height="6rem" />
+            )}
+          </Grid>
+          {stats && (
+            <Grid item xs={12}>
+              <Typography variant="subtitle2">{t('section_stat_contrib')}</Typography>
+              <Grid container spacing={1}>
+                <Grid item xs={12} sm={3}>
+                  <Typography variant="caption">{t('count')}</Typography>
+                  <Paper component="pre" variant="outlined" className={classes.stats}>
+                    {stats.count}
+                  </Paper>
+                </Grid>
+                <Grid item xs={12} sm={3}>
+                  <Typography variant="caption">{t('min')}</Typography>
+                  <Paper component="pre" variant="outlined" className={classes.stats}>
+                    {stats.min}
+                  </Paper>
+                </Grid>
+                <Grid item xs={12} sm={3}>
+                  <Typography variant="caption">{t('avg')}</Typography>
+                  <Paper component="pre" variant="outlined" className={classes.stats}>
+                    {stats.avg}
+                  </Paper>
+                </Grid>
+                <Grid item xs={12} sm={3}>
+                  <Typography variant="caption">{t('max')}</Typography>
+                  <Paper component="pre" variant="outlined" className={classes.stats}>
+                    {stats.max}
+                  </Paper>
+                </Grid>
+              </Grid>
+            </Grid>
+          )}
         </Grid>
-        {signature ? (
-          <Paper component="pre" variant="outlined" className={classes.preview}>
-            {signature.data}
-          </Paper>
-        ) : (
-          <Skeleton variant="rect" height="6rem" />
-        )}
 
         {signature && modified ? (
           <div
@@ -292,6 +335,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
 
 SignatureDetail.defaultProps = {
   signature_id: null,
+  stats: null,
   onUpdated: () => {},
   onDeleted: () => {}
 };
