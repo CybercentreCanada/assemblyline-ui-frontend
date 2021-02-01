@@ -6,12 +6,15 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import clsx from 'clsx';
+import Throttler from 'commons/addons/elements/utils/throttler';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import Classification from '../Classification';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from '../DivTable';
+
+const throttler = new Throttler(250);
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -175,7 +178,7 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
             <FilterListIcon />
           </div>
           <InputBase
-            onChange={handleFilter}
+            onChange={event => handleFilter(event.target.value)}
             placeholder={t('filter')}
             classes={{
               root: classes.inputRoot,
@@ -230,6 +233,124 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
+interface EnhancedTableBodyProps {
+  cells: Cell[];
+  rows: any[];
+  rowsPerPage: number;
+  page: number;
+  linkField?: string;
+  linkPrefix?: string;
+  onClick?: (row: any) => void;
+  defaultOrderBy?: string;
+  defaultOrderDirection?: Order;
+  dense?: boolean;
+  showEmpty?: boolean;
+}
+
+const WrappedEnhancedTableBody: React.FC<EnhancedTableBodyProps> = ({
+  cells,
+  rows,
+  rowsPerPage,
+  page,
+  linkField = null,
+  linkPrefix = null,
+  onClick = null,
+  dense = false,
+  defaultOrderBy = 'name',
+  defaultOrderDirection = 'asc',
+  showEmpty = false
+}) => {
+  const classes = useStyles();
+  const [order, setOrder] = React.useState<Order>(defaultOrderDirection);
+  const [orderBy, setOrderBy] = React.useState<string>(defaultOrderBy);
+
+  const handleRequestSort = (event: React.MouseEvent<unknown>, property: string) => {
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
+    setOrderBy(property);
+  };
+
+  const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
+
+  return (
+    <Paper className={classes.paper}>
+      <TableContainer style={{ paddingLeft: '8px', paddingRight: '8px' }}>
+        <DivTable className={classes.table} aria-labelledby="tableTitle" aria-label="enhanced table">
+          <EnhancedTableHead
+            dense={dense}
+            cells={cells}
+            order={order}
+            orderBy={orderBy}
+            onRequestSort={handleRequestSort}
+          />
+          <DivTableBody>
+            {stableSort(rows, getComparator(order, orderBy))
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((row, index) => {
+                return linkField && linkPrefix ? (
+                  <LinkRow
+                    hover
+                    component={Link}
+                    to={`${linkPrefix}${row[linkField]}`}
+                    onClick={
+                      onClick
+                        ? event => {
+                            event.preventDefault();
+                            onClick(row);
+                          }
+                        : null
+                    }
+                    tabIndex={-1}
+                    key={index}
+                  >
+                    {cells.map(head => {
+                      return (
+                        <DivTableCell
+                          key={head.id}
+                          className={clsx(dense ? classes.dense : null, head.break ? classes.break : null)}
+                          align={head.numeric ? 'right' : 'inherit'}
+                        >
+                          {head.id === 'classification' ? (
+                            <Classification c12n={row[head.id]} type="text" />
+                          ) : (
+                            `${row[head.id]}`
+                          )}
+                        </DivTableCell>
+                      );
+                    })}
+                  </LinkRow>
+                ) : (
+                  <DivTableRow hover onClick={onClick ? () => onClick(row) : null} tabIndex={-1} key={index}>
+                    {cells.map(head => {
+                      return (
+                        <DivTableCell
+                          key={head.id}
+                          className={clsx(dense ? classes.dense : null, head.break ? classes.break : null)}
+                          align={head.numeric ? 'right' : 'inherit'}
+                        >
+                          {head.id === 'classification' ? (
+                            <Classification c12n={row[head.id]} type="text" />
+                          ) : (
+                            `${row[head.id]}`
+                          )}
+                        </DivTableCell>
+                      );
+                    })}
+                  </DivTableRow>
+                );
+              })}
+            {showEmpty && emptyRows > 0 && (
+              <DivTableRow style={{ height: (dense ? 45 : 53) * emptyRows }}>
+                <TableCell colSpan={cells.length} />
+              </DivTableRow>
+            )}
+          </DivTableBody>
+        </DivTable>
+      </TableContainer>
+    </Paper>
+  );
+};
+
 interface EnhancedTableProps {
   cells: Cell[];
   rows: any[];
@@ -254,17 +375,10 @@ const WrappedEnhancedTable: React.FC<EnhancedTableProps> = ({
   showEmpty = false
 }) => {
   const classes = useStyles();
-  const [order, setOrder] = React.useState<Order>(defaultOrderDirection);
-  const [orderBy, setOrderBy] = React.useState<string>(defaultOrderBy);
+  const [filteredRows, setFilteredRows] = React.useState(rows);
   const [page, setPage] = React.useState(0);
   const [filter, setFilter] = React.useState('');
   const [rowsPerPage, setRowsPerPage] = React.useState(15);
-
-  const handleRequestSort = (event: React.MouseEvent<unknown>, property: string) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
-  };
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -275,98 +389,51 @@ const WrappedEnhancedTable: React.FC<EnhancedTableProps> = ({
     setPage(0);
   };
 
-  const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
+  const filterData = () => {
+    const filterText = filter.toLowerCase();
+    const filtered = [];
+    for (const sig in rows) {
+      if (JSON.stringify(rows[sig]).toLowerCase().indexOf(filterText) > -1) {
+        filtered.push(rows[sig]);
+      }
+    }
+    setFilteredRows(filtered);
+  };
+
+  useEffect(() => {
+    throttler.delay(filterData);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filter, rows]);
 
   return (
     <div className={classes.root}>
       <EnhancedTableToolbar
-        itemCount={rows.length}
+        itemCount={filteredRows.length}
         rowsPerPage={rowsPerPage}
         page={page}
         filter={filter}
         handleChangePage={handleChangePage}
         handleChangeRowsPerPage={handleChangeRowsPerPage}
-        handleFilter={event => setFilter(event.target.value)}
+        handleFilter={value => setFilter(value)}
       />
-      <Paper className={classes.paper}>
-        <TableContainer style={{ paddingLeft: '8px', paddingRight: '8px' }}>
-          <DivTable className={classes.table} aria-labelledby="tableTitle" aria-label="enhanced table">
-            <EnhancedTableHead
-              dense={dense}
-              cells={cells}
-              order={order}
-              orderBy={orderBy}
-              onRequestSort={handleRequestSort}
-            />
-            <DivTableBody>
-              {stableSort(rows, getComparator(order, orderBy))
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row, index) => {
-                  return linkField && linkPrefix ? (
-                    <LinkRow
-                      hover
-                      component={Link}
-                      to={`${linkPrefix}${row[linkField]}`}
-                      onClick={
-                        onClick
-                          ? event => {
-                              event.preventDefault();
-                              onClick(row);
-                            }
-                          : null
-                      }
-                      tabIndex={-1}
-                      key={index}
-                    >
-                      {cells.map(head => {
-                        return (
-                          <DivTableCell
-                            key={head.id}
-                            className={clsx(dense ? classes.dense : null, head.break ? classes.break : null)}
-                            align={head.numeric ? 'right' : 'inherit'}
-                          >
-                            {head.id === 'classification' ? (
-                              <Classification c12n={row[head.id]} type="text" />
-                            ) : (
-                              `${row[head.id]}`
-                            )}
-                          </DivTableCell>
-                        );
-                      })}
-                    </LinkRow>
-                  ) : (
-                    <DivTableRow hover onClick={onClick ? () => onClick(row) : null} tabIndex={-1} key={index}>
-                      {cells.map(head => {
-                        return (
-                          <DivTableCell
-                            key={head.id}
-                            className={clsx(dense ? classes.dense : null, head.break ? classes.break : null)}
-                            align={head.numeric ? 'right' : 'inherit'}
-                          >
-                            {head.id === 'classification' ? (
-                              <Classification c12n={row[head.id]} type="text" />
-                            ) : (
-                              `${row[head.id]}`
-                            )}
-                          </DivTableCell>
-                        );
-                      })}
-                    </DivTableRow>
-                  );
-                })}
-              {showEmpty && emptyRows > 0 && (
-                <DivTableRow style={{ height: (dense ? 45 : 53) * emptyRows }}>
-                  <TableCell colSpan={cells.length} />
-                </DivTableRow>
-              )}
-            </DivTableBody>
-          </DivTable>
-        </TableContainer>
-      </Paper>
+      <EnhancedTableBody
+        cells={cells}
+        rows={filteredRows}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        linkField={linkField}
+        linkPrefix={linkPrefix}
+        onClick={onClick}
+        dense={dense}
+        defaultOrderBy={defaultOrderBy}
+        defaultOrderDirection={defaultOrderDirection}
+        showEmpty={showEmpty}
+      />
     </div>
   );
 };
 
+const EnhancedTableBody = React.memo(WrappedEnhancedTableBody);
 const EnhancedTableHead = React.memo(WrappedEnhancedTableHead);
 const EnhancedTable = React.memo(WrappedEnhancedTable);
 export default EnhancedTable;
