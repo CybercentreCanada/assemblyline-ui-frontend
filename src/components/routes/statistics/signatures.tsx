@@ -58,7 +58,15 @@ export default function StatisticsSignatures() {
       </div>
 
       {signatureStats ? (
-        <EnhancedTable dense cells={cells} rows={signatureStats} defaultOrderBy="type" onClick={handleRowClick} />
+        <EnhancedTable
+          dense
+          cells={cells}
+          rows={signatureStats}
+          linkPrefix="/manage/signature/"
+          linkField="id"
+          defaultOrderBy="type"
+          onClick={handleRowClick}
+        />
       ) : (
         <Skeleton />
       )}
