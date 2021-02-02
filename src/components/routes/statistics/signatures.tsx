@@ -73,7 +73,6 @@ export default function StatisticsSignatures() {
 
       {signatureStats ? (
         <EnhancedTable
-          dense
           cells={cells}
           rows={signatureStats}
           linkPrefix="/manage/signature/"
