@@ -53,7 +53,7 @@ export function OAuthLogin({ avatar, username, email, oAuthToken, buttonLoading,
           {!oAuthToken ? <Skeleton /> : email}
         </Typography>
         {!oAuthToken ? (
-          <Skeleton style={{ height: '56px', marginTop: '1.5rem', marginBottom: '1.5rem' }} />
+          <Skeleton variant="rect" style={{ height: '36px', marginTop: '1.5rem', marginBottom: '1.5rem' }} />
         ) : (
           <Button
             type="submit"
