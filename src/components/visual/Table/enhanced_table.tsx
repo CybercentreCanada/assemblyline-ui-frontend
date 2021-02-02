@@ -1,10 +1,14 @@
-import { InputBase, TablePagination } from '@material-ui/core';
+import { IconButton, InputBase, TablePagination, Tooltip } from '@material-ui/core';
 import Paper from '@material-ui/core/Paper';
 import { createStyles, fade, makeStyles, Theme } from '@material-ui/core/styles';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 import FilterListIcon from '@material-ui/icons/FilterList';
+import FirstPageIcon from '@material-ui/icons/FirstPage';
+import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
+import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
+import LastPageIcon from '@material-ui/icons/LastPage';
 import clsx from 'clsx';
 import Throttler from 'commons/addons/elements/utils/throttler';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
@@ -57,14 +61,14 @@ export interface Cell {
 
 const useHeaderStyles = makeStyles((theme: Theme) =>
   createStyles({
-    dense: {
+    big: {
       whiteSpace: 'nowrap',
       paddingLeft: theme.spacing(1),
       paddingRight: theme.spacing(1),
       paddingTop: theme.spacing(1.5),
       paddingBottom: theme.spacing(1.5)
     },
-    big: {
+    dense: {
       whiteSpace: 'nowrap'
     }
   })
@@ -114,6 +118,67 @@ const WrappedEnhancedTableHead: React.FC<EnhancedTableHeadProps> = ({
     </DivTableHead>
   );
 };
+
+interface TablePaginationActionsProps {
+  count: number;
+  page: number;
+  rowsPerPage: number;
+  onChangePage: (event: React.MouseEvent<HTMLButtonElement>, newPage: number) => void;
+}
+
+function TablePaginationActions(props: TablePaginationActionsProps) {
+  const { t } = useTranslation();
+  const { count, page, rowsPerPage, onChangePage } = props;
+
+  const handleFirstPageButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    onChangePage(event, 0);
+  };
+
+  const handleBackButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    onChangePage(event, page - 1);
+  };
+
+  const handleNextButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    onChangePage(event, page + 1);
+  };
+
+  const handleLastPageButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    onChangePage(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
+  };
+
+  return (
+    <div style={{ flexShrink: 0, marginLeft: '20px' }}>
+      <Tooltip title={t('pager.first')}>
+        <span>
+          <IconButton onClick={handleFirstPageButtonClick} disabled={page === 0}>
+            <FirstPageIcon />
+          </IconButton>
+        </span>
+      </Tooltip>
+      <Tooltip title={t('pager.back')}>
+        <span>
+          <IconButton onClick={handleBackButtonClick} disabled={page === 0}>
+            <KeyboardArrowLeft />
+          </IconButton>
+        </span>
+      </Tooltip>
+      <Tooltip title={t('pager.next')}>
+        <span>
+          <IconButton onClick={handleNextButtonClick} disabled={page >= Math.ceil(count / rowsPerPage) - 1}>
+            <KeyboardArrowRight />
+          </IconButton>
+        </span>
+      </Tooltip>
+      <Tooltip title={t('pager.last')}>
+        <span>
+          <IconButton onClick={handleLastPageButtonClick} disabled={page >= Math.ceil(count / rowsPerPage) - 1}>
+            <LastPageIcon />
+          </IconButton>
+        </span>
+      </Tooltip>
+    </div>
+  );
+}
 
 const useToolbarStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -171,10 +236,9 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
   const classes = useToolbarStyles();
 
   return (
-    <PageHeader isSticky>
-      <div
-        style={{ display: 'flex', marginLeft: '-4px', marginRight: '-4px', paddingLeft: '4px', paddingRight: '4px' }}
-      >
+    <PageHeader
+      isSticky
+      left={
         <div className={classes.search}>
           <div className={classes.searchIcon}>
             <FilterListIcon />
@@ -189,25 +253,24 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
             value={filter}
           />
         </div>
-
+      }
+      right={
         <TablePagination
           className={classes.flexItem}
-          backIconButtonText={t('pager.back')}
-          nextIconButtonText={t('pager.next')}
           labelRowsPerPage={t('pager.rows')}
           labelDisplayedRows={({ from, to, count }) =>
             `${from}-${to} ${t('pager.of')} ${count !== -1 ? count : `${t('pager.more')} ${to}`}`
           }
-          rowsPerPageOptions={[15, 25, 50, 100]}
           component="div"
           count={itemCount}
           rowsPerPage={rowsPerPage}
           page={page}
           onChangePage={handleChangePage}
           onChangeRowsPerPage={handleChangeRowsPerPage}
+          ActionsComponent={TablePaginationActions}
         />
-      </div>
-    </PageHeader>
+      }
+    />
   );
 };
 
@@ -223,11 +286,11 @@ const useStyles = makeStyles((theme: Theme) =>
     table: {
       minWidth: 750
     },
-    dense: {
+    comfortable: {
       paddingLeft: theme.spacing(1),
       paddingRight: theme.spacing(1),
-      paddingTop: theme.spacing(0.75),
-      paddingBottom: theme.spacing(0.75)
+      paddingTop: theme.spacing(1.5),
+      paddingBottom: theme.spacing(1.5)
     },
     break: {
       wordBreak: 'break-word'
@@ -310,7 +373,7 @@ const WrappedEnhancedTableBody: React.FC<EnhancedTableBodyProps> = ({
                         return (
                           <DivTableCell
                             key={head.id}
-                            className={clsx(dense ? classes.dense : null, head.break ? classes.break : null)}
+                            className={clsx(!dense ? classes.comfortable : null, head.break ? classes.break : null)}
                             align={head.numeric ? 'right' : 'inherit'}
                           >
                             {head.id === 'classification' ? (
@@ -328,7 +391,7 @@ const WrappedEnhancedTableBody: React.FC<EnhancedTableBodyProps> = ({
                         return (
                           <DivTableCell
                             key={head.id}
-                            className={clsx(dense ? classes.dense : null, head.break ? classes.break : null)}
+                            className={clsx(!dense ? classes.comfortable : null, head.break ? classes.break : null)}
                             align={head.numeric ? 'right' : 'inherit'}
                           >
                             {head.id === 'classification' ? (
