@@ -58,6 +58,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
   );
   const { showErrorMessage, showSuccessMessage } = useMySnackbar();
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [avatar, setAvatar] = useState('');
   const [oAuthToken, setOAuthToken] = useState('');
@@ -76,6 +77,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
       setWebAuthNResponse(null);
       setShownControls('login');
       setUsername('');
+      setEmail('');
       setPassword('');
       setAvatar('');
       setOAuthToken('');
@@ -149,6 +151,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
         onSuccess: api_data => {
           setAvatar(api_data.api_response.avatar);
           setUsername(api_data.api_response.username);
+          setEmail(api_data.api_response.email_adr || '');
           setOAuthToken(api_data.api_response.oauth_token);
         },
         onFailure: api_data => {
@@ -246,6 +249,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
               oAuthToken={oAuthToken}
               avatar={avatar}
               username={username}
+              email={email}
               onSubmit={onSubmit}
               buttonLoading={buttonLoading}
             />

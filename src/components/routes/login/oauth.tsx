@@ -28,13 +28,14 @@ const useStyles = makeStyles(() =>
 type OAuthProps = {
   avatar: string;
   username: string;
+  email: string;
   oAuthToken: string;
   buttonLoading: boolean;
   onSubmit: (event) => void;
   reset: (event) => void;
 };
 
-export function OAuthLogin({ avatar, username, oAuthToken, buttonLoading, onSubmit, reset }: OAuthProps) {
+export function OAuthLogin({ avatar, username, email, oAuthToken, buttonLoading, onSubmit, reset }: OAuthProps) {
   const { t } = useTranslation(['login']);
   const classes = useStyles();
   const theme = useTheme();
@@ -47,8 +48,9 @@ export function OAuthLogin({ avatar, username, oAuthToken, buttonLoading, onSubm
         ) : (
           <Avatar style={{ alignSelf: 'center', width: theme.spacing(18), height: theme.spacing(18) }} src={avatar} />
         )}
-        <Typography color="textPrimary" gutterBottom>
-          {!oAuthToken ? <Skeleton /> : username}
+        <Typography color="textPrimary">{!oAuthToken ? <Skeleton /> : username}</Typography>
+        <Typography variant="caption" color="textSecondary" gutterBottom>
+          {!oAuthToken ? <Skeleton /> : email}
         </Typography>
         {!oAuthToken ? (
           <Skeleton style={{ height: '56px', marginTop: '1.5rem', marginBottom: '1.5rem' }} />
