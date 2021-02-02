@@ -219,7 +219,7 @@ const SignatureDetail = ({ signature_id, stats, onUpdated, onDeleted }: Signatur
                     <IconButton
                       component={Link}
                       style={{ color: theme.palette.action.active }}
-                      to={`/search/result/?query=result.sections.tags.file.rule.suricata:"${signature.source}.${signature.name}"`}
+                      to={`/search/result/?query=result.sections.tags.file.rule.${signature.type}:"${signature.source}.${signature.name}"`}
                     >
                       <YoutubeSearchedForIcon />
                     </IconButton>
