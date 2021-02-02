@@ -61,15 +61,11 @@ export interface Cell {
 
 const useHeaderStyles = makeStyles((theme: Theme) =>
   createStyles({
-    big: {
-      whiteSpace: 'nowrap',
+    comfortable: {
       paddingLeft: theme.spacing(1),
       paddingRight: theme.spacing(1),
       paddingTop: theme.spacing(1.5),
       paddingBottom: theme.spacing(1.5)
-    },
-    dense: {
-      whiteSpace: 'nowrap'
     }
   })
 );
@@ -100,7 +96,7 @@ const WrappedEnhancedTableHead: React.FC<EnhancedTableHeadProps> = ({
         {cells.map(cell => (
           <DivTableCell
             key={cell.id}
-            className={dense ? classes.dense : classes.big}
+            className={!dense ? classes.comfortable : null}
             align={cell.numeric ? 'right' : 'left'}
             padding={cell.disablePadding ? 'none' : 'default'}
             sortDirection={orderBy === cell.id ? order : false}
