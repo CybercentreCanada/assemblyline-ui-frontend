@@ -58,7 +58,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   }
 }));
 
-const WrappedMetricCounter = ({ value, title, tooltip, init = false }) => {
+const WrappedMetricCounter = ({ value, title, tooltip, init = false, margin = '8px' }) => {
   const classes = useStyles();
 
   return !init ? (
@@ -66,7 +66,7 @@ const WrappedMetricCounter = ({ value, title, tooltip, init = false }) => {
       variant="rect"
       height="1.5rem"
       width="2rem"
-      style={{ borderRadius: '4px', marginRight: '8px', display: 'inline-block', verticalAlign: 'middle' }}
+      style={{ borderRadius: '4px', marginRight: margin, display: 'inline-block', verticalAlign: 'middle' }}
     />
   ) : (
     <Tooltip title={tooltip}>
@@ -248,9 +248,10 @@ const WrappedIngestCard = ({ ingester }) => {
               value={ingester.metrics.error}
               title="E"
               tooltip={t('throughput.error')}
+              margin="16px"
             />
             <Tooltip title={t('throughput.bytes')}>
-              <span style={{ marginLeft: '8px' }}>
+              <span style={{ display: 'inline-block' }}>
                 <SpeedOutlinedIcon className={classes.icon} />
                 {ingester.initialized ? (
                   `${Number(
