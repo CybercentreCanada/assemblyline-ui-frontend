@@ -84,6 +84,7 @@ const WrappedIngestCard = ({ ingester }) => {
   const [timer, setTimer] = useState(null);
   const [error, setError] = useState(null);
   const classes = useStyles();
+  const busyness = (ingester.metrics.busy_seconds * ingester.metrics.busy_seconds_count) / ingester.instances / 60;
 
   useEffect(() => {
     if (ingester.processing_chance.critical !== 1) {
@@ -98,6 +99,8 @@ const WrappedIngestCard = ({ ingester }) => {
       setError(t('ingest.error.bytes'));
     } else if (ingester.ingest > 100000) {
       setError(t('ingest.error.queue'));
+    } else if (busyness >= 0.8) {
+      setError(t('ingest.error.busy'));
     } else if ((timer !== null && ingester.initialized) || (timer === null && !ingester.initialized)) {
       if (error !== null) setError(null);
       if (timer !== null) clearTimeout(timer);
@@ -177,6 +180,12 @@ const WrappedIngestCard = ({ ingester }) => {
               value={ingester.processing.inflight}
               title="I"
               tooltip={t('processing.inflight')}
+            />
+            <MetricCounter
+              init={ingester.initialized}
+              value={`${Number(busyness * 100).toFixed(2)} %`}
+              title="B"
+              tooltip={t('throughput.busy')}
             />
           </div>
         </Grid>
@@ -264,10 +273,16 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
   const [timer, setTimer] = useState(null);
   const [error, setError] = useState(null);
   const classes = useStyles();
+  const busyness =
+    (dispatcher.metrics.busy_seconds * dispatcher.metrics.busy_seconds_count) / dispatcher.instances / 60;
 
   useEffect(() => {
-    if (dispatcher.initialized && dispatcher.queues.ingest >= dispatcher.inflight.max) {
-      setError(t('dispatcher.error.queue'));
+    if (dispatcher.initialized && dispatcher.queues.ingest >= dispatcher.inflight.max / 10) {
+      setError(t('dispatcher.error.queue.ingest'));
+    } else if (dispatcher.initialized && dispatcher.queues.files >= dispatcher.inflight.max / 10) {
+      setError(t('dispatcher.error.queue.files'));
+    } else if (dispatcher.initialized && busyness >= 0.8) {
+      setError(t('dispatcher.error.busy'));
     } else if (dispatcher.inflight.outstanding / dispatcher.inflight.max > 0.9) {
       setError(t('dispatcher.error.inflight'));
     } else if ((timer !== null && dispatcher.initialized) || (timer === null && !dispatcher.initialized)) {
@@ -279,6 +294,7 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
         }, 10000)
       );
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatcher]);
 
@@ -312,7 +328,7 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
             </div>
           )}
         </Grid>
-        <Grid item xs={12} sm={3}>
+        <Grid item xs={12} sm={4} md={2}>
           <div>
             <label>{t('submissions')}</label>
           </div>
@@ -329,7 +345,7 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
             />
           </div>
         </Grid>
-        <Grid item xs={12} sm={3}>
+        <Grid item xs={12} sm={4} md={2}>
           <div>
             <label>{t('queues')}</label>
           </div>
@@ -348,7 +364,20 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
             />
           </div>
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid item xs={12} sm={4} md={3}>
+          <div>
+            <label>{t('busyness')}</label>
+          </div>
+          <div>
+            <MetricCounter
+              init={dispatcher.initialized}
+              value={`${Number(busyness * 100).toFixed(2)} %`}
+              title="B"
+              tooltip={t('throughput.busy')}
+            />
+          </div>
+        </Grid>
+        <Grid item xs={12} md={4}>
           <div>
             <label>{t('throughput')}</label>
           </div>
@@ -799,6 +828,8 @@ const DEFAULT_DISPATCHER = {
     files: 0
   },
   metrics: {
+    busy_seconds: 0,
+    busy_seconds_count: 0,
     files_completed: 0,
     submissions_completed: 0
   },
@@ -851,6 +882,8 @@ const DEFAULT_EXPIRY = {
 const DEFAULT_INGESTER = {
   instances: 0,
   metrics: {
+    busy_seconds: 0,
+    busy_seconds_count: 0,
     cache_miss: 0,
     cache_expired: 0,
     cache_stale: 0,
@@ -950,50 +983,50 @@ const Dashboard = () => {
 
   const handleAlerterHeartbeat = hb => {
     // eslint-disable-next-line no-console
-    console.log('Socket-IO :: AlerterHeartbeat', hb);
+    console.debug('Socket-IO :: AlerterHeartbeat', hb);
     setAlerter({ ...hb, initialized: true });
   };
 
   const handleArchiveHeartbeat = hb => {
     // eslint-disable-next-line no-console
-    console.log('Socket-IO :: ArchiveHeartbeat', hb);
+    console.debug('Socket-IO :: ArchiveHeartbeat', hb);
     setExpiry({ archive: hb.metrics, initialized: true });
   };
 
   const handleDispatcherHeartbeat = hb => {
     // eslint-disable-next-line no-console
-    console.log('Socket-IO :: DispatcherHeartbeat', hb);
+    console.debug('Socket-IO :: DispatcherHeartbeat', hb);
     setDispatcher({ ...hb, initialized: true });
   };
 
   const handleExpiryHeartbeat = hb => {
     // eslint-disable-next-line no-console
-    console.log('Socket-IO :: ExpiryHeartbeat', hb);
+    console.debug('Socket-IO :: ExpiryHeartbeat', hb);
     setExpiry({ ...hb, initialized: true });
   };
 
   const handleIngestHeartbeat = hb => {
     // eslint-disable-next-line no-console
-    console.log('Socket-IO :: IngestHeartbeat', hb);
+    console.debug('Socket-IO :: IngestHeartbeat', hb);
     setIngester({ ...hb, initialized: true });
   };
 
   const handleScalerHeartbeat = hb => {
     // eslint-disable-next-line no-console
-    console.log('Socket-IO :: ScalerHeartbeat', hb);
+    console.debug('Socket-IO :: ScalerHeartbeat', hb);
     setScaler({ ...hb, initialized: true });
   };
 
   const handleServiceHeartbeat = hb => {
     // eslint-disable-next-line no-console
-    console.log(`Socket-IO :: ServiceHeartbeat ${hb.service_name}`, hb);
+    console.debug(`Socket-IO :: ServiceHeartbeat ${hb.service_name}`, hb);
     setServicesList(hb.service_name);
     setServices({ type: 'service', hb: { ...hb, last_hb: Math.floor(new Date().getTime() / 1000) } });
   };
 
   const handleScalerStatusHeartbeat = hb => {
     // eslint-disable-next-line no-console
-    console.log(`Socket-IO :: ScalerStatusHeartbeat ${hb.service_name}`, hb);
+    console.debug(`Socket-IO :: ScalerStatusHeartbeat ${hb.service_name}`, hb);
     setServices({ type: 'scaler', hb });
   };
 
@@ -1003,15 +1036,15 @@ const Dashboard = () => {
     socket.on('connect', () => {
       socket.emit('monitor', { status: 'start' });
       // eslint-disable-next-line no-console
-      console.log('Socket-IO :: Connecting to socketIO server...');
+      console.debug('Socket-IO :: Connecting to socketIO server...');
     });
 
     socket.on('disconnect', () => {
       // eslint-disable-next-line no-console
-      console.log('Socket-IO :: Disconnected from socketIO server.');
+      console.debug('Socket-IO :: Disconnected from socketIO server.');
     });
     // eslint-disable-next-line no-console
-    socket.on('monitoring', data => console.log('Socket-IO :: Connected to socket server', data));
+    socket.on('monitoring', data => console.debug('Socket-IO :: Connected to socket server', data));
 
     socket.on('AlerterHeartbeat', handleAlerterHeartbeat);
     socket.on('ArchiveHeartbeat', handleArchiveHeartbeat);
