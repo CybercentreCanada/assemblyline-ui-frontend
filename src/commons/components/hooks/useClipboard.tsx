@@ -1,7 +1,18 @@
-import useMySnackbar from 'components/hooks/useMySnackbar';
+import { OptionsObject, useSnackbar } from 'notistack';
 
 export default function useClipboard() {
-  const { showSuccessMessage, showErrorMessage } = useMySnackbar();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const snackBarOptions: OptionsObject = {
+    preventDuplicate: true,
+    autoHideDuration: 5000,
+    anchorOrigin: {
+      vertical: 'bottom',
+      horizontal: 'center'
+    },
+    onClick: _snack => {
+      closeSnackbar();
+    }
+  };
 
   const copy = (text: string, targetId = 'root') => {
     const el = document.createElement('textarea');
@@ -10,14 +21,14 @@ export default function useClipboard() {
     target.appendChild(el);
     el.focus();
     el.select();
-    el.setSelectionRange(0, 99999);
     const copySuccess = document.execCommand('copy');
     target.removeChild(el);
     if (copySuccess) {
-      showSuccessMessage(text);
+      enqueueSnackbar(text, { variant: 'success', ...snackBarOptions });
     } else {
-      showErrorMessage(text);
+      enqueueSnackbar(text, { variant: 'error', ...snackBarOptions });
     }
   };
+ 
   return { copy };
 }
