@@ -17,7 +17,7 @@ const BookListPager: React.FC<BookListPagerProps> = ({ book, onLoadNext, onChang
   const pageCount = book.pageCount();
   const isOnLastPage = book.isOnLastPage();
 
-  const onPageChange = (event, pageNumber: number) => {
+  const onPageChange = (_event: React.ChangeEvent<unknown>, pageNumber: number) => {
     book.turnTo(pageNumber - 1);
     onChange(book.build());
   };

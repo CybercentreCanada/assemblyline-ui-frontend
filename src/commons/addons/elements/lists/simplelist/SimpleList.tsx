@@ -69,12 +69,12 @@ const SimpleList: React.FC<SimpleListProps> = ({
     pause: loading,
     onEscape: () => {
       if (onItemSelected) {
-        onItemSelected(null);
+        onItemSelected(null, -1);
       }
     },
     onEnter: (_cursor: number) => {
       if (onItemSelected) {
-        onItemSelected(items[_cursor]);
+        onItemSelected(items[_cursor], _cursor);
       }
     },
     onCursorChange: (_cursor: number) => {

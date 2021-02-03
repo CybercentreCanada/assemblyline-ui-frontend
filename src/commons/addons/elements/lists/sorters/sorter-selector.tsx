@@ -24,7 +24,7 @@ const SorterSelector: React.FC<SorterSelectorProps> = ({ list, fields, selection
   const theme = useTheme();
   const { icon: sortIcon, onSort } = useSorters();
 
-  const onSelectionChange = (event, _selections: SorterField[]) => {
+  const onSelectionChange = (_event: React.ChangeEvent<{}>, _selections: SorterField[]) => {
     onChange(_selections);
   };
 
@@ -68,7 +68,7 @@ const SorterSelector: React.FC<SorterSelectorProps> = ({ list, fields, selection
       )}
       renderInput={params => <TextField {...params} label="Sorters" />}
       renderOption={(option, { selected }) => (
-        <React.Fragment>
+        <>
           <Checkbox
             icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
             checkedIcon={<CheckBoxIcon fontSize="small" />}
@@ -76,7 +76,7 @@ const SorterSelector: React.FC<SorterSelectorProps> = ({ list, fields, selection
             checked={selected}
           />
           {option.label}
-        </React.Fragment>
+        </>
       )}
       onChange={(event, _fields: SorterField[]) => onSelectionChange(event, _fields)}
     />

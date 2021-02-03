@@ -116,7 +116,6 @@ export default function useFilters(fields?: FilterField[]): UsingFilters {
     return list.filter(o => compareAll(o, filters, intersection));
   };
 
-  //
   return {
     stringComparator,
     numberComparator,

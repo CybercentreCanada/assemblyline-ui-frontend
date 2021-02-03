@@ -1,11 +1,13 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
-import { CircularProgress, Grid, GridSpacing, useMediaQuery, useTheme } from '@material-ui/core';
+import { CircularProgress, Grid, GridSpacing, useTheme } from '@material-ui/core';
 import useListKeyboard from 'commons/addons/elements/lists/hooks/useListKeyboard';
 import useListStyles from 'commons/addons/elements/lists/hooks/useListStyles';
 import { LineItem } from 'commons/addons/elements/lists/item/ListItemBase';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import useListNavigator from '../hooks/useListNavigator';
 import ListItemBase from '../item/ListItemBase';
+import ListScroller from '../scrollers/ListScroller';
+import SimpleListScroller from '../scrollers/SimpleListScroller';
 
 interface Breakpoints {
   xs?: 1 | 2 | 3 | 4 | 6 | 12;
@@ -47,14 +49,17 @@ const GridList: React.FC<GridListProps> = ({
   // React hooks.
   const theme = useTheme();
   const { simpleListStyles } = useListStyles();
-  const isLg = useMediaQuery(theme.breakpoints.up('lg'));
-  const isCardLayout = view === 'card' || (!view && isLg);
+
+  // Some refs.
+  const outerEL = useRef<HTMLDivElement>();
+  const scrollEL = useRef<HTMLElement>();
+  const scroller = useRef<ListScroller>();
 
   // Configure the list keyboard custom hook...
   const { register } = useListNavigator(id);
   const { cursor, setCursor, next, previous, onKeyDown } = useListKeyboard({
     id,
-    scroller: null,
+    scroller: scroller.current,
     infinite: false,
     count: items.length,
     onEscape: () => onItemSelected(null),
@@ -86,19 +91,28 @@ const GridList: React.FC<GridListProps> = ({
     [setCursor, onItemSelected]
   );
 
-  console.log(`isCard: ${isCardLayout}`);
+  useEffect(() => {
+    // Register scroll handler on scrolltarget.
+    if (scrollTargetId) {
+      scrollEL.current = document.getElementById(scrollTargetId);
+    } else {
+      scrollEL.current = outerEL.current;
+    }
+
+    // Create the scroller computer.
+    scroller.current = new SimpleListScroller(scrollEL.current, outerEL.current);
+  });
 
   useEffect(() => {
     return register({
-      onSelect: () => console.log('select'),
+      onSelect: () => {},
       onSelectNext: () => next(),
       onSelectPrevious: () => previous()
     });
   });
 
-  //
   return (
-    <div className={simpleListStyles.outer}>
+    <div ref={outerEL} className={simpleListStyles.outer}>
       {loading && (
         <div className={simpleListStyles.progressCt}>
           <CircularProgress className={simpleListStyles.progressSpinner} />

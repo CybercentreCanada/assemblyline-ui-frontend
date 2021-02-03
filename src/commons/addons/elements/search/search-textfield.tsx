@@ -177,7 +177,6 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
   // Grab nearest group to the left of cursor.
   // Filter entire list with that value if not empty.
   const filterOptions = (inputValue: string, selectionOffset = 0) => {
-    //
     const {
       value: filterValue,
       cursor: thisCursor,

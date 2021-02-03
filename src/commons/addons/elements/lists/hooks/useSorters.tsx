@@ -7,11 +7,11 @@ import React from 'react';
 interface UsingSorters {
   sort: (list: any[], sorter: SorterField) => any[];
   sortAll: (list: any[], sorters: SorterField[]) => any[];
-  onSort: (sorter: SorterField, sorters: SorterField[]) => any[];
+  onSort: (list: any[], sorter: SorterField, sorters: SorterField[]) => any[];
   icon: (sorter: SorterField) => React.ReactElement;
 }
 
-export default function useSorters() {
+export default function useSorters(): UsingSorters {
   // extract the value in the specified object at the given path.
   const extractValue = (object: any, path: string) => {
     return lodash.get(object, path);
@@ -84,7 +84,6 @@ export default function useSorters() {
       sorter.state = 'unset';
     }
     const sorted = sortAll(list, sorters);
-    console.log(sorted);
     return sorted;
   };
 
