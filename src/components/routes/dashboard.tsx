@@ -340,6 +340,12 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
               title="I"
               tooltip={t('queues.ingest')}
             />
+            <MetricCounter
+              init={dispatcher.initialized}
+              value={dispatcher.queues.files}
+              title="F"
+              tooltip={t('queues.file')}
+            />
           </div>
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -789,7 +795,8 @@ const DEFAULT_DISPATCHER = {
     max: 0
   },
   queues: {
-    ingest: 0
+    ingest: 0,
+    files: 0
   },
   metrics: {
     files_completed: 0,
