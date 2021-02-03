@@ -1,6 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { appendRoute, BreadcrumbItem, getRoute } from 'commons/components/hooks/useAppSitemap';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import useAppUser from '../hooks/useAppUser';
 
 export type SiteMapRoute = {
   path: string;
@@ -34,9 +36,16 @@ export const SiteMapContext = React.createContext<SitemapProviderContextProps>(n
 function SiteMapProvider(props: SiteMapProviderProps) {
   const { children, ...contextProps } = props;
   const history = useHistory();
-  const [breadcrumbs, setBreadcrumbs] = useState(
-    appendRoute([getRoute('/', contextProps.routes)], getRoute(history.location.pathname, contextProps.routes))
-  );
+  const { isReady } = useAppUser();
+  const [breadcrumbs, setBreadcrumbs] = useState([]);
+  const isUserReady = isReady();
+
+  // Reset the breadcrumbs if the user ready state changes.
+  useEffect(() => {
+    setBreadcrumbs(
+      appendRoute([getRoute('/', contextProps.routes)], getRoute(history.location.pathname, contextProps.routes))
+    );
+  }, [isUserReady]);
 
   useEffect(() => {
     // The return callback will ensure the event handler deregisters when component

@@ -131,8 +131,8 @@ const AppInit: React.FC = () => {
   // General TemplateUI layout structure.
   return (
     <BrowserRouter basename={process.env.PUBLIC_URL}>
-      <SiteMapProvider {...sitemapProps}>
-        <UserProvider {...userProps}>
+      <UserProvider {...userProps}>
+        <SiteMapProvider {...sitemapProps}>
           <HighlightProvider>
             <DrawerProvider>
               <AppLayoutProvider {...layoutProps}>
@@ -140,8 +140,8 @@ const AppInit: React.FC = () => {
               </AppLayoutProvider>
             </DrawerProvider>
           </HighlightProvider>
-        </UserProvider>
-      </SiteMapProvider>
+        </SiteMapProvider>
+      </UserProvider>
     </BrowserRouter>
   );
 };
