@@ -35,7 +35,7 @@ const FilterInput: React.FC<FilterInputProps> = ({ filter, currentFilters, filte
   const [value, setValue] = useState<string>('');
   const { applyFilters } = useFilters(filters);
 
-  const onChange = event => {
+  const onChange = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     filter.value = event.target.value;
     setValue(filter.value);
     THROTTLER.delay(() => {

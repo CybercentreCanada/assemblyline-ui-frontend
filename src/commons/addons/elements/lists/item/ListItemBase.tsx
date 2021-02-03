@@ -23,7 +23,7 @@ export interface ListItemBaseProps {
   disableBackgrounds?: boolean;
   children: (item: LineItem) => React.ReactNode;
   onClick: (item: LineItem, index: number) => void;
-  onRenderActions?: (item: LineItem, index: number) => React.ReactNode;
+  onRenderActions?: (item: LineItem, index?: number) => React.ReactNode;
 }
 
 const ListItemBase: React.FC<ListItemBaseProps> = React.memo(

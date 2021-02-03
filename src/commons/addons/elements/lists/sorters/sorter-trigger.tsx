@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import { makeStyles } from '@material-ui/core';
 import React from 'react';
 import useSorters from '../hooks/useSorters';
@@ -18,7 +20,7 @@ interface SorterTriggerProps {
   sorter: SorterField;
   currentSorters: SorterField[];
   list: any[];
-  className?: string
+  className?: string;
   onSorted: (list: any[]) => void;
   onSortersChange: (sorters: SorterField[]) => void;
 }
@@ -60,7 +62,7 @@ const SorterTrigger: React.FC<SorterTriggerProps> = ({
   return (
     <div className={`${classes.sorterTrigger} ${className}`} onClick={onClick}>
       {position > -1 && <>{icon(sorter)}&nbsp;</>}
-      {label ? label : sorter.label}&nbsp;
+      {label ?? sorter.label}&nbsp;
       {position > -1 && currentSorters.length > 1 && <em>({position + 1})</em>}
     </div>
   );

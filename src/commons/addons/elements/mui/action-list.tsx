@@ -1,4 +1,4 @@
-import { Button, ButtonProps, IconButton, IconButtonProps, useTheme } from '@material-ui/core';
+import { Button, ButtonProps, IconButton, IconButtonProps, Tooltip, useTheme } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
 import FlexHorizontal from 'commons/addons/elements/layout/flexers/FlexHorizontal';
 import FlexVertical from 'commons/addons/elements/layout/flexers/FlexVertical';
@@ -10,30 +10,27 @@ export interface ButtonAction {
   icon?: React.ReactNode;
   color?: 'primary' | 'secondary';
   action?: () => void;
-  btnProp?: ButtonProps | IconButtonProps;
+  btnProps?: ButtonProps | IconButtonProps;
+  tooltip?: string;
 }
 
-export default function ActionList({
-  orientation,
-  loading = false,
-  actions
-}: {
+const ActionList: React.FC<{
   orientation: 'horizontal' | 'vertical';
   loading: boolean;
   actions: ButtonAction[];
-}) {
+}> = ({ orientation, loading = false, actions }) => {
   const theme = useTheme();
 
-  const renderButtons = _actions => {
-    return _actions.map((a, i) =>
-      a.title ? (
+  const renderButtons = (_actions: ButtonAction[]) => {
+    return _actions.map((a, i) => {
+      const button = a.title ? (
         <Button
           style={{ marginRight: theme.spacing(1) }}
           key={a.key ? a.key : `ph-action-${i}`}
           color={a.color}
           onClick={a.action}
           startIcon={a.icon}
-          {...(a.btnProp as ButtonProps)}
+          {...(a.btnProps as ButtonProps)}
         >
           {a.title}
         </Button>
@@ -42,15 +39,23 @@ export default function ActionList({
           key={a.key ? a.key : `ph-action-${i}`}
           color={a.color}
           onClick={a.action}
-          {...(a.btnProp as IconButtonProps)}
+          {...(a.btnProps as IconButtonProps)}
         >
           {a.icon}
         </IconButton>
-      )
-    );
+      );
+
+      return a.tooltip ? (
+        <Tooltip key={a.key ? a.key : `ph-action-${i}`} title={a.tooltip}>
+          {button}
+        </Tooltip>
+      ) : (
+        button
+      );
+    });
   };
 
-  const renderSkeletons = _actions => {
+  const renderSkeletons = (_actions: ButtonAction[]) => {
     return _actions.map((a, i) => (
       <div key={a.key ? a.key : `ph-action-${i}`} style={{ marginLeft: theme.spacing(1) }}>
         <Skeleton width={36} height={48} variant="text" animation="wave" />
@@ -64,4 +69,5 @@ export default function ActionList({
     return <FlexVertical>{elements}</FlexVertical>;
   }
   return <FlexHorizontal>{elements}</FlexHorizontal>;
-}
+};
+export default ActionList;

@@ -55,15 +55,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const element = useRef<HTMLInputElement>();
   const [value, setValue] = useState<string>(initValue);
 
-  //
   const getInputEl = () => {
     return element.current.querySelector('input');
   };
-
-  // handler[onclick]: search button click handler.
-  // const _onSearchBtnClick = () => {
-  //   _onSearch();
-  // };
 
   // handler[onchange]: textfield change handler.
   // track value of filter..
@@ -88,7 +82,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
     }
   };
 
-  //
   useEffect(() => {
     setValue(initValue);
   }, [initValue]);
@@ -115,9 +108,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
             onClear={_onValueClear}
           />
         </Box>
-        {/* <IconButton onClick={onSearchBtnClick} edge="end" color="primary">
-          <FilterListIcon />
-        </IconButton> */}
         <IconButton onClick={_onValueClear} edge="end" color="primary">
           <BackspaceIcon />
         </IconButton>
