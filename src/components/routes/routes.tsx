@@ -43,11 +43,14 @@ import Statistics from './statistics';
 import StatisticsHeuristics from './statistics/heuristics';
 import StatisticsSignatures from './statistics/signatures';
 
-function ScrollToTop() {
+const APP_NAME = 'AL4';
+
+function RouteActions() {
   const { pathname } = useLocation();
   const [oldID, setOldID] = useState(null);
 
   useEffect(() => {
+    // Scroll to top
     const { params } = { params: { id: null }, ...matchPath(pathname, { path: '/submission/detail/:id' }) };
     // eslint-disable-next-line prefer-destructuring, @typescript-eslint/dot-notation
     const id = params['id'];
@@ -55,7 +58,14 @@ function ScrollToTop() {
       window.scrollTo(0, 0);
       setOldID(id);
     }
-    // eslint-disable-next-line
+
+    // Patch window title
+    const currentLocation = pathname.split('/').join(' ').trim();
+    document.title = `${APP_NAME} | ${
+      currentLocation ? currentLocation.charAt(0).toUpperCase() + currentLocation.slice(1) : 'Submit'
+    }`;
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
   return null;
@@ -65,7 +75,7 @@ const WrappedRoutes = () => {
   const { settings } = useALContext();
   return (
     <>
-      <ScrollToTop />
+      <RouteActions />
       <Switch>
         <Route exact path="/" component={Submit} />
         <Route exact path="/account" component={Account} />
