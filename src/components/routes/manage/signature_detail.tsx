@@ -93,7 +93,6 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
   const [signature, setSignature] = useState<Signature>(null);
-  const [max, setMax] = useState<number>(5);
   const [stats, setStats] = useState<ScoreStatistic>(null);
   const [histogram, setHistogram] = useState<any>(null);
   const [open, setOpen] = useState(false);
@@ -152,7 +151,6 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
               }
             ]
           };
-          setMax(Math.max(max, ...Object.values<number>(api_data.api_response)));
           setHistogram(chartData);
         }
       });
@@ -368,7 +366,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
             </Grid>
           </Grid>
           <Grid item xs={12}>
-            <Histogram data={histogram} max={max} height={300} isDate title={t('chart.title')} />
+            <Histogram data={histogram} height={300} isDate title={t('chart.title')} />
           </Grid>
         </Grid>
 

@@ -1,51 +1,32 @@
 import { useTheme } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-3';
-
-export type Heuristic = {
-  attack_id: string[];
-  avg: number;
-  classification: string;
-  count: number;
-  description: string;
-  filetype: string;
-  heur_id: string;
-  max: number;
-  max_score: number;
-  min: number;
-  name: string;
-  score: number;
-  signature_score_map: {
-    [key: string]: number;
-  };
-};
-
-type ScoreStatistic = {
-  avg: number;
-  min: number;
-  max: number;
-  count: number;
-  sum: number;
-};
-
-type ParamProps = {
-  id: string;
-};
 
 type HistogramProps = {
   data: {
     labels: string[];
-    datasets: object[];
+    datasets: { label: string; data: number[] }[];
   };
   title?: string;
-  max?: number;
   height?: number;
   isDate?: boolean;
 };
 
-const WrappedHistogram = ({ data, max, height, title, isDate }: HistogramProps) => {
+const WrappedHistogram = ({ data, height, title, isDate }: HistogramProps) => {
   const theme = useTheme();
+  const [max, setMax] = useState(5);
+
+  useEffect(() => {
+    if (data) {
+      let maxValue = max;
+      data.datasets.forEach(dataset => {
+        maxValue = Math.max(maxValue, ...Object.values<number>(dataset.data));
+      });
+      setMax(maxValue);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
 
   return data ? (
     <Line
@@ -66,7 +47,12 @@ const WrappedHistogram = ({ data, max, height, title, isDate }: HistogramProps) 
           ],
           yAxes: [
             {
-              ticks: { beginAtZero: true, max, fontColor: theme.palette.text.secondary, precision: 0 }
+              ticks: {
+                beginAtZero: true,
+                max,
+                fontColor: theme.palette.text.secondary,
+                precision: 0
+              }
             }
           ]
         },
@@ -82,12 +68,11 @@ const WrappedHistogram = ({ data, max, height, title, isDate }: HistogramProps) 
       }}
     />
   ) : (
-    <Skeleton style={{ height: '150px' }} />
+    <Skeleton variant="rect" height={height} />
   );
 };
 
 WrappedHistogram.defaultProps = {
-  max: 5,
   title: null,
   height: null,
   isDate: false
