@@ -71,7 +71,6 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
   const [heuristic, setHeuristic] = useState<Heuristic>(null);
-  const [max, setMax] = useState<number>(5);
   const [stats, setStats] = useState<ScoreStatistic>(null);
   const [histogram, setHistogram] = useState<any>(null);
   const apiCall = useMyAPI();
@@ -117,7 +116,6 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
             }
           ]
         };
-        setMax(Math.max(max, ...Object.values<number>(api_data.api_response)));
         setHistogram(chartData);
       }
     });
@@ -288,7 +286,7 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
             </Grid>
           </Grid>
           <Grid item xs={12}>
-            <Histogram data={histogram} max={max} height={300} isDate title={t('chart.title')} />
+            <Histogram data={histogram} height={300} isDate title={t('chart.title')} />
           </Grid>
         </Grid>
       </div>
