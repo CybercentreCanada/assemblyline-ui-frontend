@@ -114,10 +114,16 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
           setSignature(api_data.api_response);
         }
       });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [signature_id, id]);
+
+  useEffect(() => {
+    if (signature) {
       apiCall({
         method: 'POST',
         url: '/api/v4/search/stats/result/result.score/',
-        body: { query: `result.sections.tags.file.rule.${signature_id.split('_')[0]}:${signature_id || id}` },
+        body: { query: `result.sections.tags.file.rule.${signature.type}:"${signature.source}.${signature.name}"` },
         onSuccess: api_data => {
           setStats(api_data.api_response);
         }
@@ -126,7 +132,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
         method: 'POST',
         url: '/api/v4/search/histogram/result/created/',
         body: {
-          query: `result.sections.tags.file.rule.${signature_id.split('_')[0]}:${signature_id || id}`,
+          query: `result.sections.tags.file.rule.${signature.type}:"${signature.source}.${signature.name}"`,
           mincount: 0,
           start: 'now-30d',
           end: 'now',
@@ -152,7 +158,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [signature_id, id]);
+  }, [signature]);
 
   const closeDialog = () => {
     setOpen(false);
@@ -326,7 +332,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
                     {stats.count}
                   </Paper>
                 ) : (
-                  <Skeleton style={{ height: '2.5rem' }} />
+                  <Skeleton variant="rect" style={{ height: '28.px' }} />
                 )}
               </Grid>
               <Grid item xs={12} sm={3}>
@@ -336,7 +342,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
                     {stats.min || 0}
                   </Paper>
                 ) : (
-                  <Skeleton style={{ height: '2.5rem' }} />
+                  <Skeleton variant="rect" style={{ height: '28.px' }} />
                 )}
               </Grid>
               <Grid item xs={12} sm={3}>
@@ -346,7 +352,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
                     {stats.avg || 0}
                   </Paper>
                 ) : (
-                  <Skeleton style={{ height: '2.5rem' }} />
+                  <Skeleton variant="rect" style={{ height: '28.px' }} />
                 )}
               </Grid>
               <Grid item xs={12} sm={3}>
@@ -356,7 +362,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
                     {stats.max || 0}
                   </Paper>
                 ) : (
-                  <Skeleton style={{ height: '2.5rem' }} />
+                  <Skeleton variant="rect" style={{ height: '28.px' }} />
                 )}
               </Grid>
             </Grid>

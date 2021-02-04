@@ -252,7 +252,7 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
                     {stats.count}
                   </Paper>
                 ) : (
-                  <Skeleton style={{ height: '2.5rem' }} />
+                  <Skeleton variant="rect" style={{ height: '28.px' }} />
                 )}
               </Grid>
               <Grid item xs={12} sm={3}>
@@ -262,7 +262,7 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
                     {stats.min || 0}
                   </Paper>
                 ) : (
-                  <Skeleton style={{ height: '2.5rem' }} />
+                  <Skeleton variant="rect" style={{ height: '28.px' }} />
                 )}
               </Grid>
               <Grid item xs={12} sm={3}>
@@ -272,7 +272,7 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
                     {stats.avg || 0}
                   </Paper>
                 ) : (
-                  <Skeleton style={{ height: '2.5rem' }} />
+                  <Skeleton variant="rect" style={{ height: '28.px' }} />
                 )}
               </Grid>
               <Grid item xs={12} sm={3}>
@@ -282,7 +282,7 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
                     {stats.max || 0}
                   </Paper>
                 ) : (
-                  <Skeleton style={{ height: '2.5rem' }} />
+                  <Skeleton variant="rect" style={{ height: '28.px' }} />
                 )}
               </Grid>
             </Grid>
