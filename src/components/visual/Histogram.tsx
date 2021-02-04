@@ -16,57 +16,66 @@ type HistogramProps = {
 const WrappedHistogram = ({ data, height, title, isDate }: HistogramProps) => {
   const theme = useTheme();
   const [max, setMax] = useState(5);
+  const [histData, setHistData] = useState(null);
+  const options = {
+    maintainAspectRatio: false,
+    responsive: true,
+    scales: {
+      xAxes: [
+        {
+          gridLines: { display: false, drawBorder: true },
+          ticks: { fontColor: theme.palette.text.secondary },
+          time: isDate ? { unit: 'day' } : null,
+          type: isDate ? 'time' : null
+        }
+      ],
+      yAxes: [
+        {
+          ticks: {
+            beginAtZero: true,
+            max,
+            fontColor: theme.palette.text.secondary,
+            precision: 0
+          }
+        }
+      ]
+    },
+    title: title
+      ? {
+          display: true,
+          text: title,
+          fontColor: theme.palette.text.primary,
+          fontFamily: 'Roboto',
+          fontSize: 14
+        }
+      : null
+  };
 
   useEffect(() => {
     if (data) {
+      const tempDatasets = [];
       let maxValue = max;
+
       data.datasets.forEach(dataset => {
         maxValue = Math.max(maxValue, ...Object.values<number>(dataset.data));
+        tempDatasets.push({
+          ...dataset,
+          backgroundColor: theme.palette.primary.dark,
+          borderColor: theme.palette.primary.light,
+          borderWidth: 1,
+          hoverBackgroundColor: theme.palette.primary.main
+        });
       });
-      setMax(maxValue);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
 
-  return data ? (
-    <Line
-      data={data}
-      legend={{ display: false }}
-      height={height}
-      options={{
-        maintainAspectRatio: false,
-        responsive: true,
-        scales: {
-          xAxes: [
-            {
-              gridLines: { display: false, drawBorder: true },
-              ticks: { fontColor: theme.palette.text.secondary },
-              time: isDate ? { unit: 'day' } : null,
-              type: isDate ? 'time' : null
-            }
-          ],
-          yAxes: [
-            {
-              ticks: {
-                beginAtZero: true,
-                max,
-                fontColor: theme.palette.text.secondary,
-                precision: 0
-              }
-            }
-          ]
-        },
-        title: title
-          ? {
-              display: true,
-              text: title,
-              fontColor: theme.palette.text.primary,
-              fontFamily: 'Roboto',
-              fontSize: 14
-            }
-          : null
-      }}
-    />
+      setMax(maxValue);
+      setHistData({ ...data, datasets: tempDatasets });
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, theme]);
+
+  return histData ? (
+    <Line redraw data={histData} legend={{ display: false }} height={height} options={options} />
   ) : (
     <Skeleton variant="rect" height={height} />
   );
