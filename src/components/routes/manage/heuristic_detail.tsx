@@ -5,8 +5,8 @@ import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import Classification from 'components/visual/Classification';
+import Histogram from 'components/visual/Histogram';
 import React, { useEffect, useState } from 'react';
-import { Line } from 'react-chartjs-3';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 
@@ -71,7 +71,7 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
   const [heuristic, setHeuristic] = useState<Heuristic>(null);
-  const [max, setMax] = useState<number>(10);
+  const [max, setMax] = useState<number>(5);
   const [stats, setStats] = useState<ScoreStatistic>(null);
   const [histogram, setHistogram] = useState<any>(null);
   const apiCall = useMyAPI();
@@ -288,40 +288,7 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
             </Grid>
           </Grid>
           <Grid item xs={12}>
-            {histogram ? (
-              <Line
-                data={histogram}
-                legend={{ display: false }}
-                options={{
-                  maintainAspectRatio: true,
-                  responsive: true,
-                  scales: {
-                    xAxes: [
-                      {
-                        gridLines: { display: false, drawBorder: true },
-                        ticks: { fontColor: theme.palette.text.secondary },
-                        time: { unit: 'day' },
-                        type: 'time'
-                      }
-                    ],
-                    yAxes: [
-                      {
-                        ticks: { min: 0, max, fontColor: theme.palette.text.secondary }
-                      }
-                    ]
-                  },
-                  title: {
-                    display: true,
-                    text: t('chart.title'),
-                    fontColor: theme.palette.text.primary,
-                    fontFamily: 'Roboto',
-                    fontSize: 14
-                  }
-                }}
-              />
-            ) : (
-              <Skeleton style={{ height: '150px' }} />
-            )}
+            <Histogram data={histogram} max={max} height={300} isDate title={t('chart.title')} />
           </Grid>
         </Grid>
       </div>
