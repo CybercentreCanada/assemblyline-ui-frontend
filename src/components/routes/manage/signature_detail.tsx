@@ -242,7 +242,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
         </div>
       )}
       <div style={{ textAlign: 'left' }}>
-        <Grid container alignItems="center">
+        <Grid container alignItems="center" spacing={4}>
           <Grid item xs>
             <Typography variant="h4">{t('title')}</Typography>
             <Typography variant="caption">
