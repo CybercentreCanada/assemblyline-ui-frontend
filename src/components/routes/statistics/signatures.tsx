@@ -23,14 +23,7 @@ export default function StatisticsSignatures() {
   };
 
   const handleRowClick = useCallback(row => {
-    setGlobalDrawer(
-      <SignatureDetail
-        stats={{ avg: row.avg, count: row.count, min: row.min, max: row.max }}
-        signature_id={row.id}
-        onUpdated={() => {}}
-        onDeleted={handleSignatureDelete}
-      />
-    );
+    setGlobalDrawer(<SignatureDetail signature_id={row.id} onUpdated={() => {}} onDeleted={handleSignatureDelete} />);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
