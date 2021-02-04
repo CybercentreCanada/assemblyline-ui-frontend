@@ -26,6 +26,7 @@ import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import SignatureStatus from 'components/visual/SignatureStatus';
 import React, { useEffect, useState } from 'react';
+import { Line } from 'react-chartjs-3';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory, useParams } from 'react-router-dom';
 
@@ -44,18 +45,20 @@ export type Signature = {
   type: string;
 };
 
+type ScoreStatistic = {
+  avg: number;
+  min: number;
+  max: number;
+  count: number;
+  sum: number;
+};
+
 type ParamProps = {
   id: string;
 };
 
 type SignatureDetailProps = {
   signature_id?: string;
-  stats?: {
-    avg: number;
-    count: number;
-    min: number;
-    max: number;
-  };
   onUpdated?: () => void;
   onDeleted?: () => void;
 };
@@ -85,11 +88,14 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const SignatureDetail = ({ signature_id, stats, onUpdated, onDeleted }: SignatureDetailProps) => {
+const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetailProps) => {
   const { t } = useTranslation(['manageSignatureDetail']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
   const [signature, setSignature] = useState<Signature>(null);
+  const [max, setMax] = useState<number>(10);
+  const [stats, setStats] = useState<ScoreStatistic>(null);
+  const [histogram, setHistogram] = useState<any>(null);
   const [open, setOpen] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
@@ -106,6 +112,42 @@ const SignatureDetail = ({ signature_id, stats, onUpdated, onDeleted }: Signatur
         url: `/api/v4/signature/${signature_id || id}/`,
         onSuccess: api_data => {
           setSignature(api_data.api_response);
+        }
+      });
+      apiCall({
+        method: 'POST',
+        url: '/api/v4/search/stats/result/result.score/',
+        body: { query: `result.sections.tags.file.rule.${signature_id.split('_')[0]}:${signature_id || id}` },
+        onSuccess: api_data => {
+          setStats(api_data.api_response);
+        }
+      });
+      apiCall({
+        method: 'POST',
+        url: '/api/v4/search/histogram/result/created/',
+        body: {
+          query: `result.sections.tags.file.rule.${signature_id.split('_')[0]}:${signature_id || id}`,
+          mincount: 0,
+          start: 'now-30d',
+          end: 'now',
+          gap: '+1d'
+        },
+        onSuccess: api_data => {
+          const chartData = {
+            labels: Object.keys(api_data.api_response).map((key: string) => key.replace('T00:00:00.000Z', '')),
+            datasets: [
+              {
+                label: signature_id || id,
+                backgroundColor: theme.palette.primary.dark,
+                borderColor: theme.palette.primary.light,
+                borderWidth: 1,
+                hoverBackgroundColor: theme.palette.primary.main,
+                data: Object.values(api_data.api_response)
+              }
+            ]
+          };
+          setMax(Math.max(max, ...Object.values<number>(api_data.api_response)));
+          setHistogram(chartData);
         }
       });
     }
@@ -274,37 +316,87 @@ const SignatureDetail = ({ signature_id, stats, onUpdated, onDeleted }: Signatur
               <Skeleton variant="rect" height="6rem" />
             )}
           </Grid>
-          {stats && (
-            <Grid item xs={12}>
-              <Typography variant="subtitle2">{t('section_stat_contrib')}</Typography>
-              <Grid container spacing={1}>
-                <Grid item xs={12} sm={3}>
-                  <Typography variant="caption">{t('count')}</Typography>
+          <Grid item xs={12}>
+            <Typography variant="subtitle2">{t('section_stat_contrib')}</Typography>
+            <Grid container spacing={1}>
+              <Grid item xs={12} sm={3}>
+                <Typography variant="caption">{t('count')}</Typography>
+                {stats ? (
                   <Paper component="pre" variant="outlined" className={classes.stats}>
                     {stats.count}
                   </Paper>
-                </Grid>
-                <Grid item xs={12} sm={3}>
-                  <Typography variant="caption">{t('min')}</Typography>
+                ) : (
+                  <Skeleton style={{ height: '2.5rem' }} />
+                )}
+              </Grid>
+              <Grid item xs={12} sm={3}>
+                <Typography variant="caption">{t('min')}</Typography>
+                {stats ? (
                   <Paper component="pre" variant="outlined" className={classes.stats}>
-                    {stats.min}
+                    {stats.min || 0}
                   </Paper>
-                </Grid>
-                <Grid item xs={12} sm={3}>
-                  <Typography variant="caption">{t('avg')}</Typography>
+                ) : (
+                  <Skeleton style={{ height: '2.5rem' }} />
+                )}
+              </Grid>
+              <Grid item xs={12} sm={3}>
+                <Typography variant="caption">{t('avg')}</Typography>
+                {stats ? (
                   <Paper component="pre" variant="outlined" className={classes.stats}>
-                    {stats.avg}
+                    {stats.avg || 0}
                   </Paper>
-                </Grid>
-                <Grid item xs={12} sm={3}>
-                  <Typography variant="caption">{t('max')}</Typography>
+                ) : (
+                  <Skeleton style={{ height: '2.5rem' }} />
+                )}
+              </Grid>
+              <Grid item xs={12} sm={3}>
+                <Typography variant="caption">{t('max')}</Typography>
+                {stats ? (
                   <Paper component="pre" variant="outlined" className={classes.stats}>
-                    {stats.max}
+                    {stats.max || 0}
                   </Paper>
-                </Grid>
+                ) : (
+                  <Skeleton style={{ height: '2.5rem' }} />
+                )}
               </Grid>
             </Grid>
-          )}
+          </Grid>
+          <Grid item xs={12}>
+            {histogram ? (
+              <Line
+                data={histogram}
+                legend={{ display: false }}
+                options={{
+                  maintainAspectRatio: true,
+                  responsive: true,
+                  scales: {
+                    xAxes: [
+                      {
+                        gridLines: { display: false, drawBorder: true },
+                        ticks: { fontColor: theme.palette.text.secondary },
+                        time: { unit: 'day' },
+                        type: 'time'
+                      }
+                    ],
+                    yAxes: [
+                      {
+                        ticks: { min: 0, max, fontColor: theme.palette.text.secondary }
+                      }
+                    ]
+                  },
+                  title: {
+                    display: true,
+                    text: t('chart.title'),
+                    fontColor: theme.palette.text.primary,
+                    fontFamily: 'Roboto',
+                    fontSize: 14
+                  }
+                }}
+              />
+            ) : (
+              <Skeleton style={{ height: '150px' }} />
+            )}
+          </Grid>
         </Grid>
 
         {signature && modified ? (
@@ -335,7 +427,6 @@ const SignatureDetail = ({ signature_id, stats, onUpdated, onDeleted }: Signatur
 
 SignatureDetail.defaultProps = {
   signature_id: null,
-  stats: null,
   onUpdated: () => {},
   onDeleted: () => {}
 };

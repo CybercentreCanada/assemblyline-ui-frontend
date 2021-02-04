@@ -6,6 +6,7 @@ import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import Classification from 'components/visual/Classification';
 import React, { useEffect, useState } from 'react';
+import { Line } from 'react-chartjs-3';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 
@@ -25,6 +26,14 @@ export type Heuristic = {
   signature_score_map: {
     [key: string]: number;
   };
+};
+
+type ScoreStatistic = {
+  avg: number;
+  min: number;
+  max: number;
+  count: number;
+  sum: number;
 };
 
 type ParamProps = {
@@ -62,6 +71,9 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
   const [heuristic, setHeuristic] = useState<Heuristic>(null);
+  const [max, setMax] = useState<number>(10);
+  const [stats, setStats] = useState<ScoreStatistic>(null);
+  const [histogram, setHistogram] = useState<any>(null);
   const apiCall = useMyAPI();
   const classes = useStyles();
   const { c12nDef } = useALContext();
@@ -71,6 +83,42 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
       url: `/api/v4/heuristics/${heur_id || id}/`,
       onSuccess: api_data => {
         setHeuristic(api_data.api_response);
+      }
+    });
+    apiCall({
+      method: 'POST',
+      url: '/api/v4/search/stats/result/result.score/',
+      body: { query: `result.sections.heuristic.heur_id:${heur_id || id}` },
+      onSuccess: api_data => {
+        setStats(api_data.api_response);
+      }
+    });
+    apiCall({
+      method: 'POST',
+      url: '/api/v4/search/histogram/result/created/',
+      body: {
+        query: `result.sections.heuristic.heur_id:${heur_id || id}`,
+        mincount: 0,
+        start: 'now-30d',
+        end: 'now',
+        gap: '+1d'
+      },
+      onSuccess: api_data => {
+        const chartData = {
+          labels: Object.keys(api_data.api_response).map((key: string) => key.replace('T00:00:00.000Z', '')),
+          datasets: [
+            {
+              label: heur_id || id,
+              backgroundColor: theme.palette.primary.dark,
+              borderColor: theme.palette.primary.light,
+              borderWidth: 1,
+              hoverBackgroundColor: theme.palette.primary.main,
+              data: Object.values(api_data.api_response)
+            }
+          ]
+        };
+        setMax(Math.max(max, ...Object.values<number>(api_data.api_response)));
+        setHistogram(chartData);
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -199,9 +247,9 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
             <Grid container spacing={1}>
               <Grid item xs={12} sm={3}>
                 <Typography variant="caption">{t('count')}</Typography>
-                {heuristic ? (
+                {stats ? (
                   <Paper component="pre" variant="outlined" className={classes.preview}>
-                    {heuristic.count}
+                    {stats.count}
                   </Paper>
                 ) : (
                   <Skeleton style={{ height: '2.5rem' }} />
@@ -209,9 +257,9 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
               </Grid>
               <Grid item xs={12} sm={3}>
                 <Typography variant="caption">{t('min')}</Typography>
-                {heuristic ? (
+                {stats ? (
                   <Paper component="pre" variant="outlined" className={classes.preview}>
-                    {heuristic.min}
+                    {stats.min || 0}
                   </Paper>
                 ) : (
                   <Skeleton style={{ height: '2.5rem' }} />
@@ -219,9 +267,9 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
               </Grid>
               <Grid item xs={12} sm={3}>
                 <Typography variant="caption">{t('avg')}</Typography>
-                {heuristic ? (
+                {stats ? (
                   <Paper component="pre" variant="outlined" className={classes.preview}>
-                    {heuristic.avg}
+                    {stats.avg || 0}
                   </Paper>
                 ) : (
                   <Skeleton style={{ height: '2.5rem' }} />
@@ -229,15 +277,51 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
               </Grid>
               <Grid item xs={12} sm={3}>
                 <Typography variant="caption">{t('max')}</Typography>
-                {heuristic ? (
+                {stats ? (
                   <Paper component="pre" variant="outlined" className={classes.preview}>
-                    {heuristic.max}
+                    {stats.max || 0}
                   </Paper>
                 ) : (
                   <Skeleton style={{ height: '2.5rem' }} />
                 )}
               </Grid>
             </Grid>
+          </Grid>
+          <Grid item xs={12}>
+            {histogram ? (
+              <Line
+                data={histogram}
+                legend={{ display: false }}
+                options={{
+                  maintainAspectRatio: true,
+                  responsive: true,
+                  scales: {
+                    xAxes: [
+                      {
+                        gridLines: { display: false, drawBorder: true },
+                        ticks: { fontColor: theme.palette.text.secondary },
+                        time: { unit: 'day' },
+                        type: 'time'
+                      }
+                    ],
+                    yAxes: [
+                      {
+                        ticks: { min: 0, max, fontColor: theme.palette.text.secondary }
+                      }
+                    ]
+                  },
+                  title: {
+                    display: true,
+                    text: t('chart.title'),
+                    fontColor: theme.palette.text.primary,
+                    fontFamily: 'Roboto',
+                    fontSize: 14
+                  }
+                }}
+              />
+            ) : (
+              <Skeleton style={{ height: '150px' }} />
+            )}
           </Grid>
         </Grid>
       </div>
