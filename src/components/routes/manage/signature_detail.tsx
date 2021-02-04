@@ -143,10 +143,6 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
             datasets: [
               {
                 label: signature_id || id,
-                backgroundColor: theme.palette.primary.dark,
-                borderColor: theme.palette.primary.light,
-                borderWidth: 1,
-                hoverBackgroundColor: theme.palette.primary.main,
                 data: Object.values(api_data.api_response)
               }
             ]
