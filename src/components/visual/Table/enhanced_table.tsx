@@ -1,4 +1,4 @@
-import { IconButton, InputBase, TablePagination, Tooltip } from '@material-ui/core';
+import { Grid, IconButton, InputBase, TablePagination, Tooltip } from '@material-ui/core';
 import Paper from '@material-ui/core/Paper';
 import { createStyles, fade, makeStyles, Theme } from '@material-ui/core/styles';
 import TableCell from '@material-ui/core/TableCell';
@@ -194,7 +194,11 @@ const useToolbarStyles = makeStyles((theme: Theme) =>
         backgroundColor: fade(theme.palette.text.primary, 0.06)
       },
       height: 'fit-content',
-      width: 300
+      marginTop: theme.spacing(1),
+      width: 300,
+      [theme.breakpoints.only('xs')]: {
+        width: '100%'
+      }
     },
     searchIcon: {
       padding: theme.spacing(0, 1),
@@ -232,41 +236,42 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
   const classes = useToolbarStyles();
 
   return (
-    <PageHeader
-      isSticky
-      left={
-        <div className={classes.search}>
-          <div className={classes.searchIcon}>
-            <FilterListIcon />
+    <PageHeader isSticky>
+      <Grid container>
+        <Grid item xs={12} md={6}>
+          <div className={classes.search}>
+            <div className={classes.searchIcon}>
+              <FilterListIcon />
+            </div>
+            <InputBase
+              onChange={event => handleFilter(event.target.value)}
+              placeholder={t('filter')}
+              classes={{
+                root: classes.inputRoot,
+                input: classes.inputInput
+              }}
+              value={filter}
+            />
           </div>
-          <InputBase
-            onChange={event => handleFilter(event.target.value)}
-            placeholder={t('filter')}
-            classes={{
-              root: classes.inputRoot,
-              input: classes.inputInput
-            }}
-            value={filter}
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <TablePagination
+            className={classes.flexItem}
+            labelRowsPerPage={t('pager.rows')}
+            labelDisplayedRows={({ from, to, count }) =>
+              `${from}-${to} ${t('pager.of')} ${count !== -1 ? count : `${t('pager.more')} ${to}`}`
+            }
+            component="div"
+            count={itemCount}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onChangePage={handleChangePage}
+            onChangeRowsPerPage={handleChangeRowsPerPage}
+            ActionsComponent={TablePaginationActions}
           />
-        </div>
-      }
-      right={
-        <TablePagination
-          className={classes.flexItem}
-          labelRowsPerPage={t('pager.rows')}
-          labelDisplayedRows={({ from, to, count }) =>
-            `${from}-${to} ${t('pager.of')} ${count !== -1 ? count : `${t('pager.more')} ${to}`}`
-          }
-          component="div"
-          count={itemCount}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onChangePage={handleChangePage}
-          onChangeRowsPerPage={handleChangeRowsPerPage}
-          ActionsComponent={TablePaginationActions}
-        />
-      }
-    />
+        </Grid>
+      </Grid>
+    </PageHeader>
   );
 };
 
