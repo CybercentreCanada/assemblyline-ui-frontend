@@ -6,8 +6,11 @@ import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import Classification from 'components/visual/Classification';
 import Histogram from 'components/visual/Histogram';
+import ResultsTable from 'components/visual/SearchResult/results';
+import 'moment/locale/fr';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import Moment from 'react-moment';
 import { Link, useParams } from 'react-router-dom';
 
 export type Heuristic = {
@@ -35,6 +38,8 @@ type Statistics = {
   max: number;
   count: number;
   sum: number;
+  last_hit: string;
+  first_hit: string;
 };
 
 type ParamProps = {
@@ -68,12 +73,13 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
-  const { t } = useTranslation(['manageHeuristicDetail']);
+  const { t, i18n } = useTranslation(['manageHeuristicDetail']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
   const [heuristic, setHeuristic] = useState<Heuristic>(null);
   const [stats, setStats] = useState<Statistics>(null);
   const [histogram, setHistogram] = useState<any>(null);
+  const [results, setResults] = useState<any>(null);
   const apiCall = useMyAPI();
   const classes = useStyles();
   const { c12nDef } = useALContext();
@@ -123,6 +129,13 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
           setHistogram(chartData);
         }
       });
+      apiCall({
+        method: 'GET',
+        url: `/api/v4/search/result/?query=result.sections.heuristic.heur_id:${heur_id || id}&rows=10`,
+        onSuccess: api_data => {
+          setResults(api_data.api_response);
+        }
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [heuristic]);
@@ -149,7 +162,7 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
                   <IconButton
                     component={Link}
                     style={{ color: theme.palette.action.active }}
-                    to={`/search/result/?query=result.sections.heuristic.name:"${heuristic.name}"`}
+                    to={`/search/result/?query=result.sections.heuristic.heur_id:"${heuristic.heur_id}"`}
                   >
                     <YoutubeSearchedForIcon />
                   </IconButton>
@@ -160,7 +173,7 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
             </Grid>
           </Grid>
         </div>
-        <Grid container spacing={4}>
+        <Grid container spacing={3}>
           <Grid item xs={12} sm={6}>
             <Typography variant="subtitle2">{t('name')}</Typography>
             {heuristic ? (
@@ -246,52 +259,86 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
             )}
           </Grid>
           <Grid item xs={12}>
-            <Typography variant="subtitle2">{t('section_stat_contrib')}</Typography>
-            <Grid container spacing={1}>
-              <Grid item xs={12} sm={3}>
-                <Typography variant="caption">{t('count')}</Typography>
+            <Typography variant="h6">{t('statistics')}</Typography>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Typography variant="subtitle1" style={{ fontWeight: 600, fontStyle: 'italic' }}>
+              {t('hits')}
+            </Typography>
+            <Grid container>
+              <Grid item xs={3} sm={4} md={3} lg={2}>
+                <span style={{ fontWeight: 500 }}>{t('hit.count')}</span>
+              </Grid>
+              <Grid item xs={9} sm={8} md={9} lg={10}>
+                {heuristic && (stats || heuristic.stats) ? stats ? stats.count : heuristic.stats.count : <Skeleton />}
+              </Grid>
+              <Grid item xs={3} sm={4} md={3} lg={2}>
+                <span style={{ fontWeight: 500 }}>{t('hit.first')}</span>
+              </Grid>
+              <Grid item xs={9} sm={8} md={9} lg={10}>
                 {heuristic && (stats || heuristic.stats) ? (
-                  <Paper component="pre" variant="outlined" className={classes.preview}>
-                    {stats ? stats.count : heuristic.stats.count}
-                  </Paper>
+                  heuristic.stats.first_hit ? (
+                    <Moment fromNow locale={i18n.language}>
+                      {stats ? stats.first_hit : heuristic.stats.first_hit}
+                    </Moment>
+                  ) : (
+                    t('hit.none')
+                  )
                 ) : (
-                  <Skeleton variant="rect" style={{ height: '28.px' }} />
+                  <Skeleton />
                 )}
               </Grid>
-              <Grid item xs={12} sm={3}>
-                <Typography variant="caption">{t('min')}</Typography>
+              <Grid item xs={3} sm={4} md={3} lg={2}>
+                <span style={{ fontWeight: 500 }}>{t('hit.last')}</span>
+              </Grid>
+              <Grid item xs={9} sm={8} md={9} lg={10}>
                 {heuristic && (stats || heuristic.stats) ? (
-                  <Paper component="pre" variant="outlined" className={classes.preview}>
-                    {stats ? stats.min || 0 : heuristic.stats.min || 0}
-                  </Paper>
+                  heuristic.stats.last_hit ? (
+                    <Moment fromNow locale={i18n.language}>
+                      {stats ? stats.last_hit : heuristic.stats.last_hit}
+                    </Moment>
+                  ) : (
+                    t('hit.none')
+                  )
                 ) : (
-                  <Skeleton variant="rect" style={{ height: '28.px' }} />
+                  <Skeleton />
                 )}
               </Grid>
-              <Grid item xs={12} sm={3}>
-                <Typography variant="caption">{t('avg')}</Typography>
-                {heuristic && (stats || heuristic.stats) ? (
-                  <Paper component="pre" variant="outlined" className={classes.preview}>
-                    {stats ? stats.avg || 0 : heuristic.stats.avg || 0}
-                  </Paper>
-                ) : (
-                  <Skeleton variant="rect" style={{ height: '28.px' }} />
-                )}
+            </Grid>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Typography variant="subtitle1" style={{ fontWeight: 600, fontStyle: 'italic' }}>
+              {t('contribution')}
+            </Typography>
+            <Grid container>
+              <Grid item xs={3} sm={4} md={3} lg={2}>
+                <span style={{ fontWeight: 500 }}>{t('score.min')}</span>
               </Grid>
-              <Grid item xs={12} sm={3}>
-                <Typography variant="caption">{t('max')}</Typography>
-                {heuristic && (stats || heuristic.stats) ? (
-                  <Paper component="pre" variant="outlined" className={classes.preview}>
-                    {stats ? stats.max || 0 : heuristic.stats.max || 0}
-                  </Paper>
-                ) : (
-                  <Skeleton variant="rect" style={{ height: '28.px' }} />
-                )}
+              <Grid item xs={9} sm={8} md={9} lg={10}>
+                {heuristic && (stats || heuristic.stats) ? stats ? stats.min : heuristic.stats.min : <Skeleton />}
+              </Grid>
+              <Grid item xs={3} sm={4} md={3} lg={2}>
+                <span style={{ fontWeight: 500 }}>{t('score.avg')}</span>
+              </Grid>
+              <Grid item xs={9} sm={8} md={9} lg={10}>
+                {heuristic && (stats || heuristic.stats) ? stats ? stats.avg : heuristic.stats.avg : <Skeleton />}
+              </Grid>
+              <Grid item xs={3} sm={4} md={3} lg={2}>
+                <span style={{ fontWeight: 500 }}>{t('score.max')}</span>
+              </Grid>
+              <Grid item xs={9} sm={8} md={9} lg={10}>
+                {heuristic && (stats || heuristic.stats) ? stats ? stats.max : heuristic.stats.max : <Skeleton />}
               </Grid>
             </Grid>
           </Grid>
           <Grid item xs={12}>
             <Histogram data={histogram} height={300} isDate title={t('chart.title')} />
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="h6">{t('last10')}</Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <ResultsTable resultResults={results} />
           </Grid>
         </Grid>
       </div>

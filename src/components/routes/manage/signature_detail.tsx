@@ -25,9 +25,12 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import Histogram from 'components/visual/Histogram';
+import ResultsTable from 'components/visual/SearchResult/results';
 import SignatureStatus from 'components/visual/SignatureStatus';
+import 'moment/locale/fr';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import Moment from 'react-moment';
 import { Link, useHistory, useParams } from 'react-router-dom';
 
 export type Signature = {
@@ -52,6 +55,8 @@ type Statistics = {
   max: number;
   count: number;
   sum: number;
+  last_hit: string;
+  first_hit: string;
 };
 
 type ParamProps = {
@@ -90,12 +95,13 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetailProps) => {
-  const { t } = useTranslation(['manageSignatureDetail']);
+  const { t, i18n } = useTranslation(['manageSignatureDetail']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
   const [signature, setSignature] = useState<Signature>(null);
   const [stats, setStats] = useState<Statistics>(null);
   const [histogram, setHistogram] = useState<any>(null);
+  const [results, setResults] = useState<any>(null);
   const [open, setOpen] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
@@ -151,6 +157,13 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
             ]
           };
           setHistogram(chartData);
+        }
+      });
+      apiCall({
+        method: 'GET',
+        url: `/api/v4/search/result/?query=result.sections.tags.file.rule.${signature.type}:"${signature.source}.${signature.name}"&rows=10`,
+        onSuccess: api_data => {
+          setResults(api_data.api_response);
         }
       });
     }
@@ -245,7 +258,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
         </div>
       )}
       <div style={{ textAlign: 'left' }}>
-        <Grid container alignItems="center" spacing={4}>
+        <Grid container alignItems="center" spacing={3}>
           <Grid item xs>
             <Typography variant="h4">{t('title')}</Typography>
             <Typography variant="caption">
@@ -320,52 +333,86 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
             )}
           </Grid>
           <Grid item xs={12}>
-            <Typography variant="subtitle2">{t('section_stat_contrib')}</Typography>
-            <Grid container spacing={1}>
-              <Grid item xs={12} sm={3}>
-                <Typography variant="caption">{t('count')}</Typography>
+            <Typography variant="h6">{t('statistics')}</Typography>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Typography variant="subtitle1" style={{ fontWeight: 600, fontStyle: 'italic' }}>
+              {t('hits')}
+            </Typography>
+            <Grid container>
+              <Grid item xs={3} sm={4} md={3} lg={2}>
+                <span style={{ fontWeight: 500 }}>{t('hit.count')}</span>
+              </Grid>
+              <Grid item xs={9} sm={8} md={9} lg={10}>
+                {signature && (stats || signature.stats) ? stats ? stats.count : signature.stats.count : <Skeleton />}
+              </Grid>
+              <Grid item xs={3} sm={4} md={3} lg={2}>
+                <span style={{ fontWeight: 500 }}>{t('hit.first')}</span>
+              </Grid>
+              <Grid item xs={9} sm={8} md={9} lg={10}>
                 {signature && (stats || signature.stats) ? (
-                  <Paper component="pre" variant="outlined" className={classes.stats}>
-                    {stats ? stats.count : signature.stats.count}
-                  </Paper>
+                  signature.stats.first_hit ? (
+                    <Moment fromNow locale={i18n.language}>
+                      {stats ? stats.first_hit : signature.stats.first_hit}
+                    </Moment>
+                  ) : (
+                    t('hit.none')
+                  )
                 ) : (
-                  <Skeleton variant="rect" style={{ height: '28.px' }} />
+                  <Skeleton />
                 )}
               </Grid>
-              <Grid item xs={12} sm={3}>
-                <Typography variant="caption">{t('min')}</Typography>
+              <Grid item xs={3} sm={4} md={3} lg={2}>
+                <span style={{ fontWeight: 500 }}>{t('hit.last')}</span>
+              </Grid>
+              <Grid item xs={9} sm={8} md={9} lg={10}>
                 {signature && (stats || signature.stats) ? (
-                  <Paper component="pre" variant="outlined" className={classes.stats}>
-                    {stats ? stats.min || 0 : signature.stats.min || 0}
-                  </Paper>
+                  signature.stats.last_hit ? (
+                    <Moment fromNow locale={i18n.language}>
+                      {stats ? stats.last_hit : signature.stats.last_hit}
+                    </Moment>
+                  ) : (
+                    t('hit.none')
+                  )
                 ) : (
-                  <Skeleton variant="rect" style={{ height: '28.px' }} />
+                  <Skeleton />
                 )}
               </Grid>
-              <Grid item xs={12} sm={3}>
-                <Typography variant="caption">{t('avg')}</Typography>
-                {signature && (stats || signature.stats) ? (
-                  <Paper component="pre" variant="outlined" className={classes.stats}>
-                    {stats ? stats.avg || 0 : signature.stats.avg || 0}
-                  </Paper>
-                ) : (
-                  <Skeleton variant="rect" style={{ height: '28.px' }} />
-                )}
+            </Grid>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Typography variant="subtitle1" style={{ fontWeight: 600, fontStyle: 'italic' }}>
+              {t('contribution')}
+            </Typography>
+            <Grid container>
+              <Grid item xs={3} sm={4} md={3} lg={2}>
+                <span style={{ fontWeight: 500 }}>{t('score.min')}</span>
               </Grid>
-              <Grid item xs={12} sm={3}>
-                <Typography variant="caption">{t('max')}</Typography>
-                {signature && (stats || signature.stats) ? (
-                  <Paper component="pre" variant="outlined" className={classes.stats}>
-                    {stats ? stats.max || 0 : signature.stats.max || 0}
-                  </Paper>
-                ) : (
-                  <Skeleton variant="rect" style={{ height: '28.px' }} />
-                )}
+              <Grid item xs={9} sm={8} md={9} lg={10}>
+                {signature && (stats || signature.stats) ? stats ? stats.min : signature.stats.min : <Skeleton />}
+              </Grid>
+              <Grid item xs={3} sm={4} md={3} lg={2}>
+                <span style={{ fontWeight: 500 }}>{t('score.avg')}</span>
+              </Grid>
+              <Grid item xs={9} sm={8} md={9} lg={10}>
+                {signature && (stats || signature.stats) ? stats ? stats.avg : signature.stats.avg : <Skeleton />}
+              </Grid>
+              <Grid item xs={3} sm={4} md={3} lg={2}>
+                <span style={{ fontWeight: 500 }}>{t('score.max')}</span>
+              </Grid>
+              <Grid item xs={9} sm={8} md={9} lg={10}>
+                {signature && (stats || signature.stats) ? stats ? stats.max : signature.stats.max : <Skeleton />}
               </Grid>
             </Grid>
           </Grid>
           <Grid item xs={12}>
             <Histogram data={histogram} height={300} isDate title={t('chart.title')} />
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="h6">{t('last10')}</Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <ResultsTable resultResults={results} />
           </Grid>
         </Grid>
 
