@@ -33,7 +33,7 @@ const WrappedHistogram = ({ data, height, title, isDate }: HistogramProps) => {
         {
           ticks: {
             beginAtZero: true,
-            max,
+            suggestedMax: max,
             fontColor: theme.palette.text.secondary,
             precision: 0
           }
