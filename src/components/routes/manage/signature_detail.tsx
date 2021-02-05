@@ -397,7 +397,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
                 <span style={{ fontWeight: 500 }}>{t('score.avg')}</span>
               </Grid>
               <Grid item xs={9} sm={8} md={9} lg={10}>
-                {signature && stats ? stats.avg : <Skeleton />}
+                {signature && stats ? Number(stats.avg).toFixed(0) : <Skeleton />}
               </Grid>
               <Grid item xs={3} sm={4} md={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('score.max')}</span>
