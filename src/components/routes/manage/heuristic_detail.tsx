@@ -26,9 +26,10 @@ export type Heuristic = {
   signature_score_map: {
     [key: string]: number;
   };
+  stats: Statistics;
 };
 
-type ScoreStatistic = {
+type Statistics = {
   avg: number;
   min: number;
   max: number;
@@ -71,7 +72,7 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
   const [heuristic, setHeuristic] = useState<Heuristic>(null);
-  const [stats, setStats] = useState<ScoreStatistic>(null);
+  const [stats, setStats] = useState<Statistics>(null);
   const [histogram, setHistogram] = useState<any>(null);
   const apiCall = useMyAPI();
   const classes = useStyles();
@@ -84,39 +85,47 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
         setHeuristic(api_data.api_response);
       }
     });
-    apiCall({
-      method: 'POST',
-      url: '/api/v4/search/stats/result/result.score/',
-      body: { query: `result.sections.heuristic.heur_id:${heur_id || id}` },
-      onSuccess: api_data => {
-        setStats(api_data.api_response);
-      }
-    });
-    apiCall({
-      method: 'POST',
-      url: '/api/v4/search/histogram/result/created/',
-      body: {
-        query: `result.sections.heuristic.heur_id:${heur_id || id}`,
-        mincount: 0,
-        start: 'now-30d',
-        end: 'now',
-        gap: '+1d'
-      },
-      onSuccess: api_data => {
-        const chartData = {
-          labels: Object.keys(api_data.api_response).map((key: string) => key.replace('T00:00:00.000Z', '')),
-          datasets: [
-            {
-              label: heur_id || id,
-              data: Object.values(api_data.api_response)
-            }
-          ]
-        };
-        setHistogram(chartData);
-      }
-    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [heur_id, id]);
+
+  useEffect(() => {
+    if (heuristic) {
+      if (!heuristic.stats) {
+        apiCall({
+          method: 'POST',
+          url: '/api/v4/search/stats/result/result.score/',
+          body: { query: `result.sections.heuristic.heur_id:${heur_id || id}` },
+          onSuccess: api_data => {
+            setStats(api_data.api_response);
+          }
+        });
+      }
+      apiCall({
+        method: 'POST',
+        url: '/api/v4/search/histogram/result/created/',
+        body: {
+          query: `result.sections.heuristic.heur_id:${heur_id || id}`,
+          mincount: 0,
+          start: 'now-30d',
+          end: 'now',
+          gap: '+1d'
+        },
+        onSuccess: api_data => {
+          const chartData = {
+            labels: Object.keys(api_data.api_response).map((key: string) => key.replace('T00:00:00.000Z', '')),
+            datasets: [
+              {
+                label: heur_id || id,
+                data: Object.values(api_data.api_response)
+              }
+            ]
+          };
+          setHistogram(chartData);
+        }
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [heuristic]);
 
   return (
     <PageCenter margin={!id ? 2 : 4} width="100%">
@@ -241,9 +250,9 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
             <Grid container spacing={1}>
               <Grid item xs={12} sm={3}>
                 <Typography variant="caption">{t('count')}</Typography>
-                {stats ? (
+                {heuristic && (stats || heuristic.stats) ? (
                   <Paper component="pre" variant="outlined" className={classes.preview}>
-                    {stats.count}
+                    {stats ? stats.count : heuristic.stats.count}
                   </Paper>
                 ) : (
                   <Skeleton variant="rect" style={{ height: '28.px' }} />
@@ -251,9 +260,9 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
               </Grid>
               <Grid item xs={12} sm={3}>
                 <Typography variant="caption">{t('min')}</Typography>
-                {stats ? (
+                {heuristic && (stats || heuristic.stats) ? (
                   <Paper component="pre" variant="outlined" className={classes.preview}>
-                    {stats.min || 0}
+                    {stats ? stats.min || 0 : heuristic.stats.min || 0}
                   </Paper>
                 ) : (
                   <Skeleton variant="rect" style={{ height: '28.px' }} />
@@ -261,9 +270,9 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
               </Grid>
               <Grid item xs={12} sm={3}>
                 <Typography variant="caption">{t('avg')}</Typography>
-                {stats ? (
+                {heuristic && (stats || heuristic.stats) ? (
                   <Paper component="pre" variant="outlined" className={classes.preview}>
-                    {stats.avg || 0}
+                    {stats ? stats.avg || 0 : heuristic.stats.avg || 0}
                   </Paper>
                 ) : (
                   <Skeleton variant="rect" style={{ height: '28.px' }} />
@@ -271,9 +280,9 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
               </Grid>
               <Grid item xs={12} sm={3}>
                 <Typography variant="caption">{t('max')}</Typography>
-                {stats ? (
+                {heuristic && (stats || heuristic.stats) ? (
                   <Paper component="pre" variant="outlined" className={classes.preview}>
-                    {stats.max || 0}
+                    {stats ? stats.max || 0 : heuristic.stats.max || 0}
                   </Paper>
                 ) : (
                   <Skeleton variant="rect" style={{ height: '28.px' }} />
