@@ -41,11 +41,12 @@ export type Signature = {
   source: string;
   state_change_data: string;
   state_change_user: string;
+  stats: Statistics;
   status: 'DEPLOYED' | 'NOISY' | 'DISABLED';
   type: string;
 };
 
-type ScoreStatistic = {
+type Statistics = {
   avg: number;
   min: number;
   max: number;
@@ -93,7 +94,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
   const [signature, setSignature] = useState<Signature>(null);
-  const [stats, setStats] = useState<ScoreStatistic>(null);
+  const [stats, setStats] = useState<Statistics>(null);
   const [histogram, setHistogram] = useState<any>(null);
   const [open, setOpen] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState(false);
@@ -119,14 +120,16 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
 
   useEffect(() => {
     if (signature) {
-      apiCall({
-        method: 'POST',
-        url: '/api/v4/search/stats/result/result.score/',
-        body: { query: `result.sections.tags.file.rule.${signature.type}:"${signature.source}.${signature.name}"` },
-        onSuccess: api_data => {
-          setStats(api_data.api_response);
-        }
-      });
+      if (!signature.stats) {
+        apiCall({
+          method: 'POST',
+          url: '/api/v4/search/stats/result/result.score/',
+          body: { query: `result.sections.tags.file.rule.${signature.type}:"${signature.source}.${signature.name}"` },
+          onSuccess: api_data => {
+            setStats(api_data.api_response);
+          }
+        });
+      }
       apiCall({
         method: 'POST',
         url: '/api/v4/search/histogram/result/created/',
@@ -321,9 +324,9 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
             <Grid container spacing={1}>
               <Grid item xs={12} sm={3}>
                 <Typography variant="caption">{t('count')}</Typography>
-                {stats ? (
+                {signature && (stats || signature.stats) ? (
                   <Paper component="pre" variant="outlined" className={classes.stats}>
-                    {stats.count}
+                    {stats ? stats.count : signature.stats.count}
                   </Paper>
                 ) : (
                   <Skeleton variant="rect" style={{ height: '28.px' }} />
@@ -331,9 +334,9 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
               </Grid>
               <Grid item xs={12} sm={3}>
                 <Typography variant="caption">{t('min')}</Typography>
-                {stats ? (
+                {signature && (stats || signature.stats) ? (
                   <Paper component="pre" variant="outlined" className={classes.stats}>
-                    {stats.min || 0}
+                    {stats ? stats.min || 0 : signature.stats.min || 0}
                   </Paper>
                 ) : (
                   <Skeleton variant="rect" style={{ height: '28.px' }} />
@@ -341,9 +344,9 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
               </Grid>
               <Grid item xs={12} sm={3}>
                 <Typography variant="caption">{t('avg')}</Typography>
-                {stats ? (
+                {signature && (stats || signature.stats) ? (
                   <Paper component="pre" variant="outlined" className={classes.stats}>
-                    {stats.avg || 0}
+                    {stats ? stats.avg || 0 : signature.stats.avg || 0}
                   </Paper>
                 ) : (
                   <Skeleton variant="rect" style={{ height: '28.px' }} />
@@ -351,9 +354,9 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
               </Grid>
               <Grid item xs={12} sm={3}>
                 <Typography variant="caption">{t('max')}</Typography>
-                {stats ? (
+                {signature && (stats || signature.stats) ? (
                   <Paper component="pre" variant="outlined" className={classes.stats}>
-                    {stats.max || 0}
+                    {stats ? stats.max || 0 : signature.stats.max || 0}
                   </Paper>
                 ) : (
                   <Skeleton variant="rect" style={{ height: '28.px' }} />
