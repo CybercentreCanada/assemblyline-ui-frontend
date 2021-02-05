@@ -9,10 +9,14 @@ const SMWidth = '100%';
 
 const useStyles = makeStyles(theme => ({
   appMain: {
+    '@media print': {
+      overflow: 'unset !important'
+    },
     height: '100%',
     display: 'flex',
     flexDirection: 'row',
-    position: 'relative'
+    position: 'relative',
+    overflowX: 'hidden'
   },
   appContent: {
     '@media print': {
@@ -22,7 +26,8 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column',
     position: 'relative',
     flex: 1,
-    height: '100%'
+    height: '100%',
+    overflowX: 'hidden'
   },
   appRightDrawer: {
     '@media print': {
