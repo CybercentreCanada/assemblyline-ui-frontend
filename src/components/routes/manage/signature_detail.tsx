@@ -135,6 +135,8 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
             setStats(api_data.api_response);
           }
         });
+      } else {
+        setStats(signature.stats);
       }
       apiCall({
         method: 'POST',
@@ -142,8 +144,8 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
         body: {
           query: `result.sections.tags.file.rule.${signature.type}:"${signature.source}.${signature.name}"`,
           mincount: 0,
-          start: 'now-30d',
-          end: 'now',
+          start: 'now-30d/d',
+          end: 'now+1d/d-1s',
           gap: '+1d'
         },
         onSuccess: api_data => {
@@ -344,16 +346,16 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
                 <span style={{ fontWeight: 500 }}>{t('hit.count')}</span>
               </Grid>
               <Grid item xs={9} sm={8} md={9} lg={10}>
-                {signature && (stats || signature.stats) ? stats ? stats.count : signature.stats.count : <Skeleton />}
+                {signature && stats ? stats.count : <Skeleton />}
               </Grid>
               <Grid item xs={3} sm={4} md={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('hit.first')}</span>
               </Grid>
               <Grid item xs={9} sm={8} md={9} lg={10}>
-                {signature && (stats || signature.stats) ? (
-                  signature.stats.first_hit ? (
+                {signature && stats ? (
+                  stats.first_hit ? (
                     <Moment fromNow locale={i18n.language}>
-                      {stats ? stats.first_hit : signature.stats.first_hit}
+                      {stats.first_hit}
                     </Moment>
                   ) : (
                     t('hit.none')
@@ -366,10 +368,10 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
                 <span style={{ fontWeight: 500 }}>{t('hit.last')}</span>
               </Grid>
               <Grid item xs={9} sm={8} md={9} lg={10}>
-                {signature && (stats || signature.stats) ? (
-                  signature.stats.last_hit ? (
+                {signature && stats ? (
+                  stats.last_hit ? (
                     <Moment fromNow locale={i18n.language}>
-                      {stats ? stats.last_hit : signature.stats.last_hit}
+                      {stats.last_hit}
                     </Moment>
                   ) : (
                     t('hit.none')
@@ -389,19 +391,19 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
                 <span style={{ fontWeight: 500 }}>{t('score.min')}</span>
               </Grid>
               <Grid item xs={9} sm={8} md={9} lg={10}>
-                {signature && (stats || signature.stats) ? stats ? stats.min : signature.stats.min : <Skeleton />}
+                {signature && stats ? stats.min : <Skeleton />}
               </Grid>
               <Grid item xs={3} sm={4} md={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('score.avg')}</span>
               </Grid>
               <Grid item xs={9} sm={8} md={9} lg={10}>
-                {signature && (stats || signature.stats) ? stats ? stats.avg : signature.stats.avg : <Skeleton />}
+                {signature && stats ? stats.avg : <Skeleton />}
               </Grid>
               <Grid item xs={3} sm={4} md={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('score.max')}</span>
               </Grid>
               <Grid item xs={9} sm={8} md={9} lg={10}>
-                {signature && (stats || signature.stats) ? stats ? stats.max : signature.stats.max : <Skeleton />}
+                {signature && stats ? stats.max : <Skeleton />}
               </Grid>
             </Grid>
           </Grid>
