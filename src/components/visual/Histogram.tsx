@@ -1,7 +1,7 @@
 import { useTheme } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
 import React, { useEffect, useState } from 'react';
-import { Line } from 'react-chartjs-3';
+import { Line } from 'react-chartjs-2';
 
 type HistogramProps = {
   data: {
