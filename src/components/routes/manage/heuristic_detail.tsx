@@ -105,6 +105,8 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
             setStats(api_data.api_response);
           }
         });
+      } else {
+        setStats(heuristic.stats);
       }
       apiCall({
         method: 'POST',
@@ -112,8 +114,8 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
         body: {
           query: `result.sections.heuristic.heur_id:${heur_id || id}`,
           mincount: 0,
-          start: 'now-30d',
-          end: 'now',
+          start: 'now-30d/d',
+          end: 'now+1d/d-1s',
           gap: '+1d'
         },
         onSuccess: api_data => {
@@ -270,16 +272,16 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
                 <span style={{ fontWeight: 500 }}>{t('hit.count')}</span>
               </Grid>
               <Grid item xs={9} sm={8} md={9} lg={10}>
-                {heuristic && (stats || heuristic.stats) ? stats ? stats.count : heuristic.stats.count : <Skeleton />}
+                {heuristic && stats ? stats.count : <Skeleton />}
               </Grid>
               <Grid item xs={3} sm={4} md={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('hit.first')}</span>
               </Grid>
               <Grid item xs={9} sm={8} md={9} lg={10}>
-                {heuristic && (stats || heuristic.stats) ? (
-                  heuristic.stats.first_hit ? (
+                {heuristic && stats ? (
+                  stats.first_hit ? (
                     <Moment fromNow locale={i18n.language}>
-                      {stats ? stats.first_hit : heuristic.stats.first_hit}
+                      {stats.first_hit}
                     </Moment>
                   ) : (
                     t('hit.none')
@@ -292,10 +294,10 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
                 <span style={{ fontWeight: 500 }}>{t('hit.last')}</span>
               </Grid>
               <Grid item xs={9} sm={8} md={9} lg={10}>
-                {heuristic && (stats || heuristic.stats) ? (
-                  heuristic.stats.last_hit ? (
+                {heuristic && stats ? (
+                  stats.last_hit ? (
                     <Moment fromNow locale={i18n.language}>
-                      {stats ? stats.last_hit : heuristic.stats.last_hit}
+                      {stats.last_hit}
                     </Moment>
                   ) : (
                     t('hit.none')
@@ -315,19 +317,19 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
                 <span style={{ fontWeight: 500 }}>{t('score.min')}</span>
               </Grid>
               <Grid item xs={9} sm={8} md={9} lg={10}>
-                {heuristic && (stats || heuristic.stats) ? stats ? stats.min : heuristic.stats.min : <Skeleton />}
+                {heuristic && stats ? stats.min : <Skeleton />}
               </Grid>
               <Grid item xs={3} sm={4} md={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('score.avg')}</span>
               </Grid>
               <Grid item xs={9} sm={8} md={9} lg={10}>
-                {heuristic && (stats || heuristic.stats) ? stats ? stats.avg : heuristic.stats.avg : <Skeleton />}
+                {heuristic && stats ? stats.avg : <Skeleton />}
               </Grid>
               <Grid item xs={3} sm={4} md={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('score.max')}</span>
               </Grid>
               <Grid item xs={9} sm={8} md={9} lg={10}>
-                {heuristic && (stats || heuristic.stats) ? stats ? stats.max : heuristic.stats.max : <Skeleton />}
+                {heuristic && stats ? stats.max : <Skeleton />}
               </Grid>
             </Grid>
           </Grid>
