@@ -32,7 +32,7 @@ export type Heuristic = {
   stats: Statistics;
 };
 
-type Statistics = {
+export type Statistics = {
   avg: number;
   min: number;
   max: number;

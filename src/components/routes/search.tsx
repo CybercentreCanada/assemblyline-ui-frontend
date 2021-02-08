@@ -317,7 +317,9 @@ function Search({ index }: SearchProps) {
         )}
         {tab === 'file' && query && query.get('query') && <FilesTable fileResults={fileResults} />}
         {tab === 'result' && query && query.get('query') && <ResultsTable resultResults={resultResults} />}
-        {tab === 'signature' && query && query.get('query') && <SignaturesTable signatureResults={signatureResults} />}
+        {tab === 'signature' && query && query.get('query') && (
+          <SignaturesTable signatureResults={signatureResults} allowSort={!!(index || id)} />
+        )}
         {tab === 'alert' && query && query.get('query') && <AlertsTable alertResults={alertResults} />}
       </div>
     </PageFullWidth>

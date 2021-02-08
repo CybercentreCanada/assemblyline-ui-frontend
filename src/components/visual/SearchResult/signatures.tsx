@@ -2,12 +2,22 @@ import Paper from '@material-ui/core/Paper';
 import TableContainer from '@material-ui/core/TableContainer';
 import { AlertTitle, Skeleton } from '@material-ui/lab';
 import useALContext from 'components/hooks/useALContext';
+import { Statistics } from 'components/routes/manage/signature_detail';
 import Classification from 'components/visual/Classification';
 import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
-import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from '../DivTable';
+import {
+  DivTable,
+  DivTableBody,
+  DivTableCell,
+  DivTableHead,
+  DivTableRow,
+  LinkRow,
+  SortableHeaderCell
+} from '../DivTable';
 import InformativeAlert from '../InformativeAlert';
 import SignatureStatus from '../SignatureStatus';
 
@@ -19,6 +29,7 @@ export type SignatureResult = {
   revision: string;
   signature_id: string;
   source: string;
+  stats: Statistics;
   status: 'DEPLOYED' | 'NOISY' | 'DISABLED';
   type: string;
 };
@@ -31,10 +42,15 @@ type SearchResults = {
 type SignaturesTableProps = {
   signatureResults: SearchResults;
   setSignatureID?: (id: string) => void;
+  allowSort?: boolean;
 };
 
-const WrappedSignaturesTable: React.FC<SignaturesTableProps> = ({ signatureResults, setSignatureID = null }) => {
-  const { t } = useTranslation(['search']);
+const WrappedSignaturesTable: React.FC<SignaturesTableProps> = ({
+  signatureResults,
+  setSignatureID = null,
+  allowSort = true
+}) => {
+  const { t, i18n } = useTranslation(['search']);
   const { c12nDef } = useALContext();
 
   return signatureResults ? (
@@ -43,13 +59,35 @@ const WrappedSignaturesTable: React.FC<SignaturesTableProps> = ({ signatureResul
         <DivTable>
           <DivTableHead>
             <DivTableRow>
-              <DivTableCell>{t('header.type')}</DivTableCell>
-              <DivTableCell>{t('header.source')}</DivTableCell>
-              <DivTableCell>{t('header.id')}</DivTableCell>
-              <DivTableCell>{t('header.name')}</DivTableCell>
-              <DivTableCell>{t('header.rev')}</DivTableCell>
-              {c12nDef.enforce && <DivTableCell>{t('header.classification')}</DivTableCell>}
-              <DivTableCell>{t('header.status')}</DivTableCell>
+              <SortableHeaderCell sortField="type" allowSort={allowSort}>
+                {t('header.type')}
+              </SortableHeaderCell>
+              <SortableHeaderCell sortField="source" allowSort={allowSort}>
+                {t('header.source')}
+              </SortableHeaderCell>
+              <SortableHeaderCell sortField="signature_id" allowSort={allowSort}>
+                {t('header.id')}
+              </SortableHeaderCell>
+              <SortableHeaderCell sortField="name" allowSort={allowSort}>
+                {t('header.name')}
+              </SortableHeaderCell>
+              <SortableHeaderCell sortField="revision" allowSort={allowSort}>
+                {t('header.rev')}
+              </SortableHeaderCell>
+              <SortableHeaderCell sortField="stats.count" allowSort={allowSort}>
+                {t('header.hit_count')}
+              </SortableHeaderCell>
+              <SortableHeaderCell sortField="stats.last_hit" allowSort={allowSort}>
+                {t('header.last_hit')}
+              </SortableHeaderCell>
+              {c12nDef.enforce && (
+                <SortableHeaderCell sortField="classification" allowSort={allowSort}>
+                  {t('header.classification')}
+                </SortableHeaderCell>
+              )}
+              <SortableHeaderCell sortField="status" allowSort={allowSort}>
+                {t('header.status')}
+              </SortableHeaderCell>
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
@@ -71,6 +109,16 @@ const WrappedSignaturesTable: React.FC<SignaturesTableProps> = ({ signatureResul
                 <DivTableCell>{signature.signature_id}</DivTableCell>
                 <DivTableCell>{signature.name}</DivTableCell>
                 <DivTableCell>{signature.revision}</DivTableCell>
+                <DivTableCell>{signature.stats ? signature.stats.count || 0 : 0}</DivTableCell>
+                <DivTableCell>
+                  {signature.stats && signature.stats.last_hit ? (
+                    <Moment fromNow locale={i18n.language}>
+                      {signature.stats.last_hit}
+                    </Moment>
+                  ) : (
+                    t('never')
+                  )}
+                </DivTableCell>
                 {c12nDef.enforce && (
                   <DivTableCell>
                     <Classification type="text" size="tiny" c12n={signature.classification} format="short" />
