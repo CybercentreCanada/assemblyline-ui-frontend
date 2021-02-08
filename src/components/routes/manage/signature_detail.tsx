@@ -49,7 +49,7 @@ export type Signature = {
   type: string;
 };
 
-type Statistics = {
+export type Statistics = {
   avg: number;
   min: number;
   max: number;
