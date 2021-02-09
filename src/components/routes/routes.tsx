@@ -39,9 +39,6 @@ import HeuristicDetail from './manage/heuristic_detail';
 import SignatureDetail from './manage/signature_detail';
 import WorkflowDetail from './manage/workflow_detail';
 import Optout from './optout';
-import Statistics from './statistics';
-import StatisticsHeuristics from './statistics/heuristics';
-import StatisticsSignatures from './statistics/signatures';
 
 const APP_NAME = 'AL4';
 
@@ -106,9 +103,6 @@ const WrappedRoutes = () => {
         <Route exact path="/manage/workflow/:id" component={WorkflowDetail} />
         <Route exact path="/manage/workflows" component={ManageWorkflows} />
         <Route exact path="/manage" component={Manage} />
-        <Route exact path="/stats/heuristics" component={StatisticsHeuristics} />
-        <Route exact path="/stats/signatures" component={StatisticsSignatures} />
-        <Route exact path="/stats" component={Statistics} />
         <Route exact path="/optout" component={Optout} />
         <Route exact path="/search" component={Search} />
         <Route exact path="/search/:id" component={Search} />

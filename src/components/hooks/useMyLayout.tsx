@@ -7,7 +7,6 @@ import BuildOutlinedIcon from '@material-ui/icons/BuildOutlined';
 import CancelPresentationIcon from '@material-ui/icons/CancelPresentation';
 import CodeOutlinedIcon from '@material-ui/icons/CodeOutlined';
 import DashboardOutlinedIcon from '@material-ui/icons/DashboardOutlined';
-import EqualizerOutlinedIcon from '@material-ui/icons/EqualizerOutlined';
 import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import FingerprintOutlinedIcon from '@material-ui/icons/FingerprintOutlined';
@@ -119,30 +118,6 @@ const useMyLayout = (): AppLayoutProps => {
         icon: <DashboardOutlinedIcon />,
         route: '/dashboard',
         nested: false
-      }
-    },
-    {
-      type: 'group' as 'group',
-      element: {
-        id: 'stats',
-        title: t('drawer.stats'),
-        icon: <EqualizerOutlinedIcon />,
-        items: [
-          {
-            id: 'stats.heuristics',
-            text: t('drawer.stats.heuristics'),
-            icon: <SimCardOutlinedIcon />,
-            route: '/stats/heuristics',
-            nested: true
-          },
-          {
-            id: 'stats.signatures',
-            text: t('drawer.stats.signatures'),
-            icon: <FingerprintOutlinedIcon />,
-            route: '/stats/signatures',
-            nested: true
-          }
-        ]
       }
     },
     {

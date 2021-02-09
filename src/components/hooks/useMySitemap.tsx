@@ -10,7 +10,6 @@ import ChromeReaderModeOutlinedIcon from '@material-ui/icons/ChromeReaderModeOut
 import CodeOutlinedIcon from '@material-ui/icons/CodeOutlined';
 import DashboardOutlinedIcon from '@material-ui/icons/DashboardOutlined';
 import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
-import EqualizerOutlinedIcon from '@material-ui/icons/EqualizerOutlined';
 import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
 import FingerprintOutlinedIcon from '@material-ui/icons/FingerprintOutlined';
 import HelpOutlineOutlinedIcon from '@material-ui/icons/HelpOutlineOutlined';
@@ -137,20 +136,6 @@ export default function useMySitemap() {
         title: t('drawer.manage.workflow'),
         icon: <BiNetworkChart />,
         breadcrumbs: ['/manage']
-      },
-
-      { path: '/stats', title: t('drawer.stats'), isRoot: true, icon: <EqualizerOutlinedIcon /> },
-      {
-        path: '/stats/heuristics',
-        title: t('drawer.stats.heuristics'),
-        icon: <SimCardOutlinedIcon />,
-        breadcrumbs: ['/stats']
-      },
-      {
-        path: '/stats/signatures',
-        title: t('drawer.stats.signatures'),
-        icon: <FingerprintOutlinedIcon />,
-        breadcrumbs: ['/stats']
       },
       { path: '/search', title: t('drawer.search'), isRoot: true, icon: <SearchIcon /> },
       { path: '/search/alert', title: t('drawer.search.alert'), breadcrumbs: ['/search'] },
