@@ -5,7 +5,14 @@ import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
 import PanToolOutlinedIcon from '@material-ui/icons/PanToolOutlined';
 import ReportProblemOutlinedIcon from '@material-ui/icons/ReportProblemOutlined';
 import { AlertTitle, Skeleton } from '@material-ui/lab';
-import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow } from 'components/visual/DivTable';
+import {
+  DivTable,
+  DivTableBody,
+  DivTableCell,
+  DivTableHead,
+  DivTableRow,
+  SortableHeaderCell
+} from 'components/visual/DivTable';
 import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -60,10 +67,10 @@ const WrappedErrorsTable: React.FC<ErrorsTableProps> = ({ errorResults, onClick 
         <DivTable size="small">
           <DivTableHead>
             <DivTableRow style={{ whiteSpace: 'nowrap' }}>
-              <DivTableCell>{t('header.time')}</DivTableCell>
-              <DivTableCell>{t('header.service')}</DivTableCell>
+              <SortableHeaderCell sortField="created">{t('header.time')}</SortableHeaderCell>
+              <SortableHeaderCell sortField="response.service_name">{t('header.service')}</SortableHeaderCell>
               <DivTableCell>{t('header.message')}</DivTableCell>
-              <DivTableCell>{t('header.type')}</DivTableCell>
+              <SortableHeaderCell sortField="type">{t('header.type')}</SortableHeaderCell>
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>

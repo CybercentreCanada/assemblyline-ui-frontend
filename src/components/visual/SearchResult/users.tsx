@@ -5,7 +5,15 @@ import DoneIcon from '@material-ui/icons/Done';
 import { AlertTitle, Skeleton } from '@material-ui/lab';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
-import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from 'components/visual/DivTable';
+import {
+  DivTable,
+  DivTableBody,
+  DivTableCell,
+  DivTableHead,
+  DivTableRow,
+  LinkRow,
+  SortableHeaderCell
+} from 'components/visual/DivTable';
 import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -43,12 +51,14 @@ const WrappedUsersTable: React.FC<UsersTableProps> = ({ userResults }) => {
         <DivTable size="small">
           <DivTableHead>
             <DivTableRow style={{ whiteSpace: 'nowrap' }}>
-              <DivTableCell>{t('header.uid')}</DivTableCell>
-              <DivTableCell>{t('header.fullname')}</DivTableCell>
-              <DivTableCell>{t('header.groups')}</DivTableCell>
-              {c12nDef.enforce && <DivTableCell>{t('header.classification')}</DivTableCell>}
-              <DivTableCell>{t('header.active')}</DivTableCell>
-              <DivTableCell>{t('header.admin')}</DivTableCell>
+              <SortableHeaderCell sortField="uname">{t('header.uid')}</SortableHeaderCell>
+              <SortableHeaderCell sortField="name">{t('header.fullname')}</SortableHeaderCell>
+              <SortableHeaderCell sortField="groups">{t('header.groups')}</SortableHeaderCell>
+              {c12nDef.enforce && (
+                <SortableHeaderCell sortField="classification">{t('header.classification')}</SortableHeaderCell>
+              )}
+              <SortableHeaderCell sortField="is_active">{t('header.active')}</SortableHeaderCell>
+              <SortableHeaderCell sortField="type">{t('header.admin')}</SortableHeaderCell>
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>

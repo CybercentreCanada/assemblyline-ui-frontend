@@ -313,14 +313,20 @@ function Search({ index }: SearchProps) {
       </PageHeader>
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         {tab === 'submission' && query && query.get('query') && (
-          <SubmissionsTable submissionResults={submissionResults} />
+          <SubmissionsTable submissionResults={submissionResults} allowSort={!!(index || id)} />
         )}
-        {tab === 'file' && query && query.get('query') && <FilesTable fileResults={fileResults} />}
-        {tab === 'result' && query && query.get('query') && <ResultsTable resultResults={resultResults} />}
+        {tab === 'file' && query && query.get('query') && (
+          <FilesTable fileResults={fileResults} allowSort={!!(index || id)} />
+        )}
+        {tab === 'result' && query && query.get('query') && (
+          <ResultsTable resultResults={resultResults} allowSort={!!(index || id)} />
+        )}
         {tab === 'signature' && query && query.get('query') && (
           <SignaturesTable signatureResults={signatureResults} allowSort={!!(index || id)} />
         )}
-        {tab === 'alert' && query && query.get('query') && <AlertsTable alertResults={alertResults} />}
+        {tab === 'alert' && query && query.get('query') && (
+          <AlertsTable alertResults={alertResults} allowSort={!!(index || id)} />
+        )}
       </div>
     </PageFullWidth>
   );
