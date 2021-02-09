@@ -34,7 +34,7 @@ export const DivTableCell = ({ children, ...other }) => {
   );
 };
 
-export const SortableHeaderCell = ({ children, sortField, allowSort, ...other }) => {
+export const SortableHeaderCell = ({ children, sortField, allowSort = true, ...other }) => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const curSort = searchParams.get('sort');
