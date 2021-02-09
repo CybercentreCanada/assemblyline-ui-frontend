@@ -65,14 +65,8 @@ const WrappedSignaturesTable: React.FC<SignaturesTableProps> = ({
               <SortableHeaderCell sortField="source" allowSort={allowSort}>
                 {t('header.source')}
               </SortableHeaderCell>
-              <SortableHeaderCell sortField="signature_id" allowSort={allowSort}>
-                {t('header.id')}
-              </SortableHeaderCell>
               <SortableHeaderCell sortField="name" allowSort={allowSort}>
                 {t('header.name')}
-              </SortableHeaderCell>
-              <SortableHeaderCell sortField="revision" allowSort={allowSort}>
-                {t('header.rev')}
               </SortableHeaderCell>
               <SortableHeaderCell sortField="stats.count" allowSort={allowSort}>
                 {t('header.hit_count')}
@@ -106,9 +100,7 @@ const WrappedSignaturesTable: React.FC<SignaturesTableProps> = ({
               >
                 <DivTableCell>{signature.type}</DivTableCell>
                 <DivTableCell>{signature.source}</DivTableCell>
-                <DivTableCell>{signature.signature_id}</DivTableCell>
                 <DivTableCell>{signature.name}</DivTableCell>
-                <DivTableCell>{signature.revision}</DivTableCell>
                 <DivTableCell>{signature.stats ? signature.stats.count || 0 : 0}</DivTableCell>
                 <DivTableCell>
                   {signature.stats && signature.stats.last_hit ? (
