@@ -340,7 +340,7 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
             <Typography variant="h6">{t('last10')}</Typography>
           </Grid>
           <Grid item xs={12}>
-            <ResultsTable resultResults={results} />
+            <ResultsTable resultResults={results} allowSort={false} />
           </Grid>
         </Grid>
       </div>
