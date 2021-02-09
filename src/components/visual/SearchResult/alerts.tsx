@@ -10,7 +10,15 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
-import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from '../DivTable';
+import {
+  DivTable,
+  DivTableBody,
+  DivTableCell,
+  DivTableHead,
+  DivTableRow,
+  LinkRow,
+  SortableHeaderCell
+} from '../DivTable';
 import InformativeAlert from '../InformativeAlert';
 
 export type AlertResult = {
@@ -44,9 +52,10 @@ type SearchResults = {
 
 type AlertsTableProps = {
   alertResults: SearchResults;
+  allowSort?: boolean;
 };
 
-const WrappedAlertsTable: React.FC<AlertsTableProps> = ({ alertResults }) => {
+const WrappedAlertsTable: React.FC<AlertsTableProps> = ({ alertResults, allowSort = true }) => {
   const { t, i18n } = useTranslation(['search']);
   const { c12nDef } = useALContext();
 
@@ -56,12 +65,26 @@ const WrappedAlertsTable: React.FC<AlertsTableProps> = ({ alertResults }) => {
         <DivTable>
           <DivTableHead>
             <DivTableRow>
-              <DivTableCell>{t('header.reporting_ts')}</DivTableCell>
-              <DivTableCell>{t('header.verdict')}</DivTableCell>
-              <DivTableCell>{t('header.sha256')}</DivTableCell>
-              <DivTableCell>{t('header.status')}</DivTableCell>
-              <DivTableCell>{t('header.type')}</DivTableCell>
-              {c12nDef.enforce && <DivTableCell>{t('header.classification')}</DivTableCell>}
+              <SortableHeaderCell sortField="reporting_ts" allowSort={allowSort}>
+                {t('header.reporting_ts')}
+              </SortableHeaderCell>
+              <SortableHeaderCell sortField="al.score" allowSort={allowSort}>
+                {t('header.verdict')}
+              </SortableHeaderCell>
+              <SortableHeaderCell sortField="file.sha256" allowSort={allowSort}>
+                {t('header.sha256')}
+              </SortableHeaderCell>
+              <SortableHeaderCell sortField="status" allowSort={allowSort}>
+                {t('header.status')}
+              </SortableHeaderCell>
+              <SortableHeaderCell sortField="type" allowSort={allowSort}>
+                {t('header.type')}
+              </SortableHeaderCell>
+              {c12nDef.enforce && (
+                <SortableHeaderCell sortField="classification" allowSort={allowSort}>
+                  {t('header.classification')}
+                </SortableHeaderCell>
+              )}
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>

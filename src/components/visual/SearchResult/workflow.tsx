@@ -8,7 +8,15 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
-import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from '../DivTable';
+import {
+  DivTable,
+  DivTableBody,
+  DivTableCell,
+  DivTableHead,
+  DivTableRow,
+  LinkRow,
+  SortableHeaderCell
+} from '../DivTable';
 import InformativeAlert from '../InformativeAlert';
 
 export type WorkflowResult = {
@@ -49,13 +57,15 @@ const WrappedWorflowTable: React.FC<WorkflowTableProps> = ({ workflowResults, se
         <DivTable>
           <DivTableHead>
             <DivTableRow>
-              <DivTableCell>{t('header.created')}</DivTableCell>
-              <DivTableCell>{t('header.lasttimeseen')}</DivTableCell>
-              <DivTableCell>{t('header.name')}</DivTableCell>
-              <DivTableCell>{t('header.priority')}</DivTableCell>
-              <DivTableCell>{t('header.status')}</DivTableCell>
-              <DivTableCell>{t('header.hit_count')}</DivTableCell>
-              {c12nDef.enforce && <DivTableCell>{t('header.classification')}</DivTableCell>}
+              <SortableHeaderCell sortField="creation_date">{t('header.created')}</SortableHeaderCell>
+              <SortableHeaderCell sortField="last_seen">{t('header.lasttimeseen')}</SortableHeaderCell>
+              <SortableHeaderCell sortField="name">{t('header.name')}</SortableHeaderCell>
+              <SortableHeaderCell sortField="priority">{t('header.priority')}</SortableHeaderCell>
+              <SortableHeaderCell sortField="status">{t('header.status')}</SortableHeaderCell>
+              <SortableHeaderCell sortField="hit_count">{t('header.hit_count')}</SortableHeaderCell>
+              {c12nDef.enforce && (
+                <SortableHeaderCell sortField="classification">{t('header.classification')}</SortableHeaderCell>
+              )}
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>

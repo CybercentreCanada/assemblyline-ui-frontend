@@ -9,7 +9,15 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
-import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from '../DivTable';
+import {
+  DivTable,
+  DivTableBody,
+  DivTableCell,
+  DivTableHead,
+  DivTableRow,
+  LinkRow,
+  SortableHeaderCell
+} from '../DivTable';
 import InformativeAlert from '../InformativeAlert';
 
 export type FileResult = {
@@ -35,9 +43,10 @@ type SearchResults = {
 
 type FilesTableProps = {
   fileResults: SearchResults;
+  allowSort?: boolean;
 };
 
-const WrappedFilesTable: React.FC<FilesTableProps> = ({ fileResults }) => {
+const WrappedFilesTable: React.FC<FilesTableProps> = ({ fileResults, allowSort = true }) => {
   const { t, i18n } = useTranslation(['search']);
   const { c12nDef } = useALContext();
 
@@ -47,12 +56,26 @@ const WrappedFilesTable: React.FC<FilesTableProps> = ({ fileResults }) => {
         <DivTable>
           <DivTableHead>
             <DivTableRow>
-              <DivTableCell>{t('header.lasttimeseen')}</DivTableCell>
-              <DivTableCell>{t('header.count')}</DivTableCell>
-              <DivTableCell>{t('header.sha256')}</DivTableCell>
-              <DivTableCell>{t('header.filetype')}</DivTableCell>
-              <DivTableCell>{t('header.size')}</DivTableCell>
-              {c12nDef.enforce && <DivTableCell>{t('header.classification')}</DivTableCell>}
+              <SortableHeaderCell sortField="seen.last" allowSort={allowSort}>
+                {t('header.lasttimeseen')}
+              </SortableHeaderCell>
+              <SortableHeaderCell sortField="seen.count" allowSort={allowSort}>
+                {t('header.count')}
+              </SortableHeaderCell>
+              <SortableHeaderCell sortField="sha256" allowSort={allowSort}>
+                {t('header.sha256')}
+              </SortableHeaderCell>
+              <SortableHeaderCell sortField="type" allowSort={allowSort}>
+                {t('header.filetype')}
+              </SortableHeaderCell>
+              <SortableHeaderCell sortField="size" allowSort={allowSort}>
+                {t('header.size')}
+              </SortableHeaderCell>
+              {c12nDef.enforce && (
+                <SortableHeaderCell sortField="classification" allowSort={allowSort}>
+                  {t('header.classification')}
+                </SortableHeaderCell>
+              )}
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>

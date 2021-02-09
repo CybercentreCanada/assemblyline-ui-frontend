@@ -11,7 +11,15 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
-import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from '../DivTable';
+import {
+  DivTable,
+  DivTableBody,
+  DivTableCell,
+  DivTableHead,
+  DivTableRow,
+  LinkRow,
+  SortableHeaderCell
+} from '../DivTable';
 import InformativeAlert from '../InformativeAlert';
 
 export type SubmissionResult = {
@@ -38,9 +46,10 @@ type SearchResults = {
 
 type SubmissionsTableProps = {
   submissionResults: SearchResults;
+  allowSort?: boolean;
 };
 
-const WrappedSubmissionsTable: React.FC<SubmissionsTableProps> = ({ submissionResults }) => {
+const WrappedSubmissionsTable: React.FC<SubmissionsTableProps> = ({ submissionResults, allowSort = true }) => {
   const { t, i18n } = useTranslation(['search']);
   const { c12nDef } = useALContext();
 
@@ -50,13 +59,27 @@ const WrappedSubmissionsTable: React.FC<SubmissionsTableProps> = ({ submissionRe
         <DivTable>
           <DivTableHead>
             <DivTableRow>
-              <DivTableCell>{t('header.starttime')}</DivTableCell>
-              <DivTableCell>{t('header.verdict')}</DivTableCell>
+              <SortableHeaderCell sortField="times.submitted" allowSort={allowSort}>
+                {t('header.starttime')}
+              </SortableHeaderCell>
+              <SortableHeaderCell sortField="max_score" allowSort={allowSort}>
+                {t('header.verdict')}
+              </SortableHeaderCell>
               <DivTableCell>{t('header.description')}</DivTableCell>
-              <DivTableCell>{t('header.user')}</DivTableCell>
-              <DivTableCell>{t('header.numfiles')}</DivTableCell>
-              {c12nDef && c12nDef.enforce && <DivTableCell>{t('header.classification')}</DivTableCell>}
-              <DivTableCell>{t('header.status')}</DivTableCell>
+              <SortableHeaderCell sortField="params.submitter" allowSort={allowSort}>
+                {t('header.user')}
+              </SortableHeaderCell>
+              <SortableHeaderCell sortField="file_count" allowSort={allowSort}>
+                {t('header.numfiles')}
+              </SortableHeaderCell>
+              {c12nDef && c12nDef.enforce && (
+                <SortableHeaderCell sortField="classification" allowSort={allowSort}>
+                  {t('header.classification')}
+                </SortableHeaderCell>
+              )}
+              <SortableHeaderCell sortField="error_count" allowSort={allowSort}>
+                {t('header.status')}
+              </SortableHeaderCell>
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
