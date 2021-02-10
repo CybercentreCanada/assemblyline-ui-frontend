@@ -184,7 +184,8 @@ function Submit() {
           if (
             api_data.api_status_code === 503 ||
             api_data.api_status_code === 403 ||
-            api_data.api_status_code === 404
+            api_data.api_status_code === 404 ||
+            api_data.api_status_code === 400
           ) {
             showErrorMessage(api_data.api_error_message);
           } else {
