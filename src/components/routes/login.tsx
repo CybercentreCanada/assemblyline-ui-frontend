@@ -231,7 +231,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
                         }}
                         href={`/api/v4/auth/login/?oauth_provider=${item}`}
                       >
-                        {`${t('button_oauth')} ${item}`}
+                        {`${t('button_oauth')} ${item.replace(/_/g, ' ')}`}
                         {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
                       </Button>
                     ))}
