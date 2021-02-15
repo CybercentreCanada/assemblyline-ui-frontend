@@ -22,6 +22,7 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import ServiceTree from 'components/layout/serviceTree';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
+import Empty from 'components/visual/Empty';
 import FileDropper from 'components/visual/FileDropper';
 import Flow from 'helpers/flow';
 import generateUUID from 'helpers/uuid';
@@ -326,7 +327,11 @@ function Submit() {
         <Paper square>
           <TabList centered onChange={handleChange} indicatorColor="primary" textColor="primary">
             <Tab label={t('file')} value="0" />
-            <Tab label={t('url')} value="1" />
+            {configuration.ui.allow_url_submissions ? (
+              <Tab label={t('url')} value="1" disabled={!configuration.ui.allow_url_submissions} />
+            ) : (
+              <Empty />
+            )}
             <Tab label={t('options')} value="2" />
           </TabList>
         </Paper>
@@ -369,50 +374,52 @@ function Submit() {
             </div>
           ) : null}
         </TabPanel>
-        <TabPanel value="1" className={classes.no_pad}>
-          <div style={{ display: 'flex', flexDirection: 'row', marginTop: '30px', alignItems: 'flex-start' }}>
-            {settings ? (
-              <>
-                <TextField
-                  label={t('url.input')}
-                  error={urlHasError}
-                  size="small"
-                  type="url"
-                  variant="outlined"
-                  value={url}
-                  onChange={handleUrlChange}
-                  style={{ flexGrow: 1, marginRight: '1rem' }}
-                />
-                <Button
-                  disabled={!url || !allowClick}
-                  color="primary"
-                  variant="contained"
-                  onClick={() => validateServiceSelection('url')}
-                >
-                  {t('url.button')}
-                </Button>
-              </>
-            ) : (
-              <>
-                <Skeleton style={{ flexGrow: 1, height: '3rem' }} />
-                <Skeleton style={{ marginLeft: '16px', height: '3rem', width: '5rem' }} />
-              </>
-            )}
-          </div>
-          {configuration.ui.tos ? (
-            <div style={{ marginTop: '50px', textAlign: 'center' }}>
-              <Typography variant="body2">
-                {t('terms1')}
-                <i>{t('url.button')}</i>
-                {t('terms2')}
-                <Link style={{ textDecoration: 'none', color: theme.palette.primary.main }} to="/tos">
-                  {t('terms3')}
-                </Link>
-                .
-              </Typography>
+        {configuration.ui.allow_url_submissions && (
+          <TabPanel value="1" className={classes.no_pad}>
+            <div style={{ display: 'flex', flexDirection: 'row', marginTop: '30px', alignItems: 'flex-start' }}>
+              {settings ? (
+                <>
+                  <TextField
+                    label={t('url.input')}
+                    error={urlHasError}
+                    size="small"
+                    type="url"
+                    variant="outlined"
+                    value={url}
+                    onChange={handleUrlChange}
+                    style={{ flexGrow: 1, marginRight: '1rem' }}
+                  />
+                  <Button
+                    disabled={!url || !allowClick}
+                    color="primary"
+                    variant="contained"
+                    onClick={() => validateServiceSelection('url')}
+                  >
+                    {t('url.button')}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Skeleton style={{ flexGrow: 1, height: '3rem' }} />
+                  <Skeleton style={{ marginLeft: '16px', height: '3rem', width: '5rem' }} />
+                </>
+              )}
             </div>
-          ) : null}
-        </TabPanel>
+            {configuration.ui.tos ? (
+              <div style={{ marginTop: '50px', textAlign: 'center' }}>
+                <Typography variant="body2">
+                  {t('terms1')}
+                  <i>{t('url.button')}</i>
+                  {t('terms2')}
+                  <Link style={{ textDecoration: 'none', color: theme.palette.primary.main }} to="/tos">
+                    {t('terms3')}
+                  </Link>
+                  .
+                </Typography>
+              </div>
+            ) : null}
+          </TabPanel>
+        )}
         <TabPanel value="2" className={classes.no_pad}>
           <Grid container spacing={1}>
             <Grid item xs={12} md>

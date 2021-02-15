@@ -49,7 +49,7 @@ export type ConfigurationDefinition = {
     allow_security_tokens: boolean;
   };
   ui: {
-    allow_url_submission: boolean;
+    allow_url_submissions: boolean;
     read_only: boolean;
     tos: boolean;
     tos_lockout: boolean;
