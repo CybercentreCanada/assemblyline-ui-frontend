@@ -267,7 +267,7 @@ function Submit() {
         setAllowClick(false);
         showSuccessMessage(`${t('submit.success')} ${api_data.api_response.sid}`);
         setTimeout(() => {
-          history.push(`/submissions/${api_data.api_response.sid}`);
+          history.push(`/submission/detail/${api_data.api_response.sid}`);
         }, 500);
       },
       onFailure: api_data => {
