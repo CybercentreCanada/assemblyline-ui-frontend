@@ -623,7 +623,7 @@ function Submit() {
                                     }
                                     label={
                                       <Typography variant="body2" style={{ textTransform: 'capitalize' }}>
-                                        {param.name.replace('_', ' ')}
+                                        {param.name.replace(/_/g, ' ')}
                                       </Typography>
                                     }
                                     className={classes.item}
@@ -633,7 +633,7 @@ function Submit() {
                                 <>
                                   <div>
                                     <Typography variant="caption" gutterBottom style={{ textTransform: 'capitalize' }}>
-                                      {param.name.replace('_', ' ')}
+                                      {param.name.replace(/_/g, ' ')}
                                     </Typography>
                                   </div>
                                   {param.type === 'list' ? (
