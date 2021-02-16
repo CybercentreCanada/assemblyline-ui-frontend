@@ -83,7 +83,9 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
       setOAuthToken('');
       setOneTimePass('');
     }
-    event.preventDefault();
+    if (event) {
+      event.preventDefault();
+    }
   }
 
   function resetPW(event) {
@@ -124,6 +126,9 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
           showErrorMessage(t('securitytoken.error'));
         } else if (api_data.api_error_message === 'Wrong Security Token' && shownControls !== 'sectoken') {
           setShownControls('sectoken');
+        } else if (shownControls === 'oauth') {
+          showErrorMessage(api_data.api_error_message);
+          reset(null);
         } else {
           showErrorMessage(api_data.api_error_message);
           if (focusTarget !== null) {
