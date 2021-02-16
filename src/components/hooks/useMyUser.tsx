@@ -48,8 +48,17 @@ export type ConfigurationDefinition = {
     allow_apikeys: boolean;
     allow_security_tokens: boolean;
   };
+  system: {
+    organisation: string;
+    type: string;
+    version: string;
+  };
   ui: {
     allow_url_submissions: boolean;
+    banner: {
+      [lang: string]: string;
+    };
+    banner_level: 'info' | 'warning' | 'error' | 'success';
     read_only: boolean;
     tos: boolean;
     tos_lockout: boolean;

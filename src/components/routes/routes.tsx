@@ -69,7 +69,7 @@ function RouteActions() {
 }
 
 const WrappedRoutes = () => {
-  const { settings } = useALContext();
+  const { configuration, settings } = useALContext();
   return (
     <>
       <RouteActions />
@@ -122,6 +122,22 @@ const WrappedRoutes = () => {
         <Route exact path="/notfound" component={NotFoundPage} />
         <Redirect to="/notfound" />
       </Switch>
+      {configuration.system && configuration.system.type !== 'production' && (
+        <div
+          style={{
+            position: 'sticky',
+            bottom: '16px',
+            opacity: '.2',
+            textAlign: 'right',
+            zIndex: 10000,
+            paddingRight: '16px',
+            marginTop: 'auto'
+          }}
+        >
+          {`Assemblyline ${configuration.system.version} :: `}
+          <span style={{ textTransform: 'capitalize' }}>{configuration.system.type}</span>
+        </div>
+      )}
     </>
   );
 };

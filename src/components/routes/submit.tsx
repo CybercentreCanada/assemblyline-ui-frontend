@@ -13,7 +13,7 @@ import {
   useMediaQuery,
   useTheme
 } from '@material-ui/core';
-import { Skeleton, TabContext, TabList, TabPanel } from '@material-ui/lab';
+import { Alert, Skeleton, TabContext, TabList, TabPanel } from '@material-ui/lab';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
@@ -33,7 +33,7 @@ import { Link, useHistory } from 'react-router-dom';
 function Submit() {
   const { getBanner } = useAppLayout();
   const apiCall = useMyAPI();
-  const { t } = useTranslation(['submit']);
+  const { t, i18n } = useTranslation(['submit']);
   const theme = useTheme();
   const { user: currentUser, c12nDef, configuration } = useALContext();
   const [uuid, setUUID] = useState(null);
@@ -311,7 +311,12 @@ function Submit() {
         acceptText={t('validate.acceptText')}
         text={t('validate.text')}
       />
-      <div style={{ marginBottom: !downSM ? '2rem' : null }}>{getBanner(theme)}</div>
+      <div style={{ marginBottom: !downSM && !configuration.ui.banner ? '2rem' : null }}>{getBanner(theme)}</div>
+      {configuration.ui.banner && (
+        <Alert severity={configuration.ui.banner_level} style={{ marginBottom: '2rem' }}>
+          {configuration.ui.banner[i18n.language] ? configuration.ui.banner[i18n.language] : configuration.ui.banner.en}
+        </Alert>
+      )}
       {c12nDef.enforce ? (
         <div style={{ paddingBottom: sp8 }}>
           <div style={{ padding: sp1, fontSize: 16 }}>{t('classification')}</div>
