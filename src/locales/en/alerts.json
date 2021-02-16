@@ -71,7 +71,7 @@
   "status_MALICIOUS": "MALICIOUS",
   "status_NON-MALICIOUS": "NON-MALICIOUS",
   "status_TRIAGE": "TRIAGE",
-  "submission": "Got to related submission",
+  "submission": "Go to related submission",
   "take_ownership": "Take ownership",
   "take_ownership.success": "You are now the owner of this alert!",
   "tc": "Time Constraint",
