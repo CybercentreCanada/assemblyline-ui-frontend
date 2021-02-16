@@ -41,6 +41,7 @@ import ChipInput from 'material-ui-chip-input';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Redirect, useHistory, useLocation, useParams } from 'react-router-dom';
+import RegisteredApps from './user/registered_apps';
 
 type UserProps = {
   width: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -153,6 +154,12 @@ function User({ width, username }: UserProps) {
       newTokens.splice(newTokens.indexOf(token), 1);
     }
     setUser({ ...user, security_tokens: newTokens });
+  }
+
+  function toggleApp(app) {
+    const newRegistrations = user.registered_apps;
+    delete newRegistrations[app];
+    setUser({ ...user, registered_apps: newRegistrations });
   }
 
   function toggleAPIKey(apiKey) {
@@ -370,7 +377,8 @@ function User({ width, username }: UserProps) {
                   otp: <OTP setDrawerOpen={setDrawerOpen} set2FAEnabled={set2FAEnabled} />,
                   disable_otp: <DisableOTP setDrawerOpen={setDrawerOpen} set2FAEnabled={set2FAEnabled} />,
                   token: <SecurityToken user={user} toggleToken={toggleToken} />,
-                  api_key: <APIKeys user={user} toggleAPIKey={toggleAPIKey} />
+                  api_key: <APIKeys user={user} toggleAPIKey={toggleAPIKey} />,
+                  registered_apps: <RegisteredApps user={user} toggleApp={toggleApp} />
                 }[drawerType]
               : null}
           </div>
@@ -680,7 +688,7 @@ function User({ width, username }: UserProps) {
                   user['2fa_enabled'] &&
                   configuration.auth.allow_security_tokens && (
                     <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('token')}>
-                      <TableCell width="100%">{user ? t('token') : <Skeleton />}</TableCell>
+                      <TableCell width="100%">{t('token')}</TableCell>
                       <TableCell align="right">
                         <ChevronRightOutlinedIcon />
                       </TableCell>
@@ -688,7 +696,15 @@ function User({ width, username }: UserProps) {
                   )}
                 {user && currentUser.username === user.uname && configuration.auth.allow_apikeys && (
                   <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('api_key')}>
-                    <TableCell width="100%">{user ? t('apikeys') : <Skeleton />}</TableCell>
+                    <TableCell width="100%">{t('apikeys')}</TableCell>
+                    <TableCell align="right">
+                      <ChevronRightOutlinedIcon />
+                    </TableCell>
+                  </TableRow>
+                )}
+                {user && currentUser.username === user.uname && configuration.auth.allow_apikeys && (
+                  <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('registered_apps')}>
+                    <TableCell width="100%">{t('registered_apps')}</TableCell>
                     <TableCell align="right">
                       <ChevronRightOutlinedIcon />
                     </TableCell>
