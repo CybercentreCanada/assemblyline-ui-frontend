@@ -7,6 +7,7 @@ import adminServicesEN from 'locales/en/admin/services.json';
 import adminSiteMapEN from 'locales/en/admin/site_map.json';
 import adminUsersEN from 'locales/en/admin/users.json';
 import alertsEN from 'locales/en/alerts.json';
+import authorizeEN from 'locales/en/authorize.json';
 import dashboardEN from 'locales/en/dashboard.json';
 import favoritesEN from 'locales/en/favorites.json';
 import fileDetailEN from 'locales/en/file/detail.json';
@@ -45,6 +46,7 @@ import adminServicesFR from 'locales/fr/admin/services.json';
 import adminSiteMapFR from 'locales/fr/admin/site_map.json';
 import adminUsersFR from 'locales/fr/admin/users.json';
 import alertsFR from 'locales/fr/alerts.json';
+import authorizeFR from 'locales/fr/authorize.json';
 import dashboardFR from 'locales/fr/dashboard.json';
 import favoritesFR from 'locales/fr/favorites.json';
 import fileDetailFR from 'locales/fr/file/detail.json';
@@ -84,6 +86,7 @@ const resources = {
     adminServices: adminServicesEN,
     adminSiteMap: adminSiteMapEN,
     adminUsers: adminUsersEN,
+    authorize: authorizeEN,
     dashboard: dashboardEN,
     error403: error403EN,
     error404: error404EN,
@@ -124,6 +127,7 @@ const resources = {
     adminServices: adminServicesFR,
     adminSiteMap: adminSiteMapFR,
     adminUsers: adminUsersFR,
+    authorize: authorizeFR,
     dashboard: dashboardFR,
     error403: error403FR,
     error404: error404FR,

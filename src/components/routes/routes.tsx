@@ -35,6 +35,7 @@ import User from 'components/routes/user';
 import React, { useEffect, useState } from 'react';
 import { matchPath, Redirect, Route, Switch, useLocation } from 'react-router-dom';
 import AlertDetails from './alerts/alert-details';
+import AppRegistration from './authorize';
 import HeuristicDetail from './manage/heuristic_detail';
 import SignatureDetail from './manage/signature_detail';
 import WorkflowDetail from './manage/workflow_detail';
@@ -85,6 +86,7 @@ const WrappedRoutes = () => {
         <Route exact path="/admin/sitemap" component={AdminSiteMap} />
         <Route exact path="/admin/users" component={AdminUsers} />
         <Route exact path="/admin/users/:id" component={User} />
+        <Route exact path="/authorize" component={AppRegistration} />
         <Route exact path="/dashboard" component={Dashboard} />
         <Route exact path="/file/detail/:id" component={FileFullDetail} />
         <Route exact path="/file/viewer/:id" component={FileViewer} />

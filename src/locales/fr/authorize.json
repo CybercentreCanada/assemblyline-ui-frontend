@@ -1,0 +1,12 @@
+{
+  "access": "demande l'accès à votre compte.",
+  "button.back": "Retourner",
+  "button.allow": "Permettre",
+  "button.cancel": "Annuler",
+  "scope": "Cela permettra à l'application de:",
+  "invalid": "Des paramètres non valides ont été fournis pour l'enregistrement de l'application. Nous ne pourrons pas continuer.",
+  "scope.r": "Lire toutes les données de Assemblyline en votre nom",
+  "scope.rw": "Lire et écrire toutes les données depuis et vers Assemblyline en votre nom",
+  "scope.w": "Ecrire des données à Assemblyline en votre nom",
+  "warning": "Assurez-vous de faire confiance à cette application avant de continuer. Vous pouvez révoquer à tout moment l'accès à cette application à partir de votre profil utilisateur."
+}

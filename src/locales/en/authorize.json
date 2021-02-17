@@ -1,0 +1,12 @@
+{
+  "access": "is requesting access to your account.",
+  "button.back": "Go back",
+  "button.allow": "Allow",
+  "button.cancel": "Cancel",
+  "scope": "This will allow the application to:",
+  "invalid": "Invalid parameters were provided for the app registration. We will not be able to proceed.",
+  "scope.r": "Read any data from Assemblyline on your behalf",
+  "scope.rw": "Read and write any data from and to Assemblyline on your behalf",
+  "scope.w": "Write any data to Assemblyline on your behalf",
+  "warning": "Make sure you trust this application before allowing it access to your account. You can revoke this access at any time from your user profile."
+}
