@@ -41,7 +41,7 @@ import ChipInput from 'material-ui-chip-input';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Redirect, useHistory, useLocation, useParams } from 'react-router-dom';
-import RegisteredApps from './user/registered_apps';
+import Apps from './user/apps';
 
 type UserProps = {
   width: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -157,9 +157,9 @@ function User({ width, username }: UserProps) {
   }
 
   function toggleApp(app) {
-    const newRegistrations = user.registered_apps;
-    delete newRegistrations[app];
-    setUser({ ...user, registered_apps: newRegistrations });
+    const newApps = user.apps;
+    delete newApps[app];
+    setUser({ ...user, apps: newApps });
   }
 
   function toggleAPIKey(apiKey) {
@@ -378,7 +378,7 @@ function User({ width, username }: UserProps) {
                   disable_otp: <DisableOTP setDrawerOpen={setDrawerOpen} set2FAEnabled={set2FAEnabled} />,
                   token: <SecurityToken user={user} toggleToken={toggleToken} />,
                   api_key: <APIKeys user={user} toggleAPIKey={toggleAPIKey} />,
-                  registered_apps: <RegisteredApps user={user} toggleApp={toggleApp} />
+                  apps: <Apps user={user} toggleApp={toggleApp} />
                 }[drawerType]
               : null}
           </div>
@@ -703,8 +703,8 @@ function User({ width, username }: UserProps) {
                   </TableRow>
                 )}
                 {user && currentUser.username === user.uname && configuration.auth.allow_apikeys && (
-                  <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('registered_apps')}>
-                    <TableCell width="100%">{t('registered_apps')}</TableCell>
+                  <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('apps')}>
+                    <TableCell width="100%">{t('apps')}</TableCell>
                     <TableCell align="right">
                       <ChevronRightOutlinedIcon />
                     </TableCell>
