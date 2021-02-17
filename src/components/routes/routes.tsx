@@ -129,11 +129,12 @@ const WrappedRoutes = () => {
           style={{
             position: 'sticky',
             bottom: '16px',
+            right: '16px',
             opacity: '.2',
             textAlign: 'right',
             zIndex: 10000,
-            paddingRight: '16px',
-            marginTop: 'auto'
+            marginTop: 'auto',
+            marginLeft: 'auto'
           }}
         >
           {`Assemblyline ${configuration.system.version} :: `}
