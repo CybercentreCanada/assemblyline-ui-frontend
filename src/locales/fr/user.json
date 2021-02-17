@@ -32,7 +32,7 @@
   "apikeys.title": "Clés API",
   "apikeys.w_token": "Écriture",
   "apps": "Gérer les Applications Autorisées",
-  "apps.desc": "Ces applications pourront emprunter l'identité de votre compte et émettre une requête à Assemblyline en votre nom.",
+  "apps.desc": "Ces applications peuvent emprunter l'identité de votre compte et émettre une requête à Assemblyline en votre nom.",
   "apps.none": "Aucune application n'a actuellement accès à votre compte.",
   "apps.remove": "Supprimer",
   "apps.remove_text": "Voulez-vous révoquer l'accès de cette application à votre compte? Cela ne peut pas être annulé, mais l'application peut demander à nouveau l'accès plus tard.",
