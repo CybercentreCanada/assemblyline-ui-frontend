@@ -62,9 +62,8 @@ export default function Apps({ user, toggleApp }: APIKeysProps) {
       <div style={{ paddingTop: sp4, paddingBottom: sp4 }}>
         {user.apps && Object.keys(user.apps).length !== 0 ? (
           Object.keys(user.apps).map(e => (
-            <Tooltip title={user.apps[e].netloc}>
+            <Tooltip key={e} title={user.apps[e].netloc}>
               <Chip
-                key={e}
                 label={`${user.apps[e].server} [${user.apps[e].scope.toUpperCase()}]`}
                 onDelete={() => askForDelete(e)}
                 style={{ marginRight: sp1, marginBottom: sp1 }}
@@ -87,7 +86,9 @@ export default function Apps({ user, toggleApp }: APIKeysProps) {
       >
         <DialogTitle id="alert-dialog-title">
           {`${t('apps.remove_title')}: ${
-            selectedApp && `${user.apps[selectedApp].server} [${user.apps[selectedApp].scope.toUpperCase()}]`
+            selectedApp &&
+            user.apps[selectedApp] &&
+            `${user.apps[selectedApp].server} [${user.apps[selectedApp].scope.toUpperCase()}]`
           }`}
         </DialogTitle>
         <DialogContent>
