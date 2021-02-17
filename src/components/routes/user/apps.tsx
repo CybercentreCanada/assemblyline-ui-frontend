@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Tooltip,
   Typography,
   useMediaQuery,
   useTheme
@@ -20,14 +21,13 @@ type APIKeysProps = {
   toggleApp: (apiKey: string) => void;
 };
 
-export default function RegisteredApps({ user, toggleApp }: APIKeysProps) {
+export default function Apps({ user, toggleApp }: APIKeysProps) {
   const { t } = useTranslation(['user']);
   const [selectedApp, setSelectedApp] = useState(null);
-  const [selectedName, setSelectedName] = useState(null);
   const apiCall = useMyAPI();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
-  const { showSuccessMessage } = useMySnackbar();
+  const { showSuccessMessage, showErrorMessage } = useMySnackbar();
   const sp1 = theme.spacing(1);
   const sp4 = theme.spacing(4);
 
@@ -38,41 +38,42 @@ export default function RegisteredApps({ user, toggleApp }: APIKeysProps) {
       onSuccess: () => {
         toggleApp(selectedApp);
         setSelectedApp(null);
-        setSelectedName(null);
-        showSuccessMessage(t('registered_apps.removed'));
+        showSuccessMessage(t('apps.removed'));
+      },
+      onFailure: api_data => {
+        setSelectedApp(null);
+        showErrorMessage(api_data.api_error_message);
       }
     });
   }
 
-  function askForDelete(app, name) {
+  function askForDelete(app) {
     setSelectedApp(app);
-    setSelectedName(name);
   }
 
   return (
     <>
       <Typography variant="h4" gutterBottom>
-        {t('registered_apps.title')}
+        {t('apps.title')}
       </Typography>
       <Typography variant="caption" gutterBottom>
-        {t('registered_apps.desc')}
+        {t('apps.desc')}
       </Typography>
       <div style={{ paddingTop: sp4, paddingBottom: sp4 }}>
-        <Typography variant="subtitle1" gutterBottom>
-          {t('registered_apps.list')}
-        </Typography>
-        {Object.keys(user.registered_apps).length !== 0 ? (
-          Object.keys(user.registered_apps).map(e => (
-            <Chip
-              key={e}
-              label={user.registered_apps[e].server}
-              onDelete={() => askForDelete(e, user.registered_apps[e].server)}
-              style={{ marginRight: sp1, marginBottom: sp1 }}
-            />
+        {user.apps && Object.keys(user.apps).length !== 0 ? (
+          Object.keys(user.apps).map(e => (
+            <Tooltip title={user.apps[e].netloc}>
+              <Chip
+                key={e}
+                label={`${user.apps[e].server} [${user.apps[e].scope.toUpperCase()}]`}
+                onDelete={() => askForDelete(e)}
+                style={{ marginRight: sp1, marginBottom: sp1 }}
+              />
+            </Tooltip>
           ))
         ) : (
           <Typography variant="subtitle2" color="secondary">
-            {t('registered_apps.none')}
+            {t('apps.none')}
           </Typography>
         )}
       </div>
@@ -85,17 +86,19 @@ export default function RegisteredApps({ user, toggleApp }: APIKeysProps) {
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          {t('registered_apps.remove_title')}: {selectedName}
+          {`${t('apps.remove_title')}: ${
+            selectedApp && `${user.apps[selectedApp].server} [${user.apps[selectedApp].scope.toUpperCase()}]`
+          }`}
         </DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">{t('registered_apps.remove_text')}</DialogContentText>
+          <DialogContentText id="alert-dialog-description">{t('apps.remove_text')}</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setSelectedApp(null)} color="primary" autoFocus>
             {t('cancel')}
           </Button>
           <Button onClick={() => handleDelete()} color="primary">
-            {t('registered_apps.remove')}
+            {t('apps.remove')}
           </Button>
         </DialogActions>
       </Dialog>
