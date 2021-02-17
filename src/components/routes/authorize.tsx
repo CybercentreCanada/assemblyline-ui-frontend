@@ -2,6 +2,7 @@
 import { Backdrop, Button, Typography, useTheme } from '@material-ui/core';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import CardCentered from 'commons/components/layout/pages/CardCentered';
+import getXSRFCookie from 'helpers/xsrf';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -63,7 +64,11 @@ export default function AppRegistration() {
                 <Button variant="text" href={`${rUrl}${rUrl.indexOf('?') === -1 ? '?' : '&'}error=cancelled`}>
                   {t('button.cancel')}
                 </Button>
-                <Button variant="contained" color="primary" href={`/api/v4/auth/obo_token/${location.search}`}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  href={`/api/v4/auth/obo_token/?XSRF_TOKEN=${getXSRFCookie()}&${location.search.substring(1)}`}
+                >
                   {t('button.allow')}
                 </Button>
               </div>
