@@ -702,7 +702,7 @@ function User({ width, username }: UserProps) {
                     </TableCell>
                   </TableRow>
                 )}
-                {user && currentUser.username === user.uname && configuration.auth.allow_apikeys && (
+                {user && currentUser.username === user.uname && (
                   <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('apps')}>
                     <TableCell width="100%">{t('apps')}</TableCell>
                     <TableCell align="right">
