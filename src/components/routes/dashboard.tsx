@@ -274,14 +274,22 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
   const [timer, setTimer] = useState(null);
   const [error, setError] = useState(null);
   const classes = useStyles();
-  const busyness =
-    (dispatcher.metrics.busy_seconds * dispatcher.metrics.busy_seconds_count) / dispatcher.instances / 60;
+  const busyness = (dispatcher.metrics.cpu_seconds * dispatcher.metrics.cpu_seconds_count) / dispatcher.instances / 60;
+  const startQueue = dispatcher.queues.start.reduce((x, y) => x + y, 0);
+  const resultQueue = dispatcher.queues.result.reduce((x, y) => x + y, 0);
+  const commandQueue = dispatcher.queues.command.reduce((x, y) => x + y, 0);
 
   useEffect(() => {
     if (dispatcher.initialized && dispatcher.queues.ingest >= dispatcher.inflight.max / 10) {
       setError(t('dispatcher.error.queue.ingest'));
     } else if (dispatcher.initialized && dispatcher.queues.files >= dispatcher.inflight.max / 10) {
       setError(t('dispatcher.error.queue.files'));
+    } else if (dispatcher.initialized && startQueue >= dispatcher.inflight.max / 10) {
+      setError(t('dispatcher.error.queue.start'));
+    } else if (dispatcher.initialized && resultQueue >= dispatcher.inflight.max / 10) {
+      setError(t('dispatcher.error.queue.result'));
+    } else if (dispatcher.initialized && commandQueue >= dispatcher.inflight.max / 10) {
+      setError(t('dispatcher.error.queue.command'));
     } else if (dispatcher.initialized && busyness >= 0.8) {
       setError(t('dispatcher.error.busy'));
     } else if (dispatcher.inflight.outstanding / dispatcher.inflight.max > 0.9) {
@@ -357,12 +365,25 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
               title="I"
               tooltip={t('queues.ingest')}
             />
-            <MetricCounter
-              init={dispatcher.initialized}
-              value={dispatcher.queues.files}
-              title="F"
-              tooltip={t('queues.file')}
-            />
+            {dispatcher.queues.start.length === 0 &&
+              dispatcher.queues.result.length === 0 &&
+              dispatcher.queues.command.length === 0 && (
+                <MetricCounter
+                  init={dispatcher.initialized}
+                  value={dispatcher.queues.files}
+                  title="F"
+                  tooltip={t('queues.file')}
+                />
+              )}
+            {dispatcher.queues.start.length > 0 && (
+              <MetricCounter init={dispatcher.initialized} value={startQueue} title="S" tooltip={t('queues.start')} />
+            )}
+            {dispatcher.queues.result.length > 0 && (
+              <MetricCounter init={dispatcher.initialized} value={resultQueue} title="R" tooltip={t('queues.result')} />
+            )}
+            {dispatcher.queues.command.length > 0 && (
+              <MetricCounter init={dispatcher.initialized} value={commandQueue} title="C" tooltip={t('queues.start')} />
+            )}
           </div>
         </Grid>
         <Grid item xs={12} sm={4} md={3}>
@@ -822,15 +843,21 @@ const DEFAULT_DISPATCHER = {
   instances: 0,
   inflight: {
     outstanding: 0,
-    max: 0
+    max: 0,
+    per_instance: []
   },
   queues: {
     ingest: 0,
-    files: 0
+    files: 0,
+    start: [],
+    result: [],
+    command: []
   },
   metrics: {
     busy_seconds: 0,
     busy_seconds_count: 0,
+    cpu_seconds: 0,
+    cpu_seconds_count: 0,
     files_completed: 0,
     submissions_completed: 0
   },
