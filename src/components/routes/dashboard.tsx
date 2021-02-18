@@ -382,7 +382,12 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
               <MetricCounter init={dispatcher.initialized} value={resultQueue} title="R" tooltip={t('queues.result')} />
             )}
             {dispatcher.queues.command.length > 0 && (
-              <MetricCounter init={dispatcher.initialized} value={commandQueue} title="C" tooltip={t('queues.start')} />
+              <MetricCounter
+                init={dispatcher.initialized}
+                value={commandQueue}
+                title="C"
+                tooltip={t('queues.command')}
+              />
             )}
           </div>
         </Grid>
