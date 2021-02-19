@@ -79,7 +79,7 @@ function Service({ name, onDeleted }: ServiceProps) {
           acceptText={t('delete.acceptText')}
           text={t('delete.text')}
         />
-        <Grid container alignItems="center" spacing={3}>
+        <Grid container alignItems="center" spacing={3} style={{ paddingBottom: theme.spacing(2) }}>
           <Grid item xs>
             <Typography variant="h4">{t('title')}</Typography>
             <Typography variant="caption">
