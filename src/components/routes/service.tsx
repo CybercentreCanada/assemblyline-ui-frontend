@@ -82,7 +82,9 @@ function Service({ name, onDeleted }: ServiceProps) {
         <Grid container alignItems="center" spacing={3}>
           <Grid item xs>
             <Typography variant="h4">{t('title')}</Typography>
-            <Typography variant="caption">{service ? name : <Skeleton style={{ width: '10rem' }} />}</Typography>
+            <Typography variant="caption">
+              {service ? service.name : <Skeleton style={{ width: '10rem' }} />}
+            </Typography>
           </Grid>
           <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
             {service ? (
