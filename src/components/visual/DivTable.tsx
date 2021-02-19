@@ -26,12 +26,21 @@ const StyledTableCell = withStyles((theme: Theme) =>
   })
 )(TableCell);
 
-export const DivTableCell = ({ children, ...other }) => {
+type CellProps = {
+  children?: React.ReactNode;
+  [key: string]: any;
+};
+
+export const DivTableCell = ({ children, ...other }: CellProps) => {
   return (
     <StyledTableCell {...other} component="div">
       {children}
     </StyledTableCell>
   );
+};
+
+DivTableCell.defaultProps = {
+  children: null
 };
 
 export const SortableHeaderCell = ({ children, sortField, allowSort = true, ...other }) => {
