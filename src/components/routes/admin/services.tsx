@@ -4,12 +4,12 @@ import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
+import Service from 'components/routes/admin/service_detail';
 import ServiceTable from 'components/visual/SearchResult/service';
 import 'moment/locale/fr';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Redirect } from 'react-router-dom';
-import Service from '../service';
 
 export default function Services() {
   const { t } = useTranslation(['adminServices']);
