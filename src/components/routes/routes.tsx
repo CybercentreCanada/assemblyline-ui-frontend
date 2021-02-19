@@ -40,6 +40,7 @@ import HeuristicDetail from './manage/heuristic_detail';
 import SignatureDetail from './manage/signature_detail';
 import WorkflowDetail from './manage/workflow_detail';
 import Optout from './optout';
+import Service from './service';
 
 const APP_NAME = 'AL4';
 
@@ -83,6 +84,7 @@ const WrappedRoutes = () => {
         <Route exact path="/admin" component={Admin} />
         <Route exact path="/admin/errors" component={AdminErrorViewer} />
         <Route exact path="/admin/services" component={AdminServices} />
+        <Route exact path="/admin/services/:svc" component={Service} />
         <Route exact path="/admin/sitemap" component={AdminSiteMap} />
         <Route exact path="/admin/users" component={AdminUsers} />
         <Route exact path="/admin/users/:id" component={User} />

@@ -27,6 +27,7 @@ import SettingsApplicationsOutlinedIcon from '@material-ui/icons/SettingsApplica
 import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
 import SimCardOutlinedIcon from '@material-ui/icons/SimCardOutlined';
 import SupervisorAccountOutlinedIcon from '@material-ui/icons/SupervisorAccountOutlined';
+import WebAssetIcon from '@material-ui/icons/WebAsset';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
@@ -179,6 +180,12 @@ export default function useMySitemap() {
         title: t('adminmenu.services'),
         icon: <AccountTreeOutlinedIcon />,
         breadcrumbs: ['/admin']
+      },
+      {
+        path: '/admin/services/:svc',
+        title: '{:svc}',
+        icon: <WebAssetIcon />,
+        breadcrumbs: ['/admin', '/admin/services']
       },
       { path: '/admin/sitemap', title: t('adminmenu.sitemap'), icon: <MapOutlinedIcon />, breadcrumbs: ['/admin'] },
       {
