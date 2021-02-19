@@ -21,7 +21,7 @@ type ParamProps = {
 
 function Service({ name, onDeleted }: ServiceProps) {
   const { svc } = useParams<ParamProps>();
-  const { t } = useTranslation(['service']);
+  const { t } = useTranslation(['adminServices']);
   const [service, setService] = useState(null);
   const theme = useTheme();
   const [deleteDialog, setDeleteDialog] = useState(false);
