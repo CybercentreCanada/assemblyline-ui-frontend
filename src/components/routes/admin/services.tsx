@@ -12,6 +12,7 @@ import {
   useTheme
 } from '@material-ui/core';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
+import { Skeleton } from '@material-ui/lab';
 import useUser from 'commons/components/hooks/useAppUser';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import useDrawer from 'components/hooks/useDrawer';
@@ -139,6 +140,11 @@ export default function Services() {
       <Grid container alignItems="center" spacing={3} style={{ paddingBottom: theme.spacing(2) }}>
         <Grid item xs>
           <Typography variant="h4">{t('title')}</Typography>
+          {serviceResults ? (
+            <Typography variant="caption">{`${serviceResults.length} ${t('count')}`}</Typography>
+          ) : (
+            <Skeleton width="8rem" />
+          )}
         </Grid>
         <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
           <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
