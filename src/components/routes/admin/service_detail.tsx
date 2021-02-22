@@ -103,22 +103,7 @@ function Service({ name, onDeleted }: ServiceProps) {
                 </div>
               </>
             ) : (
-              <>
-                <div style={{ display: 'flex' }}>
-                  <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-                  <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-                </div>
-                <Skeleton
-                  variant="rect"
-                  height="1rem"
-                  width="6rem"
-                  style={{
-                    marginBottom: theme.spacing(1),
-                    marginTop: theme.spacing(1),
-                    borderRadius: theme.spacing(1)
-                  }}
-                />
-              </>
+              <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
             )}
           </Grid>
         </Grid>
