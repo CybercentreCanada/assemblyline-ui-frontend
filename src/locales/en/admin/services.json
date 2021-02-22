@@ -1,3 +1,10 @@
 {
-  "title": "Service Management"
+  "delete.title": "Remove Service",
+  "delete.cancelText": "Cancel",
+  "delete.acceptText": "Remove",
+  "delete.success": "The service has successfully been remove from the system.",
+  "delete.text": "Are you sure you want to remove this service from the system? This cannot be undone but you can always re-add it afterwards.",
+  "title": "Service Management",
+  "title.detail": "Service Details",
+  "remove": "Remove service"
 }
