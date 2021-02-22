@@ -92,6 +92,11 @@ export default function Services() {
     <PageFullWidth margin={4}>
       <div style={{ marginBottom: theme.spacing(4) }}>
         <Typography variant="h4">{t('title')}</Typography>
+        {services ? (
+          <Typography variant="caption">{`${services.length} ${t('count')}`}</Typography>
+        ) : (
+          <Skeleton width="8rem" />
+        )}
       </div>
       {services ? (
         <Grid container spacing={2}>

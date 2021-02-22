@@ -1,6 +1,7 @@
 {
   "accepts": "Accepte",
   "category": "Catégorie",
+  "count": "services chargés dans le système",
   "disabled": "Désactivé",
   "rejects": "Rejette",
   "stage": "Stage",

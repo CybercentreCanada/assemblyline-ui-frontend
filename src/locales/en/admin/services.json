@@ -5,6 +5,7 @@
   "add.paste": "Paste your service manifest here",
   "add.success": "The service was successfully added to the system.",
   "add.title": "Add a service",
+  "count": "services loaded in the system",
   "delete.title": "Remove Service",
   "delete.cancelText": "Cancel",
   "delete.acceptText": "Remove",
