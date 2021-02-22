@@ -1,8 +1,22 @@
-import { Typography, useTheme } from '@material-ui/core';
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  IconButton,
+  TextField,
+  Tooltip,
+  Typography,
+  useTheme
+} from '@material-ui/core';
+import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import useUser from 'commons/components/hooks/useAppUser';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
+import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
 import Service from 'components/routes/admin/service_detail';
 import ServiceTable from 'components/visual/SearchResult/service';
@@ -15,10 +29,28 @@ export default function Services() {
   const { t } = useTranslation(['adminServices']);
   const [serviceResults, setServiceResults] = useState(null);
   const [updates, setUpdates] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [manifest, setManifest] = useState('');
+  const { showSuccessMessage } = useMySnackbar();
   const theme = useTheme();
   const apiCall = useMyAPI();
   const { user: currentUser } = useUser<CustomUser>();
   const { setGlobalDrawer } = useDrawer();
+
+  const handleAddService = () => {
+    apiCall({
+      method: 'PUT',
+      url: '/api/v4/service/',
+      body: manifest,
+      onSuccess: api_data => {
+        showSuccessMessage(t('add.success'));
+      }
+    });
+  };
+
+  function handleManifestChange(event) {
+    setManifest(event.target.value);
+  }
 
   const reload = () => {
     apiCall({
@@ -77,9 +109,46 @@ export default function Services() {
 
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>
-      <div style={{ paddingBottom: theme.spacing(2) }}>
-        <Typography variant="h4">{t('title')}</Typography>
-      </div>
+      <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby="form-dialog-title" fullWidth maxWidth="md">
+        <DialogTitle id="form-dialog-title">{t('add.title')}</DialogTitle>
+        <DialogContent>
+          <TextField
+            label={t('add.paste')}
+            multiline
+            rows={24}
+            variant="outlined"
+            fullWidth
+            onChange={handleManifestChange}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpen(false)} color="secondary">
+            {t('add.cancelText')}
+          </Button>
+          <Button onClick={handleAddService} color="primary" disabled={!manifest}>
+            {t('add.acceptText')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Grid container alignItems="center" spacing={3} style={{ paddingBottom: theme.spacing(2) }}>
+        <Grid item xs>
+          <Typography variant="h4">{t('title')}</Typography>
+        </Grid>
+        <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
+          <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
+            <Tooltip title={t('add')}>
+              <IconButton
+                style={{
+                  color: theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark
+                }}
+                onClick={() => setOpen(true)}
+              >
+                <AddCircleOutlineIcon />
+              </IconButton>
+            </Tooltip>
+          </div>
+        </Grid>
+      </Grid>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         <ServiceTable serviceResults={serviceResults} updates={updates} setService={setService} onUpdate={onUpdate} />

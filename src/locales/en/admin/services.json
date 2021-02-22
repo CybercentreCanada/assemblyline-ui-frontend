@@ -1,4 +1,10 @@
 {
+  "add": "Add a service",
+  "add.cancelText": "Cancel",
+  "add.acceptText": "Add",
+  "add.paste": "Paste your service manifest here",
+  "add.success": "The service was successfully added to the system.",
+  "add.title": "Add a service",
   "delete.title": "Remove Service",
   "delete.cancelText": "Cancel",
   "delete.acceptText": "Remove",
