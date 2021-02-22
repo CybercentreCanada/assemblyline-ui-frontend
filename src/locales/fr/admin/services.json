@@ -1,10 +1,16 @@
 {
+  "add": "Ajouter un service",
+  "add.cancelText": "Annuler",
+  "add.acceptText": "Ajouter",
+  "add.paste": "Collez votre manifeste de service ici",
+  "add.success": "Le service a été ajouté avec succès au système.",
+  "add.title": "Ajouter un service",
   "delete.title": "Supprimer le service",
   "delete.cancelText": "Annuler",
   "delete.acceptText": "Supprimé",
   "delete.success": "Le service a été supprimé du système avec succès.",
   "delete.text": "Voulez-vous vraiment supprimer ce service du système? Cela ne peut pas être annulé, mais vous pouvez toujours le ré-ajouter par la suite.",
-  "title": "La gestion des services",
+  "title": "Gestion des services",
   "title.detail": "Détail du service",
   "remove": "Supprimer le service"
 }
