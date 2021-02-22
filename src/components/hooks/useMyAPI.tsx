@@ -28,22 +28,21 @@ export default function useMyAPI() {
 
   function apiCall({
     url,
-    contentType,
-    method,
-    body,
-    reloadOnUnauthorize,
+    contentType = 'application/json',
+    method = 'GET',
+    body = null,
+    reloadOnUnauthorize = true,
     onSuccess,
     onFailure,
     onEnter,
     onExit,
     onFinalize
   }: APICallProps) {
-    const allowReload = reloadOnUnauthorize === undefined || reloadOnUnauthorize;
     const requestOptions: RequestInit = {
-      method: method || 'GET',
+      method,
       credentials: 'same-origin',
       headers: {
-        'Content-Type': contentType || 'application/json',
+        'Content-Type': contentType,
         'X-XSRF-TOKEN': getXSRFCookie()
       },
       body: body !== null ? (contentType === 'application/json' ? JSON.stringify(body) : body) : null
@@ -55,7 +54,7 @@ export default function useMyAPI() {
     // Fetch the URL
     fetch(url, requestOptions)
       .then(res => {
-        if (res.status === 401 && allowReload) {
+        if (res.status === 401 && reloadOnUnauthorize) {
           // Trigger a page reload, we're not logged in anymore
           window.location.reload(false);
         }
@@ -79,7 +78,7 @@ export default function useMyAPI() {
         // eslint-disable-next-line no-prototype-builtins
         if (api_data === undefined || !api_data.hasOwnProperty('api_status_code')) {
           showErrorMessage(t('api.invalid'));
-        } else if (api_data.api_status_code === 401 && allowReload) {
+        } else if (api_data.api_status_code === 401 && reloadOnUnauthorize) {
           // Detect login request
           // Do nothing... we are reloading the page
           return;
