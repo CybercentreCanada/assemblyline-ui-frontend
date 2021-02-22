@@ -40,10 +40,13 @@ export default function Services() {
   const handleAddService = () => {
     apiCall({
       method: 'PUT',
+      contentType: 'text/plain',
       url: '/api/v4/service/',
       body: manifest,
       onSuccess: api_data => {
         showSuccessMessage(t('add.success'));
+        setOpen(false);
+        setTimeout(() => reload(), 1000);
       }
     });
   };
@@ -118,6 +121,9 @@ export default function Services() {
             rows={24}
             variant="outlined"
             fullWidth
+            InputProps={{
+              style: { fontFamily: 'monospace' }
+            }}
             onChange={handleManifestChange}
           />
         </DialogContent>

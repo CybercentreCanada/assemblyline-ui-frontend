@@ -15,6 +15,7 @@ export default function useMyAPI() {
 
   type APICallProps = {
     url: string;
+    contentType?: string;
     method?: string;
     body?: any;
     reloadOnUnauthorize?: boolean;
@@ -27,6 +28,7 @@ export default function useMyAPI() {
 
   function apiCall({
     url,
+    contentType,
     method,
     body,
     reloadOnUnauthorize,
@@ -41,10 +43,10 @@ export default function useMyAPI() {
       method: method || 'GET',
       credentials: 'same-origin',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': contentType || 'application/json',
         'X-XSRF-TOKEN': getXSRFCookie()
       },
-      body: body !== null ? JSON.stringify(body) : null
+      body: body !== null ? (contentType === 'application/json' ? JSON.stringify(body) : body) : null
     };
 
     // Run enter callback
