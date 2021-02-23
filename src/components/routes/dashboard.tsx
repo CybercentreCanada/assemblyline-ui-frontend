@@ -775,6 +775,7 @@ const WrappedServiceCard = ({ service, max_inflight }) => {
         </Grid>
         <Grid item xs={6}>
           <MetricCounter init value={service.metrics.fail_nonrecoverable} title="F" tooltip={t('service.failed')} />
+          <MetricCounter init value={service.metrics.fail_recoverable} title="R" tooltip={t('service.retried')} />
         </Grid>
       </Grid>
     </Card>

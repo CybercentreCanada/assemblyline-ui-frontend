@@ -63,6 +63,7 @@
   "service.error.none": "Il n'y a aucune instance de ce service",
   "service.error.queue": "La file d'attente pour ce service devient très élevée",
   "service.failed": "Fichiers échoués au cours de la dernière minute",
+  "service.retried": "Fichiers réessayés au cours de la dernière minute",
   "service.processed": "Fichiers traités dans la dernière minute",
   "service.queue": "Nombre de fichiers dans la file d'attente de service",
   "services": "Services en ligne:",

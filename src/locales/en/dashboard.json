@@ -63,6 +63,7 @@
   "service.error.none": "There are no instances of this service",
   "service.error.queue": "The queue for this service is getting very high",
   "service.failed": "Failed files in the last minute",
+  "service.retried": "Retried files in the last minute",
   "service.processed": "Processed files in the last minute",
   "service.queue": "Number of files in service queue",
   "services": "Online services:",
