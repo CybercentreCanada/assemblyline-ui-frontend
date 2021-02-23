@@ -140,7 +140,7 @@ const ServiceGeneral = ({ service, constants, versions, setService, setModified 
               fullWidth
               size="small"
               multiline
-              rows={4}
+              rows={6}
               margin="dense"
               variant="outlined"
               onChange={handleDescriptionChange}
