@@ -78,7 +78,7 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
                 <DivTableCell>{result.version}</DivTableCell>
                 <DivTableCell>{result.category}</DivTableCell>
                 <DivTableCell>{result.stage}</DivTableCell>
-                <DivTableCell>{result.accepts}</DivTableCell>
+                <DivTableCell style={{ wordBreak: 'break-all' }}>{result.accepts}</DivTableCell>
                 <DivTableCell>
                   {result.enabled ? <DoneIcon color="primary" /> : <ClearIcon color="error" />}
                 </DivTableCell>

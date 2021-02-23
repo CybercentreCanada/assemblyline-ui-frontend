@@ -13,6 +13,7 @@
   "delete.text": "Are you sure you want to remove this service from the system? This cannot be undone but you can always re-add it afterwards.",
   "general.name": "Service name",
   "general.version": "Version",
+  "general.classification": "Default result's classification",
   "general.description": "Description",
   "general.stage": "Execution stage",
   "general.category": "Service category",
