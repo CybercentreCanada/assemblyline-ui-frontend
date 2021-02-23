@@ -87,15 +87,6 @@ const ServiceGeneral = ({ service, constants, versions, setService, setModified 
 
   return (
     <div>
-      {c12nDef.enforce && (
-        <div style={{ paddingBottom: theme.spacing(4) }}>
-          <Classification
-            type="picker"
-            c12n={service ? service.default_result_classification : null}
-            setClassification={setClassification}
-          />
-        </div>
-      )}
       <Grid container spacing={2}>
         <Grid item xs={12} sm={6}>
           <Typography variant="subtitle2">{t('general.name')}</Typography>
@@ -133,6 +124,16 @@ const ServiceGeneral = ({ service, constants, versions, setService, setModified 
             <Skeleton style={{ height: '2.5rem' }} />
           )}
         </Grid>
+        {c12nDef.enforce && (
+          <Grid item xs={12}>
+            <Typography variant="subtitle2">{t('general.classification')}</Typography>
+            <Classification
+              type="picker"
+              c12n={service ? service.default_result_classification : null}
+              setClassification={setClassification}
+            />
+          </Grid>
+        )}
         <Grid item xs={12}>
           <Typography variant="subtitle2">{t('general.description')}</Typography>
           {service ? (

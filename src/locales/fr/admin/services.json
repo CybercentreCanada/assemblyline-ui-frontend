@@ -13,6 +13,7 @@
   "delete.text": "Voulez-vous vraiment supprimer ce service du système? Cela ne peut pas être annulé, mais vous pouvez toujours le ré-ajouter par la suite.",
   "general.name": "Nom du service",
   "general.version": "Version",
+  "general.classification": "Classification par défaut des résultats ",
   "general.description": "Description",
   "general.stage": "Étape d'exécution",
   "general.category": "Catégorie de service",
