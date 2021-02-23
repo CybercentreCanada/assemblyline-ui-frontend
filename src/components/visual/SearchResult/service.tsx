@@ -85,7 +85,14 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
                 <DivTableCell>
                   {updates[result.name] && updates[result.name].update_available && !updates[result.name].updating && (
                     <Tooltip title={`${result.name} ${updates[result.name].latest_tag} ${t('available')}!`}>
-                      <Button onClick={() => onUpdate(result.name, updates[result.name])}>{t('update')}</Button>
+                      <Button
+                        onClick={event => {
+                          event.preventDefault();
+                          onUpdate(result.name, updates[result.name]);
+                        }}
+                      >
+                        {t('update')}
+                      </Button>
                     </Tooltip>
                   )}
                   {updates[result.name] && updates[result.name].updating && t('updating')}
