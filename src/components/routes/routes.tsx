@@ -132,7 +132,7 @@ const WrappedRoutes = () => {
             position: 'sticky',
             bottom: '16px',
             right: '16px',
-            opacity: '.2',
+            opacity: '0.4',
             textAlign: 'right',
             zIndex: 10000,
             marginTop: 'auto',
