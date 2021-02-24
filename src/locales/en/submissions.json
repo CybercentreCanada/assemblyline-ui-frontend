@@ -1,8 +1,10 @@
 {
+  "completed_submissions": "Show completed submissions",
   "detail": "Detail",
   "filter": "Filter submissions...",
   "filtered": "submission matching filter",
   "filtereds": "submissions matching filter",
+  "malicious_submissions": "Show malicious submissions",
   "my_submission": "Show my submissions",
   "report": "Report",
   "searching": "Searching...",
