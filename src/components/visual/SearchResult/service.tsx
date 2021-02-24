@@ -88,7 +88,7 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
                       <Button
                         size="small"
                         variant="outlined"
-                        color="secondary"
+                        color="primary"
                         onClick={event => {
                           event.preventDefault();
                           event.stopPropagation();
