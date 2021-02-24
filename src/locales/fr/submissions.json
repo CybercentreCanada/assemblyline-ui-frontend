@@ -1,8 +1,10 @@
 {
+  "completed_submissions": "Afficher les soumissions terminées",
   "detail": "Détail",
   "filter": "Filtrer les soumissions...",
   "filtered": "soumission correspondant au filtre",
   "filtereds": "soumissions correspondant au filtre",
+  "malicious_submissions": "Afficher les soumissions malveillantes",
   "my_submission": "Voir mes soumissions",
   "report": "Rapport",
   "searching": "Recherche en cours...",
