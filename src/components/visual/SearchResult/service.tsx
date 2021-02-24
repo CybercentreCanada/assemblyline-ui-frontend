@@ -82,7 +82,7 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
                 <DivTableCell>
                   {result.enabled ? <DoneIcon color="primary" /> : <ClearIcon color="error" />}
                 </DivTableCell>
-                <DivTableCell>
+                <DivTableCell style={{ whiteSpace: 'nowrap' }}>
                   {updates[result.name] && updates[result.name].update_available && !updates[result.name].updating && (
                     <Tooltip title={`${result.name} ${updates[result.name].latest_tag} ${t('available')}!`}>
                       <Button
@@ -94,7 +94,6 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
                           event.stopPropagation();
                           onUpdate(result.name, updates[result.name]);
                         }}
-                        style={{ whiteSpace: 'nowrap' }}
                       >
                         {t('update')}
                       </Button>
