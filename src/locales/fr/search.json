@@ -11,8 +11,9 @@
   "header.description": "Description",
   "header.enabled": "Activé",
   "header.filetype": "Type de fichers",
-  "header.id": "ID",
   "header.hit_count": "Fois vue",
+  "header.id": "ID",
+  "header.last_hit": "Dernière fois",
   "header.lasttimeseen": "Dernière fois vu",
   "header.name": "Nom",
   "header.numfiles": "Fichiers",
@@ -31,7 +32,6 @@
   "header.user": "Utilisateur",
   "header.verdict": "Verdict",
   "header.version": "Version",
-  "header.last_hit": "Dernière fois",
   "matching_result": "résultat correspondant",
   "matching_results": "résultats correspondants",
   "never": "Jamais",
@@ -58,6 +58,8 @@
   "title_result": "Recherche de Résultats",
   "title_signature": "Recherche de Signatures",
   "title_submission": "Recherche de Soumissions",
+  "update": "Mettre à jour",
+  "updating": "Mise à jour...",
   "use_archive.turn_off": "Désactiver la recherche dans les archives",
   "use_archive.turn_on": "Activer la recherche dans les archives"
 }
