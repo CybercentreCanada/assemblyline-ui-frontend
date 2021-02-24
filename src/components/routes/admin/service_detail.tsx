@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 import { Redirect, useHistory, useParams } from 'react-router-dom';
 import UnderConstruction from '../under_construction';
 import ServiceGeneral from './service_detail/general';
+import ServiceParams from './service_detail/parameters';
 
 type ServiceProps = {
   name?: string | null;
@@ -57,7 +58,7 @@ type Container = {
   registry_username: string;
 };
 
-type SubmissionParams = {
+export type SubmissionParams = {
   default: string | boolean | number;
   name: string;
   type: 'int' | 'bool' | 'str' | 'list';
@@ -232,10 +233,8 @@ function Service({ name, onDeleted }: ServiceProps) {
         />
         <Grid container alignItems="center" spacing={3} style={{ paddingBottom: theme.spacing(2) }}>
           <Grid item xs>
-            <Typography variant="h4">{t('title.detail')}</Typography>
-            <Typography variant="caption">
-              {service ? service.name : <Skeleton style={{ width: '10rem' }} />}
-            </Typography>
+            <Typography variant="h4">{service ? service.name : <Skeleton style={{ width: '20rem' }} />}</Typography>
+            <Typography variant="caption">{t('title.detail')}</Typography>
           </Grid>
           <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
             {service ? (
@@ -281,14 +280,14 @@ function Service({ name, onDeleted }: ServiceProps) {
                 versions={versions}
               />
             </TabPanel>
-            <TabPanel value="docker">
+            <TabPanel value="docker" style={{ paddingLeft: 0, paddingRight: 0 }}>
               <UnderConstruction page="Docker Tab" />
             </TabPanel>
-            <TabPanel value="updater">
+            <TabPanel value="updater" style={{ paddingLeft: 0, paddingRight: 0 }}>
               <UnderConstruction page="Updater Tab" />
             </TabPanel>
-            <TabPanel value="params">
-              <UnderConstruction page="Params Tab" />
+            <TabPanel value="params" style={{ paddingLeft: 0, paddingRight: 0 }}>
+              <ServiceParams service={service} setService={setService} setModified={setModified} />
             </TabPanel>
           </TabContext>
         ) : (
