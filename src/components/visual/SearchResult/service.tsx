@@ -94,6 +94,7 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
                           event.stopPropagation();
                           onUpdate(result.name, updates[result.name]);
                         }}
+                        style={{ whiteSpace: 'nowrap' }}
                       >
                         {t('update')}
                       </Button>
