@@ -35,5 +35,7 @@
   "tab.params": "Parameters",
   "title": "Service Management",
   "title.detail": "Service Details",
-  "remove": "Remove service"
+  "remove": "Remove service",
+  "update": "Update",
+  "updating": "Updating..."
 }
