@@ -86,7 +86,8 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
       ...tempUserParams,
       type,
       list: [],
-      default: type === 'int' ? '1' : type === 'bool' ? 'false' : ''
+      default: type === 'int' ? '1' : type === 'bool' ? 'false' : '',
+      value: type === 'int' ? '1' : type === 'bool' ? 'false' : ''
     });
   };
 

@@ -177,10 +177,31 @@ const URLBody = ({ body }) => {
 
 const JSONBody = ({ body }) => {
   const theme = useTheme();
+
+  const jsonTheme = {
+    base00: 'transparent', // Background
+    base01: '#f1f1f1', // Edit key text
+    base02: theme.palette.type === 'dark' ? theme.palette.text.hint : theme.palette.divider, // Borders and DataType Background
+    base03: '#444', // Unused
+    base04: theme.palette.grey[theme.palette.type === 'dark' ? 700 : 400], // Object size and Add key border
+    base05: theme.palette.grey[theme.palette.type === 'dark' ? 700 : 700], // Undefined and Add key background
+    base06: '#444', // Unused
+    base07: theme.palette.text.primary, // Brace, Key and Borders
+    base08: theme.palette.text.secondary, // NaN
+    base09: theme.palette.type === 'dark' ? theme.palette.warning.light : theme.palette.warning.dark, // Strings and Icons
+    base0A: '#333', // Null, Regex and edit color
+    base0B: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark, // Float
+    base0C: theme.palette.type === 'dark' ? theme.palette.secondary.light : theme.palette.secondary.dark, // Array Key
+    base0D: theme.palette.type === 'dark' ? theme.palette.info.light : theme.palette.info.dark, // Date, function, expand icon
+    base0E: theme.palette.type === 'dark' ? theme.palette.info.light : theme.palette.info.dark, // Boolean
+    base0F: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark // Integer
+  };
+
   return (
     <ReactJson
+      name={false}
       src={body}
-      theme={theme.palette.type === 'dark' ? 'bright' : 'bright:inverted'}
+      theme={jsonTheme}
       enableClipboard={false}
       collapsed
       groupArraysAfterLength={10}
