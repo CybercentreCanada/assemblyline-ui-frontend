@@ -22,6 +22,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Redirect, useHistory, useParams } from 'react-router-dom';
 import UnderConstruction from '../under_construction';
+import ServiceContainer from './service_detail/container';
 import ServiceGeneral from './service_detail/general';
 import ServiceParams from './service_detail/parameters';
 
@@ -34,7 +35,7 @@ type ParamProps = {
   svc: string;
 };
 
-type Volume = {
+export type Volume = {
   capacity: string;
   mount_path: string;
   storage_class: string;
@@ -45,7 +46,7 @@ type Environment = {
   value: string;
 };
 
-type Container = {
+export type Container = {
   allow_internet_access: boolean;
   command: string;
   cpu_cores: number;
@@ -281,7 +282,7 @@ function Service({ name, onDeleted }: ServiceProps) {
               />
             </TabPanel>
             <TabPanel value="docker" style={{ paddingLeft: 0, paddingRight: 0 }}>
-              <UnderConstruction page="Docker Tab" />
+              <ServiceContainer service={service} setService={setService} setModified={setModified} />
             </TabPanel>
             <TabPanel value="updater" style={{ paddingLeft: 0, paddingRight: 0 }}>
               <UnderConstruction page="Updater Tab" />
