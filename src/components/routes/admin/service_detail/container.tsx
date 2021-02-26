@@ -70,11 +70,11 @@ const ContainerCard = ({ container, name, volumes, onClick }: ContainerCardProps
           <Grid item xs={12}>
             <div style={{ display: 'inline-block', paddingRight: theme.spacing(4) }}>
               <CgSmartphoneChip size={24} style={{ verticalAlign: 'middle' }} />
-              <span style={{ paddingLeft: theme.spacing(1) }}>{container.cpu_cores}</span>
+              <span style={{ paddingLeft: theme.spacing(1), verticalAlign: 'middle' }}>{container.cpu_cores}</span>
             </div>
             <div style={{ display: 'inline-block' }}>
               <CgSmartphoneRam size={24} style={{ verticalAlign: 'middle' }} />
-              <span style={{ paddingLeft: theme.spacing(1) }}>{container.ram_mb}</span>
+              <span style={{ paddingLeft: theme.spacing(1), verticalAlign: 'middle' }}>{container.ram_mb}</span>
             </div>
           </Grid>
         </Grid>
