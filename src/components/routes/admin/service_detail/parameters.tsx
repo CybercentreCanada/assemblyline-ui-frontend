@@ -3,6 +3,7 @@ import 'moment/locale/fr';
 import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ServiceDetail } from '../service_detail';
+import MultiTypeConfig from './multi_type_config';
 import MultiTypeParam from './multi_type_param';
 
 type ServiceParamsProps = {
@@ -27,8 +28,16 @@ const ServiceParams = ({ service, setService, setModified }: ServiceParamsProps)
     window.dispatchEvent(new CustomEvent('paramDelete', { detail: id }));
   }, []);
 
+  const onConfigAddUpdate = useCallback(config => {
+    window.dispatchEvent(new CustomEvent('configAddUpdate', { detail: config }));
+  }, []);
+
+  const onConfigDelete = useCallback(config => {
+    window.dispatchEvent(new CustomEvent('configDelete', { detail: config }));
+  }, []);
+
   useEffect(() => {
-    function handleAdd(event: CustomEvent) {
+    function handleSPAdd(event: CustomEvent) {
       const { detail: param } = event;
       const newSP = [...service.submission_params, { ...param }];
 
@@ -36,7 +45,7 @@ const ServiceParams = ({ service, setService, setModified }: ServiceParamsProps)
       setService({ ...service, submission_params: newSP });
     }
 
-    function handleUpdate(event: CustomEvent) {
+    function handleSPUpdate(event: CustomEvent) {
       const {
         detail: { param, id }
       } = event;
@@ -48,7 +57,7 @@ const ServiceParams = ({ service, setService, setModified }: ServiceParamsProps)
       setService({ ...service, submission_params: newSP });
     }
 
-    function handleDelete(event: CustomEvent) {
+    function handleSPDelete(event: CustomEvent) {
       const { detail: id } = event;
       const newSP = [...service.submission_params];
       newSP.splice(id, 1);
@@ -56,14 +65,32 @@ const ServiceParams = ({ service, setService, setModified }: ServiceParamsProps)
       setService({ ...service, submission_params: newSP });
     }
 
-    window.addEventListener('paramAdd', handleAdd);
-    window.addEventListener('paramUpdate', handleUpdate);
-    window.addEventListener('paramDelete', handleDelete);
+    function handleConfigAddUpdate(event: CustomEvent) {
+      const { detail: config } = event;
+      setModified(true);
+      setService({ ...service, config: { ...service.config, [config.name]: config.value } });
+    }
+
+    function handleConfigDelete(event: CustomEvent) {
+      const { detail: config } = event;
+      const newConfig = { ...service.config };
+      delete newConfig[config.name];
+      setModified(true);
+      setService({ ...service, config: newConfig });
+    }
+
+    window.addEventListener('paramAdd', handleSPAdd);
+    window.addEventListener('paramUpdate', handleSPUpdate);
+    window.addEventListener('paramDelete', handleSPDelete);
+    window.addEventListener('configAddUpdate', handleConfigAddUpdate);
+    window.addEventListener('configDelete', handleConfigDelete);
 
     return () => {
-      window.removeEventListener('paramAdd', handleAdd);
-      window.removeEventListener('paramUpdate', handleUpdate);
-      window.removeEventListener('paramDelete', handleDelete);
+      window.removeEventListener('paramAdd', handleSPAdd);
+      window.removeEventListener('paramUpdate', handleSPUpdate);
+      window.removeEventListener('paramDelete', handleSPDelete);
+      window.removeEventListener('configAddUpdate', handleConfigAddUpdate);
+      window.removeEventListener('configDelete', handleConfigDelete);
     };
   }, [service, setModified, setService]);
 
@@ -96,6 +123,38 @@ const ServiceParams = ({ service, setService, setModified }: ServiceParamsProps)
         </Grid>
         <Grid item xs={12}>
           <MultiTypeParam onAdd={onParamAdd} />
+        </Grid>
+
+        <Grid item xs={12} style={{ marginTop: theme.spacing(2) }}>
+          <Typography variant="h6">{t('params.config')}</Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <Typography variant="subtitle2">{t('params.config.current')}</Typography>
+        </Grid>
+        {Object.keys(service.config).length !== 0 ? (
+          Object.keys(service.config).map((name, i) => {
+            return (
+              <Grid item key={i} xs={12}>
+                <MultiTypeConfig
+                  config={{ name, value: service.config[name] }}
+                  onUpdate={onConfigAddUpdate}
+                  onDelete={onConfigDelete}
+                />
+              </Grid>
+            );
+          })
+        ) : (
+          <Grid item xs={12}>
+            <Typography variant="caption" color="textSecondary">
+              {t('params.config.none')}
+            </Typography>
+          </Grid>
+        )}
+        <Grid item xs={12} style={{ marginTop: theme.spacing(2) }}>
+          <Typography variant="subtitle2">{t('params.config.new')}</Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <MultiTypeConfig onAdd={onConfigAddUpdate} />
         </Grid>
       </Grid>
     </div>
