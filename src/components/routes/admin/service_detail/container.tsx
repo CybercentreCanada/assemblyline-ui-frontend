@@ -1,4 +1,16 @@
-import { Button, Card, Grid, makeStyles, MenuItem, Select, Typography, useTheme } from '@material-ui/core';
+import {
+  Button,
+  Card,
+  Grid,
+  IconButton,
+  makeStyles,
+  MenuItem,
+  Select,
+  Tooltip,
+  Typography,
+  useTheme
+} from '@material-ui/core';
+import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
 import { Skeleton } from '@material-ui/lab';
 import 'moment/locale/fr';
 import React from 'react';
@@ -15,7 +27,7 @@ const useStyles = makeStyles(theme => ({
     overflow: 'auto',
     wordBreak: 'break-word',
     '&:hover': {
-      backgroundColor: theme.palette.type === 'dark' ? '#ffffff10' : '#00000010',
+      backgroundColor: theme.palette.type === 'dark' ? '#ffffff10' : '#00000005',
       cursor: 'pointer'
     }
   },
@@ -42,18 +54,24 @@ type ContainerCardProps = {
   container: Container;
   name?: string;
   volumes?: { [name: string]: Volume };
-  onClick: () => void;
+  onChange: (newContainer: Container, name?: string, newVolumes?: { [name: string]: Volume }) => void;
 };
 
-const ContainerCard = ({ container, name, volumes, onClick }: ContainerCardProps) => {
+const WrappedContainerCard = ({ container, name, volumes, onChange }: ContainerCardProps) => {
   const { t } = useTranslation(['adminServices']);
   const theme = useTheme();
   const classes = useStyles();
+  const yesColor = theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark;
+  const noColor = theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark;
+
+  const handleContainerEdit = () => {
+    onChange(container, name, volumes);
+  };
 
   return (
     <div style={{ paddingTop: theme.spacing(1) }}>
-      <Card className={classes.card} onClick={onClick}>
-        <Grid container spacing={1}>
+      <Card className={classes.card} onClick={handleContainerEdit}>
+        <Grid container>
           {name && (
             <Grid item xs={12} className={classes.card_title} style={{ fontWeight: 700 }}>
               {name}
@@ -64,55 +82,78 @@ const ContainerCard = ({ container, name, volumes, onClick }: ContainerCardProps
           </Grid>
           {container.registry_password && container.registry_username && (
             <Grid item xs={12}>
-              <i>{t('container.registry.creds')}</i>
+              <i>{t('container.card.creds')}</i>
             </Grid>
           )}
-          <Grid item xs={12}>
-            <div style={{ display: 'inline-block', paddingRight: theme.spacing(4) }}>
-              <CgSmartphoneChip size={24} style={{ verticalAlign: 'middle' }} />
-              <span style={{ paddingLeft: theme.spacing(1), verticalAlign: 'middle' }}>{container.cpu_cores}</span>
-            </div>
-            <div style={{ display: 'inline-block' }}>
-              <CgSmartphoneRam size={24} style={{ verticalAlign: 'middle' }} />
-              <span style={{ paddingLeft: theme.spacing(1), verticalAlign: 'middle' }}>{container.ram_mb}</span>
-            </div>
+          <Grid item xs={12} style={{ paddingTop: theme.spacing(1), paddingBottom: theme.spacing(1) }}>
+            <Tooltip title={t('container.card.cpu')}>
+              <div style={{ display: 'inline-block', paddingRight: theme.spacing(4) }}>
+                <CgSmartphoneChip size={24} style={{ verticalAlign: 'middle' }} />
+                <span style={{ paddingLeft: theme.spacing(1), verticalAlign: 'middle' }}>{container.cpu_cores}</span>
+              </div>
+            </Tooltip>
+            <Tooltip title={t('container.card.ram')}>
+              <div style={{ display: 'inline-block' }}>
+                <CgSmartphoneRam size={24} style={{ verticalAlign: 'middle' }} />
+                <span style={{ paddingLeft: theme.spacing(1), verticalAlign: 'middle' }}>{container.ram_mb}</span>
+              </div>
+            </Tooltip>
           </Grid>
+          {container.command && (
+            <>
+              <Grid item xs={5} sm={4} md={2} className={classes.label}>{`${t('container.card.command')}:`}</Grid>
+              <Grid item xs={7} sm={8} md={10} className={classes.mono}>
+                {container.command}
+              </Grid>
+            </>
+          )}
+          <Grid item xs={5} sm={4} md={2} className={classes.label}>{`${t('container.card.internet')}:`}</Grid>
+          <Grid
+            item
+            xs={7}
+            sm={8}
+            md={10}
+            className={classes.mono}
+            style={{ color: container.allow_internet_access ? yesColor : noColor }}
+          >
+            {container.allow_internet_access ? t('container.card.yes') : t('container.card.no')}
+          </Grid>
+          {container.environment && container.environment.length !== 0 && (
+            <Grid item xs={12}>
+              <div className={classes.label}>{`${t('container.card.env')}:`}&nbsp;</div>
+              {container.environment.map((env, id) => {
+                return (
+                  <div key={id} className={classes.mono} style={{ paddingLeft: '2rem' }}>
+                    {`${env.name} = ${env.value}`}
+                  </div>
+                );
+              })}
+            </Grid>
+          )}
+          {volumes && Object.keys(volumes).length !== 0 && (
+            <Grid item xs={12}>
+              <div className={classes.label}>{`${t('container.card.volumes')}:`}&nbsp;</div>
+              {Object.keys(volumes).map((vol, id) => {
+                return (
+                  <div key={id} className={classes.mono} style={{ paddingLeft: '2rem' }}>
+                    {`${vol} = ${volumes[vol].mount_path} (${volumes[vol].capacity})`}
+                  </div>
+                );
+              })}
+            </Grid>
+          )}
         </Grid>
-        {/* <div style={{ paddingBottom: theme.spacing(2) }}>
-          <div style={{ float: 'right' }}>
-            {source.private_key && (
-              <Tooltip title={t('private_key_used')}>
-                <VpnKeyOutlinedIcon color="action" style={{ marginLeft: theme.spacing(0.5) }} />
-              </Tooltip>
-            )}
-            {source.ca_cert && (
-              <Tooltip title={t('ca_used')}>
-                <CardMembershipOutlinedIcon color="action" style={{ marginLeft: theme.spacing(0.5) }} />
-              </Tooltip>
-            )}
-            {source.proxy && (
-              <Tooltip title={t('proxy_used')}>
-                <DnsOutlinedIcon color="action" style={{ marginLeft: theme.spacing(0.5) }} />
-              </Tooltip>
-            )}
-            {source.ssl_ignore_errors && (
-              <Tooltip title={t('ignore_ssl_used')}>
-                <NoEncryptionOutlinedIcon color="action" style={{ marginLeft: theme.spacing(0.5) }} />
-              </Tooltip>
-            )}
-          </div>
-          <span className={classes.card_title}>{source.name}&nbsp;</span>
-          <span className={classes.mono}>({source.uri})</span>
-        </div> */}
       </Card>
     </div>
   );
 };
 
-ContainerCard.defaultProps = {
+WrappedContainerCard.defaultProps = {
   name: null,
   volumes: null
 };
+
+const ContainerCard = React.memo(WrappedContainerCard);
 
 const ServiceContainer = ({ service, setService, setModified }: ServiceContainerProps) => {
   const { t } = useTranslation(['adminServices']);
@@ -121,6 +162,25 @@ const ServiceContainer = ({ service, setService, setModified }: ServiceContainer
   const handleChannelChange = event => {
     setModified(true);
     setService({ ...service, update_channel: event.target.value });
+  };
+
+  const onDependencyDelete = name => {
+    const depList = { ...service.dependencies };
+    delete depList[name];
+    setModified(true);
+    setService({ ...service, dependencies: depList });
+  };
+
+  const handleContainerImageChange = newContainer => {
+    setModified(true);
+    setService({ ...service, docker_config: newContainer });
+  };
+
+  const handleDependencyChange = (newDep, name, newVolumes) => {
+    const depList = { ...service.dependencies };
+    depList[name] = { container: newDep, volumes: newVolumes };
+    setModified(true);
+    setService({ ...service, dependencies: depList });
   };
 
   return (
@@ -152,7 +212,7 @@ const ServiceContainer = ({ service, setService, setModified }: ServiceContainer
       <Grid item xs={12}>
         <Typography variant="subtitle2">{t('container.image')}</Typography>
         {service ? (
-          <ContainerCard container={service.docker_config} onClick={() => console.log(service.docker_config)} />
+          <ContainerCard container={service.docker_config} onChange={handleContainerImageChange} />
         ) : (
           <Skeleton style={{ height: '8rem' }} />
         )}
@@ -163,13 +223,28 @@ const ServiceContainer = ({ service, setService, setModified }: ServiceContainer
           Object.keys(service.dependencies).length !== 0 ? (
             Object.keys(service.dependencies).map(name => {
               return (
-                <ContainerCard
-                  key={name}
-                  name={name}
-                  container={service.dependencies[name].container}
-                  volumes={service.dependencies[name].volumes}
-                  onClick={() => console.log(name)}
-                />
+                <div key={name} style={{ display: 'flex', alignItems: 'center' }}>
+                  <div style={{ paddingRight: theme.spacing(1) }}>
+                    <ContainerCard
+                      name={name}
+                      container={service.dependencies[name].container}
+                      volumes={service.dependencies[name].volumes}
+                      onChange={handleDependencyChange}
+                    />
+                  </div>
+                  <div>
+                    <Tooltip title={t('container.dependencies.remove')}>
+                      <IconButton
+                        style={{
+                          color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                        }}
+                        onClick={() => onDependencyDelete(name)}
+                      >
+                        <RemoveCircleOutlineOutlinedIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </div>
+                </div>
               );
             })
           ) : (
