@@ -1,34 +1,8 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, makeStyles, useTheme } from '@material-ui/core';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, useTheme } from '@material-ui/core';
 import 'moment/locale/fr';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Container, Volume } from '../service_detail';
-
-const useStyles = makeStyles(theme => ({
-  card: {
-    border: `1px solid ${theme.palette.divider}`,
-    borderRadius: '4px',
-    padding: '8px',
-    margin: '0.25rem 0',
-    overflow: 'auto',
-    wordBreak: 'break-word',
-    '&:hover': {
-      backgroundColor: theme.palette.type === 'dark' ? '#ffffff10' : '#00000005',
-      cursor: 'pointer'
-    }
-  },
-  card_title: {
-    fontSize: 'large',
-    fontFamily: 'monospace'
-  },
-  label: {
-    fontWeight: 500
-  },
-  mono: {
-    fontSize: 'larger',
-    fontFamily: 'monospace'
-  }
-}));
 
 const DEFAULT_CONTAINER: Container = {
   allow_internet_access: false,
