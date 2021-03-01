@@ -21,10 +21,10 @@ import Empty from 'components/visual/Empty';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Redirect, useHistory, useParams } from 'react-router-dom';
-import UnderConstruction from '../under_construction';
 import ServiceContainer from './service_detail/container';
 import ServiceGeneral from './service_detail/general';
 import ServiceParams from './service_detail/parameters';
+import ServiceUpdater from './service_detail/updater';
 
 type ServiceProps = {
   name?: string | null;
@@ -82,7 +82,7 @@ type Source = {
 };
 
 type UpdateConfig = {
-  generate_signatures: boolean;
+  generates_signatures: boolean;
   method: 'run' | 'build';
   run_options: Container;
   sources: Source[];
@@ -285,7 +285,7 @@ function Service({ name, onDeleted }: ServiceProps) {
               <ServiceContainer service={service} setService={setService} setModified={setModified} />
             </TabPanel>
             <TabPanel value="updater" style={{ paddingLeft: 0, paddingRight: 0 }}>
-              <UnderConstruction page="Updater Tab" />
+              <ServiceUpdater service={service} setService={setService} setModified={setModified} />
             </TabPanel>
             <TabPanel value="params" style={{ paddingLeft: 0, paddingRight: 0 }}>
               <ServiceParams service={service} setService={setService} setModified={setModified} />

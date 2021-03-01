@@ -325,6 +325,11 @@ const WrappedContainerDialog = ({ open, setOpen, container, name, volumes, onSav
     setTempContainer({ ...tempContainer, [field]: value });
   };
 
+  const handleContainerCommandChange = event => {
+    setModified(true);
+    setTempContainer({ ...tempContainer, command: event.target.value.split(' ') });
+  };
+
   const handleEnvAddUpdate = newEnv => {
     const newEnvironment = [...tempContainer.environment];
     let index = -1;
@@ -462,6 +467,17 @@ const WrappedContainerDialog = ({ open, setOpen, container, name, volumes, onSav
                 variant="outlined"
                 onChange={event => handleContainerValueChange('registry_password', event.target.value)}
                 value={tempContainer.registry_password}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="subtitle2">{t('container.dialog.command')}</Typography>
+              <TextField
+                fullWidth
+                size="small"
+                margin="dense"
+                variant="outlined"
+                onChange={handleContainerCommandChange}
+                value={tempContainer.command}
               />
             </Grid>
             <Grid item xs={12}>

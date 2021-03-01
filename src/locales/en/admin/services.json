@@ -30,6 +30,7 @@
   "container.dialog.allow_internet.yes": "Yes - Allowed to access resources outside of the Assemblyline cluster",
   "container.dialog.allow_internet.no": "No - Confined to the container",
   "container.dialog.cancelText": "Cancel",
+  "container.dialog.command": "Command executed in the container",
   "container.dialog.cpu": "Allowed CPU cores",
   "container.dialog.environment": "Environment variables",
   "container.dialog.environment.name": "Variable name",
@@ -89,5 +90,19 @@
   "tab.params": "Parameters",
   "tab.updater": "Updates",
   "title": "Service Management",
-  "title.detail": "Service Details"
+  "title.detail": "Service Details",
+  "updater": "Update's configuration",
+  "updater.method": "Update's method",
+  "updater.method.run": "Execute a container",
+  "updater.method.build": "Rebuild a container",
+  "updater.interval": "Update interval (seconds)",
+  "updater.run.options": "Executed update container",
+  "updater.signatures": "Generates Signatures",
+  "updater.signatures.yes": "Yes",
+  "updater.signatures.no": "No",
+  "updater.sources": "Updates' sources",
+  "updater.sources.add": "Add a source",
+  "updater.wait": "Wait for a valid update before starting service",
+  "updater.wait.yes": "Yes",
+  "updater.wait.no": "No"
 }
