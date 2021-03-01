@@ -49,7 +49,7 @@ const useStyles = makeStyles(theme => ({
     overflow: 'auto',
     wordBreak: 'break-word',
     '&:hover': {
-      backgroundColor: theme.palette.type === 'dark' ? '#ffffff10' : '#00000010',
+      backgroundColor: theme.palette.type === 'dark' ? '#ffffff10' : '#00000005',
       cursor: 'pointer'
     }
   },
