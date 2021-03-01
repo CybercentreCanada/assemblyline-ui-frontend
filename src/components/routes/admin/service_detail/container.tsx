@@ -61,8 +61,8 @@ const ServiceContainer = ({ service, setService, setModified }: ServiceContainer
             style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(0.5) }}
           >
             <MenuItem value="stable">{t('container.channel.stable')}</MenuItem>
-            {/* <MenuItem value="rc">{service.version}</MenuItem> */}
-            {/* <MenuItem value="beta">{service.version}</MenuItem> */}
+            {/* <MenuItem value="rc">{t('container.channel.rc')}</MenuItem> */}
+            {/* <MenuItem value="beta">{t('container.channel.beta')}</MenuItem> */}
             <MenuItem value="dev">{t('container.channel.dev')}</MenuItem>
           </Select>
         ) : (
@@ -84,7 +84,7 @@ const ServiceContainer = ({ service, setService, setModified }: ServiceContainer
             Object.keys(service.dependencies).map(name => {
               return (
                 <div key={name} style={{ display: 'flex', alignItems: 'center' }}>
-                  <div style={{ paddingRight: theme.spacing(1) }}>
+                  <div style={{ paddingRight: theme.spacing(1), flexGrow: 1 }}>
                     <ContainerCard
                       name={name}
                       container={service.dependencies[name].container}

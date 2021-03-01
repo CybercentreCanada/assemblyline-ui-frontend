@@ -47,8 +47,8 @@ const WrappedContainerCard = ({ container, name, volumes, onChange }: ContainerC
   const yesColor = theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark;
   const noColor = theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark;
 
-  const handleContainerChange = () => {
-    onChange(container, name, volumes);
+  const handleContainerChange = (tempContainer, tempName, tempVolumes) => {
+    onChange(tempContainer, tempName, tempVolumes);
   };
 
   return (
