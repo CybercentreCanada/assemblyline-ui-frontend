@@ -467,9 +467,9 @@ const WrappedSourceDetail = ({ service, base, close, reload }) => {
   );
 };
 
-const SourceDetail = React.memo(WrappedSourceDetail);
+export const SourceDetail = React.memo(WrappedSourceDetail);
 
-const SourceCard = ({ source, onClick }) => {
+export const SourceCard = ({ source, onClick }) => {
   const { t } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
   const { c12nDef } = useALContext();

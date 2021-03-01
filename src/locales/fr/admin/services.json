@@ -30,6 +30,7 @@
   "container.dialog.allow_internet.yes": "Oui - Autorisé à accéder aux ressources en dehors du cluster Assemblyline",
   "container.dialog.allow_internet.no": "Non - Confiné au conteneur",
   "container.dialog.cancelText": "Annuler",
+  "container.dialog.command": "Commande exécutée dans le conteneur",
   "container.dialog.cpu": "Cœurs de processeur autorisés",
   "container.dialog.environment": "Variables d'environnement",
   "container.dialog.environment.name": "Nom de variable",
@@ -89,5 +90,19 @@
   "tab.params": "Paramètres",
   "tab.updater": "Mise à jour",
   "title": "Gestion des services",
-  "title.detail": "Détail du service"
+  "title.detail": "Détail du service",
+  "updater": "Configuration de la mise à jour",
+  "updater.method": "Méthode de mise à jour",
+  "updater.method.run": "Exécuter un conteneur",
+  "updater.method.build": "Reconstruire un conteneur",
+  "updater.interval": "Intervalle de mise à jour (secondes)",
+  "updater.run.options": "Conteneur de mise à jour exécuté",
+  "updater.signatures": "Génère des signatures",
+  "updater.signatures.yes": "Oui",
+  "updater.signatures.no": "Non",
+  "updater.sources": "Sources des mises à jour",
+  "updater.sources.add": "Ajouter une source",
+  "updater.wait": "Attendez une mise à jour valide avant de démarrer le service",
+  "updater.wait.yes": "Oui",
+  "updater.wait.no": "Non"
 }
