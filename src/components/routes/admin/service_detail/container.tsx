@@ -117,7 +117,7 @@ const ServiceContainer = ({ service, setService, setModified }: ServiceContainer
         )}
       </Grid>
       <Grid item xs={12}>
-        <ContainerDialog open={dialog} setOpen={setDialog} name="" onSave={handleDependencyChange} />
+        <ContainerDialog open={dialog} setOpen={setDialog} name="" volumes={{}} onSave={handleDependencyChange} />
         <Button variant="contained" color="primary" onClick={() => setDialog(true)}>
           {t('container.dependencies.add')}
         </Button>
