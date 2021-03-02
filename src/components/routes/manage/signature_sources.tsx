@@ -545,7 +545,7 @@ export const SourceCard = ({ source, onClick }) => {
             {source.headers.map((item, id) => {
               return (
                 <div key={id} className={classes.mono} style={{ paddingLeft: '2rem' }}>
-                  {`${item.name}: ${item.value}`}
+                  {`${item.name} = ${item.value}`}
                 </div>
               );
             })}
