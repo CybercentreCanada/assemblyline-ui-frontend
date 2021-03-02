@@ -477,7 +477,7 @@ const WrappedContainerDialog = ({ open, setOpen, container, name, volumes, onSav
                 margin="dense"
                 variant="outlined"
                 onChange={handleContainerCommandChange}
-                value={tempContainer.command}
+                value={tempContainer.command ? tempContainer.command.join(' ') : ''}
               />
             </Grid>
             <Grid item xs={12}>

@@ -17,6 +17,7 @@ import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
+import CustomChip from 'components/visual/CustomChip';
 import Empty from 'components/visual/Empty';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -48,7 +49,7 @@ type Environment = {
 
 export type Container = {
   allow_internet_access: boolean;
-  command: string;
+  command: string[];
   cpu_cores: number;
   environment: Environment[];
   image: string;
@@ -67,7 +68,7 @@ export type SubmissionParams = {
   list?: string[];
 };
 
-type Source = {
+export type Source = {
   ca_cert: string;
   default_classification: string;
   headers: Environment[];
@@ -193,6 +194,11 @@ function Service({ name, onDeleted }: ServiceProps) {
     setDeleteDialog(true);
   };
 
+  const handleToggleEnabled = () => {
+    setModified(true);
+    setService({ ...service, enabled: !service.enabled });
+  };
+
   useEffect(() => {
     // Load user on start
     if (currentUser.is_admin) {
@@ -258,6 +264,19 @@ function Service({ name, onDeleted }: ServiceProps) {
             )}
           </Grid>
         </Grid>
+
+        {service ? (
+          <CustomChip
+            type="rounded"
+            color={service.enabled ? 'primary' : 'default'}
+            onClick={handleToggleEnabled}
+            label={service.enabled ? t('enabled') : t('disabled')}
+            fullWidth
+            style={{ marginBottom: theme.spacing(2) }}
+          />
+        ) : (
+          <Skeleton variant="rect" height="2.5rem" style={{ marginBottom: theme.spacing(1) }} />
+        )}
 
         {service ? (
           <TabContext value={tab}>

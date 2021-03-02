@@ -94,7 +94,7 @@ const WrappedContainerCard = ({ container, name, volumes, onChange }: ContainerC
             <>
               <Grid item xs={5} sm={4} md={2} className={classes.label}>{`${t('container.card.command')}:`}</Grid>
               <Grid item xs={7} sm={8} md={10} className={classes.mono}>
-                {container.command}
+                {container.command.join(' ')}
               </Grid>
             </>
           )}
