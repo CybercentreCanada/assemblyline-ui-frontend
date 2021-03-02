@@ -101,7 +101,7 @@
   "updater.dialog.headers": "Headers",
   "updater.dialog.headers.name": "Header name",
   "updater.dialog.headers.value": "Header value",
-  "updater.dialog.ignore_ssl": "Ignore SSL Certificates Erreurs",
+  "updater.dialog.ignore_ssl": "Ignore SSL Certificates Errors",
   "updater.dialog.name": "Source name (required)",
   "updater.dialog.password": "Password",
   "updater.dialog.pattern": "Regex Pattern",
