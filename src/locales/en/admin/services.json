@@ -122,6 +122,7 @@
   "updater.sources": "Update sources",
   "updater.sources.add": "Add a source",
   "updater.sources.none": "There are no update sources specified right now",
+  "updater.sources.remove": "Remove source",
   "updater.wait": "Wait for a valid update before starting service",
   "updater.wait.yes": "Yes",
   "updater.wait.no": "No"

@@ -122,6 +122,7 @@
   "updater.sources": "Sources des mises à jour",
   "updater.sources.add": "Ajouter une source",
   "updater.sources.none": "Aucune source de mise à jour n'est spécifiée pour le moment",
+  "updater.sources.remove": "Supprimer la source",
   "updater.wait": "Attendre une mise à jour valide avant de démarrer le service",
   "updater.wait.yes": "Oui",
   "updater.wait.no": "Non"
