@@ -180,27 +180,33 @@ const ServiceUpdater = ({ service, setService, setModified }: ServiceUpdaterProp
           setOpen={setEditDialog}
           onSave={handleSaveSource}
         />
-        {service.update_config.sources.map((source, i) => {
-          return (
-            <div key={i} style={{ display: 'flex', alignItems: 'center' }}>
-              <div style={{ paddingRight: theme.spacing(1), flexGrow: 1 }}>
-                <SourceCard key={i} source={source} onClick={() => handleEditSource(i)} />
+        {service.update_config.sources.length !== 0 ? (
+          service.update_config.sources.map((source, i) => {
+            return (
+              <div key={i} style={{ display: 'flex', alignItems: 'center' }}>
+                <div style={{ paddingRight: theme.spacing(1), flexGrow: 1 }}>
+                  <SourceCard key={i} source={source} onClick={() => handleEditSource(i)} />
+                </div>
+                <div>
+                  <Tooltip title={t('updater.sources.remove')}>
+                    <IconButton
+                      style={{
+                        color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                      }}
+                      onClick={() => handleDeleteSource(i)}
+                    >
+                      <RemoveCircleOutlineOutlinedIcon />
+                    </IconButton>
+                  </Tooltip>
+                </div>
               </div>
-              <div>
-                <Tooltip title={t('updater.sources.remove')}>
-                  <IconButton
-                    style={{
-                      color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                    }}
-                    onClick={() => handleDeleteSource(i)}
-                  >
-                    <RemoveCircleOutlineOutlinedIcon />
-                  </IconButton>
-                </Tooltip>
-              </div>
-            </div>
-          );
-        })}
+            );
+          })
+        ) : (
+          <Typography variant="caption" color="textSecondary">
+            {t('updater.sources.none')}
+          </Typography>
+        )}
       </Grid>
 
       <Grid item xs={12}>
