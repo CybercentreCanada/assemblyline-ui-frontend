@@ -15,6 +15,7 @@ import Routes from 'components/routes/routes';
 import Tos from 'components/routes/tos';
 import DrawerProvider from 'components/visual/DrawerProvider';
 import HighlightProvider from 'components/visual/HighlightProvider';
+import { getProvider } from 'helpers/utils';
 import getXSRFCookie from 'helpers/xsrf';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -33,8 +34,8 @@ const MyApp = () => {
   const storedLoginParams = localStorage.getItem('loginParams');
   const defaultLoginParams = storedLoginParams ? JSON.parse(storedLoginParams) : null;
 
-  const params = new URLSearchParams(window.location.search);
-  const [renderedApp, setRenderedApp] = useState<PossibleApps>(params.get('provider') ? 'login' : 'load');
+  const provider = getProvider();
+  const [renderedApp, setRenderedApp] = useState<PossibleApps>(provider ? 'login' : 'load');
   const [loginParams, setLoginParams] = useState<LoginParamsProps | null>(defaultLoginParams);
 
   const { t } = useTranslation();
@@ -49,7 +50,7 @@ const MyApp = () => {
   };
 
   useEffect(() => {
-    if (params.get('provider')) {
+    if (provider) {
       return;
     }
     const requestOptions: RequestInit = {

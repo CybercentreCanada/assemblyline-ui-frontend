@@ -43,3 +43,11 @@ export function getValueFromPath(obj: object, path: string) {
   }
   return current;
 }
+
+export function getProvider() {
+  if (window.location.pathname.indexOf(`${process.env.PUBLIC_URL}/oauth/`) !== -1) {
+    return window.location.pathname.split(`${process.env.PUBLIC_URL}/oauth/`).pop().slice(0, -1);
+  }
+  const params = new URLSearchParams(window.location.search);
+  return params.get('provider');
+}

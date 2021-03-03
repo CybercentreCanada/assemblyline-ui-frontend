@@ -21,6 +21,7 @@ import { SecurityTokenLogin } from 'components/routes/login/sectoken';
 import { SignUp } from 'components/routes/login/signup';
 import { UserPassLogin } from 'components/routes/login/userpass';
 import TextDivider from 'components/visual/TextDivider';
+import { getProvider } from 'helpers/utils';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -53,8 +54,9 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
   const classes = useStyles();
   const apiCall = useMyAPI();
   const { getBanner } = useAppLayout();
+  const provider = getProvider();
   const [shownControls, setShownControls] = useState(
-    params.get('provider') ? 'oauth' : params.get('reset_id') ? 'reset_now' : 'login'
+    provider ? 'oauth' : params.get('reset_id') ? 'reset_now' : 'login'
   );
   const { showErrorMessage, showSuccessMessage } = useMySnackbar();
   const [username, setUsername] = useState('');
@@ -164,7 +166,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
           setShownControls('login');
         },
         onFinalize: () => {
-          if (params.get('provider')) {
+          if (provider) {
             history.push(localStorage.getItem('nextLocation') || '/');
           }
         }
