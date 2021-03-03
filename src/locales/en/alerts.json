@@ -41,7 +41,7 @@
   "groupBy.status": "Status",
   "group_count": "Group Count",
   "heuristic": "Heuristics",
-  "hint_owned_by": "Another user owns an alert in from this group",
+  "hint_owned_by": "Another user owns an alert in this group",
   "hint_owner": "There are owners for previous alerts in the group",
   "ip": "IPs",
   "ip_dynamic": "Dynamic",
