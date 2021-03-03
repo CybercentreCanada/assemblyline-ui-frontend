@@ -12,7 +12,7 @@
   "delete.acceptText": "Yes, delete it!",
   "delete.cancelText": "Cancel",
   "delete.success": "Signature was successfully deleted.",
-  "delete.text": "Are you sure you want to delete the current signature? There will be no way to recover it once it's done.",
+  "delete.text": "Are you sure you want to delete the current signature? There will be no way to recover it once removed.",
   "delete.title": "Delete Signature",
   "hit.count": "Hit Count:",
   "hit.first": "First Hit:",

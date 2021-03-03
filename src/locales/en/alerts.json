@@ -41,7 +41,7 @@
   "groupBy.status": "Status",
   "group_count": "Group Count",
   "heuristic": "Heuristics",
-  "hint_owned_by": "Another user own an alert in from this group",
+  "hint_owned_by": "Another user owns an alert in from this group",
   "hint_owner": "There are owners for previous alerts in the group",
   "ip": "IPs",
   "ip_dynamic": "Dynamic",
@@ -77,7 +77,7 @@
   "tc": "Time Constraint",
   "tc.1month": "1 Month",
   "tc.1week": "1 Week",
-  "tc.24h": "24 hours",
+  "tc.24h": "24 Hours",
   "tc.4d": "4 Days",
   "tc.none": "No time constraint (can be slow)",
   "tooltip.actions": "Alert Actions",
@@ -102,5 +102,5 @@
   "workflow.title": "Perform a workflow action",
   "workflow_action": "Perform a workflow action",
   "workflows": "Workflow actions",
-  "yara": "Yara rules triggered"
+  "yara": "YARA rules triggered"
 }

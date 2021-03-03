@@ -3,7 +3,7 @@
   "attack": "Att&ck Matrix",
   "detail_view": "Show detailed view",
   "error.notfound": "The submission was not found",
-  "error.too_early": "It is too early to generate the report, the submission is not completed. Redirecting you to the detail view...",
+  "error.too_early": "It is too early to generate the report, the submission has not completed. Redirecting you to the detail view...",
   "family": "Family",
   "file.description": "Description",
   "file.magic": "Magic",
