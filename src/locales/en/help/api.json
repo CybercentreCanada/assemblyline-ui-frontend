@@ -9,7 +9,7 @@
   "priv.W": "Write",
   "protected": "Requires login",
   "require_type": "Required user types",
-  "required_priv": "Required priviledges",
+  "required_priv": "Required privileges",
   "title": "API Documentation",
   "user_type.admin": "Administrator",
   "user_type.signature_importer": "Signature Importer",

@@ -12,7 +12,7 @@
   "header.service": "Service",
   "header.message": "Error Message",
   "header.type": "Type",
-  "maxed": "Show maximum depth, files and retries",
+  "maxed": "Show maximum depth, files, and retries",
   "message": "Error message:",
   "no_results_desc": "The query that you ran did not return any results.",
   "no_errors_title": "No errors found!",

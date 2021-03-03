@@ -58,7 +58,7 @@
   "queues.submission": "Submissions",
   "ram": "Memory",
   "resources": "System Resources",
-  "service.busy": "Number of busy service instance",
+  "service.busy": "Number of busy service instances",
   "service.error.fail_nonrecoverable": "There are non-recoverable failures for this service",
   "service.error.none": "There are no instances of this service",
   "service.error.queue": "The queue for this service is getting very high",
@@ -81,6 +81,6 @@
   "throughput.submissions_completed": "Scanned submissions",
   "throughput.updated": "Updated",
   "throughput.whitelisted": "Whitelisted submissions",
-  "timeout": "Were are not receiving any heartbeat for this component",
+  "timeout": "We are not receiving any heartbeat for this component",
   "title": "Dashboard"
 }
