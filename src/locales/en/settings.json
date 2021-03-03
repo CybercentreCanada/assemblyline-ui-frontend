@@ -11,7 +11,7 @@
   "interface.score_100000000": "Never auto-expand service sections",
   "interface.score_2000": "Malicious",
   "interface.score_500": "Highly Suspicious",
-  "interface.score_desc": "Minimum verdit required for a service result section gets auto-expanded.",
+  "interface.score_desc": "Minimum verdict required before a service result section gets auto-expanded.",
   "interface.view": "Submission view",
   "interface.view_desc": "Default view shown when opening completed submissions.",
   "interface.view_details": "Detail view",
