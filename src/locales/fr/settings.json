@@ -11,7 +11,7 @@
   "interface.score_100000000": "Ne jamais afficher automatiquement les sections de service",
   "interface.score_2000": "Malveillant",
   "interface.score_500": "Très suspect",
-  "interface.score_desc": "Le verdit minimum requis pour qu'une section de résultat de service soit automatiquement affichée.",
+  "interface.score_desc": "Verdict minimum requis avant qu'une section de résultat de service soit automatiquement affichée.",
   "interface.view": "Vue de soumission",
   "interface.view_desc": "Vue par défaut affichée lors de l'ouverture des soumissions.",
   "interface.view_details": "Vue de détail",

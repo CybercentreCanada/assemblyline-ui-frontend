@@ -49,7 +49,7 @@
   "label": "Labels",
   "labels": "Labels",
   "metadata": "Metadata",
-  "no_alerts_desc": "The following query in combinaison with the current selected filters do not match any alerts.",
+  "no_alerts_desc": "The following query in combination with the current selected filters do not match any alerts.",
   "no_alerts_title": "No alerts found",
   "others": "Other filters",
   "owned_by": "Alert owned by:",
