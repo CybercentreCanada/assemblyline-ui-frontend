@@ -18,10 +18,10 @@ server {
     access_log    off;
 
     location / {
-        try_files    ${DOLLAR}uri @alui;
+        try_files    ${DOLLAR}uri @frontend;
     }
 
-    location /next/ {
+    location @frontend {
         add_header            X-Frame-Options            SAMEORIGIN;
         add_header            Strict-Transport-Security  "max-age=31536000; includeSubDomains";
 
@@ -65,7 +65,7 @@ server {
         proxy_pass            http://${SOCKET_HOST}:5002;
     }
 
-    location @alui {
+    location /api/ {
         add_header            X-Frame-Options            SAMEORIGIN;
         add_header            Strict-Transport-Security  "max-age=31536000; includeSubDomains";
 
