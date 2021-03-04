@@ -16,7 +16,9 @@ type AlertStatusProps = {
 
 const AlertStatus: React.FC<AlertStatusProps> = ({ name, size = 'small' as 'small' }) => {
   const { t } = useTranslation('alerts');
-  return <CustomChip size={size} variant="outlined" color={COLOR_MAP[name]} label={t(`status_${name}`)} />;
+  return name ? (
+    <CustomChip size={size} variant="outlined" color={COLOR_MAP[name]} label={t(`status_${name}`)} />
+  ) : null;
 };
 
 export default AlertStatus;
