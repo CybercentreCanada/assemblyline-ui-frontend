@@ -104,7 +104,7 @@ export default function Services() {
   };
 
   const setService = useCallback(
-    service_name => {
+    (service_name: string) => {
       setGlobalDrawer(<Service name={service_name} onDeleted={onDeleted} />);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps

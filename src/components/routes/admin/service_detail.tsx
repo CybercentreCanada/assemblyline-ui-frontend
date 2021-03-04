@@ -209,15 +209,22 @@ function Service({ name, onDeleted }: ServiceProps) {
         }
       });
       apiCall({
-        url: '/api/v4/service/constants/',
-        onSuccess: api_data => {
-          setConstants(api_data.api_response);
-        }
-      });
-      apiCall({
         url: `/api/v4/service/versions/${name || svc}/`,
         onSuccess: api_data => {
           setVersions(api_data.api_response);
+        }
+      });
+    }
+    // eslint-disable-next-line
+  }, [name]);
+
+  useEffect(() => {
+    // Load user on start
+    if (currentUser.is_admin) {
+      apiCall({
+        url: '/api/v4/service/constants/',
+        onSuccess: api_data => {
+          setConstants(api_data.api_response);
         }
       });
     }
