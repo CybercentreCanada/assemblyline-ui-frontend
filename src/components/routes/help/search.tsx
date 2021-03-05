@@ -16,7 +16,7 @@ import ContentManagedSection from 'commons/addons/section/ContentManagedSection'
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import CustomChip from 'components/visual/CustomChip';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const StyledTableCell = withStyles((theme: Theme) =>
@@ -81,51 +81,55 @@ export default function Search() {
   const classes = useStyles();
   const { indexes } = useALContext();
   const theme = useTheme();
-  const [TOC] = useState([
-    { name: t('overview'), id: 'overview' },
-    { name: t('basic'), id: 'basic' },
-    {
-      name: t('fields.toc'),
-      id: 'fields',
-      subItems: [
-        { name: t('fields.idx_alert.toc'), id: 'fields.idx_alert' },
-        { name: t('fields.idx_file.toc'), id: 'fields.idx_file' },
-        { name: t('fields.idx_heuristic.toc'), id: 'fields.idx_heuristic' },
-        { name: t('fields.idx_result.toc'), id: 'fields.idx_result' },
-        { name: t('fields.idx_signature.toc'), id: 'fields.idx_signature' },
-        { name: t('fields.idx_submission.toc'), id: 'fields.idx_submission' },
-        { name: t('fields.idx_workflow.toc'), id: 'fields.idx_workflow' }
-      ]
-    },
-    { name: t('wildcard'), id: 'wildcard' },
-    {
-      name: t('regex'),
-      id: 'regex',
-      subItems: [
-        { name: t('regex.anchoring'), id: 'regex.anchoring' },
-        { name: t('regex.chars'), id: 'regex.chars' },
-        { name: t('regex.any'), id: 'regex.any' },
-        { name: t('regex.oneplus'), id: 'regex.oneplus' },
-        { name: t('regex.zeroplus'), id: 'regex.zeroplus' },
-        { name: t('regex.zeroone'), id: 'regex.zeroone' },
-        { name: t('regex.minmax'), id: 'regex.minmax' },
-        { name: t('regex.grouping'), id: 'regex.grouping' },
-        { name: t('regex.alternation'), id: 'regex.alternation' },
-        { name: t('regex.class'), id: 'regex.class' }
-      ]
-    },
-    { name: t('fuzziness'), id: 'fuzziness' },
-    { name: t('proximity'), id: 'proximity' },
-    { name: t('ranges'), id: 'ranges', subItems: [{ name: t('ranges.datemath'), id: 'ranges.datemath' }] },
-    { name: t('operator'), id: 'operator' },
-    { name: t('grouping'), id: 'grouping' },
-    { name: t('reserved'), id: 'reserved' }
-  ]);
+  const [toc, setToc] = useState([]);
   const [top] = useState({ name: t('top'), id: 'title' });
+
+  useEffect(() => {
+    setToc([
+      { name: t('overview'), id: 'overview' },
+      { name: t('basic'), id: 'basic' },
+      {
+        name: t('fields.toc'),
+        id: 'fields',
+        subItems: [
+          { name: t('fields.idx_alert.toc'), id: 'fields.idx_alert' },
+          { name: t('fields.idx_file.toc'), id: 'fields.idx_file' },
+          { name: t('fields.idx_heuristic.toc'), id: 'fields.idx_heuristic' },
+          { name: t('fields.idx_result.toc'), id: 'fields.idx_result' },
+          { name: t('fields.idx_signature.toc'), id: 'fields.idx_signature' },
+          { name: t('fields.idx_submission.toc'), id: 'fields.idx_submission' },
+          { name: t('fields.idx_workflow.toc'), id: 'fields.idx_workflow' }
+        ]
+      },
+      { name: t('wildcard'), id: 'wildcard' },
+      {
+        name: t('regex'),
+        id: 'regex',
+        subItems: [
+          { name: t('regex.anchoring'), id: 'regex.anchoring' },
+          { name: t('regex.chars'), id: 'regex.chars' },
+          { name: t('regex.any'), id: 'regex.any' },
+          { name: t('regex.oneplus'), id: 'regex.oneplus' },
+          { name: t('regex.zeroplus'), id: 'regex.zeroplus' },
+          { name: t('regex.zeroone'), id: 'regex.zeroone' },
+          { name: t('regex.minmax'), id: 'regex.minmax' },
+          { name: t('regex.grouping'), id: 'regex.grouping' },
+          { name: t('regex.alternation'), id: 'regex.alternation' },
+          { name: t('regex.class'), id: 'regex.class' }
+        ]
+      },
+      { name: t('fuzziness'), id: 'fuzziness' },
+      { name: t('proximity'), id: 'proximity' },
+      { name: t('ranges'), id: 'ranges', subItems: [{ name: t('ranges.datemath'), id: 'ranges.datemath' }] },
+      { name: t('operator'), id: 'operator' },
+      { name: t('grouping'), id: 'grouping' },
+      { name: t('reserved'), id: 'reserved' }
+    ]);
+  }, [t]);
 
   return (
     <PageCenter margin={4} textAlign="left">
-      <ContentManagedSection title={t('toc')} top={top} items={TOC}>
+      <ContentManagedSection title={t('toc')} top={top} items={toc}>
         {useMemo(() => {
           return (
             <>
