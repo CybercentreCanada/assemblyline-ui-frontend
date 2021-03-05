@@ -340,6 +340,216 @@ export default function Search() {
                   {t('regex.zeroplus.ex')}
                 </Card>
               </div>
+
+              <div id="regex.zeroone" className={classes.paragraph}>
+                <Typography variant="h6">{t('regex.zeroone')}</Typography>
+                <div className={classes.padded}>{t('regex.zeroone.text')}</div>
+                <Card variant="outlined" className={classes.pre}>
+                  {t('regex.zeroone.ex')}
+                </Card>
+              </div>
+
+              <div id="regex.minmax" className={classes.paragraph}>
+                <Typography variant="h6">{t('regex.minmax')}</Typography>
+                <div className={classes.padded}>{t('regex.minmax.text')}</div>
+                <Card variant="outlined" className={classes.pre}>
+                  {t('regex.minmax.ex')}
+                </Card>
+                <div className={classes.padded}>{t('regex.minmax.text2')}</div>
+                <Card variant="outlined" className={classes.pre}>
+                  {t('regex.minmax.ex2')}
+                </Card>
+              </div>
+
+              <div id="regex.grouping" className={classes.paragraph}>
+                <Typography variant="h6">{t('regex.grouping')}</Typography>
+                <div className={classes.padded}>{t('regex.grouping.text')}</div>
+                <Card variant="outlined" className={classes.pre}>
+                  {t('regex.grouping.ex')}
+                </Card>
+              </div>
+
+              <div id="regex.alternation" className={classes.paragraph}>
+                <Typography variant="h6">{t('regex.alternation')}</Typography>
+                <div className={classes.padded}>{t('regex.alternation.text')}</div>
+                <Card variant="outlined" className={classes.pre}>
+                  {t('regex.alternation.ex')}
+                </Card>
+              </div>
+
+              <div id="regex.class" className={classes.paragraph}>
+                <Typography variant="h6">{t('regex.class')}</Typography>
+                <div className={classes.padded}>{t('regex.class.text')}</div>
+                <Card variant="outlined" className={classes.pre}>
+                  {t('regex.class.ex')}
+                </Card>
+                <div className={classes.padded}>{t('regex.class.text2')}</div>
+                <div className={classes.padded}>{t('regex.class.text3')}</div>
+                <Card variant="outlined" className={classes.pre}>
+                  {t('regex.class.ex2')}
+                </Card>
+              </div>
+
+              <div id="fuzziness" className={classes.paragraph}>
+                <Typography variant="h5">{t('fuzziness')}</Typography>
+                <div className={classes.padded}>{t('fuzziness.text')}</div>
+                <Card variant="outlined" className={classes.pre}>
+                  {t('fuzziness.ex')}
+                </Card>
+                <div className={classes.padded}>{t('fuzziness.text2')}</div>
+                <div className={classes.padded}>{t('fuzziness.text3')}</div>
+                <Card variant="outlined" className={classes.pre}>
+                  {t('fuzziness.ex2')}
+                </Card>
+              </div>
+
+              <div id="proximity" className={classes.paragraph}>
+                <Typography variant="h5">{t('proximity')}</Typography>
+                <div className={classes.padded}>{t('proximity.text')}</div>
+                <Card variant="outlined" className={classes.pre}>
+                  {t('proximity.ex')}
+                </Card>
+                <div className={classes.padded}>{t('proximity.text2')}</div>
+              </div>
+
+              <div id="ranges" className={classes.paragraph}>
+                <Typography variant="h5">{t('ranges')}</Typography>
+                {t('ranges.text')}
+                <Typography variant="subtitle2" className={classes.padded}>
+                  {t('exemples')}
+                </Typography>
+                <ul className={classes.multipleEx}>
+                  <li>
+                    {t('ranges.ex1.title')}
+                    <Card variant="outlined" className={classes.pre}>
+                      {t('ranges.ex1')}
+                    </Card>
+                  </li>
+                  <li>
+                    {t('ranges.ex2.title')}
+                    <Card variant="outlined" className={classes.pre}>
+                      {t('ranges.ex2')}
+                    </Card>
+                  </li>
+                  <li>
+                    {t('ranges.ex3.title')}
+                    <Card variant="outlined" className={classes.pre}>
+                      {t('ranges.ex3')}
+                    </Card>
+                  </li>
+                  <li>
+                    {t('ranges.ex4.title')}
+                    <Card variant="outlined" className={classes.pre}>
+                      {t('ranges.ex4')}
+                    </Card>
+                  </li>
+                  <li>
+                    {t('ranges.ex5.title')}
+                    <Card variant="outlined" className={classes.pre}>
+                      {t('ranges.ex5')}
+                    </Card>
+                  </li>
+                  <li>
+                    {t('ranges.ex6.title')}
+                    <Card variant="outlined" className={classes.pre}>
+                      {t('ranges.ex6')}
+                    </Card>
+                  </li>
+                  <li>
+                    {t('ranges.ex7.title')}
+                    <Card variant="outlined" className={classes.pre}>
+                      {t('ranges.ex7')}
+                    </Card>
+                  </li>
+                </ul>
+                <div className={classes.padded}>{t('ranges.text2')}</div>
+                <ul className={classes.multipleEx}>
+                  <li>
+                    {t('ranges.ex8.title')}
+                    <Card variant="outlined" className={classes.pre}>
+                      {t('ranges.ex8')}
+                    </Card>
+                  </li>
+                </ul>
+                <div className={classes.padded}>{t('ranges.text3')}</div>
+                <Card variant="outlined" className={classes.pre}>
+                  {t('ranges.ex9')}
+                </Card>
+                <div className={classes.padded}>{t('ranges.text4')}</div>
+                <Card variant="outlined" className={classes.pre}>
+                  {t('ranges.ex10')}
+                </Card>
+              </div>
+
+              <div id="ranges.datemath" className={classes.paragraph}>
+                <Typography variant="h6">{t('ranges.datemath')}</Typography>
+                <div className={classes.padded}>{t('ranges.datemath.text')}</div>
+                <ul>
+                  <li>{t('ranges.datemath.list1')}</li>
+                  <li>{t('ranges.datemath.list2')}</li>
+                  <li>{t('ranges.datemath.list3')}</li>
+                </ul>
+                <div className={classes.padded}>{t('ranges.datemath.text2')}</div>
+                <Card variant="outlined" className={classes.pre}>
+                  {t('ranges.datemath.ex1')}
+                </Card>
+                <div className={classes.padded}>{t('ranges.datemath.text3')}</div>
+                <Card variant="outlined" className={classes.pre}>
+                  {t('ranges.datemath.ex2')}
+                </Card>
+              </div>
+
+              <div id="operator" className={classes.paragraph}>
+                <Typography variant="h5">{t('operator')}</Typography>
+                <div className={classes.padded}>{t('operator.text')}</div>
+                <div className={classes.padded}>{t('operator.text2')}</div>
+                <Card variant="outlined" className={classes.pre}>
+                  {t('operator.ex1')}
+                </Card>
+                <div className={classes.padded}>{t('operator.text3')}</div>
+                <ul>
+                  <li>{t('operator.list1')}</li>
+                  <li>{t('operator.list2')}</li>
+                  <li>{t('operator.list3')}</li>
+                </ul>
+                <div className={classes.padded}>{t('operator.text4')}</div>
+                <Card variant="outlined" className={classes.pre}>
+                  {t('operator.ex2')}
+                </Card>
+                <div className={classes.padded}>{t('operator.text5')}</div>
+              </div>
+
+              <div id="grouping" className={classes.paragraph}>
+                <Typography variant="h5">{t('grouping')}</Typography>
+                <div className={classes.padded}>{t('grouping.text')}</div>
+                <Card variant="outlined" className={classes.pre}>
+                  {t('grouping.ex')}
+                </Card>
+                <div className={classes.padded}>{t('grouping.text2')}</div>
+                <Card variant="outlined" className={classes.pre}>
+                  {t('grouping.ex2')}
+                </Card>
+              </div>
+
+              <div id="reserved" className={classes.paragraph}>
+                <Typography variant="h5">{t('reserved')}</Typography>
+                <div className={classes.padded}>{t('reserved.text')}</div>
+                <div className={classes.padded}>{t('reserved.text2')}</div>
+                <Card variant="outlined" className={classes.pre}>
+                  {t('reserved.ex')}
+                </Card>
+                <div className={classes.padded}>{t('reserved.text3')}</div>
+                <Card variant="outlined" className={classes.pre}>
+                  {t('reserved.ex2')}
+                </Card>
+                <div className={classes.padded}>{t('reserved.text4')}</div>
+                <div className={classes.padded}>
+                  <b>
+                    <i>{t('reserved.note')}</i>
+                  </b>
+                  {`: ${t('reserved.text5')}`}
+                </div>
+              </div>
             </>
           );
         }, [classes.multipleEx, classes.padded, classes.paragraph, classes.pre, indexes, t, theme])}
