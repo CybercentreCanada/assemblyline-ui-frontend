@@ -43,7 +43,10 @@ const useStyles = makeStyles(theme => ({
   },
   paragraph: {
     marginTop: theme.spacing(-8),
-    paddingTop: theme.spacing(12)
+    paddingTop: theme.spacing(12),
+    '& h6': {
+      fontWeight: 300
+    }
   },
   pre: {
     fontFamily: 'monospace',
@@ -261,7 +264,7 @@ export default function Search() {
 
               <div id="wildcard" className={classes.paragraph}>
                 <Typography variant="h5">{t('wildcard')}</Typography>
-                {t('wildcard.text')}
+                <div className={classes.padded}>{t('wildcard.text')}</div>
                 <Card variant="outlined" className={classes.pre}>
                   {t('wildcard.ex')}
                 </Card>
@@ -276,7 +279,7 @@ export default function Search() {
 
               <div id="regex" className={classes.paragraph}>
                 <Typography variant="h5">{t('regex')}</Typography>
-                {t('regex.text')}
+                <div className={classes.padded}>{t('regex.text')}</div>
                 <Card variant="outlined" className={classes.pre}>
                   {t('regex.ex')}
                 </Card>
@@ -290,6 +293,52 @@ export default function Search() {
                   {t('regex.warning.ex')}
                 </Card>
                 <div className={classes.padded}>{t('regex.warning.follow')}</div>
+              </div>
+
+              <div id="regex.anchoring" className={classes.paragraph}>
+                <Typography variant="h6">{t('regex.anchoring')}</Typography>
+                <div className={classes.padded}>{t('regex.anchoring.text')}</div>
+                <div className={classes.padded}>{t('regex.anchoring.text2')}</div>
+                <Card variant="outlined" className={classes.pre}>
+                  {t('regex.anchoring.ex')}
+                </Card>
+              </div>
+
+              <div id="regex.chars" className={classes.paragraph}>
+                <Typography variant="h6">{t('regex.chars')}</Typography>
+                <div className={classes.padded}>{t('regex.chars.text')}</div>
+                <Card variant="outlined" className={classes.pre}>
+                  {t('regex.chars.ex')}
+                </Card>
+                <div className={classes.padded}>{t('regex.chars.text2')}</div>
+                <div className={classes.padded}>{t('regex.chars.text3')}</div>
+                <Card variant="outlined" className={classes.pre}>
+                  {t('regex.chars.ex2')}
+                </Card>
+              </div>
+
+              <div id="regex.any" className={classes.paragraph}>
+                <Typography variant="h6">{t('regex.any')}</Typography>
+                <div className={classes.padded}>{t('regex.any.text')}</div>
+                <Card variant="outlined" className={classes.pre}>
+                  {t('regex.any.ex')}
+                </Card>
+              </div>
+
+              <div id="regex.oneplus" className={classes.paragraph}>
+                <Typography variant="h6">{t('regex.oneplus')}</Typography>
+                <div className={classes.padded}>{t('regex.oneplus.text')}</div>
+                <Card variant="outlined" className={classes.pre}>
+                  {t('regex.oneplus.ex')}
+                </Card>
+              </div>
+
+              <div id="regex.zeroplus" className={classes.paragraph}>
+                <Typography variant="h6">{t('regex.zeroplus')}</Typography>
+                <div className={classes.padded}>{t('regex.zeroplus.text')}</div>
+                <Card variant="outlined" className={classes.pre}>
+                  {t('regex.zeroplus.ex')}
+                </Card>
               </div>
             </>
           );
