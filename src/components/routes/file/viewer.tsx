@@ -153,58 +153,53 @@ const FileViewer = () => {
   }, [location.hash]);
 
   return (
-    <PageCenter margin={4} width="100%">
-      <div style={{ textAlign: 'left' }}>
-        <Grid container alignItems="center">
-          <Grid item xs sm={8}>
-            <Typography variant="h4">{t('title')}</Typography>
-            <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
-              {id}
-            </Typography>
-          </Grid>
-          <Grid item xs={12} sm>
-            <div style={{ textAlign: 'right' }}>
-              <Tooltip title={t('detail')}>
-                <IconButton component={Link} to={`/file/detail/${id}`}>
-                  <DescriptionOutlinedIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={t('related')}>
-                <IconButton component={Link} to={`/search/submission?query=files.sha256:${id} OR results:${id}*`}>
-                  <AmpStoriesOutlinedIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={t('download')}>
-                <IconButton
-                  component={MaterialLink}
-                  href={`/api/v4/file/download/${id}/?XSRF_TOKEN=${getXSRFCookie()}`}
-                >
-                  <GetAppOutlinedIcon color="action" />
-                </IconButton>
-              </Tooltip>
-            </div>
-          </Grid>
+    <PageCenter margin={4} width="100%" textAlign="left">
+      <Grid container alignItems="center">
+        <Grid item xs sm={8}>
+          <Typography variant="h4">{t('title')}</Typography>
+          <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
+            {id}
+          </Typography>
         </Grid>
+        <Grid item xs={12} sm>
+          <div style={{ textAlign: 'right' }}>
+            <Tooltip title={t('detail')}>
+              <IconButton component={Link} to={`/file/detail/${id}`}>
+                <DescriptionOutlinedIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={t('related')}>
+              <IconButton component={Link} to={`/search/submission?query=files.sha256:${id} OR results:${id}*`}>
+                <AmpStoriesOutlinedIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={t('download')}>
+              <IconButton component={MaterialLink} href={`/api/v4/file/download/${id}/?XSRF_TOKEN=${getXSRFCookie()}`}>
+                <GetAppOutlinedIcon color="action" />
+              </IconButton>
+            </Tooltip>
+          </div>
+        </Grid>
+      </Grid>
 
-        <TabContext value={tab}>
-          <Paper square style={{ marginTop: theme.spacing(4), marginBottom: theme.spacing(2) }}>
-            <TabList onChange={handleChangeTab} indicatorColor="primary" textColor="primary">
-              <Tab label={t('ascii')} value="ascii" />
-              <Tab label={t('strings')} value="strings" />
-              <Tab label={t('hex')} value="hex" />
-            </TabList>
-          </Paper>
-          <TabPanel value="ascii" className={classes.no_pad}>
-            <AsciiViewer sha256={id} />
-          </TabPanel>
-          <TabPanel value="strings" className={classes.no_pad}>
-            <StringViewer sha256={id} />
-          </TabPanel>
-          <TabPanel value="hex" className={classes.no_pad}>
-            <HexViewer sha256={id} />
-          </TabPanel>
-        </TabContext>
-      </div>
+      <TabContext value={tab}>
+        <Paper square style={{ marginTop: theme.spacing(4), marginBottom: theme.spacing(2) }}>
+          <TabList onChange={handleChangeTab} indicatorColor="primary" textColor="primary">
+            <Tab label={t('ascii')} value="ascii" />
+            <Tab label={t('strings')} value="strings" />
+            <Tab label={t('hex')} value="hex" />
+          </TabList>
+        </Paper>
+        <TabPanel value="ascii" className={classes.no_pad}>
+          <AsciiViewer sha256={id} />
+        </TabPanel>
+        <TabPanel value="strings" className={classes.no_pad}>
+          <StringViewer sha256={id} />
+        </TabPanel>
+        <TabPanel value="hex" className={classes.no_pad}>
+          <HexViewer sha256={id} />
+        </TabPanel>
+      </TabContext>
     </PageCenter>
   );
 };

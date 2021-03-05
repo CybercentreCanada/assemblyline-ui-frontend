@@ -16,11 +16,11 @@ export default function HelpClassification() {
   const sp4 = theme.spacing(4);
 
   return c12nDef.enforce ? (
-    <PageCenter margin={4} width="100%">
-      <div style={{ marginBottom: theme.spacing(4), textAlign: 'left' }}>
+    <PageCenter margin={4} width="100%" textAlign="left">
+      <div style={{ marginBottom: theme.spacing(4) }}>
         <Typography variant="h4">{t('title')}</Typography>
       </div>
-      <div style={{ textAlign: 'left', paddingBottom: sp4 }}>
+      <div style={{ paddingBottom: sp4 }}>
         <Typography variant="h5" gutterBottom>
           {t('desc_title')}
         </Typography>
@@ -31,7 +31,7 @@ export default function HelpClassification() {
           {t('desc_2')}
         </Typography>
       </div>
-      <div style={{ textAlign: 'left', paddingBottom: sp4 }}>
+      <div style={{ paddingBottom: sp4 }}>
         <Typography variant="h5" gutterBottom>
           {t('submission_title')}
         </Typography>
@@ -84,7 +84,7 @@ export default function HelpClassification() {
           </Typography>
         </div>
       </div>
-      <div style={{ textAlign: 'left', paddingBottom: sp4 }}>
+      <div style={{ paddingBottom: sp4 }}>
         <Typography variant="h5" gutterBottom>
           {t('result_title')}
         </Typography>
@@ -142,12 +142,12 @@ export default function HelpClassification() {
           </Typography>
         </div>
       </div>
-      <div style={{ textAlign: 'left' }}>
+      <div>
         <Typography variant="h5" gutterBottom>
           {t('validation_title')}
         </Typography>
       </div>
-      <div style={{ textAlign: 'left', paddingBottom: sp1 }}>
+      <div style={{ paddingBottom: sp1 }}>
         <Typography variant="h6" gutterBottom>
           {t('validation_level')}
         </Typography>
@@ -175,7 +175,7 @@ export default function HelpClassification() {
               })}
         </ul>
       </div>
-      <div style={{ textAlign: 'left', paddingBottom: sp1 }}>
+      <div style={{ paddingBottom: sp1 }}>
         <Typography variant="h6" gutterBottom>
           {t('validation_required')}
         </Typography>
@@ -212,7 +212,7 @@ export default function HelpClassification() {
           )}
         </ul>
       </div>
-      <div style={{ textAlign: 'left', paddingBottom: sp1 }}>
+      <div style={{ paddingBottom: sp1 }}>
         <Typography variant="h6" gutterBottom>
           {t('validation_groups')}
         </Typography>
@@ -252,7 +252,7 @@ export default function HelpClassification() {
           <Trans ns="helpClassification" i18nKey="validation_groups_note" components={{ bold: <strong /> }} />
         </Typography>
       </div>
-      <div style={{ textAlign: 'left' }}>
+      <div>
         <Typography variant="h6" gutterBottom>
           {t('validation_subgroups')}
         </Typography>

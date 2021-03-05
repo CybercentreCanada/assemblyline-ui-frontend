@@ -1,10 +1,10 @@
 import { makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
 import React from 'react';
 
-const useStyles = (w, mxw) => {
+const useStyles = (w, mxw, ta) => {
   return makeStyles(theme => ({
     page: {
-      textAlign: 'center',
+      textAlign: ta,
       margin: '0 auto auto auto',
       width: w,
       maxWidth: mxw,
@@ -24,6 +24,7 @@ type PageCenterProps = {
   mt?: number;
   maxWidth?: string;
   width?: string;
+  textAlign?: string;
 };
 
 const PageCenter: React.FC<PageCenterProps> = ({
@@ -34,9 +35,10 @@ const PageCenter: React.FC<PageCenterProps> = ({
   ml = 2,
   mr = 2,
   mt = 2,
-  width = '95%'
+  width = '95%',
+  textAlign = 'center'
 }) => {
-  const classes = useStyles(width, maxWidth);
+  const classes = useStyles(width, maxWidth, textAlign);
   const theme = useTheme();
   const divider = useMediaQuery(theme.breakpoints.up('md')) ? 1 : 2;
 

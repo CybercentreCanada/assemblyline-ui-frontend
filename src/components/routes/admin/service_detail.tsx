@@ -234,93 +234,91 @@ function Service({ name, onDeleted }: ServiceProps) {
   return !currentUser.is_admin ? (
     <Redirect to="/forbidden" />
   ) : (
-    <PageCenter margin={!svc ? 2 : 4} width="100%">
-      <div style={{ textAlign: 'left' }}>
-        <ConfirmationDialog
-          open={deleteDialog}
-          handleClose={() => setDeleteDialog(false)}
-          handleAccept={handleExecuteDeleteButtonClick}
-          title={t('delete.title')}
-          cancelText={t('delete.cancelText')}
-          acceptText={t('delete.acceptText')}
-          text={t('delete.text')}
-        />
-        <Grid container alignItems="center" spacing={3} style={{ paddingBottom: theme.spacing(2) }}>
-          <Grid item xs>
-            <Typography variant="h4">{service ? service.name : <Skeleton style={{ width: '20rem' }} />}</Typography>
-            <Typography variant="caption">{t('title.detail')}</Typography>
-          </Grid>
-          <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
-            {service ? (
-              <>
-                <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
-                  <Tooltip title={t('remove')}>
-                    <IconButton
-                      style={{
-                        color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                      }}
-                      onClick={handleDeleteButtonClick}
-                    >
-                      <RemoveCircleOutlineOutlinedIcon />
-                    </IconButton>
-                  </Tooltip>
-                </div>
-              </>
-            ) : (
-              <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-            )}
-          </Grid>
+    <PageCenter margin={!svc ? 2 : 4} width="100%" textAlign="left">
+      <ConfirmationDialog
+        open={deleteDialog}
+        handleClose={() => setDeleteDialog(false)}
+        handleAccept={handleExecuteDeleteButtonClick}
+        title={t('delete.title')}
+        cancelText={t('delete.cancelText')}
+        acceptText={t('delete.acceptText')}
+        text={t('delete.text')}
+      />
+      <Grid container alignItems="center" spacing={3} style={{ paddingBottom: theme.spacing(2) }}>
+        <Grid item xs>
+          <Typography variant="h4">{service ? service.name : <Skeleton style={{ width: '20rem' }} />}</Typography>
+          <Typography variant="caption">{t('title.detail')}</Typography>
         </Grid>
+        <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
+          {service ? (
+            <>
+              <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
+                <Tooltip title={t('remove')}>
+                  <IconButton
+                    style={{
+                      color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                    }}
+                    onClick={handleDeleteButtonClick}
+                  >
+                    <RemoveCircleOutlineOutlinedIcon />
+                  </IconButton>
+                </Tooltip>
+              </div>
+            </>
+          ) : (
+            <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+          )}
+        </Grid>
+      </Grid>
 
-        {service ? (
-          <CustomChip
-            type="rounded"
-            color={service.enabled ? 'primary' : 'default'}
-            onClick={handleToggleEnabled}
-            label={service.enabled ? t('enabled') : t('disabled')}
-            fullWidth
-            style={{ marginBottom: theme.spacing(2) }}
-          />
-        ) : (
-          <Skeleton variant="rect" height="2.5rem" style={{ marginBottom: theme.spacing(1) }} />
-        )}
+      {service ? (
+        <CustomChip
+          type="rounded"
+          color={service.enabled ? 'primary' : 'default'}
+          onClick={handleToggleEnabled}
+          label={service.enabled ? t('enabled') : t('disabled')}
+          fullWidth
+          style={{ marginBottom: theme.spacing(2) }}
+        />
+      ) : (
+        <Skeleton variant="rect" height="2.5rem" style={{ marginBottom: theme.spacing(1) }} />
+      )}
 
-        {service ? (
-          <TabContext value={tab}>
-            <Paper
-              square
-              style={{ backgroundColor: name ? theme.palette.background.default : theme.palette.background.paper }}
-            >
-              <TabList onChange={onChangeTab} indicatorColor="primary" textColor="primary">
-                <Tab label={t('tab.general')} value="general" />
-                <Tab label={t('tab.docker')} value="docker" />
-                {service.update_config ? <Tab label={t('tab.updater')} value="updater" /> : <Empty />}
-                <Tab label={t('tab.params')} value="params" />
-              </TabList>
-            </Paper>
-            <TabPanel value="general" style={{ paddingLeft: 0, paddingRight: 0 }}>
-              <ServiceGeneral
-                service={service}
-                setService={setService}
-                setModified={setModified}
-                constants={constants}
-                versions={versions}
-              />
-            </TabPanel>
-            <TabPanel value="docker" style={{ paddingLeft: 0, paddingRight: 0 }}>
-              <ServiceContainer service={service} setService={setService} setModified={setModified} />
-            </TabPanel>
-            <TabPanel value="updater" style={{ paddingLeft: 0, paddingRight: 0 }}>
-              <ServiceUpdater service={service} setService={setService} setModified={setModified} />
-            </TabPanel>
-            <TabPanel value="params" style={{ paddingLeft: 0, paddingRight: 0 }}>
-              <ServiceParams service={service} setService={setService} setModified={setModified} />
-            </TabPanel>
-          </TabContext>
-        ) : (
-          <Skeleton variant="rect" height="10rem" />
-        )}
-      </div>
+      {service ? (
+        <TabContext value={tab}>
+          <Paper
+            square
+            style={{ backgroundColor: name ? theme.palette.background.default : theme.palette.background.paper }}
+          >
+            <TabList onChange={onChangeTab} indicatorColor="primary" textColor="primary">
+              <Tab label={t('tab.general')} value="general" />
+              <Tab label={t('tab.docker')} value="docker" />
+              {service.update_config ? <Tab label={t('tab.updater')} value="updater" /> : <Empty />}
+              <Tab label={t('tab.params')} value="params" />
+            </TabList>
+          </Paper>
+          <TabPanel value="general" style={{ paddingLeft: 0, paddingRight: 0 }}>
+            <ServiceGeneral
+              service={service}
+              setService={setService}
+              setModified={setModified}
+              constants={constants}
+              versions={versions}
+            />
+          </TabPanel>
+          <TabPanel value="docker" style={{ paddingLeft: 0, paddingRight: 0 }}>
+            <ServiceContainer service={service} setService={setService} setModified={setModified} />
+          </TabPanel>
+          <TabPanel value="updater" style={{ paddingLeft: 0, paddingRight: 0 }}>
+            <ServiceUpdater service={service} setService={setService} setModified={setModified} />
+          </TabPanel>
+          <TabPanel value="params" style={{ paddingLeft: 0, paddingRight: 0 }}>
+            <ServiceParams service={service} setService={setService} setModified={setModified} />
+          </TabPanel>
+        </TabContext>
+      ) : (
+        <Skeleton variant="rect" height="10rem" />
+      )}
 
       {service && modified ? (
         <div

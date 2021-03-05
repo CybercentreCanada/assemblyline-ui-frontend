@@ -13,7 +13,7 @@ import {
   withStyles
 } from '@material-ui/core';
 import ContentManagedSection from 'commons/addons/section/ContentManagedSection';
-import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
+import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import CustomChip from 'components/visual/CustomChip';
 import React, { useMemo, useState } from 'react';
@@ -124,7 +124,7 @@ export default function Search() {
   const [top] = useState({ name: t('top'), id: 'title' });
 
   return (
-    <PageFullWidth margin={4}>
+    <PageCenter margin={4} textAlign="left">
       <ContentManagedSection title={t('toc')} top={top} items={TOC}>
         {useMemo(() => {
           return (
@@ -344,6 +344,6 @@ export default function Search() {
           );
         }, [classes.multipleEx, classes.padded, classes.paragraph, classes.pre, indexes, t, theme])}
       </ContentManagedSection>
-    </PageFullWidth>
+    </PageCenter>
   );
 }

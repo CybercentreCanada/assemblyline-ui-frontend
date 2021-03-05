@@ -27,8 +27,8 @@ function AlertFullDetails() {
 
   //
   return (
-    <PageCenter margin={4} width="100%">
-      <div style={{ textAlign: 'left' }}>{alert ? <AlertDetails id="" /> : <Skeleton variant="rect" height={8} />}</div>
+    <PageCenter margin={4} width="100%" textAlign="left">
+      {alert ? <AlertDetails id="" /> : <Skeleton variant="rect" height={8} />}
     </PageCenter>
   );
 }
