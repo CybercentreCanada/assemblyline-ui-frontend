@@ -138,7 +138,7 @@ export default function Submissions() {
                 tooltip: t('malicious_submissions'),
                 props: {
                   onClick: () => {
-                    query.set('query', 'max_score:>1000');
+                    query.set('query', 'max_score:>=1000');
                     history.push(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
