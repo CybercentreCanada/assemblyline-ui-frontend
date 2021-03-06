@@ -253,7 +253,7 @@ export default function ErrorViewer() {
                 tooltip: t('exception'),
                 props: {
                   onClick: () => {
-                    query.set('query', 'type:EXCEPTION OR type:UNKNOWN');
+                    query.set('query', 'type:(EXCEPTION OR UNKNOWN)');
                     history.push(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
@@ -263,7 +263,7 @@ export default function ErrorViewer() {
                 tooltip: t('canceled'),
                 props: {
                   onClick: () => {
-                    query.set('query', 'type:SERVICE* OR type:TASK*');
+                    query.set('query', 'type:(SERVICE* OR TASK*)');
                     history.push(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
