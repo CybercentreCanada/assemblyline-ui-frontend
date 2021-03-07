@@ -35,13 +35,13 @@ const MyApp = () => {
   const defaultLoginParams = storedLoginParams ? JSON.parse(storedLoginParams) : null;
 
   const provider = getProvider();
-  const [renderedApp, setRenderedApp] = useState<PossibleApps>(provider ? 'login' : 'load');
-  const [loginParams, setLoginParams] = useState<LoginParamsProps | null>(defaultLoginParams);
-
   const { t } = useTranslation();
-  const { setUser, setConfiguration } = useALContext();
+  const { setUser, setConfiguration, user } = useALContext();
   const { setReady } = useAppLayout();
   const { showErrorMessage } = useMySnackbar();
+
+  const [renderedApp, setRenderedApp] = useState<PossibleApps>(user ? 'routes' : provider ? 'login' : 'load');
+  const [loginParams, setLoginParams] = useState<LoginParamsProps | null>(defaultLoginParams);
 
   const switchRenderedApp = (value: PossibleApps) => {
     if (renderedApp !== value) {
@@ -50,7 +50,7 @@ const MyApp = () => {
   };
 
   useEffect(() => {
-    if (provider) {
+    if (user || provider) {
       return;
     }
     const requestOptions: RequestInit = {
