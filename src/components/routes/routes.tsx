@@ -131,7 +131,8 @@ const WrappedRoutes = () => {
           style={{
             position: 'sticky',
             bottom: '16px',
-            left: '16px',
+            left: '0',
+            marginLeft: '16px',
             opacity: '0.4',
             zIndex: 10000,
             marginTop: 'auto',
