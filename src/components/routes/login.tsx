@@ -53,7 +53,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
   const theme = useTheme();
   const classes = useStyles();
   const apiCall = useMyAPI();
-  const { getBanner } = useAppLayout();
+  const { getBanner, hideMenus } = useAppLayout();
   const provider = getProvider();
   const [shownControls, setShownControls] = useState(
     provider ? 'oauth' : params.get('reset_id') ? 'reset_now' : 'login'
@@ -187,6 +187,10 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
     // eslint-disable-next-line
   }, [webAuthNResponse, shownControls]);
 
+  useEffect(() => {
+    hideMenus();
+  }, [hideMenus]);
+
   return (
     <CardCentered>
       <Box style={{ cursor: 'pointer' }} onClick={reset}>
@@ -237,7 +241,9 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
                           document.cookie = `ui4_path=${process.env.PUBLIC_URL}; expires=${date.toUTCString()}; path=/`;
                           localStorage.setItem(
                             'nextLocation',
-                            `${location.pathname}${location.search}${location.hash}`
+                            location.pathname === '/logout'
+                              ? '/'
+                              : `${location.pathname}${location.search}${location.hash}`
                           );
                         }}
                         href={`/api/v4/auth/login/?oauth_provider=${item}`}
