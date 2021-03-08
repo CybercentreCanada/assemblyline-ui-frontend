@@ -1,6 +1,6 @@
 import { makeStyles, useTheme } from '@material-ui/core';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
-import React, { ReactNode, useEffect, useMemo, useState } from 'react';
+import React, { ReactNode, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -60,24 +60,35 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const ContentWithTOCItem: React.FC<ContentWithTOCItemProps> = ({ name, id, subItems = [] }) => {
+export type ContentWithTOCItemDef = {
+  id: string;
+  subItems?: ContentWithTOCItemDef[];
+};
+
+export type ContentWithTOCItemProps = {
+  translation: string;
+  item: ContentWithTOCItemDef;
+};
+
+const ContentWithTOCItem: React.FC<ContentWithTOCItemProps> = ({ translation, item }) => {
   const { autoHideAppbar, currentLayout } = useAppLayout();
   const classes = useStyles(autoHideAppbar && currentLayout !== 'top');
   const location = useLocation();
+  const { t } = useTranslation([translation]);
   const currentHash = location.hash && location.hash !== '' ? location.hash.substring(1) : null;
-  const active = currentHash && currentHash.startsWith(id) ? 'active' : null;
+  const active = currentHash && currentHash.startsWith(item.id) ? 'active' : null;
 
   return (
     <>
       <li className={active}>
-        <Link to={`#${id}`} target="_self">
-          {name}
+        <Link to={`#${item.id}`} target="_self">
+          {t(item.id)}
         </Link>
       </li>
-      {active && (
+      {active && item.subItems && (
         <ul className={classes.toc} style={{ fontSize: 'smaller', paddingInlineStart: '8px' }}>
-          {subItems.map(item => {
-            return <ContentWithTOCItem key={item.id} name={item.name} id={item.id} />;
+          {item.subItems.map(itm => {
+            return <ContentWithTOCItem key={itm.id} item={itm} translation={translation} />;
           })}
         </ul>
       )}
@@ -85,70 +96,26 @@ const ContentWithTOCItem: React.FC<ContentWithTOCItemProps> = ({ name, id, subIt
   );
 };
 
-type ContentWithTOCItemProps = {
-  name: string;
-  id: string;
-  subItems?: ContentWithTOCItemProps[];
-};
-
 type ContentWithTOCProps = {
   children: ReactNode;
+  translation: string;
+  items: ContentWithTOCItemDef[];
   title?: string;
-  top?: ContentWithTOCItemProps;
+  top?: string;
 };
 
-const WrappedContentWithTOC: React.FC<ContentWithTOCProps> = ({ children }) => {
+const WrappedContentWithTOC: React.FC<ContentWithTOCProps> = ({
+  children,
+  translation,
+  items,
+  title = null,
+  top = null
+}) => {
   const { autoHideAppbar, currentLayout } = useAppLayout();
   const theme = useTheme();
   const classes = useStyles();
   const location = useLocation();
-  const { t } = useTranslation(['helpSearch']);
-  const [items, setItems] = useState<ContentWithTOCItemProps[]>(null);
-  const [top, setTop] = useState<ContentWithTOCItemProps>(null);
-
-  useEffect(() => {
-    setItems([
-      { name: t('overview'), id: 'overview' },
-      { name: t('basic'), id: 'basic' },
-      {
-        name: t('fields.toc'),
-        id: 'fields',
-        subItems: [
-          { name: t('fields.idx_alert.toc'), id: 'fields.idx_alert' },
-          { name: t('fields.idx_file.toc'), id: 'fields.idx_file' },
-          { name: t('fields.idx_heuristic.toc'), id: 'fields.idx_heuristic' },
-          { name: t('fields.idx_result.toc'), id: 'fields.idx_result' },
-          { name: t('fields.idx_signature.toc'), id: 'fields.idx_signature' },
-          { name: t('fields.idx_submission.toc'), id: 'fields.idx_submission' },
-          { name: t('fields.idx_workflow.toc'), id: 'fields.idx_workflow' }
-        ]
-      },
-      { name: t('wildcard'), id: 'wildcard' },
-      {
-        name: t('regex'),
-        id: 'regex',
-        subItems: [
-          { name: t('regex.anchoring'), id: 'regex.anchoring' },
-          { name: t('regex.chars'), id: 'regex.chars' },
-          { name: t('regex.any'), id: 'regex.any' },
-          { name: t('regex.oneplus'), id: 'regex.oneplus' },
-          { name: t('regex.zeroplus'), id: 'regex.zeroplus' },
-          { name: t('regex.zeroone'), id: 'regex.zeroone' },
-          { name: t('regex.minmax'), id: 'regex.minmax' },
-          { name: t('regex.grouping'), id: 'regex.grouping' },
-          { name: t('regex.alternation'), id: 'regex.alternation' },
-          { name: t('regex.class'), id: 'regex.class' }
-        ]
-      },
-      { name: t('fuzziness'), id: 'fuzziness' },
-      { name: t('proximity'), id: 'proximity' },
-      { name: t('ranges'), id: 'ranges', subItems: [{ name: t('ranges.datemath'), id: 'ranges.datemath' }] },
-      { name: t('operator'), id: 'operator' },
-      { name: t('grouping'), id: 'grouping' },
-      { name: t('reserved'), id: 'reserved' }
-    ]);
-    setTop({ name: t('top'), id: 'title' });
-  }, [t]);
+  const { t } = useTranslation([translation]);
 
   useEffect(() => {
     if (location.hash && location.hash !== '') {
@@ -176,25 +143,23 @@ const WrappedContentWithTOC: React.FC<ContentWithTOCProps> = ({ children }) => {
           {useMemo(() => {
             return (
               <>
-                <div style={{ fontSize: '1.25rem', marginLeft: '18px' }}>{t('toc')}</div>
+                {title && <div style={{ fontSize: '1.25rem', marginLeft: '18px' }}>{t(title)}</div>}
                 <ul className={classes.toc}>
                   {items &&
                     items.map(item => {
-                      return (
-                        <ContentWithTOCItem key={item.id} name={item.name} id={item.id} subItems={item.subItems} />
-                      );
+                      return <ContentWithTOCItem key={item.id} item={item} translation={translation} />;
                     })}
                   {top && (
                     <div className={classes.top}>
-                      <Link to={`#${top.id}`} target="_self">
-                        {top.name}
+                      <Link to={`#${top}`} target="_self">
+                        {t(top)}
                       </Link>
                     </div>
                   )}
                 </ul>
               </>
             );
-          }, [classes.toc, classes.top, items, t, top])}
+          }, [classes.toc, classes.top, items, t, title, top, translation])}
         </div>
       </div>
     </div>

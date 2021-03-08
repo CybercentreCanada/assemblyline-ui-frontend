@@ -12,13 +12,53 @@ import {
   useTheme,
   withStyles
 } from '@material-ui/core';
+import ContentWithTOC, { ContentWithTOCItemDef } from 'commons/addons/elements/toc/Toc';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
-import ContentWithTOC from 'components/routes/help/search/toc';
 import CustomChip from 'components/visual/CustomChip';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+
+const Toc: ContentWithTOCItemDef[] = [
+  { id: 'overview' },
+  { id: 'basic' },
+  {
+    id: 'fields',
+    subItems: [
+      { id: 'fields.legend' },
+      { id: 'fields.idx_alert' },
+      { id: 'fields.idx_file' },
+      { id: 'fields.idx_heuristic' },
+      { id: 'fields.idx_result' },
+      { id: 'fields.idx_signature' },
+      { id: 'fields.idx_submission' },
+      { id: 'fields.idx_workflow' }
+    ]
+  },
+  { id: 'wildcard' },
+  {
+    id: 'regex',
+    subItems: [
+      { id: 'regex.anchoring' },
+      { id: 'regex.chars' },
+      { id: 'regex.any' },
+      { id: 'regex.oneplus' },
+      { id: 'regex.zeroplus' },
+      { id: 'regex.zeroone' },
+      { id: 'regex.minmax' },
+      { id: 'regex.grouping' },
+      { id: 'regex.alternation' },
+      { id: 'regex.class' }
+    ]
+  },
+  { id: 'fuzziness' },
+  { id: 'proximity' },
+  { id: 'ranges', subItems: [{ id: 'ranges.datemath' }] },
+  { id: 'operator' },
+  { id: 'grouping' },
+  { id: 'reserved' }
+];
 
 const StyledTableCell = withStyles((theme: Theme) =>
   createStyles({
@@ -102,7 +142,7 @@ export default function Search() {
 
   return (
     <PageCenter margin={4} width="100%" textAlign="left">
-      <ContentWithTOC>
+      <ContentWithTOC translation="helpSearch" items={Toc} title="toc" top="top">
         <Title>
           <Typography variant="h4">{t('title')}</Typography>
           <Typography variant="subtitle2">{t('subtitle')}</Typography>
@@ -174,10 +214,37 @@ export default function Search() {
           </div>
         </Paragraph>
 
+        <Paragraph id="fields.legend">
+          <Typography variant="h6">{t('fields.legend')}</Typography>
+          {t('fields.legend.text')}
+          <ul>
+            <li>
+              <b>text</b>
+              {`: ${t('fields.legend.text_field')}`}
+            </li>
+            <li>
+              <b>ip</b>
+              {`: ${t('fields.legend.ip_field')}`}
+            </li>
+            <li>
+              <CustomChip color="primary" size="tiny" type="rounded" label={t('fields.att.default')} />:{' '}
+              {t('fields.legend.default')}
+            </li>
+            <li>
+              <CustomChip color="warning" size="tiny" type="rounded" label={t('fields.att.list')} />:{' '}
+              {t('fields.legend.list')}
+            </li>
+            <li>
+              <CustomChip color="info" size="tiny" type="rounded" label={t('fields.att.stored')} />:{' '}
+              {t('fields.legend.stored')}
+            </li>
+          </ul>
+        </Paragraph>
+
         {Object.keys(indexes).map(idx => {
           return (
             <Paragraph id={`fields.idx_${idx}`} key={idx}>
-              <Typography variant="h5" gutterBottom>
+              <Typography variant="h6" gutterBottom>
                 {t(`fields.idx_${idx}`)}
               </Typography>
               <Table size="small">
