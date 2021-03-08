@@ -1,0 +1,16 @@
+{
+  "favorites.addfavorites": "Ajouter un favori",
+  "favorites.cancel": "Ferme",
+  "favorites.clear": "Effacer",
+  "favorites.confirmdiag.content": "Voulez-vous vraiment supprimer ce favori?",
+  "favorites.confirmdiag.header": "Avertissement",
+  "favorites.form.field.required": "Les valeurs Requête et Nom sont obligatoires.",
+  "favorites.globalfavorites": "Favoris publics",
+  "favorites.name": "Nom",
+  "favorites.ok": "D'accord",
+  "favorites.private": "Privé",
+  "favorites.public": "Public",
+  "favorites.query": "Requete",
+  "favorites.save": "Sauvegarder",
+  "favorites.yourfavorites": "Vos favoris "
+}

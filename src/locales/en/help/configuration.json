@@ -1,0 +1,17 @@
+{
+  "config": "Configuration variables",
+  "config.desc": "Every assemblyline instance has a unique configuration. Some configuration parameters are particularly useful to understand how the system works:",
+  "file_types": "File Types",
+  "file_types.desc": "Assemblyline assigns all files a type by analysing the file's structure and uses that type to route the file to the appropriate service.",
+  "file_types.non_specific": "Other files types are identified but not routed to specific services:",
+  "file_types.non_specific_service": "The following services process all file types:",
+  "file_types.specific": "Some file types will be routed to specific services:",
+  "priorities": "Priorities",
+  "priorities.desc": "Every submission in Assemblyline is assigned a priority. Submissions are processed in descending order of priority with higher priority submissions processed first. If two submissions have the same priority they are performed in the order they were received. The priority field is a number which allows for very fine-grained control over priorities.",
+  "priorities.desc_list": "For convenience, we've define a number of  priorities, these are listed below:",
+  "priorities.max": "maximum",
+  "tags": "Tags",
+  "tags.desc": "Assemblyline pulls potentially interesting identifiers and assign them a type. Assemblyline calls these tags.",
+  "tags.desc_list": "Below are the different tag types that you can find throughout the system:",
+  "title": "Current Configuration"
+}

@@ -1,0 +1,20 @@
+{
+  "E": "Extended",
+  "R": "Read",
+  "W": "Write",
+  "admin": "A",
+  "admin_label": "Administrator",
+  "caption": "available paths",
+  "header.function": "Function",
+  "header.methods": "Methods",
+  "header.permissions": "Permissions",
+  "header.protected": "Protected",
+  "header.url": "URL",
+  "signature_importer": "I",
+  "signature_importer_label": "Signature Importer",
+  "signature_manager": "M",
+  "signature_manager_label": "Signature Manager",
+  "title": "Site Map",
+  "user": "U",
+  "user_label": "User"
+}

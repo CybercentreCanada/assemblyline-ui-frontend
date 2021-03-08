@@ -1,0 +1,12 @@
+{
+  "recommendations": [
+    "esbenp.prettier-vscode",
+    "msjsdiag.debugger-for-chrome",
+    "firefox-devtools.vscode-firefox-debug",
+    "dbaeumer.vscode-eslint",
+    "eg2.vscode-npm-script",
+    "syler.sass-indented",
+    "ms-vscode.vscode-typescript-tslint-plugin",
+    "richie5um2.vscode-sort-json"
+  ]
+}

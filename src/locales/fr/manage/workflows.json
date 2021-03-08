@@ -1,0 +1,11 @@
+{
+  "filter": "Filtrer les flux de travail ...",
+  "filtered": "flu de travail correspondant au filtre",
+  "filtereds": "flux de travail correspondant au filtre",
+  "searching": "Recherche en cours...",
+  "title": "Flux de travail",
+  "total": "flu de travail",
+  "totals": "flux de travail",
+  "never_used": "Flux de travail qui n'ont jamais été utilisés",
+  "old": "Flux de travail non utilisés au cours des 3 derniers mois"
+}

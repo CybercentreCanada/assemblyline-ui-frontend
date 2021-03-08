@@ -1,0 +1,19 @@
+{
+  "title": "Détails de l'heuristique",
+  "name": "Nom",
+  "filetype": "Type de fichier associé",
+  "desc": "Description",
+  "score": "Score",
+  "max_score": "Score maximum autorisé",
+  "attack_id": "IDs Att&ck associés",
+  "signature_score_map": "Score des différentes signatures",
+  "section_stat_contrib": "Statistiques sur les contributions aux sections",
+  "count": "Nombre de fois déclencher",
+  "min": "Score de section minimum",
+  "avg": "Score de section moyen",
+  "max": "Score de section maximum",
+  "no_max": "Aucun score maximum imposé",
+  "no_attack_id": "Aucun",
+  "no_sigs": "Aucun remplacement de score de signature",
+  "usage": "Afficher l'utilisation de l'heuristique"
+}

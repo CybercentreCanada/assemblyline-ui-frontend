@@ -1,0 +1,21 @@
+{
+  "change.save": "Enregistrer les modifications",
+  "change.close": "Annuler",
+  "change.success": "L'état de la signature a été modifié avec succès",
+  "change.title": "Changer le statut d'une signature",
+  "change.warning": "Avant de modifier l'état de la signature, tenez compte des points suivants:",
+  "change.warning.1": "Une fois qu'une signature a été DÉPLOYÉE, marquée BRUYANTE ou DÉSACTIVÉE, elle ne peut pas revenir à l'état d'ESSAI ou de MIS EN SCÈNE.",
+  "change.warning.2": "Une seule révision d'une signature peut être exécutée en même temps dans le système.",
+  "change.warning.action": "Choisissez le nouvel état de signature:",
+  "delete.acceptText": "Oui, supprimer la!",
+  "delete.cancelText": "Annuler",
+  "delete.text": "Voulez-vous vraiment supprimer la signature actuelle? Il n'y aura aucun moyen de le récupérer une fois que c'est fait.",
+  "delete.success": "La signature a été supprimer avec succès.",
+  "delete.title": "Supprimer la signature",
+  "remove": "Supprimer la signature",
+  "status.DEPLOYED": "Déployée",
+  "status.DISABLED": "Désactivée",
+  "status.NOISY": "Bruyante",
+  "title": "Détails de la signature",
+  "usage": "Afficher l'utilisation de la signature"
+}
