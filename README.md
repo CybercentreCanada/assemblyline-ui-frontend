@@ -8,7 +8,7 @@ This repo is dedicated for the new version off Assemblyline 4 UI. It uses React 
 
 Follow these simple command to get NodeJS installed
 
-    curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+    curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
     sudo apt-get install -y nodejs
 
 ### Install NPM dependencies
@@ -39,7 +39,7 @@ Follow these simple commands to get Docker running on your machine:
 Installing docker-compose is done the same way on all Linux distros. Follow these simple instructions:
 
     # Install docker-compose
-    sudo curl -L "https://github.com/docker/compose/releases/download/1.27.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    sudo curl -L "https://github.com/docker/compose/releases/download/1.28.5/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
     sudo chmod +x /usr/local/bin/docker-compose
 
     # Test docker-compose installation
