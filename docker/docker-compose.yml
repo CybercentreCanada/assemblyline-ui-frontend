@@ -39,11 +39,10 @@ services:
       retries: 3
 
   nginx:
-    image: cccs/nginx-ssl
+    image: cccs/nginx-ssl-frontend
     volumes:
       - ./minimal.template:/opt/minimal.template
     ports:
-      - '80:80'
       - '443:443'
     environment:
       - FRONTEND_HOST=${EXTERNAL_IP}

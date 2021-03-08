@@ -1,0 +1,9 @@
+.vscode
+.env.local
+.eslintrc
+.gitignore
+.git
+.prettierrc
+docker
+node_modules
+npm-debug.log
