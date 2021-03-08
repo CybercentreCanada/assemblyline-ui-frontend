@@ -1,5 +1,5 @@
 # Build source environment
-FROM node:12 AS builder
+FROM node:14-slim AS builder
 WORKDIR /tmp
 COPY . ./frontend/
 WORKDIR /tmp/frontend
@@ -8,7 +8,7 @@ RUN npm run build
 
 
 # Production container creation
-FROM node:12
+FROM node:14-slim
 RUN npm install -g serve
 WORKDIR /usr/src/app
 COPY --from=builder /tmp/frontend/build .
