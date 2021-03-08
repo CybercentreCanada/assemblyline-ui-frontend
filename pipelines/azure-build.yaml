@@ -33,7 +33,7 @@ stages:
               export VERSION=${TAG/stable}
               export VERSION=${VERSION/beta/b}
               export SERIES="`expr $TAG : '\([0-9]\+\.[0-9]\+\.\)'`${BUILD_TYPE}"
-              for IMAGE in "cccs/assemblyline-ui-frontend" "docker.pkg.github.com/cybercentrecanada/assemblyline-ui-frontend/assemblyline-ui-frontend"
+              for IMAGE in "cccs/assemblyline-ui-frontend" "docker.pkg.github.com/cybercentrecanada/assemblyline/assemblyline-ui-frontend"
               do
                 docker build --build-arg version=$VERSION -t $IMAGE:$TAG -t $IMAGE:$BUILD_TYPE -t $IMAGE:$SERIES .
                 docker push $IMAGE --all-tags
