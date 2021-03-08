@@ -314,7 +314,7 @@ const useMyLayout = (): AppLayoutProps => {
     defaultLayout: 'side' as 'side',
     defaultDrawerOpen: false,
     defaultShowQuickSearch: true,
-    defaultAutoHideAppbar: true,
+    defaultAutoHideAppbar: false,
     defaultShowBreadcrumbs: true,
     defaultBreadcrumbsOpen: true,
     leftnav: {
