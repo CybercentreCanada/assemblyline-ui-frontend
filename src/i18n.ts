@@ -27,7 +27,6 @@ import manageSignatureDetailEN from 'locales/en/manage/signature_detail.json';
 import manageSignatureSourcesEN from 'locales/en/manage/signature_sources.json';
 import manageWorkflowsEN from 'locales/en/manage/workflows.json';
 import manageWorkflowDetailEN from 'locales/en/manage/workflow_detail.json';
-import optoutEN from 'locales/en/optout.json';
 import searchEN from 'locales/en/search.json';
 import settingsEN from 'locales/en/settings.json';
 import statisticsHeuristicsEN from 'locales/en/statistics/heuristics.json';
@@ -66,7 +65,6 @@ import manageSignatureDetailFR from 'locales/fr/manage/signature_detail.json';
 import manageSignatureSourcesFR from 'locales/fr/manage/signature_sources.json';
 import manageWorkflowsFR from 'locales/fr/manage/workflows.json';
 import manageWorkflowDetailFR from 'locales/fr/manage/workflow_detail.json';
-import optoutFR from 'locales/fr/optout.json';
 import searchFR from 'locales/fr/search.json';
 import settingsFR from 'locales/fr/settings.json';
 import statisticsHeuristicsFR from 'locales/fr/statistics/heuristics.json';
@@ -107,7 +105,6 @@ const resources = {
     manageSignatureSources: manageSignatureSourcesEN,
     manageWorkflowDetail: manageWorkflowDetailEN,
     manageWorkflows: manageWorkflowsEN,
-    optout: optoutEN,
     search: searchEN,
     settings: settingsEN,
     statisticsHeuristics: statisticsHeuristicsEN,
@@ -148,7 +145,6 @@ const resources = {
     manageSignatureSources: manageSignatureSourcesFR,
     manageWorkflowDetail: manageWorkflowDetailFR,
     manageWorkflows: manageWorkflowsFR,
-    optout: optoutFR,
     search: searchFR,
     settings: settingsFR,
     statisticsHeuristics: statisticsHeuristicsFR,

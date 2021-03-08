@@ -30,7 +30,6 @@ import SignatureDetail from 'components/routes/manage/signature_detail';
 import ManageSignatureSources from 'components/routes/manage/signature_sources';
 import ManageWorkflows from 'components/routes/manage/workflows';
 import WorkflowDetail from 'components/routes/manage/workflow_detail';
-import Optout from 'components/routes/optout';
 import Search from 'components/routes/search';
 import Settings from 'components/routes/settings';
 import SubmissionDetail from 'components/routes/submission/detail';
@@ -107,7 +106,6 @@ const WrappedRoutes = () => {
         <Route exact path="/manage/workflow/:id" component={WorkflowDetail} />
         <Route exact path="/manage/workflows" component={ManageWorkflows} />
         <Route exact path="/manage" component={Manage} />
-        <Route exact path="/optout" component={Optout} />
         <Route exact path="/search" component={Search} />
         <Route exact path="/search/:id" component={Search} />
         <Route exact path="/settings" component={Settings} />
