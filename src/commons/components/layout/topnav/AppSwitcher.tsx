@@ -13,7 +13,6 @@ import {
 } from '@material-ui/core';
 import withWidth, { isWidthDown } from '@material-ui/core/withWidth';
 import AppsIcon from '@material-ui/icons/Apps';
-import useAppLayout from 'commons/components/hooks/useAppLayout';
 import React, { useState } from 'react';
 
 export type AppElement = {
