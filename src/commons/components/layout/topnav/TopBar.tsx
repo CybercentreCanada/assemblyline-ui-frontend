@@ -4,7 +4,7 @@ import { APPBAR_READY_EVENT } from 'commons/components/hooks/useAppBarHeight';
 import useAppContext from 'commons/components/hooks/useAppContext';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import Breadcrumbs from 'commons/components/layout/breadcrumbs/Breadcrumbs';
-import AppSwitcher from 'commons/components/layout/topnav/AppSwitcher';
+import AppSwitcher, { AppElement } from 'commons/components/layout/topnav/AppSwitcher';
 import QuickSearch from 'commons/components/layout/topnav/QuickSearch';
 import ThemeSelectionIcon from 'commons/components/layout/topnav/ThemeSelectionIcon';
 import UserProfile from 'commons/components/layout/topnav/UserProfile';
@@ -43,10 +43,11 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type AppBarProps = {
+  apps: AppElement[];
   width: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 };
 
-const TopBar: React.FC<AppBarProps> = ({ width }) => {
+const TopBar: React.FC<AppBarProps> = ({ apps, width }) => {
   const {
     currentLayout,
     layoutProps,
@@ -112,7 +113,7 @@ const TopBar: React.FC<AppBarProps> = ({ width }) => {
           {showQuickSearch && isWidthUp('sm', width) && <QuickSearch />}
           {layoutProps.topnav.themeSelectionUnder === 'icon' && <ThemeSelectionIcon />}
           {layoutProps.topnav.right}
-          <AppSwitcher />
+          <AppSwitcher apps={apps} />
           <UserProfile />
         </Toolbar>
       </AppBar>

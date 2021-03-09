@@ -32,13 +32,13 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type AppsSwitcherProps = {
+  apps: AppElement[];
   width: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 };
 
-const AppSwitcher: React.FC<AppsSwitcherProps> = props => {
+const AppSwitcher: React.FC<AppsSwitcherProps> = ({ apps, width }) => {
   const theme = useTheme();
   const classes = useStyles();
-  const { layoutProps } = useAppLayout();
   const [popperAnchorEl, setPopperAnchorEl] = useState(null);
   const isDarkTheme = theme.palette.type === 'dark';
   const isPopperOpen = !!popperAnchorEl;
@@ -48,7 +48,7 @@ const AppSwitcher: React.FC<AppsSwitcherProps> = props => {
   const onClickAway = () => setPopperAnchorEl(null);
   const sp1 = theme.spacing(1);
 
-  if (layoutProps.topnav.apps.length === 0) {
+  if (apps.length === 0) {
     return null;
   }
 
@@ -68,13 +68,13 @@ const AppSwitcher: React.FC<AppsSwitcherProps> = props => {
               <Paper style={{ textAlign: 'center', padding: theme.spacing(1) }} elevation={4}>
                 <div
                   style={{
-                    maxWidth: layoutProps.topnav.apps.length <= 4 || isWidthDown('xs', props.width) ? '240px' : '360px',
+                    maxWidth: apps.length <= 4 || isWidthDown('xs', width) ? '240px' : '360px',
                     display: 'flex',
                     flexDirection: 'row',
                     flexWrap: 'wrap'
                   }}
                 >
-                  {layoutProps.topnav.apps.map((a, i) => (
+                  {apps.map((a, i) => (
                     <div key={`box-${i}`} style={{ width: '120px', padding: sp1, overflow: 'hidden' }}>
                       <Button
                         component={Link}

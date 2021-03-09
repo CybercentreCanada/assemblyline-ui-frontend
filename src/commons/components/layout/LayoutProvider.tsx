@@ -70,6 +70,7 @@ export type AppLayoutContextProps = {
   isReady: () => boolean;
   setReady: (isReady: boolean) => void;
   setAppbarState: (show: boolean) => void;
+  setApps: (apps: AppElement[]) => void;
 };
 
 export interface AppLayoutProps {
@@ -169,6 +170,7 @@ function AppLayoutProvider(props: LayoutProviderProps) {
   const [quickSearch, setQuickSearch] = useState<boolean>(initialQuickSearch);
   const [autoHideAppbar, setAutoHideAppbar] = useState<boolean>(initialAutoHideAppbar);
   const [layout, setLayout] = useState<'top' | 'side'>(initialLayout);
+  const [apps, setApps] = useState<AppElement[]>(layoutProps.topnav.apps || []);
   const theme = useTheme();
   const isSM = useMediaQuery(theme.breakpoints.only('sm'));
   const isPrinting = useMediaQuery('print');
@@ -243,7 +245,8 @@ function AppLayoutProvider(props: LayoutProviderProps) {
         toggleBreadcrumbsState: onToggleBreadcrumbsState,
         isReady: () => appReady,
         setReady: (isReady: boolean) => setAppReady(isReady),
-        setAppbarState
+        setAppbarState,
+        setApps
       }}
     >
       <>
@@ -258,13 +261,13 @@ function AppLayoutProvider(props: LayoutProviderProps) {
               className={newClasses.appVerticalRight}
               style={{ overflow: 'auto', paddingLeft: showMenus && isSM && !isPrinting ? theme.spacing(7) : 0 }}
             >
-              {isUserReady() && appReady && showMenus && <TopBar />}
+              {isUserReady() && appReady && showMenus && <TopBar apps={apps} />}
               {children}
             </div>
           </div>
         ) : (
           <div id="app-scrollct" className={newClasses.appHorizontal} style={{ overflow: 'auto' }}>
-            {isUserReady() && appReady && showMenus && <TopBar />}
+            {isUserReady() && appReady && showMenus && <TopBar apps={apps} />}
             <div className={newClasses.appVertical}>
               <div className={newClasses.appVerticalLeft}>
                 {isUserReady() && appReady && showMenus && <LeftNavDrawer />}
