@@ -329,6 +329,7 @@ function Service({ name, onDeleted }: ServiceProps) {
             bottom: 0,
             left: 0,
             width: '100%',
+            textAlign: 'center',
             zIndex: theme.zIndex.drawer - 1,
             backgroundColor: theme.palette.background.default,
             boxShadow: theme.shadows[4]
