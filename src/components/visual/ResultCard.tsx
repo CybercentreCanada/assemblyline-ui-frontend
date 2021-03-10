@@ -127,8 +127,10 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates = null 
   const allTags = useMemo(() => {
     const tagList = [];
     displayedResult.result.sections.forEach(section => {
-      for (const tag of section.tags) {
-        tagList.push(getKey(tag.type, tag.value));
+      if (Array.isArray(section.tags)) {
+        for (const tag of section.tags) {
+          tagList.push(getKey(tag.type, tag.value));
+        }
       }
 
       if (section.heuristic !== undefined && section.heuristic !== null) {

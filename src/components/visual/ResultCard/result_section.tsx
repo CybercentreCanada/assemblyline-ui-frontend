@@ -486,8 +486,10 @@ const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sec
 
   const allTags = useMemo(() => {
     const tagList = [];
-    for (const tag of section.tags) {
-      tagList.push(getKey(tag.type, tag.value));
+    if (Array.isArray(section.tags)) {
+      for (const tag of section.tags) {
+        tagList.push(getKey(tag.type, tag.value));
+      }
     }
 
     if (section.heuristic !== undefined && section.heuristic !== null) {
@@ -607,18 +609,19 @@ const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sec
                         />
                       );
                     })}
-                  {section.tags.map((tag, idx) => {
-                    return (
-                      <Tag
-                        key={idx}
-                        type={tag.type}
-                        value={tag.value}
-                        short_type={tag.short_type}
-                        score={section.heuristic ? section.heuristic.score : 0}
-                        highlight_key={getKey(tag.type, tag.value)}
-                      />
-                    );
-                  })}
+                  {Array.isArray(section.tags) &&
+                    section.tags.map((tag, idx) => {
+                      return (
+                        <Tag
+                          key={idx}
+                          type={tag.type}
+                          value={tag.value}
+                          short_type={tag.short_type}
+                          score={section.heuristic ? section.heuristic.score : 0}
+                          highlight_key={getKey(tag.type, tag.value)}
+                        />
+                      );
+                    })}
                 </div>
                 <div>
                   {sub_sections.map(item => {
