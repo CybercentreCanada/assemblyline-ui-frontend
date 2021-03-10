@@ -44,7 +44,10 @@ const useStyles = makeStyles(theme => ({
     }
   },
   content: {
-    padding: '6px'
+    fontSize: '1rem',
+    paddingLeft: theme.spacing(1),
+    paddingRight: theme.spacing(1),
+    whiteSpace: 'pre-wrap'
   },
   muted: {
     color: theme.palette.text.secondary
@@ -81,7 +84,7 @@ const ErrorCard: React.FC<ErrorCardProps> = ({ error }) => {
         {open ? <ExpandLess className={classes.muted} /> : <ExpandMore className={classes.muted} />}
       </Box>
       <Collapse in={open} timeout="auto">
-        <div className={classes.content}>{error.response.message}</div>
+        <pre className={classes.content}>{error.response.message}</pre>
       </Collapse>
     </div>
   );
