@@ -102,7 +102,7 @@ function WrappedClassification({
 
   useEffect(() => {
     if (c12nDef && c12nDef.enforce && c12n) {
-      const parts = getParts(c12n, c12nDef, format, isMobile);
+      const parts = getParts(c12n.toLocaleUpperCase(), c12nDef, format, isMobile);
       if (type === 'picker') {
         setUserParts(getParts(currentUser.classification, c12nDef, format, isMobile));
         setValidated(applyClassificationRules(parts, c12nDef, format, isMobile, isUser));
@@ -188,7 +188,7 @@ function WrappedClassification({
 
   const useClassification = () => {
     const newC12n = normalizedClassification(validated.parts, c12nDef, format, isMobile);
-    const originalParts = getParts(c12n, c12nDef, format, isMobile);
+    const originalParts = getParts(c12n.toLocaleUpperCase(), c12nDef, format, isMobile);
     const originalC12n = normalizedClassification(originalParts, c12nDef, format, isMobile);
     if (setClassification && newC12n !== originalC12n) {
       setClassification(newC12n);
