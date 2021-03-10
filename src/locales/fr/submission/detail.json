@@ -52,5 +52,7 @@
   "verdict.malicious": "Malveillant",
   "verdict.set.malicious": "Votez pour un verdict malveillant",
   "verdict.set.non_malicious": "Votez pour un verdict non malveillant",
-  "verdict.suspicious": "Suspect"
+  "verdict.suspicious": "Suspect",
+  "warning": "Avertissement",
+  "warning.text": "Certains détails sur la soumission ont été filtrés car vous ne disposez pas de suffisamment de privilèges pour afficher tous les résultats."
 }

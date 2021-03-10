@@ -52,5 +52,7 @@
   "verdict.malicious": "Malicious",
   "verdict.set.malicious": "Vote for Malicious verdict",
   "verdict.set.non_malicious": "Vote for Non-Malicious verdict",
-  "verdict.suspicious": "Suspicious"
+  "verdict.suspicious": "Suspicious",
+  "warning": "Warning",
+  "warning.text": "Some details about the submission has been filtered because you do not have enough privilege to view all the results."
 }

@@ -732,6 +732,14 @@ export default function SubmissionReport() {
           </div>
         </div>
 
+        {report && report.report_filtered && (
+          <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+            <Typography variant="subtitle1">
+              <b>**{t('warning')}</b>: {t('warning.text')}
+            </Typography>
+          </div>
+        )}
+
         {(!report || Object.keys(report.metadata).length !== 0) && (
           <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
             <Typography variant="h6">{t('metadata')}</Typography>

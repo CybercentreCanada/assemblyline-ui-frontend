@@ -82,6 +82,7 @@ export default function SubmissionDetail() {
   const [submission, setSubmission] = useState(null);
   const [summary, setSummary] = useState(null);
   const [tree, setTree] = useState(null);
+  const [filtered, setFiltered] = useState(false);
   const [watchQueue, setWatchQueue] = useState(null);
   const [liveResultKeys, setLiveResultKeys] = useReducer(messageReducer, []);
   const [liveErrorKeys, setLiveErrorKeys] = useReducer(messageReducer, []);
@@ -524,12 +525,18 @@ export default function SubmissionDetail() {
           onSuccess: summ_data => {
             setHighlightMap(summ_data.api_response.map);
             setSummary(summ_data.api_response);
+            if (summ_data.api_response.filtered) {
+              setFiltered(true);
+            }
           }
         });
         apiCall({
           url: `/api/v4/submission/tree/${id}/`,
           onSuccess: tree_data => {
             setTree(tree_data.api_response.tree);
+            if (tree_data.api_response.filtered) {
+              setFiltered(true);
+            }
           }
         });
       } else {
@@ -942,6 +949,14 @@ export default function SubmissionDetail() {
         )}
 
         <InfoSection submission={submission} />
+
+        {filtered && (
+          <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2) }}>
+            <Typography variant="subtitle1">
+              <b>**{t('warning')}</b>: {t('warning.text')}
+            </Typography>
+          </div>
+        )}
 
         {(!submission || Object.keys(submission.metadata).length !== 0) && (
           <MetaSection metadata={submission ? submission.metadata : null} />

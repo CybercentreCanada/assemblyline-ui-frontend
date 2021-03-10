@@ -35,5 +35,7 @@
   "tag.table.type": "Type",
   "tag.table.value": "Value",
   "title": "Submission Report",
-  "user.verdict": "User's Verdicts"
+  "user.verdict": "User's Verdicts",
+  "warning": "Warning",
+  "warning.text": "Data in this report has been filtered because you do not have enough privilege to view the full report."
 }

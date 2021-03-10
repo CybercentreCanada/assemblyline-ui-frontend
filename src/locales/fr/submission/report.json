@@ -35,5 +35,7 @@
   "tag.table.type": "Type",
   "tag.table.value": "Valeur",
   "title": "Rapport de Soumission",
-  "user.verdict": "Verdict des Utilisateurs"
+  "user.verdict": "Verdict des Utilisateurs",
+  "warning": "Avertissement",
+  "warning.text": "Les données de ce rapport ont été filtrées car vous ne disposez pas des privilèges suffisants pour afficher le rapport complet."
 }
