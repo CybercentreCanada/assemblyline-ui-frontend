@@ -649,13 +649,17 @@ function Submit() {
                                       onChange={event => setParam(idx, pidx, event.target.value)}
                                       fullWidth
                                     >
-                                      {param.list.map((item, i) => {
-                                        return (
-                                          <MenuItem key={i} value={item}>
-                                            {item}
-                                          </MenuItem>
-                                        );
-                                      })}
+                                      {param.list ? (
+                                        param.list.map((item, i) => {
+                                          return (
+                                            <MenuItem key={i} value={item}>
+                                              {item}
+                                            </MenuItem>
+                                          );
+                                        })
+                                      ) : (
+                                        <MenuItem value="" />
+                                      )}
                                     </Select>
                                   ) : (
                                     <TextField
