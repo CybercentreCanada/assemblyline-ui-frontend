@@ -55,6 +55,10 @@ const WrappedMultiTypeConfig = ({ config, onAdd, onUpdate, onDelete }: MultiType
   };
 
   const detectConfigType = (cfg: ServiceConfig): ExtendedServiceConfig => {
+    if (cfg.value === null || cfg.value === undefined) {
+      return { ...cfg, value: '', type: 'str' };
+    }
+
     if (typeof cfg.value === 'number') {
       return { ...cfg, type: 'int' };
     }
