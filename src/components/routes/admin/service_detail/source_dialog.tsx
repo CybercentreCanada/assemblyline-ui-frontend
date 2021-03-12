@@ -145,7 +145,7 @@ const WrappedSourceDialog = ({ open, setOpen, source, onSave }: SourceDialogProp
                   <Classification
                     c12n={tempSource.default_classification}
                     type="picker"
-                    setClassification={value => handleValueChange('classification', value)}
+                    setClassification={value => handleValueChange('default_classification', value)}
                   />
                 </Grid>
               )}
