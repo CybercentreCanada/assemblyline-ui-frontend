@@ -37,6 +37,7 @@ interface ClassificationProps {
   inline: boolean;
   isUser: boolean;
   fullWidth?: boolean;
+  dynGroup?: string;
 }
 
 const useStyles = makeStyles(theme => ({
@@ -87,7 +88,8 @@ function WrappedClassification({
   size,
   type,
   isUser,
-  fullWidth
+  fullWidth,
+  dynGroup
 }: ClassificationProps) {
   const classes = useStyles();
   const { t } = useTranslation();
@@ -328,16 +330,19 @@ function WrappedClassification({
                             {c12nDef.dynamic_groups && currentUser.email && (
                               <ListItem
                                 button
-                                disabled={validated.disabled.groups.includes(currentUser.dynamic_group)}
-                                selected={validated.parts.groups.includes(currentUser.dynamic_group)}
+                                disabled={validated.disabled.groups.includes(dynGroup || currentUser.dynamic_group)}
+                                selected={validated.parts.groups.includes(dynGroup || currentUser.dynamic_group)}
                                 onClick={() =>
                                   toggleGroups({
-                                    name: currentUser.dynamic_group,
-                                    short_name: currentUser.dynamic_group
+                                    name: dynGroup || currentUser.dynamic_group,
+                                    short_name: dynGroup || currentUser.dynamic_group
                                   })
                                 }
                               >
-                                <ListItemText style={{ textAlign: 'center' }} primary={currentUser.dynamic_group} />
+                                <ListItemText
+                                  style={{ textAlign: 'center' }}
+                                  primary={dynGroup || currentUser.dynamic_group}
+                                />
                               </ListItem>
                             )}
                           </List>
@@ -397,7 +402,8 @@ WrappedClassification.defaultProps = {
   format: 'short' as 'short',
   inline: false,
   isUser: false,
-  fullWidth: true
+  fullWidth: true,
+  dynGroup: null
 };
 
 const Classification = React.memo(WrappedClassification);
