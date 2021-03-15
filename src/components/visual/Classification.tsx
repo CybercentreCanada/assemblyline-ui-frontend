@@ -121,10 +121,20 @@ function WrappedClassification({
 
     if (newGrp.indexOf(grp.name) === -1 && newGrp.indexOf(grp.short_name) === -1) {
       newGrp.push(format === 'long' && !isMobile ? grp.name : grp.short_name);
-    } else if (newGrp.indexOf(grp.name) !== -1) {
-      newGrp.splice(newGrp.indexOf(grp.name), 1);
     } else {
-      newGrp.splice(newGrp.indexOf(grp.short_name), 1);
+      if (newGrp.indexOf(grp.name) !== -1) {
+        newGrp.splice(newGrp.indexOf(grp.name), 1);
+      } else {
+        newGrp.splice(newGrp.indexOf(grp.short_name), 1);
+      }
+      if (newGrp.length === 1 && !isUser) {
+        const lastGrp = newGrp[0];
+        for (const grpItem of c12nDef.original_definition.groups) {
+          if ((lastGrp === grpItem.name || lastGrp === grpItem.short_name) && grpItem.auto_select) {
+            newGrp.splice(newGrp.indexOf(lastGrp), 1);
+          }
+        }
+      }
     }
 
     setValidated(applyClassificationRules({ ...validated.parts, groups: newGrp }, c12nDef, format, isMobile, isUser));
@@ -315,6 +325,21 @@ function WrappedClassification({
                                 )
                               );
                             })}
+                            {c12nDef.dynamic_groups && currentUser.email && (
+                              <ListItem
+                                button
+                                disabled={validated.disabled.groups.includes(currentUser.dynamic_group)}
+                                selected={validated.parts.groups.includes(currentUser.dynamic_group)}
+                                onClick={() =>
+                                  toggleGroups({
+                                    name: currentUser.dynamic_group,
+                                    short_name: currentUser.dynamic_group
+                                  })
+                                }
+                              >
+                                <ListItemText style={{ textAlign: 'center' }} primary={currentUser.dynamic_group} />
+                              </ListItem>
+                            )}
                           </List>
                         </Card>
                       </div>
