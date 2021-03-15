@@ -166,7 +166,7 @@ export default function useMyUser(): CustomUserContextProps {
     setIndexes(idx);
     setState({
       ...curUser,
-      dynamic_group: curUser.email ? curUser.email.split('@')[1].replace(/\./g, '_').toUpperCase() : null
+      dynamic_group: curUser.email ? curUser.email.toUpperCase().split('@')[1] : null
     });
     setSettings(userSettings);
     setFlattenedProps(
