@@ -71,6 +71,7 @@ export interface CustomUser extends UserProfileProps {
   agrees_with_tos: boolean;
   classification: string;
   default_view?: string;
+  dynamic_group: string | null;
   groups: string[];
   is_active: boolean;
   roles: string[];
@@ -163,7 +164,10 @@ export default function useMyUser(): CustomUserContextProps {
     setC12nDef(upperC12n);
     setConfiguration(cfg);
     setIndexes(idx);
-    setState(curUser);
+    setState({
+      ...curUser,
+      dynamic_group: curUser.email ? curUser.email.toUpperCase().split('@')[1] : null
+    });
     setSettings(userSettings);
     setFlattenedProps(
       flatten({ user: curUser, c12nDef: upperC12n, configuration: cfg, indexes: idx, settings: userSettings })
