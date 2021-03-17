@@ -493,6 +493,7 @@ function User({ width, username }: UserProps) {
             c12n={user && user.classification}
             setClassification={setClassification}
             isUser
+            dynGroup={user && user.email ? user.email.toUpperCase().split('@')[1] : null}
           />
           <TableContainer className={classes.group} component={Paper}>
             <Table aria-label={t('profile')}>

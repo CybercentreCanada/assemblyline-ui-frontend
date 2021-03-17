@@ -81,6 +81,7 @@ export type ClassificationDefinition = {
   access_req_map_lts: StringMap;
   access_req_map_stl: StringMap;
   description: StringMap;
+  dynamic_groups: boolean;
   enforce: boolean;
   groups_aliases: StringMapArray;
   groups_auto_select: string[];
@@ -209,6 +210,7 @@ function getGroups(
 ): ClassificationGroups {
   const g1 = [];
   const g2 = [];
+  const other = [];
 
   const groupParts = c12n.split('//');
   let groups = [];
@@ -237,13 +239,30 @@ function getGroups(
       for (const sa of c12nDef.subgroups_aliases[g]) {
         g2.push(sa);
       }
+    } else {
+      other.push(g);
+    }
+  }
+
+  if (c12nDef.dynamic_groups) {
+    for (const o of other) {
+      if (
+        !(o in c12nDef.access_req_map_lts) &&
+        !(o in c12nDef.access_req_map_stl) &&
+        !(o in c12nDef.access_req_aliases) &&
+        !(o in c12nDef.levels_map) &&
+        !(o in c12nDef.levels_map_lts) &&
+        !(o in c12nDef.levels_aliases)
+      ) {
+        g1.push(o);
+      }
     }
   }
 
   if (format === 'long' && !isMobile) {
     const g1Out = [];
     for (const gr of g1) {
-      g1Out.push(c12nDef.groups_map_stl[gr]);
+      g1Out.push(gr in c12nDef.groups_map_stl ? c12nDef.groups_map_stl[gr] : gr);
     }
 
     const g2Out = [];
