@@ -1,4 +1,5 @@
 {
+  "add_workflow": "Add workflow",
   "filter": "Filter workflows...",
   "filtered": "workflow matching filter",
   "filtereds": "workflows matching filter",
