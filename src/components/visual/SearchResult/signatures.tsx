@@ -74,6 +74,9 @@ const WrappedSignaturesTable: React.FC<SignaturesTableProps> = ({
               <SortableHeaderCell sortField="stats.last_hit" allowSort={allowSort}>
                 {t('header.last_hit')}
               </SortableHeaderCell>
+              <SortableHeaderCell sortField="last_modified" allowSort={allowSort}>
+                {t('header.last_modified')}
+              </SortableHeaderCell>
               {c12nDef.enforce && (
                 <SortableHeaderCell sortField="classification" allowSort={allowSort}>
                   {t('header.classification')}
@@ -110,6 +113,11 @@ const WrappedSignaturesTable: React.FC<SignaturesTableProps> = ({
                   ) : (
                     t('never')
                   )}
+                </DivTableCell>
+                <DivTableCell>
+                  <Moment fromNow locale={i18n.language}>
+                    {signature.last_modified}
+                  </Moment>
                 </DivTableCell>
                 {c12nDef.enforce && (
                   <DivTableCell>

@@ -6,6 +6,7 @@
   "file.dragzone": "Sélectioner un fichier à analyser",
   "file.dragzone.byte": "octets",
   "file.drophere": "Déposez votre fichier ici!",
+  "is_malware": "Je sais que ce fichier est malveillant, dites m'en plus!",
   "options": "Options",
   "options.service": "Sélection de service",
   "options.service_spec": "Paramètres spécifiques au services",

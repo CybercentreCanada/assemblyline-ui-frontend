@@ -15,6 +15,7 @@
   "header.hit_count": "Times seen",
   "header.id": "ID",
   "header.last_hit": "Last Seen",
+  "header.last_modified": "Modified",
   "header.lasttimeseen": "Last Time Seen",
   "header.name": "Name",
   "header.numfiles": "Files",
