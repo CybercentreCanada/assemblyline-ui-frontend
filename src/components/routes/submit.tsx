@@ -10,6 +10,7 @@ import {
   Switch,
   Tab,
   TextField,
+  Tooltip,
   Typography,
   useMediaQuery,
   useTheme
@@ -348,19 +349,20 @@ function Submit() {
               {file ? (
                 <>
                   <div style={{ padding: sp1 }}>
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={settings ? settings.malicious : true}
-                          disabled={settings === null}
-                          onChange={() => setSettingValue('malicious', !settings.malicious)}
-                          color="secondary"
-                          name="is_malware"
-                        />
-                      }
-                      label={t('is_malware')}
-                      labelPlacement="start"
-                    />
+                    <Tooltip title={t('malicious.tooltip')}>
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={settings ? settings.malicious : true}
+                            disabled={settings === null}
+                            onChange={() => setSettingValue('malicious', !settings.malicious)}
+                            color="secondary"
+                            name="is_malware"
+                          />
+                        }
+                        label={t('malicious')}
+                      />
+                    </Tooltip>
                   </div>
                   <Button
                     disabled={!allowClick}
