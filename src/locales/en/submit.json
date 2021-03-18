@@ -6,6 +6,7 @@
   "file.dragzone": "Select a file to scan",
   "file.dragzone.byte": "bytes",
   "file.drophere": "Drop your file here!",
+  "is_malware": "I know this file is malicious, tell me more!",
   "options": "Options",
   "options.service": "Service Selection",
   "options.service_spec": "Services Specific Parameters",
