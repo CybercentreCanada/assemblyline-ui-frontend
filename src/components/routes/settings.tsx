@@ -378,7 +378,7 @@ function Settings<SettingsProps>({ width }) {
               </TableCell>
               <TableCell align="right">
                 <Switch
-                  checked={settings ? !settings.profile : true}
+                  checked={settings ? settings.profile : true}
                   disabled={settings === null}
                   onChange={() => toggleProfile()}
                   color="secondary"
