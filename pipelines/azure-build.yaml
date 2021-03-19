@@ -30,7 +30,13 @@ stages:
               set -xv  # Echo commands before they are run
               export TAG=${BUILD_SOURCEBRANCH#"refs/tags/v"}
               if [[ "$TAG" == *stable* ]]; then export BUILD_TYPE=stable; else export BUILD_TYPE=latest; fi
+
               export VERSION=${TAG/stable}
+              export BRANCH=`git branch -r --contains ${BUILD_SOURCEBRANCH} | grep -v ${BUILD_SOURCEVERSION} | xargs`
+              echo "Building $VERSION On branch $BRANCH"
+              if [[ "$VERSION" == *stable* ]] && [[ $BRANCH != "origin/master" ]]; then exit 1; fi
+              if [[ "$VERSION" == *dev* ]] && [[ $BRANCH != "origin/dev" ]]; then exit 1; fi
+
               export VERSION=${VERSION/beta/b}
               export SERIES="`expr $TAG : '\([0-9]\+\.[0-9]\+\.\)'`${BUILD_TYPE}"
               for IMAGE in "cccs/assemblyline-ui-frontend" "docker.pkg.github.com/cybercentrecanada/assemblyline/assemblyline-ui-frontend"
