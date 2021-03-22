@@ -10,7 +10,7 @@ type VerdictBarProps = {
   width?: string;
 };
 
-const WrappedVerdictBar: React.FC<VerdictBarProps> = ({ verdicts, width = '100%' }) => {
+const VerdictBar: React.FC<VerdictBarProps> = ({ verdicts, width = '100%' }) => {
   const { t } = useTranslation();
   const theme = useTheme();
 
@@ -39,6 +39,4 @@ const WrappedVerdictBar: React.FC<VerdictBarProps> = ({ verdicts, width = '100%'
     </Tooltip>
   );
 };
-
-const VerdictBar = React.memo(WrappedVerdictBar);
 export default VerdictBar;
