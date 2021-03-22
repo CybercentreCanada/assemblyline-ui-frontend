@@ -54,6 +54,7 @@ export type ConfigurationDefinition = {
     version: string;
   };
   ui: {
+    allow_malicious_hinting: boolean;
     allow_url_submissions: boolean;
     banner: {
       [lang: string]: string;

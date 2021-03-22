@@ -7,8 +7,10 @@ import {
   MenuItem,
   Paper,
   Select,
+  Switch,
   Tab,
   TextField,
+  Tooltip,
   Typography,
   useMediaQuery,
   useTheme
@@ -344,23 +346,41 @@ function Submit() {
           {settings ? (
             <div style={{ marginTop: '30px' }}>
               <FileDropper file={file} setFile={setFileDropperFile} disabled={!allowClick} />
-              <div style={{ marginTop: '2rem' }}>
-                {file ? (
-                  <>
-                    <Button
-                      disabled={!allowClick}
-                      color="primary"
-                      variant="contained"
-                      onClick={() => validateServiceSelection('file')}
-                    >
-                      {uploadProgress === null ? t('file.button') : `${uploadProgress}${t('submit.progress')}`}
-                    </Button>
-                    <Button style={{ marginLeft: '16px' }} color="secondary" variant="contained" onClick={cancelUpload}>
-                      {t('file.cancel')}
-                    </Button>
-                  </>
-                ) : null}
-              </div>
+              {file ? (
+                <>
+                  {configuration.ui.allow_malicious_hinting ? (
+                    <div style={{ padding: sp1 }}>
+                      <Tooltip title={t('malicious.tooltip')}>
+                        <FormControlLabel
+                          control={
+                            <Switch
+                              checked={settings ? settings.malicious : true}
+                              disabled={settings === null}
+                              onChange={() => setSettingValue('malicious', !settings.malicious)}
+                              color="secondary"
+                              name="is_malware"
+                            />
+                          }
+                          label={t('malicious')}
+                        />
+                      </Tooltip>
+                    </div>
+                  ) : (
+                    <div style={{ padding: sp2 }} />
+                  )}
+                  <Button
+                    disabled={!allowClick}
+                    color="primary"
+                    variant="contained"
+                    onClick={() => validateServiceSelection('file')}
+                  >
+                    {uploadProgress === null ? t('file.button') : `${uploadProgress}${t('submit.progress')}`}
+                  </Button>
+                  <Button style={{ marginLeft: '16px' }} color="secondary" variant="contained" onClick={cancelUpload}>
+                    {t('file.cancel')}
+                  </Button>
+                </>
+              ) : null}
             </div>
           ) : (
             <Skeleton style={{ height: '280px' }} />
