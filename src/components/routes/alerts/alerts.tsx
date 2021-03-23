@@ -212,7 +212,7 @@ const Alerts: React.FC = () => {
                 marginRight: theme.spacing(-1),
                 position: 'sticky',
                 top: theme.spacing(1),
-                zIndex: 1
+                zIndex: 10
               }}
             >
               <ListNavigator id={ALERT_SIMPLELIST_ID} />
