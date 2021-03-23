@@ -6,7 +6,7 @@ import VerifiedUserOutlinedIcon from '@material-ui/icons/VerifiedUserOutlined';
 import { Skeleton } from '@material-ui/lab';
 import Alert from '@material-ui/lab/Alert';
 import useClipboard from 'commons/components/hooks/useClipboard';
-import PageCenter from 'commons/components/layout/pages/PageCenter';
+import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { AlertItem } from 'components/routes/alerts/hooks/useAlerts';
@@ -89,7 +89,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
   }, [item]);
 
   return (
-    <PageCenter margin={!alert ? 4 : 1} width="100%">
+    <PageFullWidth margin={!alert ? 4 : 1}>
       {c12nDef.enforce && (
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: theme.spacing(2) }}>
           <div style={{ flex: 1 }}>
@@ -525,7 +525,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
           </div>
         ) : null}
       </div>
-    </PageCenter>
+    </PageFullWidth>
   );
 };
 
