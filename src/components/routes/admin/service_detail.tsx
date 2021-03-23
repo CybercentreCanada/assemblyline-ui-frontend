@@ -30,6 +30,7 @@ import ServiceUpdater from './service_detail/updater';
 type ServiceProps = {
   name?: string | null;
   onDeleted?: () => void;
+  onUpdated?: () => void;
 };
 
 type ParamProps = {
@@ -137,7 +138,7 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-function Service({ name, onDeleted }: ServiceProps) {
+function Service({ name, onDeleted, onUpdated }: ServiceProps) {
   const { svc } = useParams<ParamProps>();
   const { t } = useTranslation(['adminServices']);
   const [service, setService] = useState<ServiceDetail>(null);
@@ -163,6 +164,7 @@ function Service({ name, onDeleted }: ServiceProps) {
       onSuccess: () => {
         setModified(false);
         showSuccessMessage(t('save.success'));
+        onUpdated();
       },
       onEnter: () => setButtonLoading(true),
       onExit: () => setButtonLoading(false)
@@ -347,7 +349,8 @@ function Service({ name, onDeleted }: ServiceProps) {
 
 Service.defaultProps = {
   name: null,
-  onDeleted: () => null
+  onDeleted: () => null,
+  onUpdated: () => null
 };
 
 export default Service;

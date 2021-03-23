@@ -10,6 +10,7 @@ import {
   TextField,
   Tooltip,
   Typography,
+  useMediaQuery,
   useTheme
 } from '@material-ui/core';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
@@ -42,7 +43,8 @@ export default function Services() {
   const theme = useTheme();
   const apiCall = useMyAPI();
   const { user: currentUser } = useUser<CustomUser>();
-  const { setGlobalDrawer } = useDrawer();
+  const { setGlobalDrawer, closeGlobalDrawer } = useDrawer();
+  const isXL = useMediaQuery(theme.breakpoints.only('xl'));
 
   const handleAddService = () => {
     apiCall({
@@ -109,6 +111,11 @@ export default function Services() {
     if (currentUser.is_admin) {
       reload();
     }
+
+    window.addEventListener('reloadServices', reload);
+    return () => {
+      window.removeEventListener('reloadServices', reload);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -132,14 +139,19 @@ export default function Services() {
     [updates]
   );
 
+  const onUpdated = () => {
+    if (!isXL) closeGlobalDrawer();
+    setTimeout(() => window.dispatchEvent(new CustomEvent('reloadServices')), 1000);
+  };
+
   const onDeleted = () => {
-    setGlobalDrawer(null);
-    setTimeout(() => reload(), 1000);
+    closeGlobalDrawer();
+    setTimeout(() => window.dispatchEvent(new CustomEvent('reloadServices')), 1000);
   };
 
   const setService = useCallback(
     (service_name: string) => {
-      setGlobalDrawer(<Service name={service_name} onDeleted={onDeleted} />);
+      setGlobalDrawer(<Service name={service_name} onDeleted={onDeleted} onUpdated={onUpdated} />);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
