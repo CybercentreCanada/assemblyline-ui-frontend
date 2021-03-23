@@ -115,7 +115,7 @@ function DrawerProvider(props: DrawerProviderProps) {
                     padding: theme.spacing(1),
                     position: 'sticky',
                     top: 0,
-                    zIndex: 1
+                    zIndex: 5
                   }}
                 >
                   <IconButton onClick={closeGlobalDrawer}>
