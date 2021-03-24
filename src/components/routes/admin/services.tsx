@@ -24,6 +24,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
 import Service from 'components/routes/admin/service_detail';
+import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import ServiceTable from 'components/visual/SearchResult/service';
 import getXSRFCookie from 'helpers/xsrf';
 import 'moment/locale/fr';
@@ -37,6 +38,7 @@ export default function Services() {
   const [updates, setUpdates] = useState(null);
   const [open, setOpen] = useState(false);
   const [openRestore, setOpenRestore] = useState(false);
+  const [restoreConfirmation, setRestoreConfirmation] = useState(false);
   const [manifest, setManifest] = useState('');
   const [restore, setRestore] = useState('');
   const { showSuccessMessage } = useMySnackbar();
@@ -159,6 +161,15 @@ export default function Services() {
 
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>
+      <ConfirmationDialog
+        open={restoreConfirmation}
+        handleClose={() => setRestoreConfirmation(false)}
+        handleAccept={handleRestore}
+        title={t('restore.confirm.title')}
+        text={t('restore.confirm.text')}
+        cancelText={t('restore.confirm.cancel')}
+        acceptText={t('restore.confirm.accept')}
+      />
       <Dialog
         open={openRestore}
         onClose={closeRestoreDialog}
@@ -184,7 +195,7 @@ export default function Services() {
           <Button onClick={closeRestoreDialog} color="secondary">
             {t('restore.cancelText')}
           </Button>
-          <Button onClick={handleRestore} color="primary" disabled={!restore}>
+          <Button onClick={() => setRestoreConfirmation(true)} color="primary" disabled={!restore}>
             {t('restore.acceptText')}
           </Button>
         </DialogActions>
