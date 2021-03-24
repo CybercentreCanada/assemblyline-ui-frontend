@@ -93,7 +93,7 @@
   "restore.cancelText": "Cancel",
   "restore.acceptText": "Restore",
   "restore.confirm.title": "Overwrite services configuration?",
-  "restore.confirm.text": "Are you sure you want to overwrite the current service configuration with the content of this backup? This is irreversible so you should probably create a backup before...",
+  "restore.confirm.text": "Are you sure you want to overwrite the current services configuration with the content of this backup? This is irreversible so you should probably create a backup before...",
   "restore.confirm.cancel": "Cancel",
   "restore.confirm.accept": "Yes, do it!",
   "save": "Save changes",
