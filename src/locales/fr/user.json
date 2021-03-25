@@ -17,6 +17,7 @@
   "apikeys": "Gérer les clés API",
   "apikeys.add": "Ajouter",
   "apikeys.desc": "Mot de passe généré aléatoirement pour utiliser dans les scripts afin d'obtenir un accès limité aux données pour la lecture, l'écriture ou même les deux.",
+  "apikeys.e_token": "Étendue",
   "apikeys.list": "Clés API configurées",
   "apikeys.new_notice_text": "Ce sera le seul moment où vous verrez réellement la clé. Assurez-vous de copier/coller cette clé dans le script où vous souhaitez l'utiliser maintenant, car une fois que vous fermez cette fenêtre, vous ne pouvez plus voir la clé. Si vous oubliez la clé, vous devrez la supprimer et en recréer une autre.",
   "apikeys.new_notice_title": "* Important *",

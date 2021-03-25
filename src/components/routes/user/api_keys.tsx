@@ -14,6 +14,7 @@ import {
   useMediaQuery,
   useTheme
 } from '@material-ui/core';
+import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import React, { useState } from 'react';
@@ -27,6 +28,7 @@ type APIKeysProps = {
 export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
   const { t } = useTranslation(['user']);
   const [selectedAPIKey, setSelectedAPIKey] = useState(null);
+  const { configuration } = useALContext();
   const [tempAPIKey, setTempAPIKey] = useState(null);
   const [tempKeyName, setTempKeyName] = useState('');
   const [tempKeyPriv, setTempKeyPriv] = useState('READ');
@@ -123,6 +125,7 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
             <MenuItem value="READ">{t('apikeys.r_token')}</MenuItem>
             <MenuItem value="READ_WRITE">{t('apikeys.rw_token')}</MenuItem>
             <MenuItem value="WRITE">{t('apikeys.w_token')}</MenuItem>
+            {configuration.auth.allow_extended_apikeys && <MenuItem value="EXTENDED">{t('apikeys.e_token')}</MenuItem>}
           </Select>
         </div>
         <div style={{ alignSelf: 'flex-end', paddingLeft: sp1 }}>

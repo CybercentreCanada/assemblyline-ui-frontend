@@ -17,6 +17,7 @@
   "apikeys": "Manage API Keys",
   "apikeys.add": "Add",
   "apikeys.desc": "Randomly generated password used in scripts to gain limited data access for either reading, writing or both.",
+  "apikeys.e_token": "Extended",
   "apikeys.list": "Configured API Keys",
   "apikeys.new_notice_text": "This will be the only time where you'll actually see the key. Make sure you copy/paste that key in the script where you want to use it now because once you close this window you can no longer see the key. If you forget the key you'll have to delete it and re-create another.",
   "apikeys.new_notice_title": "* Important *",
