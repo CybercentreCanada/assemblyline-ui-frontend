@@ -46,6 +46,7 @@ export type ConfigurationDefinition = {
   auth: {
     allow_2fa: boolean;
     allow_apikeys: boolean;
+    allow_extended_apikeys: boolean;
     allow_security_tokens: boolean;
   };
   system: {
