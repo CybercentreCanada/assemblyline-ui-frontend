@@ -230,7 +230,7 @@ const ProcessTreeItem = ({ process }) => {
 
   return (
     <TreeItem
-      nodeId={process.process_pid.toString()}
+      nodeId={process.pid.toString()}
       classes={{
         root: classes.root
       }}
@@ -259,11 +259,11 @@ const ProcessTreeItem = ({ process }) => {
               borderRadius: '4px 0px 0px 4px'
             }}
           >
-            {process.process_pid}
+            {process.pid}
           </div>
           <div style={{ padding: '5px', flexGrow: 1, wordBreak: 'break-word' }}>
             <div style={{ paddingBottom: '5px' }}>
-              <b>{process.process_name}</b>
+              <b>{process.image}</b>
             </div>
             <div>
               <samp>
@@ -304,13 +304,13 @@ const ProcessTreeBody = ({ body }) => {
 
     // Auto-expand first two levels
     data.forEach(process => {
-      if (process.process_pid !== undefined && process.process_pid !== null) {
-        expanded.push(process.process_pid.toString());
+      if (process.pid !== undefined && process.pid !== null) {
+        expanded.push(process.pid.toString());
       }
       if (process.children !== undefined && process.children !== null && process.children.length !== 0) {
         process.children.forEach(subprocess => {
-          if (subprocess.process_pid !== undefined && subprocess.process_pid !== null) {
-            expanded.push(subprocess.process_pid.toString());
+          if (subprocess.pid !== undefined && subprocess.pid !== null) {
+            expanded.push(subprocess.pid.toString());
           }
         });
       }
