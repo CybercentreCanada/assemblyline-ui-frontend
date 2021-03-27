@@ -54,5 +54,6 @@
   "verdict.set.non_malicious": "Vote for Non-Malicious verdict",
   "verdict.suspicious": "Suspicious",
   "warning": "Warning",
+  "warning.partial": "Some information about this submission is missing from the system. Therefore you're only seeing partial results.",
   "warning.text": "Some details about the submission has been filtered because you do not have enough privilege to view all the results."
 }
