@@ -83,6 +83,7 @@ export default function SubmissionDetail() {
   const [summary, setSummary] = useState(null);
   const [tree, setTree] = useState(null);
   const [filtered, setFiltered] = useState(false);
+  const [partial, setPartial] = useState(false);
   const [watchQueue, setWatchQueue] = useState(null);
   const [liveResultKeys, setLiveResultKeys] = useReducer(messageReducer, []);
   const [liveErrorKeys, setLiveErrorKeys] = useReducer(messageReducer, []);
@@ -528,6 +529,9 @@ export default function SubmissionDetail() {
             if (summ_data.api_response.filtered) {
               setFiltered(true);
             }
+            if (summ_data.api_response.partial) {
+              setPartial(true);
+            }
           }
         });
         apiCall({
@@ -536,6 +540,9 @@ export default function SubmissionDetail() {
             setTree(tree_data.api_response.tree);
             if (tree_data.api_response.filtered) {
               setFiltered(true);
+            }
+            if (tree_data.api_response.partial) {
+              setPartial(true);
             }
           }
         });
@@ -954,6 +961,14 @@ export default function SubmissionDetail() {
           <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2) }}>
             <Typography variant="subtitle1">
               <b>**{t('warning')}</b>: {t('warning.text')}
+            </Typography>
+          </div>
+        )}
+
+        {partial && (
+          <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2) }}>
+            <Typography variant="subtitle1">
+              <b>**{t('warning')}</b>: {t('warning.partial')}
             </Typography>
           </div>
         )}
