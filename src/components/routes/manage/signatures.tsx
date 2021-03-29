@@ -13,6 +13,7 @@ import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
 import SignaturesTable from 'components/visual/SearchResult/signatures';
+import { searchResultsDisplay } from 'helpers/utils';
 import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -225,7 +226,7 @@ export default function Signatures() {
                             <span>{t('searching')}</span>
                           ) : (
                             <span>
-                              {signatureResults.total}&nbsp;
+                              {searchResultsDisplay(signatureResults.total)}&nbsp;
                               {query.get('query')
                                 ? t(`filtered${signatureResults.total === 1 ? '' : 's'}`)
                                 : t(`total${signatureResults.total === 1 ? '' : 's'}`)}
