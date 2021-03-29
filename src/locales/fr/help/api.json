@@ -4,7 +4,7 @@
   "function": "Fonction interne",
   "methods": "Méthodes autorisées",
   "path": "Chemin d'API",
-  "priv.E": "Étendu",
+  "priv.E": "Étendue",
   "priv.R": "Lecture",
   "priv.W": "Écriture",
   "protected": "Nécessite une authentification",
