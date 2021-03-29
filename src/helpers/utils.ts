@@ -51,3 +51,11 @@ export function getProvider() {
   const params = new URLSearchParams(window.location.search);
   return params.get('provider');
 }
+
+export function searchResultsDisplay(count, max = 10000) {
+  if (count >= max) {
+    return `${count}+`;
+  }
+
+  return `${count}`;
+}

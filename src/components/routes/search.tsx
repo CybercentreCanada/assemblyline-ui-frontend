@@ -28,6 +28,7 @@ import FilesTable from 'components/visual/SearchResult/files';
 import ResultsTable from 'components/visual/SearchResult/results';
 import SignaturesTable from 'components/visual/SearchResult/signatures';
 import SubmissionsTable from 'components/visual/SearchResult/submissions';
+import { searchResultsDisplay } from 'helpers/utils';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory, useLocation, useParams } from 'react-router-dom';
@@ -265,16 +266,29 @@ function Search({ index }: SearchProps) {
                 variant="scrollable"
               >
                 <Tab
-                  label={`${t('submission')} (${submissionResults ? submissionResults.total : '...'})`}
+                  label={`${t('submission')} (${
+                    submissionResults ? searchResultsDisplay(submissionResults.total) : '...'
+                  })`}
                   value="submission"
                 />
-                <Tab label={`${t('file')} (${fileResults ? fileResults.total : '...'})`} value="file" />
-                <Tab label={`${t('result')} (${resultResults ? resultResults.total : '...'})`} value="result" />
                 <Tab
-                  label={`${t('signature')} (${signatureResults ? signatureResults.total : '...'})`}
+                  label={`${t('file')} (${fileResults ? searchResultsDisplay(fileResults.total) : '...'})`}
+                  value="file"
+                />
+                <Tab
+                  label={`${t('result')} (${resultResults ? searchResultsDisplay(resultResults.total) : '...'})`}
+                  value="result"
+                />
+                <Tab
+                  label={`${t('signature')} (${
+                    signatureResults ? searchResultsDisplay(signatureResults.total) : '...'
+                  })`}
                   value="signature"
                 />
-                <Tab label={`${t('alert')} (${alertResults ? alertResults.total : '...'})`} value="alert" />
+                <Tab
+                  label={`${t('alert')} (${alertResults ? searchResultsDisplay(alertResults.total) : '...'})`}
+                  value="alert"
+                />
                 <TabSpacer />
                 <SpecialTab>
                   <Tooltip title={t('focus_search')}>
@@ -293,7 +307,9 @@ function Search({ index }: SearchProps) {
           <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', marginBottom: theme.spacing(0.5) }}>
             {resMap[tab] && resMap[tab].total !== 0 && (index || id) && (
               <div className={classes.searchresult}>
-                {`${resMap[tab].total} ${t(resMap[tab].total === 1 ? 'matching_result' : 'matching_results')}`}
+                {`${searchResultsDisplay(resMap[tab].total)} ${t(
+                  resMap[tab].total === 1 ? 'matching_result' : 'matching_results'
+                )}`}
               </div>
             )}
             <div style={{ flexGrow: 1 }} />
