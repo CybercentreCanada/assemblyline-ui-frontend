@@ -28,6 +28,7 @@ import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
 import UsersTable from 'components/visual/SearchResult/users';
+import { searchResultsDisplay } from 'helpers/utils';
 import ChipInput from 'material-ui-chip-input';
 import 'moment/locale/fr';
 import React, { useEffect, useRef, useState } from 'react';
@@ -420,7 +421,7 @@ export default function Users() {
                       <span>{t('searching')}</span>
                     ) : (
                       <span>
-                        {userResults.total}&nbsp;
+                        {searchResultsDisplay(userResults.total)}&nbsp;
                         {query.get('query')
                           ? t(`filtered${userResults.total === 1 ? '' : 's'}`)
                           : t(`total${userResults.total === 1 ? '' : 's'}`)}

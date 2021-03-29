@@ -14,6 +14,7 @@ import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
 import ErrorsTable from 'components/visual/SearchResult/errors';
+import { searchResultsDisplay } from 'helpers/utils';
 import 'moment/locale/fr';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -288,7 +289,7 @@ export default function ErrorViewer() {
                       <span>{t('searching')}</span>
                     ) : (
                       <span>
-                        {errorResults.total}&nbsp;
+                        {searchResultsDisplay(errorResults.total)}&nbsp;
                         {query.get('query')
                           ? t(`filtered${errorResults.total === 1 ? '' : 's'}`)
                           : t(`total${errorResults.total === 1 ? '' : 's'}`)}
