@@ -37,5 +37,6 @@
   "title": "Submission Report",
   "user.verdict": "User's Verdicts",
   "warning": "Warning",
+  "warning.partial": "Some information about this report is missing from the system. Therefore you're only seeing a partial report.",
   "warning.text": "Data in this report has been filtered because you do not have enough privilege to view the full report."
 }

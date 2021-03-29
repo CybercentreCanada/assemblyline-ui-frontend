@@ -37,5 +37,6 @@
   "title": "Rapport de Soumission",
   "user.verdict": "Verdict des Utilisateurs",
   "warning": "Avertissement",
+  "warning.partial": "Certaines informations sur ce rapport sont manquantes dans le système. Par conséquent, vous ne voyez qu'un rapport partiel.",
   "warning.text": "Les données de ce rapport ont été filtrées car vous ne disposez pas des privilèges suffisants pour afficher le rapport complet."
 }
