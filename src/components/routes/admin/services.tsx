@@ -6,12 +6,16 @@ import {
   DialogTitle,
   Grid,
   IconButton,
+  Link as MaterialLink,
   TextField,
   Tooltip,
   Typography,
+  useMediaQuery,
   useTheme
 } from '@material-ui/core';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
+import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
+import RestoreOutlinedIcon from '@material-ui/icons/RestoreOutlined';
 import { Skeleton } from '@material-ui/lab';
 import useUser from 'commons/components/hooks/useAppUser';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
@@ -20,7 +24,9 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
 import Service from 'components/routes/admin/service_detail';
+import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import ServiceTable from 'components/visual/SearchResult/service';
+import getXSRFCookie from 'helpers/xsrf';
 import 'moment/locale/fr';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -31,12 +37,16 @@ export default function Services() {
   const [serviceResults, setServiceResults] = useState(null);
   const [updates, setUpdates] = useState(null);
   const [open, setOpen] = useState(false);
+  const [openRestore, setOpenRestore] = useState(false);
+  const [restoreConfirmation, setRestoreConfirmation] = useState(false);
   const [manifest, setManifest] = useState('');
+  const [restore, setRestore] = useState('');
   const { showSuccessMessage } = useMySnackbar();
   const theme = useTheme();
   const apiCall = useMyAPI();
   const { user: currentUser } = useUser<CustomUser>();
-  const { setGlobalDrawer } = useDrawer();
+  const { setGlobalDrawer, closeGlobalDrawer } = useDrawer();
+  const isXL = useMediaQuery(theme.breakpoints.only('xl'));
 
   const handleAddService = () => {
     apiCall({
@@ -46,11 +56,39 @@ export default function Services() {
       body: manifest,
       onSuccess: api_data => {
         showSuccessMessage(t('add.success'));
-        setOpen(false);
+        closeServiceDialog();
         setTimeout(() => reload(), 1000);
       }
     });
   };
+
+  const closeServiceDialog = () => {
+    setManifest('');
+    setOpen(false);
+  };
+
+  const handleRestore = () => {
+    apiCall({
+      method: 'PUT',
+      contentType: 'text/plain',
+      url: '/api/v4/service/restore/',
+      body: restore,
+      onSuccess: api_data => {
+        showSuccessMessage(t('restore.success'));
+        closeRestoreDialog();
+        setTimeout(() => reload(), 1000);
+      }
+    });
+  };
+
+  const closeRestoreDialog = () => {
+    setRestore('');
+    setOpenRestore(false);
+  };
+
+  function handleRestoreChange(event) {
+    setRestore(event.target.value);
+  }
 
   function handleManifestChange(event) {
     setManifest(event.target.value);
@@ -75,6 +113,11 @@ export default function Services() {
     if (currentUser.is_admin) {
       reload();
     }
+
+    window.addEventListener('reloadServices', reload);
+    return () => {
+      window.removeEventListener('reloadServices', reload);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -98,14 +141,19 @@ export default function Services() {
     [updates]
   );
 
+  const onUpdated = () => {
+    if (!isXL) closeGlobalDrawer();
+    setTimeout(() => window.dispatchEvent(new CustomEvent('reloadServices')), 1000);
+  };
+
   const onDeleted = () => {
-    setGlobalDrawer(null);
-    setTimeout(() => reload(), 1000);
+    closeGlobalDrawer();
+    setTimeout(() => window.dispatchEvent(new CustomEvent('reloadServices')), 1000);
   };
 
   const setService = useCallback(
     (service_name: string) => {
-      setGlobalDrawer(<Service name={service_name} onDeleted={onDeleted} />);
+      setGlobalDrawer(<Service name={service_name} onDeleted={onDeleted} onUpdated={onUpdated} />);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
@@ -113,7 +161,46 @@ export default function Services() {
 
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>
-      <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby="form-dialog-title" fullWidth maxWidth="md">
+      <ConfirmationDialog
+        open={restoreConfirmation}
+        handleClose={() => setRestoreConfirmation(false)}
+        handleAccept={handleRestore}
+        title={t('restore.confirm.title')}
+        text={t('restore.confirm.text')}
+        cancelText={t('restore.confirm.cancel')}
+        acceptText={t('restore.confirm.accept')}
+      />
+      <Dialog
+        open={openRestore}
+        onClose={closeRestoreDialog}
+        aria-labelledby="restore-dialog-title"
+        fullWidth
+        maxWidth="md"
+      >
+        <DialogTitle id="restore-dialog-title">{t('restore.title')}</DialogTitle>
+        <DialogContent>
+          <TextField
+            label={t('restore.paste')}
+            multiline
+            rows={24}
+            variant="outlined"
+            fullWidth
+            InputProps={{
+              style: { fontFamily: 'monospace' }
+            }}
+            onChange={handleRestoreChange}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeRestoreDialog} color="secondary">
+            {t('restore.cancelText')}
+          </Button>
+          <Button onClick={() => setRestoreConfirmation(true)} color="primary" disabled={!restore}>
+            {t('restore.acceptText')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={open} onClose={closeServiceDialog} aria-labelledby="form-dialog-title" fullWidth maxWidth="md">
         <DialogTitle id="form-dialog-title">{t('add.title')}</DialogTitle>
         <DialogContent>
           <TextField
@@ -129,7 +216,7 @@ export default function Services() {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpen(false)} color="secondary">
+          <Button onClick={closeServiceDialog} color="secondary">
             {t('add.cancelText')}
           </Button>
           <Button onClick={handleAddService} color="primary" disabled={!manifest}>
@@ -156,6 +243,16 @@ export default function Services() {
                 onClick={() => setOpen(true)}
               >
                 <AddCircleOutlineIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={t('backup')}>
+              <IconButton component={MaterialLink} href={`/api/v4/service/backup/?XSRF_TOKEN=${getXSRFCookie()}`}>
+                <GetAppOutlinedIcon color="action" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={t('restore')}>
+              <IconButton onClick={() => setOpenRestore(true)}>
+                <RestoreOutlinedIcon />
               </IconButton>
             </Tooltip>
           </div>
