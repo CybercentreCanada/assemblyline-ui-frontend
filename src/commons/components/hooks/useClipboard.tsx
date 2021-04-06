@@ -1,10 +1,12 @@
 import { OptionsObject, useSnackbar } from 'notistack';
+import { useTranslation } from 'react-i18next';
 
 export default function useClipboard() {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const { t } = useTranslation();
   const snackBarOptions: OptionsObject = {
     preventDuplicate: true,
-    autoHideDuration: 5000,
+    autoHideDuration: 3000,
     anchorOrigin: {
       vertical: 'bottom',
       horizontal: 'center'
@@ -24,11 +26,11 @@ export default function useClipboard() {
     const copySuccess = document.execCommand('copy');
     target.removeChild(el);
     if (copySuccess) {
-      enqueueSnackbar(text, { variant: 'success', ...snackBarOptions });
+      enqueueSnackbar(`'${text}' ${t('clipboard.success')}`, { variant: 'success', ...snackBarOptions });
     } else {
-      enqueueSnackbar(text, { variant: 'error', ...snackBarOptions });
+      enqueueSnackbar(`'${text}' ${t('clipboard.failure')}`, { variant: 'error', ...snackBarOptions });
     }
   };
- 
+
   return { copy };
 }

@@ -1,4 +1,5 @@
 import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
+import useClipboard from 'commons/components/hooks/useClipboard';
 import useHighlighter from 'components/hooks/useHighlighter';
 import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
 import { scoreToVerdict } from 'helpers/utils';
@@ -27,6 +28,7 @@ const Attack: React.FC<AttackProps> = ({
 }) => {
   const history = useHistory();
   const { isHighlighted, triggerHighlight } = useHighlighter();
+  const { copy } = useClipboard();
 
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
 
@@ -65,6 +67,10 @@ const Attack: React.FC<AttackProps> = ({
       style={STYLE}
       onClick={highlight_key ? handleClick : null}
       fullWidth={fullWidth}
+      onContextMenu={event => {
+        event.preventDefault();
+        copy(text, 'drawerTop');
+      }}
     />
   );
 };

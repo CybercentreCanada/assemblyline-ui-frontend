@@ -21,6 +21,8 @@
   "breadcrumb.tos": "Conditions d'utilisation",
   "classification.done": "Terminé",
   "clear_filter": "Effacer le filtre de recherche",
+  "clipboard.success": "a été copié dans le presse-papiers.",
+  "clipboard.failure": "n'a pas pu être copié dans le presse-papiers.",
   "divider": "OU",
   "drawer.alerts": "Alertes",
   "drawer.collapse": "Fermer le Menu",
