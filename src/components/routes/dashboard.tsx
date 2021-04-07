@@ -146,25 +146,41 @@ const WrappedIngestCard = ({ ingester }) => {
           <div>
             <MetricCounter
               init={ingester.initialized}
-              value={ingester.queues.critical}
+              value={
+                ingester.processing_chance.critical === 1
+                  ? ingester.queues.critical
+                  : `${ingester.queues.critical} (${Math.round(ingester.processing_chance.critical * 100)}%)`
+              }
               title="C"
               tooltip={t('ingest.critical')}
             />
             <MetricCounter
               init={ingester.initialized}
-              value={ingester.queues.high}
+              value={
+                ingester.processing_chance.high === 1
+                  ? ingester.queues.high
+                  : `${ingester.queues.high} (${Math.round(ingester.processing_chance.high * 100)}%)`
+              }
               title="H"
               tooltip={t('ingest.high')}
             />
             <MetricCounter
               init={ingester.initialized}
-              value={ingester.queues.medium}
+              value={
+                ingester.processing_chance.medium === 1
+                  ? ingester.queues.medium
+                  : `${ingester.queues.medium} (${Math.round(ingester.processing_chance.medium * 100)}%)`
+              }
               title="M"
               tooltip={t('ingest.medium')}
             />
             <MetricCounter
               init={ingester.initialized}
-              value={ingester.queues.low}
+              value={
+                ingester.processing_chance.low === 1
+                  ? ingester.queues.low
+                  : `${ingester.queues.low} (${Math.round(ingester.processing_chance.low * 100)}%)`
+              }
               title="L"
               tooltip={t('ingest.low')}
             />
