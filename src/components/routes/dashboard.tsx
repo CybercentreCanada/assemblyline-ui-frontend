@@ -84,7 +84,7 @@ const WrappedIngestCard = ({ ingester }) => {
   const [timer, setTimer] = useState(null);
   const [error, setError] = useState(null);
   const classes = useStyles();
-  const busyness = (ingester.metrics.busy_seconds * ingester.metrics.busy_seconds_count) / ingester.instances / 60;
+  const busyness = (ingester.metrics.cpu_seconds * ingester.metrics.cpu_seconds_count) / ingester.instances / 60;
 
   useEffect(() => {
     if (ingester.processing_chance.critical !== 1) {
@@ -923,6 +923,8 @@ const DEFAULT_INGESTER = {
     cache_stale: 0,
     cache_hit_local: 0,
     cache_hit: 0,
+    cpu_seconds: 0,
+    cpu_seconds_count: 0,
     bytes_completed: 0,
     bytes_ingested: 0,
     duplicates: 0,
