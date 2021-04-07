@@ -21,6 +21,8 @@
   "breadcrumb.tos": "Terms of Service",
   "classification.done": "Done",
   "clear_filter": "Clear search filter",
+  "clipboard.success": "was copied to clipboard.",
+  "clipboard.failure": "could not be copied to clipboard",
   "divider": "OR",
   "drawer.alerts": "Alerts",
   "drawer.collapse": "Collapse Menu",
