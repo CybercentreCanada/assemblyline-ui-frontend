@@ -109,7 +109,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                   <IconButton
                     component={Link}
                     style={{ color: theme.palette.action.active }}
-                    to={`/submission/"${item.sid}"`}
+                    to={`/submission/${item.sid}`}
                   >
                     <AmpStoriesOutlinedIcon />
                   </IconButton>
