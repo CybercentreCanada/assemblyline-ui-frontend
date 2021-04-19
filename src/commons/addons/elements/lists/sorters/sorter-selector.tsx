@@ -4,6 +4,7 @@ import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import { Autocomplete } from '@material-ui/lab';
 import useSorters from 'commons/addons/elements/lists/hooks/useSorters';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export interface SorterField {
   id: string | number;
@@ -22,6 +23,7 @@ interface SorterSelectorProps {
 
 const SorterSelector: React.FC<SorterSelectorProps> = ({ list, fields, selections, onChange, onSorted }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const { icon: sortIcon, onSort } = useSorters();
 
   const onSelectionChange = (_event: React.ChangeEvent<{}>, _selections: SorterField[]) => {
@@ -66,7 +68,7 @@ const SorterSelector: React.FC<SorterSelectorProps> = ({ list, fields, selection
           ))}
         </>
       )}
-      renderInput={params => <TextField {...params} label="Sorters" />}
+      renderInput={params => <TextField {...params} label={t('list.selector.sorters')} />}
       renderOption={(option, { selected }) => (
         <>
           <Checkbox

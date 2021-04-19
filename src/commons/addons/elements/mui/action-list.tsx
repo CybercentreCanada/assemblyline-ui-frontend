@@ -47,7 +47,7 @@ const ActionList: React.FC<{
 
       return a.tooltip ? (
         <Tooltip key={a.key ? a.key : `ph-action-${i}`} title={a.tooltip}>
-          {button}
+          <span>{button}</span>
         </Tooltip>
       ) : (
         button

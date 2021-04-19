@@ -23,6 +23,7 @@ const useStyles = makeStyles(theme => ({
 const THROTTLER = new Throttler(100);
 
 interface FilterInputProps {
+  fullWidth?: boolean;
   filter: FilterField;
   currentFilters: FilterField[];
   filters: FilterField[];
@@ -30,7 +31,14 @@ interface FilterInputProps {
   onFiltered: (list: any[]) => void;
 }
 
-const FilterInput: React.FC<FilterInputProps> = ({ filter, currentFilters, filters, list, onFiltered }) => {
+const FilterInput: React.FC<FilterInputProps> = ({
+  fullWidth = false,
+  filter,
+  currentFilters,
+  filters,
+  list,
+  onFiltered
+}) => {
   const classes = useStyles();
   const [value, setValue] = useState<string>('');
   const { applyFilters } = useFilters(filters);
@@ -49,6 +57,7 @@ const FilterInput: React.FC<FilterInputProps> = ({ filter, currentFilters, filte
       value={value}
       onChange={onChange}
       label={filter.label}
+      fullWidth={fullWidth}
       InputProps={{
         className: classes.filterInput,
         classes: { focused: classes.filterInputFocused },

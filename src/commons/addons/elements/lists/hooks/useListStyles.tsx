@@ -100,7 +100,8 @@ const useSimpleListStyles = makeStyles(theme => ({
   },
   inner: {
     position: 'relative',
-    width: '100%'
+    width: '100%',
+    outline: 'none'
   },
   progressCt: {
     position: 'absolute',
@@ -130,15 +131,18 @@ const useListItemStyles = makeStyles(theme => ({
       display: 'inherit'
     }
   },
+  cardItemBackground: {
+    backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 15%)' : 'hsl(0, 0%, 97%)'
+  },
   itemDefaultBackgrounds: {
     '&:hover': {
-      backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 17%)' : 'hsl(0, 0%, 95%)'
+      backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 19%)' : 'hsl(0, 0%, 95%)'
     },
     '&[data-listitem-focus="true"]': {
-      backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 17%)' : 'hsl(0, 0%, 95%)'
+      backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 19%)' : 'hsl(0, 0%, 95%)'
     },
     '&[data-listitem-selected="true"]': {
-      backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 15%)' : 'hsl(0, 0%, 92%)'
+      backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 17%)' : 'hsl(0, 0%, 92%)'
     }
   },
   itemOuter: {
@@ -160,7 +164,7 @@ const useListItemStyles = makeStyles(theme => ({
     top: theme.spacing(1),
     right: theme.spacing(1),
     display: 'none',
-    backgroundColor: 'transparent',
+    backgroundColor: 'inherit',
     '& button': {
       marginRight: theme.spacing(1),
       boxShadow: theme.shadows[2]

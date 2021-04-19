@@ -20,6 +20,7 @@ interface Breakpoints {
 interface GridListProps {
   id: string;
   items: LineItem[];
+  emptyValue?: React.ReactNode;
   spacing?: GridSpacing;
   view?: 'table' | 'card';
   breakpoints?: Breakpoints;
@@ -35,9 +36,10 @@ interface GridListProps {
 const GridList: React.FC<GridListProps> = ({
   id,
   loading = false,
-  spacing = 0,
+  spacing = 1,
   items,
-  view,
+  emptyValue,
+  view = 'card',
   breakpoints = { xs: 12, sm: 12, md: 6, lg: 4, xl: 3 },
   disableOverflow = false,
   scrollTargetId,
@@ -103,13 +105,13 @@ const GridList: React.FC<GridListProps> = ({
     scroller.current = new SimpleListScroller(scrollEL.current, outerEL.current);
   });
 
-  useEffect(() => {
-    return register({
+  useEffect(() =>
+    register({
       onSelect: () => {},
       onSelectNext: () => next(),
       onSelectPrevious: () => previous()
-    });
-  });
+    })
+  );
 
   return (
     <div ref={outerEL} className={simpleListStyles.outer}>
@@ -125,22 +127,25 @@ const GridList: React.FC<GridListProps> = ({
         onKeyDown={!loading ? onKeyDown : null}
         style={{ overflow: disableOverflow ? 'unset' : null, padding: theme.spacing(spacing) }}
       >
-        <Grid container spacing={spacing}>
-          {items.map((item: LineItem, index: number) => (
-            <Grid key={item.id} item {...computeBreakpoints()}>
-              <ListItemBase
-                noDivider
-                index={index}
-                item={item}
-                height="100%"
-                selected={cursor === index}
-                onClick={_onItemClick}
-                onRenderActions={onRenderActions}
-              >
-                {children}
-              </ListItemBase>
-            </Grid>
-          ))}
+        <Grid container spacing={view === 'card' ? spacing : 0}>
+          {items.length === 0
+            ? emptyValue
+            : items.map((item: LineItem, index: number) => (
+                <Grid key={item.id} item {...computeBreakpoints()}>
+                  <ListItemBase
+                    noDivider
+                    card={view !== 'table'}
+                    index={index}
+                    item={item}
+                    height="100%"
+                    selected={cursor === index}
+                    onClick={_onItemClick}
+                    onRenderActions={onRenderActions}
+                  >
+                    {children}
+                  </ListItemBase>
+                </Grid>
+              ))}
         </Grid>
       </div>
     </div>
