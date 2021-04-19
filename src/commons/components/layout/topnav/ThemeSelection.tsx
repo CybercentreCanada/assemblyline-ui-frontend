@@ -13,7 +13,6 @@ import withWidth, { isWidthDown } from '@material-ui/core/withWidth';
 import useApp from 'commons/components/hooks/useAppContext';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import i18n from 'i18next';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 export enum Lang {
@@ -21,9 +20,7 @@ export enum Lang {
   FR = 'fr'
 }
 
-const isLang = (lang: Lang): boolean => {
-  return i18n.language === lang.valueOf();
-};
+const isLang = (lang: Lang): boolean => i18n.language === lang.valueOf();
 
 const ThemeSelection = ({ width }) => {
   const theme = useTheme();

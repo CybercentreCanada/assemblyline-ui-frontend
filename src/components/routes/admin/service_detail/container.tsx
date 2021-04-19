@@ -81,32 +81,30 @@ const ServiceContainer = ({ service, setService, setModified }: ServiceContainer
         <Typography variant="subtitle2">{t('container.dependencies')}</Typography>
         {service ? (
           Object.keys(service.dependencies).length !== 0 ? (
-            Object.keys(service.dependencies).map(name => {
-              return (
-                <div key={name} style={{ display: 'flex', alignItems: 'center' }}>
-                  <div style={{ paddingRight: theme.spacing(1), flexGrow: 1 }}>
-                    <ContainerCard
-                      name={name}
-                      container={service.dependencies[name].container}
-                      volumes={service.dependencies[name].volumes}
-                      onChange={handleDependencyChange}
-                    />
-                  </div>
-                  <div>
-                    <Tooltip title={t('container.dependencies.remove')}>
-                      <IconButton
-                        style={{
-                          color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                        }}
-                        onClick={() => onDependencyDelete(name)}
-                      >
-                        <RemoveCircleOutlineOutlinedIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </div>
+            Object.keys(service.dependencies).map(name => (
+              <div key={name} style={{ display: 'flex', alignItems: 'center' }}>
+                <div style={{ paddingRight: theme.spacing(1), flexGrow: 1 }}>
+                  <ContainerCard
+                    name={name}
+                    container={service.dependencies[name].container}
+                    volumes={service.dependencies[name].volumes}
+                    onChange={handleDependencyChange}
+                  />
                 </div>
-              );
-            })
+                <div>
+                  <Tooltip title={t('container.dependencies.remove')}>
+                    <IconButton
+                      style={{
+                        color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                      }}
+                      onClick={() => onDependencyDelete(name)}
+                    >
+                      <RemoveCircleOutlineOutlinedIcon />
+                    </IconButton>
+                  </Tooltip>
+                </div>
+              </div>
+            ))
           ) : (
             <Typography color="textSecondary" variant="caption" component="div">
               {t('container.dependencies.none')}

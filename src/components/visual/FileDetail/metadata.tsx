@@ -41,32 +41,28 @@ const WrappedMetadataSection: React.FC<MetadataSectionProps> = ({ metadata }) =>
           () => (
             <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
               {metadata
-                ? Object.keys(metadata).map((meta, i) => {
-                    return (
-                      <Grid container key={i}>
-                        <Grid item xs={12} sm={3} lg={2}>
-                          <span style={{ fontWeight: 500, wordBreak: 'break-word' }}>{meta}</span>
-                        </Grid>
-                        <Grid item xs={12} sm={9} lg={10}>
-                          {Object.keys(metadata[meta]).map((item, key) => {
-                            return <CustomChip size="tiny" key={key} label={`${metadata[meta][item]}x ${item}`} />;
-                          })}
-                        </Grid>
+                ? Object.keys(metadata).map((meta, i) => (
+                    <Grid container key={i}>
+                      <Grid item xs={12} sm={3} lg={2}>
+                        <span style={{ fontWeight: 500, wordBreak: 'break-word' }}>{meta}</span>
                       </Grid>
-                    );
-                  })
-                : [...Array(3)].map((_, i) => {
-                    return (
-                      <Grid container key={i} spacing={1}>
-                        <Grid item xs={12} sm={3} lg={2}>
-                          <Skeleton style={{ height: '2rem' }} />
-                        </Grid>
-                        <Grid item xs={12} sm={9} lg={10}>
-                          <Skeleton style={{ height: '2rem' }} />
-                        </Grid>
+                      <Grid item xs={12} sm={9} lg={10}>
+                        {Object.keys(metadata[meta]).map((item, key) => (
+                          <CustomChip size="tiny" key={key} label={`${metadata[meta][item]}x ${item}`} />
+                        ))}
                       </Grid>
-                    );
-                  })}
+                    </Grid>
+                  ))
+                : [...Array(3)].map((_, i) => (
+                    <Grid container key={i} spacing={1}>
+                      <Grid item xs={12} sm={3} lg={2}>
+                        <Skeleton style={{ height: '2rem' }} />
+                      </Grid>
+                      <Grid item xs={12} sm={9} lg={10}>
+                        <Skeleton style={{ height: '2rem' }} />
+                      </Grid>
+                    </Grid>
+                  ))}
             </div>
           ),
           // eslint-disable-next-line react-hooks/exhaustive-deps

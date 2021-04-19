@@ -32,13 +32,7 @@ const WrappedSupplementarySection: React.FC<SupplementarySectionProps> = ({ extr
         <h3>{t('supplementary')}</h3>
       </Box>
       <Collapse in={open} timeout="auto">
-        {useMemo(
-          () =>
-            extracted.map((file, id) => {
-              return <ExtractedFile key={id} file={file} download />;
-            }),
-          [extracted]
-        )}
+        {useMemo(() => extracted.map((file, id) => <ExtractedFile key={id} file={file} download />), [extracted])}
       </Collapse>
     </div>
   );

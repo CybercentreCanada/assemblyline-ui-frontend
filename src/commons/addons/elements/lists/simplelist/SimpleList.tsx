@@ -139,13 +139,13 @@ const SimpleList: React.FC<SimpleListProps> = ({
     };
   }, [scrollTargetId, outerEL, onScrollEnabled, loading, onLoadNext]);
 
-  useEffect(() => {
-    return register({
+  useEffect(() =>
+    register({
       onSelect: () => null,
       onSelectNext: () => next(),
       onSelectPrevious: () => previous()
-    });
-  });
+    })
+  );
 
   return (
     <div
@@ -163,22 +163,20 @@ const SimpleList: React.FC<SimpleListProps> = ({
       )}
       <div ref={innerEL} className={classes.inner}>
         {items && items.length !== 0
-          ? items.map((item, index) => {
-              return (
-                <ListItemBase
-                  key={`list.rowitem[${index}]`}
-                  index={index}
-                  selected={cursor === index}
-                  item={item}
-                  disableBackgrounds={disableBackgrounds}
-                  noDivider={noDivider}
-                  onRenderActions={onRenderActions}
-                  onClick={_onRowClick}
-                >
-                  {children}
-                </ListItemBase>
-              );
-            })
+          ? items.map((item, index) => (
+              <ListItemBase
+                key={`list.rowitem[${index}]`}
+                index={index}
+                selected={cursor === index}
+                item={item}
+                disableBackgrounds={disableBackgrounds}
+                noDivider={noDivider}
+                onRenderActions={onRenderActions}
+                onClick={_onRowClick}
+              >
+                {children}
+              </ListItemBase>
+            ))
           : !loading
           ? emptyValue
           : null}

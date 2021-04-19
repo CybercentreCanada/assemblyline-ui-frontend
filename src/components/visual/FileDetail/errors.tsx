@@ -39,9 +39,9 @@ const WrappedErrorSection: React.FC<ErrorSectionProps> = ({ errors }) => {
         {useMemo(
           () => (
             <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
-              {errors.map((error, i) => {
-                return <ErrorCard key={i} error={error} />;
-              })}
+              {errors.map((error, i) => (
+                <ErrorCard key={i} error={error} />
+              ))}
             </div>
           ),
           // eslint-disable-next-line react-hooks/exhaustive-deps

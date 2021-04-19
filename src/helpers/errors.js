@@ -50,6 +50,4 @@ export const getErrorIDFromKey = key => {
   return eID;
 };
 
-export const getHashFromKey = key => {
-  return key.substr(0, 64);
-};
+export const getHashFromKey = key => key.substr(0, 64);

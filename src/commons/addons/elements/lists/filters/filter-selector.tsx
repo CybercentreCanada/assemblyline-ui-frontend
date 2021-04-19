@@ -3,6 +3,7 @@ import CheckBoxIcon from '@material-ui/icons/CheckBox';
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import { Autocomplete } from '@material-ui/lab';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export const GLOBAL_FILTER = { id: 999, value: '', key: 'global.filter', label: 'Global', path: '.' };
 
@@ -21,6 +22,7 @@ interface FilterSelectorProps {
 }
 
 const FilterSelector: React.FC<FilterSelectorProps> = ({ fields, selections, onChange }) => {
+  const { t } = useTranslation();
   const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
   const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
@@ -28,10 +30,7 @@ const FilterSelector: React.FC<FilterSelectorProps> = ({ fields, selections, onC
     onChange(_selections);
   };
 
-  const isSelected = (option: FilterField, value: FilterField) => {
-    return option.id === value.id;
-  };
-
+  const isSelected = (option: FilterField, value: FilterField) => option.id === value.id;
   return (
     <Autocomplete
       multiple
@@ -42,7 +41,7 @@ const FilterSelector: React.FC<FilterSelectorProps> = ({ fields, selections, onC
       value={selections}
       getOptionLabel={option => option.label}
       getOptionSelected={isSelected}
-      renderInput={params => <TextField {...params} label="Filters" />}
+      renderInput={params => <TextField {...params} label={t('list.selector.filters')} />}
       renderOption={(option, { selected }) => (
         <>
           <Checkbox icon={icon} checkedIcon={checkedIcon} style={{ marginRight: 8 }} checked={selected} />

@@ -36,7 +36,7 @@ type SettingsProps = {
   width: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 };
 
-function Settings<SettingsProps>({ width }) {
+function Settings({ width }: SettingsProps) {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
   const [drawerType, setDrawerType] = useState(null);

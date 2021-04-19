@@ -21,12 +21,10 @@ const StyledAlert = withStyles((theme: Theme) =>
   })
 )(Alert);
 
-const InformativeAlert = ({ children, ...props }) => {
-  return (
-    <StyledAlert {...props} severity="info">
-      {children}
-    </StyledAlert>
-  );
-};
+const InformativeAlert = ({ children, ...props }) => (
+  <StyledAlert {...props} severity="info">
+    {children}
+  </StyledAlert>
+);
 
 export default InformativeAlert;

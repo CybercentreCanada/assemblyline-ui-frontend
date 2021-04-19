@@ -23,13 +23,11 @@ export default function AlertsLegacy() {
       <h1>Alert Legacy Test</h1>
       <div style={{ textAlign: 'left' }}>
         {alerts &&
-          alerts.map((a, i) => {
-            return (
-              <div key={i}>
-                <AlertCardItem item={a} />
-              </div>
-            );
-          })}
+          alerts.map((a, i) => (
+            <div key={i}>
+              <AlertCardItem item={a} />
+            </div>
+          ))}
       </div>
     </PageCenter>
   );

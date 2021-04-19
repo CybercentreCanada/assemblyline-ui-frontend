@@ -65,26 +65,24 @@ const WrappedInfoSection: React.FC<InfoSectionProps> = ({ submission }) => {
                 </Grid>
 
                 {['deep_scan', 'ignore_cache', 'ignore_dynamic_recursion_prevention', 'ignore_filtering'].map(
-                  (k, i) => {
-                    return (
-                      <div key={i} style={{ display: 'contents' }}>
-                        <Grid item xs={4} sm={3} lg={2}>
-                          <span style={{ fontWeight: 500 }}>{t(`params.${k}`)}</span>
-                        </Grid>
-                        <Grid item xs={8} sm={9} lg={10}>
-                          {submission ? (
-                            submission.params[k] ? (
-                              <DoneOutlinedIcon color="primary" />
-                            ) : (
-                              <ClearOutlinedIcon color="error" />
-                            )
+                  (k, i) => (
+                    <div key={i} style={{ display: 'contents' }}>
+                      <Grid item xs={4} sm={3} lg={2}>
+                        <span style={{ fontWeight: 500 }}>{t(`params.${k}`)}</span>
+                      </Grid>
+                      <Grid item xs={8} sm={9} lg={10}>
+                        {submission ? (
+                          submission.params[k] ? (
+                            <DoneOutlinedIcon color="primary" />
                           ) : (
-                            <Skeleton />
-                          )}
-                        </Grid>
-                      </div>
-                    );
-                  }
+                            <ClearOutlinedIcon color="error" />
+                          )
+                        ) : (
+                          <Skeleton />
+                        )}
+                      </Grid>
+                    </div>
+                  )
                 )}
 
                 <Grid item xs={4} sm={3} lg={2}>

@@ -31,13 +31,11 @@ type CellProps = {
   [key: string]: any;
 };
 
-export const DivTableCell = ({ children, ...other }: CellProps) => {
-  return (
-    <StyledTableCell {...other} component="div">
-      {children}
-    </StyledTableCell>
-  );
-};
+export const DivTableCell = ({ children, ...other }: CellProps) => (
+  <StyledTableCell {...other} component="div">
+    {children}
+  </StyledTableCell>
+);
 
 DivTableCell.defaultProps = {
   children: null
@@ -72,42 +70,32 @@ export const SortableHeaderCell = ({ children, sortField, allowSort = true, ...o
   );
 };
 
-export const LinkRow = ({ children, to, ...other }) => {
-  return (
-    <TableRow component={Link} {...other} to={to} style={{ cursor: 'pointer', textDecoration: 'none' }}>
-      {children}
-    </TableRow>
-  );
-};
+export const LinkRow = ({ children, to, ...other }) => (
+  <TableRow component={Link} {...other} to={to} style={{ cursor: 'pointer', textDecoration: 'none' }}>
+    {children}
+  </TableRow>
+);
 
-export const DivTableRow = ({ children, ...other }) => {
-  return (
-    <TableRow {...other} component="div">
-      {children}
-    </TableRow>
-  );
-};
+export const DivTableRow = ({ children, ...other }) => (
+  <TableRow {...other} component="div">
+    {children}
+  </TableRow>
+);
 
-export const DivTableHead = ({ children, ...other }) => {
-  return (
-    <TableHead {...other} component="div">
-      {children}
-    </TableHead>
-  );
-};
+export const DivTableHead = ({ children, ...other }) => (
+  <TableHead {...other} component="div">
+    {children}
+  </TableHead>
+);
 
-export const DivTableBody = ({ children, ...other }) => {
-  return (
-    <TableBody {...other} component="div">
-      {children}
-    </TableBody>
-  );
-};
+export const DivTableBody = ({ children, ...other }) => (
+  <TableBody {...other} component="div">
+    {children}
+  </TableBody>
+);
 
-export const DivTable = ({ children, size = 'small' as 'small', ...other }) => {
-  return (
-    <Table size={size} {...other} component="div">
-      {children}
-    </Table>
-  );
-};
+export const DivTable = ({ children, size = 'small' as 'small', ...other }) => (
+  <Table size={size} {...other} component="div">
+    {children}
+  </Table>
+);

@@ -176,13 +176,13 @@ const MetaList: React.FC<MetaListProps> = React.memo(
       };
     }, [buffer, rowHeight, scrollReset, recompute]);
 
-    useEffect(() => {
-      return register({
+    useEffect(() =>
+      register({
         onSelect: () => null,
         onSelectNext: () => next(),
         onSelectPrevious: () => previous()
-      });
-    });
+      })
+    );
 
     useEffect(() => {
       // Scroll handler to track scroll position in order check if it has hit the scrollThreshold.

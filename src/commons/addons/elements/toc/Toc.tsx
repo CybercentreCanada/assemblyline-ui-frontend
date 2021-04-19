@@ -87,9 +87,9 @@ const ContentWithTOCItem: React.FC<ContentWithTOCItemProps> = ({ translation, it
       </li>
       {active && item.subItems && (
         <ul className={classes.toc} style={{ fontSize: 'smaller', paddingInlineStart: '8px' }}>
-          {item.subItems.map(itm => {
-            return <ContentWithTOCItem key={itm.id} item={itm} translation={translation} />;
-          })}
+          {item.subItems.map(itm => (
+            <ContentWithTOCItem key={itm.id} item={itm} translation={translation} />
+          ))}
         </ul>
       )}
     </>
@@ -140,15 +140,13 @@ const WrappedContentWithTOC: React.FC<ContentWithTOCProps> = ({
             top: theme.spacing(autoHideAppbar && currentLayout !== 'top' ? 4 : 12)
           }}
         >
-          {useMemo(() => {
-            return (
+          {useMemo(
+            () => (
               <>
                 {title && <div style={{ fontSize: '1.25rem', marginLeft: '18px' }}>{t(title)}</div>}
                 <ul className={classes.toc}>
                   {items &&
-                    items.map(item => {
-                      return <ContentWithTOCItem key={item.id} item={item} translation={translation} />;
-                    })}
+                    items.map(item => <ContentWithTOCItem key={item.id} item={item} translation={translation} />)}
                   {top && (
                     <div className={classes.top}>
                       <Link to={`#${top}`} target="_self">
@@ -158,8 +156,9 @@ const WrappedContentWithTOC: React.FC<ContentWithTOCProps> = ({
                   )}
                 </ul>
               </>
-            );
-          }, [classes.toc, classes.top, items, t, title, top, translation])}
+            ),
+            [classes.toc, classes.top, items, t, title, top, translation]
+          )}
         </div>
       </div>
     </div>

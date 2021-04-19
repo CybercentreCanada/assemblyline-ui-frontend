@@ -194,9 +194,9 @@ const AlertCardItem: React.FC<AlertCardItemProps> = ({ item, setItem = null }) =
               <b>{t('label')}</b>
             </Grid>
             <Grid item xs={9} md={10}>
-              {item.label.map((l, i) => {
-                return <CustomChip key={i} label={l} size="tiny" type="rounded" />;
-              })}
+              {item.label.map((l, i) => (
+                <CustomChip key={i} label={l} size="tiny" type="rounded" />
+              ))}
             </Grid>
 
             <Grid item xs={3} md={2}>
@@ -269,20 +269,18 @@ const AlertCardItem: React.FC<AlertCardItemProps> = ({ item, setItem = null }) =
 
           {Object.keys(item.metadata).length !== 0 && (
             <div style={{ paddingTop: sp2 }}>
-              {Object.keys(item.metadata).map((key, i) => {
-                return (
-                  <Grid container key={i}>
-                    <Grid item xs={12} md={2}>
-                      <span style={{ textTransform: 'capitalize', fontWeight: 600 }}>
-                        {key.replace('.', ' ').replace('_', ' ')}
-                      </span>
-                    </Grid>
-                    <Grid item xs={12} md={10}>
-                      {item.metadata[key]}
-                    </Grid>
+              {Object.keys(item.metadata).map((key, i) => (
+                <Grid container key={i}>
+                  <Grid item xs={12} md={2}>
+                    <span style={{ textTransform: 'capitalize', fontWeight: 600 }}>
+                      {key.replace('.', ' ').replace('_', ' ')}
+                    </span>
                   </Grid>
-                );
-              })}
+                  <Grid item xs={12} md={10}>
+                    {item.metadata[key]}
+                  </Grid>
+                </Grid>
+              ))}
             </div>
           )}
 
@@ -390,7 +388,7 @@ const AlertCardItem: React.FC<AlertCardItemProps> = ({ item, setItem = null }) =
               size="small"
               variant="outlined"
               style={{ fontSize: '80%', marginBottom: '4px', marginRight: '4px' }}
-              onClick={() => alert('NOT DONE YET')}
+              onClick={() => null}
             >
               {t('btn.workflow')}
             </Button>

@@ -145,13 +145,11 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
             margin="dense"
           >
             {param.list ? (
-              param.list.map((value, x) => {
-                return (
-                  <MenuItem key={x} value={value}>
-                    {value}
-                  </MenuItem>
-                );
-              })
+              param.list.map((value, x) => (
+                <MenuItem key={x} value={value}>
+                  {value}
+                </MenuItem>
+              ))
             ) : (
               <MenuItem value="" />
             )}
@@ -245,13 +243,11 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
             variant="outlined"
             margin="dense"
           >
-            {tempUserParams.list.map((value, x) => {
-              return (
-                <MenuItem key={x} value={value}>
-                  {value}
-                </MenuItem>
-              );
-            })}
+            {tempUserParams.list.map((value, x) => (
+              <MenuItem key={x} value={value}>
+                {value}
+              </MenuItem>
+            ))}
           </Select>
         ) : (
           <TextField

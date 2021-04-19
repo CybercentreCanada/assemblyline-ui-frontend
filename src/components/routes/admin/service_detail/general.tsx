@@ -109,13 +109,11 @@ const ServiceGeneral = ({ service, constants, versions, setService, setModified 
               style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(0.5) }}
             >
               {versions ? (
-                versions.map((v, i) => {
-                  return (
-                    <MenuItem key={i} value={v}>
-                      {v}
-                    </MenuItem>
-                  );
-                })
+                versions.map((v, i) => (
+                  <MenuItem key={i} value={v}>
+                    {v}
+                  </MenuItem>
+                ))
               ) : (
                 <MenuItem value={service.version}>{service.version}</MenuItem>
               )}
@@ -164,13 +162,11 @@ const ServiceGeneral = ({ service, constants, versions, setService, setModified 
               style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(0.5) }}
             >
               {constants ? (
-                constants.stages.map((s, i) => {
-                  return (
-                    <MenuItem key={i} value={s}>
-                      {s}
-                    </MenuItem>
-                  );
-                })
+                constants.stages.map((s, i) => (
+                  <MenuItem key={i} value={s}>
+                    {s}
+                  </MenuItem>
+                ))
               ) : (
                 <MenuItem value={service.stage}>{service.stage}</MenuItem>
               )}
@@ -192,13 +188,11 @@ const ServiceGeneral = ({ service, constants, versions, setService, setModified 
               style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(0.5) }}
             >
               {constants ? (
-                constants.categories.map((c, i) => {
-                  return (
-                    <MenuItem key={i} value={c}>
-                      {c}
-                    </MenuItem>
-                  );
-                })
+                constants.categories.map((c, i) => (
+                  <MenuItem key={i} value={c}>
+                    {c}
+                  </MenuItem>
+                ))
               ) : (
                 <MenuItem value={service.category}>{service.category}</MenuItem>
               )}

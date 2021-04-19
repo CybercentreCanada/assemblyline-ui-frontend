@@ -100,14 +100,11 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export const emptyResult = (result: Result) => {
-  return (
-    result.result.score === 0 &&
-    result.result.sections.length === 0 &&
-    result.response.extracted.length === 0 &&
-    result.response.supplementary.length === 0
-  );
-};
+export const emptyResult = (result: Result) =>
+  result.result.score === 0 &&
+  result.result.sections.length === 0 &&
+  result.response.extracted.length === 0 &&
+  result.response.supplementary.length === 0;
 
 const ResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates = null }) => {
   const { t } = useTranslation(['fileDetail']);
@@ -199,16 +196,14 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates = null 
                     </span>
                     <Moment format="YYYY-MM-DD HH:mm:ss">{result.created}</Moment>
                   </MenuItem>
-                  {alternates.map(alt => {
-                    return (
-                      <MenuItem disabled={selected === alt.id} key={alt.id} onClick={() => setSelected(alt.id)}>
-                        <span style={{ paddingRight: theme.spacing(2) }}>
-                          {`${alt.response.service_version} :: [${alt.result.score}]`}
-                        </span>
-                        <Moment format="YYYY-MM-DD HH:mm:ss">{alt.created}</Moment>
-                      </MenuItem>
-                    );
-                  })}
+                  {alternates.map(alt => (
+                    <MenuItem disabled={selected === alt.id} key={alt.id} onClick={() => setSelected(alt.id)}>
+                      <span style={{ paddingRight: theme.spacing(2) }}>
+                        {`${alt.response.service_version} :: [${alt.result.score}]`}
+                      </span>
+                      <Moment format="YYYY-MM-DD HH:mm:ss">{alt.created}</Moment>
+                    </MenuItem>
+                  ))}
                 </MenuList>
               </ClickAwayListener>
             </Paper>
@@ -267,29 +262,25 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates = null 
             ) : (
               <div className={classes.content}>
                 {displayedResult.section_hierarchy
-                  ? displayedResult.section_hierarchy.map(item => {
-                      return (
-                        <ResultSection
-                          key={item.id}
-                          section_list={displayedResult.result.sections}
-                          id={item.id}
-                          sub_sections={item.children}
-                          indent={1}
-                        />
-                      );
-                    })
-                  : displayedResult.result.sections.map((section, id) => {
-                      return (
-                        <ResultSection
-                          key={id}
-                          section_list={displayedResult.result.sections}
-                          id={id}
-                          sub_sections={[]}
-                          indent={section.depth}
-                          depth={section.depth}
-                        />
-                      );
-                    })}
+                  ? displayedResult.section_hierarchy.map(item => (
+                      <ResultSection
+                        key={item.id}
+                        section_list={displayedResult.result.sections}
+                        id={item.id}
+                        sub_sections={item.children}
+                        indent={1}
+                      />
+                    ))
+                  : displayedResult.result.sections.map((section, id) => (
+                      <ResultSection
+                        key={id}
+                        section_list={displayedResult.result.sections}
+                        id={id}
+                        sub_sections={[]}
+                        indent={section.depth}
+                        depth={section.depth}
+                      />
+                    ))}
                 {displayedResult.response.supplementary.length !== 0 && (
                   <SupplementarySection extracted={displayedResult.response.supplementary} />
                 )}

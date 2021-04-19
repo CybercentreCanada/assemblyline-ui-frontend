@@ -74,9 +74,9 @@ function ServiceTreeItem({ item, onChange, size = 'medium' as 'medium' }: Servic
       />
       <div style={{ paddingLeft: sp4 }}>
         {item.services
-          ? item.services.map((service, service_id) => {
-              return <ServiceTreeItem size={size} key={service_id} item={service} onChange={onChange} />;
-            })
+          ? item.services.map((service, service_id) => (
+              <ServiceTreeItem size={size} key={service_id} item={service} onChange={onChange} />
+            ))
           : null}
       </div>
     </div>
@@ -221,17 +221,21 @@ const ServiceTree: React.FC<ServiceTreeProps> = ({
       }}
     >
       {settings ? (
-        settings.services.sort(sortFunc).map((category, cat_id) => {
-          return <ServiceTreeItem size={size} key={cat_id} item={category} onChange={handleServiceChange} />;
-        })
+        settings.services
+          .sort(sortFunc)
+          .map((category, cat_id) => (
+            <ServiceTreeItem size={size} key={cat_id} item={category} onChange={handleServiceChange} />
+          ))
       ) : (
         <SkelItems size={size} spacing={sp4} />
       )}
     </div>
   ) : settings ? (
-    settings.services.sort(sortFunc).map((category, cat_id) => {
-      return <ServiceTreeItem size={size} key={cat_id} item={category} onChange={handleServiceChange} />;
-    })
+    settings.services
+      .sort(sortFunc)
+      .map((category, cat_id) => (
+        <ServiceTreeItem size={size} key={cat_id} item={category} onChange={handleServiceChange} />
+      ))
   ) : (
     <SkelItems size={size} spacing={sp4} />
   );

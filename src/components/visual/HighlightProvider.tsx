@@ -4,10 +4,6 @@ type HighlighMapProps = {
   [key: string]: string[];
 };
 
-type EventProps = {
-  key: string;
-};
-
 export type HighlightContextProps = {
   getKey: (type: string, value: string) => string;
   triggerHighlight: (key: string) => void;
@@ -28,9 +24,7 @@ function HighlightProvider(props: HighlightProviderProps) {
   const [relatedHighlighted, setRelatedHighlighted] = useState<Set<any>>(new Set());
   const [highlightMap, setHighlightMap] = useState<HighlighMapProps>({});
 
-  const getKey = useCallback((type: string, value: string) => {
-    return `${type}__${value}`;
-  }, []);
+  const getKey = useCallback((type: string, value: string) => `${type}__${value}`, []);
 
   const isHighlighted = useCallback(
     key => {
@@ -42,12 +36,9 @@ function HighlightProvider(props: HighlightProviderProps) {
     [highlighted, relatedHighlighted, highlightMap]
   );
 
-  const hasHighlightedKeys = useCallback(
-    (keyList: string[]) => {
-      return keyList.some(item => isHighlighted(item));
-    },
-    [isHighlighted]
-  );
+  const hasHighlightedKeys = useCallback((keyList: string[]) => keyList.some(item => isHighlighted(item)), [
+    isHighlighted
+  ]);
 
   const triggerHighlight = useCallback((data: string) => {
     window.dispatchEvent(new CustomEvent('tiggerHighlight', { detail: data }));

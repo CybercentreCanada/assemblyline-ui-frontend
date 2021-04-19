@@ -1,7 +1,6 @@
 import { IconButton, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
-import React from 'react';
 import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({

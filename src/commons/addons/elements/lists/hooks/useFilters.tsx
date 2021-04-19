@@ -13,44 +13,33 @@ export default function useFilters(fields?: FilterField[]): UsingFilters {
   const GLOBAL_FILTERS = fields ? fields.filter(f => f.id !== GLOBAL_FILTER.id) : null;
 
   const isNumber = (value: any): boolean => {
-    return !lodash.isNaN(value);
+    return !lodash.isNull(value) && !lodash.isNaN(value);
   };
 
-  const extractValue = (object: any, path: string): any => {
-    return lodash.get(object, path, '');
-  };
+  const extractValue = (object: any, path: string): any => lodash.get(object, path, '');
 
-  const isString = (value: any): boolean => {
-    return lodash.isString(value);
-  };
+  const isString = (value: any): boolean => lodash.isString(value);
 
-  const isArray = (value: any): boolean => {
-    return lodash.isArray(value);
-  };
+  const isArray = (value: any): boolean => lodash.isArray(value);
 
   const normalizeString = (input: string): string => {
     const _input = input.trim();
     return _input.toLowerCase();
   };
 
-  const normalizeNumber = (input: number): string => {
-    return input.toString();
-  };
+  const normalizeNumber = (input: number): string => input.toString();
 
   // default string comparator.
-  const stringComparator = (objectValue: string, compareValue: string) => {
-    return normalizeString(objectValue).indexOf(normalizeString(compareValue)) > -1;
-  };
+  const stringComparator = (objectValue: string, compareValue: string) =>
+    normalizeString(objectValue).indexOf(normalizeString(compareValue)) > -1;
 
   // default string comparator.
-  const numberComparator = (objectValue: number, compareValue: string) => {
-    return normalizeNumber(objectValue).indexOf(normalizeString(compareValue)) > -1;
-  };
+  const numberComparator = (objectValue: number, compareValue: string) =>
+    normalizeNumber(objectValue).indexOf(normalizeString(compareValue)) > -1;
 
   // default string array comparator.
-  const arrayComparator = (objectValue: any[], compareValue: string) => {
-    return objectValue.some(v => defaultComparator(v, compareValue));
-  };
+  const arrayComparator = (objectValue: any[], compareValue: string) =>
+    objectValue.some(v => defaultComparator(v, compareValue));
 
   const defaultComparator = (objectValue: any, compareValue: string) => {
     if (isArray(objectValue)) {
@@ -62,7 +51,7 @@ export default function useFilters(fields?: FilterField[]): UsingFilters {
     if (isNumber(objectValue)) {
       return numberComparator(objectValue, compareValue);
     }
-    return stringComparator(objectValue.toString(), compareValue);
+    return stringComparator(objectValue ? objectValue.toString() : '', compareValue);
   };
 
   // Main filter comparator logic for a single object and single filter.
@@ -107,14 +96,11 @@ export default function useFilters(fields?: FilterField[]): UsingFilters {
   };
 
   // Apply comparator for a single FilterField.
-  const applyFilter = (list: any[], filter: FilterField): any[] => {
-    return list.filter(o => compare(o, filter));
-  };
+  const applyFilter = (list: any[], filter: FilterField): any[] => list.filter(o => compare(o, filter));
 
   // Apply comparator for all specified FilterField.
-  const applyFilters = (list: any[], filters: FilterField[], intersection: boolean = true): any[] => {
-    return list.filter(o => compareAll(o, filters, intersection));
-  };
+  const applyFilters = (list: any[], filters: FilterField[], intersection: boolean = true): any[] =>
+    list.filter(o => compareAll(o, filters, intersection));
 
   return {
     stringComparator,

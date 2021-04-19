@@ -55,61 +55,53 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ signatures, tags }) => {
                     <span style={{ fontWeight: 500 }}>heuristic.signature</span>
                   </Grid>
                   <Grid item xs={12} sm={9} lg={10}>
-                    {signatures.map(([value, lvl], idx) => {
-                      return (
-                        <Heuristic
-                          key={idx}
-                          signature
-                          text={value}
-                          lvl={lvl}
-                          highlight_key={getKey('heuristic.signature', value)}
-                        />
-                      );
-                    })}
+                    {signatures.map(([value, lvl], idx) => (
+                      <Heuristic
+                        key={idx}
+                        signature
+                        text={value}
+                        lvl={lvl}
+                        highlight_key={getKey('heuristic.signature', value)}
+                      />
+                    ))}
                   </Grid>
                 </Grid>
               )}
               {tags
-                ? Object.keys(tags).map((tag_type, i) => {
-                    return (
-                      <Grid container key={i}>
-                        <Grid className={classes.meta_key} item xs={12} sm={3} lg={2}>
-                          <span
-                            style={{
-                              fontWeight: 500
-                            }}
-                          >
-                            {tag_type}
-                          </span>
-                        </Grid>
-                        <Grid item xs={12} sm={9} lg={10}>
-                          {tags[tag_type].map(([value, lvl], idx) => {
-                            return (
-                              <Tag
-                                key={idx}
-                                value={value}
-                                type={tag_type}
-                                lvl={lvl}
-                                highlight_key={getKey(tag_type, value)}
-                              />
-                            );
-                          })}
-                        </Grid>
+                ? Object.keys(tags).map((tag_type, i) => (
+                    <Grid container key={i}>
+                      <Grid className={classes.meta_key} item xs={12} sm={3} lg={2}>
+                        <span
+                          style={{
+                            fontWeight: 500
+                          }}
+                        >
+                          {tag_type}
+                        </span>
                       </Grid>
-                    );
-                  })
-                : [...Array(3)].map((_, i) => {
-                    return (
-                      <Grid container key={i} spacing={1}>
-                        <Grid item xs={12} sm={3} lg={2}>
-                          <Skeleton style={{ height: '2rem' }} />
-                        </Grid>
-                        <Grid item xs={12} sm={9} lg={10}>
-                          <Skeleton style={{ height: '2rem' }} />
-                        </Grid>
+                      <Grid item xs={12} sm={9} lg={10}>
+                        {tags[tag_type].map(([value, lvl], idx) => (
+                          <Tag
+                            key={idx}
+                            value={value}
+                            type={tag_type}
+                            lvl={lvl}
+                            highlight_key={getKey(tag_type, value)}
+                          />
+                        ))}
                       </Grid>
-                    );
-                  })}
+                    </Grid>
+                  ))
+                : [...Array(3)].map((_, i) => (
+                    <Grid container key={i} spacing={1}>
+                      <Grid item xs={12} sm={3} lg={2}>
+                        <Skeleton style={{ height: '2rem' }} />
+                      </Grid>
+                      <Grid item xs={12} sm={9} lg={10}>
+                        <Skeleton style={{ height: '2rem' }} />
+                      </Grid>
+                    </Grid>
+                  ))}
             </div>
           ),
           // eslint-disable-next-line react-hooks/exhaustive-deps

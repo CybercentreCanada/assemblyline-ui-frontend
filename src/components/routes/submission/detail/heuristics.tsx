@@ -43,39 +43,33 @@ const WrappedHeuristicSection: React.FC<HeuristicSectionProps> = ({ heuristics }
           () => (
             <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
               {heuristics
-                ? Object.keys(heuristics).map((lvl, i) => {
-                    return (
-                      <Grid container key={i}>
-                        <Grid item xs={12} sm={3} lg={2}>
-                          <span style={{ fontWeight: 500, wordBreak: 'break-word' }}>{t(`verdict.${lvl}`)}</span>
-                        </Grid>
-                        <Grid item xs={12} sm={9} lg={10}>
-                          {heuristics[lvl].map(([cid, name], idx) => {
-                            return (
-                              <Heuristic
-                                key={`${cid}_${idx}`}
-                                text={name}
-                                lvl={lvl}
-                                highlight_key={getKey('heuristic', cid)}
-                              />
-                            );
-                          })}
-                        </Grid>
+                ? Object.keys(heuristics).map((lvl, i) => (
+                    <Grid container key={i}>
+                      <Grid item xs={12} sm={3} lg={2}>
+                        <span style={{ fontWeight: 500, wordBreak: 'break-word' }}>{t(`verdict.${lvl}`)}</span>
                       </Grid>
-                    );
-                  })
-                : [...Array(3)].map((_, i) => {
-                    return (
-                      <Grid container key={i} spacing={1}>
-                        <Grid item xs={12} sm={3} lg={2}>
-                          <Skeleton style={{ height: '2rem' }} />
-                        </Grid>
-                        <Grid item xs={12} sm={9} lg={10}>
-                          <Skeleton style={{ height: '2rem' }} />
-                        </Grid>
+                      <Grid item xs={12} sm={9} lg={10}>
+                        {heuristics[lvl].map(([cid, name], idx) => (
+                          <Heuristic
+                            key={`${cid}_${idx}`}
+                            text={name}
+                            lvl={lvl}
+                            highlight_key={getKey('heuristic', cid)}
+                          />
+                        ))}
                       </Grid>
-                    );
-                  })}
+                    </Grid>
+                  ))
+                : [...Array(3)].map((_, i) => (
+                    <Grid container key={i} spacing={1}>
+                      <Grid item xs={12} sm={3} lg={2}>
+                        <Skeleton style={{ height: '2rem' }} />
+                      </Grid>
+                      <Grid item xs={12} sm={9} lg={10}>
+                        <Skeleton style={{ height: '2rem' }} />
+                      </Grid>
+                    </Grid>
+                  ))}
             </div>
           ),
           // eslint-disable-next-line react-hooks/exhaustive-deps
