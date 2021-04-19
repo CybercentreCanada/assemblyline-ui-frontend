@@ -1,6 +1,5 @@
 import { Button, Typography, useTheme } from '@material-ui/core';
 import useMyAPI from 'components/hooks/useMyAPI';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 type DisableOTPProps = {

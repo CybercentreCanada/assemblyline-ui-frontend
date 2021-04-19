@@ -1,6 +1,6 @@
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useMyAPI from 'components/hooks/useMyAPI';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import AlertCardItem from './alert-card';
 
 export default function AlertsLegacy() {

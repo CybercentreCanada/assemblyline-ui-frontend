@@ -4,7 +4,6 @@ import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import NotFoundPage from 'components/routes/404_dl';
 import Classification from 'components/visual/Classification';
-import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 
 export default function HelpClassification() {

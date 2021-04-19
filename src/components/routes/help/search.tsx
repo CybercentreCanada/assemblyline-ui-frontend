@@ -17,7 +17,7 @@ import useAppLayout from 'commons/components/hooks/useAppLayout';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import CustomChip from 'components/visual/CustomChip';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const Toc: ContentWithTOCItemDef[] = [

@@ -29,7 +29,7 @@ import FileDetail from 'components/visual/FileDetail';
 import VerdictBar from 'components/visual/VerdictBar';
 import { getErrorIDFromKey, getServiceFromKey } from 'helpers/errors';
 import getXSRFCookie from 'helpers/xsrf';
-import React, { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import io from 'socket.io-client';

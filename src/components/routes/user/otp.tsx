@@ -2,7 +2,7 @@ import { Button, TextField, Typography, useTheme } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 import useMyAPI from 'components/hooks/useMyAPI';
 import TextDivider from 'components/visual/TextDivider';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type OTPProps = {

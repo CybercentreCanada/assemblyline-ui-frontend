@@ -2,7 +2,7 @@ import { Button, Grid, IconButton, MenuItem, Select, Tooltip, Typography, useThe
 import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
 import { Skeleton } from '@material-ui/lab';
 import 'moment/locale/fr';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ServiceDetail } from '../service_detail';
 import ContainerCard from './container_card';

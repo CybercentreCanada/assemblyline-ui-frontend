@@ -28,7 +28,7 @@ import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import Empty from 'components/visual/Empty';
 import FileDropper from 'components/visual/FileDropper';
 import generateUUID from 'helpers/uuid';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory } from 'react-router-dom';
 

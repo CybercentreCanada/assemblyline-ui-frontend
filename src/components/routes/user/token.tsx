@@ -13,7 +13,7 @@ import {
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import toArrayBuffer from 'helpers/toArrayBuffer';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const CBOR = require('helpers/cbor.js');

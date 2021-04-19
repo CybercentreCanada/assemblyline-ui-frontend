@@ -16,7 +16,7 @@ import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutl
 import { Skeleton } from '@material-ui/lab';
 import { SourceCard } from 'components/routes/manage/signature_sources';
 import 'moment/locale/fr';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ServiceDetail } from '../service_detail';
 import ContainerCard from './container_card';

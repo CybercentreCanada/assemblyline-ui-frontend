@@ -31,7 +31,7 @@ import UsersTable from 'components/visual/SearchResult/users';
 import { searchResultsDisplay } from 'helpers/utils';
 import ChipInput from 'material-ui-chip-input';
 import 'moment/locale/fr';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Redirect, useHistory, useLocation } from 'react-router-dom';
 

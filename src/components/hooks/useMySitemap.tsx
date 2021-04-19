@@ -28,7 +28,6 @@ import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
 import SimCardOutlinedIcon from '@material-ui/icons/SimCardOutlined';
 import SupervisorAccountOutlinedIcon from '@material-ui/icons/SupervisorAccountOutlined';
 import WebAssetIcon from '@material-ui/icons/WebAsset';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 

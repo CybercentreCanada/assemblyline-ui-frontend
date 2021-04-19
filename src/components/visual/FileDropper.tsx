@@ -1,6 +1,6 @@
 import { makeStyles } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
 import { AiOutlineSecurityScan } from 'react-icons/ai';

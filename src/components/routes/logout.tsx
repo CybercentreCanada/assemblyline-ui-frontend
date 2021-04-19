@@ -2,7 +2,7 @@ import { CircularProgress, Typography, useTheme } from '@material-ui/core';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import CardCentered from 'commons/components/layout/pages/CardCentered';
 import useMyAPI from 'components/hooks/useMyAPI';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 function Logout() {
