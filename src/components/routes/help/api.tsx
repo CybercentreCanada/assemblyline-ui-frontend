@@ -18,7 +18,7 @@ import clsx from 'clsx';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import useMyAPI from 'components/hooks/useMyAPI';
 import CustomChip from 'components/visual/CustomChip';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const apiHeight = '48px';
@@ -158,13 +158,11 @@ export default function ApiDoc() {
                   variant="outlined"
                   margin="dense"
                 >
-                  {apiList.map((version, index) => {
-                    return (
-                      <MenuItem key={index} value={version}>
-                        {version.replace('v', t('version')) + t('version_end')}
-                      </MenuItem>
-                    );
-                  })}
+                  {apiList.map((version, index) => (
+                    <MenuItem key={index} value={version}>
+                      {version.replace('v', t('version')) + t('version_end')}
+                    </MenuItem>
+                  ))}
                 </Select>
               ) : (
                 <Skeleton variant="rect" style={{ display: 'inline-block', height: '2rem', width: '14rem' }} />
@@ -174,252 +172,238 @@ export default function ApiDoc() {
         </div>
         {apiDefinition ? (
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            {Object.keys(apiDefinition.blueprints).map((bp, i) => {
-              return (
-                <div key={i}>
-                  <Box
-                    display="flex"
-                    flexDirection="row"
-                    flexWrap="wrap"
-                    className={classes.blueprint}
-                    borderBottom={1}
-                    px={1}
-                    onClick={() => toggleBlueprintExpand(bp)}
-                  >
-                    <Typography variant="body2" color="textSecondary" style={{ fontWeight: 800, lineHeight: 2 }}>
-                      {`/api/${apiSelected}/`}&nbsp;
-                    </Typography>
-                    <div style={{ flexGrow: 1 }}>
-                      <Typography variant="h6" style={{ fontWeight: 800, lineHeight: 2 }} color="secondary">
-                        {bp}
-                      </Typography>
-                    </div>
-                    <div style={{ display: 'inline-flex', width: downSM ? '100%' : null, justifyContent: 'flex-end' }}>
-                      <Typography variant="body2" color="textSecondary" align="right" style={{ lineHeight: 2 }}>
-                        {apiDefinition.blueprints[bp]}
-                      </Typography>
-                      <ExpandMoreIcon
-                        className={clsx(classes.expand, {
-                          [classes.expandOpen]: expandMap[bp]
-                        })}
-                      />
-                    </div>
-                  </Box>
-                  <Collapse in={expandMap[bp]} timeout="auto" unmountOnExit>
-                    <div
-                      style={{
-                        backgroundColor: isDark ? theme.palette.grey[900] : theme.palette.grey[100]
-                      }}
-                    >
-                      {blueprintAPIs(bp).map((api, idx) => {
-                        return (
-                          <div key={idx}>
-                            <Box
-                              className={classes.api}
-                              px={1}
-                              display="flex"
-                              flexDirection={xs ? 'column' : 'row'}
-                              flexWrap="wrap"
-                              alignItems={xs ? 'flex-start' : 'center'}
-                              onClick={() => toggleBlueprintExpand(api.name)}
-                            >
-                              <div>
-                                {api.methods.map((method, midx) => {
-                                  return (
-                                    <CustomChip
-                                      color={methodColor[method]}
-                                      type="rounded"
-                                      size="small"
-                                      key={midx}
-                                      label={method}
-                                    />
-                                  );
-                                })}
-                              </div>
-                              <div style={{ flexGrow: 1 }}>
-                                <Typography
-                                  variant="body2"
-                                  color="textSecondary"
-                                  style={{ wordBreak: 'break-word', lineHeight: 2 }}
-                                >
-                                  {api.path}
-                                </Typography>
-                              </div>
-                              <div
-                                style={{
-                                  display: 'inline-flex',
-                                  width: downSM ? '100%' : null,
-                                  justifyContent: 'flex-end'
-                                }}
-                              >
-                                <Typography align="right" variant="caption" style={{ lineHeight: 2 }}>
-                                  {api.name}
-                                </Typography>
-
-                                <ExpandMoreIcon
-                                  className={clsx(classes.expand, {
-                                    [classes.expandOpen]: expandMap[api.name]
-                                  })}
-                                />
-                              </div>
-                            </Box>
-                            <Collapse in={expandMap[api.name]} timeout="auto" unmountOnExit>
-                              <div
-                                style={{
-                                  border: 1,
-                                  borderTop: 0,
-                                  borderBottom: 0,
-                                  padding: sp1,
-                                  borderColor: isDark ? theme.palette.grey[900] : theme.palette.grey[100],
-                                  backgroundColor: theme.palette.background.default
-                                }}
-                              >
-                                <Grid container alignItems="center">
-                                  <>
-                                    <Grid item xs={8} sm={4} md={3} lg={2}>
-                                      <div style={{ fontWeight: 500 }}>{t('complete')}:</div>
-                                    </Grid>
-                                    <Grid item xs={4} sm={8} md={9} lg={4}>
-                                      {api.complete ? (
-                                        <CheckOutlinedIcon htmlColor={theme.palette.success.main} />
-                                      ) : (
-                                        <ClearOutlinedIcon htmlColor={theme.palette.error.main} />
-                                      )}
-                                    </Grid>
-                                  </>
-                                  <>
-                                    <Grid item xs={8} sm={4} md={3} lg={2}>
-                                      <div style={{ fontWeight: 500 }}>{t('protected')}:</div>
-                                    </Grid>
-                                    <Grid item xs={4} sm={8} md={9} lg={4}>
-                                      {api.protected ? (
-                                        <CheckOutlinedIcon htmlColor={theme.palette.success.main} />
-                                      ) : (
-                                        <ClearOutlinedIcon htmlColor={theme.palette.error.main} />
-                                      )}
-                                    </Grid>
-                                  </>
-                                  <>
-                                    <Grid item xs={12} sm={4} md={3} lg={2}>
-                                      <div style={{ fontWeight: 500 }}>{t('require_type')}:</div>
-                                    </Grid>
-                                    <Grid item xs={12} sm={8} md={9} lg={4}>
-                                      {api.require_type.map((utype, uidx) => {
-                                        return (
-                                          <CustomChip
-                                            key={uidx}
-                                            color={userColor[utype]}
-                                            type="rounded"
-                                            size="tiny"
-                                            label={t(`user_type.${utype}`)}
-                                          />
-                                        );
-                                      })}
-                                    </Grid>
-                                  </>
-                                  {api.required_priv ? (
-                                    <>
-                                      <Grid item xs={12} sm={4} md={3} lg={2}>
-                                        <div style={{ fontWeight: 500 }}>{t('required_priv')}:</div>
-                                      </Grid>
-                                      <Grid item xs={12} sm={8} md={9} lg={4}>
-                                        {api.required_priv.map((ptype, pidx) => {
-                                          return (
-                                            <CustomChip
-                                              key={pidx}
-                                              color={privColor[ptype]}
-                                              type="rounded"
-                                              size="tiny"
-                                              label={t(`priv.${ptype}`)}
-                                            />
-                                          );
-                                        })}
-                                      </Grid>
-                                    </>
-                                  ) : null}
-                                  <>
-                                    <Grid item xs={12} sm={4} md={3} lg={2}>
-                                      <div style={{ fontWeight: 500 }}>{t('methods')}:</div>
-                                    </Grid>
-                                    <Grid item xs={12} sm={8} md={9} lg={4}>
-                                      {api.methods.map((met, metid) => {
-                                        return (
-                                          <CustomChip
-                                            key={metid}
-                                            color={methodColor[met]}
-                                            type="rounded"
-                                            size="tiny"
-                                            label={t(met)}
-                                          />
-                                        );
-                                      })}
-                                    </Grid>
-                                  </>
-                                  <>
-                                    <Grid item xs={12} sm={4} md={3} lg={2}>
-                                      <div style={{ fontWeight: 500 }}>{t('path')}:</div>
-                                    </Grid>
-                                    <Grid item xs={12} sm={8} md={9} lg={4}>
-                                      <div style={{ lineHeight: 2, fontFamily: 'Monospace', wordBreak: 'break-word' }}>
-                                        {api.path}
-                                      </div>
-                                    </Grid>
-                                  </>
-                                  <>
-                                    <Grid item xs={12}>
-                                      <div style={{ fontWeight: 500, lineHeight: 2 }}>{t('description')}:</div>
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                      <Card variant="outlined" style={{ overflowX: 'auto' }}>
-                                        <pre style={{ paddingLeft: sp2, paddingRight: sp2 }}>{api.description}</pre>
-                                      </Card>
-                                    </Grid>
-                                  </>
-                                </Grid>
-                              </div>
-                            </Collapse>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </Collapse>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            {[...Array(21)].map((_, i) => {
-              return (
-                <div
-                  key={i}
-                  style={{
-                    paddingLeft: sp1,
-                    paddingRight: sp1,
-                    display: 'flex',
-                    flexDirection: 'row',
-                    flexWrap: 'wrap',
-                    borderBottom: 1
-                  }}
-                  className={classes.blueprintSkel}
+            {Object.keys(apiDefinition.blueprints).map((bp, i) => (
+              <div key={i}>
+                <Box
+                  display="flex"
+                  flexDirection="row"
+                  flexWrap="wrap"
+                  className={classes.blueprint}
+                  borderBottom={1}
+                  px={1}
+                  onClick={() => toggleBlueprintExpand(bp)}
                 >
-                  <Typography variant="body2" style={{ paddingRight: '8px' }}>
-                    <Skeleton width="2rem" />
+                  <Typography variant="body2" color="textSecondary" style={{ fontWeight: 800, lineHeight: 2 }}>
+                    {`/api/${apiSelected}/`}&nbsp;
                   </Typography>
                   <div style={{ flexGrow: 1 }}>
-                    <Typography variant="h6">
-                      <Skeleton width="12rem" />
+                    <Typography variant="h6" style={{ fontWeight: 800, lineHeight: 2 }} color="secondary">
+                      {bp}
                     </Typography>
                   </div>
                   <div style={{ display: 'inline-flex', width: downSM ? '100%' : null, justifyContent: 'flex-end' }}>
-                    <Typography variant="body2" style={{ paddingRight: '16px', lineHeight: 2 }}>
-                      <Skeleton width="14rem" />
+                    <Typography variant="body2" color="textSecondary" align="right" style={{ lineHeight: 2 }}>
+                      {apiDefinition.blueprints[bp]}
                     </Typography>
-                    <Skeleton width="1rem" />
+                    <ExpandMoreIcon
+                      className={clsx(classes.expand, {
+                        [classes.expandOpen]: expandMap[bp]
+                      })}
+                    />
                   </div>
+                </Box>
+                <Collapse in={expandMap[bp]} timeout="auto" unmountOnExit>
+                  <div
+                    style={{
+                      backgroundColor: isDark ? theme.palette.grey[900] : theme.palette.grey[100]
+                    }}
+                  >
+                    {blueprintAPIs(bp).map((api, idx) => (
+                      <div key={idx}>
+                        <Box
+                          className={classes.api}
+                          px={1}
+                          display="flex"
+                          flexDirection={xs ? 'column' : 'row'}
+                          flexWrap="wrap"
+                          alignItems={xs ? 'flex-start' : 'center'}
+                          onClick={() => toggleBlueprintExpand(api.name)}
+                        >
+                          <div>
+                            {api.methods.map((method, midx) => (
+                              <CustomChip
+                                color={methodColor[method]}
+                                type="rounded"
+                                size="small"
+                                key={midx}
+                                label={method}
+                              />
+                            ))}
+                          </div>
+                          <div style={{ flexGrow: 1 }}>
+                            <Typography
+                              variant="body2"
+                              color="textSecondary"
+                              style={{ wordBreak: 'break-word', lineHeight: 2 }}
+                            >
+                              {api.path}
+                            </Typography>
+                          </div>
+                          <div
+                            style={{
+                              display: 'inline-flex',
+                              width: downSM ? '100%' : null,
+                              justifyContent: 'flex-end'
+                            }}
+                          >
+                            <Typography align="right" variant="caption" style={{ lineHeight: 2 }}>
+                              {api.name}
+                            </Typography>
+
+                            <ExpandMoreIcon
+                              className={clsx(classes.expand, {
+                                [classes.expandOpen]: expandMap[api.name]
+                              })}
+                            />
+                          </div>
+                        </Box>
+                        <Collapse in={expandMap[api.name]} timeout="auto" unmountOnExit>
+                          <div
+                            style={{
+                              border: 1,
+                              borderTop: 0,
+                              borderBottom: 0,
+                              padding: sp1,
+                              borderColor: isDark ? theme.palette.grey[900] : theme.palette.grey[100],
+                              backgroundColor: theme.palette.background.default
+                            }}
+                          >
+                            <Grid container alignItems="center">
+                              <>
+                                <Grid item xs={8} sm={4} md={3} lg={2}>
+                                  <div style={{ fontWeight: 500 }}>{t('complete')}:</div>
+                                </Grid>
+                                <Grid item xs={4} sm={8} md={9} lg={4}>
+                                  {api.complete ? (
+                                    <CheckOutlinedIcon htmlColor={theme.palette.success.main} />
+                                  ) : (
+                                    <ClearOutlinedIcon htmlColor={theme.palette.error.main} />
+                                  )}
+                                </Grid>
+                              </>
+                              <>
+                                <Grid item xs={8} sm={4} md={3} lg={2}>
+                                  <div style={{ fontWeight: 500 }}>{t('protected')}:</div>
+                                </Grid>
+                                <Grid item xs={4} sm={8} md={9} lg={4}>
+                                  {api.protected ? (
+                                    <CheckOutlinedIcon htmlColor={theme.palette.success.main} />
+                                  ) : (
+                                    <ClearOutlinedIcon htmlColor={theme.palette.error.main} />
+                                  )}
+                                </Grid>
+                              </>
+                              <>
+                                <Grid item xs={12} sm={4} md={3} lg={2}>
+                                  <div style={{ fontWeight: 500 }}>{t('require_type')}:</div>
+                                </Grid>
+                                <Grid item xs={12} sm={8} md={9} lg={4}>
+                                  {api.require_type.map((utype, uidx) => (
+                                    <CustomChip
+                                      key={uidx}
+                                      color={userColor[utype]}
+                                      type="rounded"
+                                      size="tiny"
+                                      label={t(`user_type.${utype}`)}
+                                    />
+                                  ))}
+                                </Grid>
+                              </>
+                              {api.required_priv ? (
+                                <>
+                                  <Grid item xs={12} sm={4} md={3} lg={2}>
+                                    <div style={{ fontWeight: 500 }}>{t('required_priv')}:</div>
+                                  </Grid>
+                                  <Grid item xs={12} sm={8} md={9} lg={4}>
+                                    {api.required_priv.map((ptype, pidx) => (
+                                      <CustomChip
+                                        key={pidx}
+                                        color={privColor[ptype]}
+                                        type="rounded"
+                                        size="tiny"
+                                        label={t(`priv.${ptype}`)}
+                                      />
+                                    ))}
+                                  </Grid>
+                                </>
+                              ) : null}
+                              <>
+                                <Grid item xs={12} sm={4} md={3} lg={2}>
+                                  <div style={{ fontWeight: 500 }}>{t('methods')}:</div>
+                                </Grid>
+                                <Grid item xs={12} sm={8} md={9} lg={4}>
+                                  {api.methods.map((met, metid) => (
+                                    <CustomChip
+                                      key={metid}
+                                      color={methodColor[met]}
+                                      type="rounded"
+                                      size="tiny"
+                                      label={t(met)}
+                                    />
+                                  ))}
+                                </Grid>
+                              </>
+                              <>
+                                <Grid item xs={12} sm={4} md={3} lg={2}>
+                                  <div style={{ fontWeight: 500 }}>{t('path')}:</div>
+                                </Grid>
+                                <Grid item xs={12} sm={8} md={9} lg={4}>
+                                  <div style={{ lineHeight: 2, fontFamily: 'Monospace', wordBreak: 'break-word' }}>
+                                    {api.path}
+                                  </div>
+                                </Grid>
+                              </>
+                              <>
+                                <Grid item xs={12}>
+                                  <div style={{ fontWeight: 500, lineHeight: 2 }}>{t('description')}:</div>
+                                </Grid>
+                                <Grid item xs={12}>
+                                  <Card variant="outlined" style={{ overflowX: 'auto' }}>
+                                    <pre style={{ paddingLeft: sp2, paddingRight: sp2 }}>{api.description}</pre>
+                                  </Card>
+                                </Grid>
+                              </>
+                            </Grid>
+                          </div>
+                        </Collapse>
+                      </div>
+                    ))}
+                  </div>
+                </Collapse>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {[...Array(21)].map((_, i) => (
+              <div
+                key={i}
+                style={{
+                  paddingLeft: sp1,
+                  paddingRight: sp1,
+                  display: 'flex',
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
+                  borderBottom: 1
+                }}
+                className={classes.blueprintSkel}
+              >
+                <Typography variant="body2" style={{ paddingRight: '8px' }}>
+                  <Skeleton width="2rem" />
+                </Typography>
+                <div style={{ flexGrow: 1 }}>
+                  <Typography variant="h6">
+                    <Skeleton width="12rem" />
+                  </Typography>
                 </div>
-              );
-            })}
+                <div style={{ display: 'inline-flex', width: downSM ? '100%' : null, justifyContent: 'flex-end' }}>
+                  <Typography variant="body2" style={{ paddingRight: '16px', lineHeight: 2 }}>
+                    <Skeleton width="14rem" />
+                  </Typography>
+                  <Skeleton width="1rem" />
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>

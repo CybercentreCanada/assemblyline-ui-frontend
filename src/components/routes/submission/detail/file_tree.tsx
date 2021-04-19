@@ -67,14 +67,12 @@ const WrappedFileTreeSection: React.FC<FileTreeProps> = ({ tree, sid }) => {
           {tree !== null ? (
             <FileTree tree={tree} sid={sid} />
           ) : (
-            [...Array(3)].map((_, i) => {
-              return (
-                <div style={{ display: 'flex' }} key={i}>
-                  <Skeleton style={{ height: '2rem', width: '1.5rem', marginRight: '0.5rem' }} />
-                  <Skeleton style={{ flexGrow: 1 }} />
-                </div>
-              );
-            })
+            [...Array(3)].map((_, i) => (
+              <div style={{ display: 'flex' }} key={i}>
+                <Skeleton style={{ height: '2rem', width: '1.5rem', marginRight: '0.5rem' }} />
+                <Skeleton style={{ flexGrow: 1 }} />
+              </div>
+            ))
           )}
         </div>
       </Collapse>

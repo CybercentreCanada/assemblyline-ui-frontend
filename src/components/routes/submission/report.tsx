@@ -25,7 +25,7 @@ import TextVerdict from 'components/visual/TextVerdict';
 import Verdict from 'components/visual/Verdict';
 import VerdictGauge from 'components/visual/VerdictGauge';
 import { bytesToSize, scoreToVerdict } from 'helpers/utils';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { Link, useHistory, useParams } from 'react-router-dom';
@@ -282,39 +282,35 @@ function TagTable({ group, items }) {
         }}
       >
         <Grid container spacing={1}>
-          {Object.keys(orderedItems).map((k, idx) => {
-            return (
-              <Grid key={idx} style={{ marginBottom: sp2, paddingLeft: sp1, paddingRight: sp1, minWidth: '21rem' }}>
-                <Grid container spacing={1}>
-                  <Grid item>
-                    <div style={{ display: 'flex', minWidth: '5rem' }}>
-                      <TextVerdict verdict={orderedItems[k].verdict} mono />
-                      <Tooltip title={orderedItems[k].type}>
-                        <span style={{ fontSize: '110%', flexGrow: 1, textTransform: 'capitalize' }}>
-                          {orderedItems[k].type.split('.').pop().replace('_', ' ')}
-                        </span>
-                      </Tooltip>
+          {Object.keys(orderedItems).map((k, idx) => (
+            <Grid key={idx} style={{ marginBottom: sp2, paddingLeft: sp1, paddingRight: sp1, minWidth: '21rem' }}>
+              <Grid container spacing={1}>
+                <Grid item>
+                  <div style={{ display: 'flex', minWidth: '5rem' }}>
+                    <TextVerdict verdict={orderedItems[k].verdict} mono />
+                    <Tooltip title={orderedItems[k].type}>
+                      <span style={{ fontSize: '110%', flexGrow: 1, textTransform: 'capitalize' }}>
+                        {orderedItems[k].type.split('.').pop().replace('_', ' ')}
+                      </span>
+                    </Tooltip>
+                  </div>
+                </Grid>
+                <Grid item>
+                  {orderedItems[k].values.map((v, vidx) => (
+                    <div
+                      key={vidx}
+                      style={{
+                        paddingBottom: '5px',
+                        wordBreak: 'break-word'
+                      }}
+                    >
+                      {v}
                     </div>
-                  </Grid>
-                  <Grid item>
-                    {orderedItems[k].values.map((v, vidx) => {
-                      return (
-                        <div
-                          key={vidx}
-                          style={{
-                            paddingBottom: '5px',
-                            wordBreak: 'break-word'
-                          }}
-                        >
-                          {v}
-                        </div>
-                      );
-                    })}
-                  </Grid>
+                  ))}
                 </Grid>
               </Grid>
-            );
-          })}
+            </Grid>
+          ))}
         </Grid>
       </div>
     </div>
@@ -335,14 +331,12 @@ function AttackMatrixBlock({ attack, items }) {
       }}
     >
       <span style={{ fontSize: '1rem', textTransform: 'capitalize' }}>{attack.replace(/-/g, ' ')}</span>
-      {Object.keys(items).map((cat, idx) => {
-        return (
-          <div key={idx}>
-            <TextVerdict verdict={items[cat].h_type} mono />
-            <span style={{ verticalAlign: 'middle' }}>{cat}</span>
-          </div>
-        );
-      })}
+      {Object.keys(items).map((cat, idx) => (
+        <div key={idx}>
+          <TextVerdict verdict={items[cat].h_type} mono />
+          <span style={{ verticalAlign: 'middle' }}>{cat}</span>
+        </div>
+      ))}
     </div>
   );
 }
@@ -394,13 +388,11 @@ function HeuristicsList({ verdict, items }) {
         {t(`verdict.${verdict}`)}
       </div>
       <div style={{ paddingLeft: sp1, paddingRight: sp1 }}>
-        {Object.keys(items).map((heur, idx) => {
-          return (
-            <div key={idx} style={{ fontSize: '1rem', verticalAlign: 'middle', paddingBottom: '2px' }}>
-              {heur}
-            </div>
-          );
-        })}
+        {Object.keys(items).map((heur, idx) => (
+          <div key={idx} style={{ fontSize: '1rem', verticalAlign: 'middle', paddingBottom: '2px' }}>
+            {heur}
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -428,8 +420,8 @@ function FileTree({ tree, important_files }) {
 
   return (
     <div>
-      {Object.keys(tree).map((f, i) => {
-        return important_files.indexOf(f) !== -1 ? (
+      {Object.keys(tree).map((f, i) =>
+        important_files.indexOf(f) !== -1 ? (
           <div key={i} style={{ pageBreakInside: 'avoid' }}>
             <table style={{ borderSpacing: 0 }}>
               <tbody>
@@ -460,8 +452,8 @@ function FileTree({ tree, important_files }) {
               </tbody>
             </table>
           </div>
-        ) : null;
-      })}
+        ) : null
+      )}
     </div>
   );
 }
@@ -755,30 +747,26 @@ export default function SubmissionReport() {
             <table style={{ paddingBottom: sp2, paddingTop: sp2, width: '100%' }}>
               <tbody>
                 {report
-                  ? Object.keys(report.metadata).map((meta, i) => {
-                      return (
-                        <tr key={i}>
-                          <td style={{ width: '20%' }}>
-                            <span style={{ fontWeight: 500 }}>{meta}</span>
-                          </td>
-                          <td style={{ paddingLeft: sp1, width: '80%', wordBreak: 'break-word' }}>
-                            {report.metadata[meta]}
-                          </td>
-                        </tr>
-                      );
-                    })
-                  : [...Array(3)].map((_, i) => {
-                      return (
-                        <tr key={i} style={{ width: '100%' }}>
-                          <td width="33%">
-                            <Skeleton />
-                          </td>
-                          <td width="67%">
-                            <Skeleton />
-                          </td>
-                        </tr>
-                      );
-                    })}
+                  ? Object.keys(report.metadata).map((meta, i) => (
+                      <tr key={i}>
+                        <td style={{ width: '20%' }}>
+                          <span style={{ fontWeight: 500 }}>{meta}</span>
+                        </td>
+                        <td style={{ paddingLeft: sp1, width: '80%', wordBreak: 'break-word' }}>
+                          {report.metadata[meta]}
+                        </td>
+                      </tr>
+                    ))
+                  : [...Array(3)].map((_, i) => (
+                      <tr key={i} style={{ width: '100%' }}>
+                        <td width="33%">
+                          <Skeleton />
+                        </td>
+                        <td width="67%">
+                          <Skeleton />
+                        </td>
+                      </tr>
+                    ))}
               </tbody>
             </table>
           </div>
@@ -797,12 +785,10 @@ export default function SubmissionReport() {
               }}
             >
               {report
-                ? Object.keys(report.attack_matrix).map((att, i) => {
-                    return <AttackMatrixBlock key={i} attack={att} items={report.attack_matrix[att]} />;
-                  })
-                : [...Array(5)].map((_, i) => {
-                    return <AttackMatrixSkel key={i} />;
-                  })}
+                ? Object.keys(report.attack_matrix).map((att, i) => (
+                    <AttackMatrixBlock key={i} attack={att} items={report.attack_matrix[att]} />
+                  ))
+                : [...Array(5)].map((_, i) => <AttackMatrixSkel key={i} />)}
             </div>
           </div>
         )}
@@ -833,9 +819,7 @@ export default function SubmissionReport() {
                   )}
                 </>
               ) : (
-                [...Array(3)].map((_, i) => {
-                  return <HeuristicsListSkel key={i} />;
-                })
+                [...Array(3)].map((_, i) => <HeuristicsListSkel key={i} />)
               )}
             </div>
           </div>
@@ -843,9 +827,9 @@ export default function SubmissionReport() {
 
         {report &&
           Object.keys(report.tags).length !== 0 &&
-          Object.keys(report.tags).map((tagGroup, groupIdx) => {
-            return <TagTable key={groupIdx} group={tagGroup} items={report.tags[tagGroup]} />;
-          })}
+          Object.keys(report.tags).map((tagGroup, groupIdx) => (
+            <TagTable key={groupIdx} group={tagGroup} items={report.tags[tagGroup]} />
+          ))}
 
         {(!report || report.important_files.length !== 0) && (
           <div style={{ paddingTop: sp2, pageBreakInside: 'avoid' }}>

@@ -31,7 +31,7 @@ import UsersTable from 'components/visual/SearchResult/users';
 import { searchResultsDisplay } from 'helpers/utils';
 import ChipInput from 'material-ui-chip-input';
 import 'moment/locale/fr';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Redirect, useHistory, useLocation } from 'react-router-dom';
 
@@ -72,13 +72,6 @@ const useStyles = makeStyles(theme => ({
     marginLeft: -12
   }
 }));
-
-type SearchResults = {
-  items: any[];
-  offset: number;
-  rows: number;
-  total: number;
-};
 
 type User = {
   avatar: string;
@@ -147,9 +140,7 @@ export default function Users() {
       url: '/api/v4/search/fields/user/',
       onSuccess: api_data => {
         setSuggestions([
-          ...Object.keys(api_data.api_response).filter(name => {
-            return api_data.api_response[name].indexed;
-          }),
+          ...Object.keys(api_data.api_response).filter(name => api_data.api_response[name].indexed),
           ...DEFAULT_SUGGESTION
         ]);
       }

@@ -489,9 +489,9 @@ const WrappedContainerDialog = ({ open, setOpen, container, name, volumes, onSav
             </Grid>
             <Grid item xs={12}>
               <Typography variant="subtitle2">{t('container.dialog.environment')}</Typography>
-              {tempContainer.environment.map((env, i) => {
-                return <Environment key={i} envVar={env} onUpdate={handleEnvAddUpdate} onDelete={handleEnvDelete} />;
-              })}
+              {tempContainer.environment.map((env, i) => (
+                <Environment key={i} envVar={env} onUpdate={handleEnvAddUpdate} onDelete={handleEnvDelete} />
+              ))}
             </Grid>
             <Grid item xs={12}>
               <Environment onAdd={handleEnvAddUpdate} />
@@ -500,16 +500,14 @@ const WrappedContainerDialog = ({ open, setOpen, container, name, volumes, onSav
               <>
                 <Grid item xs={12}>
                   <Typography variant="subtitle2">{t('container.dialog.volumes')}</Typography>
-                  {Object.keys(tempVolumes).map(vol_name => {
-                    return (
-                      <VolumeControl
-                        key={vol_name}
-                        name={vol_name}
-                        vol={tempVolumes[vol_name]}
-                        onDelete={handleVolDelete}
-                      />
-                    );
-                  })}
+                  {Object.keys(tempVolumes).map(vol_name => (
+                    <VolumeControl
+                      key={vol_name}
+                      name={vol_name}
+                      vol={tempVolumes[vol_name]}
+                      onDelete={handleVolDelete}
+                    />
+                  ))}
                 </Grid>
 
                 <Grid item xs={12}>

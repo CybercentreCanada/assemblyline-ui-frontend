@@ -16,44 +16,25 @@ const useStyles = makeStyles(theme => ({
     overflow: 'hidden',
     flexGrow: 1
   },
-  splitLayoutLeft: {
+  splitLayoutLeftCt: {
+    height: '100%',
     display: 'inline-block',
-    verticalAlign: 'top',
-    width: '25%',
-    height: '100%'
+    backgroundColor: theme.palette.background.default
   },
-  splitLayoutLeftContent: {
-    flexGrow: 1,
-    overflow: 'auto'
+  splitLayoutRightCt: {
+    height: '100%',
+    display: 'inline-block',
+    backgroundColor: theme.palette.background.default
   },
+  splitLayoutDock: {},
   splitLayoutLeftAnchor: {
-    width: '20px',
+    width: '10px',
     '&:hover': {
+      backgroundColor: theme.palette.background.paper,
       cursor: 'col-resize'
     }
-  },
-  splitLayoutRight: {
-    display: 'inline-block',
-    verticalAlign: 'top',
-    width: '75%',
-    height: '100%'
-  },
-  splitLayoutRightContent: {
-    flexGrow: 1,
-    overflow: 'auto'
-  },
-  splitLayoutDock: {}
+  }
 }));
-
-interface SplitLayoutState {
-  leftOpen: boolean;
-  rightOpen: boolean;
-  widths: {
-    container: number;
-    left: number;
-    right: number;
-  };
-}
 
 interface SplitLayoutProps {
   id: string;
@@ -107,15 +88,10 @@ const SplitLayout: React.FC<SplitLayoutProps> = React.memo(
 
     // Some DOM refs
     const containerRef = useRef<HTMLDivElement>();
-    const leftRef = useRef<HTMLDivElement>();
-    const rightRef = useRef<HTMLDivElement>();
     const anchorRef = useRef<HTMLDivElement>();
 
     // Utility function the get the current width of container.
-    const getWidth = (): number => {
-      return containerRef.current.getBoundingClientRect().width;
-    };
-
+    const getWidth = (): number => containerRef.current.getBoundingClientRect().width;
     // Update the current layout state.
     const updateState = (_state: LayoutState) => {
       setState(_state);
@@ -169,48 +145,38 @@ const SplitLayout: React.FC<SplitLayoutProps> = React.memo(
       updateState(computerRef.current.onToggleRight());
     };
 
-    const renderLeftDock = () => {
-      return (
-        <>
-          <div className={classes.splitLayoutDock}>
-            <FlexVertical>
-              <IconButton onClick={onToggleLeft}>
-                <MenuOpenIcon style={{ transform: !state.leftOpen ? 'rotate(180deg)' : null }} />
-              </IconButton>
-              {onRenderLeftDock && onRenderLeftDock()}
-            </FlexVertical>
-          </div>
-        </>
+    const renderLeftDock = () =>
+      !disableManualResize && (
+        <FlexVertical>
+          <IconButton onClick={onToggleLeft}>
+            <MenuOpenIcon style={{ transform: !state.leftOpen ? 'rotate(180deg)' : null }} />
+          </IconButton>
+          {onRenderLeftDock && onRenderLeftDock()}
+        </FlexVertical>
       );
-    };
 
-    const renderRightDock = () => {
-      return (
-        rightNode && (
-          <>
-            <div className={classes.splitLayoutDock}>
-              <IconButton onClick={onToggleRight}>
-                <MenuOpenIcon style={{ transform: state.rightOpen ? 'rotate(180deg)' : null }} />
-              </IconButton>
-              <FlexVertical>{onRenderRightDock && onRenderRightDock()}</FlexVertical>
-            </div>
-          </>
-        )
+    const renderRightDock = () =>
+      !disableManualResize &&
+      rightNode && (
+        <FlexVertical>
+          <IconButton onClick={onToggleRight}>
+            <MenuOpenIcon style={{ transform: state.rightOpen ? 'rotate(180deg)' : null }} />
+          </IconButton>
+          {onRenderRightDock && onRenderRightDock()}
+        </FlexVertical>
       );
-    };
 
     // Ensure we recompute state when rightNode is provided.
     // This handles cases where the component will toggle between
-    //  having no right node and having noe.
+    //  having no right node and having one.
     useEffect(() => {
       updateState(computerRef.current.init(getWidth(), !!rightNode));
     }, [rightNode]);
 
     // Listen for splitlayout events.
-    useEffect(() => {
-      return register({ onOpenLeft, onCloseLeft, onOpenRight, onCloseRight, onToggleLeft, onToggleRight });
-    });
+    useEffect(() => register({ onOpenLeft, onCloseLeft, onOpenRight, onCloseRight, onToggleLeft, onToggleRight }));
 
+    //
     return (
       <FlexVertical>
         <Flexport>
@@ -225,16 +191,16 @@ const SplitLayout: React.FC<SplitLayoutProps> = React.memo(
                   onMouseLeave={onContainerMouseLeave}
                 >
                   <div
-                    ref={leftRef}
-                    className={classes.splitLayoutLeft}
+                    className={classes.splitLayoutLeftCt}
                     style={{
-                      width: !state.leftOpen ? 0 : state.leftWidth ? state.leftWidth : null,
-                      overflow: !state.leftOpen ? 'hidden' : null
+                      position: 'absolute',
+                      width: state.leftOpen ? state.leftWidth : leftMinWidth,
+                      zIndex: state.leftOpen ? 1 : -1
                     }}
                   >
                     <FlexHorizontal>
                       {persistentMenu && persistentMenuDock === 'left' && renderLeftDock()}
-                      <div className={classes.splitLayoutLeftContent}>{leftNode}</div>
+                      <div style={{ flexGrow: 1, overflow: state.leftOpen ? 'auto' : 'hidden' }}>{leftNode}</div>
                       {!state.rightOpen && renderRightDock()}
                       {!disableManualResize && (
                         <div
@@ -246,13 +212,17 @@ const SplitLayout: React.FC<SplitLayoutProps> = React.memo(
                     </FlexHorizontal>
                   </div>
                   <div
-                    ref={rightRef}
-                    className={classes.splitLayoutRight}
-                    style={{ width: state.rightWidth ? state.rightWidth : null }}
+                    className={classes.splitLayoutRightCt}
+                    style={{
+                      position: 'absolute',
+                      width: state.rightOpen ? state.rightWidth : rightMinWidth,
+                      zIndex: state.rightOpen ? 1 : -1,
+                      left: state.rightOpen ? state.leftWidth : 0
+                    }}
                   >
                     <FlexHorizontal>
                       {!state.leftOpen && renderLeftDock()}
-                      <div className={classes.splitLayoutRightContent}>{state.rightOpen && rightNode}</div>
+                      <div style={{ flexGrow: 1, overflow: state.rightOpen ? 'auto' : 'hidden' }}>{rightNode}</div>
                       {persistentMenu && persistentMenuDock === 'right' && renderRightDock()}
                     </FlexHorizontal>
                   </div>

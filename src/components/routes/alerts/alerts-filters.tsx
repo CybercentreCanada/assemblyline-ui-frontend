@@ -18,17 +18,14 @@ const DEFAULT_TC = '4d';
 const DEFAULT_GROUPBY = 'file.sha256';
 
 //
-const findOption = (value: string, options: { value: string; label: string }[]) => {
-  return options.find(o => o.value === value);
-};
+const findOption = (value: string, options: { value: string; label: string }[]) => options.find(o => o.value === value);
 
 // Decorate each filter in the specified 'queryFilters' list and indicate whether they are a valueFilter.
-const decorateQueryFilters = (queryFilters: SearchFilter[], userFavoritesFilters) => {
-  return queryFilters.map(qf => ({
+const decorateQueryFilters = (queryFilters: SearchFilter[], userFavoritesFilters) =>
+  queryFilters.map(qf => ({
     filter: qf,
     isFavorite: userFavoritesFilters ? userFavoritesFilters.some(vf => vf.value === qf.value) : false
   }));
-};
 
 function ensureSearchFilter(selection): SearchFilter {
   if (typeof selection === 'string') {
@@ -106,17 +103,18 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
     groupByOption || findOption(DEFAULT_GROUPBY, GROUPBY_OPTIONS)
   );
   const [userFavoritesFilters] = useState<SearchFilter[]>([
-    ...userFavorites.map((fav, idx) => {
-      return { id: `u_${idx}`, type: SearchFilterType.QUERY, label: fav.name, value: fav.query };
-    }),
-    ...globalFavorites.map((fav, idx) => {
-      return {
-        id: `g_${idx}`,
-        type: SearchFilterType.QUERY,
-        label: `${fav.name} (${fav.created_by})`,
-        value: fav.query
-      };
-    })
+    ...userFavorites.map((fav, idx) => ({
+      id: `u_${idx}`,
+      type: SearchFilterType.QUERY,
+      label: fav.name,
+      value: fav.query
+    })),
+    ...globalFavorites.map((fav, idx) => ({
+      id: `g_${idx}`,
+      type: SearchFilterType.QUERY,
+      label: `${fav.name} (${fav.created_by})`,
+      value: fav.query
+    }))
   ]);
   const [selectedStatusFilters, setSelectedStatusFilters] = useState<SearchFilter[]>(filters.statuses);
   const [selectedPriorityFilters, setSelectedPriorityFilters] = useState<SearchFilter[]>(filters.priorities);
@@ -198,13 +196,11 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
   };
 
   // Render method of a single Autocomplete component option.
-  const renderOption = (item: SearchFilter) => {
-    return (
-      <div>
-        {item.other && <CustomChip label={item.other.count} size="tiny" />} {item.label}
-      </div>
-    );
-  };
+  const renderOption = (item: SearchFilter) => (
+    <div>
+      {item.other && <CustomChip label={item.other.count} size="tiny" />} {item.label}
+    </div>
+  );
 
   // Apply updates to selected filters if required.
   useEffect(() => {

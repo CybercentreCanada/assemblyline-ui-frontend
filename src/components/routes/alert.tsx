@@ -1,7 +1,7 @@
 import { Skeleton } from '@material-ui/lab';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useMyAPI from 'components/hooks/useMyAPI';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import AlertDetails from './alerts/alert-details';
 import { AlertItem } from './alerts/hooks/useAlerts';

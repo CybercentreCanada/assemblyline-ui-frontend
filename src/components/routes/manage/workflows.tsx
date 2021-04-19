@@ -15,7 +15,7 @@ import SearchPager from 'components/visual/SearchPager';
 import WorkflowTable from 'components/visual/SearchResult/workflow';
 import { searchResultsDisplay } from 'helpers/utils';
 import 'moment/locale/fr';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
 import WorkflowDetail from './workflow_detail';
@@ -60,9 +60,7 @@ export default function Workflows() {
   const classes = useStyles();
   const { closeGlobalDrawer, setGlobalDrawer } = useDrawer();
   const [suggestions] = useState([
-    ...Object.keys(indexes.workflow).filter(name => {
-      return indexes.workflow[name].indexed;
-    }),
+    ...Object.keys(indexes.workflow).filter(name => indexes.workflow[name].indexed),
     ...DEFAULT_SUGGESTION
   ]);
   const filterValue = useRef<string>('');

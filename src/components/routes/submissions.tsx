@@ -14,7 +14,7 @@ import SearchPager from 'components/visual/SearchPager';
 import SubmissionsTable, { SubmissionResult } from 'components/visual/SearchResult/submissions';
 import { searchResultsDisplay } from 'helpers/utils';
 import 'moment/locale/fr';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
 
@@ -51,9 +51,7 @@ export default function Submissions() {
   const filterValue = useRef<string>('');
   const classes = useStyles();
   const [suggestions] = useState([
-    ...Object.keys(indexes.submission).filter(name => {
-      return indexes.submission[name].indexed;
-    }),
+    ...Object.keys(indexes.submission).filter(name => indexes.submission[name].indexed),
     ...DEFAULT_SUGGESTION
   ]);
 

@@ -4,7 +4,6 @@ import HourglassEmptyOutlinedIcon from '@material-ui/icons/HourglassEmptyOutline
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import ForbiddenPage from 'components/routes/403';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 const LockedPage = () => {

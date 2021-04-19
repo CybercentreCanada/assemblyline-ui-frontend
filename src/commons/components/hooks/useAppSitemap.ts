@@ -71,9 +71,7 @@ const resolveTitle = (breadcrumb: BreadcrumbItem, siteMap: SiteMapRoute[]) => {
   return title;
 };
 
-const is404 = (breadcrumb: BreadcrumbItem) => {
-  return breadcrumb.route.title === TITLE_404;
-};
+const is404 = (breadcrumb: BreadcrumbItem) => breadcrumb.route.title === TITLE_404;
 
 export default function useAppSitemap(): SitemapProps {
   const { breadcrumbs, ...props } = useContext(SiteMapContext);

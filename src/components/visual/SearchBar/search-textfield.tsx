@@ -85,9 +85,7 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
   useEffect(() => setFilteredOptions({ start: 0, end: 0, items: options }), [options]);
 
   // Get the the text input element.
-  const getInputEl = () => {
-    return element.current.querySelector('input');
-  };
+  const getInputEl = () => element.current.querySelector('input');
 
   // Automatically close the options box with losing focus.
   const _onBlur = () => {

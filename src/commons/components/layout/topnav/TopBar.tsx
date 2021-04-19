@@ -75,17 +75,15 @@ const TopBar: React.FC<AppBarProps> = ({ apps, width }) => {
     window.dispatchEvent(new CustomEvent(APPBAR_READY_EVENT));
   }, []);
 
-  const renderLeft = () => {
-    return (
-      <div className={classes.topBarLeft}>
-        <AppTitle disabled={!isTopLayout && !isXs} noTitle={isXs} />
-        <div className={isTopLayout ? classes.leftSpacer : null} />
-        {left}
-        {breadcrumbsEnabled && !isSm && <Breadcrumbs />}
-        {leftAfterBreadcrumbs}
-      </div>
-    );
-  };
+  const renderLeft = () => (
+    <div className={classes.topBarLeft}>
+      <AppTitle disabled={!isTopLayout && !isXs} noTitle={isXs} />
+      <div className={isTopLayout ? classes.leftSpacer : null} />
+      {left}
+      {breadcrumbsEnabled && !isSm && <Breadcrumbs />}
+      {leftAfterBreadcrumbs}
+    </div>
+  );
 
   const autoHide = !isTopLayout && autoHideAppbar;
 

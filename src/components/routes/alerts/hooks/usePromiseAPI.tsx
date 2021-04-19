@@ -23,8 +23,8 @@ export default function usePromiseAPI(): UsingPromiseAPI {
   const apiCall = useMyAPI();
 
   // Hook API: fetch the alert for the specified alert_id.
-  const fetchAlert = async (alertId: string): Promise<AlertItem> => {
-    return new Promise<AlertItem>((resolve, reject) => {
+  const fetchAlert = async (alertId: string): Promise<AlertItem> =>
+    new Promise<AlertItem>((resolve, reject) => {
       const url = `/api/v4/alert/${alertId}/`;
       apiCall({
         url,
@@ -34,7 +34,6 @@ export default function usePromiseAPI(): UsingPromiseAPI {
         onFailure: api_data => reject(api_data)
       });
     });
-  };
 
   // Hook API: apply workflow actions
   const onApplyWorkflowAction = async (
@@ -95,8 +94,8 @@ export default function usePromiseAPI(): UsingPromiseAPI {
   };
 
   // Hook API: take ownership of alerts matching specified query.
-  const onTakeOwnership = async (query: SearchQuery): Promise<boolean> => {
-    return new Promise((resolve, reject) => {
+  const onTakeOwnership = async (query: SearchQuery): Promise<boolean> =>
+    new Promise((resolve, reject) => {
       apiCall({
         url: `/api/v4/alert/ownership/batch/?${query.buildAPIQueryString()}`,
         onSuccess: () => {
@@ -105,11 +104,10 @@ export default function usePromiseAPI(): UsingPromiseAPI {
         onFailure: api_data => reject(api_data)
       });
     });
-  };
 
   // Hook API: set the verdict on a selected alert
-  const setVerdict = async (alert_id: string, verdict: 'malicious' | 'non_malicious'): Promise<boolean> => {
-    return new Promise((resolve, reject) => {
+  const setVerdict = async (alert_id: string, verdict: 'malicious' | 'non_malicious'): Promise<boolean> =>
+    new Promise((resolve, reject) => {
       apiCall({
         method: 'PUT',
         url: `/api/v4/alert/verdict/${alert_id}/${verdict}/`,
@@ -119,7 +117,6 @@ export default function usePromiseAPI(): UsingPromiseAPI {
         onFailure: api_data => reject(api_data)
       });
     });
-  };
 
   // Wrap each exposed method in 'useCallback' hook in order to ensure they are memoized and do not
   //  cause re-renders.

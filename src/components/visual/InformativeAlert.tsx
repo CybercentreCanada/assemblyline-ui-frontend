@@ -1,7 +1,6 @@
 import { createStyles, fade, Theme, withStyles } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
 import 'moment/locale/fr';
-import React from 'react';
 
 const StyledAlert = withStyles((theme: Theme) =>
   createStyles({
@@ -21,12 +20,10 @@ const StyledAlert = withStyles((theme: Theme) =>
   })
 )(Alert);
 
-const InformativeAlert = ({ children, ...props }) => {
-  return (
-    <StyledAlert {...props} severity="info">
-      {children}
-    </StyledAlert>
-  );
-};
+const InformativeAlert = ({ children, ...props }) => (
+  <StyledAlert {...props} severity="info">
+    {children}
+  </StyledAlert>
+);
 
 export default InformativeAlert;

@@ -20,7 +20,7 @@ import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import CustomChip from 'components/visual/CustomChip';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Redirect } from 'react-router-dom';
 
@@ -97,10 +97,7 @@ export default function SiteMap() {
                   <StyledTableCell>{path.url}</StyledTableCell>
                   <StyledTableCell>{path.function}</StyledTableCell>
                   <StyledTableCell>
-                    {path.methods &&
-                      path.methods.map((method, mid) => {
-                        return <div key={mid}>{method}</div>;
-                      })}
+                    {path.methods && path.methods.map((method, mid) => <div key={mid}>{method}</div>)}
                   </StyledTableCell>
                   <StyledTableCell>
                     {path.protected ? (
@@ -111,35 +108,31 @@ export default function SiteMap() {
                   </StyledTableCell>
                   <StyledTableCell>
                     {path.req_priv &&
-                      path.req_priv.map((priv, pid) => {
-                        return (
-                          <CustomChip
-                            key={pid}
-                            mono
-                            type="rounded"
-                            color={privMap[priv]}
-                            size="tiny"
-                            label={priv}
-                            tooltip={t(`${priv}`)}
-                          />
-                        );
-                      })}
+                      path.req_priv.map((priv, pid) => (
+                        <CustomChip
+                          key={pid}
+                          mono
+                          type="rounded"
+                          color={privMap[priv]}
+                          size="tiny"
+                          label={priv}
+                          tooltip={t(`${priv}`)}
+                        />
+                      ))}
                   </StyledTableCell>
                   <StyledTableCell>
                     {path.required_type &&
-                      path.required_type.map((req, rid) => {
-                        return (
-                          <CustomChip
-                            key={rid}
-                            mono
-                            type="rounded"
-                            color={reqMapColor[req]}
-                            size="tiny"
-                            label={t(req)}
-                            tooltip={t(`${req}_label`)}
-                          />
-                        );
-                      })}
+                      path.required_type.map((req, rid) => (
+                        <CustomChip
+                          key={rid}
+                          mono
+                          type="rounded"
+                          color={reqMapColor[req]}
+                          size="tiny"
+                          label={t(req)}
+                          tooltip={t(`${req}_label`)}
+                        />
+                      ))}
                   </StyledTableCell>
                 </TableRow>
               ))}

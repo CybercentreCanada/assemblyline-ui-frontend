@@ -1,6 +1,5 @@
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import FileDetail from 'components/visual/FileDetail';
-import React from 'react';
 import { useParams } from 'react-router-dom';
 
 type ParamProps = {

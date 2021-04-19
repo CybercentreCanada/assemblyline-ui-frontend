@@ -12,7 +12,7 @@ import SearchPager from 'components/visual/SearchPager';
 import HeuristicsTable from 'components/visual/SearchResult/heuristics';
 import { searchResultsDisplay } from 'helpers/utils';
 import 'moment/locale/fr';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
 import HeuristicDetail from './heuristic_detail';
@@ -56,9 +56,7 @@ export default function Heuristics() {
   const classes = useStyles();
   const { setGlobalDrawer } = useDrawer();
   const [suggestions] = useState([
-    ...Object.keys(indexes.heuristic).filter(name => {
-      return indexes.heuristic[name].indexed;
-    }),
+    ...Object.keys(indexes.heuristic).filter(name => indexes.heuristic[name].indexed),
     ...DEFAULT_SUGGESTION
   ]);
   const filterValue = useRef<string>('');
@@ -123,8 +121,8 @@ export default function Heuristics() {
 
   return (
     <PageFullWidth margin={4}>
-      {useMemo(() => {
-        return (
+      {useMemo(
+        () => (
           <>
             <div style={{ paddingBottom: theme.spacing(2) }}>
               <Typography variant="h4">{t('title')}</Typography>
@@ -172,19 +170,9 @@ export default function Heuristics() {
               </div>
             </PageHeader>
           </>
-        );
-      }, [
-        classes.searchresult,
-        heuristicResults,
-        onClear,
-        onSearch,
-        pageSize,
-        query,
-        searching,
-        suggestions,
-        t,
-        theme
-      ])}
+        ),
+        [classes.searchresult, heuristicResults, onClear, onSearch, pageSize, query, searching, suggestions, t, theme]
+      )}
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         <HeuristicsTable heuristicResults={heuristicResults} setHeuristicID={setHeuristicID} />

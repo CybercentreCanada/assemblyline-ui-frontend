@@ -210,33 +210,31 @@ const WrappedSourceDialog = ({ open, setOpen, source, onSave }: SourceDialogProp
               <Grid item xs={12}>
                 <div className={classes.label}>{t('updater.dialog.headers')}</div>
               </Grid>
-              {tempSource.headers.map((header, id) => {
-                return (
-                  <Grid key={id} item xs={12}>
-                    <Grid container spacing={1} alignItems="center">
-                      <Grid item xs={10} md={3}>
-                        <div className={classes.label}>{header.name}</div>
-                      </Grid>
-                      <Grid item xs={10} md={8}>
-                        <TextField size="small" value={header.value} fullWidth variant="outlined" />
-                      </Grid>
-                      <Grid item xs={2} md={1} style={{ textAlign: 'end' }}>
-                        <IconButton
-                          style={{
-                            color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark,
-                            margin: '-4px 0'
-                          }}
-                          onClick={() => {
-                            removeHeader(id);
-                          }}
-                        >
-                          <RemoveCircleOutlineOutlinedIcon />
-                        </IconButton>
-                      </Grid>
+              {tempSource.headers.map((header, id) => (
+                <Grid key={id} item xs={12}>
+                  <Grid container spacing={1} alignItems="center">
+                    <Grid item xs={10} md={3}>
+                      <div className={classes.label}>{header.name}</div>
+                    </Grid>
+                    <Grid item xs={10} md={8}>
+                      <TextField size="small" value={header.value} fullWidth variant="outlined" />
+                    </Grid>
+                    <Grid item xs={2} md={1} style={{ textAlign: 'end' }}>
+                      <IconButton
+                        style={{
+                          color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark,
+                          margin: '-4px 0'
+                        }}
+                        onClick={() => {
+                          removeHeader(id);
+                        }}
+                      >
+                        <RemoveCircleOutlineOutlinedIcon />
+                      </IconButton>
                     </Grid>
                   </Grid>
-                );
-              })}
+                </Grid>
+              ))}
               <Grid item xs={12}>
                 <Grid container spacing={1}>
                   <Grid item xs={10} md={3}>

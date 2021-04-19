@@ -8,7 +8,7 @@ import Classification from 'components/visual/Classification';
 import Histogram from 'components/visual/Histogram';
 import ResultsTable from 'components/visual/SearchResult/results';
 import 'moment/locale/fr';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { Link, useParams } from 'react-router-dom';
@@ -244,13 +244,11 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
               <Paper component="pre" variant="outlined" className={classes.preview}>
                 {heuristic.signature_score_map && Object.keys(heuristic.signature_score_map).length !== 0 ? (
                   <Grid container spacing={1}>
-                    {Object.keys(heuristic.signature_score_map).map((key, i) => {
-                      return (
-                        <Grid key={i} item xs>
-                          {`${key} = ${heuristic.signature_score_map[key]}`}
-                        </Grid>
-                      );
-                    })}
+                    {Object.keys(heuristic.signature_score_map).map((key, i) => (
+                      <Grid key={i} item xs>
+                        {`${key} = ${heuristic.signature_score_map[key]}`}
+                      </Grid>
+                    ))}
                   </Grid>
                 ) : (
                   t('no_sigs')

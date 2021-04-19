@@ -45,19 +45,15 @@ const WrappedResultSection: React.FC<ResultSectionProps> = ({ results, sid, alte
           () => (
             <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
               {results
-                ? results.map((result, i) => {
-                    return (
-                      <ResultCard
-                        key={i}
-                        result={result}
-                        sid={sid}
-                        alternates={alternates ? alternates[result.response.service_name] : null}
-                      />
-                    );
-                  })
-                : [...Array(2)].map((_, i) => {
-                    return <Skeleton key={i} style={{ height: '16rem' }} />;
-                  })}
+                ? results.map((result, i) => (
+                    <ResultCard
+                      key={i}
+                      result={result}
+                      sid={sid}
+                      alternates={alternates ? alternates[result.response.service_name] : null}
+                    />
+                  ))
+                : [...Array(2)].map((_, i) => <Skeleton key={i} style={{ height: '16rem' }} />)}
             </div>
           ),
           // eslint-disable-next-line react-hooks/exhaustive-deps

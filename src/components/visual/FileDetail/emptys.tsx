@@ -42,12 +42,8 @@ const WrappedEmptySection: React.FC<EmptySectionProps> = ({ emptys, sid }) => {
           () => (
             <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
               {emptys
-                ? emptys.map((result, i) => {
-                    return <ResultCard key={i} result={result} sid={sid} />;
-                  })
-                : [...Array(2)].map((_, i) => {
-                    return <Skeleton key={i} style={{ height: '16rem' }} />;
-                  })}
+                ? emptys.map((result, i) => <ResultCard key={i} result={result} sid={sid} />)
+                : [...Array(2)].map((_, i) => <Skeleton key={i} style={{ height: '16rem' }} />)}
             </div>
           ),
           // eslint-disable-next-line react-hooks/exhaustive-deps

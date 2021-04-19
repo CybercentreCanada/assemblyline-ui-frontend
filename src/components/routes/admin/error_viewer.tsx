@@ -16,7 +16,7 @@ import SearchPager from 'components/visual/SearchPager';
 import ErrorsTable from 'components/visual/SearchResult/errors';
 import { searchResultsDisplay } from 'helpers/utils';
 import 'moment/locale/fr';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
 import Moment from 'react-moment';
@@ -188,9 +188,7 @@ export default function ErrorViewer() {
       url: '/api/v4/search/fields/error/',
       onSuccess: api_data => {
         setSuggestions([
-          ...Object.keys(api_data.api_response).filter(name => {
-            return api_data.api_response[name].indexed;
-          }),
+          ...Object.keys(api_data.api_response).filter(name => api_data.api_response[name].indexed),
           ...DEFAULT_SUGGESTION
         ]);
       }

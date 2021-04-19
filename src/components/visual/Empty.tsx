@@ -1,5 +1,3 @@
-import React from 'react';
-
 type EmptyProps = {
   [string: string]: any;
 };

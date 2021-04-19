@@ -15,7 +15,7 @@ import SearchPager from 'components/visual/SearchPager';
 import SignaturesTable from 'components/visual/SearchResult/signatures';
 import { searchResultsDisplay } from 'helpers/utils';
 import 'moment/locale/fr';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
 import SignatureDetail from './signature_detail';
@@ -61,9 +61,7 @@ export default function Signatures() {
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
   const [suggestions] = useState([
-    ...Object.keys(indexes.signature).filter(name => {
-      return indexes.signature[name].indexed;
-    }),
+    ...Object.keys(indexes.signature).filter(name => indexes.signature[name].indexed),
     ...DEFAULT_SUGGESTION
   ]);
   const filterValue = useRef<string>('');
@@ -162,8 +160,8 @@ export default function Signatures() {
 
   return (
     <PageFullWidth margin={4}>
-      {useMemo(() => {
-        return (
+      {useMemo(
+        () => (
           <>
             <div style={{ paddingBottom: theme.spacing(2) }}>
               <Grid container alignItems="center">
@@ -249,22 +247,23 @@ export default function Signatures() {
               </div>
             </PageHeader>
           </>
-        );
-      }, [
-        classes.searchresult,
-        history,
-        location.pathname,
-        onClear,
-        onSearch,
-        pageSize,
-        query,
-        searching,
-        signatureResults,
-        suggestions,
-        t,
-        theme,
-        upMD
-      ])}
+        ),
+        [
+          classes.searchresult,
+          history,
+          location.pathname,
+          onClear,
+          onSearch,
+          pageSize,
+          query,
+          searching,
+          signatureResults,
+          suggestions,
+          t,
+          theme,
+          upMD
+        ]
+      )}
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         <SignaturesTable signatureResults={signatureResults} setSignatureID={setSignatureID} />

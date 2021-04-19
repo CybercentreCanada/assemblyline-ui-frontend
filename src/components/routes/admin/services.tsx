@@ -28,7 +28,7 @@ import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import ServiceTable from 'components/visual/SearchResult/service';
 import getXSRFCookie from 'helpers/xsrf';
 import 'moment/locale/fr';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Redirect } from 'react-router-dom';
 

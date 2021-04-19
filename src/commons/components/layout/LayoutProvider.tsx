@@ -230,12 +230,8 @@ function AppLayoutProvider(props: LayoutProviderProps) {
           ...layoutProps
         },
         showQuickSearch: quickSearch,
-        getBanner: curTheme => {
-          return curTheme.palette.type === 'dark' ? layoutProps.bannerDark : layoutProps.bannerLight;
-        },
-        getLogo: curTheme => {
-          return curTheme.palette.type === 'dark' ? layoutProps.appIconDark : layoutProps.appIconLight;
-        },
+        getBanner: curTheme => (curTheme.palette.type === 'dark' ? layoutProps.bannerDark : layoutProps.bannerLight),
+        getLogo: curTheme => (curTheme.palette.type === 'dark' ? layoutProps.appIconDark : layoutProps.appIconLight),
         hideMenus: () => setShowMenus(false),
         toggleLayout: onToggleLayout,
         toggleDrawer: onToggleDrawer,

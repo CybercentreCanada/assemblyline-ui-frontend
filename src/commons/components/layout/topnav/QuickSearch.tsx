@@ -1,12 +1,12 @@
 import { fade, InputBase, makeStyles } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 
-const useStyles = breadcrumbsEnabled => {
-  return makeStyles(theme => ({
+const useStyles = breadcrumbsEnabled =>
+  makeStyles(theme => ({
     search: {
       flexGrow: 1,
       position: 'relative',
@@ -45,7 +45,6 @@ const useStyles = breadcrumbsEnabled => {
       width: '100%'
     }
   }))();
-};
 
 const QuickSearch = () => {
   const { t } = useTranslation();

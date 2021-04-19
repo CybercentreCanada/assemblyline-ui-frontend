@@ -255,8 +255,8 @@ function WrappedClassification({
                 <Grid item xs={12} md>
                   <Card variant="outlined">
                     <List disablePadding style={{ borderRadius: '6px' }}>
-                      {c12nDef.original_definition.levels.map((lvl, idx) => {
-                        return (
+                      {c12nDef.original_definition.levels.map(
+                        (lvl, idx) =>
                           (isUser || lvl.lvl <= uParts.lvlIdx) && (
                             <ListItem
                               key={idx}
@@ -271,8 +271,7 @@ function WrappedClassification({
                               <ListItemText style={{ textAlign: 'center' }} primary={lvl.name} />
                             </ListItem>
                           )
-                        );
-                      })}
+                      )}
                     </List>
                   </Card>
                 </Grid>
@@ -280,8 +279,8 @@ function WrappedClassification({
                   <Grid item xs={12} md>
                     <Card variant="outlined">
                       <List disablePadding>
-                        {c12nDef.original_definition.required.map((req, idx) => {
-                          return (
+                        {c12nDef.original_definition.required.map(
+                          (req, idx) =>
                             (isUser || [req.name, req.short_name].some(r => uParts.req.includes(r))) && (
                               <ListItem
                                 key={idx}
@@ -294,8 +293,7 @@ function WrappedClassification({
                                 <ListItemText style={{ textAlign: 'center' }} primary={req.name} />
                               </ListItem>
                             )
-                          );
-                        })}
+                        )}
                       </List>
                     </Card>
                   </Grid>
@@ -306,8 +304,8 @@ function WrappedClassification({
                       <div style={{ paddingBottom: sp2 }}>
                         <Card variant="outlined">
                           <List disablePadding>
-                            {c12nDef.original_definition.groups.map((grp, idx) => {
-                              return (
+                            {c12nDef.original_definition.groups.map(
+                              (grp, idx) =>
                                 (isUser || [grp.name, grp.short_name].some(g => uParts.groups.includes(g))) && (
                                   <ListItem
                                     key={idx}
@@ -325,8 +323,7 @@ function WrappedClassification({
                                     <ListItemText style={{ textAlign: 'center' }} primary={grp.name} />
                                   </ListItem>
                                 )
-                              );
-                            })}
+                            )}
                             {c12nDef.dynamic_groups && currentUser.email && (
                               <ListItem
                                 button
@@ -352,8 +349,8 @@ function WrappedClassification({
                     {(isUser || uParts.subgroups.length !== 0) && (
                       <Card variant="outlined">
                         <List disablePadding>
-                          {c12nDef.original_definition.subgroups.map((sgrp, idx) => {
-                            return (
+                          {c12nDef.original_definition.subgroups.map(
+                            (sgrp, idx) =>
                               (isUser || [sgrp.name, sgrp.short_name].some(sg => uParts.subgroups.includes(sg))) && (
                                 <ListItem
                                   key={idx}
@@ -367,8 +364,7 @@ function WrappedClassification({
                                   <ListItemText style={{ textAlign: 'center' }} primary={sgrp.name} />
                                 </ListItem>
                               )
-                            );
-                          })}
+                          )}
                         </List>
                       </Card>
                     )}

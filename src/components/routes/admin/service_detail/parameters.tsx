@@ -1,6 +1,6 @@
 import { Grid, Typography, useTheme } from '@material-ui/core';
 import 'moment/locale/fr';
-import React, { useCallback, useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ServiceDetail } from '../service_detail';
 import MultiTypeConfig from './multi_type_config';
@@ -104,13 +104,11 @@ const ServiceParams = ({ service, setService, setModified }: ServiceParamsProps)
           <Typography variant="subtitle2">{t('params.user.current')}</Typography>
         </Grid>
         {service.submission_params.length !== 0 ? (
-          service.submission_params.map((param, i) => {
-            return (
-              <Grid item key={i} xs={12}>
-                <MultiTypeParam param={param} id={i} onUpdate={onParamUpdate} onDelete={onParamDelete} />
-              </Grid>
-            );
-          })
+          service.submission_params.map((param, i) => (
+            <Grid item key={i} xs={12}>
+              <MultiTypeParam param={param} id={i} onUpdate={onParamUpdate} onDelete={onParamDelete} />
+            </Grid>
+          ))
         ) : (
           <Grid item xs={12}>
             <Typography variant="caption" color="textSecondary">
@@ -132,17 +130,15 @@ const ServiceParams = ({ service, setService, setModified }: ServiceParamsProps)
           <Typography variant="subtitle2">{t('params.config.current')}</Typography>
         </Grid>
         {Object.keys(service.config).length !== 0 ? (
-          Object.keys(service.config).map((name, i) => {
-            return (
-              <Grid item key={i} xs={12}>
-                <MultiTypeConfig
-                  config={{ name, value: service.config[name] }}
-                  onUpdate={onConfigAddUpdate}
-                  onDelete={onConfigDelete}
-                />
-              </Grid>
-            );
-          })
+          Object.keys(service.config).map((name, i) => (
+            <Grid item key={i} xs={12}>
+              <MultiTypeConfig
+                config={{ name, value: service.config[name] }}
+                onUpdate={onConfigAddUpdate}
+                onDelete={onConfigDelete}
+              />
+            </Grid>
+          ))
         ) : (
           <Grid item xs={12}>
             <Typography variant="caption" color="textSecondary">

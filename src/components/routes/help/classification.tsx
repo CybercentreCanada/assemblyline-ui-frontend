@@ -4,7 +4,6 @@ import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import NotFoundPage from 'components/routes/404_dl';
 import Classification from 'components/visual/Classification';
-import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 
 export default function HelpClassification() {
@@ -159,20 +158,16 @@ export default function HelpClassification() {
         </Typography>
         <ul>
           {c12nDef
-            ? c12nDef.original_definition.levels.map((lvl, idx) => {
-                return (
-                  <li key={idx}>
-                    <Classification size="tiny" type="text" c12n={lvl.name} format="long" /> :: {lvl.description}
-                  </li>
-                );
-              })
-            : [...Array(2)].map((_, i) => {
-                return (
-                  <li>
-                    <Skeleton />
-                  </li>
-                );
-              })}
+            ? c12nDef.original_definition.levels.map((lvl, idx) => (
+                <li key={idx}>
+                  <Classification size="tiny" type="text" c12n={lvl.name} format="long" /> :: {lvl.description}
+                </li>
+              ))
+            : [...Array(2)].map((_, i) => (
+                <li>
+                  <Skeleton />
+                </li>
+              ))}
         </ul>
       </div>
       <div style={{ paddingBottom: sp1 }}>
@@ -188,27 +183,23 @@ export default function HelpClassification() {
         <ul>
           {c12nDef ? (
             c12nDef.original_definition.required.length !== 0 ? (
-              c12nDef.original_definition.required.map((req, idx) => {
-                return (
-                  <li key={idx}>
-                    <div style={{ display: 'inline-block', fontWeight: 700 }}>{req.name}</div>
-                    {` :: ${req.description}`}
-                  </li>
-                );
-              })
+              c12nDef.original_definition.required.map((req, idx) => (
+                <li key={idx}>
+                  <div style={{ display: 'inline-block', fontWeight: 700 }}>{req.name}</div>
+                  {` :: ${req.description}`}
+                </li>
+              ))
             ) : (
               <Typography variant="body2" color="secondary">
                 {t('validation_required_none')}
               </Typography>
             )
           ) : (
-            [...Array(2)].map((_, i) => {
-              return (
-                <li>
-                  <Skeleton />
-                </li>
-              );
-            })
+            [...Array(2)].map((_, i) => (
+              <li>
+                <Skeleton />
+              </li>
+            ))
           )}
         </ul>
       </div>
@@ -225,27 +216,23 @@ export default function HelpClassification() {
         <ul>
           {c12nDef ? (
             c12nDef.original_definition.groups.length !== 0 ? (
-              c12nDef.original_definition.groups.map((grp, idx) => {
-                return (
-                  <li key={idx}>
-                    <div style={{ display: 'inline-block', fontWeight: 700 }}>{grp.name}</div>
-                    {` :: ${grp.description}`}
-                  </li>
-                );
-              })
+              c12nDef.original_definition.groups.map((grp, idx) => (
+                <li key={idx}>
+                  <div style={{ display: 'inline-block', fontWeight: 700 }}>{grp.name}</div>
+                  {` :: ${grp.description}`}
+                </li>
+              ))
             ) : (
               <Typography variant="body2" color="secondary">
                 {t('validation_groups_none')}
               </Typography>
             )
           ) : (
-            [...Array(2)].map((_, i) => {
-              return (
-                <li>
-                  <Skeleton />
-                </li>
-              );
-            })
+            [...Array(2)].map((_, i) => (
+              <li>
+                <Skeleton />
+              </li>
+            ))
           )}
         </ul>
         <Typography variant="subtitle2" gutterBottom color="error">
@@ -265,27 +252,23 @@ export default function HelpClassification() {
         <ul>
           {c12nDef ? (
             c12nDef.original_definition.subgroups.length !== 0 ? (
-              c12nDef.original_definition.subgroups.map((sgrp, idx) => {
-                return (
-                  <li key={idx}>
-                    <div style={{ display: 'inline-block', fontWeight: 700 }}>{sgrp.name}</div>
-                    {` :: ${sgrp.description}`}
-                  </li>
-                );
-              })
+              c12nDef.original_definition.subgroups.map((sgrp, idx) => (
+                <li key={idx}>
+                  <div style={{ display: 'inline-block', fontWeight: 700 }}>{sgrp.name}</div>
+                  {` :: ${sgrp.description}`}
+                </li>
+              ))
             ) : (
               <Typography variant="body2" color="secondary">
                 {t('validation_subgroups_none')}
               </Typography>
             )
           ) : (
-            [...Array(2)].map((_, i) => {
-              return (
-                <li>
-                  <Skeleton />
-                </li>
-              );
-            })
+            [...Array(2)].map((_, i) => (
+              <li>
+                <Skeleton />
+              </li>
+            ))
           )}
         </ul>
         <Typography variant="subtitle2" gutterBottom color="error">

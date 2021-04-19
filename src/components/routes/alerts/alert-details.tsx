@@ -45,9 +45,7 @@ type AlertDetailsProps = {
   alert?: AlertItem;
 };
 
-const SkeletonInline = () => {
-  return <Skeleton style={{ display: 'inline-block', width: '10rem' }} />;
-};
+const SkeletonInline = () => <Skeleton style={{ display: 'inline-block', width: '10rem' }} />;
 
 const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
   const { t } = useTranslation('alerts');

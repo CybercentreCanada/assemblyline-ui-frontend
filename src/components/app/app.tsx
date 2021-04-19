@@ -62,17 +62,13 @@ const MyApp = () => {
     };
 
     fetch('/api/v4/user/whoami/', requestOptions)
-      .then(res => {
-        return res.json();
-      })
-      .catch(() => {
-        return {
-          api_error_message: t('api.unreachable'),
-          api_response: '',
-          api_server_version: '4.0.0',
-          api_status_code: 400
-        };
-      })
+      .then(res => res.json())
+      .catch(() => ({
+        api_error_message: t('api.unreachable'),
+        api_response: '',
+        api_server_version: '4.0.0',
+        api_status_code: 400
+      }))
       .then(api_data => {
         // eslint-disable-next-line no-prototype-builtins
         if (api_data === undefined || !api_data.hasOwnProperty('api_response')) {

@@ -17,7 +17,7 @@ import useAppLayout from 'commons/components/hooks/useAppLayout';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import CustomChip from 'components/visual/CustomChip';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const Toc: ContentWithTOCItemDef[] = [
@@ -92,8 +92,8 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const useParagraphStyles = autoHide => {
-  return makeStyles(theme => ({
+const useParagraphStyles = autoHide =>
+  makeStyles(theme => ({
     paragraph: {
       marginTop: theme.spacing(autoHide ? 0 : -8),
       paddingTop: theme.spacing(autoHide ? 4 : 12),
@@ -102,7 +102,6 @@ const useParagraphStyles = autoHide => {
       }
     }
   }))();
-};
 
 function Title({ children }) {
   const { autoHideAppbar, currentLayout } = useAppLayout();
@@ -116,9 +115,7 @@ function Title({ children }) {
         paddingTop: theme.spacing(autoHide ? 4 : 12)
       }}
     >
-      {useMemo(() => {
-        return children;
-      }, [children])}
+      {useMemo(() => children, [children])}
     </div>
   );
 }
@@ -128,9 +125,7 @@ function Paragraph({ id, children }) {
   const classes = useParagraphStyles(autoHideAppbar && currentLayout !== 'top');
   return (
     <div id={id} className={classes.paragraph}>
-      {useMemo(() => {
-        return children;
-      }, [children])}
+      {useMemo(() => children, [children])}
     </div>
   );
 }
@@ -241,67 +236,64 @@ export default function Search() {
           </ul>
         </Paragraph>
 
-        {Object.keys(indexes).map(idx => {
-          return (
-            <Paragraph id={`fields.idx_${idx}`} key={idx}>
-              <Typography variant="h6" gutterBottom>
-                {t(`fields.idx_${idx}`)}
-              </Typography>
-              <Table size="small">
-                <TableHead>
-                  <TableRow>
-                    <StyledTableCell>{t('fields.table.name')}</StyledTableCell>
-                    <StyledTableCell>{t('fields.table.type')}</StyledTableCell>
-                    <StyledTableCell>{t('fields.table.attrib')}</StyledTableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {Object.keys(indexes[idx]).map(field => {
-                    return (
-                      indexes[idx][field].indexed && (
-                        <TableRow hover key={field}>
-                          <StyledTableCell width="50%" style={{ wordBreak: 'break-word' }}>
-                            {field}
-                          </StyledTableCell>
-                          <StyledTableCell>{indexes[idx][field].type}</StyledTableCell>
-                          <StyledTableCell>
-                            {indexes[idx][field].stored && (
-                              <CustomChip
-                                color="info"
-                                size="tiny"
-                                type="rounded"
-                                label={t('fields.att.stored')}
-                                // tooltip={t('fields.att.stored.tooltip')}
-                              />
-                            )}
-                            {indexes[idx][field].list && (
-                              <CustomChip
-                                color="warning"
-                                size="tiny"
-                                type="rounded"
-                                label={t('fields.att.list')}
-                                // tooltip={t('fields.att.list.tooltip')}
-                              />
-                            )}
-                            {indexes[idx][field].default && (
-                              <CustomChip
-                                color="primary"
-                                size="tiny"
-                                type="rounded"
-                                label={t('fields.att.default')}
-                                // tooltip={t('fields.att.default.tooltip')}
-                              />
-                            )}
-                          </StyledTableCell>
-                        </TableRow>
-                      )
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </Paragraph>
-          );
-        })}
+        {Object.keys(indexes).map(idx => (
+          <Paragraph id={`fields.idx_${idx}`} key={idx}>
+            <Typography variant="h6" gutterBottom>
+              {t(`fields.idx_${idx}`)}
+            </Typography>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <StyledTableCell>{t('fields.table.name')}</StyledTableCell>
+                  <StyledTableCell>{t('fields.table.type')}</StyledTableCell>
+                  <StyledTableCell>{t('fields.table.attrib')}</StyledTableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {Object.keys(indexes[idx]).map(
+                  field =>
+                    indexes[idx][field].indexed && (
+                      <TableRow hover key={field}>
+                        <StyledTableCell width="50%" style={{ wordBreak: 'break-word' }}>
+                          {field}
+                        </StyledTableCell>
+                        <StyledTableCell>{indexes[idx][field].type}</StyledTableCell>
+                        <StyledTableCell>
+                          {indexes[idx][field].stored && (
+                            <CustomChip
+                              color="info"
+                              size="tiny"
+                              type="rounded"
+                              label={t('fields.att.stored')}
+                              // tooltip={t('fields.att.stored.tooltip')}
+                            />
+                          )}
+                          {indexes[idx][field].list && (
+                            <CustomChip
+                              color="warning"
+                              size="tiny"
+                              type="rounded"
+                              label={t('fields.att.list')}
+                              // tooltip={t('fields.att.list.tooltip')}
+                            />
+                          )}
+                          {indexes[idx][field].default && (
+                            <CustomChip
+                              color="primary"
+                              size="tiny"
+                              type="rounded"
+                              label={t('fields.att.default')}
+                              // tooltip={t('fields.att.default.tooltip')}
+                            />
+                          )}
+                        </StyledTableCell>
+                      </TableRow>
+                    )
+                )}
+              </TableBody>
+            </Table>
+          </Paragraph>
+        ))}
 
         <Paragraph id="wildcard">
           <Typography variant="h5">{t('wildcard')}</Typography>

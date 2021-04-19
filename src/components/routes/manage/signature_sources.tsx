@@ -347,33 +347,31 @@ const WrappedSourceDetail = ({ service, base, close, reload }) => {
           <Grid item xs={12}>
             <div className={classes.label}>{t('headers')}</div>
           </Grid>
-          {source.headers.map((header, id) => {
-            return (
-              <Grid key={id} item xs={12}>
-                <Grid container spacing={1} alignItems="center">
-                  <Grid item xs={10} md={3}>
-                    <div className={classes.label}>{header.name}</div>
-                  </Grid>
-                  <Grid item xs={10} md={8}>
-                    <TextField size="small" value={header.value} fullWidth variant="outlined" />
-                  </Grid>
-                  <Grid item xs={2} md={1} style={{ textAlign: 'end' }}>
-                    <IconButton
-                      style={{
-                        color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark,
-                        margin: '-4px 0'
-                      }}
-                      onClick={() => {
-                        removeHeader(id);
-                      }}
-                    >
-                      <RemoveCircleOutlineOutlinedIcon />
-                    </IconButton>
-                  </Grid>
+          {source.headers.map((header, id) => (
+            <Grid key={id} item xs={12}>
+              <Grid container spacing={1} alignItems="center">
+                <Grid item xs={10} md={3}>
+                  <div className={classes.label}>{header.name}</div>
+                </Grid>
+                <Grid item xs={10} md={8}>
+                  <TextField size="small" value={header.value} fullWidth variant="outlined" />
+                </Grid>
+                <Grid item xs={2} md={1} style={{ textAlign: 'end' }}>
+                  <IconButton
+                    style={{
+                      color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark,
+                      margin: '-4px 0'
+                    }}
+                    onClick={() => {
+                      removeHeader(id);
+                    }}
+                  >
+                    <RemoveCircleOutlineOutlinedIcon />
+                  </IconButton>
                 </Grid>
               </Grid>
-            );
-          })}
+            </Grid>
+          ))}
           <Grid item xs={12}>
             <Grid container spacing={1}>
               <Grid item xs={10} md={3}>
@@ -542,13 +540,11 @@ export const SourceCard = ({ source, onClick }) => {
         {source.headers && source.headers.length !== 0 && (
           <div>
             <div className={classes.label}>{`${t('headers')}:`}&nbsp;</div>
-            {source.headers.map((item, id) => {
-              return (
-                <div key={id} className={classes.mono} style={{ paddingLeft: '2rem' }}>
-                  {`${item.name} = ${item.value}`}
-                </div>
-              );
-            })}
+            {source.headers.map((item, id) => (
+              <div key={id} className={classes.mono} style={{ paddingLeft: '2rem' }}>
+                {`${item.name} = ${item.value}`}
+              </div>
+            ))}
           </div>
         )}
       </Card>
@@ -568,8 +564,8 @@ const ServiceDetail = ({ service, sources, reload }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return useMemo(() => {
-    return (
+  return useMemo(
+    () => (
       <div style={{ paddingTop: theme.spacing(2) }}>
         <Grid container>
           <Grid item xs={10} style={{ alignSelf: 'center' }}>
@@ -601,9 +597,9 @@ const ServiceDetail = ({ service, sources, reload }) => {
         <Collapse in={open} timeout="auto">
           <div>
             {sources.length !== 0 ? (
-              sources.map((source, id) => {
-                return <SourceCard key={id} source={source} onClick={() => openDrawer(service, source)} />;
-              })
+              sources.map((source, id) => (
+                <SourceCard key={id} source={source} onClick={() => openDrawer(service, source)} />
+              ))
             ) : (
               <Typography variant="subtitle1" color="textSecondary" style={{ marginTop: theme.spacing(1) }}>
                 {t('no_sources')}
@@ -612,8 +608,9 @@ const ServiceDetail = ({ service, sources, reload }) => {
           </div>
         </Collapse>
       </div>
-    );
-  }, [classes.title, open, openDrawer, service, sources, t, theme]);
+    ),
+    [classes.title, open, openDrawer, service, sources, t, theme]
+  );
 };
 
 export default function SignatureSources() {
@@ -650,20 +647,18 @@ export default function SignatureSources() {
         </div>
 
         {sources
-          ? Object.keys(sources).map((key, id) => {
-              return <ServiceDetail key={id} service={key} sources={sources[key]} reload={reload} />;
-            })
-          : [...Array(2)].map((item, i) => {
-              return (
-                <div key={i} style={{ marginTop: theme.spacing(2) }}>
-                  <Typography variant="h6" style={{ marginTop: theme.spacing(0.5), marginBottom: theme.spacing(0.5) }}>
-                    <Skeleton />
-                  </Typography>
-                  <Divider />
-                  <Skeleton variant="rect" height="6rem" style={{ marginTop: theme.spacing(2), borderRadius: '4px' }} />
-                </div>
-              );
-            })}
+          ? Object.keys(sources).map((key, id) => (
+              <ServiceDetail key={id} service={key} sources={sources[key]} reload={reload} />
+            ))
+          : [...Array(2)].map((item, i) => (
+              <div key={i} style={{ marginTop: theme.spacing(2) }}>
+                <Typography variant="h6" style={{ marginTop: theme.spacing(0.5), marginBottom: theme.spacing(0.5) }}>
+                  <Skeleton />
+                </Typography>
+                <Divider />
+                <Skeleton variant="rect" height="6rem" style={{ marginTop: theme.spacing(2), borderRadius: '4px' }} />
+              </div>
+            ))}
       </div>
     </PageFullWidth>
   ) : (

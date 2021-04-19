@@ -10,7 +10,6 @@ import {
   useTheme
 } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(() =>
