@@ -4,14 +4,13 @@ import useAppLayout from 'commons/components/hooks/useAppLayout';
 import ThemeSelection from 'commons/components/layout/topnav/ThemeSelection';
 import React, { useState } from 'react';
 
-const useStyles = () => {
-  return makeStyles(theme => ({
+const useStyles = () =>
+  makeStyles(theme => ({
     popper: {
       zIndex: theme.zIndex.drawer + 2,
       minWidth: '280px'
     }
   }))();
-};
 
 const ThemeSelectionIcon = () => {
   const theme = useTheme();

@@ -47,16 +47,16 @@ function SiteMapProvider(props: SiteMapProviderProps) {
     );
   }, [isUserReady]);
 
-  useEffect(() => {
+  useEffect(() =>
     // The return callback will ensure the event handler deregisters when component
     //  is unmounted.  Failure to do this will result in an event handler
     //  being registered each time this component renders.
-    return history.listen(location => {
+    history.listen(location => {
       const _matchedRoute = getRoute(location.pathname, contextProps.routes);
       const _breadcrumbs = appendRoute(breadcrumbs, _matchedRoute);
       setBreadcrumbs(_breadcrumbs);
-    });
-  });
+    })
+  );
 
   return <SiteMapContext.Provider value={{ breadcrumbs, ...contextProps }}>{children}</SiteMapContext.Provider>;
 }

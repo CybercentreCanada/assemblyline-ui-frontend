@@ -1,8 +1,8 @@
 import { makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
 import React from 'react';
 
-const useStyles = (w, mxw, ta) => {
-  return makeStyles(theme => ({
+const useStyles = (w, mxw, ta) =>
+  makeStyles(theme => ({
     page: {
       textAlign: ta,
       margin: '0 auto auto auto',
@@ -13,7 +13,6 @@ const useStyles = (w, mxw, ta) => {
       }
     }
   }))();
-};
 
 type PageCenterProps = {
   children: React.ReactNode;
