@@ -341,8 +341,8 @@ export default function SubmissionDetail() {
   };
 
   const getParsedErrors = errorList => {
-    const relevantErrors = errors => {
-      return errors.filter(error => {
+    const relevantErrors = errors =>
+      errors.filter(error => {
         let eID = error.substr(65, error.length);
 
         if (eID.indexOf('.e') !== -1) {
@@ -351,7 +351,6 @@ export default function SubmissionDetail() {
 
         return ['20', '21', '12', '10', '11'].indexOf(eID) === -1;
       });
-    };
     const futileErrors = errors => {
       const out = {
         depth: [],
@@ -403,12 +402,10 @@ export default function SubmissionDetail() {
     };
   };
 
-  const parseSubmissionErrors = currentSubmission => {
-    return {
-      ...currentSubmission,
-      parsed_errors: getParsedErrors(currentSubmission.errors)
-    };
-  };
+  const parseSubmissionErrors = currentSubmission => ({
+    ...currentSubmission,
+    parsed_errors: getParsedErrors(currentSubmission.errors)
+  });
 
   const resetLiveMode = useCallback(() => {
     if (socket) {
@@ -635,11 +632,12 @@ export default function SubmissionDetail() {
     setOutstanding(null);
   };
 
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       if (loadInterval) clearInterval(loadInterval);
-    };
-  }, [loadInterval]);
+    },
+    [loadInterval]
+  );
 
   useEffect(() => {
     if (socket) {
@@ -784,18 +782,16 @@ export default function SubmissionDetail() {
                   <b>{t('outstanding.files')}</b>
                 </Grid>
               </Grid>
-              {Object.keys(outstanding).map(service => {
-                return (
-                  <Grid key={service} container>
-                    <Grid item xs={6}>
-                      <b>{service}</b>
-                    </Grid>
-                    <Grid item xs={6}>
-                      {outstanding[service]}
-                    </Grid>
+              {Object.keys(outstanding).map(service => (
+                <Grid key={service} container>
+                  <Grid item xs={6}>
+                    <b>{service}</b>
                   </Grid>
-                );
-              })}
+                  <Grid item xs={6}>
+                    {outstanding[service]}
+                  </Grid>
+                </Grid>
+              ))}
             </Alert>
           ) : (
             <Alert
@@ -987,13 +983,12 @@ export default function SubmissionDetail() {
 
         {summary &&
           Object.keys(summary.tags).length !== 0 &&
-          Object.keys(summary.tags).map((tag_group, group_idx) => {
-            return (
+          Object.keys(summary.tags).map(
+            (tag_group, group_idx) =>
               Object.keys(summary.tags[tag_group]).length !== 0 && (
                 <TagSection key={group_idx} tag_group={tag_group} tags={summary.tags[tag_group]} />
               )
-            );
-          })}
+          )}
 
         {submission && submission.state === 'completed' && Object.keys(submission.errors).length !== 0 && (
           <ErrorSection sid={id} parsed_errors={submission.parsed_errors} />

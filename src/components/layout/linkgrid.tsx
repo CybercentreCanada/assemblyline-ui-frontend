@@ -18,20 +18,18 @@ export default function LinkGrid({ items }: LinkGridProps) {
   const padding = theme.spacing(10);
   return (
     <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-around' }}>
-      {items.map((e, i) => {
-        return (
-          <Button key={i} component={Link} to={e.route}>
-            <div style={{ height: '300px', width: '300px', padding, textAlign: 'center', color }}>
-              {e.icon ? (
-                React.cloneElement(e.icon, { style: { fontSize: '8rem' } }, null)
-              ) : (
-                <LinkIcon style={{ fontSize: '8rem' }} />
-              )}
-              <span style={{ fontSize: 'medium' }}>{e.name || e.text}</span>
-            </div>
-          </Button>
-        );
-      })}
+      {items.map((e, i) => (
+        <Button key={i} component={Link} to={e.route}>
+          <div style={{ height: '300px', width: '300px', padding, textAlign: 'center', color }}>
+            {e.icon ? (
+              React.cloneElement(e.icon, { style: { fontSize: '8rem' } }, null)
+            ) : (
+              <LinkIcon style={{ fontSize: '8rem' }} />
+            )}
+            <span style={{ fontSize: 'medium' }}>{e.name || e.text}</span>
+          </div>
+        </Button>
+      ))}
     </div>
   );
 }

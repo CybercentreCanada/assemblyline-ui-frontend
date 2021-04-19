@@ -14,8 +14,8 @@ type FileDropperProps = {
 export default function FileDropper({ file, setFile, disabled }: FileDropperProps) {
   const { t } = useTranslation(['submit']);
   const { acceptedFiles, getRootProps, getInputProps, isDragActive } = useDropzone({ disabled });
-  const useStyles = ctrlDisabled => {
-    return makeStyles(theme => ({
+  const useStyles = ctrlDisabled =>
+    makeStyles(theme => ({
       drop_zone: {
         flex: '1',
         display: 'flex',
@@ -40,7 +40,6 @@ export default function FileDropper({ file, setFile, disabled }: FileDropperProp
         color: theme.palette.text.disabled
       }
     }))();
-  };
   const classes = useStyles(disabled);
 
   useEffect(() => {

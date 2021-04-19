@@ -805,9 +805,7 @@ const AlerterCard = React.memo(WrappedAlerterCard);
 const ScalerResourcesCard = React.memo(WrappedScalerResourcesCard);
 const ServiceCard = React.memo(WrappedServiceCard);
 
-const basicReducer = (state, newState) => {
-  return { ...state, ...newState };
-};
+const basicReducer = (state, newState) => ({ ...state, ...newState });
 
 const serviceReducer = (state, serviceState) => {
   const { type: hbType, hb } = serviceState;

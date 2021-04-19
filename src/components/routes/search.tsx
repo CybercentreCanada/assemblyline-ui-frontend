@@ -154,9 +154,7 @@ function Search({ index }: SearchProps) {
   useEffect(() => {
     // On index change we need to update the search suggestion
     setSearchSuggestion([
-      ...Object.keys(indexes[index || id] || {}).filter(name => {
-        return indexes[index || id][name].indexed;
-      }),
+      ...Object.keys(indexes[index || id] || {}).filter(name => indexes[index || id][name].indexed),
       ...DEFAULT_SUGGESTION
     ]);
   }, [index, id, indexes]);
@@ -211,13 +209,9 @@ function Search({ index }: SearchProps) {
     // eslint-disable-next-line
   }, [query]);
 
-  const TabSpacer = props => {
-    return <div style={{ flexGrow: 1 }} />;
-  };
+  const TabSpacer = props => <div style={{ flexGrow: 1 }} />;
 
-  const SpecialTab = ({ children, ...otherProps }) => {
-    return children;
-  };
+  const SpecialTab = ({ children, ...otherProps }) => children;
 
   return (
     <PageFullWidth margin={4}>

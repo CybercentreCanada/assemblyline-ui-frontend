@@ -63,9 +63,7 @@ const useTreeItemStyles = makeStyles((theme: Theme) => ({
   }
 }));
 
-const TextBody = ({ body }) => {
-  return <div style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{body}</div>;
-};
+const TextBody = ({ body }) => <div style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{body}</div>;
 
 const MemDumpBody = ({ body }) => {
   const theme = useTheme();
@@ -87,34 +85,32 @@ const MemDumpBody = ({ body }) => {
   );
 };
 
-const KVBody = ({ body }) => {
-  return (
-    <table cellSpacing={0}>
-      <tbody>
-        {Object.keys(body).map((key, id) => {
-          let value = body[key];
-          if (value instanceof Array) {
-            value = value.join(' | ');
-          } else if (value === true) {
-            value = 'true';
-          } else if (value === false) {
-            value = 'false';
-          } else if (typeof value === 'object') {
-            value = JSON.stringify(value);
-          }
-          return (
-            <tr key={id}>
-              <td style={{ paddingRight: '16px', wordBreak: 'normal' }}>
-                <TitleKey title={key} />
-              </td>
-              <td style={{ wordBreak: 'break-word' }}>{value}</td>
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
-  );
-};
+const KVBody = ({ body }) => (
+  <table cellSpacing={0}>
+    <tbody>
+      {Object.keys(body).map((key, id) => {
+        let value = body[key];
+        if (value instanceof Array) {
+          value = value.join(' | ');
+        } else if (value === true) {
+          value = 'true';
+        } else if (value === false) {
+          value = 'false';
+        } else if (typeof value === 'object') {
+          value = JSON.stringify(value);
+        }
+        return (
+          <tr key={id}>
+            <td style={{ paddingRight: '16px', wordBreak: 'normal' }}>
+              <TitleKey title={key} />
+            </td>
+            <td style={{ wordBreak: 'break-word' }}>{value}</td>
+          </tr>
+        );
+      })}
+    </tbody>
+  </table>
+);
 
 const GraphBody = ({ body }) => {
   const theme = useTheme();
@@ -128,19 +124,17 @@ const GraphBody = ({ body }) => {
         <text y={22} x={20} fill={theme.palette.text.primary}>{`: ${body.data.domain[0]}`}</text>
         <rect y={10} x={80} width={15} height={15} fill={colorRange[1]} />
         <text y={22} x={100} fill={theme.palette.text.primary}>{`: ${body.data.domain[1]}`}</text>
-        {body.data.values.map((value, i) => {
-          return (
-            <rect
-              key={i}
-              y={30}
-              x={`${i * itemWidthPct}%`}
-              width={`${itemWidthPct}%`}
-              height={40}
-              stroke={colorScale(value)}
-              fill={colorScale(value)}
-            />
-          );
-        })}
+        {body.data.values.map((value, i) => (
+          <rect
+            key={i}
+            y={30}
+            x={`${i * itemWidthPct}%`}
+            width={`${itemWidthPct}%`}
+            height={40}
+            stroke={colorScale(value)}
+            fill={colorScale(value)}
+          />
+        ))}
       </svg>
     );
   }
@@ -164,13 +158,11 @@ const URLBody = ({ body }) => {
         marginBlockEnd: '0.25rem'
       }}
     >
-      {arr.map((item, id) => {
-        return (
-          <li key={id}>
-            <Link href={item.url}>{item.name ? item.name : item.url}</Link>
-          </li>
-        );
-      })}
+      {arr.map((item, id) => (
+        <li key={id}>
+          <Link href={item.url}>{item.name ? item.name : item.url}</Link>
+        </li>
+      ))}
     </ul>
   );
 };
@@ -291,11 +283,8 @@ const ProcessTreeItem = ({ process }) => {
   );
 };
 
-const ProcessTreeItemList = ({ processes }) => {
-  return processes.map((process, id) => {
-    return <ProcessTreeItem key={id} process={process} />;
-  });
-};
+const ProcessTreeItemList = ({ processes }) =>
+  processes.map((process, id) => <ProcessTreeItem key={id} process={process} />);
 
 const ProcessTreeBody = ({ body }) => {
   try {
@@ -400,35 +389,31 @@ const TblBody = ({ body }) => {
         <StyledTable stickyHeader size="small">
           <TableHead>
             <TableRow>
-              {headers.map((th, id) => {
-                return (
-                  <StyledTableCell key={id}>
-                    <TitleKey title={th} />
-                  </StyledTableCell>
-                );
-              })}
+              {headers.map((th, id) => (
+                <StyledTableCell key={id}>
+                  <TitleKey title={th} />
+                </StyledTableCell>
+              ))}
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.map((row, id) => {
-              return (
-                <StyledTableRow key={id}>
-                  {headers.map((key, hid) => {
-                    let value = row[key];
-                    if (value instanceof Array) {
-                      value = value.join(' | ');
-                    } else if (value === true) {
-                      value = 'true';
-                    } else if (value === false) {
-                      value = 'false';
-                    } else if (typeof value === 'object' && value !== null && value !== undefined) {
-                      value = <KVBody body={value} />;
-                    }
-                    return <StyledTableCell key={hid}>{value}</StyledTableCell>;
-                  })}
-                </StyledTableRow>
-              );
-            })}
+            {data.map((row, id) => (
+              <StyledTableRow key={id}>
+                {headers.map((key, hid) => {
+                  let value = row[key];
+                  if (value instanceof Array) {
+                    value = value.join(' | ');
+                  } else if (value === true) {
+                    value = 'true';
+                  } else if (value === false) {
+                    value = 'false';
+                  } else if (typeof value === 'object' && value !== null && value !== undefined) {
+                    value = <KVBody body={value} />;
+                  }
+                  return <StyledTableCell key={hid}>{value}</StyledTableCell>;
+                })}
+              </StyledTableRow>
+            ))}
           </TableBody>
         </StyledTable>
       </TableContainer>
@@ -585,56 +570,48 @@ const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sec
                     />
                   )}
                   {section.heuristic &&
-                    section.heuristic.attack.map((attack, idx) => {
-                      return (
-                        <Attack
-                          key={idx}
-                          text={attack.pattern}
-                          score={section.heuristic.score}
-                          show_type
-                          highlight_key={getKey('attack_pattern', attack.attack_id)}
-                        />
-                      );
-                    })}
+                    section.heuristic.attack.map((attack, idx) => (
+                      <Attack
+                        key={idx}
+                        text={attack.pattern}
+                        score={section.heuristic.score}
+                        show_type
+                        highlight_key={getKey('attack_pattern', attack.attack_id)}
+                      />
+                    ))}
                   {section.heuristic &&
-                    section.heuristic.signature.map((signature, idx) => {
-                      return (
-                        <Heuristic
-                          key={idx}
-                          text={signature.name}
-                          score={section.heuristic.score}
-                          signature
-                          show_type
-                          highlight_key={getKey('heuristic.signature', signature.name)}
-                        />
-                      );
-                    })}
+                    section.heuristic.signature.map((signature, idx) => (
+                      <Heuristic
+                        key={idx}
+                        text={signature.name}
+                        score={section.heuristic.score}
+                        signature
+                        show_type
+                        highlight_key={getKey('heuristic.signature', signature.name)}
+                      />
+                    ))}
                   {Array.isArray(section.tags) &&
-                    section.tags.map((tag, idx) => {
-                      return (
-                        <Tag
-                          key={idx}
-                          type={tag.type}
-                          value={tag.value}
-                          short_type={tag.short_type}
-                          score={section.heuristic ? section.heuristic.score : 0}
-                          highlight_key={getKey(tag.type, tag.value)}
-                        />
-                      );
-                    })}
+                    section.tags.map((tag, idx) => (
+                      <Tag
+                        key={idx}
+                        type={tag.type}
+                        value={tag.value}
+                        short_type={tag.short_type}
+                        score={section.heuristic ? section.heuristic.score : 0}
+                        highlight_key={getKey(tag.type, tag.value)}
+                      />
+                    ))}
                 </div>
                 <div>
-                  {sub_sections.map(item => {
-                    return (
-                      <ResultSection
-                        key={item.id}
-                        section_list={section_list}
-                        id={item.id}
-                        sub_sections={item.children}
-                        indent={indent + 1}
-                      />
-                    );
-                  })}
+                  {sub_sections.map(item => (
+                    <ResultSection
+                      key={item.id}
+                      section_list={section_list}
+                      id={item.id}
+                      sub_sections={item.children}
+                      indent={indent + 1}
+                    />
+                  ))}
                 </div>
               </>
             ),

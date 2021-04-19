@@ -643,85 +643,76 @@ function Submit() {
                   <Typography variant="h6" gutterBottom>
                     {t('options.service_spec')}
                   </Typography>
-                  {settings.service_spec.map((service, idx) => {
-                    return (
+                  {settings.service_spec.map(
+                    (service, idx) =>
                       isSelected(service.name) && (
                         <div key={idx} style={{ paddingTop: sp1, paddingBottom: sp1 }}>
                           <Typography variant="subtitle1" gutterBottom>
                             {service.name}
                           </Typography>
-                          {service.params.map((param, pidx) => {
-                            return (
-                              <div key={pidx} style={{ paddingBottom: sp1 }}>
-                                {param.type === 'bool' ? (
-                                  <div style={{ paddingLeft: sp1 }}>
-                                    <FormControlLabel
-                                      control={
-                                        <Checkbox
-                                          size="small"
-                                          checked={param.value === 'true' || param.value === true}
-                                          name="label"
-                                          onChange={() => setParam(idx, pidx, !param.value)}
-                                        />
-                                      }
-                                      label={
-                                        <Typography variant="body2" style={{ textTransform: 'capitalize' }}>
-                                          {param.name.replace(/_/g, ' ')}
-                                        </Typography>
-                                      }
-                                      className={classes.item}
-                                    />
-                                  </div>
-                                ) : (
-                                  <>
-                                    <div>
-                                      <Typography
-                                        variant="caption"
-                                        gutterBottom
-                                        style={{ textTransform: 'capitalize' }}
-                                      >
+                          {service.params.map((param, pidx) => (
+                            <div key={pidx} style={{ paddingBottom: sp1 }}>
+                              {param.type === 'bool' ? (
+                                <div style={{ paddingLeft: sp1 }}>
+                                  <FormControlLabel
+                                    control={
+                                      <Checkbox
+                                        size="small"
+                                        checked={param.value === 'true' || param.value === true}
+                                        name="label"
+                                        onChange={() => setParam(idx, pidx, !param.value)}
+                                      />
+                                    }
+                                    label={
+                                      <Typography variant="body2" style={{ textTransform: 'capitalize' }}>
                                         {param.name.replace(/_/g, ' ')}
                                       </Typography>
-                                    </div>
-                                    {param.type === 'list' ? (
-                                      <Select
-                                        margin="dense"
-                                        value={param.value}
-                                        variant="outlined"
-                                        onChange={event => setParam(idx, pidx, event.target.value)}
-                                        fullWidth
-                                      >
-                                        {param.list ? (
-                                          param.list.map((item, i) => {
-                                            return (
-                                              <MenuItem key={i} value={item}>
-                                                {item}
-                                              </MenuItem>
-                                            );
-                                          })
-                                        ) : (
-                                          <MenuItem value="" />
-                                        )}
-                                      </Select>
-                                    ) : (
-                                      <TextField
-                                        variant="outlined"
-                                        type={param.type === 'int' ? 'number' : 'text'}
-                                        size="small"
-                                        fullWidth
-                                        defaultValue={param.value}
-                                        onChange={event => setParamAsync(idx, pidx, event.target.value)}
-                                      />
-                                    )}
-                                  </>
-                                )}
-                              </div>
-                            );
-                          })}
+                                    }
+                                    className={classes.item}
+                                  />
+                                </div>
+                              ) : (
+                                <>
+                                  <div>
+                                    <Typography variant="caption" gutterBottom style={{ textTransform: 'capitalize' }}>
+                                      {param.name.replace(/_/g, ' ')}
+                                    </Typography>
+                                  </div>
+                                  {param.type === 'list' ? (
+                                    <Select
+                                      margin="dense"
+                                      value={param.value}
+                                      variant="outlined"
+                                      onChange={event => setParam(idx, pidx, event.target.value)}
+                                      fullWidth
+                                    >
+                                      {param.list ? (
+                                        param.list.map((item, i) => (
+                                          <MenuItem key={i} value={item}>
+                                            {item}
+                                          </MenuItem>
+                                        ))
+                                      ) : (
+                                        <MenuItem value="" />
+                                      )}
+                                    </Select>
+                                  ) : (
+                                    <TextField
+                                      variant="outlined"
+                                      type={param.type === 'int' ? 'number' : 'text'}
+                                      size="small"
+                                      fullWidth
+                                      defaultValue={param.value}
+                                      onChange={event => setParamAsync(idx, pidx, event.target.value)}
+                                    />
+                                  )}
+                                </>
+                              )}
+                            </div>
+                          ))}
                         </div>
                       )
-                    );
-                  })}
+                  )}
                 </div>
               ) : null}
             </Grid>

@@ -112,25 +112,21 @@ const WrappedContainerCard = ({ container, name, volumes, onChange }: ContainerC
           {container.environment && container.environment.length !== 0 && (
             <Grid item xs={12}>
               <div className={classes.label}>{`${t('container.card.env')}:`}&nbsp;</div>
-              {container.environment.map((env, id) => {
-                return (
-                  <div key={id} className={classes.mono} style={{ paddingLeft: '2rem' }}>
-                    {`${env.name} = ${env.value}`}
-                  </div>
-                );
-              })}
+              {container.environment.map((env, id) => (
+                <div key={id} className={classes.mono} style={{ paddingLeft: '2rem' }}>
+                  {`${env.name} = ${env.value}`}
+                </div>
+              ))}
             </Grid>
           )}
           {volumes && Object.keys(volumes).length !== 0 && (
             <Grid item xs={12}>
               <div className={classes.label}>{`${t('container.card.volumes')}:`}&nbsp;</div>
-              {Object.keys(volumes).map((vol, id) => {
-                return (
-                  <div key={id} className={classes.mono} style={{ paddingLeft: '2rem' }}>
-                    {`${vol} = ${volumes[vol].mount_path} (${volumes[vol].capacity})`}
-                  </div>
-                );
-              })}
+              {Object.keys(volumes).map((vol, id) => (
+                <div key={id} className={classes.mono} style={{ paddingLeft: '2rem' }}>
+                  {`${vol} = ${volumes[vol].mount_path} (${volumes[vol].capacity})`}
+                </div>
+              ))}
             </Grid>
           )}
         </Grid>

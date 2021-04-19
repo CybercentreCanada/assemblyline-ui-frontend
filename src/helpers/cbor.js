@@ -43,6 +43,7 @@
 /* eslint-disable func-names */
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable @typescript-eslint/no-throw-literal */
+/* eslint-disable @typescript-eslint/no-shadow */
 
 (function (global, undefined) {
   'use strict';

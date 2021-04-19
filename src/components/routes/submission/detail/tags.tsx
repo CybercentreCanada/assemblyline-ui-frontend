@@ -41,28 +41,18 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ tag_group, tags }) => {
         {useMemo(
           () => (
             <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
-              {Object.keys(tags).map((tag_type, i) => {
-                return (
-                  <Grid container key={i}>
-                    <Grid className={classes.meta_key} item xs={12} sm={3} lg={2}>
-                      <span style={{ fontWeight: 500 }}>{tag_type}</span>
-                    </Grid>
-                    <Grid item xs={12} sm={9} lg={10}>
-                      {tags[tag_type].map(([value, lvl], idx) => {
-                        return (
-                          <Tag
-                            key={idx}
-                            value={value}
-                            type={tag_type}
-                            lvl={lvl}
-                            highlight_key={getKey(tag_type, value)}
-                          />
-                        );
-                      })}
-                    </Grid>
+              {Object.keys(tags).map((tag_type, i) => (
+                <Grid container key={i}>
+                  <Grid className={classes.meta_key} item xs={12} sm={3} lg={2}>
+                    <span style={{ fontWeight: 500 }}>{tag_type}</span>
                   </Grid>
-                );
-              })}
+                  <Grid item xs={12} sm={9} lg={10}>
+                    {tags[tag_type].map(([value, lvl], idx) => (
+                      <Tag key={idx} value={value} type={tag_type} lvl={lvl} highlight_key={getKey(tag_type, value)} />
+                    ))}
+                  </Grid>
+                </Grid>
+              ))}
             </div>
           ),
           // eslint-disable-next-line react-hooks/exhaustive-deps

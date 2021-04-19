@@ -33,13 +33,7 @@ const WrappedExtractedSection: React.FC<ExtractedSectionProps> = ({ extracted, s
         <h3>{t('extracted')}</h3>
       </Box>
       <Collapse in={open} timeout="auto">
-        {useMemo(
-          () =>
-            extracted.map((file, id) => {
-              return <ExtractedFile key={id} file={file} sid={sid} />;
-            }),
-          [extracted, sid]
-        )}
+        {useMemo(() => extracted.map((file, id) => <ExtractedFile key={id} file={file} sid={sid} />), [extracted, sid])}
       </Collapse>
     </div>
   );

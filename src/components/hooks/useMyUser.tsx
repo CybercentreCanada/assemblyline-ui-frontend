@@ -129,38 +129,30 @@ export default function useMyUser(): CustomUserContextProps {
       ...c12n,
       original_definition: {
         ...c12n.original_definition,
-        groups: c12n.original_definition.groups.map(grp => {
-          return {
-            ...grp,
-            aliases: grp.aliases.map(val => val.toUpperCase()),
-            name: grp.name.toLocaleUpperCase(),
-            short_name: grp.short_name.toLocaleUpperCase()
-          };
-        }),
-        levels: c12n.original_definition.levels.map(lvl => {
-          return {
-            ...lvl,
-            aliases: lvl.aliases.map(val => val.toUpperCase()),
-            name: lvl.name.toLocaleUpperCase(),
-            short_name: lvl.short_name.toLocaleUpperCase()
-          };
-        }),
-        subgroups: c12n.original_definition.subgroups.map(sg => {
-          return {
-            ...sg,
-            aliases: sg.aliases.map(val => val.toUpperCase()),
-            name: sg.name.toLocaleUpperCase(),
-            short_name: sg.short_name.toLocaleUpperCase()
-          };
-        }),
-        required: c12n.original_definition.required.map(req => {
-          return {
-            ...req,
-            aliases: req.aliases.map(val => val.toUpperCase()),
-            name: req.name.toLocaleUpperCase(),
-            short_name: req.short_name.toLocaleUpperCase()
-          };
-        })
+        groups: c12n.original_definition.groups.map(grp => ({
+          ...grp,
+          aliases: grp.aliases.map(val => val.toUpperCase()),
+          name: grp.name.toLocaleUpperCase(),
+          short_name: grp.short_name.toLocaleUpperCase()
+        })),
+        levels: c12n.original_definition.levels.map(lvl => ({
+          ...lvl,
+          aliases: lvl.aliases.map(val => val.toUpperCase()),
+          name: lvl.name.toLocaleUpperCase(),
+          short_name: lvl.short_name.toLocaleUpperCase()
+        })),
+        subgroups: c12n.original_definition.subgroups.map(sg => ({
+          ...sg,
+          aliases: sg.aliases.map(val => val.toUpperCase()),
+          name: sg.name.toLocaleUpperCase(),
+          short_name: sg.short_name.toLocaleUpperCase()
+        })),
+        required: c12n.original_definition.required.map(req => ({
+          ...req,
+          aliases: req.aliases.map(val => val.toUpperCase()),
+          name: req.name.toLocaleUpperCase(),
+          short_name: req.short_name.toLocaleUpperCase()
+        }))
       }
     };
     setC12nDef(upperC12n);

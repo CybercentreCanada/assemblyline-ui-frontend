@@ -78,9 +78,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
 
   //
-  const getInputEl = () => {
-    return element.current.querySelector('input');
-  };
+  const getInputEl = () => element.current.querySelector('input');
 
   // handler[onchange]: textfield change handler.
   // track value of filter..
@@ -143,8 +141,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
             style={{ marginLeft: theme.spacing(upMD ? 0 : 0.5), marginRight: theme.spacing(upMD ? 1 : 0.5) }}
           />
         )}
-        {buttons.map((b, i) => {
-          return b.tooltip ? (
+        {buttons.map((b, i) =>
+          b.tooltip ? (
             <Tooltip key={`searchbar-button-${i}`} title={b.tooltip}>
               <IconButton
                 {...b.props}
@@ -165,8 +163,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
             >
               {b.icon}
             </IconButton>
-          );
-        })}
+          )
+        )}
         {extras}
       </Box>
       {searching && (

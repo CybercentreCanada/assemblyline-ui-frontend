@@ -46,23 +46,21 @@ const WrappedChildrenSection: React.FC<ChildrenSectionProps> = ({ childrens }) =
         {useMemo(
           () => (
             <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
-              {childrens.map((fileItem, i) => {
-                return (
-                  <Box
-                    key={i}
-                    className={classes.clickable}
-                    onClick={() => {
-                      history.push(`/file/detail/${fileItem.sha256}?name=${encodeURI(fileItem.name)}`);
-                    }}
-                    style={{ wordBreak: 'break-word' }}
-                  >
-                    <span>{fileItem.name}</span>
-                    <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>
-                      {` :: ${fileItem.sha256}`}
-                    </span>
-                  </Box>
-                );
-              })}
+              {childrens.map((fileItem, i) => (
+                <Box
+                  key={i}
+                  className={classes.clickable}
+                  onClick={() => {
+                    history.push(`/file/detail/${fileItem.sha256}?name=${encodeURI(fileItem.name)}`);
+                  }}
+                  style={{ wordBreak: 'break-word' }}
+                >
+                  <span>{fileItem.name}</span>
+                  <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>
+                    {` :: ${fileItem.sha256}`}
+                  </span>
+                </Box>
+              ))}
             </div>
           ),
           // eslint-disable-next-line react-hooks/exhaustive-deps

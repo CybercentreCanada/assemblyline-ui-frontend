@@ -12,9 +12,7 @@ export default function Help() {
   for (const item of layout.leftnav.elements) {
     if (item.type === 'group' && item.element.id === 'help') {
       // eslint-disable-next-line @typescript-eslint/dot-notation
-      items = item.element['items'].filter(obj => {
-        return validateProps(obj.userPropValidators);
-      });
+      items = item.element['items'].filter(obj => validateProps(obj.userPropValidators));
     }
   }
 

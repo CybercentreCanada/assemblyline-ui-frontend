@@ -58,8 +58,8 @@ const WrappedErrorSection: React.FC<ErrorSectionProps> = ({ sid, parsed_errors }
           () => (
             <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
               <div>
-                {Object.keys(parsed_errors.aggregated).map((errorType, i) => {
-                  return (
+                {Object.keys(parsed_errors.aggregated).map(
+                  (errorType, i) =>
                     parsed_errors.aggregated[errorType].length > 0 && (
                       <div
                         key={i}
@@ -73,35 +73,32 @@ const WrappedErrorSection: React.FC<ErrorSectionProps> = ({ sid, parsed_errors }
                         )}: ${parsed_errors.aggregated[errorType].join(' | ')}`}
                       </div>
                     )
-                  );
-                })}
-                {parsed_errors.listed.map((error, i) => {
-                  return (
-                    <div
-                      key={i}
-                      style={{
-                        color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                      }}
-                    >
-                      <strong>{getServiceFromKey(error)}</strong>
-                      {t('errors.listed')}
-                      <strong>
-                        <MaterialLink
-                          component={Link}
-                          style={{
-                            color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                          }}
-                          to={`/submission/detail/${sid}/${getHashFromKey(error)}`}
-                        >
-                          {getHashFromKey(error)}
-                        </MaterialLink>
-                      </strong>
-                      <span style={{ fontSize: 'smaller' }}>
-                        &nbsp;::&nbsp;{t(`errors.type.${getErrorTypeFromKey(error)}`)}
-                      </span>
-                    </div>
-                  );
-                })}
+                )}
+                {parsed_errors.listed.map((error, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                    }}
+                  >
+                    <strong>{getServiceFromKey(error)}</strong>
+                    {t('errors.listed')}
+                    <strong>
+                      <MaterialLink
+                        component={Link}
+                        style={{
+                          color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                        }}
+                        to={`/submission/detail/${sid}/${getHashFromKey(error)}`}
+                      >
+                        {getHashFromKey(error)}
+                      </MaterialLink>
+                    </strong>
+                    <span style={{ fontSize: 'smaller' }}>
+                      &nbsp;::&nbsp;{t(`errors.type.${getErrorTypeFromKey(error)}`)}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           ),
