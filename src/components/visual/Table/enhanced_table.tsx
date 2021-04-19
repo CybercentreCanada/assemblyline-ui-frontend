@@ -353,8 +353,8 @@ const WrappedEnhancedTableBody: React.FC<EnhancedTableBodyProps> = ({
             <DivTableBody>
               {stableSort(rows, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row, index) => {
-                  return linkField && linkPrefix ? (
+                .map((row, index) =>
+                  linkField && linkPrefix ? (
                     <LinkRow
                       hover
                       component={Link}
@@ -370,42 +370,38 @@ const WrappedEnhancedTableBody: React.FC<EnhancedTableBodyProps> = ({
                       tabIndex={-1}
                       key={index}
                     >
-                      {cells.map(head => {
-                        return (
-                          <DivTableCell
-                            key={head.id}
-                            className={clsx(!dense ? classes.comfortable : null, head.break ? classes.break : null)}
-                            align={head.numeric ? 'right' : 'inherit'}
-                          >
-                            {head.id === 'classification' ? (
-                              <Classification c12n={row[head.id]} type="text" />
-                            ) : (
-                              `${row[head.id]}`
-                            )}
-                          </DivTableCell>
-                        );
-                      })}
+                      {cells.map(head => (
+                        <DivTableCell
+                          key={head.id}
+                          className={clsx(!dense ? classes.comfortable : null, head.break ? classes.break : null)}
+                          align={head.numeric ? 'right' : 'inherit'}
+                        >
+                          {head.id === 'classification' ? (
+                            <Classification c12n={row[head.id]} type="text" />
+                          ) : (
+                            `${row[head.id]}`
+                          )}
+                        </DivTableCell>
+                      ))}
                     </LinkRow>
                   ) : (
                     <DivTableRow hover onClick={onClick ? () => onClick(row) : null} tabIndex={-1} key={index}>
-                      {cells.map(head => {
-                        return (
-                          <DivTableCell
-                            key={head.id}
-                            className={clsx(!dense ? classes.comfortable : null, head.break ? classes.break : null)}
-                            align={head.numeric ? 'right' : 'inherit'}
-                          >
-                            {head.id === 'classification' ? (
-                              <Classification c12n={row[head.id]} type="text" />
-                            ) : (
-                              `${row[head.id]}`
-                            )}
-                          </DivTableCell>
-                        );
-                      })}
+                      {cells.map(head => (
+                        <DivTableCell
+                          key={head.id}
+                          className={clsx(!dense ? classes.comfortable : null, head.break ? classes.break : null)}
+                          align={head.numeric ? 'right' : 'inherit'}
+                        >
+                          {head.id === 'classification' ? (
+                            <Classification c12n={row[head.id]} type="text" />
+                          ) : (
+                            `${row[head.id]}`
+                          )}
+                        </DivTableCell>
+                      ))}
                     </DivTableRow>
-                  );
-                })}
+                  )
+                )}
               {showEmpty && emptyRows > 0 && (
                 <DivTableRow style={{ height: (dense ? 45 : 53) * emptyRows }}>
                   <TableCell colSpan={cells.length} />

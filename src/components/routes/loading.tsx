@@ -1,6 +1,5 @@
 import { CircularProgress, useTheme } from '@material-ui/core';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
-import React from 'react';
 
 function LoadingScreen() {
   const theme = useTheme();

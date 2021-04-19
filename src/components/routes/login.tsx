@@ -22,7 +22,7 @@ import { SignUp } from 'components/routes/login/signup';
 import { UserPassLogin } from 'components/routes/login/userpass';
 import TextDivider from 'components/visual/TextDivider';
 import { getProvider } from 'helpers/utils';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
 

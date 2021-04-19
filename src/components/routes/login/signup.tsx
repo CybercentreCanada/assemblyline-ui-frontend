@@ -1,6 +1,6 @@
 import { Button, CircularProgress, createStyles, makeStyles, TextField, Typography } from '@material-ui/core';
 import useMyAPI from 'components/hooks/useMyAPI';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(() =>

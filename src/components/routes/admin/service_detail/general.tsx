@@ -13,7 +13,6 @@ import { Skeleton } from '@material-ui/lab';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
 import 'moment/locale/fr';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ServiceConstants, ServiceDetail } from '../service_detail';
 

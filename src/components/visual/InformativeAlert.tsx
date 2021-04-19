@@ -1,7 +1,6 @@
 import { createStyles, fade, Theme, withStyles } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
 import 'moment/locale/fr';
-import React from 'react';
 
 const StyledAlert = withStyles((theme: Theme) =>
   createStyles({

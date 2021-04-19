@@ -2,7 +2,6 @@ import { useTheme } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 import LinkOffIcon from '@material-ui/icons/LinkOff';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 const NotFoundPage = () => {

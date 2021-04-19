@@ -5,7 +5,7 @@ import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import EnhancedTable, { Cell } from 'components/visual/Table/enhanced_table';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import SignatureDetail from '../manage/signature_detail';
 

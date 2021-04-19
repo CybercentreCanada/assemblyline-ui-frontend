@@ -20,7 +20,6 @@ import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
 import SimCardOutlinedIcon from '@material-ui/icons/SimCardOutlined';
 import SupervisorAccountOutlinedIcon from '@material-ui/icons/SupervisorAccountOutlined';
 import { AppLayoutProps } from 'commons/components/layout/LayoutProvider';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 

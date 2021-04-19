@@ -1,6 +1,6 @@
 import { Grid, Typography, useTheme } from '@material-ui/core';
 import 'moment/locale/fr';
-import React, { useCallback, useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ServiceDetail } from '../service_detail';
 import MultiTypeConfig from './multi_type_config';

@@ -15,7 +15,7 @@ import SearchPager from 'components/visual/SearchPager';
 import WorkflowTable from 'components/visual/SearchResult/workflow';
 import { searchResultsDisplay } from 'helpers/utils';
 import 'moment/locale/fr';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
 import WorkflowDetail from './workflow_detail';

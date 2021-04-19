@@ -15,7 +15,7 @@ import SearchPager from 'components/visual/SearchPager';
 import SignaturesTable from 'components/visual/SearchResult/signatures';
 import { searchResultsDisplay } from 'helpers/utils';
 import 'moment/locale/fr';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
 import SignatureDetail from './signature_detail';

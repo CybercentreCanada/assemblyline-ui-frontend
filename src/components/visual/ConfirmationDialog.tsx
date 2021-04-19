@@ -1,5 +1,4 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
-import React from 'react';
 
 const ConfirmationDialog = ({ open, handleClose, handleAccept, title, cancelText, acceptText, text = null }) => (
   <Dialog
