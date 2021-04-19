@@ -1,3 +1,4 @@
+import Flow from '@flowjs/flow.js';
 import {
   Button,
   Checkbox,
@@ -26,7 +27,6 @@ import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import Empty from 'components/visual/Empty';
 import FileDropper from 'components/visual/FileDropper';
-import Flow from 'helpers/flow';
 import generateUUID from 'helpers/uuid';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -301,7 +301,7 @@ function Submit() {
     setFlow(
       new Flow({
         target: '/api/v4/ui/flowjs/',
-        permanentErrors: [412, 404, 500],
+        permanentErrors: [412, 500, 501],
         maxChunkRetries: 1,
         chunkRetryInterval: 500,
         simultaneousUploads: 4
