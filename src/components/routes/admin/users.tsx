@@ -73,13 +73,6 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-type SearchResults = {
-  items: any[];
-  offset: number;
-  rows: number;
-  total: number;
-};
-
 type User = {
   avatar: string;
   email: string;

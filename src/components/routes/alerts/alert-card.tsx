@@ -388,7 +388,7 @@ const AlertCardItem: React.FC<AlertCardItemProps> = ({ item, setItem = null }) =
               size="small"
               variant="outlined"
               style={{ fontSize: '80%', marginBottom: '4px', marginRight: '4px' }}
-              onClick={() => alert('NOT DONE YET')}
+              onClick={() => null}
             >
               {t('btn.workflow')}
             </Button>
