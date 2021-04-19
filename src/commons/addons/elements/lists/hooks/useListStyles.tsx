@@ -164,7 +164,7 @@ const useListItemStyles = makeStyles(theme => ({
     top: theme.spacing(1),
     right: theme.spacing(1),
     display: 'none',
-    backgroundColor: 'inherit',
+    backgroundColor: 'transparent',
     '& button': {
       marginRight: theme.spacing(1),
       boxShadow: theme.shadows[2]
