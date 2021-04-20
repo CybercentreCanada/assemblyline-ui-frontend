@@ -90,6 +90,7 @@ function Submit() {
     flow.off('complete');
     flow.off('fileError');
     flow.off('progress');
+    setUUID(generateUUID());
   };
 
   const validateServiceSelection = cbType => {
@@ -176,7 +177,7 @@ function Submit() {
       apiCall({
         url: `/api/v4/ui/start/${uuid}/`,
         method: 'POST',
-        body: settings,
+        body: { ...settings, filename: file.path },
         onSuccess: api_data => {
           showSuccessMessage(`${t('submit.success')} ${api_data.api_response.sid}`);
           setTimeout(() => {
