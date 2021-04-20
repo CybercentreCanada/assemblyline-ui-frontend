@@ -83,7 +83,7 @@ export default function Tos() {
         {tos ? (
           <>
             <div style={{ textAlign: 'left' }}>
-              <Markdown components={{ link: Link }}>{tos}</Markdown>
+              <Markdown components={{ a: Link }}>{tos}</Markdown>
             </div>
             {currentUser.agrees_with_tos ? (
               <div style={{ marginTop: sp6 }}>
