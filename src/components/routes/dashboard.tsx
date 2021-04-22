@@ -99,8 +99,6 @@ const WrappedIngestCard = ({ ingester }) => {
       setError(t('ingest.error.bytes'));
     } else if (ingester.ingest > 100000) {
       setError(t('ingest.error.queue'));
-    } else if (busyness >= 0.8) {
-      setError(t('ingest.error.busy'));
     } else if ((timer !== null && ingester.initialized) || (timer === null && !ingester.initialized)) {
       if (error !== null) setError(null);
       if (timer !== null) clearTimeout(timer);
@@ -306,8 +304,6 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
       setError(t('dispatcher.error.queue.result'));
     } else if (dispatcher.initialized && commandQueue >= dispatcher.inflight.max / 10) {
       setError(t('dispatcher.error.queue.command'));
-    } else if (dispatcher.initialized && busyness >= 0.8) {
-      setError(t('dispatcher.error.busy'));
     } else if (dispatcher.inflight.outstanding / dispatcher.inflight.max > 0.9) {
       setError(t('dispatcher.error.inflight'));
     } else if ((timer !== null && dispatcher.initialized) || (timer === null && !dispatcher.initialized)) {
