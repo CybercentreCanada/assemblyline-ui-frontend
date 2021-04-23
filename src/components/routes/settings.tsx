@@ -44,7 +44,7 @@ function Settings({ width }: SettingsProps) {
   const [settings, setSettings] = useState(null);
   const [modified, setModified] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
-  const { user: currentUser, c12nDef } = useALContext();
+  const { user: currentUser, c12nDef, configuration } = useALContext();
   const { showSuccessMessage } = useMySnackbar();
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
@@ -223,7 +223,10 @@ function Settings({ width }: SettingsProps) {
                       variant="outlined"
                       onChange={event => setTTL(event.target.value)}
                       value={settings.ttl}
-                      inputProps={{ min: 0, max: 365 }}
+                      inputProps={{
+                        min: configuration.submission.max_dtl !== 0 ? 1 : 0,
+                        max: configuration.submission.max_dtl !== 0 ? configuration.submission.max_dtl : 365
+                      }}
                     />
                   </>
                 ),
