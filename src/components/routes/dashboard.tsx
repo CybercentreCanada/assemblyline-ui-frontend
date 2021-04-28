@@ -749,7 +749,7 @@ const WrappedServiceCard = ({ service, max_inflight }) => {
   const classes = useStyles();
 
   useEffect(() => {
-    if (service.total !== 0 && service.instances === 0) {
+    if (service.scaler.target !== 0 && service.instances === 0) {
       setError(t('service.error.none'));
     } else if (service.metrics.fail_nonrecoverable > 0) {
       setError(t('service.error.fail_nonrecoverable'));
@@ -773,7 +773,7 @@ const WrappedServiceCard = ({ service, max_inflight }) => {
             </Tooltip>
           )}
           <div className={classes.title}>
-            {`${service.service_name} :: ${service.instances} / ${service.scaler.target || '-'}`}
+            {`${service.service_name} :: ${service.instances} / ${service.scaler.target}`}
           </div>
         </Grid>
         <Grid item xs={6}>
