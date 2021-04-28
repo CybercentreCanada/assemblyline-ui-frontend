@@ -33,6 +33,7 @@
   "outstanding.title": "Vous attendez la fin du traitement des services suivants:",
   "params.deep_scan": "Analyse approfondie",
   "params.description": "Description",
+  "params.dtl": "Jours à vivre",
   "params.groups": "Groupes",
   "params.ignore_cache": "Ignorer la cache",
   "params.ignore_dynamic_recursion_prevention": "Ignorer la prévention de récursivité dynamique",

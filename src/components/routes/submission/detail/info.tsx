@@ -99,6 +99,17 @@ const WrappedInfoSection: React.FC<InfoSectionProps> = ({ submission }) => {
                   {submission ? <Verdict score={submission.max_score} /> : <Skeleton />}
                 </Grid>
 
+                {submission && submission.params.ttl !== 0 && (
+                  <>
+                    <Grid item xs={4} sm={3} lg={2}>
+                      <span style={{ fontWeight: 500 }}>{t('params.dtl')}</span>
+                    </Grid>
+                    <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                      {submission.params.ttl}
+                    </Grid>
+                  </>
+                )}
+
                 <Grid item xs={4} sm={3} lg={2}>
                   <span style={{ fontWeight: 500 }}>{t('times.submitted')}</span>
                 </Grid>
@@ -124,7 +135,7 @@ const WrappedInfoSection: React.FC<InfoSectionProps> = ({ submission }) => {
             </div>
           ),
           // eslint-disable-next-line react-hooks/exhaustive-deps
-          [submission]
+          [submission, t]
         )}
       </Collapse>
     </div>
