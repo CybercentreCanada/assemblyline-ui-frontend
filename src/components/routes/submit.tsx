@@ -620,14 +620,21 @@ function Submit() {
                 </div>
                 <div style={{ paddingTop: sp1, paddingBottom: sp1 }}>
                   <Typography variant="caption" color="textSecondary" gutterBottom>
-                    {t('options.submission.ttl')}
+                    {`${t('options.submission.ttl')} (${
+                      configuration.submission.max_dtl !== 0
+                        ? `${t('options.submission.ttl.max')}: ${configuration.submission.max_dtl}`
+                        : t('options.submission.ttl.forever')
+                    })`}
                   </Typography>
                   {settings ? (
                     <TextField
                       id="ttl"
                       size="small"
                       type="number"
-                      inputProps={{ min: 0, max: 365 }}
+                      inputProps={{
+                        min: configuration.submission.max_dtl !== 0 ? 1 : 0,
+                        max: configuration.submission.max_dtl !== 0 ? configuration.submission.max_dtl : 365
+                      }}
                       defaultValue={settings.ttl}
                       onChange={event => setSettingAsyncValue('ttl', event.target.value)}
                       variant="outlined"

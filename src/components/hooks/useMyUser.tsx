@@ -49,6 +49,10 @@ export type ConfigurationDefinition = {
     allow_extended_apikeys: boolean;
     allow_security_tokens: boolean;
   };
+  submission: {
+    dtl: number;
+    max_dtl: number;
+  };
   system: {
     organisation: string;
     type: string;
