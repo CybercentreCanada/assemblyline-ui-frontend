@@ -33,6 +33,7 @@
   "outstanding.title": "You are waiting on the following services to finish processing:",
   "params.deep_scan": "Deep Scan",
   "params.description": "Description",
+  "params.dtl": "Days to live",
   "params.groups": "Groups",
   "params.ignore_cache": "Ignore Cache",
   "params.ignore_dynamic_recursion_prevention": "Ignore Dynamic Recursion Prevention",
