@@ -231,16 +231,16 @@ function Search({ index }: SearchProps) {
             buttons={[
               {
                 icon:
-                  query && query.get('use_archive') === 'false' ? (
-                    <FolderOutlinedIcon fontSize={downSM ? 'small' : 'default'} />
-                  ) : (
+                  query && query.get('use_archive') === 'true' ? (
                     <FolderIcon fontSize={downSM ? 'small' : 'default'} />
+                  ) : (
+                    <FolderOutlinedIcon fontSize={downSM ? 'small' : 'default'} />
                   ),
                 tooltip:
-                  query && query.get('use_archive') === 'false' ? t('use_archive.turn_on') : t('use_archive.turn_off'),
+                  query && query.get('use_archive') === 'true' ? t('use_archive.turn_off') : t('use_archive.turn_on'),
                 props: {
                   onClick: () => {
-                    query.set('use_archive', query.get('use_archive') === 'false');
+                    query.set('use_archive', !query.has('use_archive') ? 'true' : query.get('use_archive') === 'false');
                     history.push(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
                   }
                 }
