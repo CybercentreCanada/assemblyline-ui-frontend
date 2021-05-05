@@ -1,7 +1,7 @@
 {
   "alert": "Alerte",
   "available": "disponible",
-  "file": "Ficher",
+  "file": "Fichier",
   "focus_search": "Focus sur l'onglet sélectionné",
   "header.accepts": "Type de fichier",
   "header.attack_id": "IDs Att&ck",
@@ -11,7 +11,7 @@
   "header.created": "Temps de création",
   "header.description": "Description",
   "header.enabled": "Activé",
-  "header.filetype": "Type de fichers",
+  "header.filetype": "Type de fichiers",
   "header.hit_count": "Fois vue",
   "header.id": "ID",
   "header.last_hit": "Dernière fois",
