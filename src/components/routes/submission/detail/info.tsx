@@ -64,7 +64,7 @@ const WrappedInfoSection: React.FC<InfoSectionProps> = ({ submission }) => {
                   {submission ? submission.params.services.selected.join(' | ') : <Skeleton />}
                 </Grid>
 
-                {submission && submission.params.service_spec && (
+                {submission && Object.keys(submission.params.service_spec).length !== 0 && (
                   <>
                     <Grid item xs={4} sm={3} lg={2}>
                       <span style={{ fontWeight: 500 }}>{t('params.services.service_spec')}</span>
