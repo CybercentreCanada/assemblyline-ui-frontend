@@ -39,6 +39,7 @@
   "params.ignore_dynamic_recursion_prevention": "Ignorer la prévention de récursivité dynamique",
   "params.ignore_filtering": "Ignorer le filtrage",
   "params.services.selected": "Services sélectionnés",
+  "params.services.service_spec": "Paramètres de service",
   "params.submitter": "Soumis par",
   "report_view": "Afficher la vue du rapport",
   "resubmit": "Soumettre à nouveau la soumission actuelle",

@@ -64,6 +64,26 @@ const WrappedInfoSection: React.FC<InfoSectionProps> = ({ submission }) => {
                   {submission ? submission.params.services.selected.join(' | ') : <Skeleton />}
                 </Grid>
 
+                {submission && Object.keys(submission.params.service_spec).length !== 0 && (
+                  <>
+                    <Grid item xs={4} sm={3} lg={2}>
+                      <span style={{ fontWeight: 500 }}>{t('params.services.service_spec')}</span>
+                    </Grid>
+                    <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                      {Object.keys(submission.params.service_spec).map(service => (
+                        <div key={service}>
+                          <i>{service}</i>:
+                          {Object.keys(submission.params.service_spec[service]).map(service_var => (
+                            <div key={service_var} style={{ paddingLeft: '1.5rem' }}>
+                              {service_var} &rarr; {String(submission.params.service_spec[service][service_var])}
+                            </div>
+                          ))}
+                        </div>
+                      ))}
+                    </Grid>
+                  </>
+                )}
+
                 {['deep_scan', 'ignore_cache', 'ignore_dynamic_recursion_prevention', 'ignore_filtering'].map(
                   (k, i) => (
                     <div key={i} style={{ display: 'contents' }}>
