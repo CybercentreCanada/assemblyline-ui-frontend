@@ -76,7 +76,11 @@ const WrappedUsersTable: React.FC<UsersTableProps> = ({ userResults }) => {
                   {user.is_active ? <DoneIcon color="primary" /> : <ClearIcon color="error" />}
                 </DivTableCell>
                 <DivTableCell>
-                  {user.type.indexOf('admin') !== -1 ? <DoneIcon color="primary" /> : <ClearIcon color="error" />}
+                  {user.type && user.type.indexOf('admin') !== -1 ? (
+                    <DoneIcon color="primary" />
+                  ) : (
+                    <ClearIcon color="error" />
+                  )}
                 </DivTableCell>
               </LinkRow>
             ))}
