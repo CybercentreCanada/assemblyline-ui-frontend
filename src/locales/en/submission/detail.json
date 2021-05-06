@@ -39,6 +39,7 @@
   "params.ignore_dynamic_recursion_prevention": "Ignore Dynamic Recursion Prevention",
   "params.ignore_filtering": "Ignore Filtering",
   "params.services.selected": "Selected services",
+  "params.services.service_spec": "Service parameters",
   "params.submitter": "Submitted By",
   "report_view": "Show report view",
   "resubmit": "Resubmit current submission",
