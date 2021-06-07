@@ -100,7 +100,7 @@ const WhitelistDetail = ({ whitelist_id, close }: WhitelistDetailProps) => {
         if (id) {
           setTimeout(() => history.push('/manage/whitelist'), 1000);
         }
-        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadWhitelists')), 1000);
+        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadWhitelist')), 1000);
         close();
       }
     });
