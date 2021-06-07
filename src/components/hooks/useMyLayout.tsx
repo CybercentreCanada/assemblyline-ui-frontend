@@ -134,6 +134,13 @@ const useMyLayout = (): AppLayoutProps => {
             nested: true
           },
           {
+            id: 'manage.safelist',
+            text: t('drawer.manage.safelist'),
+            icon: <PlaylistAddCheckIcon />,
+            route: '/manage/safelist',
+            nested: true
+          },
+          {
             id: 'manage.signatures',
             text: t('drawer.manage.signatures'),
             icon: <FingerprintOutlinedIcon />,
@@ -149,13 +156,6 @@ const useMyLayout = (): AppLayoutProps => {
             ],
             icon: <CodeOutlinedIcon />,
             route: '/manage/sources',
-            nested: true
-          },
-          {
-            id: 'manage.safelist',
-            text: t('drawer.manage.safelist'),
-            icon: <PlaylistAddCheckIcon />,
-            route: '/manage/safelist',
             nested: true
           },
           {
