@@ -32,11 +32,11 @@
   "verdict.malicious": "Malveillant",
   "verdict.suspicious": "Suspect",
   "view_file": "Visionner le fichier",
-  "whitelist": "Ajouter un fichier à la liste blanche",
-  "whitelist.title": "Ajout à la liste blanche",
-  "whitelist.cancelText": "Annuler",
-  "whitelist.acceptText": "Oui, ajoutez-le !",
-  "whitelist.text": "Voulez-vous vraiment que le fichier actuel soit ajouté à la liste blanche ?",
-  "whitelist.input": "Raison d'ajout",
-  "whitelist.success": "Le hachage a été ajouté avec succès à la liste blanche"
+  "safelist": "Ajouter un fichier à la liste sûre",
+  "safelist.title": "Liste sûre",
+  "safelist.cancelText": "Annuler",
+  "safelist.acceptText": "Oui, ajoutez-le !",
+  "safelist.text": "Voulez-vous vraiment que le fichier actuel soit ajouté à la liste sûre ?",
+  "safelist.input": "Raison d'ajout",
+  "safelist.success": "Le hachage a été ajouté avec succès à la liste sûre"
 }

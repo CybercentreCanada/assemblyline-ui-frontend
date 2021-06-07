@@ -95,8 +95,8 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
 }) => {
   const { t } = useTranslation(['fileDetail']);
   const [file, setFile] = useState<File | null>(null);
-  const [whitelistDialog, setWhitelistDialog] = useState<boolean>(false);
-  const [whitelistReason, setWhitelistReason] = useState<string>('');
+  const [safelistDialog, setSafelistDialog] = useState<boolean>(false);
+  const [safelistReason, setSafelistReason] = useState<string>('');
   const apiCall = useMyAPI();
   const { c12nDef, user: currentUser } = useALContext();
   const theme = useTheme();
@@ -154,13 +154,13 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sha256]);
 
-  const prepareWhitelist = useCallback(() => {
-    setWhitelistReason('');
-    setWhitelistDialog(true);
+  const prepareSafelist = useCallback(() => {
+    setSafelistReason('');
+    setSafelistDialog(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sha256]);
 
-  const addToWhitelist = useCallback(() => {
+  const addToSafelist = useCallback(() => {
     const data = {
       fileinfo: {
         md5: file.file_info.md5,
@@ -169,19 +169,19 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
         size: file.file_info.size,
         type: file.file_info.type
       },
-      sources: [{ name: currentUser.username, type: 'user', reason: [whitelistReason] }]
+      sources: [{ name: currentUser.username, type: 'user', reason: [safelistReason] }]
     };
     apiCall({
-      url: `/api/v4/whitelist/${sha256}/`,
+      url: `/api/v4/safelist/${sha256}/`,
       method: 'PUT',
       body: data,
       onSuccess: api_data => {
-        setWhitelistDialog(false);
-        showSuccessMessage(t('whitelist.success'));
+        setSafelistDialog(false);
+        showSuccessMessage(t('safelist.success'));
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sha256, whitelistReason, file]);
+  }, [sha256, safelistReason, file]);
 
   useEffect(() => {
     setFile(null);
@@ -211,16 +211,16 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
   return (
     <div id="fileDetailTop" style={{ textAlign: 'left' }}>
       <InputDialog
-        open={whitelistDialog}
-        handleClose={() => setWhitelistDialog(false)}
-        handleAccept={addToWhitelist}
-        handleInputChange={event => setWhitelistReason(event.target.value)}
-        inputValue={whitelistReason}
-        title={t('whitelist.title')}
-        cancelText={t('whitelist.cancelText')}
-        acceptText={t('whitelist.acceptText')}
-        inputLabel={t('whitelist.input')}
-        text={t('whitelist.text')}
+        open={safelistDialog}
+        handleClose={() => setSafelistDialog(false)}
+        handleAccept={addToSafelist}
+        handleInputChange={event => setSafelistReason(event.target.value)}
+        inputValue={safelistReason}
+        title={t('safelist.title')}
+        cancelText={t('safelist.cancelText')}
+        acceptText={t('safelist.acceptText')}
+        inputLabel={t('safelist.input')}
+        text={t('safelist.text')}
       />
       {useMemo(
         () => (
@@ -270,8 +270,8 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                         <RotateLeftOutlinedIcon />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title={t('whitelist')}>
-                      <IconButton onClick={prepareWhitelist}>
+                    <Tooltip title={t('safelist')}>
+                      <IconButton onClick={prepareSafelist}>
                         <PlaylistAddCheckIcon />
                       </IconButton>
                     </Tooltip>

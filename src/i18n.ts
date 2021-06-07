@@ -22,11 +22,11 @@ import loginEN from 'locales/en/login.json';
 import logoutEN from 'locales/en/logout.json';
 import manageHeuristicsEN from 'locales/en/manage/heuristics.json';
 import manageHeuristicDetailEN from 'locales/en/manage/heuristic_detail.json';
+import manageSafelistEN from 'locales/en/manage/safelist.json';
+import manageSafelistDetailEN from 'locales/en/manage/safelist_detail.json';
 import manageSignaturesEN from 'locales/en/manage/signatures.json';
 import manageSignatureDetailEN from 'locales/en/manage/signature_detail.json';
 import manageSignatureSourcesEN from 'locales/en/manage/signature_sources.json';
-import manageWhitelistEN from 'locales/en/manage/whitelist.json';
-import manageWhitelistDetailEN from 'locales/en/manage/whitelist_detail.json';
 import manageWorkflowsEN from 'locales/en/manage/workflows.json';
 import manageWorkflowDetailEN from 'locales/en/manage/workflow_detail.json';
 import searchEN from 'locales/en/search.json';
@@ -62,11 +62,11 @@ import loginFR from 'locales/fr/login.json';
 import logoutFR from 'locales/fr/logout.json';
 import manageHeuristicsFR from 'locales/fr/manage/heuristics.json';
 import manageHeuristicDetailFR from 'locales/fr/manage/heuristic_detail.json';
+import manageSafelistFR from 'locales/fr/manage/safelist.json';
+import manageSafelistDetailFR from 'locales/fr/manage/safelist_detail.json';
 import manageSignaturesFR from 'locales/fr/manage/signatures.json';
 import manageSignatureDetailFR from 'locales/fr/manage/signature_detail.json';
 import manageSignatureSourcesFR from 'locales/fr/manage/signature_sources.json';
-import manageWhitelistFR from 'locales/fr/manage/whitelist.json';
-import manageWhitelistDetailFR from 'locales/fr/manage/whitelist_detail.json';
 import manageWorkflowsFR from 'locales/fr/manage/workflows.json';
 import manageWorkflowDetailFR from 'locales/fr/manage/workflow_detail.json';
 import searchFR from 'locales/fr/search.json';
@@ -109,8 +109,8 @@ const resources = {
     manageSignatureSources: manageSignatureSourcesEN,
     manageWorkflowDetail: manageWorkflowDetailEN,
     manageWorkflows: manageWorkflowsEN,
-    manageWhitelistDetail: manageWhitelistDetailEN,
-    manageWhitelist: manageWhitelistEN,
+    manageSafelistDetail: manageSafelistDetailEN,
+    manageSafelist: manageSafelistEN,
     search: searchEN,
     settings: settingsEN,
     statisticsHeuristics: statisticsHeuristicsEN,
@@ -151,8 +151,8 @@ const resources = {
     manageSignatureSources: manageSignatureSourcesFR,
     manageWorkflowDetail: manageWorkflowDetailFR,
     manageWorkflows: manageWorkflowsFR,
-    manageWhitelistDetail: manageWhitelistDetailFR,
-    manageWhitelist: manageWhitelistFR,
+    manageSafelistDetail: manageSafelistDetailFR,
+    manageSafelist: manageSafelistFR,
     search: searchFR,
     settings: settingsFR,
     statisticsHeuristics: statisticsHeuristicsFR,

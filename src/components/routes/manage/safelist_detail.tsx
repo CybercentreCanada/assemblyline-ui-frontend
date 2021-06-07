@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { useHistory, useParams } from 'react-router-dom';
 
-export type Whitelist = {
+export type Safelist = {
   added: string;
   classification: string;
   fileinfo: {
@@ -38,16 +38,16 @@ type ParamProps = {
   id: string;
 };
 
-type WhitelistDetailProps = {
-  whitelist_id?: string;
+type SafelistDetailProps = {
+  safelist_id?: string;
   close?: () => void;
 };
 
-const WhitelistDetail = ({ whitelist_id, close }: WhitelistDetailProps) => {
-  const { t, i18n } = useTranslation(['manageWhitelistDetail']);
+const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
+  const { t, i18n } = useTranslation(['manageSafelistDetail']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
-  const [whitelist, setWhitelist] = useState<Whitelist>(null);
+  const [safelist, setSafelist] = useState<Safelist>(null);
   const [histogram, setHistogram] = useState<any>(null);
   const [deleteDialog, setDeleteDialog] = useState(false);
   const { c12nDef } = useALContext();
@@ -56,18 +56,18 @@ const WhitelistDetail = ({ whitelist_id, close }: WhitelistDetailProps) => {
   const history = useHistory();
 
   useEffect(() => {
-    if (whitelist_id || id) {
+    if (safelist_id || id) {
       apiCall({
-        url: `/api/v4/whitelist/${whitelist_id || id}/`,
+        url: `/api/v4/safelist/${safelist_id || id}/`,
         onSuccess: api_data => {
-          setWhitelist(api_data.api_response);
+          setSafelist(api_data.api_response);
         }
       });
       apiCall({
         method: 'POST',
         url: '/api/v4/search/histogram/result/created/',
         body: {
-          query: `response.service_name:Whitelist AND id:${whitelist_id || id}*`,
+          query: `response.service_name:Safelist AND id:${safelist_id || id}*`,
           mincount: 0,
           start: 'now-30d/d',
           end: 'now+1d/d-1s',
@@ -78,7 +78,7 @@ const WhitelistDetail = ({ whitelist_id, close }: WhitelistDetailProps) => {
             labels: Object.keys(api_data.api_response).map((key: string) => key.replace('T00:00:00.000Z', '')),
             datasets: [
               {
-                label: whitelist_id || id,
+                label: safelist_id || id,
                 data: Object.values(api_data.api_response)
               }
             ]
@@ -88,19 +88,19 @@ const WhitelistDetail = ({ whitelist_id, close }: WhitelistDetailProps) => {
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [whitelist_id, id]);
+  }, [safelist_id, id]);
 
-  const removeWhitelist = () => {
+  const removeSafelist = () => {
     apiCall({
-      url: `/api/v4/whitelist/${whitelist_id || id}/`,
+      url: `/api/v4/safelist/${safelist_id || id}/`,
       method: 'DELETE',
       onSuccess: () => {
         setDeleteDialog(false);
         showSuccessMessage(t('delete.success'));
         if (id) {
-          setTimeout(() => history.push('/manage/whitelist'), 1000);
+          setTimeout(() => history.push('/manage/safelist'), 1000);
         }
-        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadWhitelist')), 1000);
+        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadSafelist')), 1000);
         close();
       }
     });
@@ -111,7 +111,7 @@ const WhitelistDetail = ({ whitelist_id, close }: WhitelistDetailProps) => {
       <ConfirmationDialog
         open={deleteDialog}
         handleClose={() => setDeleteDialog(false)}
-        handleAccept={removeWhitelist}
+        handleAccept={removeSafelist}
         title={t('delete.title')}
         cancelText={t('delete.cancelText')}
         acceptText={t('delete.acceptText')}
@@ -120,7 +120,7 @@ const WhitelistDetail = ({ whitelist_id, close }: WhitelistDetailProps) => {
 
       {c12nDef.enforce && (
         <div style={{ paddingBottom: theme.spacing(4) }}>
-          <Classification type="outlined" c12n={whitelist ? whitelist.classification : null} />
+          <Classification type="outlined" c12n={safelist ? safelist.classification : null} />
         </div>
       )}
       <div style={{ textAlign: 'left' }}>
@@ -129,12 +129,12 @@ const WhitelistDetail = ({ whitelist_id, close }: WhitelistDetailProps) => {
             <Grid item xs>
               <Typography variant="h4">{t('title')}</Typography>
               <Typography variant="caption">
-                {whitelist ? whitelist.fileinfo.sha256 : <Skeleton style={{ width: '10rem' }} />}
+                {safelist ? safelist.fileinfo.sha256 : <Skeleton style={{ width: '10rem' }} />}
               </Typography>
             </Grid>
-            {(whitelist_id || id) && (
+            {(safelist_id || id) && (
               <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
-                {whitelist ? (
+                {safelist ? (
                   <Tooltip title={t('remove')}>
                     <IconButton
                       style={{
@@ -167,8 +167,8 @@ const WhitelistDetail = ({ whitelist_id, close }: WhitelistDetailProps) => {
                 lg={10}
                 style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
               >
-                {whitelist ? (
-                  whitelist.fileinfo.md5 || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
+                {safelist ? (
+                  safelist.fileinfo.md5 || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
                 ) : (
                   <Skeleton />
                 )}
@@ -183,8 +183,8 @@ const WhitelistDetail = ({ whitelist_id, close }: WhitelistDetailProps) => {
                 lg={10}
                 style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
               >
-                {whitelist ? (
-                  whitelist.fileinfo.sha1 || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
+                {safelist ? (
+                  safelist.fileinfo.sha1 || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
                 ) : (
                   <Skeleton />
                 )}
@@ -199,10 +199,8 @@ const WhitelistDetail = ({ whitelist_id, close }: WhitelistDetailProps) => {
                 lg={10}
                 style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
               >
-                {whitelist ? (
-                  whitelist.fileinfo.sha256 || (
-                    <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
-                  )
+                {safelist ? (
+                  safelist.fileinfo.sha256 || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
                 ) : (
                   <Skeleton />
                 )}
@@ -212,11 +210,11 @@ const WhitelistDetail = ({ whitelist_id, close }: WhitelistDetailProps) => {
                 <span style={{ fontWeight: 500 }}>{t('size')}</span>
               </Grid>
               <Grid item xs={8} sm={9} lg={10}>
-                {whitelist ? (
-                  whitelist.fileinfo.size ? (
+                {safelist ? (
+                  safelist.fileinfo.size ? (
                     <span>
-                      {whitelist.fileinfo.size}
-                      <span style={{ fontWeight: 300 }}> ({bytesToSize(whitelist.fileinfo.size)})</span>
+                      {safelist.fileinfo.size}
+                      <span style={{ fontWeight: 300 }}> ({bytesToSize(safelist.fileinfo.size)})</span>
                     </span>
                   ) : (
                     <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
@@ -230,8 +228,8 @@ const WhitelistDetail = ({ whitelist_id, close }: WhitelistDetailProps) => {
                 <span style={{ fontWeight: 500 }}>{t('type')}</span>
               </Grid>
               <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
-                {whitelist ? (
-                  whitelist.fileinfo.type || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
+                {safelist ? (
+                  safelist.fileinfo.type || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
                 ) : (
                   <Skeleton />
                 )}
@@ -241,8 +239,8 @@ const WhitelistDetail = ({ whitelist_id, close }: WhitelistDetailProps) => {
           <Grid item xs={12}>
             <Typography variant="h6">{t('sources')}</Typography>
             <Divider />
-            {whitelist ? (
-              whitelist.sources.map(src => (
+            {safelist ? (
+              safelist.sources.map(src => (
                 <Grid key={src.name} container spacing={1}>
                   <Grid item xs={4} sm={3} lg={2}>
                     <span style={{ fontWeight: 500 }}>
@@ -268,11 +266,11 @@ const WhitelistDetail = ({ whitelist_id, close }: WhitelistDetailProps) => {
                 <span style={{ fontWeight: 500 }}>{t('timing.added')}</span>
               </Grid>
               <Grid item xs={8} sm={9} lg={10}>
-                {whitelist ? (
+                {safelist ? (
                   <div>
-                    <Moment format="YYYY-MM-DD">{whitelist.added}</Moment>&nbsp; (
+                    <Moment format="YYYY-MM-DD">{safelist.added}</Moment>&nbsp; (
                     <Moment fromNow locale={i18n.language}>
-                      {whitelist.added}
+                      {safelist.added}
                     </Moment>
                     )
                   </div>
@@ -284,11 +282,11 @@ const WhitelistDetail = ({ whitelist_id, close }: WhitelistDetailProps) => {
                 <span style={{ fontWeight: 500 }}>{t('timing.updated')}</span>
               </Grid>
               <Grid item xs={8} sm={9} lg={10}>
-                {whitelist ? (
+                {safelist ? (
                   <div>
-                    <Moment format="YYYY-MM-DD">{whitelist.updated}</Moment>&nbsp; (
+                    <Moment format="YYYY-MM-DD">{safelist.updated}</Moment>&nbsp; (
                     <Moment fromNow locale={i18n.language}>
-                      {whitelist.updated}
+                      {safelist.updated}
                     </Moment>
                     )
                   </div>
@@ -307,9 +305,9 @@ const WhitelistDetail = ({ whitelist_id, close }: WhitelistDetailProps) => {
   );
 };
 
-WhitelistDetail.defaultProps = {
-  whitelist_id: null,
+SafelistDetail.defaultProps = {
+  safelist_id: null,
   close: () => {}
 };
 
-export default WhitelistDetail;
+export default SafelistDetail;

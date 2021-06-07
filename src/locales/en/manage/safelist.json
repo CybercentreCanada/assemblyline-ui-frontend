@@ -1,11 +1,11 @@
 {
-  "filter": "Filter whitelisted hashes...",
+  "filter": "Filter safelisted hashes...",
   "filtered": "hash matching filter",
   "filtereds": "hashes matching filter",
   "searching": "Searching...",
-  "title": "Whitelist",
-  "total": "hash in whitelist",
-  "totals": "hashes in whitelist",
+  "title": "Safelist",
+  "total": "hash in safelist",
+  "totals": "hashes in safelist",
   "user": "Hashes added by users",
   "external": "Hashes from external sources"
 }

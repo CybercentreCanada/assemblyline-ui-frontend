@@ -241,9 +241,9 @@ const WrappedIngestCard = ({ ingester }) => {
             />
             <MetricCounter
               init={ingester.initialized}
-              value={ingester.metrics.whitelisted}
+              value={ingester.metrics.safelisted}
               title="W"
-              tooltip={t('throughput.whitelisted')}
+              tooltip={t('throughput.safelisted')}
             />
             <MetricCounter
               init={ingester.initialized}
@@ -944,7 +944,7 @@ const DEFAULT_INGESTER = {
     submissions_completed: 0,
     submissions_ingested: 0,
     timed_out: 0,
-    whitelisted: 0
+    safelisted: 0
   },
   processing: {
     inflight: 0

@@ -139,14 +139,14 @@ export default function useMySitemap() {
         breadcrumbs: ['/manage']
       },
       {
-        path: '/manage/whitelist/:id',
-        title: t('breadcrumb.whitelist.detail'),
+        path: '/manage/safelist/:id',
+        title: t('breadcrumb.safelist.detail'),
         icon: <ListOutlinedIcon />,
-        breadcrumbs: ['/manage', '/manage/whitelist']
+        breadcrumbs: ['/manage', '/manage/safelist']
       },
       {
-        path: '/manage/whitelist',
-        title: t('drawer.manage.whitelist'),
+        path: '/manage/safelist',
+        title: t('drawer.manage.safelist'),
         icon: <PlaylistAddCheckIcon />,
         breadcrumbs: ['/manage']
       },

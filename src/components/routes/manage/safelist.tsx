@@ -11,13 +11,13 @@ import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
-import WhitelistTable from 'components/visual/SearchResult/whitelist';
+import SafelistTable from 'components/visual/SearchResult/safelist';
 import { searchResultsDisplay } from 'helpers/utils';
 import 'moment/locale/fr';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
-import WhitelistDetail from './whitelist_detail';
+import SafelistDetail from './safelist_detail';
 
 const PAGE_SIZE = 25;
 
@@ -44,12 +44,12 @@ type SearchResults = {
   total: number;
 };
 
-export default function Whitelist() {
-  const { t } = useTranslation(['manageWhitelist']);
+export default function Safelist() {
+  const { t } = useTranslation(['manageSafelist']);
   const [pageSize] = useState(PAGE_SIZE);
   const [searching, setSearching] = useState(false);
   const { indexes } = useALContext();
-  const [whitelistResults, setWhitelistResults] = useState<SearchResults>(null);
+  const [safelistResults, setSafelistResults] = useState<SearchResults>(null);
   const location = useLocation();
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
   const history = useHistory();
@@ -59,7 +59,7 @@ export default function Whitelist() {
   const classes = useStyles();
   const { closeGlobalDrawer, setGlobalDrawer } = useDrawer();
   const [suggestions] = useState([
-    ...Object.keys(indexes.whitelist).filter(name => indexes.whitelist[name].indexed),
+    ...Object.keys(indexes.safelist).filter(name => indexes.safelist[name].indexed),
     ...DEFAULT_SUGGESTION
   ]);
   const filterValue = useRef<string>('');
@@ -78,23 +78,23 @@ export default function Whitelist() {
 
   useEffect(() => {
     function handleReload() {
-      reload(whitelistResults ? whitelistResults.offset : 0);
+      reload(safelistResults ? safelistResults.offset : 0);
     }
 
-    window.addEventListener('reloadWhitelist', handleReload);
+    window.addEventListener('reloadSafelist', handleReload);
 
     return () => {
-      window.removeEventListener('reloadWhitelist', handleReload);
+      window.removeEventListener('reloadSafelist', handleReload);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, whitelistResults]);
+  }, [query, safelistResults]);
 
   const reload = offset => {
     query.set('rows', PAGE_SIZE);
     query.set('offset', offset);
     apiCall({
       method: 'POST',
-      url: '/api/v4/search/whitelist/',
+      url: '/api/v4/search/safelist/',
       body: query.getParams(),
       onSuccess: api_data => {
         if (
@@ -104,7 +104,7 @@ export default function Whitelist() {
         ) {
           reload(Math.max(0, api_data.api_response.offset - api_data.api_response.rows));
         } else {
-          setWhitelistResults(api_data.api_response);
+          setSafelistResults(api_data.api_response);
         }
       },
       onEnter: () => setSearching(true),
@@ -137,9 +137,9 @@ export default function Whitelist() {
     filterValue.current = inputValue;
   };
 
-  const setWhitelistID = useCallback(
+  const setSafelistID = useCallback(
     (wf_id: string) => {
-      setGlobalDrawer(<WhitelistDetail whitelist_id={wf_id} close={closeGlobalDrawer} />);
+      setGlobalDrawer(<SafelistDetail safelist_id={wf_id} close={closeGlobalDrawer} />);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
@@ -184,28 +184,28 @@ export default function Whitelist() {
               }
             ]}
           >
-            {whitelistResults !== null && (
+            {safelistResults !== null && (
               <div className={classes.searchresult}>
-                {whitelistResults.total !== 0 && (
+                {safelistResults.total !== 0 && (
                   <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
                     {searching ? (
                       <span>{t('searching')}</span>
                     ) : (
                       <span>
-                        {searchResultsDisplay(whitelistResults.total)}&nbsp;
+                        {searchResultsDisplay(safelistResults.total)}&nbsp;
                         {query.get('query')
-                          ? t(`filtered${whitelistResults.total === 1 ? '' : 's'}`)
-                          : t(`total${whitelistResults.total === 1 ? '' : 's'}`)}
+                          ? t(`filtered${safelistResults.total === 1 ? '' : 's'}`)
+                          : t(`total${safelistResults.total === 1 ? '' : 's'}`)}
                       </span>
                     )}
                   </Typography>
                 )}
 
                 <SearchPager
-                  total={whitelistResults.total}
-                  setResults={setWhitelistResults}
+                  total={safelistResults.total}
+                  setResults={setSafelistResults}
                   pageSize={pageSize}
-                  index="whitelist"
+                  index="safelist"
                   query={query}
                   setSearching={setSearching}
                 />
@@ -216,7 +216,7 @@ export default function Whitelist() {
       </PageHeader>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
-        <WhitelistTable whitelistResults={whitelistResults} setWhitelistID={setWhitelistID} />
+        <SafelistTable safelistResults={safelistResults} setSafelistID={setSafelistID} />
       </div>
     </PageFullWidth>
   );

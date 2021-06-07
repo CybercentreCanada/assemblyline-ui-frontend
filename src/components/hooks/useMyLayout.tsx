@@ -152,10 +152,10 @@ const useMyLayout = (): AppLayoutProps => {
             nested: true
           },
           {
-            id: 'manage.whitelist',
-            text: t('drawer.manage.whitelist'),
+            id: 'manage.safelist',
+            text: t('drawer.manage.safelist'),
             icon: <PlaylistAddCheckIcon />,
-            route: '/manage/whitelist',
+            route: '/manage/safelist',
             nested: true
           },
           {

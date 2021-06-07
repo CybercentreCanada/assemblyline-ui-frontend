@@ -32,11 +32,11 @@
   "verdict.malicious": "Malicious",
   "verdict.suspicious": "Suspicious",
   "view_file": "View file",
-  "whitelist": "Add file to the whitelist",
-  "whitelist.title": "Add to the whitelist",
-  "whitelist.cancelText": "Cancel",
-  "whitelist.acceptText": "Yes, add it!",
-  "whitelist.text": "Are you sure you want the current file to be added to the whitelist?",
-  "whitelist.input": "Reason for whitelisting",
-  "whitelist.success": "Hash has been successfully added to the whitelist"
+  "safelist": "Add file to the safelist",
+  "safelist.title": "Safelist",
+  "safelist.cancelText": "Cancel",
+  "safelist.acceptText": "Yes, add it!",
+  "safelist.text": "Are you sure you want the current file to be added to the safelist?",
+  "safelist.input": "Reason for safelisting",
+  "safelist.success": "Hash has been successfully added to the safelist"
 }

@@ -20,7 +20,7 @@ import {
 } from '../DivTable';
 import InformativeAlert from '../InformativeAlert';
 
-export type Whitelist = {
+export type Safelist = {
   added: string;
   classification: string;
   fileinfo: {
@@ -40,26 +40,26 @@ export type Whitelist = {
 };
 
 type SearchResults = {
-  items: Whitelist[];
+  items: Safelist[];
   total: number;
 };
 
-type WhitelistTableProps = {
-  whitelistResults: SearchResults;
-  setWhitelistID?: (id: string) => void;
+type SafelistTableProps = {
+  safelistResults: SearchResults;
+  setSafelistID?: (id: string) => void;
   allowSort?: boolean;
 };
 
-const WrappedWhitelistTable: React.FC<WhitelistTableProps> = ({
-  whitelistResults,
-  setWhitelistID = null,
+const WrappedSafelistTable: React.FC<SafelistTableProps> = ({
+  safelistResults,
+  setSafelistID = null,
   allowSort = true
 }) => {
   const { t, i18n } = useTranslation(['search']);
   const { c12nDef } = useALContext();
 
-  return whitelistResults ? (
-    whitelistResults.total !== 0 ? (
+  return safelistResults ? (
+    safelistResults.total !== 0 ? (
       <TableContainer component={Paper}>
         <DivTable>
           <DivTableHead>
@@ -81,15 +81,15 @@ const WrappedWhitelistTable: React.FC<WhitelistTableProps> = ({
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
-            {whitelistResults.items.map(wl_item => (
+            {safelistResults.items.map(wl_item => (
               <LinkRow
                 key={wl_item.id}
                 component={Link}
-                to={`/manage/whitelist/${wl_item.fileinfo.sha256}`}
+                to={`/manage/safelist/${wl_item.fileinfo.sha256}`}
                 onClick={event => {
-                  if (setWhitelistID) {
+                  if (setSafelistID) {
                     event.preventDefault();
-                    setWhitelistID(wl_item.id);
+                    setSafelistID(wl_item.id);
                   }
                 }}
                 hover
@@ -116,7 +116,7 @@ const WrappedWhitelistTable: React.FC<WhitelistTableProps> = ({
     ) : (
       <div style={{ width: '100%' }}>
         <InformativeAlert>
-          <AlertTitle>{t('no_whitelist_title')}</AlertTitle>
+          <AlertTitle>{t('no_safelist_title')}</AlertTitle>
           {t('no_results_desc')}
         </InformativeAlert>
       </div>
@@ -126,5 +126,5 @@ const WrappedWhitelistTable: React.FC<WhitelistTableProps> = ({
   );
 };
 
-const WhitelistTable = React.memo(WrappedWhitelistTable);
-export default WhitelistTable;
+const SafelistTable = React.memo(WrappedSafelistTable);
+export default SafelistTable;
