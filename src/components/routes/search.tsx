@@ -28,7 +28,6 @@ import FilesTable from 'components/visual/SearchResult/files';
 import ResultsTable from 'components/visual/SearchResult/results';
 import SignaturesTable from 'components/visual/SearchResult/signatures';
 import SubmissionsTable from 'components/visual/SearchResult/submissions';
-import WhitelistTable from 'components/visual/SearchResult/whitelist';
 import { searchResultsDisplay } from 'helpers/utils';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -103,15 +102,13 @@ function Search({ index }: SearchProps) {
   const [resultResults, setResultResults] = useState<SearchResults>(null);
   const [signatureResults, setSignatureResults] = useState<SearchResults>(null);
   const [alertResults, setAlertResults] = useState<SearchResults>(null);
-  const [whitelistResults, setWhitelistResults] = useState<SearchResults>(null);
 
   const stateMap = {
     submission: setSubmissionResults,
     file: setFileResults,
     result: setResultResults,
     signature: setSignatureResults,
-    alert: setAlertResults,
-    whitelist: setWhitelistResults
+    alert: setAlertResults
   };
 
   const resMap = {
@@ -152,7 +149,6 @@ function Search({ index }: SearchProps) {
     setResultResults(null);
     setSignatureResults(null);
     setAlertResults(null);
-    setWhitelistResults(null);
   };
 
   useEffect(() => {
@@ -287,12 +283,6 @@ function Search({ index }: SearchProps) {
                   label={`${t('alert')} (${alertResults ? searchResultsDisplay(alertResults.total) : '...'})`}
                   value="alert"
                 />
-                <Tab
-                  label={`${t('whitelist')} (${
-                    whitelistResults ? searchResultsDisplay(whitelistResults.total) : '...'
-                  })`}
-                  value="whitelist"
-                />
                 <TabSpacer />
                 <SpecialTab>
                   <Tooltip title={t('focus_search')}>
@@ -346,9 +336,6 @@ function Search({ index }: SearchProps) {
         )}
         {tab === 'alert' && query && query.get('query') && (
           <AlertsTable alertResults={alertResults} allowSort={!!(index || id)} />
-        )}
-        {tab === 'whitelist' && query && query.get('query') && (
-          <WhitelistTable whitelistResults={whitelistResults} allowSort={!!(index || id)} />
         )}
       </div>
     </PageFullWidth>

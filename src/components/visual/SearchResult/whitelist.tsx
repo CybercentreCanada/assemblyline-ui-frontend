@@ -46,10 +46,15 @@ type SearchResults = {
 
 type WhitelistTableProps = {
   whitelistResults: SearchResults;
+  setWhitelistID?: (id: string) => void;
   allowSort?: boolean;
 };
 
-const WrappedWhitelistTable: React.FC<WhitelistTableProps> = ({ whitelistResults, allowSort = true }) => {
+const WrappedWhitelistTable: React.FC<WhitelistTableProps> = ({
+  whitelistResults,
+  setWhitelistID = null,
+  allowSort = true
+}) => {
   const { t, i18n } = useTranslation(['search']);
   const { c12nDef } = useALContext();
 
@@ -80,9 +85,14 @@ const WrappedWhitelistTable: React.FC<WhitelistTableProps> = ({ whitelistResults
               <LinkRow
                 key={wl_item.id}
                 component={Link}
-                to={`/whitelist/detail/${wl_item.fileinfo.sha256}`}
+                to={`/manage/whitelist/${wl_item.fileinfo.sha256}`}
+                onClick={event => {
+                  if (setWhitelistID) {
+                    event.preventDefault();
+                    setWhitelistID(wl_item.id);
+                  }
+                }}
                 hover
-                style={{ textDecoration: 'none' }}
               >
                 <DivTableCell>
                   <Tooltip title={wl_item.added}>

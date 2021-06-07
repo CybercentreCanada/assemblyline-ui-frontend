@@ -1,0 +1,20 @@
+{
+  "chart.title": "Nombre de fois sur liste blanche au cours des 30 derniers jours",
+  "delete.acceptText": "Oui, supprimez-le !",
+  "delete.cancelText": "Annuler",
+  "delete.success": "Le hachage a été supprimé avec succès de la liste blanche.",
+  "delete.text": "Voulez-vous vraiment supprimer le hachage actuel de la liste blanche ?",
+  "delete.title": "Supprimer le hachage ?",
+  "external": "externe",
+  "fileinfo": "Informations Complémentaires",
+  "remove": "Supprimer ce hachage de la liste blanche",
+  "size": "Taille",
+  "sources": "Sources",
+  "timing": "Informations sur le temps",
+  "timing.added": "Date d'ajout",
+  "timing.updated": "Dernière mise à jour",
+  "title": "Détails de hachage en liste blanche",
+  "type": "Type de fichier",
+  "unknown": "Indisponible",
+  "user": "utilisateur"
+}

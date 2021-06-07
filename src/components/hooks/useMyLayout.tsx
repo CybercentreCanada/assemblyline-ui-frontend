@@ -13,6 +13,7 @@ import HelpOutlineOutlinedIcon from '@material-ui/icons/HelpOutlineOutlined';
 import LabelOutlinedIcon from '@material-ui/icons/LabelOutlined';
 import MapOutlinedIcon from '@material-ui/icons/MapOutlined';
 import NotificationImportantOutlinedIcon from '@material-ui/icons/NotificationImportantOutlined';
+import PlaylistAddCheckIcon from '@material-ui/icons/PlaylistAddCheck';
 import PublishOutlinedIcon from '@material-ui/icons/PublishOutlined';
 import SearchIcon from '@material-ui/icons/Search';
 import SettingsApplicationsOutlinedIcon from '@material-ui/icons/SettingsApplicationsOutlined';
@@ -100,12 +101,6 @@ const useMyLayout = (): AppLayoutProps => {
             text: t('drawer.search.submission'),
             route: '/search/submission',
             nested: true
-          },
-          {
-            id: 'search.whitelist',
-            text: t('drawer.search.whitelist'),
-            route: '/search/whitelist',
-            nested: true
           }
         ]
       }
@@ -154,6 +149,13 @@ const useMyLayout = (): AppLayoutProps => {
             ],
             icon: <CodeOutlinedIcon />,
             route: '/manage/sources',
+            nested: true
+          },
+          {
+            id: 'manage.whitelist',
+            text: t('drawer.manage.whitelist'),
+            icon: <PlaylistAddCheckIcon />,
+            route: '/manage/whitelist',
             nested: true
           },
           {

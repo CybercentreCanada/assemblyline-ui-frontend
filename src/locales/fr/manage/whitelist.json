@@ -1,0 +1,11 @@
+{
+  "filter": "Filtrer les hachages de la liste blanche...",
+  "filtered": "hachage correspondant au filtre",
+  "filtereds": "hachages correspondant au filtre",
+  "searching": "Recherche...",
+  "title": "Liste Blanche",
+  "total": "hachage dans la liste blanche",
+  "totals": "hachages dans la liste blanche",
+  "user": "Hachages ajoutés par les utilisateurs",
+  "external": "Hachages provenant de sources externes"
+}

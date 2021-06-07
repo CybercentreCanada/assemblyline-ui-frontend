@@ -20,6 +20,7 @@ import ListOutlinedIcon from '@material-ui/icons/ListOutlined';
 import MapOutlinedIcon from '@material-ui/icons/MapOutlined';
 import NotificationImportantOutlinedIcon from '@material-ui/icons/NotificationImportantOutlined';
 import PageviewOutlinedIcon from '@material-ui/icons/PageviewOutlined';
+import PlaylistAddCheckIcon from '@material-ui/icons/PlaylistAddCheck';
 import PublishOutlinedIcon from '@material-ui/icons/PublishOutlined';
 import ReceiptOutlinedIcon from '@material-ui/icons/ReceiptOutlined';
 import SearchIcon from '@material-ui/icons/Search';
@@ -137,13 +138,24 @@ export default function useMySitemap() {
         icon: <BiNetworkChart />,
         breadcrumbs: ['/manage']
       },
+      {
+        path: '/manage/whitelist/:id',
+        title: t('breadcrumb.whitelist.detail'),
+        icon: <ListOutlinedIcon />,
+        breadcrumbs: ['/manage', '/manage/whitelist']
+      },
+      {
+        path: '/manage/whitelist',
+        title: t('drawer.manage.whitelist'),
+        icon: <PlaylistAddCheckIcon />,
+        breadcrumbs: ['/manage']
+      },
       { path: '/search', title: t('drawer.search'), isRoot: true, icon: <SearchIcon /> },
       { path: '/search/alert', title: t('drawer.search.alert'), breadcrumbs: ['/search'] },
       { path: '/search/file', title: t('drawer.search.file'), breadcrumbs: ['/search'] },
       { path: '/search/result', title: t('drawer.search.result'), breadcrumbs: ['/search'] },
       { path: '/search/signature', title: t('drawer.search.signature'), breadcrumbs: ['/search'] },
       { path: '/search/submission', title: t('drawer.search.submission'), breadcrumbs: ['/search'] },
-      { path: '/search/whitelist', title: t('drawer.search.whitelist'), breadcrumbs: ['/search'] },
       { path: '/help', title: t('drawer.help'), isRoot: true, icon: <HelpOutlineOutlinedIcon /> },
       { path: '/help/api', title: t('drawer.help.api'), icon: <AssignmentOutlinedIcon />, breadcrumbs: ['/help'] },
       {

@@ -28,6 +28,8 @@ import HeuristicDetail from 'components/routes/manage/heuristic_detail';
 import ManageSignatures from 'components/routes/manage/signatures';
 import SignatureDetail from 'components/routes/manage/signature_detail';
 import ManageSignatureSources from 'components/routes/manage/signature_sources';
+import ManageWhitelist from 'components/routes/manage/whitelist';
+import WhitelistDetail from 'components/routes/manage/whitelist_detail';
 import ManageWorkflows from 'components/routes/manage/workflows';
 import WorkflowDetail from 'components/routes/manage/workflow_detail';
 import Search from 'components/routes/search';
@@ -105,6 +107,8 @@ const WrappedRoutes = () => {
         <Route exact path="/manage/sources" component={ManageSignatureSources} />
         <Route exact path="/manage/workflow/:id" component={WorkflowDetail} />
         <Route exact path="/manage/workflows" component={ManageWorkflows} />
+        <Route exact path="/manage/whitelist/:id" component={WhitelistDetail} />
+        <Route exact path="/manage/whitelist" component={ManageWhitelist} />
         <Route exact path="/manage" component={Manage} />
         <Route exact path="/search" component={Search} />
         <Route exact path="/search/:id" component={Search} />

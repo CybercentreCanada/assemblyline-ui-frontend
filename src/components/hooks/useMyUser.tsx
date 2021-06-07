@@ -22,6 +22,7 @@ type IndexDefinitionMap = {
   result: IndexDefinition;
   signature: IndexDefinition;
   submission: IndexDefinition;
+  whitelist: IndexDefinition;
   workflow: IndexDefinition;
 };
 

@@ -1,0 +1,20 @@
+{
+  "chart.title": "Number of times whitelisted in the past 30 days",
+  "delete.acceptText": "Yes, remove it!",
+  "delete.cancelText": "Cancel",
+  "delete.success": "Hash was successfully removed from whitelist.",
+  "delete.text": "Do you really want to remove the current hash from the whitelist?",
+  "delete.title": "Remove hash?",
+  "external": "external",
+  "fileinfo": "Additional information",
+  "remove": "Remove this hash from the whitelist",
+  "size": "Size",
+  "sources": "Sources",
+  "timing": "Timing information",
+  "timing.added": "Date Added",
+  "timing.updated": "Last updated",
+  "title": "Whitelisted hash details",
+  "type": "File type",
+  "unknown": "Unavailable",
+  "user": "user"
+}
