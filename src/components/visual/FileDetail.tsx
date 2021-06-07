@@ -2,6 +2,7 @@ import { Grid, IconButton, Link as MaterialLink, Tooltip, Typography, useTheme }
 import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
 import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
 import PageviewOutlinedIcon from '@material-ui/icons/PageviewOutlined';
+import PlaylistAddCheckIcon from '@material-ui/icons/PlaylistAddCheck';
 import RotateLeftOutlinedIcon from '@material-ui/icons/RotateLeftOutlined';
 import { Skeleton } from '@material-ui/lab';
 import useALContext from 'components/hooks/useALContext';
@@ -25,6 +26,7 @@ import MetadataSection from './FileDetail/metadata';
 import ParentSection from './FileDetail/parents';
 import ResultSection from './FileDetail/results';
 import TagSection from './FileDetail/tags';
+import InputDialog from './InputDialog';
 
 type FileInfo = {
   archive_ts: string;
@@ -93,8 +95,10 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
 }) => {
   const { t } = useTranslation(['fileDetail']);
   const [file, setFile] = useState<File | null>(null);
+  const [whitelistDialog, setWhitelistDialog] = useState<boolean>(false);
+  const [whitelistReason, setWhitelistReason] = useState<string>('');
   const apiCall = useMyAPI();
-  const { c12nDef } = useALContext();
+  const { c12nDef, user: currentUser } = useALContext();
   const theme = useTheme();
   const history = useHistory();
   const { showSuccessMessage } = useMySnackbar();
@@ -150,6 +154,35 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sha256]);
 
+  const prepareWhitelist = useCallback(() => {
+    setWhitelistReason('');
+    setWhitelistDialog(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sha256]);
+
+  const addToWhitelist = useCallback(() => {
+    const data = {
+      fileinfo: {
+        md5: file.file_info.md5,
+        sha1: file.file_info.sha1,
+        sha256: file.file_info.sha256,
+        size: file.file_info.size,
+        type: file.file_info.type
+      },
+      sources: [{ name: currentUser.username, type: 'user', reason: [whitelistReason] }]
+    };
+    apiCall({
+      url: `/api/v4/whitelist/${sha256}/`,
+      method: 'PUT',
+      body: data,
+      onSuccess: api_data => {
+        setWhitelistDialog(false);
+        showSuccessMessage(t('whitelist.success'));
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sha256, whitelistReason, file]);
+
   useEffect(() => {
     setFile(null);
 
@@ -177,6 +210,18 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
 
   return (
     <div id="fileDetailTop" style={{ textAlign: 'left' }}>
+      <InputDialog
+        open={whitelistDialog}
+        handleClose={() => setWhitelistDialog(false)}
+        handleAccept={addToWhitelist}
+        handleInputChange={event => setWhitelistReason(event.target.value)}
+        inputValue={whitelistReason}
+        title={t('whitelist.title')}
+        cancelText={t('whitelist.cancelText')}
+        acceptText={t('whitelist.acceptText')}
+        inputLabel={t('whitelist.input')}
+        text={t('whitelist.text')}
+      />
       {useMemo(
         () => (
           <>
@@ -223,6 +268,11 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                     <Tooltip title={t('resubmit_dynamic')}>
                       <IconButton onClick={resubmit}>
                         <RotateLeftOutlinedIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t('whitelist')}>
+                      <IconButton onClick={prepareWhitelist}>
+                        <PlaylistAddCheckIcon />
                       </IconButton>
                     </Tooltip>
                   </div>
