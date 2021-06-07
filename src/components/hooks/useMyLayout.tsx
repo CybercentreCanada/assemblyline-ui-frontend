@@ -100,6 +100,12 @@ const useMyLayout = (): AppLayoutProps => {
             text: t('drawer.search.submission'),
             route: '/search/submission',
             nested: true
+          },
+          {
+            id: 'search.whitelist',
+            text: t('drawer.search.whitelist'),
+            route: '/search/whitelist',
+            nested: true
           }
         ]
       }
