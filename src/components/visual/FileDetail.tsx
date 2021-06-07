@@ -162,6 +162,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
 
   const addToSafelist = useCallback(() => {
     const data = {
+      classification: file.file_info.classification,
       fileinfo: {
         md5: file.file_info.md5,
         sha1: file.file_info.sha1,
