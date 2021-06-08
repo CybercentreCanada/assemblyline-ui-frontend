@@ -67,7 +67,7 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
         method: 'POST',
         url: '/api/v4/search/histogram/result/created/',
         body: {
-          query: `response.service_name:Safelist AND id:${safelist_id || id}*`,
+          query: `result.sections.heuristic.signature.name:"SAFELIST_${safelist_id || id}"`,
           mincount: 0,
           start: 'now-30d/d',
           end: 'now+1d/d-1s',
