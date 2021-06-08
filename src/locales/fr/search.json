@@ -13,6 +13,7 @@
   "header.description": "Description",
   "header.enabled": "Activé",
   "header.filetype": "Type de fichiers",
+  "header.hash": "Hachage",
   "header.hit_count": "Fois vue",
   "header.id": "ID",
   "header.last_hit": "Dernière fois",

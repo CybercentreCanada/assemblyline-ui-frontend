@@ -13,6 +13,7 @@
   "header.description": "Description",
   "header.enabled": "Enabled",
   "header.filetype": "File Type",
+  "header.hash": "Hash",
   "header.hit_count": "Times seen",
   "header.id": "ID",
   "header.last_hit": "Last Seen",

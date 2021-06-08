@@ -67,8 +67,8 @@ const WrappedSafelistTable: React.FC<SafelistTableProps> = ({
               <SortableHeaderCell sortField="added" allowSort={allowSort}>
                 {t('header.added')}
               </SortableHeaderCell>
-              <SortableHeaderCell sortField="fileinfo.sha256" allowSort={allowSort}>
-                {t('header.sha256')}
+              <SortableHeaderCell sortField="id" allowSort={allowSort}>
+                {t('header.hash')}
               </SortableHeaderCell>
               <SortableHeaderCell sortField="sources.name" allowSort={allowSort}>
                 {t('header.source')}
@@ -85,7 +85,7 @@ const WrappedSafelistTable: React.FC<SafelistTableProps> = ({
               <LinkRow
                 key={wl_item.id}
                 component={Link}
-                to={`/manage/safelist/${wl_item.fileinfo.sha256}`}
+                to={`/manage/safelist/${wl_item.id}`}
                 onClick={event => {
                   if (setSafelistID) {
                     event.preventDefault();
@@ -101,7 +101,7 @@ const WrappedSafelistTable: React.FC<SafelistTableProps> = ({
                     </Moment>
                   </Tooltip>
                 </DivTableCell>
-                <DivTableCell>{wl_item.fileinfo.sha256}</DivTableCell>
+                <DivTableCell>{wl_item.id}</DivTableCell>
                 <DivTableCell style={{ wordBreak: 'break-word' }}>{wl_item.sources.name.join(' | ')}</DivTableCell>
                 {c12nDef.enforce && (
                   <DivTableCell>
