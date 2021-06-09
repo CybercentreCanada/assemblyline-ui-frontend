@@ -44,6 +44,7 @@ const Heuristic: React.FC<HeuristicProps> = ({
   if (lvl) {
     color = {
       info: 'default' as 'default',
+      safe: 'success' as 'success',
       suspicious: 'warning' as 'warning',
       malicious: 'error' as 'error'
     }[lvl];

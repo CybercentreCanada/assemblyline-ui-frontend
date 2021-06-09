@@ -52,6 +52,7 @@
   "verdict.is.malicious": "You believe this file is Malicious",
   "verdict.is.non_malicious": "You believe this file is Non-Malicious",
   "verdict.malicious": "Malicious",
+  "verdict.safe": "Safe",
   "verdict.set.malicious": "Vote for Malicious verdict",
   "verdict.set.non_malicious": "Vote for Non-Malicious verdict",
   "verdict.suspicious": "Suspicious",

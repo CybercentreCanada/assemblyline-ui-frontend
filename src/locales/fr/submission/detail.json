@@ -52,6 +52,7 @@
   "verdict.is.malicious": "Vous pensez que ce fichier est malveillant",
   "verdict.is.non_malicious": "Vous pensez que ce fichier n'est pas malveillant",
   "verdict.malicious": "Malveillant",
+  "verdict.safe": "Sans Danger",
   "verdict.set.malicious": "Votez pour un verdict malveillant",
   "verdict.set.non_malicious": "Votez pour un verdict non malveillant",
   "verdict.suspicious": "Suspect",

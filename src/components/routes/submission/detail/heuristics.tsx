@@ -73,7 +73,7 @@ const WrappedHeuristicSection: React.FC<HeuristicSectionProps> = ({ heuristics }
             </div>
           ),
           // eslint-disable-next-line react-hooks/exhaustive-deps
-          [getKey, heuristics]
+          [getKey, heuristics, t]
         )}
       </Collapse>
     </div>
