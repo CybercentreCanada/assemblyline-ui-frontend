@@ -30,6 +30,7 @@
   "type": "Type",
   "verdict.info": "Informatif",
   "verdict.malicious": "Malveillant",
+  "verdict.safe": "Sans Danger",
   "verdict.suspicious": "Suspect",
   "view_file": "Visionner le fichier",
   "safelist": "Ajouter un fichier à la liste sûre",
