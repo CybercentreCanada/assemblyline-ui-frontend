@@ -173,10 +173,10 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
       sources: [{ name: currentUser.username, type: 'user', reason: [safelistReason] }]
     };
     apiCall({
-      url: `/api/v4/safelist/${sha256}/`,
+      url: `/api/v4/safelist/`,
       method: 'PUT',
       body: data,
-      onSuccess: api_data => {
+      onSuccess: _ => {
         setSafelistDialog(false);
         showSuccessMessage(t('safelist.success'));
       }
