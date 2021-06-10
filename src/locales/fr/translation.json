@@ -60,6 +60,7 @@
   "extended_scan.submitted": "En attente de la fin de l'analyse étendu ...",
   "filter": "Filtrer...",
   "forbidden": "Interdit",
+  "full_count": "Suivez tous les documents pour obtenir le décompte complet",
   "locked": "Vérouillé",
   "logo.alt": "Logo d'Assemblyline",
   "notfound": "Introuvable",

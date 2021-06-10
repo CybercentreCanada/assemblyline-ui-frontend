@@ -60,6 +60,7 @@
   "extended_scan.submitted": "Waiting on extended scan to be completed...",
   "filter": "Filter...",
   "forbidden": "Forbidden",
+  "full_count": "Track all documents to get the full count",
   "locked": "Locked",
   "logo.alt": "Assemblyline Logo",
   "notfound": "Not Found",

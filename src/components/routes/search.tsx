@@ -28,8 +28,9 @@ import FilesTable from 'components/visual/SearchResult/files';
 import ResultsTable from 'components/visual/SearchResult/results';
 import SignaturesTable from 'components/visual/SearchResult/signatures';
 import SubmissionsTable from 'components/visual/SearchResult/submissions';
+import SearchResultCount from 'components/visual/SearchResultCount';
 import { searchResultsDisplay } from 'helpers/utils';
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory, useLocation, useParams } from 'react-router-dom';
 
@@ -301,9 +302,8 @@ function Search({ index }: SearchProps) {
           <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', marginBottom: theme.spacing(0.5) }}>
             {resMap[tab] && resMap[tab].total !== 0 && (index || id) && (
               <div className={classes.searchresult}>
-                {`${searchResultsDisplay(resMap[tab].total)} ${t(
-                  resMap[tab].total === 1 ? 'matching_result' : 'matching_results'
-                )}`}
+                <SearchResultCount count={resMap[tab].total} />
+                {t(resMap[tab].total === 1 ? 'matching_result' : 'matching_results')}
               </div>
             )}
             <div style={{ flexGrow: 1 }} />
