@@ -53,7 +53,10 @@ export function getProvider() {
 }
 
 export function searchResultsDisplay(count, max = 10000) {
-  if (count >= max) {
+  const params = new URLSearchParams(window.location.search);
+  const trackedHits = params.get('track_total_hits');
+
+  if (count === parseInt(trackedHits) || (trackedHits === null && count === max)) {
     return `${count}+`;
   }
 
