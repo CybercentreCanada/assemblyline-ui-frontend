@@ -80,7 +80,7 @@ const Attack: React.FC<AttackProps> = ({
   }, []);
 
   const handleMenuCopy = useCallback(() => {
-    copy(text, 'drawerTop');
+    copy(text, 'clipID');
     handleClose();
   }, [copy, handleClose, text]);
 
@@ -104,7 +104,7 @@ const Attack: React.FC<AttackProps> = ({
           state.mouseY !== null && state.mouseX !== null ? { top: state.mouseY, left: state.mouseX } : undefined
         }
       >
-        <MenuItem dense onClick={handleMenuCopy}>
+        <MenuItem id="clipID" dense onClick={handleMenuCopy}>
           {CLIPBOARD_ICON}
           {t('clipboard')}
         </MenuItem>

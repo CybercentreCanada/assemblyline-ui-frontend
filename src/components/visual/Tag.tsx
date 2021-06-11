@@ -93,7 +93,7 @@ const Tag: React.FC<TagProps> = ({
   }, []);
 
   const handleMenuCopy = useCallback(() => {
-    copy(value, 'drawerTop');
+    copy(value, 'clipID');
     handleClose();
   }, [copy, handleClose, value]);
 
@@ -162,7 +162,7 @@ const Tag: React.FC<TagProps> = ({
           state.mouseY !== null && state.mouseX !== null ? { top: state.mouseY, left: state.mouseX } : undefined
         }
       >
-        <MenuItem dense onClick={handleMenuCopy}>
+        <MenuItem id="clipID" dense onClick={handleMenuCopy}>
           {CLIPBOARD_ICON}
           {t('clipboard')}
         </MenuItem>

@@ -63,7 +63,7 @@ const Heuristic: React.FC<HeuristicProps> = ({
   }, []);
 
   const handleMenuCopy = useCallback(() => {
-    copy(text, 'drawerTop');
+    copy(text, 'clipID');
     handleClose();
   }, [copy, handleClose, text]);
 
@@ -105,7 +105,7 @@ const Heuristic: React.FC<HeuristicProps> = ({
           state.mouseY !== null && state.mouseX !== null ? { top: state.mouseY, left: state.mouseX } : undefined
         }
       >
-        <MenuItem dense onClick={handleMenuCopy}>
+        <MenuItem id="clipID" dense onClick={handleMenuCopy}>
           {CLIPBOARD_ICON}Copy to clipboard
         </MenuItem>
         <MenuItem dense onClick={handleMenuSearch}>
