@@ -162,16 +162,31 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
 
   const addToSafelist = useCallback(() => {
     const data = {
-      classification: file.file_info.classification,
-      fileinfo: {
+      hashes: {
         md5: file.file_info.md5,
         sha1: file.file_info.sha1,
-        sha256: file.file_info.sha256,
+        sha256: file.file_info.sha256
+      },
+      file: {
+        name: [],
         size: file.file_info.size,
         type: file.file_info.type
       },
-      sources: [{ name: currentUser.username, type: 'user', reason: [safelistReason] }]
+      sources: [
+        {
+          classification: file.file_info.classification,
+          name: currentUser.username,
+          reason: [safelistReason],
+          type: 'user'
+        }
+      ],
+      type: 'file'
     };
+
+    if (fileName !== sha256) {
+      data.file.name.push(fileName);
+    }
+
     apiCall({
       url: `/api/v4/safelist/`,
       method: 'PUT',

@@ -9,6 +9,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
+import CustomChip from '../CustomChip';
 import {
   DivTable,
   DivTableBody,
@@ -23,19 +24,24 @@ import InformativeAlert from '../InformativeAlert';
 export type Safelist = {
   added: string;
   classification: string;
-  fileinfo: {
+  enabled: boolean;
+  hashes: {
     md5: string;
     sha1: string;
     sha256: string;
-    size: number;
-    type: 'user' | 'external';
+  };
+  file: {
+    name: string[];
   };
   id: string;
   sources: {
     name: string[];
-    type: string[];
-    reason: string[];
   };
+  tag: {
+    type: string;
+    value: string;
+  };
+  type: string;
   updated: string;
 };
 
@@ -67,6 +73,9 @@ const WrappedSafelistTable: React.FC<SafelistTableProps> = ({
               <SortableHeaderCell sortField="added" allowSort={allowSort}>
                 {t('header.added')}
               </SortableHeaderCell>
+              <SortableHeaderCell sortField="type" allowSort={allowSort}>
+                {t('header.type')}
+              </SortableHeaderCell>
               <SortableHeaderCell sortField="id" allowSort={allowSort}>
                 {t('header.hash')}
               </SortableHeaderCell>
@@ -78,36 +87,49 @@ const WrappedSafelistTable: React.FC<SafelistTableProps> = ({
                   {t('header.classification')}
                 </SortableHeaderCell>
               )}
+              <SortableHeaderCell sortField="enabled" allowSort={allowSort}>
+                {t('header.status')}
+              </SortableHeaderCell>
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
-            {safelistResults.items.map(wl_item => (
+            {safelistResults.items.map(sl_item => (
               <LinkRow
-                key={wl_item.id}
+                key={sl_item.id}
                 component={Link}
-                to={`/manage/safelist/${wl_item.id}`}
+                to={`/manage/safelist/${sl_item.id}`}
                 onClick={event => {
                   if (setSafelistID) {
                     event.preventDefault();
-                    setSafelistID(wl_item.id);
+                    setSafelistID(sl_item.id);
                   }
                 }}
                 hover
               >
                 <DivTableCell>
-                  <Tooltip title={wl_item.added}>
+                  <Tooltip title={sl_item.added}>
                     <Moment fromNow locale={i18n.language}>
-                      {wl_item.added}
+                      {sl_item.added}
                     </Moment>
                   </Tooltip>
                 </DivTableCell>
-                <DivTableCell>{wl_item.id}</DivTableCell>
-                <DivTableCell style={{ wordBreak: 'break-word' }}>{wl_item.sources.name.join(' | ')}</DivTableCell>
+                <DivTableCell>{sl_item.type}</DivTableCell>
+                <DivTableCell style={{ wordBreak: 'break-word' }}>{sl_item.id}</DivTableCell>
+                <DivTableCell style={{ wordBreak: 'break-word' }}>{sl_item.sources.name.join(' | ')}</DivTableCell>
                 {c12nDef.enforce && (
                   <DivTableCell>
-                    <Classification type="text" size="tiny" c12n={wl_item.classification} format="short" />
+                    <Classification type="text" size="tiny" c12n={sl_item.classification} format="short" />
                   </DivTableCell>
                 )}
+                <DivTableCell>
+                  <CustomChip
+                    fullWidth
+                    type="rounded"
+                    size="small"
+                    color={sl_item.enabled ? 'primary' : 'default'}
+                    label={sl_item.enabled ? t('enabled') : t('disabled')}
+                  />
+                </DivTableCell>
               </LinkRow>
             ))}
           </DivTableBody>

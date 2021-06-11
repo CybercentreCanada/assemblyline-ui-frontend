@@ -1,6 +1,8 @@
 {
   "alert": "Alerte",
   "available": "disponible",
+  "disabled": "Désactivé",
+  "enabled": "Activé",
   "file": "Fichier",
   "focus_search": "Focus sur l'onglet sélectionné",
   "header.accepts": "Type de fichier",

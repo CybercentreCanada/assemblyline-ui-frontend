@@ -1,6 +1,8 @@
 {
   "alert": "Alert",
   "available": "available",
+  "disabled": "Disabled",
+  "enabled": "Enabled",
   "file": "File",
   "focus_search": "Focus on selected tab",
   "header.accepts": "File types",
