@@ -33,6 +33,8 @@
   "timing.added": "Date d'ajout",
   "timing.updated": "Dernière mise à jour",
   "title": "Détails de hachage en liste sûre",
+  "title.file": "Détails de fichier en liste sûre",
+  "title.tag": "Détails de balises en liste sûre",
   "unknown": "Indisponible",
   "usage": "Afficher l'utilisation du hachage",
   "user": "utilisateur"

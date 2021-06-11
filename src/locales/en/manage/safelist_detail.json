@@ -33,6 +33,8 @@
   "timing.added": "Date Added",
   "timing.updated": "Last updated",
   "title": "Safelisted hash details",
+  "title.file": "Safelisted file details",
+  "title.tag": "Safelisted tag details",
   "unknown": "Unavailable",
   "usage": "Show hash usage",
   "user": "user"

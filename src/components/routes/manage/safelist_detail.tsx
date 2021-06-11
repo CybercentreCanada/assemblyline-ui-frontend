@@ -187,7 +187,7 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
         <div style={{ paddingBottom: theme.spacing(4) }}>
           <Grid container alignItems="center">
             <Grid item xs>
-              <Typography variant="h4">{t('title')}</Typography>
+              <Typography variant="h4">{safelist ? t(`title.${safelist.type}`) : t('title')}</Typography>
               <Typography variant="caption">
                 {safelist ? safelist_id || id : <Skeleton style={{ width: '10rem' }} />}
               </Typography>
@@ -195,7 +195,7 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
             <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
               {safelist ? (
                 <>
-                  <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'center' }}>
                     <Tooltip title={t('usage')}>
                       <IconButton
                         component={Link}
@@ -207,7 +207,9 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
                         <YoutubeSearchedForIcon />
                       </IconButton>
                     </Tooltip>
-                    {(currentUser.is_admin || currentUser.roles.indexOf('signature_manager') !== -1) && (
+                    {(currentUser.is_admin ||
+                      currentUser.roles.indexOf('signature_manager') !== -1 ||
+                      safelist.sources.some(elem => elem.name === currentUser.username)) && (
                       <Tooltip title={t('remove')}>
                         <IconButton
                           style={{
