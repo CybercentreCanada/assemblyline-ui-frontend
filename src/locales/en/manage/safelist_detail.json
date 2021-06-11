@@ -1,5 +1,5 @@
 {
-  "chart.title": "Number of times safelisted in the past 30 days",
+  "chart.title": "Number of times seen in the past 30 days",
   "delete.acceptText": "Yes, remove it!",
   "delete.cancelText": "Cancel",
   "delete.success": "Hash was successfully removed from safelist",

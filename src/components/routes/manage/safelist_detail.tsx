@@ -77,11 +77,20 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
           setSafelist(api_data.api_response);
         }
       });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [safelist_id, id]);
+
+  useEffect(() => {
+    if (safelist) {
       apiCall({
         method: 'POST',
         url: '/api/v4/search/histogram/result/created/',
         body: {
-          query: `result.sections.heuristic.signature.name:"SAFELIST_${safelist_id || id}"`,
+          query:
+            safelist.type === 'file'
+              ? `result.sections.tags.signature.name:"SAFELIST_${safelist_id || id}"`
+              : `result.sections.tags.${safelist.tag.type}:"${safelist.tag.value}"`,
           mincount: 0,
           start: 'now-30d/d',
           end: 'now+1d/d-1s',
@@ -102,7 +111,7 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [safelist_id, id]);
+  }, [safelist]);
 
   const removeSafelist = () => {
     apiCall({
@@ -200,9 +209,13 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
                       <IconButton
                         component={Link}
                         style={{ color: theme.palette.action.active }}
-                        to={`/search/result/?query=result.sections.heuristic.signature.name:"SAFELIST_${
-                          safelist_id || id
-                        }"`}
+                        to={
+                          safelist.type === 'file'
+                            ? `/search/result/?query=result.sections.heuristic.signature.name:"SAFELIST_${
+                                safelist_id || id
+                              }"`
+                            : `/search/result/?query=result.sections.tags.${safelist.tag.type}:"${safelist.tag.value}"`
+                        }
                       >
                         <YoutubeSearchedForIcon />
                       </IconButton>

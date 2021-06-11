@@ -1,5 +1,5 @@
 {
-  "chart.title": "Nombre de fois sur liste sûre au cours des 30 derniers jours",
+  "chart.title": "Nombre de fois vue au cours des 30 derniers jours",
   "delete.acceptText": "Oui, supprimez-le !",
   "delete.cancelText": "Annuler",
   "delete.success": "Le hachage a été supprimé avec succès de la liste sûre",
