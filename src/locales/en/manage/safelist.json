@@ -7,5 +7,6 @@
   "total": "hash in safelist",
   "totals": "hashes in safelist",
   "user": "Hashes added by users",
-  "external": "Hashes from external sources"
+  "disabled": "Disabled hashes",
+  "tag": "Tag based hashes"
 }

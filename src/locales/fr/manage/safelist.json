@@ -7,5 +7,6 @@
   "total": "hachage dans la liste sûre",
   "totals": "hachages dans la liste sûre",
   "user": "Hachages ajoutés par les utilisateurs",
-  "external": "Hachages provenant de sources externes"
+  "disabled": "Hachages désactivés",
+  "tag": "Hachages basés sur des balises"
 }

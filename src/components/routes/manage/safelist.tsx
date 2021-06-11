@@ -1,6 +1,7 @@
 import { makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
-import CloudOutlinedIcon from '@material-ui/icons/CloudOutlined';
+import BlockOutlinedIcon from '@material-ui/icons/BlockOutlined';
+import LabelOutlinedIcon from '@material-ui/icons/LabelOutlined';
 import PersonOutlineOutlinedIcon from '@material-ui/icons/PersonOutlineOutlined';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
@@ -173,11 +174,21 @@ export default function Safelist() {
                 }
               },
               {
-                icon: <CloudOutlinedIcon fontSize={upMD ? 'default' : 'small'} />,
-                tooltip: t('external'),
+                icon: <LabelOutlinedIcon fontSize={upMD ? 'default' : 'small'} />,
+                tooltip: t('tag'),
                 props: {
                   onClick: () => {
-                    query.set('query', 'sources.type:external');
+                    query.set('query', 'type:tag');
+                    history.push(`${location.pathname}?${query.getDeltaString()}`);
+                  }
+                }
+              },
+              {
+                icon: <BlockOutlinedIcon fontSize={upMD ? 'default' : 'small'} />,
+                tooltip: t('disabled'),
+                props: {
+                  onClick: () => {
+                    query.set('query', 'enabled:false');
                     history.push(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
