@@ -125,6 +125,7 @@ const WrappedSafelistTable: React.FC<SafelistTableProps> = ({
                   <CustomChip
                     fullWidth
                     type="rounded"
+                    variant="outlined"
                     size="small"
                     color={sl_item.enabled ? 'primary' : 'default'}
                     label={sl_item.enabled ? t('enabled') : t('disabled')}

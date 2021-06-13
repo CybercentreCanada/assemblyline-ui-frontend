@@ -125,7 +125,7 @@ const WrappedSignaturesTable: React.FC<SignaturesTableProps> = ({
                   </DivTableCell>
                 )}
                 <DivTableCell>
-                  <SignatureStatus status={signature.status} />
+                  <SignatureStatus variant="outlined" status={signature.status} />
                 </DivTableCell>
               </LinkRow>
             ))}
