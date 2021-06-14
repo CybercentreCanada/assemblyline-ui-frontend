@@ -20,9 +20,9 @@ type IndexDefinitionMap = {
   file: IndexDefinition;
   heuristic: IndexDefinition;
   result: IndexDefinition;
+  safelist: IndexDefinition;
   signature: IndexDefinition;
   submission: IndexDefinition;
-  safelist: IndexDefinition;
   workflow: IndexDefinition;
 };
 
