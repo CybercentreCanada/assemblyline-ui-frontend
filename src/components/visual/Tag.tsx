@@ -32,6 +32,7 @@ type TagProps = {
   score?: number | null;
   short_type?: string | null;
   highlight_key?: string;
+  safelisted?: boolean;
   fullWidth?: boolean;
 };
 
@@ -42,6 +43,7 @@ const Tag: React.FC<TagProps> = ({
   score = null,
   short_type = null,
   highlight_key = null,
+  safelisted = false,
   fullWidth = false
 }) => {
   const { t } = useTranslation();
@@ -64,7 +66,9 @@ const Tag: React.FC<TagProps> = ({
   );
 
   let color: PossibleColors = 'default' as 'default';
-  if (lvl) {
+  if (safelisted) {
+    color = 'success' as 'success';
+  } else if (lvl) {
     color = {
       info: 'default' as 'default',
       suspicious: 'warning' as 'warning',
@@ -181,6 +185,7 @@ const Tag: React.FC<TagProps> = ({
       </Menu>
       <CustomChip
         wrap
+        variant={safelisted ? 'outlined' : 'default'}
         size="tiny"
         type="rounded"
         color={highlight_key && isHighlighted(highlight_key) ? ('primary' as 'info') : color}

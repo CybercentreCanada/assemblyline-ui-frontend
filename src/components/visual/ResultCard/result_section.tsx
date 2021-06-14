@@ -449,6 +449,7 @@ export type Section = {
     type: string;
     short_type: string;
     value: string;
+    safelisted: boolean;
   }[];
   title_text: string;
 };
@@ -596,6 +597,7 @@ const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sec
                         key={idx}
                         type={tag.type}
                         value={tag.value}
+                        safelisted={tag.safelisted}
                         short_type={tag.short_type}
                         score={section.heuristic ? section.heuristic.score : 0}
                         highlight_key={getKey(tag.type, tag.value)}
