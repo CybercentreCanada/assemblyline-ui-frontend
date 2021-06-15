@@ -41,6 +41,7 @@
   "container.dialog.ram": "Allowed memory range",
   "container.dialog.registry_password": "Container registry password",
   "container.dialog.registry_username": "Container registry username",
+  "container.dialog.registry_type": "Container registry type",
   "container.dialog.title.dependency": "Modifying dependency",
   "container.dialog.title.container": "Modifying container",
   "container.dialog.volumes": "Persistent Volumes",
