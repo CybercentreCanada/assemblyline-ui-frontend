@@ -7,8 +7,10 @@ import {
   FormControlLabel,
   Grid,
   IconButton,
+  MenuItem,
   Radio,
   RadioGroup,
+  Select,
   TextField,
   Tooltip,
   Typography,
@@ -281,7 +283,8 @@ const DEFAULT_CONTAINER: Container = {
   ram_mb: 512,
   ram_mb_min: 128,
   registry_password: '',
-  registry_username: ''
+  registry_username: '',
+  registry_type: 'docker'
 };
 
 type ContainerDialogProps = {
@@ -397,7 +400,7 @@ const WrappedContainerDialog = ({ open, setOpen, container, name, volumes, onSav
                 />
               </Grid>
             )}
-            <Grid item xs={12}>
+            <Grid item xs={8}>
               <Typography variant="subtitle2">{t('container.dialog.image')}</Typography>
               <TextField
                 fullWidth
@@ -407,6 +410,21 @@ const WrappedContainerDialog = ({ open, setOpen, container, name, volumes, onSav
                 onChange={event => handleContainerValueChange('image', event.target.value)}
                 value={tempContainer.image}
               />
+            </Grid>
+            <Grid item xs={4}>
+              <Typography variant="subtitle2">{t('container.dialog.registry_type')}</Typography>
+              <Select
+                fullWidth
+                id="registry_type"
+                variant="outlined"
+                margin="dense"
+                value={tempContainer.registry_type}
+                style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(0.5) }}
+                onChange={event => handleContainerValueChange('registry_type', event.target.value)}
+              >
+                <MenuItem value="docker">{t('Docker')}</MenuItem>
+                <MenuItem value="harbor">{t('Harbor')}</MenuItem>
+              </Select>
             </Grid>
             <Grid item xs={12} md={6}>
               <Typography variant="subtitle2">{t('container.dialog.cpu')}</Typography>

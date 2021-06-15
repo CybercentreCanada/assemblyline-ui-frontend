@@ -59,6 +59,7 @@ export type Container = {
   ram_mb_min: number;
   registry_password: string;
   registry_username: string;
+  registry_type: 'docker' | 'harbor';
 };
 
 export type SubmissionParams = {
