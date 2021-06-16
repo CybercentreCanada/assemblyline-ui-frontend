@@ -7,6 +7,7 @@ import AdminErrorViewer from 'components/routes/admin/error_viewer';
 import AdminServices from 'components/routes/admin/services';
 import Service from 'components/routes/admin/service_detail';
 import AdminSiteMap from 'components/routes/admin/site_map';
+import AdminTagSafelist from 'components/routes/admin/tag_safelist';
 import AdminUsers from 'components/routes/admin/users';
 import AlertDetails from 'components/routes/alerts/alert-details';
 import Alerts from 'components/routes/alerts/alerts';
@@ -87,6 +88,7 @@ const WrappedRoutes = () => {
         <Route exact path="/admin/services" component={AdminServices} />
         <Route exact path="/admin/services/:svc" component={Service} />
         <Route exact path="/admin/sitemap" component={AdminSiteMap} />
+        <Route exact path="/admin/tag_safelist" component={AdminTagSafelist} />
         <Route exact path="/admin/users" component={AdminUsers} />
         <Route exact path="/admin/users/:id" component={User} />
         <Route exact path="/authorize" component={AppRegistration} />

@@ -265,6 +265,11 @@ const useMyLayout = (): AppLayoutProps => {
       icon: <MapOutlinedIcon />
     },
     {
+      name: t('adminmenu.tag_safelist'),
+      route: '/admin/tag_safelist',
+      icon: <PlaylistAddCheckIcon />
+    },
+    {
       name: t('adminmenu.users'),
       route: '/admin/users',
       icon: <SupervisorAccountOutlinedIcon />

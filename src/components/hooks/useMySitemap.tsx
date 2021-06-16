@@ -201,6 +201,12 @@ export default function useMySitemap() {
       },
       { path: '/admin/sitemap', title: t('adminmenu.sitemap'), icon: <MapOutlinedIcon />, breadcrumbs: ['/admin'] },
       {
+        path: '/admin/tag_safelist',
+        title: t('adminmenu.tag_safelist'),
+        icon: <PlaylistAddCheckIcon />,
+        breadcrumbs: ['/admin']
+      },
+      {
         path: '/admin/users',
         title: t('adminmenu.users'),
         icon: <SupervisorAccountOutlinedIcon />,
