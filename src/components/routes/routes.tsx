@@ -7,6 +7,7 @@ import AdminErrorViewer from 'components/routes/admin/error_viewer';
 import AdminServices from 'components/routes/admin/services';
 import Service from 'components/routes/admin/service_detail';
 import AdminSiteMap from 'components/routes/admin/site_map';
+import AdminTagSafelist from 'components/routes/admin/tag_safelist';
 import AdminUsers from 'components/routes/admin/users';
 import AlertDetails from 'components/routes/alerts/alert-details';
 import Alerts from 'components/routes/alerts/alerts';
@@ -25,6 +26,8 @@ import Logout from 'components/routes/logout';
 import Manage from 'components/routes/manage';
 import ManageHeuristics from 'components/routes/manage/heuristics';
 import HeuristicDetail from 'components/routes/manage/heuristic_detail';
+import ManageSafelist from 'components/routes/manage/safelist';
+import SafelistDetail from 'components/routes/manage/safelist_detail';
 import ManageSignatures from 'components/routes/manage/signatures';
 import SignatureDetail from 'components/routes/manage/signature_detail';
 import ManageSignatureSources from 'components/routes/manage/signature_sources';
@@ -85,6 +88,7 @@ const WrappedRoutes = () => {
         <Route exact path="/admin/services" component={AdminServices} />
         <Route exact path="/admin/services/:svc" component={Service} />
         <Route exact path="/admin/sitemap" component={AdminSiteMap} />
+        <Route exact path="/admin/tag_safelist" component={AdminTagSafelist} />
         <Route exact path="/admin/users" component={AdminUsers} />
         <Route exact path="/admin/users/:id" component={User} />
         <Route exact path="/authorize" component={AppRegistration} />
@@ -105,6 +109,8 @@ const WrappedRoutes = () => {
         <Route exact path="/manage/sources" component={ManageSignatureSources} />
         <Route exact path="/manage/workflow/:id" component={WorkflowDetail} />
         <Route exact path="/manage/workflows" component={ManageWorkflows} />
+        <Route exact path="/manage/safelist/:id" component={SafelistDetail} />
+        <Route exact path="/manage/safelist" component={ManageSafelist} />
         <Route exact path="/manage" component={Manage} />
         <Route exact path="/search" component={Search} />
         <Route exact path="/search/:id" component={Search} />

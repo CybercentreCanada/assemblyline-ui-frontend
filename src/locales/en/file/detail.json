@@ -21,6 +21,13 @@
   "resubmit.success": "File successfully resubmitted for dynamic analysis. You will be redirected...",
   "resubmit_dynamic": "Resubmit for Dynamic Analysis",
   "results": "Service Results",
+  "safelist": "Add file to the safelist",
+  "safelist.acceptText": "Yes, add it!",
+  "safelist.cancelText": "Cancel",
+  "safelist.input": "Reason for safelisting",
+  "safelist.success": "File has been successfully added to the safelist",
+  "safelist.text": "Are you sure you want the current file to be added to the safelist?",
+  "safelist.title": "Safelist",
   "seen.count": "Count",
   "seen.first": "First Seen",
   "seen.last": "Last Seen",
@@ -30,6 +37,7 @@
   "type": "Type",
   "verdict.info": "Informational",
   "verdict.malicious": "Malicious",
+  "verdict.safe": "Safe",
   "verdict.suspicious": "Suspicious",
   "view_file": "View file"
 }

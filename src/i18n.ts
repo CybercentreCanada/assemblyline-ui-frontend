@@ -5,6 +5,7 @@ import error404EN from 'locales/en/404.json';
 import adminErrorViewerEN from 'locales/en/admin/error_viewer.json';
 import adminServicesEN from 'locales/en/admin/services.json';
 import adminSiteMapEN from 'locales/en/admin/site_map.json';
+import adminTagSafelistEN from 'locales/en/admin/tag_safelist.json';
 import adminUsersEN from 'locales/en/admin/users.json';
 import alertsEN from 'locales/en/alerts.json';
 import authorizeEN from 'locales/en/authorize.json';
@@ -22,6 +23,8 @@ import loginEN from 'locales/en/login.json';
 import logoutEN from 'locales/en/logout.json';
 import manageHeuristicsEN from 'locales/en/manage/heuristics.json';
 import manageHeuristicDetailEN from 'locales/en/manage/heuristic_detail.json';
+import manageSafelistEN from 'locales/en/manage/safelist.json';
+import manageSafelistDetailEN from 'locales/en/manage/safelist_detail.json';
 import manageSignaturesEN from 'locales/en/manage/signatures.json';
 import manageSignatureDetailEN from 'locales/en/manage/signature_detail.json';
 import manageSignatureSourcesEN from 'locales/en/manage/signature_sources.json';
@@ -43,6 +46,7 @@ import error404FR from 'locales/fr/404.json';
 import adminErrorViewerFR from 'locales/fr/admin/error_viewer.json';
 import adminServicesFR from 'locales/fr/admin/services.json';
 import adminSiteMapFR from 'locales/fr/admin/site_map.json';
+import adminTagSafelistFR from 'locales/fr/admin/tag_safelist.json';
 import adminUsersFR from 'locales/fr/admin/users.json';
 import alertsFR from 'locales/fr/alerts.json';
 import authorizeFR from 'locales/fr/authorize.json';
@@ -60,6 +64,8 @@ import loginFR from 'locales/fr/login.json';
 import logoutFR from 'locales/fr/logout.json';
 import manageHeuristicsFR from 'locales/fr/manage/heuristics.json';
 import manageHeuristicDetailFR from 'locales/fr/manage/heuristic_detail.json';
+import manageSafelistFR from 'locales/fr/manage/safelist.json';
+import manageSafelistDetailFR from 'locales/fr/manage/safelist_detail.json';
 import manageSignaturesFR from 'locales/fr/manage/signatures.json';
 import manageSignatureDetailFR from 'locales/fr/manage/signature_detail.json';
 import manageSignatureSourcesFR from 'locales/fr/manage/signature_sources.json';
@@ -83,6 +89,7 @@ const resources = {
     adminErrorViewer: adminErrorViewerEN,
     adminServices: adminServicesEN,
     adminSiteMap: adminSiteMapEN,
+    adminTagSafelist: adminTagSafelistEN,
     adminUsers: adminUsersEN,
     authorize: authorizeEN,
     dashboard: dashboardEN,
@@ -105,6 +112,8 @@ const resources = {
     manageSignatureSources: manageSignatureSourcesEN,
     manageWorkflowDetail: manageWorkflowDetailEN,
     manageWorkflows: manageWorkflowsEN,
+    manageSafelistDetail: manageSafelistDetailEN,
+    manageSafelist: manageSafelistEN,
     search: searchEN,
     settings: settingsEN,
     statisticsHeuristics: statisticsHeuristicsEN,
@@ -123,6 +132,7 @@ const resources = {
     adminErrorViewer: adminErrorViewerFR,
     adminServices: adminServicesFR,
     adminSiteMap: adminSiteMapFR,
+    adminTagSafelist: adminTagSafelistFR,
     adminUsers: adminUsersFR,
     authorize: authorizeFR,
     dashboard: dashboardFR,
@@ -145,6 +155,8 @@ const resources = {
     manageSignatureSources: manageSignatureSourcesFR,
     manageWorkflowDetail: manageWorkflowDetailFR,
     manageWorkflows: manageWorkflowsFR,
+    manageSafelistDetail: manageSafelistDetailFR,
+    manageSafelist: manageSafelistFR,
     search: searchFR,
     settings: settingsFR,
     statisticsHeuristics: statisticsHeuristicsFR,

@@ -6,6 +6,7 @@ import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
 import SubmissionState from 'components/visual/SubmissionState';
 import Verdict from 'components/visual/Verdict';
+import { maxLenStr } from 'helpers/utils';
 import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -106,9 +107,7 @@ const WrappedSubmissionsTable: React.FC<SubmissionsTableProps> = ({ submissionRe
                   <Verdict score={submission.max_score} fullWidth />
                 </DivTableCell>
                 <DivTableCell style={{ wordBreak: 'break-word' }}>
-                  {submission.params.description.length > 150
-                    ? `${submission.params.description.substr(0, 147)}...`
-                    : submission.params.description}
+                  {maxLenStr(submission.params.description, 150)}
                 </DivTableCell>
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>{submission.params.submitter}</DivTableCell>
                 <DivTableCell>{submission.file_count}</DivTableCell>

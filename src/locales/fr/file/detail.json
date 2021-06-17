@@ -21,6 +21,13 @@
   "resubmit.success": "Le fichier a été soumis à nouveau pour une analyse dynamique. Vous serez redirigé ...",
   "resubmit_dynamic": "Soumettre à nouveau pour l'analyse dynamique",
   "results": "Résultats du service",
+  "safelist": "Ajouter un fichier à la liste sûre",
+  "safelist.acceptText": "Oui, ajoutez-le !",
+  "safelist.cancelText": "Annuler",
+  "safelist.input": "Raison d'ajout",
+  "safelist.success": "Le fichier a été ajouté avec succès à la liste sûre",
+  "safelist.text": "Voulez-vous vraiment que le fichier actuel soit ajouté à la liste sûre ?",
+  "safelist.title": "Liste sûre",
   "seen.count": "Nombre de fois",
   "seen.first": "Vu la première fois",
   "seen.last": "Vu la dernière fois",
@@ -30,6 +37,7 @@
   "type": "Type",
   "verdict.info": "Informatif",
   "verdict.malicious": "Malveillant",
+  "verdict.safe": "Sans Danger",
   "verdict.suspicious": "Suspect",
   "view_file": "Visionner le fichier"
 }

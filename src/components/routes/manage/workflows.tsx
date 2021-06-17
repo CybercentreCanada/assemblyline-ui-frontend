@@ -13,9 +13,9 @@ import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
 import WorkflowTable from 'components/visual/SearchResult/workflow';
-import { searchResultsDisplay } from 'helpers/utils';
+import SearchResultCount from 'components/visual/SearchResultCount';
 import 'moment/locale/fr';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
 import WorkflowDetail from './workflow_detail';
@@ -209,7 +209,7 @@ export default function Workflows() {
                       <span>{t('searching')}</span>
                     ) : (
                       <span>
-                        {searchResultsDisplay(workflowResults.total)}&nbsp;
+                        <SearchResultCount count={workflowResults.total} />
                         {query.get('query')
                           ? t(`filtered${workflowResults.total === 1 ? '' : 's'}`)
                           : t(`total${workflowResults.total === 1 ? '' : 's'}`)}

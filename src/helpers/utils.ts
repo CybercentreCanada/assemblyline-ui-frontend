@@ -52,10 +52,20 @@ export function getProvider() {
   return params.get('provider');
 }
 
-export function searchResultsDisplay(count, max = 10000) {
-  if (count >= max) {
+export function searchResultsDisplay(count: number, max: number = 10000) {
+  const params = new URLSearchParams(window.location.search);
+  const trackedHits = params.get('track_total_hits');
+
+  if (count === parseInt(trackedHits) || (trackedHits === null && count === max)) {
     return `${count}+`;
   }
 
   return `${count}`;
+}
+
+export function maxLenStr(str: string, len: number) {
+  if (str.length > len) {
+    return `${str.substr(0, len - 3)}...`;
+  }
+  return str;
 }

@@ -3,6 +3,8 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React from 'react';
 
+const MAX_TRACKED_RECORDS = 10000;
+
 type SearchResults = {
   items: any[];
   offset: number;
@@ -39,7 +41,7 @@ const WrappedSearchPager: React.FC<SearchPagerProps> = ({
   ...otherProps
 }) => {
   const apiCall = useMyAPI();
-  const count = Math.ceil(total / pageSize);
+  const count = Math.ceil(Math.min(total, MAX_TRACKED_RECORDS) / pageSize);
 
   const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
     if (setSearching) {
