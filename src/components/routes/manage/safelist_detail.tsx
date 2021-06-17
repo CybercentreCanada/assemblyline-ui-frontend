@@ -89,7 +89,7 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
         body: {
           query:
             safelist.type === 'file'
-              ? `result.sections.tags.signature.name:"SAFELIST_${safelist_id || id}"`
+              ? `result.sections.heuristic.signature.name:"SAFELIST_${safelist_id || id}"`
               : `result.sections.safelisted_tags.${safelist.tag.type}:"${safelist.tag.value}"`,
           mincount: 0,
           start: 'now-30d/d',
