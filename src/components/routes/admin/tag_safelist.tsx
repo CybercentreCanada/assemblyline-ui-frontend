@@ -42,6 +42,8 @@ export default function AdminTagSafelist() {
     // the right language on first load...
     if (i18n.language === 'fr') {
       loader.config({ 'vs/nls': { availableLanguages: { '*': 'fr' } } });
+    } else {
+      loader.config({ 'vs/nls': { availableLanguages: { '*': '' } } });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
