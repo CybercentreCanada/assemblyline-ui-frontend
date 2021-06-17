@@ -5,5 +5,6 @@
   "save.cancelText": "Annuler",
   "save.success": "La liste sûre système a bien été enregistrée",
   "save.title": "Voici les modifications qui seront appliquées :",
-  "title": "Liste sûre système"
+  "title": "Liste sûre système",
+  "loading": "Chargement de l'éditeur de liste sûre..."
 }

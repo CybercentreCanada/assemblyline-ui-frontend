@@ -1,4 +1,5 @@
 {
+  "loading": "Loading safelist editor...",
   "reset": "Reset",
   "save": "Save changes",
   "save.acceptText": "Yes, apply them!",

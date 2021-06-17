@@ -9,18 +9,19 @@ import {
   useTheme
 } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
+import Editor, { DiffEditor, loader } from '@monaco-editor/react';
 import useAppContext from 'commons/components/hooks/useAppContext';
 import useUser from 'commons/components/hooks/useAppUser';
 import PageFullSize from 'commons/components/layout/pages/PageFullSize';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
-// import monacoEditor from 'monaco-editor/esm/vs/editor/editor.api';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import MonacoEditor, { MonacoDiffEditor } from 'react-monaco-editor';
 import ReactResizeDetector from 'react-resize-detector';
 import { Redirect } from 'react-router-dom';
+
+loader.config({ paths: { vs: '/cdn/monaco/' } });
 
 export default function AdminTagSafelist() {
   const { t } = useTranslation(['adminTagSafelist']);
@@ -105,17 +106,15 @@ export default function AdminTagSafelist() {
             <ReactResizeDetector handleHeight handleWidth targetRef={containerDialogEL}>
               {({ width, height }) => (
                 <div ref={containerDialogEL}>
-                  <MonacoDiffEditor
+                  <DiffEditor
                     language="yaml"
                     theme={isDarkTheme ? 'vs-dark' : 'vs'}
                     original={originalTagSafelist}
                     width={width}
                     height="50vh"
-                    value={tagSafelist}
-                    onChange={setTagSafelist}
+                    loading={t('loading')}
+                    modified={tagSafelist}
                     options={{ renderSideBySide: false, readOnly: true }}
-                    // options={{ readOnly: readonly, ...options }}
-                    editorDidMount={onMount}
                   />
                 </div>
               )}
@@ -139,14 +138,15 @@ export default function AdminTagSafelist() {
           >
             {tagSafelist !== null ? (
               <>
-                <MonacoEditor
-                  language="yaml"
+                <Editor
+                  defaultLanguage="yaml"
                   width={width}
                   height={height}
                   theme={isDarkTheme ? 'vs-dark' : 'vs'}
-                  value={tagSafelist}
+                  loading={t('loading')}
+                  defaultValue={tagSafelist}
                   onChange={setTagSafelist}
-                  editorDidMount={onMount}
+                  onMount={onMount}
                 />
               </>
             ) : (
