@@ -214,7 +214,7 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
                             ? `/search/result/?query=result.sections.heuristic.signature.name:"SAFELIST_${
                                 safelist_id || id
                               }"`
-                            : `/search/result/?query=result.sections.tags.${safelist.tag.type}:"${safelist.tag.value}"`
+                            : `/search/result/?query=result.sections.safelisted_tags.${safelist.tag.type}:"${safelist.tag.value}"`
                         }
                       >
                         <YoutubeSearchedForIcon />
