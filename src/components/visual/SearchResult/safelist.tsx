@@ -4,6 +4,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import { AlertTitle, Skeleton } from '@material-ui/lab';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
+import { maxLenStr } from 'helpers/utils';
 import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -77,7 +78,7 @@ const WrappedSafelistTable: React.FC<SafelistTableProps> = ({
                 {t('header.type')}
               </SortableHeaderCell>
               <SortableHeaderCell sortField="id" allowSort={allowSort}>
-                {t('header.hash')}
+                {t('header.identifier')}
               </SortableHeaderCell>
               <SortableHeaderCell sortField="sources.name" allowSort={allowSort}>
                 {t('header.source')}
@@ -114,7 +115,9 @@ const WrappedSafelistTable: React.FC<SafelistTableProps> = ({
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell>{sl_item.type}</DivTableCell>
-                <DivTableCell style={{ wordBreak: 'break-word' }}>{sl_item.id}</DivTableCell>
+                <DivTableCell style={{ wordBreak: 'break-word' }}>
+                  {sl_item.type === 'file' ? sl_item.id : `${sl_item.tag.type} - ${maxLenStr(sl_item.tag.value, 100)}`}
+                </DivTableCell>
                 <DivTableCell style={{ wordBreak: 'break-word' }}>{sl_item.sources.name.join(' | ')}</DivTableCell>
                 {c12nDef.enforce && (
                   <DivTableCell>

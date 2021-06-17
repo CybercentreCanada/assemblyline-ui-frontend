@@ -18,6 +18,7 @@
   "header.hash": "Hash",
   "header.hit_count": "Times seen",
   "header.id": "ID",
+  "header.identifier": "Identifier",
   "header.last_hit": "Last Seen",
   "header.last_modified": "Modified",
   "header.lasttimeseen": "Last Time Seen",

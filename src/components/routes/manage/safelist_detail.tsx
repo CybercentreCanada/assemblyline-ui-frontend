@@ -266,7 +266,7 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
           </Grid>
         </div>
         <Grid container spacing={3}>
-          <Grid item xs={12}>
+          <Grid item xs={12} style={{ display: safelist && safelist.type === 'tag' ? 'none' : 'initial' }}>
             <Typography variant="h6">{t('hashes')}</Typography>
             <Divider />
             <Grid container>
