@@ -77,9 +77,7 @@ const WrappedSafelistTable: React.FC<SafelistTableProps> = ({
               <SortableHeaderCell sortField="type" allowSort={allowSort}>
                 {t('header.type')}
               </SortableHeaderCell>
-              <SortableHeaderCell sortField="id" allowSort={allowSort}>
-                {t('header.identifier')}
-              </SortableHeaderCell>
+              <DivTableCell>{t('header.identifier')}</DivTableCell>
               <SortableHeaderCell sortField="sources.name" allowSort={allowSort}>
                 {t('header.source')}
               </SortableHeaderCell>
