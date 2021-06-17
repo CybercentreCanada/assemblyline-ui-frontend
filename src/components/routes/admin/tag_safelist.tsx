@@ -51,7 +51,7 @@ export default function AdminTagSafelist() {
   const reload = () => {
     apiCall({
       method: 'GET',
-      url: '/api/v4/admin/tag_safelist/',
+      url: '/api/v4/system/tag_safelist/',
       onSuccess: api_data => {
         setTagSafelist(api_data.api_response);
         setOriginalTagSafelist(api_data.api_response);
@@ -63,7 +63,7 @@ export default function AdminTagSafelist() {
     setOpen(false);
     apiCall({
       method: 'PUT',
-      url: '/api/v4/admin/tag_safelist/',
+      url: '/api/v4/system/tag_safelist/',
       body: tagData,
       onSuccess: api_data => {
         reload();
