@@ -24,7 +24,7 @@ import { Redirect } from 'react-router-dom';
 loader.config({ paths: { vs: '/cdn/monaco/' } });
 
 export default function AdminTagSafelist() {
-  const { t } = useTranslation(['adminTagSafelist']);
+  const { t, i18n } = useTranslation(['adminTagSafelist']);
   const theme = useTheme();
   const containerEL = useRef<HTMLDivElement>();
   const containerDialogEL = useRef<HTMLDivElement>();
@@ -38,6 +38,11 @@ export default function AdminTagSafelist() {
 
   useEffect(() => {
     reload();
+    // I cannot find a way to hot switch monaco editor's locale but at least I can load
+    // the right language on first load...
+    if (i18n.language === 'fr') {
+      loader.config({ 'vs/nls': { availableLanguages: { '*': 'fr' } } });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -139,12 +144,12 @@ export default function AdminTagSafelist() {
             {tagSafelist !== null ? (
               <>
                 <Editor
-                  defaultLanguage="yaml"
+                  language="yaml"
                   width={width}
                   height={height}
                   theme={isDarkTheme ? 'vs-dark' : 'vs'}
                   loading={t('loading')}
-                  defaultValue={tagSafelist}
+                  value={tagSafelist}
                   onChange={setTagSafelist}
                   onMount={onMount}
                 />
