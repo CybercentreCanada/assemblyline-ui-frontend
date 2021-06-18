@@ -59,10 +59,11 @@ export default function Safelist() {
   const apiCall = useMyAPI();
   const classes = useStyles();
   const { closeGlobalDrawer, setGlobalDrawer } = useDrawer();
-  const [suggestions] = useState([
-    ...Object.keys(indexes.safelist).filter(name => indexes.safelist[name].indexed),
-    ...DEFAULT_SUGGESTION
-  ]);
+  const [suggestions] = useState(
+    indexes.safelist
+      ? [...Object.keys(indexes.safelist).filter(name => indexes.safelist[name].indexed), ...DEFAULT_SUGGESTION]
+      : [...DEFAULT_SUGGESTION]
+  );
   const filterValue = useRef<string>('');
 
   useEffect(() => {
