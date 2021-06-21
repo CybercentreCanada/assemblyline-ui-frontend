@@ -277,8 +277,8 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates = null 
                         section_list={displayedResult.result.sections}
                         id={id}
                         sub_sections={[]}
-                        indent={section.depth}
-                        depth={section.depth}
+                        indent={section.depth + 1}
+                        depth={section.depth + 1}
                       />
                     ))}
                 {displayedResult.response.supplementary.length !== 0 && (
