@@ -459,9 +459,17 @@ type ResultSectionProps = {
   sub_sections: SectionItem[];
   indent: number;
   depth?: number;
+  nested?: boolean;
 };
 
-const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sections, indent, depth = 1 }) => {
+const ResultSection: React.FC<ResultSectionProps> = ({
+  section_list,
+  id,
+  sub_sections,
+  indent,
+  depth = 1,
+  nested = false
+}) => {
   const classes = useStyles();
   const theme = useTheme();
   const section = section_list[id];
@@ -516,6 +524,7 @@ const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sec
         indent={indent}
         depth={depth}
         highlighted={highlighted}
+        nested={nested}
       />
 
       <div style={{ width: '100%' }}>
@@ -610,6 +619,7 @@ const ResultSection: React.FC<ResultSectionProps> = ({ section_list, id, sub_sec
                       id={item.id}
                       sub_sections={item.children}
                       indent={indent + 1}
+                      nested
                     />
                   ))}
                 </div>
