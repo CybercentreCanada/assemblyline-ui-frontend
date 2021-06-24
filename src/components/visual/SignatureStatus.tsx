@@ -11,17 +11,26 @@ const COLOR_MAP = {
 type SignatureStatusProps = {
   status: 'DEPLOYED' | 'NOISY' | 'DISABLED';
   fullWidth?: boolean;
+  size?: 'tiny' | 'small' | 'medium';
+  variant?: 'default' | 'outlined';
   onClick?: () => void;
 };
 
-const WrappedSignatureStatus: React.FC<SignatureStatusProps> = ({ status, fullWidth = true, onClick = null }) => {
+const WrappedSignatureStatus: React.FC<SignatureStatusProps> = ({
+  status,
+  fullWidth = true,
+  onClick = null,
+  size = 'small',
+  variant = 'default'
+}) => {
   const { t } = useTranslation();
 
   return (
     <CustomChip
-      size="tiny"
+      size={size}
       fullWidth={fullWidth}
       color={COLOR_MAP[status]}
+      variant={variant}
       label={t(`signature.status.${status}`)}
       onClick={onClick}
     />

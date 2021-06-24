@@ -13,6 +13,7 @@ import HelpOutlineOutlinedIcon from '@material-ui/icons/HelpOutlineOutlined';
 import LabelOutlinedIcon from '@material-ui/icons/LabelOutlined';
 import MapOutlinedIcon from '@material-ui/icons/MapOutlined';
 import NotificationImportantOutlinedIcon from '@material-ui/icons/NotificationImportantOutlined';
+import PlaylistAddCheckIcon from '@material-ui/icons/PlaylistAddCheck';
 import PublishOutlinedIcon from '@material-ui/icons/PublishOutlined';
 import SearchIcon from '@material-ui/icons/Search';
 import SettingsApplicationsOutlinedIcon from '@material-ui/icons/SettingsApplicationsOutlined';
@@ -130,6 +131,13 @@ const useMyLayout = (): AppLayoutProps => {
             text: t('drawer.manage.heuristics'),
             icon: <SimCardOutlinedIcon />,
             route: '/manage/heuristics',
+            nested: true
+          },
+          {
+            id: 'manage.safelist',
+            text: t('drawer.manage.safelist'),
+            icon: <PlaylistAddCheckIcon />,
+            route: '/manage/safelist',
             nested: true
           },
           {
@@ -255,6 +263,11 @@ const useMyLayout = (): AppLayoutProps => {
       name: t('adminmenu.sitemap'),
       route: '/admin/sitemap',
       icon: <MapOutlinedIcon />
+    },
+    {
+      name: t('adminmenu.tag_safelist'),
+      route: '/admin/tag_safelist',
+      icon: <PlaylistAddCheckIcon />
     },
     {
       name: t('adminmenu.users'),

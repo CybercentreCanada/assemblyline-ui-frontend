@@ -2,6 +2,7 @@ import { Grid, IconButton, Link as MaterialLink, Tooltip, Typography, useTheme }
 import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
 import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
 import PageviewOutlinedIcon from '@material-ui/icons/PageviewOutlined';
+import PlaylistAddCheckIcon from '@material-ui/icons/PlaylistAddCheck';
 import RotateLeftOutlinedIcon from '@material-ui/icons/RotateLeftOutlined';
 import { Skeleton } from '@material-ui/lab';
 import useALContext from 'components/hooks/useALContext';
@@ -25,6 +26,7 @@ import MetadataSection from './FileDetail/metadata';
 import ParentSection from './FileDetail/parents';
 import ResultSection from './FileDetail/results';
 import TagSection from './FileDetail/tags';
+import InputDialog from './InputDialog';
 
 type FileInfo = {
   archive_ts: string;
@@ -93,8 +95,10 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
 }) => {
   const { t } = useTranslation(['fileDetail']);
   const [file, setFile] = useState<File | null>(null);
+  const [safelistDialog, setSafelistDialog] = useState<boolean>(false);
+  const [safelistReason, setSafelistReason] = useState<string>('');
   const apiCall = useMyAPI();
-  const { c12nDef } = useALContext();
+  const { c12nDef, user: currentUser } = useALContext();
   const theme = useTheme();
   const history = useHistory();
   const { showSuccessMessage } = useMySnackbar();
@@ -150,6 +154,51 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sha256]);
 
+  const prepareSafelist = useCallback(() => {
+    setSafelistReason('');
+    setSafelistDialog(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sha256]);
+
+  const addToSafelist = useCallback(() => {
+    const data = {
+      hashes: {
+        md5: file.file_info.md5,
+        sha1: file.file_info.sha1,
+        sha256: file.file_info.sha256
+      },
+      file: {
+        name: [],
+        size: file.file_info.size,
+        type: file.file_info.type
+      },
+      sources: [
+        {
+          classification: file.file_info.classification,
+          name: currentUser.username,
+          reason: [safelistReason],
+          type: 'user'
+        }
+      ],
+      type: 'file'
+    };
+
+    if (fileName !== sha256) {
+      data.file.name.push(fileName);
+    }
+
+    apiCall({
+      url: `/api/v4/safelist/`,
+      method: 'PUT',
+      body: data,
+      onSuccess: _ => {
+        setSafelistDialog(false);
+        showSuccessMessage(t('safelist.success'));
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sha256, safelistReason, file]);
+
   useEffect(() => {
     setFile(null);
 
@@ -177,6 +226,18 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
 
   return (
     <div id="fileDetailTop" style={{ textAlign: 'left' }}>
+      <InputDialog
+        open={safelistDialog}
+        handleClose={() => setSafelistDialog(false)}
+        handleAccept={addToSafelist}
+        handleInputChange={event => setSafelistReason(event.target.value)}
+        inputValue={safelistReason}
+        title={t('safelist.title')}
+        cancelText={t('safelist.cancelText')}
+        acceptText={t('safelist.acceptText')}
+        inputLabel={t('safelist.input')}
+        text={t('safelist.text')}
+      />
       {useMemo(
         () => (
           <>
@@ -223,6 +284,11 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                     <Tooltip title={t('resubmit_dynamic')}>
                       <IconButton onClick={resubmit}>
                         <RotateLeftOutlinedIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t('safelist')}>
+                      <IconButton onClick={prepareSafelist}>
+                        <PlaylistAddCheckIcon />
                       </IconButton>
                     </Tooltip>
                   </div>

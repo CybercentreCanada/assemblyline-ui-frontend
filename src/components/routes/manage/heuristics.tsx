@@ -10,9 +10,9 @@ import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
 import HeuristicsTable from 'components/visual/SearchResult/heuristics';
-import { searchResultsDisplay } from 'helpers/utils';
+import SearchResultCount from 'components/visual/SearchResultCount';
 import 'moment/locale/fr';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
 import HeuristicDetail from './heuristic_detail';
@@ -147,7 +147,7 @@ export default function Heuristics() {
                             <span>{t('searching')}</span>
                           ) : (
                             <span>
-                              {searchResultsDisplay(heuristicResults.total)}&nbsp;
+                              <SearchResultCount count={heuristicResults.total} />
                               {query.get('query')
                                 ? t(`filtered${heuristicResults.total === 1 ? '' : 's'}`)
                                 : t(`total${heuristicResults.total === 1 ? '' : 's'}`)}

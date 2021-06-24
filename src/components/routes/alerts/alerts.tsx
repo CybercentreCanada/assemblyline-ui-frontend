@@ -14,7 +14,7 @@ import InformativeAlert from 'components/visual/InformativeAlert';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import SearchQuery, { SearchQueryFilters } from 'components/visual/SearchBar/search-query';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
-import { searchResultsDisplay } from 'helpers/utils';
+import SearchResultCount from 'components/visual/SearchResultCount';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
@@ -471,7 +471,14 @@ const SearchResultLarge = ({ searching, total, query, onApplyFilters }) => {
     <div style={{ position: 'relative' }}>
       <AlertsFiltersSelected searchQuery={query} onChange={onApplyFilters} hideQuery />
       <div style={{ position: 'absolute', top: theme.spacing(0.5), right: theme.spacing(1) }}>
-        {searching ? '' : <span>{`${searchResultsDisplay(total)} ${total > 1 ? t('results') : t('result')}`}</span>}
+        {searching ? (
+          ''
+        ) : (
+          <span>
+            <SearchResultCount count={total} />
+            {total > 1 ? t('results') : t('result')}
+          </span>
+        )}
       </div>
     </div>
   );
@@ -489,7 +496,14 @@ const SearchResultSmall = ({ searching, total, query }) => {
             <FiFilter style={{ marginRight: theme.spacing(1) }} />
           </>
         )}
-        {searching ? '' : `${searchResultsDisplay(total)} ${total > 1 ? t('results') : t('result')}`}
+        {searching ? (
+          ''
+        ) : (
+          <span>
+            <SearchResultCount count={total} />
+            {total > 1 ? t('results') : t('result')}
+          </span>
+        )}
       </div>
     </>
   );

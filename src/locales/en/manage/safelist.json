@@ -1,0 +1,12 @@
+{
+  "filter": "Filter safelisted hashes...",
+  "filtered": "hash matching filter",
+  "filtereds": "hashes matching filter",
+  "searching": "Searching...",
+  "title": "Safelist",
+  "total": "hash in safelist",
+  "totals": "hashes in safelist",
+  "user": "Hashes added by users",
+  "disabled": "Disabled hashes",
+  "tag": "Tag based hashes"
+}

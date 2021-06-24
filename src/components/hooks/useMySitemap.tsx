@@ -20,6 +20,7 @@ import ListOutlinedIcon from '@material-ui/icons/ListOutlined';
 import MapOutlinedIcon from '@material-ui/icons/MapOutlined';
 import NotificationImportantOutlinedIcon from '@material-ui/icons/NotificationImportantOutlined';
 import PageviewOutlinedIcon from '@material-ui/icons/PageviewOutlined';
+import PlaylistAddCheckIcon from '@material-ui/icons/PlaylistAddCheck';
 import PublishOutlinedIcon from '@material-ui/icons/PublishOutlined';
 import ReceiptOutlinedIcon from '@material-ui/icons/ReceiptOutlined';
 import SearchIcon from '@material-ui/icons/Search';
@@ -137,6 +138,18 @@ export default function useMySitemap() {
         icon: <BiNetworkChart />,
         breadcrumbs: ['/manage']
       },
+      {
+        path: '/manage/safelist/:id',
+        title: t('breadcrumb.safelist.detail'),
+        icon: <ListOutlinedIcon />,
+        breadcrumbs: ['/manage', '/manage/safelist']
+      },
+      {
+        path: '/manage/safelist',
+        title: t('drawer.manage.safelist'),
+        icon: <PlaylistAddCheckIcon />,
+        breadcrumbs: ['/manage']
+      },
       { path: '/search', title: t('drawer.search'), isRoot: true, icon: <SearchIcon /> },
       { path: '/search/alert', title: t('drawer.search.alert'), breadcrumbs: ['/search'] },
       { path: '/search/file', title: t('drawer.search.file'), breadcrumbs: ['/search'] },
@@ -187,6 +200,12 @@ export default function useMySitemap() {
         breadcrumbs: ['/admin', '/admin/services']
       },
       { path: '/admin/sitemap', title: t('adminmenu.sitemap'), icon: <MapOutlinedIcon />, breadcrumbs: ['/admin'] },
+      {
+        path: '/admin/tag_safelist',
+        title: t('adminmenu.tag_safelist'),
+        icon: <PlaylistAddCheckIcon />,
+        breadcrumbs: ['/admin']
+      },
       {
         path: '/admin/users',
         title: t('adminmenu.users'),

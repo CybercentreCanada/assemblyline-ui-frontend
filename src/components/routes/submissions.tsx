@@ -12,9 +12,9 @@ import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
 import SubmissionsTable, { SubmissionResult } from 'components/visual/SearchResult/submissions';
-import { searchResultsDisplay } from 'helpers/utils';
+import SearchResultCount from 'components/visual/SearchResultCount';
 import 'moment/locale/fr';
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
 
@@ -152,7 +152,7 @@ export default function Submissions() {
                       <span>{t('searching')}</span>
                     ) : (
                       <span>
-                        {searchResultsDisplay(submissionResults.total)}&nbsp;
+                        <SearchResultCount count={submissionResults.total} />
                         {query.get('query')
                           ? t(`filtered${submissionResults.total === 1 ? '' : 's'}`)
                           : t(`total${submissionResults.total === 1 ? '' : 's'}`)}

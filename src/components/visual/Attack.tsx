@@ -1,13 +1,23 @@
+import { Menu, MenuItem } from '@material-ui/core';
+import AssignmentOutlinedIcon from '@material-ui/icons/AssignmentOutlined';
 import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
+import SelectAllOutlinedIcon from '@material-ui/icons/SelectAllOutlined';
 import useClipboard from 'commons/components/hooks/useClipboard';
 import useHighlighter from 'components/hooks/useHighlighter';
 import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
 import { scoreToVerdict } from 'helpers/utils';
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 
 const STYLE = { height: 'auto', minHeight: '20px' };
-const SEARCH_ICON = <SearchOutlinedIcon style={{ marginLeft: '2px', height: '18px', width: '18px' }} />;
+const SEARCH_ICON = <SearchOutlinedIcon style={{ marginRight: '16px' }} />;
+const CLIPBOARD_ICON = <AssignmentOutlinedIcon style={{ marginRight: '16px' }} />;
+const HIGHLIGHT_ICON = <SelectAllOutlinedIcon style={{ marginRight: '16px' }} />;
+const initialMenuState = {
+  mouseX: null,
+  mouseY: null
+};
 
 type AttackProps = {
   text: string;
@@ -26,6 +36,8 @@ const Attack: React.FC<AttackProps> = ({
   highlight_key = null,
   fullWidth = false
 }) => {
+  const { t } = useTranslation();
+  const [state, setState] = React.useState(initialMenuState);
   const history = useHistory();
   const { isHighlighted, triggerHighlight } = useHighlighter();
   const { copy } = useClipboard();
@@ -55,23 +67,68 @@ const Attack: React.FC<AttackProps> = ({
     }[scoreToVerdict(score)];
   }
 
+  const handleMenuClick = useCallback(event => {
+    event.preventDefault();
+    setState({
+      mouseX: event.clientX - 2,
+      mouseY: event.clientY - 4
+    });
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setState(initialMenuState);
+  }, []);
+
+  const handleMenuCopy = useCallback(() => {
+    copy(text, 'clipID');
+    handleClose();
+  }, [copy, handleClose, text]);
+
+  const handleMenuSearch = useCallback(() => {
+    searchAttack();
+    handleClose();
+  }, [searchAttack, handleClose]);
+
+  const handleMenuHighlight = useCallback(() => {
+    handleClick();
+    handleClose();
+  }, [handleClick, handleClose]);
+
   return (
-    <CustomChip
-      wrap
-      size="tiny"
-      type="rounded"
-      color={highlight_key && isHighlighted(highlight_key) ? ('primary' as 'info') : color}
-      label={show_type ? `[ATT&CK] ${text}` : text}
-      onDelete={searchAttack}
-      deleteIcon={SEARCH_ICON}
-      style={STYLE}
-      onClick={highlight_key ? handleClick : null}
-      fullWidth={fullWidth}
-      onContextMenu={event => {
-        event.preventDefault();
-        copy(text, 'drawerTop');
-      }}
-    />
+    <>
+      <Menu
+        open={state.mouseY !== null}
+        onClose={handleClose}
+        anchorReference="anchorPosition"
+        anchorPosition={
+          state.mouseY !== null && state.mouseX !== null ? { top: state.mouseY, left: state.mouseX } : undefined
+        }
+      >
+        <MenuItem id="clipID" dense onClick={handleMenuCopy}>
+          {CLIPBOARD_ICON}
+          {t('clipboard')}
+        </MenuItem>
+        <MenuItem dense onClick={handleMenuSearch}>
+          {SEARCH_ICON}
+          {t('related')}
+        </MenuItem>
+        <MenuItem dense onClick={handleMenuHighlight}>
+          {HIGHLIGHT_ICON}
+          {t('highlight')}
+        </MenuItem>
+      </Menu>
+      <CustomChip
+        wrap
+        size="tiny"
+        type="rounded"
+        color={highlight_key && isHighlighted(highlight_key) ? ('primary' as 'info') : color}
+        label={show_type ? `[ATT&CK] ${text}` : text}
+        style={STYLE}
+        onClick={highlight_key ? handleClick : null}
+        fullWidth={fullWidth}
+        onContextMenu={handleMenuClick}
+      />
+    </>
   );
 };
 

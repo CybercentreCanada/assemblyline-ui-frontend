@@ -105,6 +105,14 @@ const useStyles = makeStyles(theme => ({
     WebkitPrintColorAdjust: 'exact',
     backgroundColor: '#6e6e6e15 !important',
     borderBottom: '1px solid #aaa !important'
+  },
+  safe_heur: {
+    textTransform: 'capitalize',
+    fontWeight: 700,
+    padding: '5px',
+    WebkitPrintColorAdjust: 'exact',
+    backgroundColor: '#00f20015 !important',
+    borderBottom: '1px solid #81c784 !important'
   }
 }));
 
@@ -374,7 +382,8 @@ function HeuristicsList({ verdict, items }) {
   const classMap = {
     malicious: classes.malicious_heur,
     suspicious: classes.suspicious_heur,
-    info: classes.info_heur
+    info: classes.info_heur,
+    safe: classes.safe_heur
   };
 
   return (
@@ -796,7 +805,8 @@ export default function SubmissionReport() {
         {(!report ||
           Object.keys(report.heuristics.malicious).length !== 0 ||
           Object.keys(report.heuristics.suspicious).length !== 0 ||
-          Object.keys(report.heuristics.info).length !== 0) && (
+          Object.keys(report.heuristics.info).length !== 0 ||
+          (report.heuristics.safe && Object.keys(report.heuristics.safe).length !== 0)) && (
           <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
             <Typography variant="h6">{t('heuristics')}</Typography>
             <Divider className={classes.divider} />
@@ -808,6 +818,9 @@ export default function SubmissionReport() {
             >
               {report ? (
                 <>
+                  {report.heuristics.safe && Object.keys(report.heuristics.safe).length !== 0 && (
+                    <HeuristicsList verdict="safe" items={report.heuristics.safe} />
+                  )}
                   {Object.keys(report.heuristics.malicious).length !== 0 && (
                     <HeuristicsList verdict="malicious" items={report.heuristics.malicious} />
                   )}

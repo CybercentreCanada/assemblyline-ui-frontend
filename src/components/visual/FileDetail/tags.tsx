@@ -80,11 +80,12 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ signatures, tags }) => {
                         </span>
                       </Grid>
                       <Grid item xs={12} sm={9} lg={10}>
-                        {tags[tag_type].map(([value, lvl], idx) => (
+                        {tags[tag_type].map(([value, lvl, safelisted], idx) => (
                           <Tag
                             key={idx}
                             value={value}
                             type={tag_type}
+                            safelisted={safelisted}
                             lvl={lvl}
                             highlight_key={getKey(tag_type, value)}
                           />
