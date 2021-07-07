@@ -41,6 +41,7 @@
   "container.dialog.ram": "Plage de mémoire autorisée",
   "container.dialog.registry_password": "Mot de passe du registre du conteneur",
   "container.dialog.registry_username": "Nom d'utilisateur du registre de conteneurs",
+  "container.dialog.registry_type": "Type de registre de conteneurs",
   "container.dialog.title.dependency": "Modifier la dépendance",
   "container.dialog.title.container": "Modifier le conteneur",
   "container.dialog.volumes": "Volumes persistants",
