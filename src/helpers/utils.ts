@@ -11,13 +11,13 @@ export function scoreToVerdict(score: number | null) {
     return 'malicious';
   }
 
-  // Between 500 - 999 => highly suspicious
-  if (score >= 500) {
+  // Between 700 - 999 => Highly suspicious
+  if (score >= 700) {
     return 'highly_suspicious';
   }
 
-  // Between 100 - 999 => suspicious
-  if (score >= 100) {
+  // Between 300 - 699 => Suspicious
+  if (score >= 300) {
     return 'suspicious';
   }
 
@@ -26,7 +26,7 @@ export function scoreToVerdict(score: number | null) {
     return 'safe';
   }
 
-  // Between 0 and 99 => Unknown
+  // Between 0 and 299 => Informational
   return 'info';
 }
 
