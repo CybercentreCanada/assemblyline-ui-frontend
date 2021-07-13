@@ -53,13 +53,7 @@ export default function useMyAPI() {
 
     // Fetch the URL
     fetch(url, requestOptions)
-      .then(res => {
-        if (res.status === 401 && reloadOnUnauthorize) {
-          // Trigger a page reload, we're not logged in anymore
-          window.location.reload(false);
-        }
-        return res.json();
-      })
+      .then(res => res.json())
       .catch(err => {
         // eslint-disable-next-line no-console
         console.error(err);
@@ -81,6 +75,7 @@ export default function useMyAPI() {
         } else if (api_data.api_status_code === 401 && reloadOnUnauthorize) {
           // Detect login request
           // Do nothing... we are reloading the page
+          window.location.reload();
           return;
         } else if (api_data.api_status_code !== 200) {
           // Handle errors

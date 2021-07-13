@@ -46,7 +46,7 @@ export function ResetPasswordNow({ buttonLoading, setButtonLoading }: ResetPassw
       onExit: () => setButtonLoading(false),
       onSuccess: () => {
         setDone(true);
-        setTimeout(() => window.location.reload(false), 7000);
+        setTimeout(() => window.location.reload(), 7000);
       }
     });
     event.preventDefault();

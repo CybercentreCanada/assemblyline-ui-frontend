@@ -143,7 +143,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
         }
       },
       onSuccess: () => {
-        window.location.reload(false);
+        window.location.reload();
       }
     });
   }

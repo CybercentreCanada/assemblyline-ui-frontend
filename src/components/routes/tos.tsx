@@ -46,7 +46,7 @@ export default function Tos() {
   function acceptTOS() {
     apiCall({
       url: `/api/v4/user/tos/${currentUser.username}/`,
-      onSuccess: () => window.location.reload(false),
+      onSuccess: () => window.location.reload(),
       onEnter: () => setButtonLoading(true),
       onExit: () => setButtonLoading(false)
     });
@@ -55,7 +55,7 @@ export default function Tos() {
   function cancelTOS() {
     apiCall({
       url: '/api/v4/auth/logout/',
-      onSuccess: () => window.location.reload(false),
+      onSuccess: () => window.location.reload(),
       onEnter: () => setButtonLoading(true),
       onExit: () => setButtonLoading(false)
     });
