@@ -153,7 +153,7 @@ function Submit() {
         const data = JSON.parse(api_data);
         if (Object.hasOwnProperty.call(data, 'api_status_code')) {
           if (data.api_status_code === 401) {
-            window.location.reload(false);
+            window.location.reload();
           }
         }
       } catch (ex) {
