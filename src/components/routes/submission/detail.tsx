@@ -125,7 +125,7 @@ export default function SubmissionDetail() {
           // #1: Get heuristic score
           if (section.heuristic.score < 0) {
             hType = 'safe';
-          } else if (section.heuristic.score < 100) {
+          } else if (section.heuristic.score < 300) {
             hType = 'info';
           } else if (section.heuristic.score < 1000) {
             hType = 'suspicious';
