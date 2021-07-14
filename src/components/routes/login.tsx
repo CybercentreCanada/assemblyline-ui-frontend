@@ -236,9 +236,6 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
                         color="primary"
                         disabled={buttonLoading}
                         onClick={() => {
-                          const date = new Date();
-                          date.setTime(date.getTime() + 5 * 60 * 1000);
-                          document.cookie = `ui4_path=${process.env.PUBLIC_URL}; expires=${date.toUTCString()}; path=/`;
                           localStorage.setItem(
                             'nextLocation',
                             location.pathname === '/logout'
