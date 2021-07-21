@@ -241,9 +241,9 @@ const WrappedIngestCard = ({ ingester }) => {
             />
             <MetricCounter
               init={ingester.initialized}
-              value={ingester.metrics.safelisted}
+              value={ingester.metrics.whitelisted}
               title="W"
-              tooltip={t('throughput.safelisted')}
+              tooltip={t('throughput.whitelisted')}
             />
             <MetricCounter
               init={ingester.initialized}
