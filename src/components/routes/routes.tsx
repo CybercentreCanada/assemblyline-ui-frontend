@@ -106,6 +106,7 @@ const WrappedRoutes = () => {
         <Route exact path="/manage/heuristic/:id" component={HeuristicDetail} />
         <Route exact path="/manage/signatures" component={ManageSignatures} />
         <Route exact path="/manage/signature/:id" component={SignatureDetail} />
+        <Route exact path="/manage/signature/:type/:source/:name" component={SignatureDetail} />
         <Route exact path="/manage/sources" component={ManageSignatureSources} />
         <Route exact path="/manage/workflow/:id" component={WorkflowDetail} />
         <Route exact path="/manage/workflows" component={ManageWorkflows} />

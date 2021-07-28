@@ -121,6 +121,12 @@ export default function useMySitemap() {
         breadcrumbs: ['/manage', '/manage/signatures']
       },
       {
+        path: '/manage/signature/:type/:source/:name',
+        title: t('breadcrumb.signature.detail'),
+        icon: <ListOutlinedIcon />,
+        breadcrumbs: ['/manage', '/manage/signatures']
+      },
+      {
         path: '/manage/sources',
         title: t('drawer.manage.source'),
         icon: <CodeOutlinedIcon />,
