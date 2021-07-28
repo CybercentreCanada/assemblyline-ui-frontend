@@ -1,5 +1,6 @@
 import { Menu, MenuItem } from '@material-ui/core';
 import AssignmentOutlinedIcon from '@material-ui/icons/AssignmentOutlined';
+import FingerprintOutlinedIcon from '@material-ui/icons/FingerprintOutlined';
 import PlaylistAddCheckOutlinedIcon from '@material-ui/icons/PlaylistAddCheckOutlined';
 import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 import SelectAllOutlinedIcon from '@material-ui/icons/SelectAllOutlined';
@@ -12,7 +13,7 @@ import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
 import { scoreToVerdict } from 'helpers/utils';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useHistory } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import InputDialog from './InputDialog';
 
 const STYLE = { height: 'auto', minHeight: '20px' };
@@ -20,6 +21,7 @@ const SEARCH_ICON = <SearchOutlinedIcon style={{ marginRight: '16px' }} />;
 const CLIPBOARD_ICON = <AssignmentOutlinedIcon style={{ marginRight: '16px' }} />;
 const HIGHLIGHT_ICON = <SelectAllOutlinedIcon style={{ marginRight: '16px' }} />;
 const SAFELIST_ICON = <PlaylistAddCheckOutlinedIcon style={{ marginRight: '16px' }} />;
+const SIGNATURE_ICON = <FingerprintOutlinedIcon style={{ marginRight: '16px' }} />;
 const initialMenuState = {
   mouseX: null,
   mouseY: null
@@ -166,6 +168,19 @@ const Tag: React.FC<TagProps> = ({
           state.mouseY !== null && state.mouseX !== null ? { top: state.mouseY, left: state.mouseX } : undefined
         }
       >
+        {type.startsWith('file.rule.') && (
+          <MenuItem
+            id="clipID"
+            dense
+            component={Link}
+            to={`/manage/signature/${type.substring(10)}/${value.substring(0, value.indexOf('.'))}/${value.substring(
+              value.indexOf('.') + 1
+            )}`}
+          >
+            {SIGNATURE_ICON}
+            {t('goto_signature')}
+          </MenuItem>
+        )}
         <MenuItem id="clipID" dense onClick={handleMenuCopy}>
           {CLIPBOARD_ICON}
           {t('clipboard')}

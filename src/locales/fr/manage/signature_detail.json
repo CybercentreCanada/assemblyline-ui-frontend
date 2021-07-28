@@ -20,6 +20,7 @@
   "hit.none": "Jamais",
   "hits": "Utilisation",
   "last10": "Dernière 10 utilisations",
+  "not_found": "La signature est introuvable dans la base de données.",
   "remove": "Supprimer la signature",
   "score.avg": "Moyen",
   "score.max": "Maximum",

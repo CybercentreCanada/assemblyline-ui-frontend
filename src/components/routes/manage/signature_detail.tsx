@@ -60,7 +60,10 @@ export type Statistics = {
 };
 
 type ParamProps = {
-  id: string;
+  id?: string;
+  type?: string;
+  source?: string;
+  name?: string;
 };
 
 type SignatureDetailProps = {
@@ -96,7 +99,7 @@ const useStyles = makeStyles(theme => ({
 
 const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetailProps) => {
   const { t, i18n } = useTranslation(['manageSignatureDetail']);
-  const { id } = useParams<ParamProps>();
+  const { id, type, source, name } = useParams<ParamProps>();
   const theme = useTheme();
   const [signature, setSignature] = useState<Signature>(null);
   const [stats, setStats] = useState<Statistics>(null);
@@ -107,7 +110,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
   const [buttonLoading, setButtonLoading] = useState(false);
   const [modified, setModified] = useState(false);
   const history = useHistory();
-  const { showSuccessMessage } = useMySnackbar();
+  const { showSuccessMessage, showErrorMessage } = useMySnackbar();
   const apiCall = useMyAPI();
   const classes = useStyles();
   const { user: currentUser, c12nDef } = useALContext();
@@ -123,6 +126,28 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [signature_id, id]);
+
+  useEffect(() => {
+    if (type && source && name) {
+      apiCall({
+        url: `/api/v4/search/signature/?query=type:${type} AND source:${source} AND name:${name}&rows=1&fl=id`,
+        onSuccess: api_data => {
+          if (api_data.api_response.items.length) {
+            const sigId = api_data.api_response.items[0].id;
+            apiCall({
+              url: `/api/v4/signature/${sigId}/`,
+              onSuccess: id_api_data => {
+                setSignature(id_api_data.api_response);
+              }
+            });
+          } else {
+            showErrorMessage(t('not_found'));
+          }
+        }
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [type, source, name]);
 
   useEffect(() => {
     if (signature) {
@@ -213,7 +238,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
   };
 
   return (
-    <PageCenter margin={!id ? 2 : 4} width="100%">
+    <PageCenter margin={!id && !type && !name && !source ? 2 : 4} width="100%">
       <ConfirmationDialog
         open={deleteDialog}
         handleClose={() => setDeleteDialog(false)}
