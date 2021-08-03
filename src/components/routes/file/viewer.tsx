@@ -52,8 +52,10 @@ const WrappedAsciiViewer = ({ sha256 }) => {
       url: `/api/v4/file/ascii/${sha256}/`,
       onSuccess: api_data => {
         setAscii(api_data.api_response);
+        if (error !== null) setError(null);
       },
       onFailure: api_data => {
+        if (ascii !== null) setAscii(null);
         setError(api_data.api_error_message);
       }
     });
@@ -79,10 +81,12 @@ const WrappedHexViewer = ({ sha256 }) => {
     apiCall({
       url: `/api/v4/file/hex/${sha256}/`,
       onSuccess: api_data => {
+        if (error !== null) setError(null);
         setHex(api_data.api_response);
       },
       onFailure: api_data => {
         setError(api_data.api_error_message);
+        if (hex !== null) setHex(null);
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -109,10 +113,12 @@ const WrappedStringViewer = ({ sha256 }) => {
     apiCall({
       url: `/api/v4/file/strings/${sha256}/`,
       onSuccess: api_data => {
+        if (error !== null) setError(null);
         setString(api_data.api_response);
       },
       onFailure: api_data => {
         setError(api_data.api_error_message);
+        if (string !== null) setString(null);
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
