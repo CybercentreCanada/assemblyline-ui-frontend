@@ -427,6 +427,7 @@ export type SectionItem = {
 };
 
 export type Section = {
+  auto_collapse: boolean;
   body: any;
   body_format: string;
   classification: string;
@@ -474,7 +475,7 @@ const ResultSection: React.FC<ResultSectionProps> = ({
   const classes = useStyles();
   const theme = useTheme();
   const section = section_list[id];
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = React.useState(!section.auto_collapse);
   const { getKey, hasHighlightedKeys } = useHighlighter();
   const { c12nDef } = useALContext();
 
