@@ -1,5 +1,6 @@
 import { useTheme } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
+import 'chartjs-adapter-moment';
 import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 
@@ -18,37 +19,40 @@ const WrappedHistogram = ({ data, height, title, isDate }: HistogramProps) => {
   const [max, setMax] = useState(5);
   const [histData, setHistData] = useState(null);
   const options = {
+    datasets: { line: { tension: 0.4, fill: 'origin' } },
     maintainAspectRatio: false,
     responsive: true,
-    scales: {
-      xAxes: [
-        {
-          gridLines: { display: false, drawBorder: true },
-          ticks: { fontColor: theme.palette.text.secondary },
-          time: isDate ? { unit: 'day' } : null,
-          type: isDate ? 'time' : null
-        }
-      ],
-      yAxes: [
-        {
-          ticks: {
-            beginAtZero: true,
-            suggestedMax: max,
-            fontColor: theme.palette.text.secondary,
-            precision: 0
+    plugins: {
+      title: title
+        ? {
+            display: true,
+            text: title,
+            color: theme.palette.text.primary,
+            font: { family: 'Roboto', size: 14 }
           }
-        }
-      ]
+        : null,
+      legend: { display: false }
     },
-    title: title
-      ? {
-          display: true,
-          text: title,
-          fontColor: theme.palette.text.primary,
-          fontFamily: 'Roboto',
-          fontSize: 14
+    scales: {
+      xAxis: {
+        axis: 'x',
+        grid: { display: false, drawBorder: true },
+        ticks: {
+          color: theme.palette.text.secondary
+        },
+        time: isDate ? { unit: 'day' } : null,
+        type: isDate ? 'time' : null
+      },
+      yAxis: {
+        axis: 'y',
+        beginAtZero: true,
+        suggestedMax: max,
+        ticks: {
+          color: theme.palette.text.secondary,
+          precision: 0
         }
-      : null
+      }
+    }
   };
 
   useEffect(() => {
@@ -75,7 +79,7 @@ const WrappedHistogram = ({ data, height, title, isDate }: HistogramProps) => {
   }, [data, theme]);
 
   return histData ? (
-    <Line redraw data={histData} legend={{ display: false }} height={height} options={options} />
+    <Line data={histData} height={height} options={options} />
   ) : (
     <Skeleton variant="rect" height={height} />
   );
