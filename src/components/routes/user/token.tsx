@@ -12,11 +12,11 @@ import {
 } from '@material-ui/core';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+// eslint-disable-next-line import/extensions
+import CBOR from 'helpers/cbor.js';
 import toArrayBuffer from 'helpers/toArrayBuffer';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-const CBOR = require('helpers/cbor.js');
 
 type SecurityTokenProps = {
   user: any;
