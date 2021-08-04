@@ -1,4 +1,4 @@
-import { fade, InputBase, makeStyles } from '@material-ui/core';
+import { alpha, InputBase, makeStyles } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import { useState } from 'react';
@@ -11,9 +11,9 @@ const useStyles = breadcrumbsEnabled =>
       flexGrow: 1,
       position: 'relative',
       borderRadius: theme.shape.borderRadius,
-      backgroundColor: fade(theme.palette.text.primary, 0.04),
+      backgroundColor: alpha(theme.palette.text.primary, 0.04),
       '&:hover': {
-        backgroundColor: fade(theme.palette.text.primary, 0.06)
+        backgroundColor: alpha(theme.palette.text.primary, 0.06)
       },
       marginRight: theme.spacing(2),
       marginLeft: 0,

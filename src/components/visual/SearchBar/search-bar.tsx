@@ -1,7 +1,7 @@
 import {
+  alpha,
   Box,
   Divider,
-  fade,
   IconButton,
   IconButtonProps,
   LinearProgress,
@@ -25,9 +25,9 @@ const useStyles = makeStyles(theme => ({
     borderRadius: '4px',
     paddingLeft: theme.spacing(2),
     // paddingRight: theme.spacing(0.5),
-    backgroundColor: fade(theme.palette.text.primary, 0.04),
+    backgroundColor: alpha(theme.palette.text.primary, 0.04),
     '&:hover': {
-      backgroundColor: fade(theme.palette.text.primary, 0.06)
+      backgroundColor: alpha(theme.palette.text.primary, 0.06)
     },
     '& input': {
       color: theme.palette.text.secondary
