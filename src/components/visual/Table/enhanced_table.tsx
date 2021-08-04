@@ -265,8 +265,8 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
             count={itemCount}
             rowsPerPage={rowsPerPage}
             page={page}
-            onChangePage={handleChangePage}
-            onChangeRowsPerPage={handleChangeRowsPerPage}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
             ActionsComponent={TablePaginationActions}
           />
         </Grid>
