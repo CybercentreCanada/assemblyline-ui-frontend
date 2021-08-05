@@ -1,4 +1,4 @@
-import { createStyles, fade, Theme, withStyles } from '@material-ui/core';
+import { alpha, createStyles, Theme, withStyles } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
 import 'moment/locale/fr';
 
@@ -8,7 +8,7 @@ const StyledAlert = withStyles((theme: Theme) =>
       marginbottom: theme.spacing(2),
       marginTop: theme.spacing(4),
       color: theme.palette.text.secondary,
-      backgroundColor: fade(theme.palette.text.primary, 0.04)
+      backgroundColor: alpha(theme.palette.text.primary, 0.04)
     },
     icon: {
       color: `${theme.palette.text.secondary} !important`

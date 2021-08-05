@@ -1,6 +1,6 @@
 import { Grid, IconButton, InputBase, TablePagination, Tooltip } from '@material-ui/core';
 import Paper from '@material-ui/core/Paper';
-import { createStyles, fade, makeStyles, Theme } from '@material-ui/core/styles';
+import { alpha, createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
@@ -189,9 +189,9 @@ const useToolbarStyles = makeStyles((theme: Theme) =>
       position: 'relative',
       alignSelf: 'center',
       borderRadius: theme.shape.borderRadius,
-      backgroundColor: fade(theme.palette.text.primary, 0.04),
+      backgroundColor: alpha(theme.palette.text.primary, 0.04),
       '&:hover': {
-        backgroundColor: fade(theme.palette.text.primary, 0.06)
+        backgroundColor: alpha(theme.palette.text.primary, 0.06)
       },
       height: 'fit-content',
       marginTop: theme.spacing(1),

@@ -1,4 +1,4 @@
-import { createMuiTheme, PaletteType } from '@material-ui/core';
+import { createTheme, PaletteType } from '@material-ui/core';
 import { useMemo } from 'react';
 
 export type AppThemeProps = {
@@ -56,7 +56,7 @@ const useAppTheme = (isDark: boolean, colors: AppThemeProps) => {
       }
     }
 
-    return createMuiTheme({
+    return createTheme({
       overrides: {
         MuiCssBaseline: {
           '@global': {
