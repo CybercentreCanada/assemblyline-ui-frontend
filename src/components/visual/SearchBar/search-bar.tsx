@@ -131,7 +131,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           style={{ marginRight: theme.spacing(upMD ? 1 : 0.5) }}
         >
           <Tooltip title={t('clear_filter')}>
-            <BackspaceIcon fontSize={!upMD ? 'small' : 'default'} />
+            <BackspaceIcon fontSize={!upMD ? 'small' : 'medium'} />
           </Tooltip>
         </IconButton>
         {buttons.length !== 0 && (

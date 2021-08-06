@@ -398,21 +398,21 @@ const Alerts: React.FC = () => {
             onSearch={onSearch}
             buttons={[
               {
-                icon: <StarIcon fontSize={upMD ? 'default' : 'small'} />,
+                icon: <StarIcon fontSize={upMD ? 'medium' : 'small'} />,
                 tooltip: t('favorites'),
                 props: {
                   onClick: () => setDrawer({ open: true, type: 'favorites' })
                 }
               },
               {
-                icon: <FilterListIcon fontSize={upMD ? 'default' : 'small'} />,
+                icon: <FilterListIcon fontSize={upMD ? 'medium' : 'small'} />,
                 tooltip: t('filters'),
                 props: {
                   onClick: () => setDrawer({ open: true, type: 'filter' })
                 }
               },
               {
-                icon: <BiNetworkChart fontSize={upMD ? 'default' : 'small'} />,
+                icon: <BiNetworkChart fontSize={upMD ? 'medium' : 'small'} />,
                 tooltip: t('workflows'),
                 props: {
                   onClick: () => setDrawer({ open: true, type: 'actions', actionData: { query: searchQuery } })

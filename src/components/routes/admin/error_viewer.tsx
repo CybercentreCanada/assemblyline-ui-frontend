@@ -248,7 +248,7 @@ export default function ErrorViewer() {
             onSearch={onSearch}
             buttons={[
               {
-                icon: <ReportProblemOutlinedIcon fontSize={upMD ? 'default' : 'small'} />,
+                icon: <ReportProblemOutlinedIcon fontSize={upMD ? 'medium' : 'small'} />,
                 tooltip: t('exception'),
                 props: {
                   onClick: () => {
@@ -258,7 +258,7 @@ export default function ErrorViewer() {
                 }
               },
               {
-                icon: <CancelOutlinedIcon fontSize={upMD ? 'default' : 'small'} />,
+                icon: <CancelOutlinedIcon fontSize={upMD ? 'medium' : 'small'} />,
                 tooltip: t('canceled'),
                 props: {
                   onClick: () => {
@@ -268,7 +268,7 @@ export default function ErrorViewer() {
                 }
               },
               {
-                icon: <PanToolOutlinedIcon fontSize={upMD ? 'default' : 'small'} />,
+                icon: <PanToolOutlinedIcon fontSize={upMD ? 'medium' : 'small'} />,
                 tooltip: t('maxed'),
                 props: {
                   onClick: () => {

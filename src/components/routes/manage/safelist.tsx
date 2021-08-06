@@ -165,7 +165,7 @@ export default function Safelist() {
             onSearch={onSearch}
             buttons={[
               {
-                icon: <PersonOutlineOutlinedIcon fontSize={upMD ? 'default' : 'small'} />,
+                icon: <PersonOutlineOutlinedIcon fontSize={upMD ? 'medium' : 'small'} />,
                 tooltip: t('user'),
                 props: {
                   onClick: () => {
@@ -175,7 +175,7 @@ export default function Safelist() {
                 }
               },
               {
-                icon: <LabelOutlinedIcon fontSize={upMD ? 'default' : 'small'} />,
+                icon: <LabelOutlinedIcon fontSize={upMD ? 'medium' : 'small'} />,
                 tooltip: t('tag'),
                 props: {
                   onClick: () => {
@@ -185,7 +185,7 @@ export default function Safelist() {
                 }
               },
               {
-                icon: <BlockOutlinedIcon fontSize={upMD ? 'default' : 'small'} />,
+                icon: <BlockOutlinedIcon fontSize={upMD ? 'medium' : 'small'} />,
                 tooltip: t('disabled'),
                 props: {
                   onClick: () => {
