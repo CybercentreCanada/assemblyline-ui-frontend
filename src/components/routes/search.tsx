@@ -233,9 +233,9 @@ function Search({ index }: SearchProps) {
               {
                 icon:
                   query && query.get('use_archive') === 'true' ? (
-                    <FolderIcon fontSize={downSM ? 'small' : 'default'} />
+                    <FolderIcon fontSize={downSM ? 'small' : 'medium'} />
                   ) : (
-                    <FolderOutlinedIcon fontSize={downSM ? 'small' : 'default'} />
+                    <FolderOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />
                   ),
                 tooltip:
                   query && query.get('use_archive') === 'true' ? t('use_archive.turn_off') : t('use_archive.turn_on'),
