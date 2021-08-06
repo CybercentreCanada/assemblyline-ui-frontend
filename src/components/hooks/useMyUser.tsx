@@ -26,6 +26,13 @@ type IndexDefinitionMap = {
   workflow: IndexDefinition;
 };
 
+type MessageDefinition = {
+  user: string;
+  title: string;
+  severity: 'success' | 'info' | 'warning' | 'error';
+  message: string;
+};
+
 type SettingsDefinition = {
   classification: string;
   deep_scan: boolean;
@@ -88,14 +95,17 @@ export interface CustomUserContextProps extends UserContextProps<CustomUser> {
   c12nDef: ClassificationDefinition;
   configuration: ConfigurationDefinition;
   indexes: IndexDefinitionMap;
+  message: MessageDefinition;
   settings: SettingsDefinition;
   setConfiguration: (cfg: ConfigurationDefinition) => void;
+  setMessage: (msg: MessageDefinition) => void;
 }
 
 interface WhoAmIProps extends CustomUser {
   c12nDef: ClassificationDefinition;
   configuration: ConfigurationDefinition;
   indexes: IndexDefinitionMap;
+  message: MessageDefinition;
   settings: SettingsDefinition;
 }
 
@@ -105,6 +115,7 @@ export default function useMyUser(): CustomUserContextProps {
   const [c12nDef, setC12nDef] = useState<ClassificationDefinition>(null);
   const [configuration, setConfiguration] = useState<ConfigurationDefinition>(null);
   const [indexes, setIndexes] = useState<IndexDefinitionMap>(null);
+  const [message, setMessage] = useState<MessageDefinition>(null);
   const [settings, setSettings] = useState<SettingsDefinition>(null);
   const [flattenedProps, setFlattenedProps] = useState(null);
 
@@ -129,7 +140,14 @@ export default function useMyUser(): CustomUserContextProps {
   }
 
   const setUser = (whoAmIData: WhoAmIProps) => {
-    const { configuration: cfg, c12nDef: c12n, indexes: idx, settings: userSettings, ...curUser } = whoAmIData;
+    const {
+      configuration: cfg,
+      c12nDef: c12n,
+      indexes: idx,
+      message: msg,
+      settings: userSettings,
+      ...curUser
+    } = whoAmIData;
     const upperC12n = {
       ...c12n,
       original_definition: {
@@ -163,6 +181,7 @@ export default function useMyUser(): CustomUserContextProps {
     setC12nDef(upperC12n);
     setConfiguration(cfg);
     setIndexes(idx);
+    setMessage(msg);
     setState({
       ...curUser,
       dynamic_group: curUser.email ? curUser.email.toUpperCase().split('@')[1] : null
@@ -198,10 +217,12 @@ export default function useMyUser(): CustomUserContextProps {
     c12nDef,
     configuration,
     indexes,
+    message,
     settings,
     user,
     setUser,
     setConfiguration,
+    setMessage,
     isReady,
     validateProps
   };

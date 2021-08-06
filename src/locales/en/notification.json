@@ -1,0 +1,23 @@
+{
+  "delete.acceptText": "Yes, do it!",
+  "delete.cancelText": "Cancel",
+  "delete.success": "The system message was successfully removed.",
+  "delete.text": "Are you sure you want to clear the current message from the system?",
+  "delete.title": "Clear the system message?",
+  "edit.button.cancel": "Cancel",
+  "edit.button.save": "Save",
+  "edit.message": "Message to display to users",
+  "edit.message.title": "Message title (optional)",
+  "edit.severity": "Severity of the message",
+  "edit.text": "This message will be permanently displayed for all users in their notification area. Only one message can be displayed at the time and only administrators can change the message.",
+  "edit.title": "Set a system message",
+  "save.acceptText": "Yes, do it!",
+  "save.cancelText": "Cancel",
+  "save.success": "The system message was successfully set.",
+  "save.text": "Are you sure you want to save the current message to the system?",
+  "save.title": "Save the system message?",
+  "severity.error": "Error",
+  "severity.info": "Information",
+  "severity.success": "Success",
+  "severity.warning": "Warning"
+}
