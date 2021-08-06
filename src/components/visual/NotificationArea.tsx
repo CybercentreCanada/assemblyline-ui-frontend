@@ -55,7 +55,7 @@ const NotificationArea = () => {
   const { t } = useTranslation(['notification']);
   const classes = useStyles();
   const theme = useTheme();
-  const { message, setMessage, user: currentUser } = useALContext();
+  const { systemMessage, setSystemMessage, user: currentUser } = useALContext();
   const apiCall = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
 
@@ -69,7 +69,7 @@ const NotificationArea = () => {
   const [severity, setSeverity] = useState<'success' | 'info' | 'warning' | 'error'>('info');
 
   const onNotificationAreaIconClick = (event: React.MouseEvent) => {
-    if (!message && currentUser.is_admin) {
+    if (!systemMessage && currentUser.is_admin) {
       setEdit(true);
     } else {
       if (!read) setRead(true);
@@ -109,7 +109,7 @@ const NotificationArea = () => {
       body: data,
       onSuccess: () => {
         showSuccessMessage(t('save.success'));
-        setMessage(data);
+        setSystemMessage(data);
         setEdit(false);
         setRead(false);
       }
@@ -128,16 +128,16 @@ const NotificationArea = () => {
       method: 'DELETE',
       onSuccess: () => {
         showSuccessMessage(t('delete.success'));
-        setMessage(null);
+        setSystemMessage(null);
       }
     });
   };
 
   const onEditSystemMessage = event => {
     event.stopPropagation();
-    setSeverity(message.severity);
-    setNewMsg(message.message);
-    setNewTitle(message.title);
+    setSeverity(systemMessage.severity);
+    setNewMsg(systemMessage.message);
+    setNewTitle(systemMessage.title);
     setEdit(true);
   };
 
@@ -233,13 +233,13 @@ const NotificationArea = () => {
           />
 
           <IconButton
-            disabled={!message && !currentUser.is_admin}
+            disabled={!systemMessage && !currentUser.is_admin}
             color="inherit"
             aria-label="open drawer"
             onClick={onNotificationAreaIconClick}
             edge="start"
           >
-            {message ? (
+            {systemMessage ? (
               <Badge color="primary" variant="dot" invisible={read}>
                 <NotificationsActiveOutlinedIcon />
               </Badge>
@@ -259,9 +259,9 @@ const NotificationArea = () => {
             {({ TransitionProps }) => (
               <Fade {...TransitionProps} timeout={250}>
                 <Paper elevation={4}>
-                  {message && (
+                  {systemMessage && (
                     <Alert
-                      severity={message.severity}
+                      severity={systemMessage.severity}
                       onClick={closeNotificationArea}
                       classes={{ message: classes.message, action: classes.action }}
                       action={
@@ -277,9 +277,9 @@ const NotificationArea = () => {
                         )
                       }
                     >
-                      {message.title && <AlertTitle>{message.title}</AlertTitle>}
-                      {message.message}
-                      <div style={{ paddingTop: theme.spacing(1), textAlign: 'right' }}>{message.user}</div>
+                      {systemMessage.title && <AlertTitle>{systemMessage.title}</AlertTitle>}
+                      {systemMessage.message}
+                      <div style={{ paddingTop: theme.spacing(1), textAlign: 'right' }}>{systemMessage.user}</div>
                     </Alert>
                   )}
                 </Paper>

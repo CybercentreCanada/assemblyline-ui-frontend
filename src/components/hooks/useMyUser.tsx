@@ -95,17 +95,17 @@ export interface CustomUserContextProps extends UserContextProps<CustomUser> {
   c12nDef: ClassificationDefinition;
   configuration: ConfigurationDefinition;
   indexes: IndexDefinitionMap;
-  message: MessageDefinition;
   settings: SettingsDefinition;
+  systemMessage: MessageDefinition;
   setConfiguration: (cfg: ConfigurationDefinition) => void;
-  setMessage: (msg: MessageDefinition) => void;
+  setSystemMessage: (msg: MessageDefinition) => void;
 }
 
 interface WhoAmIProps extends CustomUser {
   c12nDef: ClassificationDefinition;
   configuration: ConfigurationDefinition;
   indexes: IndexDefinitionMap;
-  message: MessageDefinition;
+  system_message: MessageDefinition;
   settings: SettingsDefinition;
 }
 
@@ -115,7 +115,7 @@ export default function useMyUser(): CustomUserContextProps {
   const [c12nDef, setC12nDef] = useState<ClassificationDefinition>(null);
   const [configuration, setConfiguration] = useState<ConfigurationDefinition>(null);
   const [indexes, setIndexes] = useState<IndexDefinitionMap>(null);
-  const [message, setMessage] = useState<MessageDefinition>(null);
+  const [systemMessage, setSystemMessage] = useState<MessageDefinition>(null);
   const [settings, setSettings] = useState<SettingsDefinition>(null);
   const [flattenedProps, setFlattenedProps] = useState(null);
 
@@ -144,7 +144,7 @@ export default function useMyUser(): CustomUserContextProps {
       configuration: cfg,
       c12nDef: c12n,
       indexes: idx,
-      message: msg,
+      system_message: msg,
       settings: userSettings,
       ...curUser
     } = whoAmIData;
@@ -181,7 +181,7 @@ export default function useMyUser(): CustomUserContextProps {
     setC12nDef(upperC12n);
     setConfiguration(cfg);
     setIndexes(idx);
-    setMessage(msg);
+    setSystemMessage(msg);
     setState({
       ...curUser,
       dynamic_group: curUser.email ? curUser.email.toUpperCase().split('@')[1] : null
@@ -217,12 +217,12 @@ export default function useMyUser(): CustomUserContextProps {
     c12nDef,
     configuration,
     indexes,
-    message,
+    systemMessage,
     settings,
     user,
     setUser,
     setConfiguration,
-    setMessage,
+    setSystemMessage,
     isReady,
     validateProps
   };
