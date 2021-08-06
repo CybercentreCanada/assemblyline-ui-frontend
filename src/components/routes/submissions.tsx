@@ -113,7 +113,7 @@ export default function Submissions() {
             onSearch={onSearch}
             buttons={[
               {
-                icon: <PersonIcon fontSize={upMD ? 'default' : 'small'} />,
+                icon: <PersonIcon fontSize={upMD ? 'medium' : 'small'} />,
                 tooltip: t('my_submission'),
                 props: {
                   onClick: () => {
@@ -123,7 +123,7 @@ export default function Submissions() {
                 }
               },
               {
-                icon: <AssignmentTurnedInIcon fontSize={upMD ? 'default' : 'small'} />,
+                icon: <AssignmentTurnedInIcon fontSize={upMD ? 'medium' : 'small'} />,
                 tooltip: t('completed_submissions'),
                 props: {
                   onClick: () => {
@@ -133,7 +133,7 @@ export default function Submissions() {
                 }
               },
               {
-                icon: <BugReportIcon fontSize={upMD ? 'default' : 'small'} />,
+                icon: <BugReportIcon fontSize={upMD ? 'medium' : 'small'} />,
                 tooltip: t('malicious_submissions'),
                 props: {
                   onClick: () => {

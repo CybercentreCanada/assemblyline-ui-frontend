@@ -180,7 +180,7 @@ export default function Workflows() {
             onSearch={onSearch}
             buttons={[
               {
-                icon: <EventBusyOutlinedIcon fontSize={upMD ? 'default' : 'small'} />,
+                icon: <EventBusyOutlinedIcon fontSize={upMD ? 'medium' : 'small'} />,
                 tooltip: t('never_used'),
                 props: {
                   onClick: () => {
@@ -190,7 +190,7 @@ export default function Workflows() {
                 }
               },
               {
-                icon: <EventOutlinedIcon fontSize={upMD ? 'default' : 'small'} />,
+                icon: <EventOutlinedIcon fontSize={upMD ? 'medium' : 'small'} />,
                 tooltip: t('old'),
                 props: {
                   onClick: () => {

@@ -1,0 +1,23 @@
+{
+  "delete.acceptText": "Oui, fais le!",
+  "delete.cancelText": "Annuler",
+  "delete.success": "Le message système a été supprimé avec succès.",
+  "delete.text": "Voulez-vous vraiment effacer le message actuel du système ?",
+  "delete.title": "Effacer le message système ?",
+  "edit.button.cancel": "Annuler",
+  "edit.button.save": "Sauvegarder",
+  "edit.message": "Message à afficher aux utilisateurs",
+  "edit.message.title": "Titre du message (facultatif)",
+  "edit.severity": "Gravité du message",
+  "edit.text": "Ce message sera affiché en permanence pour tous les utilisateurs dans leur zone de notification. Un seul message peut être affiché à la fois et seuls les administrateurs peuvent modifier le message.",
+  "edit.title": "Définir un message système",
+  "save.acceptText": "Oui, fais le!",
+  "save.cancelText": "Annuler",
+  "save.success": "Le message système a été défini avec succès.",
+  "save.text": "Voulez-vous vraiment enregistrer le message actuel dans le système ?",
+  "save.title": "Enregistrer le message système ?",
+  "severity.error": "Erreur",
+  "severity.info": "Information",
+  "severity.success": "Succès",
+  "severity.warning": "Avertissement"
+}

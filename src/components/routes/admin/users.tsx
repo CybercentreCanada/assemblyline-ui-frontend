@@ -383,7 +383,7 @@ export default function Users() {
             onSearch={onSearch}
             buttons={[
               {
-                icon: <SupervisorAccountIcon fontSize={upMD ? 'default' : 'small'} />,
+                icon: <SupervisorAccountIcon fontSize={upMD ? 'medium' : 'small'} />,
                 tooltip: t('admins'),
                 props: {
                   onClick: () => {
@@ -393,7 +393,7 @@ export default function Users() {
                 }
               },
               {
-                icon: <BlockIcon fontSize={upMD ? 'default' : 'small'} />,
+                icon: <BlockIcon fontSize={upMD ? 'medium' : 'small'} />,
                 tooltip: t('disabled'),
                 props: {
                   onClick: () => {
