@@ -194,7 +194,7 @@ export default function Signatures() {
                   onSearch={onSearch}
                   buttons={[
                     {
-                      icon: <RecordVoiceOverOutlinedIcon fontSize={upMD ? 'default' : 'small'} />,
+                      icon: <RecordVoiceOverOutlinedIcon fontSize={upMD ? 'medium' : 'small'} />,
                       tooltip: t('noisy'),
                       props: {
                         onClick: () => {
@@ -205,7 +205,7 @@ export default function Signatures() {
                     },
 
                     {
-                      icon: <BlockIcon fontSize={upMD ? 'default' : 'small'} />,
+                      icon: <BlockIcon fontSize={upMD ? 'medium' : 'small'} />,
                       tooltip: t('disabled'),
                       props: {
                         onClick: () => {

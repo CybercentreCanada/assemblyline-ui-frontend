@@ -395,7 +395,7 @@ function User({ width, username }: UserProps) {
         text={t('delete.text')}
       />
 
-      <Grid container spacing={2} justify="center">
+      <Grid container spacing={2} justifyContent="center">
         <Grid item xs={12} sm={12} md={3}>
           <Grid container className={classes.group}>
             {id && (

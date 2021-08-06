@@ -177,7 +177,7 @@ function AttributionBanner({ report }) {
         borderRadius: '4px'
       }}
     >
-      <Grid container alignItems="center" justify="center">
+      <Grid container alignItems="center" justifyContent="center">
         <Hidden smDown>
           <Grid item xs style={{ color: textColor }}>
             {icon}
