@@ -33,12 +33,21 @@ import ConfirmationDialog from './ConfirmationDialog';
 
 const useStyles = () =>
   makeStyles(theme => ({
+    action: {
+      flexDirection: 'column',
+      justifyContent: 'space-evenly'
+    },
     popper: {
       zIndex: theme.zIndex.drawer + 2,
-      minWidth: '280px'
+      minWidth: '500px',
+      [theme.breakpoints.down('sm')]: { minWidth: '320px' },
+      [theme.breakpoints.down('xs')]: { minWidth: '250px' }
     },
     margin: {
       margin: theme.spacing(1)
+    },
+    message: {
+      width: '100%'
     }
   }))();
 
@@ -254,13 +263,14 @@ const NotificationArea = () => {
                     <Alert
                       severity={message.severity}
                       onClick={closeNotificationArea}
+                      classes={{ message: classes.message, action: classes.action }}
                       action={
                         currentUser.is_admin && (
                           <>
-                            <IconButton size="small" onClick={onEditSystemMessage}>
+                            <IconButton size="small" onClick={onEditSystemMessage} color="inherit">
                               <EditOutlinedIcon />
                             </IconButton>
-                            <IconButton size="small" onClick={onDeleteSystemMessage}>
+                            <IconButton size="small" onClick={onDeleteSystemMessage} color="inherit">
                               <DeleteOutlineOutlinedIcon />
                             </IconButton>
                           </>
