@@ -26,13 +26,6 @@ type IndexDefinitionMap = {
   workflow: IndexDefinition;
 };
 
-type MessageDefinition = {
-  user: string;
-  title: string;
-  severity: 'success' | 'info' | 'warning' | 'error';
-  message: string;
-};
-
 type SettingsDefinition = {
   classification: string;
   deep_scan: boolean;
@@ -48,6 +41,13 @@ type SettingsDefinition = {
   services: any[];
   submission_view: string;
   ttl: number;
+};
+
+type SystemMessageDefinition = {
+  user: string;
+  title: string;
+  severity: 'success' | 'info' | 'warning' | 'error';
+  message: string;
 };
 
 export type ConfigurationDefinition = {
@@ -96,16 +96,16 @@ export interface CustomUserContextProps extends UserContextProps<CustomUser> {
   configuration: ConfigurationDefinition;
   indexes: IndexDefinitionMap;
   settings: SettingsDefinition;
-  systemMessage: MessageDefinition;
+  systemMessage: SystemMessageDefinition;
   setConfiguration: (cfg: ConfigurationDefinition) => void;
-  setSystemMessage: (msg: MessageDefinition) => void;
+  setSystemMessage: (msg: SystemMessageDefinition) => void;
 }
 
 interface WhoAmIProps extends CustomUser {
   c12nDef: ClassificationDefinition;
   configuration: ConfigurationDefinition;
   indexes: IndexDefinitionMap;
-  system_message: MessageDefinition;
+  system_message: SystemMessageDefinition;
   settings: SettingsDefinition;
 }
 
@@ -115,7 +115,7 @@ export default function useMyUser(): CustomUserContextProps {
   const [c12nDef, setC12nDef] = useState<ClassificationDefinition>(null);
   const [configuration, setConfiguration] = useState<ConfigurationDefinition>(null);
   const [indexes, setIndexes] = useState<IndexDefinitionMap>(null);
-  const [systemMessage, setSystemMessage] = useState<MessageDefinition>(null);
+  const [systemMessage, setSystemMessage] = useState<SystemMessageDefinition>(null);
   const [settings, setSettings] = useState<SettingsDefinition>(null);
   const [flattenedProps, setFlattenedProps] = useState(null);
 
