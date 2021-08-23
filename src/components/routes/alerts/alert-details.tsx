@@ -320,7 +320,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
             <Typography className={classes.sectionTitle}>{t('metadata')}</Typography>
             <Divider />
             <div className={classes.sectionContent}>
-              <pre style={{ margin: 0, fontSize: 'larger', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+              <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
                 {item ? (
                   Object.keys(item.metadata).map(k => (
                     <Grid container spacing={1} key={`alert-metadata-${k}`}>
