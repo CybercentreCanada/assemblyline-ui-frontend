@@ -20,14 +20,13 @@ const useStyles = makeStyles(theme => ({
     }
   },
   card_title: {
-    fontSize: 'large',
+    fontSize: 'larger',
     fontFamily: 'monospace'
   },
   label: {
     fontWeight: 500
   },
   mono: {
-    fontSize: 'larger',
     fontFamily: 'monospace'
   }
 }));

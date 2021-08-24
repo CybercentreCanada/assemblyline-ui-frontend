@@ -55,9 +55,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const element = useRef<HTMLInputElement>();
   const [value, setValue] = useState<string>(initValue);
 
-  const getInputEl = () => {
-    return element.current.querySelector('input');
-  };
+  const getInputEl = () => element.current.querySelector('input');
 
   // handler[onchange]: textfield change handler.
   // track value of filter..

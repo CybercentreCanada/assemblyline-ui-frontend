@@ -51,9 +51,10 @@ const useTreeItemStyles = makeStyles((theme: Theme) => ({
     '&:focus > .MuiTreeItem-content, &$root.Mui-selected > .MuiTreeItem-content': {
       backgroundColor: 'transparent'
     },
-    '&:focus > .MuiTreeItem-content .MuiTreeItem-label, &:hover > .MuiTreeItem-content .MuiTreeItem-label, &$root.Mui-selected > .MuiTreeItem-content .MuiTreeItem-label': {
-      backgroundColor: 'transparent'
-    }
+    '&:focus > .MuiTreeItem-content .MuiTreeItem-label, &:hover > .MuiTreeItem-content .MuiTreeItem-label, &$root.Mui-selected > .MuiTreeItem-content .MuiTreeItem-label':
+      {
+        backgroundColor: 'transparent'
+      }
   },
   suspicious: {
     backgroundColor: theme.palette.type === 'dark' ? '#654312' : '#ffedd4'
@@ -75,7 +76,6 @@ const MemDumpBody = ({ body }) => {
         borderRadius: '4px',
         padding: '4px',
         whiteSpace: 'pre-wrap',
-        fontSize: '1rem',
         wordBreak: 'break-word',
         margin: '0.25rem 0'
       }}
@@ -203,7 +203,6 @@ const JSONBody = ({ body }) => {
         backgroundColor: theme.palette.type === 'dark' ? '#FFFFFF05' : '#00000005',
         border: `1px solid ${theme.palette.divider}`,
         borderRadius: '4px',
-        fontSize: '1rem',
         padding: '4px'
       }}
     />
@@ -333,7 +332,9 @@ const StyledTableCell = withStyles((theme: Theme) =>
       backgroundColor: theme.palette.type === 'dark' ? '#404040' : '#EEE'
     },
     body: {
-      wordBreak: 'break-word'
+      [theme.breakpoints.up('md')]: {
+        wordBreak: 'break-word'
+      }
     }
   })
 )(TableCell);

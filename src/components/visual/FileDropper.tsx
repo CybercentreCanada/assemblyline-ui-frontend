@@ -56,8 +56,8 @@ export default function FileDropper({ file, setFile, disabled }: FileDropperProp
     >
       <input {...getInputProps()} />
       <AiOutlineSecurityScan style={{ fontSize: '140px' }} />
-      <div style={{ height: '44px', textAlign: 'center' }}>
-        <Typography variant="body1">
+      <div style={{ minHeight: '44px', textAlign: 'center' }}>
+        <Typography variant="body1" style={{ wordBreak: 'break-word' }}>
           <b>{isDragActive && !disabled ? t('file.drophere') : file ? file.name : t('file.dragzone')}</b>
         </Typography>
         {file && (!isDragActive || disabled) && (

@@ -47,7 +47,7 @@ const AlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
         <Grid item xs={12} md={8}>
           <AlertPriority name={item.priority} />
           {item.group_count && <span style={{ marginLeft: theme.spacing(1) }}>{item.group_count}x</span>}
-          <span style={{ marginLeft: theme.spacing(1), wordBreak: 'break-all' }}>{item.file.name}</span>
+          <span style={{ marginLeft: theme.spacing(1), wordBreak: 'break-word' }}>{item.file.name}</span>
         </Grid>
         <Grid item xs={6} md={2}>
           {item.verdict.malicious.length > item.verdict.non_malicious.length ? (

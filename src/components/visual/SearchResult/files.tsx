@@ -95,7 +95,7 @@ const WrappedFilesTable: React.FC<FilesTableProps> = ({ fileResults, allowSort =
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell>{file.seen.count}</DivTableCell>
-                <DivTableCell style={{ wordBreak: 'break-word' }}>{file.sha256}</DivTableCell>
+                <DivTableCell breakable>{file.sha256}</DivTableCell>
                 <DivTableCell>{file.type}</DivTableCell>
                 <DivTableCell>{file.size}</DivTableCell>
                 {c12nDef.enforce && (
