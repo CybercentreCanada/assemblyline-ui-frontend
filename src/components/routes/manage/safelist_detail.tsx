@@ -194,10 +194,10 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
       )}
       <div style={{ textAlign: 'left' }}>
         <div style={{ paddingBottom: theme.spacing(4) }}>
-          <Grid container alignItems="center">
+          <Grid container alignItems="center" spacing={1}>
             <Grid item xs>
               <Typography variant="h4">{safelist ? t(`title.${safelist.type}`) : t('title')}</Typography>
-              <Typography variant="caption">
+              <Typography variant="caption" style={{ wordBreak: 'break-all' }}>
                 {safelist ? safelist_id || id : <Skeleton style={{ width: '10rem' }} />}
               </Typography>
             </Grid>
