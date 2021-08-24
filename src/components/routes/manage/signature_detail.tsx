@@ -36,6 +36,7 @@ import { Link, useHistory, useParams } from 'react-router-dom';
 export type Signature = {
   classification: string;
   data: string;
+  id: string;
   last_modified: string;
   name: string;
   order: number;
@@ -120,7 +121,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
       apiCall({
         url: `/api/v4/signature/${signature_id || id}/`,
         onSuccess: api_data => {
-          setSignature(api_data.api_response);
+          setSignature({ id: signature_id || id, ...api_data.api_response });
         }
       });
     }
@@ -130,14 +131,14 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
   useEffect(() => {
     if (type && source && name) {
       apiCall({
-        url: `/api/v4/search/signature/?query=type:${type} AND source:${source} AND name:${name}&rows=1&fl=id`,
+        url: `/api/v4/search/signature/?query=type:${type} AND source:${source} AND name:"${name}"&rows=1&fl=id`,
         onSuccess: api_data => {
           if (api_data.api_response.items.length) {
             const sigId = api_data.api_response.items[0].id;
             apiCall({
               url: `/api/v4/signature/${sigId}/`,
               onSuccess: id_api_data => {
-                setSignature(id_api_data.api_response);
+                setSignature({ id: sigId, ...id_api_data.api_response });
               }
             });
           } else {
@@ -178,7 +179,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
             labels: Object.keys(api_data.api_response).map((key: string) => key.replace('T00:00:00.000Z', '')),
             datasets: [
               {
-                label: signature_id || id,
+                label: signature.id,
                 data: Object.values(api_data.api_response)
               }
             ]
@@ -209,7 +210,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
 
   const handleStateSaveButtonClick = () => {
     apiCall({
-      url: `/api/v4/signature/change_status/${signature_id || id}/${signature.status}/`,
+      url: `/api/v4/signature/change_status/${signature.id}/${signature.status}/`,
       onSuccess: () => {
         showSuccessMessage(t('change.success'));
         setModified(false);
@@ -223,7 +224,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
   const handleExecuteDeleteButtonClick = () => {
     closeDialog();
     apiCall({
-      url: `/api/v4/signature/${signature_id || id}/`,
+      url: `/api/v4/signature/${signature.id}/`,
       method: 'DELETE',
       onSuccess: () => {
         showSuccessMessage(t('delete.success'));
@@ -446,16 +447,16 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
         {signature && modified ? (
           <div
             style={{
-              paddingTop: id ? theme.spacing(1) : theme.spacing(2),
-              paddingBottom: id ? theme.spacing(1) : theme.spacing(2),
-              position: id ? 'fixed' : 'inherit',
-              bottom: id ? 0 : 'inherit',
-              left: id ? 0 : 'inherit',
-              width: id ? '100%' : 'inherit',
-              textAlign: id ? 'center' : 'right',
-              zIndex: id ? theme.zIndex.drawer - 1 : 'auto',
-              backgroundColor: id ? theme.palette.background.default : 'inherit',
-              boxShadow: id ? theme.shadows[4] : 'inherit'
+              paddingTop: id || (type && source && name) ? theme.spacing(1) : theme.spacing(2),
+              paddingBottom: id || (type && source && name) ? theme.spacing(1) : theme.spacing(2),
+              position: id || (type && source && name) ? 'fixed' : 'inherit',
+              bottom: id || (type && source && name) ? 0 : 'inherit',
+              left: id || (type && source && name) ? 0 : 'inherit',
+              width: id || (type && source && name) ? '100%' : 'inherit',
+              textAlign: id || (type && source && name) ? 'center' : 'right',
+              zIndex: id || (type && source && name) ? theme.zIndex.drawer - 1 : 'auto',
+              backgroundColor: id || (type && source && name) ? theme.palette.background.default : 'inherit',
+              boxShadow: id || (type && source && name) ? theme.shadows[4] : 'inherit'
             }}
           >
             <Button variant="contained" color="primary" disabled={buttonLoading} onClick={handleStateSaveButtonClick}>
