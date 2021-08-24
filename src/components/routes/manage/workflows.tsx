@@ -27,7 +27,8 @@ const useStyles = makeStyles(theme => ({
     fontStyle: 'italic',
     paddingTop: theme.spacing(0.5),
     display: 'flex',
-    flexWrap: 'wrap'
+    flexWrap: 'wrap',
+    justifyContent: 'flex-end'
   },
   drawerPaper: {
     width: '80%',

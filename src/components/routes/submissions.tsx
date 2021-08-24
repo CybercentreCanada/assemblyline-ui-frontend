@@ -25,6 +25,7 @@ const useStyles = makeStyles(theme => ({
     fontStyle: 'italic',
     paddingTop: theme.spacing(0.5),
     display: 'flex',
+    justifyContent: 'flex-end',
     flexWrap: 'wrap'
   }
 }));

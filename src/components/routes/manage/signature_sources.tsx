@@ -77,12 +77,6 @@ const useStyles = makeStyles(theme => ({
   mono: {
     fontFamily: 'monospace'
   },
-  searchresult: {
-    fontStyle: 'italic',
-    paddingTop: theme.spacing(0.5),
-    display: 'flex',
-    flexWrap: 'wrap'
-  },
   title: {
     cursor: 'pointer',
     '&:hover, &:focus': {

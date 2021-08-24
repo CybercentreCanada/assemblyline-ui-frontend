@@ -299,7 +299,15 @@ function Search({ index }: SearchProps) {
               </Tabs>
             </Paper>
           )}
-          <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', marginBottom: theme.spacing(0.5) }}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              marginBottom: theme.spacing(0.5),
+              justifyContent: 'flex-end'
+            }}
+          >
             {resMap[tab] && resMap[tab].total !== 0 && (index || id) && (
               <div className={classes.searchresult}>
                 <SearchResultCount count={resMap[tab].total} />
