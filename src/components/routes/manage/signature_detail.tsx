@@ -131,7 +131,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
   useEffect(() => {
     if (type && source && name) {
       apiCall({
-        url: `/api/v4/search/signature/?query=type:${type} AND source:${source} AND name:${name}&rows=1&fl=id`,
+        url: `/api/v4/search/signature/?query=type:${type} AND source:${source} AND name:"${name}"&rows=1&fl=id`,
         onSuccess: api_data => {
           if (api_data.api_response.items.length) {
             const sigId = api_data.api_response.items[0].id;
