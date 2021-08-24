@@ -29,7 +29,8 @@ const useStyles = makeStyles(theme => ({
     fontStyle: 'italic',
     paddingTop: theme.spacing(0.5),
     display: 'flex',
-    flexWrap: 'wrap'
+    flexWrap: 'wrap',
+    justifyContent: 'flex-end'
   },
   drawerPaper: {
     width: '80%',
@@ -134,7 +135,7 @@ function ErrorDetail({ error }) {
 
       <div style={{ marginBottom: theme.spacing(1) }}>
         <label>{t('file_info')}</label>
-        <div style={{ wordBreak: 'break-all' }}>
+        <div style={{ wordBreak: 'break-word' }}>
           {error.sha256}
           <BsClipboard className={classes.clipboardIcon} onClick={() => copy(error.sha256, 'drawerTop')} />
         </div>

@@ -30,7 +30,8 @@ const useNewStyles = makeStyles(theme => ({
     flexDirection: 'column',
     position: 'relative',
     flex: 1,
-    height: '100%'
+    height: '100%',
+    width: '100%'
   },
   appVerticalRightContent: {
     height: 'auto',

@@ -29,7 +29,9 @@ const StyledTableCell = withStyles((theme: Theme) =>
     root: {
       paddingRight: theme.spacing(1),
       paddingLeft: theme.spacing(1),
-      wordBreak: 'break-all'
+      [theme.breakpoints.up('md')]: {
+        wordBreak: 'break-word'
+      }
     },
     head: {
       backgroundColor: theme.palette.type === 'dark' ? '#404040' : '#EEE',
@@ -107,32 +109,36 @@ export default function SiteMap() {
                     )}
                   </StyledTableCell>
                   <StyledTableCell>
-                    {path.req_priv &&
-                      path.req_priv.map((priv, pid) => (
-                        <CustomChip
-                          key={pid}
-                          mono
-                          type="rounded"
-                          color={privMap[priv]}
-                          size="tiny"
-                          label={priv}
-                          tooltip={t(`${priv}`)}
-                        />
-                      ))}
+                    <div style={{ display: 'flex' }}>
+                      {path.req_priv &&
+                        path.req_priv.map((priv, pid) => (
+                          <CustomChip
+                            key={pid}
+                            mono
+                            type="rounded"
+                            color={privMap[priv]}
+                            size="tiny"
+                            label={priv}
+                            tooltip={t(`${priv}`)}
+                          />
+                        ))}
+                    </div>
                   </StyledTableCell>
                   <StyledTableCell>
-                    {path.required_type &&
-                      path.required_type.map((req, rid) => (
-                        <CustomChip
-                          key={rid}
-                          mono
-                          type="rounded"
-                          color={reqMapColor[req]}
-                          size="tiny"
-                          label={t(req)}
-                          tooltip={t(`${req}_label`)}
-                        />
-                      ))}
+                    <div style={{ display: 'flex' }}>
+                      {path.required_type &&
+                        path.required_type.map((req, rid) => (
+                          <CustomChip
+                            key={rid}
+                            mono
+                            type="rounded"
+                            color={reqMapColor[req]}
+                            size="tiny"
+                            label={t(req)}
+                            tooltip={t(`${req}_label`)}
+                          />
+                        ))}
+                    </div>
                   </StyledTableCell>
                 </TableRow>
               ))}

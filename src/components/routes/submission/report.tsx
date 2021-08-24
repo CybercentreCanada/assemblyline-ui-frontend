@@ -686,7 +686,7 @@ export default function SubmissionReport() {
                 xs={8}
                 md={9}
                 lg={10}
-                style={{ fontFamily: 'monospace', fontSize: 'larger', wordBreak: 'break-word' }}
+                style={{ fontFamily: 'monospace',  wordBreak: 'break-word' }}
               >
                 {report ? report.file_info.md5 : <Skeleton />}
               </Grid>
@@ -699,7 +699,7 @@ export default function SubmissionReport() {
                 xs={8}
                 md={9}
                 lg={10}
-                style={{ fontFamily: 'monospace', fontSize: 'larger', wordBreak: 'break-word' }}
+                style={{ fontFamily: 'monospace',  wordBreak: 'break-word' }}
               >
                 {report ? report.file_info.sha1 : <Skeleton />}
               </Grid>
@@ -712,7 +712,7 @@ export default function SubmissionReport() {
                 xs={8}
                 md={9}
                 lg={10}
-                style={{ fontFamily: 'monospace', fontSize: 'larger', wordBreak: 'break-word' }}
+                style={{ fontFamily: 'monospace',  wordBreak: 'break-word' }}
               >
                 {report ? report.file_info.sha256 : <Skeleton />}
               </Grid>
@@ -725,7 +725,7 @@ export default function SubmissionReport() {
                 xs={8}
                 md={9}
                 lg={10}
-                style={{ fontFamily: 'monospace', fontSize: 'larger', wordBreak: 'break-word' }}
+                style={{ fontFamily: 'monospace',  wordBreak: 'break-word' }}
               >
                 {report ? report.file_info.ssdeep : <Skeleton />}
               </Grid>

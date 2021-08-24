@@ -61,7 +61,7 @@ const useStyles = makeStyles(theme => ({
     }
   },
   card_title: {
-    fontSize: 'large',
+    fontSize: 'larger',
     fontFamily: 'monospace'
   },
   drawerPaper: {
@@ -75,14 +75,7 @@ const useStyles = makeStyles(theme => ({
     fontWeight: 500
   },
   mono: {
-    fontSize: 'larger',
     fontFamily: 'monospace'
-  },
-  searchresult: {
-    fontStyle: 'italic',
-    paddingTop: theme.spacing(0.5),
-    display: 'flex',
-    flexWrap: 'wrap'
   },
   title: {
     cursor: 'pointer',

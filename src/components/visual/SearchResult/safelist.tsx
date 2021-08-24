@@ -113,10 +113,10 @@ const WrappedSafelistTable: React.FC<SafelistTableProps> = ({
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell>{sl_item.type}</DivTableCell>
-                <DivTableCell style={{ wordBreak: 'break-word' }}>
+                <DivTableCell breakable>
                   {sl_item.type === 'file' ? sl_item.id : `${sl_item.tag.type} - ${maxLenStr(sl_item.tag.value, 100)}`}
                 </DivTableCell>
-                <DivTableCell style={{ wordBreak: 'break-word' }}>{sl_item.sources.name.join(' | ')}</DivTableCell>
+                <DivTableCell breakable>{sl_item.sources.name.join(' | ')}</DivTableCell>
                 {c12nDef.enforce && (
                   <DivTableCell>
                     <Classification type="text" size="tiny" c12n={sl_item.classification} format="short" />

@@ -44,52 +44,28 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                 <Grid item xs={4} sm={3} lg={2}>
                   <span style={{ fontWeight: 500 }}>MD5</span>
                 </Grid>
-                <Grid
-                  item
-                  xs={8}
-                  sm={9}
-                  lg={10}
-                  style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
-                >
+                <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
                   {fileinfo ? fileinfo.md5 : <Skeleton />}
                 </Grid>
 
                 <Grid item xs={4} sm={3} lg={2}>
                   <span style={{ fontWeight: 500 }}>SHA1</span>
                 </Grid>
-                <Grid
-                  item
-                  xs={8}
-                  sm={9}
-                  lg={10}
-                  style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
-                >
+                <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
                   {fileinfo ? fileinfo.sha1 : <Skeleton />}
                 </Grid>
 
                 <Grid item xs={4} sm={3} lg={2}>
                   <span style={{ fontWeight: 500 }}>SHA256</span>
                 </Grid>
-                <Grid
-                  item
-                  xs={8}
-                  sm={9}
-                  lg={10}
-                  style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
-                >
+                <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
                   {fileinfo ? fileinfo.sha256 : <Skeleton />}
                 </Grid>
 
                 <Grid item xs={4} sm={3} lg={2}>
                   <span style={{ fontWeight: 500 }}>SSDEEP</span>
                 </Grid>
-                <Grid
-                  item
-                  xs={8}
-                  sm={9}
-                  lg={10}
-                  style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
-                >
+                <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
                   {fileinfo ? fileinfo.ssdeep : <Skeleton />}
                 </Grid>
 
