@@ -254,7 +254,7 @@ const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
               groupBy ? (
                 <>
                   <span style={{ display: 'inline-block' }}>{t('actions.takeownershipdiag.content.grouped')}</span>
-                  <span style={{ display: 'inline-block', padding: theme.spacing(1), wordBreak: 'break-all' }}>
+                  <span style={{ display: 'inline-block', padding: theme.spacing(1), wordBreak: 'break-word' }}>
                     <Typography variant="caption">{`${groupBy}: ${getValueFromPath(item, groupBy)}`}</Typography>
                   </span>
                 </>

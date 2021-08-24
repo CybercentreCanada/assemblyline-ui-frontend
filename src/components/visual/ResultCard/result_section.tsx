@@ -332,7 +332,9 @@ const StyledTableCell = withStyles((theme: Theme) =>
       backgroundColor: theme.palette.type === 'dark' ? '#404040' : '#EEE'
     },
     body: {
-      wordBreak: 'break-word'
+      [theme.breakpoints.up('md')]: {
+        wordBreak: 'break-word'
+      }
     }
   })
 )(TableCell);

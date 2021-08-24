@@ -106,9 +106,7 @@ const WrappedSubmissionsTable: React.FC<SubmissionsTableProps> = ({ submissionRe
                 <DivTableCell>
                   <Verdict score={submission.max_score} fullWidth />
                 </DivTableCell>
-                <DivTableCell style={{ wordBreak: 'break-word' }}>
-                  {maxLenStr(submission.params.description, 150)}
-                </DivTableCell>
+                <DivTableCell breakable>{maxLenStr(submission.params.description, 150)}</DivTableCell>
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>{submission.params.submitter}</DivTableCell>
                 <DivTableCell>{submission.file_count}</DivTableCell>
                 {c12nDef && c12nDef.enforce && (

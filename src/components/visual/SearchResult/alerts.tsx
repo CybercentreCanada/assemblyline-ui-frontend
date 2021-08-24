@@ -106,7 +106,7 @@ const WrappedAlertsTable: React.FC<AlertsTableProps> = ({ alertResults, allowSor
                 <DivTableCell>
                   <Verdict score={alert.al.score} fullWidth />
                 </DivTableCell>
-                <DivTableCell style={{ wordBreak: 'break-word' }}>{alert.file.sha256}</DivTableCell>
+                <DivTableCell breakable>{alert.file.sha256}</DivTableCell>
                 <DivTableCell>{alert.status}</DivTableCell>
                 <DivTableCell>{alert.type}</DivTableCell>
                 {c12nDef.enforce && (

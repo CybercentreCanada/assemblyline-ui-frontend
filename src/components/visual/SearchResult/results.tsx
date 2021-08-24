@@ -93,7 +93,7 @@ const WrappedResultsTable: React.FC<ResultsTableProps> = ({ resultResults, allow
                 <DivTableCell>
                   <Verdict score={result.result.score} fullWidth />
                 </DivTableCell>
-                <DivTableCell style={{ wordBreak: 'break-word' }}>{result.id.substring(0, 64)}</DivTableCell>
+                <DivTableCell breakable>{result.id.substring(0, 64)}</DivTableCell>
                 <DivTableCell>{result.response.service_name}</DivTableCell>
                 {c12nDef.enforce && (
                   <DivTableCell>

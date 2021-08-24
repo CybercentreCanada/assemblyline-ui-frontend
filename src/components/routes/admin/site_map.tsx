@@ -29,8 +29,8 @@ const StyledTableCell = withStyles((theme: Theme) =>
     root: {
       paddingRight: theme.spacing(1),
       paddingLeft: theme.spacing(1),
-      [theme.breakpoints.up('sm')]: {
-        wordBreak: 'break-all'
+      [theme.breakpoints.up('md')]: {
+        wordBreak: 'break-word'
       }
     },
     head: {

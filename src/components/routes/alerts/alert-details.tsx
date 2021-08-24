@@ -263,7 +263,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
             <Grid container>
               <Grid item xs={12} style={{ marginBottom: theme.spacing(1) }}>
                 <span>{item ? item.file.name : <SkeletonInline />}</span>
-                <span style={{ marginLeft: theme.spacing(1), marginRight: theme.spacing(1), wordBreak: 'break-all' }}>
+                <span style={{ marginLeft: theme.spacing(1), marginRight: theme.spacing(1), wordBreak: 'break-word' }}>
                   {item ? (
                     <CustomChip label={item.file.type} variant="outlined" size="small" />
                   ) : (
@@ -283,7 +283,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                   MD5:
                 </Typography>
               </Grid>
-              <Grid item xs={9} sm={10} style={{ wordBreak: 'break-all' }}>
+              <Grid item xs={9} sm={10} style={{ wordBreak: 'break-word' }}>
                 {item ? item.file.md5 : <SkeletonInline />}
               </Grid>
               <Grid item xs={3} sm={2}>
@@ -295,7 +295,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                   SHA1:
                 </Typography>
               </Grid>
-              <Grid item xs={9} sm={10} style={{ wordBreak: 'break-all' }}>
+              <Grid item xs={9} sm={10} style={{ wordBreak: 'break-word' }}>
                 {item ? item.file.sha1 : <SkeletonInline />}
               </Grid>
               <Grid item xs={3} sm={2}>
@@ -307,7 +307,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                   SHA256:
                 </Typography>
               </Grid>
-              <Grid item xs={9} sm={10} style={{ wordBreak: 'break-all' }}>
+              <Grid item xs={9} sm={10} style={{ wordBreak: 'break-word' }}>
                 {item ? item.file.sha256 : <SkeletonInline />}
               </Grid>
             </Grid>
@@ -320,7 +320,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
             <Typography className={classes.sectionTitle}>{t('metadata')}</Typography>
             <Divider />
             <div className={classes.sectionContent}>
-              <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+              <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
                 {item ? (
                   Object.keys(item.metadata).map(k => (
                     <Grid container spacing={1} key={`alert-metadata-${k}`}>

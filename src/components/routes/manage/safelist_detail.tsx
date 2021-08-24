@@ -197,7 +197,7 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
           <Grid container alignItems="center" spacing={1}>
             <Grid item xs>
               <Typography variant="h4">{safelist ? t(`title.${safelist.type}`) : t('title')}</Typography>
-              <Typography variant="caption" style={{ wordBreak: 'break-all' }}>
+              <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
                 {safelist ? safelist_id || id : <Skeleton style={{ width: '10rem' }} />}
               </Typography>
             </Grid>

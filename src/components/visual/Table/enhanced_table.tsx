@@ -294,7 +294,9 @@ const useStyles = makeStyles((theme: Theme) =>
       paddingBottom: theme.spacing(1.5)
     },
     break: {
-      wordBreak: 'break-word'
+      [theme.breakpoints.up('md')]: {
+        wordBreak: 'break-word'
+      }
     }
   })
 );

@@ -16,8 +16,24 @@ import { Link, useHistory, useLocation } from 'react-router-dom';
 const StyledTableCell = withStyles((theme: Theme) =>
   createStyles({
     root: {
-      paddingRight: '8px',
-      paddingLeft: '8px'
+      paddingRight: theme.spacing(1),
+      paddingLeft: theme.spacing(1)
+    },
+    head: {
+      backgroundColor: theme.palette.type === 'dark' ? '#404040' : '#EEE',
+      whiteSpace: 'nowrap'
+    }
+  })
+)(TableCell);
+
+const BreakableTableCell = withStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      paddingRight: theme.spacing(1),
+      paddingLeft: theme.spacing(1),
+      [theme.breakpoints.up('md')]: {
+        wordBreak: 'break-word'
+      }
     },
     head: {
       backgroundColor: theme.palette.type === 'dark' ? '#404040' : '#EEE',
@@ -28,17 +44,24 @@ const StyledTableCell = withStyles((theme: Theme) =>
 
 type CellProps = {
   children?: React.ReactNode;
+  breakable?: boolean;
   [key: string]: any;
 };
 
-export const DivTableCell = ({ children, ...other }: CellProps) => (
-  <StyledTableCell {...other} component="div">
-    {children}
-  </StyledTableCell>
-);
+export const DivTableCell = ({ children, breakable, ...other }: CellProps) =>
+  breakable ? (
+    <BreakableTableCell {...other} component="div">
+      {children}
+    </BreakableTableCell>
+  ) : (
+    <StyledTableCell {...other} component="div">
+      {children}
+    </StyledTableCell>
+  );
 
 DivTableCell.defaultProps = {
-  children: null
+  children: null,
+  breakable: false
 };
 
 export const SortableHeaderCell = ({ children, sortField, allowSort = true, ...other }) => {

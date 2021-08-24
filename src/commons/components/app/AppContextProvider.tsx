@@ -53,7 +53,7 @@ const getInitialTheme = (defaultTheme, prefersDarkMode) => {
 
 const useStyles = makeStyles(theme => ({
   snackroot: {
-    [theme.breakpoints.only('xs')]: { wordBreak: 'break-all' }
+    [theme.breakpoints.only('xs')]: { wordBreak: 'break-word' }
   }
 }));
 
