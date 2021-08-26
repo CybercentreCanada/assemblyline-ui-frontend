@@ -2,6 +2,7 @@ import {
   Button,
   CircularProgress,
   Drawer,
+  Grid,
   IconButton,
   isWidthDown,
   makeStyles,
@@ -27,6 +28,7 @@ import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import ServiceSpec from 'components/layout/serviceSpec';
 import ServiceTree from 'components/layout/serviceTree';
 import Classification from 'components/visual/Classification';
 import React, { useEffect, useState } from 'react';
@@ -35,6 +37,22 @@ import { useTranslation } from 'react-i18next';
 type SettingsProps = {
   width: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 };
+
+function Skel() {
+  return (
+    <div>
+      <Typography variant="subtitle1" gutterBottom>
+        <Skeleton />
+      </Typography>
+      <Skeleton />
+      <Skeleton style={{ height: '2.5rem' }} />
+      <div style={{ display: 'flex', flexDirection: 'row', paddingBottom: '8px' }}>
+        <Skeleton style={{ height: '2.5rem', width: '1.5rem' }} />
+        <Skeleton style={{ marginLeft: '1rem', height: '2.5rem', width: '100%' }} />
+      </div>
+    </div>
+  );
+}
 
 function Settings({ width }: SettingsProps) {
   const { t } = useTranslation(['settings']);
@@ -82,6 +100,15 @@ function Settings({ width }: SettingsProps) {
     }
   }));
   const classes = useStyles();
+
+  const setParam = (service_idx, param_idx, p_value) => {
+    if (settings) {
+      const newSettings = { ...settings };
+      newSettings.service_spec[service_idx].params[param_idx].value = p_value;
+      setSettings(newSettings);
+      setModified(true);
+    }
+  };
 
   function setClassification(value) {
     if (settings) {
@@ -547,14 +574,37 @@ function Settings({ width }: SettingsProps) {
         </Table>
       </TableContainer>
 
-      <Paper className={classes.group}>
-        <div style={{ padding: sp2, textAlign: 'left' }}>
-          <Typography variant="h6" gutterBottom>
-            {t('service')}
-          </Typography>
-          <ServiceTree settings={settings} setSettings={setSettings} setModified={setModified} compressed />
-        </div>
-      </Paper>
+      <Grid container spacing={1}>
+        <Grid item xs={12} md>
+          <Paper className={classes.group}>
+            <div style={{ padding: sp2, textAlign: 'left' }}>
+              <Typography variant="h6" gutterBottom>
+                {t('service')}
+              </Typography>
+              <ServiceTree settings={settings} setSettings={setSettings} setModified={setModified} />
+            </div>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} md>
+          <Paper className={classes.group}>
+            <div style={{ padding: sp2, textAlign: 'left' }}>
+              <Typography variant="h6" gutterBottom>
+                {t('service_spec')}
+              </Typography>
+              {settings ? (
+                <ServiceSpec service_spec={settings.service_spec} setParam={setParam} setParamAsync={setParam} />
+              ) : (
+                <div>
+                  <Skel />
+                  <Skel />
+                  <Skel />
+                  <Skel />
+                </div>
+              )}
+            </div>
+          </Paper>
+        </Grid>
+      </Grid>
 
       {settings && modified && (
         <div
