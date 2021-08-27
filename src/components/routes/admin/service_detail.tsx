@@ -68,6 +68,7 @@ export type SubmissionParams = {
   type: 'int' | 'bool' | 'str' | 'list';
   value: string | boolean | number;
   list?: string[];
+  hide?: boolean;
 };
 
 export type Source = {
