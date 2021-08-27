@@ -22,6 +22,7 @@ import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import ServiceSpec from 'components/layout/serviceSpec';
 import ServiceTree from 'components/layout/serviceTree';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
@@ -265,7 +266,8 @@ function Submit() {
   }
 
   function analyseUrl() {
-    const urlParseRE = /^(((([^:/#?]+:)?(?:(\/\/)((?:(([^:@/#?]+)(?::([^:@/#?]+))?)@)?(([^:/#?\][]+|\[[^/\]@#?]+])(?::([0-9]+))?))?)?)?((\/?(?:[^/?#]+\/+)*)([^?#]*)))?(\?[^#]+)?)(#.*)?/;
+    const urlParseRE =
+      /^(((([^:/#?]+:)?(?:(\/\/)((?:(([^:@/#?]+)(?::([^:@/#?]+))?)@)?(([^:/#?\][]+|\[[^/\]@#?]+])(?::([0-9]+))?))?)?)?((\/?(?:[^/?#]+\/+)*)([^?#]*)))?(\?[^#]+)?)(#.*)?/;
     const matches = urlParseRE.exec(url);
 
     if (matches[15] === undefined || matches[15] === '') {
@@ -646,83 +648,19 @@ function Submit() {
                 </div>
               </div>
 
-              {settings && settings.service_spec.length !== 0 && anySelected() ? (
+              {settings && settings.service_spec.length !== 0 && anySelected() && (
                 <div style={{ textAlign: 'left', marginTop: sp4 }}>
                   <Typography variant="h6" gutterBottom>
                     {t('options.service_spec')}
                   </Typography>
-                  {settings.service_spec.map(
-                    (service, idx) =>
-                      isSelected(service.name) && (
-                        <div key={idx} style={{ paddingTop: sp1, paddingBottom: sp1 }}>
-                          <Typography variant="subtitle1" gutterBottom>
-                            {service.name}
-                          </Typography>
-                          {service.params.map((param, pidx) => (
-                            <div key={pidx} style={{ paddingBottom: sp1 }}>
-                              {param.type === 'bool' ? (
-                                <div style={{ paddingLeft: sp1 }}>
-                                  <FormControlLabel
-                                    control={
-                                      <Checkbox
-                                        size="small"
-                                        checked={param.value === 'true' || param.value === true}
-                                        name="label"
-                                        onChange={() => setParam(idx, pidx, !param.value)}
-                                      />
-                                    }
-                                    label={
-                                      <Typography variant="body2" style={{ textTransform: 'capitalize' }}>
-                                        {param.name.replace(/_/g, ' ')}
-                                      </Typography>
-                                    }
-                                    className={classes.item}
-                                  />
-                                </div>
-                              ) : (
-                                <>
-                                  <div>
-                                    <Typography variant="caption" gutterBottom style={{ textTransform: 'capitalize' }}>
-                                      {param.name.replace(/_/g, ' ')}
-                                    </Typography>
-                                  </div>
-                                  {param.type === 'list' ? (
-                                    <Select
-                                      margin="dense"
-                                      value={param.value}
-                                      variant="outlined"
-                                      onChange={event => setParam(idx, pidx, event.target.value)}
-                                      fullWidth
-                                    >
-                                      {param.list ? (
-                                        param.list.map((item, i) => (
-                                          <MenuItem key={i} value={item}>
-                                            {item}
-                                          </MenuItem>
-                                        ))
-                                      ) : (
-                                        <MenuItem value="" />
-                                      )}
-                                    </Select>
-                                  ) : (
-                                    <TextField
-                                      variant="outlined"
-                                      type={param.type === 'int' ? 'number' : 'text'}
-                                      size="small"
-                                      fullWidth
-                                      defaultValue={param.value}
-                                      onChange={event => setParamAsync(idx, pidx, event.target.value)}
-                                    />
-                                  )}
-                                </>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      )
-                  )}
+                  <ServiceSpec
+                    service_spec={settings.service_spec}
+                    setParam={setParam}
+                    setParamAsync={setParamAsync}
+                    isSelected={isSelected}
+                  />
                 </div>
-              ) : null}
+              )}
             </Grid>
           </Grid>
         </TabPanel>
