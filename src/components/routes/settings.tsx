@@ -2,7 +2,6 @@ import {
   Button,
   CircularProgress,
   Drawer,
-  Grid,
   IconButton,
   isWidthDown,
   makeStyles,
@@ -574,37 +573,32 @@ function Settings({ width }: SettingsProps) {
         </Table>
       </TableContainer>
 
-      <Grid container spacing={1}>
-        <Grid item xs={12} md>
-          <Paper className={classes.group}>
-            <div style={{ padding: sp2, textAlign: 'left' }}>
-              <Typography variant="h6" gutterBottom>
-                {t('service')}
-              </Typography>
-              <ServiceTree settings={settings} setSettings={setSettings} setModified={setModified} />
+      <Paper className={classes.group}>
+        <div style={{ padding: sp2, textAlign: 'left' }}>
+          <Typography variant="h6" gutterBottom>
+            {t('service')}
+          </Typography>
+          <ServiceTree settings={settings} setSettings={setSettings} setModified={setModified} compressed />
+        </div>
+      </Paper>
+
+      <Paper className={classes.group}>
+        <div style={{ padding: sp2, textAlign: 'left' }}>
+          <Typography variant="h6" gutterBottom>
+            {t('service_spec')}
+          </Typography>
+          {settings ? (
+            <ServiceSpec service_spec={settings.service_spec} setParam={setParam} setParamAsync={setParam} compressed />
+          ) : (
+            <div>
+              <Skel />
+              <Skel />
+              <Skel />
+              <Skel />
             </div>
-          </Paper>
-        </Grid>
-        <Grid item xs={12} md>
-          <Paper className={classes.group}>
-            <div style={{ padding: sp2, textAlign: 'left' }}>
-              <Typography variant="h6" gutterBottom>
-                {t('service_spec')}
-              </Typography>
-              {settings ? (
-                <ServiceSpec service_spec={settings.service_spec} setParam={setParam} setParamAsync={setParam} />
-              ) : (
-                <div>
-                  <Skel />
-                  <Skel />
-                  <Skel />
-                  <Skel />
-                </div>
-              )}
-            </div>
-          </Paper>
-        </Grid>
-      </Grid>
+          )}
+        </div>
+      </Paper>
 
       {settings && modified && (
         <div

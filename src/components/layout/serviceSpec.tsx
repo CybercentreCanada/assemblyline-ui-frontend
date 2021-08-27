@@ -27,25 +27,42 @@ type ServiceSpecProps = {
   setParam: (service_id: number, param_id: number, param_value: any) => void;
   setParamAsync: (service_id: number, param_id: number, param_value: any) => void;
   isSelected?: (name: string) => boolean;
+  compressed?: boolean;
 };
 
-function ServiceSpec({ service_spec, setParam, setParamAsync, isSelected }: ServiceSpecProps) {
+function ServiceSpec({ service_spec, setParam, setParamAsync, isSelected, compressed }: ServiceSpecProps) {
   const classes = useStyles();
   const theme = useTheme();
-  const sp1 = theme.spacing(1);
   return (
-    <div>
+    <div
+      style={
+        compressed
+          ? {
+              paddingTop: theme.spacing(2),
+              paddingBottom: theme.spacing(2),
+              columnWidth: '18rem',
+              columnGap: '1rem',
+              columnRuleWidth: '1px',
+              columnRuleStyle: 'dotted',
+              columnRuleColor: theme.palette.divider
+            }
+          : null
+      }
+    >
       {service_spec.map(
         (service, idx) =>
           isSelected(service.name) && (
-            <div key={idx} style={{ paddingTop: sp1, paddingBottom: sp1 }}>
+            <div
+              key={idx}
+              style={{ paddingTop: theme.spacing(1), paddingBottom: theme.spacing(1), pageBreakInside: 'avoid' }}
+            >
               <Typography variant="subtitle1" gutterBottom>
-                {service.name}
+                <b>{service.name}</b>
               </Typography>
               {service.params.map((param, pidx) => (
-                <div key={pidx} style={{ paddingBottom: sp1 }}>
+                <div key={pidx} style={{ paddingBottom: theme.spacing(1) }}>
                   {param.type === 'bool' ? (
-                    <div style={{ paddingLeft: sp1 }}>
+                    <div style={{ paddingLeft: theme.spacing(1) }}>
                       <FormControlLabel
                         control={
                           <Checkbox
@@ -110,7 +127,8 @@ function ServiceSpec({ service_spec, setParam, setParamAsync, isSelected }: Serv
 }
 
 ServiceSpec.defaultProps = {
-  isSelected: (name: string) => true
+  isSelected: (name: string) => true,
+  compressed: false
 };
 
 export default ServiceSpec;
