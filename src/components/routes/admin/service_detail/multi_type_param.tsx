@@ -1,6 +1,19 @@
-import { Grid, IconButton, MenuItem, Select, TextField, Tooltip, useTheme } from '@material-ui/core';
+import {
+  Checkbox,
+  FormControlLabel,
+  Grid,
+  IconButton,
+  MenuItem,
+  Select,
+  TextField,
+  Tooltip,
+  Typography,
+  useTheme
+} from '@material-ui/core';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
+import VisibilityIcon from '@material-ui/icons/Visibility';
+import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import 'moment/locale/fr';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,6 +25,7 @@ type SimpleSubmissionParams = {
   default: string;
   value: string;
   list: string[];
+  hide: string;
 };
 
 type MultiTypeParamProps = {
@@ -27,7 +41,8 @@ const DEFAULT_USER_PARAM: SimpleSubmissionParams = {
   type: 'bool',
   default: 'false',
   value: 'false',
-  list: []
+  list: [],
+  hide: 'false'
 };
 
 const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTypeParamProps) => {
@@ -46,6 +61,10 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
     }
   };
 
+  const handleParamHide = () => {
+    onUpdate({ ...param, hide: !param.hide }, id);
+  };
+
   const handleSubmissionParamListUpdate = event => {
     const { value } = event.target;
     const newList = value.split(',');
@@ -61,15 +80,22 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
       onAdd({
         ...tempUserParams,
         default: tempUserParams.default === 'true',
-        value: tempUserParams.default === 'true'
+        value: tempUserParams.default === 'true',
+        hide: tempUserParams.hide === 'true'
       });
     } else if (tempUserParams.type === 'list' || tempUserParams.type === 'str') {
-      onAdd({ ...tempUserParams, default: tempUserParams.default, value: tempUserParams.default });
+      onAdd({
+        ...tempUserParams,
+        default: tempUserParams.default,
+        value: tempUserParams.default,
+        hide: tempUserParams.hide === 'true'
+      });
     } else {
       onAdd({
         ...tempUserParams,
         default: parseInt(tempUserParams.default) || 0,
-        value: parseInt(tempUserParams.default) || 0
+        value: parseInt(tempUserParams.default) || 0,
+        hide: tempUserParams.hide === 'true'
       });
     }
 
@@ -95,6 +121,10 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
     setTempUserParams({ ...tempUserParams, default: event.target.value, value: event.target.value });
   };
 
+  const handleSPAdvancedChange = () => {
+    setTempUserParams({ ...tempUserParams, hide: tempUserParams.hide === 'false' ? 'true' : 'false' });
+  };
+
   const handleSPListChange = event => {
     const newList = event.target.value.split(',');
     let newDefault = newList[0];
@@ -109,6 +139,11 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
       <Grid item xs={10} sm={3} style={{ wordBreak: 'break-word' }}>
         {`${param.name} [${param.type}]:`}
       </Grid>
+      <Grid item xs={2} sm={1}>
+        <Tooltip title={t(param.hide ? 'params.user.show' : 'params.user.hide')}>
+          <IconButton onClick={handleParamHide}>{param.hide ? <VisibilityOffIcon /> : <VisibilityIcon />}</IconButton>
+        </Tooltip>
+      </Grid>
       {param.type === 'list' && (
         <Grid item xs={10} sm={5}>
           <TextField
@@ -122,7 +157,7 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
           />
         </Grid>
       )}
-      <Grid item xs={10} sm={param.type === 'list' ? 3 : 8}>
+      <Grid item xs={10} sm={param.type === 'list' ? 2 : 7}>
         {param.type === 'bool' ? (
           <Select
             id="user_spec_params"
@@ -181,7 +216,7 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
       </Grid>
     </Grid>
   ) : (
-    <Grid container spacing={1}>
+    <Grid container spacing={1} alignItems="center">
       <Grid item xs={10} sm={3}>
         <TextField
           fullWidth
@@ -275,6 +310,19 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
             </IconButton>
           </Tooltip>
         )}
+      </Grid>
+      <Grid item xs={12}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              size="small"
+              checked={tempUserParams.hide === 'true'}
+              name="label"
+              onChange={handleSPAdvancedChange}
+            />
+          }
+          label={<Typography variant="subtitle2">{t('params.user.hide')}</Typography>}
+        />
       </Grid>
     </Grid>
   );
