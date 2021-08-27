@@ -93,6 +93,7 @@
   "safelist.success": "Tag has been successfully added to the safelist",
   "safelist.text": "Are you sure you want the current tag to be added to the safelist?",
   "safelist.title": "Safelist",
+  "show_more": "Show more...",
   "signature.status.DEPLOYED": "DEPLOYED",
   "signature.status.DISABLED": "DISABLED",
   "signature.status.NOISY": "NOISY",
