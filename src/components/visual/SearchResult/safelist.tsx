@@ -38,6 +38,9 @@ export type Safelist = {
   sources: {
     name: string[];
   };
+  signature: {
+    name: string;
+  };
   tag: {
     type: string;
     value: string;
@@ -114,7 +117,11 @@ const WrappedSafelistTable: React.FC<SafelistTableProps> = ({
                 </DivTableCell>
                 <DivTableCell>{sl_item.type}</DivTableCell>
                 <DivTableCell breakable>
-                  {sl_item.type === 'file' ? sl_item.id : `${sl_item.tag.type} - ${maxLenStr(sl_item.tag.value, 100)}`}
+                  {sl_item.type === 'file'
+                    ? sl_item.id
+                    : sl_item.type === 'signature'
+                    ? maxLenStr(sl_item.signature.name, 100)
+                    : `${sl_item.tag.type} - ${maxLenStr(sl_item.tag.value, 100)}`}
                 </DivTableCell>
                 <DivTableCell breakable>{sl_item.sources.name.join(' | ')}</DivTableCell>
                 {c12nDef.enforce && (

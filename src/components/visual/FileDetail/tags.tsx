@@ -55,13 +55,14 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ signatures, tags }) => {
                     <span style={{ fontWeight: 500 }}>heuristic.signature</span>
                   </Grid>
                   <Grid item xs={12} sm={9} lg={10}>
-                    {signatures.map(([value, lvl], idx) => (
+                    {signatures.map(([value, lvl, safe], idx) => (
                       <Heuristic
                         key={idx}
                         signature
                         text={value}
                         lvl={lvl}
                         highlight_key={getKey('heuristic.signature', value)}
+                        safe={safe}
                       />
                     ))}
                   </Grid>
