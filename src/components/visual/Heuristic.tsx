@@ -1,17 +1,24 @@
 import { Menu, MenuItem } from '@material-ui/core';
 import AssignmentOutlinedIcon from '@material-ui/icons/AssignmentOutlined';
+import PlaylistAddCheckOutlinedIcon from '@material-ui/icons/PlaylistAddCheckOutlined';
 import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 import SelectAllOutlinedIcon from '@material-ui/icons/SelectAllOutlined';
 import useClipboard from 'commons/components/hooks/useClipboard';
+import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
+import useMyAPI from 'components/hooks/useMyAPI';
+import useMySnackbar from 'components/hooks/useMySnackbar';
 import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
 import { scoreToVerdict } from 'helpers/utils';
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
+import InputDialog from './InputDialog';
 
 const STYLE = { height: 'auto', minHeight: '20px' };
 const SEARCH_ICON = <SearchOutlinedIcon style={{ marginRight: '16px' }} />;
 const CLIPBOARD_ICON = <AssignmentOutlinedIcon style={{ marginRight: '16px' }} />;
+const SAFELIST_ICON = <PlaylistAddCheckOutlinedIcon style={{ marginRight: '16px' }} />;
 const HIGHLIGHT_ICON = <SelectAllOutlinedIcon style={{ marginRight: '16px' }} />;
 const initialMenuState = {
   mouseX: null,
@@ -26,6 +33,7 @@ type HeuristicProps = {
   show_type?: boolean;
   highlight_key?: string;
   fullWidth?: boolean;
+  safe?: boolean;
 };
 
 const Heuristic: React.FC<HeuristicProps> = ({
@@ -35,12 +43,19 @@ const Heuristic: React.FC<HeuristicProps> = ({
   signature = false,
   show_type = false,
   highlight_key = null,
-  fullWidth = false
+  fullWidth = false,
+  safe = false
 }) => {
+  const { t } = useTranslation();
   const [state, setState] = React.useState(initialMenuState);
+  const [safelistDialog, setSafelistDialog] = React.useState(false);
+  const [safelistReason, setSafelistReason] = React.useState(null);
   const history = useHistory();
+  const apiCall = useMyAPI();
+  const { showSuccessMessage } = useMySnackbar();
   const { isHighlighted, triggerHighlight } = useHighlighter();
   const { copy } = useClipboard();
+  const { user: currentUser } = useALContext();
 
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
 
@@ -77,8 +92,42 @@ const Heuristic: React.FC<HeuristicProps> = ({
     handleClose();
   }, [handleClick, handleClose]);
 
+  const handleMenuSafelist = useCallback(() => {
+    setSafelistDialog(true);
+    handleClose();
+  }, [setSafelistDialog, handleClose]);
+
+  const addToSafelist = useCallback(() => {
+    const data = {
+      signature: {
+        name: text
+      },
+      sources: [
+        {
+          name: currentUser.username,
+          reason: [safelistReason],
+          type: 'user'
+        }
+      ],
+      type: 'signature'
+    };
+
+    apiCall({
+      url: `/api/v4/safelist/`,
+      method: 'PUT',
+      body: data,
+      onSuccess: _ => {
+        setSafelistDialog(false);
+        showSuccessMessage(t('safelist.success'));
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [safelistReason, t, text]);
+
   let color: PossibleColors = 'default' as 'default';
-  if (lvl) {
+  if (safe) {
+    color = 'success' as 'success';
+  } else if (lvl) {
     color = {
       info: 'default' as 'default',
       safe: 'success' as 'success',
@@ -97,6 +146,20 @@ const Heuristic: React.FC<HeuristicProps> = ({
 
   return (
     <>
+      {signature && (
+        <InputDialog
+          open={safelistDialog}
+          handleClose={() => setSafelistDialog(false)}
+          handleAccept={addToSafelist}
+          handleInputChange={event => setSafelistReason(event.target.value)}
+          inputValue={safelistReason}
+          title={t('safelist.title')}
+          cancelText={t('safelist.cancelText')}
+          acceptText={t('safelist.acceptText')}
+          inputLabel={t('safelist.input')}
+          text={t('safelist.text')}
+        />
+      )}
       <Menu
         open={state.mouseY !== null}
         onClose={handleClose}
@@ -114,9 +177,16 @@ const Heuristic: React.FC<HeuristicProps> = ({
         <MenuItem dense onClick={handleMenuHighlight}>
           {HIGHLIGHT_ICON}Toggle Highlight
         </MenuItem>
+        {signature && (
+          <MenuItem dense onClick={handleMenuSafelist}>
+            {SAFELIST_ICON}
+            {t('safelist')}
+          </MenuItem>
+        )}
       </Menu>
       <CustomChip
         wrap
+        variant={safe ? 'outlined' : 'default'}
         size="tiny"
         type="rounded"
         color={highlight_key && isHighlighted(highlight_key) ? ('primary' as 'info') : color}

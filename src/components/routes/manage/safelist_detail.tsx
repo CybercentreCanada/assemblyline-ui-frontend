@@ -38,6 +38,9 @@ export type Safelist = {
     reason: string[];
     type: string;
   }[];
+  signature: {
+    name: string;
+  };
   tag: {
     type: string;
     value: string;
@@ -90,6 +93,8 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
           query:
             safelist.type === 'file'
               ? `result.sections.heuristic.signature.name:"SAFELIST_${safelist_id || id}"`
+              : safelist.type === 'signature'
+              ? `result.sections.heuristic.signature.name:"${safelist.signature.name}"`
               : `result.sections.safelisted_tags.${safelist.tag.type}:"${safelist.tag.value}"`,
           mincount: 0,
           start: 'now-30d/d',
@@ -214,6 +219,8 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
                             ? `/search/result/?query=result.sections.heuristic.signature.name:"SAFELIST_${
                                 safelist_id || id
                               }"`
+                            : safelist.type === 'signature'
+                            ? `/search/result/?query=result.sections.heuristic.signature.name:"${safelist.signature.name}"`
                             : `/search/result/?query=result.sections.safelisted_tags.${safelist.tag.type}:"${safelist.tag.value}"`
                         }
                       >
@@ -266,7 +273,7 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
           </Grid>
         </div>
         <Grid container spacing={3}>
-          <Grid item xs={12} style={{ display: safelist && safelist.type === 'tag' ? 'none' : 'initial' }}>
+          <Grid item xs={12} style={{ display: safelist && safelist.type === 'file' ? 'initial' : 'none' }}>
             <Typography variant="h6">{t('hashes')}</Typography>
             <Divider />
             <Grid container>
@@ -350,6 +357,20 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
                 </Grid>
                 <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
                   {safelist.file.type || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>}
+                </Grid>
+              </Grid>
+            </Grid>
+          )}
+          {safelist && safelist.signature && (
+            <Grid item xs={12}>
+              <Typography variant="h6">{t('signature.title')}</Typography>
+              <Divider />
+              <Grid container>
+                <Grid item xs={4} sm={3} lg={2}>
+                  <span style={{ fontWeight: 500 }}>{t('signature.name')}</span>
+                </Grid>
+                <Grid item xs={8} sm={9} lg={10}>
+                  {safelist.signature.name}
                 </Grid>
               </Grid>
             </Grid>
