@@ -208,17 +208,21 @@ const ServiceTree: React.FC<ServiceTreeProps> = ({
     return 0;
   }
 
-  return compressed ? (
+  return (
     <div
-      style={{
-        paddingTop: sp2,
-        paddingBottom: sp2,
-        columnWidth: '18rem',
-        columnGap: '1rem',
-        columnRuleWidth: '1px',
-        columnRuleStyle: 'dotted',
-        columnRuleColor: theme.palette.divider
-      }}
+      style={
+        compressed
+          ? {
+              paddingTop: sp2,
+              paddingBottom: sp2,
+              columnWidth: '18rem',
+              columnGap: '1rem',
+              columnRuleWidth: '1px',
+              columnRuleStyle: 'dotted',
+              columnRuleColor: theme.palette.divider
+            }
+          : null
+      }
     >
       {settings ? (
         settings.services
@@ -230,14 +234,6 @@ const ServiceTree: React.FC<ServiceTreeProps> = ({
         <SkelItems size={size} spacing={sp4} />
       )}
     </div>
-  ) : settings ? (
-    settings.services
-      .sort(sortFunc)
-      .map((category, cat_id) => (
-        <ServiceTreeItem size={size} key={cat_id} item={category} onChange={handleServiceChange} />
-      ))
-  ) : (
-    <SkelItems size={size} spacing={sp4} />
   );
 };
 
