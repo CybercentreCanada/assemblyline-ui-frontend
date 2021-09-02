@@ -445,6 +445,7 @@ export type Section = {
     signature: {
       frequency: number;
       name: string;
+      safe: boolean;
     }[];
   };
   tags: {
@@ -600,6 +601,7 @@ const ResultSection: React.FC<ResultSectionProps> = ({
                         signature
                         show_type
                         highlight_key={getKey('heuristic.signature', signature.name)}
+                        safe={signature.safe}
                       />
                     ))}
                   {Array.isArray(section.tags) &&
