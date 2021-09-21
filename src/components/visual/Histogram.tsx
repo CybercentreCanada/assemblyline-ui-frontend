@@ -34,17 +34,15 @@ const WrappedHistogram = ({ data, height, title, isDate }: HistogramProps) => {
       legend: { display: false }
     },
     scales: {
-      xAxis: {
-        axis: 'x',
+      x: {
         grid: { display: false, drawBorder: true },
         ticks: {
           color: theme.palette.text.secondary
         },
-        time: isDate ? { unit: 'day' } : null,
-        type: isDate ? 'time' : null
+        time: isDate ? { unit: 'day' as 'day' } : null,
+        type: isDate ? ('time' as 'time') : null
       },
-      yAxis: {
-        axis: 'y',
+      y: {
         beginAtZero: true,
         suggestedMax: max,
         ticks: {
