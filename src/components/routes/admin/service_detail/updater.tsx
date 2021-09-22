@@ -3,11 +3,11 @@ import {
   FormControlLabel,
   Grid,
   IconButton,
-  MenuItem,
+  InputAdornment,
+  OutlinedInput,
   Radio,
   RadioGroup,
-  Select,
-  TextField,
+  Slider,
   Tooltip,
   Typography,
   useTheme
@@ -26,6 +26,29 @@ type ServiceUpdaterProps = {
   setService: (value: ServiceDetail) => void;
   setModified: (value: boolean) => void;
 };
+
+const marks = [
+  {
+    value: 3600,
+    label: '1h'
+  },
+  {
+    value: 14400,
+    label: '4h'
+  },
+  {
+    value: 21600,
+    label: '6h'
+  },
+  {
+    value: 43200,
+    label: '12h'
+  },
+  {
+    value: 86400,
+    label: '24h'
+  }
+];
 
 const ServiceUpdater = ({ service, setService, setModified }: ServiceUpdaterProps) => {
   const { t } = useTranslation(['adminServices']);
@@ -55,6 +78,14 @@ const ServiceUpdater = ({ service, setService, setModified }: ServiceUpdaterProp
     setService({
       ...service,
       update_config: { ...service.update_config, update_interval_seconds: event.target.value }
+    });
+  };
+
+  const handleSliderChange = (event, number) => {
+    setModified(true);
+    setService({
+      ...service,
+      update_config: { ...service.update_config, update_interval_seconds: number }
     });
   };
 
@@ -101,35 +132,59 @@ const ServiceUpdater = ({ service, setService, setModified }: ServiceUpdaterProp
       <Grid item xs={12}>
         <Typography variant="h6">{t('updater')}</Typography>
       </Grid>
-      <Grid item xs={12} sm={3}>
+      <Grid item xs={12}>
+        <Typography variant="subtitle2">{t('updater.interval')}</Typography>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={9}>
+            <div style={{ marginLeft: theme.spacing(1), marginRight: theme.spacing(1) }}>
+              <Slider
+                min={3600}
+                max={86400}
+                defaultValue={3600}
+                valueLabelDisplay="off"
+                // getAriaValueText={valuetext}
+                aria-labelledby="discrete-slider-custom"
+                step={null}
+                value={service.update_config.update_interval_seconds}
+                marks={marks}
+                // marks={true}
+                onChange={handleSliderChange}
+                valueLabelFormat={x => x / 3600}
+              />
+            </div>
+          </Grid>
+          <Grid item xs={12} sm={3}>
+            {service ? (
+              <OutlinedInput
+                fullWidth
+                type="number"
+                // size="small"
+                margin="dense"
+                // variant="outlined"
+                value={service.update_config.update_interval_seconds}
+                onChange={handleIntervalChange}
+                endAdornment={<InputAdornment position="end">sec</InputAdornment>}
+              />
+            ) : (
+              <Skeleton style={{ height: '2.5rem' }} />
+            )}
+          </Grid>
+        </Grid>
+      </Grid>
+
+      <Grid item xs={12} sm={6}>
         <Typography variant="subtitle2">{t('updater.signatures')}</Typography>
         <RadioGroup value={service.update_config.generates_signatures} onChange={toggleSignatures}>
           <FormControlLabel value control={<Radio />} label={t('updater.signatures.yes')} />
           <FormControlLabel value={false} control={<Radio />} label={t('updater.signatures.no')} />
         </RadioGroup>
       </Grid>
-      <Grid item xs={12} sm={3}>
+      <Grid item xs={12} sm={6}>
         <Typography variant="subtitle2">{t('updater.wait')}</Typography>
         <RadioGroup value={service.update_config.wait_for_update} onChange={toggleWaitForUpdate}>
           <FormControlLabel value control={<Radio />} label={t('updater.wait.yes')} />
           <FormControlLabel value={false} control={<Radio />} label={t('updater.wait.no')} />
         </RadioGroup>
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <Typography variant="subtitle2">{t('updater.interval')}</Typography>
-        {service ? (
-          <TextField
-            fullWidth
-            type="number"
-            size="small"
-            margin="dense"
-            variant="outlined"
-            value={service.update_config.update_interval_seconds}
-            onChange={handleIntervalChange}
-          />
-        ) : (
-          <Skeleton style={{ height: '2.5rem' }} />
-        )}
       </Grid>
       <Grid item xs={12}>
         <Typography variant="subtitle2">{t('updater.sources')}</Typography>

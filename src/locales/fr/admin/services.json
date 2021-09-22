@@ -128,7 +128,7 @@
   "updater.method": "Méthode de mise à jour",
   "updater.method.run": "Exécuter un conteneur",
   "updater.method.build": "Reconstruire un conteneur",
-  "updater.interval": "Intervalle de mise à jour (secondes)",
+  "updater.interval": "Intervalle de mise à jour",
   "updater.run.options": "Conteneur de mise à jour exécuté",
   "updater.signatures": "Génère des signatures",
   "updater.signatures.yes": "Oui",
