@@ -7,8 +7,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import NotFoundPage from 'components/routes/404_dl';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-const Markdown = require('react-markdown');
+import Markdown from 'react-markdown';
 
 export default function Tos() {
   const { t } = useTranslation(['tos']);
@@ -83,7 +82,7 @@ export default function Tos() {
         {tos ? (
           <>
             <div style={{ textAlign: 'left' }}>
-              <Markdown components={{ a: Link }}>{tos}</Markdown>
+              <Markdown components={{ a: props => <Link href={props.href}>{props.children}</Link> }}>{tos}</Markdown>
             </div>
             {currentUser.agrees_with_tos ? (
               <div style={{ marginTop: sp6 }}>
