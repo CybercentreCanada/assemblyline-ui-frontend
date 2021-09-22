@@ -245,7 +245,7 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
                 {heuristic.signature_score_map && Object.keys(heuristic.signature_score_map).length !== 0 ? (
                   <Grid container spacing={1}>
                     {Object.keys(heuristic.signature_score_map).map((key, i) => (
-                      <Grid key={i} item xs>
+                      <Grid key={i} item xs={12} sm={6} md={4}>
                         {`${key} = ${heuristic.signature_score_map[key]}`}
                       </Grid>
                     ))}
