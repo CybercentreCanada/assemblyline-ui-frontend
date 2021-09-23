@@ -275,7 +275,7 @@ function WrappedClassification({
                     </List>
                   </Card>
                 </Grid>
-                {(isUser || uParts.req.length !== 0) && (
+                {((isUser && c12nDef.original_definition.required.length !== 0) || uParts.req.length !== 0) && (
                   <Grid item xs={12} md>
                     <Card variant="outlined">
                       <List disablePadding>
@@ -298,9 +298,14 @@ function WrappedClassification({
                     </Card>
                   </Grid>
                 )}
-                {(isUser || uParts.groups.length !== 0 || uParts.subgroups.length !== 0) && (
+                {((isUser &&
+                  (c12nDef.original_definition.groups.length !== 0 ||
+                    c12nDef.original_definition.subgroups.length !== 0)) ||
+                  uParts.groups.length !== 0 ||
+                  uParts.subgroups.length !== 0) && (
                   <Grid item xs={12} md>
-                    {(isUser || uParts.groups.length !== 0) && (
+                    {((isUser && (c12nDef.original_definition.groups.length !== 0 || c12nDef.dynamic_groups)) ||
+                      uParts.groups.length !== 0) && (
                       <div style={{ paddingBottom: sp2 }}>
                         <Card variant="outlined">
                           <List disablePadding>
@@ -346,7 +351,8 @@ function WrappedClassification({
                         </Card>
                       </div>
                     )}
-                    {(isUser || uParts.subgroups.length !== 0) && (
+                    {((isUser && c12nDef.original_definition.subgroups.length !== 0) ||
+                      uParts.subgroups.length !== 0) && (
                       <Card variant="outlined">
                         <List disablePadding>
                           {c12nDef.original_definition.subgroups.map(
