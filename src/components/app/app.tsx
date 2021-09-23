@@ -37,7 +37,7 @@ const MyApp = () => {
   const provider = getProvider();
   const { t } = useTranslation();
   const { setUser, setConfiguration, user } = useALContext();
-  const { setReady } = useAppLayout();
+  const { setReady, setApps } = useAppLayout();
   const { showErrorMessage } = useMySnackbar();
 
   const [renderedApp, setRenderedApp] = useState<PossibleApps>(user ? 'routes' : provider ? 'login' : 'load');
@@ -48,6 +48,36 @@ const MyApp = () => {
       setRenderedApp(value);
     }
   };
+
+  useEffect(() => {
+    if (user && process.env.REACT_APP_DISCOVER_URL) {
+      const discoverOptions: RequestInit = {
+        method: 'GET',
+        headers: {
+          accept: 'application/json'
+        }
+      };
+
+      fetch(process.env.REACT_APP_DISCOVER_URL, discoverOptions)
+        .then(res => res.json())
+        .catch(() => null)
+        .then(api_data => {
+          if (api_data) {
+            setApps(
+              api_data.applications.application.map((app, i) => {
+                return {
+                  alt: app.instance[0].metadata.alternateText,
+                  name: app.name,
+                  img_d: app.instance[0].metadata.imageDark,
+                  img_l: app.instance[0].metadata.imageLight,
+                  route: app.instance[0].hostName
+                };
+              })
+            );
+          }
+        });
+    }
+  }, [setApps, user]);
 
   useEffect(() => {
     if (user || provider) {
