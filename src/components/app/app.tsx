@@ -36,7 +36,7 @@ const MyApp = () => {
 
   const provider = getProvider();
   const { t } = useTranslation();
-  const { setUser, setConfiguration, user } = useALContext();
+  const { setUser, setConfiguration, user, configuration } = useALContext();
   const { setReady, setApps } = useAppLayout();
   const { showErrorMessage } = useMySnackbar();
 
@@ -50,7 +50,7 @@ const MyApp = () => {
   };
 
   useEffect(() => {
-    if (user && process.env.REACT_APP_DISCOVER_URL) {
+    if (user && configuration && configuration.ui.discover_url) {
       const discoverOptions: RequestInit = {
         method: 'GET',
         headers: {
@@ -58,13 +58,13 @@ const MyApp = () => {
         }
       };
 
-      fetch(process.env.REACT_APP_DISCOVER_URL, discoverOptions)
+      fetch(configuration.ui.discover_url, discoverOptions)
         .then(res => res.json())
         .catch(() => null)
         .then(api_data => {
           if (api_data) {
             setApps(
-              api_data.applications.application.map((app, i) => {
+              api_data.applications.application.map(app => {
                 return {
                   alt: app.instance[0].metadata.alternateText,
                   name: app.name,
@@ -77,7 +77,7 @@ const MyApp = () => {
           }
         });
     }
-  }, [setApps, user]);
+  }, [setApps, user, configuration]);
 
   useEffect(() => {
     if (user || provider) {
