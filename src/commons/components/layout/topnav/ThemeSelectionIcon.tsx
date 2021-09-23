@@ -35,7 +35,7 @@ const ThemeSelectionIcon = () => {
 
   return allowPersonalization || layoutProps.allowTranslate || layoutProps.allowReset ? (
     <ClickAwayListener onClickAway={onClickAway}>
-      <IconButton color="inherit" aria-label="open drawer" onClick={onThemeSelectionClick} edge="start">
+      <IconButton color="inherit" aria-label="open drawer" onClick={onThemeSelectionClick}>
         <TuneIcon />
         <Popper
           open={isPopperOpen}

@@ -4,6 +4,7 @@ import AccountTreeOutlinedIcon from '@material-ui/icons/AccountTreeOutlined';
 import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
 import AssignmentOutlinedIcon from '@material-ui/icons/AssignmentOutlined';
 import BuildOutlinedIcon from '@material-ui/icons/BuildOutlined';
+import BusinessOutlinedIcon from '@material-ui/icons/BusinessOutlined';
 import CodeOutlinedIcon from '@material-ui/icons/CodeOutlined';
 import DashboardOutlinedIcon from '@material-ui/icons/DashboardOutlined';
 import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
@@ -169,6 +170,53 @@ const useMyLayout = (): AppLayoutProps => {
         ]
       }
     },
+
+    {
+      type: 'group' as 'group',
+      element: {
+        id: 'adminmenu',
+        title: t('adminmenu'),
+        userPropValidators: [{ prop: 'user.is_admin', value: true }],
+        icon: <BusinessOutlinedIcon />,
+        items: [
+          {
+            id: 'adminmenu.errors',
+            text: t('adminmenu.errors'),
+            route: '/admin/errors',
+            icon: <ErrorOutlineOutlinedIcon />,
+            nested: true
+          },
+          {
+            id: 'adminmenu.services',
+            text: t('adminmenu.services'),
+            route: '/admin/services',
+            icon: <AccountTreeOutlinedIcon />,
+            nested: true
+          },
+          {
+            id: 'adminmenu.sitemap',
+            text: t('adminmenu.sitemap'),
+            route: '/admin/sitemap',
+            icon: <MapOutlinedIcon />,
+            nested: true
+          },
+          {
+            id: 'adminmenu.tag_safelist',
+            text: t('adminmenu.tag_safelist'),
+            route: '/admin/tag_safelist',
+            icon: <PlaylistAddCheckIcon />,
+            nested: true
+          },
+          {
+            id: 'adminmenu.users',
+            text: t('adminmenu.users'),
+            route: '/admin/users',
+            icon: <SupervisorAccountOutlinedIcon />,
+            nested: true
+          }
+        ]
+      }
+    },
     {
       type: 'divider' as 'divider',
       element: null
@@ -222,13 +270,13 @@ const useMyLayout = (): AppLayoutProps => {
   ];
 
   const APP_SWITCHER_ITEMS = [
-    //  {
-    //    alt: "AL",
-    //    name: "Assemblyline",
-    //    img_d: "/images/al_dark.svg",
-    //    img_l: "/images/al.svg",
-    //    route: "https://localhost"
-    //  },
+    // {
+    //   alt: 'AL',
+    //   name: 'Assemblyline',
+    //   img_d: '/images/al_dark.svg',
+    //   img_l: '/images/al.svg',
+    //   route: 'https://localhost'
+    // }
   ];
 
   const USER_MENU_ITEMS = [
@@ -250,31 +298,31 @@ const useMyLayout = (): AppLayoutProps => {
   ];
 
   const ADMIN_MENU_ITEMS = [
-    {
-      name: t('adminmenu.errors'),
-      route: '/admin/errors',
-      icon: <ErrorOutlineOutlinedIcon />
-    },
-    {
-      name: t('adminmenu.services'),
-      route: '/admin/services',
-      icon: <AccountTreeOutlinedIcon />
-    },
-    {
-      name: t('adminmenu.sitemap'),
-      route: '/admin/sitemap',
-      icon: <MapOutlinedIcon />
-    },
-    {
-      name: t('adminmenu.tag_safelist'),
-      route: '/admin/tag_safelist',
-      icon: <PlaylistAddCheckIcon />
-    },
-    {
-      name: t('adminmenu.users'),
-      route: '/admin/users',
-      icon: <SupervisorAccountOutlinedIcon />
-    }
+    // {
+    //   name: t('adminmenu.errors'),
+    //   route: '/admin/errors',
+    //   icon: <ErrorOutlineOutlinedIcon />
+    // },
+    // {
+    //   name: t('adminmenu.services'),
+    //   route: '/admin/services',
+    //   icon: <AccountTreeOutlinedIcon />
+    // },
+    // {
+    //   name: t('adminmenu.sitemap'),
+    //   route: '/admin/sitemap',
+    //   icon: <MapOutlinedIcon />
+    // },
+    // {
+    //   name: t('adminmenu.tag_safelist'),
+    //   route: '/admin/tag_safelist',
+    //   icon: <PlaylistAddCheckIcon />
+    // },
+    // {
+    //   name: t('adminmenu.users'),
+    //   route: '/admin/users',
+    //   icon: <SupervisorAccountOutlinedIcon />
+    // }
   ];
 
   const darkLogo = (
@@ -335,9 +383,10 @@ const useMyLayout = (): AppLayoutProps => {
       quickSearchURI: '/search',
       quickSearchParam: 'query',
       right: <NotificationArea />,
-      themeSelectionUnder: 'icon' as 'icon',
+      themeSelectionUnder: 'profile' as 'profile',
       userMenu: USER_MENU_ITEMS,
-      userMenuTitle: t('usermenu')
+      userMenuTitle: t('usermenu'),
+      userMenuType: 'icon' as 'icon'
     }
   };
 };

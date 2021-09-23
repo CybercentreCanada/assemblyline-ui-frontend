@@ -48,14 +48,8 @@ type AppBarProps = {
 };
 
 const TopBar: React.FC<AppBarProps> = ({ apps, width }) => {
-  const {
-    currentLayout,
-    layoutProps,
-    showQuickSearch,
-    autoHideAppbar,
-    breadcrumbsEnabled,
-    appbarState
-  } = useAppLayout();
+  const { currentLayout, layoutProps, showQuickSearch, autoHideAppbar, breadcrumbsEnabled, appbarState } =
+    useAppLayout();
   const theme = useTheme();
   const { getAppbarStyles } = useAppContext();
   const classes = useStyles(currentLayout);
@@ -109,9 +103,9 @@ const TopBar: React.FC<AppBarProps> = ({ apps, width }) => {
             (!showQuickSearch && !breadcrumbsEnabled) ||
             (!showQuickSearch && breadcrumbsEnabled && isSm)) && <div style={{ flexGrow: 1 }} />}
           {showQuickSearch && isWidthUp('sm', width) && <QuickSearch />}
-          {layoutProps.topnav.themeSelectionUnder === 'icon' && <ThemeSelectionIcon />}
           {layoutProps.topnav.right}
           <AppSwitcher apps={apps} />
+          {layoutProps.topnav.themeSelectionUnder === 'icon' && <ThemeSelectionIcon />}
           <UserProfile />
         </Toolbar>
       </AppBar>
