@@ -75,7 +75,6 @@ export type ConfigurationDefinition = {
       [lang: string]: string;
     };
     banner_level: 'info' | 'warning' | 'error' | 'success';
-    discover_url: string;
     read_only: boolean;
     tos: boolean;
     tos_lockout: boolean;
