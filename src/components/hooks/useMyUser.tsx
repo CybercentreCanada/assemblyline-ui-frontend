@@ -1,3 +1,4 @@
+import { AppElement } from 'commons/components/layout/topnav/AppSwitcher';
 import { UserContextProps, UserProfileProps, ValidatedProp } from 'commons/components/user/UserProvider';
 import { ClassificationDefinition } from 'helpers/classificationParser';
 import { useState } from 'react';
@@ -69,11 +70,11 @@ export type ConfigurationDefinition = {
   ui: {
     allow_malicious_hinting: boolean;
     allow_url_submissions: boolean;
+    apps: AppElement[];
     banner: {
       [lang: string]: string;
     };
     banner_level: 'info' | 'warning' | 'error' | 'success';
-    discover_url: string;
     read_only: boolean;
     tos: boolean;
     tos_lockout: boolean;

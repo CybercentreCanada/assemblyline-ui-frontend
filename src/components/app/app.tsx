@@ -36,7 +36,7 @@ const MyApp = () => {
 
   const provider = getProvider();
   const { t } = useTranslation();
-  const { setUser, setConfiguration, user, configuration } = useALContext();
+  const { setUser, setConfiguration, user } = useALContext();
   const { setReady, setApps } = useAppLayout();
   const { showErrorMessage } = useMySnackbar();
 
@@ -48,36 +48,6 @@ const MyApp = () => {
       setRenderedApp(value);
     }
   };
-
-  useEffect(() => {
-    if (user && configuration && configuration.ui.discover_url) {
-      const discoverOptions: RequestInit = {
-        method: 'GET',
-        headers: {
-          accept: 'application/json'
-        }
-      };
-
-      fetch(configuration.ui.discover_url, discoverOptions)
-        .then(res => res.json())
-        .catch(() => null)
-        .then(api_data => {
-          if (api_data) {
-            setApps(
-              api_data.applications.application.map(app => {
-                return {
-                  alt: app.instance[0].metadata.alternateText,
-                  name: app.name,
-                  img_d: app.instance[0].metadata.imageDark,
-                  img_l: app.instance[0].metadata.imageLight,
-                  route: app.instance[0].hostName
-                };
-              })
-            );
-          }
-        });
-    }
-  }, [setApps, user, configuration]);
 
   useEffect(() => {
     if (user || provider) {
@@ -102,24 +72,38 @@ const MyApp = () => {
       .then(api_data => {
         // eslint-disable-next-line no-prototype-builtins
         if (api_data === undefined || !api_data.hasOwnProperty('api_response')) {
+          // We got no response
           showErrorMessage(t('api.unreachable'), 30000);
           switchRenderedApp('load');
         } else if (api_data.api_status_code === 403) {
+          // User account is locked
           setConfiguration(api_data.api_response);
           switchRenderedApp('locked');
         } else if (api_data.api_status_code === 401) {
+          // User is not logged in
           localStorage.setItem('loginParams', JSON.stringify(api_data.api_response));
           setLoginParams(api_data.api_response);
           switchRenderedApp('login');
         } else if (api_data.api_status_code === 200) {
+          // Set the current user
           setUser(api_data.api_response);
+
+          //Set the app list?
+          if (api_data.api_response.configuration.ui.apps) {
+            setApps(api_data.api_response.configuration.ui.apps);
+          }
+
+          // Mark the interface ready
           setReady(true);
+
+          // Render appropriate page
           if (!api_data.api_response.agrees_with_tos && api_data.api_response.configuration.ui.tos) {
             switchRenderedApp('tos');
           } else {
             switchRenderedApp('routes');
           }
         } else {
+          // We got an unexpected result
           showErrorMessage(t('api.unreachable'), 30000);
           switchRenderedApp('load');
         }
