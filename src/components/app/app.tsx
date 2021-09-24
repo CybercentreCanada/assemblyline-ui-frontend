@@ -36,7 +36,7 @@ const MyApp = () => {
 
   const provider = getProvider();
   const { t } = useTranslation();
-  const { setUser, setConfiguration, user } = useALContext();
+  const { setUser, setConfiguration, user, configuration } = useALContext();
   const { setReady, setApps } = useAppLayout();
   const { showErrorMessage } = useMySnackbar();
 
@@ -48,6 +48,12 @@ const MyApp = () => {
       setRenderedApp(value);
     }
   };
+
+  useEffect(() => {
+    if (configuration && configuration.ui.apps) {
+      setApps(configuration.ui.apps);
+    }
+  }, [configuration, setApps]);
 
   useEffect(() => {
     if (user || provider) {
@@ -87,11 +93,6 @@ const MyApp = () => {
         } else if (api_data.api_status_code === 200) {
           // Set the current user
           setUser(api_data.api_response);
-
-          //Set the app list?
-          if (api_data.api_response.configuration.ui.apps) {
-            setApps(api_data.api_response.configuration.ui.apps);
-          }
 
           // Mark the interface ready
           setReady(true);
