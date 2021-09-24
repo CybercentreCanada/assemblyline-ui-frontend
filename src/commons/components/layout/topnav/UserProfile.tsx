@@ -12,6 +12,7 @@ import {
   makeStyles,
   Paper,
   Popper,
+  Tooltip,
   Typography,
   useTheme
 } from '@material-ui/core';
@@ -104,6 +105,26 @@ const UserProfile = () => {
     return null;
   };
 
+  const renderButtonMenu = menuItems => {
+    if (menuItems !== undefined && menuItems !== null && menuItems.length !== 0) {
+      return (
+        <div style={{ marginBottom: theme.spacing(-2), textAlign: 'end' }}>
+          {menuItems.map(
+            (a, i) =>
+              a.icon && (
+                <Tooltip title={a.name}>
+                  <IconButton key={`buttonmenu-${i}`} component={Link} color="inherit" to={a.route}>
+                    {a.icon}
+                  </IconButton>
+                </Tooltip>
+              )
+          )}
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <ClickAwayListener onClickAway={onClickAway}>
       <IconButton edge="end" className={classes.avatarButton} onClick={onProfileClick}>
@@ -141,8 +162,8 @@ const UserProfile = () => {
                     >
                       <Avatar
                         style={{
-                          width: theme.spacing(8),
-                          height: theme.spacing(8)
+                          width: layoutProps.topnav.userMenuType === 'icon' ? theme.spacing(10) : theme.spacing(8),
+                          height: layoutProps.topnav.userMenuType === 'icon' ? theme.spacing(10) : theme.spacing(8)
                         }}
                         alt={currentUser.name}
                         src={currentUser.avatar ? currentUser.avatar : gravatarUrl}
@@ -159,11 +180,13 @@ const UserProfile = () => {
                         <Typography variant="caption" noWrap>
                           {currentUser.email}
                         </Typography>
+                        {layoutProps.topnav.userMenuType === 'icon' && renderButtonMenu(layoutProps.topnav.userMenu)}
                       </div>
                     </div>
                   </ListItem>
                 </List>
-                {renderMenu('usermenu', layoutProps.topnav.userMenu, layoutProps.topnav.userMenuTitle)}
+                {layoutProps.topnav.userMenuType !== 'icon' &&
+                  renderMenu('usermenu', layoutProps.topnav.userMenu, layoutProps.topnav.userMenuTitle)}
                 {currentUser.is_admin &&
                   renderMenu('adminmenu', layoutProps.topnav.adminMenu, layoutProps.topnav.adminMenuTitle)}
                 {renderThemeSelection(layoutProps.topnav.themeSelectionUnder === 'profile')}
