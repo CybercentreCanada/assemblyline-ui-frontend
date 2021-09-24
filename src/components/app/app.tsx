@@ -50,32 +50,8 @@ const MyApp = () => {
   };
 
   useEffect(() => {
-    if (user && configuration && configuration.ui.discover_url) {
-      const discoverOptions: RequestInit = {
-        method: 'GET',
-        headers: {
-          accept: 'application/json'
-        }
-      };
-
-      fetch(configuration.ui.discover_url, discoverOptions)
-        .then(res => res.json())
-        .catch(() => null)
-        .then(api_data => {
-          if (api_data) {
-            setApps(
-              api_data.applications.application.map(app => {
-                return {
-                  alt: app.instance[0].metadata.alternateText,
-                  name: app.name,
-                  img_d: app.instance[0].metadata.imageDark,
-                  img_l: app.instance[0].metadata.imageLight,
-                  route: app.instance[0].hostName
-                };
-              })
-            );
-          }
-        });
+    if (user && configuration && configuration.ui.apps) {
+      setApps(configuration.ui.apps);
     }
   }, [setApps, user, configuration]);
 
