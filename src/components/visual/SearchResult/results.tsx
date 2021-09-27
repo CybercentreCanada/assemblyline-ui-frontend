@@ -49,7 +49,7 @@ type ResultsTableProps = {
 const WrappedResultsTable: React.FC<ResultsTableProps> = ({ resultResults, allowSort = true }) => {
   const { t, i18n } = useTranslation(['search']);
   const { c12nDef } = useALContext();
-  const { closeGlobalDrawer } = useDrawer();
+  const { closeTemporaryDrawer } = useDrawer();
 
   return resultResults ? (
     resultResults.total !== 0 ? (
@@ -82,7 +82,7 @@ const WrappedResultsTable: React.FC<ResultsTableProps> = ({ resultResults, allow
                 key={result.id}
                 component={Link}
                 to={`/file/detail/${result.id.substring(0, 64)}`}
-                onClick={closeGlobalDrawer}
+                onClick={closeTemporaryDrawer}
                 hover
                 style={{ textDecoration: 'none' }}
               >
