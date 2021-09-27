@@ -3,6 +3,7 @@ import Paper from '@material-ui/core/Paper';
 import TableContainer from '@material-ui/core/TableContainer';
 import { AlertTitle, Skeleton } from '@material-ui/lab';
 import useALContext from 'components/hooks/useALContext';
+import useDrawer from 'components/hooks/useDrawer';
 import Classification from 'components/visual/Classification';
 import Verdict from 'components/visual/Verdict';
 import 'moment/locale/fr';
@@ -48,6 +49,7 @@ type ResultsTableProps = {
 const WrappedResultsTable: React.FC<ResultsTableProps> = ({ resultResults, allowSort = true }) => {
   const { t, i18n } = useTranslation(['search']);
   const { c12nDef } = useALContext();
+  const { closeGlobalDrawer } = useDrawer();
 
   return resultResults ? (
     resultResults.total !== 0 ? (
@@ -80,6 +82,7 @@ const WrappedResultsTable: React.FC<ResultsTableProps> = ({ resultResults, allow
                 key={result.id}
                 component={Link}
                 to={`/file/detail/${result.id.substring(0, 64)}`}
+                onClick={closeGlobalDrawer}
                 hover
                 style={{ textDecoration: 'none' }}
               >
