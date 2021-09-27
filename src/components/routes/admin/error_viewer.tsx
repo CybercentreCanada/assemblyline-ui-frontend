@@ -72,7 +72,7 @@ function ErrorDetail({ error }) {
           <Typography variant="h5">{error.response.service_name}</Typography>
           <Typography variant="caption">
             {`${error.response.service_version}${
-              error.response.service_tool_version && ` (${error.response.service_tool_version})`
+              error.response.service_tool_version ? ` (${error.response.service_tool_version})` : ''
             }`}
           </Typography>
         </Grid>
