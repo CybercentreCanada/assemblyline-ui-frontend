@@ -71,9 +71,10 @@ function ErrorDetail({ error }) {
         <Grid item xs={6} sm={8}>
           <Typography variant="h5">{error.response.service_name}</Typography>
           <Typography variant="caption">
-            {`${error.response.service_version}${
-              error.response.service_tool_version && ` (${error.response.service_tool_version})`
-            }`}
+            {error.response.service_version !== 0 &&
+              error.response.service_version !== '0' &&
+              error.response.service_version}
+            {error.response.service_tool_version && ` (${error.response.service_tool_version})`}
           </Typography>
         </Grid>
         <Grid item xs={6} sm={4}>
