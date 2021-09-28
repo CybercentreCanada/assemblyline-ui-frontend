@@ -1,4 +1,5 @@
 import useALContext from 'components/hooks/useALContext';
+import useDrawer from 'components/hooks/useDrawer';
 import ForbiddenPage from 'components/routes/403';
 import NotFoundPage from 'components/routes/404_dl';
 import Account from 'components/routes/account';
@@ -49,6 +50,7 @@ const APP_NAME = 'AL4';
 function RouteActions() {
   const { pathname } = useLocation();
   const [oldID, setOldID] = useState(null);
+  const { closeTemporaryDrawer } = useDrawer();
 
   useEffect(() => {
     // Scroll to top
@@ -65,6 +67,8 @@ function RouteActions() {
     document.title = `${APP_NAME} | ${
       currentLocation ? currentLocation.charAt(0).toUpperCase() + currentLocation.slice(1) : 'Submit'
     }`;
+
+    closeTemporaryDrawer();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
