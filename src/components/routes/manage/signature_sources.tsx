@@ -200,7 +200,9 @@ const WrappedSourceDetail = ({ service, base, close, reload }) => {
   const saveChanges = () => {
     apiCall({
       method: base ? 'POST' : 'PUT',
-      url: base ? `/api/v4/signature/sources/${service}/${source.name}/` : `/api/v4/signature/sources/${service}/`,
+      url: base
+        ? `/api/v4/signature/sources/${service}/${encodeURIComponent(source.name)}/`
+        : `/api/v4/signature/sources/${service}/`,
       body: source,
       onSuccess: () => {
         showSuccessMessage(t(base ? 'change.success' : 'add.success'));
@@ -218,7 +220,7 @@ const WrappedSourceDetail = ({ service, base, close, reload }) => {
   const executeDeleteSource = () => {
     close();
     apiCall({
-      url: `/api/v4/signature/sources/${service}/${source.name}/`,
+      url: `/api/v4/signature/sources/${service}/${encodeURIComponent(source.name)}/`,
       method: 'DELETE',
       onSuccess: () => {
         showSuccessMessage(t('delete.success'));
