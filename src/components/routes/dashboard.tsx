@@ -197,6 +197,12 @@ const WrappedIngestCard = ({ ingester }) => {
             />
             <MetricCounter
               init={ingester.initialized}
+              value={ingester.queues.complete}
+              title="C"
+              tooltip={t('processing.complete')}
+            />
+            <MetricCounter
+              init={ingester.initialized}
               value={`${Number(busyness * 100).toFixed(2)} %`}
               title="B"
               tooltip={t('throughput.busy')}
