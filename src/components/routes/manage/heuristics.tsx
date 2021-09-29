@@ -55,7 +55,7 @@ export default function Heuristics() {
   const theme = useTheme();
   const apiCall = useMyAPI();
   const classes = useStyles();
-  const { setGlobalDrawer } = useDrawer();
+  const { closeGlobalDrawer, setGlobalDrawer, globalDrawer } = useDrawer();
   const [suggestions] = useState([
     ...Object.keys(indexes.heuristic).filter(name => indexes.heuristic[name].indexed),
     ...DEFAULT_SUGGESTION
@@ -65,6 +65,22 @@ export default function Heuristics() {
   useEffect(() => {
     setQuery(new SimpleSearchQuery(location.search, `query=*&rows=${pageSize}&offset=0`));
   }, [location.pathname, location.search, pageSize]);
+
+  useEffect(() => {
+    if (heuristicResults !== null && globalDrawer === null && location.hash) {
+      history.push(`${location.pathname}${location.search ? location.search : ''}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [globalDrawer]);
+
+  useEffect(() => {
+    if (location.hash) {
+      setGlobalDrawer(<HeuristicDetail heur_id={location.hash.substr(1)} />);
+    } else {
+      closeGlobalDrawer();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.hash]);
 
   useEffect(() => {
     if (query) {
@@ -99,7 +115,7 @@ export default function Heuristics() {
     () => {
       if (filterValue.current !== '') {
         query.set('query', filterValue.current);
-        history.push(`${location.pathname}?${query.toString()}`);
+        history.push(`${location.pathname}?${query.getDeltaString()}${location.hash ? location.hash : ''}`);
       } else {
         onClear();
       }
@@ -114,10 +130,10 @@ export default function Heuristics() {
 
   const setHeuristicID = useCallback(
     (heur_id: string) => {
-      setGlobalDrawer(<HeuristicDetail heur_id={heur_id} />);
+      history.push(`${location.pathname}${location.search ? location.search : ''}#${heur_id}`);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [location.search]
   );
 
   return (
