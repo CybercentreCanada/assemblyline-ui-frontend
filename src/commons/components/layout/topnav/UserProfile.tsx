@@ -112,8 +112,8 @@ const UserProfile = () => {
           {menuItems.map(
             (a, i) =>
               a.icon && (
-                <Tooltip title={a.name}>
-                  <IconButton key={`buttonmenu-${i}`} component={Link} color="inherit" to={a.route}>
+                <Tooltip key={`buttonmenu-${i}`} title={a.name}>
+                  <IconButton component={Link} color="inherit" to={a.route}>
                     {a.icon}
                   </IconButton>
                 </Tooltip>
