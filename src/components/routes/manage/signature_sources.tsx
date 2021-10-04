@@ -183,6 +183,13 @@ const WrappedSourceDetail = ({ service, base, close, reload }) => {
     setTempHeader({ ...tempHeader, value: event.target.value });
   };
 
+  const handleHeaderValueChange = (event, id) => {
+    const newHeaders = [...source.headers];
+    newHeaders[id] = { ...newHeaders[id], value: event.target.value };
+    setSource({ ...source, headers: newHeaders });
+    setModified(true);
+  };
+
   const addHeader = () => {
     const newHeaders = [...source.headers];
     newHeaders.push(tempHeader);
@@ -349,7 +356,13 @@ const WrappedSourceDetail = ({ service, base, close, reload }) => {
                   <div className={classes.label}>{header.name}</div>
                 </Grid>
                 <Grid item xs={10} md={8}>
-                  <TextField size="small" value={header.value} fullWidth variant="outlined" />
+                  <TextField
+                    size="small"
+                    value={header.value}
+                    fullWidth
+                    variant="outlined"
+                    onChange={event => handleHeaderValueChange(event, id)}
+                  />
                 </Grid>
                 <Grid item xs={2} md={1} style={{ textAlign: 'end' }}>
                   <IconButton
