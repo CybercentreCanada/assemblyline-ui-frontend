@@ -43,7 +43,7 @@ export type Volume = {
   storage_class: string;
 };
 
-type Environment = {
+export type Environment = {
   name: string;
   value: string;
 };
