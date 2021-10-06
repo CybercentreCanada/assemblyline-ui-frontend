@@ -194,6 +194,12 @@ export default function useMySitemap() {
         breadcrumbs: ['/admin']
       },
       {
+        path: '/admin/errors/:id',
+        title: t('breadcrumb.heuristic.detail'),
+        icon: <ListOutlinedIcon />,
+        breadcrumbs: ['/admin', '/admin/errors']
+      },
+      {
         path: '/admin/services',
         title: t('adminmenu.services'),
         icon: <AccountTreeOutlinedIcon />,
