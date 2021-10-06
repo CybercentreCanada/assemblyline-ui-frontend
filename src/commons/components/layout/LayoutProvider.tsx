@@ -99,11 +99,12 @@ export interface AppLayoutProps {
     apps?: AppElement[];
     userMenu?: UserMenuElement[];
     userMenuTitle?: string;
+    userMenuType?: 'icon' | 'list';
     adminMenu?: UserMenuElement[];
     adminMenuTitle?: string;
     quickSearchURI?: string;
     quickSearchParam?: string;
-    themeSelectionUnder: 'profile' | 'icon';
+    themeSelectionUnder?: 'profile' | 'icon';
     left?: React.ReactNode;
     leftAfterBreadcrumbs?: React.ReactNode;
     right?: React.ReactNode;

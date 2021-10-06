@@ -105,6 +105,7 @@ export type LeftNavGroupProps = {
   title: string;
   icon: React.ReactElement<any>;
   items: LeftNavItemProps[];
+  userPropValidators?: ValidatedProp[];
 };
 
 type LeftNavDrawerProps = {
