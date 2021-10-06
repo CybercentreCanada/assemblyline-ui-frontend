@@ -4,6 +4,7 @@ import ForbiddenPage from 'components/routes/403';
 import NotFoundPage from 'components/routes/404_dl';
 import Account from 'components/routes/account';
 import Admin from 'components/routes/admin';
+import AdminErrorDetail from 'components/routes/admin/error_detail';
 import AdminErrorViewer from 'components/routes/admin/error_viewer';
 import AdminServices from 'components/routes/admin/services';
 import Service from 'components/routes/admin/service_detail';
@@ -89,6 +90,7 @@ const WrappedRoutes = () => {
         <Route exact path="/alerts/:id" component={AlertDetails} />
         <Route exact path="/admin" component={Admin} />
         <Route exact path="/admin/errors" component={AdminErrorViewer} />
+        <Route exact path="/admin/errors/:key" component={AdminErrorDetail} />
         <Route exact path="/admin/services" component={AdminServices} />
         <Route exact path="/admin/services/:svc" component={Service} />
         <Route exact path="/admin/sitemap" component={AdminSiteMap} />

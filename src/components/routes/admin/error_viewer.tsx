@@ -1,9 +1,8 @@
-import { Card, Grid, makeStyles, Typography, useMediaQuery, useTheme } from '@material-ui/core';
+import { makeStyles, Typography, useMediaQuery, useTheme } from '@material-ui/core';
 import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
 import PanToolOutlinedIcon from '@material-ui/icons/PanToolOutlined';
 import ReportProblemOutlinedIcon from '@material-ui/icons/ReportProblemOutlined';
 import useUser from 'commons/components/hooks/useAppUser';
-import useClipboard from 'commons/components/hooks/useClipboard';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import useDrawer from 'components/hooks/useDrawer';
@@ -18,9 +17,8 @@ import SearchResultCount from 'components/visual/SearchResultCount';
 import 'moment/locale/fr';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BsClipboard } from 'react-icons/bs';
-import Moment from 'react-moment';
 import { Redirect, useHistory, useLocation } from 'react-router-dom';
+import { ErrorDetail } from './error_detail';
 
 const PAGE_SIZE = 25;
 
@@ -38,118 +36,21 @@ const useStyles = makeStyles(theme => ({
     [theme.breakpoints.down('sm')]: {
       width: '100%'
     }
-  },
-  clipboardIcon: {
-    marginLeft: theme.spacing(1),
-    '&:hover': {
-      cursor: 'pointer',
-      transform: 'scale(1.1)'
-    }
   }
 }));
 
-function ErrorDetail({ error }) {
-  const { t, i18n } = useTranslation(['adminErrorViewer']);
-  const classes = useStyles();
-  const theme = useTheme();
-  const { copy } = useClipboard();
-
-  const errorMap = {
-    'MAX DEPTH REACHED': <PanToolOutlinedIcon style={{ color: theme.palette.action.active }} />,
-    'MAX RETRY REACHED': <PanToolOutlinedIcon style={{ color: theme.palette.action.active }} />,
-    EXCEPTION: <ReportProblemOutlinedIcon style={{ color: theme.palette.action.active }} />,
-    'TASK PRE-EMPTED': <CancelOutlinedIcon style={{ color: theme.palette.action.active }} />,
-    'SERVICE DOWN': <CancelOutlinedIcon style={{ color: theme.palette.action.active }} />,
-    'SERVICE BUSY': <CancelOutlinedIcon style={{ color: theme.palette.action.active }} />,
-    'MAX FILES REACHED': <PanToolOutlinedIcon style={{ color: theme.palette.action.active }} />,
-    UNKNOWN: <ReportProblemOutlinedIcon style={{ color: theme.palette.action.active }} />
-  };
-
-  return (
-    <div style={{ paddingLeft: theme.spacing(2), paddingRight: theme.spacing(2) }}>
-      <Grid container spacing={1} style={{ paddingBottom: theme.spacing(1) }}>
-        <Grid item xs={6} sm={8}>
-          <Typography variant="h5">{error.response.service_name}</Typography>
-          <Typography variant="caption">
-            {error.response.service_version !== 0 &&
-              error.response.service_version !== '0' &&
-              error.response.service_version}
-            {error.response.service_tool_version && ` (${error.response.service_tool_version})`}
-          </Typography>
-        </Grid>
-        <Grid item xs={6} sm={4}>
-          <div style={{ display: 'inline-block', textAlign: 'start' }}>
-            <Typography component="div" variant="body1">
-              <Moment fromNow locale={i18n.language}>
-                {error.created}
-              </Moment>
-            </Typography>
-            <Typography component="div" variant="caption">
-              <Moment format="YYYY-MM-DD HH:mm:ss">{error.created}</Moment>
-            </Typography>
-          </div>
-        </Grid>
-      </Grid>
-
-      <Grid container spacing={1} style={{ paddingBottom: theme.spacing(1) }}>
-        <Grid item xs={6} sm={8}>
-          <span style={{ verticalAlign: 'middle' }}>{errorMap[error.type]}&nbsp;</span>
-          <span style={{ verticalAlign: 'middle' }}>{t(`type.${error.type}`)}</span>
-        </Grid>
-        <Grid item xs={6} sm={4} style={{ alignSelf: 'center' }}>
-          <span style={{ verticalAlign: 'middle' }}>{t(`fail.${error.response.status}`)}</span>
-        </Grid>
-      </Grid>
-
-      <div style={{ marginBottom: theme.spacing(1) }}>
-        <label>{t('message')}</label>
-        <Card variant="outlined">
-          <pre
-            style={{
-              paddingLeft: theme.spacing(1),
-              paddingRight: theme.spacing(1),
-              whiteSpace: 'pre-wrap',
-              minHeight: '10rem'
-            }}
-          >
-            {error.response.message}
-          </pre>
-        </Card>
-      </div>
-
-      {error.response.service_debug_info && (
-        <div style={{ marginBottom: theme.spacing(1) }}>
-          <label>{t('debug_info')}</label>
-          <Card variant="outlined">
-            <pre
-              style={{
-                paddingLeft: theme.spacing(1),
-                paddingRight: theme.spacing(1),
-                whiteSpace: 'pre-wrap'
-              }}
-            >
-              {error.response.service_debug_info}
-            </pre>
-          </Card>
-        </div>
-      )}
-
-      <div style={{ marginBottom: theme.spacing(1) }}>
-        <label>{t('file_info')}</label>
-        <div style={{ wordBreak: 'break-word' }}>
-          {error.sha256}
-          <BsClipboard className={classes.clipboardIcon} onClick={() => copy(error.sha256, 'drawerTop')} />
-        </div>
-      </div>
-    </div>
-  );
-}
+type ErrorResults = {
+  items: any[];
+  offset: number;
+  rows: number;
+  total: number;
+};
 
 export default function ErrorViewer() {
   const { t } = useTranslation(['adminErrorViewer']);
   const [pageSize] = useState(PAGE_SIZE);
   const [searching, setSearching] = useState(false);
-  const [errorResults, setErrorResults] = useState(null);
+  const [errorResults, setErrorResults] = useState<ErrorResults>(null);
   const classes = useStyles();
   const history = useHistory();
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
@@ -160,11 +61,27 @@ export default function ErrorViewer() {
   const location = useLocation();
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
   const filterValue = useRef<string>('');
-  const { setGlobalDrawer } = useDrawer();
+  const { closeGlobalDrawer, setGlobalDrawer, globalDrawer } = useDrawer();
 
   useEffect(() => {
     setQuery(new SimpleSearchQuery(location.search, `rows=${pageSize}&offset=0`));
-  }, [location.search, pageSize]);
+  }, [location.pathname, location.search, pageSize]);
+
+  useEffect(() => {
+    if (errorResults !== null && globalDrawer === null && location.hash) {
+      history.push(`${location.pathname}${location.search ? location.search : ''}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [globalDrawer]);
+
+  useEffect(() => {
+    if (location.hash) {
+      setGlobalDrawer(<ErrorDetail error_key={location.hash.substr(1)} />);
+    } else {
+      closeGlobalDrawer();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.hash]);
 
   useEffect(() => {
     if (query && currentUser.is_admin) {
@@ -224,12 +141,12 @@ export default function ErrorViewer() {
     filterValue.current = inputValue;
   };
 
-  const setError = useCallback(
-    error => {
-      setGlobalDrawer(<ErrorDetail error={error} />);
+  const setErrorKey = useCallback(
+    (error_key: string) => {
+      history.push(`${location.pathname}${location.search ? location.search : ''}#${error_key}`);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [location.search]
   );
 
   return currentUser.is_admin ? (
@@ -315,7 +232,7 @@ export default function ErrorViewer() {
       </PageHeader>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
-        <ErrorsTable errorResults={errorResults} onClick={setError} />
+        <ErrorsTable errorResults={errorResults} setErrorKey={setErrorKey} />
       </div>
     </PageFullWidth>
   ) : (
