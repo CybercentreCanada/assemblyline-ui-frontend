@@ -21,7 +21,7 @@ export type Error = {
     service_debug_info: string;
     service_name: string;
     service_tool_version: string;
-    service_version: string;
+    service_version: number | string;
     status: string;
   };
   sha256: string;
@@ -90,9 +90,10 @@ export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
             <Grid item xs={6} sm={8}>
               <Typography variant="h5">{error.response.service_name}</Typography>
               <Typography variant="caption">
-                {`${error.response.service_version}${
-                  error.response.service_tool_version && ` (${error.response.service_tool_version})`
-                }`}
+                {error.response.service_version !== 0 &&
+                  error.response.service_version !== '0' &&
+                  error.response.service_version}
+                {error.response.service_tool_version && ` (${error.response.service_tool_version})`}
               </Typography>
             </Grid>
             <Grid item xs={6} sm={4}>
