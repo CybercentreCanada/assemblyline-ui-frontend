@@ -16,6 +16,7 @@ import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
 import { Alert, TabContext, TabList, TabPanel } from '@material-ui/lab';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useMyAPI from 'components/hooks/useMyAPI';
+import Empty from 'components/visual/Empty';
 import getXSRFCookie from 'helpers/xsrf';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -38,29 +39,15 @@ const useStyles = makeStyles(theme => ({
   },
   no_pad: {
     padding: 0
+  },
+  img: {
+    maxWidth: '100%',
+    maxHeight: '100%'
   }
 }));
 
-const WrappedAsciiViewer = ({ sha256 }) => {
-  const [ascii, setAscii] = useState(null);
-  const [error, setError] = useState(null);
+const WrappedAsciiViewer = ({ ascii, error }) => {
   const classes = useStyles();
-  const apiCall = useMyAPI();
-
-  useEffect(() => {
-    apiCall({
-      url: `/api/v4/file/ascii/${sha256}/`,
-      onSuccess: api_data => {
-        setAscii(api_data.api_response);
-        if (error !== null) setError(null);
-      },
-      onFailure: api_data => {
-        if (ascii !== null) setAscii(null);
-        setError(api_data.api_error_message);
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sha256]);
 
   return ascii ? (
     <pre className={classes.pre}>{ascii}</pre>
@@ -71,26 +58,8 @@ const WrappedAsciiViewer = ({ sha256 }) => {
   );
 };
 
-const WrappedHexViewer = ({ sha256 }) => {
-  const [hex, setHex] = useState(null);
-  const [error, setError] = useState(null);
+const WrappedHexViewer = ({ hex, error }) => {
   const classes = useStyles();
-  const apiCall = useMyAPI();
-
-  useEffect(() => {
-    apiCall({
-      url: `/api/v4/file/hex/${sha256}/`,
-      onSuccess: api_data => {
-        if (error !== null) setError(null);
-        setHex(api_data.api_response);
-      },
-      onFailure: api_data => {
-        setError(api_data.api_error_message);
-        if (hex !== null) setHex(null);
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sha256]);
 
   return hex ? (
     <pre className={classes.pre}>
@@ -103,26 +72,8 @@ const WrappedHexViewer = ({ sha256 }) => {
   );
 };
 
-const WrappedStringViewer = ({ sha256 }) => {
-  const [string, setString] = useState(null);
-  const [error, setError] = useState(null);
+const WrappedStringViewer = ({ string, error }) => {
   const classes = useStyles();
-  const apiCall = useMyAPI();
-
-  useEffect(() => {
-    apiCall({
-      url: `/api/v4/file/strings/${sha256}/`,
-      onSuccess: api_data => {
-        if (error !== null) setError(null);
-        setString(api_data.api_response);
-      },
-      onFailure: api_data => {
-        setError(api_data.api_error_message);
-        if (string !== null) setString(null);
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sha256]);
 
   return string ? (
     <pre className={classes.pre}>{string}</pre>
@@ -133,9 +84,22 @@ const WrappedStringViewer = ({ sha256 }) => {
   );
 };
 
+const WrappedImageViewer = ({ image, error }) => {
+  const classes = useStyles();
+
+  return image ? (
+    <img className={classes.img} alt={''} src={image} />
+  ) : error ? (
+    <Alert severity="error">{error}</Alert>
+  ) : (
+    <LinearProgress />
+  );
+};
+
 const AsciiViewer = React.memo(WrappedAsciiViewer);
 const HexViewer = React.memo(WrappedHexViewer);
 const StringViewer = React.memo(WrappedStringViewer);
+const ImageViewer = React.memo(WrappedImageViewer);
 
 const FileViewer = () => {
   const { id } = useParams<ParamProps>();
@@ -144,7 +108,15 @@ const FileViewer = () => {
   const theme = useTheme();
   const location = useLocation();
   const history = useHistory();
-  const [tab, setTab] = useState('ascii');
+  const apiCall = useMyAPI();
+  const [string, setString] = useState(null);
+  const [hex, setHex] = useState(null);
+  const [ascii, setAscii] = useState(null);
+  const [error, setError] = useState(null);
+  const [image, setImage] = useState(null);
+  const [imageAllowed, setImageAllowed] = useState(false);
+  const [tab, setTab] = useState(null);
+  const [sha256, setSha256] = useState(null);
 
   const handleChangeTab = (event, newTab) => {
     const currentTab = location.hash.substring(1, location.hash.length) || 'ascii';
@@ -154,9 +126,83 @@ const FileViewer = () => {
   };
 
   useEffect(() => {
-    const newTab = location.hash.substring(1, location.hash.length) || 'ascii';
-    setTab(newTab);
-  }, [location.hash]);
+    setString(null);
+    setHex(null);
+    setAscii(null);
+    setError(null);
+    setImage(null);
+    setSha256(id);
+    apiCall({
+      url: `/api/v4/file/info/${id}/`,
+      onSuccess: api_data => {
+        setImageAllowed(api_data.api_response.is_section_image === true);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
+  useEffect(() => {
+    const newTab = location.hash.substring(1, location.hash.length);
+    if (newTab) setTab(newTab);
+    else if (tab === null || (!imageAllowed && tab === 'image')) setTab('ascii');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [imageAllowed, location.hash]);
+
+  useEffect(() => {
+    setError(null);
+
+    if (tab === 'ascii' && ascii === null) {
+      apiCall({
+        url: `/api/v4/file/ascii/${sha256}/`,
+        onSuccess: api_data => {
+          if (error !== null) setError(null);
+          setAscii(api_data.api_response);
+        },
+        onFailure: api_data => {
+          setError(api_data.api_error_message);
+          if (string !== null) setAscii(null);
+        }
+      });
+    } else if (tab === 'hex' && hex === null) {
+      apiCall({
+        url: `/api/v4/file/hex/${sha256}/`,
+        onSuccess: api_data => {
+          if (error !== null) setError(null);
+          setHex(api_data.api_response);
+        },
+        onFailure: api_data => {
+          setError(api_data.api_error_message);
+          if (hex !== null) setHex(null);
+        }
+      });
+    } else if (tab === 'strings' && string === null) {
+      apiCall({
+        url: `/api/v4/file/strings/${sha256}/`,
+        onSuccess: api_data => {
+          if (error !== null) setError(null);
+          setString(api_data.api_response);
+        },
+        onFailure: api_data => {
+          setError(api_data.api_error_message);
+          if (string !== null) setString(null);
+        }
+      });
+    } else if (tab === 'image' && image === null) {
+      apiCall({
+        url: `/api/v4/file/image/${sha256}/`,
+        onSuccess: api_data => {
+          if (error !== null) setError(null);
+          setImage(api_data.api_response);
+        },
+        onFailure: api_data => {
+          setError(api_data.api_error_message);
+          if (string !== null) setImage(null);
+        }
+      });
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sha256, tab]);
 
   return (
     <PageCenter margin={4} width="100%" textAlign="left">
@@ -194,17 +240,23 @@ const FileViewer = () => {
             <Tab label={t('ascii')} value="ascii" />
             <Tab label={t('strings')} value="strings" />
             <Tab label={t('hex')} value="hex" />
+            {imageAllowed ? <Tab label={t('image')} value="image" /> : <Empty />}
           </TabList>
         </Paper>
         <TabPanel value="ascii" className={classes.no_pad}>
-          <AsciiViewer sha256={id} />
+          <AsciiViewer ascii={ascii} error={error} />
         </TabPanel>
         <TabPanel value="strings" className={classes.no_pad}>
-          <StringViewer sha256={id} />
+          <StringViewer string={string} error={error} />
         </TabPanel>
         <TabPanel value="hex" className={classes.no_pad}>
-          <HexViewer sha256={id} />
+          <HexViewer hex={hex} error={error} />
         </TabPanel>
+        {imageAllowed && (
+          <TabPanel value="image" style={{ paddingLeft: 0, paddingRight: 0 }}>
+            <ImageViewer image={image} error={error} />
+          </TabPanel>
+        )}
       </TabContext>
     </PageCenter>
   );
