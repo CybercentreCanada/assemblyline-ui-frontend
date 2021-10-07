@@ -61,14 +61,6 @@ const ServiceUpdater = ({ service, setService, setModified }: ServiceUpdaterProp
     });
   };
 
-  const handleIntervalChange = event => {
-    setModified(true);
-    setService({
-      ...service,
-      update_config: { ...service.update_config, update_interval_seconds: event.target.value }
-    });
-  };
-
   const handleDelimiterChange = event => {
     setModified(true);
     setService({ ...service, update_config: { ...service.update_config, signature_delimiter: event.target.value } });
@@ -77,6 +69,14 @@ const ServiceUpdater = ({ service, setService, setModified }: ServiceUpdaterProp
   const handleCustomDelimiterChange = event => {
     setModified(true);
     setService({ ...service, update_config: { ...service.update_config, custom_delimiter: event.target.value } });
+  };
+
+  const handleIntervalChange = event => {
+    setModified(true);
+    setService({
+      ...service,
+      update_config: { ...service.update_config, update_interval_seconds: event.target.value }
+    });
   };
 
   const handleDeleteSource = source_id => {
