@@ -53,6 +53,7 @@ const useStyles = makeStyles(theme => ({
 
 export type DrawerContextProps = {
   closeGlobalDrawer: () => void;
+  closeTemporaryDrawer: () => void;
   setGlobalDrawer: (elements: React.ReactElement<any>) => void;
   globalDrawer: React.ReactElement<any>;
 };
@@ -76,11 +77,15 @@ function DrawerProvider(props: DrawerProviderProps) {
   const closeGlobalDrawer = () => {
     setGlobalDrawer(null);
   };
+  const closeTemporaryDrawer = () => {
+    if (!isXL) setGlobalDrawer(null);
+  };
 
   return (
     <DrawerContext.Provider
       value={{
         closeGlobalDrawer,
+        closeTemporaryDrawer,
         setGlobalDrawer,
         globalDrawer
       }}

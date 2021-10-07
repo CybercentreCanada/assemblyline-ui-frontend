@@ -59,7 +59,7 @@ export default function Safelist() {
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
   const apiCall = useMyAPI();
   const classes = useStyles();
-  const { closeGlobalDrawer, setGlobalDrawer } = useDrawer();
+  const { closeGlobalDrawer, setGlobalDrawer, globalDrawer } = useDrawer();
   const [suggestions] = useState(
     indexes.safelist
       ? [...Object.keys(indexes.safelist).filter(name => indexes.safelist[name].indexed), ...DEFAULT_SUGGESTION]
@@ -70,6 +70,22 @@ export default function Safelist() {
   useEffect(() => {
     setQuery(new SimpleSearchQuery(location.search, `query=*&rows=${pageSize}&offset=0`));
   }, [location.pathname, location.search, pageSize]);
+
+  useEffect(() => {
+    if (safelistResults !== null && globalDrawer === null && location.hash) {
+      history.push(`${location.pathname}${location.search ? location.search : ''}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [globalDrawer]);
+
+  useEffect(() => {
+    if (location.hash) {
+      setGlobalDrawer(<SafelistDetail safelist_id={location.hash.substr(1)} close={closeGlobalDrawer} />);
+    } else {
+      closeGlobalDrawer();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.hash]);
 
   useEffect(() => {
     if (query) {
@@ -127,7 +143,8 @@ export default function Safelist() {
     () => {
       if (filterValue.current !== '') {
         query.set('query', filterValue.current);
-        history.push(`${location.pathname}?${query.toString()}`);
+        // history.push(`${location.pathname}?${query.toString()}`);
+        history.push(`${location.pathname}?${query.getDeltaString()}${location.hash ? location.hash : ''}`);
       } else {
         onClear();
       }
@@ -142,10 +159,10 @@ export default function Safelist() {
 
   const setSafelistID = useCallback(
     (wf_id: string) => {
-      setGlobalDrawer(<SafelistDetail safelist_id={wf_id} close={closeGlobalDrawer} />);
+      history.push(`${location.pathname}${location.search ? location.search : ''}#${wf_id}`);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [location.search]
   );
 
   return (

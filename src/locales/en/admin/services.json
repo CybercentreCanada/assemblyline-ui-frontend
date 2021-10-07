@@ -128,7 +128,7 @@
   "updater.method": "Update's method",
   "updater.method.run": "Execute a container",
   "updater.method.build": "Rebuild a container",
-  "updater.interval": "Update interval (seconds)",
+  "updater.interval": "Update interval",
   "updater.run.options": "Executed update container",
   "updater.signatures": "Generates Signatures",
   "updater.signatures.yes": "Yes",

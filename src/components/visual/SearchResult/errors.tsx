@@ -11,12 +11,14 @@ import {
   DivTableCell,
   DivTableHead,
   DivTableRow,
+  LinkRow,
   SortableHeaderCell
 } from 'components/visual/DivTable';
 import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
+import { Link } from 'react-router-dom';
 import InformativeAlert from '../InformativeAlert';
 
 export type ErrorResult = {
@@ -43,10 +45,11 @@ type SearchResults = {
 
 type ErrorsTableProps = {
   errorResults: SearchResults;
-  onClick: (error: ErrorResult) => void;
+  setErrorKey?: (key: string) => void;
+  allowSort?: boolean;
 };
 
-const WrappedErrorsTable: React.FC<ErrorsTableProps> = ({ errorResults, onClick }) => {
+const WrappedErrorsTable: React.FC<ErrorsTableProps> = ({ errorResults, setErrorKey = null, allowSort = true }) => {
   const { t, i18n } = useTranslation(['adminErrorViewer']);
   const theme = useTheme();
 
@@ -67,15 +70,32 @@ const WrappedErrorsTable: React.FC<ErrorsTableProps> = ({ errorResults, onClick 
         <DivTable size="small">
           <DivTableHead>
             <DivTableRow style={{ whiteSpace: 'nowrap' }}>
-              <SortableHeaderCell sortField="created">{t('header.time')}</SortableHeaderCell>
-              <SortableHeaderCell sortField="response.service_name">{t('header.service')}</SortableHeaderCell>
+              <SortableHeaderCell sortField="created" allowSort={allowSort}>
+                {t('header.time')}
+              </SortableHeaderCell>
+              <SortableHeaderCell sortField="response.service_name" allowSort={allowSort}>
+                {t('header.service')}
+              </SortableHeaderCell>
               <DivTableCell>{t('header.message')}</DivTableCell>
-              <SortableHeaderCell sortField="type">{t('header.type')}</SortableHeaderCell>
+              <SortableHeaderCell sortField="type" allowSort={allowSort}>
+                {t('header.type')}
+              </SortableHeaderCell>
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
             {errorResults.items.map(error => (
-              <DivTableRow key={error.id} hover onClick={() => onClick(error)} style={{ cursor: 'pointer' }}>
+              <LinkRow
+                key={error.id}
+                component={Link}
+                to={`/admin/errors/${error.id}`}
+                onClick={event => {
+                  if (setErrorKey) {
+                    event.preventDefault();
+                    setErrorKey(error.id);
+                  }
+                }}
+                hover
+              >
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>
                   <Tooltip title={error.created}>
                     <Moment fromNow locale={i18n.language}>
@@ -90,7 +110,7 @@ const WrappedErrorsTable: React.FC<ErrorsTableProps> = ({ errorResults, onClick 
                     <span>{errorMap[error.type]}</span>
                   </Tooltip>
                 </DivTableCell>
-              </DivTableRow>
+              </LinkRow>
             ))}
           </DivTableBody>
         </DivTable>
