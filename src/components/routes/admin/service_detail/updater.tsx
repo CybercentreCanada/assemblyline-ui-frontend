@@ -45,16 +45,6 @@ const ServiceUpdater = ({ service, setService, setModified }: ServiceUpdaterProp
     setService({ ...service, update_config: { ...service.update_config, run_options: newContainer } });
   };
 
-  const handleDelimiterChange = event => {
-    setModified(true);
-    setService({ ...service, update_config: { ...service.update_config, signature_delimiter: event.target.value } });
-  };
-
-  const handleCustomDelimiterChange = event => {
-    setModified(true);
-    setService({ ...service, update_config: { ...service.update_config, custom_delimiter: event.target.value } });
-  };
-
   const toggleSignatures = () => {
     setModified(true);
     setService({
@@ -77,6 +67,16 @@ const ServiceUpdater = ({ service, setService, setModified }: ServiceUpdaterProp
       ...service,
       update_config: { ...service.update_config, update_interval_seconds: event.target.value }
     });
+  };
+
+  const handleDelimiterChange = event => {
+    setModified(true);
+    setService({ ...service, update_config: { ...service.update_config, signature_delimiter: event.target.value } });
+  };
+
+  const handleCustomDelimiterChange = event => {
+    setModified(true);
+    setService({ ...service, update_config: { ...service.update_config, custom_delimiter: event.target.value } });
   };
 
   const handleDeleteSource = source_id => {
