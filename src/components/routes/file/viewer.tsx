@@ -134,7 +134,9 @@ const FileViewer = () => {
     apiCall({
       url: `/api/v4/file/info/${id}/`,
       onSuccess: api_data => {
-        setImageAllowed(api_data.api_response.is_section_image === true);
+        const imgAllowed = api_data.api_response.is_section_image === true;
+        if (!imgAllowed && tab === 'image') setTab('ascii');
+        setImageAllowed(imgAllowed);
         setSha256(id);
       }
     });
@@ -142,15 +144,15 @@ const FileViewer = () => {
   }, [id]);
 
   useEffect(() => {
-    if (sha256) {
-      const newTab = location.hash.substring(1, location.hash.length);
-      if (newTab) setTab(newTab);
-      else if (tab === null || (!imageAllowed && tab === 'image')) setTab('ascii');
-    }
+    const newTab = location.hash.substring(1, location.hash.length);
+    if (newTab) setTab(newTab);
+    else if (tab === null || (!imageAllowed && tab === 'image')) setTab('ascii');
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sha256, imageAllowed, location.hash]);
+  }, [imageAllowed, location.hash]);
 
   useEffect(() => {
+    if (!sha256) return;
+
     setError(null);
 
     if (tab === 'ascii' && ascii === null) {
