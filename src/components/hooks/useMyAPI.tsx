@@ -19,6 +19,7 @@ export default function useMyAPI() {
     method?: string;
     body?: any;
     reloadOnUnauthorize?: boolean;
+    allowCache?: boolean;
     onSuccess?: (api_data: APIResponseProps) => void;
     onFailure?: (api_data: APIResponseProps) => void;
     onEnter?: () => void;
@@ -32,6 +33,7 @@ export default function useMyAPI() {
     method = 'GET',
     body = null,
     reloadOnUnauthorize = true,
+    allowCache = false,
     onSuccess,
     onFailure,
     onEnter,
@@ -50,6 +52,16 @@ export default function useMyAPI() {
 
     // Run enter callback
     if (onEnter) onEnter();
+
+    // Check the cache
+    const cachedURL = sessionStorage.getItem(url);
+    if (allowCache && cachedURL) {
+      const apiData = JSON.parse(cachedURL);
+      if (onExit) onExit();
+      onSuccess(apiData);
+      if (onFinalize) onFinalize(apiData);
+      return;
+    }
 
     // Fetch the URL
     fetch(url, requestOptions)
@@ -87,6 +99,11 @@ export default function useMyAPI() {
             showErrorMessage(api_data.api_error_message);
           }
         } else if (onSuccess) {
+          // Cache success status
+          if (allowCache) {
+            sessionStorage.setItem(url, JSON.stringify(api_data));
+          }
+
           // Handle success
           // Run success callback
           onSuccess(api_data);
