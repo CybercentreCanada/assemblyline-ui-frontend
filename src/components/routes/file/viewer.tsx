@@ -13,7 +13,7 @@ import {
 import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
 import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
 import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
-import { Alert, TabContext, TabList, TabPanel } from '@material-ui/lab';
+import { Alert, Skeleton, TabContext, TabList, TabPanel } from '@material-ui/lab';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import Empty from 'components/visual/Empty';
@@ -131,22 +131,24 @@ const FileViewer = () => {
     setAscii(null);
     setError(null);
     setImage(null);
-    setSha256(id);
     apiCall({
       url: `/api/v4/file/info/${id}/`,
       onSuccess: api_data => {
         setImageAllowed(api_data.api_response.is_section_image === true);
+        setSha256(id);
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   useEffect(() => {
-    const newTab = location.hash.substring(1, location.hash.length);
-    if (newTab) setTab(newTab);
-    else if (tab === null || (!imageAllowed && tab === 'image')) setTab('ascii');
+    if (sha256) {
+      const newTab = location.hash.substring(1, location.hash.length);
+      if (newTab) setTab(newTab);
+      else if (tab === null || (!imageAllowed && tab === 'image')) setTab('ascii');
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [imageAllowed, location.hash]);
+  }, [sha256, imageAllowed, location.hash]);
 
   useEffect(() => {
     setError(null);
@@ -189,6 +191,7 @@ const FileViewer = () => {
       });
     } else if (tab === 'image' && image === null) {
       apiCall({
+        allowCache: true,
         url: `/api/v4/file/image/${sha256}/`,
         onSuccess: api_data => {
           if (error !== null) setError(null);
@@ -234,30 +237,36 @@ const FileViewer = () => {
         </Grid>
       </Grid>
 
-      <TabContext value={tab}>
-        <Paper square style={{ marginTop: theme.spacing(4), marginBottom: theme.spacing(2) }}>
-          <TabList onChange={handleChangeTab} indicatorColor="primary" textColor="primary">
-            <Tab label={t('ascii')} value="ascii" />
-            <Tab label={t('strings')} value="strings" />
-            <Tab label={t('hex')} value="hex" />
-            {imageAllowed ? <Tab label={t('image')} value="image" /> : <Empty />}
-          </TabList>
-        </Paper>
-        <TabPanel value="ascii" className={classes.no_pad}>
-          <AsciiViewer ascii={ascii} error={error} />
-        </TabPanel>
-        <TabPanel value="strings" className={classes.no_pad}>
-          <StringViewer string={string} error={error} />
-        </TabPanel>
-        <TabPanel value="hex" className={classes.no_pad}>
-          <HexViewer hex={hex} error={error} />
-        </TabPanel>
-        {imageAllowed && (
-          <TabPanel value="image" style={{ paddingLeft: 0, paddingRight: 0 }}>
-            <ImageViewer image={image} error={error} />
+      {sha256 && tab !== null ? (
+        <TabContext value={tab}>
+          <Paper square style={{ marginTop: theme.spacing(4), marginBottom: theme.spacing(2) }}>
+            <TabList onChange={handleChangeTab} indicatorColor="primary" textColor="primary">
+              <Tab label={t('ascii')} value="ascii" />
+              <Tab label={t('strings')} value="strings" />
+              <Tab label={t('hex')} value="hex" />
+              {imageAllowed ? <Tab label={t('image')} value="image" /> : <Empty />}
+            </TabList>
+          </Paper>
+          <TabPanel value="ascii" className={classes.no_pad}>
+            <AsciiViewer ascii={ascii} error={error} />
           </TabPanel>
-        )}
-      </TabContext>
+          <TabPanel value="strings" className={classes.no_pad}>
+            <StringViewer string={string} error={error} />
+          </TabPanel>
+          <TabPanel value="hex" className={classes.no_pad}>
+            <HexViewer hex={hex} error={error} />
+          </TabPanel>
+          {imageAllowed && (
+            <TabPanel value="image" style={{ paddingLeft: 0, paddingRight: 0 }}>
+              <ImageViewer image={image} error={error} />
+            </TabPanel>
+          )}
+        </TabContext>
+      ) : (
+        <div style={{ marginTop: theme.spacing(4), marginBottom: theme.spacing(2) }}>
+          <Skeleton variant="rect" height={theme.spacing(6)} />
+        </div>
+      )}
     </PageCenter>
   );
 };
