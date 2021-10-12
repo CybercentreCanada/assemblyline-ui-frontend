@@ -33,6 +33,7 @@ import { scoreToVerdict } from 'helpers/utils';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactJson from 'react-json-view';
+import { ImageBody } from './image_section';
 
 const useStyles = makeStyles(theme => ({
   section_title: {
@@ -570,6 +571,8 @@ const ResultSection: React.FC<ResultSectionProps> = ({
                         return <ProcessTreeBody body={section.body} />;
                       case 'TABLE':
                         return <TblBody body={section.body} />;
+                      case 'IMAGE':
+                        return <ImageBody body={section.body} />;
                       default:
                         return <div style={{ margin: '2rem' }}>INVALID SECTION TYPE</div>;
                     }
