@@ -1,5 +1,5 @@
 import { Button, CircularProgress, makeStyles, Theme, Tooltip } from '@material-ui/core';
-import BrokenImageIcon from '@material-ui/icons/BrokenImage';
+import BrokenImageOutlinedIcon from '@material-ui/icons/BrokenImageOutlined';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { default as React, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -8,26 +8,33 @@ const useStyles = makeStyles((theme: Theme) => ({
   imageList: {
     display: 'flex',
     flexWrap: 'nowrap',
-    overflowY: 'hidden',
+    marginRight: theme.spacing(2),
     overflowX: 'auto',
-    whiteSpace: 'nowrap',
-    width: '97.5%'
+    paddingBottom: theme.spacing(0.5),
+    paddingTop: theme.spacing(0.5)
+  },
+  imageBox: {
+    display: 'flex',
+    height: theme.spacing(17),
+    width: theme.spacing(17)
   },
   imageItem: {
-    minHeight: '160px',
-    minWidth: '160px',
-    margin: '0.25rem',
-    padding: '0.25rem'
+    display: 'inherit',
+    padding: theme.spacing(0.5),
+    textDecoration: 'none'
   },
   imageLoading: {
-    minHeight: '128px',
-    minWidth: '128px',
+    borderRadius: theme.spacing(0.5),
     display: 'grid',
+    minHeight: theme.spacing(16),
+    minWidth: theme.spacing(16),
     placeItems: 'center'
   },
   image: {
-    maxHeight: '128px',
-    maxWidth: '128px'
+    borderRadius: theme.spacing(0.5),
+    maxHeight: theme.spacing(16),
+    maxWidth: theme.spacing(16),
+    objectFit: 'contain'
   }
 }));
 
@@ -37,7 +44,7 @@ const WrappedImageBody = ({ body }) => {
   return (
     <div className={classes.imageList}>
       {JSON.parse(body).map((element, index) => (
-        <ImageItem key={index} img={element.img.sha256} src={element.thumb.sha256} alt={element.thumb.name} />
+        <ImageItem key={index} img={element.img.sha256} src={element.thumb.sha256} alt={element.img.name} />
       ))}
     </div>
   );
@@ -66,35 +73,23 @@ const ImageItem = ({ img, alt, src }: { img: string; alt: string; src: string })
     });
   }, [alt, src, apiCall, image, loading]);
 
-  return loading ? (
-    <div className={classes.imageLoading}>
-      <CircularProgress color="primary" />
+  return (
+    <div className={classes.imageBox}>
+      {image ? (
+        <Tooltip title={alt}>
+          <Button className={classes.imageItem} component={Link} to={`/file/viewer/${img}#image`}>
+            <img src={image} alt={alt} className={classes.image} />
+          </Button>
+        </Tooltip>
+      ) : (
+        <Tooltip title={alt}>
+          <Button className={classes.imageItem} component={Link} to={'#'} color="secondary">
+            <div className={classes.imageLoading}>
+              {loading ? <CircularProgress /> : <BrokenImageOutlinedIcon fontSize="large" />}
+            </div>
+          </Button>
+        </Tooltip>
+      )}
     </div>
-  ) : image ? (
-    <Tooltip title={alt} placement="top">
-      <Button
-        className={classes.imageItem}
-        component={Link}
-        // target={element.newWindow ? '_blank' : null}
-        to={`/file/viewer/${img}`}
-        color="primary"
-      >
-        <img className={classes.image} src={image} alt={alt} />
-      </Button>
-    </Tooltip>
-  ) : (
-    <Tooltip title={alt} placement="top">
-      <Button
-        className={classes.imageItem}
-        component={Link}
-        // target={element.newWindow ? '_blank' : null}
-        // href={element.sha256}
-        to={null}
-        color="primary"
-        disabled={true}
-      >
-        <BrokenImageIcon color="primary" fontSize="large" />
-      </Button>
-    </Tooltip>
   );
 };
