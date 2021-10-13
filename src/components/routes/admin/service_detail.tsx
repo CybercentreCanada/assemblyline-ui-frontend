@@ -92,6 +92,8 @@ type UpdateConfig = {
   sources: Source[];
   update_interval_seconds: number;
   wait_for_update: boolean;
+  signature_delimiter: 'new_line' | 'double_new_line' | 'pipe' | 'comma' | 'space' | 'none' | 'file' | 'custom';
+  custom_delimiter: string;
 };
 
 export type ServiceDetail = {
