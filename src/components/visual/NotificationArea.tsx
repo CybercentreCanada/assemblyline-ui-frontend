@@ -212,7 +212,7 @@ const NotificationArea = () => {
         </DialogActions>
       </Dialog>
       <ClickAwayListener onClickAway={closeNotificationArea}>
-        <div>
+        <>
           <ConfirmationDialog
             open={saveConfirmation}
             handleClose={() => setSaveConfirmation(false)}
@@ -237,7 +237,6 @@ const NotificationArea = () => {
             color="inherit"
             aria-label="open drawer"
             onClick={onNotificationAreaIconClick}
-            edge="start"
           >
             {systemMessage ? (
               <Badge color="primary" variant="dot" invisible={read}>
@@ -286,7 +285,7 @@ const NotificationArea = () => {
               </Fade>
             )}
           </Popper>
-        </div>
+        </>
       </ClickAwayListener>
     </>
   );

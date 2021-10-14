@@ -27,6 +27,11 @@ export type AppElement = {
 const useStyles = makeStyles(theme => ({
   popper: {
     zIndex: theme.zIndex.drawer + 2
+  },
+  avatarIcon: {
+    '& img': {
+      objectFit: 'contain'
+    }
   }
 }));
 
@@ -101,6 +106,7 @@ const AppSwitcher: React.FC<AppsSwitcherProps> = ({ apps, width }) => {
                                 ? { width: theme.spacing(8), height: theme.spacing(8) }
                                 : { backgroundColor: 'transparent', width: theme.spacing(8), height: theme.spacing(8) }
                             }
+                            className={classes.avatarIcon}
                           >
                             {isDarkTheme
                               ? a.img_d !== null && typeof a.img_d !== 'string'

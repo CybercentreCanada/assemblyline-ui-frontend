@@ -43,7 +43,7 @@ export type Volume = {
   storage_class: string;
 };
 
-type Environment = {
+export type Environment = {
   name: string;
   value: string;
 };
@@ -92,6 +92,8 @@ type UpdateConfig = {
   sources: Source[];
   update_interval_seconds: number;
   wait_for_update: boolean;
+  signature_delimiter: 'new_line' | 'double_new_line' | 'pipe' | 'comma' | 'space' | 'none' | 'file' | 'custom';
+  custom_delimiter: string;
 };
 
 export type ServiceDetail = {
@@ -204,6 +206,10 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
   };
 
   useEffect(() => {
+    // Reset tab because we are using a different service
+    setTab('general');
+    setVersions(null);
+
     // Load user on start
     if (currentUser.is_admin) {
       apiCall({
@@ -223,7 +229,7 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
   }, [name]);
 
   useEffect(() => {
-    // Load user on start
+    // Load constants on page load
     if (currentUser.is_admin) {
       apiCall({
         url: '/api/v4/service/constants/',
@@ -313,9 +319,11 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
           <TabPanel value="docker" style={{ paddingLeft: 0, paddingRight: 0 }}>
             <ServiceContainer service={service} setService={setService} setModified={setModified} />
           </TabPanel>
-          <TabPanel value="updater" style={{ paddingLeft: 0, paddingRight: 0 }}>
-            <ServiceUpdater service={service} setService={setService} setModified={setModified} />
-          </TabPanel>
+          {service.update_config && (
+            <TabPanel value="updater" style={{ paddingLeft: 0, paddingRight: 0 }}>
+              <ServiceUpdater service={service} setService={setService} setModified={setModified} />
+            </TabPanel>
+          )}
           <TabPanel value="params" style={{ paddingLeft: 0, paddingRight: 0 }}>
             <ServiceParams service={service} setService={setService} setModified={setModified} />
           </TabPanel>

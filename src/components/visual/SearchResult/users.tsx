@@ -66,7 +66,7 @@ const WrappedUsersTable: React.FC<UsersTableProps> = ({ userResults }) => {
               <LinkRow key={user.id} to={`/admin/users/${user.uname}`} hover style={{ textDecoration: 'none' }}>
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>{user.uname}</DivTableCell>
                 <DivTableCell>{user.name}</DivTableCell>
-                <DivTableCell>{user.groups.join(' | ')}</DivTableCell>
+                <DivTableCell>{user.groups && user.groups.join(' | ')}</DivTableCell>
                 {c12nDef.enforce && (
                   <DivTableCell style={{ whiteSpace: 'nowrap' }}>
                     <Classification type="text" size="tiny" c12n={user.classification} format="short" />

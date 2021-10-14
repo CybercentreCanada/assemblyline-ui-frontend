@@ -73,6 +73,16 @@ const ServiceUpdater = ({ service, setService, setModified }: ServiceUpdaterProp
     });
   };
 
+  const handleDelimiterChange = event => {
+    setModified(true);
+    setService({ ...service, update_config: { ...service.update_config, signature_delimiter: event.target.value } });
+  };
+
+  const handleCustomDelimiterChange = event => {
+    setModified(true);
+    setService({ ...service, update_config: { ...service.update_config, custom_delimiter: event.target.value } });
+  };
+
   const handleIntervalChange = event => {
     setModified(true);
     setService({
@@ -186,6 +196,52 @@ const ServiceUpdater = ({ service, setService, setModified }: ServiceUpdaterProp
           <FormControlLabel value={false} control={<Radio />} label={t('updater.wait.no')} />
         </RadioGroup>
       </Grid>
+
+      {service && service.update_config.generates_signatures && (
+        <Grid item xs={12}>
+          <Typography variant="subtitle2">{t('updater.signature_delimiter')}</Typography>
+          <Grid container spacing={1}>
+            <Grid
+              item
+              xs={12}
+              sm={service.update_config.signature_delimiter === 'custom' ? 7 : 12}
+              md={service.update_config.signature_delimiter === 'custom' ? 8 : 12}
+            >
+              <Select
+                id="delimiter"
+                fullWidth
+                value={service.update_config.signature_delimiter}
+                onChange={handleDelimiterChange}
+                variant="outlined"
+                margin="dense"
+                style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(0.5) }}
+              >
+                <MenuItem value="new_line">{t('updater.signature_delimiter.new_line')}</MenuItem>
+                <MenuItem value="double_new_line">{t('updater.signature_delimiter.double_new_line')}</MenuItem>
+                <MenuItem value="pipe">{t('updater.signature_delimiter.pipe')}</MenuItem>
+                <MenuItem value="comma">{t('updater.signature_delimiter.comma')}</MenuItem>
+                <MenuItem value="space">{t('updater.signature_delimiter.space')}</MenuItem>
+                <MenuItem value="none">{t('updater.signature_delimiter.none')}</MenuItem>
+                <MenuItem value="file">{t('updater.signature_delimiter.file')}</MenuItem>
+                <MenuItem value="custom">{t('updater.signature_delimiter.custom')}</MenuItem>
+              </Select>
+            </Grid>
+            {service.update_config.signature_delimiter === 'custom' && (
+              <Grid item xs={12} sm={5} md={4}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  margin="dense"
+                  variant="outlined"
+                  value={service.update_config.custom_delimiter}
+                  onChange={handleCustomDelimiterChange}
+                />
+              </Grid>
+            )}
+          </Grid>
+        </Grid>
+      )}
+
       <Grid item xs={12}>
         <Typography variant="subtitle2">{t('updater.sources')}</Typography>
         <SourceDialog

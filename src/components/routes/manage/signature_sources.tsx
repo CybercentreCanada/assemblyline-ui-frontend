@@ -1,15 +1,12 @@
 import {
   Button,
   Card,
-  Checkbox,
   CircularProgress,
   Collapse,
   Divider,
-  FormControlLabel,
   Grid,
   IconButton,
   makeStyles,
-  TextField,
   Tooltip,
   Typography,
   useMediaQuery,
@@ -32,6 +29,8 @@ import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Redirect } from 'react-router-dom';
+import { Source } from '../admin/service_detail';
+import { SourceDetail } from './signature_sources_details';
 
 const useStyles = makeStyles(theme => ({
   buttonProgress: {
@@ -85,12 +84,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const DEFAULT_HEADER = {
-  name: '',
-  value: ''
-};
-
-const DEFAULT_SOURCE = {
+const DEFAULT_SOURCE: Source = {
   ca_cert: '',
   default_classification: '',
   headers: [],
@@ -98,12 +92,13 @@ const DEFAULT_SOURCE = {
   password: '',
   pattern: '',
   private_key: '',
+  proxy: '',
   ssl_ignore_errors: false,
   uri: '',
   username: ''
 };
 
-const WrappedSourceDetail = ({ service, base, close, reload }) => {
+const WrappedSourceDetailDrawer = ({ service, base, close, reload }) => {
   const { t } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
   const { c12nDef } = useALContext();
@@ -112,7 +107,6 @@ const WrappedSourceDetail = ({ service, base, close, reload }) => {
   const [buttonLoading, setButtonLoading] = useState(false);
   const apiCall = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
-  const [tempHeader, setTempHeader] = useState({ ...DEFAULT_HEADER });
   const [source, setSource] = useState(null);
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
   const classes = useStyles();
@@ -126,81 +120,12 @@ const WrappedSourceDetail = ({ service, base, close, reload }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [base]);
 
-  const handleURIChange = event => {
-    setSource({ ...source, uri: event.target.value });
-    setModified(true);
-  };
-
-  const handleProxyChange = event => {
-    setSource({ ...source, proxy: event.target.value });
-    setModified(true);
-  };
-
-  const handleNameChange = event => {
-    setSource({ ...source, name: event.target.value });
-    setModified(true);
-  };
-
-  const handlePasswordChange = event => {
-    setSource({ ...source, password: event.target.value });
-    setModified(true);
-  };
-
-  const handlePatternChange = event => {
-    setSource({ ...source, pattern: event.target.value });
-    setModified(true);
-  };
-
-  const handleCAChange = event => {
-    setSource({ ...source, ca_cert: event.target.value });
-    setModified(true);
-  };
-
-  const handlePrivateKeyChange = event => {
-    setSource({ ...source, private_key: event.target.value });
-    setModified(true);
-  };
-
-  const handleUsernameChange = event => {
-    setSource({ ...source, username: event.target.value });
-    setModified(true);
-  };
-
-  const handleSSLChange = event => {
-    setSource({ ...source, ssl_ignore_errors: event.target.checked });
-    setModified(true);
-  };
-
-  const handleClassificationChange = c12n => {
-    setSource({ ...source, default_classification: c12n });
-    setModified(true);
-  };
-
-  const handleTempHeaderName = event => {
-    setTempHeader({ ...tempHeader, name: event.target.value });
-  };
-  const handleTempHeaderValue = event => {
-    setTempHeader({ ...tempHeader, value: event.target.value });
-  };
-
-  const addHeader = () => {
-    const newHeaders = [...source.headers];
-    newHeaders.push(tempHeader);
-    setSource({ ...source, headers: newHeaders });
-    setTempHeader({ ...DEFAULT_HEADER });
-    setModified(true);
-  };
-  const removeHeader = id => {
-    const newHeaders = [...source.headers];
-    newHeaders.splice(id, 1);
-    setSource({ ...source, headers: newHeaders });
-    setModified(true);
-  };
-
   const saveChanges = () => {
     apiCall({
       method: base ? 'POST' : 'PUT',
-      url: base ? `/api/v4/signature/sources/${service}/${source.name}/` : `/api/v4/signature/sources/${service}/`,
+      url: base
+        ? `/api/v4/signature/sources/${service}/${encodeURIComponent(source.name)}/`
+        : `/api/v4/signature/sources/${service}/`,
       body: source,
       onSuccess: () => {
         showSuccessMessage(t(base ? 'change.success' : 'add.success'));
@@ -218,7 +143,7 @@ const WrappedSourceDetail = ({ service, base, close, reload }) => {
   const executeDeleteSource = () => {
     close();
     apiCall({
-      url: `/api/v4/signature/sources/${service}/${source.name}/`,
+      url: `/api/v4/signature/sources/${service}/${encodeURIComponent(source.name)}/`,
       method: 'DELETE',
       onSuccess: () => {
         showSuccessMessage(t('delete.success'));
@@ -264,184 +189,7 @@ const WrappedSourceDetail = ({ service, base, close, reload }) => {
             )}
           </Grid>
         </div>
-        <Grid container spacing={1}>
-          <Grid item xs={12}>
-            <div className={classes.label}>{t('uri')}</div>
-            <TextField size="small" value={source.uri} fullWidth variant="outlined" onChange={handleURIChange} />
-          </Grid>
-          {c12nDef.enforce && (
-            <Grid item xs={12}>
-              <div className={classes.label}>{t('classification')}</div>
-              <Classification
-                c12n={source.default_classification}
-                type="picker"
-                setClassification={handleClassificationChange}
-              />
-            </Grid>
-          )}
-          <Grid item xs={12} md={6}>
-            <div>
-              <div className={classes.label}>{t('name')}</div>
-              <TextField
-                disabled={!!base}
-                size="small"
-                value={source.name}
-                fullWidth
-                variant="outlined"
-                onChange={handleNameChange}
-              />
-            </div>
-            <div style={{ paddingTop: theme.spacing(1) }}>
-              <div className={classes.label}>{t('pattern')}</div>
-              <TextField
-                size="small"
-                value={source.pattern}
-                fullWidth
-                variant="outlined"
-                onChange={handlePatternChange}
-              />
-            </div>
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <div>
-              <div className={classes.label}>{t('username')}</div>
-              <TextField
-                size="small"
-                value={source.username}
-                fullWidth
-                variant="outlined"
-                onChange={handleUsernameChange}
-              />
-            </div>
-            <div style={{ paddingTop: theme.spacing(1) }}>
-              <div className={classes.label}>{t('password')}</div>
-              <TextField
-                size="small"
-                value={source.password}
-                fullWidth
-                variant="outlined"
-                onChange={handlePasswordChange}
-              />
-            </div>
-          </Grid>
-          <Grid item xs={12}>
-            <div className={classes.label}>{t('private_key')}</div>
-            <TextField
-              size="small"
-              value={source.private_key}
-              multiline
-              rows={6}
-              fullWidth
-              variant="outlined"
-              InputProps={{ style: { fontFamily: 'monospace' } }}
-              onChange={handlePrivateKeyChange}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <div className={classes.label}>{t('headers')}</div>
-          </Grid>
-          {source.headers.map((header, id) => (
-            <Grid key={id} item xs={12}>
-              <Grid container spacing={1} alignItems="center">
-                <Grid item xs={10} md={3}>
-                  <div className={classes.label}>{header.name}</div>
-                </Grid>
-                <Grid item xs={10} md={8}>
-                  <TextField size="small" value={header.value} fullWidth variant="outlined" />
-                </Grid>
-                <Grid item xs={2} md={1} style={{ textAlign: 'end' }}>
-                  <IconButton
-                    style={{
-                      color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark,
-                      margin: '-4px 0'
-                    }}
-                    onClick={() => {
-                      removeHeader(id);
-                    }}
-                  >
-                    <RemoveCircleOutlineOutlinedIcon />
-                  </IconButton>
-                </Grid>
-              </Grid>
-            </Grid>
-          ))}
-          <Grid item xs={12}>
-            <Grid container spacing={1}>
-              <Grid item xs={10} md={3}>
-                <TextField
-                  size="small"
-                  value={tempHeader.name}
-                  fullWidth
-                  placeholder={t('headers.name')}
-                  variant="outlined"
-                  onChange={handleTempHeaderName}
-                />
-              </Grid>
-              <Grid item xs={10} md={8}>
-                <TextField
-                  size="small"
-                  value={tempHeader.value}
-                  fullWidth
-                  placeholder={t('headers.value')}
-                  variant="outlined"
-                  onChange={handleTempHeaderValue}
-                />
-              </Grid>
-              <Grid item xs={2} md={1} style={{ textAlign: 'end' }}>
-                <IconButton
-                  style={{
-                    color:
-                      !tempHeader.name || !tempHeader.value
-                        ? theme.palette.action.disabled
-                        : theme.palette.type === 'dark'
-                        ? theme.palette.success.light
-                        : theme.palette.success.dark,
-                    margin: '-4px 0'
-                  }}
-                  disabled={!tempHeader.name || !tempHeader.value}
-                  onClick={() => {
-                    addHeader();
-                  }}
-                >
-                  <AddCircleOutlineOutlinedIcon />
-                </IconButton>
-              </Grid>
-            </Grid>
-          </Grid>
-          <Grid item xs={12}>
-            <div className={classes.label}>{t('proxy')}</div>
-            <TextField
-              size="small"
-              value={source.proxy}
-              placeholder={t('proxy.placeholder')}
-              fullWidth
-              variant="outlined"
-              onChange={handleProxyChange}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <div className={classes.label}>{t('ca')}</div>
-            <TextField
-              size="small"
-              value={source.ca_cert}
-              multiline
-              rows={6}
-              fullWidth
-              variant="outlined"
-              InputProps={{ style: { fontFamily: 'monospace' } }}
-              onChange={handleCAChange}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <FormControlLabel
-              control={
-                <Checkbox size="small" checked={source.ssl_ignore_errors} name="label" onChange={handleSSLChange} />
-              }
-              label={<Typography variant="body2">{t('ignore_ssl')}</Typography>}
-              className={classes.checkbox}
-            />
-          </Grid>
-        </Grid>
+        <SourceDetail source={source} addMode={!base} setSource={setSource} setModified={setModified} />
         <div style={{ paddingTop: theme.spacing(2), paddingBottom: theme.spacing(2), textAlign: 'right' }}>
           <Button
             variant="contained"
@@ -458,7 +206,7 @@ const WrappedSourceDetail = ({ service, base, close, reload }) => {
   );
 };
 
-export const SourceDetail = React.memo(WrappedSourceDetail);
+export const SourceDetailDrawer = React.memo(WrappedSourceDetailDrawer);
 
 export const SourceCard = ({ source, onClick }) => {
   const { t } = useTranslation(['manageSignatureSources']);
@@ -553,7 +301,9 @@ const ServiceDetail = ({ service, sources, reload }) => {
   const classes = useStyles();
 
   const openDrawer = useCallback((currentService: string, source) => {
-    setGlobalDrawer(<SourceDetail service={currentService} base={source} close={closeGlobalDrawer} reload={reload} />);
+    setGlobalDrawer(
+      <SourceDetailDrawer service={currentService} base={source} close={closeGlobalDrawer} reload={reload} />
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

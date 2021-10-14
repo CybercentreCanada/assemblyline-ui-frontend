@@ -2,13 +2,15 @@ import { Collapse, List, ListItem, ListItemIcon, ListItemText, Popover, Tooltip 
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
+import useAppUser from 'commons/components/hooks/useAppUser';
 import { LeftNavGroupProps } from 'commons/components/layout/leftnav/LeftNavDrawer';
 import LeftNavItem from 'commons/components/layout/leftnav/LeftNavItem';
 import React, { useState } from 'react';
 
-const LeftNavGroup: React.FC<LeftNavGroupProps> = ({ open = true, id, title, icon, items }) => {
+const LeftNavGroup: React.FC<LeftNavGroupProps> = ({ open = true, id, title, icon, items, userPropValidators }) => {
   const { drawerState } = useAppLayout();
   const [popoverTarget, setPopoverTarget] = useState<(EventTarget & Element) | undefined>();
+  const { validateProps } = useAppUser();
 
   const onPopoverClick = (event: React.MouseEvent) => {
     setPopoverTarget(event ? event.currentTarget : undefined);
@@ -31,7 +33,7 @@ const LeftNavGroup: React.FC<LeftNavGroupProps> = ({ open = true, id, title, ico
     </ListItem>
   );
 
-  return (
+  return validateProps(userPropValidators) ? (
     <div>
       {drawerState ? (
         groupItem
@@ -68,7 +70,7 @@ const LeftNavGroup: React.FC<LeftNavGroupProps> = ({ open = true, id, title, ico
         </List>
       </Popover>
     </div>
-  );
+  ) : null;
 };
 
 export default LeftNavGroup;
