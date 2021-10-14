@@ -45,6 +45,7 @@
   "ingester": "Métriques d'ingestion",
   "no_services": "Il n'y a pas de service en ligne",
   "processing": "En traitement:",
+  "processing.complete": "Soumissions en file d'attente après traitement",
   "processing.inflight": "Soumissions en cours d'analyse",
   "queued": "En file d'attente:",
   "queues": "Files d'attente:",

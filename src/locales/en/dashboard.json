@@ -45,6 +45,7 @@
   "ingester": "Ingestion Metrics",
   "no_services": "There are no service online",
   "processing": "Processing:",
+  "processing.complete": "Submissions queued after processing",
   "processing.inflight": "Submissions being scanned right now",
   "queued": "Queued:",
   "queues": "Queues:",

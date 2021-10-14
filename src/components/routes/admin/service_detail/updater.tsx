@@ -3,11 +3,11 @@ import {
   FormControlLabel,
   Grid,
   IconButton,
-  MenuItem,
+  InputAdornment,
+  OutlinedInput,
   Radio,
   RadioGroup,
-  Select,
-  TextField,
+  Slider,
   Tooltip,
   Typography,
   useTheme
@@ -19,7 +19,6 @@ import 'moment/locale/fr';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ServiceDetail } from '../service_detail';
-import ContainerCard from './container_card';
 import SourceDialog from './source_dialog';
 
 type ServiceUpdaterProps = {
@@ -28,22 +27,35 @@ type ServiceUpdaterProps = {
   setModified: (value: boolean) => void;
 };
 
+const marks = [
+  {
+    value: 3600,
+    label: '1h'
+  },
+  {
+    value: 14400,
+    label: '4h'
+  },
+  {
+    value: 21600,
+    label: '6h'
+  },
+  {
+    value: 43200,
+    label: '12h'
+  },
+  {
+    value: 86400,
+    label: '24h'
+  }
+];
+
 const ServiceUpdater = ({ service, setService, setModified }: ServiceUpdaterProps) => {
   const { t } = useTranslation(['adminServices']);
   const [dialog, setDialog] = useState(false);
   const [editDialog, setEditDialog] = useState(false);
   const [editedSourceID, setEditedSourceID] = useState(-1);
   const theme = useTheme();
-
-  const handleMethodChange = event => {
-    setModified(true);
-    setService({ ...service, update_config: { ...service.update_config, method: event.target.value } });
-  };
-
-  const handleUpdateContainerChange = newContainer => {
-    setModified(true);
-    setService({ ...service, update_config: { ...service.update_config, run_options: newContainer } });
-  };
 
   const toggleSignatures = () => {
     setModified(true);
@@ -76,6 +88,14 @@ const ServiceUpdater = ({ service, setService, setModified }: ServiceUpdaterProp
     setService({
       ...service,
       update_config: { ...service.update_config, update_interval_seconds: event.target.value }
+    });
+  };
+
+  const handleSliderChange = (event, number) => {
+    setModified(true);
+    setService({
+      ...service,
+      update_config: { ...service.update_config, update_interval_seconds: number }
     });
   };
 
@@ -122,51 +142,46 @@ const ServiceUpdater = ({ service, setService, setModified }: ServiceUpdaterProp
       <Grid item xs={12}>
         <Typography variant="h6">{t('updater')}</Typography>
       </Grid>
-      <Grid item xs={12} sm={6}>
-        <Typography variant="subtitle2">{t('updater.method')}</Typography>
-        {service ? (
-          <Select
-            id="channel"
-            fullWidth
-            value={service.update_config.method}
-            onChange={handleMethodChange}
-            variant="outlined"
-            margin="dense"
-            style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(0.5) }}
-          >
-            <MenuItem value="run">{t('updater.method.run')}</MenuItem>
-            {/* <MenuItem value="build">{t('updater.method.build')}</MenuItem> */}
-          </Select>
-        ) : (
-          <Skeleton style={{ height: '2.5rem' }} />
-        )}
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <Typography variant="subtitle2">{t('updater.interval')}</Typography>
-        {service ? (
-          <TextField
-            fullWidth
-            type="number"
-            size="small"
-            margin="dense"
-            variant="outlined"
-            value={service.update_config.update_interval_seconds}
-            onChange={handleIntervalChange}
-          />
-        ) : (
-          <Skeleton style={{ height: '2.5rem' }} />
-        )}
-      </Grid>
       <Grid item xs={12}>
-        <Typography variant="subtitle2">{t('updater.run.options')}</Typography>
-        {service ? (
-          service.update_config.method === 'run' && (
-            <ContainerCard container={service.update_config.run_options} onChange={handleUpdateContainerChange} />
-          )
-        ) : (
-          <Skeleton style={{ height: '8rem' }} />
-        )}
+        <Typography variant="subtitle2">{t('updater.interval')}</Typography>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={9}>
+            <div style={{ marginLeft: theme.spacing(1), marginRight: theme.spacing(1) }}>
+              <Slider
+                min={3600}
+                max={86400}
+                defaultValue={3600}
+                valueLabelDisplay="off"
+                // getAriaValueText={valuetext}
+                aria-labelledby="discrete-slider-custom"
+                step={null}
+                value={service.update_config.update_interval_seconds}
+                marks={marks}
+                // marks={true}
+                onChange={handleSliderChange}
+                valueLabelFormat={x => x / 3600}
+              />
+            </div>
+          </Grid>
+          <Grid item xs={12} sm={3}>
+            {service ? (
+              <OutlinedInput
+                fullWidth
+                type="number"
+                // size="small"
+                margin="dense"
+                // variant="outlined"
+                value={service.update_config.update_interval_seconds}
+                onChange={handleIntervalChange}
+                endAdornment={<InputAdornment position="end">sec</InputAdornment>}
+              />
+            ) : (
+              <Skeleton style={{ height: '2.5rem' }} />
+            )}
+          </Grid>
+        </Grid>
       </Grid>
+
       <Grid item xs={12} sm={6}>
         <Typography variant="subtitle2">{t('updater.signatures')}</Typography>
         <RadioGroup value={service.update_config.generates_signatures} onChange={toggleSignatures}>
