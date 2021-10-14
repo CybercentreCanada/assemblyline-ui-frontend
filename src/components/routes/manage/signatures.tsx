@@ -58,7 +58,7 @@ export default function Signatures() {
   const theme = useTheme();
   const apiCall = useMyAPI();
   const classes = useStyles();
-  const { closeGlobalDrawer, setGlobalDrawer } = useDrawer();
+  const { closeGlobalDrawer, setGlobalDrawer, globalDrawer } = useDrawer();
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
   const [suggestions] = useState([
@@ -70,6 +70,28 @@ export default function Signatures() {
   useEffect(() => {
     setQuery(new SimpleSearchQuery(location.search, `query=*&rows=${pageSize}&offset=0`));
   }, [location.pathname, location.search, pageSize]);
+
+  useEffect(() => {
+    if (signatureResults !== null && globalDrawer === null && location.hash) {
+      history.push(`${location.pathname}${location.search ? location.search : ''}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [globalDrawer]);
+
+  useEffect(() => {
+    if (location.hash) {
+      setGlobalDrawer(
+        <SignatureDetail
+          signature_id={location.hash.substr(1)}
+          onUpdated={handleSignatureUpdated}
+          onDeleted={handleSignatureDeleted}
+        />
+      );
+    } else {
+      closeGlobalDrawer();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.hash]);
 
   useEffect(() => {
     if (query) {
@@ -141,12 +163,10 @@ export default function Signatures() {
 
   const setSignatureID = useCallback(
     (sig_id: string) => {
-      setGlobalDrawer(
-        <SignatureDetail signature_id={sig_id} onUpdated={handleSignatureUpdated} onDeleted={handleSignatureDeleted} />
-      );
+      history.push(`${location.pathname}${location.search ? location.search : ''}#${sig_id}`);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [query]
+    [location.search]
   );
 
   const handleSignatureUpdated = () => {
