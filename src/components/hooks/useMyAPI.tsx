@@ -89,6 +89,24 @@ export default function useMyAPI() {
           // Do nothing... we are reloading the page
           window.location.reload();
           return;
+        } else if (api_data.api_status_code === 503) {
+          // You are over you API quota, retry the call in 50 ms
+          setTimeout(() => {
+            apiCall({
+              url,
+              contentType,
+              method,
+              body,
+              reloadOnUnauthorize,
+              allowCache,
+              onSuccess,
+              onFailure,
+              onEnter,
+              onExit,
+              onFinalize
+            });
+          }, 50);
+          return;
         } else if (api_data.api_status_code !== 200) {
           // Handle errors
           // Run failure callback
@@ -101,7 +119,15 @@ export default function useMyAPI() {
         } else if (onSuccess) {
           // Cache success status
           if (allowCache) {
-            sessionStorage.setItem(url, JSON.stringify(api_data));
+            try {
+              sessionStorage.setItem(url, JSON.stringify(api_data));
+            } catch (error) {
+              // We could not store into the Session Storage, this means that it is full
+              // Let's delete the oldest quarter of items to free up some space
+              [...Array(Math.floor(sessionStorage.length / 4))].forEach(_ => {
+                sessionStorage.removeItem(sessionStorage.key(0));
+              });
+            }
           }
 
           // Handle success
