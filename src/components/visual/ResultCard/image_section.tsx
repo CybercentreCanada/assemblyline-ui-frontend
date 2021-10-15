@@ -3,6 +3,7 @@ import BrokenImageOutlinedIcon from '@material-ui/icons/BrokenImageOutlined';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { default as React, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { CarouselDialog } from './carouselDialog';
 
 const useStyles = makeStyles((theme: Theme) => ({
   imageList: {
@@ -40,19 +41,68 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const WrappedImageBody = ({ body }) => {
   const classes = useStyles();
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [carouselIndex, setCarouselIndex] = useState<number>(0);
+  const [data, setData] = useState<
+    Array<{
+      name: string;
+      description: string;
+      imgSrc: string;
+      thumbSrc: string;
+    }>
+  >([]);
 
-  return (
+  useEffect(() => {
+    setData(
+      JSON.parse(body).map(element => {
+        return {
+          name: element.img.name,
+          description: element.img.description,
+          imgSrc: element.img.sha256,
+          thumbSrc: element.thumb.sha256
+        };
+      })
+    );
+    return () => {
+      setData([]);
+    };
+  }, [body]);
+
+  const OpenCarouselDialog = (index: number) => {
+    setCarouselIndex(index);
+    setOpenDialog(true);
+  };
+
+  const closeCarouselDialog = () => {
+    setOpenDialog(false);
+  };
+
+  return body && Array.isArray(JSON.parse(body)) ? (
     <div className={classes.imageList}>
       {JSON.parse(body).map((element, index) => (
-        <ImageItem key={index} img={element.img.sha256} src={element.thumb.sha256} alt={element.img.name} />
+        <ImageItem
+          key={index}
+          src={element.thumb.sha256}
+          alt={element.img.name}
+          index={index}
+          handleOpenCarousel={OpenCarouselDialog}
+        />
       ))}
+      <CarouselDialog open={openDialog} onClose={closeCarouselDialog} initialIndex={carouselIndex} images={data} />
     </div>
-  );
+  ) : null;
 };
 
 export const ImageBody = React.memo(WrappedImageBody);
 
-const ImageItem = ({ img, alt, src }: { img: string; alt: string; src: string }) => {
+type ImageItemProps = {
+  alt: string;
+  src: string;
+  index: number;
+  handleOpenCarousel: (index: number) => void;
+};
+
+const ImageItem = ({ alt, src, index, handleOpenCarousel }: ImageItemProps) => {
   const [image, setImage] = useState<string>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const classes = useStyles();
@@ -73,11 +123,15 @@ const ImageItem = ({ img, alt, src }: { img: string; alt: string; src: string })
     });
   }, [alt, src, apiCall, image, loading]);
 
+  const handleImageClick = () => {
+    handleOpenCarousel(index);
+  };
+
   return (
     <div className={classes.imageBox}>
       {image ? (
         <Tooltip title={alt}>
-          <Button className={classes.imageItem} component={Link} to={`/file/viewer/${img}#image`}>
+          <Button className={classes.imageItem} onClick={handleImageClick}>
             <img src={image} alt={alt} className={classes.image} />
           </Button>
         </Tooltip>
