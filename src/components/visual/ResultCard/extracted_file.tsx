@@ -9,6 +9,7 @@ export type ExtractedFiles = {
   description: string;
   name: string;
   sha256: string;
+  is_section_image?: boolean;
 };
 
 type ExtractedFileProps = {
