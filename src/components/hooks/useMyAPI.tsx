@@ -89,6 +89,24 @@ export default function useMyAPI() {
           // Do nothing... we are reloading the page
           window.location.reload();
           return;
+        } else if (api_data.api_status_code === 503) {
+          // You are over you API quota, retry the call in 50 ms
+          setTimeout(() => {
+            apiCall({
+              url,
+              contentType,
+              method,
+              body,
+              reloadOnUnauthorize,
+              allowCache,
+              onSuccess,
+              onFailure,
+              onEnter,
+              onExit,
+              onFinalize
+            });
+          }, 50);
+          return;
         } else if (api_data.api_status_code !== 200) {
           // Handle errors
           // Run failure callback
