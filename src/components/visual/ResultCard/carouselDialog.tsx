@@ -18,6 +18,19 @@ const useStyles = makeStyles((theme: Theme) => ({
     height: '100vh',
     width: '100vw'
   },
+  grid: {
+    position: 'absolute',
+    width: '100vw',
+    height: 'calc(100vh - 200px)',
+    display: 'grid',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gridAutoFlow: 'row',
+    gridTemplateColumns: 'minmax(75px, 10%) 1fr minmax(75px, 10%)',
+    gridTemplateRows: '100px 1fr',
+    gridTemplateAreas: `'top-left top-center top-right'
+                        'middle-left middle-center middle-right'`
+  },
   topCenterBox: {
     height: '100%',
     width: '100%'
@@ -63,16 +76,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   mainImage: {
     // cursor: 'pointer',
     objectFit: 'contain',
-    width: '100%',
-    // maxHeight: 'calc(95vh - 250px)',
+    maxWidth: '100vw',
+    maxHeight: 'calc(100vh - 200px)',
     position: 'relative',
-    display: 'inline-block',
-    [theme.breakpoints.up('xs')]: {
-      maxHeight: 'calc(45vh - 100px)'
-    },
-    [theme.breakpoints.up('lg')]: {
-      maxHeight: 'calc(95vh - 250px)'
-    }
+    display: 'inline-block'
   },
   detailedImage: {
     objectFit: 'contain',
@@ -131,8 +138,12 @@ const useStyles = makeStyles((theme: Theme) => ({
   thumb: {
     cursor: 'pointer',
     objectFit: 'cover',
-    height: '100px',
-    width: '100px',
+    height: '32px',
+    width: '32px',
+    [theme.breakpoints.up('md')]: {
+      height: '100px',
+      width: '100px'
+    },
     borderRadius: theme.spacing(1)
   }
 }));
@@ -214,55 +225,8 @@ const WrappedCarouselDialog = ({ open, onClose, initialIndex, images }: Carousel
         }
       }}
     >
-      <Box
-        className={classes.container}
-        sx={{
-          display: 'grid',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gridAutoFlow: 'row',
-          gridTemplateColumns: 'minmax(75px, 10%) 1fr minmax(75px, 10%)',
-          gridTemplateRows: '100px 1fr 150px',
-          gridTemplateAreas: `'top-left top-center top-right'
-                              'middle-left middle-center middle-right'
-                              'bottom bottom bottom'`
-        }}
-      >
-        <Box className={clsx(classes.topCenterBox)} sx={{ gridArea: 'top-center' }} onClick={onCloseDialog}></Box>
-        <Box className={clsx(classes.gridBox, classes.buttonBox)} sx={{ gridArea: 'top-left' }} onClick={onCloseDialog}>
-          <IconButton className={clsx(classes.button)}>
-            <CloseOutlinedIcon fontSize={'large'} />
-          </IconButton>
-        </Box>
-        <Box
-          className={clsx(classes.gridBox, classes.buttonBox)}
-          sx={{ gridArea: 'top-right' }}
-          onClick={onToggleDetails}
-        >
-          <IconButton className={clsx(classes.button)}>
-            <NotesIcon fontSize={'large'} />
-          </IconButton>
-        </Box>
-        <Box
-          className={clsx(classes.gridBox, classes.buttonBox)}
-          sx={{ gridArea: 'middle-left' }}
-          onClick={onPreviousImage}
-        >
-          <IconButton className={clsx(classes.button)}>
-            <NavigateBeforeIcon fontSize={'large'} />
-          </IconButton>
-        </Box>
-        <Box
-          className={clsx(classes.gridBox, classes.buttonBox)}
-          sx={{ gridArea: 'middle-right' }}
-          onClick={onNextImage}
-        >
-          <IconButton className={clsx(classes.button)}>
-            <NavigateNextIcon fontSize={'large'} />
-          </IconButton>
-        </Box>
-
-        <Box /*className={clsx(classes.mainBox)}*/ sx={{ gridArea: 'middle-center' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100vw', height: '100vh' }}>
+        <div style={{ flexGrow: 1, display: 'inline-flex', alignItems: 'center' }}>
           <Carousel enableSwipe onNext={onNextImage} onPrevious={onPreviousImage}>
             {details ? (
               <Box
@@ -307,10 +271,14 @@ const WrappedCarouselDialog = ({ open, onClose, initialIndex, images }: Carousel
                 </Box>
               </Box>
             ) : (
-              <Image className={classes.mainImage} alt={images[index].name} src={images[index].imgSrc} />
+              <>
+                <div>{images[index].name}</div>
+                <Image className={classes.mainImage} alt={images[index].name} src={images[index].imgSrc} />
+                <div>{images[index].description}</div>
+              </>
             )}
           </Carousel>
-        </Box>
+        </div>
         <Box className={clsx(classes.gridBox)} sx={{ gridArea: 'bottom' }}>
           <Grid className={clsx(classes.thumbsBox)} container spacing={2}>
             {images.map((element, i) => {
@@ -343,6 +311,41 @@ const WrappedCarouselDialog = ({ open, onClose, initialIndex, images }: Carousel
               );
             })}
           </Grid>
+        </Box>
+      </div>
+      <Box className={classes.grid}>
+        <Box className={clsx(classes.topCenterBox)} sx={{ gridArea: 'top-center' }} onClick={onCloseDialog}></Box>
+        <Box className={clsx(classes.gridBox, classes.buttonBox)} sx={{ gridArea: 'top-left' }} onClick={onCloseDialog}>
+          <IconButton className={clsx(classes.button)}>
+            <CloseOutlinedIcon fontSize={'large'} />
+          </IconButton>
+        </Box>
+        <Box
+          className={clsx(classes.gridBox, classes.buttonBox)}
+          sx={{ gridArea: 'top-right' }}
+          onClick={onToggleDetails}
+        >
+          <IconButton className={clsx(classes.button)}>
+            <NotesIcon fontSize={'large'} />
+          </IconButton>
+        </Box>
+        <Box
+          className={clsx(classes.gridBox, classes.buttonBox)}
+          sx={{ gridArea: 'middle-left' }}
+          onClick={onPreviousImage}
+        >
+          <IconButton className={clsx(classes.button)}>
+            <NavigateBeforeIcon fontSize={'large'} />
+          </IconButton>
+        </Box>
+        <Box
+          className={clsx(classes.gridBox, classes.buttonBox)}
+          sx={{ gridArea: 'middle-right' }}
+          onClick={onNextImage}
+        >
+          <IconButton className={clsx(classes.button)}>
+            <NavigateNextIcon fontSize={'large'} />
+          </IconButton>
         </Box>
       </Box>
     </Dialog>
