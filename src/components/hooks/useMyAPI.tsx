@@ -107,7 +107,7 @@ export default function useMyAPI() {
               // We could not store into the Session Storage, this means that it is full
               // Let's delete the oldest quarter of items to free up some space
               [...Array(Math.floor(sessionStorage.length / 4))].forEach(_ => {
-                sessionStorage.deleteItem(sessionStorage.key(0));
+                sessionStorage.removeItem(sessionStorage.key(0));
               });
             }
           }
