@@ -50,7 +50,7 @@ const WrappedContainerCard = ({ container, name, volumes, onChange }: ContainerC
     onChange(tempContainer, tempName, tempVolumes);
   };
 
-  return (
+  return container ? (
     <div style={{ paddingTop: theme.spacing(1) }}>
       <ContainerDialog
         open={dialog}
@@ -131,7 +131,7 @@ const WrappedContainerCard = ({ container, name, volumes, onChange }: ContainerC
         </Grid>
       </Card>
     </div>
-  );
+  ) : null;
 };
 
 WrappedContainerCard.defaultProps = {

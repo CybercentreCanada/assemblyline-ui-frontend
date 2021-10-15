@@ -1,8 +1,10 @@
 import useALContext from 'components/hooks/useALContext';
+import useDrawer from 'components/hooks/useDrawer';
 import ForbiddenPage from 'components/routes/403';
 import NotFoundPage from 'components/routes/404_dl';
 import Account from 'components/routes/account';
 import Admin from 'components/routes/admin';
+import AdminErrorDetail from 'components/routes/admin/error_detail';
 import AdminErrorViewer from 'components/routes/admin/error_viewer';
 import AdminServices from 'components/routes/admin/services';
 import Service from 'components/routes/admin/service_detail';
@@ -49,6 +51,7 @@ const APP_NAME = 'AL4';
 function RouteActions() {
   const { pathname } = useLocation();
   const [oldID, setOldID] = useState(null);
+  const { closeTemporaryDrawer } = useDrawer();
 
   useEffect(() => {
     // Scroll to top
@@ -65,6 +68,8 @@ function RouteActions() {
     document.title = `${APP_NAME} | ${
       currentLocation ? currentLocation.charAt(0).toUpperCase() + currentLocation.slice(1) : 'Submit'
     }`;
+
+    closeTemporaryDrawer();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
@@ -85,6 +90,7 @@ const WrappedRoutes = () => {
         <Route exact path="/alerts/:id" component={AlertDetails} />
         <Route exact path="/admin" component={Admin} />
         <Route exact path="/admin/errors" component={AdminErrorViewer} />
+        <Route exact path="/admin/errors/:key" component={AdminErrorDetail} />
         <Route exact path="/admin/services" component={AdminServices} />
         <Route exact path="/admin/services/:svc" component={Service} />
         <Route exact path="/admin/sitemap" component={AdminSiteMap} />

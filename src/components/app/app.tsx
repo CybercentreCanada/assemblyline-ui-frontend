@@ -88,6 +88,7 @@ const MyApp = () => {
         } else if (api_data.api_status_code === 401) {
           // User is not logged in
           localStorage.setItem('loginParams', JSON.stringify(api_data.api_response));
+          sessionStorage.clear();
           setLoginParams(api_data.api_response);
           switchRenderedApp('login');
         } else if (api_data.api_status_code === 200) {
