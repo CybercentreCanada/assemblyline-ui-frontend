@@ -1,6 +1,7 @@
 import { Drawer, IconButton, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
 import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
-import React, { useMemo, useState } from 'react';
+import useCarousel from 'components/hooks/useCarousel';
+import React, { useEffect, useMemo, useState } from 'react';
 
 const XLWidth = '45vw';
 const LGWidth = '85%';
@@ -67,11 +68,13 @@ export const DrawerContext = React.createContext<DrawerContextProps>(null);
 function DrawerProvider(props: DrawerProviderProps) {
   const { children } = props;
   const [globalDrawer, setGlobalDrawer] = useState(null);
+  const [drawerVariant, setDrawerVariant] = useState<'temporary' | 'persistent' | 'permanent'>('temporary');
   const theme = useTheme();
   const classes = useStyles();
   const isMD = useMediaQuery(theme.breakpoints.only('md'));
   const isLG = useMediaQuery(theme.breakpoints.only('lg'));
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
+  const { carousel } = useCarousel();
 
   const drawerWidth = isXL ? XLWidth : isLG ? LGWidth : isMD ? MDWidth : SMWidth;
   const closeGlobalDrawer = () => {
@@ -80,6 +83,12 @@ function DrawerProvider(props: DrawerProviderProps) {
   const closeTemporaryDrawer = () => {
     if (!isXL) setGlobalDrawer(null);
   };
+
+  useEffect(() => {
+    if (!carousel) {
+      isXL ? setDrawerVariant('persistent') : setDrawerVariant('temporary');
+    }
+  }, [isXL, carousel]);
 
   return (
     <DrawerContext.Provider
@@ -107,7 +116,7 @@ function DrawerProvider(props: DrawerProviderProps) {
           }}
           classes={{ paper: classes.paper }}
           anchor="right"
-          variant={isXL ? 'persistent' : 'temporary'}
+          variant={drawerVariant}
           onClose={closeGlobalDrawer}
         >
           {useMemo(

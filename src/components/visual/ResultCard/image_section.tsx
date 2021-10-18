@@ -1,9 +1,9 @@
 import { Button, CircularProgress, makeStyles, Theme, Tooltip } from '@material-ui/core';
 import BrokenImageOutlinedIcon from '@material-ui/icons/BrokenImageOutlined';
+import useCarousel from 'components/hooks/useCarousel';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { default as React, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CarouselDialog } from './carouselDialog';
 
 const useStyles = makeStyles((theme: Theme) => ({
   imageList: {
@@ -41,8 +41,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const WrappedImageBody = ({ body }) => {
   const classes = useStyles();
-  const [openDialog, setOpenDialog] = useState<boolean>(false);
-  const [carouselIndex, setCarouselIndex] = useState<number>(0);
+  const { openCarousel } = useCarousel();
   const [data, setData] = useState<
     Array<{
       name: string;
@@ -69,12 +68,7 @@ const WrappedImageBody = ({ body }) => {
   }, [body]);
 
   const OpenCarouselDialog = (index: number) => {
-    setCarouselIndex(index);
-    setOpenDialog(true);
-  };
-
-  const closeCarouselDialog = () => {
-    setOpenDialog(false);
+    openCarousel(index, data);
   };
 
   return body && Array.isArray(JSON.parse(body)) ? (
@@ -88,7 +82,6 @@ const WrappedImageBody = ({ body }) => {
           handleOpenCarousel={OpenCarouselDialog}
         />
       ))}
-      <CarouselDialog open={openDialog} onClose={closeCarouselDialog} initialIndex={carouselIndex} images={data} />
     </div>
   ) : null;
 };
