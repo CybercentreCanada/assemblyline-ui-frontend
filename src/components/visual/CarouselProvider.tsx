@@ -1,4 +1,4 @@
-import { alpha, CircularProgress, Dialog, IconButton, makeStyles, Typography } from '@material-ui/core';
+import { alpha, Backdrop, CircularProgress, IconButton, makeStyles, Typography } from '@material-ui/core';
 import { grey } from '@material-ui/core/colors';
 import BrokenImageOutlinedIcon from '@material-ui/icons/BrokenImageOutlined';
 import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
@@ -17,7 +17,7 @@ const BottomMargin = '25px';
 
 const useStyles = makeStyles(theme => ({
   container: {
-    backgroundColor: alpha(grey[900], 0.4),
+    backgroundColor: alpha(grey[900], 0.8),
     boxShadow: 'none',
     backdropFilter: 'blur(1px)',
     height: '100vh',
@@ -56,7 +56,6 @@ const useStyles = makeStyles(theme => ({
   },
   text: {
     color: 'white',
-    fontWeight: 500,
     wordBreak: 'break-word',
     textAlign: 'center'
   },
@@ -146,9 +145,7 @@ const useStyles = makeStyles(theme => ({
     cursor: 'pointer',
     backgroundColor: alpha(theme.palette.secondary.main, 0.1),
     color: 'white',
-    margin: theme.spacing(2),
-    height: theme.spacing(8),
-    width: theme.spacing(8)
+    margin: theme.spacing(2)
   },
   closeButton: {
     position: 'absolute',
@@ -166,9 +163,6 @@ const useStyles = makeStyles(theme => ({
     top: '50%',
     right: '0px',
     transform: 'translate(0%, -50%)'
-  },
-  icon: {
-    fontSize: theme.spacing(6)
   },
   imageLoading: {
     borderRadius: theme.spacing(0.5),
@@ -304,17 +298,7 @@ function CarouselProvider(props: CarouselProviderProps) {
         return (
           carousel &&
           images.length && (
-            <Dialog
-              className={classes.container}
-              open={carousel}
-              onClose={closeCarousel}
-              fullScreen={true}
-              PaperProps={{
-                style: {
-                  backgroundColor: 'transparent'
-                }
-              }}
-            >
+            <Backdrop className={classes.container} open={carousel}>
               <Carousel enableSwipe onNext={onNextImage} onPrevious={onPreviousImage}>
                 <div className={classes.carouselGrid}>
                   <div className={classes.imageItem}>
@@ -358,18 +342,18 @@ function CarouselProvider(props: CarouselProviderProps) {
                 </div>
 
                 <IconButton className={clsx(classes.button, classes.closeButton)} onClick={closeCarousel}>
-                  <CloseOutlinedIcon className={clsx(classes.icon)} />
+                  <CloseOutlinedIcon />
                 </IconButton>
 
                 <IconButton className={clsx(classes.button, classes.beforeButton)} onClick={onPreviousImage}>
-                  <NavigateBeforeIcon className={clsx(classes.icon)} />
+                  <NavigateBeforeIcon />
                 </IconButton>
 
                 <IconButton className={clsx(classes.button, classes.nextButton)} onClick={onNextImage}>
-                  <NavigateNextIcon className={clsx(classes.icon)} />
+                  <NavigateNextIcon />
                 </IconButton>
               </Carousel>
-            </Dialog>
+            </Backdrop>
           )
         );
       }, [carousel, classes, handleSelectedImageChange, images, index, onNextImage, onPreviousImage])}
@@ -413,13 +397,7 @@ const Image = ({ className, alt, src, onClick, onRef }: ImageProps) => {
       {image ? (
         <img className={className} src={image} alt={alt} onClick={onClick} ref={onRef} />
       ) : (
-        <div className={classes.imageLoading}>
-          {loading ? (
-            <CircularProgress className={clsx(classes.icon)} />
-          ) : (
-            <BrokenImageOutlinedIcon className={clsx(classes.icon)} />
-          )}
-        </div>
+        <div className={classes.imageLoading}>{loading ? <CircularProgress /> : <BrokenImageOutlinedIcon />}</div>
       )}
     </>
   );
