@@ -55,10 +55,10 @@ const useStyles = makeStyles(theme => ({
       maxHeight: `calc(95vh - ${MDSize} - 2*${textSpacing})`
     },
     '@media (min-height:720px)': {
-      maxHeight: `calc(100vh - ${LGSize} - 2*${textSpacing})`
+      maxHeight: `calc(95vh - ${LGSize} - 2*${textSpacing})`
     },
     '@media (min-height:1080px)': {
-      maxHeight: `calc(100vh - ${XLSize} - 2*${textSpacing})`
+      maxHeight: `calc(95vh - ${XLSize} - 2*${textSpacing})`
     }
   },
   thumbsSection: {
