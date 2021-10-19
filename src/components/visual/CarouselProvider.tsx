@@ -12,76 +12,62 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 const XLSize = '8.5vh';
 const LGSize = '10.5vh';
 const MDSize = '15vh';
-const textSpacing = '50px';
-const BottomMargin = '25px';
+const textSpacing = '25px';
 
 const useStyles = makeStyles(theme => ({
   container: {
     backgroundColor: alpha(grey[900], 0.8),
-    boxShadow: 'none',
     backdropFilter: 'blur(1px)',
     height: '100vh',
     width: '100vw',
     zIndex: 3000
   },
-  carouselGrid: {
-    height: '100vh',
-    width: '100vw',
-    display: 'grid',
-    gridAutoFlow: 'row',
-    gridTemplateColumns: '1fr',
-
-    '@media (min-height:0px)': {
-      gridTemplateRows: `1fr`,
-      gridTemplateAreas: `'image'`
-    },
-    '@media (min-height:500px)': {
-      gridTemplateRows: `1fr ${MDSize + BottomMargin}`,
-      gridTemplateAreas: `'image'
-                        'thumbs'`
-    },
-    '@media (min-height:720px)': {
-      gridTemplateRows: `1fr ${LGSize + BottomMargin}`
-    },
-    '@media (min-height:1080px)': {
-      gridTemplateRows: `1fr ${XLSize + BottomMargin}`
-    }
-  },
-  imageItem: {
-    gridArea: 'image',
+  carousel: {
+    height: '95vh',
+    width: '100vh',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'center'
+    flexWrap: 'nowrap'
   },
   text: {
+    display: 'flex',
+    flex: `1 1 ${textSpacing}`,
     color: 'white',
-    wordBreak: 'break-word',
-    textAlign: 'center'
+    wordBreak: 'break-word'
+  },
+  title: {
+    alignItems: 'flex-end'
+  },
+  description: {
+    alignItems: 'flex-start'
   },
   image: {
+    display: 'flex',
+    flex: '0 1 auto',
     objectFit: 'contain',
-    maxWidth: '100%',
+    maxWidth: '100vw',
 
     '@media (min-height:0px)': {
-      maxHeight: `calc(100vh - 50px)`
+      maxHeight: `calc(95vh - 2*${textSpacing})`
     },
     '@media (min-height:500px)': {
-      maxHeight: `calc(100vh - ${MDSize} - ${textSpacing} - ${BottomMargin})`
+      maxHeight: `calc(95vh - ${MDSize} - 2*${textSpacing})`
     },
     '@media (min-height:720px)': {
-      maxHeight: `calc(100vh - ${LGSize} - ${textSpacing} - ${BottomMargin})`
+      maxHeight: `calc(100vh - ${LGSize} - 2*${textSpacing})`
     },
     '@media (min-height:1080px)': {
-      maxHeight: `calc(100vh - ${XLSize} - ${textSpacing} - ${BottomMargin})`
+      maxHeight: `calc(100vh - ${XLSize} - 2*${textSpacing})`
     }
   },
-  thumbsItem: {
+  thumbsSection: {
     '@media (min-height:0px)': {
       display: 'none'
     },
     '@media (min-height:500px)': {
-      gridArea: 'thumbs',
+      flex: '0 1 auto',
+      flexWrap: 'nowrap',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -101,10 +87,6 @@ const useStyles = makeStyles(theme => ({
   thumb: {
     cursor: 'pointer',
     objectFit: 'cover',
-    padding: 0,
-    margin: 0,
-    marginBottom: BottomMargin,
-
     '@media (min-height:500px)': {
       borderRadius: '3vh',
       height: MDSize,
@@ -165,11 +147,11 @@ const useStyles = makeStyles(theme => ({
     transform: 'translate(0%, -50%)'
   },
   imageLoading: {
-    borderRadius: theme.spacing(0.5),
     display: 'grid',
+    placeItems: 'center',
+    borderRadius: theme.spacing(0.5),
     minHeight: theme.spacing(16),
-    minWidth: theme.spacing(16),
-    placeItems: 'center'
+    minWidth: theme.spacing(16)
   }
 }));
 
@@ -298,19 +280,17 @@ function CarouselProvider(props: CarouselProviderProps) {
         return (
           carousel &&
           images.length && (
-            <Backdrop className={classes.container} open={carousel}>
+            <Backdrop className={clsx(classes.container)} open>
               <Carousel enableSwipe onNext={onNextImage} onPrevious={onPreviousImage}>
-                <div className={classes.carouselGrid}>
-                  <div className={classes.imageItem}>
-                    <Typography className={classes.text} variant="body1" noWrap>
-                      {images[index].name}
-                    </Typography>
-                    <Image className={classes.image} alt={images[index].name} src={images[index].imgSrc} />
-                    <Typography className={classes.text} variant="body1" noWrap>
-                      {images[index].description}
-                    </Typography>
-                  </div>
-                  <div className={classes.thumbsItem}>
+                <div id="carousel-image" className={classes.carousel}>
+                  <Typography className={clsx(classes.text, classes.title)} variant="body1" noWrap>
+                    {images[index].name}
+                  </Typography>
+                  <Image className={classes.image} alt={images[index].name} src={images[index].imgSrc} />
+                  <Typography className={clsx(classes.text, classes.description)} variant="body1" noWrap>
+                    {images[index].description}
+                  </Typography>
+                  <div className={classes.thumbsSection}>
                     <div className={classes.thumbsSlide}>
                       {images.map((element, i) => {
                         return index === i ? (
@@ -364,6 +344,7 @@ function CarouselProvider(props: CarouselProviderProps) {
 export default CarouselProvider;
 
 type ImageProps = {
+  id?: string;
   className?: string;
   alt: string;
   src: string;
@@ -371,7 +352,7 @@ type ImageProps = {
   onRef?: (el: HTMLDivElement) => void;
 };
 
-const Image = ({ className, alt, src, onClick, onRef }: ImageProps) => {
+const Image = ({ id, className, alt, src, onClick, onRef }: ImageProps) => {
   const [image, setImage] = useState<string>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const classes = useStyles();
@@ -395,7 +376,7 @@ const Image = ({ className, alt, src, onClick, onRef }: ImageProps) => {
   return (
     <>
       {image ? (
-        <img className={className} src={image} alt={alt} onClick={onClick} ref={onRef} />
+        <img id={id} className={className} src={image} alt={alt} onClick={onClick} ref={onRef} />
       ) : (
         <div className={classes.imageLoading}>{loading ? <CircularProgress /> : <BrokenImageOutlinedIcon />}</div>
       )}
