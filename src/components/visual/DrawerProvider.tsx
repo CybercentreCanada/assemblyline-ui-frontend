@@ -16,7 +16,8 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'row',
     position: 'relative',
-    overflowX: 'hidden'
+    overflowX: 'hidden',
+    '-webkit-transform': 'translate3d(0, 0, 0)'
   },
   appContent: {
     '@media print': {
