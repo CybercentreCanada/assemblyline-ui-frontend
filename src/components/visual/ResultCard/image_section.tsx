@@ -113,7 +113,8 @@ const ImageItem = ({ alt, src, index, handleOpenCarousel }: ImageItemProps) => {
         setImage(null);
       }
     });
-  }, [alt, src, apiCall, image, loading]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [alt, src]);
 
   const handleImageClick = () => {
     handleOpenCarousel(index);
