@@ -3,7 +3,6 @@ import BrokenImageOutlinedIcon from '@material-ui/icons/BrokenImageOutlined';
 import useCarousel from 'components/hooks/useCarousel';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { default as React, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme: Theme) => ({
   imageList: {
@@ -130,7 +129,7 @@ const ImageItem = ({ alt, src, index, handleOpenCarousel }: ImageItemProps) => {
         </Tooltip>
       ) : (
         <Tooltip title={alt}>
-          <Button className={classes.imageItem} component={Link} to={'#'} color="secondary">
+          <Button className={classes.imageItem} onClick={handleImageClick} color="secondary">
             <div className={classes.imageLoading}>
               {loading ? <CircularProgress /> : <BrokenImageOutlinedIcon fontSize="large" />}
             </div>

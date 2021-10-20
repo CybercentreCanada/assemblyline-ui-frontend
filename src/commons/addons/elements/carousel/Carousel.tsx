@@ -15,6 +15,7 @@ export interface CarouselProps {
   disableArrowLeft?: boolean;
   disableArrowRight?: boolean;
   enableSwipe?: boolean;
+  style?: any;
   children: React.ReactNode;
   onNext: () => void;
   onPrevious: () => void;
@@ -28,7 +29,8 @@ const Carousel: React.FC<CarouselProps> = ({
   disableArrowRight,
   children,
   onPrevious,
-  onNext
+  onNext,
+  style
 }) => {
   const classes = useStyles();
   const touchX = useRef<number>(-1);
@@ -116,6 +118,7 @@ const Carousel: React.FC<CarouselProps> = ({
       onTouchStart={enableSwipe && onTouchStart}
       onTouchMove={enableSwipe && onTouchMove}
       onTouchEnd={enableSwipe && onTouchEnd}
+      style={style}
     >
       {children}
     </div>

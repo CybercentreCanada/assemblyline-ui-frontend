@@ -9,7 +9,7 @@ import adminTagSafelistEN from 'locales/en/admin/tag_safelist.json';
 import adminUsersEN from 'locales/en/admin/users.json';
 import alertsEN from 'locales/en/alerts.json';
 import authorizeEN from 'locales/en/authorize.json';
-import carouselDialogEN from 'locales/en/carouselDialog.json';
+import carouselEN from 'locales/en/carousel.json';
 import dashboardEN from 'locales/en/dashboard.json';
 import favoritesEN from 'locales/en/favorites.json';
 import fileDetailEN from 'locales/en/file/detail.json';
@@ -52,7 +52,7 @@ import adminTagSafelistFR from 'locales/fr/admin/tag_safelist.json';
 import adminUsersFR from 'locales/fr/admin/users.json';
 import alertsFR from 'locales/fr/alerts.json';
 import authorizeFR from 'locales/fr/authorize.json';
-import carouselDialogFR from 'locales/fr/carouselDialog.json';
+import carouselFR from 'locales/fr/carousel.json';
 import dashboardFR from 'locales/fr/dashboard.json';
 import favoritesFR from 'locales/fr/favorites.json';
 import fileDetailFR from 'locales/fr/file/detail.json';
@@ -96,7 +96,7 @@ const resources = {
     adminTagSafelist: adminTagSafelistEN,
     adminUsers: adminUsersEN,
     authorize: authorizeEN,
-    carouselDialog: carouselDialogEN,
+    carousel: carouselEN,
     dashboard: dashboardEN,
     error403: error403EN,
     error404: error404EN,
@@ -141,7 +141,7 @@ const resources = {
     adminTagSafelist: adminTagSafelistFR,
     adminUsers: adminUsersFR,
     authorize: authorizeFR,
-    carouselDialog: carouselDialogFR,
+    carousel: carouselFR,
     dashboard: dashboardFR,
     error403: error403FR,
     error404: error404FR,
