@@ -44,8 +44,17 @@ const useStyles = makeStyles(theme => ({
   textContainer: {
     maxWidth: '90vh'
   },
+  imageContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: theme.spacing(24),
+    minWidth: theme.spacing(24)
+  },
   image: {
     objectFit: 'contain',
+    minHeight: theme.spacing(12),
+    minWidth: theme.spacing(12),
     maxWidth: '100vw',
     maxHeight: `calc(95vh - 2*${theme.spacing(3)}px - 2*${theme.spacing(2)}px)`,
     '@media (min-height:500px)': {
@@ -79,34 +88,48 @@ const useStyles = makeStyles(theme => ({
     paddingLeft: theme.spacing(2),
     paddingRight: theme.spacing(2)
   },
-  thumb: {
+  thumbContainer: {
     color: 'white',
     backgroundColor: '#00000080',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     cursor: 'pointer',
-    objectFit: 'cover',
     '@media (min-height:500px)': {
       borderRadius: theme.spacing(1),
-      height: MDSize,
-      width: MDSize,
       minHeight: MDSize,
       minWidth: MDSize
     },
     '@media (min-height:720px)': {
       borderRadius: theme.spacing(1.5),
-      height: LGSize,
-      width: LGSize,
       minHeight: LGSize,
       minWidth: LGSize
     },
     '@media (min-height:1080px)': {
       borderRadius: theme.spacing(2),
-      height: XLSize,
-      width: XLSize,
       minHeight: XLSize,
       minWidth: XLSize
+    }
+  },
+  thumb: {
+    objectFit: 'cover',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    '@media (min-height:500px)': {
+      borderRadius: theme.spacing(1),
+      height: MDSize,
+      width: MDSize
+    },
+    '@media (min-height:720px)': {
+      borderRadius: theme.spacing(1.5),
+      height: LGSize,
+      width: LGSize
+    },
+    '@media (min-height:1080px)': {
+      borderRadius: theme.spacing(2),
+      height: XLSize,
+      width: XLSize
     }
   },
   unselectedThumb: {
@@ -148,13 +171,11 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: theme.spacing(1),
-    minHeight: theme.spacing(32),
-    minWidth: theme.spacing(32)
+    borderRadius: theme.spacing(1)
   },
   imageMissing: {
     backgroundColor: '#00000080',
-    padding: '64px'
+    padding: theme.spacing(4)
   }
 }));
 
@@ -292,7 +313,7 @@ function CarouselProvider(props: CarouselProviderProps) {
                       {images[index].name}
                     </Typography>
                   </div>
-                  <Image className={classes.image} alt={images[index].name} src={images[index].imgSrc} />
+                  <Image alt={images[index].name} src={images[index].imgSrc} />
                   <div className={classes.textContainer} style={{ paddingTop: '4px' }}>
                     <Typography className={classes.text} variant="body2" noWrap>
                       {images[index].description}
@@ -302,25 +323,13 @@ function CarouselProvider(props: CarouselProviderProps) {
                   <div className={classes.thumbsSection}>
                     <div className={classes.thumbsSlide}>
                       {images.map((element, i) => {
-                        return index === i ? (
+                        return (
                           <Image
                             key={'thumb-' + i}
-                            className={clsx(classes.thumb)}
                             alt={element.name}
                             src={element.thumbSrc}
                             isThumb
-                            onClick={() => {
-                              handleSelectedImageChange(i);
-                            }}
-                            onRef={el => (carouselItemsRef.current[i] = el)}
-                          />
-                        ) : (
-                          <Image
-                            key={'thumb-' + i}
-                            className={clsx(classes.thumb, classes.unselectedThumb)}
-                            alt={element.name}
-                            src={element.thumbSrc}
-                            isThumb
+                            thumbSelected={index === i}
                             onClick={() => {
                               handleSelectedImageChange(i);
                             }}
@@ -347,7 +356,8 @@ function CarouselProvider(props: CarouselProviderProps) {
             </Backdrop>
           )
         );
-      }, [carousel, classes, handleSelectedImageChange, images, index, onNextImage, onPreviousImage])}
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, [carousel, images, index])}
     </CarouselContext.Provider>
   );
 }
@@ -356,15 +366,15 @@ export default CarouselProvider;
 
 type ImageProps = {
   id?: string;
-  className?: string;
   alt: string;
   src: string;
   isThumb?: boolean;
+  thumbSelected?: boolean;
   onClick?: () => void;
   onRef?: (el: HTMLDivElement) => void;
 };
 
-const Image = ({ id, className, alt, src, isThumb, onClick, onRef }: ImageProps) => {
+const Image = ({ id, alt, src, isThumb, thumbSelected, onClick, onRef }: ImageProps) => {
   const [image, setImage] = useState<string>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const classes = useStyles();
@@ -390,19 +400,38 @@ const Image = ({ id, className, alt, src, isThumb, onClick, onRef }: ImageProps)
   }, [alt, src]);
 
   return (
-    <>
+    <div className={isThumb ? classes.thumbContainer : classes.imageContainer}>
       {image ? (
-        <img id={id} className={className} src={image} alt={alt} onClick={onClick} ref={onRef} />
+        <img
+          id={id}
+          className={isThumb ? clsx(classes.thumb, thumbSelected ? '' : classes.unselectedThumb) : classes.image}
+          src={image}
+          alt={alt}
+          onClick={onClick}
+          ref={onRef}
+        />
       ) : loading ? (
-        <div className={isThumb ? className : classes.imageLoading}>
+        <div
+          className={isThumb ? clsx(classes.thumb, thumbSelected ? '' : classes.unselectedThumb) : classes.imageLoading}
+          ref={onRef}
+        >
           <CircularProgress color="secondary" />
         </div>
       ) : (
-        <Box className={isThumb ? className : clsx(classes.imageLoading, classes.imageMissing)} onClick={onClick}>
-          <BrokenImageOutlinedIcon style={{ fontSize: isThumb ? '2rem' : '6rem' }} />
-          {!isThumb && <Typography>{t('not_found')}</Typography>}
-        </Box>
+        <div ref={onRef}>
+          <Box
+            className={
+              isThumb
+                ? clsx(classes.thumb, thumbSelected ? '' : classes.unselectedThumb)
+                : clsx(classes.imageLoading, classes.imageMissing)
+            }
+            onClick={onClick}
+          >
+            <BrokenImageOutlinedIcon style={{ fontSize: isThumb ? '2rem' : '6rem' }} />
+            {!isThumb && <Typography>{t('not_found')}</Typography>}
+          </Box>
+        </div>
       )}
-    </>
+    </div>
   );
 };
