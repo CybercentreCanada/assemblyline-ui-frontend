@@ -1,4 +1,4 @@
-import { alpha, Backdrop, Box, CircularProgress, IconButton, makeStyles, Typography } from '@material-ui/core';
+import { alpha, Backdrop, Box, CircularProgress, IconButton, makeStyles, Tooltip, Typography } from '@material-ui/core';
 import { grey } from '@material-ui/core/colors';
 import BrokenImageOutlinedIcon from '@material-ui/icons/BrokenImageOutlined';
 import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
@@ -10,15 +10,15 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const XLSize = '128px';
-const LGSize = '100px';
-const MDSize = '80px';
+const XLSize = '96px';
+const LGSize = '80px';
+const MDSize = '64px';
 
 const useStyles = makeStyles(theme => ({
   backdrop: {
     backgroundColor: alpha(grey[900], 0.8),
     backdropFilter: 'blur(1px)',
-    zIndex: 3000
+    zIndex: 1350
   },
   carousel: {
     display: 'flex',
@@ -98,45 +98,36 @@ const useStyles = makeStyles(theme => ({
     '@media (min-height:500px)': {
       borderRadius: theme.spacing(1),
       minHeight: MDSize,
-      minWidth: MDSize
+      minWidth: MDSize,
+      maxHeight: MDSize,
+      maxWidth: MDSize,
+      overflow: 'hidden'
     },
     '@media (min-height:720px)': {
       borderRadius: theme.spacing(1.5),
       minHeight: LGSize,
-      minWidth: LGSize
+      minWidth: LGSize,
+      maxHeight: LGSize,
+      maxWidth: LGSize,
+      overflow: 'hidden'
     },
     '@media (min-height:1080px)': {
       borderRadius: theme.spacing(2),
       minHeight: XLSize,
-      minWidth: XLSize
+      minWidth: XLSize,
+      maxHeight: XLSize,
+      maxWidth: XLSize,
+      overflow: 'hidden'
     }
   },
   thumb: {
-    objectFit: 'cover',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    '@media (min-height:500px)': {
-      borderRadius: theme.spacing(1),
-      height: MDSize,
-      width: MDSize
-    },
-    '@media (min-height:720px)': {
-      borderRadius: theme.spacing(1.5),
-      height: LGSize,
-      width: LGSize
-    },
-    '@media (min-height:1080px)': {
-      borderRadius: theme.spacing(2),
-      height: XLSize,
-      width: XLSize
-    }
+    display: 'flex'
   },
   unselectedThumb: {
     filter: `brightness(50%)`,
     transition: theme.transitions.create('filter', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen
+      easing: theme.transitions.easing.easeInOut,
+      duration: theme.transitions.duration.short
     }),
     '&:hover': {
       filter: `brightness(90%)`
@@ -400,38 +391,42 @@ const Image = ({ id, alt, src, isThumb, thumbSelected, onClick, onRef }: ImagePr
   }, [alt, src]);
 
   return (
-    <div className={isThumb ? classes.thumbContainer : classes.imageContainer}>
-      {image ? (
-        <img
-          id={id}
-          className={isThumb ? clsx(classes.thumb, thumbSelected ? '' : classes.unselectedThumb) : classes.image}
-          src={image}
-          alt={alt}
-          onClick={onClick}
-          ref={onRef}
-        />
-      ) : loading ? (
-        <div
-          className={isThumb ? clsx(classes.thumb, thumbSelected ? '' : classes.unselectedThumb) : classes.imageLoading}
-          ref={onRef}
-        >
-          <CircularProgress color="secondary" />
-        </div>
-      ) : (
-        <div ref={onRef}>
-          <Box
-            className={
-              isThumb
-                ? clsx(classes.thumb, thumbSelected ? '' : classes.unselectedThumb)
-                : clsx(classes.imageLoading, classes.imageMissing)
-            }
+    <Tooltip title={alt} placement="top">
+      <div className={isThumb ? classes.thumbContainer : classes.imageContainer}>
+        {image ? (
+          <img
+            id={id}
+            className={isThumb ? clsx(classes.thumb, thumbSelected ? '' : classes.unselectedThumb) : classes.image}
+            src={image}
+            alt={alt}
             onClick={onClick}
+            ref={onRef}
+          />
+        ) : loading ? (
+          <div
+            className={
+              isThumb ? clsx(classes.thumb, thumbSelected ? '' : classes.unselectedThumb) : classes.imageLoading
+            }
+            ref={onRef}
           >
-            <BrokenImageOutlinedIcon style={{ fontSize: isThumb ? '2rem' : '6rem' }} />
-            {!isThumb && <Typography>{t('not_found')}</Typography>}
-          </Box>
-        </div>
-      )}
-    </div>
+            <CircularProgress color="secondary" />
+          </div>
+        ) : (
+          <div ref={onRef}>
+            <Box
+              className={
+                isThumb
+                  ? clsx(classes.thumb, thumbSelected ? '' : classes.unselectedThumb)
+                  : clsx(classes.imageLoading, classes.imageMissing)
+              }
+              onClick={onClick}
+            >
+              <BrokenImageOutlinedIcon style={{ fontSize: isThumb ? '2rem' : '6rem' }} />
+              {!isThumb && <Typography>{t('not_found')}</Typography>}
+            </Box>
+          </div>
+        )}
+      </div>
+    </Tooltip>
   );
 };
