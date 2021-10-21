@@ -97,31 +97,34 @@ const useStyles = makeStyles(theme => ({
     cursor: 'pointer',
     '@media (min-height:500px)': {
       borderRadius: theme.spacing(1),
-      minHeight: MDSize,
-      minWidth: MDSize,
-      maxHeight: MDSize,
-      maxWidth: MDSize,
+      height: MDSize,
+      width: MDSize,
       overflow: 'hidden'
     },
     '@media (min-height:720px)': {
       borderRadius: theme.spacing(1.5),
-      minHeight: LGSize,
-      minWidth: LGSize,
-      maxHeight: LGSize,
-      maxWidth: LGSize,
+      height: LGSize,
+      width: LGSize,
       overflow: 'hidden'
     },
     '@media (min-height:1080px)': {
       borderRadius: theme.spacing(2),
-      minHeight: XLSize,
-      minWidth: XLSize,
-      maxHeight: XLSize,
-      maxWidth: XLSize,
+      height: XLSize,
+      width: XLSize,
       overflow: 'hidden'
     }
   },
   thumb: {
-    display: 'flex'
+    display: 'flex',
+    '@media (min-height:500px)': {
+      maxHeight: MDSize
+    },
+    '@media (min-height:720px)': {
+      maxHeight: LGSize
+    },
+    '@media (min-height:1080px)': {
+      maxHeight: XLSize
+    }
   },
   unselectedThumb: {
     filter: `brightness(50%)`,
@@ -392,33 +395,22 @@ const Image = ({ id, alt, src, isThumb, thumbSelected, onClick, onRef }: ImagePr
 
   return (
     <Tooltip title={alt} placement="top">
-      <div className={isThumb ? classes.thumbContainer : classes.imageContainer}>
+      <Box
+        className={
+          isThumb ? clsx(classes.thumbContainer, thumbSelected ? '' : classes.unselectedThumb) : classes.imageContainer
+        }
+        onClick={onClick}
+      >
         {image ? (
-          <img
-            id={id}
-            className={isThumb ? clsx(classes.thumb, thumbSelected ? '' : classes.unselectedThumb) : classes.image}
-            src={image}
-            alt={alt}
-            onClick={onClick}
-            ref={onRef}
-          />
+          <img id={id} className={isThumb ? classes.thumb : classes.image} src={image} alt={alt} ref={onRef} />
         ) : loading ? (
-          <div
-            className={
-              isThumb ? clsx(classes.thumb, thumbSelected ? '' : classes.unselectedThumb) : classes.imageLoading
-            }
-            ref={onRef}
-          >
+          <div className={isThumb ? classes.thumb : classes.imageLoading} ref={onRef}>
             <CircularProgress color="secondary" />
           </div>
         ) : (
           <div ref={onRef}>
             <Box
-              className={
-                isThumb
-                  ? clsx(classes.thumb, thumbSelected ? '' : classes.unselectedThumb)
-                  : clsx(classes.imageLoading, classes.imageMissing)
-              }
+              className={isThumb ? classes.thumb : clsx(classes.imageLoading, classes.imageMissing)}
               onClick={onClick}
             >
               <BrokenImageOutlinedIcon style={{ fontSize: isThumb ? '2rem' : '6rem' }} />
@@ -426,7 +418,7 @@ const Image = ({ id, alt, src, isThumb, thumbSelected, onClick, onRef }: ImagePr
             </Box>
           </div>
         )}
-      </div>
+      </Box>
     </Tooltip>
   );
 };
