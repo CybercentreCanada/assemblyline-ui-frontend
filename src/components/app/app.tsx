@@ -13,6 +13,7 @@ import LockedPage from 'components/routes/locked';
 import LoginScreen from 'components/routes/login';
 import Routes from 'components/routes/routes';
 import Tos from 'components/routes/tos';
+import CarouselProvider from 'components/visual/CarouselProvider';
 import DrawerProvider from 'components/visual/DrawerProvider';
 import HighlightProvider from 'components/visual/HighlightProvider';
 import { getProvider } from 'helpers/utils';
@@ -147,11 +148,13 @@ const AppInit: React.FC = () => {
       <UserProvider {...userProps}>
         <SiteMapProvider {...sitemapProps}>
           <HighlightProvider>
-            <DrawerProvider>
-              <AppLayoutProvider {...layoutProps}>
-                <MyApp />
-              </AppLayoutProvider>
-            </DrawerProvider>
+            <CarouselProvider>
+              <DrawerProvider>
+                <AppLayoutProvider {...layoutProps}>
+                  <MyApp />
+                </AppLayoutProvider>
+              </DrawerProvider>
+            </CarouselProvider>
           </HighlightProvider>
         </SiteMapProvider>
       </UserProvider>
