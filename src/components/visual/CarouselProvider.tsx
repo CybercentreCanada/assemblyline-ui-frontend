@@ -97,20 +97,26 @@ const useStyles = makeStyles(theme => ({
     cursor: 'pointer',
     '@media (min-height:500px)': {
       borderRadius: theme.spacing(1),
-      height: MDSize,
-      width: MDSize,
+      minHeight: MDSize,
+      minWidth: MDSize,
+      maxHeight: MDSize,
+      maxWidth: MDSize,
       overflow: 'hidden'
     },
     '@media (min-height:720px)': {
       borderRadius: theme.spacing(1.5),
-      height: LGSize,
-      width: LGSize,
+      minHeight: LGSize,
+      minWidth: LGSize,
+      maxHeight: LGSize,
+      maxWidth: LGSize,
       overflow: 'hidden'
     },
     '@media (min-height:1080px)': {
       borderRadius: theme.spacing(2),
-      height: XLSize,
-      width: XLSize,
+      minHeight: XLSize,
+      minWidth: XLSize,
+      maxHeight: XLSize,
+      maxWidth: XLSize,
       overflow: 'hidden'
     }
   },
