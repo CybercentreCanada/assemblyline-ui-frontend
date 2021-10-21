@@ -400,7 +400,7 @@ const Image = ({ id, alt, src, isThumb, thumbSelected, onClick, onRef }: ImagePr
   }, [alt, src]);
 
   return (
-    <Tooltip title={alt} placement="top">
+    <Tooltip title={isThumb ? alt : ''} placement="top">
       <Box
         className={
           isThumb ? clsx(classes.thumbContainer, thumbSelected ? '' : classes.unselectedThumb) : classes.imageContainer
