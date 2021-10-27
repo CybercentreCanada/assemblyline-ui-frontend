@@ -271,7 +271,9 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                     <Tooltip title={t('download')}>
                       <IconButton
                         component={MaterialLink}
-                        href={`/api/v4/file/download/${file && file.file_info.sha256}/?XSRF_TOKEN=${getXSRFCookie()}`}
+                        href={`/api/v4/file/download/${file && file.file_info.sha256}/?${
+                          file && fileName && file.file_info.sha256 !== fileName ? `name=${fileName}&` : ''
+                        }XSRF_TOKEN=${getXSRFCookie()}`}
                       >
                         <GetAppOutlinedIcon color="action" />
                       </IconButton>
