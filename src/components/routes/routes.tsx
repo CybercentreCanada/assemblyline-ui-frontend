@@ -147,7 +147,8 @@ const WrappedRoutes = () => {
             opacity: '0.4',
             zIndex: 10000,
             marginTop: 'auto',
-            marginRight: 'auto'
+            marginRight: 'auto',
+            pointerEvents: 'none'
           }}
         >
           {`Assemblyline ${configuration.system.version} :: `}
