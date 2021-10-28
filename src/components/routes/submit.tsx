@@ -57,7 +57,6 @@ function Submit() {
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
-  const sp8 = theme.spacing(8);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -340,7 +339,7 @@ function Submit() {
         </Alert>
       )}
       {c12nDef.enforce ? (
-        <div style={{ paddingBottom: sp8 }}>
+        <div style={{ paddingBottom: sp4 }}>
           <div style={{ padding: sp1, fontSize: 16 }}>{t('classification')}</div>
           <Classification
             format="long"
@@ -364,7 +363,7 @@ function Submit() {
         </Paper>
         <TabPanel value="0" className={classes.no_pad}>
           {settings ? (
-            <div style={{ marginTop: '30px' }}>
+            <div style={{ marginTop: sp2 }}>
               <FileDropper file={file} setFile={setFileDropperFile} disabled={!allowClick} />
               {file ? (
                 <>
@@ -396,7 +395,7 @@ function Submit() {
                   >
                     {uploadProgress === null ? t('file.button') : `${uploadProgress}${t('submit.progress')}`}
                   </Button>
-                  <Button style={{ marginLeft: '16px' }} color="secondary" variant="contained" onClick={cancelUpload}>
+                  <Button style={{ marginLeft: sp2 }} color="secondary" variant="contained" onClick={cancelUpload}>
                     {t('file.cancel')}
                   </Button>
                 </>
@@ -406,7 +405,7 @@ function Submit() {
             <Skeleton style={{ height: '280px' }} />
           )}
           {configuration.ui.tos ? (
-            <div style={{ marginTop: '50px', textAlign: 'center' }}>
+            <div style={{ marginTop: sp4, textAlign: 'center' }}>
               <Typography variant="body2">
                 {t('terms1')}
                 <i>{t('file.button')}</i>
@@ -421,7 +420,7 @@ function Submit() {
         </TabPanel>
         {configuration.ui.allow_url_submissions && (
           <TabPanel value="1" className={classes.no_pad}>
-            <div style={{ display: 'flex', flexDirection: 'row', marginTop: '30px', alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', flexDirection: 'row', marginTop: sp2, alignItems: 'flex-start' }}>
               {settings ? (
                 <>
                   <TextField
@@ -446,12 +445,12 @@ function Submit() {
               ) : (
                 <>
                   <Skeleton style={{ flexGrow: 1, height: '3rem' }} />
-                  <Skeleton style={{ marginLeft: '16px', height: '3rem', width: '5rem' }} />
+                  <Skeleton style={{ marginLeft: sp2, height: '3rem', width: '5rem' }} />
                 </>
               )}
             </div>
             {configuration.ui.tos ? (
-              <div style={{ marginTop: '50px', textAlign: 'center' }}>
+              <div style={{ marginTop: sp4, textAlign: 'center' }}>
                 <Typography variant="body2">
                   {t('terms1')}
                   <i>{t('url.button')}</i>
@@ -468,7 +467,7 @@ function Submit() {
         <TabPanel value="2" className={classes.no_pad}>
           <Grid container spacing={1}>
             <Grid item xs={12} md>
-              <div style={{ paddingLeft: sp2, textAlign: 'left', marginTop: sp4 }}>
+              <div style={{ paddingLeft: sp2, textAlign: 'left', marginTop: sp2 }}>
                 <Typography variant="h6" gutterBottom>
                   {t('options.service')}
                 </Typography>
@@ -476,7 +475,7 @@ function Submit() {
               </div>
             </Grid>
             <Grid item xs={12} md>
-              <div style={{ textAlign: 'left', marginTop: sp4 }}>
+              <div style={{ textAlign: 'left', marginTop: sp2 }}>
                 <Typography variant="h6" gutterBottom>
                   {t('options.submission')}
                 </Typography>
@@ -533,9 +532,7 @@ function Submit() {
                           onChange={event => setSettingValue('ignore_filtering', event.target.checked)}
                         />
                       ) : (
-                        <Skeleton
-                          style={{ height: '2rem', width: '1.5rem', marginLeft: '16px', marginRight: '16px' }}
-                        />
+                        <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
                       )
                     }
                     label={<Typography variant="body2">{t('options.submission.ignore_filtering')}</Typography>}
@@ -551,9 +548,7 @@ function Submit() {
                           onChange={event => setSettingValue('ignore_cache', event.target.checked)}
                         />
                       ) : (
-                        <Skeleton
-                          style={{ height: '2rem', width: '1.5rem', marginLeft: '16px', marginRight: '16px' }}
-                        />
+                        <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
                       )
                     }
                     label={<Typography variant="body2">{t('options.submission.ignore_cache')}</Typography>}
@@ -571,9 +566,7 @@ function Submit() {
                           }
                         />
                       ) : (
-                        <Skeleton
-                          style={{ height: '2rem', width: '1.5rem', marginLeft: '16px', marginRight: '16px' }}
-                        />
+                        <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
                       )
                     }
                     label={
@@ -593,9 +586,7 @@ function Submit() {
                           onChange={event => setSettingValue('profile', event.target.checked)}
                         />
                       ) : (
-                        <Skeleton
-                          style={{ height: '2rem', width: '1.5rem', marginLeft: '16px', marginRight: '16px' }}
-                        />
+                        <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
                       )
                     }
                     label={<Typography variant="body2">{t('options.submission.profile')}</Typography>}
@@ -611,9 +602,7 @@ function Submit() {
                           onChange={event => setSettingValue('deep_scan', event.target.checked)}
                         />
                       ) : (
-                        <Skeleton
-                          style={{ height: '2rem', width: '1.5rem', marginLeft: '16px', marginRight: '16px' }}
-                        />
+                        <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
                       )
                     }
                     label={<Typography variant="body2">{t('options.submission.deep_scan')}</Typography>}
