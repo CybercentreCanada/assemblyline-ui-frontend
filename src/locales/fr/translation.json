@@ -6,7 +6,7 @@
   "adminmenu.tag_safelist": "Liste sûre système",
   "adminmenu.users": "Utilisateurs",
   "api.invalid": "Données non valides renvoyées par le serveur API",
-  "api.unreachable": "Serveur API inaccessible. Réessayez plus tard...",
+  "api.unreachable": "Serveur API inaccessible, nous nous reconnecterons automatiquement une fois que le serveur sera de retour en ligne...",
   "app.language": "Langue",
   "banner.alt": "Banière d'Assemblyline",
   "breadcrumb.404": "Non disponible",

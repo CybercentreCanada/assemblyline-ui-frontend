@@ -98,7 +98,7 @@ export default function SubmissionDetail() {
   const [loadInterval, setLoadInterval] = useState(null);
   const [lastSuccessfulTrigger, setLastSuccessfulTrigger] = useState(0);
   const [deleteDialog, setDeleteDialog] = useState(false);
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
   const sp4 = theme.spacing(4);
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
   const history = useHistory();

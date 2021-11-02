@@ -35,7 +35,7 @@ import { Link, useHistory } from 'react-router-dom';
 
 function Submit() {
   const { getBanner } = useAppLayout();
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
   const { t, i18n } = useTranslation(['submit']);
   const theme = useTheme();
   const { user: currentUser, c12nDef, configuration } = useALContext();

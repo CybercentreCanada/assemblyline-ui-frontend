@@ -51,7 +51,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
   const { t } = useTranslation('alerts');
   const theme = useTheme();
   const classes = useStyles();
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
   const { c12nDef } = useALContext();
   const { copy } = useClipboard();
   const [item, setItem] = useState<AlertItem>(null);

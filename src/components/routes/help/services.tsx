@@ -72,7 +72,7 @@ function ServiceCard({ service }) {
 }
 
 export default function Services() {
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
   const { t } = useTranslation(['helpServices']);
   const theme = useTheme();
   const [services, setServices] = useState(null);

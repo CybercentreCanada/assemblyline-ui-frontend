@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export default function Configuration() {
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
   const [configuration, setConfiguration] = useState(null);
   const [constants, setConstants] = useState(null);
   const { t } = useTranslation(['helpConfiguration']);

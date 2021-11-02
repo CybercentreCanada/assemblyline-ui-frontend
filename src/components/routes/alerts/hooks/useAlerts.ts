@@ -148,7 +148,7 @@ const alertStateReducer = (state: AlertState, newState: AlertMessage) => {
 // Custom Hook implementation for dealing with alerts.
 export default function useAlerts(pageSize: number): UsingAlerts {
   const location = useLocation();
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
   const { indexes: fieldIndexes } = useALContext();
   const [searchQuery, setSearchQuery] = useState<SearchQuery>(null);
   const [fields, setFields] = useState<ALField[]>([]);

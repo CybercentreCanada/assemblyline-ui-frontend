@@ -57,7 +57,7 @@ export default function Safelist() {
   const history = useHistory();
   const theme = useTheme();
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
   const classes = useStyles();
   const { closeGlobalDrawer, setGlobalDrawer, globalDrawer } = useDrawer();
   const [suggestions] = useState(

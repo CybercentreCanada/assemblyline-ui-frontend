@@ -103,7 +103,7 @@ export interface CustomUserContextProps extends UserContextProps<CustomUser> {
   setSystemMessage: (msg: SystemMessageDefinition) => void;
 }
 
-interface WhoAmIProps extends CustomUser {
+export interface WhoAmIProps extends CustomUser {
   c12nDef: ClassificationDefinition;
   configuration: ConfigurationDefinition;
   indexes: IndexDefinitionMap;

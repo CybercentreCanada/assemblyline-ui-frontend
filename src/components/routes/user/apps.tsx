@@ -24,7 +24,7 @@ type APIKeysProps = {
 export default function Apps({ user, toggleApp }: APIKeysProps) {
   const { t } = useTranslation(['user']);
   const [selectedApp, setSelectedApp] = useState(null);
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();

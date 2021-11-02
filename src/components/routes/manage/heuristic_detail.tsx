@@ -80,7 +80,7 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
   const [stats, setStats] = useState<Statistics>(null);
   const [histogram, setHistogram] = useState<any>(null);
   const [results, setResults] = useState<any>(null);
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
   const classes = useStyles();
   const { c12nDef } = useALContext();
 
