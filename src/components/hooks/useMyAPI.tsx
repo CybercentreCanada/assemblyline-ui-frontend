@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import useMySnackbar from './useMySnackbar';
 import { ConfigurationDefinition, WhoAmIProps } from './useMyUser';
 
+const DEFAULT_RETRY_MS = 32;
+
 export type APIResponseProps = {
   api_error_message: string;
   api_response: any;
@@ -65,7 +67,7 @@ export default function useMyAPI() {
     setLoginParams,
     setUser,
     setReady,
-    retryAfter = 50
+    retryAfter = DEFAULT_RETRY_MS
   }: BootstrapProps) {
     const requestOptions: RequestInit = {
       method: 'GET',
@@ -100,19 +102,19 @@ export default function useMyAPI() {
           showErrorMessage(t('api.invalid'), 30000);
           switchRenderedApp('load');
         } else if (api_data.api_status_code === 403) {
-          closeSnackbar();
+          if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
           // User account is locked
           setConfiguration(api_data.api_response);
           switchRenderedApp('locked');
         } else if (api_data.api_status_code === 401) {
-          closeSnackbar();
+          if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
           // User is not logged in
           localStorage.setItem('loginParams', JSON.stringify(api_data.api_response));
           sessionStorage.clear();
           setLoginParams(api_data.api_response);
           switchRenderedApp('login');
         } else if (api_data.api_status_code === 200) {
-          closeSnackbar();
+          if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
           // Set the current user
           setUser(api_data.api_response);
 
@@ -157,7 +159,7 @@ export default function useMyAPI() {
     onEnter,
     onExit,
     onFinalize,
-    retryAfter = 50
+    retryAfter = DEFAULT_RETRY_MS
   }: APICallProps) {
     const requestOptions: RequestInit = {
       method,
@@ -223,7 +225,7 @@ export default function useMyAPI() {
         ) {
           // Retryable status responses
           if (api_data.api_status_code === 502) {
-            showErrorMessage(api_data.api_error_message, retryAfter + 1000);
+            showErrorMessage(api_data.api_error_message, 30000);
           }
 
           setTimeout(() => {
@@ -244,6 +246,7 @@ export default function useMyAPI() {
           }, retryAfter);
           return;
         } else if (api_data.api_status_code !== 200) {
+          if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
           // Handle errors
           // Run failure callback
           if (onFailure) {
@@ -253,6 +256,7 @@ export default function useMyAPI() {
             showErrorMessage(api_data.api_error_message);
           }
         } else if (onSuccess) {
+          if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
           // Cache success status
           if (allowCache) {
             try {
@@ -269,6 +273,8 @@ export default function useMyAPI() {
           // Handle success
           // Run success callback
           onSuccess(api_data);
+        } else {
+          if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
         }
         if (onFinalize) onFinalize(api_data);
       });
