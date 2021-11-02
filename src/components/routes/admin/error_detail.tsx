@@ -55,7 +55,7 @@ export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
   const theme = useTheme();
   const { copy } = useClipboard();
   const [error, setError] = useState<Error>(null);
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
   const { key, type, source, name } = useParams<ParamProps>();
   const { user: currentUser } = useALContext();
 

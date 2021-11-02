@@ -92,7 +92,7 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
   const [deleteDialog, setDeleteDialog] = useState(false);
   const { c12nDef } = useALContext();
   const { showSuccessMessage } = useMySnackbar();
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
   const classes = useStyles();
   const history = useHistory();
 

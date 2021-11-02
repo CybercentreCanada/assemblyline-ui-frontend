@@ -32,7 +32,7 @@ export default function AdminTagSafelist() {
   const [originalTagSafelist, setOriginalTagSafelist] = useState(null);
   const [open, setOpen] = useState(false);
   const { showSuccessMessage } = useMySnackbar();
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
   const { user: currentUser } = useUser<CustomUser>();
   const { isDarkTheme } = useAppContext();
 

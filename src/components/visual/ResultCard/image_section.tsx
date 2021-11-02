@@ -98,7 +98,7 @@ const ImageItem = ({ alt, src, index, handleOpenCarousel }: ImageItemProps) => {
   const [image, setImage] = useState<string>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const classes = useStyles();
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
 
   useEffect(() => {
     apiCall({

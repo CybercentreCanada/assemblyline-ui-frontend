@@ -56,7 +56,7 @@ const NotificationArea = () => {
   const classes = useStyles();
   const theme = useTheme();
   const { systemMessage, setSystemMessage, user: currentUser } = useALContext();
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
 
   const [popperAnchorEl, setPopperAnchorEl] = useState(null);

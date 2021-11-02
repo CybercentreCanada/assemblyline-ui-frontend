@@ -44,7 +44,7 @@ export default function Submissions() {
   const [searching, setSearching] = useState(false);
   const { user: currentUser, indexes } = useALContext();
   const history = useHistory();
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
   const theme = useTheme();
   const location = useLocation();
   const [query, setQuery] = useState<SimpleSearchQuery>(null);

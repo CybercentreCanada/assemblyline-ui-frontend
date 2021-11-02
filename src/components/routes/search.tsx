@@ -90,7 +90,7 @@ function Search({ index }: SearchProps) {
   const history = useHistory();
   const theme = useTheme();
   const classes = useStyles();
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
   const [searchSuggestion, setSearchSuggestion] = useState<string[]>(null);
   const [tab, setTab] = useState(null);

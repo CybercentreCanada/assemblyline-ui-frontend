@@ -16,7 +16,7 @@ export default function Tos() {
   const [buttonLoading, setButtonLoading] = useState(false);
   const { getBanner } = useAppLayout();
   const { user: currentUser, configuration } = useALContext();
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
   const useStyles = makeStyles(curTheme => ({
     no_pad: {
       padding: 0
