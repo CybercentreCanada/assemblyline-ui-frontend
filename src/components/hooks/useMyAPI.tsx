@@ -89,8 +89,12 @@ export default function useMyAPI() {
           // Do nothing... we are reloading the page
           window.location.reload();
           return;
-        } else if (api_data.api_status_code === 503) {
-          // You are over you API quota, retry the call in 50 ms
+        } else if (
+          api_data.api_status_code === 503 &&
+          api_data.api_error_message.includes('quota') &&
+          !api_data.api_error_message.includes('submission')
+        ) {
+          // You are over you API quota, retry the call in 50-150 ms
           setTimeout(() => {
             apiCall({
               url,
@@ -105,7 +109,7 @@ export default function useMyAPI() {
               onExit,
               onFinalize
             });
-          }, 50);
+          }, Math.floor(Math.random() * 100) + 50);
           return;
         } else if (api_data.api_status_code !== 200) {
           // Handle errors
