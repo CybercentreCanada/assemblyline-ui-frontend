@@ -446,7 +446,9 @@ function User({ width, username }: UserProps) {
                         src={user.avatar}
                       >
                         {user.name
-                          .split(' ', 2)
+                          .split(' ')
+                          .filter(w => w !== '')
+                          .splice(0, 2)
                           .map(n => (n ? n[0].toUpperCase() : ''))
                           .join('')}
                       </Avatar>
