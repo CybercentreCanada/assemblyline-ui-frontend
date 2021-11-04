@@ -378,7 +378,7 @@ const Image = ({ id, alt, src, isThumb, thumbSelected, onClick, onRef }: ImagePr
   const [image, setImage] = useState<string>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const classes = useStyles();
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
   const { t } = useTranslation(['carousel']);
 
   useEffect(() => {

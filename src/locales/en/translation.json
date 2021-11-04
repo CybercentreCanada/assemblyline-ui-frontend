@@ -6,7 +6,7 @@
   "adminmenu.tag_safelist": "System Safelist",
   "adminmenu.users": "Users",
   "api.invalid": "Invalid data returned by API server",
-  "api.unreachable": "API server unreachable. Try again later...",
+  "api.unreachable": "API server unreachable, we will auto-reconnect once the server is back online...",
   "app.language": "Language",
   "banner.alt": "Assemblyline Banner",
   "breadcrumb.404": "Not Found",

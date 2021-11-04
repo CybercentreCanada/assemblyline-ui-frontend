@@ -69,7 +69,7 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
   const [disableDialog, setDisableDialog] = useState(false);
   const { user: currentUser, c12nDef } = useALContext();
   const { showSuccessMessage } = useMySnackbar();
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
   const history = useHistory();
 
   useEffect(() => {

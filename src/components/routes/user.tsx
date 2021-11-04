@@ -83,7 +83,7 @@ function User({ width, username }: UserProps) {
   const sp4 = theme.spacing(4);
   const sp6 = theme.spacing(6);
 
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
   const useStyles = makeStyles(curTheme => ({
     drawer: {
       width: '500px',

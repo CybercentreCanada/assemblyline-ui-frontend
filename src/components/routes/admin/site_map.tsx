@@ -44,7 +44,7 @@ export default function SiteMap() {
   const { t } = useTranslation(['adminSiteMap']);
   const theme = useTheme();
   const [siteMap, setSiteMap] = useState(null);
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
   const { user: currentUser } = useUser<CustomUser>();
 
   const privMap = {

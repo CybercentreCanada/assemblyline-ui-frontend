@@ -158,7 +158,7 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
   const history = useHistory();
   const classes = useStyles();
 
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
 
   function saveService() {
     apiCall({

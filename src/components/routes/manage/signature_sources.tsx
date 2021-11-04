@@ -105,7 +105,7 @@ const WrappedSourceDetailDrawer = ({ service, base, close, reload }) => {
   const [modified, setModified] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
   const [source, setSource] = useState(null);
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
@@ -361,7 +361,7 @@ export default function SignatureSources() {
   const theme = useTheme();
   const { user: currentUser } = useALContext();
   const [sources, setSources] = useState(null);
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
 
   const reload = useCallback(() => {
     if (currentUser.is_admin || currentUser.roles.indexOf('signature_manager') !== -1) {

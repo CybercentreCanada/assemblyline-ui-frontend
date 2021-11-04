@@ -8,7 +8,7 @@ type DisableOTPProps = {
 };
 
 export default function DisableOTP({ setDrawerOpen, set2FAEnabled }: DisableOTPProps) {
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
   const { t } = useTranslation(['user']);
   const theme = useTheme();
 
