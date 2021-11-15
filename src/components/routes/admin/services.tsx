@@ -76,6 +76,7 @@ export default function Services() {
       onSuccess: api_data => {
         showSuccessMessage(t('restore.success'));
         closeRestoreDialog();
+        setRestoreConfirmation(false);
         setTimeout(() => reload(), 1000);
       }
     });
