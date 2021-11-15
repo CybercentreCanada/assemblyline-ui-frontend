@@ -50,19 +50,19 @@ const useStyles = () =>
       width: '100%'
     },
     badgeInfo: {
-      color: theme.palette.text.primary,
+      color: theme.palette.getContrastText(theme.palette.primary.main),
       backgroundColor: theme.palette.primary.main
     },
     badgeWarning: {
-      color: theme.palette.text.primary,
+      color: theme.palette.getContrastText(theme.palette.primary.main),
       backgroundColor: theme.palette.warning.main
     },
     badgeSuccess: {
-      color: theme.palette.text.primary,
+      color: theme.palette.getContrastText(theme.palette.primary.main),
       backgroundColor: theme.palette.success.main
     },
     badgeError: {
-      color: theme.palette.text.primary,
+      color: theme.palette.getContrastText(theme.palette.primary.main),
       backgroundColor: theme.palette.error.main
     }
   }))();
