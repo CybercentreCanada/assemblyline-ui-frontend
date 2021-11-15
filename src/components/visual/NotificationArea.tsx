@@ -264,7 +264,7 @@ const NotificationArea = () => {
           <Badge
             invisible={read}
             classes={{ badge: badgeColorMap[systemMessage.severity] }}
-            badgeContent={systemMessage.severity.charAt(0).toUpperCase()}
+            badgeContent={t(`severity.${systemMessage.severity}`).charAt(0).toUpperCase()}
           >
             <NotificationsActiveOutlinedIcon />
           </Badge>
