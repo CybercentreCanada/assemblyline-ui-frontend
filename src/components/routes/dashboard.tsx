@@ -372,7 +372,7 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
             />
           </div>
         </Grid>
-        <Grid item xs={12} sm={4} md={2}>
+        <Grid item xs={12} sm={5} md={3}>
           <div>
             <label>{t('queues')}</label>
           </div>
@@ -409,7 +409,7 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
             )}
           </div>
         </Grid>
-        <Grid item xs={12} sm={4} md={3}>
+        <Grid item xs={12} sm={3} md={2}>
           <div>
             <label>{t('busyness')}</label>
           </div>
