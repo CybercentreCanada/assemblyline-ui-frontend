@@ -1133,11 +1133,13 @@ const Dashboard = () => {
         <Grid item xs={12} md={4} xl={3}>
           <ScalerResourcesCard scaler={scaler} />
         </Grid>
-        {Object.keys(services).map(key => (
-          <Grid key={key} item xs={12} md={4} xl={3}>
-            <ServiceCard service={services[key]} max_inflight={dispatcher.inflight.max} />
-          </Grid>
-        ))}
+        {Object.keys(services)
+          .sort()
+          .map(key => (
+            <Grid key={key} item xs={12} md={4} xl={3}>
+              <ServiceCard service={services[key]} max_inflight={dispatcher.inflight.max} />
+            </Grid>
+          ))}
       </Grid>
     </PageFullscreen>
   );
