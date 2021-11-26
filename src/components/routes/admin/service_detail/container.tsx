@@ -10,6 +10,7 @@ import ContainerDialog from './container_dialog';
 
 type ServiceContainerProps = {
   service: ServiceDetail;
+  defaults: ServiceDetail;
   setService: (value: ServiceDetail) => void;
   setModified: (value: boolean) => void;
 };

@@ -26,6 +26,7 @@ import SourceDialog from './source_dialog';
 
 type ServiceUpdaterProps = {
   service: ServiceDetail;
+  defaults: ServiceDetail;
   setService: (value: ServiceDetail) => void;
   setModified: (value: boolean) => void;
 };
