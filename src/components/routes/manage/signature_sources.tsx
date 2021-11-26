@@ -189,7 +189,7 @@ const WrappedSourceDetailDrawer = ({ service, base, close, reload }) => {
             )}
           </Grid>
         </div>
-        <SourceDetail source={source} addMode={!base} setSource={setSource} setModified={setModified} />
+        <SourceDetail source={source} defaults={null} addMode={!base} setSource={setSource} setModified={setModified} />
         <div style={{ paddingTop: theme.spacing(2), paddingBottom: theme.spacing(2), textAlign: 'right' }}>
           <Button
             variant="contained"
