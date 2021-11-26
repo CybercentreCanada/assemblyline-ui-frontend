@@ -211,6 +211,7 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
     // Reset tab because we are using a different service
     setTab('general');
     setVersions(null);
+    setServiceDefault(null);
 
     // Load user on start
     if (currentUser.is_admin) {
