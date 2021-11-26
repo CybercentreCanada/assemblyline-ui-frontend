@@ -32,7 +32,7 @@
   "fields.legend.default": "Queried when no fields are specified",
   "fields.legend.ip_field": "Can be queried using CIDR notation",
   "fields.legend.list": "Can have multiple values in the same document",
-  "fields.legend.stored": "Returned in search results",
+  "fields.legend.stored": "Returned by default in search results",
   "fields.legend.text": "The special particularities of some field types as well as their various attributes are explained here:",
   "fields.legend.text_field": "Only the first 4k is indexed, wildcard searches will not work as expected and this field cannot be sorted",
   "fields.table.attrib": "Attributes",

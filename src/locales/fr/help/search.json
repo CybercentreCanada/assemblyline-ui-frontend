@@ -32,7 +32,7 @@
   "fields.legend.default": "Interrogé lorsqu'aucun champ n'est spécifié",
   "fields.legend.ip_field": "Peut être interrogé en utilisant la notation CIDR",
   "fields.legend.list": "Peut avoir plusieurs valeurs dans le même document",
-  "fields.legend.stored": "Renvoyé dans les résultats de recherche",
+  "fields.legend.stored": "Renvoyé par défault dans les résultats de recherche",
   "fields.legend.text": "Les particularités de certains types de champs ainsi que leurs différents attributs sont expliqués ici:",
   "fields.legend.text_field": "Seul les premiers 4k sont indexé, les recherches par caractères génériques ne fonctionneront pas comme prévu et ce champ ne peut pas être trié",
   "fields.table.attrib": "Attributs",
