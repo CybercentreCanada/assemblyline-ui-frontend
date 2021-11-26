@@ -15,12 +15,7 @@ const WrappedResetButton = ({ service, defaults, field, reset }: ResetButtonProp
   const theme = useTheme();
 
   const getValue = (obj, fieldname) => {
-    const parts = fieldname.split('.', 1);
-    if (parts.lenght >= 1) {
-      const newobj = obj[parts[0]] || {};
-      return getValue(newobj, parts[1]);
-    }
-    const val = obj[parts[0]] || null;
+    const val = obj[fieldname] || null;
     return Array.isArray(val) ? JSON.stringify(val) : val;
   };
 
@@ -36,7 +31,11 @@ const WrappedResetButton = ({ service, defaults, field, reset }: ResetButtonProp
     <Tooltip title={t('reset.tooltip')}>
       <Button
         style={{ marginLeft: theme.spacing(1), padding: 0, lineHeight: '1rem' }}
-        onClick={reset}
+        onClick={event => {
+          event.stopPropagation();
+          event.preventDefault();
+          reset();
+        }}
         size="small"
         color="secondary"
         variant="outlined"
