@@ -71,6 +71,11 @@ const ServiceGeneral = ({ service, defaults, constants, versions, setService, se
     setService({ ...service, licence_count: event.target.value });
   };
 
+  const handleMaxQueueSizeChange = event => {
+    setModified(true);
+    setService({ ...service, max_queue_length: event.target.value });
+  };
+
   const handleExternalToggle = () => {
     setModified(true);
     setService({ ...service, is_external: !service.is_external });
@@ -308,7 +313,7 @@ const ServiceGeneral = ({ service, defaults, constants, versions, setService, se
           )}
         </Grid>
         <Grid item xs={12} sm={6}>
-          <Typography variant="subtitle2">
+          <Typography variant="subtitle2" noWrap>
             {t('general.timeout')}
             <ResetButton
               service={service}
@@ -327,6 +332,7 @@ const ServiceGeneral = ({ service, defaults, constants, versions, setService, se
               size="small"
               margin="dense"
               variant="outlined"
+              InputProps={{ inputProps: { min: 5 } }}
               onChange={handleTimeoutChange}
               value={service.timeout}
             />
@@ -335,7 +341,7 @@ const ServiceGeneral = ({ service, defaults, constants, versions, setService, se
           )}
         </Grid>
         <Grid item xs={12} sm={6}>
-          <Typography variant="subtitle2">
+          <Typography variant="subtitle2" noWrap>
             {t('general.licence')}
             <ResetButton
               service={service}
@@ -354,12 +360,33 @@ const ServiceGeneral = ({ service, defaults, constants, versions, setService, se
               size="small"
               margin="dense"
               variant="outlined"
+              InputProps={{ inputProps: { min: 0 } }}
               onChange={handleLicenceChange}
               value={service.licence_count}
             />
           ) : (
             <Skeleton style={{ height: '2.5rem' }} />
           )}
+        </Grid>
+        <Grid item xs={12} sm={4}>
+          <Typography variant="subtitle2" noWrap>
+            {t('general.max_queue_length')}
+          </Typography>
+          {service ? (
+            <TextField
+              fullWidth
+              type="number"
+              size="small"
+              margin="dense"
+              variant="outlined"
+              InputProps={{ inputProps: { min: 0 } }}
+              onChange={handleMaxQueueSizeChange}
+              value={service.max_queue_length}
+            />
+          ) : (
+            <Skeleton style={{ height: '2.5rem' }} />
+          )}
+          <Typography variant="caption">{t('general.max_queue_length.desc')}</Typography>
         </Grid>
         <Grid item xs={12} sm={6}>
           <Typography variant="subtitle2">
