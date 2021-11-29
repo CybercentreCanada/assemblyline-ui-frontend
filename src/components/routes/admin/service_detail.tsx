@@ -117,6 +117,7 @@ export type ServiceDetail = {
   enabled: boolean;
   is_external: boolean;
   licence_count: number;
+  max_queue_length: number;
   name: string;
   rejects: string;
   stage: string;
