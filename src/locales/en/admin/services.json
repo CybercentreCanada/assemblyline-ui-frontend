@@ -91,6 +91,8 @@
   "params.user.remove": "Remove user parameter",
   "params.user.show": "Show the parameter by default",
   "remove": "Remove service",
+  "reset": "Reset",
+  "reset.tooltip": "Reset parameter to it's original value",
   "restore": "Restore a backup of the services configurations",
   "restore.success": "Backup was successfully restored",
   "restore.title": "Restore a backup of the services configurations",
