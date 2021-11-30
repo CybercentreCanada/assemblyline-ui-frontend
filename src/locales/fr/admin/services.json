@@ -69,7 +69,7 @@
   "general.location.external": "Externe - En dehors de l'infrastructure d'Assemblyline",
   "general.location.internal": "Interne - À l'intérieur de l'infrastructure d'Assemblyline",
   "general.max_queue_length": "Nombre maximum d'éléments en file d'attente",
-  "general.max_queue_length.desc": "* À utiliser uniquement pour le service qui ne peut pas suivre la charge de travail.",
+  "general.max_queue_length.desc": "** À n'utiliser que si le service ne peut pas suivre la charge de travail.",
   "general.name": "Nom du service",
   "general.reject": "Types de fichier rejeté",
   "general.stage": "Étape d'exécution",
