@@ -7,14 +7,16 @@ import { useTranslation } from 'react-i18next';
 import { ServiceDetail } from '../service_detail';
 import ContainerCard from './container_card';
 import ContainerDialog from './container_dialog';
+import ResetButton from './reset_button';
 
 type ServiceContainerProps = {
   service: ServiceDetail;
+  defaults: ServiceDetail;
   setService: (value: ServiceDetail) => void;
   setModified: (value: boolean) => void;
 };
 
-const ServiceContainer = ({ service, setService, setModified }: ServiceContainerProps) => {
+const ServiceContainer = ({ service, defaults, setService, setModified }: ServiceContainerProps) => {
   const { t } = useTranslation(['adminServices']);
   const [dialog, setDialog] = useState(false);
   const theme = useTheme();
@@ -49,7 +51,18 @@ const ServiceContainer = ({ service, setService, setModified }: ServiceContainer
         <Typography variant="h6">{t('container')}</Typography>
       </Grid>
       <Grid item xs={12}>
-        <Typography variant="subtitle2">{t('container.channel')}</Typography>
+        <Typography variant="subtitle2">
+          {t('container.channel')}
+          <ResetButton
+            service={service}
+            defaults={defaults}
+            field="update_channel"
+            reset={() => {
+              setModified(true);
+              setService({ ...service, update_channel: defaults.update_channel });
+            }}
+          />
+        </Typography>
         {service ? (
           <Select
             id="channel"
@@ -72,7 +85,11 @@ const ServiceContainer = ({ service, setService, setModified }: ServiceContainer
       <Grid item xs={12}>
         <Typography variant="subtitle2">{t('container.image')}</Typography>
         {service ? (
-          <ContainerCard container={service.docker_config} onChange={handleContainerImageChange} />
+          <ContainerCard
+            container={service.docker_config}
+            defaults={defaults ? defaults.docker_config : null}
+            onChange={handleContainerImageChange}
+          />
         ) : (
           <Skeleton style={{ height: '8rem' }} />
         )}
@@ -87,6 +104,7 @@ const ServiceContainer = ({ service, setService, setModified }: ServiceContainer
                   <ContainerCard
                     name={name}
                     container={service.dependencies[name].container}
+                    defaults={defaults && defaults.dependencies[name] ? defaults.dependencies[name].container : null}
                     volumes={service.dependencies[name].volumes}
                     onChange={handleDependencyChange}
                   />

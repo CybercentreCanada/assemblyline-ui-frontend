@@ -147,6 +147,8 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
   const { svc } = useParams<ParamProps>();
   const { t } = useTranslation(['adminServices']);
   const [service, setService] = useState<ServiceDetail>(null);
+  const [serviceDefault, setServiceDefault] = useState<ServiceDetail>(null);
+  const [serviceVersion, setServiceVersion] = useState<string>(null);
   const [constants, setConstants] = useState<ServiceConstants>(null);
   const [versions, setVersions] = useState<string[]>(null);
   const [tab, setTab] = useState('general');
@@ -210,6 +212,7 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
     // Reset tab because we are using a different service
     setTab('general');
     setVersions(null);
+    setServiceDefault(null);
 
     // Load user on start
     if (currentUser.is_admin) {
@@ -217,6 +220,7 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
         url: `/api/v4/service/${name || svc}/`,
         onSuccess: api_data => {
           setService(api_data.api_response);
+          setServiceVersion(api_data.api_response.version);
         }
       });
       apiCall({
@@ -228,6 +232,19 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
     }
     // eslint-disable-next-line
   }, [name]);
+
+  useEffect(() => {
+    // Load user on start
+    if (currentUser.is_admin && serviceVersion) {
+      apiCall({
+        url: `/api/v4/service/${name || svc}/${serviceVersion}/`,
+        onSuccess: api_data => {
+          setServiceDefault(api_data.api_response);
+        }
+      });
+    }
+    // eslint-disable-next-line
+  }, [serviceVersion]);
 
   useEffect(() => {
     // Load constants on page load
@@ -311,6 +328,7 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
           <TabPanel value="general" style={{ paddingLeft: 0, paddingRight: 0 }}>
             <ServiceGeneral
               service={service}
+              defaults={serviceDefault}
               setService={setService}
               setModified={setModified}
               constants={constants}
@@ -318,11 +336,21 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
             />
           </TabPanel>
           <TabPanel value="docker" style={{ paddingLeft: 0, paddingRight: 0 }}>
-            <ServiceContainer service={service} setService={setService} setModified={setModified} />
+            <ServiceContainer
+              service={service}
+              defaults={serviceDefault}
+              setService={setService}
+              setModified={setModified}
+            />
           </TabPanel>
           {service.update_config && (
             <TabPanel value="updater" style={{ paddingLeft: 0, paddingRight: 0 }}>
-              <ServiceUpdater service={service} setService={setService} setModified={setModified} />
+              <ServiceUpdater
+                service={service}
+                defaults={serviceDefault}
+                setService={setService}
+                setModified={setModified}
+              />
             </TabPanel>
           )}
           <TabPanel value="params" style={{ paddingLeft: 0, paddingRight: 0 }}>

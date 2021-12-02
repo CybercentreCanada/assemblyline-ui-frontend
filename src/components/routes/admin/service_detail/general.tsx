@@ -15,16 +15,18 @@ import Classification from 'components/visual/Classification';
 import 'moment/locale/fr';
 import { useTranslation } from 'react-i18next';
 import { ServiceConstants, ServiceDetail } from '../service_detail';
+import ResetButton from './reset_button';
 
 type ServiceGeneralProps = {
   service: ServiceDetail;
+  defaults: ServiceDetail;
   constants: ServiceConstants;
   versions: string[];
   setService: (value: ServiceDetail) => void;
   setModified: (value: boolean) => void;
 };
 
-const ServiceGeneral = ({ service, constants, versions, setService, setModified }: ServiceGeneralProps) => {
+const ServiceGeneral = ({ service, defaults, constants, versions, setService, setModified }: ServiceGeneralProps) => {
   const { t } = useTranslation(['adminServices']);
   const theme = useTheme();
   const { c12nDef } = useALContext();
@@ -101,7 +103,19 @@ const ServiceGeneral = ({ service, constants, versions, setService, setModified 
           )}
         </Grid>
         <Grid item xs={12} sm={6}>
-          <Typography variant="subtitle2">{t('general.version')}</Typography>
+          <Typography variant="subtitle2">
+            {t('general.version')}
+            <ResetButton
+              service={service}
+              defaults={defaults}
+              field="version"
+              reset={() => {
+                setModified(true);
+                setService({ ...service, version: defaults.version });
+              }}
+            />
+          </Typography>
+
           {service ? (
             <Select
               id="version"
@@ -128,7 +142,15 @@ const ServiceGeneral = ({ service, constants, versions, setService, setModified 
         </Grid>
         {c12nDef.enforce && (
           <Grid item xs={12}>
-            <Typography variant="subtitle2">{t('general.classification')}</Typography>
+            <Typography variant="subtitle2">
+              {t('general.classification')}
+              <ResetButton
+                service={service}
+                defaults={defaults}
+                field="default_result_classification"
+                reset={() => setClassification(defaults.default_result_classification)}
+              />
+            </Typography>
             <Classification
               type="picker"
               c12n={service ? service.default_result_classification : null}
@@ -137,7 +159,18 @@ const ServiceGeneral = ({ service, constants, versions, setService, setModified 
           </Grid>
         )}
         <Grid item xs={12}>
-          <Typography variant="subtitle2">{t('general.description')}</Typography>
+          <Typography variant="subtitle2">
+            {t('general.description')}
+            <ResetButton
+              service={service}
+              defaults={defaults}
+              field="description"
+              reset={() => {
+                setModified(true);
+                setService({ ...service, description: defaults.description });
+              }}
+            />
+          </Typography>
           {service ? (
             <TextField
               fullWidth
@@ -154,7 +187,18 @@ const ServiceGeneral = ({ service, constants, versions, setService, setModified 
           )}
         </Grid>
         <Grid item xs={12} sm={6}>
-          <Typography variant="subtitle2">{t('general.stage')}</Typography>
+          <Typography variant="subtitle2">
+            {t('general.stage')}
+            <ResetButton
+              service={service}
+              defaults={defaults}
+              field="stage"
+              reset={() => {
+                setModified(true);
+                setService({ ...service, stage: defaults.stage });
+              }}
+            />
+          </Typography>
           {service ? (
             <Select
               id="stage"
@@ -180,7 +224,18 @@ const ServiceGeneral = ({ service, constants, versions, setService, setModified 
           )}
         </Grid>
         <Grid item xs={12} sm={6}>
-          <Typography variant="subtitle2">{t('general.category')}</Typography>
+          <Typography variant="subtitle2">
+            {t('general.category')}
+            <ResetButton
+              service={service}
+              defaults={defaults}
+              field="category"
+              reset={() => {
+                setModified(true);
+                setService({ ...service, category: defaults.category });
+              }}
+            />
+          </Typography>
           {service ? (
             <Select
               id="category"
@@ -206,7 +261,18 @@ const ServiceGeneral = ({ service, constants, versions, setService, setModified 
           )}
         </Grid>
         <Grid item xs={12} sm={6}>
-          <Typography variant="subtitle2">{t('general.accept')}</Typography>
+          <Typography variant="subtitle2">
+            {t('general.accept')}
+            <ResetButton
+              service={service}
+              defaults={defaults}
+              field="accepts"
+              reset={() => {
+                setModified(true);
+                setService({ ...service, accepts: defaults.accepts });
+              }}
+            />
+          </Typography>
           {service ? (
             <TextField
               fullWidth
@@ -221,7 +287,18 @@ const ServiceGeneral = ({ service, constants, versions, setService, setModified 
           )}
         </Grid>
         <Grid item xs={12} sm={6}>
-          <Typography variant="subtitle2">{t('general.reject')}</Typography>
+          <Typography variant="subtitle2">
+            {t('general.reject')}
+            <ResetButton
+              service={service}
+              defaults={defaults}
+              field="rejects"
+              reset={() => {
+                setModified(true);
+                setService({ ...service, rejects: defaults.rejects });
+              }}
+            />
+          </Typography>
           {service ? (
             <TextField
               fullWidth
@@ -238,6 +315,15 @@ const ServiceGeneral = ({ service, constants, versions, setService, setModified 
         <Grid item xs={12} sm={4}>
           <Typography variant="subtitle2" noWrap>
             {t('general.timeout')}
+            <ResetButton
+              service={service}
+              defaults={defaults}
+              field="timeout"
+              reset={() => {
+                setModified(true);
+                setService({ ...service, timeout: defaults.timeout });
+              }}
+            />
           </Typography>
           {service ? (
             <TextField
@@ -257,6 +343,15 @@ const ServiceGeneral = ({ service, constants, versions, setService, setModified 
         <Grid item xs={12} sm={4}>
           <Typography variant="subtitle2" noWrap>
             {t('general.licence')}
+            <ResetButton
+              service={service}
+              defaults={defaults}
+              field="licence_count"
+              reset={() => {
+                setModified(true);
+                setService({ ...service, licence_count: defaults.licence_count });
+              }}
+            />
           </Typography>
           {service ? (
             <TextField
@@ -294,7 +389,18 @@ const ServiceGeneral = ({ service, constants, versions, setService, setModified 
           <Typography variant="caption">{t('general.max_queue_length.desc')}</Typography>
         </Grid>
         <Grid item xs={12} sm={6}>
-          <Typography variant="subtitle2">{t('general.location')}</Typography>
+          <Typography variant="subtitle2">
+            {t('general.location')}
+            <ResetButton
+              service={service}
+              defaults={defaults}
+              field="is_external"
+              reset={() => {
+                setModified(true);
+                setService({ ...service, is_external: defaults.is_external });
+              }}
+            />
+          </Typography>
           {service ? (
             <RadioGroup value={service.is_external} onChange={handleExternalToggle}>
               <FormControlLabel value control={<Radio />} label={t('general.location.external')} />
@@ -305,7 +411,18 @@ const ServiceGeneral = ({ service, constants, versions, setService, setModified 
           )}
         </Grid>
         <Grid item xs={12} sm={6}>
-          <Typography variant="subtitle2">{t('general.caching')}</Typography>
+          <Typography variant="subtitle2">
+            {t('general.caching')}
+            <ResetButton
+              service={service}
+              defaults={defaults}
+              field="disable_cache"
+              reset={() => {
+                setModified(true);
+                setService({ ...service, disable_cache: defaults.disable_cache });
+              }}
+            />
+          </Typography>
           {service ? (
             <RadioGroup value={service.disable_cache} onChange={handleCacheToggle}>
               <FormControlLabel value={false} control={<Radio />} label={t('general.caching.enabled')} />
