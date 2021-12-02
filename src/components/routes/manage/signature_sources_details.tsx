@@ -15,6 +15,7 @@ import Classification from 'components/visual/Classification';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Environment } from '../admin/service_detail';
+import ResetButton from '../admin/service_detail/reset_button';
 
 const useStyles = makeStyles(theme => ({
   checkbox: {
@@ -34,7 +35,7 @@ const DEFAULT_HEADER: Environment = {
   value: ''
 };
 
-const WrappedSourceDetail = ({ source, setSource, addMode = false, setModified = null }) => {
+const WrappedSourceDetail = ({ source, defaults, setSource, addMode = false, setModified = null }) => {
   const { t } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
   const { c12nDef } = useALContext();
@@ -125,12 +126,34 @@ const WrappedSourceDetail = ({ source, setSource, addMode = false, setModified =
     source && (
       <Grid container spacing={1}>
         <Grid item xs={12}>
-          <div className={classes.label}>{t('uri')}</div>
+          <div className={classes.label}>
+            {t('uri')}
+            <ResetButton
+              service={source}
+              defaults={defaults}
+              field="uri"
+              reset={() => {
+                setSource({ ...source, uri: defaults.uri });
+                setModified(true);
+              }}
+            />
+          </div>
           <TextField size="small" value={source.uri} fullWidth variant="outlined" onChange={handleURIChange} />
         </Grid>
         {c12nDef.enforce && (
           <Grid item xs={12}>
-            <div className={classes.label}>{t('classification')}</div>
+            <div className={classes.label}>
+              {t('classification')}
+              <ResetButton
+                service={source}
+                defaults={defaults}
+                field="default_classification"
+                reset={() => {
+                  setSource({ ...source, default_classification: defaults.default_classification });
+                  setModified(true);
+                }}
+              />
+            </div>
             <Classification
               c12n={source.default_classification}
               type="picker"
@@ -151,7 +174,18 @@ const WrappedSourceDetail = ({ source, setSource, addMode = false, setModified =
             />
           </div>
           <div style={{ paddingTop: theme.spacing(1) }}>
-            <div className={classes.label}>{t('pattern')}</div>
+            <div className={classes.label}>
+              {t('pattern')}
+              <ResetButton
+                service={source}
+                defaults={defaults}
+                field="pattern"
+                reset={() => {
+                  setSource({ ...source, pattern: defaults.pattern });
+                  setModified(true);
+                }}
+              />
+            </div>
             <TextField
               size="small"
               value={source.pattern}
@@ -163,7 +197,18 @@ const WrappedSourceDetail = ({ source, setSource, addMode = false, setModified =
         </Grid>
         <Grid item xs={12} md={6}>
           <div>
-            <div className={classes.label}>{t('username')}</div>
+            <div className={classes.label}>
+              {t('username')}
+              <ResetButton
+                service={source}
+                defaults={defaults}
+                field="username"
+                reset={() => {
+                  setSource({ ...source, username: defaults.username });
+                  setModified(true);
+                }}
+              />
+            </div>
             <TextField
               size="small"
               value={source.username}
@@ -173,7 +218,18 @@ const WrappedSourceDetail = ({ source, setSource, addMode = false, setModified =
             />
           </div>
           <div style={{ paddingTop: theme.spacing(1) }}>
-            <div className={classes.label}>{t('password')}</div>
+            <div className={classes.label}>
+              {t('password')}
+              <ResetButton
+                service={source}
+                defaults={defaults}
+                field="password"
+                reset={() => {
+                  setSource({ ...source, password: defaults.password });
+                  setModified(true);
+                }}
+              />
+            </div>
             <TextField
               size="small"
               value={source.password}
@@ -184,7 +240,18 @@ const WrappedSourceDetail = ({ source, setSource, addMode = false, setModified =
           </div>
         </Grid>
         <Grid item xs={12}>
-          <div className={classes.label}>{t('private_key')}</div>
+          <div className={classes.label}>
+            {t('private_key')}
+            <ResetButton
+              service={source}
+              defaults={defaults}
+              field="private_key"
+              reset={() => {
+                setSource({ ...source, private_key: defaults.private_key });
+                setModified(true);
+              }}
+            />
+          </div>
           <TextField
             size="small"
             value={source.private_key}
@@ -274,7 +341,18 @@ const WrappedSourceDetail = ({ source, setSource, addMode = false, setModified =
           </Grid>
         </Grid>
         <Grid item xs={12}>
-          <div className={classes.label}>{t('proxy')}</div>
+          <div className={classes.label}>
+            {t('proxy')}
+            <ResetButton
+              service={source}
+              defaults={defaults}
+              field="proxy"
+              reset={() => {
+                setSource({ ...source, proxy: defaults.proxy });
+                setModified(true);
+              }}
+            />
+          </div>
           <TextField
             size="small"
             value={source.proxy}
@@ -285,7 +363,18 @@ const WrappedSourceDetail = ({ source, setSource, addMode = false, setModified =
           />
         </Grid>
         <Grid item xs={12}>
-          <div className={classes.label}>{t('ca')}</div>
+          <div className={classes.label}>
+            {t('ca')}
+            <ResetButton
+              service={source}
+              defaults={defaults}
+              field="ca_cert"
+              reset={() => {
+                setSource({ ...source, ca_cert: defaults.ca_cert });
+                setModified(true);
+              }}
+            />
+          </div>
           <TextField
             size="small"
             value={source.ca_cert}
@@ -302,7 +391,20 @@ const WrappedSourceDetail = ({ source, setSource, addMode = false, setModified =
             control={
               <Checkbox size="small" checked={source.ssl_ignore_errors} name="label" onChange={handleSSLChange} />
             }
-            label={<Typography variant="body2">{t('ignore_ssl')}</Typography>}
+            label={
+              <Typography variant="body2">
+                {t('ignore_ssl')}
+                <ResetButton
+                  service={source}
+                  defaults={defaults}
+                  field="ssl_ignore_errors"
+                  reset={() => {
+                    setSource({ ...source, ssl_ignore_errors: defaults.ssl_ignore_errors });
+                    setModified(true);
+                  }}
+                />
+              </Typography>
+            }
             className={classes.checkbox}
           />
         </Grid>

@@ -89,6 +89,8 @@
   "params.user.remove": "Supprimer le paramètre utilisateur",
   "params.user.show": "Afficher le paramètre par défaut",
   "remove": "Supprimer le service",
+  "reset": "Réinitialiser",
+  "reset.tooltip": "Réinitialiser le paramètre à sa valeur d'origine",
   "restore": "Restaurer une sauvegarde des configurations des services",
   "restore.success": "La sauvegarde a été restaurée avec succès",
   "restore.title": "Restaurer une sauvegarde des configurations des services",
