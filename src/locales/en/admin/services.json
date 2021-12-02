@@ -68,6 +68,8 @@
   "general.location": "Service location",
   "general.location.external": "External - Outside of Assemblyline infrastructure",
   "general.location.internal": "Internal - Inside of Assemblyline infrastructure",
+  "general.max_queue_length": "Maximum queued items",
+  "general.max_queue_length.desc": "** Only use if service can't keep up with workload.",
   "general.name": "Service name",
   "general.reject": "Rejected file types",
   "general.stage": "Execution stage",
