@@ -371,6 +371,15 @@ const ServiceGeneral = ({ service, defaults, constants, versions, setService, se
         <Grid item xs={12} sm={4}>
           <Typography variant="subtitle2" noWrap>
             {t('general.max_queue_length')}
+            <ResetButton
+              service={service}
+              defaults={defaults}
+              field="max_queue_length"
+              reset={() => {
+                setModified(true);
+                setService({ ...service, max_queue_length: defaults.max_queue_length });
+              }}
+            />
           </Typography>
           {service ? (
             <TextField
