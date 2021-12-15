@@ -119,6 +119,7 @@ export type ServiceDetail = {
   licence_count: number;
   max_queue_length: number;
   name: string;
+  privileged: boolean;
   rejects: string;
   stage: string;
   submission_params: SubmissionParams[];
