@@ -1,4 +1,16 @@
-import { Button, FormControlLabel, Grid, IconButton, MenuItem, Radio, RadioGroup, Select, Tooltip, Typography, useTheme } from '@material-ui/core';
+import {
+  Button,
+  FormControlLabel,
+  Grid,
+  IconButton,
+  MenuItem,
+  Radio,
+  RadioGroup,
+  Select,
+  Tooltip,
+  Typography,
+  useTheme
+} from '@material-ui/core';
 import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
 import { Skeleton } from '@material-ui/lab';
 import 'moment/locale/fr';
@@ -45,7 +57,7 @@ const ServiceContainer = ({ service, defaults, setService, setModified }: Servic
     setService({ ...service, dependencies: depList });
   };
 
-  const handlePrivilegeToggle = () => {
+  const handlePrivilegedToggle = () => {
     setModified(true);
     setService({ ...service, privileged: !service.privileged });
   };
@@ -55,7 +67,7 @@ const ServiceContainer = ({ service, defaults, setService, setModified }: Servic
       <Grid item xs={12}>
         <Typography variant="h6">{t('container')}</Typography>
       </Grid>
-      <Grid item xs={6}>
+      <Grid item xs={12}>
         <Typography variant="subtitle2">
           {t('container.channel')}
           <ResetButton
@@ -87,23 +99,23 @@ const ServiceContainer = ({ service, defaults, setService, setModified }: Servic
           <Skeleton style={{ height: '2.5rem' }} />
         )}
       </Grid>
-      <Grid item xs={6}>
+      <Grid item xs={12}>
         <Typography variant="subtitle2">
-          {t('container.privilege')}
+          {t('container.privileged')}
           <ResetButton
             service={service}
             defaults={defaults}
             field="privileged"
             reset={() => {
               setModified(true);
-              setService({ ...service, privileged: defaults.privileged });
+              setService({ ...service, privileged: !!defaults.privileged });
             }}
           />
         </Typography>
         {service ? (
-          <RadioGroup value={service.privileged} onChange={handlePrivilegeToggle} row>
-            <FormControlLabel value control={<Radio />} label={t('container.privilege.yes')} />
-            <FormControlLabel value={false} control={<Radio />} label={t('container.privilege.no')} />
+          <RadioGroup value={service.privileged} onChange={handlePrivilegedToggle}>
+            <FormControlLabel value control={<Radio />} label={t('container.privileged.true')} />
+            <FormControlLabel value={false} control={<Radio />} label={t('container.privileged.false')} />
           </RadioGroup>
         ) : (
           <Skeleton style={{ height: '2.5rem' }} />
