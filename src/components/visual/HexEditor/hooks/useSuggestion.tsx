@@ -10,6 +10,7 @@ export type SuggestionContextProps = {
   nextSuggestionOpen?: React.MutableRefObject<boolean>;
   suggestionLabels?: React.MutableRefObject<string[]>;
   suggestionValues?: React.MutableRefObject<string[]>;
+  onSuggestionLabelChange: (language: string) => void;
   onSuggestionFocus?: () => void;
   onSuggestionBlur?: () => void;
   onSuggestionChange?: (value: string | null) => void;
@@ -24,10 +25,7 @@ export const WrappedSuggestionProvider = ({ children }: HexProps) => {
   const { nextSearchValue, onSearchValueChange } = useSearch();
 
   const nextSuggestionOpen = useRef<boolean>(false);
-  const suggestionLabels = useRef<Array<string>>([
-    'hexes (Search in hexadecimal values)',
-    'texts (Search in texts values)'
-  ]);
+  const suggestionLabels = useRef<Array<string>>([]);
   const suggestionValues = useRef<Array<string>>(['hexes:', 'texts:']);
 
   const handleSuggestionLabelsIndex = useCallback((value: string) => {
@@ -47,6 +45,16 @@ export const WrappedSuggestionProvider = ({ children }: HexProps) => {
     },
     [handleSuggestionLabelsIndex, nextLayoutColumns, setSuggestionOpen]
   );
+
+  const onSuggestionLabelChange = useCallback((language: string) => {
+    if (language === 'en')
+      suggestionLabels.current = ['hexes (Search using hexadecimal values)', 'texts (Search using ASCII values)'];
+    else if (language === 'fr')
+      suggestionLabels.current = [
+        'hexes (Recherche utilisant des valeurs hexadécimales)',
+        'texts (Recherche utilisant des valeurs ASCII)'
+      ];
+  }, []);
 
   const onSuggestionFocus = useCallback(() => {
     handleSuggestionOpen(nextSearchValue.current);
@@ -82,6 +90,7 @@ export const WrappedSuggestionProvider = ({ children }: HexProps) => {
         nextSuggestionOpen,
         suggestionLabels,
         suggestionValues,
+        onSuggestionLabelChange,
         onSuggestionFocus,
         onSuggestionBlur,
         onSuggestionChange,
