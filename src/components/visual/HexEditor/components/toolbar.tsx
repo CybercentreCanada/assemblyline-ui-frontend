@@ -116,10 +116,12 @@ export const WrappedHexToolBar = (states: StoreState) => {
                 variant="subtitle1"
                 color={searchValue.length > 0 ? 'error' : 'textPrimary'}
               >
-                No Results
+                {t('no-results')}
               </Typography>
             )
-          ) : null}
+          ) : (
+            <></>
+          )}
         </Tooltip>
 
         <TooltipButton title={t('previous-match')} onClick={() => onSearchClick('previous')} icon={<ArrowUpward />} />
@@ -132,8 +134,8 @@ export const WrappedHexToolBar = (states: StoreState) => {
         <HexPopper
           ref={searchPopperRef}
           id="search-index"
-          label={'Search Index:'}
-          placeholder={'ex: 0'}
+          label={t('search-label')}
+          placeholder={t('search-placeholder')}
           value={searchIndex + 1}
           min={0}
           max={searchIndexes.length}
@@ -142,8 +144,8 @@ export const WrappedHexToolBar = (states: StoreState) => {
         <HexPopper
           ref={cursorPopperRef}
           id="cursor-index"
-          label={'Cursor Address:'}
-          placeholder={'ex: 0'}
+          label={t('navigation-label')}
+          placeholder={t('navigation-placeholder')}
           value={cursorIndex ? cursorIndex : ''}
           min={0}
           max={hexMap.current.size - 1}

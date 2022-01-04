@@ -1,9 +1,15 @@
 {
-  "find": "Recherche les valeurs hexadécimales",
-  "previous-match": "Match précédent (Shift + Enter)",
-  "next-match": "Previous Match (Enter)",
-  "of": " de ",
-  "download": "Télécharger le fichier",
-  "related": "Soumissions connexes",
-  "title": "Visualisateur de Fichiers"
+  "find": "Rechercher (⇵ pour l'historique)",
+  "search": "Index de recherche",
+  "search-label": "Index de recherche :",
+  "search-placeholder": "Ex: 001",
+  "of": " sur ",
+  "previous-match": "Correspondance précédente (Maj + Enter)",
+  "next-match": "Correspondance suivante (Enter)",
+  "clear": "Effacer la recherche (Escape)",
+  "navigation": "Naviguer vers",
+  "navigation-label": "Adresse du curseur :",
+  "navigation-placeholder": "Ex: 001",
+  "settings": "Configurer les paramètres",
+  "no-results": "Aucun résultat"
 }
