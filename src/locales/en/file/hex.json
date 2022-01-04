@@ -1,11 +1,15 @@
 {
   "find": "Find (⇵ for history)",
+  "search": "Search Index",
+  "search-label": "Search Index:",
+  "search-placeholder": "Ex: 001",
+  "of": " of ",
   "previous-match": "Previous Match (Shift + Enter)",
   "next-match": "Next Match (Enter)",
   "clear": "Clear Search (Escape)",
+  "navigation": "Navigate to",
+  "navigation-label": "Cursor Address:",
+  "navigation-placeholder": "Ex: 001",
   "settings": "Customize the Settings",
-  "of": " of ",
-  "download": "Download file",
-  "related": "Related submissions",
-  "title": "File viewer"
+  "no-results": "No Results"
 }
