@@ -11,7 +11,7 @@ export type { HexRowProps } from './components/row';
 export { HexScrollBar } from './components/scrollbar';
 export { HexSettings } from './components/settings';
 export { HexToolBar } from './components/toolbar';
-export { default as NewHexEditor } from './hexEditor';
+export { default as HexViewerApp } from './hexViewer';
 export { CopyProvider, useCopy } from './hooks/useCopy';
 export type { CopyContextProps } from './hooks/useCopy';
 export { CursorProvider, useCursor } from './hooks/useCursor';
@@ -36,6 +36,3 @@ export { StyleProvider, useStyles } from './hooks/useStyles';
 export type { StyleContextProps } from './hooks/useStyles';
 export { SuggestionProvider, useSuggestion } from './hooks/useSuggestion';
 export type { SuggestionContextProps, SuggestionType } from './hooks/useSuggestion';
-
-// export { useStore } from './store/useStoreOld';
-// export type { HexProps, StoreProps, StoreState } from './store/useStoreOld';

@@ -18,7 +18,7 @@ import clsx from 'clsx';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import Empty from 'components/visual/Empty';
-import { NewHexEditor } from 'components/visual/HexEditor';
+import { HexViewerApp } from 'components/visual/HexViewer';
 import getXSRFCookie from 'helpers/xsrf';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -74,17 +74,9 @@ const WrappedHexViewer = ({ hex, error }) => {
   const classes = useStyles();
 
   return hex ? (
-    // <pre className={classes.pre}>
-    //   <div style={{ minWidth: '580px' }}>{hex}</div>
-    // </pre>
-    <>
-      {/* <pre className={classes.pre}>
-        <HexEditor data={hex} />
-      </pre> */}
-      <pre className={classes.pre}>
-        <NewHexEditor data={hex} />
-      </pre>
-    </>
+    <pre className={classes.pre}>
+      <HexViewerApp data={hex} />
+    </pre>
   ) : error ? (
     <div className={clsx(classes.flexContainer)}>
       <Alert className={clsx(classes.flexItem)} severity="error">
