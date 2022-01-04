@@ -7,7 +7,7 @@
   "previous-match": "Correspondance précédente (Maj + Enter)",
   "next-match": "Correspondance suivante (Enter)",
   "clear": "Effacer la recherche (Escape)",
-  "navigation": "Naviguer vers",
+  "navigation": "Naviguer vers une adresse",
   "navigation-label": "Adresse du curseur :",
   "navigation-placeholder": "Ex: 001",
   "settings": "Configurer les paramètres",

@@ -164,14 +164,26 @@ export const useToolBarStyles = makeStyles(theme => ({
     }
   },
   resultIndexes: {
-    minWidth: '100px',
     textAlign: 'center',
-    cursor: 'pointer'
+    cursor: 'pointer',
+    padding: 8,
+    [theme.breakpoints.down('sm')]: {
+      padding: 2
+    },
+    [theme.breakpoints.down('xs')]: {
+      padding: 0
+    }
   },
   resultNoneIndexes: {
-    minWidth: '100px',
     textAlign: 'center',
-    cursor: 'default'
+    cursor: 'default',
+    padding: 8,
+    [theme.breakpoints.down('sm')]: {
+      padding: 2
+    },
+    [theme.breakpoints.down('xs')]: {
+      padding: 0
+    }
   },
   cursorIndex: {
     minWidth: '125px',
