@@ -30,12 +30,9 @@ export const WrappedHexToolBar = (states: StoreState) => {
   const theme = useTheme();
   const upXS = useMediaQuery(theme.breakpoints.up('xs'));
 
-  const { layoutRef } = useLayout();
-
-  const { hexMap, getAddressValue } = useHex();
+  const { hexMap } = useHex();
   const { onOpenSettings } = useLayout();
-  const { onSearchChange, onSearchKeyDown, onSearchClear, onSearchClick, onSearchIndexChange, onSearchInputChange } =
-    useSearch();
+  const { onSearchKeyDown, onSearchClear, onSearchClick, onSearchIndexChange, onSearchInputChange } = useSearch();
   const { onCursorIndexChange } = useCursor();
   const { onHistoryChange, onHistoryKeyDown } = useHistory();
   const { suggestionLabels, onSuggestionFocus, onSuggestionBlur, onSuggestionChange, onSuggestionInputChange } =
@@ -102,75 +99,35 @@ export const WrappedHexToolBar = (states: StoreState) => {
           )}
         />
 
-        {upXS ? (
-          searchIndexes.length > 0 ? (
-            <Typography
-              className={toolbarClasses.resultIndexes}
-              variant="subtitle1"
-              color={searchValue && searchValue.length > 0 && searchIndexes.length === 0 ? 'error' : 'textPrimary'}
-              onClick={handleSearchClick}
-            >
-              {searchIndex + 1 + t('of') + searchIndexes.length}
-            </Typography>
-          ) : (
-            <Typography
-              className={toolbarClasses.resultNoneIndexes}
-              variant="subtitle1"
-              color={searchValue.length > 0 ? 'error' : 'textPrimary'}
-            >
-              No Results
-            </Typography>
-          )
-        ) : null}
-        <Tooltip title={t('previous-match')}>
-          <IconButton
-            className={toolbarClasses.iconButton}
-            aria-label="previous-match"
-            onClick={() => onSearchClick('previous')}
-            disabled={searchIndexes.length === 0}
-            size="small"
-          >
-            <ArrowUpward />
-          </IconButton>
+        <Tooltip title={t('search')}>
+          {upXS ? (
+            searchIndexes.length > 0 ? (
+              <Typography
+                className={toolbarClasses.resultIndexes}
+                variant="subtitle1"
+                color={searchValue && searchValue.length > 0 && searchIndexes.length === 0 ? 'error' : 'textPrimary'}
+                onClick={handleSearchClick}
+              >
+                {searchIndex + 1 + t('of') + searchIndexes.length}
+              </Typography>
+            ) : (
+              <Typography
+                className={toolbarClasses.resultNoneIndexes}
+                variant="subtitle1"
+                color={searchValue.length > 0 ? 'error' : 'textPrimary'}
+              >
+                No Results
+              </Typography>
+            )
+          ) : null}
         </Tooltip>
-        <Tooltip title={t('next-match')}>
-          <IconButton
-            className={toolbarClasses.iconButton}
-            aria-label="next-match"
-            onClick={() => onSearchClick('next')}
-            disabled={searchIndexes.length === 0}
-            size="small"
-          >
-            <ArrowDownward />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title={t('clear')}>
-          <IconButton
-            className={toolbarClasses.iconButton}
-            aria-label="clear"
-            onClick={() => onSearchClear()}
-            disabled={searchIndexes.length === 0}
-            size="small"
-          >
-            <ClearIcon />
-          </IconButton>
-        </Tooltip>
+
+        <TooltipButton title={t('previous-match')} onClick={() => onSearchClick('previous')} icon={<ArrowUpward />} />
+        <TooltipButton title={t('next-match')} onClick={() => onSearchClick('next')} icon={<ArrowDownward />} />
+        <TooltipButton title={t('clear')} onClick={onSearchClear} icon={<ClearIcon />} />
         <Divider className={toolbarClasses.divider} orientation="vertical" />
-        <Tooltip title={t('navigation')}>
-          <IconButton className={toolbarClasses.iconButton} aria-label="clear" onClick={handleCursorClick} size="small">
-            <NavigationIcon />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title={t('settings')}>
-          <IconButton
-            className={toolbarClasses.iconButton}
-            aria-label="settings"
-            onClick={() => onOpenSettings()}
-            size="small"
-          >
-            <SettingsIcon />
-          </IconButton>
-        </Tooltip>
+        <TooltipButton title={t('navigation')} onClick={handleCursorClick} icon={<NavigationIcon />} />
+        <TooltipButton title={t('settings')} onClick={onOpenSettings} icon={<SettingsIcon />} />
 
         <HexPopper
           ref={searchPopperRef}
@@ -210,3 +167,25 @@ export const HexToolBar = React.memo(
     prevProps.cursorIndex === nextProps.cursorIndex
 );
 export default HexToolBar;
+
+const TooltipButton = React.memo(
+  ({
+    title = '',
+    icon = null,
+    onClick = () => null
+  }: {
+    title: string;
+    icon: React.ReactElement;
+    onClick?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  }) => {
+    const { toolbarClasses } = useStyles();
+
+    return (
+      <Tooltip title={title}>
+        <IconButton className={toolbarClasses.iconButton} aria-label={title} onClick={onClick} size="small">
+          {icon}
+        </IconButton>
+      </Tooltip>
+    );
+  }
+);
