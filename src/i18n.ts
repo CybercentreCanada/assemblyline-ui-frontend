@@ -13,6 +13,7 @@ import carouselEN from 'locales/en/carousel.json';
 import dashboardEN from 'locales/en/dashboard.json';
 import favoritesEN from 'locales/en/favorites.json';
 import fileDetailEN from 'locales/en/file/detail.json';
+import hexViewerEN from 'locales/en/file/hex.json';
 import fileViewerEN from 'locales/en/file/viewer.json';
 import helpAPIEN from 'locales/en/help/api.json';
 import helpClassificationEN from 'locales/en/help/classification.json';
@@ -56,6 +57,7 @@ import carouselFR from 'locales/fr/carousel.json';
 import dashboardFR from 'locales/fr/dashboard.json';
 import favoritesFR from 'locales/fr/favorites.json';
 import fileDetailFR from 'locales/fr/file/detail.json';
+import hexViewerFR from 'locales/fr/file/hex.json';
 import fileViewerFR from 'locales/fr/file/viewer.json';
 import helpAPIFR from 'locales/fr/help/api.json';
 import helpClassificationFR from 'locales/fr/help/classification.json';
@@ -107,6 +109,7 @@ const resources = {
     helpConfiguration: helpConfigurationEN,
     helpSearch: helpSearchEN,
     helpServices: helpServicesEN,
+    hexViewer: hexViewerEN,
     locked: lockedEN,
     login: loginEN,
     logout: logoutEN,
@@ -152,6 +155,7 @@ const resources = {
     helpConfiguration: helpConfigurationFR,
     helpSearch: helpSearchFR,
     helpServices: helpServicesFR,
+    hexViewer: hexViewerFR,
     locked: lockedFR,
     login: loginFR,
     logout: logoutFR,

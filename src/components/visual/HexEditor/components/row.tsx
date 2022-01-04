@@ -1,0 +1,98 @@
+import React, { useMemo } from 'react';
+import { HexItem, StoreState, useStyles } from '..';
+
+export type HexRowProps = {
+  isLightTheme?: boolean;
+  isLoaded?: boolean;
+  rowIndexes?: Array<number>;
+  store?: StoreState;
+  getValue?: (index: number) => string;
+  getColorClass?: (index: number) => string;
+  getBorderClass?: (index: number) => string;
+  getCursorClass?: (index: number) => string;
+  getSelectClass?: (index: number) => string;
+  getSearchClass?: (index: number) => string;
+  getSelectedSearchClass?: (index: number) => string;
+};
+
+export const WrappedHexRow = ({
+  isLightTheme,
+  isLoaded,
+  rowIndexes,
+  store,
+  getValue = (index: number) => null,
+  getColorClass = (index: number) => null,
+  getBorderClass = (index: number) => null,
+  getCursorClass = (index: number) => null,
+  getSelectClass = (index: number) => null,
+  getSearchClass = (index: number) => null,
+  getSelectedSearchClass = (index: number) => null
+}: HexRowProps) => {
+  const { hexClasses } = useStyles();
+
+  const itemValues: Array<string> = useMemo(() => rowIndexes.map(index => getValue(index)), [getValue, rowIndexes]);
+
+  const colorClasses: Array<string> = useMemo(
+    () => rowIndexes.map(index => getColorClass(index)),
+    [rowIndexes, getColorClass]
+  );
+  // const borderClasses: Array<string> = useMemo(
+  //   () => rowIndexes.map((index, j) => getBorderClass(j)),
+  //   [rowIndexes, getBorderClass]
+  // );
+  const cursorClasses: Array<string> = useMemo(
+    () => rowIndexes.map(index => getCursorClass(index)),
+    [rowIndexes, getCursorClass]
+  );
+  const selectClasses: Array<string> = useMemo(
+    () => rowIndexes.map(index => getSelectClass(index)),
+    [rowIndexes, getSelectClass]
+  );
+  const searchClasses: Array<string> = useMemo(
+    () => rowIndexes.map(index => getSearchClass(index)),
+    [rowIndexes, getSearchClass]
+  );
+  const selectedSearchClasses: Array<string> = useMemo(
+    () => rowIndexes.map(index => getSelectedSearchClass(index)),
+    [rowIndexes, getSelectedSearchClass]
+  );
+
+  return (
+    <div>
+      {rowIndexes.map((index, j) => (
+        <HexItem
+          key={index}
+          store={store}
+          index={index}
+          value={itemValues[j]}
+          colorClass={colorClasses[j]}
+          // borderClass={borderClasses[j]}
+          cursorClass={cursorClasses[j]}
+          selectClass={selectClasses[j]}
+          searchClass={searchClasses[j]}
+          selectedSearchClass={selectedSearchClasses[j]}
+          isLightTheme={isLightTheme}
+          isLoaded={isLoaded}
+          // getColorClass={getColorClass}
+        />
+      ))}
+      {/* <span>{'\n'}</span> */}
+    </div>
+  );
+};
+
+export const HexRow = React.memo(
+  WrappedHexRow,
+  (
+    prevProps: Readonly<React.PropsWithChildren<HexRowProps>>,
+    nextProps: Readonly<React.PropsWithChildren<HexRowProps>>
+  ) =>
+    prevProps.rowIndexes[0] === nextProps.rowIndexes[0] &&
+    prevProps.rowIndexes.length === nextProps.rowIndexes.length &&
+    // prevProps.rowIndexes.length === nextProps.rowIndexes.length &&
+    // prevProps.rowIndexes.includes(prevProps.store.cursorIndex) ===
+    //   nextProps.rowIndexes.includes(nextProps.store.cursorIndex) &&
+    // !nextProps.rowIndexes.includes(nextProps.store.cursorIndex) &&
+    prevProps.isLoaded === nextProps.isLoaded &&
+    prevProps.isLightTheme === nextProps.isLightTheme
+);
