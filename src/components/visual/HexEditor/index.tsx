@@ -4,6 +4,8 @@ export type { HexContainerProps } from './components/container';
 export { HexItem } from './components/item';
 export type { HexItemProps } from './components/item';
 export { HexOffsets } from './components/offsets';
+export { HexPopper } from './components/popper';
+export type { HexPopperProps } from './components/popper';
 export { HexRow } from './components/row';
 export type { HexRowProps } from './components/row';
 export { HexScrollBar } from './components/scrollbar';
@@ -34,5 +36,6 @@ export { StyleProvider, useStyles } from './hooks/useStyles';
 export type { StyleContextProps } from './hooks/useStyles';
 export { SuggestionProvider, useSuggestion } from './hooks/useSuggestion';
 export type { SuggestionContextProps, SuggestionType } from './hooks/useSuggestion';
+
 // export { useStore } from './store/useStoreOld';
 // export type { HexProps, StoreProps, StoreState } from './store/useStoreOld';
