@@ -10,7 +10,7 @@ import NavigationIcon from '@material-ui/icons/Navigation';
 import SettingsIcon from '@material-ui/icons/Settings';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import 'moment/locale/fr';
-import { default as React, useCallback, useRef } from 'react';
+import { default as React, useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   HexPopper,
@@ -26,7 +26,7 @@ import {
 
 export const WrappedHexToolBar = (states: StoreState) => {
   const { toolbarClasses } = useStyles();
-  const { t } = useTranslation(['hexViewer']);
+  const { t, i18n } = useTranslation(['hexViewer']);
   const theme = useTheme();
   const upXS = useMediaQuery(theme.breakpoints.up('xs'));
 
@@ -35,18 +35,27 @@ export const WrappedHexToolBar = (states: StoreState) => {
   const { onSearchKeyDown, onSearchClear, onSearchClick, onSearchIndexChange, onSearchInputChange } = useSearch();
   const { onCursorIndexChange } = useCursor();
   const { onHistoryChange, onHistoryKeyDown } = useHistory();
-  const { suggestionLabels, onSuggestionFocus, onSuggestionBlur, onSuggestionChange, onSuggestionInputChange } =
-    useSuggestion();
+  const {
+    suggestionLabels,
+    onSuggestionLabelChange,
+    onSuggestionFocus,
+    onSuggestionBlur,
+    onSuggestionChange,
+    onSuggestionInputChange
+  } = useSuggestion();
 
   const { cursorIndex, searchValue, searchIndexes, searchIndex, suggestionOpen } = states;
 
-  // Search
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [value, setValue] = useState<string>('');
+
   const searchPopperRef = useRef(null);
   const handleSearchClick = useCallback(event => searchPopperRef.current.open(event), []);
 
-  // Cursor
   const cursorPopperRef = useRef(null);
   const handleCursorClick = useCallback(event => cursorPopperRef.current.open(event), []);
+
+  useLayoutEffect(() => onSuggestionLabelChange(i18n.language), [i18n.language, onSuggestionLabelChange]);
 
   return (
     <div className={toolbarClasses.root}>
@@ -66,6 +75,7 @@ export const WrappedHexToolBar = (states: StoreState) => {
           closeIcon={null}
           fullWidth
           size="small"
+          value={value}
           options={suggestionLabels.current}
           onFocus={event => {
             onSuggestionFocus();
