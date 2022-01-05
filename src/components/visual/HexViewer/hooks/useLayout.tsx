@@ -4,7 +4,8 @@ import { HexProps, useHex, useStore } from '..';
 export type LayoutContextProps = {
   nextLayoutRow?: React.MutableRefObject<number>;
   nextLayoutColumns?: React.MutableRefObject<number>;
-  nextSettingsOpen?: React.MutableRefObject<boolean>;
+  nextLayoutAutoRow?: React.MutableRefObject<boolean>;
+  nextLayoutAutoColumns?: React.MutableRefObject<boolean>;
   isContainerFocused?: React.MutableRefObject<boolean>;
 
   layoutRef?: React.MutableRefObject<HTMLDivElement>;
@@ -14,20 +15,20 @@ export type LayoutContextProps = {
 
   onLayoutInit?: () => void;
   onLayoutResize?: () => void;
-  onOpenSettings?: () => void;
-  onCloseSettings?: () => void;
+  onLayoutColumnsChange?: (columns: number) => void;
   onContainerMouseDown: (event: MouseEvent) => void;
 };
 
 export const LayoutContext = React.createContext<LayoutContextProps>(null);
 
 export const WrappedLayoutProvider = ({ children }: HexProps) => {
-  const { setLayoutRows, setLayoutColumns, setSettingsOpen } = useStore();
+  const { setLayoutRows, setLayoutColumns } = useStore();
   const { hexOffsetSize, onHexOffsetSizeChange } = useHex();
 
   const nextLayoutRow = useRef<number>(50);
   const nextLayoutColumns = useRef<number>(16);
-  const nextSettingsOpen = useRef<boolean>(false);
+  const nextLayoutAutoRow = useRef<boolean>(false);
+  const nextLayoutAutoColumns = useRef<boolean>(false);
   const isContainerFocused = useRef<boolean>(false);
 
   const hexesContainerRefs = useRef<HTMLDivElement>(null);
@@ -74,25 +75,22 @@ export const WrappedLayoutProvider = ({ children }: HexProps) => {
   const onLayoutInit = useCallback(() => {
     setLayoutRows(nextLayoutRow.current);
     setLayoutColumns(nextLayoutColumns.current);
-    setSettingsOpen(nextSettingsOpen.current);
-  }, [setLayoutColumns, setLayoutRows, setSettingsOpen]);
+  }, [setLayoutColumns, setLayoutRows]);
 
   const onLayoutResize = useCallback(() => {
     if (layoutRef.current === null || layoutRef.current === undefined) return;
-    handleRowResize();
-    handleColumnResize();
+    nextLayoutAutoRow.current && handleRowResize();
+    nextLayoutAutoColumns.current && handleColumnResize();
     handleOffsetResize();
   }, [handleColumnResize, handleOffsetResize, handleRowResize]);
 
-  const onOpenSettings = useCallback(() => {
-    nextSettingsOpen.current = true;
-    setSettingsOpen(true);
-  }, [setSettingsOpen]);
-
-  const onCloseSettings = useCallback(() => {
-    nextSettingsOpen.current = false;
-    setSettingsOpen(false);
-  }, [setSettingsOpen]);
+  const onLayoutColumnsChange = useCallback(
+    (columns: number) => {
+      nextLayoutColumns.current = columns;
+      setLayoutColumns(columns);
+    },
+    [setLayoutColumns]
+  );
 
   const onContainerMouseDown = useCallback(
     event =>
@@ -106,7 +104,8 @@ export const WrappedLayoutProvider = ({ children }: HexProps) => {
       value={{
         nextLayoutRow,
         nextLayoutColumns,
-        nextSettingsOpen,
+        nextLayoutAutoRow,
+        nextLayoutAutoColumns,
         isContainerFocused,
         layoutRef,
         containerRefs,
@@ -114,8 +113,7 @@ export const WrappedLayoutProvider = ({ children }: HexProps) => {
         textsContainerRefs,
         onLayoutInit,
         onLayoutResize,
-        onOpenSettings,
-        onCloseSettings,
+        onLayoutColumnsChange,
         onContainerMouseDown
       }}
     >

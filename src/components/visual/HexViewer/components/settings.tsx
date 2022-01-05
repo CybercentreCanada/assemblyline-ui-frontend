@@ -2,16 +2,25 @@ import { Grid, TextField, Typography } from '@material-ui/core';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import { default as React } from 'react';
+import FormControl from '@material-ui/core/FormControl';
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import { default as React, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StoreState, useLayout, useStore } from '..';
+import { StoreState, useSetting, useStore } from '..';
 
 export const WrappedHexSettings = (states: StoreState) => {
   const { t } = useTranslation(['adminServices']);
-  const { onCloseSettings } = useLayout();
-
+  const { nextSettingValue, nextSettingValues, onSettingClose, onSettingColumnsChange } = useSetting();
   const { setLayoutColumns, setHexBase } = useStore();
-  const { settingsOpen, layoutColumns, hexBase } = states;
+  const { settingsOpen, layoutColumns, hexBase, isLoaded } = states;
+
+  const [columns, setColumns] = useState<string>(null);
+
+  useEffect(() => {
+    setColumns(nextSettingValue.current.columns);
+  }, [isLoaded, nextSettingValue]);
 
   const handleColumnsChange = event => setLayoutColumns(parseInt(event.target.value));
 
@@ -19,7 +28,7 @@ export const WrappedHexSettings = (states: StoreState) => {
     <div>
       <Dialog
         open={settingsOpen}
-        onClose={() => onCloseSettings()}
+        onClose={() => onSettingClose()}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
@@ -31,6 +40,15 @@ export const WrappedHexSettings = (states: StoreState) => {
             </Grid>
             <Grid item xs={12}>
               <Grid container spacing={1} alignItems="center">
+                <HexSelect
+                  label="Age"
+                  items={nextSettingValues.current.columns}
+                  value={columns}
+                  onChange={event => {
+                    onSettingColumnsChange(event.target.value as string);
+                    setColumns(event.target.value as string);
+                  }}
+                />
                 <Grid item xs={10} sm={3} style={{ wordBreak: 'break-word' }}>
                   {'rows [int]:'}
                 </Grid>
@@ -139,3 +157,65 @@ export const HexSettings = React.memo(
     prevProps.hexBase === nextProps.hexBase
 );
 export default HexSettings;
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    button: {
+      display: 'block',
+      marginTop: theme.spacing(2)
+    },
+    formControl: {
+      margin: theme.spacing(1),
+      minWidth: 120
+    }
+  })
+);
+
+const HexSelect = ({
+  label = '',
+  items = [],
+  value = '',
+  onChange = () => null
+}: {
+  label?: string;
+  items?: Array<string>;
+  value?: string;
+  onChange?: (
+    event: React.ChangeEvent<{
+      name?: string;
+      value: unknown;
+    }>
+  ) => void;
+}) => {
+  const classes = useStyles();
+  const [open, setOpen] = React.useState(false);
+  const handleClose = () => setOpen(false);
+  const handleOpen = () => setOpen(true);
+  return (
+    <>
+      <Grid item xs={10} sm={3} style={{ wordBreak: 'break-word' }}>
+        {label}
+      </Grid>
+      <Grid item xs={10} sm={9}>
+        <FormControl className={classes.formControl}>
+          <Select
+            open={open}
+            onOpen={handleOpen}
+            onClose={handleClose}
+            value={value}
+            onChange={onChange}
+            fullWidth
+            variant="outlined"
+            autoWidth
+          >
+            {items.map(item => (
+              <MenuItem key={item} value={item}>
+                {item}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+    </>
+  );
+};
