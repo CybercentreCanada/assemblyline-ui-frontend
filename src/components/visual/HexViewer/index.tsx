@@ -24,6 +24,8 @@ export { HoverProvider, useHover } from './hooks/useHover';
 export type { HoverContextProps } from './hooks/useHover';
 export { LayoutProvider, useLayout } from './hooks/useLayout';
 export type { LayoutContextProps } from './hooks/useLayout';
+export { LocationProvider, useLocation } from './hooks/useLocation';
+export type { LocationContextProps } from './hooks/useLocation';
 export { ScrollProvider, useScroll } from './hooks/useScroll';
 export type { ScrollContextProps } from './hooks/useScroll';
 export { SearchProvider, useSearch } from './hooks/useSearch';

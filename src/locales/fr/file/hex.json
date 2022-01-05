@@ -11,5 +11,6 @@
   "navigation-label": "Adresse du curseur :",
   "navigation-placeholder": "Ex: 001",
   "settings": "Configurer les paramètres",
-  "no-results": "Aucun résultat"
+  "no-results": "Aucun résultat",
+  "share": "Partager le URL"
 }
