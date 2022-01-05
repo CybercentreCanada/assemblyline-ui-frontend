@@ -18,6 +18,7 @@ import {
   useScroll,
   useSearch,
   useSelect,
+  useSetting,
   useStateStore,
   useStore,
   useStyles
@@ -40,6 +41,7 @@ export const WrappedHexMain = ({ data }: DataProps) => {
   const { nextSearchQuery, nextSearchIndexes, nextSearchIndex } = useSearch();
   const { onHoverMouseUp } = useHover();
   const { onCopyKeyDown, onCopyMouseEnter } = useCopy();
+  const { onSettingLoad, onSettingSave } = useSetting();
   const { onHistoryLoad, onHistorySave } = useHistory();
   const {
     onScrollWheel,
@@ -72,7 +74,11 @@ export const WrappedHexMain = ({ data }: DataProps) => {
     onScrollResize();
 
     onHistoryLoad();
-    return () => onHistorySave();
+    onSettingLoad();
+    return () => {
+      onHistorySave();
+      onSettingSave();
+    };
   }, [
     data,
     onHexInit,
@@ -82,6 +88,8 @@ export const WrappedHexMain = ({ data }: DataProps) => {
     onLayoutResize,
     onScrollInit,
     onScrollResize,
+    onSettingLoad,
+    onSettingSave,
     onStoreInit
   ]);
 

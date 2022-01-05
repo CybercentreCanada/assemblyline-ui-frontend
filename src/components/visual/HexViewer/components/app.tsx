@@ -11,6 +11,7 @@ import {
   ScrollProvider,
   SearchProvider,
   SelectProvider,
+  SettingProvider,
   StoreProvider,
   StyleProvider,
   SuggestionProvider
@@ -35,7 +36,9 @@ export default React.memo(({ data }: DataProps) =>
                         <HistoryProvider>
                           <CopyProvider>
                             <LocationProvider>
-                              <HexMain data={data} />
+                              <SettingProvider>
+                                <HexMain data={data} />
+                              </SettingProvider>
                             </LocationProvider>
                           </CopyProvider>
                         </HistoryProvider>

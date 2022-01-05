@@ -19,9 +19,9 @@ import {
   useCursor,
   useHex,
   useHistory,
-  useLayout,
   useLocation,
   useSearch,
+  useSetting,
   useStyles,
   useSuggestion
 } from '..';
@@ -33,7 +33,7 @@ export const WrappedHexToolBar = (states: StoreState) => {
   const upXS = useMediaQuery(theme.breakpoints.up('xs'));
 
   const { hexMap } = useHex();
-  const { onOpenSettings } = useLayout();
+  const { onSettingOpen } = useSetting();
   const { onSearchKeyDown, onSearchClear, onSearchClick, onSearchIndexChange, onSearchInputChange } = useSearch();
   const { onCursorIndexChange } = useCursor();
   const { onHistoryChange, onHistoryKeyDown } = useHistory();
@@ -145,7 +145,7 @@ export const WrappedHexToolBar = (states: StoreState) => {
         <Divider className={toolbarClasses.divider} orientation="vertical" />
         <TooltipButton title={t('navigation')} onClick={handleCursorClick} icon={<NavigationIcon />} />
         <TooltipButton title={t('share')} onClick={onLocationShare} icon={<ShareIcon />} />
-        <TooltipButton title={t('settings')} onClick={onOpenSettings} icon={<SettingsIcon />} />
+        <TooltipButton title={t('settings')} onClick={onSettingOpen} icon={<SettingsIcon />} />
 
         <HexPopper
           ref={searchPopperRef}

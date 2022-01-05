@@ -76,8 +76,10 @@ export const WrappedHistoryProvider = ({ children }: HexProps) => {
 
   const onHistoryLoad = useCallback(() => {
     const value = localStorage.getItem('hexViewer.history');
-    const json = value !== null && value !== '' ? JSON.parse(value) : null;
-    nextHistoryValues.current = Array.isArray(json) ? json : [];
+    const json = JSON.parse(value);
+    if (value === null || value === '' || !Array.isArray(json)) return;
+
+    nextHistoryValues.current = json;
     nextHistoryIndex.current = 0;
 
     if (nextHistoryShowLastValue.current)

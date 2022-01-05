@@ -32,6 +32,8 @@ export { SearchProvider, useSearch } from './hooks/useSearch';
 export type { SearchContextProps } from './hooks/useSearch';
 export { SelectProvider, useSelect } from './hooks/useSelect';
 export type { SelectContextProps } from './hooks/useSelect';
+export { SettingProvider, useSetting } from './hooks/useSetting';
+export type { SettingContextProps } from './hooks/useSetting';
 export { StoreProvider, useStateStore, useStore } from './hooks/useStore';
 export type { HexProps, StateStoreContext, StoreContextProps, StoreSetState, StoreState } from './hooks/useStore';
 export { StyleProvider, useStyles } from './hooks/useStyles';
