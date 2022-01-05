@@ -27,10 +27,14 @@ export const WrappedCursorProvider = ({ children }: HexProps) => {
   const mouseHoverIndex = useRef<number>(null);
   const isCursorMoving = useRef<boolean>(false);
 
-  const clampCursor = useCallback(() => {
-    if (nextCursorIndex.current < 0) nextCursorIndex.current = 0;
-    else if (nextCursorIndex.current >= hexMap.current.size) return hexMap.current.size - 1;
-  }, [hexMap]);
+  const clampCursor = useCallback(
+    (index: number) => {
+      if (index < 0) return 0;
+      else if (index >= hexMap.current.size) return hexMap.current.size - 1;
+      else return index;
+    },
+    [hexMap]
+  );
 
   const handleCursorIndexChange = useCallback(
     (index: number, cursorMoving: boolean) => {
@@ -85,7 +89,7 @@ export const WrappedCursorProvider = ({ children }: HexProps) => {
       else if (isArrowUp(keyCode)) newCursorIndex -= nextLayoutColumns.current;
       else if (isArrowDown(keyCode)) newCursorIndex += nextLayoutColumns.current;
 
-      clampCursor();
+      newCursorIndex = clampCursor(newCursorIndex);
       onScrollToCursor(newCursorIndex);
       handleCursorChange(newCursorIndex);
     },
@@ -96,14 +100,12 @@ export const WrappedCursorProvider = ({ children }: HexProps) => {
 
   const onCursorIndexChange = useCallback(
     (index: number) => {
-      // const index = parseInt(event.target.value);
-      if (isNaN(index) || index < 0 || index >= hexMap.current.size) return;
-      // nextCursorIndex.current = index;
-      // clampCursor();
-      onScrollToCursor(index);
-      handleCursorChange(index);
+      if (typeof index !== 'number' || isNaN(index)) return;
+      const newCursorIndex = clampCursor(index);
+      onScrollToCursor(newCursorIndex);
+      handleCursorChange(newCursorIndex);
     },
-    [handleCursorChange, hexMap, onScrollToCursor]
+    [clampCursor, handleCursorChange, onScrollToCursor]
   );
 
   return (
