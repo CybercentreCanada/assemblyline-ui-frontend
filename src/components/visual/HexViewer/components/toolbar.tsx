@@ -8,6 +8,7 @@ import ArrowUpward from '@material-ui/icons/ArrowUpward';
 import ClearIcon from '@material-ui/icons/Clear';
 import NavigationIcon from '@material-ui/icons/Navigation';
 import SettingsIcon from '@material-ui/icons/Settings';
+import ShareIcon from '@material-ui/icons/Share';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import 'moment/locale/fr';
 import { default as React, useCallback, useLayoutEffect, useRef, useState } from 'react';
@@ -19,6 +20,7 @@ import {
   useHex,
   useHistory,
   useLayout,
+  useLocation,
   useSearch,
   useStyles,
   useSuggestion
@@ -35,6 +37,7 @@ export const WrappedHexToolBar = (states: StoreState) => {
   const { onSearchKeyDown, onSearchClear, onSearchClick, onSearchIndexChange, onSearchInputChange } = useSearch();
   const { onCursorIndexChange } = useCursor();
   const { onHistoryChange, onHistoryKeyDown } = useHistory();
+  const { onLocationShare } = useLocation();
   const {
     suggestionLabels,
     onSuggestionLabelChange,
@@ -139,6 +142,7 @@ export const WrappedHexToolBar = (states: StoreState) => {
         <TooltipButton title={t('clear')} onClick={onSearchClear} icon={<ClearIcon />} />
         <Divider className={toolbarClasses.divider} orientation="vertical" />
         <TooltipButton title={t('navigation')} onClick={handleCursorClick} icon={<NavigationIcon />} />
+        <TooltipButton title={t('share')} onClick={onLocationShare} icon={<ShareIcon />} />
         <TooltipButton title={t('settings')} onClick={onOpenSettings} icon={<SettingsIcon />} />
 
         <HexPopper

@@ -6,6 +6,7 @@ export type CopyContextProps = {
   onCopyKeyDown?: (event: KeyboardEvent) => void;
   onCopyMouseEnter?: (index: number) => void;
   onCopyMouseLeave?: () => void;
+  onCopyText?: (text: string) => void;
 };
 
 export const CopyContext = React.createContext<CopyContextProps>(null);
@@ -55,12 +56,15 @@ export const WrappedCopyProvider = ({ children }: HexProps) => {
 
   const onCopyMouseLeave = useCallback(() => (selectedContainerIndex.current = null), []);
 
+  const onCopyText = useCallback((text: string) => copy(text), [copy]);
+
   return (
     <CopyContext.Provider
       value={{
         onCopyKeyDown,
         onCopyMouseEnter,
-        onCopyMouseLeave
+        onCopyMouseLeave,
+        onCopyText
       }}
     >
       {useMemo(() => children, [children])}

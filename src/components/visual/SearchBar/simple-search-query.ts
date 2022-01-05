@@ -66,6 +66,12 @@ export default class SimpleSearchQuery {
     this.params.delete(key);
   }
 
+  public deleteAll() {
+    let keys = [];
+    this.params.forEach((value, key) => keys.push(key));
+    keys.forEach(key => this.params.delete(key));
+  }
+
   public has(key: string): boolean {
     return this.params.has(key);
   }

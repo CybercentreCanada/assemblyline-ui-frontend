@@ -7,6 +7,7 @@ import {
   HistoryProvider,
   HoverProvider,
   LayoutProvider,
+  LocationProvider,
   ScrollProvider,
   SearchProvider,
   SelectProvider,
@@ -33,7 +34,9 @@ export default React.memo(({ data }: DataProps) =>
                       <SuggestionProvider>
                         <HistoryProvider>
                           <CopyProvider>
-                            <HexApp data={data} />
+                            <LocationProvider>
+                              <HexApp data={data} />
+                            </LocationProvider>
                           </CopyProvider>
                         </HistoryProvider>
                       </SuggestionProvider>
@@ -51,6 +54,8 @@ export default React.memo(({ data }: DataProps) =>
 
 /**
  * To Do:
+ *
+ * change the hexViewwer to main.tsx and remove store
  *
  * 1. done - Clean the useSearch
  * 2. Add the translation
