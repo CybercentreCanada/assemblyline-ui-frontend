@@ -1,8 +1,9 @@
-export { HexApp } from './components/app';
+export { default as HexViewerApp } from './components/app';
 export { HexContainer } from './components/container';
 export type { HexContainerProps } from './components/container';
 export { HexItem } from './components/item';
 export type { HexItemProps } from './components/item';
+export { HexMain } from './components/main';
 export { HexOffsets } from './components/offsets';
 export { HexPopper } from './components/popper';
 export type { HexPopperProps } from './components/popper';
@@ -11,7 +12,6 @@ export type { HexRowProps } from './components/row';
 export { HexScrollBar } from './components/scrollbar';
 export { HexSettings } from './components/settings';
 export { HexToolBar } from './components/toolbar';
-export { default as HexViewerApp } from './hexViewer';
 export { CopyProvider, useCopy } from './hooks/useCopy';
 export type { CopyContextProps } from './hooks/useCopy';
 export { CursorProvider, useCursor } from './hooks/useCursor';
