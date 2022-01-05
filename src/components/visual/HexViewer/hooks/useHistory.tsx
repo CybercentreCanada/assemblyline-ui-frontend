@@ -3,6 +3,7 @@ import { default as React, useCallback, useContext, useMemo, useRef } from 'reac
 import { HexProps, useLayout, useSearch, useStore, useSuggestion } from '..';
 
 export type HistoryContextProps = {
+  nextHistoryShowLastValue?: React.MutableRefObject<boolean>;
   onHistoryChange?: () => boolean;
   onHistoryKeyDown?: (event: React.KeyboardEvent<HTMLElement>) => void;
   onHistorySave?: () => void;
@@ -20,6 +21,7 @@ export const WrappedHistoryProvider = ({ children }: HexProps) => {
   const inputChanged = useRef<boolean>(false);
   const nextHistoryValues = useRef<Array<string>>([]);
   const nextHistoryIndex = useRef<number>(0);
+  const nextHistoryShowLastValue = useRef<boolean>(false);
 
   const clampHistoryIndex = useCallback(() => {
     if (nextHistoryIndex.current < 0) nextHistoryIndex.current = 0;
@@ -77,8 +79,9 @@ export const WrappedHistoryProvider = ({ children }: HexProps) => {
     const json = value !== null && value !== '' ? JSON.parse(value) : null;
     nextHistoryValues.current = Array.isArray(json) ? json : [];
     nextHistoryIndex.current = 0;
-    const searchValue = nextHistoryValues.current.length > 0 ? nextHistoryValues.current[nextHistoryIndex.current] : '';
-    onSearchLoad(searchValue);
+
+    if (nextHistoryShowLastValue.current)
+      onSearchLoad(nextHistoryValues.current.length > 0 ? nextHistoryValues.current[nextHistoryIndex.current] : '');
 
     setIsLoaded(true);
   }, [onSearchLoad, setIsLoaded]);
@@ -93,6 +96,7 @@ export const WrappedHistoryProvider = ({ children }: HexProps) => {
   return (
     <HistoryContext.Provider
       value={{
+        nextHistoryShowLastValue,
         onHistoryChange,
         onHistoryKeyDown,
         onHistoryLoad,
