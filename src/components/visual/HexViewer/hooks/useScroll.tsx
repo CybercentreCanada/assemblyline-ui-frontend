@@ -7,19 +7,18 @@ export type ScrollContextProps = {
   nextScrollMaxIndex?: React.MutableRefObject<number>;
   nextIsSliding?: React.MutableRefObject<boolean>;
   isScrolling?: React.MutableRefObject<boolean>;
-  handleScrollChange: () => void;
+  getScrollOffsetIndex?: () => number;
   onScrollInit?: () => void;
   onScrollChange?: (state: 'scrollUp' | 'scrollDown' | 'setScroll', value: number) => void;
   onScrollWheel?: (event: React.WheelEvent<HTMLDivElement>) => void;
   onScrollClick?: (value: number) => void;
   onScrollSliderChange?: (value: number) => void;
   onScrollSliderMouseDown?: () => void;
-  onScrollSliderMouseUp: () => void;
-  onScrollTouchStart: (event: React.TouchEvent<HTMLDivElement>) => void;
-  onScrollTouchMove: (event: React.TouchEvent<HTMLDivElement>) => void;
-  onScrollTouchEnd: (event: React.TouchEvent<HTMLDivElement>) => void;
-  onScrollToCursor?: (index: number) => void;
-  onScrollToSearchIndex?: (index: number) => void;
+  onScrollSliderMouseUp?: () => void;
+  onScrollTouchStart?: (event: React.TouchEvent<HTMLDivElement>) => void;
+  onScrollTouchMove?: (event: React.TouchEvent<HTMLDivElement>) => void;
+  onScrollTouchEnd?: (event: React.TouchEvent<HTMLDivElement>) => void;
+  onScrollOffsetChange?: (index: number, location: 'top' | 'middle' | 'bottom' | 'include' | 'include-middle') => void;
   onScrollResize?: () => void;
 };
 
@@ -27,7 +26,7 @@ export const ScrollContext = React.createContext<ScrollContextProps>(null);
 
 export const WrappedScrollProvider = ({ children }: HexProps) => {
   const { setScrollIndex, setScrollSpeed, setIsSliding } = useStore();
-  const { hexMap } = useHex();
+  const { hexMap, onHexIndexClamp } = useHex();
   const { nextLayoutColumns, nextLayoutRow } = useLayout();
 
   const nextScrollIndex = useRef<number>(0);
@@ -44,6 +43,25 @@ export const WrappedScrollProvider = ({ children }: HexProps) => {
       nextScrollIndex.current = nextScrollMaxIndex.current - 1;
   }, []);
 
+  const clampOffsetIndex = useCallback(
+    (offsetIndex: number) => {
+      if (offsetIndex < nextScrollIndex.current) return offsetIndex;
+      else if (offsetIndex >= nextScrollIndex.current + nextLayoutRow.current - 1)
+        return offsetIndex - nextLayoutRow.current + 1;
+      else return nextScrollIndex.current;
+    },
+    [nextLayoutRow]
+  );
+
+  const isOffsetClamped = useCallback(
+    (offsetIndex: number) => {
+      if (offsetIndex < nextScrollIndex.current) return true;
+      else if (offsetIndex >= nextScrollIndex.current + nextLayoutRow.current - 1) return true;
+      return false;
+    },
+    [nextLayoutRow]
+  );
+
   const handleScrollIndexChange = useCallback(
     (scrolling: boolean) => {
       setScrollIndex(nextScrollIndex.current);
@@ -58,6 +76,11 @@ export const WrappedScrollProvider = ({ children }: HexProps) => {
     setTimeout(() => handleScrollIndexChange(false), 50);
     handleScrollIndexChange(true);
   }, [handleScrollIndexChange]);
+
+  const getScrollOffsetIndex = useCallback(
+    () => nextScrollIndex.current * nextLayoutColumns.current,
+    [nextLayoutColumns]
+  );
 
   const onScrollInit = useCallback(() => {
     setScrollIndex(nextScrollIndex.current);
@@ -140,30 +163,36 @@ export const WrappedScrollProvider = ({ children }: HexProps) => {
     [clampScrollIndex, handleScrollChange]
   );
 
-  const onScrollToCursor = useCallback(
-    (index: number) => {
-      let cursorRow = Math.floor(index / nextLayoutColumns.current);
-      if (cursorRow <= nextScrollIndex.current) nextScrollIndex.current = cursorRow;
-      else if (cursorRow >= nextScrollIndex.current + nextLayoutRow.current - 1)
-        nextScrollIndex.current = cursorRow - nextLayoutRow.current + 1;
-      clampScrollIndex();
+  const onScrollOffsetChange = useCallback(
+    (index: number, location: 'top' | 'middle' | 'bottom' | 'include' | 'include-middle') => {
+      if (isNaN(index)) return;
+      const clampedIndex = onHexIndexClamp(index);
 
-      handleScrollChange();
-    },
-    [clampScrollIndex, handleScrollChange, nextLayoutColumns, nextLayoutRow]
-  );
+      if (location === 'top') {
+        nextScrollIndex.current = Math.floor(clampedIndex / nextLayoutColumns.current);
+      } else if (location === 'middle') {
+        nextScrollIndex.current = Math.floor(clampedIndex / nextLayoutColumns.current - nextLayoutRow.current / 2);
+      } else if (location === 'bottom') {
+        nextScrollIndex.current = Math.floor(clampedIndex / nextLayoutColumns.current - nextLayoutRow.current);
+      } else if (location === 'include') {
+        nextScrollIndex.current = clampOffsetIndex(Math.floor(clampedIndex / nextLayoutColumns.current));
+      } else if (location === 'include-middle') {
+        if (isOffsetClamped(Math.floor(clampedIndex / nextLayoutColumns.current)))
+          nextScrollIndex.current = Math.floor(clampedIndex / nextLayoutColumns.current - nextLayoutRow.current / 2);
+      }
 
-  const onScrollToSearchIndex = useCallback(
-    (index: number) => {
-      // let searchRow = Math.floor(index / nextLayoutColumns.current - nextLayoutRow.current / 2);
-      let searchRow = Math.floor(index / nextLayoutColumns.current);
-
-      if (searchRow <= nextScrollIndex.current || searchRow >= nextScrollIndex.current + nextLayoutRow.current - 1)
-        nextScrollIndex.current = Math.floor(searchRow - nextLayoutRow.current / 2);
       clampScrollIndex();
       handleScrollChange();
     },
-    [clampScrollIndex, handleScrollChange, nextLayoutColumns, nextLayoutRow]
+    [
+      clampOffsetIndex,
+      clampScrollIndex,
+      handleScrollChange,
+      isOffsetClamped,
+      nextLayoutColumns,
+      nextLayoutRow,
+      onHexIndexClamp
+    ]
   );
 
   const onScrollResize = useCallback(() => {
@@ -180,7 +209,7 @@ export const WrappedScrollProvider = ({ children }: HexProps) => {
         nextScrollMaxIndex,
         nextIsSliding,
         isScrolling,
-        handleScrollChange,
+        getScrollOffsetIndex,
         onScrollInit,
         onScrollChange,
         onScrollWheel,
@@ -191,8 +220,7 @@ export const WrappedScrollProvider = ({ children }: HexProps) => {
         onScrollTouchStart,
         onScrollTouchMove,
         onScrollTouchEnd,
-        onScrollToCursor,
-        onScrollToSearchIndex,
+        onScrollOffsetChange,
         onScrollResize
       }}
     >

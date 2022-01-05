@@ -20,7 +20,7 @@ export const WrappedCursorProvider = ({ children }: HexProps) => {
   const { onHexIndexClamp } = useHex();
   const { isContainerFocused, nextLayoutColumns } = useLayout();
   const { itemClasses, addContainerClass, removeContainerClass } = useStyles();
-  const { onScrollToCursor } = useScroll();
+  const { onScrollOffsetChange } = useScroll();
 
   const nextCursorIndex = useRef<number>(null);
   const mouseDownIndex = useRef<number>(null);
@@ -81,10 +81,10 @@ export const WrappedCursorProvider = ({ children }: HexProps) => {
       else if (isArrowDown(keyCode)) newCursorIndex += nextLayoutColumns.current;
 
       newCursorIndex = onHexIndexClamp(newCursorIndex);
-      onScrollToCursor(newCursorIndex);
+      onScrollOffsetChange(newCursorIndex, 'include');
       handleCursorChange(newCursorIndex);
     },
-    [isContainerFocused, nextLayoutColumns, onHexIndexClamp, onScrollToCursor, handleCursorChange]
+    [isContainerFocused, nextLayoutColumns, onHexIndexClamp, onScrollOffsetChange, handleCursorChange]
   );
 
   const onCursorClear = useCallback(() => handleCursorChange(null), [handleCursorChange]);
