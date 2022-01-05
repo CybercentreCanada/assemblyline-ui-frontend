@@ -18,6 +18,7 @@ export type HexContextProps = {
   toHexChar?: (hex: string) => string;
   onHexInit?: (data: string) => void;
   onHexOffsetSizeChange?: (size: number) => void;
+  onHexIndexClamp?: (index: number) => number;
 };
 
 export const HexContext = React.createContext<HexContextProps>(null);
@@ -119,6 +120,12 @@ export const WrappedHexProvider = ({ children }: HexProps) => {
     [setHexOffsetSize]
   );
 
+  const onHexIndexClamp = useCallback((index: number) => {
+    if (index < 0) return 0;
+    else if (index >= hexMap.current.size) return hexMap.current.size - 1;
+    else return index;
+  }, []);
+
   // const parseStringToHex = useCallback((text: string) => {
   //   let newMap = new Map();
   //   text.split(/[ ]+/).forEach((hex, index) => {
@@ -169,7 +176,8 @@ export const WrappedHexProvider = ({ children }: HexProps) => {
         getAddressValue,
         toHexChar,
         onHexInit,
-        onHexOffsetSizeChange
+        onHexOffsetSizeChange,
+        onHexIndexClamp
       }}
     >
       {useMemo(() => children, [children])}

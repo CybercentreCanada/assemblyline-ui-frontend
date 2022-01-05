@@ -17,7 +17,7 @@ export const CursorContext = React.createContext<CursorContextProps>(null);
 
 export const WrappedCursorProvider = ({ children }: HexProps) => {
   const { setCursorIndex } = useStore();
-  const { hexMap } = useHex();
+  const { onHexIndexClamp } = useHex();
   const { isContainerFocused, nextLayoutColumns } = useLayout();
   const { itemClasses, addContainerClass, removeContainerClass } = useStyles();
   const { onScrollToCursor } = useScroll();
@@ -26,15 +26,6 @@ export const WrappedCursorProvider = ({ children }: HexProps) => {
   const mouseDownIndex = useRef<number>(null);
   const mouseHoverIndex = useRef<number>(null);
   const isCursorMoving = useRef<boolean>(false);
-
-  const clampCursor = useCallback(
-    (index: number) => {
-      if (index < 0) return 0;
-      else if (index >= hexMap.current.size) return hexMap.current.size - 1;
-      else return index;
-    },
-    [hexMap]
-  );
 
   const handleCursorIndexChange = useCallback(
     (index: number, cursorMoving: boolean) => {
@@ -89,23 +80,23 @@ export const WrappedCursorProvider = ({ children }: HexProps) => {
       else if (isArrowUp(keyCode)) newCursorIndex -= nextLayoutColumns.current;
       else if (isArrowDown(keyCode)) newCursorIndex += nextLayoutColumns.current;
 
-      newCursorIndex = clampCursor(newCursorIndex);
+      newCursorIndex = onHexIndexClamp(newCursorIndex);
       onScrollToCursor(newCursorIndex);
       handleCursorChange(newCursorIndex);
     },
-    [isContainerFocused, nextLayoutColumns, clampCursor, onScrollToCursor, handleCursorChange]
+    [isContainerFocused, nextLayoutColumns, onHexIndexClamp, onScrollToCursor, handleCursorChange]
   );
 
   const onCursorClear = useCallback(() => handleCursorChange(null), [handleCursorChange]);
 
   const onCursorIndexChange = useCallback(
     (index: number) => {
-      if (typeof index !== 'number' || isNaN(index)) return;
-      const newCursorIndex = clampCursor(index);
+      if (isNaN(index)) return;
+      const newCursorIndex = onHexIndexClamp(index);
       onScrollToCursor(newCursorIndex);
       handleCursorChange(newCursorIndex);
     },
-    [clampCursor, handleCursorChange, onScrollToCursor]
+    [onHexIndexClamp, handleCursorChange, onScrollToCursor]
   );
 
   return (
