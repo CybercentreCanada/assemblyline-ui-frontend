@@ -29,7 +29,7 @@ export const WrappedSearchProvider = ({ children }: HexProps) => {
   const { hexData } = useHex();
   const { nextLayoutColumns, nextLayoutRow } = useLayout();
   const { parseStringToHexString } = useHex();
-  const { nextScrollIndex, onScrollToSearchIndex } = useScroll();
+  const { nextScrollIndex, onScrollOffsetChange } = useScroll();
   const { nextCursorIndex } = useCursor();
   const {
     itemClasses,
@@ -191,7 +191,7 @@ export const WrappedSearchProvider = ({ children }: HexProps) => {
       handleSearchIndexChange(searchIndex);
       handleRemoveSelectedSearchClass();
       handleAddSelectedSearchClass();
-      onScrollToSearchIndex(nextSearchIndexes.current[nextSearchIndex.current]);
+      onScrollOffsetChange(nextSearchIndexes.current[nextSearchIndex.current], 'include-middle');
       handleSearchUpdate();
     },
     [
@@ -199,7 +199,7 @@ export const WrappedSearchProvider = ({ children }: HexProps) => {
       handleRemoveSelectedSearchClass,
       handleSearchIndexChange,
       handleSearchUpdate,
-      onScrollToSearchIndex
+      onScrollOffsetChange
     ]
   );
 
@@ -285,7 +285,7 @@ export const WrappedSearchProvider = ({ children }: HexProps) => {
       handleSearchIndexChange(value);
       handleRemoveSelectedSearchClass();
       handleAddSelectedSearchClass();
-      onScrollToSearchIndex(nextSearchIndexes.current[nextSearchIndex.current]);
+      onScrollOffsetChange(nextSearchIndexes.current[nextSearchIndex.current], 'include-middle');
       handleSearchUpdate();
     },
     [
@@ -293,7 +293,7 @@ export const WrappedSearchProvider = ({ children }: HexProps) => {
       handleRemoveSelectedSearchClass,
       handleSearchIndexChange,
       handleSearchUpdate,
-      onScrollToSearchIndex
+      onScrollOffsetChange
     ]
   );
 
@@ -345,10 +345,10 @@ export const WrappedSearchProvider = ({ children }: HexProps) => {
 
       handleRemoveSelectedSearchClass();
       handleAddSelectedSearchClass();
-      onScrollToSearchIndex(nextSearchIndexes.current[nextSearchIndex.current]);
+      onScrollOffsetChange(nextSearchIndexes.current[nextSearchIndex.current], 'include-middle');
       handleSearchUpdate();
     },
-    [handleAddSelectedSearchClass, handleRemoveSelectedSearchClass, handleSearchUpdate, onScrollToSearchIndex]
+    [handleAddSelectedSearchClass, handleRemoveSelectedSearchClass, handleSearchUpdate, onScrollOffsetChange]
   );
 
   return (
