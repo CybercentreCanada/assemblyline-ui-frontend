@@ -1,5 +1,5 @@
 import { default as React, useCallback, useContext, useMemo, useRef } from 'react';
-import { HexProps, useStore, useStyles } from '..';
+import { HexProps, useHex, useStore, useStyles } from '..';
 
 export type SelectContextProps = {
   nextSelectIndexes?: React.MutableRefObject<{ start: number; end: number }>;
@@ -10,12 +10,14 @@ export type SelectContextProps = {
   onSelectMouseDown?: (index: number) => void;
   onSelectMouseUp?: (event: MouseEvent) => void;
   onSelectClear?: () => void;
+  onSelectChange?: (start: number, end: number) => void;
 };
 
 export const SelectContext = React.createContext<SelectContextProps>(null);
 
 export const WrappedSelectProvider = ({ children }: HexProps) => {
   const { setSelectIndexes } = useStore();
+  const { onHexIndexClamp } = useHex();
   const { itemClasses, addContainerClassToRange, removeContainerClassToRange } = useStyles();
 
   const nextSelectIndexes = useRef<{ start: number; end: number }>({ start: -1, end: -1 });
@@ -23,7 +25,7 @@ export const WrappedSelectProvider = ({ children }: HexProps) => {
   const mouseDownIndex = useRef<number>(null);
   const mouseHoverIndex = useRef<number>(null);
 
-  const handleSelectText = useCallback(
+  const handleSelectClass = useCallback(
     (index: number) => {
       if (
         index > mouseHoverIndex.current &&
@@ -54,10 +56,10 @@ export const WrappedSelectProvider = ({ children }: HexProps) => {
   const onSelectMouseEnter = useCallback(
     (index: number) => {
       if (!isMouseDown.current) return;
-      handleSelectText(index);
+      handleSelectClass(index);
       mouseHoverIndex.current = index;
     },
-    [handleSelectText]
+    [handleSelectClass]
   );
   const onSelectMouseDown = useCallback(
     (index: number) => {
@@ -89,6 +91,21 @@ export const WrappedSelectProvider = ({ children }: HexProps) => {
     setSelectIndexes({ start: -1, end: -1 });
   }, [itemClasses.select, removeContainerClassToRange, setSelectIndexes]);
 
+  const onSelectChange = useCallback(
+    (start: number, end: number) => {
+      if (isNaN(start) || isNaN(end)) return;
+      let newStart = onHexIndexClamp(start);
+      let newEnd = onHexIndexClamp(end);
+
+      mouseDownIndex.current = newStart;
+      mouseHoverIndex.current = newStart;
+      handleSelectClass(newEnd);
+      nextSelectIndexes.current = { start: newStart, end: newEnd };
+      setSelectIndexes({ start: newStart, end: newEnd });
+    },
+    [handleSelectClass, onHexIndexClamp, setSelectIndexes]
+  );
+
   return (
     <SelectContext.Provider
       value={{
@@ -99,7 +116,8 @@ export const WrappedSelectProvider = ({ children }: HexProps) => {
         onSelectMouseEnter,
         onSelectMouseDown,
         onSelectMouseUp,
-        onSelectClear
+        onSelectClear,
+        onSelectChange
       }}
     >
       {useMemo(() => children, [children])}
