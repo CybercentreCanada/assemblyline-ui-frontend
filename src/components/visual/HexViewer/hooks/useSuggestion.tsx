@@ -1,3 +1,4 @@
+import { isEscape } from 'commons/addons/elements/utils/keyboard';
 import React, { useCallback, useContext, useMemo, useRef } from 'react';
 import { HexProps, useLayout, useSearch, useStore } from '..';
 
@@ -15,12 +16,13 @@ export type SuggestionContextProps = {
   onSuggestionBlur?: () => void;
   onSuggestionChange?: (value: string | null) => void;
   onSuggestionInputChange?: (inputValue: string | null) => void;
+  onSuggestionKeyDown?: (event: React.KeyboardEvent<HTMLElement>) => void;
 };
 
 export const SuggestionContext = React.createContext<SuggestionContextProps>(null);
 
 export const WrappedSuggestionProvider = ({ children }: HexProps) => {
-  const { nextLayoutColumns } = useLayout();
+  const { nextLayoutColumns, isContainerFocused } = useLayout();
   const { setSuggestionOpen } = useStore();
   const { nextSearchValue, onSearchValueChange } = useSearch();
 
@@ -57,12 +59,13 @@ export const WrappedSuggestionProvider = ({ children }: HexProps) => {
   }, []);
 
   const onSuggestionFocus = useCallback(() => {
+    nextSuggestionOpen.current = true;
     handleSuggestionOpen(nextSearchValue.current);
   }, [handleSuggestionOpen, nextSearchValue]);
 
   const onSuggestionBlur = useCallback(() => {
     nextSuggestionOpen.current = false;
-    setSuggestionOpen(nextSuggestionOpen.current);
+    setSuggestionOpen(false);
   }, [setSuggestionOpen]);
 
   const onSuggestionChange = useCallback(
@@ -84,6 +87,18 @@ export const WrappedSuggestionProvider = ({ children }: HexProps) => {
     [handleSuggestionOpen]
   );
 
+  const onSuggestionKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLElement>) => {
+      const { key: keyCode } = event;
+
+      if (isContainerFocused.current || !isEscape(keyCode)) return;
+      event.preventDefault();
+
+      if (isEscape(keyCode)) onSuggestionBlur();
+    },
+    [isContainerFocused, onSuggestionBlur]
+  );
+
   return (
     <SuggestionContext.Provider
       value={{
@@ -94,7 +109,8 @@ export const WrappedSuggestionProvider = ({ children }: HexProps) => {
         onSuggestionFocus,
         onSuggestionBlur,
         onSuggestionChange,
-        onSuggestionInputChange
+        onSuggestionInputChange,
+        onSuggestionKeyDown
       }}
     >
       {useMemo(() => children, [children])}

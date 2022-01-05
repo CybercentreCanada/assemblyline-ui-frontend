@@ -44,7 +44,8 @@ export const WrappedHexToolBar = (states: StoreState) => {
     onSuggestionFocus,
     onSuggestionBlur,
     onSuggestionChange,
-    onSuggestionInputChange
+    onSuggestionInputChange,
+    onSuggestionKeyDown
   } = useSuggestion();
 
   const { cursorIndex, searchValue, searchIndexes, searchIndex, suggestionOpen } = states;
@@ -98,6 +99,7 @@ export const WrappedHexToolBar = (states: StoreState) => {
           onKeyDown={event => {
             onSearchKeyDown(event);
             onHistoryKeyDown(event);
+            onSuggestionKeyDown(event);
           }}
           renderInput={params => (
             <TextField
