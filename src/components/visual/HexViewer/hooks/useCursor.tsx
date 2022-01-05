@@ -93,10 +93,9 @@ export const WrappedCursorProvider = ({ children }: HexProps) => {
     (index: number) => {
       if (isNaN(index)) return;
       const newCursorIndex = onHexIndexClamp(index);
-      onScrollToCursor(newCursorIndex);
       handleCursorChange(newCursorIndex);
     },
-    [onHexIndexClamp, handleCursorChange, onScrollToCursor]
+    [onHexIndexClamp, handleCursorChange]
   );
 
   return (

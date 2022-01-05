@@ -215,9 +215,6 @@ export const WrappedSearchProvider = ({ children }: HexProps) => {
       handleAddSearchClass();
 
       handleSearchUpdate();
-
-      // query.set('query', filterValue.current);
-      // history.push(`${location.pathname}?${query.toString()}`);
     },
     [
       handleAddSearchClass,
@@ -243,9 +240,6 @@ export const WrappedSearchProvider = ({ children }: HexProps) => {
       handleAddSearchClass();
 
       handleSearchUpdate();
-
-      // query.set('query', filterValue.current);
-      // history.push(`${location.pathname}?${query.toString()}`);
     },
     [
       handleAddSearchClass,
@@ -349,10 +343,6 @@ export const WrappedSearchProvider = ({ children }: HexProps) => {
       nextSearchIndex.current = index - 1;
       nextSearchHexIndex.current = nextSearchIndexes.current[nextSearchIndex.current];
 
-      // handleRemoveSelectedSearchClass();
-      // handleAddSelectedSearchClass();
-      // handleRemoveSearchClass();
-      // handleAddSearchClass();
       handleRemoveSelectedSearchClass();
       handleAddSelectedSearchClass();
       onScrollToSearchIndex(nextSearchIndexes.current[nextSearchIndex.current]);
