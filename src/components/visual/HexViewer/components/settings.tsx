@@ -1,4 +1,4 @@
-import { Grid, TextField, Typography } from '@material-ui/core';
+import { Grid, TextField, Tooltip, Typography } from '@material-ui/core';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { StoreState, useSetting, useStore } from '..';
 
 export const WrappedHexSettings = (states: StoreState) => {
-  const { t } = useTranslation(['adminServices']);
+  const { t } = useTranslation(['hexViewer']);
   const { nextSettingValue, nextSettingValues, onSettingClose, onSettingColumnsChange } = useSetting();
   const { setLayoutColumns, setHexBase } = useStore();
   const { settingsOpen, layoutColumns, hexBase, isLoaded } = states;
@@ -40,8 +40,25 @@ export const WrappedHexSettings = (states: StoreState) => {
             </Grid>
             <Grid item xs={12}>
               <Grid container spacing={1} alignItems="center">
+                <Grid item xs={10} sm={3} style={{ wordBreak: 'break-word' }}>
+                  {'rows [int]:'}
+                </Grid>
+                <Grid item xs={10} sm={9}>
+                  <TextField
+                    fullWidth
+                    type="number"
+                    size="small"
+                    margin="dense"
+                    variant="outlined"
+                    InputProps={{ inputProps: { min: 1 } }}
+                    value={layoutColumns}
+                    onChange={handleColumnsChange}
+                    style={{ margin: 0 }}
+                  />
+                </Grid>
                 <HexSelect
-                  label="Age"
+                  label={t('columns.label')}
+                  description={t('columns.description')}
                   items={nextSettingValues.current.columns}
                   value={columns}
                   onChange={event => {
@@ -165,19 +182,30 @@ const useStyles = makeStyles((theme: Theme) =>
       marginTop: theme.spacing(2)
     },
     formControl: {
-      margin: theme.spacing(1),
-      minWidth: 120
+      width: '100%'
+    },
+    select: {
+      width: '100%',
+      '& > .MuiSelect-root': {
+        paddingTop: theme.spacing(1.25),
+        paddingBottom: theme.spacing(1.25)
+      }
+    },
+    item: {
+      width: '100%'
     }
   })
 );
 
 const HexSelect = ({
   label = '',
+  description = '',
   items = [],
   value = '',
   onChange = () => null
 }: {
   label?: string;
+  description?: string;
   items?: Array<string>;
   value?: string;
   onChange?: (
@@ -194,22 +222,25 @@ const HexSelect = ({
   return (
     <>
       <Grid item xs={10} sm={3} style={{ wordBreak: 'break-word' }}>
-        {label}
+        <Tooltip title={description} placement="right">
+          <Typography variant="subtitle2">{label}</Typography>
+        </Tooltip>
       </Grid>
       <Grid item xs={10} sm={9}>
         <FormControl className={classes.formControl}>
           <Select
+            className={classes.select}
             open={open}
             onOpen={handleOpen}
             onClose={handleClose}
             value={value}
             onChange={onChange}
+            autoWidth
             fullWidth
             variant="outlined"
-            autoWidth
           >
             {items.map(item => (
-              <MenuItem key={item} value={item}>
+              <MenuItem key={item} className={classes.item} value={item}>
                 {item}
               </MenuItem>
             ))}
