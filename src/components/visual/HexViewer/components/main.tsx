@@ -157,7 +157,7 @@ export const WrappedHexMain = ({ data }: DataProps) => {
           <HexContainer
             isLightTheme={isLightTheme}
             isSliding={states.isSliding}
-            isLoaded={states.isLoaded}
+            initialized={states.initialized}
             containerRef={hexesContainerRefs}
             containerClass={clsx(hexClasses.container, hexClasses.rows, hexClasses.item, itemClasses.hexBorder)}
             store={states}
@@ -176,7 +176,7 @@ export const WrappedHexMain = ({ data }: DataProps) => {
           <HexContainer
             isLightTheme={isLightTheme}
             isSliding={states.isSliding}
-            isLoaded={states.isLoaded}
+            initialized={states.initialized}
             containerRef={textsContainerRefs}
             containerClass={clsx(hexClasses.container, hexClasses.rows, hexClasses.item)}
             store={states}

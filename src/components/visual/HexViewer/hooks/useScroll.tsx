@@ -27,7 +27,7 @@ export const ScrollContext = React.createContext<ScrollContextProps>(null);
 export const WrappedScrollProvider = ({ children }: HexProps) => {
   const { setScrollIndex, setScrollSpeed, setIsSliding } = useStore();
   const { hexMap, onHexIndexClamp } = useHex();
-  const { nextLayoutColumns, nextLayoutRow } = useLayout();
+  const { nextLayoutColumns, nextLayoutRows } = useLayout();
 
   const nextScrollIndex = useRef<number>(0);
   const nextScrollSpeed = useRef<number>(1);
@@ -46,20 +46,20 @@ export const WrappedScrollProvider = ({ children }: HexProps) => {
   const clampOffsetIndex = useCallback(
     (offsetIndex: number) => {
       if (offsetIndex < nextScrollIndex.current) return offsetIndex;
-      else if (offsetIndex >= nextScrollIndex.current + nextLayoutRow.current - 1)
-        return offsetIndex - nextLayoutRow.current + 1;
+      else if (offsetIndex >= nextScrollIndex.current + nextLayoutRows.current - 1)
+        return offsetIndex - nextLayoutRows.current + 1;
       else return nextScrollIndex.current;
     },
-    [nextLayoutRow]
+    [nextLayoutRows]
   );
 
   const isOffsetClamped = useCallback(
     (offsetIndex: number) => {
       if (offsetIndex < nextScrollIndex.current) return true;
-      else if (offsetIndex >= nextScrollIndex.current + nextLayoutRow.current - 1) return true;
+      else if (offsetIndex >= nextScrollIndex.current + nextLayoutRows.current - 1) return true;
       return false;
     },
-    [nextLayoutRow]
+    [nextLayoutRows]
   );
 
   const handleScrollIndexChange = useCallback(
@@ -171,14 +171,14 @@ export const WrappedScrollProvider = ({ children }: HexProps) => {
       if (location === 'top') {
         nextScrollIndex.current = Math.floor(clampedIndex / nextLayoutColumns.current);
       } else if (location === 'middle') {
-        nextScrollIndex.current = Math.floor(clampedIndex / nextLayoutColumns.current - nextLayoutRow.current / 2);
+        nextScrollIndex.current = Math.floor(clampedIndex / nextLayoutColumns.current - nextLayoutRows.current / 2);
       } else if (location === 'bottom') {
-        nextScrollIndex.current = Math.floor(clampedIndex / nextLayoutColumns.current - nextLayoutRow.current);
+        nextScrollIndex.current = Math.floor(clampedIndex / nextLayoutColumns.current - nextLayoutRows.current);
       } else if (location === 'include') {
         nextScrollIndex.current = clampOffsetIndex(Math.floor(clampedIndex / nextLayoutColumns.current));
       } else if (location === 'include-middle') {
         if (isOffsetClamped(Math.floor(clampedIndex / nextLayoutColumns.current)))
-          nextScrollIndex.current = Math.floor(clampedIndex / nextLayoutColumns.current - nextLayoutRow.current / 2);
+          nextScrollIndex.current = Math.floor(clampedIndex / nextLayoutColumns.current - nextLayoutRows.current / 2);
       }
 
       clampScrollIndex();
@@ -190,16 +190,18 @@ export const WrappedScrollProvider = ({ children }: HexProps) => {
       handleScrollChange,
       isOffsetClamped,
       nextLayoutColumns,
-      nextLayoutRow,
+      nextLayoutRows,
       onHexIndexClamp
     ]
   );
 
   const onScrollResize = useCallback(() => {
-    nextScrollMaxIndex.current = Math.ceil(hexMap.current.size / nextLayoutColumns.current - nextLayoutRow.current + 1);
+    nextScrollMaxIndex.current = Math.ceil(
+      hexMap.current.size / nextLayoutColumns.current - nextLayoutRows.current + 1
+    );
     clampScrollIndex();
     handleScrollChange();
-  }, [clampScrollIndex, handleScrollChange, hexMap, nextLayoutColumns, nextLayoutRow]);
+  }, [clampScrollIndex, handleScrollChange, hexMap, nextLayoutColumns, nextLayoutRows]);
 
   return (
     <ScrollContext.Provider

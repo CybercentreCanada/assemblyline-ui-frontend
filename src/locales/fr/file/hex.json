@@ -12,5 +12,8 @@
   "navigation-placeholder": "Ex: 001",
   "settings": "Configurer les paramètres",
   "no-results": "Aucun résultat",
-  "share": "Partager le URL"
+  "share": "Partager le URL",
+  "columns.label": "Nombre de colonnes :",
+  "columns.description": "Définir le nombre de colonnes",
+  "columns.auto": "Auto"
 }

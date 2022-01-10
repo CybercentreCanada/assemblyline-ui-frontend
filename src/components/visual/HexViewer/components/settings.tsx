@@ -6,23 +6,18 @@ import FormControl from '@material-ui/core/FormControl';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import { default as React, useEffect, useState } from 'react';
+import { default as React } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StoreState, useSetting, useStore } from '..';
+import { StoreState, useLayout, useSetting, useStore } from '..';
+import { CheckBoxNumberField } from './settings-components';
 
 export const WrappedHexSettings = (states: StoreState) => {
+  const { settingsOpen, layoutColumns, layoutAutoColumns, hexBase, initialized } = states;
+
   const { t } = useTranslation(['hexViewer']);
   const { nextSettingValue, nextSettingValues, onSettingClose, onSettingColumnsChange } = useSetting();
-  const { setLayoutColumns, setHexBase } = useStore();
-  const { settingsOpen, layoutColumns, hexBase, isLoaded } = states;
-
-  const [columns, setColumns] = useState<string>(null);
-
-  useEffect(() => {
-    setColumns(nextSettingValue.current.columns);
-  }, [isLoaded, nextSettingValue]);
-
-  const handleColumnsChange = event => setLayoutColumns(parseInt(event.target.value));
+  const { setHexBase } = useStore();
+  const { onLayoutAutoColumnsChange, onLayoutColumnsChange } = useLayout();
 
   return (
     <div>
@@ -40,31 +35,16 @@ export const WrappedHexSettings = (states: StoreState) => {
             </Grid>
             <Grid item xs={12}>
               <Grid container spacing={1} alignItems="center">
-                <Grid item xs={10} sm={3} style={{ wordBreak: 'break-word' }}>
-                  {'rows [int]:'}
-                </Grid>
-                <Grid item xs={10} sm={9}>
-                  <TextField
-                    fullWidth
-                    type="number"
-                    size="small"
-                    margin="dense"
-                    variant="outlined"
-                    InputProps={{ inputProps: { min: 1 } }}
-                    value={layoutColumns}
-                    onChange={handleColumnsChange}
-                    style={{ margin: 0 }}
-                  />
-                </Grid>
-                <HexSelect
+                <CheckBoxNumberField
                   label={t('columns.label')}
                   description={t('columns.description')}
-                  items={nextSettingValues.current.columns}
-                  value={columns}
-                  onChange={event => {
-                    onSettingColumnsChange(event.target.value as string);
-                    setColumns(event.target.value as string);
-                  }}
+                  checkedLabel={t('columns.auto')}
+                  checked={layoutAutoColumns}
+                  onChecked={onLayoutAutoColumnsChange}
+                  value={layoutColumns}
+                  onNumberChange={onLayoutColumnsChange}
+                  min={1}
+                  max={264}
                 />
                 <Grid item xs={10} sm={3} style={{ wordBreak: 'break-word' }}>
                   {'rows [int]:'}
@@ -78,7 +58,7 @@ export const WrappedHexSettings = (states: StoreState) => {
                     variant="outlined"
                     InputProps={{ inputProps: { min: 1 } }}
                     value={layoutColumns}
-                    onChange={handleColumnsChange}
+                    onChange={event => onLayoutColumnsChange(parseInt(event.target.value))}
                     style={{ margin: 0 }}
                   />
                 </Grid>
@@ -171,6 +151,7 @@ export const HexSettings = React.memo(
   ) =>
     prevProps.settingsOpen === nextProps.settingsOpen &&
     prevProps.layoutColumns === nextProps.layoutColumns &&
+    prevProps.layoutAutoColumns === nextProps.layoutAutoColumns &&
     prevProps.hexBase === nextProps.hexBase
 );
 export default HexSettings;
@@ -221,7 +202,7 @@ const HexSelect = ({
   const handleOpen = () => setOpen(true);
   return (
     <>
-      <Grid item xs={10} sm={3} style={{ wordBreak: 'break-word' }}>
+      <Grid item xs={2} sm={3} style={{ wordBreak: 'break-word' }}>
         <Tooltip title={description} placement="right">
           <Typography variant="subtitle2">{label}</Typography>
         </Tooltip>
