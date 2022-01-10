@@ -13,7 +13,7 @@ export type HexItemProps = {
   searchClass?: string;
   selectedSearchClass?: string;
   isLightTheme?: boolean;
-  isLoaded?: boolean;
+  initialized?: boolean;
   getColorClass?: (value: string) => string;
 };
 
@@ -77,5 +77,5 @@ export const HexItem = React.memo(
     // prevProps.selectClass === nextProps.selectClass &&
     // prevProps.searchClass === nextProps.searchClass &&
     prevProps.isLightTheme === nextProps.isLightTheme &&
-    prevProps.isLoaded === nextProps.isLoaded
+    prevProps.initialized === nextProps.initialized
 );

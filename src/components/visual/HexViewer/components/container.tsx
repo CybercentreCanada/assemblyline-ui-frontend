@@ -4,7 +4,7 @@ import { HexRow, StoreState } from '..';
 export type HexContainerProps = {
   isLightTheme?: boolean;
   isSliding?: boolean;
-  isLoaded?: boolean;
+  initialized?: boolean;
   containerRef?: React.MutableRefObject<any>;
   containerClass?: string;
   store?: StoreState;
@@ -22,7 +22,7 @@ export type HexContainerProps = {
 
 export const WrappedHexContainer = ({
   isLightTheme,
-  isLoaded,
+  initialized,
   containerRef,
   containerClass,
   store,
@@ -60,7 +60,7 @@ export const WrappedHexContainer = ({
       {indexes.map(rowIndexes => (
         <HexRow
           key={rowIndexes[0] + hexIndex}
-          isLoaded={isLoaded}
+          initialized={initialized}
           isLightTheme={isLightTheme}
           rowIndexes={rowIndexes.map(index => index + hexIndex)}
           store={store}
@@ -87,6 +87,6 @@ export const HexContainer = React.memo(
     (prevProps.store.layoutRows === nextProps.store.layoutRows &&
       prevProps.store.layoutColumns === nextProps.store.layoutColumns &&
       prevProps.store.scrollIndex === nextProps.store.scrollIndex &&
-      prevProps.store.isLoaded === nextProps.store.isLoaded &&
+      prevProps.store.initialized === nextProps.store.initialized &&
       prevProps.isLightTheme === nextProps.isLightTheme)
 );

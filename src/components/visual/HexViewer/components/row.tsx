@@ -3,7 +3,7 @@ import { HexItem, StoreState, useStyles } from '..';
 
 export type HexRowProps = {
   isLightTheme?: boolean;
-  isLoaded?: boolean;
+  initialized?: boolean;
   rowIndexes?: Array<number>;
   store?: StoreState;
   getValue?: (index: number) => string;
@@ -17,7 +17,7 @@ export type HexRowProps = {
 
 export const WrappedHexRow = ({
   isLightTheme,
-  isLoaded,
+  initialized,
   rowIndexes,
   store,
   getValue = (index: number) => null,
@@ -72,7 +72,7 @@ export const WrappedHexRow = ({
           searchClass={searchClasses[j]}
           selectedSearchClass={selectedSearchClasses[j]}
           isLightTheme={isLightTheme}
-          isLoaded={isLoaded}
+          initialized={initialized}
           // getColorClass={getColorClass}
         />
       ))}
@@ -93,6 +93,6 @@ export const HexRow = React.memo(
     // prevProps.rowIndexes.includes(prevProps.store.cursorIndex) ===
     //   nextProps.rowIndexes.includes(nextProps.store.cursorIndex) &&
     // !nextProps.rowIndexes.includes(nextProps.store.cursorIndex) &&
-    prevProps.isLoaded === nextProps.isLoaded &&
+    prevProps.initialized === nextProps.initialized &&
     prevProps.isLightTheme === nextProps.isLightTheme
 );

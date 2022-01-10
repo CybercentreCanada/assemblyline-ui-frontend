@@ -13,7 +13,7 @@ export type HistoryContextProps = {
 export const HistoryContext = React.createContext<HistoryContextProps>(null);
 
 export const WrappedHistoryProvider = ({ children }: HexProps) => {
-  const { setIsLoaded } = useStore();
+  const { setInitialized } = useStore();
   const { isContainerFocused } = useLayout();
   const { nextSearchValue, onSearchValueChange, onSearchLoad } = useSearch();
   const { nextSuggestionOpen } = useSuggestion();
@@ -85,8 +85,8 @@ export const WrappedHistoryProvider = ({ children }: HexProps) => {
     if (nextHistoryShowLastValue.current)
       onSearchLoad(nextHistoryValues.current.length > 0 ? nextHistoryValues.current[nextHistoryIndex.current] : '');
 
-    setIsLoaded(true);
-  }, [onSearchLoad, setIsLoaded]);
+    setInitialized(true);
+  }, [onSearchLoad, setInitialized]);
 
   const onHistorySave = useCallback(
     () => localStorage.setItem('hexViewer.history', JSON.stringify(nextHistoryValues.current.slice(0, 10))),

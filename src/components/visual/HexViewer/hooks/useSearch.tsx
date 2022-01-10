@@ -27,7 +27,7 @@ export const SearchContext = React.createContext<SearchContextProps>(null);
 export const WrappedSearchProvider = ({ children }: HexProps) => {
   const { setSearchValue, setSearchQuery, setSearchIndexes, setSearchIndex, setSearchHexIndex } = useStore();
   const { hexData } = useHex();
-  const { nextLayoutColumns, nextLayoutRow } = useLayout();
+  const { nextLayoutColumns, nextLayoutRows } = useLayout();
   const { parseStringToHexString } = useHex();
   const { nextScrollIndex, onScrollOffsetChange } = useScroll();
   const { nextCursorIndex } = useCursor();
@@ -59,19 +59,19 @@ export const WrappedSearchProvider = ({ children }: HexProps) => {
 
   const handleAddSearchClass = useCallback(() => {
     const start: number = nextScrollIndex.current * nextLayoutColumns.current;
-    const end: number = (nextScrollIndex.current + nextLayoutRow.current) * nextLayoutColumns.current;
+    const end: number = (nextScrollIndex.current + nextLayoutRows.current) * nextLayoutColumns.current;
     const indexes: Array<number> = nextSearchIndexes.current.filter(
       (index: number, i: number) => start <= index && index <= end && nextSearchIndex.current !== i
     );
     addContainerClassToIndexArray(indexes, nextSearchQuery.current.length, itemClasses.search);
-  }, [addContainerClassToIndexArray, itemClasses.search, nextLayoutColumns, nextLayoutRow, nextScrollIndex]);
+  }, [addContainerClassToIndexArray, itemClasses.search, nextLayoutColumns, nextLayoutRows, nextScrollIndex]);
 
   const handleRemoveSearchClass = useCallback(() => {
     const start: number = nextScrollIndex.current * nextLayoutColumns.current;
-    const end: number = (nextScrollIndex.current + nextLayoutRow.current) * nextLayoutColumns.current;
+    const end: number = (nextScrollIndex.current + nextLayoutRows.current) * nextLayoutColumns.current;
     const indexes: Array<number> = prevSearchIndexes.current.filter((index: number) => start <= index && index <= end);
     removeContainerClassToIndexArray(indexes, prevSearchQuery.current.length, itemClasses.search);
-  }, [itemClasses.search, nextLayoutColumns, nextLayoutRow, nextScrollIndex, removeContainerClassToIndexArray]);
+  }, [itemClasses.search, nextLayoutColumns, nextLayoutRows, nextScrollIndex, removeContainerClassToIndexArray]);
 
   const handleAddSelectedSearchClass = useCallback(() => {
     const start = nextSearchIndexes.current[nextSearchIndex.current];

@@ -5,7 +5,8 @@ export type HexProps = {
 };
 
 export type StoreState = {
-  isLoaded?: boolean;
+  // App
+  initialized?: boolean;
 
   // Hex
   hexBase?: number;
@@ -13,8 +14,9 @@ export type StoreState = {
 
   // Layout
   layoutRows?: number;
+  layoutAutoRows?: boolean;
   layoutColumns?: number;
-  settingsOpen?: boolean;
+  layoutAutoColumns?: boolean;
 
   // Scroll
   scrollIndex?: number;
@@ -40,10 +42,14 @@ export type StoreState = {
   // History
   historyValues?: Array<string>;
   historyIndex?: number;
+
+  // Settings
+  settingsOpen?: boolean;
 };
 
 export type StoreSetState = {
-  setIsLoaded?: React.Dispatch<React.SetStateAction<boolean>>;
+  // App
+  setInitialized?: React.Dispatch<React.SetStateAction<boolean>>;
 
   // Hex
   setHexBase?: React.Dispatch<React.SetStateAction<number>>;
@@ -51,8 +57,9 @@ export type StoreSetState = {
 
   // Layout
   setLayoutRows?: React.Dispatch<React.SetStateAction<number>>;
+  setLayoutAutoRows?: React.Dispatch<React.SetStateAction<boolean>>;
   setLayoutColumns?: React.Dispatch<React.SetStateAction<number>>;
-  setSettingsOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+  setLayoutAutoColumns?: React.Dispatch<React.SetStateAction<boolean>>;
 
   // Scroll
   setScrollIndex?: React.Dispatch<React.SetStateAction<number>>;
@@ -78,6 +85,9 @@ export type StoreSetState = {
   // History
   setHistoryValues?: React.Dispatch<React.SetStateAction<Array<string>>>;
   setHistoryIndex?: React.Dispatch<React.SetStateAction<number>>;
+
+  // Settings
+  setSettingsOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export type StateStoreContext = {
@@ -86,40 +96,78 @@ export type StateStoreContext = {
 };
 
 export type StoreContextProps = {
-  setLayoutRows?: (value: number) => void;
-  setLayoutColumns?: (value: number) => void;
+  // App
+  setInitialized?: React.Dispatch<React.SetStateAction<boolean>>;
+  onStoreInit?: (setStates: StoreSetState) => void;
+
+  // Hex
   setHexBase?: (value: number) => void;
   setHexOffsetSize?: (value: number) => void;
+
+  // Layout
+  setLayoutRows?: (value: number) => void;
+  setLayoutColumns?: (value: number) => void;
+  setLayoutAutoRows?: (value: boolean) => void;
+  setLayoutAutoColumns?: (value: boolean) => void;
+
+  // Scroll
   setScrollIndex?: (value: number) => void;
-  setSettingsOpen?: (value: boolean) => void;
   setScrollSpeed?: (value: number) => void;
   setIsSliding?: (value: boolean) => void;
+
+  // Cursor
   setCursorIndex?: (value: number) => void;
+
+  // Select
   setSelectIndexes?: (value: { start: number; end: number }) => void;
+
+  // Suggestion
+  setSuggestionOpen?: (value: boolean) => void;
+
+  // Search
   setSearchValue?: (value: string) => void;
   setSearchQuery?: (value: { key?: string; value?: string; length?: number }) => void;
   setSearchIndexes?: (value: Array<number>) => void;
   setSearchIndex?: (value: number) => void;
   setSearchHexIndex?: (value: number) => void;
+
+  // History
   setHistoryValues?: (value: Array<string>) => void;
   setHistoryIndex?: (value: number) => void;
-  setIsLoaded?: (value: boolean) => void;
-  setSuggestionOpen?: (value: boolean) => void;
-  onStoreInit?: (setStates: StoreSetState) => void;
+
+  // Settings
+  setSettingsOpen?: (value: boolean) => void;
 };
 
 export const useStateStore = (): StateStoreContext => {
-  const [isLoaded, setIsLoaded] = useState<boolean>(false);
-  const [isSliding, setIsSliding] = useState<boolean>(false);
-  const [layoutRows, setLayoutRows] = useState<number>(50);
-  const [layoutColumns, setLayoutColumns] = useState<number>(16);
+  // App
+  const [initialized, setInitialized] = useState<boolean>(false);
+
+  // Hex
   const [hexBase, setHexBase] = useState<number>(10);
   const [hexOffsetBase, setHexOffsetSize] = useState<number>(8);
+
+  // Layout
+  const [layoutRows, setLayoutRows] = useState<number>(50);
+  const [layoutColumns, setLayoutColumns] = useState<number>(16);
+  const [layoutAutoRows, setLayoutAutoRows] = useState<boolean>(true);
+  const [layoutAutoColumns, setLayoutAutoColumns] = useState<boolean>(true);
+
+  // Scroll
   const [scrollIndex, setScrollIndex] = useState<number>(0);
   const [scrollSpeed, setScrollSpeed] = useState<number>(1);
+  const [isSliding, setIsSliding] = useState<boolean>(false);
+
+  // Cursor
   const [cursorIndex, setCursorIndex] = useState<number>(null);
+
+  // Select
   const [selectIndexes, setSelectIndexes] = useState<{ start: number; end: number }>({ start: -1, end: -1 });
-  const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
+
+  // Suggestion
+  const [suggestionOpen, setSuggestionOpen] = useState<boolean>(false);
+
+  // Search
   const [searchValue, setSearchValue] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<{ key?: string; value?: string; length?: number }>({
     key: '',
@@ -129,13 +177,18 @@ export const useStateStore = (): StateStoreContext => {
   const [searchIndexes, setSearchIndexes] = useState<Array<number>>([]);
   const [searchIndex, setSearchIndex] = useState<number>(null);
   const [searchHexIndex, setSearchHexIndex] = useState<number>(null);
+
+  // History
   const [historyValues, setHistoryValues] = useState<Array<string>>([]);
   const [historyIndex, setHistoryIndex] = useState<number>(null);
-  const [suggestionOpen, setSuggestionOpen] = useState<boolean>(false);
+
+  // Settings
+  const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
 
   return {
     states: {
-      isLoaded: isLoaded,
+      // App
+      initialized: initialized,
 
       // Hex
       hexBase: hexBase,
@@ -144,7 +197,8 @@ export const useStateStore = (): StateStoreContext => {
       // Layout
       layoutRows: layoutRows,
       layoutColumns: layoutColumns,
-      settingsOpen: settingsOpen,
+      layoutAutoRows: layoutAutoRows,
+      layoutAutoColumns: layoutAutoColumns,
 
       // Scroll
       scrollIndex: scrollIndex,
@@ -169,10 +223,14 @@ export const useStateStore = (): StateStoreContext => {
 
       // History
       historyValues: historyValues,
-      historyIndex: historyIndex
+      historyIndex: historyIndex,
+
+      // Settings
+      settingsOpen: settingsOpen
     },
     setStates: {
-      setIsLoaded: setIsLoaded,
+      // App
+      setInitialized: setInitialized,
 
       // Hex
       setHexBase: setHexBase,
@@ -181,7 +239,8 @@ export const useStateStore = (): StateStoreContext => {
       // Layout
       setLayoutRows: setLayoutRows,
       setLayoutColumns: setLayoutColumns,
-      setSettingsOpen: setSettingsOpen,
+      setLayoutAutoRows: setLayoutAutoRows,
+      setLayoutAutoColumns: setLayoutAutoColumns,
 
       // Scroll
       setScrollIndex: setScrollIndex,
@@ -206,7 +265,10 @@ export const useStateStore = (): StateStoreContext => {
 
       // History
       setHistoryValues: setHistoryValues,
-      setHistoryIndex: setHistoryIndex
+      setHistoryIndex: setHistoryIndex,
+
+      // Settings
+      setSettingsOpen: setSettingsOpen
     }
   };
 };
@@ -214,9 +276,12 @@ export const useStateStore = (): StateStoreContext => {
 export const StoreContext = React.createContext<StoreContextProps>(null);
 
 export const WrappedStoreProvider = ({ children }: HexProps) => {
+  // Store
   const store = useRef<StoreSetState>(null);
-
   const onStoreInit = useCallback((setStates: StoreSetState) => (store.current = setStates), []);
+
+  // App
+  const setInitialized = useCallback((value: boolean) => store.current?.setInitialized(value), []);
 
   // Hex
   const setHexBase = useCallback((value: number) => store.current?.setHexBase(value), []);
@@ -225,16 +290,27 @@ export const WrappedStoreProvider = ({ children }: HexProps) => {
   // Layout
   const setLayoutRows = useCallback((value: number) => store.current?.setLayoutRows(value), []);
   const setLayoutColumns = useCallback((value: number) => store.current?.setLayoutColumns(value), []);
-  const setSettingsOpen = useCallback((value: boolean) => store.current?.setSettingsOpen(value), []);
+  const setLayoutAutoRows = useCallback((value: boolean) => store.current?.setLayoutAutoRows(value), []);
+  const setLayoutAutoColumns = useCallback((value: boolean) => store.current?.setLayoutAutoColumns(value), []);
 
+  // Scroll
   const setScrollIndex = useCallback((value: number) => store.current?.setScrollIndex(value), []);
   const setScrollSpeed = useCallback((value: number) => store.current?.setScrollSpeed(value), []);
   const setIsSliding = useCallback((value: boolean) => store.current?.setIsSliding(value), []);
+
+  // Cursor
   const setCursorIndex = useCallback((value: number) => store.current?.setCursorIndex(value), []);
+
+  // Select
   const setSelectIndexes = useCallback(
     (value: { start: number; end: number }) => store.current?.setSelectIndexes(value),
     []
   );
+
+  // Suggestion
+  const setSuggestionOpen = useCallback((value: boolean) => store.current?.setSuggestionOpen(value), []);
+
+  // Search
   const setSearchValue = useCallback((value: string) => store.current?.setSearchValue(value), []);
   const setSearchQuery = useCallback(
     (value: { key?: string; value?: string; length?: number }) => store.current?.setSearchQuery(value),
@@ -243,34 +319,60 @@ export const WrappedStoreProvider = ({ children }: HexProps) => {
   const setSearchIndexes = useCallback((value: Array<number>) => store.current?.setSearchIndexes(value), []);
   const setSearchIndex = useCallback((value: number) => store.current?.setSearchIndex(value), []);
   const setSearchHexIndex = useCallback((value: number) => store.current?.setSearchHexIndex(value), []);
+
+  // History
   const setHistoryValues = useCallback((value: Array<string>) => store.current?.setHistoryValues(value), []);
   const setHistoryIndex = useCallback((value: number) => store.current?.setHistoryIndex(value), []);
-  const setIsLoaded = useCallback((value: boolean) => store.current?.setIsLoaded(value), []);
-  const setSuggestionOpen = useCallback((value: boolean) => store.current?.setSuggestionOpen(value), []);
+
+  // Settings
+  const setSettingsOpen = useCallback((value: boolean) => store.current?.setSettingsOpen(value), []);
 
   return (
     <StoreContext.Provider
       value={{
+        // Store
         onStoreInit,
-        setLayoutRows,
-        setLayoutColumns,
+
+        // App
+        setInitialized,
+
+        // Hex
         setHexBase,
         setHexOffsetSize,
+
+        // Layout
+        setLayoutRows,
+        setLayoutColumns,
+        setLayoutAutoRows,
+        setLayoutAutoColumns,
+
+        // Scroll
         setScrollIndex,
-        setSettingsOpen,
         setScrollSpeed,
         setIsSliding,
+
+        // Cursor
         setCursorIndex,
+
+        // Select
         setSelectIndexes,
+
+        // Suggestion
+        setSuggestionOpen,
+
+        // Search
         setSearchValue,
         setSearchQuery,
         setSearchIndexes,
         setSearchIndex,
         setSearchHexIndex,
+
+        // History
         setHistoryValues,
         setHistoryIndex,
-        setIsLoaded,
-        setSuggestionOpen
+
+        // Settings
+        setSettingsOpen
       }}
     >
       {useMemo(() => children, [children])}
