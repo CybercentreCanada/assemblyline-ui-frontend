@@ -12,5 +12,8 @@
   "navigation-placeholder": "Ex: 001",
   "settings": "Customize the Settings",
   "no-results": "No Results",
-  "share": "Share the URL"
+  "share": "Share the URL",
+  "columns.label": "Number of Columns:",
+  "columns.description": "Set the number of columns",
+  "columns.auto": "Auto"
 }
