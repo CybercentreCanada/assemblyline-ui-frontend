@@ -15,5 +15,8 @@
   "share": "Partager le URL",
   "columns.label": "Nombre de colonnes :",
   "columns.description": "Définir le nombre de colonnes",
-  "columns.auto": "Auto"
+  "columns.auto": "Auto",
+  "rows.label": "Nombre de rangées :",
+  "rows.description": "Définir le nombre de rangées",
+  "rows.auto": "Auto"
 }
