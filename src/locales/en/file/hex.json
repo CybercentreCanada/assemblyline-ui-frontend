@@ -13,6 +13,7 @@
   "settings": "Customize the Settings",
   "no-results": "No Results",
   "share": "Share the URL",
+  "menu": "Show the Options",
   "columns.label": "Number of Columns:",
   "columns.description": "Set the number of columns",
   "columns.auto": "Auto",

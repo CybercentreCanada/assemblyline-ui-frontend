@@ -3,7 +3,7 @@ import { isEnter, isEscape } from 'commons/addons/elements/utils/keyboard';
 import { default as React, forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react';
 import { useStyles } from '..';
 
-export type HexPopperProps = {
+export type MenuPopperProps = {
   id?: string;
   label?: string;
   placeholder?: string;
@@ -15,7 +15,7 @@ export type HexPopperProps = {
   onNumberChange?: (value: number) => void;
 };
 
-export const WrappedHexPopper = (
+export const WrappedMenuPopper = (
   {
     id = '',
     label = '',
@@ -26,7 +26,7 @@ export const WrappedHexPopper = (
     onClickAway = () => null,
     onChange = () => null,
     onNumberChange = () => null
-  }: HexPopperProps,
+  }: MenuPopperProps,
   ref
 ) => {
   const { toolbarClasses } = useStyles();
@@ -99,6 +99,6 @@ export const WrappedHexPopper = (
   );
 };
 
-export const HexPopper = React.memo(forwardRef(WrappedHexPopper));
+export const MenuPopper = React.memo(forwardRef(WrappedMenuPopper));
 
-export default HexPopper;
+export default MenuPopper;

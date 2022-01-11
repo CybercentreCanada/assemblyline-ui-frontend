@@ -2,7 +2,7 @@ import React from 'react';
 import {
   CopyProvider,
   CursorProvider,
-  HexMain,
+  HexApp,
   HexProvider,
   HistoryProvider,
   HoverProvider,
@@ -37,7 +37,7 @@ export default React.memo(({ data }: DataProps) =>
                           <CopyProvider>
                             <LocationProvider>
                               <SettingProvider>
-                                <HexMain data={data} />
+                                <HexApp data={data} />
                               </SettingProvider>
                             </LocationProvider>
                           </CopyProvider>

@@ -1,4 +1,5 @@
 import { Grid, TextField, Tooltip, Typography } from '@material-ui/core';
+import Collapse from '@material-ui/core/Collapse';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
@@ -8,8 +9,7 @@ import Select from '@material-ui/core/Select';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { default as React } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StoreState, useLayout, useSetting, useStore } from '..';
-import { CheckBoxNumberField } from './settings-components';
+import { CheckBoxNumberField, StoreState, useLayout, useSetting, useStore } from '..';
 
 export const WrappedHexSettings = (states: StoreState) => {
   const { settingsOpen, layoutColumns, layoutAutoColumns, layoutRows, layoutAutoRows, hexBase, initialized } = states;
@@ -57,6 +57,24 @@ export const WrappedHexSettings = (states: StoreState) => {
                   min={1}
                   max={264}
                 />
+                <Collapse in={layoutAutoRows} timeout="auto" unmountOnExit>
+                  <Grid item xs={10} sm={3} style={{ wordBreak: 'break-word' }}>
+                    {'rows [int]:'}
+                  </Grid>
+                  <Grid item xs={10} sm={9}>
+                    <TextField
+                      fullWidth
+                      type="number"
+                      size="small"
+                      margin="dense"
+                      variant="outlined"
+                      InputProps={{ inputProps: { min: 1 } }}
+                      value={layoutColumns}
+                      onChange={event => onLayoutColumnsChange(parseInt(event.target.value))}
+                      style={{ margin: 0 }}
+                    />
+                  </Grid>
+                </Collapse>
                 <Grid item xs={10} sm={3} style={{ wordBreak: 'break-word' }}>
                   {'rows [int]:'}
                 </Grid>
