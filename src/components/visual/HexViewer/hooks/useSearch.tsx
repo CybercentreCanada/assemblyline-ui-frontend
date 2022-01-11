@@ -300,16 +300,10 @@ export const WrappedSearchProvider = ({ children }: HexProps) => {
   const onSearchKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLElement>) => {
       const { key: keyCode, shiftKey } = event;
-
-      if (
-        !nextSearchIndexes.current ||
-        nextSearchIndexes.current.length === 0 ||
-        (!isArrowDown(keyCode) && !isArrowUp(keyCode) && !isEnter(keyCode) && !isEscape(keyCode))
-      )
-        return;
+      if (!isArrowDown(keyCode) && !isArrowUp(keyCode) && !isEnter(keyCode) && !isEscape(keyCode)) return;
       event.preventDefault();
-
       if (isEscape(keyCode)) onSearchClear();
+      if (!nextSearchIndexes.current || nextSearchIndexes.current.length === 0) return;
       else if (isEnter(keyCode) && shiftKey) handleSearchKeyDown('previous');
       else if (isEnter(keyCode)) handleSearchKeyDown('next');
     },
