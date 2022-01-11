@@ -15,7 +15,7 @@ export const WrappedHexSettings = (states: StoreState) => {
   const { settingsOpen, layoutColumns, layoutAutoColumns, layoutRows, layoutAutoRows, hexBase, initialized } = states;
 
   const { t } = useTranslation(['hexViewer']);
-  const { nextSettingValue, nextSettingValues, onSettingClose, onSettingColumnsChange } = useSetting();
+  const { onSettingClose } = useSetting();
   const { setHexBase } = useStore();
   const { onLayoutAutoColumnsChange, onLayoutColumnsChange, onLayoutAutoRowsChange, onLayoutRowsChange } = useLayout();
 
@@ -89,66 +89,10 @@ export const WrappedHexSettings = (states: StoreState) => {
                     style={{ margin: 0 }}
                   />
                 </Grid>
-                {/* <Grid item xs={10} sm={2}>
-                  <Select
-                    id="user_spec_params"
-                    fullWidth
-                    // value={tempUserParams.type}
-                    // onChange={handleSPTypeChange}
-                    variant="outlined"
-                    margin="dense"
-                  >
-                    <MenuItem value="bool">bool</MenuItem>
-                    <MenuItem value="int">int</MenuItem>
-                    <MenuItem value="list">list ({t('params.comma')})</MenuItem>
-                    <MenuItem value="str">str</MenuItem>
-                  </Select>
-                </Grid> */}
               </Grid>
-              {/* <Grid container spacing={1} alignItems="center">
-                <Grid item xs={10} sm={3} style={{ wordBreak: 'break-word' }}>
-                  {'test'}
-                </Grid>
-                <Grid item xs={10} sm={9}>
-                  <InputField
-                    fullWidth
-                    type={'number'}
-                    size="small"
-                    margin="dense"
-                    variant="outlined"
-                    InputProps={{ inputProps: { min: 1 } }}
-                    value={columns}
-                    onChange={event => setColumns(parseInt(event.target.value))}
-                    style={{ margin: 0 }}
-                  />
-                </Grid>
-              </Grid> */}
             </Grid>
           </Grid>
-
-          {/* <DialogContentText id="alert-dialog-description">
-            <TextField
-              id="standard-number"
-              label="Columns"
-              type="number"
-              InputLabelProps={{
-                shrink: true
-              }}
-              value={columns}
-              onChange={(event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) =>
-                setColumns(parseInt(event.target.value))
-              }
-            />
-          </DialogContentText> */}
         </DialogContent>
-        {/* <DialogActions>
-          <Button onClick={() => onCloseSettings(store)} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={() => onCloseSettings(store)} color="primary" autoFocus>
-            Save
-          </Button>
-        </DialogActions> */}
       </Dialog>
     </div>
   );
