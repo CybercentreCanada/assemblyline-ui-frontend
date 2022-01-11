@@ -12,12 +12,12 @@ import { StoreState, useLayout, useSetting, useStore } from '..';
 import { CheckBoxNumberField } from './settings-components';
 
 export const WrappedHexSettings = (states: StoreState) => {
-  const { settingsOpen, layoutColumns, layoutAutoColumns, hexBase, initialized } = states;
+  const { settingsOpen, layoutColumns, layoutAutoColumns, layoutRows, layoutAutoRows, hexBase, initialized } = states;
 
   const { t } = useTranslation(['hexViewer']);
   const { nextSettingValue, nextSettingValues, onSettingClose, onSettingColumnsChange } = useSetting();
   const { setHexBase } = useStore();
-  const { onLayoutAutoColumnsChange, onLayoutColumnsChange } = useLayout();
+  const { onLayoutAutoColumnsChange, onLayoutColumnsChange, onLayoutAutoRowsChange, onLayoutRowsChange } = useLayout();
 
   return (
     <div>
@@ -43,6 +43,17 @@ export const WrappedHexSettings = (states: StoreState) => {
                   onChecked={onLayoutAutoColumnsChange}
                   value={layoutColumns}
                   onNumberChange={onLayoutColumnsChange}
+                  min={1}
+                  max={264}
+                />
+                <CheckBoxNumberField
+                  label={t('rows.label')}
+                  description={t('rows.description')}
+                  checkedLabel={t('rows.auto')}
+                  checked={layoutAutoRows}
+                  onChecked={onLayoutAutoRowsChange}
+                  value={layoutRows}
+                  onNumberChange={onLayoutRowsChange}
                   min={1}
                   max={264}
                 />
@@ -152,6 +163,8 @@ export const HexSettings = React.memo(
     prevProps.settingsOpen === nextProps.settingsOpen &&
     prevProps.layoutColumns === nextProps.layoutColumns &&
     prevProps.layoutAutoColumns === nextProps.layoutAutoColumns &&
+    prevProps.layoutRows === nextProps.layoutRows &&
+    prevProps.layoutAutoRows === nextProps.layoutAutoRows &&
     prevProps.hexBase === nextProps.hexBase
 );
 export default HexSettings;

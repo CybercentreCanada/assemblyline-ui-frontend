@@ -15,5 +15,8 @@
   "share": "Share the URL",
   "columns.label": "Number of Columns:",
   "columns.description": "Set the number of columns",
-  "columns.auto": "Auto"
+  "columns.auto": "Auto",
+  "rows.label": "Number of Rows:",
+  "rows.description": "Set the number of rows",
+  "rows.auto": "Auto"
 }
