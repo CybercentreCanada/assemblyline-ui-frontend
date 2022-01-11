@@ -28,7 +28,7 @@ export const WrappedSuggestionProvider = ({ children }: HexProps) => {
 
   const nextSuggestionOpen = useRef<boolean>(false);
   const suggestionLabels = useRef<Array<string>>([]);
-  const suggestionValues = useRef<Array<string>>(['hexes:', 'texts:']);
+  const suggestionValues = useRef<Array<string>>(['hex:', 'text:']);
 
   const handleSuggestionLabelsIndex = useCallback((value: string) => {
     let i = 0;
@@ -50,11 +50,11 @@ export const WrappedSuggestionProvider = ({ children }: HexProps) => {
 
   const onSuggestionLabelChange = useCallback((language: string) => {
     if (language === 'en')
-      suggestionLabels.current = ['hexes (Search using hexadecimal values)', 'texts (Search using ASCII values)'];
+      suggestionLabels.current = ['hex (Search using hexadecimal values)', 'text (Search using ASCII values)'];
     else if (language === 'fr')
       suggestionLabels.current = [
-        'hexes (Recherche utilisant des valeurs hexadécimales)',
-        'texts (Recherche utilisant des valeurs ASCII)'
+        'hex (Recherche utilisant des valeurs hexadécimales)',
+        'text (Recherche utilisant des valeurs ASCII)'
       ];
   }, []);
 
