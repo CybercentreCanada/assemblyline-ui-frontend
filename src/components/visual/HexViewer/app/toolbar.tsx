@@ -1,11 +1,6 @@
 import { Paper, Tooltip, useMediaQuery, useTheme } from '@material-ui/core';
-import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import Divider from '@material-ui/core/Divider';
-import Grow from '@material-ui/core/Grow';
 import IconButton from '@material-ui/core/IconButton';
-import MenuItem from '@material-ui/core/MenuItem';
-import MenuList from '@material-ui/core/MenuList';
-import Popper from '@material-ui/core/Popper';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import ArrowDownward from '@material-ui/icons/ArrowDownward';
@@ -16,12 +11,13 @@ import NavigationIcon from '@material-ui/icons/Navigation';
 import SettingsIcon from '@material-ui/icons/Settings';
 import ShareIcon from '@material-ui/icons/Share';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import 'moment/locale/fr';
 import { default as React, useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  MenuPopper,
   NumberFieldPopper,
   StoreState,
+  TooltipButton,
   useCursor,
   useHex,
   useHistory,
@@ -47,7 +43,6 @@ export const WrappedHexToolBar = (states: StoreState) => {
   const { onCursorIndexChange } = useCursor();
   const { onHistoryChange, onHistoryKeyDown } = useHistory();
   const { onLocationShare } = useLocation();
-
   const {
     suggestionLabels,
     onSuggestionLabelChange,
@@ -68,6 +63,10 @@ export const WrappedHexToolBar = (states: StoreState) => {
 
   const cursorPopperRef = useRef(null);
   const handleCursorClick = useCallback(event => cursorPopperRef.current.open(event), []);
+
+  const menuPopperRef = useRef(null);
+  const toolbarRef = useRef(null);
+  const handleMenuClick = useCallback(event => menuPopperRef.current.open(), []);
 
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef<HTMLButtonElement>(null);
@@ -105,7 +104,7 @@ export const WrappedHexToolBar = (states: StoreState) => {
   useLayoutEffect(() => onSuggestionLabelChange(i18n.language), [i18n.language, onSuggestionLabelChange]);
 
   return (
-    <div className={toolbarClasses.root}>
+    <div className={toolbarClasses.root} ref={toolbarRef}>
       <Paper component="form" className={toolbarClasses.toolbar}>
         <Autocomplete
           classes={{
@@ -196,7 +195,7 @@ export const WrappedHexToolBar = (states: StoreState) => {
             <Divider className={toolbarClasses.divider} orientation="vertical" />
             <TooltipButton title={t('navigation')} onClick={handleCursorClick} icon={<NavigationIcon />} />
             <TooltipButton title={t('share')} onClick={onLocationShare} icon={<ShareIcon />} />
-            <TooltipButton title={t('settings')} onClick={onSettingOpen} icon={<SettingsIcon />} />
+            <TooltipButton title={t('settings.label')} onClick={onSettingOpen} icon={<SettingsIcon />} />
           </>
         ) : (
           <Tooltip title={t('menu')}>
@@ -205,7 +204,7 @@ export const WrappedHexToolBar = (states: StoreState) => {
               ref={anchorRef}
               aria-controls={open ? 'menu-list-grow' : undefined}
               aria-haspopup="true"
-              onClick={handleToggle}
+              onClick={handleMenuClick}
             >
               <MenuIcon />
             </IconButton>
@@ -227,26 +226,12 @@ export const WrappedHexToolBar = (states: StoreState) => {
           id="cursor-index"
           label={t('navigation-label')}
           placeholder={t('navigation-placeholder')}
-          value={cursorIndex ? cursorIndex : ''}
+          value={cursorIndex !== null ? cursorIndex : ''}
           min={0}
           max={hexMap.current.size - 1}
           onNumberChange={(index: number) => onCursorIndexChange(index)}
         />
-        <Popper open={open} anchorEl={layoutRef.current} role={undefined} transition disablePortal>
-          {({ TransitionProps, placement }) => (
-            <Grow {...TransitionProps} style={{ transformOrigin: 'right bottom' }}>
-              <Paper>
-                <ClickAwayListener onClickAway={handleClose}>
-                  <MenuList autoFocusItem={open} id="menu-list-grow" onKeyDown={handleListKeyDown}>
-                    <MenuItem onClick={handleClose}>Profile</MenuItem>
-                    <MenuItem onClick={handleClose}>My account</MenuItem>
-                    <MenuItem onClick={handleClose}>Logout</MenuItem>
-                  </MenuList>
-                </ClickAwayListener>
-              </Paper>
-            </Grow>
-          )}
-        </Popper>
+        <MenuPopper ref={menuPopperRef} anchorEl={toolbarRef.current} states={states} />
       </Paper>
     </div>
   );
@@ -265,25 +250,3 @@ export const HexToolBar = React.memo(
     prevProps.cursorIndex === nextProps.cursorIndex
 );
 export default HexToolBar;
-
-const TooltipButton = React.memo(
-  ({
-    title = '',
-    icon = null,
-    onClick = () => null
-  }: {
-    title: string;
-    icon: React.ReactElement;
-    onClick?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
-  }) => {
-    const { toolbarClasses } = useStyles();
-
-    return (
-      <Tooltip title={title}>
-        <IconButton className={toolbarClasses.iconButton} aria-label={title} onClick={onClick} size="small">
-          {icon}
-        </IconButton>
-      </Tooltip>
-    );
-  }
-);
