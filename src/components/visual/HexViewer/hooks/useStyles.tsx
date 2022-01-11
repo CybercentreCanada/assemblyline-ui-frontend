@@ -208,6 +208,11 @@ export const useToolBarStyles = makeStyles(theme => ({
   divider: {
     height: 28,
     margin: 4
+  },
+  menuPopper: {
+    marginTop: '-10px',
+    minWidth: '250px',
+    backgroundColor: theme.palette.background.paper
   }
 }));
 
