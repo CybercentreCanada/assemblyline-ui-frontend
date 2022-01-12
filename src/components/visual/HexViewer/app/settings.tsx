@@ -1,22 +1,28 @@
-import { Grid, TextField, Tooltip, Typography } from '@material-ui/core';
+import { Grid, TextField, Typography } from '@material-ui/core';
 import Collapse from '@material-ui/core/Collapse';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import FormControl from '@material-ui/core/FormControl';
-import MenuItem from '@material-ui/core/MenuItem';
-import Select from '@material-ui/core/Select';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { default as React } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CheckBoxNumberField, StoreState, useLayout, useSetting, useStore } from '..';
+import { CheckBoxNumberField, SelectField, StoreState, useHex, useLayout, useSetting, useStore } from '..';
 
 export const WrappedHexSettings = (states: StoreState) => {
-  const { settingsOpen, layoutColumns, layoutAutoColumns, layoutRows, layoutAutoRows, hexBase, initialized } = states;
+  const {
+    settingsOpen,
+    hexBaseValues,
+    layoutColumns,
+    layoutAutoColumns,
+    layoutRows,
+    layoutAutoRows,
+    hexBase,
+    initialized
+  } = states;
 
   const { t } = useTranslation(['hexViewer']);
   const { onSettingClose } = useSetting();
   const { setHexBase } = useStore();
+  const { onHexBaseChange } = useHex();
   const { onLayoutAutoColumnsChange, onLayoutColumnsChange, onLayoutAutoRowsChange, onLayoutRowsChange } = useLayout();
 
   return (
@@ -35,6 +41,13 @@ export const WrappedHexSettings = (states: StoreState) => {
             </Grid>
             <Grid item xs={12}>
               <Grid container spacing={1} alignItems="center">
+                <SelectField
+                  label={t('base.label')}
+                  description={t('base.description')}
+                  value={hexBase}
+                  items={hexBaseValues}
+                  onChange={onHexBaseChange}
+                />
                 <CheckBoxNumberField
                   label={t('columns.label')}
                   description={t('columns.description')}
@@ -123,6 +136,7 @@ export const HexSettings = React.memo(
     nextProps: Readonly<React.PropsWithChildren<StoreState>>
   ) =>
     prevProps.settingsOpen === nextProps.settingsOpen &&
+    prevProps.hexBaseValues === nextProps.hexBaseValues &&
     prevProps.layoutColumns === nextProps.layoutColumns &&
     prevProps.layoutAutoColumns === nextProps.layoutAutoColumns &&
     prevProps.layoutRows === nextProps.layoutRows &&
@@ -130,79 +144,3 @@ export const HexSettings = React.memo(
     prevProps.hexBase === nextProps.hexBase
 );
 export default HexSettings;
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    button: {
-      display: 'block',
-      marginTop: theme.spacing(2)
-    },
-    formControl: {
-      width: '100%'
-    },
-    select: {
-      width: '100%',
-      '& > .MuiSelect-root': {
-        paddingTop: theme.spacing(1.25),
-        paddingBottom: theme.spacing(1.25)
-      }
-    },
-    item: {
-      width: '100%'
-    }
-  })
-);
-
-const HexSelect = ({
-  label = '',
-  description = '',
-  items = [],
-  value = '',
-  onChange = () => null
-}: {
-  label?: string;
-  description?: string;
-  items?: Array<string>;
-  value?: string;
-  onChange?: (
-    event: React.ChangeEvent<{
-      name?: string;
-      value: unknown;
-    }>
-  ) => void;
-}) => {
-  const classes = useStyles();
-  const [open, setOpen] = React.useState(false);
-  const handleClose = () => setOpen(false);
-  const handleOpen = () => setOpen(true);
-  return (
-    <>
-      <Grid item xs={2} sm={3} style={{ wordBreak: 'break-word' }}>
-        <Tooltip title={description} placement="right">
-          <Typography variant="subtitle2">{label}</Typography>
-        </Tooltip>
-      </Grid>
-      <Grid item xs={10} sm={9}>
-        <FormControl className={classes.formControl}>
-          <Select
-            className={classes.select}
-            open={open}
-            onOpen={handleOpen}
-            onClose={handleClose}
-            value={value}
-            onChange={onChange}
-            autoWidth
-            fullWidth
-            variant="outlined"
-          >
-            {items.map(item => (
-              <MenuItem key={item} className={classes.item} value={item}>
-                {item}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Grid>
-    </>
-  );
-};

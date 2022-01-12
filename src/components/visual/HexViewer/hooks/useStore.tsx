@@ -11,6 +11,10 @@ export type StoreState = {
   // Hex
   hexBase?: number;
   hexOffsetBase?: number;
+  hexBaseValues?: Array<{
+    label: string;
+    value: number;
+  }>;
 
   // Layout
   layoutRows?: number;
@@ -54,6 +58,14 @@ export type StoreSetState = {
   // Hex
   setHexBase?: React.Dispatch<React.SetStateAction<number>>;
   setHexOffsetSize?: React.Dispatch<React.SetStateAction<number>>;
+  setHexBaseValues?: React.Dispatch<
+    React.SetStateAction<
+      Array<{
+        label: string;
+        value: number;
+      }>
+    >
+  >;
 
   // Layout
   setLayoutRows?: React.Dispatch<React.SetStateAction<number>>;
@@ -103,6 +115,12 @@ export type StoreContextProps = {
   // Hex
   setHexBase?: (value: number) => void;
   setHexOffsetSize?: (value: number) => void;
+  setHexBaseValues?: (
+    values: Array<{
+      label: string;
+      value: number;
+    }>
+  ) => void;
 
   // Layout
   setLayoutRows?: (value: number) => void;
@@ -146,6 +164,16 @@ export const useStateStore = (): StateStoreContext => {
   // Hex
   const [hexBase, setHexBase] = useState<number>(10);
   const [hexOffsetBase, setHexOffsetSize] = useState<number>(8);
+  const [hexBaseValues, setHexBaseValues] = useState<
+    Array<{
+      label: string;
+      value: number;
+    }>
+  >([
+    { label: 'Octal', value: 8 },
+    { label: 'Decimal', value: 10 },
+    { label: 'Hexadecimal', value: 16 }
+  ]);
 
   // Layout
   const [layoutRows, setLayoutRows] = useState<number>(50);
@@ -193,6 +221,7 @@ export const useStateStore = (): StateStoreContext => {
       // Hex
       hexBase: hexBase,
       hexOffsetBase: hexOffsetBase,
+      hexBaseValues: hexBaseValues,
 
       // Layout
       layoutRows: layoutRows,
@@ -235,6 +264,7 @@ export const useStateStore = (): StateStoreContext => {
       // Hex
       setHexBase: setHexBase,
       setHexOffsetSize: setHexOffsetSize,
+      setHexBaseValues: setHexBaseValues,
 
       // Layout
       setLayoutRows: setLayoutRows,
@@ -286,6 +316,15 @@ export const WrappedStoreProvider = ({ children }: HexProps) => {
   // Hex
   const setHexBase = useCallback((value: number) => store.current?.setHexBase(value), []);
   const setHexOffsetSize = useCallback((value: number) => store.current?.setHexOffsetSize(value), []);
+  const setHexBaseValues = useCallback(
+    (
+      values: Array<{
+        label: string;
+        value: number;
+      }>
+    ) => store.current?.setHexBaseValues(values),
+    []
+  );
 
   // Layout
   const setLayoutRows = useCallback((value: number) => store.current?.setLayoutRows(value), []);
@@ -339,6 +378,7 @@ export const WrappedStoreProvider = ({ children }: HexProps) => {
         // Hex
         setHexBase,
         setHexOffsetSize,
+        setHexBaseValues,
 
         // Layout
         setLayoutRows,

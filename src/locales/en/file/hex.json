@@ -24,5 +24,7 @@
   "columns.auto": "Auto",
   "rows.label": "Number of Rows:",
   "rows.description": "Set the number of rows",
-  "rows.auto": "Auto"
+  "rows.auto": "Auto",
+  "base.label": "Base:",
+  "base.description": "Set the base value"
 }

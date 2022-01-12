@@ -101,7 +101,9 @@ export const WrappedHexToolBar = (states: StoreState) => {
   // const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => setAnchorMenuEl(event.currentTarget);
   // const handleMenuClose = () => setAnchorMenuEl(null);
 
-  useLayoutEffect(() => onSuggestionLabelChange(i18n.language), [i18n.language, onSuggestionLabelChange]);
+  useLayoutEffect(() => {
+    onSuggestionLabelChange(i18n.language);
+  }, [i18n.language, onSuggestionLabelChange]);
 
   return (
     <div className={toolbarClasses.root} ref={toolbarRef}>

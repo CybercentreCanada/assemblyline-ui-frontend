@@ -18,6 +18,8 @@ export { MenuPopper } from './components/MenuPopper';
 export type { MenuPopperProps } from './components/MenuPopper';
 export { NumberFieldPopper } from './components/NumberFieldPopper';
 export type { NumberFieldPopperProps } from './components/NumberFieldPopper';
+export { SelectField } from './components/SelectField';
+export type { SelectFieldProps } from './components/SelectField';
 export { TooltipButton } from './components/TooltipButton';
 export type { TooltipButtonProps } from './components/TooltipButton';
 export { CopyProvider, useCopy } from './hooks/useCopy';
