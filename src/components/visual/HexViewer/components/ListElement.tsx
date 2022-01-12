@@ -1,7 +1,7 @@
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import { default as React, forwardRef } from 'react';
+import { default as React } from 'react';
 
 export type ListElementProps = {
   title: string;
@@ -18,5 +18,5 @@ export const WrappedListElement = ({ title = '', icon = null, onClick = () => nu
   );
 };
 
-export const ListElement = React.memo(forwardRef(WrappedListElement));
+export const ListElement = React.memo(WrappedListElement);
 export default ListElement;

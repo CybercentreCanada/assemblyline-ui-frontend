@@ -1,6 +1,6 @@
 import { Tooltip } from '@material-ui/core';
 import IconButton from '@material-ui/core/IconButton';
-import { default as React, forwardRef } from 'react';
+import { default as React } from 'react';
 import { useStyles } from '..';
 
 export type TooltipButtonProps = {
@@ -21,5 +21,5 @@ export const WrappedTooltipButton = ({ title = '', icon = null, onClick = () => 
   );
 };
 
-export const TooltipButton = React.memo(forwardRef(WrappedTooltipButton));
+export const TooltipButton = React.memo(WrappedTooltipButton);
 export default TooltipButton;
