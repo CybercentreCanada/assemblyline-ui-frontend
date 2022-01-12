@@ -2,6 +2,7 @@ import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import clsx from 'clsx';
 import useAppContext from 'commons/components/hooks/useAppContext';
 import React, { useEffect, useLayoutEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   HexContainer,
   HexOffsets,
@@ -30,9 +31,10 @@ export type DataProps = {
 
 export const WrappedHexMain = ({ data }: DataProps) => {
   const { isLightTheme } = useAppContext();
+  const { i18n } = useTranslation(['hexViewer']);
 
   const { onStoreInit } = useStore();
-  const { hexMap, getHexValue, getTextValue, onHexInit } = useHex();
+  const { hexMap, getHexValue, getTextValue, onHexInit, onHexLanguageChange } = useHex();
   const { layoutRef, hexesContainerRefs, textsContainerRefs, onContainerMouseDown, onLayoutResize, onLayoutInit } =
     useLayout();
   const { onScrollInit } = useScroll();
@@ -92,6 +94,10 @@ export const WrappedHexMain = ({ data }: DataProps) => {
     onSettingSave,
     onStoreInit
   ]);
+
+  useEffect(() => {
+    onHexLanguageChange(i18n.language);
+  }, [i18n.language, onHexLanguageChange]);
 
   useEffect(() => {
     const handleResize = (event: UIEvent) => {

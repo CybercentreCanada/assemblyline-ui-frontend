@@ -17,12 +17,14 @@
   "settings.title": "Paramètres",
   "settings.description": "Configurer les paramètres",
   "no-results": "Aucun résultat",
-  "share": "Partager le URL",
+  "share": "Partager l'URL",
   "menu": "Afficher les options",
   "columns.label": "Nombre de colonnes :",
   "columns.description": "Définir le nombre de colonnes",
   "columns.auto": "Auto",
   "rows.label": "Nombre de rangées :",
   "rows.description": "Définir le nombre de rangées",
-  "rows.auto": "Auto"
+  "rows.auto": "Auto",
+  "base.label": "Base :",
+  "base.description": "Définir la valeur de la base"
 }

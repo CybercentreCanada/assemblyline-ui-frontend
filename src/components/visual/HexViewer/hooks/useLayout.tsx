@@ -26,7 +26,7 @@ export const LayoutContext = React.createContext<LayoutContextProps>(null);
 
 export const WrappedLayoutProvider = ({ children }: HexProps) => {
   const { setLayoutRows, setLayoutColumns, setLayoutAutoColumns, setLayoutAutoRows } = useStore();
-  const { hexOffsetSize, onHexOffsetSizeChange } = useHex();
+  const { nextHexOffsetSize, onHexOffsetSizeChange } = useHex();
 
   const nextLayoutColumns = useRef<number>(16);
   const nextLayoutRows = useRef<number>(50);
@@ -41,9 +41,9 @@ export const WrappedLayoutProvider = ({ children }: HexProps) => {
 
   const handleOffsetResize = useCallback(() => {
     const size = layoutRef.current.getBoundingClientRect().width > 425 ? 8 : 4;
-    hexOffsetSize.current = size;
+    nextHexOffsetSize.current = size;
     onHexOffsetSizeChange(size);
-  }, [hexOffsetSize, onHexOffsetSizeChange]);
+  }, [nextHexOffsetSize, onHexOffsetSizeChange]);
 
   const handleRowResize = useCallback(() => {
     const viewportOffset = layoutRef.current.getBoundingClientRect();
