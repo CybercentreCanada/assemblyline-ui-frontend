@@ -7,7 +7,7 @@ import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import StarBorder from '@material-ui/icons/StarBorder';
-import { default as React, forwardRef, useState } from 'react';
+import { default as React, useState } from 'react';
 
 export type ListElementProps = {
   children: React.ReactNode;
@@ -46,5 +46,5 @@ export const WrappedListElement = ({ title = '', icon = null, onClick = () => nu
   );
 };
 
-export const ListElement = React.memo(forwardRef(WrappedListElement));
+export const ListElement = React.memo(WrappedListElement);
 export default ListElement;
