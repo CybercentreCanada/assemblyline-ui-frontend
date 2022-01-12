@@ -22,7 +22,8 @@ import {
   useSetting,
   useStateStore,
   useStore,
-  useStyles
+  useStyles,
+  useSuggestion
 } from '..';
 
 export type DataProps = {
@@ -45,6 +46,7 @@ export const WrappedHexMain = ({ data }: DataProps) => {
   const { onCopyKeyDown, onCopyMouseEnter } = useCopy();
   const { onSettingLoad, onSettingSave } = useSetting();
   const { onHistoryLoad, onHistorySave } = useHistory();
+  const { onSuggestionLanguageChange } = useSuggestion();
   const {
     onScrollWheel,
     onScrollTouchStart,
@@ -97,7 +99,8 @@ export const WrappedHexMain = ({ data }: DataProps) => {
 
   useEffect(() => {
     onHexLanguageChange(i18n.language);
-  }, [i18n.language, onHexLanguageChange]);
+    onSuggestionLanguageChange(i18n.language);
+  }, [i18n.language, onHexLanguageChange, onSuggestionLanguageChange]);
 
   useEffect(() => {
     const handleResize = (event: UIEvent) => {

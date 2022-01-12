@@ -9,31 +9,44 @@ export type SuggestionType = {
 
 export type SuggestionContextProps = {
   nextSuggestionOpen?: React.MutableRefObject<boolean>;
-  suggestionLabels?: React.MutableRefObject<string[]>;
+  nextSuggestionLabels?: React.MutableRefObject<string[]>;
   suggestionValues?: React.MutableRefObject<string[]>;
-  onSuggestionLabelChange: (language: string) => void;
   onSuggestionFocus?: () => void;
   onSuggestionBlur?: () => void;
   onSuggestionChange?: (value: string | null) => void;
   onSuggestionInputChange?: (inputValue: string | null) => void;
   onSuggestionKeyDown?: (event: React.KeyboardEvent<HTMLElement>) => void;
+  onSuggestionLanguageChange?: (language: string) => void;
 };
 
 export const SuggestionContext = React.createContext<SuggestionContextProps>(null);
 
 export const WrappedSuggestionProvider = ({ children }: HexProps) => {
   const { nextLayoutColumns, isContainerFocused } = useLayout();
-  const { setSuggestionOpen } = useStore();
+  const { setSuggestionOpen, setSuggestionLabels } = useStore();
   const { nextSearchValue, onSearchValueChange } = useSearch();
 
   const nextSuggestionOpen = useRef<boolean>(false);
-  const suggestionLabels = useRef<Array<string>>([]);
+  const nextSuggestionLabels = useRef<Array<string>>([
+    'hex (Search using hexadecimal values)',
+    'text (Search using ASCII values)'
+  ]);
   const suggestionValues = useRef<Array<string>>(['hex:', 'text:']);
+  const suggestionTranslations = useMemo<{
+    en: Array<string>;
+    fr: Array<string>;
+  }>(
+    () => ({
+      en: ['hex (Search using hexadecimal values)', 'text (Search using ASCII values)'],
+      fr: ['hex (Recherche utilisant des valeurs hexadécimales)', 'text (Recherche utilisant des valeurs ASCII)']
+    }),
+    []
+  );
 
   const handleSuggestionLabelsIndex = useCallback((value: string) => {
     let i = 0;
-    while (i < suggestionLabels.current.length) {
-      if (suggestionLabels.current[i].includes(value)) return i;
+    while (i < nextSuggestionLabels.current.length) {
+      if (nextSuggestionLabels.current[i].includes(value)) return i;
       i++;
     }
     return -1;
@@ -47,16 +60,6 @@ export const WrappedSuggestionProvider = ({ children }: HexProps) => {
     },
     [handleSuggestionLabelsIndex, nextLayoutColumns, setSuggestionOpen]
   );
-
-  const onSuggestionLabelChange = useCallback((language: string) => {
-    if (language === 'en')
-      suggestionLabels.current = ['hex (Search using hexadecimal values)', 'text (Search using ASCII values)'];
-    else if (language === 'fr')
-      suggestionLabels.current = [
-        'hex (Recherche utilisant des valeurs hexadécimales)',
-        'text (Recherche utilisant des valeurs ASCII)'
-      ];
-  }, []);
 
   const onSuggestionFocus = useCallback(() => {
     nextSuggestionOpen.current = true;
@@ -99,18 +102,31 @@ export const WrappedSuggestionProvider = ({ children }: HexProps) => {
     [isContainerFocused, onSuggestionBlur]
   );
 
+  const onSuggestionLanguageChange = useCallback(
+    (language: string) => {
+      if (language === 'en') {
+        nextSuggestionLabels.current = suggestionTranslations.en;
+        setSuggestionLabels(suggestionTranslations.en);
+      } else if (language === 'fr') {
+        nextSuggestionLabels.current = suggestionTranslations.fr;
+        setSuggestionLabels(suggestionTranslations.fr);
+      }
+    },
+    [setSuggestionLabels, suggestionTranslations.en, suggestionTranslations.fr]
+  );
+
   return (
     <SuggestionContext.Provider
       value={{
         nextSuggestionOpen,
-        suggestionLabels,
+        nextSuggestionLabels,
         suggestionValues,
-        onSuggestionLabelChange,
         onSuggestionFocus,
         onSuggestionBlur,
         onSuggestionChange,
         onSuggestionInputChange,
-        onSuggestionKeyDown
+        onSuggestionKeyDown,
+        onSuggestionLanguageChange
       }}
     >
       {useMemo(() => children, [children])}
