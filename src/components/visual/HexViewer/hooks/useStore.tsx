@@ -35,6 +35,7 @@ export type StoreState = {
 
   // Suggestion
   suggestionOpen?: boolean;
+  suggestionLabels?: Array<string>;
 
   // Search
   searchValue?: string;
@@ -86,6 +87,7 @@ export type StoreSetState = {
 
   // Suggestion
   setSuggestionOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+  setSuggestionLabels?: React.Dispatch<React.SetStateAction<Array<string>>>;
 
   // Search
   setSearchValue?: React.Dispatch<React.SetStateAction<string>>;
@@ -141,6 +143,7 @@ export type StoreContextProps = {
 
   // Suggestion
   setSuggestionOpen?: (value: boolean) => void;
+  setSuggestionLabels?: (values: Array<string>) => void;
 
   // Search
   setSearchValue?: (value: string) => void;
@@ -194,6 +197,7 @@ export const useStateStore = (): StateStoreContext => {
 
   // Suggestion
   const [suggestionOpen, setSuggestionOpen] = useState<boolean>(false);
+  const [suggestionLabels, setSuggestionLabels] = useState<Array<string>>([]);
 
   // Search
   const [searchValue, setSearchValue] = useState<string>('');
@@ -242,6 +246,7 @@ export const useStateStore = (): StateStoreContext => {
 
       // Suggestion
       suggestionOpen: suggestionOpen,
+      suggestionLabels: suggestionLabels,
 
       // Search
       searchValue: searchValue,
@@ -285,6 +290,7 @@ export const useStateStore = (): StateStoreContext => {
 
       // Suggestion
       setSuggestionOpen: setSuggestionOpen,
+      setSuggestionLabels: setSuggestionLabels,
 
       // Search
       setSearchValue: setSearchValue,
@@ -348,6 +354,7 @@ export const WrappedStoreProvider = ({ children }: HexProps) => {
 
   // Suggestion
   const setSuggestionOpen = useCallback((value: boolean) => store.current?.setSuggestionOpen(value), []);
+  const setSuggestionLabels = useCallback((values: Array<string>) => store.current?.setSuggestionLabels(values), []);
 
   // Search
   const setSearchValue = useCallback((value: string) => store.current?.setSearchValue(value), []);
@@ -399,6 +406,7 @@ export const WrappedStoreProvider = ({ children }: HexProps) => {
 
         // Suggestion
         setSuggestionOpen,
+        setSuggestionLabels,
 
         // Search
         setSearchValue,

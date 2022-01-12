@@ -13,18 +13,7 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import ShareIcon from '@material-ui/icons/Share';
 import { default as React, forwardRef, useImperativeHandle, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  ListElement,
-  StoreState,
-  useCursor,
-  useHex,
-  useHistory,
-  useLocation,
-  useSearch,
-  useSetting,
-  useStyles,
-  useSuggestion
-} from '..';
+import { ListElement, StoreState, useCursor, useHex, useLocation, useSearch, useSetting, useStyles } from '..';
 
 export type MenuPopperProps = {
   states?: StoreState;
@@ -45,34 +34,22 @@ const useMenuStyles = makeStyles((theme: Theme) =>
 );
 
 export const WrappedMenuPopper = ({ states = null, anchorEl = null }: MenuPopperProps, ref) => {
-  const { t, i18n } = useTranslation(['hexViewer']);
+  const { t } = useTranslation(['hexViewer']);
   const theme = useTheme();
   const downSM = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const { cursorIndex, searchValue, searchIndexes, searchIndex, suggestionOpen } = states;
+  const { cursorIndex, searchValue, searchIndexes, searchIndex } = states;
 
   const classes = useMenuStyles();
   const { toolbarClasses } = useStyles();
 
   const { hexMap } = useHex();
   const { onSettingOpen } = useSetting();
-  const { onSearchKeyDown, onSearchClear, onSearchClick, onSearchIndexChange, onSearchInputChange } = useSearch();
+  const { onSearchClear, onSearchClick } = useSearch();
   const { onCursorIndexChange } = useCursor();
-  const { onHistoryChange, onHistoryKeyDown } = useHistory();
   const { onLocationShare } = useLocation();
-  const {
-    suggestionLabels,
-    onSuggestionLabelChange,
-    onSuggestionFocus,
-    onSuggestionBlur,
-    onSuggestionChange,
-    onSuggestionInputChange,
-    onSuggestionKeyDown
-  } = useSuggestion();
 
   const [open, setOpen] = useState<boolean>(false);
-  const [nestedOpen, setNestedOpen] = useState<boolean>(false);
-  // const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
   useImperativeHandle(
     ref,
@@ -81,20 +58,6 @@ export const WrappedMenuPopper = ({ states = null, anchorEl = null }: MenuPopper
     }),
     []
   );
-
-  // const handleClose = (event: React.MouseEvent<EventTarget>) => {
-  //   setOpen(false);
-  // };
-
-  // const handleCloseKeyDown = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
-  //   if (!isEscape(event.key) && !isEnter(event.key)) return;
-  //   setOpen(false);
-  //   // setAnchorEl(null);
-  // }, []);
-
-  const handleClick = () => {
-    setNestedOpen(!nestedOpen);
-  };
 
   return (
     <Popper open={open && downSM} anchorEl={anchorEl} placement="bottom-end" transition>

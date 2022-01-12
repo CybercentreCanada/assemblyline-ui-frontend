@@ -11,7 +11,7 @@ import NavigationIcon from '@material-ui/icons/Navigation';
 import SettingsIcon from '@material-ui/icons/Settings';
 import ShareIcon from '@material-ui/icons/Share';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import { default as React, useCallback, useLayoutEffect, useRef, useState } from 'react';
+import { default as React, useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   MenuPopper,
@@ -21,7 +21,6 @@ import {
   useCursor,
   useHex,
   useHistory,
-  useLayout,
   useLocation,
   useSearch,
   useSetting,
@@ -31,29 +30,21 @@ import {
 
 export const WrappedHexToolBar = (states: StoreState) => {
   const { toolbarClasses } = useStyles();
-  const { t, i18n } = useTranslation(['hexViewer']);
+  const { t } = useTranslation(['hexViewer']);
   const theme = useTheme();
   const upSM = useMediaQuery(theme.breakpoints.up('sm'));
   const upXS = useMediaQuery(theme.breakpoints.up('xs'));
 
   const { hexMap } = useHex();
-  const { layoutRef } = useLayout();
   const { onSettingOpen } = useSetting();
   const { onSearchKeyDown, onSearchClear, onSearchClick, onSearchIndexChange, onSearchInputChange } = useSearch();
   const { onCursorIndexChange } = useCursor();
   const { onHistoryChange, onHistoryKeyDown } = useHistory();
   const { onLocationShare } = useLocation();
-  const {
-    suggestionLabels,
-    onSuggestionLabelChange,
-    onSuggestionFocus,
-    onSuggestionBlur,
-    onSuggestionChange,
-    onSuggestionInputChange,
-    onSuggestionKeyDown
-  } = useSuggestion();
+  const { onSuggestionFocus, onSuggestionBlur, onSuggestionChange, onSuggestionInputChange, onSuggestionKeyDown } =
+    useSuggestion();
 
-  const { cursorIndex, searchValue, searchIndexes, searchIndex, suggestionOpen } = states;
+  const { suggestionLabels, cursorIndex, searchValue, searchIndexes, searchIndex, suggestionOpen } = states;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [value, setValue] = useState<string>('');
@@ -68,42 +59,7 @@ export const WrappedHexToolBar = (states: StoreState) => {
   const toolbarRef = useRef(null);
   const handleMenuClick = useCallback(event => menuPopperRef.current.open(), []);
 
-  const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef<HTMLButtonElement>(null);
-
-  const handleToggle = () => {
-    setOpen(prevOpen => !prevOpen);
-  };
-
-  const handleClose = (event: React.MouseEvent<EventTarget>) => {
-    if (anchorRef.current && anchorRef.current.contains(event.target as HTMLElement)) return;
-    setOpen(false);
-  };
-
-  function handleListKeyDown(event: React.KeyboardEvent) {
-    if (event.key === 'Tab') {
-      event.preventDefault();
-      setOpen(false);
-    }
-  }
-
-  // return focus to the button when we transitioned from !open -> open
-  const prevOpen = React.useRef(open);
-  React.useEffect(() => {
-    if (prevOpen.current === true && open === false) {
-      anchorRef.current!.focus();
-    }
-
-    prevOpen.current = open;
-  }, [open]);
-
-  // const [anchorMenuEl, setAnchorMenuEl] = useState<null | HTMLElement>(null);
-  // const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => setAnchorMenuEl(event.currentTarget);
-  // const handleMenuClose = () => setAnchorMenuEl(null);
-
-  useLayoutEffect(() => {
-    onSuggestionLabelChange(i18n.language);
-  }, [i18n.language, onSuggestionLabelChange]);
 
   return (
     <div className={toolbarClasses.root} ref={toolbarRef}>
@@ -124,7 +80,7 @@ export const WrappedHexToolBar = (states: StoreState) => {
           fullWidth
           size="small"
           value={value}
-          options={suggestionLabels.current}
+          options={suggestionLabels}
           onFocus={event => {
             onSuggestionFocus();
           }}
@@ -201,18 +157,11 @@ export const WrappedHexToolBar = (states: StoreState) => {
           </>
         ) : (
           <Tooltip title={t('menu')}>
-            <IconButton
-              aria-label={t('menu')}
-              ref={anchorRef}
-              aria-controls={open ? 'menu-list-grow' : undefined}
-              aria-haspopup="true"
-              onClick={handleMenuClick}
-            >
+            <IconButton aria-label={t('menu')} ref={anchorRef} onClick={handleMenuClick}>
               <MenuIcon />
             </IconButton>
           </Tooltip>
         )}
-
         <NumberFieldPopper
           ref={searchPopperRef}
           id="search-index"
@@ -249,6 +198,7 @@ export const HexToolBar = React.memo(
     prevProps.searchIndex === nextProps.searchIndex &&
     prevProps.searchHexIndex === nextProps.searchHexIndex &&
     prevProps.suggestionOpen === nextProps.suggestionOpen &&
+    prevProps.suggestionLabels === nextProps.suggestionLabels &&
     prevProps.cursorIndex === nextProps.cursorIndex
 );
 export default HexToolBar;
