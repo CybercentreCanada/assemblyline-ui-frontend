@@ -66,7 +66,7 @@ export const WrappedSettingProvider = ({ children }: HexProps) => {
           layoutAutoColumns: nextLayoutAutoColumns.current
         })
       ),
-    []
+    [nextHexBase, nextLayoutAutoColumns, nextLayoutAutoRows, nextLayoutColumns, nextLayoutRows]
   );
 
   const onSettingLoad = useCallback(() => {
