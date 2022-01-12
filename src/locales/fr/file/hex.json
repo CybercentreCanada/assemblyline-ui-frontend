@@ -25,6 +25,6 @@
   "rows.label": "Nombre de rangées :",
   "rows.description": "Définir le nombre de rangées",
   "rows.auto": "Auto",
-  "base.label": "Base :",
-  "base.description": "Définir la valeur de la base"
+  "base.label": "Base des décalages :",
+  "base.description": "Définir le système de numération des décalages"
 }
