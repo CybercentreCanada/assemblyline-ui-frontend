@@ -1,17 +1,19 @@
 import { default as React, useCallback, useContext, useMemo, useRef } from 'react';
-import { HexProps, useLayout, useStore } from '..';
-
-export type SettingValue = {
-  columns?: string;
-};
+import { HexProps, useHex, useLayout, useStore } from '..';
 
 export type SettingValues = {
-  columns?: Array<string>;
+  // Hex
+  hexBase?: number;
+
+  // Layout
+  layoutRows?: number;
+  layoutAutoRows?: boolean;
+  layoutColumns?: number;
+  layoutAutoColumns?: boolean;
 };
 
 export type SettingContextProps = {
   nextSettingsOpen?: React.MutableRefObject<boolean>;
-  nextSettingValue?: React.MutableRefObject<SettingValue>;
   nextSettingValues?: React.MutableRefObject<SettingValues>;
   settingColumns?: Array<string>;
   onSettingOpen?: () => void;
@@ -25,15 +27,19 @@ export const SettingContext = React.createContext<SettingContextProps>(null);
 
 export const WrappedSettingProvider = ({ children }: HexProps) => {
   const { setSettingsOpen } = useStore();
-  const { nextLayoutAutoColumns, onLayoutColumnsChange, onLayoutResize } = useLayout();
+  const { nextHexBase, onHexBaseValueChange } = useHex();
+  const {
+    nextLayoutRows,
+    nextLayoutAutoRows,
+    nextLayoutColumns,
+    nextLayoutAutoColumns,
+    onLayoutRowsChange,
+    onLayoutAutoRowsChange,
+    onLayoutColumnsChange,
+    onLayoutAutoColumnsChange
+  } = useLayout();
 
   const nextSettingsOpen = useRef<boolean>(false);
-  const nextSettingValue = useRef<SettingValue>({
-    columns: 'auto'
-  });
-  const nextSettingValues = useRef<SettingValues>({
-    columns: ['auto', '2', '4', '8', '12', '16', '20', '24', '32', '48', '64', '80', '96', '112', '128']
-  });
 
   const onSettingOpen = useCallback(() => {
     nextSettingsOpen.current = true;
@@ -46,48 +52,52 @@ export const WrappedSettingProvider = ({ children }: HexProps) => {
   }, [setSettingsOpen]);
 
   const onSettingSave = useCallback(
-    () => localStorage.setItem('hexViewer.settings', JSON.stringify(nextSettingValue.current)),
+    () =>
+      localStorage.setItem(
+        'hexViewer.settings',
+        JSON.stringify({
+          // Hex
+          hexBase: nextHexBase.current,
+
+          // Layout
+          layoutRows: nextLayoutRows.current,
+          layoutAutoRows: nextLayoutAutoRows.current,
+          layoutColumns: nextLayoutColumns.current,
+          layoutAutoColumns: nextLayoutAutoColumns.current
+        })
+      ),
     []
   );
 
-  const onSettingColumnsChange = useCallback(
-    (value: string) => {
-      if (!nextSettingValues.current.columns.includes(value)) return;
-      nextSettingValue.current.columns = value;
-
-      if (nextSettingValue.current.columns === 'auto') {
-        nextLayoutAutoColumns.current = true;
-        onLayoutResize();
-      } else {
-        nextLayoutAutoColumns.current = false;
-        onLayoutColumnsChange(parseInt(nextSettingValue.current.columns));
-      }
-      onSettingSave();
-    },
-    [nextLayoutAutoColumns, onLayoutColumnsChange, onLayoutResize, onSettingSave]
-  );
-
   const onSettingLoad = useCallback(() => {
-    setSettingsOpen(nextSettingsOpen.current);
-
     const value = localStorage.getItem('hexViewer.settings');
-    const json: SettingValue = JSON.parse(value) as SettingValue;
+    const json: SettingValues = JSON.parse(value) as SettingValues;
     if (value === null || value === '' || typeof json !== 'object') return;
 
-    if (json.hasOwnProperty('columns')) onSettingColumnsChange(json.columns);
-  }, [onSettingColumnsChange, setSettingsOpen]);
+    // Hex
+    if (json.hasOwnProperty('hexBase')) onHexBaseValueChange(json.hexBase);
+
+    // Layout
+    if (json.hasOwnProperty('layoutRows')) onLayoutRowsChange(json.layoutRows);
+    if (json.hasOwnProperty('layoutAutoRows')) onLayoutAutoRowsChange(json.layoutAutoRows);
+    if (json.hasOwnProperty('layoutColumns')) onLayoutColumnsChange(json.layoutColumns);
+    if (json.hasOwnProperty('layoutAutoColumns')) onLayoutAutoColumnsChange(json.layoutAutoColumns);
+  }, [
+    onHexBaseValueChange,
+    onLayoutAutoColumnsChange,
+    onLayoutAutoRowsChange,
+    onLayoutColumnsChange,
+    onLayoutRowsChange
+  ]);
 
   return (
     <SettingContext.Provider
       value={{
         nextSettingsOpen,
-        nextSettingValue,
-        nextSettingValues,
         onSettingOpen,
         onSettingClose,
         onSettingLoad,
-        onSettingSave,
-        onSettingColumnsChange
+        onSettingSave
       }}
     >
       {useMemo(() => children, [children])}

@@ -26,6 +26,7 @@ export type HexContextProps = {
     }>,
     child: React.ReactNode
   ) => void;
+  onHexBaseValueChange?: (value: number) => void;
   onHexLanguageChange?: (language: string) => void;
 };
 
@@ -195,6 +196,14 @@ export const WrappedHexProvider = ({ children }: HexProps) => {
     [setHexBase]
   );
 
+  const onHexBaseValueChange = useCallback(
+    (value: number) => {
+      nextHexBase.current = value;
+      setHexBase(value);
+    },
+    [setHexBase]
+  );
+
   // const parseStringToHex = useCallback((text: string) => {
   //   let newMap = new Map();
   //   text.split(/[ ]+/).forEach((hex, index) => {
@@ -248,6 +257,7 @@ export const WrappedHexProvider = ({ children }: HexProps) => {
         onHexOffsetSizeChange,
         onHexIndexClamp,
         onHexBaseChange,
+        onHexBaseValueChange,
         onHexLanguageChange
       }}
     >

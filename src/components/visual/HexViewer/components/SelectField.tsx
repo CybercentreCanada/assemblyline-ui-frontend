@@ -39,8 +39,7 @@ const useStyles = makeStyles((theme: Theme) =>
       }
     },
     item: {
-      width: '100%',
-      textAlign: 'left'
+      width: '100%'
     }
   })
 );
