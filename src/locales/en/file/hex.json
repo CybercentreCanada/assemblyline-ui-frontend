@@ -26,5 +26,9 @@
   "rows.description": "Set the number of rows",
   "rows.auto": "Auto",
   "base.label": "Offsets Base:",
-  "base.description": "Set the numeral system used for the offsets"
+  "base.description": "Set the numeral system used for the offsets",
+  "offset.name": "Offset",
+  "offset.title": "Go to an Offset",
+  "offset.label": "Offset :",
+  "offset.placeholder": "Ex: 001"
 }
