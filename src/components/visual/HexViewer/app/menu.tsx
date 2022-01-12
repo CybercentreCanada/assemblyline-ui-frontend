@@ -15,7 +15,7 @@ import { default as React, forwardRef, useImperativeHandle, useState } from 'rea
 import { useTranslation } from 'react-i18next';
 import { ListElement, StoreState, useCursor, useHex, useLocation, useSearch, useSetting, useStyles } from '..';
 
-export type MenuPopperProps = {
+export type HexMenuProps = {
   states?: StoreState;
   anchorEl?: any;
 };
@@ -33,7 +33,7 @@ const useMenuStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export const WrappedMenuPopper = ({ states = null, anchorEl = null }: MenuPopperProps, ref) => {
+export const WrappedHexMenu = ({ states = null, anchorEl = null }: HexMenuProps, ref) => {
   const { t } = useTranslation(['hexViewer']);
   const theme = useTheme();
   const downSM = useMediaQuery(theme.breakpoints.down('sm'));
@@ -101,8 +101,8 @@ export const WrappedMenuPopper = ({ states = null, anchorEl = null }: MenuPopper
                   <ListItemText>
                     <TextField
                       id="cursor-index"
-                      label={t('navigation-label')}
-                      placeholder={t('navigation-placeholder')}
+                      label={t('offset.name')}
+                      placeholder={t('offset.placeholder')}
                       fullWidth
                       size="small"
                       margin="dense"
@@ -130,6 +130,6 @@ export const WrappedMenuPopper = ({ states = null, anchorEl = null }: MenuPopper
   );
 };
 
-export const MenuPopper = React.memo(forwardRef(WrappedMenuPopper));
+export const HexMenu = React.memo(forwardRef(WrappedHexMenu));
 
-export default MenuPopper;
+export default HexMenu;

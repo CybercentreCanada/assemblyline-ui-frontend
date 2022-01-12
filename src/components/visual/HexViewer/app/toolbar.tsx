@@ -14,7 +14,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import { default as React, useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  MenuPopper,
+  HexMenu,
   NumberFieldPopper,
   StoreState,
   TooltipButton,
@@ -55,10 +55,9 @@ export const WrappedHexToolBar = (states: StoreState) => {
   const cursorPopperRef = useRef(null);
   const handleCursorClick = useCallback(event => cursorPopperRef.current.open(event), []);
 
-  const menuPopperRef = useRef(null);
+  const menuRef = useRef(null);
   const toolbarRef = useRef(null);
-  const handleMenuClick = useCallback(event => menuPopperRef.current.open(), []);
-
+  const handleMenuClick = useCallback(event => menuRef.current.open(), []);
   const anchorRef = React.useRef<HTMLButtonElement>(null);
 
   return (
@@ -151,7 +150,7 @@ export const WrappedHexToolBar = (states: StoreState) => {
             <TooltipButton title={t('next-match')} onClick={() => onSearchClick('next')} icon={<ArrowDownward />} />
             <TooltipButton title={t('clear')} onClick={onSearchClear} icon={<ClearIcon />} />
             <Divider className={toolbarClasses.divider} orientation="vertical" />
-            <TooltipButton title={t('navigation')} onClick={handleCursorClick} icon={<NavigationIcon />} />
+            <TooltipButton title={t('offset.title')} onClick={handleCursorClick} icon={<NavigationIcon />} />
             <TooltipButton title={t('share')} onClick={onLocationShare} icon={<ShareIcon />} />
             <TooltipButton title={t('settings.label')} onClick={onSettingOpen} icon={<SettingsIcon />} />
           </>
@@ -175,14 +174,14 @@ export const WrappedHexToolBar = (states: StoreState) => {
         <NumberFieldPopper
           ref={cursorPopperRef}
           id="cursor-index"
-          label={t('navigation-label')}
-          placeholder={t('navigation-placeholder')}
+          label={t('offset.label')}
+          placeholder={t('offset.placeholder')}
           value={cursorIndex !== null ? cursorIndex : ''}
           min={0}
           max={hexMap.current.size - 1}
           onNumberChange={(index: number) => onCursorIndexChange(index)}
         />
-        <MenuPopper ref={menuPopperRef} anchorEl={toolbarRef.current} states={states} />
+        <HexMenu ref={menuRef} anchorEl={toolbarRef.current} states={states} />
       </Paper>
     </div>
   );

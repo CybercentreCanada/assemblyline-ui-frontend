@@ -26,5 +26,9 @@
   "rows.description": "Définir le nombre de rangées",
   "rows.auto": "Auto",
   "base.label": "Base des décalages :",
-  "base.description": "Définir le système de numération des décalages"
+  "base.description": "Définir le système de numération des décalages",
+  "offset.name": "Décalage",
+  "offset.title": "Aller au décalage",
+  "offset.label": "Décalage :",
+  "offset.placeholder": "Ex: 001"
 }
