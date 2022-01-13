@@ -1,7 +1,7 @@
-import { ClickAwayListener, Fade, Paper, Popper, TextField } from '@material-ui/core';
+import { ClickAwayListener, Fade, Paper, Popper } from '@material-ui/core';
 import { isEnter, isEscape } from 'commons/addons/elements/utils/keyboard';
-import { default as React, forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react';
-import { useStyles } from '..';
+import { default as React, forwardRef, useCallback, useImperativeHandle, useState } from 'react';
+import { NumericField, useStyles } from '..';
 
 export type NumberFieldPopperProps = {
   id?: string;
@@ -10,6 +10,8 @@ export type NumberFieldPopperProps = {
   value: number | string;
   min?: number;
   max?: number;
+  base?: number;
+  labelWidth?: number;
   onClickAway?: (event: React.MouseEvent<Document, MouseEvent>) => void;
   onChange?: (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => void;
   onNumberChange?: (value: number) => void;
@@ -23,6 +25,8 @@ export const WrappedNumberFieldPopper = (
     value = null,
     min = 0,
     max = 1,
+    base = 10,
+    labelWidth = 0,
     onClickAway = () => null,
     onChange = () => null,
     onNumberChange = () => null
@@ -31,7 +35,6 @@ export const WrappedNumberFieldPopper = (
 ) => {
   const { toolbarClasses } = useStyles();
 
-  const textFieldRef = useRef(null);
   const [open, setOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
@@ -67,29 +70,19 @@ export const WrappedNumberFieldPopper = (
         <ClickAwayListener onClickAway={handleClickAway}>
           <Fade {...TransitionProps} timeout={200}>
             <Paper className={toolbarClasses.searchPaper}>
-              <TextField
-                ref={textFieldRef}
+              <NumericField
                 id={id}
                 label={label}
                 placeholder={placeholder}
                 fullWidth
-                size="small"
                 margin="dense"
-                variant="outlined"
-                type="number"
-                value={value}
-                InputProps={{
-                  autoCorrect: 'off',
-                  autoCapitalize: 'off',
-                  autoFocus: true,
-                  inputProps: { min: min, max: max }
-                }}
-                onChange={onChange}
-                onInput={(event: any) => {
-                  onNumberChange(event.target.valueAsNumber);
-                }}
+                value={value as number}
+                labelWidth={labelWidth}
+                min={min}
+                max={max}
+                base={base}
+                onChange={event => onNumberChange(event.target.valueAsNumber as number)}
                 onKeyDown={event => handleCloseKeyDown(event)}
-                style={{ margin: 0 }}
               />
             </Paper>
           </Fade>
