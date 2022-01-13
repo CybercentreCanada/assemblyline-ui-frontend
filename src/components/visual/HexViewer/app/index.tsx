@@ -54,19 +54,3 @@ export default React.memo(({ data }: DataProps) =>
     </StoreProvider>
   ) : null
 );
-
-/**
- * To Do:
- *
- * change the hexViewwer to main.tsx and remove store
- *
- * 1. done - Clean the useSearch
- * 2. Add the translation
- * 3. Finish the settings menu to include
- *  3.1 changing the base value
- *  3.2 width of the viewer: auto, 8, 16,
- * 4. Add a jump to function in the settings
- * 5. Better the search value
- * 6. useQuery to save the history of search
- *
- */

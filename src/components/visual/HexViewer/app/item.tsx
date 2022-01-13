@@ -27,8 +27,7 @@ export const WrappedHexItem = ({
   selectClass = '',
   searchClass = '',
   selectedSearchClass = ''
-}: // isLightTheme = false
-HexItemProps) => {
+}: HexItemProps) => {
   const { onHoverMouseEnter, onHoverMouseLeave, onHoverMouseDown } = useHover();
   const { onCursorMouseDown, onCursorMouseEnter } = useCursor();
   const { onSelectMouseEnter, onSelectMouseDown } = useSelect();
@@ -45,17 +44,10 @@ HexItemProps) => {
       }}
       onMouseLeave={event => onHoverMouseLeave(index)}
       onMouseDown={event => {
-        // event.preventDefault();
         onHoverMouseDown();
         onCursorMouseDown(index);
         onSelectMouseDown(index);
         onSearchMouseDown(index);
-      }}
-      onMouseUp={event => {
-        // event.preventDefault();
-        // onHoverMouseUp();
-        // onCursorMouseUp(store);
-        // onSelectMouseUp(store);
       }}
     >
       {value}
@@ -71,11 +63,6 @@ export const HexItem = React.memo(
   ) =>
     prevProps.value === nextProps.value &&
     prevProps.index === nextProps.index &&
-    // prevProps.colorClass === nextProps.colorClass &&
-    // prevProps.borderClass === nextProps.borderClass &&
-    // prevProps.cursorClass === nextProps.cursorClass &&
-    // prevProps.selectClass === nextProps.selectClass &&
-    // prevProps.searchClass === nextProps.searchClass &&
     prevProps.isLightTheme === nextProps.isLightTheme &&
     prevProps.initialized === nextProps.initialized
 );

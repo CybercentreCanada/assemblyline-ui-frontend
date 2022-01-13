@@ -204,39 +204,6 @@ export const WrappedHexProvider = ({ children }: HexProps) => {
     [setHexBase]
   );
 
-  // const parseStringToHex = useCallback((text: string) => {
-  //   let newMap = new Map();
-  //   text.split(/[ ]+/).forEach((hex, index) => {
-  //     newMap.set(index, hex);
-  //   });
-  //   return newMap;
-  // }, []);
-
-  // const onParseDataToHex = useCallback(
-  //   (data: string, { setHexes }: StoreState) => setHexes(parseStringToHex(data)),
-  //   [parseStringToHex]
-  // );
-
-  // const onClearHex = useCallback(({ setHexes }: StoreState) => setHexes(new Map()), []);
-
-  // const getHexValue = useCallback(
-  //   ({ hexChars }: StoreState, index: number) => (index < hexChars.size ? hexChars.get(index).toUpperCase() : ''),
-  //   []
-  // );
-
-  // const getTextValue = useCallback(({ textChars }: StoreState, index: number) => {
-  //   return index < textChars.size ? textChars.get(index) : '';
-  //   const hex = index < hexChars.size ? hexChars.get(index) : '';
-  //   const character = nullHexValue.includes(hex)
-  //     ? ''
-  //     : Buffer.from(hex, 'hex')
-  //         .toString()
-  //         .replace(/[^\x00-\x7F]/g, '');
-
-  //   return character;
-  //   return nullTextValue.includes(character) ? '·' : character;
-  // }, []);
-
   return (
     <HexContext.Provider
       value={{

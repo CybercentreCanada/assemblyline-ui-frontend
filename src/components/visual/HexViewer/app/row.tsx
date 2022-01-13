@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { HexItem, StoreState, useStyles } from '..';
+import { HexItem, StoreState } from '..';
 
 export type HexRowProps = {
   isLightTheme?: boolean;
@@ -28,18 +28,12 @@ export const WrappedHexRow = ({
   getSearchClass = (index: number) => null,
   getSelectedSearchClass = (index: number) => null
 }: HexRowProps) => {
-  const { hexClasses } = useStyles();
-
   const itemValues: Array<string> = useMemo(() => rowIndexes.map(index => getValue(index)), [getValue, rowIndexes]);
 
   const colorClasses: Array<string> = useMemo(
     () => rowIndexes.map(index => getColorClass(index)),
     [rowIndexes, getColorClass]
   );
-  // const borderClasses: Array<string> = useMemo(
-  //   () => rowIndexes.map((index, j) => getBorderClass(j)),
-  //   [rowIndexes, getBorderClass]
-  // );
   const cursorClasses: Array<string> = useMemo(
     () => rowIndexes.map(index => getCursorClass(index)),
     [rowIndexes, getCursorClass]
@@ -66,17 +60,14 @@ export const WrappedHexRow = ({
           index={index}
           value={itemValues[j]}
           colorClass={colorClasses[j]}
-          // borderClass={borderClasses[j]}
           cursorClass={cursorClasses[j]}
           selectClass={selectClasses[j]}
           searchClass={searchClasses[j]}
           selectedSearchClass={selectedSearchClasses[j]}
           isLightTheme={isLightTheme}
           initialized={initialized}
-          // getColorClass={getColorClass}
         />
       ))}
-      {/* <span>{'\n'}</span> */}
     </div>
   );
 };
@@ -89,10 +80,6 @@ export const HexRow = React.memo(
   ) =>
     prevProps.rowIndexes[0] === nextProps.rowIndexes[0] &&
     prevProps.rowIndexes.length === nextProps.rowIndexes.length &&
-    // prevProps.rowIndexes.length === nextProps.rowIndexes.length &&
-    // prevProps.rowIndexes.includes(prevProps.store.cursorIndex) ===
-    //   nextProps.rowIndexes.includes(nextProps.store.cursorIndex) &&
-    // !nextProps.rowIndexes.includes(nextProps.store.cursorIndex) &&
     prevProps.initialized === nextProps.initialized &&
     prevProps.isLightTheme === nextProps.isLightTheme
 );

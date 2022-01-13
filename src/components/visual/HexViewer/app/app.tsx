@@ -208,9 +208,5 @@ export const WrappedHexMain = ({ data }: DataProps) => {
   );
 };
 
-export const HexApp = React.memo(
-  WrappedHexMain
-  // (prevProps: Readonly<HexProps>, nextProps: Readonly<HexProps>) => prevProps === nextProps
-  // prevProps.hexChars.size === nextProps.hexChars.size && prevProps.setSelectIndexes === nextProps.setSelectIndexes
-);
+export const HexApp = React.memo(WrappedHexMain);
 export default HexApp;

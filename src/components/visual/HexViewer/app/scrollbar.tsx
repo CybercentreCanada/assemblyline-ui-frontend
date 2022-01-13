@@ -48,6 +48,5 @@ export const WrappedHexScrollBar = (store: StoreState) => {
 export const HexScrollBar = React.memo(
   WrappedHexScrollBar,
   (prevProps: Readonly<StoreState>, nextProps: Readonly<StoreState>) => prevProps.scrollIndex === nextProps.scrollIndex
-  // prevProps.nextScrollMaxIndex.current === nextProps.nextScrollMaxIndex.current
 );
 export default HexScrollBar;

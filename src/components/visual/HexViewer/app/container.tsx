@@ -50,13 +50,7 @@ export const WrappedHexContainer = ({
   }, [layoutColumns, layoutRows]);
 
   return (
-    <div
-      ref={containerRef}
-      className={containerClass}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      // onMouseDown={event => onContainerMouseDown(event)}
-    >
+    <div ref={containerRef} className={containerClass} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
       {indexes.map(rowIndexes => (
         <HexRow
           key={rowIndexes[0] + hexIndex}
