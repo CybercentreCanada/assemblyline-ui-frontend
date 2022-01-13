@@ -120,8 +120,8 @@ export const WrappedSearchProvider = ({ children }: HexProps) => {
     if (!value || value === '') return [];
 
     if (key === '') getSearchPatternInTexts(hexData.current, parseStringToHexString(value));
-    else if (key === 'texts') getSearchPatternInTexts(hexData.current, parseStringToHexString(value));
-    else if (key === 'hexes') getSearchPatternInHexes(hexData.current, value.toLowerCase());
+    else if (key === 'text') getSearchPatternInTexts(hexData.current, parseStringToHexString(value));
+    else if (key === 'hex') getSearchPatternInHexes(hexData.current, value.toLowerCase());
   }, [getSearchPatternInHexes, getSearchPatternInTexts, hexData, parseStringToHexString]);
 
   const getPreviousSearchIndex = useCallback(() => {
