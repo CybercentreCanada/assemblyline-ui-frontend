@@ -3,9 +3,18 @@ import Collapse from '@material-ui/core/Collapse';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import { default as React } from 'react';
+import { default as React, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CheckBoxNumberField, SelectField, StoreState, useHex, useLayout, useSetting, useStore } from '..';
+import {
+  CheckBoxNumberField,
+  NumericField,
+  SelectField,
+  StoreState,
+  useHex,
+  useLayout,
+  useSetting,
+  useStore
+} from '..';
 
 export const WrappedHexSettings = (states: StoreState) => {
   const {
@@ -24,6 +33,8 @@ export const WrappedHexSettings = (states: StoreState) => {
   const { setHexBase } = useStore();
   const { onHexBaseChange } = useHex();
   const { onLayoutAutoColumnsChange, onLayoutColumnsChange, onLayoutAutoRowsChange, onLayoutRowsChange } = useLayout();
+
+  const [value, setValue] = useState(0);
 
   return (
     <div>
@@ -118,6 +129,21 @@ export const WrappedHexSettings = (states: StoreState) => {
                     value={hexBase}
                     onChange={event => setHexBase(parseInt(event.target.value))}
                     style={{ margin: 0 }}
+                  />
+                </Grid>
+                <Grid item xs={10} sm={3} style={{ wordBreak: 'break-word' }}>
+                  {'base [int]:'}
+                </Grid>
+                <Grid item xs={10} sm={9}>
+                  <NumericField
+                    value={value}
+                    base={16}
+                    step={1}
+                    fullWidth
+                    onChange={event => {
+                      // console.log(event.target.valueAsNumber);
+                      setValue(event.target.valueAsNumber);
+                    }}
                   />
                 </Grid>
               </Grid>
