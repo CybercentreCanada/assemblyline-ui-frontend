@@ -4,7 +4,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { default as React } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CheckBoxNumberField, SelectField, StoreState, useHex, useLayout, useScroll, useSetting, useStore } from '..';
+import { CheckBoxNumberField, SelectField, StoreState, useHex, useLayout, useScroll, useSetting } from '..';
 
 export const WrappedHexSettings = (states: StoreState) => {
   const {
@@ -20,7 +20,6 @@ export const WrappedHexSettings = (states: StoreState) => {
 
   const { t } = useTranslation(['hexViewer']);
   const { onSettingClose } = useSetting();
-  const { setHexBase } = useStore();
   const { onHexBaseChange } = useHex();
   const { onLayoutAutoColumnsChange, onLayoutColumnsChange, onLayoutAutoRowsChange, onLayoutRowsChange } = useLayout();
   const { onScrollSpeedChange } = useScroll();

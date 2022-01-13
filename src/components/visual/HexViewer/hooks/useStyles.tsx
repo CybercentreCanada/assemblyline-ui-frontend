@@ -38,7 +38,6 @@ const useNewHexStyles = makeStyles(theme => ({
   item: {
     '& > div > div': {
       display: 'block',
-      // color: theme.palette.text.primary,
       paddingLeft: theme.spacing(0.2),
       paddingRight: theme.spacing(0.2),
       fontWeight: theme.palette.type === 'dark' ? 400 : 600,
@@ -69,7 +68,6 @@ const useItemStyles = makeStyles(theme => ({
   },
   hover: {
     backgroundColor: theme.palette.action.selected
-    // backgroundColor: theme.palette.action.focus
   },
   select: {
     color: theme.palette.common.white,
@@ -86,9 +84,6 @@ const useItemStyles = makeStyles(theme => ({
     backgroundColor: yellow[500],
     fontWeight: theme.palette.type === 'dark' ? 600 : 600
   },
-  // search: {
-  //   backgroundColor: theme.palette.action.active
-  // },
   cursor: {
     fontWeight: theme.palette.type === 'dark' ? 400 : 600,
     backgroundColor: theme.palette.primary.light,
@@ -98,7 +93,6 @@ const useItemStyles = makeStyles(theme => ({
   '@keyframes blink': {
     'from, to': {
       boxShadow: `inset 0 -4px 0 -2px ${theme.palette.primary.dark}`
-      // borderBottom: `20px solid ${blue[200]}`
     },
     '50%': {
       boxShadow: `none`
@@ -244,122 +238,7 @@ export const useScrollBarStyles = makeStyles(theme => ({
   }
 }));
 
-// const useHexStyles = makeStyles(theme => ({
-//   main: {
-//     fontFamily:
-//       '"Source Code Pro", "HexEd.it Symbols", "Courier New", Consolas, Menlo, "PT Mono", "Liberation Mono", monospace;',
-//     fontSize: '1rem',
-//     width: '100%'
-//   },
-//   body: {
-//     cursor: 'default',
-//     overflowX: 'hidden',
-//     overflowY: 'hidden',
-//     display: 'flex',
-//     flexDirection: 'row',
-//     alignItems: 'stretch'
-//   },
-//   spacers: {
-//     flex: 1
-//   },
-//   container: {
-//     paddingLeft: theme.spacing(0.75),
-//     paddingRight: theme.spacing(0.75)
-//   },
-//   item: {
-//     // minWidth: theme.spacing(1),
-//     // letterSpacing: '1.0',
-//     // lineHeight: '1.0',
-//     // fontSize: '1rem',
-//     // fontWeight: theme.palette.type === 'dark' ? 400 : 600,
-//     // paddingTop: '2.25px',
-//     // paddingBottom: '2.5px'
-//   },
-//   itemHex: {
-//     paddingRight: '1.25px',
-//     paddingLeft: '1.25px'
-//   },
-//   itemHover: {
-//     // backgroundColor: theme.palette.type === 'dark' ? grey[700] : grey[300]
-//     backgroundColor: theme.palette.action.focus
-//   },
-//   itemHighlighted: {
-//     // backgroundColor: theme.palette.type === 'dark' ? grey[600] : grey[400]
-//     backgroundColor: theme.palette.action.selected
-//   },
-//   itemCursor: {
-//     backgroundColor: theme.palette.info.main,
-//     color: 'white !important',
-//     animation: `1s $blink step-end infinite`
-//     // '-webkit-animation': '1s blink step-end infinite',
-//     // '-moz-animation': '1s blink step-end infinite',
-//     // '-ms-animation': '1s blink step-end infinite',
-//     // '-o-animation': '1s blink step-end infinite',
-//     // '@-moz-keyframes blink': {
-//     //   'from, to': {
-//     //     color: 'transparent'
-//     //   },
-//     //   '50%': {
-//     //     color: 'white'
-//     //   }
-//     // },
-//     // '@-webkit-keyframes blink': {
-//     //   'from, to': {
-//     //     color: 'transparent'
-//     //   },
-//     //   '50%': {
-//     //     color: 'white'
-//     //   }
-//     // },
-//     // '@-ms-keyframes blink': {
-//     //   'from, to': {
-//     //     color: 'transparent'
-//     //   },
-//     //   '50%': {
-//     //     color: 'white'
-//     //   }
-//     // },
-//     // '@-o-keyframes blink': {
-//     //   'from, to': {
-//     //     color: 'transparent'
-//     //   },
-//     //   '50%': {
-//     //     color: 'white'
-//     //   }
-//     // }
-//   },
-//   itemOffset: {
-//     color: theme.palette.text.secondary
-//   },
-//   itemBorder: {
-//     borderRight: `1px solid ${theme.palette.text.hint}`
-//   },
-//   itemHexChar: {
-//     color: theme.palette.text.primary
-//   },
-//   itemNullChar: {
-//     color: theme.palette.text.disabled
-//   },
-//   '@keyframes blink': {
-//     'from, to': {
-//       boxShadow: `inset 0 -4px 0 -2px ${theme.palette.action.hover}`
-//       // borderBottom: `20px solid ${blue[200]}`
-//     },
-//     '50%': {
-//       boxShadow: `none`
-//     }
-//   }
-// }));
-
-// const useContainerStyles = makeStyles(theme => ({
-//   root: {
-//     paddingLeft: theme.spacing(0.75),
-//     paddingRight: theme.spacing(0.75)
-//   }
-// }));
-
 export type StyleContextProps = {
-  // classes?: ClassNameMap<any>;
   hexClasses?: ClassNameMap<any>;
   itemClasses?: ClassNameMap<any>;
   toolbarClasses?: ClassNameMap<any>;
@@ -413,11 +292,9 @@ export const StyleContext = React.createContext<StyleContextProps>(null);
 
 export const WrappedStyleProvider = ({ children }: HexProps) => {
   const { containerRefs } = useLayout();
-  // const classes = useHexStyles();
   const hexClasses = useNewHexStyles();
   const itemClasses = useItemStyles();
   const toolbarClasses = useToolBarStyles();
-  // const containerClasses = useContainerStyles();
   const scrollbarClasses = useScrollBarStyles();
 
   const addClassItem = useCallback((refs: any, index: number, classname: string) => {
@@ -544,7 +421,6 @@ export const WrappedStyleProvider = ({ children }: HexProps) => {
   return (
     <StyleContext.Provider
       value={{
-        // classes,
         hexClasses,
         itemClasses,
         toolbarClasses,
