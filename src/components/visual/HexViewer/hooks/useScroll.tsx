@@ -20,6 +20,7 @@ export type ScrollContextProps = {
   onScrollTouchEnd?: (event: React.TouchEvent<HTMLDivElement>) => void;
   onScrollOffsetChange?: (index: number, location: 'top' | 'middle' | 'bottom' | 'include' | 'include-middle') => void;
   onScrollResize?: () => void;
+  onScrollSpeedChange?: (speed: number) => void;
 };
 
 export const ScrollContext = React.createContext<ScrollContextProps>(null);
@@ -203,6 +204,15 @@ export const WrappedScrollProvider = ({ children }: HexProps) => {
     handleScrollChange();
   }, [clampScrollIndex, handleScrollChange, hexMap, nextLayoutColumns, nextLayoutRows]);
 
+  const onScrollSpeedChange = useCallback(
+    (speed: number) => {
+      if (speed <= 0 || isNaN(speed)) return;
+      nextScrollSpeed.current = speed;
+      setScrollSpeed(speed);
+    },
+    [setScrollSpeed]
+  );
+
   return (
     <ScrollContext.Provider
       value={{
@@ -223,7 +233,8 @@ export const WrappedScrollProvider = ({ children }: HexProps) => {
         onScrollTouchMove,
         onScrollTouchEnd,
         onScrollOffsetChange,
-        onScrollResize
+        onScrollResize,
+        onScrollSpeedChange
       }}
     >
       {useMemo(() => children, [children])}

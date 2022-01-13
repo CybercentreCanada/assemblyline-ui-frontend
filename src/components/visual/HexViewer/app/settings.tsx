@@ -1,20 +1,10 @@
-import { Grid, TextField, Typography } from '@material-ui/core';
-import Collapse from '@material-ui/core/Collapse';
+import { Grid, TextField } from '@material-ui/core';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import { default as React, useState } from 'react';
+import { default as React } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  CheckBoxNumberField,
-  NumericField,
-  SelectField,
-  StoreState,
-  useHex,
-  useLayout,
-  useSetting,
-  useStore
-} from '..';
+import { CheckBoxNumberField, SelectField, StoreState, useHex, useLayout, useScroll, useSetting, useStore } from '..';
 
 export const WrappedHexSettings = (states: StoreState) => {
   const {
@@ -25,7 +15,7 @@ export const WrappedHexSettings = (states: StoreState) => {
     layoutRows,
     layoutAutoRows,
     hexBase,
-    initialized
+    scrollSpeed
   } = states;
 
   const { t } = useTranslation(['hexViewer']);
@@ -33,23 +23,14 @@ export const WrappedHexSettings = (states: StoreState) => {
   const { setHexBase } = useStore();
   const { onHexBaseChange } = useHex();
   const { onLayoutAutoColumnsChange, onLayoutColumnsChange, onLayoutAutoRowsChange, onLayoutRowsChange } = useLayout();
-
-  const [value, setValue] = useState(0);
+  const { onScrollSpeedChange } = useScroll();
 
   return (
     <div>
-      <Dialog
-        open={settingsOpen}
-        onClose={() => onSettingClose()}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">Settings</DialogTitle>
+      <Dialog open={settingsOpen} onClose={() => onSettingClose()}>
+        <DialogTitle>{t('settings.title')}</DialogTitle>
         <DialogContent>
           <Grid container spacing={1} alignItems="center">
-            <Grid item xs={12}>
-              <Typography variant="subtitle2">{t('grid parameters')}</Typography>
-            </Grid>
             <Grid item xs={12}>
               <Grid container spacing={1} alignItems="center">
                 <SelectField
@@ -81,28 +62,10 @@ export const WrappedHexSettings = (states: StoreState) => {
                   min={1}
                   max={264}
                 />
-                <Collapse in={layoutAutoRows} timeout="auto" unmountOnExit>
-                  <Grid item xs={10} sm={3} style={{ wordBreak: 'break-word' }}>
-                    {'rows [int]:'}
-                  </Grid>
-                  <Grid item xs={10} sm={9}>
-                    <TextField
-                      fullWidth
-                      type="number"
-                      size="small"
-                      margin="dense"
-                      variant="outlined"
-                      InputProps={{ inputProps: { min: 1 } }}
-                      value={layoutColumns}
-                      onChange={event => onLayoutColumnsChange(parseInt(event.target.value))}
-                      style={{ margin: 0 }}
-                    />
-                  </Grid>
-                </Collapse>
-                <Grid item xs={10} sm={3} style={{ wordBreak: 'break-word' }}>
-                  {'rows [int]:'}
+                <Grid item xs={12} sm={4} style={{ wordBreak: 'break-word' }}>
+                  {t('scrollspeed.label')}
                 </Grid>
-                <Grid item xs={10} sm={9}>
+                <Grid item xs={12} sm={8}>
                   <TextField
                     fullWidth
                     type="number"
@@ -110,40 +73,9 @@ export const WrappedHexSettings = (states: StoreState) => {
                     margin="dense"
                     variant="outlined"
                     InputProps={{ inputProps: { min: 1 } }}
-                    value={layoutColumns}
-                    onChange={event => onLayoutColumnsChange(parseInt(event.target.value))}
+                    value={scrollSpeed}
+                    onChange={event => onScrollSpeedChange(parseInt(event.target.value))}
                     style={{ margin: 0 }}
-                  />
-                </Grid>
-                <Grid item xs={10} sm={3} style={{ wordBreak: 'break-word' }}>
-                  {'base [int]:'}
-                </Grid>
-                <Grid item xs={10} sm={9}>
-                  <TextField
-                    fullWidth
-                    type="number"
-                    size="small"
-                    margin="dense"
-                    variant="outlined"
-                    InputProps={{ inputProps: { min: 2, max: 36 } }}
-                    value={hexBase}
-                    onChange={event => setHexBase(parseInt(event.target.value))}
-                    style={{ margin: 0 }}
-                  />
-                </Grid>
-                <Grid item xs={10} sm={3} style={{ wordBreak: 'break-word' }}>
-                  {'base [int]:'}
-                </Grid>
-                <Grid item xs={10} sm={9}>
-                  <NumericField
-                    value={value}
-                    base={16}
-                    step={1}
-                    fullWidth
-                    onChange={event => {
-                      // console.log(event.target.valueAsNumber);
-                      setValue(event.target.valueAsNumber);
-                    }}
                   />
                 </Grid>
               </Grid>
@@ -167,6 +99,7 @@ export const HexSettings = React.memo(
     prevProps.layoutAutoColumns === nextProps.layoutAutoColumns &&
     prevProps.layoutRows === nextProps.layoutRows &&
     prevProps.layoutAutoRows === nextProps.layoutAutoRows &&
-    prevProps.hexBase === nextProps.hexBase
+    prevProps.hexBase === nextProps.hexBase &&
+    prevProps.scrollSpeed === nextProps.scrollSpeed
 );
 export default HexSettings;

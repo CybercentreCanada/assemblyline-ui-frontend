@@ -14,7 +14,6 @@
   "navigation.title": "Naviguer vers",
   "navigation-label": "Adresse du curseur :",
   "navigation-placeholder": "Ex: 001",
-  "settings.title": "Paramètres",
   "settings.description": "Configurer les paramètres",
   "no-results": "Aucun résultat",
   "share": "Partager l'URL",
@@ -30,5 +29,8 @@
   "offset.name": "Décalage",
   "offset.title": "Aller au décalage",
   "offset.label": "Décalage :",
-  "offset.placeholder": "Ex: 001"
+  "offset.placeholder": "Ex: 001",
+  "scrollspeed.label": "Vitesse de défilement :",
+  "settings.title": "Paramètres :",
+  "settings.label": "Configurer les paramètres"
 }
