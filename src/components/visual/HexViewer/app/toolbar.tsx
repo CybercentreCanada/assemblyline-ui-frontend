@@ -44,7 +44,7 @@ export const WrappedHexToolBar = (states: StoreState) => {
   const { onSuggestionFocus, onSuggestionBlur, onSuggestionChange, onSuggestionInputChange, onSuggestionKeyDown } =
     useSuggestion();
 
-  const { suggestionLabels, cursorIndex, searchValue, searchIndexes, searchIndex, suggestionOpen } = states;
+  const { suggestionLabels, hexBase, cursorIndex, searchValue, searchIndexes, searchIndex, suggestionOpen } = states;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [value, setValue] = useState<string>('');
@@ -164,11 +164,12 @@ export const WrappedHexToolBar = (states: StoreState) => {
         <NumberFieldPopper
           ref={searchPopperRef}
           id="search-index"
-          label={t('search-label')}
-          placeholder={t('search-placeholder')}
+          label={t('search.label')}
+          placeholder={t('search.placeholder')}
           value={searchIndex + 1}
           min={0}
           max={searchIndexes.length}
+          labelWidth={200}
           onNumberChange={(index: number) => onSearchIndexChange(index)}
         />
         <NumberFieldPopper
@@ -176,9 +177,11 @@ export const WrappedHexToolBar = (states: StoreState) => {
           id="cursor-index"
           label={t('offset.label')}
           placeholder={t('offset.placeholder')}
-          value={cursorIndex !== null ? cursorIndex : ''}
+          value={cursorIndex}
           min={0}
           max={hexMap.current.size - 1}
+          base={hexBase}
+          labelWidth={100}
           onNumberChange={(index: number) => onCursorIndexChange(index)}
         />
         <HexMenu ref={menuRef} anchorEl={toolbarRef.current} states={states} />

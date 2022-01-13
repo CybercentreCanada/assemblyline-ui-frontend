@@ -41,7 +41,9 @@ export type NumericFieldProps = {
   labelWidth?: number;
   fullWidth?: boolean;
   autoFocus?: boolean;
+  margin?: 'none' | 'dense';
   onChange?: (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement | any>) => void;
+  onKeyDown?: (event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement | any>) => void;
 };
 
 export const WrappedNumericField = ({
@@ -56,7 +58,9 @@ export const WrappedNumericField = ({
   labelWidth = 0,
   fullWidth = false,
   autoFocus = false,
-  onChange = () => null
+  margin = 'none',
+  onChange = () => null,
+  onKeyDown = () => null
 }: NumericFieldProps) => {
   const classes = useStyles();
 
@@ -107,13 +111,14 @@ export const WrappedNumericField = ({
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement | any>) => {
       const { key: keyCode } = event;
+      onKeyDown(event);
       if (!isArrowUp(keyCode) && !isArrowDown(keyCode) && !isEscape(keyCode)) return;
       event.preventDefault();
       if (isEscape(keyCode)) inputRef.current?.blur();
       else if (isArrowUp(keyCode)) handleValueChange(value + stepValue)(event);
       else if (isArrowDown(keyCode)) handleValueChange(value - stepValue)(event);
     },
-    [handleValueChange, inputRef, stepValue, value]
+    [handleValueChange, onKeyDown, stepValue, value]
   );
 
   const handleClick = useCallback(
@@ -135,6 +140,7 @@ export const WrappedNumericField = ({
         type="text"
         placeholder={placeholder}
         fullWidth={fullWidth}
+        margin={margin}
         value={textValue}
         onChange={handleChange}
         onWheel={handleWheel}

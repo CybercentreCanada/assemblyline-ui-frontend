@@ -91,11 +91,11 @@ export const WrappedCursorProvider = ({ children }: HexProps) => {
 
   const onCursorIndexChange = useCallback(
     (index: number) => {
-      if (isNaN(index)) return;
-      const newCursorIndex = onHexIndexClamp(index);
+      const newCursorIndex = isNaN(index) ? null : onHexIndexClamp(index);
       handleCursorChange(newCursorIndex);
+      onScrollOffsetChange(newCursorIndex, 'include-middle');
     },
-    [onHexIndexClamp, handleCursorChange]
+    [onHexIndexClamp, handleCursorChange, onScrollOffsetChange]
   );
 
   return (

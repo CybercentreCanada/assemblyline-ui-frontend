@@ -1,8 +1,8 @@
 {
   "find": "Rechercher (⇵ pour l'historique)",
   "search": "Index de recherche",
-  "search-label": "Index de recherche :",
-  "search-placeholder": "Ex: 001",
+  "search.label": "Index de recherche :",
+  "search.placeholder": "Ex: 001",
   "of": " sur ",
   "previous-match": "Correspondance précédente (Maj + Enter)",
   "previous": "Précédent",
