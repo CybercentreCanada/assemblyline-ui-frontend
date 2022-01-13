@@ -1,5 +1,5 @@
 import { default as React, useCallback, useContext, useMemo, useRef } from 'react';
-import { HexProps, useHex, useLayout, useStore } from '..';
+import { HexProps, useHex, useLayout, useScroll, useStore } from '..';
 
 export type SettingValues = {
   // Hex
@@ -10,6 +10,9 @@ export type SettingValues = {
   layoutAutoRows?: boolean;
   layoutColumns?: number;
   layoutAutoColumns?: boolean;
+
+  // Scroll
+  scrollSpeed?: number;
 };
 
 export type SettingContextProps = {
@@ -38,6 +41,7 @@ export const WrappedSettingProvider = ({ children }: HexProps) => {
     onLayoutColumnsChange,
     onLayoutAutoColumnsChange
   } = useLayout();
+  const { nextScrollSpeed, onScrollSpeedChange } = useScroll();
 
   const nextSettingsOpen = useRef<boolean>(false);
 
@@ -63,10 +67,13 @@ export const WrappedSettingProvider = ({ children }: HexProps) => {
           layoutRows: nextLayoutRows.current,
           layoutAutoRows: nextLayoutAutoRows.current,
           layoutColumns: nextLayoutColumns.current,
-          layoutAutoColumns: nextLayoutAutoColumns.current
+          layoutAutoColumns: nextLayoutAutoColumns.current,
+
+          // Scroll
+          scrollSpeed: nextScrollSpeed.current
         })
       ),
-    [nextHexBase, nextLayoutAutoColumns, nextLayoutAutoRows, nextLayoutColumns, nextLayoutRows]
+    [nextHexBase, nextLayoutAutoColumns, nextLayoutAutoRows, nextLayoutColumns, nextLayoutRows, nextScrollSpeed]
   );
 
   const onSettingLoad = useCallback(() => {
@@ -82,12 +89,16 @@ export const WrappedSettingProvider = ({ children }: HexProps) => {
     if (json.hasOwnProperty('layoutAutoRows')) onLayoutAutoRowsChange(json.layoutAutoRows);
     if (json.hasOwnProperty('layoutColumns')) onLayoutColumnsChange(json.layoutColumns);
     if (json.hasOwnProperty('layoutAutoColumns')) onLayoutAutoColumnsChange(json.layoutAutoColumns);
+
+    // Scroll
+    if (json.hasOwnProperty('scrollSpeed')) onScrollSpeedChange(json.scrollSpeed);
   }, [
     onHexBaseValueChange,
     onLayoutAutoColumnsChange,
     onLayoutAutoRowsChange,
     onLayoutColumnsChange,
-    onLayoutRowsChange
+    onLayoutRowsChange,
+    onScrollSpeedChange
   ]);
 
   return (
