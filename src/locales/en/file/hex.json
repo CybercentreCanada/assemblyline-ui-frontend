@@ -14,7 +14,6 @@
   "navigation": "Navigate to address",
   "navigation-label": "Cursor Address:",
   "navigation-placeholder": "Ex: 001",
-  "settings.title": "Settings",
   "settings.description": "Customize the Settings",
   "no-results": "No Results",
   "share": "Share the URL",
@@ -30,5 +29,8 @@
   "offset.name": "Offset",
   "offset.title": "Go to an Offset",
   "offset.label": "Offset :",
-  "offset.placeholder": "Ex: 001"
+  "offset.placeholder": "Ex: 001",
+  "scrollspeed.label": "Scroll Speed:",
+  "settings.title": "Settings:",
+  "settings.label": "Configure the settings"
 }

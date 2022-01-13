@@ -169,7 +169,7 @@ export const WrappedHexToolBar = (states: StoreState) => {
           value={searchIndex + 1}
           min={0}
           max={searchIndexes.length}
-          labelWidth={200}
+          labelWidth={175}
           onNumberChange={(index: number) => onSearchIndexChange(index)}
         />
         <NumberFieldPopper
