@@ -1,7 +1,6 @@
 import { FormControl, Grid, TextField, Tooltip, Typography, useMediaQuery, useTheme } from '@material-ui/core';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import 'moment/locale/fr';
 import { default as React } from 'react';
 
 export type CheckBoxNumberFieldProps = {

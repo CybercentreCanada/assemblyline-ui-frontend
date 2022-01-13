@@ -18,6 +18,8 @@ export { ListElement } from './components/ListElement';
 export type { ListElementProps } from './components/ListElement';
 export { NumberFieldPopper } from './components/NumberFieldPopper';
 export type { NumberFieldPopperProps } from './components/NumberFieldPopper';
+export { NumericField } from './components/NumericField';
+export type { NumericFieldProps } from './components/NumericField';
 export { SelectField } from './components/SelectField';
 export type { SelectFieldProps } from './components/SelectField';
 export { TooltipButton } from './components/TooltipButton';
