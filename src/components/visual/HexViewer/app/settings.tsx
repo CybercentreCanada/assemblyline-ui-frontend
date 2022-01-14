@@ -24,7 +24,7 @@ export const WrappedHexSettings = (states: StoreState) => {
   const { onSettingClose, onSettingSave } = useSetting();
   const { onHexBaseChange } = useHex();
   const { onLayoutAutoColumnsChange, onLayoutColumnsChange, onLayoutAutoRowsChange, onLayoutRowsChange } = useLayout();
-  const { onScrollSpeedChange } = useScroll();
+  const { onScrollSpeedChange, onScrollResize } = useScroll();
 
   useLayoutEffect(() => {
     return () => onSettingSave();
@@ -52,7 +52,10 @@ export const WrappedHexSettings = (states: StoreState) => {
                   checked={layoutAutoColumns}
                   onChecked={onLayoutAutoColumnsChange}
                   value={layoutColumns}
-                  onNumberChange={onLayoutColumnsChange}
+                  onNumberChange={(value: number) => {
+                    onLayoutColumnsChange(value);
+                    onScrollResize();
+                  }}
                   min={1}
                   max={264}
                 />
@@ -63,7 +66,10 @@ export const WrappedHexSettings = (states: StoreState) => {
                   checked={layoutAutoRows}
                   onChecked={onLayoutAutoRowsChange}
                   value={layoutRows}
-                  onNumberChange={onLayoutRowsChange}
+                  onNumberChange={(value: number) => {
+                    onLayoutRowsChange(value);
+                    onScrollResize();
+                  }}
                   min={1}
                   max={264}
                 />
