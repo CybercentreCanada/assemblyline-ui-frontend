@@ -31,6 +31,7 @@
   "offset.label": "Offset :",
   "offset.placeholder": "Ex: 001",
   "scrollspeed.label": "Scroll Speed:",
+  "scrollspeed.description": "Set the scroll speed",
   "settings.title": "Settings:",
   "settings.label": "Configure the settings"
 }

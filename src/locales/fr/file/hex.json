@@ -31,6 +31,7 @@
   "offset.label": "Décalage :",
   "offset.placeholder": "Ex: 001",
   "scrollspeed.label": "Vitesse de défilement :",
+  "scrollspeed.description": "Définir la vitesse de défilement",
   "settings.title": "Paramètres :",
   "settings.label": "Configurer les paramètres"
 }

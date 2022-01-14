@@ -1,8 +1,8 @@
-import { Grid, TextField } from '@material-ui/core';
+import { Grid, TextField, Tooltip, Typography, useMediaQuery, useTheme } from '@material-ui/core';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import { default as React } from 'react';
+import { default as React, useLayoutEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CheckBoxNumberField, SelectField, StoreState, useHex, useLayout, useScroll, useSetting } from '..';
 
@@ -18,11 +18,17 @@ export const WrappedHexSettings = (states: StoreState) => {
     scrollSpeed
   } = states;
 
+  const theme = useTheme();
+  const upSM = useMediaQuery(theme.breakpoints.up('sm'));
   const { t } = useTranslation(['hexViewer']);
-  const { onSettingClose } = useSetting();
+  const { onSettingClose, onSettingSave } = useSetting();
   const { onHexBaseChange } = useHex();
   const { onLayoutAutoColumnsChange, onLayoutColumnsChange, onLayoutAutoRowsChange, onLayoutRowsChange } = useLayout();
   const { onScrollSpeedChange } = useScroll();
+
+  useLayoutEffect(() => {
+    return () => onSettingSave();
+  }, [layoutColumns, layoutAutoColumns, layoutRows, layoutAutoRows, hexBase, scrollSpeed, onSettingSave]);
 
   return (
     <div>
@@ -61,8 +67,10 @@ export const WrappedHexSettings = (states: StoreState) => {
                   min={1}
                   max={264}
                 />
-                <Grid item xs={12} sm={4} style={{ wordBreak: 'break-word' }}>
-                  {t('scrollspeed.label')}
+                <Grid item sm={4} xs={12} style={{ wordBreak: 'break-word' }}>
+                  <Tooltip title={t('scrollspeed.description')} placement={upSM ? 'right' : 'bottom-start'}>
+                    <Typography variant="subtitle2">{t('scrollspeed.label')}</Typography>
+                  </Tooltip>
                 </Grid>
                 <Grid item xs={12} sm={8}>
                   <TextField
