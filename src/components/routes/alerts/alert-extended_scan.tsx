@@ -17,7 +17,7 @@ const useStyles = makeStyles(theme => ({
   success: {
     color: theme.palette.type !== 'dark' ? theme.palette.success.dark : theme.palette.success.light
   },
-  default: {
+  info: {
     color: theme.palette.type !== 'dark' ? theme.palette.info.dark : theme.palette.info.light
   },
   warning: {
@@ -30,7 +30,7 @@ const useStyles = makeStyles(theme => ({
 
 const EXTENDED_MAP = {
   submitted: {
-    color: 'default',
+    color: 'info',
     arrow: <SlowMotionVideoIcon fontSize="small" color="inherit" />
   },
   skipped: {
@@ -57,7 +57,7 @@ const WrappedAlertExtendedScan: React.FC<AlertExtendedScanProps> = ({ name, with
   const { t } = useTranslation('alerts');
   const classes = useStyles();
 
-  if (name === null || name === undefined) {
+  if (name === null || name === undefined || name === 'skipped') {
     return null;
   }
 
