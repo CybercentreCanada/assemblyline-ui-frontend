@@ -10,6 +10,7 @@ import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
+import AlertListChip from './alert-av-list';
 import AlertExtendedScan from './alert-extended_scan';
 import AlertPriority from './alert-priority';
 import AlertStatus from './alert-status';
@@ -20,27 +21,6 @@ type AlertListItemProps = {
 const WrappedAlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
   const theme = useTheme();
   const { t, i18n } = useTranslation('alerts');
-  const infoItems = [];
-
-  if (item.al.av.length !== 0) {
-    infoItems.push({ label: `${item.al.av.length}x AV`, color: 'warning', size: 'tiny', variant: 'outlined' });
-  }
-  if (item.al.ip.length !== 0) {
-    infoItems.push({
-      label: `${item.al.ip.length}x IP`,
-      color: 'primary',
-      size: 'tiny',
-      variant: 'outlined'
-    });
-  }
-  if (item.al.domain.length !== 0) {
-    infoItems.push({
-      label: `${item.al.domain.length}x DOM`,
-      color: 'success',
-      size: 'tiny',
-      variant: 'outlined'
-    });
-  }
 
   return (
     <div style={{ padding: theme.spacing(2) }}>
@@ -51,7 +31,7 @@ const WrappedAlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
           {item.group_count && <span style={{ marginLeft: theme.spacing(1) }}>{item.group_count}x</span>}
           <span style={{ marginLeft: theme.spacing(1), wordBreak: 'break-word' }}>{item.file.name}</span>
         </Grid>
-        <Grid item xs={6} md={2}>
+        <Grid item xs={6} md={2} style={{ minHeight: theme.spacing(5) }}>
           {item.verdict.malicious.length > item.verdict.non_malicious.length ? (
             <Tooltip
               title={`${item.verdict.malicious.length}/${
@@ -101,13 +81,16 @@ const WrappedAlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
                   label,
                   size: 'tiny' as 'tiny',
                   color: 'error',
-                  variant: 'outlined' as 'outlined'
+                  variant: 'outlined' as 'outlined',
+                  style: { cursor: 'inherit' }
                 }))
               )}
           />
         </Grid>
         <Grid item xs={12} md={2}>
-          <ChipList items={infoItems} />
+          <AlertListChip items={item.al.av} title="AV" color="warning" size="tiny" />
+          <AlertListChip items={item.al.ip} title="IP" color="primary" size="tiny" />
+          <AlertListChip items={item.al.domain} title="DOM" color="success" size="tiny" />
         </Grid>
         <Grid item xs={12} md={2} style={{ textAlign: 'right' }}>
           <Verdict score={item.al.score} />

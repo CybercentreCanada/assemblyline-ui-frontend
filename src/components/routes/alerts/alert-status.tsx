@@ -17,7 +17,13 @@ type AlertStatusProps = {
 const WrappedAlertStatus: React.FC<AlertStatusProps> = ({ name, size = 'small' as 'small' }) => {
   const { t } = useTranslation('alerts');
   return name ? (
-    <CustomChip size={size} variant="outlined" color={COLOR_MAP[name]} label={t(`status_${name}`)} />
+    <CustomChip
+      size={size}
+      variant="outlined"
+      color={COLOR_MAP[name]}
+      label={t(`status_${name}`)}
+      style={{ cursor: 'inherit' }}
+    />
   ) : null;
 };
 

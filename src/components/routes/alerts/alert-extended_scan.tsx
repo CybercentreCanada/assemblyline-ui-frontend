@@ -63,6 +63,7 @@ const WrappedAlertExtendedScan: React.FC<AlertExtendedScanProps> = ({ name, with
       label={t(`extended_${name}`)}
       icon={extendedData.arrow}
       tooltip={t(`extended_${name}_desc`)}
+      style={{ cursor: 'inherit' }}
     />
   ) : (
     <Tooltip title={t(`extended_${name}_desc`)}>
