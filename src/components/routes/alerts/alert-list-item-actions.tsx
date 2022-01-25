@@ -44,6 +44,9 @@ const useStyles = makeStyles(theme => ({
     '&.MuiFab-primary:hover': {
       backgroundColor: theme.palette.action.hover
     },
+    '&.MuiFab-root:active': {
+      boxShadow: theme.shadows[0]
+    },
     color: theme.palette.text.secondary
   }
 }));
