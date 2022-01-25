@@ -67,6 +67,21 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
     }
   };
 
+  const emptyFilters = () => {
+    const filters = searchQuery.parseFilters();
+    if (
+      filters.tc === '' &&
+      filters.labels.length === 0 &&
+      filters.priorities.length === 0 &&
+      filters.queries.length === 0 &&
+      filters.statuses.length === 0
+    ) {
+      return true;
+    }
+
+    return false;
+  };
+
   const query = searchQuery.getQuery();
 
   return (
@@ -76,23 +91,29 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
       </div>
       <div style={{ margin: theme.spacing(1) }}>
         <Alert severity={query && query.startsWith('alert_id') && alert ? 'info' : 'warning'}>
-          {query && query.startsWith('alert_id') && alert ? t('workflow.impact.low') : t('workflow.impact.high')}
+          {query || !emptyFilters()
+            ? query && query.startsWith('alert_id') && alert
+              ? t('workflow.impact.low')
+              : t('workflow.impact.high')
+            : t('workflow.impact.all')}
         </Alert>
       </div>
 
-      <div style={{ margin: theme.spacing(1) }}>
-        <div
-          style={{
-            wordBreak: 'break-word',
-            marginTop: theme.spacing(1),
-            padding: theme.spacing(2),
-            color: theme.palette.primary.light,
-            backgroundColor: theme.palette.type === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
-          }}
-        >
-          <AlertsFiltersSelected searchQuery={searchQuery} disableActions hideGroupBy />
+      {(query || !emptyFilters()) && (
+        <div style={{ margin: theme.spacing(1) }}>
+          <div
+            style={{
+              wordBreak: 'break-word',
+              marginTop: theme.spacing(1),
+              padding: theme.spacing(2),
+              color: theme.palette.primary.light,
+              backgroundColor: theme.palette.type === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
+            }}
+          >
+            <AlertsFiltersSelected searchQuery={searchQuery} disableActions hideGroupBy />
+          </div>
         </div>
-      </div>
+      )}
 
       <div style={{ margin: theme.spacing(1), marginTop: theme.spacing(2) }}>
         <div style={{ marginBottom: theme.spacing(2) }}>
