@@ -3,37 +3,46 @@ import BlockIcon from '@material-ui/icons/Block';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import RemoveCircleOutlineIcon from '@material-ui/icons/RemoveCircleOutline';
 import SlowMotionVideoIcon from '@material-ui/icons/SlowMotionVideo';
+import clsx from 'clsx';
 import CustomChip from 'components/visual/CustomChip';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
   extended: {
     '& > svg': {
       verticalAlign: 'bottom'
     }
+  },
+  success: {
+    color: theme.palette.type !== 'dark' ? theme.palette.success.dark : theme.palette.success.light
+  },
+  default: {
+    color: theme.palette.type !== 'dark' ? theme.palette.info.dark : theme.palette.info.light
+  },
+  warning: {
+    color: theme.palette.type !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
+  },
+  error: {
+    color: theme.palette.type !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
   }
-});
+}));
 
 const EXTENDED_MAP = {
   submitted: {
-    color: 'inherit',
-    chip_color: 'default',
+    color: 'default',
     arrow: <SlowMotionVideoIcon fontSize="small" color="inherit" />
   },
   skipped: {
-    color: 'hsl(39, 100%, 40%)',
-    chip_color: 'warning',
+    color: 'warning',
     arrow: <RemoveCircleOutlineIcon fontSize="small" color="inherit" />
   },
   incomplete: {
-    color: 'hsl(0, 100%, 40%)',
-    chip_color: 'error',
+    color: 'error',
     arrow: <BlockIcon fontSize="small" color="inherit" />
   },
   completed: {
-    color: 'hsl(120, 100%, 30%)',
-    chip_color: 'success',
+    color: 'success',
     arrow: <CheckCircleOutlineIcon fontSize="small" color="inherit" />
   }
 };
@@ -59,7 +68,7 @@ const WrappedAlertExtendedScan: React.FC<AlertExtendedScanProps> = ({ name, with
       wrap
       size={size}
       variant="outlined"
-      color={extendedData.chip_color}
+      color={extendedData.color}
       label={t(`extended_${name}`)}
       icon={extendedData.arrow}
       tooltip={t(`extended_${name}_desc`)}
@@ -67,7 +76,7 @@ const WrappedAlertExtendedScan: React.FC<AlertExtendedScanProps> = ({ name, with
     />
   ) : (
     <Tooltip title={t(`extended_${name}_desc`)}>
-      <Box style={{ color: extendedData.color }} display="inline-block" className={classes.extended}>
+      <Box display="inline-block" className={clsx(classes.extended, classes[extendedData.color])}>
         {extendedData.arrow}
       </Box>
     </Tooltip>
