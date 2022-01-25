@@ -48,6 +48,9 @@ const useStyles = makeStyles(theme => ({
       boxShadow: theme.shadows[0]
     },
     color: theme.palette.text.secondary
+  },
+  actionsClosed: {
+    width: 0
   }
 }));
 
@@ -68,6 +71,14 @@ const SpeedDialActionLink = props => {
     <Link to={to}>
       <SpeedDialAction {...others} />
     </Link>
+  );
+};
+
+const SpeedDialActionButton = props => {
+  return (
+    <div>
+      <SpeedDialAction {...props} />
+    </div>
   );
 };
 
@@ -166,6 +177,7 @@ const WrappedAlertListItemActions: React.FC<AlertListItemActionsProps> = ({
             openIcon={vertical ? <ExpandLessIcon /> : <ChevronRightIcon />}
           />
         }
+        classes={{ actionsClosed: vertical ? null : classes.actionsClosed }}
         onClose={handleClose}
         onOpen={handleOpen}
         open={open}
@@ -175,7 +187,7 @@ const WrappedAlertListItemActions: React.FC<AlertListItemActionsProps> = ({
         }}
         direction={vertical ? 'down' : 'left'}
       >
-        <SpeedDialAction
+        <SpeedDialActionButton
           icon={<BugReportOutlinedIcon />}
           tooltipTitle={t(hasSetMalicious ? 'verdict.malicious.set' : 'verdict.malicious.action')}
           tooltipPlacement={vertical ? 'left' : 'bottom'}
@@ -190,7 +202,7 @@ const WrappedAlertListItemActions: React.FC<AlertListItemActionsProps> = ({
           }}
           onClick={!hasSetMalicious ? () => handleVerdict('malicious') : null}
         />
-        <SpeedDialAction
+        <SpeedDialActionButton
           icon={<VerifiedUserOutlinedIcon />}
           tooltipTitle={t(hasSetNonMalicious ? 'verdict.non_malicious.set' : 'verdict.non_malicious.action')}
           tooltipPlacement={vertical ? 'left' : 'bottom'}
@@ -205,7 +217,7 @@ const WrappedAlertListItemActions: React.FC<AlertListItemActionsProps> = ({
           }}
           onClick={!hasSetNonMalicious ? () => handleVerdict('non_malicious') : null}
         />
-        <SpeedDialAction
+        <SpeedDialActionButton
           icon={<BiNetworkChart style={{ height: '1.3rem', width: '1.3rem' }} />}
           tooltipTitle={t('workflow_action')}
           tooltipPlacement={vertical ? 'left' : 'bottom'}
@@ -234,7 +246,7 @@ const WrappedAlertListItemActions: React.FC<AlertListItemActionsProps> = ({
           tooltipPlacement={vertical ? 'left' : 'bottom'}
         />
         {!item.owner && (
-          <SpeedDialAction
+          <SpeedDialActionButton
             icon={<AssignmentIndIcon />}
             tooltipTitle={t('take_ownership')}
             tooltipPlacement={vertical ? 'left' : 'bottom'}
