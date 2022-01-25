@@ -10,13 +10,14 @@ import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
+import AlertExtendedScan from './alert-extended_scan';
 import AlertPriority from './alert-priority';
 import AlertStatus from './alert-status';
 
 type AlertListItemProps = {
   item: AlertItem;
 };
-const AlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
+const WrappedAlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
   const theme = useTheme();
   const { t, i18n } = useTranslation('alerts');
   const infoItems = [];
@@ -45,6 +46,7 @@ const AlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
     <div style={{ padding: theme.spacing(2) }}>
       <Grid container spacing={1}>
         <Grid item xs={12} md={8}>
+          <AlertExtendedScan name={item.extended_scan} />
           <AlertPriority name={item.priority} />
           {item.group_count && <span style={{ marginLeft: theme.spacing(1) }}>{item.group_count}x</span>}
           <span style={{ marginLeft: theme.spacing(1), wordBreak: 'break-word' }}>{item.file.name}</span>
@@ -115,4 +117,5 @@ const AlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
   );
 };
 
+const AlertListItem = React.memo(WrappedAlertListItem);
 export default AlertListItem;

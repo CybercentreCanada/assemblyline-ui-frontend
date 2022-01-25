@@ -50,7 +50,12 @@ type AlertPriorityProps = {
   size?: 'tiny' | 'small' | 'medium';
 };
 
-const AlertPriority: React.FC<AlertPriorityProps> = ({ name, withText = false, withChip = false, size = 'small' }) => {
+const WrappedAlertPriority: React.FC<AlertPriorityProps> = ({
+  name,
+  withText = false,
+  withChip = false,
+  size = 'small'
+}) => {
   const { t } = useTranslation('alerts');
   const classes = useStyles();
   return withChip ? (
@@ -70,4 +75,5 @@ const AlertPriority: React.FC<AlertPriorityProps> = ({ name, withText = false, w
   );
 };
 
+const AlertPriority = React.memo(WrappedAlertPriority);
 export default AlertPriority;

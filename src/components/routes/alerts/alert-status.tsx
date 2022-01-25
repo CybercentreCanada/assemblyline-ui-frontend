@@ -14,11 +14,12 @@ type AlertStatusProps = {
   size?: 'tiny' | 'small' | 'medium';
 };
 
-const AlertStatus: React.FC<AlertStatusProps> = ({ name, size = 'small' as 'small' }) => {
+const WrappedAlertStatus: React.FC<AlertStatusProps> = ({ name, size = 'small' as 'small' }) => {
   const { t } = useTranslation('alerts');
   return name ? (
     <CustomChip size={size} variant="outlined" color={COLOR_MAP[name]} label={t(`status_${name}`)} />
   ) : null;
 };
 
+const AlertStatus = React.memo(WrappedAlertStatus);
 export default AlertStatus;
