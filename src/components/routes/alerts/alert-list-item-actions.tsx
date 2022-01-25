@@ -45,9 +45,6 @@ const useStyles = makeStyles(theme => ({
       backgroundColor: theme.palette.action.hover
     },
     color: theme.palette.text.secondary
-  },
-  actionsClosed: {
-    width: 0
   }
 }));
 
@@ -71,202 +68,212 @@ const SpeedDialActionLink = props => {
   );
 };
 
-const AlertListItemActions: React.FC<AlertListItemActionsProps> = React.memo(
-  ({ item, index, currentQuery, setDrawer, onTakeOwnershipComplete, onVerdictComplete, vertical = false }) => {
-    const { onTakeOwnership, setVerdict } = usePromiseAPI();
-    const classes = useStyles();
-    const groupBy = currentQuery.getGroupBy();
-    const { t } = useTranslation('alerts');
-    const theme = useTheme();
-    const { showErrorMessage, showSuccessMessage } = useMySnackbar();
-    const [takeOwnershipConfirmation, setTakeOwnershipConfirmation] = useState<OwnerProps>(DEFAULT_OWNER);
-    const [open, setOpen] = useState(false);
-    const { user: currentUser } = useALContext();
-    const hasSetMalicious = item.verdict.malicious.indexOf(currentUser.username) !== -1;
-    const hasSetNonMalicious = item.verdict.non_malicious.indexOf(currentUser.username) !== -1;
+const WrappedAlertListItemActions: React.FC<AlertListItemActionsProps> = ({
+  item,
+  index,
+  currentQuery,
+  setDrawer,
+  onTakeOwnershipComplete,
+  onVerdictComplete,
+  vertical = false
+}) => {
+  const { onTakeOwnership, setVerdict } = usePromiseAPI();
+  const classes = useStyles();
+  const groupBy = currentQuery.getGroupBy();
+  const { t } = useTranslation('alerts');
+  const theme = useTheme();
+  const { showErrorMessage, showSuccessMessage } = useMySnackbar();
+  const [takeOwnershipConfirmation, setTakeOwnershipConfirmation] = useState<OwnerProps>(DEFAULT_OWNER);
+  const [open, setOpen] = useState(false);
+  const { user: currentUser } = useALContext();
+  const hasSetMalicious = item.verdict.malicious.indexOf(currentUser.username) !== -1;
+  const hasSetNonMalicious = item.verdict.non_malicious.indexOf(currentUser.username) !== -1;
 
-    const handleVerdict = async (verdict: PossibleVerdict) => {
-      try {
-        await setVerdict(item.alert_id, verdict);
-        showSuccessMessage(t(`verdict.${verdict}.success`));
-        if (onVerdictComplete) {
-          onVerdictComplete(verdict);
-        }
-      } catch (api_data) {
-        showErrorMessage(t('verdict.failed'));
+  const handleVerdict = async (verdict: PossibleVerdict) => {
+    try {
+      await setVerdict(item.alert_id, verdict);
+      showSuccessMessage(t(`verdict.${verdict}.success`));
+      if (onVerdictComplete) {
+        onVerdictComplete(verdict);
       }
-    };
+    } catch (api_data) {
+      showErrorMessage(t('verdict.failed'));
+    }
+  };
 
-    const onTakeOwnershipOkClick = async () => {
-      try {
-        await onTakeOwnership(takeOwnershipConfirmation.query);
-        setTakeOwnershipConfirmation({ open: false, query: null });
-        if (onTakeOwnershipComplete) {
-          onTakeOwnershipComplete();
-        }
-      } catch (api_data) {
-        setTakeOwnershipConfirmation({ open: false, query: null });
-      }
-    };
-
-    const onTakeOwnershipCancelClick = () => {
+  const onTakeOwnershipOkClick = async () => {
+    try {
+      await onTakeOwnership(takeOwnershipConfirmation.query);
       setTakeOwnershipConfirmation({ open: false, query: null });
-    };
-
-    const buildActionQuery = (): SearchQuery => {
-      const _actionQuery = currentQuery.newBase(name => name === 'tc_start');
-      _actionQuery.setGroupBy('');
-
-      if (groupBy) {
-        _actionQuery.setQuery(`${groupBy}:${getValueFromPath(item, groupBy)}`);
-      } else {
-        _actionQuery.setQuery(`alert_id:${item.alert_id}`);
+      if (onTakeOwnershipComplete) {
+        onTakeOwnershipComplete();
       }
-      return _actionQuery;
-    };
+    } catch (api_data) {
+      setTakeOwnershipConfirmation({ open: false, query: null });
+    }
+  };
 
-    const buildFocusQuery = (): SearchQuery => {
-      const focusQuery = currentQuery.build();
-      focusQuery.setGroupBy('');
-      focusQuery.addFq(`${groupBy}:${getValueFromPath(item, groupBy)}`);
-      return focusQuery;
-    };
+  const onTakeOwnershipCancelClick = () => {
+    setTakeOwnershipConfirmation({ open: false, query: null });
+  };
 
-    const handleClose = () => {
+  const buildActionQuery = (): SearchQuery => {
+    const _actionQuery = currentQuery.newBase(name => name === 'tc_start');
+    _actionQuery.setGroupBy('');
+
+    if (groupBy) {
+      _actionQuery.setQuery(`${groupBy}:${getValueFromPath(item, groupBy)}`);
+    } else {
+      _actionQuery.setQuery(`alert_id:${item.alert_id}`);
+    }
+    return _actionQuery;
+  };
+
+  const buildFocusQuery = (): SearchQuery => {
+    const focusQuery = currentQuery.build();
+    focusQuery.setGroupBy('');
+    focusQuery.addFq(`${groupBy}:${getValueFromPath(item, groupBy)}`);
+    return focusQuery;
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason === 'toggle' || reason === 'escapeKeyDown') {
       setOpen(false);
-    };
+    }
+  };
 
-    const handleOpen = () => {
+  const handleOpen = (event, reason) => {
+    if (reason === 'toggle') {
       setOpen(true);
-    };
+    }
+  };
 
-    return (
-      <div
-        style={{
-          marginTop: vertical ? null : theme.spacing(-1),
-          marginRight: vertical ? null : theme.spacing(-1)
+  return (
+    <div
+      style={{
+        marginTop: vertical ? null : theme.spacing(-1),
+        marginRight: vertical ? null : theme.spacing(-1)
+      }}
+    >
+      <SpeedDial
+        ariaLabel={t('action_menu')}
+        icon={
+          <SpeedDialIcon
+            icon={vertical ? <ExpandMoreIcon /> : <ChevronLeftIcon />}
+            openIcon={vertical ? <ExpandLessIcon /> : <ChevronRightIcon />}
+          />
+        }
+        onClose={handleClose}
+        onOpen={handleOpen}
+        open={open}
+        FabProps={{
+          size: vertical ? 'medium' : 'small',
+          className: vertical ? classes.verticalSpeedDial : null
         }}
+        direction={vertical ? 'down' : 'left'}
       >
-        <SpeedDial
-          ariaLabel={t('action_menu')}
-          icon={
-            <SpeedDialIcon
-              icon={vertical ? <ExpandMoreIcon /> : <ChevronLeftIcon />}
-              openIcon={vertical ? <ExpandLessIcon /> : <ChevronRightIcon />}
-            />
-          }
-          classes={{ actionsClosed: vertical ? null : classes.actionsClosed }}
-          onClose={handleClose}
-          onOpen={handleOpen}
-          open={open}
+        <SpeedDialAction
+          icon={<BugReportOutlinedIcon />}
+          tooltipTitle={t(hasSetMalicious ? 'verdict.malicious.set' : 'verdict.malicious.action')}
+          tooltipPlacement={vertical ? 'left' : 'bottom'}
           FabProps={{
-            size: vertical ? 'medium' : 'small',
-            className: vertical ? classes.verticalSpeedDial : null
+            style: {
+              color: hasSetMalicious
+                ? theme.palette.type === 'dark'
+                  ? theme.palette.error.light
+                  : theme.palette.error.dark
+                : null
+            }
           }}
-          direction={vertical ? 'down' : 'left'}
-        >
-          <SpeedDialAction
-            icon={<BugReportOutlinedIcon />}
-            tooltipTitle={t(hasSetMalicious ? 'verdict.malicious.set' : 'verdict.malicious.action')}
-            tooltipPlacement={vertical ? 'left' : 'bottom'}
-            FabProps={{
-              style: {
-                color: hasSetMalicious
-                  ? theme.palette.type === 'dark'
-                    ? theme.palette.error.light
-                    : theme.palette.error.dark
-                  : null
+          onClick={!hasSetMalicious ? () => handleVerdict('malicious') : null}
+        />
+        <SpeedDialAction
+          icon={<VerifiedUserOutlinedIcon />}
+          tooltipTitle={t(hasSetNonMalicious ? 'verdict.non_malicious.set' : 'verdict.non_malicious.action')}
+          tooltipPlacement={vertical ? 'left' : 'bottom'}
+          FabProps={{
+            style: {
+              color: hasSetNonMalicious
+                ? theme.palette.type === 'dark'
+                  ? theme.palette.success.light
+                  : theme.palette.success.dark
+                : null
+            }
+          }}
+          onClick={!hasSetNonMalicious ? () => handleVerdict('non_malicious') : null}
+        />
+        <SpeedDialAction
+          icon={<BiNetworkChart style={{ height: '1.3rem', width: '1.3rem' }} />}
+          tooltipTitle={t('workflow_action')}
+          tooltipPlacement={vertical ? 'left' : 'bottom'}
+          onClick={() => {
+            const actionQuery = buildActionQuery();
+            setDrawer({
+              open: true,
+              type: 'actions',
+              actionData: {
+                query: actionQuery,
+                alert: {
+                  index,
+                  alert_id: item.alert_id,
+                  priority: item.priority,
+                  status: item.status,
+                  labels: item.label
+                }
               }
-            }}
-            onClick={!hasSetMalicious ? () => handleVerdict('malicious') : null}
-          />
+            });
+          }}
+        />
+        <SpeedDialActionLink
+          icon={<AmpStoriesOutlinedIcon />}
+          to={`/submission/${item.sid}`}
+          tooltipTitle={t('submission')}
+          tooltipPlacement={vertical ? 'left' : 'bottom'}
+        />
+        {!item.owner && (
           <SpeedDialAction
-            icon={<VerifiedUserOutlinedIcon />}
-            tooltipTitle={t(hasSetNonMalicious ? 'verdict.non_malicious.set' : 'verdict.non_malicious.action')}
-            tooltipPlacement={vertical ? 'left' : 'bottom'}
-            FabProps={{
-              style: {
-                color: hasSetNonMalicious
-                  ? theme.palette.type === 'dark'
-                    ? theme.palette.success.light
-                    : theme.palette.success.dark
-                  : null
-              }
-            }}
-            onClick={!hasSetNonMalicious ? () => handleVerdict('non_malicious') : null}
-          />
-          <SpeedDialAction
-            icon={<BiNetworkChart style={{ height: '1.3rem', width: '1.3rem' }} />}
-            tooltipTitle={t('workflow_action')}
+            icon={<AssignmentIndIcon />}
+            tooltipTitle={t('take_ownership')}
             tooltipPlacement={vertical ? 'left' : 'bottom'}
             onClick={() => {
-              const actionQuery = buildActionQuery();
-              setDrawer({
-                open: true,
-                type: 'actions',
-                actionData: {
-                  query: actionQuery,
-                  alert: {
-                    index,
-                    alert_id: item.alert_id,
-                    priority: item.priority,
-                    status: item.status,
-                    labels: item.label
-                  }
-                }
-              });
+              setTakeOwnershipConfirmation({ open: true, query: buildActionQuery() });
             }}
           />
+        )}
+        {item.group_count && (
           <SpeedDialActionLink
-            icon={<AmpStoriesOutlinedIcon />}
-            to={`/submission/${item.sid}`}
-            tooltipTitle={t('submission')}
+            icon={<CenterFocusStrongOutlinedIcon />}
+            to={`/alerts/?${buildFocusQuery().buildURLQueryString()}`}
+            tooltipTitle={t('focus')}
             tooltipPlacement={vertical ? 'left' : 'bottom'}
           />
-          {!item.owner && (
-            <SpeedDialAction
-              icon={<AssignmentIndIcon />}
-              tooltipTitle={t('take_ownership')}
-              tooltipPlacement={vertical ? 'left' : 'bottom'}
-              onClick={() => {
-                setTakeOwnershipConfirmation({ open: true, query: buildActionQuery() });
-              }}
-            />
-          )}
-          {item.group_count && (
-            <SpeedDialActionLink
-              icon={<CenterFocusStrongOutlinedIcon />}
-              to={`/alerts/?${buildFocusQuery().buildURLQueryString()}`}
-              tooltipTitle={t('focus')}
-              tooltipPlacement={vertical ? 'left' : 'bottom'}
-            />
-          )}
-        </SpeedDial>
-        {takeOwnershipConfirmation.open && (
-          <ConfirmationDialog
-            open={takeOwnershipConfirmation.open}
-            handleClose={onTakeOwnershipCancelClick}
-            handleAccept={onTakeOwnershipOkClick}
-            title={t('actions.takeownershipdiag.header')}
-            cancelText={t('actions.cancel')}
-            acceptText={t('actions.ok')}
-            text={
-              groupBy ? (
-                <>
-                  <span style={{ display: 'inline-block' }}>{t('actions.takeownershipdiag.content.grouped')}</span>
-                  <span style={{ display: 'inline-block', padding: theme.spacing(1), wordBreak: 'break-word' }}>
-                    <Typography variant="caption">{`${groupBy}: ${getValueFromPath(item, groupBy)}`}</Typography>
-                  </span>
-                </>
-              ) : (
-                t('actions.takeownershipdiag.content.single')
-              )
-            }
-          />
         )}
-      </div>
-    );
-  }
-);
+      </SpeedDial>
+      {takeOwnershipConfirmation.open && (
+        <ConfirmationDialog
+          open={takeOwnershipConfirmation.open}
+          handleClose={onTakeOwnershipCancelClick}
+          handleAccept={onTakeOwnershipOkClick}
+          title={t('actions.takeownershipdiag.header')}
+          cancelText={t('actions.cancel')}
+          acceptText={t('actions.ok')}
+          text={
+            groupBy ? (
+              <>
+                <span style={{ display: 'inline-block' }}>{t('actions.takeownershipdiag.content.grouped')}</span>
+                <span style={{ display: 'inline-block', padding: theme.spacing(1), wordBreak: 'break-word' }}>
+                  <Typography variant="caption">{`${groupBy}: ${getValueFromPath(item, groupBy)}`}</Typography>
+                </span>
+              </>
+            ) : (
+              t('actions.takeownershipdiag.content.single')
+            )
+          }
+        />
+      )}
+    </div>
+  );
+};
 
+const AlertListItemActions = React.memo(WrappedAlertListItemActions);
 export default AlertListItemActions;
