@@ -182,7 +182,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
               <Divider />
               <div className={classes.sectionContent}>
                 <Box display="flex">
-                  {item ? <AlertPriority name={item ? item.priority : null} withText withChip /> : <ChipSkeleton />}
+                  {item ? <AlertPriority name={item ? item.priority : null} withChip /> : <ChipSkeleton />}
                 </Box>
               </div>
             </div>

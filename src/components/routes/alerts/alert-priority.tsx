@@ -1,4 +1,4 @@
-import { Box, makeStyles, Typography } from '@material-ui/core';
+import { Box, makeStyles, Tooltip } from '@material-ui/core';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import RemoveOutlinedIcon from '@material-ui/icons/RemoveOutlined';
@@ -45,17 +45,11 @@ const COLOR_MAP = {
 
 type AlertPriorityProps = {
   name: string;
-  withText?: boolean;
   withChip?: boolean;
   size?: 'tiny' | 'small' | 'medium';
 };
 
-const WrappedAlertPriority: React.FC<AlertPriorityProps> = ({
-  name,
-  withText = false,
-  withChip = false,
-  size = 'small'
-}) => {
+const WrappedAlertPriority: React.FC<AlertPriorityProps> = ({ name, withChip = false, size = 'small' }) => {
   const { t } = useTranslation('alerts');
   const classes = useStyles();
   return withChip ? (
@@ -68,10 +62,11 @@ const WrappedAlertPriority: React.FC<AlertPriorityProps> = ({
       icon={COLOR_MAP[name].arrow}
     />
   ) : (
-    <Box style={{ color: COLOR_MAP[name].color }} display="inline-block" className={classes.priority}>
-      {COLOR_MAP[name].arrow}{' '}
-      {withText ? <Typography>{name ? t(`priority_${name}`) : t('priority_unset')}</Typography> : ''}
-    </Box>
+    <Tooltip title={name ? t(`priority_${name}`) : t('priority_unset')}>
+      <Box style={{ color: COLOR_MAP[name].color }} display="inline-block" className={classes.priority}>
+        {COLOR_MAP[name].arrow}
+      </Box>
+    </Tooltip>
   );
 };
 

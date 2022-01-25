@@ -1,4 +1,4 @@
-import { Box, makeStyles, Tooltip, Typography } from '@material-ui/core';
+import { Box, makeStyles, Tooltip } from '@material-ui/core';
 import BlockIcon from '@material-ui/icons/Block';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import RemoveCircleOutlineIcon from '@material-ui/icons/RemoveCircleOutline';
@@ -40,17 +40,11 @@ const EXTENDED_MAP = {
 
 type AlertExtendedScanProps = {
   name: string;
-  withText?: boolean;
   withChip?: boolean;
   size?: 'tiny' | 'small' | 'medium';
 };
 
-const WrappedAlertExtendedScan: React.FC<AlertExtendedScanProps> = ({
-  name,
-  withText = false,
-  withChip = false,
-  size = 'small'
-}) => {
+const WrappedAlertExtendedScan: React.FC<AlertExtendedScanProps> = ({ name, withChip = false, size = 'small' }) => {
   const { t } = useTranslation('alerts');
   const classes = useStyles();
 
@@ -73,7 +67,7 @@ const WrappedAlertExtendedScan: React.FC<AlertExtendedScanProps> = ({
   ) : (
     <Tooltip title={t(`extended_${name}_desc`)}>
       <Box style={{ color: extendedData.color }} display="inline-block" className={classes.extended}>
-        {extendedData.arrow} {withText ? <Typography>{t(`extended_${name}`)}</Typography> : ''}
+        {extendedData.arrow}
       </Box>
     </Tooltip>
   );
