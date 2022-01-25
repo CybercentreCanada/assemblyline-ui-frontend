@@ -5,6 +5,7 @@ import PersonOutlineOutlinedIcon from '@material-ui/icons/PersonOutlineOutlined'
 import VerifiedUserOutlinedIcon from '@material-ui/icons/VerifiedUserOutlined';
 import { AlertItem } from 'components/routes/alerts/hooks/useAlerts';
 import { ChipList } from 'components/visual/ChipList';
+import CustomChip from 'components/visual/CustomChip';
 import Verdict from 'components/visual/Verdict';
 import 'moment/locale/fr';
 import React from 'react';
@@ -70,7 +71,14 @@ const WrappedAlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
           </Moment>
         </Grid>
         <Grid item xs={12} md={2}>
-          <AlertStatus name={item.status} size={'tiny' as 'tiny'} />
+          <Grid container spacing={1}>
+            <Grid item>
+              <CustomChip size="tiny" variant="outlined" label={item.type} style={{ cursor: 'inherit' }} />
+            </Grid>
+            <Grid item>
+              <AlertStatus name={item.status} size={'tiny' as 'tiny'} />
+            </Grid>
+          </Grid>
         </Grid>
         <Grid item xs={12} md={6}>
           <ChipList
