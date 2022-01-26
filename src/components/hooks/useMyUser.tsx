@@ -68,6 +68,11 @@ export type ConfigurationDefinition = {
     version: string;
   };
   ui: {
+    alerting_meta: {
+      important: string[];
+      subject: string[];
+      url: string[];
+    };
     allow_malicious_hinting: boolean;
     allow_url_submissions: boolean;
     apps: AppElement[];

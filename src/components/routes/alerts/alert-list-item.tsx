@@ -3,6 +3,7 @@ import BugReportOutlinedIcon from '@material-ui/icons/BugReportOutlined';
 import GroupOutlinedIcon from '@material-ui/icons/GroupOutlined';
 import PersonOutlineOutlinedIcon from '@material-ui/icons/PersonOutlineOutlined';
 import VerifiedUserOutlinedIcon from '@material-ui/icons/VerifiedUserOutlined';
+import useALContext from 'components/hooks/useALContext';
 import { AlertItem } from 'components/routes/alerts/hooks/useAlerts';
 import { ChipList } from 'components/visual/ChipList';
 import CustomChip from 'components/visual/CustomChip';
@@ -22,15 +23,56 @@ type AlertListItemProps = {
 const WrappedAlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
   const theme = useTheme();
   const { t, i18n } = useTranslation('alerts');
+  const { configuration } = useALContext();
+
+  let subject = '';
+  for (let subItem of configuration.ui.alerting_meta.subject) {
+    let metaVal = item.metadata[subItem];
+    if (metaVal !== undefined && metaVal !== null) {
+      subject = metaVal;
+      break;
+    }
+  }
+
+  let url = '';
+  for (let subItem of configuration.ui.alerting_meta.url) {
+    let metaVal = item.metadata[subItem];
+    if (metaVal !== undefined && metaVal !== null) {
+      url = metaVal;
+      break;
+    }
+  }
 
   return (
     <div style={{ padding: theme.spacing(2) }}>
       <Grid container spacing={1}>
         <Grid item xs={12} md={8}>
-          <AlertExtendedScan name={item.extended_scan} />
-          <AlertPriority name={item.priority} />
-          {item.group_count && <span style={{ marginLeft: theme.spacing(1) }}>{item.group_count}x</span>}
-          <span style={{ marginLeft: theme.spacing(1), wordBreak: 'break-word' }}>{item.file.name}</span>
+          <div style={{ display: 'inline-block', verticalAlign: 'top' }}>
+            <AlertExtendedScan name={item.extended_scan} />
+            <AlertPriority name={item.priority} />
+            {item.group_count && <span style={{ marginLeft: theme.spacing(1) }}>{item.group_count}x</span>}
+          </div>
+          <div style={{ display: 'inline-block' }}>
+            {subject && (
+              <div
+                style={{
+                  marginLeft: theme.spacing(1),
+                  wordBreak: 'break-word',
+                  fontSize: 'medium'
+                }}
+              >
+                {subject}
+              </div>
+            )}
+            <div
+              style={{
+                marginLeft: theme.spacing(1),
+                wordBreak: 'break-word'
+              }}
+            >
+              {url || item.file.name}
+            </div>
+          </div>
         </Grid>
         <Grid item xs={6} md={2} style={{ minHeight: theme.spacing(5) }}>
           {item.verdict.malicious.length > item.verdict.non_malicious.length ? (
@@ -83,7 +125,12 @@ const WrappedAlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
         <Grid item xs={12} md={6}>
           <ChipList
             items={item.label
-              .map(label => ({ label, size: 'tiny' as 'tiny', variant: 'outlined' as 'outlined' }))
+              .map(label => ({
+                label,
+                size: 'tiny' as 'tiny',
+                variant: 'outlined' as 'outlined',
+                style: { cursor: 'inherit' }
+              }))
               .concat(
                 item.al.attrib.map(label => ({
                   label,
