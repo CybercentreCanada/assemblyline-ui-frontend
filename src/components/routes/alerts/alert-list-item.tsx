@@ -12,7 +12,7 @@ import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
-import AlertListChip from './alert-av-list';
+import AlertListChip from './alert-chip-list';
 import AlertExtendedScan from './alert-extended_scan';
 import AlertPriority from './alert-priority';
 import AlertStatus from './alert-status';
