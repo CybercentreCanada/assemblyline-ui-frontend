@@ -30,6 +30,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
 import { Link, useParams } from 'react-router-dom';
+import AlertExtendedScan from './alert-extended_scan';
 import AlertPriority from './alert-priority';
 import AlertStatus from './alert-status';
 
@@ -160,6 +161,13 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                   </Grid>
                   <Grid item xs={9} sm={10} md={8}>
                     {item ? item.type : <Skeleton />}
+                  </Grid>
+                  {/* Alert Type */}
+                  <Grid item xs={3} sm={2} md={4}>
+                    {t('extended')}
+                  </Grid>
+                  <Grid item xs={9} sm={10} md={8}>
+                    {item ? <AlertExtendedScan name={item.extended_scan} withChip /> : <Skeleton />}
                   </Grid>
                   {/* Submission received date */}
                   <Grid item xs={3} sm={2} md={4}>
