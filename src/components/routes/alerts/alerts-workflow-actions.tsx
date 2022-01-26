@@ -35,7 +35,10 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
   const theme = useTheme();
   const [formValid, setFormValid] = useState<boolean>(false);
   const [applying, setApplying] = useState<boolean>(false);
-  const [possibleLabels] = useState<string[]>([...DEFAULT_LABELS, ...labelFilters.map(val => val.label)]);
+  const [possibleLabels] = useState<string[]>([
+    ...DEFAULT_LABELS,
+    ...labelFilters.filter(lbl => DEFAULT_LABELS.indexOf(lbl.label) === -1).map(val => val.label)
+  ]);
   const [selectedStatus, setSelectedStatus] = useState<string>(null);
   const [selectedPriority, setSelectedPriority] = useState<string>(null);
   const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
