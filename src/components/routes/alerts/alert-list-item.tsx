@@ -47,30 +47,30 @@ const WrappedAlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
     <div style={{ padding: theme.spacing(2) }}>
       <Grid container spacing={1}>
         <Grid item xs={12} md={8}>
-          <div style={{ display: 'inline-block', verticalAlign: 'top' }}>
+          <div style={{ display: 'flex' }}>
             <AlertExtendedScan name={item.extended_scan} />
             <AlertPriority name={item.priority} />
-            {item.group_count && <span style={{ marginLeft: theme.spacing(1) }}>{item.group_count}x</span>}
-          </div>
-          <div style={{ display: 'inline-block' }}>
-            {subject && (
+            {item.group_count && <div style={{ marginLeft: theme.spacing(1) }}>{item.group_count}x</div>}
+            <div>
+              {subject && (
+                <div
+                  style={{
+                    marginLeft: theme.spacing(1),
+                    wordBreak: 'break-word'
+                  }}
+                >
+                  {subject}
+                </div>
+              )}
               <div
                 style={{
                   marginLeft: theme.spacing(1),
-                  wordBreak: 'break-word',
-                  fontSize: 'medium'
+                  wordBreak: 'break-all',
+                  color: subject ? theme.palette.text.secondary : theme.palette.text.primary
                 }}
               >
-                {subject}
+                {url || item.file.name}
               </div>
-            )}
-            <div
-              style={{
-                marginLeft: theme.spacing(1),
-                wordBreak: 'break-word'
-              }}
-            >
-              {url || item.file.name}
             </div>
           </div>
         </Grid>
