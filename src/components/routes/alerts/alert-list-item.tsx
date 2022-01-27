@@ -3,53 +3,78 @@ import BugReportOutlinedIcon from '@material-ui/icons/BugReportOutlined';
 import GroupOutlinedIcon from '@material-ui/icons/GroupOutlined';
 import PersonOutlineOutlinedIcon from '@material-ui/icons/PersonOutlineOutlined';
 import VerifiedUserOutlinedIcon from '@material-ui/icons/VerifiedUserOutlined';
+import useALContext from 'components/hooks/useALContext';
 import { AlertItem } from 'components/routes/alerts/hooks/useAlerts';
 import { ChipList } from 'components/visual/ChipList';
+import CustomChip from 'components/visual/CustomChip';
 import Verdict from 'components/visual/Verdict';
 import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
+import AlertListChip from './alert-chip-list';
+import AlertExtendedScan from './alert-extended_scan';
 import AlertPriority from './alert-priority';
 import AlertStatus from './alert-status';
 
 type AlertListItemProps = {
   item: AlertItem;
 };
-const AlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
+const WrappedAlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
   const theme = useTheme();
   const { t, i18n } = useTranslation('alerts');
-  const infoItems = [];
+  const { configuration } = useALContext();
 
-  if (item.al.av.length !== 0) {
-    infoItems.push({ label: `${item.al.av.length}x AV`, color: 'warning', size: 'tiny', variant: 'outlined' });
+  let subject = '';
+  for (let subItem of configuration.ui.alerting_meta.subject) {
+    let metaVal = item.metadata[subItem];
+    if (metaVal !== undefined && metaVal !== null) {
+      subject = metaVal;
+      break;
+    }
   }
-  if (item.al.ip.length !== 0) {
-    infoItems.push({
-      label: `${item.al.ip.length}x IP`,
-      color: 'primary',
-      size: 'tiny',
-      variant: 'outlined'
-    });
-  }
-  if (item.al.domain.length !== 0) {
-    infoItems.push({
-      label: `${item.al.domain.length}x DOM`,
-      color: 'success',
-      size: 'tiny',
-      variant: 'outlined'
-    });
+
+  let url = '';
+  for (let subItem of configuration.ui.alerting_meta.url) {
+    let metaVal = item.metadata[subItem];
+    if (metaVal !== undefined && metaVal !== null) {
+      url = metaVal;
+      break;
+    }
   }
 
   return (
     <div style={{ padding: theme.spacing(2) }}>
       <Grid container spacing={1}>
         <Grid item xs={12} md={8}>
-          <AlertPriority name={item.priority} />
-          {item.group_count && <span style={{ marginLeft: theme.spacing(1) }}>{item.group_count}x</span>}
-          <span style={{ marginLeft: theme.spacing(1), wordBreak: 'break-word' }}>{item.file.name}</span>
+          <div style={{ display: 'inline-block', verticalAlign: 'top' }}>
+            <AlertExtendedScan name={item.extended_scan} />
+            <AlertPriority name={item.priority} />
+            {item.group_count && <span style={{ marginLeft: theme.spacing(1) }}>{item.group_count}x</span>}
+          </div>
+          <div style={{ display: 'inline-block' }}>
+            {subject && (
+              <div
+                style={{
+                  marginLeft: theme.spacing(1),
+                  wordBreak: 'break-word',
+                  fontSize: 'medium'
+                }}
+              >
+                {subject}
+              </div>
+            )}
+            <div
+              style={{
+                marginLeft: theme.spacing(1),
+                wordBreak: 'break-word'
+              }}
+            >
+              {url || item.file.name}
+            </div>
+          </div>
         </Grid>
-        <Grid item xs={6} md={2}>
+        <Grid item xs={6} md={2} style={{ minHeight: theme.spacing(5) }}>
           {item.verdict.malicious.length > item.verdict.non_malicious.length ? (
             <Tooltip
               title={`${item.verdict.malicious.length}/${
@@ -88,24 +113,39 @@ const AlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
           </Moment>
         </Grid>
         <Grid item xs={12} md={2}>
-          <AlertStatus name={item.status} size={'tiny' as 'tiny'} />
+          <Grid container spacing={1}>
+            <Grid item>
+              <CustomChip size="tiny" variant="outlined" label={item.type} style={{ cursor: 'inherit' }} />
+            </Grid>
+            <Grid item>
+              <AlertStatus name={item.status} size={'tiny' as 'tiny'} />
+            </Grid>
+          </Grid>
         </Grid>
         <Grid item xs={12} md={6}>
           <ChipList
             items={item.label
-              .map(label => ({ label, size: 'tiny' as 'tiny', variant: 'outlined' as 'outlined' }))
+              .map(label => ({
+                label,
+                size: 'tiny' as 'tiny',
+                variant: 'outlined' as 'outlined',
+                style: { cursor: 'inherit' }
+              }))
               .concat(
                 item.al.attrib.map(label => ({
                   label,
                   size: 'tiny' as 'tiny',
                   color: 'error',
-                  variant: 'outlined' as 'outlined'
+                  variant: 'outlined' as 'outlined',
+                  style: { cursor: 'inherit' }
                 }))
               )}
           />
         </Grid>
         <Grid item xs={12} md={2}>
-          <ChipList items={infoItems} />
+          <AlertListChip items={item.al.av} title="AV" color="warning" size="tiny" />
+          <AlertListChip items={item.al.ip} title="IP" color="primary" size="tiny" />
+          <AlertListChip items={item.al.domain} title="DOM" color="success" size="tiny" />
         </Grid>
         <Grid item xs={12} md={2} style={{ textAlign: 'right' }}>
           <Verdict score={item.al.score} />
@@ -115,4 +155,5 @@ const AlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
   );
 };
 
+const AlertListItem = React.memo(WrappedAlertListItem);
 export default AlertListItem;
