@@ -36,7 +36,7 @@ const VerdictBar: React.FC<VerdictBarProps> = ({ verdicts, width = '100%' }) => 
           fill={theme.palette.success.main}
           width={`${verdicts.non_malicious.length * 5}%`}
         />
-        <rect x="50%" y="1" height="13" width="1%" fill="lightgrey" />
+        <rect x="49.5%" y="1" height="13" width="1%" fill={theme.palette.divider} />
       </svg>
     </Tooltip>
   );
