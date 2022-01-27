@@ -200,7 +200,14 @@ const WrappedAlertListItemActions: React.FC<AlertListItemActionsProps> = ({
                 : null
             }
           }}
-          onClick={!hasSetMalicious ? () => handleVerdict('malicious') : null}
+          onClick={
+            !hasSetMalicious
+              ? () => {
+                  handleVerdict('malicious');
+                  handleClose(null, 'toggle');
+                }
+              : null
+          }
         />
         <SpeedDialActionButton
           icon={<VerifiedUserOutlinedIcon />}
@@ -215,7 +222,14 @@ const WrappedAlertListItemActions: React.FC<AlertListItemActionsProps> = ({
                 : null
             }
           }}
-          onClick={!hasSetNonMalicious ? () => handleVerdict('non_malicious') : null}
+          onClick={
+            !hasSetNonMalicious
+              ? () => {
+                  handleVerdict('non_malicious');
+                  handleClose(null, 'toggle');
+                }
+              : null
+          }
         />
         <SpeedDialActionButton
           icon={<BiNetworkChart style={{ height: '1.3rem', width: '1.3rem' }} />}
@@ -237,6 +251,7 @@ const WrappedAlertListItemActions: React.FC<AlertListItemActionsProps> = ({
                 }
               }
             });
+            handleClose(null, 'toggle');
           }}
         />
         <SpeedDialActionLink
@@ -244,6 +259,7 @@ const WrappedAlertListItemActions: React.FC<AlertListItemActionsProps> = ({
           to={`/submission/${item.sid}`}
           tooltipTitle={t('submission')}
           tooltipPlacement={vertical ? 'left' : 'bottom'}
+          onClick={() => handleClose(null, 'toggle')}
         />
         {!item.owner && (
           <SpeedDialActionButton
@@ -252,6 +268,7 @@ const WrappedAlertListItemActions: React.FC<AlertListItemActionsProps> = ({
             tooltipPlacement={vertical ? 'left' : 'bottom'}
             onClick={() => {
               setTakeOwnershipConfirmation({ open: true, query: buildActionQuery() });
+              handleClose(null, 'toggle');
             }}
           />
         )}
@@ -261,6 +278,7 @@ const WrappedAlertListItemActions: React.FC<AlertListItemActionsProps> = ({
             to={`/alerts/?${buildFocusQuery().buildURLQueryString()}`}
             tooltipTitle={t('focus')}
             tooltipPlacement={vertical ? 'left' : 'bottom'}
+            onClick={() => handleClose(null, 'toggle')}
           />
         )}
       </SpeedDial>
