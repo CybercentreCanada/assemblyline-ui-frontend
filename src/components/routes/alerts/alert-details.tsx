@@ -616,7 +616,11 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                     <Grid item xs={9} sm={10}>
                       <div className={classes.sectionContent}>
                         <ChipList
-                          items={item ? item.heuristic.name.map(label => ({ label, variant: 'outlined' })) : null}
+                          items={
+                            item
+                              ? item.heuristic.name.map(label => ({ label, variant: 'outlined', color: 'info' }))
+                              : null
+                          }
                         />
                       </div>
                     </Grid>
@@ -647,7 +651,13 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                     </Grid>
                     <Grid item xs={9} sm={10}>
                       <div className={classes.sectionContent}>
-                        <ChipList items={item ? item.al.yara.map(label => ({ label, variant: 'outlined' })) : null} />
+                        <ChipList
+                          items={
+                            item
+                              ? item.al.yara.map(label => ({ label, variant: 'outlined', color: 'secondary' }))
+                              : null
+                          }
+                        />
                       </div>
                     </Grid>
                   </>
