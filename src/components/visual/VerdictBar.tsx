@@ -21,19 +21,21 @@ const VerdictBar: React.FC<VerdictBarProps> = ({ verdicts, width = '100%' }) => 
       }`}
     >
       <svg height="15" width={width}>
-        <rect
-          height="15"
-          width="100%"
-          style={{ fill: theme.palette.background.default, stroke: theme.palette.divider }}
-        />
+        <rect height="15" width="100%" style={{ fill: 'transparent', stroke: theme.palette.divider }} />
         <rect
           y="1"
           height="13"
-          fill="#d9534f"
+          fill={theme.palette.error.main}
           x={`${50 - verdicts.malicious.length * 5}%`}
           width={`${verdicts.malicious.length * 5}%`}
         />
-        <rect x="50%" y="1" height="13" fill="#5cb85c" width={`${verdicts.non_malicious.length * 5}%`} />
+        <rect
+          x="50%"
+          y="1"
+          height="13"
+          fill={theme.palette.success.main}
+          width={`${verdicts.non_malicious.length * 5}%`}
+        />
         <rect x="50%" y="1" height="13" width="1%" fill="lightgrey" />
       </svg>
     </Tooltip>

@@ -70,7 +70,6 @@ const WrappedAlertExtendedScan: React.FC<AlertExtendedScanProps> = ({ name, with
       variant="outlined"
       color={extendedData.color}
       label={t(`extended_${name}`)}
-      icon={extendedData.arrow}
       tooltip={t(`extended_${name}_desc`)}
       style={{ cursor: 'inherit' }}
     />

@@ -69,7 +69,7 @@ const WrappedAlertPriority: React.FC<AlertPriorityProps> = ({ name, withChip = f
       variant="outlined"
       color={priorityData.color}
       label={name ? t(`priority_${name}`) : t('priority_unset')}
-      icon={priorityData.arrow}
+      disabled={!name}
     />
   ) : (
     <Tooltip title={name ? `${t('priority')}: ${t(`priority_${name}`)}` : `${t('priority')}: ${t('priority_unset')}`}>
