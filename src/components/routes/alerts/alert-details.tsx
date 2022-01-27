@@ -363,13 +363,18 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
             </div>
             <Divider />
             <div className={classes.sectionContent}>
-              <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+              <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
                 {item ? (
                   Object.keys(item.metadata)
                     .filter(k => configuration.ui.alerting_meta.important.indexOf(k) !== -1)
                     .map(k => (
                       <Grid container spacing={1} key={`alert-metadata-${k}`}>
-                        <Grid item xs={3} sm={2}>
+                        <Grid
+                          item
+                          xs={3}
+                          sm={2}
+                          style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                        >
                           {k}
                         </Grid>
                         <Grid item xs={9} sm={10}>
@@ -393,7 +398,12 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                           .filter(k => configuration.ui.alerting_meta.important.indexOf(k) === -1)
                           .map(k => (
                             <Grid container spacing={1} key={`alert-metadata-${k}`}>
-                              <Grid item xs={3} sm={2}>
+                              <Grid
+                                item
+                                xs={3}
+                                sm={2}
+                                style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                              >
                                 {k}
                               </Grid>
                               <Grid item xs={9} sm={10}>
@@ -583,23 +593,17 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                             <Typography variant="caption" style={{ marginRight: theme.spacing(1) }}>
                               <i>{t('attack_category')}</i>
                             </Typography>
-                            <div style={{ verticalAlign: 'middle', display: 'inline-block' }}>
-                              <ChipList
-                                items={
-                                  item ? item.attack.category.map(label => ({ label, variant: 'outlined' })) : null
-                                }
-                              />
-                            </div>
+                            <ChipList
+                              items={item ? item.attack.category.map(label => ({ label, variant: 'outlined' })) : null}
+                            />
                           </Grid>
                           <Grid item xs={12} md={6}>
                             <Typography variant="caption" style={{ marginRight: theme.spacing(1) }}>
                               <i>{t('attack_pattern')}</i>
                             </Typography>
-                            <div style={{ verticalAlign: 'middle', display: 'inline-block' }}>
-                              <ChipList
-                                items={item ? item.attack.pattern.map(label => ({ label, variant: 'outlined' })) : null}
-                              />
-                            </div>
+                            <ChipList
+                              items={item ? item.attack.pattern.map(label => ({ label, variant: 'outlined' })) : null}
+                            />
                           </Grid>
                         </Grid>
                       </div>
