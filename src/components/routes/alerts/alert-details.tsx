@@ -11,10 +11,8 @@ import {
   useTheme
 } from '@material-ui/core';
 import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
-import BugReportOutlinedIcon from '@material-ui/icons/BugReportOutlined';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
-import VerifiedUserOutlinedIcon from '@material-ui/icons/VerifiedUserOutlined';
 import { Skeleton } from '@material-ui/lab';
 import Alert from '@material-ui/lab/Alert';
 import useClipboard from 'commons/components/hooks/useClipboard';
@@ -26,6 +24,7 @@ import { ChipList, ChipSkeleton, ChipSkeletonInline } from 'components/visual/Ch
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
 import Verdict from 'components/visual/Verdict';
+import VerdictBar from 'components/visual/VerdictBar';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
@@ -147,7 +146,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
               <Typography className={classes.sectionTitle}>{t('alert_info')}</Typography>
               <Divider />
               <div className={classes.sectionContent}>
-                <Grid container>
+                <Grid container alignItems="center">
                   {/* Alert ID */}
                   <Grid item xs={3} sm={2} md={4}>
                     {t('alert_id')}
@@ -161,13 +160,6 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                   </Grid>
                   <Grid item xs={9} sm={10} md={8}>
                     {item ? item.type : <Skeleton />}
-                  </Grid>
-                  {/* Alert Type */}
-                  <Grid item xs={3} sm={2} md={4}>
-                    {t('extended')}
-                  </Grid>
-                  <Grid item xs={9} sm={10} md={8}>
-                    {item ? <AlertExtendedScan name={item.extended_scan} withChip /> : <Skeleton />}
                   </Grid>
                   {/* Submission received date */}
                   <Grid item xs={3} sm={2} md={4}>
@@ -188,21 +180,46 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                     {t('ownership')}
                   </Grid>
                   <Grid item xs={9} sm={10} md={8}>
-                    {item ? item.owner ? item.owner : item.hint_owner ? 'assigned' : null : <Skeleton />}
+                    {item ? (
+                      item.owner ? (
+                        item.owner
+                      ) : (
+                        <div style={{ color: theme.palette.text.disabled }}>
+                          {item.hint_owner ? t('hint_owner_detail') : t('owned_none')}
+                        </div>
+                      )
+                    ) : (
+                      <Skeleton />
+                    )}
+                  </Grid>
+                  {/* Alert Extended scan status */}
+                  <Grid item xs={3} sm={2} md={4}>
+                    {t('extended')}
+                  </Grid>
+                  <Grid item xs={9} sm={10} md={8} style={{ marginTop: theme.spacing(0.5) }}>
+                    {item ? <AlertExtendedScan name={item.extended_scan} withChip /> : <Skeleton />}
                   </Grid>
                   {/* Alert Priority */}
-                  <Grid item xs={3} sm={2} md={4} style={{ placeSelf: 'center' }}>
+                  <Grid item xs={3} sm={2} md={4}>
                     {t('priority')}
                   </Grid>
                   <Grid item xs={9} sm={10} md={8} style={{ marginTop: theme.spacing(0.5) }}>
                     {item ? <AlertPriority name={item ? item.priority : null} withChip /> : <ChipSkeleton />}
                   </Grid>
                   {/* Alert Status */}
-                  <Grid item xs={3} sm={2} md={4} style={{ placeSelf: 'center' }}>
+                  <Grid item xs={3} sm={2} md={4}>
                     {t('status')}
                   </Grid>
                   <Grid item xs={9} sm={10} md={8} style={{ marginTop: theme.spacing(0.5) }}>
-                    {item ? <AlertStatus name={item.status} /> : <ChipSkeleton />}
+                    {item ? (
+                      item.status ? (
+                        <AlertStatus name={item.status} />
+                      ) : (
+                        <CustomChip size="small" variant="outlined" label={t(`status_unset`)} disabled />
+                      )
+                    ) : (
+                      <ChipSkeleton />
+                    )}
                   </Grid>
                 </Grid>
               </div>
@@ -223,30 +240,12 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                       {item ? <Verdict size="tiny" score={item.al.score} fullWidth /> : <Skeleton />}
                     </Grid>
                     <Grid item xs={3} sm={2} md={4}>
-                      {t('user_verdict')}
+                      <div style={{ marginTop: theme.spacing(0.5) }}>{t('user_verdict')}</div>
                     </Grid>
                     <Grid item xs={9} sm={10} md={8}>
                       {item ? (
-                        <div style={{ display: 'flex' }}>
-                          <div style={{ flexGrow: 1 }}>
-                            <div>{`${item.verdict.malicious.length}x ${t('verdict.malicious')}`}</div>
-                            <div>{`${item.verdict.non_malicious.length}x ${t('verdict.non_malicious')}`}</div>
-                          </div>
-                          <div
-                            style={{
-                              flexGrow: 0,
-                              alignSelf: 'center',
-                              paddingLeft: theme.spacing(2),
-                              paddingRight: theme.spacing(2)
-                            }}
-                          >
-                            {item.verdict.malicious.length > item.verdict.non_malicious.length && (
-                              <BugReportOutlinedIcon />
-                            )}
-                            {item.verdict.non_malicious.length > item.verdict.malicious.length && (
-                              <VerifiedUserOutlinedIcon />
-                            )}
-                          </div>
+                        <div style={{ marginTop: theme.spacing(0.5), marginBottom: theme.spacing(0.5) }}>
+                          <VerdictBar verdicts={item.verdict} />
                         </div>
                       ) : (
                         <>
@@ -617,7 +616,11 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                     <Grid item xs={9} sm={10}>
                       <div className={classes.sectionContent}>
                         <ChipList
-                          items={item ? item.heuristic.name.map(label => ({ label, variant: 'outlined' })) : null}
+                          items={
+                            item
+                              ? item.heuristic.name.map(label => ({ label, variant: 'outlined', color: 'info' }))
+                              : null
+                          }
                         />
                       </div>
                     </Grid>
@@ -648,7 +651,13 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                     </Grid>
                     <Grid item xs={9} sm={10}>
                       <div className={classes.sectionContent}>
-                        <ChipList items={item ? item.al.yara.map(label => ({ label, variant: 'outlined' })) : null} />
+                        <ChipList
+                          items={
+                            item
+                              ? item.al.yara.map(label => ({ label, variant: 'outlined', color: 'secondary' }))
+                              : null
+                          }
+                        />
                       </div>
                     </Grid>
                   </>
