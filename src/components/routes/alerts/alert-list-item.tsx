@@ -75,6 +75,12 @@ const WrappedAlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
           </div>
         </Grid>
         <Grid item xs={6} md={2} style={{ minHeight: theme.spacing(5) }}>
+          <CustomChip
+            size="tiny"
+            label={item.file.type}
+            variant="outlined"
+            style={{ marginBottom: '11px', marginRight: theme.spacing(0.5) }}
+          />
           {item.verdict.malicious.length > item.verdict.non_malicious.length ? (
             <Tooltip
               title={`${item.verdict.malicious.length}/${
