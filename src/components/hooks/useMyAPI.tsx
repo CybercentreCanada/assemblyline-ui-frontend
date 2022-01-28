@@ -1,6 +1,9 @@
 import getXSRFCookie from 'helpers/xsrf';
 import { useTranslation } from 'react-i18next';
 import useMySnackbar from './useMySnackbar';
+import { ConfigurationDefinition, WhoAmIProps } from './useMyUser';
+
+const DEFAULT_RETRY_MS = 32;
 
 export type APIResponseProps = {
   api_error_message: string;
@@ -9,9 +12,16 @@ export type APIResponseProps = {
   api_status_code: number;
 };
 
+export type LoginParamsProps = {
+  oauth_providers: string[];
+  allow_userpass_login: boolean;
+  allow_signup: boolean;
+  allow_pw_rest: boolean;
+};
+
 export default function useMyAPI() {
   const { t } = useTranslation();
-  const { showErrorMessage } = useMySnackbar();
+  const { showErrorMessage, closeSnackbar } = useMySnackbar();
 
   type APICallProps = {
     url: string;
@@ -25,7 +35,117 @@ export default function useMyAPI() {
     onEnter?: () => void;
     onExit?: () => void;
     onFinalize?: (api_data: APIResponseProps) => void;
+    retryAfter?: number;
   };
+
+  type BootstrapProps = {
+    switchRenderedApp: (value: string) => void;
+    setConfiguration: (cfg: ConfigurationDefinition) => void;
+    setLoginParams: (params: LoginParamsProps) => void;
+    setUser: (user: WhoAmIProps) => void;
+    setReady: (isReady: boolean) => void;
+    retryAfter?: number;
+  };
+
+  function isAPIData(value: any) {
+    if (
+      value !== undefined &&
+      value !== null &&
+      value.hasOwnProperty('api_response') &&
+      value.hasOwnProperty('api_error_message') &&
+      value.hasOwnProperty('api_server_version') &&
+      value.hasOwnProperty('api_status_code')
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  function bootstrap({
+    switchRenderedApp,
+    setConfiguration,
+    setLoginParams,
+    setUser,
+    setReady,
+    retryAfter = DEFAULT_RETRY_MS
+  }: BootstrapProps) {
+    const requestOptions: RequestInit = {
+      method: 'GET',
+      headers: {
+        'X-XSRF-TOKEN': getXSRFCookie()
+      },
+      credentials: 'same-origin'
+    };
+
+    fetch('/api/v4/user/whoami/', requestOptions)
+      .then(res => {
+        if (res.status === 502) {
+          return {
+            api_error_message: t('api.unreachable'),
+            api_response: '',
+            api_server_version: '4.0.0',
+            api_status_code: 502
+          };
+        }
+        return res.json();
+      })
+      .catch(() => ({
+        api_error_message: t('api.invalid'),
+        api_response: '',
+        api_server_version: '4.0.0',
+        api_status_code: 400
+      }))
+      .then(api_data => {
+        // eslint-disable-next-line no-prototype-builtins
+        if (!isAPIData(api_data)) {
+          // We got no response
+          showErrorMessage(t('api.invalid'), 30000);
+          switchRenderedApp('load');
+        } else if (api_data.api_status_code === 403) {
+          if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
+          // User account is locked
+          setConfiguration(api_data.api_response);
+          switchRenderedApp('locked');
+        } else if (api_data.api_status_code === 401) {
+          if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
+          // User is not logged in
+          localStorage.setItem('loginParams', JSON.stringify(api_data.api_response));
+          sessionStorage.clear();
+          setLoginParams(api_data.api_response);
+          switchRenderedApp('login');
+        } else if (api_data.api_status_code === 200) {
+          if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
+          // Set the current user
+          setUser(api_data.api_response);
+
+          // Mark the interface ready
+          setReady(true);
+
+          // Render appropriate page
+          if (!api_data.api_response.agrees_with_tos && api_data.api_response.configuration.ui.tos) {
+            switchRenderedApp('tos');
+          } else {
+            switchRenderedApp('routes');
+          }
+        } else {
+          // Server is unreachable or quota is reached... retry!
+          if (api_data.api_status_code !== 503) {
+            showErrorMessage(api_data.api_error_message, 30000);
+          }
+          setTimeout(() => {
+            bootstrap({
+              switchRenderedApp,
+              setConfiguration,
+              setLoginParams,
+              setUser,
+              setReady,
+              retryAfter: Math.min(retryAfter * 2, 10000)
+            });
+          }, retryAfter);
+          switchRenderedApp('load');
+        }
+      });
+  }
 
   function apiCall({
     url,
@@ -38,7 +158,8 @@ export default function useMyAPI() {
     onFailure,
     onEnter,
     onExit,
-    onFinalize
+    onFinalize,
+    retryAfter = DEFAULT_RETRY_MS
   }: APICallProps) {
     const requestOptions: RequestInit = {
       method,
@@ -65,32 +186,48 @@ export default function useMyAPI() {
 
     // Fetch the URL
     fetch(url, requestOptions)
-      .then(res => res.json())
-      .catch(err => {
-        // eslint-disable-next-line no-console
-        console.error(err);
-        return {
-          api_error_message: t('api.unreachable'),
-          api_response: '',
-          api_server_version: '4.0.0',
-          api_status_code: 400
-        };
+      .then(res => {
+        if (res.status === 502) {
+          return {
+            api_error_message: t('api.unreachable'),
+            api_response: '',
+            api_server_version: '4.0.0',
+            api_status_code: 502
+          };
+        }
+        return res.json();
       })
+      .catch(() => ({
+        api_error_message: t('api.invalid'),
+        api_response: '',
+        api_server_version: '4.0.0',
+        api_status_code: 400
+      }))
       .then(api_data => {
         // Run finished Callback
         if (onExit) onExit();
 
         // Check Api response validity
         // eslint-disable-next-line no-prototype-builtins
-        if (api_data === undefined || !api_data.hasOwnProperty('api_status_code')) {
+        if (!isAPIData(api_data)) {
           showErrorMessage(t('api.invalid'));
+          return;
         } else if (api_data.api_status_code === 401 && reloadOnUnauthorize) {
           // Detect login request
           // Do nothing... we are reloading the page
           window.location.reload();
           return;
-        } else if (api_data.api_status_code === 503) {
-          // You are over you API quota, retry the call in 50 ms
+        } else if (
+          api_data.api_status_code === 502 ||
+          (api_data.api_status_code === 503 &&
+            api_data.api_error_message.includes('quota') &&
+            !api_data.api_error_message.includes('submission'))
+        ) {
+          // Retryable status responses
+          if (api_data.api_status_code === 502) {
+            showErrorMessage(api_data.api_error_message, 30000);
+          }
+
           setTimeout(() => {
             apiCall({
               url,
@@ -103,11 +240,13 @@ export default function useMyAPI() {
               onFailure,
               onEnter,
               onExit,
-              onFinalize
+              onFinalize,
+              retryAfter: Math.min(retryAfter * 2, 10000)
             });
-          }, 50);
+          }, retryAfter);
           return;
         } else if (api_data.api_status_code !== 200) {
+          if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
           // Handle errors
           // Run failure callback
           if (onFailure) {
@@ -117,6 +256,7 @@ export default function useMyAPI() {
             showErrorMessage(api_data.api_error_message);
           }
         } else if (onSuccess) {
+          if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
           // Cache success status
           if (allowCache) {
             try {
@@ -133,10 +273,12 @@ export default function useMyAPI() {
           // Handle success
           // Run success callback
           onSuccess(api_data);
+        } else {
+          if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
         }
         if (onFinalize) onFinalize(api_data);
       });
   }
 
-  return apiCall;
+  return { apiCall, bootstrap };
 }

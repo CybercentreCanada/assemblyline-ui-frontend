@@ -68,6 +68,11 @@ export type ConfigurationDefinition = {
     version: string;
   };
   ui: {
+    alerting_meta: {
+      important: string[];
+      subject: string[];
+      url: string[];
+    };
     allow_malicious_hinting: boolean;
     allow_url_submissions: boolean;
     apps: AppElement[];
@@ -103,7 +108,7 @@ export interface CustomUserContextProps extends UserContextProps<CustomUser> {
   setSystemMessage: (msg: SystemMessageDefinition) => void;
 }
 
-interface WhoAmIProps extends CustomUser {
+export interface WhoAmIProps extends CustomUser {
   c12nDef: ClassificationDefinition;
   configuration: ConfigurationDefinition;
   indexes: IndexDefinitionMap;

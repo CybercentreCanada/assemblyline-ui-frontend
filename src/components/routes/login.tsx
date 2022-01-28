@@ -52,7 +52,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
   const { t } = useTranslation(['login']);
   const theme = useTheme();
   const classes = useStyles();
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
   const { getBanner, hideMenus } = useAppLayout();
   const provider = getProvider();
   const [shownControls, setShownControls] = useState(

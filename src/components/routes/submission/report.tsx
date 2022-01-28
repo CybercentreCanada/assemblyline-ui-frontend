@@ -499,7 +499,7 @@ export default function SubmissionReport() {
   const history = useHistory();
   const theme = useTheme();
   const [report, setReport] = useState(null);
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
@@ -681,52 +681,28 @@ export default function SubmissionReport() {
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.md5')}</span>
               </Grid>
-              <Grid
-                item
-                xs={8}
-                md={9}
-                lg={10}
-                style={{ fontFamily: 'monospace',  wordBreak: 'break-word' }}
-              >
+              <Grid item xs={8} md={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
                 {report ? report.file_info.md5 : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.sha1')}</span>
               </Grid>
-              <Grid
-                item
-                xs={8}
-                md={9}
-                lg={10}
-                style={{ fontFamily: 'monospace',  wordBreak: 'break-word' }}
-              >
+              <Grid item xs={8} md={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
                 {report ? report.file_info.sha1 : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.sha256')}</span>
               </Grid>
-              <Grid
-                item
-                xs={8}
-                md={9}
-                lg={10}
-                style={{ fontFamily: 'monospace',  wordBreak: 'break-word' }}
-              >
+              <Grid item xs={8} md={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
                 {report ? report.file_info.sha256 : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.ssdeep')}</span>
               </Grid>
-              <Grid
-                item
-                xs={8}
-                md={9}
-                lg={10}
-                style={{ fontFamily: 'monospace',  wordBreak: 'break-word' }}
-              >
+              <Grid item xs={8} md={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
                 {report ? report.file_info.ssdeep : <Skeleton />}
               </Grid>
             </Grid>

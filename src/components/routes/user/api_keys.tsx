@@ -32,7 +32,7 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
   const [tempAPIKey, setTempAPIKey] = useState(null);
   const [tempKeyName, setTempKeyName] = useState('');
   const [tempKeyPriv, setTempKeyPriv] = useState('READ');
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const { showSuccessMessage } = useMySnackbar();

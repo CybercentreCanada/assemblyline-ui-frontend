@@ -57,7 +57,7 @@ export default function Workflows() {
   const history = useHistory();
   const theme = useTheme();
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
   const classes = useStyles();
   const { closeGlobalDrawer, setGlobalDrawer } = useDrawer();
   const [suggestions] = useState([

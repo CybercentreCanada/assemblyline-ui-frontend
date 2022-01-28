@@ -112,7 +112,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
   const [modified, setModified] = useState(false);
   const history = useHistory();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
   const classes = useStyles();
   const { user: currentUser, c12nDef } = useALContext();
 

@@ -43,7 +43,7 @@ export default function Services() {
   const [restore, setRestore] = useState('');
   const { showSuccessMessage } = useMySnackbar();
   const theme = useTheme();
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
   const { user: currentUser } = useUser<CustomUser>();
   const { setGlobalDrawer, closeGlobalDrawer } = useDrawer();
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
@@ -76,6 +76,7 @@ export default function Services() {
       onSuccess: api_data => {
         showSuccessMessage(t('restore.success'));
         closeRestoreDialog();
+        setRestoreConfirmation(false);
         setTimeout(() => reload(), 1000);
       }
     });

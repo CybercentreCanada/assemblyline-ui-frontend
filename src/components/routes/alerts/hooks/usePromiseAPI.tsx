@@ -20,7 +20,7 @@ export interface UsingPromiseAPI {
 // Stateless hook that returns promise wrappers around AL's rest api.
 export default function usePromiseAPI(): UsingPromiseAPI {
   //
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
 
   // Hook API: fetch the alert for the specified alert_id.
   const fetchAlert = async (alertId: string): Promise<AlertItem> =>

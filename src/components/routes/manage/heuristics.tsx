@@ -53,7 +53,7 @@ export default function Heuristics() {
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
   const history = useHistory();
   const theme = useTheme();
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
   const classes = useStyles();
   const { closeGlobalDrawer, setGlobalDrawer, globalDrawer } = useDrawer();
   const [suggestions] = useState([

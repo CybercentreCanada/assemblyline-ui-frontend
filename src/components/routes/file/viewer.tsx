@@ -126,7 +126,7 @@ const FileViewer = () => {
   const theme = useTheme();
   const location = useLocation();
   const history = useHistory();
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
   const [string, setString] = useState(null);
   const [hex, setHex] = useState(null);
   const [ascii, setAscii] = useState(null);

@@ -16,7 +16,7 @@ type SecTokenProps = {
 
 export function SecurityTokenLogin({ username, setShownControls, setWebAuthNResponse }: SecTokenProps) {
   const { t } = useTranslation(['login']);
-  const apiCall = useMyAPI();
+  const { apiCall } = useMyAPI();
   const { showErrorMessage } = useMySnackbar();
 
   useEffect(() => {

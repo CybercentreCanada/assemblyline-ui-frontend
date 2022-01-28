@@ -15,6 +15,7 @@ import AlertDetails from 'components/routes/alerts/alert-details';
 import Alerts from 'components/routes/alerts/alerts';
 import AlertsLegacy from 'components/routes/alerts/legacy-alert';
 import AppRegistration from 'components/routes/authorize';
+import CrashTest from 'components/routes/crash';
 import Dashboard from 'components/routes/dashboard';
 import FileFullDetail from 'components/routes/file/detail';
 import FileViewer from 'components/routes/file/viewer';
@@ -98,6 +99,7 @@ const WrappedRoutes = () => {
         <Route exact path="/admin/users" component={AdminUsers} />
         <Route exact path="/admin/users/:id" component={User} />
         <Route exact path="/authorize" component={AppRegistration} />
+        <Route exact path="/crash" component={CrashTest} />
         <Route exact path="/dashboard" component={Dashboard} />
         <Route exact path="/file/detail/:id" component={FileFullDetail} />
         <Route exact path="/file/viewer/:id" component={FileViewer} />
@@ -147,7 +149,8 @@ const WrappedRoutes = () => {
             opacity: '0.4',
             zIndex: 10000,
             marginTop: 'auto',
-            marginRight: 'auto'
+            marginRight: 'auto',
+            pointerEvents: 'none'
           }}
         >
           {`Assemblyline ${configuration.system.version} :: `}

@@ -134,7 +134,9 @@ const UserProfile = () => {
           src={currentUser.avatar ? currentUser.avatar : gravatarUrl}
         >
           {currentUser.name
-            .split(' ', 2)
+            .split(' ')
+            .filter(w => w !== '')
+            .splice(0, 2)
             .map(n => n[0].toUpperCase())
             .join('')}
         </Avatar>
@@ -169,7 +171,9 @@ const UserProfile = () => {
                         src={currentUser.avatar ? currentUser.avatar : gravatarUrl}
                       >
                         {currentUser.name
-                          .split(' ', 2)
+                          .split(' ')
+                          .filter(w => w !== '')
+                          .splice(0, 2)
                           .map(n => n[0].toUpperCase())
                           .join('')}
                       </Avatar>
