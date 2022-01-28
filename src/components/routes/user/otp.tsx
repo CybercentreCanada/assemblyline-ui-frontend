@@ -11,7 +11,7 @@ type OTPProps = {
 };
 
 export default function OTP({ setDrawerOpen, set2FAEnabled }: OTPProps) {
-  const { apiCall } = useMyAPI();
+  const apiCall = useMyAPI();
   const [response, setResponse] = useState(null);
   const [tempOTP, setTempOTP] = useState('');
   const { t } = useTranslation(['user']);

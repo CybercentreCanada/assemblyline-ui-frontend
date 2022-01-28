@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import { Box, ClickAwayListener, makeStyles, TextField, useMediaQuery, useTheme } from '@material-ui/core';
+import { Box, makeStyles, TextField, useMediaQuery, useTheme } from '@material-ui/core';
 import { insertText } from 'commons/addons/elements/utils/browser';
 import {
   isArrowDown,
@@ -265,37 +265,35 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
   };
 
   return (
-    <ClickAwayListener onClickAway={() => setOpen(false)}>
-      <div ref={element}>
-        <TextField
-          placeholder={placeholder || t('filter')}
-          value={value}
-          color="secondary"
-          InputProps={{ disableUnderline: true }}
-          disabled={disabled}
-          onChange={_onChange}
-          onKeyDown={_onKeyDown}
-          onBlur={_onBlur}
-          autoFocus
-          fullWidth
-        />
-        {open && isLTEMedium ? (
-          <div ref={optionsElement} className={classes.searchTextFieldOptionsCt}>
-            <div className={classes.searchTextFieldOptionsInner}>
-              {filteredOptions.items.map((item, index) => (
-                <SearchTextOption
-                  key={`SearchTextField-item-${index}`}
-                  text={item}
-                  position={index}
-                  onSelection={() => onOptionSelection(filteredOptions.start, filteredOptions.end, item)}
-                  selected={index === cursor}
-                />
-              ))}
-            </div>
+    <div ref={element}>
+      <TextField
+        placeholder={placeholder || t('filter')}
+        value={value}
+        color="secondary"
+        InputProps={{ disableUnderline: true }}
+        disabled={disabled}
+        onChange={_onChange}
+        onKeyDown={_onKeyDown}
+        onBlur={_onBlur}
+        autoFocus
+        fullWidth
+      />
+      {open && isLTEMedium ? (
+        <div ref={optionsElement} className={classes.searchTextFieldOptionsCt}>
+          <div className={classes.searchTextFieldOptionsInner}>
+            {filteredOptions.items.map((item, index) => (
+              <SearchTextOption
+                key={`SearchTextField-item-${index}`}
+                text={item}
+                position={index}
+                onSelection={() => onOptionSelection(filteredOptions.start, filteredOptions.end, item)}
+                selected={index === cursor}
+              />
+            ))}
           </div>
-        ) : null}
-      </div>
-    </ClickAwayListener>
+        </div>
+      ) : null}
+    </div>
   );
 };
 

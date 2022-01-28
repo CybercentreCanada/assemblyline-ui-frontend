@@ -110,7 +110,7 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates = null 
   const { t } = useTranslation(['fileDetail']);
   const classes = useStyles();
   const theme = useTheme();
-  const { apiCall } = useMyAPI();
+  const apiCall = useMyAPI();
   const sp2 = theme.spacing(2);
   const { c12nDef, settings } = useALContext();
   const empty = emptyResult(result);

@@ -23,7 +23,7 @@ type SignUpProps = {
 export function SignUp({ buttonLoading, setButtonLoading }: SignUpProps) {
   const { t } = useTranslation(['login']);
   const classes = useStyles();
-  const { apiCall } = useMyAPI();
+  const apiCall = useMyAPI();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

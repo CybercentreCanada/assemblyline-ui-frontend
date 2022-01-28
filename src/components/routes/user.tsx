@@ -83,7 +83,7 @@ function User({ width, username }: UserProps) {
   const sp4 = theme.spacing(4);
   const sp6 = theme.spacing(6);
 
-  const { apiCall } = useMyAPI();
+  const apiCall = useMyAPI();
   const useStyles = makeStyles(curTheme => ({
     drawer: {
       width: '500px',
@@ -446,9 +446,7 @@ function User({ width, username }: UserProps) {
                         src={user.avatar}
                       >
                         {user.name
-                          .split(' ')
-                          .filter(w => w !== '')
-                          .splice(0, 2)
+                          .split(' ', 2)
                           .map(n => (n ? n[0].toUpperCase() : ''))
                           .join('')}
                       </Avatar>

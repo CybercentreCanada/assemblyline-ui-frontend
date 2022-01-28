@@ -8,7 +8,6 @@ import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import CustomChip from '../CustomChip';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from '../DivTable';
 import InformativeAlert from '../InformativeAlert';
 
@@ -18,7 +17,6 @@ export type ServiceResult = {
   description: string;
   enabled: boolean;
   name: string;
-  privileged: boolean;
   rejects: string;
   stage: string;
   version: string;
@@ -57,7 +55,6 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
               <DivTableCell>{t('header.category')}</DivTableCell>
               <DivTableCell>{t('header.stage')}</DivTableCell>
               <DivTableCell>{t('header.accepts')}</DivTableCell>
-              <DivTableCell>{t('header.mode')}</DivTableCell>
               <DivTableCell>{t('header.enabled')}</DivTableCell>
               <DivTableCell />
             </DivTableRow>
@@ -82,16 +79,6 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
                 <DivTableCell>{result.category}</DivTableCell>
                 <DivTableCell>{result.stage}</DivTableCell>
                 <DivTableCell breakable>{result.accepts}</DivTableCell>
-                <DivTableCell>
-                  <CustomChip
-                    size="tiny"
-                    type="rounded"
-                    mono
-                    label={result.privileged ? 'P' : 'S'}
-                    color={result.privileged ? 'primary' : 'default'}
-                    tooltip={result.privileged ? t('mode.privileged') : t('mode.service')}
-                  />
-                </DivTableCell>
                 <DivTableCell>
                   {result.enabled ? <DoneIcon color="primary" /> : <ClearIcon color="error" />}
                 </DivTableCell>

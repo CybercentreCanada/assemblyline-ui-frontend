@@ -36,8 +36,8 @@ export type Safelist = {
   };
   id: string;
   sources: {
-    name: string;
-  }[];
+    name: string[];
+  };
   signature: {
     name: string;
   };
@@ -123,7 +123,7 @@ const WrappedSafelistTable: React.FC<SafelistTableProps> = ({
                     ? maxLenStr(sl_item.signature.name, 100)
                     : `${sl_item.tag.type} - ${maxLenStr(sl_item.tag.value, 100)}`}
                 </DivTableCell>
-                <DivTableCell breakable>{sl_item.sources.map(obj => obj.name).join(' | ')}</DivTableCell>
+                <DivTableCell breakable>{sl_item.sources.name.join(' | ')}</DivTableCell>
                 {c12nDef.enforce && (
                   <DivTableCell>
                     <Classification type="text" size="tiny" c12n={sl_item.classification} format="short" />

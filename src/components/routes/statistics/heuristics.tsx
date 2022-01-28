@@ -11,7 +11,7 @@ import HeuristicDetail from '../manage/heuristic_detail';
 
 export default function StatisticsSignatures() {
   const { t } = useTranslation(['statisticsHeuristics']);
-  const { apiCall } = useMyAPI();
+  const apiCall = useMyAPI();
   const theme = useTheme();
   const { c12nDef } = useALContext();
   const { setGlobalDrawer } = useDrawer();

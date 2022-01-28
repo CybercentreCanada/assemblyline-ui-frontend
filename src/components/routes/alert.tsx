@@ -13,7 +13,7 @@ type ParamProps = {
 function AlertFullDetails() {
   const { id } = useParams<ParamProps>();
   const [alert, setAlert] = useState<AlertItem | null>(null);
-  const { apiCall } = useMyAPI();
+  const apiCall = useMyAPI();
 
   useEffect(() => {
     apiCall({

@@ -57,7 +57,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function ApiDoc() {
-  const { apiCall } = useMyAPI();
+  const apiCall = useMyAPI();
   const [apiList, setApiList] = useState(null);
   const [apiSelected, setApiSelected] = useState(null);
   const [apiDefinition, setApiDefinition] = useState(null);

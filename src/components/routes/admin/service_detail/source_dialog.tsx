@@ -24,11 +24,10 @@ type SourceDialogProps = {
   open: boolean;
   setOpen: (value: boolean) => void;
   source?: Source;
-  defaults?: Source;
   onSave: (newSource: Source) => void;
 };
 
-const WrappedSourceDialog = ({ open, setOpen, source, defaults, onSave }: SourceDialogProps) => {
+const WrappedSourceDialog = ({ open, setOpen, source, onSave }: SourceDialogProps) => {
   const { t } = useTranslation(['adminServices']);
   const [modified, setModified] = useState(false);
   const { c12nDef } = useALContext();
@@ -63,13 +62,7 @@ const WrappedSourceDialog = ({ open, setOpen, source, defaults, onSave }: Source
         <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title" fullWidth maxWidth="md">
           <DialogTitle id="form-dialog-title">{t('updater.dialog.title')}</DialogTitle>
           <DialogContent>
-            <SourceDetail
-              source={tempSource}
-              addMode={!source}
-              defaults={defaults}
-              setSource={setTempSource}
-              setModified={setModified}
-            />
+            <SourceDetail source={tempSource} addMode={!source} setSource={setTempSource} setModified={setModified} />
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose} color="secondary">

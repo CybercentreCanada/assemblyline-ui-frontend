@@ -33,13 +33,12 @@ const useStyles = makeStyles(theme => ({
 
 type ContainerCardProps = {
   container: Container;
-  defaults: Container;
   name?: string;
   volumes?: { [name: string]: Volume };
   onChange: (newContainer: Container, name?: string, newVolumes?: { [name: string]: Volume }) => void;
 };
 
-const WrappedContainerCard = ({ container, defaults, name, volumes, onChange }: ContainerCardProps) => {
+const WrappedContainerCard = ({ container, name, volumes, onChange }: ContainerCardProps) => {
   const { t } = useTranslation(['adminServices']);
   const [dialog, setDialog] = useState(false);
   const theme = useTheme();
@@ -58,7 +57,6 @@ const WrappedContainerCard = ({ container, defaults, name, volumes, onChange }: 
         setOpen={setDialog}
         name={name}
         container={container}
-        defaults={defaults}
         volumes={volumes}
         onSave={handleContainerChange}
       />

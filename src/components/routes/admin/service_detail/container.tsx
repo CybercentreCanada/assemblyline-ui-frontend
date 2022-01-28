@@ -1,16 +1,4 @@
-import {
-  Button,
-  FormControlLabel,
-  Grid,
-  IconButton,
-  MenuItem,
-  Radio,
-  RadioGroup,
-  Select,
-  Tooltip,
-  Typography,
-  useTheme
-} from '@material-ui/core';
+import { Button, Grid, IconButton, MenuItem, Select, Tooltip, Typography, useTheme } from '@material-ui/core';
 import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
 import { Skeleton } from '@material-ui/lab';
 import 'moment/locale/fr';
@@ -19,16 +7,14 @@ import { useTranslation } from 'react-i18next';
 import { ServiceDetail } from '../service_detail';
 import ContainerCard from './container_card';
 import ContainerDialog from './container_dialog';
-import ResetButton from './reset_button';
 
 type ServiceContainerProps = {
   service: ServiceDetail;
-  defaults: ServiceDetail;
   setService: (value: ServiceDetail) => void;
   setModified: (value: boolean) => void;
 };
 
-const ServiceContainer = ({ service, defaults, setService, setModified }: ServiceContainerProps) => {
+const ServiceContainer = ({ service, setService, setModified }: ServiceContainerProps) => {
   const { t } = useTranslation(['adminServices']);
   const [dialog, setDialog] = useState(false);
   const theme = useTheme();
@@ -57,29 +43,13 @@ const ServiceContainer = ({ service, defaults, setService, setModified }: Servic
     setService({ ...service, dependencies: depList });
   };
 
-  const handlePrivilegedToggle = () => {
-    setModified(true);
-    setService({ ...service, privileged: !service.privileged });
-  };
-
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
         <Typography variant="h6">{t('container')}</Typography>
       </Grid>
       <Grid item xs={12}>
-        <Typography variant="subtitle2">
-          {t('container.channel')}
-          <ResetButton
-            service={service}
-            defaults={defaults}
-            field="update_channel"
-            reset={() => {
-              setModified(true);
-              setService({ ...service, update_channel: defaults.update_channel });
-            }}
-          />
-        </Typography>
+        <Typography variant="subtitle2">{t('container.channel')}</Typography>
         {service ? (
           <Select
             id="channel"
@@ -100,35 +70,9 @@ const ServiceContainer = ({ service, defaults, setService, setModified }: Servic
         )}
       </Grid>
       <Grid item xs={12}>
-        <Typography variant="subtitle2">
-          {t('container.privileged')}
-          <ResetButton
-            service={service}
-            defaults={defaults}
-            field="privileged"
-            reset={() => {
-              setModified(true);
-              setService({ ...service, privileged: !!defaults.privileged });
-            }}
-          />
-        </Typography>
-        {service ? (
-          <RadioGroup value={service.privileged} onChange={handlePrivilegedToggle}>
-            <FormControlLabel value control={<Radio />} label={t('container.privileged.true')} />
-            <FormControlLabel value={false} control={<Radio />} label={t('container.privileged.false')} />
-          </RadioGroup>
-        ) : (
-          <Skeleton style={{ height: '2.5rem' }} />
-        )}
-      </Grid>
-      <Grid item xs={12}>
         <Typography variant="subtitle2">{t('container.image')}</Typography>
         {service ? (
-          <ContainerCard
-            container={service.docker_config}
-            defaults={defaults ? defaults.docker_config : null}
-            onChange={handleContainerImageChange}
-          />
+          <ContainerCard container={service.docker_config} onChange={handleContainerImageChange} />
         ) : (
           <Skeleton style={{ height: '8rem' }} />
         )}
@@ -143,7 +87,6 @@ const ServiceContainer = ({ service, defaults, setService, setModified }: Servic
                   <ContainerCard
                     name={name}
                     container={service.dependencies[name].container}
-                    defaults={defaults && defaults.dependencies[name] ? defaults.dependencies[name].container : null}
                     volumes={service.dependencies[name].volumes}
                     onChange={handleDependencyChange}
                   />

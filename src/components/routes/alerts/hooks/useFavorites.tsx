@@ -33,7 +33,7 @@ interface UsingFavorites {
 
 export default function useFavorites(): UsingFavorites {
   // hooks.
-  const { apiCall } = useMyAPI();
+  const apiCall = useMyAPI();
   const { user } = useALContext();
 
   // states.

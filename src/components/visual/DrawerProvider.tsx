@@ -96,7 +96,8 @@ function DrawerProvider(props: DrawerProviderProps) {
           () => (
             <div className={classes.appContent}>{children}</div>
           ),
-          [children, classes.appContent]
+          // eslint-disable-next-line react-hooks/exhaustive-deps
+          [children]
         )}
         <Drawer
           open={globalDrawer !== null}

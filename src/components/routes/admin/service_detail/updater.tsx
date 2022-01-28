@@ -21,13 +21,11 @@ import { SourceCard } from 'components/routes/manage/signature_sources';
 import 'moment/locale/fr';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ServiceDetail, Source } from '../service_detail';
-import ResetButton from './reset_button';
+import { ServiceDetail } from '../service_detail';
 import SourceDialog from './source_dialog';
 
 type ServiceUpdaterProps = {
   service: ServiceDetail;
-  defaults: ServiceDetail;
   setService: (value: ServiceDetail) => void;
   setModified: (value: boolean) => void;
 };
@@ -55,7 +53,7 @@ const marks = [
   }
 ];
 
-const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceUpdaterProps) => {
+const ServiceUpdater = ({ service, setService, setModified }: ServiceUpdaterProps) => {
   const { t } = useTranslation(['adminServices']);
   const [dialog, setDialog] = useState(false);
   const [editDialog, setEditDialog] = useState(false);
@@ -135,19 +133,6 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
     });
   };
 
-  const findDefaults = (curSource: Source) => {
-    if (defaults && defaults.update_config && defaults.update_config.sources) {
-      return defaults.update_config.sources.find(element => {
-        if (curSource.name === element.name) {
-          return element;
-        }
-        return null;
-      });
-    }
-
-    return null;
-  };
-
   useEffect(() => {
     if (!editDialog && editedSourceID !== -1) {
       setEditedSourceID(-1);
@@ -161,15 +146,7 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
         <Typography variant="h6">{t('updater')}</Typography>
       </Grid>
       <Grid item xs={12}>
-        <Typography variant="subtitle2">
-          {t('updater.interval')}
-          <ResetButton
-            service={service.update_config}
-            defaults={defaults.update_config}
-            field="update_interval_seconds"
-            reset={() => handleSliderChange(null, defaults.update_config.update_interval_seconds)}
-          />
-        </Typography>
+        <Typography variant="subtitle2">{t('updater.interval')}</Typography>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={9}>
             <div style={{ marginLeft: theme.spacing(1), marginRight: theme.spacing(1) }}>
@@ -209,48 +186,14 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
       </Grid>
 
       <Grid item xs={12} sm={6}>
-        <Typography variant="subtitle2">
-          {t('updater.signatures')}
-          <ResetButton
-            service={service.update_config}
-            defaults={defaults.update_config}
-            field="generates_signatures"
-            reset={() => {
-              setModified(true);
-              setService({
-                ...service,
-                update_config: {
-                  ...service.update_config,
-                  generates_signatures: defaults.update_config.generates_signatures
-                }
-              });
-            }}
-          />
-        </Typography>
+        <Typography variant="subtitle2">{t('updater.signatures')}</Typography>
         <RadioGroup value={service.update_config.generates_signatures} onChange={toggleSignatures}>
           <FormControlLabel value control={<Radio />} label={t('updater.signatures.yes')} />
           <FormControlLabel value={false} control={<Radio />} label={t('updater.signatures.no')} />
         </RadioGroup>
       </Grid>
       <Grid item xs={12} sm={6}>
-        <Typography variant="subtitle2">
-          {t('updater.wait')}
-          <ResetButton
-            service={service.update_config}
-            defaults={defaults.update_config}
-            field="wait_for_update"
-            reset={() => {
-              setModified(true);
-              setService({
-                ...service,
-                update_config: {
-                  ...service.update_config,
-                  wait_for_update: defaults.update_config.wait_for_update
-                }
-              });
-            }}
-          />
-        </Typography>
+        <Typography variant="subtitle2">{t('updater.wait')}</Typography>
         <RadioGroup value={service.update_config.wait_for_update} onChange={toggleWaitForUpdate}>
           <FormControlLabel value control={<Radio />} label={t('updater.wait.yes')} />
           <FormControlLabel value={false} control={<Radio />} label={t('updater.wait.no')} />
@@ -259,25 +202,7 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
 
       {service && service.update_config.generates_signatures && (
         <Grid item xs={12}>
-          <Typography variant="subtitle2">
-            {t('updater.signature_delimiter')}
-            <ResetButton
-              service={service.update_config}
-              defaults={defaults.update_config}
-              field={['signature_delimiter', 'custom_delimiter']}
-              reset={() => {
-                setModified(true);
-                setService({
-                  ...service,
-                  update_config: {
-                    ...service.update_config,
-                    signature_delimiter: defaults.update_config.signature_delimiter,
-                    custom_delimiter: defaults.update_config.custom_delimiter || ''
-                  }
-                });
-              }}
-            />
-          </Typography>
+          <Typography variant="subtitle2">{t('updater.signature_delimiter')}</Typography>
           <Grid container spacing={1}>
             <Grid
               item
@@ -311,7 +236,7 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
                   size="small"
                   margin="dense"
                   variant="outlined"
-                  value={service.update_config.custom_delimiter ? service.update_config.custom_delimiter : ''}
+                  value={service.update_config.custom_delimiter}
                   onChange={handleCustomDelimiterChange}
                 />
               </Grid>
@@ -325,7 +250,6 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
         <SourceDialog
           open={editDialog}
           source={editedSourceID !== -1 ? service.update_config.sources[editedSourceID] : null}
-          defaults={editedSourceID !== -1 ? findDefaults(service.update_config.sources[editedSourceID]) : null}
           setOpen={setEditDialog}
           onSave={handleSaveSource}
         />

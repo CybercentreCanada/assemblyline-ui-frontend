@@ -26,7 +26,7 @@ export function ResetPasswordNow({ buttonLoading, setButtonLoading }: ResetPassw
   const history = useHistory();
   const { t } = useTranslation(['login']);
   const classes = useStyles();
-  const { apiCall } = useMyAPI();
+  const apiCall = useMyAPI();
   const params = new URLSearchParams(location.search);
   const [resetID, setResetID] = useState('');
   const [password, setPassword] = useState('');
@@ -116,7 +116,7 @@ type ResetPasswordProps = {
 export function ResetPassword({ buttonLoading, setButtonLoading }: ResetPasswordProps) {
   const { t } = useTranslation(['login']);
   const classes = useStyles();
-  const { apiCall } = useMyAPI();
+  const apiCall = useMyAPI();
   const [email, setEmail] = useState('');
   const [done, setDone] = useState(false);
 

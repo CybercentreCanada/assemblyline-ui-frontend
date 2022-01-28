@@ -1,84 +1,73 @@
-import { Box, makeStyles, Tooltip } from '@material-ui/core';
+import { Box, makeStyles, Typography } from '@material-ui/core';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import RemoveOutlinedIcon from '@material-ui/icons/RemoveOutlined';
-import clsx from 'clsx';
 import CustomChip from 'components/visual/CustomChip';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles({
   priority: {
     '& > svg': {
       verticalAlign: 'bottom'
     }
-  },
-  success: {
-    color: theme.palette.type !== 'dark' ? theme.palette.success.dark : theme.palette.success.light
-  },
-  default: {
-    color: theme.palette.type !== 'dark' ? theme.palette.secondary.dark : theme.palette.secondary.light
-  },
-  warning: {
-    color: theme.palette.type !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
-  },
-  error: {
-    color: theme.palette.type !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
   }
-}));
+});
 
 const COLOR_MAP = {
   CRITICAL: {
-    color: 'error',
+    color: 'hsl(0, 100%, 40%)',
+    chip_color: 'error',
     arrow: <ArrowUpwardIcon fontSize="small" color="inherit" />
   },
   HIGH: {
-    color: 'warning',
+    color: 'hsl(39, 100%, 40%)',
+    chip_color: 'warning',
     arrow: <ArrowUpwardIcon fontSize="small" color="inherit" />
   },
   MEDIUM: {
-    color: 'warning',
+    color: 'hsl(39, 100%, 40%)',
+    chip_color: 'warning',
     arrow: <ArrowDownwardIcon fontSize="small" color="inherit" />
   },
   LOW: {
-    color: 'success',
+    color: 'hsl(120, 100%, 30%)',
+    chip_color: 'success',
     arrow: <ArrowDownwardIcon fontSize="small" color="inherit" />
   },
   undefined: {
-    color: 'default',
+    color: 'inherit',
+    chip_color: 'default',
     arrow: <RemoveOutlinedIcon fontSize="small" color="inherit" />
   },
-  null: { color: 'default', arrow: <RemoveOutlinedIcon fontSize="small" color="inherit" /> }
+  null: { color: 'inherit', chip_color: 'default', arrow: <RemoveOutlinedIcon fontSize="small" color="inherit" /> }
 };
 
 type AlertPriorityProps = {
   name: string;
+  withText?: boolean;
   withChip?: boolean;
   size?: 'tiny' | 'small' | 'medium';
 };
 
-const WrappedAlertPriority: React.FC<AlertPriorityProps> = ({ name, withChip = false, size = 'small' }) => {
+const AlertPriority: React.FC<AlertPriorityProps> = ({ name, withText = false, withChip = false, size = 'small' }) => {
   const { t } = useTranslation('alerts');
   const classes = useStyles();
-
-  const priorityData = COLOR_MAP[name];
   return withChip ? (
     <CustomChip
       wrap
       size={size}
       variant="outlined"
-      color={priorityData.color}
+      color={COLOR_MAP[name].chip_color}
       label={name ? t(`priority_${name}`) : t('priority_unset')}
-      disabled={!name}
+      icon={COLOR_MAP[name].arrow}
     />
   ) : (
-    <Tooltip title={name ? `${t('priority')}: ${t(`priority_${name}`)}` : `${t('priority')}: ${t('priority_unset')}`}>
-      <Box display="inline-block" className={clsx(classes.priority, classes[priorityData.color])}>
-        {priorityData.arrow}
-      </Box>
-    </Tooltip>
+    <Box style={{ color: COLOR_MAP[name].color }} display="inline-block" className={classes.priority}>
+      {COLOR_MAP[name].arrow}{' '}
+      {withText ? <Typography>{name ? t(`priority_${name}`) : t('priority_unset')}</Typography> : ''}
+    </Box>
   );
 };
 
-const AlertPriority = React.memo(WrappedAlertPriority);
 export default AlertPriority;

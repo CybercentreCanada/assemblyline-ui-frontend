@@ -51,18 +51,16 @@ const WrappedImageBody = ({ body }) => {
   >([]);
 
   useEffect(() => {
-    if (body != null) {
-      setData(
-        JSON.parse(body).map(element => {
-          return {
-            name: element.img.name,
-            description: element.img.description,
-            imgSrc: element.img.sha256,
-            thumbSrc: element.thumb.sha256
-          };
-        })
-      );
-    }
+    setData(
+      JSON.parse(body).map(element => {
+        return {
+          name: element.img.name,
+          description: element.img.description,
+          imgSrc: element.img.sha256,
+          thumbSrc: element.thumb.sha256
+        };
+      })
+    );
     return () => {
       setData([]);
     };
@@ -100,7 +98,7 @@ const ImageItem = ({ alt, src, index, handleOpenCarousel }: ImageItemProps) => {
   const [image, setImage] = useState<string>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const classes = useStyles();
-  const { apiCall } = useMyAPI();
+  const apiCall = useMyAPI();
 
   useEffect(() => {
     apiCall({

@@ -4,9 +4,9 @@ import AppLayoutProvider from 'commons/components/layout/LayoutProvider';
 import SiteMapProvider from 'commons/components/sitemap/SitemapProvider';
 import UserProvider from 'commons/components/user/UserProvider';
 import useALContext from 'components/hooks/useALContext';
-import useMyAPI, { LoginParamsProps } from 'components/hooks/useMyAPI';
 import useMyLayout from 'components/hooks/useMyLayout';
 import useMySitemap from 'components/hooks/useMySitemap';
+import useMySnackbar from 'components/hooks/useMySnackbar';
 import useMyUser from 'components/hooks/useMyUser';
 import LoadingScreen from 'components/routes/loading';
 import LockedPage from 'components/routes/locked';
@@ -17,8 +17,17 @@ import CarouselProvider from 'components/visual/CarouselProvider';
 import DrawerProvider from 'components/visual/DrawerProvider';
 import HighlightProvider from 'components/visual/HighlightProvider';
 import { getProvider } from 'helpers/utils';
+import getXSRFCookie from 'helpers/xsrf';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BrowserRouter } from 'react-router-dom';
+
+type LoginParamsProps = {
+  oauth_providers: string[];
+  allow_userpass_login: boolean;
+  allow_signup: boolean;
+  allow_pw_rest: boolean;
+};
 
 type PossibleApps = 'load' | 'locked' | 'login' | 'routes' | 'tos';
 
@@ -27,9 +36,10 @@ const MyApp = () => {
   const defaultLoginParams = storedLoginParams ? JSON.parse(storedLoginParams) : null;
 
   const provider = getProvider();
+  const { t } = useTranslation();
   const { setUser, setConfiguration, user, configuration } = useALContext();
   const { setReady, setApps } = useAppLayout();
-  const { bootstrap } = useMyAPI();
+  const { showErrorMessage } = useMySnackbar();
 
   const [renderedApp, setRenderedApp] = useState<PossibleApps>(user ? 'routes' : provider ? 'login' : 'load');
   const [loginParams, setLoginParams] = useState<LoginParamsProps | null>(defaultLoginParams);
@@ -50,8 +60,57 @@ const MyApp = () => {
     if (user || provider) {
       return;
     }
+    const requestOptions: RequestInit = {
+      method: 'GET',
+      headers: {
+        'X-XSRF-TOKEN': getXSRFCookie()
+      },
+      credentials: 'same-origin'
+    };
 
-    bootstrap({ switchRenderedApp, setConfiguration, setLoginParams, setUser, setReady });
+    fetch('/api/v4/user/whoami/', requestOptions)
+      .then(res => res.json())
+      .catch(() => ({
+        api_error_message: t('api.unreachable'),
+        api_response: '',
+        api_server_version: '4.0.0',
+        api_status_code: 400
+      }))
+      .then(api_data => {
+        // eslint-disable-next-line no-prototype-builtins
+        if (api_data === undefined || !api_data.hasOwnProperty('api_response')) {
+          // We got no response
+          showErrorMessage(t('api.unreachable'), 30000);
+          switchRenderedApp('load');
+        } else if (api_data.api_status_code === 403) {
+          // User account is locked
+          setConfiguration(api_data.api_response);
+          switchRenderedApp('locked');
+        } else if (api_data.api_status_code === 401) {
+          // User is not logged in
+          localStorage.setItem('loginParams', JSON.stringify(api_data.api_response));
+          sessionStorage.clear();
+          setLoginParams(api_data.api_response);
+          switchRenderedApp('login');
+        } else if (api_data.api_status_code === 200) {
+          // Set the current user
+          setUser(api_data.api_response);
+
+          // Mark the interface ready
+          setReady(true);
+
+          // Render appropriate page
+          if (!api_data.api_response.agrees_with_tos && api_data.api_response.configuration.ui.tos) {
+            switchRenderedApp('tos');
+          } else {
+            switchRenderedApp('routes');
+          }
+        } else {
+          // We got an unexpected result
+          showErrorMessage(t('api.unreachable'), 30000);
+          switchRenderedApp('load');
+        }
+      });
     // eslint-disable-next-line
   }, []);
   return {

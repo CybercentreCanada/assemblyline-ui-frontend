@@ -29,7 +29,7 @@ const AlertCardItem: React.FC<AlertCardItemProps> = ({ item, setItem = null }) =
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
   const isDownSM = useMediaQuery(theme.breakpoints.down('sm'));
-  const { apiCall } = useMyAPI();
+  const apiCall = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
   const { user: currentUser, c12nDef } = useALContext();
 

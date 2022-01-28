@@ -32,7 +32,7 @@ export default function AdminTagSafelist() {
   const [originalTagSafelist, setOriginalTagSafelist] = useState(null);
   const [open, setOpen] = useState(false);
   const { showSuccessMessage } = useMySnackbar();
-  const { apiCall } = useMyAPI();
+  const apiCall = useMyAPI();
   const { user: currentUser } = useUser<CustomUser>();
   const { isDarkTheme } = useAppContext();
 
@@ -110,8 +110,8 @@ export default function AdminTagSafelist() {
         <DialogTitle id="dialog-title">{t('save.title')}</DialogTitle>
         <DialogContent>
           <div style={{ border: `1px solid ${theme.palette.divider}` }}>
-            <ReactResizeDetector handleWidth targetRef={containerDialogEL}>
-              {({ width }) => (
+            <ReactResizeDetector handleHeight handleWidth targetRef={containerDialogEL}>
+              {({ width, height }) => (
                 <div ref={containerDialogEL}>
                   <DiffEditor
                     language="yaml"
@@ -137,47 +137,31 @@ export default function AdminTagSafelist() {
           </Button>
         </DialogActions>
       </Dialog>
-      <div
-        ref={containerEL}
-        style={{
-          flexGrow: 1,
-          border: `1px solid ${theme.palette.divider}`,
-          position: 'relative'
-        }}
-      >
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            bottom: 0,
-            left: 0,
-            right: 0
-          }}
-        >
-          <ReactResizeDetector handleHeight handleWidth targetRef={containerEL}>
-            {({ width, height }) => (
-              <div ref={containerEL}>
-                {tagSafelist !== null ? (
-                  <>
-                    <Editor
-                      language="yaml"
-                      width={width}
-                      height={height}
-                      theme={isDarkTheme ? 'vs-dark' : 'vs'}
-                      loading={t('loading')}
-                      value={tagSafelist}
-                      onChange={setTagSafelist}
-                      onMount={onMount}
-                    />
-                  </>
-                ) : (
-                  <Skeleton width={width} height={height} variant="rect" animation="wave" />
-                )}
-              </div>
+      <ReactResizeDetector handleHeight handleWidth targetRef={containerEL}>
+        {({ width, height }) => (
+          <div
+            ref={containerEL}
+            style={{ flexGrow: 1, flexBasis: 'auto', minHeight: 0, border: `1px solid ${theme.palette.divider}` }}
+          >
+            {tagSafelist !== null ? (
+              <>
+                <Editor
+                  language="yaml"
+                  width={width}
+                  height={height}
+                  theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                  loading={t('loading')}
+                  value={tagSafelist}
+                  onChange={setTagSafelist}
+                  onMount={onMount}
+                />
+              </>
+            ) : (
+              <Skeleton width={width} height={height} variant="rect" animation="wave" />
             )}
-          </ReactResizeDetector>
-        </div>
-      </div>
+          </div>
+        )}
+      </ReactResizeDetector>
     </PageFullSize>
   ) : (
     <Redirect to="/forbidden" />

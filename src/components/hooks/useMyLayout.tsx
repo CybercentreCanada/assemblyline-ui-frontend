@@ -1,3 +1,4 @@
+import { useMediaQuery, useTheme } from '@material-ui/core';
 import AccountCircleOutlinedIcon from '@material-ui/icons/AccountCircleOutlined';
 import AccountTreeOutlinedIcon from '@material-ui/icons/AccountTreeOutlined';
 import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
@@ -27,6 +28,8 @@ import { BiNetworkChart } from 'react-icons/bi';
 
 const useMyLayout = (): AppLayoutProps => {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const isXS = useMediaQuery(theme.breakpoints.only('xs'));
   const MENU_ITEMS = [
     {
       type: 'item' as 'item',
@@ -342,14 +345,14 @@ const useMyLayout = (): AppLayoutProps => {
   );
   const darkBanner = (
     <img
-      style={{ display: 'inline-block', width: '100%', margin: '2rem 0' }}
+      style={{ display: 'inline-block', width: '100%', margin: `${isXS ? 2 : 3}rem 0` }}
       src={`${process.env.PUBLIC_URL}/images/banner_dark.svg`}
       alt={t('banner.alt')}
     />
   );
   const lightBanner = (
     <img
-      style={{ display: 'inline-block', width: '100%', margin: '2rem 0' }}
+      style={{ display: 'inline-block', width: '100%', margin: `${isXS ? 2 : 3}rem 0` }}
       src={`${process.env.PUBLIC_URL}/images/banner.svg`}
       alt={t('banner.alt')}
     />

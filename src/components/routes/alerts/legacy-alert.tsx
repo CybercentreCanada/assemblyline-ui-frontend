@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import AlertCardItem from './alert-card';
 
 export default function AlertsLegacy() {
-  const { apiCall } = useMyAPI();
+  const apiCall = useMyAPI();
   const [alerts, setAlerts] = useState(null);
 
   useEffect(() => {

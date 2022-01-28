@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 function Logout() {
   const { t } = useTranslation(['logout']);
   const theme = useTheme();
-  const { apiCall } = useMyAPI();
+  const apiCall = useMyAPI();
   const { getBanner, hideMenus } = useAppLayout();
 
   useEffect(() => {

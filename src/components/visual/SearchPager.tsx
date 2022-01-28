@@ -40,7 +40,7 @@ const WrappedSearchPager: React.FC<SearchPagerProps> = ({
   children,
   ...otherProps
 }) => {
-  const { apiCall } = useMyAPI();
+  const apiCall = useMyAPI();
   const count = Math.ceil(Math.min(total, MAX_TRACKED_RECORDS) / pageSize);
 
   const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {

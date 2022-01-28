@@ -355,7 +355,7 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
             </div>
           )}
         </Grid>
-        <Grid item xs={12} sm={4} md={3}>
+        <Grid item xs={12} sm={4} md={2}>
           <div>
             <label>{t('submissions')}</label>
           </div>
@@ -372,7 +372,7 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
             />
           </div>
         </Grid>
-        <Grid item xs={12} sm={5} md={3}>
+        <Grid item xs={12} sm={4} md={2}>
           <div>
             <label>{t('queues')}</label>
           </div>
@@ -409,7 +409,7 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
             )}
           </div>
         </Grid>
-        <Grid item xs={12} sm={3} md={2}>
+        <Grid item xs={12} sm={4} md={3}>
           <div>
             <label>{t('busyness')}</label>
           </div>
@@ -422,7 +422,7 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
             />
           </div>
         </Grid>
-        <Grid item xs={12} md={3}>
+        <Grid item xs={12} md={4}>
           <div>
             <label>{t('throughput')}</label>
           </div>
@@ -1133,13 +1133,11 @@ const Dashboard = () => {
         <Grid item xs={12} md={4} xl={3}>
           <ScalerResourcesCard scaler={scaler} />
         </Grid>
-        {Object.keys(services)
-          .sort()
-          .map(key => (
-            <Grid key={key} item xs={12} md={4} xl={3}>
-              <ServiceCard service={services[key]} max_inflight={dispatcher.inflight.max} />
-            </Grid>
-          ))}
+        {Object.keys(services).map(key => (
+          <Grid key={key} item xs={12} md={4} xl={3}>
+            <ServiceCard service={services[key]} max_inflight={dispatcher.inflight.max} />
+          </Grid>
+        ))}
       </Grid>
     </PageFullscreen>
   );

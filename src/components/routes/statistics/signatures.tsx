@@ -11,7 +11,7 @@ import SignatureDetail from '../manage/signature_detail';
 
 export default function StatisticsSignatures() {
   const { t } = useTranslation(['statisticsSignatures']);
-  const { apiCall } = useMyAPI();
+  const apiCall = useMyAPI();
   const theme = useTheme();
   const { c12nDef } = useALContext();
   const { closeGlobalDrawer, setGlobalDrawer } = useDrawer();

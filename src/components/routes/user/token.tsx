@@ -28,7 +28,7 @@ export default function SecurityToken({ user, toggleToken }: SecurityTokenProps)
   const [selectedToken, setSelectedToken] = useState(null);
   const [tempToken, setTempToken] = useState('');
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
-  const { apiCall } = useMyAPI();
+  const apiCall = useMyAPI();
   const regex = RegExp('^[a-zA-Z][a-zA-Z0-9_ ]*$');
   const theme = useTheme();
   const sp1 = theme.spacing(1);

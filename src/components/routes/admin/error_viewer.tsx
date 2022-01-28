@@ -55,7 +55,7 @@ export default function ErrorViewer() {
   const history = useHistory();
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
   const theme = useTheme();
-  const { apiCall } = useMyAPI();
+  const apiCall = useMyAPI();
   const { user: currentUser } = useUser<CustomUser>();
   const [suggestions, setSuggestions] = useState(DEFAULT_SUGGESTION);
   const location = useLocation();

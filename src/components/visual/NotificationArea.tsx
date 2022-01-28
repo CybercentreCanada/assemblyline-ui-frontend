@@ -48,22 +48,6 @@ const useStyles = () =>
     },
     message: {
       width: '100%'
-    },
-    badgeInfo: {
-      color: theme.palette.getContrastText(theme.palette.primary.main),
-      backgroundColor: theme.palette.primary.main
-    },
-    badgeWarning: {
-      color: theme.palette.getContrastText(theme.palette.primary.main),
-      backgroundColor: theme.palette.warning.main
-    },
-    badgeSuccess: {
-      color: theme.palette.getContrastText(theme.palette.primary.main),
-      backgroundColor: theme.palette.success.main
-    },
-    badgeError: {
-      color: theme.palette.getContrastText(theme.palette.primary.main),
-      backgroundColor: theme.palette.error.main
     }
   }))();
 
@@ -72,7 +56,7 @@ const NotificationArea = () => {
   const classes = useStyles();
   const theme = useTheme();
   const { systemMessage, setSystemMessage, user: currentUser } = useALContext();
-  const { apiCall } = useMyAPI();
+  const apiCall = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
 
   const [popperAnchorEl, setPopperAnchorEl] = useState(null);
@@ -83,13 +67,6 @@ const NotificationArea = () => {
   const [newMsg, setNewMsg] = useState('');
   const [newTitle, setNewTitle] = useState('');
   const [severity, setSeverity] = useState<'success' | 'info' | 'warning' | 'error'>('info');
-
-  const badgeColorMap = {
-    info: classes.badgeInfo,
-    success: classes.badgeSuccess,
-    warning: classes.badgeWarning,
-    error: classes.badgeError
-  };
 
   const onNotificationAreaIconClick = (event: React.MouseEvent) => {
     if (!systemMessage && currentUser.is_admin) {
@@ -234,85 +211,82 @@ const NotificationArea = () => {
           </Button>
         </DialogActions>
       </Dialog>
+      <ClickAwayListener onClickAway={closeNotificationArea}>
+        <>
+          <ConfirmationDialog
+            open={saveConfirmation}
+            handleClose={() => setSaveConfirmation(false)}
+            handleAccept={doSaveSystemMessage}
+            title={t('save.title')}
+            cancelText={t('save.cancelText')}
+            acceptText={t('save.acceptText')}
+            text={t('save.text')}
+          />
+          <ConfirmationDialog
+            open={deleteConfirmation}
+            handleClose={() => setDeleteConfirmation(false)}
+            handleAccept={doDeleteSystemMessage}
+            title={t('delete.title')}
+            cancelText={t('delete.cancelText')}
+            acceptText={t('delete.acceptText')}
+            text={t('delete.text')}
+          />
 
-      <ConfirmationDialog
-        open={saveConfirmation}
-        handleClose={() => setSaveConfirmation(false)}
-        handleAccept={doSaveSystemMessage}
-        title={t('save.title')}
-        cancelText={t('save.cancelText')}
-        acceptText={t('save.acceptText')}
-        text={t('save.text')}
-      />
-      <ConfirmationDialog
-        open={deleteConfirmation}
-        handleClose={() => setDeleteConfirmation(false)}
-        handleAccept={doDeleteSystemMessage}
-        title={t('delete.title')}
-        cancelText={t('delete.cancelText')}
-        acceptText={t('delete.acceptText')}
-        text={t('delete.text')}
-      />
-
-      <IconButton
-        disabled={!systemMessage && !currentUser.is_admin}
-        color="inherit"
-        aria-label="open drawer"
-        onClick={onNotificationAreaIconClick}
-      >
-        {systemMessage ? (
-          <Badge
-            invisible={read}
-            classes={{ badge: badgeColorMap[systemMessage.severity] }}
-            badgeContent={t(`severity.${systemMessage.severity}`).charAt(0).toUpperCase()}
+          <IconButton
+            disabled={!systemMessage && !currentUser.is_admin}
+            color="inherit"
+            aria-label="open drawer"
+            onClick={onNotificationAreaIconClick}
           >
-            <NotificationsActiveOutlinedIcon />
-          </Badge>
-        ) : currentUser.is_admin ? (
-          <AddAlertOutlinedIcon />
-        ) : (
-          <NotificationsNoneOutlinedIcon />
-        )}
-      </IconButton>
-      <Popper
-        open={!!popperAnchorEl}
-        anchorEl={popperAnchorEl}
-        className={classes.popper}
-        placement="bottom-end"
-        transition
-      >
-        {({ TransitionProps }) => (
-          <ClickAwayListener onClickAway={closeNotificationArea}>
-            <Fade {...TransitionProps} timeout={250}>
-              <Paper elevation={4}>
-                {systemMessage && (
-                  <Alert
-                    severity={systemMessage.severity}
-                    onClick={closeNotificationArea}
-                    classes={{ message: classes.message, action: classes.action }}
-                    action={
-                      currentUser.is_admin && (
-                        <>
-                          <IconButton size="small" onClick={onEditSystemMessage} color="inherit">
-                            <EditOutlinedIcon />
-                          </IconButton>
-                          <IconButton size="small" onClick={onDeleteSystemMessage} color="inherit">
-                            <DeleteOutlineOutlinedIcon />
-                          </IconButton>
-                        </>
-                      )
-                    }
-                  >
-                    {systemMessage.title && <AlertTitle>{systemMessage.title}</AlertTitle>}
-                    {systemMessage.message}
-                    <div style={{ paddingTop: theme.spacing(1), textAlign: 'right' }}>{systemMessage.user}</div>
-                  </Alert>
-                )}
-              </Paper>
-            </Fade>
-          </ClickAwayListener>
-        )}
-      </Popper>
+            {systemMessage ? (
+              <Badge color="primary" variant="dot" invisible={read}>
+                <NotificationsActiveOutlinedIcon />
+              </Badge>
+            ) : currentUser.is_admin ? (
+              <AddAlertOutlinedIcon />
+            ) : (
+              <NotificationsNoneOutlinedIcon />
+            )}
+          </IconButton>
+          <Popper
+            open={!!popperAnchorEl}
+            anchorEl={popperAnchorEl}
+            className={classes.popper}
+            placement="bottom-end"
+            transition
+          >
+            {({ TransitionProps }) => (
+              <Fade {...TransitionProps} timeout={250}>
+                <Paper elevation={4}>
+                  {systemMessage && (
+                    <Alert
+                      severity={systemMessage.severity}
+                      onClick={closeNotificationArea}
+                      classes={{ message: classes.message, action: classes.action }}
+                      action={
+                        currentUser.is_admin && (
+                          <>
+                            <IconButton size="small" onClick={onEditSystemMessage} color="inherit">
+                              <EditOutlinedIcon />
+                            </IconButton>
+                            <IconButton size="small" onClick={onDeleteSystemMessage} color="inherit">
+                              <DeleteOutlineOutlinedIcon />
+                            </IconButton>
+                          </>
+                        )
+                      }
+                    >
+                      {systemMessage.title && <AlertTitle>{systemMessage.title}</AlertTitle>}
+                      {systemMessage.message}
+                      <div style={{ paddingTop: theme.spacing(1), textAlign: 'right' }}>{systemMessage.user}</div>
+                    </Alert>
+                  )}
+                </Paper>
+              </Fade>
+            )}
+          </Popper>
+        </>
+      </ClickAwayListener>
     </>
   );
 };
