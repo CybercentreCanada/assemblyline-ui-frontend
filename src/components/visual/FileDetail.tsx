@@ -1,10 +1,11 @@
-import { Grid, IconButton, Link as MaterialLink, Tooltip, Typography, useTheme } from '@material-ui/core';
+import { Grid, IconButton, Link as MaterialLink, Tab, Tabs, Tooltip, Typography, useTheme } from '@material-ui/core';
 import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
 import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
 import PageviewOutlinedIcon from '@material-ui/icons/PageviewOutlined';
 import PlaylistAddCheckIcon from '@material-ui/icons/PlaylistAddCheck';
 import RotateLeftOutlinedIcon from '@material-ui/icons/RotateLeftOutlined';
-import { Skeleton } from '@material-ui/lab';
+import { Skeleton, TabContext, TabPanel } from '@material-ui/lab';
+import PageHeader from 'commons/components/layout/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -95,6 +96,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
 }) => {
   const { t } = useTranslation(['fileDetail']);
   const [file, setFile] = useState<File | null>(null);
+  const [curTab, setCurTab] = useState<string>('detection');
   const [safelistDialog, setSafelistDialog] = useState<boolean>(false);
   const [safelistReason, setSafelistReason] = useState<string>('');
   const { apiCall } = useMyAPI();
@@ -139,6 +141,10 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
     newData.results = data.results.filter(result => !emptyResult(result));
     newData.errors = liveErrors ? [...data.errors, ...liveErrors] : data.errors;
     return newData;
+  };
+
+  const handleTabChange = (event, newValue) => {
+    setCurTab(newValue);
   };
 
   const resubmit = useCallback(() => {
@@ -303,38 +309,63 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
         [file, fileName, resubmit]
       )}
 
-      <div style={{ paddingBottom: sp2 }}>
-        <IdentificationSection fileinfo={file ? file.file_info : null} />
-        <FrequencySection fileinfo={file ? file.file_info : null} />
+      <TabContext value={curTab}>
+        <div style={{ paddingBottom: sp2 }}>
+          <PageHeader isSticky>
+            <Tabs
+              value={curTab}
+              onChange={handleTabChange}
+              indicatorColor="primary"
+              textColor="primary"
+              variant="scrollable"
+              scrollButtons="auto"
+            >
+              <Tab label={t('detection')} value={'detection'} />
+              <Tab label={t('information')} value={'information'} />
+              <Tab label={t('mitre')} value={'mitre'} />
+              <Tab label={t('detailled')} value={'detailled'} />
+            </Tabs>
+          </PageHeader>
+          <TabPanel value="detection"></TabPanel>
+          <TabPanel value="information">
+            <IdentificationSection fileinfo={file ? file.file_info : null} />
+            <FrequencySection fileinfo={file ? file.file_info : null} />
+            {(!file || Object.keys(file.metadata).length !== 0) && (
+              <MetadataSection metadata={file ? file.metadata : null} />
+            )}
 
-        {(!file || Object.keys(file.metadata).length !== 0) && (
-          <MetadataSection metadata={file ? file.metadata : null} />
-        )}
+            {file && file.childrens && file.childrens.length !== 0 && <ChildrenSection childrens={file.childrens} />}
 
-        {file && file.childrens && file.childrens.length !== 0 && <ChildrenSection childrens={file.childrens} />}
+            {file && file.parents && file.parents.length !== 0 && <ParentSection parents={file.parents} />}
+          </TabPanel>
 
-        {file && file.parents && file.parents.length !== 0 && <ParentSection parents={file.parents} />}
+          <TabPanel value="mitre">
+            {(!file || Object.keys(file.attack_matrix).length !== 0) && (
+              <AttackSection attacks={file ? file.attack_matrix : null} />
+            )}
+          </TabPanel>
 
-        {(!file || Object.keys(file.attack_matrix).length !== 0) && (
-          <AttackSection attacks={file ? file.attack_matrix : null} />
-        )}
+          <TabPanel value="detailled">
+            {(!file || Object.keys(file.heuristics).length !== 0) && (
+              <HeuristicSection heuristics={file ? file.heuristics : null} />
+            )}
+            {(!file || Object.keys(file.tags).length !== 0 || file.signatures.length !== 0) && (
+              <TagSection signatures={file ? file.signatures : null} tags={file ? file.tags : null} />
+            )}
+            {(!file || file.results.length !== 0) && (
+              <ResultSection
+                results={file ? file.results : null}
+                sid={sid}
+                alternates={file ? file.alternates : null}
+              />
+            )}
 
-        {(!file || Object.keys(file.heuristics).length !== 0) && (
-          <HeuristicSection heuristics={file ? file.heuristics : null} />
-        )}
+            {(!file || file.emptys.length !== 0) && <EmptySection emptys={file ? file.emptys : null} sid={sid} />}
 
-        {(!file || Object.keys(file.tags).length !== 0 || file.signatures.length !== 0) && (
-          <TagSection signatures={file ? file.signatures : null} tags={file ? file.tags : null} />
-        )}
-
-        {(!file || file.results.length !== 0) && (
-          <ResultSection results={file ? file.results : null} sid={sid} alternates={file ? file.alternates : null} />
-        )}
-
-        {(!file || file.emptys.length !== 0) && <EmptySection emptys={file ? file.emptys : null} sid={sid} />}
-
-        {file && file.errors.length !== 0 && <ErrorSection errors={file.errors} />}
-      </div>
+            {file && file.errors.length !== 0 && <ErrorSection errors={file.errors} />}
+          </TabPanel>
+        </div>
+      </TabContext>
     </div>
   );
 };

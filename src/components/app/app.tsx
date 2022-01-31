@@ -90,11 +90,11 @@ const AppInit: React.FC = () => {
         <SiteMapProvider {...sitemapProps}>
           <HighlightProvider>
             <CarouselProvider>
-              <DrawerProvider>
-                <AppLayoutProvider {...layoutProps}>
+              <AppLayoutProvider {...layoutProps}>
+                <DrawerProvider>
                   <MyApp />
-                </AppLayoutProvider>
-              </DrawerProvider>
+                </DrawerProvider>
+              </AppLayoutProvider>
             </CarouselProvider>
           </HighlightProvider>
         </SiteMapProvider>
