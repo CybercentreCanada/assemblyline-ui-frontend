@@ -2,6 +2,7 @@ import {
   Box,
   Collapse,
   createStyles,
+  IconButton,
   Link,
   makeStyles,
   Table,
@@ -18,6 +19,8 @@ import {
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import FingerprintOutlinedIcon from '@material-ui/icons/FingerprintOutlined';
+import LabelOutlinedIcon from '@material-ui/icons/LabelOutlined';
+import SimCardOutlinedIcon from '@material-ui/icons/SimCardOutlined';
 import { TreeItem, TreeView } from '@material-ui/lab';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
@@ -475,10 +478,14 @@ const ResultSection: React.FC<ResultSectionProps> = ({
   depth = 1,
   nested = false
 }) => {
+  const { t } = useTranslation(['fileDetail']);
   const classes = useStyles();
   const theme = useTheme();
   const section = section_list[id];
   const [open, setOpen] = React.useState(!section.auto_collapse);
+  const [showTags, setShowTags] = React.useState(false);
+  const [showHeur, setShowHeur] = React.useState(false);
+  const [showAttack, setShowAttack] = React.useState(false);
   const { getKey, hasHighlightedKeys } = useHighlighter();
   const { c12nDef } = useALContext();
 
@@ -513,6 +520,18 @@ const ResultSection: React.FC<ResultSectionProps> = ({
 
   const handleClick = () => {
     setOpen(!open);
+  };
+
+  const handleShowTags = () => {
+    setShowTags(!showTags);
+  };
+
+  const handleShowAttack = () => {
+    setShowAttack(!showAttack);
+  };
+
+  const handleShowHeur = () => {
+    setShowHeur(!showHeur);
   };
 
   return (
@@ -577,48 +596,106 @@ const ResultSection: React.FC<ResultSectionProps> = ({
                         return <div style={{ margin: '2rem' }}>INVALID SECTION TYPE</div>;
                     }
                   })()}
-                  {section.heuristic && (
-                    <Heuristic
-                      text={section.heuristic.name}
-                      score={section.heuristic.score}
-                      show_type
-                      highlight_key={getKey('heuristic', section.heuristic.heur_id)}
-                    />
-                  )}
-                  {section.heuristic &&
-                    section.heuristic.attack.map((attack, idx) => (
-                      <Attack
-                        key={idx}
-                        text={attack.pattern}
-                        score={section.heuristic.score}
-                        show_type
-                        highlight_key={getKey('attack_pattern', attack.attack_id)}
-                      />
-                    ))}
-                  {section.heuristic &&
-                    section.heuristic.signature.map((signature, idx) => (
+                  <div style={{ color: theme.palette.text.disabled }}>
+                    {section.heuristic && (
+                      <Tooltip title={t('show_heur')}>
+                        <IconButton
+                          size="small"
+                          onClick={handleShowHeur}
+                          disabled={highlighted}
+                          color={showHeur ? 'default' : 'inherit'}
+                        >
+                          <SimCardOutlinedIcon />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                    {Array.isArray(section.tags) && section.tags.length > 0 && (
+                      <Tooltip title={t('show_tags')}>
+                        <IconButton
+                          size="small"
+                          onClick={handleShowTags}
+                          disabled={highlighted}
+                          color={showTags ? 'default' : 'inherit'}
+                        >
+                          <LabelOutlinedIcon />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                    {section.heuristic &&
+                      section.heuristic.attack &&
+                      Array.isArray(section.heuristic.attack) &&
+                      section.heuristic.attack.length > 0 && (
+                        <Tooltip title={t('show_attack')}>
+                          <IconButton
+                            size="small"
+                            onClick={handleShowAttack}
+                            disabled={highlighted}
+                            color={showAttack ? 'default' : 'inherit'}
+                          >
+                            {/* <FontDownloadOutlinedIcon /> */}
+                            <span
+                              style={{
+                                display: 'inline-flex',
+                                width: '24px',
+                                height: '24px',
+                                justifyContent: 'center',
+                                alignItems: 'center'
+                              }}
+                            >
+                              {'[&]'}
+                            </span>
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                  </div>
+                  <Collapse in={showHeur || highlighted} timeout="auto">
+                    {section.heuristic && (
                       <Heuristic
-                        key={idx}
-                        text={signature.name}
+                        text={section.heuristic.name}
                         score={section.heuristic.score}
-                        signature
                         show_type
-                        highlight_key={getKey('heuristic.signature', signature.name)}
-                        safe={signature.safe}
+                        highlight_key={getKey('heuristic', section.heuristic.heur_id)}
                       />
-                    ))}
-                  {Array.isArray(section.tags) &&
-                    section.tags.map((tag, idx) => (
-                      <Tag
-                        key={idx}
-                        type={tag.type}
-                        value={tag.value}
-                        safelisted={tag.safelisted}
-                        short_type={tag.short_type}
-                        score={section.heuristic ? section.heuristic.score : 0}
-                        highlight_key={getKey(tag.type, tag.value)}
-                      />
-                    ))}
+                    )}
+                    {section.heuristic &&
+                      section.heuristic.signature.map((signature, idx) => (
+                        <Heuristic
+                          key={idx}
+                          text={signature.name}
+                          score={section.heuristic.score}
+                          signature
+                          show_type
+                          highlight_key={getKey('heuristic.signature', signature.name)}
+                          safe={signature.safe}
+                        />
+                      ))}
+                  </Collapse>
+                  <Collapse in={showTags || highlighted} timeout="auto">
+                    {Array.isArray(section.tags) &&
+                      section.tags.map((tag, idx) => (
+                        <Tag
+                          key={idx}
+                          type={tag.type}
+                          value={tag.value}
+                          safelisted={tag.safelisted}
+                          short_type={tag.short_type}
+                          score={section.heuristic ? section.heuristic.score : 0}
+                          highlight_key={getKey(tag.type, tag.value)}
+                        />
+                      ))}
+                  </Collapse>
+                  <Collapse in={showAttack || highlighted} timeout="auto">
+                    {section.heuristic &&
+                      section.heuristic.attack.map((attack, idx) => (
+                        <Attack
+                          key={idx}
+                          text={attack.pattern}
+                          score={section.heuristic.score}
+                          show_type
+                          highlight_key={getKey('attack_pattern', attack.attack_id)}
+                        />
+                      ))}
+                  </Collapse>
                 </div>
                 <div>
                   {sub_sections.map(item => (
@@ -634,7 +711,12 @@ const ResultSection: React.FC<ResultSectionProps> = ({
                 </div>
               </>
             ),
+            // eslint-disable-next-line react-hooks/exhaustive-deps
             [
+              highlighted,
+              showTags,
+              showAttack,
+              showHeur,
               getKey,
               indent,
               section.body,
@@ -642,7 +724,8 @@ const ResultSection: React.FC<ResultSectionProps> = ({
               section.heuristic,
               section.tags,
               section_list,
-              sub_sections
+              sub_sections,
+              t
             ]
           )}
         </Collapse>
