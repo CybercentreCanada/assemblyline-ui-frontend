@@ -574,6 +574,7 @@ const ResultSection: React.FC<ResultSectionProps> = ({
   const handleShowTags = useCallback(
     event => {
       event.stopPropagation();
+      if (!showTags) setOpen(true);
       setShowTags(!showTags);
       handleClose();
     },
@@ -583,6 +584,7 @@ const ResultSection: React.FC<ResultSectionProps> = ({
   const handleShowAttack = useCallback(
     event => {
       event.stopPropagation();
+      if (!showAttack) setOpen(true);
       setShowAttack(!showAttack);
       handleClose();
     },
@@ -592,6 +594,7 @@ const ResultSection: React.FC<ResultSectionProps> = ({
   const handleShowHeur = useCallback(
     event => {
       event.stopPropagation();
+      if (!showHeur) setOpen(true);
       setShowHeur(!showHeur);
       handleClose();
     },
