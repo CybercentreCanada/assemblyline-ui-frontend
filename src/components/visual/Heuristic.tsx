@@ -36,7 +36,7 @@ type HeuristicProps = {
   safe?: boolean;
 };
 
-const Heuristic: React.FC<HeuristicProps> = ({
+const WrappedHeuristic: React.FC<HeuristicProps> = ({
   text,
   lvl = null,
   score = null,
@@ -200,4 +200,5 @@ const Heuristic: React.FC<HeuristicProps> = ({
   );
 };
 
+const Heuristic = React.memo(WrappedHeuristic);
 export default Heuristic;
