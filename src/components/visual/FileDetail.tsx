@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import AttackSection from './FileDetail/attacks';
 import ChildrenSection from './FileDetail/childrens';
+import Detection from './FileDetail/detection';
 import EmptySection from './FileDetail/emptys';
 import ErrorSection from './FileDetail/errors';
 import FrequencySection from './FileDetail/frequency';
@@ -330,7 +331,9 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
               <Tab label={t('detailled')} value={'detailled'} />
             </Tabs>
           </PageHeader>
-          <TabPanel value="detection"></TabPanel>
+          <TabPanel value="detection">
+            <Detection results={file ? file.results : null} heuristics={file ? file.heuristics : null} />
+          </TabPanel>
           <TabPanel value="information">
             <IdentificationSection fileinfo={file ? file.file_info : null} />
             <FrequencySection fileinfo={file ? file.file_info : null} />
