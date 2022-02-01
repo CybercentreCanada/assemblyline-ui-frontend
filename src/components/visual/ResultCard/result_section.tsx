@@ -5,6 +5,8 @@ import {
   IconButton,
   Link,
   makeStyles,
+  Menu,
+  MenuItem,
   Table,
   TableBody,
   TableCell,
@@ -16,12 +18,14 @@ import {
   useTheme,
   withStyles
 } from '@material-ui/core';
+import AssignmentOutlinedIcon from '@material-ui/icons/AssignmentOutlined';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import FingerprintOutlinedIcon from '@material-ui/icons/FingerprintOutlined';
 import LabelOutlinedIcon from '@material-ui/icons/LabelOutlined';
 import SimCardOutlinedIcon from '@material-ui/icons/SimCardOutlined';
 import { TreeItem, TreeView } from '@material-ui/lab';
+import useClipboard from 'commons/components/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
 import Attack from 'components/visual/Attack';
@@ -33,13 +37,34 @@ import TitleKey from 'components/visual/TitleKey';
 import Verdict from 'components/visual/Verdict';
 import { scaleLinear } from 'd3-scale';
 import { scoreToVerdict } from 'helpers/utils';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactJson from 'react-json-view';
 import { ImageBody } from './image_section';
 
+const CLIPBOARD_ICON = <AssignmentOutlinedIcon style={{ marginRight: '16px' }} />;
+const HEURISTIC_ICON = <SimCardOutlinedIcon style={{ marginRight: '16px' }} />;
+const TAGS_ICON = <LabelOutlinedIcon style={{ marginRight: '16px' }} />;
+const ATTACK_ICON = (
+  <span
+    style={{
+      display: 'inline-flex',
+      width: '24px',
+      height: '24px',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: '16px',
+      fontSize: '1.125rem'
+    }}
+  >
+    {'[&]'}
+  </span>
+);
+
 const useStyles = makeStyles(theme => ({
   section_title: {
+    display: 'flex',
+    alignItems: 'baseline',
     '&:hover': {
       backgroundColor: theme.palette.action.hover,
       cursor: 'pointer'
@@ -488,6 +513,8 @@ const ResultSection: React.FC<ResultSectionProps> = ({
   const [showAttack, setShowAttack] = React.useState(false);
   const { getKey, hasHighlightedKeys } = useHighlighter();
   const { c12nDef } = useALContext();
+  const [state, setState] = React.useState(null);
+  const { copy } = useClipboard();
 
   const allTags = useMemo(() => {
     const tagList = [];
@@ -518,219 +545,318 @@ const ResultSection: React.FC<ResultSectionProps> = ({
 
   const highlighted = hasHighlightedKeys(allTags);
 
+  const handleMenuClick = useCallback(
+    event => {
+      event.preventDefault();
+      setState(
+        state === null
+          ? {
+              mouseX: event.clientX - 2,
+              mouseY: event.clientY - 4
+            }
+          : // repeated contextmenu when it is already open closes it with Chrome 84 on Ubuntu
+            // Other native context menus might behave different.
+            // With this behavior we prevent contextmenu from the backdrop to re-locale existing context menus.
+            null
+      );
+    },
+    [state]
+  );
+
   const handleClick = () => {
     setOpen(!open);
   };
 
-  const handleShowTags = () => {
-    setShowTags(!showTags);
-  };
+  const handleClose = useCallback(() => {
+    setState(null);
+  }, []);
 
-  const handleShowAttack = () => {
-    setShowAttack(!showAttack);
-  };
+  const handleShowTags = useCallback(
+    event => {
+      event.stopPropagation();
+      setShowTags(!showTags);
+      handleClose();
+    },
+    [showTags, handleClose]
+  );
 
-  const handleShowHeur = () => {
-    setShowHeur(!showHeur);
-  };
+  const handleShowAttack = useCallback(
+    event => {
+      event.stopPropagation();
+      setShowAttack(!showAttack);
+      handleClose();
+    },
+    [showAttack, handleClose]
+  );
+
+  const handleShowHeur = useCallback(
+    event => {
+      event.stopPropagation();
+      setShowHeur(!showHeur);
+      handleClose();
+    },
+    [showHeur, handleClose]
+  );
+
+  const handleMenuCopy = useCallback(() => {
+    copy(typeof section.body === 'string' ? section.body : JSON.stringify(section.body), 'clipID');
+    handleClose();
+  }, [copy, handleClose, section.body]);
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexWrap: 'nowrap',
-        marginLeft: `${depth}rem`,
-        backgroundColor: highlighted ? (theme.palette.type === 'dark' ? '#343a44' : '#d8e3ea') : null
-      }}
-    >
-      <SectionHighlight
-        score={section.heuristic ? section.heuristic.score : 0}
-        indent={indent}
-        depth={depth}
-        highlighted={highlighted}
-        nested={nested}
-      />
+    <>
+      <Menu
+        open={state !== null}
+        onClose={handleClose}
+        anchorReference="anchorPosition"
+        anchorPosition={state !== null ? { top: state.mouseY, left: state.mouseX } : undefined}
+      >
+        <MenuItem id="clipID" dense onClick={handleMenuCopy}>
+          {CLIPBOARD_ICON}
+          {t('clipboard')}
+        </MenuItem>
+        {!highlighted && section.heuristic && (
+          <MenuItem
+            dense
+            onClick={handleShowHeur}
+            style={{ color: showHeur ? theme.palette.text.primary : theme.palette.text.disabled }}
+          >
+            {HEURISTIC_ICON}
+            {t('show_heur')}
+          </MenuItem>
+        )}
+        {!highlighted && Array.isArray(section.tags) && section.tags.length > 0 && (
+          <MenuItem
+            dense
+            onClick={handleShowTags}
+            style={{ color: showTags ? theme.palette.text.primary : theme.palette.text.disabled }}
+          >
+            {TAGS_ICON}
+            {t('show_tags')}
+          </MenuItem>
+        )}
+        {!highlighted &&
+          section.heuristic &&
+          section.heuristic.attack &&
+          Array.isArray(section.heuristic.attack) &&
+          section.heuristic.attack.length > 0 && (
+            <MenuItem
+              dense
+              onClick={handleShowAttack}
+              style={{ color: showAttack ? theme.palette.text.primary : theme.palette.text.disabled }}
+            >
+              {ATTACK_ICON}
+              {t('show_attack')}
+            </MenuItem>
+          )}
+      </Menu>
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'nowrap',
+          marginLeft: `${depth}rem`,
+          backgroundColor: highlighted ? (theme.palette.type === 'dark' ? '#343a44' : '#d8e3ea') : null
+        }}
+      >
+        <SectionHighlight
+          score={section.heuristic ? section.heuristic.score : 0}
+          indent={indent}
+          depth={depth}
+          highlighted={highlighted}
+          nested={nested}
+        />
 
-      <div style={{ width: '100%' }}>
-        <Box className={classes.section_title} onClick={handleClick}>
-          {c12nDef.enforce && (
-            <span>
-              <Classification c12n={section.classification} type="text" />
-              &nbsp;&nbsp;::&nbsp;&nbsp;
-            </span>
-          )}
-          {section.heuristic && (
-            <span>
-              <Verdict score={section.heuristic.score} mono short size="tiny" />
-              &nbsp;::&nbsp;&nbsp;
-            </span>
-          )}
-          <span style={{ fontWeight: 500, wordBreak: 'break-word' }}>{section.title_text}</span>
-        </Box>
-        <Collapse in={open} timeout="auto">
-          {useMemo(
-            () => (
+        <div style={{ width: '100%' }}>
+          <Box className={classes.section_title} onClick={handleClick}>
+            {c12nDef.enforce && (
               <>
-                <div style={{ marginLeft: '1rem', marginBottom: '0.75rem' }}>
-                  {(() => {
-                    switch (section.body_format) {
-                      case 'TEXT':
-                        return <TextBody body={section.body} />;
-                      case 'MEMORY_DUMP':
-                        return <MemDumpBody body={section.body} />;
-                      case 'GRAPH_DATA':
-                        return <GraphBody body={section.body} />;
-                      case 'URL':
-                        return <URLBody body={section.body} />;
-                      case 'JSON':
-                        return <JSONBody body={section.body} />;
-                      case 'KEY_VALUE':
-                        return <KVBody body={section.body} />;
-                      case 'PROCESS_TREE':
-                        return <ProcessTreeBody body={section.body} />;
-                      case 'TABLE':
-                        return <TblBody body={section.body} />;
-                      case 'IMAGE':
-                        return <ImageBody body={section.body} />;
-                      default:
-                        return <div style={{ margin: '2rem' }}>INVALID SECTION TYPE</div>;
-                    }
-                  })()}
-                  <div style={{ color: theme.palette.text.disabled }}>
-                    {section.heuristic && (
-                      <Tooltip title={t('show_heur')}>
-                        <IconButton
-                          size="small"
-                          onClick={handleShowHeur}
-                          disabled={highlighted}
-                          color={showHeur ? 'default' : 'inherit'}
-                        >
-                          <SimCardOutlinedIcon />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                    {Array.isArray(section.tags) && section.tags.length > 0 && (
-                      <Tooltip title={t('show_tags')}>
-                        <IconButton
-                          size="small"
-                          onClick={handleShowTags}
-                          disabled={highlighted}
-                          color={showTags ? 'default' : 'inherit'}
-                        >
-                          <LabelOutlinedIcon />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                    {section.heuristic &&
-                      section.heuristic.attack &&
-                      Array.isArray(section.heuristic.attack) &&
-                      section.heuristic.attack.length > 0 && (
-                        <Tooltip title={t('show_attack')}>
-                          <IconButton
-                            size="small"
-                            onClick={handleShowAttack}
-                            disabled={highlighted}
-                            color={showAttack ? 'default' : 'inherit'}
-                          >
-                            {/* <FontDownloadOutlinedIcon /> */}
-                            <span
-                              style={{
-                                display: 'inline-flex',
-                                width: '24px',
-                                height: '24px',
-                                justifyContent: 'center',
-                                alignItems: 'center'
-                              }}
-                            >
-                              {'[&]'}
-                            </span>
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                  </div>
-                  <Collapse in={showHeur || highlighted} timeout="auto">
-                    {section.heuristic && (
-                      <Heuristic
-                        text={section.heuristic.name}
-                        score={section.heuristic.score}
-                        show_type
-                        highlight_key={getKey('heuristic', section.heuristic.heur_id)}
-                      />
-                    )}
-                    {section.heuristic &&
-                      section.heuristic.signature.map((signature, idx) => (
-                        <Heuristic
-                          key={idx}
-                          text={signature.name}
-                          score={section.heuristic.score}
-                          signature
-                          show_type
-                          highlight_key={getKey('heuristic.signature', signature.name)}
-                          safe={signature.safe}
-                        />
-                      ))}
-                  </Collapse>
-                  <Collapse in={showTags || highlighted} timeout="auto">
-                    {Array.isArray(section.tags) &&
-                      section.tags.map((tag, idx) => (
-                        <Tag
-                          key={idx}
-                          type={tag.type}
-                          value={tag.value}
-                          safelisted={tag.safelisted}
-                          short_type={tag.short_type}
-                          score={section.heuristic ? section.heuristic.score : 0}
-                          highlight_key={getKey(tag.type, tag.value)}
-                        />
-                      ))}
-                  </Collapse>
-                  <Collapse in={showAttack || highlighted} timeout="auto">
-                    {section.heuristic &&
-                      section.heuristic.attack.map((attack, idx) => (
-                        <Attack
-                          key={idx}
-                          text={attack.pattern}
-                          score={section.heuristic.score}
-                          show_type
-                          highlight_key={getKey('attack_pattern', attack.attack_id)}
-                        />
-                      ))}
-                  </Collapse>
-                </div>
-                <div>
-                  {sub_sections.map(item => (
-                    <ResultSection
-                      key={item.id}
-                      section_list={section_list}
-                      id={item.id}
-                      sub_sections={item.children}
-                      indent={indent + 1}
-                      nested
-                    />
-                  ))}
-                </div>
+                <Classification c12n={section.classification} type="text" />
+                <span>&nbsp;&nbsp;::&nbsp;&nbsp;</span>
               </>
-            ),
-            // eslint-disable-next-line react-hooks/exhaustive-deps
-            [
-              highlighted,
-              showTags,
-              showAttack,
-              showHeur,
-              getKey,
-              indent,
-              section.body,
-              section.body_format,
-              section.heuristic,
-              section.tags,
-              section_list,
-              sub_sections,
-              t
-            ]
-          )}
-        </Collapse>
+            )}
+            {section.heuristic && (
+              <>
+                <Verdict score={section.heuristic.score} mono short size="tiny" />
+                <span>&nbsp;::&nbsp;&nbsp;</span>
+              </>
+            )}
+            <span
+              style={{
+                fontWeight: 500,
+                wordBreak: 'break-word',
+                flexGrow: 1
+              }}
+            >
+              {section.title_text}
+            </span>
+            <div style={{ color: theme.palette.text.disabled, whiteSpace: 'nowrap' }}>
+              {section.heuristic && (
+                <Tooltip title={t('show_heur')} placement="top">
+                  <IconButton
+                    size="small"
+                    onClick={handleShowHeur}
+                    disabled={highlighted}
+                    color={showHeur ? 'default' : 'inherit'}
+                  >
+                    <SimCardOutlinedIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
+              {Array.isArray(section.tags) && section.tags.length > 0 && (
+                <Tooltip title={t('show_tags')} placement="top">
+                  <IconButton
+                    size="small"
+                    onClick={handleShowTags}
+                    disabled={highlighted}
+                    color={showTags ? 'default' : 'inherit'}
+                  >
+                    <LabelOutlinedIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
+              {section.heuristic &&
+                section.heuristic.attack &&
+                Array.isArray(section.heuristic.attack) &&
+                section.heuristic.attack.length > 0 && (
+                  <Tooltip title={t('show_attack')} placement="top">
+                    <IconButton
+                      size="small"
+                      onClick={handleShowAttack}
+                      disabled={highlighted}
+                      color={showAttack ? 'default' : 'inherit'}
+                    >
+                      {/* <FontDownloadOutlinedIcon /> */}
+                      <span
+                        style={{
+                          display: 'inline-flex',
+                          width: '24px',
+                          height: '24px',
+                          justifyContent: 'center',
+                          alignItems: 'center'
+                        }}
+                      >
+                        {'[&]'}
+                      </span>
+                    </IconButton>
+                  </Tooltip>
+                )}
+            </div>
+          </Box>
+          <Collapse in={open} timeout="auto">
+            {useMemo(
+              () => (
+                <>
+                  <div style={{ marginLeft: '1rem', marginBottom: '0.75rem' }}>
+                    <div style={{ cursor: 'context-menu' }} onContextMenu={handleMenuClick}>
+                      {(() => {
+                        switch (section.body_format) {
+                          case 'TEXT':
+                            return <TextBody body={section.body} />;
+                          case 'MEMORY_DUMP':
+                            return <MemDumpBody body={section.body} />;
+                          case 'GRAPH_DATA':
+                            return <GraphBody body={section.body} />;
+                          case 'URL':
+                            return <URLBody body={section.body} />;
+                          case 'JSON':
+                            return <JSONBody body={section.body} />;
+                          case 'KEY_VALUE':
+                            return <KVBody body={section.body} />;
+                          case 'PROCESS_TREE':
+                            return <ProcessTreeBody body={section.body} />;
+                          case 'TABLE':
+                            return <TblBody body={section.body} />;
+                          case 'IMAGE':
+                            return <ImageBody body={section.body} />;
+                          default:
+                            return <div style={{ margin: '2rem' }}>INVALID SECTION TYPE</div>;
+                        }
+                      })()}
+                    </div>
+
+                    <Collapse in={showHeur || highlighted} timeout="auto">
+                      {section.heuristic && (
+                        <Heuristic
+                          text={section.heuristic.name}
+                          score={section.heuristic.score}
+                          show_type
+                          highlight_key={getKey('heuristic', section.heuristic.heur_id)}
+                        />
+                      )}
+                      {section.heuristic &&
+                        section.heuristic.signature.map((signature, idx) => (
+                          <Heuristic
+                            key={idx}
+                            text={signature.name}
+                            score={section.heuristic.score}
+                            signature
+                            show_type
+                            highlight_key={getKey('heuristic.signature', signature.name)}
+                            safe={signature.safe}
+                          />
+                        ))}
+                    </Collapse>
+                    <Collapse in={showTags || highlighted} timeout="auto">
+                      {Array.isArray(section.tags) &&
+                        section.tags.map((tag, idx) => (
+                          <Tag
+                            key={idx}
+                            type={tag.type}
+                            value={tag.value}
+                            safelisted={tag.safelisted}
+                            short_type={tag.short_type}
+                            score={section.heuristic ? section.heuristic.score : 0}
+                            highlight_key={getKey(tag.type, tag.value)}
+                          />
+                        ))}
+                    </Collapse>
+                    <Collapse in={showAttack || highlighted} timeout="auto">
+                      {section.heuristic &&
+                        section.heuristic.attack.map((attack, idx) => (
+                          <Attack
+                            key={idx}
+                            text={attack.pattern}
+                            score={section.heuristic.score}
+                            show_type
+                            highlight_key={getKey('attack_pattern', attack.attack_id)}
+                          />
+                        ))}
+                    </Collapse>
+                  </div>
+                  <div>
+                    {sub_sections.map(item => (
+                      <ResultSection
+                        key={item.id}
+                        section_list={section_list}
+                        id={item.id}
+                        sub_sections={item.children}
+                        indent={indent + 1}
+                        nested
+                      />
+                    ))}
+                  </div>
+                </>
+              ),
+              [
+                handleMenuClick,
+                showHeur,
+                highlighted,
+                section.heuristic,
+                section.tags,
+                section.body_format,
+                section.body,
+                getKey,
+                showTags,
+                showAttack,
+                sub_sections,
+                section_list,
+                indent
+              ]
+            )}
+          </Collapse>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
