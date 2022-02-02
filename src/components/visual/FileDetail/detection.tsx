@@ -1,5 +1,4 @@
 import { Collapse, Divider, makeStyles, Typography, useTheme } from '@material-ui/core';
-import useHighlighter from 'components/hooks/useHighlighter';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Result } from '../ResultCard';
@@ -26,26 +25,24 @@ const WrappedDetection: React.FC<WrappedDetectionProps> = ({ heuristics, results
   const theme = useTheme();
   const classes = useStyles();
   const sp2 = theme.spacing(2);
-  const { getKey } = useHighlighter();
 
   useEffect(() => {
     const newSectionMap = {};
     if (results) {
       for (const res of results) {
-        for (const sec of res.result.sections) {
-          if (sec.heuristic) {
-            if (!newSectionMap.hasOwnProperty(sec.heuristic.heur_id)) {
-              newSectionMap[sec.heuristic.heur_id] = [];
-            }
-            newSectionMap[sec.heuristic.heur_id].push(sec);
+        for (const sec of res.result.sections
+          .filter(s => s.heuristic)
+          .sort((a, b) => (a.heuristic.score >= b.heuristic.score ? -1 : 1))) {
+          if (!newSectionMap.hasOwnProperty(sec.heuristic.heur_id)) {
+            newSectionMap[sec.heuristic.heur_id] = [];
           }
+          newSectionMap[sec.heuristic.heur_id].push(sec);
         }
       }
     }
     setSectionMap(newSectionMap);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [results]);
-  console.log(heuristics, sectionMap);
 
   return (
     <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
