@@ -10,6 +10,7 @@ import { Result } from '../ResultCard';
 import ResultSection, { Section } from '../ResultCard/result_section';
 
 const HEUR_LEVELS = ['malicious' as 'malicious', 'suspicious' as 'suspicious', 'info' as 'info', 'safe' as 'safe'];
+const EMPTY_SUBSECTIONS = [];
 
 const useStyles = makeStyles(theme => ({
   title: {
@@ -18,7 +19,7 @@ const useStyles = makeStyles(theme => ({
       color: theme.palette.text.secondary
     }
   },
-  heuristic: {
+  header: {
     fontWeight: 500,
     fontSize: 'larger',
     cursor: 'pointer',
@@ -27,41 +28,56 @@ const useStyles = makeStyles(theme => ({
     justifyContent: 'space-between',
     alignItems: 'center'
   },
-  malicious: {
+  header_malicious: {
     color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark,
     backgroundColor: '#f2000025',
-    border: `1px solid ${theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark}`,
     '&:hover, &:focus': {
       backgroundColor: '#f2000035'
     }
   },
-  suspicious: {
+  header_suspicious: {
     color: theme.palette.type === 'dark' ? theme.palette.warning.light : theme.palette.warning.dark,
     backgroundColor: '#ff970025',
-    border: `1px solid ${theme.palette.type === 'dark' ? theme.palette.warning.light : theme.palette.warning.dark}`,
     '&:hover, &:focus': {
       backgroundColor: '#ff970035'
     }
   },
-  info: {
+  header_info: {
     backgroundColor: '#6e6e6e25',
-    border: `1px solid ${theme.palette.divider}`,
     '&:hover, &:focus': {
       backgroundColor: '#6e6e6e35'
     }
   },
-  safe: {
+  header_safe: {
     color: theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark,
     backgroundColor: '#00f20025',
-    border: `1px solid ${theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark}`,
     '&:hover, &:focus': {
       backgroundColor: '#00f20035'
     }
   },
+  container: {
+    borderRadius: theme.spacing(0.5),
+    marginBottom: theme.spacing(0.25),
+    overflow: 'hidden'
+  },
+  container_malicious: {
+    border: `1px solid ${theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark}`
+  },
+  container_suspicious: {
+    border: `1px solid ${theme.palette.type === 'dark' ? theme.palette.warning.light : theme.palette.warning.dark}`
+  },
+  container_info: {
+    border: `1px solid ${theme.palette.divider}`
+  },
+  container_safe: {
+    border: `1px solid ${theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark}`
+  },
+  container_highlight: {
+    border: `1px solid ${theme.palette.type === 'dark' ? theme.palette.info.light : theme.palette.info.dark}`
+  },
   highlighted: {
     color: theme.palette.type === 'dark' ? theme.palette.info.light : theme.palette.primary.main,
     backgroundColor: theme.palette.type === 'dark' ? '#3d485b' : '#cae8f9',
-    border: `1px solid ${theme.palette.type === 'dark' ? theme.palette.info.light : theme.palette.info.dark}`,
     '&:hover, &:focus': {
       backgroundColor: theme.palette.type === 'dark' ? '#343a44' : '#e2f2fa'
     }
@@ -80,6 +96,7 @@ const WrappedHeuristic: React.FC<WrappedHeuristicProps> = ({ name, id, sections,
   const [open, setOpen] = React.useState(false);
   const { isHighlighted, triggerHighlight, getKey } = useHighlighter();
   const classes = useStyles();
+  const theme = useTheme();
 
   const highlighted = isHighlighted(getKey('heuristic', id));
 
@@ -88,9 +105,15 @@ const WrappedHeuristic: React.FC<WrappedHeuristicProps> = ({ name, id, sections,
   const handleHighlight = useCallback(() => triggerHighlight(getKey('heuristic', id)), [triggerHighlight, getKey, id]);
 
   return (
-    <>
+    <div
+      className={clsx(
+        classes.container,
+        classes[`container_${level}`],
+        highlighted ? classes.container_highlight : null
+      )}
+    >
       <Box
-        className={clsx(classes.heuristic, classes[level], highlighted ? classes.highlighted : null)}
+        className={clsx(classes.header, classes[`header_${level}`], highlighted ? classes.highlighted : null)}
         onClick={() => setOpen(!open)}
       >
         <div>{name}</div>
@@ -116,15 +139,19 @@ const WrappedHeuristic: React.FC<WrappedHeuristicProps> = ({ name, id, sections,
           </Tooltip>
         </Box>
       </Box>
-      <Collapse in={open || highlighted} timeout="auto">
+      <Collapse in={open} timeout="auto" style={{ marginRight: theme.spacing(0.5) }}>
         {sections &&
           sections.map((section, sid) => (
-            <ResultSection key={sid} section_list={sections} id={sid} sub_sections={[]} indent={1} depth={1} />
+            <div key={sid}>
+              <ResultSection section_list={sections} id={sid} sub_sections={EMPTY_SUBSECTIONS} indent={1} depth={1} />
+            </div>
           ))}
       </Collapse>
-    </>
+    </div>
   );
 };
+
+const Heuristic = React.memo(WrappedHeuristic);
 
 type WrappedDetectionProps = {
   heuristics: { [category: string]: string[][] };
@@ -177,7 +204,11 @@ const WrappedDetection: React.FC<WrappedDetectionProps> = ({ heuristics, results
               return heuristics[lvl] ? (
                 <div key={lid}>
                   {heuristics[lvl].map(([hid, hname], idx) => {
-                    return <WrappedHeuristic key={idx} name={hname} id={hid} sections={sectionMap[hid]} level={lvl} />;
+                    return (
+                      <div key={idx}>
+                        <Heuristic name={hname} id={hid} sections={sectionMap[hid]} level={lvl} />
+                      </div>
+                    );
                   })}
                 </div>
               ) : null;
