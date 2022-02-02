@@ -311,11 +311,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
       )}
       <TabContext value={curTab}>
         <div style={{ paddingBottom: sp2 }}>
-          <PageHeader
-            isSticky
-            top={theme.spacing(sid ? 8 : 0)}
-            backgroundColor={sid ? theme.palette.background.paper : null}
-          >
+          <PageHeader isSticky backgroundColor={sid ? theme.palette.background.paper : null}>
             <Tabs
               value={curTab}
               onChange={handleTabChange}

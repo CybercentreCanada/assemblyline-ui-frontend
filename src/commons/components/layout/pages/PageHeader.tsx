@@ -32,6 +32,10 @@ type PageHeaderProps = {
   top?: number;
   elevation?: number;
   backgroundColor?: string;
+  defaultLayout?: {
+    currentLayout: 'top' | 'side';
+    autoHideAppbar: boolean;
+  };
 };
 
 const PageHeader: React.FC<PageHeaderProps> = ({
@@ -42,10 +46,11 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   isSticky = false,
   top,
   backgroundColor = null,
-  elevation = 0
+  elevation = 0,
+  defaultLayout = { currentLayout: 'top', autoHideAppbar: false }
 }) => {
   const theme = useTheme();
-  const { currentLayout, autoHideAppbar } = useAppLayout();
+  const { currentLayout, autoHideAppbar } = useAppLayout() || defaultLayout;
   const appBarHeight = useAppBarHeight();
 
   const barWillHide = currentLayout !== 'top' && autoHideAppbar;
