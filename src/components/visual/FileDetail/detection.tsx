@@ -2,6 +2,7 @@ import { Box, Collapse, Divider, IconButton, makeStyles, Tooltip, Typography, us
 import OpenInNewOutlinedIcon from '@material-ui/icons/OpenInNewOutlined';
 import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 import SelectAllOutlinedIcon from '@material-ui/icons/SelectAllOutlined';
+import { Skeleton } from '@material-ui/lab';
 import clsx from 'clsx';
 import useHighlighter from 'components/hooks/useHighlighter';
 import React, { useCallback, useEffect } from 'react';
@@ -198,21 +199,21 @@ const WrappedDetection: React.FC<WrappedDetectionProps> = ({ heuristics, results
       <Divider />
       <Collapse in={open} timeout="auto">
         <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
-          {sectionMap &&
-            heuristics &&
-            HEUR_LEVELS.map((lvl, lid) => {
-              return heuristics[lvl] ? (
-                <div key={lid}>
-                  {heuristics[lvl].map(([hid, hname], idx) => {
-                    return (
-                      <div key={idx}>
-                        <Heuristic name={hname} id={hid} sections={sectionMap[hid]} level={lvl} />
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : null;
-            })}
+          {sectionMap && heuristics
+            ? HEUR_LEVELS.map((lvl, lid) => {
+                return heuristics[lvl] ? (
+                  <div key={lid}>
+                    {heuristics[lvl].map(([hid, hname], idx) => {
+                      return (
+                        <div key={idx}>
+                          <Heuristic name={hname} id={hid} sections={sectionMap[hid]} level={lvl} />
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : null;
+              })
+            : [...Array(3)].map((_, i) => <Skeleton style={{ height: '3rem' }} />)}
         </div>
       </Collapse>
     </div>
