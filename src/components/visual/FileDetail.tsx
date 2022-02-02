@@ -309,7 +309,6 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [file, fileName, resubmit]
       )}
-
       <TabContext value={curTab}>
         <div style={{ paddingBottom: sp2 }}>
           <PageHeader
@@ -331,10 +330,10 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
               <Tab label={t('detailled')} value={'detailled'} />
             </Tabs>
           </PageHeader>
-          <TabPanel value="detection">
+          <TabPanel value="detection" style={{ padding: 0 }}>
             <Detection results={file ? file.results : null} heuristics={file ? file.heuristics : null} />
           </TabPanel>
-          <TabPanel value="information">
+          <TabPanel value="information" style={{ padding: 0 }}>
             <IdentificationSection fileinfo={file ? file.file_info : null} />
             <FrequencySection fileinfo={file ? file.file_info : null} />
             {(!file || Object.keys(file.metadata).length !== 0) && (
@@ -346,13 +345,13 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
             {file && file.parents && file.parents.length !== 0 && <ParentSection parents={file.parents} />}
           </TabPanel>
 
-          <TabPanel value="mitre">
+          <TabPanel value="mitre" style={{ padding: 0 }}>
             {(!file || Object.keys(file.attack_matrix).length !== 0) && (
               <AttackSection attacks={file ? file.attack_matrix : null} />
             )}
           </TabPanel>
 
-          <TabPanel value="detailled">
+          <TabPanel value="detailled" style={{ padding: 0 }}>
             {(!file || Object.keys(file.heuristics).length !== 0) && (
               <HeuristicSection heuristics={file ? file.heuristics : null} />
             )}
