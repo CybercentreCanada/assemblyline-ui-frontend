@@ -658,7 +658,7 @@ const ResultSection: React.FC<ResultSectionProps> = ({
           display: 'flex',
           flexWrap: 'nowrap',
           marginLeft: `${depth}rem`,
-          backgroundColor: highlighted ? (theme.palette.type === 'dark' ? '#343a44' : '#d8e3ea') : null
+          backgroundColor: highlighted ? (theme.palette.type === 'dark' ? '#343a44' : '#e2f2fa') : null
         }}
       >
         <SectionHighlight

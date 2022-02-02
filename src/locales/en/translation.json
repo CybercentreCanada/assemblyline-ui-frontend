@@ -67,6 +67,7 @@
   "forbidden": "Forbidden",
   "full_count": "Track all documents to get the full count",
   "goto_signature": "Go to signature",
+  "goto_heuristic": "Go to heuristic",
   "highlight": "Toggle highlight",
   "locked": "Locked",
   "logo.alt": "Assemblyline Logo",
