@@ -495,7 +495,7 @@ type ResultSectionProps = {
   nested?: boolean;
 };
 
-const ResultSection: React.FC<ResultSectionProps> = ({
+const WrappedResultSection: React.FC<ResultSectionProps> = ({
   section_list,
   id,
   sub_sections,
@@ -563,9 +563,9 @@ const ResultSection: React.FC<ResultSectionProps> = ({
     [state]
   );
 
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     setOpen(!open);
-  };
+  }, [open]);
 
   const handleClose = useCallback(() => {
     setState(null);
@@ -862,5 +862,5 @@ const ResultSection: React.FC<ResultSectionProps> = ({
     </>
   );
 };
-
+const ResultSection = React.memo(WrappedResultSection);
 export default ResultSection;
