@@ -495,7 +495,7 @@ type ResultSectionProps = {
   nested?: boolean;
 };
 
-const WrappedResultSection: React.FC<ResultSectionProps> = ({
+const ResultSection: React.FC<ResultSectionProps> = ({
   section_list,
   id,
   sub_sections,
@@ -562,6 +562,9 @@ const WrappedResultSection: React.FC<ResultSectionProps> = ({
     },
     [state]
   );
+  const stopPropagation = useCallback(event => {
+    event.stopPropagation();
+  }, []);
 
   const handleClick = useCallback(() => {
     setOpen(!open);
@@ -571,35 +574,23 @@ const WrappedResultSection: React.FC<ResultSectionProps> = ({
     setState(null);
   }, []);
 
-  const handleShowTags = useCallback(
-    event => {
-      event.stopPropagation();
-      if (!showTags) setOpen(true);
-      setShowTags(!showTags);
-      handleClose();
-    },
-    [showTags, handleClose]
-  );
+  const handleShowTags = useCallback(() => {
+    if (!showTags) setOpen(true);
+    setShowTags(!showTags);
+    handleClose();
+  }, [showTags, handleClose]);
 
-  const handleShowAttack = useCallback(
-    event => {
-      event.stopPropagation();
-      if (!showAttack) setOpen(true);
-      setShowAttack(!showAttack);
-      handleClose();
-    },
-    [showAttack, handleClose]
-  );
+  const handleShowAttack = useCallback(() => {
+    if (!showAttack) setOpen(true);
+    setShowAttack(!showAttack);
+    handleClose();
+  }, [showAttack, handleClose]);
 
-  const handleShowHeur = useCallback(
-    event => {
-      event.stopPropagation();
-      if (!showHeur) setOpen(true);
-      setShowHeur(!showHeur);
-      handleClose();
-    },
-    [showHeur, handleClose]
-  );
+  const handleShowHeur = useCallback(() => {
+    if (!showHeur) setOpen(true);
+    setShowHeur(!showHeur);
+    handleClose();
+  }, [showHeur, handleClose]);
 
   const handleMenuCopy = useCallback(() => {
     copy(typeof section.body === 'string' ? section.body : JSON.stringify(section.body), 'clipID');
@@ -692,27 +683,17 @@ const WrappedResultSection: React.FC<ResultSectionProps> = ({
             >
               {section.title_text}
             </span>
-            <div style={{ color: theme.palette.text.disabled, whiteSpace: 'nowrap' }}>
+            <div style={{ color: theme.palette.text.disabled, whiteSpace: 'nowrap' }} onClick={stopPropagation}>
               {section.heuristic && (
                 <Tooltip title={t('show_heur')} placement="top">
-                  <IconButton
-                    size="small"
-                    onClick={handleShowHeur}
-                    disabled={highlighted}
-                    color={showHeur ? 'default' : 'inherit'}
-                  >
+                  <IconButton size="small" onClick={handleShowHeur} color={showHeur ? 'default' : 'inherit'}>
                     <SimCardOutlinedIcon />
                   </IconButton>
                 </Tooltip>
               )}
               {Array.isArray(section.tags) && section.tags.length > 0 && (
                 <Tooltip title={t('show_tags')} placement="top">
-                  <IconButton
-                    size="small"
-                    onClick={handleShowTags}
-                    disabled={highlighted}
-                    color={showTags ? 'default' : 'inherit'}
-                  >
+                  <IconButton size="small" onClick={handleShowTags} color={showTags ? 'default' : 'inherit'}>
                     <LabelOutlinedIcon />
                   </IconButton>
                 </Tooltip>
@@ -722,12 +703,7 @@ const WrappedResultSection: React.FC<ResultSectionProps> = ({
                 Array.isArray(section.heuristic.attack) &&
                 section.heuristic.attack.length > 0 && (
                   <Tooltip title={t('show_attack')} placement="top">
-                    <IconButton
-                      size="small"
-                      onClick={handleShowAttack}
-                      disabled={highlighted}
-                      color={showAttack ? 'default' : 'inherit'}
-                    >
+                    <IconButton size="small" onClick={handleShowAttack} color={showAttack ? 'default' : 'inherit'}>
                       {/* <FontDownloadOutlinedIcon /> */}
                       <span
                         style={{
@@ -777,7 +753,7 @@ const WrappedResultSection: React.FC<ResultSectionProps> = ({
                       })()}
                     </div>
 
-                    <Collapse in={showHeur || highlighted} timeout="auto">
+                    <Collapse in={showHeur} timeout="auto">
                       {section.heuristic && (
                         <Heuristic
                           text={section.heuristic.name}
@@ -799,7 +775,7 @@ const WrappedResultSection: React.FC<ResultSectionProps> = ({
                           />
                         ))}
                     </Collapse>
-                    <Collapse in={showTags || highlighted} timeout="auto">
+                    <Collapse in={showTags} timeout="auto">
                       {Array.isArray(section.tags) &&
                         section.tags.map((tag, idx) => (
                           <Tag
@@ -813,7 +789,7 @@ const WrappedResultSection: React.FC<ResultSectionProps> = ({
                           />
                         ))}
                     </Collapse>
-                    <Collapse in={showAttack || highlighted} timeout="auto">
+                    <Collapse in={showAttack} timeout="auto">
                       {section.heuristic &&
                         section.heuristic.attack.map((attack, idx) => (
                           <Attack
@@ -843,7 +819,6 @@ const WrappedResultSection: React.FC<ResultSectionProps> = ({
               [
                 handleMenuClick,
                 showHeur,
-                highlighted,
                 section.heuristic,
                 section.tags,
                 section.body_format,
@@ -862,5 +837,4 @@ const WrappedResultSection: React.FC<ResultSectionProps> = ({
     </>
   );
 };
-const ResultSection = React.memo(WrappedResultSection);
 export default ResultSection;
