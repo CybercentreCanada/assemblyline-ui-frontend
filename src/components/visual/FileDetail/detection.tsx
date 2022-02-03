@@ -117,7 +117,9 @@ const WrappedHeuristic: React.FC<WrappedHeuristicProps> = ({ name, id, sections,
         className={clsx(classes.header, classes[`header_${level}`], highlighted ? classes.highlighted : null)}
         onClick={() => setOpen(!open)}
       >
-        <div>{name}</div>
+        <div>
+          {name} <span style={{ fontSize: 'small' }}>({id})</span>
+        </div>
         <Box onClick={stopPropagating}>
           <Tooltip title={t('related')}>
             <IconButton
