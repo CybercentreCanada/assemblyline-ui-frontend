@@ -141,6 +141,7 @@ const WrappedRoutes = () => {
       </Switch>
       {configuration.system && configuration.system.type !== 'production' && (
         <div
+          className="no-print"
           style={{
             position: 'sticky',
             bottom: '16px',
