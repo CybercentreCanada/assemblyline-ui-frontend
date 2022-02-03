@@ -3,6 +3,7 @@ import { yellow } from '@material-ui/core/colors';
 import { ClassNameMap } from '@material-ui/core/styles/withStyles';
 import React, { useCallback, useContext, useMemo } from 'react';
 import { HexProps, useLayout } from '..';
+import { ASCII } from '../models/Hex';
 
 const useNewHexStyles = makeStyles(theme => ({
   root: {
@@ -60,11 +61,17 @@ const useItemStyles = makeStyles(theme => ({
       borderLeft: `1px solid ${theme.palette.text.hint}`
     }
   },
-  characterColor: {
-    color: theme.palette.text.primary
-  },
   nullColor: {
     color: theme.palette.text.disabled
+  },
+  nonPrintableColor: {
+    color: 'rgb(203, 203, 99)'
+  },
+  lowerASCIIColor: {
+    color: 'rgb(153, 236, 255)'
+  },
+  higherASCIIColor: {
+    color: 'rgb(104, 152, 59)'
   },
   hover: {
     backgroundColor: theme.palette.action.selected
@@ -258,6 +265,7 @@ export type StyleContextProps = {
   removeContainerClassToIndexArray: (indexes: Array<number>, length: number, classname: string) => void;
 
   getHexColorClass?: (hexes: Map<number, string>, index: number) => string;
+  getBorderClass?: (index: number) => string;
   getCursorClass?: (cursorIndex: number, index: number) => string;
   getSelectClass?: (
     selectIndexes: {
@@ -358,8 +366,17 @@ export const WrappedStyleProvider = ({ children }: HexProps) => {
   );
 
   const getHexColorClass = useCallback(
-    (hexes: Map<number, string>, index: number) =>
-      ['00', '20', '0a'].includes(hexes.get(index)) ? itemClasses.nullColor : null,
+    (hexes: Map<number, string>, index: number) => {
+      const value: number = parseInt(hexes.get(index), 16);
+      const char: string = Buffer.from(hexes.get(index), 'hex').toString();
+      const ascii = ASCII.find(element => value >= element.range.start && value <= element.range.end);
+
+      if (ascii.type === 'null') return itemClasses.nullColor;
+      else if (ascii.type === 'non printable') return itemClasses.nonPrintableColor;
+      else if (ascii.type === 'lower ASCII') return itemClasses.lowerASCIIColor;
+      else if (ascii.type === 'higher ASCII') return itemClasses.higherASCIIColor;
+      else return null;
+    },
     [itemClasses]
   );
 
@@ -418,6 +435,11 @@ export const WrappedStyleProvider = ({ children }: HexProps) => {
     [itemClasses]
   );
 
+  const getBorderClass = useCallback(
+    (index: number) => (index % 4 === 0 ? itemClasses.hexBorder : null),
+    [itemClasses.hexBorder]
+  );
+
   return (
     <StyleContext.Provider
       value={{
@@ -439,6 +461,7 @@ export const WrappedStyleProvider = ({ children }: HexProps) => {
         removeContainerClassToIndexArray,
 
         getHexColorClass,
+        getBorderClass,
         getCursorClass,
         getSelectClass,
         getSearchClass,

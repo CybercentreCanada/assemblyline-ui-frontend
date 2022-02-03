@@ -4,9 +4,9 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { default as React, useLayoutEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CheckBoxNumberField, SelectField, StoreState, useHex, useLayout, useScroll, useSetting } from '..';
+import { CheckBoxNumberField, HexStore, SelectField, useHex, useLayout, useScroll, useSetting } from '..';
 
-export const WrappedHexSettings = (states: StoreState) => {
+export const WrappedHexSettings = (states: HexStore) => {
   const {
     settingsOpen,
     hexBaseValues,
@@ -102,10 +102,7 @@ export const WrappedHexSettings = (states: StoreState) => {
 
 export const HexSettings = React.memo(
   WrappedHexSettings,
-  (
-    prevProps: Readonly<React.PropsWithChildren<StoreState>>,
-    nextProps: Readonly<React.PropsWithChildren<StoreState>>
-  ) =>
+  (prevProps: Readonly<React.PropsWithChildren<HexStore>>, nextProps: Readonly<React.PropsWithChildren<HexStore>>) =>
     prevProps.settingsOpen === nextProps.settingsOpen &&
     prevProps.hexBaseValues === nextProps.hexBaseValues &&
     prevProps.layoutColumns === nextProps.layoutColumns &&

@@ -1,5 +1,6 @@
 import React, { useCallback, useContext, useMemo, useRef } from 'react';
-import { HexProps, useHex, useStore } from '..';
+import { HexProps, useHex, useMode, useStore } from '..';
+import { COLUMNS, DEFAULT_LAYOUT, LAYOUT_SIZE } from '../models/Layout';
 
 export type LayoutContextProps = {
   nextLayoutRows?: React.MutableRefObject<number>;
@@ -8,12 +9,13 @@ export type LayoutContextProps = {
   nextLayoutAutoColumns?: React.MutableRefObject<boolean>;
   isContainerFocused?: React.MutableRefObject<boolean>;
 
+  bodyRef?: React.MutableRefObject<HTMLDivElement>;
   layoutRef?: React.MutableRefObject<HTMLDivElement>;
   containerRefs?: React.MutableRefObject<HTMLDivElement>[];
   hexesContainerRefs?: React.MutableRefObject<HTMLDivElement>;
   textsContainerRefs?: React.MutableRefObject<HTMLDivElement>;
 
-  onLayoutInit?: () => void;
+  // onLayoutInit?: () => void;
   onLayoutResize?: () => void;
   onLayoutColumnsChange?: (columns: number) => void;
   onLayoutRowsChange?: (rows: number) => void;
@@ -26,64 +28,52 @@ export const LayoutContext = React.createContext<LayoutContextProps>(null);
 
 export const WrappedLayoutProvider = ({ children }: HexProps) => {
   const { setLayoutRows, setLayoutColumns, setLayoutAutoColumns, setLayoutAutoRows } = useStore();
+  const { nextModeWidth } = useMode();
   const { nextHexOffsetSize, onHexOffsetSizeChange } = useHex();
 
-  const nextLayoutColumns = useRef<number>(16);
-  const nextLayoutRows = useRef<number>(50);
-  const nextLayoutAutoColumns = useRef<boolean>(true);
-  const nextLayoutAutoRows = useRef<boolean>(true);
-  const isContainerFocused = useRef<boolean>(false);
+  const nextLayoutColumns = useRef<number>(DEFAULT_LAYOUT.layoutColumns);
+  const nextLayoutRows = useRef<number>(DEFAULT_LAYOUT.layoutRows);
+  const nextLayoutAutoColumns = useRef<boolean>(DEFAULT_LAYOUT.layoutAutoColumns);
+  const nextLayoutAutoRows = useRef<boolean>(DEFAULT_LAYOUT.layoutAutoRows);
 
+  const bodyRef = useRef<HTMLDivElement>(null);
+
+  const isContainerFocused = useRef<boolean>(false);
   const hexesContainerRefs = useRef<HTMLDivElement>(null);
   const textsContainerRefs = useRef<HTMLDivElement>(null);
   const layoutRef = useRef<HTMLDivElement>(null);
-  const containerRefs = useMemo(() => [hexesContainerRefs, textsContainerRefs], []);
+  const containerRefs = useMemo(() => [hexesContainerRefs, textsContainerRefs, bodyRef], []);
 
   const handleOffsetResize = useCallback(() => {
-    const size = layoutRef.current.getBoundingClientRect().width > 425 ? 8 : 4;
+    // const size = layoutRef.current.getBoundingClientRect().width > 425 ? 8 : 4;
+    const size = nextModeWidth.current === 'xs' ? 0 : 8;
     nextHexOffsetSize.current = size;
     onHexOffsetSizeChange(size);
-  }, [nextHexOffsetSize, onHexOffsetSizeChange]);
+  }, [nextHexOffsetSize, nextModeWidth, onHexOffsetSizeChange]);
 
   const handleRowResize = useCallback(() => {
-    const viewportOffset = layoutRef.current.getBoundingClientRect();
-    const newYSize = Math.floor(Math.abs(window.innerHeight - viewportOffset.top) / 22.875);
-    const rows = newYSize > 5 ? newYSize - 3 : 3;
+    const height = bodyRef.current === null ? 0 : bodyRef.current?.getBoundingClientRect().height;
+    const rows = Math.floor(height / LAYOUT_SIZE.rowHeight);
     nextLayoutRows.current = rows;
     setLayoutRows(rows);
   }, [setLayoutRows]);
 
   const handleColumnResize = useCallback(() => {
-    const width = layoutRef.current.getBoundingClientRect().width;
-    let columns = 16;
-    if (width > 4750) columns = 128;
-    else if (width > 4160) columns = 112;
-    else if (width > 3590) columns = 96;
-    else if (width > 3015) columns = 80;
-    else if (width > 2450) columns = 64;
-    else if (width > 1870) columns = 48;
-    else if (width > 1290) columns = 32;
-    else if (width > 1000) columns = 24;
-    else if (width > 860) columns = 20;
-    else if (width > 715) columns = 16;
-    else if (width > 575) columns = 12;
-    else if (width > 425) columns = 8;
-    else if (width > 285) columns = 4;
-    else if (width > 215) columns = 2;
-    else columns = 1;
+    const width = bodyRef.current.getBoundingClientRect().width;
+    const columns = COLUMNS.find(e => width >= e.width)?.columns;
     nextLayoutColumns.current = columns;
     setLayoutColumns(columns);
   }, [setLayoutColumns]);
 
-  const onLayoutInit = useCallback(() => {
-    setLayoutRows(nextLayoutRows.current);
-    setLayoutColumns(nextLayoutColumns.current);
-    setLayoutAutoColumns(nextLayoutAutoColumns.current);
-    setLayoutAutoRows(nextLayoutAutoRows.current);
-  }, [setLayoutAutoColumns, setLayoutAutoRows, setLayoutColumns, setLayoutRows]);
+  // const onLayoutInit = useCallback(() => {
+  //   setLayoutRows(nextLayoutRows.current);
+  //   setLayoutColumns(nextLayoutColumns.current);
+  //   setLayoutAutoColumns(nextLayoutAutoColumns.current);
+  //   setLayoutAutoRows(nextLayoutAutoRows.current);
+  // }, [setLayoutAutoColumns, setLayoutAutoRows, setLayoutColumns, setLayoutRows]);
 
   const onLayoutResize = useCallback(() => {
-    if (layoutRef.current === null || layoutRef.current === undefined) return;
+    if (bodyRef.current === null || bodyRef.current === undefined) return;
     nextLayoutAutoRows.current && handleRowResize();
     nextLayoutAutoColumns.current && handleColumnResize();
     handleOffsetResize();
@@ -126,10 +116,8 @@ export const WrappedLayoutProvider = ({ children }: HexProps) => {
   );
 
   const onContainerMouseDown = useCallback(
-    event =>
-      (isContainerFocused.current =
-        containerRefs[0].current.contains(event.target) || containerRefs[1].current.contains(event.target)),
-    [containerRefs]
+    event => (isContainerFocused.current = bodyRef.current.contains(event.target)),
+    []
   );
 
   return (
@@ -139,12 +127,13 @@ export const WrappedLayoutProvider = ({ children }: HexProps) => {
         nextLayoutColumns,
         nextLayoutAutoRows,
         nextLayoutAutoColumns,
+        bodyRef,
         isContainerFocused,
         layoutRef,
         containerRefs,
         hexesContainerRefs,
         textsContainerRefs,
-        onLayoutInit,
+        // onLayoutInit,
         onLayoutResize,
         onLayoutColumnsChange,
         onLayoutRowsChange,

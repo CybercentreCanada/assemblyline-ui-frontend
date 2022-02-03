@@ -3,9 +3,11 @@ import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 import clsx from 'clsx';
 import { default as React } from 'react';
-import { StoreState, useScroll, useStyles } from '..';
+import { HexStoreProps, useScroll, useStyles } from '../..';
 
-export const WrappedHexScrollBar = (store: StoreState) => {
+
+
+export const WrappedHexScrollBar = ({ store }: HexStoreProps) => {
   const { scrollbarClasses } = useStyles();
   const { nextScrollMaxIndex, onScrollClick, onScrollSliderChange, onScrollSliderMouseDown } = useScroll();
   const { scrollIndex } = store;
@@ -47,6 +49,8 @@ export const WrappedHexScrollBar = (store: StoreState) => {
 };
 export const HexScrollBar = React.memo(
   WrappedHexScrollBar,
-  (prevProps: Readonly<StoreState>, nextProps: Readonly<StoreState>) => prevProps.scrollIndex === nextProps.scrollIndex
+  (prevProps: Readonly<HexStoreProps>, nextProps: Readonly<HexStoreProps>) =>
+    prevProps.store.scrollIndex === nextProps.store.scrollIndex &&
+    prevProps.store.layoutRows === nextProps.store.layoutRows
 );
 export default HexScrollBar;

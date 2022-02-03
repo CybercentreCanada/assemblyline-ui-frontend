@@ -1,7 +1,7 @@
 import { Tooltip } from '@material-ui/core';
 import IconButton from '@material-ui/core/IconButton';
 import { default as React } from 'react';
-import { useStyles } from '..';
+import { useStyles } from '../..';
 
 export type TooltipButtonProps = {
   title: string;

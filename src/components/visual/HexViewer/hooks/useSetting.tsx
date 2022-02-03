@@ -30,7 +30,7 @@ export const SettingContext = React.createContext<SettingContextProps>(null);
 
 export const WrappedSettingProvider = ({ children }: HexProps) => {
   const { setSettingsOpen } = useStore();
-  const { nextHexBase, onHexBaseValueChange } = useHex();
+  const { nextHexOffsetBase, onHexBaseValueChange } = useHex();
   const {
     nextLayoutRows,
     nextLayoutAutoRows,
@@ -61,7 +61,7 @@ export const WrappedSettingProvider = ({ children }: HexProps) => {
         'hexViewer.settings',
         JSON.stringify({
           // Hex
-          hexBase: nextHexBase.current,
+          hexBase: nextHexOffsetBase.current,
 
           // Layout
           layoutRows: nextLayoutRows.current,
@@ -73,7 +73,7 @@ export const WrappedSettingProvider = ({ children }: HexProps) => {
           scrollSpeed: nextScrollSpeed.current
         })
       ),
-    [nextHexBase, nextLayoutAutoColumns, nextLayoutAutoRows, nextLayoutColumns, nextLayoutRows, nextScrollSpeed]
+    [nextHexOffsetBase, nextLayoutAutoColumns, nextLayoutAutoRows, nextLayoutColumns, nextLayoutRows, nextScrollSpeed]
   );
 
   const onSettingLoad = useCallback(() => {

@@ -1,5 +1,6 @@
+import { HexStore } from 'components/visual/HexViewer';
 import React, { useMemo } from 'react';
-import { HexRow, StoreState } from '..';
+import { HexRow } from '.';
 
 export type HexContainerProps = {
   isLightTheme?: boolean;
@@ -7,7 +8,7 @@ export type HexContainerProps = {
   initialized?: boolean;
   containerRef?: React.MutableRefObject<any>;
   containerClass?: string;
-  store?: StoreState;
+  store?: HexStore;
   values?: Map<number, string>;
   onMouseEnter?: React.MouseEventHandler<HTMLDivElement>;
   onMouseLeave?: React.MouseEventHandler<HTMLDivElement>;

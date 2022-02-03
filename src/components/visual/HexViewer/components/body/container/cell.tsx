@@ -1,9 +1,9 @@
 import clsx from 'clsx';
+import { HexStore, useCursor, useHover, useSearch, useSelect } from 'components/visual/HexViewer';
 import React from 'react';
-import { StoreState, useCursor, useHover, useSearch, useSelect } from '..';
 
-export type HexItemProps = {
-  store?: StoreState;
+export type HexCellProps = {
+  store?: HexStore;
   index?: number;
   value?: string;
   colorClass?: string;
@@ -17,7 +17,7 @@ export type HexItemProps = {
   getColorClass?: (value: string) => string;
 };
 
-export const WrappedHexItem = ({
+export const WrappedHexCell = ({
   store = null,
   index = 0,
   value = '',
@@ -27,7 +27,7 @@ export const WrappedHexItem = ({
   selectClass = '',
   searchClass = '',
   selectedSearchClass = ''
-}: HexItemProps) => {
+}: HexCellProps) => {
   const { onHoverMouseEnter, onHoverMouseLeave, onHoverMouseDown } = useHover();
   const { onCursorMouseDown, onCursorMouseEnter } = useCursor();
   const { onSelectMouseEnter, onSelectMouseDown } = useSelect();
@@ -55,11 +55,11 @@ export const WrappedHexItem = ({
   ) : null;
 };
 
-export const HexItem = React.memo(
-  WrappedHexItem,
+export const HexCell = React.memo(
+  WrappedHexCell,
   (
-    prevProps: Readonly<React.PropsWithChildren<HexItemProps>>,
-    nextProps: Readonly<React.PropsWithChildren<HexItemProps>>
+    prevProps: Readonly<React.PropsWithChildren<HexCellProps>>,
+    nextProps: Readonly<React.PropsWithChildren<HexCellProps>>
   ) =>
     prevProps.value === nextProps.value &&
     prevProps.index === nextProps.index &&

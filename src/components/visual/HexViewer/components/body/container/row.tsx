@@ -1,11 +1,12 @@
+import { HexStore } from 'components/visual/HexViewer';
 import React, { useMemo } from 'react';
-import { HexItem, StoreState } from '..';
+import { HexCell } from '.';
 
 export type HexRowProps = {
   isLightTheme?: boolean;
   initialized?: boolean;
   rowIndexes?: Array<number>;
-  store?: StoreState;
+  store?: HexStore;
   getValue?: (index: number) => string;
   getColorClass?: (index: number) => string;
   getBorderClass?: (index: number) => string;
@@ -54,7 +55,7 @@ export const WrappedHexRow = ({
   return (
     <div>
       {rowIndexes.map((index, j) => (
-        <HexItem
+        <HexCell
           key={index}
           store={store}
           index={index}

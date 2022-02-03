@@ -1,7 +1,7 @@
 import { ClickAwayListener, Fade, Paper, Popper } from '@material-ui/core';
 import { isEnter, isEscape } from 'commons/addons/elements/utils/keyboard';
 import { default as React, forwardRef, useCallback, useImperativeHandle, useState } from 'react';
-import { NumericField, useStyles } from '..';
+import { NumericField, useStyles } from '../..';
 
 export type NumberFieldPopperProps = {
   id?: string;

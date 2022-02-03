@@ -1,8 +1,8 @@
 import clsx from 'clsx';
+import { HexStore, useStyles } from 'components/visual/HexViewer';
 import React, { useCallback, useMemo } from 'react';
-import { StoreState, useStyles } from '..';
 
-export const WrappedHexOffsets = ({ layoutRows, layoutColumns, hexBase, hexOffsetBase, scrollIndex }: StoreState) => {
+export const WrappedHexOffsets = ({ layoutRows, layoutColumns, hexBase, hexOffsetBase, scrollIndex }: HexStore) => {
   const { hexClasses } = useStyles();
 
   const offsets = useMemo(() => Array.from(Array(layoutRows).keys()), [layoutRows]);
@@ -23,7 +23,7 @@ export const WrappedHexOffsets = ({ layoutRows, layoutColumns, hexBase, hexOffse
 };
 export const HexOffsets = React.memo(
   WrappedHexOffsets,
-  (prevProps: Readonly<StoreState>, nextProps: Readonly<StoreState>) =>
+  (prevProps: Readonly<HexStore>, nextProps: Readonly<HexStore>) =>
     prevProps.layoutRows === nextProps.layoutRows &&
     prevProps.layoutColumns === nextProps.layoutColumns &&
     prevProps.hexBase === nextProps.hexBase &&

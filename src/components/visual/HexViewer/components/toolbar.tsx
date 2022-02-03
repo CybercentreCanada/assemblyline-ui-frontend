@@ -15,8 +15,8 @@ import { default as React, useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   HexMenu,
+  HexStore,
   NumberFieldPopper,
-  StoreState,
   TooltipButton,
   useCursor,
   useHex,
@@ -28,7 +28,7 @@ import {
   useSuggestion
 } from '..';
 
-export const WrappedHexToolBar = (states: StoreState) => {
+export const WrappedHexToolBar = (states: HexStore) => {
   const { toolbarClasses } = useStyles();
   const { t } = useTranslation(['hexViewer']);
   const theme = useTheme();
@@ -191,7 +191,7 @@ export const WrappedHexToolBar = (states: StoreState) => {
 };
 export const HexToolBar = React.memo(
   WrappedHexToolBar,
-  (prevProps: Readonly<StoreState>, nextProps: Readonly<StoreState>) =>
+  (prevProps: Readonly<HexStore>, nextProps: Readonly<HexStore>) =>
     prevProps.hexBase === nextProps.hexBase &&
     prevProps.layoutRows === nextProps.layoutRows &&
     prevProps.layoutColumns === nextProps.layoutColumns &&

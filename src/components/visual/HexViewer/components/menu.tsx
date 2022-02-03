@@ -13,10 +13,10 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import ShareIcon from '@material-ui/icons/Share';
 import { default as React, forwardRef, useImperativeHandle, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ListElement, StoreState, useCursor, useHex, useLocation, useSearch, useSetting, useStyles } from '..';
+import { HexStore, ListElement, useCursor, useHex, useLocation, useSearch, useSetting, useStyles } from '..';
 
 export type HexMenuProps = {
-  states?: StoreState;
+  states?: HexStore;
   anchorEl?: any;
 };
 

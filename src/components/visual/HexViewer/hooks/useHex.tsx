@@ -1,10 +1,11 @@
 import React, { useCallback, useContext, useMemo, useRef } from 'react';
 import { HexProps, useStore } from '..';
+import { ASCII, DEFAULT_HEX } from '../models/Hex';
 
 export type HexContextProps = {
   hexData?: React.MutableRefObject<string>;
   hexMap?: React.MutableRefObject<Map<number, string>>;
-  nextHexBase?: React.MutableRefObject<number>;
+  nextHexOffsetBase?: React.MutableRefObject<number>;
   nextHexOffsetSize?: React.MutableRefObject<number>;
   parseStringToHexString?: (text: string) => string;
   parseStringToHex?: (text: string) => Map<any, any>;
@@ -33,13 +34,13 @@ export type HexContextProps = {
 export const HexContext = React.createContext<HexContextProps>(null);
 
 export const WrappedHexProvider = ({ children }: HexProps) => {
-  const { setHexBase, setHexOffsetSize, setHexBaseValues } = useStore();
+  const { setHexOffsetBase, setHexOffsetSize, setHexBaseValues } = useStore();
 
   const hexData = useRef<string>('');
   const hexMap = useRef<Map<number, string>>(new Map());
-  const nextHexBase = useRef<number>(10);
-  const nextHexOffsetSize = useRef<number>(8);
-  const nextHexBaseValues = useRef<
+  const nextHexOffsetBase = useRef<number>(DEFAULT_HEX.hexOffsetBase);
+  const nextHexOffsetSize = useRef<number>(DEFAULT_HEX.hexOffsetSize);
+  const nextHexOffsetBaseValues = useRef<
     Array<{
       label: string;
       value: number;
@@ -126,14 +127,23 @@ export const WrappedHexProvider = ({ children }: HexProps) => {
   }, []);
 
   const toHexChar = useCallback((hex: string) => {
-    let char = Buffer.from(hex, 'hex').toString();
-    return ['�', ' '].includes(char) || parseInt(hex, 16) < 33 ? '·' : char;
+    // let char = Buffer.from(hex, 'hex').toString();
+    // return ['�', ' '].includes(char) || parseInt(hex, 16) < 33 ? '·' : char;
+
+    const value: number = parseInt(hex, 16);
+    const char: string = Buffer.from(hex, 'hex').toString();
+    const ascii = ASCII.find(element => value >= element.range.start && value <= element.range.end);
+
+    if (ascii.type === 'null') return ascii.value;
+    else if (ascii.type === 'non printable') return ascii.value;
+    else if (ascii.type === 'lower ASCII') return char;
+    else if (ascii.type === 'higher ASCII') return ascii.value;
+    else return '';
   }, []);
 
-  const getHexValue = useCallback(
-    (index: number) => (index < hexMap.current.size ? hexMap.current.get(index).toUpperCase() : ''),
-    []
-  );
+  const getHexValue = useCallback((index: number) => {
+    return index >= 0 && index < hexMap.current.size ? hexMap.current.get(index).toUpperCase() : '';
+  }, []);
 
   const getTextValue = useCallback(
     (index: number) => (index < hexMap.current.size ? toHexChar(hexMap.current.get(index)) : ''),
@@ -141,7 +151,7 @@ export const WrappedHexProvider = ({ children }: HexProps) => {
   );
 
   const getAddressValue = useCallback(
-    (index: number) => index.toString(nextHexBase.current).toUpperCase().padStart(nextHexOffsetSize.current, '0'),
+    (index: number) => index.toString(nextHexOffsetBase.current).toUpperCase().padStart(nextHexOffsetSize.current, '0'),
     []
   );
 
@@ -149,10 +159,10 @@ export const WrappedHexProvider = ({ children }: HexProps) => {
     (data: string) => {
       hexData.current = data;
       hexMap.current = parseHexDataToHexMap(data);
-      setHexBase(nextHexBase.current);
+      setHexOffsetBase(nextHexOffsetBase.current);
       setHexOffsetSize(nextHexOffsetSize.current);
     },
-    [parseHexDataToHexMap, setHexBase, setHexOffsetSize]
+    [parseHexDataToHexMap, setHexOffsetBase, setHexOffsetSize]
   );
 
   const onHexOffsetSizeChange = useCallback(
@@ -164,7 +174,7 @@ export const WrappedHexProvider = ({ children }: HexProps) => {
   );
 
   const onHexIndexClamp = useCallback((index: number) => {
-    if (index < 0) return 0;
+    if (index <= 0) return 0;
     else if (index >= hexMap.current.size) return hexMap.current.size - 1;
     else return index;
   }, []);
@@ -172,10 +182,10 @@ export const WrappedHexProvider = ({ children }: HexProps) => {
   const onHexLanguageChange = useCallback(
     (language: string) => {
       if (language === 'en') {
-        nextHexBaseValues.current = hexBaseTranslations.en;
+        nextHexOffsetBaseValues.current = hexBaseTranslations.en;
         setHexBaseValues(hexBaseTranslations.en);
       } else if (language === 'fr') {
-        nextHexBaseValues.current = hexBaseTranslations.fr;
+        nextHexOffsetBaseValues.current = hexBaseTranslations.fr;
         setHexBaseValues(hexBaseTranslations.fr);
       }
     },
@@ -190,18 +200,18 @@ export const WrappedHexProvider = ({ children }: HexProps) => {
       }>,
       child: React.ReactNode
     ) => {
-      nextHexBase.current = event.target.value as number;
-      setHexBase(event.target.value as number);
+      nextHexOffsetBase.current = event.target.value as number;
+      setHexOffsetBase(event.target.value as number);
     },
-    [setHexBase]
+    [setHexOffsetBase]
   );
 
   const onHexBaseValueChange = useCallback(
     (value: number) => {
-      nextHexBase.current = value;
-      setHexBase(value);
+      nextHexOffsetBase.current = value;
+      setHexOffsetBase(value);
     },
-    [setHexBase]
+    [setHexOffsetBase]
   );
 
   return (
@@ -209,7 +219,7 @@ export const WrappedHexProvider = ({ children }: HexProps) => {
       value={{
         hexData,
         hexMap,
-        nextHexBase,
+        nextHexOffsetBase,
         nextHexOffsetSize,
         parseStringToHexString,
         parseDataToHexMap,

@@ -1,5 +1,6 @@
 import React, { useCallback, useContext, useMemo, useRef } from 'react';
-import { HexProps, useStyles } from '..';
+import { HexProps, useLayout, useStyles } from '..';
+import { addClass, removeClass } from '../actions/StyleActions';
 
 export type HoverContextProps = {
   onHoverMouseEnter?: (index: number) => void;
@@ -11,18 +12,19 @@ export type HoverContextProps = {
 export const HoverContext = React.createContext<HoverContextProps>(null);
 
 export const WrappedHoverProvider = ({ children }: HexProps) => {
-  const { itemClasses, addContainerClass, removeContainerClass } = useStyles();
+  const { bodyRef } = useLayout();
+  const { itemClasses } = useStyles();
 
   const isMouseDown = useRef<boolean>(false);
 
   const onHoverMouseEnter = useCallback(
-    (index: number) => (!isMouseDown.current ? addContainerClass(index, itemClasses.hover) : null),
-    [addContainerClass, itemClasses.hover]
+    (index: number) => (!isMouseDown.current ? addClass(bodyRef, index, itemClasses.hover) : null),
+    [bodyRef, itemClasses.hover]
   );
 
   const onHoverMouseLeave = useCallback(
-    (index: number) => removeContainerClass(index, itemClasses.hover),
-    [itemClasses.hover, removeContainerClass]
+    (index: number) => removeClass(bodyRef, index, itemClasses.hover),
+    [bodyRef, itemClasses.hover]
   );
 
   const onHoverMouseDown = useCallback(() => (isMouseDown.current = true), []);
