@@ -25,6 +25,7 @@ import FingerprintOutlinedIcon from '@material-ui/icons/FingerprintOutlined';
 import LabelOutlinedIcon from '@material-ui/icons/LabelOutlined';
 import SimCardOutlinedIcon from '@material-ui/icons/SimCardOutlined';
 import { TreeItem, TreeView } from '@material-ui/lab';
+import clsx from 'clsx';
 import useClipboard from 'commons/components/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
@@ -69,6 +70,36 @@ const useStyles = makeStyles(theme => ({
       backgroundColor: theme.palette.action.hover,
       cursor: 'pointer'
     }
+  },
+  printable_section_title: {
+    display: 'flex',
+    alignItems: 'center'
+  },
+  memdump: {
+    '@media print': {
+      backgroundColor: '#00000005',
+      border: '1px solid #DDD'
+    },
+    backgroundColor: theme.palette.type === 'dark' ? '#ffffff05' : '#00000005',
+    border: `1px solid ${theme.palette.divider}`,
+    borderRadius: '4px',
+    padding: '4px',
+    whiteSpace: 'pre-wrap',
+    wordBreak: 'break-word',
+    margin: '0.25rem 0'
+  },
+  json: {
+    '@media print': {
+      backgroundColor: '#00000005',
+      border: '1px solid #DDD'
+    },
+    backgroundColor: theme.palette.type === 'dark' ? '#ffffff05' : '#00000005',
+    border: `1px solid ${theme.palette.divider}`,
+    borderRadius: '4px',
+    padding: '4px',
+    whiteSpace: 'pre-wrap',
+    wordBreak: 'break-word',
+    margin: '0.25rem 0'
   }
 }));
 
@@ -85,10 +116,48 @@ const useTreeItemStyles = makeStyles((theme: Theme) => ({
         backgroundColor: 'transparent'
       }
   },
+  treeItem: {
+    '@media print': {
+      border: '1px solid #DDD'
+    },
+    [theme.breakpoints.up('md')]: {
+      width: '40rem'
+    },
+    [theme.breakpoints.up('lg')]: {
+      width: '50rem'
+    },
+    border: `1px solid ${theme.palette.divider}`,
+    margin: '0.2em 0em',
+    borderRadius: '4px',
+    display: 'flex',
+    maxWidth: '50rem',
+    minWidth: '30rem'
+  },
+  pid: {
+    '@media print': {
+      backgroundColor: '#00000010'
+    },
+    padding: '5px',
+    backgroundColor: theme.palette.type === 'dark' ? '#FFFFFF10' : '#00000010',
+    borderRadius: '4px 0px 0px 4px'
+  },
+  signature: {
+    '@media print': {
+      color: 'black'
+    },
+    alignSelf: 'center',
+    color: theme.palette.text.secondary
+  },
   suspicious: {
+    '@media print': {
+      backgroundColor: '#ffedd4'
+    },
     backgroundColor: theme.palette.type === 'dark' ? '#654312' : '#ffedd4'
   },
   malicious: {
+    '@media print': {
+      backgroundColor: '#ffd0d0'
+    },
     backgroundColor: theme.palette.type === 'dark' ? '#4e2525' : '#ffd0d0'
   }
 }));
@@ -96,22 +165,8 @@ const useTreeItemStyles = makeStyles((theme: Theme) => ({
 const TextBody = ({ body }) => <div style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{body}</div>;
 
 const MemDumpBody = ({ body }) => {
-  const theme = useTheme();
-  return (
-    <pre
-      style={{
-        backgroundColor: theme.palette.type === 'dark' ? '#ffffff05' : '#00000005',
-        border: `1px solid ${theme.palette.divider}`,
-        borderRadius: '4px',
-        padding: '4px',
-        whiteSpace: 'pre-wrap',
-        wordBreak: 'break-word',
-        margin: '0.25rem 0'
-      }}
-    >
-      {body}
-    </pre>
-  );
+  const classes = useStyles();
+  return <pre className={classes.memdump}>{body}</pre>;
 };
 
 const KVBody = ({ body }) => (
@@ -196,51 +251,60 @@ const URLBody = ({ body }) => {
   );
 };
 
-const JSONBody = ({ body }) => {
+const JSONBody = ({ body, printable }) => {
+  const classes = useStyles();
   const theme = useTheme();
 
-  const jsonTheme = {
-    base00: 'transparent', // Background
-    base01: '#f1f1f1', // Edit key text
-    base02: theme.palette.type === 'dark' ? theme.palette.text.hint : theme.palette.divider, // Borders and DataType Background
-    base03: '#444', // Unused
-    base04: theme.palette.grey[theme.palette.type === 'dark' ? 700 : 400], // Object size and Add key border
-    base05: theme.palette.grey[theme.palette.type === 'dark' ? 700 : 700], // Undefined and Add key background
-    base06: '#444', // Unused
-    base07: theme.palette.text.primary, // Brace, Key and Borders
-    base08: theme.palette.text.secondary, // NaN
-    base09: theme.palette.type === 'dark' ? theme.palette.warning.light : theme.palette.warning.dark, // Strings and Icons
-    base0A: '#333', // Null, Regex and edit color
-    base0B: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark, // Float
-    base0C: theme.palette.type === 'dark' ? theme.palette.secondary.light : theme.palette.secondary.dark, // Array Key
-    base0D: theme.palette.type === 'dark' ? theme.palette.info.light : theme.palette.info.dark, // Date, function, expand icon
-    base0E: theme.palette.type === 'dark' ? theme.palette.info.light : theme.palette.info.dark, // Boolean
-    base0F: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark // Integer
-  };
+  if (printable) {
+    const pprint = JSON.stringify(body, undefined, 2);
+    return (
+      <pre id="json" className={classes.json}>
+        <code>{pprint}</code>
+      </pre>
+    );
+  } else {
+    const jsonTheme = {
+      base00: 'transparent', // Background
+      base01: '#f1f1f1', // Edit key text
+      base02: theme.palette.type === 'dark' ? theme.palette.text.hint : theme.palette.divider, // Borders and DataType Background
+      base03: '#444', // Unused
+      base04: theme.palette.grey[theme.palette.type === 'dark' ? 700 : 400], // Object size and Add key border
+      base05: theme.palette.grey[theme.palette.type === 'dark' ? 700 : 700], // Undefined and Add key background
+      base06: '#444', // Unused
+      base07: theme.palette.text.primary, // Brace, Key and Borders
+      base08: theme.palette.text.secondary, // NaN
+      base09: theme.palette.type === 'dark' ? theme.palette.warning.light : theme.palette.warning.dark, // Strings and Icons
+      base0A: '#333', // Null, Regex and edit color
+      base0B: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark, // Float
+      base0C: theme.palette.type === 'dark' ? theme.palette.secondary.light : theme.palette.secondary.dark, // Array Key
+      base0D: theme.palette.type === 'dark' ? theme.palette.info.light : theme.palette.info.dark, // Date, function, expand icon
+      base0E: theme.palette.type === 'dark' ? theme.palette.info.light : theme.palette.info.dark, // Boolean
+      base0F: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark // Integer
+    };
 
-  return (
-    <ReactJson
-      name={false}
-      src={body}
-      theme={jsonTheme}
-      enableClipboard={false}
-      collapsed
-      groupArraysAfterLength={10}
-      displayDataTypes={false}
-      displayObjectSize={false}
-      style={{
-        backgroundColor: theme.palette.type === 'dark' ? '#FFFFFF05' : '#00000005',
-        border: `1px solid ${theme.palette.divider}`,
-        borderRadius: '4px',
-        padding: '4px'
-      }}
-    />
-  );
+    return (
+      <ReactJson
+        name={false}
+        src={body}
+        theme={jsonTheme}
+        enableClipboard={false}
+        collapsed
+        groupArraysAfterLength={10}
+        displayDataTypes={false}
+        displayObjectSize={false}
+        style={{
+          backgroundColor: theme.palette.type === 'dark' ? '#FFFFFF05' : '#00000005',
+          border: `1px solid ${theme.palette.divider}`,
+          borderRadius: '4px',
+          padding: '4px'
+        }}
+      />
+    );
+  }
 };
 
 const ProcessTreeItem = ({ process }) => {
   const { t } = useTranslation(['fileDetail']);
-  const theme = useTheme();
   const classes = useTreeItemStyles();
   const classMap = {
     suspicious: classes.suspicious,
@@ -256,31 +320,16 @@ const ProcessTreeItem = ({ process }) => {
       }}
       label={
         <div
-          className={
+          className={clsx(
+            classes.treeItem,
             classMap[
               scoreToVerdict(
                 Object.keys(process.signatures).reduce((sum, key) => sum + parseFloat(process.signatures[key] || 0), 0)
               )
             ]
-          }
-          style={{
-            border: `1px solid ${theme.palette.divider}`,
-            margin: '0.2em 0em',
-            borderRadius: '4px',
-            display: 'flex',
-            maxWidth: '50rem',
-            minWidth: '30rem'
-          }}
+          )}
         >
-          <div
-            style={{
-              padding: '5px',
-              backgroundColor: theme.palette.type === 'dark' ? '#FFFFFF10' : '#00000010',
-              borderRadius: '4px 0px 0px 4px'
-            }}
-          >
-            {process.process_pid}
-          </div>
+          <div className={classes.pid}>{process.process_pid}</div>
           <div style={{ padding: '5px', flexGrow: 1, wordBreak: 'break-word' }}>
             <div style={{ paddingBottom: '5px' }}>
               <b>{process.process_name}</b>
@@ -291,7 +340,7 @@ const ProcessTreeItem = ({ process }) => {
               </samp>
             </div>
           </div>
-          <div style={{ alignSelf: 'center', color: theme.palette.text.secondary }}>
+          <div className={classes.signature}>
             {Object.keys(process.signatures).length !== 0 && (
               <div>
                 <Tooltip title={`${t('process_signatures')}: ${Object.keys(process.signatures).join(' | ')}`}>
@@ -316,11 +365,10 @@ const ProcessTreeItemList = ({ processes }) =>
 
 const ProcessTreeBody = ({ body }) => {
   try {
-    const data = JSON.parse(body);
     const expanded = [];
 
     // Auto-expand first two levels
-    data.forEach(process => {
+    body.forEach(process => {
       if (process.process_pid !== undefined && process.process_pid !== null) {
         expanded.push(process.process_pid.toString());
       }
@@ -340,7 +388,7 @@ const ProcessTreeBody = ({ body }) => {
           defaultCollapseIcon={<ExpandMoreIcon />}
           defaultExpandIcon={<ChevronRightIcon />}
         >
-          <ProcessTreeItemList processes={data} />
+          <ProcessTreeItemList processes={body} />
         </TreeView>
       </div>
     );
@@ -354,10 +402,17 @@ const ProcessTreeBody = ({ body }) => {
 const StyledTableCell = withStyles((theme: Theme) =>
   createStyles({
     root: {
+      '@media print': {
+        color: 'black'
+      },
       fontSize: 'inherit',
       lineHeight: 'inherit'
     },
     head: {
+      '@media print': {
+        color: 'black',
+        backgroundColor: '#DDD !important'
+      },
       backgroundColor: theme.palette.type === 'dark' ? '#404040' : '#EEE'
     },
     body: {
@@ -372,6 +427,9 @@ const StyledTableRow = withStyles((theme: Theme) =>
   createStyles({
     root: {
       '&:nth-of-type(odd)': {
+        '@media print': {
+          backgroundColor: '#EEE !important'
+        },
         backgroundColor: theme.palette.type === 'dark' ? '#ffffff08' : '#00000008'
       }
     }
@@ -382,25 +440,20 @@ const StyledTable = withStyles((theme: Theme) =>
   createStyles({
     root: {
       [theme.breakpoints.down('sm')]: {
+        '@media print': {
+          width: '100%'
+        },
         width: 'max-content'
       }
     }
   })
 )(Table);
 
-const TblBody = ({ body }) => {
-  let data = null;
-  try {
-    data = JSON.parse(body);
-  } catch (ex) {
-    // eslint-disable-next-line no-console
-    console.log('[WARNING] Could not parse Table body. The section will be skipped...');
-  }
-
+const TblBody = ({ body, printable }) => {
   const headers = [];
 
-  if (data) {
-    for (const line of data) {
+  if (body) {
+    for (const line of body) {
       // eslint-disable-next-line guard-for-in
       for (const th in line) {
         const val = line[th];
@@ -414,8 +467,8 @@ const TblBody = ({ body }) => {
   }
 
   return (
-    data && (
-      <TableContainer style={{ fontSize: '90%', maxHeight: '500px' }}>
+    body && (
+      <TableContainer style={{ fontSize: '90%', maxHeight: printable ? null : '500px' }}>
         <StyledTable stickyHeader size="small">
           <TableHead>
             <TableRow>
@@ -427,7 +480,7 @@ const TblBody = ({ body }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.map((row, id) => (
+            {body.map((row, id) => (
               <StyledTableRow key={id}>
                 {headers.map((key, hid) => {
                   let value = row[key];
@@ -487,26 +540,27 @@ export type Section = {
 };
 
 type ResultSectionProps = {
-  section_list: Section[];
-  id: number;
-  sub_sections: SectionItem[];
-  indent: number;
+  section: Section;
+  section_list?: Section[];
+  sub_sections?: SectionItem[];
+  indent?: number;
   depth?: number;
   nested?: boolean;
+  printable?: boolean;
 };
 
 const ResultSection: React.FC<ResultSectionProps> = ({
-  section_list,
-  id,
-  sub_sections,
-  indent,
+  section,
+  section_list = [],
+  sub_sections = [],
+  indent = 1,
   depth = 1,
-  nested = false
+  nested = false,
+  printable = false
 }) => {
   const { t } = useTranslation(['fileDetail']);
   const classes = useStyles();
   const theme = useTheme();
-  const section = section_list[id];
   const [open, setOpen] = React.useState(!section.auto_collapse);
   const [showTags, setShowTags] = React.useState(false);
   const [showHeur, setShowHeur] = React.useState(false);
@@ -518,24 +572,26 @@ const ResultSection: React.FC<ResultSectionProps> = ({
 
   const allTags = useMemo(() => {
     const tagList = [];
-    if (Array.isArray(section.tags)) {
-      for (const tag of section.tags) {
-        tagList.push(getKey(tag.type, tag.value));
-      }
-    }
-
-    if (section.heuristic !== undefined && section.heuristic !== null) {
-      if (section.heuristic.attack !== undefined && section.heuristic.attack.length !== 0) {
-        for (const attack of section.heuristic.attack) {
-          tagList.push(getKey('attack_pattern', attack.attack_id));
+    if (!printable) {
+      if (Array.isArray(section.tags)) {
+        for (const tag of section.tags) {
+          tagList.push(getKey(tag.type, tag.value));
         }
       }
-      if (section.heuristic.heur_id !== undefined && section.heuristic.heur_id !== null) {
-        tagList.push(getKey('heuristic', section.heuristic.heur_id));
-      }
-      if (section.heuristic.signature !== undefined && section.heuristic.signature.length !== 0) {
-        for (const signature of section.heuristic.signature) {
-          tagList.push(getKey('heuristic.signature', signature.name));
+
+      if (section.heuristic !== undefined && section.heuristic !== null) {
+        if (section.heuristic.attack !== undefined && section.heuristic.attack.length !== 0) {
+          for (const attack of section.heuristic.attack) {
+            tagList.push(getKey('attack_pattern', attack.attack_id));
+          }
+        }
+        if (section.heuristic.heur_id !== undefined && section.heuristic.heur_id !== null) {
+          tagList.push(getKey('heuristic', section.heuristic.heur_id));
+        }
+        if (section.heuristic.signature !== undefined && section.heuristic.signature.length !== 0) {
+          for (const signature of section.heuristic.signature) {
+            tagList.push(getKey('heuristic.signature', signature.name));
+          }
         }
       }
     }
@@ -547,21 +603,24 @@ const ResultSection: React.FC<ResultSectionProps> = ({
 
   const handleMenuClick = useCallback(
     event => {
-      event.preventDefault();
-      setState(
-        state === null
-          ? {
-              mouseX: event.clientX - 2,
-              mouseY: event.clientY - 4
-            }
-          : // repeated contextmenu when it is already open closes it with Chrome 84 on Ubuntu
-            // Other native context menus might behave different.
-            // With this behavior we prevent contextmenu from the backdrop to re-locale existing context menus.
-            null
-      );
+      if (!printable) {
+        event.preventDefault();
+        setState(
+          state === null
+            ? {
+                mouseX: event.clientX - 2,
+                mouseY: event.clientY - 4
+              }
+            : // repeated contextmenu when it is already open closes it with Chrome 84 on Ubuntu
+              // Other native context menus might behave different.
+              // With this behavior we prevent contextmenu from the backdrop to re-locale existing context menus.
+              null
+        );
+      }
     },
-    [state]
+    [printable, state]
   );
+
   const stopPropagation = useCallback(event => {
     event.stopPropagation();
   }, []);
@@ -593,14 +652,14 @@ const ResultSection: React.FC<ResultSectionProps> = ({
   }, [showHeur, handleClose]);
 
   const handleMenuCopy = useCallback(() => {
-    copy(typeof section.body === 'string' ? section.body : JSON.stringify(section.body), 'clipID');
+    copy(typeof section.body === 'string' ? section.body : JSON.stringify(section.body, undefined, 2), 'clipID');
     handleClose();
   }, [copy, handleClose, section.body]);
 
   return (
     <>
       <Menu
-        open={state !== null}
+        open={state !== null && !printable}
         onClose={handleClose}
         anchorReference="anchorPosition"
         anchorPosition={state !== null ? { top: state.mouseY, left: state.mouseX } : undefined}
@@ -648,21 +707,23 @@ const ResultSection: React.FC<ResultSectionProps> = ({
         style={{
           display: 'flex',
           flexWrap: 'nowrap',
-          marginLeft: `${depth}rem`,
+          marginLeft: !printable ? `${depth}rem` : null,
           backgroundColor: highlighted ? (theme.palette.type === 'dark' ? '#343a44' : '#e2f2fa') : null
         }}
       >
-        <SectionHighlight
-          score={section.heuristic ? section.heuristic.score : 0}
-          indent={indent}
-          depth={depth}
-          highlighted={highlighted}
-          nested={nested}
-        />
+        {!printable && (
+          <SectionHighlight
+            score={section.heuristic ? section.heuristic.score : 0}
+            indent={indent}
+            depth={depth}
+            highlighted={highlighted}
+            nested={nested}
+          />
+        )}
 
         <div style={{ width: '100%' }}>
-          <Box className={classes.section_title} onClick={handleClick}>
-            {c12nDef.enforce && (
+          <Box className={printable ? classes.printable_section_title : classes.section_title} onClick={handleClick}>
+            {c12nDef.enforce && !printable && (
               <>
                 <Classification c12n={section.classification} type="text" />
                 <span>&nbsp;&nbsp;::&nbsp;&nbsp;</span>
@@ -671,61 +732,64 @@ const ResultSection: React.FC<ResultSectionProps> = ({
             {section.heuristic && (
               <>
                 <Verdict score={section.heuristic.score} mono short size="tiny" />
-                <span>&nbsp;::&nbsp;&nbsp;</span>
+                {!printable && <span>&nbsp;::&nbsp;&nbsp;</span>}
               </>
             )}
             <span
               style={{
                 fontWeight: 500,
                 wordBreak: 'break-word',
-                flexGrow: 1
+                flexGrow: 1,
+                paddingLeft: printable ? theme.spacing(1) : null
               }}
             >
               {section.title_text}
             </span>
-            <div style={{ color: theme.palette.text.disabled, whiteSpace: 'nowrap' }} onClick={stopPropagation}>
-              {section.heuristic && (
-                <Tooltip title={t('show_heur')} placement="top">
-                  <IconButton size="small" onClick={handleShowHeur} color={showHeur ? 'default' : 'inherit'}>
-                    <SimCardOutlinedIcon />
-                  </IconButton>
-                </Tooltip>
-              )}
-              {Array.isArray(section.tags) && section.tags.length > 0 && (
-                <Tooltip title={t('show_tags')} placement="top">
-                  <IconButton size="small" onClick={handleShowTags} color={showTags ? 'default' : 'inherit'}>
-                    <LabelOutlinedIcon />
-                  </IconButton>
-                </Tooltip>
-              )}
-              {section.heuristic &&
-                section.heuristic.attack &&
-                Array.isArray(section.heuristic.attack) &&
-                section.heuristic.attack.length > 0 && (
-                  <Tooltip title={t('show_attack')} placement="top">
-                    <IconButton size="small" onClick={handleShowAttack} color={showAttack ? 'default' : 'inherit'}>
-                      {/* <FontDownloadOutlinedIcon /> */}
-                      <span
-                        style={{
-                          display: 'inline-flex',
-                          width: '24px',
-                          height: '24px',
-                          justifyContent: 'center',
-                          alignItems: 'center'
-                        }}
-                      >
-                        {'[&]'}
-                      </span>
+            {!printable && (
+              <div style={{ color: theme.palette.text.disabled, whiteSpace: 'nowrap' }} onClick={stopPropagation}>
+                {section.heuristic && (
+                  <Tooltip title={t('show_heur')} placement="top">
+                    <IconButton size="small" onClick={handleShowHeur} color={showHeur ? 'default' : 'inherit'}>
+                      <SimCardOutlinedIcon />
                     </IconButton>
                   </Tooltip>
                 )}
-            </div>
+                {Array.isArray(section.tags) && section.tags.length > 0 && (
+                  <Tooltip title={t('show_tags')} placement="top">
+                    <IconButton size="small" onClick={handleShowTags} color={showTags ? 'default' : 'inherit'}>
+                      <LabelOutlinedIcon />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                {section.heuristic &&
+                  section.heuristic.attack &&
+                  Array.isArray(section.heuristic.attack) &&
+                  section.heuristic.attack.length > 0 && (
+                    <Tooltip title={t('show_attack')} placement="top">
+                      <IconButton size="small" onClick={handleShowAttack} color={showAttack ? 'default' : 'inherit'}>
+                        {/* <FontDownloadOutlinedIcon /> */}
+                        <span
+                          style={{
+                            display: 'inline-flex',
+                            width: '24px',
+                            height: '24px',
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                          }}
+                        >
+                          {'[&]'}
+                        </span>
+                      </IconButton>
+                    </Tooltip>
+                  )}
+              </div>
+            )}
           </Box>
-          <Collapse in={open} timeout="auto">
+          <Collapse in={open || printable} timeout="auto">
             {useMemo(
               () => (
                 <>
-                  <div style={{ marginLeft: '1rem', marginBottom: '0.75rem' }}>
+                  <div style={{ marginLeft: printable ? '2rem' : '1rem', marginBottom: '0.75rem' }}>
                     <div style={{ cursor: 'context-menu' }} onContextMenu={handleMenuClick}>
                       {(() => {
                         switch (section.body_format) {
@@ -738,82 +802,88 @@ const ResultSection: React.FC<ResultSectionProps> = ({
                           case 'URL':
                             return <URLBody body={section.body} />;
                           case 'JSON':
-                            return <JSONBody body={section.body} />;
+                            return <JSONBody body={section.body} printable={printable} />;
                           case 'KEY_VALUE':
                             return <KVBody body={section.body} />;
                           case 'PROCESS_TREE':
                             return <ProcessTreeBody body={section.body} />;
                           case 'TABLE':
-                            return <TblBody body={section.body} />;
+                            return <TblBody body={section.body} printable={printable} />;
                           case 'IMAGE':
-                            return <ImageBody body={section.body} />;
+                            return <ImageBody body={section.body} printable={printable} />;
                           default:
                             return <div style={{ margin: '2rem' }}>INVALID SECTION TYPE</div>;
                         }
                       })()}
                     </div>
 
-                    <Collapse in={showHeur} timeout="auto">
-                      {section.heuristic && (
-                        <Heuristic
-                          text={section.heuristic.name}
-                          score={section.heuristic.score}
-                          show_type
-                          highlight_key={getKey('heuristic', section.heuristic.heur_id)}
+                    {!printable && (
+                      <>
+                        <Collapse in={showHeur} timeout="auto">
+                          {section.heuristic && (
+                            <Heuristic
+                              text={section.heuristic.name}
+                              score={section.heuristic.score}
+                              show_type
+                              highlight_key={getKey('heuristic', section.heuristic.heur_id)}
+                            />
+                          )}
+                          {section.heuristic &&
+                            section.heuristic.signature.map((signature, idx) => (
+                              <Heuristic
+                                key={idx}
+                                text={signature.name}
+                                score={section.heuristic.score}
+                                signature
+                                show_type
+                                highlight_key={getKey('heuristic.signature', signature.name)}
+                                safe={signature.safe}
+                              />
+                            ))}
+                        </Collapse>
+                        <Collapse in={showTags} timeout="auto">
+                          {Array.isArray(section.tags) &&
+                            section.tags.map((tag, idx) => (
+                              <Tag
+                                key={idx}
+                                type={tag.type}
+                                value={tag.value}
+                                safelisted={tag.safelisted}
+                                short_type={tag.short_type}
+                                score={section.heuristic ? section.heuristic.score : 0}
+                                highlight_key={getKey(tag.type, tag.value)}
+                              />
+                            ))}
+                        </Collapse>
+                        <Collapse in={showAttack} timeout="auto">
+                          {section.heuristic &&
+                            section.heuristic.attack.map((attack, idx) => (
+                              <Attack
+                                key={idx}
+                                text={attack.pattern}
+                                score={section.heuristic.score}
+                                show_type
+                                highlight_key={getKey('attack_pattern', attack.attack_id)}
+                              />
+                            ))}
+                        </Collapse>
+                      </>
+                    )}
+                  </div>
+                  {!printable && (
+                    <div>
+                      {sub_sections.map(item => (
+                        <ResultSection
+                          key={item.id}
+                          section={section_list[item.id]}
+                          section_list={section_list}
+                          sub_sections={item.children}
+                          indent={indent + 1}
+                          nested
                         />
-                      )}
-                      {section.heuristic &&
-                        section.heuristic.signature.map((signature, idx) => (
-                          <Heuristic
-                            key={idx}
-                            text={signature.name}
-                            score={section.heuristic.score}
-                            signature
-                            show_type
-                            highlight_key={getKey('heuristic.signature', signature.name)}
-                            safe={signature.safe}
-                          />
-                        ))}
-                    </Collapse>
-                    <Collapse in={showTags} timeout="auto">
-                      {Array.isArray(section.tags) &&
-                        section.tags.map((tag, idx) => (
-                          <Tag
-                            key={idx}
-                            type={tag.type}
-                            value={tag.value}
-                            safelisted={tag.safelisted}
-                            short_type={tag.short_type}
-                            score={section.heuristic ? section.heuristic.score : 0}
-                            highlight_key={getKey(tag.type, tag.value)}
-                          />
-                        ))}
-                    </Collapse>
-                    <Collapse in={showAttack} timeout="auto">
-                      {section.heuristic &&
-                        section.heuristic.attack.map((attack, idx) => (
-                          <Attack
-                            key={idx}
-                            text={attack.pattern}
-                            score={section.heuristic.score}
-                            show_type
-                            highlight_key={getKey('attack_pattern', attack.attack_id)}
-                          />
-                        ))}
-                    </Collapse>
-                  </div>
-                  <div>
-                    {sub_sections.map(item => (
-                      <ResultSection
-                        key={item.id}
-                        section_list={section_list}
-                        id={item.id}
-                        sub_sections={item.children}
-                        indent={indent + 1}
-                        nested
-                      />
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </>
               ),
               [
@@ -827,6 +897,7 @@ const ResultSection: React.FC<ResultSectionProps> = ({
                 showTags,
                 showAttack,
                 sub_sections,
+                printable,
                 section_list,
                 indent
               ]
