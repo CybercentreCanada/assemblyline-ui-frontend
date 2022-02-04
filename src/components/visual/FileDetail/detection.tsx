@@ -11,7 +11,6 @@ import { Result } from '../ResultCard';
 import ResultSection, { Section } from '../ResultCard/result_section';
 
 const HEUR_LEVELS = ['malicious' as 'malicious', 'suspicious' as 'suspicious', 'info' as 'info', 'safe' as 'safe'];
-const EMPTY_SUBSECTIONS = [];
 
 const useStyles = makeStyles(theme => ({
   title: {
@@ -146,7 +145,7 @@ const WrappedHeuristic: React.FC<WrappedHeuristicProps> = ({ name, id, sections,
         {sections &&
           sections.map((section, sid) => (
             <div key={sid}>
-              <ResultSection section_list={sections} id={sid} sub_sections={EMPTY_SUBSECTIONS} indent={1} depth={1} />
+              <ResultSection section={sections[sid]} indent={1} depth={1} />
             </div>
           ))}
       </Collapse>
@@ -158,10 +157,11 @@ const Heuristic = React.memo(WrappedHeuristic);
 
 type WrappedDetectionProps = {
   heuristics: { [category: string]: string[][] };
-  results: Result[];
+  results?: Result[];
+  section_map?: { [heur_id: string]: Section[] };
 };
 
-const WrappedDetection: React.FC<WrappedDetectionProps> = ({ heuristics, results }) => {
+const WrappedDetection: React.FC<WrappedDetectionProps> = ({ heuristics, results, section_map = null }) => {
   const { t } = useTranslation(['fileDetail']);
   const [open, setOpen] = React.useState(true);
   const [sectionMap, setSectionMap] = React.useState({});
@@ -175,7 +175,7 @@ const WrappedDetection: React.FC<WrappedDetectionProps> = ({ heuristics, results
       for (const res of results) {
         for (const sec of res.result.sections
           .filter(s => s.heuristic)
-          .sort((a, b) => (a.heuristic.score >= b.heuristic.score ? -1 : 1))) {
+          .sort((a, b) => (a.heuristic.score <= b.heuristic.score ? 1 : -1))) {
           if (!newSectionMap.hasOwnProperty(sec.heuristic.heur_id)) {
             newSectionMap[sec.heuristic.heur_id] = [];
           }
@@ -184,8 +184,13 @@ const WrappedDetection: React.FC<WrappedDetectionProps> = ({ heuristics, results
       }
     }
     setSectionMap(newSectionMap);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [results]);
+
+  useEffect(() => {
+    if (section_map) {
+      setSectionMap(section_map);
+    }
+  }, [section_map]);
 
   return (
     <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
@@ -215,7 +220,7 @@ const WrappedDetection: React.FC<WrappedDetectionProps> = ({ heuristics, results
                   </div>
                 ) : null;
               })
-            : [...Array(3)].map((_, i) => <Skeleton style={{ height: '3rem' }} />)}
+            : [...Array(3)].map((_, i) => <Skeleton key={i} style={{ height: '3rem' }} />)}
         </div>
       </Collapse>
     </div>

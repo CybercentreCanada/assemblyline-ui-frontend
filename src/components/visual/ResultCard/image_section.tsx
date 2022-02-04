@@ -57,7 +57,7 @@ const WrappedImageBody = ({ body, printable = false }) => {
   useEffect(() => {
     if (body != null) {
       setData(
-        JSON.parse(body).map(element => {
+        body.map(element => {
           return {
             name: element.img.name,
             description: element.img.description,
@@ -76,9 +76,9 @@ const WrappedImageBody = ({ body, printable = false }) => {
     openCarousel(index, data);
   };
 
-  return body && Array.isArray(JSON.parse(body)) ? (
+  return body && Array.isArray(body) ? (
     <div className={clsx(printable ? classes.printable : null, classes.imageList)}>
-      {JSON.parse(body).map((element, index) => (
+      {body.map((element, index) => (
         <ImageItem
           key={index}
           src={element.thumb.sha256}

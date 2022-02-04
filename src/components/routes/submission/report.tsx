@@ -21,7 +21,7 @@ import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import Classification from 'components/visual/Classification';
-import PrintableResultSection from 'components/visual/ResultCard/printable_result_section';
+import ResultSection from 'components/visual/ResultCard/result_section';
 import TextVerdict from 'components/visual/TextVerdict';
 import Verdict from 'components/visual/Verdict';
 import VerdictGauge from 'components/visual/VerdictGauge';
@@ -403,7 +403,7 @@ function HeuristicsList({ verdict, items, sections, name_map }) {
                     .map((sec, secidx) => {
                       return (
                         <div key={secidx} style={{ minWidth: '50%' }}>
-                          <PrintableResultSection section={sec} />
+                          <ResultSection section={sec} printable />
                         </div>
                       );
                     })
