@@ -17,10 +17,10 @@ import { useTranslation } from 'react-i18next';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import AttackSection from './FileDetail/attacks';
 import ChildrenSection from './FileDetail/childrens';
+import Detection from './FileDetail/detection';
 import EmptySection from './FileDetail/emptys';
 import ErrorSection from './FileDetail/errors';
 import FrequencySection from './FileDetail/frequency';
-import HeuristicSection from './FileDetail/heuristics';
 import IdentificationSection from './FileDetail/ident';
 import MetadataSection from './FileDetail/metadata';
 import ParentSection from './FileDetail/parents';
@@ -302,37 +302,27 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [file, fileName, resubmit]
       )}
-
       <div style={{ paddingBottom: sp2 }}>
         <IdentificationSection fileinfo={file ? file.file_info : null} />
         <FrequencySection fileinfo={file ? file.file_info : null} />
-
         {(!file || Object.keys(file.metadata).length !== 0) && (
           <MetadataSection metadata={file ? file.metadata : null} />
         )}
-
         {file && file.childrens && file.childrens.length !== 0 && <ChildrenSection childrens={file.childrens} />}
-
         {file && file.parents && file.parents.length !== 0 && <ParentSection parents={file.parents} />}
-
+        {(!file || Object.keys(file.heuristics).length !== 0) && (
+          <Detection results={file ? file.results : null} heuristics={file ? file.heuristics : null} />
+        )}
         {(!file || Object.keys(file.attack_matrix).length !== 0) && (
           <AttackSection attacks={file ? file.attack_matrix : null} />
         )}
-
-        {(!file || Object.keys(file.heuristics).length !== 0) && (
-          <HeuristicSection heuristics={file ? file.heuristics : null} />
-        )}
-
         {(!file || Object.keys(file.tags).length !== 0 || file.signatures.length !== 0) && (
           <TagSection signatures={file ? file.signatures : null} tags={file ? file.tags : null} />
         )}
-
         {(!file || file.results.length !== 0) && (
           <ResultSection results={file ? file.results : null} sid={sid} alternates={file ? file.alternates : null} />
         )}
-
         {(!file || file.emptys.length !== 0) && <EmptySection emptys={file ? file.emptys : null} sid={sid} />}
-
         {file && file.errors.length !== 0 && <ErrorSection errors={file.errors} />}
       </div>
     </div>

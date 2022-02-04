@@ -1,5 +1,6 @@
 import { Button, CircularProgress, makeStyles, Theme, Tooltip } from '@material-ui/core';
 import BrokenImageOutlinedIcon from '@material-ui/icons/BrokenImageOutlined';
+import clsx from 'clsx';
 import useCarousel from 'components/hooks/useCarousel';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { default as React, useEffect, useState } from 'react';
@@ -12,6 +13,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     overflowX: 'auto',
     paddingBottom: theme.spacing(0.5),
     paddingTop: theme.spacing(0.5)
+  },
+  printable: {
+    flexWrap: 'wrap'
   },
   imageBox: {
     display: 'flex',
@@ -38,7 +42,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   }
 }));
 
-const WrappedImageBody = ({ body }) => {
+const WrappedImageBody = ({ body, printable = false }) => {
   const classes = useStyles();
   const { openCarousel } = useCarousel();
   const [data, setData] = useState<
@@ -53,7 +57,7 @@ const WrappedImageBody = ({ body }) => {
   useEffect(() => {
     if (body != null) {
       setData(
-        JSON.parse(body).map(element => {
+        body.map(element => {
           return {
             name: element.img.name,
             description: element.img.description,
@@ -72,9 +76,9 @@ const WrappedImageBody = ({ body }) => {
     openCarousel(index, data);
   };
 
-  return body && Array.isArray(JSON.parse(body)) ? (
-    <div className={classes.imageList}>
-      {JSON.parse(body).map((element, index) => (
+  return body && Array.isArray(body) ? (
+    <div className={clsx(printable ? classes.printable : null, classes.imageList)}>
+      {body.map((element, index) => (
         <ImageItem
           key={index}
           src={element.thumb.sha256}

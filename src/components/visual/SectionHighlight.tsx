@@ -34,7 +34,7 @@ const SectionHighlight: React.FC<SectionHighlightProps> = ({
         backgroundColor: highlighted
           ? theme.palette.type === 'dark'
             ? '#343a44'
-            : '#d8e3ea'
+            : '#e2f2fa'
           : VERDICT_SCORE_MAP[scoreToVerdict(score)],
         minWidth: '0.5rem',
         marginLeft: nested ? `${-1 * indent - 0.5}rem` : `${-1 * indent + -0.5 * (indent - depth)}rem`,

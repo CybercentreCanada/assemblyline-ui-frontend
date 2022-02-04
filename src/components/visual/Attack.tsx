@@ -28,7 +28,7 @@ type AttackProps = {
   fullWidth?: boolean;
 };
 
-const Attack: React.FC<AttackProps> = ({
+const WrappedAttack: React.FC<AttackProps> = ({
   text,
   lvl = null,
   score = null,
@@ -132,4 +132,5 @@ const Attack: React.FC<AttackProps> = ({
   );
 };
 
+const Attack = React.memo(WrappedAttack);
 export default Attack;

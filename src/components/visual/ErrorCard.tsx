@@ -72,10 +72,19 @@ const ErrorCard: React.FC<ErrorCardProps> = ({ error }) => {
           <b>{error.response.service_name}</b>&nbsp;
         </span>
         <span>[{t(`type.${error.type}`)}]&nbsp;</span>
-        <small className={classes.muted}>{` :: ${error.response.service_version}`}</small>
-        <small className={classes.muted} style={{ flexGrow: 1 }}>
-          &nbsp;{error.response.service_tool_version ? `(${error.response.service_tool_version})` : ''}
-        </small>
+        {error.response.service_version !== '0' ? (
+          <>
+            <small className={classes.muted}>{` :: ${error.response.service_version}`}</small>
+            <small className={classes.muted} style={{ flexGrow: 1 }}>
+              &nbsp;
+              {error.response.service_tool_version && error.response.service_tool_version !== '0'
+                ? `(${error.response.service_tool_version})`
+                : ''}
+            </small>
+          </>
+        ) : (
+          <small style={{ flexGrow: 1 }}></small>
+        )}
         <small>
           <Moment className={classes.muted} fromNow>
             {error.created}

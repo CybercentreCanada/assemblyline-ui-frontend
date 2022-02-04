@@ -36,7 +36,7 @@ type HeuristicProps = {
   safe?: boolean;
 };
 
-const Heuristic: React.FC<HeuristicProps> = ({
+const WrappedHeuristic: React.FC<HeuristicProps> = ({
   text,
   lvl = null,
   score = null,
@@ -59,7 +59,7 @@ const Heuristic: React.FC<HeuristicProps> = ({
 
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
 
-  const searchAttack = useCallback(
+  const searchHeuristic = useCallback(
     () => history.push(`/search/result?query=result.sections.heuristic${signature ? '.signature' : ''}.name:"${text}"`),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [signature, text]
@@ -83,9 +83,9 @@ const Heuristic: React.FC<HeuristicProps> = ({
   }, [copy, handleClose, text]);
 
   const handleMenuSearch = useCallback(() => {
-    searchAttack();
+    searchHeuristic();
     handleClose();
-  }, [searchAttack, handleClose]);
+  }, [searchHeuristic, handleClose]);
 
   const handleMenuHighlight = useCallback(() => {
     handleClick();
@@ -169,13 +169,16 @@ const Heuristic: React.FC<HeuristicProps> = ({
         }
       >
         <MenuItem id="clipID" dense onClick={handleMenuCopy}>
-          {CLIPBOARD_ICON}Copy to clipboard
+          {CLIPBOARD_ICON}
+          {t('clipboard')}
         </MenuItem>
         <MenuItem dense onClick={handleMenuSearch}>
-          {SEARCH_ICON}Find instances
+          {SEARCH_ICON}
+          {t('related')}
         </MenuItem>
         <MenuItem dense onClick={handleMenuHighlight}>
-          {HIGHLIGHT_ICON}Toggle Highlight
+          {HIGHLIGHT_ICON}
+          {t('highlight')}
         </MenuItem>
         {signature && (
           <MenuItem dense onClick={handleMenuSafelist}>
@@ -200,4 +203,5 @@ const Heuristic: React.FC<HeuristicProps> = ({
   );
 };
 
+const Heuristic = React.memo(WrappedHeuristic);
 export default Heuristic;

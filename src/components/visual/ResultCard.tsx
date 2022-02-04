@@ -264,18 +264,18 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates = null 
                 {displayedResult.section_hierarchy
                   ? displayedResult.section_hierarchy.map(item => (
                       <ResultSection
-                        key={item.id}
+                        key={`section_${item.id}`}
+                        section={displayedResult.result.sections[item.id]}
                         section_list={displayedResult.result.sections}
-                        id={item.id}
                         sub_sections={item.children}
                         indent={1}
                       />
                     ))
                   : displayedResult.result.sections.map((section, id) => (
                       <ResultSection
-                        key={id}
+                        key={`section_${id}`}
+                        section={displayedResult.result.sections[id]}
                         section_list={displayedResult.result.sections}
-                        id={id}
                         sub_sections={[]}
                         indent={section.depth + 1}
                         depth={section.depth + 1}
