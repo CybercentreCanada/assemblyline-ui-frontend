@@ -368,7 +368,7 @@ function AttackMatrixSkel() {
   );
 }
 
-function HeuristicsList({ verdict, items, sections }) {
+function HeuristicsList({ verdict, items, sections, name_map }) {
   const theme = useTheme();
   const classes = useStyles();
   const classMap = {
@@ -394,16 +394,21 @@ function HeuristicsList({ verdict, items, sections }) {
               flexWrap: 'wrap'
             }}
           >
-            {sections[heur] &&
-              sections[heur]
-                .sort((a, b) => (a.title_text >= b.title_text ? 1 : -1))
-                .map((sec, secidx) => {
-                  return (
-                    <div key={secidx} style={{ minWidth: '50%' }}>
-                      <PrintableResultSection section={sec} />
-                    </div>
-                  );
-                })}
+            {name_map[heur] &&
+              name_map[heur].map(heur_id => {
+                return (
+                  sections[heur_id] &&
+                  sections[heur_id]
+                    .sort((a, b) => (a.title_text >= b.title_text ? 1 : -1))
+                    .map((sec, secidx) => {
+                      return (
+                        <div key={secidx} style={{ minWidth: '50%' }}>
+                          <PrintableResultSection section={sec} />
+                        </div>
+                      );
+                    })
+                );
+              })}
           </div>
         </div>
       ))}
@@ -775,6 +780,7 @@ export default function SubmissionReport() {
                       verdict="safe"
                       items={report.heuristics.safe}
                       sections={report.heuristic_sections}
+                      name_map={report.heuristic_name_map}
                     />
                   )}
                   {Object.keys(report.heuristics.malicious).length !== 0 && (
@@ -782,6 +788,7 @@ export default function SubmissionReport() {
                       verdict="malicious"
                       items={report.heuristics.malicious}
                       sections={report.heuristic_sections}
+                      name_map={report.heuristic_name_map}
                     />
                   )}
                   {Object.keys(report.heuristics.suspicious).length !== 0 && (
@@ -789,6 +796,7 @@ export default function SubmissionReport() {
                       verdict="suspicious"
                       items={report.heuristics.suspicious}
                       sections={report.heuristic_sections}
+                      name_map={report.heuristic_name_map}
                     />
                   )}
                   {Object.keys(report.heuristics.info).length !== 0 && (
@@ -796,6 +804,7 @@ export default function SubmissionReport() {
                       verdict="info"
                       items={report.heuristics.info}
                       sections={report.heuristic_sections}
+                      name_map={report.heuristic_name_map}
                     />
                   )}
                 </>
