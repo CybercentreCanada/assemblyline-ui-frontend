@@ -15,6 +15,7 @@
   "heuristics": "Heuristics",
   "identification": "File Identification",
   "information": "Information",
+  "invalid_section": "We have encountered an unknown result section type. Make sure you are running the latest core containers to see those results.",
   "magic": "Magic",
   "metadata": "Submissions Summary",
   "mime": "Mimetype",

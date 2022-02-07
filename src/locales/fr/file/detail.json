@@ -15,6 +15,7 @@
   "heuristics": "Heuristiques",
   "identification": "Identification du fichier",
   "information": "Information",
+  "invalid_section": "Nous avons rencontré un type de section de résultat inconnu. Assurez-vous que vous exécutez la dernière version des conteneurs principaux pour voir ces résultats.",
   "magic": "Magic",
   "metadata": "Résumé des soumissions",
   "mime": "MIME",
