@@ -1,4 +1,4 @@
-import { default as React } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { GraphBody } from './graph_body';
 import { ImageBody } from './image_body';
@@ -12,9 +12,10 @@ import { URLBody } from './url_body';
 
 const WrappedMultiBody = ({ body, printable = false }) => {
   const { t } = useTranslation(['fileDetail']);
-  return body
-    ? body.map((part, idx) => (
-        <div key={idx} style={{ paddingBottom: '8px' }}>
+  return body ? (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      {body.map((part, idx) => (
+        <div key={idx}>
           {(() => {
             switch (part[0]) {
               case 'TEXT':
@@ -42,8 +43,9 @@ const WrappedMultiBody = ({ body, printable = false }) => {
             }
           })()}
         </div>
-      ))
-    : null;
+      ))}
+    </div>
+  ) : null;
 };
 
 export const MultiBody = React.memo(WrappedMultiBody);
