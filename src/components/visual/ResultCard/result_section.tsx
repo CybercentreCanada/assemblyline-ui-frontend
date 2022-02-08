@@ -1,31 +1,7 @@
-import {
-  Box,
-  Collapse,
-  createStyles,
-  IconButton,
-  Link,
-  makeStyles,
-  Menu,
-  MenuItem,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Theme,
-  Tooltip,
-  useTheme,
-  withStyles
-} from '@material-ui/core';
+import { Box, Collapse, IconButton, makeStyles, Menu, MenuItem, Tooltip, useTheme } from '@material-ui/core';
 import AssignmentOutlinedIcon from '@material-ui/icons/AssignmentOutlined';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import FingerprintOutlinedIcon from '@material-ui/icons/FingerprintOutlined';
 import LabelOutlinedIcon from '@material-ui/icons/LabelOutlined';
 import SimCardOutlinedIcon from '@material-ui/icons/SimCardOutlined';
-import { TreeItem, TreeView } from '@material-ui/lab';
-import clsx from 'clsx';
 import useClipboard from 'commons/components/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
@@ -34,14 +10,21 @@ import Classification from 'components/visual/Classification';
 import Heuristic from 'components/visual/Heuristic';
 import SectionHighlight from 'components/visual/SectionHighlight';
 import Tag from 'components/visual/Tag';
-import TitleKey from 'components/visual/TitleKey';
 import Verdict from 'components/visual/Verdict';
-import { scaleLinear } from 'd3-scale';
-import { scoreToVerdict } from 'helpers/utils';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import ReactJson from 'react-json-view';
-import { ImageBody } from './image_section';
+import { GraphBody } from './graph_body';
+import { ImageBody } from './image_body';
+import { InvalidBody } from './invalid_body';
+import { JSONBody } from './json_body';
+import { KVBody } from './kv_body';
+import { MemDumpBody } from './memdump_body';
+import { MultiBody } from './multi_body';
+import { OrderedKVBody } from './ordered_kv_body';
+import { ProcessTreeBody } from './process_tree_body';
+import { TblBody } from './table_body';
+import { TextBody } from './text_body';
+import { URLBody } from './url_body';
 
 const CLIPBOARD_ICON = <AssignmentOutlinedIcon style={{ marginRight: '16px' }} />;
 const HEURISTIC_ICON = <SimCardOutlinedIcon style={{ marginRight: '16px' }} />;
@@ -74,435 +57,8 @@ const useStyles = makeStyles(theme => ({
   printable_section_title: {
     display: 'flex',
     alignItems: 'center'
-  },
-  memdump: {
-    '@media print': {
-      backgroundColor: '#00000005',
-      border: '1px solid #DDD'
-    },
-    backgroundColor: theme.palette.type === 'dark' ? '#ffffff05' : '#00000005',
-    border: `1px solid ${theme.palette.divider}`,
-    borderRadius: '4px',
-    padding: '4px',
-    whiteSpace: 'pre-wrap',
-    wordBreak: 'break-word',
-    margin: '0.25rem 0'
-  },
-  json: {
-    '@media print': {
-      backgroundColor: '#00000005',
-      border: '1px solid #DDD'
-    },
-    backgroundColor: theme.palette.type === 'dark' ? '#ffffff05' : '#00000005',
-    border: `1px solid ${theme.palette.divider}`,
-    borderRadius: '4px',
-    padding: '4px',
-    whiteSpace: 'pre-wrap',
-    wordBreak: 'break-word',
-    margin: '0.25rem 0'
   }
 }));
-
-const useTreeItemStyles = makeStyles((theme: Theme) => ({
-  root: {
-    '&:hover > .MuiTreeItem-content': {
-      backgroundColor: 'transparent'
-    },
-    '&:focus > .MuiTreeItem-content, &$root.Mui-selected > .MuiTreeItem-content': {
-      backgroundColor: 'transparent'
-    },
-    '&:focus > .MuiTreeItem-content .MuiTreeItem-label, &:hover > .MuiTreeItem-content .MuiTreeItem-label, &$root.Mui-selected > .MuiTreeItem-content .MuiTreeItem-label':
-      {
-        backgroundColor: 'transparent'
-      }
-  },
-  treeItem: {
-    '@media print': {
-      border: '1px solid #DDD'
-    },
-    [theme.breakpoints.up('md')]: {
-      width: '40rem'
-    },
-    [theme.breakpoints.up('lg')]: {
-      width: '50rem'
-    },
-    border: `1px solid ${theme.palette.divider}`,
-    margin: '0.2em 0em',
-    borderRadius: '4px',
-    display: 'flex',
-    maxWidth: '50rem',
-    minWidth: '30rem'
-  },
-  pid: {
-    '@media print': {
-      backgroundColor: '#00000010'
-    },
-    padding: '5px',
-    backgroundColor: theme.palette.type === 'dark' ? '#FFFFFF10' : '#00000010',
-    borderRadius: '4px 0px 0px 4px'
-  },
-  signature: {
-    '@media print': {
-      color: 'black'
-    },
-    alignSelf: 'center',
-    color: theme.palette.text.secondary
-  },
-  suspicious: {
-    '@media print': {
-      backgroundColor: '#ffedd4'
-    },
-    backgroundColor: theme.palette.type === 'dark' ? '#654312' : '#ffedd4'
-  },
-  malicious: {
-    '@media print': {
-      backgroundColor: '#ffd0d0'
-    },
-    backgroundColor: theme.palette.type === 'dark' ? '#4e2525' : '#ffd0d0'
-  }
-}));
-
-const TextBody = ({ body }) => <div style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{body}</div>;
-
-const MemDumpBody = ({ body }) => {
-  const classes = useStyles();
-  return <pre className={classes.memdump}>{body}</pre>;
-};
-
-const KVBody = ({ body }) => (
-  <table cellSpacing={0}>
-    <tbody>
-      {Object.keys(body).map((key, id) => {
-        let value = body[key];
-        if (value instanceof Array) {
-          value = value.join(' | ');
-        } else if (value === true) {
-          value = 'true';
-        } else if (value === false) {
-          value = 'false';
-        } else if (typeof value === 'object') {
-          value = JSON.stringify(value);
-        }
-        return (
-          <tr key={id}>
-            <td style={{ paddingRight: '16px', wordBreak: 'normal' }}>
-              <TitleKey title={key} />
-            </td>
-            <td style={{ wordBreak: 'break-word' }}>{value}</td>
-          </tr>
-        );
-      })}
-    </tbody>
-  </table>
-);
-
-const GraphBody = ({ body }) => {
-  const theme = useTheme();
-  if (body.type === 'colormap') {
-    const colorRange = ['#87c6fb', '#111920'];
-    const itemWidthPct = 100 / body.data.values.length;
-    const colorScale = scaleLinear().domain(body.data.domain).range(colorRange);
-    return (
-      <svg width="100%" height="70">
-        <rect y={10} x={0} width={15} height={15} fill={colorRange[0]} />
-        <text y={22} x={20} fill={theme.palette.text.primary}>{`: ${body.data.domain[0]}`}</text>
-        <rect y={10} x={80} width={15} height={15} fill={colorRange[1]} />
-        <text y={22} x={100} fill={theme.palette.text.primary}>{`: ${body.data.domain[1]}`}</text>
-        {body.data.values.map((value, i) => (
-          <rect
-            key={i}
-            y={30}
-            x={`${i * itemWidthPct}%`}
-            width={`${itemWidthPct}%`}
-            height={40}
-            stroke={colorScale(value)}
-            fill={colorScale(value)}
-          />
-        ))}
-      </svg>
-    );
-  }
-  return <div style={{ margin: '2rem' }}>Unsupported graph...</div>;
-};
-
-const URLBody = ({ body }) => {
-  const arr = [];
-  if (!(body instanceof Array)) {
-    arr.push(body);
-  } else {
-    Array.prototype.push.apply(arr, body);
-  }
-
-  return (
-    <ul
-      style={{
-        listStyleType: 'none',
-        paddingInlineStart: 0,
-        marginBlockStart: '0.25rem',
-        marginBlockEnd: '0.25rem'
-      }}
-    >
-      {arr.map((item, id) => (
-        <li key={id}>
-          <Link href={item.url}>{item.name ? item.name : item.url}</Link>
-        </li>
-      ))}
-    </ul>
-  );
-};
-
-const JSONBody = ({ body, printable }) => {
-  const classes = useStyles();
-  const theme = useTheme();
-
-  if (printable) {
-    const pprint = JSON.stringify(body, undefined, 2);
-    return (
-      <pre id="json" className={classes.json}>
-        <code>{pprint}</code>
-      </pre>
-    );
-  } else {
-    const jsonTheme = {
-      base00: 'transparent', // Background
-      base01: '#f1f1f1', // Edit key text
-      base02: theme.palette.type === 'dark' ? theme.palette.text.hint : theme.palette.divider, // Borders and DataType Background
-      base03: '#444', // Unused
-      base04: theme.palette.grey[theme.palette.type === 'dark' ? 700 : 400], // Object size and Add key border
-      base05: theme.palette.grey[theme.palette.type === 'dark' ? 700 : 700], // Undefined and Add key background
-      base06: '#444', // Unused
-      base07: theme.palette.text.primary, // Brace, Key and Borders
-      base08: theme.palette.text.secondary, // NaN
-      base09: theme.palette.type === 'dark' ? theme.palette.warning.light : theme.palette.warning.dark, // Strings and Icons
-      base0A: '#333', // Null, Regex and edit color
-      base0B: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark, // Float
-      base0C: theme.palette.type === 'dark' ? theme.palette.secondary.light : theme.palette.secondary.dark, // Array Key
-      base0D: theme.palette.type === 'dark' ? theme.palette.info.light : theme.palette.info.dark, // Date, function, expand icon
-      base0E: theme.palette.type === 'dark' ? theme.palette.info.light : theme.palette.info.dark, // Boolean
-      base0F: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark // Integer
-    };
-
-    return (
-      <ReactJson
-        name={false}
-        src={body}
-        theme={jsonTheme}
-        enableClipboard={false}
-        collapsed
-        groupArraysAfterLength={10}
-        displayDataTypes={false}
-        displayObjectSize={false}
-        style={{
-          backgroundColor: theme.palette.type === 'dark' ? '#FFFFFF05' : '#00000005',
-          border: `1px solid ${theme.palette.divider}`,
-          borderRadius: '4px',
-          padding: '4px'
-        }}
-      />
-    );
-  }
-};
-
-const ProcessTreeItem = ({ process }) => {
-  const { t } = useTranslation(['fileDetail']);
-  const classes = useTreeItemStyles();
-  const classMap = {
-    suspicious: classes.suspicious,
-    highly_suspicious: classes.suspicious,
-    malicious: classes.malicious
-  };
-
-  return (
-    <TreeItem
-      nodeId={process.process_pid.toString()}
-      classes={{
-        root: classes.root
-      }}
-      label={
-        <div
-          className={clsx(
-            classes.treeItem,
-            classMap[
-              scoreToVerdict(
-                Object.keys(process.signatures).reduce((sum, key) => sum + parseFloat(process.signatures[key] || 0), 0)
-              )
-            ]
-          )}
-        >
-          <div className={classes.pid}>{process.process_pid}</div>
-          <div style={{ padding: '5px', flexGrow: 1, wordBreak: 'break-word' }}>
-            <div style={{ paddingBottom: '5px' }}>
-              <b>{process.process_name}</b>
-            </div>
-            <div>
-              <samp>
-                <small>{process.command_line}</small>
-              </samp>
-            </div>
-          </div>
-          <div className={classes.signature}>
-            {Object.keys(process.signatures).length !== 0 && (
-              <div>
-                <Tooltip title={`${t('process_signatures')}: ${Object.keys(process.signatures).join(' | ')}`}>
-                  <span>
-                    {Object.keys(process.signatures).length}x
-                    <FingerprintOutlinedIcon style={{ verticalAlign: 'middle' }} />
-                  </span>
-                </Tooltip>
-              </div>
-            )}
-          </div>
-        </div>
-      }
-    >
-      {process.children.length !== 0 && <ProcessTreeItemList processes={process.children} />}
-    </TreeItem>
-  );
-};
-
-const ProcessTreeItemList = ({ processes }) =>
-  processes.map((process, id) => <ProcessTreeItem key={id} process={process} />);
-
-const ProcessTreeBody = ({ body }) => {
-  try {
-    const expanded = [];
-
-    // Auto-expand first two levels
-    body.forEach(process => {
-      if (process.process_pid !== undefined && process.process_pid !== null) {
-        expanded.push(process.process_pid.toString());
-      }
-      if (process.children !== undefined && process.children !== null && process.children.length !== 0) {
-        process.children.forEach(subprocess => {
-          if (subprocess.process_pid !== undefined && subprocess.process_pid !== null) {
-            expanded.push(subprocess.process_pid.toString());
-          }
-        });
-      }
-    });
-
-    return (
-      <div style={{ overflowX: 'auto' }}>
-        <TreeView
-          defaultExpanded={expanded}
-          defaultCollapseIcon={<ExpandMoreIcon />}
-          defaultExpandIcon={<ChevronRightIcon />}
-        >
-          <ProcessTreeItemList processes={body} />
-        </TreeView>
-      </div>
-    );
-  } catch (ex) {
-    // eslint-disable-next-line no-console
-    console.log('[WARNING] Could not parse ProcessTree body. The section will be skipped...');
-  }
-  return null;
-};
-
-const StyledTableCell = withStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      '@media print': {
-        color: 'black'
-      },
-      fontSize: 'inherit',
-      lineHeight: 'inherit'
-    },
-    head: {
-      '@media print': {
-        color: 'black',
-        backgroundColor: '#DDD !important'
-      },
-      backgroundColor: theme.palette.type === 'dark' ? '#404040' : '#EEE'
-    },
-    body: {
-      [theme.breakpoints.up('md')]: {
-        wordBreak: 'break-word'
-      }
-    }
-  })
-)(TableCell);
-
-const StyledTableRow = withStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      '&:nth-of-type(odd)': {
-        '@media print': {
-          backgroundColor: '#EEE !important'
-        },
-        backgroundColor: theme.palette.type === 'dark' ? '#ffffff08' : '#00000008'
-      }
-    }
-  })
-)(TableRow);
-
-const StyledTable = withStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      [theme.breakpoints.down('sm')]: {
-        '@media print': {
-          width: '100%'
-        },
-        width: 'max-content'
-      }
-    }
-  })
-)(Table);
-
-const TblBody = ({ body, printable }) => {
-  const headers = [];
-
-  if (body) {
-    for (const line of body) {
-      // eslint-disable-next-line guard-for-in
-      for (const th in line) {
-        const val = line[th];
-        if (val !== null && val !== '') {
-          if (!headers.includes(th)) {
-            headers.push(th);
-          }
-        }
-      }
-    }
-  }
-
-  return (
-    body && (
-      <TableContainer style={{ fontSize: '90%', maxHeight: printable ? null : '500px' }}>
-        <StyledTable stickyHeader size="small">
-          <TableHead>
-            <TableRow>
-              {headers.map((th, id) => (
-                <StyledTableCell key={id}>
-                  <TitleKey title={th} />
-                </StyledTableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {body.map((row, id) => (
-              <StyledTableRow key={id}>
-                {headers.map((key, hid) => {
-                  let value = row[key];
-                  if (value instanceof Array) {
-                    value = value.join(' | ');
-                  } else if (value === true) {
-                    value = 'true';
-                  } else if (value === false) {
-                    value = 'false';
-                  } else if (typeof value === 'object' && value !== null && value !== undefined) {
-                    value = <KVBody body={value} />;
-                  }
-                  return <StyledTableCell key={hid}>{value}</StyledTableCell>;
-                })}
-              </StyledTableRow>
-            ))}
-          </TableBody>
-        </StyledTable>
-      </TableContainer>
-    )
-  );
-};
 
 export type SectionItem = {
   children: SectionItem[];
@@ -805,14 +361,18 @@ const ResultSection: React.FC<ResultSectionProps> = ({
                             return <JSONBody body={section.body} printable={printable} />;
                           case 'KEY_VALUE':
                             return <KVBody body={section.body} />;
+                          case 'ORDERED_KEY_VALUE':
+                            return <OrderedKVBody body={section.body} />;
                           case 'PROCESS_TREE':
                             return <ProcessTreeBody body={section.body} />;
                           case 'TABLE':
                             return <TblBody body={section.body} printable={printable} />;
                           case 'IMAGE':
                             return <ImageBody body={section.body} printable={printable} />;
+                          case 'MULTI':
+                            return <MultiBody body={section.body} printable={printable} />;
                           default:
-                            return <div style={{ margin: '2rem' }}>INVALID SECTION TYPE</div>;
+                            return <InvalidBody />;
                         }
                       })()}
                     </div>
@@ -887,6 +447,7 @@ const ResultSection: React.FC<ResultSectionProps> = ({
                 </>
               ),
               [
+                printable,
                 handleMenuClick,
                 showHeur,
                 section.heuristic,
@@ -897,7 +458,6 @@ const ResultSection: React.FC<ResultSectionProps> = ({
                 showTags,
                 showAttack,
                 sub_sections,
-                printable,
                 section_list,
                 indent
               ]
