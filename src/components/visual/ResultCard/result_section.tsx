@@ -20,6 +20,7 @@ import { JSONBody } from './json_body';
 import { KVBody } from './kv_body';
 import { MemDumpBody } from './memdump_body';
 import { MultiBody } from './multi_body';
+import { OrderedKVBody } from './ordered_kv_body';
 import { ProcessTreeBody } from './process_tree_body';
 import { TblBody } from './table_body';
 import { TextBody } from './text_body';
@@ -360,6 +361,8 @@ const ResultSection: React.FC<ResultSectionProps> = ({
                             return <JSONBody body={section.body} printable={printable} />;
                           case 'KEY_VALUE':
                             return <KVBody body={section.body} />;
+                          case 'ORDERED_KEY_VALUE':
+                            return <OrderedKVBody body={section.body} />;
                           case 'PROCESS_TREE':
                             return <ProcessTreeBody body={section.body} />;
                           case 'TABLE':
