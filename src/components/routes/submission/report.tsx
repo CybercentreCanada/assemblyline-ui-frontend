@@ -402,7 +402,7 @@ function HeuristicsList({ verdict, items, sections, name_map }) {
                     .sort((a, b) => (a.title_text >= b.title_text ? 1 : -1))
                     .map((sec, secidx) => {
                       return (
-                        <div key={secidx} style={{ minWidth: '50%' }}>
+                        <div key={secidx} style={{ minWidth: '50%', flexGrow: 1 }}>
                           <ResultSection section={sec} printable />
                         </div>
                       );
