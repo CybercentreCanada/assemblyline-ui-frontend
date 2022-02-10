@@ -5,6 +5,16 @@ export function bytesToSize(bytes: number | null) {
   return `${Math.round(bytes / Math.pow(1024, i))} ${sizes[i]}`;
 }
 
+export function resetFavicon() {
+  const favicon: HTMLLinkElement = document.querySelector('#favicon');
+  favicon.href = `${process.env.PUBLIC_URL}/favicon.ico`;
+}
+
+export function setNotifyFavicon() {
+  const favicon: HTMLLinkElement = document.querySelector('#favicon');
+  favicon.href = `${process.env.PUBLIC_URL}/favicon_done.ico`;
+}
+
 export function scoreToVerdict(score: number | null) {
   // More then 1000 => Malicious
   if (score >= 1000) {

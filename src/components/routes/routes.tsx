@@ -44,6 +44,7 @@ import Submissions from 'components/routes/submissions';
 import Submit from 'components/routes/submit';
 import Tos from 'components/routes/tos';
 import User from 'components/routes/user';
+import { resetFavicon } from 'helpers/utils';
 import React, { useEffect, useState } from 'react';
 import { matchPath, Redirect, Route, Switch, useLocation } from 'react-router-dom';
 
@@ -62,6 +63,7 @@ function RouteActions() {
     if (id === null || id === undefined || id === oldID) {
       window.scrollTo(0, 0);
       setOldID(id);
+      resetFavicon();
     }
 
     // Patch window title
