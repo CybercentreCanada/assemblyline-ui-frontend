@@ -29,6 +29,7 @@ import FileDetail from 'components/visual/FileDetail';
 import Detection from 'components/visual/FileDetail/detection';
 import VerdictBar from 'components/visual/VerdictBar';
 import { getErrorIDFromKey, getServiceFromKey } from 'helpers/errors';
+import { setNotifyFavicon } from 'helpers/utils';
 import getXSRFCookie from 'helpers/xsrf';
 import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -519,6 +520,7 @@ export default function SubmissionDetail() {
   useEffect(() => {
     if (submission) {
       if (submission.state === 'completed') {
+        if (socket) setNotifyFavicon();
         resetLiveMode();
         apiCall({
           url: `/api/v4/submission/summary/${id}/`,
