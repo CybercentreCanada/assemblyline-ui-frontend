@@ -56,7 +56,7 @@
   "queues.ingest": "Ingest",
   "queues.processing": "Service processing messages",
   "queues.result": "Results",
-  "queues.svc_result": "Service result messages",
+  "queues.svc_result": "Service results",
   "queues.save": "Submissions finalizing",
   "queues.submission": "Submissions",
   "queues.wait": "Submissions waiting to start",

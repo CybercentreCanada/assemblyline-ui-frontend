@@ -56,7 +56,7 @@
   "queues.ingest": "Ingestion",
   "queues.processing": "Messages de traitement de service",
   "queues.result": "Résultats",
-  "queues.svc_result": "Messages de résultat de service",
+  "queues.svc_result": "Résultats de service",
   "queues.save": "Soumissions en cours de finalisation",
   "queues.start": "Début de soumissions",
   "queues.submission": "Soumissions",
