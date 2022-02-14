@@ -302,8 +302,8 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
   useEffect(() => {
     if (dispatcher.initialized && dispatcher.queues.ingest >= dispatcher.inflight.max / 10) {
       setError(t('dispatcher.error.queue.ingest'));
-    } else if (dispatcher.initialized && dispatcher.queues.files >= dispatcher.inflight.max / 10) {
-      setError(t('dispatcher.error.queue.files'));
+    } else if (dispatcher.initialized && dispatcher.metrics.save_queue >= dispatcher.inflight.max / 10) {
+      setError(t('dispatcher.error.queue.save'));
     } else if (dispatcher.initialized && startQueue >= dispatcher.inflight.max / 10) {
       setError(t('dispatcher.error.queue.start'));
     } else if (dispatcher.initialized && resultQueue >= dispatcher.inflight.max / 10) {
@@ -355,7 +355,7 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
             </div>
           )}
         </Grid>
-        <Grid item xs={12} sm={4} md={3}>
+        <Grid item xs={12} sm={3} md={2}>
           <div>
             <label>{t('submissions')}</label>
           </div>
@@ -372,7 +372,7 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
             />
           </div>
         </Grid>
-        <Grid item xs={12} sm={5} md={3}>
+        <Grid item xs={12} sm={6} md={4}>
           <div>
             <label>{t('queues')}</label>
           </div>
@@ -380,25 +380,31 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
             <MetricCounter
               init={dispatcher.initialized}
               value={dispatcher.queues.ingest}
-              title="I"
-              tooltip={t('queues.ingest')}
+              title="W"
+              tooltip={t('queues.wait')}
             />
-            {dispatcher.queues.start.length === 0 &&
-              dispatcher.queues.result.length === 0 &&
-              dispatcher.queues.command.length === 0 && (
-                <MetricCounter
-                  init={dispatcher.initialized}
-                  value={dispatcher.queues.files}
-                  title="F"
-                  tooltip={t('queues.file')}
-                />
-              )}
             {dispatcher.queues.start.length > 0 && (
-              <MetricCounter init={dispatcher.initialized} value={startQueue} title="S" tooltip={t('queues.start')} />
+              <MetricCounter
+                init={dispatcher.initialized}
+                value={startQueue}
+                title="P"
+                tooltip={t('queues.processing')}
+              />
             )}
             {dispatcher.queues.result.length > 0 && (
-              <MetricCounter init={dispatcher.initialized} value={resultQueue} title="R" tooltip={t('queues.result')} />
+              <MetricCounter
+                init={dispatcher.initialized}
+                value={resultQueue}
+                title="R"
+                tooltip={t('queues.svc_result')}
+              />
             )}
+            <MetricCounter
+              init={dispatcher.initialized}
+              value={dispatcher.metrics.save_queue}
+              title="S"
+              tooltip={t('queues.save')}
+            />
             {dispatcher.queues.command.length > 0 && (
               <MetricCounter
                 init={dispatcher.initialized}
