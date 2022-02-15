@@ -26,8 +26,10 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDetail from 'components/visual/FileDetail';
+import Detection from 'components/visual/FileDetail/detection';
 import VerdictBar from 'components/visual/VerdictBar';
 import { getErrorIDFromKey, getServiceFromKey } from 'helpers/errors';
+import { setNotifyFavicon } from 'helpers/utils';
 import getXSRFCookie from 'helpers/xsrf';
 import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -36,7 +38,6 @@ import io from 'socket.io-client';
 import AttackSection from './detail/attack';
 import ErrorSection from './detail/errors';
 import FileTreeSection from './detail/file_tree';
-import HeuristicSection from './detail/heuristics';
 import InfoSection from './detail/info';
 import MetaSection from './detail/meta';
 import TagSection from './detail/tags';
@@ -519,6 +520,7 @@ export default function SubmissionDetail() {
   useEffect(() => {
     if (submission) {
       if (submission.state === 'completed') {
+        if (socket) setNotifyFavicon();
         resetLiveMode();
         apiCall({
           url: `/api/v4/submission/summary/${id}/`,
@@ -975,12 +977,15 @@ export default function SubmissionDetail() {
           <MetaSection metadata={submission ? submission.metadata : null} />
         )}
 
-        {(!summary || Object.keys(summary.attack_matrix).length !== 0) && (
-          <AttackSection attack_matrix={summary ? summary.attack_matrix : null} />
+        {(!summary || Object.keys(summary.heuristics).length !== 0) && (
+          <Detection
+            section_map={summary ? summary.heuristic_sections : null}
+            heuristics={summary ? summary.heuristics : null}
+          />
         )}
 
-        {(!summary || Object.keys(summary.heuristics).length !== 0) && (
-          <HeuristicSection heuristics={summary ? summary.heuristics : null} />
+        {(!summary || Object.keys(summary.attack_matrix).length !== 0) && (
+          <AttackSection attack_matrix={summary ? summary.attack_matrix : null} />
         )}
 
         {summary &&

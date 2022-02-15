@@ -31,6 +31,19 @@ export interface CustomChipProps {
   mono?: boolean;
   wrap?: boolean;
   tooltip?: string;
+  tooltipPlacement?:
+    | 'bottom-end'
+    | 'bottom-start'
+    | 'bottom'
+    | 'left-end'
+    | 'left-start'
+    | 'left'
+    | 'right-end'
+    | 'right-start'
+    | 'right'
+    | 'top-end'
+    | 'top-start'
+    | 'top';
   fullWidth?: boolean;
   children?: ReactNode;
   [propName: string]: any;
@@ -150,6 +163,7 @@ const WrappedCustomChip: React.FC<CustomChipProps> = ({
   wrap = false,
   tooltip = null,
   fullWidth = false,
+  tooltipPlacement = 'bottom',
   children,
   ...otherProps
 }) => {
@@ -218,7 +232,13 @@ const WrappedCustomChip: React.FC<CustomChipProps> = ({
   );
 
   // Do we have a tooltip?
-  return tooltip ? <Tooltip title={tooltip}>{chip}</Tooltip> : chip;
+  return tooltip ? (
+    <Tooltip title={tooltip} placement={tooltipPlacement}>
+      {chip}
+    </Tooltip>
+  ) : (
+    chip
+  );
 };
 
 const CustomChip = React.memo(WrappedCustomChip);

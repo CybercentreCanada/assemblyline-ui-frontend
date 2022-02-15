@@ -38,7 +38,7 @@ type TagProps = {
   fullWidth?: boolean;
 };
 
-const Tag: React.FC<TagProps> = ({
+const WrappedTag: React.FC<TagProps> = ({
   type,
   value,
   lvl = null,
@@ -214,4 +214,5 @@ const Tag: React.FC<TagProps> = ({
   );
 };
 
+const Tag = React.memo(WrappedTag);
 export default Tag;

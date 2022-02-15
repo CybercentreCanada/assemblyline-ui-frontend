@@ -21,6 +21,7 @@ import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import Classification from 'components/visual/Classification';
+import ResultSection from 'components/visual/ResultCard/result_section';
 import TextVerdict from 'components/visual/TextVerdict';
 import Verdict from 'components/visual/Verdict';
 import VerdictGauge from 'components/visual/VerdictGauge';
@@ -83,7 +84,6 @@ const useStyles = makeStyles(theme => ({
     }
   },
   malicious_heur: {
-    textTransform: 'capitalize',
     fontWeight: 700,
     padding: '5px',
     WebkitPrintColorAdjust: 'exact',
@@ -91,7 +91,6 @@ const useStyles = makeStyles(theme => ({
     borderBottom: '1px solid #d9534f !important'
   },
   suspicious_heur: {
-    textTransform: 'capitalize',
     fontWeight: 700,
     padding: '5px',
     WebkitPrintColorAdjust: 'exact',
@@ -99,7 +98,6 @@ const useStyles = makeStyles(theme => ({
     borderBottom: '1px solid #f0ad4e !important'
   },
   info_heur: {
-    textTransform: 'capitalize',
     fontWeight: 700,
     padding: '5px',
     WebkitPrintColorAdjust: 'exact',
@@ -107,7 +105,6 @@ const useStyles = makeStyles(theme => ({
     borderBottom: '1px solid #aaa !important'
   },
   safe_heur: {
-    textTransform: 'capitalize',
     fontWeight: 700,
     padding: '5px',
     WebkitPrintColorAdjust: 'exact',
@@ -119,8 +116,6 @@ const useStyles = makeStyles(theme => ({
 function AttributionBanner({ report }) {
   const { t } = useTranslation(['submissionReport']);
   const theme = useTheme();
-  const sp2 = theme.spacing(2);
-  const sp1 = theme.spacing(1);
   const classes = useStyles();
   const score = report ? report.max_score : 0;
 
@@ -169,9 +164,9 @@ function AttributionBanner({ report }) {
   return (
     <div
       style={{
-        marginBottom: sp2,
-        marginTop: sp2,
-        padding: sp1,
+        marginBottom: theme.spacing(2),
+        marginTop: theme.spacing(2),
+        padding: theme.spacing(1),
         backgroundColor: bgColor,
         border: `solid 1px ${textColor}`,
         borderRadius: '4px'
@@ -196,7 +191,7 @@ function AttributionBanner({ report }) {
                       <td style={{ whiteSpace: 'nowrap', fontStyle: 'italic', verticalAlign: 'top' }}>
                         {`${t('implant')}: `}
                       </td>
-                      <td style={{ fontWeight: 500, paddingLeft: sp1 }}>
+                      <td style={{ fontWeight: 500, paddingLeft: theme.spacing(1) }}>
                         {Object.keys(report.tags.attributions['attribution.implant']).join(' | ')}
                       </td>
                     </>
@@ -214,7 +209,7 @@ function AttributionBanner({ report }) {
                       <td style={{ whiteSpace: 'nowrap', fontStyle: 'italic', verticalAlign: 'top' }}>
                         {`${t('family')}: `}
                       </td>
-                      <td style={{ fontWeight: 500, paddingLeft: sp1 }}>
+                      <td style={{ fontWeight: 500, paddingLeft: theme.spacing(1) }}>
                         {Object.keys(report.tags.attributions['attribution.family']).join(' | ')}
                       </td>
                     </>
@@ -232,7 +227,7 @@ function AttributionBanner({ report }) {
                       <td style={{ whiteSpace: 'nowrap', fontStyle: 'italic', verticalAlign: 'top' }}>
                         {`${t('actor')}: `}
                       </td>
-                      <td style={{ fontWeight: 500, paddingLeft: sp1 }}>
+                      <td style={{ fontWeight: 500, paddingLeft: theme.spacing(1) }}>
                         {Object.keys(report.tags.attributions['attribution.actor']).join(' | ')}
                       </td>
                     </>
@@ -246,7 +241,7 @@ function AttributionBanner({ report }) {
             </tbody>
           </table>
         </Grid>
-        <Grid item xs style={{ color: textColor, paddingLeft: sp1, paddingRight: sp1 }}>
+        <Grid item xs style={{ color: textColor, paddingLeft: theme.spacing(1), paddingRight: theme.spacing(1) }}>
           {report ? (
             <VerdictGauge verdicts={report.verdict} />
           ) : (
@@ -262,8 +257,6 @@ function TagTable({ group, items }) {
   const { t } = useTranslation(['submissionReport']);
   const theme = useTheme();
   const orderedItems = {};
-  const sp2 = theme.spacing(2);
-  const sp1 = theme.spacing(1);
   const classes = useStyles();
 
   Object.keys(items).map(tagType =>
@@ -278,45 +271,48 @@ function TagTable({ group, items }) {
   );
 
   return (
-    <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
+    <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2), pageBreakInside: 'avoid' }}>
       <Typography variant="h6">{t(`tag.${group}`)}</Typography>
       <Divider className={classes.divider} />
       <div
         style={{
-          paddingTop: sp2,
-          paddingBottom: sp2,
-          paddingLeft: sp1,
-          paddingRight: sp1
+          paddingTop: theme.spacing(2),
+          paddingBottom: theme.spacing(2),
+          paddingLeft: theme.spacing(1),
+          paddingRight: theme.spacing(1)
         }}
       >
         <Grid container spacing={1}>
           {Object.keys(orderedItems).map((k, idx) => (
-            <Grid key={idx} style={{ marginBottom: sp2, paddingLeft: sp1, paddingRight: sp1, minWidth: '21rem' }}>
-              <Grid container spacing={1}>
-                <Grid item>
-                  <div style={{ display: 'flex', minWidth: '5rem' }}>
-                    <TextVerdict verdict={orderedItems[k].verdict} mono />
-                    <Tooltip title={orderedItems[k].type}>
-                      <span style={{ fontSize: '110%', flexGrow: 1, textTransform: 'capitalize' }}>
-                        {orderedItems[k].type.split('.').pop().replace('_', ' ')}
-                      </span>
-                    </Tooltip>
+            <Grid
+              key={idx}
+              item
+              style={{
+                marginBottom: theme.spacing(2),
+                paddingLeft: theme.spacing(1),
+                paddingRight: theme.spacing(1),
+                minWidth: '21rem'
+              }}
+            >
+              <div style={{ display: 'flex', gap: '4px' }}>
+                <TextVerdict verdict={orderedItems[k].verdict} mono />
+                <span style={{ fontSize: '110%', fontStyle: 'italic' }}>{t(orderedItems[k].type)}</span>
+              </div>
+
+              <div style={{ marginLeft: theme.spacing(3.5), display: 'flex', flexWrap: 'wrap' }}>
+                {orderedItems[k].values.map((v, vidx) => (
+                  <div
+                    key={vidx}
+                    style={{
+                      minWidth: '21rem',
+                      paddingBottom: '5px',
+                      wordBreak: 'break-word'
+                    }}
+                  >
+                    {v}
                   </div>
-                </Grid>
-                <Grid item>
-                  {orderedItems[k].values.map((v, vidx) => (
-                    <div
-                      key={vidx}
-                      style={{
-                        paddingBottom: '5px',
-                        wordBreak: 'break-word'
-                      }}
-                    >
-                      {v}
-                    </div>
-                  ))}
-                </Grid>
-              </Grid>
+                ))}
+              </div>
             </Grid>
           ))}
         </Grid>
@@ -327,7 +323,6 @@ function TagTable({ group, items }) {
 
 function AttackMatrixBlock({ attack, items }) {
   const theme = useTheme();
-  const sp2 = theme.spacing(2);
   return (
     <div
       style={{
@@ -335,7 +330,7 @@ function AttackMatrixBlock({ attack, items }) {
         width: '100%',
         display: 'inline-block',
         pageBreakInside: 'avoid',
-        paddingBottom: sp2
+        paddingBottom: theme.spacing(2)
       }}
     >
       <span style={{ fontSize: '1rem', textTransform: 'capitalize' }}>{attack.replace(/-/g, ' ')}</span>
@@ -373,12 +368,9 @@ function AttackMatrixSkel() {
   );
 }
 
-function HeuristicsList({ verdict, items }) {
+function HeuristicsList({ verdict, items, sections, name_map }) {
   const theme = useTheme();
-  const { t } = useTranslation();
   const classes = useStyles();
-  const sp2 = theme.spacing(2);
-  const sp1 = theme.spacing(1);
   const classMap = {
     malicious: classes.malicious_heur,
     suspicious: classes.suspicious_heur,
@@ -387,23 +379,40 @@ function HeuristicsList({ verdict, items }) {
   };
 
   return (
-    <div
-      style={{
-        flexGrow: 1,
-        minWidth: '200px'
-      }}
-    >
-      <div className={classMap[verdict]} style={{ marginBottom: sp2, marginTop: sp2, fontSize: '1.2rem' }}>
-        {t(`verdict.${verdict}`)}
-      </div>
-      <div style={{ paddingLeft: sp1, paddingRight: sp1 }}>
-        {Object.keys(items).map((heur, idx) => (
-          <div key={idx} style={{ fontSize: '1rem', verticalAlign: 'middle', paddingBottom: '2px' }}>
+    <>
+      {Object.keys(items).map((heur, idx) => (
+        <div key={idx} style={{ paddingBottom: theme.spacing(0.25), pageBreakInside: 'avoid' }}>
+          <div
+            className={classMap[verdict]}
+            style={{ marginBottom: theme.spacing(2), marginTop: theme.spacing(2), fontSize: '1.2rem' }}
+          >
             {heur}
           </div>
-        ))}
-      </div>
-    </div>
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap'
+            }}
+          >
+            {name_map[heur] &&
+              name_map[heur].map(heur_id => {
+                return (
+                  sections[heur_id] &&
+                  sections[heur_id]
+                    .sort((a, b) => (a.title_text >= b.title_text ? 1 : -1))
+                    .map((sec, secidx) => {
+                      return (
+                        <div key={secidx} style={{ minWidth: '50%', flexGrow: 1 }}>
+                          <ResultSection section={sec} printable />
+                        </div>
+                      );
+                    })
+                );
+              })}
+          </div>
+        </div>
+      ))}
+    </>
   );
 }
 
@@ -500,8 +509,6 @@ export default function SubmissionReport() {
   const theme = useTheme();
   const [report, setReport] = useState(null);
   const { apiCall } = useMyAPI();
-  const sp1 = theme.spacing(1);
-  const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
   const classes = useStyles();
   const { showErrorMessage, showWarningMessage } = useMySnackbar();
@@ -549,7 +556,7 @@ export default function SubmissionReport() {
             <Classification type="text" size="tiny" c12n={report ? report.classification : null} />
           </div>
         )}
-        <div style={{ paddingBottom: sp2 }}>
+        <div style={{ paddingBottom: theme.spacing(2) }}>
           <Grid container alignItems="center">
             <Grid item xs>
               <div>
@@ -585,10 +592,10 @@ export default function SubmissionReport() {
 
         <AttributionBanner report={report} />
 
-        <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+        <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2) }}>
           <Typography variant="h6">{t('general')}</Typography>
           <Divider className={classes.divider} />
-          <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+          <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2) }}>
             <Grid container spacing={1}>
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.name')}</span>
@@ -605,7 +612,7 @@ export default function SubmissionReport() {
               </Grid>
 
               <Grid item xs={12}>
-                <div style={{ height: sp2 }} />
+                <div style={{ height: theme.spacing(2) }} />
               </Grid>
 
               <Grid item xs={4} sm={3} lg={2}>
@@ -647,7 +654,7 @@ export default function SubmissionReport() {
               )}
 
               <Grid item xs={12}>
-                <div style={{ height: sp2 }} />
+                <div style={{ height: theme.spacing(2) }} />
               </Grid>
 
               <Grid item xs={4} sm={3} lg={2}>
@@ -710,7 +717,7 @@ export default function SubmissionReport() {
         </div>
 
         {report && report.report_filtered && (
-          <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+          <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2) }}>
             <Typography variant="subtitle1">
               <b>**{t('warning')}</b>: {t('warning.text')}
             </Typography>
@@ -718,7 +725,7 @@ export default function SubmissionReport() {
         )}
 
         {report && report.report_partial && (
-          <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+          <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2) }}>
             <Typography variant="subtitle1">
               <b>**{t('warning')}</b>: {t('warning.partial')}
             </Typography>
@@ -726,10 +733,10 @@ export default function SubmissionReport() {
         )}
 
         {(!report || Object.keys(report.metadata).length !== 0) && (
-          <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
+          <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2), pageBreakInside: 'avoid' }}>
             <Typography variant="h6">{t('metadata')}</Typography>
             <Divider className={classes.divider} />
-            <table style={{ paddingBottom: sp2, paddingTop: sp2, width: '100%' }}>
+            <table style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2), width: '100%' }}>
               <tbody>
                 {report
                   ? Object.keys(report.metadata).map((meta, i) => (
@@ -737,7 +744,7 @@ export default function SubmissionReport() {
                         <td style={{ width: '20%' }}>
                           <span style={{ fontWeight: 500 }}>{meta}</span>
                         </td>
-                        <td style={{ paddingLeft: sp1, width: '80%', wordBreak: 'break-word' }}>
+                        <td style={{ paddingLeft: theme.spacing(1), width: '80%', wordBreak: 'break-word' }}>
                           {report.metadata[meta]}
                         </td>
                       </tr>
@@ -757,14 +764,65 @@ export default function SubmissionReport() {
           </div>
         )}
 
+        {(!report ||
+          Object.keys(report.heuristics.malicious).length !== 0 ||
+          Object.keys(report.heuristics.suspicious).length !== 0 ||
+          Object.keys(report.heuristics.info).length !== 0 ||
+          (report.heuristics.safe && Object.keys(report.heuristics.safe).length !== 0)) && (
+          <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2) }}>
+            <Typography variant="h6">{t('heuristics')}</Typography>
+            <Divider className={classes.divider} />
+            <div>
+              {report ? (
+                <>
+                  {report.heuristics.safe && Object.keys(report.heuristics.safe).length !== 0 && (
+                    <HeuristicsList
+                      verdict="safe"
+                      items={report.heuristics.safe}
+                      sections={report.heuristic_sections}
+                      name_map={report.heuristic_name_map}
+                    />
+                  )}
+                  {Object.keys(report.heuristics.malicious).length !== 0 && (
+                    <HeuristicsList
+                      verdict="malicious"
+                      items={report.heuristics.malicious}
+                      sections={report.heuristic_sections}
+                      name_map={report.heuristic_name_map}
+                    />
+                  )}
+                  {Object.keys(report.heuristics.suspicious).length !== 0 && (
+                    <HeuristicsList
+                      verdict="suspicious"
+                      items={report.heuristics.suspicious}
+                      sections={report.heuristic_sections}
+                      name_map={report.heuristic_name_map}
+                    />
+                  )}
+                  {Object.keys(report.heuristics.info).length !== 0 && (
+                    <HeuristicsList
+                      verdict="info"
+                      items={report.heuristics.info}
+                      sections={report.heuristic_sections}
+                      name_map={report.heuristic_name_map}
+                    />
+                  )}
+                </>
+              ) : (
+                [...Array(3)].map((_, i) => <HeuristicsListSkel key={i} />)
+              )}
+            </div>
+          </div>
+        )}
+
         {(!report || Object.keys(report.attack_matrix).length !== 0) && (
-          <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
+          <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2), pageBreakInside: 'avoid' }}>
             <Typography variant="h6">{t('attack')}</Typography>
             <Divider className={classes.divider} />
             <div
               style={{
-                paddingTop: sp2,
-                paddingBottom: sp2,
+                paddingTop: theme.spacing(2),
+                paddingBottom: theme.spacing(2),
                 columnWidth: '21rem',
                 columnGap: '1rem'
               }}
@@ -778,42 +836,6 @@ export default function SubmissionReport() {
           </div>
         )}
 
-        {(!report ||
-          Object.keys(report.heuristics.malicious).length !== 0 ||
-          Object.keys(report.heuristics.suspicious).length !== 0 ||
-          Object.keys(report.heuristics.info).length !== 0 ||
-          (report.heuristics.safe && Object.keys(report.heuristics.safe).length !== 0)) && (
-          <div style={{ paddingBottom: sp2, paddingTop: sp2, pageBreakInside: 'avoid' }}>
-            <Typography variant="h6">{t('heuristics')}</Typography>
-            <Divider className={classes.divider} />
-            <div
-              style={{
-                display: 'flex',
-                flexWrap: 'wrap'
-              }}
-            >
-              {report ? (
-                <>
-                  {report.heuristics.safe && Object.keys(report.heuristics.safe).length !== 0 && (
-                    <HeuristicsList verdict="safe" items={report.heuristics.safe} />
-                  )}
-                  {Object.keys(report.heuristics.malicious).length !== 0 && (
-                    <HeuristicsList verdict="malicious" items={report.heuristics.malicious} />
-                  )}
-                  {Object.keys(report.heuristics.suspicious).length !== 0 && (
-                    <HeuristicsList verdict="suspicious" items={report.heuristics.suspicious} />
-                  )}
-                  {Object.keys(report.heuristics.info).length !== 0 && (
-                    <HeuristicsList verdict="info" items={report.heuristics.info} />
-                  )}
-                </>
-              ) : (
-                [...Array(3)].map((_, i) => <HeuristicsListSkel key={i} />)
-              )}
-            </div>
-          </div>
-        )}
-
         {report &&
           Object.keys(report.tags).length !== 0 &&
           Object.keys(report.tags).map((tagGroup, groupIdx) => (
@@ -821,12 +843,12 @@ export default function SubmissionReport() {
           ))}
 
         {(!report || report.important_files.length !== 0) && (
-          <div style={{ paddingTop: sp2, pageBreakInside: 'avoid' }}>
+          <div style={{ paddingTop: theme.spacing(2), pageBreakInside: 'avoid' }}>
             <Typography variant="h6">{t('important_files')}</Typography>
             <Divider className={classes.divider} />
             <div
               style={{
-                paddingTop: sp2
+                paddingTop: theme.spacing(2)
               }}
             >
               {report ? (
