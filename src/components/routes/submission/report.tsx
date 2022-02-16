@@ -775,14 +775,16 @@ export default function SubmissionReport() {
             <div>
               {report ? (
                 <>
-                  {report.heuristics.safe && Object.keys(report.heuristics.safe).length !== 0 && (
-                    <HeuristicsList
-                      verdict="safe"
-                      items={report.heuristics.safe}
-                      sections={report.heuristic_sections}
-                      name_map={report.heuristic_name_map}
-                    />
-                  )}
+                  {report.max_score < 0 &&
+                    report.heuristics.safe &&
+                    Object.keys(report.heuristics.safe).length !== 0 && (
+                      <HeuristicsList
+                        verdict="safe"
+                        items={report.heuristics.safe}
+                        sections={report.heuristic_sections}
+                        name_map={report.heuristic_name_map}
+                      />
+                    )}
                   {Object.keys(report.heuristics.malicious).length !== 0 && (
                     <HeuristicsList
                       verdict="malicious"
