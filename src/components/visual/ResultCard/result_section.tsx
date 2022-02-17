@@ -347,34 +347,35 @@ const ResultSection: React.FC<ResultSectionProps> = ({
                 <>
                   <div style={{ marginLeft: printable ? '2rem' : '1rem', marginBottom: '0.75rem' }}>
                     <div style={{ cursor: 'context-menu' }} onContextMenu={handleMenuClick}>
-                      {(() => {
-                        switch (section.body_format) {
-                          case 'TEXT':
-                            return <TextBody body={section.body} />;
-                          case 'MEMORY_DUMP':
-                            return <MemDumpBody body={section.body} />;
-                          case 'GRAPH_DATA':
-                            return <GraphBody body={section.body} />;
-                          case 'URL':
-                            return <URLBody body={section.body} />;
-                          case 'JSON':
-                            return <JSONBody body={section.body} printable={printable} />;
-                          case 'KEY_VALUE':
-                            return <KVBody body={section.body} />;
-                          case 'ORDERED_KEY_VALUE':
-                            return <OrderedKVBody body={section.body} />;
-                          case 'PROCESS_TREE':
-                            return <ProcessTreeBody body={section.body} />;
-                          case 'TABLE':
-                            return <TblBody body={section.body} printable={printable} />;
-                          case 'IMAGE':
-                            return <ImageBody body={section.body} printable={printable} />;
-                          case 'MULTI':
-                            return <MultiBody body={section.body} printable={printable} />;
-                          default:
-                            return <InvalidBody />;
-                        }
-                      })()}
+                      {section.body &&
+                        (() => {
+                          switch (section.body_format) {
+                            case 'TEXT':
+                              return <TextBody body={section.body} />;
+                            case 'MEMORY_DUMP':
+                              return <MemDumpBody body={section.body} />;
+                            case 'GRAPH_DATA':
+                              return <GraphBody body={section.body} />;
+                            case 'URL':
+                              return <URLBody body={section.body} />;
+                            case 'JSON':
+                              return <JSONBody body={section.body} printable={printable} />;
+                            case 'KEY_VALUE':
+                              return <KVBody body={section.body} />;
+                            case 'ORDERED_KEY_VALUE':
+                              return <OrderedKVBody body={section.body} />;
+                            case 'PROCESS_TREE':
+                              return <ProcessTreeBody body={section.body} />;
+                            case 'TABLE':
+                              return <TblBody body={section.body} printable={printable} />;
+                            case 'IMAGE':
+                              return <ImageBody body={section.body} printable={printable} />;
+                            case 'MULTI':
+                              return <MultiBody body={section.body} printable={printable} />;
+                            default:
+                              return <InvalidBody />;
+                          }
+                        })()}
                     </div>
 
                     {!printable && (
