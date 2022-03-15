@@ -1,13 +1,13 @@
 import {
   Divider,
   Grid,
-  Hidden,
   IconButton,
   makeStyles,
   Tooltip,
   Typography,
   useMediaQuery,
-  useTheme
+  useTheme,
+  withStyles
 } from '@material-ui/core';
 import BugReportOutlinedIcon from '@material-ui/icons/BugReportOutlined';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
@@ -34,6 +34,14 @@ import { Link, useHistory, useParams } from 'react-router-dom';
 type ParamProps = {
   id: string;
 };
+
+const NoPrintTooltip = withStyles(() => ({
+  tooltip: {
+    '@media print': {
+      display: 'none !important'
+    }
+  }
+}))(Tooltip);
 
 const useStyles = makeStyles(theme => ({
   avatar: {
@@ -110,6 +118,14 @@ const useStyles = makeStyles(theme => ({
     WebkitPrintColorAdjust: 'exact',
     backgroundColor: '#00f20015 !important',
     borderBottom: '1px solid #81c784 !important'
+  },
+  heur: {
+    paddingBottom: theme.spacing(0.25),
+    pageBreakInside: 'avoid'
+  },
+  section: {
+    paddingBottom: theme.spacing(2),
+    paddingTop: theme.spacing(2)
   }
 }));
 
@@ -118,6 +134,7 @@ function AttributionBanner({ report }) {
   const theme = useTheme();
   const classes = useStyles();
   const score = report ? report.max_score : 0;
+  const isXS = useMediaQuery(theme.breakpoints.only('xs'));
 
   const BANNER_COLOR_MAP = {
     info: {
@@ -173,11 +190,12 @@ function AttributionBanner({ report }) {
       }}
     >
       <Grid container alignItems="center" justifyContent="center">
-        <Hidden smDown>
-          <Grid item xs style={{ color: textColor }}>
-            {icon}
-          </Grid>
-        </Hidden>
+        <Grid className="no-print" item xs style={{ color: textColor, display: isXS ? 'none' : 'inherit' }}>
+          {icon}
+        </Grid>
+        <Grid className="print-only" item xs style={{ color: textColor }}>
+          {icon}
+        </Grid>
         <Grid item xs style={{ flexGrow: 10 }}>
           <div className={classes.banner_title}>
             {report ? <Verdict type="text" size="medium" score={report.max_score} /> : <Skeleton />}
@@ -271,7 +289,7 @@ function TagTable({ group, items }) {
   );
 
   return (
-    <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2), pageBreakInside: 'avoid' }}>
+    <div className={classes.section} style={{ pageBreakInside: 'avoid' }}>
       <Typography variant="h6">{t(`tag.${group}`)}</Typography>
       <Divider className={classes.divider} />
       <div
@@ -287,11 +305,11 @@ function TagTable({ group, items }) {
             <Grid
               key={idx}
               item
+              xs={12}
               style={{
                 marginBottom: theme.spacing(2),
                 paddingLeft: theme.spacing(1),
-                paddingRight: theme.spacing(1),
-                minWidth: '21rem'
+                paddingRight: theme.spacing(1)
               }}
             >
               <div style={{ display: 'flex', gap: '4px' }}>
@@ -304,7 +322,7 @@ function TagTable({ group, items }) {
                   <div
                     key={vidx}
                     style={{
-                      minWidth: '21rem',
+                      minWidth: '18rem',
                       paddingBottom: '5px',
                       wordBreak: 'break-word'
                     }}
@@ -381,10 +399,15 @@ function HeuristicsList({ verdict, items, sections, name_map }) {
   return (
     <>
       {Object.keys(items).map((heur, idx) => (
-        <div key={idx} style={{ paddingBottom: theme.spacing(0.25), pageBreakInside: 'avoid' }}>
+        <div key={idx} className={classes.heur}>
           <div
             className={classMap[verdict]}
-            style={{ marginBottom: theme.spacing(2), marginTop: theme.spacing(2), fontSize: '1.2rem' }}
+            style={{
+              marginBottom: theme.spacing(2),
+              marginTop: theme.spacing(2),
+              fontSize: '1.2rem',
+              pageBreakInside: 'avoid'
+            }}
           >
             {heur}
           </div>
@@ -512,7 +535,6 @@ export default function SubmissionReport() {
   const sp4 = theme.spacing(4);
   const classes = useStyles();
   const { showErrorMessage, showWarningMessage } = useMySnackbar();
-  const isPrinting = useMediaQuery('print');
 
   useEffect(() => {
     apiCall({
@@ -536,24 +558,11 @@ export default function SubmissionReport() {
   }, []);
 
   return (
-    <PageCenter
-      mt={isPrinting ? 0 : 4}
-      mb={isPrinting ? 0 : 4}
-      ml={isPrinting ? 2 : 4}
-      mr={isPrinting ? 2 : 4}
-      width="100%"
-    >
+    <PageCenter margin={4} width="100%">
       <div style={{ textAlign: 'left' }}>
         {c12nDef.enforce && (
           <div style={{ paddingBottom: sp4 }}>
             <Classification size="tiny" c12n={report ? report.classification : null} />
-          </div>
-        )}
-
-        {c12nDef.enforce && (
-          <div className="print-footer print-only">
-            {`${t('title')} :: ${id} :: `}
-            <Classification type="text" size="tiny" c12n={report ? report.classification : null} />
           </div>
         )}
         <div style={{ paddingBottom: theme.spacing(2) }}>
@@ -575,11 +584,11 @@ export default function SubmissionReport() {
             </Grid>
             <Grid item xs={12} sm={3} className="no-print">
               <div style={{ textAlign: 'right' }}>
-                <Tooltip title={t('print')}>
+                <NoPrintTooltip title={t('print')} PopperProps={{ disablePortal: true }}>
                   <IconButton onClick={() => window.print()}>
                     <PrintOutlinedIcon />
                   </IconButton>
-                </Tooltip>
+                </NoPrintTooltip>
                 <Tooltip title={t('detail_view')}>
                   <IconButton component={Link} to={`/submission/detail/${report ? report.sid : id}`}>
                     <ListAltOutlinedIcon />
@@ -592,7 +601,7 @@ export default function SubmissionReport() {
 
         <AttributionBanner report={report} />
 
-        <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2) }}>
+        <div className={classes.section}>
           <Typography variant="h6">{t('general')}</Typography>
           <Divider className={classes.divider} />
           <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2) }}>
@@ -717,7 +726,7 @@ export default function SubmissionReport() {
         </div>
 
         {report && report.report_filtered && (
-          <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2) }}>
+          <div className={classes.section}>
             <Typography variant="subtitle1">
               <b>**{t('warning')}</b>: {t('warning.text')}
             </Typography>
@@ -725,7 +734,7 @@ export default function SubmissionReport() {
         )}
 
         {report && report.report_partial && (
-          <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2) }}>
+          <div className={classes.section}>
             <Typography variant="subtitle1">
               <b>**{t('warning')}</b>: {t('warning.partial')}
             </Typography>
@@ -733,7 +742,7 @@ export default function SubmissionReport() {
         )}
 
         {(!report || Object.keys(report.metadata).length !== 0) && (
-          <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2), pageBreakInside: 'avoid' }}>
+          <div className={classes.section} style={{ pageBreakInside: 'avoid' }}>
             <Typography variant="h6">{t('metadata')}</Typography>
             <Divider className={classes.divider} />
             <table style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2), width: '100%' }}>
@@ -769,63 +778,59 @@ export default function SubmissionReport() {
           Object.keys(report.heuristics.suspicious).length !== 0 ||
           Object.keys(report.heuristics.info).length !== 0 ||
           (report.heuristics.safe && Object.keys(report.heuristics.safe).length !== 0)) && (
-          <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2) }}>
+          <div className={classes.section}>
             <Typography variant="h6">{t('heuristics')}</Typography>
             <Divider className={classes.divider} />
-            <div>
-              {report ? (
-                <>
-                  {report.max_score < 0 &&
-                    report.heuristics.safe &&
-                    Object.keys(report.heuristics.safe).length !== 0 && (
-                      <HeuristicsList
-                        verdict="safe"
-                        items={report.heuristics.safe}
-                        sections={report.heuristic_sections}
-                        name_map={report.heuristic_name_map}
-                      />
-                    )}
-                  {Object.keys(report.heuristics.malicious).length !== 0 && (
-                    <HeuristicsList
-                      verdict="malicious"
-                      items={report.heuristics.malicious}
-                      sections={report.heuristic_sections}
-                      name_map={report.heuristic_name_map}
-                    />
-                  )}
-                  {Object.keys(report.heuristics.suspicious).length !== 0 && (
-                    <HeuristicsList
-                      verdict="suspicious"
-                      items={report.heuristics.suspicious}
-                      sections={report.heuristic_sections}
-                      name_map={report.heuristic_name_map}
-                    />
-                  )}
-                  {Object.keys(report.heuristics.info).length !== 0 && (
-                    <HeuristicsList
-                      verdict="info"
-                      items={report.heuristics.info}
-                      sections={report.heuristic_sections}
-                      name_map={report.heuristic_name_map}
-                    />
-                  )}
-                </>
-              ) : (
-                [...Array(3)].map((_, i) => <HeuristicsListSkel key={i} />)
-              )}
-            </div>
+            {report ? (
+              <>
+                {report.max_score < 0 && report.heuristics.safe && Object.keys(report.heuristics.safe).length !== 0 && (
+                  <HeuristicsList
+                    verdict="safe"
+                    items={report.heuristics.safe}
+                    sections={report.heuristic_sections}
+                    name_map={report.heuristic_name_map}
+                  />
+                )}
+                {Object.keys(report.heuristics.malicious).length !== 0 && (
+                  <HeuristicsList
+                    verdict="malicious"
+                    items={report.heuristics.malicious}
+                    sections={report.heuristic_sections}
+                    name_map={report.heuristic_name_map}
+                  />
+                )}
+                {Object.keys(report.heuristics.suspicious).length !== 0 && (
+                  <HeuristicsList
+                    verdict="suspicious"
+                    items={report.heuristics.suspicious}
+                    sections={report.heuristic_sections}
+                    name_map={report.heuristic_name_map}
+                  />
+                )}
+                {Object.keys(report.heuristics.info).length !== 0 && (
+                  <HeuristicsList
+                    verdict="info"
+                    items={report.heuristics.info}
+                    sections={report.heuristic_sections}
+                    name_map={report.heuristic_name_map}
+                  />
+                )}
+              </>
+            ) : (
+              [...Array(3)].map((_, i) => <HeuristicsListSkel key={i} />)
+            )}
           </div>
         )}
 
         {(!report || Object.keys(report.attack_matrix).length !== 0) && (
-          <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2), pageBreakInside: 'avoid' }}>
+          <div className={classes.section} style={{ pageBreakInside: 'avoid' }}>
             <Typography variant="h6">{t('attack')}</Typography>
             <Divider className={classes.divider} />
             <div
               style={{
                 paddingTop: theme.spacing(2),
                 paddingBottom: theme.spacing(2),
-                columnWidth: '21rem',
+                columnWidth: '20rem',
                 columnGap: '1rem'
               }}
             >
@@ -845,7 +850,7 @@ export default function SubmissionReport() {
           ))}
 
         {(!report || report.important_files.length !== 0) && (
-          <div style={{ paddingTop: theme.spacing(2), pageBreakInside: 'avoid' }}>
+          <div className={classes.section} style={{ paddingBottom: 0, pageBreakInside: 'avoid' }}>
             <Typography variant="h6">{t('important_files')}</Typography>
             <Divider className={classes.divider} />
             <div

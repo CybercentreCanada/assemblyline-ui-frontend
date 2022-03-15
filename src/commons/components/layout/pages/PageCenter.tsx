@@ -4,12 +4,18 @@ import React from 'react';
 const useStyles = (w, mxw, ta) =>
   makeStyles(theme => ({
     page: {
+      display: 'flex',
       textAlign: ta,
       margin: '0 auto auto auto',
       width: w,
       maxWidth: mxw,
       [theme.breakpoints.down('xs')]: {
         maxWidth: '100%'
+      },
+      '@media print': {
+        minWidth: '1024px',
+        maxWidth: 'unset',
+        margin: 0
       }
     }
   }))();
@@ -45,6 +51,7 @@ const PageCenter: React.FC<PageCenterProps> = ({
     <div className={classes.page}>
       <div
         style={{
+          flexGrow: 1,
           marginBottom: theme.spacing(margin / divider || mb / divider),
           marginLeft: theme.spacing(margin / divider || ml / divider),
           marginRight: theme.spacing(margin / divider || mr / divider),
