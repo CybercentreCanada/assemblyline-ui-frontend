@@ -13,6 +13,7 @@ import ChromeReaderModeOutlinedIcon from '@material-ui/icons/ChromeReaderModeOut
 import CloseIcon from '@material-ui/icons/Close';
 import CloudDownloadOutlinedIcon from '@material-ui/icons/CloudDownloadOutlined';
 import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
+import PublishOutlinedIcon from '@material-ui/icons/PublishOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
 import ReplayOutlinedIcon from '@material-ui/icons/ReplayOutlined';
 import VerifiedUserOutlinedIcon from '@material-ui/icons/VerifiedUserOutlined';
@@ -103,7 +104,7 @@ export default function SubmissionDetail() {
   const sp4 = theme.spacing(4);
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
   const history = useHistory();
-  const { user: currentUser, c12nDef } = useALContext();
+  const { user: currentUser, c12nDef, configuration: systemConfig } = useALContext();
   const { setHighlightMap } = useHighlighter();
   const { setGlobalDrawer, globalDrawer } = useDrawer();
 
@@ -447,6 +448,19 @@ export default function SubmissionDetail() {
       });
     }
   }, [apiCall, history, resetLiveMode, showSuccessMessage, submission, t]);
+
+  const replay = useCallback(() => {
+    if (submission != null && systemConfig.ui.allow_replay) {
+      apiCall({
+        url: `/api/v4/replay/submission/${submission.sid}/`,
+        onSuccess: api_data => {
+          showSuccessMessage(t('replay.success'));
+          const metadata = { ...submission.metadata, replay: 'requested' };
+          setSubmission({ ...submission, metadata });
+        }
+      });
+    }
+  }, [apiCall, showSuccessMessage, submission, systemConfig.ui.allow_replay, t]);
 
   const deleteSubmission = () => {
     if (submission != null) {
@@ -857,94 +871,104 @@ export default function SubmissionDetail() {
                       </div>
                     )}
                   </Grid>
-                  <Grid item xs={12} sm={6} md={4}>
-                    <div style={{ textAlign: 'right' }}>
-                      <Tooltip title={t('delete')}>
-                        <IconButton
-                          onClick={() => setDeleteDialog(true)}
+                  <Grid item xs={12} sm={6} md={4} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <div>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <div>
+                          <Tooltip title={t('delete')}>
+                            <IconButton
+                              onClick={() => setDeleteDialog(true)}
+                              style={{
+                                color:
+                                  theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                              }}
+                            >
+                              <RemoveCircleOutlineOutlinedIcon />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title={t('download')}>
+                            <IconButton
+                              component={MaterialLink}
+                              href={`/api/v4/bundle/${submission ? submission.sid : id}/?XSRF_TOKEN=${getXSRFCookie()}`}
+                            >
+                              <CloudDownloadOutlinedIcon color="action" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title={t('resubmit')}>
+                            <IconButton onClick={resubmit}>
+                              <ReplayOutlinedIcon />
+                            </IconButton>
+                          </Tooltip>
+                          {systemConfig.ui.allow_replay && (
+                            <Tooltip title={t('replay')}>
+                              <IconButton onClick={replay} disabled={submission && submission.metadata.replay}>
+                                <PublishOutlinedIcon />
+                              </IconButton>
+                            </Tooltip>
+                          )}
+                          <Tooltip title={t('report_view')}>
+                            <IconButton component={Link} to={`/submission/report/${submission ? submission.sid : id}`}>
+                              <ChromeReaderModeOutlinedIcon />
+                            </IconButton>
+                          </Tooltip>
+                        </div>
+                        <div
                           style={{
-                            color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                            width: '164px',
+                            marginTop: '8px'
                           }}
                         >
-                          <RemoveCircleOutlineOutlinedIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title={t('download')}>
-                        <IconButton
-                          component={MaterialLink}
-                          href={`/api/v4/bundle/${submission ? submission.sid : id}/?XSRF_TOKEN=${getXSRFCookie()}`}
-                        >
-                          <CloudDownloadOutlinedIcon color="action" />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title={t('resubmit')}>
-                        <IconButton onClick={resubmit}>
-                          <ReplayOutlinedIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title={t('report_view')}>
-                        <IconButton component={Link} to={`/submission/report/${submission ? submission.sid : id}`}>
-                          <ChromeReaderModeOutlinedIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </div>
-                    <div
-                      style={{
-                        textAlign: 'right',
-                        width: '164px',
-                        marginTop: '8px',
-                        marginLeft: 'auto',
-                        marginRight: '12px'
-                      }}
-                    >
-                      {submission ? <VerdictBar verdicts={submission.verdict} /> : <Skeleton />}
-                      <Grid container>
-                        <Grid item xs={5} style={{ textAlign: 'left' }}>
-                          <Tooltip
-                            title={t(
-                              `verdict.${
-                                submission && submission.verdict.malicious.indexOf(currentUser.username) !== -1
-                                  ? 'is'
-                                  : 'set'
-                              }.malicious`
-                            )}
-                          >
-                            <IconButton size="small" onClick={() => setVerdict('malicious')}>
-                              <BugReportOutlinedIcon
-                                style={{
-                                  color:
+                          {submission ? <VerdictBar verdicts={submission.verdict} /> : <Skeleton />}
+                          <Grid container>
+                            <Grid item xs={5} style={{ textAlign: 'left' }}>
+                              <Tooltip
+                                title={t(
+                                  `verdict.${
                                     submission && submission.verdict.malicious.indexOf(currentUser.username) !== -1
-                                      ? theme.palette.error.dark
-                                      : null
-                                }}
-                              />
-                            </IconButton>
-                          </Tooltip>
-                        </Grid>
-                        <Grid item xs={2} />
-                        <Grid item xs={5} style={{ textAlign: 'right' }}>
-                          <Tooltip
-                            title={t(
-                              `verdict.${
-                                submission && submission.verdict.non_malicious.indexOf(currentUser.username) !== -1
-                                  ? 'is'
-                                  : 'set'
-                              }.non_malicious`
-                            )}
-                          >
-                            <IconButton size="small" onClick={() => setVerdict('non_malicious')}>
-                              <VerifiedUserOutlinedIcon
-                                style={{
-                                  color:
+                                      ? 'is'
+                                      : 'set'
+                                  }.malicious`
+                                )}
+                              >
+                                <IconButton size="small" onClick={() => setVerdict('malicious')}>
+                                  <BugReportOutlinedIcon
+                                    style={{
+                                      color:
+                                        submission && submission.verdict.malicious.indexOf(currentUser.username) !== -1
+                                          ? theme.palette.error.dark
+                                          : null
+                                    }}
+                                  />
+                                </IconButton>
+                              </Tooltip>
+                            </Grid>
+                            <Grid item xs={2} />
+                            <Grid item xs={5} style={{ textAlign: 'right' }}>
+                              <Tooltip
+                                title={t(
+                                  `verdict.${
                                     submission && submission.verdict.non_malicious.indexOf(currentUser.username) !== -1
-                                      ? theme.palette.success.dark
-                                      : null
-                                }}
-                              />
-                            </IconButton>
-                          </Tooltip>
-                        </Grid>
-                      </Grid>
+                                      ? 'is'
+                                      : 'set'
+                                  }.non_malicious`
+                                )}
+                              >
+                                <IconButton size="small" onClick={() => setVerdict('non_malicious')}>
+                                  <VerifiedUserOutlinedIcon
+                                    style={{
+                                      color:
+                                        submission &&
+                                        submission.verdict.non_malicious.indexOf(currentUser.username) !== -1
+                                          ? theme.palette.success.dark
+                                          : null
+                                    }}
+                                  />
+                                </IconButton>
+                              </Tooltip>
+                            </Grid>
+                          </Grid>
+                        </div>
+                      </div>
                     </div>
                   </Grid>
                 </Grid>

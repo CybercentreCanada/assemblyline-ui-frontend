@@ -74,6 +74,7 @@ export type ConfigurationDefinition = {
       url: string[];
     };
     allow_malicious_hinting: boolean;
+    allow_replay: boolean;
     allow_url_submissions: boolean;
     apps: AppElement[];
     banner: {
