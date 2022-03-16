@@ -16,6 +16,7 @@ import MoodBadIcon from '@material-ui/icons/MoodBad';
 import PrintOutlinedIcon from '@material-ui/icons/PrintOutlined';
 import VerifiedUserOutlinedIcon from '@material-ui/icons/VerifiedUserOutlined';
 import { Skeleton } from '@material-ui/lab';
+import clsx from 'clsx';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -119,6 +120,12 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: '#00f20015 !important',
     borderBottom: '1px solid #81c784 !important'
   },
+  heur_title: {
+    marginBottom: theme.spacing(2),
+    marginTop: theme.spacing(2),
+    fontSize: '120%',
+    pageBreakInside: 'avoid'
+  },
   heur: {
     paddingBottom: theme.spacing(0.25),
     pageBreakInside: 'avoid'
@@ -126,6 +133,12 @@ const useStyles = makeStyles(theme => ({
   section: {
     paddingBottom: theme.spacing(2),
     paddingTop: theme.spacing(2)
+  },
+  page: {
+    '@media print': {
+      fontSize: '90%'
+    },
+    textAlign: 'left'
   }
 }));
 
@@ -351,7 +364,7 @@ function AttackMatrixBlock({ attack, items }) {
         paddingBottom: theme.spacing(2)
       }}
     >
-      <span style={{ fontSize: '1rem', textTransform: 'capitalize' }}>{attack.replace(/-/g, ' ')}</span>
+      <span style={{ fontSize: '110%', textTransform: 'capitalize' }}>{attack.replace(/-/g, ' ')}</span>
       {Object.keys(items).map((cat, idx) => (
         <div key={idx}>
           <TextVerdict verdict={items[cat].h_type} mono />
@@ -387,7 +400,6 @@ function AttackMatrixSkel() {
 }
 
 function HeuristicsList({ verdict, items, sections, name_map }) {
-  const theme = useTheme();
   const classes = useStyles();
   const classMap = {
     malicious: classes.malicious_heur,
@@ -400,17 +412,7 @@ function HeuristicsList({ verdict, items, sections, name_map }) {
     <>
       {Object.keys(items).map((heur, idx) => (
         <div key={idx} className={classes.heur}>
-          <div
-            className={classMap[verdict]}
-            style={{
-              marginBottom: theme.spacing(2),
-              marginTop: theme.spacing(2),
-              fontSize: '1.2rem',
-              pageBreakInside: 'avoid'
-            }}
-          >
-            {heur}
-          </div>
+          <div className={clsx(classes.heur_title, classMap[verdict])}>{heur}</div>
           <div
             style={{
               display: 'flex',
@@ -559,7 +561,7 @@ export default function SubmissionReport() {
 
   return (
     <PageCenter margin={4} width="100%">
-      <div style={{ textAlign: 'left' }}>
+      <div className={classes.page}>
         {c12nDef.enforce && (
           <div style={{ paddingBottom: sp4 }}>
             <Classification size="tiny" c12n={report ? report.classification : null} />
@@ -579,7 +581,7 @@ export default function SubmissionReport() {
               <img
                 src={`${process.env.PUBLIC_URL}/images/banner.svg`}
                 alt="Assemblyline Banner"
-                style={{ height: '72px' }}
+                style={{ height: '64px' }}
               />
             </Grid>
             <Grid item xs={12} sm={3} className="no-print">
@@ -697,28 +699,28 @@ export default function SubmissionReport() {
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.md5')}</span>
               </Grid>
-              <Grid item xs={8} md={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+              <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
                 {report ? report.file_info.md5 : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.sha1')}</span>
               </Grid>
-              <Grid item xs={8} md={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+              <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
                 {report ? report.file_info.sha1 : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.sha256')}</span>
               </Grid>
-              <Grid item xs={8} md={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+              <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
                 {report ? report.file_info.sha256 : <Skeleton />}
               </Grid>
 
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.ssdeep')}</span>
               </Grid>
-              <Grid item xs={8} md={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+              <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
                 {report ? report.file_info.ssdeep : <Skeleton />}
               </Grid>
             </Grid>
