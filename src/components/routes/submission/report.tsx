@@ -124,11 +124,15 @@ const useStyles = makeStyles(theme => ({
     marginBottom: theme.spacing(2),
     marginTop: theme.spacing(2),
     fontSize: '120%',
+    pageBreakAfter: 'avoid',
     pageBreakInside: 'avoid'
   },
   heur: {
     paddingBottom: theme.spacing(0.25),
     pageBreakInside: 'avoid'
+  },
+  section_title: {
+    pageBreakAfter: 'avoid'
   },
   section: {
     paddingBottom: theme.spacing(2),
@@ -303,8 +307,10 @@ function TagTable({ group, items }) {
 
   return (
     <div className={classes.section} style={{ pageBreakInside: 'avoid' }}>
-      <Typography variant="h6">{t(`tag.${group}`)}</Typography>
-      <Divider className={classes.divider} />
+      <div className={classes.section_title}>
+        <Typography variant="h6">{t(`tag.${group}`)}</Typography>
+        <Divider className={classes.divider} />
+      </div>
       <div
         style={{
           paddingTop: theme.spacing(2),
@@ -604,8 +610,10 @@ export default function SubmissionReport() {
         <AttributionBanner report={report} />
 
         <div className={classes.section}>
-          <Typography variant="h6">{t('general')}</Typography>
-          <Divider className={classes.divider} />
+          <div className={classes.section_title}>
+            <Typography variant="h6">{t('general')}</Typography>
+            <Divider className={classes.divider} />
+          </div>
           <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2) }}>
             <Grid container spacing={1}>
               <Grid item xs={4} sm={3} lg={2}>
@@ -745,8 +753,10 @@ export default function SubmissionReport() {
 
         {(!report || Object.keys(report.metadata).length !== 0) && (
           <div className={classes.section} style={{ pageBreakInside: 'avoid' }}>
-            <Typography variant="h6">{t('metadata')}</Typography>
-            <Divider className={classes.divider} />
+            <div className={classes.section_title}>
+              <Typography variant="h6">{t('metadata')}</Typography>
+              <Divider className={classes.divider} />
+            </div>
             <table style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2), width: '100%' }}>
               <tbody>
                 {report
@@ -781,8 +791,10 @@ export default function SubmissionReport() {
           Object.keys(report.heuristics.info).length !== 0 ||
           (report.heuristics.safe && Object.keys(report.heuristics.safe).length !== 0)) && (
           <div className={classes.section}>
-            <Typography variant="h6">{t('heuristics')}</Typography>
-            <Divider className={classes.divider} />
+            <div className={classes.section_title}>
+              <Typography variant="h6">{t('heuristics')}</Typography>
+              <Divider className={classes.divider} />
+            </div>
             {report ? (
               <>
                 {report.max_score < 0 && report.heuristics.safe && Object.keys(report.heuristics.safe).length !== 0 && (
@@ -826,8 +838,10 @@ export default function SubmissionReport() {
 
         {(!report || Object.keys(report.attack_matrix).length !== 0) && (
           <div className={classes.section} style={{ pageBreakInside: 'avoid' }}>
-            <Typography variant="h6">{t('attack')}</Typography>
-            <Divider className={classes.divider} />
+            <div className={classes.section_title}>
+              <Typography variant="h6">{t('attack')}</Typography>
+              <Divider className={classes.divider} />
+            </div>
             <div
               style={{
                 paddingTop: theme.spacing(2),
@@ -853,8 +867,10 @@ export default function SubmissionReport() {
 
         {(!report || report.important_files.length !== 0) && (
           <div className={classes.section} style={{ paddingBottom: 0, pageBreakInside: 'avoid' }}>
-            <Typography variant="h6">{t('important_files')}</Typography>
-            <Divider className={classes.divider} />
+            <div className={classes.section_title}>
+              <Typography variant="h6">{t('important_files')}</Typography>
+              <Divider className={classes.divider} />
+            </div>
             <div
               style={{
                 paddingTop: theme.spacing(2)
