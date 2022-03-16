@@ -281,7 +281,7 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates = null 
                         depth={section.depth + 1}
                       />
                     ))}
-                {displayedResult.response.supplementary.length !== 0 && (
+                {displayedResult.response.supplementary.filter(item => !item.is_section_image).length !== 0 && (
                   <SupplementarySection extracted={displayedResult.response.supplementary} />
                 )}
                 {displayedResult.response.extracted.length !== 0 && (
