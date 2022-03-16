@@ -3,7 +3,7 @@ export { AppHookInit } from './app/appHookInit';
 export type { AppHookInitProps } from './app/appHookInit';
 export { AppStoreInit } from './app/appStoreInit';
 export type { AppStoreInitProps } from './app/appStoreInit';
-export { HexBody } from './components/body/';
+export { HexBody } from './components/body';
 export { HexLayout } from './components/layout/';
 // export { HexApp } from './componHexStoreents/app';
 // export { HexContainer } from './components/content/container/container';

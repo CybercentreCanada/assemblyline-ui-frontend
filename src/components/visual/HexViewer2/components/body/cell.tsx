@@ -1,0 +1,80 @@
+import { makeStyles } from '@material-ui/core';
+import clsx from 'clsx';
+import React from 'react';
+import {
+  CellType,
+  getCellClasses,
+  getHexValue,
+  getTextValue,
+  LAYOUT_SIZE,
+  StoreProps,
+  useCellStyles,
+  useDispatch,
+  useReducer
+} from '../..';
+
+const useHexStyles = makeStyles(theme => ({
+  cell: {
+    paddingLeft: theme.spacing(0.2),
+    paddingRight: theme.spacing(0.2),
+    fontWeight: theme.palette.type === 'dark' ? 400 : 600,
+    userSelect: 'none',
+    'td&': {},
+    'div&': {
+      display: 'block'
+    }
+  }
+}));
+
+export type HexCellProps = StoreProps & {
+  columnIndex?: number;
+  index?: number;
+  Tag?: 'div' | 'td';
+  type?: CellType;
+  style?: string;
+};
+
+export const WrappedHexCell = ({
+  store,
+  columnIndex = -1,
+  index = -1,
+  Tag = 'div',
+  type = 'hex',
+  style = ''
+}: HexCellProps) => {
+  const classes = useHexStyles();
+  const cellClasses = useCellStyles();
+  const { refs } = useReducer();
+  const { onCellMouseEnter, onCellMouseDown } = useDispatch();
+
+  const { codes: hexcodes } = refs.current.hex;
+
+  return (
+    <Tag
+      id={Tag + '-' + index}
+      data-index={index}
+      className={clsx('cell', classes.cell, style, getCellClasses(store, refs, type, columnIndex, index, cellClasses))}
+      onMouseEnter={() => onCellMouseEnter(index, type)}
+      onMouseDown={() => onCellMouseDown(index, type)}
+      style={{ width: type === 'hex' ? LAYOUT_SIZE.hexWidth : LAYOUT_SIZE.textWidth }}
+    >
+      {type === 'hex' ? getHexValue(hexcodes, index) : getTextValue(hexcodes, index)}
+    </Tag>
+  );
+};
+
+export const HexCell = React.memo(
+  WrappedHexCell,
+  (
+    prevProps: Readonly<React.PropsWithChildren<HexCellProps>>,
+    nextProps: Readonly<React.PropsWithChildren<HexCellProps>>
+  ) =>
+    prevProps.index === nextProps.index &&
+    prevProps.columnIndex === nextProps.columnIndex &&
+    prevProps.store.initialized === nextProps.store.initialized &&
+    prevProps.store.layout.column.size === nextProps.store.layout.column.size &&
+    prevProps.store.mode.bodyType === nextProps.store.mode.bodyType &&
+    prevProps.store.mode.theme === nextProps.store.mode.theme &&
+    prevProps.store.mode.language === nextProps.store.mode.language &&
+    prevProps.store.mode.width === nextProps.store.mode.width
+);

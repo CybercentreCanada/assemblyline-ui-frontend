@@ -3,7 +3,7 @@ import { yellow } from '@material-ui/core/colors';
 import { ClassNameMap } from '@material-ui/core/styles/withStyles';
 import React, { useCallback, useContext, useMemo } from 'react';
 import { HexProps, useLayout } from '..';
-import { ASCII } from '../models/Hex';
+import { ASCII } from '../handlers/HexHandler';
 
 const useNewHexStyles = makeStyles(theme => ({
   root: {

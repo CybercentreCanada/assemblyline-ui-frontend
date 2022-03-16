@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useMemo, useRef } from 'react';
 import { HexProps, useLayout, useStyles } from '..';
-import { addClass, removeClass } from '../actions/StyleActions';
+import { addClass, removeClass } from '../handlers/StyleHandler';
 
 export type HoverContextProps = {
   onHoverMouseEnter?: (index: number) => void;

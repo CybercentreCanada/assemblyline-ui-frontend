@@ -33,5 +33,13 @@
   "scrollspeed.label": "Scroll Speed:",
   "scrollspeed.description": "Set the scroll speed",
   "settings.title": "Settings:",
-  "settings.label": "Configure the settings"
+  "settings.label": "Configure the settings",
+  "search.types": "Change the search type",
+  "header.selector.cursor": "Address",
+  "header.selector.hexcode": "Hex Values",
+  "header.selector.text": "Text Values",
+  "header.searchfield.cursor": "Find an address (⇵ for history)",
+  "header.searchfield.hexcode": "Find hexcodes (⇵ for history)",
+  "header.searchfield.text": "Find texts (⇵ for history)",
+  "bodyType.label": "Grid display mode:"
 }

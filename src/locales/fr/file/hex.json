@@ -33,5 +33,15 @@
   "scrollspeed.label": "Vitesse de défilement :",
   "scrollspeed.description": "Définir la vitesse de défilement",
   "settings.title": "Paramètres :",
-  "settings.label": "Configurer les paramètres"
+  "settings.label": "Configurer les paramètres",
+  "search.types": "Modifier le type of recherche",
+  "header.cursor.searchfield": "Rechercher une adresse (⇵ pour l'historique)",
+
+  "header.selector.cursor": "Adresse",
+  "header.selector.hexcode": "Codes hexadécimaux",
+  "header.selector.text": "Chaîne de caractères",
+  "header.searchfield.cursor": "Rechercher une adresse (⇵ pour l'historique)",
+  "header.searchfield.hexcode": "Rechercher des codes hexadécimaux (⇵ pour l'historique)",
+  "header.searchfield.text": "Rechercher une chaîne de caractères (⇵ pour l'historique)",
+  "bodyType.label": "Mode d'affiche de la grille :"
 }

@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useMemo, useRef } from 'react';
 import { HexProps, useStore } from '..';
-import { ASCII, DEFAULT_HEX } from '../models/Hex';
+import { ASCII } from '../handlers/HexHandler';
 
 export type HexContextProps = {
   hexData?: React.MutableRefObject<string>;
@@ -38,8 +38,8 @@ export const WrappedHexProvider = ({ children }: HexProps) => {
 
   const hexData = useRef<string>('');
   const hexMap = useRef<Map<number, string>>(new Map());
-  const nextHexOffsetBase = useRef<number>(DEFAULT_HEX.hexOffsetBase);
-  const nextHexOffsetSize = useRef<number>(DEFAULT_HEX.hexOffsetSize);
+  const nextHexOffsetBase = useRef<number>(16);
+  const nextHexOffsetSize = useRef<number>(8);
   const nextHexOffsetBaseValues = useRef<
     Array<{
       label: string;

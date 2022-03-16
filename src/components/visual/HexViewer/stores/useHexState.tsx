@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { HexStore, HexStoreDispatch } from '..';
-import { DEFAULT_HEX } from '../models/Hex';
-import { BodyType, DEFAULT_LAYOUT, LayoutType } from '../models/Layout';
-import { DEFAULT_MODE, ModeLanguage, ModeTheme, ModeWidth } from '../models/Mode';
+import { DEFAULT } from '../configs/default';
+import { BodyType, LayoutType } from '../models/Layout';
+import { ModeLanguage, ModeTheme, ModeWidth } from '../models/Mode';
 
 export type UseHexState = () => {
-  store: HexStore;
-  dispatch: HexStoreDispatch;
+  store?: HexStore;
+  dispatch?: HexStoreDispatch;
 };
 
 export const useHexState: UseHexState = () => {
@@ -14,13 +14,13 @@ export const useHexState: UseHexState = () => {
   const [initialized, setInitialized] = useState<boolean>(false);
 
   // Mode
-  const [modeTheme, setModeTheme] = useState<ModeTheme>(DEFAULT_MODE.modeTheme);
-  const [modeLanguage, setModeLanguage] = useState<ModeLanguage>(DEFAULT_MODE.modeLanguage);
-  const [modeWidth, setModeWidth] = useState<ModeWidth>(DEFAULT_MODE.modeWidth);
+  const [modeTheme, setModeTheme] = useState<ModeTheme>(DEFAULT.modeTheme);
+  const [modeLanguage, setModeLanguage] = useState<ModeLanguage>(DEFAULT.modeLanguage);
+  const [modeWidth, setModeWidth] = useState<ModeWidth>(DEFAULT.modeWidth);
 
   // Hex
-  const [hexOffsetBase, setHexOffsetBase] = useState<number>(DEFAULT_HEX.hexOffsetBase);
-  const [hexOffsetSize, setHexOffsetSize] = useState<number>(DEFAULT_HEX.hexOffsetSize);
+  const [hexOffsetBase, setHexOffsetBase] = useState<number>(16);
+  const [hexOffsetSize, setHexOffsetSize] = useState<number>(8);
   const [hexBaseValues, setHexBaseValues] = useState<
     Array<{
       label: string;
@@ -33,12 +33,12 @@ export const useHexState: UseHexState = () => {
   ]);
 
   // Layout
-  const [layoutRows, setLayoutRows] = useState<number>(DEFAULT_LAYOUT.layoutRows);
-  const [layoutColumns, setLayoutColumns] = useState<number>(DEFAULT_LAYOUT.layoutColumns);
-  const [layoutAutoRows, setLayoutAutoRows] = useState<boolean>(DEFAULT_LAYOUT.layoutAutoRows);
-  const [layoutAutoColumns, setLayoutAutoColumns] = useState<boolean>(DEFAULT_LAYOUT.layoutAutoColumns);
-  const [layoutType, setLayoutType] = useState<LayoutType>(DEFAULT_LAYOUT.layoutType);
-  const [bodyType, setBodyType] = useState<BodyType>(DEFAULT_LAYOUT.bodyType);
+  const [layoutRows, setLayoutRows] = useState<number>(DEFAULT.layoutRows);
+  const [layoutColumns, setLayoutColumns] = useState<number>(DEFAULT.layoutColumns);
+  const [layoutAutoRows, setLayoutAutoRows] = useState<boolean>(DEFAULT.layoutAutoRows);
+  const [layoutAutoColumns, setLayoutAutoColumns] = useState<boolean>(DEFAULT.layoutAutoColumns);
+  const [layoutType, setLayoutType] = useState<LayoutType>(DEFAULT.layoutType);
+  const [bodyType, setBodyType] = useState<BodyType>(DEFAULT.bodyType);
 
   // Scroll
   const [scrollIndex, setScrollIndex] = useState<number>(0);

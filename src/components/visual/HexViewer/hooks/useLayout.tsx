@@ -21,7 +21,8 @@ export type LayoutContextProps = {
   onLayoutRowsChange?: (rows: number) => void;
   onLayoutAutoColumnsChange?: (auto: boolean) => void;
   onLayoutAutoRowsChange?: (auto: boolean) => void;
-  onContainerMouseDown: (event: MouseEvent) => void;
+  onLayoutColumnsResize?: (width: number) => void
+  onContainerMouseDown?: (event: MouseEvent) => void;
 };
 
 export const LayoutContext = React.createContext<LayoutContextProps>(null);
@@ -36,7 +37,7 @@ export const WrappedLayoutProvider = ({ children }: HexProps) => {
   const nextLayoutAutoColumns = useRef<boolean>(DEFAULT_LAYOUT.layoutAutoColumns);
   const nextLayoutAutoRows = useRef<boolean>(DEFAULT_LAYOUT.layoutAutoRows);
 
-  const bodyRef = useRef<HTMLDivElement>(null);
+  const bodyRef = useRef<HTMLDivElement | HTMLTableElement>(null);
 
   const isContainerFocused = useRef<boolean>(false);
   const hexesContainerRefs = useRef<HTMLDivElement>(null);
@@ -99,6 +100,8 @@ export const WrappedLayoutProvider = ({ children }: HexProps) => {
 
   const onLayoutAutoColumnsChange = useCallback(
     (auto: boolean) => {
+      if (bodyRef.current === null || bodyRef.current === undefined) return;
+
       nextLayoutAutoColumns.current = auto;
       setLayoutAutoColumns(auto);
       nextLayoutAutoColumns.current && handleColumnResize();
@@ -108,11 +111,22 @@ export const WrappedLayoutProvider = ({ children }: HexProps) => {
 
   const onLayoutAutoRowsChange = useCallback(
     (auto: boolean) => {
+      if (bodyRef.current === null || bodyRef.current === undefined) return;
+
       nextLayoutAutoRows.current = auto;
       setLayoutAutoRows(auto);
       nextLayoutAutoRows.current && handleRowResize();
     },
     [handleRowResize, setLayoutAutoRows]
+  );
+
+  const onLayoutColumnsResize = useCallback(
+    (width: number) => {
+      const columns = COLUMNS.find(e => width >= e.width)?.columns;
+      nextLayoutColumns.current = columns;
+      setLayoutColumns(columns);
+    },
+    [setLayoutColumns]
   );
 
   const onContainerMouseDown = useCallback(
@@ -139,7 +153,8 @@ export const WrappedLayoutProvider = ({ children }: HexProps) => {
         onLayoutRowsChange,
         onLayoutAutoColumnsChange,
         onLayoutAutoRowsChange,
-        onContainerMouseDown
+        onContainerMouseDown,
+        onLayoutColumnsResize
       }}
     >
       {useMemo(() => children, [children])}

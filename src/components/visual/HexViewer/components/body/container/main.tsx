@@ -14,7 +14,7 @@ import {
 } from 'components/visual/HexViewer';
 import React from 'react';
 import { HexContainer, HexOffsets } from '.';
-import { HexScrollBar } from '../scrollbar';
+import { HexScrollBar } from '../components/scrollbar';
 
 const useHexStyles = makeStyles(theme => ({
   layout: {

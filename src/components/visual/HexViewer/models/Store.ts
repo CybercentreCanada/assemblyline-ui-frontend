@@ -158,7 +158,7 @@ export type HexStore = StoreState & ModeState & HexState & LayoutState;
 
 export type HexStoreDispatch = StoreDispatch & ModeDispatch & HexDispatch & LayoutDispatch;
 
-export type HexStoreContextProps = StoreContextProps & ModeContext & HexContext & LayoutContext;
+export type HexStoreContextProps = StoreContextProps & HexContext & ModeContext & LayoutContext;
 
 export type HexStoreProps = {
   store: HexStore;

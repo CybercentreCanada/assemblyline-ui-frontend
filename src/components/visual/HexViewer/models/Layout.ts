@@ -12,6 +12,15 @@ export type LayoutState = {
   bodyType?: BodyType;
 };
 
+export type LayoutSize = {
+  windowHeight: number;
+  rowHeight: number;
+  offsetWidth: number;
+  hexWidth: number;
+  textWidth: number;
+  spacingWidth: number;
+};
+
 export type LayoutDispatch = {
   setLayoutRows?: Dispatch<SetStateAction<number>>;
   setLayoutAutoRows?: Dispatch<SetStateAction<boolean>>;
@@ -30,17 +39,20 @@ export type LayoutContext = {
   setBodyType?: (value: BodyType) => void;
 };
 
+export type LayoutRef = {
+  bodyRef?: React.MutableRefObject<HTMLDivElement | HTMLTableElement>;
+};
+
 export const DEFAULT_LAYOUT: LayoutState = {
   layoutColumns: 0,
   layoutRows: 0,
   layoutAutoColumns: true,
   layoutAutoRows: true,
   layoutType: 'page',
-  bodyType: 'table'
+  bodyType: 'list'
 };
 
-
-export const LAYOUT_SIZE = {
+export const LAYOUT_SIZE: LayoutSize = {
   windowHeight: 350,
   rowHeight: 22.3958,
   offsetWidth: 73.5833,
@@ -65,3 +77,5 @@ export const COLUMNS = [
   { width: 285, columns: 4 },
   { width: 0, columns: 0 }
 ];
+
+export type LayoutPayload = any;
