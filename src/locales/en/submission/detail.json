@@ -41,6 +41,8 @@
   "params.services.selected": "Selected services",
   "params.services.service_spec": "Service parameters",
   "params.submitter": "Submitted By",
+  "replay": "Transfer to another server for further processing",
+  "replay.success": "Transfer request was accepted, the submission will be transfered shortly.",
   "report_view": "Show report view",
   "resubmit": "Resubmit current submission",
   "submit.success": "Submission successfully resubmitted. You will be redirected to it...",
