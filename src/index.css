@@ -1,6 +1,12 @@
 @media print {
   body {
     color: rgba(0, 0, 0, 0.87) !important;
+    page-break-after: avoid;
+    page-break-before: avoid;
+  }
+
+  #root {
+    position: unset !important;
   }
 
   h1 {
@@ -29,7 +35,7 @@
 
   @page {
     size: auto;
-    margin: 0.35in;
+    margin: 0.6in;
   }
 
   .no-print,

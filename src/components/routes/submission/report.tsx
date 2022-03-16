@@ -123,19 +123,25 @@ const useStyles = makeStyles(theme => ({
   heur_title: {
     marginBottom: theme.spacing(2),
     marginTop: theme.spacing(2),
-    fontSize: '120%',
-    pageBreakInside: 'avoid'
+    fontSize: '120%'
   },
   heur: {
     paddingBottom: theme.spacing(0.25),
     pageBreakInside: 'avoid'
+  },
+  result_section: {
+    minWidth: '50%',
+    flexGrow: 1,
+    pageBreakAfter: 'avoid'
   },
   section_title: {
     pageBreakAfter: 'avoid'
   },
   section: {
     paddingBottom: theme.spacing(2),
-    paddingTop: theme.spacing(2)
+    paddingTop: theme.spacing(2),
+    pageBreakAfter: 'avoid',
+    pageBreakBefore: 'avoid'
   },
   page: {
     '@media print': {
@@ -432,7 +438,7 @@ function HeuristicsList({ verdict, items, sections, name_map }) {
                     .sort((a, b) => (a.title_text >= b.title_text ? 1 : -1))
                     .map((sec, secidx) => {
                       return (
-                        <div key={secidx} style={{ minWidth: '50%', flexGrow: 1 }}>
+                        <div key={secidx} className={classes.result_section}>
                           <ResultSection section={sec} printable />
                         </div>
                       );
