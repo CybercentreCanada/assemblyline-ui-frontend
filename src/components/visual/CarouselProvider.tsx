@@ -6,6 +6,7 @@ import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import clsx from 'clsx';
 import Carousel from 'commons/addons/elements/carousel/Carousel';
+import { isEscape } from 'commons/addons/elements/utils/keyboard';
 import useMyAPI from 'components/hooks/useMyAPI';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -151,7 +152,7 @@ const useStyles = makeStyles(theme => ({
   closeButton: {
     position: 'absolute',
     top: '0px',
-    left: '0px'
+    right: '0px'
   },
   beforeButton: {
     position: 'absolute',
@@ -229,6 +230,7 @@ function CarouselProvider(props: CarouselProviderProps) {
       thumbSrc: string;
     }>
   >([]);
+  const carouselRef = useRef<HTMLDivElement>(null);
   const carouselItemsRef = useRef<HTMLDivElement[] | null[]>([]);
 
   const openCarousel = (idx, imgs) => {
@@ -279,6 +281,15 @@ function CarouselProvider(props: CarouselProviderProps) {
     }
   }, [index, images, handleSelectedImageChange]);
 
+  useEffect(() => {
+    if (carousel) carouselRef.current.focus();
+  }, [carousel]);
+
+  const onKeyDown = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (isEscape(event.key)) closeCarousel();
+  }, []);
+
+
   return (
     <CarouselContext.Provider
       value={{
@@ -300,64 +311,66 @@ function CarouselProvider(props: CarouselProviderProps) {
         [children]
       )}
 
-      {useMemo(() => {
-        return (
-          carousel &&
-          images.length && (
-            <Backdrop className={clsx(classes.backdrop)} open>
-              <Carousel enableSwipe onNext={onNextImage} onPrevious={onPreviousImage} style={{ height: '100%' }}>
-                <div id="carousel-image" className={classes.carousel}>
-                  <div className={classes.spacer} />
-                  <div className={classes.textContainer} style={{ paddingBottom: '4px' }}>
-                    <Typography className={classes.text} variant="body2" noWrap>
-                      {images[index].name}
-                    </Typography>
-                  </div>
-                  <Image alt={images[index].name} src={images[index].imgSrc} />
-                  <div className={classes.textContainer} style={{ paddingTop: '4px' }}>
-                    <Typography className={classes.text} variant="body2" noWrap>
-                      {images[index].description}
-                    </Typography>
-                  </div>
-                  <div className={classes.spacer} />
-                  <div className={classes.thumbsSection}>
-                    <div className={classes.thumbsSlide}>
-                      {images.map((element, i) => {
-                        return (
-                          <Image
-                            key={'thumb-' + i}
-                            alt={element.name}
-                            src={element.thumbSrc}
-                            isThumb
-                            thumbSelected={index === i}
-                            onClick={() => {
-                              handleSelectedImageChange(i);
-                            }}
-                            onRef={el => (carouselItemsRef.current[i] = el)}
-                          />
-                        );
-                      })}
-                    </div>
+      {useMemo(
+        () => (
+          <Backdrop
+            className={clsx(classes.backdrop)}
+            open={carousel && images.length > 0}
+            onKeyDown={e => onKeyDown(e)}
+          >
+            <Carousel enableSwipe onNext={onNextImage} onPrevious={onPreviousImage} style={{ height: '100%' }}>
+              <div id="carousel-image" className={classes.carousel} ref={carouselRef} tabIndex={-1}>
+                <div className={classes.spacer} />
+                <div className={classes.textContainer} style={{ paddingBottom: '4px' }}>
+                  <Typography className={classes.text} variant="body2" noWrap>
+                    {images[index]?.name}
+                  </Typography>
+                </div>
+                <Image alt={images[index]?.name} src={images[index]?.imgSrc} />
+                <div className={classes.textContainer} style={{ paddingTop: '4px' }}>
+                  <Typography className={classes.text} variant="body2" noWrap>
+                    {images[index]?.description}
+                  </Typography>
+                </div>
+                <div className={classes.spacer} />
+                <div className={classes.thumbsSection}>
+                  <div className={classes.thumbsSlide}>
+                    {images.map((element, i) => {
+                      return (
+                        <Image
+                          key={'thumb-' + i}
+                          alt={element.name}
+                          src={element.thumbSrc}
+                          isThumb
+                          thumbSelected={index === i}
+                          onClick={() => {
+                            handleSelectedImageChange(i);
+                          }}
+                          onRef={el => (carouselItemsRef.current[i] = el)}
+                        />
+                      );
+                    })}
                   </div>
                 </div>
+              </div>
 
-                <IconButton className={clsx(classes.button, classes.closeButton)} onClick={closeCarousel}>
-                  <CloseOutlinedIcon />
-                </IconButton>
+              <IconButton className={clsx(classes.button, classes.closeButton)} onClick={closeCarousel}>
+                <CloseOutlinedIcon />
+              </IconButton>
 
-                <IconButton className={clsx(classes.button, classes.beforeButton)} onClick={onPreviousImage}>
-                  <NavigateBeforeIcon />
-                </IconButton>
+              <IconButton className={clsx(classes.button, classes.beforeButton)} onClick={onPreviousImage}>
+                <NavigateBeforeIcon />
+              </IconButton>
 
-                <IconButton className={clsx(classes.button, classes.nextButton)} onClick={onNextImage}>
-                  <NavigateNextIcon />
-                </IconButton>
-              </Carousel>
-            </Backdrop>
-          )
-        );
+              <IconButton className={clsx(classes.button, classes.nextButton)} onClick={onNextImage}>
+                <NavigateNextIcon />
+              </IconButton>
+            </Carousel>
+          </Backdrop>
+        ),
         // eslint-disable-next-line react-hooks/exhaustive-deps
-      }, [carousel, images, index])}
+        [carousel, images, index]
+      )}
     </CarouselContext.Provider>
   );
 }
