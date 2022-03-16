@@ -11,11 +11,6 @@ const useStyles = (w, mxw, ta) =>
       maxWidth: mxw,
       [theme.breakpoints.down('xs')]: {
         maxWidth: '100%'
-      },
-      '@media print': {
-        minWidth: '1024px',
-        maxWidth: 'unset',
-        margin: 0
       }
     }
   }))();
