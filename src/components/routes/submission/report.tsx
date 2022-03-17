@@ -56,6 +56,18 @@ const useStyles = makeStyles(theme => ({
       marginRight: 0
     }
   },
+  attack_bloc: {
+    height: '100%',
+    width: '100%',
+    display: 'inline-block',
+    pageBreakInside: 'avoid',
+    marginBottom: theme.spacing(2)
+  },
+  attack_title: {
+    fontSize: '110%',
+    textTransform: 'capitalize',
+    fontWeight: 600
+  },
   banner_title: {
     fontWeight: 500,
     fontSize: '200%',
@@ -72,70 +84,78 @@ const useStyles = makeStyles(theme => ({
     fontFamily: 'monospace',
     color: theme.palette.text.secondary,
     wordBreak: 'break-word',
-    paddingBottom: '4px',
+    marginBottom: theme.spacing(1),
     '@media print': {
       color: 'rgba(0, 0, 0, 0.54)'
     }
   },
   icon: {
-    marginLeft: '24px',
-    marginRight: '36px',
+    marginLeft: theme.spacing(3),
+    marginRight: theme.spacing(4.5),
     fontSize: '400%',
     [theme.breakpoints.down('xs')]: {
-      marginLeft: '16px',
-      marginRight: '20px',
+      marginLeft: theme.spacing(2),
+      marginRight: theme.spacing(2.5),
       fontSize: '350%'
-    },
-    '@media print': {
-      marginLeft: '24px',
-      marginRight: '36px',
-      fontSize: '400%'
     }
   },
   malicious_heur: {
     fontWeight: 700,
-    padding: '5px',
+    padding: theme.spacing(0.625),
     WebkitPrintColorAdjust: 'exact',
     backgroundColor: '#f2000015 !important',
     borderBottom: '1px solid #d9534f !important'
   },
   suspicious_heur: {
     fontWeight: 700,
-    padding: '5px',
+    padding: theme.spacing(0.625),
     WebkitPrintColorAdjust: 'exact',
     backgroundColor: '#ff970015 !important',
     borderBottom: '1px solid #f0ad4e !important'
   },
   info_heur: {
     fontWeight: 700,
-    padding: '5px',
+    padding: theme.spacing(0.625),
     WebkitPrintColorAdjust: 'exact',
     backgroundColor: '#6e6e6e15 !important',
     borderBottom: '1px solid #aaa !important'
   },
   safe_heur: {
     fontWeight: 700,
-    padding: '5px',
+    padding: theme.spacing(0.625),
     WebkitPrintColorAdjust: 'exact',
     backgroundColor: '#00f20015 !important',
     borderBottom: '1px solid #81c784 !important'
   },
   heur_title: {
     marginBottom: theme.spacing(2),
-    marginTop: theme.spacing(2),
-    fontSize: '120%',
-    pageBreakInside: 'avoid'
+    fontSize: '120%'
   },
   heur: {
-    paddingBottom: theme.spacing(0.25),
+    marginTop: theme.spacing(2),
     pageBreakInside: 'avoid'
   },
+  result_section: {
+    minWidth: '50%',
+    flexGrow: 1
+  },
   section_title: {
-    pageBreakAfter: 'avoid'
+    marginTop: theme.spacing(4),
+    pageBreakAfter: 'avoid',
+    pageBreakInside: 'avoid'
+  },
+  section_content: {
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(2),
+    pageBreakBefore: 'avoid',
+    pageBreakInside: 'avoid'
   },
   section: {
-    paddingBottom: theme.spacing(2),
-    paddingTop: theme.spacing(2)
+    pageBreakInside: 'avoid'
+  },
+  tag_type: {
+    fontSize: '110%',
+    fontWeight: 600
   },
   page: {
     '@media print': {
@@ -197,12 +217,12 @@ function AttributionBanner({ report }) {
   return (
     <div
       style={{
-        marginBottom: theme.spacing(2),
-        marginTop: theme.spacing(2),
+        marginBottom: theme.spacing(4),
+        marginTop: theme.spacing(4),
         padding: theme.spacing(1),
         backgroundColor: bgColor,
         border: `solid 1px ${textColor}`,
-        borderRadius: '4px'
+        borderRadius: theme.spacing(1)
       }}
     >
       <Grid container alignItems="center" justifyContent="center">
@@ -225,7 +245,7 @@ function AttributionBanner({ report }) {
                       <td style={{ whiteSpace: 'nowrap', fontStyle: 'italic', verticalAlign: 'top' }}>
                         {`${t('implant')}: `}
                       </td>
-                      <td style={{ fontWeight: 500, paddingLeft: theme.spacing(1) }}>
+                      <td style={{ fontWeight: 500, marginLeft: theme.spacing(1) }}>
                         {Object.keys(report.tags.attributions['attribution.implant']).join(' | ')}
                       </td>
                     </>
@@ -243,7 +263,7 @@ function AttributionBanner({ report }) {
                       <td style={{ whiteSpace: 'nowrap', fontStyle: 'italic', verticalAlign: 'top' }}>
                         {`${t('family')}: `}
                       </td>
-                      <td style={{ fontWeight: 500, paddingLeft: theme.spacing(1) }}>
+                      <td style={{ fontWeight: 500, marginLeft: theme.spacing(1) }}>
                         {Object.keys(report.tags.attributions['attribution.family']).join(' | ')}
                       </td>
                     </>
@@ -261,7 +281,7 @@ function AttributionBanner({ report }) {
                       <td style={{ whiteSpace: 'nowrap', fontStyle: 'italic', verticalAlign: 'top' }}>
                         {`${t('actor')}: `}
                       </td>
-                      <td style={{ fontWeight: 500, paddingLeft: theme.spacing(1) }}>
+                      <td style={{ fontWeight: 500, marginLeft: theme.spacing(1) }}>
                         {Object.keys(report.tags.attributions['attribution.actor']).join(' | ')}
                       </td>
                     </>
@@ -275,7 +295,7 @@ function AttributionBanner({ report }) {
             </tbody>
           </table>
         </Grid>
-        <Grid item xs style={{ color: textColor, paddingLeft: theme.spacing(1), paddingRight: theme.spacing(1) }}>
+        <Grid item xs style={{ color: textColor, marginLeft: theme.spacing(1), marginRight: theme.spacing(1) }}>
           {report ? (
             <VerdictGauge verdicts={report.verdict} />
           ) : (
@@ -305,19 +325,12 @@ function TagTable({ group, items }) {
   );
 
   return (
-    <div className={classes.section} style={{ pageBreakInside: 'avoid' }}>
+    <div className={classes.section}>
       <div className={classes.section_title}>
         <Typography variant="h6">{t(`tag.${group}`)}</Typography>
         <Divider className={classes.divider} />
       </div>
-      <div
-        style={{
-          paddingTop: theme.spacing(2),
-          paddingBottom: theme.spacing(2),
-          paddingLeft: theme.spacing(1),
-          paddingRight: theme.spacing(1)
-        }}
-      >
+      <div className={classes.section_content}>
         <Grid container spacing={1}>
           {Object.keys(orderedItems).map((k, idx) => (
             <Grid
@@ -325,14 +338,12 @@ function TagTable({ group, items }) {
               item
               xs={12}
               style={{
-                marginBottom: theme.spacing(2),
-                paddingLeft: theme.spacing(1),
-                paddingRight: theme.spacing(1)
+                marginBottom: theme.spacing(2)
               }}
             >
-              <div style={{ display: 'flex', gap: '4px' }}>
+              <div style={{ display: 'flex', gap: theme.spacing(0.5) }}>
                 <TextVerdict verdict={orderedItems[k].verdict} mono />
-                <span style={{ fontSize: '110%', fontStyle: 'italic' }}>{t(orderedItems[k].type)}</span>
+                <span className={classes.tag_type}>{t(orderedItems[k].type)}</span>
               </div>
 
               <div style={{ marginLeft: theme.spacing(3.5), display: 'flex', flexWrap: 'wrap' }}>
@@ -341,7 +352,7 @@ function TagTable({ group, items }) {
                     key={vidx}
                     style={{
                       minWidth: '18rem',
-                      paddingBottom: '5px',
+                      marginBottom: theme.spacing(1.25),
                       wordBreak: 'break-word'
                     }}
                   >
@@ -358,18 +369,10 @@ function TagTable({ group, items }) {
 }
 
 function AttackMatrixBlock({ attack, items }) {
-  const theme = useTheme();
+  const classes = useStyles();
   return (
-    <div
-      style={{
-        height: '100%',
-        width: '100%',
-        display: 'inline-block',
-        pageBreakInside: 'avoid',
-        paddingBottom: theme.spacing(2)
-      }}
-    >
-      <span style={{ fontSize: '110%', textTransform: 'capitalize' }}>{attack.replace(/-/g, ' ')}</span>
+    <div className={classes.attack_bloc}>
+      <span className={classes.attack_title}>{attack.replace(/-/g, ' ')}</span>
       {Object.keys(items).map((cat, idx) => (
         <div key={idx}>
           <TextVerdict verdict={items[cat].h_type} mono />
@@ -381,23 +384,17 @@ function AttackMatrixBlock({ attack, items }) {
 }
 
 function AttackMatrixSkel() {
+  const classes = useStyles();
+  const theme = useTheme();
   return (
-    <div
-      style={{
-        paddingBottom: '1rem',
-        height: '100%',
-        width: '100%',
-        display: 'inline-block',
-        pageBreakInside: 'avoid'
-      }}
-    >
+    <div className={classes.attack_bloc}>
       <Skeleton style={{ height: '2rem' }} />
       <div style={{ display: 'flex', flexDirection: 'row' }}>
-        <Skeleton style={{ height: '2rem', width: '1.5rem', marginRight: '8px' }} />
+        <Skeleton style={{ height: '2rem', width: '1.5rem', marginRight: theme.spacing(2) }} />
         <Skeleton style={{ height: '2rem', flexGrow: 1 }} />
       </div>
       <div style={{ display: 'flex', flexDirection: 'row' }}>
-        <Skeleton style={{ height: '2rem', width: '1.5rem', marginRight: '8px' }} />
+        <Skeleton style={{ height: '2rem', width: '1.5rem', marginRight: theme.spacing(2) }} />
         <Skeleton style={{ height: '2rem', flexGrow: 1 }} />
       </div>
     </div>
@@ -406,6 +403,7 @@ function AttackMatrixSkel() {
 
 function HeuristicsList({ verdict, items, sections, name_map }) {
   const classes = useStyles();
+  const theme = useTheme();
   const classMap = {
     malicious: classes.malicious_heur,
     suspicious: classes.suspicious_heur,
@@ -432,8 +430,10 @@ function HeuristicsList({ verdict, items, sections, name_map }) {
                     .sort((a, b) => (a.title_text >= b.title_text ? 1 : -1))
                     .map((sec, secidx) => {
                       return (
-                        <div key={secidx} style={{ minWidth: '50%', flexGrow: 1 }}>
-                          <ResultSection section={sec} printable />
+                        <div key={secidx} className={classes.result_section}>
+                          <div style={{ marginRight: theme.spacing(1) }}>
+                            <ResultSection section={sec} printable />
+                          </div>
                         </div>
                       );
                     })
@@ -568,11 +568,11 @@ export default function SubmissionReport() {
     <PageCenter margin={4} width="100%">
       <div className={classes.page}>
         {c12nDef.enforce && (
-          <div style={{ paddingBottom: sp4 }}>
+          <div style={{ marginBottom: sp4 }}>
             <Classification size="tiny" c12n={report ? report.classification : null} />
           </div>
         )}
-        <div style={{ paddingBottom: theme.spacing(2) }}>
+        <div style={{ marginBottom: theme.spacing(4) }}>
           <Grid container alignItems="center">
             <Grid item xs>
               <div>
@@ -582,11 +582,11 @@ export default function SubmissionReport() {
                 </Typography>
               </div>
             </Grid>
-            <Grid item className="print-only">
+            <Grid item xs className="print-only" style={{ textAlign: 'right' }}>
               <img
                 src={`${process.env.PUBLIC_URL}/images/banner.svg`}
                 alt="Assemblyline Banner"
-                style={{ height: '64px' }}
+                style={{ height: theme.spacing(8) }}
               />
             </Grid>
             <Grid item xs={12} sm={3} className="no-print">
@@ -613,7 +613,7 @@ export default function SubmissionReport() {
             <Typography variant="h6">{t('general')}</Typography>
             <Divider className={classes.divider} />
           </div>
-          <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2) }}>
+          <div className={classes.section_content}>
             <Grid container spacing={1}>
               <Grid item xs={4} sm={3} lg={2}>
                 <span style={{ fontWeight: 500 }}>{t('file.name')}</span>
@@ -735,7 +735,7 @@ export default function SubmissionReport() {
         </div>
 
         {report && report.report_filtered && (
-          <div className={classes.section}>
+          <div className={classes.section_title}>
             <Typography variant="subtitle1">
               <b>**{t('warning')}</b>: {t('warning.text')}
             </Typography>
@@ -743,7 +743,7 @@ export default function SubmissionReport() {
         )}
 
         {report && report.report_partial && (
-          <div className={classes.section}>
+          <div className={classes.section_title}>
             <Typography variant="subtitle1">
               <b>**{t('warning')}</b>: {t('warning.partial')}
             </Typography>
@@ -751,12 +751,12 @@ export default function SubmissionReport() {
         )}
 
         {(!report || Object.keys(report.metadata).length !== 0) && (
-          <div className={classes.section} style={{ pageBreakInside: 'avoid' }}>
+          <div className={classes.section}>
             <div className={classes.section_title}>
               <Typography variant="h6">{t('metadata')}</Typography>
               <Divider className={classes.divider} />
             </div>
-            <table style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2), width: '100%' }}>
+            <table className={classes.section_content} style={{ width: '100%' }}>
               <tbody>
                 {report
                   ? Object.keys(report.metadata).map((meta, i) => (
@@ -764,7 +764,7 @@ export default function SubmissionReport() {
                         <td style={{ width: '20%' }}>
                           <span style={{ fontWeight: 500 }}>{meta}</span>
                         </td>
-                        <td style={{ paddingLeft: theme.spacing(1), width: '80%', wordBreak: 'break-word' }}>
+                        <td style={{ marginLeft: theme.spacing(1), width: '80%', wordBreak: 'break-word' }}>
                           {report.metadata[meta]}
                         </td>
                       </tr>
@@ -789,7 +789,7 @@ export default function SubmissionReport() {
           Object.keys(report.heuristics.suspicious).length !== 0 ||
           Object.keys(report.heuristics.info).length !== 0 ||
           (report.heuristics.safe && Object.keys(report.heuristics.safe).length !== 0)) && (
-          <div className={classes.section}>
+          <>
             <div className={classes.section_title}>
               <Typography variant="h6">{t('heuristics')}</Typography>
               <Divider className={classes.divider} />
@@ -832,19 +832,18 @@ export default function SubmissionReport() {
             ) : (
               [...Array(3)].map((_, i) => <HeuristicsListSkel key={i} />)
             )}
-          </div>
+          </>
         )}
 
         {(!report || Object.keys(report.attack_matrix).length !== 0) && (
-          <div className={classes.section} style={{ pageBreakInside: 'avoid' }}>
+          <div className={classes.section}>
             <div className={classes.section_title}>
               <Typography variant="h6">{t('attack')}</Typography>
               <Divider className={classes.divider} />
             </div>
             <div
+              className={classes.section_content}
               style={{
-                paddingTop: theme.spacing(2),
-                paddingBottom: theme.spacing(2),
                 columnWidth: '20rem',
                 columnGap: '1rem'
               }}
@@ -865,16 +864,12 @@ export default function SubmissionReport() {
           ))}
 
         {(!report || report.important_files.length !== 0) && (
-          <div className={classes.section} style={{ paddingBottom: 0, pageBreakInside: 'avoid' }}>
+          <div className={classes.section}>
             <div className={classes.section_title}>
               <Typography variant="h6">{t('important_files')}</Typography>
               <Divider className={classes.divider} />
             </div>
-            <div
-              style={{
-                paddingTop: theme.spacing(2)
-              }}
-            >
+            <div className={classes.section_content}>
               {report ? (
                 <FileTree
                   tree={report.file_tree[report.files[0].sha256].children}

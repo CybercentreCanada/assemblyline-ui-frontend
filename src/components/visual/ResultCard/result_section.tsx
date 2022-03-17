@@ -214,57 +214,60 @@ const ResultSection: React.FC<ResultSectionProps> = ({
 
   return (
     <>
-      <Menu
-        open={state !== null && !printable}
-        onClose={handleClose}
-        anchorReference="anchorPosition"
-        anchorPosition={state !== null ? { top: state.mouseY, left: state.mouseX } : undefined}
-      >
-        <MenuItem id="clipID" dense onClick={handleMenuCopy}>
-          {CLIPBOARD_ICON}
-          {t('clipboard')}
-        </MenuItem>
-        {!highlighted && section.heuristic && (
-          <MenuItem
-            dense
-            onClick={handleShowHeur}
-            style={{ color: showHeur ? theme.palette.text.primary : theme.palette.text.disabled }}
-          >
-            {HEURISTIC_ICON}
-            {t('show_heur')}
+      {!printable && (
+        <Menu
+          open={state !== null}
+          onClose={handleClose}
+          anchorReference="anchorPosition"
+          anchorPosition={state !== null ? { top: state.mouseY, left: state.mouseX } : undefined}
+        >
+          <MenuItem id="clipID" dense onClick={handleMenuCopy}>
+            {CLIPBOARD_ICON}
+            {t('clipboard')}
           </MenuItem>
-        )}
-        {!highlighted && Array.isArray(section.tags) && section.tags.length > 0 && (
-          <MenuItem
-            dense
-            onClick={handleShowTags}
-            style={{ color: showTags ? theme.palette.text.primary : theme.palette.text.disabled }}
-          >
-            {TAGS_ICON}
-            {t('show_tags')}
-          </MenuItem>
-        )}
-        {!highlighted &&
-          section.heuristic &&
-          section.heuristic.attack &&
-          Array.isArray(section.heuristic.attack) &&
-          section.heuristic.attack.length > 0 && (
+          {!highlighted && section.heuristic && (
             <MenuItem
               dense
-              onClick={handleShowAttack}
-              style={{ color: showAttack ? theme.palette.text.primary : theme.palette.text.disabled }}
+              onClick={handleShowHeur}
+              style={{ color: showHeur ? theme.palette.text.primary : theme.palette.text.disabled }}
             >
-              {ATTACK_ICON}
-              {t('show_attack')}
+              {HEURISTIC_ICON}
+              {t('show_heur')}
             </MenuItem>
           )}
-      </Menu>
+          {!highlighted && Array.isArray(section.tags) && section.tags.length > 0 && (
+            <MenuItem
+              dense
+              onClick={handleShowTags}
+              style={{ color: showTags ? theme.palette.text.primary : theme.palette.text.disabled }}
+            >
+              {TAGS_ICON}
+              {t('show_tags')}
+            </MenuItem>
+          )}
+          {!highlighted &&
+            section.heuristic &&
+            section.heuristic.attack &&
+            Array.isArray(section.heuristic.attack) &&
+            section.heuristic.attack.length > 0 && (
+              <MenuItem
+                dense
+                onClick={handleShowAttack}
+                style={{ color: showAttack ? theme.palette.text.primary : theme.palette.text.disabled }}
+              >
+                {ATTACK_ICON}
+                {t('show_attack')}
+              </MenuItem>
+            )}
+        </Menu>
+      )}
       <div
         style={{
           display: 'flex',
           flexWrap: 'nowrap',
           marginLeft: !printable ? `${depth}rem` : null,
-          backgroundColor: highlighted ? (theme.palette.type === 'dark' ? '#343a44' : '#e2f2fa') : null
+          backgroundColor: highlighted ? (theme.palette.type === 'dark' ? '#343a44' : '#e2f2fa') : null,
+          pageBreakInside: 'avoid'
         }}
       >
         {!printable && (
