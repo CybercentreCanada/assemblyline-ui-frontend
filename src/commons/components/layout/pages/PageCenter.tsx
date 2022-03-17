@@ -4,7 +4,9 @@ import React from 'react';
 const useStyles = (w, mxw, ta, mb, ml, mr, mt) =>
   makeStyles(theme => ({
     page: {
-      display: 'flex',
+      '@media print': {
+        display: 'flex'
+      },
       textAlign: ta,
       margin: '0 auto auto auto',
       width: w,
@@ -14,13 +16,13 @@ const useStyles = (w, mxw, ta, mb, ml, mr, mt) =>
       }
     },
     children: {
-      flexGrow: 1,
       marginBottom: theme.spacing(mb),
       marginLeft: theme.spacing(ml),
       marginRight: theme.spacing(mr),
       marginTop: theme.spacing(mt),
       '@media print': {
-        margin: 0
+        margin: 0,
+        flexGrow: 1
       }
     }
   }))();

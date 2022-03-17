@@ -1,5 +1,6 @@
 import {
   createStyles,
+  makeStyles,
   Table,
   TableBody,
   TableCell,
@@ -12,6 +13,15 @@ import {
 import { default as React } from 'react';
 import TitleKey from '../TitleKey';
 import { KVBody } from './kv_body';
+
+const useStyles = printable =>
+  makeStyles(theme => ({
+    root: {
+      [theme.breakpoints.down('sm')]: {
+        width: printable ? '100%' : 'max-content'
+      }
+    }
+  }))();
 
 const StyledTableCell = withStyles((theme: Theme) =>
   createStyles({
@@ -50,21 +60,9 @@ const StyledTableRow = withStyles((theme: Theme) =>
   })
 )(TableRow);
 
-const StyledTable = withStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      [theme.breakpoints.down('sm')]: {
-        '@media print': {
-          width: '100%'
-        },
-        width: 'max-content'
-      }
-    }
-  })
-)(Table);
-
 const WrappedTblBody = ({ body, printable }) => {
   const headers = [];
+  const classes = useStyles(printable);
 
   if (body) {
     for (const line of body) {
@@ -82,8 +80,10 @@ const WrappedTblBody = ({ body, printable }) => {
 
   return (
     body && (
-      <TableContainer style={{ fontSize: '90%', maxHeight: printable ? null : '500px' }}>
-        <StyledTable stickyHeader size="small">
+      <TableContainer
+        style={{ fontSize: '90%', maxHeight: printable ? null : '500px', maxWidth: printable ? '100%' : null }}
+      >
+        <Table stickyHeader size="small" classes={{ root: classes.root }}>
           <TableHead>
             <TableRow>
               {headers.map((th, id) => (
@@ -93,7 +93,7 @@ const WrappedTblBody = ({ body, printable }) => {
               ))}
             </TableRow>
           </TableHead>
-          <TableBody>
+          <TableBody style={{ wordBreak: printable ? 'break-word' : null }}>
             {body.map((row, id) => (
               <StyledTableRow key={id}>
                 {headers.map((key, hid) => {
@@ -112,7 +112,7 @@ const WrappedTblBody = ({ body, printable }) => {
               </StyledTableRow>
             ))}
           </TableBody>
-        </StyledTable>
+        </Table>
       </TableContainer>
     )
   );
