@@ -1,15 +1,26 @@
 import { makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
 import React from 'react';
 
-const useStyles = (w, mxw, ta) =>
+const useStyles = (w, mxw, ta, mb, ml, mr, mt) =>
   makeStyles(theme => ({
     page: {
+      display: 'flex',
       textAlign: ta,
       margin: '0 auto auto auto',
       width: w,
       maxWidth: mxw,
       [theme.breakpoints.down('xs')]: {
         maxWidth: '100%'
+      }
+    },
+    children: {
+      flexGrow: 1,
+      marginBottom: theme.spacing(mb),
+      marginLeft: theme.spacing(ml),
+      marginRight: theme.spacing(mr),
+      marginTop: theme.spacing(mt),
+      '@media print': {
+        margin: 0
       }
     }
   }))();
@@ -37,22 +48,21 @@ const PageCenter: React.FC<PageCenterProps> = ({
   width = '95%',
   textAlign = 'center'
 }) => {
-  const classes = useStyles(width, maxWidth, textAlign);
   const theme = useTheme();
   const divider = useMediaQuery(theme.breakpoints.up('md')) ? 1 : 2;
+  const classes = useStyles(
+    width,
+    maxWidth,
+    textAlign,
+    margin / divider || mb / divider,
+    margin / divider || ml / divider,
+    margin / divider || mr / divider,
+    margin / divider || mt / divider
+  );
 
   return (
     <div className={classes.page}>
-      <div
-        style={{
-          marginBottom: theme.spacing(margin / divider || mb / divider),
-          marginLeft: theme.spacing(margin / divider || ml / divider),
-          marginRight: theme.spacing(margin / divider || mr / divider),
-          marginTop: theme.spacing(margin / divider || mt / divider)
-        }}
-      >
-        {children}
-      </div>
+      <div className={classes.children}>{children}</div>
     </div>
   );
 };

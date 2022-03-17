@@ -1,11 +1,41 @@
 @media print {
   body {
     color: rgba(0, 0, 0, 0.87) !important;
+    page-break-after: avoid;
+    page-break-before: avoid;
+  }
+
+  #root {
+    position: unset !important;
+  }
+
+  h1 {
+    font-size: 4rem !important;
+  }
+
+  h2 {
+    font-size: 3rem !important;
+  }
+
+  h3 {
+    font-size: 2.125rem !important;
+  }
+
+  h4 {
+    font-size: 1.5rem !important;
+  }
+
+  h5 {
+    font-size: 1.25rem !important;
+  }
+
+  h6 {
+    font-size: 1.1rem !important;
   }
 
   @page {
     size: auto;
-    margin: 15mm;
+    margin: 0.5in;
   }
 
   .no-print,
