@@ -280,7 +280,7 @@ const ResultSection: React.FC<ResultSectionProps> = ({
           />
         )}
 
-        <div style={{ width: '100%' }}>
+        <div style={{ width: `calc(100% - ${!nested ? 8 : 0}px)` }}>
           <Box className={printable ? classes.printable_section_title : classes.section_title} onClick={handleClick}>
             {c12nDef.enforce && !printable && (
               <>

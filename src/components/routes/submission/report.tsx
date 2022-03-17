@@ -1,4 +1,6 @@
 import {
+  Button,
+  Collapse,
   Divider,
   Grid,
   IconButton,
@@ -11,6 +13,8 @@ import {
 } from '@material-ui/core';
 import BugReportOutlinedIcon from '@material-ui/icons/BugReportOutlined';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import ListAltOutlinedIcon from '@material-ui/icons/ListAltOutlined';
 import MoodBadIcon from '@material-ui/icons/MoodBad';
 import PrintOutlinedIcon from '@material-ui/icons/PrintOutlined';
@@ -45,6 +49,21 @@ const NoPrintTooltip = withStyles(() => ({
 }))(Tooltip);
 
 const useStyles = makeStyles(theme => ({
+  alert: {
+    '@media print': {
+      backgroundColor: '#00000005',
+      border: '1px solid #DDD',
+      color: '#888'
+    },
+    backgroundColor: theme.palette.type === 'dark' ? '#ffffff05' : '#00000005',
+    border: `1px solid ${theme.palette.divider}`,
+    borderRadius: '4px',
+    color: theme.palette.text.secondary,
+    margin: '0.25rem 0',
+    padding: '16px 8px',
+    textAlign: 'center',
+    whiteSpace: 'pre-wrap'
+  },
   avatar: {
     display: 'inline-flex',
     width: theme.spacing(16),
@@ -541,7 +560,9 @@ export default function SubmissionReport() {
   const { apiCall } = useMyAPI();
   const sp4 = theme.spacing(4);
   const classes = useStyles();
+  const { configuration } = useALContext();
   const { showErrorMessage, showWarningMessage } = useMySnackbar();
+  const [metaOpen, setMetaOpen] = useState(false);
 
   useEffect(() => {
     apiCall({
@@ -753,23 +774,69 @@ export default function SubmissionReport() {
         {(!report || Object.keys(report.metadata).length !== 0) && (
           <div className={classes.section}>
             <div className={classes.section_title}>
-              <Typography variant="h6">{t('metadata')}</Typography>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-end',
+                  justifyContent: 'space-between'
+                }}
+              >
+                <Typography variant="h6">{t('metadata')}</Typography>
+                {report &&
+                  report.metadata &&
+                  Object.keys(report.metadata).filter(k => configuration.ui.alerting_meta.important.indexOf(k) === -1)
+                    .length !== 0 && (
+                    <Button
+                      size="small"
+                      onClick={() => setMetaOpen(!metaOpen)}
+                      style={{ color: theme.palette.text.secondary }}
+                      className="no-print"
+                    >
+                      {!metaOpen ? (
+                        <>
+                          {t('meta.more')}
+                          <KeyboardArrowDownIcon style={{ marginLeft: theme.spacing(1) }} />
+                        </>
+                      ) : (
+                        <>
+                          {t('meta.less')}
+                          <KeyboardArrowUpIcon style={{ marginLeft: theme.spacing(1) }} />
+                        </>
+                      )}
+                    </Button>
+                  )}
+              </div>
               <Divider className={classes.divider} />
             </div>
-            <table className={classes.section_content} style={{ width: '100%' }}>
-              <tbody>
-                {report
-                  ? Object.keys(report.metadata).map((meta, i) => (
-                      <tr key={i}>
-                        <td style={{ width: '20%' }}>
-                          <span style={{ fontWeight: 500 }}>{meta}</span>
-                        </td>
-                        <td style={{ marginLeft: theme.spacing(1), width: '80%', wordBreak: 'break-word' }}>
-                          {report.metadata[meta]}
-                        </td>
-                      </tr>
-                    ))
-                  : [...Array(3)].map((_, i) => (
+            <div className={classes.section_content}>
+              {report ? (
+                Object.keys(report.metadata).filter(k => configuration.ui.alerting_meta.important.indexOf(k) !== -1)
+                  .length !== 0 ? (
+                  <table width="100%">
+                    <tbody>
+                      {Object.keys(report.metadata)
+                        .filter(k => configuration.ui.alerting_meta.important.indexOf(k) !== -1)
+                        .map((meta, i) => (
+                          <tr key={i}>
+                            <td style={{ width: '20%' }}>
+                              <span style={{ fontWeight: 500 }}>{meta}</span>
+                            </td>
+                            <td style={{ marginLeft: theme.spacing(1), width: '80%', wordBreak: 'break-word' }}>
+                              {report.metadata[meta]}
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <Collapse in={!metaOpen} timeout="auto">
+                    <pre className={classes.alert}>{t('meta.empty')}</pre>
+                  </Collapse>
+                )
+              ) : (
+                <table width="100%">
+                  <tbody>
+                    {[...Array(3)].map((_, i) => (
                       <tr key={i} style={{ width: '100%' }}>
                         <td width="33%">
                           <Skeleton />
@@ -779,8 +846,32 @@ export default function SubmissionReport() {
                         </td>
                       </tr>
                     ))}
-              </tbody>
-            </table>
+                  </tbody>
+                </table>
+              )}
+              {report &&
+                Object.keys(report.metadata).filter(k => configuration.ui.alerting_meta.important.indexOf(k) === -1)
+                  .length !== 0 && (
+                  <Collapse in={metaOpen} timeout="auto">
+                    <table width="100%">
+                      <tbody>
+                        {Object.keys(report.metadata)
+                          .filter(k => configuration.ui.alerting_meta.important.indexOf(k) === -1)
+                          .map((meta, i) => (
+                            <tr key={i}>
+                              <td style={{ width: '20%' }}>
+                                <span style={{ fontWeight: 500 }}>{meta}</span>
+                              </td>
+                              <td style={{ marginLeft: theme.spacing(1), width: '80%', wordBreak: 'break-word' }}>
+                                {report.metadata[meta]}
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </Collapse>
+                )}
+            </div>
           </div>
         )}
 

@@ -392,7 +392,7 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                 {item &&
                   Object.keys(item.metadata).filter(k => configuration.ui.alerting_meta.important.indexOf(k) === -1)
                     .length !== 0 && (
-                    <Collapse in={metaOpen} timeout="auto">
+                    <Collapse in={metaOpen} timeout="auto" style={{ marginTop: theme.spacing(0.5) }}>
                       {item ? (
                         Object.keys(item.metadata)
                           .filter(k => configuration.ui.alerting_meta.important.indexOf(k) === -1)
