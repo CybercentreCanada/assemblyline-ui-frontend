@@ -5,6 +5,13 @@ export function bytesToSize(bytes: number | null) {
   return `${Math.round(bytes / Math.pow(1024, i))} ${sizes[i]}`;
 }
 
+export function humanReadableNumber(num: number | null) {
+  const sizes = ['', 'k', 'm', 'g', 't', 'p', 'e', 'z', 'y'];
+  if (num === 0 || num === null) return '0 ';
+  const i = Math.floor(Math.log(num) / Math.log(1000));
+  return `${Math.round(num / Math.pow(1000, i))}${sizes[i]} `;
+}
+
 export function resetFavicon() {
   const favicon: HTMLLinkElement = document.querySelector('#favicon');
   favicon.href = `${process.env.PUBLIC_URL}/favicon.ico`;
