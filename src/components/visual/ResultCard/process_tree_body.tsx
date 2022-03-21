@@ -2,9 +2,12 @@ import { makeStyles, Theme, Tooltip } from '@material-ui/core';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import FingerprintOutlinedIcon from '@material-ui/icons/FingerprintOutlined';
+import InsertDriveFileOutlinedIcon from '@material-ui/icons/InsertDriveFileOutlined';
+import SettingsEthernetOutlinedIcon from '@material-ui/icons/SettingsEthernetOutlined';
+import WidgetsOutlinedIcon from '@material-ui/icons/WidgetsOutlined';
 import { TreeItem, TreeView } from '@material-ui/lab';
 import clsx from 'clsx';
-import { scoreToVerdict } from 'helpers/utils';
+import { humanReadableNumber, scoreToVerdict } from 'helpers/utils';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -22,6 +25,9 @@ const useTreeItemStyles = makeStyles((theme: Theme) => ({
       }
   },
   treeItem: {
+    '&:hover': {
+      backgroundColor: theme.palette.type === 'dark' ? '#FFFFFF10' : '#00000010'
+    },
     '@media print': {
       border: '1px solid #DDD'
     },
@@ -46,26 +52,51 @@ const useTreeItemStyles = makeStyles((theme: Theme) => ({
     backgroundColor: theme.palette.type === 'dark' ? '#FFFFFF10' : '#00000010',
     borderRadius: '4px 0px 0px 4px'
   },
-  signature: {
+  counter: {
     '@media print': {
+      backgroundColor: '#00000010',
       color: 'black'
     },
-    alignSelf: 'center',
-    color: theme.palette.text.secondary
+    alignItems: 'flex-end',
+    backgroundColor: theme.palette.type === 'dark' ? '#FFFFFF10' : '#00000010',
+    color: theme.palette.text.secondary,
+    display: 'flex',
+    flexDirection: 'column',
+    fontSize: '90%',
+    minWidth: theme.spacing(6)
+  },
+  counter_img: {
+    height: theme.spacing(2.25)
+  },
+  counter_item: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    padding: theme.spacing(0.25),
+    width: '100%',
+    alignItems: 'center'
   },
   safe: {
+    '&:hover': {
+      backgroundColor: theme.palette.type === 'dark' ? '#355e35' : '#c0efc0'
+    },
     '@media print': {
       backgroundColor: '#d0ffd0'
     },
     backgroundColor: theme.palette.type === 'dark' ? '#254e25' : '#d0ffd0'
   },
   suspicious: {
+    '&:hover': {
+      backgroundColor: theme.palette.type === 'dark' ? '#755322' : '#efddc4'
+    },
     '@media print': {
       backgroundColor: '#ffedd4'
     },
     backgroundColor: theme.palette.type === 'dark' ? '#654312' : '#ffedd4'
   },
   malicious: {
+    '&:hover': {
+      backgroundColor: theme.palette.type === 'dark' ? '#5e3535' : '#efc0c0'
+    },
     '@media print': {
       backgroundColor: '#ffd0d0'
     },
@@ -92,12 +123,16 @@ const ProcessTreeItem = ({ process }) => {
         <div
           className={clsx(
             classes.treeItem,
-            classMap[
-              scoreToVerdict(
-                Object.keys(process.signatures).reduce((sum, key) => sum + parseFloat(process.signatures[key] || 0), 0)
-              )
-            ],
-            process.safelisted ? classes.safe : null
+            process.safelisted
+              ? classes.safe
+              : classMap[
+                  scoreToVerdict(
+                    Object.keys(process.signatures).reduce(
+                      (sum, key) => sum + parseFloat(process.signatures[key] || 0),
+                      0
+                    )
+                  )
+                ]
           )}
         >
           <div className={classes.pid}>{process.process_pid}</div>
@@ -111,16 +146,42 @@ const ProcessTreeItem = ({ process }) => {
               </samp>
             </div>
           </div>
-          <div className={classes.signature}>
+          <div className={classes.counter}>
             {Object.keys(process.signatures).length !== 0 && (
-              <div>
-                <Tooltip title={`${t('process_signatures')}: ${Object.keys(process.signatures).join(' | ')}`}>
-                  <span>
-                    {Object.keys(process.signatures).length}x
-                    <FingerprintOutlinedIcon style={{ verticalAlign: 'middle' }} />
-                  </span>
-                </Tooltip>
-              </div>
+              <Tooltip
+                title={`${Object.keys(process.signatures).length} ${t('process_signatures')} (${Object.keys(
+                  process.signatures
+                ).join(' | ')})`}
+              >
+                <div className={classes.counter_item}>
+                  <FingerprintOutlinedIcon className={classes.counter_img} />
+                  <span> {humanReadableNumber(Object.keys(process.signatures).length)}</span>
+                </div>
+              </Tooltip>
+            )}
+            {process.network_count !== 0 && (
+              <Tooltip title={`${process.network_count} ${t('process_network')}`}>
+                <div className={classes.counter_item}>
+                  <SettingsEthernetOutlinedIcon className={classes.counter_img} />
+                  <span>{humanReadableNumber(process.network_count)}</span>
+                </div>
+              </Tooltip>
+            )}
+            {process.file_count !== 0 && (
+              <Tooltip title={`${process.file_count} ${t('process_file')}`}>
+                <div className={classes.counter_item}>
+                  <InsertDriveFileOutlinedIcon className={classes.counter_img} />
+                  <span>{humanReadableNumber(process.file_count)}</span>
+                </div>
+              </Tooltip>
+            )}
+            {process.registry_count !== 0 && (
+              <Tooltip title={`${process.registry_count} ${t('process_registry')}`}>
+                <div className={classes.counter_item}>
+                  <WidgetsOutlinedIcon className={classes.counter_img} />
+                  <span>{humanReadableNumber(process.registry_count)}</span>
+                </div>
+              </Tooltip>
             )}
           </div>
         </div>
