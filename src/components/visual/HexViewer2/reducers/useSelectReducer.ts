@@ -5,7 +5,7 @@ import {
   isSameCellClick,
   orderSelectIndexes,
   ReducerProps,
-  renderClass,
+  renderArrayClass,
   RenderProps,
   Store,
   StoreRef,
@@ -27,30 +27,15 @@ export const useSelectReducer = () => {
 
   const selectRender = useCallback(
     (prevStore: Store, nextStore: Store, refs: StoreRef): void => {
-      // console.time('adding class');
       const prev = Array.from(
         { length: prevStore.select.endIndex - prevStore.select.startIndex + 1 },
         (_, i) => i + prevStore.select.startIndex
       );
-
       const next = Array.from(
         { length: nextStore.select.endIndex - nextStore.select.startIndex + 1 },
         (_, i) => i + nextStore.select.startIndex
       );
-
-      renderClass(refs.current.layout.bodyRef, prev, next, classes.select, refs.current.cellsRendered);
-
-      // const prevIndexes: number[] = getSelectIndexes(prevStore, refs);
-      // const nextIndexes: number[] = getSelectIndexes(nextStore, refs);
-
-      // const oldIndexes = prevIndexes.filter(index => !nextIndexes.includes(index));
-      // const newIndexes = nextIndexes.filter(index => !prevIndexes.includes(index));
-
-      // oldIndexes.forEach(index => removeClass(refs.current.layout.bodyRef, index, classes.select));
-      // newIndexes.forEach(index => addClass(refs.current.layout.bodyRef, index, classes.select));
-      // console.timeEnd('adding class');
-
-      // renderClass(refs.current.layout.bodyRef, [1], [2], classes.select);
+      renderArrayClass(refs.current.layout.bodyRef, prev, next, classes.select, refs.current.cellsRendered);
     },
     [classes.select]
   );

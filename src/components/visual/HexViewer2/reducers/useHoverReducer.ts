@@ -1,10 +1,9 @@
 import { useCallback } from 'react';
 import {
-  addClass,
   isAction,
   isCellMouseDown,
   ReducerProps,
-  removeClass,
+  renderIndexClass,
   RenderProps,
   Store,
   StoreRef,
@@ -28,9 +27,7 @@ export const useHoverReducer = () => {
     (prevStore: Store, nextStore: Store, refs: StoreRef): void => {
       const { index: prevIndex } = prevStore.hover;
       const { index: nextIndex } = nextStore.hover;
-
-      if (prevIndex !== null) removeClass(refs.current.layout.bodyRef, prevIndex, classes.hover);
-      if (nextIndex !== null) addClass(refs.current.layout.bodyRef, nextIndex, classes.hover);
+      renderIndexClass(refs.current.layout.bodyRef, prevIndex, nextIndex, classes.hover, refs.current.cellsRendered);
     },
     [classes.hover]
   );

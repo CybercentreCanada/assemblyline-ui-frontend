@@ -10,7 +10,7 @@ import {
   isPageUp,
   isSameCellClick,
   ReducerProps,
-  renderClass,
+  renderIndexClass,
   RenderProps,
   Store,
   StoreRef,
@@ -40,7 +40,8 @@ export const useCursorReducer = () => {
     (prevStore: Store, nextStore: Store, refs: StoreRef): void => {
       const { index: prevIndex } = prevStore.cursor;
       const { index: nextIndex } = nextStore.cursor;
-      renderClass(refs.current.layout.bodyRef, prevIndex, nextIndex, classes.cursor, refs.current.cellsRendered);
+      renderIndexClass(refs.current.layout.bodyRef, prevIndex, nextIndex, classes.cursor, refs.current.cellsRendered);
+      // renderClass(refs.current.layout.bodyRef, prevIndex, nextIndex, classes.cursor, refs.current.cellsRendered);
     },
     [classes.cursor]
   );

@@ -42,34 +42,35 @@ export const removeClassToArray = (
   classname: string
 ) => indexes.forEach(index => removeClassToRange(ref, index, index + length - 1, classname));
 
-const getQuery = (index: number | number[]) => {
-  if (Number.isInteger(index)) return ` [data-index="${index}"]`;
-  else if (Array.isArray(index)) return index.map(i => (i !== null && i >= 0 ? `[data-index="${i}"]` : '')).toString();
-};
-
-export const renderClass = (
+export const renderIndexClass = (
   ref: MutableRefObject<HTMLDivElement>,
-  prevState: number | number[],
-  nextState: number | number[],
+  prevState: number,
+  nextState: number,
   classname: string,
   { overscanStartIndex: start, overscanStopIndex: stop }: { overscanStartIndex: number; overscanStopIndex: number }
 ) => {
-  if (Number.isInteger(prevState) && Number.isInteger(nextState)) {
-    if (prevState === nextState) return;
-    ref.current?.querySelectorAll(getQuery([prevState as number, nextState as number]))?.forEach(el => {
-      const index = parseInt(el.getAttribute('data-index'));
-      if (nextState === index) el.classList.add('class', classname);
-      if (prevState === index) el.classList.remove('class', classname);
-    });
-    return;
-  } else if (Array.isArray(prevState) && Array.isArray(nextState)) {
-    const prev = prevState.filter(index => !nextState.includes(index) && start <= index && index <= stop);
-    const next = nextState.filter(index => !prevState.includes(index) && start <= index && index <= stop);
-    ref.current?.querySelectorAll('.cell').forEach(el => {
-      const index = parseInt(el.getAttribute('data-index'));
-      if (next.includes(index)) el.classList.add('class', classname);
-      if (prev.includes(index)) el.classList.remove('class', classname);
-    });
-    return;
-  }
+  if (prevState !== null && start <= prevState && prevState <= stop)
+    ref.current
+      ?.querySelectorAll("[data-index='" + prevState + "']")
+      ?.forEach(element => element.classList.remove('class', classname));
+  if (nextState !== null && start <= prevState && prevState <= stop)
+    ref.current
+      ?.querySelectorAll("[data-index='" + nextState + "']")
+      ?.forEach(element => element.classList.add('class', classname));
+};
+
+export const renderArrayClass = (
+  ref: MutableRefObject<HTMLDivElement>,
+  prevState: number[],
+  nextState: number[],
+  classname: string,
+  { overscanStartIndex: start, overscanStopIndex: stop }: { overscanStartIndex: number; overscanStopIndex: number }
+) => {
+  const prev = prevState.filter(index => !nextState.includes(index) && start <= index && index <= stop);
+  const next = nextState.filter(index => !prevState.includes(index) && start <= index && index <= stop);
+  ref.current?.querySelectorAll('.cell').forEach(el => {
+    const index = parseInt(el.getAttribute('data-index'));
+    if (prev.includes(index)) el.classList.remove('class', classname);
+    if (next.includes(index)) el.classList.add('class', classname);
+  });
 };
