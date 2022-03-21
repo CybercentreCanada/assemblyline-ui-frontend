@@ -53,6 +53,12 @@ const useTreeItemStyles = makeStyles((theme: Theme) => ({
     alignSelf: 'center',
     color: theme.palette.text.secondary
   },
+  safe: {
+    '@media print': {
+      backgroundColor: '#d0ffd0'
+    },
+    backgroundColor: theme.palette.type === 'dark' ? '#254e25' : '#d0ffd0'
+  },
   suspicious: {
     '@media print': {
       backgroundColor: '#ffedd4'
@@ -90,7 +96,8 @@ const ProcessTreeItem = ({ process }) => {
               scoreToVerdict(
                 Object.keys(process.signatures).reduce((sum, key) => sum + parseFloat(process.signatures[key] || 0), 0)
               )
-            ]
+            ],
+            process.safelisted ? classes.safe : null
           )}
         >
           <div className={classes.pid}>{process.process_pid}</div>
