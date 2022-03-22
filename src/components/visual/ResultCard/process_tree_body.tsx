@@ -146,44 +146,49 @@ const ProcessTreeItem = ({ process }) => {
               </samp>
             </div>
           </div>
-          <div className={classes.counter}>
-            {Object.keys(process.signatures).length !== 0 && (
-              <Tooltip
-                title={`${Object.keys(process.signatures).length} ${t('process_signatures')} (${Object.keys(
-                  process.signatures
-                ).join(' | ')})`}
-              >
-                <div className={classes.counter_item}>
-                  <FingerprintOutlinedIcon className={classes.counter_img} />
-                  <span> {humanReadableNumber(Object.keys(process.signatures).length)}</span>
-                </div>
-              </Tooltip>
-            )}
-            {process.network_count !== 0 && (
-              <Tooltip title={`${process.network_count} ${t('process_network')}`}>
-                <div className={classes.counter_item}>
-                  <SettingsEthernetOutlinedIcon className={classes.counter_img} />
-                  <span>{humanReadableNumber(process.network_count)}</span>
-                </div>
-              </Tooltip>
-            )}
-            {process.file_count !== 0 && (
-              <Tooltip title={`${process.file_count} ${t('process_file')}`}>
-                <div className={classes.counter_item}>
-                  <InsertDriveFileOutlinedIcon className={classes.counter_img} />
-                  <span>{humanReadableNumber(process.file_count)}</span>
-                </div>
-              </Tooltip>
-            )}
-            {process.registry_count !== 0 && (
-              <Tooltip title={`${process.registry_count} ${t('process_registry')}`}>
-                <div className={classes.counter_item}>
-                  <WidgetsOutlinedIcon className={classes.counter_img} />
-                  <span>{humanReadableNumber(process.registry_count)}</span>
-                </div>
-              </Tooltip>
-            )}
-          </div>
+          {(process.signatures && Object.keys(process.signatures).length !== 0) ||
+          process.network_count ||
+          process.file_count ||
+          process.registry_count ? (
+            <div className={classes.counter}>
+              {process.signatures && Object.keys(process.signatures).length !== 0 && (
+                <Tooltip
+                  title={`${Object.keys(process.signatures).length} ${t('process_signatures')} (${Object.keys(
+                    process.signatures
+                  ).join(' | ')})`}
+                >
+                  <div className={classes.counter_item}>
+                    <FingerprintOutlinedIcon className={classes.counter_img} />
+                    <span> {humanReadableNumber(Object.keys(process.signatures).length)}</span>
+                  </div>
+                </Tooltip>
+              )}
+              {process.network_count && process.network_count !== 0 && (
+                <Tooltip title={`${process.network_count} ${t('process_network')}`}>
+                  <div className={classes.counter_item}>
+                    <SettingsEthernetOutlinedIcon className={classes.counter_img} />
+                    <span>{humanReadableNumber(process.network_count)}</span>
+                  </div>
+                </Tooltip>
+              )}
+              {process.file_count && process.file_count !== 0 && (
+                <Tooltip title={`${process.file_count} ${t('process_file')}`}>
+                  <div className={classes.counter_item}>
+                    <InsertDriveFileOutlinedIcon className={classes.counter_img} />
+                    <span>{humanReadableNumber(process.file_count)}</span>
+                  </div>
+                </Tooltip>
+              )}
+              {process.registry_count && process.registry_count !== 0 && (
+                <Tooltip title={`${process.registry_count} ${t('process_registry')}`}>
+                  <div className={classes.counter_item}>
+                    <WidgetsOutlinedIcon className={classes.counter_img} />
+                    <span>{humanReadableNumber(process.registry_count)}</span>
+                  </div>
+                </Tooltip>
+              )}
+            </div>
+          ) : null}
         </div>
       }
     >
