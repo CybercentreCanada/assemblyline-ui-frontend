@@ -1,12 +1,10 @@
-import { alpha, Backdrop, Box, CircularProgress, IconButton, makeStyles, Tooltip, Typography } from '@material-ui/core';
-import { grey } from '@material-ui/core/colors';
+import { alpha, Box, CircularProgress, Drawer, IconButton, makeStyles, Tooltip, Typography } from '@material-ui/core';
 import BrokenImageOutlinedIcon from '@material-ui/icons/BrokenImageOutlined';
 import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import clsx from 'clsx';
 import Carousel from 'commons/addons/elements/carousel/Carousel';
-import { isEscape } from 'commons/addons/elements/utils/keyboard';
 import useMyAPI from 'components/hooks/useMyAPI';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -17,7 +15,7 @@ const MDSize = '64px';
 
 const useStyles = makeStyles(theme => ({
   backdrop: {
-    backgroundColor: alpha(grey[900], 0.8),
+    backgroundColor: 'transparent',
     backdropFilter: 'blur(1px)',
     zIndex: 1350
   },
@@ -144,6 +142,9 @@ const useStyles = makeStyles(theme => ({
     }
   },
   button: {
+    '&:hover': {
+      backgroundColor: alpha(theme.palette.secondary.main, 0.2)
+    },
     cursor: 'pointer',
     backgroundColor: alpha(theme.palette.secondary.main, 0.1),
     color: 'white',
@@ -230,7 +231,6 @@ function CarouselProvider(props: CarouselProviderProps) {
       thumbSrc: string;
     }>
   >([]);
-  const carouselRef = useRef<HTMLDivElement>(null);
   const carouselItemsRef = useRef<HTMLDivElement[] | null[]>([]);
 
   const openCarousel = (idx, imgs) => {
@@ -281,15 +281,6 @@ function CarouselProvider(props: CarouselProviderProps) {
     }
   }, [index, images, handleSelectedImageChange]);
 
-  useEffect(() => {
-    if (carousel) carouselRef.current.focus();
-  }, [carousel]);
-
-  const onKeyDown = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (isEscape(event.key)) closeCarousel();
-  }, []);
-
-
   return (
     <CarouselContext.Provider
       value={{
@@ -310,64 +301,68 @@ function CarouselProvider(props: CarouselProviderProps) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [children]
       )}
-
       {useMemo(
-        () => (
-          <Backdrop
-            className={clsx(classes.backdrop)}
-            open={carousel && images.length > 0}
-            onKeyDown={e => onKeyDown(e)}
-          >
-            <Carousel enableSwipe onNext={onNextImage} onPrevious={onPreviousImage} style={{ height: '100%' }}>
-              <div id="carousel-image" className={classes.carousel} ref={carouselRef} tabIndex={-1}>
-                <div className={classes.spacer} />
-                <div className={classes.textContainer} style={{ paddingBottom: '4px' }}>
-                  <Typography className={classes.text} variant="body2" noWrap>
-                    {images[index]?.name}
-                  </Typography>
-                </div>
-                <Image alt={images[index]?.name} src={images[index]?.imgSrc} />
-                <div className={classes.textContainer} style={{ paddingTop: '4px' }}>
-                  <Typography className={classes.text} variant="body2" noWrap>
-                    {images[index]?.description}
-                  </Typography>
-                </div>
-                <div className={classes.spacer} />
-                <div className={classes.thumbsSection}>
-                  <div className={classes.thumbsSlide}>
-                    {images.map((element, i) => {
-                      return (
-                        <Image
-                          key={'thumb-' + i}
-                          alt={element.name}
-                          src={element.thumbSrc}
-                          isThumb
-                          thumbSelected={index === i}
-                          onClick={() => {
-                            handleSelectedImageChange(i);
-                          }}
-                          onRef={el => (carouselItemsRef.current[i] = el)}
-                        />
-                      );
-                    })}
+        () =>
+          carousel &&
+          images.length && (
+            <Drawer open classes={{ paper: classes.backdrop }}>
+              <Carousel
+                autofocus
+                enableSwipe
+                escapeCallback={closeCarousel}
+                onNext={onNextImage}
+                onPrevious={onPreviousImage}
+                style={{ height: '100%' }}
+              >
+                <div id="carousel-image" className={classes.carousel} tabIndex={-1}>
+                  <div className={classes.spacer} />
+                  <div className={classes.textContainer} style={{ paddingBottom: '4px' }}>
+                    <Typography className={classes.text} variant="body2" noWrap>
+                      {images[index].name}
+                    </Typography>
+                  </div>
+                  <Image alt={images[index].name} src={images[index].imgSrc} />
+                  <div className={classes.textContainer} style={{ paddingTop: '4px' }}>
+                    <Typography className={classes.text} variant="body2" noWrap>
+                      {images[index].description}
+                    </Typography>
+                  </div>
+                  <div className={classes.spacer} />
+                  <div className={classes.thumbsSection}>
+                    <div className={classes.thumbsSlide}>
+                      {images.map((element, i) => {
+                        return (
+                          <Image
+                            key={'thumb-' + i}
+                            alt={element.name}
+                            src={element.thumbSrc}
+                            isThumb
+                            thumbSelected={index === i}
+                            onClick={() => {
+                              handleSelectedImageChange(i);
+                            }}
+                            onRef={el => (carouselItemsRef.current[i] = el)}
+                          />
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <IconButton className={clsx(classes.button, classes.closeButton)} onClick={closeCarousel}>
-                <CloseOutlinedIcon />
-              </IconButton>
+                <IconButton className={clsx(classes.button, classes.closeButton)} onClick={closeCarousel}>
+                  <CloseOutlinedIcon />
+                </IconButton>
 
-              <IconButton className={clsx(classes.button, classes.beforeButton)} onClick={onPreviousImage}>
-                <NavigateBeforeIcon />
-              </IconButton>
+                <IconButton className={clsx(classes.button, classes.beforeButton)} onClick={onPreviousImage}>
+                  <NavigateBeforeIcon />
+                </IconButton>
 
-              <IconButton className={clsx(classes.button, classes.nextButton)} onClick={onNextImage}>
-                <NavigateNextIcon />
-              </IconButton>
-            </Carousel>
-          </Backdrop>
-        ),
+                <IconButton className={clsx(classes.button, classes.nextButton)} onClick={onNextImage}>
+                  <NavigateNextIcon />
+                </IconButton>
+              </Carousel>
+            </Drawer>
+          ),
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [carousel, images, index]
       )}

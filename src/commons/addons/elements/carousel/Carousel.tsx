@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import { makeStyles } from '@material-ui/core';
-import { isArrowDown, isArrowLeft, isArrowRight, isArrowUp } from 'commons/addons/elements/utils/keyboard';
-import React, { useRef } from 'react';
+import { isArrowDown, isArrowLeft, isArrowRight, isArrowUp, isEscape } from 'commons/addons/elements/utils/keyboard';
+import React, { useEffect, useRef } from 'react';
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -10,10 +10,12 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export interface CarouselProps {
+  autofocus?: boolean;
   disableArrowUp?: boolean;
   disableArrowDown?: boolean;
   disableArrowLeft?: boolean;
   disableArrowRight?: boolean;
+  escapeCallback?: () => void;
   enableSwipe?: boolean;
   style?: any;
   children: React.ReactNode;
@@ -22,11 +24,13 @@ export interface CarouselProps {
 }
 
 const Carousel: React.FC<CarouselProps> = ({
+  autofocus,
   enableSwipe,
   disableArrowUp,
   disableArrowDown,
   disableArrowLeft,
   disableArrowRight,
+  escapeCallback,
   children,
   onPrevious,
   onNext,
@@ -40,8 +44,13 @@ const Carousel: React.FC<CarouselProps> = ({
   const touchDirection = useRef<'left' | 'right' | 'scroll'>();
   const touchStale = useRef<boolean>(false);
 
+  const carouselRef = useRef<HTMLDivElement>(null);
+
   const onKeyDown = (event: React.KeyboardEvent) => {
     const { key } = event;
+
+    if (isEscape(event.key) && escapeCallback) escapeCallback();
+
     if ((!disableArrowLeft && isArrowLeft(key)) || (!disableArrowUp && isArrowUp(key))) {
       onPrevious();
     } else if ((!disableArrowRight && isArrowRight(key)) || (!disableArrowDown && isArrowDown(key))) {
@@ -110,6 +119,10 @@ const Carousel: React.FC<CarouselProps> = ({
     touchStale.current = false;
   };
 
+  useEffect(() => {
+    if (autofocus) carouselRef.current.focus();
+  }, [autofocus]);
+
   return (
     <div
       tabIndex={-1}
@@ -119,6 +132,7 @@ const Carousel: React.FC<CarouselProps> = ({
       onTouchMove={enableSwipe && onTouchMove}
       onTouchEnd={enableSwipe && onTouchEnd}
       style={style}
+      ref={carouselRef}
     >
       {children}
     </div>
