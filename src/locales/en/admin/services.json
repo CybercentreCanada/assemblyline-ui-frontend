@@ -6,6 +6,7 @@
   "add.success": "The service was successfully added to the system.",
   "add.title": "Add a service",
   "backup": "Download a backup of the current services configurations",
+  "compare": "Compare the service statistics in-between versions",
   "container": "Container configuration",
   "container.card.command": "Executed command",
   "container.card.cpu": "CPU cores allocated",

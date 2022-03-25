@@ -10,6 +10,7 @@ import {
   Typography,
   useTheme
 } from '@material-ui/core';
+import CompareArrowsOutlinedIcon from '@material-ui/icons/CompareArrowsOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
 import { Skeleton, TabContext, TabList, TabPanel } from '@material-ui/lab';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
@@ -21,7 +22,7 @@ import CustomChip from 'components/visual/CustomChip';
 import Empty from 'components/visual/Empty';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Redirect, useHistory, useParams } from 'react-router-dom';
+import { Link, Redirect, useHistory, useParams } from 'react-router-dom';
 import ServiceContainer from './service_detail/container';
 import ServiceGeneral from './service_detail/general';
 import ServiceParams from './service_detail/parameters';
@@ -280,22 +281,32 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
         </Grid>
         <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
           {service ? (
-            <>
-              <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
-                <Tooltip title={t('remove')}>
-                  <IconButton
-                    style={{
-                      color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                    }}
-                    onClick={handleDeleteButtonClick}
-                  >
-                    <RemoveCircleOutlineOutlinedIcon />
-                  </IconButton>
-                </Tooltip>
-              </div>
-            </>
+            <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
+              <Tooltip title={t('compare')}>
+                <IconButton
+                  component={Link}
+                  style={{ color: theme.palette.action.active }}
+                  to={`/admin/services_compare?service=${service.name}&v1=${service.version}`}
+                >
+                  <CompareArrowsOutlinedIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={t('remove')}>
+                <IconButton
+                  style={{
+                    color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                  }}
+                  onClick={handleDeleteButtonClick}
+                >
+                  <RemoveCircleOutlineOutlinedIcon />
+                </IconButton>
+              </Tooltip>
+            </div>
           ) : (
-            <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+            <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
+              <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+              <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+            </div>
           )}
         </Grid>
       </Grid>
