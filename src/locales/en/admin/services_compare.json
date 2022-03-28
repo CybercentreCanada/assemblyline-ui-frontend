@@ -6,7 +6,8 @@
   "result.count": "Number of results",
   "result.score.avg": "Average Score",
   "result.score.distribution": "Score distribution",
-  "service.selection": "Service selection:",
+  "service.selection": "Select a service",
+  "service.version": "Select a version",
   "subtitle": "Compare the statistics of two service versions to spot potential issues with new releases",
   "title": "Service Review"
 }
