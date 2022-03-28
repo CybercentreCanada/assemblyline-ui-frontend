@@ -94,15 +94,20 @@ function ServiceDetail({ stats, comp }) {
 
 function VersionSelector({ possibleVersions, selectedService, version, setVersion, except }) {
   const theme = useTheme();
+  const { t } = useTranslation(['adminServicesCompare']);
   return selectedService && possibleVersions ? (
     <Select
       fullWidth
       value={version}
       onChange={event => setVersion(event.target.value)}
+      displayEmpty
       variant="outlined"
       margin="dense"
-      style={{ minWidth: theme.spacing(30) }}
+      style={{ minWidth: theme.spacing(30), color: version === '' ? theme.palette.text.disabled : null }}
     >
+      <MenuItem value="" disabled>
+        {t('service.version')}
+      </MenuItem>
       {possibleVersions
         .filter(item => item !== except)
         .map((v, id) => (
@@ -123,8 +128,8 @@ export default function ServicesCompare() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const defaultSelectedService = params.get('service') || '';
-  const defaultVersion1 = params.get('v1') || null;
-  const defaultVersion2 = params.get('v2') || null;
+  const defaultVersion1 = params.get('v1') || '';
+  const defaultVersion2 = params.get('v2') || '';
 
   const [services, setServices] = useState(null);
   const [selectedService, setSelectedService] = useState(defaultSelectedService);
@@ -138,8 +143,8 @@ export default function ServicesCompare() {
   const { user: currentUser } = useUser<CustomUser>();
 
   const handleServiceChange = event => {
-    setVersion1(null);
-    setVersion2(null);
+    setVersion1('');
+    setVersion2('');
     setSelectedService(event.target.value);
   };
 
@@ -193,13 +198,18 @@ export default function ServicesCompare() {
 
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>
-      <Grid container justifyContent="space-between" spacing={3} style={{ paddingBottom: theme.spacing(2) }}>
+      <Grid
+        container
+        alignItems="center"
+        justifyContent="space-between"
+        spacing={3}
+        style={{ paddingBottom: theme.spacing(2) }}
+      >
         <Grid item xs={12} md>
           <Typography variant="h4">{t('title')}</Typography>
           <Typography variant="subtitle1">{t('subtitle')}</Typography>
         </Grid>
         <Grid item xs={12} md style={{ flexGrow: 0 }}>
-          <Typography variant="h6">{t('service.selection')}</Typography>
           {services ? (
             <>
               <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
@@ -208,10 +218,17 @@ export default function ServicesCompare() {
                   fullWidth
                   value={selectedService}
                   onChange={handleServiceChange}
+                  displayEmpty
                   variant="outlined"
                   margin="dense"
-                  style={{ minWidth: theme.spacing(30) }}
+                  style={{
+                    minWidth: theme.spacing(30),
+                    color: selectedService === '' ? theme.palette.text.disabled : null
+                  }}
                 >
+                  <MenuItem value="" disabled>
+                    {t('service.selection')}
+                  </MenuItem>
                   {services.map((srv, id) => (
                     <MenuItem key={id} value={srv}>
                       {srv}
