@@ -5,6 +5,7 @@ import AssignmentOutlinedIcon from '@material-ui/icons/AssignmentOutlined';
 import BuildOutlinedIcon from '@material-ui/icons/BuildOutlined';
 import BusinessOutlinedIcon from '@material-ui/icons/BusinessOutlined';
 import CodeOutlinedIcon from '@material-ui/icons/CodeOutlined';
+import CompareArrowsOutlinedIcon from '@material-ui/icons/CompareArrowsOutlined';
 import DashboardOutlinedIcon from '@material-ui/icons/DashboardOutlined';
 import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
@@ -188,6 +189,13 @@ const useMyLayout = (): AppLayoutProps => {
             text: t('adminmenu.services'),
             route: '/admin/services',
             icon: <AccountTreeOutlinedIcon />,
+            nested: true
+          },
+          {
+            id: 'adminmenu.services_compare',
+            text: t('adminmenu.services_compare'),
+            icon: <CompareArrowsOutlinedIcon />,
+            route: '/admin/services_compare',
             nested: true
           },
           {

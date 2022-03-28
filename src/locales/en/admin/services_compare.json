@@ -1,0 +1,12 @@
+{
+  "error": "Error distribution",
+  "file.extracted.avg": "Average number of extracted file",
+  "file.supplementary.avg": "Average number of supplementary files",
+  "heuristic": "Heuristic distribution",
+  "result.count": "Number of results",
+  "result.score.avg": "Average Score",
+  "result.score.distribution": "Score distribution",
+  "service.selection": "Service selection:",
+  "subtitle": "Compare the statistics of two service versions to spot potential issues with new releases",
+  "title": "Service Review"
+}
