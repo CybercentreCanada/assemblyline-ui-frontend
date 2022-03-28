@@ -25,7 +25,7 @@ function DiffNumber({ stats, comp, field, variant = 'h4' as 'h4' }) {
   const v2 = Math.round(getDescendantProp(comp, field));
 
   return (
-    v1 && (
+    v1 != null && (
       <Typography variant={variant} align="center">
         {v1}
         {v2 ? (
