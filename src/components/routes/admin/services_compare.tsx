@@ -143,6 +143,8 @@ export default function ServicesCompare() {
   const { user: currentUser } = useUser<CustomUser>();
 
   const handleServiceChange = event => {
+    setStats1('');
+    setStats2('');
     setVersion1('');
     setVersion2('');
     setSelectedService(event.target.value);
