@@ -890,9 +890,7 @@ export default function SubmissionDetail() {
                             <Tooltip title={t('download')}>
                               <IconButton
                                 component={MaterialLink}
-                                href={`/api/v4/bundle/${
-                                  submission ? submission.sid : id
-                                }/?XSRF_TOKEN=${getXSRFCookie()}`}
+                                href={`/api/v4/bundle/${submission.sid}/?XSRF_TOKEN=${getXSRFCookie()}`}
                               >
                                 <CloudDownloadOutlinedIcon color="action" />
                               </IconButton>
@@ -904,16 +902,13 @@ export default function SubmissionDetail() {
                             </Tooltip>
                             {systemConfig.ui.allow_replay && (
                               <Tooltip title={t('replay')}>
-                                <IconButton onClick={replay} disabled={submission && submission.metadata.replay}>
+                                <IconButton onClick={replay} disabled={submission.metadata.replay}>
                                   <PublishOutlinedIcon />
                                 </IconButton>
                               </Tooltip>
                             )}
                             <Tooltip title={t('report_view')}>
-                              <IconButton
-                                component={Link}
-                                to={`/submission/report/${submission ? submission.sid : id}`}
-                              >
+                              <IconButton component={Link} to={`/submission/report/${submission.sid}`}>
                                 <ChromeReaderModeOutlinedIcon />
                               </IconButton>
                             </Tooltip>
@@ -945,9 +940,7 @@ export default function SubmissionDetail() {
                                   <Tooltip
                                     title={t(
                                       `verdict.${
-                                        submission && submission.verdict.malicious.indexOf(currentUser.username) !== -1
-                                          ? 'is'
-                                          : 'set'
+                                        submission.verdict.malicious.indexOf(currentUser.username) !== -1 ? 'is' : 'set'
                                       }.malicious`
                                     )}
                                   >
@@ -955,7 +948,6 @@ export default function SubmissionDetail() {
                                       <BugReportOutlinedIcon
                                         style={{
                                           color:
-                                            submission &&
                                             submission.verdict.malicious.indexOf(currentUser.username) !== -1
                                               ? theme.palette.error.dark
                                               : null
@@ -969,7 +961,6 @@ export default function SubmissionDetail() {
                                   <Tooltip
                                     title={t(
                                       `verdict.${
-                                        submission &&
                                         submission.verdict.non_malicious.indexOf(currentUser.username) !== -1
                                           ? 'is'
                                           : 'set'
@@ -980,7 +971,6 @@ export default function SubmissionDetail() {
                                       <VerifiedUserOutlinedIcon
                                         style={{
                                           color:
-                                            submission &&
                                             submission.verdict.non_malicious.indexOf(currentUser.username) !== -1
                                               ? theme.palette.success.dark
                                               : null
