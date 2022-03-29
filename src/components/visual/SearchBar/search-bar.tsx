@@ -129,6 +129,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           edge="end"
           size={!upMD ? 'small' : null}
           style={{ marginRight: theme.spacing(upMD ? 1 : 0.5) }}
+          disabled={searching}
         >
           <Tooltip title={t('clear_filter')}>
             <BackspaceIcon fontSize={!upMD ? 'small' : 'medium'} />
@@ -149,6 +150,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 edge="end"
                 size={!upMD ? 'small' : null}
                 style={{ marginRight: theme.spacing(upMD ? 1 : 0.5) }}
+                disabled={searching}
               >
                 {b.icon}
               </IconButton>
@@ -160,6 +162,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
               edge="end"
               size={!upMD ? 'small' : null}
               style={{ marginRight: theme.spacing(upMD ? 1 : 0.5) }}
+              disabled={searching}
             >
               {b.icon}
             </IconButton>
