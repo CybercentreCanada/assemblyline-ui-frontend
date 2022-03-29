@@ -98,12 +98,13 @@ function User({ width, username }: UserProps) {
       marginTop: '1rem'
     },
     skelItem: {
-      display: 'inline-block'
+      display: 'inline-block',
+      margin: theme.spacing(0.5)
     },
     skelButton: {
       display: 'inline-block',
       width: '9rem',
-      height: '4rem'
+      height: theme.spacing(5)
     },
     buttonProgress: {
       position: 'absolute',
@@ -413,6 +414,7 @@ function User({ width, username }: UserProps) {
                     </DeleteButton>
                   ) : (
                     <Skeleton
+                      variant="rect"
                       className={classes.skelButton}
                       style={{ minWidth: theme.spacing(16), width: downSM ? '100%' : null }}
                     />
@@ -459,8 +461,8 @@ function User({ width, username }: UserProps) {
                 <Skeleton
                   className={classes.skelItem}
                   variant="circle"
-                  width={downSM ? theme.spacing(24) : theme.spacing(16)}
-                  height={downSM ? theme.spacing(24) : theme.spacing(16)}
+                  width={downSM ? theme.spacing(24.5) : theme.spacing(16.5)}
+                  height={downSM ? theme.spacing(24.5) : theme.spacing(16.5)}
                 />
               )}
               <Typography gutterBottom>{user ? user.uname : <Skeleton />}</Typography>
@@ -478,6 +480,7 @@ function User({ width, username }: UserProps) {
                   />
                 ) : (
                   <Skeleton
+                    variant="rect"
                     className={classes.skelButton}
                     style={{ minWidth: theme.spacing(16), width: downSM ? '100%' : null }}
                   />

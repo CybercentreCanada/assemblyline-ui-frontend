@@ -612,16 +612,25 @@ export default function SubmissionReport() {
             </Grid>
             <Grid item xs={12} sm={3} className="no-print">
               <div style={{ textAlign: 'right' }}>
-                <NoPrintTooltip title={t('print')} PopperProps={{ disablePortal: true }}>
-                  <IconButton onClick={() => window.print()}>
-                    <PrintOutlinedIcon />
-                  </IconButton>
-                </NoPrintTooltip>
-                <Tooltip title={t('detail_view')}>
-                  <IconButton component={Link} to={`/submission/detail/${report ? report.sid : id}`}>
-                    <ListAltOutlinedIcon />
-                  </IconButton>
-                </Tooltip>
+                {report ? (
+                  <>
+                    <NoPrintTooltip title={t('print')} PopperProps={{ disablePortal: true }}>
+                      <IconButton onClick={() => window.print()}>
+                        <PrintOutlinedIcon />
+                      </IconButton>
+                    </NoPrintTooltip>
+                    <Tooltip title={t('detail_view')}>
+                      <IconButton component={Link} to={`/submission/detail/${report.sid}`}>
+                        <ListAltOutlinedIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </>
+                ) : (
+                  <div style={{ display: 'inline-flex' }}>
+                    <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+                    <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+                  </div>
+                )}
               </div>
             </Grid>
           </Grid>
