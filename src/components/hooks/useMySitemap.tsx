@@ -189,8 +189,8 @@ export default function useMySitemap() {
       { path: '/settings', title: t('usermenu.settings'), isRoot: true, icon: <SettingsOutlinedIcon /> },
       { path: '/admin', title: t('adminmenu'), isRoot: true, icon: <BusinessOutlinedIcon /> },
       {
-        path: '/admin/services_compare',
-        title: t('adminmenu.services_compare'),
+        path: '/admin/service_review',
+        title: t('adminmenu.service_review'),
         icon: <CompareArrowsOutlinedIcon />,
         breadcrumbs: ['/admin']
       },

@@ -192,10 +192,10 @@ const useMyLayout = (): AppLayoutProps => {
             nested: true
           },
           {
-            id: 'adminmenu.services_compare',
-            text: t('adminmenu.services_compare'),
+            id: 'adminmenu.service_review',
+            text: t('adminmenu.service_review'),
             icon: <CompareArrowsOutlinedIcon />,
-            route: '/admin/services_compare',
+            route: '/admin/service_review',
             nested: true
           },
           {

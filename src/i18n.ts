@@ -4,7 +4,7 @@ import error403EN from 'locales/en/403.json';
 import error404EN from 'locales/en/404.json';
 import adminErrorViewerEN from 'locales/en/admin/error_viewer.json';
 import adminServicesEN from 'locales/en/admin/services.json';
-import adminServicesCompareEN from 'locales/en/admin/services_compare.json';
+import adminServiceReviewEN from 'locales/en/admin/service_review.json';
 import adminSiteMapEN from 'locales/en/admin/site_map.json';
 import adminTagSafelistEN from 'locales/en/admin/tag_safelist.json';
 import adminUsersEN from 'locales/en/admin/users.json';
@@ -48,7 +48,7 @@ import error403FR from 'locales/fr/403.json';
 import error404FR from 'locales/fr/404.json';
 import adminErrorViewerFR from 'locales/fr/admin/error_viewer.json';
 import adminServicesFR from 'locales/fr/admin/services.json';
-import adminServicesCompareFR from 'locales/fr/admin/services_compare.json';
+import adminServiceReviewFR from 'locales/fr/admin/service_review.json';
 import adminSiteMapFR from 'locales/fr/admin/site_map.json';
 import adminTagSafelistFR from 'locales/fr/admin/tag_safelist.json';
 import adminUsersFR from 'locales/fr/admin/users.json';
@@ -94,7 +94,7 @@ const resources = {
   en: {
     adminErrorViewer: adminErrorViewerEN,
     adminServices: adminServicesEN,
-    adminServicesCompare: adminServicesCompareEN,
+    adminServiceReview: adminServiceReviewEN,
     adminSiteMap: adminSiteMapEN,
     adminTagSafelist: adminTagSafelistEN,
     adminUsers: adminUsersEN,
@@ -140,7 +140,7 @@ const resources = {
   fr: {
     adminErrorViewer: adminErrorViewerFR,
     adminServices: adminServicesFR,
-    adminServicesCompare: adminServicesCompareFR,
+    adminServiceReview: adminServiceReviewFR,
     adminSiteMap: adminSiteMapFR,
     adminTagSafelist: adminTagSafelistFR,
     adminUsers: adminUsersFR,
