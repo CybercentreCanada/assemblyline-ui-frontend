@@ -1,5 +1,6 @@
 import { Button, CircularProgress, createStyles, makeStyles, TextField, Typography } from '@material-ui/core';
 import useMyAPI from 'components/hooks/useMyAPI';
+import useMySnackbar from 'components/hooks/useMySnackbar';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -19,9 +20,10 @@ const useStyles = makeStyles(() =>
 type ResetPasswordNowProps = {
   buttonLoading: boolean;
   setButtonLoading: (value: boolean) => void;
+  reset: (event: any) => void;
 };
 
-export function ResetPasswordNow({ buttonLoading, setButtonLoading }: ResetPasswordNowProps) {
+export function ResetPasswordNow({ buttonLoading, setButtonLoading, reset }: ResetPasswordNowProps) {
   const location = useLocation();
   const history = useHistory();
   const { t } = useTranslation(['login']);
@@ -32,6 +34,7 @@ export function ResetPasswordNow({ buttonLoading, setButtonLoading }: ResetPassw
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [done, setDone] = useState(false);
+  const { showErrorMessage } = useMySnackbar();
 
   function onSubmit(event) {
     apiCall({
@@ -44,6 +47,12 @@ export function ResetPasswordNow({ buttonLoading, setButtonLoading }: ResetPassw
       },
       onEnter: () => setButtonLoading(true),
       onExit: () => setButtonLoading(false),
+      onFailure: api_data => {
+        if (api_data.api_status_code === 403) {
+          reset(null);
+        }
+        showErrorMessage(api_data.api_error_message);
+      },
       onSuccess: () => {
         setDone(true);
         setTimeout(() => window.location.reload(), 7000);
@@ -111,14 +120,16 @@ export function ResetPasswordNow({ buttonLoading, setButtonLoading }: ResetPassw
 type ResetPasswordProps = {
   buttonLoading: boolean;
   setButtonLoading: (value: boolean) => void;
+  reset: (event: any) => void;
 };
 
-export function ResetPassword({ buttonLoading, setButtonLoading }: ResetPasswordProps) {
+export function ResetPassword({ buttonLoading, setButtonLoading, reset }: ResetPasswordProps) {
   const { t } = useTranslation(['login']);
   const classes = useStyles();
   const { apiCall } = useMyAPI();
   const [email, setEmail] = useState('');
   const [done, setDone] = useState(false);
+  const { showErrorMessage } = useMySnackbar();
 
   function onSubmit(event) {
     apiCall({
@@ -127,6 +138,12 @@ export function ResetPassword({ buttonLoading, setButtonLoading }: ResetPassword
       body: { email },
       onEnter: () => setButtonLoading(true),
       onExit: () => setButtonLoading(false),
+      onFailure: api_data => {
+        if (api_data.api_status_code === 403) {
+          reset(null);
+        }
+        showErrorMessage(api_data.api_error_message);
+      },
       onSuccess: () => setDone(true)
     });
     event.preventDefault();
