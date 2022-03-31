@@ -1,6 +1,6 @@
 import { Collapse, Divider, Grid, makeStyles, Typography, useTheme } from '@material-ui/core';
-import ClearOutlinedIcon from '@material-ui/icons/ClearOutlined';
-import DoneOutlinedIcon from '@material-ui/icons/DoneOutlined';
+import CheckBoxOutlineBlankOutlinedIcon from '@material-ui/icons/CheckBoxOutlineBlankOutlined';
+import CheckBoxOutlinedIcon from '@material-ui/icons/CheckBoxOutlined';
 import { Skeleton } from '@material-ui/lab';
 import Verdict from 'components/visual/Verdict';
 import React, { useMemo } from 'react';
@@ -86,22 +86,22 @@ const WrappedInfoSection: React.FC<InfoSectionProps> = ({ submission }) => {
 
                 {['deep_scan', 'ignore_cache', 'ignore_dynamic_recursion_prevention', 'ignore_filtering'].map(
                   (k, i) => (
-                    <div key={i} style={{ display: 'contents' }}>
-                      <Grid item xs={4} sm={3} lg={2}>
+                    <>
+                      <Grid item xs={4} sm={3} lg={2} style={{ paddingTop: theme.spacing(0.5) }}>
                         <span style={{ fontWeight: 500 }}>{t(`params.${k}`)}</span>
                       </Grid>
-                      <Grid item xs={8} sm={9} lg={10}>
+                      <Grid item xs={8} sm={9} lg={10} style={{ height: theme.spacing(3.75) }}>
                         {submission ? (
                           submission.params[k] ? (
-                            <DoneOutlinedIcon color="primary" />
+                            <CheckBoxOutlinedIcon />
                           ) : (
-                            <ClearOutlinedIcon color="error" />
+                            <CheckBoxOutlineBlankOutlinedIcon />
                           )
                         ) : (
-                          <Skeleton />
+                          <Skeleton variant="rect" style={{ width: theme.spacing(3), height: theme.spacing(3) }} />
                         )}
                       </Grid>
-                    </div>
+                    </>
                   )
                 )}
 
@@ -116,7 +116,11 @@ const WrappedInfoSection: React.FC<InfoSectionProps> = ({ submission }) => {
                   <span style={{ fontWeight: 500 }}>{t('max_score')}</span>
                 </Grid>
                 <Grid item xs={8} sm={9} lg={10}>
-                  {submission ? <Verdict score={submission.max_score} /> : <Skeleton />}
+                  {submission ? (
+                    <Verdict score={submission.max_score} />
+                  ) : (
+                    <Skeleton variant="rect" style={{ width: theme.spacing(8), height: theme.spacing(2.5) }} />
+                  )}
                 </Grid>
 
                 {submission && submission.params.ttl !== 0 && (

@@ -258,41 +258,54 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                 </Grid>
                 <Grid item xs={12} sm>
                   <div style={{ textAlign: 'right' }}>
-                    <Tooltip title={t('related')}>
-                      <IconButton
-                        component={Link}
-                        to={`/search/submission?query=files.sha256:${file && file.file_info.sha256} OR results:${
-                          file && file.file_info.sha256
-                        }*`}
-                      >
-                        <AmpStoriesOutlinedIcon />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title={t('download')}>
-                      <IconButton
-                        component={MaterialLink}
-                        href={`/api/v4/file/download/${file && file.file_info.sha256}/?${
-                          file && fileName && file.file_info.sha256 !== fileName ? `name=${fileName}&` : ''
-                        }XSRF_TOKEN=${getXSRFCookie()}`}
-                      >
-                        <GetAppOutlinedIcon color="action" />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title={t('file_viewer')}>
-                      <IconButton component={Link} to={`/file/viewer/${file && file.file_info.sha256}`}>
-                        <PageviewOutlinedIcon />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title={t('resubmit_dynamic')}>
-                      <IconButton onClick={resubmit}>
-                        <RotateLeftOutlinedIcon />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title={t('safelist')}>
-                      <IconButton onClick={prepareSafelist}>
-                        <PlaylistAddCheckIcon />
-                      </IconButton>
-                    </Tooltip>
+                    {file ? (
+                      <>
+                        <Tooltip title={t('related')}>
+                          <IconButton
+                            component={Link}
+                            to={`/search/submission?query=files.sha256:${file.file_info.sha256} OR results:${file.file_info.sha256}*`}
+                          >
+                            <AmpStoriesOutlinedIcon />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title={t('download')}>
+                          <IconButton
+                            component={MaterialLink}
+                            href={`/api/v4/file/download/${file.file_info.sha256}/?${
+                              fileName && file.file_info.sha256 !== fileName ? `name=${fileName}&` : ''
+                            }XSRF_TOKEN=${getXSRFCookie()}`}
+                          >
+                            <GetAppOutlinedIcon color="action" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title={t('file_viewer')}>
+                          <IconButton component={Link} to={`/file/viewer/${file.file_info.sha256}`}>
+                            <PageviewOutlinedIcon />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title={t('resubmit_dynamic')}>
+                          <IconButton onClick={resubmit}>
+                            <RotateLeftOutlinedIcon />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title={t('safelist')}>
+                          <IconButton onClick={prepareSafelist}>
+                            <PlaylistAddCheckIcon />
+                          </IconButton>
+                        </Tooltip>
+                      </>
+                    ) : (
+                      <div style={{ display: 'inline-flex' }}>
+                        {[...Array(5)].map((_, i) => (
+                          <Skeleton
+                            variant="circle"
+                            height="2.5rem"
+                            width="2.5rem"
+                            style={{ margin: theme.spacing(0.5) }}
+                          />
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </Grid>
               </Grid>
