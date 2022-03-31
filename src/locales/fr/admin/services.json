@@ -6,6 +6,7 @@
   "add.success": "Le service a été ajouté avec succès au système.",
   "add.title": "Ajouter un service",
   "backup": "Téléchargez une sauvegarde des configurations des services",
+  "compare": "Comparez les statistiques de service entre les versions",
   "container": "Configuration du conteneur",
   "container.card.command": "Commande exécutée",
   "container.card.cpu": "Cœurs de processeur alloués",

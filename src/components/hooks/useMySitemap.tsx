@@ -8,6 +8,7 @@ import BuildOutlinedIcon from '@material-ui/icons/BuildOutlined';
 import BusinessOutlinedIcon from '@material-ui/icons/BusinessOutlined';
 import ChromeReaderModeOutlinedIcon from '@material-ui/icons/ChromeReaderModeOutlined';
 import CodeOutlinedIcon from '@material-ui/icons/CodeOutlined';
+import CompareArrowsOutlinedIcon from '@material-ui/icons/CompareArrowsOutlined';
 import DashboardOutlinedIcon from '@material-ui/icons/DashboardOutlined';
 import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
 import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
@@ -187,6 +188,12 @@ export default function useMySitemap() {
       { path: '/account', title: t('usermenu.account'), isRoot: true, icon: <AccountCircleOutlinedIcon /> },
       { path: '/settings', title: t('usermenu.settings'), isRoot: true, icon: <SettingsOutlinedIcon /> },
       { path: '/admin', title: t('adminmenu'), isRoot: true, icon: <BusinessOutlinedIcon /> },
+      {
+        path: '/admin/services_compare',
+        title: t('adminmenu.services_compare'),
+        icon: <CompareArrowsOutlinedIcon />,
+        breadcrumbs: ['/admin']
+      },
       {
         path: '/admin/errors',
         title: t('adminmenu.errors'),

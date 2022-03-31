@@ -2,6 +2,7 @@
   "adminmenu": "Administration",
   "adminmenu.errors": "Visualisateur d'erreurs",
   "adminmenu.services": "Services",
+  "adminmenu.services_compare": "Examen des services",
   "adminmenu.sitemap": "Plan du site",
   "adminmenu.tag_safelist": "Liste sûre système",
   "adminmenu.users": "Utilisateurs",

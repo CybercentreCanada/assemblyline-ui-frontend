@@ -1,0 +1,13 @@
+{
+  "error": "Répartition des erreurs",
+  "file.extracted.avg": "Nombre moyen de fichiers extraits",
+  "file.supplementary.avg": "Nombre moyen de fichiers supplémentaires",
+  "heuristic": "Distribution d'heuristiques",
+  "result.count": "Nombre de résultats",
+  "result.score.avg": "Score moyen",
+  "result.score.distribution": "Répartition des scores",
+  "service.selection": "Sélectionnez un service",
+  "service.version": "Sélectionnez une version",
+  "subtitle": "Comparez les statistiques de deux versions de service pour repérer les problèmes potentiels avec les nouvelles versions",
+  "title": "Examen des services"
+}
