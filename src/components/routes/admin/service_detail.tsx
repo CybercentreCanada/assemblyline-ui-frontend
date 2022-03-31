@@ -286,7 +286,7 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
                 <IconButton
                   component={Link}
                   style={{ color: theme.palette.action.active }}
-                  to={`/admin/services_compare?service=${service.name}&v1=${service.version}`}
+                  to={`/admin/service_review?service=${service.name}&v1=${service.version}`}
                 >
                   <CompareArrowsOutlinedIcon />
                 </IconButton>
