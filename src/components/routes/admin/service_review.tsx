@@ -41,7 +41,7 @@ function DiffNumber({ stats, comp, field, variant = 'h4' as 'h4' }) {
 }
 
 function Counter({ stats, comp, field, titleVariant = 'h6' as 'h6', numberVariant = 'h4' as 'h4' }) {
-  const { t } = useTranslation(['adminServicesCompare']);
+  const { t } = useTranslation(['adminServiceReview']);
   const theme = useTheme();
   return (
     <div style={{ marginBottom: theme.spacing(1) }}>
@@ -54,13 +54,13 @@ function Counter({ stats, comp, field, titleVariant = 'h6' as 'h6', numberVarian
 }
 
 function ServiceDetail({ stats, comp }) {
-  const { t } = useTranslation(['adminServicesCompare']);
+  const { t } = useTranslation(['adminServiceReview']);
   const theme = useTheme();
   return (
     stats && (
       <div style={{ marginTop: theme.spacing(4), marginBottom: theme.spacing(4) }}>
         <Typography variant="h3" align="center" gutterBottom>
-          {stats.version}
+          {stats.service.version}
         </Typography>
         <Counter stats={stats} comp={comp} field={'result.count'} />
         <Counter stats={stats} comp={comp} field={'result.score.avg'} />
@@ -94,7 +94,7 @@ function ServiceDetail({ stats, comp }) {
 
 function VersionSelector({ possibleVersions, selectedService, version, setVersion, except }) {
   const theme = useTheme();
-  const { t } = useTranslation(['adminServicesCompare']);
+  const { t } = useTranslation(['adminServiceReview']);
   return selectedService && possibleVersions ? (
     <Select
       fullWidth
@@ -121,8 +121,8 @@ function VersionSelector({ possibleVersions, selectedService, version, setVersio
   );
 }
 
-export default function ServicesCompare() {
-  const { t } = useTranslation(['adminServicesCompare']);
+export default function ServiceReview() {
+  const { t } = useTranslation(['adminServiceReview']);
   const theme = useTheme();
 
   const location = useLocation();
