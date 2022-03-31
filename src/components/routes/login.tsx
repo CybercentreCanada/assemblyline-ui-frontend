@@ -254,9 +254,11 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
               ) : null}
             </>
           ),
-          signup: <SignUp setButtonLoading={setButtonLoading} buttonLoading={buttonLoading} />,
-          reset: <ResetPassword setButtonLoading={setButtonLoading} buttonLoading={buttonLoading} />,
-          reset_now: <ResetPasswordNow setButtonLoading={setButtonLoading} buttonLoading={buttonLoading} />,
+          signup: <SignUp setButtonLoading={setButtonLoading} buttonLoading={buttonLoading} reset={reset} />,
+          reset: <ResetPassword setButtonLoading={setButtonLoading} buttonLoading={buttonLoading} reset={reset} />,
+          reset_now: (
+            <ResetPasswordNow setButtonLoading={setButtonLoading} buttonLoading={buttonLoading} reset={reset} />
+          ),
           oauth: (
             <OAuthLogin
               reset={reset}

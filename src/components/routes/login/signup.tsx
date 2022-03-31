@@ -1,5 +1,6 @@
 import { Button, CircularProgress, createStyles, makeStyles, TextField, Typography } from '@material-ui/core';
 import useMyAPI from 'components/hooks/useMyAPI';
+import useMySnackbar from 'components/hooks/useMySnackbar';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -18,9 +19,10 @@ const useStyles = makeStyles(() =>
 type SignUpProps = {
   buttonLoading: boolean;
   setButtonLoading: (value: boolean) => void;
+  reset: (event: any) => void;
 };
 
-export function SignUp({ buttonLoading, setButtonLoading }: SignUpProps) {
+export function SignUp({ buttonLoading, setButtonLoading, reset }: SignUpProps) {
   const { t } = useTranslation(['login']);
   const classes = useStyles();
   const { apiCall } = useMyAPI();
@@ -29,6 +31,7 @@ export function SignUp({ buttonLoading, setButtonLoading }: SignUpProps) {
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [done, setDone] = useState(false);
+  const { showErrorMessage } = useMySnackbar();
 
   function onSubmit(event) {
     apiCall({
@@ -42,6 +45,12 @@ export function SignUp({ buttonLoading, setButtonLoading }: SignUpProps) {
       },
       onEnter: () => setButtonLoading(true),
       onExit: () => setButtonLoading(false),
+      onFailure: api_data => {
+        if (api_data.api_status_code === 403) {
+          reset(null);
+        }
+        showErrorMessage(api_data.api_error_message);
+      },
       onSuccess: () => setDone(true)
     });
     event.preventDefault();
