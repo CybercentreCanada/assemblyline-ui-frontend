@@ -21,22 +21,22 @@ function getDescendantProp(obj, desc) {
 }
 
 function DiffNumber({ stats, comp, field, variant = 'h4' as 'h4' }) {
-  const v1 = Math.round(getDescendantProp(stats, field));
-  const v2 = Math.round(getDescendantProp(comp, field));
+  const prop1 = getDescendantProp(stats, field);
+  const prop2 = getDescendantProp(comp, field);
+  const v1 = Math.round(prop1);
+  const v2 = Math.round(prop2);
 
   return (
-    v1 != null && (
-      <Typography variant={variant} align="center">
-        {v1}
-        {v2 ? (
-          v1 > v2 ? (
-            <ArrowUpwardOutlinedIcon style={{ verticalAlign: 'middle' }} />
-          ) : v2 > v1 ? (
-            <ArrowDownwardOutlinedIcon style={{ verticalAlign: 'middle' }} />
-          ) : null
-        ) : null}
-      </Typography>
-    )
+    <Typography variant={variant} align="center">
+      {prop1 != null ? v1 : <Skeleton width="4rem" style={{ display: 'inline-block' }} />}
+      {prop1 != null && prop2 != null ? (
+        v1 > v2 ? (
+          <ArrowUpwardOutlinedIcon style={{ verticalAlign: 'middle' }} />
+        ) : v2 > v1 ? (
+          <ArrowDownwardOutlinedIcon style={{ verticalAlign: 'middle' }} />
+        ) : null
+      ) : null}
+    </Typography>
   );
 }
 
@@ -53,39 +53,57 @@ function Counter({ stats, comp, field, titleVariant = 'h6' as 'h6', numberVarian
   );
 }
 
-function ServiceDetail({ stats, comp }) {
+function ServiceDetail({ stats, comp, show }) {
   const { t } = useTranslation(['adminServiceReview']);
   const theme = useTheme();
   return (
-    stats && (
+    show && (
       <div style={{ marginTop: theme.spacing(4), marginBottom: theme.spacing(4) }}>
         <Typography variant="h3" align="center" gutterBottom>
-          {stats.service.version}
+          {stats ? stats.service.version : <Skeleton width="10rem" style={{ display: 'inline-block' }} />}
         </Typography>
         <Counter stats={stats} comp={comp} field={'result.count'} />
         <Counter stats={stats} comp={comp} field={'result.score.avg'} />
         <div style={{ marginBottom: theme.spacing(2) }}>
-          <LineGraph
-            dataset={stats.result.score.distribution}
-            datatype={stats.version}
-            height="200px"
-            title={t('result.score.distribution')}
-            titleSize={20}
-          />
+          {stats ? (
+            <LineGraph
+              dataset={stats.result.score.distribution}
+              datatype={stats.version}
+              height="200px"
+              title={t('result.score.distribution')}
+              titleSize={20}
+            />
+          ) : (
+            <Skeleton variant="rect" height="200px" width="100%" />
+          )}
         </div>
         <Counter stats={stats} comp={comp} field={'file.extracted.avg'} />
         <Counter stats={stats} comp={comp} field={'file.supplementary.avg'} />
         <div style={{ marginBottom: theme.spacing(2) }}>
-          <LineGraph
-            dataset={stats.heuristic}
-            datatype={stats.version}
-            height="250px"
-            title={t('heuristic')}
-            titleSize={20}
-          />
+          {stats ? (
+            <LineGraph
+              dataset={stats.heuristic}
+              datatype={stats.version}
+              height="250px"
+              title={t('heuristic')}
+              titleSize={20}
+            />
+          ) : (
+            <Skeleton variant="rect" height="200px" width="100%" />
+          )}
         </div>
         <div style={{ marginBottom: theme.spacing(2) }}>
-          <LineGraph dataset={stats.error} datatype={stats.version} height="250px" title={t('error')} titleSize={20} />
+          {stats ? (
+            <LineGraph
+              dataset={stats.error}
+              datatype={stats.version}
+              height="250px"
+              title={t('error')}
+              titleSize={20}
+            />
+          ) : (
+            <Skeleton variant="rect" height="200px" width="100%" />
+          )}
         </div>
       </div>
     )
@@ -143,8 +161,6 @@ export default function ServiceReview() {
   const { user: currentUser } = useUser<CustomUser>();
 
   const handleServiceChange = event => {
-    setStats1('');
-    setStats2('');
     setVersion1('');
     setVersion2('');
     setSelectedService(event.target.value);
@@ -152,6 +168,7 @@ export default function ServiceReview() {
 
   useEffect(() => {
     if (selectedService !== '' && version1) {
+      setStats1(null);
       apiCall({
         url: `/api/v4/service/stats/${selectedService}/?version=${version1}`,
         onSuccess: api_data => {
@@ -164,6 +181,7 @@ export default function ServiceReview() {
 
   useEffect(() => {
     if (selectedService !== '' && version2) {
+      setStats2(null);
       apiCall({
         url: `/api/v4/service/stats/${selectedService}/?version=${version2}`,
         onSuccess: api_data => {
@@ -263,7 +281,7 @@ export default function ServiceReview() {
                 except={version2}
                 setVersion={setVersion1}
               />
-              <ServiceDetail stats={stats1} comp={stats2} />
+              <ServiceDetail stats={stats1} comp={stats2} show={version1 !== ''} />
             </Grid>
             <Grid item xs={12} md={6}>
               <VersionSelector
@@ -273,7 +291,7 @@ export default function ServiceReview() {
                 except={version1}
                 setVersion={setVersion2}
               />
-              <ServiceDetail stats={stats2} comp={stats1} />
+              <ServiceDetail stats={stats2} comp={stats1} show={version2 !== ''} />
             </Grid>
           </Grid>
         </>
