@@ -5,16 +5,15 @@ import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 
 type HistogramProps = {
-  data: {
-    labels: string[];
-    datasets: { label: string; data: number[] }[];
-  };
+  dataset: { [s: string]: number };
+  datatype: string;
   title?: string;
-  height?: number;
+  height?: string;
   isDate?: boolean;
+  titleSize?: number;
 };
 
-const WrappedHistogram = ({ data, height, title, isDate }: HistogramProps) => {
+const WrappedHistogram = ({ dataset, height, title, isDate, datatype, titleSize = 14 }: HistogramProps) => {
   const theme = useTheme();
   const [max, setMax] = useState(5);
   const [histData, setHistData] = useState(null);
@@ -28,7 +27,7 @@ const WrappedHistogram = ({ data, height, title, isDate }: HistogramProps) => {
             display: true,
             text: title,
             color: theme.palette.text.primary,
-            font: { family: 'Roboto', size: 14 }
+            font: { family: 'Roboto', size: titleSize, weight: '500' }
           }
         : null,
       legend: { display: false }
@@ -40,7 +39,7 @@ const WrappedHistogram = ({ data, height, title, isDate }: HistogramProps) => {
           color: theme.palette.text.secondary
         },
         time: isDate ? { unit: 'day' as 'day' } : null,
-        type: isDate ? ('time' as 'time') : null
+        type: isDate ? ('time' as 'time') : ('linear' as 'linear')
       },
       y: {
         beginAtZero: true,
@@ -54,30 +53,30 @@ const WrappedHistogram = ({ data, height, title, isDate }: HistogramProps) => {
   };
 
   useEffect(() => {
-    if (data) {
-      const tempDatasets = [];
-      let maxValue = max;
-
-      data.datasets.forEach(dataset => {
-        maxValue = Math.max(maxValue, ...Object.values<number>(dataset.data));
-        tempDatasets.push({
-          ...dataset,
-          backgroundColor: theme.palette.primary.dark,
-          borderColor: theme.palette.primary.light,
-          borderWidth: 1,
-          hoverBackgroundColor: theme.palette.primary.main
-        });
+    if (dataset) {
+      setMax(Math.max(max, ...Object.values<number>(dataset)));
+      setHistData({
+        labels: Object.keys(dataset).map((key: string) => key.replace('T00:00:00.000Z', '')),
+        datasets: [
+          {
+            label: datatype,
+            data: Object.values(dataset),
+            backgroundColor: theme.palette.primary.dark,
+            borderColor: theme.palette.primary.light,
+            borderWidth: 1,
+            hoverBackgroundColor: theme.palette.primary.main
+          }
+        ]
       });
-
-      setMax(maxValue);
-      setHistData({ ...data, datasets: tempDatasets });
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, theme]);
+  }, [dataset, theme]);
 
   return histData ? (
-    <Line data={histData} height={height} options={options} />
+    <div style={{ height: height }}>
+      <Line data={histData} options={options} />
+    </div>
   ) : (
     <Skeleton variant="rect" height={height} />
   );
