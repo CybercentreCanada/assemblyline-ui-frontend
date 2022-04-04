@@ -268,10 +268,34 @@ export default function ErrorViewer() {
           />
         </Grid>
         <Grid item xs={12} md={6} lg={4}>
-          <LineGraph dataset={names} height="200px" title={t('graph.name.title')} datatype={t('graph.datatype')} />
+          <LineGraph
+            dataset={names}
+            height="200px"
+            title={t('graph.name.title')}
+            datatype={t('graph.datatype')}
+            onClick={(evt, element) => {
+              if (element.length > 0) {
+                var ind = element[0].index;
+                query.set('query', `response.service_name:${Object.keys(names)[ind]}`);
+                history.push(`${location.pathname}?${query.getDeltaString()}`);
+              }
+            }}
+          />
         </Grid>
         <Grid item xs={12} md={6} lg={4}>
-          <LineGraph dataset={types} height="200px" title={t('graph.type.title')} datatype={t('graph.datatype')} />
+          <LineGraph
+            dataset={types}
+            height="200px"
+            title={t('graph.type.title')}
+            datatype={t('graph.datatype')}
+            onClick={(evt, element) => {
+              if (element.length > 0) {
+                var ind = element[0].index;
+                query.set('query', `type:"${Object.keys(types)[ind]}"`);
+                history.push(`${location.pathname}?${query.getDeltaString()}`);
+              }
+            }}
+          />
         </Grid>
       </Grid>
 
