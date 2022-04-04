@@ -269,6 +269,11 @@ export default function ErrorViewer() {
                   items={query.getAll('filters', []).map(v => ({
                     variant: 'outlined',
                     label: `${v}`,
+                    color: v.indexOf('NOT ') === 0 ? 'error' : null,
+                    onClick: () => {
+                      query.replace('filters', v, v.indexOf('NOT ') === 0 ? v.substring(4) : `NOT ${v}`);
+                      history.push(`${location.pathname}?${query.getDeltaString()}`);
+                    },
                     onDelete: () => {
                       query.remove('filters', v);
                       history.push(`${location.pathname}?${query.getDeltaString()}`);
