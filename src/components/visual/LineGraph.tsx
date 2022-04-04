@@ -52,7 +52,7 @@ function WrappedLineGraph({ dataset, height, title, datatype, onClick, titleSize
 
   useEffect(() => {
     if (dataset) {
-      setMax(Math.max(max, ...Object.values<number>(dataset)));
+      setMax(Math.max(5, ...Object.values<number>(dataset)));
       setBarData({
         labels: Object.keys(dataset),
         datasets: [

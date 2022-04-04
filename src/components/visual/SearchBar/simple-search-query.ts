@@ -77,6 +77,19 @@ export default class SimpleSearchQuery {
     return this;
   }
 
+  public replace(key: string, old_item: string, new_item: string) {
+    const items = this.params.getAll(key) || [];
+    this.params.delete(key);
+    items.forEach(item => {
+      if (item !== old_item) {
+        this.params.append(key, item);
+      } else {
+        this.params.append(key, new_item);
+      }
+    });
+    return this;
+  }
+
   public getAll(key: string, defaultVal = null) {
     return this.params.getAll(key) || defaultVal;
   }
