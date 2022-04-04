@@ -1,5 +1,6 @@
 import { makeStyles, useTheme } from '@material-ui/core';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
+import useUser from 'commons/components/hooks/useAppUser';
 import React, { ReactNode, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
@@ -63,6 +64,7 @@ const useStyles = makeStyles(theme => ({
 export type ContentWithTOCItemDef = {
   id: string;
   subItems?: ContentWithTOCItemDef[];
+  is_admin?: boolean;
 };
 
 export type ContentWithTOCItemProps = {
@@ -77,22 +79,25 @@ const ContentWithTOCItem: React.FC<ContentWithTOCItemProps> = ({ translation, it
   const { t } = useTranslation([translation]);
   const currentHash = location.hash && location.hash !== '' ? location.hash.substring(1) : null;
   const active = currentHash && currentHash.startsWith(item.id) ? 'active' : null;
+  const { user: currentUser } = useUser();
 
   return (
-    <>
-      <li className={active}>
-        <Link to={`#${item.id}`} target="_self">
-          {t(item.id)}
-        </Link>
-      </li>
-      {active && item.subItems && (
-        <ul className={classes.toc} style={{ fontSize: 'smaller', paddingInlineStart: '8px' }}>
-          {item.subItems.map(itm => (
-            <ContentWithTOCItem key={itm.id} item={itm} translation={translation} />
-          ))}
-        </ul>
-      )}
-    </>
+    (!item.is_admin || (currentUser.is_admin && item.is_admin)) && (
+      <>
+        <li className={active}>
+          <Link to={`#${item.id}`} target="_self">
+            {t(item.id)}
+          </Link>
+        </li>
+        {active && item.subItems && (
+          <ul className={classes.toc} style={{ fontSize: 'smaller', paddingInlineStart: '8px' }}>
+            {item.subItems.map(itm => (
+              <ContentWithTOCItem key={itm.id} item={itm} translation={translation} />
+            ))}
+          </ul>
+        )}
+      </>
+    )
   );
 };
 
