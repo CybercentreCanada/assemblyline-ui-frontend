@@ -56,7 +56,7 @@ const WrappedHistogram = ({ dataset, height, title, isDate, datatype, onClick, t
 
   useEffect(() => {
     if (dataset) {
-      setMax(Math.max(max, ...Object.values<number>(dataset)));
+      setMax(Math.max(5, ...Object.values<number>(dataset)));
       setHistData({
         labels: Object.keys(dataset).map((key: string) => key.replace('T00:00:00.000Z', '')),
         datasets: [
