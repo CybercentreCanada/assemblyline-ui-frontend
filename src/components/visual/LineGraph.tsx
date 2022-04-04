@@ -9,9 +9,10 @@ type LineGraphProps = {
   title?: string;
   height?: string;
   titleSize?: number;
+  onClick?: (event: any, element: any) => void;
 };
 
-function WrappedLineGraph({ dataset, height, title, datatype, titleSize = 14 }: LineGraphProps) {
+function WrappedLineGraph({ dataset, height, title, datatype, onClick, titleSize = 14 }: LineGraphProps) {
   const theme = useTheme();
   const [max, setMax] = useState(5);
   const [barData, setBarData] = useState(null);
@@ -45,7 +46,8 @@ function WrappedLineGraph({ dataset, height, title, datatype, titleSize = 14 }: 
           precision: 0
         }
       }
-    }
+    },
+    onClick: onClick
   };
 
   useEffect(() => {

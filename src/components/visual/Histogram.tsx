@@ -11,9 +11,10 @@ type HistogramProps = {
   height?: string;
   isDate?: boolean;
   titleSize?: number;
+  onClick?: (event: any, element: any) => void;
 };
 
-const WrappedHistogram = ({ dataset, height, title, isDate, datatype, titleSize = 14 }: HistogramProps) => {
+const WrappedHistogram = ({ dataset, height, title, isDate, datatype, onClick, titleSize = 14 }: HistogramProps) => {
   const theme = useTheme();
   const [max, setMax] = useState(5);
   const [histData, setHistData] = useState(null);
@@ -49,7 +50,8 @@ const WrappedHistogram = ({ dataset, height, title, isDate, datatype, titleSize 
           precision: 0
         }
       }
-    }
+    },
+    onClick: onClick
   };
 
   useEffect(() => {
