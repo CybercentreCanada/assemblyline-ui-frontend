@@ -58,6 +58,38 @@ export default class SimpleSearchQuery {
     this.params.set(key, value);
   }
 
+  public add(key: string, value: string) {
+    const items = this.params.getAll(key) || [];
+    if (items.indexOf(value) === -1) {
+      this.params.append(key, value);
+    }
+    return this;
+  }
+
+  public remove(key: string, value: string) {
+    const items = this.params.getAll(key) || [];
+    this.params.delete(key);
+    items.forEach(item => {
+      if (item !== value) {
+        this.params.append(key, item);
+      }
+    });
+    return this;
+  }
+
+  public replace(key: string, old_item: string, new_item: string) {
+    const items = this.params.getAll(key) || [];
+    this.params.delete(key);
+    items.forEach(item => {
+      if (item !== old_item) {
+        this.params.append(key, item);
+      } else {
+        this.params.append(key, new_item);
+      }
+    });
+    return this;
+  }
+
   public getAll(key: string, defaultVal = null) {
     return this.params.getAll(key) || defaultVal;
   }
@@ -70,9 +102,11 @@ export default class SimpleSearchQuery {
     return this.params.has(key);
   }
 
-  public toString(): string {
+  public toString(strip: string[] = ['group_by']): string {
     const params = new URLSearchParams(this.params.toString());
-    params.delete('group_by');
+    strip.forEach(item => {
+      params.delete(item);
+    });
     return params.toString();
   }
 }

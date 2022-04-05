@@ -102,16 +102,7 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
           gap: '+1d'
         },
         onSuccess: api_data => {
-          const chartData = {
-            labels: Object.keys(api_data.api_response).map((key: string) => key.replace('T00:00:00.000Z', '')),
-            datasets: [
-              {
-                label: safelist_id || id,
-                data: Object.values(api_data.api_response)
-              }
-            ]
-          };
-          setHistogram(chartData);
+          setHistogram(api_data.api_response);
         }
       });
     }
@@ -456,7 +447,13 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
             </Grid>
           </Grid>
           <Grid item xs={12}>
-            <Histogram data={histogram} height={300} isDate title={t('chart.title')} />
+            <Histogram
+              dataset={histogram}
+              height="300px"
+              isDate
+              title={t('chart.title')}
+              datatype={safelist_id || id}
+            />
           </Grid>
         </Grid>
       </div>

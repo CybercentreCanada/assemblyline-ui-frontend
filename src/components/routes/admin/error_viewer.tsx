@@ -1,4 +1,4 @@
-import { makeStyles, Typography, useMediaQuery, useTheme } from '@material-ui/core';
+import { Grid, makeStyles, Typography, useMediaQuery, useTheme } from '@material-ui/core';
 import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
 import PanToolOutlinedIcon from '@material-ui/icons/PanToolOutlined';
 import ReportProblemOutlinedIcon from '@material-ui/icons/ReportProblemOutlined';
@@ -8,6 +8,9 @@ import PageHeader from 'commons/components/layout/pages/PageHeader';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
+import { ChipList } from 'components/visual/ChipList';
+import Histogram from 'components/visual/Histogram';
+import LineGraph from 'components/visual/LineGraph';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
@@ -26,6 +29,7 @@ const useStyles = makeStyles(theme => ({
   searchresult: {
     fontStyle: 'italic',
     paddingTop: theme.spacing(0.5),
+    paddingBottom: theme.spacing(0.5),
     display: 'flex',
     flexWrap: 'wrap',
     justifyContent: 'flex-end'
@@ -62,6 +66,9 @@ export default function ErrorViewer() {
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
   const filterValue = useRef<string>('');
   const { closeGlobalDrawer, setGlobalDrawer, globalDrawer } = useDrawer();
+  const [histogram, setHistogram] = useState(null);
+  const [types, setTypes] = useState(null);
+  const [names, setNames] = useState(null);
 
   useEffect(() => {
     setQuery(new SimpleSearchQuery(location.search, `rows=${pageSize}&offset=0`));
@@ -95,6 +102,34 @@ export default function ErrorViewer() {
         },
         onFinalize: () => {
           setSearching(false);
+        }
+      });
+      apiCall({
+        url: `/api/v4/search/facet/error/response.service_name/?${query.toString([
+          'rows',
+          'offset',
+          'sort',
+          'track_total_hits'
+        ])}`,
+        onSuccess: api_data => {
+          setNames(api_data.api_response);
+        }
+      });
+      apiCall({
+        url: `/api/v4/search/facet/error/type/?${query.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
+        onSuccess: api_data => {
+          setTypes(api_data.api_response);
+        }
+      });
+      apiCall({
+        url: `/api/v4/search/histogram/error/created/?start=now-30d&end=now&gap=1d&mincount=0&${query.toString([
+          'rows',
+          'offset',
+          'sort',
+          'track_total_hits'
+        ])}`,
+        onSuccess: api_data => {
+          setHistogram(api_data.api_response);
         }
       });
     }
@@ -227,9 +262,73 @@ export default function ErrorViewer() {
                 />
               </div>
             )}
+
+            {query && (
+              <div>
+                <ChipList
+                  items={query.getAll('filters', []).map(v => ({
+                    variant: 'outlined',
+                    label: `${v}`,
+                    color: v.indexOf('NOT ') === 0 ? 'error' : null,
+                    onClick: () => {
+                      query.replace('filters', v, v.indexOf('NOT ') === 0 ? v.substring(4) : `NOT ${v}`);
+                      history.push(`${location.pathname}?${query.getDeltaString()}`);
+                    },
+                    onDelete: () => {
+                      query.remove('filters', v);
+                      history.push(`${location.pathname}?${query.getDeltaString()}`);
+                    }
+                  }))}
+                />
+              </div>
+            )}
           </SearchBar>
         </div>
       </PageHeader>
+
+      {errorResults !== null && errorResults.total !== 0 && (
+        <Grid container spacing={2}>
+          <Grid item xs={12} lg={4}>
+            <Histogram
+              dataset={histogram}
+              height="200px"
+              title={t('graph.histogram.title')}
+              datatype={t('graph.datatype')}
+              isDate
+            />
+          </Grid>
+          <Grid item xs={12} md={6} lg={4}>
+            <LineGraph
+              dataset={names}
+              height="200px"
+              title={t('graph.name.title')}
+              datatype={t('graph.datatype')}
+              onClick={(evt, element) => {
+                if (element.length > 0) {
+                  var ind = element[0].index;
+                  query.add('filters', `response.service_name:${Object.keys(names)[ind]}`);
+                  history.push(`${location.pathname}?${query.getDeltaString()}`);
+                }
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} md={6} lg={4}>
+            <LineGraph
+              dataset={types}
+              height="200px"
+              title={t('graph.type.title')}
+              datatype={t('graph.datatype')}
+              onClick={(evt, element) => {
+                if (element.length > 0) {
+                  var ind = element[0].index;
+                  query.add('filters', `type:"${Object.keys(types)[ind]}"`);
+                  history.push(`${location.pathname}?${query.getDeltaString()}`);
+                }
+              }}
+            />
+          </Grid>
+        </Grid>
+      )}
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         <ErrorsTable errorResults={errorResults} setErrorKey={setErrorKey} />

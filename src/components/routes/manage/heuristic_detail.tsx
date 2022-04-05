@@ -119,16 +119,7 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
           gap: '+1d'
         },
         onSuccess: api_data => {
-          const chartData = {
-            labels: Object.keys(api_data.api_response).map((key: string) => key.replace('T00:00:00.000Z', '')),
-            datasets: [
-              {
-                label: heur_id || id,
-                data: Object.values(api_data.api_response)
-              }
-            ]
-          };
-          setHistogram(chartData);
+          setHistogram(api_data.api_response);
         }
       });
       apiCall({
@@ -332,7 +323,7 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
             </Grid>
           </Grid>
           <Grid item xs={12}>
-            <Histogram data={histogram} height={300} isDate title={t('chart.title')} />
+            <Histogram dataset={histogram} height="300px" isDate title={t('chart.title')} datatype={heur_id || id} />
           </Grid>
           <Grid item xs={12}>
             <Typography variant="h6">{t('last10')}</Typography>
