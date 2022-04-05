@@ -1,4 +1,4 @@
-import { Grid, makeStyles, Typography, useMediaQuery, useTheme } from '@material-ui/core';
+import { Grid, makeStyles, MenuItem, Select, Typography, useMediaQuery, useTheme } from '@material-ui/core';
 import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
 import PanToolOutlinedIcon from '@material-ui/icons/PanToolOutlined';
 import ReportProblemOutlinedIcon from '@material-ui/icons/ReportProblemOutlined';
@@ -50,6 +50,13 @@ type ErrorResults = {
   total: number;
 };
 
+const TC_MAP = {
+  null: 'created:[now-24h TO now]',
+  '4d': 'created:[now-4d TO now]',
+  '7d': 'created:[now-7d TO now]',
+  '1m': 'created:[now-1M TO now]'
+};
+
 export default function ErrorViewer() {
   const { t } = useTranslation(['adminErrorViewer']);
   const [pageSize] = useState(PAGE_SIZE);
@@ -71,7 +78,7 @@ export default function ErrorViewer() {
   const [names, setNames] = useState(null);
 
   useEffect(() => {
-    setQuery(new SimpleSearchQuery(location.search, `rows=${pageSize}&offset=0`));
+    setQuery(new SimpleSearchQuery(location.search, `rows=${pageSize}&offset=0&tc=24h`));
   }, [location.pathname, location.search, pageSize]);
 
   useEffect(() => {
@@ -92,11 +99,16 @@ export default function ErrorViewer() {
 
   useEffect(() => {
     if (query && currentUser.is_admin) {
-      query.set('rows', pageSize);
-      query.set('offset', 0);
+      const curQuery = new SimpleSearchQuery(query.toString(), `rows=${pageSize}&offset=0`);
+      const tc = query.get('tc');
+      curQuery.set('rows', pageSize);
+      curQuery.set('offset', 0);
+      if (tc !== 'all') {
+        curQuery.add('filters', TC_MAP[tc]);
+      }
       setSearching(true);
       apiCall({
-        url: `/api/v4/error/list/?${query.toString()}`,
+        url: `/api/v4/error/list/?${curQuery.toString()}`,
         onSuccess: api_data => {
           setErrorResults(api_data.api_response);
         },
@@ -105,7 +117,7 @@ export default function ErrorViewer() {
         }
       });
       apiCall({
-        url: `/api/v4/search/facet/error/response.service_name/?${query.toString([
+        url: `/api/v4/search/facet/error/response.service_name/?${curQuery.toString([
           'rows',
           'offset',
           'sort',
@@ -116,13 +128,13 @@ export default function ErrorViewer() {
         }
       });
       apiCall({
-        url: `/api/v4/search/facet/error/type/?${query.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
+        url: `/api/v4/search/facet/error/type/?${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
         onSuccess: api_data => {
           setTypes(api_data.api_response);
         }
       });
       apiCall({
-        url: `/api/v4/search/histogram/error/created/?start=now-30d&end=now&gap=1d&mincount=0&${query.toString([
+        url: `/api/v4/search/histogram/error/created/?start=now-30d&end=now&gap=1d&mincount=0&${curQuery.toString([
           'rows',
           'offset',
           'sort',
@@ -191,9 +203,29 @@ export default function ErrorViewer() {
 
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>
-      <div style={{ paddingBottom: theme.spacing(2) }}>
-        <Typography variant="h4">{t('title')}</Typography>
-      </div>
+      <Grid container spacing={2} style={{ paddingBottom: theme.spacing(2) }}>
+        <Grid item xs={12} sm={6}>
+          <Typography variant="h4">{t('title')}</Typography>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <Select
+            margin="dense"
+            value={query ? query.get('tc') || '24h' : '24h'}
+            variant="outlined"
+            onChange={event => {
+              query.set('tc', event.target.value);
+              history.push(`${location.pathname}?${query.getDeltaString()}`);
+            }}
+            fullWidth
+          >
+            <MenuItem value="24h">{t('tc.24h')}</MenuItem>
+            <MenuItem value="4d">{t('tc.4d')}</MenuItem>
+            <MenuItem value="7d">{t('tc.7d')}</MenuItem>
+            <MenuItem value="1m">{t('tc.1m')}</MenuItem>
+            <MenuItem value="all">{t('tc.all')}</MenuItem>
+          </Select>
+        </Grid>
+      </Grid>
 
       <PageHeader isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
