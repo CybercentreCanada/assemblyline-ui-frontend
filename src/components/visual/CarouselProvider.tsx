@@ -1,5 +1,4 @@
-import { alpha, Backdrop, Box, CircularProgress, IconButton, makeStyles, Tooltip, Typography } from '@material-ui/core';
-import { grey } from '@material-ui/core/colors';
+import { alpha, Box, CircularProgress, Drawer, IconButton, makeStyles, Tooltip, Typography } from '@material-ui/core';
 import BrokenImageOutlinedIcon from '@material-ui/icons/BrokenImageOutlined';
 import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
@@ -16,7 +15,7 @@ const MDSize = '64px';
 
 const useStyles = makeStyles(theme => ({
   backdrop: {
-    backgroundColor: alpha(grey[900], 0.8),
+    backgroundColor: 'transparent',
     backdropFilter: 'blur(1px)',
     zIndex: 1350
   },
@@ -143,6 +142,9 @@ const useStyles = makeStyles(theme => ({
     }
   },
   button: {
+    '&:hover': {
+      backgroundColor: alpha(theme.palette.secondary.main, 0.2)
+    },
     cursor: 'pointer',
     backgroundColor: alpha(theme.palette.secondary.main, 0.1),
     color: 'white',
@@ -151,7 +153,7 @@ const useStyles = makeStyles(theme => ({
   closeButton: {
     position: 'absolute',
     top: '0px',
-    left: '0px'
+    right: '0px'
   },
   beforeButton: {
     position: 'absolute',
@@ -299,14 +301,20 @@ function CarouselProvider(props: CarouselProviderProps) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [children]
       )}
-
-      {useMemo(() => {
-        return (
+      {useMemo(
+        () =>
           carousel &&
           images.length && (
-            <Backdrop className={clsx(classes.backdrop)} open>
-              <Carousel enableSwipe onNext={onNextImage} onPrevious={onPreviousImage} style={{ height: '100%' }}>
-                <div id="carousel-image" className={classes.carousel}>
+            <Drawer open classes={{ paper: classes.backdrop }}>
+              <Carousel
+                autofocus
+                enableSwipe
+                escapeCallback={closeCarousel}
+                onNext={onNextImage}
+                onPrevious={onPreviousImage}
+                style={{ height: '100%' }}
+              >
+                <div id="carousel-image" className={classes.carousel} tabIndex={-1}>
                   <div className={classes.spacer} />
                   <div className={classes.textContainer} style={{ paddingBottom: '4px' }}>
                     <Typography className={classes.text} variant="body2" noWrap>
@@ -353,11 +361,11 @@ function CarouselProvider(props: CarouselProviderProps) {
                   <NavigateNextIcon />
                 </IconButton>
               </Carousel>
-            </Backdrop>
-          )
-        );
+            </Drawer>
+          ),
         // eslint-disable-next-line react-hooks/exhaustive-deps
-      }, [carousel, images, index])}
+        [carousel, images, index]
+      )}
     </CarouselContext.Provider>
   );
 }
