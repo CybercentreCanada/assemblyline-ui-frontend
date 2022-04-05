@@ -84,6 +84,7 @@ function ServiceDetail({ stats, comp, show }) {
             <LineGraph
               dataset={stats.heuristic}
               datatype={stats.version}
+              sorter={(a, b) => parseInt(a.split('.', 2)[1]) - parseInt(b.split('.', 2)[1])}
               height="250px"
               title={t('heuristic')}
               titleSize={20}

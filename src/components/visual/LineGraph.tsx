@@ -10,9 +10,10 @@ type LineGraphProps = {
   height?: string;
   titleSize?: number;
   onClick?: (event: any, element: any) => void;
+  sorter?: (a: any, b: any) => number;
 };
 
-function WrappedLineGraph({ dataset, height, title, datatype, onClick, titleSize = 14 }: LineGraphProps) {
+function WrappedLineGraph({ dataset, height, title, datatype, onClick, sorter, titleSize = 14 }: LineGraphProps) {
   const theme = useTheme();
   const [max, setMax] = useState(5);
   const [barData, setBarData] = useState(null);
@@ -52,13 +53,21 @@ function WrappedLineGraph({ dataset, height, title, datatype, onClick, titleSize
 
   useEffect(() => {
     if (dataset) {
+      let labels = Object.keys(dataset);
+      let data = Object.values(dataset);
+
+      if (sorter) {
+        labels.sort(sorter);
+        data = labels.map(k => dataset[k]);
+      }
+
       setMax(Math.max(5, ...Object.values<number>(dataset)));
       setBarData({
-        labels: Object.keys(dataset),
+        labels,
         datasets: [
           {
             label: datatype,
-            data: Object.values(dataset),
+            data,
             backgroundColor: theme.palette.primary.dark,
             borderColor: theme.palette.primary.light,
             borderWidth: 1,
