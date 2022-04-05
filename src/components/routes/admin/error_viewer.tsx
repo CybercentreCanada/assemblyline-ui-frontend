@@ -153,17 +153,22 @@ export default function ErrorViewer() {
 
   const onClear = useCallback(
     () => {
-      history.push(location.pathname);
+      if (query.getAll('filters').length !== 0) {
+        query.delete('query');
+        history.push(`${location.pathname}?${query.getDeltaString()}`);
+      } else {
+        history.push(location.pathname);
+      }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [location.pathname]
+    [location.pathname, query]
   );
 
   const onSearch = useCallback(
     () => {
       if (filterValue.current !== '') {
         query.set('query', filterValue.current);
-        history.push(`${location.pathname}?${query.toString()}`);
+        history.push(`${location.pathname}?${query.getDeltaString()}`);
       } else {
         onClear();
       }
