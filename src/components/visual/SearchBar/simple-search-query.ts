@@ -54,6 +54,12 @@ export default class SimpleSearchQuery {
     return this.params.get(key) || defaultVal;
   }
 
+  public pop(key: string, defaultVal = null) {
+    const val = this.params.get(key) || defaultVal;
+    this.params.delete(key);
+    return val;
+  }
+
   public set(key: string, value) {
     this.params.set(key, value);
   }

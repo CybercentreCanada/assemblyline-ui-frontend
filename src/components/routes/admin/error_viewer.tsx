@@ -100,7 +100,7 @@ export default function ErrorViewer() {
   useEffect(() => {
     if (query && currentUser.is_admin) {
       const curQuery = new SimpleSearchQuery(query.toString(), `rows=${pageSize}&offset=0`);
-      const tc = query.get('tc');
+      const tc = curQuery.pop('tc');
       curQuery.set('rows', pageSize);
       curQuery.set('offset', 0);
       if (tc !== 'all') {
