@@ -204,10 +204,10 @@ export default function ErrorViewer() {
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>
       <Grid container spacing={2} style={{ paddingBottom: theme.spacing(2) }}>
-        <Grid item xs={12} sm={6}>
+        <Grid item xs={12} sm={7} md={9} xl={10}>
           <Typography variant="h4">{t('title')}</Typography>
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid item xs={12} sm={5} md={3} xl={2}>
           <Select
             margin="dense"
             value={query ? query.get('tc') || '24h' : '24h'}
