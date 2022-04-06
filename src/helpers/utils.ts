@@ -5,6 +5,18 @@ export function bytesToSize(bytes: number | null) {
   return `${Math.round(bytes / Math.pow(1024, i))} ${sizes[i]}`;
 }
 
+export function getVersionQuery(version: string | null) {
+  try {
+    const [framework, major, minor, build] = version.replace('stable', '').split('.');
+    if (build.indexOf('dev') === -1) {
+      return `response.service_version:${framework}.${major}.${minor}.${build} OR response.service_version:${framework}.${major}.${minor}.stable${build}`;
+    }
+    return `response.service_version:${version}`;
+  } catch (e) {
+    return `response.service_version:${version}`;
+  }
+}
+
 export function humanReadableNumber(num: number | null) {
   const sizes = ['', 'k', 'm', 'g', 't', 'p', 'e', 'z', 'y'];
   if (num === 0 || num === null) return '0 ';

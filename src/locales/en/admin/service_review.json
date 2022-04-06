@@ -1,5 +1,6 @@
 {
   "error": "Error distribution",
+  "errors": "View errors in Error Viewer",
   "file.extracted.avg": "Average number of extracted file",
   "file.supplementary.avg": "Average number of supplementary files",
   "heuristic": "Heuristic distribution",

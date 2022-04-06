@@ -61,6 +61,7 @@
   "delete.title": "Supprimer le service",
   "disabled": "Désactivé",
   "enabled": "Activé",
+  "errors": "Afficher les erreurs dans le Visualiseur d'Erreurs",
   "general.accept": "Types de fichiers acceptés",
   "general.caching": "Mise en cache des résultats",
   "general.caching.disabled": "Désactivée",
