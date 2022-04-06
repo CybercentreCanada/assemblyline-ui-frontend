@@ -57,6 +57,22 @@ const TC_MAP = {
   '1m': 'created:[now-1M TO now]'
 };
 
+const START_MAP = {
+  null: 'now-1d',
+  '4d': 'now-4d',
+  '7d': 'now-7d',
+  '1m': 'now-1M',
+  '1y': 'now-1y'
+};
+
+const GAP_MAP = {
+  null: '1h',
+  '4d': '2h',
+  '7d': '4h',
+  '1m': '1d',
+  '1y': '15d'
+};
+
 export default function ErrorViewer() {
   const { t } = useTranslation(['adminErrorViewer']);
   const [pageSize] = useState(PAGE_SIZE);
@@ -103,7 +119,7 @@ export default function ErrorViewer() {
       const tc = curQuery.pop('tc');
       curQuery.set('rows', pageSize);
       curQuery.set('offset', 0);
-      if (tc !== 'all') {
+      if (tc !== '1y') {
         curQuery.add('filters', TC_MAP[tc]);
       }
       setSearching(true);
@@ -134,12 +150,9 @@ export default function ErrorViewer() {
         }
       });
       apiCall({
-        url: `/api/v4/search/histogram/error/created/?start=now-30d&end=now&gap=1d&mincount=0&${curQuery.toString([
-          'rows',
-          'offset',
-          'sort',
-          'track_total_hits'
-        ])}`,
+        url: `/api/v4/search/histogram/error/created/?start=${START_MAP[tc]}&end=now&gap=${
+          GAP_MAP[tc]
+        }&mincount=0&${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
         onSuccess: api_data => {
           setHistogram(api_data.api_response);
         }
@@ -222,7 +235,7 @@ export default function ErrorViewer() {
             <MenuItem value="4d">{t('tc.4d')}</MenuItem>
             <MenuItem value="7d">{t('tc.7d')}</MenuItem>
             <MenuItem value="1m">{t('tc.1m')}</MenuItem>
-            <MenuItem value="all">{t('tc.all')}</MenuItem>
+            <MenuItem value="1y">{t('tc.1y')}</MenuItem>
           </Select>
         </Grid>
       </Grid>
@@ -329,7 +342,7 @@ export default function ErrorViewer() {
             <Histogram
               dataset={histogram}
               height="200px"
-              title={t('graph.histogram.title')}
+              title={t(`graph.histogram.title.${query ? query.get('tc') || '24h' : '24h'}`)}
               datatype={t('graph.datatype')}
               isDate
             />
