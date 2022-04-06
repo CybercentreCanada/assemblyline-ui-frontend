@@ -164,7 +164,7 @@ export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
 
             <Grid item xs={12} md={8}>
               <label>{t('file_info')}</label>
-              <div style={{ wordBreak: 'break-word' }}>
+              <div style={{ wordBreak: 'break-all' }}>
                 <BsClipboard className={classes.clipboardIcon} onClick={() => copy(error.sha256, 'drawerTop')} />
                 {error.sha256}
               </div>
