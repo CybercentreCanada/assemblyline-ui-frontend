@@ -12,7 +12,11 @@
   "filtered": "error matching filter",
   "filtereds": "errors matching filter",
   "graph.datatype": "Errors",
-  "graph.histogram.title": "Error Distribution for the last 30 days",
+  "graph.histogram.title.24h": "Error Distribution for the last 24 hours",
+  "graph.histogram.title.4d": "Error Distribution for the last 4 days",
+  "graph.histogram.title.7d": "Error Distribution for the last week",
+  "graph.histogram.title.1m": "Error Distribution for the last month",
+  "graph.histogram.title.1y": "Error Distribution for the last year",
   "graph.name.title": "Service Error Distribution",
   "graph.type.title": "Error Type Distribution",
   "header.message": "Error Message",
@@ -35,5 +39,10 @@
   "type.SERVICE BUSY": "SERVICE BUSY",
   "type.SERVICE DOWN": "SERVICE DOWN",
   "type.TASK PRE-EMPTED": "TASK PRE-EMPTED",
-  "type.UNKNOWN": "UNKNOWN"
+  "type.UNKNOWN": "UNKNOWN",
+  "tc.24h": "Last 24 hours",
+  "tc.4d": "Last 4 days",
+  "tc.7d": "Last week",
+  "tc.1m": "Last month",
+  "tc.1y": "Last year"
 }

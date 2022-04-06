@@ -39,7 +39,18 @@ const WrappedHistogram = ({ dataset, height, title, isDate, datatype, onClick, t
         ticks: {
           color: theme.palette.text.secondary
         },
-        time: isDate ? { unit: 'day' as 'day' } : null,
+        time: isDate
+          ? {
+              unit: 'day' as 'day',
+              tooltipFormat: 'YYYY-MM-DD HH:mm:ss',
+              displayFormats: {
+                millisecond: 'HH:mm:ss.SSS',
+                second: 'HH:mm:ss',
+                minute: 'HH:mm',
+                hour: 'HH'
+              }
+            }
+          : null,
         type: isDate ? ('time' as 'time') : ('linear' as 'linear')
       },
       y: {
@@ -56,9 +67,13 @@ const WrappedHistogram = ({ dataset, height, title, isDate, datatype, onClick, t
 
   useEffect(() => {
     if (dataset) {
+      const labels = Object.keys(dataset).every(val => val.indexOf('T00:00:00.000Z') !== -1)
+        ? Object.keys(dataset).map((key: string) => key.replace('T00:00:00.000Z', ''))
+        : Object.keys(dataset);
+
       setMax(Math.max(5, ...Object.values<number>(dataset)));
       setHistData({
-        labels: Object.keys(dataset).map((key: string) => key.replace('T00:00:00.000Z', '')),
+        labels,
         datasets: [
           {
             label: datatype,
