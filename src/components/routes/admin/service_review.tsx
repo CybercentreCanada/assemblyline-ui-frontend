@@ -65,46 +65,34 @@ function ServiceDetail({ stats, comp, show }) {
         <Counter stats={stats} comp={comp} field={'result.count'} />
         <Counter stats={stats} comp={comp} field={'result.score.avg'} />
         <div style={{ marginBottom: theme.spacing(2) }}>
-          {stats ? (
-            <LineGraph
-              dataset={stats.result.score.distribution}
-              datatype={stats.version}
-              height="200px"
-              title={t('result.score.distribution')}
-              titleSize={20}
-            />
-          ) : (
-            <Skeleton variant="rect" height="200px" width="100%" />
-          )}
+          <LineGraph
+            dataset={stats && stats.result.score.distribution}
+            datatype={stats && stats.version}
+            height="200px"
+            title={t('result.score.distribution')}
+            titleSize={20}
+          />
         </div>
         <Counter stats={stats} comp={comp} field={'file.extracted.avg'} />
         <Counter stats={stats} comp={comp} field={'file.supplementary.avg'} />
         <div style={{ marginBottom: theme.spacing(2) }}>
-          {stats ? (
-            <LineGraph
-              dataset={stats.heuristic}
-              datatype={stats.version}
-              sorter={(a, b) => parseInt(a.split('.', 2)[1]) - parseInt(b.split('.', 2)[1])}
-              height="250px"
-              title={t('heuristic')}
-              titleSize={20}
-            />
-          ) : (
-            <Skeleton variant="rect" height="200px" width="100%" />
-          )}
+          <LineGraph
+            dataset={stats && stats.heuristic}
+            datatype={stats && stats.version}
+            sorter={(a, b) => parseInt(a.split('.', 2)[1]) - parseInt(b.split('.', 2)[1])}
+            height="250px"
+            title={t('heuristic')}
+            titleSize={20}
+          />
         </div>
         <div style={{ marginBottom: theme.spacing(2) }}>
-          {stats ? (
-            <LineGraph
-              dataset={stats.error}
-              datatype={stats.version}
-              height="250px"
-              title={t('error')}
-              titleSize={20}
-            />
-          ) : (
-            <Skeleton variant="rect" height="200px" width="100%" />
-          )}
+          <LineGraph
+            dataset={stats && stats.error}
+            datatype={stats && stats.version}
+            height="250px"
+            title={t('error')}
+            titleSize={20}
+          />
         </div>
       </div>
     )
