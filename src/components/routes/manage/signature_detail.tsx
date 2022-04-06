@@ -425,7 +425,13 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
             </Grid>
           </Grid>
           <Grid item xs={12}>
-            <Histogram dataset={histogram} height="300px" isDate title={t('chart.title')} datatype={signature.id} />
+            <Histogram
+              dataset={histogram}
+              height="300px"
+              isDate
+              title={t('chart.title')}
+              datatype={signature_id || id}
+            />
           </Grid>
           <Grid item xs={12}>
             <Typography variant="h6">{t('last10')}</Typography>

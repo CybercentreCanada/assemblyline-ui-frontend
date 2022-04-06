@@ -11,6 +11,7 @@ import {
   useTheme
 } from '@material-ui/core';
 import CompareArrowsOutlinedIcon from '@material-ui/icons/CompareArrowsOutlined';
+import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
 import { Skeleton, TabContext, TabList, TabPanel } from '@material-ui/lab';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
@@ -20,6 +21,7 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
 import Empty from 'components/visual/Empty';
+import { getVersionQuery } from 'helpers/utils';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, Redirect, useHistory, useParams } from 'react-router-dom';
@@ -282,6 +284,17 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
         <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
           {service ? (
             <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
+              <Tooltip title={t('errors')}>
+                <IconButton
+                  component={Link}
+                  style={{ color: theme.palette.action.active }}
+                  to={`/admin/errors?filters=response.service_name%3A${service.name}&filters=${getVersionQuery(
+                    service.version
+                  )}`}
+                >
+                  <ErrorOutlineOutlinedIcon />
+                </IconButton>
+              </Tooltip>
               <Tooltip title={t('compare')}>
                 <IconButton
                   component={Link}
@@ -304,6 +317,7 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
             </div>
           ) : (
             <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
+              <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
               <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
               <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
             </div>

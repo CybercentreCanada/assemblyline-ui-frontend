@@ -1,5 +1,6 @@
 {
   "error": "Répartition des erreurs",
+  "errors": "Afficher les erreurs dans le Visualiseur d'Erreurs",
   "file.extracted.avg": "Nombre moyen de fichiers extraits",
   "file.supplementary.avg": "Nombre moyen de fichiers supplémentaires",
   "heuristic": "Distribution d'heuristiques",

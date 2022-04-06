@@ -61,6 +61,7 @@
   "delete.title": "Remove Service",
   "disabled": "Disabled",
   "enabled": "Enabled",
+  "errors": "View errors in Error Viewer",
   "general.accept": "Accepted file types",
   "general.caching": "Result caching",
   "general.caching.disabled": "Disabled",

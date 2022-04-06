@@ -1,16 +1,18 @@
-import { Grid, MenuItem, Select, Typography, useTheme } from '@material-ui/core';
+import { Grid, IconButton, MenuItem, Select, Tooltip, Typography, useTheme } from '@material-ui/core';
 import ArrowDownwardOutlinedIcon from '@material-ui/icons/ArrowDownwardOutlined';
 import ArrowUpwardOutlinedIcon from '@material-ui/icons/ArrowUpwardOutlined';
+import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
 import { Skeleton } from '@material-ui/lab';
 import useUser from 'commons/components/hooks/useAppUser';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import LineGraph from 'components/visual/LineGraph';
+import { getVersionQuery } from 'helpers/utils';
 import 'moment/locale/fr';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Redirect, useLocation } from 'react-router-dom';
+import { Link, Redirect, useLocation } from 'react-router-dom';
 
 function getDescendantProp(obj, desc) {
   if (obj == null) return null;
@@ -65,46 +67,55 @@ function ServiceDetail({ stats, comp, show }) {
         <Counter stats={stats} comp={comp} field={'result.count'} />
         <Counter stats={stats} comp={comp} field={'result.score.avg'} />
         <div style={{ marginBottom: theme.spacing(2) }}>
-          {stats ? (
-            <LineGraph
-              dataset={stats.result.score.distribution}
-              datatype={stats.version}
-              height="200px"
-              title={t('result.score.distribution')}
-              titleSize={20}
-            />
-          ) : (
-            <Skeleton variant="rect" height="200px" width="100%" />
-          )}
+          <LineGraph
+            dataset={stats && stats.result.score.distribution}
+            datatype={stats && stats.version}
+            height="200px"
+            title={t('result.score.distribution')}
+            titleSize={20}
+          />
         </div>
         <Counter stats={stats} comp={comp} field={'file.extracted.avg'} />
         <Counter stats={stats} comp={comp} field={'file.supplementary.avg'} />
         <div style={{ marginBottom: theme.spacing(2) }}>
-          {stats ? (
-            <LineGraph
-              dataset={stats.heuristic}
-              datatype={stats.version}
-              sorter={(a, b) => parseInt(a.split('.', 2)[1]) - parseInt(b.split('.', 2)[1])}
-              height="250px"
-              title={t('heuristic')}
-              titleSize={20}
-            />
-          ) : (
-            <Skeleton variant="rect" height="200px" width="100%" />
-          )}
+          <LineGraph
+            dataset={stats && stats.heuristic}
+            datatype={stats && stats.version}
+            sorter={(a, b) => parseInt(a.split('.', 2)[1]) - parseInt(b.split('.', 2)[1])}
+            height="250px"
+            title={t('heuristic')}
+            titleSize={20}
+          />
         </div>
-        <div style={{ marginBottom: theme.spacing(2) }}>
+        <div style={{ marginBottom: theme.spacing(2), display: 'flex', flexDirection: 'column' }}>
           {stats ? (
-            <LineGraph
-              dataset={stats.error}
-              datatype={stats.version}
-              height="250px"
-              title={t('error')}
-              titleSize={20}
-            />
+            <Tooltip title={t('errors')}>
+              <IconButton
+                component={Link}
+                style={{ color: theme.palette.action.active, alignSelf: 'self-end' }}
+                to={`/admin/errors?tc=1y&filters=response.service_name%3A${
+                  stats.service.name
+                }&filters=${getVersionQuery(stats.service.version)}`}
+              >
+                <ErrorOutlineOutlinedIcon />
+              </IconButton>
+            </Tooltip>
           ) : (
-            <Skeleton variant="rect" height="200px" width="100%" />
+            <Skeleton
+              component="div"
+              variant="circle"
+              height="2.5rem"
+              width="2.5rem"
+              style={{ margin: theme.spacing(0.5), alignSelf: 'self-end' }}
+            />
           )}
+          <LineGraph
+            dataset={stats && stats.error}
+            datatype={stats && stats.version}
+            height="250px"
+            title={t('error')}
+            titleSize={20}
+          />
         </div>
       </div>
     )
