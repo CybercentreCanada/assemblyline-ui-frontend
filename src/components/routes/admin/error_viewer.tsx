@@ -223,6 +223,7 @@ export default function ErrorViewer() {
         <Grid item xs={12} sm={5} md={3} xl={2}>
           <Select
             margin="dense"
+            disabled={searching}
             value={query ? query.get('tc') || '24h' : '24h'}
             variant="outlined"
             onChange={event => {
@@ -354,7 +355,7 @@ export default function ErrorViewer() {
               title={t('graph.name.title')}
               datatype={t('graph.datatype')}
               onClick={(evt, element) => {
-                if (element.length > 0) {
+                if (!searching && element.length > 0) {
                   var ind = element[0].index;
                   query.add('filters', `response.service_name:${Object.keys(names)[ind]}`);
                   history.push(`${location.pathname}?${query.getDeltaString()}`);
@@ -369,7 +370,7 @@ export default function ErrorViewer() {
               title={t('graph.type.title')}
               datatype={t('graph.datatype')}
               onClick={(evt, element) => {
-                if (element.length > 0) {
+                if (!searching && element.length > 0) {
                   var ind = element[0].index;
                   query.add('filters', `type:"${Object.keys(types)[ind]}"`);
                   history.push(`${location.pathname}?${query.getDeltaString()}`);
