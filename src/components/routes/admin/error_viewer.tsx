@@ -50,15 +50,17 @@ type ErrorResults = {
   total: number;
 };
 
+const DEFAULT_TC = '4d';
+
 const TC_MAP = {
-  null: 'created:[now-24h TO now]',
+  '24h': 'created:[now-24h TO now]',
   '4d': 'created:[now-4d TO now]',
   '7d': 'created:[now-7d TO now]',
   '1m': 'created:[now-1M TO now]'
 };
 
 const START_MAP = {
-  null: 'now-1d',
+  '24h': 'now-1d',
   '4d': 'now-4d',
   '7d': 'now-7d',
   '1m': 'now-1M',
@@ -66,7 +68,7 @@ const START_MAP = {
 };
 
 const GAP_MAP = {
-  null: '1h',
+  '24h': '1h',
   '4d': '2h',
   '7d': '4h',
   '1m': '1d',
@@ -94,7 +96,7 @@ export default function ErrorViewer() {
   const [names, setNames] = useState(null);
 
   useEffect(() => {
-    setQuery(new SimpleSearchQuery(location.search, `rows=${pageSize}&offset=0&tc=24h`));
+    setQuery(new SimpleSearchQuery(location.search, `rows=${pageSize}&offset=0&tc=${DEFAULT_TC}`));
   }, [location.pathname, location.search, pageSize]);
 
   useEffect(() => {
@@ -116,7 +118,7 @@ export default function ErrorViewer() {
   useEffect(() => {
     if (query && currentUser.is_admin) {
       const curQuery = new SimpleSearchQuery(query.toString(), `rows=${pageSize}&offset=0`);
-      const tc = curQuery.pop('tc');
+      const tc = curQuery.pop('tc') || DEFAULT_TC;
       curQuery.set('rows', pageSize);
       curQuery.set('offset', 0);
       if (tc !== '1y') {
@@ -224,7 +226,7 @@ export default function ErrorViewer() {
           <Select
             margin="dense"
             disabled={searching}
-            value={query ? query.get('tc') || '24h' : '24h'}
+            value={query ? query.get('tc') || DEFAULT_TC : DEFAULT_TC}
             variant="outlined"
             onChange={event => {
               query.set('tc', event.target.value);
@@ -322,7 +324,11 @@ export default function ErrorViewer() {
                     label: `${v}`,
                     color: v.indexOf('NOT ') === 0 ? 'error' : null,
                     onClick: () => {
-                      query.replace('filters', v, v.indexOf('NOT ') === 0 ? v.substring(4) : `NOT ${v}`);
+                      query.replace(
+                        'filters',
+                        v,
+                        v.indexOf('NOT ') === 0 ? v.substring(5, v.length - 1) : `NOT (${v})`
+                      );
                       history.push(`${location.pathname}?${query.getDeltaString()}`);
                     },
                     onDelete: () => {
@@ -343,7 +349,7 @@ export default function ErrorViewer() {
             <Histogram
               dataset={histogram}
               height="200px"
-              title={t(`graph.histogram.title.${query ? query.get('tc') || '24h' : '24h'}`)}
+              title={t(`graph.histogram.title.${query ? query.get('tc') || DEFAULT_TC : DEFAULT_TC}`)}
               datatype={t('graph.datatype')}
               isDate
             />
