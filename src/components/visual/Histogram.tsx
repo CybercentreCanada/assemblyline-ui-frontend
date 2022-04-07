@@ -5,6 +5,65 @@ import 'chartjs-adapter-moment';
 import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 
+type TooltipVertLinePluginConfig = {
+  color: string;
+  display: boolean;
+  yAxis: string;
+};
+
+type HorizontalLinePluginConfig = {
+  color: string;
+  display: boolean;
+  xAxis: string;
+};
+
+const plugins = [
+  {
+    id: 'vLineTooltip',
+    afterDraw: (chart, args, cfg: TooltipVertLinePluginConfig) => {
+      // @ts-ignore
+      if (cfg.display && chart.tooltip?._active?.length) {
+        // @ts-ignore
+        let selected = chart.tooltip._active[0].element.x;
+        let axis = chart.scales[cfg.yAxis || 'yAxis'];
+        if (axis) {
+          let ctx = chart.ctx;
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(selected, axis.top);
+          ctx.lineTo(selected, axis.bottom);
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = cfg.color || '#AAA';
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+    }
+  },
+  {
+    id: 'hLineTooltip',
+    afterDraw: (chart, args, cfg: HorizontalLinePluginConfig) => {
+      // @ts-ignore
+      if (cfg.display && chart.tooltip?._active?.length) {
+        // @ts-ignore
+        let selected = chart.tooltip._active[0].element.y;
+        let axis = chart.scales[cfg.xAxis || 'xAxis'];
+        if (axis) {
+          let ctx = chart.ctx;
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(axis.right, selected);
+          ctx.lineTo(axis.left, selected);
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = cfg.color || '#AAA';
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+    }
+  }
+];
+
 type HistogramProps = {
   dataset: { [s: string]: number };
   datatype: string;
@@ -14,6 +73,7 @@ type HistogramProps = {
   titleSize?: number;
   onClick?: (event: any, element: any) => void;
   verticalLine?: boolean;
+  horizontalLine?: boolean;
 };
 
 const WrappedHistogram = ({
@@ -24,7 +84,8 @@ const WrappedHistogram = ({
   onClick,
   isDate = false,
   titleSize = 14,
-  verticalLine = false
+  verticalLine = false,
+  horizontalLine = false
 }: HistogramProps) => {
   const theme = useTheme();
   const [max, setMax] = useState(5);
@@ -47,7 +108,14 @@ const WrappedHistogram = ({
           }
         : null,
       legend: { display: false },
-      tooltipVertLine: verticalLine
+      vLineTooltip: {
+        display: verticalLine,
+        color: alpha(theme.palette.primary.main, 0.3)
+      },
+      hLineTooltip: {
+        display: horizontalLine,
+        color: alpha(theme.palette.primary.main, 0.3)
+      }
     },
     scales: {
       xAxis: {
@@ -83,29 +151,6 @@ const WrappedHistogram = ({
     },
     onClick: onClick
   };
-
-  const plugins = [
-    {
-      id: 'tooltipVertLine',
-      afterDraw: chart => {
-        // @ts-ignore
-        if (chart.tooltip?._active?.length) {
-          // @ts-ignore
-          let x = chart.tooltip._active[0].element.x;
-          let yAxis = chart.scales.yAxis;
-          let ctx = chart.ctx;
-          ctx.save();
-          ctx.beginPath();
-          ctx.moveTo(x, yAxis.top);
-          ctx.lineTo(x, yAxis.bottom);
-          ctx.lineWidth = 2;
-          ctx.strokeStyle = alpha(theme.palette.primary.main, 0.3);
-          ctx.stroke();
-          ctx.restore();
-        }
-      }
-    }
-  ];
 
   useEffect(() => {
     if (dataset) {
