@@ -431,6 +431,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
               isDate
               title={t('chart.title')}
               datatype={signature_id || id}
+              verticalLine
             />
           </Grid>
           <Grid item xs={12}>
