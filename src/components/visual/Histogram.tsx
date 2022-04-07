@@ -18,7 +18,7 @@ const WrappedHistogram = ({ dataset, height, title, isDate, datatype, onClick, t
   const theme = useTheme();
   const [max, setMax] = useState(5);
   const [histData, setHistData] = useState(null);
-  const options = {
+  const [options, setOptions] = useState({
     datasets: { line: { tension: 0.4, fill: 'origin' } },
     maintainAspectRatio: false,
     responsive: true,
@@ -67,13 +67,22 @@ const WrappedHistogram = ({ dataset, height, title, isDate, datatype, onClick, t
       }
     },
     onClick: onClick
-  };
+  });
 
   useEffect(() => {
     if (dataset) {
-      const labels = Object.keys(dataset).every(val => val.indexOf('T00:00:00.000Z') !== -1)
+      const allDays = Object.keys(dataset).every(val => val.indexOf('T00:00:00.000Z') !== -1);
+      const labels = allDays
         ? Object.keys(dataset).map((key: string) => key.replace('T00:00:00.000Z', ''))
         : Object.keys(dataset);
+
+      if (allDays && isDate) {
+        options.scales.x.time.tooltipFormat = 'YYYY-MM-DD';
+        setOptions(options);
+      } else {
+        options.scales.x.time.tooltipFormat = 'YYYY-MM-DD HH:mm:ss';
+        setOptions(options);
+      }
 
       setMax(Math.max(5, ...Object.values<number>(dataset)));
       setHistData({
