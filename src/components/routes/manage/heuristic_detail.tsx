@@ -323,7 +323,14 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
             </Grid>
           </Grid>
           <Grid item xs={12}>
-            <Histogram dataset={histogram} height="300px" isDate title={t('chart.title')} datatype={heur_id || id} />
+            <Histogram
+              dataset={histogram}
+              height="300px"
+              isDate
+              title={t('chart.title')}
+              datatype={heur_id || id}
+              verticalLine
+            />
           </Grid>
           <Grid item xs={12}>
             <Typography variant="h6">{t('last10')}</Typography>
