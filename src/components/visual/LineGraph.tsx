@@ -22,6 +22,7 @@ function WrappedLineGraph({ dataset, height, title, datatype, onClick, sorter, t
     maintainAspectRatio: false,
     responsive: true,
     interaction: {
+      mode: 'x' as 'x',
       intersect: false
     },
     plugins: {

@@ -23,6 +23,7 @@ const WrappedHistogram = ({ dataset, height, title, isDate, datatype, onClick, t
     maintainAspectRatio: false,
     responsive: true,
     interaction: {
+      mode: 'x' as 'x',
       intersect: false
     },
     plugins: {
