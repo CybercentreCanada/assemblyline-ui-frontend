@@ -1,4 +1,5 @@
 import { useTheme } from '@material-ui/core';
+import { alpha } from '@material-ui/core/styles/colorManipulator';
 import { Skeleton } from '@material-ui/lab';
 import 'chartjs-adapter-moment';
 import React, { useEffect, useState } from 'react';
@@ -12,19 +13,29 @@ type HistogramProps = {
   isDate?: boolean;
   titleSize?: number;
   onClick?: (event: any, element: any) => void;
+  verticalLine?: boolean;
 };
 
-const WrappedHistogram = ({ dataset, height, title, isDate, datatype, onClick, titleSize = 14 }: HistogramProps) => {
+const WrappedHistogram = ({
+  dataset,
+  height,
+  title,
+  datatype,
+  onClick,
+  isDate = false,
+  titleSize = 14,
+  verticalLine = false
+}: HistogramProps) => {
   const theme = useTheme();
   const [max, setMax] = useState(5);
   const [histData, setHistData] = useState(null);
-  const [options, setOptions] = useState({
+  const options = {
     datasets: { line: { tension: 0.4, fill: 'origin' } },
     maintainAspectRatio: false,
     responsive: true,
     interaction: {
-      mode: 'x' as 'x',
-      intersect: false
+      mode: 'index' as 'index',
+      intersect: !verticalLine
     },
     plugins: {
       title: title
@@ -35,10 +46,11 @@ const WrappedHistogram = ({ dataset, height, title, isDate, datatype, onClick, t
             font: { family: 'Roboto', size: titleSize, weight: '500' }
           }
         : null,
-      legend: { display: false }
+      legend: { display: false },
+      tooltipVertLine: verticalLine
     },
     scales: {
-      x: {
+      xAxis: {
         grid: { display: false, drawBorder: true },
         ticks: {
           color: theme.palette.text.secondary
@@ -46,7 +58,10 @@ const WrappedHistogram = ({ dataset, height, title, isDate, datatype, onClick, t
         time: isDate
           ? {
               unit: 'day' as 'day',
-              tooltipFormat: 'YYYY-MM-DD HH:mm:ss',
+              tooltipFormat:
+                dataset && Object.keys(dataset).every(val => val.indexOf('T00:00:00.000Z') !== -1)
+                  ? 'YYYY-MM-DD'
+                  : 'YYYY-MM-DD HH:mm:ss',
               displayFormats: {
                 millisecond: 'HH:mm:ss.SSS',
                 second: 'HH:mm:ss',
@@ -57,7 +72,7 @@ const WrappedHistogram = ({ dataset, height, title, isDate, datatype, onClick, t
           : null,
         type: isDate ? ('time' as 'time') : ('linear' as 'linear')
       },
-      y: {
+      yAxis: {
         beginAtZero: true,
         suggestedMax: max,
         ticks: {
@@ -67,22 +82,36 @@ const WrappedHistogram = ({ dataset, height, title, isDate, datatype, onClick, t
       }
     },
     onClick: onClick
-  });
+  };
+
+  const plugins = [
+    {
+      id: 'tooltipVertLine',
+      afterDraw: chart => {
+        // @ts-ignore
+        if (chart.tooltip?._active?.length) {
+          // @ts-ignore
+          let x = chart.tooltip._active[0].element.x;
+          let yAxis = chart.scales.yAxis;
+          let ctx = chart.ctx;
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(x, yAxis.top);
+          ctx.lineTo(x, yAxis.bottom);
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = alpha(theme.palette.primary.main, 0.3);
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+    }
+  ];
 
   useEffect(() => {
     if (dataset) {
-      const allDays = Object.keys(dataset).every(val => val.indexOf('T00:00:00.000Z') !== -1);
-      const labels = allDays
+      const labels = Object.keys(dataset).every(val => val.indexOf('T00:00:00.000Z') !== -1)
         ? Object.keys(dataset).map((key: string) => key.replace('T00:00:00.000Z', ''))
         : Object.keys(dataset);
-
-      if (allDays && isDate) {
-        options.scales.x.time.tooltipFormat = 'YYYY-MM-DD';
-        setOptions(options);
-      } else {
-        options.scales.x.time.tooltipFormat = 'YYYY-MM-DD HH:mm:ss';
-        setOptions(options);
-      }
 
       setMax(Math.max(5, ...Object.values<number>(dataset)));
       setHistData({
@@ -94,18 +123,18 @@ const WrappedHistogram = ({ dataset, height, title, isDate, datatype, onClick, t
             backgroundColor: theme.palette.primary.dark,
             borderColor: theme.palette.primary.light,
             borderWidth: 1,
-            hoverBackgroundColor: theme.palette.primary.main
+            hoverBackgroundColor: theme.palette.primary.main,
+            yAxisID: 'yAxis'
           }
         ]
       });
     }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataset, theme]);
 
   return histData ? (
     <div style={{ height: height }}>
-      <Line data={histData} options={options} />
+      <Line data={histData} options={options} plugins={plugins} />
     </div>
   ) : (
     <Skeleton variant="rect" height={height} />

@@ -453,6 +453,7 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
               isDate
               title={t('chart.title')}
               datatype={safelist_id || id}
+              verticalLine
             />
           </Grid>
         </Grid>

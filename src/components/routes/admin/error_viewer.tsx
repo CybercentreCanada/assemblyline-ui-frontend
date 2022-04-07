@@ -352,6 +352,7 @@ export default function ErrorViewer() {
               title={t(`graph.histogram.title.${query ? query.get('tc') || DEFAULT_TC : DEFAULT_TC}`)}
               datatype={t('graph.datatype')}
               isDate
+              verticalLine
             />
           </Grid>
           <Grid item xs={12} md={6} lg={4}>
