@@ -21,6 +21,9 @@ function WrappedLineGraph({ dataset, height, title, datatype, onClick, sorter, t
     datasets: { line: { tension: 0.4, fill: 'origin' } },
     maintainAspectRatio: false,
     responsive: true,
+    interaction: {
+      intersect: false
+    },
     plugins: {
       title: title
         ? {
