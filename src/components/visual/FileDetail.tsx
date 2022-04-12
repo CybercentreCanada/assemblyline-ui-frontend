@@ -273,7 +273,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                             component={MaterialLink}
                             href={`/api/v4/file/download/${file.file_info.sha256}/?${
                               fileName && file.file_info.sha256 !== fileName ? `name=${fileName}&` : ''
-                            }XSRF_TOKEN=${getXSRFCookie()}`}
+                            }${sid ? `sid=${sid}&` : ''}XSRF_TOKEN=${getXSRFCookie()}`}
                           >
                             <GetAppOutlinedIcon color="action" />
                           </IconButton>

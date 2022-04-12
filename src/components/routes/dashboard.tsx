@@ -304,6 +304,8 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
       setError(t('dispatcher.error.queue.ingest'));
     } else if (dispatcher.initialized && dispatcher.metrics.save_queue >= dispatcher.inflight.max / 10) {
       setError(t('dispatcher.error.queue.save'));
+    } else if (dispatcher.initialized && dispatcher.metrics.error_queue >= dispatcher.inflight.max / 10) {
+      setError(t('dispatcher.error.queue.error'));
     } else if (dispatcher.initialized && startQueue >= dispatcher.inflight.max / 10) {
       setError(t('dispatcher.error.queue.start'));
     } else if (dispatcher.initialized && resultQueue >= dispatcher.inflight.max / 10) {
@@ -404,6 +406,12 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
               value={dispatcher.metrics.save_queue}
               title="S"
               tooltip={t('queues.save')}
+            />
+            <MetricCounter
+              init={dispatcher.initialized}
+              value={dispatcher.metrics.error_queue}
+              title="E"
+              tooltip={t('queues.error_saving')}
             />
             {dispatcher.queues.command.length > 0 && (
               <MetricCounter
