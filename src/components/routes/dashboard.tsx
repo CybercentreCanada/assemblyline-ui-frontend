@@ -411,7 +411,7 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
               init={dispatcher.initialized}
               value={dispatcher.metrics.error_queue}
               title="E"
-              tooltip={t('queues.error')}
+              tooltip={t('queues.error_saving')}
             />
             {dispatcher.queues.command.length > 0 && (
               <MetricCounter
