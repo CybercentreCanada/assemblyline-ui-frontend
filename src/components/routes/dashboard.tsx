@@ -1150,7 +1150,7 @@ const Dashboard = () => {
         {Object.keys(services)
           .sort()
           .map(key => (
-            <Grid key={key} item xs={12} md={4} xl={3}>
+            <Grid key={key} item xs={12} sm={6} md={4} lg={3} xl={2}>
               <ServiceCard service={services[key]} max_inflight={dispatcher.inflight.max} />
             </Grid>
           ))}
