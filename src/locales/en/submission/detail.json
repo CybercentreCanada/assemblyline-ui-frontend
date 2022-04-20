@@ -37,6 +37,8 @@
   "params.deep_scan": "Deep Scan",
   "params.description": "Description",
   "params.dtl": "Days to live",
+  "params.generate_alert": "Generate Alert",
+  "params.priority": "Priority",
   "params.groups": "Groups",
   "params.ignore_cache": "Ignore Cache",
   "params.ignore_dynamic_recursion_prevention": "Ignore Dynamic Recursion Prevention",

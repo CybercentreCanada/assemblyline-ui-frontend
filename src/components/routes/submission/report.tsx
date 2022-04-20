@@ -681,7 +681,20 @@ export default function SubmissionReport() {
                 <span style={{ fontWeight: 500 }}>{t('submission.services')}</span>
               </Grid>
               <Grid item xs={8} sm={9} lg={10}>
-                {report ? report.params.services.selected.join(' | ') : <Skeleton />}
+                {report ? (
+                  report.params.services.rescan ? (
+                    [
+                      ...report.params.services.selected,
+                      ...report.params.services.rescan.filter(
+                        word => report.params.services.selected.indexOf(word) === -1
+                      )
+                    ].join(' | ')
+                  ) : (
+                    report.params.services.selected.join(' | ')
+                  )
+                ) : (
+                  <Skeleton />
+                )}
               </Grid>
 
               {report && report.params.services.errors.length !== 0 && (
