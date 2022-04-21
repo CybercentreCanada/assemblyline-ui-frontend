@@ -46,6 +46,7 @@
   "params.services.selected": "Services sélectionnés",
   "params.services.service_spec": "Paramètres de service",
   "params.submitter": "Soumis par",
+  "psid": "Analyse étendue de",
   "replay": "Transfert vers un autre serveur pour un traitement ultérieur",
   "replay.success": "La demande de transfert a été acceptée, la soumission sera transférée sous peu.",
   "report_view": "Afficher la vue du rapport",
