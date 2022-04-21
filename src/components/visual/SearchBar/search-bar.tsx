@@ -127,7 +127,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           onClick={_onValueClear}
           edge="end"
           size={!upMD ? 'small' : null}
-          style={{ marginRight: theme.spacing(upMD ? 1 : 0.5) }}
+          style={{ marginRight: theme.spacing(upMD ? 0 : 0.5) }}
           disabled={searching}
         >
           <Tooltip title={t('clear_filter')}>
@@ -138,7 +138,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           <Divider
             orientation="vertical"
             flexItem
-            style={{ marginLeft: theme.spacing(upMD ? 0 : 0.5), marginRight: theme.spacing(upMD ? 1 : 0.5) }}
+            style={{ marginLeft: theme.spacing(upMD ? 1 : 0.5), marginRight: theme.spacing(upMD ? 1 : 0.5) }}
           />
         )}
         {buttons.map((b, i) => (
@@ -147,7 +147,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             {...b.props}
             edge="end"
             size={!upMD ? 'small' : null}
-            style={{ marginRight: theme.spacing(upMD ? 1 : 0.5) }}
+            style={{ marginRight: theme.spacing(upMD ? 0 : 0.5) }}
             disabled={searching}
           >
             {b.tooltip ? <Tooltip title={b.tooltip}>{b.icon}</Tooltip> : b.icon}
