@@ -845,9 +845,22 @@ export default function SubmissionDetail() {
                   <Grid item xs>
                     <div>
                       <Typography variant="h4">{t('title')}</Typography>
-                      <Typography variant="caption">
+                      <Typography variant="caption" component={'div'}>
                         {submission ? submission.sid : <Skeleton style={{ width: '10rem' }} />}
                       </Typography>
+                      {submission && submission.params.psid && (
+                        <Typography variant="caption" component={'div'}>
+                          <i>
+                            <span>{t('psid')}: </span>
+                            <Link
+                              style={{ textDecoration: 'none', color: theme.palette.primary.main }}
+                              to={`/submission/detail/${submission.params.psid}`}
+                            >
+                              {submission.params.psid}
+                            </Link>
+                          </i>
+                        </Typography>
+                      )}
                     </div>
                     {socket && (
                       <div
