@@ -298,6 +298,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                       <div style={{ display: 'inline-flex' }}>
                         {[...Array(5)].map((_, i) => (
                           <Skeleton
+                            key={i}
                             variant="circle"
                             height="2.5rem"
                             width="2.5rem"

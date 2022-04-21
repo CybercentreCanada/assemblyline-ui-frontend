@@ -917,6 +917,7 @@ export default function SubmissionDetail() {
                           <div style={{ display: 'inline-flex' }}>
                             {[...Array(systemConfig.ui.allow_replay ? 5 : 4)].map((_, i) => (
                               <Skeleton
+                                key={i}
                                 variant="circle"
                                 height="2.5rem"
                                 width="2.5rem"

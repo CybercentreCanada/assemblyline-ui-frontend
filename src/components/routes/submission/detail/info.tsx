@@ -3,7 +3,7 @@ import CheckBoxOutlineBlankOutlinedIcon from '@material-ui/icons/CheckBoxOutline
 import CheckBoxOutlinedIcon from '@material-ui/icons/CheckBoxOutlined';
 import { Skeleton } from '@material-ui/lab';
 import Verdict from 'components/visual/Verdict';
-import React, { useMemo } from 'react';
+import React, { Fragment, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 
@@ -86,7 +86,7 @@ const WrappedInfoSection: React.FC<InfoSectionProps> = ({ submission }) => {
 
                 {['deep_scan', 'ignore_cache', 'ignore_dynamic_recursion_prevention', 'ignore_filtering'].map(
                   (k, i) => (
-                    <>
+                    <Fragment key={i}>
                       <Grid item xs={4} sm={3} lg={2} style={{ paddingTop: theme.spacing(0.5) }}>
                         <span style={{ fontWeight: 500 }}>{t(`params.${k}`)}</span>
                       </Grid>
@@ -101,7 +101,7 @@ const WrappedInfoSection: React.FC<InfoSectionProps> = ({ submission }) => {
                           <Skeleton variant="rect" style={{ width: theme.spacing(3), height: theme.spacing(3) }} />
                         )}
                       </Grid>
-                    </>
+                    </Fragment>
                   )
                 )}
 
