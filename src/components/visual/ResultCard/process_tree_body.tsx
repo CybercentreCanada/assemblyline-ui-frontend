@@ -147,9 +147,9 @@ const ProcessTreeItem = ({ process }) => {
             </div>
           </div>
           {(process.signatures && Object.keys(process.signatures).length !== 0) ||
-          process.network_count ||
-          process.file_count ||
-          process.registry_count ? (
+          (process.network_count && process.network_count !== 0) ||
+          (process.file_count && process.file_count !== 0) ||
+          (process.registry_count && process.registry_count !== 0) ? (
             <div className={classes.counter}>
               {process.signatures && Object.keys(process.signatures).length !== 0 && (
                 <Tooltip
@@ -163,30 +163,30 @@ const ProcessTreeItem = ({ process }) => {
                   </div>
                 </Tooltip>
               )}
-              {process.network_count && process.network_count !== 0 && (
+              {process.network_count && process.network_count !== 0 ? (
                 <Tooltip title={`${process.network_count} ${t('process_network')}`}>
                   <div className={classes.counter_item}>
                     <SettingsEthernetOutlinedIcon className={classes.counter_img} />
                     <span>{humanReadableNumber(process.network_count)}</span>
                   </div>
                 </Tooltip>
-              )}
-              {process.file_count && process.file_count !== 0 && (
+              ) : null}
+              {process.file_count && process.file_count !== 0 ? (
                 <Tooltip title={`${process.file_count} ${t('process_file')}`}>
                   <div className={classes.counter_item}>
                     <InsertDriveFileOutlinedIcon className={classes.counter_img} />
                     <span>{humanReadableNumber(process.file_count)}</span>
                   </div>
                 </Tooltip>
-              )}
-              {process.registry_count && process.registry_count !== 0 && (
+              ) : null}
+              {process.registry_count && process.registry_count !== 0 ? (
                 <Tooltip title={`${process.registry_count} ${t('process_registry')}`}>
                   <div className={classes.counter_item}>
                     <WidgetsOutlinedIcon className={classes.counter_img} />
                     <span>{humanReadableNumber(process.registry_count)}</span>
                   </div>
                 </Tooltip>
-              )}
+              ) : null}
             </div>
           ) : null}
         </div>
