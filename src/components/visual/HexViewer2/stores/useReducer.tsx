@@ -162,8 +162,7 @@ export const ReducerProvider = ({ children }: StoreProviderProps) => {
       nextStore = copy.reducer({ prevStore, nextStore, refs, action });
       // nextStore = location.reducer({ prevStore, nextStore, refs, action });
 
-      // console.log(action, nextStore);
-      // console.log(action);
+      // console.log(action, nextStore.setting);
       return nextStore;
     },
     [

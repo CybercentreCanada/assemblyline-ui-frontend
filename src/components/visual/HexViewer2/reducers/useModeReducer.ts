@@ -48,7 +48,7 @@ export const useModeReducer = () => {
   const initialRef = useMemo<ModeRef>(() => ({}), []);
 
   const bodyInitialized = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
-    return { ...store, initialized: true };
+    return { ...store, initialized: payload.value };
   }, []);
 
   const themeChange = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
@@ -83,6 +83,10 @@ export const useModeReducer = () => {
     else return { ...store };
   }, []);
 
+  const layoutTypeToggle = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
+    return { ...store, mode: { ...store.mode, layoutType: store.mode.layoutType === 'page' ? 'fullscreen' : 'page' } };
+  }, []);
+
   const reducer = useCallback(
     ({ prevStore, nextStore, refs, action }: ReducerProps): Store => {
       if (isAction.bodyInit(action)) return bodyInitialized(nextStore, refs, action);
@@ -92,9 +96,19 @@ export const useModeReducer = () => {
       else if (isAction.appLayoutTypeChange(action)) return layoutTypeChange(nextStore, refs, action);
       else if (isAction.appToolbarTypeChange(action)) return toolbarTypeChange(nextStore, refs, action);
       else if (isAction.appBodyTypeChange(action)) return bodyTypeChange(nextStore, refs, action);
+      else if (isAction.fullscreenToggle(action)) return layoutTypeToggle(nextStore, refs, action);
       else return { ...nextStore };
     },
-    [bodyInitialized, bodyTypeChange, languageChange, layoutTypeChange, themeChange, toolbarTypeChange, widthChange]
+    [
+      bodyInitialized,
+      bodyTypeChange,
+      languageChange,
+      layoutTypeChange,
+      layoutTypeToggle,
+      themeChange,
+      toolbarTypeChange,
+      widthChange
+    ]
   );
 
   return { initialState, initialRef, reducer };

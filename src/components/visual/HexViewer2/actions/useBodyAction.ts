@@ -25,7 +25,7 @@ export const BODY_ACTIONS: BodyActions = {
 } as BodyActions;
 
 export type BodyActionProps = {
-  onBodyInit: () => void;
+  onBodyInit: (value: boolean) => void;
   onBodyResize: ({ width: height }: { width: number; height: number }) => void;
   onBodyMouseLeave: () => void;
   onBodyScrollWheel: (...props: any[]) => void;
@@ -35,7 +35,7 @@ export type BodyActionProps = {
 };
 
 export const useBodyAction = (dispatch: DispatchProp): BodyActionProps => {
-  const onBodyInit = useCallback(() => dispatch(ACTIONS.bodyInit, null), [dispatch]);
+  const onBodyInit = useCallback((value: boolean) => dispatch(ACTIONS.bodyInit, { value }), [dispatch]);
 
   const onBodyResize = useCallback(
     ({ width = 1000, height = 1000 }: { width?: number; height?: number }) =>
@@ -59,8 +59,8 @@ export const useBodyAction = (dispatch: DispatchProp): BodyActionProps => {
 
   const onBodyKeyDown = useCallback(
     (event: KeyboardEvent, refs: StoreRef) => {
-      if (!isFocus.body(refs)) return;
-
+      if (!isFocus.body(refs) && !(cursorKeyDownGuard(event) || isCopyKey(event))) return;
+      event.preventDefault();
       if (cursorKeyDownGuard(event)) dispatch(ACTIONS.cursorKeyDown, { event });
       else if (isCopyKey(event)) dispatch(ACTIONS.copyKeyDown, null, true, false);
     },

@@ -38,7 +38,7 @@ export const WrappedHexScrollBar = ({ store }: StoreProps) => {
   const { onScrollButtonClick, onScrollSliderChange } = useDispatch();
 
   const {
-    scroll: { index, speed, maxIndex }
+    scroll: { rowIndex, speed, maxRowIndex }
   } = store;
 
   return (
@@ -48,18 +48,18 @@ export const WrappedHexScrollBar = ({ store }: StoreProps) => {
           className={clsx(classes.button)}
           onClick={() => onScrollButtonClick(-1)}
           size={'small'}
-          disabled={index === 0}
+          disabled={rowIndex === 0}
         >
           <ArrowDropUpIcon />
         </Button>
       </div>
       <Slider
-        value={maxIndex - index}
+        value={maxRowIndex - rowIndex}
         orientation={'vertical'}
         track={false}
         min={0}
         step={speed}
-        max={maxIndex}
+        max={maxRowIndex}
         onChange={(e: ChangeEvent, newValue: number) => onScrollSliderChange(e, newValue)}
       />
       <div className={clsx(classes.buttonBox, classes.buttonDownBox)}>
@@ -67,7 +67,7 @@ export const WrappedHexScrollBar = ({ store }: StoreProps) => {
           className={clsx(classes.button)}
           onClick={() => onScrollButtonClick(1)}
           size={'small'}
-          disabled={index === maxIndex}
+          disabled={rowIndex === maxRowIndex}
         >
           <ArrowDropDownIcon />
         </Button>
@@ -79,9 +79,9 @@ export const HexScrollBar = React.memo(
   WrappedHexScrollBar,
   (prevProps: Readonly<StoreProps>, nextProps: Readonly<StoreProps>) =>
     prevProps.store.initialized === nextProps.store.initialized &&
-    prevProps.store.scroll.index === nextProps.store.scroll.index &&
+    prevProps.store.scroll.rowIndex === nextProps.store.scroll.rowIndex &&
     prevProps.store.scroll.speed === nextProps.store.scroll.speed &&
-    prevProps.store.scroll.maxIndex === nextProps.store.scroll.maxIndex &&
+    prevProps.store.scroll.maxRowIndex === nextProps.store.scroll.maxRowIndex &&
     prevProps.store.layout.row.size === nextProps.store.layout.row.size &&
     prevProps.store.mode.bodyType === nextProps.store.mode.bodyType &&
     prevProps.store.mode.theme === nextProps.store.mode.theme &&

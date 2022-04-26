@@ -17,6 +17,7 @@
   "settings.description": "Customize the Settings",
   "no-results": "No Results",
   "share": "Share the URL",
+  "fullscreen": "Display in fullscreen mode",
   "menu": "Show the Options",
   "columns.label": "Number of Columns:",
   "columns.description": "Set the number of columns",
@@ -35,11 +36,27 @@
   "settings.title": "Settings:",
   "settings.label": "Configure the settings",
   "search.types": "Change the search type",
+
   "header.selector.cursor": "Address",
   "header.selector.hexcode": "Hex Values",
   "header.selector.text": "Text Values",
   "header.searchfield.cursor": "Find an address (⇵ for history)",
   "header.searchfield.hexcode": "Find hexcodes (⇵ for history)",
   "header.searchfield.text": "Find texts (⇵ for history)",
-  "bodyType.label": "Grid display mode:"
+  "bodyType.label": "Grid display mode:",
+
+  "null.char.label": "Null Character:",
+  "null.char.description": "Character used for the null (0x00) value",
+
+  "lower.encoding.label": "Lower ASCII encoding:",
+  "lower.encoding.description": "Character set used to render the lower ASCII values (0x01 - 0x1F)",
+
+  "lower.char.label": "Lower ASCII character:",
+  "lower.char.description": "Character that replaces all lower ASCII values (0x01 - 0x1F)",
+
+  "higher.encoding.label": "Higher ASCII encoding:",
+  "higher.encoding.description": "Character set used to render the higher ASCII values (0x80 - 0xFF)",
+
+  "higher.char.label": "Higher ASCII character:",
+  "higher.char.description": "Character that replaces all higher ASCII values (0x80 - 0xFF)"
 }

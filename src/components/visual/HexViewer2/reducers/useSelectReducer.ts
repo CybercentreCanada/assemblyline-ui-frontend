@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import {
+  getSelectIndexes,
   isAction,
   isCellMouseDown,
   isSameCellClick,
@@ -27,14 +28,8 @@ export const useSelectReducer = () => {
 
   const selectRender = useCallback(
     (prevStore: Store, nextStore: Store, refs: StoreRef): void => {
-      const prev = Array.from(
-        { length: prevStore.select.endIndex - prevStore.select.startIndex + 1 },
-        (_, i) => i + prevStore.select.startIndex
-      );
-      const next = Array.from(
-        { length: nextStore.select.endIndex - nextStore.select.startIndex + 1 },
-        (_, i) => i + nextStore.select.startIndex
-      );
+      const prev = getSelectIndexes(prevStore, refs);
+      const next = getSelectIndexes(nextStore, refs);
       renderArrayClass(refs.current.layout.bodyRef, prev, next, classes.select, refs.current.cellsRendered);
     },
     [classes.select]

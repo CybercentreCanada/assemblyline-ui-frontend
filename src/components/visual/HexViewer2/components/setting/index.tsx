@@ -5,11 +5,13 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { default as React } from 'react';
 import { useTranslation } from 'react-i18next';
-import { HexBodyTypeSetting, HexColumnSetting, HexOffsetBaseSetting, StoreProps, useDispatch } from '../..';
+import { HexColumnSetting, HexEncoding, HexOffsetBaseSetting, StoreProps, useDispatch } from '../..';
 
 export * from './bodyType';
 export * from './column';
+export * from './encoding';
 export * from './offsetBase';
+export * from './OutlinedField';
 export * from './settings';
 
 const useHexStyles = makeStyles(theme => ({
@@ -30,7 +32,8 @@ export const WrappedHexSettings = ({ store }: StoreProps) => {
           <Grid container spacing={1} alignItems="center">
             <Grid item xs={12}>
               <Grid container spacing={1} alignItems="center">
-                <HexBodyTypeSetting store={store} />
+                <HexEncoding store={store} />
+                {/* <HexBodyTypeSetting store={store} /> */}
                 <HexOffsetBaseSetting store={store} />
                 <HexColumnSetting store={store} />
               </Grid>
@@ -58,6 +61,7 @@ export const HexSettings = React.memo(
   ) =>
     prevProps.store.setting.open === nextProps.store.setting.open &&
     prevProps.store.setting.bodyType === nextProps.store.setting.bodyType &&
+    prevProps.store.setting.hex === nextProps.store.setting.hex &&
     prevProps.store.setting.offsetBase === nextProps.store.setting.offsetBase &&
     prevProps.store.setting.column.auto === nextProps.store.setting.column.auto &&
     prevProps.store.setting.column.size === nextProps.store.setting.column.size

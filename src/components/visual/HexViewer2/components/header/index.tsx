@@ -1,6 +1,5 @@
 import { makeStyles, Paper } from '@material-ui/core';
 import Divider from '@material-ui/core/Divider';
-import FullscreenOutlinedIcon from '@material-ui/icons/FullscreenOutlined';
 import SettingsIcon from '@material-ui/icons/Settings';
 import ShareIcon from '@material-ui/icons/Share';
 import React, { memo, PropsWithChildren } from 'react';
@@ -51,7 +50,11 @@ const WrappedHexDesktopHeader = ({ store }: StoreProps) => {
         <HexSearchButtons store={store} /> */}
         <Divider className={classes.divider} orientation="vertical" />
         {/* <HexCursorButton store={store} /> */}
-        <TooltipIconButton title={t('share')} onClick={onLocationShare} icon={<FullscreenOutlinedIcon />} />
+        {/* <TooltipIconButton
+          title={t('fullscreen')}
+          onClick={e => onFullscreenToggle()}
+          icon={<FullscreenOutlinedIcon />}
+        /> */}
         <TooltipIconButton title={t('share')} onClick={onLocationShare} icon={<ShareIcon />} />
         <TooltipIconButton title={t('settings.label')} onClick={onSettingOpen} icon={<SettingsIcon />} />
       </Paper>

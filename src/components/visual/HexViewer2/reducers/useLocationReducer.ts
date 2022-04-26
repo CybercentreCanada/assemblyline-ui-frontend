@@ -6,6 +6,7 @@ import {
   formatTextString,
   isAction,
   isHexString,
+  isSearchType,
   parseHexToString,
   parseStringToHexString,
   ReducerProps,
@@ -137,13 +138,17 @@ export const useLocationReducer = () => {
     (store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
       query.current.deleteAll();
 
-      if (store.scroll.index !== null) query.current.set('scroll', store.scroll.index * store.layout.column.size);
+      if (store.scroll.index !== null) query.current.set('scroll', store.scroll.index);
       if (store.cursor.index !== null) query.current.set('cursor', store.cursor.index);
       if (store.select.startIndex >= 0) query.current.set('selectStart', store.select.startIndex);
       if (store.select.endIndex >= 0) query.current.set('selectEnd', store.select.endIndex);
       if (store.search.inputValue !== null && store.search.inputValue !== '') {
         query.current.set('searchType', store.search.type);
-        query.current.set('searchValue', formatTextString(store.search.inputValue).replace(/\s/g, ''));
+        if (isSearchType.hex(store)) {
+          query.current.set('searchValue', store.search.inputValue.replace(/\s/g, ''));
+        } else if (isSearchType.text(store)) {
+          query.current.set('searchValue', formatTextString(store.search.inputValue).replace(/\s/g, ''));
+        }
         if (store.search.selectedIndex !== null) query.current.set('searchIndex', store.search.selectedIndex);
       }
 

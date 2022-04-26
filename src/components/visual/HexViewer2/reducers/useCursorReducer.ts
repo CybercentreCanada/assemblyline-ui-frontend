@@ -41,14 +41,12 @@ export const useCursorReducer = () => {
       const { index: prevIndex } = prevStore.cursor;
       const { index: nextIndex } = nextStore.cursor;
       renderIndexClass(refs.current.layout.bodyRef, prevIndex, nextIndex, classes.cursor, refs.current.cellsRendered);
-      // renderClass(refs.current.layout.bodyRef, prevIndex, nextIndex, classes.cursor, refs.current.cellsRendered);
     },
     [classes.cursor]
   );
 
   const handleCursorIndex = useCallback((store: Store, refs: StoreRef, index: number): Store => {
     if (index === null) return { ...store, cursor: { ...store.cursor, index: null } };
-
     const newCursorIndex = Math.min(Math.max(index, 0), refs.current.hex.codes.size - 1);
     return { ...store, cursor: { ...store.cursor, index: newCursorIndex } };
   }, []);

@@ -55,7 +55,10 @@ export const useHistoryReducer = () => {
         ...store,
         history: {
           ...store.history,
-          values: [...json],
+          values: [
+            { type: store.search.type, value: '' },
+            ...json.filter(e => e.value !== null && e.value !== undefined && e.value !== '')
+          ],
           index: 0
         }
       };

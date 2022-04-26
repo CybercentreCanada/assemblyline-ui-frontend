@@ -4,7 +4,7 @@ import OutlinedInput from '@material-ui/core/OutlinedInput';
 import ClearIcon from '@material-ui/icons/Clear';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { isEscapeKey, NumericField, StoreProps, TooltipIconButton, useDispatch, useReducer } from '../../..';
+import { NumericField, StoreProps, TooltipIconButton, useDispatch, useReducer } from '../../..';
 
 const useHexStyles = makeStyles(theme => ({
   endAdornment: {
@@ -66,15 +66,19 @@ export const WrappedHexcodeBar = ({ store }: StoreProps) => {
   const {
     cursor: { index: cursorIndex },
     offset: { base: offsetBase, size: offsetSize },
-    search: { value, indexes, selectedIndex }
+    search: { inputValue, value, indexes, selectedIndex }
   } = store;
   const { codes: hexcodes } = refs.current.hex;
   const [searchValue, setSearchValue] = useState<string>('');
 
   useEffect(() => {
-    if (store.history.values !== null && store.history.values !== undefined && store.history.values.length !== 0)
-      setSearchValue(store.history.values[store.history.index].value as string);
-  }, [store.history.index]);
+    if (store.search.inputValue !== searchValue) setSearchValue(store.search.inputValue);
+  }, [store.search.inputValue]);
+
+  // useEffect(() => {
+  //   if (store.history.values !== null && store.history.values !== undefined && store.history.values.length !== 0)
+  //     setSearchValue(store.history.values[store.history.index].value as string);
+  // }, [store.history.index]);
 
   // useEffect(() => {
   //   const newValue = store.location.searchValue as string;
@@ -107,7 +111,6 @@ export const WrappedHexcodeBar = ({ store }: StoreProps) => {
             onSearchBarValueChange(event.target.value);
           }}
           onKeyDown={event => {
-            if (isEscapeKey(event)) setSearchValue('');
             onSearchBarKeyDown(event, store, refs);
           }}
         />
@@ -158,6 +161,7 @@ export const HexcodeBar = React.memo(
   WrappedHexcodeBar,
   (prevProps: Readonly<StoreProps>, nextProps: Readonly<StoreProps>) =>
     prevProps.store.search.type === nextProps.store.search.type &&
+    prevProps.store.search.inputValue === nextProps.store.search.inputValue &&
     prevProps.store.search.value === nextProps.store.search.value &&
     prevProps.store.search.indexes.length === nextProps.store.search.indexes.length &&
     prevProps.store.search.selectedIndex === nextProps.store.search.selectedIndex

@@ -74,7 +74,12 @@ const HexTableBody = memo(({ store }: StoreProps) => {
 
   React.useLayoutEffect(() => {
     refs.current.layout.bodyRef = bodyRef;
-    onBodyInit();
+    onBodyInit(true);
+    return () => {
+      refs.current.layout.listRef = null;
+      refs.current.layout.bodyRef = null;
+      onBodyInit(false);
+    };
   }, [onBodyInit, refs]);
 
   React.useEffect(() => {
@@ -88,8 +93,8 @@ const HexTableBody = memo(({ store }: StoreProps) => {
   useEventListener('mouseup', (e: MouseEvent) => onBodyMouseUp(e, refs));
 
   const rowIndexes: number[] = useMemo(
-    () => Array.from(Array(store.layout.row.size).keys()).map(i => i + store.scroll.index),
-    [store.layout.row.size, store.scroll.index]
+    () => Array.from(Array(store.layout.row.size).keys()).map(i => i + store.scroll.rowIndex),
+    [store.layout.row.size, store.scroll.rowIndex]
   );
 
   return (
@@ -102,16 +107,22 @@ const HexTableBody = memo(({ store }: StoreProps) => {
       onTouchMove={e => onScrollTouchMove(e)}
       onTouchEnd={e => onScrollTouchEnd(e)}
     >
-      <div className={classes.spacer} />
-      <table className={classes.table}>
-        <tbody className={classes.tableBody}>
-          {rowIndexes.map(index => (
-            <HexRow key={index} store={store} rowIndex={index} Tag="tr" />
-          ))}
-        </tbody>
-      </table>
-      <div className={classes.spacer} />
-      <HexScrollBar store={store} />
+      {store.initialized ? (
+        <>
+          <div className={classes.spacer} />
+          <table className={classes.table}>
+            <tbody className={classes.tableBody}>
+              {rowIndexes.map(rowIndex => (
+                <HexRow key={rowIndex} store={store} rowIndex={rowIndex} Tag="tr" />
+              ))}
+            </tbody>
+          </table>
+          <div className={classes.spacer} />
+          <HexScrollBar store={store} />
+        </>
+      ) : (
+        <></>
+      )}
     </div>
   );
 });
@@ -128,12 +139,18 @@ const HexWindowBody = memo(({ store }: StoreProps) => {
   React.useLayoutEffect(() => {
     refs.current.layout.listRef = listRef;
     refs.current.layout.bodyRef = bodyRef;
-    onBodyInit();
+    onBodyInit(true);
+    return () => {
+      refs.current.layout.listRef = null;
+      refs.current.layout.bodyRef = null;
+      onBodyInit(false);
+    };
   }, [onBodyInit, refs]);
 
   React.useEffect(() => {
     if (store.initialized) {
       dispatch({ type: ACTIONS.bodyResize, payload: bodyRef.current.getBoundingClientRect() });
+      listRef?.current?.scrollToItem(store.scroll.rowIndex, 'top');
     }
   }, [dispatch, refs, store.initialized]);
 
@@ -143,7 +160,7 @@ const HexWindowBody = memo(({ store }: StoreProps) => {
   const Row = React.useMemo(
     () =>
       ({ index, style, data }) =>
-        <WindowRow key={index} rowIndex={index} style={style} Tag={data.Tag} />,
+        store.initialized ? <WindowRow key={index} rowIndex={index} style={style} Tag={data.Tag} /> : <></>,
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [store.layout.column.size, store.scroll.index]
   );
@@ -158,9 +175,9 @@ const HexWindowBody = memo(({ store }: StoreProps) => {
           height={height - 50}
           width={width}
           itemSize={LAYOUT_SIZE.rowHeight}
-          itemCount={store.scroll.maxIndex + store.layout.row.size}
-          overscanCount={-10}
-          initialScrollOffset={store.scroll.index}
+          itemCount={store.scroll.maxRowIndex + store.layout.row.size}
+          overscanCount={store.scroll.overscanCount}
+          initialScrollOffset={0}
           itemData={{
             Tag: 'div'
           }}
@@ -182,6 +199,11 @@ export const HexBody = memo(
   ({ store }: StoreProps) => <HexBodySelector store={store} />,
   (prevProps: Readonly<PropsWithChildren<StoreProps>>, nextProps: Readonly<PropsWithChildren<StoreProps>>) =>
     prevProps.store.initialized === nextProps.store.initialized &&
+    prevProps.store.hex.null.char === nextProps.store.hex.null.char &&
+    prevProps.store.hex.lower.encoding === nextProps.store.hex.lower.encoding &&
+    prevProps.store.hex.lower.char === nextProps.store.hex.lower.char &&
+    prevProps.store.hex.higher.encoding === nextProps.store.hex.higher.encoding &&
+    prevProps.store.hex.higher.char === nextProps.store.hex.higher.char &&
     prevProps.store.offset.base === nextProps.store.offset.base &&
     prevProps.store.offset.size === nextProps.store.offset.size &&
     prevProps.store.layout.row.size === nextProps.store.layout.row.size &&
@@ -193,7 +215,8 @@ export const HexBody = memo(
     prevProps.store.mode.language === nextProps.store.mode.language &&
     prevProps.store.mode.width === nextProps.store.mode.width &&
     prevProps.store.scroll.index === nextProps.store.scroll.index &&
-    prevProps.store.scroll.maxIndex === nextProps.store.scroll.maxIndex &&
+    prevProps.store.scroll.rowIndex === nextProps.store.scroll.rowIndex &&
+    prevProps.store.scroll.maxRowIndex === nextProps.store.scroll.maxRowIndex &&
     prevProps.store.scroll.speed === nextProps.store.scroll.speed
 );
 

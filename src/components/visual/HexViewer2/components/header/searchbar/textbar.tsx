@@ -93,6 +93,7 @@ export const WrappedTextBar = ({ store }: StoreProps) => {
 
   return (
     <>
+      {/* <HexField /> */}
       <FormControl className={classes.formControl} variant="outlined" size="small">
         <OutlinedInput
           className={classes.outlinedInput}
@@ -104,17 +105,24 @@ export const WrappedTextBar = ({ store }: StoreProps) => {
           placeholder={t('header.searchfield.text')}
           fullWidth
           autoFocus
+          // multiline
+          // maxRows={1}
           margin="dense"
           value={searchValue}
           onFocus={() => onSearchBarFocus()}
           onWheel={e => onSearchBarWheel(e)}
           onChange={event => {
+            // console.dir({ event: 'onChange', text: event.target.value });
             setSearchValue(event.target.value);
             onSearchBarValueChange(event.target.value);
           }}
           onKeyDown={event => {
+            // console.dir({ event: 'onKeyDown', text: event.target.value });
             if (isEscapeKey(event)) setSearchValue('');
             onSearchBarKeyDown(event, store, refs);
+          }}
+          onPaste={event => {
+            // console.log(event.clipboardData.getData('text'));
           }}
         />
       </FormControl>
@@ -168,3 +176,6 @@ export const TextBar = React.memo(
     prevProps.store.search.indexes.length === nextProps.store.search.indexes.length &&
     prevProps.store.search.selectedIndex === nextProps.store.search.selectedIndex
 );
+function useClipboard(): { copy: any } {
+  throw new Error('Function not implemented.');
+}

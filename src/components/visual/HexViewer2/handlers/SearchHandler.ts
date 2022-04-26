@@ -1,4 +1,3 @@
-import { addClassToArray, addClassToRange, removeClassToArray, removeClassToRange } from '.';
 import { Store, StoreRef } from '..';
 
 // export type Search = {
@@ -32,7 +31,7 @@ export const formatHexString = (value: string): string =>
     .toLowerCase()
     .replace(/(.{2})/g, '$& ')
     .split(' ')
-    .filter(e => e !== '')
+    .filter(e => e !== '' && e.length >= 2)
     // .map(e => parseInt(e, 16))
     // .filter(e => {
     //   console.log(e);
@@ -46,7 +45,7 @@ export const formatTextString = (value: string): string =>
     .toString('hex')
     .replace(/(.{2})/g, '$& ')
     .split(' ')
-    .filter(e => e !== '')
+    .filter(e => e !== '' && e.length >= 2)
     // .map(e => parseInt(e, 16))
     // .filter(e => !isNaN(e))
     // .map(e => Buffer.from(e.toString(16), 'hex'))
@@ -63,17 +62,17 @@ export const filterSearchIndexes = (
   }: StoreRef
 ): Array<number> => indexes.filter((index: number, i: number) => firstIndex <= index + length && index <= lastIndex);
 
-export const getSelectedSearchIndexes = (
-  { search: { length, indexes, selectedIndex } }: Store,
-  {
-    current: {
-      cellsRendered: { overscanStartIndex: firstIndex, overscanStopIndex: lastIndex }
-    }
-  }: StoreRef
-): { first: number; last: number } => ({
-  first: Math.max(firstIndex, indexes[selectedIndex]),
-  last: Math.min(lastIndex, indexes[selectedIndex] + length - 1)
-});
+// export const getSelectedSearchIndexes = (
+//   { search: { length, indexes, selectedIndex } }: Store,
+//   {
+//     current: {
+//       cellsRendered: { overscanStartIndex: firstIndex, overscanStopIndex: lastIndex }
+//     }
+//   }: StoreRef
+// ): { first: number; last: number } => ({
+//   first: Math.max(firstIndex, indexes[selectedIndex]),
+//   last: Math.min(lastIndex, indexes[selectedIndex] + length - 1)
+// });
 
 export const isSearchIndex = (store: Store, index: number) =>
   store.search.indexes.findIndex(
@@ -87,37 +86,37 @@ export const isSelectedSearchIndex = (store: Store, index: number) =>
   store.search.indexes[store.search.selectedIndex] <= index &&
   index < store.search.indexes[store.search.selectedIndex] + store.search.length;
 
-export const addSearchClass = (store: Store, refs: StoreRef, searchClass: string) => {
-  const indexes = filterSearchIndexes(store, refs);
-  addClassToArray(refs.current.layout.bodyRef, indexes, store.search.length, searchClass);
-};
+// export const addSearchClass = (store: Store, refs: StoreRef, searchClass: string) => {
+//   const indexes = filterSearchIndexes(store, refs);
+//   addClassToArray(refs.current.layout.bodyRef, indexes, store.search.length, searchClass);
+// };
 
-export const removeSearchClass = (store: Store, refs: StoreRef, searchClass: string) => {
-  const indexes = filterSearchIndexes(store, refs);
-  removeClassToArray(refs.current.layout.bodyRef, indexes, store.search.length, searchClass);
-};
+// export const removeSearchClass = (store: Store, refs: StoreRef, searchClass: string) => {
+//   const indexes = filterSearchIndexes(store, refs);
+//   removeClassToArray(refs.current.layout.bodyRef, indexes, store.search.length, searchClass);
+// };
 
-export const addSelectedSearchClass = (
-  store: Store,
-  refs: StoreRef,
-  selectedSearchClass: string,
-  searchClass: string
-) => {
-  const { first, last } = getSelectedSearchIndexes(store, refs);
-  removeClassToRange(refs.current.layout.bodyRef, first, last, searchClass);
-  addClassToRange(refs.current.layout.bodyRef, first, last, selectedSearchClass);
-};
+// export const addSelectedSearchClass = (
+//   store: Store,
+//   refs: StoreRef,
+//   selectedSearchClass: string,
+//   searchClass: string
+// ) => {
+//   const { first, last } = getSelectedSearchIndexes(store, refs);
+//   removeClassToRange(refs.current.layout.bodyRef, first, last, searchClass);
+//   addClassToRange(refs.current.layout.bodyRef, first, last, selectedSearchClass);
+// };
 
-export const removeSelectedSearchClass = (
-  store: Store,
-  refs: StoreRef,
-  selectedSearchClass: string,
-  searchClass: string
-) => {
-  const { first, last } = getSelectedSearchIndexes(store, refs);
-  removeClassToRange(refs.current.layout.bodyRef, first, last, selectedSearchClass);
-  addClassToRange(refs.current.layout.bodyRef, first, last, searchClass);
-};
+// export const removeSelectedSearchClass = (
+//   store: Store,
+//   refs: StoreRef,
+//   selectedSearchClass: string,
+//   searchClass: string
+// ) => {
+//   const { first, last } = getSelectedSearchIndexes(store, refs);
+//   removeClassToRange(refs.current.layout.bodyRef, first, last, selectedSearchClass);
+//   addClassToRange(refs.current.layout.bodyRef, first, last, searchClass);
+// };
 
 export const removeSearchQuotes = (value: string): string => {
   const firstChar = value.charAt(0);
@@ -139,6 +138,8 @@ export const getSearchQuery = (inputValue: string): { key: string; value: string
     length: length
   };
 };
+
+// /b.*e/g.exec('abcdefghijklmnopqrstuvwxyz')
 
 export const findSearchPattern = (data: string, value: string): Array<number> => {
   let indexes: Array<number> = [];
@@ -181,17 +182,14 @@ export const clampSelectedSearchIndex = (store: Store, index: number): number =>
 
 export const getSearchIndexes = (store: Store, refs: StoreRef): number[] => {
   const { indexes, length, selectedIndex } = store.search;
-  const { visibleStartIndex, visibleStopIndex } = refs.current.cellsRendered;
+  const { overscanStartIndex: start, overscanStopIndex: stop } = refs.current.cellsRendered;
   return indexes
-    .filter(
-      (index: number, i: number) =>
-        visibleStartIndex <= index + length && index <= visibleStopIndex && i !== selectedIndex
-    )
+    .filter((index: number, i: number) => start <= index + length && index <= stop && i !== selectedIndex)
     .map(index => Array.from({ length }, (_, i) => i + index))
     .flat(1);
 };
 
-export const getSelectedSearchIndexes2 = (store: Store, refs: StoreRef): number[] => {
+export const getSelectedSearchIndexes = (store: Store, refs: StoreRef): number[] => {
   const start = store.search.indexes[store.search.selectedIndex];
   const end = start + store.search.length;
   return Array.from({ length: end - start }, (_, i) => i + start).filter(

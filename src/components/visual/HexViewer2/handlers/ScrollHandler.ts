@@ -27,7 +27,8 @@ export const getScrollMaxIndex = (store: Store, hexCodeSize: number) =>
 
 export const getRowIndex = (store: Store, index: number) => Math.floor(index / store.layout.column.size);
 
-export const clampScrollIndex = (index: number, maxIndex: number): number => Math.min(Math.max(index, 0), maxIndex);
+export const clampScrollIndex = (index: number, maxRowIndex: number): number =>
+  Math.min(Math.max(index, 0), maxRowIndex);
 
 const clampOffsetIndex = (offsetIndex: number, scrollIndex: number, rowSize: number) => {
   if (offsetIndex < scrollIndex) return offsetIndex;
@@ -41,44 +42,84 @@ const isOffsetClamped = (offsetIndex: number, scrollIndex: number, rowSize: numb
   return false;
 };
 
-export const scrollToTableIndex = (store: Store, index: number, location: ScrollType): Store => {
-  if (isNaN(index)) return { ...store };
+// export const scrollToTableIndex = (store: Store, index: number, location: ScrollType): Store => {
+//   if (index === null && index === undefined && isNaN(index)) return { ...store };
 
+//   const {
+//     layout: {
+//       column: { size: columnSize },
+//       row: { size: rowSize }
+//     },
+//     scroll: { index: scrollIndex, maxRowIndex: scrollMaxIndex }
+//   } = store;
+
+//   let nextScrollIndex = store.scroll.index;
+//   if (isScroll.top(location)) {
+//     nextScrollIndex = Math.floor(index / columnSize);
+//   } else if (isScroll.middle(location)) {
+//     nextScrollIndex = Math.floor(index / columnSize - rowSize / 2);
+//   } else if (isScroll.bottom(location)) {
+//     nextScrollIndex = Math.floor(index / columnSize - rowSize);
+//   } else if (isScroll.include(location)) {
+//     nextScrollIndex = clampOffsetIndex(Math.floor(index / columnSize), scrollIndex, rowSize);
+//   } else if (isScroll.includeMiddle(location)) {
+//     nextScrollIndex = isOffsetClamped(Math.floor(index / columnSize), scrollIndex, rowSize)
+//       ? Math.floor(index / columnSize - rowSize / 2)
+//       : store.scroll.index;
+//   } else if (isScroll.smart(location)) {
+//     const distance = columnSize * rowSize;
+//     const prev = scrollIndex * columnSize - distance;
+//     const next = (scrollIndex + rowSize) * columnSize + distance;
+//     if (prev <= index && index <= next) {
+//       nextScrollIndex = clampOffsetIndex(Math.floor(index / columnSize), scrollIndex, rowSize);
+//     } else {
+//       nextScrollIndex = isOffsetClamped(Math.floor(index / columnSize), scrollIndex, rowSize)
+//         ? Math.floor(index / columnSize - rowSize / 2)
+//         : store.scroll.index;
+//     }
+//   }
+//   nextScrollIndex = clampScrollIndex(nextScrollIndex, scrollMaxIndex);
+//   return { ...store, scroll: { ...store.scroll, index: nextScrollIndex } };
+// };
+
+export const scrollToTableIndex = (store: Store, refs: StoreRef, index: number, scrollType: ScrollType): Store => {
   const {
     layout: {
       column: { size: columnSize },
       row: { size: rowSize }
     },
-    scroll: { index: scrollIndex, maxIndex: scrollMaxIndex }
+    scroll: { maxRowIndex }
   } = store;
 
-  let nextScrollIndex = store.scroll.index;
-  if (isScroll.top(location)) {
-    nextScrollIndex = Math.floor(index / columnSize);
-  } else if (isScroll.middle(location)) {
-    nextScrollIndex = Math.floor(index / columnSize - rowSize / 2);
-  } else if (isScroll.bottom(location)) {
-    nextScrollIndex = Math.floor(index / columnSize - rowSize);
-  } else if (isScroll.include(location)) {
-    nextScrollIndex = clampOffsetIndex(Math.floor(index / columnSize), scrollIndex, rowSize);
-  } else if (isScroll.includeMiddle(location)) {
-    nextScrollIndex = isOffsetClamped(Math.floor(index / columnSize), scrollIndex, rowSize)
+  let scrollIndex = store.scroll.rowIndex;
+
+  if (isScroll.top(scrollType)) {
+    scrollIndex = Math.floor(index / columnSize);
+  } else if (isScroll.middle(scrollType)) {
+    scrollIndex = Math.floor(index / columnSize - rowSize / 2);
+  } else if (isScroll.bottom(scrollType)) {
+    scrollIndex = Math.floor(index / columnSize - rowSize);
+  } else if (isScroll.include(scrollType)) {
+    scrollIndex = clampOffsetIndex(Math.floor(index / columnSize), scrollIndex, rowSize);
+  } else if (isScroll.includeMiddle(scrollType)) {
+    scrollIndex = isOffsetClamped(Math.floor(index / columnSize), scrollIndex, rowSize)
       ? Math.floor(index / columnSize - rowSize / 2)
-      : store.scroll.index;
-  } else if (isScroll.smart(location)) {
+      : scrollIndex;
+  } else if (isScroll.smart(scrollType)) {
     const distance = columnSize * rowSize;
     const prev = scrollIndex * columnSize - distance;
     const next = (scrollIndex + rowSize) * columnSize + distance;
     if (prev <= index && index <= next) {
-      nextScrollIndex = clampOffsetIndex(Math.floor(index / columnSize), scrollIndex, rowSize);
+      scrollIndex = clampOffsetIndex(Math.floor(index / columnSize), scrollIndex, rowSize);
     } else {
-      nextScrollIndex = isOffsetClamped(Math.floor(index / columnSize), scrollIndex, rowSize)
+      scrollIndex = isOffsetClamped(Math.floor(index / columnSize), scrollIndex, rowSize)
         ? Math.floor(index / columnSize - rowSize / 2)
-        : store.scroll.index;
+        : scrollIndex;
     }
   }
-  nextScrollIndex = clampScrollIndex(nextScrollIndex, scrollMaxIndex);
-  return { ...store, scroll: { ...store.scroll, index: nextScrollIndex } };
+  scrollIndex = clampScrollIndex(scrollIndex, maxRowIndex);
+
+  return { ...store, scroll: { ...store.scroll, rowIndex: scrollIndex } };
 };
 
 export const scrollToWindowIndex = (store: Store, refs: StoreRef, index: number, location: ScrollType): void => {
@@ -98,7 +139,7 @@ export const scrollToWindowIndex = (store: Store, refs: StoreRef, index: number,
 };
 
 export const getTableCellsRendered = ({
-  scroll: { index: scrollIndex, maxIndex: scrollMaxIndex, overscanCount },
+  scroll: { rowIndex: scrollIndex, maxRowIndex: scrollMaxIndex, overscanCount },
   layout: {
     column: { size: columnSize },
     row: { size: rowSize }

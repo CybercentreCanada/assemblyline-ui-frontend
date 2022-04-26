@@ -5,6 +5,7 @@ import {
   handleLayoutColumnResize,
   handleLayoutRowResize,
   isAction,
+  isBody,
   ReducerProps,
   Store,
   StoreRef
@@ -36,7 +37,7 @@ export const useLayoutReducer = () => {
     () => ({
       layout: {
         column: {
-          size: 0,
+          size: 8,
           auto: true
         },
         row: {
@@ -66,7 +67,7 @@ export const useLayoutReducer = () => {
       row: { auto: rowAuto, size: rowSize }
     } = store.layout;
     const newColumnSize = columnAuto ? handleLayoutColumnResize(width as number) : columnSize;
-    const newRowSize = rowAuto ? handleLayoutRowResize(height as number) : rowSize;
+    const newRowSize = rowAuto && isBody.table(store) ? handleLayoutRowResize(height as number) : rowSize;
 
     return {
       ...store,
@@ -93,15 +94,27 @@ export const useLayoutReducer = () => {
     return { ...store };
   }, []);
 
+  const layoutCellRendered = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
+    const { visibleStartIndex, visibleStopIndex } = payload.event;
+    return {
+      ...store,
+      layout: {
+        ...store.layout,
+        row: { ...store.layout.row, size: visibleStopIndex - visibleStartIndex }
+      }
+    };
+  }, []);
+
   const reducer = useCallback(
     ({ prevStore, nextStore, refs, action }: ReducerProps): Store => {
       if (isAction.bodyResize(action)) return layoutResize(nextStore, refs, action);
       else if (isAction.appClickAway(action)) return layoutFocusNone(nextStore, refs, action);
       else if (isAction.cellMouseDown(action)) return layoutFocusBody(nextStore, refs, action);
       else if (isAction.searchBarFocus(action)) return layoutFocusToolbar(nextStore, refs, action);
+      else if (isAction.bodyItemsRendered(action)) return layoutCellRendered(nextStore, refs, action);
       else return { ...nextStore };
     },
-    [layoutFocusBody, layoutFocusNone, layoutFocusToolbar, layoutResize]
+    [layoutCellRendered, layoutFocusBody, layoutFocusNone, layoutFocusToolbar, layoutResize]
   );
 
   return { initialState, initialRef, reducer };

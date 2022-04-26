@@ -1,23 +1,18 @@
 import { useCallback } from 'react';
 import {
   ActionProps,
-  addClass,
-  addSearchClass,
-  addSelectedSearchClass,
   clampSelectedSearchIndex,
   countHexcode,
   findSearchPattern,
   formatHexString,
   formatTextString,
   getSearchIndexes,
-  getSelectedSearchIndexes2,
+  getSelectedSearchIndexes,
   isAction,
   isSearchType,
   nextSearchIndex,
   ReducerProps,
-  removeClass,
-  removeSearchClass,
-  removeSelectedSearchClass,
+  renderArrayClass,
   RenderProps,
   SearchType,
   Store,
@@ -54,46 +49,54 @@ export const useSearchReducer = () => {
 
   const initialRef: SearchRef = {};
 
-  const oldRender = useCallback(
-    (prevStore: Store, nextStore: Store, refs: StoreRef): void => {
-      const { selectedSearch, search } = classes;
-      const { value: prevValue, selectedIndex: prevIndex } = prevStore.search;
-      const { value: nextValue, selectedIndex: nextIndex } = nextStore.search;
+  // const oldRender = useCallback(
+  //   (prevStore: Store, nextStore: Store, refs: StoreRef): void => {
+  //     const { selectedSearch, search } = classes;
+  //     const { value: prevValue, selectedIndex: prevIndex } = prevStore.search;
+  //     const { value: nextValue, selectedIndex: nextIndex } = nextStore.search;
 
-      if (prevValue !== null && (prevIndex !== nextIndex || prevValue !== nextValue))
-        removeSelectedSearchClass(prevStore, refs, selectedSearch, search);
-      if (prevValue !== null && prevValue !== nextValue) removeSearchClass(prevStore, refs, search);
-      if (nextValue !== null && prevValue !== nextValue) addSearchClass(nextStore, refs, search);
-      if (nextValue !== null && (prevIndex !== nextIndex || prevValue !== nextValue))
-        addSelectedSearchClass(nextStore, refs, selectedSearch, search);
-    },
-    [classes]
-  );
+  //     if (prevValue !== null && (prevIndex !== nextIndex || prevValue !== nextValue))
+  //       removeSelectedSearchClass(prevStore, refs, selectedSearch, search);
+  //     if (prevValue !== null && prevValue !== nextValue) removeSearchClass(prevStore, refs, search);
+  //     if (nextValue !== null && prevValue !== nextValue) addSearchClass(nextStore, refs, search);
+  //     if (nextValue !== null && (prevIndex !== nextIndex || prevValue !== nextValue))
+  //       addSelectedSearchClass(nextStore, refs, selectedSearch, search);
+  //   },
+  //   [classes]
+  // );
 
   const searchRender = useCallback(
     (prevStore: Store, nextStore: Store, refs: StoreRef): void => {
-      const prevIndexes: number[] = getSearchIndexes(prevStore, refs);
-      const nextIndexes: number[] = getSearchIndexes(nextStore, refs);
+      const prev = getSearchIndexes(prevStore, refs);
+      const next = getSearchIndexes(nextStore, refs);
+      renderArrayClass(refs.current.layout.bodyRef, prev, next, classes.search, refs.current.cellsRendered);
 
-      const oldIndexes = prevIndexes.filter(index => !nextIndexes.includes(index));
-      const newIndexes = nextIndexes.filter(index => !prevIndexes.includes(index));
+      // const prevIndexes: number[] = getSearchIndexes(prevStore, refs);
+      // const nextIndexes: number[] = getSearchIndexes(nextStore, refs);
 
-      oldIndexes.forEach(index => removeClass(refs.current.layout.bodyRef, index, classes.search));
-      newIndexes.forEach(index => addClass(refs.current.layout.bodyRef, index, classes.search));
+      // const oldIndexes = prevIndexes.filter(index => !nextIndexes.includes(index));
+      // const newIndexes = nextIndexes.filter(index => !prevIndexes.includes(index));
+
+      // oldIndexes.forEach(index => removeClass(refs.current.layout.bodyRef, index, classes.search));
+      // newIndexes.forEach(index => addClass(refs.current.layout.bodyRef, index, classes.search));
     },
     [classes]
   );
 
   const selectedSearchRender = useCallback(
     (prevStore: Store, nextStore: Store, refs: StoreRef): void => {
-      const prevIndexes: number[] = getSelectedSearchIndexes2(prevStore, refs);
-      const nextIndexes: number[] = getSelectedSearchIndexes2(nextStore, refs);
+      const prev = getSelectedSearchIndexes(prevStore, refs);
+      const next = getSelectedSearchIndexes(nextStore, refs);
+      renderArrayClass(refs.current.layout.bodyRef, prev, next, classes.selectedSearch, refs.current.cellsRendered);
 
-      const oldIndexes = prevIndexes.filter(index => !nextIndexes.includes(index));
-      const newIndexes = nextIndexes.filter(index => !prevIndexes.includes(index));
+      // const prevIndexes: number[] = getSelectedSearchIndexes2(prevStore, refs);
+      // const nextIndexes: number[] = getSelectedSearchIndexes2(nextStore, refs);
 
-      oldIndexes.forEach(index => removeClass(refs.current.layout.bodyRef, index, classes.selectedSearch));
-      newIndexes.forEach(index => addClass(refs.current.layout.bodyRef, index, classes.selectedSearch));
+      // const oldIndexes = prevIndexes.filter(index => !nextIndexes.includes(index));
+      // const newIndexes = nextIndexes.filter(index => !prevIndexes.includes(index));
+
+      // oldIndexes.forEach(index => removeClass(refs.current.layout.bodyRef, index, classes.selectedSearch));
+      // newIndexes.forEach(index => addClass(refs.current.layout.bodyRef, index, classes.selectedSearch));
     },
     [classes]
   );
@@ -107,9 +110,11 @@ export const useSearchReducer = () => {
     if (isSearchType.hex(store)) value = formatHexString(inputValue);
     else if (isSearchType.text(store)) value = formatTextString(inputValue);
 
-    length = countHexcode(value);
-    indexes = findSearchPattern(refs.current.hex.data, value);
-    selectedIndex = nextSearchIndex(indexes, store.cursor.index);
+    if (value !== null && value !== '') {
+      length = countHexcode(value);
+      indexes = findSearchPattern(refs.current.hex.data, value);
+      selectedIndex = nextSearchIndex(indexes, store.cursor.index);
+    }
 
     return {
       ...store,

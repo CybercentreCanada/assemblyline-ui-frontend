@@ -47,7 +47,7 @@ export const getCellClasses = (
     asciiType === 'non printable' && classes.nonPrintableColor,
     asciiType === 'lower ASCII' && classes.lowerASCIIColor,
     asciiType === 'higher ASCII' && classes.higherASCIIColor,
-    columnIndex % 4 === 0 && type === 'hex' && classes.border,
+    columnIndex % 4 === 0 && columnIndex !== 0 && type === 'hex' && classes.border,
     isCursorIndex(store, index) && classes.cursor,
     isSelectIndex(store, index) && classes.select,
     isSearchIndex(store, index) && classes.search,

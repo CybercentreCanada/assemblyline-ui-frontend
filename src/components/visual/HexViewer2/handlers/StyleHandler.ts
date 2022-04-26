@@ -53,7 +53,7 @@ export const renderIndexClass = (
     ref.current
       ?.querySelectorAll("[data-index='" + prevState + "']")
       ?.forEach(element => element.classList.remove('class', classname));
-  if (nextState !== null && start <= prevState && prevState <= stop)
+  if (nextState !== null && start <= nextState && nextState <= stop)
     ref.current
       ?.querySelectorAll("[data-index='" + nextState + "']")
       ?.forEach(element => element.classList.add('class', classname));

@@ -1,7 +1,20 @@
 import { useCallback, useMemo } from 'react';
-import { ActionProps, isAction, parseDataToHexcodeMap, ReducerProps, Store, StoreRef } from '..';
+import { ActionProps, EncodingType, isAction, parseDataToHexcodeMap, ReducerProps, Store, StoreRef } from '..';
 
 export type HexState = {
+  hex: {
+    null: {
+      char: string;
+    };
+    lower: {
+      encoding: EncodingType;
+      char: string;
+    };
+    higher: {
+      encoding: EncodingType;
+      char: string;
+    };
+  };
   offset: {
     base: number;
     size: number;
@@ -20,6 +33,19 @@ export type HexPayload = any;
 export const useHexReducer = () => {
   const initialState = useMemo<HexState>(
     () => ({
+      hex: {
+        null: {
+          char: '0'
+        },
+        lower: {
+          encoding: 'hidden',
+          char: '.'
+        },
+        higher: {
+          encoding: 'hidden',
+          char: '.'
+        }
+      },
       offset: {
         base: 16,
         size: 8

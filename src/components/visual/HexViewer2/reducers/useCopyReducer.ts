@@ -1,6 +1,6 @@
 import useClipboard from 'commons/components/hooks/useClipboard';
 import { useCallback, useMemo } from 'react';
-import { isAction, isCell, ReducerProps, Store, StoreRef } from '..';
+import { isAction, isCell, ReducerProps, Store, StoreRef, toHexChar2 } from '..';
 
 export type CopyState = {};
 
@@ -21,8 +21,7 @@ export const useCopyReducer = () => {
   );
 
   const copyTextCursor = useCallback(
-    (store: Store, refs: StoreRef) =>
-      copy(Buffer.from(refs.current.hex.codes.get(store.cursor.index), 'hex').toString()),
+    (store: Store, refs: StoreRef) => copy(toHexChar2(store, refs.current.hex.codes.get(store.cursor.index), true)),
     [copy]
   );
 
@@ -47,7 +46,7 @@ export const useCopyReducer = () => {
         i => i + store.select.startIndex
       );
       array.forEach(index => {
-        value += Buffer.from(refs.current.hex.codes.get(index), 'hex').toString();
+        value += toHexChar2(store, refs.current.hex.codes.get(index), true);
       });
       copy(value);
     },

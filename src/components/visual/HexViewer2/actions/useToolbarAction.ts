@@ -20,6 +20,7 @@ export type ToolbarActions = {
   historyIndexChange: 'HISTORY_INDEX_CHANGE_ACTION';
   locationShare: 'LOCATION_SHARE_ACTION';
   locationLoaded: 'LOCATION_LOADED_ACTION';
+  fullscreenToggle: 'FULLSCREEN_TOGGLE_ACTION';
 };
 
 export const TOOLBAR_ACTIONS: ToolbarActions = {
@@ -40,7 +41,8 @@ export const TOOLBAR_ACTIONS: ToolbarActions = {
   historyAddValue: 'HISTORY_ADD_VALUE_ACTION',
   historyIndexChange: 'HISTORY_INDEX_CHANGE_ACTION',
   locationShare: 'LOCATION_SHARE_ACTION',
-  locationLoaded: 'LOCATION_LOADED_ACTION'
+  locationLoaded: 'LOCATION_LOADED_ACTION',
+  fullscreenToggle: 'FULLSCREEN_TOGGLE_ACTION'
 } as ToolbarActions;
 
 export type ToolbarActionProps = {
@@ -58,6 +60,7 @@ export type ToolbarActionProps = {
   onLocationShare: () => void;
   onLocationLoaded: () => void;
   onSearchBarKeyDown: (event: KeyboardEvent<HTMLDivElement> | any, store: Store, refs: StoreRef) => void;
+  onFullscreenToggle: () => void;
 };
 
 export const useToolbarAction = (dispatch: DispatchProp): ToolbarActionProps => {
@@ -66,9 +69,9 @@ export const useToolbarAction = (dispatch: DispatchProp): ToolbarActionProps => 
       if (!isFocus.toolbar(refs) || !(isEnterKey(event) || isUpDownKey(event) || isEscapeKey(event))) return;
       event.preventDefault();
 
-      if (isEnterKey(event)) dispatch(ACTIONS.searchBarEnterKeyDown, { event }, true, false);
+      if (isEnterKey(event)) dispatch(ACTIONS.searchBarEnterKeyDown, { event });
       else if (isUpDownKey(event) && store.history.values.length > 0)
-        dispatch(ACTIONS.searchBarArrowKeyDown, { event }, true, false);
+        dispatch(ACTIONS.searchBarArrowKeyDown, { event });
       else if (isEscapeKey(event)) dispatch(ACTIONS.searchBarEscapeKeyDown, { event }, true, false);
     },
     [dispatch]
@@ -115,6 +118,8 @@ export const useToolbarAction = (dispatch: DispatchProp): ToolbarActionProps => 
 
   const onLocationLoaded = useCallback(() => dispatch(ACTIONS.locationLoaded, null), [dispatch]);
 
+  const onFullscreenToggle = useCallback(() => dispatch(ACTIONS.fullscreenToggle, null), [dispatch]);
+
   return {
     onSearchBarValueChange,
     onSearchBarInputChange,
@@ -129,6 +134,7 @@ export const useToolbarAction = (dispatch: DispatchProp): ToolbarActionProps => 
     onSearchTypeChange,
     onSearchClear,
     onLocationShare,
-    onLocationLoaded
+    onLocationLoaded,
+    onFullscreenToggle
   };
 };

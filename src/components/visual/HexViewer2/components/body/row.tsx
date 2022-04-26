@@ -53,37 +53,28 @@ export const WrappedHexRow = ({ store, rowIndex = 0, style = null, Tag = 'div' }
     [rowIndex, store.layout.column.size]
   );
 
-  if (!store.initialized) return <></>;
-  else
-    return (
-      <Tag className={classes.row} style={style}>
-        <HexOffset store={store} index={rowIndex * store.layout.column.size} Tag={cellTag} />
-        <HexSpacer Tag={cellTag} style={classes.spacer} />
-        {indexes.map((index, columnIndex) =>
-          index >= hexcodes.size ? (
-            <HexSpacer key={index} Tag={cellTag} style={clsx(classes.empty, classes.emptyHex)} />
-          ) : (
-            <HexCell key={index} store={store} Tag={cellTag} type="hex" columnIndex={columnIndex} index={index} />
-          )
-        )}
-        <HexSpacer Tag={cellTag} style={classes.spacer} />
-        {indexes.map((index, columnIndex) =>
-          index >= hexcodes.size ? (
-            <HexSpacer key={index} Tag={cellTag} style={clsx(classes.empty, classes.emptyText)} />
-          ) : (
-            <HexCell
-              key={columnIndex}
-              store={store}
-              Tag={cellTag}
-              type="text"
-              columnIndex={columnIndex}
-              index={index}
-            />
-          )
-        )}
-        <HexSpacer Tag={cellTag} style={classes.spacer} />
-      </Tag>
-    );
+  return (
+    <Tag className={classes.row} style={style}>
+      <HexOffset store={store} index={rowIndex * store.layout.column.size} Tag={cellTag} />
+      <HexSpacer Tag={cellTag} style={classes.spacer} />
+      {indexes.map((index, columnIndex) =>
+        index >= hexcodes.size ? (
+          <HexSpacer key={index} Tag={cellTag} style={clsx(classes.empty, classes.emptyHex)} />
+        ) : (
+          <HexCell key={index} store={store} Tag={cellTag} type="hex" columnIndex={columnIndex} index={index} />
+        )
+      )}
+      <HexSpacer Tag={cellTag} style={classes.spacer} />
+      {indexes.map((index, columnIndex) =>
+        index >= hexcodes.size ? (
+          <HexSpacer key={index} Tag={cellTag} style={clsx(classes.empty, classes.emptyText)} />
+        ) : (
+          <HexCell key={columnIndex} store={store} Tag={cellTag} type="text" columnIndex={columnIndex} index={index} />
+        )
+      )}
+      <HexSpacer Tag={cellTag} style={classes.spacer} />
+    </Tag>
+  );
 };
 
 export const HexRow = React.memo(
@@ -95,6 +86,11 @@ export const HexRow = React.memo(
     prevProps.rowIndex === nextProps.rowIndex &&
     prevProps.store.initialized === nextProps.store.initialized &&
     prevProps.store.layout.column.size === nextProps.store.layout.column.size &&
+    prevProps.store.hex.null.char === nextProps.store.hex.null.char &&
+    prevProps.store.hex.lower.encoding === nextProps.store.hex.lower.encoding &&
+    prevProps.store.hex.lower.char === nextProps.store.hex.lower.char &&
+    prevProps.store.hex.higher.encoding === nextProps.store.hex.higher.encoding &&
+    prevProps.store.hex.higher.char === nextProps.store.hex.higher.char &&
     prevProps.store.offset.base === nextProps.store.offset.base &&
     prevProps.store.offset.size === nextProps.store.offset.size &&
     prevProps.store.mode.bodyType === nextProps.store.mode.bodyType &&

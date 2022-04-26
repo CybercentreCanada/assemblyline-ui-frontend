@@ -58,7 +58,7 @@ export const WrappedHexCell = ({
       onMouseDown={() => onCellMouseDown(index, type)}
       style={{ width: type === 'hex' ? LAYOUT_SIZE.hexWidth : LAYOUT_SIZE.textWidth }}
     >
-      {type === 'hex' ? getHexValue(hexcodes, index) : getTextValue(hexcodes, index)}
+      {type === 'hex' ? getHexValue(hexcodes, index) : getTextValue(store, hexcodes, index)}
     </Tag>
   );
 };
@@ -76,5 +76,10 @@ export const HexCell = React.memo(
     prevProps.store.mode.bodyType === nextProps.store.mode.bodyType &&
     prevProps.store.mode.theme === nextProps.store.mode.theme &&
     prevProps.store.mode.language === nextProps.store.mode.language &&
-    prevProps.store.mode.width === nextProps.store.mode.width
+    prevProps.store.mode.width === nextProps.store.mode.width &&
+    prevProps.store.hex.null.char === nextProps.store.hex.null.char &&
+    prevProps.store.hex.lower.encoding === nextProps.store.hex.lower.encoding &&
+    prevProps.store.hex.lower.char === nextProps.store.hex.lower.char &&
+    prevProps.store.hex.higher.encoding === nextProps.store.hex.higher.encoding &&
+    prevProps.store.hex.higher.char === nextProps.store.hex.higher.char
 );

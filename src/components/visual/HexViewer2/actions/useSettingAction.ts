@@ -10,6 +10,8 @@ export type SettingActions = {
   settingOffsetBaseChange: 'SETTING_OFFSET_BASE_CHANGE_ACTION';
   settingAutoColumnChange: 'SETTING_AUTO_COLUMN_CHANGE_ACTION';
   settingColumnChange: 'SETTING_COLUMN_CHANGE_ACTION';
+  settingEncodingChange: 'SETTING_ENCODING_CHANGE_ACTION';
+  settingHexCharChange: 'SETTING_HEX_CHAR_CHANGE_ACTION';
 };
 
 export const SETTING_ACTIONS: SettingActions = {
@@ -20,7 +22,9 @@ export const SETTING_ACTIONS: SettingActions = {
   settingBodyTypeChange: 'SETTING_BODY_TYPE_CHANGE_ACTION',
   settingOffsetBaseChange: 'SETTING_OFFSET_BASE_CHANGE_ACTION',
   settingAutoColumnChange: 'SETTING_AUTO_COLUMN_CHANGE_ACTION',
-  settingColumnChange: 'SETTING_COLUMN_CHANGE_ACTION'
+  settingColumnChange: 'SETTING_COLUMN_CHANGE_ACTION',
+  settingEncodingChange: 'SETTING_ENCODING_CHANGE_ACTION',
+  settingHexCharChange: 'SETTING_HEX_CHAR_CHANGE_ACTION'
 } as SettingActions;
 
 export type SettingActionProps = {
@@ -32,6 +36,8 @@ export type SettingActionProps = {
   onSettingOffsetBaseChange: (event: ChangeEvent<{ name?: string; value: unknown }>) => void;
   onSettingAutoColumnsChange: () => void;
   onSettingColumnsChange: (value: number) => void;
+  onSettingEncodingChange: (key: string, value: number) => void;
+  onSettingHexCharChange: (key: string, value: string) => void;
 };
 
 export const useSettingAction = (dispatch: DispatchProp): SettingActionProps => {
@@ -60,14 +66,26 @@ export const useSettingAction = (dispatch: DispatchProp): SettingActionProps => 
     [dispatch]
   );
 
+  const onSettingEncodingChange = useCallback(
+    (key: string, value: number) => dispatch(ACTIONS.settingEncodingChange, { key, value }),
+    [dispatch]
+  );
+
+  const onSettingHexCharChange = useCallback(
+    (key: string, value: string) => dispatch(ACTIONS.settingHexCharChange, { key, value }),
+    [dispatch]
+  );
+
   return {
     onSettingLoad,
     onSettingSave,
     onSettingOpen,
     onSettingClose,
     onSettingBodyTypeChange,
+    onSettingEncodingChange,
     onSettingOffsetBaseChange,
     onSettingAutoColumnsChange,
-    onSettingColumnsChange
+    onSettingColumnsChange,
+    onSettingHexCharChange
   };
 };
