@@ -24,7 +24,6 @@ const useStyles = makeStyles(theme => ({
   searchbar: {
     borderRadius: '4px',
     paddingLeft: theme.spacing(2),
-    // paddingRight: theme.spacing(0.5),
     backgroundColor: alpha(theme.palette.text.primary, 0.04),
     '&:hover': {
       backgroundColor: alpha(theme.palette.text.primary, 0.06)
@@ -41,7 +40,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export interface SearchBarButton {
-  icon: React.ReactNode;
+  icon: React.ReactElement;
   props: IconButtonProps;
   tooltip?: string;
 }
@@ -128,7 +127,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           onClick={_onValueClear}
           edge="end"
           size={!upMD ? 'small' : null}
-          style={{ marginRight: theme.spacing(upMD ? 1 : 0.5) }}
+          style={{ marginRight: theme.spacing(upMD ? 0 : 0.5) }}
           disabled={searching}
         >
           <Tooltip title={t('clear_filter')}>
@@ -139,35 +138,21 @@ const SearchBar: React.FC<SearchBarProps> = ({
           <Divider
             orientation="vertical"
             flexItem
-            style={{ marginLeft: theme.spacing(upMD ? 0 : 0.5), marginRight: theme.spacing(upMD ? 1 : 0.5) }}
+            style={{ marginLeft: theme.spacing(upMD ? 1 : 0.5), marginRight: theme.spacing(upMD ? 1 : 0.5) }}
           />
         )}
-        {buttons.map((b, i) =>
-          b.tooltip ? (
-            <Tooltip key={`searchbar-button-${i}`} title={b.tooltip}>
-              <IconButton
-                {...b.props}
-                edge="end"
-                size={!upMD ? 'small' : null}
-                style={{ marginRight: theme.spacing(upMD ? 1 : 0.5) }}
-                disabled={searching}
-              >
-                {b.icon}
-              </IconButton>
-            </Tooltip>
-          ) : (
-            <IconButton
-              key={`searchbar-button-${i}`}
-              {...b.props}
-              edge="end"
-              size={!upMD ? 'small' : null}
-              style={{ marginRight: theme.spacing(upMD ? 1 : 0.5) }}
-              disabled={searching}
-            >
-              {b.icon}
-            </IconButton>
-          )
-        )}
+        {buttons.map((b, i) => (
+          <IconButton
+            key={`searchbar-button-${i}`}
+            {...b.props}
+            edge="end"
+            size={!upMD ? 'small' : null}
+            style={{ marginRight: theme.spacing(upMD ? 0 : 0.5) }}
+            disabled={searching}
+          >
+            {b.tooltip ? <Tooltip title={b.tooltip}>{b.icon}</Tooltip> : b.icon}
+          </IconButton>
+        ))}
         {extras}
       </Box>
       {searching && (

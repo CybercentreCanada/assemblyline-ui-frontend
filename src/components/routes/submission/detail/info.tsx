@@ -2,8 +2,9 @@ import { Collapse, Divider, Grid, makeStyles, Typography, useTheme } from '@mate
 import CheckBoxOutlineBlankOutlinedIcon from '@material-ui/icons/CheckBoxOutlineBlankOutlined';
 import CheckBoxOutlinedIcon from '@material-ui/icons/CheckBoxOutlined';
 import { Skeleton } from '@material-ui/lab';
+import Priority from 'components/visual/Priority';
 import Verdict from 'components/visual/Verdict';
-import React, { useMemo } from 'react';
+import React, { Fragment, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 
@@ -61,7 +62,20 @@ const WrappedInfoSection: React.FC<InfoSectionProps> = ({ submission }) => {
                   <span style={{ fontWeight: 500 }}>{t('params.services.selected')}</span>
                 </Grid>
                 <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
-                  {submission ? submission.params.services.selected.join(' | ') : <Skeleton />}
+                  {submission ? (
+                    submission.params.services.rescan ? (
+                      [
+                        ...submission.params.services.selected,
+                        ...submission.params.services.rescan.filter(
+                          word => submission.params.services.selected.indexOf(word) === -1
+                        )
+                      ].join(' | ')
+                    ) : (
+                      submission.params.services.selected.join(' | ')
+                    )
+                  ) : (
+                    <Skeleton />
+                  )}
                 </Grid>
 
                 {submission && Object.keys(submission.params.service_spec).length !== 0 && (
@@ -84,26 +98,30 @@ const WrappedInfoSection: React.FC<InfoSectionProps> = ({ submission }) => {
                   </>
                 )}
 
-                {['deep_scan', 'ignore_cache', 'ignore_dynamic_recursion_prevention', 'ignore_filtering'].map(
-                  (k, i) => (
-                    <>
-                      <Grid item xs={4} sm={3} lg={2} style={{ paddingTop: theme.spacing(0.5) }}>
-                        <span style={{ fontWeight: 500 }}>{t(`params.${k}`)}</span>
-                      </Grid>
-                      <Grid item xs={8} sm={9} lg={10} style={{ height: theme.spacing(3.75) }}>
-                        {submission ? (
-                          submission.params[k] ? (
-                            <CheckBoxOutlinedIcon />
-                          ) : (
-                            <CheckBoxOutlineBlankOutlinedIcon />
-                          )
+                {[
+                  'generate_alert',
+                  'deep_scan',
+                  'ignore_cache',
+                  'ignore_dynamic_recursion_prevention',
+                  'ignore_filtering'
+                ].map((k, i) => (
+                  <Fragment key={i}>
+                    <Grid item xs={4} sm={3} lg={2} style={{ paddingTop: theme.spacing(0.5) }}>
+                      <span style={{ fontWeight: 500 }}>{t(`params.${k}`)}</span>
+                    </Grid>
+                    <Grid item xs={8} sm={9} lg={10} style={{ height: theme.spacing(3.75) }}>
+                      {submission ? (
+                        submission.params[k] ? (
+                          <CheckBoxOutlinedIcon />
                         ) : (
-                          <Skeleton variant="rect" style={{ width: theme.spacing(3), height: theme.spacing(3) }} />
-                        )}
-                      </Grid>
-                    </>
-                  )
-                )}
+                          <CheckBoxOutlineBlankOutlinedIcon />
+                        )
+                      ) : (
+                        <Skeleton variant="rect" style={{ width: theme.spacing(3), height: theme.spacing(3) }} />
+                      )}
+                    </Grid>
+                  </Fragment>
+                ))}
 
                 <Grid item xs={4} sm={3} lg={2}>
                   <span style={{ fontWeight: 500 }}>{t('params.submitter')}</span>
@@ -118,6 +136,17 @@ const WrappedInfoSection: React.FC<InfoSectionProps> = ({ submission }) => {
                 <Grid item xs={8} sm={9} lg={10}>
                   {submission ? (
                     <Verdict score={submission.max_score} />
+                  ) : (
+                    <Skeleton variant="rect" style={{ width: theme.spacing(8), height: theme.spacing(2.5) }} />
+                  )}
+                </Grid>
+
+                <Grid item xs={4} sm={3} lg={2}>
+                  <span style={{ fontWeight: 500 }}>{t('params.priority')}</span>
+                </Grid>
+                <Grid item xs={8} sm={9} lg={10}>
+                  {submission ? (
+                    <Priority priority={submission.params.priority} />
                   ) : (
                     <Skeleton variant="rect" style={{ width: theme.spacing(8), height: theme.spacing(2.5) }} />
                   )}

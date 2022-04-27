@@ -412,7 +412,17 @@ const Alerts: React.FC = () => {
                 }
               },
               {
-                icon: <BiNetworkChart fontSize={upMD ? 'medium' : 'small'} />,
+                icon: (
+                  <>
+                    <BiNetworkChart
+                      style={{
+                        height: upMD ? theme.spacing(2.5) : theme.spacing(2),
+                        width: upMD ? theme.spacing(2.5) : theme.spacing(2),
+                        margin: theme.spacing(0.25)
+                      }}
+                    />
+                  </>
+                ),
                 tooltip: t('workflows'),
                 props: {
                   onClick: () => setDrawer({ open: true, type: 'actions', actionData: { query: searchQuery } })

@@ -59,6 +59,34 @@ export function scoreToVerdict(score: number | null) {
   return 'info';
 }
 
+export function priorityText(priority: number | null) {
+  if (priority >= 1500) {
+    return 'user-high';
+  }
+
+  if (priority >= 1000) {
+    return 'user-medium';
+  }
+
+  if (priority >= 500) {
+    return 'user-low';
+  }
+
+  if (priority >= 300) {
+    return 'critical';
+  }
+
+  if (priority >= 200) {
+    return 'high';
+  }
+
+  if (priority >= 100) {
+    return 'medium';
+  }
+
+  return 'low';
+}
+
 export function getValueFromPath(obj: object, path: string) {
   const paths = path.split('.');
   let current = obj;
