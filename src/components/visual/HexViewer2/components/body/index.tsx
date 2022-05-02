@@ -86,6 +86,7 @@ const HexTableBody = memo(({ store }: StoreProps) => {
     if (store.initialized) {
       dispatch({ type: ACTIONS.bodyResize, payload: refs.current.layout.bodyRef.current.getBoundingClientRect() });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, refs, store.initialized]);
 
   useEventListener('resize', () => onBodyResize(bodyRef?.current?.getBoundingClientRect()));
