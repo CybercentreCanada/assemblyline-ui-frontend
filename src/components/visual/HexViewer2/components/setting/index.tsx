@@ -12,7 +12,6 @@ export * from './column';
 export * from './encoding';
 export * from './offsetBase';
 export * from './OutlinedField';
-export * from './settings';
 
 const useHexStyles = makeStyles(theme => ({
   dialog: {}

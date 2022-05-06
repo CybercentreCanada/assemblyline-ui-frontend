@@ -40,9 +40,18 @@ export type HexRowProps = StoreProps & {
   rowIndex?: number;
   style?: React.CSSProperties;
   Tag?: 'div' | 'tr';
+  bodyRef?: HTMLDivElement;
+  listRef?: HTMLDivElement;
 };
 
-export const WrappedHexRow = ({ store, rowIndex = 0, style = null, Tag = 'div' }: HexRowProps) => {
+export const WrappedHexRow = ({
+  store,
+  rowIndex = 0,
+  style = null,
+  Tag = 'div',
+  bodyRef = null,
+  listRef = null
+}: HexRowProps) => {
   const classes = useHexStyles();
   const { refs } = useReducer();
 
@@ -61,7 +70,16 @@ export const WrappedHexRow = ({ store, rowIndex = 0, style = null, Tag = 'div' }
         index >= hexcodes.size ? (
           <HexSpacer key={index} Tag={cellTag} style={clsx(classes.empty, classes.emptyHex)} />
         ) : (
-          <HexCell key={index} store={store} Tag={cellTag} type="hex" columnIndex={columnIndex} index={index} />
+          <HexCell
+            key={index}
+            store={store}
+            Tag={cellTag}
+            type="hex"
+            columnIndex={columnIndex}
+            index={index}
+            bodyRef={bodyRef}
+            listRef={listRef}
+          />
         )
       )}
       <HexSpacer Tag={cellTag} style={classes.spacer} />
@@ -69,7 +87,16 @@ export const WrappedHexRow = ({ store, rowIndex = 0, style = null, Tag = 'div' }
         index >= hexcodes.size ? (
           <HexSpacer key={index} Tag={cellTag} style={clsx(classes.empty, classes.emptyText)} />
         ) : (
-          <HexCell key={columnIndex} store={store} Tag={cellTag} type="text" columnIndex={columnIndex} index={index} />
+          <HexCell
+            key={columnIndex}
+            store={store}
+            Tag={cellTag}
+            type="text"
+            columnIndex={columnIndex}
+            index={index}
+            bodyRef={bodyRef}
+            listRef={listRef}
+          />
         )
       )}
       <HexSpacer Tag={cellTag} style={classes.spacer} />
@@ -100,8 +127,14 @@ export const HexRow = React.memo(
     Object.is(prevProps.style, nextProps.style)
 );
 
-export const WrappedWindowRow = ({ rowIndex = 0, style = null, Tag = 'div' }: HexRowProps) => {
+export const WrappedWindowRow = ({
+  rowIndex = 0,
+  style = null,
+  Tag = 'div',
+  bodyRef = null,
+  listRef = null
+}: HexRowProps) => {
   const { store } = useStore();
-  return <HexRow store={store} rowIndex={rowIndex} style={style} Tag={Tag} />;
+  return <HexRow store={store} rowIndex={rowIndex} style={style} Tag={Tag} bodyRef={bodyRef} listRef={listRef} />;
 };
 export const WindowRow = React.memo(WrappedWindowRow);

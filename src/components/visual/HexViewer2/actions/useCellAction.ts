@@ -11,19 +11,33 @@ export const CELL_ACTIONS = {
   cellMouseDown: 'CELL_MOUSE_DOWN_ACTION'
 } as CellActions;
 
+export type CellMouseEnterProps = {
+  index: number;
+  type: CellType;
+  bodyRef: HTMLDivElement;
+  listRef: HTMLDivElement;
+};
+
+export type CellMouseDownProps = {
+  index: number;
+  type: CellType;
+  bodyRef: HTMLDivElement;
+  listRef: HTMLDivElement;
+};
+
 export type CellActionProps = {
-  onCellMouseEnter: (index: number, type: CellType) => void;
-  onCellMouseDown: (index: number, type: CellType) => void;
+  onCellMouseEnter: (props: CellMouseEnterProps) => void;
+  onCellMouseDown: (props: CellMouseDownProps) => void;
 };
 
 export const useCellAction = (dispatch: DispatchProp): CellActionProps => {
   const onCellMouseEnter = useCallback(
-    (index: number, type: CellType) => dispatch(ACTIONS.cellMouseEnter, { index, type }, false),
+    (props: CellMouseEnterProps) => dispatch(ACTIONS.cellMouseEnter, { ...props }, false),
     [dispatch]
   );
 
   const onCellMouseDown = useCallback(
-    (index: number, type: CellType) => dispatch(ACTIONS.cellMouseDown, { index, type }),
+    (props: CellMouseDownProps) => dispatch(ACTIONS.cellMouseDown, { ...props }),
     [dispatch]
   );
 

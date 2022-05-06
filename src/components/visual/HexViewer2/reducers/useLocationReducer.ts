@@ -112,6 +112,7 @@ export const useLocationReducer = () => {
       };
   }, []);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const searchQuery = useCallback((store: Store, refs: StoreRef, location: LocationQuery): Store => {
     let searchType = location.hasOwnProperty('searchType') ? (location.searchType as SearchType) : null;
     searchType =

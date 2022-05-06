@@ -1,6 +1,7 @@
 import React, { useLayoutEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BODY_TYPE_SETTING_VALUES, SelectField, StoreProps, useDispatch } from '../..';
+import {  SelectField, StoreProps, useDispatch } from '../..';
+import { BODY_TYPE_SETTING_VALUES } from '../../handlers/ModeHandler';
 
 export const WrappedHexBodyTypeSetting = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);

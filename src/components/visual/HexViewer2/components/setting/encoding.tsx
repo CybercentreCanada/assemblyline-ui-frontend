@@ -1,4 +1,3 @@
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { ChangeEvent, default as React, useLayoutEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -10,38 +9,9 @@ import {
   useDispatch
 } from '../..';
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      // '& > fieldset': {
-      //   border: 'none !important',
-      //   borderWidth: '0px'
-      // }
-    },
-    formControl: {},
-    outlinedInput: {
-      paddingRight: '4px'
-    },
-    buttonGroup: {
-      display: 'flex',
-      flexDirection: 'column'
-    },
-    iconButton: {
-      height: '20px',
-      borderRadius: 0,
-      minWidth: '20px'
-    },
-    input: {
-      textAlign: 'left'
-    }
-  })
-);
-
 export const WrappedHexEncoding = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);
   const { onSettingEncodingChange, onSettingHexCharChange } = useDispatch();
-
-  const fieldClasses = useStyles();
 
   const language = store.mode.language;
   const [lowerValues, setLowerValues] = useState<Array<{ label: string; value: number }>>(

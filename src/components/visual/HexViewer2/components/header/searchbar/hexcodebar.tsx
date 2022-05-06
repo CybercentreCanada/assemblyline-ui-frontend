@@ -59,35 +59,17 @@ export const WrappedHexcodeBar = ({ store }: StoreProps) => {
     onSearchBarKeyDown,
     onSearchBarValueChange,
     onSelectedSearchIndexChange,
-    onSearchBarWheel,
-    onLocationLoaded
+    onSearchBarWheel
   } = useDispatch();
 
   const {
-    cursor: { index: cursorIndex },
-    offset: { base: offsetBase, size: offsetSize },
-    search: { inputValue, value, indexes, selectedIndex }
+    search: { indexes, selectedIndex }
   } = store;
-  const { codes: hexcodes } = refs.current.hex;
   const [searchValue, setSearchValue] = useState<string>('');
 
   useEffect(() => {
     if (store.search.inputValue !== searchValue) setSearchValue(store.search.inputValue);
-  }, [store.search.inputValue]);
-
-  // useEffect(() => {
-  //   if (store.history.values !== null && store.history.values !== undefined && store.history.values.length !== 0)
-  //     setSearchValue(store.history.values[store.history.index].value as string);
-  // }, [store.history.index]);
-
-  // useEffect(() => {
-  //   const newValue = store.location.searchValue as string;
-  //   console.log(store.location.searchValue, store.location.loaded);
-  //   if (newValue !== null && newValue !== undefined && store.location.loaded === false) {
-  //     onLocationLoaded();
-  //     setSearchValue(newValue);
-  //   }
-  // }, [store.location]);
+  }, [searchValue, store.search.inputValue]);
 
   return (
     <>

@@ -59,37 +59,19 @@ export const WrappedTextBar = ({ store }: StoreProps) => {
     onSearchBarKeyDown,
     onSearchBarValueChange,
     onSelectedSearchIndexChange,
-    onSearchBarWheel,
-    onLocationLoaded
+    onSearchBarWheel
   } = useDispatch();
 
   const {
-    cursor: { index: cursorIndex },
-    offset: { base: offsetBase, size: offsetSize },
-    search: { value, indexes, selectedIndex }
+    search: { indexes, selectedIndex }
   } = store;
-  const { codes: hexcodes } = refs.current.hex;
 
   const [searchValue, setSearchValue] = useState<string>(store.search.inputValue);
 
   useEffect(() => {
     if (store.history.values !== null && store.history.values !== undefined && store.history.values.length !== 0)
       setSearchValue(store.history.values[store.history.index].value as string);
-  }, [store.history.index]);
-
-  // useEffect(() => {
-  //   const newValue = store.history.values[store.history.index].value as string;
-  //   if (newValue !== null && newValue !== undefined && newValue != '') setSearchValue(newValue);
-  // }, [store.history.index]);
-
-  // useEffect(() => {
-  //   const newValue = store.location.searchValue as string;
-  //   console.log(store.location.searchValue, store.location.loaded);
-  //   if (newValue !== null && newValue !== undefined && store.location.loaded === false) {
-  //     onLocationLoaded();
-  //     setSearchValue(newValue);
-  //   }
-  // }, [store.location]);
+  }, [store.history.index, store.history.values]);
 
   return (
     <>
@@ -176,6 +158,3 @@ export const TextBar = React.memo(
     prevProps.store.search.indexes.length === nextProps.store.search.indexes.length &&
     prevProps.store.search.selectedIndex === nextProps.store.search.selectedIndex
 );
-function useClipboard(): { copy: any } {
-  throw new Error('Function not implemented.');
-}

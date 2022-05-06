@@ -154,28 +154,6 @@ export const useSettingReducer = () => {
         }
       }
     };
-
-    // return {
-    //   ...store,
-    //   setting: {
-    //     ...store.setting,
-    //     hex: {
-    //       encoding: store.hex.encoding,
-    //       nullChar: store.hex.nullChar,
-    //       lowerASCIIChar: store.hex.lowerASCIIChar,
-    //       higherASCIIChar: store.hex.higherASCIIChar
-    //     },
-    //     offsetBase: store.offset.base,
-    //     column: {
-    //       auto: store.layout.column.auto,
-    //       size: store.layout.column.size
-    //     },
-    //     row: {
-    //       auto: store.layout.row.auto,
-    //       size: store.layout.row.size
-    //     }
-    //   }
-    // };
   }, []);
 
   const settingSave = useCallback(

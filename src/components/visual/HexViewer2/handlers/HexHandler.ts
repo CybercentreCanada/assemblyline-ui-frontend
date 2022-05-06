@@ -53,15 +53,6 @@ export const HIGHER_ENCODING_SETTING_VALUES: HigherEncodingSettingValues = {
   ]
 };
 
-// Toolbar
-type Toolbar = { desktop: 'desktop'; mobile: 'mobile' };
-const TOOLBAR: Toolbar = { desktop: 'desktop', mobile: 'mobile' };
-export type ToolbarType = typeof TOOLBAR[keyof typeof TOOLBAR];
-export type IsToolbar = { [Property in ToolbarType]: (store: Store) => boolean };
-export const isToolbar = Object.fromEntries(
-  Object.keys(TOOLBAR).map(key => [key, (store: Store) => store.mode.toolbarType === TOOLBAR[key]])
-) as IsToolbar;
-
 export type HexASCIIType = 'null' | 'non printable' | 'lower ASCII' | 'higher ASCII';
 
 export type HexASCII = {

@@ -1,29 +1,5 @@
 import { FormControl, Grid, TextField, Tooltip, Typography, useMediaQuery, useTheme } from '@material-ui/core';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { default as React, memo, PropsWithChildren } from 'react';
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    button: {
-      display: 'block',
-      marginTop: theme.spacing(2)
-    },
-    formControl: {
-      width: '100%'
-    },
-    select: {
-      textAlign: 'left',
-      width: '100%',
-      '& > .MuiSelect-root': {
-        paddingTop: theme.spacing(1.25),
-        paddingBottom: theme.spacing(1.25)
-      }
-    },
-    item: {
-      width: '100%'
-    }
-  })
-);
 
 export type OutlinedFieldProps = {
   label?: string;
@@ -43,7 +19,6 @@ export const WrappedOutlinedField = ({
   value = null,
   onChange = () => null
 }: OutlinedFieldProps) => {
-  const classes = useStyles();
   const theme = useTheme();
   const upSM = useMediaQuery(theme.breakpoints.up('sm'));
 

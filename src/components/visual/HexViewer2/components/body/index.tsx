@@ -76,8 +76,8 @@ const HexTableBody = memo(({ store }: StoreProps) => {
     refs.current.layout.bodyRef = bodyRef;
     onBodyInit(true);
     return () => {
-      refs.current.layout.listRef = null;
-      refs.current.layout.bodyRef = null;
+      // refs.current.layout.listRef = null;
+      // refs.current.layout.bodyRef = null;
       onBodyInit(false);
     };
   }, [onBodyInit, refs]);
@@ -86,7 +86,7 @@ const HexTableBody = memo(({ store }: StoreProps) => {
     if (store.initialized) {
       dispatch({ type: ACTIONS.bodyResize, payload: refs.current.layout.bodyRef.current.getBoundingClientRect() });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    /* eslint-disable react-hooks/exhaustive-deps */
   }, [dispatch, refs, store.initialized]);
 
   useEventListener('resize', () => onBodyResize(bodyRef?.current?.getBoundingClientRect()));
@@ -114,7 +114,7 @@ const HexTableBody = memo(({ store }: StoreProps) => {
           <table className={classes.table}>
             <tbody className={classes.tableBody}>
               {rowIndexes.map(rowIndex => (
-                <HexRow key={rowIndex} store={store} rowIndex={rowIndex} Tag="tr" />
+                <HexRow key={rowIndex} store={store} rowIndex={rowIndex} Tag="tr" bodyRef={bodyRef.current} />
               ))}
             </tbody>
           </table>
@@ -132,7 +132,7 @@ const HexWindowBody = memo(({ store }: StoreProps) => {
   const classes = useHexStyles();
   const { refs } = useReducer();
   const { onBodyInit, onBodyResize, onBodyItemsRendered, onBodyKeyDown, onBodyMouseUp } = useDispatch();
-  const { store: nextStore, dispatch } = useStore();
+  const { dispatch } = useStore();
 
   const listRef = React.useRef<any>(null);
   const bodyRef = React.useRef<HTMLDivElement>(null);
@@ -142,8 +142,8 @@ const HexWindowBody = memo(({ store }: StoreProps) => {
     refs.current.layout.bodyRef = bodyRef;
     onBodyInit(true);
     return () => {
-      refs.current.layout.listRef = null;
-      refs.current.layout.bodyRef = null;
+      // refs.current.layout.listRef = null;
+      // refs.current.layout.bodyRef = null;
       onBodyInit(false);
     };
   }, [onBodyInit, refs]);
@@ -161,7 +161,18 @@ const HexWindowBody = memo(({ store }: StoreProps) => {
   const Row = React.useMemo(
     () =>
       ({ index, style, data }) =>
-        store.initialized ? <WindowRow key={index} rowIndex={index} style={style} Tag={data.Tag} /> : <></>,
+        store.initialized ? (
+          <WindowRow
+            key={index}
+            rowIndex={index}
+            style={style}
+            Tag={data.Tag}
+            bodyRef={bodyRef.current}
+            listRef={listRef.current}
+          />
+        ) : (
+          <></>
+        ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [store.layout.column.size, store.scroll.index]
   );

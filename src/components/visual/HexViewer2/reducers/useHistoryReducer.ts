@@ -155,6 +155,7 @@ export const useHistoryReducer = () => {
     return { ...store, history: { ...store.history, index: 0 } };
   }, []);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const historyClear = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
     return { ...store, history: { ...store.history, index: 0, values: [{ type: store.search.type, value: '' }] } };
   }, []);

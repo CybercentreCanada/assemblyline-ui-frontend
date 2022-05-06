@@ -4,7 +4,6 @@ export * from './useEventListener';
 export * from './useLocalStorage';
 export * from './useTimeout';
 export * from './useTrottledCallback';
-export * from './useTrottledMemo';
 export * from './useTrottledReducer';
 export * from './useTrottledRef';
 export * from './useTrottledState';

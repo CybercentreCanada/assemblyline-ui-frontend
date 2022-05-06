@@ -1,4 +1,3 @@
-import { makeStyles } from '@material-ui/core';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
@@ -10,13 +9,10 @@ import React, { useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PopperIconButton, SearchType, StoreProps, useDispatch } from '../..';
 
-const useHexStyles = makeStyles(theme => ({}));
-
 export const WrappedHexSearchTypes = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);
-  const classes = useHexStyles();
   const ref = useRef(null);
-  const { onSelectedSearchIndexChange, onSearchClear, onSearchTypeChange } = useDispatch();
+  const { onSearchTypeChange } = useDispatch();
   const { type } = store.search;
 
   const handleClick = useCallback(
