@@ -1,41 +1,60 @@
-import React from 'react';
-import { HoverActionType, HoverRef, HoverState, HOVER_MOUSE_ENTER } from '../models/Hover';
-import { ActionProps, Ref, Store } from '../models/NewStore';
-// import { addClass } from '../actions/StyleActions';
+import { useCallback } from 'react';
+import {
+  isAction,
+  isCellMouseDown,
+  ReducerProps,
+  renderIndexClass,
+  RenderProps,
+  Store,
+  StoreRef,
+  useCellStyles
+} from '..';
 
-export const initialState: HoverState = {
-  count: 0
+export type HoverState = {
+  hover: { index: number };
 };
 
-export const initialRef: HoverRef = {
-  isMouseDown: false
-};
+export type HoverRef = {};
 
-const isAction = (action: ActionProps, type: HoverActionType) => action?.type === type;
-const isMouseUp = (action: ActionProps) => !action?.refs?.current.isMouseDown;
+export const useHoverReducer = () => {
+  const classes = useCellStyles();
 
-const mouseEnter = (state: Store, { type, refs, payload }: ActionProps) => {
-  console.log(state, payload);
-  // !refs.current.isMouseDown ?? addClass(refs.current.body, payload.index, refs.current.classes.cell.hover);
+  const initialState: HoverState = { hover: { index: null } };
 
-  return { ...state };
-};
+  const initialRef: HoverRef = {};
 
-export const useAction = (
-  dispatch: React.MutableRefObject<React.Dispatch<ActionProps>>,
-  refs: React.MutableRefObject<Ref>
-) => {
-  const onHoverMouseEnter = React.useCallback(
-    (index: number) => dispatch.current({ type: HOVER_MOUSE_ENTER, refs: refs, payload: { index } }),
-    [dispatch]
+  const hoverRender = useCallback(
+    (prevStore: Store, nextStore: Store, refs: StoreRef): void => {
+      const { index: prevIndex } = prevStore.hover;
+      const { index: nextIndex } = nextStore.hover;
+      renderIndexClass(refs.current.layout.bodyRef, prevIndex, nextIndex, classes.hover, refs.current.cellsRendered);
+    },
+    [classes.hover]
   );
 
-  return {
-    onHoverMouseEnter
-  };
-};
+  const hoverMouseEnter = useCallback((store: Store, refs: StoreRef): Store => {
+    return { ...store, hover: { ...store.hover, index: refs.current.cell.mouseEnterIndex } };
+  }, []);
 
-export const reducer = (state: Store, action: ActionProps) => {
-  if (isAction(action, HOVER_MOUSE_ENTER) && isMouseUp(action)) return mouseEnter(state, action);
-  else return { ...state };
+  const hoverMouseLeave = useCallback((store: Store, refs: StoreRef): Store => {
+    return { ...store, hover: { ...store.hover, index: null } };
+  }, []);
+
+  const reducer = useCallback(
+    ({ prevStore, nextStore, refs, action }: ReducerProps): Store => {
+      if (isAction.cellMouseEnter(action) && !isCellMouseDown(refs)) return hoverMouseEnter(nextStore, refs);
+      else if (isAction.bodyMouseLeave(action)) return hoverMouseLeave(nextStore, refs);
+      else return { ...nextStore };
+    },
+    [hoverMouseEnter, hoverMouseLeave]
+  );
+
+  const render = useCallback(
+    ({ prevStore, nextStore, refs }: RenderProps): void => {
+      if (prevStore.hover.index !== nextStore.hover.index) hoverRender(prevStore, nextStore, refs);
+    },
+    [hoverRender]
+  );
+
+  return { initialState, initialRef, reducer, render };
 };

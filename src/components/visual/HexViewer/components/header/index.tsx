@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { HexSearchBar, HexSearchTypes, isWidthEqualDown, StoreProps, TooltipIconButton, useDispatch } from '../..';
 
 export * from './cursorButton';
-export * from './searchbar/';
+export * from './searchbar';
 export * from './searchButtons';
 export * from './searchIndex';
 export * from './searchTypes';

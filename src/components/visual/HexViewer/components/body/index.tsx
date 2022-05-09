@@ -1,13 +1,25 @@
 import { makeStyles } from '@material-ui/core';
-import { default as React, memo, PropsWithChildren, useMemo } from 'react';
+import { default as React, KeyboardEvent, memo, MouseEvent, PropsWithChildren, useMemo } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { FixedSizeList as List } from 'react-window';
-import { HexStoreProps } from '../..';
-import { DEFAULT } from '../../configs/default';
-import { useReducer } from '../../stores/useNewStore';
-import { HexRow } from './components/row';
-import HexScrollBar from './components/scrollbar';
-import { HexContainerMain } from './container';
+import { FixedSizeList as List, ListOnItemsRenderedProps } from 'react-window';
+import {
+  ACTIONS,
+  HexRow,
+  HexScrollBar,
+  LAYOUT_SIZE,
+  StoreProps,
+  useDispatch,
+  useEventListener,
+  useReducer,
+  useStore,
+  WindowRow
+} from '../..';
+
+export * from './cell';
+export * from './offset';
+export * from './row';
+export * from './scrollbar';
+export * from './spacer';
 
 const useHexStyles = makeStyles(theme => ({
   root: {
@@ -42,132 +54,182 @@ const useHexStyles = makeStyles(theme => ({
   }
 }));
 
-const HexTableBody = memo(({ store }: HexStoreProps) => {
+const HexTableBody = memo(({ store }: StoreProps) => {
   const classes = useHexStyles();
-
-  const { layoutRows, scrollIndex } = store;
-
   const { refs } = useReducer();
+  const {
+    onBodyInit,
+    onBodyResize,
+    onBodyMouseLeave,
+    onBodyScrollWheel,
+    onBodyKeyDown,
+    onBodyMouseUp,
+    onScrollTouchStart,
+    onScrollTouchMove,
+    onScrollTouchEnd
+  } = useDispatch();
+  const { dispatch } = useStore();
+
   const bodyRef = React.useRef<HTMLDivElement>(null);
+
   React.useLayoutEffect(() => {
-    refs.current.bodyRef = bodyRef;
-  }, [refs]);
+    refs.current.layout.bodyRef = bodyRef;
+    onBodyInit(true);
+    return () => {
+      // refs.current.layout.listRef = null;
+      // refs.current.layout.bodyRef = null;
+      onBodyInit(false);
+    };
+  }, [onBodyInit, refs]);
 
-  // const { bodyRef, onLayoutResize } = useLayout();
-  // const { onScrollResize, onScrollWheel, onScrollTouchStart, onScrollTouchEnd, onScrollTouchMove } = useScroll();
+  React.useEffect(() => {
+    if (store.initialized) {
+      dispatch({ type: ACTIONS.bodyResize, payload: refs.current.layout.bodyRef.current.getBoundingClientRect() });
+    }
+    /* eslint-disable react-hooks/exhaustive-deps */
+  }, [dispatch, refs, store.initialized]);
 
-  // useLayoutEffect(() => {
-  //   onLayoutResize();
-  //   onScrollResize();
-  // }, [onLayoutResize, onScrollResize]);
+  useEventListener('resize', () => onBodyResize(bodyRef?.current?.getBoundingClientRect()));
+  useEventListener('keydown', (e: KeyboardEvent) => onBodyKeyDown(e, refs));
+  useEventListener('mouseup', (e: MouseEvent) => onBodyMouseUp(e, refs));
 
-  // useEffect(() => {
-  //   const handleResize = () => {
-  //     onLayoutResize();
-  //     onScrollResize();
-  //   };
-  //   window.addEventListener('resize', handleResize);
-  //   return () => window.removeEventListener('resize', handleResize);
-  // }, [bodyRef, onLayoutResize, onScrollResize]);
-
-  // const rowIndexes: number[] = useMemo(
-  //   () => Array.from(Array(layoutRows).keys()).map(i => i + scrollIndex),
-  //   [layoutRows, scrollIndex]
-  // );
-
-  const rowIndexes: number[] = useMemo(() => Array.from(Array(layoutRows).keys()).map(i => i), [layoutRows]);
+  const rowIndexes: number[] = useMemo(
+    () => Array.from(Array(store.layout.row.size).keys()).map(i => i + store.scroll.rowIndex),
+    [store.layout.row.size, store.scroll.rowIndex]
+  );
 
   return (
     <div
-      // ref={bodyRef}
+      ref={bodyRef}
       className={classes.root}
-      // onWheel={onScrollWheel}
-      // onTouchStart={onScrollTouchStart}
-      // onTouchMove={onScrollTouchMove}
-      // onTouchEnd={onScrollTouchEnd}
+      onWheel={(e: React.WheelEvent<HTMLDivElement>) => onBodyScrollWheel(e.deltaY)}
+      onMouseLeave={() => onBodyMouseLeave()}
+      onTouchStart={e => onScrollTouchStart(e)}
+      onTouchMove={e => onScrollTouchMove(e)}
+      onTouchEnd={e => onScrollTouchEnd(e)}
     >
-      <div className={classes.spacer} />
-      <table className={classes.table}>
-        <tbody className={classes.tableBody}>
-          {rowIndexes.map(index => (
-            <HexRow key={index} store={store} rowIndex={index} Tag="tr" />
-          ))}
-        </tbody>
-      </table>
-      <div className={classes.spacer} />
-      <HexScrollBar store={store} />
+      {store.initialized ? (
+        <>
+          <div className={classes.spacer} />
+          <table className={classes.table}>
+            <tbody className={classes.tableBody}>
+              {rowIndexes.map(rowIndex => (
+                <HexRow key={rowIndex} store={store} rowIndex={rowIndex} Tag="tr" bodyRef={bodyRef.current} />
+              ))}
+            </tbody>
+          </table>
+          <div className={classes.spacer} />
+          <HexScrollBar store={store} />
+        </>
+      ) : (
+        <></>
+      )}
     </div>
   );
 });
 
-const HexWindowBody = memo(({ store }: HexStoreProps) => {
+const HexWindowBody = memo(({ store }: StoreProps) => {
   const classes = useHexStyles();
-
-  const {
-    hex: { codes: hexcodes },
-    layoutColumns
-  } = store;
-
   const { refs } = useReducer();
-  const bodyRef = React.useRef<HTMLDivElement>(null);
-  React.useLayoutEffect(() => {
-    refs.current.bodyRef = bodyRef;
-  }, [refs]);
+  const { onBodyInit, onBodyResize, onBodyItemsRendered, onBodyKeyDown, onBodyMouseUp } = useDispatch();
+  const { dispatch } = useStore();
 
-  // const { hexMap } = useHex();
-  // const { bodyRef, onLayoutResize } = useLayout();
-  // const { onScrollResize } = useScroll();
+  const listRef = React.useRef<any>(null);
+  const bodyRef = React.useRef<HTMLDivElement>(null);
+
+  React.useLayoutEffect(() => {
+    refs.current.layout.listRef = listRef;
+    refs.current.layout.bodyRef = bodyRef;
+    onBodyInit(true);
+    return () => {
+      // refs.current.layout.listRef = null;
+      // refs.current.layout.bodyRef = null;
+      onBodyInit(false);
+    };
+  }, [onBodyInit, refs]);
+
+  React.useEffect(() => {
+    if (store.initialized) {
+      dispatch({ type: ACTIONS.bodyResize, payload: bodyRef.current.getBoundingClientRect() });
+      listRef?.current?.scrollToItem(store.scroll.rowIndex, 'top');
+    }
+  }, [dispatch, refs, store.initialized]);
+
+  useEventListener('keydown', (e: KeyboardEvent) => onBodyKeyDown(e, refs));
+  useEventListener('mouseup', (e: MouseEvent) => onBodyMouseUp(e, refs));
+
+  const Row = React.useMemo(
+    () =>
+      ({ index, style, data }) =>
+        store.initialized ? (
+          <WindowRow
+            key={index}
+            rowIndex={index}
+            style={style}
+            Tag={data.Tag}
+            bodyRef={bodyRef.current}
+            listRef={listRef.current}
+          />
+        ) : (
+          <></>
+        ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [store.layout.column.size, store.scroll.index]
+  );
 
   return (
-    <AutoSizer
-      onResize={() => {
-        // onLayoutResize();
-        // onScrollResize();
-      }}
-    >
+    <AutoSizer onResize={({ height, width }: { height: number; width: number }) => onBodyResize({ height, width })}>
       {({ height, width }) => (
         <List
+          ref={listRef}
           innerRef={bodyRef}
           className={classes.root}
-          height={height - 10}
+          height={height - 50}
           width={width}
-          itemSize={DEFAULT.rowHeight}
-          itemCount={Math.floor(hexcodes.size / layoutColumns)}
-          overscanCount={3}
+          itemSize={LAYOUT_SIZE.rowHeight}
+          itemCount={store.scroll.maxRowIndex + store.layout.row.size}
+          overscanCount={store.scroll.overscanCount}
+          initialScrollOffset={0}
+          itemData={{
+            Tag: 'div'
+          }}
+          onItemsRendered={(e: ListOnItemsRenderedProps) => onBodyItemsRendered(e)}
         >
-          {({ index, style }) => <HexRow store={store} rowIndex={index} style={style} Tag="div" />}
+          {Row}
         </List>
       )}
     </AutoSizer>
   );
 });
 
-const HexBodySelector = memo(({ store }: HexStoreProps) => {
-  const { bodyType } = store;
-
-  if (bodyType === 'container') return <HexContainerMain store={store} />;
-  else if (bodyType === 'table') return <HexTableBody store={store} />;
-  else if (bodyType === 'list') return <HexWindowBody store={store} />;
+const HexBodySelector = memo(({ store }: StoreProps) => {
+  if (store.mode.bodyType === 'table') return <HexTableBody store={store} />;
+  else if (store.mode.bodyType === 'window') return <HexWindowBody store={store} />;
 });
 
 export const HexBody = memo(
-  ({ store }: HexStoreProps) =>
-    store.hex.codes === null || store.hex.codes.size <= 0 ? null : <HexBodySelector store={store} />,
-  (prevProps: Readonly<PropsWithChildren<HexStoreProps>>, nextProps: Readonly<PropsWithChildren<HexStoreProps>>) =>
+  ({ store }: StoreProps) => <HexBodySelector store={store} />,
+  (prevProps: Readonly<PropsWithChildren<StoreProps>>, nextProps: Readonly<PropsWithChildren<StoreProps>>) =>
     prevProps.store.initialized === nextProps.store.initialized &&
-    prevProps.store.hex.codes === nextProps.store.hex.codes &&
-    prevProps.store.modeTheme === nextProps.store.modeTheme &&
-    prevProps.store.modeLanguage === nextProps.store.modeLanguage &&
-    prevProps.store.modeWidth === nextProps.store.modeWidth &&
+    prevProps.store.hex.null.char === nextProps.store.hex.null.char &&
+    prevProps.store.hex.lower.encoding === nextProps.store.hex.lower.encoding &&
+    prevProps.store.hex.lower.char === nextProps.store.hex.lower.char &&
+    prevProps.store.hex.higher.encoding === nextProps.store.hex.higher.encoding &&
+    prevProps.store.hex.higher.char === nextProps.store.hex.higher.char &&
     prevProps.store.offset.base === nextProps.store.offset.base &&
     prevProps.store.offset.size === nextProps.store.offset.size &&
-    prevProps.store.layoutRows === nextProps.store.layoutRows &&
-    prevProps.store.layoutColumns === nextProps.store.layoutColumns &&
-    prevProps.store.layoutAutoRows === nextProps.store.layoutAutoRows &&
-    prevProps.store.layoutAutoColumns === nextProps.store.layoutAutoColumns &&
-    prevProps.store.layoutType === nextProps.store.layoutType &&
-    prevProps.store.bodyType === nextProps.store.bodyType &&
-    prevProps.store.scrollIndex === nextProps.store.scrollIndex
+    prevProps.store.layout.row.size === nextProps.store.layout.row.size &&
+    prevProps.store.layout.column.size === nextProps.store.layout.column.size &&
+    prevProps.store.layout.row.auto === nextProps.store.layout.row.auto &&
+    prevProps.store.layout.column.auto === nextProps.store.layout.column.auto &&
+    prevProps.store.mode.bodyType === nextProps.store.mode.bodyType &&
+    prevProps.store.mode.theme === nextProps.store.mode.theme &&
+    prevProps.store.mode.language === nextProps.store.mode.language &&
+    prevProps.store.mode.width === nextProps.store.mode.width &&
+    prevProps.store.scroll.index === nextProps.store.scroll.index &&
+    prevProps.store.scroll.rowIndex === nextProps.store.scroll.rowIndex &&
+    prevProps.store.scroll.maxRowIndex === nextProps.store.scroll.maxRowIndex &&
+    prevProps.store.scroll.speed === nextProps.store.scroll.speed
 );
 
 export default HexBody;

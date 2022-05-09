@@ -1,13 +1,12 @@
 import React from 'react';
-import { HexStoreProps } from '../..';
-import { HexFullscreenLayout } from './fullscreen';
-import { HexPageLayout } from './page';
+import { HexFullscreenLayout, HexPageLayout, StoreProps } from '../..';
 
-export const WrappedHexLayout = ({ store }: HexStoreProps) => {
-  const { layoutType } = store;
+export * from './fullscreen';
+export * from './page';
 
-  if (layoutType === 'page') return <HexPageLayout store={store} />;
-  else if (layoutType === 'fullscreen') return <HexFullscreenLayout store={store} />;
+export const WrappedHexLayout = ({ store }: StoreProps) => {
+  if (store.mode.layoutType === 'page') return <HexPageLayout store={store} />;
+  else if (store.mode.layoutType === 'fullscreen') return <HexFullscreenLayout store={store} />;
   else <></>;
 };
 

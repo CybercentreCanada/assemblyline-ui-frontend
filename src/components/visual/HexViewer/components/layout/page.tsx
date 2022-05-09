@@ -1,14 +1,12 @@
-import { ClickAwayListener, makeStyles } from '@material-ui/core';
-import React from 'react';
-import { HexBody, HexStoreProps } from '../..';
-// import React, { useEffect } from 'react';
-// import { HexBody, HexStoreProps, useCopy, useCursor, useHover, useLayout, useScroll, useSelect } from '../..';
-import { LAYOUT_SIZE } from '../../models/Layout';
+import { makeStyles } from '@material-ui/core';
+import React, { useRef } from 'react';
+import { HexBody, HexHeader, HexSettings, LAYOUT_SIZE, StoreProps, useDispatch, useEventListener } from '../..';
 
 const useHexStyles = makeStyles(theme => ({
   root: {
     display: 'flex',
     flexDirection: 'column',
+    minHeight: `250px`,
     height: `calc(100vh - ${LAYOUT_SIZE.windowHeight}px)`,
     width: '100%',
     cursor: 'default',
@@ -21,62 +19,24 @@ const useHexStyles = makeStyles(theme => ({
   }
 }));
 
-export const WrappedHexPageLayout = ({ store }: HexStoreProps) => {
+export const WrappedHexPageLayout = ({ store }: StoreProps) => {
   const classes = useHexStyles();
 
-  // const { onContainerMouseDown } = useLayout();
-  // const { onCursorKeyDown, onCursorMouseUp, onCursorClear } = useCursor();
-  // const { onSelectMouseUp, onSelectClear } = useSelect();
-  // const { onHoverMouseUp } = useHover();
-  // const { onCopyKeyDown } = useCopy();
+  const { onAppClickAway } = useDispatch();
 
-  // const { onScrollSliderMouseUp } = useScroll();
+  const ref = useRef(null);
 
-  // useEffect(() => {
-  //   const handleKeyDown = (event: KeyboardEvent) => {
-  //     onCursorKeyDown(event);
-  //     onCopyKeyDown(event);
-  //   };
-  //   const handleMouseUp = (event: MouseEvent) => {
-  //     onScrollSliderMouseUp();
-  //     onHoverMouseUp();
-  //     onCursorMouseUp(event);
-  //     onSelectMouseUp(event);
-  //   };
-  //   const handleMouseDown = (event: MouseEvent) => {
-  //     onContainerMouseDown(event);
-  //   };
-
-  //   window.addEventListener('keydown', handleKeyDown);
-  //   window.addEventListener('mouseup', handleMouseUp);
-  //   window.addEventListener('mousedown', handleMouseDown);
-  //   return () => {
-  //     window.removeEventListener('keydown', handleKeyDown);
-  //     window.removeEventListener('mouseup', handleMouseUp);
-  //     window.removeEventListener('mousedown', handleMouseDown);
-  //   };
-  // }, [
-  //   onContainerMouseDown,
-  //   onCopyKeyDown,
-  //   onCursorKeyDown,
-  //   onCursorMouseUp,
-  //   onHoverMouseUp,
-  //   onScrollSliderMouseUp,
-  //   onSelectMouseUp
-  // ]);
+  // Mouse Up
+  useEventListener('mousedown', (e: MouseEvent) => {
+    !ref?.current?.contains(e.target) && onAppClickAway();
+  });
 
   return (
-    <ClickAwayListener
-      onClickAway={event => {
-        // onCursorClear();
-        // onSelectClear();
-      }}
-    >
-      <div className={classes.root}>
-        <div style={{ textAlign: 'center' }}>Header</div>
-        <HexBody store={store} />
-      </div>
-    </ClickAwayListener>
+    <div ref={ref} className={classes.root}>
+      <HexHeader store={store} />
+      <HexBody store={store} />
+      <HexSettings store={store} />
+    </div>
   );
 };
 

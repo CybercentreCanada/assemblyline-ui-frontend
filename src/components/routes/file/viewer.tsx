@@ -18,7 +18,7 @@ import clsx from 'clsx';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import Empty from 'components/visual/Empty';
-import { HexViewerApp } from 'components/visual/HexViewer2';
+import { HexViewerApp } from 'components/visual/HexViewer';
 import getXSRFCookie from 'helpers/xsrf';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
