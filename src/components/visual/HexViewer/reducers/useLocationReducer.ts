@@ -5,6 +5,7 @@ import {
   ActionProps,
   formatTextString,
   isAction,
+  isBody,
   isHexString,
   isSearchType,
   parseHexToString,
@@ -139,7 +140,10 @@ export const useLocationReducer = () => {
     (store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
       query.current.deleteAll();
 
-      if (store.scroll.index !== null) query.current.set('scroll', store.scroll.index);
+      if (store.scroll.index !== null) {
+        if (isBody.table(store)) query.current.set('scroll', store.scroll.index);
+        else if (isBody.window(store)) query.current.set('scroll', refs.current.cellsRendered.visibleStartIndex);
+      }
       if (store.cursor.index !== null) query.current.set('cursor', store.cursor.index);
       if (store.select.startIndex >= 0) query.current.set('selectStart', store.select.startIndex);
       if (store.select.endIndex >= 0) query.current.set('selectEnd', store.select.endIndex);
@@ -159,39 +163,6 @@ export const useLocationReducer = () => {
     },
     [copy]
   );
-
-  // const oldLocationLoad = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
-  //   query.current = new SimpleSearchQuery(window.location.search, '');
-  //   const params: LocationQuery = query.current.getParams();
-
-  //   const scrollIndex = params.hasOwnProperty('scroll')
-  //     ? Math.floor(parseInt(params.scroll) / store.layout.column.size)
-  //     : store.scroll.index;
-  //   const cursorIndex = params.hasOwnProperty('cursor') ? parseInt(params.cursor) : store.cursor.index;
-  //   const selectStart =
-  //     params.hasOwnProperty('selectStart') && params.hasOwnProperty('selectEnd')
-  //       ? parseInt(params.selectStart)
-  //       : store.select.startIndex;
-  //   const selectEnd =
-  //     params.hasOwnProperty('selectEnd') && params.hasOwnProperty('selectEnd')
-  //       ? parseInt(params.selectEnd)
-  //       : store.select.endIndex;
-
-  //   const searchType = params.hasOwnProperty('searchType') ? (params.searchType as SearchType) : store.search.type;
-  //   const searchValue = params.hasOwnProperty('searchValue') ? params.searchValue : store.search.inputValue;
-  //   const searchIndex = params.hasOwnProperty('searchIndex')
-  //     ? parseInt(params.searchIndex)
-  //     : store.search.selectedIndex;
-
-  //   console.log(searchValue);
-  //   return {
-  //     ...store,
-  //     scroll: { ...store.scroll, index: scrollIndex },
-  //     cursor: { ...store.cursor, index: cursorIndex },
-  //     select: { ...store.select, startIndex: selectStart, endIndex: selectEnd },
-  //     search: { ...store.search, type: searchType, inputValue: searchValue, selectedIndex: searchIndex }
-  //   };
-  // }, []);
 
   const locationInit = useCallback(
     (store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {

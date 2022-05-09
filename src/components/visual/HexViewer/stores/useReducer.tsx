@@ -150,7 +150,6 @@ export const ReducerProvider = ({ children }: StoreProviderProps) => {
       nextStore = history.reducer({ prevStore, nextStore, refs, action });
       nextStore = suggestion.reducer({ prevStore, nextStore, refs, action });
 
-      // if (!nextStore.initialized) return { ...nextStore };
       nextStore = cell.reducer({ prevStore, nextStore, refs, action });
       nextStore = hover.reducer({ prevStore, nextStore, refs, action });
       nextStore = cursor.reducer({ prevStore, nextStore, refs, action });
@@ -160,9 +159,6 @@ export const ReducerProvider = ({ children }: StoreProviderProps) => {
       nextStore = scroll.reducer({ prevStore, nextStore, refs, action });
 
       nextStore = copy.reducer({ prevStore, nextStore, refs, action });
-      // nextStore = location.reducer({ prevStore, nextStore, refs, action });
-
-      // console.log(action, nextStore.setting);
       return nextStore;
     },
     [

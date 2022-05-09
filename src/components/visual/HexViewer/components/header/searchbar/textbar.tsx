@@ -65,13 +65,16 @@ export const WrappedTextBar = ({ store }: StoreProps) => {
   const {
     search: { indexes, selectedIndex }
   } = store;
-
-  const [searchValue, setSearchValue] = useState<string>(store.search.inputValue);
+  const [searchValue, setSearchValue] = useState<string>('');
 
   useEffect(() => {
     if (store.history.values !== null && store.history.values !== undefined && store.history.values.length !== 0)
       setSearchValue(store.history.values[store.history.index].value as string);
   }, [store.history.index, store.history.values]);
+
+  useEffect(() => {
+    if (store.search.inputValue !== searchValue) setSearchValue(store.search.inputValue);
+  }, [searchValue, store.search.inputValue]);
 
   return (
     <>
@@ -128,7 +131,7 @@ export const WrappedTextBar = ({ store }: StoreProps) => {
             direction="inverse"
             preventArrowKeyDown
             endAdornment={
-              <div className={classes.endAdornment}>{t('of') + (indexes.length - 1).toString().toUpperCase()}</div>
+              <div className={classes.endAdornment}>{t('of') + indexes.length.toString().toUpperCase()}</div>
             }
             onFocus={() => onSearchBarFocus()}
             onChange={event => onSelectedSearchIndexChange(event.target.valueAsNumber as number)}

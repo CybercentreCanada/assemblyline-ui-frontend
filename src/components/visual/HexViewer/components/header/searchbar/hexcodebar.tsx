@@ -117,7 +117,7 @@ export const WrappedHexcodeBar = ({ store }: StoreProps) => {
             direction="inverse"
             preventArrowKeyDown
             endAdornment={
-              <div className={classes.endAdornment}>{t('of') + (indexes.length - 1).toString().toUpperCase()}</div>
+              <div className={classes.endAdornment}>{t('of') + indexes.length.toString().toUpperCase()}</div>
             }
             onFocus={() => onSearchBarFocus()}
             onChange={event => onSelectedSearchIndexChange(event.target.valueAsNumber as number)}

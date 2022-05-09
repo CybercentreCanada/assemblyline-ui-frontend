@@ -254,8 +254,6 @@ export const useScrollReducer = () => {
 
   const reducer = useCallback(
     ({ prevStore, nextStore, refs, action }: ReducerProps): Store => {
-      // if (isAction.appInit(action)) return scrollResize(nextStore, refs, action);
-      // else if (isAction.appDataChange(action)) return scrollResize(nextStore, refs, action);
       if (isAction.bodyResize(action)) return scrollResize(nextStore, refs, action);
       else if (isAction.bodyScrollWheel(action)) return scrollWheel(nextStore, refs, action);
       else if (isAction.scrollButtonClick(action)) return scrollButtonClick(nextStore, refs, action);

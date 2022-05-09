@@ -16,12 +16,6 @@ export type SettingState = {
   setting: {
     open: boolean;
     bodyType: number;
-    // hex: {
-    //   encoding: number;
-    //   nullChar: string;
-    //   lowerASCIIChar: string;
-    //   higherASCIIChar: string;
-    // };
     hex: {
       null: {
         char: string;
@@ -62,12 +56,6 @@ export const useSettingReducer = () => {
       setting: {
         open: false,
         bodyType: 0,
-        // hex: {
-        //   encoding: 0,
-        //   nullChar: '0',
-        //   lowerASCIIChar: '.',
-        //   higherASCIIChar: '.'
-        // },
         hex: {
           null: {
             char: '0'
@@ -285,18 +273,6 @@ export const useSettingReducer = () => {
   }, []);
 
   const settingHexCharChange = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
-    // let newStore = Object.assign({ ...store });
-    // if (payload.key === 'null') {
-    //   newStore.setting.hex.null.char = payload.value.substr(-1) !== null ? payload.value.substr(-1) : ' ';
-    // }
-    // if (payload.key === 'lower') {
-    //   newStore.setting.hex.lower.char = payload.value.substr(-1) !== null ? payload.value.substr(-1) : ' ';
-    // }
-    // if (payload.key === 'higher') {
-    //   newStore.setting.hex.higher.char = payload.value.substr(-1) !== null ? payload.value.substr(-1) : ' ';
-    // }
-    // return { ...newStore };
-
     return {
       ...store,
       setting: {
@@ -332,17 +308,6 @@ export const useSettingReducer = () => {
         }
       }
     };
-
-    // return {
-    //   ...store,
-    //   setting: {
-    //     ...store.setting,
-    //     hex: {
-    //       ...store.setting.hex,
-    //       [payload.key]: payload.value.substr(-1) !== null ? payload.value.substr(-1) : ' '
-    //     }
-    //   }
-    // };
   }, []);
 
   const reducer = useCallback(

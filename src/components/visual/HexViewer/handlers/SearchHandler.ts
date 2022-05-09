@@ -1,22 +1,5 @@
 import { Store, StoreRef } from '..';
 
-// export type Search = {
-//   type: string;
-//   label: { en: string; fr: string };
-//   icon: any;
-// };
-
-// export const SEARCH: Array<Search> = [
-//   {
-//     type: 'cursor',
-//     label: {
-//       en: 'Address',
-//       fr: 'Adresse'
-//     },
-//     icon: <NavigationIcon />
-//   }
-// ];
-
 type Search = { cursor: 'cursor'; hex: 'hex'; text: 'text' };
 const SEARCH: Search = { cursor: 'cursor', hex: 'hex', text: 'text' };
 export type SearchType = typeof SEARCH[keyof typeof SEARCH];
@@ -32,12 +15,6 @@ export const formatHexString = (value: string): string =>
     .replace(/(.{2})/g, '$& ')
     .split(' ')
     .filter(e => e !== '' && e.length >= 2)
-    // .map(e => parseInt(e, 16))
-    // .filter(e => {
-    //   console.log(e);
-    //   return !isNaN(e);
-    // })
-    // .map(e => e.toString(16))
     .join(' ');
 
 export const formatTextString = (value: string): string =>
@@ -46,9 +23,6 @@ export const formatTextString = (value: string): string =>
     .replace(/(.{2})/g, '$& ')
     .split(' ')
     .filter(e => e !== '' && e.length >= 2)
-    // .map(e => parseInt(e, 16))
-    // .filter(e => !isNaN(e))
-    // .map(e => Buffer.from(e.toString(16), 'hex'))
     .join(' ');
 
 export const countHexcode = (value: string) => value.split(' ').filter(code => code !== '' && code.length === 2).length;
@@ -62,18 +36,6 @@ export const filterSearchIndexes = (
   }: StoreRef
 ): Array<number> => indexes.filter((index: number, i: number) => firstIndex <= index + length && index <= lastIndex);
 
-// export const getSelectedSearchIndexes = (
-//   { search: { length, indexes, selectedIndex } }: Store,
-//   {
-//     current: {
-//       cellsRendered: { overscanStartIndex: firstIndex, overscanStopIndex: lastIndex }
-//     }
-//   }: StoreRef
-// ): { first: number; last: number } => ({
-//   first: Math.max(firstIndex, indexes[selectedIndex]),
-//   last: Math.min(lastIndex, indexes[selectedIndex] + length - 1)
-// });
-
 export const isSearchIndex = (store: Store, index: number) =>
   store.search.indexes.findIndex(
     (searchIndex: number, i: number) =>
@@ -85,38 +47,6 @@ export const isSearchIndex = (store: Store, index: number) =>
 export const isSelectedSearchIndex = (store: Store, index: number) =>
   store.search.indexes[store.search.selectedIndex] <= index &&
   index < store.search.indexes[store.search.selectedIndex] + store.search.length;
-
-// export const addSearchClass = (store: Store, refs: StoreRef, searchClass: string) => {
-//   const indexes = filterSearchIndexes(store, refs);
-//   addClassToArray(refs.current.layout.bodyRef, indexes, store.search.length, searchClass);
-// };
-
-// export const removeSearchClass = (store: Store, refs: StoreRef, searchClass: string) => {
-//   const indexes = filterSearchIndexes(store, refs);
-//   removeClassToArray(refs.current.layout.bodyRef, indexes, store.search.length, searchClass);
-// };
-
-// export const addSelectedSearchClass = (
-//   store: Store,
-//   refs: StoreRef,
-//   selectedSearchClass: string,
-//   searchClass: string
-// ) => {
-//   const { first, last } = getSelectedSearchIndexes(store, refs);
-//   removeClassToRange(refs.current.layout.bodyRef, first, last, searchClass);
-//   addClassToRange(refs.current.layout.bodyRef, first, last, selectedSearchClass);
-// };
-
-// export const removeSelectedSearchClass = (
-//   store: Store,
-//   refs: StoreRef,
-//   selectedSearchClass: string,
-//   searchClass: string
-// ) => {
-//   const { first, last } = getSelectedSearchIndexes(store, refs);
-//   removeClassToRange(refs.current.layout.bodyRef, first, last, selectedSearchClass);
-//   addClassToRange(refs.current.layout.bodyRef, first, last, searchClass);
-// };
 
 export const removeSearchQuotes = (value: string): string => {
   const firstChar = value.charAt(0);
@@ -138,8 +68,6 @@ export const getSearchQuery = (inputValue: string): { key: string; value: string
     length: length
   };
 };
-
-// /b.*e/g.exec('abcdefghijklmnopqrstuvwxyz')
 
 export const findSearchPattern = (data: string, value: string): Array<number> => {
   let indexes: Array<number> = [];
