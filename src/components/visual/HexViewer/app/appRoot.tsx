@@ -39,17 +39,9 @@ const WrappedAppRoot = ({ data = '' }: DataProps) => {
     dispatch({ type: ACTIONS.appWidthChange, payload: { width } });
   }, [dispatch, isLG, isMD, isSM, isXL, isXS]);
 
-  // // History
-  // React.useEffect(() => {
-  //   dispatch({ type: ACTIONS.appHistoryLoad, payload: null });
-  //   return () => dispatch({ type: ACTIONS.appHistorySave, payload: null });
-  // }, [dispatch]);
+  // History
 
-  // // Setting
-  // React.useEffect(() => {
-  //   dispatch({ type: ACTIONS.settingLoad, payload: null });
-  //   return () => dispatch({ type: ACTIONS.settingSave, payload: null });
-  // }, [dispatch]);
+  // Setting
 
   // Location
   React.useEffect(() => {
