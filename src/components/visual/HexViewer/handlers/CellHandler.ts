@@ -4,15 +4,14 @@ import { getHexType, isCursorIndex, isSearchIndex, isSelectedSearchIndex, isSele
 type Cell = { hex: 'hex'; text: 'text' };
 const CELL: Cell = { hex: 'hex', text: 'text' };
 export type CellType = typeof CELL[keyof typeof CELL];
-export type IsCell = { [Property in CellType]: (refs: StoreRef) => boolean };
+export type IsCell = { [Property in CellType]: (store: Store) => boolean };
 export const isCell = Object.fromEntries(
-  Object.keys(CELL).map(key => [key, (refs: StoreRef) => refs.current.cell.mouseOverType === CELL[key]])
+  Object.keys(CELL).map(key => [key, (store: Store) => store.cell.mouseOverType === CELL[key]])
 ) as IsCell;
 
-export const isCellMouseDown = (refs: StoreRef) => refs.current.cell.isMouseDown;
+export const isCellMouseDown = (store: Store) => store.cell.isMouseDown;
 
-export const isSameCellClick = (refs: StoreRef) =>
-  refs.current.cell.mouseDownIndex === refs.current.cell.mouseEnterIndex;
+export const isSameCellClick = (store: Store) => store.cell.mouseDownIndex === store.cell.mouseEnterIndex;
 
 export type OffsetSettingValues = {
   en: Array<{ label: string; value: number }>;

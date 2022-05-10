@@ -60,9 +60,9 @@ export const useCursorReducer = () => {
 
   const cursorMouseUp = useCallback(
     (store: Store, refs: StoreRef): Store => {
-      if (refs?.current?.cell.mouseEnterIndex === null) return { ...store };
-      else if (!isSameCellClick(refs)) return handleCursorIndex(store, refs, null);
-      else return handleCursorIndex(store, refs, refs.current.cell.mouseEnterIndex);
+      if (store.cell.mouseEnterIndex === null) return { ...store };
+      else if (!isSameCellClick(store)) return handleCursorIndex(store, refs, null);
+      else return handleCursorIndex(store, refs, store.cell.mouseEnterIndex);
     },
     [handleCursorIndex]
   );

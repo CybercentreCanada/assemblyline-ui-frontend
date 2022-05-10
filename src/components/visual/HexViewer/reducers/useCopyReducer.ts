@@ -55,11 +55,11 @@ export const useCopyReducer = () => {
 
   const copyKeyDown = useCallback(
     (store: Store, refs: StoreRef): Store => {
-      if (store.cursor.index !== null && isCell.hex(refs)) copyHexCursor(store, refs);
-      else if (store.cursor.index !== null && isCell.text(refs)) copyTextCursor(store, refs);
-      else if (store.select.startIndex !== -1 && store.select.endIndex !== -1 && isCell.hex(refs))
+      if (store.cursor.index !== null && isCell.hex(store)) copyHexCursor(store, refs);
+      else if (store.cursor.index !== null && isCell.text(store)) copyTextCursor(store, refs);
+      else if (store.select.startIndex !== -1 && store.select.endIndex !== -1 && isCell.hex(store))
         copyHexSelect(store, refs);
-      else if (store.select.startIndex !== -1 && store.select.endIndex !== -1 && isCell.text(refs))
+      else if (store.select.startIndex !== -1 && store.select.endIndex !== -1 && isCell.text(store))
         copyTextSelect(store, refs);
       return { ...store };
     },

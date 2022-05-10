@@ -33,7 +33,7 @@ export const useHoverReducer = () => {
   );
 
   const hoverMouseEnter = useCallback((store: Store, refs: StoreRef): Store => {
-    return { ...store, hover: { ...store.hover, index: refs.current.cell.mouseEnterIndex } };
+    return { ...store, hover: { ...store.hover, index: store.cell.mouseEnterIndex } };
   }, []);
 
   const hoverMouseLeave = useCallback((store: Store, refs: StoreRef): Store => {
@@ -42,7 +42,7 @@ export const useHoverReducer = () => {
 
   const reducer = useCallback(
     ({ prevStore, nextStore, refs, action }: ReducerProps): Store => {
-      if (isAction.cellMouseEnter(action) && !isCellMouseDown(refs)) return hoverMouseEnter(nextStore, refs);
+      if (isAction.cellMouseEnter(action) && !isCellMouseDown(nextStore)) return hoverMouseEnter(nextStore, refs);
       else if (isAction.bodyMouseLeave(action)) return hoverMouseLeave(nextStore, refs);
       else return { ...nextStore };
     },

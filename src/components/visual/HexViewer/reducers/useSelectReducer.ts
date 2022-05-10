@@ -36,8 +36,8 @@ export const useSelectReducer = () => {
   );
 
   const selectMouseEnter = useCallback((store: Store, refs: StoreRef): Store => {
-    if (!isCellMouseDown(refs)) return { ...store };
-    const { mouseEnterIndex, mouseDownIndex } = refs.current.cell;
+    if (!isCellMouseDown(store)) return { ...store };
+    const { mouseEnterIndex, mouseDownIndex } = store.cell;
     return { ...store, select: orderSelectIndexes(mouseDownIndex, mouseEnterIndex) };
   }, []);
 
@@ -48,8 +48,8 @@ export const useSelectReducer = () => {
 
   const selectMouseUp = useCallback(
     (store: Store, refs: StoreRef): Store => {
-      if (refs?.current?.cell.mouseEnterIndex === null) return { ...store };
-      else if (isSameCellClick(refs) || !refs.current.select.isHighlighting) return selectClear(store);
+      if (store.cell.mouseEnterIndex === null) return { ...store };
+      else if (isSameCellClick(store) || !refs.current.select.isHighlighting) return selectClear(store);
       else {
         refs.current.select.isHighlighting = false;
         return { ...store };
