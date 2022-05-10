@@ -53,7 +53,7 @@ export const useSearchReducer = () => {
     (prevStore: Store, nextStore: Store, refs: StoreRef): void => {
       const prev = getSearchIndexes(prevStore, refs);
       const next = getSearchIndexes(nextStore, refs);
-      renderArrayClass(refs.current.layout.bodyRef, prev, next, classes.search, refs.current.cellsRendered);
+      renderArrayClass(refs.current.layout.bodyRef, prev, next, classes.search, nextStore.cellsRendered);
     },
     [classes]
   );
@@ -62,7 +62,7 @@ export const useSearchReducer = () => {
     (prevStore: Store, nextStore: Store, refs: StoreRef): void => {
       const prev = getSelectedSearchIndexes(prevStore, refs);
       const next = getSelectedSearchIndexes(nextStore, refs);
-      renderArrayClass(refs.current.layout.bodyRef, prev, next, classes.selectedSearch, refs.current.cellsRendered);
+      renderArrayClass(refs.current.layout.bodyRef, prev, next, classes.selectedSearch, nextStore.cellsRendered);
     },
     [classes]
   );

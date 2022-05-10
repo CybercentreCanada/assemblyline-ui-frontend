@@ -142,7 +142,7 @@ export const useLocationReducer = () => {
 
       if (store.scroll.index !== null) {
         if (isBody.table(store)) query.current.set('scroll', store.scroll.index);
-        else if (isBody.window(store)) query.current.set('scroll', refs.current.cellsRendered.visibleStartIndex);
+        else if (isBody.window(store)) query.current.set('scroll', store.cellsRendered.visibleStartIndex);
       }
       if (store.cursor.index !== null) query.current.set('cursor', store.cursor.index);
       if (store.select.startIndex >= 0) query.current.set('selectStart', store.select.startIndex);

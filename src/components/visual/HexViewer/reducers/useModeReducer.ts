@@ -19,7 +19,6 @@ export type ModeState = {
     theme: ThemeType;
     language: LanguageType;
     width: WidthType;
-    // height: ModeHeight;
     layoutType: LayoutType;
     toolbarType: ToolbarType;
     bodyType: BodyType;
@@ -36,7 +35,6 @@ export const useModeReducer = () => {
         theme: 'light',
         language: 'en',
         width: 'md',
-        // height: 'md',
         layoutType: 'page',
         toolbarType: 'desktop',
         bodyType: 'window'

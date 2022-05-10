@@ -14,10 +14,7 @@ export const getSelectIndexes = (store: Store, refs: StoreRef): number[] =>
   Array.from(
     { length: store.select.endIndex - store.select.startIndex + 1 },
     (_, i) => i + store.select.startIndex
-  ).filter(
-    index =>
-      refs.current.cellsRendered.overscanStartIndex <= index && index <= refs.current.cellsRendered.overscanStopIndex
-  );
+  ).filter(index => store.cellsRendered.overscanStartIndex <= index && index <= store.cellsRendered.overscanStopIndex);
 
 export const handleSelectClass = (
   ref: MutableRefObject<HTMLDivElement>,

@@ -29,9 +29,6 @@ export type ScrollState = {
     speed: number;
     overscanCount: number;
   };
-};
-
-export type ScrollRef = {
   cellsRendered: {
     overscanStartRowIndex: number;
     overscanStopRowIndex: number;
@@ -49,6 +46,8 @@ export type ScrollRef = {
   };
 };
 
+export type ScrollRef = {};
+
 export const useScrollReducer = () => {
   const initialState = useMemo<ScrollState>(
     () => ({
@@ -58,13 +57,7 @@ export const useScrollReducer = () => {
         maxRowIndex: 1,
         speed: 3,
         overscanCount: 20
-      }
-    }),
-    []
-  );
-
-  const initialRef = useMemo<ScrollRef>(
-    () => ({
+      },
       cellsRendered: {
         overscanStartRowIndex: 0,
         overscanStopRowIndex: 0,
@@ -84,6 +77,8 @@ export const useScrollReducer = () => {
     []
   );
 
+  const initialRef = useMemo<ScrollRef>(() => ({}), []);
+
   const scrollIndexChange = useCallback(
     (store: Store, refs: StoreRef, index: number, scrollType: ScrollType): Store => {
       if (index === null || index === undefined || isNaN(index)) return { ...store };
@@ -96,7 +91,7 @@ export const useScrollReducer = () => {
       if (isBody.table(store)) {
         let newStore = { ...store, scroll: { ...store.scroll, maxRowIndex } };
         newStore = scrollToTableIndex(newStore, refs, newIndex, scrollType);
-        refs.current.cellsRendered = getTableCellsRendered(store);
+        store.cellsRendered = getTableCellsRendered(store);
         return { ...newStore };
       } else if (isBody.window(store)) {
         let newStore = { ...store, scroll: { ...store.scroll, rowIndex, maxRowIndex } };
@@ -112,7 +107,7 @@ export const useScrollReducer = () => {
     rowIndex = clampScrollIndex(rowIndex, maxRowIndex);
     const index = rowIndex * store.layout.column.size;
     const newStore = { ...store, scroll: { ...store.scroll, index, rowIndex, maxRowIndex } };
-    refs.current.cellsRendered = getTableCellsRendered(newStore);
+    store.cellsRendered = getTableCellsRendered(newStore);
     return { ...newStore };
   }, []);
 
@@ -121,7 +116,7 @@ export const useScrollReducer = () => {
       if (store.layout.column.size === 0) return { ...store };
       else {
         const newStore = scrollIndexChange(store, refs, store.scroll.index, 'top');
-        refs.current.cellsRendered = getTableCellsRendered(newStore);
+        store.cellsRendered = getTableCellsRendered(newStore);
         return { ...newStore };
       }
     },
@@ -169,20 +164,19 @@ export const useScrollReducer = () => {
   );
 
   const scrollCellRendered = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
-    refs.current.cellsRendered = getWindowCellsRendered({ ...payload.event }, store.layout.column.size);
+    store.cellsRendered = getWindowCellsRendered({ ...payload.event }, store.layout.column.size);
     return {
       ...store,
       scroll: {
         ...store.scroll,
-        // index: refs.current.cellsRendered.visibleStartIndex,
-        rowIndex: refs.current.cellsRendered.visibleStartRowIndex
+        rowIndex: store.cellsRendered.visibleStartRowIndex
       }
     };
   }, []);
 
   const scrollTouchStart = useCallback(
     (store: Store, refs: StoreRef, { type, payload: { event } }: ActionProps): Store => {
-      refs.current.touchScroll = {
+      store.touchScroll = {
         startTouchScreenY: event.targetTouches[0].screenY,
         prevTouchDistance: 0
       };
@@ -193,7 +187,7 @@ export const useScrollReducer = () => {
 
   const scrollTouchEnd = useCallback(
     (store: Store, refs: StoreRef, { type, payload: { event } }: ActionProps): Store => {
-      refs.current.touchScroll = {
+      store.touchScroll = {
         startTouchScreenY: 0,
         prevTouchDistance: 0
       };
@@ -204,14 +198,14 @@ export const useScrollReducer = () => {
 
   const scrollTouchMove = useCallback(
     (store: Store, refs: StoreRef, { type, payload: { event } }: ActionProps): Store => {
-      const { startTouchScreenY, prevTouchDistance } = refs.current.touchScroll;
+      const { startTouchScreenY, prevTouchDistance } = store.touchScroll;
       const distance: number = (event.targetTouches[0].screenY - startTouchScreenY) / LAYOUT_SIZE.rowHeight;
       const scrollDistance: number = distance >= 0 ? Math.floor(distance) : Math.ceil(distance);
 
       if (scrollDistance !== prevTouchDistance) {
         const newScrollIndex = store.scroll.rowIndex - (scrollDistance - prevTouchDistance);
         const newStore = scrollRowIndexChange(store, refs, newScrollIndex);
-        refs.current.touchScroll.prevTouchDistance = scrollDistance;
+        store.touchScroll.prevTouchDistance = scrollDistance;
         return { ...newStore };
       } else return { ...store };
     },

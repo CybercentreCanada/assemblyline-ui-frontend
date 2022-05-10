@@ -40,7 +40,7 @@ export const useCursorReducer = () => {
     (prevStore: Store, nextStore: Store, refs: StoreRef): void => {
       const { index: prevIndex } = prevStore.cursor;
       const { index: nextIndex } = nextStore.cursor;
-      renderIndexClass(refs.current.layout.bodyRef, prevIndex, nextIndex, classes.cursor, refs.current.cellsRendered);
+      renderIndexClass(refs.current.layout.bodyRef, prevIndex, nextIndex, classes.cursor, nextStore.cellsRendered);
     },
     [classes.cursor]
   );
@@ -80,7 +80,7 @@ export const useCursorReducer = () => {
 
       const { key: keyCode } = payload.event;
       let newCursorIndex: number = store.cursor.index;
-      const { visibleStartIndex, visibleStopIndex } = refs.current.cellsRendered;
+      const { visibleStartIndex, visibleStopIndex } = store.cellsRendered;
 
       if (isArrowLeft(keyCode)) newCursorIndex -= 1;
       else if (isArrowRight(keyCode)) newCursorIndex += 1;

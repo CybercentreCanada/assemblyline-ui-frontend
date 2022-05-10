@@ -28,12 +28,11 @@ export const formatTextString = (value: string): string =>
 export const countHexcode = (value: string) => value.split(' ').filter(code => code !== '' && code.length === 2).length;
 
 export const filterSearchIndexes = (
-  { search: { length, indexes, selectedIndex } }: Store,
   {
-    current: {
-      cellsRendered: { overscanStartIndex: firstIndex, overscanStopIndex: lastIndex }
-    }
-  }: StoreRef
+    search: { length, indexes, selectedIndex },
+    cellsRendered: { overscanStartIndex: firstIndex, overscanStopIndex: lastIndex }
+  }: Store,
+  ref: StoreRef
 ): Array<number> => indexes.filter((index: number, i: number) => firstIndex <= index + length && index <= lastIndex);
 
 export const isSearchIndex = (store: Store, index: number) =>
@@ -110,7 +109,7 @@ export const clampSelectedSearchIndex = (store: Store, index: number): number =>
 
 export const getSearchIndexes = (store: Store, refs: StoreRef): number[] => {
   const { indexes, length, selectedIndex } = store.search;
-  const { overscanStartIndex: start, overscanStopIndex: stop } = refs.current.cellsRendered;
+  const { overscanStartIndex: start, overscanStopIndex: stop } = store.cellsRendered;
   return indexes
     .filter((index: number, i: number) => start <= index + length && index <= stop && i !== selectedIndex)
     .map(index => Array.from({ length }, (_, i) => i + index))
@@ -121,7 +120,6 @@ export const getSelectedSearchIndexes = (store: Store, refs: StoreRef): number[]
   const start = store.search.indexes[store.search.selectedIndex];
   const end = start + store.search.length;
   return Array.from({ length: end - start }, (_, i) => i + start).filter(
-    index =>
-      refs.current.cellsRendered.visibleStartIndex <= index && index <= refs.current.cellsRendered.visibleStopIndex
+    index => store.cellsRendered.visibleStartIndex <= index && index <= store.cellsRendered.visibleStopIndex
   );
 };

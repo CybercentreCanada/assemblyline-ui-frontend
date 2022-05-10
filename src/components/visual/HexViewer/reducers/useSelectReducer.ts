@@ -30,7 +30,7 @@ export const useSelectReducer = () => {
     (prevStore: Store, nextStore: Store, refs: StoreRef): void => {
       const prev = getSelectIndexes(prevStore, refs);
       const next = getSelectIndexes(nextStore, refs);
-      renderArrayClass(refs.current.layout.bodyRef, prev, next, classes.select, refs.current.cellsRendered);
+      renderArrayClass(refs.current.layout.bodyRef, prev, next, classes.select, nextStore.cellsRendered);
     },
     [classes.select]
   );

@@ -91,7 +91,7 @@ export const scrollToWindowIndex = (store: Store, refs: StoreRef, index: number,
     else if (isScroll.include(location)) refs?.current?.layout.listRef?.current?.scrollToItem(scrollIndex, 'auto');
     else if (
       isScroll.includeMiddle(location) &&
-      (index < refs.current.cellsRendered.visibleStartIndex || refs.current.cellsRendered.visibleStopIndex < index)
+      (index < store.cellsRendered.visibleStartIndex || store.cellsRendered.visibleStopIndex < index)
     )
       refs?.current?.layout.listRef?.current?.scrollToItem(scrollIndex, 'center');
     else if (isScroll.smart(location)) refs?.current?.layout.listRef?.current?.scrollToItem(scrollIndex, 'smart');
