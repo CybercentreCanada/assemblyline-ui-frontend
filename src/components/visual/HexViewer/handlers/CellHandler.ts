@@ -39,7 +39,7 @@ export const getCellClasses = (
   index: number,
   classes: ClassNameMap<any>
 ): Array<string> => {
-  const asciiType = getHexType(refs.current.hex.codes.get(index));
+  const asciiType = getHexType(store.hex.codes.get(index));
 
   return [
     asciiType === 'null' && classes.nullColor,

@@ -1,19 +1,18 @@
 import NavigationIcon from '@material-ui/icons/Navigation';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { NumericField, PopperIconButton, StoreProps, useDispatch, useReducer } from '../..';
+import { NumericField, PopperIconButton, StoreProps, useDispatch } from '../..';
 
 export const WrappedHexCursorButton = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);
 
-  const { refs } = useReducer();
   const { onCursorIndexChange } = useDispatch();
 
   const {
     cursor: { index: cursorIndex },
     offset: { base: offsetBase }
   } = store;
-  const { codes: hexcodes } = refs.current.hex;
+  const { codes: hexcodes } = store.hex;
 
   return (
     <PopperIconButton

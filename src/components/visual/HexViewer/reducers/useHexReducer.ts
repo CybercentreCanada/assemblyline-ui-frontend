@@ -3,6 +3,8 @@ import { ActionProps, EncodingType, isAction, parseDataToHexcodeMap, ReducerProp
 
 export type HexState = {
   hex: {
+    data: string;
+    codes: Map<number, string>;
     null: {
       char: string;
     };
@@ -22,10 +24,10 @@ export type HexState = {
 };
 
 export type HexRef = {
-  hex: {
-    data: string;
-    codes: Map<number, string>;
-  };
+  // hex: {
+  //   data: string;
+  //   codes: Map<number, string>;
+  // };
 };
 
 export type HexPayload = any;
@@ -34,6 +36,8 @@ export const useHexReducer = () => {
   const initialState = useMemo<HexState>(
     () => ({
       hex: {
+        data: '',
+        codes: new Map(),
         null: {
           char: '0'
         },
@@ -56,17 +60,17 @@ export const useHexReducer = () => {
 
   const initialRef = useMemo<HexRef>(
     () => ({
-      hex: {
-        data: '',
-        codes: new Map()
-      }
+      // hex: {
+      //   data: '',
+      //   codes: new Map()
+      // }
     }),
     []
   );
 
   const hexDataChange = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
-    refs.current.hex.data = payload.data;
-    refs.current.hex.codes = parseDataToHexcodeMap(payload.data);
+    store.hex.data = payload.data;
+    store.hex.codes = parseDataToHexcodeMap(payload.data);
     return { ...store };
   }, []);
 

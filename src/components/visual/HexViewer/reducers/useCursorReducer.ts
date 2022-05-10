@@ -47,7 +47,7 @@ export const useCursorReducer = () => {
 
   const handleCursorIndex = useCallback((store: Store, refs: StoreRef, index: number): Store => {
     if (index === null) return { ...store, cursor: { ...store.cursor, index: null } };
-    const newCursorIndex = Math.min(Math.max(index, 0), refs.current.hex.codes.size - 1);
+    const newCursorIndex = Math.min(Math.max(index, 0), store.hex.codes.size - 1);
     return { ...store, cursor: { ...store.cursor, index: newCursorIndex } };
   }, []);
 
@@ -87,7 +87,7 @@ export const useCursorReducer = () => {
       else if (isArrowUp(keyCode)) newCursorIndex -= store.layout.column.size;
       else if (isArrowDown(keyCode)) newCursorIndex += store.layout.column.size;
       else if (isHome(keyCode)) newCursorIndex = 0;
-      else if (isEnd(keyCode)) newCursorIndex = refs.current.hex.codes.size - 1;
+      else if (isEnd(keyCode)) newCursorIndex = store.hex.codes.size - 1;
       else if (isPageUp(keyCode)) newCursorIndex -= visibleStopIndex - visibleStartIndex;
       else if (isPageDown(keyCode)) newCursorIndex += visibleStopIndex - visibleStartIndex;
 

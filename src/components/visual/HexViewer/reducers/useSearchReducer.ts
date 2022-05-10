@@ -78,7 +78,7 @@ export const useSearchReducer = () => {
 
     if (value !== null && value !== '') {
       length = countHexcode(value);
-      indexes = findSearchPattern(refs.current.hex.data, value);
+      indexes = findSearchPattern(store.hex.data, value);
       selectedIndex = nextSearchIndex(indexes, store.cursor.index);
     }
 

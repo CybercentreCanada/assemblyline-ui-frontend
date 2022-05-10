@@ -36,7 +36,7 @@ export const WrappedHexCursorBar = ({ store }: StoreProps) => {
     cursor: { index: cursorIndex },
     offset: { base: offsetBase }
   } = store;
-  const { codes: hexcodes } = refs.current.hex;
+  const { codes: hexcodes } = store.hex;
 
   return (
     <>

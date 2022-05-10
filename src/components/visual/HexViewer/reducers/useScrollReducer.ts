@@ -88,7 +88,7 @@ export const useScrollReducer = () => {
     (store: Store, refs: StoreRef, index: number, scrollType: ScrollType): Store => {
       if (index === null || index === undefined || isNaN(index)) return { ...store };
 
-      const hexcodeSize = refs.current.hex.codes.size;
+      const hexcodeSize = store.hex.codes.size;
       const newIndex = Math.min(Math.max(index, 0), hexcodeSize);
       const rowIndex = Math.floor(newIndex / store.layout.column.size);
       const maxRowIndex = getScrollMaxIndex(store, hexcodeSize);
@@ -108,7 +108,7 @@ export const useScrollReducer = () => {
   );
 
   const scrollRowIndexChange = useCallback((store: Store, refs: StoreRef, rowIndex: number): Store => {
-    const maxRowIndex = getScrollMaxIndex(store, refs?.current?.hex.codes.size);
+    const maxRowIndex = getScrollMaxIndex(store, store.hex.codes.size);
     rowIndex = clampScrollIndex(rowIndex, maxRowIndex);
     const index = rowIndex * store.layout.column.size;
     const newStore = { ...store, scroll: { ...store.scroll, index, rowIndex, maxRowIndex } };

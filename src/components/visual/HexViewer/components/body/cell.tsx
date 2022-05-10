@@ -51,7 +51,7 @@ export const WrappedHexCell = ({
   const { refs } = useReducer();
   const { onCellMouseEnter, onCellMouseDown } = useDispatch();
 
-  const { codes: hexcodes } = refs.current.hex;
+  const { codes: hexcodes } = store.hex;
 
   return (
     <Tag

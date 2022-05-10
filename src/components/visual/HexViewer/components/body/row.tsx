@@ -1,7 +1,7 @@
 import { makeStyles } from '@material-ui/core';
 import clsx from 'clsx';
 import React, { useMemo } from 'react';
-import { HexCell, HexOffset, HexSpacer, LAYOUT_SIZE, StoreProps, useReducer, useStore } from '../..';
+import { HexCell, HexOffset, HexSpacer, LAYOUT_SIZE, StoreProps, useStore } from '../..';
 
 const useHexStyles = makeStyles(theme => ({
   row: {
@@ -53,9 +53,8 @@ export const WrappedHexRow = ({
   listRef = null
 }: HexRowProps) => {
   const classes = useHexStyles();
-  const { refs } = useReducer();
 
-  const hexcodes = refs.current.hex.codes;
+  const hexcodes = store.hex.codes;
   const cellTag = useMemo(() => (Tag === 'tr' ? 'td' : 'div'), [Tag]);
   const indexes: number[] = useMemo(
     () => Array.from({ length: store.layout.column.size }, (_, i) => i + rowIndex * store.layout.column.size),

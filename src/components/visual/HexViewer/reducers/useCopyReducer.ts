@@ -16,12 +16,12 @@ export const useCopyReducer = () => {
   const initialRef = useMemo<CopyRef>(() => ({}), []);
 
   const copyHexCursor = useCallback(
-    (store: Store, refs: StoreRef) => copy(refs.current.hex.codes.get(store.cursor.index)),
+    (store: Store, refs: StoreRef) => copy(store.hex.codes.get(store.cursor.index)),
     [copy]
   );
 
   const copyTextCursor = useCallback(
-    (store: Store, refs: StoreRef) => copy(toHexChar2(store, refs.current.hex.codes.get(store.cursor.index), true)),
+    (store: Store, refs: StoreRef) => copy(toHexChar2(store, store.hex.codes.get(store.cursor.index), true)),
     [copy]
   );
 
@@ -32,7 +32,7 @@ export const useCopyReducer = () => {
         i => i + store.select.startIndex
       );
       array.forEach(index => {
-        value += refs.current.hex.codes.get(index) + ' ';
+        value += store.hex.codes.get(index) + ' ';
       });
       copy(value);
     },
@@ -46,7 +46,7 @@ export const useCopyReducer = () => {
         i => i + store.select.startIndex
       );
       array.forEach(index => {
-        value += toHexChar2(store, refs.current.hex.codes.get(index), true);
+        value += toHexChar2(store, store.hex.codes.get(index), true);
       });
       copy(value);
     },
