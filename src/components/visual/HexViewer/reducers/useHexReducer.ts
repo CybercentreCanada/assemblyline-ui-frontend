@@ -23,12 +23,7 @@ export type HexState = {
   };
 };
 
-export type HexRef = {
-  // hex: {
-  //   data: string;
-  //   codes: Map<number, string>;
-  // };
-};
+export type HexRef = {};
 
 export type HexPayload = any;
 
@@ -58,15 +53,7 @@ export const useHexReducer = () => {
     []
   );
 
-  const initialRef = useMemo<HexRef>(
-    () => ({
-      // hex: {
-      //   data: '',
-      //   codes: new Map()
-      // }
-    }),
-    []
-  );
+  const initialRef = useMemo<HexRef>(() => ({}), []);
 
   const hexDataChange = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
     store.hex.data = payload.data;

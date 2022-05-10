@@ -12,14 +12,11 @@ export type HistoryState = {
     values: Array<HistoryType>;
     index: number;
     maxSize: number;
-  };
-};
-
-export type HistoryRef = {
-  history: {
     storageKey: string;
   };
 };
+
+export type HistoryRef = {};
 
 export type HistoryPayload = {};
 
@@ -29,23 +26,17 @@ export const useHistoryReducer = () => {
       history: {
         values: [],
         index: 0,
-        maxSize: 10
-      }
-    }),
-    []
-  );
-
-  const initialRef = useMemo<HistoryRef>(
-    () => ({
-      history: {
+        maxSize: 10,
         storageKey: 'hexViewer.history'
       }
     }),
     []
   );
 
+  const initialRef = useMemo<HistoryRef>(() => ({}), []);
+
   const historyLoad = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
-    const value = localStorage.getItem(refs.current.history.storageKey);
+    const value = localStorage.getItem(store.history.storageKey);
     const json = JSON.parse(value) as HistoryType[];
 
     if (value === null || value === '' || !Array.isArray(json)) {
@@ -67,7 +58,7 @@ export const useHistoryReducer = () => {
 
   const historySave = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
     localStorage.setItem(
-      refs.current.history.storageKey,
+      store.history.storageKey,
       JSON.stringify(
         store.history.values.filter(v => v.value !== null && v.value !== '' && v.value !== undefined).slice(0, 10)
       )
