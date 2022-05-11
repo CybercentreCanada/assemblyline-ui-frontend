@@ -3,6 +3,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import error403EN from 'locales/en/403.json';
 import error404EN from 'locales/en/404.json';
 import adminErrorViewerEN from 'locales/en/admin/error_viewer.json';
+import adminIdentifyEN from 'locales/en/admin/identify.json';
 import adminServicesEN from 'locales/en/admin/services.json';
 import adminServiceReviewEN from 'locales/en/admin/service_review.json';
 import adminSiteMapEN from 'locales/en/admin/site_map.json';
@@ -47,6 +48,7 @@ import userEN from 'locales/en/user.json';
 import error403FR from 'locales/fr/403.json';
 import error404FR from 'locales/fr/404.json';
 import adminErrorViewerFR from 'locales/fr/admin/error_viewer.json';
+import adminIdentifyFR from 'locales/fr/admin/identify.json';
 import adminServicesFR from 'locales/fr/admin/services.json';
 import adminServiceReviewFR from 'locales/fr/admin/service_review.json';
 import adminSiteMapFR from 'locales/fr/admin/site_map.json';
@@ -93,6 +95,7 @@ import { initReactI18next } from 'react-i18next';
 const resources = {
   en: {
     adminErrorViewer: adminErrorViewerEN,
+    adminIdentify: adminIdentifyEN,
     adminServices: adminServicesEN,
     adminServiceReview: adminServiceReviewEN,
     adminSiteMap: adminSiteMapEN,
@@ -139,6 +142,7 @@ const resources = {
   },
   fr: {
     adminErrorViewer: adminErrorViewerFR,
+    adminIdentify: adminIdentifyFR,
     adminServices: adminServicesFR,
     adminServiceReview: adminServiceReviewFR,
     adminSiteMap: adminSiteMapFR,

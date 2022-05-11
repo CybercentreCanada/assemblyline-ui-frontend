@@ -1,0 +1,14 @@
+{
+  "loading.magic": "Chargement de l'éditeur LibMagic personnalisé...",
+  "loading.yara": "Chargement de l'éditeur Yara personnalisé...",
+  "reset": "Réinitialiser",
+  "save": "Sauvegarder les modifications",
+  "save.acceptText": "Oui, appliquez-les !",
+  "save.cancelText": "Annuler",
+  "save.success.magic": "Le nouveau fichier LibMagic personnalisé a été enregistré avec succès, tous les composants principaux doivent être redémarrés pour que cela prenne effet.",
+  "save.success.yara": "Le nouveau fichier de règles Yara personnalisé a été enregistré avec succès, tous les composants principaux doivent être redémarrés pour que cela prenne effet.",
+  "save.title": "Voici les modifications qui seront appliquées:",
+  "title.magic": "Fichier LibMagic personnalisé",
+  "title.yara": "Fichier Yara personnalisé",
+  "title": "Identification des fichiers"
+}

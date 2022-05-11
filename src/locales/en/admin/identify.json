@@ -1,0 +1,14 @@
+{
+  "loading.magic": "Loading custom LibMagic editor...",
+  "loading.yara": "Loading custom Yara editor...",
+  "reset": "Reset",
+  "save": "Save changes",
+  "save.acceptText": "Yes, apply them!",
+  "save.cancelText": "Cancel",
+  "save.success.magic": "The new custom LibMagic file was successfully saved, all core components have to be restarted for this to take effect.",
+  "save.success.yara": "The new custom Yara rules file was successfully saved, all core components have to be restarted for this to take effect.",
+  "save.title": "These are the changes that will be applied:",
+  "title.magic": "LibMagic custom file",
+  "title.yara": "Yara custom file",
+  "title": "File Identification"
+}

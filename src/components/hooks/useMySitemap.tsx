@@ -12,6 +12,7 @@ import CompareArrowsOutlinedIcon from '@material-ui/icons/CompareArrowsOutlined'
 import DashboardOutlinedIcon from '@material-ui/icons/DashboardOutlined';
 import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
 import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
+import FindInPageOutlinedIcon from '@material-ui/icons/FindInPageOutlined';
 import FingerprintOutlinedIcon from '@material-ui/icons/FingerprintOutlined';
 import HelpOutlineOutlinedIcon from '@material-ui/icons/HelpOutlineOutlined';
 import LabelOutlinedIcon from '@material-ui/icons/LabelOutlined';
@@ -198,6 +199,12 @@ export default function useMySitemap() {
         path: '/admin/errors',
         title: t('adminmenu.errors'),
         icon: <ErrorOutlineOutlinedIcon />,
+        breadcrumbs: ['/admin']
+      },
+      {
+        path: '/admin/identify',
+        title: t('adminmenu.identify'),
+        icon: <FindInPageOutlinedIcon />,
         breadcrumbs: ['/admin']
       },
       {
