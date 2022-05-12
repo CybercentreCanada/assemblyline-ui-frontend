@@ -10,5 +10,6 @@
   "save.title": "These are the changes that will be applied:",
   "title.magic": "LibMagic custom file",
   "title.yara": "Yara custom file",
-  "title": "File Identification"
+  "title": "File Identification",
+  "warning": "Warning: Making changes to any of these files will affect how Assemblyline process/routes your files. Use with caution!"
 }

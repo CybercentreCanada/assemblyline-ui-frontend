@@ -321,13 +321,9 @@ function Yara() {
       body: tagData,
       onSuccess: api_data => {
         reload();
-        showSuccessMessage(t('save.success'));
+        showSuccessMessage(t('save.success.yara'));
       }
     });
-  };
-
-  const onMount = editor => {
-    editor.focus();
   };
 
   const beforeMount = monaco => {
@@ -433,7 +429,6 @@ function Yara() {
                       value={yaraFile}
                       onChange={setYaraFile}
                       beforeMount={beforeMount}
-                      onMount={onMount}
                     />
                   </>
                 ) : (
@@ -491,7 +486,7 @@ function LibMagic() {
       body: tagData,
       onSuccess: api_data => {
         reload();
-        showSuccessMessage(t('save.success'));
+        showSuccessMessage(t('save.success.magic'));
       }
     });
   };
@@ -624,6 +619,7 @@ export default function AdminIdentify() {
   const { user: currentUser } = useUser<CustomUser>();
   const useStyles = makeStyles(curTheme => ({
     main: {
+      marginTop: theme.spacing(1),
       flexGrow: 1,
       display: 'flex',
       flexDirection: 'column',
@@ -657,6 +653,9 @@ export default function AdminIdentify() {
           <Grid item style={{ flexGrow: 1 }}>
             <div>
               <Typography variant="h4">{t('title')}</Typography>
+            </div>
+            <div>
+              <Typography variant="subtitle2">{t('warning')}</Typography>
             </div>
           </Grid>
         </Grid>
