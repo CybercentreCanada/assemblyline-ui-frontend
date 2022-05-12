@@ -73,11 +73,8 @@ const HexTableBody = memo(({ store }: StoreProps) => {
   const bodyRef = React.useRef<HTMLDivElement>(null);
 
   React.useLayoutEffect(() => {
-    // refs.current.layout.bodyRef = bodyRef;
     onBodyInit(true);
     return () => {
-      // refs.current.layout.listRef = null;
-      // refs.current.layout.bodyRef = null;
       onBodyInit(false);
     };
   }, [onBodyInit, refs]);
@@ -114,7 +111,7 @@ const HexTableBody = memo(({ store }: StoreProps) => {
           <table className={classes.table}>
             <tbody className={classes.tableBody}>
               {rowIndexes.map(rowIndex => (
-                <HexRow key={rowIndex} store={store} rowIndex={rowIndex} Tag="tr" bodyRef={bodyRef.current} />
+                <HexRow key={rowIndex} store={store} rowIndex={rowIndex} Tag="tr" />
               ))}
             </tbody>
           </table>
@@ -139,11 +136,9 @@ const HexWindowBody = memo(({ store }: StoreProps) => {
 
   React.useLayoutEffect(() => {
     refs.current.layout.listRef = listRef;
-    // refs.current.layout.bodyRef = bodyRef;
+
     onBodyInit(true);
     return () => {
-      // refs.current.layout.listRef = null;
-      // refs.current.layout.bodyRef = null;
       onBodyInit(false);
     };
   }, [onBodyInit, refs]);
@@ -161,18 +156,7 @@ const HexWindowBody = memo(({ store }: StoreProps) => {
   const Row = React.useMemo(
     () =>
       ({ index, style, data }) =>
-        store.initialized ? (
-          <WindowRow
-            key={index}
-            rowIndex={index}
-            style={style}
-            Tag={data.Tag}
-            bodyRef={bodyRef.current}
-            listRef={listRef.current}
-          />
-        ) : (
-          <></>
-        ),
+        store.initialized ? <WindowRow key={index} rowIndex={index} style={style} Tag={data.Tag} /> : <></>,
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [store.layout.column.size, store.scroll.index]
   );

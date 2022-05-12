@@ -14,15 +14,11 @@ export const CELL_ACTIONS = {
 export type CellMouseEnterProps = {
   index: number;
   type: CellType;
-  bodyRef: HTMLDivElement;
-  listRef: HTMLDivElement;
 };
 
 export type CellMouseDownProps = {
   index: number;
   type: CellType;
-  bodyRef: HTMLDivElement;
-  listRef: HTMLDivElement;
 };
 
 export type CellActionProps = {

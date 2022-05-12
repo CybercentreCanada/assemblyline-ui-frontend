@@ -32,8 +32,6 @@ export type HexCellProps = StoreProps & {
   Tag?: 'div' | 'td';
   type?: CellType;
   style?: string;
-  bodyRef?: HTMLDivElement;
-  listRef?: HTMLDivElement;
 };
 
 export const WrappedHexCell = ({
@@ -42,9 +40,7 @@ export const WrappedHexCell = ({
   index = -1,
   Tag = 'div',
   type = 'hex',
-  style = '',
-  bodyRef = null,
-  listRef = null
+  style = ''
 }: HexCellProps) => {
   const classes = useHexStyles();
   const cellClasses = useCellStyles();
@@ -58,8 +54,8 @@ export const WrappedHexCell = ({
       id={Tag + '-' + index}
       data-index={index}
       className={clsx('cell', classes.cell, style, getCellClasses(store, refs, type, columnIndex, index, cellClasses))}
-      onMouseEnter={() => onCellMouseEnter({ index, type, bodyRef, listRef })}
-      onMouseDown={() => onCellMouseDown({ index, type, bodyRef, listRef })}
+      onMouseEnter={() => onCellMouseEnter({ index, type })}
+      onMouseDown={() => onCellMouseDown({ index, type })}
       style={{ width: type === 'hex' ? LAYOUT_SIZE.hexWidth : LAYOUT_SIZE.textWidth }}
     >
       {type === 'hex' ? getHexValue(hexcodes, index) : getTextValue(store, hexcodes, index)}
