@@ -40,8 +40,8 @@ export const handleLayoutColumnResize = (width: number) => COLUMNS.find(e => wid
 
 export const handleLayoutRowResize = (height: number) => Math.floor(height / LAYOUT_SIZE.rowHeight);
 
-export const bodyRefExist = (refs: MutableRefObject<LayoutRef>) =>
-  !(refs.current.layout.bodyRef === null || refs.current.layout.bodyRef?.current === null);
+// export const bodyRefExist = (refs: MutableRefObject<LayoutRef>) =>
+//   !(refs.current.layout.bodyRef === null || refs.current.layout.bodyRef?.current === null);
 
 export const listRefExist = (refs: MutableRefObject<LayoutRef>) =>
   !(refs.current.layout.listRef === null || refs.current.layout.listRef?.current === null);

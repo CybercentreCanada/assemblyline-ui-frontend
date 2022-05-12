@@ -27,7 +27,7 @@ export type LayoutState = {
 
 export type LayoutRef = {
   layout: {
-    bodyRef?: React.MutableRefObject<HTMLDivElement | HTMLTableElement>;
+    // bodyRef?: React.MutableRefObject<HTMLDivElement | HTMLTableElement>;
     listRef?: React.MutableRefObject<any>;
   };
 };
@@ -53,7 +53,7 @@ export const useLayoutReducer = () => {
   const initialRef = useMemo<LayoutRef>(
     () => ({
       layout: {
-        bodyRef: null,
+        // bodyRef: null,
         listRef: null
       }
     }),

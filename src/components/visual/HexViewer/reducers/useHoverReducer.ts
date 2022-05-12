@@ -27,7 +27,7 @@ export const useHoverReducer = () => {
     (prevStore: Store, nextStore: Store, refs: StoreRef): void => {
       const { index: prevIndex } = prevStore.hover;
       const { index: nextIndex } = nextStore.hover;
-      renderIndexClass(refs.current.layout.bodyRef, prevIndex, nextIndex, classes.hover, nextStore.cellsRendered);
+      renderIndexClass(prevIndex, nextIndex, classes.hover, nextStore.cellsRendered);
     },
     [classes.hover]
   );

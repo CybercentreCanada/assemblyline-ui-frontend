@@ -1,4 +1,3 @@
-import { MutableRefObject } from 'react';
 import { addClassToRange, removeClassToRange } from '.';
 import { Store, StoreRef } from '..';
 
@@ -16,21 +15,15 @@ export const getSelectIndexes = (store: Store, refs: StoreRef): number[] =>
     (_, i) => i + store.select.startIndex
   ).filter(index => store.cellsRendered.overscanStartIndex <= index && index <= store.cellsRendered.overscanStopIndex);
 
-export const handleSelectClass = (
-  ref: MutableRefObject<HTMLDivElement>,
-  nextIndex: number,
-  prevIndex: number,
-  origin: number,
-  selectClass: string
-) => {
+export const handleSelectClass = (nextIndex: number, prevIndex: number, origin: number, selectClass: string) => {
   if (nextIndex > prevIndex && prevIndex < origin && nextIndex > origin) {
-    removeClassToRange(ref, prevIndex, origin, selectClass);
-    addClassToRange(ref, origin, nextIndex, selectClass);
+    removeClassToRange(prevIndex, origin, selectClass);
+    addClassToRange(origin, nextIndex, selectClass);
   } else if (nextIndex < prevIndex && prevIndex > origin && nextIndex < origin) {
-    removeClassToRange(ref, origin, prevIndex, selectClass);
-    addClassToRange(ref, nextIndex, origin, selectClass);
-  } else if (nextIndex > prevIndex && prevIndex >= origin) addClassToRange(ref, prevIndex, nextIndex, selectClass);
-  else if (nextIndex < prevIndex && nextIndex >= origin) removeClassToRange(ref, nextIndex + 1, prevIndex, selectClass);
-  else if (nextIndex < prevIndex && nextIndex <= origin) addClassToRange(ref, nextIndex, prevIndex, selectClass);
-  else if (nextIndex > prevIndex && nextIndex <= origin) removeClassToRange(ref, prevIndex, nextIndex - 1, selectClass);
+    removeClassToRange(origin, prevIndex, selectClass);
+    addClassToRange(nextIndex, origin, selectClass);
+  } else if (nextIndex > prevIndex && prevIndex >= origin) addClassToRange(prevIndex, nextIndex, selectClass);
+  else if (nextIndex < prevIndex && nextIndex >= origin) removeClassToRange(nextIndex + 1, prevIndex, selectClass);
+  else if (nextIndex < prevIndex && nextIndex <= origin) addClassToRange(nextIndex, prevIndex, selectClass);
+  else if (nextIndex > prevIndex && nextIndex <= origin) removeClassToRange(prevIndex, nextIndex - 1, selectClass);
 };

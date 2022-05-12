@@ -73,7 +73,7 @@ const HexTableBody = memo(({ store }: StoreProps) => {
   const bodyRef = React.useRef<HTMLDivElement>(null);
 
   React.useLayoutEffect(() => {
-    refs.current.layout.bodyRef = bodyRef;
+    // refs.current.layout.bodyRef = bodyRef;
     onBodyInit(true);
     return () => {
       // refs.current.layout.listRef = null;
@@ -84,7 +84,7 @@ const HexTableBody = memo(({ store }: StoreProps) => {
 
   React.useEffect(() => {
     if (store.initialized) {
-      dispatch({ type: ACTIONS.bodyResize, payload: refs.current.layout.bodyRef.current.getBoundingClientRect() });
+      dispatch({ type: ACTIONS.bodyResize, payload: bodyRef.current.getBoundingClientRect() });
     }
     /* eslint-disable react-hooks/exhaustive-deps */
   }, [dispatch, refs, store.initialized]);
@@ -139,7 +139,7 @@ const HexWindowBody = memo(({ store }: StoreProps) => {
 
   React.useLayoutEffect(() => {
     refs.current.layout.listRef = listRef;
-    refs.current.layout.bodyRef = bodyRef;
+    // refs.current.layout.bodyRef = bodyRef;
     onBodyInit(true);
     return () => {
       // refs.current.layout.listRef = null;

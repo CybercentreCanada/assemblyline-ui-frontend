@@ -40,7 +40,7 @@ export const useCursorReducer = () => {
     (prevStore: Store, nextStore: Store, refs: StoreRef): void => {
       const { index: prevIndex } = prevStore.cursor;
       const { index: nextIndex } = nextStore.cursor;
-      renderIndexClass(refs.current.layout.bodyRef, prevIndex, nextIndex, classes.cursor, nextStore.cellsRendered);
+      renderIndexClass(prevIndex, nextIndex, classes.cursor, nextStore.cellsRendered);
     },
     [classes.cursor]
   );
