@@ -69,7 +69,6 @@ export const useBodyAction = (dispatch: DispatchProp): BodyActionProps => {
 
   const onBodyMouseUp = useCallback(
     (event: MouseEvent, store: Store) => {
-      console.log('test', store.layout.isFocusing);
       if (isFocus.body(store)) dispatch(ACTIONS.bodyMouseUp, { event });
     },
     [dispatch]

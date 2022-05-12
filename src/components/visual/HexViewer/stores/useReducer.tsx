@@ -160,8 +160,6 @@ export const ReducerProvider = ({ children }: StoreProviderProps) => {
 
       nextStore = copy.reducer({ prevStore, nextStore, refs, action });
 
-      console.log(action.type, nextStore.select.isHighlighting, nextStore.layout.isFocusing);
-
       return nextStore;
     },
     [
