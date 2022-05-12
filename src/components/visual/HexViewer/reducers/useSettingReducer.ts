@@ -14,6 +14,7 @@ import {
 
 export type SettingState = {
   setting: {
+    storageKey: string;
     open: boolean;
     bodyType: number;
     hex: {
@@ -42,11 +43,7 @@ export type SettingState = {
   };
 };
 
-export type SettingRef = {
-  setting: {
-    storageKey: string;
-  };
-};
+export type SettingRef = {};
 
 export type SettingPayload = {};
 
@@ -54,6 +51,7 @@ export const useSettingReducer = () => {
   const initialState = useMemo<SettingState>(
     () => ({
       setting: {
+        storageKey: 'hexViewer.settings',
         open: false,
         bodyType: 0,
         hex: {
@@ -84,18 +82,11 @@ export const useSettingReducer = () => {
     []
   );
 
-  const initialRef = useMemo<SettingRef>(
-    () => ({
-      setting: {
-        storageKey: 'hexViewer.settings'
-      }
-    }),
-    []
-  );
+  const initialRef: SettingRef = {};
 
   const handleSaveLocalStorage = useCallback((store: Store, refs: StoreRef): void => {
     localStorage.setItem(
-      refs.current.setting.storageKey,
+      store.setting.storageKey,
       JSON.stringify({
         hex: {
           null: { char: store.hex.null.char },
@@ -116,7 +107,7 @@ export const useSettingReducer = () => {
   }, []);
 
   const settingLoad = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
-    const value = localStorage.getItem(refs.current.setting.storageKey);
+    const value = localStorage.getItem(store.setting.storageKey);
     const json = JSON.parse(value) as any;
 
     if (value === null || value === '' || !Array.isArray(json)) return { ...store };
