@@ -2,7 +2,7 @@ import { MutableRefObject } from 'react';
 import { addClassToRange, removeClassToRange } from '.';
 import { Store, StoreRef } from '..';
 
-export const orderSelectIndexes = (startIndex: number, endIndex: number) => ({
+export const orderSelectIndexes = (startIndex: number, endIndex: number): { startIndex: number; endIndex: number } => ({
   startIndex: Math.min(startIndex, endIndex),
   endIndex: Math.max(startIndex, endIndex)
 });

@@ -1,12 +1,14 @@
 import { MutableRefObject } from 'react';
 
 export const addClass = (ref: MutableRefObject<HTMLDivElement>, index: number, classname: string) =>
-  ref.current
+  document
+    .getElementById('hex-viewer')
     ?.querySelectorAll("[data-index='" + index + "']")
     ?.forEach(element => element.classList.add('class', classname));
 
 export const removeClass = (ref: MutableRefObject<HTMLDivElement>, index: number, classname: string) =>
-  ref.current
+  document
+    .getElementById('hex-viewer')
     ?.querySelectorAll("[data-index='" + index + "']")
     ?.forEach(element => element.classList.remove('class', classname));
 
@@ -50,11 +52,13 @@ export const renderIndexClass = (
   { overscanStartIndex: start, overscanStopIndex: stop }: { overscanStartIndex: number; overscanStopIndex: number }
 ) => {
   if (prevState !== null && start <= prevState && prevState <= stop)
-    ref.current
+    document
+      .getElementById('hex-viewer')
       ?.querySelectorAll("[data-index='" + prevState + "']")
       ?.forEach(element => element.classList.remove('class', classname));
   if (nextState !== null && start <= nextState && nextState <= stop)
-    ref.current
+    document
+      .getElementById('hex-viewer')
       ?.querySelectorAll("[data-index='" + nextState + "']")
       ?.forEach(element => element.classList.add('class', classname));
 };
@@ -68,9 +72,12 @@ export const renderArrayClass = (
 ) => {
   const prev = prevState.filter(index => !nextState.includes(index) && start <= index && index <= stop);
   const next = nextState.filter(index => !prevState.includes(index) && start <= index && index <= stop);
-  ref.current?.querySelectorAll('.cell').forEach(el => {
-    const index = parseInt(el.getAttribute('data-index'));
-    if (prev.includes(index)) el.classList.remove('class', classname);
-    if (next.includes(index)) el.classList.add('class', classname);
-  });
+  document
+    .getElementById('hex-viewer')
+    ?.querySelectorAll('.cell')
+    .forEach(el => {
+      const index = parseInt(el.getAttribute('data-index'));
+      if (prev.includes(index)) el.classList.remove('class', classname);
+      if (next.includes(index)) el.classList.add('class', classname);
+    });
 };

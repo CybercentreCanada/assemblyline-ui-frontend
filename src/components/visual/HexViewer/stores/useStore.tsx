@@ -73,8 +73,10 @@ export const StoreProvider = ({ children }: StoreProviderProps) => {
   }, [dispatch, dispatchRef]);
 
   return (
-    <storeContext.Provider value={{ store, dispatch }}>
-      {React.useMemo(() => children, [children])}
-    </storeContext.Provider>
+    <div id="hex-viewer">
+      <storeContext.Provider value={{ store, dispatch }}>
+        {React.useMemo(() => children, [children])}
+      </storeContext.Provider>
+    </div>
   );
 };

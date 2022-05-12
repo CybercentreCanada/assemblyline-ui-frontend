@@ -13,18 +13,14 @@ import {
   useCellStyles
 } from '..';
 
-export type SelectState = { select: { startIndex: number; endIndex: number } };
+export type SelectState = { select: { startIndex: number; endIndex: number; isHighlighting: boolean } };
 
-export type SelectRef = {
-  select: {
-    isHighlighting: boolean;
-  };
-};
+export type SelectRef = {};
 
 export const useSelectReducer = () => {
   const classes = useCellStyles();
-  const initialState: SelectState = { select: { startIndex: -1, endIndex: -1 } };
-  const initialRef: SelectRef = { select: { isHighlighting: false } };
+  const initialState: SelectState = { select: { startIndex: -1, endIndex: -1, isHighlighting: false } };
+  const initialRef: SelectRef = {};
 
   const selectRender = useCallback(
     (prevStore: Store, nextStore: Store, refs: StoreRef): void => {
@@ -38,21 +34,20 @@ export const useSelectReducer = () => {
   const selectMouseEnter = useCallback((store: Store, refs: StoreRef): Store => {
     if (!isCellMouseDown(store)) return { ...store };
     const { mouseEnterIndex, mouseDownIndex } = store.cell;
-    return { ...store, select: orderSelectIndexes(mouseDownIndex, mouseEnterIndex) };
+    return { ...store, select: { ...store.select, ...orderSelectIndexes(mouseDownIndex, mouseEnterIndex) } };
   }, []);
 
   const selectClear = useCallback(
-    (store: Store): Store => ({ ...store, select: { startIndex: -1, endIndex: -1 } }),
+    (store: Store): Store => ({ ...store, select: { ...store.select, startIndex: -1, endIndex: -1 } }),
     []
   );
 
   const selectMouseUp = useCallback(
     (store: Store, refs: StoreRef): Store => {
       if (store.cell.mouseEnterIndex === null) return { ...store };
-      else if (isSameCellClick(store) || !refs.current.select.isHighlighting) return selectClear(store);
+      else if (isSameCellClick(store) || !store.select.isHighlighting) return selectClear(store);
       else {
-        refs.current.select.isHighlighting = false;
-        return { ...store };
+        return { ...store, select: { ...store.select, isHighlighting: false } };
       }
     },
     [selectClear]
@@ -60,15 +55,18 @@ export const useSelectReducer = () => {
 
   const selectMouseDown = useCallback(
     (store: Store, refs: StoreRef): Store => {
-      refs.current.select.isHighlighting = true;
-      return selectClear(store);
+      return selectClear({ ...store, select: { ...store.select, isHighlighting: true } });
     },
     [selectClear]
   );
 
   const selectLocation = useCallback((store: Store, refs: StoreRef): Store => {
     if (store.location.selectStart === null || store.location.selectEnd === null) return { ...store };
-    else return { ...store, select: orderSelectIndexes(store.location.selectStart, store.location.selectEnd) };
+    else
+      return {
+        ...store,
+        select: { ...store.select, ...orderSelectIndexes(store.location.selectStart, store.location.selectEnd) }
+      };
   }, []);
 
   const reducer = useCallback(
