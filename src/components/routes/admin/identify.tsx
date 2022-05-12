@@ -107,8 +107,6 @@ const yaraDef = {
     'xor',
     'defined'
   ],
-  regexpctl: /[(){}[\]$^|\-*+?.]/,
-  regexpesc: /\\(?:[bBdDfnrstvwWn0\\/]|@regexpctl|c[A-Z]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4})/,
   typeKeywords: [
     'any',
     'of',
@@ -141,8 +139,7 @@ const yaraDef = {
     { include: '@strings' },
     { include: '@tags' }
   ],
-  symbols: /[=><!~?:&|+\-*/^%]+/,
-  escapes: /\\(?:[nrt\\"]|x\d{2})/,
+  escapes: /(\\[nrt\\"]|x\d{2})/,
 
   operators: [
     '.',
@@ -171,6 +168,8 @@ const yaraDef = {
     root: [[/[{}]/, 'delimiter.bracket'], { include: 'common' }],
 
     common: [
+      // to show class names nicely
+      [/\$[\w_]*/, 'attribute.name'],
       // identifiers and keywords
       [
         /[a-z_$][\w$]*/,
@@ -182,30 +181,15 @@ const yaraDef = {
           }
         }
       ],
-      [/[A-Z][\w$]*/, 'type.identifier'], // to show class names nicely
-      // [/[A-Z][\w\$]*/, 'identifier'],
 
       // whitespace
       { include: '@whitespace' },
 
       // regular expression: ensure it is terminated before beginning (otherwise it is an opeator)
-      [
-        /\/(?=([^\\/]|\\.)+\/([is]*)(\s*)(ascii|wide|nocase|xor|base64|base64wide|fullword|private|\.|;|\/|,|\)|\]|\}|$))/,
-        { token: 'regexp', bracket: '@open', next: '@regexp' }
-      ],
+      [/(\/(?:[^\\/]|\\.)+\/)(i|is|si|i)?[ \t\n\r$]*/, 'annotation'],
 
       // delimiters and operators
       [/[()[\]]/, '@brackets'],
-      [/[<>](?!@symbols)/, '@brackets'],
-      [
-        /@symbols/,
-        {
-          cases: {
-            '@operators': 'delimiter',
-            '@default': ''
-          }
-        }
-      ],
 
       // numbers
       [/(@digits)[eE]([-+]?(@digits))?/, 'number.float'],
@@ -219,8 +203,6 @@ const yaraDef = {
       [/[;,.]/, 'delimiter'],
 
       // strings
-      [/"([^"\\]|\\.)*$/, 'string.invalid'], // non-teminated string
-      [/'([^'\\]|\\.)*$/, 'string.invalid'], // non-teminated string
       [/"/, 'string', '@string_double']
     ],
 
@@ -236,34 +218,9 @@ const yaraDef = {
       [/[/*]/, 'comment']
     ],
 
-    // We match regular expression quite precisely
-    regexp: [
-      [/(\{)(\d+(?:,\d*)?)(\})/, ['regexp.escape.control', 'regexp.escape.control', 'regexp.escape.control']],
-      [
-        /(\[)(\^?)(?=(?:[^\]\\/]|\\.)+)/,
-        ['regexp.escape.control', { token: 'regexp.escape.control', next: '@regexrange' }]
-      ],
-      [/(\()(\?:|\?=|\?!)/, ['regexp.escape.control', 'regexp.escape.control']],
-      [/[()]/, 'regexp.escape.control'],
-      [/@regexpctl/, 'regexp.escape.control'],
-      [/[^\\/]/, 'regexp'],
-      [/@regexpesc/, 'regexp.escape'],
-      [/\\\./, 'regexp.invalid'],
-      [/(\/)([is]*)/, [{ token: 'regexp', bracket: '@close', next: '@pop' }, 'regexp']]
-    ],
-
-    regexrange: [
-      [/-/, 'regexp.escape.control'],
-      [/\^/, 'regexp.invalid'],
-      [/@regexpesc/, 'regexp.escape'],
-      [/[^\]]/, 'regexp'],
-      [/\]/, { token: 'regexp.escape.control', next: '@pop', bracket: '@close' }]
-    ],
-
     string_double: [
       [/[^\\"]+/, 'string'],
       [/@escapes/, 'string.escape'],
-      [/\\./, 'string.escape.invalid'],
       [/"/, 'string', '@pop']
     ],
 
@@ -287,14 +244,17 @@ const yaraConfig = {
   brackets: [
     ['{', '}'],
     ['[', ']'],
-    ['(', ')']
+    ['(', ')'],
+    ['"', '"'],
+    ['/', '/']
   ],
   // symbols that that can be used to surround a selection
   surroundingPairs: [
     ['{', '}'],
     ['[', ']'],
     ['(', ')'],
-    ['"', '"']
+    ['"', '"'],
+    ['/', '/']
   ]
 };
 
