@@ -26,17 +26,37 @@ loader.config({ paths: { vs: '/cdn/monaco/' } });
 
 const magicDef = {
   defaultToken: '',
-  number: /\d+(\.\d+)?/,
+  digits: /\d+(_+\d+)*/,
+  octaldigits: /[0-7]{1,3}/,
+  hexdigits: /[0-9a-fA-F]+/,
   keywords: [],
   tokenizer: {
-    root: [{ include: '@whitespace' }, { include: '@numbers' }, { include: '@strings' }, { include: '@tags' }],
+    root: [
+      { include: '@offset' },
+      { include: '@operators' },
+      { include: '@strings' },
+      { include: '@whitespace' },
+      { include: '@numbers' },
+      { include: '@tags' }
+    ],
+    offset: [[/^[>&\d]*[&+()\d\w.\-*]+/, 'keyword']],
+    operators: [[/\s+([=!<>&^?]|\\x)/, 'number.hex']],
     whitespace: [
       [/^\s*#([ =|].*)?$/, 'comment'],
       [/\s+/, 'white']
     ],
-    numbers: [[/@number/, 'number']],
-    strings: [[/(string|regex|search|quad|long|byte|short|beshort|belong|bequad)[/\dx]*/, 'string.escape']],
-    tags: [[/custom: [\w/]+/, 'tag']]
+    numbers: [
+      [/0[xX]@hexdigits/, 'number'],
+      [/\\@octaldigits/, 'number'],
+      [/(@digits)/, 'number']
+    ],
+    strings: [
+      [
+        /\s+((be|le)?(short|long|quad|float|double|date|qdate|ldate|qldate|qwdate|id3|string16)|byte|string|pstring|melong|medate|meldate|indirect|name|use|regex|search|default|clear)(?=[^\w]|$)/,
+        'string'
+      ]
+    ],
+    tags: [[/custom: [\w/]+/, 'attribute.name']]
   }
 };
 
