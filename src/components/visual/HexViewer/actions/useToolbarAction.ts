@@ -66,7 +66,7 @@ export type ToolbarActionProps = {
 export const useToolbarAction = (dispatch: DispatchProp): ToolbarActionProps => {
   const onSearchBarKeyDown = useCallback(
     (event: KeyboardEvent<HTMLDivElement> | any, store: Store, refs: StoreRef) => {
-      if (!isFocus.toolbar(refs) || !(isEnterKey(event) || isUpDownKey(event) || isEscapeKey(event))) return;
+      if (!isFocus.toolbar(store) || !(isEnterKey(event) || isUpDownKey(event) || isEscapeKey(event))) return;
       event.preventDefault();
 
       if (isEnterKey(event)) dispatch(ACTIONS.searchBarEnterKeyDown, { event });

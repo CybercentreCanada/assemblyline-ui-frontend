@@ -90,8 +90,8 @@ const HexTableBody = memo(({ store }: StoreProps) => {
   }, [dispatch, refs, store.initialized]);
 
   useEventListener('resize', () => onBodyResize(bodyRef?.current?.getBoundingClientRect()));
-  useEventListener('keydown', (e: KeyboardEvent) => onBodyKeyDown(e, refs));
-  useEventListener('mouseup', (e: MouseEvent) => onBodyMouseUp(e, refs));
+  useEventListener('keydown', (e: KeyboardEvent) => onBodyKeyDown(e, store));
+  useEventListener('mouseup', (e: MouseEvent) => onBodyMouseUp(e, store));
 
   const rowIndexes: number[] = useMemo(
     () => Array.from(Array(store.layout.row.size).keys()).map(i => i + store.scroll.rowIndex),
@@ -155,8 +155,8 @@ const HexWindowBody = memo(({ store }: StoreProps) => {
     }
   }, [dispatch, refs, store.initialized]);
 
-  useEventListener('keydown', (e: KeyboardEvent) => onBodyKeyDown(e, refs));
-  useEventListener('mouseup', (e: MouseEvent) => onBodyMouseUp(e, refs));
+  useEventListener('keydown', (e: KeyboardEvent) => onBodyKeyDown(e, store));
+  useEventListener('mouseup', (e: MouseEvent) => onBodyMouseUp(e, store));
 
   const Row = React.useMemo(
     () =>
@@ -222,6 +222,7 @@ export const HexBody = memo(
     prevProps.store.layout.column.size === nextProps.store.layout.column.size &&
     prevProps.store.layout.row.auto === nextProps.store.layout.row.auto &&
     prevProps.store.layout.column.auto === nextProps.store.layout.column.auto &&
+    prevProps.store.layout.isFocusing === nextProps.store.layout.isFocusing &&
     prevProps.store.mode.bodyType === nextProps.store.mode.bodyType &&
     prevProps.store.mode.theme === nextProps.store.mode.theme &&
     prevProps.store.mode.language === nextProps.store.mode.language &&
@@ -229,7 +230,8 @@ export const HexBody = memo(
     prevProps.store.scroll.index === nextProps.store.scroll.index &&
     prevProps.store.scroll.rowIndex === nextProps.store.scroll.rowIndex &&
     prevProps.store.scroll.maxRowIndex === nextProps.store.scroll.maxRowIndex &&
-    prevProps.store.scroll.speed === nextProps.store.scroll.speed
+    prevProps.store.scroll.speed === nextProps.store.scroll.speed &&
+    prevProps.store.select.isHighlighting === nextProps.store.select.isHighlighting
 );
 
 export default HexBody;

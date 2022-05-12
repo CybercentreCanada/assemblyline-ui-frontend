@@ -1,5 +1,5 @@
 import { MutableRefObject } from 'react';
-import { LayoutRef, StoreRef } from '..';
+import { LayoutRef, Store } from '..';
 
 export type LayoutSize = {
   windowHeight: number;
@@ -50,7 +50,7 @@ export const listRefExist = (refs: MutableRefObject<LayoutRef>) =>
 type Focus = { none: 'none'; toolbar: 'toolbar'; body: 'body' };
 const FOCUS: Focus = { none: 'none', toolbar: 'toolbar', body: 'body' };
 export type FocusType = typeof FOCUS[keyof typeof FOCUS];
-export type IsFocus = { [Property in FocusType]: (refs: StoreRef) => boolean };
+export type IsFocus = { [Property in FocusType]: (store: Store) => boolean };
 export const isFocus = Object.fromEntries(
-  Object.keys(FOCUS).map(key => [key, (refs: StoreRef) => refs.current.layout.isFocusing === FOCUS[key]])
+  Object.keys(FOCUS).map(key => [key, (store: Store) => store.layout.isFocusing === FOCUS[key]])
 ) as IsFocus;

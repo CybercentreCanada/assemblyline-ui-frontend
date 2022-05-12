@@ -159,6 +159,9 @@ export const ReducerProvider = ({ children }: StoreProviderProps) => {
       nextStore = scroll.reducer({ prevStore, nextStore, refs, action });
 
       nextStore = copy.reducer({ prevStore, nextStore, refs, action });
+
+      console.log(action.type, nextStore.select.isHighlighting, nextStore.layout.isFocusing);
+
       return nextStore;
     },
     [

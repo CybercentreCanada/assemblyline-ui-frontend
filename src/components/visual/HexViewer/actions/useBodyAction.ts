@@ -1,6 +1,6 @@
 import { KeyboardEvent, MouseEvent, useCallback } from 'react';
 import { ListOnItemsRenderedProps } from 'react-window';
-import { ACTIONS, DispatchProp, isArrowKey, isCopyKey, isFocus, isHomeEndKey, isPageKey, StoreRef } from '..';
+import { ACTIONS, DispatchProp, isArrowKey, isCopyKey, isFocus, isHomeEndKey, isPageKey, Store } from '..';
 
 export type BodyActions = {
   bodyInit: 'BODY_INIT_ACTION';
@@ -30,8 +30,8 @@ export type BodyActionProps = {
   onBodyMouseLeave: () => void;
   onBodyScrollWheel: (...props: any[]) => void;
   onBodyItemsRendered: (event: ListOnItemsRenderedProps) => void;
-  onBodyKeyDown: (event: KeyboardEvent, refs: StoreRef) => void;
-  onBodyMouseUp: (event: MouseEvent, refs: StoreRef) => void;
+  onBodyKeyDown: (event: KeyboardEvent, store: Store) => void;
+  onBodyMouseUp: (event: MouseEvent, store: Store) => void;
 };
 
 export const useBodyAction = (dispatch: DispatchProp): BodyActionProps => {
@@ -58,8 +58,8 @@ export const useBodyAction = (dispatch: DispatchProp): BodyActionProps => {
   );
 
   const onBodyKeyDown = useCallback(
-    (event: KeyboardEvent, refs: StoreRef) => {
-      if (!isFocus.body(refs) && !(cursorKeyDownGuard(event) || isCopyKey(event))) return;
+    (event: KeyboardEvent, store: Store) => {
+      if (!isFocus.body(store) && !(cursorKeyDownGuard(event) || isCopyKey(event))) return;
       event.preventDefault();
       if (cursorKeyDownGuard(event)) dispatch(ACTIONS.cursorKeyDown, { event });
       else if (isCopyKey(event)) dispatch(ACTIONS.copyKeyDown, null, true, false);
@@ -68,8 +68,9 @@ export const useBodyAction = (dispatch: DispatchProp): BodyActionProps => {
   );
 
   const onBodyMouseUp = useCallback(
-    (event: MouseEvent, refs: StoreRef) => {
-      if (isFocus.body(refs)) dispatch(ACTIONS.bodyMouseUp, { event });
+    (event: MouseEvent, store: Store) => {
+      console.log('test', store.layout.isFocusing);
+      if (isFocus.body(store)) dispatch(ACTIONS.bodyMouseUp, { event });
     },
     [dispatch]
   );

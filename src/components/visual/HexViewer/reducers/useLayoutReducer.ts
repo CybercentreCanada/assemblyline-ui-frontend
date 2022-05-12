@@ -21,6 +21,7 @@ export type LayoutState = {
       size: number;
       auto: boolean;
     };
+    isFocusing: FocusType;
   };
 };
 
@@ -28,7 +29,6 @@ export type LayoutRef = {
   layout: {
     bodyRef?: React.MutableRefObject<HTMLDivElement | HTMLTableElement>;
     listRef?: React.MutableRefObject<any>;
-    isFocusing: FocusType;
   };
 };
 
@@ -43,7 +43,8 @@ export const useLayoutReducer = () => {
         row: {
           size: 0,
           auto: true
-        }
+        },
+        isFocusing: 'none'
       }
     }),
     []
@@ -53,8 +54,7 @@ export const useLayoutReducer = () => {
     () => ({
       layout: {
         bodyRef: null,
-        listRef: null,
-        isFocusing: 'none'
+        listRef: null
       }
     }),
     []
@@ -80,18 +80,15 @@ export const useLayoutReducer = () => {
   }, []);
 
   const layoutFocusNone = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
-    refs.current.layout.isFocusing = 'none';
-    return { ...store };
+    return { ...store, layout: { ...store.layout, isFocusing: 'none' } };
   }, []);
 
   const layoutFocusBody = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
-    refs.current.layout.isFocusing = 'body';
-    return { ...store };
+    return { ...store, layout: { ...store.layout, isFocusing: 'body' } };
   }, []);
 
   const layoutFocusToolbar = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
-    refs.current.layout.isFocusing = 'toolbar';
-    return { ...store };
+    return { ...store, layout: { ...store.layout, isFocusing: 'toolbar' } };
   }, []);
 
   const layoutCellRendered = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
