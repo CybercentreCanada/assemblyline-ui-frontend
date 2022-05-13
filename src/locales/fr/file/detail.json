@@ -28,6 +28,7 @@
   "related": "Soumissions connexes",
   "resubmit.success": "Le fichier a été soumis à nouveau pour une analyse dynamique. Vous serez redirigé ...",
   "resubmit_dynamic": "Soumettre à nouveau pour l'analyse dynamique",
+  "resubmit_file": "Soumettre à nouveau le fichier actuel",
   "results": "Résultats du service",
   "safelist": "Ajouter un fichier à la liste sûre",
   "safelist.acceptText": "Oui, ajoutez-le !",
