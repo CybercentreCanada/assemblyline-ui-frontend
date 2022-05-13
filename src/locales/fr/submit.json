@@ -31,7 +31,7 @@
   "submit.file.upload_fail": "Échec du téléversement du fichier, réessayez ...",
   "submit.progress": "% téléversé ...",
   "submit.success": "Envoi réussi, redirection vers l'ID de soumission:",
-  "submit.hash.failure": "Le SHA256 soumis n'est pas valide ou n'est pas connu de Assemblyline...",
+  "submit.hash.failure": "Le SHA256 soumis n'est pas valide ou n'est pas connu d'Assemblyline...",
   "submit.url.failure": "L'URL soumit est soit invalide, ou inaccessible ...",
   "terms1": "En appuyant sur ",
   "terms2": ", vous acceptez nos ",

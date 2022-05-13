@@ -61,6 +61,7 @@ function Submit() {
   const state = history.location.state;
   const [hash, setHash] = useState((state !== undefined) ? state['hash'] : "");
   const [value, setValue] = useState((state !== undefined) ? state['tabContext'] : "0");
+  const classification = useState((state !== undefined) ? state['c12n'] : null)[0];
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -386,7 +387,7 @@ function Submit() {
           <Classification
             format="long"
             type="picker"
-            c12n={settings ? settings.classification : null}
+            c12n={classification ? classification : settings ? settings.classification : null}
             setClassification={setClassification}
           />
         </div>
