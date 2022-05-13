@@ -11,5 +11,5 @@
   "title.magic": "Fichier LibMagic personnalisé",
   "title.yara": "Fichier Yara personnalisé",
   "title": "Identification des fichiers",
-  "warning": "Avertissement : apporter des modifications à l'un de ces fichiers affectera la manière dont Assemblyline traite/achemine vos fichiers. Utiliser avec précaution!"
+  "warning": "Avertissement: apporter des modifications à l'un de ces fichiers affectera la manière dont Assemblyline traite/achemine vos fichiers. Utiliser avec précaution!"
 }
