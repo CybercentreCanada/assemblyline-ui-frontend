@@ -4,6 +4,7 @@ import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
 import PageviewOutlinedIcon from '@material-ui/icons/PageviewOutlined';
 import PlaylistAddCheckIcon from '@material-ui/icons/PlaylistAddCheck';
 import RotateLeftOutlinedIcon from '@material-ui/icons/RotateLeftOutlined';
+import ReplayOutlinedIcon from '@material-ui/icons/ReplayOutlined';
 import { Skeleton } from '@material-ui/lab';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -27,6 +28,7 @@ import ParentSection from './FileDetail/parents';
 import ResultSection from './FileDetail/results';
 import TagSection from './FileDetail/tags';
 import InputDialog from './InputDialog';
+
 
 type FileInfo = {
   archive_ts: string;
@@ -281,6 +283,11 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                         <Tooltip title={t('file_viewer')}>
                           <IconButton component={Link} to={`/file/viewer/${file.file_info.sha256}`}>
                             <PageviewOutlinedIcon />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title={t('resubmit_file')}>
+                          <IconButton component={Link} to={{pathname: "/submit", state: {hash: file.file_info.sha256, tabContext: "2"}}}>
+                            <ReplayOutlinedIcon />
                           </IconButton>
                         </Tooltip>
                         <Tooltip title={t('resubmit_dynamic')}>

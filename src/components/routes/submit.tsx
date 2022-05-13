@@ -33,6 +33,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory } from 'react-router-dom';
 
+
 function Submit() {
   const { getBanner } = useAppLayout();
   const { apiCall } = useMyAPI();
@@ -45,11 +46,11 @@ function Submit() {
   const [uploadProgress, setUploadProgress] = useState(null);
   const [url, setUrl] = useState('');
   const [urlHasError, setUrlHasError] = useState(false);
+  const [hashHasError, setHashHasError] = useState(false);
   const [validate, setValidate] = useState(false);
   const [validateCB, setValidateCB] = useState(null);
   const [allowClick, setAllowClick] = useState(true);
   const [file, setFile] = useState(null);
-  const [value, setValue] = useState('0');
   const downSM = useMediaQuery(theme.breakpoints.down('sm'));
   const md = useMediaQuery(theme.breakpoints.only('md'));
   const { showErrorMessage, showSuccessMessage, closeSnackbar } = useMySnackbar();
@@ -57,6 +58,9 @@ function Submit() {
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
+  const state = history.location.state;
+  const [hash, setHash] = useState((state !== undefined) ? state['hash'] : "");
+  const [value, setValue] = useState((state !== undefined) ? state['tabContext'] : "0");
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -112,6 +116,8 @@ function Submit() {
     } else if (cbType === 'file') {
       // No external service and file submitted
       uploadAndScan();
+    } else if (cbType === 'sha256') {
+      analyseHash();
     } else {
       // No external service and url submitted
       analyseUrl();
@@ -258,10 +264,46 @@ function Submit() {
     }
   }
 
+  function handleHashChange(event) {
+    closeSnackbar();
+    setHashHasError(false);
+    setHash(event.target.value);
+  }
+
   function handleUrlChange(event) {
     closeSnackbar();
     setUrlHasError(false);
     setUrl(event.target.value);
+  }
+
+  function analyseHash() {
+    // Validation might not be necessary since the API will check if the hash exists
+    // const sha256ParseRE = /^[a-f0-9]{64}$/;
+    // const matches = sha256ParseRE.exec(hash)
+
+    const data = {
+      name: hash,
+      sha256: hash,
+      ui_params: settings
+    };
+
+    setHashHasError(false);
+    apiCall({
+      url: '/api/v4/submit/',
+      method: 'POST',
+      body: data,
+      onSuccess: api_data => {
+        setAllowClick(false);
+        showSuccessMessage(`${t('submit.success')} ${api_data.api_response.sid}`);
+        setTimeout(() => {
+          history.push(`/submission/detail/${api_data.api_response.sid}`);
+        }, 500);
+      },
+      onFailure: api_data => {
+        showErrorMessage(t('submit.hash.failure'));
+        setHashHasError(true);
+      }
+    });
   }
 
   function analyseUrl() {
@@ -358,7 +400,8 @@ function Submit() {
             ) : (
               <Empty />
             )}
-            <Tab label={t('options')} value="2" />
+            <Tab label="SHA256" value="2" />
+            <Tab label={t('options')} value="3" />
           </TabList>
         </Paper>
         <TabPanel value="0" className={classes.no_pad}>
@@ -465,6 +508,50 @@ function Submit() {
           </TabPanel>
         )}
         <TabPanel value="2" className={classes.no_pad}>
+          <div style={{ display: 'flex', flexDirection: 'row', marginTop: sp2, alignItems: 'flex-start' }}>
+            {settings ? (
+              <>
+                <TextField
+                  label={t('hash.input')}
+                  error={hashHasError}
+                  size="small"
+                  type="hash"
+                  variant="outlined"
+                  value={hash}
+                  onChange={handleHashChange}
+                  style={{ flexGrow: 1, marginRight: '1rem' }}
+                />
+                <Button
+                  disabled={!hash || !allowClick}
+                  color="primary"
+                  variant="contained"
+                  onClick={() => validateServiceSelection('sha256')}
+                >
+                  {t('hash.button')}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Skeleton style={{ flexGrow: 1, height: '3rem' }} />
+                <Skeleton style={{ marginLeft: sp2, height: '3rem', width: '5rem' }} />
+              </>
+            )}
+          </div>
+          {configuration.ui.tos ? (
+            <div style={{ marginTop: sp4, textAlign: 'center' }}>
+              <Typography variant="body2">
+                {t('terms1')}
+                <i>{t('hash.button')}</i>
+                {t('terms2')}
+                <Link style={{ textDecoration: 'none', color: theme.palette.primary.main }} to="/tos">
+                  {t('terms3')}
+                </Link>
+                .
+              </Typography>
+            </div>
+          ) : null}
+        </TabPanel>
+        <TabPanel value="3" className={classes.no_pad}>
           <Grid container spacing={1}>
             <Grid item xs={12} md>
               <div style={{ paddingLeft: sp2, textAlign: 'left', marginTop: sp2 }}>
