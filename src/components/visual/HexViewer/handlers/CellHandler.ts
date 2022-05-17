@@ -1,5 +1,5 @@
 import { ClassNameMap } from '@material-ui/core/styles/withStyles';
-import { getHexType, isCursorIndex, isSearchIndex, isSelectedSearchIndex, isSelectIndex, Store, StoreRef } from '..';
+import { getHexType, isCursorIndex, isSearchIndex, isSelectedSearchIndex, isSelectIndex, Store } from '..';
 
 type Cell = { hex: 'hex'; text: 'text' };
 const CELL: Cell = { hex: 'hex', text: 'text' };
@@ -33,7 +33,6 @@ export const OFFSET_SETTING_VALUES: OffsetSettingValues = {
 
 export const getCellClasses = (
   store: Store,
-  refs: StoreRef,
   type: CellType,
   columnIndex: number,
   index: number,

@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { CellType, isAction, ReducerProps, Store, StoreRef } from '..';
+import { CellType, isAction, ReducerProps, Store } from '..';
 
 export type CellState = {
   cell: {
@@ -36,7 +36,7 @@ export const useCellReducer = () => {
 
   const initialRef = useMemo<CellRef>(() => ({}), []);
 
-  const cellMouseEnter = useCallback((store: Store, refs: StoreRef, payload: CellPayload): Store => {
+  const cellMouseEnter = useCallback((store: Store, payload: CellPayload): Store => {
     return {
       ...store,
       cell: {
@@ -48,7 +48,7 @@ export const useCellReducer = () => {
     };
   }, []);
 
-  const cellMouseDown = useCallback((store: Store, refs: StoreRef, payload: CellPayload): Store => {
+  const cellMouseDown = useCallback((store: Store, payload: CellPayload): Store => {
     return {
       ...store,
       cell: {
@@ -59,7 +59,7 @@ export const useCellReducer = () => {
     };
   }, []);
 
-  const bodyMouseLeave = useCallback((store: Store, refs: StoreRef, payload: CellPayload): Store => {
+  const bodyMouseLeave = useCallback((store: Store, payload: CellPayload): Store => {
     return {
       ...store,
       cell: {
@@ -70,7 +70,7 @@ export const useCellReducer = () => {
     };
   }, []);
 
-  const bodyMouseUp = useCallback((store: Store, refs: StoreRef, payload: CellPayload): Store => {
+  const bodyMouseUp = useCallback((store: Store, payload: CellPayload): Store => {
     return {
       ...store,
       cell: {
@@ -81,12 +81,12 @@ export const useCellReducer = () => {
   }, []);
 
   const reducer = useCallback(
-    ({ prevStore, nextStore, refs, action }: ReducerProps): Store => {
-      if (isAction.cellMouseEnter(action)) return cellMouseEnter(nextStore, refs, action.payload);
-      else if (isAction.cellMouseDown(action)) return cellMouseDown(nextStore, refs, action.payload);
-      else if (isAction.bodyMouseLeave(action)) return bodyMouseLeave(nextStore, refs, action.payload);
-      else if (isAction.bodyMouseUp(action)) return bodyMouseUp(nextStore, refs, action.payload);
-      return { ...nextStore };
+    ({ store, action }: ReducerProps): Store => {
+      if (isAction.cellMouseEnter(action)) return cellMouseEnter(store, action.payload);
+      else if (isAction.cellMouseDown(action)) return cellMouseDown(store, action.payload);
+      else if (isAction.bodyMouseLeave(action)) return bodyMouseLeave(store, action.payload);
+      else if (isAction.bodyMouseUp(action)) return bodyMouseUp(store, action.payload);
+      else return { ...store };
     },
     [bodyMouseLeave, bodyMouseUp, cellMouseDown, cellMouseEnter]
   );

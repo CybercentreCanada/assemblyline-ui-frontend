@@ -1,14 +1,5 @@
 import { useCallback } from 'react';
-import {
-  isAction,
-  isCellMouseDown,
-  ReducerProps,
-  renderIndexClass,
-  RenderProps,
-  Store,
-  StoreRef,
-  useCellStyles
-} from '..';
+import { isAction, isCellMouseDown, ReducerProps, renderIndexClass, RenderProps, Store, useCellStyles } from '..';
 
 export type HoverState = {
   hover: { index: number };
@@ -24,7 +15,7 @@ export const useHoverReducer = () => {
   const initialRef: HoverRef = {};
 
   const hoverRender = useCallback(
-    (prevStore: Store, nextStore: Store, refs: StoreRef): void => {
+    (prevStore: Store, nextStore: Store): void => {
       const { index: prevIndex } = prevStore.hover;
       const { index: nextIndex } = nextStore.hover;
       renderIndexClass(prevIndex, nextIndex, classes.hover, nextStore.cellsRendered);
@@ -32,26 +23,26 @@ export const useHoverReducer = () => {
     [classes.hover]
   );
 
-  const hoverMouseEnter = useCallback((store: Store, refs: StoreRef): Store => {
+  const hoverMouseEnter = useCallback((store: Store): Store => {
     return { ...store, hover: { ...store.hover, index: store.cell.mouseEnterIndex } };
   }, []);
 
-  const hoverMouseLeave = useCallback((store: Store, refs: StoreRef): Store => {
+  const hoverMouseLeave = useCallback((store: Store): Store => {
     return { ...store, hover: { ...store.hover, index: null } };
   }, []);
 
   const reducer = useCallback(
-    ({ prevStore, nextStore, refs, action }: ReducerProps): Store => {
-      if (isAction.cellMouseEnter(action) && !isCellMouseDown(nextStore)) return hoverMouseEnter(nextStore, refs);
-      else if (isAction.bodyMouseLeave(action)) return hoverMouseLeave(nextStore, refs);
-      else return { ...nextStore };
+    ({ store, action }: ReducerProps): Store => {
+      if (isAction.cellMouseEnter(action) && !isCellMouseDown(store)) return hoverMouseEnter(store);
+      else if (isAction.bodyMouseLeave(action)) return hoverMouseLeave(store);
+      else return { ...store };
     },
     [hoverMouseEnter, hoverMouseLeave]
   );
 
   const render = useCallback(
-    ({ prevStore, nextStore, refs }: RenderProps): void => {
-      if (prevStore.hover.index !== nextStore.hover.index) hoverRender(prevStore, nextStore, refs);
+    ({ prevStore, nextStore }: RenderProps): void => {
+      if (prevStore.hover.index !== nextStore.hover.index) hoverRender(prevStore, nextStore);
     },
     [hoverRender]
   );

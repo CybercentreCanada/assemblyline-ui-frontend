@@ -1,6 +1,6 @@
 import { isArrowDown, isArrowUp } from 'commons/addons/elements/utils/keyboard';
 import { useCallback, useMemo } from 'react';
-import { ActionProps, isAction, ReducerProps, SearchType, Store, StoreRef } from '..';
+import { ActionProps, isAction, ReducerProps, SearchType, Store } from '..';
 
 export type HistoryType = {
   type: SearchType;
@@ -35,7 +35,7 @@ export const useHistoryReducer = () => {
 
   const initialRef = useMemo<HistoryRef>(() => ({}), []);
 
-  const historyLoad = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
+  const historyLoad = useCallback((store: Store, { type, payload }: ActionProps): Store => {
     const value = localStorage.getItem(store.history.storageKey);
     const json = JSON.parse(value) as HistoryType[];
 
@@ -56,7 +56,7 @@ export const useHistoryReducer = () => {
     }
   }, []);
 
-  const historySave = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
+  const historySave = useCallback((store: Store, { type, payload }: ActionProps): Store => {
     localStorage.setItem(
       store.history.storageKey,
       JSON.stringify(
@@ -66,7 +66,7 @@ export const useHistoryReducer = () => {
     return { ...store };
   }, []);
 
-  const historyAddValue = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
+  const historyAddValue = useCallback((store: Store, { type, payload }: ActionProps): Store => {
     const { value: inputValue } = payload.event.target;
     const {
       cursor: { index: cursorIndex },
@@ -113,7 +113,7 @@ export const useHistoryReducer = () => {
     }
   }, []);
 
-  const historyIndexChange = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
+  const historyIndexChange = useCallback((store: Store, { type, payload }: ActionProps): Store => {
     const { key: keyCode } = payload.event;
 
     let newHistoryIndex = store.history.index;
@@ -142,24 +142,24 @@ export const useHistoryReducer = () => {
     }
   }, []);
 
-  const historyReset = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
+  const historyReset = useCallback((store: Store, { type, payload }: ActionProps): Store => {
     return { ...store, history: { ...store.history, index: 0 } };
   }, []);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const historyClear = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
+  const historyClear = useCallback((store: Store, { type, payload }: ActionProps): Store => {
     return { ...store, history: { ...store.history, index: 0, values: [{ type: store.search.type, value: '' }] } };
   }, []);
 
   const reducer = useCallback(
-    ({ prevStore, nextStore, refs, action }: ReducerProps): Store => {
-      if (isAction.appLoad(action)) return historyLoad(nextStore, refs, action);
-      else if (isAction.appSave(action)) return historySave(nextStore, refs, action);
-      else if (isAction.searchBarEnterKeyDown(action)) return historyAddValue(nextStore, refs, action);
-      else if (isAction.searchBarArrowKeyDown(action)) return historyIndexChange(nextStore, refs, action);
-      else if (isAction.searchBarEscapeKeyDown(action)) return historyReset(nextStore, refs, action);
-      else if (isAction.searchTypeChange(action)) return historyReset(nextStore, refs, action);
-      else return { ...nextStore };
+    ({ store, action }: ReducerProps): Store => {
+      if (isAction.appLoad(action)) return historyLoad(store, action);
+      else if (isAction.appSave(action)) return historySave(store, action);
+      else if (isAction.searchBarEnterKeyDown(action)) return historyAddValue(store, action);
+      else if (isAction.searchBarArrowKeyDown(action)) return historyIndexChange(store, action);
+      else if (isAction.searchBarEscapeKeyDown(action)) return historyReset(store, action);
+      else if (isAction.searchTypeChange(action)) return historyReset(store, action);
+      else return { ...store };
     },
     [historyAddValue, historyIndexChange, historyLoad, historyReset, historySave]
   );

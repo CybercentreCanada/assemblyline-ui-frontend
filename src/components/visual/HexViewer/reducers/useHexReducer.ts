@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { ActionProps, EncodingType, isAction, parseDataToHexcodeMap, ReducerProps, Store, StoreRef } from '..';
+import { ActionProps, EncodingType, isAction, parseDataToHexcodeMap, ReducerProps, Store } from '..';
 
 export type HexState = {
   hex: {
@@ -55,16 +55,16 @@ export const useHexReducer = () => {
 
   const initialRef = useMemo<HexRef>(() => ({}), []);
 
-  const hexDataChange = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
+  const hexDataChange = useCallback((store: Store, { type, payload }: ActionProps): Store => {
     store.hex.data = payload.data;
     store.hex.codes = parseDataToHexcodeMap(payload.data);
     return { ...store };
   }, []);
 
   const reducer = useCallback(
-    ({ prevStore, nextStore, refs, action }: ReducerProps): Store => {
-      if (isAction.appLoad(action)) return hexDataChange(nextStore, refs, action);
-      else return { ...nextStore };
+    ({ store, action }: ReducerProps): Store => {
+      if (isAction.appLoad(action)) return hexDataChange(store, action);
+      else return { ...store };
     },
     [hexDataChange]
   );

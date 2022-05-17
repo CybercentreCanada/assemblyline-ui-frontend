@@ -4,7 +4,7 @@ import OutlinedInput from '@material-ui/core/OutlinedInput';
 import ClearIcon from '@material-ui/icons/Clear';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { isEscapeKey, NumericField, StoreProps, TooltipIconButton, useDispatch, useReducer } from '../../..';
+import { isEscapeKey, NumericField, StoreProps, TooltipIconButton, useDispatch } from '../../..';
 
 const useHexStyles = makeStyles(theme => ({
   endAdornment: {
@@ -51,8 +51,6 @@ const useHexStyles = makeStyles(theme => ({
 export const WrappedTextBar = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);
   const classes = useHexStyles();
-
-  const { refs } = useReducer();
   const {
     onSearchClear,
     onSearchBarFocus,
@@ -104,7 +102,7 @@ export const WrappedTextBar = ({ store }: StoreProps) => {
           onKeyDown={event => {
             // console.dir({ event: 'onKeyDown', text: event.target.value });
             if (isEscapeKey(event)) setSearchValue('');
-            onSearchBarKeyDown(event, store, refs);
+            onSearchBarKeyDown(event, store);
           }}
           onPaste={event => {
             // console.log(event.clipboardData.getData('text'));

@@ -9,8 +9,7 @@ import {
   LAYOUT_SIZE,
   StoreProps,
   useCellStyles,
-  useDispatch,
-  useReducer
+  useDispatch
 } from '../..';
 
 const useHexStyles = makeStyles(theme => ({
@@ -44,7 +43,6 @@ export const WrappedHexCell = ({
 }: HexCellProps) => {
   const classes = useHexStyles();
   const cellClasses = useCellStyles();
-  const { refs } = useReducer();
   const { onCellMouseEnter, onCellMouseDown } = useDispatch();
 
   const { codes: hexcodes } = store.hex;
@@ -53,7 +51,7 @@ export const WrappedHexCell = ({
     <Tag
       id={Tag + '-' + index}
       data-index={index}
-      className={clsx('cell', classes.cell, style, getCellClasses(store, refs, type, columnIndex, index, cellClasses))}
+      className={clsx('cell', classes.cell, style, getCellClasses(store, type, columnIndex, index, cellClasses))}
       onMouseEnter={() => onCellMouseEnter({ index, type })}
       onMouseDown={() => onCellMouseDown({ index, type })}
       style={{ width: type === 'hex' ? LAYOUT_SIZE.hexWidth : LAYOUT_SIZE.textWidth }}

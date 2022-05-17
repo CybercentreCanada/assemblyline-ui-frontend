@@ -13,7 +13,6 @@ import {
   renderIndexClass,
   RenderProps,
   Store,
-  StoreRef,
   useCellStyles
 } from '..';
 
@@ -37,7 +36,7 @@ export const useCursorReducer = () => {
   const initialRef: CursorRef = {};
 
   const cursorRender = useCallback(
-    (prevStore: Store, nextStore: Store, refs: StoreRef): void => {
+    (prevStore: Store, nextStore: Store): void => {
       const { index: prevIndex } = prevStore.cursor;
       const { index: nextIndex } = nextStore.cursor;
       renderIndexClass(prevIndex, nextIndex, classes.cursor, nextStore.cellsRendered);
@@ -45,37 +44,37 @@ export const useCursorReducer = () => {
     [classes.cursor]
   );
 
-  const handleCursorIndex = useCallback((store: Store, refs: StoreRef, index: number): Store => {
+  const handleCursorIndex = useCallback((store: Store, index: number): Store => {
     if (index === null) return { ...store, cursor: { ...store.cursor, index: null } };
     const newCursorIndex = Math.min(Math.max(index, 0), store.hex.codes.size - 1);
     return { ...store, cursor: { ...store.cursor, index: newCursorIndex } };
   }, []);
 
   const cursorClear = useCallback(
-    (store: Store, refs: StoreRef): Store => {
-      return handleCursorIndex(store, refs, null);
+    (store: Store): Store => {
+      return handleCursorIndex(store, null);
     },
     [handleCursorIndex]
   );
 
   const cursorMouseUp = useCallback(
-    (store: Store, refs: StoreRef): Store => {
+    (store: Store): Store => {
       if (store.cell.mouseEnterIndex === null) return { ...store };
-      else if (!isSameCellClick(store)) return handleCursorIndex(store, refs, null);
-      else return handleCursorIndex(store, refs, store.cell.mouseEnterIndex);
+      else if (!isSameCellClick(store)) return handleCursorIndex(store, null);
+      else return handleCursorIndex(store, store.cell.mouseEnterIndex);
     },
     [handleCursorIndex]
   );
 
   const cursorIndexChange = useCallback(
-    (store: Store, refs: StoreRef, action: ActionProps): Store => {
-      return handleCursorIndex(store, refs, action.payload.index);
+    (store: Store, action: ActionProps): Store => {
+      return handleCursorIndex(store, action.payload.index);
     },
     [handleCursorIndex]
   );
 
   const cursorKeyDown = useCallback(
-    (store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
+    (store: Store, { type, payload }: ActionProps): Store => {
       if (isCursorNull(store)) return { ...store };
 
       const { key: keyCode } = payload.event;
@@ -91,35 +90,35 @@ export const useCursorReducer = () => {
       else if (isPageUp(keyCode)) newCursorIndex -= visibleStopIndex - visibleStartIndex;
       else if (isPageDown(keyCode)) newCursorIndex += visibleStopIndex - visibleStartIndex;
 
-      return handleCursorIndex(store, refs, newCursorIndex);
+      return handleCursorIndex(store, newCursorIndex);
     },
     [handleCursorIndex]
   );
 
   const cursorLocation = useCallback(
-    (store: Store, refs: StoreRef, action: ActionProps): Store => {
+    (store: Store, action: ActionProps): Store => {
       if (store.location.cursor === null) return { ...store };
-      else return handleCursorIndex(store, refs, store.location.cursor);
+      else return handleCursorIndex(store, store.location.cursor);
     },
     [handleCursorIndex]
   );
 
   const reducer = useCallback(
-    ({ prevStore, nextStore, refs, action }: ReducerProps): Store => {
-      if (isAction.bodyMouseUp(action)) return cursorMouseUp(nextStore, refs);
-      else if (isAction.cursorIndexChange(action)) return cursorIndexChange(nextStore, refs, action);
-      else if (isAction.appClickAway(action)) return cursorClear(nextStore, refs);
-      else if (isAction.cursorClear(action)) return cursorClear(nextStore, refs);
-      else if (isAction.cursorKeyDown(action)) return cursorKeyDown(nextStore, refs, action);
-      else if (isAction.appLocationInit(action)) return cursorLocation(nextStore, refs, action);
-      else return { ...nextStore };
+    ({ store, action }: ReducerProps): Store => {
+      if (isAction.bodyMouseUp(action)) return cursorMouseUp(store);
+      else if (isAction.cursorIndexChange(action)) return cursorIndexChange(store, action);
+      else if (isAction.appClickAway(action)) return cursorClear(store);
+      else if (isAction.cursorClear(action)) return cursorClear(store);
+      else if (isAction.cursorKeyDown(action)) return cursorKeyDown(store, action);
+      else if (isAction.appLocationInit(action)) return cursorLocation(store, action);
+      else return { ...store };
     },
     [cursorClear, cursorIndexChange, cursorKeyDown, cursorLocation, cursorMouseUp]
   );
 
   const render = useCallback(
-    ({ prevStore, nextStore, refs }: RenderProps): void => {
-      if (prevStore.cursor.index !== nextStore.cursor.index) cursorRender(prevStore, nextStore, refs);
+    ({ prevStore, nextStore }: RenderProps): void => {
+      if (prevStore.cursor.index !== nextStore.cursor.index) cursorRender(prevStore, nextStore);
     },
     [cursorRender]
   );

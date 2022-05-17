@@ -4,7 +4,7 @@ import OutlinedInput from '@material-ui/core/OutlinedInput';
 import ClearIcon from '@material-ui/icons/Clear';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { NumericField, StoreProps, TooltipIconButton, useDispatch, useReducer } from '../../..';
+import { NumericField, StoreProps, TooltipIconButton, useDispatch } from '../../..';
 
 const useHexStyles = makeStyles(theme => ({
   endAdornment: {
@@ -51,8 +51,6 @@ const useHexStyles = makeStyles(theme => ({
 export const WrappedHexcodeBar = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);
   const classes = useHexStyles();
-
-  const { refs } = useReducer();
   const {
     onSearchClear,
     onSearchBarFocus,
@@ -93,7 +91,7 @@ export const WrappedHexcodeBar = ({ store }: StoreProps) => {
             onSearchBarValueChange(event.target.value);
           }}
           onKeyDown={event => {
-            onSearchBarKeyDown(event, store, refs);
+            onSearchBarKeyDown(event, store);
           }}
         />
       </FormControl>

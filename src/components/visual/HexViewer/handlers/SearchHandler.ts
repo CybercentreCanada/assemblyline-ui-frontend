@@ -1,4 +1,4 @@
-import { Store, StoreRef } from '..';
+import { Store } from '..';
 
 type Search = { cursor: 'cursor'; hex: 'hex'; text: 'text' };
 const SEARCH: Search = { cursor: 'cursor', hex: 'hex', text: 'text' };
@@ -27,13 +27,11 @@ export const formatTextString = (value: string): string =>
 
 export const countHexcode = (value: string) => value.split(' ').filter(code => code !== '' && code.length === 2).length;
 
-export const filterSearchIndexes = (
-  {
-    search: { length, indexes, selectedIndex },
-    cellsRendered: { overscanStartIndex: firstIndex, overscanStopIndex: lastIndex }
-  }: Store,
-  ref: StoreRef
-): Array<number> => indexes.filter((index: number, i: number) => firstIndex <= index + length && index <= lastIndex);
+export const filterSearchIndexes = ({
+  search: { length, indexes, selectedIndex },
+  cellsRendered: { overscanStartIndex: firstIndex, overscanStopIndex: lastIndex }
+}: Store): Array<number> =>
+  indexes.filter((index: number, i: number) => firstIndex <= index + length && index <= lastIndex);
 
 export const isSearchIndex = (store: Store, index: number) =>
   store.search.indexes.findIndex(
@@ -107,7 +105,7 @@ export const clampSelectedSearchIndex = (store: Store, index: number): number =>
   else return index;
 };
 
-export const getSearchIndexes = (store: Store, refs: StoreRef): number[] => {
+export const getSearchIndexes = (store: Store): number[] => {
   const { indexes, length, selectedIndex } = store.search;
   const { overscanStartIndex: start, overscanStopIndex: stop } = store.cellsRendered;
   return indexes
@@ -116,7 +114,7 @@ export const getSearchIndexes = (store: Store, refs: StoreRef): number[] => {
     .flat(1);
 };
 
-export const getSelectedSearchIndexes = (store: Store, refs: StoreRef): number[] => {
+export const getSelectedSearchIndexes = (store: Store): number[] => {
   const start = store.search.indexes[store.search.selectedIndex];
   const end = start + store.search.length;
   return Array.from({ length: end - start }, (_, i) => i + start).filter(

@@ -1,4 +1,4 @@
-import { Store, StoreRef } from '..';
+import { Store } from '..';
 
 type Scroll = {
   top: 'top';
@@ -42,7 +42,7 @@ export const isOffsetClamped = (offsetIndex: number, scrollIndex: number, rowSiz
   return false;
 };
 
-export const scrollToTableIndex = (store: Store, refs: StoreRef, index: number, scrollType: ScrollType): Store => {
+export const scrollToTableIndex = (store: Store, index: number, scrollType: ScrollType): Store => {
   const {
     layout: {
       column: { size: columnSize },
@@ -82,19 +82,24 @@ export const scrollToTableIndex = (store: Store, refs: StoreRef, index: number, 
   return { ...store, scroll: { ...store.scroll, rowIndex: scrollIndex } };
 };
 
-export const scrollToWindowIndex = (store: Store, refs: StoreRef, index: number, location: ScrollType): void => {
+export const scrollToWindowIndex = (
+  store: Store,
+  listRef: React.MutableRefObject<any>,
+  index: number,
+  location: ScrollType
+): void => {
   setTimeout(() => {
     const scrollIndex = Math.floor(index / store.layout.column.size);
-    if (isScroll.top(location)) refs?.current?.layout.listRef?.current?.scrollToItem(scrollIndex, 'start');
-    else if (isScroll.middle(location)) refs?.current?.layout.listRef?.current?.scrollToItem(scrollIndex, 'center');
-    else if (isScroll.bottom(location)) refs?.current?.layout.listRef?.current?.scrollToItem(scrollIndex, 'end');
-    else if (isScroll.include(location)) refs?.current?.layout.listRef?.current?.scrollToItem(scrollIndex, 'auto');
+    if (isScroll.top(location)) listRef?.current?.scrollToItem(scrollIndex, 'start');
+    else if (isScroll.middle(location)) listRef?.current?.scrollToItem(scrollIndex, 'center');
+    else if (isScroll.bottom(location)) listRef?.current?.scrollToItem(scrollIndex, 'end');
+    else if (isScroll.include(location)) listRef?.current?.scrollToItem(scrollIndex, 'auto');
     else if (
       isScroll.includeMiddle(location) &&
       (index < store.cellsRendered.visibleStartIndex || store.cellsRendered.visibleStopIndex < index)
     )
-      refs?.current?.layout.listRef?.current?.scrollToItem(scrollIndex, 'center');
-    else if (isScroll.smart(location)) refs?.current?.layout.listRef?.current?.scrollToItem(scrollIndex, 'smart');
+      listRef?.current?.scrollToItem(scrollIndex, 'center');
+    else if (isScroll.smart(location)) listRef?.current?.scrollToItem(scrollIndex, 'smart');
   }, 1);
 };
 

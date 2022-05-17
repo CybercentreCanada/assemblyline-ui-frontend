@@ -1,5 +1,4 @@
-import { MutableRefObject } from 'react';
-import { LayoutRef, Store } from '..';
+import { Store } from '..';
 
 export type LayoutSize = {
   windowHeight: number;
@@ -40,8 +39,8 @@ export const handleLayoutColumnResize = (width: number) => COLUMNS.find(e => wid
 
 export const handleLayoutRowResize = (height: number) => Math.floor(height / LAYOUT_SIZE.rowHeight);
 
-export const listRefExist = (refs: MutableRefObject<LayoutRef>) =>
-  !(refs.current.layout.listRef === null || refs.current.layout.listRef?.current === null);
+// export const listRefExist = (refs: MutableRefObject<LayoutRef>) =>
+//   !(refs.current.layout.listRef === null || refs.current.layout.listRef?.current === null);
 
 // Focus
 type Focus = { none: 'none'; toolbar: 'toolbar'; body: 'body' };

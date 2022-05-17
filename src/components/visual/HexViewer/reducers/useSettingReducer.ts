@@ -8,8 +8,7 @@ import {
   isAction,
   LOWER_ENCODING_SETTING_VALUES,
   ReducerProps,
-  Store,
-  StoreRef
+  Store
 } from '..';
 
 export type SettingState = {
@@ -84,7 +83,7 @@ export const useSettingReducer = () => {
 
   const initialRef: SettingRef = {};
 
-  const handleSaveLocalStorage = useCallback((store: Store, refs: StoreRef): void => {
+  const handleSaveLocalStorage = useCallback((store: Store): void => {
     localStorage.setItem(
       store.setting.storageKey,
       JSON.stringify({
@@ -106,7 +105,7 @@ export const useSettingReducer = () => {
     );
   }, []);
 
-  const settingLoad = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
+  const settingLoad = useCallback((store: Store, { type, payload }: ActionProps): Store => {
     const value = localStorage.getItem(store.setting.storageKey);
     const json = JSON.parse(value) as any;
 
@@ -136,7 +135,7 @@ export const useSettingReducer = () => {
   }, []);
 
   const settingSave = useCallback(
-    (store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
+    (store: Store, { type, payload }: ActionProps): Store => {
       const newBodyType: BodyType = BODY_TYPE_SETTING_VALUES.en.find(e => e.value === store.setting.bodyType).type;
       const newLowerEncoding: EncodingType = LOWER_ENCODING_SETTING_VALUES.en.find(
         e => e.value === store.setting.hex.lower.encoding
@@ -165,14 +164,14 @@ export const useSettingReducer = () => {
         }
       };
 
-      handleSaveLocalStorage(newStore, refs);
+      handleSaveLocalStorage(newStore);
 
       return newStore;
     },
     [handleSaveLocalStorage]
   );
 
-  const settingOpen = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
+  const settingOpen = useCallback((store: Store, { type, payload }: ActionProps): Store => {
     return {
       ...store,
       setting: {
@@ -198,18 +197,18 @@ export const useSettingReducer = () => {
     };
   }, []);
 
-  const settingClose = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
+  const settingClose = useCallback((store: Store, { type, payload }: ActionProps): Store => {
     return { ...store, setting: { ...store.setting, open: false } };
   }, []);
 
-  const settingOffsetBaseChange = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
+  const settingOffsetBaseChange = useCallback((store: Store, { type, payload }: ActionProps): Store => {
     return {
       ...store,
       setting: { ...store.setting, offsetBase: payload.event.target.value }
     };
   }, []);
 
-  const settingAutoColumnChange = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
+  const settingAutoColumnChange = useCallback((store: Store, { type, payload }: ActionProps): Store => {
     return {
       ...store,
       setting: {
@@ -223,7 +222,7 @@ export const useSettingReducer = () => {
     };
   }, []);
 
-  const settingColumnChange = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
+  const settingColumnChange = useCallback((store: Store, { type, payload }: ActionProps): Store => {
     return {
       ...store,
       setting: {
@@ -233,7 +232,7 @@ export const useSettingReducer = () => {
     };
   }, []);
 
-  const settingBodyChange = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
+  const settingBodyChange = useCallback((store: Store, { type, payload }: ActionProps): Store => {
     return {
       ...store,
       setting: {
@@ -243,7 +242,7 @@ export const useSettingReducer = () => {
     };
   }, []);
 
-  const settingEncodingChange = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
+  const settingEncodingChange = useCallback((store: Store, { type, payload }: ActionProps): Store => {
     return {
       ...store,
       setting: {
@@ -263,7 +262,7 @@ export const useSettingReducer = () => {
     };
   }, []);
 
-  const settingHexCharChange = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
+  const settingHexCharChange = useCallback((store: Store, { type, payload }: ActionProps): Store => {
     return {
       ...store,
       setting: {
@@ -302,20 +301,20 @@ export const useSettingReducer = () => {
   }, []);
 
   const reducer = useCallback(
-    ({ prevStore, nextStore, refs, action }: ReducerProps): Store => {
+    ({ prevStore, store, action }: ReducerProps): Store => {
       // Load and Save only when open
-      if (isAction.appLoad(action)) return settingLoad(nextStore, refs, action);
-      else if (isAction.settingLoad(action)) return settingLoad(nextStore, refs, action);
-      else if (isAction.settingSave(action)) return settingSave(nextStore, refs, action);
-      else if (isAction.settingOpen(action)) return settingOpen(nextStore, refs, action);
-      else if (isAction.settingClose(action)) return settingClose(nextStore, refs, action);
-      else if (isAction.settingBodyTypeChange(action)) return settingBodyChange(nextStore, refs, action);
-      else if (isAction.settingOffsetBaseChange(action)) return settingOffsetBaseChange(nextStore, refs, action);
-      else if (isAction.settingAutoColumnChange(action)) return settingAutoColumnChange(nextStore, refs, action);
-      else if (isAction.settingColumnChange(action)) return settingColumnChange(nextStore, refs, action);
-      else if (isAction.settingEncodingChange(action)) return settingEncodingChange(nextStore, refs, action);
-      else if (isAction.settingHexCharChange(action)) return settingHexCharChange(nextStore, refs, action);
-      else return { ...nextStore };
+      if (isAction.appLoad(action)) return settingLoad(store, action);
+      else if (isAction.settingLoad(action)) return settingLoad(store, action);
+      else if (isAction.settingSave(action)) return settingSave(store, action);
+      else if (isAction.settingOpen(action)) return settingOpen(store, action);
+      else if (isAction.settingClose(action)) return settingClose(store, action);
+      else if (isAction.settingBodyTypeChange(action)) return settingBodyChange(store, action);
+      else if (isAction.settingOffsetBaseChange(action)) return settingOffsetBaseChange(store, action);
+      else if (isAction.settingAutoColumnChange(action)) return settingAutoColumnChange(store, action);
+      else if (isAction.settingColumnChange(action)) return settingColumnChange(store, action);
+      else if (isAction.settingEncodingChange(action)) return settingEncodingChange(store, action);
+      else if (isAction.settingHexCharChange(action)) return settingHexCharChange(store, action);
+      else return { ...store };
     },
     [
       settingAutoColumnChange,

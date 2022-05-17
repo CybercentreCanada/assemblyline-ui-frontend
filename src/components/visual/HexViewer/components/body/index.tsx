@@ -7,10 +7,10 @@ import {
   HexRow,
   HexScrollBar,
   LAYOUT_SIZE,
+  scrollToWindowIndex,
   StoreProps,
   useDispatch,
   useEventListener,
-  useReducer,
   useStore,
   WindowRow
 } from '../..';
@@ -56,7 +56,6 @@ const useHexStyles = makeStyles(theme => ({
 
 const HexTableBody = memo(({ store }: StoreProps) => {
   const classes = useHexStyles();
-  const { refs } = useReducer();
   const {
     onBodyInit,
     onBodyResize,
@@ -77,14 +76,14 @@ const HexTableBody = memo(({ store }: StoreProps) => {
     return () => {
       onBodyInit(false);
     };
-  }, [onBodyInit, refs]);
+  }, [onBodyInit]);
 
   React.useEffect(() => {
     if (store.initialized) {
       dispatch({ type: ACTIONS.bodyResize, payload: bodyRef.current.getBoundingClientRect() });
     }
     /* eslint-disable react-hooks/exhaustive-deps */
-  }, [dispatch, refs, store.initialized]);
+  }, [dispatch, store.initialized]);
 
   useEventListener('resize', () => onBodyResize(bodyRef?.current?.getBoundingClientRect()));
   useEventListener('keydown', (e: KeyboardEvent) => onBodyKeyDown(e, store));
@@ -127,7 +126,6 @@ const HexTableBody = memo(({ store }: StoreProps) => {
 
 const HexWindowBody = memo(({ store }: StoreProps) => {
   const classes = useHexStyles();
-  const { refs } = useReducer();
   const { onBodyInit, onBodyResize, onBodyItemsRendered, onBodyKeyDown, onBodyMouseUp } = useDispatch();
   const { dispatch } = useStore();
 
@@ -135,30 +133,32 @@ const HexWindowBody = memo(({ store }: StoreProps) => {
   const bodyRef = React.useRef<HTMLDivElement>(null);
 
   React.useLayoutEffect(() => {
-    refs.current.layout.listRef = listRef;
-
     onBodyInit(true);
     return () => {
       onBodyInit(false);
     };
-  }, [onBodyInit, refs]);
+  }, [onBodyInit]);
 
   React.useEffect(() => {
     if (store.initialized) {
       dispatch({ type: ACTIONS.bodyResize, payload: bodyRef.current.getBoundingClientRect() });
       listRef?.current?.scrollToItem(store.scroll.rowIndex, 'top');
     }
-  }, [dispatch, refs, store.initialized]);
+  }, [dispatch, store.initialized]);
 
   useEventListener('keydown', (e: KeyboardEvent) => onBodyKeyDown(e, store));
   useEventListener('mouseup', (e: MouseEvent) => onBodyMouseUp(e, store));
+
+  React.useEffect(() => {
+    if (store.initialized) scrollToWindowIndex(store, listRef, store.scroll.index, store.scroll.type);
+  }, [dispatch, store.initialized, store.scroll.index, store.scroll.rowIndex, store.scroll.type]);
 
   const Row = React.useMemo(
     () =>
       ({ index, style, data }) =>
         store.initialized ? <WindowRow key={index} rowIndex={index} style={style} Tag={data.Tag} /> : <></>,
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [store.layout.column.size, store.scroll.index]
+    [store.layout.column.size]
   );
 
   return (
@@ -215,6 +215,7 @@ export const HexBody = memo(
     prevProps.store.scroll.rowIndex === nextProps.store.scroll.rowIndex &&
     prevProps.store.scroll.maxRowIndex === nextProps.store.scroll.maxRowIndex &&
     prevProps.store.scroll.speed === nextProps.store.scroll.speed &&
+    prevProps.store.scroll.type === nextProps.store.scroll.type &&
     prevProps.store.select.isHighlighting === nextProps.store.select.isHighlighting
 );
 

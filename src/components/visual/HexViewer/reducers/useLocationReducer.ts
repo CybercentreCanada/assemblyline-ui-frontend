@@ -12,8 +12,7 @@ import {
   parseStringToHexString,
   ReducerProps,
   SearchType,
-  Store,
-  StoreRef
+  Store
 } from '..';
 
 export type LocationState = {
@@ -66,31 +65,31 @@ export const useLocationReducer = () => {
 
   const query = React.useRef<SimpleSearchQuery>(new SimpleSearchQuery(window.location.search, ''));
 
-  const getScrollIndex = useCallback((store: Store, refs: StoreRef, location: LocationQuery): Store => {
+  const getScrollIndex = useCallback((store: Store,   location: LocationQuery): Store => {
     if (!location.hasOwnProperty('scroll')) return { ...store };
     else return { ...store, location: { ...store.location, scroll: parseInt(location.scroll) } };
   }, []);
 
-  const getCursorIndex = useCallback((store: Store, refs: StoreRef, location: LocationQuery): Store => {
+  const getCursorIndex = useCallback((store: Store,   location: LocationQuery): Store => {
     if (!location.hasOwnProperty('cursor')) return { ...store };
     else return { ...store, location: { ...store.location, cursor: parseInt(location.cursor) } };
   }, []);
 
-  const getSelectIndexes = useCallback((store: Store, refs: StoreRef, location: LocationQuery): Store => {
+  const getSelectIndexes = useCallback((store: Store,   location: LocationQuery): Store => {
     if (!location.hasOwnProperty('selectStart') || !location.hasOwnProperty('selectEnd')) return { ...store };
     const selectStart = parseInt(location.selectStart);
     const selectEnd = parseInt(location.selectEnd);
     return { ...store, location: { ...store.location, selectStart, selectEnd } };
   }, []);
 
-  const getSearchType = useCallback((store: Store, refs: StoreRef, location: LocationQuery): Store => {
+  const getSearchType = useCallback((store: Store,   location: LocationQuery): Store => {
     if (!location.hasOwnProperty('searchType')) return { ...store };
     else if (location.searchType !== 'cursor' && location.searchType !== 'hex' && location.searchType !== 'text')
       return { ...store };
     else return { ...store, location: { ...store.location, searchType: location.searchType } };
   }, []);
 
-  const getSearchValue = useCallback((store: Store, refs: StoreRef, location: LocationQuery): Store => {
+  const getSearchValue = useCallback((store: Store,   location: LocationQuery): Store => {
     if (!location.hasOwnProperty('searchValue')) return { ...store };
     else if (store.location.searchType === null) return { ...store };
     else if (store.location.searchType === 'hex' && isHexString(location.searchValue))
@@ -103,7 +102,7 @@ export const useLocationReducer = () => {
     else return { ...store };
   }, []);
 
-  const getSearchIndex = useCallback((store: Store, refs: StoreRef, location: LocationQuery): Store => {
+  const getSearchIndex = useCallback((store: Store,   location: LocationQuery): Store => {
     if (!location.hasOwnProperty('searchIndex')) return { ...store };
     else if (store.location.searchType === null || store.location.searchValue === null) return { ...store };
     else
@@ -114,7 +113,7 @@ export const useLocationReducer = () => {
   }, []);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const searchQuery = useCallback((store: Store, refs: StoreRef, location: LocationQuery): Store => {
+  const searchQuery = useCallback((store: Store,   location: LocationQuery): Store => {
     let searchType = location.hasOwnProperty('searchType') ? (location.searchType as SearchType) : null;
     searchType =
       searchType === 'cursor'
@@ -137,7 +136,7 @@ export const useLocationReducer = () => {
   }, []);
 
   const locationShare = useCallback(
-    (store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
+    (store: Store,   { type, payload }: ActionProps): Store => {
       query.current.deleteAll();
 
       if (store.scroll.index !== null) {
@@ -165,31 +164,31 @@ export const useLocationReducer = () => {
   );
 
   const locationInit = useCallback(
-    (store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
+    (store: Store,   { type, payload }: ActionProps): Store => {
       query.current = new SimpleSearchQuery(window.location.search, '');
       const params: LocationQuery = query.current.getParams();
-      store = getScrollIndex(store, refs, params);
-      store = getCursorIndex(store, refs, params);
-      store = getSelectIndexes(store, refs, params);
-      store = getSearchType(store, refs, params);
-      store = getSearchValue(store, refs, params);
-      store = getSearchIndex(store, refs, params);
+      store = getScrollIndex(store,  params);
+      store = getCursorIndex(store,  params);
+      store = getSelectIndexes(store,  params);
+      store = getSearchType(store,  params);
+      store = getSearchValue(store,  params);
+      store = getSearchIndex(store,  params);
       store = { ...store, location: { ...store.location, loaded: true } };
       return { ...store };
     },
     [getCursorIndex, getScrollIndex, getSearchIndex, getSearchType, getSearchValue, getSelectIndexes]
   );
 
-  const locationLoaded = useCallback((store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
+  const locationLoaded = useCallback((store: Store,   { type, payload }: ActionProps): Store => {
     return { ...store, location: { ...store.location, loaded: true } };
   }, []);
 
   const reducer = useCallback(
-    ({ prevStore, nextStore, refs, action }: ReducerProps): Store => {
-      if (isAction.appLocationInit(action)) return locationInit(nextStore, refs, action);
-      else if (isAction.locationLoaded(action)) return locationLoaded(nextStore, refs, action);
-      else if (isAction.locationShare(action)) return locationShare(nextStore, refs, action);
-      else return { ...nextStore };
+    ({   store, action }: ReducerProps): Store => {
+      if (isAction.appLocationInit(action)) return locationInit( store, action);
+      else if (isAction.locationLoaded(action)) return locationLoaded( store, action);
+      else if (isAction.locationShare(action)) return locationShare( store, action);
+      else return { ...store };
     },
     [locationInit, locationLoaded, locationShare]
   );

@@ -16,7 +16,6 @@ import {
   RenderProps,
   SearchType,
   Store,
-  StoreRef,
   useCellStyles
 } from '..';
 
@@ -50,24 +49,24 @@ export const useSearchReducer = () => {
   const initialRef: SearchRef = {};
 
   const searchRender = useCallback(
-    (prevStore: Store, nextStore: Store, refs: StoreRef): void => {
-      const prev = getSearchIndexes(prevStore, refs);
-      const next = getSearchIndexes(nextStore, refs);
+    (prevStore: Store, nextStore: Store): void => {
+      const prev = getSearchIndexes(prevStore);
+      const next = getSearchIndexes(nextStore);
       renderArrayClass(prev, next, classes.search, nextStore.cellsRendered);
     },
     [classes]
   );
 
   const selectedSearchRender = useCallback(
-    (prevStore: Store, nextStore: Store, refs: StoreRef): void => {
-      const prev = getSelectedSearchIndexes(prevStore, refs);
-      const next = getSelectedSearchIndexes(nextStore, refs);
+    (prevStore: Store, nextStore: Store): void => {
+      const prev = getSelectedSearchIndexes(prevStore);
+      const next = getSelectedSearchIndexes(nextStore);
       renderArrayClass(prev, next, classes.selectedSearch, nextStore.cellsRendered);
     },
     [classes]
   );
 
-  const handleSearchInputValueChange = useCallback((store: Store, refs: StoreRef, inputValue: string): Store => {
+  const handleSearchInputValueChange = useCallback((store: Store, inputValue: string): Store => {
     let value = inputValue,
       length = 0,
       indexes = [],
@@ -95,78 +94,78 @@ export const useSearchReducer = () => {
     };
   }, []);
 
-  const searchClear = useCallback((store: Store, refs: StoreRef): Store => {
+  const searchClear = useCallback((store: Store): Store => {
     return { ...store, search: { ...store.search, value: '', inputValue: '', indexes: [], selectedIndex: null } };
   }, []);
 
   const searchTypeChange = useCallback(
-    (store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
-      const newStore = searchClear(store, refs);
+    (store: Store, { type, payload }: ActionProps): Store => {
+      const newStore = searchClear(store);
       return { ...newStore, search: { ...newStore.search, type: payload.type } };
     },
     [searchClear]
   );
 
   const searchInputValueChange = useCallback(
-    (store: Store, refs: StoreRef, { type, payload: { inputValue } }: ActionProps): Store => {
-      if (inputValue === null || inputValue === '') return searchClear(store, refs);
-      else return handleSearchInputValueChange(store, refs, inputValue);
+    (store: Store, { type, payload: { inputValue } }: ActionProps): Store => {
+      if (inputValue === null || inputValue === '') return searchClear(store);
+      else return handleSearchInputValueChange(store, inputValue);
     },
     [handleSearchInputValueChange, searchClear]
   );
 
-  const selectedSearchIndexChange = useCallback((store: Store, refs: StoreRef, index: number): Store => {
+  const selectedSearchIndexChange = useCallback((store: Store, index: number): Store => {
     return { ...store, search: { ...store.search, selectedIndex: clampSelectedSearchIndex(store, index) } };
   }, []);
 
   const searchEnterKeyDown = useCallback(
-    (store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
+    (store: Store, { type, payload }: ActionProps): Store => {
       if (payload.event.shiftKey === undefined || payload.event.shiftKey === null) return { ...store };
-      else if (payload.event.shiftKey) return selectedSearchIndexChange(store, refs, store.search.selectedIndex - 1);
-      else return selectedSearchIndexChange(store, refs, store.search.selectedIndex + 1);
+      else if (payload.event.shiftKey) return selectedSearchIndexChange(store, store.search.selectedIndex - 1);
+      else return selectedSearchIndexChange(store, store.search.selectedIndex + 1);
     },
     [selectedSearchIndexChange]
   );
 
   const searchWheel = useCallback(
-    (store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
+    (store: Store, { type, payload }: ActionProps): Store => {
       if (payload.event.deltaY === undefined || payload.event.deltaY === null) return { ...store };
-      else if (payload.event.deltaY > 0) return selectedSearchIndexChange(store, refs, store.search.selectedIndex + 1);
-      else return selectedSearchIndexChange(store, refs, store.search.selectedIndex - 1);
+      else if (payload.event.deltaY > 0) return selectedSearchIndexChange(store, store.search.selectedIndex + 1);
+      else return selectedSearchIndexChange(store, store.search.selectedIndex - 1);
     },
     [selectedSearchIndexChange]
   );
 
   const searchLocation = useCallback(
-    (store: Store, refs: StoreRef, { type, payload }: ActionProps): Store => {
+    (store: Store, { type, payload }: ActionProps): Store => {
       if (store.location.searchType === null) return { ...store };
       store = { ...store, search: { ...store.search, type: store.location.searchType } };
       if (store.location.searchValue === null) return { ...store };
-      store = handleSearchInputValueChange(store, refs, store.location.searchValue);
+      store = handleSearchInputValueChange(store, store.location.searchValue);
       if (store.location.searchIndex === null) return { ...store };
-      store = selectedSearchIndexChange(store, refs, store.location.searchIndex);
+      store = selectedSearchIndexChange(store, store.location.searchIndex);
       return { ...store };
     },
     [handleSearchInputValueChange, selectedSearchIndexChange]
   );
 
   const reducer = useCallback(
-    ({ prevStore, nextStore, refs, action }: ReducerProps): Store => {
-      if (isAction.searchBarValueChange(action)) return searchInputValueChange(nextStore, refs, action);
-      else if (isAction.searchTypeChange(action)) return searchTypeChange(nextStore, refs, action);
-      else if (isAction.searchBarEnterKeyDown(action)) return searchEnterKeyDown(nextStore, refs, action);
-      else if (isAction.searchBarEscapeKeyDown(action)) return searchClear(nextStore, refs);
-      else if (isAction.searchClear(action)) return searchClear(nextStore, refs);
+    ({ prevStore, store, action }: ReducerProps): Store => {
+      if (isAction.searchBarValueChange(action)) return searchInputValueChange(store, action);
+      else if (isAction.searchTypeChange(action)) return searchTypeChange(store, action);
+      else if (isAction.searchBarEnterKeyDown(action)) return searchEnterKeyDown(store, action);
+      else if (isAction.searchBarEscapeKeyDown(action)) return searchClear(store);
+      else if (isAction.searchClear(action)) return searchClear(store);
       else if (isAction.selectedSearchIndexChange(action))
-        return selectedSearchIndexChange(nextStore, refs, action.payload.index);
-      else if (isAction.searchBarWheel(action)) return searchWheel(nextStore, refs, action);
-      else if (prevStore.search.inputValue !== nextStore.search.inputValue)
-        return searchInputValueChange(nextStore, refs, {
+        return selectedSearchIndexChange(store, action.payload.index);
+      else if (isAction.searchBarWheel(action)) return searchWheel(store, action);
+      else if (prevStore.search.inputValue !== store.search.inputValue)
+        return searchInputValueChange(store, {
           type: action.type,
-          payload: { inputValue: nextStore.search.inputValue }
+          payload: { inputValue: store.search.inputValue }
         });
-      else if (isAction.appLocationInit(action)) return searchLocation(nextStore, refs, action);
-      else return { ...nextStore };
+      else if (isAction.appLocationInit(action)) return searchLocation(store, action);
+      else return { ...store };
     },
     [
       searchClear,
@@ -180,10 +179,10 @@ export const useSearchReducer = () => {
   );
 
   const render = useCallback(
-    ({ prevStore, nextStore, refs }: RenderProps): void => {
+    ({ prevStore, nextStore }: RenderProps): void => {
       if (!Object.is(prevStore.search, nextStore.search)) {
-        searchRender(prevStore, nextStore, refs);
-        selectedSearchRender(prevStore, nextStore, refs);
+        searchRender(prevStore, nextStore);
+        selectedSearchRender(prevStore, nextStore);
       }
     },
     [searchRender, selectedSearchRender]

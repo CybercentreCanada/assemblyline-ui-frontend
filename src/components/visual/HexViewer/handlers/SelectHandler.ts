@@ -1,5 +1,5 @@
 import { addClassToRange, removeClassToRange } from '.';
-import { Store, StoreRef } from '..';
+import { Store } from '..';
 
 export const orderSelectIndexes = (startIndex: number, endIndex: number): { startIndex: number; endIndex: number } => ({
   startIndex: Math.min(startIndex, endIndex),
@@ -9,7 +9,7 @@ export const orderSelectIndexes = (startIndex: number, endIndex: number): { star
 export const isSelectIndex = (store: Store, index: number) =>
   store.select.startIndex <= index && index <= store.select.endIndex;
 
-export const getSelectIndexes = (store: Store, refs: StoreRef): number[] =>
+export const getSelectIndexes = (store: Store): number[] =>
   Array.from(
     { length: store.select.endIndex - store.select.startIndex + 1 },
     (_, i) => i + store.select.startIndex

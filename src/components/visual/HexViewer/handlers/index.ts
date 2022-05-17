@@ -9,4 +9,3 @@ export * from './ScrollHandler';
 export * from './SearchHandler';
 export * from './SelectHandler';
 export * from './StyleHandler';
-export * from './SuggestionHandler';

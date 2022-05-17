@@ -2,7 +2,7 @@ import { makeStyles } from '@material-ui/core';
 import ClearIcon from '@material-ui/icons/Clear';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { NumericField, StoreProps, TooltipIconButton, useDispatch, useReducer } from '../../..';
+import { NumericField, StoreProps, TooltipIconButton, useDispatch } from '../../..';
 
 const useHexStyles = makeStyles(theme => ({
   root: {
@@ -28,8 +28,6 @@ const useHexStyles = makeStyles(theme => ({
 export const WrappedHexCursorBar = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);
   const classes = useHexStyles();
-
-  const { refs } = useReducer();
   const { onCursorIndexChange, onCursorClear, onSearchBarFocus, onSearchBarKeyDown } = useDispatch();
 
   const {
@@ -61,7 +59,7 @@ export const WrappedHexCursorBar = ({ store }: StoreProps) => {
         }
         onFocus={() => onSearchBarFocus()}
         onChange={event => onCursorIndexChange(event.target.valueAsNumber as number)}
-        onKeyDown={event => onSearchBarKeyDown(event, store, refs)}
+        onKeyDown={event => onSearchBarKeyDown(event, store)}
       />
       <TooltipIconButton
         classes={{ iconButton: classes.iconButton }}

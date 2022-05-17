@@ -1,5 +1,5 @@
 import { KeyboardEvent, useCallback, WheelEvent } from 'react';
-import { ACTIONS, DispatchProp, isEnterKey, isEscapeKey, isFocus, isUpDownKey, SearchType, Store, StoreRef } from '..';
+import { ACTIONS, DispatchProp, isEnterKey, isEscapeKey, isFocus, isUpDownKey, SearchType, Store } from '..';
 
 export type ToolbarActions = {
   searchBarFocus: 'SEARCH_BAR_FOCUS_ACTION';
@@ -59,13 +59,13 @@ export type ToolbarActionProps = {
   onSearchClear: () => void;
   onLocationShare: () => void;
   onLocationLoaded: () => void;
-  onSearchBarKeyDown: (event: KeyboardEvent<HTMLDivElement> | any, store: Store, refs: StoreRef) => void;
+  onSearchBarKeyDown: (event: KeyboardEvent<HTMLDivElement> | any, store: Store) => void;
   onFullscreenToggle: () => void;
 };
 
 export const useToolbarAction = (dispatch: DispatchProp): ToolbarActionProps => {
   const onSearchBarKeyDown = useCallback(
-    (event: KeyboardEvent<HTMLDivElement> | any, store: Store, refs: StoreRef) => {
+    (event: KeyboardEvent<HTMLDivElement> | any, store: Store) => {
       if (!isFocus.toolbar(store) || !(isEnterKey(event) || isUpDownKey(event) || isEscapeKey(event))) return;
       event.preventDefault();
 

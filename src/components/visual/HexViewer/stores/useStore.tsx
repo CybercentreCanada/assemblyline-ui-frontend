@@ -14,9 +14,6 @@ import {
   SearchState,
   SelectState,
   SettingState,
-  StyleState,
-  SuggestionState,
-  TranslationState,
   useDispatch,
   useReducer
 } from '..';
@@ -34,10 +31,7 @@ export type Store = CellState &
   ScrollState &
   SearchState &
   SelectState &
-  SettingState &
-  StyleState &
-  SuggestionState &
-  TranslationState;
+  SettingState;
 
 export type ActionProps = {
   type: ActionTypes | string;
