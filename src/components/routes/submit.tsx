@@ -118,7 +118,7 @@ function Submit() {
     } else if (cbType === 'file') {
       // No external service and file submitted
       uploadAndScan();
-    } else {
+    } else if (cbType === 'urlHash'){
       // No external service and url/SHA256 submitted
       analyseUrlHash();
     }
@@ -276,7 +276,7 @@ function Submit() {
     const urlParseRE =
     /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/;
     const url_matches = urlParseRE.exec(urlHash);
-    const sha256ParseRE = /^[a-f0-9]{64}$/;
+    const sha256ParseRE = /^[a-fA-F0-9]{64}$/;
 
     let err_msg = t('submit.unknown.failure');
     let data = {ui_params: settings};
@@ -446,7 +446,7 @@ function Submit() {
                   disabled={!urlHash || !allowClick}
                   color="primary"
                   variant="contained"
-                  onClick={() => validateServiceSelection('sha256')}
+                  onClick={() => validateServiceSelection('urlHash')}
                 >
                   {t('urlHash.button')}
                 </Button>
