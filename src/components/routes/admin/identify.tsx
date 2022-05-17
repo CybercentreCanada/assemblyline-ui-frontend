@@ -6,6 +6,9 @@ import {
   DialogTitle,
   Grid,
   makeStyles,
+  Paper,
+  Tab,
+  Tabs,
   Typography,
   useTheme
 } from '@material-ui/core';
@@ -278,20 +281,18 @@ const yaraConfig = {
   ]
 };
 
-function Yara() {
+function Yara({ reload, yaraFile, originalYaraFile, setYaraFile }) {
   const { t, i18n } = useTranslation(['adminIdentify']);
   const theme = useTheme();
   const containerEL = useRef<HTMLDivElement>();
   const containerDialogEL = useRef<HTMLDivElement>();
-  const [yaraFile, setYaraFile] = useState(null);
-  const [originalYaraFile, setOriginalYaraFile] = useState(null);
   const [open, setOpen] = useState(false);
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
   const { isDarkTheme } = useAppContext();
 
   useEffect(() => {
-    reload();
+    if (!yaraFile) reload();
     // I cannot find a way to hot switch monaco editor's locale but at least I can load
     // the right language on first load...
     if (i18n.language === 'fr') {
@@ -301,17 +302,6 @@ function Yara() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const reload = () => {
-    apiCall({
-      method: 'GET',
-      url: '/api/v4/system/identify/yara/',
-      onSuccess: api_data => {
-        setYaraFile(api_data.api_response);
-        setOriginalYaraFile(api_data.api_response);
-      }
-    });
-  };
 
   const saveChanges = tagData => {
     setOpen(false);
@@ -443,20 +433,18 @@ function Yara() {
   );
 }
 
-function LibMagic() {
+function LibMagic({ reload, magicFile, originalMagicFile, setMagicFile }) {
   const { t, i18n } = useTranslation(['adminIdentify']);
   const theme = useTheme();
   const containerEL = useRef<HTMLDivElement>();
   const containerDialogEL = useRef<HTMLDivElement>();
-  const [magicFile, setMagicFile] = useState(null);
-  const [originalMagicFile, setOriginalMagicFile] = useState(null);
   const [open, setOpen] = useState(false);
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
   const { isDarkTheme } = useAppContext();
 
   useEffect(() => {
-    reload();
+    if (!magicFile) reload();
     // I cannot find a way to hot switch monaco editor's locale but at least I can load
     // the right language on first load...
     if (i18n.language === 'fr') {
@@ -466,17 +454,6 @@ function LibMagic() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const reload = () => {
-    apiCall({
-      method: 'GET',
-      url: '/api/v4/system/identify/magic/',
-      onSuccess: api_data => {
-        setMagicFile(api_data.api_response);
-        setOriginalMagicFile(api_data.api_response);
-      }
-    });
-  };
 
   const saveChanges = tagData => {
     setOpen(false);
@@ -617,34 +594,53 @@ export default function AdminIdentify() {
   const { t } = useTranslation(['adminIdentify']);
   const theme = useTheme();
   const { user: currentUser } = useUser<CustomUser>();
+  const { apiCall } = useMyAPI();
+  const [value, setValue] = useState('libmagic');
+  const [magicFile, setMagicFile] = useState(null);
+  const [originalMagicFile, setOriginalMagicFile] = useState(null);
+  const [yaraFile, setYaraFile] = useState(null);
+  const [originalYaraFile, setOriginalYaraFile] = useState(null);
   const useStyles = makeStyles(curTheme => ({
     main: {
       marginTop: theme.spacing(1),
       flexGrow: 1,
       display: 'flex',
-      flexDirection: 'column',
-      [theme.breakpoints.up('lg')]: {
-        flexDirection: 'row'
-      }
+      flexDirection: 'column'
     },
     tab: {
       flexGrow: 1,
-      height: '100%',
       display: 'flex',
-      flexDirection: 'column'
-    },
-    divider: {
-      marginTop: theme.spacing(2),
-      marginBottom: theme.spacing(2),
-      [theme.breakpoints.up('lg')]: {
-        marginTop: 0,
-        marginBottom: 0,
-        marginLeft: theme.spacing(2),
-        marginRight: theme.spacing(2)
-      }
+      flexDirection: 'column',
+      paddingTop: theme.spacing(2)
     }
   }));
   const classes = useStyles();
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
+  const loadMagic = () => {
+    apiCall({
+      method: 'GET',
+      url: '/api/v4/system/identify/magic/',
+      onSuccess: api_data => {
+        setMagicFile(api_data.api_response);
+        setOriginalMagicFile(api_data.api_response);
+      }
+    });
+  };
+
+  const loadYara = () => {
+    apiCall({
+      method: 'GET',
+      url: '/api/v4/system/identify/yara/',
+      onSuccess: api_data => {
+        setYaraFile(api_data.api_response);
+        setOriginalYaraFile(api_data.api_response);
+      }
+    });
+  };
 
   return currentUser.is_admin ? (
     <PageFullSize margin={4}>
@@ -661,13 +657,27 @@ export default function AdminIdentify() {
         </Grid>
       </div>
       <div className={classes.main}>
-        <div className={classes.tab}>
-          <LibMagic />
-        </div>
-        <div className={classes.divider} />
-        <div className={classes.tab}>
-          <Yara />
-        </div>
+        <Paper square>
+          <Tabs value={value} onChange={handleChange} indicatorColor="primary" textColor="primary">
+            <Tab label={t('libmagic')} value="libmagic" />
+            <Tab label={t('yara')} value="yara" />
+          </Tabs>
+        </Paper>
+        {value === 'libmagic' && (
+          <div className={classes.tab}>
+            <LibMagic
+              reload={loadMagic}
+              magicFile={magicFile}
+              originalMagicFile={originalMagicFile}
+              setMagicFile={setMagicFile}
+            />
+          </div>
+        )}
+        {value === 'yara' && (
+          <div className={classes.tab}>
+            <Yara reload={loadYara} yaraFile={yaraFile} originalYaraFile={originalYaraFile} setYaraFile={setYaraFile} />
+          </div>
+        )}
       </div>
     </PageFullSize>
   ) : (
