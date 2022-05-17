@@ -6,6 +6,7 @@ import Account from 'components/routes/account';
 import Admin from 'components/routes/admin';
 import AdminErrorDetail from 'components/routes/admin/error_detail';
 import AdminErrorViewer from 'components/routes/admin/error_viewer';
+import AdminIdentify from 'components/routes/admin/identify';
 import AdminServices from 'components/routes/admin/services';
 import Service from 'components/routes/admin/service_detail';
 import ServiceReview from 'components/routes/admin/service_review';
@@ -95,6 +96,7 @@ const WrappedRoutes = () => {
         <Route exact path="/admin" component={Admin} />
         <Route exact path="/admin/errors" component={AdminErrorViewer} />
         <Route exact path="/admin/errors/:key" component={AdminErrorDetail} />
+        <Route exact path="/admin/identify" component={AdminIdentify} />
         <Route exact path="/admin/services" component={AdminServices} />
         <Route exact path="/admin/service_review" component={ServiceReview} />
         <Route exact path="/admin/services/:svc" component={Service} />
