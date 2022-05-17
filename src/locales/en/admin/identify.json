@@ -11,5 +11,10 @@
   "title.magic": "LibMagic custom file",
   "title.yara": "Yara custom file",
   "title": "File Identification",
-  "warning": "Warning: Making changes to any of these files will affect how Assemblyline process/routes your files. Use with caution!"
+  "warning": "Warning: Making changes to any of these files will affect how Assemblyline process/routes your files. Use with caution!",
+
+  "magic": "LibMagic",
+  "mimes": "Trusted Mimes",
+  "patterns": "Magic Patterns",
+  "yara": "Yara Rules"
 }
