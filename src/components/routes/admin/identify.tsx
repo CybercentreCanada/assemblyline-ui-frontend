@@ -8,6 +8,8 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Redirect } from 'react-router-dom';
 import LibMagic from './identify/libmagic';
+import Mimes from './identify/mimes';
+import Patterns from './identify/patterns';
 import Yara from './identify/yara';
 
 loader.config({ paths: { vs: '/cdn/monaco/' } });
@@ -22,6 +24,10 @@ export default function AdminIdentify() {
   const [originalMagicFile, setOriginalMagicFile] = useState(null);
   const [yaraFile, setYaraFile] = useState(null);
   const [originalYaraFile, setOriginalYaraFile] = useState(null);
+  const [mimesFile, setMimesFile] = useState(null);
+  const [originalMimesFile, setOriginalMimesFile] = useState(null);
+  const [patternsFile, setPatternsFile] = useState(null);
+  const [originalPatternsFile, setOriginalPatternsFile] = useState(null);
   const useStyles = makeStyles(curTheme => ({
     main: {
       marginTop: theme.spacing(1),
@@ -64,6 +70,28 @@ export default function AdminIdentify() {
     });
   };
 
+  const loadMimes = () => {
+    apiCall({
+      method: 'GET',
+      url: '/api/v4/system/identify/mimes/',
+      onSuccess: api_data => {
+        setMimesFile(api_data.api_response);
+        setOriginalMimesFile(api_data.api_response);
+      }
+    });
+  };
+
+  const loadPatterns = () => {
+    apiCall({
+      method: 'GET',
+      url: '/api/v4/system/identify/patterns/',
+      onSuccess: api_data => {
+        setPatternsFile(api_data.api_response);
+        setOriginalPatternsFile(api_data.api_response);
+      }
+    });
+  };
+
   return currentUser.is_admin ? (
     <PageFullSize margin={4}>
       <div style={{ marginBottom: theme.spacing(2), textAlign: 'left' }}>
@@ -99,22 +127,22 @@ export default function AdminIdentify() {
         )}
         {value === 'mimes' && (
           <div className={classes.tab}>
-            {/* <Mimes
+            <Mimes
               reload={loadMimes}
               mimesFile={mimesFile}
               originalMimesFile={originalMimesFile}
               setMimesFile={setMimesFile}
-            /> */}
+            />
           </div>
         )}
         {value === 'patterns' && (
           <div className={classes.tab}>
-            {/* <Patterns
+            <Patterns
               reload={loadPatterns}
               patternsFile={patternsFile}
               originalPatternsFile={originalPatternsFile}
               setPatternsFile={setPatternsFile}
-            /> */}
+            />
           </div>
         )}
         {value === 'yara' && (
