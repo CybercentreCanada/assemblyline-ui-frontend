@@ -28,6 +28,7 @@
   "related": "Related Submissions",
   "resubmit.success": "File successfully resubmitted for dynamic analysis. You will be redirected...",
   "resubmit_dynamic": "Resubmit for Dynamic Analysis",
+  "resubmit_file": "Resubmit current file",
   "results": "Service Results",
   "safelist": "Add file to the safelist",
   "safelist.acceptText": "Yes, add it!",

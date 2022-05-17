@@ -33,6 +33,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory } from 'react-router-dom';
 
+
 function Submit() {
   const { getBanner } = useAppLayout();
   const { apiCall } = useMyAPI();
@@ -43,13 +44,10 @@ function Submit() {
   const [flow, setFlow] = useState(null);
   const [settings, setSettings] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(null);
-  const [url, setUrl] = useState('');
-  const [urlHasError, setUrlHasError] = useState(false);
   const [validate, setValidate] = useState(false);
   const [validateCB, setValidateCB] = useState(null);
   const [allowClick, setAllowClick] = useState(true);
   const [file, setFile] = useState(null);
-  const [value, setValue] = useState('0');
   const downSM = useMediaQuery(theme.breakpoints.down('sm'));
   const md = useMediaQuery(theme.breakpoints.only('md'));
   const { showErrorMessage, showSuccessMessage, closeSnackbar } = useMySnackbar();
@@ -57,6 +55,14 @@ function Submit() {
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
+  const state = history.location.state;
+  const urlHashTitle = configuration.ui.allow_url_submissions ? "URL/SHA256" : "SHA256";
+  const urlInputText = urlHashTitle + t('urlHash.input_suffix');
+  const [urlHash, setUrlHash] = useState((state !== undefined) ? state['hash'] : "");
+  const [urlHashHasError, setUrlHashHasError] = useState(false);
+  const [value, setValue] = useState((state !== undefined) ? state['tabContext'] : "0");
+  const classification = useState((state !== undefined) ? state['c12n'] : null)[0];
+
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -112,9 +118,9 @@ function Submit() {
     } else if (cbType === 'file') {
       // No external service and file submitted
       uploadAndScan();
-    } else {
-      // No external service and url submitted
-      analyseUrl();
+    } else if (cbType === 'urlHash'){
+      // No external service and url/SHA256 submitted
+      analyseUrlHash();
     }
   };
 
@@ -140,7 +146,7 @@ function Submit() {
     if (validateCB === 'file') {
       uploadAndScan();
     } else {
-      analyseUrl();
+      analyseUrlHash();
     }
   };
 
@@ -258,28 +264,36 @@ function Submit() {
     }
   }
 
-  function handleUrlChange(event) {
+  function handleUrlHashChange(event) {
     closeSnackbar();
-    setUrlHasError(false);
-    setUrl(event.target.value);
+    setUrlHashHasError(false);
+    setUrlHash(event.target.value);
   }
 
-  function analyseUrl() {
-    const urlParseRE =
-      /^(((([^:/#?]+:)?(?:(\/\/)((?:(([^:@/#?]+)(?::([^:@/#?]+))?)@)?(([^:/#?\][]+|\[[^/\]@#?]+])(?::([0-9]+))?))?)?)?((\/?(?:[^/?#]+\/+)*)([^?#]*)))?(\?[^#]+)?)(#.*)?/;
-    const matches = urlParseRE.exec(url);
 
-    if (matches[15] === undefined || matches[15] === '') {
-      matches[15] = 'file';
+
+  function analyseUrlHash() {
+    const urlParseRE =
+    /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/;
+    const url_matches = urlParseRE.exec(urlHash);
+    const sha256ParseRE = /^[a-fA-F0-9]{64}$/;
+
+    let err_msg = t('submit.unknown.failure');
+    let data = {ui_params: settings};
+
+    if (sha256ParseRE.exec(urlHash)) {
+      data['name'] = urlHash;
+      data['sha256'] = urlHash;
+      err_msg = t('submit.hash.failure');
+
+    }
+    else if (configuration.ui.allow_url_submissions && url_matches) {
+      data["name"] = (url_matches[15] === undefined || url_matches[15] === '') ? 'file' : url_matches[15];
+      data["url"] = urlHash;
+      err_msg = t('submit.url.failure');
     }
 
-    const data = {
-      name: matches[15],
-      url,
-      ui_params: settings
-    };
-
-    setUrlHasError(false);
+    setUrlHashHasError(false);
     apiCall({
       url: '/api/v4/submit/',
       method: 'POST',
@@ -292,8 +306,8 @@ function Submit() {
         }, 500);
       },
       onFailure: api_data => {
-        showErrorMessage(t('submit.url.failure'));
-        setUrlHasError(true);
+        showErrorMessage(err_msg);
+        setUrlHashHasError(true);
       }
     });
   }
@@ -344,7 +358,7 @@ function Submit() {
           <Classification
             format="long"
             type="picker"
-            c12n={settings ? settings.classification : null}
+            c12n={classification ? classification : settings ? settings.classification : null}
             setClassification={setClassification}
           />
         </div>
@@ -353,11 +367,7 @@ function Submit() {
         <Paper square>
           <TabList centered onChange={handleChange} indicatorColor="primary" textColor="primary">
             <Tab label={t('file')} value="0" />
-            {configuration.ui.allow_url_submissions ? (
-              <Tab label={t('url')} value="1" disabled={!configuration.ui.allow_url_submissions} />
-            ) : (
-              <Empty />
-            )}
+            <Tab label={urlHashTitle} value="1" />
             <Tab label={t('options')} value="2" />
           </TabList>
         </Paper>
@@ -418,52 +428,50 @@ function Submit() {
             </div>
           ) : null}
         </TabPanel>
-        {configuration.ui.allow_url_submissions && (
-          <TabPanel value="1" className={classes.no_pad}>
-            <div style={{ display: 'flex', flexDirection: 'row', marginTop: sp2, alignItems: 'flex-start' }}>
-              {settings ? (
-                <>
-                  <TextField
-                    label={t('url.input')}
-                    error={urlHasError}
-                    size="small"
-                    type="url"
-                    variant="outlined"
-                    value={url}
-                    onChange={handleUrlChange}
-                    style={{ flexGrow: 1, marginRight: '1rem' }}
-                  />
-                  <Button
-                    disabled={!url || !allowClick}
-                    color="primary"
-                    variant="contained"
-                    onClick={() => validateServiceSelection('url')}
-                  >
-                    {t('url.button')}
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Skeleton style={{ flexGrow: 1, height: '3rem' }} />
-                  <Skeleton style={{ marginLeft: sp2, height: '3rem', width: '5rem' }} />
-                </>
-              )}
+        <TabPanel value="1" className={classes.no_pad}>
+          <div style={{ display: 'flex', flexDirection: 'row', marginTop: sp2, alignItems: 'flex-start' }}>
+            {settings ? (
+              <>
+                <TextField
+                  label={urlInputText}
+                  error={urlHashHasError}
+                  size="small"
+                  type="urlHash"
+                  variant="outlined"
+                  value={urlHash}
+                  onChange={handleUrlHashChange}
+                  style={{ flexGrow: 1, marginRight: '1rem' }}
+                />
+                <Button
+                  disabled={!urlHash || !allowClick}
+                  color="primary"
+                  variant="contained"
+                  onClick={() => validateServiceSelection('urlHash')}
+                >
+                  {t('urlHash.button')}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Skeleton style={{ flexGrow: 1, height: '3rem' }} />
+                <Skeleton style={{ marginLeft: sp2, height: '3rem', width: '5rem' }} />
+              </>
+            )}
+          </div>
+          {configuration.ui.tos ? (
+            <div style={{ marginTop: sp4, textAlign: 'center' }}>
+              <Typography variant="body2">
+                {t('terms1')}
+                <i>{t('urlHash.button')}</i>
+                {t('terms2')}
+                <Link style={{ textDecoration: 'none', color: theme.palette.primary.main }} to="/tos">
+                  {t('terms3')}
+                </Link>
+                .
+              </Typography>
             </div>
-            {configuration.ui.tos ? (
-              <div style={{ marginTop: sp4, textAlign: 'center' }}>
-                <Typography variant="body2">
-                  {t('terms1')}
-                  <i>{t('url.button')}</i>
-                  {t('terms2')}
-                  <Link style={{ textDecoration: 'none', color: theme.palette.primary.main }} to="/tos">
-                    {t('terms3')}
-                  </Link>
-                  .
-                </Typography>
-              </div>
-            ) : null}
-          </TabPanel>
-        )}
+          ) : null}
+        </TabPanel>
         <TabPanel value="2" className={classes.no_pad}>
           <Grid container spacing={1}>
             <Grid item xs={12} md>
