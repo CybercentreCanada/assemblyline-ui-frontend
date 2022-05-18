@@ -156,8 +156,18 @@ function WrappedLibMagic({ reload, magicFile, originalMagicFile, setMagicFile })
         <Grid item>
           <Grid container spacing={2}>
             <Grid item>
-              <Button size="small" variant="contained" onClick={() => setMagicFile(originalMagicFile)}>
+              <Button size="small" variant="outlined" onClick={() => reload(true)}>
                 {t('reset')}
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                size="small"
+                variant="contained"
+                onClick={() => setMagicFile(originalMagicFile)}
+                disabled={magicFile === originalMagicFile}
+              >
+                {t('undo')}
               </Button>
             </Grid>
             <Grid item>

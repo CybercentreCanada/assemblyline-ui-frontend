@@ -100,8 +100,18 @@ function WrappedPatterns({ reload, patternsFile, originalPatternsFile, setPatter
         <Grid item>
           <Grid container spacing={2}>
             <Grid item>
-              <Button size="small" variant="contained" onClick={() => setPatternsFile(originalPatternsFile)}>
+              <Button size="small" variant="outlined" onClick={() => reload(true)}>
                 {t('reset')}
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                size="small"
+                variant="contained"
+                onClick={() => setPatternsFile(originalPatternsFile)}
+                disabled={patternsFile === originalPatternsFile}
+              >
+                {t('undo')}
               </Button>
             </Grid>
             <Grid item>

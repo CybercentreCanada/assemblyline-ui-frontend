@@ -48,46 +48,46 @@ export default function AdminIdentify() {
     setValue(newValue);
   };
 
-  const loadMagic = () => {
+  const loadMagic = defValue => {
     apiCall({
       method: 'GET',
-      url: '/api/v4/system/identify/magic/',
+      url: `/api/v4/system/identify/magic/${defValue ? '?default' : ''}`,
       onSuccess: api_data => {
         setMagicFile(api_data.api_response);
-        setOriginalMagicFile(api_data.api_response);
+        if (!defValue) setOriginalMagicFile(api_data.api_response);
       }
     });
   };
 
-  const loadYara = () => {
+  const loadYara = defValue => {
     apiCall({
       method: 'GET',
-      url: '/api/v4/system/identify/yara/',
+      url: `/api/v4/system/identify/yara/${defValue ? '?default' : ''}`,
       onSuccess: api_data => {
         setYaraFile(api_data.api_response);
-        setOriginalYaraFile(api_data.api_response);
+        if (!defValue) setOriginalYaraFile(api_data.api_response);
       }
     });
   };
 
-  const loadMimes = () => {
+  const loadMimes = defValue => {
     apiCall({
       method: 'GET',
-      url: '/api/v4/system/identify/mimes/',
+      url: `/api/v4/system/identify/mimes/${defValue ? '?default' : ''}`,
       onSuccess: api_data => {
         setMimesFile(api_data.api_response);
-        setOriginalMimesFile(api_data.api_response);
+        if (!defValue) setOriginalMimesFile(api_data.api_response);
       }
     });
   };
 
-  const loadPatterns = () => {
+  const loadPatterns = defValue => {
     apiCall({
       method: 'GET',
-      url: '/api/v4/system/identify/patterns/',
+      url: `/api/v4/system/identify/patterns/${defValue ? '?default' : ''}`,
       onSuccess: api_data => {
         setPatternsFile(api_data.api_response);
-        setOriginalPatternsFile(api_data.api_response);
+        if (!defValue) setOriginalPatternsFile(api_data.api_response);
       }
     });
   };

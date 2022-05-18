@@ -20,6 +20,7 @@
   "title.mimes": "Trusted mimetypes",
   "title.patterns": "Magic regex patterns",
   "title.yara": "Yara custom file",
+  "undo": "Undo",
   "warning": "Warning: Making changes to any of these files will affect how Assemblyline process/routes your files. Use with caution!",
   "yara": "Yara Rules"
 }
