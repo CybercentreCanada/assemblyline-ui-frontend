@@ -37,7 +37,7 @@ export default function AdminTagSafelist() {
   const { isDarkTheme } = useAppContext();
 
   useEffect(() => {
-    reload();
+    reload(false);
     // I cannot find a way to hot switch monaco editor's locale but at least I can load
     // the right language on first load...
     if (i18n.language === 'fr') {
@@ -48,13 +48,13 @@ export default function AdminTagSafelist() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const reload = () => {
+  const reload = defValue => {
     apiCall({
       method: 'GET',
-      url: '/api/v4/system/tag_safelist/',
+      url: `/api/v4/system/tag_safelist/${defValue ? '?default' : ''}`,
       onSuccess: api_data => {
         setTagSafelist(api_data.api_response);
-        setOriginalTagSafelist(api_data.api_response);
+        if (!defValue) setOriginalTagSafelist(api_data.api_response);
       }
     });
   };
@@ -66,7 +66,7 @@ export default function AdminTagSafelist() {
       url: '/api/v4/system/tag_safelist/',
       body: tagData,
       onSuccess: api_data => {
-        reload();
+        reload(false);
         showSuccessMessage(t('save.success'));
       }
     });
@@ -88,8 +88,17 @@ export default function AdminTagSafelist() {
           <Grid item>
             <Grid container spacing={2}>
               <Grid item>
-                <Button variant="contained" onClick={() => setTagSafelist(originalTagSafelist)}>
+                <Button variant="outlined" onClick={() => reload(true)}>
                   {t('reset')}
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button
+                  variant="contained"
+                  onClick={() => setTagSafelist(originalTagSafelist)}
+                  disabled={tagSafelist === originalTagSafelist}
+                >
+                  {t('undo')}
                 </Button>
               </Grid>
               <Grid item>
