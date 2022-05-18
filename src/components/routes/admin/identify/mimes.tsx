@@ -100,8 +100,18 @@ function WrappedMimes({ reload, mimesFile, originalMimesFile, setMimesFile }) {
         <Grid item>
           <Grid container spacing={2}>
             <Grid item>
-              <Button size="small" variant="contained" onClick={() => setMimesFile(originalMimesFile)}>
+              <Button size="small" variant="outlined" onClick={() => reload(true)}>
                 {t('reset')}
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                size="small"
+                variant="contained"
+                onClick={() => setMimesFile(originalMimesFile)}
+                disabled={mimesFile === originalMimesFile}
+              >
+                {t('undo')}
               </Button>
             </Grid>
             <Grid item>

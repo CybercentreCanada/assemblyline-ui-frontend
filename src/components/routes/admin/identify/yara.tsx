@@ -318,8 +318,18 @@ function WrappedYara({ reload, yaraFile, originalYaraFile, setYaraFile }) {
         <Grid item>
           <Grid container spacing={2}>
             <Grid item>
-              <Button size="small" variant="contained" onClick={() => setYaraFile(originalYaraFile)}>
+              <Button size="small" variant="outlined" onClick={() => reload(true)}>
                 {t('reset')}
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                size="small"
+                variant="contained"
+                onClick={() => setYaraFile(originalYaraFile)}
+                disabled={yaraFile === originalYaraFile}
+              >
+                {t('undo')}
               </Button>
             </Grid>
             <Grid item>
