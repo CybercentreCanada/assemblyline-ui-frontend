@@ -48,46 +48,50 @@ export default function AdminIdentify() {
     setValue(newValue);
   };
 
-  const loadMagic = defValue => {
+  const loadMagic = (defValue, autoOpen) => {
     apiCall({
       method: 'GET',
       url: `/api/v4/system/identify/magic/${defValue ? '?default' : ''}`,
       onSuccess: api_data => {
         setMagicFile(api_data.api_response);
         if (!defValue) setOriginalMagicFile(api_data.api_response);
+        if (autoOpen && api_data.api_response !== originalMagicFile) autoOpen(true);
       }
     });
   };
 
-  const loadYara = defValue => {
+  const loadYara = (defValue, autoOpen) => {
     apiCall({
       method: 'GET',
       url: `/api/v4/system/identify/yara/${defValue ? '?default' : ''}`,
       onSuccess: api_data => {
         setYaraFile(api_data.api_response);
         if (!defValue) setOriginalYaraFile(api_data.api_response);
+        if (autoOpen && api_data.api_response !== originalYaraFile) autoOpen(true);
       }
     });
   };
 
-  const loadMimes = defValue => {
+  const loadMimes = (defValue, autoOpen) => {
     apiCall({
       method: 'GET',
       url: `/api/v4/system/identify/mimes/${defValue ? '?default' : ''}`,
       onSuccess: api_data => {
         setMimesFile(api_data.api_response);
         if (!defValue) setOriginalMimesFile(api_data.api_response);
+        if (autoOpen && api_data.api_response !== originalMimesFile) autoOpen(true);
       }
     });
   };
 
-  const loadPatterns = defValue => {
+  const loadPatterns = (defValue, autoOpen) => {
     apiCall({
       method: 'GET',
       url: `/api/v4/system/identify/patterns/${defValue ? '?default' : ''}`,
       onSuccess: api_data => {
         setPatternsFile(api_data.api_response);
         if (!defValue) setOriginalPatternsFile(api_data.api_response);
+        if (autoOpen && api_data.api_response !== originalPatternsFile) autoOpen(true);
       }
     });
   };
