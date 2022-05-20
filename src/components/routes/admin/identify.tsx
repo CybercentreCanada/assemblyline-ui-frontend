@@ -1,4 +1,4 @@
-import { Grid, makeStyles, Paper, Tab, Tabs, Typography, useTheme } from '@material-ui/core';
+import { Grid, Hidden, makeStyles, Paper, Tab, Tabs, Typography, useTheme } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
 import { loader } from '@monaco-editor/react';
 import useUser from 'commons/components/hooks/useAppUser';
@@ -105,13 +105,22 @@ export default function AdminIdentify() {
             <Typography variant="h4">{t('title')}</Typography>
           </Grid>
           <Grid item xs={12}>
-            <Alert severity="warning">{t('warning')}</Alert>
+            <Hidden xsDown>
+              <Alert severity="warning">{t('warning')}</Alert>
+            </Hidden>
           </Grid>
         </Grid>
       </div>
       <div className={classes.main}>
         <Paper square>
-          <Tabs value={value} onChange={handleChange} indicatorColor="primary" textColor="primary">
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            indicatorColor="primary"
+            textColor="primary"
+            variant="scrollable"
+            scrollButtons="auto"
+          >
             <Tab label={t('magic')} value="magic" />
             <Tab label={t('mimes')} value="mimes" />
             <Tab label={t('patterns')} value="patterns" />
