@@ -21,6 +21,6 @@
   "title.patterns": "Modèles d'expressions régulières magic",
   "title.yara": "Fichier Yara personnalisé",
   "undo": "Annuler",
-  "warning": "Avertissement: apporter des modifications à l'un de ces fichiers affectera la manière dont Assemblyline traite/achemine vos fichiers. Utiliser avec précaution!",
+  "warning": "Apporter des modifications à l'un de ces fichiers affectera la manière dont Assemblyline traite/achemine vos fichiers. Utiliser avec précaution!",
   "yara": "Règles Yara"
 }
