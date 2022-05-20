@@ -91,14 +91,14 @@ function WrappedMimes({ reload, mimesFile, originalMimesFile, setMimesFile }) {
           </Button>
         </DialogActions>
       </Dialog>
-      <Grid container justifyContent="flex-end" style={{ marginBottom: theme.spacing(1), textAlign: 'left' }}>
+      <Grid container justifyContent="flex-end" spacing={1} style={{ marginBottom: theme.spacing(1) }}>
         <Grid item style={{ flexGrow: 1 }}>
           <div>
             <Typography variant="h5">{t('title.mimes')}</Typography>
           </div>
         </Grid>
         <Grid item>
-          <Grid container spacing={2}>
+          <Grid container spacing={1}>
             <Grid item>
               <Button size="small" variant="outlined" onClick={() => reload(true, setOpen)}>
                 {t('reset')}

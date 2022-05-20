@@ -275,6 +275,10 @@ function WrappedYara({ reload, yaraFile, originalYaraFile, setYaraFile }) {
     }
   };
 
+  const onMount = editor => {
+    editor.focus();
+  };
+
   return (
     <>
       <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby="dialog-title" fullWidth maxWidth="md">
@@ -309,14 +313,14 @@ function WrappedYara({ reload, yaraFile, originalYaraFile, setYaraFile }) {
           </Button>
         </DialogActions>
       </Dialog>
-      <Grid container justifyContent="flex-end" style={{ marginBottom: theme.spacing(1), textAlign: 'left' }}>
+      <Grid container justifyContent="flex-end" spacing={1} style={{ marginBottom: theme.spacing(1) }}>
         <Grid item style={{ flexGrow: 1 }}>
           <div>
             <Typography variant="h5">{t('title.yara')}</Typography>
           </div>
         </Grid>
         <Grid item>
-          <Grid container spacing={2}>
+          <Grid container spacing={1}>
             <Grid item>
               <Button size="small" variant="outlined" onClick={() => reload(true, setOpen)}>
                 {t('reset')}
@@ -377,6 +381,7 @@ function WrappedYara({ reload, yaraFile, originalYaraFile, setYaraFile }) {
                       value={yaraFile}
                       onChange={setYaraFile}
                       beforeMount={beforeMount}
+                      onMount={onMount}
                     />
                   </>
                 ) : (

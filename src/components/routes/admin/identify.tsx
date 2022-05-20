@@ -1,4 +1,5 @@
-import { Grid, makeStyles, Paper, Tab, Tabs, Typography, useTheme } from '@material-ui/core';
+import { Grid, Hidden, makeStyles, Paper, Tab, Tabs, Typography, useTheme } from '@material-ui/core';
+import { Alert } from '@material-ui/lab';
 import { loader } from '@monaco-editor/react';
 import useUser from 'commons/components/hooks/useAppUser';
 import PageFullSize from 'commons/components/layout/pages/PageFullSize';
@@ -99,20 +100,27 @@ export default function AdminIdentify() {
   return currentUser.is_admin ? (
     <PageFullSize margin={4}>
       <div style={{ marginBottom: theme.spacing(2), textAlign: 'left' }}>
-        <Grid container alignItems="center" spacing={2}>
-          <Grid item style={{ flexGrow: 1 }}>
-            <div>
-              <Typography variant="h4">{t('title')}</Typography>
-            </div>
-            <div>
-              <Typography variant="subtitle2">{t('warning')}</Typography>
-            </div>
+        <Grid container alignItems="center" spacing={1}>
+          <Grid item xs={12}>
+            <Typography variant="h4">{t('title')}</Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Hidden xsDown>
+              <Alert severity="warning">{t('warning')}</Alert>
+            </Hidden>
           </Grid>
         </Grid>
       </div>
       <div className={classes.main}>
         <Paper square>
-          <Tabs value={value} onChange={handleChange} indicatorColor="primary" textColor="primary">
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            indicatorColor="primary"
+            textColor="primary"
+            variant="scrollable"
+            scrollButtons="auto"
+          >
             <Tab label={t('magic')} value="magic" />
             <Tab label={t('mimes')} value="mimes" />
             <Tab label={t('patterns')} value="patterns" />
