@@ -70,6 +70,7 @@ export const HexCell = React.memo(
     prevProps.index === nextProps.index &&
     prevProps.columnIndex === nextProps.columnIndex &&
     prevProps.store.initialized === nextProps.store.initialized &&
+    prevProps.store.layout.column.auto === nextProps.store.layout.column.auto &&
     prevProps.store.layout.column.size === nextProps.store.layout.column.size &&
     prevProps.store.mode.bodyType === nextProps.store.mode.bodyType &&
     prevProps.store.mode.theme === nextProps.store.mode.theme &&

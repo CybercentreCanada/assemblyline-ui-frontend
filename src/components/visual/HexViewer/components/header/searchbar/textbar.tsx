@@ -1,10 +1,8 @@
 import { makeStyles } from '@material-ui/core';
-import FormControl from '@material-ui/core/FormControl';
-import OutlinedInput from '@material-ui/core/OutlinedInput';
 import ClearIcon from '@material-ui/icons/Clear';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { isEscapeKey, NumericField, StoreProps, TooltipIconButton, useDispatch } from '../../..';
+import { DelayedTextField, NumericField, StoreProps, TooltipIconButton, useDispatch } from '../../..';
 
 const useHexStyles = makeStyles(theme => ({
   endAdornment: {
@@ -61,54 +59,30 @@ export const WrappedTextBar = ({ store }: StoreProps) => {
   } = useDispatch();
 
   const {
-    search: { indexes, selectedIndex }
+    search: { inputValue, indexes, selectedIndex }
   } = store;
-  const [searchValue, setSearchValue] = useState<string>('');
-
-  useEffect(() => {
-    if (store.history.values !== null && store.history.values !== undefined && store.history.values.length !== 0)
-      setSearchValue(store.history.values[store.history.index].value as string);
-  }, [store.history.index, store.history.values]);
-
-  useEffect(() => {
-    if (store.search.inputValue !== searchValue) setSearchValue(store.search.inputValue);
-  }, [searchValue, store.search.inputValue]);
 
   return (
     <>
-      {/* <HexField /> */}
-      <FormControl className={classes.formControl} variant="outlined" size="small">
-        <OutlinedInput
-          className={classes.outlinedInput}
-          classes={{
-            root: classes.root,
-            input: classes.input
-          }}
-          type="text"
-          placeholder={t('header.searchfield.text')}
-          fullWidth
-          autoFocus
-          // multiline
-          // maxRows={1}
-          margin="dense"
-          value={searchValue}
-          onFocus={() => onSearchBarFocus()}
-          onWheel={e => onSearchBarWheel(e)}
-          onChange={event => {
-            // console.dir({ event: 'onChange', text: event.target.value });
-            setSearchValue(event.target.value);
-            onSearchBarValueChange(event.target.value);
-          }}
-          onKeyDown={event => {
-            // console.dir({ event: 'onKeyDown', text: event.target.value });
-            if (isEscapeKey(event)) setSearchValue('');
-            onSearchBarKeyDown(event, store);
-          }}
-          onPaste={event => {
-            // console.log(event.clipboardData.getData('text'));
-          }}
-        />
-      </FormControl>
+      <DelayedTextField
+        classes={{
+          formControl: classes.formControl,
+          outlinedInput: classes.outlinedInput,
+          root: classes.root,
+          input: classes.input
+        }}
+        type="text"
+        placeholder={t('header.searchfield.text')}
+        fullWidth
+        autoFocus
+        delay={200}
+        value={inputValue}
+        margin="dense"
+        onFocus={() => onSearchBarFocus()}
+        onWheel={e => onSearchBarWheel(e)}
+        onChange={event => onSearchBarValueChange(event.target.value)}
+        onKeyDown={event => onSearchBarKeyDown(event, store)}
+      />
 
       {indexes === null || indexes.length === 0 ? (
         <></>
@@ -133,16 +107,13 @@ export const WrappedTextBar = ({ store }: StoreProps) => {
             }
             onFocus={() => onSearchBarFocus()}
             onChange={event => onSelectedSearchIndexChange(event.target.valueAsNumber as number)}
-            // onKeyDown={event => onSearchBarKeyDown(event)}
+            // onKeyDown={event => onSearchBarKeyDown(event,store)}
           />
           <TooltipIconButton
             classes={{ iconButton: classes.iconButton }}
             title={t('clear')}
-            onClick={() => {
-              setSearchValue('');
-              onSearchClear();
-            }}
-            disabled={searchValue === null || searchValue === ''}
+            onClick={() => onSearchClear()}
+            disabled={inputValue === null || inputValue === ''}
             icon={<ClearIcon />}
           />
         </>
@@ -156,6 +127,7 @@ export const TextBar = React.memo(
   (prevProps: Readonly<StoreProps>, nextProps: Readonly<StoreProps>) =>
     prevProps.store.search.type === nextProps.store.search.type &&
     prevProps.store.search.value === nextProps.store.search.value &&
+    prevProps.store.search.inputValue === nextProps.store.search.inputValue &&
     prevProps.store.search.indexes.length === nextProps.store.search.indexes.length &&
     prevProps.store.search.selectedIndex === nextProps.store.search.selectedIndex
 );

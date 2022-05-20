@@ -16,8 +16,6 @@ export type HistoryState = {
   };
 };
 
-export type HistoryRef = {};
-
 export type HistoryPayload = {};
 
 export const useHistoryReducer = () => {
@@ -32,8 +30,6 @@ export const useHistoryReducer = () => {
     }),
     []
   );
-
-  const initialRef = useMemo<HistoryRef>(() => ({}), []);
 
   const historyLoad = useCallback((store: Store, { type, payload }: ActionProps): Store => {
     const value = localStorage.getItem(store.history.storageKey);
@@ -164,5 +160,5 @@ export const useHistoryReducer = () => {
     [historyAddValue, historyIndexChange, historyLoad, historyReset, historySave]
   );
 
-  return { initialState, initialRef, reducer };
+  return { initialState, reducer };
 };

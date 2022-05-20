@@ -5,7 +5,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { default as React } from 'react';
 import { useTranslation } from 'react-i18next';
-import { HexColumnSetting, HexEncoding, HexOffsetBaseSetting, StoreProps, useDispatch } from '../..';
+import { HexBodyTypeSetting, HexColumnSetting, HexEncoding, HexOffsetBaseSetting, StoreProps, useDispatch } from '../..';
 
 export * from './bodyType';
 export * from './column';
@@ -32,7 +32,7 @@ export const WrappedHexSettings = ({ store }: StoreProps) => {
             <Grid item xs={12}>
               <Grid container spacing={1} alignItems="center">
                 <HexEncoding store={store} />
-                {/* <HexBodyTypeSetting store={store} /> */}
+                <HexBodyTypeSetting store={store} />
                 <HexOffsetBaseSetting store={store} />
                 <HexColumnSetting store={store} />
               </Grid>

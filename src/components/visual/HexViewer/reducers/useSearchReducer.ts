@@ -30,8 +30,6 @@ export type SearchState = {
   };
 };
 
-export type SearchRef = {};
-
 export const useSearchReducer = () => {
   const classes = useCellStyles();
 
@@ -45,8 +43,6 @@ export const useSearchReducer = () => {
       selectedIndex: null
     }
   };
-
-  const initialRef: SearchRef = {};
 
   const searchRender = useCallback(
     (prevStore: Store, nextStore: Store): void => {
@@ -188,5 +184,5 @@ export const useSearchReducer = () => {
     [searchRender, selectedSearchRender]
   );
 
-  return { initialState, initialRef, reducer, render };
+  return { initialState, reducer, render };
 };

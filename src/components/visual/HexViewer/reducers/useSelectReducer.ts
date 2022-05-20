@@ -14,12 +14,9 @@ import {
 
 export type SelectState = { select: { startIndex: number; endIndex: number; isHighlighting: boolean } };
 
-export type SelectRef = {};
-
 export const useSelectReducer = () => {
   const classes = useCellStyles();
   const initialState: SelectState = { select: { startIndex: -1, endIndex: -1, isHighlighting: false } };
-  const initialRef: SelectRef = {};
 
   const selectRender = useCallback(
     (prevStore: Store, nextStore: Store): void => {
@@ -87,5 +84,5 @@ export const useSelectReducer = () => {
     [selectRender]
   );
 
-  return { initialState, initialRef, reducer, render };
+  return { initialState, reducer, render };
 };

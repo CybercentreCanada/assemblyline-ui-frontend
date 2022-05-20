@@ -4,16 +4,10 @@ import { isAction, isCell, ReducerProps, Store, toHexChar2 } from '..';
 
 export type CopyState = {};
 
-export type CopyRef = {};
-
-export type CopyPayload = {};
-
 export const useCopyReducer = () => {
   const { copy } = useClipboard();
 
   const initialState = useMemo<CopyState>(() => ({}), []);
-
-  const initialRef = useMemo<CopyRef>(() => ({}), []);
 
   const copyHexCursor = useCallback((store: Store) => copy(store.hex.codes.get(store.cursor.index)), [copy]);
 
@@ -71,5 +65,5 @@ export const useCopyReducer = () => {
     [copyKeyDown]
   );
 
-  return { initialState, initialRef, reducer };
+  return { initialState, reducer };
 };

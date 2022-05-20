@@ -24,8 +24,6 @@ export type ModeState = {
   };
 };
 
-export type ModeRef = {};
-
 export const useModeReducer = () => {
   const initialState = useMemo<ModeState>(
     () => ({
@@ -41,8 +39,6 @@ export const useModeReducer = () => {
     }),
     []
   );
-
-  const initialRef = useMemo<ModeRef>(() => ({}), []);
 
   const bodyInitialized = useCallback((store: Store, { type, payload }: ActionProps): Store => {
     return { ...store, initialized: payload.value };
@@ -108,5 +104,5 @@ export const useModeReducer = () => {
     ]
   );
 
-  return { initialState, initialRef, reducer };
+  return { initialState, reducer };
 };

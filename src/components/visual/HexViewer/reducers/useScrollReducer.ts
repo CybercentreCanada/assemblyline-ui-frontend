@@ -45,8 +45,6 @@ export type ScrollState = {
   };
 };
 
-export type ScrollRef = {};
-
 export const useScrollReducer = () => {
   const initialState = useMemo<ScrollState>(
     () => ({
@@ -76,8 +74,6 @@ export const useScrollReducer = () => {
     }),
     []
   );
-
-  const initialRef = useMemo<ScrollRef>(() => ({}), []);
 
   const scrollIndexChange = useCallback((store: Store, _index: number, scrollType: ScrollType): Store => {
     if (_index === null || _index === undefined || isNaN(_index)) return { ...store };
@@ -265,5 +261,5 @@ export const useScrollReducer = () => {
     ]
   );
 
-  return { initialState, initialRef, reducer };
+  return { initialState, reducer };
 };

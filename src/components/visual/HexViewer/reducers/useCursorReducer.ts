@@ -22,8 +22,6 @@ export type CursorState = {
   };
 };
 
-export type CursorRef = {};
-
 export const useCursorReducer = () => {
   const classes = useCellStyles();
 
@@ -32,8 +30,6 @@ export const useCursorReducer = () => {
       index: null
     }
   };
-
-  const initialRef: CursorRef = {};
 
   const cursorRender = useCallback(
     (prevStore: Store, nextStore: Store): void => {
@@ -123,5 +119,5 @@ export const useCursorReducer = () => {
     [cursorRender]
   );
 
-  return { initialState, initialRef, reducer, render };
+  return { initialState, reducer, render };
 };

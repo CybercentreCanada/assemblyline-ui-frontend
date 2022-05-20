@@ -23,8 +23,6 @@ export type HexState = {
   };
 };
 
-export type HexRef = {};
-
 export type HexPayload = any;
 
 export const useHexReducer = () => {
@@ -53,8 +51,6 @@ export const useHexReducer = () => {
     []
   );
 
-  const initialRef = useMemo<HexRef>(() => ({}), []);
-
   const hexDataChange = useCallback((store: Store, { type, payload }: ActionProps): Store => {
     store.hex.data = payload.data;
     store.hex.codes = parseDataToHexcodeMap(payload.data);
@@ -69,5 +65,5 @@ export const useHexReducer = () => {
     [hexDataChange]
   );
 
-  return { initialState, initialRef, reducer };
+  return { initialState, reducer };
 };

@@ -5,14 +5,10 @@ export type HoverState = {
   hover: { index: number };
 };
 
-export type HoverRef = {};
-
 export const useHoverReducer = () => {
   const classes = useCellStyles();
 
   const initialState: HoverState = { hover: { index: null } };
-
-  const initialRef: HoverRef = {};
 
   const hoverRender = useCallback(
     (prevStore: Store, nextStore: Store): void => {
@@ -47,5 +43,5 @@ export const useHoverReducer = () => {
     [hoverRender]
   );
 
-  return { initialState, initialRef, reducer, render };
+  return { initialState, reducer, render };
 };

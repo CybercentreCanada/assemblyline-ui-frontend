@@ -59,7 +59,7 @@ export const useBodyAction = (dispatch: DispatchProp): BodyActionProps => {
 
   const onBodyKeyDown = useCallback(
     (event: KeyboardEvent, store: Store) => {
-      if (!isFocus.body(store) && !(cursorKeyDownGuard(event) || isCopyKey(event))) return;
+      if (!(isFocus.body(store) && (cursorKeyDownGuard(event) || isCopyKey(event)))) return;
       event.preventDefault();
       if (cursorKeyDownGuard(event)) dispatch(ACTIONS.cursorKeyDown, { event });
       else if (isCopyKey(event)) dispatch(ACTIONS.copyKeyDown, null, true, false);

@@ -12,8 +12,6 @@ export type CellState = {
   };
 };
 
-export type CellRef = {};
-
 export type CellPayload = {
   index: number;
   type: CellType;
@@ -33,8 +31,6 @@ export const useCellReducer = () => {
     }),
     []
   );
-
-  const initialRef = useMemo<CellRef>(() => ({}), []);
 
   const cellMouseEnter = useCallback((store: Store, payload: CellPayload): Store => {
     return {
@@ -91,5 +87,5 @@ export const useCellReducer = () => {
     [bodyMouseLeave, bodyMouseUp, cellMouseDown, cellMouseEnter]
   );
 
-  return { initialState, initialRef, reducer };
+  return { initialState, reducer };
 };

@@ -42,8 +42,6 @@ export type SettingState = {
   };
 };
 
-export type SettingRef = {};
-
 export type SettingPayload = {};
 
 export const useSettingReducer = () => {
@@ -80,8 +78,6 @@ export const useSettingReducer = () => {
     }),
     []
   );
-
-  const initialRef: SettingRef = {};
 
   const handleSaveLocalStorage = useCallback((store: Store): void => {
     localStorage.setItem(
@@ -330,5 +326,5 @@ export const useSettingReducer = () => {
     ]
   );
 
-  return { initialState, initialRef, reducer };
+  return { initialState, reducer };
 };

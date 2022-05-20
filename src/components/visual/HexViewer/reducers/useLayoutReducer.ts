@@ -24,8 +24,6 @@ export type LayoutState = {
   };
 };
 
-export type LayoutRef = {};
-
 export const useLayoutReducer = () => {
   const initialState = useMemo<LayoutState>(
     () => ({
@@ -43,8 +41,6 @@ export const useLayoutReducer = () => {
     }),
     []
   );
-
-  const initialRef = useMemo<LayoutRef>(() => ({}), []);
 
   const layoutResize = useCallback((store: Store, { type, payload }: ActionProps): Store => {
     const { height, width } = payload;
@@ -100,5 +96,5 @@ export const useLayoutReducer = () => {
     [layoutCellRendered, layoutFocusBody, layoutFocusNone, layoutFocusToolbar, layoutResize]
   );
 
-  return { initialState, initialRef, reducer };
+  return { initialState, reducer };
 };
