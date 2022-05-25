@@ -3,6 +3,7 @@ import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { ALField } from 'components/hooks/useMyUser';
 import SearchQuery, { SearchFilter, SearchFilterType } from 'components/visual/SearchBar/search-query';
+import { safeFieldValue } from 'helpers/utils';
 import { useCallback, useEffect, useReducer, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
@@ -333,7 +334,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
               id: `${ki}.${vki}}`,
               type: SearchFilterType.QUERY,
               label: `${k}:${vk}`,
-              value: `${k}:"${vk}"`,
+              value: `${k}:${safeFieldValue(vk)}`,
               other: { count: vkv }
             });
           });

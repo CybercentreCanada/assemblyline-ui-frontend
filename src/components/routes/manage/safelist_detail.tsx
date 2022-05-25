@@ -10,7 +10,7 @@ import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
 import Histogram from 'components/visual/Histogram';
-import { bytesToSize } from 'helpers/utils';
+import { bytesToSize, safeFieldValue } from 'helpers/utils';
 import 'moment/locale/fr';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -94,8 +94,8 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
             safelist.type === 'file'
               ? `result.sections.heuristic.signature.name:"SAFELIST_${safelist_id || id}"`
               : safelist.type === 'signature'
-              ? `result.sections.heuristic.signature.name:"${safelist.signature.name}"`
-              : `result.sections.safelisted_tags.${safelist.tag.type}:"${safelist.tag.value}"`,
+              ? `result.sections.heuristic.signature.name:${safeFieldValue(safelist.signature.name)}`
+              : `result.sections.safelisted_tags.${safelist.tag.type}:${safeFieldValue(safelist.tag.value)}`,
           mincount: 0,
           start: 'now-30d/d',
           end: 'now+1d/d-1s',
@@ -211,8 +211,12 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
                                 safelist_id || id
                               }"`
                             : safelist.type === 'signature'
-                            ? `/search/result/?query=result.sections.heuristic.signature.name:"${safelist.signature.name}"`
-                            : `/search/result/?query=result.sections.safelisted_tags.${safelist.tag.type}:"${safelist.tag.value}"`
+                            ? `/search/result/?query=result.sections.heuristic.signature.name:${safeFieldValue(
+                                safelist.signature.name
+                              )}`
+                            : `/search/result/?query=result.sections.safelisted_tags.${
+                                safelist.tag.type
+                              }:${safeFieldValue(safelist.tag.value)}`
                         }
                       >
                         <YoutubeSearchedForIcon />

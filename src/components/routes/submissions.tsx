@@ -13,6 +13,7 @@ import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
 import SubmissionsTable, { SubmissionResult } from 'components/visual/SearchResult/submissions';
 import SearchResultCount from 'components/visual/SearchResultCount';
+import { safeFieldValue } from 'helpers/utils';
 import 'moment/locale/fr';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -118,7 +119,7 @@ export default function Submissions() {
                 tooltip: t('my_submission'),
                 props: {
                   onClick: () => {
-                    query.set('query', `params.submitter:"${currentUser.username}"`);
+                    query.set('query', `params.submitter:${safeFieldValue(currentUser.username)}`);
                     history.push(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }

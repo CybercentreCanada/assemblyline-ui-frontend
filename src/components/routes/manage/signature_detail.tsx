@@ -27,6 +27,7 @@ import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import Histogram from 'components/visual/Histogram';
 import ResultsTable from 'components/visual/SearchResult/results';
 import SignatureStatus from 'components/visual/SignatureStatus';
+import { safeFieldValue } from 'helpers/utils';
 import 'moment/locale/fr';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -131,7 +132,9 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
   useEffect(() => {
     if (type && source && name) {
       apiCall({
-        url: `/api/v4/search/signature/?query=type:${type} AND source:${source} AND name:"${name}"&rows=1&fl=id`,
+        url: `/api/v4/search/signature/?query=type:${safeFieldValue(type)} AND source:${safeFieldValue(
+          source
+        )} AND name:${safeFieldValue(name)}&rows=1&fl=id`,
         onSuccess: api_data => {
           if (api_data.api_response.items.length) {
             const sigId = api_data.api_response.items[0].id;
@@ -156,7 +159,11 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
         apiCall({
           method: 'POST',
           url: '/api/v4/search/stats/result/result.score/',
-          body: { query: `result.sections.tags.file.rule.${signature.type}:"${signature.source}.${signature.name}"` },
+          body: {
+            query: `result.sections.tags.file.rule.${signature.type}:${safeFieldValue(
+              `${signature.source}.${signature.name}`
+            )}`
+          },
           onSuccess: api_data => {
             setStats(api_data.api_response);
           }
@@ -168,7 +175,9 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
         method: 'POST',
         url: '/api/v4/search/histogram/result/created/',
         body: {
-          query: `result.sections.tags.file.rule.${signature.type}:"${signature.source}.${signature.name}"`,
+          query: `result.sections.tags.file.rule.${signature.type}:${safeFieldValue(
+            `${signature.source}.${signature.name}`
+          )}`,
           mincount: 0,
           start: 'now-30d/d',
           end: 'now+1d/d-1s',
@@ -180,7 +189,9 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
       });
       apiCall({
         method: 'GET',
-        url: `/api/v4/search/result/?query=result.sections.tags.file.rule.${signature.type}:"${signature.source}.${signature.name}"&rows=10`,
+        url: `/api/v4/search/result/?query=result.sections.tags.file.rule.${signature.type}:${safeFieldValue(
+          `${signature.source}.${signature.name}`
+        )}&rows=10`,
         onSuccess: api_data => {
           setResults(api_data.api_response);
         }
@@ -296,7 +307,9 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
                     <IconButton
                       component={Link}
                       style={{ color: theme.palette.action.active }}
-                      to={`/search/result/?query=result.sections.tags.file.rule.${signature.type}:"${signature.source}.${signature.name}"`}
+                      to={`/search/result/?query=result.sections.tags.file.rule.${signature.type}:${safeFieldValue(
+                        `${signature.source}.${signature.name}`
+                      )}`}
                     >
                       <YoutubeSearchedForIcon />
                     </IconButton>
