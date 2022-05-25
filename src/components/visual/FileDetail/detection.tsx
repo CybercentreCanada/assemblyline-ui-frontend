@@ -5,6 +5,7 @@ import SelectAllOutlinedIcon from '@material-ui/icons/SelectAllOutlined';
 import { Skeleton } from '@material-ui/lab';
 import clsx from 'clsx';
 import useHighlighter from 'components/hooks/useHighlighter';
+import { safeFieldValue } from 'helpers/utils';
 import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Result } from '../ResultCard';
@@ -123,7 +124,7 @@ const WrappedHeuristic: React.FC<WrappedHeuristicProps> = ({ name, id, sections,
           <Tooltip title={t('related')}>
             <IconButton
               size="small"
-              href={`/search/result?query=result.sections.heuristic.heur_id:"${id}"`}
+              href={`/search/result?query=result.sections.heuristic.heur_id:${safeFieldValue(id)}`}
               color="inherit"
             >
               <SearchOutlinedIcon />

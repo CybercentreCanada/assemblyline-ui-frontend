@@ -7,6 +7,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import Classification from 'components/visual/Classification';
 import Histogram from 'components/visual/Histogram';
 import ResultsTable from 'components/visual/SearchResult/results';
+import { safeFieldValue } from 'helpers/utils';
 import 'moment/locale/fr';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -155,7 +156,7 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
                   <IconButton
                     component={Link}
                     style={{ color: theme.palette.action.active }}
-                    to={`/search/result/?query=result.sections.heuristic.heur_id:"${heuristic.heur_id}"`}
+                    to={`/search/result/?query=result.sections.heuristic.heur_id:${safeFieldValue(heuristic.heur_id)}`}
                   >
                     <YoutubeSearchedForIcon />
                   </IconButton>
