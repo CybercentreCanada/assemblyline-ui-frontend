@@ -1,5 +1,6 @@
 {
   "adminmenu": "Administration",
+  "adminmenu.identify": "Identification des fichiers",
   "adminmenu.errors": "Visualisateur d'erreurs",
   "adminmenu.services": "Services",
   "adminmenu.service_review": "Examen des services",

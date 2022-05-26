@@ -11,33 +11,26 @@ import {
 import { Skeleton } from '@material-ui/lab';
 import Editor, { DiffEditor, loader } from '@monaco-editor/react';
 import useAppContext from 'commons/components/hooks/useAppContext';
-import useUser from 'commons/components/hooks/useAppUser';
-import PageFullSize from 'commons/components/layout/pages/PageFullSize';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { CustomUser } from 'components/hooks/useMyUser';
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactResizeDetector from 'react-resize-detector';
-import { Redirect } from 'react-router-dom';
 
 loader.config({ paths: { vs: '/cdn/monaco/' } });
 
-export default function AdminTagSafelist() {
-  const { t, i18n } = useTranslation(['adminTagSafelist']);
+function WrappedPatterns({ reload, patternsFile, originalPatternsFile, setPatternsFile }) {
+  const { t, i18n } = useTranslation(['adminIdentify']);
   const theme = useTheme();
   const containerEL = useRef<HTMLDivElement>();
   const containerDialogEL = useRef<HTMLDivElement>();
-  const [tagSafelist, setTagSafelist] = useState(null);
-  const [originalTagSafelist, setOriginalTagSafelist] = useState(null);
   const [open, setOpen] = useState(false);
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
-  const { user: currentUser } = useUser<CustomUser>();
   const { isDarkTheme } = useAppContext();
 
   useEffect(() => {
-    reload(false);
+    if (!patternsFile) reload();
     // I cannot find a way to hot switch monaco editor's locale but at least I can load
     // the right language on first load...
     if (i18n.language === 'fr') {
@@ -48,26 +41,15 @@ export default function AdminTagSafelist() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const reload = defValue => {
-    apiCall({
-      method: 'GET',
-      url: `/api/v4/system/tag_safelist/${defValue ? '?default' : ''}`,
-      onSuccess: api_data => {
-        setTagSafelist(api_data.api_response);
-        if (!defValue) setOriginalTagSafelist(api_data.api_response);
-      }
-    });
-  };
-
   const saveChanges = tagData => {
     setOpen(false);
     apiCall({
       method: 'PUT',
-      url: '/api/v4/system/tag_safelist/',
+      url: '/api/v4/system/identify/patterns/',
       body: tagData,
       onSuccess: api_data => {
-        reload(false);
-        showSuccessMessage(t('save.success'));
+        reload();
+        showSuccessMessage(t('save.success.patterns'));
       }
     });
   };
@@ -76,45 +58,8 @@ export default function AdminTagSafelist() {
     editor.focus();
   };
 
-  return currentUser.is_admin ? (
-    <PageFullSize margin={4}>
-      <div style={{ marginBottom: theme.spacing(4), textAlign: 'left' }}>
-        <Grid container alignItems="center" spacing={2}>
-          <Grid item style={{ flexGrow: 1 }}>
-            <div>
-              <Typography variant="h4">{t('title')}</Typography>
-            </div>
-          </Grid>
-          <Grid item>
-            <Grid container spacing={2}>
-              <Grid item>
-                <Button variant="outlined" onClick={() => reload(true)}>
-                  {t('reset')}
-                </Button>
-              </Grid>
-              <Grid item>
-                <Button
-                  variant="contained"
-                  onClick={() => setTagSafelist(originalTagSafelist)}
-                  disabled={tagSafelist === originalTagSafelist}
-                >
-                  {t('undo')}
-                </Button>
-              </Grid>
-              <Grid item>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  disabled={tagSafelist === originalTagSafelist}
-                  onClick={() => setOpen(true)}
-                >
-                  {t('save')}
-                </Button>
-              </Grid>
-            </Grid>
-          </Grid>
-        </Grid>
-      </div>
+  return (
+    <>
       <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby="dialog-title" fullWidth maxWidth="md">
         <DialogTitle id="dialog-title">{t('save.title')}</DialogTitle>
         <DialogContent>
@@ -123,13 +68,13 @@ export default function AdminTagSafelist() {
               {({ width }) => (
                 <div ref={containerDialogEL}>
                   <DiffEditor
-                    language="yaml"
+                    language="patterns"
                     theme={isDarkTheme ? 'vs-dark' : 'vs'}
-                    original={originalTagSafelist}
+                    original={originalPatternsFile}
                     width={width}
                     height="50vh"
-                    loading={t('loading')}
-                    modified={tagSafelist}
+                    loading={t('loading.patterns')}
+                    modified={patternsFile}
                     options={{ renderSideBySide: false, readOnly: true }}
                   />
                 </div>
@@ -141,11 +86,48 @@ export default function AdminTagSafelist() {
           <Button onClick={() => setOpen(false)} color="secondary">
             {t('save.cancelText')}
           </Button>
-          <Button onClick={() => saveChanges(tagSafelist)} color="primary">
+          <Button onClick={() => saveChanges(patternsFile)} color="primary">
             {t('save.acceptText')}
           </Button>
         </DialogActions>
       </Dialog>
+      <Grid container justifyContent="flex-end" spacing={1} style={{ marginBottom: theme.spacing(1) }}>
+        <Grid item style={{ flexGrow: 1 }}>
+          <div>
+            <Typography variant="h5">{t('title.patterns')}</Typography>
+          </div>
+        </Grid>
+        <Grid item>
+          <Grid container spacing={1}>
+            <Grid item>
+              <Button size="small" variant="outlined" onClick={() => reload(true, setOpen)}>
+                {t('reset')}
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                size="small"
+                variant="contained"
+                onClick={() => setPatternsFile(originalPatternsFile)}
+                disabled={patternsFile === originalPatternsFile}
+              >
+                {t('undo')}
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                variant="contained"
+                size="small"
+                color="primary"
+                disabled={patternsFile === originalPatternsFile}
+                onClick={() => setOpen(true)}
+              >
+                {t('save')}
+              </Button>
+            </Grid>
+          </Grid>
+        </Grid>
+      </Grid>
       <div
         ref={containerEL}
         style={{
@@ -166,16 +148,16 @@ export default function AdminTagSafelist() {
           <ReactResizeDetector handleHeight handleWidth targetRef={containerEL}>
             {({ width, height }) => (
               <div ref={containerEL}>
-                {tagSafelist !== null ? (
+                {patternsFile !== null ? (
                   <>
                     <Editor
                       language="yaml"
                       width={width}
                       height={height}
                       theme={isDarkTheme ? 'vs-dark' : 'vs'}
-                      loading={t('loading')}
-                      value={tagSafelist}
-                      onChange={setTagSafelist}
+                      loading={t('loading.patterns')}
+                      value={patternsFile}
+                      onChange={setPatternsFile}
                       onMount={onMount}
                     />
                   </>
@@ -187,8 +169,9 @@ export default function AdminTagSafelist() {
           </ReactResizeDetector>
         </div>
       </div>
-    </PageFullSize>
-  ) : (
-    <Redirect to="/forbidden" />
+    </>
   );
 }
+
+const Patterns = React.memo(WrappedPatterns);
+export default Patterns;

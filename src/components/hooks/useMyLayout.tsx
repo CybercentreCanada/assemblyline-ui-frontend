@@ -9,6 +9,7 @@ import CompareArrowsOutlinedIcon from '@material-ui/icons/CompareArrowsOutlined'
 import DashboardOutlinedIcon from '@material-ui/icons/DashboardOutlined';
 import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import FindInPageOutlinedIcon from '@material-ui/icons/FindInPageOutlined';
 import FingerprintOutlinedIcon from '@material-ui/icons/FingerprintOutlined';
 import HelpOutlineOutlinedIcon from '@material-ui/icons/HelpOutlineOutlined';
 import LabelOutlinedIcon from '@material-ui/icons/LabelOutlined';
@@ -182,6 +183,13 @@ const useMyLayout = (): AppLayoutProps => {
             text: t('adminmenu.errors'),
             route: '/admin/errors',
             icon: <ErrorOutlineOutlinedIcon />,
+            nested: true
+          },
+          {
+            id: 'adminmenu.identify',
+            text: t('adminmenu.identify'),
+            route: '/admin/identify',
+            icon: <FindInPageOutlinedIcon />,
             nested: true
           },
           {
