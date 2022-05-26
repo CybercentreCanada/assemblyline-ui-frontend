@@ -9,7 +9,7 @@ import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
-import { scoreToVerdict } from 'helpers/utils';
+import { safeFieldValue, scoreToVerdict } from 'helpers/utils';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
@@ -60,7 +60,10 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
 
   const searchHeuristic = useCallback(
-    () => history.push(`/search/result?query=result.sections.heuristic${signature ? '.signature' : ''}.name:"${text}"`),
+    () =>
+      history.push(
+        `/search/result?query=result.sections.heuristic${signature ? '.signature' : ''}.name:${safeFieldValue(text)}`
+      ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [signature, text]
   );
