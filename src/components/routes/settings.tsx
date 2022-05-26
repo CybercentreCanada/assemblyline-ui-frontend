@@ -172,6 +172,13 @@ function Settings({ width }: SettingsProps) {
     }
   }
 
+  function handleEncodingPasswordChange(event) {
+    if (settings) {
+      setModified(true);
+      setSettings({ ...settings, default_protected_password: event.target.value });
+    }
+  }
+
   function handleScoreChange(event) {
     if (settings) {
       setModified(true);
@@ -279,9 +286,9 @@ function Settings({ width }: SettingsProps) {
                 ),
                 encoding: (
                   <>
-                    <Typography variant="h4">{t('interface.encoding')}</Typography>
+                    <Typography variant="h4">{t('download.encoding')}</Typography>
                     <Typography variant="caption" color="textSecondary" gutterBottom>
-                      {t('interface.encoding_desc')}
+                      {t('download.encoding_desc')}
                     </Typography>
                     <div style={{ paddingTop: sp2, width: '100%' }}>
                       <Select
@@ -292,8 +299,13 @@ function Settings({ width }: SettingsProps) {
                         variant="outlined"
                         style={{ width: '100%' }}
                       >
-                        <MenuItem value="raw">{t('interface.encoding_raw')}</MenuItem>
-                        <MenuItem value="cart">{t('interface.encoding_cart')}</MenuItem>
+                        {!configuration.ui.allow_raw_downloads ? null :
+                        <MenuItem value="raw">{t('download.encoding_raw')}</MenuItem>
+                        }
+                        <MenuItem value="cart">{t('download.encoding_cart')}</MenuItem>
+                        {!configuration.ui.allow_protected_downloads ? null :
+                        <MenuItem value="protected">{t('download.encoding_protected')}</MenuItem>
+                        }
                       </Select>
                     </div>
                   </>
@@ -321,6 +333,15 @@ function Settings({ width }: SettingsProps) {
                         <MenuItem value="100000000">{t('interface.score_100000000')}</MenuItem>
                       </Select>
                     </div>
+                  </>
+                ),
+                password: (
+                  <>
+                   <Typography variant="h4">{t('download.password')}</Typography>
+                   <div style={{ paddingTop: sp2, width: '100%' }}>
+                    <TextField fullWidth={true} value={settings.default_protected_password} onChange={handleEncodingPasswordChange}></TextField>
+                   </div>
+
                   </>
                 )
               }[drawerType]}
@@ -474,6 +495,75 @@ function Settings({ width }: SettingsProps) {
       </TableContainer>
 
       <TableContainer className={classes.group} component={Paper}>
+        <Table aria-label={t('download')}>
+          <TableHead>
+            <TableRow>
+              <TableCell colSpan={3}>
+                <Typography variant="h6" gutterBottom>
+                  {t('download')}
+                </Typography>
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            <TableRow hover style={{ cursor: 'pointer' }} onClick={event => toggleDrawer('encoding')}>
+              {isWidthDown('xs', width) ? null : (
+                <TableCell>
+                  <Typography variant="body1">{t('download.encoding')}</Typography>
+                  <Typography variant="caption">{t('download.encoding_desc')}</Typography>
+                </TableCell>
+              )}
+              <TableCell colSpan={isWidthDown('xs', width) ? 2 : 1}>
+                {!isWidthDown('xs', width) ? null : (
+                  <>
+                    <Typography variant="body1">{t('download.encoding')}</Typography>
+                    <Typography variant="caption" gutterBottom>{t('download.encoding_desc')}</Typography>
+                  </>
+                )}
+                {settings ? (
+                  <Typography variant="subtitle2" color="primary">
+                    {t(`download.encoding_${settings.download_encoding}`)}
+                  </Typography>
+                ) : (
+                  <Skeleton />
+                )}
+              </TableCell>
+              <TableCell align="right">
+                <ChevronRightOutlinedIcon />
+              </TableCell>
+            </TableRow>
+            {settings && settings.download_encoding == 'protected' ? (
+              <TableRow hover style={{ cursor: 'pointer' }} onClick={event => toggleDrawer('password')}>
+              {isWidthDown('xs', width) ? null : (
+                <TableCell>
+                  <Typography variant="body1">{t('download.password')}</Typography>
+                </TableCell>
+              )}
+              <TableCell colSpan={isWidthDown('xs', width) ? 2 : 1}>
+                {!isWidthDown('xs', width) ? null : (
+                  <>
+                    <Typography variant="body1">{t('download.password')}</Typography>
+                  </>
+                )}
+                {settings ? (
+                  <Typography variant="subtitle2" color="primary">
+                    {settings.default_protected_password}
+                  </Typography>
+                ) : (
+                  <Skeleton />
+                )}
+              </TableCell>
+              <TableCell align="right">
+                <ChevronRightOutlinedIcon />
+              </TableCell>
+            </TableRow>
+            ) : null
+            }
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      <TableContainer className={classes.group} component={Paper}>
         <Table aria-label={t('interface')}>
           <TableHead>
             <TableRow>
@@ -504,34 +594,6 @@ function Settings({ width }: SettingsProps) {
                 {settings ? (
                   <Typography variant="subtitle2" color="primary">
                     {t(`interface.view_${settings.submission_view}`)}
-                  </Typography>
-                ) : (
-                  <Skeleton />
-                )}
-              </TableCell>
-              <TableCell align="right">
-                <ChevronRightOutlinedIcon />
-              </TableCell>
-            </TableRow>
-            <TableRow hover style={{ cursor: 'pointer' }} onClick={event => toggleDrawer('encoding')}>
-              {isWidthDown('xs', width) ? null : (
-                <TableCell>
-                  <Typography variant="body1">{t('interface.encoding')}</Typography>
-                  <Typography variant="caption">{t('interface.encoding_desc')}</Typography>
-                </TableCell>
-              )}
-              <TableCell colSpan={isWidthDown('xs', width) ? 2 : 1}>
-                {!isWidthDown('xs', width) ? null : (
-                  <>
-                    <Typography variant="body1">{t('interface.encoding')}</Typography>
-                    <Typography variant="caption" gutterBottom>
-                      {t('interface.encoding_desc')}
-                    </Typography>
-                  </>
-                )}
-                {settings ? (
-                  <Typography variant="subtitle2" color="primary">
-                    {t(`interface.encoding_${settings.download_encoding}`)}
                   </Typography>
                 ) : (
                   <Skeleton />
