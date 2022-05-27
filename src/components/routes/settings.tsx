@@ -21,8 +21,8 @@ import {
   withWidth
 } from '@material-ui/core';
 import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import CloseIcon from '@material-ui/icons/Close';
+import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Skeleton from '@material-ui/lab/Skeleton';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
@@ -199,7 +199,7 @@ function Settings({ width }: SettingsProps) {
         },
         onFailure: api_data => {
           if (api_data.api_status_code === 403) {
-            showErrorMessage(api_data.api_error_message)
+            showErrorMessage(api_data.api_error_message);
           }
         },
         onEnter: () => setButtonLoading(true),
@@ -305,32 +305,31 @@ function Settings({ width }: SettingsProps) {
                         variant="outlined"
                         style={{ width: '100%' }}
                       >
-                        {!configuration.ui.allow_raw_downloads ? null :
-                        <MenuItem value="raw">{t('interface.encoding_raw')}</MenuItem>
-                        }
+                        {!configuration.ui.allow_raw_downloads ? null : (
+                          <MenuItem value="raw">{t('interface.encoding_raw')}</MenuItem>
+                        )}
                         <MenuItem value="cart">{t('interface.encoding_cart')}</MenuItem>
-                        {!configuration.ui.allow_protected_downloads ? null :
-                        <MenuItem value="protected">{t('interface.encoding_protected')}</MenuItem>
-                        }
+                        {!configuration.ui.allow_protected_downloads ? null : (
+                          <MenuItem value="protected">{t('interface.encoding_protected')}</MenuItem>
+                        )}
                       </Select>
                     </div>
-                    { settings.download_encoding != 'protected' ? null :
-                    <>
-                      <div style={{ paddingTop: sp2, width: '100%' }}>
-                        <Typography variant="caption" color="textSecondary" gutterBottom>
-                          {t('interface.encoding_password')}
-                        </Typography>
-                        <TextField
-                          fullWidth={true}
-                          required={true}
-                          onChange={handleEncodingPasswordChange}
-                          variant='outlined'
-                          value={settings.default_protected_password}
-                          >
-                        </TextField>
-                      </div>
-                    </>
-                    }
+                    {settings.download_encoding !== 'protected' ? null : (
+                      <>
+                        <div style={{ paddingTop: sp2, width: '100%' }}>
+                          <Typography variant="caption" color="textSecondary" gutterBottom>
+                            {t('interface.encoding_password')}
+                          </Typography>
+                          <TextField
+                            fullWidth={true}
+                            required={true}
+                            onChange={handleEncodingPasswordChange}
+                            variant="outlined"
+                            value={settings.default_protected_password}
+                          ></TextField>
+                        </div>
+                      </>
+                    )}
                   </>
                 ),
                 score: (
@@ -569,12 +568,14 @@ function Settings({ width }: SettingsProps) {
                     <Typography variant="subtitle2" color="primary">
                       {t(`interface.encoding_${settings.download_encoding}`)}
                     </Typography>
-                    {settings.download_encoding != 'protected' ? null :
-                    <>
-                      <div style={{ display: 'inline-block', verticalAlign: 'middle', paddingRight: '3px' }}><LockOutlinedIcon fontSize='small'/></div>
-                      <Typography variant="caption">{settings.default_protected_password}</Typography>
-                    </>
-                    }
+                    {settings.download_encoding !== 'protected' ? null : (
+                      <>
+                        <div style={{ display: 'inline-block', verticalAlign: 'middle', paddingRight: '3px' }}>
+                          <LockOutlinedIcon fontSize="small" />
+                        </div>
+                        <Typography variant="caption">{settings.default_protected_password}</Typography>
+                      </>
+                    )}
                   </>
                 ) : (
                   <Skeleton />
