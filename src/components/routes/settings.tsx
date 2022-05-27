@@ -176,7 +176,7 @@ function Settings({ width }: SettingsProps) {
   function handleEncodingPasswordChange(event) {
     if (settings) {
       setModified(true);
-      setSettings({ ...settings, default_protected_password: event.target.value });
+      setSettings({ ...settings, default_zip_password: event.target.value });
     }
   }
 
@@ -309,12 +309,12 @@ function Settings({ width }: SettingsProps) {
                           <MenuItem value="raw">{t('interface.encoding_raw')}</MenuItem>
                         )}
                         <MenuItem value="cart">{t('interface.encoding_cart')}</MenuItem>
-                        {!configuration.ui.allow_protected_downloads ? null : (
-                          <MenuItem value="protected">{t('interface.encoding_protected')}</MenuItem>
+                        {!configuration.ui.allow_zip_downloads ? null : (
+                          <MenuItem value="zip">{t('interface.encoding_zip')}</MenuItem>
                         )}
                       </Select>
                     </div>
-                    {settings.download_encoding !== 'protected' ? null : (
+                    {settings.download_encoding !== 'zip' ? null : (
                       <>
                         <div style={{ paddingTop: sp2, width: '100%' }}>
                           <Typography variant="caption" color="textSecondary" gutterBottom>
@@ -325,7 +325,7 @@ function Settings({ width }: SettingsProps) {
                             required={true}
                             onChange={handleEncodingPasswordChange}
                             variant="outlined"
-                            value={settings.default_protected_password}
+                            value={settings.default_zip_password}
                           ></TextField>
                         </div>
                       </>
@@ -568,12 +568,12 @@ function Settings({ width }: SettingsProps) {
                     <Typography variant="subtitle2" color="primary">
                       {t(`interface.encoding_${settings.download_encoding}`)}
                     </Typography>
-                    {settings.download_encoding !== 'protected' ? null : (
+                    {settings.download_encoding !== 'zip' ? null : (
                       <>
                         <div style={{ display: 'inline-block', verticalAlign: 'middle', paddingRight: '3px' }}>
                           <LockOutlinedIcon fontSize="small" />
                         </div>
-                        <Typography variant="caption">{settings.default_protected_password}</Typography>
+                        <Typography variant="caption">{settings.default_zip_password}</Typography>
                       </>
                     )}
                   </>
