@@ -22,6 +22,7 @@ import {
 } from '@material-ui/core';
 import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
 import CloseIcon from '@material-ui/icons/Close';
+import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Skeleton from '@material-ui/lab/Skeleton';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
@@ -62,7 +63,7 @@ function Settings({ width }: SettingsProps) {
   const [modified, setModified] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
   const { user: currentUser, c12nDef, configuration } = useALContext();
-  const { showSuccessMessage } = useMySnackbar();
+  const { showErrorMessage, showSuccessMessage } = useMySnackbar();
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
@@ -172,6 +173,13 @@ function Settings({ width }: SettingsProps) {
     }
   }
 
+  function handleEncodingPasswordChange(event) {
+    if (settings) {
+      setModified(true);
+      setSettings({ ...settings, default_zip_password: event.target.value });
+    }
+  }
+
   function handleScoreChange(event) {
     if (settings) {
       setModified(true);
@@ -188,6 +196,11 @@ function Settings({ width }: SettingsProps) {
         onSuccess: () => {
           setModified(false);
           showSuccessMessage(t('success_save'));
+        },
+        onFailure: api_data => {
+          if (api_data.api_status_code === 403) {
+            showErrorMessage(api_data.api_error_message);
+          }
         },
         onEnter: () => setButtonLoading(true),
         onExit: () => setButtonLoading(false)
@@ -292,10 +305,31 @@ function Settings({ width }: SettingsProps) {
                         variant="outlined"
                         style={{ width: '100%' }}
                       >
-                        <MenuItem value="raw">{t('interface.encoding_raw')}</MenuItem>
+                        {!configuration.ui.allow_raw_downloads ? null : (
+                          <MenuItem value="raw">{t('interface.encoding_raw')}</MenuItem>
+                        )}
                         <MenuItem value="cart">{t('interface.encoding_cart')}</MenuItem>
+                        {!configuration.ui.allow_zip_downloads ? null : (
+                          <MenuItem value="zip">{t('interface.encoding_zip')}</MenuItem>
+                        )}
                       </Select>
                     </div>
+                    {settings.download_encoding !== 'zip' ? null : (
+                      <>
+                        <div style={{ paddingTop: sp2, width: '100%' }}>
+                          <Typography variant="caption" color="textSecondary" gutterBottom>
+                            {t('interface.encoding_password')}
+                          </Typography>
+                          <TextField
+                            fullWidth={true}
+                            required={true}
+                            onChange={handleEncodingPasswordChange}
+                            variant="outlined"
+                            value={settings.default_zip_password}
+                          ></TextField>
+                        </div>
+                      </>
+                    )}
                   </>
                 ),
                 score: (
@@ -530,9 +564,19 @@ function Settings({ width }: SettingsProps) {
                   </>
                 )}
                 {settings ? (
-                  <Typography variant="subtitle2" color="primary">
-                    {t(`interface.encoding_${settings.download_encoding}`)}
-                  </Typography>
+                  <>
+                    <Typography variant="subtitle2" color="primary">
+                      {t(`interface.encoding_${settings.download_encoding}`)}
+                    </Typography>
+                    {settings.download_encoding !== 'zip' ? null : (
+                      <>
+                        <div style={{ display: 'inline-block', verticalAlign: 'middle', paddingRight: '3px' }}>
+                          <LockOutlinedIcon fontSize="small" />
+                        </div>
+                        <Typography variant="caption">{settings.default_zip_password}</Typography>
+                      </>
+                    )}
+                  </>
                 ) : (
                   <Skeleton />
                 )}

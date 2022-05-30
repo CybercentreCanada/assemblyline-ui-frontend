@@ -74,8 +74,10 @@ export type ConfigurationDefinition = {
       url: string[];
     };
     allow_malicious_hinting: boolean;
+    allow_raw_downloads: boolean;
     allow_replay: boolean;
     allow_url_submissions: boolean;
+    allow_zip_downloads: boolean;
     apps: AppElement[];
     banner: {
       [lang: string]: string;

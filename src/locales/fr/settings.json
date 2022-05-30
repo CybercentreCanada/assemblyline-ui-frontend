@@ -4,6 +4,8 @@
   "interface.encoding_cart": "Format de stérilisation des fichiers CaRT",
   "interface.encoding_desc": "Encodage utilisé pour tous les fichiers téléchargés.",
   "interface.encoding_raw": "Aucun encodage",
+  "interface.encoding_password": "Mot de passe utilisé pour le cryptage ZIP",
+  "interface.encoding_zip": "ZIP protégé par mot de passe",
   "interface.score": "Verdict d'expansion automatique",
   "interface.score_-1000000": "Afficher automatiquement toutes les sections",
   "interface.score_0": "Non malveillant",

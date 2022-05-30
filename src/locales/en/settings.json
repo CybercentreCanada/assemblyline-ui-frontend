@@ -4,6 +4,8 @@
   "interface.encoding_cart": "CaRT file neutering format",
   "interface.encoding_desc": "Encoding used for all downloaded files.",
   "interface.encoding_raw": "No encoding",
+  "interface.encoding_password": "Password used for ZIP encryption",
+  "interface.encoding_zip": "Password-Protected ZIP",
   "interface.score": "Auto-expand verdict",
   "interface.score_-1000000": "Auto-expand all sections",
   "interface.score_0": "Non-Malicious",
