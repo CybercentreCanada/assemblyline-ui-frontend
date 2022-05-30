@@ -25,6 +25,7 @@ import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
 import Verdict from 'components/visual/Verdict';
 import VerdictBar from 'components/visual/VerdictBar';
+import { verdictToColor } from 'helpers/utils';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
@@ -446,11 +447,23 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                     </Grid>
                     <Grid item xs={9} sm={10}>
                       <div className={classes.sectionContent}>
-                        <ChipList
-                          items={
-                            item ? item.al.attrib.map(label => ({ label, variant: 'outlined', color: 'error' })) : null
-                          }
-                        />
+                        {item.al.detailed ? (
+                          <ChipList
+                            items={
+                              item
+                                ? item.al.detailed.attrib.map(attrib => ({
+                                    label: attrib.value,
+                                    variant: 'outlined',
+                                    color: verdictToColor(attrib.verdict)
+                                  }))
+                                : null
+                            }
+                          />
+                        ) : (
+                          <ChipList
+                            items={item ? item.al.attrib.map(label => ({ label, variant: 'outlined' })) : null}
+                          />
+                        )}
                       </div>
                     </Grid>
                   </>
@@ -464,11 +477,21 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                     </Grid>
                     <Grid item xs={9} sm={10}>
                       <div className={classes.sectionContent}>
-                        <ChipList
-                          items={
-                            item ? item.al.av.map(label => ({ label, variant: 'outlined', color: 'warning' })) : null
-                          }
-                        />
+                        {item.al.detailed ? (
+                          <ChipList
+                            items={
+                              item
+                                ? item.al.detailed.av.map(av => ({
+                                    label: av.value,
+                                    variant: 'outlined',
+                                    color: verdictToColor(av.verdict)
+                                  }))
+                                : null
+                            }
+                          />
+                        ) : (
+                          <ChipList items={item ? item.al.av.map(label => ({ label, variant: 'outlined' })) : null} />
+                        )}
                       </div>
                     </Grid>
                   </>
@@ -489,17 +512,32 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                                 <Typography variant="caption">
                                   <i>{t('ip_dynamic')}</i>
                                 </Typography>
-                                <ChipList
-                                  items={
-                                    item
-                                      ? item.al.ip_dynamic.map(label => ({
-                                          label,
-                                          variant: 'outlined',
-                                          color: 'primary'
-                                        }))
-                                      : null
-                                  }
-                                />
+                                {item.al.detailed ? (
+                                  <ChipList
+                                    items={
+                                      item
+                                        ? item.al.detailed.ip
+                                            .filter(ip => ip.type === 'network.dynamic.ip')
+                                            .map(ip => ({
+                                              label: ip.value,
+                                              variant: 'outlined',
+                                              color: verdictToColor(ip.verdict)
+                                            }))
+                                        : null
+                                    }
+                                  />
+                                ) : (
+                                  <ChipList
+                                    items={
+                                      item
+                                        ? item.al.ip_dynamic.map(label => ({
+                                            label,
+                                            variant: 'outlined'
+                                          }))
+                                        : null
+                                    }
+                                  />
+                                )}
                               </Grid>
                             ))}
                           {!item ||
@@ -508,17 +546,32 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                                 <Typography variant="caption">
                                   <i>{t('ip_static')}</i>
                                 </Typography>
-                                <ChipList
-                                  items={
-                                    item
-                                      ? item.al.ip_static.map(label => ({
-                                          label,
-                                          variant: 'outlined',
-                                          color: 'primary'
-                                        }))
-                                      : null
-                                  }
-                                />{' '}
+                                {item.al.detailed ? (
+                                  <ChipList
+                                    items={
+                                      item
+                                        ? item.al.detailed.ip
+                                            .filter(ip => ip.type === 'network.static.ip')
+                                            .map(ip => ({
+                                              label: ip.value,
+                                              variant: 'outlined',
+                                              color: verdictToColor(ip.verdict)
+                                            }))
+                                        : null
+                                    }
+                                  />
+                                ) : (
+                                  <ChipList
+                                    items={
+                                      item
+                                        ? item.al.ip_static.map(label => ({
+                                            label,
+                                            variant: 'outlined'
+                                          }))
+                                        : null
+                                    }
+                                  />
+                                )}
                               </Grid>
                             ))}
                         </Grid>
@@ -542,17 +595,32 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                                 <Typography variant="caption">
                                   <i>{t('domain_dynamic')}</i>
                                 </Typography>
-                                <ChipList
-                                  items={
-                                    item
-                                      ? item.al.domain_dynamic.map(label => ({
-                                          label,
-                                          variant: 'outlined',
-                                          color: 'success'
-                                        }))
-                                      : null
-                                  }
-                                />
+                                {item.al.detailed ? (
+                                  <ChipList
+                                    items={
+                                      item
+                                        ? item.al.detailed.domain
+                                            .filter(domain => domain.type === 'network.dynamic.domain')
+                                            .map(domain => ({
+                                              label: domain.value,
+                                              variant: 'outlined',
+                                              color: verdictToColor(domain.verdict)
+                                            }))
+                                        : null
+                                    }
+                                  />
+                                ) : (
+                                  <ChipList
+                                    items={
+                                      item
+                                        ? item.al.domain_dynamic.map(label => ({
+                                            label,
+                                            variant: 'outlined'
+                                          }))
+                                        : null
+                                    }
+                                  />
+                                )}
                               </Grid>
                             ))}
                           {!item ||
@@ -561,17 +629,32 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                                 <Typography variant="caption">
                                   <i>{t('domain_static')}</i>
                                 </Typography>
-                                <ChipList
-                                  items={
-                                    item
-                                      ? item.al.domain_static.map(label => ({
-                                          label,
-                                          variant: 'outlined',
-                                          color: 'success'
-                                        }))
-                                      : null
-                                  }
-                                />{' '}
+                                {item.al.detailed ? (
+                                  <ChipList
+                                    items={
+                                      item
+                                        ? item.al.detailed.domain
+                                            .filter(domain => domain.type === 'network.static.domain')
+                                            .map(domain => ({
+                                              label: domain.value,
+                                              variant: 'outlined',
+                                              color: verdictToColor(domain.verdict)
+                                            }))
+                                        : null
+                                    }
+                                  />
+                                ) : (
+                                  <ChipList
+                                    items={
+                                      item
+                                        ? item.al.domain_static.map(label => ({
+                                            label,
+                                            variant: 'outlined'
+                                          }))
+                                        : null
+                                    }
+                                  />
+                                )}
                               </Grid>
                             ))}
                         </Grid>
@@ -593,17 +676,47 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                             <Typography variant="caption" style={{ marginRight: theme.spacing(1) }}>
                               <i>{t('attack_category')}</i>
                             </Typography>
-                            <ChipList
-                              items={item ? item.attack.category.map(label => ({ label, variant: 'outlined' })) : null}
-                            />
+                            {item.al.detailed ? (
+                              <ChipList
+                                items={
+                                  item
+                                    ? item.al.detailed.attack_category.map(cat => ({
+                                        label: cat.value,
+                                        variant: 'outlined',
+                                        color: verdictToColor(cat.verdict)
+                                      }))
+                                    : null
+                                }
+                              />
+                            ) : (
+                              <ChipList
+                                items={
+                                  item ? item.attack.category.map(label => ({ label, variant: 'outlined' })) : null
+                                }
+                              />
+                            )}
                           </Grid>
                           <Grid item xs={12} md={6}>
                             <Typography variant="caption" style={{ marginRight: theme.spacing(1) }}>
                               <i>{t('attack_pattern')}</i>
                             </Typography>
-                            <ChipList
-                              items={item ? item.attack.pattern.map(label => ({ label, variant: 'outlined' })) : null}
-                            />
+                            {item.al.detailed ? (
+                              <ChipList
+                                items={
+                                  item
+                                    ? item.al.detailed.attack_pattern.map(pattern => ({
+                                        label: pattern.value,
+                                        variant: 'outlined',
+                                        color: verdictToColor(pattern.verdict)
+                                      }))
+                                    : null
+                                }
+                              />
+                            ) : (
+                              <ChipList
+                                items={item ? item.attack.pattern.map(label => ({ label, variant: 'outlined' })) : null}
+                              />
+                            )}
                           </Grid>
                         </Grid>
                       </div>
@@ -619,13 +732,23 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                     </Grid>
                     <Grid item xs={9} sm={10}>
                       <div className={classes.sectionContent}>
-                        <ChipList
-                          items={
-                            item
-                              ? item.heuristic.name.map(label => ({ label, variant: 'outlined', color: 'info' }))
-                              : null
-                          }
-                        />
+                        {item.al.detailed ? (
+                          <ChipList
+                            items={
+                              item
+                                ? item.al.detailed.heuristic.map(heur => ({
+                                    label: heur.value,
+                                    variant: 'outlined',
+                                    color: verdictToColor(heur.verdict)
+                                  }))
+                                : null
+                            }
+                          />
+                        ) : (
+                          <ChipList
+                            items={item ? item.heuristic.name.map(label => ({ label, variant: 'outlined' })) : null}
+                          />
+                        )}
                       </div>
                     </Grid>
                   </>
@@ -639,9 +762,23 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                     </Grid>
                     <Grid item xs={9} sm={10}>
                       <div className={classes.sectionContent}>
-                        <ChipList
-                          items={item ? item.al.behavior.map(label => ({ label, variant: 'outlined' })) : null}
-                        />
+                        {item.al.detailed ? (
+                          <ChipList
+                            items={
+                              item
+                                ? item.al.detailed.behavior.map(behavior => ({
+                                    label: behavior.value,
+                                    variant: 'outlined',
+                                    color: verdictToColor(behavior.verdict)
+                                  }))
+                                : null
+                            }
+                          />
+                        ) : (
+                          <ChipList
+                            items={item ? item.al.behavior.map(label => ({ label, variant: 'outlined' })) : null}
+                          />
+                        )}
                       </div>
                     </Grid>
                   </>
@@ -655,13 +792,21 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                     </Grid>
                     <Grid item xs={9} sm={10}>
                       <div className={classes.sectionContent}>
-                        <ChipList
-                          items={
-                            item
-                              ? item.al.yara.map(label => ({ label, variant: 'outlined', color: 'secondary' }))
-                              : null
-                          }
-                        />
+                        {item.al.detailed ? (
+                          <ChipList
+                            items={
+                              item
+                                ? item.al.detailed.yara.map(yara => ({
+                                    label: yara.value,
+                                    variant: 'outlined',
+                                    color: verdictToColor(yara.verdict)
+                                  }))
+                                : null
+                            }
+                          />
+                        ) : (
+                          <ChipList items={item ? item.al.yara.map(label => ({ label, variant: 'outlined' })) : null} />
+                        )}
                       </div>
                     </Grid>
                   </>

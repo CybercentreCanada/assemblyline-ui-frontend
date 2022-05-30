@@ -13,6 +13,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import AlertListChip from './alert-chip-list';
+import AlertListChipDetailed from './alert-chip-list-detailed';
 import AlertExtendedScan from './alert-extended_scan';
 import AlertPriority from './alert-priority';
 import AlertStatus from './alert-status';
@@ -20,6 +21,14 @@ import AlertStatus from './alert-status';
 type AlertListItemProps = {
   item: AlertItem;
 };
+
+const COLOR_MAP = {
+  safe: 'success',
+  info: 'default',
+  suspicious: 'warning',
+  malicious: 'error'
+};
+
 const WrappedAlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
   const theme = useTheme();
   const { t, i18n } = useTranslation('alerts');
@@ -138,20 +147,37 @@ const WrappedAlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
                 style: { cursor: 'inherit' }
               }))
               .concat(
-                item.al.attrib.map(label => ({
-                  label,
-                  size: 'tiny' as 'tiny',
-                  color: 'error',
-                  variant: 'outlined' as 'outlined',
-                  style: { cursor: 'inherit' }
-                }))
+                item.al.detailed
+                  ? item.al.detailed.attrib.map(attrib_item => ({
+                      label: attrib_item.value,
+                      size: 'tiny' as 'tiny',
+                      color: COLOR_MAP[attrib_item.verdict],
+                      variant: 'outlined' as 'outlined',
+                      style: { cursor: 'inherit' }
+                    }))
+                  : item.al.attrib.map(label => ({
+                      label,
+                      size: 'tiny' as 'tiny',
+                      variant: 'outlined' as 'outlined',
+                      style: { cursor: 'inherit' }
+                    }))
               )}
           />
         </Grid>
         <Grid item xs={12} md={2}>
-          <AlertListChip items={item.al.av} title="AV" color="warning" size="tiny" />
-          <AlertListChip items={item.al.ip} title="IP" color="primary" size="tiny" />
-          <AlertListChip items={item.al.domain} title="DOM" color="success" size="tiny" />
+          {item.al.detailed ? (
+            <>
+              <AlertListChipDetailed items={item.al.detailed.av} title="AV" size="tiny" />
+              <AlertListChipDetailed items={item.al.detailed.ip} title="IP" size="tiny" />
+              <AlertListChipDetailed items={item.al.detailed.domain} title="DOM" size="tiny" />
+            </>
+          ) : (
+            <>
+              <AlertListChip items={item.al.av} title="AV" size="tiny" />
+              <AlertListChip items={item.al.ip} title="IP" size="tiny" />
+              <AlertListChip items={item.al.domain} title="DOM" size="tiny" />
+            </>
+          )}
         </Grid>
         <Grid item xs={12} md={2} style={{ textAlign: 'right' }}>
           <Verdict score={item.al.score} />
