@@ -33,6 +33,7 @@ export type ResultResult = {
   result: {
     score: number;
   };
+  type: number;
 };
 
 type SearchResults = {
@@ -64,6 +65,9 @@ const WrappedResultsTable: React.FC<ResultsTableProps> = ({ resultResults, allow
               <SortableHeaderCell sortField="id" allowSort={allowSort}>
                 {t('header.sha256')}
               </SortableHeaderCell>
+              <SortableHeaderCell sortField="type" allowSort={allowSort}>
+                {t('header.filetype')}
+              </SortableHeaderCell>
               <SortableHeaderCell sortField="response.service_name" allowSort={allowSort}>
                 {t('header.service')}
               </SortableHeaderCell>
@@ -94,6 +98,7 @@ const WrappedResultsTable: React.FC<ResultsTableProps> = ({ resultResults, allow
                   <Verdict score={result.result.score} fullWidth />
                 </DivTableCell>
                 <DivTableCell breakable>{result.id.substring(0, 64)}</DivTableCell>
+                <DivTableCell>{result.type}</DivTableCell>
                 <DivTableCell>{result.response.service_name}</DivTableCell>
                 {c12nDef.enforce && (
                   <DivTableCell>
