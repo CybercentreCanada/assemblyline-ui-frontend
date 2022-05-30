@@ -59,6 +59,22 @@ export function scoreToVerdict(score: number | null) {
   return 'info';
 }
 
+export function verdictToColor(verdict) {
+  if (verdict === 'malicious') {
+    return 'error';
+  }
+
+  if (verdict === 'highly_suspicious' || verdict === 'suspicious') {
+    return 'warning';
+  }
+
+  if (verdict === 'safe') {
+    return 'success';
+  }
+
+  return 'default';
+}
+
 export function priorityText(priority: number | null) {
   if (priority >= 1500) {
     return 'user-high';
@@ -130,20 +146,4 @@ export function maxLenStr(str: string, len: number) {
 export function safeFieldValue(data: string | number | boolean) {
   const temp = String(data);
   return `"${encodeURIComponent(temp.replace(/\\/g, '\\\\').replace(/"/g, '\\"'))}"`;
-}
-
-export function verdictToColor(verdict) {
-  if (verdict === 'malicious') {
-    return 'error';
-  }
-
-  if (verdict === 'highly_suspicious' || verdict === 'suspicious') {
-    return 'warning';
-  }
-
-  if (verdict === 'safe') {
-    return 'success';
-  }
-
-  return 'default';
 }
