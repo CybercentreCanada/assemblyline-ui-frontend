@@ -131,3 +131,19 @@ export function safeFieldValue(data: string | number | boolean) {
   const temp = String(data);
   return `"${encodeURIComponent(temp.replace(/\\/g, '\\\\').replace(/"/g, '\\"'))}"`;
 }
+
+export function verdictToColor(verdict) {
+  if (verdict === 'malicious') {
+    return 'error';
+  }
+
+  if (verdict === 'highly_suspicious' || verdict === 'suspicious') {
+    return 'warning';
+  }
+
+  if (verdict === 'safe') {
+    return 'success';
+  }
+
+  return 'default';
+}

@@ -34,11 +34,29 @@ export interface AlertUpdateItem {
   };
 }
 
+export interface DetailedItem {
+  subtype: string;
+  type: string;
+  value: string;
+  verdict: 'safe' | 'info' | 'suspicious' | 'malicious';
+}
+
 export interface AlertItem extends LineItem {
   al: {
     attrib: string[];
     av: string[];
     behavior: string[];
+    detailed: {
+      attack_category: DetailedItem[];
+      attack_pattern: DetailedItem[];
+      attrib: DetailedItem[];
+      av: DetailedItem[];
+      behavior: DetailedItem[];
+      domain: DetailedItem[];
+      heuristic: DetailedItem[];
+      ip: DetailedItem[];
+      yara: DetailedItem[];
+    };
     domain: string[];
     domain_dynamic: string[];
     domain_static: string[];

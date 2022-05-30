@@ -1,0 +1,43 @@
+import { useTheme } from '@material-ui/core';
+import CustomChip from 'components/visual/CustomChip';
+import React from 'react';
+import { DetailedItem } from './hooks/useAlerts';
+
+type AlertListChipProps = {
+  items: DetailedItem[];
+  title: string;
+  size?: 'tiny' | 'small' | 'medium';
+  variant?: 'default' | 'outlined';
+};
+
+const WrappedAlertListChipDetailed: React.FC<AlertListChipProps> = ({
+  items,
+  title,
+  size = 'small',
+  variant = 'outlined'
+}) => {
+  const theme = useTheme();
+  const hasSuspicious = items.some(element => element.verdict === 'suspicious');
+  const hasMalicious = items.some(element => element.verdict === 'malicious');
+  return (
+    items &&
+    items.length > 0 && (
+      <CustomChip
+        wrap
+        size={size}
+        variant={variant}
+        color={hasMalicious ? 'error' : hasSuspicious ? 'warning' : 'default'}
+        label={`${items.length}x ${title}`}
+        tooltip={items.map(item => item.value).join(' | ')}
+        style={{
+          marginBottom: theme.spacing(0.5),
+          marginRight: theme.spacing(1),
+          cursor: 'inherit'
+        }}
+      />
+    )
+  );
+};
+
+const AlertListChipDetailed = React.memo(WrappedAlertListChipDetailed);
+export default AlertListChipDetailed;
