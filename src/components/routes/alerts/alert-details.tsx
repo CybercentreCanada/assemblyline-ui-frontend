@@ -65,6 +65,16 @@ type AutoHideChipListProps = {
 
 const SkeletonInline = () => <Skeleton style={{ display: 'inline-block', width: '10rem' }} />;
 
+function stringCompare(a, b) {
+  if (a.value < b.value) {
+    return -1;
+  }
+  if (a.value > b.value) {
+    return 1;
+  }
+  return 0;
+}
+
 const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items }) => {
   const { t } = useTranslation('alerts');
   const [show, setShow] = useState<boolean>(
@@ -75,6 +85,7 @@ const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items }) => 
       <ChipList
         items={items
           .filter(item => item.verdict === 'malicious')
+          .sort(stringCompare)
           .map(item => ({
             label: item.value,
             variant: 'outlined',
@@ -84,6 +95,7 @@ const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items }) => 
       <ChipList
         items={items
           .filter(item => item.verdict === 'suspicious')
+          .sort(stringCompare)
           .map(item => ({
             label: item.value,
             variant: 'outlined',
@@ -94,6 +106,7 @@ const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items }) => 
         <ChipList
           items={items
             .filter(item => item.verdict === 'info')
+            .sort(stringCompare)
             .map(item => ({
               label: item.value,
               variant: 'outlined',
@@ -484,7 +497,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
           item.al.av.length !== 0 ||
           item.al.ip.length !== 0 ||
           item.al.domain.length !== 0 ||
-          (item.al.url && item.al.url.length !== 0) ||
+          (item.al.uri && item.al.uri.length !== 0) ||
           item.attack.category.length !== 0 ||
           (item.heuristic && item.heuristic.name && item.heuristic.name.length !== 0) ||
           item.al.behavior.length !== 0 ||
@@ -655,29 +668,29 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                 </>
               ) : null}
 
-              {/* url sections */}
-              {!item || (item.al.url && item.al.url.length !== 0) ? (
+              {/* uri sections */}
+              {!item || (item.al.uri && item.al.uri.length !== 0) ? (
                 <>
                   <Grid item xs={3} sm={2}>
-                    {t('url')}
+                    {t('uri')}
                   </Grid>
                   <Grid item xs={9} sm={10}>
                     <div className={classes.sectionContent}>
                       <Grid container spacing={1}>
-                        {(!item || item.al.url_dynamic.length !== 0) && (
-                          <Grid item xs={12} md={!item || item.al.url_static.length !== 0 ? 6 : 12}>
+                        {(!item || item.al.uri_dynamic.length !== 0) && (
+                          <Grid item xs={12} md={!item || item.al.uri_static.length !== 0 ? 6 : 12}>
                             <Typography variant="caption" component={'div'}>
-                              <i>{t('url_dynamic')}</i>
+                              <i>{t('uri_dynamic')}</i>
                             </Typography>
                             {item && item.al.detailed ? (
                               <AutoHideChipList
-                                items={item.al.detailed.url.filter(url => url.type === 'network.dynamic.url')}
+                                items={item.al.detailed.uri.filter(uri => uri.type === 'network.dynamic.uri')}
                               />
                             ) : (
                               <ChipList
                                 items={
                                   item
-                                    ? item.al.url_dynamic.map(label => ({
+                                    ? item.al.uri_dynamic.map(label => ({
                                         label,
                                         variant: 'outlined'
                                       }))
@@ -687,20 +700,20 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                             )}
                           </Grid>
                         )}
-                        {(!item || item.al.url_static.length !== 0) && (
-                          <Grid item xs={12} md={!item || item.al.url_dynamic.length !== 0 ? 6 : 12}>
+                        {(!item || item.al.uri_static.length !== 0) && (
+                          <Grid item xs={12} md={!item || item.al.uri_dynamic.length !== 0 ? 6 : 12}>
                             <Typography variant="caption" component={'div'}>
-                              <i>{t('url_static')}</i>
+                              <i>{t('uri_static')}</i>
                             </Typography>
                             {item && item.al.detailed ? (
                               <AutoHideChipList
-                                items={item.al.detailed.url.filter(url => url.type === 'network.static.url')}
+                                items={item.al.detailed.uri.filter(uri => uri.type === 'network.static.uri')}
                               />
                             ) : (
                               <ChipList
                                 items={
                                   item
-                                    ? item.al.url_static.map(label => ({
+                                    ? item.al.uri_static.map(label => ({
                                         label,
                                         variant: 'outlined'
                                       }))

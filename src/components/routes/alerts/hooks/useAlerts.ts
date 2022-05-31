@@ -55,7 +55,7 @@ export interface AlertItem extends LineItem {
       domain: DetailedItem[];
       heuristic: DetailedItem[];
       ip: DetailedItem[];
-      url: DetailedItem[];
+      uri: DetailedItem[];
       yara: DetailedItem[];
     };
     domain: string[];
@@ -64,9 +64,9 @@ export interface AlertItem extends LineItem {
     ip: string[];
     ip_dynamic: string[];
     ip_static: string[];
-    url: string[];
-    url_dynamic: string[];
-    url_static: string[];
+    uri: string[];
+    uri_dynamic: string[];
+    uri_static: string[];
     request_end_time: string[];
     score: number;
     yara: string[];
