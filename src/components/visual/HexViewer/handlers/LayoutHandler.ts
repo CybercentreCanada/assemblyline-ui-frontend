@@ -39,9 +39,6 @@ export const handleLayoutColumnResize = (width: number) => COLUMNS.find(e => wid
 
 export const handleLayoutRowResize = (height: number) => Math.floor(height / LAYOUT_SIZE.rowHeight);
 
-// export const listRefExist = (refs: MutableRefObject<LayoutRef>) =>
-//   !(refs.current.layout.listRef === null || refs.current.layout.listRef?.current === null);
-
 // Focus
 type Focus = { none: 'none'; toolbar: 'toolbar'; body: 'body' };
 const FOCUS: Focus = { none: 'none', toolbar: 'toolbar', body: 'body' };
