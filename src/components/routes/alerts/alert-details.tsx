@@ -663,67 +663,6 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                   </>
                 ) : null}
 
-                {/* Attack Section */}
-                {!item || item.attack.category.length !== 0 ? (
-                  <>
-                    <Grid item xs={3} sm={2}>
-                      {t('attack')}
-                    </Grid>
-                    <Grid item xs={9} sm={10}>
-                      <div className={classes.sectionContent}>
-                        <Grid container spacing={1}>
-                          <Grid item xs={12} md={6}>
-                            <Typography variant="caption" style={{ marginRight: theme.spacing(1) }}>
-                              <i>{t('attack_category')}</i>
-                            </Typography>
-                            {item.al.detailed ? (
-                              <ChipList
-                                items={
-                                  item
-                                    ? item.al.detailed.attack_category.map(cat => ({
-                                        label: cat.value,
-                                        variant: 'outlined',
-                                        color: verdictToColor(cat.verdict)
-                                      }))
-                                    : null
-                                }
-                              />
-                            ) : (
-                              <ChipList
-                                items={
-                                  item ? item.attack.category.map(label => ({ label, variant: 'outlined' })) : null
-                                }
-                              />
-                            )}
-                          </Grid>
-                          <Grid item xs={12} md={6}>
-                            <Typography variant="caption" style={{ marginRight: theme.spacing(1) }}>
-                              <i>{t('attack_pattern')}</i>
-                            </Typography>
-                            {item.al.detailed ? (
-                              <ChipList
-                                items={
-                                  item
-                                    ? item.al.detailed.attack_pattern.map(pattern => ({
-                                        label: pattern.value,
-                                        variant: 'outlined',
-                                        color: verdictToColor(pattern.verdict)
-                                      }))
-                                    : null
-                                }
-                              />
-                            ) : (
-                              <ChipList
-                                items={item ? item.attack.pattern.map(label => ({ label, variant: 'outlined' })) : null}
-                              />
-                            )}
-                          </Grid>
-                        </Grid>
-                      </div>
-                    </Grid>
-                  </>
-                ) : null}
-
                 {/* Heuristics Section */}
                 {!item || (item.heuristic && item.heuristic.name && item.heuristic.name.length !== 0) ? (
                   <>
@@ -807,6 +746,67 @@ const AlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                         ) : (
                           <ChipList items={item ? item.al.yara.map(label => ({ label, variant: 'outlined' })) : null} />
                         )}
+                      </div>
+                    </Grid>
+                  </>
+                ) : null}
+
+                {/* Attack Section */}
+                {!item || item.attack.category.length !== 0 ? (
+                  <>
+                    <Grid item xs={3} sm={2}>
+                      {t('attack')}
+                    </Grid>
+                    <Grid item xs={9} sm={10}>
+                      <div className={classes.sectionContent}>
+                        <Grid container spacing={1}>
+                          <Grid item xs={12} md={6}>
+                            <Typography variant="caption" style={{ marginRight: theme.spacing(1) }}>
+                              <i>{t('attack_category')}</i>
+                            </Typography>
+                            {item.al.detailed ? (
+                              <ChipList
+                                items={
+                                  item
+                                    ? item.al.detailed.attack_category.map(cat => ({
+                                        label: cat.value,
+                                        variant: 'outlined',
+                                        color: verdictToColor(cat.verdict)
+                                      }))
+                                    : null
+                                }
+                              />
+                            ) : (
+                              <ChipList
+                                items={
+                                  item ? item.attack.category.map(label => ({ label, variant: 'outlined' })) : null
+                                }
+                              />
+                            )}
+                          </Grid>
+                          <Grid item xs={12} md={6}>
+                            <Typography variant="caption" style={{ marginRight: theme.spacing(1) }}>
+                              <i>{t('attack_pattern')}</i>
+                            </Typography>
+                            {item.al.detailed ? (
+                              <ChipList
+                                items={
+                                  item
+                                    ? item.al.detailed.attack_pattern.map(pattern => ({
+                                        label: pattern.value,
+                                        variant: 'outlined',
+                                        color: verdictToColor(pattern.verdict)
+                                      }))
+                                    : null
+                                }
+                              />
+                            ) : (
+                              <ChipList
+                                items={item ? item.attack.pattern.map(label => ({ label, variant: 'outlined' })) : null}
+                              />
+                            )}
+                          </Grid>
+                        </Grid>
                       </div>
                     </Grid>
                   </>
