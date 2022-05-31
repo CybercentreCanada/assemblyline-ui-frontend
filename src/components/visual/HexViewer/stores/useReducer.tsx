@@ -1,7 +1,10 @@
 import React from 'react';
 import {
-  ActionProps,
+  Action,
+  ReducerConfig,
+  ReducersConfig,
   Store,
+  StoreAction,
   StoreProviderProps,
   useCellReducer,
   useCopyReducer,
@@ -18,21 +21,16 @@ import {
   useSettingReducer
 } from '..';
 
-export type ReducerProps = {
-  prevStore?: Store;
-  store: Store;
-  action: ActionProps;
-};
-
-export type RenderProps = {
-  prevStore: Store;
-  nextStore: Store;
-};
+export type Reducer = ReducerConfig<StoreAction>;
+export type Reducers = ReducersConfig<StoreAction>;
+export type ReducerHandler = (arg: { store: Store; action: Action; prevStore?: Store }) => Store;
+export type RenderHandler = (arg: { prevStore: Store; nextStore: Store }) => void;
+export type UseReducer<State> = () => { initialState: State; reducer: ReducerHandler; render?: RenderHandler };
 
 export type ReducerContextProps = {
-  initialState?: React.MutableRefObject<Store>;
-  reducer?: (store: Store, action: ActionProps) => Store;
-  render?: (prevStore: Store, nextStore: Store) => void;
+  initialState: React.MutableRefObject<Store>;
+  reducer: (store: Store, action: Action) => Store;
+  render: (prevStore: Store, nextStore: Store) => void;
 };
 
 export const reducerContext = React.createContext<ReducerContextProps>(null);
@@ -70,7 +68,7 @@ export const ReducerProvider = ({ children }: StoreProviderProps) => {
   });
 
   const reducer = React.useCallback(
-    (store: Store, action: ActionProps) => {
+    (store: Store, action: Action) => {
       const prevStore = { ...store };
 
       store = mode.reducer({ store, action });
@@ -85,9 +83,9 @@ export const ReducerProvider = ({ children }: StoreProviderProps) => {
       store = hover.reducer({ store, action });
       store = cursor.reducer({ store, action });
       store = select.reducer({ store, action });
-      store = search.reducer({ prevStore, store, action });
+      store = search.reducer({ store, action, prevStore });
 
-      store = scroll.reducer({ prevStore, store, action });
+      store = scroll.reducer({ store, action, prevStore });
 
       store = copy.reducer({ store, action });
 

@@ -62,7 +62,7 @@ export const WrappedHexSearchIndex = ({ store }: StoreProps) => {
           offset={1}
           endAdornment={<>{t('of') + indexes.length}</>}
           onChange={(event: React.ChangeEvent<any>) => {
-            onSelectedSearchIndexChange(event.target.valueAsNumber as number);
+            onSelectedSearchIndexChange({ index: event.target.valueAsNumber as number });
           }}
         />
         <Tooltip title={t('search')}>
@@ -97,7 +97,7 @@ export const WrappedHexSearchIndex = ({ store }: StoreProps) => {
               offset={1}
               endAdornment={<div>test</div>}
               onChange={(event: React.ChangeEvent<any>) => {
-                onSelectedSearchIndexChange(event.target.valueAsNumber as number);
+                onSelectedSearchIndexChange({ index: event.target.valueAsNumber as number });
               }}
             />
           }

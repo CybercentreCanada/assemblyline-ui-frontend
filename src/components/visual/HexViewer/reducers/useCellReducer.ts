@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { CellType, isAction, ReducerProps, Store } from '..';
+import { CellType, isAction, ReducerHandler, Reducers, UseReducer } from '..';
 
 export type CellState = {
   cell: {
@@ -12,12 +12,7 @@ export type CellState = {
   };
 };
 
-export type CellPayload = {
-  index: number;
-  type: CellType;
-};
-
-export const useCellReducer = () => {
+export const useCellReducer: UseReducer<CellState> = () => {
   const initialState = useMemo<CellState>(
     () => ({
       cell: {
@@ -32,56 +27,28 @@ export const useCellReducer = () => {
     []
   );
 
-  const cellMouseEnter = useCallback((store: Store, payload: CellPayload): Store => {
-    return {
-      ...store,
-      cell: {
-        ...store.cell,
-        mouseOverType: payload.type,
-        mouseLeaveIndex: store.cell.mouseEnterIndex,
-        mouseEnterIndex: payload.index
-      }
-    };
+  const cellMouseEnter: Reducers['cellMouseEnter'] = useCallback((store, { type, index }) => {
+    return { ...store, cell: { ...store.cell, mouseOverType: type, mouseLeaveIndex: index, mouseEnterIndex: index } };
   }, []);
 
-  const cellMouseDown = useCallback((store: Store, payload: CellPayload): Store => {
-    return {
-      ...store,
-      cell: {
-        ...store.cell,
-        isMouseDown: true,
-        mouseDownIndex: payload.index
-      }
-    };
+  const cellMouseDown: Reducers['cellMouseDown'] = useCallback((store, { type, index }) => {
+    return { ...store, cell: { ...store.cell, isMouseDown: true, mouseDownIndex: index } };
   }, []);
 
-  const bodyMouseLeave = useCallback((store: Store, payload: CellPayload): Store => {
-    return {
-      ...store,
-      cell: {
-        ...store.cell,
-        mouseLeaveIndex: store.cell.mouseEnterIndex,
-        mouseEnterIndex: null
-      }
-    };
+  const bodyMouseLeave: Reducers['bodyMouseLeave'] = useCallback((store, payload) => {
+    return { ...store, cell: { ...store.cell, mouseLeaveIndex: store.cell.mouseEnterIndex, mouseEnterIndex: null } };
   }, []);
 
-  const bodyMouseUp = useCallback((store: Store, payload: CellPayload): Store => {
-    return {
-      ...store,
-      cell: {
-        ...store.cell,
-        isMouseDown: false
-      }
-    };
+  const bodyMouseUp: Reducers['bodyMouseUp'] = useCallback((store, payload) => {
+    return { ...store, cell: { ...store.cell, isMouseDown: false } };
   }, []);
 
-  const reducer = useCallback(
-    ({ store, action }: ReducerProps): Store => {
-      if (isAction.cellMouseEnter(action)) return cellMouseEnter(store, action.payload);
-      else if (isAction.cellMouseDown(action)) return cellMouseDown(store, action.payload);
-      else if (isAction.bodyMouseLeave(action)) return bodyMouseLeave(store, action.payload);
-      else if (isAction.bodyMouseUp(action)) return bodyMouseUp(store, action.payload);
+  const reducer: ReducerHandler = useCallback(
+    ({ store, action: { type, payload } }) => {
+      if (isAction.cellMouseEnter(type)) return cellMouseEnter(store, payload);
+      else if (isAction.cellMouseDown(type)) return cellMouseDown(store, payload);
+      else if (isAction.bodyMouseLeave(type)) return bodyMouseLeave(store, payload);
+      else if (isAction.bodyMouseUp(type)) return bodyMouseUp(store, payload);
       else return { ...store };
     },
     [bodyMouseLeave, bodyMouseUp, cellMouseDown, cellMouseEnter]

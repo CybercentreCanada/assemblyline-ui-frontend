@@ -17,7 +17,7 @@ export const WrappedHexSearchTypes = ({ store }: StoreProps) => {
 
   const handleClick = useCallback(
     (_type: SearchType) => (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-      onSearchTypeChange(_type);
+      onSearchTypeChange({ type: _type });
       ref.current?.close();
     },
     [onSearchTypeChange]

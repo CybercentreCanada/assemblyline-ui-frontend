@@ -1,4 +1,4 @@
-import { Store } from '..';
+import { LanguageConfig, Store } from '..';
 
 // Theme
 type Theme = { light: 'light'; dark: 'dark' };
@@ -6,7 +6,7 @@ const THEMES: Theme = { light: 'light', dark: 'dark' };
 export type ThemeType = typeof THEMES[keyof typeof THEMES];
 export type IsTheme = { [Property in ThemeType]: (store: Store) => boolean };
 export const isTheme = Object.fromEntries(
-  Object.keys(THEMES).map(key => [key, (store: Store) => store.mode.theme === THEMES[key]])
+  Object.keys(THEMES).map(key => [key, (store: Store) => store.mode.themeType === THEMES[key]])
 ) as IsTheme;
 
 // Language
@@ -15,7 +15,7 @@ const LANGUAGE: Language = { en: 'en', fr: 'fr' };
 export type LanguageType = typeof LANGUAGE[keyof typeof LANGUAGE];
 export type IsLanguage = { [Property in LanguageType]: (store: Store) => boolean };
 export const isLanguage = Object.fromEntries(
-  Object.keys(LANGUAGE).map(key => [key, (store: Store) => store.mode.language === LANGUAGE[key]])
+  Object.keys(LANGUAGE).map(key => [key, (store: Store) => store.mode.languageType === LANGUAGE[key]])
 ) as IsLanguage;
 
 // Width
@@ -25,13 +25,13 @@ const WIDTH_INDEX = { xs: 0, sm: 1, md: 2, lg: 3, xl: 4, wd: 5 };
 export type WidthType = typeof WIDTH[keyof typeof WIDTH];
 export type IsWidth = { [Property in WidthType]: (store: Store) => boolean };
 export const isWidth = Object.fromEntries(
-  Object.keys(WIDTH).map(key => [key, (store: Store) => store.mode.width === WIDTH[key]])
+  Object.keys(WIDTH).map(key => [key, (store: Store) => store.mode.widthType === WIDTH[key]])
 ) as IsWidth;
 export const isWidthEqualDown = (store: Store, type: WidthType): boolean =>
-  WIDTH_INDEX[type] >= WIDTH_INDEX[store.mode.width];
+  WIDTH_INDEX[type] >= WIDTH_INDEX[store.mode.widthType];
 
 export const isWidthEqualUp = (store: Store, type: WidthType): boolean =>
-  WIDTH_INDEX[type] <= WIDTH_INDEX[store.mode.width];
+  WIDTH_INDEX[type] <= WIDTH_INDEX[store.mode.widthType];
 
 // Layout
 type Layout = { page: 'page'; fullscreen: 'fullscreen' };
@@ -60,10 +60,7 @@ export const isBody = Object.fromEntries(
   Object.keys(BODY).map(key => [key, (store: Store) => store.mode.bodyType === BODY[key]])
 ) as IsBody;
 
-export type BodyTypeSettingValues = {
-  en: Array<{ label: string; type: BodyType; value: number }>;
-  fr: Array<{ label: string; type: BodyType; value: number }>;
-};
+export type BodyTypeSettingValues = LanguageConfig<Array<{ label: string; type: BodyType; value: number }>>;
 
 export const BODY_TYPE_SETTING_VALUES: BodyTypeSettingValues = {
   en: [

@@ -25,7 +25,7 @@ export type HexSpacerProps = {
 export const WrappedHexSpacer = ({ Tag = 'div', style = '' }: HexSpacerProps) => {
   const classes = useHexStyles();
   const { onBodyMouseLeave } = useDispatch();
-  return <Tag className={clsx(classes.offset, style)} onMouseEnter={onBodyMouseLeave} />;
+  return <Tag className={clsx(classes.offset, style)} onMouseEnter={() => onBodyMouseLeave()} />;
 };
 
 export const HexSpacer = React.memo(WrappedHexSpacer);

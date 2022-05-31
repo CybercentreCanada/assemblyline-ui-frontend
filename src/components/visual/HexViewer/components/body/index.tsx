@@ -1,5 +1,5 @@
 import { makeStyles } from '@material-ui/core';
-import { default as React, KeyboardEvent, memo, MouseEvent, PropsWithChildren, useMemo } from 'react';
+import { default as React, KeyboardEvent, memo, PropsWithChildren, useMemo } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList as List, ListOnItemsRenderedProps } from 'react-window';
 import {
@@ -61,7 +61,8 @@ const HexTableBody = memo(({ store }: StoreProps) => {
     onBodyResize,
     onBodyMouseLeave,
     onBodyScrollWheel,
-    onBodyKeyDown,
+    onCursorKeyDown,
+    onCopyKeyDown,
     onBodyMouseUp,
     onScrollTouchStart,
     onScrollTouchMove,
@@ -72,9 +73,9 @@ const HexTableBody = memo(({ store }: StoreProps) => {
   const bodyRef = React.useRef<HTMLDivElement>(null);
 
   React.useLayoutEffect(() => {
-    onBodyInit(true);
+    onBodyInit({ initialized: true });
     return () => {
-      onBodyInit(false);
+      onBodyInit({ initialized: false });
     };
   }, [onBodyInit]);
 
@@ -86,8 +87,9 @@ const HexTableBody = memo(({ store }: StoreProps) => {
   }, [dispatch, store.initialized]);
 
   useEventListener('resize', () => onBodyResize(bodyRef?.current?.getBoundingClientRect()));
-  useEventListener('keydown', (e: KeyboardEvent) => onBodyKeyDown(e, store));
-  useEventListener('mouseup', (e: MouseEvent) => onBodyMouseUp(e, store));
+  useEventListener('keydown', (event: KeyboardEvent) => onCursorKeyDown({ event }, { store }));
+  useEventListener('keydown', (event: KeyboardEvent) => onCopyKeyDown(undefined, { event, store }));
+  useEventListener('mouseup', () => onBodyMouseUp(undefined, { store }));
 
   const rowIndexes: number[] = useMemo(
     () => Array.from(Array(store.layout.row.size).keys()).map(i => i + store.scroll.rowIndex),
@@ -98,11 +100,11 @@ const HexTableBody = memo(({ store }: StoreProps) => {
     <div
       ref={bodyRef}
       className={classes.root}
-      onWheel={(e: React.WheelEvent<HTMLDivElement>) => onBodyScrollWheel(e.deltaY)}
+      onWheel={(event: React.WheelEvent<HTMLDivElement>) => onBodyScrollWheel({ event })}
       onMouseLeave={() => onBodyMouseLeave()}
-      onTouchStart={e => onScrollTouchStart(e)}
-      onTouchMove={e => onScrollTouchMove(e)}
-      onTouchEnd={e => onScrollTouchEnd(e)}
+      onTouchStart={(event: React.TouchEvent<HTMLDivElement>) => onScrollTouchStart({ event })}
+      onTouchMove={(event: React.TouchEvent<HTMLDivElement>) => onScrollTouchMove({ event })}
+      onTouchEnd={() => onScrollTouchEnd()}
     >
       {store.initialized ? (
         <>
@@ -126,16 +128,17 @@ const HexTableBody = memo(({ store }: StoreProps) => {
 
 const HexWindowBody = memo(({ store }: StoreProps) => {
   const classes = useHexStyles();
-  const { onBodyInit, onBodyResize, onBodyItemsRendered, onBodyKeyDown, onBodyMouseUp } = useDispatch();
+  const { onBodyInit, onBodyResize, onBodyItemsRendered, onCursorKeyDown, onCopyKeyDown, onBodyMouseUp } =
+    useDispatch();
   const { dispatch } = useStore();
 
   const listRef = React.useRef<any>(null);
   const bodyRef = React.useRef<HTMLDivElement>(null);
 
   React.useLayoutEffect(() => {
-    onBodyInit(true);
+    onBodyInit({ initialized: true });
     return () => {
-      onBodyInit(false);
+      onBodyInit({ initialized: false });
     };
   }, [onBodyInit]);
 
@@ -146,8 +149,9 @@ const HexWindowBody = memo(({ store }: StoreProps) => {
     }
   }, [dispatch, store.initialized]);
 
-  useEventListener('keydown', (e: KeyboardEvent) => onBodyKeyDown(e, store));
-  useEventListener('mouseup', (e: MouseEvent) => onBodyMouseUp(e, store));
+  useEventListener('keydown', (event: KeyboardEvent) => onCursorKeyDown({ event }, { store }));
+  useEventListener('keydown', (event: KeyboardEvent) => onCopyKeyDown(undefined, { event, store }));
+  useEventListener('mouseup', () => onBodyMouseUp(undefined, { store }));
 
   React.useEffect(() => {
     if (store.initialized) scrollToWindowIndex(store, listRef, store.scroll.index, store.scroll.type);
@@ -177,7 +181,7 @@ const HexWindowBody = memo(({ store }: StoreProps) => {
           itemData={{
             Tag: 'div'
           }}
-          onItemsRendered={(e: ListOnItemsRenderedProps) => onBodyItemsRendered(e)}
+          onItemsRendered={(event: ListOnItemsRenderedProps) => onBodyItemsRendered({ event })}
         >
           {Row}
         </List>
@@ -208,9 +212,9 @@ export const HexBody = memo(
     prevProps.store.layout.column.auto === nextProps.store.layout.column.auto &&
     prevProps.store.layout.isFocusing === nextProps.store.layout.isFocusing &&
     prevProps.store.mode.bodyType === nextProps.store.mode.bodyType &&
-    prevProps.store.mode.theme === nextProps.store.mode.theme &&
-    prevProps.store.mode.language === nextProps.store.mode.language &&
-    prevProps.store.mode.width === nextProps.store.mode.width &&
+    prevProps.store.mode.themeType === nextProps.store.mode.themeType &&
+    prevProps.store.mode.languageType === nextProps.store.mode.languageType &&
+    prevProps.store.mode.widthType === nextProps.store.mode.widthType &&
     prevProps.store.scroll.index === nextProps.store.scroll.index &&
     prevProps.store.scroll.rowIndex === nextProps.store.scroll.rowIndex &&
     prevProps.store.scroll.maxRowIndex === nextProps.store.scroll.maxRowIndex &&

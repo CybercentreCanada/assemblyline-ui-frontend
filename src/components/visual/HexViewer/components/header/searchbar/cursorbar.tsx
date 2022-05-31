@@ -58,13 +58,13 @@ export const WrappedHexCursorBar = ({ store }: StoreProps) => {
           <div className={classes.endAdornment}>{t('of') + (hexcodes.size - 1).toString(offsetBase).toUpperCase()}</div>
         }
         onFocus={() => onSearchBarFocus()}
-        onChange={event => onCursorIndexChange(event.target.valueAsNumber as number)}
-        onKeyDown={event => onSearchBarKeyDown(event, store)}
+        onChange={event => onCursorIndexChange({ index: event.target.valueAsNumber as number })}
+        onKeyDown={event => onSearchBarKeyDown({ event }, { store })}
       />
       <TooltipIconButton
         classes={{ iconButton: classes.iconButton }}
         title={t('clear')}
-        onClick={onCursorClear}
+        onClick={() => onCursorClear()}
         disabled={cursorIndex === null}
         icon={<ClearIcon />}
       />

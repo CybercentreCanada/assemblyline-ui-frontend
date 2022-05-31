@@ -13,24 +13,6 @@ export const isCellMouseDown = (store: Store) => store.cell.isMouseDown;
 
 export const isSameCellClick = (store: Store) => store.cell.mouseDownIndex === store.cell.mouseEnterIndex;
 
-export type OffsetSettingValues = {
-  en: Array<{ label: string; value: number }>;
-  fr: Array<{ label: string; value: number }>;
-};
-
-export const OFFSET_SETTING_VALUES: OffsetSettingValues = {
-  en: [
-    { label: 'Octal', value: 8 },
-    { label: 'Decimal', value: 10 },
-    { label: 'Hexadecimal', value: 16 }
-  ],
-  fr: [
-    { label: 'Octal', value: 8 },
-    { label: 'Décimal', value: 10 },
-    { label: 'Hexadécimal', value: 16 }
-  ]
-};
-
 export const getCellClasses = (
   store: Store,
   type: CellType,

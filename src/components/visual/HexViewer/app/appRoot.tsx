@@ -2,7 +2,7 @@ import { CircularProgress, useMediaQuery, useTheme } from '@material-ui/core';
 import useAppContext from 'commons/components/hooks/useAppContext';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { ACTIONS, DataProps, HexLayout, useStore, WidthType } from '..';
+import { ACTIONS, DataProps, HexLayout, LanguageType, ThemeType, useStore, WidthType } from '..';
 
 const WrappedAppRoot = ({ data = '' }: DataProps) => {
   const { store, dispatch } = useStore();
@@ -16,13 +16,13 @@ const WrappedAppRoot = ({ data = '' }: DataProps) => {
   // Theme
   const { theme: appTheme } = useAppContext();
   React.useEffect(() => {
-    dispatch({ type: ACTIONS.appThemeChange, payload: { theme: appTheme } });
+    dispatch({ type: ACTIONS.appThemeTypeChange, payload: { themeType: appTheme as ThemeType } });
   }, [appTheme, dispatch]);
 
   // Language
   const { i18n } = useTranslation(['hexViewer']);
   React.useEffect(() => {
-    dispatch({ type: ACTIONS.appLanguageChange, payload: { language: i18n.language } });
+    dispatch({ type: ACTIONS.appLanguageTypeChange, payload: { languageType: i18n.language as LanguageType } });
   }, [dispatch, i18n.language]);
 
   // Width
@@ -34,8 +34,8 @@ const WrappedAppRoot = ({ data = '' }: DataProps) => {
   const isXL = useMediaQuery(theme.breakpoints.down('xl'));
 
   React.useEffect(() => {
-    const width: WidthType = isXS ? 'xs' : isSM ? 'sm' : isMD ? 'md' : isLG ? 'lg' : isXL ? 'xl' : 'wd';
-    dispatch({ type: ACTIONS.appWidthChange, payload: { width } });
+    const widthType: WidthType = isXS ? 'xs' : isSM ? 'sm' : isMD ? 'md' : isLG ? 'lg' : isXL ? 'xl' : 'wd';
+    dispatch({ type: ACTIONS.appWidthTypeChange, payload: { widthType } });
   }, [dispatch, isLG, isMD, isSM, isXL, isXS]);
 
   // History

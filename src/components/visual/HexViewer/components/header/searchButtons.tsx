@@ -29,7 +29,7 @@ export const WrappedHexSearchButtons = ({ store }: StoreProps) => {
       <TooltipIconButton
         classes={{ iconButton: classes.iconButton }}
         title={t('previous-match')}
-        onClick={() => onSelectedSearchIndexChange(selectedIndex - 1)}
+        onClick={() => onSelectedSearchIndexChange({ index: selectedIndex - 1 })}
         disabled={selectedIndex === null}
         icon={<ArrowUpward />}
       />
@@ -37,13 +37,13 @@ export const WrappedHexSearchButtons = ({ store }: StoreProps) => {
         classes={{ iconButton: classes.iconButton }}
         title={t('next-match')}
         disabled={selectedIndex === null}
-        onClick={() => onSelectedSearchIndexChange(selectedIndex + 1)}
+        onClick={() => onSelectedSearchIndexChange({ index: selectedIndex + 1 })}
         icon={<ArrowDownward />}
       />
       <TooltipIconButton
         classes={{ iconButton: classes.iconButton }}
         title={t('clear')}
-        onClick={onSearchClear}
+        onClick={() => onSearchClear()}
         disabled={value === null || value === ''}
         icon={<ClearIcon />}
       />

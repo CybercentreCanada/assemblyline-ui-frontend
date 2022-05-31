@@ -79,9 +79,9 @@ export const WrappedTextBar = ({ store }: StoreProps) => {
         value={inputValue}
         margin="dense"
         onFocus={() => onSearchBarFocus()}
-        onWheel={e => onSearchBarWheel(e)}
-        onChange={event => onSearchBarValueChange(event.target.value)}
-        onKeyDown={event => onSearchBarKeyDown(event, store)}
+        onWheel={event => onSearchBarWheel({ event })}
+        onChange={event => onSearchBarValueChange({ value: event.target.value })}
+        onKeyDown={event => onSearchBarKeyDown({ event }, { store })}
       />
 
       {indexes === null || indexes.length === 0 ? (
@@ -106,7 +106,7 @@ export const WrappedTextBar = ({ store }: StoreProps) => {
               <div className={classes.endAdornment}>{t('of') + indexes.length.toString().toUpperCase()}</div>
             }
             onFocus={() => onSearchBarFocus()}
-            onChange={event => onSelectedSearchIndexChange(event.target.valueAsNumber as number)}
+            onChange={event => onSelectedSearchIndexChange({ index: event.target.valueAsNumber as number })}
             // onKeyDown={event => onSearchBarKeyDown(event,store)}
           />
           <TooltipIconButton

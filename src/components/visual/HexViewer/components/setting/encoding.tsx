@@ -13,7 +13,7 @@ export const WrappedHexEncoding = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);
   const { onSettingEncodingChange, onSettingHexCharChange } = useDispatch();
 
-  const language = store.mode.language;
+  const language = store.mode.languageType;
   const [lowerValues, setLowerValues] = useState<Array<{ label: string; value: number }>>(
     LOWER_ENCODING_SETTING_VALUES[language]
   );
@@ -29,7 +29,7 @@ export const WrappedHexEncoding = ({ store }: StoreProps) => {
         label={t('null.char.label')}
         description={t('null.char.description')}
         value={store.setting.hex.null.char}
-        onChange={event => onSettingHexCharChange('null', event.target.value)}
+        onChange={event => onSettingHexCharChange({ key: 'null', value: event.target.value })}
       />
       <SelectField
         label={t('lower.encoding.label')}
@@ -37,7 +37,7 @@ export const WrappedHexEncoding = ({ store }: StoreProps) => {
         value={store.setting.hex.lower.encoding}
         items={lowerValues}
         onChange={(event: ChangeEvent<{ name?: string; value: unknown }>) =>
-          onSettingEncodingChange('lower', event.target.value as number)
+          onSettingEncodingChange({ key: 'lower', value: event.target.value as number })
         }
       />
       {store.setting.hex.lower.encoding === 0 ? (
@@ -45,7 +45,7 @@ export const WrappedHexEncoding = ({ store }: StoreProps) => {
           label={t('lower.char.label')}
           description={t('lower.char.description')}
           value={store.setting.hex.lower.char}
-          onChange={event => onSettingHexCharChange('lower', event.target.value)}
+          onChange={event => onSettingHexCharChange({ key: 'lower', value: event.target.value })}
         />
       ) : (
         <></>
@@ -56,7 +56,7 @@ export const WrappedHexEncoding = ({ store }: StoreProps) => {
         value={store.setting.hex.higher.encoding}
         items={higherValues}
         onChange={(event: ChangeEvent<{ name?: string; value: unknown }>) =>
-          onSettingEncodingChange('higher', event.target.value as number)
+          onSettingEncodingChange({ key: 'higher', value: event.target.value as number })
         }
       />
       {store.setting.hex.higher.encoding === 0 ? (
@@ -64,7 +64,7 @@ export const WrappedHexEncoding = ({ store }: StoreProps) => {
           label={t('higher.char.label')}
           description={t('higher.char.description')}
           value={store.setting.hex.higher.char}
-          onChange={event => onSettingHexCharChange('higher', event.target.value)}
+          onChange={event => onSettingHexCharChange({ key: 'higher', value: event.target.value })}
         />
       ) : (
         <></>
@@ -77,5 +77,5 @@ export const HexEncoding = React.memo(
   WrappedHexEncoding,
   (prevProps: Readonly<StoreProps>, nextProps: Readonly<StoreProps>) =>
     prevProps.store.setting.hex === nextProps.store.setting.hex &&
-    prevProps.store.mode.language === nextProps.store.mode.language
+    prevProps.store.mode.languageType === nextProps.store.mode.languageType
 );

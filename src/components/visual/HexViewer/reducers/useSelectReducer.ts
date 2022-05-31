@@ -5,16 +5,18 @@ import {
   isCellMouseDown,
   isSameCellClick,
   orderSelectIndexes,
-  ReducerProps,
+  ReducerHandler,
+  Reducers,
   renderArrayClass,
-  RenderProps,
+  RenderHandler,
   Store,
-  useCellStyles
+  useCellStyles,
+  UseReducer
 } from '..';
 
 export type SelectState = { select: { startIndex: number; endIndex: number; isHighlighting: boolean } };
 
-export const useSelectReducer = () => {
+export const useSelectReducer: UseReducer<SelectState> = () => {
   const classes = useCellStyles();
   const initialState: SelectState = { select: { startIndex: -1, endIndex: -1, isHighlighting: false } };
 
@@ -27,19 +29,26 @@ export const useSelectReducer = () => {
     [classes.select]
   );
 
-  const selectMouseEnter = useCallback((store: Store): Store => {
+  const selectClear: Reducers['appClickAway'] = useCallback(
+    store => ({ ...store, select: { ...store.select, startIndex: -1, endIndex: -1 } }),
+    []
+  );
+
+  const selectMouseEnter: Reducers['cellMouseEnter'] = useCallback(store => {
     if (!isCellMouseDown(store)) return { ...store };
     const { mouseEnterIndex, mouseDownIndex } = store.cell;
     return { ...store, select: { ...store.select, ...orderSelectIndexes(mouseDownIndex, mouseEnterIndex) } };
   }, []);
 
-  const selectClear = useCallback(
-    (store: Store): Store => ({ ...store, select: { ...store.select, startIndex: -1, endIndex: -1 } }),
-    []
+  const selectMouseDown: Reducers['cellMouseDown'] = useCallback(
+    store => {
+      return selectClear({ ...store, select: { ...store.select, isHighlighting: true } });
+    },
+    [selectClear]
   );
 
-  const selectMouseUp = useCallback(
-    (store: Store): Store => {
+  const selectMouseUp: Reducers['bodyMouseUp'] = useCallback(
+    store => {
       if (store.cell.mouseEnterIndex === null) return { ...store };
       else if (isSameCellClick(store) || !store.select.isHighlighting) return selectClear(store);
       else {
@@ -49,14 +58,7 @@ export const useSelectReducer = () => {
     [selectClear]
   );
 
-  const selectMouseDown = useCallback(
-    (store: Store): Store => {
-      return selectClear({ ...store, select: { ...store.select, isHighlighting: true } });
-    },
-    [selectClear]
-  );
-
-  const selectLocation = useCallback((store: Store): Store => {
+  const selectLocation: Reducers['appLocationInit'] = useCallback(store => {
     if (store.location.selectStart === null || store.location.selectEnd === null) return { ...store };
     else
       return {
@@ -65,20 +67,20 @@ export const useSelectReducer = () => {
       };
   }, []);
 
-  const reducer = useCallback(
-    ({ prevStore, store, action }: ReducerProps): Store => {
-      if (isAction.cellMouseEnter(action)) return selectMouseEnter(store);
-      else if (isAction.cellMouseDown(action)) return selectMouseDown(store);
-      else if (isAction.bodyMouseUp(action)) return selectMouseUp(store);
-      else if (isAction.appClickAway(action)) return selectClear(store);
-      else if (isAction.appLocationInit(action)) return selectLocation(store);
+  const reducer: ReducerHandler = useCallback(
+    ({ store, action: { type, payload } }) => {
+      if (isAction.appClickAway(type)) return selectClear(store);
+      else if (isAction.cellMouseEnter(type)) return selectMouseEnter(store, payload);
+      else if (isAction.cellMouseDown(type)) return selectMouseDown(store, payload);
+      else if (isAction.bodyMouseUp(type)) return selectMouseUp(store);
+      else if (isAction.appLocationInit(type)) return selectLocation(store);
       else return { ...store };
     },
     [selectClear, selectLocation, selectMouseDown, selectMouseEnter, selectMouseUp]
   );
 
-  const render = useCallback(
-    ({ prevStore, nextStore }: RenderProps): void => {
+  const render: RenderHandler = useCallback(
+    ({ prevStore, nextStore }) => {
       if (!Object.is(prevStore.select, nextStore.select)) selectRender(prevStore, nextStore);
     },
     [selectRender]

@@ -1,13 +1,13 @@
 import { useCallback, useMemo } from 'react';
 import {
-  ActionProps,
   FocusType,
   handleLayoutColumnResize,
   handleLayoutRowResize,
   isAction,
   isBody,
-  ReducerProps,
-  Store
+  ReducerHandler,
+  Reducers,
+  UseReducer
 } from '..';
 
 export type LayoutState = {
@@ -24,7 +24,7 @@ export type LayoutState = {
   };
 };
 
-export const useLayoutReducer = () => {
+export const useLayoutReducer: UseReducer<LayoutState> = () => {
   const initialState = useMemo<LayoutState>(
     () => ({
       layout: {
@@ -42,8 +42,7 @@ export const useLayoutReducer = () => {
     []
   );
 
-  const layoutResize = useCallback((store: Store, { type, payload }: ActionProps): Store => {
-    const { height, width } = payload;
+  const layoutResize: Reducers['bodyResize'] = useCallback((store, { height, width }) => {
     const {
       column: { auto: columnAuto, size: columnSize },
       row: { auto: rowAuto, size: rowSize }
@@ -61,20 +60,20 @@ export const useLayoutReducer = () => {
     };
   }, []);
 
-  const layoutFocusNone = useCallback((store: Store, { type, payload }: ActionProps): Store => {
+  const layoutFocusNone: Reducers['appClickAway'] = useCallback(store => {
     return { ...store, layout: { ...store.layout, isFocusing: 'none' } };
   }, []);
 
-  const layoutFocusBody = useCallback((store: Store, { type, payload }: ActionProps): Store => {
+  const layoutFocusBody: Reducers['cellMouseDown'] = useCallback(store => {
     return { ...store, layout: { ...store.layout, isFocusing: 'body' } };
   }, []);
 
-  const layoutFocusToolbar = useCallback((store: Store, { type, payload }: ActionProps): Store => {
+  const layoutFocusToolbar: Reducers['searchBarFocus'] = useCallback(store => {
     return { ...store, layout: { ...store.layout, isFocusing: 'toolbar' } };
   }, []);
 
-  const layoutCellRendered = useCallback((store: Store, { type, payload }: ActionProps): Store => {
-    const { visibleStartIndex, visibleStopIndex } = payload.event;
+  const layoutCellRendered: Reducers['bodyItemsRendered'] = useCallback((store, { event }) => {
+    const { visibleStartIndex, visibleStopIndex } = event;
     return {
       ...store,
       layout: {
@@ -84,13 +83,13 @@ export const useLayoutReducer = () => {
     };
   }, []);
 
-  const reducer = useCallback(
-    ({ store, action }: ReducerProps): Store => {
-      if (isAction.bodyResize(action)) return layoutResize(store, action);
-      else if (isAction.appClickAway(action)) return layoutFocusNone(store, action);
-      else if (isAction.cellMouseDown(action)) return layoutFocusBody(store, action);
-      else if (isAction.searchBarFocus(action)) return layoutFocusToolbar(store, action);
-      else if (isAction.bodyItemsRendered(action)) return layoutCellRendered(store, action);
+  const reducer: ReducerHandler = useCallback(
+    ({ store, action: { type, payload } }) => {
+      if (isAction.bodyResize(type)) return layoutResize(store, payload);
+      else if (isAction.appClickAway(type)) return layoutFocusNone(store, payload);
+      else if (isAction.cellMouseDown(type)) return layoutFocusBody(store, payload);
+      else if (isAction.searchBarFocus(type)) return layoutFocusToolbar(store, payload);
+      else if (isAction.bodyItemsRendered(type)) return layoutCellRendered(store, payload);
       else return { ...store };
     },
     [layoutCellRendered, layoutFocusBody, layoutFocusNone, layoutFocusToolbar, layoutResize]

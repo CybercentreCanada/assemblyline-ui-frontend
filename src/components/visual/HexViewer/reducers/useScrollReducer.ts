@@ -1,7 +1,6 @@
 import { isArrowDown, isArrowUp } from 'commons/addons/elements/utils/keyboard';
 import { useCallback, useMemo } from 'react';
 import {
-  ActionProps,
   clampScrollIndex,
   getScrollMaxIndex,
   getTableCellsRendered,
@@ -13,10 +12,12 @@ import {
   isPageDown,
   isPageUp,
   LAYOUT_SIZE,
-  ReducerProps,
+  ReducerHandler,
+  Reducers,
   scrollToTableIndex,
   ScrollType,
-  Store
+  Store,
+  UseReducer
 } from '..';
 
 export type ScrollState = {
@@ -45,7 +46,7 @@ export type ScrollState = {
   };
 };
 
-export const useScrollReducer = () => {
+export const useScrollReducer: UseReducer<ScrollState> = () => {
   const initialState = useMemo<ScrollState>(
     () => ({
       scroll: {
@@ -90,7 +91,6 @@ export const useScrollReducer = () => {
       return { ...newStore, cellsRendered: { ...newStore.cellsRendered, ...cellsRendered } };
     } else if (isBody.window(store)) {
       let newStore = { ...store, scroll: { ...store.scroll, index, rowIndex, maxRowIndex, type: scrollType } };
-      // scrollToWindowIndex(newStore, refs, newIndex, scrollType);
       return { ...newStore };
     } else return { ...store };
   }, []);
@@ -104,8 +104,8 @@ export const useScrollReducer = () => {
     return { ...newStore };
   }, []);
 
-  const scrollResize = useCallback(
-    (store: Store, { type, payload }: ActionProps): Store => {
+  const scrollResize: Reducers['bodyResize'] = useCallback(
+    (store, { width, height }) => {
       if (store.layout.column.size === 0) return { ...store };
       else {
         const newStore = scrollIndexChange(store, store.scroll.index, 'top');
@@ -116,9 +116,9 @@ export const useScrollReducer = () => {
     [scrollIndexChange]
   );
 
-  const scrollWheel = useCallback(
-    (store: Store, { type, payload }: ActionProps): Store => {
-      const deltaY = payload.deltaY >= 0 ? store.scroll.speed : -store.scroll.speed;
+  const scrollWheel: Reducers['bodyScrollWheel'] = useCallback(
+    (store, { event }) => {
+      const deltaY = event.deltaY >= 0 ? store.scroll.speed : -store.scroll.speed;
       const newScrollIndex = store.scroll.rowIndex + deltaY;
       const newStore = scrollRowIndexChange(store, newScrollIndex);
       return newStore;
@@ -126,21 +126,22 @@ export const useScrollReducer = () => {
     [scrollRowIndexChange]
   );
 
-  const scrollButtonClick = useCallback(
-    (store: Store, { type, payload }: ActionProps): Store => {
-      const newScrollIndex = store.scroll.rowIndex + store.scroll.speed * payload.value;
+  const scrollButtonClick: Reducers['scrollButtonClick'] = useCallback(
+    (store, { value }) => {
+      const newScrollIndex = store.scroll.rowIndex + store.scroll.speed * value;
       return scrollRowIndexChange(store, newScrollIndex);
     },
     [scrollRowIndexChange]
   );
 
-  const scrollSliderChange = useCallback(
-    (store: Store, { type, payload: { event, newValue } }: ActionProps): Store => {
+  const scrollSliderChange: Reducers['scrollSliderChange'] = useCallback(
+    (store, { event, newValue }) => {
       event.preventDefault();
       if (event.type === 'mousemove' || event.type === 'mousedown') {
-        return scrollRowIndexChange(store, store.scroll.maxRowIndex - newValue);
+        return scrollRowIndexChange(store, store.scroll.maxRowIndex - (newValue as number));
       } else if (event.type === 'keydown') {
-        const { key: keyCode } = event;
+        // eslint-disable-next-line @typescript-eslint/dot-notation
+        const keyCode = event['key'];
         let newScrollIndex: number = store.scroll.rowIndex;
 
         if (isArrowUp(keyCode)) newScrollIndex -= store.scroll.speed;
@@ -156,8 +157,8 @@ export const useScrollReducer = () => {
     [scrollRowIndexChange]
   );
 
-  const scrollCellRendered = useCallback((store: Store, { type, payload }: ActionProps): Store => {
-    const cellsRendered = getWindowCellsRendered({ ...payload.event }, store.layout.column.size);
+  const scrollCellRendered: Reducers['bodyItemsRendered'] = useCallback((store, { event }) => {
+    const cellsRendered = getWindowCellsRendered({ ...event }, store.layout.column.size);
     return {
       ...store,
       cellsRendered: {
@@ -167,24 +168,22 @@ export const useScrollReducer = () => {
     };
   }, []);
 
-  const scrollTouchStart = useCallback((store: Store, { type, payload: { event } }: ActionProps): Store => {
-    store.touchScroll = {
-      startTouchScreenY: event.targetTouches[0].screenY,
-      prevTouchDistance: 0
+  const scrollTouchStart: Reducers['scrollTouchStart'] = useCallback((store, { event }) => {
+    return {
+      ...store,
+      touchScroll: { ...store.touchScroll, startTouchScreenY: event.targetTouches[0].screenY, prevTouchDistance: 0 }
     };
-    return { ...store };
   }, []);
 
-  const scrollTouchEnd = useCallback((store: Store, { type, payload: { event } }: ActionProps): Store => {
-    store.touchScroll = {
-      startTouchScreenY: 0,
-      prevTouchDistance: 0
+  const scrollTouchEnd: Reducers['scrollTouchEnd'] = useCallback((store, payload) => {
+    return {
+      ...store,
+      touchScroll: { ...store.touchScroll, startTouchScreenY: 0, prevTouchDistance: 0 }
     };
-    return { ...store };
   }, []);
 
-  const scrollTouchMove = useCallback(
-    (store: Store, { type, payload: { event } }: ActionProps): Store => {
+  const scrollTouchMove: Reducers['scrollTouchMove'] = useCallback(
+    (store, { event }) => {
       const { startTouchScreenY, prevTouchDistance } = store.touchScroll;
       const distance: number = (event.targetTouches[0].screenY - startTouchScreenY) / LAYOUT_SIZE.rowHeight;
       const scrollDistance: number = distance >= 0 ? Math.floor(distance) : Math.ceil(distance);
@@ -199,8 +198,8 @@ export const useScrollReducer = () => {
     [scrollRowIndexChange]
   );
 
-  const scrollLocation = useCallback(
-    (store: Store, { type, payload }: ActionProps): Store => {
+  const scrollLocation: Reducers['bodyInit'] = useCallback(
+    (store, { initialized }) => {
       if (store.location.scroll === null) return { ...store };
       else {
         let newStore = { ...store, scroll: { ...store.scroll, index: store.location.scroll } };
@@ -211,7 +210,7 @@ export const useScrollReducer = () => {
   );
 
   const scrollStoreChange = useCallback(
-    (prevStore: Store, nextStore: Store, { type, payload }: ActionProps): Store => {
+    (prevStore: Store, nextStore: Store): Store => {
       let newStore = { ...nextStore };
 
       if (prevStore.cursor.index !== nextStore.cursor.index)
@@ -232,19 +231,19 @@ export const useScrollReducer = () => {
     [scrollIndexChange]
   );
 
-  const reducer = useCallback(
-    ({ prevStore, store, action }: ReducerProps): Store => {
-      if (isAction.bodyResize(action)) return scrollResize(store, action);
-      else if (isAction.bodyScrollWheel(action)) return scrollWheel(store, action);
-      else if (isAction.scrollButtonClick(action)) return scrollButtonClick(store, action);
-      else if (isAction.scrollSliderChange(action)) return scrollSliderChange(store, action);
-      else if (isAction.bodyItemsRendered(action)) return scrollCellRendered(store, action);
-      else if (isAction.scrollTouchStart(action)) return scrollTouchStart(store, action);
-      else if (isAction.scrollTouchEnd(action)) return scrollTouchEnd(store, action);
-      else if (isAction.scrollTouchMove(action)) return scrollTouchMove(store, action);
-      else if (isAction.bodyInit(action)) return scrollLocation(store, action);
-      else if (isAction.appLocationInit(action)) return scrollIndexChange(store, store.location.scroll, 'top');
-      else return scrollStoreChange(prevStore, store, action);
+  const reducer: ReducerHandler = useCallback(
+    ({ store, action: { type, payload }, prevStore }) => {
+      if (isAction.bodyResize(type)) return scrollResize(store, payload);
+      else if (isAction.bodyScrollWheel(type)) return scrollWheel(store, payload);
+      else if (isAction.scrollButtonClick(type)) return scrollButtonClick(store, payload);
+      else if (isAction.scrollSliderChange(type)) return scrollSliderChange(store, payload);
+      else if (isAction.bodyItemsRendered(type)) return scrollCellRendered(store, payload);
+      else if (isAction.scrollTouchStart(type)) return scrollTouchStart(store, payload);
+      else if (isAction.scrollTouchEnd(type)) return scrollTouchEnd(store, payload);
+      else if (isAction.scrollTouchMove(type)) return scrollTouchMove(store, payload);
+      else if (isAction.bodyInit(type)) return scrollLocation(store, payload);
+      else if (isAction.appLocationInit(type)) return scrollIndexChange(store, store.location.scroll, 'top');
+      else return scrollStoreChange(prevStore, store);
     },
     [
       scrollButtonClick,

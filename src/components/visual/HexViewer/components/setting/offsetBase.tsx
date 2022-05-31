@@ -6,7 +6,7 @@ export const WrappedHexOffsetBaseSetting = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);
   const { onSettingOffsetBaseChange } = useDispatch();
 
-  const language = store.mode.language;
+  const language = store.mode.languageType;
   const offsetBaseValue = store.setting.offsetBase;
   const [values, setValues] = useState<Array<{ label: string; value: number }>>(OFFSET_SETTING_VALUES[language]);
   useLayoutEffect(() => setValues(OFFSET_SETTING_VALUES[language]), [language]);
@@ -17,7 +17,7 @@ export const WrappedHexOffsetBaseSetting = ({ store }: StoreProps) => {
       description={t('base.description')}
       value={offsetBaseValue}
       items={values}
-      onChange={onSettingOffsetBaseChange}
+      onChange={event => onSettingOffsetBaseChange({ event })}
     />
   );
 };
@@ -26,5 +26,5 @@ export const HexOffsetBaseSetting = React.memo(
   WrappedHexOffsetBaseSetting,
   (prevProps: Readonly<StoreProps>, nextProps: Readonly<StoreProps>) =>
     prevProps.store.setting.offsetBase === nextProps.store.setting.offsetBase &&
-    prevProps.store.mode.language === nextProps.store.mode.language
+    prevProps.store.mode.languageType === nextProps.store.mode.languageType
 );

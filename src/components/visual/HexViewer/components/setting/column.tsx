@@ -9,7 +9,7 @@ export const WrappedHexColumnSetting = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);
   const theme = useTheme();
   const upSM = useMediaQuery(theme.breakpoints.up('sm'));
-  const { onSettingAutoColumnsChange, onSettingColumnsChange } = useDispatch();
+  const { onSettingAutoColumnChange, onSettingColumnChange } = useDispatch();
 
   const {
     column: { auto: columnAuto, size: columnSize }
@@ -25,11 +25,7 @@ export const WrappedHexColumnSetting = ({ store }: StoreProps) => {
       <Grid item sm={2} xs={4} style={{ textAlign: 'right' }}>
         <FormControlLabel
           control={
-            <Checkbox
-              name={t('columns.auto')}
-              checked={columnAuto}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => onSettingAutoColumnsChange()}
-            />
+            <Checkbox name={t('columns.auto')} checked={columnAuto} onChange={() => onSettingAutoColumnChange()} />
           }
           label={t('columns.auto')}
         />
@@ -48,7 +44,7 @@ export const WrappedHexColumnSetting = ({ store }: StoreProps) => {
             options={COLUMNS.map(c => c.columns)}
             disabled={columnAuto}
             allowNull={false}
-            onChange={event => onSettingColumnsChange(event.target.valueAsNumber as number)}
+            onChange={event => onSettingColumnChange({ value: event.target.valueAsNumber as number })}
           />
         </FormControl>
       </Grid>

@@ -1,4 +1,19 @@
-import { Store } from '..';
+import { LanguageConfig, Store } from '..';
+
+export type OffsetSettingValues = LanguageConfig<Array<{ label: string; value: number }>>;
+
+export const OFFSET_SETTING_VALUES: OffsetSettingValues = {
+  en: [
+    { label: 'Octal', value: 8 },
+    { label: 'Decimal', value: 10 },
+    { label: 'Hexadecimal', value: 16 }
+  ],
+  fr: [
+    { label: 'Octal', value: 8 },
+    { label: 'Décimal', value: 10 },
+    { label: 'Hexadécimal', value: 16 }
+  ]
+};
 
 export type EncodingType =
   | 'hidden'
@@ -15,15 +30,8 @@ export type EncodingType =
   | 'utf16le'
   | 'utf8';
 
-export type LowerEncodingSettingValues = {
-  en: Array<{ label: string; type: EncodingType; value: number }>;
-  fr: Array<{ label: string; type: EncodingType; value: number }>;
-};
-
-export type HigherEncodingSettingValues = {
-  en: Array<{ label: string; type: EncodingType; value: number }>;
-  fr: Array<{ label: string; type: EncodingType; value: number }>;
-};
+export type LowerEncodingSettingValues = LanguageConfig<Array<{ label: string; type: EncodingType; value: number }>>;
+export type HigherEncodingSettingValues = LanguageConfig<Array<{ label: string; type: EncodingType; value: number }>>;
 
 export const LOWER_ENCODING_SETTING_VALUES: LowerEncodingSettingValues = {
   en: [

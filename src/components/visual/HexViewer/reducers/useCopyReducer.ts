@@ -1,23 +1,26 @@
 import useClipboard from 'commons/components/hooks/useClipboard';
 import { useCallback, useMemo } from 'react';
-import { isAction, isCell, ReducerProps, Store, toHexChar2 } from '..';
+import { isAction, isCell, ReducerHandler, Reducers, Store, toHexChar2, UseReducer } from '..';
 
 export type CopyState = {};
 
-export const useCopyReducer = () => {
+export const useCopyReducer: UseReducer<CopyState> = () => {
   const { copy } = useClipboard();
 
   const initialState = useMemo<CopyState>(() => ({}), []);
 
-  const copyHexCursor = useCallback((store: Store) => copy(store.hex.codes.get(store.cursor.index)), [copy]);
-
-  const copyTextCursor = useCallback(
-    (store: Store) => copy(toHexChar2(store, store.hex.codes.get(store.cursor.index), true)),
+  const copyHexCursor: (store: Store) => void = useCallback(
+    store => copy(store.hex.codes.get(store.cursor.index)),
     [copy]
   );
 
-  const copyHexSelect = useCallback(
-    (store: Store) => {
+  const copyTextCursor: (store: Store) => void = useCallback(
+    store => copy(toHexChar2(store, store.hex.codes.get(store.cursor.index), true)),
+    [copy]
+  );
+
+  const copyHexSelect: (store: Store) => void = useCallback(
+    store => {
       let value = '';
       const array = Array.from(Array(store.select.endIndex - store.select.startIndex + 1).keys()).map(
         i => i + store.select.startIndex
@@ -30,8 +33,8 @@ export const useCopyReducer = () => {
     [copy]
   );
 
-  const copyTextSelect = useCallback(
-    (store: Store) => {
+  const copyTextSelect: (store: Store) => void = useCallback(
+    store => {
       let value = '';
       const array = Array.from(Array(store.select.endIndex - store.select.startIndex + 1).keys()).map(
         i => i + store.select.startIndex
@@ -44,8 +47,8 @@ export const useCopyReducer = () => {
     [copy]
   );
 
-  const copyKeyDown = useCallback(
-    (store: Store): Store => {
+  const copyKeyDown: Reducers['copyKeyDown'] = useCallback(
+    store => {
       if (store.cursor.index !== null && isCell.hex(store)) copyHexCursor(store);
       else if (store.cursor.index !== null && isCell.text(store)) copyTextCursor(store);
       else if (store.select.startIndex !== -1 && store.select.endIndex !== -1 && isCell.hex(store))
@@ -57,9 +60,9 @@ export const useCopyReducer = () => {
     [copyHexCursor, copyHexSelect, copyTextCursor, copyTextSelect]
   );
 
-  const reducer = useCallback(
-    ({ store, action }: ReducerProps): Store => {
-      if (isAction.copyKeyDown(action)) return copyKeyDown(store);
+  const reducer: ReducerHandler = useCallback(
+    ({ store, action: { type } }) => {
+      if (isAction.copyKeyDown(type)) return copyKeyDown(store);
       else return { ...store };
     },
     [copyKeyDown]

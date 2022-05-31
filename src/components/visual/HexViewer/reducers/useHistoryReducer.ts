@@ -1,6 +1,6 @@
 import { isArrowDown, isArrowUp } from 'commons/addons/elements/utils/keyboard';
 import { useCallback, useMemo } from 'react';
-import { ActionProps, isAction, ReducerProps, SearchType, Store } from '..';
+import { ActionProps, isAction, ReducerHandler, Reducers, SearchType, Store, UseReducer } from '..';
 
 export type HistoryType = {
   type: SearchType;
@@ -16,9 +16,7 @@ export type HistoryState = {
   };
 };
 
-export type HistoryPayload = {};
-
-export const useHistoryReducer = () => {
+export const useHistoryReducer: UseReducer<HistoryState> = () => {
   const initialState = useMemo<HistoryState>(
     () => ({
       history: {
@@ -31,7 +29,7 @@ export const useHistoryReducer = () => {
     []
   );
 
-  const historyLoad = useCallback((store: Store, { type, payload }: ActionProps): Store => {
+  const historyLoad: Reducers['appLoad'] = useCallback((store, { data }) => {
     const value = localStorage.getItem(store.history.storageKey);
     const json = JSON.parse(value) as HistoryType[];
 
@@ -52,7 +50,7 @@ export const useHistoryReducer = () => {
     }
   }, []);
 
-  const historySave = useCallback((store: Store, { type, payload }: ActionProps): Store => {
+  const historySave: Reducers['appSave'] = useCallback((store, payload) => {
     localStorage.setItem(
       store.history.storageKey,
       JSON.stringify(
@@ -62,8 +60,8 @@ export const useHistoryReducer = () => {
     return { ...store };
   }, []);
 
-  const historyAddValue = useCallback((store: Store, { type, payload }: ActionProps): Store => {
-    const { value: inputValue } = payload.event.target;
+  const historyAddValue: Reducers['searchBarEnterKeyDown'] = useCallback((store, { event }) => {
+    const { value: inputValue } = event.target;
     const {
       cursor: { index: cursorIndex },
       search: { type: searchType },
@@ -109,8 +107,8 @@ export const useHistoryReducer = () => {
     }
   }, []);
 
-  const historyIndexChange = useCallback((store: Store, { type, payload }: ActionProps): Store => {
-    const { key: keyCode } = payload.event;
+  const historyIndexChange: Reducers['searchBarArrowKeyDown'] = useCallback((store, { event }) => {
+    const { key: keyCode } = event;
 
     let newHistoryIndex = store.history.index;
     if (isArrowUp(keyCode)) newHistoryIndex += 1;
@@ -138,7 +136,11 @@ export const useHistoryReducer = () => {
     }
   }, []);
 
-  const historyReset = useCallback((store: Store, { type, payload }: ActionProps): Store => {
+  const historyEscapeKeyDown: Reducers['searchBarEscapeKeyDown'] = useCallback((store, { event }) => {
+    return { ...store, history: { ...store.history, index: 0 } };
+  }, []);
+
+  const historyTypeChange: Reducers['searchTypeChange'] = useCallback((store, { type }) => {
     return { ...store, history: { ...store.history, index: 0 } };
   }, []);
 
@@ -147,17 +149,17 @@ export const useHistoryReducer = () => {
     return { ...store, history: { ...store.history, index: 0, values: [{ type: store.search.type, value: '' }] } };
   }, []);
 
-  const reducer = useCallback(
-    ({ store, action }: ReducerProps): Store => {
-      if (isAction.appLoad(action)) return historyLoad(store, action);
-      else if (isAction.appSave(action)) return historySave(store, action);
-      else if (isAction.searchBarEnterKeyDown(action)) return historyAddValue(store, action);
-      else if (isAction.searchBarArrowKeyDown(action)) return historyIndexChange(store, action);
-      else if (isAction.searchBarEscapeKeyDown(action)) return historyReset(store, action);
-      else if (isAction.searchTypeChange(action)) return historyReset(store, action);
+  const reducer: ReducerHandler = useCallback(
+    ({ store, action: { type, payload } }) => {
+      if (isAction.appLoad(type)) return historyLoad(store, payload);
+      else if (isAction.appSave(type)) return historySave(store, payload);
+      else if (isAction.searchBarEnterKeyDown(type)) return historyAddValue(store, payload);
+      else if (isAction.searchBarArrowKeyDown(type)) return historyIndexChange(store, payload);
+      else if (isAction.searchBarEscapeKeyDown(type)) return historyEscapeKeyDown(store, payload);
+      else if (isAction.searchTypeChange(type)) return historyTypeChange(store, payload);
       else return { ...store };
     },
-    [historyAddValue, historyIndexChange, historyLoad, historyReset, historySave]
+    [historyAddValue, historyEscapeKeyDown, historyIndexChange, historyLoad, historySave, historyTypeChange]
   );
 
   return { initialState, reducer };

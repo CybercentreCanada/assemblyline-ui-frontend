@@ -78,13 +78,13 @@ export const WrappedHexSearchbar = ({ store }: StoreProps) => {
       onChange={(event: React.ChangeEvent, newValue: string | null) => {
         console.log('onChange', newValue);
         setValue(newValue);
-        onSearchBarChange(newValue);
+        onSearchBarChange({ value: newValue });
       }}
       inputValue={inputValue}
       onInputChange={(event: React.ChangeEvent, newInputValue: string) => {
         console.log('onInputChange', newInputValue);
         setInputValue(newInputValue);
-        onSearchBarInputChange(newInputValue);
+        onSearchBarInputChange({ inputValue: newInputValue });
       }}
       onFocus={event => onSearchBarFocus()}
       onBlur={event => onSearchBarBlur()}

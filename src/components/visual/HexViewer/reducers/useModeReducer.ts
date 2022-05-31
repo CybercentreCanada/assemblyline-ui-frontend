@@ -1,37 +1,37 @@
 import { useCallback, useMemo } from 'react';
 import {
-  ActionProps,
   BodyType,
   isAction,
   LanguageType,
   LayoutType,
-  ReducerProps,
-  Store,
+  ReducerHandler,
+  Reducers,
   ThemeType,
   ToolbarType,
+  UseReducer,
   WidthType
 } from '..';
 
 export type ModeState = {
   initialized: boolean;
   mode: {
-    theme: ThemeType;
-    language: LanguageType;
-    width: WidthType;
+    themeType: ThemeType;
+    languageType: LanguageType;
+    widthType: WidthType;
     layoutType: LayoutType;
     toolbarType: ToolbarType;
     bodyType: BodyType;
   };
 };
 
-export const useModeReducer = () => {
+export const useModeReducer: UseReducer<ModeState> = () => {
   const initialState = useMemo<ModeState>(
     () => ({
       initialized: false,
       mode: {
-        theme: 'light',
-        language: 'en',
-        width: 'md',
+        themeType: 'light',
+        languageType: 'en',
+        widthType: 'md',
         layoutType: 'page',
         toolbarType: 'desktop',
         bodyType: 'window'
@@ -40,67 +40,65 @@ export const useModeReducer = () => {
     []
   );
 
-  const bodyInitialized = useCallback((store: Store, { type, payload }: ActionProps): Store => {
-    return { ...store, initialized: payload.value };
+  const bodyInitialized: Reducers['bodyInit'] = useCallback((store, { initialized }) => {
+    return { ...store, initialized };
   }, []);
 
-  const themeChange = useCallback((store: Store, { type, payload }: ActionProps): Store => {
-    if (!payload.hasOwnProperty('theme')) return { ...store, mode: { ...store.mode, theme: payload.theme } };
-    else return { ...store };
-  }, []);
+  const themeTypeChange: Reducers['appThemeTypeChange'] = useCallback(
+    (store, { themeType }) => ({ ...store, mode: { ...store.mode, themeType } }),
+    []
+  );
 
-  const languageChange = useCallback((store: Store, { type, payload }: ActionProps): Store => {
-    if (payload.hasOwnProperty('language')) return { ...store, mode: { ...store.mode, language: payload.language } };
-    else return { ...store };
-  }, []);
+  const languageTypeChange: Reducers['appLanguageTypeChange'] = useCallback(
+    (store, { languageType }) => ({ ...store, mode: { ...store.mode, languageType } }),
+    []
+  );
 
-  const widthChange = useCallback((store: Store, { type, payload }: ActionProps): Store => {
-    if (payload.hasOwnProperty('width')) return { ...store, mode: { ...store.mode, width: payload.width } };
-    else return { ...store };
-  }, []);
+  const widthTypeChange: Reducers['appWidthTypeChange'] = useCallback(
+    (store, { widthType }) => ({ ...store, mode: { ...store.mode, widthType } }),
+    []
+  );
 
-  const layoutTypeChange = useCallback((store: Store, { type, payload }: ActionProps): Store => {
-    if (payload.hasOwnProperty('layoutType'))
-      return { ...store, mode: { ...store.mode, layoutType: payload.layoutType } };
-    else return { ...store };
-  }, []);
+  const layoutTypeChange: Reducers['appLayoutTypeChange'] = useCallback(
+    (store, { layoutType }) => ({ ...store, mode: { ...store.mode, layoutType } }),
+    []
+  );
 
-  const toolbarTypeChange = useCallback((store: Store, { type, payload }: ActionProps): Store => {
-    if (payload.hasOwnProperty('toolbarType'))
-      return { ...store, mode: { ...store.mode, toolbarType: payload.toolbarType } };
-    else return { ...store };
-  }, []);
+  const toolbarTypeChange: Reducers['appToolbarTypeChange'] = useCallback(
+    (store, { toolbarType }) => ({ ...store, mode: { ...store.mode, toolbarType } }),
+    []
+  );
 
-  const bodyTypeChange = useCallback((store: Store, { type, payload }: ActionProps): Store => {
-    if (payload.hasOwnProperty('bodyType')) return { ...store, mode: { ...store.mode, bodyType: payload.bodyType } };
-    else return { ...store };
-  }, []);
+  const bodyTypeChange: Reducers['appBodyTypeChange'] = useCallback(
+    (store, { bodyType }) => ({ ...store, mode: { ...store.mode, bodyType } }),
+    []
+  );
 
-  const layoutTypeToggle = useCallback((store: Store, { type, payload }: ActionProps): Store => {
+  const layoutTypeToggle: Reducers['fullscreenToggle'] = useCallback((store, payload) => {
     return { ...store, mode: { ...store.mode, layoutType: store.mode.layoutType === 'page' ? 'fullscreen' : 'page' } };
   }, []);
 
-  const reducer = useCallback(
-    ({ store, action }: ReducerProps): Store => {
-      if (isAction.bodyInit(action)) return bodyInitialized(store, action);
-      else if (isAction.appThemeChange(action)) return themeChange(store, action);
-      else if (isAction.appLanguageChange(action)) return languageChange(store, action);
-      else if (isAction.appWidthChange(action)) return widthChange(store, action);
-      else if (isAction.appLayoutTypeChange(action)) return layoutTypeChange(store, action);
-      else if (isAction.appToolbarTypeChange(action)) return toolbarTypeChange(store, action);
-      else if (isAction.appBodyTypeChange(action)) return bodyTypeChange(store, action);
-      else if (isAction.fullscreenToggle(action)) return layoutTypeToggle(store, action);
+  const reducer: ReducerHandler = useCallback(
+    ({ store, action: { type, payload } }) => {
+      if (isAction.bodyInit(type)) return bodyInitialized(store, payload);
+      else if (isAction.appThemeTypeChange(type)) return themeTypeChange(store, payload);
+      else if (isAction.appLanguageTypeChange(type)) return languageTypeChange(store, payload);
+      else if (isAction.appWidthTypeChange(type)) return widthTypeChange(store, payload);
+      else if (isAction.appLayoutTypeChange(type)) return layoutTypeChange(store, payload);
+      else if (isAction.appToolbarTypeChange(type)) return toolbarTypeChange(store, payload);
+      else if (isAction.appBodyTypeChange(type)) return bodyTypeChange(store, payload);
+      else if (isAction.fullscreenToggle(type)) return layoutTypeToggle(store, payload);
       else return { ...store };
     },
     [
       bodyInitialized,
       bodyTypeChange,
-      languageChange,
+      languageTypeChange,
       layoutTypeChange,
       layoutTypeToggle,
-      themeChange,
+      themeTypeChange,
       toolbarTypeChange,
-      widthChange
+      widthTypeChange
     ]
   );
 

@@ -2,7 +2,6 @@ import useClipboard from 'commons/components/hooks/useClipboard';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React, { useCallback } from 'react';
 import {
-  ActionProps,
   formatTextString,
   isAction,
   isBody,
@@ -10,9 +9,11 @@ import {
   isSearchType,
   parseHexToString,
   parseStringToHexString,
-  ReducerProps,
+  ReducerHandler,
+  Reducers,
   SearchType,
-  Store
+  Store,
+  UseReducer
 } from '..';
 
 export type LocationState = {
@@ -28,8 +29,6 @@ export type LocationState = {
   };
 };
 
-export type LocationPayload = {};
-
 export type LocationQuery = {
   scroll?: string;
   cursor?: string;
@@ -40,7 +39,7 @@ export type LocationQuery = {
   searchIndex?: string;
 };
 
-export const useLocationReducer = () => {
+export const useLocationReducer: UseReducer<LocationState> = () => {
   const { copy } = useClipboard();
 
   const initialState = React.useMemo<LocationState>(
@@ -131,8 +130,8 @@ export const useLocationReducer = () => {
     return { ...store, location: { ...store.location, searchType, searchValue, searchIndex } };
   }, []);
 
-  const locationShare = useCallback(
-    (store: Store, { type, payload }: ActionProps): Store => {
+  const locationShare: Reducers['locationShare'] = useCallback(
+    store => {
       query.current.deleteAll();
 
       if (store.scroll.index !== null) {
@@ -159,8 +158,8 @@ export const useLocationReducer = () => {
     [copy]
   );
 
-  const locationInit = useCallback(
-    (store: Store, { type, payload }: ActionProps): Store => {
+  const locationInit: Reducers['appLocationInit'] = useCallback(
+    store => {
       query.current = new SimpleSearchQuery(window.location.search, '');
       const params: LocationQuery = query.current.getParams();
       store = getScrollIndex(store, params);
@@ -175,15 +174,15 @@ export const useLocationReducer = () => {
     [getCursorIndex, getScrollIndex, getSearchIndex, getSearchType, getSearchValue, getSelectIndexes]
   );
 
-  const locationLoaded = useCallback((store: Store, { type, payload }: ActionProps): Store => {
+  const locationLoaded: Reducers['locationLoaded'] = useCallback(store => {
     return { ...store, location: { ...store.location, loaded: true } };
   }, []);
 
-  const reducer = useCallback(
-    ({ store, action }: ReducerProps): Store => {
-      if (isAction.appLocationInit(action)) return locationInit(store, action);
-      else if (isAction.locationLoaded(action)) return locationLoaded(store, action);
-      else if (isAction.locationShare(action)) return locationShare(store, action);
+  const reducer: ReducerHandler = useCallback(
+    ({ store, action: { type, payload } }) => {
+      if (isAction.appLocationInit(type)) return locationInit(store, payload);
+      else if (isAction.locationLoaded(type)) return locationLoaded(store, payload);
+      else if (isAction.locationShare(type)) return locationShare(store, payload);
       else return { ...store };
     },
     [locationInit, locationLoaded, locationShare]

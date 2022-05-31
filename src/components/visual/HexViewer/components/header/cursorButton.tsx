@@ -35,7 +35,7 @@ export const WrappedHexCursorButton = ({ store }: StoreProps) => {
           allowNull={true}
           direction="inverse"
           onChange={event => {
-            onCursorIndexChange(event.target.valueAsNumber as number);
+            onCursorIndexChange({ index: event.target.valueAsNumber as number });
           }}
         />
       }

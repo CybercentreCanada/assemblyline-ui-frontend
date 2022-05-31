@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { ActionProps, EncodingType, isAction, parseDataToHexcodeMap, ReducerProps, Store } from '..';
+import { EncodingType, isAction, parseDataToHexcodeMap, ReducerHandler, Reducers, UseReducer } from '..';
 
 export type HexState = {
   hex: {
@@ -18,14 +18,13 @@ export type HexState = {
     };
   };
   offset: {
+    show: boolean;
     base: number;
     size: number;
   };
 };
 
-export type HexPayload = any;
-
-export const useHexReducer = () => {
+export const useHexReducer: UseReducer<HexState> = () => {
   const initialState = useMemo<HexState>(
     () => ({
       hex: {
@@ -44,6 +43,7 @@ export const useHexReducer = () => {
         }
       },
       offset: {
+        show: true,
         base: 16,
         size: 8
       }
@@ -51,15 +51,15 @@ export const useHexReducer = () => {
     []
   );
 
-  const hexDataChange = useCallback((store: Store, { type, payload }: ActionProps): Store => {
-    store.hex.data = payload.data;
-    store.hex.codes = parseDataToHexcodeMap(payload.data);
+  const hexDataChange: Reducers['appLoad'] = useCallback((store, { data }) => {
+    store.hex.data = data;
+    store.hex.codes = parseDataToHexcodeMap(data);
     return { ...store };
   }, []);
 
-  const reducer = useCallback(
-    ({ store, action }: ReducerProps): Store => {
-      if (isAction.appLoad(action)) return hexDataChange(store, action);
+  const reducer: ReducerHandler = useCallback(
+    ({ store, action: { type, payload } }) => {
+      if (isAction.appLoad(type)) return hexDataChange(store, payload);
       else return { ...store };
     },
     [hexDataChange]

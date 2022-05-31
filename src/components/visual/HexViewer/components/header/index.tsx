@@ -42,7 +42,7 @@ const WrappedHexDesktopHeader = ({ store }: StoreProps) => {
   const toolbarRef = React.useRef(null);
 
   return (
-    <div className={classes.root} ref={toolbarRef} onMouseEnter={onBodyMouseLeave}>
+    <div className={classes.root} ref={toolbarRef} onMouseEnter={() => onBodyMouseLeave()}>
       <Paper component="form" className={classes.toolbar}>
         <HexSearchTypes store={store} />
         <HexSearchBar store={store} />
@@ -55,8 +55,8 @@ const WrappedHexDesktopHeader = ({ store }: StoreProps) => {
           onClick={e => onFullscreenToggle()}
           icon={<FullscreenOutlinedIcon />}
         /> */}
-        <TooltipIconButton title={t('share')} onClick={onLocationShare} icon={<ShareIcon />} />
-        <TooltipIconButton title={t('settings.label')} onClick={onSettingOpen} icon={<SettingsIcon />} />
+        <TooltipIconButton title={t('share')} onClick={() => onLocationShare()} icon={<ShareIcon />} />
+        <TooltipIconButton title={t('settings.label')} onClick={() => onSettingOpen()} icon={<SettingsIcon />} />
       </Paper>
     </div>
   );

@@ -2,7 +2,7 @@ import { Button, makeStyles, Slider } from '@material-ui/core';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 import clsx from 'clsx';
-import { ChangeEvent, default as React } from 'react';
+import { default as React } from 'react';
 import { StoreProps, useDispatch } from '../..';
 
 export const useStyles = makeStyles(theme => ({
@@ -46,7 +46,7 @@ export const WrappedHexScrollBar = ({ store }: StoreProps) => {
       <div className={clsx(classes.buttonBox, classes.buttonUpBox)}>
         <Button
           className={clsx(classes.button)}
-          onClick={() => onScrollButtonClick(-1)}
+          onClick={() => onScrollButtonClick({ value: -1 })}
           size={'small'}
           disabled={rowIndex === 0}
         >
@@ -60,12 +60,12 @@ export const WrappedHexScrollBar = ({ store }: StoreProps) => {
         min={0}
         step={speed}
         max={maxRowIndex}
-        onChange={(e: ChangeEvent, newValue: number) => onScrollSliderChange(e, newValue)}
+        onChange={(event, newValue) => onScrollSliderChange({ event, newValue })}
       />
       <div className={clsx(classes.buttonBox, classes.buttonDownBox)}>
         <Button
           className={clsx(classes.button)}
-          onClick={() => onScrollButtonClick(1)}
+          onClick={() => onScrollButtonClick({ value: 1 })}
           size={'small'}
           disabled={rowIndex === maxRowIndex}
         >
@@ -84,8 +84,8 @@ export const HexScrollBar = React.memo(
     prevProps.store.scroll.maxRowIndex === nextProps.store.scroll.maxRowIndex &&
     prevProps.store.layout.row.size === nextProps.store.layout.row.size &&
     prevProps.store.mode.bodyType === nextProps.store.mode.bodyType &&
-    prevProps.store.mode.theme === nextProps.store.mode.theme &&
-    prevProps.store.mode.language === nextProps.store.mode.language &&
-    prevProps.store.mode.width === nextProps.store.mode.width
+    prevProps.store.mode.themeType === nextProps.store.mode.themeType &&
+    prevProps.store.mode.languageType === nextProps.store.mode.languageType &&
+    prevProps.store.mode.widthType === nextProps.store.mode.widthType
 );
 export default HexScrollBar;

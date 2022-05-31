@@ -1,14 +1,15 @@
 import { useCallback, useMemo } from 'react';
 import {
-  ActionProps,
   BodyType,
   BODY_TYPE_SETTING_VALUES,
   EncodingType,
   HIGHER_ENCODING_SETTING_VALUES,
   isAction,
   LOWER_ENCODING_SETTING_VALUES,
-  ReducerProps,
-  Store
+  ReducerHandler,
+  Reducers,
+  Store,
+  UseReducer
 } from '..';
 
 export type SettingState = {
@@ -42,9 +43,7 @@ export type SettingState = {
   };
 };
 
-export type SettingPayload = {};
-
-export const useSettingReducer = () => {
+export const useSettingReducer: UseReducer<SettingState> = () => {
   const initialState = useMemo<SettingState>(
     () => ({
       setting: {
@@ -101,7 +100,7 @@ export const useSettingReducer = () => {
     );
   }, []);
 
-  const settingLoad = useCallback((store: Store, { type, payload }: ActionProps): Store => {
+  const settingLoad: Reducers['settingLoad'] = useCallback(store => {
     const value = localStorage.getItem(store.setting.storageKey);
     const json = JSON.parse(value) as any;
 
@@ -130,8 +129,10 @@ export const useSettingReducer = () => {
     };
   }, []);
 
-  const settingSave = useCallback(
-    (store: Store, { type, payload }: ActionProps): Store => {
+  const appLoad: Reducers['appLoad'] = useCallback((store, payload) => settingLoad(store), [settingLoad]);
+
+  const settingSave: Reducers['settingSave'] = useCallback(
+    store => {
       const newBodyType: BodyType = BODY_TYPE_SETTING_VALUES.en.find(e => e.value === store.setting.bodyType).type;
       const newLowerEncoding: EncodingType = LOWER_ENCODING_SETTING_VALUES.en.find(
         e => e.value === store.setting.hex.lower.encoding
@@ -161,13 +162,12 @@ export const useSettingReducer = () => {
       };
 
       handleSaveLocalStorage(newStore);
-
       return newStore;
     },
     [handleSaveLocalStorage]
   );
 
-  const settingOpen = useCallback((store: Store, { type, payload }: ActionProps): Store => {
+  const settingOpen: Reducers['settingOpen'] = useCallback(store => {
     return {
       ...store,
       setting: {
@@ -193,18 +193,15 @@ export const useSettingReducer = () => {
     };
   }, []);
 
-  const settingClose = useCallback((store: Store, { type, payload }: ActionProps): Store => {
+  const settingClose: Reducers['settingClose'] = useCallback(store => {
     return { ...store, setting: { ...store.setting, open: false } };
   }, []);
 
-  const settingOffsetBaseChange = useCallback((store: Store, { type, payload }: ActionProps): Store => {
-    return {
-      ...store,
-      setting: { ...store.setting, offsetBase: payload.event.target.value }
-    };
+  const settingOffsetBaseChange: Reducers['settingOffsetBaseChange'] = useCallback((store, { event }) => {
+    return { ...store, setting: { ...store.setting, offsetBase: event.target.value as number } };
   }, []);
 
-  const settingAutoColumnChange = useCallback((store: Store, { type, payload }: ActionProps): Store => {
+  const settingAutoColumnChange: Reducers['settingAutoColumnChange'] = useCallback(store => {
     return {
       ...store,
       setting: {
@@ -218,27 +215,21 @@ export const useSettingReducer = () => {
     };
   }, []);
 
-  const settingColumnChange = useCallback((store: Store, { type, payload }: ActionProps): Store => {
+  const settingColumnChange: Reducers['settingColumnChange'] = useCallback((store, { value }) => {
     return {
       ...store,
       setting: {
         ...store.setting,
-        column: { ...store.setting.column, size: payload.value }
+        column: { ...store.setting.column, size: value }
       }
     };
   }, []);
 
-  const settingBodyChange = useCallback((store: Store, { type, payload }: ActionProps): Store => {
-    return {
-      ...store,
-      setting: {
-        ...store.setting,
-        bodyType: payload.event.target.value
-      }
-    };
+  const settingBodyTypeChange: Reducers['settingBodyTypeChange'] = useCallback((store, { event }) => {
+    return { ...store, setting: { ...store.setting, bodyType: event.target.value as number } };
   }, []);
 
-  const settingEncodingChange = useCallback((store: Store, { type, payload }: ActionProps): Store => {
+  const settingEncodingChange: Reducers['settingEncodingChange'] = useCallback((store, { key, value }) => {
     return {
       ...store,
       setting: {
@@ -247,18 +238,18 @@ export const useSettingReducer = () => {
           ...store.setting.hex,
           lower: {
             ...store.setting.hex.lower,
-            encoding: payload.key === 'lower' ? payload.value : store.setting.hex.lower.encoding
+            encoding: key === 'lower' ? value : store.setting.hex.lower.encoding
           },
           higher: {
             ...store.setting.hex.higher,
-            encoding: payload.key === 'higher' ? payload.value : store.setting.hex.higher.encoding
+            encoding: key === 'higher' ? value : store.setting.hex.higher.encoding
           }
         }
       }
     };
   }, []);
 
-  const settingHexCharChange = useCallback((store: Store, { type, payload }: ActionProps): Store => {
+  const settingHexCharChange: Reducers['settingHexCharChange'] = useCallback((store, { key, value }) => {
     return {
       ...store,
       setting: {
@@ -266,55 +257,42 @@ export const useSettingReducer = () => {
         hex: {
           ...store.setting.hex,
           null: {
-            char:
-              payload.key === 'null'
-                ? payload.value.substr(-1) !== null
-                  ? payload.value.substr(-1)
-                  : ' '
-                : store.setting.hex.null.char
+            char: key === 'null' ? (value.substr(-1) !== null ? value.substr(-1) : ' ') : store.setting.hex.null.char
           },
           lower: {
             ...store.setting.hex.lower,
-            char:
-              payload.key === 'lower'
-                ? payload.value.substr(-1) !== null
-                  ? payload.value.substr(-1)
-                  : ' '
-                : store.setting.hex.lower.char
+            char: key === 'lower' ? (value.substr(-1) !== null ? value.substr(-1) : ' ') : store.setting.hex.lower.char
           },
           higher: {
             ...store.setting.hex.higher,
             char:
-              payload.key === 'higher'
-                ? payload.value.substr(-1) !== null
-                  ? payload.value.substr(-1)
-                  : ' '
-                : store.setting.hex.higher.char
+              key === 'higher' ? (value.substr(-1) !== null ? value.substr(-1) : ' ') : store.setting.hex.higher.char
           }
         }
       }
     };
   }, []);
 
-  const reducer = useCallback(
-    ({ prevStore, store, action }: ReducerProps): Store => {
+  const reducer: ReducerHandler = useCallback(
+    ({ store, action: { type, payload } }) => {
       // Load and Save only when open
-      if (isAction.appLoad(action)) return settingLoad(store, action);
-      else if (isAction.settingLoad(action)) return settingLoad(store, action);
-      else if (isAction.settingSave(action)) return settingSave(store, action);
-      else if (isAction.settingOpen(action)) return settingOpen(store, action);
-      else if (isAction.settingClose(action)) return settingClose(store, action);
-      else if (isAction.settingBodyTypeChange(action)) return settingBodyChange(store, action);
-      else if (isAction.settingOffsetBaseChange(action)) return settingOffsetBaseChange(store, action);
-      else if (isAction.settingAutoColumnChange(action)) return settingAutoColumnChange(store, action);
-      else if (isAction.settingColumnChange(action)) return settingColumnChange(store, action);
-      else if (isAction.settingEncodingChange(action)) return settingEncodingChange(store, action);
-      else if (isAction.settingHexCharChange(action)) return settingHexCharChange(store, action);
+      if (isAction.appLoad(type)) return appLoad(store, payload);
+      else if (isAction.settingLoad(type)) return settingLoad(store, payload);
+      else if (isAction.settingSave(type)) return settingSave(store, payload);
+      else if (isAction.settingOpen(type)) return settingOpen(store, payload);
+      else if (isAction.settingClose(type)) return settingClose(store, payload);
+      else if (isAction.settingBodyTypeChange(type)) return settingBodyTypeChange(store, payload);
+      else if (isAction.settingOffsetBaseChange(type)) return settingOffsetBaseChange(store, payload);
+      else if (isAction.settingAutoColumnChange(type)) return settingAutoColumnChange(store, payload);
+      else if (isAction.settingColumnChange(type)) return settingColumnChange(store, payload);
+      else if (isAction.settingEncodingChange(type)) return settingEncodingChange(store, payload);
+      else if (isAction.settingHexCharChange(type)) return settingHexCharChange(store, payload);
       else return { ...store };
     },
     [
+      appLoad,
       settingAutoColumnChange,
-      settingBodyChange,
+      settingBodyTypeChange,
       settingClose,
       settingColumnChange,
       settingEncodingChange,

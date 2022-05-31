@@ -1,6 +1,8 @@
 import React, { useLayoutEffect } from 'react';
 import {
-  ActionTypes,
+  ActionProps,
+  ACTIONS,
+  ActionType,
   CellState,
   CopyState,
   CursorState,
@@ -33,13 +35,6 @@ export type Store = CellState &
   SelectState &
   SettingState;
 
-export type ActionProps = {
-  type: ActionTypes | string;
-  payload: any;
-  tracked?: boolean;
-  repeat?: boolean;
-};
-
 export type StoreContextProps = {
   store?: Store;
   dispatch?: React.Dispatch<ActionProps>;
@@ -53,6 +48,8 @@ export type StoreProps = {
   store?: Store;
 };
 
+export type AT = typeof ACTIONS[keyof typeof ACTIONS];
+
 export const storeContext = React.createContext<StoreContextProps>(null);
 export const useStore = () => React.useContext(storeContext);
 
@@ -60,7 +57,7 @@ export const StoreProvider = ({ children }: StoreProviderProps) => {
   const { dispatchRef } = useDispatch();
   const { initialState, reducer, render } = useReducer();
 
-  const [store, dispatch] = useAdvanceReducer<Store, ActionTypes>(reducer, { ...initialState.current }, 15, render);
+  const [store, dispatch] = useAdvanceReducer<Store, ActionType>({ ...initialState.current }, reducer, render, 15);
 
   useLayoutEffect(() => {
     dispatchRef.current = dispatch;

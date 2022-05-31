@@ -1,14 +1,13 @@
 import React, { useEffect } from 'react';
 
 //tracked, untracked forced, update
-
-export type Dispatch<Action> = { type: Action | string; payload: object; tracked?: boolean; repeat?: boolean };
+export type Dispatch<Action> = { type: Action | any; payload: any; tracked?: boolean; repeat?: boolean };
 
 export const useAdvanceReducer = <State, Action>(
-  reducer: (state: Partial<State>, action: Dispatch<Action>) => State,
   initialState: State,
-  delay: number = 1000,
-  update?: (prevState: Partial<State>, nextState: Partial<State>) => void
+  reducer: (state: Partial<State>, action: Dispatch<Action>) => State,
+  update?: (prevState: Partial<State>, nextState: Partial<State>) => void,
+  delay: number = 1000
 ): [State, (action: Dispatch<Action>) => void, React.MutableRefObject<State>] => {
   const [state, setState] = React.useState<State>({ ...initialState });
   const prevStateRef = React.useRef<State>({ ...initialState });
