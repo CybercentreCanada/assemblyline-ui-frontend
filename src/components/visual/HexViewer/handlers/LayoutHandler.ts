@@ -1,7 +1,10 @@
 import { Store } from '..';
 
+export type DisplayType = 'dual' | 'hex' | 'text';
+
 export type LayoutSize = {
   windowHeight: number;
+  mobileWindowHeight: number;
   rowHeight: number;
   offsetWidth: number;
   hexWidth: number;
@@ -11,6 +14,7 @@ export type LayoutSize = {
 
 export const LAYOUT_SIZE: LayoutSize = {
   windowHeight: 350,
+  mobileWindowHeight: 140,
   rowHeight: 22.3958,
   offsetWidth: 73.5833,
   hexWidth: 21.8958,
@@ -47,3 +51,18 @@ export type IsFocus = { [Property in FocusType]: (store: Store) => boolean };
 export const isFocus = Object.fromEntries(
   Object.keys(FOCUS).map(key => [key, (store: Store) => store.layout.isFocusing === FOCUS[key]])
 ) as IsFocus;
+
+export const handleLayoutColumnResize2 = (store: Store, width: number) => {
+  return COLUMNS.sort((a, b) => b.columns - a.columns).find(e => {
+    const displayType = store.layout.display;
+    let size: number = 0;
+
+    size += 20;
+    size += store.offset.show && LAYOUT_SIZE.offsetWidth;
+    size += displayType === 'dual' ? 3 * LAYOUT_SIZE.spacingWidth : 2 * LAYOUT_SIZE.spacingWidth;
+    size += (displayType === 'dual' || displayType === 'hex') && e.columns * LAYOUT_SIZE.hexWidth;
+    size += (displayType === 'dual' || displayType === 'text') && e.columns * LAYOUT_SIZE.textWidth;
+
+    return size < width;
+  })?.columns;
+};

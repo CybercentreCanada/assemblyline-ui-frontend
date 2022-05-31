@@ -1,4 +1,5 @@
 import { makeStyles } from '@material-ui/core';
+import clsx from 'clsx';
 import React, { useRef } from 'react';
 import { HexBody, HexHeader, HexSettings, LAYOUT_SIZE, StoreProps, useDispatch, useEventListener } from '../..';
 
@@ -16,6 +17,9 @@ const useHexStyles = makeStyles(theme => ({
     '-khtml-user-select': 'none' /* Konqueror HTML */,
     '-moz-user-select': 'none' /* Firefox */,
     '-ms-user-select': 'none' /* Internet Explorer/Edge */
+  },
+  mobile: {
+    height: `calc(100vh - ${LAYOUT_SIZE.mobileWindowHeight}px)`
   }
 }));
 
@@ -32,7 +36,7 @@ export const WrappedHexPageLayout = ({ store }: StoreProps) => {
   });
 
   return (
-    <div ref={ref} className={classes.root}>
+    <div ref={ref} className={clsx(classes.root, window.innerHeight.valueOf() < 1000 && classes.mobile)}>
       <HexHeader store={store} />
       <HexBody store={store} />
       <HexSettings store={store} />

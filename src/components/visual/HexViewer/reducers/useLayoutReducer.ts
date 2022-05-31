@@ -1,7 +1,8 @@
 import { useCallback, useMemo } from 'react';
 import {
+  DisplayType,
   FocusType,
-  handleLayoutColumnResize,
+  handleLayoutColumnResize2,
   handleLayoutRowResize,
   isAction,
   isBody,
@@ -12,6 +13,7 @@ import {
 
 export type LayoutState = {
   layout: {
+    display: DisplayType;
     column: {
       size: number;
       auto: boolean;
@@ -28,6 +30,7 @@ export const useLayoutReducer: UseReducer<LayoutState> = () => {
   const initialState = useMemo<LayoutState>(
     () => ({
       layout: {
+        display: 'dual',
         column: {
           size: 8,
           auto: true
@@ -47,7 +50,7 @@ export const useLayoutReducer: UseReducer<LayoutState> = () => {
       column: { auto: columnAuto, size: columnSize },
       row: { auto: rowAuto, size: rowSize }
     } = store.layout;
-    const newColumnSize = columnAuto ? handleLayoutColumnResize(width as number) : columnSize;
+    const newColumnSize = columnAuto ? handleLayoutColumnResize2(store, width as number) : columnSize;
     const newRowSize = rowAuto && isBody.table(store) ? handleLayoutRowResize(height as number) : rowSize;
 
     return {
