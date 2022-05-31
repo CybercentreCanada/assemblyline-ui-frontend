@@ -170,12 +170,14 @@ const WrappedAlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
               <AlertListChipDetailed items={item.al.detailed.av} title="AV" size="tiny" />
               <AlertListChipDetailed items={item.al.detailed.ip} title="IP" size="tiny" />
               <AlertListChipDetailed items={item.al.detailed.domain} title="DOM" size="tiny" />
+              <AlertListChipDetailed items={item.al.detailed.uri} title="URI" size="tiny" />
             </>
           ) : (
             <>
               <AlertListChip items={item.al.av} title="AV" size="tiny" />
               <AlertListChip items={item.al.ip} title="IP" size="tiny" />
               <AlertListChip items={item.al.domain} title="DOM" size="tiny" />
+              <AlertListChip items={item.al.uri} title="URI" size="tiny" />
             </>
           )}
         </Grid>

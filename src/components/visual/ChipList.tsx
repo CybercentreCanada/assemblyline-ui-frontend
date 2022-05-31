@@ -5,7 +5,7 @@ import React from 'react';
 
 const useStyles = makeStyles((theme: Theme) => ({
   chiplist: {
-    display: 'flex',
+    display: 'inline-flex',
     flexWrap: 'wrap',
     listStyle: 'none',
     padding: 0,
