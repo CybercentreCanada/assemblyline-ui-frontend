@@ -479,351 +479,342 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
           </div>
         ) : null}
 
-        {!item ||
-          ((item.al.attrib.length !== 0 ||
-            item.al.av.length !== 0 ||
-            item.al.ip.length !== 0 ||
-            item.al.domain.length !== 0 ||
-            item.attack.category.length !== 0 ||
-            (item.heuristic && item.heuristic.name && item.heuristic.name.length !== 0) ||
-            item.al.behavior.length !== 0 ||
-            item.al.yara.length !== 0) && (
-            <>
-              <Typography className={classes.sectionTitle}>{t('al_results')}</Typography>
-              <Divider />
-              <Grid container spacing={1} style={{ marginTop: theme.spacing(1) }}>
-                {/* AL Attributions Section */}
-                {!item || item.al.attrib.length !== 0 ? (
-                  <>
-                    <Grid item xs={3} sm={2}>
-                      {t('attributions')}
-                    </Grid>
-                    <Grid item xs={9} sm={10}>
-                      <div className={classes.sectionContent}>
-                        {item && item.al.detailed ? (
-                          <AutoHideChipList items={item.al.detailed.attrib} />
-                        ) : (
-                          <ChipList
-                            items={item ? item.al.attrib.map(label => ({ label, variant: 'outlined' })) : null}
-                          />
-                        )}
-                      </div>
-                    </Grid>
-                  </>
-                ) : null}
+        {(!item ||
+          item.al.attrib.length !== 0 ||
+          item.al.av.length !== 0 ||
+          item.al.ip.length !== 0 ||
+          item.al.domain.length !== 0 ||
+          (item.al.url && item.al.url.length !== 0) ||
+          item.attack.category.length !== 0 ||
+          (item.heuristic && item.heuristic.name && item.heuristic.name.length !== 0) ||
+          item.al.behavior.length !== 0 ||
+          item.al.yara.length !== 0) && (
+          <>
+            <Typography className={classes.sectionTitle}>{t('al_results')}</Typography>
+            <Divider />
+            <Grid container spacing={1} style={{ marginTop: theme.spacing(1) }}>
+              {/* AL Attributions Section */}
+              {!item || item.al.attrib.length !== 0 ? (
+                <>
+                  <Grid item xs={3} sm={2}>
+                    {t('attributions')}
+                  </Grid>
+                  <Grid item xs={9} sm={10}>
+                    <div className={classes.sectionContent}>
+                      {item && item.al.detailed ? (
+                        <AutoHideChipList items={item.al.detailed.attrib} />
+                      ) : (
+                        <ChipList items={item ? item.al.attrib.map(label => ({ label, variant: 'outlined' })) : null} />
+                      )}
+                    </div>
+                  </Grid>
+                </>
+              ) : null}
 
-                {/* AL AV Hits */}
-                {!item || item.al.av.length !== 0 ? (
-                  <>
-                    <Grid item xs={3} sm={2}>
-                      {t('avhits')}
-                    </Grid>
-                    <Grid item xs={9} sm={10}>
-                      <div className={classes.sectionContent}>
-                        {item && item.al.detailed ? (
-                          <AutoHideChipList items={item.al.detailed.av} />
-                        ) : (
-                          <ChipList items={item ? item.al.av.map(label => ({ label, variant: 'outlined' })) : null} />
-                        )}
-                      </div>
-                    </Grid>
-                  </>
-                ) : null}
+              {/* AL AV Hits */}
+              {!item || item.al.av.length !== 0 ? (
+                <>
+                  <Grid item xs={3} sm={2}>
+                    {t('avhits')}
+                  </Grid>
+                  <Grid item xs={9} sm={10}>
+                    <div className={classes.sectionContent}>
+                      {item && item.al.detailed ? (
+                        <AutoHideChipList items={item.al.detailed.av} />
+                      ) : (
+                        <ChipList items={item ? item.al.av.map(label => ({ label, variant: 'outlined' })) : null} />
+                      )}
+                    </div>
+                  </Grid>
+                </>
+              ) : null}
 
-                {/* IPs sections */}
-                {!item || item.al.ip.length !== 0 ? (
-                  <>
-                    <Grid item xs={3} sm={2}>
-                      {t('ip')}
-                    </Grid>
-                    <Grid item xs={9} sm={10}>
-                      <div className={classes.sectionContent}>
-                        <Grid container spacing={1}>
-                          {!item ||
-                            (item.al.ip_dynamic.length !== 0 && (
-                              <Grid item xs={12} md={!item || item.al.ip_static.length !== 0 ? 6 : 12}>
-                                <Typography variant="caption" component={'div'}>
-                                  <i>{t('ip_dynamic')}</i>
-                                </Typography>
-                                {item && item.al.detailed ? (
-                                  <AutoHideChipList
-                                    items={item.al.detailed.ip.filter(ip => ip.type === 'network.dynamic.ip')}
-                                  />
-                                ) : (
-                                  <ChipList
-                                    items={
-                                      item
-                                        ? item.al.ip_dynamic.map(label => ({
-                                            label,
-                                            variant: 'outlined'
-                                          }))
-                                        : null
-                                    }
-                                  />
-                                )}
-                              </Grid>
-                            ))}
-                          {!item ||
-                            (item.al.ip_static.length !== 0 && (
-                              <Grid item xs={12} md={!item || item.al.ip_dynamic.length !== 0 ? 6 : 12}>
-                                <Typography variant="caption" component={'div'}>
-                                  <i>{t('ip_static')}</i>
-                                </Typography>
-                                {item && item.al.detailed ? (
-                                  <AutoHideChipList
-                                    items={item.al.detailed.ip.filter(ip => ip.type === 'network.static.ip')}
-                                  />
-                                ) : (
-                                  <ChipList
-                                    items={
-                                      item
-                                        ? item.al.ip_static.map(label => ({
-                                            label,
-                                            variant: 'outlined'
-                                          }))
-                                        : null
-                                    }
-                                  />
-                                )}
-                              </Grid>
-                            ))}
-                        </Grid>
-                      </div>
-                    </Grid>
-                  </>
-                ) : null}
-
-                {/* Domains sections */}
-                {!item || item.al.domain.length !== 0 ? (
-                  <>
-                    <Grid item xs={3} sm={2}>
-                      {t('domain')}
-                    </Grid>
-                    <Grid item xs={9} sm={10}>
-                      <div className={classes.sectionContent}>
-                        <Grid container spacing={1}>
-                          {!item ||
-                            (item.al.domain_dynamic.length !== 0 && (
-                              <Grid item xs={12} md={!item || item.al.domain_static.length !== 0 ? 6 : 12}>
-                                <Typography variant="caption" component={'div'}>
-                                  <i>{t('domain_dynamic')}</i>
-                                </Typography>
-                                {item && item.al.detailed ? (
-                                  <AutoHideChipList
-                                    items={item.al.detailed.domain.filter(
-                                      domain => domain.type === 'network.dynamic.domain'
-                                    )}
-                                  />
-                                ) : (
-                                  <ChipList
-                                    items={
-                                      item
-                                        ? item.al.domain_dynamic.map(label => ({
-                                            label,
-                                            variant: 'outlined'
-                                          }))
-                                        : null
-                                    }
-                                  />
-                                )}
-                              </Grid>
-                            ))}
-                          {!item ||
-                            (item.al.domain_static.length !== 0 && (
-                              <Grid item xs={12} md={!item || item.al.domain_dynamic.length !== 0 ? 6 : 12}>
-                                <Typography variant="caption" component={'div'}>
-                                  <i>{t('domain_static')}</i>
-                                </Typography>
-                                {item && item.al.detailed ? (
-                                  <AutoHideChipList
-                                    items={item.al.detailed.domain.filter(
-                                      domain => domain.type === 'network.static.domain'
-                                    )}
-                                  />
-                                ) : (
-                                  <ChipList
-                                    items={
-                                      item
-                                        ? item.al.domain_static.map(label => ({
-                                            label,
-                                            variant: 'outlined'
-                                          }))
-                                        : null
-                                    }
-                                  />
-                                )}
-                              </Grid>
-                            ))}
-                        </Grid>
-                      </div>
-                    </Grid>
-                  </>
-                ) : null}
-
-                {/* url sections */}
-                {!item || item.al.url.length !== 0 ? (
-                  <>
-                    <Grid item xs={3} sm={2}>
-                      {t('url')}
-                    </Grid>
-                    <Grid item xs={9} sm={10}>
-                      <div className={classes.sectionContent}>
-                        <Grid container spacing={1}>
-                          {!item ||
-                            (item.al.url_dynamic.length !== 0 && (
-                              <Grid item xs={12} md={!item || item.al.url_static.length !== 0 ? 6 : 12}>
-                                <Typography variant="caption" component={'div'}>
-                                  <i>{t('url_dynamic')}</i>
-                                </Typography>
-                                {item && item.al.detailed ? (
-                                  <AutoHideChipList
-                                    items={item.al.detailed.url.filter(url => url.type === 'network.dynamic.url')}
-                                  />
-                                ) : (
-                                  <ChipList
-                                    items={
-                                      item
-                                        ? item.al.url_dynamic.map(label => ({
-                                            label,
-                                            variant: 'outlined'
-                                          }))
-                                        : null
-                                    }
-                                  />
-                                )}
-                              </Grid>
-                            ))}
-                          {!item ||
-                            (item.al.url_static.length !== 0 && (
-                              <Grid item xs={12} md={!item || item.al.url_dynamic.length !== 0 ? 6 : 12}>
-                                <Typography variant="caption" component={'div'}>
-                                  <i>{t('url_static')}</i>
-                                </Typography>
-                                {item && item.al.detailed ? (
-                                  <AutoHideChipList
-                                    items={item.al.detailed.url.filter(url => url.type === 'network.static.url')}
-                                  />
-                                ) : (
-                                  <ChipList
-                                    items={
-                                      item
-                                        ? item.al.url_static.map(label => ({
-                                            label,
-                                            variant: 'outlined'
-                                          }))
-                                        : null
-                                    }
-                                  />
-                                )}
-                              </Grid>
-                            ))}
-                        </Grid>
-                      </div>
-                    </Grid>
-                  </>
-                ) : null}
-
-                {/* Heuristics Section */}
-                {!item || (item.heuristic && item.heuristic.name && item.heuristic.name.length !== 0) ? (
-                  <>
-                    <Grid item xs={3} sm={2}>
-                      {t('heuristic')}
-                    </Grid>
-                    <Grid item xs={9} sm={10}>
-                      <div className={classes.sectionContent}>
-                        {item && item.al.detailed ? (
-                          <AutoHideChipList items={item.al.detailed.heuristic} />
-                        ) : (
-                          <ChipList
-                            items={item ? item.heuristic.name.map(label => ({ label, variant: 'outlined' })) : null}
-                          />
-                        )}
-                      </div>
-                    </Grid>
-                  </>
-                ) : null}
-
-                {/* AL Behaviours Section */}
-                {!item || item.al.behavior.length !== 0 ? (
-                  <>
-                    <Grid item xs={3} sm={2}>
-                      {t('behaviors')}
-                    </Grid>
-                    <Grid item xs={9} sm={10}>
-                      <div className={classes.sectionContent}>
-                        {item && item.al.detailed ? (
-                          <AutoHideChipList items={item.al.detailed.behavior} />
-                        ) : (
-                          <ChipList
-                            items={item ? item.al.behavior.map(label => ({ label, variant: 'outlined' })) : null}
-                          />
-                        )}
-                      </div>
-                    </Grid>
-                  </>
-                ) : null}
-
-                {/* YARA Hits */}
-                {!item || item.al.yara.length !== 0 ? (
-                  <>
-                    <Grid item xs={3} sm={2}>
-                      {t('yara')}
-                    </Grid>
-                    <Grid item xs={9} sm={10}>
-                      <div className={classes.sectionContent}>
-                        {item && item.al.detailed ? (
-                          <AutoHideChipList items={item.al.detailed.yara} />
-                        ) : (
-                          <ChipList items={item ? item.al.yara.map(label => ({ label, variant: 'outlined' })) : null} />
-                        )}
-                      </div>
-                    </Grid>
-                  </>
-                ) : null}
-
-                {/* Attack Section */}
-                {!item || item.attack.category.length !== 0 ? (
-                  <>
-                    <Grid item xs={3} sm={2}>
-                      {t('attack')}
-                    </Grid>
-                    <Grid item xs={9} sm={10}>
-                      <div className={classes.sectionContent}>
-                        <Grid container spacing={1}>
-                          <Grid item xs={12} md={6}>
-                            <Typography variant="caption" style={{ marginRight: theme.spacing(1) }} component={'div'}>
-                              <i>{t('attack_category')}</i>
+              {/* IPs sections */}
+              {!item || item.al.ip.length !== 0 ? (
+                <>
+                  <Grid item xs={3} sm={2}>
+                    {t('ip')}
+                  </Grid>
+                  <Grid item xs={9} sm={10}>
+                    <div className={classes.sectionContent}>
+                      <Grid container spacing={1}>
+                        {(!item || item.al.ip_dynamic.length !== 0) && (
+                          <Grid item xs={12} md={!item || item.al.ip_static.length !== 0 ? 6 : 12}>
+                            <Typography variant="caption" component={'div'}>
+                              <i>{t('ip_dynamic')}</i>
                             </Typography>
                             {item && item.al.detailed ? (
-                              <AutoHideChipList items={item.al.detailed.attack_category} />
+                              <AutoHideChipList
+                                items={item.al.detailed.ip.filter(ip => ip.type === 'network.dynamic.ip')}
+                              />
                             ) : (
                               <ChipList
                                 items={
-                                  item ? item.attack.category.map(label => ({ label, variant: 'outlined' })) : null
+                                  item
+                                    ? item.al.ip_dynamic.map(label => ({
+                                        label,
+                                        variant: 'outlined'
+                                      }))
+                                    : null
                                 }
                               />
                             )}
                           </Grid>
-                          <Grid item xs={12} md={6}>
-                            <Typography variant="caption" style={{ marginRight: theme.spacing(1) }} component={'div'}>
-                              <i>{t('attack_pattern')}</i>
+                        )}
+                        {(!item || item.al.ip_static.length !== 0) && (
+                          <Grid item xs={12} md={!item || item.al.ip_dynamic.length !== 0 ? 6 : 12}>
+                            <Typography variant="caption" component={'div'}>
+                              <i>{t('ip_static')}</i>
                             </Typography>
                             {item && item.al.detailed ? (
-                              <AutoHideChipList items={item.al.detailed.attack_pattern} />
+                              <AutoHideChipList
+                                items={item.al.detailed.ip.filter(ip => ip.type === 'network.static.ip')}
+                              />
                             ) : (
                               <ChipList
-                                items={item ? item.attack.pattern.map(label => ({ label, variant: 'outlined' })) : null}
+                                items={
+                                  item
+                                    ? item.al.ip_static.map(label => ({
+                                        label,
+                                        variant: 'outlined'
+                                      }))
+                                    : null
+                                }
                               />
                             )}
                           </Grid>
+                        )}
+                      </Grid>
+                    </div>
+                  </Grid>
+                </>
+              ) : null}
+
+              {/* Domains sections */}
+              {!item || item.al.domain.length !== 0 ? (
+                <>
+                  <Grid item xs={3} sm={2}>
+                    {t('domain')}
+                  </Grid>
+                  <Grid item xs={9} sm={10}>
+                    <div className={classes.sectionContent}>
+                      <Grid container spacing={1}>
+                        {(!item || item.al.domain_dynamic.length !== 0) && (
+                          <Grid item xs={12} md={!item || item.al.domain_static.length !== 0 ? 6 : 12}>
+                            <Typography variant="caption" component={'div'}>
+                              <i>{t('domain_dynamic')}</i>
+                            </Typography>
+                            {item && item.al.detailed ? (
+                              <AutoHideChipList
+                                items={item.al.detailed.domain.filter(
+                                  domain => domain.type === 'network.dynamic.domain'
+                                )}
+                              />
+                            ) : (
+                              <ChipList
+                                items={
+                                  item
+                                    ? item.al.domain_dynamic.map(label => ({
+                                        label,
+                                        variant: 'outlined'
+                                      }))
+                                    : null
+                                }
+                              />
+                            )}
+                          </Grid>
+                        )}
+                        {(!item || item.al.domain_static.length !== 0) && (
+                          <Grid item xs={12} md={!item || item.al.domain_dynamic.length !== 0 ? 6 : 12}>
+                            <Typography variant="caption" component={'div'}>
+                              <i>{t('domain_static')}</i>
+                            </Typography>
+                            {item && item.al.detailed ? (
+                              <AutoHideChipList
+                                items={item.al.detailed.domain.filter(
+                                  domain => domain.type === 'network.static.domain'
+                                )}
+                              />
+                            ) : (
+                              <ChipList
+                                items={
+                                  item
+                                    ? item.al.domain_static.map(label => ({
+                                        label,
+                                        variant: 'outlined'
+                                      }))
+                                    : null
+                                }
+                              />
+                            )}
+                          </Grid>
+                        )}
+                      </Grid>
+                    </div>
+                  </Grid>
+                </>
+              ) : null}
+
+              {/* url sections */}
+              {!item || (item.al.url && item.al.url.length !== 0) ? (
+                <>
+                  <Grid item xs={3} sm={2}>
+                    {t('url')}
+                  </Grid>
+                  <Grid item xs={9} sm={10}>
+                    <div className={classes.sectionContent}>
+                      <Grid container spacing={1}>
+                        {(!item || item.al.url_dynamic.length !== 0) && (
+                          <Grid item xs={12} md={!item || item.al.url_static.length !== 0 ? 6 : 12}>
+                            <Typography variant="caption" component={'div'}>
+                              <i>{t('url_dynamic')}</i>
+                            </Typography>
+                            {item && item.al.detailed ? (
+                              <AutoHideChipList
+                                items={item.al.detailed.url.filter(url => url.type === 'network.dynamic.url')}
+                              />
+                            ) : (
+                              <ChipList
+                                items={
+                                  item
+                                    ? item.al.url_dynamic.map(label => ({
+                                        label,
+                                        variant: 'outlined'
+                                      }))
+                                    : null
+                                }
+                              />
+                            )}
+                          </Grid>
+                        )}
+                        {(!item || item.al.url_static.length !== 0) && (
+                          <Grid item xs={12} md={!item || item.al.url_dynamic.length !== 0 ? 6 : 12}>
+                            <Typography variant="caption" component={'div'}>
+                              <i>{t('url_static')}</i>
+                            </Typography>
+                            {item && item.al.detailed ? (
+                              <AutoHideChipList
+                                items={item.al.detailed.url.filter(url => url.type === 'network.static.url')}
+                              />
+                            ) : (
+                              <ChipList
+                                items={
+                                  item
+                                    ? item.al.url_static.map(label => ({
+                                        label,
+                                        variant: 'outlined'
+                                      }))
+                                    : null
+                                }
+                              />
+                            )}
+                          </Grid>
+                        )}
+                      </Grid>
+                    </div>
+                  </Grid>
+                </>
+              ) : null}
+
+              {/* Heuristics Section */}
+              {!item || (item.heuristic && item.heuristic.name && item.heuristic.name.length !== 0) ? (
+                <>
+                  <Grid item xs={3} sm={2}>
+                    {t('heuristic')}
+                  </Grid>
+                  <Grid item xs={9} sm={10}>
+                    <div className={classes.sectionContent}>
+                      {item && item.al.detailed ? (
+                        <AutoHideChipList items={item.al.detailed.heuristic} />
+                      ) : (
+                        <ChipList
+                          items={item ? item.heuristic.name.map(label => ({ label, variant: 'outlined' })) : null}
+                        />
+                      )}
+                    </div>
+                  </Grid>
+                </>
+              ) : null}
+
+              {/* AL Behaviours Section */}
+              {!item || item.al.behavior.length !== 0 ? (
+                <>
+                  <Grid item xs={3} sm={2}>
+                    {t('behaviors')}
+                  </Grid>
+                  <Grid item xs={9} sm={10}>
+                    <div className={classes.sectionContent}>
+                      {item && item.al.detailed ? (
+                        <AutoHideChipList items={item.al.detailed.behavior} />
+                      ) : (
+                        <ChipList
+                          items={item ? item.al.behavior.map(label => ({ label, variant: 'outlined' })) : null}
+                        />
+                      )}
+                    </div>
+                  </Grid>
+                </>
+              ) : null}
+
+              {/* YARA Hits */}
+              {!item || item.al.yara.length !== 0 ? (
+                <>
+                  <Grid item xs={3} sm={2}>
+                    {t('yara')}
+                  </Grid>
+                  <Grid item xs={9} sm={10}>
+                    <div className={classes.sectionContent}>
+                      {item && item.al.detailed ? (
+                        <AutoHideChipList items={item.al.detailed.yara} />
+                      ) : (
+                        <ChipList items={item ? item.al.yara.map(label => ({ label, variant: 'outlined' })) : null} />
+                      )}
+                    </div>
+                  </Grid>
+                </>
+              ) : null}
+
+              {/* Attack Section */}
+              {!item || item.attack.category.length !== 0 ? (
+                <>
+                  <Grid item xs={3} sm={2}>
+                    {t('attack')}
+                  </Grid>
+                  <Grid item xs={9} sm={10}>
+                    <div className={classes.sectionContent}>
+                      <Grid container spacing={1}>
+                        <Grid item xs={12} md={6}>
+                          <Typography variant="caption" style={{ marginRight: theme.spacing(1) }} component={'div'}>
+                            <i>{t('attack_category')}</i>
+                          </Typography>
+                          {item && item.al.detailed ? (
+                            <AutoHideChipList items={item.al.detailed.attack_category} />
+                          ) : (
+                            <ChipList
+                              items={item ? item.attack.category.map(label => ({ label, variant: 'outlined' })) : null}
+                            />
+                          )}
                         </Grid>
-                      </div>
-                    </Grid>
-                  </>
-                ) : null}
-              </Grid>
-            </>
-          ))}
+                        <Grid item xs={12} md={6}>
+                          <Typography variant="caption" style={{ marginRight: theme.spacing(1) }} component={'div'}>
+                            <i>{t('attack_pattern')}</i>
+                          </Typography>
+                          {item && item.al.detailed ? (
+                            <AutoHideChipList items={item.al.detailed.attack_pattern} />
+                          ) : (
+                            <ChipList
+                              items={item ? item.attack.pattern.map(label => ({ label, variant: 'outlined' })) : null}
+                            />
+                          )}
+                        </Grid>
+                      </Grid>
+                    </div>
+                  </Grid>
+                </>
+              ) : null}
+            </Grid>
+          </>
+        )}
       </div>
     </PageFullWidth>
   );
