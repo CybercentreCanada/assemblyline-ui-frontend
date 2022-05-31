@@ -80,46 +80,46 @@ const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items }) => 
   const [show, setShow] = useState<boolean>(
     !items.some(item => item.verdict === 'malicious' || item.verdict === 'suspicious')
   );
+  const maliciousItems = items.filter(item => item.verdict === 'malicious').sort(stringCompare);
+  const suspiciousItems = items.filter(item => item.verdict === 'suspicious').sort(stringCompare);
+  const infoItems = items.filter(item => item.verdict === 'info').sort(stringCompare);
+
   return (
     <>
-      <ChipList
-        items={items
-          .filter(item => item.verdict === 'malicious')
-          .sort(stringCompare)
-          .map(item => ({
-            label: item.value,
-            variant: 'outlined',
-            color: verdictToColor(item.verdict)
-          }))}
-      />
-      <ChipList
-        items={items
-          .filter(item => item.verdict === 'suspicious')
-          .sort(stringCompare)
-          .map(item => ({
-            label: item.value,
-            variant: 'outlined',
-            color: verdictToColor(item.verdict)
-          }))}
-      />
-      {show ? (
+      {maliciousItems.length > 0 && (
         <ChipList
-          items={items
-            .filter(item => item.verdict === 'info')
-            .sort(stringCompare)
-            .map(item => ({
+          items={maliciousItems.map(item => ({
+            label: item.value,
+            variant: 'outlined',
+            color: verdictToColor(item.verdict)
+          }))}
+        />
+      )}
+      {suspiciousItems.length > 0 && (
+        <ChipList
+          items={suspiciousItems.map(item => ({
+            label: item.value,
+            variant: 'outlined',
+            color: verdictToColor(item.verdict)
+          }))}
+        />
+      )}
+      {infoItems.length > 0 &&
+        (show ? (
+          <ChipList
+            items={infoItems.map(item => ({
               label: item.value,
               variant: 'outlined',
               color: verdictToColor(item.verdict)
             }))}
-        />
-      ) : (
-        <Tooltip title={t('more')}>
-          <IconButton size="small" onClick={() => setShow(true)} style={{ padding: 0 }}>
-            <MoreHorizOutlinedIcon />
-          </IconButton>
-        </Tooltip>
-      )}
+          />
+        ) : (
+          <Tooltip title={t('more')}>
+            <IconButton size="small" onClick={() => setShow(true)} style={{ padding: 0 }}>
+              <MoreHorizOutlinedIcon />
+            </IconButton>
+          </Tooltip>
+        ))}
     </>
   );
 };
