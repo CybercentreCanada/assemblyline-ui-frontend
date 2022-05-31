@@ -14,13 +14,13 @@ export const useCellStyles = makeStyles(theme => ({
     color: theme.palette.text.disabled
   },
   nonPrintableColor: {
-    color: theme.palette.type === 'dark' ? 'rgb(203, 203, 99)' : 'rgb(184, 184, 16)'
+    color: theme.palette.type === 'dark' ? 'rgb(203, 203, 99)' : 'rgb(229, 185, 94)'
   },
   lowerASCIIColor: {
-    color: theme.palette.type === 'dark' ? 'rgb(153, 236, 255)' : 'rgb(0, 160, 196)'
+    color: theme.palette.type === 'dark' ? 'rgb(153, 236, 255)' : 'rgb(55, 161, 223)'
   },
   higherASCIIColor: {
-    color: theme.palette.type === 'dark' ? 'rgb(104, 152, 59)' : 'rgb(86, 178, 0)'
+    color: theme.palette.type === 'dark' ? 'rgb(104, 152, 59)' : 'rgb(36, 128, 0)'
   },
   hover: {
     backgroundColor: theme.palette.action.selected
