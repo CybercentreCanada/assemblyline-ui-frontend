@@ -20,9 +20,10 @@ export const isStoreTypeConfig = <Type extends string>(TYPES: TypeConfig<Type>, 
 
 export type AsType<Type> = (type: any) => Type;
 
-export const asType = <Type>(type) => (Object.keys(CELL2).includes(type) ? type : null) as Type;
+export const asType = <Type extends string>(TYPES: TypeConfig<Type>, type) =>
+  (Object.keys(TYPES).includes(type) ? type : null) as Type;
 
-export type Cell2 = 'hex' | 'text';
-export const CELL2: TypeConfig<Cell2> = { hex: 'hex', text: 'text' };
-export const isCellType: IsStoreTypeConfig<Cell2> = isStoreTypeConfig<Cell2>(CELL2, ['cell', 'mouseOverType']);
-export const asCellType = prop => asType(prop) as Cell2;
+// export type Cell2 = 'hex' | 'text';
+// export const CELL2: TypeConfig<Cell2> = { hex: 'hex', text: 'text' };
+// export const isCellType: IsStoreTypeConfig<Cell2> = isStoreTypeConfig<Cell2>(CELL2, ['cell', 'mouseOverType']);
+// export const asCellType = prop => asType2(CELL2, prop) as Cell2;
