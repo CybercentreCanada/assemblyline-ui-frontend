@@ -26,7 +26,14 @@ const WrappedAlertListChipDetailed: React.FC<AlertListChipProps> = ({
       variant={variant}
       color={hasMalicious ? 'error' : hasSuspicious ? 'warning' : 'default'}
       label={`${items.length}x ${title}`}
-      tooltip={items.map(item => item.value).join(' | ')}
+      tooltip={
+        items.length > 5
+          ? items
+              .slice(0, 5)
+              .map(item => item.value)
+              .join(' | ') + ' ...'
+          : items.map(item => item.value).join(' | ')
+      }
       style={{
         marginBottom: theme.spacing(0.5),
         marginRight: theme.spacing(1),
