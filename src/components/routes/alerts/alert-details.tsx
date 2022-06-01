@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import {
   Button,
   Collapse,
@@ -23,7 +22,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import { AlertItem, DetailedItem } from 'components/routes/alerts/hooks/useAlerts';
 import { ChipList, ChipSkeleton, ChipSkeletonInline } from 'components/visual/ChipList';
 import Classification from 'components/visual/Classification';
-import CustomChip from 'components/visual/CustomChip';
+import CustomChip, { CustomChipProps } from 'components/visual/CustomChip';
 import Verdict from 'components/visual/Verdict';
 import VerdictBar from 'components/visual/VerdictBar';
 import { verdictToColor } from 'helpers/utils';
@@ -34,6 +33,8 @@ import { Link, useParams } from 'react-router-dom';
 import AlertExtendedScan from './alert-extended_scan';
 import AlertPriority from './alert-priority';
 import AlertStatus from './alert-status';
+
+const TARGET_RESULT_COUNT = 10;
 
 const useStyles = makeStyles(theme => ({
   section: {
@@ -66,60 +67,80 @@ type AutoHideChipListProps = {
 const SkeletonInline = () => <Skeleton style={{ display: 'inline-block', width: '10rem' }} />;
 
 function stringCompare(a, b) {
-  if (a.value < b.value) {
-    return -1;
-  }
-  if (a.value > b.value) {
-    return 1;
-  }
-  return 0;
+  return a.value < b.value ? -1 : a.value > b.value ? 1 : 0;
 }
+
+type AutoHideChipListState = {
+  showExtra: boolean;
+  mItems: DetailedItem[];
+  sItems: DetailedItem[];
+  iItems: DetailedItem[];
+};
 
 const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items }) => {
   const { t } = useTranslation('alerts');
-  const [show, setShow] = useState<boolean>(
-    !items.some(item => item.verdict === 'malicious' || item.verdict === 'suspicious')
-  );
-  const maliciousItems = items.filter(item => item.verdict === 'malicious').sort(stringCompare);
-  const suspiciousItems = items.filter(item => item.verdict === 'suspicious').sort(stringCompare);
-  const infoItems = items.filter(item => item.verdict === 'info').sort(stringCompare);
+  const [state, setState] = useState<AutoHideChipListState | null>(null);
+  const [shownChips, setShownChips] = useState<CustomChipProps[]>([]);
+
+  useEffect(() => {
+    const mItems = items.filter(item => item.verdict === 'malicious').sort(stringCompare);
+    const sItems = items.filter(item => item.verdict === 'suspicious').sort(stringCompare);
+    const iItems = items.filter(item => item.verdict === 'info').sort(stringCompare);
+    const showExtra = items.length <= TARGET_RESULT_COUNT;
+
+    setState({ showExtra, mItems, sItems, iItems });
+  }, [items]);
+
+  useEffect(() => {
+    if (state !== null) {
+      let tempChips = state.mItems
+        .map(item => ({
+          label: item.value,
+          variant: 'outlined' as 'outlined',
+          color: verdictToColor(item.verdict)
+        }))
+        .concat(
+          state.sItems.map(item => ({
+            label: item.value,
+            variant: 'outlined' as 'outlined',
+            color: verdictToColor(item.verdict)
+          }))
+        );
+
+      if (state.showExtra) {
+        tempChips = tempChips.concat(
+          state.iItems.map(item => ({
+            label: item.value,
+            variant: 'outlined' as 'outlined',
+            color: verdictToColor(item.verdict)
+          }))
+        );
+      } else {
+        tempChips = tempChips.concat(
+          state.iItems
+            .slice(0, Math.max(TARGET_RESULT_COUNT - state.mItems.length - state.sItems.length, 0))
+            .map(item => ({
+              label: item.value,
+              variant: 'outlined' as 'outlined',
+              color: verdictToColor(item.verdict)
+            }))
+        );
+      }
+
+      setShownChips(tempChips);
+    }
+  }, [state]);
 
   return (
     <>
-      {maliciousItems.length > 0 && (
-        <ChipList
-          items={maliciousItems.map(item => ({
-            label: item.value,
-            variant: 'outlined',
-            color: verdictToColor(item.verdict)
-          }))}
-        />
+      <ChipList items={shownChips} />
+      {state && !state.showExtra && (
+        <Tooltip title={t('more')}>
+          <IconButton size="small" onClick={() => setState({ ...state, showExtra: true })} style={{ padding: 0 }}>
+            <MoreHorizOutlinedIcon />
+          </IconButton>
+        </Tooltip>
       )}
-      {suspiciousItems.length > 0 && (
-        <ChipList
-          items={suspiciousItems.map(item => ({
-            label: item.value,
-            variant: 'outlined',
-            color: verdictToColor(item.verdict)
-          }))}
-        />
-      )}
-      {infoItems.length > 0 &&
-        (show ? (
-          <ChipList
-            items={infoItems.map(item => ({
-              label: item.value,
-              variant: 'outlined',
-              color: verdictToColor(item.verdict)
-            }))}
-          />
-        ) : (
-          <Tooltip title={t('more')}>
-            <IconButton size="small" onClick={() => setShow(true)} style={{ padding: 0 }}>
-              <MoreHorizOutlinedIcon />
-            </IconButton>
-          </Tooltip>
-        ))}
     </>
   );
 };
@@ -148,7 +169,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
         }
       });
     }
-  }, [id, paramId]);
+  }, [apiCall, id, paramId]);
 
   useEffect(() => {
     if (alert) setItem(alert);

@@ -1,3 +1,5 @@
+import { PossibleColors } from 'components/visual/CustomChip';
+
 export function bytesToSize(bytes: number | null) {
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
   if (bytes === 0 || bytes === null) return '0 B';
@@ -59,7 +61,7 @@ export function scoreToVerdict(score: number | null) {
   return 'info';
 }
 
-export function verdictToColor(verdict) {
+export function verdictToColor(verdict): PossibleColors {
   if (verdict === 'malicious') {
     return 'error';
   }
