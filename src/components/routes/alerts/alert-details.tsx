@@ -25,7 +25,7 @@ import Classification from 'components/visual/Classification';
 import CustomChip, { CustomChipProps } from 'components/visual/CustomChip';
 import Verdict from 'components/visual/Verdict';
 import VerdictBar from 'components/visual/VerdictBar';
-import { verdictToColor } from 'helpers/utils';
+import { verdictRank, verdictToColor } from 'helpers/utils';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
@@ -66,15 +66,24 @@ type AutoHideChipListProps = {
 
 const SkeletonInline = () => <Skeleton style={{ display: 'inline-block', width: '10rem' }} />;
 
+function detailedItemCompare(a, b) {
+  const aVerdict = verdictRank(a.verdict);
+  const bVerdict = verdictRank(b.verdict);
+
+  if (aVerdict === bVerdict) {
+    return stringCompare(a, b);
+  } else {
+    return aVerdict < bVerdict ? -1 : 1;
+  }
+}
+
 function stringCompare(a, b) {
   return a.value < b.value ? -1 : a.value > b.value ? 1 : 0;
 }
 
 type AutoHideChipListState = {
   showExtra: boolean;
-  mItems: DetailedItem[];
-  sItems: DetailedItem[];
-  iItems: DetailedItem[];
+  fullChipList: CustomChipProps[];
 };
 
 const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items }) => {
@@ -83,51 +92,23 @@ const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items }) => 
   const [shownChips, setShownChips] = useState<CustomChipProps[]>([]);
 
   useEffect(() => {
-    const mItems = items.filter(item => item.verdict === 'malicious').sort(stringCompare);
-    const sItems = items.filter(item => item.verdict === 'suspicious').sort(stringCompare);
-    const iItems = items.filter(item => item.verdict === 'info').sort(stringCompare);
+    const fullChipList = items.sort(detailedItemCompare).map(item => ({
+      label: item.value,
+      variant: 'outlined' as 'outlined',
+      color: verdictToColor(item.verdict)
+    }));
     const showExtra = items.length <= TARGET_RESULT_COUNT;
 
-    setState({ showExtra, mItems, sItems, iItems });
+    setState({ showExtra, fullChipList });
   }, [items]);
 
   useEffect(() => {
     if (state !== null) {
-      let tempChips = state.mItems
-        .map(item => ({
-          label: item.value,
-          variant: 'outlined' as 'outlined',
-          color: verdictToColor(item.verdict)
-        }))
-        .concat(
-          state.sItems.map(item => ({
-            label: item.value,
-            variant: 'outlined' as 'outlined',
-            color: verdictToColor(item.verdict)
-          }))
-        );
-
       if (state.showExtra) {
-        tempChips = tempChips.concat(
-          state.iItems.map(item => ({
-            label: item.value,
-            variant: 'outlined' as 'outlined',
-            color: verdictToColor(item.verdict)
-          }))
-        );
+        setShownChips(state.fullChipList);
       } else {
-        tempChips = tempChips.concat(
-          state.iItems
-            .slice(0, Math.max(TARGET_RESULT_COUNT - state.mItems.length - state.sItems.length, 0))
-            .map(item => ({
-              label: item.value,
-              variant: 'outlined' as 'outlined',
-              color: verdictToColor(item.verdict)
-            }))
-        );
+        setShownChips(state.fullChipList.slice(0, TARGET_RESULT_COUNT));
       }
-
-      setShownChips(tempChips);
     }
   }, [state]);
 
