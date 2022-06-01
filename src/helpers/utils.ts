@@ -77,6 +77,26 @@ export function verdictToColor(verdict): PossibleColors {
   return 'default';
 }
 
+export function verdictRank(verdict): number {
+  if (verdict === 'malicious') {
+    return 0;
+  }
+
+  if (verdict === 'highly_suspicious') {
+    return 1;
+  }
+
+  if (verdict === 'suspicious') {
+    return 2;
+  }
+
+  if (verdict === 'safe') {
+    return 4;
+  }
+
+  return 3;
+}
+
 export function priorityText(priority: number | null) {
   if (priority >= 1500) {
     return 'user-high';
