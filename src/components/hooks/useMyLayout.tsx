@@ -16,6 +16,7 @@ import LabelOutlinedIcon from '@material-ui/icons/LabelOutlined';
 import MapOutlinedIcon from '@material-ui/icons/MapOutlined';
 import NotificationImportantOutlinedIcon from '@material-ui/icons/NotificationImportantOutlined';
 import PlaylistAddCheckIcon from '@material-ui/icons/PlaylistAddCheck';
+import PlaylistPlayOutlinedIcon from '@material-ui/icons/PlaylistPlayOutlined';
 import PublishOutlinedIcon from '@material-ui/icons/PublishOutlined';
 import SearchIcon from '@material-ui/icons/Search';
 import SettingsApplicationsOutlinedIcon from '@material-ui/icons/SettingsApplicationsOutlined';
@@ -190,6 +191,13 @@ const useMyLayout = (): AppLayoutProps => {
             text: t('adminmenu.identify'),
             route: '/admin/identify',
             icon: <FindInPageOutlinedIcon />,
+            nested: true
+          },
+          {
+            id: 'adminmenu.actions',
+            text: t('adminmenu.actions'),
+            route: '/admin/actions',
+            icon: <PlaylistPlayOutlinedIcon />,
             nested: true
           },
           {

@@ -1,0 +1,10 @@
+{
+  "reset": "Réinitialiser",
+  "save": "Sauvegarder les modifications",
+  "save.acceptText": "Oui, appliquez-les !",
+  "save.cancelText": "Annuler",
+  "save.success": "Les actions post-traitement ont bien été enregistrées",
+  "save.title": "Voici les modifications qui seront appliquées:",
+  "title": "Actions post-traitement",
+  "loading": "Chargement de l'éditeur d'actions post-traitement..."
+}

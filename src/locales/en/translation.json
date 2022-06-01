@@ -1,5 +1,6 @@
 {
   "adminmenu": "Administration",
+  "adminmenu.actions": "Post-process actions",
   "adminmenu.identify": "File Identification",
   "adminmenu.errors": "Error Viewer",
   "adminmenu.services": "Services",

@@ -1,0 +1,10 @@
+{
+  "loading": "Loading post-process actions editor...",
+  "reset": "Reset",
+  "save": "Save changes",
+  "save.acceptText": "Yes, apply them!",
+  "save.cancelText": "Cancel",
+  "save.success": "Successfully saved the post-process actions",
+  "save.title": "These are the changes that will be applied:",
+  "title": "Post-process actions"
+}
