@@ -8,7 +8,7 @@ export type HexState = {
     null: {
       char: string;
     };
-    lower: {
+    nonPrintable: {
       encoding: EncodingType;
       char: string;
     };
@@ -33,7 +33,7 @@ export const useHexReducer: UseReducer<HexState> = () => {
         null: {
           char: '0'
         },
-        lower: {
+        nonPrintable: {
           encoding: 'hidden',
           char: '.'
         },

@@ -48,11 +48,17 @@
   "null.char.label": "Null Character:",
   "null.char.description": "Character used for the null (0x00) value",
 
+  "nonPrintable.encoding.label": "Non-Printable ASCII encoding:",
+  "nonPrintable.encoding.description": "Character set used to render the non-printable ASCII values (0x01 - 0x1F)",
+
+  "nonPrintable.char.label": "Non-Printable ASCII character:",
+  "nonPrintable.char.description": "Character that replaces all non-printable ASCII values (0x01 - 0x1F)",
+
   "lower.encoding.label": "Lower ASCII encoding:",
-  "lower.encoding.description": "Character set used to render the lower ASCII values (0x01 - 0x1F)",
+  "lower.encoding.description": "Character set used to render the lower ASCII values (0x20 - 0x7F)",
 
   "lower.char.label": "Lower ASCII character:",
-  "lower.char.description": "Character that replaces all lower ASCII values (0x01 - 0x1F)",
+  "lower.char.description": "Character that replaces all lower ASCII values (0x20 - 0x7F)",
 
   "higher.encoding.label": "Higher ASCII encoding:",
   "higher.encoding.description": "Character set used to render the higher ASCII values (0x80 - 0xFF)",

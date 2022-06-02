@@ -30,10 +30,12 @@ export type EncodingType =
   | 'utf16le'
   | 'utf8';
 
-export type LowerEncodingSettingValues = LanguageConfig<Array<{ label: string; type: EncodingType; value: number }>>;
+export type NonPrintableEncodingSettingValues = LanguageConfig<
+  Array<{ label: string; type: EncodingType; value: number }>
+>;
 export type HigherEncodingSettingValues = LanguageConfig<Array<{ label: string; type: EncodingType; value: number }>>;
 
-export const LOWER_ENCODING_SETTING_VALUES: LowerEncodingSettingValues = {
+export const NON_PRINTABLE_ENCODING_SETTING_VALUES: NonPrintableEncodingSettingValues = {
   en: [
     { label: 'Hidden', type: 'hidden', value: 0 },
     { label: 'Code page 437', type: 'CP437', value: 1 }
@@ -96,7 +98,7 @@ export const ASCII: Array<HexASCII> = [
   }
 ];
 
-export const LOWER_ASCII_TABLE = new Map<
+export const NON_PRINTABLE_ASCII_TABLE = new Map<
   number,
   { dec: number; hex: string; bin: string; html: string; code: string; char: string; text: string; copy: string }
 >([
@@ -351,12 +353,12 @@ export const toHexChar2 = (store: Store, hexcode: string, copy: boolean = false)
   if (isNaN(value)) return '';
 
   if (value === 0) {
-    if (copy) return LOWER_ASCII_TABLE.get(0).copy;
+    if (copy) return NON_PRINTABLE_ASCII_TABLE.get(0).copy;
     else return store.hex.null.char;
   } else if (1 <= value && value <= 31) {
-    if (copy) return LOWER_ASCII_TABLE.get(value).copy;
-    else if (store.hex.lower.encoding === 'hidden') return store.hex.lower.char;
-    else return LOWER_ASCII_TABLE.get(value).char;
+    if (copy) return NON_PRINTABLE_ASCII_TABLE.get(value).copy;
+    else if (store.hex.nonPrintable.encoding === 'hidden') return store.hex.nonPrintable.char;
+    else return NON_PRINTABLE_ASCII_TABLE.get(value).char;
   } else if (32 <= value && value <= 127) {
     return Buffer.from(hexcode, 'hex').toString();
   } else if (128 <= value && value <= 255) {

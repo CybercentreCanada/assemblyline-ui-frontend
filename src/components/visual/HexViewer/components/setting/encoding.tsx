@@ -2,7 +2,7 @@ import { ChangeEvent, default as React, useLayoutEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import {
   HIGHER_ENCODING_SETTING_VALUES,
-  LOWER_ENCODING_SETTING_VALUES,
+  NON_PRINTABLE_ENCODING_SETTING_VALUES,
   OutlinedField,
   SelectField,
   StoreProps,
@@ -14,13 +14,13 @@ export const WrappedHexEncoding = ({ store }: StoreProps) => {
   const { onSettingEncodingChange, onSettingHexCharChange } = useDispatch();
 
   const language = store.mode.languageType;
-  const [lowerValues, setLowerValues] = useState<Array<{ label: string; value: number }>>(
-    LOWER_ENCODING_SETTING_VALUES[language]
+  const [nonPrintableValues, setNonPrintableValues] = useState<Array<{ label: string; value: number }>>(
+    NON_PRINTABLE_ENCODING_SETTING_VALUES[language]
   );
   const [higherValues, setHigherValues] = useState<Array<{ label: string; value: number }>>(
     HIGHER_ENCODING_SETTING_VALUES[language]
   );
-  useLayoutEffect(() => setLowerValues(LOWER_ENCODING_SETTING_VALUES[language]), [language]);
+  useLayoutEffect(() => setNonPrintableValues(NON_PRINTABLE_ENCODING_SETTING_VALUES[language]), [language]);
   useLayoutEffect(() => setHigherValues(HIGHER_ENCODING_SETTING_VALUES[language]), [language]);
 
   return (
@@ -32,20 +32,20 @@ export const WrappedHexEncoding = ({ store }: StoreProps) => {
         onChange={event => onSettingHexCharChange({ key: 'null', value: event.target.value })}
       />
       <SelectField
-        label={t('lower.encoding.label')}
-        description={t('lower.encoding.description')}
-        value={store.setting.hex.lower.encoding}
-        items={lowerValues}
+        label={t('nonPrintable.encoding.label')}
+        description={t('nonPrintable.encoding.description')}
+        value={store.setting.hex.nonPrintable.encoding}
+        items={nonPrintableValues}
         onChange={(event: ChangeEvent<{ name?: string; value: unknown }>) =>
-          onSettingEncodingChange({ key: 'lower', value: event.target.value as number })
+          onSettingEncodingChange({ key: 'nonPrintable', value: event.target.value as number })
         }
       />
-      {store.setting.hex.lower.encoding === 0 ? (
+      {store.setting.hex.nonPrintable.encoding === 0 ? (
         <OutlinedField
-          label={t('lower.char.label')}
-          description={t('lower.char.description')}
-          value={store.setting.hex.lower.char}
-          onChange={event => onSettingHexCharChange({ key: 'lower', value: event.target.value })}
+          label={t('nonPrintable.char.label')}
+          description={t('nonPrintable.char.description')}
+          value={store.setting.hex.nonPrintable.char}
+          onChange={event => onSettingHexCharChange({ key: 'nonPrintable', value: event.target.value })}
         />
       ) : (
         <></>

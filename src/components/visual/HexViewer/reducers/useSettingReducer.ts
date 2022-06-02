@@ -5,7 +5,7 @@ import {
   EncodingType,
   HIGHER_ENCODING_SETTING_VALUES,
   isAction,
-  LOWER_ENCODING_SETTING_VALUES,
+  NON_PRINTABLE_ENCODING_SETTING_VALUES,
   ReducerHandler,
   Reducers,
   Store,
@@ -21,7 +21,7 @@ export type SettingState = {
       null: {
         char: string;
       };
-      lower: {
+      nonPrintable: {
         encoding: number;
         char: string;
       };
@@ -54,7 +54,7 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
           null: {
             char: '0'
           },
-          lower: {
+          nonPrintable: {
             encoding: 0,
             char: '.'
           },
@@ -84,7 +84,7 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
       JSON.stringify({
         hex: {
           null: { char: store.hex.null.char },
-          lower: { encoding: store.hex.lower.encoding, char: store.hex.lower.char },
+          nonPrintable: { encoding: store.hex.nonPrintable.encoding, char: store.hex.nonPrintable.char },
           higher: { encoding: store.hex.higher.encoding, char: store.hex.higher.char }
         },
         offsetBase: store.offset.base,
@@ -107,9 +107,14 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
     if (value === null || value === '' || !Array.isArray(json)) return { ...store };
 
     const nullChar = (json as any).hex.null.char === undefined ? store.hex.null.char : (json as any).hex.null.char;
-    const lowerEncoding =
-      (json as any).hex.lower.encoding === undefined ? store.hex.lower.encoding : (json as any).hex.lower.encoding;
-    const lowerChar = (json as any).hex.lower.char === undefined ? store.hex.lower.char : (json as any).hex.lower.char;
+    const nonPrintableEncoding =
+      (json as any).hex.nonPrintable.encoding === undefined
+        ? store.hex.nonPrintable.encoding
+        : (json as any).hex.nonPrintable.encoding;
+    const nonPrintableChar =
+      (json as any).hex.nonPrintable.char === undefined
+        ? store.hex.nonPrintable.char
+        : (json as any).hex.nonPrintable.char;
     const higherEncoding =
       (json as any).hex.higher.encoding === undefined ? store.hex.higher.encoding : (json as any).hex.higher.encoding;
     const higherChar =
@@ -122,7 +127,10 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
         hex: {
           ...store.hex,
           null: { char: nullChar.substr(-1) !== null ? nullChar.substr(-1) : ' ' },
-          lower: { encoding: lowerEncoding, char: lowerChar.substr(-1) !== null ? lowerChar.substr(-1) : ' ' },
+          nonPrintable: {
+            encoding: nonPrintableEncoding,
+            char: nonPrintableChar.substr(-1) !== null ? nonPrintableChar.substr(-1) : ' '
+          },
           higher: { encoding: higherEncoding, char: higherChar.substr(-1) !== null ? higherChar.substr(-1) : ' ' }
         }
       }
@@ -134,8 +142,8 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
   const settingSave: Reducers['settingSave'] = useCallback(
     store => {
       const newBodyType: BodyType = BODY_TYPE_SETTING_VALUES.en.find(e => e.value === store.setting.bodyType).type;
-      const newLowerEncoding: EncodingType = LOWER_ENCODING_SETTING_VALUES.en.find(
-        e => e.value === store.setting.hex.lower.encoding
+      const newLowerEncoding: EncodingType = NON_PRINTABLE_ENCODING_SETTING_VALUES.en.find(
+        e => e.value === store.setting.hex.nonPrintable.encoding
       ).type;
 
       const newHigherEncoding: EncodingType = HIGHER_ENCODING_SETTING_VALUES.en.find(
@@ -150,7 +158,7 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
         hex: {
           ...store.hex,
           null: { char: store.setting.hex.null.char },
-          lower: { encoding: newLowerEncoding, char: store.setting.hex.lower.char },
+          nonPrintable: { encoding: newLowerEncoding, char: store.setting.hex.nonPrintable.char },
           higher: { encoding: newHigherEncoding, char: store.setting.hex.higher.char }
         },
         offset: { ...store.offset, base: store.setting.offsetBase },
@@ -178,9 +186,10 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
           null: {
             char: store.hex.null.char
           },
-          lower: {
-            encoding: LOWER_ENCODING_SETTING_VALUES.en.find(e => e.type === store.hex.lower.encoding).value,
-            char: store.hex.lower.char
+          nonPrintable: {
+            encoding: NON_PRINTABLE_ENCODING_SETTING_VALUES.en.find(e => e.type === store.hex.nonPrintable.encoding)
+              .value,
+            char: store.hex.nonPrintable.char
           },
           higher: {
             encoding: HIGHER_ENCODING_SETTING_VALUES.en.find(e => e.type === store.hex.higher.encoding).value,
@@ -236,9 +245,9 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
         ...store.setting,
         hex: {
           ...store.setting.hex,
-          lower: {
-            ...store.setting.hex.lower,
-            encoding: key === 'lower' ? value : store.setting.hex.lower.encoding
+          nonPrintable: {
+            ...store.setting.hex.nonPrintable,
+            encoding: key === 'nonPrintable' ? value : store.setting.hex.nonPrintable.encoding
           },
           higher: {
             ...store.setting.hex.higher,
@@ -259,9 +268,14 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
           null: {
             char: key === 'null' ? (value.substr(-1) !== null ? value.substr(-1) : ' ') : store.setting.hex.null.char
           },
-          lower: {
-            ...store.setting.hex.lower,
-            char: key === 'lower' ? (value.substr(-1) !== null ? value.substr(-1) : ' ') : store.setting.hex.lower.char
+          nonPrintable: {
+            ...store.setting.hex.nonPrintable,
+            char:
+              key === 'nonPrintable'
+                ? value.substr(-1) !== null
+                  ? value.substr(-1)
+                  : ' '
+                : store.setting.hex.nonPrintable.char
           },
           higher: {
             ...store.setting.hex.higher,

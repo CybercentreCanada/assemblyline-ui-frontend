@@ -49,6 +49,12 @@
   "null.char.label": "Caractère nul :",
   "null.char.description": "Caractère utilisé pour la valeur nulle (0x00).",
 
+  "nonPrintable.encoding.label": "Codage ASCII non imprimables :",
+  "nonPrintable.encoding.description": "Ensemble de caractères utilisé pour traduire les valeurs ASCII non imprimables (0x01 - 0x1F)",
+
+  "nonPrintable.char.label": "Caractères ASCII non imprimables :",
+  "nonPrintable.char.description": "Caractère qui remplace toutes les valeurs ASCII non imprimables (0x01 - 0x1F)",
+
   "lower.encoding.label": "Codage ASCII inférieurs :",
   "lower.encoding.description": "Ensemble de caractères utilisé pour traduire les valeurs ASCII inférieures (0x01 - 0x1F)",
 

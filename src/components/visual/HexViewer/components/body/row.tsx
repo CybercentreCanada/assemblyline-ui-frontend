@@ -87,8 +87,8 @@ export const HexRow = React.memo(
     prevProps.store.layout.column.auto === nextProps.store.layout.column.auto &&
     prevProps.store.layout.column.size === nextProps.store.layout.column.size &&
     prevProps.store.hex.null.char === nextProps.store.hex.null.char &&
-    prevProps.store.hex.lower.encoding === nextProps.store.hex.lower.encoding &&
-    prevProps.store.hex.lower.char === nextProps.store.hex.lower.char &&
+    prevProps.store.hex.nonPrintable.encoding === nextProps.store.hex.nonPrintable.encoding &&
+    prevProps.store.hex.nonPrintable.char === nextProps.store.hex.nonPrintable.char &&
     prevProps.store.hex.higher.encoding === nextProps.store.hex.higher.encoding &&
     prevProps.store.hex.higher.char === nextProps.store.hex.higher.char &&
     prevProps.store.offset.base === nextProps.store.offset.base &&
