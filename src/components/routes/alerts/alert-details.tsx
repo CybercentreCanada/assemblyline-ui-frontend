@@ -19,13 +19,13 @@ import useClipboard from 'commons/components/hooks/useClipboard';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { AlertItem, DetailedItem } from 'components/routes/alerts/hooks/useAlerts';
+import { AlertItem, DetailedItem, detailedItemCompare } from 'components/routes/alerts/hooks/useAlerts';
 import { ChipList, ChipSkeleton, ChipSkeletonInline } from 'components/visual/ChipList';
 import Classification from 'components/visual/Classification';
 import CustomChip, { CustomChipProps } from 'components/visual/CustomChip';
 import Verdict from 'components/visual/Verdict';
 import VerdictBar from 'components/visual/VerdictBar';
-import { verdictRank, verdictToColor } from 'helpers/utils';
+import { verdictToColor } from 'helpers/utils';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
@@ -66,21 +66,6 @@ type AutoHideChipListProps = {
 
 const SkeletonInline = () => <Skeleton style={{ display: 'inline-block', width: '10rem' }} />;
 
-function detailedItemCompare(a, b) {
-  const aVerdict = verdictRank(a.verdict);
-  const bVerdict = verdictRank(b.verdict);
-
-  if (aVerdict === bVerdict) {
-    return stringCompare(a, b);
-  } else {
-    return aVerdict < bVerdict ? -1 : 1;
-  }
-}
-
-function stringCompare(a, b) {
-  return a.value < b.value ? -1 : a.value > b.value ? 1 : 0;
-}
-
 type AutoHideChipListState = {
   showExtra: boolean;
   fullChipList: CustomChipProps[];
@@ -93,7 +78,7 @@ const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items }) => 
 
   useEffect(() => {
     const fullChipList = items.sort(detailedItemCompare).map(item => ({
-      label: item.value,
+      label: item.subtype ? `${item.value} - ${item.subtype}` : item.value,
       variant: 'outlined' as 'outlined',
       color: verdictToColor(item.verdict)
     }));
