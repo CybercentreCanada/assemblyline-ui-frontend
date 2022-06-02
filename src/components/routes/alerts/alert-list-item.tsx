@@ -4,10 +4,11 @@ import GroupOutlinedIcon from '@material-ui/icons/GroupOutlined';
 import PersonOutlineOutlinedIcon from '@material-ui/icons/PersonOutlineOutlined';
 import VerifiedUserOutlinedIcon from '@material-ui/icons/VerifiedUserOutlined';
 import useALContext from 'components/hooks/useALContext';
-import { AlertItem } from 'components/routes/alerts/hooks/useAlerts';
+import { AlertItem, detailedItemCompare } from 'components/routes/alerts/hooks/useAlerts';
 import { ChipList } from 'components/visual/ChipList';
 import CustomChip from 'components/visual/CustomChip';
 import Verdict from 'components/visual/Verdict';
+import { verdictToColor } from 'helpers/utils';
 import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -20,13 +21,6 @@ import AlertStatus from './alert-status';
 
 type AlertListItemProps = {
   item: AlertItem;
-};
-
-const COLOR_MAP = {
-  safe: 'success',
-  info: 'default',
-  suspicious: 'warning',
-  malicious: 'error'
 };
 
 const WrappedAlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
@@ -140,6 +134,7 @@ const WrappedAlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
         <Grid item xs={12} md={6}>
           <ChipList
             items={item.label
+              .sort()
               .map(label => ({
                 label,
                 size: 'tiny' as 'tiny',
@@ -148,10 +143,10 @@ const WrappedAlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
               }))
               .concat(
                 item.al.detailed
-                  ? item.al.detailed.attrib.map(attrib_item => ({
-                      label: attrib_item.value,
+                  ? item.al.detailed.attrib.sort(detailedItemCompare).map(attrib_item => ({
+                      label: attrib_item.subtype ? `${attrib_item.value} - ${attrib_item.subtype}` : attrib_item.value,
                       size: 'tiny' as 'tiny',
-                      color: COLOR_MAP[attrib_item.verdict],
+                      color: verdictToColor(attrib_item.verdict),
                       variant: 'outlined' as 'outlined',
                       style: { cursor: 'inherit' }
                     }))

@@ -3,7 +3,7 @@ import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { ALField } from 'components/hooks/useMyUser';
 import SearchQuery, { SearchFilter, SearchFilterType } from 'components/visual/SearchBar/search-query';
-import { safeFieldValue } from 'helpers/utils';
+import { safeFieldValue, verdictRank } from 'helpers/utils';
 import { useCallback, useEffect, useReducer, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
@@ -167,6 +167,17 @@ const alertStateReducer = (state: AlertState, newState: AlertMessage) => {
     alerts: alerts ? state.alerts.concat(alerts) : state.alerts
   };
 };
+
+export function detailedItemCompare(a: DetailedItem, b: DetailedItem) {
+  const aVerdict = verdictRank(a.verdict);
+  const bVerdict = verdictRank(b.verdict);
+
+  if (aVerdict === bVerdict) {
+    return a.value < b.value ? -1 : a.value > b.value ? 1 : 0;
+  } else {
+    return aVerdict < bVerdict ? -1 : 1;
+  }
+}
 
 // Custom Hook implementation for dealing with alerts.
 export default function useAlerts(pageSize: number): UsingAlerts {

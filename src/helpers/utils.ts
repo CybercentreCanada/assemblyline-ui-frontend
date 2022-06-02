@@ -61,40 +61,28 @@ export function scoreToVerdict(score: number | null) {
   return 'info';
 }
 
+const COLOR_MAP = {
+  safe: 'success',
+  info: 'default',
+  suspicious: 'warning',
+  highly_suspicious: 'warning',
+  malicious: 'error'
+};
+
 export function verdictToColor(verdict): PossibleColors {
-  if (verdict === 'malicious') {
-    return 'error';
-  }
-
-  if (verdict === 'highly_suspicious' || verdict === 'suspicious') {
-    return 'warning';
-  }
-
-  if (verdict === 'safe') {
-    return 'success';
-  }
-
-  return 'default';
+  return COLOR_MAP[verdict];
 }
 
+const RANK_MAP = {
+  safe: 4,
+  info: 3,
+  suspicious: 2,
+  highly_suspicious: 1,
+  malicious: 0
+};
+
 export function verdictRank(verdict): number {
-  if (verdict === 'malicious') {
-    return 0;
-  }
-
-  if (verdict === 'highly_suspicious') {
-    return 1;
-  }
-
-  if (verdict === 'suspicious') {
-    return 2;
-  }
-
-  if (verdict === 'safe') {
-    return 4;
-  }
-
-  return 3;
+  return RANK_MAP[verdict];
 }
 
 export function priorityText(priority: number | null) {
