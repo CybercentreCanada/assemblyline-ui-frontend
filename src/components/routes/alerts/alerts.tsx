@@ -92,7 +92,6 @@ const Alerts: React.FC = () => {
   const classes = useStyles();
   const theme = useTheme();
   const { user: currentUser } = useALContext();
-  const upMD = useMediaQuery(theme.breakpoints.up('md'));
   const { setGlobalDrawer } = useDrawer();
 
   // Alerts hook.
@@ -216,7 +215,6 @@ const Alerts: React.FC = () => {
                 zIndex: 10
               }}
             >
-              <ListNavigator id={ALERT_SIMPLELIST_ID} />
               <AlertListItemActions
                 item={item}
                 index={index}
@@ -224,8 +222,9 @@ const Alerts: React.FC = () => {
                 setDrawer={setDrawer}
                 onTakeOwnershipComplete={() => onTakeOwnershipComplete(index, item)}
                 onVerdictComplete={verdict => onVerdictComplete(index, item, verdict)}
-                vertical
+                type="drawer"
               />
+              <ListNavigator id={ALERT_SIMPLELIST_ID} />
             </div>
             <ListCarousel id={ALERT_SIMPLELIST_ID} disableArrowUp disableArrowDown enableSwipe>
               <AlertDetails alert={item} />
@@ -398,14 +397,14 @@ const Alerts: React.FC = () => {
             onSearch={onSearch}
             buttons={[
               {
-                icon: <StarIcon fontSize={upMD ? 'medium' : 'small'} />,
+                icon: <StarIcon fontSize={isMDUp ? 'medium' : 'small'} />,
                 tooltip: t('favorites'),
                 props: {
                   onClick: () => setDrawer({ open: true, type: 'favorites' })
                 }
               },
               {
-                icon: <FilterListIcon fontSize={upMD ? 'medium' : 'small'} />,
+                icon: <FilterListIcon fontSize={isMDUp ? 'medium' : 'small'} />,
                 tooltip: t('filters'),
                 props: {
                   onClick: () => setDrawer({ open: true, type: 'filter' })
@@ -416,8 +415,8 @@ const Alerts: React.FC = () => {
                   <>
                     <BiNetworkChart
                       style={{
-                        height: upMD ? theme.spacing(2.5) : theme.spacing(2),
-                        width: upMD ? theme.spacing(2.5) : theme.spacing(2),
+                        height: isMDUp ? theme.spacing(2.5) : theme.spacing(2),
+                        width: isMDUp ? theme.spacing(2.5) : theme.spacing(2),
                         margin: theme.spacing(0.25)
                       }}
                     />
