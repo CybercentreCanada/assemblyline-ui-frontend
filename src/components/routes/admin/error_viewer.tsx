@@ -17,7 +17,6 @@ import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
 import ErrorsTable from 'components/visual/SearchResult/errors';
 import SearchResultCount from 'components/visual/SearchResultCount';
-import { safeFieldValue } from 'helpers/utils';
 import 'moment/locale/fr';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -380,7 +379,7 @@ export default function ErrorViewer() {
               onClick={(evt, element) => {
                 if (!searching && element.length > 0) {
                   var ind = element[0].index;
-                  query.add('filters', `type:${safeFieldValue(Object.keys(types)[ind])}`);
+                  query.add('filters', `type:"${Object.keys(types)[ind]}"`);
                   history.push(`${location.pathname}?${query.getDeltaString()}`);
                 }
               }}
