@@ -155,5 +155,9 @@ export function maxLenStr(str: string, len: number) {
 
 export function safeFieldValue(data: string | number | boolean) {
   const temp = String(data);
-  return `"${encodeURIComponent(temp.replace(/\\/g, '\\\\').replace(/"/g, '\\"'))}"`;
+  return `"${temp.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
+}
+
+export function safeFieldValueURI(data: string | number | boolean) {
+  return `"${encodeURIComponent(safeFieldValue(data))}"`;
 }
