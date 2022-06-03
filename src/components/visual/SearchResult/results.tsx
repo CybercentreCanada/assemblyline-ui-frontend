@@ -1,4 +1,4 @@
-import { Tooltip } from '@material-ui/core';
+import { Tooltip, useTheme } from '@material-ui/core';
 import Paper from '@material-ui/core/Paper';
 import TableContainer from '@material-ui/core/TableContainer';
 import { AlertTitle, Skeleton } from '@material-ui/lab';
@@ -33,6 +33,7 @@ export type ResultResult = {
   result: {
     score: number;
   };
+  type: number;
 };
 
 type SearchResults = {
@@ -48,6 +49,7 @@ type ResultsTableProps = {
 const WrappedResultsTable: React.FC<ResultsTableProps> = ({ resultResults, allowSort = true }) => {
   const { t, i18n } = useTranslation(['search']);
   const { c12nDef } = useALContext();
+  const theme = useTheme();
 
   return resultResults ? (
     resultResults.total !== 0 ? (
@@ -63,6 +65,9 @@ const WrappedResultsTable: React.FC<ResultsTableProps> = ({ resultResults, allow
               </SortableHeaderCell>
               <SortableHeaderCell sortField="id" allowSort={allowSort}>
                 {t('header.sha256')}
+              </SortableHeaderCell>
+              <SortableHeaderCell sortField="type" allowSort={allowSort}>
+                {t('header.filetype')}
               </SortableHeaderCell>
               <SortableHeaderCell sortField="response.service_name" allowSort={allowSort}>
                 {t('header.service')}
@@ -94,6 +99,9 @@ const WrappedResultsTable: React.FC<ResultsTableProps> = ({ resultResults, allow
                   <Verdict score={result.result.score} fullWidth />
                 </DivTableCell>
                 <DivTableCell breakable>{result.id.substring(0, 64)}</DivTableCell>
+                <DivTableCell style={{ color: result.type ? null : theme.palette.text.disabled }}>
+                  {result.type || t('na')}
+                </DivTableCell>
                 <DivTableCell>{result.response.service_name}</DivTableCell>
                 {c12nDef.enforce && (
                   <DivTableCell>
