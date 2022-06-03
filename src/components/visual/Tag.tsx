@@ -10,7 +10,7 @@ import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
-import { safeFieldValue, scoreToVerdict } from 'helpers/utils';
+import { safeFieldValueURI, scoreToVerdict } from 'helpers/utils';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory } from 'react-router-dom';
@@ -62,7 +62,7 @@ const WrappedTag: React.FC<TagProps> = ({
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
 
   const searchTag = useCallback(
-    () => history.push(`/search/result?query=result.sections.tags.${type}:${safeFieldValue(value)}`),
+    () => history.push(`/search/result?query=result.sections.tags.${type}:${safeFieldValueURI(value)}`),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [type, value]
   );

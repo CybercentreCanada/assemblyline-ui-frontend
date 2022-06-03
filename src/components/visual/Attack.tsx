@@ -5,7 +5,7 @@ import SelectAllOutlinedIcon from '@material-ui/icons/SelectAllOutlined';
 import useClipboard from 'commons/components/hooks/useClipboard';
 import useHighlighter from 'components/hooks/useHighlighter';
 import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
-import { safeFieldValue, scoreToVerdict } from 'helpers/utils';
+import { safeFieldValueURI, scoreToVerdict } from 'helpers/utils';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
@@ -45,7 +45,7 @@ const WrappedAttack: React.FC<AttackProps> = ({
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
 
   const searchAttack = useCallback(
-    () => history.push(`/search/result?query=result.sections.heuristic.attack.pattern:${safeFieldValue(text)}`),
+    () => history.push(`/search/result?query=result.sections.heuristic.attack.pattern:${safeFieldValueURI(text)}`),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [text]
   );

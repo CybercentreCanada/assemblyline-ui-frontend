@@ -1,3 +1,5 @@
+import { PossibleColors } from 'components/visual/CustomChip';
+
 export function bytesToSize(bytes: number | null) {
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
   if (bytes === 0 || bytes === null) return '0 B';
@@ -57,6 +59,30 @@ export function scoreToVerdict(score: number | null) {
 
   // Between 0 and 299 => Informational
   return 'info';
+}
+
+const COLOR_MAP = {
+  safe: 'success',
+  info: 'default',
+  suspicious: 'warning',
+  highly_suspicious: 'warning',
+  malicious: 'error'
+};
+
+export function verdictToColor(verdict): PossibleColors {
+  return COLOR_MAP[verdict];
+}
+
+const RANK_MAP = {
+  safe: 4,
+  info: 3,
+  suspicious: 2,
+  highly_suspicious: 1,
+  malicious: 0
+};
+
+export function verdictRank(verdict): number {
+  return RANK_MAP[verdict];
 }
 
 export function priorityText(priority: number | null) {
@@ -129,5 +155,9 @@ export function maxLenStr(str: string, len: number) {
 
 export function safeFieldValue(data: string | number | boolean) {
   const temp = String(data);
-  return `"${encodeURIComponent(temp.replace(/\\/g, '\\\\').replace(/"/g, '\\"'))}"`;
+  return `"${temp.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
+}
+
+export function safeFieldValueURI(data: string | number | boolean) {
+  return `"${encodeURIComponent(safeFieldValue(data))}"`;
 }

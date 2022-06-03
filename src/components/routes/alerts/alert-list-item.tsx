@@ -4,15 +4,17 @@ import GroupOutlinedIcon from '@material-ui/icons/GroupOutlined';
 import PersonOutlineOutlinedIcon from '@material-ui/icons/PersonOutlineOutlined';
 import VerifiedUserOutlinedIcon from '@material-ui/icons/VerifiedUserOutlined';
 import useALContext from 'components/hooks/useALContext';
-import { AlertItem } from 'components/routes/alerts/hooks/useAlerts';
+import { AlertItem, detailedItemCompare } from 'components/routes/alerts/hooks/useAlerts';
 import { ChipList } from 'components/visual/ChipList';
 import CustomChip from 'components/visual/CustomChip';
 import Verdict from 'components/visual/Verdict';
+import { verdictToColor } from 'helpers/utils';
 import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import AlertListChip from './alert-chip-list';
+import AlertListChipDetailed from './alert-chip-list-detailed';
 import AlertExtendedScan from './alert-extended_scan';
 import AlertPriority from './alert-priority';
 import AlertStatus from './alert-status';
@@ -20,6 +22,7 @@ import AlertStatus from './alert-status';
 type AlertListItemProps = {
   item: AlertItem;
 };
+
 const WrappedAlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
   const theme = useTheme();
   const { t, i18n } = useTranslation('alerts');
@@ -131,6 +134,7 @@ const WrappedAlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
         <Grid item xs={12} md={6}>
           <ChipList
             items={item.label
+              .sort()
               .map(label => ({
                 label,
                 size: 'tiny' as 'tiny',
@@ -138,20 +142,39 @@ const WrappedAlertListItem: React.FC<AlertListItemProps> = ({ item }) => {
                 style: { cursor: 'inherit' }
               }))
               .concat(
-                item.al.attrib.map(label => ({
-                  label,
-                  size: 'tiny' as 'tiny',
-                  color: 'error',
-                  variant: 'outlined' as 'outlined',
-                  style: { cursor: 'inherit' }
-                }))
+                item.al.detailed
+                  ? item.al.detailed.attrib.sort(detailedItemCompare).map(attrib_item => ({
+                      label: attrib_item.subtype ? `${attrib_item.value} - ${attrib_item.subtype}` : attrib_item.value,
+                      size: 'tiny' as 'tiny',
+                      color: verdictToColor(attrib_item.verdict),
+                      variant: 'outlined' as 'outlined',
+                      style: { cursor: 'inherit' }
+                    }))
+                  : item.al.attrib.map(label => ({
+                      label,
+                      size: 'tiny' as 'tiny',
+                      variant: 'outlined' as 'outlined',
+                      style: { cursor: 'inherit' }
+                    }))
               )}
           />
         </Grid>
         <Grid item xs={12} md={2}>
-          <AlertListChip items={item.al.av} title="AV" color="warning" size="tiny" />
-          <AlertListChip items={item.al.ip} title="IP" color="primary" size="tiny" />
-          <AlertListChip items={item.al.domain} title="DOM" color="success" size="tiny" />
+          {item.al.detailed ? (
+            <>
+              <AlertListChipDetailed items={item.al.detailed.av} title="AV" size="tiny" />
+              <AlertListChipDetailed items={item.al.detailed.ip} title="IP" size="tiny" />
+              <AlertListChipDetailed items={item.al.detailed.domain} title="DOM" size="tiny" />
+              <AlertListChipDetailed items={item.al.detailed.uri} title="URI" size="tiny" />
+            </>
+          ) : (
+            <>
+              <AlertListChip items={item.al.av} title="AV" size="tiny" />
+              <AlertListChip items={item.al.ip} title="IP" size="tiny" />
+              <AlertListChip items={item.al.domain} title="DOM" size="tiny" />
+              <AlertListChip items={item.al.uri} title="URI" size="tiny" />
+            </>
+          )}
         </Grid>
         <Grid item xs={12} md={2} style={{ textAlign: 'right' }}>
           <Verdict score={item.al.score} />

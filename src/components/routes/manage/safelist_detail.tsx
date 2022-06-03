@@ -10,7 +10,7 @@ import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
 import Histogram from 'components/visual/Histogram';
-import { bytesToSize, safeFieldValue } from 'helpers/utils';
+import { bytesToSize, safeFieldValue, safeFieldValueURI } from 'helpers/utils';
 import 'moment/locale/fr';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -211,12 +211,12 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
                                 safelist_id || id
                               }"`
                             : safelist.type === 'signature'
-                            ? `/search/result/?query=result.sections.heuristic.signature.name:${safeFieldValue(
+                            ? `/search/result/?query=result.sections.heuristic.signature.name:${safeFieldValueURI(
                                 safelist.signature.name
                               )}`
                             : `/search/result/?query=result.sections.safelisted_tags.${
                                 safelist.tag.type
-                              }:${safeFieldValue(safelist.tag.value)}`
+                              }:${safeFieldValueURI(safelist.tag.value)}`
                         }
                       >
                         <YoutubeSearchedForIcon />
