@@ -53,7 +53,7 @@ export const WrappedHexCell = ({
       data-index={index}
       className={clsx('cell', classes.cell, style, getCellClasses(store, type, columnIndex, index, cellClasses))}
       onMouseEnter={() => onCellMouseEnter({ index, type })}
-      onMouseDown={() => onCellMouseDown({ index, type })}
+      onMouseDown={event => onCellMouseDown({ index, type }, { event })}
       style={{ width: type === 'hex' ? LAYOUT_SIZE.hexWidth : LAYOUT_SIZE.textWidth }}
     >
       {type === 'hex' ? getHexValue(hexcodes, index) : getTextValue(store, hexcodes, index)}

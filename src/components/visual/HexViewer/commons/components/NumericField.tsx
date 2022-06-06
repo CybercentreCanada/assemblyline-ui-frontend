@@ -70,6 +70,7 @@ export type NumericFieldProps = {
   preventArrowKeyDown?: boolean;
   preventWheel?: boolean;
   preventClick?: boolean;
+  inputRef?: React.MutableRefObject<any>;
 };
 
 export const WrappedNumericField = ({
@@ -104,14 +105,15 @@ export const WrappedNumericField = ({
   preventEnterKeyDown = false,
   preventArrowKeyDown = false,
   preventWheel = false,
-  preventClick = false
+  preventClick = false,
+  inputRef = { current: null }
 }: NumericFieldProps) => {
   const fieldClasses = useStyles();
 
   const [textValue, setTextValue] = useState<string>('');
 
   const loaded = useRef<boolean>(false);
-  const inputRef = useRef<any>(null);
+  const _inputRef = useRef<any>(null);
   const inputValue = useRef<number>(value);
   const baseValue = useRef<number>(base);
   const stepValue = useRef<number>(step);
@@ -136,14 +138,14 @@ export const WrappedNumericField = ({
   // );
 
   useLayoutEffect(() => {
-    (loaded.current || autoFocus) && inputRef.current?.focus();
+    (loaded.current || autoFocus) && _inputRef.current?.focus();
     loaded.current = true;
-  }, [autoFocus, inputRef]);
+  }, [autoFocus, _inputRef]);
 
   useLayoutEffect(() => {
-    focusOnClick.current && inputRef.current?.focus();
+    focusOnClick.current && _inputRef.current?.focus();
     focusOnClick.current = false;
-  }, [inputRef, value]);
+  }, [_inputRef, value]);
 
   useEffect(() => {
     inputValue.current = value;
@@ -336,10 +338,13 @@ export const WrappedNumericField = ({
         onChange={inputChange}
         onWheel={wheel}
         onKeyDown={keyDown}
-        inputRef={inputEl => (inputRef.current = inputEl)}
+        inputRef={inputEl => {
+          _inputRef.current = inputEl;
+          inputRef.current = inputEl;
+        }}
         startAdornment={startAdornment}
         endAdornment={
-          <InputAdornment position="end" onClick={() => inputRef.current?.focus()}>
+          <InputAdornment position="end" onClick={() => _inputRef.current?.focus()}>
             {endAdornment}
             <div className={fieldClasses.buttonGroup}>
               <IconButton

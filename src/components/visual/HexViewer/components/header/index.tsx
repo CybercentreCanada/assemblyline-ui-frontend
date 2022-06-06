@@ -4,7 +4,7 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import ShareIcon from '@material-ui/icons/Share';
 import React, { memo, PropsWithChildren } from 'react';
 import { useTranslation } from 'react-i18next';
-import { HexSearchBar, HexSearchTypes, isWidthEqualDown, StoreProps, TooltipIconButton, useDispatch } from '../..';
+import { HexSearchBar, HexSearchTypes, StoreProps, TooltipIconButton, useDispatch } from '../..';
 
 export * from './cursorButton';
 export * from './searchbar';
@@ -70,8 +70,9 @@ const HexDesktopHeader = React.memo(WrappedHexDesktopHeader);
 const HexMobileHeader = React.memo(WrappedHexMobileHeader);
 
 const HexHeaderSelector = memo(({ store }: StoreProps) => {
-  if (isWidthEqualDown(store, 'xs')) return <HexMobileHeader store={store} />;
-  else return <HexDesktopHeader store={store} />;
+  return <HexDesktopHeader store={store} />;
+  // if (isWidthEqualDown(store, 'xs')) return <HexMobileHeader store={store} />;
+  // else return <HexDesktopHeader store={store} />;
 });
 
 export const HexHeader = memo(
@@ -83,6 +84,7 @@ export const HexHeader = memo(
     prevProps.store.cursor.index === nextProps.store.cursor.index &&
     prevProps.store.offset.base === nextProps.store.offset.base &&
     prevProps.store.mode.toolbarType === nextProps.store.mode.toolbarType &&
+    prevProps.store.mode.widthType === nextProps.store.mode.widthType &&
     prevProps.store.search.type === nextProps.store.search.type &&
     // prevProps.store.search.inputValue === nextProps.store.search.inputValue &&
     prevProps.store.search.value === nextProps.store.search.value &&

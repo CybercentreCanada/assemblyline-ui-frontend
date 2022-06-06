@@ -17,7 +17,7 @@ export type BodyAction =
   | { type: 'bodyInit'; payload: { initialized: boolean } }
   | { type: 'bodyResize'; payload: { width?: number; height?: number }; tracked: false; repeat: true }
   | { type: 'bodyMouseLeave'; payload: void; tracked: false; repeat: false }
-  | { type: 'bodyMouseUp'; payload: void; guard: { store: Store } }
+  | { type: 'bodyMouseUp'; payload: void; guard: { store: Store; event: MouseEvent } }
   | { type: 'bodyScrollWheel'; payload: { event: React.WheelEvent<HTMLDivElement> } }
   | { type: 'bodyItemsRendered'; payload: { event: ListOnItemsRenderedProps } }
   | { type: 'cursorKeyDown'; payload: { event: KeyboardEvent }; guard: { store: Store } }
@@ -68,8 +68,10 @@ export const useBodyDispatcher = (dispatch: Dispatch): BodyDispatchers => {
   );
 
   const onBodyMouseUp: BodyDispatchers['onBodyMouseUp'] = useCallback(
-    (payload, { store }) => {
-      if (isFocus.body(store)) dispatch({ type: ACTIONS.bodyMouseUp, payload: null });
+    (payload, { store, event }) => {
+      if (!isFocus.body(store) || event.button !== 0) return;
+      event.preventDefault();
+      dispatch({ type: ACTIONS.bodyMouseUp, payload: null });
     },
     [dispatch]
   );

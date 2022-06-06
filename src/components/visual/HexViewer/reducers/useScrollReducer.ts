@@ -2,6 +2,7 @@ import { isArrowDown, isArrowUp } from 'commons/addons/elements/utils/keyboard';
 import { useCallback, useMemo } from 'react';
 import {
   clampScrollIndex,
+  getScrollLastIndex,
   getScrollMaxIndex,
   getTableCellsRendered,
   getWindowCellsRendered,
@@ -25,6 +26,7 @@ export type ScrollState = {
     index: number;
     rowIndex: number;
     maxRowIndex: number;
+    lastRowIndex: number;
     speed: number;
     overscanCount: number;
     type: ScrollType;
@@ -53,6 +55,7 @@ export const useScrollReducer: UseReducer<ScrollState> = () => {
         index: 0,
         rowIndex: 0,
         maxRowIndex: 1,
+        lastRowIndex: 1,
         speed: 3,
         overscanCount: 20,
         type: 'top'
@@ -83,14 +86,18 @@ export const useScrollReducer: UseReducer<ScrollState> = () => {
     const index = Math.min(Math.max(_index, 0), hexcodeSize);
     const rowIndex = Math.floor(index / store.layout.column.size);
     const maxRowIndex = getScrollMaxIndex(store, hexcodeSize);
+    const lastRowIndex = getScrollLastIndex(store, hexcodeSize);
 
     if (isBody.table(store)) {
-      let newStore = { ...store, scroll: { ...store.scroll, maxRowIndex } };
+      let newStore = { ...store, scroll: { ...store.scroll, maxRowIndex, lastRowIndex } };
       newStore = scrollToTableIndex(newStore, index, scrollType);
       const cellsRendered = getTableCellsRendered(store);
       return { ...newStore, cellsRendered: { ...newStore.cellsRendered, ...cellsRendered } };
     } else if (isBody.window(store)) {
-      let newStore = { ...store, scroll: { ...store.scroll, index, rowIndex, maxRowIndex, type: scrollType } };
+      let newStore = {
+        ...store,
+        scroll: { ...store.scroll, index, rowIndex, maxRowIndex, lastRowIndex, type: scrollType }
+      };
       return { ...newStore };
     } else return { ...store };
   }, []);

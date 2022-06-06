@@ -25,24 +25,28 @@ export const useCellStyles = makeStyles(theme => ({
   hover: {
     backgroundColor: theme.palette.action.selected
   },
-  select: {
-    color: theme.palette.common.white,
-    backgroundColor: theme.palette.info.main,
+  search: {
+    color: theme.palette.common.black,
+    backgroundColor: yellow[500],
+    opacity: 0.9,
     fontWeight: theme.palette.type === 'dark' ? 600 : 600
   },
   selectedSearch: {
     color: theme.palette.common.white,
     backgroundColor: theme.palette.warning.main,
+    opacity: 0.9,
     fontWeight: theme.palette.type === 'dark' ? 600 : 600
   },
-  search: {
-    color: theme.palette.common.black,
-    backgroundColor: yellow[500],
+  select: {
+    color: theme.palette.common.white,
+    backgroundColor: theme.palette.info.main,
+    opacity: 0.9,
     fontWeight: theme.palette.type === 'dark' ? 600 : 600
   },
   cursor: {
     fontWeight: theme.palette.type === 'dark' ? 400 : 600,
     backgroundColor: theme.palette.primary.light,
+    opacity: 0.9,
     color: 'white !important',
     animation: `1s $blink step-end infinite`
   },

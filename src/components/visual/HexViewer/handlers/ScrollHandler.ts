@@ -25,6 +25,9 @@ export const isScroll = Object.fromEntries(
 export const getScrollMaxIndex = (store: Store, hexCodeSize: number) =>
   Math.ceil(hexCodeSize / store.layout.column.size - store.layout.row.size);
 
+export const getScrollLastIndex = (store: Store, hexCodeSize: number) =>
+  Math.ceil(hexCodeSize / store.layout.column.size);
+
 export const getRowIndex = (store: Store, index: number) => Math.floor(index / store.layout.column.size);
 
 export const clampScrollIndex = (index: number, maxRowIndex: number): number =>
@@ -161,7 +164,7 @@ export const getWindowCellsRendered = (
   visibleStopRowIndex: visibleStopIndex,
 
   overscanStartIndex: overscanStartIndex * columnSize,
-  overscanStopIndex: overscanStopIndex * columnSize,
+  overscanStopIndex: overscanStopIndex * columnSize + (columnSize - 1),
   visibleStartIndex: visibleStartIndex * columnSize,
-  visibleStopIndex: visibleStopIndex * columnSize
+  visibleStopIndex: visibleStopIndex * columnSize + (columnSize - 1)
 });

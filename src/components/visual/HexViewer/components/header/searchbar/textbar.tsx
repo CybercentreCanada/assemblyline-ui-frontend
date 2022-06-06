@@ -1,8 +1,16 @@
-import { makeStyles } from '@material-ui/core';
+import { makeStyles, Typography } from '@material-ui/core';
 import ClearIcon from '@material-ui/icons/Clear';
-import React from 'react';
+import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DelayedTextField, NumericField, StoreProps, TooltipIconButton, useDispatch } from '../../..';
+import {
+  DelayedTextField,
+  isWidthEqualUp,
+  NumericField,
+  StoreProps,
+  TooltipIconButton,
+  useDispatch,
+  useEventListener
+} from '../../..';
 
 const useHexStyles = makeStyles(theme => ({
   endAdornment: {
@@ -43,6 +51,17 @@ const useHexStyles = makeStyles(theme => ({
   },
   indexInput: {
     textAlign: 'right'
+  },
+  resultNoneIndexes: {
+    textAlign: 'center',
+    cursor: 'default',
+    padding: 8,
+    [theme.breakpoints.down('sm')]: {
+      padding: 2
+    },
+    [theme.breakpoints.down('xs')]: {
+      padding: 0
+    }
   }
 }));
 
@@ -62,6 +81,14 @@ export const WrappedTextBar = ({ store }: StoreProps) => {
     search: { inputValue, indexes, selectedIndex }
   } = store;
 
+  const inputRef = useRef(null);
+
+  useEventListener('keydown', (event: KeyboardEvent) => {
+    if (event.ctrlKey === false || event.code !== 'KeyF') return;
+    event.preventDefault();
+    inputRef.current.focus();
+  });
+
   return (
     <>
       <DelayedTextField
@@ -71,6 +98,7 @@ export const WrappedTextBar = ({ store }: StoreProps) => {
           root: classes.root,
           input: classes.input
         }}
+        inputRef={inputRef}
         type="text"
         placeholder={t('header.searchfield.text')}
         fullWidth
@@ -84,8 +112,18 @@ export const WrappedTextBar = ({ store }: StoreProps) => {
         onKeyDown={event => onSearchBarKeyDown({ event }, { store })}
       />
 
-      {indexes === null || indexes.length === 0 ? (
+      {(inputValue === null || inputValue === '') && (indexes === null || indexes.length === 0) ? (
         <></>
+      ) : indexes === null || indexes.length === 0 ? (
+        isWidthEqualUp(store, 'sm') ? (
+          <Typography className={classes.resultNoneIndexes} variant="subtitle1" color="error">
+            {t('no-results.desktop')}
+          </Typography>
+        ) : (
+          <Typography className={classes.resultNoneIndexes} variant="subtitle1" color="error">
+            {t('no-results.mobile')}
+          </Typography>
+        )
       ) : (
         <>
           <NumericField
@@ -125,6 +163,7 @@ export const WrappedTextBar = ({ store }: StoreProps) => {
 export const TextBar = React.memo(
   WrappedTextBar,
   (prevProps: Readonly<StoreProps>, nextProps: Readonly<StoreProps>) =>
+    prevProps.store.mode.widthType === nextProps.store.mode.widthType &&
     prevProps.store.search.type === nextProps.store.search.type &&
     prevProps.store.search.value === nextProps.store.search.value &&
     prevProps.store.search.inputValue === nextProps.store.search.inputValue &&

@@ -1,8 +1,8 @@
 import { makeStyles } from '@material-ui/core';
 import ClearIcon from '@material-ui/icons/Clear';
-import React from 'react';
+import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { NumericField, StoreProps, TooltipIconButton, useDispatch } from '../../..';
+import { NumericField, StoreProps, TooltipIconButton, useDispatch, useEventListener } from '../../..';
 
 const useHexStyles = makeStyles(theme => ({
   root: {
@@ -36,11 +36,20 @@ export const WrappedHexCursorBar = ({ store }: StoreProps) => {
   } = store;
   const { codes: hexcodes } = store.hex;
 
+  const inputRef = useRef(null);
+
+  useEventListener('keydown', (event: KeyboardEvent) => {
+    if (event.ctrlKey === false || event.code !== 'KeyF') return;
+    event.preventDefault();
+    inputRef.current.focus();
+  });
+
   return (
     <>
       <NumericField
         classes={{ root: classes.root }}
         // label={t('offset.label')}
+        inputRef={inputRef}
         labelWidth={0}
         placeholder={t('header.searchfield.cursor')}
         fullWidth

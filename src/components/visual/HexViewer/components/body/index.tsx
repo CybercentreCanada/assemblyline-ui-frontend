@@ -89,7 +89,7 @@ const HexTableBody = memo(({ store }: StoreProps) => {
   useEventListener('resize', () => onBodyResize(bodyRef?.current?.getBoundingClientRect()));
   useEventListener('keydown', (event: KeyboardEvent) => onCursorKeyDown({ event }, { store }));
   useEventListener('keydown', (event: KeyboardEvent) => onCopyKeyDown(undefined, { event, store }));
-  useEventListener('mouseup', () => onBodyMouseUp(undefined, { store }));
+  useEventListener('mouseup', (event: MouseEvent) => onBodyMouseUp(undefined, { store, event }));
 
   const rowIndexes: number[] = useMemo(
     () => Array.from(Array(store.layout.row.size).keys()).map(i => i + store.scroll.rowIndex),
@@ -151,7 +151,7 @@ const HexWindowBody = memo(({ store }: StoreProps) => {
 
   useEventListener('keydown', (event: KeyboardEvent) => onCursorKeyDown({ event }, { store }));
   useEventListener('keydown', (event: KeyboardEvent) => onCopyKeyDown(undefined, { event, store }));
-  useEventListener('mouseup', () => onBodyMouseUp(undefined, { store }));
+  useEventListener('mouseup', (event: MouseEvent) => onBodyMouseUp(undefined, { store, event }));
 
   React.useEffect(() => {
     if (store.initialized) scrollToWindowIndex(store, listRef, store.scroll.index, store.scroll.type);
@@ -162,7 +162,7 @@ const HexWindowBody = memo(({ store }: StoreProps) => {
       ({ index, style, data }) =>
         store.initialized ? <WindowRow key={index} rowIndex={index} style={style} Tag={data.Tag} /> : <></>,
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [store.layout.column.size]
+    [store.layout.column.size, store.layout.row.size]
   );
 
   return (
@@ -175,7 +175,7 @@ const HexWindowBody = memo(({ store }: StoreProps) => {
           height={height - 50}
           width={width}
           itemSize={LAYOUT_SIZE.rowHeight}
-          itemCount={store.scroll.maxRowIndex + store.layout.row.size}
+          itemCount={store.scroll.lastRowIndex}
           overscanCount={store.scroll.overscanCount}
           initialScrollOffset={0}
           itemData={{

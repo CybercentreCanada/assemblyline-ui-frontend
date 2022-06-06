@@ -66,6 +66,8 @@ export type DelayedTextFieldProps = {
   multiline?: boolean;
   maxRows?: number;
 
+  inputRef?: React.MutableRefObject<any>;
+
   onFocus?: React.FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>;
   onBlur?: React.FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>;
   onWheel?: React.WheelEventHandler<HTMLDivElement>;
@@ -96,6 +98,7 @@ export const WrappedDelayedTextField = ({
   multiline = false,
   maxRows = null,
 
+  inputRef = { current: null },
   onFocus = () => null,
   onBlur = () => null,
   onWheel = () => null,
@@ -106,8 +109,7 @@ export const WrappedDelayedTextField = ({
 
   const [_value, setValue] = React.useState<string>(value);
 
-  const inputRef = React.useRef(null);
-
+  const _inputRef = React.useRef<any>(null);
   const valueRef = React.useRef<string>(value);
   const delayRef = React.useRef<number>(delay);
   const timerRef = React.useRef(null);
@@ -147,7 +149,10 @@ export const WrappedDelayedTextField = ({
           root: clsx(c.root, classes.root),
           input: clsx(c.input, classes.input)
         }}
-        inputRef={inputRef}
+        inputRef={inputEl => {
+          _inputRef.current = inputEl;
+          inputRef.current = inputEl;
+        }}
         type={type}
         placeholder={placeholder}
         fullWidth={fullWidth}
