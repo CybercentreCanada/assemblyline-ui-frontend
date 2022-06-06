@@ -67,6 +67,8 @@ const WrappedHexMobileHeader = ({ store }: StoreProps) => {
 };
 
 const HexDesktopHeader = React.memo(WrappedHexDesktopHeader);
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const HexMobileHeader = React.memo(WrappedHexMobileHeader);
 
 const HexHeaderSelector = memo(({ store }: StoreProps) => {
