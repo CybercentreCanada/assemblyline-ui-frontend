@@ -13,10 +13,11 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type SupplementarySectionProps = {
-  extracted: ExtractedFiles[];
+  supplementary: ExtractedFiles[];
+  sid: string;
 };
 
-const WrappedSupplementarySection: React.FC<SupplementarySectionProps> = ({ extracted }) => {
+const WrappedSupplementarySection: React.FC<SupplementarySectionProps> = ({ supplementary, sid }) => {
   const { t } = useTranslation(['fileDetail']);
   const [open, setOpen] = React.useState(true);
   const classes = useStyles();
@@ -34,10 +35,10 @@ const WrappedSupplementarySection: React.FC<SupplementarySectionProps> = ({ extr
       <Collapse in={open} timeout="auto">
         {useMemo(
           () =>
-            extracted.map((file, id) =>
-              file.is_section_image ? null : <ExtractedFile key={id} file={file} download />
+            supplementary.map((file, id) =>
+              file.is_section_image ? null : <ExtractedFile key={id} file={file} sid={sid} download />
             ),
-          [extracted]
+          [supplementary, sid]
         )}
       </Collapse>
     </div>
