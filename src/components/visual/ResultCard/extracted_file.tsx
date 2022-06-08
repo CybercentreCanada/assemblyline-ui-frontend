@@ -30,7 +30,9 @@ const WrappedExtractedFile: React.FC<ExtractedFileProps> = ({ file, download = f
   return (
     <div>
       {download ? (
-        <Link href={`/api/v4/file/download/${file.sha256}/?name=${encodeURI(file.name)}`}>{file.name}</Link>
+        <Link href={`/api/v4/file/download/${file.sha256}/?${sid ? `sid=${sid}&` : ''}name=${encodeURI(file.name)}`}>
+          {file.name}
+        </Link>
       ) : (
         <Link
           component={RouterLink}

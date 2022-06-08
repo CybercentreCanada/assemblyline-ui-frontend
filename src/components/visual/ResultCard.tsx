@@ -282,7 +282,7 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates = null 
                       />
                     ))}
                 {displayedResult.response.supplementary.filter(item => !item.is_section_image).length !== 0 && (
-                  <SupplementarySection extracted={displayedResult.response.supplementary} />
+                  <SupplementarySection supplementary={displayedResult.response.supplementary} sid={sid} />
                 )}
                 {displayedResult.response.extracted.length !== 0 && (
                   <ExtractedSection extracted={displayedResult.response.extracted} sid={sid} />
