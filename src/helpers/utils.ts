@@ -159,5 +159,5 @@ export function safeFieldValue(data: string | number | boolean) {
 }
 
 export function safeFieldValueURI(data: string | number | boolean) {
-  return `"${encodeURIComponent(safeFieldValue(data))}"`;
+  return `${encodeURIComponent(safeFieldValue(data))}`;
 }
