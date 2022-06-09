@@ -14,9 +14,11 @@ import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
 import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
 import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
 import { Alert, Skeleton, TabContext, TabList, TabPanel } from '@material-ui/lab';
+import clsx from 'clsx';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import Empty from 'components/visual/Empty';
+import { HexViewerApp } from 'components/visual/HexViewer';
 import getXSRFCookie from 'helpers/xsrf';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -43,6 +45,16 @@ const useStyles = makeStyles(theme => ({
   img: {
     maxWidth: '100%',
     maxHeight: '100%'
+  },
+  flexContainer: {
+    display: 'flex',
+    alignContent: 'center',
+    justifyContent: 'center'
+  },
+  flexItem: {
+    width: '100%',
+    maxWidth: '1200px',
+    padding: 0
   }
 }));
 
@@ -54,7 +66,7 @@ const WrappedAsciiViewer = ({ ascii, error }) => {
   ) : error ? (
     <Alert severity="error">{error}</Alert>
   ) : (
-    <LinearProgress />
+    <LinearProgress className={classes.flexItem} />
   );
 };
 
@@ -63,12 +75,18 @@ const WrappedHexViewer = ({ hex, error }) => {
 
   return hex ? (
     <pre className={classes.pre}>
-      <div style={{ minWidth: '580px' }}>{hex}</div>
+      <HexViewerApp data={hex} />
     </pre>
   ) : error ? (
-    <Alert severity="error">{error}</Alert>
+    <div className={clsx(classes.flexContainer)}>
+      <Alert className={clsx(classes.flexItem)} severity="error">
+        {error}
+      </Alert>
+    </div>
   ) : (
-    <LinearProgress />
+    <div className={clsx(classes.flexContainer)}>
+      <LinearProgress className={clsx(classes.flexItem)} />
+    </div>
   );
 };
 
@@ -169,7 +187,8 @@ const FileViewer = () => {
       });
     } else if (tab === 'hex' && hex === null) {
       apiCall({
-        url: `/api/v4/file/hex/${sha256}/`,
+        url: `/api/v4/file/hex/${sha256}/?bytes_only=true`,
+        // url: `/api/v4/file/hex/${sha256}/`,
         onSuccess: api_data => {
           if (error !== null) setError(null);
           setHex(api_data.api_response);
@@ -210,63 +229,77 @@ const FileViewer = () => {
   }, [sha256, tab]);
 
   return (
-    <PageCenter margin={4} width="100%" textAlign="left">
-      <Grid container alignItems="center">
-        <Grid item xs sm={8}>
-          <Typography variant="h4">{t('title')}</Typography>
-          <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
-            {id}
-          </Typography>
+    <PageCenter margin={4} width="100%" textAlign="left" maxWidth="100%">
+      <div className={classes.flexContainer}>
+        <Grid className={classes.flexItem} container alignItems="center">
+          <Grid item xs sm={8}>
+            <Typography variant="h4">{t('title')}</Typography>
+            <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
+              {id}
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sm>
+            <div style={{ textAlign: 'right' }}>
+              <Tooltip title={t('detail')}>
+                <IconButton component={Link} to={`/file/detail/${id}`}>
+                  <DescriptionOutlinedIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={t('related')}>
+                <IconButton component={Link} to={`/search/submission?query=files.sha256:${id} OR results:${id}*`}>
+                  <AmpStoriesOutlinedIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={t('download')}>
+                <IconButton
+                  component={MaterialLink}
+                  href={`/api/v4/file/download/${id}/?XSRF_TOKEN=${getXSRFCookie()}`}
+                >
+                  <GetAppOutlinedIcon color="action" />
+                </IconButton>
+              </Tooltip>
+            </div>
+          </Grid>
         </Grid>
-        <Grid item xs={12} sm>
-          <div style={{ textAlign: 'right' }}>
-            <Tooltip title={t('detail')}>
-              <IconButton component={Link} to={`/file/detail/${id}`}>
-                <DescriptionOutlinedIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={t('related')}>
-              <IconButton component={Link} to={`/search/submission?query=files.sha256:${id} OR results:${id}*`}>
-                <AmpStoriesOutlinedIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={t('download')}>
-              <IconButton component={MaterialLink} href={`/api/v4/file/download/${id}/?XSRF_TOKEN=${getXSRFCookie()}`}>
-                <GetAppOutlinedIcon color="action" />
-              </IconButton>
-            </Tooltip>
-          </div>
-        </Grid>
-      </Grid>
+      </div>
 
       {sha256 && tab !== null ? (
         <TabContext value={tab}>
-          <Paper square style={{ marginTop: theme.spacing(4), marginBottom: theme.spacing(2) }}>
-            <TabList onChange={handleChangeTab} indicatorColor="primary" textColor="primary">
-              <Tab label={t('ascii')} value="ascii" />
-              <Tab label={t('strings')} value="strings" />
-              <Tab label={t('hex')} value="hex" />
-              {imageAllowed ? <Tab label={t('image')} value="image" /> : <Empty />}
-            </TabList>
-          </Paper>
-          <TabPanel value="ascii" className={classes.no_pad}>
-            <AsciiViewer ascii={ascii} error={error} />
-          </TabPanel>
-          <TabPanel value="strings" className={classes.no_pad}>
-            <StringViewer string={string} error={error} />
-          </TabPanel>
-          <TabPanel value="hex" className={classes.no_pad}>
-            <HexViewer hex={hex} error={error} />
-          </TabPanel>
-          {imageAllowed && (
-            <TabPanel value="image" style={{ paddingLeft: 0, paddingRight: 0 }}>
-              <ImageViewer image={image} error={error} />
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+            <Paper
+              className={classes.flexItem}
+              square
+              style={{ marginTop: theme.spacing(4), marginBottom: theme.spacing(2) }}
+            >
+              <TabList onChange={handleChangeTab} indicatorColor="primary" textColor="primary">
+                <Tab label={t('ascii')} value="ascii" />
+                <Tab label={t('strings')} value="strings" />
+                <Tab label={t('hex')} value="hex" />
+                {imageAllowed ? <Tab label={t('image')} value="image" /> : <Empty />}
+              </TabList>
+            </Paper>
+
+            <TabPanel value="ascii" className={clsx(classes.flexItem, classes.no_pad)}>
+              <AsciiViewer ascii={ascii} error={error} />
             </TabPanel>
-          )}
+            <TabPanel value="strings" className={clsx(classes.flexItem, classes.no_pad)}>
+              <StringViewer string={string} error={error} />
+            </TabPanel>
+            <TabPanel value="hex" className={clsx(classes.no_pad)} style={{ width: '100%', maxWidth: '100%' }}>
+              <HexViewer hex={hex} error={error} />
+            </TabPanel>
+            {imageAllowed && (
+              <TabPanel value="image" className={clsx(classes.flexItem)} style={{ paddingLeft: 0, paddingRight: 0 }}>
+                <ImageViewer image={image} error={error} />
+              </TabPanel>
+            )}
+          </div>
         </TabContext>
       ) : (
-        <div style={{ marginTop: theme.spacing(4), marginBottom: theme.spacing(2) }}>
-          <Skeleton variant="rect" height={theme.spacing(6)} />
+        <div className={classes.flexContainer}>
+          <div className={classes.flexItem} style={{ marginTop: theme.spacing(4), marginBottom: theme.spacing(2) }}>
+            <Skeleton variant="rect" height={theme.spacing(6)} />
+          </div>
         </div>
       )}
     </PageCenter>
