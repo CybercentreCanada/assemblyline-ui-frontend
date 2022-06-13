@@ -53,7 +53,9 @@ export const isFocus = Object.fromEntries(
 ) as IsFocus;
 
 export const handleLayoutColumnResize2 = (store: Store, width: number) => {
-  return COLUMNS.sort((a, b) => b.columns - a.columns).find(e => {
+  if (store.layout.column.auto === false) return store.layout.column.size;
+
+  const columns = COLUMNS.sort((a, b) => b.columns - a.columns).find(e => {
     const displayType = store.layout.display;
     let size: number = 0;
 
@@ -65,4 +67,8 @@ export const handleLayoutColumnResize2 = (store: Store, width: number) => {
 
     return size < width;
   })?.columns;
+
+  if (store.hex.codes.size <= columns)
+    return COLUMNS.sort((a, b) => b.columns - a.columns).find(e => e.columns <= store.hex.codes.size)?.columns;
+  else return columns;
 };
