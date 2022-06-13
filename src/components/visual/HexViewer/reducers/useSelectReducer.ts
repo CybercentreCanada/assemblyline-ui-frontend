@@ -47,6 +47,7 @@ export const useSelectReducer: UseReducer<SelectState> = () => {
     [selectClear]
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const selectMouseUp: Reducers['bodyMouseUp'] = useCallback(
     store => {
       if (store.cell.mouseEnterIndex === null) return { ...store };
@@ -72,11 +73,11 @@ export const useSelectReducer: UseReducer<SelectState> = () => {
       if (isAction.appClickAway(type)) return selectClear(store);
       else if (isAction.cellMouseEnter(type)) return selectMouseEnter(store, payload);
       else if (isAction.cellMouseDown(type)) return selectMouseDown(store, payload);
-      else if (isAction.bodyMouseUp(type)) return selectMouseUp(store);
+      // else if (isAction.bodyMouseUp(type)) return selectMouseUp(store);
       else if (isAction.appLocationInit(type)) return selectLocation(store);
       else return { ...store };
     },
-    [selectClear, selectLocation, selectMouseDown, selectMouseEnter, selectMouseUp]
+    [selectClear, selectLocation, selectMouseDown, selectMouseEnter]
   );
 
   const render: RenderHandler = useCallback(
