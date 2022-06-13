@@ -65,6 +65,7 @@ export type DelayedTextFieldProps = {
   disabled?: boolean;
   multiline?: boolean;
   maxRows?: number;
+  preventSubmit?: boolean;
 
   inputRef?: React.MutableRefObject<any>;
 
@@ -73,6 +74,7 @@ export type DelayedTextFieldProps = {
   onWheel?: React.WheelEventHandler<HTMLDivElement>;
   onKeyDown?: React.KeyboardEventHandler<HTMLInputElement | HTMLTextAreaElement>;
   onChange?: (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => void;
+  onSubmit?: (event: React.FormEvent<HTMLDivElement>) => void;
 };
 
 export const WrappedDelayedTextField = ({
@@ -97,13 +99,15 @@ export const WrappedDelayedTextField = ({
   disabled = false,
   multiline = false,
   maxRows = null,
+  preventSubmit = false,
 
   inputRef = { current: null },
   onFocus = () => null,
   onBlur = () => null,
   onWheel = () => null,
   onKeyDown = () => null,
-  onChange = () => null
+  onChange = () => null,
+  onSubmit = () => null
 }: DelayedTextFieldProps) => {
   const c = useStyles();
 
@@ -172,6 +176,10 @@ export const WrappedDelayedTextField = ({
           onChangeEventRef.current = event;
           valueRef.current = event.target.value;
           setValue(event.target.value);
+        }}
+        onSubmit={(event: React.FormEvent<HTMLDivElement>) => {
+          if (preventSubmit) event.preventDefault();
+          onSubmit(event);
         }}
       />
     </FormControl>
