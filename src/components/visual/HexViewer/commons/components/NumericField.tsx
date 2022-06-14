@@ -66,10 +66,13 @@ export type NumericFieldProps = {
   onBlur?: (event: React.FocusEvent<HTMLTextAreaElement | HTMLInputElement | any>) => void;
   onWheel?: (event: React.WheelEvent<HTMLTextAreaElement | HTMLInputElement | HTMLDivElement | any>) => void;
   onClick?: (event: React.WheelEvent<HTMLTextAreaElement | HTMLInputElement | HTMLDivElement | any>) => void;
+  onSubmit?: (event: React.FormEvent<HTMLDivElement>) => void;
+
   preventEnterKeyDown?: boolean;
   preventArrowKeyDown?: boolean;
   preventWheel?: boolean;
   preventClick?: boolean;
+  preventSubmit?: boolean;
   inputRef?: React.MutableRefObject<any>;
 };
 
@@ -102,10 +105,12 @@ export const WrappedNumericField = ({
   onBlur = () => null,
   onWheel = () => null,
   onClick = () => null,
+  onSubmit = () => null,
   preventEnterKeyDown = false,
   preventArrowKeyDown = false,
   preventWheel = false,
   preventClick = false,
+  preventSubmit = false,
   inputRef = { current: null }
 }: NumericFieldProps) => {
   const fieldClasses = useStyles();
@@ -275,8 +280,10 @@ export const WrappedNumericField = ({
 
   const wheel = useCallback(
     (event: React.WheelEvent<HTMLTextAreaElement | HTMLInputElement | HTMLDivElement | any>) => {
+      if (preventWheel) return;
+      event.preventDefault();
       handleChange(inputValue.current, event.deltaY > 0 ? -stepValue.current : stepValue.current)(event);
-      !preventWheel && onWheel(event);
+      onWheel(event);
     },
     [handleChange, onWheel, preventWheel]
   );
@@ -312,6 +319,14 @@ export const WrappedNumericField = ({
     [handleChange, onClick, preventClick]
   );
 
+  const submit = useCallback(
+    (event: React.FormEvent<HTMLDivElement>) => {
+      if (preventSubmit) event.preventDefault();
+      onSubmit(event);
+    },
+    [onSubmit, preventSubmit]
+  );
+
   return (
     <FormControl
       fullWidth={fullWidth}
@@ -338,6 +353,7 @@ export const WrappedNumericField = ({
         onChange={inputChange}
         onWheel={wheel}
         onKeyDown={keyDown}
+        onSubmit={submit}
         inputRef={inputEl => {
           _inputRef.current = inputEl;
           inputRef.current = inputEl;

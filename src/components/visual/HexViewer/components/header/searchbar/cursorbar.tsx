@@ -63,6 +63,8 @@ export const WrappedHexCursorBar = ({ store }: StoreProps) => {
         allowNull={true}
         direction="inverse"
         preventArrowKeyDown
+        preventWheel
+        preventSubmit
         endAdornment={
           <div className={classes.endAdornment}>{t('of') + (hexcodes.size - 1).toString(offsetBase).toUpperCase()}</div>
         }
