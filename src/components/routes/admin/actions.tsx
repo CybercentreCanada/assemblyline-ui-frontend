@@ -23,13 +23,13 @@ import { Redirect } from 'react-router-dom';
 
 loader.config({ paths: { vs: '/cdn/monaco/' } });
 
-export default function AdminTagSafelist() {
-  const { t, i18n } = useTranslation(['adminTagSafelist']);
+export default function AdminActions() {
+  const { t, i18n } = useTranslation(['adminActions']);
   const theme = useTheme();
   const containerEL = useRef<HTMLDivElement>();
   const containerDialogEL = useRef<HTMLDivElement>();
-  const [tagSafelist, setTagSafelist] = useState(null);
-  const [originalTagSafelist, setOriginalTagSafelist] = useState(null);
+  const [actions, setActions] = useState(null);
+  const [originalActions, setOriginalActions] = useState(null);
   const [open, setOpen] = useState(false);
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
@@ -51,11 +51,11 @@ export default function AdminTagSafelist() {
   const reload = defValue => {
     apiCall({
       method: 'GET',
-      url: `/api/v4/system/tag_safelist/${defValue ? '?default' : ''}`,
+      url: `/api/v4/system/actions/${defValue ? '?default' : ''}`,
       onSuccess: api_data => {
-        setTagSafelist(api_data.api_response);
-        if (!defValue) setOriginalTagSafelist(api_data.api_response);
-        if (defValue && api_data.api_response !== originalTagSafelist) setOpen(true);
+        setActions(api_data.api_response);
+        if (!defValue) setOriginalActions(api_data.api_response);
+        if (defValue && api_data.api_response !== originalActions) setOpen(true);
       }
     });
   };
@@ -64,7 +64,7 @@ export default function AdminTagSafelist() {
     setOpen(false);
     apiCall({
       method: 'PUT',
-      url: '/api/v4/system/tag_safelist/',
+      url: '/api/v4/system/actions/',
       body: tagData,
       onSuccess: api_data => {
         reload(false);
@@ -96,8 +96,8 @@ export default function AdminTagSafelist() {
               <Grid item>
                 <Button
                   variant="contained"
-                  onClick={() => setTagSafelist(originalTagSafelist)}
-                  disabled={tagSafelist === originalTagSafelist}
+                  onClick={() => setActions(originalActions)}
+                  disabled={actions === originalActions}
                 >
                   {t('undo')}
                 </Button>
@@ -106,7 +106,7 @@ export default function AdminTagSafelist() {
                 <Button
                   variant="contained"
                   color="primary"
-                  disabled={tagSafelist === originalTagSafelist}
+                  disabled={actions === originalActions}
                   onClick={() => setOpen(true)}
                 >
                   {t('save')}
@@ -126,11 +126,11 @@ export default function AdminTagSafelist() {
                   <DiffEditor
                     language="yaml"
                     theme={isDarkTheme ? 'vs-dark' : 'vs'}
-                    original={originalTagSafelist}
+                    original={originalActions}
                     width={width}
                     height="50vh"
                     loading={t('loading')}
-                    modified={tagSafelist}
+                    modified={actions}
                     options={{ renderSideBySide: false, readOnly: true }}
                   />
                 </div>
@@ -142,7 +142,7 @@ export default function AdminTagSafelist() {
           <Button onClick={() => setOpen(false)} color="secondary">
             {t('save.cancelText')}
           </Button>
-          <Button onClick={() => saveChanges(tagSafelist)} color="primary">
+          <Button onClick={() => saveChanges(actions)} color="primary">
             {t('save.acceptText')}
           </Button>
         </DialogActions>
@@ -167,7 +167,7 @@ export default function AdminTagSafelist() {
           <ReactResizeDetector handleHeight handleWidth targetRef={containerEL}>
             {({ width, height }) => (
               <div ref={containerEL}>
-                {tagSafelist !== null ? (
+                {actions !== null ? (
                   <>
                     <Editor
                       language="yaml"
@@ -175,8 +175,8 @@ export default function AdminTagSafelist() {
                       height={height}
                       theme={isDarkTheme ? 'vs-dark' : 'vs'}
                       loading={t('loading')}
-                      value={tagSafelist}
-                      onChange={setTagSafelist}
+                      value={actions}
+                      onChange={setActions}
                       onMount={onMount}
                     />
                   </>
