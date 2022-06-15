@@ -1,4 +1,4 @@
-import { ClickAwayListener, Fade, makeStyles, Paper, Popper, useTheme } from '@material-ui/core';
+import { Fade, makeStyles, Paper, Popper, useTheme } from '@material-ui/core';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
@@ -7,31 +7,21 @@ import ExposureZeroIcon from '@material-ui/icons/ExposureZero';
 import NavigationIcon from '@material-ui/icons/Navigation';
 import TextFieldsIcon from '@material-ui/icons/TextFields';
 import { isEscape } from 'commons/addons/elements/utils/keyboard';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SearchType, StoreProps, useDispatch } from '../..';
+import { SearchType, StoreProps, useDispatch, useEventListener } from '../..';
 import { TooltipIconButton } from '../../commons/components';
 
 const useStyles = makeStyles(theme => ({
+  clickAway: {
+    zIndex: theme.zIndex.appBar + 200
+  },
   popper: {
     zIndex: theme.zIndex.appBar + 200,
     minWidth: '280px',
     marginTop: '16px',
     padding: theme.spacing(0),
     backgroundColor: theme.palette.background.paper
-  },
-  avatarButton: {
-    padding: 0,
-    marginLeft: theme.spacing(1),
-    marginRight: theme.spacing(1)
-  },
-  iconButton: {
-    width: theme.spacing(5),
-    height: theme.spacing(5),
-    [theme.breakpoints.down('xs')]: {
-      width: theme.spacing(4),
-      height: theme.spacing(4)
-    }
   },
   searchPaper: {
     marginTop: '16px',
@@ -48,83 +38,90 @@ export const WrappedHexSearchTypes = ({ store }: StoreProps) => {
   const { onSearchTypeChange } = useDispatch();
   const { type } = store.search;
 
+  const ref = useRef<HTMLDivElement>(null);
+  const [popperAnchorEl, setPopperAnchorEl] = useState(null);
+  const isPopperOpen = !!popperAnchorEl;
+
+  const handleClickAway = useCallback(
+    (event: any) => {
+      if (ref?.current?.contains(event.target) || !isPopperOpen) return;
+      setPopperAnchorEl(popperAnchorEl ? null : event.currentTarget);
+    },
+    [isPopperOpen, popperAnchorEl]
+  );
+
   const handleClick = useCallback(
     (_type: SearchType) => (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
       onSearchTypeChange({ type: _type });
-      setIsPopperOpen(false);
-      setPopperAnchorEl(null);
+      setPopperAnchorEl(popperAnchorEl ? null : event.currentTarget);
     },
-    [onSearchTypeChange]
+    [onSearchTypeChange, popperAnchorEl]
   );
 
-  const [isPopperOpen, setIsPopperOpen] = useState<boolean>(false);
-  const [popperAnchorEl, setPopperAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const handleOpen = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      setPopperAnchorEl(popperAnchorEl ? null : event.currentTarget);
+    },
+    [popperAnchorEl]
+  );
 
-  const handleOpen = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
-    setPopperAnchorEl(event.currentTarget);
-    setIsPopperOpen(true);
-  }, []);
+  const handleCloseKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      if (!isEscape(event.key)) return;
+      setPopperAnchorEl(popperAnchorEl ? null : event.currentTarget);
+    },
+    [popperAnchorEl]
+  );
 
-  const handleClickAway = useCallback((event: React.MouseEvent<Document, MouseEvent>) => {
-    setIsPopperOpen(false);
-    setPopperAnchorEl(null);
-  }, []);
-
-  const handleCloseKeyDown = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (!isEscape(event.key)) return;
-    setIsPopperOpen(false);
-    setPopperAnchorEl(null);
-  }, []);
+  useEventListener('mousedown', event => handleClickAway(event));
 
   return (
-    <ClickAwayListener onClickAway={handleClickAway}>
-      <>
-        <TooltipIconButton
-          title={t('search.types')}
-          size="small"
-          icon={
-            type === 'cursor' ? (
-              <NavigationIcon />
-            ) : type === 'hex' ? (
-              <ExposureZeroIcon />
-            ) : type === 'text' ? (
-              <TextFieldsIcon />
-            ) : null
-          }
-          disabled={false}
-          onClick={handleOpen}
-        />
-        <Popper
-          open={isPopperOpen}
-          anchorEl={popperAnchorEl}
-          className={classes.popper}
-          placement="bottom-start"
-          disablePortal={true}
-          transition
-        >
-          {({ TransitionProps }) => (
-            <Fade {...TransitionProps} timeout={250}>
-              <Paper style={{ padding: theme.spacing(1) }} elevation={4} onKeyDown={handleCloseKeyDown}>
-                <List component="nav" aria-label="main mailbox folders" dense disablePadding>
-                  <ListItem button selected={type === 'cursor'} onClick={handleClick('cursor')}>
-                    <ListItemIcon children={<NavigationIcon />} />
-                    <ListItemText primary={t('header.selector.cursor')} />
-                  </ListItem>
-                  <ListItem button selected={type === 'hex'} onClick={handleClick('hex')}>
-                    <ListItemIcon children={<ExposureZeroIcon />} />
-                    <ListItemText primary={t('header.selector.hexcode')} />
-                  </ListItem>
-                  <ListItem button selected={type === 'text'} onClick={handleClick('text')}>
-                    <ListItemIcon children={<TextFieldsIcon />} />
-                    <ListItemText primary={t('header.selector.text')} />
-                  </ListItem>
-                </List>
-              </Paper>
-            </Fade>
-          )}
-        </Popper>
-      </>
-    </ClickAwayListener>
+    <div ref={ref} onKeyDown={handleCloseKeyDown}>
+      <TooltipIconButton
+        title={t('search.types')}
+        size="small"
+        icon={
+          type === 'cursor' ? (
+            <NavigationIcon />
+          ) : type === 'hex' ? (
+            <ExposureZeroIcon />
+          ) : type === 'text' ? (
+            <TextFieldsIcon />
+          ) : null
+        }
+        disabled={false}
+        onClick={handleOpen}
+      />
+      <Popper
+        open={isPopperOpen}
+        anchorEl={popperAnchorEl}
+        className={classes.popper}
+        placement="bottom-start"
+        disablePortal={true}
+        transition
+      >
+        {({ TransitionProps }) => (
+          <Fade {...TransitionProps} timeout={250}>
+            <Paper style={{ padding: theme.spacing(1) }} elevation={4}>
+              <List component="nav" aria-label="main mailbox folders" dense disablePadding>
+                <ListItem button selected={type === 'cursor'} onClick={handleClick('cursor')}>
+                  <ListItemIcon children={<NavigationIcon />} />
+                  <ListItemText primary={t('header.selector.cursor')} />
+                </ListItem>
+                <ListItem button selected={type === 'hex'} onClick={handleClick('hex')}>
+                  <ListItemIcon children={<ExposureZeroIcon />} />
+                  <ListItemText primary={t('header.selector.hexcode')} />
+                </ListItem>
+                <ListItem button selected={type === 'text'} onClick={handleClick('text')}>
+                  <ListItemIcon children={<TextFieldsIcon />} />
+                  <ListItemText primary={t('header.selector.text')} />
+                </ListItem>
+              </List>
+            </Paper>
+          </Fade>
+        )}
+      </Popper>
+    </div>
   );
 };
 
