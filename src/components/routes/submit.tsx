@@ -1,3 +1,4 @@
+/* eslint-disable */
 import Flow from '@flowjs/flow.js';
 import {
   Button,
@@ -26,13 +27,11 @@ import ServiceSpec from 'components/layout/serviceSpec';
 import ServiceTree from 'components/layout/serviceTree';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
-import Empty from 'components/visual/Empty';
 import FileDropper from 'components/visual/FileDropper';
 import generateUUID from 'helpers/uuid';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory } from 'react-router-dom';
-
 
 function Submit() {
   const { getBanner } = useAppLayout();
@@ -56,13 +55,12 @@ function Submit() {
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
   const state = history.location.state;
-  const urlHashTitle = configuration.ui.allow_url_submissions ? "URL/SHA256" : "SHA256";
+  const urlHashTitle = configuration.ui.allow_url_submissions ? 'URL/SHA256' : 'SHA256';
   const urlInputText = urlHashTitle + t('urlHash.input_suffix');
-  const [urlHash, setUrlHash] = useState((state !== undefined) ? state['hash'] : "");
+  const [urlHash, setUrlHash] = useState(state !== undefined ? state['hash'] : '');
   const [urlHashHasError, setUrlHashHasError] = useState(false);
-  const [value, setValue] = useState((state !== undefined) ? state['tabContext'] : "0");
-  const classification = useState((state !== undefined) ? state['c12n'] : null)[0];
-
+  const [value, setValue] = useState(state !== undefined ? state['tabContext'] : '0');
+  const classification = useState(state !== undefined ? state['c12n'] : null)[0];
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -118,7 +116,7 @@ function Submit() {
     } else if (cbType === 'file') {
       // No external service and file submitted
       uploadAndScan();
-    } else if (cbType === 'urlHash'){
+    } else if (cbType === 'urlHash') {
       // No external service and url/SHA256 submitted
       analyseUrlHash();
     }
@@ -270,27 +268,23 @@ function Submit() {
     setUrlHash(event.target.value);
   }
 
-
-
   function analyseUrlHash() {
     const urlParseRE =
-    /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/;
-    const url_matches = urlParseRE.exec(urlHash);
+      /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/;
+    const urlMatches = urlParseRE.exec(urlHash);
     const sha256ParseRE = /^[a-fA-F0-9]{64}$/;
 
-    let err_msg = t('submit.unknown.failure');
-    let data = {ui_params: settings};
+    let errMsg = t('submit.unknown.failure');
+    let data = { ui_params: settings };
 
     if (sha256ParseRE.exec(urlHash)) {
       data['name'] = urlHash;
       data['sha256'] = urlHash;
-      err_msg = t('submit.hash.failure');
-
-    }
-    else if (configuration.ui.allow_url_submissions && url_matches) {
-      data["name"] = (url_matches[15] === undefined || url_matches[15] === '') ? 'file' : url_matches[15];
-      data["url"] = urlHash;
-      err_msg = t('submit.url.failure');
+      errMsg = t('submit.hash.failure');
+    } else if (configuration.ui.allow_url_submissions && urlMatches) {
+      data['name'] = urlMatches[15] === undefined || urlMatches[15] === '' ? 'file' : urlMatches[15];
+      data['url'] = urlHash;
+      errMsg = t('submit.url.failure');
     }
 
     setUrlHashHasError(false);
@@ -306,7 +300,7 @@ function Submit() {
         }, 500);
       },
       onFailure: api_data => {
-        showErrorMessage(err_msg);
+        showErrorMessage(errMsg);
         setUrlHashHasError(true);
       }
     });
