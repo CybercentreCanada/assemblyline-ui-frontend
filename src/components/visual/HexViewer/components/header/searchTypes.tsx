@@ -104,15 +104,33 @@ export const WrappedHexSearchTypes = ({ store }: StoreProps) => {
           <Fade {...TransitionProps} timeout={250}>
             <Paper style={{ padding: theme.spacing(1) }} elevation={4}>
               <List component="nav" aria-label="main mailbox folders" dense disablePadding>
-                <ListItem button selected={type === 'cursor'} onClick={handleClick('cursor')}>
+                <ListItem
+                  button
+                  selected={type === 'cursor'}
+                  autoFocus={type === 'cursor'}
+                  dense
+                  onClick={handleClick('cursor')}
+                >
                   <ListItemIcon children={<NavigationIcon />} />
                   <ListItemText primary={t('header.selector.cursor')} />
                 </ListItem>
-                <ListItem button selected={type === 'hex'} onClick={handleClick('hex')}>
+                <ListItem
+                  button
+                  selected={type === 'hex'}
+                  autoFocus={type === 'hex'}
+                  dense
+                  onClick={handleClick('hex')}
+                >
                   <ListItemIcon children={<ExposureZeroIcon />} />
                   <ListItemText primary={t('header.selector.hexcode')} />
                 </ListItem>
-                <ListItem button selected={type === 'text'} onClick={handleClick('text')}>
+                <ListItem
+                  button
+                  selected={type === 'text'}
+                  autoFocus={type === 'text'}
+                  dense
+                  onClick={handleClick('text')}
+                >
                   <ListItemIcon children={<TextFieldsIcon />} />
                   <ListItemText primary={t('header.selector.text')} />
                 </ListItem>
