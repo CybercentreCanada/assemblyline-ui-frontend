@@ -32,7 +32,7 @@ export const useLayoutReducer: UseReducer<LayoutState> = () => {
       layout: {
         display: 'dual',
         column: {
-          size: 8,
+          size: 10000,
           auto: true
         },
         row: {

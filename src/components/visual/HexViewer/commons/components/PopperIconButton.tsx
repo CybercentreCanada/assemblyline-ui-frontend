@@ -102,7 +102,7 @@ export const WrappedPopperIconButton = (
         size={size}
         onClick={handleOpen}
       />
-      <Popper open={open} anchorEl={anchorEl} placement={placement} transition>
+      <Popper open={open} anchorEl={anchorEl} placement={placement} transition disablePortal={true}>
         {({ TransitionProps }) => (
           <ClickAwayListener onClickAway={handleClickAway}>
             <Fade {...TransitionProps} timeout={200}>

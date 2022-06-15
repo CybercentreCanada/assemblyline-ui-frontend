@@ -103,9 +103,10 @@ export const WrappedTextBar = ({ store }: StoreProps) => {
         placeholder={t('header.searchfield.text')}
         fullWidth
         autoFocus
-        delay={200}
+        delay={1000}
         value={inputValue}
         margin="dense"
+        preventSubmit={true}
         onFocus={() => onSearchBarFocus()}
         onWheel={event => onSearchBarWheel({ event })}
         onChange={event => onSearchBarValueChange({ value: event.target.value })}

@@ -141,7 +141,49 @@ export const useHistoryReducer: UseReducer<HistoryState> = () => {
   }, []);
 
   const historyTypeChange: Reducers['searchTypeChange'] = useCallback((store, { type }) => {
-    return { ...store, history: { ...store.history, index: 0 } };
+    const {
+      cursor: { index: cursorIndex },
+      search: { type: searchType, inputValue },
+      history: { values: historyValues }
+    } = store;
+
+    if (
+      inputValue === null ||
+      inputValue === '' ||
+      historyValues.findIndex(h => h.type === searchType && h.value === inputValue) !== -1
+    ) {
+      return { ...store, history: { ...store.history, index: 0 } };
+    } else if (searchType === 'cursor') {
+      return {
+        ...store,
+        history: {
+          ...store.history,
+          index: 0,
+          values: [
+            { type: store.search.type, value: '' },
+            ...[{ type: searchType, value: cursorIndex }, ...store.history.values]
+              .filter(v => v.value !== null && v.value !== '' && v.value !== undefined)
+              .slice(0, store.history.maxSize)
+          ]
+        }
+      };
+    } else if (searchType === 'hex' || searchType === 'text') {
+      return {
+        ...store,
+        history: {
+          ...store.history,
+          index: 0,
+          values: [
+            { type: store.search.type, value: '' },
+            ...[{ type: searchType, value: inputValue }, ...store.history.values]
+              .filter(v => v.value !== null && v.value !== '' && v.value !== undefined)
+              .slice(0, store.history.maxSize)
+          ]
+        }
+      };
+    } else {
+      return { ...store };
+    }
   }, []);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
