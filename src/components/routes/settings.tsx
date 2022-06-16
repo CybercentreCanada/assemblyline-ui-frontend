@@ -28,6 +28,7 @@ import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import ExternalSources from 'components/layout/externalSources';
 import ServiceSpec from 'components/layout/serviceSpec';
 import ServiceTree from 'components/layout/serviceTree';
 import Classification from 'components/visual/Classification';
@@ -131,12 +132,18 @@ function Settings({ width }: SettingsProps) {
     }
   }
 
-  function toggleExternalSubmit() {
+  const toggleExternalSource = source => {
     if (settings) {
+      const newSources = settings.default_external_sources;
+      if (newSources.indexOf(source) === -1) {
+        newSources.push(source);
+      } else {
+        newSources.splice(newSources.indexOf(source), 1);
+      }
       setModified(true);
-      setSettings({ ...settings, allow_external_submit: !settings.allow_external_submit });
+      setSettings({ ...settings, default_external_sources: newSources });
     }
-  }
+  };
 
   function toggleFiltering() {
     if (settings) {
@@ -381,23 +388,6 @@ function Settings({ width }: SettingsProps) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {configuration.submission.has_sha256_sources && (
-              <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleExternalSubmit()}>
-                <TableCell colSpan={2} width="100%">
-                  <Typography variant="body1">{t('submissions.allow_external_submit')}</Typography>
-                  <Typography variant="caption">{t('submissions.allow_external_submit_desc')}</Typography>
-                </TableCell>
-                <TableCell align="right">
-                  <Switch
-                    checked={settings ? settings.allow_external_submit : true}
-                    disabled={settings === null}
-                    onChange={() => toggleExternalSubmit()}
-                    color="secondary"
-                    name="allow_external_submit"
-                  />
-                </TableCell>
-              </TableRow>
-            )}
             <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDynamicPrevention()}>
               <TableCell colSpan={2} width="100%">
                 <Typography variant="body1">{t('submissions.dynamic_recursion')}</Typography>
@@ -640,6 +630,12 @@ function Settings({ width }: SettingsProps) {
           </TableBody>
         </Table>
       </TableContainer>
+
+      {configuration.submission.sha256_sources && (
+        <Paper className={classes.group}>
+          <ExternalSources settings={settings} onChange={toggleExternalSource} />
+        </Paper>
+      )}
 
       <Paper className={classes.group}>
         <div style={{ padding: sp2, textAlign: 'left' }}>
