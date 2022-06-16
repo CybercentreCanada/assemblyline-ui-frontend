@@ -131,6 +131,13 @@ function Settings({ width }: SettingsProps) {
     }
   }
 
+  function toggleExternalSubmit() {
+    if (settings) {
+      setModified(true);
+      setSettings({ ...settings, allow_external_submit: !settings.allow_external_submit });
+    }
+  }
+
   function toggleFiltering() {
     if (settings) {
       setModified(true);
@@ -374,6 +381,23 @@ function Settings({ width }: SettingsProps) {
             </TableRow>
           </TableHead>
           <TableBody>
+            {configuration.submission.has_sha256_sources && (
+              <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleExternalSubmit()}>
+                <TableCell colSpan={2} width="100%">
+                  <Typography variant="body1">{t('submissions.allow_external_submit')}</Typography>
+                  <Typography variant="caption">{t('submissions.allow_external_submit_desc')}</Typography>
+                </TableCell>
+                <TableCell align="right">
+                  <Switch
+                    checked={settings ? settings.allow_external_submit : true}
+                    disabled={settings === null}
+                    onChange={() => toggleExternalSubmit()}
+                    color="secondary"
+                    name="allow_external_submit"
+                  />
+                </TableCell>
+              </TableRow>
+            )}
             <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDynamicPrevention()}>
               <TableCell colSpan={2} width="100%">
                 <Typography variant="body1">{t('submissions.dynamic_recursion')}</Typography>

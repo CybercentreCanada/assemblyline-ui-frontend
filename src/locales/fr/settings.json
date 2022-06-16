@@ -22,6 +22,8 @@
   "service": "Sélection de service par défaut",
   "service_spec": "Valeur par défaut des paramètres de service",
   "submissions": "Options de soumission",
+  "submissions.allow_external_submit": "Autoriser les soumissions externes",
+  "submissions.allow_external_submit_desc": "Autoriser la recherche de sources externes lorsqu'une soumission utilisant le hachage SHA256 se produit.",
   "submissions.classification": "Classification",
   "submissions.classification_desc": "Classification par défaut utilisée pour les nouvelles soumissions.",
   "submissions.deep_scan": "Analyse approfondie",
