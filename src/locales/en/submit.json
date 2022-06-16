@@ -12,7 +12,7 @@
   "options.service": "Service Selection",
   "options.service_spec": "Services Specific Parameters",
   "options.submission": "Submission Parameters",
-  "options.submission.allow_external_submit": "Allow sha256 hashes to be downloaded from external sources",
+  "options.submission.default_external_sources": "Also check the following external sources:",
   "options.submission.deep_scan": "Perform deep analysis",
   "options.submission.desc": "Description",
   "options.submission.ignore_cache": "Ignore result cache",

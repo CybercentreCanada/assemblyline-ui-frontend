@@ -12,7 +12,7 @@
   "options.service": "Sélection de service",
   "options.service_spec": "Paramètres spécifiques au services",
   "options.submission": "Paramètres de soumission",
-  "options.submission.allow_external_submit": "Autoriser le téléchargement des hachages sha256 à partir de sources externes",
+  "options.submission.default_external_sources": "Vérifiez également les sources externes suivantes:",
   "options.submission.deep_scan": "Effectuer une analyse approfondie",
   "options.submission.desc": "Description",
   "options.submission.ignore_cache": "Ignorer le cache des résultats",
