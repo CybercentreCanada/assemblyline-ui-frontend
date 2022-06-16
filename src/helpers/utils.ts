@@ -161,3 +161,14 @@ export function safeFieldValue(data: string | number | boolean) {
 export function safeFieldValueURI(data: string | number | boolean) {
   return `${encodeURIComponent(safeFieldValue(data))}`;
 }
+
+export function matchSHA256(data: string) {
+  const sha256ParseRE = /^[a-fA-F0-9]{64}$/;
+  return sha256ParseRE.exec(data);
+}
+
+export function matchURL(data: string) {
+  const urlParseRE =
+    /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www\.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w\-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[.!/\\\w]*))?)/;
+  return urlParseRE.exec(data);
+}
