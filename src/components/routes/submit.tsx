@@ -484,31 +484,33 @@ function Submit() {
               </>
             )}
           </div>
-          {matchSHA256(urlHash) && configuration.submission.sha256_sources && (
-            <div style={{ textAlign: 'start', marginTop: theme.spacing(1) }}>
-              <Typography variant="subtitle1">{t('options.submission.default_external_sources')}</Typography>
-              {configuration.submission.sha256_sources.map(source => (
-                <div>
-                  <FormControlLabel
-                    control={
-                      settings ? (
-                        <Checkbox
-                          size="small"
-                          checked={settings.default_external_sources.indexOf(source) !== -1}
-                          name="label"
-                          onChange={event => toggleExternalSource(source)}
-                        />
-                      ) : (
-                        <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
-                      )
-                    }
-                    label={<Typography variant="body2">{source}</Typography>}
-                    className={settings ? classes.item : null}
-                  />
-                </div>
-              ))}
-            </div>
-          )}
+          {matchSHA256(urlHash) &&
+            configuration.submission.sha256_sources &&
+            configuration.submission.sha256_sources.length > 0 && (
+              <div style={{ textAlign: 'start', marginTop: theme.spacing(1) }}>
+                <Typography variant="subtitle1">{t('options.submission.default_external_sources')}</Typography>
+                {configuration.submission.sha256_sources.map(source => (
+                  <div>
+                    <FormControlLabel
+                      control={
+                        settings ? (
+                          <Checkbox
+                            size="small"
+                            checked={settings.default_external_sources.indexOf(source) !== -1}
+                            name="label"
+                            onChange={event => toggleExternalSource(source)}
+                          />
+                        ) : (
+                          <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
+                        )
+                      }
+                      label={<Typography variant="body2">{source}</Typography>}
+                      className={settings ? classes.item : null}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           {configuration.ui.tos ? (
             <div style={{ marginTop: sp4, textAlign: 'center' }}>
               <Typography variant="body2">

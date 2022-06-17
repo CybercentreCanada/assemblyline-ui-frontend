@@ -631,7 +631,7 @@ function Settings({ width }: SettingsProps) {
         </Table>
       </TableContainer>
 
-      {configuration.submission.sha256_sources && (
+      {configuration.submission.sha256_sources && configuration.submission.sha256_sources.length > 0 && (
         <Paper className={classes.group}>
           <ExternalSources settings={settings} onChange={toggleExternalSource} />
         </Paper>
