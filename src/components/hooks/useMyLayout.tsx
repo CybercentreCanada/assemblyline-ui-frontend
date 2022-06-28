@@ -17,13 +17,15 @@ import MapOutlinedIcon from '@material-ui/icons/MapOutlined';
 import NotificationImportantOutlinedIcon from '@material-ui/icons/NotificationImportantOutlined';
 import PlaylistAddCheckIcon from '@material-ui/icons/PlaylistAddCheck';
 import PublishOutlinedIcon from '@material-ui/icons/PublishOutlined';
+import RssFeedOutlinedIcon from '@material-ui/icons/RssFeedOutlined';
 import SearchIcon from '@material-ui/icons/Search';
 import SettingsApplicationsOutlinedIcon from '@material-ui/icons/SettingsApplicationsOutlined';
 import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
 import SimCardOutlinedIcon from '@material-ui/icons/SimCardOutlined';
 import SupervisorAccountOutlinedIcon from '@material-ui/icons/SupervisorAccountOutlined';
 import { AppLayoutProps } from 'commons/components/layout/LayoutProvider';
-import NotificationArea from 'components/visual/NotificationArea';
+// import { NotificationArea } from 'components/visual/NewsFeed/';
+import { NewsFeedArea } from 'components/visual/NewsFeed/';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 
@@ -190,6 +192,13 @@ const useMyLayout = (): AppLayoutProps => {
             text: t('adminmenu.identify'),
             route: '/admin/identify',
             icon: <FindInPageOutlinedIcon />,
+            nested: true
+          },
+          {
+            id: 'adminmenu.feeds',
+            text: t('adminmenu.feeds'),
+            route: '/admin/feeds',
+            icon: <RssFeedOutlinedIcon />,
             nested: true
           },
           {
@@ -395,7 +404,8 @@ const useMyLayout = (): AppLayoutProps => {
       apps: APP_SWITCHER_ITEMS,
       quickSearchURI: '/search',
       quickSearchParam: 'query',
-      right: <NotificationArea />,
+      // right: <NotificationArea />,
+      right: <NewsFeedArea />,
       themeSelectionUnder: 'profile' as 'profile',
       userMenu: USER_MENU_ITEMS,
       userMenuTitle: t('usermenu'),

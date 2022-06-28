@@ -52,45 +52,45 @@ services:
       - MAX_BODY_SIZE=100M
       - TEMPLATE=minimal
 
-  # Create test data
-  create_test_data:
-    image: cccs/assemblyline-core:4.0.stable
-    environment:
-      DEV_ADMIN_PASS: $DEV_ADMIN_PASS
-      DEV_USER_PASS: $DEV_USER_PASS
-    volumes:
-      - ./config.yml:/etc/assemblyline/config.yml:ro
-      - ./classification.yml:/etc/assemblyline/classification.yml:ro
-    command: python -m assemblyline.odm.random_data.create_test_data full alerts
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
+  # # Create test data
+  # create_test_data:
+  #   image: cccs/assemblyline-core:4.0.stable
+  #   environment:
+  #     DEV_ADMIN_PASS: $DEV_ADMIN_PASS
+  #     DEV_USER_PASS: $DEV_USER_PASS
+  #   volumes:
+  #     - ./config.yml:/etc/assemblyline/config.yml:ro
+  #     - ./classification.yml:/etc/assemblyline/classification.yml:ro
+  #   command: python -m assemblyline.odm.random_data.create_test_data full alerts
+  #   depends_on:
+  #     elasticsearch:
+  #       condition: service_healthy
 
-  # UI
-  al_ui:
-    image: cccs/assemblyline-ui:4.0.stable
-    ports:
-      - '5000:5000'
-    volumes:
-      - ./config.yml:/etc/assemblyline/config.yml:ro
-      - ./classification.yml:/etc/assemblyline/classification.yml:ro
-    restart: on-failure
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
+  # # UI
+  # al_ui:
+  #   image: cccs/assemblyline-ui:4.0.stable
+  #   ports:
+  #     - '5000:5000'
+  #   volumes:
+  #     - ./config.yml:/etc/assemblyline/config.yml:ro
+  #     - ./classification.yml:/etc/assemblyline/classification.yml:ro
+  #   restart: on-failure
+  #   depends_on:
+  #     elasticsearch:
+  #       condition: service_healthy
 
-  # SocketIO Server
-  al_socketio:
-    image: cccs/assemblyline-socketio:4.0.stable
-    ports:
-      - '5002:5002'
-    volumes:
-      - ./config.yml:/etc/assemblyline/config.yml:ro
-      - ./classification.yml:/etc/assemblyline/classification.yml:ro
-    restart: on-failure
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
+  # # SocketIO Server
+  # al_socketio:
+  #   image: cccs/assemblyline-socketio:4.0.stable
+  #   ports:
+  #     - '5002:5002'
+  #   volumes:
+  #     - ./config.yml:/etc/assemblyline/config.yml:ro
+  #     - ./classification.yml:/etc/assemblyline/classification.yml:ro
+  #   restart: on-failure
+  #   depends_on:
+  #     elasticsearch:
+  #       condition: service_healthy
 
   # # #####################################
   # # Test Components

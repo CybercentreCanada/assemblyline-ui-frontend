@@ -25,6 +25,7 @@ import PageviewOutlinedIcon from '@material-ui/icons/PageviewOutlined';
 import PlaylistAddCheckIcon from '@material-ui/icons/PlaylistAddCheck';
 import PublishOutlinedIcon from '@material-ui/icons/PublishOutlined';
 import ReceiptOutlinedIcon from '@material-ui/icons/ReceiptOutlined';
+import RssFeedOutlinedIcon from '@material-ui/icons/RssFeedOutlined';
 import SearchIcon from '@material-ui/icons/Search';
 import SettingsApplicationsOutlinedIcon from '@material-ui/icons/SettingsApplicationsOutlined';
 import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
@@ -212,6 +213,18 @@ export default function useMySitemap() {
         title: t('breadcrumb.heuristic.detail'),
         icon: <ListOutlinedIcon />,
         breadcrumbs: ['/admin', '/admin/errors']
+      },
+      {
+        path: '/admin/feeds',
+        title: t('adminmenu.feeds'),
+        icon: <RssFeedOutlinedIcon />,
+        breadcrumbs: ['/admin']
+      },
+      {
+        path: '/admin/feeds/:id',
+        title: t('adminmenu.feeds'),
+        icon: <RssFeedOutlinedIcon />,
+        breadcrumbs: ['/admin', '/admin/feeds']
       },
       {
         path: '/admin/services',

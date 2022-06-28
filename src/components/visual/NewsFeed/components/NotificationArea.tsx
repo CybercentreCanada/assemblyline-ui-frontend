@@ -29,7 +29,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ConfirmationDialog from './ConfirmationDialog';
+import ConfirmationDialog from '../../ConfirmationDialog';
 
 const useStyles = () =>
   makeStyles(theme => ({
@@ -67,7 +67,7 @@ const useStyles = () =>
     }
   }))();
 
-const NotificationArea = () => {
+export const NotificationArea = () => {
   const { t } = useTranslation(['notification']);
   const classes = useStyles();
   const theme = useTheme();
