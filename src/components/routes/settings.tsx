@@ -28,6 +28,7 @@ import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import ExternalSources from 'components/layout/externalSources';
 import ServiceSpec from 'components/layout/serviceSpec';
 import ServiceTree from 'components/layout/serviceTree';
 import Classification from 'components/visual/Classification';
@@ -130,6 +131,19 @@ function Settings({ width }: SettingsProps) {
       setSettings({ ...settings, ignore_dynamic_recursion_prevention: !settings.ignore_dynamic_recursion_prevention });
     }
   }
+
+  const toggleExternalSource = source => {
+    if (settings) {
+      const newSources = settings.default_external_sources;
+      if (newSources.indexOf(source) === -1) {
+        newSources.push(source);
+      } else {
+        newSources.splice(newSources.indexOf(source), 1);
+      }
+      setModified(true);
+      setSettings({ ...settings, default_external_sources: newSources });
+    }
+  };
 
   function toggleFiltering() {
     if (settings) {
@@ -616,6 +630,12 @@ function Settings({ width }: SettingsProps) {
           </TableBody>
         </Table>
       </TableContainer>
+
+      {configuration.submission.sha256_sources && configuration.submission.sha256_sources.length > 0 && (
+        <Paper className={classes.group}>
+          <ExternalSources settings={settings} onChange={toggleExternalSource} />
+        </Paper>
+      )}
 
       <Paper className={classes.group}>
         <div style={{ padding: sp2, textAlign: 'left' }}>
