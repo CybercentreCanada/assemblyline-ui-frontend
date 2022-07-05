@@ -14,7 +14,7 @@ export type EnclosureImage = {
 
 export type FeedItem = {
   guid?: string;
-  pubDate?: Date;
+  pubDate: Date;
   title?: string;
   description?: string;
   link?: string;
@@ -44,7 +44,7 @@ export type FeedMetadata = {
 export type Feed = {
   metadata?: FeedMetadata;
   channel?: FeedChannel;
-  items?: FeedItem[];
+  items: FeedItem[];
 };
 
 export const DEFAULT_ITEM: FeedItem = {

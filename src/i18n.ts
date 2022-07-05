@@ -15,6 +15,7 @@ import authorizeEN from 'locales/en/authorize.json';
 import carouselEN from 'locales/en/carousel.json';
 import dashboardEN from 'locales/en/dashboard.json';
 import favoritesEN from 'locales/en/favorites.json';
+import feedEN from 'locales/en/feed.json';
 import fileDetailEN from 'locales/en/file/detail.json';
 import fileViewerEN from 'locales/en/file/viewer.json';
 import helpAPIEN from 'locales/en/help/api.json';
@@ -61,6 +62,7 @@ import authorizeFR from 'locales/fr/authorize.json';
 import carouselFR from 'locales/fr/carousel.json';
 import dashboardFR from 'locales/fr/dashboard.json';
 import favoritesFR from 'locales/fr/favorites.json';
+import feedFR from 'locales/fr/feed.json';
 import fileDetailFR from 'locales/fr/file/detail.json';
 import fileViewerFR from 'locales/fr/file/viewer.json';
 import helpAPIFR from 'locales/fr/help/api.json';
@@ -109,6 +111,7 @@ const resources = {
     dashboard: dashboardEN,
     error403: error403EN,
     error404: error404EN,
+    feed: feedEN,
     fileDetail: fileDetailEN,
     fileViewer: fileViewerEN,
     helpAPI: helpAPIEN,
@@ -157,6 +160,7 @@ const resources = {
     dashboard: dashboardFR,
     error403: error403FR,
     error404: error404FR,
+    feed: feedFR,
     fileDetail: fileDetailFR,
     fileViewer: fileViewerFR,
     helpAPI: helpAPIFR,

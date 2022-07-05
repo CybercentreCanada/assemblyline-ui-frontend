@@ -85,7 +85,7 @@ export const NewsFeedArea = () => {
   const [newTitle, setNewTitle] = useState('');
   const [severity, setSeverity] = useState<'success' | 'info' | 'warning' | 'error'>('info');
 
-  const { onOpenDrawer } = useNewsFeed();
+  const { onFeedDrawerChange } = useNewsFeed();
 
   const badgeColorMap = {
     info: classes.badgeInfo,
@@ -95,7 +95,7 @@ export const NewsFeedArea = () => {
   };
 
   const onNewsFeedAreaIconClick = (event: React.MouseEvent) => {
-    onOpenDrawer();
+    // onOpenFeedDrawer();
     if (!systemMessage && currentUser.is_admin) {
       setEdit(true);
     } else {

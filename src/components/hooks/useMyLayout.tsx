@@ -24,8 +24,7 @@ import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
 import SimCardOutlinedIcon from '@material-ui/icons/SimCardOutlined';
 import SupervisorAccountOutlinedIcon from '@material-ui/icons/SupervisorAccountOutlined';
 import { AppLayoutProps } from 'commons/components/layout/LayoutProvider';
-// import { NotificationArea } from 'components/visual/NewsFeed/';
-import { NewsFeedArea } from 'components/visual/NewsFeed/';
+import { LayoutFeedIconButton } from 'components/visual/NewsFeed/components/layout/LayoutFeedIconButton';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 
@@ -405,7 +404,7 @@ const useMyLayout = (): AppLayoutProps => {
       quickSearchURI: '/search',
       quickSearchParam: 'query',
       // right: <NotificationArea />,
-      right: <NewsFeedArea />,
+      right: <LayoutFeedIconButton />,
       themeSelectionUnder: 'profile' as 'profile',
       userMenu: USER_MENU_ITEMS,
       userMenuTitle: t('usermenu'),

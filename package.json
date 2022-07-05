@@ -1,7 +1,16 @@
 {
-  "name": "assemblyline-ui-frontend",
-  "version": "4.1.0",
-  "private": true,
+  "browserslist": {
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ],
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ]
+  },
   "dependencies": {
     "@flowjs/flow.js": "^2.14.1",
     "@material-ui/core": "^4.12.3",
@@ -17,6 +26,7 @@
     "@types/react-dom": "^17.0.9",
     "@types/react-icons": "^3.0.0",
     "@types/react-router-dom": "^5.3.0",
+    "@types/rss": "0.0.29",
     "browser-detect": "^0.2.28",
     "chart.js": "^3.5.1",
     "chartjs-adapter-moment": "^1.0.0",
@@ -24,6 +34,7 @@
     "d3-scale": "^4.0.1",
     "d3-shape": "^3.0.1",
     "date-fns": "^2.24.0",
+    "fast-xml-parser": "^4.0.8",
     "fontsource-roboto": "^2.2.6",
     "i18next": "^21.0.1",
     "i18next-browser-languagedetector": "^6.1.2",
@@ -51,30 +62,6 @@
     "socket.io-client": "^4.2.0",
     "typescript": "^4.4.3"
   },
-  "scripts": {
-    "start": "BROWSER=none react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
   "devDependencies": {
     "@iconify/icons-logos": "^1.1.10",
     "@iconify/icons-simple-icons": "^1.1.43",
@@ -95,5 +82,20 @@
     "eslint-plugin-react-hooks": "^4.2.0",
     "prettier": "^2.4.1",
     "prettier-plugin-organize-imports": "^2.3.3"
-  }
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "name": "assemblyline-ui-frontend",
+  "private": true,
+  "scripts": {
+    "build": "react-scripts build",
+    "eject": "react-scripts eject",
+    "start": "BROWSER=none react-scripts start",
+    "test": "react-scripts test"
+  },
+  "version": "4.1.0"
 }

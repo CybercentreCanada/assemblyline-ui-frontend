@@ -1,10 +1,13 @@
-import { Drawer, IconButton, makeStyles, useTheme } from '@material-ui/core';
-import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
+import { makeStyles, useTheme } from '@material-ui/core';
+import useALContext from 'components/hooks/useALContext';
+import useMyAPI from 'components/hooks/useMyAPI';
+import useMySnackbar from 'components/hooks/useMySnackbar';
+import { XMLBuilder, XMLParser } from 'fast-xml-parser';
 import 'moment-timezone';
 import 'moment/locale/fr';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DEFAULT_FEED, Feed, FeedItemView, parseFeed } from '..';
+import { DEFAULT_FEED, Feed, LayoutFeedDrawer, parseFeed, SystemMessage } from '..';
 
 const useStyles = makeStyles(theme => ({
   searchresult: {
@@ -80,13 +83,17 @@ type OnFetch = (props: {
 
 export type NewsFeedContextProps = {
   feeds: Array<Feed>;
+  feedDrawerOpen: boolean;
   onFetchFeed: (url: string) => Promise<Feed>;
   onFetchFeeds: (urls: string[]) => Promise<Feed[]>;
   onAddFeed: (feed: Feed) => void;
   onUpdateFeed: (feed: Feed, index: number) => void;
   onRemoveFeed: (index: number) => void;
 
-  onOpenDrawer: () => void;
+  onFeedDrawerChange: (value: boolean) => void;
+
+  saveSystemMessage: (title: string, severity: 'success' | 'info' | 'warning' | 'error', message: string) => void;
+  deleteSystemMessage: () => void;
 };
 
 export const NewsFeedContext = React.createContext<NewsFeedContextProps>(null);
@@ -97,8 +104,40 @@ export const NewsFeedProvider = ({ children }: NewsFeedProviderProps) => {
   const theme = useTheme();
   const classes = useStyles();
 
-  const [feeds, setFeeds] = useState<Feed[]>([]);
   const localStorageKey = useRef('news-feed');
+  const [feeds, setFeeds] = useState<Feed[]>([]);
+  const [feedDrawerOpen, setFeedDrawerOpen] = useState<boolean>(true);
+
+  const { setSystemMessage, user: currentUser } = useALContext();
+  const { apiCall } = useMyAPI();
+  const { showSuccessMessage } = useMySnackbar();
+
+  const saveSystemMessage = useCallback(
+    (title: string, severity: 'success' | 'info' | 'warning' | 'error', message: string) => {
+      const data: SystemMessage = { user: currentUser.username, title, severity, message };
+      apiCall({
+        url: '/api/v4/system/system_message/',
+        method: 'PUT',
+        body: data,
+        onSuccess: () => {
+          showSuccessMessage(t('save.success'));
+          setSystemMessage(data);
+        }
+      });
+    },
+    [apiCall, currentUser?.username, setSystemMessage, showSuccessMessage, t]
+  );
+
+  const deleteSystemMessage = useCallback(() => {
+    apiCall({
+      url: '/api/v4/system/system_message/',
+      method: 'DELETE',
+      onSuccess: () => {
+        showSuccessMessage(t('delete.success'));
+        setSystemMessage(null);
+      }
+    });
+  }, [apiCall, setSystemMessage, showSuccessMessage, t]);
 
   const onFetchFeed: (url: string) => Promise<Feed> = useCallback(
     (url: string) =>
@@ -128,6 +167,14 @@ export const NewsFeedProvider = ({ children }: NewsFeedProviderProps) => {
         const str: string = await response.clone().text();
         const data = new window.DOMParser().parseFromString(str, 'text/xml');
 
+        const parser = new XMLParser();
+        let jObj = parser.parse(str);
+
+        const builder = new XMLBuilder({});
+        const xmlContent = builder.build(jObj);
+
+        console.log(jObj);
+
         resolve({
           ...f,
           ...parseFeed(data, response.url),
@@ -148,14 +195,15 @@ export const NewsFeedProvider = ({ children }: NewsFeedProviderProps) => {
     [onFetchFeed]
   );
 
-  const onLoad = useCallback(() => {
-    const value = localStorage.getItem(localStorageKey.current);
+  const onLoadFeeds = useCallback(() => {
+    const value: null | string = localStorage.getItem(localStorageKey.current);
+    if (value === null) return;
     const json = JSON.parse(value) as any;
     if (value === null || value === '' || !Array.isArray(json) || !json.every(e => typeof e == 'string')) return;
     onFetchFeeds(json).then((f: Feed[]) => setFeeds(f));
   }, [onFetchFeeds]);
 
-  const onSave = useCallback(() => {
+  const onSaveFeeds = useCallback(() => {
     if (feeds === null || feeds.length === 0) return;
     localStorage.setItem(localStorageKey.current, JSON.stringify(feeds.map(e => e.metadata.url)));
   }, [feeds]);
@@ -173,54 +221,32 @@ export const NewsFeedProvider = ({ children }: NewsFeedProviderProps) => {
     setFeeds(f => (index < 0 || index >= f.length ? [...f] : f.filter((_, i) => i !== index)));
   }, []);
 
-  useEffect(() => onLoad(), [onLoad]);
-  useEffect(() => onSave(), [feeds, onSave]);
+  useEffect(() => onLoadFeeds(), [onLoadFeeds]);
+  useEffect(() => onSaveFeeds(), [feeds, onSaveFeeds]);
 
-  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
-
-  const onOpenDrawer = useCallback(() => {
-    setIsDrawerOpen(true);
-  }, []);
+  const onFeedDrawerChange = useCallback((value: boolean) => setFeedDrawerOpen(value), []);
 
   return (
     <NewsFeedContext.Provider
-      value={{ feeds, onFetchFeed, onFetchFeeds, onAddFeed, onUpdateFeed, onRemoveFeed, onOpenDrawer }}
+      value={{
+        feeds,
+        feedDrawerOpen,
+        onFetchFeed,
+        onFetchFeeds,
+        onAddFeed,
+        onUpdateFeed,
+        onRemoveFeed,
+        onFeedDrawerChange,
+        saveSystemMessage,
+        deleteSystemMessage
+      }}
     >
       {React.useMemo(() => children, [children])}
       {React.useMemo(
         () => (
-          <Drawer
-            anchor="right"
-            classes={{ paper: classes.drawerPaper }}
-            open={isDrawerOpen}
-            onClose={() => {
-              setIsDrawerOpen(false);
-              // setTimeout(() => setIsDrawerOpen(true), 2000);
-            }}
-          >
-            <div id="drawerTop" style={{ padding: theme.spacing(1) }}>
-              <IconButton
-                onClick={() => {
-                  setIsDrawerOpen(false);
-                }}
-              >
-                <CloseOutlinedIcon />
-              </IconButton>
-            </div>
-            <div style={{ paddingLeft: theme.spacing(2), paddingRight: theme.spacing(2) }}>
-              <div className={classes.section_content}>
-                {feeds
-                  .map(f => f.items)
-                  .flat()
-                  .sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf())
-                  .map((feedItem, i) => (
-                    <FeedItemView key={'item-' + i} item={feedItem} />
-                  ))}
-              </div>
-            </div>
-          </Drawer>
+          <LayoutFeedDrawer />
         ),
-        [classes.drawerPaper, classes.section_content, feeds, isDrawerOpen, theme]
+        []
       )}
     </NewsFeedContext.Provider>
   );
