@@ -20,6 +20,9 @@ const useHexStyles = makeStyles(theme => ({
   },
   mobile: {
     height: `calc(100vh - ${LAYOUT_SIZE.mobileWindowHeight}px)`
+  },
+  hidden: {
+    visibility: 'hidden'
   }
 }));
 
@@ -36,7 +39,14 @@ export const WrappedHexPageLayout = ({ store }: StoreProps) => {
   });
 
   return (
-    <div ref={ref} className={clsx(classes.root, window.innerHeight.valueOf() < 1000 && classes.mobile)}>
+    <div
+      ref={ref}
+      className={clsx(
+        classes.root,
+        window.innerHeight.valueOf() < 1000 && classes.mobile,
+        !store.loading.initialized && classes.hidden
+      )}
+    >
       <HexHeader store={store} />
       <HexBody store={store} />
       <HexSettings store={store} />

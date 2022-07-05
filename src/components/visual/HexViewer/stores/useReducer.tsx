@@ -13,6 +13,7 @@ import {
   useHistoryReducer,
   useHoverReducer,
   useLayoutReducer,
+  useLoadingReducer,
   useLocationReducer,
   useModeReducer,
   useScrollReducer,
@@ -45,6 +46,7 @@ export const ReducerProvider = ({ children }: StoreProviderProps) => {
   const hover = useHoverReducer();
   const layout = useLayoutReducer();
   const location = useLocationReducer();
+  const loading = useLoadingReducer();
   const mode = useModeReducer();
   const scroll = useScrollReducer();
   const search = useSearchReducer();
@@ -60,6 +62,7 @@ export const ReducerProvider = ({ children }: StoreProviderProps) => {
     ...hover.initialState,
     ...layout.initialState,
     ...location.initialState,
+    ...loading.initialState,
     ...mode.initialState,
     ...scroll.initialState,
     ...search.initialState,
@@ -71,6 +74,7 @@ export const ReducerProvider = ({ children }: StoreProviderProps) => {
     (store: Store, action: Action) => {
       const prevStore = { ...store };
 
+      store = loading.reducer({ store, action });
       store = mode.reducer({ store, action });
       store = hex.reducer({ store, action });
       store = setting.reducer({ store, action });
@@ -91,12 +95,12 @@ export const ReducerProvider = ({ children }: StoreProviderProps) => {
 
       return store;
     },
-    [cell, copy, cursor, hex, history, hover, layout, location, mode, scroll, search, select, setting]
+    [cell, copy, cursor, hex, history, hover, layout, loading, location, mode, scroll, search, select, setting]
   );
 
   const render = React.useCallback(
     (prevStore: Store, nextStore: Store) => {
-      if (!nextStore.initialized) return;
+      if (!nextStore.loading.initialized) return;
 
       hover.render({ prevStore, nextStore });
       cursor.render({ prevStore, nextStore });

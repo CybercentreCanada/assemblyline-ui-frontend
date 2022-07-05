@@ -10,6 +10,7 @@ import {
   HistoryState,
   HoverState,
   LayoutState,
+  LoadingState,
   LocationState,
   ModeState,
   ScrollState,
@@ -29,6 +30,7 @@ export type Store = CellState &
   HoverState &
   LayoutState &
   LocationState &
+  LoadingState &
   ModeState &
   ScrollState &
   SearchState &
