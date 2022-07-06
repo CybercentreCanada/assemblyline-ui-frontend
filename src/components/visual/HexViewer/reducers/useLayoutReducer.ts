@@ -32,7 +32,7 @@ export const useLayoutReducer: UseReducer<LayoutState> = () => {
       layout: {
         display: 'dual',
         column: {
-          size: 10000,
+          size: 1,
           auto: true
         },
         row: {
@@ -76,6 +76,7 @@ export const useLayoutReducer: UseReducer<LayoutState> = () => {
   }, []);
 
   const layoutCellRendered: Reducers['bodyItemsRendered'] = useCallback((store, { event }) => {
+    if (event === null) return { ...store };
     const { visibleStartIndex, visibleStopIndex } = event;
     return {
       ...store,

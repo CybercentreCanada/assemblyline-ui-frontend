@@ -1,13 +1,13 @@
 import { makeStyles } from '@material-ui/core';
+import clsx from 'clsx';
 import { default as React, KeyboardEvent, memo, PropsWithChildren, useMemo } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { FixedSizeList as List, ListOnItemsRenderedProps } from 'react-window';
+import { FixedSizeList, FixedSizeList as List, ListOnItemsRenderedProps } from 'react-window';
 import {
-  ACTIONS,
   HexRow,
   HexScrollBar,
   LAYOUT_SIZE,
-  scrollToWindowIndex,
+  scrollToWindowIndexAsync,
   StoreProps,
   useDispatch,
   useEventListener,
@@ -66,30 +66,33 @@ const HexTableBody = memo(({ store }: StoreProps) => {
     onBodyMouseUp,
     onScrollTouchStart,
     onScrollTouchMove,
+    onBodyRefInit,
+    onBodyScrollInit,
     onScrollTouchEnd
   } = useDispatch();
-  const { dispatch } = useStore();
-
   const bodyRef = React.useRef<HTMLDivElement>(null);
-
-  React.useLayoutEffect(() => {
-    onBodyInit({ initialized: true });
-    return () => {
-      onBodyInit({ initialized: false });
-    };
-  }, [onBodyInit]);
-
-  React.useEffect(() => {
-    if (store.initialized) {
-      dispatch({ type: ACTIONS.bodyResize, payload: bodyRef.current.getBoundingClientRect() });
-    }
-    /* eslint-disable react-hooks/exhaustive-deps */
-  }, [dispatch, store.initialized]);
 
   useEventListener('resize', () => onBodyResize(bodyRef?.current?.getBoundingClientRect()));
   useEventListener('keydown', (event: KeyboardEvent) => onCursorKeyDown({ event }, { store }));
   useEventListener('keydown', (event: KeyboardEvent) => onCopyKeyDown(undefined, { event, store }));
   useEventListener('mouseup', (event: MouseEvent) => onBodyMouseUp(undefined, { store, event }));
+
+  React.useLayoutEffect(() => {
+    if (bodyRef.current !== null && store.loading.refsReady === false) onBodyRefInit({ ready: true });
+    else if (bodyRef.current === null && store.loading.refsReady === true) onBodyRefInit({ ready: false });
+  }, [store, onBodyInit, onBodyRefInit]);
+
+  React.useEffect(() => {
+    if (store.loading.refsReady) onBodyResize(bodyRef.current.getBoundingClientRect());
+  }, [onBodyResize, store.loading.refsReady]);
+
+  React.useEffect(() => {
+    if (store.loading.hasResized && !store.loading.hasScrolled) onBodyScrollInit();
+  }, [onBodyScrollInit, store.loading.hasResized, store.loading.hasScrolled]);
+
+  React.useEffect(() => {
+    if (store.loading.hasScrolled) onBodyInit({ initialized: true });
+  }, [onBodyInit, store.loading.hasScrolled]);
 
   const rowIndexes: number[] = useMemo(
     () => Array.from(Array(store.layout.row.size).keys()).map(i => i + store.scroll.rowIndex),
@@ -106,7 +109,7 @@ const HexTableBody = memo(({ store }: StoreProps) => {
       onTouchMove={(event: React.TouchEvent<HTMLDivElement>) => onScrollTouchMove({ event })}
       onTouchEnd={() => onScrollTouchEnd()}
     >
-      {store.initialized ? (
+      {store.loading.initialized ? (
         <>
           <div className={classes.spacer} />
           <table className={classes.table}>
@@ -128,39 +131,59 @@ const HexTableBody = memo(({ store }: StoreProps) => {
 
 const HexWindowBody = memo(({ store }: StoreProps) => {
   const classes = useHexStyles();
-  const { onBodyInit, onBodyResize, onBodyItemsRendered, onCursorKeyDown, onCopyKeyDown, onBodyMouseUp } =
-    useDispatch();
+  const {
+    onBodyInit,
+    onBodyRefInit,
+    onBodyResize,
+    onBodyItemsRendered,
+    onBodyScrollInit,
+    onCursorKeyDown,
+    onCopyKeyDown,
+    onBodyMouseUp
+  } = useDispatch();
   const { dispatch } = useStore();
 
-  const listRef = React.useRef<any>(null);
+  const listRef = React.useRef<FixedSizeList<any>>(null);
   const bodyRef = React.useRef<HTMLDivElement>(null);
-
-  React.useLayoutEffect(() => {
-    onBodyInit({ initialized: true });
-    return () => {
-      onBodyInit({ initialized: false });
-    };
-  }, [onBodyInit]);
-
-  React.useEffect(() => {
-    if (store.initialized) {
-      dispatch({ type: ACTIONS.bodyResize, payload: bodyRef.current.getBoundingClientRect() });
-      listRef?.current?.scrollToItem(store.scroll.rowIndex, 'top');
-    }
-  }, [dispatch, store.initialized]);
 
   useEventListener('keydown', (event: KeyboardEvent) => onCursorKeyDown({ event }, { store }));
   useEventListener('keydown', (event: KeyboardEvent) => onCopyKeyDown(undefined, { event, store }));
   useEventListener('mouseup', (event: MouseEvent) => onBodyMouseUp(undefined, { store, event }));
 
+  React.useLayoutEffect(() => {
+    if (listRef.current !== null && bodyRef.current !== null && store.loading.refsReady === false)
+      onBodyRefInit({ ready: true });
+    else if ((listRef.current === null || bodyRef.current === null) && store.loading.refsReady === true)
+      onBodyRefInit({ ready: false });
+  }, [store, onBodyInit, onBodyRefInit]);
+
   React.useEffect(() => {
-    if (store.initialized) scrollToWindowIndex(store, listRef, store.scroll.index, store.scroll.type);
-  }, [dispatch, store.initialized, store.scroll.index, store.scroll.rowIndex, store.scroll.type]);
+    if (store.loading.refsReady) onBodyResize(bodyRef.current.getBoundingClientRect());
+  }, [onBodyResize, store.loading.refsReady]);
+
+  React.useEffect(() => {
+    if (store.loading.hasResized)
+      scrollToWindowIndexAsync(store, listRef, store.scroll.index, store.scroll.type).then(
+        () => !store.loading.hasScrolled && onBodyScrollInit()
+      );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    dispatch,
+    onBodyScrollInit,
+    store.loading.hasResized,
+    store.scroll.index,
+    store.scroll.rowIndex,
+    store.scroll.type
+  ]);
+
+  // React.useEffect(() => {
+  //   if (store.loading.hasScrolled) onBodyItemsRendered({ event: null });
+  // }, [onBodyItemsRendered, store.loading.hasScrolled]);
 
   const Row = React.useMemo(
     () =>
       ({ index, style, data }) =>
-        store.initialized ? <WindowRow key={index} rowIndex={index} style={style} Tag={data.Tag} /> : <></>,
+        store.loading.initialized ? <WindowRow key={index} rowIndex={index} style={style} Tag={data.Tag} /> : <></>,
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [store.layout.column.size, store.layout.row.size]
   );
@@ -171,7 +194,7 @@ const HexWindowBody = memo(({ store }: StoreProps) => {
         <List
           ref={listRef}
           innerRef={bodyRef}
-          className={classes.root}
+          className={clsx(classes.root)}
           height={height - 50}
           width={width}
           itemSize={LAYOUT_SIZE.rowHeight}
@@ -198,7 +221,7 @@ const HexBodySelector = memo(({ store }: StoreProps) => {
 export const HexBody = memo(
   ({ store }: StoreProps) => <HexBodySelector store={store} />,
   (prevProps: Readonly<PropsWithChildren<StoreProps>>, nextProps: Readonly<PropsWithChildren<StoreProps>>) =>
-    prevProps.store.initialized === nextProps.store.initialized &&
+    Object.is(prevProps.store.loading, nextProps.store.loading) &&
     prevProps.store.hex.null.char === nextProps.store.hex.null.char &&
     prevProps.store.hex.nonPrintable.encoding === nextProps.store.hex.nonPrintable.encoding &&
     prevProps.store.hex.nonPrintable.char === nextProps.store.hex.nonPrintable.char &&

@@ -106,6 +106,34 @@ export const scrollToWindowIndex = (
   }, 1);
 };
 
+export const scrollToWindowIndexAsync = (
+  store: Store,
+  listRef: React.MutableRefObject<any>,
+  index: number,
+  location: ScrollType
+): Promise<void> =>
+  new Promise(async (resolve, reject) => {
+    if (listRef.current === null) {
+      reject();
+      return;
+    }
+
+    const scrollIndex = Math.floor(index / store.layout.column.size);
+    if (isScroll.top(location)) await listRef.current.scrollToItem(scrollIndex, 'start');
+    else if (isScroll.middle(location)) await listRef.current.scrollToItem(scrollIndex, 'center');
+    else if (isScroll.bottom(location)) await listRef.current.scrollToItem(scrollIndex, 'end');
+    else if (isScroll.include(location)) await listRef.current.scrollToItem(scrollIndex, 'auto');
+    else if (
+      isScroll.includeMiddle(location) &&
+      (index < store.cellsRendered.visibleStartIndex || store.cellsRendered.visibleStopIndex < index)
+    )
+      await listRef.current.scrollToItem(scrollIndex, 'center');
+    else if (isScroll.smart(location)) await listRef.current.scrollToItem(scrollIndex, 'smart');
+
+    resolve();
+    return;
+  });
+
 export const getTableCellsRendered = ({
   scroll: { rowIndex: scrollIndex, maxRowIndex: scrollMaxIndex, overscanCount },
   layout: {

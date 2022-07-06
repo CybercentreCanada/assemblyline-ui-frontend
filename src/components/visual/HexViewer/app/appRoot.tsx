@@ -1,8 +1,8 @@
-import { CircularProgress, useMediaQuery, useTheme } from '@material-ui/core';
+import { useMediaQuery, useTheme } from '@material-ui/core';
 import useAppContext from 'commons/components/hooks/useAppContext';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { ACTIONS, DataProps, HexLayout, LanguageType, ThemeType, useStore, WidthType } from '..';
+import { ACTIONS, DataProps, HexLayout, HexLoading, LanguageType, ThemeType, useStore, WidthType } from '..';
 
 const WrappedAppRoot = ({ data = '' }: DataProps) => {
   const { store, dispatch } = useStore();
@@ -47,12 +47,11 @@ const WrappedAppRoot = ({ data = '' }: DataProps) => {
     if (!store.location.loaded) dispatch({ type: ACTIONS.appLocationInit, payload: null });
   }, [dispatch, store.location.loaded]);
 
-  return store.hex.codes.size !== 0 && store.location.loaded ? (
-    <HexLayout store={store} />
-  ) : (
-    <div style={{ textAlign: 'center' }}>
-      <CircularProgress />
-    </div>
+  return (
+    <>
+      <HexLoading store={store} />
+      {store.hex.codes.size !== 0 && store.location.loaded && <HexLayout store={store} />}
+    </>
   );
 };
 

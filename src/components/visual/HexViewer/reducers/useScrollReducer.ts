@@ -165,6 +165,7 @@ export const useScrollReducer: UseReducer<ScrollState> = () => {
   );
 
   const scrollCellRendered: Reducers['bodyItemsRendered'] = useCallback((store, { event }) => {
+    if (event === null) return { ...store };
     const cellsRendered = getWindowCellsRendered({ ...event }, store.layout.column.size);
     return {
       ...store,

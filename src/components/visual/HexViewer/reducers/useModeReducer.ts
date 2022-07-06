@@ -13,7 +13,6 @@ import {
 } from '..';
 
 export type ModeState = {
-  initialized: boolean;
   mode: {
     themeType: ThemeType;
     languageType: LanguageType;
@@ -27,7 +26,6 @@ export type ModeState = {
 export const useModeReducer: UseReducer<ModeState> = () => {
   const initialState = useMemo<ModeState>(
     () => ({
-      initialized: false,
       mode: {
         themeType: 'light',
         languageType: 'en',
@@ -39,10 +37,6 @@ export const useModeReducer: UseReducer<ModeState> = () => {
     }),
     []
   );
-
-  const bodyInitialized: Reducers['bodyInit'] = useCallback((store, { initialized }) => {
-    return { ...store, initialized };
-  }, []);
 
   const themeTypeChange: Reducers['appThemeTypeChange'] = useCallback(
     (store, { themeType }) => ({ ...store, mode: { ...store.mode, themeType } }),
@@ -80,8 +74,7 @@ export const useModeReducer: UseReducer<ModeState> = () => {
 
   const reducer: ReducerHandler = useCallback(
     ({ store, action: { type, payload } }) => {
-      if (isAction.bodyInit(type)) return bodyInitialized(store, payload);
-      else if (isAction.appThemeTypeChange(type)) return themeTypeChange(store, payload);
+      if (isAction.appThemeTypeChange(type)) return themeTypeChange(store, payload);
       else if (isAction.appLanguageTypeChange(type)) return languageTypeChange(store, payload);
       else if (isAction.appWidthTypeChange(type)) return widthTypeChange(store, payload);
       else if (isAction.appLayoutTypeChange(type)) return layoutTypeChange(store, payload);
@@ -91,7 +84,6 @@ export const useModeReducer: UseReducer<ModeState> = () => {
       else return { ...store };
     },
     [
-      bodyInitialized,
       bodyTypeChange,
       languageTypeChange,
       layoutTypeChange,

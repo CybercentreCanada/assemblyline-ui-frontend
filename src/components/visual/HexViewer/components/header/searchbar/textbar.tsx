@@ -103,7 +103,7 @@ export const WrappedTextBar = ({ store }: StoreProps) => {
         placeholder={t('header.searchfield.text')}
         fullWidth
         autoFocus
-        delay={1000}
+        delay={250}
         value={inputValue}
         margin="dense"
         preventSubmit={true}
