@@ -176,10 +176,6 @@ const HexWindowBody = memo(({ store }: StoreProps) => {
     store.scroll.type
   ]);
 
-  // React.useEffect(() => {
-  //   if (store.loading.hasScrolled) onBodyItemsRendered({ event: null });
-  // }, [onBodyItemsRendered, store.loading.hasScrolled]);
-
   const Row = React.useMemo(
     () =>
       ({ index, style, data }) =>

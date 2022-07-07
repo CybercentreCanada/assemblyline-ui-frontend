@@ -1,4 +1,5 @@
 import { CircularProgress, makeStyles, Typography } from '@material-ui/core';
+import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import clsx from 'clsx';
 import { default as React } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -33,12 +34,23 @@ export const WrappedHexLoading = ({ store }: StoreProps) => {
 
   return (
     !store.loading.initialized && (
-      <div className={clsx(classes.root, window.innerHeight.valueOf() < 1000 && classes.mobile)}>
+      <div className={clsx(classes.root)}>
         <div className={clsx(classes.container)}>
-          <Typography className={clsx(classes.text)} variant="subtitle1" color="secondary">
-            {t(store.loading.message)}
-          </Typography>
-          <CircularProgress />
+          {store.loading.isInvalidData ? (
+            <>
+              <Typography className={clsx(classes.text)} variant="subtitle1" color="error">
+                {t('loading.isInvalidData')}
+              </Typography>
+              <ErrorOutlineIcon color="error" fontSize="large" />
+            </>
+          ) : (
+            <>
+              <Typography className={clsx(classes.text)} variant="subtitle1" color="secondary">
+                {t(store.loading.message)}
+              </Typography>
+              <CircularProgress />
+            </>
+          )}
         </div>
       </div>
     )

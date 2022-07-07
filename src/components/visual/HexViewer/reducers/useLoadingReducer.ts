@@ -3,6 +3,7 @@ import { isAction, ReducerHandler, Reducers, UseReducer } from '..';
 
 export type LoadingState = {
   loading: {
+    isInvalidData: boolean;
     refsReady: boolean;
     hasResized: boolean;
     hasScrolled: boolean;
@@ -16,6 +17,7 @@ export const useLoadingReducer: UseReducer<LoadingState> = () => {
   const initialState = useMemo<LoadingState>(
     () => ({
       loading: {
+        isInvalidData: false,
         refsReady: false,
         hasResized: false,
         hasScrolled: false,
@@ -33,6 +35,7 @@ export const useLoadingReducer: UseReducer<LoadingState> = () => {
         ...store,
         loading: {
           ...store.loading,
+          isInvalidData: false,
           refsReady: true,
           hasResized: true,
           hasScrolled: true,
@@ -46,6 +49,7 @@ export const useLoadingReducer: UseReducer<LoadingState> = () => {
         ...store,
         loading: {
           ...store.loading,
+          isInvalidData: false,
           refsReady: false,
           hasResized: false,
           hasScrolled: false,

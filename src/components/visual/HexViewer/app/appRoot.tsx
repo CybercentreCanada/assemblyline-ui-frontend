@@ -1,10 +1,34 @@
-import { useMediaQuery, useTheme } from '@material-ui/core';
+import { makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
+import clsx from 'clsx';
 import useAppContext from 'commons/components/hooks/useAppContext';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { ACTIONS, DataProps, HexLayout, HexLoading, LanguageType, ThemeType, useStore, WidthType } from '..';
+import {
+  ACTIONS,
+  DataProps,
+  HexLayout,
+  HexLoading,
+  LanguageType,
+  LAYOUT_SIZE,
+  ThemeType,
+  useStore,
+  WidthType
+} from '..';
+
+const useHexStyles = makeStyles(theme => ({
+  root: {
+    height: `calc(100vh - ${LAYOUT_SIZE.windowHeight}px)`,
+    width: '100%',
+    display: 'grid',
+    alignContent: 'center'
+  },
+  mobile: {
+    height: `calc(100vh - ${LAYOUT_SIZE.mobileWindowHeight}px)`
+  }
+}));
 
 const WrappedAppRoot = ({ data = '' }: DataProps) => {
+  const classes = useHexStyles();
   const { store, dispatch } = useStore();
 
   // Data
@@ -48,10 +72,10 @@ const WrappedAppRoot = ({ data = '' }: DataProps) => {
   }, [dispatch, store.location.loaded]);
 
   return (
-    <>
+    <div className={clsx(classes.root, window.innerHeight.valueOf() < 1000 && classes.mobile)}>
       <HexLoading store={store} />
       {store.hex.codes.size !== 0 && store.location.loaded && <HexLayout store={store} />}
-    </>
+    </div>
   );
 };
 
