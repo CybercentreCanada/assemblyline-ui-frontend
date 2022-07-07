@@ -52,9 +52,9 @@ export const useHexReducer: UseReducer<HexState> = () => {
   );
 
   const hexDataChange: Reducers['appLoad'] = useCallback((store, { data }) => {
-    store.hex.data = data;
-    store.hex.codes = parseDataToHexcodeMap(data);
-    return { ...store };
+    if (data === undefined || data === null || data === '') return { ...store };
+    const codes = parseDataToHexcodeMap(data);
+    return { ...store, hex: { ...store.hex, data, codes } };
   }, []);
 
   const reducer: ReducerHandler = useCallback(
