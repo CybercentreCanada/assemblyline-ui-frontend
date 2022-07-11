@@ -18,24 +18,21 @@ const WrappedAlertListChip: React.FC<AlertListChipProps> = ({
   variant = 'outlined'
 }) => {
   const theme = useTheme();
-  return (
-    items &&
-    items.length > 0 && (
-      <CustomChip
-        wrap
-        size={size}
-        variant={variant}
-        color={color}
-        label={`${items.length}x ${title}`}
-        tooltip={items.length > 5 ? items.slice(0, 5).join(' | ') + ' ...' : items.join(' | ')}
-        style={{
-          marginBottom: theme.spacing(0.5),
-          marginRight: theme.spacing(1),
-          cursor: 'inherit'
-        }}
-      />
-    )
-  );
+  return items && items.length > 0 ? (
+    <CustomChip
+      wrap
+      size={size}
+      variant={variant}
+      color={color}
+      label={`${items.length}x ${title}`}
+      tooltip={items.length > 5 ? items.slice(0, 5).join(' | ') + ' ...' : items.join(' | ')}
+      style={{
+        marginBottom: theme.spacing(0.5),
+        marginRight: theme.spacing(1),
+        cursor: 'inherit'
+      }}
+    />
+  ) : null;
 };
 
 const AlertListChip = React.memo(WrappedAlertListChip);
