@@ -1,4 +1,4 @@
-import { Feed, FeedChannel, FeedItem, FeedMetadata } from '../';
+import { Feed, FeedChannel, FeedItem, FeedMetadata } from '..';
 
 const clean = (text: string): string =>
   text.replace('<![CDATA[', '').replace(']]>', '').replace('<p>', '').replace('</p>', '');
@@ -73,36 +73,3 @@ export const formatByte = (bytes: number, decimals: number = 2): string => {
 
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 };
-
-
-// const handleFetch = useCallback(() => {
-//   fetch(feedURL)
-//     .then((response: Response) => {
-//       if (response.status === 404) throw new Error(t('error.not-found'));
-//       else if (response.status === 502) throw new Error(t('error.unreachable'));
-//       else if (response.status === 400) throw new Error(t('error.invalid'));
-//       else return Promise.all([response, response.clone().blob()]);
-//     })
-//     .then(([response, blob]: [Response, Blob]) => {
-//       if (!['text/xml', 'application/rss', 'application/xml', 'application/atom'].includes(blob.type))
-//         throw new Error(t('error.format'));
-//       else if (blob.size > 20000) throw new Error(t('error.size'));
-//       else return Promise.all([response, blob, blob.text()]);
-//     })
-//     .then(([response, blob, str]: [Response, Blob, string]) => {
-//       const data = new window.DOMParser().parseFromString(str, 'text/xml');
-//       return [response, blob, data];
-//     })
-//     .then(([response, blob, data]: [Response, Blob, Document]) => {
-//       const newFeed: Feed = parseFeed(data, response.url);
-//       setFeed({ ...newFeed, metadata: { url: response.url, size: blob.size } });
-//       setSearching(false);
-//       setError({ value: false, message: `` });
-//     })
-//     .catch(err => {
-//       console.log(err);
-//       setFeed({ ...DEFAULT_FEED });
-//       setSearching(false);
-//       setError({ value: true, message: `${err}` });
-//     });
-// }, [feedURL, t]);
