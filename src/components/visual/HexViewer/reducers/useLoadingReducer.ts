@@ -3,6 +3,7 @@ import { isAction, ReducerHandler, Reducers, UseReducer } from '..';
 
 export type LoadingState = {
   loading: {
+    progress: number;
     isInvalidData: boolean;
     refsReady: boolean;
     hasResized: boolean;
@@ -17,13 +18,14 @@ export const useLoadingReducer: UseReducer<LoadingState> = () => {
   const initialState = useMemo<LoadingState>(
     () => ({
       loading: {
+        progress: 0,
         isInvalidData: false,
         refsReady: false,
         hasResized: false,
         hasScrolled: false,
         initialized: false,
         error: false,
-        message: ''
+        message: 'loading.initialization'
       }
     }),
     []
@@ -35,6 +37,7 @@ export const useLoadingReducer: UseReducer<LoadingState> = () => {
         ...store,
         loading: {
           ...store.loading,
+          progress: 100,
           isInvalidData: false,
           refsReady: true,
           hasResized: true,
@@ -55,37 +58,70 @@ export const useLoadingReducer: UseReducer<LoadingState> = () => {
           hasScrolled: false,
           initialized: false,
           error: false,
-          message: 'loading.bodyInit'
+          message: 'loading.bodyInit',
+          progress: (100 * 2) / 7
         }
       };
   }, []);
 
   const appLoad: Reducers['appLoad'] = useCallback((store, { data }) => {
-    return { ...store, loading: { ...store.loading, message: 'loading.appLoad' } };
+    return {
+      ...store,
+      loading: { ...store.loading, message: 'loading.appLoad', progress: (100 * 1) / 7 }
+    };
   }, []);
 
   const appLocationInit: Reducers['appLocationInit'] = useCallback((store, payload) => {
-    return { ...store, loading: { ...store.loading, message: 'loading.appLocationInit' } };
+    return {
+      ...store,
+      loading: { ...store.loading, message: 'loading.appLocationInit', progress: (100 * 2) / 7 }
+    };
   }, []);
 
   const bodyRefInit: Reducers['bodyRefInit'] = useCallback((store, { ready }) => {
-    return { ...store, loading: { ...store.loading, refsReady: ready, message: 'loading.bodyRefInit' } };
+    return {
+      ...store,
+      loading: {
+        ...store.loading,
+        refsReady: ready,
+        message: 'loading.bodyRefInit',
+        progress: (100 * 4) / 7
+      }
+    };
   }, []);
 
   const bodyResize: Reducers['bodyResize'] = useCallback((store, payload) => {
-    return { ...store, loading: { ...store.loading, hasResized: true, message: 'loading.bodyResize' } };
+    return {
+      ...store,
+      loading: {
+        ...store.loading,
+        hasResized: true,
+        message: 'loading.bodyResize',
+        progress: (100 * 5) / 7
+      }
+    };
   }, []);
 
   const bodyScrollInit: Reducers['bodyScrollInit'] = useCallback((store, payload) => {
     return {
       ...store,
-      loading: { ...store.loading, initialized: true, hasScrolled: true, message: 'loading.bodyScrollInit' }
+      loading: {
+        ...store.loading,
+        initialized: true,
+        hasScrolled: true,
+        message: 'loading.bodyScrollInit',
+        progress: (100 * 6) / 7
+      }
     };
   }, []);
 
   const bodyItemsRendered: Reducers['bodyItemsRendered'] = useCallback((store, payload) => {
-    if (!store.loading.hasScrolled) return { ...store, message: 'loading.bodyItemsRendered' };
-    else return { ...store, loading: { ...store.loading, message: 'loading.initialized' } };
+    if (!store.loading.hasScrolled) return { ...store, message: 'loading.bodyItemsRendered', progress: (100 * 3) / 7 };
+    else
+      return {
+        ...store,
+        loading: { ...store.loading, message: 'loading.initialized', progress: 100 }
+      };
   }, []);
 
   const reducer: ReducerHandler = useCallback(
