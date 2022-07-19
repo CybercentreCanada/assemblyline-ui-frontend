@@ -26,6 +26,7 @@
   "loading.bodyRefInit": "Initializing the references",
   "loading.bodyResize": "Resizing the Hex Viewer's body",
   "loading.bodyScrollInit": "Scrolling to the initial index",
+  "loading.initialization": "Hex Viewer is initializing",
   "loading.initialized": "Hex Viewer is initialized",
   "loading.isInvalidData": "The file is invalid",
   "lower.char.description": "Character that replaces all lower ASCII values (0x20 - 0x7F)",

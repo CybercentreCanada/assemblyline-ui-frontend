@@ -1,4 +1,4 @@
-import { CircularProgress, makeStyles, Typography } from '@material-ui/core';
+import { LinearProgress, makeStyles, Typography } from '@material-ui/core';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import clsx from 'clsx';
 import { default as React } from 'react';
@@ -25,6 +25,10 @@ const useHexStyles = makeStyles(theme => ({
   },
   hidden: {
     visibility: 'hidden'
+  },
+  progressSpinner: {
+    width: '50%',
+    margin: 'auto'
   }
 }));
 
@@ -48,7 +52,11 @@ export const WrappedHexLoading = ({ store }: StoreProps) => {
               <Typography className={clsx(classes.text)} variant="subtitle1" color="secondary">
                 {t(store.loading.message)}
               </Typography>
-              <CircularProgress />
+              <LinearProgress
+                className={classes.progressSpinner}
+                variant="determinate"
+                value={store.loading.progress}
+              />
             </>
           )}
         </div>
