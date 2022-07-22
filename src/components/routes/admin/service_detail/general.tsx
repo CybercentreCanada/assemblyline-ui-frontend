@@ -312,7 +312,7 @@ const ServiceGeneral = ({ service, defaults, constants, versions, setService, se
             <Skeleton style={{ height: '2.5rem' }} />
           )}
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid item xs={12} sm={4}>
           <Typography variant="subtitle2" noWrap>
             {t('general.timeout')}
             <ResetButton
@@ -340,7 +340,7 @@ const ServiceGeneral = ({ service, defaults, constants, versions, setService, se
             <Skeleton style={{ height: '2.5rem' }} />
           )}
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid item xs={12} sm={4}>
           <Typography variant="subtitle2" noWrap>
             {t('general.licence')}
             <ResetButton
