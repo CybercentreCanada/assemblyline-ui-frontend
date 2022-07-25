@@ -364,7 +364,8 @@ function Submit() {
     <PageCenter maxWidth={md ? '800px' : downSM ? '100%' : '1024px'} margin={4} width="100%">
       <ConfirmationDialog
         open={validate}
-        handleClose={cleanupServiceSelection}
+        handleClose={event => setValidate(false)}
+        handleCancel={cleanupServiceSelection}
         handleAccept={executeCB}
         title={t('validate.title')}
         cancelText={t('validate.cancelText')}
