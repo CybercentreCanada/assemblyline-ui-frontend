@@ -14,14 +14,15 @@ export * from './offsetBase';
 export * from './OutlinedField';
 
 const useHexStyles = makeStyles(theme => ({
-  dialog: {}
+  dialog: {},
+  spacer: { flex: 1 }
 }));
 
 export const WrappedHexSettings = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);
   const classes = useHexStyles();
 
-  const { onSettingSave, onSettingClose } = useDispatch();
+  const { onSettingSave, onSettingClose, onSettingReset } = useDispatch();
 
   return (
     <div>
@@ -40,11 +41,15 @@ export const WrappedHexSettings = ({ store }: StoreProps) => {
           </Grid>
         </DialogContent>
         <DialogActions>
+          <Button onClick={() => onSettingReset()} color="primary" autoFocus>
+            {t('settings.reset')}
+          </Button>
+          <div className={classes.spacer} />
           <Button onClick={() => onSettingSave()} color="primary" autoFocus>
-            Save
+            {t('settings.save')}
           </Button>
           <Button onClick={() => onSettingClose()} color="primary">
-            Cancel
+            {t('settings.cancel')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -62,7 +67,7 @@ export const HexSettings = React.memo(
     prevProps.store.setting.bodyType === nextProps.store.setting.bodyType &&
     prevProps.store.setting.hex === nextProps.store.setting.hex &&
     prevProps.store.setting.offsetBase === nextProps.store.setting.offsetBase &&
-    prevProps.store.setting.column.auto === nextProps.store.setting.column.auto &&
-    prevProps.store.setting.column.size === nextProps.store.setting.column.size
+    prevProps.store.setting.layout.column.auto === nextProps.store.setting.layout.column.auto &&
+    prevProps.store.setting.layout.column.max === nextProps.store.setting.layout.column.max
 );
 export default HexSettings;

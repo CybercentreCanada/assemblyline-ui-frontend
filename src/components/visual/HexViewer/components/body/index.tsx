@@ -227,7 +227,9 @@ export const HexBody = memo(
     prevProps.store.offset.size === nextProps.store.offset.size &&
     prevProps.store.layout.row.size === nextProps.store.layout.row.size &&
     prevProps.store.layout.column.size === nextProps.store.layout.column.size &&
+    prevProps.store.layout.column.max === nextProps.store.layout.column.max &&
     prevProps.store.layout.row.auto === nextProps.store.layout.row.auto &&
+    prevProps.store.layout.row.max === nextProps.store.layout.row.max &&
     prevProps.store.layout.column.auto === nextProps.store.layout.column.auto &&
     prevProps.store.layout.isFocusing === nextProps.store.layout.isFocusing &&
     prevProps.store.mode.bodyType === nextProps.store.mode.bodyType &&

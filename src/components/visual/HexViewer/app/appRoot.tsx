@@ -15,20 +15,24 @@ import {
   WidthType
 } from '..';
 
-const useHexStyles = makeStyles(theme => ({
-  root: {
-    height: `calc(100vh - ${LAYOUT_SIZE.windowHeight}px)`,
-    width: '100%',
-    display: 'grid',
-    alignContent: 'center'
-  },
-  mobile: {
-    height: `calc(100vh - ${LAYOUT_SIZE.mobileWindowHeight}px)`
-  }
-}));
+const useHexStyles = ({ y = 0, height = 1000 }: { y: number; height: number }) =>
+  makeStyles(theme => ({
+    root: {
+      height: `calc(${height}px - ${y}px - 75px)`,
+      width: '100%',
+      display: 'grid',
+      alignContent: 'center'
+    },
+    mobile: {
+      height: `calc(${height}px - ${LAYOUT_SIZE.mobileWindowHeight}px)`
+    }
+  }));
 
 const WrappedAppRoot = ({ data = '' }: DataProps) => {
-  const classes = useHexStyles();
+  const classes = useHexStyles({
+    y: document.getElementById('hex-viewer')?.getBoundingClientRect()?.y,
+    height: window.innerHeight
+  })();
   const { store, dispatch } = useStore();
 
   // Data
@@ -65,6 +69,7 @@ const WrappedAppRoot = ({ data = '' }: DataProps) => {
   // History
 
   // Setting
+  React.useEffect(() => dispatch({ type: ACTIONS.settingLoad, payload: null }), [dispatch]);
 
   // Location
   React.useEffect(() => {

@@ -2,6 +2,7 @@ import React from 'react';
 import { HexFullscreenLayout, HexPageLayout, StoreProps } from '../..';
 
 export * from './fullscreen';
+export * from './loading';
 export * from './page';
 
 export const WrappedHexLayout = ({ store }: StoreProps) => {

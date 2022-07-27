@@ -13,14 +13,16 @@ import {
 
 export type LayoutState = {
   layout: {
-    display: DisplayType;
+    display: { type: DisplayType; width: number; height: number };
     column: {
       size: number;
       auto: boolean;
+      max: number;
     };
     row: {
       size: number;
       auto: boolean;
+      max: number;
     };
     isFocusing: FocusType;
   };
@@ -30,14 +32,16 @@ export const useLayoutReducer: UseReducer<LayoutState> = () => {
   const initialState = useMemo<LayoutState>(
     () => ({
       layout: {
-        display: 'dual',
+        display: { type: 'dual', width: 0, height: 0 },
         column: {
           size: 1,
-          auto: true
+          auto: true,
+          max: 24
         },
         row: {
           size: 0,
-          auto: true
+          auto: true,
+          max: 2000
         },
         isFocusing: 'none'
       }
@@ -47,16 +51,20 @@ export const useLayoutReducer: UseReducer<LayoutState> = () => {
 
   const layoutResize: Reducers['bodyResize'] = useCallback((store, { height, width }) => {
     const {
-      column: { auto: columnAuto, size: columnSize },
-      row: { auto: rowAuto, size: rowSize }
+      column: { auto: columnAuto, max: maxColumns },
+      row: { auto: rowAuto, max: maxRows }
     } = store.layout;
-    const newColumnSize = columnAuto ? handleLayoutColumnResize2(store, width as number) : columnSize;
-    const newRowSize = rowAuto && isBody.table(store) ? handleLayoutRowResize(height as number) : rowSize;
+
+    let newColumnSize = handleLayoutColumnResize2(store, width as number);
+    let newRowSize = handleLayoutRowResize(height as number);
+    newColumnSize = columnAuto ? newColumnSize : Math.min(newColumnSize, maxColumns);
+    newRowSize = rowAuto && isBody.table(store) ? newRowSize : Math.min(newRowSize, maxRows);
 
     return {
       ...store,
       layout: {
         ...store.layout,
+        display: { ...store.layout.display, width: width as number, height: height as number },
         column: { ...store.layout.column, size: newColumnSize },
         row: { ...store.layout.row, size: newRowSize }
       }
@@ -87,6 +95,24 @@ export const useLayoutReducer: UseReducer<LayoutState> = () => {
     };
   }, []);
 
+  const settingLoad: Reducers['settingLoad'] = useCallback(store => {
+    const {
+      column: { auto: columnAuto, max: maxColumns }
+    } = store.setting.layout;
+
+    const { width = 1 } = document.getElementById('hex-viewer')?.getBoundingClientRect();
+    let newColumnSize = handleLayoutColumnResize2(store, width as number);
+    newColumnSize = columnAuto ? newColumnSize : Math.min(newColumnSize, maxColumns);
+    
+    return {
+      ...store,
+      layout: {
+        ...store.layout,
+        column: { ...store.layout.column, auto: columnAuto, size: newColumnSize, max: maxColumns }
+      }
+    };
+  }, []);
+
   const reducer: ReducerHandler = useCallback(
     ({ store, action: { type, payload } }) => {
       if (isAction.bodyResize(type)) return layoutResize(store, payload);
@@ -94,9 +120,10 @@ export const useLayoutReducer: UseReducer<LayoutState> = () => {
       else if (isAction.cellMouseDown(type)) return layoutFocusBody(store, payload);
       else if (isAction.searchBarFocus(type)) return layoutFocusToolbar(store, payload);
       else if (isAction.bodyItemsRendered(type)) return layoutCellRendered(store, payload);
+      else if (isAction.settingLoad(type)) return settingLoad(store, payload);
       else return { ...store };
     },
-    [layoutCellRendered, layoutFocusBody, layoutFocusNone, layoutFocusToolbar, layoutResize]
+    [layoutCellRendered, layoutFocusBody, layoutFocusNone, layoutFocusToolbar, layoutResize, settingLoad]
   );
 
   return { initialState, reducer };
