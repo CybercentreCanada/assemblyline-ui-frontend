@@ -2,6 +2,7 @@ import i18n from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import error403EN from 'locales/en/403.json';
 import error404EN from 'locales/en/404.json';
+import adminActionsEN from 'locales/en/admin/actions.json';
 import adminErrorViewerEN from 'locales/en/admin/error_viewer.json';
 import adminIdentifyEN from 'locales/en/admin/identify.json';
 import adminServicesEN from 'locales/en/admin/services.json';
@@ -48,6 +49,7 @@ import translationEN from 'locales/en/translation.json';
 import userEN from 'locales/en/user.json';
 import error403FR from 'locales/fr/403.json';
 import error404FR from 'locales/fr/404.json';
+import adminActionsFR from 'locales/fr/admin/actions.json';
 import adminErrorViewerFR from 'locales/fr/admin/error_viewer.json';
 import adminIdentifyFR from 'locales/fr/admin/identify.json';
 import adminServicesFR from 'locales/fr/admin/services.json';
@@ -96,6 +98,7 @@ import { initReactI18next } from 'react-i18next';
 
 const resources = {
   en: {
+    adminActions: adminActionsEN,
     adminErrorViewer: adminErrorViewerEN,
     adminIdentify: adminIdentifyEN,
     adminServices: adminServicesEN,
@@ -144,6 +147,7 @@ const resources = {
     favorites: favoritesEN
   },
   fr: {
+    adminActions: adminActionsFR,
     adminErrorViewer: adminErrorViewerFR,
     adminIdentify: adminIdentifyFR,
     adminServices: adminServicesFR,
