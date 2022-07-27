@@ -1,5 +1,14 @@
 import { useCallback, useMemo } from 'react';
-import { EncodingType, isAction, parseDataToHexcodeMap, ReducerHandler, Reducers, UseReducer } from '..';
+import {
+  EncodingType,
+  HIGHER_ENCODING_SETTING_VALUES,
+  isAction,
+  NON_PRINTABLE_ENCODING_SETTING_VALUES,
+  parseDataToHexcodeMap,
+  ReducerHandler,
+  Reducers,
+  UseReducer
+} from '..';
 
 export type HexState = {
   hex: {
@@ -57,12 +66,35 @@ export const useHexReducer: UseReducer<HexState> = () => {
     return { ...store, hex: { ...store.hex, data, codes } };
   }, []);
 
+  const settingLoad: Reducers['settingLoad'] = useCallback(store => {
+    return {
+      ...store,
+      hex: {
+        ...store.hex,
+        null: { char: store.setting.hex.null.char },
+        nonPrintable: {
+          encoding: NON_PRINTABLE_ENCODING_SETTING_VALUES.en[store.setting.hex.nonPrintable.encoding].type,
+          char: store.setting.hex.nonPrintable.char
+        },
+        higher: {
+          encoding: HIGHER_ENCODING_SETTING_VALUES.en[store.setting.hex.higher.encoding].type,
+          char: store.setting.hex.higher.char
+        }
+      },
+      offset: {
+        ...store.offset,
+        base: store.setting.offsetBase
+      }
+    };
+  }, []);
+
   const reducer: ReducerHandler = useCallback(
     ({ store, action: { type, payload } }) => {
       if (isAction.appLoad(type)) return hexDataChange(store, payload);
+      else if (isAction.settingLoad(type)) return settingLoad(store, payload);
       else return { ...store };
     },
-    [hexDataChange]
+    [hexDataChange, settingLoad]
   );
 
   return { initialState, reducer };

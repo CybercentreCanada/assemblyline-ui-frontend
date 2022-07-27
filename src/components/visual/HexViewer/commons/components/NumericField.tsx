@@ -227,7 +227,7 @@ export const WrappedNumericField = ({
                     return Math.abs(next - _value) < Math.abs(prev - _value) ? next : prev;
                   })
               ),
-            optionValues.current.length - 1
+            optionValues.current.length
           )
         ];
       }
@@ -281,7 +281,7 @@ export const WrappedNumericField = ({
   const wheel = useCallback(
     (event: React.WheelEvent<HTMLTextAreaElement | HTMLInputElement | HTMLDivElement | any>) => {
       if (preventWheel) return;
-      event.preventDefault();
+      // event.preventDefault();
       handleChange(inputValue.current, event.deltaY > 0 ? -stepValue.current : stepValue.current)(event);
       onWheel(event);
     },
@@ -390,22 +390,6 @@ export const WrappedNumericField = ({
   );
 };
 
-export const NumericField = React.memo(
-  WrappedNumericField
-  // (prevProps: Readonly<NumericFieldProps>, nextProps: Readonly<NumericFieldProps>) =>
-  //   prevProps.value === nextProps.value &&
-  //   prevProps.id === nextProps.id &&
-  //   prevProps.label === nextProps.label &&
-  //   prevProps.placeholder === nextProps.placeholder &&
-  //   prevProps.base === nextProps.base &&
-  //   prevProps.min === nextProps.min &&
-  //   prevProps.max === nextProps.max &&
-  //   prevProps.step === nextProps.step &&
-  //   prevProps.labelWidth === nextProps.labelWidth &&
-  //   prevProps.fullWidth === nextProps.fullWidth &&
-  //   prevProps.autoFocus === nextProps.autoFocus &&
-  //   prevProps.margin === nextProps.margin &&
-  //   prevProps.disabled === nextProps.disabled
-);
+export const NumericField = React.memo(WrappedNumericField);
 
 export default NumericField;

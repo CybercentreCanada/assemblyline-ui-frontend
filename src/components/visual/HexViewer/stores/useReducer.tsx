@@ -75,9 +75,9 @@ export const ReducerProvider = ({ children }: StoreProviderProps) => {
       const prevStore = { ...store };
 
       store = loading.reducer({ store, action });
+      store = setting.reducer({ store, action });
       store = mode.reducer({ store, action });
       store = hex.reducer({ store, action });
-      store = setting.reducer({ store, action });
       store = layout.reducer({ store, action });
 
       store = location.reducer({ store, action });
