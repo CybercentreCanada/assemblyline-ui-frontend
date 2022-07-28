@@ -1,5 +1,7 @@
-import { Card, Grid, makeStyles, Theme, Tooltip, Typography } from '@material-ui/core';
+import { Card, Grid, makeStyles, Theme, Tooltip, Typography, Switch, IconButton } from '@material-ui/core';
 import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
+import PauseCircleOutlineIcon from '@material-ui/icons/PauseCircleOutline';
+import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import SpeedOutlinedIcon from '@material-ui/icons/SpeedOutlined';
 import { Skeleton } from '@material-ui/lab';
 import PageFullscreen from 'commons/components/layout/pages/PageFullScreen';
@@ -8,7 +10,7 @@ import CustomChip from 'components/visual/CustomChip';
 import React, { useEffect, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import io from 'socket.io-client';
-
+import useMyAPI from 'components/hooks/useMyAPI';
 const NAMESPACE = '/status';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -85,6 +87,24 @@ const WrappedIngestCard = ({ ingester }) => {
   const [error, setError] = useState(null);
   const classes = useStyles();
   const busyness = (ingester.metrics.cpu_seconds * ingester.metrics.cpu_seconds_count) / ingester.instances / 60;
+  const [status, setStatus] = useState(true);
+
+  const { apiCall } = useMyAPI();
+  function handleStatusChange(event){
+    console.log('change triggered')
+    apiCall({
+      url: `/api/v4/system/status/ingester?active=${event.target.checked}`,
+      method: 'POST',
+      onSuccess: api_data => {
+        console.log('success')
+        console.log(api_data)
+      },
+      onFailure: (api_data) => {
+        console.log('failure')
+        console.log(api_data)
+      }
+    });
+  }
 
   useEffect(() => {
     if (ingester.processing_chance.critical !== 1) {
@@ -122,7 +142,15 @@ const WrappedIngestCard = ({ ingester }) => {
               </div>
             </Tooltip>
           )}
-          <div className={classes.title}>{`${t('ingester')} :: x${ingester.instances}`}</div>
+          <div className={classes.title}>
+            {`${t('ingester')} :: x${ingester.instances}`}
+            <Switch
+            checkedIcon={<PlayCircleOutlineIcon fontSize='small'/>}
+            icon={<PauseCircleOutlineIcon fontSize='small'/>}
+            onChange={handleStatusChange}
+            />
+            </div>
+          <IconButton/>
         </Grid>
         <Grid item xs={12} sm={3}>
           <div>
