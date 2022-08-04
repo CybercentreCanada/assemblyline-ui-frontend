@@ -8,6 +8,8 @@
   "columns.description": "Définir le nombre maximal de colonnes",
   "columns.error": "La fenêtre est trop petite",
   "columns.label": "Nombre maximal de colonnes :",
+  "error.isInvalidData": "Le fichier n'est pas valide",
+  "error.isWindowTooSmall": "La fenêtre est trop petite",
   "find": "Rechercher (⇵ pour l'historique)",
   "fullscreen": "Afficher en mode plein écran",
   "header.searchfield.cursor": "Rechercher une adresse (⇵ pour l'historique)",

@@ -9,9 +9,10 @@ const useHexStyles = ({ y = 0, height = 1000 }: { y: number; height: number }) =
       display: 'flex',
       flexDirection: 'column',
       minHeight: `250px`,
-      height: `calc(${height}px - ${y}px - 75px)`,
+      height: `calc(${height}px - ${y}px - 100px)`,
       width: '100%',
       cursor: 'default',
+      overflow: 'hidden',
 
       userSelection: 'none',
       '-webkit-user-select': 'none' /* Safari */,
@@ -46,7 +47,7 @@ export const WrappedHexPageLayout = ({ store }: StoreProps) => {
       className={clsx(
         classes.root,
         window.innerHeight.valueOf() < 1000 && classes.mobile,
-        (!store.loading.initialized || store.layout.column.size <= 1 || store.layout.row.size < 3) && classes.hidden
+        store.loading.status !== 'initialized' && classes.hidden
       )}
     >
       <HexHeader store={store} />
