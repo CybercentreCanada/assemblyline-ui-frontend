@@ -9,7 +9,8 @@ const useHexStyles = ({ y = 0, height = 1000 }: { y: number; height: number }) =
   makeStyles(theme => ({
     root: {
       position: 'absolute',
-      height: `calc(${height}px - ${y}px - 100px)`,
+      // height: `calc(${height}px - ${y}px - 75px)`,
+      height: `auto`,
       width: '100%',
       left: 0,
       display: 'grid',

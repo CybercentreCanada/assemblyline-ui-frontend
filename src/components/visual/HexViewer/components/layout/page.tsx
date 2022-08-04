@@ -9,7 +9,7 @@ const useHexStyles = ({ y = 0, height = 1000 }: { y: number; height: number }) =
       display: 'flex',
       flexDirection: 'column',
       minHeight: `250px`,
-      height: `calc(${height}px - ${y}px - 100px)`,
+      height: `calc(${height}px - ${y}px - 75px)`,
       width: '100%',
       cursor: 'default',
       overflow: 'hidden',
@@ -24,7 +24,8 @@ const useHexStyles = ({ y = 0, height = 1000 }: { y: number; height: number }) =
       height: `calc(${height}px - ${LAYOUT_SIZE.mobileWindowHeight}px)`
     },
     hidden: {
-      visibility: 'hidden'
+      visibility: 'hidden',
+      height: 'auto'
     }
   }));
 
