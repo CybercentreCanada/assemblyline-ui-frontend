@@ -6,6 +6,7 @@ export type SettingAction =
   | { type: 'settingSave'; payload: void }
   | { type: 'settingOpen'; payload: void }
   | { type: 'settingClose'; payload: void }
+  | { type: 'settingReset'; payload: void }
   | { type: 'settingBodyTypeChange'; payload: { event: ChangeEvent<{ name?: string; value: unknown }> } }
   | { type: 'settingOffsetBaseChange'; payload: { event: ChangeEvent<{ name?: string; value: unknown }> } }
   | { type: 'settingAutoColumnChange'; payload: void }
@@ -21,6 +22,7 @@ export const SETTING_ACTION_TYPES: SettingActionTypes = {
   settingSave: 'SettingSave_Action',
   settingOpen: 'SettingOpen_Action',
   settingClose: 'SettingClose_Action',
+  settingReset: 'SettingReset_Action',
   settingBodyTypeChange: 'SettingBodyTypeChange_Action',
   settingOffsetBaseChange: 'SettingOffsetBaseChange_Action',
   settingAutoColumnChange: 'SettingAutoColumnChange_Action',
@@ -35,6 +37,7 @@ export const useSettingDispatcher = (dispatch: Dispatch): SettingDispatchers => 
     onSettingSave: payload => dispatch({ type: ACTIONS.settingSave, payload }),
     onSettingOpen: payload => dispatch({ type: ACTIONS.settingOpen, payload }),
     onSettingClose: payload => dispatch({ type: ACTIONS.settingClose, payload }),
+    onSettingReset: payload => dispatch({ type: ACTIONS.settingReset, payload }),
     onSettingBodyTypeChange: payload => dispatch({ type: ACTIONS.settingBodyTypeChange, payload }),
     onSettingEncodingChange: payload => dispatch({ type: ACTIONS.settingEncodingChange, payload }),
     onSettingOffsetBaseChange: payload => dispatch({ type: ACTIONS.settingOffsetBaseChange, payload }),

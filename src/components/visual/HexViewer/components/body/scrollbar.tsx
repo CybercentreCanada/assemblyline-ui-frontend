@@ -78,7 +78,7 @@ export const WrappedHexScrollBar = ({ store }: StoreProps) => {
 export const HexScrollBar = React.memo(
   WrappedHexScrollBar,
   (prevProps: Readonly<StoreProps>, nextProps: Readonly<StoreProps>) =>
-    prevProps.store.loading.initialized === nextProps.store.loading.initialized &&
+    prevProps.store.loading.status === nextProps.store.loading.status &&
     prevProps.store.scroll.rowIndex === nextProps.store.scroll.rowIndex &&
     prevProps.store.scroll.speed === nextProps.store.scroll.speed &&
     prevProps.store.scroll.maxRowIndex === nextProps.store.scroll.maxRowIndex &&

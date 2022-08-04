@@ -30,6 +30,10 @@ export type ScrollState = {
     speed: number;
     overscanCount: number;
     type: ScrollType;
+    touchScroll: {
+      startTouchScreenY: number;
+      prevTouchDistance: number;
+    };
   };
   cellsRendered: {
     overscanStartRowIndex: number;
@@ -41,10 +45,6 @@ export type ScrollState = {
     overscanStopIndex: number;
     visibleStartIndex: number;
     visibleStopIndex: number;
-  };
-  touchScroll: {
-    startTouchScreenY: number;
-    prevTouchDistance: number;
   };
 };
 
@@ -58,7 +58,11 @@ export const useScrollReducer: UseReducer<ScrollState> = () => {
         lastRowIndex: 1,
         speed: 3,
         overscanCount: 20,
-        type: 'top'
+        type: 'top',
+        touchScroll: {
+          startTouchScreenY: 0,
+          prevTouchDistance: 0
+        }
       },
       cellsRendered: {
         overscanStartRowIndex: 0,
@@ -70,10 +74,6 @@ export const useScrollReducer: UseReducer<ScrollState> = () => {
         overscanStopIndex: 0,
         visibleStartIndex: 0,
         visibleStopIndex: 0
-      },
-      touchScroll: {
-        startTouchScreenY: 0,
-        prevTouchDistance: 0
       }
     }),
     []
@@ -179,27 +179,41 @@ export const useScrollReducer: UseReducer<ScrollState> = () => {
   const scrollTouchStart: Reducers['scrollTouchStart'] = useCallback((store, { event }) => {
     return {
       ...store,
-      touchScroll: { ...store.touchScroll, startTouchScreenY: event.targetTouches[0].screenY, prevTouchDistance: 0 }
+      scroll: {
+        ...store.scroll,
+        touchScroll: {
+          ...store.scroll.touchScroll,
+          startTouchScreenY: event.targetTouches[0].screenY,
+          prevTouchDistance: 0
+        }
+      }
     };
   }, []);
 
   const scrollTouchEnd: Reducers['scrollTouchEnd'] = useCallback((store, payload) => {
     return {
       ...store,
-      touchScroll: { ...store.touchScroll, startTouchScreenY: 0, prevTouchDistance: 0 }
+      scroll: {
+        ...store.scroll,
+        touchScroll: {
+          ...store.scroll.touchScroll,
+          startTouchScreenY: 0,
+          prevTouchDistance: 0
+        }
+      }
     };
   }, []);
 
   const scrollTouchMove: Reducers['scrollTouchMove'] = useCallback(
     (store, { event }) => {
-      const { startTouchScreenY, prevTouchDistance } = store.touchScroll;
+      const { startTouchScreenY, prevTouchDistance } = store.scroll.touchScroll;
       const distance: number = (event.targetTouches[0].screenY - startTouchScreenY) / LAYOUT_SIZE.rowHeight;
       const scrollDistance: number = distance >= 0 ? Math.floor(distance) : Math.ceil(distance);
 
       if (scrollDistance !== prevTouchDistance) {
         const newScrollIndex = store.scroll.rowIndex - (scrollDistance - prevTouchDistance);
         const newStore = scrollRowIndexChange(store, newScrollIndex);
-        store.touchScroll.prevTouchDistance = scrollDistance;
+        store.scroll.touchScroll.prevTouchDistance = scrollDistance;
         return { ...newStore };
       } else return { ...store };
     },
