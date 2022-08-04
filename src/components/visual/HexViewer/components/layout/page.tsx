@@ -12,7 +12,6 @@ const useHexStyles = ({ y = 0, height = 1000 }: { y: number; height: number }) =
       height: `calc(${height}px - ${y}px - 75px)`,
       width: '100%',
       cursor: 'default',
-      overflow: 'hidden',
 
       userSelection: 'none',
       '-webkit-user-select': 'none' /* Safari */,
