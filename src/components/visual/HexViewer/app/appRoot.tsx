@@ -18,7 +18,7 @@ import {
 const useHexStyles = ({ y = 0, height = 1000 }: { y: number; height: number }) =>
   makeStyles(theme => ({
     root: {
-      height: `calc(${height}px - ${y}px - 75px)`,
+      height: `calc(${height}px - ${y}px - 100px)`,
       width: '100%',
       display: 'grid',
       alignContent: 'center'

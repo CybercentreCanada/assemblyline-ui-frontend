@@ -100,7 +100,7 @@ export const ReducerProvider = ({ children }: StoreProviderProps) => {
 
   const render = React.useCallback(
     (prevStore: Store, nextStore: Store) => {
-      if (!nextStore.loading.initialized) return;
+      if (nextStore.loading.status !== 'initialized') return;
 
       hover.render({ prevStore, nextStore });
       cursor.render({ prevStore, nextStore });

@@ -8,6 +8,8 @@
   "columns.description": "Set the maximum number of columns",
   "columns.error": "The viewport is too small",
   "columns.label": "Maximum number of Columns:",
+  "error.isInvalidData": "File is invalid",
+  "error.isWindowTooSmall": "The viewport is too small",
   "find": "Find (⇵ for history)",
   "fullscreen": "Display in fullscreen mode",
   "header.searchfield.cursor": "Find an address (⇵ for history)",

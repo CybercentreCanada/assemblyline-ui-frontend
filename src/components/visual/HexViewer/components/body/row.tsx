@@ -83,7 +83,7 @@ export const HexRow = React.memo(
     nextProps: Readonly<React.PropsWithChildren<HexRowProps>>
   ) =>
     prevProps.rowIndex === nextProps.rowIndex &&
-    prevProps.store.loading.initialized === nextProps.store.loading.initialized &&
+    prevProps.store.loading.status === nextProps.store.loading.status &&
     prevProps.store.layout.column.auto === nextProps.store.layout.column.auto &&
     prevProps.store.layout.column.size === nextProps.store.layout.column.size &&
     prevProps.store.hex.null.char === nextProps.store.hex.null.char &&
