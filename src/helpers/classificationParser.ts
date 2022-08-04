@@ -141,12 +141,12 @@ export function getLevelText(
   isMobile: boolean
 ): string {
   let text = null;
-  if (c12nDef != null) {
+  if (c12nDef != null && lvl != null) {
     text = c12nDef.levels_map[lvl.toString()];
   }
 
   if (text === undefined || text == null) {
-    text = '';
+    text = 'INVALID';
   }
 
   if (format === 'long' && !isMobile) {

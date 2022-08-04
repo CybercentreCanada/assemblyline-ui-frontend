@@ -3,6 +3,7 @@ import Flow from '@flowjs/flow.js';
 import {
   Button,
   Checkbox,
+  CircularProgress,
   FormControlLabel,
   Grid,
   makeStyles,
@@ -28,10 +29,17 @@ import ServiceTree from 'components/layout/serviceTree';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDropper from 'components/visual/FileDropper';
+import { matchSHA256, matchURL } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory } from 'react-router-dom';
+
+type SubmitState = {
+  hash: string;
+  tabContext: string;
+  c12n: string;
+};
 
 function Submit() {
   const { getBanner } = useAppLayout();
@@ -54,13 +62,13 @@ function Submit() {
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
-  const state = history.location.state;
+  const state: SubmitState = history.location.state as SubmitState;
   const urlHashTitle = configuration.ui.allow_url_submissions ? 'URL/SHA256' : 'SHA256';
   const urlInputText = urlHashTitle + t('urlHash.input_suffix');
-  const [urlHash, setUrlHash] = useState(state !== undefined ? state['hash'] : '');
+  const [urlHash, setUrlHash] = useState(state !== undefined ? state.hash : '');
   const [urlHashHasError, setUrlHashHasError] = useState(false);
-  const [value, setValue] = useState(state !== undefined ? state['tabContext'] : '0');
-  const classification = useState(state !== undefined ? state['c12n'] : null)[0];
+  const [value, setValue] = useState(state !== undefined ? state.tabContext : '0');
+  const classification = useState(state !== undefined ? state.c12n : null)[0];
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -76,6 +84,13 @@ function Submit() {
       '&:hover': {
         background: theme.palette.action.hover
       }
+    },
+    buttonProgress: {
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      marginTop: -12,
+      marginLeft: -12
     }
   }));
   const classes = useStyles();
@@ -230,6 +245,18 @@ function Submit() {
     setFile(selectedFile);
   };
 
+  const toggleExternalSource = source => {
+    if (settings) {
+      const newSources = settings.default_external_sources;
+      if (newSources.indexOf(source) === -1) {
+        newSources.push(source);
+      } else {
+        newSources.splice(newSources.indexOf(source), 1);
+      }
+      setSettings({ ...settings, default_external_sources: newSources });
+    }
+  };
+
   const setParam = (service_idx, param_idx, p_value) => {
     if (settings) {
       const newSettings = { ...settings };
@@ -269,22 +296,26 @@ function Submit() {
   }
 
   function analyseUrlHash() {
-    const urlParseRE =
-      /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/;
-    const urlMatches = urlParseRE.exec(urlHash);
-    const sha256ParseRE = /^[a-fA-F0-9]{64}$/;
+    let data: any = null;
+    setAllowClick(false);
+    const sha256 = matchSHA256(urlHash);
+    const url = matchURL(urlHash);
 
-    let errMsg = t('submit.unknown.failure');
-    let data = { ui_params: settings };
+    if (!sha256 && (!url || !configuration.ui.allow_url_submissions)) {
+      setAllowClick(true);
+      setUrlHashHasError(true);
+      showErrorMessage(t(`submit.${configuration.ui.allow_url_submissions ? 'urlhash' : 'hash'}.error`));
+      return;
+    }
 
-    if (sha256ParseRE.exec(urlHash)) {
-      data['name'] = urlHash;
-      data['sha256'] = urlHash;
-      errMsg = t('submit.hash.failure');
-    } else if (configuration.ui.allow_url_submissions && urlMatches) {
-      data['name'] = urlMatches[15] === undefined || urlMatches[15] === '' ? 'file' : urlMatches[15];
-      data['url'] = urlHash;
-      errMsg = t('submit.url.failure');
+    if (sha256) {
+      data = { ui_params: settings, name: urlHash, sha256: urlHash };
+    } else {
+      data = {
+        ui_params: settings,
+        name: url[15] === undefined || url[15] === '' ? 'file' : url[15],
+        url: urlHash
+      };
     }
 
     setUrlHashHasError(false);
@@ -300,8 +331,9 @@ function Submit() {
         }, 500);
       },
       onFailure: api_data => {
-        showErrorMessage(errMsg);
+        showErrorMessage(api_data.api_error_message);
         setUrlHashHasError(true);
+        setAllowClick(true);
       }
     });
   }
@@ -333,7 +365,8 @@ function Submit() {
     <PageCenter maxWidth={md ? '800px' : downSM ? '100%' : '1024px'} margin={4} width="100%">
       <ConfirmationDialog
         open={validate}
-        handleClose={cleanupServiceSelection}
+        handleClose={event => setValidate(false)}
+        handleCancel={cleanupServiceSelection}
         handleAccept={executeCB}
         title={t('validate.title')}
         cancelText={t('validate.cancelText')}
@@ -443,6 +476,7 @@ function Submit() {
                   onClick={() => validateServiceSelection('urlHash')}
                 >
                   {t('urlHash.button')}
+                  {!allowClick && <CircularProgress size={24} className={classes.buttonProgress} />}
                 </Button>
               </>
             ) : (
@@ -452,6 +486,33 @@ function Submit() {
               </>
             )}
           </div>
+          {matchSHA256(urlHash) &&
+            configuration.submission.sha256_sources &&
+            configuration.submission.sha256_sources.length > 0 && (
+              <div style={{ textAlign: 'start', marginTop: theme.spacing(1) }}>
+                <Typography variant="subtitle1">{t('options.submission.default_external_sources')}</Typography>
+                {configuration.submission.sha256_sources.map(source => (
+                  <div>
+                    <FormControlLabel
+                      control={
+                        settings ? (
+                          <Checkbox
+                            size="small"
+                            checked={settings.default_external_sources.indexOf(source) !== -1}
+                            name="label"
+                            onChange={event => toggleExternalSource(source)}
+                          />
+                        ) : (
+                          <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
+                        )
+                      }
+                      label={<Typography variant="body2">{source}</Typography>}
+                      className={settings ? classes.item : null}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           {configuration.ui.tos ? (
             <div style={{ marginTop: sp4, textAlign: 'center' }}>
               <Typography variant="body2">

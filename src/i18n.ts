@@ -2,6 +2,7 @@ import i18n from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import error403EN from 'locales/en/403.json';
 import error404EN from 'locales/en/404.json';
+import adminActionsEN from 'locales/en/admin/actions.json';
 import adminErrorViewerEN from 'locales/en/admin/error_viewer.json';
 import adminFeedsEN from 'locales/en/admin/feeds.json';
 import adminIdentifyEN from 'locales/en/admin/identify.json';
@@ -17,6 +18,7 @@ import dashboardEN from 'locales/en/dashboard.json';
 import favoritesEN from 'locales/en/favorites.json';
 import feedEN from 'locales/en/feed.json';
 import fileDetailEN from 'locales/en/file/detail.json';
+import hexViewerEN from 'locales/en/file/hex.json';
 import fileViewerEN from 'locales/en/file/viewer.json';
 import helpAPIEN from 'locales/en/help/api.json';
 import helpClassificationEN from 'locales/en/help/classification.json';
@@ -49,6 +51,7 @@ import translationEN from 'locales/en/translation.json';
 import userEN from 'locales/en/user.json';
 import error403FR from 'locales/fr/403.json';
 import error404FR from 'locales/fr/404.json';
+import adminActionsFR from 'locales/fr/admin/actions.json';
 import adminErrorViewerFR from 'locales/fr/admin/error_viewer.json';
 import adminFeedsFR from 'locales/fr/admin/feeds.json';
 import adminIdentifyFR from 'locales/fr/admin/identify.json';
@@ -64,6 +67,7 @@ import dashboardFR from 'locales/fr/dashboard.json';
 import favoritesFR from 'locales/fr/favorites.json';
 import feedFR from 'locales/fr/feed.json';
 import fileDetailFR from 'locales/fr/file/detail.json';
+import hexViewerFR from 'locales/fr/file/hex.json';
 import fileViewerFR from 'locales/fr/file/viewer.json';
 import helpAPIFR from 'locales/fr/help/api.json';
 import helpClassificationFR from 'locales/fr/help/classification.json';
@@ -98,6 +102,7 @@ import { initReactI18next } from 'react-i18next';
 
 const resources = {
   en: {
+    adminActions: adminActionsEN,
     adminErrorViewer: adminErrorViewerEN,
     adminIdentify: adminIdentifyEN,
     adminFeeds: adminFeedsEN,
@@ -119,6 +124,7 @@ const resources = {
     helpConfiguration: helpConfigurationEN,
     helpSearch: helpSearchEN,
     helpServices: helpServicesEN,
+    hexViewer: hexViewerEN,
     locked: lockedEN,
     login: loginEN,
     logout: logoutEN,
@@ -147,6 +153,7 @@ const resources = {
     favorites: favoritesEN
   },
   fr: {
+    adminActions: adminActionsFR,
     adminErrorViewer: adminErrorViewerFR,
     adminIdentify: adminIdentifyFR,
     adminFeeds: adminFeedsFR,
@@ -168,6 +175,7 @@ const resources = {
     helpConfiguration: helpConfigurationFR,
     helpSearch: helpSearchFR,
     helpServices: helpServicesFR,
+    hexViewer: hexViewerFR,
     locked: lockedFR,
     login: loginFR,
     logout: logoutFR,

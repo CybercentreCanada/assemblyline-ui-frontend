@@ -61,6 +61,7 @@ export type ConfigurationDefinition = {
   submission: {
     dtl: number;
     max_dtl: number;
+    sha256_sources: string[];
   };
   system: {
     organisation: string;

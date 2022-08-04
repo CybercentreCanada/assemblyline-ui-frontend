@@ -1,5 +1,6 @@
 {
   "adminmenu": "Administration",
+  "adminmenu.actions": "Actions post-traitement",
   "adminmenu.identify": "Identification des fichiers",
   "adminmenu.errors": "Visualisateur d'erreurs",
   "adminmenu.feeds": "Fils de nouvelles",

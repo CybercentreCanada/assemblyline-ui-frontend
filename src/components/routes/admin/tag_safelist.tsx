@@ -55,6 +55,7 @@ export default function AdminTagSafelist() {
       onSuccess: api_data => {
         setTagSafelist(api_data.api_response);
         if (!defValue) setOriginalTagSafelist(api_data.api_response);
+        if (defValue && api_data.api_response !== originalTagSafelist) setOpen(true);
       }
     });
   };

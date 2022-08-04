@@ -1,6 +1,15 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 
-const ConfirmationDialog = ({ open, handleClose, handleAccept, title, cancelText, acceptText, text = null }) => (
+const ConfirmationDialog = ({
+  open,
+  handleClose,
+  handleAccept,
+  title,
+  cancelText,
+  acceptText,
+  text = null,
+  handleCancel = null
+}) => (
   <Dialog
     open={open}
     onClose={handleClose}
@@ -14,7 +23,7 @@ const ConfirmationDialog = ({ open, handleClose, handleAccept, title, cancelText
       </DialogContent>
     )}
     <DialogActions>
-      <Button onClick={handleClose} color="secondary">
+      <Button onClick={handleCancel || handleClose} color="secondary">
         {cancelText}
       </Button>
       <Button onClick={handleAccept} color="primary" autoFocus>

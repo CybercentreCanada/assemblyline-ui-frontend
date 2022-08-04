@@ -23,6 +23,7 @@ import MapOutlinedIcon from '@material-ui/icons/MapOutlined';
 import NotificationImportantOutlinedIcon from '@material-ui/icons/NotificationImportantOutlined';
 import PageviewOutlinedIcon from '@material-ui/icons/PageviewOutlined';
 import PlaylistAddCheckIcon from '@material-ui/icons/PlaylistAddCheck';
+import PlaylistPlayOutlinedIcon from '@material-ui/icons/PlaylistPlayOutlined';
 import PublishOutlinedIcon from '@material-ui/icons/PublishOutlined';
 import ReceiptOutlinedIcon from '@material-ui/icons/ReceiptOutlined';
 import RssFeedOutlinedIcon from '@material-ui/icons/RssFeedOutlined';
@@ -194,6 +195,12 @@ export default function useMySitemap() {
         path: '/admin/service_review',
         title: t('adminmenu.service_review'),
         icon: <CompareArrowsOutlinedIcon />,
+        breadcrumbs: ['/admin']
+      },
+      {
+        path: '/admin/actions',
+        title: t('adminmenu.actions'),
+        icon: <PlaylistPlayOutlinedIcon />,
         breadcrumbs: ['/admin']
       },
       {
