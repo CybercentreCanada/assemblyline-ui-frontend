@@ -5,6 +5,7 @@ import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import SpeedOutlinedIcon from '@material-ui/icons/SpeedOutlined';
 import { Skeleton } from '@material-ui/lab';
 import PageFullscreen from 'commons/components/layout/pages/PageFullScreen';
+import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import ArcGauge from 'components/visual/ArcGauge';
 import CustomChip from 'components/visual/CustomChip';
@@ -33,7 +34,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   disabled: {
     color: theme.palette.text.hint,
-    backgroundColor: theme.palette.type === 'dark' ? '#52525217' : '#EAEAEA',
+    backgroundColor: theme.palette.type === 'dark' ? '#63636317' : '#EAEAEA',
     border: `solid 1px ${theme.palette.divider}`
   },
   error: {
@@ -93,6 +94,7 @@ const WrappedIngestCard = ({ ingester, handleStatusChange, status }) => {
   const [error, setError] = useState(null);
   const classes = useStyles();
   const busyness = (ingester.metrics.cpu_seconds * ingester.metrics.cpu_seconds_count) / ingester.instances / 60;
+  const { user: currentUser } = useALContext();
 
   useEffect(() => {
     if (ingester.processing_chance.critical !== 1) {
@@ -137,14 +139,17 @@ const WrappedIngestCard = ({ ingester, handleStatusChange, status }) => {
           <div className={classes.title}>
             {`${t('ingester')} :: x${ingester.instances}`}
             {status !== null && (
-              <div style={{ marginLeft: '8px', display: 'inline' }}>
-                <Switch
-                  checked={status}
-                  checkedIcon={<PlayCircleOutlineIcon fontSize="small" />}
-                  icon={<PauseCircleOutlineIcon fontSize="small" />}
-                  onChange={handleStatusChange}
-                />
-              </div>
+              <Tooltip title={t(`ingest.status.${status}`)}>
+                <div style={{ marginLeft: '8px', display: 'inline' }}>
+                  <Switch
+                    checked={status}
+                    disabled={!currentUser.is_admin}
+                    checkedIcon={<PlayCircleOutlineIcon fontSize="small" />}
+                    icon={<PauseCircleOutlineIcon fontSize="small" />}
+                    onChange={handleStatusChange}
+                  />
+                </div>
+              </Tooltip>
             )}
           </div>
         </Grid>
@@ -322,6 +327,7 @@ const WrappedDispatcherCard = ({ dispatcher, up, down, handleStatusChange, statu
   const startQueue = dispatcher.queues.start.reduce((x, y) => x + y, 0);
   const resultQueue = dispatcher.queues.result.reduce((x, y) => x + y, 0);
   const commandQueue = dispatcher.queues.command.reduce((x, y) => x + y, 0);
+  const { user: currentUser } = useALContext();
 
   useEffect(() => {
     if (dispatcher.initialized && dispatcher.queues.ingest >= dispatcher.inflight.max / 10) {
@@ -369,14 +375,17 @@ const WrappedDispatcherCard = ({ dispatcher, up, down, handleStatusChange, statu
           <div className={classes.title}>
             {`${t('dispatcher')} :: x${dispatcher.instances}`}
             {status !== null && (
-              <div style={{ marginLeft: '8px', display: 'inline' }}>
-                <Switch
-                  checked={status}
-                  checkedIcon={<PlayCircleOutlineIcon fontSize="small" />}
-                  icon={<PauseCircleOutlineIcon fontSize="small" />}
-                  onChange={handleStatusChange}
-                />
-              </div>
+              <Tooltip title={t(`dispatcher.status.${status}`)}>
+                <div style={{ marginLeft: '8px', display: 'inline' }}>
+                  <Switch
+                    checked={status}
+                    disabled={!currentUser.is_admin}
+                    checkedIcon={<PlayCircleOutlineIcon fontSize="small" />}
+                    icon={<PauseCircleOutlineIcon fontSize="small" />}
+                    onChange={handleStatusChange}
+                  />
+                </div>
+              </Tooltip>
             )}
           </div>
         </Grid>
