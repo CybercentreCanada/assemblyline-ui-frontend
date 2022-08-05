@@ -1125,19 +1125,19 @@ const Dashboard = () => {
     });
   }
 
+  function reloadStatuses() {
+    apiCall({
+      url: `/api/v4/system/status/ALL/`,
+      onSuccess: api_data => {
+        setIngestStatus(api_data.api_response.ingester);
+        setDispatcherStatus(api_data.api_response.dispatcher);
+      }
+    });
+    setTimeout(reloadStatuses, 30000);
+  }
+
   useEffect(() => {
-    apiCall({
-      url: `/api/v4/system/status/ingester/`,
-      onSuccess: api_data => {
-        setIngestStatus(api_data.api_response.status);
-      }
-    });
-    apiCall({
-      url: `/api/v4/system/status/dispatcher/`,
-      onSuccess: api_data => {
-        setDispatcherStatus(api_data.api_response.status);
-      }
-    });
+    reloadStatuses();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
