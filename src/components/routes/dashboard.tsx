@@ -1,8 +1,12 @@
-import { Card, Grid, makeStyles, Theme, Tooltip, Typography } from '@material-ui/core';
+import { Card, Grid, makeStyles, Switch, Theme, Tooltip, Typography } from '@material-ui/core';
 import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
+import PauseCircleOutlineIcon from '@material-ui/icons/PauseCircleOutline';
+import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import SpeedOutlinedIcon from '@material-ui/icons/SpeedOutlined';
 import { Skeleton } from '@material-ui/lab';
 import PageFullscreen from 'commons/components/layout/pages/PageFullScreen';
+import useALContext from 'components/hooks/useALContext';
+import useMyAPI from 'components/hooks/useMyAPI';
 import ArcGauge from 'components/visual/ArcGauge';
 import CustomChip from 'components/visual/CustomChip';
 import React, { useEffect, useReducer, useState } from 'react';
@@ -27,6 +31,11 @@ const useStyles = makeStyles((theme: Theme) => ({
     '&:hover': {
       boxShadow: theme.shadows[6]
     }
+  },
+  disabled: {
+    color: theme.palette.text.hint,
+    backgroundColor: theme.palette.type === 'dark' ? '#63636317' : '#EAEAEA',
+    border: `solid 1px ${theme.palette.divider}`
   },
   error: {
     backgroundColor: theme.palette.type === 'dark' ? '#ff000017' : '#FFE4E4',
@@ -79,12 +88,13 @@ const WrappedMetricCounter = ({ value, title, tooltip, init = false, margin = '8
 };
 const MetricCounter = React.memo(WrappedMetricCounter);
 
-const WrappedIngestCard = ({ ingester }) => {
+const WrappedIngestCard = ({ ingester, handleStatusChange, status }) => {
   const { t } = useTranslation(['dashboard']);
   const [timer, setTimer] = useState(null);
   const [error, setError] = useState(null);
   const classes = useStyles();
   const busyness = (ingester.metrics.cpu_seconds * ingester.metrics.cpu_seconds_count) / ingester.instances / 60;
+  const { user: currentUser } = useALContext();
 
   useEffect(() => {
     if (ingester.processing_chance.critical !== 1) {
@@ -112,17 +122,36 @@ const WrappedIngestCard = ({ ingester }) => {
   }, [ingester]);
 
   return (
-    <Card className={`${classes.core_card} ${error || ingester.error ? classes.error : classes.ok}`}>
+    <Card
+      className={`${classes.core_card} ${
+        status ? (error || ingester.error ? classes.error : classes.ok) : classes.disabled
+      }`}
+    >
       <Grid container spacing={1}>
         <Grid item xs={12}>
-          {(error || ingester.error) && (
+          {status && (error || ingester.error) && (
             <Tooltip title={error || ingester.error}>
               <div className={classes.error_icon}>
                 <ErrorOutlineOutlinedIcon />
               </div>
             </Tooltip>
           )}
-          <div className={classes.title}>{`${t('ingester')} :: x${ingester.instances}`}</div>
+          <div className={classes.title}>
+            {`${t('ingester')} :: x${ingester.instances}`}
+            {status !== null && (
+              <Tooltip title={t(`ingest.status.${status}`)}>
+                <div style={{ marginLeft: '8px', display: 'inline' }}>
+                  <Switch
+                    checked={status}
+                    disabled={!currentUser.is_admin}
+                    checkedIcon={<PlayCircleOutlineIcon fontSize="small" />}
+                    icon={<PauseCircleOutlineIcon fontSize="small" />}
+                    onChange={handleStatusChange}
+                  />
+                </div>
+              </Tooltip>
+            )}
+          </div>
         </Grid>
         <Grid item xs={12} sm={3}>
           <div>
@@ -289,7 +318,7 @@ const WrappedIngestCard = ({ ingester }) => {
   );
 };
 
-const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
+const WrappedDispatcherCard = ({ dispatcher, up, down, handleStatusChange, status }) => {
   const { t } = useTranslation(['dashboard']);
   const [timer, setTimer] = useState(null);
   const [error, setError] = useState(null);
@@ -298,6 +327,7 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
   const startQueue = dispatcher.queues.start.reduce((x, y) => x + y, 0);
   const resultQueue = dispatcher.queues.result.reduce((x, y) => x + y, 0);
   const commandQueue = dispatcher.queues.command.reduce((x, y) => x + y, 0);
+  const { user: currentUser } = useALContext();
 
   useEffect(() => {
     if (dispatcher.initialized && dispatcher.queues.ingest >= dispatcher.inflight.max / 10) {
@@ -328,17 +358,36 @@ const WrappedDispatcherCard = ({ dispatcher, up, down }) => {
   }, [dispatcher]);
 
   return (
-    <Card className={`${classes.core_card} ${error || dispatcher.error ? classes.error : classes.ok}`}>
+    <Card
+      className={`${classes.core_card} ${
+        status ? (error || dispatcher.error ? classes.error : classes.ok) : classes.disabled
+      }`}
+    >
       <Grid container spacing={1}>
         <Grid item xs={12}>
-          {(error || dispatcher.error) && (
+          {status && (error || dispatcher.error) && (
             <Tooltip title={error || dispatcher.error}>
               <div className={classes.error_icon}>
                 <ErrorOutlineOutlinedIcon />
               </div>
             </Tooltip>
           )}
-          <div className={classes.title}>{`${t('dispatcher')} :: x${dispatcher.instances}`}</div>
+          <div className={classes.title}>
+            {`${t('dispatcher')} :: x${dispatcher.instances}`}
+            {status !== null && (
+              <Tooltip title={t(`dispatcher.status.${status}`)}>
+                <div style={{ marginLeft: '8px', display: 'inline' }}>
+                  <Switch
+                    checked={status}
+                    disabled={!currentUser.is_admin}
+                    checkedIcon={<PlayCircleOutlineIcon fontSize="small" />}
+                    icon={<PauseCircleOutlineIcon fontSize="small" />}
+                    onChange={handleStatusChange}
+                  />
+                </div>
+              </Tooltip>
+            )}
+          </div>
         </Grid>
         <Grid item xs={12}>
           <div>
@@ -1047,6 +1096,51 @@ const Dashboard = () => {
   const [services, setServices] = useReducer(serviceReducer, {});
   const [servicesList, setServicesList] = useReducer(serviceListReducer, DEFAULT_SERVICE_LIST);
 
+  const [dispatcherStatus, setDispatcherStatus] = useState(null);
+  const [ingestStatus, setIngestStatus] = useState(null);
+
+  const { apiCall } = useMyAPI();
+
+  function handleIngesterStatusChange(event) {
+    apiCall({
+      url: `/api/v4/system/status/ingester/?active=${event.target.checked}`,
+      method: 'POST',
+      onSuccess: api_data => {
+        if (api_data.api_response.success) {
+          setIngestStatus(!ingestStatus);
+        }
+      }
+    });
+  }
+
+  function handleDispatcherStatusChange(event) {
+    apiCall({
+      url: `/api/v4/system/status/dispatcher/?active=${event.target.checked}`,
+      method: 'POST',
+      onSuccess: api_data => {
+        if (api_data.api_response.success) {
+          setDispatcherStatus(!dispatcherStatus);
+        }
+      }
+    });
+  }
+
+  function reloadStatuses() {
+    apiCall({
+      url: `/api/v4/system/status/ALL/`,
+      onSuccess: api_data => {
+        setIngestStatus(api_data.api_response.ingester);
+        setDispatcherStatus(api_data.api_response.dispatcher);
+      }
+    });
+    setTimeout(reloadStatuses, 30000);
+  }
+
+  useEffect(() => {
+    reloadStatuses();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleAlerterHeartbeat = hb => {
     // eslint-disable-next-line no-console
     console.debug('Socket-IO :: AlerterHeartbeat', hb);
@@ -1133,10 +1227,16 @@ const Dashboard = () => {
       </Typography>
       <Grid container spacing={2}>
         <Grid item xs={12} xl={6}>
-          <IngestCard ingester={ingester} />
+          <IngestCard ingester={ingester} handleStatusChange={handleIngesterStatusChange} status={ingestStatus} />
         </Grid>
         <Grid item xs={12} xl={6}>
-          <DispatcherCard dispatcher={dispatcher} up={servicesList.up} down={servicesList.down} />
+          <DispatcherCard
+            dispatcher={dispatcher}
+            up={servicesList.up}
+            down={servicesList.down}
+            handleStatusChange={handleDispatcherStatusChange}
+            status={dispatcherStatus}
+          />
         </Grid>
         <Grid item xs={12} xl={5}>
           <ExpiryCard expiry={expiry} />
