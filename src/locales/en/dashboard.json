@@ -90,6 +90,7 @@
   "throughput.skipped": "Skipped submissions",
   "throughput.submissions_completed": "Scanned submissions",
   "throughput.updated": "Updated",
+  "throughput.wait": "Waiting",
   "throughput.whitelisted": "Whitelisted submissions",
   "timeout": "We are not receiving any heartbeat for this component",
   "title": "Dashboard"
