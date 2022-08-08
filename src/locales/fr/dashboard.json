@@ -91,6 +91,7 @@
   "throughput.skipped": "Soumissions ignorées",
   "throughput.submissions_completed": "Soumissions analysés",
   "throughput.updated": "Mise à jour",
+  "throughput.wait": "En attente",
   "throughput.whitelisted": "Soumissions sur liste sûre",
   "timeout": "Nous ne recevons aucun messages pour cette composante",
   "title": "Tableau de bord"
