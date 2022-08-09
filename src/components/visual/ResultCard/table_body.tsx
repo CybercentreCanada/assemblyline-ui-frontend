@@ -13,6 +13,7 @@ import {
 import { default as React } from 'react';
 import TitleKey from '../TitleKey';
 import { KVBody } from './kv_body';
+import { TextBody } from './text_body';
 
 const useStyles = printable =>
   makeStyles(theme => ({
@@ -63,6 +64,10 @@ const StyledTableRow = withStyles((theme: Theme) =>
 const WrappedTblBody = ({ body, printable }) => {
   const headers = [];
   const classes = useStyles(printable);
+
+  if (!Array.isArray(body)) {
+    return <TextBody body={body} />;
+  }
 
   if (body) {
     for (const line of body) {
