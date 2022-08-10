@@ -14,6 +14,7 @@ import ResultSection, { Section } from '../ResultCard/result_section';
 
 const HEUR_LEVELS = ['malicious' as 'malicious', 'suspicious' as 'suspicious', 'info' as 'info', 'safe' as 'safe'];
 const DEFAULT_SEC_SCORE = -1000;
+const SCORE_SHOW_THRESHOLD = 0;
 
 const useStyles = makeStyles(theme => ({
   title: {
@@ -176,9 +177,9 @@ const WrappedDetection: React.FC<WrappedDetectionProps> = ({ heuristics, results
   const { showSafeResults } = useSafeResults();
 
   useEffect(() => {
-    let newMaxScore = DEFAULT_SEC_SCORE;
-    const newSectionMap = {};
     if (results) {
+      let newMaxScore = DEFAULT_SEC_SCORE;
+      const newSectionMap = {};
       for (const res of results) {
         for (const sec of res.result.sections
           .filter(s => s.heuristic)
@@ -192,18 +193,31 @@ const WrappedDetection: React.FC<WrappedDetectionProps> = ({ heuristics, results
           newSectionMap[sec.heuristic.heur_id].push(sec);
         }
       }
+      setSectionMap(newSectionMap);
+      setMaxScore(newMaxScore);
     }
-    setSectionMap(newSectionMap);
-    setMaxScore(newMaxScore);
   }, [results]);
 
   useEffect(() => {
     if (section_map) {
+      let newMaxScore = DEFAULT_SEC_SCORE;
+      for (const heurId of Object.keys(section_map)) {
+        for (const sec of section_map[heurId]) {
+          if (sec.heuristic.score >= SCORE_SHOW_THRESHOLD) {
+            newMaxScore = sec.heuristic.score;
+            break;
+          }
+        }
+        if (newMaxScore >= SCORE_SHOW_THRESHOLD) {
+          break;
+        }
+      }
       setSectionMap(section_map);
+      setMaxScore(newMaxScore);
     }
   }, [section_map]);
 
-  return maxScore < 0 && !showSafeResults ? null : (
+  return maxScore < SCORE_SHOW_THRESHOLD && !showSafeResults ? null : (
     <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
       <Typography
         variant="h6"
