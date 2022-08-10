@@ -17,6 +17,7 @@ import ExpandMore from '@material-ui/icons/ExpandMore';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
+import useSafeResults from 'components/hooks/useSafeResults';
 import Classification from 'components/visual/Classification';
 import Verdict from 'components/visual/Verdict';
 import React, { useEffect, useMemo } from 'react';
@@ -106,7 +107,7 @@ export const emptyResult = (result: Result) =>
   result.response.extracted.length === 0 &&
   result.response.supplementary.length === 0;
 
-const ResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates = null }) => {
+const WrappedResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates = null }) => {
   const { t } = useTranslation(['fileDetail']);
   const classes = useStyles();
   const theme = useTheme();
@@ -119,6 +120,7 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates = null 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [selected, setSelected] = React.useState(null);
   const { getKey, hasHighlightedKeys } = useHighlighter();
+  const { showSafeResults } = useSafeResults();
   const popper = Boolean(anchorEl);
 
   const allTags = useMemo(() => {
@@ -182,7 +184,7 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates = null 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected]);
 
-  return (
+  return displayedResult.result.score < 0 && !showSafeResults ? null : (
     <div className={classes.card} style={{ marginBottom: sp2 }}>
       <Popper open={popper} anchorEl={anchorEl} placement="bottom-end" transition>
         {({ TransitionProps }) => (
@@ -253,55 +255,44 @@ const ResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates = null 
         {open ? <ExpandLess className={classes.muted} /> : <ExpandMore className={classes.muted} />}
       </Box>
       <Collapse in={open} timeout="auto">
-        {useMemo(
-          () =>
-            empty ? (
-              <div className={classes.content} style={{ color: theme.palette.text.secondary }}>
-                {t('nothing_to_report')}
-              </div>
-            ) : (
-              <div className={classes.content}>
-                {displayedResult.section_hierarchy
-                  ? displayedResult.section_hierarchy.map(item => (
-                      <ResultSection
-                        key={`section_${item.id}`}
-                        section={displayedResult.result.sections[item.id]}
-                        section_list={displayedResult.result.sections}
-                        sub_sections={item.children}
-                        indent={1}
-                      />
-                    ))
-                  : displayedResult.result.sections.map((section, id) => (
-                      <ResultSection
-                        key={`section_${id}`}
-                        section={displayedResult.result.sections[id]}
-                        section_list={displayedResult.result.sections}
-                        sub_sections={[]}
-                        indent={section.depth + 1}
-                        depth={section.depth + 1}
-                      />
-                    ))}
-                {displayedResult.response.supplementary.filter(item => !item.is_section_image).length !== 0 && (
-                  <SupplementarySection supplementary={displayedResult.response.supplementary} sid={sid} />
-                )}
-                {displayedResult.response.extracted.length !== 0 && (
-                  <ExtractedSection extracted={displayedResult.response.extracted} sid={sid} />
-                )}
-              </div>
-            ),
-          // eslint-disable-next-line react-hooks/exhaustive-deps
-          [
-            empty,
-            displayedResult.response.extracted,
-            displayedResult.response.supplementary,
-            displayedResult.result.sections,
-            displayedResult.section_hierarchy,
-            sid
-          ]
+        {empty ? (
+          <div className={classes.content} style={{ color: theme.palette.text.secondary }}>
+            {t('nothing_to_report')}
+          </div>
+        ) : (
+          <div className={classes.content}>
+            {displayedResult.section_hierarchy
+              ? displayedResult.section_hierarchy.map(item => (
+                  <ResultSection
+                    key={`section_${item.id}`}
+                    section={displayedResult.result.sections[item.id]}
+                    section_list={displayedResult.result.sections}
+                    sub_sections={item.children}
+                    indent={1}
+                  />
+                ))
+              : displayedResult.result.sections.map((section, id) => (
+                  <ResultSection
+                    key={`section_${id}`}
+                    section={displayedResult.result.sections[id]}
+                    section_list={displayedResult.result.sections}
+                    sub_sections={[]}
+                    indent={section.depth + 1}
+                    depth={section.depth + 1}
+                  />
+                ))}
+            {displayedResult.response.supplementary.filter(item => !item.is_section_image).length !== 0 && (
+              <SupplementarySection supplementary={displayedResult.response.supplementary} sid={sid} />
+            )}
+            {displayedResult.response.extracted.length !== 0 && (
+              <ExtractedSection extracted={displayedResult.response.extracted} sid={sid} />
+            )}
+          </div>
         )}
       </Collapse>
     </div>
   );
 };
 
+const ResultCard = React.memo(WrappedResultCard);
 export default ResultCard;
