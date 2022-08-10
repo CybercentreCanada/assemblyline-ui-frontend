@@ -8,6 +8,7 @@ import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import useSafeResults from 'components/hooks/useSafeResults';
 import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
 import { safeFieldValueURI, scoreToVerdict } from 'helpers/utils';
 import React, { useCallback } from 'react';
@@ -56,6 +57,7 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({
   const { isHighlighted, triggerHighlight } = useHighlighter();
   const { copy } = useClipboard();
   const { user: currentUser } = useALContext();
+  const { showSafeResults } = useSafeResults();
 
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
 
@@ -127,27 +129,20 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [safelistReason, t, text]);
 
-  let color: PossibleColors = 'default' as 'default';
+  let maliciousness = lvl || scoreToVerdict(score);
   if (safe) {
-    color = 'success' as 'success';
-  } else if (lvl) {
-    color = {
-      info: 'default' as 'default',
-      safe: 'success' as 'success',
-      suspicious: 'warning' as 'warning',
-      malicious: 'error' as 'error'
-    }[lvl];
-  } else if (score) {
-    color = {
-      suspicious: 'warning' as 'warning',
-      malicious: 'error' as 'error',
-      safe: 'success' as 'success',
-      info: 'default' as 'default',
-      highly_suspicious: 'warning' as 'warning'
-    }[scoreToVerdict(score)];
+    maliciousness = 'safe';
   }
 
-  return (
+  const color: PossibleColors = {
+    suspicious: 'warning' as 'warning',
+    malicious: 'error' as 'error',
+    safe: 'success' as 'success',
+    info: 'default' as 'default',
+    highly_suspicious: 'warning' as 'warning'
+  }[maliciousness];
+
+  return maliciousness === 'safe' && !showSafeResults ? null : (
     <>
       {signature && (
         <InputDialog
