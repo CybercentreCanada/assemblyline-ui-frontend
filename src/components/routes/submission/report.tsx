@@ -25,6 +25,7 @@ import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import useSafeResults from 'components/hooks/useSafeResults';
 import Classification from 'components/visual/Classification';
 import ResultSection from 'components/visual/ResultCard/result_section';
 import TextVerdict from 'components/visual/TextVerdict';
@@ -553,14 +554,14 @@ function FileTreeSkel() {
 export default function SubmissionReport() {
   const { t } = useTranslation(['submissionReport']);
   const { id } = useParams<ParamProps>();
-  const { c12nDef } = useALContext();
+  const { c12nDef, configuration } = useALContext();
+  const { showSafeResults } = useSafeResults();
   const history = useHistory();
   const theme = useTheme();
   const [report, setReport] = useState(null);
   const { apiCall } = useMyAPI();
   const sp4 = theme.spacing(4);
   const classes = useStyles();
-  const { configuration } = useALContext();
   const { showErrorMessage, showWarningMessage } = useMySnackbar();
   const [metaOpen, setMetaOpen] = useState(false);
 
@@ -901,7 +902,7 @@ export default function SubmissionReport() {
           Object.keys(report.heuristics.malicious).length !== 0 ||
           Object.keys(report.heuristics.suspicious).length !== 0 ||
           Object.keys(report.heuristics.info).length !== 0 ||
-          (report.heuristics.safe && Object.keys(report.heuristics.safe).length !== 0)) && (
+          (showSafeResults && report.heuristics.safe && Object.keys(report.heuristics.safe).length !== 0)) && (
           <>
             <div className={classes.section_title}>
               <Typography variant="h6">{t('heuristics')}</Typography>
