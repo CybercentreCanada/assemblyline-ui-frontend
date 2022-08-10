@@ -5,6 +5,7 @@ import SelectAllOutlinedIcon from '@material-ui/icons/SelectAllOutlined';
 import { Skeleton } from '@material-ui/lab';
 import clsx from 'clsx';
 import useHighlighter from 'components/hooks/useHighlighter';
+import useSafeResults from 'components/hooks/useSafeResults';
 import { safeFieldValueURI } from 'helpers/utils';
 import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -98,6 +99,7 @@ const WrappedHeuristic: React.FC<WrappedHeuristicProps> = ({ name, id, sections,
   const { isHighlighted, triggerHighlight, getKey } = useHighlighter();
   const classes = useStyles();
   const theme = useTheme();
+  const { showSafeResults } = useSafeResults();
 
   const highlighted = isHighlighted(getKey('heuristic', id));
 
@@ -105,7 +107,7 @@ const WrappedHeuristic: React.FC<WrappedHeuristicProps> = ({ name, id, sections,
 
   const handleHighlight = useCallback(() => triggerHighlight(getKey('heuristic', id)), [triggerHighlight, getKey, id]);
 
-  return (
+  return level === 'safe' && !showSafeResults ? null : (
     <div
       className={clsx(
         classes.container,
