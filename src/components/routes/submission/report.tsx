@@ -485,41 +485,44 @@ function HeuristicsListSkel() {
 
 function FileTree({ tree, important_files }) {
   const classes = useStyles();
+  const { showSafeResults } = useSafeResults();
 
   return (
     <div>
       {Object.keys(tree).map((f, i) =>
         important_files.indexOf(f) !== -1 ? (
-          <div key={i} style={{ pageBreakInside: 'avoid' }}>
-            <table style={{ borderSpacing: 0 }}>
-              <tbody>
-                <tr>
-                  <td style={{ verticalAlign: 'top' }}>
-                    <Verdict score={tree[f].score} short mono />
-                  </td>
-                  <td>
-                    <b style={{ fontSize: '110%', wordBreak: 'break-word' }}>{tree[f].name.join(' | ')}</b>
-                  </td>
-                </tr>
-                <tr>
-                  <td />
-                  <td>
-                    <div className={classes.file_details}>
-                      {`${tree[f].sha256} - ${tree[f].type} - `}
-                      <b>{tree[f].size}</b>
-                      <span style={{ fontWeight: 300 }}> ({bytesToSize(tree[f].size)})</span>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td />
-                  <td>
-                    <FileTree tree={tree[f].children} important_files={important_files} />
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          tree[f].score < 0 && !showSafeResults ? null : (
+            <div key={i} style={{ pageBreakInside: 'avoid' }}>
+              <table style={{ borderSpacing: 0 }}>
+                <tbody>
+                  <tr>
+                    <td style={{ verticalAlign: 'top' }}>
+                      <Verdict score={tree[f].score} short mono />
+                    </td>
+                    <td>
+                      <b style={{ fontSize: '110%', wordBreak: 'break-word' }}>{tree[f].name.join(' | ')}</b>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td />
+                    <td>
+                      <div className={classes.file_details}>
+                        {`${tree[f].sha256} - ${tree[f].type} - `}
+                        <b>{tree[f].size}</b>
+                        <span style={{ fontWeight: 300 }}> ({bytesToSize(tree[f].size)})</span>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td />
+                    <td>
+                      <FileTree tree={tree[f].children} important_files={important_files} />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          )
         ) : null
       )}
     </div>
