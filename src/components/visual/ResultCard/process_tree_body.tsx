@@ -7,6 +7,7 @@ import SettingsEthernetOutlinedIcon from '@material-ui/icons/SettingsEthernetOut
 import WidgetsOutlinedIcon from '@material-ui/icons/WidgetsOutlined';
 import { TreeItem, TreeView } from '@material-ui/lab';
 import clsx from 'clsx';
+import useSafeResults from 'components/hooks/useSafeResults';
 import { humanReadableNumber, scoreToVerdict } from 'helpers/utils';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -107,13 +108,14 @@ const useTreeItemStyles = makeStyles((theme: Theme) => ({
 const ProcessTreeItem = ({ process }) => {
   const { t } = useTranslation(['fileDetail']);
   const classes = useTreeItemStyles();
+  const { showSafeResults } = useSafeResults();
   const classMap = {
     suspicious: classes.suspicious,
     highly_suspicious: classes.suspicious,
     malicious: classes.malicious
   };
 
-  return (
+  return process.safelisted && process.children.length === 0 && !showSafeResults ? null : (
     <TreeItem
       nodeId={process.process_pid.toString()}
       classes={{
