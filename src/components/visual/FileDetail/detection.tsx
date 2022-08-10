@@ -13,6 +13,7 @@ import { Result } from '../ResultCard';
 import ResultSection, { Section } from '../ResultCard/result_section';
 
 const HEUR_LEVELS = ['malicious' as 'malicious', 'suspicious' as 'suspicious', 'info' as 'info', 'safe' as 'safe'];
+const DEFAULT_SEC_SCORE = -1000;
 
 const useStyles = makeStyles(theme => ({
   title: {
@@ -168,11 +169,14 @@ const WrappedDetection: React.FC<WrappedDetectionProps> = ({ heuristics, results
   const { t } = useTranslation(['fileDetail']);
   const [open, setOpen] = React.useState(true);
   const [sectionMap, setSectionMap] = React.useState({});
+  const [maxScore, setMaxScore] = React.useState(DEFAULT_SEC_SCORE);
   const theme = useTheme();
   const classes = useStyles();
   const sp2 = theme.spacing(2);
+  const { showSafeResults } = useSafeResults();
 
   useEffect(() => {
+    let newMaxScore = DEFAULT_SEC_SCORE;
     const newSectionMap = {};
     if (results) {
       for (const res of results) {
@@ -182,11 +186,15 @@ const WrappedDetection: React.FC<WrappedDetectionProps> = ({ heuristics, results
           if (!newSectionMap.hasOwnProperty(sec.heuristic.heur_id)) {
             newSectionMap[sec.heuristic.heur_id] = [];
           }
+          if (sec.heuristic.score > newMaxScore) {
+            newMaxScore = sec.heuristic.score;
+          }
           newSectionMap[sec.heuristic.heur_id].push(sec);
         }
       }
     }
     setSectionMap(newSectionMap);
+    setMaxScore(newMaxScore);
   }, [results]);
 
   useEffect(() => {
@@ -195,7 +203,7 @@ const WrappedDetection: React.FC<WrappedDetectionProps> = ({ heuristics, results
     }
   }, [section_map]);
 
-  return (
+  return maxScore < 0 && !showSafeResults ? null : (
     <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
       <Typography
         variant="h6"
