@@ -1,6 +1,7 @@
 import { Box, Collapse, Divider, makeStyles, Typography, useTheme } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
 import useHighlighter from 'components/hooks/useHighlighter';
+import useSafeResults from 'components/hooks/useSafeResults';
 import Verdict from 'components/visual/Verdict';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -85,12 +86,13 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid }) => {
   const classes = useStyles();
   const history = useHistory();
   const { isHighlighted } = useHighlighter();
+  const { showSafeResults } = useSafeResults();
 
   return (
     <>
       {Object.keys(tree).map((sha256, i) => {
         const item = tree[sha256];
-        return (
+        return item.score < 0 && !showSafeResults ? null : (
           <div key={i}>
             <Box
               className={classes.file_item}
