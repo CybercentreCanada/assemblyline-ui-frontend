@@ -9,6 +9,7 @@ import { Skeleton } from '@material-ui/lab';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import useSafeResults from 'components/hooks/useSafeResults';
 import Classification from 'components/visual/Classification';
 import { Error } from 'components/visual/ErrorCard';
 import { AlternateResult, emptyResult, Result } from 'components/visual/ResultCard';
@@ -107,6 +108,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
   const { showSuccessMessage } = useMySnackbar();
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
+  const { showSafeResults } = useSafeResults();
 
   const location = useLocation();
   const params = new URLSearchParams(location.search);
@@ -348,10 +350,15 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
         {(!file || Object.keys(file.attack_matrix).length !== 0) && (
           <AttackSection attacks={file ? file.attack_matrix : null} force={force} />
         )}
-        {(!file || Object.keys(file.tags).length !== 0 || file.signatures.length !== 0) && (
+        {(!file ||
+          Object.keys(file.tags).length !== 0 ||
+          file.signatures.some(i => i[1] !== 'safe') ||
+          (file.signatures.length > 0 && (showSafeResults || force))) && (
           <TagSection signatures={file ? file.signatures : null} tags={file ? file.tags : null} force={force} />
         )}
-        {(!file || file.results.length !== 0) && (
+        {(!file ||
+          file.results.some(i => i.result.score >= 0) ||
+          (file.results.length > 0 && (showSafeResults || force))) && (
           <ResultSection
             results={file ? file.results : null}
             sid={sid}

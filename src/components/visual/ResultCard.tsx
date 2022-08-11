@@ -270,6 +270,7 @@ const WrappedResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates 
                     section_list={displayedResult.result.sections}
                     sub_sections={item.children}
                     indent={1}
+                    force={force}
                   />
                 ))
               : displayedResult.result.sections.map((section, id) => (
@@ -280,6 +281,7 @@ const WrappedResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates 
                     sub_sections={[]}
                     indent={section.depth + 1}
                     depth={section.depth + 1}
+                    force={force}
                   />
                 ))}
             {displayedResult.response.supplementary.filter(item => !item.is_section_image).length !== 0 && (
