@@ -42,9 +42,10 @@ type FileTreeProps = {
     [key: string]: FileItemProps;
   };
   sid: string;
+  force?: boolean;
 };
 
-const WrappedFileTreeSection: React.FC<FileTreeProps> = ({ tree, sid }) => {
+const WrappedFileTreeSection: React.FC<FileTreeProps> = ({ tree, sid, force = false }) => {
   const { t } = useTranslation(['submissionDetail']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
@@ -66,7 +67,7 @@ const WrappedFileTreeSection: React.FC<FileTreeProps> = ({ tree, sid }) => {
       <Collapse in={open} timeout="auto">
         <div style={{ paddingTop: sp2 }}>
           {tree !== null ? (
-            <FileTree tree={tree} sid={sid} />
+            <FileTree tree={tree} sid={sid} force={force} />
           ) : (
             [...Array(3)].map((_, i) => (
               <div style={{ display: 'flex' }} key={i}>
@@ -81,7 +82,7 @@ const WrappedFileTreeSection: React.FC<FileTreeProps> = ({ tree, sid }) => {
   );
 };
 
-const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid }) => {
+const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, force = false }) => {
   const theme = useTheme();
   const classes = useStyles();
   const history = useHistory();
@@ -92,7 +93,7 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid }) => {
     <>
       {Object.keys(tree).map((sha256, i) => {
         const item = tree[sha256];
-        return item.score < 0 && !showSafeResults ? null : (
+        return item.score < 0 && !showSafeResults && !force ? null : (
           <div key={i}>
             <Box
               className={classes.file_item}
@@ -115,7 +116,7 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid }) => {
               </span>
             </Box>
             <div style={{ marginLeft: theme.spacing(3) }}>
-              <FileTree tree={item.children} sid={sid} />
+              <FileTree tree={item.children} sid={sid} force={force} />
             </div>
           </div>
         );

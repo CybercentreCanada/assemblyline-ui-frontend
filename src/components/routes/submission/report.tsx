@@ -25,7 +25,6 @@ import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import useSafeResults from 'components/hooks/useSafeResults';
 import Classification from 'components/visual/Classification';
 import ResultSection from 'components/visual/ResultCard/result_section';
 import TextVerdict from 'components/visual/TextVerdict';
@@ -393,12 +392,14 @@ function AttackMatrixBlock({ attack, items }) {
   return (
     <div className={classes.attack_bloc}>
       <span className={classes.attack_title}>{attack.replace(/-/g, ' ')}</span>
-      {Object.keys(items).map((cat, idx) => (
-        <div key={idx}>
-          <TextVerdict verdict={items[cat].h_type} mono />
-          <span style={{ verticalAlign: 'middle' }}>{cat}</span>
-        </div>
-      ))}
+      {Object.keys(items).map((cat, idx) =>
+        items[cat].h_type === 'safe' ? null : (
+          <div key={idx}>
+            <TextVerdict verdict={items[cat].h_type} mono />
+            <span style={{ verticalAlign: 'middle' }}>{cat}</span>
+          </div>
+        )
+      )}
     </div>
   );
 }
@@ -421,7 +422,7 @@ function AttackMatrixSkel() {
   );
 }
 
-function HeuristicsList({ verdict, items, sections, name_map }) {
+function HeuristicsList({ verdict, items, sections, name_map, force = false }) {
   const classes = useStyles();
   const theme = useTheme();
   const classMap = {
@@ -452,7 +453,7 @@ function HeuristicsList({ verdict, items, sections, name_map }) {
                       return (
                         <div key={secidx} className={classes.result_section}>
                           <div style={{ marginRight: theme.spacing(1) }}>
-                            <ResultSection section={sec} printable />
+                            <ResultSection section={sec} printable force={force} />
                           </div>
                         </div>
                       );
@@ -485,13 +486,12 @@ function HeuristicsListSkel() {
 
 function FileTree({ tree, important_files }) {
   const classes = useStyles();
-  const { showSafeResults } = useSafeResults();
 
   return (
     <div>
       {Object.keys(tree).map((f, i) =>
         important_files.indexOf(f) !== -1 ? (
-          tree[f].score < 0 && !showSafeResults ? null : (
+          tree[f].score < 0 ? null : (
             <div key={i} style={{ pageBreakInside: 'avoid' }}>
               <table style={{ borderSpacing: 0 }}>
                 <tbody>
@@ -558,7 +558,6 @@ export default function SubmissionReport() {
   const { t } = useTranslation(['submissionReport']);
   const { id } = useParams<ParamProps>();
   const { c12nDef, configuration } = useALContext();
-  const { showSafeResults } = useSafeResults();
   const history = useHistory();
   const theme = useTheme();
   const [report, setReport] = useState(null);
@@ -905,7 +904,7 @@ export default function SubmissionReport() {
           Object.keys(report.heuristics.malicious).length !== 0 ||
           Object.keys(report.heuristics.suspicious).length !== 0 ||
           Object.keys(report.heuristics.info).length !== 0 ||
-          (showSafeResults && report.heuristics.safe && Object.keys(report.heuristics.safe).length !== 0)) && (
+          (report.max_score < 0 && report.heuristics.safe && Object.keys(report.heuristics.safe).length !== 0)) && (
           <>
             <div className={classes.section_title}>
               <Typography variant="h6">{t('heuristics')}</Typography>
@@ -919,6 +918,7 @@ export default function SubmissionReport() {
                     items={report.heuristics.safe}
                     sections={report.heuristic_sections}
                     name_map={report.heuristic_name_map}
+                    force
                   />
                 )}
                 {Object.keys(report.heuristics.malicious).length !== 0 && (

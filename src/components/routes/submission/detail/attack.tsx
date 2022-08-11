@@ -16,9 +16,10 @@ const useStyles = makeStyles(theme => ({
 
 type AttackSectionProps = {
   attack_matrix: any;
+  force?: boolean;
 };
 
-const WrappedAttackSection: React.FC<AttackSectionProps> = ({ attack_matrix }) => {
+const WrappedAttackSection: React.FC<AttackSectionProps> = ({ attack_matrix, force = false }) => {
   const { t } = useTranslation(['submissionDetail']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
@@ -55,6 +56,7 @@ const WrappedAttackSection: React.FC<AttackSectionProps> = ({ attack_matrix }) =
                             text={name}
                             lvl={lvl}
                             highlight_key={getKey('attack_pattern', cid)}
+                            force={force}
                           />
                         ))}
                       </Grid>

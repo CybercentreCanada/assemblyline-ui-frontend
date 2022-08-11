@@ -21,9 +21,10 @@ const useStyles = makeStyles(theme => ({
 type TagSectionProps = {
   tag_group: string;
   tags: any;
+  force?: boolean;
 };
 
-const WrappedTagSection: React.FC<TagSectionProps> = ({ tag_group, tags }) => {
+const WrappedTagSection: React.FC<TagSectionProps> = ({ tag_group, tags, force = false }) => {
   const { t } = useTranslation(['submissionDetail']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
@@ -55,6 +56,7 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ tag_group, tags }) => {
                         type={tag_type}
                         lvl={lvl}
                         highlight_key={getKey(tag_type, value)}
+                        force={force}
                       />
                     ))}
                   </Grid>

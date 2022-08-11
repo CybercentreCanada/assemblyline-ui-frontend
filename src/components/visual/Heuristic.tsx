@@ -35,6 +35,7 @@ type HeuristicProps = {
   highlight_key?: string;
   fullWidth?: boolean;
   safe?: boolean;
+  force?: boolean;
 };
 
 const WrappedHeuristic: React.FC<HeuristicProps> = ({
@@ -45,7 +46,8 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({
   show_type = false,
   highlight_key = null,
   fullWidth = false,
-  safe = false
+  safe = false,
+  force = false
 }) => {
   const { t } = useTranslation();
   const [state, setState] = React.useState(initialMenuState);
@@ -142,7 +144,7 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({
     highly_suspicious: 'warning' as 'warning'
   }[maliciousness];
 
-  return maliciousness === 'safe' && !showSafeResults ? null : (
+  return maliciousness === 'safe' && !showSafeResults && !force ? null : (
     <>
       {signature && (
         <InputDialog

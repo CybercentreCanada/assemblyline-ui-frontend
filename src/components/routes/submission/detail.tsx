@@ -705,14 +705,20 @@ export default function SubmissionDetail() {
           }
         });
         setGlobalDrawer(
-          <FileDetail sha256={fid} sid={id} liveResultKeys={liveResultKeys} liveErrors={curFileLiveErrors} />
+          <FileDetail
+            sha256={fid}
+            sid={id}
+            liveResultKeys={liveResultKeys}
+            liveErrors={curFileLiveErrors}
+            force={submission && submission.max_score < 0}
+          />
         );
       } else {
-        setGlobalDrawer(<FileDetail sha256={fid} sid={id} />);
+        setGlobalDrawer(<FileDetail sha256={fid} sid={id} force={submission && submission.max_score < 0} />);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fid]);
+  }, [fid, submission]);
 
   useEffect(() => {
     if (loadTrigger === 0) return;
@@ -1052,11 +1058,15 @@ export default function SubmissionDetail() {
           <Detection
             section_map={summary ? summary.heuristic_sections : null}
             heuristics={summary ? summary.heuristics : null}
+            force={submission && submission.max_score < 0}
           />
         )}
 
         {(!summary || Object.keys(summary.attack_matrix).length !== 0) && (
-          <AttackSection attack_matrix={summary ? summary.attack_matrix : null} />
+          <AttackSection
+            attack_matrix={summary ? summary.attack_matrix : null}
+            force={submission && submission.max_score < 0}
+          />
         )}
 
         {summary &&
@@ -1064,7 +1074,12 @@ export default function SubmissionDetail() {
           Object.keys(summary.tags).map(
             (tag_group, group_idx) =>
               Object.keys(summary.tags[tag_group]).length !== 0 && (
-                <TagSection key={group_idx} tag_group={tag_group} tags={summary.tags[tag_group]} />
+                <TagSection
+                  key={group_idx}
+                  tag_group={tag_group}
+                  tags={summary.tags[tag_group]}
+                  force={submission && submission.max_score < 0}
+                />
               )
           )}
 
@@ -1076,7 +1091,7 @@ export default function SubmissionDetail() {
           <ErrorSection sid={id} parsed_errors={liveErrors} />
         )}
 
-        <FileTreeSection tree={tree} sid={id} />
+        <FileTreeSection tree={tree} sid={id} force={submission && submission.max_score < 0} />
       </div>
     </PageCenter>
   );

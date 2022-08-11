@@ -27,6 +27,7 @@ type AttackProps = {
   show_type?: boolean;
   highlight_key?: string;
   fullWidth?: boolean;
+  force?: boolean;
 };
 
 const WrappedAttack: React.FC<AttackProps> = ({
@@ -35,7 +36,8 @@ const WrappedAttack: React.FC<AttackProps> = ({
   score = null,
   show_type = false,
   highlight_key = null,
-  fullWidth = false
+  fullWidth = false,
+  force = false
 }) => {
   const { t } = useTranslation();
   const [state, setState] = React.useState(initialMenuState);
@@ -88,7 +90,7 @@ const WrappedAttack: React.FC<AttackProps> = ({
     handleClose();
   }, [handleClick, handleClose]);
 
-  return maliciousness === 'safe' && !showSafeResults ? null : (
+  return maliciousness === 'safe' && !showSafeResults && !force ? null : (
     <>
       <Menu
         open={state.mouseY !== null}

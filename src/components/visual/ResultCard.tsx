@@ -73,6 +73,7 @@ type ResultCardProps = {
   result: Result;
   sid: string | null;
   alternates?: AlternateResult[] | null;
+  force?: boolean;
 };
 
 const useStyles = makeStyles(theme => ({
@@ -107,7 +108,7 @@ export const emptyResult = (result: Result) =>
   result.response.extracted.length === 0 &&
   result.response.supplementary.length === 0;
 
-const WrappedResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates = null }) => {
+const WrappedResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates = null, force = false }) => {
   const { t } = useTranslation(['fileDetail']);
   const classes = useStyles();
   const theme = useTheme();
@@ -184,7 +185,7 @@ const WrappedResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected]);
 
-  return displayedResult.result.score < 0 && !showSafeResults ? null : (
+  return displayedResult.result.score < 0 && !showSafeResults && !force ? null : (
     <div className={classes.card} style={{ marginBottom: sp2 }}>
       <Popper open={popper} anchorEl={anchorEl} placement="bottom-end" transition>
         {({ TransitionProps }) => (

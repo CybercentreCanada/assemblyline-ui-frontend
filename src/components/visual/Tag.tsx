@@ -37,6 +37,7 @@ type TagProps = {
   highlight_key?: string;
   safelisted?: boolean;
   fullWidth?: boolean;
+  force?: boolean;
 };
 
 const WrappedTag: React.FC<TagProps> = ({
@@ -47,7 +48,8 @@ const WrappedTag: React.FC<TagProps> = ({
   short_type = null,
   highlight_key = null,
   safelisted = false,
-  fullWidth = false
+  fullWidth = false,
+  force = false
 }) => {
   const { t } = useTranslation();
   const [state, setState] = React.useState(initialMenuState);
@@ -142,7 +144,7 @@ const WrappedTag: React.FC<TagProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [safelistReason, t, type, value]);
 
-  return maliciousness === 'safe' && !showSafeResults ? null : (
+  return maliciousness === 'safe' && !showSafeResults && !force ? null : (
     <>
       <InputDialog
         open={safelistDialog}

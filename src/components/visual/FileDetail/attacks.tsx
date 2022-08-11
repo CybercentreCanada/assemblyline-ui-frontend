@@ -16,9 +16,10 @@ const useStyles = makeStyles(theme => ({
 
 type AttackSectionProps = {
   attacks: any;
+  force?: boolean;
 };
 
-const WrappedAttackSection: React.FC<AttackSectionProps> = ({ attacks }) => {
+const WrappedAttackSection: React.FC<AttackSectionProps> = ({ attacks, force = false }) => {
   const { t } = useTranslation(['fileDetail']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
@@ -55,6 +56,7 @@ const WrappedAttackSection: React.FC<AttackSectionProps> = ({ attacks }) => {
                             text={mat}
                             lvl={lvl}
                             highlight_key={getKey('attack_pattern', cid)}
+                            force={force}
                           />
                         ))}
                       </Grid>

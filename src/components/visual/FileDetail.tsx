@@ -3,8 +3,8 @@ import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
 import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
 import PageviewOutlinedIcon from '@material-ui/icons/PageviewOutlined';
 import PlaylistAddCheckIcon from '@material-ui/icons/PlaylistAddCheck';
-import RotateLeftOutlinedIcon from '@material-ui/icons/RotateLeftOutlined';
 import ReplayOutlinedIcon from '@material-ui/icons/ReplayOutlined';
+import RotateLeftOutlinedIcon from '@material-ui/icons/RotateLeftOutlined';
 import { Skeleton } from '@material-ui/lab';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -28,7 +28,6 @@ import ParentSection from './FileDetail/parents';
 import ResultSection from './FileDetail/results';
 import TagSection from './FileDetail/tags';
 import InputDialog from './InputDialog';
-
 
 type FileInfo = {
   archive_ts: string;
@@ -87,13 +86,15 @@ type FileDetailProps = {
   sid?: string;
   liveResultKeys?: string[];
   liveErrors?: Error[];
+  force?: boolean;
 };
 
 const WrappedFileDetail: React.FC<FileDetailProps> = ({
   sha256,
   sid = null,
   liveResultKeys = null,
-  liveErrors = null
+  liveErrors = null,
+  force = false
 }) => {
   const { t } = useTranslation(['fileDetail']);
   const [file, setFile] = useState<File | null>(null);
@@ -286,7 +287,17 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                           </IconButton>
                         </Tooltip>
                         <Tooltip title={t('resubmit_file')}>
-                          <IconButton component={Link} to={{pathname: "/submit", state: {hash: file.file_info.sha256, tabContext: "1", c12n: file.file_info.classification}}}>
+                          <IconButton
+                            component={Link}
+                            to={{
+                              pathname: '/submit',
+                              state: {
+                                hash: file.file_info.sha256,
+                                tabContext: '1',
+                                c12n: file.file_info.classification
+                              }
+                            }}
+                          >
                             <ReplayOutlinedIcon />
                           </IconButton>
                         </Tooltip>
@@ -332,16 +343,21 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
         {file && file.childrens && file.childrens.length !== 0 && <ChildrenSection childrens={file.childrens} />}
         {file && file.parents && file.parents.length !== 0 && <ParentSection parents={file.parents} />}
         {(!file || Object.keys(file.heuristics).length !== 0) && (
-          <Detection results={file ? file.results : null} heuristics={file ? file.heuristics : null} />
+          <Detection results={file ? file.results : null} heuristics={file ? file.heuristics : null} force={force} />
         )}
         {(!file || Object.keys(file.attack_matrix).length !== 0) && (
-          <AttackSection attacks={file ? file.attack_matrix : null} />
+          <AttackSection attacks={file ? file.attack_matrix : null} force={force} />
         )}
         {(!file || Object.keys(file.tags).length !== 0 || file.signatures.length !== 0) && (
-          <TagSection signatures={file ? file.signatures : null} tags={file ? file.tags : null} />
+          <TagSection signatures={file ? file.signatures : null} tags={file ? file.tags : null} force={force} />
         )}
         {(!file || file.results.length !== 0) && (
-          <ResultSection results={file ? file.results : null} sid={sid} alternates={file ? file.alternates : null} />
+          <ResultSection
+            results={file ? file.results : null}
+            sid={sid}
+            alternates={file ? file.alternates : null}
+            force={force}
+          />
         )}
         {(!file || file.emptys.length !== 0) && <EmptySection emptys={file ? file.emptys : null} sid={sid} />}
         {file && file.errors.length !== 0 && <ErrorSection errors={file.errors} />}

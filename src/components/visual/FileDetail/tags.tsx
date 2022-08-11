@@ -23,9 +23,10 @@ const useStyles = makeStyles(theme => ({
 type TagSectionProps = {
   signatures: any;
   tags: any;
+  force?: boolean;
 };
 
-const WrappedTagSection: React.FC<TagSectionProps> = ({ signatures, tags }) => {
+const WrappedTagSection: React.FC<TagSectionProps> = ({ signatures, tags, force = false }) => {
   const { t } = useTranslation(['fileDetail']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
@@ -63,6 +64,7 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ signatures, tags }) => {
                         lvl={lvl}
                         highlight_key={getKey('heuristic.signature', value)}
                         safe={safe}
+                        force={force}
                       />
                     ))}
                   </Grid>
@@ -89,6 +91,7 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ signatures, tags }) => {
                             safelisted={safelisted}
                             lvl={lvl}
                             highlight_key={getKey(tag_type, value)}
+                            force={force}
                           />
                         ))}
                       </Grid>

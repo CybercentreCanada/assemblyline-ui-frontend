@@ -104,6 +104,7 @@ type ResultSectionProps = {
   depth?: number;
   nested?: boolean;
   printable?: boolean;
+  force?: boolean;
 };
 
 const WrappedResultSection: React.FC<ResultSectionProps> = ({
@@ -113,7 +114,8 @@ const WrappedResultSection: React.FC<ResultSectionProps> = ({
   indent = 1,
   depth = 1,
   nested = false,
-  printable = false
+  printable = false,
+  force = false
 }) => {
   const { t } = useTranslation(['fileDetail']);
   const classes = useStyles();
@@ -214,7 +216,7 @@ const WrappedResultSection: React.FC<ResultSectionProps> = ({
     handleClose();
   }, [copy, handleClose, section.body]);
 
-  return section.heuristic && section.heuristic.score < 0 && !showSafeResults ? null : (
+  return section.heuristic && section.heuristic.score < 0 && !showSafeResults && !force ? null : (
     <>
       {!printable && (
         <Menu

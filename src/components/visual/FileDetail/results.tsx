@@ -19,9 +19,10 @@ type ResultSectionProps = {
   alternates?: {
     [serviceName: string]: AlternateResult[];
   };
+  force?: boolean;
 };
 
-const WrappedResultSection: React.FC<ResultSectionProps> = ({ results, sid, alternates }) => {
+const WrappedResultSection: React.FC<ResultSectionProps> = ({ results, sid, alternates, force = false }) => {
   const { t } = useTranslation(['fileDetail']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
@@ -51,6 +52,7 @@ const WrappedResultSection: React.FC<ResultSectionProps> = ({ results, sid, alte
                       result={result}
                       sid={sid}
                       alternates={alternates ? alternates[result.response.service_name] : null}
+                      force={force}
                     />
                   ))
                 : [...Array(2)].map((_, i) => <Skeleton key={i} style={{ height: '16rem' }} />)}
