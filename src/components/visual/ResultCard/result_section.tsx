@@ -369,7 +369,7 @@ const WrappedResultSection: React.FC<ResultSectionProps> = ({
                       case 'ORDERED_KEY_VALUE':
                         return <OrderedKVBody body={section.body} />;
                       case 'PROCESS_TREE':
-                        return <ProcessTreeBody body={section.body} />;
+                        return <ProcessTreeBody body={section.body} force={force} />;
                       case 'TABLE':
                         return <TblBody body={section.body} printable={printable} />;
                       case 'IMAGE':
