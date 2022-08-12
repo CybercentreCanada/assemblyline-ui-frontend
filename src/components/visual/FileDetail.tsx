@@ -9,7 +9,6 @@ import { Skeleton } from '@material-ui/lab';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import useSafeResults from 'components/hooks/useSafeResults';
 import Classification from 'components/visual/Classification';
 import { Error } from 'components/visual/ErrorCard';
 import { AlternateResult, emptyResult, Result } from 'components/visual/ResultCard';
@@ -108,7 +107,6 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
   const { showSuccessMessage } = useMySnackbar();
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
-  const { showSafeResults } = useSafeResults();
 
   const location = useLocation();
   const params = new URLSearchParams(location.search);
@@ -339,35 +337,20 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
       <div style={{ paddingBottom: sp2 }}>
         <IdentificationSection fileinfo={file ? file.file_info : null} />
         <FrequencySection fileinfo={file ? file.file_info : null} />
-        {(!file || Object.keys(file.metadata).length !== 0) && (
-          <MetadataSection metadata={file ? file.metadata : null} />
-        )}
-        {file && file.childrens && file.childrens.length !== 0 && <ChildrenSection childrens={file.childrens} />}
-        {file && file.parents && file.parents.length !== 0 && <ParentSection parents={file.parents} />}
-        {(!file || Object.keys(file.heuristics).length !== 0) && (
-          <Detection results={file ? file.results : null} heuristics={file ? file.heuristics : null} force={force} />
-        )}
-        {(!file || Object.keys(file.attack_matrix).length !== 0) && (
-          <AttackSection attacks={file ? file.attack_matrix : null} force={force} />
-        )}
-        {(!file ||
-          Object.keys(file.tags).length !== 0 ||
-          file.signatures.some(i => i[1] !== 'safe') ||
-          (file.signatures.length > 0 && (showSafeResults || force))) && (
-          <TagSection signatures={file ? file.signatures : null} tags={file ? file.tags : null} force={force} />
-        )}
-        {(!file ||
-          file.results.some(i => i.result.score >= 0) ||
-          (file.results.length > 0 && (showSafeResults || force))) && (
-          <ResultSection
-            results={file ? file.results : null}
-            sid={sid}
-            alternates={file ? file.alternates : null}
-            force={force}
-          />
-        )}
-        {(!file || file.emptys.length !== 0) && <EmptySection emptys={file ? file.emptys : null} sid={sid} />}
-        {file && file.errors.length !== 0 && <ErrorSection errors={file.errors} />}
+        <MetadataSection metadata={file ? file.metadata : null} />
+        <ChildrenSection childrens={file ? file.childrens : null} />
+        <ParentSection parents={file ? file.parents : null} />
+        <Detection results={file ? file.results : null} heuristics={file ? file.heuristics : null} force={force} />
+        <AttackSection attacks={file ? file.attack_matrix : null} force={force} />
+        <TagSection signatures={file ? file.signatures : null} tags={file ? file.tags : null} force={force} />
+        <ResultSection
+          results={file ? file.results : null}
+          sid={sid}
+          alternates={file ? file.alternates : null}
+          force={force}
+        />
+        <EmptySection emptys={file ? file.emptys : null} sid={sid} />
+        <ErrorSection errors={file ? file.errors : null} />
       </div>
     </div>
   );

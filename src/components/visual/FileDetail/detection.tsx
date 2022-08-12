@@ -224,7 +224,8 @@ const WrappedDetection: React.FC<WrappedDetectionProps> = ({
     }
   }, [section_map]);
 
-  return maxScore < SCORE_SHOW_THRESHOLD && !showSafeResults && !force ? null : (
+  return (heuristics && Object.keys(heuristics).length === 0) ||
+    (heuristics && maxScore < SCORE_SHOW_THRESHOLD && !showSafeResults && !force) ? null : (
     <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
       <Typography
         variant="h6"

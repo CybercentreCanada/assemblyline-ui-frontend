@@ -1054,13 +1054,11 @@ export default function SubmissionDetail() {
           <MetaSection metadata={submission ? submission.metadata : null} />
         )}
 
-        {(!summary || Object.keys(summary.heuristics).length !== 0) && (
-          <Detection
-            section_map={summary ? summary.heuristic_sections : null}
-            heuristics={summary ? summary.heuristics : null}
-            force={submission && submission.max_score < 0}
-          />
-        )}
+        <Detection
+          section_map={summary ? summary.heuristic_sections : null}
+          heuristics={summary ? summary.heuristics : null}
+          force={submission && submission.max_score < 0}
+        />
 
         {(!summary || Object.keys(summary.attack_matrix).length !== 0) && (
           <AttackSection
