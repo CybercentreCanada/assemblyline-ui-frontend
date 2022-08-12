@@ -9,6 +9,7 @@ import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import useSafeResults from 'components/hooks/useSafeResults';
 import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
 import { safeFieldValueURI, scoreToVerdict } from 'helpers/utils';
 import React, { useCallback } from 'react';
@@ -36,6 +37,7 @@ type TagProps = {
   highlight_key?: string;
   safelisted?: boolean;
   fullWidth?: boolean;
+  force?: boolean;
 };
 
 const WrappedTag: React.FC<TagProps> = ({
@@ -46,7 +48,8 @@ const WrappedTag: React.FC<TagProps> = ({
   short_type = null,
   highlight_key = null,
   safelisted = false,
-  fullWidth = false
+  fullWidth = false,
+  force = false
 }) => {
   const { t } = useTranslation();
   const [state, setState] = React.useState(initialMenuState);
@@ -58,6 +61,7 @@ const WrappedTag: React.FC<TagProps> = ({
   const { showSuccessMessage } = useMySnackbar();
   const { isHighlighted, triggerHighlight } = useHighlighter();
   const { copy } = useClipboard();
+  const { showSafeResults } = useSafeResults();
 
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
 
@@ -67,24 +71,18 @@ const WrappedTag: React.FC<TagProps> = ({
     [type, value]
   );
 
-  let color: PossibleColors = 'default' as 'default';
+  let maliciousness = lvl || scoreToVerdict(score);
   if (safelisted) {
-    color = 'success' as 'success';
-  } else if (lvl) {
-    color = {
-      info: 'default' as 'default',
-      suspicious: 'warning' as 'warning',
-      malicious: 'error' as 'error'
-    }[lvl];
-  } else if (score) {
-    color = {
-      suspicious: 'warning' as 'warning',
-      malicious: 'error' as 'error',
-      safe: 'success' as 'success',
-      info: 'default' as 'default',
-      highly_suspicious: 'warning' as 'warning'
-    }[scoreToVerdict(score)];
+    maliciousness = 'safe';
   }
+
+  const color: PossibleColors = {
+    suspicious: 'warning' as 'warning',
+    malicious: 'error' as 'error',
+    safe: 'success' as 'success',
+    info: 'default' as 'default',
+    highly_suspicious: 'warning' as 'warning'
+  }[maliciousness];
 
   const handleMenuClick = useCallback(event => {
     event.preventDefault();
@@ -146,7 +144,7 @@ const WrappedTag: React.FC<TagProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [safelistReason, t, type, value]);
 
-  return (
+  return maliciousness === 'safe' && !showSafeResults && !force ? null : (
     <>
       <InputDialog
         open={safelistDialog}

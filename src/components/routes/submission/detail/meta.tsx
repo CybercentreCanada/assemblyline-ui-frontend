@@ -3,7 +3,7 @@ import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import { Skeleton } from '@material-ui/lab';
 import useALContext from 'components/hooks/useALContext';
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(theme => ({
@@ -47,7 +47,8 @@ const WrappedMetaSection: React.FC<MetaSectionProps> = ({ metadata }) => {
   const classes = useStyles();
   const { configuration } = useALContext();
   const [metaOpen, setMetaOpen] = React.useState(false);
-  return (
+
+  return !metadata || Object.keys(metadata).length !== 0 ? (
     <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2) }}>
       <div
         style={{
@@ -85,67 +86,61 @@ const WrappedMetaSection: React.FC<MetaSectionProps> = ({ metadata }) => {
       </div>
       <Divider />
       <Collapse in={open} timeout="auto">
-        {useMemo(
-          () => (
-            <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2) }}>
-              {metadata ? (
-                Object.keys(metadata).filter(k => configuration.ui.alerting_meta.important.indexOf(k) !== -1).length !==
-                0 ? (
-                  Object.keys(metadata)
-                    .filter(k => configuration.ui.alerting_meta.important.indexOf(k) !== -1)
-                    .map((meta, i) => (
-                      <Grid container key={i}>
-                        <Grid className={classes.meta_key} item xs={12} sm={3} lg={2}>
-                          <span style={{ fontWeight: 500 }}>{meta}</span>
-                        </Grid>
-                        <Grid item xs={12} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
-                          {metadata[meta]}
-                        </Grid>
-                      </Grid>
-                    ))
-                ) : (
-                  <Collapse in={!metaOpen} timeout="auto">
-                    <pre className={classes.alert}>{t('meta.empty')}</pre>
-                  </Collapse>
-                )
-              ) : (
-                [...Array(3)].map((_, i) => (
-                  <Grid container key={i} spacing={1}>
-                    <Grid item xs={12} sm={3} lg={2}>
-                      <Skeleton style={{ height: '2rem' }} />
+        <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2) }}>
+          {metadata ? (
+            Object.keys(metadata).filter(k => configuration.ui.alerting_meta.important.indexOf(k) !== -1).length !==
+            0 ? (
+              Object.keys(metadata)
+                .filter(k => configuration.ui.alerting_meta.important.indexOf(k) !== -1)
+                .map((meta, i) => (
+                  <Grid container key={i}>
+                    <Grid className={classes.meta_key} item xs={12} sm={3} lg={2}>
+                      <span style={{ fontWeight: 500 }}>{meta}</span>
                     </Grid>
-                    <Grid item xs={12} sm={9} lg={10}>
-                      <Skeleton style={{ height: '2rem' }} />
+                    <Grid item xs={12} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                      {metadata[meta]}
                     </Grid>
                   </Grid>
                 ))
-              )}
-              {metadata &&
-                Object.keys(metadata).filter(k => configuration.ui.alerting_meta.important.indexOf(k) === -1).length !==
-                  0 && (
-                  <Collapse in={metaOpen} timeout="auto">
-                    {Object.keys(metadata)
-                      .filter(k => configuration.ui.alerting_meta.important.indexOf(k) === -1)
-                      .map((meta, i) => (
-                        <Grid container key={i}>
-                          <Grid className={classes.meta_key} item xs={12} sm={3} lg={2}>
-                            <span style={{ fontWeight: 500 }}>{meta}</span>
-                          </Grid>
-                          <Grid item xs={12} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
-                            {metadata[meta]}
-                          </Grid>
-                        </Grid>
-                      ))}
-                  </Collapse>
-                )}
-            </div>
-          ),
-          // eslint-disable-next-line react-hooks/exhaustive-deps
-          [metadata, metaOpen, classes.alert, classes.meta_key, t, theme]
-        )}
+            ) : (
+              <Collapse in={!metaOpen} timeout="auto">
+                <pre className={classes.alert}>{t('meta.empty')}</pre>
+              </Collapse>
+            )
+          ) : (
+            [...Array(3)].map((_, i) => (
+              <Grid container key={i} spacing={1}>
+                <Grid item xs={12} sm={3} lg={2}>
+                  <Skeleton style={{ height: '2rem' }} />
+                </Grid>
+                <Grid item xs={12} sm={9} lg={10}>
+                  <Skeleton style={{ height: '2rem' }} />
+                </Grid>
+              </Grid>
+            ))
+          )}
+          {metadata &&
+            Object.keys(metadata).filter(k => configuration.ui.alerting_meta.important.indexOf(k) === -1).length !==
+              0 && (
+              <Collapse in={metaOpen} timeout="auto">
+                {Object.keys(metadata)
+                  .filter(k => configuration.ui.alerting_meta.important.indexOf(k) === -1)
+                  .map((meta, i) => (
+                    <Grid container key={i}>
+                      <Grid className={classes.meta_key} item xs={12} sm={3} lg={2}>
+                        <span style={{ fontWeight: 500 }}>{meta}</span>
+                      </Grid>
+                      <Grid item xs={12} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                        {metadata[meta]}
+                      </Grid>
+                    </Grid>
+                  ))}
+              </Collapse>
+            )}
+        </div>
       </Collapse>
     </div>
-  );
+  ) : null;
 };
 const MetaSection = React.memo(WrappedMetaSection);
 

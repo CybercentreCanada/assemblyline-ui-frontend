@@ -1,6 +1,7 @@
 import { Collapse, Divider, makeStyles, Typography, useTheme } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
-import React, { useMemo } from 'react';
+import useSafeResults from 'components/hooks/useSafeResults';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import ResultCard, { AlternateResult } from '../ResultCard';
 
@@ -19,16 +20,18 @@ type ResultSectionProps = {
   alternates?: {
     [serviceName: string]: AlternateResult[];
   };
+  force?: boolean;
 };
 
-const WrappedResultSection: React.FC<ResultSectionProps> = ({ results, sid, alternates }) => {
+const WrappedResultSection: React.FC<ResultSectionProps> = ({ results, sid, alternates, force = false }) => {
   const { t } = useTranslation(['fileDetail']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
   const classes = useStyles();
   const sp2 = theme.spacing(2);
+  const { showSafeResults } = useSafeResults();
 
-  return (
+  return !results || results.some(i => i.result.score >= 0) || (results.length > 0 && (showSafeResults || force)) ? (
     <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
       <Typography
         variant="h6"
@@ -41,27 +44,28 @@ const WrappedResultSection: React.FC<ResultSectionProps> = ({ results, sid, alte
       </Typography>
       <Divider />
       <Collapse in={open} timeout="auto">
-        {useMemo(
-          () => (
-            <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
-              {results
-                ? results.map((result, i) => (
-                    <ResultCard
-                      key={i}
-                      result={result}
-                      sid={sid}
-                      alternates={alternates ? alternates[result.response.service_name] : null}
-                    />
-                  ))
-                : [...Array(2)].map((_, i) => <Skeleton key={i} style={{ height: '16rem' }} />)}
-            </div>
-          ),
-          // eslint-disable-next-line react-hooks/exhaustive-deps
-          [results, sid]
-        )}
+        <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+          {results
+            ? results.map((result, i) => (
+                <ResultCard
+                  key={i}
+                  result={result}
+                  sid={sid}
+                  alternates={alternates ? alternates[result.response.service_name] : null}
+                  force={force}
+                />
+              ))
+            : [...Array(2)].map((_, i) => (
+                <Skeleton
+                  variant="rect"
+                  key={i}
+                  style={{ height: '12rem', marginBottom: '8px', borderRadius: '4px' }}
+                />
+              ))}
+        </div>
       </Collapse>
     </div>
-  );
+  ) : null;
 };
 
 const ResultSection = React.memo(WrappedResultSection);

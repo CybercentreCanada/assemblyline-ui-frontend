@@ -5,6 +5,7 @@ import SimCardOutlinedIcon from '@material-ui/icons/SimCardOutlined';
 import useClipboard from 'commons/components/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
+import useSafeResults from 'components/hooks/useSafeResults';
 import Attack from 'components/visual/Attack';
 import Classification from 'components/visual/Classification';
 import Heuristic from 'components/visual/Heuristic';
@@ -103,16 +104,18 @@ type ResultSectionProps = {
   depth?: number;
   nested?: boolean;
   printable?: boolean;
+  force?: boolean;
 };
 
-const ResultSection: React.FC<ResultSectionProps> = ({
+const WrappedResultSection: React.FC<ResultSectionProps> = ({
   section,
   section_list = [],
   sub_sections = [],
   indent = 1,
   depth = 1,
   nested = false,
-  printable = false
+  printable = false,
+  force = false
 }) => {
   const { t } = useTranslation(['fileDetail']);
   const classes = useStyles();
@@ -125,6 +128,7 @@ const ResultSection: React.FC<ResultSectionProps> = ({
   const { c12nDef } = useALContext();
   const [state, setState] = React.useState(null);
   const { copy } = useClipboard();
+  const { showSafeResults } = useSafeResults();
 
   const allTags = useMemo(() => {
     const tagList = [];
@@ -212,7 +216,7 @@ const ResultSection: React.FC<ResultSectionProps> = ({
     handleClose();
   }, [copy, handleClose, section.body]);
 
-  return (
+  return section.heuristic && section.heuristic.score < 0 && !showSafeResults && !force ? null : (
     <>
       {!printable && (
         <Menu
@@ -345,126 +349,105 @@ const ResultSection: React.FC<ResultSectionProps> = ({
             )}
           </Box>
           <Collapse in={open || printable} timeout="auto">
-            {useMemo(
-              () => (
-                <>
-                  <div style={{ marginLeft: printable ? '2rem' : '1rem', marginBottom: '0.75rem' }}>
-                    <div style={{ cursor: 'context-menu' }} onContextMenu={handleMenuClick}>
-                      {section.body &&
-                        (() => {
-                          switch (section.body_format) {
-                            case 'TEXT':
-                              return <TextBody body={section.body} />;
-                            case 'MEMORY_DUMP':
-                              return <MemDumpBody body={section.body} />;
-                            case 'GRAPH_DATA':
-                              return <GraphBody body={section.body} />;
-                            case 'URL':
-                              return <URLBody body={section.body} />;
-                            case 'JSON':
-                              return <JSONBody body={section.body} printable={printable} />;
-                            case 'KEY_VALUE':
-                              return <KVBody body={section.body} />;
-                            case 'ORDERED_KEY_VALUE':
-                              return <OrderedKVBody body={section.body} />;
-                            case 'PROCESS_TREE':
-                              return <ProcessTreeBody body={section.body} />;
-                            case 'TABLE':
-                              return <TblBody body={section.body} printable={printable} />;
-                            case 'IMAGE':
-                              return <ImageBody body={section.body} printable={printable} />;
-                            case 'MULTI':
-                              return <MultiBody body={section.body} printable={printable} />;
-                            default:
-                              return <InvalidBody />;
-                          }
-                        })()}
-                    </div>
+            <div style={{ marginLeft: printable ? '2rem' : '1rem', marginBottom: '0.75rem' }}>
+              <div style={{ cursor: 'context-menu' }} onContextMenu={handleMenuClick}>
+                {section.body &&
+                  (() => {
+                    switch (section.body_format) {
+                      case 'TEXT':
+                        return <TextBody body={section.body} />;
+                      case 'MEMORY_DUMP':
+                        return <MemDumpBody body={section.body} />;
+                      case 'GRAPH_DATA':
+                        return <GraphBody body={section.body} />;
+                      case 'URL':
+                        return <URLBody body={section.body} />;
+                      case 'JSON':
+                        return <JSONBody body={section.body} printable={printable} />;
+                      case 'KEY_VALUE':
+                        return <KVBody body={section.body} />;
+                      case 'ORDERED_KEY_VALUE':
+                        return <OrderedKVBody body={section.body} />;
+                      case 'PROCESS_TREE':
+                        return <ProcessTreeBody body={section.body} force={force} />;
+                      case 'TABLE':
+                        return <TblBody body={section.body} printable={printable} />;
+                      case 'IMAGE':
+                        return <ImageBody body={section.body} printable={printable} />;
+                      case 'MULTI':
+                        return <MultiBody body={section.body} printable={printable} />;
+                      default:
+                        return <InvalidBody />;
+                    }
+                  })()}
+              </div>
 
-                    {!printable && (
-                      <>
-                        <Collapse in={showHeur} timeout="auto">
-                          {section.heuristic && (
-                            <Heuristic
-                              text={section.heuristic.name}
-                              score={section.heuristic.score}
-                              show_type
-                              highlight_key={getKey('heuristic', section.heuristic.heur_id)}
-                            />
-                          )}
-                          {section.heuristic &&
-                            section.heuristic.signature.map((signature, idx) => (
-                              <Heuristic
-                                key={idx}
-                                text={signature.name}
-                                score={section.heuristic.score}
-                                signature
-                                show_type
-                                highlight_key={getKey('heuristic.signature', signature.name)}
-                                safe={signature.safe}
-                              />
-                            ))}
-                        </Collapse>
-                        <Collapse in={showTags} timeout="auto">
-                          {Array.isArray(section.tags) &&
-                            section.tags.map((tag, idx) => (
-                              <Tag
-                                key={idx}
-                                type={tag.type}
-                                value={tag.value}
-                                safelisted={tag.safelisted}
-                                short_type={tag.short_type}
-                                score={section.heuristic ? section.heuristic.score : 0}
-                                highlight_key={getKey(tag.type, tag.value)}
-                              />
-                            ))}
-                        </Collapse>
-                        <Collapse in={showAttack} timeout="auto">
-                          {section.heuristic &&
-                            section.heuristic.attack.map((attack, idx) => (
-                              <Attack
-                                key={idx}
-                                text={attack.pattern}
-                                score={section.heuristic.score}
-                                show_type
-                                highlight_key={getKey('attack_pattern', attack.attack_id)}
-                              />
-                            ))}
-                        </Collapse>
-                      </>
+              {!printable && (
+                <>
+                  <Collapse in={showHeur} timeout="auto">
+                    {section.heuristic && (
+                      <Heuristic
+                        text={section.heuristic.name}
+                        score={section.heuristic.score}
+                        show_type
+                        highlight_key={getKey('heuristic', section.heuristic.heur_id)}
+                      />
                     )}
-                  </div>
-                  {!printable && (
-                    <div>
-                      {sub_sections.map(item => (
-                        <ResultSection
-                          key={item.id}
-                          section={section_list[item.id]}
-                          section_list={section_list}
-                          sub_sections={item.children}
-                          indent={indent + 1}
-                          nested
+                    {section.heuristic &&
+                      section.heuristic.signature.map((signature, idx) => (
+                        <Heuristic
+                          key={idx}
+                          text={signature.name}
+                          score={section.heuristic.score}
+                          signature
+                          show_type
+                          highlight_key={getKey('heuristic.signature', signature.name)}
+                          safe={signature.safe}
                         />
                       ))}
-                    </div>
-                  )}
+                  </Collapse>
+                  <Collapse in={showTags} timeout="auto">
+                    {Array.isArray(section.tags) &&
+                      section.tags.map((tag, idx) => (
+                        <Tag
+                          key={idx}
+                          type={tag.type}
+                          value={tag.value}
+                          safelisted={tag.safelisted}
+                          short_type={tag.short_type}
+                          score={section.heuristic ? section.heuristic.score : 0}
+                          highlight_key={getKey(tag.type, tag.value)}
+                        />
+                      ))}
+                  </Collapse>
+                  <Collapse in={showAttack} timeout="auto">
+                    {section.heuristic &&
+                      section.heuristic.attack.map((attack, idx) => (
+                        <Attack
+                          key={idx}
+                          text={attack.pattern}
+                          score={section.heuristic.score}
+                          show_type
+                          highlight_key={getKey('attack_pattern', attack.attack_id)}
+                        />
+                      ))}
+                  </Collapse>
                 </>
-              ),
-              [
-                printable,
-                handleMenuClick,
-                showHeur,
-                section.heuristic,
-                section.tags,
-                section.body_format,
-                section.body,
-                getKey,
-                showTags,
-                showAttack,
-                sub_sections,
-                section_list,
-                indent
-              ]
+              )}
+            </div>
+            {!printable && (
+              <div>
+                {sub_sections.map(item => (
+                  <ResultSection
+                    key={item.id}
+                    section={section_list[item.id]}
+                    section_list={section_list}
+                    sub_sections={item.children}
+                    indent={indent + 1}
+                    nested
+                  />
+                ))}
+              </div>
             )}
           </Collapse>
         </div>
@@ -472,4 +455,6 @@ const ResultSection: React.FC<ResultSectionProps> = ({
     </>
   );
 };
+
+const ResultSection = React.memo(WrappedResultSection);
 export default ResultSection;

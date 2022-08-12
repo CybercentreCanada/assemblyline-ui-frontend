@@ -1,6 +1,6 @@
 import { Collapse, Divider, makeStyles, Typography, useTheme } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import ResultCard from '../ResultCard';
 
@@ -25,7 +25,7 @@ const WrappedEmptySection: React.FC<EmptySectionProps> = ({ emptys, sid }) => {
   const classes = useStyles();
   const sp2 = theme.spacing(2);
 
-  return (
+  return !emptys || emptys.length !== 0 ? (
     <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
       <Typography
         variant="h6"
@@ -38,20 +38,20 @@ const WrappedEmptySection: React.FC<EmptySectionProps> = ({ emptys, sid }) => {
       </Typography>
       <Divider />
       <Collapse in={open} timeout="auto">
-        {useMemo(
-          () => (
-            <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
-              {emptys
-                ? emptys.map((result, i) => <ResultCard key={i} result={result} sid={sid} />)
-                : [...Array(2)].map((_, i) => <Skeleton key={i} style={{ height: '16rem' }} />)}
-            </div>
-          ),
-          // eslint-disable-next-line react-hooks/exhaustive-deps
-          [emptys, sid]
-        )}
+        <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+          {emptys
+            ? emptys.map((result, i) => <ResultCard key={i} result={result} sid={sid} />)
+            : [...Array(2)].map((_, i) => (
+                <Skeleton
+                  variant="rect"
+                  key={i}
+                  style={{ height: '12rem', marginBottom: '8px', borderRadius: '4px' }}
+                />
+              ))}
+        </div>
       </Collapse>
     </div>
-  );
+  ) : null;
 };
 
 const EmptySection = React.memo(WrappedEmptySection);
