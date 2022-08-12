@@ -16,6 +16,7 @@ import Tos from 'components/routes/tos';
 import CarouselProvider from 'components/visual/CarouselProvider';
 import DrawerProvider from 'components/visual/DrawerProvider';
 import HighlightProvider from 'components/visual/HighlightProvider';
+import SafeResultsProvider from 'components/visual/SafeResultsProvider';
 import { getProvider } from 'helpers/utils';
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
@@ -86,19 +87,21 @@ const AppInit: React.FC = () => {
   // General TemplateUI layout structure.
   return (
     <BrowserRouter basename={process.env.PUBLIC_URL}>
-      <UserProvider {...userProps}>
-        <SiteMapProvider {...sitemapProps}>
-          <HighlightProvider>
-            <CarouselProvider>
-              <DrawerProvider>
-                <AppLayoutProvider {...layoutProps}>
-                  <MyApp />
-                </AppLayoutProvider>
-              </DrawerProvider>
-            </CarouselProvider>
-          </HighlightProvider>
-        </SiteMapProvider>
-      </UserProvider>
+      <SafeResultsProvider>
+        <UserProvider {...userProps}>
+          <SiteMapProvider {...sitemapProps}>
+            <HighlightProvider>
+              <CarouselProvider>
+                <DrawerProvider>
+                  <AppLayoutProvider {...layoutProps}>
+                    <MyApp />
+                  </AppLayoutProvider>
+                </DrawerProvider>
+              </CarouselProvider>
+            </HighlightProvider>
+          </SiteMapProvider>
+        </UserProvider>
+      </SafeResultsProvider>
     </BrowserRouter>
   );
 };

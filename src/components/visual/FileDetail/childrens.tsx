@@ -1,5 +1,5 @@
 import { Box, Collapse, Divider, makeStyles, Typography, useTheme } from '@material-ui/core';
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 
@@ -30,7 +30,7 @@ const WrappedChildrenSection: React.FC<ChildrenSectionProps> = ({ childrens }) =
   const sp2 = theme.spacing(2);
   const history = useHistory();
 
-  return (
+  return childrens && childrens.length !== 0 ? (
     <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
       <Typography
         variant="h6"
@@ -43,32 +43,24 @@ const WrappedChildrenSection: React.FC<ChildrenSectionProps> = ({ childrens }) =
       </Typography>
       <Divider />
       <Collapse in={open} timeout="auto">
-        {useMemo(
-          () => (
-            <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
-              {childrens.map((fileItem, i) => (
-                <Box
-                  key={i}
-                  className={classes.clickable}
-                  onClick={() => {
-                    history.push(`/file/detail/${fileItem.sha256}?name=${encodeURI(fileItem.name)}`);
-                  }}
-                  style={{ wordBreak: 'break-word' }}
-                >
-                  <span>{fileItem.name}</span>
-                  <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>
-                    {` :: ${fileItem.sha256}`}
-                  </span>
-                </Box>
-              ))}
-            </div>
-          ),
-          // eslint-disable-next-line react-hooks/exhaustive-deps
-          [childrens]
-        )}
+        <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+          {childrens.map((fileItem, i) => (
+            <Box
+              key={i}
+              className={classes.clickable}
+              onClick={() => {
+                history.push(`/file/detail/${fileItem.sha256}?name=${encodeURI(fileItem.name)}`);
+              }}
+              style={{ wordBreak: 'break-word' }}
+            >
+              <span>{fileItem.name}</span>
+              <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{` :: ${fileItem.sha256}`}</span>
+            </Box>
+          ))}
+        </div>
       </Collapse>
     </div>
-  );
+  ) : null;
 };
 
 const ChildrenSection = React.memo(WrappedChildrenSection);

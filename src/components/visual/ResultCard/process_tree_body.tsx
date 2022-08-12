@@ -7,6 +7,7 @@ import SettingsEthernetOutlinedIcon from '@material-ui/icons/SettingsEthernetOut
 import WidgetsOutlinedIcon from '@material-ui/icons/WidgetsOutlined';
 import { TreeItem, TreeView } from '@material-ui/lab';
 import clsx from 'clsx';
+import useSafeResults from 'components/hooks/useSafeResults';
 import { humanReadableNumber, scoreToVerdict } from 'helpers/utils';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -104,16 +105,17 @@ const useTreeItemStyles = makeStyles((theme: Theme) => ({
   }
 }));
 
-const ProcessTreeItem = ({ process }) => {
+const ProcessTreeItem = ({ process, force = false }) => {
   const { t } = useTranslation(['fileDetail']);
   const classes = useTreeItemStyles();
+  const { showSafeResults } = useSafeResults();
   const classMap = {
     suspicious: classes.suspicious,
     highly_suspicious: classes.suspicious,
     malicious: classes.malicious
   };
 
-  return (
+  return process.safelisted && process.children.length === 0 && !showSafeResults && !force ? null : (
     <TreeItem
       nodeId={process.process_pid.toString()}
       classes={{
@@ -197,10 +199,10 @@ const ProcessTreeItem = ({ process }) => {
   );
 };
 
-const ProcessTreeItemList = ({ processes }) =>
-  processes.map((process, id) => <ProcessTreeItem key={id} process={process} />);
+const ProcessTreeItemList = ({ processes, force = false }) =>
+  processes.map((process, id) => <ProcessTreeItem key={id} process={process} force={force} />);
 
-const WrappedProcessTreeBody = ({ body }) => {
+const WrappedProcessTreeBody = ({ body, force = false }) => {
   try {
     const expanded = [];
 
@@ -225,7 +227,7 @@ const WrappedProcessTreeBody = ({ body }) => {
           defaultCollapseIcon={<ExpandMoreIcon />}
           defaultExpandIcon={<ChevronRightIcon />}
         >
-          <ProcessTreeItemList processes={body} />
+          <ProcessTreeItemList processes={body} force={force} />
         </TreeView>
       </div>
     );

@@ -5,6 +5,7 @@ import SelectAllOutlinedIcon from '@material-ui/icons/SelectAllOutlined';
 import { Skeleton } from '@material-ui/lab';
 import clsx from 'clsx';
 import useHighlighter from 'components/hooks/useHighlighter';
+import useSafeResults from 'components/hooks/useSafeResults';
 import { safeFieldValueURI } from 'helpers/utils';
 import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,6 +13,8 @@ import { Result } from '../ResultCard';
 import ResultSection, { Section } from '../ResultCard/result_section';
 
 const HEUR_LEVELS = ['malicious' as 'malicious', 'suspicious' as 'suspicious', 'info' as 'info', 'safe' as 'safe'];
+const DEFAULT_SEC_SCORE = -1000;
+const SCORE_SHOW_THRESHOLD = 0;
 
 const useStyles = makeStyles(theme => ({
   title: {
@@ -90,14 +93,16 @@ type WrappedHeuristicProps = {
   id: string;
   sections: Section[];
   level: 'malicious' | 'suspicious' | 'info' | 'safe';
+  force?: boolean;
 };
 
-const WrappedHeuristic: React.FC<WrappedHeuristicProps> = ({ name, id, sections, level }) => {
+const WrappedHeuristic: React.FC<WrappedHeuristicProps> = ({ name, id, sections, level, force = false }) => {
   const { t } = useTranslation();
   const [open, setOpen] = React.useState(false);
   const { isHighlighted, triggerHighlight, getKey } = useHighlighter();
   const classes = useStyles();
   const theme = useTheme();
+  const { showSafeResults } = useSafeResults();
 
   const highlighted = isHighlighted(getKey('heuristic', id));
 
@@ -105,7 +110,7 @@ const WrappedHeuristic: React.FC<WrappedHeuristicProps> = ({ name, id, sections,
 
   const handleHighlight = useCallback(() => triggerHighlight(getKey('heuristic', id)), [triggerHighlight, getKey, id]);
 
-  return (
+  return level === 'safe' && !showSafeResults && !force ? null : (
     <div
       className={clsx(
         classes.container,
@@ -146,7 +151,7 @@ const WrappedHeuristic: React.FC<WrappedHeuristicProps> = ({ name, id, sections,
         {sections &&
           sections.map((section, sid) => (
             <div key={sid}>
-              <ResultSection section={sections[sid]} indent={1} depth={1} />
+              <ResultSection section={sections[sid]} indent={1} depth={1} force={force} />
             </div>
           ))}
       </Collapse>
@@ -160,19 +165,28 @@ type WrappedDetectionProps = {
   heuristics: { [category: string]: string[][] };
   results?: Result[];
   section_map?: { [heur_id: string]: Section[] };
+  force?: boolean;
 };
 
-const WrappedDetection: React.FC<WrappedDetectionProps> = ({ heuristics, results, section_map = null }) => {
+const WrappedDetection: React.FC<WrappedDetectionProps> = ({
+  heuristics,
+  results,
+  section_map = null,
+  force = false
+}) => {
   const { t } = useTranslation(['fileDetail']);
   const [open, setOpen] = React.useState(true);
   const [sectionMap, setSectionMap] = React.useState({});
+  const [maxScore, setMaxScore] = React.useState(DEFAULT_SEC_SCORE);
   const theme = useTheme();
   const classes = useStyles();
   const sp2 = theme.spacing(2);
+  const { showSafeResults } = useSafeResults();
 
   useEffect(() => {
-    const newSectionMap = {};
     if (results) {
+      let newMaxScore = DEFAULT_SEC_SCORE;
+      const newSectionMap = {};
       for (const res of results) {
         for (const sec of res.result.sections
           .filter(s => s.heuristic)
@@ -180,20 +194,38 @@ const WrappedDetection: React.FC<WrappedDetectionProps> = ({ heuristics, results
           if (!newSectionMap.hasOwnProperty(sec.heuristic.heur_id)) {
             newSectionMap[sec.heuristic.heur_id] = [];
           }
+          if (sec.heuristic.score > newMaxScore) {
+            newMaxScore = sec.heuristic.score;
+          }
           newSectionMap[sec.heuristic.heur_id].push(sec);
         }
       }
+      setSectionMap(newSectionMap);
+      setMaxScore(newMaxScore);
     }
-    setSectionMap(newSectionMap);
   }, [results]);
 
   useEffect(() => {
     if (section_map) {
+      let newMaxScore = DEFAULT_SEC_SCORE;
+      for (const heurId of Object.keys(section_map)) {
+        for (const sec of section_map[heurId]) {
+          if (sec.heuristic.score >= SCORE_SHOW_THRESHOLD) {
+            newMaxScore = sec.heuristic.score;
+            break;
+          }
+        }
+        if (newMaxScore >= SCORE_SHOW_THRESHOLD) {
+          break;
+        }
+      }
       setSectionMap(section_map);
+      setMaxScore(newMaxScore);
     }
   }, [section_map]);
 
-  return (
+  return (heuristics && Object.keys(heuristics).length === 0) ||
+    (heuristics && maxScore < SCORE_SHOW_THRESHOLD && !showSafeResults && !force) ? null : (
     <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
       <Typography
         variant="h6"
@@ -214,7 +246,7 @@ const WrappedDetection: React.FC<WrappedDetectionProps> = ({ heuristics, results
                     {heuristics[lvl].map(([hid, hname], idx) => {
                       return (
                         <div key={idx}>
-                          <Heuristic name={hname} id={hid} sections={sectionMap[hid]} level={lvl} />
+                          <Heuristic name={hname} id={hid} sections={sectionMap[hid]} level={lvl} force={force} />
                         </div>
                       );
                     })}
