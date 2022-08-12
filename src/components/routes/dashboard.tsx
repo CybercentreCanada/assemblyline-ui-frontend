@@ -734,6 +734,12 @@ const WrappedAlerterCard = ({ alerter }) => {
               title="U"
               tooltip={t('throughput.updated')}
             />
+            <MetricCounter
+              init={alerter.initialized}
+              value={alerter.metrics.wait}
+              title="W"
+              tooltip={t('throughput.wait')}
+            />
           </div>
         </Grid>
       </Grid>
@@ -918,7 +924,8 @@ const DEFAULT_ALERTER = {
     created: 0,
     error: 0,
     received: 0,
-    updated: 0
+    updated: 0,
+    wait: 0
   },
   error: null,
   initialized: false
