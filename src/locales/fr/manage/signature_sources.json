@@ -16,6 +16,7 @@
   "delete.text": "Voulez-vous vraiment supprimer la source de signature actuelle? Il n'y aura aucun moyen de la récupérer une fois que c'est fait.",
   "delete.title": "Supprimer la source de signature",
   "editing_source": "Modifier une source de signature",
+  "git_branch": "Branche Git",
   "headers": "En-têtes",
   "headers.name": "Nom",
   "headers.value": "Valeur",

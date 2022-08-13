@@ -95,7 +95,8 @@ const DEFAULT_SOURCE: Source = {
   proxy: '',
   ssl_ignore_errors: false,
   uri: '',
-  username: ''
+  username: '',
+  git_branch: ''
 };
 
 const WrappedSourceDetailDrawer = ({ service, base, close, reload }) => {
@@ -391,17 +392,17 @@ export default function SignatureSources() {
 
         {sources
           ? Object.keys(sources).map((key, id) => (
-              <ServiceDetail key={id} service={key} sources={sources[key]} reload={reload} />
-            ))
+            <ServiceDetail key={id} service={key} sources={sources[key]} reload={reload} />
+          ))
           : [...Array(2)].map((item, i) => (
-              <div key={i} style={{ marginTop: theme.spacing(2) }}>
-                <Typography variant="h6" style={{ marginTop: theme.spacing(0.5), marginBottom: theme.spacing(0.5) }}>
-                  <Skeleton />
-                </Typography>
-                <Divider />
-                <Skeleton variant="rect" height="6rem" style={{ marginTop: theme.spacing(2), borderRadius: '4px' }} />
-              </div>
-            ))}
+            <div key={i} style={{ marginTop: theme.spacing(2) }}>
+              <Typography variant="h6" style={{ marginTop: theme.spacing(0.5), marginBottom: theme.spacing(0.5) }}>
+                <Skeleton />
+              </Typography>
+              <Divider />
+              <Skeleton variant="rect" height="6rem" style={{ marginTop: theme.spacing(2), borderRadius: '4px' }} />
+            </div>
+          ))}
       </div>
     </PageFullWidth>
   ) : (

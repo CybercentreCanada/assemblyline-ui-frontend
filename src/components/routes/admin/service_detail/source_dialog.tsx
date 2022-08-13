@@ -17,7 +17,8 @@ const DEFAULT_SOURCE: Source = {
   proxy: '',
   ssl_ignore_errors: false,
   uri: '',
-  username: ''
+  username: '',
+  git_branch: ''
 };
 
 type SourceDialogProps = {
