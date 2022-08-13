@@ -47,6 +47,11 @@ const WrappedSourceDetail = ({ source, defaults, setSource, addMode = false, set
     setModified(true);
   };
 
+  const handleBranchChange = event => {
+    setSource({ ...source, git_branch: event.target.value });
+    setModified(true);
+  };
+
   const handleProxyChange = event => {
     setSource({ ...source, proxy: event.target.value });
     setModified(true);
@@ -125,7 +130,7 @@ const WrappedSourceDetail = ({ source, defaults, setSource, addMode = false, set
   return (
     source && (
       <Grid container spacing={1}>
-        <Grid item xs={12}>
+        <Grid item xs={9}>
           <div className={classes.label}>
             {t('uri')}
             <ResetButton
@@ -139,6 +144,10 @@ const WrappedSourceDetail = ({ source, defaults, setSource, addMode = false, set
             />
           </div>
           <TextField size="small" value={source.uri} fullWidth variant="outlined" onChange={handleURIChange} />
+        </Grid>
+        <Grid item xs={3}>
+          <div className={classes.label}>{t('git_branch')}</div>
+          <TextField size="small" value={source.git_branch} fullWidth variant="outlined" onChange={handleBranchChange} />
         </Grid>
         {c12nDef.enforce && (
           <Grid item xs={12}>
@@ -326,8 +335,8 @@ const WrappedSourceDetail = ({ source, defaults, setSource, addMode = false, set
                     !tempHeader.name || !tempHeader.value
                       ? theme.palette.action.disabled
                       : theme.palette.type === 'dark'
-                      ? theme.palette.success.light
-                      : theme.palette.success.dark,
+                        ? theme.palette.success.light
+                        : theme.palette.success.dark,
                   margin: '-4px 0'
                 }}
                 disabled={!tempHeader.name || !tempHeader.value}

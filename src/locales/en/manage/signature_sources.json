@@ -16,6 +16,7 @@
   "delete.text": "Are you sure you want to delete the current signature source? There will be no way to recover it once removed.",
   "delete.title": "Delete signature source",
   "editing_source": "Edit a signature source",
+  "git_branch": "Git Branch",
   "headers": "Headers",
   "headers.name": "Name",
   "headers.value": "Value",
