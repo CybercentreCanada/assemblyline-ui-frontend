@@ -1,4 +1,5 @@
 export * from './CellHandler';
+export * from './CopyHandler';
 export * from './CursorHandler';
 export * from './HexHandler';
 export * from './HistoryHandler';

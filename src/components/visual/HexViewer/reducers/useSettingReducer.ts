@@ -12,6 +12,8 @@ import {
   OFFSET_SETTING_VALUES,
   ReducerHandler,
   Reducers,
+  SearchTextType,
+  SEARCH_TEXT_TYPE_VALUES,
   Store,
   UseReducer
 } from '..';
@@ -44,6 +46,9 @@ export type SettingState = {
         auto: boolean;
         max: number;
       };
+    };
+    search: {
+      textType: number;
     };
     showHistoryLastValue: boolean;
   };
@@ -80,6 +85,9 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
             max: 2000
           }
         },
+        search: {
+          textType: 0
+        },
         showHistoryLastValue: false
       }
     }),
@@ -103,6 +111,9 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
         row: {
           auto: store.layout.row.auto,
           max: store.layout.row.max
+        },
+        search: {
+          textType: store.search.textType
         }
       })
     );
@@ -129,6 +140,8 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
       (json as any).hex.higher.char === undefined ? store.hex.higher.char : (json as any).hex.higher.char;
 
     const offsetBase = (json as any).offsetBase === undefined ? store.offset.base : (json as any).offsetBase;
+    const searchTextType =
+      (json as any).search.textType === undefined ? store.search.textType : (json as any).search.textType;
     const autoColumn = (json as any).column.auto === undefined ? store.layout.column.auto : (json as any).column.auto;
     const maxColumn = (json as any).column.max === undefined ? store.layout.column.max : (json as any).column.max;
 
@@ -160,6 +173,12 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
             auto: typeof autoColumn === 'boolean' ? autoColumn : store.setting.layout.column.auto,
             max: COLUMNS.map(c => c.columns).includes(maxColumn) ? maxColumn : store.setting.layout.column.max
           }
+        },
+        search: {
+          ...store.search,
+          textType: SEARCH_TEXT_TYPE_VALUES.en.map(c => c.type).includes(searchTextType)
+            ? SEARCH_TEXT_TYPE_VALUES.en.map(c => c.type).findIndex(c => c === searchTextType)
+            : 0
         }
       }
     };
@@ -168,6 +187,9 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
   const settingSave: Reducers['settingSave'] = useCallback(
     store => {
       const newBodyType: BodyType = BODY_TYPE_SETTING_VALUES.en.find(e => e.value === store.setting.bodyType).type;
+      const newSearchTextType: SearchTextType = SEARCH_TEXT_TYPE_VALUES.en.find(
+        e => e.value === store.setting.search.textType
+      ).type;
       const newLowerEncoding: EncodingType = NON_PRINTABLE_ENCODING_SETTING_VALUES.en.find(
         e => e.value === store.setting.hex.nonPrintable.encoding
       ).type;
@@ -209,6 +231,10 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
             size: newColumnSize
           },
           row: { ...store.layout.row, auto: rowAuto, max: maxRows, size: newRowSize }
+        },
+        search: {
+          ...store.search,
+          textType: newSearchTextType
         }
       };
 
@@ -243,7 +269,10 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
           auto: store.layout.column.auto,
           max: store.layout.column.auto ? store.layout.column.size : store.layout.column.max
         },
-        row: { auto: store.layout.row.auto, max: store.layout.row.auto ? store.layout.row.size : store.layout.row.max }
+        row: { auto: store.layout.row.auto, max: store.layout.row.auto ? store.layout.row.size : store.layout.row.max },
+        search: {
+          textType: SEARCH_TEXT_TYPE_VALUES.en.find(e => e.type === store.search.textType).value
+        }
       }
     };
   }, []);
@@ -269,8 +298,18 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
         layout: {
           column: { auto: true, max: newColumnSize },
           row: { auto: true, max: 2000 }
+        },
+        search: {
+          textType: 0
         }
       }
+    };
+  }, []);
+
+  const settingSearchTextTypeChange: Reducers['settingSearchTextTypeChange'] = useCallback((store, { event }) => {
+    return {
+      ...store,
+      setting: { ...store.setting, search: { ...store.setting.search, textType: event.target.value as number } }
     };
   }, []);
 
@@ -386,6 +425,7 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
       else if (isAction.settingClose(type)) return settingClose(store, payload);
       else if (isAction.settingReset(type)) return settingReset(store, payload);
       else if (isAction.settingBodyTypeChange(type)) return settingBodyTypeChange(store, payload);
+      else if (isAction.settingSearchTextTypeChange(type)) return settingSearchTextTypeChange(store, payload);
       else if (isAction.settingOffsetBaseChange(type)) return settingOffsetBaseChange(store, payload);
       else if (isAction.settingAutoColumnChange(type)) return settingAutoColumnChange(store, payload);
       else if (isAction.settingColumnChange(type)) return settingColumnChange(store, payload);
@@ -395,18 +435,19 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
       else return { ...store };
     },
     [
-      settingAutoColumnChange,
-      settingBodyResize,
-      settingBodyTypeChange,
+      settingLoad,
+      settingSave,
+      settingOpen,
       settingClose,
+      settingReset,
+      settingBodyTypeChange,
+      settingSearchTextTypeChange,
+      settingOffsetBaseChange,
+      settingAutoColumnChange,
       settingColumnChange,
       settingEncodingChange,
       settingHexCharChange,
-      settingLoad,
-      settingOffsetBaseChange,
-      settingOpen,
-      settingSave,
-      settingReset
+      settingBodyResize
     ]
   );
 

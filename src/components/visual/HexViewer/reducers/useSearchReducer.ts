@@ -2,19 +2,25 @@ import { useCallback } from 'react';
 import {
   clampSelectedSearchIndex,
   countHexcode,
+  executeSearchRegex,
   findSearchPattern,
   formatHexString,
   formatTextString,
+  getNarrowTextExpression,
   getSearchIndexes,
   getSelectedSearchIndexes,
+  getWideTextExpression,
   isAction,
+  isSearchTextType,
   isSearchType,
   nextSearchIndex,
   ReducerHandler,
   Reducers,
   renderArrayClass,
   RenderHandler,
+  SearchTextType,
   SearchType,
+  SEARCH_TEXT_TYPE_VALUES,
   Store,
   useCellStyles,
   UseReducer
@@ -23,6 +29,7 @@ import {
 export type SearchState = {
   search: {
     type: SearchType;
+    textType: SearchTextType;
     inputValue: string;
     value: string;
     length: number;
@@ -37,6 +44,7 @@ export const useSearchReducer: UseReducer<SearchState> = () => {
   const initialState: SearchState = {
     search: {
       type: 'text',
+      textType: 'narrow',
       inputValue: '',
       value: '',
       length: 0,
@@ -69,13 +77,27 @@ export const useSearchReducer: UseReducer<SearchState> = () => {
       indexes = [],
       selectedIndex = null;
 
-    if (isSearchType.hex(store)) value = formatHexString(inputValue);
-    else if (isSearchType.text(store)) value = formatTextString(inputValue);
+    if (isSearchType.hex(store)) {
+      value = formatHexString(inputValue);
+      const expression = value;
+      if (value !== null && value !== '') {
+        length = countHexcode(value);
+        indexes = findSearchPattern(store.hex.data, expression, length);
+        selectedIndex = nextSearchIndex(indexes, store.cursor.index);
+      }
+    } else if (isSearchType.text(store)) {
+      value = formatTextString(inputValue);
+      if (inputValue !== null && inputValue !== '') {
+        const expression: RegExp = isSearchTextType.narrow(store)
+          ? getNarrowTextExpression(store, inputValue)
+          : isSearchTextType.wide(store)
+          ? getWideTextExpression(store, inputValue)
+          : RegExp('xx');
 
-    if (value !== null && value !== '') {
-      length = countHexcode(value);
-      indexes = findSearchPattern(store.hex.data, value);
-      selectedIndex = nextSearchIndex(indexes, store.cursor.index);
+        length = inputValue.length;
+        indexes = executeSearchRegex(store.hex.data, expression, length);
+        selectedIndex = nextSearchIndex(indexes, store.cursor.index);
+      }
     }
 
     return {
@@ -159,6 +181,13 @@ export const useSearchReducer: UseReducer<SearchState> = () => {
     [handleSearchInputValueChange, searchClear]
   );
 
+  const settingLoad: Reducers['settingLoad'] = useCallback(store => {
+    return {
+      ...store,
+      search: { ...store.search, textType: SEARCH_TEXT_TYPE_VALUES.en[store.setting.search.textType].type }
+    };
+  }, []);
+
   const reducer: ReducerHandler = useCallback(
     ({ prevStore, store, action: { type, payload } }) => {
       if (isAction.selectedSearchIndexChange(type)) return selectedSearchIndexChange(store, payload);
@@ -169,6 +198,7 @@ export const useSearchReducer: UseReducer<SearchState> = () => {
       else if (isAction.searchBarEscapeKeyDown(type)) return searchEscapeKeyDown(store, payload);
       else if (isAction.searchBarWheel(type)) return searchWheel(store, payload);
       else if (isAction.appLocationInit(type)) return searchLocation(store, payload);
+      else if (isAction.settingLoad(type)) return settingLoad(store, payload);
       else if (prevStore.search.inputValue !== store.search.inputValue)
         return searchInputValueChange(store, { inputValue: store.search.inputValue });
       else return { ...store };
@@ -182,7 +212,8 @@ export const useSearchReducer: UseReducer<SearchState> = () => {
       searchTypeChange,
       searchValueChange,
       searchWheel,
-      selectedSearchIndexChange
+      selectedSearchIndexChange,
+      settingLoad
     ]
   );
 
