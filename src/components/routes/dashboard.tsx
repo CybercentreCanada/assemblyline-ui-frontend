@@ -703,6 +703,12 @@ const WrappedAlerterCard = ({ alerter }) => {
               title="A"
               tooltip={t('queues.alert')}
             />
+            <MetricCounter
+              init={alerter.initialized}
+              value={alerter.queues.alert_retry}
+              title="R"
+              tooltip={t('queues.alert_retry')}
+            />
           </div>
         </Grid>
         <Grid item xs={12} sm={8}>
