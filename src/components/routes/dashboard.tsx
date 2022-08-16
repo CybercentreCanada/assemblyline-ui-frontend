@@ -924,7 +924,8 @@ const serviceListReducer = (state, serviceName) => {
 const DEFAULT_ALERTER = {
   instances: 0,
   queues: {
-    alert: 0
+    alert: 0,
+    alert_retry: 0
   },
   metrics: {
     created: 0,
