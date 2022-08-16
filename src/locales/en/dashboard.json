@@ -55,6 +55,7 @@
   "queued": "Queued:",
   "queues": "Queues:",
   "queues.alert": "Alerts",
+  "queues.alert_retry": "Alerts buffered for retry",
   "queues.command": "Control commands",
   "queues.error": "Errors",
   "queues.error_saving": "Error saving",
