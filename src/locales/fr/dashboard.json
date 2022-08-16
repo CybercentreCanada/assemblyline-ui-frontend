@@ -55,6 +55,7 @@
   "queued": "En file d'attente:",
   "queues": "Files d'attente:",
   "queues.alert": "Alertes",
+  "queues.alert_retry": "Alertes en attente pour être réessayer",
   "queues.command": "Commandes de contrôle",
   "queues.error": "Erreurs",
   "queues.error_saving": "Erreurs en cours de sauvegarde",
