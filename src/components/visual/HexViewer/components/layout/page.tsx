@@ -1,39 +1,32 @@
 import { makeStyles } from '@material-ui/core';
 import clsx from 'clsx';
 import React, { useRef } from 'react';
-import { HexBody, HexHeader, HexSettings, LAYOUT_SIZE, StoreProps, useDispatch, useEventListener } from '../..';
+import { HexBody, HexHeader, HexSettings, StoreProps, useDispatch, useEventListener } from '../..';
 
-const useHexStyles = ({ y = 0, height = 1000 }: { y: number; height: number }) =>
-  makeStyles(theme => ({
-    root: {
-      display: 'flex',
-      flexDirection: 'column',
-      minHeight: `250px`,
-      height: `calc(${height}px - ${y}px - 75px)`,
-      width: '100%',
-      cursor: 'default',
+const useHexStyles = makeStyles(theme => ({
+  root: {
+    position: 'absolute',
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+    width: '100%',
+    cursor: 'default',
 
-      userSelection: 'none',
-      '-webkit-user-select': 'none' /* Safari */,
-      '-khtml-user-select': 'none' /* Konqueror HTML */,
-      '-moz-user-select': 'none' /* Firefox */,
-      '-ms-user-select': 'none' /* Internet Explorer/Edge */
-    },
-    mobile: {
-      height: `calc(${height}px - ${LAYOUT_SIZE.mobileWindowHeight}px)`
-    },
-    hidden: {
-      visibility: 'hidden',
-      height: 'auto'
-    }
-  }));
+    userSelection: 'none',
+    '-webkit-user-select': 'none' /* Safari */,
+    '-khtml-user-select': 'none' /* Konqueror HTML */,
+    '-moz-user-select': 'none' /* Firefox */,
+    '-ms-user-select': 'none' /* Internet Explorer/Edge */
+  },
+
+  hidden: {
+    visibility: 'hidden'
+  }
+}));
 
 export const WrappedHexPageLayout = ({ store }: StoreProps) => {
   const ref = useRef(null);
-  const classes = useHexStyles({
-    y: document.getElementById('hex-viewer')?.getBoundingClientRect()?.y,
-    height: window.innerHeight
-  })();
+  const classes = useHexStyles();
   const { onAppClickAway } = useDispatch();
 
   // Mouse Up
@@ -42,14 +35,7 @@ export const WrappedHexPageLayout = ({ store }: StoreProps) => {
   });
 
   return (
-    <div
-      ref={ref}
-      className={clsx(
-        classes.root,
-        window.innerHeight.valueOf() < 1000 && classes.mobile,
-        store.loading.status !== 'initialized' && classes.hidden
-      )}
-    >
+    <div ref={ref} className={clsx(classes.root, store.loading.status !== 'initialized' && classes.hidden)}>
       <HexHeader store={store} />
       <HexBody store={store} />
       <HexSettings store={store} />
