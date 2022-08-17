@@ -8,6 +8,8 @@ import {
   handleLayoutRowResize,
   HIGHER_ENCODING_SETTING_VALUES,
   isAction,
+  NonPrintableCopyType,
+  NON_PRINTABLE_COPY_TYPE_VALUES,
   NON_PRINTABLE_ENCODING_SETTING_VALUES,
   OFFSET_SETTING_VALUES,
   ReducerHandler,
@@ -24,32 +26,17 @@ export type SettingState = {
     open: boolean;
     bodyType: number;
     hex: {
-      null: {
-        char: string;
-      };
-      nonPrintable: {
-        encoding: number;
-        char: string;
-      };
-      higher: {
-        encoding: number;
-        char: string;
-      };
+      null: { char: string };
+      nonPrintable: { encoding: number; char: string };
+      higher: { encoding: number; char: string };
     };
     offsetBase: number;
     layout: {
-      column: {
-        auto: boolean;
-        max: number;
-      };
-      row: {
-        auto: boolean;
-        max: number;
-      };
+      column: { auto: boolean; max: number };
+      row: { auto: boolean; max: number };
     };
-    search: {
-      textType: number;
-    };
+    search: { textType: number };
+    copy: { nonPrintable: { type: number; prefix: string } };
     showHistoryLastValue: boolean;
   };
 };
@@ -62,32 +49,17 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
         open: false,
         bodyType: 0,
         hex: {
-          null: {
-            char: '0'
-          },
-          nonPrintable: {
-            encoding: 0,
-            char: '.'
-          },
-          higher: {
-            encoding: 0,
-            char: '.'
-          }
+          null: { char: '0' },
+          nonPrintable: { encoding: 0, char: '.' },
+          higher: { encoding: 0, char: '.' }
         },
         offsetBase: 16,
         layout: {
-          column: {
-            auto: true,
-            max: 128
-          },
-          row: {
-            auto: true,
-            max: 2000
-          }
+          column: { auto: true, max: 128 },
+          row: { auto: true, max: 2000 }
         },
-        search: {
-          textType: 0
-        },
+        search: { textType: 0 },
+        copy: { nonPrintable: { type: 0, prefix: '\\' } },
         showHistoryLastValue: false
       }
     }),
@@ -114,7 +86,8 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
         },
         search: {
           textType: store.search.textType
-        }
+        },
+        copy: { nonPrintable: { type: store.copy.nonPrintable.type, prefix: store.copy.nonPrintable.prefix } }
       })
     );
   }, []);
@@ -125,25 +98,36 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
 
     if (value === null || value === '' || Array.isArray(json)) return { ...store };
 
-    const nullChar = (json as any).hex.null.char === undefined ? store.hex.null.char : (json as any).hex.null.char;
+    const nullChar = (json as any)?.hex?.null?.char === undefined ? store.hex.null.char : (json as any).hex.null.char;
     const nonPrintableEncoding =
-      (json as any).hex.nonPrintable.encoding === undefined
+      (json as any)?.hex?.nonPrintable?.encoding === undefined
         ? store.hex.nonPrintable.encoding
         : (json as any).hex.nonPrintable.encoding;
     const nonPrintableChar =
-      (json as any).hex.nonPrintable.char === undefined
+      (json as any)?.hex?.nonPrintable?.char === undefined
         ? store.hex.nonPrintable.char
         : (json as any).hex.nonPrintable.char;
     const higherEncoding =
-      (json as any).hex.higher.encoding === undefined ? store.hex.higher.encoding : (json as any).hex.higher.encoding;
+      (json as any)?.hex?.higher?.encoding === undefined
+        ? store.hex.higher.encoding
+        : (json as any).hex.higher.encoding;
     const higherChar =
-      (json as any).hex.higher.char === undefined ? store.hex.higher.char : (json as any).hex.higher.char;
+      (json as any)?.hex?.higher?.char === undefined ? store.hex.higher.char : (json as any).hex.higher.char;
 
-    const offsetBase = (json as any).offsetBase === undefined ? store.offset.base : (json as any).offsetBase;
+    const offsetBase = (json as any)?.offsetBase === undefined ? store.offset.base : (json as any).offsetBase;
     const searchTextType =
-      (json as any).search.textType === undefined ? store.search.textType : (json as any).search.textType;
-    const autoColumn = (json as any).column.auto === undefined ? store.layout.column.auto : (json as any).column.auto;
-    const maxColumn = (json as any).column.max === undefined ? store.layout.column.max : (json as any).column.max;
+      (json as any)?.search?.textType === undefined ? store.search.textType : (json as any).search.textType;
+    const autoColumn = (json as any)?.column?.auto === undefined ? store.layout.column.auto : (json as any).column.auto;
+    const maxColumn = (json as any)?.column?.max === undefined ? store.layout.column.max : (json as any).column.max;
+
+    const copyType =
+      (json as any)?.copy?.nonPrintable?.type === undefined
+        ? store.copy.nonPrintable.type
+        : (json as any).copy.nonPrintable.type;
+    const copyPrefix =
+      (json as any)?.copy?.nonPrintable?.prefix === undefined
+        ? store.copy.nonPrintable.prefix
+        : (json as any).copy.nonPrintable.prefix;
 
     return {
       ...store,
@@ -151,18 +135,18 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
         ...store.setting,
         hex: {
           ...store.hex,
-          null: { char: nullChar.substr(-1) !== null ? nullChar.substr(-1) : ' ' },
+          null: { char: nullChar.slice(-1) !== null ? nullChar.slice(-1) : ' ' },
           nonPrintable: {
             encoding: NON_PRINTABLE_ENCODING_SETTING_VALUES.en.map(c => c.type).includes(nonPrintableEncoding)
               ? NON_PRINTABLE_ENCODING_SETTING_VALUES.en.map(c => c.type).findIndex(c => c === nonPrintableEncoding)
               : 0,
-            char: nonPrintableChar.substr(-1) !== null ? nonPrintableChar.substr(-1) : ' '
+            char: nonPrintableChar.slice(-1) !== null ? nonPrintableChar.slice(-1) : ' '
           },
           higher: {
             encoding: HIGHER_ENCODING_SETTING_VALUES.en.map(c => c.type).includes(higherEncoding)
               ? HIGHER_ENCODING_SETTING_VALUES.en.map(c => c.type).findIndex(c => c === higherEncoding)
               : 0,
-            char: higherChar.substr(-1) !== null ? higherChar.substr(-1) : ' '
+            char: higherChar.slice(-1) !== null ? higherChar.slice(-1) : ' '
           }
         },
         offsetBase: OFFSET_SETTING_VALUES.en.map(c => c.value).includes(offsetBase) ? offsetBase : 16,
@@ -179,6 +163,15 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
           textType: SEARCH_TEXT_TYPE_VALUES.en.map(c => c.type).includes(searchTextType)
             ? SEARCH_TEXT_TYPE_VALUES.en.map(c => c.type).findIndex(c => c === searchTextType)
             : 0
+        },
+        copy: {
+          ...store.copy,
+          nonPrintable: {
+            type: NON_PRINTABLE_COPY_TYPE_VALUES.en.map(c => c.type).includes(copyType)
+              ? NON_PRINTABLE_COPY_TYPE_VALUES.en.map(c => c.type).findIndex(c => c === copyType)
+              : 0,
+            prefix: copyPrefix.slice(-1) !== null ? copyPrefix.slice(-1) : ' '
+          }
         }
       }
     };
@@ -189,6 +182,9 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
       const newBodyType: BodyType = BODY_TYPE_SETTING_VALUES.en.find(e => e.value === store.setting.bodyType).type;
       const newSearchTextType: SearchTextType = SEARCH_TEXT_TYPE_VALUES.en.find(
         e => e.value === store.setting.search.textType
+      ).type;
+      const newCopyType: NonPrintableCopyType = NON_PRINTABLE_COPY_TYPE_VALUES.en.find(
+        e => e.value === store.setting.copy.nonPrintable.type
       ).type;
       const newLowerEncoding: EncodingType = NON_PRINTABLE_ENCODING_SETTING_VALUES.en.find(
         e => e.value === store.setting.hex.nonPrintable.encoding
@@ -235,6 +231,12 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
         search: {
           ...store.search,
           textType: newSearchTextType
+        },
+        copy: {
+          nonPrintable: {
+            type: newCopyType,
+            prefix: store.setting.copy.nonPrintable.prefix
+          }
         }
       };
 
@@ -272,6 +274,12 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
         row: { auto: store.layout.row.auto, max: store.layout.row.auto ? store.layout.row.size : store.layout.row.max },
         search: {
           textType: SEARCH_TEXT_TYPE_VALUES.en.find(e => e.type === store.search.textType).value
+        },
+        copy: {
+          nonPrintable: {
+            type: NON_PRINTABLE_COPY_TYPE_VALUES.en.find(e => e.type === store.copy.nonPrintable.type).value,
+            prefix: store.copy.nonPrintable.prefix
+          }
         }
       }
     };
@@ -312,6 +320,41 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
       setting: { ...store.setting, search: { ...store.setting.search, textType: event.target.value as number } }
     };
   }, []);
+
+  const settingCopyNonPrintableTypeChange: Reducers['settingCopyNonPrintableTypeChange'] = useCallback(
+    (store, { event }) => {
+      return {
+        ...store,
+        setting: {
+          ...store.setting,
+          copy: {
+            ...store.setting.copy,
+            nonPrintable: { ...store.setting.copy.nonPrintable, type: event.target.value as number }
+          }
+        }
+      };
+    },
+    []
+  );
+
+  const settingCopyNonPrintablePrefixChange: Reducers['settingCopyNonPrintablePrefixChange'] = useCallback(
+    (store, { event }) => {
+      return {
+        ...store,
+        setting: {
+          ...store.setting,
+          copy: {
+            ...store.setting.copy,
+            nonPrintable: {
+              ...store.setting.copy.nonPrintable,
+              prefix: (event.target.value as string).slice(-1) !== null ? (event.target.value as string).slice(-1) : ' '
+            }
+          }
+        }
+      };
+    },
+    []
+  );
 
   const settingOffsetBaseChange: Reducers['settingOffsetBaseChange'] = useCallback((store, { event }) => {
     return { ...store, setting: { ...store.setting, offsetBase: event.target.value as number } };
@@ -378,21 +421,20 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
         hex: {
           ...store.setting.hex,
           null: {
-            char: key === 'null' ? (value.substr(-1) !== null ? value.substr(-1) : ' ') : store.setting.hex.null.char
+            char: key === 'null' ? (value.slice(-1) !== null ? value.slice(-1) : ' ') : store.setting.hex.null.char
           },
           nonPrintable: {
             ...store.setting.hex.nonPrintable,
             char:
               key === 'nonPrintable'
-                ? value.substr(-1) !== null
-                  ? value.substr(-1)
+                ? value.slice(-1) !== null
+                  ? value.slice(-1)
                   : ' '
                 : store.setting.hex.nonPrintable.char
           },
           higher: {
             ...store.setting.hex.higher,
-            char:
-              key === 'higher' ? (value.substr(-1) !== null ? value.substr(-1) : ' ') : store.setting.hex.higher.char
+            char: key === 'higher' ? (value.slice(-1) !== null ? value.slice(-1) : ' ') : store.setting.hex.higher.char
           }
         }
       }
@@ -426,6 +468,10 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
       else if (isAction.settingReset(type)) return settingReset(store, payload);
       else if (isAction.settingBodyTypeChange(type)) return settingBodyTypeChange(store, payload);
       else if (isAction.settingSearchTextTypeChange(type)) return settingSearchTextTypeChange(store, payload);
+      else if (isAction.settingCopyNonPrintableTypeChange(type))
+        return settingCopyNonPrintableTypeChange(store, payload);
+      else if (isAction.settingCopyNonPrintablePrefixChange(type))
+        return settingCopyNonPrintablePrefixChange(store, payload);
       else if (isAction.settingOffsetBaseChange(type)) return settingOffsetBaseChange(store, payload);
       else if (isAction.settingAutoColumnChange(type)) return settingAutoColumnChange(store, payload);
       else if (isAction.settingColumnChange(type)) return settingColumnChange(store, payload);
@@ -442,6 +488,8 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
       settingReset,
       settingBodyTypeChange,
       settingSearchTextTypeChange,
+      settingCopyNonPrintableTypeChange,
+      settingCopyNonPrintablePrefixChange,
       settingOffsetBaseChange,
       settingAutoColumnChange,
       settingColumnChange,

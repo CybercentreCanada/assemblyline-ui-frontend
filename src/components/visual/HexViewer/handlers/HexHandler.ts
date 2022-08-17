@@ -105,9 +105,9 @@ export const NON_PRINTABLE_ASCII_TABLE = new Map<
   number,
   { dec: number; hex: string; html: string; code: string; CP437: string; caret: string; text: string; copy: string }
 >([
+  [0, { dec: 0, hex: '00', html: '&#0;', code: 'NUL', CP437: ' ', caret: '@', text: '^@', copy: ' ' }],
   [1, { dec: 1, hex: '01', html: '&#1;', code: 'SOH', CP437: '☺', caret: 'A', text: '^A', copy: ' ' }],
   [2, { dec: 2, hex: '02', html: '&#2;', code: 'STX', CP437: '☻', caret: 'B', text: '^B', copy: ' ' }],
-  [0, { dec: 0, hex: '00', html: '&#0;', code: 'NUL', CP437: '', caret: '@', text: '^@', copy: ' ' }],
   [3, { dec: 3, hex: '03', html: '&#3;', code: 'ETX', CP437: '♥', caret: 'C', text: '^C', copy: ' ' }],
   [4, { dec: 4, hex: '04', html: '&#4;', code: 'EOT', CP437: '♦', caret: 'D', text: '^D', copy: ' ' }],
   [5, { dec: 5, hex: '05', html: '&#5;', code: 'ENQ', CP437: '♣', caret: 'E', text: '^E', copy: ' ' }],
@@ -273,6 +273,46 @@ export const HIGHER_ASCII_TABLE = new Map<
   [254, { dec: 254, hex: 'FE', bin: '11111110', html: '&#254;', CP437: '■', windows1252: 'þ' }],
   [255, { dec: 255, hex: 'FF', bin: '11111111', html: '&#255;', CP437: '⍽', windows1252: 'ÿ' }]
 ]);
+
+export const getNonPrintableAsciiFromDec = (
+  index: number,
+  encoding: 'CP437' | 'prefix' | 'copy',
+  prefix: string = ''
+) =>
+  !['CP437', 'prefix', 'copy'].includes(encoding) || index < 0 || index > 31
+    ? null
+    : prefix.slice(-1) + NON_PRINTABLE_ASCII_TABLE.get(index)[encoding];
+
+export const getNonPrintableAsciiFromHex = (
+  hex: string,
+  encoding: 'CP437' | 'prefix' | 'copy',
+  prefix: string = ''
+) => {
+  const index: number = parseInt(hex, 16);
+  return !['CP437', 'prefix', 'copy'].includes(encoding) ||
+    isNaN(index) ||
+    index === undefined ||
+    index < 0 ||
+    index > 31
+    ? null
+    : prefix.slice(-1) + NON_PRINTABLE_ASCII_TABLE.get(index)[encoding];
+};
+
+export const getHigherAsciiFromDec = (index: number, encoding: 'CP437' | 'windows1252') =>
+  !['CP437', 'windows1252'].includes(encoding) || index < 127 || index > 255
+    ? null
+    : HIGHER_ASCII_TABLE.get(index)[encoding];
+
+export const getHigherAsciiFromHex = (hex: string, encoding: 'CP437' | 'windows1252') => {
+  const index: number = parseInt(hex, 16);
+  return !['CP437', 'windows1252'].includes(encoding) ||
+    isNaN(index) ||
+    index === undefined ||
+    index < 127 ||
+    index > 255
+    ? null
+    : HIGHER_ASCII_TABLE.get(index)[encoding];
+};
 
 export const parseDataToHexcodeMap = (data: string) => {
   if (data === undefined || data === null || data === '') return new Map();
