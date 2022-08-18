@@ -152,10 +152,11 @@ type VolumeControlProps = {
   onDelete?: (name: string) => void;
 };
 
-const DEFAULT_VOL = {
+const DEFAULT_VOL: Volume = {
   capacity: '',
   mount_path: '',
-  storage_class: ''
+  storage_class: '',
+  access_mode: 'ReadWriteOnce'
 };
 
 const WrappedVolumeControl = ({ name, vol, onAdd, onDelete }: VolumeControlProps) => {
@@ -184,7 +185,7 @@ const WrappedVolumeControl = ({ name, vol, onAdd, onDelete }: VolumeControlProps
         {`${name} :`}
       </Grid>
       <Grid item xs={10} sm={8}>
-        {`${vol.mount_path} (${vol.capacity})`}
+        {`${vol.mount_path} (${vol.storage_class} | ${vol.access_mode} | ${vol.capacity}B)`}
       </Grid>
       <Grid item xs={2} sm={1}>
         <Tooltip title={t('params.user.remove')}>
@@ -214,6 +215,19 @@ const WrappedVolumeControl = ({ name, vol, onAdd, onDelete }: VolumeControlProps
         />
       </Grid>
       <Grid item xs={10} sm={8}>
+        <Select
+          fullWidth
+          label={t('container.dialog.volumes.access_mode')}
+          id="access_mode"
+          variant="outlined"
+          margin="dense"
+          value={tempVol.access_mode}
+          style={{ margin: 0 }}
+          onChange={event => handleValueChange('access_mode', event.target.value)}
+        >
+          <MenuItem value="ReadWriteOnce">{t('ReadWriteOnce')}</MenuItem>
+          <MenuItem value="ReadWriteMany">{t('ReadWriteMany')}</MenuItem>
+        </Select>
         <TextField
           fullWidth
           placeholder={t('container.dialog.volumes.mount_path')}

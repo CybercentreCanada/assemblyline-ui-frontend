@@ -44,6 +44,7 @@ export type Volume = {
   capacity: string;
   mount_path: string;
   storage_class: string;
+  access_mode: 'ReadWriteOnce' | 'ReadWriteMany';
 };
 
 export type Environment = {

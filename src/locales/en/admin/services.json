@@ -46,6 +46,7 @@
   "container.dialog.title.dependency": "Modifying dependency",
   "container.dialog.title.container": "Modifying container",
   "container.dialog.volumes": "Persistent Volumes",
+  "container.dialog.volumes.access_mode": "Access Mode",
   "container.dialog.volumes.name": "Volume name",
   "container.dialog.volumes.mount_path": "Mount path",
   "container.dialog.volumes.capacity": "Capacity",
