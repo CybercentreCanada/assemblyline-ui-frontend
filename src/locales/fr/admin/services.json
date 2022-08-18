@@ -46,6 +46,7 @@
   "container.dialog.title.dependency": "Modifier la dépendance",
   "container.dialog.title.container": "Modifier le conteneur",
   "container.dialog.volumes": "Volumes persistants",
+  "container.dialog.volumes.access_mode": "Mode d'accès",
   "container.dialog.volumes.name": "Nom du volume",
   "container.dialog.volumes.mount_path": "Répertoire de montage",
   "container.dialog.volumes.capacity": "Capacité",
