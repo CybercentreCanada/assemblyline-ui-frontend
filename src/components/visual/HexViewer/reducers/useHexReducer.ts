@@ -40,7 +40,7 @@ export const useHexReducer: UseReducer<HexState> = () => {
         data: '',
         codes: new Map(),
         null: {
-          char: '0'
+          char: '.'
         },
         nonPrintable: {
           encoding: 'hidden',
