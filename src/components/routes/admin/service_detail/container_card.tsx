@@ -125,7 +125,7 @@ const WrappedContainerCard = ({ container, defaults, name, volumes, onChange }: 
               <div className={classes.label}>{`${t('container.card.volumes')}:`}&nbsp;</div>
               {Object.keys(volumes).map((vol, id) => (
                 <div key={id} className={classes.mono} style={{ paddingLeft: '2rem' }}>
-                  {`${vol} = ${volumes[vol].mount_path} (${volumes[vol].capacity})`}
+                  {`${vol} = ${volumes[vol].mount_path} (${volumes[vol].storage_class}: ${volumes[vol].capacity}B)`}
                 </div>
               ))}
             </Grid>

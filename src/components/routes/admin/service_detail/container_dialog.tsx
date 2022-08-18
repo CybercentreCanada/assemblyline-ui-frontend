@@ -184,7 +184,7 @@ const WrappedVolumeControl = ({ name, vol, onAdd, onDelete }: VolumeControlProps
         {`${name} :`}
       </Grid>
       <Grid item xs={10} sm={8}>
-        {`${vol.mount_path} (${vol.capacity})`}
+        {`${vol.mount_path} (${vol.storage_class}: ${vol.capacity}B)`}
       </Grid>
       <Grid item xs={2} sm={1}>
         <Tooltip title={t('params.user.remove')}>

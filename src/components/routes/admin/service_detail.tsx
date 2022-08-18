@@ -86,6 +86,7 @@ export type Source = {
   ssl_ignore_errors: boolean;
   uri: string;
   username: string;
+  git_branch: string;
 };
 
 type UpdateConfig = {
