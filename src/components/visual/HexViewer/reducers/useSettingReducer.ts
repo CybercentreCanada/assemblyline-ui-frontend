@@ -49,7 +49,7 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
         open: false,
         bodyType: 0,
         hex: {
-          null: { char: '0' },
+          null: { char: '.' },
           nonPrintable: { encoding: 0, char: '.' },
           higher: { encoding: 0, char: '.' }
         },
@@ -298,7 +298,7 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
         ...store.setting,
         bodyType: 0,
         hex: {
-          null: { char: '0' },
+          null: { char: '.' },
           nonPrintable: { encoding: 0, char: '.' },
           higher: { encoding: 0, char: '.' }
         },
