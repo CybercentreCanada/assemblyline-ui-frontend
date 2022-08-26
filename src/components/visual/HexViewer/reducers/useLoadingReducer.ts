@@ -17,7 +17,8 @@ export type LoadingState = {
     };
     errors: {
       isDataInvalid: boolean;
-      isWindowTooSmall: boolean;
+      isHeightTooSmall: boolean;
+      isWidthTooSmall: boolean;
     };
   };
 };
@@ -40,7 +41,8 @@ export const useLoadingReducer: UseReducer<LoadingState> = () => {
         },
         errors: {
           isDataInvalid: false,
-          isWindowTooSmall: false
+          isHeightTooSmall: false,
+          isWidthTooSmall: false
         }
       }
     }),
@@ -117,7 +119,8 @@ export const useLoadingReducer: UseReducer<LoadingState> = () => {
     (store, { height, width }) => {
       store.loading.message = 'loading.bodyResize';
       store.loading.conditions.hasResized = true;
-      store.loading.errors.isWindowTooSmall = height < 0 || width < 264;
+      // store.loading.errors.isHeightTooSmall = height < 400;
+      store.loading.errors.isWidthTooSmall = width < 264;
       return handleLoading(store);
     },
     [handleLoading]

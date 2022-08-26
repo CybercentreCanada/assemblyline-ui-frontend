@@ -9,10 +9,8 @@ const useHexStyles = ({ y = 0, height = 1000 }: { y: number; height: number }) =
   makeStyles(theme => ({
     root: {
       position: 'absolute',
-      // height: `calc(${height}px - ${y}px - 75px)`,
-      height: `auto`,
+      height: '100%',
       width: '100%',
-      left: 0,
       display: 'grid',
       alignContent: 'center',
       whiteSpace: 'normal',
@@ -40,32 +38,30 @@ export const WrappedHexLoading = ({ store }: StoreProps) => {
     height: window.innerHeight
   })();
 
-  if (store.loading.status === 'loading')
-    return (
-      <div className={clsx(classes.root)}>
-        <div className={clsx(classes.container)}>
-          <Typography className={clsx(classes.text)} variant="subtitle1" color="secondary">
-            {t(store.loading.message)}
-          </Typography>
-          <LinearProgress className={classes.progressSpinner} variant="determinate" value={store.loading.progress} />
-        </div>
+  return (
+    <div className={clsx(classes.root)}>
+      <div className={clsx(classes.container)}>
+        {store.loading.status === 'loading' && (
+          <>
+            <Typography className={clsx(classes.text)} variant="subtitle1" color="secondary">
+              {t(store.loading.message)}
+            </Typography>
+            <LinearProgress className={classes.progressSpinner} variant="determinate" value={store.loading.progress} />
+          </>
+        )}
+        {store.loading.status === 'error' && (
+          <>
+            <Typography className={clsx(classes.text)} variant="subtitle1" color="error">
+              {store.loading.errors.isDataInvalid && t('error.isInvalidData')}
+              {store.loading.errors.isHeightTooSmall && t('error.isHeightTooSmall')}
+              {store.loading.errors.isWidthTooSmall && t('error.isWidthTooSmall')}
+            </Typography>
+            <ErrorOutlineIcon color="error" fontSize="large" />
+          </>
+        )}
       </div>
-    );
-  else if (store.loading.status === 'error')
-    return (
-      <div className={clsx(classes.root)}>
-        <div className={clsx(classes.container)}>
-          <Typography className={clsx(classes.text)} variant="subtitle1" color="error">
-            {store.loading.errors.isDataInvalid && t('error.isInvalidData')}
-          </Typography>
-          <Typography className={clsx(classes.text)} variant="subtitle1" color="error">
-            {store.loading.errors.isWindowTooSmall && t('error.isWindowTooSmall')}
-          </Typography>
-          <ErrorOutlineIcon color="error" fontSize="large" />
-        </div>
-      </div>
-    );
-  else return <></>;
+    </div>
+  );
 };
 
 export const HexLoading = React.memo(WrappedHexLoading);

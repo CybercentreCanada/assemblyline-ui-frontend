@@ -5,10 +5,11 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { default as React } from 'react';
 import { useTranslation } from 'react-i18next';
-import { HexColumnSetting, HexEncoding, HexOffsetBaseSetting, StoreProps, useDispatch } from '../..';
+import { CopyTypeSetting, HexColumnSetting, HexEncoding, HexOffsetBaseSetting, StoreProps, useDispatch } from '../..';
 
 export * from './bodyType';
 export * from './column';
+export * from './copyType';
 export * from './encoding';
 export * from './offsetBase';
 export * from './OutlinedField';
@@ -32,6 +33,7 @@ export const WrappedHexSettings = ({ store }: StoreProps) => {
           <Grid container spacing={1} alignItems="center">
             <Grid item xs={12}>
               <Grid container spacing={1} alignItems="center">
+                <CopyTypeSetting store={store} />
                 <HexEncoding store={store} />
                 {/* <HexBodyTypeSetting store={store} /> */}
                 <HexOffsetBaseSetting store={store} />
@@ -67,6 +69,8 @@ export const HexSettings = React.memo(
     prevProps.store.setting.bodyType === nextProps.store.setting.bodyType &&
     prevProps.store.setting.hex === nextProps.store.setting.hex &&
     prevProps.store.setting.offsetBase === nextProps.store.setting.offsetBase &&
+    prevProps.store.setting.copy.nonPrintable.type === nextProps.store.setting.copy.nonPrintable.type &&
+    prevProps.store.setting.copy.nonPrintable.prefix === nextProps.store.setting.copy.nonPrintable.prefix &&
     prevProps.store.setting.layout.column.auto === nextProps.store.setting.layout.column.auto &&
     prevProps.store.setting.layout.column.max === nextProps.store.setting.layout.column.max
 );

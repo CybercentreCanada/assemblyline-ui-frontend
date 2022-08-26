@@ -103,7 +103,6 @@ export const useLayoutReducer: UseReducer<LayoutState> = () => {
     const { width = 1 } = document.getElementById('hex-viewer')?.getBoundingClientRect();
     let newColumnSize = handleLayoutColumnResize2(store, width as number);
     newColumnSize = columnAuto ? newColumnSize : Math.min(newColumnSize, maxColumns);
-    
     return {
       ...store,
       layout: {

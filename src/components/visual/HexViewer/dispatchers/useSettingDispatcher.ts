@@ -8,6 +8,9 @@ export type SettingAction =
   | { type: 'settingClose'; payload: void }
   | { type: 'settingReset'; payload: void }
   | { type: 'settingBodyTypeChange'; payload: { event: ChangeEvent<{ name?: string; value: unknown }> } }
+  | { type: 'settingSearchTextTypeChange'; payload: { event: ChangeEvent<{ name?: string; value: unknown }> } }
+  | { type: 'settingCopyNonPrintableTypeChange'; payload: { event: ChangeEvent<{ name?: string; value: unknown }> } }
+  | { type: 'settingCopyNonPrintablePrefixChange'; payload: { event: ChangeEvent<{ name?: string; value: unknown }> } }
   | { type: 'settingOffsetBaseChange'; payload: { event: ChangeEvent<{ name?: string; value: unknown }> } }
   | { type: 'settingAutoColumnChange'; payload: void }
   | { type: 'settingColumnChange'; payload: { value: number } }
@@ -24,6 +27,9 @@ export const SETTING_ACTION_TYPES: SettingActionTypes = {
   settingClose: 'SettingClose_Action',
   settingReset: 'SettingReset_Action',
   settingBodyTypeChange: 'SettingBodyTypeChange_Action',
+  settingSearchTextTypeChange: 'SettingSearchTextTypeChange_Action',
+  settingCopyNonPrintableTypeChange: 'SettingCopyNonPrintableTypeChange_Action',
+  settingCopyNonPrintablePrefixChange: 'SettingCopyNonPrintablePrefixChange_Action',
   settingOffsetBaseChange: 'SettingOffsetBaseChange_Action',
   settingAutoColumnChange: 'SettingAutoColumnChange_Action',
   settingColumnChange: 'SettingColumnChange_Action',
@@ -40,6 +46,11 @@ export const useSettingDispatcher = (dispatch: Dispatch): SettingDispatchers => 
     onSettingReset: payload => dispatch({ type: ACTIONS.settingReset, payload }),
     onSettingBodyTypeChange: payload => dispatch({ type: ACTIONS.settingBodyTypeChange, payload }),
     onSettingEncodingChange: payload => dispatch({ type: ACTIONS.settingEncodingChange, payload }),
+    onSettingSearchTextTypeChange: payload => dispatch({ type: ACTIONS.settingSearchTextTypeChange, payload }),
+    onSettingCopyNonPrintableTypeChange: payload =>
+      dispatch({ type: ACTIONS.settingCopyNonPrintableTypeChange, payload }),
+    onSettingCopyNonPrintablePrefixChange: payload =>
+      dispatch({ type: ACTIONS.settingCopyNonPrintablePrefixChange, payload }),
     onSettingOffsetBaseChange: payload => dispatch({ type: ACTIONS.settingOffsetBaseChange, payload }),
     onSettingAutoColumnChange: payload => dispatch({ type: ACTIONS.settingAutoColumnChange, payload }),
     onSettingColumnChange: payload => dispatch({ type: ACTIONS.settingColumnChange, payload }),

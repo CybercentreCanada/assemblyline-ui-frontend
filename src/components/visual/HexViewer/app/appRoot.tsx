@@ -15,19 +15,20 @@ import {
   WidthType
 } from '..';
 
-const useHexStyles = ({ y = 0, height = 1000 }: { y: number; height: number }) =>
+const useHexStyles = ({ y = 275.890625, height = 1000 }: { y: number; height: number }) =>
   makeStyles(theme => ({
     root: {
+      position: 'relative',
       height: `calc(${height}px - ${y}px - 75px)`,
       width: '100%',
       display: 'grid',
       alignContent: 'center'
     },
-    mobile: {
+    widescreen: {
       height: `calc(${height}px - ${LAYOUT_SIZE.mobileWindowHeight}px)`
     },
-    hidden: {
-      height: `auto`
+    viewportAuto: {
+      height: 'auto'
     }
   }));
 
@@ -80,13 +81,7 @@ const WrappedAppRoot = ({ data = '' }: DataProps) => {
   }, [dispatch, store.location.loaded]);
 
   return (
-    <div
-      className={clsx(
-        classes.root,
-        window.innerHeight.valueOf() < 1000 && classes.mobile,
-        store.loading.status !== 'initialized' && classes.hidden
-      )}
-    >
+    <div className={clsx(classes.root, window.innerHeight.valueOf() < 1000 && classes.widescreen)}>
       <HexLoading store={store} />
       {store.hex.codes.size !== 0 && store.location.loaded && <HexLayout store={store} />}
     </div>
