@@ -312,7 +312,6 @@ function Submit() {
     } else {
       data = {
         ui_params: settings,
-        name: url[15] === undefined || url[15] === '' ? 'file' : url[15],
         url: urlHash
       };
     }
@@ -673,11 +672,10 @@ function Submit() {
                 </div>
                 <div style={{ paddingTop: sp1, paddingBottom: sp1 }}>
                   <Typography variant="caption" color="textSecondary" gutterBottom>
-                    {`${t('options.submission.ttl')} (${
-                      configuration.submission.max_dtl !== 0
-                        ? `${t('options.submission.ttl.max')}: ${configuration.submission.max_dtl}`
-                        : t('options.submission.ttl.forever')
-                    })`}
+                    {`${t('options.submission.ttl')} (${configuration.submission.max_dtl !== 0
+                      ? `${t('options.submission.ttl.max')}: ${configuration.submission.max_dtl}`
+                      : t('options.submission.ttl.forever')
+                      })`}
                   </Typography>
                   {settings ? (
                     <TextField
