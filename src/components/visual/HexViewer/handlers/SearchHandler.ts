@@ -8,28 +8,6 @@ export const isSearchType = Object.fromEntries(
   Object.keys(SEARCH).map(key => [key, (store: Store) => store.search.type === SEARCH[key]])
 ) as IsSearch;
 
-type SearchText = { narrow: 'narrow'; wide: 'wide' };
-const SEARCH_TEXT: SearchText = { narrow: 'narrow', wide: 'wide' };
-export type SearchTextType = typeof SEARCH_TEXT[keyof typeof SEARCH_TEXT];
-export type IsSearchText = { [Property in SearchTextType]: (store: Store) => boolean };
-export const isSearchTextType = Object.fromEntries(
-  Object.keys(SEARCH_TEXT).map(key => [key, (store: Store) => store.search.textType === SEARCH_TEXT[key]])
-) as IsSearchText;
-
-export const SEARCH_TEXT_TYPE_VALUES: {
-  en: Array<{ label: string; type: SearchTextType; value: number }>;
-  fr: Array<{ label: string; type: SearchTextType; value: number }>;
-} = {
-  en: [
-    { label: 'Narrow', type: 'narrow', value: 0 },
-    { label: 'Wide', type: 'wide', value: 1 }
-  ],
-  fr: [
-    { label: 'Étroit', type: 'narrow', value: 0 },
-    { label: 'Large', type: 'wide', value: 1 }
-  ]
-};
-
 export const addRegexAlternation = (text1: string, text2: string): string =>
   text1 === '' || text1 === null ? text2 : text1 + '|' + text2;
 
@@ -50,94 +28,94 @@ export const formatTextString = (value: string): string =>
     .filter(e => e !== '' && e.length >= 2)
     .join(' ');
 
-export const getNarrowTextExpression = (store: Store, value: string): RegExp => {
-  const { nonPrintable, higher } = store.hex;
-  let expression: string = '';
-
-  // eslint-disable-next-line array-callback-return
-  value.split('').map(character => {
-    let sub: string = '';
-    let count: number = 0;
-
-    const char = Buffer.from(character).toString('hex');
-
-    if (char.length === 2) {
-      sub = addRegexAlternation(sub, '(' + char + ')');
-      count = count + 1;
-    } else {
-      // Add Non-Printable ASCII Characters
-      NON_PRINTABLE_ASCII_TABLE.forEach(ascii => {
-        if (
-          (nonPrintable.encoding === 'hidden' && nonPrintable.char === character) ||
-          ascii[nonPrintable.encoding] === character ||
-          [ascii.copy, ' '].includes(character)
-        ) {
-          sub = addRegexAlternation(sub, '(' + ascii.hex + ')');
-          count = count + 1;
-        }
-      });
-
-      // Add Higher ASCII Characters
-      HIGHER_ASCII_TABLE.forEach(ascii => {
-        if ((higher.encoding === 'hidden' && higher.char === character) || ascii[higher.encoding] === character) {
-          sub = addRegexAlternation(sub, '(' + ascii.hex + ')');
-          count = count + 1;
-        }
-      });
+export const spliceBackslash = (array: Array<string>): Array<string> => {
+  let i = array.length - 1;
+  while (i >= 1) {
+    if (array[i - 1] === '\\') {
+      array.splice(i - 1, 2, array[i - 1] + array[i]);
+      i--;
     }
-    count <= 5 ? (expression += '(' + sub.toLowerCase() + ') ') : (expression += '(..) ');
-  });
-  return RegExp(expression, 'g');
+    i--;
+  }
+  if (array[array.length - 1] === '\\') array.splice(array.length - 1, 1);
+  return array;
 };
 
-export const getWideTextExpression = (store: Store, value: string): RegExp => {
-  const {
-    null: { char: nullChar },
-    nonPrintable,
-    higher
-  } = store.hex;
-  let expression: string = '';
+export const reduceRegex = (array: Array<string>): Array<string> => {
+  let i = array.length - 1;
+  while (i >= 1) {
+    let j = i - 1;
+    let sameValues = false;
+    while (j >= 0) {
+      if (array[i] === array[j]) sameValues = true;
+      else break;
+      j--;
+    }
+    if (sameValues) {
+      array.splice(j + 1, i - j, '(' + array[i] + '){' + (i - j) + '}');
+      i = j;
+    } else i--;
+  }
+  return array;
+};
+
+export const getNonPrintableASCIILookUpMap = (store: Store): Map<string, string> => {
+  const map = new Map<string, string>();
+  map.set(' ', '(?!00)([0-1]([0-9]|[a-f]))');
+  for (let i = 8; i <= 13; i++) {
+    const ascii = NON_PRINTABLE_ASCII_TABLE.get(i);
+    map.set(ascii.copy, ascii.hex);
+  }
+  if (store.hex.nonPrintable.encoding === 'hidden') map.set(store.hex.nonPrintable.char, '(?!00)([0-1]([0-9]|[a-f]))');
+  else if (['CP437', 'caret'].includes(store.hex.nonPrintable.encoding))
+    Array.from(NON_PRINTABLE_ASCII_TABLE.values()).forEach(ascii =>
+      map.set(ascii[store.hex.nonPrintable.encoding], ascii.hex)
+    );
+  return map;
+};
+
+export const getHigherASCIILookUpMap = (store: Store): Map<string, string> => {
+  const map = new Map<string, string>();
+  if (store.hex.higher.encoding === 'hidden') map.set(store.hex.higher.char, '(7f)|(([8-9]|[a-f])([0-9]|[a-f]))');
+  else if (['CP437', 'windows1252'].includes(store.hex.higher.encoding))
+    Array.from(HIGHER_ASCII_TABLE.values()).forEach(ascii => map.set(ascii[store.hex.higher.encoding], ascii.hex));
+  return map;
+};
+
+export const getTextExpression = (store: Store, value: string): RegExp => {
+  const nonPrintableASCII = getNonPrintableASCIILookUpMap(store);
+  const higherASCII = getHigherASCIILookUpMap(store);
 
   // eslint-disable-next-line array-callback-return
-  value.split('').map(character => {
-    let sub: string = '';
-    let count: number = 0;
+  const regex: string[][] = value.split('').map(character => {
+    let array: string[] = [];
 
-    // Add Null Value
-    if (nullChar === character || NON_PRINTABLE_ASCII_TABLE.get(0).copy === character) {
-      sub = addRegexAlternation(sub, '(00)');
-      count = count + 1;
-    }
+    // Null Character
+    if (character === ' ' || character === store.hex.null.char) array.push('(00)');
 
-    // Add Non-Printable ASCII Characters
-    NON_PRINTABLE_ASCII_TABLE.forEach(ascii => {
-      if (
-        (nonPrintable.encoding === 'hidden' && nonPrintable.char === character) ||
-        ascii[nonPrintable.encoding] === character ||
-        [ascii.copy, ' '].includes(character)
-      ) {
-        sub = addRegexAlternation(sub, '(' + ascii.hex + ')');
-        count = count + 1;
-      }
-    });
+    // Non-Printable ASCII Character
+    const nonPrintableChars = nonPrintableASCII.get(character);
+    if (nonPrintableChars !== undefined) array.push('(' + nonPrintableChars + ')');
 
-    // Add Lower ASCII Characters
-    for (let i = 32; i < 127; i++) {
-      if (character === String.fromCharCode(i)) {
-        sub = addRegexAlternation(sub, '(' + Buffer.from(String.fromCharCode(i)).toString('hex') + ')');
-        count = count + 1;
-      }
-    }
+    // Lower ASCII Character
+    const lowerChars = Buffer.from(character).toString('hex');
+    if (lowerChars.length === 2) array.push('(' + lowerChars + ')');
 
-    // Add Higher ASCII Characters
-    HIGHER_ASCII_TABLE.forEach(ascii => {
-      if ((higher.encoding === 'hidden' && higher.char === character) || ascii[higher.encoding] === character) {
-        sub = addRegexAlternation(sub, '(' + ascii.hex + ')');
-        count = count + 1;
-      }
-    });
-    count <= 5 ? (expression += '(' + sub.toLowerCase() + ') ') : (expression += '(..) ');
+    // Higher ASCII Character
+    const higherChars = higherASCII.get(character);
+    if (higherChars !== undefined) array.push('(' + higherChars + ')');
+
+    return array;
   });
+
+  const flatReg = regex.map(element => (element.length === 0 ? '(XX)' : '(' + element.join('|') + ')'));
+  const expression =
+    flatReg.length === 0 || flatReg.includes('(XX)')
+      ? '(XX)'
+      : reduceRegex(flatReg.map(e => e + ' '))
+          .join('')
+          .toLowerCase();
+
   return RegExp(expression, 'g');
 };
 

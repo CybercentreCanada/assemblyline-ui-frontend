@@ -7,8 +7,8 @@ import { getHigherAsciiFromDec, getNonPrintableAsciiFromDec, Store } from '..';
  *  - Displayed Values : straight the displayed value shown in one line
  */
 
-type NonPrintableCopy = { parsed: 'parsed'; displayed: 'displayed'; prefix: 'prefix' };
-const NON_PRINTABLE_COPY_TYPE: NonPrintableCopy = { parsed: 'parsed', displayed: 'displayed', prefix: 'prefix' };
+type NonPrintableCopy = { parsed: 'parsed'; displayed: 'displayed' };
+const NON_PRINTABLE_COPY_TYPE: NonPrintableCopy = { parsed: 'parsed', displayed: 'displayed' };
 export type NonPrintableCopyType = typeof NON_PRINTABLE_COPY_TYPE[keyof typeof NON_PRINTABLE_COPY_TYPE];
 export type IsNonPrintableCopyType = { [Property in NonPrintableCopyType]: (store: Store) => boolean };
 export const isNonPrintableCopyType = Object.fromEntries(
@@ -23,14 +23,12 @@ export const NON_PRINTABLE_COPY_TYPE_VALUES: {
   fr: Array<{ label: string; type: NonPrintableCopyType; value: number }>;
 } = {
   en: [
-    { label: 'Parsed', type: 'parsed', value: 0 },
-    { label: 'Displayed Value', type: 'displayed', value: 1 },
-    { label: 'Displayed Value with Prefix', type: 'prefix', value: 2 }
+    { label: 'Displayed', type: 'displayed', value: 0 },
+    { label: 'Parsed', type: 'parsed', value: 1 }
   ],
   fr: [
-    { label: 'Analysé', type: 'parsed', value: 0 },
-    { label: 'Valeur affichée', type: 'displayed', value: 1 },
-    { label: 'Valeur affichée avec préfix', type: 'prefix', value: 2 }
+    { label: 'Affichée', type: 'displayed', value: 0 },
+    { label: 'Analysé', type: 'parsed', value: 1 }
   ]
 };
 
@@ -40,29 +38,17 @@ export const getCopyHexCharacter = (store: Store, hexcode: string) => {
 
   // Null ASCII Character
   if (value === 0) {
-    if (store.copy.nonPrintable.type === 'displayed') return store.hex.null.char;
-    else if (store.copy.nonPrintable.type === 'parsed') return getNonPrintableAsciiFromDec(0, 'copy');
-    else if (store.copy.nonPrintable.type === 'prefix')
-      return getNonPrintableAsciiFromDec(
-        0,
-        store.hex.nonPrintable.encoding as 'CP437' | 'prefix' | 'copy',
-        store.copy.nonPrintable.prefix
-      );
+    if (store.copy.nonPrintable.type === 'parsed') return getNonPrintableAsciiFromDec(0, 'copy');
+    else if (store.copy.nonPrintable.type === 'displayed') return store.hex.null.char;
     else return '';
   }
   // Non Printable ASCII Characters
   else if (1 <= value && value <= 31) {
-    if (store.copy.nonPrintable.type === 'displayed' && store.hex.nonPrintable.encoding === 'hidden')
+    if (store.hex.nonPrintable.encoding === 'hidden' && store.copy.nonPrintable.type === 'displayed')
       return store.hex.nonPrintable.char;
-    else if (store.copy.nonPrintable.type === 'displayed')
-      return getNonPrintableAsciiFromDec(value, store.hex.nonPrintable.encoding as 'CP437' | 'prefix' | 'copy');
     else if (store.copy.nonPrintable.type === 'parsed') return getNonPrintableAsciiFromDec(value, 'copy');
-    else if (store.copy.nonPrintable.type === 'prefix')
-      return getNonPrintableAsciiFromDec(
-        value,
-        store.hex.nonPrintable.encoding as 'CP437' | 'prefix' | 'copy',
-        store.copy.nonPrintable.prefix
-      );
+    else if (store.copy.nonPrintable.type === 'displayed')
+      return getNonPrintableAsciiFromDec(value, store.hex.nonPrintable.encoding as 'CP437' | 'caret' | 'copy');
     else return '';
   }
   // Lower ASCII ASCII Characters

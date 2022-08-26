@@ -105,8 +105,8 @@ export const NON_PRINTABLE_ASCII_TABLE = new Map<
   number,
   { dec: number; hex: string; html: string; code: string; CP437: string; caret: string; text: string; copy: string }
 >([
-  [0, { dec: 0, hex: '00', html: '&#0;', code: 'NUL', CP437: ' ', caret: '@', text: '^@', copy: ' ' }],
   [1, { dec: 1, hex: '01', html: '&#1;', code: 'SOH', CP437: '☺', caret: 'A', text: '^A', copy: ' ' }],
+  [0, { dec: 0, hex: '00', html: '&#0;', code: 'NUL', CP437: ' ', caret: '@', text: '^@', copy: ' ' }],
   [2, { dec: 2, hex: '02', html: '&#2;', code: 'STX', CP437: '☻', caret: 'B', text: '^B', copy: ' ' }],
   [3, { dec: 3, hex: '03', html: '&#3;', code: 'ETX', CP437: '♥', caret: 'C', text: '^C', copy: ' ' }],
   [4, { dec: 4, hex: '04', html: '&#4;', code: 'EOT', CP437: '♦', caret: 'D', text: '^D', copy: ' ' }],
@@ -133,7 +133,7 @@ export const NON_PRINTABLE_ASCII_TABLE = new Map<
   [25, { dec: 25, hex: '19', html: '&#25;', code: 'EM', CP437: '↓', caret: 'Y', text: '^Y', copy: ' ' }],
   [26, { dec: 26, hex: '1A', html: '&#26;', code: 'SUB', CP437: '→', caret: 'Z', text: '^Z', copy: ' ' }],
   [27, { dec: 27, hex: '1B', html: '&#27;', code: 'ESC', CP437: '←', caret: '[', text: '^[', copy: ' ' }],
-  [28, { dec: 28, hex: '1C', html: '&#28;', code: 'FS', CP437: '∟', caret: '', text: '^', copy: ' ' }],
+  [28, { dec: 28, hex: '1C', html: '&#28;', code: 'FS', CP437: '∟', caret: '\\', text: '^\\', copy: ' ' }],
   [29, { dec: 29, hex: '1D', html: '&#29;', code: 'GS', CP437: '↔', caret: ']', text: '^]', copy: ' ' }],
   [30, { dec: 30, hex: '1E', html: '&#30;', code: 'RS', CP437: '▲', caret: '^', text: '^^', copy: ' ' }],
   [31, { dec: 31, hex: '1F', html: '&#31;', code: 'US', CP437: '▼', caret: '_', text: '^_', copy: ' ' }]
@@ -274,33 +274,25 @@ export const HIGHER_ASCII_TABLE = new Map<
   [255, { dec: 255, hex: 'FF', bin: '11111111', html: '&#255;', CP437: '⍽', windows1252: 'ÿ' }]
 ]);
 
-export const getNonPrintableAsciiFromDec = (
-  index: number,
-  encoding: 'CP437' | 'prefix' | 'copy',
-  prefix: string = ''
-) =>
-  !['CP437', 'prefix', 'copy'].includes(encoding) || index < 0 || index > 31
-    ? null
+export const getNonPrintableAsciiFromDec = (index: number, encoding: 'CP437' | 'caret' | 'copy', prefix: string = '') =>
+  !['CP437', 'caret', 'copy'].includes(encoding) || index < 0 || index > 31
+    ? ''
     : prefix.slice(-1) + NON_PRINTABLE_ASCII_TABLE.get(index)[encoding];
 
-export const getNonPrintableAsciiFromHex = (
-  hex: string,
-  encoding: 'CP437' | 'prefix' | 'copy',
-  prefix: string = ''
-) => {
+export const getNonPrintableAsciiFromHex = (hex: string, encoding: 'CP437' | 'caret' | 'copy', prefix: string = '') => {
   const index: number = parseInt(hex, 16);
-  return !['CP437', 'prefix', 'copy'].includes(encoding) ||
+  return !['CP437', 'caret', 'copy'].includes(encoding) ||
     isNaN(index) ||
     index === undefined ||
     index < 0 ||
     index > 31
-    ? null
+    ? ''
     : prefix.slice(-1) + NON_PRINTABLE_ASCII_TABLE.get(index)[encoding];
 };
 
 export const getHigherAsciiFromDec = (index: number, encoding: 'CP437' | 'windows1252') =>
   !['CP437', 'windows1252'].includes(encoding) || index < 127 || index > 255
-    ? null
+    ? ''
     : HIGHER_ASCII_TABLE.get(index)[encoding];
 
 export const getHigherAsciiFromHex = (hex: string, encoding: 'CP437' | 'windows1252') => {
@@ -310,7 +302,7 @@ export const getHigherAsciiFromHex = (hex: string, encoding: 'CP437' | 'windows1
     index === undefined ||
     index < 127 ||
     index > 255
-    ? null
+    ? ''
     : HIGHER_ASCII_TABLE.get(index)[encoding];
 };
 
