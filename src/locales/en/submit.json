@@ -39,6 +39,6 @@
   "urlHash.input_suffix": " to Scan",
   "validate.acceptText": "Continue",
   "validate.cancelText": "Deselect external services",
-  "validate.text": "You are about to submit your file to a service outside Assemblyline's infrastructure. What do you want to do?",
+  "validate.text": "You've enabled URL analysis to the Internet or selected a service outside Assemblyline's infrastructure. Do you want to continue?",
   "validate.title": "External Services Selected"
 }

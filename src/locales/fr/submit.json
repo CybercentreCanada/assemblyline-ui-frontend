@@ -39,6 +39,6 @@
   "urlHash.input_suffix": " à Analyser",
   "validate.acceptText": "Continuer",
   "validate.cancelText": "Désélectionner les services externes",
-  "validate.text": "Vous êtes sur le point de soumettre votre fichier à un service à l'extérieur de l'infrastructure d'Assemblyline. Que voulez-vous faire?",
+  "validate.text": "Vous avez activé l'analyze d'URL sur Internet ou avez selectioné un service à l'extérieur de l'infrastructure d'Assemblyline. Voulez-vous continuez?",
   "validate.title": "Services externes sélectionnés"
 }
