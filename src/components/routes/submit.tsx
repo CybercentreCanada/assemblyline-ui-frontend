@@ -114,6 +114,12 @@ function Submit() {
   const validateServiceSelection = cbType => {
     let showPopup = false;
 
+    // If we're attempting to fetch a URL, make sure the popup is enabled to warn users
+    const url = matchURL(urlHash);
+    if (url) {
+      showPopup = true;
+    }
+
     // Check if we need the popup, and if we do
     settings.services.forEach(cat => {
       cat.services.forEach(srv => {
