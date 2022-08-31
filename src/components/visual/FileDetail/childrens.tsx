@@ -1,10 +1,13 @@
-import { Box, Collapse, Divider, makeStyles, Typography, useTheme } from '@material-ui/core';
+import { Collapse, Divider, makeStyles, Typography, useTheme } from '@material-ui/core';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useHistory } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
   clickable: {
+    color: 'inherit',
+    display: 'block',
+    textDecoration: 'none',
     cursor: 'pointer',
     '&:hover, &:focus': {
       backgroundColor: theme.palette.action.hover
@@ -28,7 +31,6 @@ const WrappedChildrenSection: React.FC<ChildrenSectionProps> = ({ childrens }) =
   const theme = useTheme();
   const classes = useStyles();
   const sp2 = theme.spacing(2);
-  const history = useHistory();
 
   return childrens && childrens.length !== 0 ? (
     <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
@@ -45,17 +47,15 @@ const WrappedChildrenSection: React.FC<ChildrenSectionProps> = ({ childrens }) =
       <Collapse in={open} timeout="auto">
         <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
           {childrens.map((fileItem, i) => (
-            <Box
+            <Link
               key={i}
               className={classes.clickable}
-              onClick={() => {
-                history.push(`/file/detail/${fileItem.sha256}?name=${encodeURI(fileItem.name)}`);
-              }}
+              to={`/file/detail/${fileItem.sha256}?name=${encodeURI(fileItem.name)}`}
               style={{ wordBreak: 'break-word' }}
             >
               <span>{fileItem.name}</span>
               <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{` :: ${fileItem.sha256}`}</span>
-            </Box>
+            </Link>
           ))}
         </div>
       </Collapse>
