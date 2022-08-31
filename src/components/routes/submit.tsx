@@ -114,12 +114,6 @@ function Submit() {
   const validateServiceSelection = cbType => {
     let showPopup = false;
 
-    // If we're attempting to fetch a URL, make sure the popup is enabled to warn users
-    const url = matchURL(urlHash);
-    if (url) {
-      showPopup = true;
-    }
-
     // Check if we need the popup, and if we do
     settings.services.forEach(cat => {
       cat.services.forEach(srv => {
@@ -318,6 +312,7 @@ function Submit() {
     } else {
       data = {
         ui_params: settings,
+        name: url[15] === undefined || url[15] === '' ? 'file' : url[15],
         url: urlHash
       };
     }
