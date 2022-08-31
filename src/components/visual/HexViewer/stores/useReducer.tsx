@@ -68,6 +68,9 @@ export const ReducerProvider = ({ children }: StoreProviderProps) => {
     ...search.initialState,
     ...select.initialState,
     ...setting.initialState
+    // setting: {
+    //   ...hex.initialSetting,
+    // }
   });
 
   const reducer = React.useCallback(

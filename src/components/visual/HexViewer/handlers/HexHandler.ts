@@ -14,7 +14,6 @@ export const OFFSET_SETTING_VALUES: OffsetSettingValues = {
     { label: 'Hexadécimal', value: 16 }
   ]
 };
-
 export type EncodingType =
   | 'hidden'
   | 'caret'
@@ -433,4 +432,19 @@ export const clampHexIndex = (hexcodes: Map<number, string>, index: number): num
   if (index <= 0) return 0;
   else if (index >= hexcodes.size) return hexcodes.size - 1;
   else return index;
+};
+
+
+
+export const HEX_BYTE_SIZE: LanguageConfig<Array<{ label: string; value: number }>> = {
+  en: [
+    { label: 'Octal', value: 8 },
+    { label: 'Decimal', value: 10 },
+    { label: 'Hexadecimal', value: 16 }
+  ],
+  fr: [
+    { label: 'Octal', value: 8 },
+    { label: 'Décimal', value: 10 },
+    { label: 'Hexadécimal', value: 16 }
+  ]
 };

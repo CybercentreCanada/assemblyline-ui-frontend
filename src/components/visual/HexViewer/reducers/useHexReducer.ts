@@ -14,6 +14,7 @@ export type HexState = {
   hex: {
     data: string;
     codes: Map<number, string>;
+    byteSize: number;
     null: {
       char: string;
     };
@@ -33,12 +34,31 @@ export type HexState = {
   };
 };
 
+export type HexSetting = {
+  hex: {
+    byteSize: {
+      value: number;
+      language: {
+        en: Array<{
+          label: string;
+          value: number;
+        }>;
+        fr: Array<{
+          label: string;
+          value: number;
+        }>;
+      };
+    };
+  };
+};
+
 export const useHexReducer: UseReducer<HexState> = () => {
   const initialState = useMemo<HexState>(
     () => ({
       hex: {
         data: '',
         codes: new Map(),
+        byteSize: 4,
         null: {
           char: '.'
         },
@@ -55,6 +75,30 @@ export const useHexReducer: UseReducer<HexState> = () => {
         show: true,
         base: 16,
         size: 8
+      },
+      setting: {
+        byteSize: {
+          value: 0,
+          language: {
+            en: [],
+            fr: []
+          }
+        }
+      }
+    }),
+    []
+  );
+
+  const initialSetting = useMemo<HexSetting>(
+    () => ({
+      hex: {
+        byteSize: {
+          value: 0,
+          language: {
+            en: [],
+            fr: []
+          }
+        }
       }
     }),
     []

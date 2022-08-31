@@ -1,4 +1,4 @@
-import { HIGHER_ASCII_TABLE, NON_PRINTABLE_ASCII_TABLE, Store } from '..';
+import { HIGHER_ASCII_TABLE, NON_PRINTABLE_ASCII_TABLE, Store, toHexChar2 } from '..';
 
 type Search = { cursor: 'cursor'; hex: 'hex'; text: 'text' };
 const SEARCH: Search = { cursor: 'cursor', hex: 'hex', text: 'text' };
@@ -82,31 +82,80 @@ export const getHigherASCIILookUpMap = (store: Store): Map<string, string> => {
   return map;
 };
 
+const fromHex = (hex: string) => {
+  let str;
+  try {
+    str = decodeURIComponent(hex.replace(/(..)/g, '%$1'));
+  } catch (e) {
+    console.log('invalid hex input: ' + hex);
+  }
+  return str;
+};
+
+export const addPadToBytes = (store: Store, value: string) =>
+  value
+    .split('')
+    .map(char => char.charCodeAt(0).toString(16).padStart(store.hex.byteSize, '0'))
+    .join('')
+    .match(/.{2}/g)
+    .map(char => toHexChar2(store, char))
+    .join('');
+
+const parseCharacter = (store: Store, hex: number): string => {
+  return '' + hex;
+};
+
 export const getTextExpression = (store: Store, value: string): RegExp => {
   const nonPrintableASCII = getNonPrintableASCIILookUpMap(store);
   const higherASCII = getHigherASCIILookUpMap(store);
 
+  console.log(String.fromCharCode(0, 20, 64, 9731, 0x0072));
+  console.log(String.fromCodePoint(0, 20, 64, 9731));
+
+  console.log(value.split('').map(char => fromHex(char)));
+  console.log(
+    value
+      .split('')
+      .map(char => char.charCodeAt(0).toString(16).padStart(4, '0'))
+      .join('')
+      .match(/.{2}/g)
+      // .map(char => String.fromCharCode(parseInt(char, 16)))
+      .map(char => toHexChar2(store, char))
+      .join('')
+  );
+  // console.log(
+  //   value
+  //     .split('')
+  //     .map(char => char.codePointAt(0).toString(16).padStart(4, '0'))
+  //     .join('')
+  //     .replace(/(.{2})/g, '$& ')
+  // );
+  // console.log(value.split('').map(char => String.raw(char)));
+  // console.log(value.split(''));
+
   // eslint-disable-next-line array-callback-return
-  const regex: string[][] = value.split('').map(character => {
-    let array: string[] = [];
+  const regex: string[][] = addPadToBytes(store, value)
+    .split('')
+    .map(character => {
+      let array: string[] = [];
 
-    // Null Character
-    if (character === ' ' || character === store.hex.null.char) array.push('(00)');
+      // Null Character
+      if (character === ' ' || character === store.hex.null.char) array.push('(00)');
 
-    // Non-Printable ASCII Character
-    const nonPrintableChars = nonPrintableASCII.get(character);
-    if (nonPrintableChars !== undefined) array.push('(' + nonPrintableChars + ')');
+      // Non-Printable ASCII Character
+      const nonPrintableChars = nonPrintableASCII.get(character);
+      if (nonPrintableChars !== undefined) array.push('(' + nonPrintableChars + ')');
 
-    // Lower ASCII Character
-    const lowerChars = Buffer.from(character).toString('hex');
-    if (lowerChars.length === 2) array.push('(' + lowerChars + ')');
+      // Lower ASCII Character
+      const lowerChars = Buffer.from(character).toString('hex');
+      if (lowerChars.length === 2) array.push('(' + lowerChars + ')');
 
-    // Higher ASCII Character
-    const higherChars = higherASCII.get(character);
-    if (higherChars !== undefined) array.push('(' + higherChars + ')');
+      // Higher ASCII Character
+      const higherChars = higherASCII.get(character);
+      if (higherChars !== undefined) array.push('(' + higherChars + ')');
 
-    return array;
-  });
+      return array;
+    });
 
   const flatReg = regex.map(element => (element.length === 0 ? '(XX)' : '(' + element.join('|') + ')'));
   const expression =

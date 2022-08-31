@@ -36,6 +36,9 @@ export type Store = CellState &
   SearchState &
   SelectState &
   SettingState;
+// & {
+//   setting: HexSetting;
+// };
 
 export type StoreContextProps = {
   store?: Store;

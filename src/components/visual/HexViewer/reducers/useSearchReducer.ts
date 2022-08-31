@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import {
+  addPadToBytes,
   clampSelectedSearchIndex,
   countHexcode,
   executeSearchRegex,
@@ -83,7 +84,7 @@ export const useSearchReducer: UseReducer<SearchState> = () => {
       value = formatTextString(inputValue);
       if (inputValue !== null && inputValue !== '') {
         const expression: RegExp = getTextExpression(store, inputValue);
-        length = inputValue.length;
+        length = addPadToBytes(store, inputValue).length;
         indexes = executeSearchRegex(store.hex.data, expression, length);
         selectedIndex = nextSearchIndex(indexes, store.cursor.index);
       }
