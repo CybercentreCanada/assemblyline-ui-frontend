@@ -30,7 +30,7 @@
     "material-ui-chip-input": "^1.1.0",
     "md5": "^2.3.0",
     "moment": "^2.29.4",
-    "moment-timezone": "^0.5.33",
+    "moment-timezone": "^0.5.35",
     "node-fetch": "^3.2.3",
     "node-forge": "^0.10.0",
     "notistack": "^1.0.10",
