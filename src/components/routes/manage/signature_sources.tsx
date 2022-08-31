@@ -373,7 +373,8 @@ export default function SignatureSources() {
         }
       });
     }
-  }, [apiCall, currentUser.is_admin, currentUser.roles]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser.is_admin, currentUser.roles]);
 
   useEffect(() => {
     reload();
@@ -392,17 +393,17 @@ export default function SignatureSources() {
 
         {sources
           ? Object.keys(sources).map((key, id) => (
-            <ServiceDetail key={id} service={key} sources={sources[key]} reload={reload} />
-          ))
+              <ServiceDetail key={id} service={key} sources={sources[key]} reload={reload} />
+            ))
           : [...Array(2)].map((item, i) => (
-            <div key={i} style={{ marginTop: theme.spacing(2) }}>
-              <Typography variant="h6" style={{ marginTop: theme.spacing(0.5), marginBottom: theme.spacing(0.5) }}>
-                <Skeleton />
-              </Typography>
-              <Divider />
-              <Skeleton variant="rect" height="6rem" style={{ marginTop: theme.spacing(2), borderRadius: '4px' }} />
-            </div>
-          ))}
+              <div key={i} style={{ marginTop: theme.spacing(2) }}>
+                <Typography variant="h6" style={{ marginTop: theme.spacing(0.5), marginBottom: theme.spacing(0.5) }}>
+                  <Skeleton />
+                </Typography>
+                <Divider />
+                <Skeleton variant="rect" height="6rem" style={{ marginTop: theme.spacing(2), borderRadius: '4px' }} />
+              </div>
+            ))}
       </div>
     </PageFullWidth>
   ) : (
