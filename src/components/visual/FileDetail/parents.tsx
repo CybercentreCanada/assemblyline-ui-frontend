@@ -1,10 +1,13 @@
-import { Box, Collapse, Divider, makeStyles, Typography, useTheme } from '@material-ui/core';
+import { Collapse, Divider, makeStyles, Typography, useTheme } from '@material-ui/core';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useHistory } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
   clickable: {
+    color: 'inherit',
+    display: 'block',
+    textDecoration: 'none',
     cursor: 'pointer',
     '&:hover, &:focus': {
       backgroundColor: theme.palette.action.hover
@@ -28,7 +31,6 @@ const WrappedParentSection: React.FC<ParentSectionProps> = ({ parents }) => {
   const theme = useTheme();
   const classes = useStyles();
   const sp2 = theme.spacing(2);
-  const history = useHistory();
 
   return parents && parents.length !== 0 ? (
     <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
@@ -47,17 +49,15 @@ const WrappedParentSection: React.FC<ParentSectionProps> = ({ parents }) => {
           {parents.map((resultKey, i) => {
             const [parentSHA256, service] = resultKey.split('.', 2);
             return (
-              <Box
+              <Link
                 key={i}
                 className={classes.clickable}
-                onClick={() => {
-                  history.push(`/file/detail/${parentSHA256}`);
-                }}
+                to={`/file/detail/${parentSHA256}`}
                 style={{ wordBreak: 'break-word' }}
               >
                 <span>{parentSHA256}</span>
                 <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{` :: ${service}`}</span>
-              </Box>
+              </Link>
             );
           })}
         </div>
