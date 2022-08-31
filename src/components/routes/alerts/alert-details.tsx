@@ -135,7 +135,8 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
         }
       });
     }
-  }, [apiCall, id, paramId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, paramId]);
 
   useEffect(() => {
     if (alert) setItem(alert);
