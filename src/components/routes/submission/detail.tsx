@@ -447,7 +447,8 @@ export default function SubmissionDetail() {
         }
       });
     }
-  }, [apiCall, history, resetLiveMode, showSuccessMessage, submission, t]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [history, resetLiveMode, showSuccessMessage, submission, t]);
 
   const replay = useCallback(() => {
     if (submission != null && systemConfig.ui.allow_replay) {
@@ -460,7 +461,8 @@ export default function SubmissionDetail() {
         }
       });
     }
-  }, [apiCall, showSuccessMessage, submission, systemConfig.ui.allow_replay, t]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showSuccessMessage, submission, systemConfig.ui.allow_replay, t]);
 
   const deleteSubmission = () => {
     if (submission != null) {
@@ -512,7 +514,8 @@ export default function SubmissionDetail() {
         });
       }
     },
-    [apiCall, currentUser.username, submission]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentUser.username, submission]
   );
 
   useEffect(() => {
