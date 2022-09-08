@@ -11,7 +11,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import useSafeResults from 'components/hooks/useSafeResults';
 import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
-import { safeFieldValueURI, scoreToVerdict } from 'helpers/utils';
+import { safeFieldValueURI } from 'helpers/utils';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory } from 'react-router-dom';
@@ -56,7 +56,7 @@ const WrappedTag: React.FC<TagProps> = ({
   const [safelistDialog, setSafelistDialog] = React.useState(false);
   const [safelistReason, setSafelistReason] = React.useState(null);
   const history = useHistory();
-  const { user: currentUser } = useALContext();
+  const { user: currentUser, scoreToVerdict } = useALContext();
   const { apiCall } = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
   const { isHighlighted, triggerHighlight } = useHighlighter();

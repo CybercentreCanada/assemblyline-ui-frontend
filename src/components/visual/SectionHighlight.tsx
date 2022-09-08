@@ -1,5 +1,5 @@
 import { useTheme } from '@material-ui/core';
-import { scoreToVerdict } from 'helpers/utils';
+import useALContext from 'components/hooks/useALContext';
 import React from 'react';
 
 type SectionHighlightProps = {
@@ -18,6 +18,7 @@ const SectionHighlight: React.FC<SectionHighlightProps> = ({
   nested = false
 }) => {
   const theme = useTheme();
+  const { scoreToVerdict } = useALContext();
 
   const VERDICT_SCORE_MAP = {
     // suspicious: theme.palette.type === 'dark' ? '#1f5c6e' : '#a8ebff',

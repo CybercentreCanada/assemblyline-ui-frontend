@@ -7,8 +7,9 @@ import SettingsEthernetOutlinedIcon from '@material-ui/icons/SettingsEthernetOut
 import WidgetsOutlinedIcon from '@material-ui/icons/WidgetsOutlined';
 import { TreeItem, TreeView } from '@material-ui/lab';
 import clsx from 'clsx';
+import useALContext from 'components/hooks/useALContext';
 import useSafeResults from 'components/hooks/useSafeResults';
-import { humanReadableNumber, scoreToVerdict } from 'helpers/utils';
+import { humanReadableNumber } from 'helpers/utils';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -109,6 +110,7 @@ const ProcessTreeItem = ({ process, force = false }) => {
   const { t } = useTranslation(['fileDetail']);
   const classes = useTreeItemStyles();
   const { showSafeResults } = useSafeResults();
+  const { scoreToVerdict } = useALContext();
   const classMap = {
     suspicious: classes.suspicious,
     highly_suspicious: classes.suspicious,
