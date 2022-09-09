@@ -55,9 +55,29 @@ export default function SiteMap() {
 
   const reqMapColor = {
     user: 'default',
-    signature_importer: 'warning',
+    signature_importer: 'success',
     signature_manager: 'info',
-    admin: 'error'
+    signature_view: 'default',
+    signature_download: 'warning',
+    admin: 'error',
+    alert_view: 'default',
+    alert_manage: 'info',
+    safelist_view: 'default',
+    safelist_manage: 'info',
+    workflow_view: 'default',
+    workflow_manage: 'info',
+    apikey_access: 'default',
+    obo_access: 'default',
+    bundle_download: 'warning',
+    submission_create: 'success',
+    submission_view: 'default',
+    submission_delete: 'error',
+    submission_manage: 'info',
+    file_view: 'default',
+    file_download: 'warning',
+    search: 'default',
+    replay: 'default',
+    replay_manage: 'info'
   };
 
   useEffect(() => {
