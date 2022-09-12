@@ -89,6 +89,16 @@ export type ConfigurationDefinition = {
     tos_lockout: boolean;
     tos_lockout_notify: boolean;
   };
+  user: {
+    roles: string[];
+    role_dependencies: {
+      [role: string]: string[];
+    };
+    role_lookup_order: string[];
+    role_parent: {
+      [role: string]: string;
+    };
+  };
 };
 
 export interface CustomUser extends UserProfileProps {

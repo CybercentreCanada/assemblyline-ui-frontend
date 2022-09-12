@@ -231,13 +231,42 @@ function User({ width, username }: UserProps) {
     }
   }
 
+  function recurseAddRole(roles, role) {
+    let newTypes = roles;
+    if (configuration.user.role_lookup_order.includes(role)) {
+      for (const subRole of configuration.user.role_dependencies[role]) {
+        if (newTypes.indexOf(subRole) === -1) {
+          newTypes.push(subRole);
+          newTypes = recurseAddRole(newTypes, subRole);
+        }
+      }
+    }
+    return newTypes;
+  }
+
+  function recurseRemoveRole(roles, role) {
+    let newTypes = roles;
+    if (configuration.user.role_lookup_order.includes(role)) {
+      for (const subRole of configuration.user.role_dependencies[role]) {
+        if (newTypes.indexOf(subRole) !== -1) {
+          newTypes.splice(newTypes.indexOf(subRole), 1);
+          newTypes = recurseRemoveRole(newTypes, subRole);
+        }
+      }
+    }
+    return newTypes;
+  }
+
   function toggleRole(role) {
-    const newTypes = user.type;
+    let newTypes = user.type;
     if (newTypes.indexOf(role) === -1) {
       newTypes.push(role);
+      newTypes = recurseAddRole(newTypes, role);
     } else {
       newTypes.splice(newTypes.indexOf(role), 1);
+      newTypes = recurseRemoveRole(newTypes, role);
     }
+
     setModified(true);
     setUser({ ...user, type: newTypes });
   }
@@ -261,7 +290,15 @@ function User({ width, username }: UserProps) {
       apiCall({
         url: `/api/v4/user/${username || id}/?load_avatar`,
         onSuccess: api_data => {
-          setUser(api_data.api_response);
+          let newUser = api_data.api_response;
+          let newRoles = newUser.type;
+          for (const role of configuration.user.role_lookup_order) {
+            if (newRoles.includes(role)) {
+              newRoles = newRoles.concat(configuration.user.role_dependencies[role]);
+            }
+          }
+          newUser.type = newRoles;
+          setUser(newUser);
         }
       });
     }
@@ -580,42 +617,39 @@ function User({ width, username }: UserProps) {
                     {!isWidthDown('xs', width) ? null : <Typography variant="caption">{t('roles')}</Typography>}
                     {user ? (
                       <div>
-                        <CustomChip
-                          type="rounded"
-                          size="small"
-                          color={user.type.includes('user') ? 'primary' : 'default'}
-                          onClick={
-                            currentUser.username !== user.uname && currentUser.is_admin
-                              ? () => toggleRole('user')
-                              : null
-                          }
-                          label={t('normal_user')}
-                        />
-                        <CustomChip
-                          type="rounded"
-                          size="small"
-                          color={user.type.includes('admin') ? 'primary' : 'default'}
-                          onClick={
-                            currentUser.username !== user.uname && currentUser.is_admin
-                              ? () => toggleRole('admin')
-                              : null
-                          }
-                          label={t('admin')}
-                        />
-                        <CustomChip
-                          type="rounded"
-                          size="small"
-                          color={user.type.includes('signature_manager') ? 'primary' : 'default'}
-                          onClick={currentUser.is_admin ? () => toggleRole('signature_manager') : null}
-                          label={t('signature_manager')}
-                        />
-                        <CustomChip
-                          type="rounded"
-                          size="small"
-                          color={user.type.includes('signature_importer') ? 'primary' : 'default'}
-                          onClick={currentUser.is_admin ? () => toggleRole('signature_importer') : null}
-                          label={t('signature_importer')}
-                        />
+                        {configuration.user.role_lookup_order.map((role, role_id) => (
+                          <CustomChip
+                            key={role_id}
+                            type="rounded"
+                            size="small"
+                            color={user.type.includes(role) ? 'primary' : 'default'}
+                            disabled={user.type.includes(configuration.user.role_parent[role])}
+                            onClick={
+                              currentUser.username !== user.uname && currentUser.is_admin
+                                ? () => toggleRole(role)
+                                : null
+                            }
+                            label={t(role)}
+                          />
+                        ))}
+                        {configuration.user.roles
+                          .filter(x => !configuration.user.role_lookup_order.includes(x))
+                          .sort()
+                          .map((role, role_id) => (
+                            <CustomChip
+                              key={role_id}
+                              type="rounded"
+                              size="small"
+                              color={user.type.includes(role) ? 'primary' : 'default'}
+                              disabled={user.type.includes(configuration.user.role_parent[role])}
+                              onClick={
+                                currentUser.username !== user.uname && currentUser.is_admin
+                                  ? () => toggleRole(role)
+                                  : null
+                              }
+                              label={t(role)}
+                            />
+                          ))}
                       </div>
                     ) : (
                       <Skeleton />
