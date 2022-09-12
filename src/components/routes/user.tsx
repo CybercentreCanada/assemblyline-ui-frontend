@@ -231,44 +231,26 @@ function User({ width, username }: UserProps) {
     }
   }
 
-  function recurseAddRole(roles, role) {
-    let newTypes = roles;
-    if (configuration.user.role_lookup_order.includes(role)) {
-      for (const subRole of configuration.user.role_dependencies[role]) {
-        if (newTypes.indexOf(subRole) === -1) {
-          newTypes.push(subRole);
-          newTypes = recurseAddRole(newTypes, subRole);
-        }
-      }
+  function setType(userType) {
+    const newRoles = configuration.user.role_dependencies[userType];
+    setModified(true);
+    if (newRoles) {
+      setUser({ ...user, type: [userType], roles: [...newRoles] });
+    } else {
+      setUser({ ...user, type: [userType] });
     }
-    return newTypes;
-  }
-
-  function recurseRemoveRole(roles, role) {
-    let newTypes = roles;
-    if (configuration.user.role_lookup_order.includes(role)) {
-      for (const subRole of configuration.user.role_dependencies[role]) {
-        if (newTypes.indexOf(subRole) !== -1) {
-          newTypes.splice(newTypes.indexOf(subRole), 1);
-          newTypes = recurseRemoveRole(newTypes, subRole);
-        }
-      }
-    }
-    return newTypes;
   }
 
   function toggleRole(role) {
-    let newTypes = user.type;
-    if (newTypes.indexOf(role) === -1) {
-      newTypes.push(role);
-      newTypes = recurseAddRole(newTypes, role);
+    const newRoles = [...user.roles];
+    if (newRoles.indexOf(role) === -1) {
+      newRoles.push(role);
     } else {
-      newTypes.splice(newTypes.indexOf(role), 1);
-      newTypes = recurseRemoveRole(newTypes, role);
+      newRoles.splice(newRoles.indexOf(role), 1);
     }
 
     setModified(true);
-    setUser({ ...user, type: newTypes });
+    setUser({ ...user, roles: newRoles, type: ['custom'] });
   }
 
   function handleAvatar(e) {
@@ -290,15 +272,7 @@ function User({ width, username }: UserProps) {
       apiCall({
         url: `/api/v4/user/${username || id}/?load_avatar`,
         onSuccess: api_data => {
-          let newUser = api_data.api_response;
-          let newRoles = newUser.type;
-          for (const role of configuration.user.role_lookup_order) {
-            if (newRoles.includes(role)) {
-              newRoles = newRoles.concat(configuration.user.role_dependencies[role]);
-            }
-          }
-          newUser.type = newRoles;
-          setUser(newUser);
+          setUser(api_data.api_response);
         }
       });
     }
@@ -611,45 +585,54 @@ function User({ width, username }: UserProps) {
               <TableBody>
                 <TableRow>
                   {isWidthDown('xs', width) ? null : (
+                    <TableCell style={{ whiteSpace: 'nowrap' }}>{t('type')}</TableCell>
+                  )}
+                  <TableCell width="100%">
+                    {!isWidthDown('xs', width) ? null : <Typography variant="caption">{t('type')}</Typography>}
+                    {user ? (
+                      <div>
+                        {configuration.user.types.map((uType, type_id) => (
+                          <CustomChip
+                            key={type_id}
+                            type="rounded"
+                            size="small"
+                            color={user.type.includes(uType) ? 'primary' : 'default'}
+                            disabled={uType === 'custom'}
+                            onClick={
+                              currentUser.username !== user.uname && currentUser.is_admin ? () => setType(uType) : null
+                            }
+                            label={t(`user_type.${uType}`)}
+                          />
+                        ))}
+                      </div>
+                    ) : (
+                      <Skeleton />
+                    )}
+                  </TableCell>
+                  <TableCell align="right" />
+                </TableRow>
+                <TableRow>
+                  {isWidthDown('xs', width) ? null : (
                     <TableCell style={{ whiteSpace: 'nowrap' }}>{t('roles')}</TableCell>
                   )}
                   <TableCell width="100%">
                     {!isWidthDown('xs', width) ? null : <Typography variant="caption">{t('roles')}</Typography>}
                     {user ? (
                       <div>
-                        {configuration.user.role_lookup_order.map((role, role_id) => (
+                        {configuration.user.roles.sort().map((role, role_id) => (
                           <CustomChip
                             key={role_id}
                             type="rounded"
                             size="small"
-                            color={user.type.includes(role) ? 'primary' : 'default'}
-                            disabled={user.type.includes(configuration.user.role_parent[role])}
+                            color={user.roles.includes(role) ? 'primary' : 'default'}
                             onClick={
                               currentUser.username !== user.uname && currentUser.is_admin
                                 ? () => toggleRole(role)
                                 : null
                             }
-                            label={t(role)}
+                            label={t(`role.${role}`)}
                           />
                         ))}
-                        {configuration.user.roles
-                          .filter(x => !configuration.user.role_lookup_order.includes(x))
-                          .sort()
-                          .map((role, role_id) => (
-                            <CustomChip
-                              key={role_id}
-                              type="rounded"
-                              size="small"
-                              color={user.type.includes(role) ? 'primary' : 'default'}
-                              disabled={user.type.includes(configuration.user.role_parent[role])}
-                              onClick={
-                                currentUser.username !== user.uname && currentUser.is_admin
-                                  ? () => toggleRole(role)
-                                  : null
-                              }
-                              label={t(role)}
-                            />
-                          ))}
                       </div>
                     ) : (
                       <Skeleton />

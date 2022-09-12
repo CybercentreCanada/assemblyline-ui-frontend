@@ -54,12 +54,11 @@ export default function SiteMap() {
   };
 
   const reqMapColor = {
-    user: 'default',
-    signature_importer: 'success',
-    signature_manager: 'info',
+    signature_import: 'success',
+    signature_manage: 'info',
     signature_view: 'default',
     signature_download: 'warning',
-    admin: 'error',
+    administration: 'error',
     alert_view: 'default',
     alert_manage: 'info',
     safelist_view: 'default',
@@ -73,11 +72,10 @@ export default function SiteMap() {
     submission_view: 'default',
     submission_delete: 'error',
     submission_manage: 'info',
-    file_view: 'default',
+    file_detail: 'default',
     file_download: 'warning',
-    search: 'default',
-    replay: 'default',
-    replay_manage: 'info'
+    replay_trigger: 'default',
+    replay_system: 'info'
   };
 
   useEffect(() => {

@@ -94,10 +94,7 @@ export type ConfigurationDefinition = {
     role_dependencies: {
       [role: string]: string[];
     };
-    role_lookup_order: string[];
-    role_parent: {
-      [role: string]: string;
-    };
+    types: string[];
   };
 };
 
