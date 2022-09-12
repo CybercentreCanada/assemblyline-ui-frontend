@@ -106,6 +106,6 @@
   "user_type.signature_manager": "Signature Manager",
   "user_type.user": "User",
   "user_type.viewer": "Data Viewer",
-  "user_type.submitter": "Submission creator",
+  "user_type.submitter": "Submission Creator",
   "validate": "Validate"
 }

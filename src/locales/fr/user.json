@@ -105,7 +105,7 @@
   "user_type.signature_importer": "Importateur de Signatures",
   "user_type.signature_manager": "Gestionaire de Signatures",
   "user_type.user": "Utilisateur",
-  "user_type.viewer": "Visualiseur de données",
-  "user_type.submitter": "Créateur de soumission",
+  "user_type.viewer": "Visualiseur de Données",
+  "user_type.submitter": "Créateur de Soumission",
   "validate": "Valider"
 }
