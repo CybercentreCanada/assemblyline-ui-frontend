@@ -66,6 +66,7 @@
   "role.bundle_download": "Téléchargement de Paquets",
   "role.file_detail": "Détail de Fichiers",
   "role.file_download": "Téléchargement de Fichiers",
+  "role.heuristic_view": "Visionnement d'Heuristiques",
   "role.obo_access": "Accès au nom de",
   "role.replay_system": "Gestion des Rediffusions",
   "role.replay_trigger": "Déclencher des Rediffusions",
@@ -104,8 +105,8 @@
   "user_type.admin": "Administrateur",
   "user_type.signature_importer": "Importateur de Signatures",
   "user_type.signature_manager": "Gestionaire de Signatures",
+  "user_type.submitter": "Créateur de Soumission",
   "user_type.user": "Utilisateur",
   "user_type.viewer": "Visualiseur de Données",
-  "user_type.submitter": "Créateur de Soumission",
   "validate": "Valider"
 }

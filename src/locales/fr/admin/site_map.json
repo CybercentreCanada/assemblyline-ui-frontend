@@ -17,6 +17,8 @@
   "file_download_label": "Télécharger de Fichier",
   "file_detail": "FIL",
   "file_detail_label": "Détail de Fichier",
+  "heuristic_view": "HEU",
+  "heuristic_view_label": "Visionnement d'Heuristiques",
   "header.function": "Fonction",
   "header.methods": "Méthodes",
   "header.permissions": "Autorisations",
@@ -53,8 +55,8 @@
   "title": "Plan du site",
   "user": "USR",
   "user_label": "Utilisateur",
-  "workflow_manage": "SAF",
+  "workflow_manage": "WKF",
   "workflow_manage_label": "Gestion de Flux de travail",
-  "workflow_view": "SAF",
+  "workflow_view": "WKF",
   "workflow_view_label": "Visionnement de Flux de travail"
 }

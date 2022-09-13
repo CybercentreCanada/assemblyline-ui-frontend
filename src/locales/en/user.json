@@ -66,6 +66,7 @@
   "role.bundle_download": "Bundle Download",
   "role.file_detail": "File Detail",
   "role.file_download": "File Download",
+  "role.heuristic_view": "Heuristic View",
   "role.obo_access": "On Behalf Off Access",
   "role.replay_system": "Replay System",
   "role.replay_trigger": "Replay Trigger",
@@ -104,8 +105,8 @@
   "user_type.admin": "Administrator",
   "user_type.signature_importer": "Signature Importer",
   "user_type.signature_manager": "Signature Manager",
+  "user_type.submitter": "Submission Creator",
   "user_type.user": "User",
   "user_type.viewer": "Data Viewer",
-  "user_type.submitter": "Submission Creator",
   "validate": "Validate"
 }

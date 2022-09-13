@@ -17,6 +17,8 @@
   "file_download_label": "File Download",
   "file_detail": "FIL",
   "file_detail_label": "File Detail",
+  "heuristic_view": "HEU",
+  "heuristic_view_label": "heuristic_view",
   "header.function": "Function",
   "header.methods": "Methods",
   "header.permissions": "Permissions",
@@ -53,8 +55,8 @@
   "title": "Site Map",
   "user": "USR",
   "user_label": "User",
-  "workflow_manage": "SAF",
+  "workflow_manage": "WKF",
   "workflow_manage_label": "Workflow Manage",
-  "workflow_view": "SAF",
+  "workflow_view": "WKF",
   "workflow_view_label": "Workflow View"
 }
