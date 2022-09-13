@@ -86,6 +86,7 @@ type User = {
   uname: string;
   api_quota: number;
   submission_quota: number;
+  roles?: string[];
 };
 
 export default function Users() {
@@ -94,7 +95,7 @@ export default function Users() {
   const [searching, setSearching] = useState(false);
   const [drawer, setDrawer] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
-  const { user: currentUser, c12nDef } = useALContext();
+  const { user: currentUser, c12nDef, configuration } = useALContext();
   const [userResults, setUserResults] = useState(null);
   const [newUser, setNewUser] = useState<User>(DEFAULT_USER);
   const location = useLocation();
@@ -175,14 +176,13 @@ export default function Users() {
     setNewUser({ ...newUser, classification: value });
   }
 
-  function toggleRole(role) {
-    const newTypes = newUser.type;
-    if (newTypes.indexOf(role) === -1) {
-      newTypes.push(role);
+  function setType(userType) {
+    const newRoles = configuration.user.role_dependencies[userType];
+    if (newRoles) {
+      setNewUser({ ...newUser, type: [userType], roles: [...newRoles] });
     } else {
-      newTypes.splice(newTypes.indexOf(role), 1);
+      setNewUser({ ...newUser, type: [userType] });
     }
-    setNewUser({ ...newUser, type: newTypes });
   }
 
   const handleAddUser = () => {
@@ -265,6 +265,7 @@ export default function Users() {
                 size="small"
                 margin="dense"
                 variant="outlined"
+                type="password"
                 onChange={event => updateNewUser('new_pass', event.target.value)}
                 value={newUser.new_pass}
               />
@@ -281,36 +282,19 @@ export default function Users() {
               />
             </Grid>
             <Grid item xs={12}>
-              <Typography variant="caption">{t('newuser.roles')}</Typography>
+              <Typography variant="caption">{t('newuser.user_type')}</Typography>
               <div>
-                <CustomChip
-                  type="rounded"
-                  size="small"
-                  color={newUser.type.includes('user') ? 'primary' : 'default'}
-                  onClick={() => toggleRole('user')}
-                  label={t('role.normal_user')}
-                />
-                <CustomChip
-                  type="rounded"
-                  size="small"
-                  color={newUser.type.includes('admin') ? 'primary' : 'default'}
-                  onClick={() => toggleRole('admin')}
-                  label={t('role.admin')}
-                />
-                <CustomChip
-                  type="rounded"
-                  size="small"
-                  color={newUser.type.includes('signature_manager') ? 'primary' : 'default'}
-                  onClick={() => toggleRole('signature_manager')}
-                  label={t('role.signature_manager')}
-                />
-                <CustomChip
-                  type="rounded"
-                  size="small"
-                  color={newUser.type.includes('signature_importer') ? 'primary' : 'default'}
-                  onClick={() => toggleRole('signature_importer')}
-                  label={t('role.signature_importer')}
-                />
+                {configuration.user.types.map((uType, type_id) => (
+                  <CustomChip
+                    key={type_id}
+                    type="rounded"
+                    size="small"
+                    color={newUser.type.includes(uType) ? 'primary' : 'default'}
+                    disabled={uType === 'custom'}
+                    onClick={() => setType(uType)}
+                    label={t(`user_type.${uType}`)}
+                  />
+                ))}
               </div>
             </Grid>
             <Grid item xs={12} md={6}>
