@@ -378,343 +378,355 @@ function Submit() {
           {configuration.ui.banner[i18n.language] ? configuration.ui.banner[i18n.language] : configuration.ui.banner.en}
         </Alert>
       )}
-      {c12nDef.enforce ? (
-        <div style={{ paddingBottom: sp4 }}>
-          <div style={{ padding: sp1, fontSize: 16 }}>{t('classification')}</div>
-          <Classification
-            format="long"
-            type="picker"
-            c12n={classification ? classification : settings ? settings.classification : null}
-            setClassification={setClassification}
-          />
-        </div>
-      ) : null}
-      <TabContext value={value}>
-        <Paper square>
-          <TabList centered onChange={handleChange} indicatorColor="primary" textColor="primary">
-            <Tab label={t('file')} value="0" />
-            <Tab label={urlHashTitle} value="1" />
-            <Tab label={t('options')} value="2" />
-          </TabList>
-        </Paper>
-        <TabPanel value="0" className={classes.no_pad}>
-          {settings ? (
-            <div style={{ marginTop: sp2 }}>
-              <FileDropper file={file} setFile={setFileDropperFile} disabled={!allowClick} />
-              {file ? (
+      {/* {currentUser.roles.includes('submission_create') ? ( */}
+      <>
+        {c12nDef.enforce ? (
+          <div style={{ paddingBottom: sp4 }}>
+            <div style={{ padding: sp1, fontSize: 16 }}>{t('classification')}</div>
+            <Classification
+              format="long"
+              type="picker"
+              c12n={classification ? classification : settings ? settings.classification : null}
+              setClassification={setClassification}
+              disabled={!currentUser.roles.includes('submission_create')}
+            />
+          </div>
+        ) : null}
+        <TabContext value={value}>
+          <Paper square>
+            <TabList centered onChange={handleChange} indicatorColor="primary" textColor="primary">
+              <Tab label={t('file')} value="0" disabled={!currentUser.roles.includes('submission_create')} />
+              <Tab label={urlHashTitle} value="1" disabled={!currentUser.roles.includes('submission_create')} />
+              <Tab label={t('options')} value="2" disabled={!currentUser.roles.includes('submission_create')} />
+            </TabList>
+          </Paper>
+          <TabPanel value="0" className={classes.no_pad}>
+            {settings ? (
+              <div style={{ marginTop: sp2 }}>
+                <FileDropper
+                  file={file}
+                  setFile={setFileDropperFile}
+                  disabled={!allowClick || !currentUser.roles.includes('submission_create')}
+                />
+                {file ? (
+                  <>
+                    {configuration.ui.allow_malicious_hinting ? (
+                      <div style={{ padding: sp1 }}>
+                        <Tooltip title={t('malicious.tooltip')}>
+                          <FormControlLabel
+                            control={
+                              <Switch
+                                checked={settings ? settings.malicious : true}
+                                disabled={settings === null}
+                                onChange={() => setSettingValue('malicious', !settings.malicious)}
+                                color="secondary"
+                                name="is_malware"
+                              />
+                            }
+                            label={t('malicious')}
+                          />
+                        </Tooltip>
+                      </div>
+                    ) : (
+                      <div style={{ padding: sp2 }} />
+                    )}
+                    <Button
+                      disabled={!allowClick}
+                      color="primary"
+                      variant="contained"
+                      onClick={() => validateServiceSelection('file')}
+                    >
+                      {uploadProgress === null ? t('file.button') : `${uploadProgress}${t('submit.progress')}`}
+                    </Button>
+                    <Button style={{ marginLeft: sp2 }} color="secondary" variant="contained" onClick={cancelUpload}>
+                      {t('file.cancel')}
+                    </Button>
+                  </>
+                ) : null}
+              </div>
+            ) : (
+              <Skeleton style={{ height: '280px' }} />
+            )}
+            {configuration.ui.tos ? (
+              <div style={{ marginTop: sp4, textAlign: 'center' }}>
+                <Typography variant="body2">
+                  {t('terms1')}
+                  <i>{t('file.button')}</i>
+                  {t('terms2')}
+                  <Link style={{ textDecoration: 'none', color: theme.palette.primary.main }} to="/tos">
+                    {t('terms3')}
+                  </Link>
+                  .
+                </Typography>
+              </div>
+            ) : null}
+          </TabPanel>
+          <TabPanel value="1" className={classes.no_pad}>
+            <div style={{ display: 'flex', flexDirection: 'row', marginTop: sp2, alignItems: 'flex-start' }}>
+              {settings ? (
                 <>
-                  {configuration.ui.allow_malicious_hinting ? (
-                    <div style={{ padding: sp1 }}>
-                      <Tooltip title={t('malicious.tooltip')}>
-                        <FormControlLabel
-                          control={
-                            <Switch
-                              checked={settings ? settings.malicious : true}
-                              disabled={settings === null}
-                              onChange={() => setSettingValue('malicious', !settings.malicious)}
-                              color="secondary"
-                              name="is_malware"
-                            />
-                          }
-                          label={t('malicious')}
-                        />
-                      </Tooltip>
-                    </div>
-                  ) : (
-                    <div style={{ padding: sp2 }} />
-                  )}
+                  <TextField
+                    label={urlInputText}
+                    error={urlHashHasError}
+                    size="small"
+                    type="urlHash"
+                    variant="outlined"
+                    value={urlHash}
+                    onChange={handleUrlHashChange}
+                    style={{ flexGrow: 1, marginRight: '1rem' }}
+                  />
                   <Button
-                    disabled={!allowClick}
+                    disabled={!urlHash || !allowClick}
                     color="primary"
                     variant="contained"
-                    onClick={() => validateServiceSelection('file')}
+                    onClick={() => validateServiceSelection('urlHash')}
                   >
-                    {uploadProgress === null ? t('file.button') : `${uploadProgress}${t('submit.progress')}`}
-                  </Button>
-                  <Button style={{ marginLeft: sp2 }} color="secondary" variant="contained" onClick={cancelUpload}>
-                    {t('file.cancel')}
+                    {t('urlHash.button')}
+                    {!allowClick && <CircularProgress size={24} className={classes.buttonProgress} />}
                   </Button>
                 </>
-              ) : null}
+              ) : (
+                <>
+                  <Skeleton style={{ flexGrow: 1, height: '3rem' }} />
+                  <Skeleton style={{ marginLeft: sp2, height: '3rem', width: '5rem' }} />
+                </>
+              )}
             </div>
-          ) : (
-            <Skeleton style={{ height: '280px' }} />
-          )}
-          {configuration.ui.tos ? (
-            <div style={{ marginTop: sp4, textAlign: 'center' }}>
-              <Typography variant="body2">
-                {t('terms1')}
-                <i>{t('file.button')}</i>
-                {t('terms2')}
-                <Link style={{ textDecoration: 'none', color: theme.palette.primary.main }} to="/tos">
-                  {t('terms3')}
-                </Link>
-                .
-              </Typography>
-            </div>
-          ) : null}
-        </TabPanel>
-        <TabPanel value="1" className={classes.no_pad}>
-          <div style={{ display: 'flex', flexDirection: 'row', marginTop: sp2, alignItems: 'flex-start' }}>
-            {settings ? (
-              <>
-                <TextField
-                  label={urlInputText}
-                  error={urlHashHasError}
-                  size="small"
-                  type="urlHash"
-                  variant="outlined"
-                  value={urlHash}
-                  onChange={handleUrlHashChange}
-                  style={{ flexGrow: 1, marginRight: '1rem' }}
-                />
-                <Button
-                  disabled={!urlHash || !allowClick}
-                  color="primary"
-                  variant="contained"
-                  onClick={() => validateServiceSelection('urlHash')}
-                >
-                  {t('urlHash.button')}
-                  {!allowClick && <CircularProgress size={24} className={classes.buttonProgress} />}
-                </Button>
-              </>
-            ) : (
-              <>
-                <Skeleton style={{ flexGrow: 1, height: '3rem' }} />
-                <Skeleton style={{ marginLeft: sp2, height: '3rem', width: '5rem' }} />
-              </>
-            )}
-          </div>
-          {matchSHA256(urlHash) &&
-            configuration.submission.sha256_sources &&
-            configuration.submission.sha256_sources.length > 0 && (
-              <div style={{ textAlign: 'start', marginTop: theme.spacing(1) }}>
-                <Typography variant="subtitle1">{t('options.submission.default_external_sources')}</Typography>
-                {configuration.submission.sha256_sources.map(source => (
-                  <div>
+            {matchSHA256(urlHash) &&
+              configuration.submission.sha256_sources &&
+              configuration.submission.sha256_sources.length > 0 && (
+                <div style={{ textAlign: 'start', marginTop: theme.spacing(1) }}>
+                  <Typography variant="subtitle1">{t('options.submission.default_external_sources')}</Typography>
+                  {configuration.submission.sha256_sources.map(source => (
+                    <div>
+                      <FormControlLabel
+                        control={
+                          settings ? (
+                            <Checkbox
+                              size="small"
+                              checked={settings.default_external_sources.indexOf(source) !== -1}
+                              name="label"
+                              onChange={event => toggleExternalSource(source)}
+                            />
+                          ) : (
+                            <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
+                          )
+                        }
+                        label={<Typography variant="body2">{source}</Typography>}
+                        className={settings ? classes.item : null}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            {configuration.ui.tos ? (
+              <div style={{ marginTop: sp4, textAlign: 'center' }}>
+                <Typography variant="body2">
+                  {t('terms1')}
+                  <i>{t('urlHash.button')}</i>
+                  {t('terms2')}
+                  <Link style={{ textDecoration: 'none', color: theme.palette.primary.main }} to="/tos">
+                    {t('terms3')}
+                  </Link>
+                  .
+                </Typography>
+              </div>
+            ) : null}
+          </TabPanel>
+          <TabPanel value="2" className={classes.no_pad}>
+            <Grid container spacing={1}>
+              <Grid item xs={12} md>
+                <div style={{ paddingLeft: sp2, textAlign: 'left', marginTop: sp2 }}>
+                  <Typography variant="h6" gutterBottom>
+                    {t('options.service')}
+                  </Typography>
+                  <ServiceTree size="small" settings={settings} setSettings={setSettings} />
+                </div>
+              </Grid>
+              <Grid item xs={12} md>
+                <div style={{ textAlign: 'left', marginTop: sp2 }}>
+                  <Typography variant="h6" gutterBottom>
+                    {t('options.submission')}
+                  </Typography>
+                  <div style={{ paddingTop: sp1, paddingBottom: sp1 }}>
+                    <Typography variant="caption" color="textSecondary" gutterBottom>
+                      {t('options.submission.desc')}
+                    </Typography>
+                    {settings ? (
+                      <TextField
+                        id="desc"
+                        size="small"
+                        type="text"
+                        defaultValue={settings.description}
+                        onChange={event => setSettingAsyncValue('description', event.target.value)}
+                        InputLabelProps={{
+                          shrink: true
+                        }}
+                        variant="outlined"
+                        fullWidth
+                      />
+                    ) : (
+                      <Skeleton style={{ height: '3rem' }} />
+                    )}
+                  </div>
+                  <div style={{ paddingTop: sp1, paddingBottom: sp1 }}>
+                    <Typography variant="caption" color="textSecondary" gutterBottom>
+                      {t('options.submission.priority')}
+                    </Typography>
+                    {settings ? (
+                      <Select
+                        id="priority"
+                        margin="dense"
+                        value={settings.priority}
+                        variant="outlined"
+                        onChange={event => setSettingValue('priority', event.target.value)}
+                        fullWidth
+                      >
+                        <MenuItem value="500">{t('options.submission.priority.low')}</MenuItem>
+                        <MenuItem value="1000">{t('options.submission.priority.medium')}</MenuItem>
+                        <MenuItem value="1500">{t('options.submission.priority.high')}</MenuItem>
+                      </Select>
+                    ) : (
+                      <Skeleton style={{ height: '3rem' }} />
+                    )}
+                  </div>
+                  <div style={{ paddingTop: sp1, paddingBottom: sp1 }}>
                     <FormControlLabel
                       control={
                         settings ? (
                           <Checkbox
                             size="small"
-                            checked={settings.default_external_sources.indexOf(source) !== -1}
+                            checked={settings.ignore_filtering}
                             name="label"
-                            onChange={event => toggleExternalSource(source)}
+                            onChange={event => setSettingValue('ignore_filtering', event.target.checked)}
                           />
                         ) : (
                           <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
                         )
                       }
-                      label={<Typography variant="body2">{source}</Typography>}
+                      label={<Typography variant="body2">{t('options.submission.ignore_filtering')}</Typography>}
+                      className={settings ? classes.item : null}
+                    />
+                    <FormControlLabel
+                      control={
+                        settings ? (
+                          <Checkbox
+                            size="small"
+                            checked={settings.ignore_cache}
+                            name="label"
+                            onChange={event => setSettingValue('ignore_cache', event.target.checked)}
+                          />
+                        ) : (
+                          <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
+                        )
+                      }
+                      label={<Typography variant="body2">{t('options.submission.ignore_cache')}</Typography>}
+                      className={settings ? classes.item : null}
+                    />
+                    <FormControlLabel
+                      control={
+                        settings ? (
+                          <Checkbox
+                            size="small"
+                            checked={settings.ignore_dynamic_recursion_prevention}
+                            name="label"
+                            onChange={event =>
+                              setSettingValue('ignore_dynamic_recursion_prevention', event.target.checked)
+                            }
+                          />
+                        ) : (
+                          <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
+                        )
+                      }
+                      label={
+                        <Typography variant="body2">
+                          {t('options.submission.ignore_dynamic_recursion_prevention')}
+                        </Typography>
+                      }
+                      className={settings ? classes.item : null}
+                    />
+                    <FormControlLabel
+                      control={
+                        settings ? (
+                          <Checkbox
+                            size="small"
+                            checked={settings.profile}
+                            name="label"
+                            onChange={event => setSettingValue('profile', event.target.checked)}
+                          />
+                        ) : (
+                          <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
+                        )
+                      }
+                      label={<Typography variant="body2">{t('options.submission.profile')}</Typography>}
+                      className={settings ? classes.item : null}
+                    />
+                    <FormControlLabel
+                      control={
+                        settings ? (
+                          <Checkbox
+                            size="small"
+                            checked={settings.deep_scan}
+                            name="label"
+                            onChange={event => setSettingValue('deep_scan', event.target.checked)}
+                          />
+                        ) : (
+                          <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
+                        )
+                      }
+                      label={<Typography variant="body2">{t('options.submission.deep_scan')}</Typography>}
                       className={settings ? classes.item : null}
                     />
                   </div>
-                ))}
-              </div>
-            )}
-          {configuration.ui.tos ? (
-            <div style={{ marginTop: sp4, textAlign: 'center' }}>
-              <Typography variant="body2">
-                {t('terms1')}
-                <i>{t('urlHash.button')}</i>
-                {t('terms2')}
-                <Link style={{ textDecoration: 'none', color: theme.palette.primary.main }} to="/tos">
-                  {t('terms3')}
-                </Link>
-                .
-              </Typography>
-            </div>
-          ) : null}
-        </TabPanel>
-        <TabPanel value="2" className={classes.no_pad}>
-          <Grid container spacing={1}>
-            <Grid item xs={12} md>
-              <div style={{ paddingLeft: sp2, textAlign: 'left', marginTop: sp2 }}>
-                <Typography variant="h6" gutterBottom>
-                  {t('options.service')}
-                </Typography>
-                <ServiceTree size="small" settings={settings} setSettings={setSettings} />
-              </div>
-            </Grid>
-            <Grid item xs={12} md>
-              <div style={{ textAlign: 'left', marginTop: sp2 }}>
-                <Typography variant="h6" gutterBottom>
-                  {t('options.submission')}
-                </Typography>
-                <div style={{ paddingTop: sp1, paddingBottom: sp1 }}>
-                  <Typography variant="caption" color="textSecondary" gutterBottom>
-                    {t('options.submission.desc')}
-                  </Typography>
-                  {settings ? (
-                    <TextField
-                      id="desc"
-                      size="small"
-                      type="text"
-                      defaultValue={settings.description}
-                      onChange={event => setSettingAsyncValue('description', event.target.value)}
-                      InputLabelProps={{
-                        shrink: true
-                      }}
-                      variant="outlined"
-                      fullWidth
-                    />
-                  ) : (
-                    <Skeleton style={{ height: '3rem' }} />
-                  )}
-                </div>
-                <div style={{ paddingTop: sp1, paddingBottom: sp1 }}>
-                  <Typography variant="caption" color="textSecondary" gutterBottom>
-                    {t('options.submission.priority')}
-                  </Typography>
-                  {settings ? (
-                    <Select
-                      id="priority"
-                      margin="dense"
-                      value={settings.priority}
-                      variant="outlined"
-                      onChange={event => setSettingValue('priority', event.target.value)}
-                      fullWidth
-                    >
-                      <MenuItem value="500">{t('options.submission.priority.low')}</MenuItem>
-                      <MenuItem value="1000">{t('options.submission.priority.medium')}</MenuItem>
-                      <MenuItem value="1500">{t('options.submission.priority.high')}</MenuItem>
-                    </Select>
-                  ) : (
-                    <Skeleton style={{ height: '3rem' }} />
-                  )}
-                </div>
-                <div style={{ paddingTop: sp1, paddingBottom: sp1 }}>
-                  <FormControlLabel
-                    control={
-                      settings ? (
-                        <Checkbox
-                          size="small"
-                          checked={settings.ignore_filtering}
-                          name="label"
-                          onChange={event => setSettingValue('ignore_filtering', event.target.checked)}
-                        />
-                      ) : (
-                        <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
-                      )
-                    }
-                    label={<Typography variant="body2">{t('options.submission.ignore_filtering')}</Typography>}
-                    className={settings ? classes.item : null}
-                  />
-                  <FormControlLabel
-                    control={
-                      settings ? (
-                        <Checkbox
-                          size="small"
-                          checked={settings.ignore_cache}
-                          name="label"
-                          onChange={event => setSettingValue('ignore_cache', event.target.checked)}
-                        />
-                      ) : (
-                        <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
-                      )
-                    }
-                    label={<Typography variant="body2">{t('options.submission.ignore_cache')}</Typography>}
-                    className={settings ? classes.item : null}
-                  />
-                  <FormControlLabel
-                    control={
-                      settings ? (
-                        <Checkbox
-                          size="small"
-                          checked={settings.ignore_dynamic_recursion_prevention}
-                          name="label"
-                          onChange={event =>
-                            setSettingValue('ignore_dynamic_recursion_prevention', event.target.checked)
-                          }
-                        />
-                      ) : (
-                        <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
-                      )
-                    }
-                    label={
-                      <Typography variant="body2">
-                        {t('options.submission.ignore_dynamic_recursion_prevention')}
-                      </Typography>
-                    }
-                    className={settings ? classes.item : null}
-                  />
-                  <FormControlLabel
-                    control={
-                      settings ? (
-                        <Checkbox
-                          size="small"
-                          checked={settings.profile}
-                          name="label"
-                          onChange={event => setSettingValue('profile', event.target.checked)}
-                        />
-                      ) : (
-                        <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
-                      )
-                    }
-                    label={<Typography variant="body2">{t('options.submission.profile')}</Typography>}
-                    className={settings ? classes.item : null}
-                  />
-                  <FormControlLabel
-                    control={
-                      settings ? (
-                        <Checkbox
-                          size="small"
-                          checked={settings.deep_scan}
-                          name="label"
-                          onChange={event => setSettingValue('deep_scan', event.target.checked)}
-                        />
-                      ) : (
-                        <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
-                      )
-                    }
-                    label={<Typography variant="body2">{t('options.submission.deep_scan')}</Typography>}
-                    className={settings ? classes.item : null}
-                  />
-                </div>
-                <div style={{ paddingTop: sp1, paddingBottom: sp1 }}>
-                  <Typography variant="caption" color="textSecondary" gutterBottom>
-                    {`${t('options.submission.ttl')} (${configuration.submission.max_dtl !== 0
-                      ? `${t('options.submission.ttl.max')}: ${configuration.submission.max_dtl}`
-                      : t('options.submission.ttl.forever')
+                  <div style={{ paddingTop: sp1, paddingBottom: sp1 }}>
+                    <Typography variant="caption" color="textSecondary" gutterBottom>
+                      {`${t('options.submission.ttl')} (${
+                        configuration.submission.max_dtl !== 0
+                          ? `${t('options.submission.ttl.max')}: ${configuration.submission.max_dtl}`
+                          : t('options.submission.ttl.forever')
                       })`}
-                  </Typography>
-                  {settings ? (
-                    <TextField
-                      id="ttl"
-                      size="small"
-                      type="number"
-                      inputProps={{
-                        min: configuration.submission.max_dtl !== 0 ? 1 : 0,
-                        max: configuration.submission.max_dtl !== 0 ? configuration.submission.max_dtl : 365
-                      }}
-                      defaultValue={settings.ttl}
-                      onChange={event => setSettingAsyncValue('ttl', event.target.value)}
-                      variant="outlined"
-                      fullWidth
-                    />
-                  ) : (
-                    <Skeleton style={{ height: '3rem' }} />
-                  )}
+                    </Typography>
+                    {settings ? (
+                      <TextField
+                        id="ttl"
+                        size="small"
+                        type="number"
+                        inputProps={{
+                          min: configuration.submission.max_dtl !== 0 ? 1 : 0,
+                          max: configuration.submission.max_dtl !== 0 ? configuration.submission.max_dtl : 365
+                        }}
+                        defaultValue={settings.ttl}
+                        onChange={event => setSettingAsyncValue('ttl', event.target.value)}
+                        variant="outlined"
+                        fullWidth
+                      />
+                    ) : (
+                      <Skeleton style={{ height: '3rem' }} />
+                    )}
+                  </div>
                 </div>
-              </div>
 
-              {settings && settings.service_spec.length !== 0 && anySelected() && (
-                <div style={{ textAlign: 'left', marginTop: sp4 }}>
-                  <Typography variant="h6" gutterBottom>
-                    {t('options.service_spec')}
-                  </Typography>
-                  <ServiceSpec
-                    service_spec={settings.service_spec}
-                    setParam={setParam}
-                    setParamAsync={setParamAsync}
-                    isSelected={isSelected}
-                  />
-                </div>
-              )}
+                {settings && settings.service_spec.length !== 0 && anySelected() && (
+                  <div style={{ textAlign: 'left', marginTop: sp4 }}>
+                    <Typography variant="h6" gutterBottom>
+                      {t('options.service_spec')}
+                    </Typography>
+                    <ServiceSpec
+                      service_spec={settings.service_spec}
+                      setParam={setParam}
+                      setParamAsync={setParamAsync}
+                      isSelected={isSelected}
+                    />
+                  </div>
+                )}
+              </Grid>
             </Grid>
-          </Grid>
-        </TabPanel>
-      </TabContext>
+          </TabPanel>
+        </TabContext>
+      </>
+      {/* ) : (
+        <div>Cannot submit files</div>
+      )} */}
     </PageCenter>
   );
 }
