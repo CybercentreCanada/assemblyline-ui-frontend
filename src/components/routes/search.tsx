@@ -19,6 +19,7 @@ import PageHeader from 'commons/components/layout/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import Empty from 'components/visual/Empty';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
@@ -33,6 +34,7 @@ import { searchResultsDisplay } from 'helpers/utils';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory, useLocation, useParams } from 'react-router-dom';
+import ForbiddenPage from './403';
 
 const PAGE_SIZE = 25;
 
@@ -85,7 +87,7 @@ function Search({ index }: SearchProps) {
   const { t } = useTranslation(['search']);
   const [pageSize] = useState(PAGE_SIZE);
   const [searching, setSearching] = useState(false);
-  const { indexes } = useALContext();
+  const { indexes, user: currentUser } = useALContext();
   const location = useLocation();
   const history = useHistory();
   const theme = useTheme();
@@ -118,6 +120,14 @@ function Search({ index }: SearchProps) {
     result: resultResults,
     signature: signatureResults,
     alert: alertResults
+  };
+
+  const permissionMap = {
+    submission: 'submission_view',
+    file: 'submission_view',
+    result: 'submission_view',
+    signature: 'signature_view',
+    alert: 'alert_view'
   };
 
   const queryValue = useRef<string>('');
@@ -167,9 +177,16 @@ function Search({ index }: SearchProps) {
   }, [location.search, pageSize]);
 
   useEffect(() => {
+    const nextAvailableTab = () => {
+      for (const curTab of [...Object.keys(stateMap)]) {
+        if (currentUser.roles.includes(permissionMap[curTab])) return curTab;
+      }
+      return 'submission';
+    };
     // On location.hash change, we need to change the tab
-    const newTab = location.hash.substring(1, location.hash.length) || index || id || 'submission';
+    const newTab = location.hash.substring(1, location.hash.length) || index || id || nextAvailableTab();
     setTab(newTab);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, index, location.hash]);
 
   useEffect(() => {
@@ -184,6 +201,9 @@ function Search({ index }: SearchProps) {
           if (!searching) setSearching(true);
         }
         for (const searchIndex of searchList) {
+          // Do no perform search if user has no rights
+          if (!currentUser.roles.includes(permissionMap[searchIndex])) continue;
+
           apiCall({
             method: 'POST',
             url: `/api/v4/search/${searchIndex}/`,
@@ -214,7 +234,10 @@ function Search({ index }: SearchProps) {
 
   const SpecialTab = ({ children, ...otherProps }) => children;
 
-  return (
+  return ((index || id) && !currentUser.roles.includes(permissionMap[index || id])) ||
+    (!(index || id) && Object.values(permissionMap).every(val => !currentUser.roles.includes(val))) ? (
+    <ForbiddenPage />
+  ) : (
     <PageFullWidth margin={4}>
       <div style={{ paddingBottom: theme.spacing(2), textAlign: 'left', width: '100%' }}>
         <Typography variant="h4">{t(`title_${index || id || 'all'}`)}</Typography>
@@ -260,30 +283,50 @@ function Search({ index }: SearchProps) {
                 scrollButtons="auto"
                 variant="scrollable"
               >
-                <Tab
-                  label={`${t('submission')} (${
-                    submissionResults ? searchResultsDisplay(submissionResults.total) : '...'
-                  })`}
-                  value="submission"
-                />
-                <Tab
-                  label={`${t('file')} (${fileResults ? searchResultsDisplay(fileResults.total) : '...'})`}
-                  value="file"
-                />
-                <Tab
-                  label={`${t('result')} (${resultResults ? searchResultsDisplay(resultResults.total) : '...'})`}
-                  value="result"
-                />
-                <Tab
-                  label={`${t('signature')} (${
-                    signatureResults ? searchResultsDisplay(signatureResults.total) : '...'
-                  })`}
-                  value="signature"
-                />
-                <Tab
-                  label={`${t('alert')} (${alertResults ? searchResultsDisplay(alertResults.total) : '...'})`}
-                  value="alert"
-                />
+                {currentUser.roles.includes(permissionMap.submission) ? (
+                  <Tab
+                    label={`${t('submission')} (${
+                      submissionResults ? searchResultsDisplay(submissionResults.total) : '...'
+                    })`}
+                    value="submission"
+                  />
+                ) : (
+                  <Empty />
+                )}
+                {currentUser.roles.includes(permissionMap.file) ? (
+                  <Tab
+                    label={`${t('file')} (${fileResults ? searchResultsDisplay(fileResults.total) : '...'})`}
+                    value="file"
+                  />
+                ) : (
+                  <Empty />
+                )}
+                {currentUser.roles.includes(permissionMap.result) ? (
+                  <Tab
+                    label={`${t('result')} (${resultResults ? searchResultsDisplay(resultResults.total) : '...'})`}
+                    value="result"
+                  />
+                ) : (
+                  <Empty />
+                )}
+                {currentUser.roles.includes(permissionMap.signature) ? (
+                  <Tab
+                    label={`${t('signature')} (${
+                      signatureResults ? searchResultsDisplay(signatureResults.total) : '...'
+                    })`}
+                    value="signature"
+                  />
+                ) : (
+                  <Empty />
+                )}
+                {currentUser.roles.includes(permissionMap.alert) ? (
+                  <Tab
+                    label={`${t('alert')} (${alertResults ? searchResultsDisplay(alertResults.total) : '...'})`}
+                    value="alert"
+                  />
+                ) : (
+                  <Empty />
+                )}
                 <TabSpacer />
                 <SpecialTab>
                   <Tooltip title={t('focus_search')}>
