@@ -30,6 +30,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
 import { Link, useParams } from 'react-router-dom';
+import ForbiddenPage from '../403';
 import AlertExtendedScan from './alert-extended_scan';
 import AlertPriority from './alert-priority';
 import AlertStatus from './alert-status';
@@ -127,7 +128,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
 
   useEffect(() => {
     const alertId = id || paramId;
-    if (alertId) {
+    if (alertId && currentUser.roles.includes('alert_view')) {
       apiCall({
         url: `/api/v4/alert/${alertId}/`,
         onSuccess: api_data => {
@@ -155,7 +156,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
     };
   }, [item]);
 
-  return (
+  return currentUser.roles.includes('alert_view') ? (
     <PageFullWidth margin={!alert ? 4 : 1}>
       {c12nDef.enforce && (
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: theme.spacing(2) }}>
@@ -820,6 +821,8 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
         )}
       </div>
     </PageFullWidth>
+  ) : (
+    <ForbiddenPage />
   );
 };
 
