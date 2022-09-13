@@ -954,16 +954,16 @@ function WrappedSubmissionDetail() {
                     </div>
                   )}
 
-                  {currentUser.roles.includes('submission_manage') && (
-                    <div
-                      style={{
-                        width: '164px',
-                        marginTop: '8px'
-                      }}
-                    >
-                      {submission ? (
-                        <>
-                          <VerdictBar verdicts={submission.verdict} />
+                  <div
+                    style={{
+                      width: '164px',
+                      marginTop: '8px'
+                    }}
+                  >
+                    {submission ? (
+                      <>
+                        <VerdictBar verdicts={submission.verdict} />
+                        {currentUser.roles.includes('submission_manage') && (
                           <Grid container>
                             <Grid item xs={5} style={{ textAlign: 'left' }}>
                               <Tooltip
@@ -1007,28 +1007,28 @@ function WrappedSubmissionDetail() {
                               </Tooltip>
                             </Grid>
                           </Grid>
-                        </>
-                      ) : (
-                        <>
-                          <Skeleton variant="rect" style={{ height: '15px', width: '100%' }} />
-                          <div style={{ display: 'inline-flex', width: '100%', justifyContent: 'space-between' }}>
-                            <Skeleton
-                              variant="circle"
-                              height="1.5rem"
-                              width="1.5rem"
-                              style={{ margin: theme.spacing(0.5) }}
-                            />
-                            <Skeleton
-                              variant="circle"
-                              height="1.5rem"
-                              width="1.5rem"
-                              style={{ margin: theme.spacing(0.5) }}
-                            />
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  )}
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <Skeleton variant="rect" style={{ height: '15px', width: '100%' }} />
+                        <div style={{ display: 'inline-flex', width: '100%', justifyContent: 'space-between' }}>
+                          <Skeleton
+                            variant="circle"
+                            height="1.5rem"
+                            width="1.5rem"
+                            style={{ margin: theme.spacing(0.5) }}
+                          />
+                          <Skeleton
+                            variant="circle"
+                            height="1.5rem"
+                            width="1.5rem"
+                            style={{ margin: theme.spacing(0.5) }}
+                          />
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
             </Grid>
