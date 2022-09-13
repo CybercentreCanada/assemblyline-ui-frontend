@@ -27,6 +27,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { useHistory, useParams } from 'react-router-dom';
+import ForbiddenPage from '../403';
 
 const DEFAULT_LABELS = [
   'PHISHING',
@@ -90,7 +91,7 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
   const [modified, setModified] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState(false);
-  const { c12nDef } = useALContext();
+  const { c12nDef, user: currentUser } = useALContext();
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
   const classes = useStyles();
@@ -107,7 +108,7 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
   };
 
   useEffect(() => {
-    if (workflow_id || id) {
+    if ((workflow_id || id) && currentUser.roles.includes('workflow_view')) {
       apiCall({
         url: `/api/v4/workflow/${workflow_id || id}/`,
         onSuccess: api_data => {
@@ -191,7 +192,7 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
     });
   };
 
-  return (
+  return currentUser.roles.includes('workflow_view') ? (
     <PageCenter margin={!id ? 2 : 4} width="100%">
       <ConfirmationDialog
         open={deleteDialog}
@@ -209,6 +210,7 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
             type="picker"
             c12n={workflow ? workflow.classification : null}
             setClassification={setClassification}
+            disabled={!currentUser.roles.includes('workflow_manage')}
           />
         </div>
       )}
@@ -221,7 +223,7 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
                 {workflow ? workflow.workflow_id : <Skeleton style={{ width: '10rem' }} />}
               </Typography>
             </Grid>
-            {(workflow_id || id) && (
+            {(workflow_id || id) && currentUser.roles.includes('workflow_manage') && (
               <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
                 {workflow ? (
                   <Tooltip title={t('remove')}>
@@ -252,6 +254,7 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
                 variant="outlined"
                 onChange={handleNameChange}
                 value={workflow.name}
+                disabled={!currentUser.roles.includes('workflow_manage')}
               />
             ) : (
               <Skeleton style={{ height: '2.5rem' }} />
@@ -267,6 +270,7 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
                 variant="outlined"
                 onChange={handleQueryChange}
                 value={workflow.query}
+                disabled={!currentUser.roles.includes('workflow_manage')}
               />
             ) : (
               <Skeleton style={{ height: '2.5rem' }} />
@@ -283,6 +287,7 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
                 value={workflow.labels}
                 renderInput={params => <TextField {...params} variant="outlined" />}
                 onChange={(event, value) => handleLabelsChange(value as string[])}
+                disabled={!currentUser.roles.includes('workflow_manage')}
               />
             ) : (
               <Skeleton style={{ height: '2.5rem' }} />
@@ -298,6 +303,7 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
                 onChange={handlePriorityChange}
                 variant="outlined"
                 margin="dense"
+                disabled={!currentUser.roles.includes('workflow_manage')}
               >
                 <MyMenuItem value="">{t('priority.null')}</MyMenuItem>
                 <MyMenuItem value="LOW">{t('priority.LOW')}</MyMenuItem>
@@ -319,6 +325,7 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
                 onChange={handleStatusChange}
                 variant="outlined"
                 margin="dense"
+                disabled={!currentUser.roles.includes('workflow_manage')}
               >
                 <MyMenuItem value="">{t('status.null')}</MyMenuItem>
                 <MyMenuItem value="MALICIOUS">{t('status.MALICIOUS')}</MyMenuItem>
@@ -380,6 +387,8 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
         </div>
       ) : null}
     </PageCenter>
+  ) : (
+    <ForbiddenPage />
   );
 };
 
