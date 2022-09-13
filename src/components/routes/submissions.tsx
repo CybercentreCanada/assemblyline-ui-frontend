@@ -18,6 +18,7 @@ import 'moment/locale/fr';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
+import ForbiddenPage from './403';
 
 const PAGE_SIZE = 25;
 
@@ -80,7 +81,7 @@ export default function Submissions() {
   }, [location.search, pageSize]);
 
   useEffect(() => {
-    if (query) {
+    if (query && currentUser.roles.includes('submission_view')) {
       query.set('rows', pageSize);
       query.set('offset', 0);
       apiCall({
@@ -98,7 +99,7 @@ export default function Submissions() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
-  return (
+  return currentUser.roles.includes('submission_view') ? (
     <PageFullWidth margin={4}>
       <div style={{ paddingBottom: theme.spacing(2) }}>
         <Typography variant="h4">{t('title')}</Typography>
@@ -180,5 +181,7 @@ export default function Submissions() {
         <SubmissionsTable submissionResults={submissionResults} />
       </div>
     </PageFullWidth>
+  ) : (
+    <ForbiddenPage />
   );
 }
