@@ -717,15 +717,18 @@ function User({ width, username }: UserProps) {
                       </TableCell>
                     </TableRow>
                   )}
-                {user && currentUser.username === user.uname && configuration.auth.allow_apikeys && (
-                  <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('api_key')}>
-                    <TableCell width="100%">{t('apikeys')}</TableCell>
-                    <TableCell align="right">
-                      <ChevronRightOutlinedIcon />
-                    </TableCell>
-                  </TableRow>
-                )}
-                {user && currentUser.username === user.uname && (
+                {user &&
+                  currentUser.username === user.uname &&
+                  configuration.auth.allow_apikeys &&
+                  user.roles.includes('apikey_access') && (
+                    <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('api_key')}>
+                      <TableCell width="100%">{t('apikeys')}</TableCell>
+                      <TableCell align="right">
+                        <ChevronRightOutlinedIcon />
+                      </TableCell>
+                    </TableRow>
+                  )}
+                {user && currentUser.username === user.uname && user.roles.includes('obo_access') && (
                   <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('apps')}>
                     <TableCell width="100%">{t('apps')}</TableCell>
                     <TableCell align="right">
