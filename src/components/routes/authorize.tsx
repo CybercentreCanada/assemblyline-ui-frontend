@@ -2,9 +2,11 @@
 import { Backdrop, Button, Typography, useTheme } from '@material-ui/core';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import CardCentered from 'commons/components/layout/pages/CardCentered';
+import useALContext from 'components/hooks/useALContext';
 import getXSRFCookie from 'helpers/xsrf';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
+import ForbiddenPage from './403';
 
 const VALID_SCOPES = ['r', 'w', 'rw'];
 
@@ -14,6 +16,7 @@ export default function AppRegistration() {
   const { t } = useTranslation(['authorize']);
   const theme = useTheme();
   const { getBanner } = useAppLayout();
+  const { user: currentUser } = useALContext();
 
   const params = new URLSearchParams(location.search);
   const rUrl = params.get('redirect_url');
@@ -21,7 +24,7 @@ export default function AppRegistration() {
   const scope = params.get('scope');
   const server = params.get('server');
 
-  return (
+  return currentUser.roles.includes('obo_access') ? (
     <Backdrop open style={{ backgroundColor: theme.palette.background.default, zIndex: 10000 }} transitionDuration={0}>
       <CardCentered>
         {getBanner(theme)}
@@ -76,5 +79,7 @@ export default function AppRegistration() {
         </div>
       </CardCentered>
     </Backdrop>
+  ) : (
+    <ForbiddenPage />
   );
 }
