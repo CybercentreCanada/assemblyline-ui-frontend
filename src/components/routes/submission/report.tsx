@@ -35,6 +35,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { Link, useHistory, useParams } from 'react-router-dom';
+import ForbiddenPage from '../403';
 
 type ParamProps = {
   id: string;
@@ -557,7 +558,7 @@ function FileTreeSkel() {
 export default function SubmissionReport() {
   const { t } = useTranslation(['submissionReport']);
   const { id } = useParams<ParamProps>();
-  const { c12nDef, configuration } = useALContext();
+  const { c12nDef, configuration, user: currentUser } = useALContext();
   const history = useHistory();
   const theme = useTheme();
   const [report, setReport] = useState(null);
@@ -568,27 +569,30 @@ export default function SubmissionReport() {
   const [metaOpen, setMetaOpen] = useState(false);
 
   useEffect(() => {
-    apiCall({
-      url: `/api/v4/submission/report/${id}/`,
-      onSuccess: api_data => {
-        setReport(api_data.api_response);
-      },
-      onFailure: api_data => {
-        if (api_data.api_status_code === 425) {
-          showWarningMessage(t('error.too_early'));
-          history.replace(`/submission/detail/${id}`);
-        } else if (api_data.api_status_code === 404) {
-          showErrorMessage(t('error.notfound'));
-          history.replace('/notfound');
-        } else {
-          showErrorMessage(api_data.api_error_message);
+    if (currentUser.roles.includes('submission_view')) {
+      apiCall({
+        url: `/api/v4/submission/report/${id}/`,
+        onSuccess: api_data => {
+          setReport(api_data.api_response);
+        },
+        onFailure: api_data => {
+          if (api_data.api_status_code === 425) {
+            showWarningMessage(t('error.too_early'));
+            history.replace(`/submission/detail/${id}`);
+          } else if (api_data.api_status_code === 404) {
+            showErrorMessage(t('error.notfound'));
+            history.replace('/notfound');
+          } else {
+            showErrorMessage(api_data.api_error_message);
+          }
         }
-      }
-    });
+      });
+    }
+
     // eslint-disable-next-line
   }, []);
 
-  return (
+  return currentUser.roles.includes('submission_view') ? (
     <PageCenter margin={4} width="100%">
       <div className={classes.page}>
         {c12nDef.enforce && (
@@ -1000,5 +1004,7 @@ export default function SubmissionReport() {
         )}
       </div>
     </PageCenter>
+  ) : (
+    <ForbiddenPage />
   );
 }
