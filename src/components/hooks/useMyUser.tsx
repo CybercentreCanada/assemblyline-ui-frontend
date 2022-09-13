@@ -142,7 +142,7 @@ export default function useMyUser(): CustomUserContextProps {
 
     for (const i in ob) {
       if ({}.hasOwnProperty.call(ob, i)) {
-        if (typeof ob[i] == 'object') {
+        if (!Array.isArray(ob[i]) && typeof ob[i] == 'object') {
           const flatObject = flatten(ob[i]);
           for (const x in flatObject) {
             if ({}.hasOwnProperty.call(flatObject, x)) {
