@@ -137,16 +137,18 @@ export default function Users() {
   }, [query]);
 
   useEffect(() => {
-    setClassification(c12nDef.UNRESTRICTED);
-    apiCall({
-      url: '/api/v4/search/fields/user/',
-      onSuccess: api_data => {
-        setSuggestions([
-          ...Object.keys(api_data.api_response).filter(name => api_data.api_response[name].indexed),
-          ...DEFAULT_SUGGESTION
-        ]);
-      }
-    });
+    if (currentUser.is_admin) {
+      setClassification(c12nDef.UNRESTRICTED);
+      apiCall({
+        url: '/api/v4/search/fields/user/',
+        onSuccess: api_data => {
+          setSuggestions([
+            ...Object.keys(api_data.api_response).filter(name => api_data.api_response[name].indexed),
+            ...DEFAULT_SUGGESTION
+          ]);
+        }
+      });
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

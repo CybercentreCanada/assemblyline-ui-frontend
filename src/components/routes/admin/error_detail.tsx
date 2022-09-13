@@ -85,7 +85,7 @@ export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
   };
 
   useEffect(() => {
-    if (error_key || key) {
+    if ((error_key || key) && currentUser.is_admin) {
       apiCall({
         url: `/api/v4/error/${error_key || key}/`,
         onSuccess: api_data => {

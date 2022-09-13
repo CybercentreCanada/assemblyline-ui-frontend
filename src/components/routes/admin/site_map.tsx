@@ -79,13 +79,15 @@ export default function SiteMap() {
   };
 
   useEffect(() => {
-    apiCall({
-      method: 'GET',
-      url: '/api/site_map/',
-      onSuccess: api_data => {
-        setSiteMap(api_data.api_response);
-      }
-    });
+    if (currentUser.is_admin) {
+      apiCall({
+        method: 'GET',
+        url: '/api/site_map/',
+        onSuccess: api_data => {
+          setSiteMap(api_data.api_response);
+        }
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

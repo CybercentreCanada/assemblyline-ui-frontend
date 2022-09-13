@@ -49,15 +49,17 @@ export default function AdminActions() {
   }, []);
 
   const reload = defValue => {
-    apiCall({
-      method: 'GET',
-      url: `/api/v4/system/actions/${defValue ? '?default' : ''}`,
-      onSuccess: api_data => {
-        setActions(api_data.api_response);
-        if (!defValue) setOriginalActions(api_data.api_response);
-        if (defValue && api_data.api_response !== originalActions) setOpen(true);
-      }
-    });
+    if (currentUser.is_admin) {
+      apiCall({
+        method: 'GET',
+        url: `/api/v4/system/actions/${defValue ? '?default' : ''}`,
+        onSuccess: api_data => {
+          setActions(api_data.api_response);
+          if (!defValue) setOriginalActions(api_data.api_response);
+          if (defValue && api_data.api_response !== originalActions) setOpen(true);
+        }
+      });
+    }
   };
 
   const saveChanges = tagData => {
