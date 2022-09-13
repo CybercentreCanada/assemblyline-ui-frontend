@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { Link, useParams } from 'react-router-dom';
+import ForbiddenPage from '../403';
 
 export type Heuristic = {
   attack_id: string[];
@@ -83,21 +84,23 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
   const [results, setResults] = useState<any>(null);
   const { apiCall } = useMyAPI();
   const classes = useStyles();
-  const { c12nDef } = useALContext();
+  const { c12nDef, user: currentUser } = useALContext();
 
   useEffect(() => {
-    apiCall({
-      url: `/api/v4/heuristics/${heur_id || id}/`,
-      onSuccess: api_data => {
-        setHeuristic(api_data.api_response);
-      }
-    });
+    if (currentUser.roles.includes('heuristic_view')) {
+      apiCall({
+        url: `/api/v4/heuristics/${heur_id || id}/`,
+        onSuccess: api_data => {
+          setHeuristic(api_data.api_response);
+        }
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [heur_id, id]);
 
   useEffect(() => {
     if (heuristic) {
-      if (!heuristic.stats) {
+      if (!heuristic.stats && currentUser.roles.includes('heuristic_view')) {
         apiCall({
           method: 'POST',
           url: '/api/v4/search/stats/result/result.score/',
@@ -109,32 +112,34 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
       } else {
         setStats(heuristic.stats);
       }
-      apiCall({
-        method: 'POST',
-        url: '/api/v4/search/histogram/result/created/',
-        body: {
-          query: `result.sections.heuristic.heur_id:${heur_id || id}`,
-          mincount: 0,
-          start: 'now-30d/d',
-          end: 'now+1d/d-1s',
-          gap: '+1d'
-        },
-        onSuccess: api_data => {
-          setHistogram(api_data.api_response);
-        }
-      });
-      apiCall({
-        method: 'GET',
-        url: `/api/v4/search/result/?query=result.sections.heuristic.heur_id:${heur_id || id}&rows=10`,
-        onSuccess: api_data => {
-          setResults(api_data.api_response);
-        }
-      });
+      if (currentUser.roles.includes('submission_view')) {
+        apiCall({
+          method: 'POST',
+          url: '/api/v4/search/histogram/result/created/',
+          body: {
+            query: `result.sections.heuristic.heur_id:${heur_id || id}`,
+            mincount: 0,
+            start: 'now-30d/d',
+            end: 'now+1d/d-1s',
+            gap: '+1d'
+          },
+          onSuccess: api_data => {
+            setHistogram(api_data.api_response);
+          }
+        });
+        apiCall({
+          method: 'GET',
+          url: `/api/v4/search/result/?query=result.sections.heuristic.heur_id:${heur_id || id}&rows=10`,
+          onSuccess: api_data => {
+            setResults(api_data.api_response);
+          }
+        });
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [heuristic]);
 
-  return (
+  return currentUser.roles.includes('heuristic_view') ? (
     <PageCenter margin={!id ? 2 : 4} width="100%">
       {c12nDef.enforce && (
         <div style={{ paddingBottom: theme.spacing(4) }}>
@@ -150,23 +155,25 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
                 {heuristic ? heuristic.heur_id : <Skeleton style={{ width: '10rem' }} />}
               </Typography>
             </Grid>
-            <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
-              {heuristic ? (
-                <Tooltip title={t('usage')}>
-                  <IconButton
-                    component={Link}
-                    style={{ color: theme.palette.action.active }}
-                    to={`/search/result/?query=result.sections.heuristic.heur_id:${safeFieldValueURI(
-                      heuristic.heur_id
-                    )}`}
-                  >
-                    <YoutubeSearchedForIcon />
-                  </IconButton>
-                </Tooltip>
-              ) : (
-                <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-              )}
-            </Grid>
+            {currentUser.roles.includes('submission_view') && (
+              <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
+                {heuristic ? (
+                  <Tooltip title={t('usage')}>
+                    <IconButton
+                      component={Link}
+                      style={{ color: theme.palette.action.active }}
+                      to={`/search/result/?query=result.sections.heuristic.heur_id:${safeFieldValueURI(
+                        heuristic.heur_id
+                      )}`}
+                    >
+                      <YoutubeSearchedForIcon />
+                    </IconButton>
+                  </Tooltip>
+                ) : (
+                  <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+                )}
+              </Grid>
+            )}
           </Grid>
         </div>
         <Grid container spacing={3}>
@@ -325,25 +332,31 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
               </Grid>
             </Grid>
           </Grid>
-          <Grid item xs={12}>
-            <Histogram
-              dataset={histogram}
-              height="300px"
-              isDate
-              title={t('chart.title')}
-              datatype={heur_id || id}
-              verticalLine
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <Typography variant="h6">{t('last10')}</Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <ResultsTable resultResults={results} allowSort={false} />
-          </Grid>
+          {currentUser.roles.includes('submission_view') && (
+            <>
+              <Grid item xs={12}>
+                <Histogram
+                  dataset={histogram}
+                  height="300px"
+                  isDate
+                  title={t('chart.title')}
+                  datatype={heur_id || id}
+                  verticalLine
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="h6">{t('last10')}</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <ResultsTable resultResults={results} allowSort={false} />
+              </Grid>
+            </>
+          )}
         </Grid>
       </div>
     </PageCenter>
+  ) : (
+    <ForbiddenPage />
   );
 };
 
