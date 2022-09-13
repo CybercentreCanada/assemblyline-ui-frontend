@@ -172,15 +172,17 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({
           {CLIPBOARD_ICON}
           {t('clipboard')}
         </MenuItem>
-        <MenuItem dense onClick={handleMenuSearch}>
-          {SEARCH_ICON}
-          {t('related')}
-        </MenuItem>
+        {currentUser.roles.includes('submission_view') && (
+          <MenuItem dense onClick={handleMenuSearch}>
+            {SEARCH_ICON}
+            {t('related')}
+          </MenuItem>
+        )}
         <MenuItem dense onClick={handleMenuHighlight}>
           {HIGHLIGHT_ICON}
           {t('highlight')}
         </MenuItem>
-        {signature && (
+        {signature && currentUser.roles.includes('safelist_manage') && (
           <MenuItem dense onClick={handleMenuSafelist}>
             {SAFELIST_ICON}
             {t('safelist')}

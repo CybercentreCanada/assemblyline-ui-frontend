@@ -3,6 +3,7 @@ import AssignmentOutlinedIcon from '@material-ui/icons/AssignmentOutlined';
 import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 import SelectAllOutlinedIcon from '@material-ui/icons/SelectAllOutlined';
 import useClipboard from 'commons/components/hooks/useClipboard';
+import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';
 import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
@@ -45,6 +46,7 @@ const WrappedAttack: React.FC<AttackProps> = ({
   const { isHighlighted, triggerHighlight } = useHighlighter();
   const { copy } = useClipboard();
   const { showSafeResults } = useSafeResults();
+  const { user: currentUser } = useALContext();
 
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
 
@@ -104,10 +106,12 @@ const WrappedAttack: React.FC<AttackProps> = ({
           {CLIPBOARD_ICON}
           {t('clipboard')}
         </MenuItem>
-        <MenuItem dense onClick={handleMenuSearch}>
-          {SEARCH_ICON}
-          {t('related')}
-        </MenuItem>
+        {currentUser.roles.includes('submission_view') && (
+          <MenuItem dense onClick={handleMenuSearch}>
+            {SEARCH_ICON}
+            {t('related')}
+          </MenuItem>
+        )}
         <MenuItem dense onClick={handleMenuHighlight}>
           {HIGHLIGHT_ICON}
           {t('highlight')}

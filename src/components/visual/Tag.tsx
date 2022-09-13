@@ -166,7 +166,7 @@ const WrappedTag: React.FC<TagProps> = ({
           state.mouseY !== null && state.mouseX !== null ? { top: state.mouseY, left: state.mouseX } : undefined
         }
       >
-        {type.startsWith('file.rule.') && (
+        {type.startsWith('file.rule.') && currentUser.roles.includes('signature_view') && (
           <MenuItem
             id="clipID"
             dense
@@ -183,18 +183,22 @@ const WrappedTag: React.FC<TagProps> = ({
           {CLIPBOARD_ICON}
           {t('clipboard')}
         </MenuItem>
-        <MenuItem dense onClick={handleMenuSearch}>
-          {SEARCH_ICON}
-          {t('related')}
-        </MenuItem>
+        {currentUser.roles.includes('submission_view') && (
+          <MenuItem dense onClick={handleMenuSearch}>
+            {SEARCH_ICON}
+            {t('related')}
+          </MenuItem>
+        )}
         <MenuItem dense onClick={handleMenuHighlight}>
           {HIGHLIGHT_ICON}
           {t('highlight')}
         </MenuItem>
-        <MenuItem dense onClick={handleMenuSafelist}>
-          {SAFELIST_ICON}
-          {t('safelist')}
-        </MenuItem>
+        {currentUser.roles.includes('safelist_manage') && (
+          <MenuItem dense onClick={handleMenuSafelist}>
+            {SAFELIST_ICON}
+            {t('safelist')}
+          </MenuItem>
+        )}
       </Menu>
       <CustomChip
         wrap
