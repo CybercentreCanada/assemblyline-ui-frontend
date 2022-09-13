@@ -74,12 +74,22 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+const defaultStats = {
+  count: 0,
+  first_hit: null,
+  last_hit: null,
+  min: 0,
+  avg: 0,
+  max: 0,
+  sum: 0
+};
+
 const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
   const { t, i18n } = useTranslation(['manageHeuristicDetail']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
   const [heuristic, setHeuristic] = useState<Heuristic>(null);
-  const [stats, setStats] = useState<Statistics>(null);
+  const [stats, setStats] = useState<Statistics>(defaultStats);
   const [histogram, setHistogram] = useState<any>(null);
   const [results, setResults] = useState<any>(null);
   const { apiCall } = useMyAPI();
@@ -100,19 +110,19 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
 
   useEffect(() => {
     if (heuristic) {
-      if (!heuristic.stats && currentUser.roles.includes('heuristic_view')) {
-        apiCall({
-          method: 'POST',
-          url: '/api/v4/search/stats/result/result.score/',
-          body: { query: `result.sections.heuristic.heur_id:${heur_id || id}` },
-          onSuccess: api_data => {
-            setStats(api_data.api_response);
-          }
-        });
-      } else {
-        setStats(heuristic.stats);
-      }
       if (currentUser.roles.includes('submission_view')) {
+        if (!heuristic.stats) {
+          apiCall({
+            method: 'POST',
+            url: '/api/v4/search/stats/result/result.score/',
+            body: { query: `result.sections.heuristic.heur_id:${heur_id || id}` },
+            onSuccess: api_data => {
+              setStats(api_data.api_response);
+            }
+          });
+        } else {
+          setStats(heuristic.stats);
+        }
         apiCall({
           method: 'POST',
           url: '/api/v4/search/histogram/result/created/',
@@ -134,6 +144,8 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
             setResults(api_data.api_response);
           }
         });
+      } else if (heuristic.stats) {
+        setStats(heuristic.stats);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
