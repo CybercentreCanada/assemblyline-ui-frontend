@@ -183,7 +183,7 @@ export function detailedItemCompare(a: DetailedItem, b: DetailedItem) {
 export default function useAlerts(pageSize: number): UsingAlerts {
   const location = useLocation();
   const { apiCall } = useMyAPI();
-  const { indexes: fieldIndexes } = useALContext();
+  const { indexes: fieldIndexes, user: currentUser } = useALContext();
   const [searchQuery, setSearchQuery] = useState<SearchQuery>(null);
   const [fields, setFields] = useState<ALField[]>([]);
   const [statusFilters, setStatusFilters] = useState<SearchFilter[]>([]);
@@ -380,7 +380,7 @@ export default function useAlerts(pageSize: number): UsingAlerts {
 
   // Load it up!
   useEffect(() => {
-    if (searchQuery) {
+    if (searchQuery && currentUser.roles.includes('alert_view')) {
       onLoad();
       onLoadStatuses();
       onLoadPriorities();

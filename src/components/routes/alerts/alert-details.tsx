@@ -122,7 +122,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
   const { copy } = useClipboard();
   const [item, setItem] = useState<AlertItem>(null);
   const { id: paramId } = useParams<{ id: string }>();
-  const { configuration } = useALContext();
+  const { configuration, user: currentUser } = useALContext();
   const [metaOpen, setMetaOpen] = React.useState(false);
 
   useEffect(() => {
@@ -170,21 +170,23 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
             <Grid item xs>
               <Typography variant="h4">{t('detail.title')}</Typography>
             </Grid>
-            <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
-              {item ? (
-                <Tooltip title={t('submission')}>
-                  <IconButton
-                    component={Link}
-                    style={{ color: theme.palette.action.active }}
-                    to={`/submission/${item.sid}`}
-                  >
-                    <AmpStoriesOutlinedIcon />
-                  </IconButton>
-                </Tooltip>
-              ) : (
-                <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-              )}
-            </Grid>
+            {currentUser.roles.includes('submission_view') && (
+              <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
+                {item ? (
+                  <Tooltip title={t('submission')}>
+                    <IconButton
+                      component={Link}
+                      style={{ color: theme.palette.action.active }}
+                      to={`/submission/${item.sid}`}
+                    >
+                      <AmpStoriesOutlinedIcon />
+                    </IconButton>
+                  </Tooltip>
+                ) : (
+                  <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+                )}
+              </Grid>
+            )}
           </Grid>
         </div>
       )}
