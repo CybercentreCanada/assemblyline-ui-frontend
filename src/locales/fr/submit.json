@@ -3,6 +3,7 @@
   "file": "Fichier",
   "file.button": "Téléverser et Analyser",
   "file.cancel": "Annuler",
+  "file.disabled": "Téléversement de fichier désactivé en raison d'un rôle manquant.",
   "file.dragzone": "Sélectioner un fichier à analyser",
   "file.dragzone.byte": "octets",
   "file.drophere": "Déposez votre fichier ici!",

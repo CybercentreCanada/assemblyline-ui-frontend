@@ -15,9 +15,10 @@ import SearchPager from 'components/visual/SearchPager';
 import SignaturesTable from 'components/visual/SearchResult/signatures';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import 'moment/locale/fr';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
+import ForbiddenPage from '../403';
 import SignatureDetail from './signature_detail';
 
 const PAGE_SIZE = 25;
@@ -50,7 +51,7 @@ export default function Signatures() {
   const { t } = useTranslation(['manageSignatures']);
   const [pageSize] = useState(PAGE_SIZE);
   const [searching, setSearching] = useState(false);
-  const { indexes } = useALContext();
+  const { indexes, user: currentUser } = useALContext();
   const [signatureResults, setSignatureResults] = useState<SearchResults>(null);
   const location = useLocation();
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
@@ -94,7 +95,7 @@ export default function Signatures() {
   }, [location.hash]);
 
   useEffect(() => {
-    if (query) {
+    if (query && currentUser.roles.includes('signature_view')) {
       reload(0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -179,116 +180,99 @@ export default function Signatures() {
     setTimeout(() => window.dispatchEvent(new CustomEvent('reloadSignatures')), 1000);
   };
 
-  return (
+  return currentUser.roles.includes('signature_view') ? (
     <PageFullWidth margin={4}>
-      {useMemo(
-        () => (
-          <>
-            <div style={{ paddingBottom: theme.spacing(2) }}>
-              <Grid container alignItems="center">
-                <Grid item xs>
-                  <Typography variant="h4">{t('title')}</Typography>
-                </Grid>
-                <Grid item xs style={{ textAlign: 'right' }}>
-                  <Tooltip title={t('download_desc')}>
-                    <IconButton
-                      component={Link}
-                      style={{ color: theme.palette.action.active }}
-                      href={`/api/v4/signature/download/?query=${query ? query.get('query', '*') : '*'}`}
-                    >
-                      <GetAppOutlinedIcon />
-                    </IconButton>
-                  </Tooltip>
-                </Grid>
-              </Grid>
-            </div>
-
-            <PageHeader isSticky>
-              <div style={{ paddingTop: theme.spacing(1) }}>
-                <SearchBar
-                  initValue={query ? query.get('query', '') : ''}
-                  placeholder={t('filter')}
-                  searching={searching}
-                  suggestions={suggestions}
-                  onValueChange={onFilterValueChange}
-                  onClear={onClear}
-                  onSearch={onSearch}
-                  buttons={[
-                    {
-                      icon: <RecordVoiceOverOutlinedIcon fontSize={upMD ? 'medium' : 'small'} />,
-                      tooltip: t('noisy'),
-                      props: {
-                        onClick: () => {
-                          query.set('query', 'status:NOISY');
-                          history.push(`${location.pathname}?${query.getDeltaString()}`);
-                        }
-                      }
-                    },
-
-                    {
-                      icon: <BlockIcon fontSize={upMD ? 'medium' : 'small'} />,
-                      tooltip: t('disabled'),
-                      props: {
-                        onClick: () => {
-                          query.set('query', 'status:DISABLED');
-                          history.push(`${location.pathname}?${query.getDeltaString()}`);
-                        }
-                      }
-                    }
-                  ]}
+      <div style={{ paddingBottom: theme.spacing(2) }}>
+        <Grid container alignItems="center">
+          <Grid item xs>
+            <Typography variant="h4">{t('title')}</Typography>
+          </Grid>
+          {currentUser.roles.includes('signature_download') && (
+            <Grid item xs style={{ textAlign: 'right' }}>
+              <Tooltip title={t('download_desc')}>
+                <IconButton
+                  component={Link}
+                  style={{ color: theme.palette.action.active }}
+                  href={`/api/v4/signature/download/?query=${query ? query.get('query', '*') : '*'}`}
                 >
-                  {signatureResults !== null && (
-                    <div className={classes.searchresult}>
-                      {signatureResults.total !== 0 && (
-                        <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
-                          {searching ? (
-                            <span>{t('searching')}</span>
-                          ) : (
-                            <span>
-                              <SearchResultCount count={signatureResults.total} />
-                              {query.get('query')
-                                ? t(`filtered${signatureResults.total === 1 ? '' : 's'}`)
-                                : t(`total${signatureResults.total === 1 ? '' : 's'}`)}
-                            </span>
-                          )}
-                        </Typography>
-                      )}
+                  <GetAppOutlinedIcon />
+                </IconButton>
+              </Tooltip>
+            </Grid>
+          )}
+        </Grid>
+      </div>
 
-                      <SearchPager
-                        total={signatureResults.total}
-                        setResults={setSignatureResults}
-                        pageSize={pageSize}
-                        index="signature"
-                        query={query}
-                        setSearching={setSearching}
-                      />
-                    </div>
-                  )}
-                </SearchBar>
+      <PageHeader isSticky>
+        <div style={{ paddingTop: theme.spacing(1) }}>
+          <SearchBar
+            initValue={query ? query.get('query', '') : ''}
+            placeholder={t('filter')}
+            searching={searching}
+            suggestions={suggestions}
+            onValueChange={onFilterValueChange}
+            onClear={onClear}
+            onSearch={onSearch}
+            buttons={[
+              {
+                icon: <RecordVoiceOverOutlinedIcon fontSize={upMD ? 'medium' : 'small'} />,
+                tooltip: t('noisy'),
+                props: {
+                  onClick: () => {
+                    query.set('query', 'status:NOISY');
+                    history.push(`${location.pathname}?${query.getDeltaString()}`);
+                  }
+                }
+              },
+
+              {
+                icon: <BlockIcon fontSize={upMD ? 'medium' : 'small'} />,
+                tooltip: t('disabled'),
+                props: {
+                  onClick: () => {
+                    query.set('query', 'status:DISABLED');
+                    history.push(`${location.pathname}?${query.getDeltaString()}`);
+                  }
+                }
+              }
+            ]}
+          >
+            {signatureResults !== null && (
+              <div className={classes.searchresult}>
+                {signatureResults.total !== 0 && (
+                  <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
+                    {searching ? (
+                      <span>{t('searching')}</span>
+                    ) : (
+                      <span>
+                        <SearchResultCount count={signatureResults.total} />
+                        {query.get('query')
+                          ? t(`filtered${signatureResults.total === 1 ? '' : 's'}`)
+                          : t(`total${signatureResults.total === 1 ? '' : 's'}`)}
+                      </span>
+                    )}
+                  </Typography>
+                )}
+
+                <SearchPager
+                  total={signatureResults.total}
+                  setResults={setSignatureResults}
+                  pageSize={pageSize}
+                  index="signature"
+                  query={query}
+                  setSearching={setSearching}
+                />
               </div>
-            </PageHeader>
-          </>
-        ),
-        [
-          classes.searchresult,
-          history,
-          location.pathname,
-          onClear,
-          onSearch,
-          pageSize,
-          query,
-          searching,
-          signatureResults,
-          suggestions,
-          t,
-          theme,
-          upMD
-        ]
-      )}
+            )}
+          </SearchBar>
+        </div>
+      </PageHeader>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         <SignaturesTable signatureResults={signatureResults} setSignatureID={setSignatureID} />
       </div>
     </PageFullWidth>
+  ) : (
+    <ForbiddenPage />
   );
 }

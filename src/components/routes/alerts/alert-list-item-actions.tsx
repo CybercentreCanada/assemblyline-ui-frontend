@@ -213,101 +213,109 @@ const WrappedAlertListItemActions: React.FC<AlertListItemActionsProps> = ({
         }}
         direction={vertical ? 'down' : 'left'}
       >
-        <SpeedDialActionButton
-          icon={<BugReportOutlinedIcon />}
-          tooltipTitle={t(hasSetMalicious ? 'verdict.malicious.set' : 'verdict.malicious.action')}
-          tooltipPlacement={vertical ? 'left' : 'bottom'}
-          FabProps={{
-            size: permanent ? 'medium' : 'small',
-            style: {
-              boxShadow: permanent ? theme.shadows[0] : null,
-              margin: permanent ? '8px 2px 8px 2px' : null,
-              color: hasSetMalicious
-                ? theme.palette.type === 'dark'
-                  ? theme.palette.error.light
-                  : theme.palette.error.dark
-                : null
-            }
-          }}
-          onClick={
-            !hasSetMalicious
-              ? () => {
-                  handleVerdict('malicious');
-                  handleClose(null, 'toggle');
-                }
-              : null
-          }
-        />
-        <SpeedDialActionButton
-          icon={<VerifiedUserOutlinedIcon />}
-          tooltipTitle={t(hasSetNonMalicious ? 'verdict.non_malicious.set' : 'verdict.non_malicious.action')}
-          tooltipPlacement={vertical ? 'left' : 'bottom'}
-          FabProps={{
-            size: permanent ? 'medium' : 'small',
-            style: {
-              boxShadow: permanent ? theme.shadows[0] : null,
-              margin: permanent ? '8px 2px 8px 2px' : null,
-              color: hasSetNonMalicious
-                ? theme.palette.type === 'dark'
-                  ? theme.palette.success.light
-                  : theme.palette.success.dark
-                : null
-            }
-          }}
-          onClick={
-            !hasSetNonMalicious
-              ? () => {
-                  handleVerdict('non_malicious');
-                  handleClose(null, 'toggle');
-                }
-              : null
-          }
-        />
-        <SpeedDialActionButton
-          icon={<BiNetworkChart style={{ height: '1.3rem', width: '1.3rem' }} />}
-          tooltipTitle={t('workflow_action')}
-          tooltipPlacement={vertical ? 'left' : 'bottom'}
-          FabProps={{
-            size: permanent ? 'medium' : 'small',
-            style: {
-              margin: permanent ? '8px 2px 8px 2px' : null,
-              boxShadow: permanent ? theme.shadows[0] : null
-            }
-          }}
-          onClick={() => {
-            const actionQuery = buildActionQuery();
-            setDrawer({
-              open: true,
-              type: 'actions',
-              actionData: {
-                query: actionQuery,
-                alert: {
-                  index,
-                  alert_id: item.alert_id,
-                  priority: item.priority,
-                  status: item.status,
-                  labels: item.label
-                }
+        {currentUser.roles.includes('alert_manage') && (
+          <SpeedDialActionButton
+            icon={<BugReportOutlinedIcon />}
+            tooltipTitle={t(hasSetMalicious ? 'verdict.malicious.set' : 'verdict.malicious.action')}
+            tooltipPlacement={vertical ? 'left' : 'bottom'}
+            FabProps={{
+              size: permanent ? 'medium' : 'small',
+              style: {
+                boxShadow: permanent ? theme.shadows[0] : null,
+                margin: permanent ? '8px 2px 8px 2px' : null,
+                color: hasSetMalicious
+                  ? theme.palette.type === 'dark'
+                    ? theme.palette.error.light
+                    : theme.palette.error.dark
+                  : null
               }
-            });
-            handleClose(null, 'toggle');
-          }}
-        />
-        <SpeedDialActionLink
-          icon={<AmpStoriesOutlinedIcon />}
-          to={`/submission/${item.sid}`}
-          tooltipTitle={t('submission')}
-          tooltipPlacement={vertical ? 'left' : 'bottom'}
-          FabProps={{
-            size: permanent ? 'medium' : 'small',
-            style: {
-              margin: permanent ? '8px 2px 8px 2px' : null,
-              boxShadow: permanent ? theme.shadows[0] : null
+            }}
+            onClick={
+              !hasSetMalicious
+                ? () => {
+                    handleVerdict('malicious');
+                    handleClose(null, 'toggle');
+                  }
+                : null
             }
-          }}
-          onClick={() => handleClose(null, 'toggle')}
-        />
-        {!item.owner && (
+          />
+        )}
+        {currentUser.roles.includes('alert_manage') && (
+          <SpeedDialActionButton
+            icon={<VerifiedUserOutlinedIcon />}
+            tooltipTitle={t(hasSetNonMalicious ? 'verdict.non_malicious.set' : 'verdict.non_malicious.action')}
+            tooltipPlacement={vertical ? 'left' : 'bottom'}
+            FabProps={{
+              size: permanent ? 'medium' : 'small',
+              style: {
+                boxShadow: permanent ? theme.shadows[0] : null,
+                margin: permanent ? '8px 2px 8px 2px' : null,
+                color: hasSetNonMalicious
+                  ? theme.palette.type === 'dark'
+                    ? theme.palette.success.light
+                    : theme.palette.success.dark
+                  : null
+              }
+            }}
+            onClick={
+              !hasSetNonMalicious
+                ? () => {
+                    handleVerdict('non_malicious');
+                    handleClose(null, 'toggle');
+                  }
+                : null
+            }
+          />
+        )}
+        {currentUser.roles.includes('alert_manage') && (
+          <SpeedDialActionButton
+            icon={<BiNetworkChart style={{ height: '1.3rem', width: '1.3rem' }} />}
+            tooltipTitle={t('workflow_action')}
+            tooltipPlacement={vertical ? 'left' : 'bottom'}
+            FabProps={{
+              size: permanent ? 'medium' : 'small',
+              style: {
+                margin: permanent ? '8px 2px 8px 2px' : null,
+                boxShadow: permanent ? theme.shadows[0] : null
+              }
+            }}
+            onClick={() => {
+              const actionQuery = buildActionQuery();
+              setDrawer({
+                open: true,
+                type: 'actions',
+                actionData: {
+                  query: actionQuery,
+                  alert: {
+                    index,
+                    alert_id: item.alert_id,
+                    priority: item.priority,
+                    status: item.status,
+                    labels: item.label
+                  }
+                }
+              });
+              handleClose(null, 'toggle');
+            }}
+          />
+        )}
+        {currentUser.roles.includes('submission_view') && (
+          <SpeedDialActionLink
+            icon={<AmpStoriesOutlinedIcon />}
+            to={`/submission/${item.sid}`}
+            tooltipTitle={t('submission')}
+            tooltipPlacement={vertical ? 'left' : 'bottom'}
+            FabProps={{
+              size: permanent ? 'medium' : 'small',
+              style: {
+                margin: permanent ? '8px 2px 8px 2px' : null,
+                boxShadow: permanent ? theme.shadows[0] : null
+              }
+            }}
+            onClick={() => handleClose(null, 'toggle')}
+          />
+        )}
+        {currentUser.roles.includes('alert_manage') && !item.owner && (
           <SpeedDialActionButton
             icon={<AssignmentIndIcon />}
             tooltipTitle={t('take_ownership')}

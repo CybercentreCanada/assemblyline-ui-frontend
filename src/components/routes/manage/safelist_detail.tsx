@@ -16,6 +16,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { Link, useHistory, useParams } from 'react-router-dom';
+import ForbiddenPage from '../403';
 
 export type Safelist = {
   added: string;
@@ -73,7 +74,7 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
   const history = useHistory();
 
   useEffect(() => {
-    if (safelist_id || id) {
+    if ((safelist_id || id) && currentUser.roles.includes('safelist_view')) {
       apiCall({
         url: `/api/v4/safelist/${safelist_id || id}/`,
         onSuccess: api_data => {
@@ -85,7 +86,7 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
   }, [safelist_id, id]);
 
   useEffect(() => {
-    if (safelist) {
+    if (safelist && currentUser.roles.includes('submission_view')) {
       apiCall({
         method: 'POST',
         url: '/api/v4/search/histogram/result/created/',
@@ -153,7 +154,7 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
     });
   };
 
-  return (
+  return currentUser.roles.includes('safelist_view') ? (
     <PageCenter margin={!id ? 2 : 4} width="100%">
       <ConfirmationDialog
         open={deleteDialog}
@@ -201,30 +202,30 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
               {safelist ? (
                 <>
                   <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'center' }}>
-                    <Tooltip title={t('usage')}>
-                      <IconButton
-                        component={Link}
-                        style={{ color: theme.palette.action.active }}
-                        to={
-                          safelist.type === 'file'
-                            ? `/search/result/?query=result.sections.heuristic.signature.name:"SAFELIST_${
-                                safelist_id || id
-                              }"`
-                            : safelist.type === 'signature'
-                            ? `/search/result/?query=result.sections.heuristic.signature.name:${safeFieldValueURI(
-                                safelist.signature.name
-                              )}`
-                            : `/search/result/?query=result.sections.safelisted_tags.${
-                                safelist.tag.type
-                              }:${safeFieldValueURI(safelist.tag.value)}`
-                        }
-                      >
-                        <YoutubeSearchedForIcon />
-                      </IconButton>
-                    </Tooltip>
-                    {(currentUser.is_admin ||
-                      currentUser.roles.indexOf('signature_manager') !== -1 ||
-                      safelist.sources.some(elem => elem.name === currentUser.username)) && (
+                    {currentUser.roles.includes('submission_view') && (
+                      <Tooltip title={t('usage')}>
+                        <IconButton
+                          component={Link}
+                          style={{ color: theme.palette.action.active }}
+                          to={
+                            safelist.type === 'file'
+                              ? `/search/result/?query=result.sections.heuristic.signature.name:"SAFELIST_${
+                                  safelist_id || id
+                                }"`
+                              : safelist.type === 'signature'
+                              ? `/search/result/?query=result.sections.heuristic.signature.name:${safeFieldValueURI(
+                                  safelist.signature.name
+                                )}`
+                              : `/search/result/?query=result.sections.safelisted_tags.${
+                                  safelist.tag.type
+                                }:${safeFieldValueURI(safelist.tag.value)}`
+                          }
+                        >
+                          <YoutubeSearchedForIcon />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                    {currentUser.roles.includes('safelist_manage') && (
                       <Tooltip title={t('remove')}>
                         <IconButton
                           style={{
@@ -237,14 +238,16 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
                       </Tooltip>
                     )}
                   </div>
-                  <CustomChip
-                    type="rounded"
-                    size="small"
-                    style={{ width: '6rem' }}
-                    color={safelist.enabled ? 'primary' : 'default'}
-                    onClick={safelist.enabled ? () => setDisableDialog(true) : () => setEnableDialog(true)}
-                    label={safelist.enabled ? t('enabled') : t('disabled')}
-                  />
+                  {currentUser.roles.includes('safelist_manage') && (
+                    <CustomChip
+                      type="rounded"
+                      size="small"
+                      style={{ width: '6rem' }}
+                      color={safelist.enabled ? 'primary' : 'default'}
+                      onClick={safelist.enabled ? () => setDisableDialog(true) : () => setEnableDialog(true)}
+                      label={safelist.enabled ? t('enabled') : t('disabled')}
+                    />
+                  )}
                 </>
               ) : (
                 <>
@@ -450,19 +453,23 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
               </Grid>
             </Grid>
           </Grid>
-          <Grid item xs={12}>
-            <Histogram
-              dataset={histogram}
-              height="300px"
-              isDate
-              title={t('chart.title')}
-              datatype={safelist_id || id}
-              verticalLine
-            />
-          </Grid>
+          {currentUser.roles.includes('submission_view') && (
+            <Grid item xs={12}>
+              <Histogram
+                dataset={histogram}
+                height="300px"
+                isDate
+                title={t('chart.title')}
+                datatype={safelist_id || id}
+                verticalLine
+              />
+            </Grid>
+          )}
         </Grid>
       </div>
     </PageCenter>
+  ) : (
+    <ForbiddenPage />
   );
 };
 

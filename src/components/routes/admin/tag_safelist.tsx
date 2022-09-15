@@ -37,7 +37,9 @@ export default function AdminTagSafelist() {
   const { isDarkTheme } = useAppContext();
 
   useEffect(() => {
-    reload(false);
+    if (currentUser.is_admin) {
+      reload(false);
+    }
     // I cannot find a way to hot switch monaco editor's locale but at least I can load
     // the right language on first load...
     if (i18n.language === 'fr') {

@@ -18,6 +18,7 @@ import 'moment/locale/fr';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
+import ForbiddenPage from '../403';
 import WorkflowDetail from './workflow_detail';
 
 const PAGE_SIZE = 25;
@@ -50,7 +51,7 @@ export default function Workflows() {
   const { t } = useTranslation(['manageWorkflows']);
   const [pageSize] = useState(PAGE_SIZE);
   const [searching, setSearching] = useState(false);
-  const { indexes } = useALContext();
+  const { indexes, user: currentUser } = useALContext();
   const [workflowResults, setWorkflowResults] = useState<SearchResults>(null);
   const location = useLocation();
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
@@ -71,7 +72,7 @@ export default function Workflows() {
   }, [location.pathname, location.search, pageSize]);
 
   useEffect(() => {
-    if (query) {
+    if (query && currentUser.roles.includes('workflow_view')) {
       reload(0);
     }
 
@@ -147,25 +148,27 @@ export default function Workflows() {
     []
   );
 
-  return (
+  return currentUser.roles.includes('workflow_view') ? (
     <PageFullWidth margin={4}>
       <div style={{ paddingBottom: theme.spacing(2) }}>
         <Grid container alignItems="center">
           <Grid item xs>
             <Typography variant="h4">{t('title')}</Typography>
           </Grid>
-          <Grid item xs style={{ textAlign: 'right' }}>
-            <Tooltip title={t('add_workflow')}>
-              <IconButton
-                style={{
-                  color: theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark
-                }}
-                onClick={() => setGlobalDrawer(<WorkflowDetail workflow_id={null} close={closeGlobalDrawer} />)}
-              >
-                <AddCircleOutlineOutlinedIcon />
-              </IconButton>
-            </Tooltip>
-          </Grid>
+          {currentUser.roles.includes('workflow_manage') && (
+            <Grid item xs style={{ textAlign: 'right' }}>
+              <Tooltip title={t('add_workflow')}>
+                <IconButton
+                  style={{
+                    color: theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark
+                  }}
+                  onClick={() => setGlobalDrawer(<WorkflowDetail workflow_id={null} close={closeGlobalDrawer} />)}
+                >
+                  <AddCircleOutlineOutlinedIcon />
+                </IconButton>
+              </Tooltip>
+            </Grid>
+          )}
         </Grid>
       </div>
 
@@ -237,5 +240,7 @@ export default function Workflows() {
         <WorkflowTable workflowResults={workflowResults} setWorkflowID={setWorkflowID} />
       </div>
     </PageFullWidth>
+  ) : (
+    <ForbiddenPage />
   );
 }

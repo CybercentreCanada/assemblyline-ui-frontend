@@ -1,5 +1,7 @@
 import { makeStyles } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
+import BlockIcon from '@material-ui/icons/Block';
+import useALContext from 'components/hooks/useALContext';
 import { useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
@@ -14,6 +16,7 @@ type FileDropperProps = {
 export default function FileDropper({ file, setFile, disabled }: FileDropperProps) {
   const { t } = useTranslation(['submit']);
   const { acceptedFiles, getRootProps, getInputProps, isDragActive } = useDropzone({ disabled });
+  const { user: currentUser } = useALContext();
   const useStyles = ctrlDisabled =>
     makeStyles(theme => ({
       drop_zone: {
@@ -55,10 +58,20 @@ export default function FileDropper({ file, setFile, disabled }: FileDropperProp
       className={isDragActive && !disabled ? `${classes.drop_zone} ${classes.drag_enter}` : classes.drop_zone}
     >
       <input {...getInputProps()} />
-      <AiOutlineSecurityScan style={{ fontSize: '140px' }} />
+      {currentUser.roles.includes('submission_create') ? (
+        <AiOutlineSecurityScan style={{ fontSize: '140px' }} />
+      ) : (
+        <BlockIcon style={{ fontSize: '140px' }} />
+      )}
       <div style={{ minHeight: '44px', textAlign: 'center' }}>
         <Typography variant="body1" style={{ wordBreak: 'break-word' }}>
-          <b>{isDragActive && !disabled ? t('file.drophere') : file ? file.name : t('file.dragzone')}</b>
+          <b>
+            {isDragActive && !disabled
+              ? t('file.drophere')
+              : file
+              ? file.name
+              : t(currentUser.roles.includes('submission_create') ? 'file.dragzone' : 'file.disabled')}
+          </b>
         </Typography>
         {file && (!isDragActive || disabled) && (
           <Typography variant="body2" align="center">

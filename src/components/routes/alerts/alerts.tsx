@@ -20,6 +20,7 @@ import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 import { FiFilter } from 'react-icons/fi';
 import { useHistory, useLocation } from 'react-router-dom';
+import ForbiddenPage from '../403';
 import AlertDetails from './alert-details';
 import AlertListItem from './alert-list-item';
 import AlertListItemActions, { PossibleVerdict } from './alert-list-item-actions';
@@ -324,20 +325,24 @@ const Alerts: React.FC = () => {
 
   // Handler to render the action buttons of each list item.
   const onRenderListActions = useCallback(
-    (item: AlertItem, index: number) => (
-      <AlertListItemActions
-        item={item}
-        index={index}
-        currentQuery={searchQuery}
-        setDrawer={setDrawer}
-        onTakeOwnershipComplete={() => onTakeOwnershipComplete(index, item)}
-        onVerdictComplete={verdict => onVerdictComplete(index, item, verdict)}
-      />
-    ),
+    (item: AlertItem, index: number) =>
+      currentUser.roles.includes('submission_view') ||
+      currentUser.roles.includes('alert_manage') ||
+      item.group_count ? (
+        <AlertListItemActions
+          item={item}
+          index={index}
+          currentQuery={searchQuery}
+          setDrawer={setDrawer}
+          onTakeOwnershipComplete={() => onTakeOwnershipComplete(index, item)}
+          onVerdictComplete={verdict => onVerdictComplete(index, item, verdict)}
+        />
+      ) : null,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [onTakeOwnershipComplete, onVerdictComplete, searchQuery]
   );
 
-  return (
+  return currentUser.roles.includes('alert_view') ? (
     <PageFullWidth margin={4}>
       <Drawer open={drawer.open} anchor="right" onClose={onDrawerClose}>
         <div style={{ padding: theme.spacing(1) }}>
@@ -470,6 +475,8 @@ const Alerts: React.FC = () => {
         {onRenderListRow}
       </SimpleList>
     </PageFullWidth>
+  ) : (
+    <ForbiddenPage />
   );
 };
 
