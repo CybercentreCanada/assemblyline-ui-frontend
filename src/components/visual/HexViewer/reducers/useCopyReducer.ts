@@ -1,13 +1,35 @@
 import useClipboard from 'commons/components/hooks/useClipboard';
 import { useCallback, useMemo } from 'react';
-import { isAction, isCell, ReducerHandler, Reducers, Store, toHexChar2, UseReducer } from '..';
+import {
+  getCopyHexCharacter,
+  isAction,
+  isCell,
+  NonPrintableCopyType,
+  NON_PRINTABLE_COPY_TYPE_VALUES,
+  ReducerHandler,
+  Reducers,
+  Store,
+  UseReducer
+} from '..';
 
-export type CopyState = {};
+export type CopyState = {
+  copy: { nonPrintable: { type: NonPrintableCopyType; prefix: string } };
+};
 
 export const useCopyReducer: UseReducer<CopyState> = () => {
   const { copy } = useClipboard();
 
-  const initialState = useMemo<CopyState>(() => ({}), []);
+  const initialState = useMemo<CopyState>(
+    () => ({
+      copy: {
+        nonPrintable: {
+          type: 'parsed',
+          prefix: '\\'
+        }
+      }
+    }),
+    []
+  );
 
   const copyHexCursor: (store: Store) => void = useCallback(
     store => copy(store.hex.codes.get(store.cursor.index)),
@@ -15,7 +37,7 @@ export const useCopyReducer: UseReducer<CopyState> = () => {
   );
 
   const copyTextCursor: (store: Store) => void = useCallback(
-    store => copy(toHexChar2(store, store.hex.codes.get(store.cursor.index), true)),
+    store => copy(getCopyHexCharacter(store, store.hex.codes.get(store.cursor.index))),
     [copy]
   );
 
@@ -40,7 +62,7 @@ export const useCopyReducer: UseReducer<CopyState> = () => {
         i => i + store.select.startIndex
       );
       array.forEach(index => {
-        value += toHexChar2(store, store.hex.codes.get(index), true);
+        value += getCopyHexCharacter(store, store.hex.codes.get(index));
       });
       copy(value);
     },
@@ -60,12 +82,27 @@ export const useCopyReducer: UseReducer<CopyState> = () => {
     [copyHexCursor, copyHexSelect, copyTextCursor, copyTextSelect]
   );
 
+  const settingLoad: Reducers['settingLoad'] = useCallback(store => {
+    return {
+      ...store,
+      copy: {
+        ...store.copy,
+        nonPrintable: {
+          ...store.copy.nonPrintable,
+          type: NON_PRINTABLE_COPY_TYPE_VALUES.en[store.setting.copy.nonPrintable.type].type,
+          prefix: store.setting.copy.nonPrintable.prefix
+        }
+      }
+    };
+  }, []);
+
   const reducer: ReducerHandler = useCallback(
-    ({ store, action: { type } }) => {
+    ({ store, action: { type, payload } }) => {
       if (isAction.copyKeyDown(type)) return copyKeyDown(store);
+      else if (isAction.settingLoad(type)) return settingLoad(store, payload);
       else return { ...store };
     },
-    [copyKeyDown]
+    [copyKeyDown, settingLoad]
   );
 
   return { initialState, reducer };

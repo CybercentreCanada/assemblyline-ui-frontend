@@ -2,10 +2,16 @@ import { useCallback, useMemo } from 'react';
 import {
   BodyType,
   BODY_TYPE_SETTING_VALUES,
+  COLUMNS,
   EncodingType,
+  handleLayoutColumnResize2,
+  handleLayoutRowResize,
   HIGHER_ENCODING_SETTING_VALUES,
   isAction,
+  NonPrintableCopyType,
+  NON_PRINTABLE_COPY_TYPE_VALUES,
   NON_PRINTABLE_ENCODING_SETTING_VALUES,
+  OFFSET_SETTING_VALUES,
   ReducerHandler,
   Reducers,
   Store,
@@ -18,27 +24,16 @@ export type SettingState = {
     open: boolean;
     bodyType: number;
     hex: {
-      null: {
-        char: string;
-      };
-      nonPrintable: {
-        encoding: number;
-        char: string;
-      };
-      higher: {
-        encoding: number;
-        char: string;
-      };
+      null: { char: string };
+      nonPrintable: { encoding: number; char: string };
+      higher: { encoding: number; char: string };
     };
     offsetBase: number;
-    column: {
-      auto: boolean;
-      size: number;
+    layout: {
+      column: { auto: boolean; max: number };
+      row: { auto: boolean; max: number };
     };
-    row: {
-      auto: boolean;
-      size: number;
-    };
+    copy: { nonPrintable: { type: number; prefix: string } };
     showHistoryLastValue: boolean;
   };
 };
@@ -51,27 +46,17 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
         open: false,
         bodyType: 0,
         hex: {
-          null: {
-            char: '0'
-          },
-          nonPrintable: {
-            encoding: 0,
-            char: '.'
-          },
-          higher: {
-            encoding: 0,
-            char: '.'
-          }
+          null: { char: '.' },
+          nonPrintable: { encoding: 0, char: '.' },
+          higher: { encoding: 0, char: '.' }
         },
         offsetBase: 16,
-        column: {
-          auto: true,
-          size: 48
+        layout: {
+          column: { auto: true, max: 128 },
+          row: { auto: true, max: 2000 }
         },
-        row: {
-          auto: true,
-          size: 48
-        },
+        search: { textType: 0 },
+        copy: { nonPrintable: { type: 0, prefix: '\\' } },
         showHistoryLastValue: false
       }
     }),
@@ -90,12 +75,13 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
         offsetBase: store.offset.base,
         column: {
           auto: store.layout.column.auto,
-          size: store.layout.column.size
+          max: store.layout.column.max
         },
         row: {
           auto: store.layout.row.auto,
-          size: store.layout.row.size
-        }
+          max: store.layout.row.max
+        },
+        copy: { nonPrintable: { type: store.copy.nonPrintable.type, prefix: store.copy.nonPrintable.prefix } }
       })
     );
   }, []);
@@ -104,21 +90,36 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
     const value = localStorage.getItem(store.setting.storageKey);
     const json = JSON.parse(value) as any;
 
-    if (value === null || value === '' || !Array.isArray(json)) return { ...store };
+    if (value === null || value === '' || Array.isArray(json)) return { ...store };
 
-    const nullChar = (json as any).hex.null.char === undefined ? store.hex.null.char : (json as any).hex.null.char;
+    const nullChar = (json as any)?.hex?.null?.char === undefined ? store.hex.null.char : (json as any).hex.null.char;
     const nonPrintableEncoding =
-      (json as any).hex.nonPrintable.encoding === undefined
+      (json as any)?.hex?.nonPrintable?.encoding === undefined
         ? store.hex.nonPrintable.encoding
         : (json as any).hex.nonPrintable.encoding;
     const nonPrintableChar =
-      (json as any).hex.nonPrintable.char === undefined
+      (json as any)?.hex?.nonPrintable?.char === undefined
         ? store.hex.nonPrintable.char
         : (json as any).hex.nonPrintable.char;
     const higherEncoding =
-      (json as any).hex.higher.encoding === undefined ? store.hex.higher.encoding : (json as any).hex.higher.encoding;
+      (json as any)?.hex?.higher?.encoding === undefined
+        ? store.hex.higher.encoding
+        : (json as any).hex.higher.encoding;
     const higherChar =
-      (json as any).hex.higher.char === undefined ? store.hex.higher.char : (json as any).hex.higher.char;
+      (json as any)?.hex?.higher?.char === undefined ? store.hex.higher.char : (json as any).hex.higher.char;
+
+    const offsetBase = (json as any)?.offsetBase === undefined ? store.offset.base : (json as any).offsetBase;
+    const autoColumn = (json as any)?.column?.auto === undefined ? store.layout.column.auto : (json as any).column.auto;
+    const maxColumn = (json as any)?.column?.max === undefined ? store.layout.column.max : (json as any).column.max;
+
+    const copyType =
+      (json as any)?.copy?.nonPrintable?.type === undefined
+        ? store.copy.nonPrintable.type
+        : (json as any).copy.nonPrintable.type;
+    const copyPrefix =
+      (json as any)?.copy?.nonPrintable?.prefix === undefined
+        ? store.copy.nonPrintable.prefix
+        : (json as any).copy.nonPrintable.prefix;
 
     return {
       ...store,
@@ -126,22 +127,49 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
         ...store.setting,
         hex: {
           ...store.hex,
-          null: { char: nullChar.substr(-1) !== null ? nullChar.substr(-1) : ' ' },
+          null: { char: nullChar.slice(-1) !== null ? nullChar.slice(-1) : ' ' },
           nonPrintable: {
-            encoding: nonPrintableEncoding,
-            char: nonPrintableChar.substr(-1) !== null ? nonPrintableChar.substr(-1) : ' '
+            encoding: NON_PRINTABLE_ENCODING_SETTING_VALUES.en.map(c => c.type).includes(nonPrintableEncoding)
+              ? NON_PRINTABLE_ENCODING_SETTING_VALUES.en.map(c => c.type).findIndex(c => c === nonPrintableEncoding)
+              : 0,
+            char: nonPrintableChar.slice(-1) !== null ? nonPrintableChar.slice(-1) : ' '
           },
-          higher: { encoding: higherEncoding, char: higherChar.substr(-1) !== null ? higherChar.substr(-1) : ' ' }
+          higher: {
+            encoding: HIGHER_ENCODING_SETTING_VALUES.en.map(c => c.type).includes(higherEncoding)
+              ? HIGHER_ENCODING_SETTING_VALUES.en.map(c => c.type).findIndex(c => c === higherEncoding)
+              : 0,
+            char: higherChar.slice(-1) !== null ? higherChar.slice(-1) : ' '
+          }
+        },
+        offsetBase: OFFSET_SETTING_VALUES.en.map(c => c.value).includes(offsetBase) ? offsetBase : 16,
+        layout: {
+          ...store.layout,
+          column: {
+            ...store.layout.column,
+            auto: typeof autoColumn === 'boolean' ? autoColumn : store.setting.layout.column.auto,
+            max: COLUMNS.map(c => c.columns).includes(maxColumn) ? maxColumn : store.setting.layout.column.max
+          }
+        },
+
+        copy: {
+          ...store.copy,
+          nonPrintable: {
+            type: NON_PRINTABLE_COPY_TYPE_VALUES.en.map(c => c.type).includes(copyType)
+              ? NON_PRINTABLE_COPY_TYPE_VALUES.en.map(c => c.type).findIndex(c => c === copyType)
+              : 0,
+            prefix: copyPrefix.slice(-1) !== null ? copyPrefix.slice(-1) : ' '
+          }
         }
       }
     };
   }, []);
 
-  const appLoad: Reducers['appLoad'] = useCallback((store, payload) => settingLoad(store), [settingLoad]);
-
   const settingSave: Reducers['settingSave'] = useCallback(
     store => {
       const newBodyType: BodyType = BODY_TYPE_SETTING_VALUES.en.find(e => e.value === store.setting.bodyType).type;
+      const newCopyType: NonPrintableCopyType = NON_PRINTABLE_COPY_TYPE_VALUES.en.find(
+        e => e.value === store.setting.copy.nonPrintable.type
+      ).type;
       const newLowerEncoding: EncodingType = NON_PRINTABLE_ENCODING_SETTING_VALUES.en.find(
         e => e.value === store.setting.hex.nonPrintable.encoding
       ).type;
@@ -149,6 +177,18 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
       const newHigherEncoding: EncodingType = HIGHER_ENCODING_SETTING_VALUES.en.find(
         e => e.value === store.setting.hex.higher.encoding
       ).type;
+
+      const {
+        column: { auto: columnAuto, max: maxColumns },
+        row: { auto: rowAuto, max: maxRows }
+      } = store.setting.layout;
+
+      const { width = 1, height = 1 } = document.getElementById('hex-viewer')?.getBoundingClientRect();
+
+      let newColumnSize = handleLayoutColumnResize2(store, width as number);
+      let newRowSize = handleLayoutRowResize(height as number);
+      newColumnSize = columnAuto ? newColumnSize : Math.min(newColumnSize, maxColumns);
+      newRowSize = rowAuto ? newRowSize : Math.min(newRowSize, maxRows);
 
       const newStore = {
         ...store,
@@ -164,8 +204,19 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
         offset: { ...store.offset, base: store.setting.offsetBase },
         layout: {
           ...store.layout,
-          column: { auto: store.setting.column.auto, size: store.setting.column.size },
-          row: { auto: store.setting.row.auto, size: store.setting.row.size }
+          column: {
+            ...store.layout.column,
+            auto: columnAuto,
+            max: maxColumns,
+            size: newColumnSize
+          },
+          row: { ...store.layout.row, auto: rowAuto, max: maxRows, size: newRowSize }
+        },
+        copy: {
+          nonPrintable: {
+            type: newCopyType,
+            prefix: store.setting.copy.nonPrintable.prefix
+          }
         }
       };
 
@@ -196,8 +247,17 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
             char: store.hex.higher.char
           }
         },
-        column: { auto: store.layout.column.auto, size: store.layout.column.size },
-        row: { auto: store.layout.row.auto, size: store.layout.row.size }
+        column: {
+          auto: store.layout.column.auto,
+          max: store.layout.column.auto ? store.layout.column.size : store.layout.column.max
+        },
+        row: { auto: store.layout.row.auto, max: store.layout.row.auto ? store.layout.row.size : store.layout.row.max },
+        copy: {
+          nonPrintable: {
+            type: NON_PRINTABLE_COPY_TYPE_VALUES.en.find(e => e.type === store.copy.nonPrintable.type).value,
+            prefix: store.copy.nonPrintable.prefix
+          }
+        }
       }
     };
   }, []);
@@ -206,19 +266,84 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
     return { ...store, setting: { ...store.setting, open: false } };
   }, []);
 
+  const settingReset: Reducers['settingReset'] = useCallback(store => {
+    const { width = 1 } = document.getElementById('hex-viewer')?.getBoundingClientRect();
+    const newColumnSize = handleLayoutColumnResize2(store, width as number);
+    return {
+      ...store,
+      setting: {
+        ...store.setting,
+        bodyType: 0,
+        hex: {
+          null: { char: '.' },
+          nonPrintable: { encoding: 0, char: '.' },
+          higher: { encoding: 0, char: '.' }
+        },
+        offsetBase: 16,
+        layout: {
+          column: { auto: true, max: newColumnSize },
+          row: { auto: true, max: 2000 }
+        },
+        search: {
+          textType: 0
+        }
+      }
+    };
+  }, []);
+
+  const settingCopyNonPrintableTypeChange: Reducers['settingCopyNonPrintableTypeChange'] = useCallback(
+    (store, { event }) => {
+      return {
+        ...store,
+        setting: {
+          ...store.setting,
+          copy: {
+            ...store.setting.copy,
+            nonPrintable: { ...store.setting.copy.nonPrintable, type: event.target.value as number }
+          }
+        }
+      };
+    },
+    []
+  );
+
+  const settingCopyNonPrintablePrefixChange: Reducers['settingCopyNonPrintablePrefixChange'] = useCallback(
+    (store, { event }) => {
+      return {
+        ...store,
+        setting: {
+          ...store.setting,
+          copy: {
+            ...store.setting.copy,
+            nonPrintable: {
+              ...store.setting.copy.nonPrintable,
+              prefix: (event.target.value as string).slice(-1) !== null ? (event.target.value as string).slice(-1) : ' '
+            }
+          }
+        }
+      };
+    },
+    []
+  );
+
   const settingOffsetBaseChange: Reducers['settingOffsetBaseChange'] = useCallback((store, { event }) => {
     return { ...store, setting: { ...store.setting, offsetBase: event.target.value as number } };
   }, []);
 
   const settingAutoColumnChange: Reducers['settingAutoColumnChange'] = useCallback(store => {
+    const { width = 1 } = document.getElementById('hex-viewer')?.getBoundingClientRect();
+    const newColumnSize = handleLayoutColumnResize2(store, width as number);
     return {
       ...store,
       setting: {
         ...store.setting,
-        column: {
-          ...store.setting.column,
-          auto: !store.setting.column.auto,
-          size: !store.setting.column.auto ? store.layout.column.size : store.setting.column.size
+        layout: {
+          ...store.setting.layout,
+          column: {
+            ...store.setting.layout.column,
+            auto: !store.setting.layout.column.auto,
+            max: store.setting.layout.column.auto ? store.setting.layout.column.max : newColumnSize
+          }
         }
       }
     };
@@ -229,7 +354,7 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
       ...store,
       setting: {
         ...store.setting,
-        column: { ...store.setting.column, size: value }
+        layout: { ...store.setting.layout, column: { ...store.setting.layout.column, max: value } }
       }
     };
   }, []);
@@ -266,21 +391,37 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
         hex: {
           ...store.setting.hex,
           null: {
-            char: key === 'null' ? (value.substr(-1) !== null ? value.substr(-1) : ' ') : store.setting.hex.null.char
+            char: key === 'null' ? (value.slice(-1) !== null ? value.slice(-1) : ' ') : store.setting.hex.null.char
           },
           nonPrintable: {
             ...store.setting.hex.nonPrintable,
             char:
               key === 'nonPrintable'
-                ? value.substr(-1) !== null
-                  ? value.substr(-1)
+                ? value.slice(-1) !== null
+                  ? value.slice(-1)
                   : ' '
                 : store.setting.hex.nonPrintable.char
           },
           higher: {
             ...store.setting.hex.higher,
-            char:
-              key === 'higher' ? (value.substr(-1) !== null ? value.substr(-1) : ' ') : store.setting.hex.higher.char
+            char: key === 'higher' ? (value.slice(-1) !== null ? value.slice(-1) : ' ') : store.setting.hex.higher.char
+          }
+        }
+      }
+    };
+  }, []);
+
+  const settingBodyResize: Reducers['bodyResize'] = useCallback((store, { height, width }) => {
+    const newColumnSize = handleLayoutColumnResize2(store, width as number);
+    return {
+      ...store,
+      setting: {
+        ...store.setting,
+        layout: {
+          ...store.setting.layout,
+          column: {
+            ...store.setting.layout.column,
+            max: store.setting.layout.column.auto ? newColumnSize : store.setting.layout.column.max
           }
         }
       }
@@ -290,31 +431,39 @@ export const useSettingReducer: UseReducer<SettingState> = () => {
   const reducer: ReducerHandler = useCallback(
     ({ store, action: { type, payload } }) => {
       // Load and Save only when open
-      if (isAction.appLoad(type)) return appLoad(store, payload);
-      else if (isAction.settingLoad(type)) return settingLoad(store, payload);
+      if (isAction.settingLoad(type)) return settingLoad(store, payload);
       else if (isAction.settingSave(type)) return settingSave(store, payload);
       else if (isAction.settingOpen(type)) return settingOpen(store, payload);
       else if (isAction.settingClose(type)) return settingClose(store, payload);
+      else if (isAction.settingReset(type)) return settingReset(store, payload);
       else if (isAction.settingBodyTypeChange(type)) return settingBodyTypeChange(store, payload);
+      else if (isAction.settingCopyNonPrintableTypeChange(type))
+        return settingCopyNonPrintableTypeChange(store, payload);
+      else if (isAction.settingCopyNonPrintablePrefixChange(type))
+        return settingCopyNonPrintablePrefixChange(store, payload);
       else if (isAction.settingOffsetBaseChange(type)) return settingOffsetBaseChange(store, payload);
       else if (isAction.settingAutoColumnChange(type)) return settingAutoColumnChange(store, payload);
       else if (isAction.settingColumnChange(type)) return settingColumnChange(store, payload);
       else if (isAction.settingEncodingChange(type)) return settingEncodingChange(store, payload);
       else if (isAction.settingHexCharChange(type)) return settingHexCharChange(store, payload);
+      else if (isAction.bodyResize(type)) return settingBodyResize(store, payload);
       else return { ...store };
     },
     [
-      appLoad,
-      settingAutoColumnChange,
-      settingBodyTypeChange,
+      settingLoad,
+      settingSave,
+      settingOpen,
       settingClose,
+      settingReset,
+      settingBodyTypeChange,
+      settingCopyNonPrintableTypeChange,
+      settingCopyNonPrintablePrefixChange,
+      settingOffsetBaseChange,
+      settingAutoColumnChange,
       settingColumnChange,
       settingEncodingChange,
       settingHexCharChange,
-      settingLoad,
-      settingOffsetBaseChange,
-      settingOpen,
-      settingSave
+      settingBodyResize
     ]
   );
 

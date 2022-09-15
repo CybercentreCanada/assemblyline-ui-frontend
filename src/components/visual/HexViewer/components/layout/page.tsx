@@ -1,14 +1,14 @@
 import { makeStyles } from '@material-ui/core';
 import clsx from 'clsx';
 import React, { useRef } from 'react';
-import { HexBody, HexHeader, HexSettings, LAYOUT_SIZE, StoreProps, useDispatch, useEventListener } from '../..';
+import { HexBody, HexHeader, HexSettings, StoreProps, useDispatch, useEventListener } from '../..';
 
 const useHexStyles = makeStyles(theme => ({
   root: {
+    position: 'absolute',
     display: 'flex',
     flexDirection: 'column',
-    minHeight: `250px`,
-    height: `calc(100vh - ${LAYOUT_SIZE.windowHeight}px)`,
+    height: '100%',
     width: '100%',
     cursor: 'default',
 
@@ -18,20 +18,16 @@ const useHexStyles = makeStyles(theme => ({
     '-moz-user-select': 'none' /* Firefox */,
     '-ms-user-select': 'none' /* Internet Explorer/Edge */
   },
-  mobile: {
-    height: `calc(100vh - ${LAYOUT_SIZE.mobileWindowHeight}px)`
-  },
+
   hidden: {
     visibility: 'hidden'
   }
 }));
 
 export const WrappedHexPageLayout = ({ store }: StoreProps) => {
-  const classes = useHexStyles();
-
-  const { onAppClickAway } = useDispatch();
-
   const ref = useRef(null);
+  const classes = useHexStyles();
+  const { onAppClickAway } = useDispatch();
 
   // Mouse Up
   useEventListener('mousedown', (e: MouseEvent) => {
@@ -39,14 +35,7 @@ export const WrappedHexPageLayout = ({ store }: StoreProps) => {
   });
 
   return (
-    <div
-      ref={ref}
-      className={clsx(
-        classes.root,
-        window.innerHeight.valueOf() < 1000 && classes.mobile,
-        !store.loading.initialized && classes.hidden
-      )}
-    >
+    <div ref={ref} className={clsx(classes.root, store.loading.status !== 'initialized' && classes.hidden)}>
       <HexHeader store={store} />
       <HexBody store={store} />
       <HexSettings store={store} />

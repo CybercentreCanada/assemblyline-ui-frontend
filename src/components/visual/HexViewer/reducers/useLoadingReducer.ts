@@ -1,16 +1,25 @@
 import { useCallback, useMemo } from 'react';
-import { isAction, ReducerHandler, Reducers, UseReducer } from '..';
+import { isAction, ReducerHandler, Reducers, Store, UseReducer } from '..';
 
 export type LoadingState = {
   loading: {
-    progress: number;
-    isInvalidData: boolean;
-    refsReady: boolean;
-    hasResized: boolean;
-    hasScrolled: boolean;
-    initialized: boolean;
-    error: boolean;
+    status: 'loading' | 'initialized' | 'error';
     message: string;
+    progress: number;
+    conditions: {
+      hasAppLoaded: boolean;
+      hasSettingsLoaded: boolean;
+      hasLocationInit: boolean;
+      hasBodyRefInit: boolean;
+      hasBodyItemsRendered: boolean;
+      hasResized: boolean;
+      hasScrolled: boolean;
+    };
+    errors: {
+      isDataInvalid: boolean;
+      isHeightTooSmall: boolean;
+      isWidthTooSmall: boolean;
+    };
   };
 };
 
@@ -18,115 +27,128 @@ export const useLoadingReducer: UseReducer<LoadingState> = () => {
   const initialState = useMemo<LoadingState>(
     () => ({
       loading: {
+        status: 'loading',
+        message: 'loading.initialization',
         progress: 0,
-        isInvalidData: false,
-        refsReady: false,
-        hasResized: false,
-        hasScrolled: false,
-        initialized: false,
-        error: false,
-        message: 'loading.initialization'
+        conditions: {
+          hasAppLoaded: false,
+          hasSettingsLoaded: false,
+          hasLocationInit: false,
+          hasBodyRefInit: false,
+          hasBodyItemsRendered: false,
+          hasResized: false,
+          hasScrolled: false
+        },
+        errors: {
+          isDataInvalid: false,
+          isHeightTooSmall: false,
+          isWidthTooSmall: false
+        }
       }
     }),
     []
   );
 
-  const bodyInit: Reducers['bodyInit'] = useCallback((store, { initialized }) => {
-    if (initialized)
-      return {
-        ...store,
-        loading: {
-          ...store.loading,
-          progress: 100,
-          isInvalidData: false,
-          refsReady: true,
-          hasResized: true,
-          hasScrolled: true,
-          initialized: true,
-          error: false,
-          message: ''
-        }
-      };
-    else
-      return {
-        ...store,
-        loading: {
-          ...store.loading,
-          isInvalidData: false,
-          refsReady: false,
-          hasResized: false,
-          hasScrolled: false,
-          initialized: false,
-          error: false,
-          message: 'loading.bodyInit',
-          progress: (100 * 2) / 7
-        }
-      };
+  const handleLoading = useCallback((store: Store): Store => {
+    const progress: number =
+      (100 / Object.keys(store.loading.conditions).length) *
+      Object.values(store.loading.conditions).reduce((sum, next) => (next === true ? sum + 1 : sum), 0);
+
+    const conditions: boolean = Object.values(store.loading.conditions).reduce((prev, next) => prev && next, true);
+    const errors: boolean = Object.values(store.loading.errors).reduce((prev, next) => prev || next, false);
+    const status: 'loading' | 'initialized' | 'error' = !conditions ? 'loading' : !errors ? 'initialized' : 'error';
+
+    return { ...store, loading: { ...store.loading, progress, status } };
   }, []);
 
-  const appLoad: Reducers['appLoad'] = useCallback((store, { data }) => {
-    return {
-      ...store,
-      loading: { ...store.loading, message: 'loading.appLoad', progress: (100 * 1) / 7 }
-    };
-  }, []);
+  const bodyInit: Reducers['bodyInit'] = useCallback(
+    (store, { initialized }) => {
+      store.loading.message = 'loading.bodyInit';
+      return handleLoading(store);
+    },
+    [handleLoading]
+  );
 
-  const appLocationInit: Reducers['appLocationInit'] = useCallback((store, payload) => {
-    return {
-      ...store,
-      loading: { ...store.loading, message: 'loading.appLocationInit', progress: (100 * 2) / 7 }
-    };
-  }, []);
+  const appLoad: Reducers['appLoad'] = useCallback(
+    (store, { data }) => {
+      store.loading.message = 'loading.appLoad';
+      store.loading.conditions.hasAppLoaded = true;
+      store.loading.errors.isDataInvalid = data === undefined || data === null || data === '';
+      return handleLoading(store);
+    },
+    [handleLoading]
+  );
 
-  const bodyRefInit: Reducers['bodyRefInit'] = useCallback((store, { ready }) => {
-    return {
-      ...store,
-      loading: {
-        ...store.loading,
-        refsReady: ready,
-        message: 'loading.bodyRefInit',
-        progress: (100 * 4) / 7
-      }
-    };
-  }, []);
+  const appSave: Reducers['appSave'] = useCallback(
+    (store, payload) => {
+      store.loading.message = 'loading.appLoad';
+      store.loading.conditions.hasAppLoaded = false;
+      return handleLoading(store);
+    },
+    [handleLoading]
+  );
 
-  const bodyResize: Reducers['bodyResize'] = useCallback((store, payload) => {
-    return {
-      ...store,
-      loading: {
-        ...store.loading,
-        hasResized: true,
-        message: 'loading.bodyResize',
-        progress: (100 * 5) / 7
-      }
-    };
-  }, []);
+  const settingLoad: Reducers['settingLoad'] = useCallback(
+    (store, payload) => {
+      store.loading.message = 'loading.settingLoad';
+      store.loading.conditions.hasSettingsLoaded = true;
+      return handleLoading(store);
+    },
+    [handleLoading]
+  );
 
-  const bodyScrollInit: Reducers['bodyScrollInit'] = useCallback((store, payload) => {
-    return {
-      ...store,
-      loading: {
-        ...store.loading,
-        initialized: true,
-        hasScrolled: true,
-        message: 'loading.bodyScrollInit',
-        progress: (100 * 6) / 7
-      }
-    };
-  }, []);
+  const appLocationInit: Reducers['appLocationInit'] = useCallback(
+    (store, payload) => {
+      store.loading.message = 'loading.appLocationInit';
+      store.loading.conditions.hasLocationInit = true;
+      return handleLoading(store);
+    },
+    [handleLoading]
+  );
 
-  const bodyItemsRendered: Reducers['bodyItemsRendered'] = useCallback((store, payload) => {
-    if (!store.loading.hasScrolled) return { ...store, message: 'loading.bodyItemsRendered', progress: (100 * 3) / 7 };
-    else
-      return {
-        ...store,
-        loading: { ...store.loading, message: 'loading.initialized', progress: 100 }
-      };
-  }, []);
+  const bodyRefInit: Reducers['bodyRefInit'] = useCallback(
+    (store, { ready }) => {
+      store.loading.message = 'loading.bodyRefInit';
+      store.loading.conditions.hasBodyRefInit = ready;
+      return handleLoading(store);
+    },
+    [handleLoading]
+  );
+
+  const bodyResize: Reducers['bodyResize'] = useCallback(
+    (store, { height, width }) => {
+      store.loading.message = 'loading.bodyResize';
+      store.loading.conditions.hasResized = true;
+      // store.loading.errors.isHeightTooSmall = height < 400;
+      store.loading.errors.isWidthTooSmall = width < 264;
+      return handleLoading(store);
+    },
+    [handleLoading]
+  );
+
+  const bodyScrollInit: Reducers['bodyScrollInit'] = useCallback(
+    (store, payload) => {
+      store.loading.message = 'loading.bodyScrollInit';
+      store.loading.conditions.hasScrolled = true;
+      return handleLoading(store);
+    },
+    [handleLoading]
+  );
+
+  const bodyItemsRendered: Reducers['bodyItemsRendered'] = useCallback(
+    (store, payload) => {
+      store.loading.message = 'loading.bodyItemsRendered';
+      store.loading.conditions.hasBodyItemsRendered = true;
+      return handleLoading(store);
+    },
+    [handleLoading]
+  );
 
   const reducer: ReducerHandler = useCallback(
     ({ store, action: { type, payload } }) => {
       if (isAction.appLoad(type)) return appLoad(store, payload);
+      else if (isAction.appSave(type)) return appSave(store, payload);
+      else if (isAction.settingLoad(type)) return settingLoad(store, payload);
       else if (isAction.appLocationInit(type)) return appLocationInit(store, payload);
       else if (isAction.bodyInit(type)) return bodyInit(store, payload);
       else if (isAction.bodyRefInit(type)) return bodyRefInit(store, payload);
@@ -135,7 +157,17 @@ export const useLoadingReducer: UseReducer<LoadingState> = () => {
       else if (isAction.bodyItemsRendered(type)) return bodyItemsRendered(store, payload);
       else return { ...store };
     },
-    [appLoad, appLocationInit, bodyInit, bodyItemsRendered, bodyRefInit, bodyResize, bodyScrollInit]
+    [
+      appLoad,
+      appSave,
+      appLocationInit,
+      bodyInit,
+      bodyItemsRendered,
+      bodyRefInit,
+      bodyResize,
+      bodyScrollInit,
+      settingLoad
+    ]
   );
 
   return { initialState, reducer };

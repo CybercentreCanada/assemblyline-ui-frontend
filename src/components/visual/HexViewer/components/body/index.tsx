@@ -78,21 +78,22 @@ const HexTableBody = memo(({ store }: StoreProps) => {
   useEventListener('mouseup', (event: MouseEvent) => onBodyMouseUp(undefined, { store, event }));
 
   React.useLayoutEffect(() => {
-    if (bodyRef.current !== null && store.loading.refsReady === false) onBodyRefInit({ ready: true });
-    else if (bodyRef.current === null && store.loading.refsReady === true) onBodyRefInit({ ready: false });
+    if (bodyRef.current !== null && store.loading.conditions.hasBodyRefInit === false) onBodyRefInit({ ready: true });
+    else if (bodyRef.current === null && store.loading.conditions.hasBodyRefInit === true)
+      onBodyRefInit({ ready: false });
   }, [store, onBodyInit, onBodyRefInit]);
 
   React.useEffect(() => {
-    if (store.loading.refsReady) onBodyResize(bodyRef.current.getBoundingClientRect());
-  }, [onBodyResize, store.loading.refsReady]);
+    if (store.loading.conditions.hasBodyRefInit) onBodyResize(bodyRef.current.getBoundingClientRect());
+  }, [onBodyResize, store.loading.conditions.hasBodyRefInit]);
 
   React.useEffect(() => {
-    if (store.loading.hasResized && !store.loading.hasScrolled) onBodyScrollInit();
-  }, [onBodyScrollInit, store.loading.hasResized, store.loading.hasScrolled]);
+    if (store.loading.conditions.hasResized && !store.loading.conditions.hasScrolled) onBodyScrollInit();
+  }, [onBodyScrollInit, store.loading.conditions.hasResized, store.loading.conditions.hasScrolled]);
 
   React.useEffect(() => {
-    if (store.loading.hasScrolled) onBodyInit({ initialized: true });
-  }, [onBodyInit, store.loading.hasScrolled]);
+    if (store.loading.conditions.hasScrolled) onBodyInit({ initialized: true });
+  }, [onBodyInit, store.loading.conditions.hasScrolled]);
 
   const rowIndexes: number[] = useMemo(
     () => Array.from(Array(store.layout.row.size).keys()).map(i => i + store.scroll.rowIndex),
@@ -109,7 +110,7 @@ const HexTableBody = memo(({ store }: StoreProps) => {
       onTouchMove={(event: React.TouchEvent<HTMLDivElement>) => onScrollTouchMove({ event })}
       onTouchEnd={() => onScrollTouchEnd()}
     >
-      {store.loading.initialized ? (
+      {store.loading.status === 'initialized' ? (
         <>
           <div className={classes.spacer} />
           <table className={classes.table}>
@@ -139,7 +140,8 @@ const HexWindowBody = memo(({ store }: StoreProps) => {
     onBodyScrollInit,
     onCursorKeyDown,
     onCopyKeyDown,
-    onBodyMouseUp
+    onBodyMouseUp,
+    onBodyMouseLeave
   } = useDispatch();
   const { dispatch } = useStore();
 
@@ -151,37 +153,47 @@ const HexWindowBody = memo(({ store }: StoreProps) => {
   useEventListener('mouseup', (event: MouseEvent) => onBodyMouseUp(undefined, { store, event }));
 
   React.useLayoutEffect(() => {
-    if (listRef.current !== null && bodyRef.current !== null && store.loading.refsReady === false)
+    if (listRef.current !== null && bodyRef.current !== null && store.loading.conditions.hasBodyRefInit === false)
       onBodyRefInit({ ready: true });
-    else if ((listRef.current === null || bodyRef.current === null) && store.loading.refsReady === true)
+    else if ((listRef.current === null || bodyRef.current === null) && store.loading.conditions.hasBodyRefInit === true)
       onBodyRefInit({ ready: false });
   }, [store, onBodyInit, onBodyRefInit]);
 
   React.useEffect(() => {
-    if (store.loading.refsReady) onBodyResize(bodyRef.current.getBoundingClientRect());
-  }, [onBodyResize, store.loading.refsReady]);
+    if (store.loading.conditions.hasBodyRefInit) onBodyResize(bodyRef.current.getBoundingClientRect());
+  }, [onBodyResize, store.loading.conditions.hasBodyRefInit]);
 
   React.useEffect(() => {
-    if (store.loading.hasResized)
+    if (store.loading.conditions.hasResized)
       scrollToWindowIndexAsync(store, listRef, store.scroll.index, store.scroll.type).then(
-        () => !store.loading.hasScrolled && onBodyScrollInit()
+        () => !store.loading.conditions.hasScrolled && onBodyScrollInit()
       );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     dispatch,
     onBodyScrollInit,
-    store.loading.hasResized,
+    store.loading.conditions.hasResized,
     store.scroll.index,
     store.scroll.rowIndex,
     store.scroll.type
   ]);
 
+  React.useEffect(() => {
+    const _bodyRef = bodyRef.current;
+    _bodyRef !== null && _bodyRef.addEventListener('mouseleave', () => onBodyMouseLeave());
+    return () => _bodyRef !== null && _bodyRef.removeEventListener('mouseleave', () => onBodyMouseLeave());
+  }, [onBodyMouseLeave, store.loading.status]);
+
   const Row = React.useMemo(
     () =>
       ({ index, style, data }) =>
-        store.loading.initialized ? <WindowRow key={index} rowIndex={index} style={style} Tag={data.Tag} /> : <></>,
+        store.loading.status === 'initialized' ? (
+          <WindowRow key={index} rowIndex={index} style={style} Tag={data.Tag} />
+        ) : (
+          <></>
+        ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [store.layout.column.size, store.layout.row.size]
+    [store.layout.column.size, store.layout.row.size, store.loading.status]
   );
 
   return (
@@ -227,10 +239,12 @@ export const HexBody = memo(
     prevProps.store.offset.size === nextProps.store.offset.size &&
     prevProps.store.layout.row.size === nextProps.store.layout.row.size &&
     prevProps.store.layout.column.size === nextProps.store.layout.column.size &&
+    prevProps.store.layout.column.max === nextProps.store.layout.column.max &&
     prevProps.store.layout.row.auto === nextProps.store.layout.row.auto &&
+    prevProps.store.layout.row.max === nextProps.store.layout.row.max &&
     prevProps.store.layout.column.auto === nextProps.store.layout.column.auto &&
     prevProps.store.layout.isFocusing === nextProps.store.layout.isFocusing &&
-    prevProps.store.mode.bodyType === nextProps.store.mode.bodyType &&
+    prevProps.store.loading.status === nextProps.store.loading.status &&
     prevProps.store.mode.themeType === nextProps.store.mode.themeType &&
     prevProps.store.mode.languageType === nextProps.store.mode.languageType &&
     prevProps.store.mode.widthType === nextProps.store.mode.widthType &&

@@ -15,20 +15,28 @@ import {
   WidthType
 } from '..';
 
-const useHexStyles = makeStyles(theme => ({
-  root: {
-    height: `calc(100vh - ${LAYOUT_SIZE.windowHeight}px)`,
-    width: '100%',
-    display: 'grid',
-    alignContent: 'center'
-  },
-  mobile: {
-    height: `calc(100vh - ${LAYOUT_SIZE.mobileWindowHeight}px)`
-  }
-}));
+const useHexStyles = ({ y = 275.890625, height = 1000 }: { y: number; height: number }) =>
+  makeStyles(theme => ({
+    root: {
+      position: 'relative',
+      height: `calc(${height}px - ${y}px - 75px)`,
+      width: '100%',
+      display: 'grid',
+      alignContent: 'center'
+    },
+    widescreen: {
+      height: `calc(${height}px - ${LAYOUT_SIZE.mobileWindowHeight}px)`
+    },
+    viewportAuto: {
+      height: 'auto'
+    }
+  }));
 
 const WrappedAppRoot = ({ data = '' }: DataProps) => {
-  const classes = useHexStyles();
+  const classes = useHexStyles({
+    y: document.getElementById('hex-viewer')?.getBoundingClientRect()?.y,
+    height: window.innerHeight
+  })();
   const { store, dispatch } = useStore();
 
   // Data
@@ -65,6 +73,7 @@ const WrappedAppRoot = ({ data = '' }: DataProps) => {
   // History
 
   // Setting
+  React.useEffect(() => dispatch({ type: ACTIONS.settingLoad, payload: null }), [dispatch]);
 
   // Location
   React.useEffect(() => {
@@ -72,7 +81,7 @@ const WrappedAppRoot = ({ data = '' }: DataProps) => {
   }, [dispatch, store.location.loaded]);
 
   return (
-    <div className={clsx(classes.root, window.innerHeight.valueOf() < 1000 && classes.mobile)}>
+    <div className={clsx(classes.root, window.innerHeight.valueOf() < 1000 && classes.widescreen)}>
       <HexLoading store={store} />
       {store.hex.codes.size !== 0 && store.location.loaded && <HexLayout store={store} />}
     </div>

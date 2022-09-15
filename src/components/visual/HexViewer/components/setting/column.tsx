@@ -12,8 +12,8 @@ export const WrappedHexColumnSetting = ({ store }: StoreProps) => {
   const { onSettingAutoColumnChange, onSettingColumnChange } = useDispatch();
 
   const {
-    column: { auto: columnAuto, size: columnSize }
-  } = store.setting;
+    column: { auto: columnAuto, max: maxColumns }
+  } = store.setting.layout;
 
   return (
     <>
@@ -37,13 +37,14 @@ export const WrappedHexColumnSetting = ({ store }: StoreProps) => {
             placeholder={t('columns.description')}
             fullWidth
             margin="dense"
-            value={columnSize as number}
+            value={maxColumns as number}
             min={1}
             max={264}
             base={10}
-            options={COLUMNS.map(c => c.columns)}
+            options={COLUMNS.filter(c => ![0, 1].includes(c.columns)).map(c => c.columns)}
             disabled={columnAuto}
             allowNull={false}
+            direction="inverse"
             onChange={event => onSettingColumnChange({ value: event.target.valueAsNumber as number })}
           />
         </FormControl>
@@ -55,6 +56,6 @@ export const WrappedHexColumnSetting = ({ store }: StoreProps) => {
 export const HexColumnSetting = React.memo(
   WrappedHexColumnSetting,
   (prevProps: Readonly<StoreProps>, nextProps: Readonly<StoreProps>) =>
-    prevProps.store.setting.column.auto === nextProps.store.setting.column.auto &&
-    prevProps.store.setting.column.size === nextProps.store.setting.column.size
+    prevProps.store.setting.layout.column.auto === nextProps.store.setting.layout.column.auto &&
+    prevProps.store.setting.layout.column.max === nextProps.store.setting.layout.column.max
 );

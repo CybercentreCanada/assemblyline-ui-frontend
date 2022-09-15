@@ -14,7 +14,7 @@ export type LayoutSize = {
 
 export const LAYOUT_SIZE: LayoutSize = {
   windowHeight: 350,
-  mobileWindowHeight: 140,
+  mobileWindowHeight: 160,
   rowHeight: 22.3958,
   offsetWidth: 73.5833,
   hexWidth: 21.8958,
@@ -36,12 +36,15 @@ export const COLUMNS: Array<{ width: number; columns: number }> = [
   { width: 575, columns: 12 },
   { width: 425, columns: 8 },
   { width: 285, columns: 4 },
-  { width: 0, columns: 0 }
+  { width: 1, columns: 1 }
 ];
 
 export const handleLayoutColumnResize = (width: number) => COLUMNS.find(e => width >= e.width)?.columns;
 
-export const handleLayoutRowResize = (height: number) => Math.floor(height / LAYOUT_SIZE.rowHeight);
+export const handleLayoutRowResize = (height: number) => {
+  const row = Math.floor(height / LAYOUT_SIZE.rowHeight);
+  return row > 3 ? row : 3;
+};
 
 // Focus
 type Focus = { none: 'none'; toolbar: 'toolbar'; body: 'body' };
@@ -53,10 +56,8 @@ export const isFocus = Object.fromEntries(
 ) as IsFocus;
 
 export const handleLayoutColumnResize2 = (store: Store, width: number) => {
-  if (store.layout.column.auto === false) return store.layout.column.size;
-
   const columns = COLUMNS.sort((a, b) => b.columns - a.columns).find(e => {
-    const displayType = store.layout.display;
+    const displayType = store.layout.display.type;
     let size: number = 0;
 
     size += 20;
@@ -68,7 +69,8 @@ export const handleLayoutColumnResize2 = (store: Store, width: number) => {
     return size < width;
   })?.columns;
 
-  if (store.hex.codes.size <= columns)
+  if (columns === null || columns === undefined) return COLUMNS[COLUMNS.length - 1].columns;
+  else if (store.hex.codes.size <= columns)
     return COLUMNS.sort((a, b) => b.columns - a.columns).find(e => e.columns <= store.hex.codes.size)?.columns;
   else return columns;
 };

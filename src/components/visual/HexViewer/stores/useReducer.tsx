@@ -75,9 +75,9 @@ export const ReducerProvider = ({ children }: StoreProviderProps) => {
       const prevStore = { ...store };
 
       store = loading.reducer({ store, action });
+      store = setting.reducer({ store, action });
       store = mode.reducer({ store, action });
       store = hex.reducer({ store, action });
-      store = setting.reducer({ store, action });
       store = layout.reducer({ store, action });
 
       store = location.reducer({ store, action });
@@ -100,7 +100,7 @@ export const ReducerProvider = ({ children }: StoreProviderProps) => {
 
   const render = React.useCallback(
     (prevStore: Store, nextStore: Store) => {
-      if (!nextStore.loading.initialized) return;
+      if (nextStore.loading.status !== 'initialized') return;
 
       hover.render({ prevStore, nextStore });
       cursor.render({ prevStore, nextStore });

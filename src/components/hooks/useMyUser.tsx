@@ -62,6 +62,12 @@ export type ConfigurationDefinition = {
     dtl: number;
     max_dtl: number;
     sha256_sources: string[];
+    verdicts: {
+      info: number;
+      suspicious: number;
+      highly_suspicious: number;
+      malicious: number;
+    };
   };
   system: {
     organisation: string;
@@ -117,6 +123,7 @@ export interface CustomUserContextProps extends UserContextProps<CustomUser> {
   systemMessage: SystemMessageDefinition;
   setConfiguration: (cfg: ConfigurationDefinition) => void;
   setSystemMessage: (msg: SystemMessageDefinition) => void;
+  scoreToVerdict: (score: number) => string;
 }
 
 export interface WhoAmIProps extends CustomUser {
@@ -231,6 +238,26 @@ export default function useMyUser(): CustomUserContextProps {
     return true;
   };
 
+  const scoreToVerdict = (score: number | null) => {
+    if (score >= configuration.submission.verdicts.malicious) {
+      return 'malicious';
+    }
+
+    if (score >= configuration.submission.verdicts.highly_suspicious) {
+      return 'highly_suspicious';
+    }
+
+    if (score >= configuration.submission.verdicts.suspicious) {
+      return 'suspicious';
+    }
+
+    if (score === null || score >= configuration.submission.verdicts.info) {
+      return 'info';
+    }
+
+    return 'safe';
+  };
+
   return {
     c12nDef,
     configuration,
@@ -242,6 +269,7 @@ export default function useMyUser(): CustomUserContextProps {
     setConfiguration,
     setSystemMessage,
     isReady,
-    validateProps
+    validateProps,
+    scoreToVerdict
   };
 }

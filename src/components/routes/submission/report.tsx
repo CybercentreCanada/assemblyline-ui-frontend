@@ -30,7 +30,7 @@ import ResultSection from 'components/visual/ResultCard/result_section';
 import TextVerdict from 'components/visual/TextVerdict';
 import Verdict from 'components/visual/Verdict';
 import VerdictGauge from 'components/visual/VerdictGauge';
-import { bytesToSize, scoreToVerdict } from 'helpers/utils';
+import { bytesToSize } from 'helpers/utils';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
@@ -191,6 +191,7 @@ function AttributionBanner({ report }) {
   const classes = useStyles();
   const score = report ? report.max_score : 0;
   const isXS = useMediaQuery(theme.breakpoints.only('xs'));
+  const { scoreToVerdict } = useALContext();
 
   const BANNER_COLOR_MAP = {
     info: {

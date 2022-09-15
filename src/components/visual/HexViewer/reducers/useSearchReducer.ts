@@ -2,11 +2,13 @@ import { useCallback } from 'react';
 import {
   clampSelectedSearchIndex,
   countHexcode,
+  executeSearchRegex,
   findSearchPattern,
   formatHexString,
   formatTextString,
   getSearchIndexes,
   getSelectedSearchIndexes,
+  getTextExpression,
   isAction,
   isSearchType,
   nextSearchIndex,
@@ -69,13 +71,22 @@ export const useSearchReducer: UseReducer<SearchState> = () => {
       indexes = [],
       selectedIndex = null;
 
-    if (isSearchType.hex(store)) value = formatHexString(inputValue);
-    else if (isSearchType.text(store)) value = formatTextString(inputValue);
-
-    if (value !== null && value !== '') {
-      length = countHexcode(value);
-      indexes = findSearchPattern(store.hex.data, value);
-      selectedIndex = nextSearchIndex(indexes, store.cursor.index);
+    if (isSearchType.hex(store)) {
+      value = formatHexString(inputValue);
+      const expression = value;
+      if (value !== null && value !== '') {
+        length = countHexcode(value);
+        indexes = findSearchPattern(store.hex.data, expression, length);
+        selectedIndex = nextSearchIndex(indexes, store.cursor.index);
+      }
+    } else if (isSearchType.text(store)) {
+      value = formatTextString(inputValue);
+      if (inputValue !== null && inputValue !== '') {
+        const expression: RegExp = getTextExpression(store, inputValue);
+        length = inputValue.length;
+        indexes = executeSearchRegex(store.hex.data, expression, length);
+        selectedIndex = nextSearchIndex(indexes, store.cursor.index);
+      }
     }
 
     return {
