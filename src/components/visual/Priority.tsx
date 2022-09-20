@@ -13,8 +13,8 @@ const WrappedPriority: React.FC<PriorityProps> = ({ priority, size = 'tiny' }) =
   const { t } = useTranslation();
 
   const PRIORITY_MAP = {
-    'user-info': {
-      text: t('priority.userinfo'),
+    'user-low': {
+      text: t('priority.userlow'),
       color: 'default' as 'default'
     },
     'user-medium': {
