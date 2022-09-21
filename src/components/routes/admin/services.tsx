@@ -16,6 +16,7 @@ import {
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
 import RestoreOutlinedIcon from '@material-ui/icons/RestoreOutlined';
+import SystemUpdateAltIcon from '@material-ui/icons/SystemUpdateAlt';
 import { Skeleton } from '@material-ui/lab';
 import useUser from 'commons/components/hooks/useAppUser';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
@@ -142,6 +143,27 @@ export default function Services() {
     [updates]
   );
 
+  const updateAll = useCallback(
+    () => {
+      apiCall({
+        url: '/api/v4/service/update_all/',
+        onSuccess: resp => {
+          const newUpdates = { ...updates };
+          for (const srv of resp.api_response.updating) {
+            newUpdates[srv] = { ...newUpdates[srv], updating: true };
+          }
+
+          for (const srv of resp.api_response.updated) {
+            delete newUpdates[srv];
+          }
+          setUpdates(newUpdates);
+        }
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [updates]
+  );
+
   const onUpdated = () => {
     if (!isXL) closeGlobalDrawer();
     setTimeout(() => window.dispatchEvent(new CustomEvent('reloadServices')), 1000);
@@ -245,6 +267,25 @@ export default function Services() {
               >
                 <AddCircleOutlineIcon />
               </IconButton>
+            </Tooltip>
+            <Tooltip
+              title={
+                updates && Object.values(updates).some((srv: any) => srv.update_available && !srv.updating)
+                  ? t('update_all')
+                  : t('update_none')
+              }
+            >
+              <span>
+                <IconButton
+                  color="primary"
+                  onClick={updateAll}
+                  disabled={
+                    !updates || !Object.values(updates).some((srv: any) => srv.update_available && !srv.updating)
+                  }
+                >
+                  <SystemUpdateAltIcon />
+                </IconButton>
+              </span>
             </Tooltip>
             <Tooltip title={t('backup')}>
               <IconButton component={MaterialLink} href={`/api/v4/service/backup/?XSRF_TOKEN=${getXSRFCookie()}`}>

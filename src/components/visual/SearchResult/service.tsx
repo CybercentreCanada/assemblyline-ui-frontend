@@ -1,8 +1,9 @@
-import { Button, Tooltip } from '@material-ui/core';
+import { IconButton, Tooltip } from '@material-ui/core';
 import Paper from '@material-ui/core/Paper';
 import TableContainer from '@material-ui/core/TableContainer';
 import ClearIcon from '@material-ui/icons/Clear';
 import DoneIcon from '@material-ui/icons/Done';
+import SystemUpdateAltIcon from '@material-ui/icons/SystemUpdateAlt';
 import { AlertTitle, Skeleton } from '@material-ui/lab';
 import 'moment/locale/fr';
 import React from 'react';
@@ -95,24 +96,30 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
                 <DivTableCell>
                   {result.enabled ? <DoneIcon color="primary" /> : <ClearIcon color="error" />}
                 </DivTableCell>
-                <DivTableCell style={{ whiteSpace: 'nowrap' }}>
-                  {updates[result.name] && updates[result.name].update_available && !updates[result.name].updating && (
-                    <Tooltip title={`${result.name} ${updates[result.name].latest_tag} ${t('available')}!`}>
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        color="primary"
-                        onClick={event => {
-                          event.preventDefault();
-                          event.stopPropagation();
-                          onUpdate(result.name, updates[result.name]);
-                        }}
-                      >
-                        {t('update')}
-                      </Button>
+                <DivTableCell style={{ whiteSpace: 'nowrap', paddingTop: 0, paddingBottom: 0 }}>
+                  {updates[result.name] && updates[result.name].update_available && (
+                    <Tooltip
+                      title={
+                        updates[result.name].updating
+                          ? t('updating')
+                          : `${result.name} ${updates[result.name].latest_tag} ${t('available')}!`
+                      }
+                    >
+                      <span>
+                        <IconButton
+                          color="primary"
+                          onClick={event => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            onUpdate(result.name, updates[result.name]);
+                          }}
+                          disabled={updates[result.name].updating}
+                        >
+                          <SystemUpdateAltIcon />
+                        </IconButton>
+                      </span>
                     </Tooltip>
                   )}
-                  {updates[result.name] && updates[result.name].updating && t('updating')}
                 </DivTableCell>
               </LinkRow>
             ))}
