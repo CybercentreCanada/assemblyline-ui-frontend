@@ -28,13 +28,13 @@ type OAuthProps = {
   avatar: string;
   username: string;
   email: string;
-  oAuthToken: string;
+  oAuthTokenID: string;
   buttonLoading: boolean;
   onSubmit: (event) => void;
   reset: (event) => void;
 };
 
-export function OAuthLogin({ avatar, username, email, oAuthToken, buttonLoading, onSubmit, reset }: OAuthProps) {
+export function OAuthLogin({ avatar, username, email, oAuthTokenID, buttonLoading, onSubmit, reset }: OAuthProps) {
   const { t } = useTranslation(['login']);
   const classes = useStyles();
   const theme = useTheme();
@@ -42,16 +42,16 @@ export function OAuthLogin({ avatar, username, email, oAuthToken, buttonLoading,
   return (
     <form onSubmit={onSubmit}>
       <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'center', justifyContent: 'center' }}>
-        {!oAuthToken ? (
+        {!oAuthTokenID ? (
           <Skeleton variant="circle" style={{ alignSelf: 'center' }} width={144} height={144} />
         ) : (
           <Avatar style={{ alignSelf: 'center', width: theme.spacing(18), height: theme.spacing(18) }} src={avatar} />
         )}
-        <Typography color="textPrimary">{!oAuthToken ? <Skeleton /> : username}</Typography>
+        <Typography color="textPrimary">{!oAuthTokenID ? <Skeleton /> : username}</Typography>
         <Typography variant="caption" color="textSecondary" gutterBottom>
-          {!oAuthToken ? <Skeleton /> : email}
+          {!oAuthTokenID ? <Skeleton /> : email}
         </Typography>
-        {!oAuthToken ? (
+        {!oAuthTokenID ? (
           <Skeleton variant="rect" style={{ height: '36px', marginTop: '1.5rem', marginBottom: '1.5rem' }} />
         ) : (
           <Button
@@ -65,7 +65,7 @@ export function OAuthLogin({ avatar, username, email, oAuthToken, buttonLoading,
             {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
           </Button>
         )}
-        {!oAuthToken ? (
+        {!oAuthTokenID ? (
           <Skeleton />
         ) : (
           <Link variant="body2" href="#" onClick={reset}>

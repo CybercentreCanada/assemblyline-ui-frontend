@@ -63,7 +63,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [avatar, setAvatar] = useState('');
-  const [oAuthToken, setOAuthToken] = useState('');
+  const [oAuthTokenID, setOAuthTokenID] = useState('');
   const [oneTimePass, setOneTimePass] = useState('');
   const [webAuthNResponse, setWebAuthNResponse] = useState(null);
   const [buttonLoading, setButtonLoading] = useState(false);
@@ -75,14 +75,14 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
   }
 
   function reset(event) {
-    if ((shownControls === 'oauth' && oAuthToken) || shownControls !== 'oauth') {
+    if ((shownControls === 'oauth' && oAuthTokenID) || shownControls !== 'oauth') {
       setWebAuthNResponse(null);
       setShownControls('login');
       setUsername('');
       setEmail('');
       setPassword('');
       setAvatar('');
-      setOAuthToken('');
+      setOAuthTokenID('');
       setOneTimePass('');
     }
     if (event) {
@@ -110,7 +110,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
       password,
       otp: oneTimePass,
       webauthn_auth_resp: webAuthNResponse,
-      oauth_token: oAuthToken
+      oauth_token_id: oAuthTokenID
     };
 
     apiCall({
@@ -163,7 +163,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
           setAvatar(api_data.api_response.avatar);
           setUsername(api_data.api_response.username);
           setEmail(api_data.api_response.email_adr || '');
-          setOAuthToken(api_data.api_response.oauth_token);
+          setOAuthTokenID(api_data.api_response.oauth_token_id);
         },
         onFailure: api_data => {
           showErrorMessage(api_data.api_error_message);
@@ -262,7 +262,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
           oauth: (
             <OAuthLogin
               reset={reset}
-              oAuthToken={oAuthToken}
+              oAuthTokenID={oAuthTokenID}
               avatar={avatar}
               username={username}
               email={email}
