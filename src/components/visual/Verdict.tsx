@@ -1,6 +1,6 @@
 import { Tooltip, useTheme } from '@material-ui/core';
+import useALContext from 'components/hooks/useALContext';
 import CustomChip from 'components/visual/CustomChip';
-import { scoreToVerdict } from 'helpers/utils';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -27,6 +27,7 @@ const WrappedVerdict: React.FC<VerdictProps> = ({
 }) => {
   const { t } = useTranslation();
   const theme = useTheme();
+  const { scoreToVerdict } = useALContext();
 
   const VERDICT_SCORE_MAP = {
     info: {
