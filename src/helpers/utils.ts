@@ -36,31 +36,6 @@ export function setNotifyFavicon() {
   favicon.href = `${process.env.PUBLIC_URL}/favicon_done.ico`;
 }
 
-export function scoreToVerdict(score: number | null) {
-  // More then 1000 => Malicious
-  if (score >= 1000) {
-    return 'malicious';
-  }
-
-  // Between 700 - 999 => Highly suspicious
-  if (score >= 700) {
-    return 'highly_suspicious';
-  }
-
-  // Between 300 - 699 => Suspicious
-  if (score >= 300) {
-    return 'suspicious';
-  }
-
-  // Smaller then 0 => Safe
-  if (score < 0) {
-    return 'safe';
-  }
-
-  // Between 0 and 299 => Informational
-  return 'info';
-}
-
 const COLOR_MAP = {
   safe: 'success',
   info: 'default',
