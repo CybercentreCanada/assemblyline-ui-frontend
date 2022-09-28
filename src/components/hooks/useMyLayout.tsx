@@ -46,6 +46,7 @@ const useMyLayout = (): AppLayoutProps => {
       element: {
         id: 'submissions',
         text: t('drawer.submissions'),
+        userPropValidators: [{ prop: 'user.roles', value: 'submission_view' }],
         icon: <AmpStoriesOutlinedIcon />,
         route: '/submissions',
         nested: false
@@ -56,6 +57,7 @@ const useMyLayout = (): AppLayoutProps => {
       element: {
         id: 'alerts',
         text: t('drawer.alerts'),
+        userPropValidators: [{ prop: 'user.roles', value: 'alert_view' }],
         icon: <NotificationImportantOutlinedIcon />,
         route: '/alerts',
         nested: false
@@ -66,6 +68,11 @@ const useMyLayout = (): AppLayoutProps => {
       element: {
         id: 'search',
         title: t('drawer.search'),
+        userPropValidators: [
+          { prop: 'user.roles', value: 'alert_view' },
+          { prop: 'user.roles', value: 'signature_view' },
+          { prop: 'user.roles', value: 'submission_view' }
+        ],
         icon: <SearchIcon />,
         items: [
           {
@@ -77,30 +84,35 @@ const useMyLayout = (): AppLayoutProps => {
           {
             id: 'search.alert',
             text: t('drawer.search.alert'),
+            userPropValidators: [{ prop: 'user.roles', value: 'alert_view' }],
             route: '/search/alert',
             nested: true
           },
           {
             id: 'search.file',
             text: t('drawer.search.file'),
+            userPropValidators: [{ prop: 'user.roles', value: 'submission_view' }],
             route: '/search/file',
             nested: true
           },
           {
             id: 'search.result',
             text: t('drawer.search.result'),
+            userPropValidators: [{ prop: 'user.roles', value: 'submission_view' }],
             route: '/search/result',
             nested: true
           },
           {
             id: 'search.signature',
             text: t('drawer.search.signature'),
+            userPropValidators: [{ prop: 'user.roles', value: 'signature_view' }],
             route: '/search/signature',
             nested: true
           },
           {
             id: 'search.submission',
             text: t('drawer.search.submission'),
+            userPropValidators: [{ prop: 'user.roles', value: 'submission_view' }],
             route: '/search/submission',
             nested: true
           }
@@ -126,11 +138,19 @@ const useMyLayout = (): AppLayoutProps => {
       element: {
         id: 'manage',
         title: t('drawer.manage'),
+        userPropValidators: [
+          { prop: 'user.roles', value: 'heuristic_view' },
+          { prop: 'user.roles', value: 'safelist_view' },
+          { prop: 'user.roles', value: 'signature_view' },
+          { prop: 'user.roles', value: 'signature_manage' },
+          { prop: 'user.roles', value: 'workflow_view' }
+        ],
         icon: <BuildOutlinedIcon />,
         items: [
           {
             id: 'manage.heuristics',
             text: t('drawer.manage.heuristics'),
+            userPropValidators: [{ prop: 'user.roles', value: 'heuristic_view' }],
             icon: <SimCardOutlinedIcon />,
             route: '/manage/heuristics',
             nested: true
@@ -138,6 +158,7 @@ const useMyLayout = (): AppLayoutProps => {
           {
             id: 'manage.safelist',
             text: t('drawer.manage.safelist'),
+            userPropValidators: [{ prop: 'user.roles', value: 'safelist_view' }],
             icon: <PlaylistAddCheckIcon />,
             route: '/manage/safelist',
             nested: true
@@ -145,6 +166,7 @@ const useMyLayout = (): AppLayoutProps => {
           {
             id: 'manage.signatures',
             text: t('drawer.manage.signatures'),
+            userPropValidators: [{ prop: 'user.roles', value: 'signature_view' }],
             icon: <FingerprintOutlinedIcon />,
             route: '/manage/signatures',
             nested: true
@@ -152,10 +174,7 @@ const useMyLayout = (): AppLayoutProps => {
           {
             id: 'manage.source',
             text: t('drawer.manage.source'),
-            userPropValidators: [
-              { prop: 'user.is_admin', value: true },
-              { prop: 'user.roles', value: 'signature_manager' }
-            ],
+            userPropValidators: [{ prop: 'user.roles', value: 'signature_manage' }],
             icon: <CodeOutlinedIcon />,
             route: '/manage/sources',
             nested: true
@@ -163,6 +182,7 @@ const useMyLayout = (): AppLayoutProps => {
           {
             id: 'manage.workflow',
             text: t('drawer.manage.workflow'),
+            userPropValidators: [{ prop: 'user.roles', value: 'workflow_view' }],
             icon: <BiNetworkChart />,
             route: '/manage/workflows',
             nested: true

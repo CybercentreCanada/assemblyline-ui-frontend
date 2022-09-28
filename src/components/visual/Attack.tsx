@@ -46,7 +46,7 @@ const WrappedAttack: React.FC<AttackProps> = ({
   const { isHighlighted, triggerHighlight } = useHighlighter();
   const { copy } = useClipboard();
   const { showSafeResults } = useSafeResults();
-  const { scoreToVerdict } = useALContext();
+  const { scoreToVerdict, user: currentUser } = useALContext();
 
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
 
@@ -106,10 +106,12 @@ const WrappedAttack: React.FC<AttackProps> = ({
           {CLIPBOARD_ICON}
           {t('clipboard')}
         </MenuItem>
-        <MenuItem dense onClick={handleMenuSearch}>
-          {SEARCH_ICON}
-          {t('related')}
-        </MenuItem>
+        {currentUser.roles.includes('submission_view') && (
+          <MenuItem dense onClick={handleMenuSearch}>
+            {SEARCH_ICON}
+            {t('related')}
+          </MenuItem>
+        )}
         <MenuItem dense onClick={handleMenuHighlight}>
           {HIGHLIGHT_ICON}
           {t('highlight')}

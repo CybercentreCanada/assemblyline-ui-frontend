@@ -54,20 +54,40 @@ export default function SiteMap() {
   };
 
   const reqMapColor = {
-    user: 'default',
-    signature_importer: 'warning',
-    signature_manager: 'info',
-    admin: 'error'
+    signature_import: 'success',
+    signature_manage: 'info',
+    signature_view: 'default',
+    signature_download: 'warning',
+    administration: 'error',
+    alert_view: 'default',
+    alert_manage: 'info',
+    safelist_view: 'default',
+    safelist_manage: 'info',
+    workflow_view: 'default',
+    workflow_manage: 'info',
+    apikey_access: 'default',
+    obo_access: 'default',
+    bundle_download: 'warning',
+    submission_create: 'success',
+    submission_view: 'default',
+    submission_delete: 'error',
+    submission_manage: 'info',
+    file_detail: 'default',
+    file_download: 'warning',
+    replay_trigger: 'default',
+    replay_system: 'info'
   };
 
   useEffect(() => {
-    apiCall({
-      method: 'GET',
-      url: '/api/site_map/',
-      onSuccess: api_data => {
-        setSiteMap(api_data.api_response);
-      }
-    });
+    if (currentUser.is_admin) {
+      apiCall({
+        method: 'GET',
+        url: '/api/site_map/',
+        onSuccess: api_data => {
+          setSiteMap(api_data.api_response);
+        }
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

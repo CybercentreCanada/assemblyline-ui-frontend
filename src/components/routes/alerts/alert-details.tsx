@@ -30,6 +30,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
 import { Link, useParams } from 'react-router-dom';
+import ForbiddenPage from '../403';
 import AlertExtendedScan from './alert-extended_scan';
 import AlertPriority from './alert-priority';
 import AlertStatus from './alert-status';
@@ -122,12 +123,12 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
   const { copy } = useClipboard();
   const [item, setItem] = useState<AlertItem>(null);
   const { id: paramId } = useParams<{ id: string }>();
-  const { configuration } = useALContext();
+  const { configuration, user: currentUser } = useALContext();
   const [metaOpen, setMetaOpen] = React.useState(false);
 
   useEffect(() => {
     const alertId = id || paramId;
-    if (alertId) {
+    if (alertId && currentUser.roles.includes('alert_view')) {
       apiCall({
         url: `/api/v4/alert/${alertId}/`,
         onSuccess: api_data => {
@@ -155,7 +156,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
     };
   }, [item]);
 
-  return (
+  return currentUser.roles.includes('alert_view') ? (
     <PageFullWidth margin={!alert ? 4 : 1}>
       {c12nDef.enforce && (
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: theme.spacing(2) }}>
@@ -170,21 +171,23 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
             <Grid item xs>
               <Typography variant="h4">{t('detail.title')}</Typography>
             </Grid>
-            <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
-              {item ? (
-                <Tooltip title={t('submission')}>
-                  <IconButton
-                    component={Link}
-                    style={{ color: theme.palette.action.active }}
-                    to={`/submission/${item.sid}`}
-                  >
-                    <AmpStoriesOutlinedIcon />
-                  </IconButton>
-                </Tooltip>
-              ) : (
-                <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-              )}
-            </Grid>
+            {currentUser.roles.includes('submission_view') && (
+              <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
+                {item ? (
+                  <Tooltip title={t('submission')}>
+                    <IconButton
+                      component={Link}
+                      style={{ color: theme.palette.action.active }}
+                      to={`/submission/${item.sid}`}
+                    >
+                      <AmpStoriesOutlinedIcon />
+                    </IconButton>
+                  </Tooltip>
+                ) : (
+                  <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+                )}
+              </Grid>
+            )}
           </Grid>
         </div>
       )}
@@ -818,6 +821,8 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
         )}
       </div>
     </PageFullWidth>
+  ) : (
+    <ForbiddenPage />
   );
 };
 

@@ -28,7 +28,7 @@ import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Redirect } from 'react-router-dom';
+import ForbiddenPage from '../403';
 import { Source } from '../admin/service_detail';
 import { SourceDetail } from './signature_sources_details';
 
@@ -365,7 +365,7 @@ export default function SignatureSources() {
   const { apiCall } = useMyAPI();
 
   const reload = useCallback(() => {
-    if (currentUser.is_admin || currentUser.roles.indexOf('signature_manager') !== -1) {
+    if (currentUser.roles.includes('signature_manage')) {
       apiCall({
         url: '/api/v4/signature/sources/',
         onSuccess: api_data => {
@@ -374,14 +374,14 @@ export default function SignatureSources() {
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser.is_admin, currentUser.roles]);
+  }, [currentUser.roles]);
 
   useEffect(() => {
     reload();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return currentUser.is_admin || currentUser.roles.indexOf('signature_manager') !== -1 ? (
+  return currentUser.roles.includes('signature_manage') ? (
     <PageFullWidth margin={4}>
       <div style={{ textAlign: 'left' }}>
         <div style={{ paddingBottom: theme.spacing(2) }}>
@@ -407,6 +407,6 @@ export default function SignatureSources() {
       </div>
     </PageFullWidth>
   ) : (
-    <Redirect to="/forbidden" />
+    <ForbiddenPage />
   );
 }

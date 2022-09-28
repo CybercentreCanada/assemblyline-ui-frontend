@@ -7,16 +7,20 @@ import { Redirect } from 'react-router-dom';
 
 export default function Admin() {
   const layout = useMyLayout();
-  const { user: currentUser } = useUser<CustomUser>();
+  const { user: currentUser, validateProps } = useUser<CustomUser>();
   let items = [];
   for (const item of layout.leftnav.elements) {
     if (item.type === 'group' && item.element.id === 'adminmenu') {
       // eslint-disable-next-line @typescript-eslint/dot-notation
-      items = item.element['items'];
+      for (const i of item.element['items']) {
+        if (validateProps(i.userPropValidators)) {
+          items.push(i);
+        }
+      }
     }
   }
 
-  return currentUser.is_admin ? (
+  return currentUser.is_admin || items.length !== 0 ? (
     <PageCenter margin={4} width="100%">
       <LinkGrid items={layout.topnav.adminMenu.length !== 0 ? layout.topnav.adminMenu : items} />
     </PageCenter>
