@@ -86,7 +86,7 @@ export const WrappedHexCursorBar = ({ store }: StoreProps) => {
 export const HexCursorBar = React.memo(
   WrappedHexCursorBar,
   (prevProps: Readonly<StoreProps>, nextProps: Readonly<StoreProps>) =>
-    prevProps.store.search.type === nextProps.store.search.type &&
+    prevProps.store.search.mode === nextProps.store.search.mode &&
     prevProps.store.offset.base === nextProps.store.offset.base &&
     prevProps.store.cursor.index === nextProps.store.cursor.index
 );

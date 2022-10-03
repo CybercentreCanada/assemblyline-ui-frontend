@@ -7,9 +7,9 @@ import {
   DispatchersConfig,
   isArrowKey,
   isCopyKey,
-  isFocus,
   isHomeEndKey,
   isPageKey,
+  isType,
   Store
 } from '..';
 
@@ -56,7 +56,7 @@ export const useBodyDispatcher = (dispatch: Dispatch): BodyDispatchers => {
 
   const onCursorKeyDown: BodyDispatchers['onCursorKeyDown'] = useCallback(
     ({ event }, { store }) => {
-      if (!(isFocus.body(store) && cursorKeyDownGuard(event))) return;
+      if (!(isType.layout.isFocusing(store, 'body') && cursorKeyDownGuard(event))) return;
       event.preventDefault();
       dispatch({ type: ACTIONS.cursorKeyDown, payload: { event } });
     },
@@ -65,7 +65,7 @@ export const useBodyDispatcher = (dispatch: Dispatch): BodyDispatchers => {
 
   const onCopyKeyDown: BodyDispatchers['onCopyKeyDown'] = useCallback(
     (_, { event, store }) => {
-      if (!(isFocus.body(store) && isCopyKey(event))) return;
+      if (!(isType.layout.isFocusing(store, 'body') && isCopyKey(event))) return;
       event.preventDefault();
       dispatch({ type: ACTIONS.copyKeyDown, payload: null, tracked: true, repeat: false });
     },
@@ -74,7 +74,7 @@ export const useBodyDispatcher = (dispatch: Dispatch): BodyDispatchers => {
 
   const onBodyMouseUp: BodyDispatchers['onBodyMouseUp'] = useCallback(
     (payload, { store, event }) => {
-      if (!isFocus.body(store) || event.button !== 0) return;
+      if (!isType.layout.isFocusing(store, 'body') || event.button !== 0) return;
       event.preventDefault();
       dispatch({ type: ACTIONS.bodyMouseUp, payload: null });
     },

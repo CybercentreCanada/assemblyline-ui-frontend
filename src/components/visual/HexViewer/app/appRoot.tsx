@@ -8,11 +8,11 @@ import {
   DataProps,
   HexLayout,
   HexLoading,
-  LanguageType,
   LAYOUT_SIZE,
-  ThemeType,
-  useStore,
-  WidthType
+  ModeLanguage,
+  ModeTheme,
+  ModeWidth,
+  useStore
 } from '..';
 
 const useHexStyles = ({ y = 275.890625, height = 1000 }: { y: number; height: number }) =>
@@ -37,7 +37,7 @@ const WrappedAppRoot = ({ data = '' }: DataProps) => {
     y: document.getElementById('hex-viewer')?.getBoundingClientRect()?.y,
     height: window.innerHeight
   })();
-  const { store, dispatch } = useStore();
+  const { store, dispatch, update } = useStore();
 
   // Data
   React.useEffect(() => {
@@ -48,14 +48,14 @@ const WrappedAppRoot = ({ data = '' }: DataProps) => {
   // Theme
   const { theme: appTheme } = useAppContext();
   React.useEffect(() => {
-    dispatch({ type: ACTIONS.appThemeTypeChange, payload: { themeType: appTheme as ThemeType } });
-  }, [appTheme, dispatch]);
+    update.store.mode.setTheme(appTheme as ModeTheme);
+  }, [appTheme, update]);
 
   // Language
   const { i18n } = useTranslation(['hexViewer']);
   React.useEffect(() => {
-    dispatch({ type: ACTIONS.appLanguageTypeChange, payload: { languageType: i18n.language as LanguageType } });
-  }, [dispatch, i18n.language]);
+    update.store.mode.setLanguage(i18n.language as ModeLanguage);
+  }, [i18n.language, update]);
 
   // Width
   const theme = useTheme();
@@ -66,24 +66,30 @@ const WrappedAppRoot = ({ data = '' }: DataProps) => {
   const isXL = useMediaQuery(theme.breakpoints.down('xl'));
 
   React.useEffect(() => {
-    const widthType: WidthType = isXS ? 'xs' : isSM ? 'sm' : isMD ? 'md' : isLG ? 'lg' : isXL ? 'xl' : 'wd';
-    dispatch({ type: ACTIONS.appWidthTypeChange, payload: { widthType } });
-  }, [dispatch, isLG, isMD, isSM, isXL, isXS]);
+    const width: ModeWidth = isXS ? 'xs' : isSM ? 'sm' : isMD ? 'md' : isLG ? 'lg' : isXL ? 'xl' : 'wd';
+    update.store.mode.setWidth(width);
+  }, [isLG, isMD, isSM, isXL, isXS, update]);
 
   // History
 
   // Setting
-  React.useEffect(() => dispatch({ type: ACTIONS.settingLoad, payload: null }), [dispatch]);
+  React.useEffect(() => {
+    dispatch({ type: ACTIONS.settingFetch, payload: null });
+  }, [dispatch]);
+  React.useEffect(() => {
+    if (store.loading.conditions.hasSettingsFetched) dispatch({ type: ACTIONS.settingLoad, payload: null });
+  }, [dispatch, store.loading.conditions.hasSettingsFetched]);
 
   // Location
   React.useEffect(() => {
-    if (!store.location.loaded) dispatch({ type: ACTIONS.appLocationInit, payload: null });
-  }, [dispatch, store.location.loaded]);
+    if (store.loading.conditions.hasSettingsFetched && store.loading.conditions.hasSettingsLoaded)
+      dispatch({ type: ACTIONS.locationLoad, payload: null });
+  }, [dispatch, store.loading.conditions.hasSettingsFetched, store.loading.conditions.hasSettingsLoaded]);
 
   return (
     <div className={clsx(classes.root, window.innerHeight.valueOf() < 1000 && classes.widescreen)}>
       <HexLoading store={store} />
-      {store.hex.codes.size !== 0 && store.location.loaded && <HexLayout store={store} />}
+      {store.hex.codes.size !== 0 && store.loading.conditions.hasLocationInit && <HexLayout store={store} />}
     </div>
   );
 };

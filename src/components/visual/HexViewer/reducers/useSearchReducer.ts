@@ -3,55 +3,37 @@ import {
   addPadToBytes,
   clampSelectedSearchIndex,
   countHexcode,
-  executeSearchRegex,
-  findSearchPattern,
+  DEFAULT_STORE,
+  executeSearchHexRegex,
+  executeSearchTextRegex,
   formatHexString,
-  formatTextString,
-  getSearchIndexes,
-  getSelectedSearchIndexes,
-  getTextExpression,
+  get16BitsDirectTextExpression,
+  get8BitsDirectTextExpression,
+  getSearchResultsIndexes,
+  getSelectedSearchResultIndexes,
+  getWideTextExpression,
   isAction,
-  isSearchType,
+  isType,
   nextSearchIndex,
   ReducerHandler,
   Reducers,
   renderArrayClass,
   RenderHandler,
-  SearchType,
+  SEARCH_STATE,
+  setStore,
+  setStoreWithKeys,
   Store,
   useCellStyles,
   UseReducer
 } from '..';
 
-export type SearchState = {
-  search: {
-    type: SearchType;
-    inputValue: string;
-    value: string;
-    length: number;
-    indexes: Array<number>;
-    selectedIndex: number;
-  };
-};
-
-export const useSearchReducer: UseReducer<SearchState> = () => {
+export const useSearchReducer: UseReducer = () => {
   const classes = useCellStyles();
-
-  const initialState: SearchState = {
-    search: {
-      type: 'text',
-      inputValue: '',
-      value: '',
-      length: 0,
-      indexes: [],
-      selectedIndex: null
-    }
-  };
 
   const searchRender = useCallback(
     (prevStore: Store, nextStore: Store): void => {
-      const prev = getSearchIndexes(prevStore);
-      const next = getSearchIndexes(nextStore);
+      const prev = getSearchResultsIndexes(prevStore);
+      const next = getSearchResultsIndexes(nextStore);
       renderArrayClass(prev, next, classes.search, nextStore.cellsRendered);
     },
     [classes]
@@ -59,8 +41,8 @@ export const useSearchReducer: UseReducer<SearchState> = () => {
 
   const selectedSearchRender = useCallback(
     (prevStore: Store, nextStore: Store): void => {
-      const prev = getSelectedSearchIndexes(prevStore);
-      const next = getSelectedSearchIndexes(nextStore);
+      const prev = getSelectedSearchResultIndexes(prevStore);
+      const next = getSelectedSearchResultIndexes(nextStore);
       renderArrayClass(prev, next, classes.selectedSearch, nextStore.cellsRendered);
     },
     [classes]
@@ -68,47 +50,50 @@ export const useSearchReducer: UseReducer<SearchState> = () => {
 
   const handleSearchInputValueChange = useCallback((store: Store, inputValue: string): Store => {
     let value = inputValue,
-      length = 0,
-      indexes = [],
-      selectedIndex = null;
+      length = 0;
 
-    if (isSearchType.hex(store)) {
-      value = formatHexString(inputValue);
-      const expression = value;
-      if (value !== null && value !== '') {
-        length = countHexcode(value);
-        indexes = findSearchPattern(store.hex.data, expression, length);
-        selectedIndex = nextSearchIndex(indexes, store.cursor.index);
+    let results: Array<{ index: number; length: number }> = [];
+    let selectedResult = null;
+
+    if (isType.search.mode.type(store, 'hex')) {
+      const expression = formatHexString(inputValue);
+      if (expression !== null && expression !== '') {
+        length = countHexcode(expression);
+        results = executeSearchHexRegex(store.hex.data, expression, length);
+        selectedResult = nextSearchIndex(results, store.cursor.index);
       }
-    } else if (isSearchType.text(store)) {
-      value = formatTextString(inputValue);
-      if (inputValue !== null && inputValue !== '') {
-        const expression: RegExp = getTextExpression(store, inputValue);
-        length = addPadToBytes(store, inputValue).length;
-        indexes = executeSearchRegex(store.hex.data, expression, length);
-        selectedIndex = nextSearchIndex(indexes, store.cursor.index);
+    } else if (isType.search.mode.type(store, 'text')) {
+      if (isType.search.mode.encoding(store, '8Bits') || isType.search.mode.encoding(store, 'both')) {
+        if (isType.search.mode.textSpan(store, 'direct')) {
+          const expression = get8BitsDirectTextExpression(inputValue);
+          results = [...results, ...executeSearchTextRegex(store.hex.data, expression, inputValue.length)];
+        } else {
+          const expression = getWideTextExpression(store, inputValue);
+          results = [...results, ...executeSearchTextRegex(store.hex.data, expression, inputValue.length)];
+        }
       }
+      if (isType.search.mode.encoding(store, '16Bits') || isType.search.mode.encoding(store, 'both')) {
+        if (isType.search.mode.textSpan(store, 'direct')) {
+          const expression = get16BitsDirectTextExpression(inputValue);
+          results = [...results, ...executeSearchTextRegex(store.hex.data, expression, inputValue.length * 2)];
+        } else {
+          value = addPadToBytes(store, inputValue, 4);
+          const expression = getWideTextExpression(store, value);
+          results = [...results, ...executeSearchTextRegex(store.hex.data, expression, inputValue.length * 2)];
+        }
+      }
+      results = results.sort((a, b) => a.index - b.index);
+      selectedResult = nextSearchIndex(results, store.cursor.index);
     }
-
-    return {
-      ...store,
-      search: {
-        ...store.search,
-        value: value,
-        inputValue: inputValue,
-        length: length,
-        indexes: indexes,
-        selectedIndex: selectedIndex
-      }
-    };
+    return { ...store, search: { ...store.search, inputValue, results, selectedResult } };
   }, []);
 
   const selectedSearchIndexChange: Reducers['selectedSearchIndexChange'] = useCallback((store, { index }) => {
-    return { ...store, search: { ...store.search, selectedIndex: clampSelectedSearchIndex(store, index) } };
+    return { ...store, search: { ...store.search, selectedResult: clampSelectedSearchIndex(store, index) } };
   }, []);
 
   const searchClear: Reducers['searchClear'] = useCallback(store => {
-    return { ...store, search: { ...store.search, value: '', inputValue: '', indexes: [], selectedIndex: null } };
+    return { ...store, search: { ...store.search, inputValue: '', results: [], selectedResult: null } };
   }, []);
 
   const searchValueChange: Reducers['searchBarValueChange'] = useCallback(
@@ -122,7 +107,7 @@ export const useSearchReducer: UseReducer<SearchState> = () => {
   const searchTypeChange: Reducers['searchTypeChange'] = useCallback(
     (store, { type }) => {
       const newStore = searchClear(store);
-      return { ...newStore, search: { ...newStore.search, type } };
+      return { ...newStore, search: { ...newStore.search, mode: { ...newStore.search.mode, type } } };
     },
     [searchClear]
   );
@@ -130,8 +115,8 @@ export const useSearchReducer: UseReducer<SearchState> = () => {
   const searchEnterKeyDown: Reducers['searchBarEnterKeyDown'] = useCallback(
     (store, { event }) => {
       if (event.shiftKey === undefined || event.shiftKey === null) return { ...store };
-      else if (event.shiftKey) return selectedSearchIndexChange(store, { index: store.search.selectedIndex - 1 });
-      else return selectedSearchIndexChange(store, { index: store.search.selectedIndex + 1 });
+      else if (event.shiftKey) return selectedSearchIndexChange(store, { index: store.search.selectedResult - 1 });
+      else return selectedSearchIndexChange(store, { index: store.search.selectedResult + 1 });
     },
     [selectedSearchIndexChange]
   );
@@ -144,21 +129,22 @@ export const useSearchReducer: UseReducer<SearchState> = () => {
   const searchWheel: Reducers['searchBarWheel'] = useCallback(
     (store, { event }) => {
       if (event.deltaY === undefined || event.deltaY === null) return { ...store };
-      else if (event.deltaY > 0) return selectedSearchIndexChange(store, { index: store.search.selectedIndex + 1 });
-      else return selectedSearchIndexChange(store, { index: store.search.selectedIndex - 1 });
+      else if (event.deltaY > 0) return selectedSearchIndexChange(store, { index: store.search.selectedResult + 1 });
+      else return selectedSearchIndexChange(store, { index: store.search.selectedResult - 1 });
     },
     [selectedSearchIndexChange]
   );
 
-  const searchLocation: Reducers['appLocationInit'] = useCallback(
+  const locationLoad: Reducers['locationLoad'] = useCallback(
     store => {
-      if (store.location.searchType === null) return { ...store };
-      store = { ...store, search: { ...store.search, type: store.location.searchType } };
-      if (store.location.searchValue === null) return { ...store };
-      store = handleSearchInputValueChange(store, store.location.searchValue);
-      if (store.location.searchIndex === null) return { ...store };
-      store = selectedSearchIndexChange(store, { index: store.location.searchIndex });
-      return { ...store };
+      let newStore = { ...store };
+      if (store.location.search.mode.type === null) return newStore;
+      newStore = setStore.store.search.mode.Type(newStore, store.location.search.mode.type);
+      if (DEFAULT_STORE.search.inputValue === store.location.search.inputValue) return newStore;
+      newStore = handleSearchInputValueChange(newStore, store.location.search.inputValue);
+      if (DEFAULT_STORE.search.selectedResult === store.location.search.selectedResult) return newStore;
+      newStore = selectedSearchIndexChange(newStore, { index: store.location.search.selectedResult });
+      return newStore;
     },
     [handleSearchInputValueChange, selectedSearchIndexChange]
   );
@@ -171,6 +157,26 @@ export const useSearchReducer: UseReducer<SearchState> = () => {
     [handleSearchInputValueChange, searchClear]
   );
 
+  const settingLoad: Reducers['settingLoad'] = useCallback(
+    store => setStore.store.search.Mode(store, store.setting.storage.data?.search?.mode),
+    []
+  );
+
+  const settingOpen: Reducers['settingOpen'] = useCallback(
+    store => setStoreWithKeys.store.setting.search.Mode(store, store.search.mode, ['encoding', 'textSpan']),
+    []
+  );
+
+  const settingSave: Reducers['settingSave'] = useCallback(
+    store => setStoreWithKeys.store.search.Mode(store, store.setting.search.mode, ['encoding', 'textSpan']),
+    []
+  );
+
+  const settingReset: Reducers['settingReset'] = useCallback(
+    store => setStoreWithKeys.store.setting.search.Mode(store, SEARCH_STATE.search.mode, ['encoding', 'textSpan']),
+    []
+  );
+
   const reducer: ReducerHandler = useCallback(
     ({ prevStore, store, action: { type, payload } }) => {
       if (isAction.selectedSearchIndexChange(type)) return selectedSearchIndexChange(store, payload);
@@ -180,7 +186,11 @@ export const useSearchReducer: UseReducer<SearchState> = () => {
       else if (isAction.searchBarEnterKeyDown(type)) return searchEnterKeyDown(store, payload);
       else if (isAction.searchBarEscapeKeyDown(type)) return searchEscapeKeyDown(store, payload);
       else if (isAction.searchBarWheel(type)) return searchWheel(store, payload);
-      else if (isAction.appLocationInit(type)) return searchLocation(store, payload);
+      else if (isAction.locationLoad(type)) return locationLoad(store, payload);
+      else if (isAction.settingLoad(type)) return settingLoad(store, payload);
+      else if (isAction.settingOpen(type)) return settingOpen(store, payload);
+      else if (isAction.settingSave(type)) return settingSave(store, payload);
+      else if (isAction.settingReset(type)) return settingReset(store, payload);
       else if (prevStore.search.inputValue !== store.search.inputValue)
         return searchInputValueChange(store, { inputValue: store.search.inputValue });
       else return { ...store };
@@ -190,11 +200,15 @@ export const useSearchReducer: UseReducer<SearchState> = () => {
       searchEnterKeyDown,
       searchEscapeKeyDown,
       searchInputValueChange,
-      searchLocation,
+      locationLoad,
       searchTypeChange,
       searchValueChange,
       searchWheel,
-      selectedSearchIndexChange
+      selectedSearchIndexChange,
+      settingLoad,
+      settingOpen,
+      settingReset,
+      settingSave
     ]
   );
 
@@ -208,5 +222,5 @@ export const useSearchReducer: UseReducer<SearchState> = () => {
     [searchRender, selectedSearchRender]
   );
 
-  return { initialState, reducer, render };
+  return { reducer, render };
 };

@@ -6,7 +6,7 @@ import {
   DispatchersConfig,
   isEnterKey,
   isEscapeKey,
-  isFocus,
+  isType,
   isUpDownKey,
   SearchType,
   Store
@@ -64,7 +64,11 @@ export const TOOLBAR_ACTION_TYPES: ToolbarActionTypes = {
 export const useToolbarDispatcher = (dispatch: Dispatch): ToolbarDispatchers => {
   const onSearchBarKeyDown: ToolbarDispatchers['onSearchBarKeyDown'] = useCallback(
     ({ event }, { store }) => {
-      if (!isFocus.toolbar(store) || !(isEnterKey(event) || isUpDownKey(event) || isEscapeKey(event))) return;
+      if (
+        !isType.layout.isFocusing(store, 'toolbar') ||
+        !(isEnterKey(event) || isUpDownKey(event) || isEscapeKey(event))
+      )
+        return;
       event.preventDefault();
 
       if (isEnterKey(event)) dispatch({ type: ACTIONS.searchBarEnterKeyDown, payload: { event } });
@@ -78,7 +82,7 @@ export const useToolbarDispatcher = (dispatch: Dispatch): ToolbarDispatchers => 
 
   const onSearchBarEnterKeyDown: ToolbarDispatchers['onSearchBarEnterKeyDown'] = useCallback(
     ({ event }, { store }) => {
-      if (!isFocus.toolbar(store) || !isEnterKey(event)) return;
+      if (!isType.layout.isFocusing(store, 'toolbar') || !isEnterKey(event)) return;
       event.preventDefault();
       dispatch({ type: ACTIONS.searchBarEnterKeyDown, payload: { event } });
     },
@@ -87,7 +91,7 @@ export const useToolbarDispatcher = (dispatch: Dispatch): ToolbarDispatchers => 
 
   const onSearchBarArrowKeyDown: ToolbarDispatchers['onSearchBarArrowKeyDown'] = useCallback(
     ({ event }, { store }) => {
-      if (!isFocus.toolbar(store) || !isUpDownKey(event)) return;
+      if (!isType.layout.isFocusing(store, 'toolbar') || !isUpDownKey(event)) return;
       event.preventDefault();
       dispatch({ type: ACTIONS.searchBarArrowKeyDown, payload: { event } });
     },
@@ -96,7 +100,7 @@ export const useToolbarDispatcher = (dispatch: Dispatch): ToolbarDispatchers => 
 
   const onSearchBarEscapeKeyDown: ToolbarDispatchers['onSearchBarEscapeKeyDown'] = useCallback(
     ({ event }, { store }) => {
-      if (!isFocus.toolbar(store) || !isEscapeKey(event)) return;
+      if (!isType.layout.isFocusing(store, 'toolbar') || !isEscapeKey(event)) return;
       event.preventDefault();
       dispatch({ type: ACTIONS.searchBarEscapeKeyDown, payload: { event }, tracked: true, repeat: false });
     },
