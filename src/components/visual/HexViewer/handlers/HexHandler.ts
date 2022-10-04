@@ -1,79 +1,4 @@
-import { LanguageConfig, Store } from '..';
-
-export type OffsetSettingValues = LanguageConfig<Array<{ label: string; value: number }>>;
-
-export const OFFSET_SETTING_VALUES: OffsetSettingValues = {
-  en: [
-    { label: 'Octal', value: 8 },
-    { label: 'Decimal', value: 10 },
-    { label: 'Hexadecimal', value: 16 }
-  ],
-  fr: [
-    { label: 'Octal', value: 8 },
-    { label: 'Décimal', value: 10 },
-    { label: 'Hexadécimal', value: 16 }
-  ]
-};
-
-export type EncodingType =
-  | 'hidden'
-  | 'caret'
-  | 'CP437'
-  | 'windows1252'
-  | 'ascii'
-  | 'base64'
-  | 'base64url'
-  | 'hex'
-  | 'latin1'
-  | 'ucs-2'
-  | 'ucs2'
-  | 'utf-8'
-  | 'utf16le'
-  | 'utf8';
-
-export type NonPrintableEncodingSettingValues = LanguageConfig<
-  Array<{ label: string; type: EncodingType; value: number }>
->;
-export type HigherEncodingSettingValues = LanguageConfig<Array<{ label: string; type: EncodingType; value: number }>>;
-
-export const NON_PRINTABLE_ENCODING_SETTING_VALUES: NonPrintableEncodingSettingValues = {
-  en: [
-    { label: 'Hidden', type: 'hidden', value: 0 },
-    { label: 'Caret notation', type: 'caret', value: 1 },
-    { label: 'Code page 437', type: 'CP437', value: 2 }
-  ],
-  fr: [
-    { label: 'Caché', type: 'hidden', value: 0 },
-    { label: 'Notation caret', type: 'caret', value: 1 },
-    { label: 'Code page 437', type: 'CP437', value: 2 }
-  ]
-};
-
-export const HIGHER_ENCODING_SETTING_VALUES: HigherEncodingSettingValues = {
-  en: [
-    { label: 'Hidden', type: 'hidden', value: 0 },
-    { label: 'Code page 437', type: 'CP437', value: 1 },
-    { label: 'Windows-1252', type: 'windows1252', value: 2 },
-    { label: 'ASCII', type: 'ascii', value: 3 },
-    { label: 'Latin-1', type: 'latin1', value: 4 }
-  ],
-  fr: [
-    { label: 'Caché', type: 'hidden', value: 0 },
-    { label: 'Code page 437', type: 'CP437', value: 1 },
-    { label: 'Windows-1252', type: 'windows1252', value: 2 },
-    { label: 'ASCII', type: 'ascii', value: 3 },
-    { label: 'Latin-1', type: 'latin1', value: 4 }
-  ]
-};
-
-export type HexASCIIType = 'null' | 'non printable' | 'lower ASCII' | 'higher ASCII';
-
-export type HexASCII = {
-  type: HexASCIIType;
-  regex: RegExp;
-  value?: string;
-  range: { start: number; end: number };
-};
+import { HexASCII, Store } from '..';
 
 export const ASCII: Array<HexASCII> = [
   {
@@ -393,22 +318,22 @@ export const toHexChar2 = (store: Store, hexcode: string, copy: boolean = false)
     else return store.hex.null.char;
   } else if (1 <= value && value <= 31) {
     if (copy) return NON_PRINTABLE_ASCII_TABLE.get(value).copy;
-    else if (store.hex.nonPrintable.encoding === 'hidden') return store.hex.nonPrintable.char;
-    else if (store.hex.nonPrintable.encoding === 'caret') return NON_PRINTABLE_ASCII_TABLE.get(value).caret;
-    else if (store.hex.nonPrintable.encoding === 'CP437') return NON_PRINTABLE_ASCII_TABLE.get(value).CP437;
+    else if (store.hex.nonPrintable.set === 'hidden') return store.hex.nonPrintable.char;
+    else if (store.hex.nonPrintable.set === 'caret') return NON_PRINTABLE_ASCII_TABLE.get(value).caret;
+    else if (store.hex.nonPrintable.set === 'CP437') return NON_PRINTABLE_ASCII_TABLE.get(value).CP437;
     else return NON_PRINTABLE_ASCII_TABLE.get(value).caret;
   } else if (32 <= value && value <= 127) {
     return Buffer.from(hexcode, 'hex').toString();
   } else if (128 <= value && value <= 255) {
-    if (store.hex.higher.encoding === 'hidden') return store.hex.higher.char;
-    else if (['CP437', 'windows1252'].includes(store.hex.higher.encoding))
-      return HIGHER_ASCII_TABLE.get(value)[store.hex.higher.encoding];
+    if (store.hex.higher.set === 'hidden') return store.hex.higher.char;
+    else if (['CP437', 'windows1252'].includes(store.hex.higher.set))
+      return HIGHER_ASCII_TABLE.get(value)[store.hex.higher.set];
     else if (
       ['ascii', 'base64', 'base64url', 'hex', 'latin1', 'ucs-2', 'ucs2', 'utf-8', 'utf16le', 'utf8'].includes(
-        store.hex.higher.encoding
+        store.hex.higher.set
       )
     )
-      return Buffer.from(hexcode, 'hex').toString(store.hex.higher.encoding as BufferEncoding);
+      return Buffer.from(hexcode, 'hex').toString(store.hex.higher.set as BufferEncoding);
     else return '';
   } else return '';
 };
@@ -434,3 +359,6 @@ export const clampHexIndex = (hexcodes: Map<number, string>, index: number): num
   else if (index >= hexcodes.size) return hexcodes.size - 1;
   else return index;
 };
+
+export const singleCharacterString = (value: any, base: string = undefined) =>
+  value === undefined || value === null || typeof value !== 'string' || value === '' ? base : value.slice(-1);

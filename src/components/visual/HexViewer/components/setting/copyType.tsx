@@ -1,26 +1,20 @@
-import { ChangeEvent, default as React, useLayoutEffect, useState } from 'react';
+import { ChangeEvent, default as React } from 'react';
 import { useTranslation } from 'react-i18next';
-import { NON_PRINTABLE_COPY_TYPE_VALUES, SelectField, StoreProps, useDispatch } from '../..';
+import { getItems, getType, getValue, SelectField, StoreProps, useStore } from '../..';
 
 export const WrappedCopyTypeSetting = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);
-  const { onSettingCopyNonPrintableTypeChange } = useDispatch();
-
-  const language = store.mode.languageType;
-  const [values, setValues] = useState<Array<{ label: string; value: number }>>(
-    NON_PRINTABLE_COPY_TYPE_VALUES[language]
-  );
-  useLayoutEffect(() => setValues(NON_PRINTABLE_COPY_TYPE_VALUES[language]), [language]);
+  const { update } = useStore();
 
   return (
     <>
       <SelectField
-        label={t('copy.nonPrintable.type.label')}
-        description={t('copy.nonPrintable.type.description')}
-        value={store.setting.copy.nonPrintable.type}
-        items={values}
+        label={t('copy.nonPrintable.mode.label')}
+        description={t('copy.nonPrintable.mode.description')}
+        value={getValue.copy.nonPrintable.mode(store.setting.copy.nonPrintable.mode)}
+        items={getItems.copy.nonPrintable.mode(store)}
         onChange={(event: ChangeEvent<{ name?: string; value: unknown }>) =>
-          onSettingCopyNonPrintableTypeChange({ event })
+          update.store.setting.copy.nonPrintable.setMode(getType.copy.nonPrintable.mode(event.target.value as number))
         }
       />
     </>
@@ -30,7 +24,7 @@ export const WrappedCopyTypeSetting = ({ store }: StoreProps) => {
 export const CopyTypeSetting = React.memo(
   WrappedCopyTypeSetting,
   (prevProps: Readonly<StoreProps>, nextProps: Readonly<StoreProps>) =>
-    prevProps.store.setting.copy.nonPrintable.type === nextProps.store.setting.copy.nonPrintable.type &&
+    prevProps.store.setting.copy.nonPrintable.mode === nextProps.store.setting.copy.nonPrintable.mode &&
     prevProps.store.setting.copy.nonPrintable.prefix === nextProps.store.setting.copy.nonPrintable.prefix &&
-    prevProps.store.mode.languageType === nextProps.store.mode.languageType
+    prevProps.store.mode.language === nextProps.store.mode.language
 );

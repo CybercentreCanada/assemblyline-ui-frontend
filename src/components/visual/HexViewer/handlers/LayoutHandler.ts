@@ -1,6 +1,4 @@
-import { Store } from '..';
-
-export type DisplayType = 'dual' | 'hex' | 'text';
+import { FoldingType, Store } from '..';
 
 export type LayoutSize = {
   windowHeight: number;
@@ -46,18 +44,9 @@ export const handleLayoutRowResize = (height: number) => {
   return row > 3 ? row : 3;
 };
 
-// Focus
-type Focus = { none: 'none'; toolbar: 'toolbar'; body: 'body' };
-const FOCUS: Focus = { none: 'none', toolbar: 'toolbar', body: 'body' };
-export type FocusType = typeof FOCUS[keyof typeof FOCUS];
-export type IsFocus = { [Property in FocusType]: (store: Store) => boolean };
-export const isFocus = Object.fromEntries(
-  Object.keys(FOCUS).map(key => [key, (store: Store) => store.layout.isFocusing === FOCUS[key]])
-) as IsFocus;
-
 export const handleLayoutColumnResize2 = (store: Store, width: number) => {
   const columns = COLUMNS.sort((a, b) => b.columns - a.columns).find(e => {
-    const displayType = store.layout.display.type;
+    const displayType = store.layout.display.mode;
     let size: number = 0;
 
     size += 20;
@@ -73,4 +62,57 @@ export const handleLayoutColumnResize2 = (store: Store, width: number) => {
   else if (store.hex.codes.size <= columns)
     return COLUMNS.sort((a, b) => b.columns - a.columns).find(e => e.columns <= store.hex.codes.size)?.columns;
   else return columns;
+};
+
+export const concatArray = (data: Array<string>, size: number): Array<string> => {
+  let array = [];
+  let text = '';
+  for (let i = 0; i < data.length; i++) {
+    if (i % size === size - 1) {
+      array.push(text);
+      text = '';
+    } else text = text + data[i];
+  }
+  if (text.length !== 0) array.push(text);
+  return array;
+};
+
+export const getFoldingRowMap = (
+  store: Store,
+  columnSize: number
+): Map<number, { index: number; type: FoldingType }> => {
+  const data = concatArray(store.hex.data.split(' '), columnSize);
+  let map: Map<number, { index: number; type: FoldingType }> = new Map();
+
+  let i: number = 1; // data
+  let j: number = 1; // map
+  let hiddenSection: boolean = false;
+
+  if (data.length === null || data.length === 0) return map;
+
+  map.set(0, { index: 0, type: FoldingType.SHOW });
+  if (data.length === 1) return map;
+
+  while (i < data.length - 2) {
+    if (data[i - 1] !== data[i] && data[i] !== data[i + 1]) {
+      map.set(j, { index: i, type: FoldingType.SHOW });
+      j++;
+    } else if (data[i - 1] !== data[i] && data[i] === data[i + 1]) {
+      map.set(j, { index: i, type: FoldingType.SHOW });
+      j++;
+    } else if (data[i - 1] === data[i] && data[i] !== data[i + 1] && hiddenSection) {
+      map.set(j, { index: i, type: FoldingType.SHOW });
+      hiddenSection = false;
+      j++;
+    } else if (data[i - 1] === data[i] && data[i] === data[i + 1] && !hiddenSection) {
+      map.set(j, { index: i, type: FoldingType.HIDE });
+      hiddenSection = true;
+      j++;
+    }
+    i++;
+  }
+
+  map.set(j, { index: data.length - 1, type: FoldingType.SHOW });
+
+  return map;
 };

@@ -1,54 +1,7 @@
-import { useCallback, useMemo } from 'react';
-import { isAction, ReducerHandler, Reducers, Store, UseReducer } from '..';
+import { useCallback } from 'react';
+import { isAction, ReducerHandler, Reducers, setStore, Store, UseReducer } from '..';
 
-export type LoadingState = {
-  loading: {
-    status: 'loading' | 'initialized' | 'error';
-    message: string;
-    progress: number;
-    conditions: {
-      hasAppLoaded: boolean;
-      hasSettingsLoaded: boolean;
-      hasLocationInit: boolean;
-      hasBodyRefInit: boolean;
-      hasBodyItemsRendered: boolean;
-      hasResized: boolean;
-      hasScrolled: boolean;
-    };
-    errors: {
-      isDataInvalid: boolean;
-      isHeightTooSmall: boolean;
-      isWidthTooSmall: boolean;
-    };
-  };
-};
-
-export const useLoadingReducer: UseReducer<LoadingState> = () => {
-  const initialState = useMemo<LoadingState>(
-    () => ({
-      loading: {
-        status: 'loading',
-        message: 'loading.initialization',
-        progress: 0,
-        conditions: {
-          hasAppLoaded: false,
-          hasSettingsLoaded: false,
-          hasLocationInit: false,
-          hasBodyRefInit: false,
-          hasBodyItemsRendered: false,
-          hasResized: false,
-          hasScrolled: false
-        },
-        errors: {
-          isDataInvalid: false,
-          isHeightTooSmall: false,
-          isWidthTooSmall: false
-        }
-      }
-    }),
-    []
-  );
-
+export const useLoadingReducer: UseReducer = () => {
   const handleLoading = useCallback((store: Store): Store => {
     const progress: number =
       (100 / Object.keys(store.loading.conditions).length) *
@@ -62,85 +15,108 @@ export const useLoadingReducer: UseReducer<LoadingState> = () => {
   }, []);
 
   const bodyInit: Reducers['bodyInit'] = useCallback(
-    (store, { initialized }) => {
-      store.loading.message = 'loading.bodyInit';
-      return handleLoading(store);
-    },
+    (store, { initialized }) => handleLoading(setStore.store.loading.Message(store, 'loading.bodyInit')),
     [handleLoading]
   );
 
   const appLoad: Reducers['appLoad'] = useCallback(
-    (store, { data }) => {
-      store.loading.message = 'loading.appLoad';
-      store.loading.conditions.hasAppLoaded = true;
-      store.loading.errors.isDataInvalid = data === undefined || data === null || data === '';
-      return handleLoading(store);
-    },
+    (store, { data }) =>
+      handleLoading(
+        setStore.store.Loading(store, store.loading, () => ({
+          message: 'loading.appLoad',
+          conditions: { hasAppLoaded: true },
+          errors: { isDataInvalid: data === undefined || data === null || data === '' }
+        }))
+      ),
     [handleLoading]
   );
 
   const appSave: Reducers['appSave'] = useCallback(
-    (store, payload) => {
-      store.loading.message = 'loading.appLoad';
-      store.loading.conditions.hasAppLoaded = false;
-      return handleLoading(store);
-    },
+    (store, payload) =>
+      handleLoading(
+        setStore.store.Loading(store, store.loading, () => ({
+          message: 'loading.appLoad',
+          conditions: { hasAppLoaded: false }
+        }))
+      ),
+    [handleLoading]
+  );
+
+  const settingFetch: Reducers['settingFetch'] = useCallback(
+    (store, payload) =>
+      handleLoading(
+        setStore.store.Loading(store, store.loading, () => ({
+          message: 'loading.settingFetch',
+          conditions: { hasSettingsFetched: true }
+        }))
+      ),
     [handleLoading]
   );
 
   const settingLoad: Reducers['settingLoad'] = useCallback(
-    (store, payload) => {
-      store.loading.message = 'loading.settingLoad';
-      store.loading.conditions.hasSettingsLoaded = true;
-      return handleLoading(store);
-    },
+    (store, payload) =>
+      handleLoading(
+        setStore.store.Loading(store, store.loading, () => ({
+          message: 'loading.settingLoad',
+          conditions: { hasSettingsLoaded: true }
+        }))
+      ),
     [handleLoading]
   );
 
-  const appLocationInit: Reducers['appLocationInit'] = useCallback(
-    (store, payload) => {
-      store.loading.message = 'loading.appLocationInit';
-      store.loading.conditions.hasLocationInit = true;
-      return handleLoading(store);
-    },
+  const locationLoad: Reducers['locationLoad'] = useCallback(
+    (store, payload) =>
+      handleLoading(
+        setStore.store.Loading(store, store.loading, () => ({
+          message: 'loading.appLocationInit',
+          conditions: { hasLocationInit: true }
+        }))
+      ),
     [handleLoading]
   );
 
   const bodyRefInit: Reducers['bodyRefInit'] = useCallback(
-    (store, { ready }) => {
-      store.loading.message = 'loading.bodyRefInit';
-      store.loading.conditions.hasBodyRefInit = ready;
-      return handleLoading(store);
-    },
+    (store, { ready }) =>
+      handleLoading(
+        setStore.store.Loading(store, store.loading, () => ({
+          message: 'loading.bodyRefInit',
+          conditions: { hasBodyRefInit: ready }
+        }))
+      ),
     [handleLoading]
   );
 
   const bodyResize: Reducers['bodyResize'] = useCallback(
-    (store, { height, width }) => {
-      store.loading.message = 'loading.bodyResize';
-      store.loading.conditions.hasResized = true;
-      // store.loading.errors.isHeightTooSmall = height < 400;
-      store.loading.errors.isWidthTooSmall = width < 264;
-      return handleLoading(store);
-    },
+    (store, { height, width }) =>
+      handleLoading(
+        setStore.store.Loading(store, store.loading, () => ({
+          message: 'loading.bodyResize',
+          conditions: { hasResized: true },
+          errors: { isWidthTooSmall: width < 264 }
+        }))
+      ),
     [handleLoading]
   );
 
   const bodyScrollInit: Reducers['bodyScrollInit'] = useCallback(
-    (store, payload) => {
-      store.loading.message = 'loading.bodyScrollInit';
-      store.loading.conditions.hasScrolled = true;
-      return handleLoading(store);
-    },
+    (store, payload) =>
+      handleLoading(
+        setStore.store.Loading(store, store.loading, () => ({
+          message: 'loading.bodyScrollInit',
+          conditions: { hasScrolled: true }
+        }))
+      ),
     [handleLoading]
   );
 
   const bodyItemsRendered: Reducers['bodyItemsRendered'] = useCallback(
-    (store, payload) => {
-      store.loading.message = 'loading.bodyItemsRendered';
-      store.loading.conditions.hasBodyItemsRendered = true;
-      return handleLoading(store);
-    },
+    (store, payload) =>
+      handleLoading(
+        setStore.store.Loading(store, store.loading, () => ({
+          message: 'loading.bodyItemsRendered',
+          conditions: { hasBodyItemsRendered: true }
+        }))
+      ),
     [handleLoading]
   );
 
@@ -148,8 +124,9 @@ export const useLoadingReducer: UseReducer<LoadingState> = () => {
     ({ store, action: { type, payload } }) => {
       if (isAction.appLoad(type)) return appLoad(store, payload);
       else if (isAction.appSave(type)) return appSave(store, payload);
+      else if (isAction.settingFetch(type)) return settingFetch(store, payload);
       else if (isAction.settingLoad(type)) return settingLoad(store, payload);
-      else if (isAction.appLocationInit(type)) return appLocationInit(store, payload);
+      else if (isAction.locationLoad(type)) return locationLoad(store, payload);
       else if (isAction.bodyInit(type)) return bodyInit(store, payload);
       else if (isAction.bodyRefInit(type)) return bodyRefInit(store, payload);
       else if (isAction.bodyScrollInit(type)) return bodyScrollInit(store, payload);
@@ -160,15 +137,16 @@ export const useLoadingReducer: UseReducer<LoadingState> = () => {
     [
       appLoad,
       appSave,
-      appLocationInit,
+      settingFetch,
+      settingLoad,
+      locationLoad,
       bodyInit,
-      bodyItemsRendered,
       bodyRefInit,
-      bodyResize,
       bodyScrollInit,
-      settingLoad
+      bodyResize,
+      bodyItemsRendered
     ]
   );
 
-  return { initialState, reducer };
+  return { reducer };
 };

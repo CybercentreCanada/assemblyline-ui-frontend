@@ -2,6 +2,7 @@ export * from './app';
 export * from './commons';
 export * from './commons/hooks';
 export * from './components';
+export * from './configs';
 export * from './dispatchers';
 export * from './handlers';
 export * from './models';

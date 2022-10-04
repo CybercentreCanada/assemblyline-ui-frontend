@@ -36,14 +36,14 @@ export const WrappedHexSearchIndex = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);
   const classes = useHexStyles();
   const { onSelectedSearchIndexChange } = useDispatch();
-  const { value, selectedIndex, indexes } = store.search;
+  const { inputValue, results, selectedResult } = store.search;
 
   const searchFieldPopper = React.useRef(null);
   const handleClick = useCallback((e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
     searchFieldPopper.current.open(e);
   }, []);
 
-  if (indexes.length > 0) {
+  if (results.length > 0) {
     return (
       <>
         <NumericField
@@ -54,13 +54,13 @@ export const WrappedHexSearchIndex = ({ store }: StoreProps) => {
           range="loop"
           direction="inverse"
           allowNull
-          value={selectedIndex}
+          value={selectedResult}
           min={0}
-          max={indexes.length - 1}
+          max={results.length - 1}
           base={10}
           step={1}
           offset={1}
-          endAdornment={<>{t('of') + indexes.length}</>}
+          endAdornment={<>{t('of') + results.length}</>}
           onChange={(event: React.ChangeEvent<any>) => {
             onSelectedSearchIndexChange({ index: event.target.valueAsNumber as number });
           }}
@@ -72,7 +72,7 @@ export const WrappedHexSearchIndex = ({ store }: StoreProps) => {
             color="textPrimary"
             onClick={e => handleClick(e)}
           >
-            {selectedIndex !== null ? selectedIndex + 1 + t('of') + indexes.length : t('of') + indexes.length}
+            {selectedResult !== null ? selectedResult + 1 + t('of') + results.length : t('of') + results.length}
           </Typography>
         </Tooltip>
         <FieldPopper
@@ -89,9 +89,9 @@ export const WrappedHexSearchIndex = ({ store }: StoreProps) => {
               autoFocus
               allowNull
               labelWidth={175}
-              value={selectedIndex}
+              value={selectedResult}
               min={0}
-              max={indexes.length - 1}
+              max={results.length - 1}
               base={10}
               step={1}
               offset={1}
@@ -104,7 +104,7 @@ export const WrappedHexSearchIndex = ({ store }: StoreProps) => {
         />
       </>
     );
-  } else if (value === null || value === '') {
+  } else if (inputValue === null || inputValue === '') {
     return <></>;
   } else {
     return (
@@ -120,7 +120,7 @@ export const WrappedHexSearchIndex = ({ store }: StoreProps) => {
 export const HexSearchIndex = React.memo(
   WrappedHexSearchIndex,
   (prevProps: Readonly<StoreProps>, nextProps: Readonly<StoreProps>) =>
-    prevProps.store.search.value === nextProps.store.search.value &&
-    prevProps.store.search.selectedIndex === nextProps.store.search.selectedIndex &&
-    prevProps.store.search.indexes.length === nextProps.store.search.indexes.length
+    prevProps.store.search.inputValue === nextProps.store.search.inputValue &&
+    prevProps.store.search.selectedResult === nextProps.store.search.selectedResult &&
+    prevProps.store.search.results.length === nextProps.store.search.results.length
 );
