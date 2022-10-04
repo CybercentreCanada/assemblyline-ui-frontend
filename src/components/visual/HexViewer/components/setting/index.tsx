@@ -47,14 +47,14 @@ export const WrappedHexSettings = ({ store }: StoreProps) => {
           <Grid container spacing={1} alignItems="center">
             <Grid item xs={12}>
               <Grid container spacing={1} alignItems="center">
-                <CopyTypeSetting store={store} />
-                <HexSearchModeEncodingSetting store={store} />
-                <HexSearchModeTextSpanSetting store={store} />
-                <HexSetSetting store={store} />
                 {/* <HexBodyTypeSetting store={store} /> */}
-                <HexOffsetBaseSetting store={store} />
                 <HexColumnSetting store={store} />
                 <RowFoldingSetting store={store} />
+                <HexSearchModeEncodingSetting store={store} />
+                <HexSearchModeTextSpanSetting store={store} />
+                <HexOffsetBaseSetting store={store} />
+                <CopyTypeSetting store={store} />
+                <HexSetSetting store={store} />
               </Grid>
             </Grid>
           </Grid>
