@@ -32,6 +32,10 @@
   "proxy.placeholder": "scheme://user:pass@proxy:port",
   "proxy_used": "A proxy server will be used to connect to the source",
   "title": "Signature sources",
+  "update": "Update the current signature source",
+  "update_all": "Update all signature sources for service",
+  "update.label.last_successful": "Last Successful Update",
+  "update.label.status": "Status",
   "uri": "URI (Required)",
   "username": "Username"
 }
