@@ -17,6 +17,7 @@ import CardMembershipOutlinedIcon from '@material-ui/icons/CardMembershipOutline
 import DnsOutlinedIcon from '@material-ui/icons/DnsOutlined';
 import NoEncryptionOutlinedIcon from '@material-ui/icons/NoEncryptionOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
+import SystemUpdateAltIcon from '@material-ui/icons/SystemUpdateAlt';
 import VpnKeyOutlinedIcon from '@material-ui/icons/VpnKeyOutlined';
 import { Skeleton } from '@material-ui/lab';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
@@ -28,6 +29,7 @@ import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import Moment from 'react-moment';
 import ForbiddenPage from '../403';
 import { Source } from '../admin/service_detail';
 import { SourceDetail } from './signature_sources_details';
@@ -52,6 +54,18 @@ const useStyles = makeStyles(theme => ({
       cursor: 'pointer'
     }
   },
+  errorCard: {
+    border: `1px solid ${theme.palette.divider}`,
+    borderRadius: '4px',
+    padding: '8px',
+    margin: '0.25rem 0',
+    overflow: 'auto',
+    backgroundColor: theme.palette.type === 'dark' ? '#ff000017' : '#FFE4E4',
+    wordBreak: 'break-word',
+    '&:hover': {
+      cursor: 'pointer'
+    }
+  },
   checkbox: {
     marginLeft: 0,
     width: '100%',
@@ -62,6 +76,13 @@ const useStyles = makeStyles(theme => ({
   card_title: {
     fontSize: 'larger',
     fontFamily: 'monospace'
+  },
+  card_caption: {
+    fontSize: 'smaller',
+    fontFamily: 'monospace',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
   },
   drawerPaper: {
     width: '80%',
@@ -96,7 +117,13 @@ const DEFAULT_SOURCE: Source = {
   ssl_ignore_errors: false,
   uri: '',
   username: '',
-  git_branch: ''
+  git_branch: '',
+  status: {
+    last_successful_update: '',
+    message: '',
+    state: '',
+    ts: ''
+  }
 };
 
 const WrappedSourceDetailDrawer = ({ service, base, close, reload }) => {
@@ -209,17 +236,31 @@ const WrappedSourceDetailDrawer = ({ service, base, close, reload }) => {
 
 export const SourceDetailDrawer = React.memo(WrappedSourceDetailDrawer);
 
-export const SourceCard = ({ source, onClick }) => {
-  const { t } = useTranslation(['manageSignatureSources']);
+export const SourceCard = ({ source, onClick, service }) => {
+  const { t, i18n } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
   const { c12nDef } = useALContext();
   const classes = useStyles();
+  const { apiCall } = useMyAPI();
+  const { showSuccessMessage } = useMySnackbar();
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const triggerSourceUpdate = e => {
+    apiCall({
+      method: 'PUT',
+      url: `/api/v4/signature/sources/update/${service}/?sources=${encodeURIComponent(source.name)}`,
+      onSuccess: () => {
+        showSuccessMessage('Source triggered for update.');
+      }
+    });
+    e.stopPropagation();
+  };
 
   return (
     <div style={{ paddingTop: theme.spacing(1) }}>
-      <Card className={classes.card} onClick={onClick}>
+      <Card className={source.status.state === 'ERROR' ? classes.errorCard : classes.card} onClick={onClick}>
         <div style={{ paddingBottom: theme.spacing(2) }}>
-          <div style={{ float: 'right' }}>
+          <div style={{ float: 'right', marginTop: '8px' }}>
             {source.private_key && (
               <Tooltip title={t('private_key_used')}>
                 <VpnKeyOutlinedIcon color="action" style={{ marginLeft: theme.spacing(0.5) }} />
@@ -240,9 +281,39 @@ export const SourceCard = ({ source, onClick }) => {
                 <NoEncryptionOutlinedIcon color="action" style={{ marginLeft: theme.spacing(0.5) }} />
               </Tooltip>
             )}
+            <Tooltip title={t('update')}>
+              <IconButton
+                style={{
+                  marginTop: '-16px',
+                  color:
+                    source.status.state === 'UPDATING'
+                      ? theme.palette.action.disabled
+                      : theme.palette.type === 'dark'
+                      ? theme.palette.info.light
+                      : theme.palette.info.dark
+                }}
+                disabled={source.status.state === 'UPDATING'}
+                onClick={triggerSourceUpdate}
+              >
+                <SystemUpdateAltIcon />
+              </IconButton>
+            </Tooltip>
           </div>
           <span className={classes.card_title}>{source.name}&nbsp;</span>
           <span className={classes.mono}>({source.uri})</span>
+          <div>
+            <span className={classes.card_caption}>{t('update.label.last_successful')}:&nbsp;</span>
+            <Tooltip title={source.status.last_successful_update}>
+              <Moment className={classes.card_caption} fromNow locale={i18n.language}>
+                {source.status.last_successful_update}
+              </Moment>
+            </Tooltip>
+          </div>
+          <Tooltip title={`${source.status.message} @ ${source.status.ts}`}>
+            <div className={classes.card_caption}>
+              {t('update.label.status')}: {source.status.message}
+            </div>
+          </Tooltip>
         </div>
         <Grid container>
           {source.pattern && (
@@ -300,6 +371,30 @@ const ServiceDetail = ({ service, sources, reload }) => {
   const theme = useTheme();
   const { closeGlobalDrawer, setGlobalDrawer } = useDrawer();
   const classes = useStyles();
+  const { apiCall } = useMyAPI();
+  const { showSuccessMessage } = useMySnackbar();
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const isUpdateAllDisabled = () => {
+    for (let i = 0; i < sources.length; i++) {
+      if (sources[i].status.state === 'UPDATING') {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const triggerSourceUpdateAll = () => {
+    apiCall({
+      method: 'PUT',
+      url: `/api/v4/signature/sources/update/${service}/`,
+      onSuccess: () => {
+        showSuccessMessage('Source(s) triggered for update.');
+        reload();
+      }
+    });
+  };
 
   const openDrawer = useCallback((currentService: string, source) => {
     setGlobalDrawer(
@@ -324,6 +419,21 @@ const ServiceDetail = ({ service, sources, reload }) => {
             </Typography>
           </Grid>
           <Grid item xs={2} style={{ textAlign: 'right' }}>
+            <Tooltip title={t('update_all')}>
+              <IconButton
+                style={{
+                  color: isUpdateAllDisabled()
+                    ? theme.palette.action.disabled
+                    : theme.palette.type === 'dark'
+                    ? theme.palette.info.light
+                    : theme.palette.info.dark
+                }}
+                disabled={isUpdateAllDisabled()}
+                onClick={triggerSourceUpdateAll}
+              >
+                <SystemUpdateAltIcon />
+              </IconButton>
+            </Tooltip>
             <Tooltip title={t('add_source')}>
               <IconButton
                 style={{
@@ -342,7 +452,7 @@ const ServiceDetail = ({ service, sources, reload }) => {
           <div>
             {sources.length !== 0 ? (
               sources.map((source, id) => (
-                <SourceCard key={id} source={source} onClick={() => openDrawer(service, source)} />
+                <SourceCard key={id} source={source} service={service} onClick={() => openDrawer(service, source)} />
               ))
             ) : (
               <Typography variant="subtitle1" color="textSecondary" style={{ marginTop: theme.spacing(1) }}>
@@ -353,7 +463,7 @@ const ServiceDetail = ({ service, sources, reload }) => {
         </Collapse>
       </div>
     ),
-    [classes.title, open, openDrawer, service, sources, t, theme]
+    [classes.title, isUpdateAllDisabled, open, openDrawer, service, sources, t, theme, triggerSourceUpdateAll]
   );
 };
 
@@ -372,6 +482,7 @@ export default function SignatureSources() {
           setSources(api_data.api_response);
         }
       });
+      setTimeout(reload, 15000);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser.roles]);

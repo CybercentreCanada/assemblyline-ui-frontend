@@ -18,7 +18,13 @@ const DEFAULT_SOURCE: Source = {
   ssl_ignore_errors: false,
   uri: '',
   username: '',
-  git_branch: ''
+  git_branch: '',
+  status: {
+    'last_successful_update': '',
+    'message': '',
+    'state': '',
+    'ts': ''
+  }
 };
 
 type SourceDialogProps = {
