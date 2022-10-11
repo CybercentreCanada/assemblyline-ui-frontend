@@ -236,7 +236,7 @@ const WrappedSourceDetailDrawer = ({ service, base, close, reload }) => {
 
 export const SourceDetailDrawer = React.memo(WrappedSourceDetailDrawer);
 
-export const SourceCard = ({ source, onClick, service }) => {
+export const SourceCard = ({ source, onClick, service, showDetails = true }) => {
   const { t, i18n } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
   const { c12nDef } = useALContext();
@@ -281,39 +281,45 @@ export const SourceCard = ({ source, onClick, service }) => {
                 <NoEncryptionOutlinedIcon color="action" style={{ marginLeft: theme.spacing(0.5) }} />
               </Tooltip>
             )}
-            <Tooltip title={t('update')}>
-              <IconButton
-                style={{
-                  marginTop: '-16px',
-                  color:
-                    source.status.state === 'UPDATING'
-                      ? theme.palette.action.disabled
-                      : theme.palette.type === 'dark'
-                      ? theme.palette.info.light
-                      : theme.palette.info.dark
-                }}
-                disabled={source.status.state === 'UPDATING'}
-                onClick={triggerSourceUpdate}
-              >
-                <SystemUpdateAltIcon />
-              </IconButton>
-            </Tooltip>
+            {showDetails && (
+              <Tooltip title={t('update')}>
+                <IconButton
+                  style={{
+                    marginTop: '-16px',
+                    color:
+                      source.status.state === 'UPDATING'
+                        ? theme.palette.action.disabled
+                        : theme.palette.type === 'dark'
+                        ? theme.palette.info.light
+                        : theme.palette.info.dark
+                  }}
+                  disabled={source.status.state === 'UPDATING'}
+                  onClick={triggerSourceUpdate}
+                >
+                  <SystemUpdateAltIcon />
+                </IconButton>
+              </Tooltip>
+            )}
           </div>
           <span className={classes.card_title}>{source.name}&nbsp;</span>
           <span className={classes.mono}>({source.uri})</span>
-          <div>
-            <span className={classes.card_caption}>{t('update.label.last_successful')}:&nbsp;</span>
-            <Tooltip title={source.status.last_successful_update}>
-              <Moment className={classes.card_caption} fromNow locale={i18n.language}>
-                {source.status.last_successful_update}
-              </Moment>
-            </Tooltip>
-          </div>
-          <Tooltip title={`${source.status.message} @ ${source.status.ts}`}>
-            <div className={classes.card_caption}>
-              {t('update.label.status')}: {source.status.message}
-            </div>
-          </Tooltip>
+          {showDetails && (
+            <>
+              <div>
+                <span className={classes.card_caption}>{t('update.label.last_successful')}:&nbsp;</span>
+                <Tooltip title={source.status.last_successful_update}>
+                  <Moment className={classes.card_caption} fromNow locale={i18n.language}>
+                    {source.status.last_successful_update}
+                  </Moment>
+                </Tooltip>
+              </div>
+              <Tooltip title={`${source.status.message} @ ${source.status.ts}`}>
+                <div className={classes.card_caption}>
+                  {t('update.label.status')}: {source.status.message}
+                </div>
+              </Tooltip>
+            </>
+          )}
         </div>
         <Grid container>
           {source.pattern && (
