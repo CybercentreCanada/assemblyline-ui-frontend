@@ -250,7 +250,7 @@ export const SourceCard = ({ source, onClick, service }) => {
       method: 'PUT',
       url: `/api/v4/signature/sources/update/${service}/?sources=${encodeURIComponent(source.name)}`,
       onSuccess: () => {
-        showSuccessMessage('Source triggered for update.');
+        showSuccessMessage(`${t('update.response.success')}: ${source.name} (${service})`);
       }
     });
     e.stopPropagation();
@@ -390,7 +390,7 @@ const ServiceDetail = ({ service, sources, reload }) => {
       method: 'PUT',
       url: `/api/v4/signature/sources/update/${service}/`,
       onSuccess: () => {
-        showSuccessMessage('Source(s) triggered for update.');
+        showSuccessMessage(`${t('update_all.response.success')}: ${service}`);
         reload();
       }
     });
@@ -418,7 +418,18 @@ const ServiceDetail = ({ service, sources, reload }) => {
               {service}
             </Typography>
           </Grid>
-          <Grid item xs={2} style={{ textAlign: 'right' }}>
+          <Grid item xs={2} style={{ textAlign: 'right', paddingRight: '8px' }}>
+            <Tooltip title={t('add_source')}>
+              <IconButton
+                style={{
+                  color: theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark,
+                  margin: '-4px 0'
+                }}
+                onClick={() => openDrawer(service, null)}
+              >
+                <AddCircleOutlineOutlinedIcon />
+              </IconButton>
+            </Tooltip>
             <Tooltip title={t('update_all')}>
               <IconButton
                 style={{
@@ -432,17 +443,6 @@ const ServiceDetail = ({ service, sources, reload }) => {
                 onClick={triggerSourceUpdateAll}
               >
                 <SystemUpdateAltIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={t('add_source')}>
-              <IconButton
-                style={{
-                  color: theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark,
-                  margin: '-4px 0'
-                }}
-                onClick={() => openDrawer(service, null)}
-              >
-                <AddCircleOutlineOutlinedIcon />
               </IconButton>
             </Tooltip>
           </Grid>
