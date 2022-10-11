@@ -180,6 +180,16 @@ const WrappedSourceDetailDrawer = ({ service, base, close, reload }) => {
     });
   };
 
+  const triggerSourceUpdate = () => {
+    apiCall({
+      method: 'PUT',
+      url: `/api/v4/signature/sources/update/${service}/?sources=${encodeURIComponent(source.name)}`,
+      onSuccess: () => {
+        showSuccessMessage(`${t('update.response.success')}: ${source.name} (${service})`);
+      }
+    });
+  };
+
   return (
     source && (
       <div style={{ paddingTop: theme.spacing(2) }}>
@@ -202,7 +212,7 @@ const WrappedSourceDetailDrawer = ({ service, base, close, reload }) => {
               </Typography>
             </Grid>
             {base && (
-              <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
+              <Grid item xs style={{ textAlign: 'right', flexGrow: 1 }}>
                 <Tooltip title={t('delete')}>
                   <IconButton
                     style={{
@@ -213,6 +223,24 @@ const WrappedSourceDetailDrawer = ({ service, base, close, reload }) => {
                     <RemoveCircleOutlineOutlinedIcon />
                   </IconButton>
                 </Tooltip>
+                {base && (
+                  <Tooltip title={t('update')}>
+                    <IconButton
+                      style={{
+                        color:
+                          source.status.state === 'UPDATING'
+                            ? theme.palette.action.disabled
+                            : theme.palette.type === 'dark'
+                            ? theme.palette.info.light
+                            : theme.palette.info.dark
+                      }}
+                      disabled={source.status.state === 'UPDATING'}
+                      onClick={triggerSourceUpdate}
+                    >
+                      <SystemUpdateAltIcon />
+                    </IconButton>
+                  </Tooltip>
+                )}
               </Grid>
             )}
           </Grid>
