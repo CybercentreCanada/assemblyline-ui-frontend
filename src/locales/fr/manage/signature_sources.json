@@ -31,7 +31,7 @@
   "proxy": "Serveur Proxy",
   "proxy.placeholder": "scheme://utilisateur:mot_de_passe@serveur:port",
   "proxy_used": "Un serveur proxy sera utilisé pour se connecter à la source",
-  "title": "Sources de signature",
+  "title": "Sources de mise à jour",
   "update": "Mettre à jour la source de signature actuelle",
   "update.response.success": "La source suivante a été déclenchée pour la mise à jour",
   "update_all": "Mettre à jour toutes les sources de signature pour le service",

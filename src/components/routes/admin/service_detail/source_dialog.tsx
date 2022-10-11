@@ -20,10 +20,10 @@ const DEFAULT_SOURCE: Source = {
   username: '',
   git_branch: '',
   status: {
-    'last_successful_update': '',
-    'message': '',
-    'state': '',
-    'ts': ''
+    last_successful_update: '',
+    message: '',
+    state: '',
+    ts: ''
   }
 };
 
@@ -76,6 +76,7 @@ const WrappedSourceDialog = ({ open, setOpen, source, defaults, onSave }: Source
               defaults={defaults}
               setSource={setTempSource}
               setModified={setModified}
+              showDetails={false}
             />
           </DialogContent>
           <DialogActions>

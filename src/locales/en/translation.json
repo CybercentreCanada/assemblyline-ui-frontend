@@ -44,7 +44,7 @@
   "drawer.manage.heuristics": "Heuristics",
   "drawer.manage.safelist": "Safelist",
   "drawer.manage.signatures": "Signatures",
-  "drawer.manage.source": "Signature Sources",
+  "drawer.manage.source": "Update Sources",
   "drawer.manage.workflow": "Workflows",
   "drawer.search": "Search",
   "drawer.search.alert": "Alert Index",
