@@ -39,5 +39,6 @@
   "update.label.last_successful": "Last Successful Update",
   "update.label.status": "Status",
   "uri": "URI (Required)",
-  "username": "Username"
+  "username": "Username",
+  "view_signatures": "View Signatures"
 }

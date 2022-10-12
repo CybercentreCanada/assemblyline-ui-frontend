@@ -15,6 +15,7 @@ import {
 import AddCircleOutlineOutlinedIcon from '@material-ui/icons/AddCircleOutlineOutlined';
 import CardMembershipOutlinedIcon from '@material-ui/icons/CardMembershipOutlined';
 import DnsOutlinedIcon from '@material-ui/icons/DnsOutlined';
+import FingerprintOutlinedIcon from '@material-ui/icons/FingerprintOutlined';
 import NoEncryptionOutlinedIcon from '@material-ui/icons/NoEncryptionOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
 import SystemUpdateAltIcon from '@material-ui/icons/SystemUpdateAlt';
@@ -30,6 +31,7 @@ import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
+import { useHistory } from 'react-router-dom';
 import ForbiddenPage from '../403';
 import { Source } from '../admin/service_detail';
 import { SourceDetail } from './signature_sources_details';
@@ -138,6 +140,8 @@ const WrappedSourceDetailDrawer = ({ service, base, close, reload }) => {
   const [source, setSource] = useState(null);
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
   const classes = useStyles();
+  const history = useHistory();
+  const [generatesSig, setGeneratesSig] = React.useState(null);
 
   useEffect(() => {
     if (base) {
@@ -180,6 +184,19 @@ const WrappedSourceDetailDrawer = ({ service, base, close, reload }) => {
     });
   };
 
+  const generateSignatures = () => {
+    if (generatesSig === null) {
+      apiCall({
+        method: 'GET',
+        url: `/api/v4/service/${service}/`,
+        onSuccess: response => {
+          setGeneratesSig(response.api_response.update_config.generates_signatures);
+        }
+      });
+    }
+    return generatesSig;
+  };
+
   const triggerSourceUpdate = () => {
     apiCall({
       method: 'PUT',
@@ -188,6 +205,11 @@ const WrappedSourceDetailDrawer = ({ service, base, close, reload }) => {
         showSuccessMessage(`${t('update.response.success')}: ${source.name} (${service})`);
       }
     });
+  };
+
+  const viewSourceSignatures = () => {
+    let query = `type:${service.toLowerCase()} AND source:${source.name}`;
+    history.push(`/manage/signatures/?query=${encodeURIComponent(query)}`);
   };
 
   return (
@@ -213,16 +235,18 @@ const WrappedSourceDetailDrawer = ({ service, base, close, reload }) => {
             </Grid>
             {base && (
               <Grid item xs style={{ textAlign: 'right', flexGrow: 1 }}>
-                <Tooltip title={t('delete')}>
-                  <IconButton
-                    style={{
-                      color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                    }}
-                    onClick={deleteSource}
-                  >
-                    <RemoveCircleOutlineOutlinedIcon />
-                  </IconButton>
-                </Tooltip>
+                {generateSignatures() && (
+                  <Tooltip title={t('view_signatures')}>
+                    <IconButton
+                      style={{
+                        color: theme.palette.type === 'dark' ? '#F' : '#0'
+                      }}
+                      onClick={viewSourceSignatures}
+                    >
+                      <FingerprintOutlinedIcon />
+                    </IconButton>
+                  </Tooltip>
+                )}
                 {base && (
                   <Tooltip title={t('update')}>
                     <IconButton
@@ -241,6 +265,16 @@ const WrappedSourceDetailDrawer = ({ service, base, close, reload }) => {
                     </IconButton>
                   </Tooltip>
                 )}
+                <Tooltip title={t('delete')}>
+                  <IconButton
+                    style={{
+                      color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                    }}
+                    onClick={deleteSource}
+                  >
+                    <RemoveCircleOutlineOutlinedIcon />
+                  </IconButton>
+                </Tooltip>
               </Grid>
             )}
           </Grid>
@@ -407,6 +441,22 @@ const ServiceDetail = ({ service, sources, reload }) => {
   const classes = useStyles();
   const { apiCall } = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
+  const history = useHistory();
+  const [generatesSig, setGeneratesSig] = React.useState(null);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const generateSignatures = () => {
+    if (generatesSig === null) {
+      apiCall({
+        method: 'GET',
+        url: `/api/v4/service/${service}/`,
+        onSuccess: response => {
+          setGeneratesSig(response.api_response.update_config.generates_signatures);
+        }
+      });
+    }
+    return generatesSig;
+  };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const isUpdateAllDisabled = () => {
@@ -430,6 +480,12 @@ const ServiceDetail = ({ service, sources, reload }) => {
     });
   };
 
+  // eslint-disable-next-line
+  const viewTypeSignatures = () => {
+    let query = `type:${service.toLowerCase()}`;
+    history.push(`/manage/signatures/?query=${encodeURIComponent(query)}`);
+  };
+
   const openDrawer = useCallback((currentService: string, source) => {
     setGlobalDrawer(
       <SourceDetailDrawer service={currentService} base={source} close={closeGlobalDrawer} reload={reload} />
@@ -441,7 +497,7 @@ const ServiceDetail = ({ service, sources, reload }) => {
     () => (
       <div style={{ paddingTop: theme.spacing(2) }}>
         <Grid container>
-          <Grid item xs={10} style={{ alignSelf: 'center' }}>
+          <Grid item xs={9} style={{ alignSelf: 'center' }}>
             <Typography
               variant="h6"
               className={classes.title}
@@ -452,7 +508,19 @@ const ServiceDetail = ({ service, sources, reload }) => {
               {service}
             </Typography>
           </Grid>
-          <Grid item xs={2} style={{ textAlign: 'right', paddingRight: '8px' }}>
+          <Grid item xs={3} style={{ textAlign: 'right', paddingRight: '8px' }}>
+            {generateSignatures() && (
+              <Tooltip title={t('view_signatures')}>
+                <IconButton
+                  style={{
+                    color: theme.palette.type === 'dark' ? '#F' : '#0'
+                  }}
+                  onClick={viewTypeSignatures}
+                >
+                  <FingerprintOutlinedIcon />
+                </IconButton>
+              </Tooltip>
+            )}
             <Tooltip title={t('add_source')}>
               <IconButton
                 style={{
@@ -497,7 +565,19 @@ const ServiceDetail = ({ service, sources, reload }) => {
         </Collapse>
       </div>
     ),
-    [classes.title, isUpdateAllDisabled, open, openDrawer, service, sources, t, theme, triggerSourceUpdateAll]
+    [
+      classes.title,
+      generateSignatures,
+      isUpdateAllDisabled,
+      open,
+      openDrawer,
+      service,
+      sources,
+      t,
+      theme,
+      triggerSourceUpdateAll,
+      viewTypeSignatures
+    ]
   );
 };
 

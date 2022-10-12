@@ -39,5 +39,6 @@
   "update.label.last_successful": "Dernière mise à jour réussie",
   "update.label.status": "Statut",
   "uri": "URI (obligatoire)",
-  "username": "Nom d'utilisateur"
+  "username": "Nom d'utilisateur",
+  "view_signatures": "Afficher les signatures"
 }
