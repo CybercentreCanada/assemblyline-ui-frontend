@@ -36,7 +36,14 @@ const DEFAULT_HEADER: Environment = {
   value: ''
 };
 
-const WrappedSourceDetail = ({ source, defaults, setSource, addMode = false, setModified = null }) => {
+const WrappedSourceDetail = ({
+  source,
+  defaults,
+  setSource,
+  addMode = false,
+  setModified = null,
+  showDetails = true
+}) => {
   const { t, i18n } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
   const { c12nDef } = useALContext();
@@ -424,17 +431,19 @@ const WrappedSourceDetail = ({ source, defaults, setSource, addMode = false, set
             className={classes.checkbox}
           />
         </Grid>
-        <div style={{ textAlign: 'center', paddingTop: theme.spacing(3), flexGrow: 1 }}>
-          <Typography variant="subtitle2" color="textSecondary">
-            {`${t('update.label.last_successful')}: `}
-            <Moment fromNow locale={i18n.language}>
-              {source.status.last_successful_update}
-            </Moment>
-          </Typography>
-          <Typography variant="subtitle2" color="textSecondary">
-            {`${t('update.label.status')}: ${source.status.message}`}
-          </Typography>
-        </div>
+        {showDetails && (
+          <div style={{ textAlign: 'center', paddingTop: theme.spacing(3), flexGrow: 1 }}>
+            <Typography variant="subtitle2" color="textSecondary">
+              {`${t('update.label.last_successful')}: `}
+              <Moment fromNow locale={i18n.language}>
+                {source.status.last_successful_update}
+              </Moment>
+            </Typography>
+            <Typography variant="subtitle2" color="textSecondary">
+              {`${t('update.label.status')}: ${source.status.message}`}
+            </Typography>
+          </div>
+        )}
       </Grid>
     )
   );
