@@ -30,6 +30,7 @@ import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { DiGitBranch } from 'react-icons/di';
 import Moment from 'react-moment';
 import { useHistory } from 'react-router-dom';
 import ForbiddenPage from '../403';
@@ -37,6 +38,10 @@ import { Source } from '../admin/service_detail';
 import { SourceDetail } from './signature_sources_details';
 
 const useStyles = makeStyles(theme => ({
+  actionButton: {
+    marginTop: '-16px',
+    padding: '6px'
+  },
   buttonProgress: {
     position: 'absolute',
     top: '50%',
@@ -305,6 +310,21 @@ export const SourceCard = ({ source, onClick, service, showDetails = true }) => 
   const classes = useStyles();
   const { apiCall } = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
+  const history = useHistory();
+  const [generatesSig, setGeneratesSig] = React.useState(null);
+
+  const generateSignatures = () => {
+    if (generatesSig === null) {
+      apiCall({
+        method: 'GET',
+        url: `/api/v4/service/${service}/`,
+        onSuccess: response => {
+          setGeneratesSig(response.api_response.update_config.generates_signatures);
+        }
+      });
+    }
+    return generatesSig;
+  };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const triggerSourceUpdate = e => {
@@ -316,6 +336,11 @@ export const SourceCard = ({ source, onClick, service, showDetails = true }) => 
       }
     });
     e.stopPropagation();
+  };
+
+  const viewSourceSignatures = () => {
+    let query = `type:${service.toLowerCase()} AND source:${source.name}`;
+    history.push(`/manage/signatures/?query=${encodeURIComponent(query)}`);
   };
 
   return (
@@ -344,27 +369,49 @@ export const SourceCard = ({ source, onClick, service, showDetails = true }) => 
               </Tooltip>
             )}
             {showDetails && (
-              <Tooltip title={t('update')}>
-                <IconButton
-                  style={{
-                    marginTop: '-16px',
-                    color:
-                      source.status.state === 'UPDATING'
-                        ? theme.palette.action.disabled
-                        : theme.palette.type === 'dark'
-                        ? theme.palette.info.light
-                        : theme.palette.info.dark
-                  }}
-                  disabled={source.status.state === 'UPDATING'}
-                  onClick={triggerSourceUpdate}
-                >
-                  <SystemUpdateAltIcon />
-                </IconButton>
-              </Tooltip>
+              <>
+                {generateSignatures() && (
+                  <Tooltip title={t('view_signatures')}>
+                    <IconButton
+                      className={classes.actionButton}
+                      style={{
+                        marginLeft: '12px',
+                        color: theme.palette.type === 'dark' ? '#F' : '#0'
+                      }}
+                      onClick={viewSourceSignatures}
+                    >
+                      <FingerprintOutlinedIcon />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                <Tooltip title={t('update')}>
+                  <IconButton
+                    className={classes.actionButton}
+                    style={{
+                      color:
+                        source.status.state === 'UPDATING'
+                          ? theme.palette.action.disabled
+                          : theme.palette.type === 'dark'
+                          ? theme.palette.info.light
+                          : theme.palette.info.dark
+                    }}
+                    disabled={source.status.state === 'UPDATING'}
+                    onClick={triggerSourceUpdate}
+                  >
+                    <SystemUpdateAltIcon />
+                  </IconButton>
+                </Tooltip>
+              </>
             )}
           </div>
           <span className={classes.card_title}>{source.name}&nbsp;</span>
           <span className={classes.mono}>({source.uri})</span>
+          {source.git_branch && (
+            <>
+              <DiGitBranch style={{ verticalAlign: 'text-bottom' }}></DiGitBranch>
+              <span className={classes.mono}>{source.git_branch}</span>
+            </>
+          )}
           {showDetails && (
             <>
               <div>
