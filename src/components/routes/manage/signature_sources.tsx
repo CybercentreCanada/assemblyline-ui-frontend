@@ -133,7 +133,7 @@ const DEFAULT_SOURCE: Source = {
   }
 };
 
-const WrappedSourceDetailDrawer = ({ service, base, close, reload }) => {
+const WrappedSourceDetailDrawer = ({ service, base, close, reload, generatesSignatures }) => {
   const { t } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
   const { c12nDef } = useALContext();
@@ -146,7 +146,6 @@ const WrappedSourceDetailDrawer = ({ service, base, close, reload }) => {
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
   const classes = useStyles();
   const history = useHistory();
-  const [generatesSig, setGeneratesSig] = React.useState(null);
 
   useEffect(() => {
     if (base) {
@@ -189,19 +188,6 @@ const WrappedSourceDetailDrawer = ({ service, base, close, reload }) => {
     });
   };
 
-  const generateSignatures = () => {
-    if (generatesSig === null) {
-      apiCall({
-        method: 'GET',
-        url: `/api/v4/service/${service}/`,
-        onSuccess: response => {
-          setGeneratesSig(response.api_response.update_config.generates_signatures);
-        }
-      });
-    }
-    return generatesSig;
-  };
-
   const triggerSourceUpdate = () => {
     apiCall({
       method: 'PUT',
@@ -240,7 +226,7 @@ const WrappedSourceDetailDrawer = ({ service, base, close, reload }) => {
             </Grid>
             {base && (
               <Grid item xs style={{ textAlign: 'right', flexGrow: 1 }}>
-                {generateSignatures() && (
+                {generatesSignatures && (
                   <Tooltip title={t('view_signatures')}>
                     <IconButton
                       style={{
@@ -303,7 +289,7 @@ const WrappedSourceDetailDrawer = ({ service, base, close, reload }) => {
 
 export const SourceDetailDrawer = React.memo(WrappedSourceDetailDrawer);
 
-export const SourceCard = ({ source, onClick, service, showDetails = true }) => {
+export const SourceCard = ({ source, onClick, service, generatesSignatures, showDetails = true }) => {
   const { t, i18n } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
   const { c12nDef } = useALContext();
@@ -311,20 +297,6 @@ export const SourceCard = ({ source, onClick, service, showDetails = true }) => 
   const { apiCall } = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
   const history = useHistory();
-  const [generatesSig, setGeneratesSig] = React.useState(null);
-
-  const generateSignatures = () => {
-    if (generatesSig === null) {
-      apiCall({
-        method: 'GET',
-        url: `/api/v4/service/${service}/`,
-        onSuccess: response => {
-          setGeneratesSig(response.api_response.update_config.generates_signatures);
-        }
-      });
-    }
-    return generatesSig;
-  };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const triggerSourceUpdate = e => {
@@ -370,7 +342,7 @@ export const SourceCard = ({ source, onClick, service, showDetails = true }) => 
             )}
             {showDetails && (
               <>
-                {generateSignatures() && (
+                {generatesSignatures && (
                   <Tooltip title={t('view_signatures')}>
                     <IconButton
                       className={classes.actionButton}
@@ -388,6 +360,7 @@ export const SourceCard = ({ source, onClick, service, showDetails = true }) => 
                   <IconButton
                     className={classes.actionButton}
                     style={{
+                      marginRight: '5px',
                       color:
                         source.status.state === 'UPDATING'
                           ? theme.palette.action.disabled
@@ -480,7 +453,7 @@ export const SourceCard = ({ source, onClick, service, showDetails = true }) => 
   );
 };
 
-const ServiceDetail = ({ service, sources, reload }) => {
+const ServiceDetail = ({ service, sources, reload, generatesSignatures }) => {
   const { t } = useTranslation(['manageSignatureSources']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
@@ -489,21 +462,6 @@ const ServiceDetail = ({ service, sources, reload }) => {
   const { apiCall } = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
   const history = useHistory();
-  const [generatesSig, setGeneratesSig] = React.useState(null);
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const generateSignatures = () => {
-    if (generatesSig === null) {
-      apiCall({
-        method: 'GET',
-        url: `/api/v4/service/${service}/`,
-        onSuccess: response => {
-          setGeneratesSig(response.api_response.update_config.generates_signatures);
-        }
-      });
-    }
-    return generatesSig;
-  };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const isUpdateAllDisabled = () => {
@@ -535,7 +493,13 @@ const ServiceDetail = ({ service, sources, reload }) => {
 
   const openDrawer = useCallback((currentService: string, source) => {
     setGlobalDrawer(
-      <SourceDetailDrawer service={currentService} base={source} close={closeGlobalDrawer} reload={reload} />
+      <SourceDetailDrawer
+        service={currentService}
+        base={source}
+        close={closeGlobalDrawer}
+        reload={reload}
+        generatesSignatures={generatesSignatures}
+      />
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -556,7 +520,7 @@ const ServiceDetail = ({ service, sources, reload }) => {
             </Typography>
           </Grid>
           <Grid item xs={3} style={{ textAlign: 'right', paddingRight: '8px' }}>
-            {generateSignatures() && (
+            {generatesSignatures && (
               <Tooltip title={t('view_signatures')}>
                 <IconButton
                   style={{
@@ -601,7 +565,13 @@ const ServiceDetail = ({ service, sources, reload }) => {
           <div>
             {sources.length !== 0 ? (
               sources.map((source, id) => (
-                <SourceCard key={id} source={source} service={service} onClick={() => openDrawer(service, source)} />
+                <SourceCard
+                  key={id}
+                  source={source}
+                  service={service}
+                  onClick={() => openDrawer(service, source)}
+                  generatesSignatures={generatesSignatures}
+                />
               ))
             ) : (
               <Typography variant="subtitle1" color="textSecondary" style={{ marginTop: theme.spacing(1) }}>
@@ -614,7 +584,7 @@ const ServiceDetail = ({ service, sources, reload }) => {
     ),
     [
       classes.title,
-      generateSignatures,
+      generatesSignatures,
       isUpdateAllDisabled,
       open,
       openDrawer,
@@ -665,7 +635,13 @@ export default function SignatureSources() {
 
         {sources
           ? Object.keys(sources).map((key, id) => (
-              <ServiceDetail key={id} service={key} sources={sources[key]} reload={reload} />
+              <ServiceDetail
+                key={id}
+                service={key}
+                sources={sources[key].sources}
+                reload={reload}
+                generatesSignatures={sources[key].generates_signatures}
+              />
             ))
           : [...Array(2)].map((item, i) => (
               <div key={i} style={{ marginTop: theme.spacing(2) }}>
