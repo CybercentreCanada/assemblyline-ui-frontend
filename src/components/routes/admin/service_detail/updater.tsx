@@ -339,6 +339,7 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
                   service={service.name}
                   onClick={() => handleEditSource(i)}
                   showDetails={false}
+                  generatesSignatures={service.update_config.generates_signatures}
                 />
               </div>
               <div>
