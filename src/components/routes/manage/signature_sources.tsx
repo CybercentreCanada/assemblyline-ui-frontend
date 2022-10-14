@@ -133,7 +133,7 @@ const DEFAULT_SOURCE: Source = {
   }
 };
 
-const WrappedSourceDetailDrawer = ({ service, base, close, reload, generatesSignatures }) => {
+const WrappedSourceDetailDrawer = ({ service, base, close, reload, generatesSignatures, setUpdateAll }) => {
   const { t } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
   const { c12nDef } = useALContext();
@@ -155,6 +155,8 @@ const WrappedSourceDetailDrawer = ({ service, base, close, reload, generatesSign
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [base]);
+
+  const [updateDisabled, setUpdateDisabled] = React.useState(source ? source.status.state === 'UPDATING' : false);
 
   const saveChanges = () => {
     apiCall({
@@ -194,6 +196,11 @@ const WrappedSourceDetailDrawer = ({ service, base, close, reload, generatesSign
       url: `/api/v4/signature/sources/update/${service}/?sources=${encodeURIComponent(source.name)}`,
       onSuccess: () => {
         showSuccessMessage(`${t('update.response.success')}: ${source.name} (${service})`);
+        setUpdateAll(false);
+        source.status.state = 'UPDATING';
+        source.status.message = 'Queued for update..';
+        setUpdateDisabled(true);
+        reload();
       }
     });
   };
@@ -242,14 +249,13 @@ const WrappedSourceDetailDrawer = ({ service, base, close, reload, generatesSign
                   <Tooltip title={t('update')}>
                     <IconButton
                       style={{
-                        color:
-                          source.status.state === 'UPDATING'
-                            ? theme.palette.action.disabled
-                            : theme.palette.type === 'dark'
-                            ? theme.palette.info.light
-                            : theme.palette.info.dark
+                        color: updateDisabled
+                          ? theme.palette.action.disabled
+                          : theme.palette.type === 'dark'
+                          ? theme.palette.info.light
+                          : theme.palette.info.dark
                       }}
-                      disabled={source.status.state === 'UPDATING'}
+                      disabled={updateDisabled}
                       onClick={triggerSourceUpdate}
                     >
                       <SystemUpdateAltIcon />
@@ -303,7 +309,6 @@ export const SourceCard = ({
   const classes = useStyles();
   const { apiCall } = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
-  var updateDisabled = source.status.state === 'UPDATING';
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const triggerSourceUpdate = e => {
@@ -317,7 +322,6 @@ export const SourceCard = ({
         if (setUpdateAll) {
           setUpdateAll(false);
         }
-        updateDisabled = true;
       }
     });
     e.stopPropagation();
@@ -373,13 +377,14 @@ export const SourceCard = ({
                   <IconButton
                     className={classes.actionButton}
                     style={{
-                      color: updateDisabled
-                        ? theme.palette.action.disabled
-                        : theme.palette.type === 'dark'
-                        ? theme.palette.info.light
-                        : theme.palette.info.dark
+                      color:
+                        source.status.state === 'UPDATING'
+                          ? theme.palette.action.disabled
+                          : theme.palette.type === 'dark'
+                          ? theme.palette.info.light
+                          : theme.palette.info.dark
                     }}
-                    disabled={updateDisabled}
+                    disabled={source.status.state === 'UPDATING'}
                     onClick={triggerSourceUpdate}
                   >
                     <SystemUpdateAltIcon />
@@ -507,6 +512,7 @@ const ServiceDetail = ({ service, sources, reload, generatesSignatures }) => {
         close={closeGlobalDrawer}
         reload={reload}
         generatesSignatures={generatesSignatures}
+        setUpdateAll={setUpdateAll}
       />
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
