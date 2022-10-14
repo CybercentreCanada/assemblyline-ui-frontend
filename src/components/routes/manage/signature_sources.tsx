@@ -6,6 +6,7 @@ import {
   Divider,
   Grid,
   IconButton,
+  Link,
   makeStyles,
   Tooltip,
   Typography,
@@ -39,8 +40,7 @@ import { SourceDetail } from './signature_sources_details';
 
 const useStyles = makeStyles(theme => ({
   actionButton: {
-    marginTop: '-16px',
-    padding: '6px'
+    marginTop: '-16px'
   },
   buttonProgress: {
     position: 'absolute',
@@ -289,14 +289,21 @@ const WrappedSourceDetailDrawer = ({ service, base, close, reload, generatesSign
 
 export const SourceDetailDrawer = React.memo(WrappedSourceDetailDrawer);
 
-export const SourceCard = ({ source, onClick, service, generatesSignatures, showDetails = true }) => {
+export const SourceCard = ({
+  source,
+  onClick,
+  service,
+  generatesSignatures,
+  setUpdateAll = null,
+  showDetails = true
+}) => {
   const { t, i18n } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
   const { c12nDef } = useALContext();
   const classes = useStyles();
   const { apiCall } = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
-  const history = useHistory();
+  const [updateEnabled, setUpdateEnabled] = useState(source.status.state !== 'UPDATING');
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const triggerSourceUpdate = e => {
@@ -305,14 +312,15 @@ export const SourceCard = ({ source, onClick, service, generatesSignatures, show
       url: `/api/v4/signature/sources/update/${service}/?sources=${encodeURIComponent(source.name)}`,
       onSuccess: () => {
         showSuccessMessage(`${t('update.response.success')}: ${source.name} (${service})`);
+        source.status.state = 'UPDATING';
+        source.status.message = 'Queued for update...';
+        if (setUpdateAll) {
+          setUpdateAll(false);
+        }
+        setUpdateEnabled(false);
       }
     });
     e.stopPropagation();
-  };
-
-  const viewSourceSignatures = () => {
-    let query = `type:${service.toLowerCase()} AND source:${source.name}`;
-    history.push(`/manage/signatures/?query=${encodeURIComponent(query)}`);
   };
 
   return (
@@ -341,16 +349,21 @@ export const SourceCard = ({ source, onClick, service, generatesSignatures, show
               </Tooltip>
             )}
             {showDetails && (
-              <>
+              <span style={{ marginLeft: '6px' }}>
                 {generatesSignatures && (
                   <Tooltip title={t('view_signatures')}>
                     <IconButton
                       className={classes.actionButton}
+                      component={Link}
+                      href={`/manage/signatures/?query=${encodeURIComponent(
+                        `type:${service.toLowerCase()} AND source:${source.name}`
+                      )}`}
                       style={{
-                        marginLeft: '12px',
-                        color: theme.palette.type === 'dark' ? '#F' : '#0'
+                        color: theme.palette.type === 'dark' ? '#FFFFFF' : '#000000'
                       }}
-                      onClick={viewSourceSignatures}
+                      onClick={e => {
+                        e.stopPropagation();
+                      }}
                     >
                       <FingerprintOutlinedIcon />
                     </IconButton>
@@ -360,30 +373,28 @@ export const SourceCard = ({ source, onClick, service, generatesSignatures, show
                   <IconButton
                     className={classes.actionButton}
                     style={{
-                      marginRight: '5px',
-                      color:
-                        source.status.state === 'UPDATING'
-                          ? theme.palette.action.disabled
-                          : theme.palette.type === 'dark'
-                          ? theme.palette.info.light
-                          : theme.palette.info.dark
+                      color: !updateEnabled
+                        ? theme.palette.action.disabled
+                        : theme.palette.type === 'dark'
+                        ? theme.palette.info.light
+                        : theme.palette.info.dark
                     }}
-                    disabled={source.status.state === 'UPDATING'}
+                    disabled={!updateEnabled}
                     onClick={triggerSourceUpdate}
                   >
                     <SystemUpdateAltIcon />
                   </IconButton>
                 </Tooltip>
-              </>
+              </span>
             )}
           </div>
           <span className={classes.card_title}>{source.name}&nbsp;</span>
-          <span className={classes.mono}>({source.uri})</span>
+          <span className={classes.mono}>({source.uri})&nbsp;</span>
           {source.git_branch && (
-            <>
+            <span>
               <DiGitBranch style={{ verticalAlign: 'text-bottom' }}></DiGitBranch>
               <span className={classes.mono}>{source.git_branch}</span>
-            </>
+            </span>
           )}
           {showDetails && (
             <>
@@ -461,17 +472,15 @@ const ServiceDetail = ({ service, sources, reload, generatesSignatures }) => {
   const classes = useStyles();
   const { apiCall } = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
-  const history = useHistory();
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const isUpdateAllDisabled = () => {
+  const [updateAll, setUpdateAll] = React.useState(() => {
+    // If any are updating, disable button
     for (let i = 0; i < sources.length; i++) {
       if (sources[i].status.state === 'UPDATING') {
-        return true;
+        return false;
       }
     }
-    return false;
-  };
+    return true;
+  });
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const triggerSourceUpdateAll = () => {
@@ -480,15 +489,14 @@ const ServiceDetail = ({ service, sources, reload, generatesSignatures }) => {
       url: `/api/v4/signature/sources/update/${service}/`,
       onSuccess: () => {
         showSuccessMessage(`${t('update_all.response.success')}: ${service}`);
+        setUpdateAll(false);
+        for (let i = 0; i < sources.length; i++) {
+          sources[i].status.state = 'UPDATING';
+          sources[i].status.message = 'Queued for update...';
+        }
         reload();
       }
     });
-  };
-
-  // eslint-disable-next-line
-  const viewTypeSignatures = () => {
-    let query = `type:${service.toLowerCase()}`;
-    history.push(`/manage/signatures/?query=${encodeURIComponent(query)}`);
   };
 
   const openDrawer = useCallback((currentService: string, source) => {
@@ -520,18 +528,6 @@ const ServiceDetail = ({ service, sources, reload, generatesSignatures }) => {
             </Typography>
           </Grid>
           <Grid item xs={3} style={{ textAlign: 'right', paddingRight: '8px' }}>
-            {generatesSignatures && (
-              <Tooltip title={t('view_signatures')}>
-                <IconButton
-                  style={{
-                    color: theme.palette.type === 'dark' ? '#F' : '#0'
-                  }}
-                  onClick={viewTypeSignatures}
-                >
-                  <FingerprintOutlinedIcon />
-                </IconButton>
-              </Tooltip>
-            )}
             <Tooltip title={t('add_source')}>
               <IconButton
                 style={{
@@ -543,21 +539,36 @@ const ServiceDetail = ({ service, sources, reload, generatesSignatures }) => {
                 <AddCircleOutlineOutlinedIcon />
               </IconButton>
             </Tooltip>
-            <Tooltip title={t('update_all')}>
-              <IconButton
-                style={{
-                  color: isUpdateAllDisabled()
-                    ? theme.palette.action.disabled
-                    : theme.palette.type === 'dark'
-                    ? theme.palette.info.light
-                    : theme.palette.info.dark
-                }}
-                disabled={isUpdateAllDisabled()}
-                onClick={triggerSourceUpdateAll}
-              >
-                <SystemUpdateAltIcon />
-              </IconButton>
-            </Tooltip>
+            {generatesSignatures && (
+              <Tooltip title={t('view_signatures')}>
+                <IconButton
+                  component={Link}
+                  style={{
+                    color: theme.palette.type === 'dark' ? '#FFFFFF' : '#000000'
+                  }}
+                  href={`/manage/signatures/?query=${encodeURIComponent(`type:${service.toLowerCase()}`)}`}
+                >
+                  <FingerprintOutlinedIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+            {sources.length !== 0 && (
+              <Tooltip title={t('update_all')}>
+                <IconButton
+                  style={{
+                    color: !updateAll
+                      ? theme.palette.action.disabled
+                      : theme.palette.type === 'dark'
+                      ? theme.palette.info.light
+                      : theme.palette.info.dark
+                  }}
+                  disabled={!updateAll}
+                  onClick={triggerSourceUpdateAll}
+                >
+                  <SystemUpdateAltIcon />
+                </IconButton>
+              </Tooltip>
+            )}
           </Grid>
         </Grid>
         <Divider />
@@ -571,6 +582,7 @@ const ServiceDetail = ({ service, sources, reload, generatesSignatures }) => {
                   service={service}
                   onClick={() => openDrawer(service, source)}
                   generatesSignatures={generatesSignatures}
+                  setUpdateAll={setUpdateAll}
                 />
               ))
             ) : (
@@ -585,7 +597,6 @@ const ServiceDetail = ({ service, sources, reload, generatesSignatures }) => {
     [
       classes.title,
       generatesSignatures,
-      isUpdateAllDisabled,
       open,
       openDrawer,
       service,
@@ -593,7 +604,7 @@ const ServiceDetail = ({ service, sources, reload, generatesSignatures }) => {
       t,
       theme,
       triggerSourceUpdateAll,
-      viewTypeSignatures
+      updateAll
     ]
   );
 };
