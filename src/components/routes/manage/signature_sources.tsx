@@ -303,7 +303,7 @@ export const SourceCard = ({
   const classes = useStyles();
   const { apiCall } = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
-  const [updateEnabled, setUpdateEnabled] = useState(source.status.state !== 'UPDATING');
+  var updateDisabled = source.status.state === 'UPDATING';
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const triggerSourceUpdate = e => {
@@ -313,11 +313,11 @@ export const SourceCard = ({
       onSuccess: () => {
         showSuccessMessage(`${t('update.response.success')}: ${source.name} (${service})`);
         source.status.state = 'UPDATING';
-        source.status.message = 'Queued for update...';
+        source.status.message = 'Queued for update..';
         if (setUpdateAll) {
           setUpdateAll(false);
         }
-        setUpdateEnabled(false);
+        updateDisabled = true;
       }
     });
     e.stopPropagation();
@@ -373,13 +373,13 @@ export const SourceCard = ({
                   <IconButton
                     className={classes.actionButton}
                     style={{
-                      color: !updateEnabled
+                      color: updateDisabled
                         ? theme.palette.action.disabled
                         : theme.palette.type === 'dark'
                         ? theme.palette.info.light
                         : theme.palette.info.dark
                     }}
-                    disabled={!updateEnabled}
+                    disabled={updateDisabled}
                     onClick={triggerSourceUpdate}
                   >
                     <SystemUpdateAltIcon />
@@ -492,7 +492,7 @@ const ServiceDetail = ({ service, sources, reload, generatesSignatures }) => {
         setUpdateAll(false);
         for (let i = 0; i < sources.length; i++) {
           sources[i].status.state = 'UPDATING';
-          sources[i].status.message = 'Queued for update...';
+          sources[i].status.message = 'Queued for update..';
         }
         reload();
       }
