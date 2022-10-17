@@ -133,7 +133,13 @@ const DEFAULT_SOURCE: Source = {
   }
 };
 
-const WrappedSourceDetailDrawer = ({ service, base, close, reload, generatesSignatures, setUpdateAll }) => {
+const isSourceUpdating = (source: Source) => source.status.state === 'UPDATING';
+const queueSourceUpdate = (source: Source) => ({
+  ...source,
+  status: { ...source.status, state: 'UPDATING', message: 'Queued for update..' }
+});
+
+const WrappedSourceDetailDrawer = ({ service, base, close, reload, generatesSignatures }) => {
   const { t } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
   const { c12nDef } = useALContext();
@@ -155,8 +161,6 @@ const WrappedSourceDetailDrawer = ({ service, base, close, reload, generatesSign
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [base]);
-
-  const [updateDisabled, setUpdateDisabled] = React.useState(source ? source.status.state === 'UPDATING' : false);
 
   const saveChanges = () => {
     apiCall({
@@ -196,11 +200,7 @@ const WrappedSourceDetailDrawer = ({ service, base, close, reload, generatesSign
       url: `/api/v4/signature/sources/update/${service}/?sources=${encodeURIComponent(source.name)}`,
       onSuccess: () => {
         showSuccessMessage(`${t('update.response.success')}: ${source.name} (${service})`);
-        setUpdateAll(false);
-        source.status.state = 'UPDATING';
-        source.status.message = 'Queued for update..';
-        setUpdateDisabled(true);
-        reload();
+        setSource(queueSourceUpdate(source));
       }
     });
   };
@@ -249,13 +249,13 @@ const WrappedSourceDetailDrawer = ({ service, base, close, reload, generatesSign
                   <Tooltip title={t('update')}>
                     <IconButton
                       style={{
-                        color: updateDisabled
+                        color: isSourceUpdating(source)
                           ? theme.palette.action.disabled
                           : theme.palette.type === 'dark'
                           ? theme.palette.info.light
                           : theme.palette.info.dark
                       }}
-                      disabled={updateDisabled}
+                      disabled={isSourceUpdating(source)}
                       onClick={triggerSourceUpdate}
                     >
                       <SystemUpdateAltIcon />
@@ -300,7 +300,7 @@ export const SourceCard = ({
   onClick,
   service,
   generatesSignatures,
-  setUpdateAll = null,
+  setUpdateAllEnabled = null,
   showDetails = true
 }) => {
   const { t, i18n } = useTranslation(['manageSignatureSources']);
@@ -319,8 +319,10 @@ export const SourceCard = ({
         showSuccessMessage(`${t('update.response.success')}: ${source.name} (${service})`);
         source.status.state = 'UPDATING';
         source.status.message = 'Queued for update..';
-        if (setUpdateAll) {
-          setUpdateAll(false);
+        //setSource({ ...source, status: { ...source.status, state: 'UPDATING', message: 'Queued for update..' } });
+        if (setUpdateAllEnabled) {
+          // Set the 'Update All' for service to disabled state
+          setUpdateAllEnabled(false);
         }
       }
     });
@@ -377,14 +379,13 @@ export const SourceCard = ({
                   <IconButton
                     className={classes.actionButton}
                     style={{
-                      color:
-                        source.status.state === 'UPDATING'
-                          ? theme.palette.action.disabled
-                          : theme.palette.type === 'dark'
-                          ? theme.palette.info.light
-                          : theme.palette.info.dark
+                      color: isSourceUpdating(source)
+                        ? theme.palette.action.disabled
+                        : theme.palette.type === 'dark'
+                        ? theme.palette.info.light
+                        : theme.palette.info.dark
                     }}
-                    disabled={source.status.state === 'UPDATING'}
+                    disabled={isSourceUpdating(source)}
                     onClick={triggerSourceUpdate}
                   >
                     <SystemUpdateAltIcon />
@@ -477,15 +478,10 @@ const ServiceDetail = ({ service, sources, reload, generatesSignatures }) => {
   const classes = useStyles();
   const { apiCall } = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
-  const [updateAll, setUpdateAll] = React.useState(() => {
-    // If any are updating, disable button
-    for (let i = 0; i < sources.length; i++) {
-      if (sources[i].status.state === 'UPDATING') {
-        return false;
-      }
-    }
-    return true;
-  });
+  const [serviceSources, setServiceSources] = React.useState(sources);
+  const [updateAllEnabled, setUpdateAllEnabled] = React.useState(
+    serviceSources ? !serviceSources.some(isSourceUpdating) : true
+  );
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const triggerSourceUpdateAll = () => {
@@ -494,12 +490,8 @@ const ServiceDetail = ({ service, sources, reload, generatesSignatures }) => {
       url: `/api/v4/signature/sources/update/${service}/`,
       onSuccess: () => {
         showSuccessMessage(`${t('update_all.response.success')}: ${service}`);
-        setUpdateAll(false);
-        for (let i = 0; i < sources.length; i++) {
-          sources[i].status.state = 'UPDATING';
-          sources[i].status.message = 'Queued for update..';
-        }
-        reload();
+        setServiceSources(sources.map(source => queueSourceUpdate(source)));
+        setUpdateAllEnabled(false);
       }
     });
   };
@@ -512,7 +504,6 @@ const ServiceDetail = ({ service, sources, reload, generatesSignatures }) => {
         close={closeGlobalDrawer}
         reload={reload}
         generatesSignatures={generatesSignatures}
-        setUpdateAll={setUpdateAll}
       />
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -562,13 +553,13 @@ const ServiceDetail = ({ service, sources, reload, generatesSignatures }) => {
               <Tooltip title={t('update_all')}>
                 <IconButton
                   style={{
-                    color: !updateAll
+                    color: !updateAllEnabled
                       ? theme.palette.action.disabled
                       : theme.palette.type === 'dark'
                       ? theme.palette.info.light
                       : theme.palette.info.dark
                   }}
-                  disabled={!updateAll}
+                  disabled={!updateAllEnabled}
                   onClick={triggerSourceUpdateAll}
                 >
                   <SystemUpdateAltIcon />
@@ -580,15 +571,15 @@ const ServiceDetail = ({ service, sources, reload, generatesSignatures }) => {
         <Divider />
         <Collapse in={open} timeout="auto">
           <div>
-            {sources.length !== 0 ? (
-              sources.map((source, id) => (
+            {serviceSources.length !== 0 ? (
+              serviceSources.map((source, id) => (
                 <SourceCard
                   key={id}
                   source={source}
                   service={service}
                   onClick={() => openDrawer(service, source)}
                   generatesSignatures={generatesSignatures}
-                  setUpdateAll={setUpdateAll}
+                  setUpdateAllEnabled={setUpdateAllEnabled}
                 />
               ))
             ) : (
@@ -606,11 +597,12 @@ const ServiceDetail = ({ service, sources, reload, generatesSignatures }) => {
       open,
       openDrawer,
       service,
-      sources,
+      serviceSources,
+      sources.length,
       t,
       theme,
       triggerSourceUpdateAll,
-      updateAll
+      updateAllEnabled
     ]
   );
 };
@@ -630,7 +622,6 @@ export default function SignatureSources() {
           setSources(api_data.api_response);
         }
       });
-      setTimeout(reload, 15000);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser.roles]);
@@ -638,7 +629,12 @@ export default function SignatureSources() {
   useEffect(() => {
     reload();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const timeoutID = setTimeout(reload, 15000);
+
+    return () => {
+      clearTimeout(timeoutID);
+    };
+  }, [reload]);
 
   return currentUser.roles.includes('signature_manage') ? (
     <PageFullWidth margin={4}>
