@@ -1,13 +1,13 @@
 import { makeStyles } from '@material-ui/core';
+import clsx from 'clsx';
 import { default as React, KeyboardEvent, memo, PropsWithChildren, useMemo } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { FixedSizeList as List, ListOnItemsRenderedProps } from 'react-window';
+import { FixedSizeList, FixedSizeList as List, ListOnItemsRenderedProps } from 'react-window';
 import {
-  ACTIONS,
   HexRow,
   HexScrollBar,
   LAYOUT_SIZE,
-  scrollToWindowIndex,
+  scrollToWindowIndexAsync,
   StoreProps,
   useDispatch,
   useEventListener,
@@ -66,30 +66,34 @@ const HexTableBody = memo(({ store }: StoreProps) => {
     onBodyMouseUp,
     onScrollTouchStart,
     onScrollTouchMove,
+    onBodyRefInit,
+    onBodyScrollInit,
     onScrollTouchEnd
   } = useDispatch();
-  const { dispatch } = useStore();
-
   const bodyRef = React.useRef<HTMLDivElement>(null);
-
-  React.useLayoutEffect(() => {
-    onBodyInit({ initialized: true });
-    return () => {
-      onBodyInit({ initialized: false });
-    };
-  }, [onBodyInit]);
-
-  React.useEffect(() => {
-    if (store.initialized) {
-      dispatch({ type: ACTIONS.bodyResize, payload: bodyRef.current.getBoundingClientRect() });
-    }
-    /* eslint-disable react-hooks/exhaustive-deps */
-  }, [dispatch, store.initialized]);
 
   useEventListener('resize', () => onBodyResize(bodyRef?.current?.getBoundingClientRect()));
   useEventListener('keydown', (event: KeyboardEvent) => onCursorKeyDown({ event }, { store }));
   useEventListener('keydown', (event: KeyboardEvent) => onCopyKeyDown(undefined, { event, store }));
   useEventListener('mouseup', (event: MouseEvent) => onBodyMouseUp(undefined, { store, event }));
+
+  React.useLayoutEffect(() => {
+    if (bodyRef.current !== null && store.loading.conditions.hasBodyRefInit === false) onBodyRefInit({ ready: true });
+    else if (bodyRef.current === null && store.loading.conditions.hasBodyRefInit === true)
+      onBodyRefInit({ ready: false });
+  }, [store, onBodyInit, onBodyRefInit]);
+
+  React.useEffect(() => {
+    if (store.loading.conditions.hasBodyRefInit) onBodyResize(bodyRef.current.getBoundingClientRect());
+  }, [onBodyResize, store.loading.conditions.hasBodyRefInit]);
+
+  React.useEffect(() => {
+    if (store.loading.conditions.hasResized && !store.loading.conditions.hasScrolled) onBodyScrollInit();
+  }, [onBodyScrollInit, store.loading.conditions.hasResized, store.loading.conditions.hasScrolled]);
+
+  React.useEffect(() => {
+    if (store.loading.conditions.hasScrolled) onBodyInit({ initialized: true });
+  }, [onBodyInit, store.loading.conditions.hasScrolled]);
 
   const rowIndexes: number[] = useMemo(
     () => Array.from(Array(store.layout.row.size).keys()).map(i => i + store.scroll.rowIndex),
@@ -106,7 +110,7 @@ const HexTableBody = memo(({ store }: StoreProps) => {
       onTouchMove={(event: React.TouchEvent<HTMLDivElement>) => onScrollTouchMove({ event })}
       onTouchEnd={() => onScrollTouchEnd()}
     >
-      {store.initialized ? (
+      {store.loading.status === 'initialized' ? (
         <>
           <div className={classes.spacer} />
           <table className={classes.table}>
@@ -128,42 +132,71 @@ const HexTableBody = memo(({ store }: StoreProps) => {
 
 const HexWindowBody = memo(({ store }: StoreProps) => {
   const classes = useHexStyles();
-  const { onBodyInit, onBodyResize, onBodyItemsRendered, onCursorKeyDown, onCopyKeyDown, onBodyMouseUp } =
-    useDispatch();
+  const {
+    onBodyInit,
+    onBodyRefInit,
+    onBodyResize,
+    onBodyItemsRendered,
+    onBodyScrollInit,
+    onCursorKeyDown,
+    onCopyKeyDown,
+    onBodyMouseUp,
+    onBodyMouseLeave
+  } = useDispatch();
   const { dispatch } = useStore();
 
-  const listRef = React.useRef<any>(null);
+  const listRef = React.useRef<FixedSizeList<any>>(null);
   const bodyRef = React.useRef<HTMLDivElement>(null);
-
-  React.useLayoutEffect(() => {
-    onBodyInit({ initialized: true });
-    return () => {
-      onBodyInit({ initialized: false });
-    };
-  }, [onBodyInit]);
-
-  React.useEffect(() => {
-    if (store.initialized) {
-      dispatch({ type: ACTIONS.bodyResize, payload: bodyRef.current.getBoundingClientRect() });
-      listRef?.current?.scrollToItem(store.scroll.rowIndex, 'top');
-    }
-  }, [dispatch, store.initialized]);
 
   useEventListener('keydown', (event: KeyboardEvent) => onCursorKeyDown({ event }, { store }));
   useEventListener('keydown', (event: KeyboardEvent) => onCopyKeyDown(undefined, { event, store }));
   useEventListener('mouseup', (event: MouseEvent) => onBodyMouseUp(undefined, { store, event }));
 
+  React.useLayoutEffect(() => {
+    if (listRef.current !== null && bodyRef.current !== null && store.loading.conditions.hasBodyRefInit === false)
+      onBodyRefInit({ ready: true });
+    else if ((listRef.current === null || bodyRef.current === null) && store.loading.conditions.hasBodyRefInit === true)
+      onBodyRefInit({ ready: false });
+  }, [store, onBodyInit, onBodyRefInit]);
+
   React.useEffect(() => {
-    if (store.initialized) scrollToWindowIndex(store, listRef, store.scroll.index, store.scroll.type);
-  }, [dispatch, store.initialized, store.scroll.index, store.scroll.rowIndex, store.scroll.type]);
+    if (store.loading.conditions.hasBodyRefInit) onBodyResize(bodyRef.current.getBoundingClientRect());
+  }, [onBodyResize, store.loading.conditions.hasBodyRefInit]);
+
+  React.useEffect(() => {
+    if (store.loading.conditions.hasResized)
+      scrollToWindowIndexAsync(store, listRef, store.scroll.index, store.scroll.type).then(
+        () => !store.loading.conditions.hasScrolled && onBodyScrollInit()
+      );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    dispatch,
+    onBodyScrollInit,
+    store.loading.conditions.hasResized,
+    store.scroll.index,
+    store.scroll.rowIndex,
+    store.scroll.type
+  ]);
+
+  React.useEffect(() => {
+    const _bodyRef = bodyRef.current;
+    _bodyRef !== null && _bodyRef.addEventListener('mouseleave', () => onBodyMouseLeave());
+    return () => _bodyRef !== null && _bodyRef.removeEventListener('mouseleave', () => onBodyMouseLeave());
+  }, [onBodyMouseLeave, store.loading.status]);
 
   const Row = React.useMemo(
     () =>
       ({ index, style, data }) =>
-        store.initialized ? <WindowRow key={index} rowIndex={index} style={style} Tag={data.Tag} /> : <></>,
+        store.loading.status === 'initialized' ? (
+          <WindowRow key={index} rowIndex={index} style={style} Tag={data.Tag} />
+        ) : (
+          <></>
+        ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [store.layout.column.size, store.layout.row.size]
+    [store.layout.column.size, store.layout.row.size, store.loading.status]
   );
+
+  const { active, rows } = store.layout.folding;
 
   return (
     <AutoSizer onResize={({ height, width }: { height: number; width: number }) => onBodyResize({ height, width })}>
@@ -171,11 +204,11 @@ const HexWindowBody = memo(({ store }: StoreProps) => {
         <List
           ref={listRef}
           innerRef={bodyRef}
-          className={classes.root}
+          className={clsx(classes.root)}
           height={height - 50}
           width={width}
           itemSize={LAYOUT_SIZE.rowHeight}
-          itemCount={store.scroll.lastRowIndex}
+          itemCount={!active ? store.scroll.lastRowIndex : rows.size}
           overscanCount={store.scroll.overscanCount}
           initialScrollOffset={0}
           itemData={{
@@ -191,36 +224,40 @@ const HexWindowBody = memo(({ store }: StoreProps) => {
 });
 
 const HexBodySelector = memo(({ store }: StoreProps) => {
-  if (store.mode.bodyType === 'table') return <HexTableBody store={store} />;
-  else if (store.mode.bodyType === 'window') return <HexWindowBody store={store} />;
+  if (store.mode.body === 'table') return <HexTableBody store={store} />;
+  else if (store.mode.body === 'window') return <HexWindowBody store={store} />;
 });
 
 export const HexBody = memo(
   ({ store }: StoreProps) => <HexBodySelector store={store} />,
   (prevProps: Readonly<PropsWithChildren<StoreProps>>, nextProps: Readonly<PropsWithChildren<StoreProps>>) =>
-    prevProps.store.initialized === nextProps.store.initialized &&
+    Object.is(prevProps.store.loading, nextProps.store.loading) &&
     prevProps.store.hex.null.char === nextProps.store.hex.null.char &&
-    prevProps.store.hex.nonPrintable.encoding === nextProps.store.hex.nonPrintable.encoding &&
+    prevProps.store.hex.nonPrintable.set === nextProps.store.hex.nonPrintable.set &&
     prevProps.store.hex.nonPrintable.char === nextProps.store.hex.nonPrintable.char &&
-    prevProps.store.hex.higher.encoding === nextProps.store.hex.higher.encoding &&
+    prevProps.store.hex.higher.set === nextProps.store.hex.higher.set &&
     prevProps.store.hex.higher.char === nextProps.store.hex.higher.char &&
     prevProps.store.offset.base === nextProps.store.offset.base &&
     prevProps.store.offset.size === nextProps.store.offset.size &&
     prevProps.store.layout.row.size === nextProps.store.layout.row.size &&
     prevProps.store.layout.column.size === nextProps.store.layout.column.size &&
+    prevProps.store.layout.column.max === nextProps.store.layout.column.max &&
     prevProps.store.layout.row.auto === nextProps.store.layout.row.auto &&
+    prevProps.store.layout.row.max === nextProps.store.layout.row.max &&
     prevProps.store.layout.column.auto === nextProps.store.layout.column.auto &&
     prevProps.store.layout.isFocusing === nextProps.store.layout.isFocusing &&
-    prevProps.store.mode.bodyType === nextProps.store.mode.bodyType &&
-    prevProps.store.mode.themeType === nextProps.store.mode.themeType &&
-    prevProps.store.mode.languageType === nextProps.store.mode.languageType &&
-    prevProps.store.mode.widthType === nextProps.store.mode.widthType &&
+    prevProps.store.loading.status === nextProps.store.loading.status &&
+    prevProps.store.mode.theme === nextProps.store.mode.theme &&
+    prevProps.store.mode.language === nextProps.store.mode.language &&
+    prevProps.store.mode.width === nextProps.store.mode.width &&
     prevProps.store.scroll.index === nextProps.store.scroll.index &&
     prevProps.store.scroll.rowIndex === nextProps.store.scroll.rowIndex &&
     prevProps.store.scroll.maxRowIndex === nextProps.store.scroll.maxRowIndex &&
     prevProps.store.scroll.speed === nextProps.store.scroll.speed &&
     prevProps.store.scroll.type === nextProps.store.scroll.type &&
-    prevProps.store.select.isHighlighting === nextProps.store.select.isHighlighting
+    prevProps.store.select.isHighlighting === nextProps.store.select.isHighlighting &&
+    prevProps.store.layout.folding.active === nextProps.store.layout.folding.active &&
+    prevProps.store.layout.folding.rows.size === nextProps.store.layout.folding.rows.size
 );
 
 export default HexBody;

@@ -3,17 +3,18 @@ import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
 import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
 import PageviewOutlinedIcon from '@material-ui/icons/PageviewOutlined';
 import PlaylistAddCheckIcon from '@material-ui/icons/PlaylistAddCheck';
-import RotateLeftOutlinedIcon from '@material-ui/icons/RotateLeftOutlined';
 import ReplayOutlinedIcon from '@material-ui/icons/ReplayOutlined';
+import RotateLeftOutlinedIcon from '@material-ui/icons/RotateLeftOutlined';
 import { Skeleton } from '@material-ui/lab';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import ForbiddenPage from 'components/routes/403';
 import Classification from 'components/visual/Classification';
 import { Error } from 'components/visual/ErrorCard';
 import { AlternateResult, emptyResult, Result } from 'components/visual/ResultCard';
 import getXSRFCookie from 'helpers/xsrf';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import AttackSection from './FileDetail/attacks';
@@ -28,7 +29,6 @@ import ParentSection from './FileDetail/parents';
 import ResultSection from './FileDetail/results';
 import TagSection from './FileDetail/tags';
 import InputDialog from './InputDialog';
-
 
 type FileInfo = {
   archive_ts: string;
@@ -87,13 +87,15 @@ type FileDetailProps = {
   sid?: string;
   liveResultKeys?: string[];
   liveErrors?: Error[];
+  force?: boolean;
 };
 
 const WrappedFileDetail: React.FC<FileDetailProps> = ({
   sha256,
   sid = null,
   liveResultKeys = null,
-  liveErrors = null
+  liveErrors = null,
+  force = false
 }) => {
   const { t } = useTranslation(['fileDetail']);
   const [file, setFile] = useState<File | null>(null);
@@ -226,7 +228,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
     // eslint-disable-next-line
   }, [sha256, sid]);
 
-  return (
+  return currentUser.roles.includes('submission_view') ? (
     <div id="fileDetailTop" style={{ textAlign: 'left' }}>
       <InputDialog
         open={safelistDialog}
@@ -240,113 +242,122 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
         inputLabel={t('safelist.input')}
         text={t('safelist.text')}
       />
-      {useMemo(
-        () => (
-          <>
-            {c12nDef.enforce && (
-              <div style={{ paddingBottom: sp4, paddingTop: sp2 }}>
-                <Classification size="tiny" c12n={file ? file.file_info.classification : null} />
-              </div>
-            )}
-            <div style={{ paddingBottom: sp4 }}>
-              <Grid container alignItems="center">
-                <Grid item xs>
-                  <div>
-                    <Typography variant="h4">{t('title')}</Typography>
-                    <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
-                      {file ? fileName : <Skeleton style={{ width: '10rem' }} />}
-                    </Typography>
-                  </div>
-                </Grid>
-                <Grid item xs={12} sm>
-                  <div style={{ textAlign: 'right' }}>
-                    {file ? (
-                      <>
-                        <Tooltip title={t('related')}>
-                          <IconButton
-                            component={Link}
-                            to={`/search/submission?query=files.sha256:${file.file_info.sha256} OR results:${file.file_info.sha256}*`}
-                          >
-                            <AmpStoriesOutlinedIcon />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title={t('download')}>
-                          <IconButton
-                            component={MaterialLink}
-                            href={`/api/v4/file/download/${file.file_info.sha256}/?${
-                              fileName && file.file_info.sha256 !== fileName ? `name=${fileName}&` : ''
-                            }${sid ? `sid=${sid}&` : ''}XSRF_TOKEN=${getXSRFCookie()}`}
-                          >
-                            <GetAppOutlinedIcon color="action" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title={t('file_viewer')}>
-                          <IconButton component={Link} to={`/file/viewer/${file.file_info.sha256}`}>
-                            <PageviewOutlinedIcon />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title={t('resubmit_file')}>
-                          <IconButton component={Link} to={{pathname: "/submit", state: {hash: file.file_info.sha256, tabContext: "1", c12n: file.file_info.classification}}}>
-                            <ReplayOutlinedIcon />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title={t('resubmit_dynamic')}>
-                          <IconButton onClick={resubmit}>
-                            <RotateLeftOutlinedIcon />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title={t('safelist')}>
-                          <IconButton onClick={prepareSafelist}>
-                            <PlaylistAddCheckIcon />
-                          </IconButton>
-                        </Tooltip>
-                      </>
-                    ) : (
-                      <div style={{ display: 'inline-flex' }}>
-                        {[...Array(5)].map((_, i) => (
-                          <Skeleton
-                            key={i}
-                            variant="circle"
-                            height="2.5rem"
-                            width="2.5rem"
-                            style={{ margin: theme.spacing(0.5) }}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </Grid>
-              </Grid>
-            </div>
-          </>
-        ),
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [file, fileName, resubmit]
+      {c12nDef.enforce && (
+        <div style={{ paddingBottom: sp4, paddingTop: sp2 }}>
+          <Classification size="tiny" c12n={file ? file.file_info.classification : null} />
+        </div>
       )}
+      <div style={{ paddingBottom: sp4 }}>
+        <Grid container alignItems="center">
+          <Grid item xs>
+            <div>
+              <Typography variant="h4">{t('title')}</Typography>
+              <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
+                {file ? fileName : <Skeleton style={{ width: '10rem' }} />}
+              </Typography>
+            </div>
+          </Grid>
+          <Grid item xs={12} sm>
+            <div style={{ textAlign: 'right' }}>
+              {file ? (
+                <>
+                  <Tooltip title={t('related')}>
+                    <IconButton
+                      component={Link}
+                      to={`/search/submission?query=files.sha256:${file.file_info.sha256} OR results:${file.file_info.sha256}*`}
+                    >
+                      <AmpStoriesOutlinedIcon />
+                    </IconButton>
+                  </Tooltip>
+                  {currentUser.roles.includes('file_download') && (
+                    <Tooltip title={t('download')}>
+                      <IconButton
+                        component={MaterialLink}
+                        href={`/api/v4/file/download/${file.file_info.sha256}/?${
+                          fileName && file.file_info.sha256 !== fileName ? `name=${fileName}&` : ''
+                        }${sid ? `sid=${sid}&` : ''}XSRF_TOKEN=${getXSRFCookie()}`}
+                      >
+                        <GetAppOutlinedIcon color="action" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                  {currentUser.roles.includes('file_detail') && (
+                    <Tooltip title={t('file_viewer')}>
+                      <IconButton component={Link} to={`/file/viewer/${file.file_info.sha256}`}>
+                        <PageviewOutlinedIcon />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                  {currentUser.roles.includes('submission_create') && (
+                    <Tooltip title={t('resubmit_file')}>
+                      <IconButton
+                        component={Link}
+                        to={{
+                          pathname: '/submit',
+                          state: {
+                            hash: file.file_info.sha256,
+                            tabContext: '1',
+                            c12n: file.file_info.classification
+                          }
+                        }}
+                      >
+                        <ReplayOutlinedIcon />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                  {currentUser.roles.includes('submission_create') && (
+                    <Tooltip title={t('resubmit_dynamic')}>
+                      <IconButton onClick={resubmit}>
+                        <RotateLeftOutlinedIcon />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                  {currentUser.roles.includes('safelist_manage') && (
+                    <Tooltip title={t('safelist')}>
+                      <IconButton onClick={prepareSafelist}>
+                        <PlaylistAddCheckIcon />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                </>
+              ) : (
+                <div style={{ display: 'inline-flex' }}>
+                  {[...Array(5)].map((_, i) => (
+                    <Skeleton
+                      key={i}
+                      variant="circle"
+                      height="2.5rem"
+                      width="2.5rem"
+                      style={{ margin: theme.spacing(0.5) }}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </Grid>
+        </Grid>
+      </div>
       <div style={{ paddingBottom: sp2 }}>
         <IdentificationSection fileinfo={file ? file.file_info : null} />
         <FrequencySection fileinfo={file ? file.file_info : null} />
-        {(!file || Object.keys(file.metadata).length !== 0) && (
-          <MetadataSection metadata={file ? file.metadata : null} />
-        )}
-        {file && file.childrens && file.childrens.length !== 0 && <ChildrenSection childrens={file.childrens} />}
-        {file && file.parents && file.parents.length !== 0 && <ParentSection parents={file.parents} />}
-        {(!file || Object.keys(file.heuristics).length !== 0) && (
-          <Detection results={file ? file.results : null} heuristics={file ? file.heuristics : null} />
-        )}
-        {(!file || Object.keys(file.attack_matrix).length !== 0) && (
-          <AttackSection attacks={file ? file.attack_matrix : null} />
-        )}
-        {(!file || Object.keys(file.tags).length !== 0 || file.signatures.length !== 0) && (
-          <TagSection signatures={file ? file.signatures : null} tags={file ? file.tags : null} />
-        )}
-        {(!file || file.results.length !== 0) && (
-          <ResultSection results={file ? file.results : null} sid={sid} alternates={file ? file.alternates : null} />
-        )}
-        {(!file || file.emptys.length !== 0) && <EmptySection emptys={file ? file.emptys : null} sid={sid} />}
-        {file && file.errors.length !== 0 && <ErrorSection errors={file.errors} />}
+        <MetadataSection metadata={file ? file.metadata : null} />
+        <ChildrenSection childrens={file ? file.childrens : null} />
+        <ParentSection parents={file ? file.parents : null} />
+        <Detection results={file ? file.results : null} heuristics={file ? file.heuristics : null} force={force} />
+        <AttackSection attacks={file ? file.attack_matrix : null} force={force} />
+        <TagSection signatures={file ? file.signatures : null} tags={file ? file.tags : null} force={force} />
+        <ResultSection
+          results={file ? file.results : null}
+          sid={sid}
+          alternates={file ? file.alternates : null}
+          force={force}
+        />
+        <EmptySection emptys={file ? file.emptys : null} sid={sid} />
+        <ErrorSection errors={file ? file.errors : null} />
       </div>
     </div>
+  ) : (
+    <ForbiddenPage />
   );
 };
 

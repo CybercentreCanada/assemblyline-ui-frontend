@@ -16,6 +16,7 @@ import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
 import { Alert, Skeleton, TabContext, TabList, TabPanel } from '@material-ui/lab';
 import clsx from 'clsx';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
+import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import Empty from 'components/visual/Empty';
 import { HexViewerApp } from 'components/visual/HexViewer';
@@ -23,6 +24,7 @@ import getXSRFCookie from 'helpers/xsrf';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory, useLocation, useParams } from 'react-router-dom';
+import ForbiddenPage from '../403';
 
 type ParamProps = {
   id: string;
@@ -61,7 +63,7 @@ const useStyles = makeStyles(theme => ({
 const WrappedAsciiViewer = ({ ascii, error }) => {
   const classes = useStyles();
 
-  return ascii ? (
+  return ascii !== null && ascii !== undefined ? (
     <pre className={classes.pre}>{ascii}</pre>
   ) : error ? (
     <Alert severity="error">{error}</Alert>
@@ -93,7 +95,7 @@ const WrappedHexViewer = ({ hex, error }) => {
 const WrappedStringViewer = ({ string, error }) => {
   const classes = useStyles();
 
-  return string ? (
+  return string !== null && string !== undefined ? (
     <pre className={classes.pre}>{string}</pre>
   ) : error ? (
     <Alert severity="error">{error}</Alert>
@@ -135,6 +137,7 @@ const FileViewer = () => {
   const [imageAllowed, setImageAllowed] = useState(false);
   const [tab, setTab] = useState(null);
   const [sha256, setSha256] = useState(null);
+  const { user: currentUser } = useALContext();
 
   const handleChangeTab = (event, newTab) => {
     const currentTab = location.hash.substring(1, location.hash.length) || 'ascii';
@@ -228,7 +231,7 @@ const FileViewer = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sha256, tab]);
 
-  return (
+  return currentUser.roles.includes('file_detail') ? (
     <PageCenter margin={4} width="100%" textAlign="left" maxWidth="100%">
       <div className={classes.flexContainer}>
         <Grid className={classes.flexItem} container alignItems="center">
@@ -240,24 +243,30 @@ const FileViewer = () => {
           </Grid>
           <Grid item xs={12} sm>
             <div style={{ textAlign: 'right' }}>
-              <Tooltip title={t('detail')}>
-                <IconButton component={Link} to={`/file/detail/${id}`}>
-                  <DescriptionOutlinedIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={t('related')}>
-                <IconButton component={Link} to={`/search/submission?query=files.sha256:${id} OR results:${id}*`}>
-                  <AmpStoriesOutlinedIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={t('download')}>
-                <IconButton
-                  component={MaterialLink}
-                  href={`/api/v4/file/download/${id}/?XSRF_TOKEN=${getXSRFCookie()}`}
-                >
-                  <GetAppOutlinedIcon color="action" />
-                </IconButton>
-              </Tooltip>
+              {currentUser.roles.includes('submission_view') && (
+                <Tooltip title={t('detail')}>
+                  <IconButton component={Link} to={`/file/detail/${id}`}>
+                    <DescriptionOutlinedIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
+              {currentUser.roles.includes('submission_view') && (
+                <Tooltip title={t('related')}>
+                  <IconButton component={Link} to={`/search/submission?query=files.sha256:${id} OR results:${id}*`}>
+                    <AmpStoriesOutlinedIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
+              {currentUser.roles.includes('file_download') && (
+                <Tooltip title={t('download')}>
+                  <IconButton
+                    component={MaterialLink}
+                    href={`/api/v4/file/download/${id}/?XSRF_TOKEN=${getXSRFCookie()}`}
+                  >
+                    <GetAppOutlinedIcon color="action" />
+                  </IconButton>
+                </Tooltip>
+              )}
             </div>
           </Grid>
         </Grid>
@@ -303,6 +312,8 @@ const FileViewer = () => {
         </div>
       )}
     </PageCenter>
+  ) : (
+    <ForbiddenPage />
   );
 };
 

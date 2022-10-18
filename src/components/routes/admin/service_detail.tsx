@@ -44,6 +44,7 @@ export type Volume = {
   capacity: string;
   mount_path: string;
   storage_class: string;
+  access_mode: 'ReadWriteOnce' | 'ReadWriteMany';
 };
 
 export type Environment = {
@@ -74,6 +75,13 @@ export type SubmissionParams = {
   hide?: boolean;
 };
 
+export type SourceStatus = {
+  last_successful_update: string;
+  state: string;
+  message: string;
+  ts: string;
+};
+
 export type Source = {
   ca_cert: string;
   default_classification: string;
@@ -86,6 +94,8 @@ export type Source = {
   ssl_ignore_errors: boolean;
   uri: string;
   username: string;
+  git_branch: string;
+  status: SourceStatus;
 };
 
 type UpdateConfig = {

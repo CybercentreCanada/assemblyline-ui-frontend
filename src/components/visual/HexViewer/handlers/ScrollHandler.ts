@@ -1,26 +1,4 @@
-import { Store } from '..';
-
-type Scroll = {
-  top: 'top';
-  middle: 'middle';
-  bottom: 'bottom';
-  include: 'include';
-  includeMiddle: 'includeMiddle';
-  smart: 'smart';
-};
-const SCROLL: Scroll = {
-  top: 'top',
-  middle: 'middle',
-  bottom: 'bottom',
-  include: 'include',
-  includeMiddle: 'includeMiddle',
-  smart: 'smart'
-};
-export type ScrollType = typeof SCROLL[keyof typeof SCROLL];
-export type IsScroll = { [Property in ScrollType]: (scrollType: ScrollType) => boolean };
-export const isScroll = Object.fromEntries(
-  Object.keys(SCROLL).map(key => [key, (scrollType: ScrollType) => scrollType === SCROLL[key]])
-) as IsScroll;
+import { isType, ScrollType, Store } from '..';
 
 export const getScrollMaxIndex = (store: Store, hexCodeSize: number) =>
   Math.ceil(hexCodeSize / store.layout.column.size - store.layout.row.size);
@@ -56,19 +34,19 @@ export const scrollToTableIndex = (store: Store, index: number, scrollType: Scro
 
   let scrollIndex = store.scroll.rowIndex;
 
-  if (isScroll.top(scrollType)) {
+  if (isType.scroll.type(scrollType, 'top')) {
     scrollIndex = Math.floor(index / columnSize);
-  } else if (isScroll.middle(scrollType)) {
+  } else if (isType.scroll.type(scrollType, 'middle')) {
     scrollIndex = Math.floor(index / columnSize - rowSize / 2);
-  } else if (isScroll.bottom(scrollType)) {
+  } else if (isType.scroll.type(scrollType, 'bottom')) {
     scrollIndex = Math.floor(index / columnSize - rowSize);
-  } else if (isScroll.include(scrollType)) {
+  } else if (isType.scroll.type(scrollType, 'include')) {
     scrollIndex = clampOffsetIndex(Math.floor(index / columnSize), scrollIndex, rowSize);
-  } else if (isScroll.includeMiddle(scrollType)) {
+  } else if (isType.scroll.type(scrollType, 'includeMiddle')) {
     scrollIndex = isOffsetClamped(Math.floor(index / columnSize), scrollIndex, rowSize)
       ? Math.floor(index / columnSize - rowSize / 2)
       : scrollIndex;
-  } else if (isScroll.smart(scrollType)) {
+  } else if (isType.scroll.type(scrollType, 'smart')) {
     const distance = columnSize * rowSize;
     const prev = scrollIndex * columnSize - distance;
     const next = (scrollIndex + rowSize) * columnSize + distance;
@@ -93,18 +71,49 @@ export const scrollToWindowIndex = (
 ): void => {
   setTimeout(() => {
     const scrollIndex = Math.floor(index / store.layout.column.size);
-    if (isScroll.top(location)) listRef?.current?.scrollToItem(scrollIndex, 'start');
-    else if (isScroll.middle(location)) listRef?.current?.scrollToItem(scrollIndex, 'center');
-    else if (isScroll.bottom(location)) listRef?.current?.scrollToItem(scrollIndex, 'end');
-    else if (isScroll.include(location)) listRef?.current?.scrollToItem(scrollIndex, 'auto');
+    if (isType.scroll.type(location, 'top')) listRef?.current?.scrollToItem(scrollIndex, 'start');
+    else if (isType.scroll.type(location, 'middle')) listRef?.current?.scrollToItem(scrollIndex, 'center');
+    else if (isType.scroll.type(location, 'bottom')) listRef?.current?.scrollToItem(scrollIndex, 'end');
+    else if (isType.scroll.type(location, 'include')) listRef?.current?.scrollToItem(scrollIndex, 'auto');
     else if (
-      isScroll.includeMiddle(location) &&
+      isType.scroll.type(location, 'includeMiddle') &&
       (index < store.cellsRendered.visibleStartIndex || store.cellsRendered.visibleStopIndex < index)
     )
       listRef?.current?.scrollToItem(scrollIndex, 'center');
-    else if (isScroll.smart(location)) listRef?.current?.scrollToItem(scrollIndex, 'smart');
+    else if (isType.scroll.type(location, 'smart')) listRef?.current?.scrollToItem(scrollIndex, 'smart');
   }, 1);
 };
+
+export const scrollToWindowIndexAsync = (
+  store: Store,
+  listRef: React.MutableRefObject<any>,
+  index: number,
+  location: ScrollType
+): Promise<void> =>
+  new Promise(async (resolve, reject) => {
+    if (listRef.current === null) {
+      reject();
+      return;
+    }
+
+    let scrollIndex = 0;
+    if (store.layout.folding.active) scrollIndex = getFoldingRowIndex(store, index);
+    else scrollIndex = Math.floor(index / store.layout.column.size);
+
+    if (isType.scroll.type(location, 'top')) await listRef.current.scrollToItem(scrollIndex, 'start');
+    else if (isType.scroll.type(location, 'middle')) await listRef.current.scrollToItem(scrollIndex, 'center');
+    else if (isType.scroll.type(location, 'bottom')) await listRef.current.scrollToItem(scrollIndex, 'end');
+    else if (isType.scroll.type(location, 'include')) await listRef.current.scrollToItem(scrollIndex, 'auto');
+    else if (
+      isType.scroll.type(location, 'includeMiddle') &&
+      (index < store.cellsRendered.visibleStartIndex || store.cellsRendered.visibleStopIndex < index)
+    )
+      await listRef.current.scrollToItem(scrollIndex, 'center');
+    else if (isType.scroll.type(location, 'smart')) await listRef.current.scrollToItem(scrollIndex, 'smart');
+
+    resolve();
+    return;
+  });
 
 export const getTableCellsRendered = ({
   scroll: { rowIndex: scrollIndex, maxRowIndex: scrollMaxIndex, overscanCount },
@@ -135,6 +144,7 @@ export const getTableCellsRendered = ({
 });
 
 export const getWindowCellsRendered = (
+  store: Store,
   {
     overscanStartIndex,
     overscanStopIndex,
@@ -145,8 +155,7 @@ export const getWindowCellsRendered = (
     overscanStopIndex: number;
     visibleStartIndex: number;
     visibleStopIndex: number;
-  },
-  columnSize: number
+  }
 ): {
   overscanStartRowIndex: number;
   overscanStopRowIndex: number;
@@ -157,14 +166,39 @@ export const getWindowCellsRendered = (
   overscanStopIndex: number;
   visibleStartIndex: number;
   visibleStopIndex: number;
-} => ({
-  overscanStartRowIndex: overscanStartIndex,
-  overscanStopRowIndex: overscanStopIndex,
-  visibleStartRowIndex: visibleStartIndex,
-  visibleStopRowIndex: visibleStopIndex,
+} => {
+  const columnSize = store.layout.column.size;
+  if (store.layout.folding.active) {
+    const rows = store.layout.folding.rows;
+    return {
+      overscanStartRowIndex: rows.get(overscanStartIndex).index,
+      overscanStopRowIndex: rows.get(overscanStopIndex).index,
+      visibleStartRowIndex: rows.get(visibleStartIndex).index,
+      visibleStopRowIndex: rows.get(visibleStopIndex).index,
 
-  overscanStartIndex: overscanStartIndex * columnSize,
-  overscanStopIndex: overscanStopIndex * columnSize + (columnSize - 1),
-  visibleStartIndex: visibleStartIndex * columnSize,
-  visibleStopIndex: visibleStopIndex * columnSize + (columnSize - 1)
-});
+      overscanStartIndex: rows.get(overscanStartIndex).index * columnSize,
+      overscanStopIndex: rows.get(overscanStopIndex).index * columnSize + (columnSize - 1),
+      visibleStartIndex: rows.get(visibleStartIndex).index * columnSize,
+      visibleStopIndex: rows.get(visibleStopIndex).index * columnSize + (columnSize - 1)
+    };
+  } else
+    return {
+      overscanStartRowIndex: overscanStartIndex,
+      overscanStopRowIndex: overscanStopIndex,
+      visibleStartRowIndex: visibleStartIndex,
+      visibleStopRowIndex: visibleStopIndex,
+
+      overscanStartIndex: overscanStartIndex * columnSize,
+      overscanStopIndex: overscanStopIndex * columnSize + (columnSize - 1),
+      visibleStartIndex: visibleStartIndex * columnSize,
+      visibleStopIndex: visibleStopIndex * columnSize + (columnSize - 1)
+    };
+};
+
+export const getFoldingRowIndex = (store: Store, index: number): number => {
+  let i = 0;
+  while (i < store.layout.folding.rows.size) {
+    if (Math.floor(index / store.layout.column.size) <= store.layout.folding.rows.get(i).index) return i;
+    i++;
+  }
+};

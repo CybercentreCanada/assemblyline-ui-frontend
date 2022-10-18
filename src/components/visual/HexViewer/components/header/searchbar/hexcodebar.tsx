@@ -78,7 +78,7 @@ export const WrappedHexcodeBar = ({ store }: StoreProps) => {
   } = useDispatch();
 
   const {
-    search: { inputValue, indexes, selectedIndex }
+    search: { inputValue, results, selectedResult }
   } = store;
 
   const inputRef = useRef(null);
@@ -103,7 +103,7 @@ export const WrappedHexcodeBar = ({ store }: StoreProps) => {
         placeholder={t('header.searchfield.text')}
         fullWidth
         autoFocus
-        delay={1000}
+        delay={250}
         value={inputValue}
         margin="dense"
         preventSubmit={true}
@@ -113,9 +113,9 @@ export const WrappedHexcodeBar = ({ store }: StoreProps) => {
         onKeyDown={event => onSearchBarKeyDown({ event }, { store })}
       />
 
-      {(inputValue === null || inputValue === '') && (indexes === null || indexes.length === 0) ? (
+      {(inputValue === null || inputValue === '') && (results === null || results.length === 0) ? (
         <></>
-      ) : indexes === null || indexes.length === 0 ? (
+      ) : results === null || results.length === 0 ? (
         isWidthEqualUp(store, 'sm') ? (
           <Typography className={classes.resultNoneIndexes} variant="subtitle1" color="error">
             {t('no-results.desktop')}
@@ -134,15 +134,15 @@ export const WrappedHexcodeBar = ({ store }: StoreProps) => {
             placeholder={''}
             margin="dense"
             range="loop"
-            value={selectedIndex as number}
+            value={selectedResult as number}
             min={0}
-            max={indexes.length - 1}
+            max={results.length - 1}
             allowNull={true}
             offset={1}
             direction="inverse"
             preventArrowKeyDown
             endAdornment={
-              <div className={classes.endAdornment}>{t('of') + indexes.length.toString().toUpperCase()}</div>
+              <div className={classes.endAdornment}>{t('of') + results.length.toString().toUpperCase()}</div>
             }
             onFocus={() => onSearchBarFocus()}
             onChange={event => onSelectedSearchIndexChange({ index: event.target.valueAsNumber as number })}
@@ -164,10 +164,9 @@ export const WrappedHexcodeBar = ({ store }: StoreProps) => {
 export const HexcodeBar = React.memo(
   WrappedHexcodeBar,
   (prevProps: Readonly<StoreProps>, nextProps: Readonly<StoreProps>) =>
-    prevProps.store.mode.widthType === nextProps.store.mode.widthType &&
-    prevProps.store.search.type === nextProps.store.search.type &&
+    prevProps.store.mode.width === nextProps.store.mode.width &&
+    prevProps.store.search.mode === nextProps.store.search.mode &&
     prevProps.store.search.inputValue === nextProps.store.search.inputValue &&
-    prevProps.store.search.value === nextProps.store.search.value &&
-    prevProps.store.search.indexes.length === nextProps.store.search.indexes.length &&
-    prevProps.store.search.selectedIndex === nextProps.store.search.selectedIndex
+    prevProps.store.search.selectedResult === nextProps.store.search.selectedResult &&
+    prevProps.store.search.results === nextProps.store.search.results
 );

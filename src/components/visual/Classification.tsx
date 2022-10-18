@@ -38,6 +38,7 @@ interface ClassificationProps {
   isUser: boolean;
   fullWidth?: boolean;
   dynGroup?: string;
+  disabled?: boolean;
 }
 
 const useStyles = makeStyles(theme => ({
@@ -89,7 +90,8 @@ function WrappedClassification({
   type,
   isUser,
   fullWidth,
-  dynGroup
+  dynGroup,
+  disabled = false
 }: ClassificationProps) {
   const classes = useStyles();
   const { t } = useTranslation();
@@ -228,6 +230,7 @@ function WrappedClassification({
               label={normalizedClassification(validated.parts, c12nDef, format, isMobile)}
               onClick={type === 'picker' ? () => setShowPicker(true) : null}
               fullWidth={fullWidth}
+              disabled={disabled}
             />
           </div>
         )}

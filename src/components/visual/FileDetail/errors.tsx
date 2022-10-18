@@ -1,5 +1,5 @@
 import { Collapse, Divider, makeStyles, Typography, useTheme } from '@material-ui/core';
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import ErrorCard from '../ErrorCard';
 
@@ -23,7 +23,7 @@ const WrappedErrorSection: React.FC<ErrorSectionProps> = ({ errors }) => {
   const classes = useStyles();
   const sp2 = theme.spacing(2);
 
-  return (
+  return errors && errors.length !== 0 ? (
     <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
       <Typography
         variant="h6"
@@ -36,20 +36,14 @@ const WrappedErrorSection: React.FC<ErrorSectionProps> = ({ errors }) => {
       </Typography>
       <Divider />
       <Collapse in={open} timeout="auto">
-        {useMemo(
-          () => (
-            <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
-              {errors.map((error, i) => (
-                <ErrorCard key={i} error={error} />
-              ))}
-            </div>
-          ),
-          // eslint-disable-next-line react-hooks/exhaustive-deps
-          [errors]
-        )}
+        <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+          {errors.map((error, i) => (
+            <ErrorCard key={i} error={error} />
+          ))}
+        </div>
       </Collapse>
     </div>
-  );
+  ) : null;
 };
 
 const ErrorSection = React.memo(WrappedErrorSection);

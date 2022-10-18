@@ -1,4 +1,5 @@
 export * from './CellHandler';
+export * from './CopyHandler';
 export * from './CursorHandler';
 export * from './HexHandler';
 export * from './HistoryHandler';
@@ -8,4 +9,5 @@ export * from './ModeHandler';
 export * from './ScrollHandler';
 export * from './SearchHandler';
 export * from './SelectHandler';
+export * from './SettingHandler';
 export * from './StyleHandler';

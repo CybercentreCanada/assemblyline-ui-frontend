@@ -33,6 +33,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { Link, useHistory, useParams } from 'react-router-dom';
+import ForbiddenPage from '../403';
 
 export type Signature = {
   classification: string;
@@ -99,12 +100,22 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+const defaultStats = {
+  count: 0,
+  first_hit: null,
+  last_hit: null,
+  min: 0,
+  avg: 0,
+  max: 0,
+  sum: 0
+};
+
 const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetailProps) => {
   const { t, i18n } = useTranslation(['manageSignatureDetail']);
   const { id, type, source, name } = useParams<ParamProps>();
   const theme = useTheme();
   const [signature, setSignature] = useState<Signature>(null);
-  const [stats, setStats] = useState<Statistics>(null);
+  const [stats, setStats] = useState<Statistics>(defaultStats);
   const [histogram, setHistogram] = useState<any>(null);
   const [results, setResults] = useState<any>(null);
   const [open, setOpen] = useState(false);
@@ -118,7 +129,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
   const { user: currentUser, c12nDef } = useALContext();
 
   useEffect(() => {
-    if (signature_id || id) {
+    if ((signature_id || id) && currentUser.roles.includes('signature_view')) {
       apiCall({
         url: `/api/v4/signature/${signature_id || id}/`,
         onSuccess: api_data => {
@@ -130,7 +141,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
   }, [signature_id, id]);
 
   useEffect(() => {
-    if (type && source && name) {
+    if (type && source && name && currentUser.roles.includes('signature_view')) {
       apiCall({
         url: `/api/v4/search/signature/?query=type:${safeFieldValueURI(type)} AND source:${safeFieldValueURI(
           source
@@ -155,47 +166,51 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
 
   useEffect(() => {
     if (signature) {
-      if (!signature.stats) {
+      if (currentUser.roles.includes('submission_view')) {
+        if (!signature.stats) {
+          apiCall({
+            method: 'POST',
+            url: '/api/v4/search/stats/result/result.score/',
+            body: {
+              query: `result.sections.tags.file.rule.${signature.type}:${safeFieldValue(
+                `${signature.source}.${signature.name}`
+              )}`
+            },
+            onSuccess: api_data => {
+              setStats(api_data.api_response);
+            }
+          });
+        } else {
+          setStats(signature.stats);
+        }
         apiCall({
           method: 'POST',
-          url: '/api/v4/search/stats/result/result.score/',
+          url: '/api/v4/search/histogram/result/created/',
           body: {
             query: `result.sections.tags.file.rule.${signature.type}:${safeFieldValue(
               `${signature.source}.${signature.name}`
-            )}`
+            )}`,
+            mincount: 0,
+            start: 'now-30d/d',
+            end: 'now+1d/d-1s',
+            gap: '+1d'
           },
           onSuccess: api_data => {
-            setStats(api_data.api_response);
+            setHistogram(api_data.api_response);
           }
         });
-      } else {
+        apiCall({
+          method: 'GET',
+          url: `/api/v4/search/result/?query=result.sections.tags.file.rule.${signature.type}:${safeFieldValueURI(
+            `${signature.source}.${signature.name}`
+          )}&rows=10`,
+          onSuccess: api_data => {
+            setResults(api_data.api_response);
+          }
+        });
+      } else if (signature.stats) {
         setStats(signature.stats);
       }
-      apiCall({
-        method: 'POST',
-        url: '/api/v4/search/histogram/result/created/',
-        body: {
-          query: `result.sections.tags.file.rule.${signature.type}:${safeFieldValue(
-            `${signature.source}.${signature.name}`
-          )}`,
-          mincount: 0,
-          start: 'now-30d/d',
-          end: 'now+1d/d-1s',
-          gap: '+1d'
-        },
-        onSuccess: api_data => {
-          setHistogram(api_data.api_response);
-        }
-      });
-      apiCall({
-        method: 'GET',
-        url: `/api/v4/search/result/?query=result.sections.tags.file.rule.${signature.type}:${safeFieldValueURI(
-          `${signature.source}.${signature.name}`
-        )}&rows=10`,
-        onSuccess: api_data => {
-          setResults(api_data.api_response);
-        }
-      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [signature]);
@@ -240,7 +255,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
     setDeleteDialog(true);
   };
 
-  return (
+  return currentUser.roles.includes('signature_view') ? (
     <PageCenter margin={!id && !type && !name && !source ? 2 : 4} width="100%">
       <ConfirmationDialog
         open={deleteDialog}
@@ -303,18 +318,20 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
             {signature ? (
               <>
                 <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
-                  <Tooltip title={t('usage')}>
-                    <IconButton
-                      component={Link}
-                      style={{ color: theme.palette.action.active }}
-                      to={`/search/result/?query=result.sections.tags.file.rule.${signature.type}:${safeFieldValueURI(
-                        `${signature.source}.${signature.name}`
-                      )}`}
-                    >
-                      <YoutubeSearchedForIcon />
-                    </IconButton>
-                  </Tooltip>
-                  {(currentUser.is_admin || currentUser.roles.indexOf('signature_manager') !== -1) && (
+                  {currentUser.roles.includes('submission_view') && (
+                    <Tooltip title={t('usage')}>
+                      <IconButton
+                        component={Link}
+                        style={{ color: theme.palette.action.active }}
+                        to={`/search/result/?query=result.sections.tags.file.rule.${signature.type}:${safeFieldValueURI(
+                          `${signature.source}.${signature.name}`
+                        )}`}
+                      >
+                        <YoutubeSearchedForIcon />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                  {currentUser.roles.includes('signature_manage') && (
                     <Tooltip title={t('remove')}>
                       <IconButton
                         style={{
@@ -329,11 +346,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
                 </div>
                 <SignatureStatus
                   status={signature.status}
-                  onClick={
-                    currentUser.is_admin || currentUser.roles.indexOf('signature_manager') !== -1
-                      ? () => setOpen(true)
-                      : null
-                  }
+                  onClick={currentUser.roles.includes('signature_manage') ? () => setOpen(true) : null}
                 />
               </>
             ) : (
@@ -437,22 +450,26 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
               </Grid>
             </Grid>
           </Grid>
-          <Grid item xs={12}>
-            <Histogram
-              dataset={histogram}
-              height="300px"
-              isDate
-              title={t('chart.title')}
-              datatype={signature_id || id}
-              verticalLine
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <Typography variant="h6">{t('last10')}</Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <ResultsTable resultResults={results} allowSort={false} />
-          </Grid>
+          {currentUser.roles.includes('submission_view') && (
+            <>
+              <Grid item xs={12}>
+                <Histogram
+                  dataset={histogram}
+                  height="300px"
+                  isDate
+                  title={t('chart.title')}
+                  datatype={signature_id || id}
+                  verticalLine
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="h6">{t('last10')}</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <ResultsTable resultResults={results} allowSort={false} />
+              </Grid>
+            </>
+          )}
         </Grid>
 
         {signature && modified ? (
@@ -478,6 +495,8 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
         ) : null}
       </div>
     </PageCenter>
+  ) : (
+    <ForbiddenPage />
   );
 };
 

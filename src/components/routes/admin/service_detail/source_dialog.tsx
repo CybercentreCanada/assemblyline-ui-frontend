@@ -17,7 +17,14 @@ const DEFAULT_SOURCE: Source = {
   proxy: '',
   ssl_ignore_errors: false,
   uri: '',
-  username: ''
+  username: '',
+  git_branch: '',
+  status: {
+    last_successful_update: '',
+    message: '',
+    state: '',
+    ts: ''
+  }
 };
 
 type SourceDialogProps = {
@@ -69,6 +76,7 @@ const WrappedSourceDialog = ({ open, setOpen, source, defaults, onSave }: Source
               defaults={defaults}
               setSource={setTempSource}
               setModified={setModified}
+              showDetails={false}
             />
           </DialogContent>
           <DialogActions>

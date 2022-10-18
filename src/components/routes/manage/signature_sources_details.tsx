@@ -14,6 +14,7 @@ import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import Moment from 'react-moment';
 import { Environment } from '../admin/service_detail';
 import ResetButton from '../admin/service_detail/reset_button';
 
@@ -35,8 +36,15 @@ const DEFAULT_HEADER: Environment = {
   value: ''
 };
 
-const WrappedSourceDetail = ({ source, defaults, setSource, addMode = false, setModified = null }) => {
-  const { t } = useTranslation(['manageSignatureSources']);
+const WrappedSourceDetail = ({
+  source,
+  defaults,
+  setSource,
+  addMode = false,
+  setModified = null,
+  showDetails = true
+}) => {
+  const { t, i18n } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
   const { c12nDef } = useALContext();
   const [tempHeader, setTempHeader] = useState({ ...DEFAULT_HEADER });
@@ -44,6 +52,11 @@ const WrappedSourceDetail = ({ source, defaults, setSource, addMode = false, set
 
   const handleURIChange = event => {
     setSource({ ...source, uri: event.target.value });
+    setModified(true);
+  };
+
+  const handleBranchChange = event => {
+    setSource({ ...source, git_branch: event.target.value });
     setModified(true);
   };
 
@@ -125,7 +138,7 @@ const WrappedSourceDetail = ({ source, defaults, setSource, addMode = false, set
   return (
     source && (
       <Grid container spacing={1}>
-        <Grid item xs={12}>
+        <Grid item xs={9}>
           <div className={classes.label}>
             {t('uri')}
             <ResetButton
@@ -139,6 +152,16 @@ const WrappedSourceDetail = ({ source, defaults, setSource, addMode = false, set
             />
           </div>
           <TextField size="small" value={source.uri} fullWidth variant="outlined" onChange={handleURIChange} />
+        </Grid>
+        <Grid item xs={3}>
+          <div className={classes.label}>{t('git_branch')}</div>
+          <TextField
+            size="small"
+            value={source.git_branch}
+            fullWidth
+            variant="outlined"
+            onChange={handleBranchChange}
+          />
         </Grid>
         {c12nDef.enforce && (
           <Grid item xs={12}>
@@ -408,6 +431,19 @@ const WrappedSourceDetail = ({ source, defaults, setSource, addMode = false, set
             className={classes.checkbox}
           />
         </Grid>
+        {showDetails && (
+          <div style={{ textAlign: 'center', paddingTop: theme.spacing(3), flexGrow: 1 }}>
+            <Typography variant="subtitle2" color="textSecondary">
+              {`${t('update.label.last_successful')}: `}
+              <Moment fromNow locale={i18n.language}>
+                {source.status.last_successful_update}
+              </Moment>
+            </Typography>
+            <Typography variant="subtitle2" color="textSecondary">
+              {`${t('update.label.status')}: ${source.status.message}`}
+            </Typography>
+          </div>
+        )}
       </Grid>
     )
   );

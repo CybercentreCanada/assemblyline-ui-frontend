@@ -32,10 +32,11 @@ import VerdictBar from 'components/visual/VerdictBar';
 import { getErrorIDFromKey, getServiceFromKey } from 'helpers/errors';
 import { setNotifyFavicon } from 'helpers/utils';
 import getXSRFCookie from 'helpers/xsrf';
-import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
+import React, { useCallback, useEffect, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import io from 'socket.io-client';
+import ForbiddenPage from '../403';
 import AttackSection from './detail/attack';
 import ErrorSection from './detail/errors';
 import FileTreeSection from './detail/file_tree';
@@ -77,7 +78,7 @@ const incrementReducer = (old: number, increment: number) => {
   return old + increment;
 };
 
-export default function SubmissionDetail() {
+function WrappedSubmissionDetail() {
   const { t } = useTranslation(['submissionDetail']);
   const { id, fid } = useParams<ParamProps>();
   const theme = useTheme();
@@ -447,7 +448,8 @@ export default function SubmissionDetail() {
         }
       });
     }
-  }, [apiCall, history, resetLiveMode, showSuccessMessage, submission, t]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [history, resetLiveMode, showSuccessMessage, submission, t]);
 
   const replay = useCallback(() => {
     if (submission != null && systemConfig.ui.allow_replay) {
@@ -460,7 +462,8 @@ export default function SubmissionDetail() {
         }
       });
     }
-  }, [apiCall, showSuccessMessage, submission, systemConfig.ui.allow_replay, t]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showSuccessMessage, submission, systemConfig.ui.allow_replay, t]);
 
   const deleteSubmission = () => {
     if (submission != null) {
@@ -512,22 +515,25 @@ export default function SubmissionDetail() {
         });
       }
     },
-    [apiCall, currentUser.username, submission]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentUser.username, submission]
   );
 
   useEffect(() => {
-    apiCall({
-      url: '/api/v4/help/configuration/',
-      onSuccess: api_data => {
-        setConfiguration(api_data.api_response);
-      }
-    });
-    apiCall({
-      url: `/api/v4/submission/${id}/`,
-      onSuccess: api_data => {
-        setSubmission(parseSubmissionErrors(api_data.api_response));
-      }
-    });
+    if (currentUser.roles.includes('submission_view')) {
+      apiCall({
+        url: '/api/v4/help/configuration/',
+        onSuccess: api_data => {
+          setConfiguration(api_data.api_response);
+        }
+      });
+      apiCall({
+        url: `/api/v4/submission/${id}/`,
+        onSuccess: api_data => {
+          setSubmission(parseSubmissionErrors(api_data.api_response));
+        }
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
@@ -705,14 +711,20 @@ export default function SubmissionDetail() {
           }
         });
         setGlobalDrawer(
-          <FileDetail sha256={fid} sid={id} liveResultKeys={liveResultKeys} liveErrors={curFileLiveErrors} />
+          <FileDetail
+            sha256={fid}
+            sid={id}
+            liveResultKeys={liveResultKeys}
+            liveErrors={curFileLiveErrors}
+            force={submission && submission.max_score < 0}
+          />
         );
       } else {
-        setGlobalDrawer(<FileDetail sha256={fid} sid={id} />);
+        setGlobalDrawer(<FileDetail sha256={fid} sid={id} force={submission && submission.max_score < 0} />);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fid]);
+  }, [fid, submission]);
 
   useEffect(() => {
     if (loadTrigger === 0) return;
@@ -756,7 +768,7 @@ export default function SubmissionDetail() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loadTrigger]);
 
-  return (
+  return currentUser.roles.includes('submission_view') ? (
     <PageCenter margin={4} width="100%">
       <ConfirmationDialog
         open={deleteDialog}
@@ -832,199 +844,196 @@ export default function SubmissionDetail() {
           ))}
       </Snackbar>
       <div style={{ textAlign: 'left' }}>
-        {useMemo(
-          () => (
-            <>
-              {c12nDef.enforce && (
-                <div style={{ paddingBottom: sp4 }}>
-                  <Classification size="tiny" c12n={submission ? submission.classification : null} />
+        {c12nDef.enforce && (
+          <div style={{ paddingBottom: sp4 }}>
+            <Classification size="tiny" c12n={submission ? submission.classification : null} />
+          </div>
+        )}
+        <div style={{ paddingBottom: sp4 }}>
+          <Grid container>
+            <Grid item xs>
+              <div>
+                <Typography variant="h4">{t('title')}</Typography>
+                <Typography variant="caption" component={'div'}>
+                  {submission ? submission.sid : <Skeleton style={{ width: '10rem' }} />}
+                </Typography>
+                {submission && submission.params.psid && (
+                  <Typography variant="caption" component={'div'}>
+                    <i>
+                      <span>{t('psid')}: </span>
+                      <Link
+                        style={{ textDecoration: 'none', color: theme.palette.primary.main }}
+                        to={`/submission/detail/${submission.params.psid}`}
+                      >
+                        {submission.params.psid}
+                      </Link>
+                    </i>
+                  </Typography>
+                )}
+              </div>
+              {socket && (
+                <div
+                  style={{
+                    paddingBottom: theme.spacing(3),
+                    paddingTop: theme.spacing(2),
+                    color: theme.palette.type === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark
+                  }}
+                >
+                  <PlayCircleOutlineIcon
+                    style={{
+                      height: theme.spacing(2),
+                      width: theme.spacing(2),
+                      verticalAlign: 'sub',
+                      marginRight: theme.spacing(1)
+                    }}
+                  />
+                  {t('live_mode')}
+                  <LinearProgress />
                 </div>
               )}
-              <div style={{ paddingBottom: sp4 }}>
-                <Grid container>
-                  <Grid item xs>
+            </Grid>
+            <Grid item xs={12} sm={6} md={4} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  {submission ? (
                     <div>
-                      <Typography variant="h4">{t('title')}</Typography>
-                      <Typography variant="caption" component={'div'}>
-                        {submission ? submission.sid : <Skeleton style={{ width: '10rem' }} />}
-                      </Typography>
-                      {submission && submission.params.psid && (
-                        <Typography variant="caption" component={'div'}>
-                          <i>
-                            <span>{t('psid')}: </span>
-                            <Link
-                              style={{ textDecoration: 'none', color: theme.palette.primary.main }}
-                              to={`/submission/detail/${submission.params.psid}`}
-                            >
-                              {submission.params.psid}
-                            </Link>
-                          </i>
-                        </Typography>
+                      {currentUser.roles.includes('submission_delete') && (
+                        <Tooltip title={t('delete')}>
+                          <IconButton
+                            onClick={() => setDeleteDialog(true)}
+                            style={{
+                              color:
+                                theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                            }}
+                          >
+                            <RemoveCircleOutlineOutlinedIcon />
+                          </IconButton>
+                        </Tooltip>
                       )}
+                      {currentUser.roles.includes('bundle_download') && (
+                        <Tooltip title={t('download')}>
+                          <IconButton
+                            component={MaterialLink}
+                            href={`/api/v4/bundle/${submission.sid}/?XSRF_TOKEN=${getXSRFCookie()}`}
+                          >
+                            <CloudDownloadOutlinedIcon color="action" />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                      {currentUser.roles.includes('submission_create') && (
+                        <Tooltip title={t('resubmit')}>
+                          <IconButton onClick={resubmit}>
+                            <ReplayOutlinedIcon />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                      {systemConfig.ui.allow_replay && currentUser.roles.includes('replay_trigger') && (
+                        <Tooltip title={t('replay')}>
+                          <IconButton onClick={replay} disabled={submission.metadata.replay}>
+                            <PublishOutlinedIcon />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                      <Tooltip title={t('report_view')}>
+                        <IconButton component={Link} to={`/submission/report/${submission.sid}`}>
+                          <ChromeReaderModeOutlinedIcon />
+                        </IconButton>
+                      </Tooltip>
                     </div>
-                    {socket && (
-                      <div
-                        style={{
-                          paddingBottom: theme.spacing(3),
-                          paddingTop: theme.spacing(2),
-                          color:
-                            theme.palette.type === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark
-                        }}
-                      >
-                        <PlayCircleOutlineIcon
-                          style={{
-                            height: theme.spacing(2),
-                            width: theme.spacing(2),
-                            verticalAlign: 'sub',
-                            marginRight: theme.spacing(1)
-                          }}
+                  ) : (
+                    <div style={{ display: 'inline-flex' }}>
+                      {[...Array(systemConfig.ui.allow_replay ? 5 : 4)].map((_, i) => (
+                        <Skeleton
+                          key={i}
+                          variant="circle"
+                          height="2.5rem"
+                          width="2.5rem"
+                          style={{ margin: theme.spacing(0.5) }}
                         />
-                        {t('live_mode')}
-                        <LinearProgress />
-                      </div>
-                    )}
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={4} style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <div>
-                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        {submission ? (
-                          <div>
-                            <Tooltip title={t('delete')}>
-                              <IconButton
-                                onClick={() => setDeleteDialog(true)}
-                                style={{
-                                  color:
-                                    theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                                }}
+                      ))}
+                    </div>
+                  )}
+
+                  <div
+                    style={{
+                      width: '164px',
+                      marginTop: '8px'
+                    }}
+                  >
+                    {submission ? (
+                      <>
+                        <VerdictBar verdicts={submission.verdict} />
+                        {currentUser.roles.includes('submission_manage') && (
+                          <Grid container>
+                            <Grid item xs={5} style={{ textAlign: 'left' }}>
+                              <Tooltip
+                                title={t(
+                                  `verdict.${
+                                    submission.verdict.malicious.indexOf(currentUser.username) !== -1 ? 'is' : 'set'
+                                  }.malicious`
+                                )}
                               >
-                                <RemoveCircleOutlineOutlinedIcon />
-                              </IconButton>
-                            </Tooltip>
-                            <Tooltip title={t('download')}>
-                              <IconButton
-                                component={MaterialLink}
-                                href={`/api/v4/bundle/${submission.sid}/?XSRF_TOKEN=${getXSRFCookie()}`}
-                              >
-                                <CloudDownloadOutlinedIcon color="action" />
-                              </IconButton>
-                            </Tooltip>
-                            <Tooltip title={t('resubmit')}>
-                              <IconButton onClick={resubmit}>
-                                <ReplayOutlinedIcon />
-                              </IconButton>
-                            </Tooltip>
-                            {systemConfig.ui.allow_replay && (
-                              <Tooltip title={t('replay')}>
-                                <IconButton onClick={replay} disabled={submission.metadata.replay}>
-                                  <PublishOutlinedIcon />
+                                <IconButton size="small" onClick={() => setVerdict('malicious')}>
+                                  <BugReportOutlinedIcon
+                                    style={{
+                                      color:
+                                        submission.verdict.malicious.indexOf(currentUser.username) !== -1
+                                          ? theme.palette.error.dark
+                                          : null
+                                    }}
+                                  />
                                 </IconButton>
                               </Tooltip>
-                            )}
-                            <Tooltip title={t('report_view')}>
-                              <IconButton component={Link} to={`/submission/report/${submission.sid}`}>
-                                <ChromeReaderModeOutlinedIcon />
-                              </IconButton>
-                            </Tooltip>
-                          </div>
-                        ) : (
-                          <div style={{ display: 'inline-flex' }}>
-                            {[...Array(systemConfig.ui.allow_replay ? 5 : 4)].map((_, i) => (
-                              <Skeleton
-                                key={i}
-                                variant="circle"
-                                height="2.5rem"
-                                width="2.5rem"
-                                style={{ margin: theme.spacing(0.5) }}
-                              />
-                            ))}
-                          </div>
-                        )}
-
-                        <div
-                          style={{
-                            width: '164px',
-                            marginTop: '8px'
-                          }}
-                        >
-                          {submission ? (
-                            <>
-                              <VerdictBar verdicts={submission.verdict} />
-                              <Grid container>
-                                <Grid item xs={5} style={{ textAlign: 'left' }}>
-                                  <Tooltip
-                                    title={t(
-                                      `verdict.${
-                                        submission.verdict.malicious.indexOf(currentUser.username) !== -1 ? 'is' : 'set'
-                                      }.malicious`
-                                    )}
-                                  >
-                                    <IconButton size="small" onClick={() => setVerdict('malicious')}>
-                                      <BugReportOutlinedIcon
-                                        style={{
-                                          color:
-                                            submission.verdict.malicious.indexOf(currentUser.username) !== -1
-                                              ? theme.palette.error.dark
-                                              : null
-                                        }}
-                                      />
-                                    </IconButton>
-                                  </Tooltip>
-                                </Grid>
-                                <Grid item xs={2} />
-                                <Grid item xs={5} style={{ textAlign: 'right' }}>
-                                  <Tooltip
-                                    title={t(
-                                      `verdict.${
+                            </Grid>
+                            <Grid item xs={2} />
+                            <Grid item xs={5} style={{ textAlign: 'right' }}>
+                              <Tooltip
+                                title={t(
+                                  `verdict.${
+                                    submission.verdict.non_malicious.indexOf(currentUser.username) !== -1 ? 'is' : 'set'
+                                  }.non_malicious`
+                                )}
+                              >
+                                <IconButton size="small" onClick={() => setVerdict('non_malicious')}>
+                                  <VerifiedUserOutlinedIcon
+                                    style={{
+                                      color:
                                         submission.verdict.non_malicious.indexOf(currentUser.username) !== -1
-                                          ? 'is'
-                                          : 'set'
-                                      }.non_malicious`
-                                    )}
-                                  >
-                                    <IconButton size="small" onClick={() => setVerdict('non_malicious')}>
-                                      <VerifiedUserOutlinedIcon
-                                        style={{
-                                          color:
-                                            submission.verdict.non_malicious.indexOf(currentUser.username) !== -1
-                                              ? theme.palette.success.dark
-                                              : null
-                                        }}
-                                      />
-                                    </IconButton>
-                                  </Tooltip>
-                                </Grid>
-                              </Grid>
-                            </>
-                          ) : (
-                            <>
-                              <Skeleton variant="rect" style={{ height: '15px', width: '100%' }} />
-                              <div style={{ display: 'inline-flex', width: '100%', justifyContent: 'space-between' }}>
-                                <Skeleton
-                                  variant="circle"
-                                  height="1.5rem"
-                                  width="1.5rem"
-                                  style={{ margin: theme.spacing(0.5) }}
-                                />
-                                <Skeleton
-                                  variant="circle"
-                                  height="1.5rem"
-                                  width="1.5rem"
-                                  style={{ margin: theme.spacing(0.5) }}
-                                />
-                              </div>
-                            </>
-                          )}
+                                          ? theme.palette.success.dark
+                                          : null
+                                    }}
+                                  />
+                                </IconButton>
+                              </Tooltip>
+                            </Grid>
+                          </Grid>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <Skeleton variant="rect" style={{ height: '15px', width: '100%' }} />
+                        <div style={{ display: 'inline-flex', width: '100%', justifyContent: 'space-between' }}>
+                          <Skeleton
+                            variant="circle"
+                            height="1.5rem"
+                            width="1.5rem"
+                            style={{ margin: theme.spacing(0.5) }}
+                          />
+                          <Skeleton
+                            variant="circle"
+                            height="1.5rem"
+                            width="1.5rem"
+                            style={{ margin: theme.spacing(0.5) }}
+                          />
                         </div>
-                      </div>
-                    </div>
-                  </Grid>
-                </Grid>
+                      </>
+                    )}
+                  </div>
+                </div>
               </div>
-            </>
-          ),
-          // eslint-disable-next-line react-hooks/exhaustive-deps
-          [submission, id, socket, theme, t]
-        )}
+            </Grid>
+          </Grid>
+        </div>
 
         <InfoSection submission={submission} />
 
@@ -1044,27 +1053,28 @@ export default function SubmissionDetail() {
           </div>
         )}
 
-        {(!submission || Object.keys(submission.metadata).length !== 0) && (
-          <MetaSection metadata={submission ? submission.metadata : null} />
-        )}
-
-        {(!summary || Object.keys(summary.heuristics).length !== 0) && (
-          <Detection
-            section_map={summary ? summary.heuristic_sections : null}
-            heuristics={summary ? summary.heuristics : null}
-          />
-        )}
-
-        {(!summary || Object.keys(summary.attack_matrix).length !== 0) && (
-          <AttackSection attack_matrix={summary ? summary.attack_matrix : null} />
-        )}
+        <MetaSection metadata={submission ? submission.metadata : null} />
+        <Detection
+          section_map={summary ? summary.heuristic_sections : null}
+          heuristics={summary ? summary.heuristics : null}
+          force={submission && submission.max_score < 0}
+        />
+        <AttackSection
+          attack_matrix={summary ? summary.attack_matrix : null}
+          force={submission && submission.max_score < 0}
+        />
 
         {summary &&
           Object.keys(summary.tags).length !== 0 &&
           Object.keys(summary.tags).map(
             (tag_group, group_idx) =>
               Object.keys(summary.tags[tag_group]).length !== 0 && (
-                <TagSection key={group_idx} tag_group={tag_group} tags={summary.tags[tag_group]} />
+                <TagSection
+                  key={group_idx}
+                  tag_group={tag_group}
+                  tags={summary.tags[tag_group]}
+                  force={submission && submission.max_score < 0}
+                />
               )
           )}
 
@@ -1076,8 +1086,13 @@ export default function SubmissionDetail() {
           <ErrorSection sid={id} parsed_errors={liveErrors} />
         )}
 
-        <FileTreeSection tree={tree} sid={id} />
+        <FileTreeSection tree={tree} sid={id} force={submission && submission.max_score < 0} />
       </div>
     </PageCenter>
+  ) : (
+    <ForbiddenPage />
   );
 }
+
+const SubmissionDetail = React.memo(WrappedSubmissionDetail);
+export default SubmissionDetail;

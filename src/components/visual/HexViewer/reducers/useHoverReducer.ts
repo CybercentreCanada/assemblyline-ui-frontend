@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import {
+  HoverState,
   isAction,
   isCellMouseDown,
   ReducerHandler,
@@ -11,11 +12,7 @@ import {
   UseReducer
 } from '..';
 
-export type HoverState = {
-  hover: { index: number };
-};
-
-export const useHoverReducer: UseReducer<HoverState> = () => {
+export const useHoverReducer: UseReducer = () => {
   const classes = useCellStyles();
 
   const initialState: HoverState = { hover: { index: null } };

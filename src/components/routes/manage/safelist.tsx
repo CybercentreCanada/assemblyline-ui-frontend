@@ -18,6 +18,7 @@ import 'moment/locale/fr';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
+import ForbiddenPage from '../403';
 import SafelistDetail from './safelist_detail';
 
 const PAGE_SIZE = 25;
@@ -50,7 +51,7 @@ export default function Safelist() {
   const { t } = useTranslation(['manageSafelist']);
   const [pageSize] = useState(PAGE_SIZE);
   const [searching, setSearching] = useState(false);
-  const { indexes } = useALContext();
+  const { indexes, user: currentUser } = useALContext();
   const [safelistResults, setSafelistResults] = useState<SearchResults>(null);
   const location = useLocation();
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
@@ -88,7 +89,7 @@ export default function Safelist() {
   }, [location.hash]);
 
   useEffect(() => {
-    if (query) {
+    if (query && currentUser.roles.includes('safelist_view')) {
       reload(0);
     }
 
@@ -165,7 +166,7 @@ export default function Safelist() {
     [location.search]
   );
 
-  return (
+  return currentUser.roles.includes('safelist_view') ? (
     <PageFullWidth margin={4}>
       <div style={{ paddingBottom: theme.spacing(2) }}>
         <Typography variant="h4">{t('title')}</Typography>
@@ -249,5 +250,7 @@ export default function Safelist() {
         <SafelistTable safelistResults={safelistResults} setSafelistID={setSafelistID} />
       </div>
     </PageFullWidth>
+  ) : (
+    <ForbiddenPage />
   );
 }

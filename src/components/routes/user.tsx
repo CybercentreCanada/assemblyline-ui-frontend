@@ -231,15 +231,26 @@ function User({ width, username }: UserProps) {
     }
   }
 
-  function toggleRole(role) {
-    const newTypes = user.type;
-    if (newTypes.indexOf(role) === -1) {
-      newTypes.push(role);
-    } else {
-      newTypes.splice(newTypes.indexOf(role), 1);
-    }
+  function setType(userType) {
+    const newRoles = configuration.user.role_dependencies[userType];
     setModified(true);
-    setUser({ ...user, type: newTypes });
+    if (newRoles) {
+      setUser({ ...user, type: [userType], roles: [...newRoles] });
+    } else {
+      setUser({ ...user, type: [userType] });
+    }
+  }
+
+  function toggleRole(role) {
+    const newRoles = [...user.roles];
+    if (newRoles.indexOf(role) === -1) {
+      newRoles.push(role);
+    } else {
+      newRoles.splice(newRoles.indexOf(role), 1);
+    }
+
+    setModified(true);
+    setUser({ ...user, roles: newRoles, type: ['custom'] });
   }
 
   function handleAvatar(e) {
@@ -574,48 +585,54 @@ function User({ width, username }: UserProps) {
               <TableBody>
                 <TableRow>
                   {isWidthDown('xs', width) ? null : (
+                    <TableCell style={{ whiteSpace: 'nowrap' }}>{t('type')}</TableCell>
+                  )}
+                  <TableCell width="100%">
+                    {!isWidthDown('xs', width) ? null : <Typography variant="caption">{t('type')}</Typography>}
+                    {user ? (
+                      <div>
+                        {configuration.user.types.map((uType, type_id) => (
+                          <CustomChip
+                            key={type_id}
+                            type="rounded"
+                            size="small"
+                            color={user.type.includes(uType) ? 'primary' : 'default'}
+                            disabled={uType === 'custom'}
+                            onClick={
+                              currentUser.username !== user.uname && currentUser.is_admin ? () => setType(uType) : null
+                            }
+                            label={t(`user_type.${uType}`)}
+                          />
+                        ))}
+                      </div>
+                    ) : (
+                      <Skeleton />
+                    )}
+                  </TableCell>
+                  <TableCell align="right" />
+                </TableRow>
+                <TableRow>
+                  {isWidthDown('xs', width) ? null : (
                     <TableCell style={{ whiteSpace: 'nowrap' }}>{t('roles')}</TableCell>
                   )}
                   <TableCell width="100%">
                     {!isWidthDown('xs', width) ? null : <Typography variant="caption">{t('roles')}</Typography>}
                     {user ? (
                       <div>
-                        <CustomChip
-                          type="rounded"
-                          size="small"
-                          color={user.type.includes('user') ? 'primary' : 'default'}
-                          onClick={
-                            currentUser.username !== user.uname && currentUser.is_admin
-                              ? () => toggleRole('user')
-                              : null
-                          }
-                          label={t('normal_user')}
-                        />
-                        <CustomChip
-                          type="rounded"
-                          size="small"
-                          color={user.type.includes('admin') ? 'primary' : 'default'}
-                          onClick={
-                            currentUser.username !== user.uname && currentUser.is_admin
-                              ? () => toggleRole('admin')
-                              : null
-                          }
-                          label={t('admin')}
-                        />
-                        <CustomChip
-                          type="rounded"
-                          size="small"
-                          color={user.type.includes('signature_manager') ? 'primary' : 'default'}
-                          onClick={currentUser.is_admin ? () => toggleRole('signature_manager') : null}
-                          label={t('signature_manager')}
-                        />
-                        <CustomChip
-                          type="rounded"
-                          size="small"
-                          color={user.type.includes('signature_importer') ? 'primary' : 'default'}
-                          onClick={currentUser.is_admin ? () => toggleRole('signature_importer') : null}
-                          label={t('signature_importer')}
-                        />
+                        {configuration.user.roles.sort().map((role, role_id) => (
+                          <CustomChip
+                            key={role_id}
+                            type="rounded"
+                            size="small"
+                            color={user.roles.includes(role) ? 'primary' : 'default'}
+                            onClick={
+                              currentUser.username !== user.uname && currentUser.is_admin
+                                ? () => toggleRole(role)
+                                : null
+                            }
+                            label={t(`role.${role}`)}
+                          />
+                        ))}
                       </div>
                     ) : (
                       <Skeleton />
@@ -700,15 +717,18 @@ function User({ width, username }: UserProps) {
                       </TableCell>
                     </TableRow>
                   )}
-                {user && currentUser.username === user.uname && configuration.auth.allow_apikeys && (
-                  <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('api_key')}>
-                    <TableCell width="100%">{t('apikeys')}</TableCell>
-                    <TableCell align="right">
-                      <ChevronRightOutlinedIcon />
-                    </TableCell>
-                  </TableRow>
-                )}
-                {user && currentUser.username === user.uname && (
+                {user &&
+                  currentUser.username === user.uname &&
+                  configuration.auth.allow_apikeys &&
+                  user.roles.includes('apikey_access') && (
+                    <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('api_key')}>
+                      <TableCell width="100%">{t('apikeys')}</TableCell>
+                      <TableCell align="right">
+                        <ChevronRightOutlinedIcon />
+                      </TableCell>
+                    </TableRow>
+                  )}
+                {user && currentUser.username === user.uname && user.roles.includes('obo_access') && (
                   <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('apps')}>
                     <TableCell width="100%">{t('apps')}</TableCell>
                     <TableCell align="right">

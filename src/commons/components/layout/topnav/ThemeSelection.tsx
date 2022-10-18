@@ -12,6 +12,7 @@ import {
 import withWidth, { isWidthDown } from '@material-ui/core/withWidth';
 import useApp from 'commons/components/hooks/useAppContext';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
+import useSafeResults from 'components/hooks/useSafeResults';
 import i18n from 'i18next';
 import { useTranslation } from 'react-i18next';
 
@@ -39,6 +40,7 @@ const ThemeSelection = ({ width }) => {
     toggleShowBreadcrumbs,
     toggleBreadcrumbsState
   } = useAppLayout();
+  const { showSafeResults, toggleShowSafeResults } = useSafeResults();
 
   const onToggleLanguage = () => {
     i18n.changeLanguage(isLang(Lang.EN) ? Lang.FR.valueOf() : Lang.EN.valueOf());
@@ -150,6 +152,13 @@ const ThemeSelection = ({ width }) => {
               )}
             </>
           )}
+
+          <ListItem button onClick={toggleShowSafeResults}>
+            <ListItemText>{t('personalization.showsaferesults')}</ListItemText>
+            <ListItemSecondaryAction>
+              <Switch edge="end" checked={showSafeResults} onClick={toggleShowSafeResults} />
+            </ListItemSecondaryAction>
+          </ListItem>
         </List>
       )}
 

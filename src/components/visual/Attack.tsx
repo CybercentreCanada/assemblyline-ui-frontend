@@ -3,9 +3,11 @@ import AssignmentOutlinedIcon from '@material-ui/icons/AssignmentOutlined';
 import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 import SelectAllOutlinedIcon from '@material-ui/icons/SelectAllOutlined';
 import useClipboard from 'commons/components/hooks/useClipboard';
+import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
+import useSafeResults from 'components/hooks/useSafeResults';
 import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
-import { safeFieldValueURI, scoreToVerdict } from 'helpers/utils';
+import { safeFieldValueURI } from 'helpers/utils';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
@@ -26,6 +28,7 @@ type AttackProps = {
   show_type?: boolean;
   highlight_key?: string;
   fullWidth?: boolean;
+  force?: boolean;
 };
 
 const WrappedAttack: React.FC<AttackProps> = ({
@@ -34,13 +37,16 @@ const WrappedAttack: React.FC<AttackProps> = ({
   score = null,
   show_type = false,
   highlight_key = null,
-  fullWidth = false
+  fullWidth = false,
+  force = false
 }) => {
   const { t } = useTranslation();
   const [state, setState] = React.useState(initialMenuState);
   const history = useHistory();
   const { isHighlighted, triggerHighlight } = useHighlighter();
   const { copy } = useClipboard();
+  const { showSafeResults } = useSafeResults();
+  const { scoreToVerdict, user: currentUser } = useALContext();
 
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
 
@@ -50,22 +56,14 @@ const WrappedAttack: React.FC<AttackProps> = ({
     [text]
   );
 
-  let color: PossibleColors = 'default' as 'default';
-  if (lvl) {
-    color = {
-      info: 'default' as 'default',
-      suspicious: 'warning' as 'warning',
-      malicious: 'error' as 'error'
-    }[lvl];
-  } else if (score) {
-    color = {
-      suspicious: 'warning' as 'warning',
-      malicious: 'error' as 'error',
-      safe: 'success' as 'success',
-      info: 'default' as 'default',
-      highly_suspicious: 'warning' as 'warning'
-    }[scoreToVerdict(score)];
-  }
+  const maliciousness = lvl || scoreToVerdict(score);
+  const color: PossibleColors = {
+    suspicious: 'warning' as 'warning',
+    malicious: 'error' as 'error',
+    safe: 'success' as 'success',
+    info: 'default' as 'default',
+    highly_suspicious: 'warning' as 'warning'
+  }[maliciousness];
 
   const handleMenuClick = useCallback(event => {
     event.preventDefault();
@@ -94,7 +92,7 @@ const WrappedAttack: React.FC<AttackProps> = ({
     handleClose();
   }, [handleClick, handleClose]);
 
-  return (
+  return maliciousness === 'safe' && !showSafeResults && !force ? null : (
     <>
       <Menu
         open={state.mouseY !== null}
@@ -108,10 +106,12 @@ const WrappedAttack: React.FC<AttackProps> = ({
           {CLIPBOARD_ICON}
           {t('clipboard')}
         </MenuItem>
-        <MenuItem dense onClick={handleMenuSearch}>
-          {SEARCH_ICON}
-          {t('related')}
-        </MenuItem>
+        {currentUser.roles.includes('submission_view') && (
+          <MenuItem dense onClick={handleMenuSearch}>
+            {SEARCH_ICON}
+            {t('related')}
+          </MenuItem>
+        )}
         <MenuItem dense onClick={handleMenuHighlight}>
           {HIGHLIGHT_ICON}
           {t('highlight')}

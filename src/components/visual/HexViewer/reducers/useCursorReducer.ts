@@ -1,6 +1,7 @@
 import { isArrowDown, isArrowLeft, isArrowRight, isArrowUp } from 'commons/addons/elements/utils/keyboard';
 import { useCallback } from 'react';
 import {
+  DEFAULT_STORE,
   isAction,
   isCursorNull,
   isEnd,
@@ -17,20 +18,8 @@ import {
   UseReducer
 } from '..';
 
-export type CursorState = {
-  cursor: {
-    index: number;
-  };
-};
-
-export const useCursorReducer: UseReducer<CursorState> = () => {
+export const useCursorReducer: UseReducer = () => {
   const classes = useCellStyles();
-
-  const initialState: CursorState = {
-    cursor: {
-      index: null
-    }
-  };
 
   const cursorRender = useCallback(
     (prevStore: Store, nextStore: Store): void => {
@@ -93,10 +82,10 @@ export const useCursorReducer: UseReducer<CursorState> = () => {
     [handleCursorIndex]
   );
 
-  const cursorLocation: Reducers['appLocationInit'] = useCallback(
+  const locationLoad: Reducers['locationLoad'] = useCallback(
     store => {
-      if (store.location.cursor === null) return { ...store };
-      else return handleCursorIndex(store, store.location.cursor);
+      if (DEFAULT_STORE.location.cursor.index === store.location.cursor.index) return { ...store };
+      else return handleCursorIndex(store, store.location.cursor.index);
     },
     [handleCursorIndex]
   );
@@ -108,10 +97,10 @@ export const useCursorReducer: UseReducer<CursorState> = () => {
       else if (isAction.appClickAway(type)) return cursorClickAway(store);
       else if (isAction.cursorClear(type)) return cursorClear(store);
       else if (isAction.cursorKeyDown(type)) return cursorKeyDown(store, payload);
-      else if (isAction.appLocationInit(type)) return cursorLocation(store);
+      else if (isAction.locationLoad(type)) return locationLoad(store);
       else return { ...store };
     },
-    [cursorClear, cursorClickAway, cursorIndexChange, cursorKeyDown, cursorLocation, cursorMouseUp]
+    [cursorClear, cursorClickAway, cursorIndexChange, cursorKeyDown, locationLoad, cursorMouseUp]
   );
 
   const render: RenderHandler = useCallback(
@@ -121,5 +110,5 @@ export const useCursorReducer: UseReducer<CursorState> = () => {
     [cursorRender]
   );
 
-  return { initialState, reducer, render };
+  return { reducer, render };
 };

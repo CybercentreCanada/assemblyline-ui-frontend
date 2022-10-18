@@ -12,9 +12,10 @@ import SearchPager from 'components/visual/SearchPager';
 import HeuristicsTable from 'components/visual/SearchResult/heuristics';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import 'moment/locale/fr';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
+import ForbiddenPage from '../403';
 import HeuristicDetail from './heuristic_detail';
 
 const PAGE_SIZE = 25;
@@ -47,7 +48,7 @@ export default function Heuristics() {
   const { t } = useTranslation(['manageHeuristics']);
   const [pageSize] = useState(PAGE_SIZE);
   const [searching, setSearching] = useState(false);
-  const { indexes } = useALContext();
+  const { indexes, user: currentUser } = useALContext();
   const [heuristicResults, setHeuristicResults] = useState<SearchResults>(null);
   const location = useLocation();
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
@@ -83,7 +84,7 @@ export default function Heuristics() {
   }, [location.hash]);
 
   useEffect(() => {
-    if (query) {
+    if (query && currentUser.roles.includes('heuristic_view')) {
       query.set('rows', PAGE_SIZE);
       query.set('offset', 0);
       setSearching(true);
@@ -136,64 +137,59 @@ export default function Heuristics() {
     [location.search]
   );
 
-  return (
+  return currentUser.roles.includes('heuristic_view') ? (
     <PageFullWidth margin={4}>
-      {useMemo(
-        () => (
-          <>
-            <div style={{ paddingBottom: theme.spacing(2) }}>
-              <Typography variant="h4">{t('title')}</Typography>
-            </div>
+      <div style={{ paddingBottom: theme.spacing(2) }}>
+        <Typography variant="h4">{t('title')}</Typography>
+      </div>
 
-            <PageHeader isSticky>
-              <div style={{ paddingTop: theme.spacing(1) }}>
-                <SearchBar
-                  initValue={query ? query.get('query', '') : ''}
-                  placeholder={t('filter')}
-                  searching={searching}
-                  suggestions={suggestions}
-                  onValueChange={onFilterValueChange}
-                  onClear={onClear}
-                  onSearch={onSearch}
-                >
-                  {heuristicResults !== null && (
-                    <div className={classes.searchresult}>
-                      {heuristicResults.total !== 0 && (
-                        <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
-                          {searching ? (
-                            <span>{t('searching')}</span>
-                          ) : (
-                            <span>
-                              <SearchResultCount count={heuristicResults.total} />
-                              {query.get('query')
-                                ? t(`filtered${heuristicResults.total === 1 ? '' : 's'}`)
-                                : t(`total${heuristicResults.total === 1 ? '' : 's'}`)}
-                            </span>
-                          )}
-                        </Typography>
-                      )}
+      <PageHeader isSticky>
+        <div style={{ paddingTop: theme.spacing(1) }}>
+          <SearchBar
+            initValue={query ? query.get('query', '') : ''}
+            placeholder={t('filter')}
+            searching={searching}
+            suggestions={suggestions}
+            onValueChange={onFilterValueChange}
+            onClear={onClear}
+            onSearch={onSearch}
+          >
+            {heuristicResults !== null && (
+              <div className={classes.searchresult}>
+                {heuristicResults.total !== 0 && (
+                  <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
+                    {searching ? (
+                      <span>{t('searching')}</span>
+                    ) : (
+                      <span>
+                        <SearchResultCount count={heuristicResults.total} />
+                        {query.get('query')
+                          ? t(`filtered${heuristicResults.total === 1 ? '' : 's'}`)
+                          : t(`total${heuristicResults.total === 1 ? '' : 's'}`)}
+                      </span>
+                    )}
+                  </Typography>
+                )}
 
-                      <SearchPager
-                        total={heuristicResults.total}
-                        setResults={setHeuristicResults}
-                        pageSize={pageSize}
-                        index="heuristic"
-                        query={query}
-                        setSearching={setSearching}
-                      />
-                    </div>
-                  )}
-                </SearchBar>
+                <SearchPager
+                  total={heuristicResults.total}
+                  setResults={setHeuristicResults}
+                  pageSize={pageSize}
+                  index="heuristic"
+                  query={query}
+                  setSearching={setSearching}
+                />
               </div>
-            </PageHeader>
-          </>
-        ),
-        [classes.searchresult, heuristicResults, onClear, onSearch, pageSize, query, searching, suggestions, t, theme]
-      )}
+            )}
+          </SearchBar>
+        </div>
+      </PageHeader>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         <HeuristicsTable heuristicResults={heuristicResults} setHeuristicID={setHeuristicID} />
       </div>
     </PageFullWidth>
+  ) : (
+    <ForbiddenPage />
   );
 }

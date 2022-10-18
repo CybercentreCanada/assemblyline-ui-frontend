@@ -9,8 +9,9 @@ import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import useSafeResults from 'components/hooks/useSafeResults';
 import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
-import { safeFieldValueURI, scoreToVerdict } from 'helpers/utils';
+import { safeFieldValueURI } from 'helpers/utils';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory } from 'react-router-dom';
@@ -36,6 +37,7 @@ type TagProps = {
   highlight_key?: string;
   safelisted?: boolean;
   fullWidth?: boolean;
+  force?: boolean;
 };
 
 const WrappedTag: React.FC<TagProps> = ({
@@ -46,18 +48,20 @@ const WrappedTag: React.FC<TagProps> = ({
   short_type = null,
   highlight_key = null,
   safelisted = false,
-  fullWidth = false
+  fullWidth = false,
+  force = false
 }) => {
   const { t } = useTranslation();
   const [state, setState] = React.useState(initialMenuState);
   const [safelistDialog, setSafelistDialog] = React.useState(false);
   const [safelistReason, setSafelistReason] = React.useState(null);
   const history = useHistory();
-  const { user: currentUser } = useALContext();
+  const { user: currentUser, scoreToVerdict } = useALContext();
   const { apiCall } = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
   const { isHighlighted, triggerHighlight } = useHighlighter();
   const { copy } = useClipboard();
+  const { showSafeResults } = useSafeResults();
 
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
 
@@ -67,24 +71,18 @@ const WrappedTag: React.FC<TagProps> = ({
     [type, value]
   );
 
-  let color: PossibleColors = 'default' as 'default';
+  let maliciousness = lvl || scoreToVerdict(score);
   if (safelisted) {
-    color = 'success' as 'success';
-  } else if (lvl) {
-    color = {
-      info: 'default' as 'default',
-      suspicious: 'warning' as 'warning',
-      malicious: 'error' as 'error'
-    }[lvl];
-  } else if (score) {
-    color = {
-      suspicious: 'warning' as 'warning',
-      malicious: 'error' as 'error',
-      safe: 'success' as 'success',
-      info: 'default' as 'default',
-      highly_suspicious: 'warning' as 'warning'
-    }[scoreToVerdict(score)];
+    maliciousness = 'safe';
   }
+
+  const color: PossibleColors = {
+    suspicious: 'warning' as 'warning',
+    malicious: 'error' as 'error',
+    safe: 'success' as 'success',
+    info: 'default' as 'default',
+    highly_suspicious: 'warning' as 'warning'
+  }[maliciousness];
 
   const handleMenuClick = useCallback(event => {
     event.preventDefault();
@@ -146,7 +144,7 @@ const WrappedTag: React.FC<TagProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [safelistReason, t, type, value]);
 
-  return (
+  return maliciousness === 'safe' && !showSafeResults && !force ? null : (
     <>
       <InputDialog
         open={safelistDialog}
@@ -168,7 +166,7 @@ const WrappedTag: React.FC<TagProps> = ({
           state.mouseY !== null && state.mouseX !== null ? { top: state.mouseY, left: state.mouseX } : undefined
         }
       >
-        {type.startsWith('file.rule.') && (
+        {type.startsWith('file.rule.') && currentUser.roles.includes('signature_view') && (
           <MenuItem
             id="clipID"
             dense
@@ -185,18 +183,22 @@ const WrappedTag: React.FC<TagProps> = ({
           {CLIPBOARD_ICON}
           {t('clipboard')}
         </MenuItem>
-        <MenuItem dense onClick={handleMenuSearch}>
-          {SEARCH_ICON}
-          {t('related')}
-        </MenuItem>
+        {currentUser.roles.includes('submission_view') && (
+          <MenuItem dense onClick={handleMenuSearch}>
+            {SEARCH_ICON}
+            {t('related')}
+          </MenuItem>
+        )}
         <MenuItem dense onClick={handleMenuHighlight}>
           {HIGHLIGHT_ICON}
           {t('highlight')}
         </MenuItem>
-        <MenuItem dense onClick={handleMenuSafelist}>
-          {SAFELIST_ICON}
-          {t('safelist')}
-        </MenuItem>
+        {currentUser.roles.includes('safelist_manage') && (
+          <MenuItem dense onClick={handleMenuSafelist}>
+            {SAFELIST_ICON}
+            {t('safelist')}
+          </MenuItem>
+        )}
       </Menu>
       <CustomChip
         wrap

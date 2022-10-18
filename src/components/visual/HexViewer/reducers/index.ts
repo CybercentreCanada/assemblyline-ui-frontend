@@ -5,6 +5,7 @@ export * from './useHexReducer';
 export * from './useHistoryReducer';
 export * from './useHoverReducer';
 export * from './useLayoutReducer';
+export * from './useLoadingReducer';
 export * from './useLocationReducer';
 export * from './useModeReducer';
 export * from './useScrollReducer';

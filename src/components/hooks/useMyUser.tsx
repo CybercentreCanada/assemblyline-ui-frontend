@@ -62,6 +62,12 @@ export type ConfigurationDefinition = {
     dtl: number;
     max_dtl: number;
     sha256_sources: string[];
+    verdicts: {
+      info: number;
+      suspicious: number;
+      highly_suspicious: number;
+      malicious: number;
+    };
   };
   system: {
     organisation: string;
@@ -89,6 +95,13 @@ export type ConfigurationDefinition = {
     tos_lockout: boolean;
     tos_lockout_notify: boolean;
   };
+  user: {
+    roles: string[];
+    role_dependencies: {
+      [role: string]: string[];
+    };
+    types: string[];
+  };
 };
 
 export interface CustomUser extends UserProfileProps {
@@ -110,6 +123,7 @@ export interface CustomUserContextProps extends UserContextProps<CustomUser> {
   systemMessage: SystemMessageDefinition;
   setConfiguration: (cfg: ConfigurationDefinition) => void;
   setSystemMessage: (msg: SystemMessageDefinition) => void;
+  scoreToVerdict: (score: number) => string;
 }
 
 export interface WhoAmIProps extends CustomUser {
@@ -135,7 +149,7 @@ export default function useMyUser(): CustomUserContextProps {
 
     for (const i in ob) {
       if ({}.hasOwnProperty.call(ob, i)) {
-        if (typeof ob[i] == 'object') {
+        if (!Array.isArray(ob[i]) && typeof ob[i] == 'object') {
           const flatObject = flatten(ob[i]);
           for (const x in flatObject) {
             if ({}.hasOwnProperty.call(flatObject, x)) {
@@ -224,6 +238,26 @@ export default function useMyUser(): CustomUserContextProps {
     return true;
   };
 
+  const scoreToVerdict = (score: number | null) => {
+    if (score >= configuration.submission.verdicts.malicious) {
+      return 'malicious';
+    }
+
+    if (score >= configuration.submission.verdicts.highly_suspicious) {
+      return 'highly_suspicious';
+    }
+
+    if (score >= configuration.submission.verdicts.suspicious) {
+      return 'suspicious';
+    }
+
+    if (score === null || score >= configuration.submission.verdicts.info) {
+      return 'info';
+    }
+
+    return 'safe';
+  };
+
   return {
     c12nDef,
     configuration,
@@ -235,6 +269,7 @@ export default function useMyUser(): CustomUserContextProps {
     setConfiguration,
     setSystemMessage,
     isReady,
-    validateProps
+    validateProps,
+    scoreToVerdict
   };
 }

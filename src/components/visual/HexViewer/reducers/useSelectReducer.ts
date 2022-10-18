@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import {
+  DEFAULT_STORE,
   getSelectIndexes,
   isAction,
   isCellMouseDown,
@@ -9,16 +10,14 @@ import {
   Reducers,
   renderArrayClass,
   RenderHandler,
+  setStore,
   Store,
   useCellStyles,
   UseReducer
 } from '..';
 
-export type SelectState = { select: { startIndex: number; endIndex: number; isHighlighting: boolean } };
-
-export const useSelectReducer: UseReducer<SelectState> = () => {
+export const useSelectReducer: UseReducer = () => {
   const classes = useCellStyles();
-  const initialState: SelectState = { select: { startIndex: -1, endIndex: -1, isHighlighting: false } };
 
   const selectRender = useCallback(
     (prevStore: Store, nextStore: Store): void => {
@@ -59,13 +58,17 @@ export const useSelectReducer: UseReducer<SelectState> = () => {
     [selectClear]
   );
 
-  const selectLocation: Reducers['appLocationInit'] = useCallback(store => {
-    if (store.location.selectStart === null || store.location.selectEnd === null) return { ...store };
+  const locationLoad: Reducers['locationLoad'] = useCallback(store => {
+    if (
+      DEFAULT_STORE.select.startIndex === store.location.select.startIndex ||
+      DEFAULT_STORE.select.endIndex === store.location.select.endIndex
+    )
+      return { ...store };
     else
-      return {
-        ...store,
-        select: { ...store.select, ...orderSelectIndexes(store.location.selectStart, store.location.selectEnd) }
-      };
+      return setStore.store.Select(
+        store,
+        orderSelectIndexes(store.location.select.startIndex, store.location.select.endIndex)
+      );
   }, []);
 
   const reducer: ReducerHandler = useCallback(
@@ -74,10 +77,10 @@ export const useSelectReducer: UseReducer<SelectState> = () => {
       else if (isAction.cellMouseEnter(type)) return selectMouseEnter(store, payload);
       else if (isAction.cellMouseDown(type)) return selectMouseDown(store, payload);
       // else if (isAction.bodyMouseUp(type)) return selectMouseUp(store);
-      else if (isAction.appLocationInit(type)) return selectLocation(store);
+      else if (isAction.locationLoad(type)) return locationLoad(store);
       else return { ...store };
     },
-    [selectClear, selectLocation, selectMouseDown, selectMouseEnter]
+    [selectClear, locationLoad, selectMouseDown, selectMouseEnter]
   );
 
   const render: RenderHandler = useCallback(
@@ -87,5 +90,5 @@ export const useSelectReducer: UseReducer<SelectState> = () => {
     [selectRender]
   );
 
-  return { initialState, reducer, render };
+  return { reducer, render };
 };

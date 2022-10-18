@@ -30,11 +30,12 @@ import ResultSection from 'components/visual/ResultCard/result_section';
 import TextVerdict from 'components/visual/TextVerdict';
 import Verdict from 'components/visual/Verdict';
 import VerdictGauge from 'components/visual/VerdictGauge';
-import { bytesToSize, scoreToVerdict } from 'helpers/utils';
+import { bytesToSize } from 'helpers/utils';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { Link, useHistory, useParams } from 'react-router-dom';
+import ForbiddenPage from '../403';
 
 type ParamProps = {
   id: string;
@@ -190,6 +191,7 @@ function AttributionBanner({ report }) {
   const classes = useStyles();
   const score = report ? report.max_score : 0;
   const isXS = useMediaQuery(theme.breakpoints.only('xs'));
+  const { scoreToVerdict } = useALContext();
 
   const BANNER_COLOR_MAP = {
     info: {
@@ -392,12 +394,14 @@ function AttackMatrixBlock({ attack, items }) {
   return (
     <div className={classes.attack_bloc}>
       <span className={classes.attack_title}>{attack.replace(/-/g, ' ')}</span>
-      {Object.keys(items).map((cat, idx) => (
-        <div key={idx}>
-          <TextVerdict verdict={items[cat].h_type} mono />
-          <span style={{ verticalAlign: 'middle' }}>{cat}</span>
-        </div>
-      ))}
+      {Object.keys(items).map((cat, idx) =>
+        items[cat].h_type === 'safe' ? null : (
+          <div key={idx}>
+            <TextVerdict verdict={items[cat].h_type} mono />
+            <span style={{ verticalAlign: 'middle' }}>{cat}</span>
+          </div>
+        )
+      )}
     </div>
   );
 }
@@ -420,7 +424,7 @@ function AttackMatrixSkel() {
   );
 }
 
-function HeuristicsList({ verdict, items, sections, name_map }) {
+function HeuristicsList({ verdict, items, sections, name_map, force = false }) {
   const classes = useStyles();
   const theme = useTheme();
   const classMap = {
@@ -451,7 +455,7 @@ function HeuristicsList({ verdict, items, sections, name_map }) {
                       return (
                         <div key={secidx} className={classes.result_section}>
                           <div style={{ marginRight: theme.spacing(1) }}>
-                            <ResultSection section={sec} printable />
+                            <ResultSection section={sec} printable force={force} />
                           </div>
                         </div>
                       );
@@ -489,36 +493,38 @@ function FileTree({ tree, important_files }) {
     <div>
       {Object.keys(tree).map((f, i) =>
         important_files.indexOf(f) !== -1 ? (
-          <div key={i} style={{ pageBreakInside: 'avoid' }}>
-            <table style={{ borderSpacing: 0 }}>
-              <tbody>
-                <tr>
-                  <td style={{ verticalAlign: 'top' }}>
-                    <Verdict score={tree[f].score} short mono />
-                  </td>
-                  <td>
-                    <b style={{ fontSize: '110%', wordBreak: 'break-word' }}>{tree[f].name.join(' | ')}</b>
-                  </td>
-                </tr>
-                <tr>
-                  <td />
-                  <td>
-                    <div className={classes.file_details}>
-                      {`${tree[f].sha256} - ${tree[f].type} - `}
-                      <b>{tree[f].size}</b>
-                      <span style={{ fontWeight: 300 }}> ({bytesToSize(tree[f].size)})</span>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td />
-                  <td>
-                    <FileTree tree={tree[f].children} important_files={important_files} />
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          tree[f].score < 0 ? null : (
+            <div key={i} style={{ pageBreakInside: 'avoid' }}>
+              <table style={{ borderSpacing: 0 }}>
+                <tbody>
+                  <tr>
+                    <td style={{ verticalAlign: 'top' }}>
+                      <Verdict score={tree[f].score} short mono />
+                    </td>
+                    <td>
+                      <b style={{ fontSize: '110%', wordBreak: 'break-word' }}>{tree[f].name.join(' | ')}</b>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td />
+                    <td>
+                      <div className={classes.file_details}>
+                        {`${tree[f].sha256} - ${tree[f].type} - `}
+                        <b>{tree[f].size}</b>
+                        <span style={{ fontWeight: 300 }}> ({bytesToSize(tree[f].size)})</span>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td />
+                    <td>
+                      <FileTree tree={tree[f].children} important_files={important_files} />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          )
         ) : null
       )}
     </div>
@@ -553,39 +559,41 @@ function FileTreeSkel() {
 export default function SubmissionReport() {
   const { t } = useTranslation(['submissionReport']);
   const { id } = useParams<ParamProps>();
-  const { c12nDef } = useALContext();
+  const { c12nDef, configuration, user: currentUser } = useALContext();
   const history = useHistory();
   const theme = useTheme();
   const [report, setReport] = useState(null);
   const { apiCall } = useMyAPI();
   const sp4 = theme.spacing(4);
   const classes = useStyles();
-  const { configuration } = useALContext();
   const { showErrorMessage, showWarningMessage } = useMySnackbar();
   const [metaOpen, setMetaOpen] = useState(false);
 
   useEffect(() => {
-    apiCall({
-      url: `/api/v4/submission/report/${id}/`,
-      onSuccess: api_data => {
-        setReport(api_data.api_response);
-      },
-      onFailure: api_data => {
-        if (api_data.api_status_code === 425) {
-          showWarningMessage(t('error.too_early'));
-          history.replace(`/submission/detail/${id}`);
-        } else if (api_data.api_status_code === 404) {
-          showErrorMessage(t('error.notfound'));
-          history.replace('/notfound');
-        } else {
-          showErrorMessage(api_data.api_error_message);
+    if (currentUser.roles.includes('submission_view')) {
+      apiCall({
+        url: `/api/v4/submission/report/${id}/`,
+        onSuccess: api_data => {
+          setReport(api_data.api_response);
+        },
+        onFailure: api_data => {
+          if (api_data.api_status_code === 425) {
+            showWarningMessage(t('error.too_early'));
+            history.replace(`/submission/detail/${id}`);
+          } else if (api_data.api_status_code === 404) {
+            showErrorMessage(t('error.notfound'));
+            history.replace('/notfound');
+          } else {
+            showErrorMessage(api_data.api_error_message);
+          }
         }
-      }
-    });
+      });
+    }
+
     // eslint-disable-next-line
   }, []);
 
-  return (
+  return currentUser.roles.includes('submission_view') ? (
     <PageCenter margin={4} width="100%">
       <div className={classes.page}>
         {c12nDef.enforce && (
@@ -901,7 +909,7 @@ export default function SubmissionReport() {
           Object.keys(report.heuristics.malicious).length !== 0 ||
           Object.keys(report.heuristics.suspicious).length !== 0 ||
           Object.keys(report.heuristics.info).length !== 0 ||
-          (report.heuristics.safe && Object.keys(report.heuristics.safe).length !== 0)) && (
+          (report.max_score < 0 && report.heuristics.safe && Object.keys(report.heuristics.safe).length !== 0)) && (
           <>
             <div className={classes.section_title}>
               <Typography variant="h6">{t('heuristics')}</Typography>
@@ -915,6 +923,7 @@ export default function SubmissionReport() {
                     items={report.heuristics.safe}
                     sections={report.heuristic_sections}
                     name_map={report.heuristic_name_map}
+                    force
                   />
                 )}
                 {Object.keys(report.heuristics.malicious).length !== 0 && (
@@ -996,5 +1005,7 @@ export default function SubmissionReport() {
         )}
       </div>
     </PageCenter>
+  ) : (
+    <ForbiddenPage />
   );
 }

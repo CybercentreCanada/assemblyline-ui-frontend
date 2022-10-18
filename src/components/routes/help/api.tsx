@@ -83,10 +83,28 @@ export default function ApiDoc() {
     W: 'warning'
   };
   const userColor = {
-    admin: 'error',
-    signature_manager: 'info',
-    user: null,
-    signature_importer: 'warning'
+    signature_import: 'success',
+    signature_manage: 'info',
+    signature_view: 'default',
+    signature_download: 'warning',
+    administration: 'error',
+    alert_view: 'default',
+    alert_manage: 'info',
+    safelist_view: 'default',
+    safelist_manage: 'info',
+    workflow_view: 'default',
+    workflow_manage: 'info',
+    apikey_access: 'default',
+    obo_access: 'default',
+    bundle_download: 'warning',
+    submission_create: 'success',
+    submission_view: 'default',
+    submission_delete: 'error',
+    submission_manage: 'info',
+    file_detail: 'default',
+    file_download: 'warning',
+    replay_trigger: 'default',
+    replay_system: 'info'
   };
 
   function toggleBlueprintExpand(bp) {
@@ -295,16 +313,16 @@ export default function ApiDoc() {
                               </>
                               <>
                                 <Grid item xs={12} sm={4} md={3} lg={2}>
-                                  <div style={{ fontWeight: 500 }}>{t('require_type')}:</div>
+                                  <div style={{ fontWeight: 500 }}>{t('require_role')}:</div>
                                 </Grid>
                                 <Grid item xs={12} sm={8} md={9} lg={4}>
-                                  {api.require_type.map((utype, uidx) => (
+                                  {api.require_role.map((utype, uidx) => (
                                     <CustomChip
                                       key={uidx}
                                       color={userColor[utype]}
                                       type="rounded"
                                       size="tiny"
-                                      label={t(`user_type.${utype}`)}
+                                      label={t(`role.${utype}`)}
                                     />
                                   ))}
                                 </Grid>
