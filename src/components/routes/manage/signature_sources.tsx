@@ -6,7 +6,6 @@ import {
   Divider,
   Grid,
   IconButton,
-  Link,
   makeStyles,
   Tooltip,
   Typography,
@@ -33,7 +32,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DiGitBranch } from 'react-icons/di';
 import Moment from 'react-moment';
-import { useHistory } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import ForbiddenPage from '../403';
 import { Source } from '../admin/service_detail';
 import { SourceDetail } from './signature_sources_details';
@@ -139,7 +138,7 @@ const queueSourceUpdate = (source: Source) => ({
   status: { ...source.status, state: 'UPDATING', message: 'Queued for update..' }
 });
 
-const WrappedSourceDetailDrawer = ({ service, base, close, reload, generatesSignatures }) => {
+const WrappedSourceDetailDrawer = ({ service, base, close, generatesSignatures }) => {
   const { t } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
   const { c12nDef } = useALContext();
@@ -151,7 +150,6 @@ const WrappedSourceDetailDrawer = ({ service, base, close, reload, generatesSign
   const [source, setSource] = useState(null);
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
   const classes = useStyles();
-  const history = useHistory();
 
   useEffect(() => {
     if (base) {
@@ -173,7 +171,7 @@ const WrappedSourceDetailDrawer = ({ service, base, close, reload, generatesSign
         showSuccessMessage(t(base ? 'change.success' : 'add.success'));
         setModified(false);
         if (!base || !isXL) close();
-        reload();
+        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadUpdateSources')), 1000);
       },
       onEnter: () => setButtonLoading(true),
       onExit: () => setButtonLoading(false)
@@ -189,7 +187,7 @@ const WrappedSourceDetailDrawer = ({ service, base, close, reload, generatesSign
       method: 'DELETE',
       onSuccess: () => {
         showSuccessMessage(t('delete.success'));
-        reload();
+        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadUpdateSources')), 1000);
       }
     });
   };
@@ -201,13 +199,9 @@ const WrappedSourceDetailDrawer = ({ service, base, close, reload, generatesSign
       onSuccess: () => {
         showSuccessMessage(`${t('update.response.success')}: ${source.name} (${service})`);
         setSource(queueSourceUpdate(source));
+        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadUpdateSources')), 500);
       }
     });
-  };
-
-  const viewSourceSignatures = () => {
-    let query = `type:${service.toLowerCase()} AND source:${source.name}`;
-    history.push(`/manage/signatures/?query=${encodeURIComponent(query)}`);
   };
 
   return (
@@ -239,7 +233,10 @@ const WrappedSourceDetailDrawer = ({ service, base, close, reload, generatesSign
                       style={{
                         color: theme.palette.type === 'dark' ? '#F' : '#0'
                       }}
-                      onClick={viewSourceSignatures}
+                      component={Link}
+                      to={`/manage/signatures/?query=${encodeURIComponent(
+                        `type:${service.toLowerCase()} AND source:${source.name}`
+                      )}`}
                     >
                       <FingerprintOutlinedIcon />
                     </IconButton>
@@ -295,14 +292,7 @@ const WrappedSourceDetailDrawer = ({ service, base, close, reload, generatesSign
 
 export const SourceDetailDrawer = React.memo(WrappedSourceDetailDrawer);
 
-export const SourceCard = ({
-  source,
-  onClick,
-  service,
-  generatesSignatures,
-  setUpdateAllEnabled = null,
-  showDetails = true
-}) => {
+export const SourceCard = ({ source, onClick, service, generatesSignatures, showDetails = true }) => {
   const { t, i18n } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
   const { c12nDef } = useALContext();
@@ -317,13 +307,7 @@ export const SourceCard = ({
       url: `/api/v4/signature/sources/update/${service}/?sources=${encodeURIComponent(source.name)}`,
       onSuccess: () => {
         showSuccessMessage(`${t('update.response.success')}: ${source.name} (${service})`);
-        source.status.state = 'UPDATING';
-        source.status.message = 'Queued for update..';
-        //setSource({ ...source, status: { ...source.status, state: 'UPDATING', message: 'Queued for update..' } });
-        if (setUpdateAllEnabled) {
-          // Set the 'Update All' for service to disabled state
-          setUpdateAllEnabled(false);
-        }
+        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadUpdateSources')), 500);
       }
     });
     e.stopPropagation();
@@ -361,7 +345,7 @@ export const SourceCard = ({
                     <IconButton
                       className={classes.actionButton}
                       component={Link}
-                      href={`/manage/signatures/?query=${encodeURIComponent(
+                      to={`/manage/signatures/?query=${encodeURIComponent(
                         `type:${service.toLowerCase()} AND source:${source.name}`
                       )}`}
                       style={{
@@ -470,7 +454,7 @@ export const SourceCard = ({
   );
 };
 
-const ServiceDetail = ({ service, sources, reload, generatesSignatures }) => {
+const ServiceDetail = ({ service, sources, generatesSignatures }) => {
   const { t } = useTranslation(['manageSignatureSources']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
@@ -478,10 +462,6 @@ const ServiceDetail = ({ service, sources, reload, generatesSignatures }) => {
   const classes = useStyles();
   const { apiCall } = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
-  const [serviceSources, setServiceSources] = React.useState(sources);
-  const [updateAllEnabled, setUpdateAllEnabled] = React.useState(
-    serviceSources ? !serviceSources.some(isSourceUpdating) : true
-  );
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const triggerSourceUpdateAll = () => {
@@ -490,8 +470,7 @@ const ServiceDetail = ({ service, sources, reload, generatesSignatures }) => {
       url: `/api/v4/signature/sources/update/${service}/`,
       onSuccess: () => {
         showSuccessMessage(`${t('update_all.response.success')}: ${service}`);
-        setServiceSources(sources.map(source => queueSourceUpdate(source)));
-        setUpdateAllEnabled(false);
+        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadUpdateSources')), 500);
       }
     });
   };
@@ -502,7 +481,6 @@ const ServiceDetail = ({ service, sources, reload, generatesSignatures }) => {
         service={currentService}
         base={source}
         close={closeGlobalDrawer}
-        reload={reload}
         generatesSignatures={generatesSignatures}
       />
     );
@@ -540,10 +518,10 @@ const ServiceDetail = ({ service, sources, reload, generatesSignatures }) => {
               <Tooltip title={t('view_signatures')}>
                 <IconButton
                   component={Link}
+                  to={`/manage/signatures/?query=${encodeURIComponent(`type:${service.toLowerCase()}`)}`}
                   style={{
                     color: theme.palette.type === 'dark' ? '#FFFFFF' : '#000000'
                   }}
-                  href={`/manage/signatures/?query=${encodeURIComponent(`type:${service.toLowerCase()}`)}`}
                 >
                   <FingerprintOutlinedIcon />
                 </IconButton>
@@ -553,13 +531,13 @@ const ServiceDetail = ({ service, sources, reload, generatesSignatures }) => {
               <Tooltip title={t('update_all')}>
                 <IconButton
                   style={{
-                    color: !updateAllEnabled
+                    color: sources.some(isSourceUpdating)
                       ? theme.palette.action.disabled
                       : theme.palette.type === 'dark'
                       ? theme.palette.info.light
                       : theme.palette.info.dark
                   }}
-                  disabled={!updateAllEnabled}
+                  disabled={sources.some(isSourceUpdating)}
                   onClick={triggerSourceUpdateAll}
                 >
                   <SystemUpdateAltIcon />
@@ -571,15 +549,14 @@ const ServiceDetail = ({ service, sources, reload, generatesSignatures }) => {
         <Divider />
         <Collapse in={open} timeout="auto">
           <div>
-            {serviceSources.length !== 0 ? (
-              serviceSources.map((source, id) => (
+            {sources.length !== 0 ? (
+              sources.map((source, id) => (
                 <SourceCard
                   key={id}
                   source={source}
                   service={service}
                   onClick={() => openDrawer(service, source)}
                   generatesSignatures={generatesSignatures}
-                  setUpdateAllEnabled={setUpdateAllEnabled}
                 />
               ))
             ) : (
@@ -591,19 +568,7 @@ const ServiceDetail = ({ service, sources, reload, generatesSignatures }) => {
         </Collapse>
       </div>
     ),
-    [
-      classes.title,
-      generatesSignatures,
-      open,
-      openDrawer,
-      service,
-      serviceSources,
-      sources.length,
-      t,
-      theme,
-      triggerSourceUpdateAll,
-      updateAllEnabled
-    ]
+    [classes.title, generatesSignatures, open, openDrawer, service, sources, t, theme, triggerSourceUpdateAll]
   );
 };
 
@@ -631,8 +596,10 @@ export default function SignatureSources() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const timeoutID = setTimeout(reload, 15000);
 
+    window.addEventListener('reloadUpdateSources', reload);
     return () => {
       clearTimeout(timeoutID);
+      window.removeEventListener('reloadUpdateSources', reload);
     };
   }, [reload]);
 
@@ -652,7 +619,6 @@ export default function SignatureSources() {
                 key={id}
                 service={key}
                 sources={sources[key].sources}
-                reload={reload}
                 generatesSignatures={sources[key].generates_signatures}
               />
             ))
