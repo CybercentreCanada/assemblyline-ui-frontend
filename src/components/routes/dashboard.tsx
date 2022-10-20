@@ -1151,10 +1151,10 @@ const Dashboard = () => {
 
   useEffect(() => {
     reloadStatuses();
-    const timeoutID = setTimeout(reloadStatuses, 30000);
+    const intervalID = setInterval(reloadStatuses, 30000);
 
     return () => {
-      clearTimeout(timeoutID);
+      clearInterval(intervalID);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

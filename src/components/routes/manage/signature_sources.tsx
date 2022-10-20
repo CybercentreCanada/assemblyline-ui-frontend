@@ -594,11 +594,11 @@ export default function SignatureSources() {
   useEffect(() => {
     reload();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    const timeoutID = setTimeout(reload, 15000);
+    const intervalID = setInterval(reload, 15000);
 
     window.addEventListener('reloadUpdateSources', reload);
     return () => {
-      clearTimeout(timeoutID);
+      clearInterval(intervalID);
       window.removeEventListener('reloadUpdateSources', reload);
     };
   }, [reload]);
