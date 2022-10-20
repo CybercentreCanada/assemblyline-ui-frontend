@@ -31,7 +31,14 @@
   "proxy": "Serveur Proxy",
   "proxy.placeholder": "scheme://utilisateur:mot_de_passe@serveur:port",
   "proxy_used": "Un serveur proxy sera utilisé pour se connecter à la source",
-  "title": "Sources de signature",
+  "title": "Sources de mise à jour",
+  "update": "Mettre à jour la source de signature actuelle",
+  "update.response.success": "La source suivante a été déclenchée pour la mise à jour",
+  "update_all": "Mettre à jour toutes les sources de signature pour le service",
+  "update_all.response.success": "Toutes les sources du service suivant ont été déclenchées pour la mise à jour",
+  "update.label.last_successful": "Dernière mise à jour réussie",
+  "update.label.status": "Statut",
   "uri": "URI (obligatoire)",
-  "username": "Nom d'utilisateur"
+  "username": "Nom d'utilisateur",
+  "view_signatures": "Afficher les signatures"
 }

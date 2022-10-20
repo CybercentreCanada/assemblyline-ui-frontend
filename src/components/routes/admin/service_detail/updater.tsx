@@ -333,7 +333,14 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
           service.update_config.sources.map((source, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'center' }}>
               <div style={{ paddingRight: theme.spacing(1), flexGrow: 1 }}>
-                <SourceCard key={i} source={source} onClick={() => handleEditSource(i)} />
+                <SourceCard
+                  key={i}
+                  source={source}
+                  service={service.name}
+                  onClick={() => handleEditSource(i)}
+                  showDetails={false}
+                  generatesSignatures={service.update_config.generates_signatures}
+                />
               </div>
               <div>
                 <Tooltip title={t('updater.sources.remove')}>
