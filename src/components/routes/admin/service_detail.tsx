@@ -75,6 +75,13 @@ export type SubmissionParams = {
   hide?: boolean;
 };
 
+export type SourceStatus = {
+  last_successful_update: string;
+  state: string;
+  message: string;
+  ts: string;
+};
+
 export type Source = {
   ca_cert: string;
   default_classification: string;
@@ -88,6 +95,7 @@ export type Source = {
   uri: string;
   username: string;
   git_branch: string;
+  status: SourceStatus;
 };
 
 type UpdateConfig = {

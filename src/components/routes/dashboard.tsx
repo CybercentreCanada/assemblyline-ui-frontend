@@ -1147,11 +1147,15 @@ const Dashboard = () => {
         setDispatcherStatus(api_data.api_response.dispatcher);
       }
     });
-    setTimeout(reloadStatuses, 30000);
   }
 
   useEffect(() => {
     reloadStatuses();
+    const intervalID = setInterval(reloadStatuses, 30000);
+
+    return () => {
+      clearInterval(intervalID);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
