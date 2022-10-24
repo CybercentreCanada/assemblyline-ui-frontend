@@ -44,7 +44,7 @@ type SettingsDefinition = {
   ttl: number;
 };
 
-type SystemMessageDefinition = {
+export type SystemMessageDefinition = {
   user: string;
   title: string;
   severity: 'success' | 'info' | 'warning' | 'error';
@@ -85,6 +85,7 @@ export type ConfigurationDefinition = {
     };
     banner_level: 'info' | 'warning' | 'error' | 'success';
     read_only: boolean;
+    rss_feeds: string[];
     tos: boolean;
     tos_lockout: boolean;
     tos_lockout_notify: boolean;

@@ -106,7 +106,7 @@ export const NewsFeedProvider = ({ children }: NewsFeedProviderProps) => {
 
   const localStorageKey = useRef('news-feed');
   const [feeds, setFeeds] = useState<Feed[]>([]);
-  const [feedDrawerOpen, setFeedDrawerOpen] = useState<boolean>(true);
+  const [feedDrawerOpen, setFeedDrawerOpen] = useState<boolean>(false);
 
   const { setSystemMessage, user: currentUser } = useALContext();
   const { apiCall } = useMyAPI();
@@ -172,8 +172,6 @@ export const NewsFeedProvider = ({ children }: NewsFeedProviderProps) => {
 
         const builder = new XMLBuilder({});
         const xmlContent = builder.build(jObj);
-
-        console.log(jObj);
 
         resolve({
           ...f,
