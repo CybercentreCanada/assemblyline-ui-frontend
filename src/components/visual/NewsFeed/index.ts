@@ -1,3 +1,4 @@
+export * from '../NotificationArea';
 export * from './components/admin/AdminFeedDrawer';
 export * from './components/admin/AdminFeedTable';
 export * from './components/commons/DataRow';
@@ -9,7 +10,6 @@ export * from './components/NewsFeedArea';
 export * from './components/notification/NotificationAdminItem';
 export * from './components/notification/NotificationDialog';
 export * from './components/notification/NotificationItem';
-export * from './components/NotificationArea';
 export * from './contexts/NewsFeedContext';
 export * from './hooks/useDelayedEffect';
 export * from './hooks/useDelayedState';
