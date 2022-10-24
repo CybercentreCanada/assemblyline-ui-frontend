@@ -52,6 +52,10 @@ services:
       - MAX_BODY_SIZE=100M
       - TEMPLATE=minimal
 
+networks:
+  default:
+    name: external
+
   # # Create test data
   # create_test_data:
   #   image: cccs/assemblyline-core:4.0.stable
@@ -181,6 +185,6 @@ services:
   #     elasticsearch:
   #       condition: service_healthy
 
-networks:
-  default:
-    name: external
+# networks:
+#   default:
+#     name: external
