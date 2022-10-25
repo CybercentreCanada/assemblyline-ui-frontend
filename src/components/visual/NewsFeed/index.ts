@@ -1,4 +1,4 @@
-export * from '../NotificationArea';
+export * from '../Notification2/NotificationArea';
 export * from './components/admin/AdminFeedDrawer';
 export * from './components/admin/AdminFeedTable';
 export * from './components/commons/DataRow';

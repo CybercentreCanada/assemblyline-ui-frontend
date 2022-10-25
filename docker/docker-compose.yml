@@ -92,10 +92,6 @@ services:
       elasticsearch:
         condition: service_healthy
 
-networks:
-  default:
-    name: external
-
   # # #####################################
   # # Test Components
   # # (Only to receive heartbeat
@@ -185,6 +181,6 @@ networks:
   #     elasticsearch:
   #       condition: service_healthy
 
-# networks:
-#   default:
-#     name: external
+networks:
+  default:
+    name: external
