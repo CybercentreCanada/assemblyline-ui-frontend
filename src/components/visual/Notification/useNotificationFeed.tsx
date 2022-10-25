@@ -296,17 +296,6 @@ export const useNotificationFeed = (): UseNotificationFeedReturn => {
           const newNotifications = feeds
             .flatMap(f => f.items)
             .map((n: FeedItem) => ({ ...n, isNew: n.pubDate.valueOf() > lastTimeOpen.valueOf() }))
-            .concat({
-              isNew: true,
-              guid: 'asd',
-              pubDate: new Date(),
-              title:
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis orci sem, iaculis ac rutrum nec, tempor in arcu. Nulla eu gravida elit, sit amet scelerisque leo. Vestibulum viverra euismod venenatis. Mauris dignissim luctus justo non placerat. Duis ac ipsum eget tellus congue commodo. Sed consequat, diam ullamcorper pellentesque porttitor, nunc odio vestibulum felis, vitae sollicitudin lorem urna at ligula. Nam commodo purus in sapien finibus tincidunt.',
-              description:
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis orci sem, iaculis ac rutrum nec, tempor in arcu. Nulla eu gravida elit, sit amet scelerisque leo. Vestibulum viverra euismod venenatis. Mauris dignissim luctus justo non placerat. Duis ac ipsum eget tellus congue commodo. Sed consequat, diam ullamcorper pellentesque porttitor, nunc odio vestibulum felis, vitae sollicitudin lorem urna at ligula. Nam commodo purus in sapien finibus tincidunt.',
-              link: null,
-              enclosure: null
-            })
             .sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf());
           onSuccess(newNotifications);
         })
