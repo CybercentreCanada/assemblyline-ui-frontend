@@ -46,7 +46,15 @@ const useStyles = makeStyles(theme => ({
     overflow: 'hidden',
     display: '-webkit-box',
     '-webkit-line-clamp': 3,
-    '-webkit-box-orient': 'vertical'
+    '-webkit-box-orient': 'vertical',
+    '&>a': {
+      textDecoration: 'none',
+      color: theme.palette.primary.main,
+      transition: 'color 225ms cubic-bezier(0, 0, 0.2, 1) 0ms',
+      '&:hover': {
+        color: theme.palette.type === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark
+      }
+    }
   },
   divider: {
     width: '95%',
@@ -81,6 +89,7 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
             {notification.link ? (
               <Link
                 className={clsx(classes.link)}
+                title={notification.link}
                 to={{ pathname: notification.link }}
                 target="_blank"
                 rel="noopener noreferrer"
