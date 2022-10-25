@@ -205,7 +205,7 @@ export const useNotificationFeed = (): UseNotificationFeedReturn => {
         RSSChannelConversion.map(channel => {
           const value = getValueFromPath(source, channel.source);
           origin = setValueFromPath(origin, channel.origin, value, channel.type);
-          return '';
+          return channel;
         });
 
         const sourceItems: Array<any> = getValueFromPath(source, RSSItems.source) as Array<any>;
@@ -215,7 +215,7 @@ export const useNotificationFeed = (): UseNotificationFeedReturn => {
             let value = getValueFromPath(sourceItem, item.source);
             if (typeof value === 'string')
               newItem = setValueFromPath(newItem, item.origin, cleanTag(value as string), item.type);
-            return '';
+            return item;
           });
           return newItem;
         });
@@ -279,8 +279,12 @@ export const useNotificationFeed = (): UseNotificationFeedReturn => {
   );
 
   const fetchNotificationFeeds = useCallback(
-    (urls: Array<string>): Promise<Feed[]> =>
+    (urls: Array<string> = []): Promise<Feed[]> =>
       new Promise(async (resolve, reject) => {
+        if (!urls) {
+          reject('no urls');
+          return;
+        }
         const n: Feed[] = (await Promise.all(urls.map(url => fetchNotificationFeed(url))).catch(err =>
           reject(err)
         )) as Feed[];
