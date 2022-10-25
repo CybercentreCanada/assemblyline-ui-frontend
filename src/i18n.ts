@@ -4,7 +4,6 @@ import error403EN from 'locales/en/403.json';
 import error404EN from 'locales/en/404.json';
 import adminActionsEN from 'locales/en/admin/actions.json';
 import adminErrorViewerEN from 'locales/en/admin/error_viewer.json';
-import adminFeedsEN from 'locales/en/admin/feeds.json';
 import adminIdentifyEN from 'locales/en/admin/identify.json';
 import adminServicesEN from 'locales/en/admin/services.json';
 import adminServiceReviewEN from 'locales/en/admin/service_review.json';
@@ -16,7 +15,6 @@ import authorizeEN from 'locales/en/authorize.json';
 import carouselEN from 'locales/en/carousel.json';
 import dashboardEN from 'locales/en/dashboard.json';
 import favoritesEN from 'locales/en/favorites.json';
-import feedEN from 'locales/en/feed.json';
 import fileDetailEN from 'locales/en/file/detail.json';
 import hexViewerEN from 'locales/en/file/hex.json';
 import fileViewerEN from 'locales/en/file/viewer.json';
@@ -53,7 +51,6 @@ import error403FR from 'locales/fr/403.json';
 import error404FR from 'locales/fr/404.json';
 import adminActionsFR from 'locales/fr/admin/actions.json';
 import adminErrorViewerFR from 'locales/fr/admin/error_viewer.json';
-import adminFeedsFR from 'locales/fr/admin/feeds.json';
 import adminIdentifyFR from 'locales/fr/admin/identify.json';
 import adminServicesFR from 'locales/fr/admin/services.json';
 import adminServiceReviewFR from 'locales/fr/admin/service_review.json';
@@ -65,7 +62,6 @@ import authorizeFR from 'locales/fr/authorize.json';
 import carouselFR from 'locales/fr/carousel.json';
 import dashboardFR from 'locales/fr/dashboard.json';
 import favoritesFR from 'locales/fr/favorites.json';
-import feedFR from 'locales/fr/feed.json';
 import fileDetailFR from 'locales/fr/file/detail.json';
 import hexViewerFR from 'locales/fr/file/hex.json';
 import fileViewerFR from 'locales/fr/file/viewer.json';
@@ -105,7 +101,6 @@ const resources = {
     adminActions: adminActionsEN,
     adminErrorViewer: adminErrorViewerEN,
     adminIdentify: adminIdentifyEN,
-    adminFeeds: adminFeedsEN,
     adminServices: adminServicesEN,
     adminServiceReview: adminServiceReviewEN,
     adminSiteMap: adminSiteMapEN,
@@ -116,7 +111,6 @@ const resources = {
     dashboard: dashboardEN,
     error403: error403EN,
     error404: error404EN,
-    feed: feedEN,
     fileDetail: fileDetailEN,
     fileViewer: fileViewerEN,
     helpAPI: helpAPIEN,
@@ -156,7 +150,6 @@ const resources = {
     adminActions: adminActionsFR,
     adminErrorViewer: adminErrorViewerFR,
     adminIdentify: adminIdentifyFR,
-    adminFeeds: adminFeedsFR,
     adminServices: adminServicesFR,
     adminServiceReview: adminServiceReviewFR,
     adminSiteMap: adminSiteMapFR,
@@ -167,7 +160,6 @@ const resources = {
     dashboard: dashboardFR,
     error403: error403FR,
     error404: error404FR,
-    feed: feedFR,
     fileDetail: fileDetailFR,
     fileViewer: fileViewerFR,
     helpAPI: helpAPIFR,

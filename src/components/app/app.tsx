@@ -16,8 +16,6 @@ import Tos from 'components/routes/tos';
 import CarouselProvider from 'components/visual/CarouselProvider';
 import DrawerProvider from 'components/visual/DrawerProvider';
 import HighlightProvider from 'components/visual/HighlightProvider';
-import { NewsFeedProvider } from 'components/visual/NewsFeed';
-import { NotificationApp } from 'components/visual/Notification';
 import { getProvider } from 'helpers/utils';
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
@@ -92,15 +90,11 @@ const AppInit: React.FC = () => {
         <SiteMapProvider {...sitemapProps}>
           <HighlightProvider>
             <CarouselProvider>
-              <NewsFeedProvider>
-                <NotificationApp>
-                  <DrawerProvider>
-                    <AppLayoutProvider {...layoutProps}>
-                      <MyApp />
-                    </AppLayoutProvider>
-                  </DrawerProvider>
-                </NotificationApp>
-              </NewsFeedProvider>
+              <DrawerProvider>
+                <AppLayoutProvider {...layoutProps}>
+                  <MyApp />
+                </AppLayoutProvider>
+              </DrawerProvider>
             </CarouselProvider>
           </HighlightProvider>
         </SiteMapProvider>

@@ -24,7 +24,7 @@ import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
 import SimCardOutlinedIcon from '@material-ui/icons/SimCardOutlined';
 import SupervisorAccountOutlinedIcon from '@material-ui/icons/SupervisorAccountOutlined';
 import { AppLayoutProps } from 'commons/components/layout/LayoutProvider';
-import { Notification } from 'components/visual/Notification2';
+import { Notification } from 'components/visual/Notification';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 
