@@ -13,6 +13,7 @@ import {
   MenuItem,
   Select,
   TextField,
+  Tooltip,
   Typography,
   useTheme
 } from '@material-ui/core';
@@ -357,12 +358,7 @@ const WrappedNotificationArea = () => {
         text={t('delete.text')}
       />
 
-      <IconButton
-        // disabled={!systemMessage && !currentUser.is_admin}
-        color="inherit"
-        aria-label="open drawer"
-        onClick={onOpenNotificationArea}
-      >
+      <IconButton color="inherit" aria-label="open drawer" onClick={onOpenNotificationArea}>
         <Badge
           invisible={systemMessageRead && notifications.filter(n => n.isNew).length === 0}
           classes={{ badge: clsx(classes.baseColor, systemMessage && getColor(systemMessage, 'bgColor', 1)) }}
@@ -388,20 +384,6 @@ const WrappedNotificationArea = () => {
             )
           }
         />
-
-        {/* {systemMessage ? (
-          <Badge
-            invisible={read}
-            classes={{ badge: badgeColorMap[systemMessage.severity] }}
-            badgeContent={t(`severity.${systemMessage.severity}`).charAt(0).toUpperCase()}
-          >
-            <NotificationsActiveOutlinedIcon />
-          </Badge>
-        ) : currentUser.is_admin ? (
-          <AddAlertOutlinedIcon />
-        ) : (
-          <NotificationsNoneOutlinedIcon />
-        )} */}
       </IconButton>
       <Drawer anchor="right" classes={{ paper: classes.drawer }} open={drawer} onClose={onCloseNotificationArea}>
         <div className={classes.root}>
@@ -440,37 +422,43 @@ const WrappedNotificationArea = () => {
                   <Typography
                     className={clsx(classes.title, getColor(systemMessage, 'color', 2))}
                     variant={'h6'}
-                    children={'System Message'}
+                    children={t('systemMessage.header')}
                   />
                   {currentUser &&
                     currentUser.is_admin &&
                     (systemMessage ? (
                       <>
                         <div className={clsx(classes.action)}>
-                          <IconButton
-                            className={clsx(getColor(systemMessage, 'color', 2))}
-                            size="small"
-                            onClick={onOpenEditSystemMessageDialog}
-                            children={<EditOutlinedIcon />}
-                          />
+                          <Tooltip title={t('edit.title')} aria-label={t('edit.title')}>
+                            <IconButton
+                              className={clsx(getColor(systemMessage, 'color', 2))}
+                              size="small"
+                              onClick={onOpenEditSystemMessageDialog}
+                              children={<EditOutlinedIcon />}
+                            />
+                          </Tooltip>
                         </div>
                         <div className={clsx(classes.action)}>
-                          <IconButton
-                            className={clsx(getColor(systemMessage, 'color', 2))}
-                            size="small"
-                            onClick={() => setDeleteConfirmation(true)}
-                            children={<DeleteOutlineOutlinedIcon />}
-                          />
+                          <Tooltip title={t('delete.title')} aria-label={t('delete.title')}>
+                            <IconButton
+                              className={clsx(getColor(systemMessage, 'color', 2))}
+                              size="small"
+                              onClick={() => setDeleteConfirmation(true)}
+                              children={<DeleteOutlineOutlinedIcon />}
+                            />
+                          </Tooltip>
                         </div>
                       </>
                     ) : (
                       <div className={clsx(classes.action)}>
-                        <IconButton
-                          size="small"
-                          color="inherit"
-                          onClick={onOpenCreateSystemMessageDialog}
-                          children={<AddOutlinedIcon />}
-                        />
+                        <Tooltip title={t('add.title')} aria-label={t('add.title')}>
+                          <IconButton
+                            size="small"
+                            color="inherit"
+                            onClick={onOpenCreateSystemMessageDialog}
+                            children={<AddOutlinedIcon />}
+                          />
+                        </Tooltip>
                       </div>
                     ))}
                 </div>
@@ -492,15 +480,14 @@ const WrappedNotificationArea = () => {
                   </div>
                 ) : (
                   <div className={clsx(classes.row, classes.center)}>
-                    <Typography variant="body2" color="secondary" children={'There is no system message.'} />
+                    <Typography variant="body2" color="secondary" children={t(`systemMessage.none`)} />
                   </div>
                 )}
               </>
             )}
-
             <div className={clsx(classes.row, classes.header)}>
               <ChatBubbleOutlineIcon className={clsx(classes.icon)} fontSize="medium" />
-              <Typography className={clsx(classes.title)} variant={'h6'} children={'Notifications'} />
+              <Typography className={clsx(classes.title)} variant={'h6'} children={t(`notification.header`)} />
             </div>
             <Divider className={clsx(classes.divider)} variant="fullWidth" />
             {notifications === null ? (
@@ -509,7 +496,7 @@ const WrappedNotificationArea = () => {
               </div>
             ) : notifications.length === 0 ? (
               <div className={clsx(classes.row, classes.center)}>
-                <Typography variant="body2" color="secondary" children={'There are no notifications.'} />
+                <Typography variant="body2" color="secondary" children={t('notification.none')} />
               </div>
             ) : (
               notifications.map((n, i) => (
