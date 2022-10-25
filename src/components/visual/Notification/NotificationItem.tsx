@@ -1,5 +1,4 @@
 import { Divider, makeStyles, Typography } from '@material-ui/core';
-import LaunchOutlinedIcon from '@material-ui/icons/LaunchOutlined';
 import PriorityHighIcon from '@material-ui/icons/PriorityHigh';
 import clsx from 'clsx';
 import React from 'react';
@@ -101,7 +100,7 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
                 dangerouslySetInnerHTML={{ __html: notification.title }}
               />
             )}
-            {notification.link && (
+            {/* {notification.link && (
               <Link
                 className={clsx(classes.launch)}
                 to={{ pathname: notification.link }}
@@ -110,7 +109,7 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
               >
                 <LaunchOutlinedIcon fontSize="small" />
               </Link>
-            )}
+            )} */}
           </div>
           <Typography
             className={classes.description}
