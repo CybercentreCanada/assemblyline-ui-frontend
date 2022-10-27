@@ -292,30 +292,6 @@ const WrappedNotificationArea = () => {
     return () => setNotifications([]);
   }, [configuration, fetchJSONNotifications, handleLastTimeOpen]);
 
-  // useEffect(() => {
-  //   handleLastTimeOpen();
-  //   !loaded &&
-  //     apiCall({
-  //       url: '/api/v4/feed/',
-  //       method: 'GET',
-  //       onSuccess: response => {
-  //         setLoaded(true);
-  //         const feeds = parseJSONFeedResponse(response);
-  //         setNotifications(
-  //           feeds
-  //             .flatMap(f => f.items)
-  //             .map((item: JSONFeedItem) => ({
-  //               ...item,
-  //               _isNew: item.date_published.valueOf() > lastTimeOpen.current.valueOf()
-  //             }))
-  //             .sort((a, b) => b.date_published.valueOf() - a.date_published.valueOf())
-  //         );
-  //       }
-  //     });
-  //   return () => null;
-  //   // return () => setNotifications([]);
-  // }, [apiCall, handleLastTimeOpen, loaded, parseJSONFeedResponse]);
-
   return (
     <>
       <Dialog

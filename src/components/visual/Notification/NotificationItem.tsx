@@ -76,10 +76,6 @@ const useStyles = makeStyles(theme => ({
     marginTop: '8px'
   },
   description: {
-    // overflow: 'hidden',
-    // display: '-webkit-box',
-    // '-webkit-line-clamp': 3,
-    // '-webkit-box-orient': 'vertical',
     '&>a': {
       textDecoration: 'none',
       color: theme.palette.primary.main,
@@ -145,12 +141,10 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
                 i18n.language === 'en' ? 'MMMM Do YYYY' : i18n.language === 'fr' ? 'Do MMMM YYYY' : 'MMMM Do YYYY'
               }
             >
-              {/* <Moment locale={i18n.language} fromNow>*/}
               {notification.date_published}
             </Moment>
           </Typography>
           <div className={classes.header}>
-            {/* {notification._isNew && <PriorityHighIcon classes={{ root: clsx(classes.icon) }} fontSize="small" />} */}
             {notification.url ? (
               <div>
                 <Link
@@ -165,7 +159,6 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
                     variant="body1"
                     color="secondary"
                     children={notification.title}
-                    // dangerouslySetInnerHTML={{ __html: notification.title }}
                   />
                 </Link>
               </div>
@@ -175,19 +168,8 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
                 variant="body1"
                 color="secondary"
                 children={notification.title}
-                // dangerouslySetInnerHTML={{ __html: notification.title }}
               />
             )}
-            {/* {notification.link && (
-              <Link
-                className={clsx(classes.launch)}
-                to={{ pathname: notification.link }}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <LaunchOutlinedIcon fontSize="small" />
-              </Link>
-            )} */}
           </div>
           {notification.content_text ? (
             <div className={classes.content}>
@@ -196,7 +178,6 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
                 variant="body2"
                 color="textPrimary"
                 children={notification.content_text}
-                // dangerouslySetInnerHTML={{ __html: notification.content_text }}
               />
               <img className={classes.descriptionImage} src={notification.image} alt="" />
             </div>
@@ -206,7 +187,6 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
                 className={classes.description}
                 variant="body2"
                 color="textPrimary"
-                // children={notification.content_html}
                 dangerouslySetInnerHTML={{ __html: notification.content_html }}
               />
               <img className={classes.descriptionImage} src={notification.image} alt="" />
@@ -218,42 +198,6 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
                 <Author key={`${i} - ${author}`} author={author} index={i} last={notification.authors.length - 1} />
               ))}
             </div>
-          )}
-          {notification.authors && (
-            <span></span>
-            // <div className={clsx(classes.row, classes.userRow)}>
-            //   {notification.authors.map((author, i) => (
-            //     <>
-            //       {author.avatar && <img className={classes.userImg} src={author.avatar} alt="author.name" />}
-            //       {author.name && author.url ? (
-            //         <Typography
-            //           className={clsx(classes.title, classes.launch, notification._isNew && classes.isNew)}
-            //           variant="body1"
-            //           color="secondary"
-            //           children={<a href={author.url}>{author.name}</a>}
-            //         />
-            //       ) : (
-            //         author.name && (
-            //           <Typography
-            //             className={classes.user}
-            //             variant="caption"
-            //             color="textSecondary"
-            //             children={author.name}
-            //             //  children={notification.authors.map(author => author.name).join(', ')}
-            //           />
-            //         )
-            //       )}
-            //     </>
-            //   ))}
-            // </div>
-            // {/* <img className={classes.userImg} src={notification.image} alt="" /> */}
-            // <Typography
-            //   className={classes.user}
-            //   variant="caption"
-            //   color="textSecondary"
-            //   children={notification.authors.map(author => author.name).join(', ')}
-            // />}
-            // </div>
           )}
         </div>
         {!hideDivider && <Divider className={classes.divider} variant="fullWidth" />}
