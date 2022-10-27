@@ -1,5 +1,6 @@
 import { Divider, makeStyles, Typography } from '@material-ui/core';
 import clsx from 'clsx';
+import * as DOMPurify from 'dompurify';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
@@ -187,7 +188,9 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
                 className={classes.description}
                 variant="body2"
                 color="textPrimary"
-                dangerouslySetInnerHTML={{ __html: notification.content_html }}
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(notification.content_html, { USE_PROFILES: { html: true } })
+                }}
               />
               <img className={classes.descriptionImage} src={notification.image} alt="" />
             </div>
