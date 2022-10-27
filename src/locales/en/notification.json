@@ -12,7 +12,7 @@
   "edit.severity": "Severity of the message",
   "edit.text": "This message will be permanently displayed for all users in their notification area. Only one message can be displayed at the time and only administrators can change the message.",
   "edit.title": "Set a system message",
-  "notification.header": "Notifications: ",
+  "notification.header": "What's new in Assemblyline",
   "notification.none": "There are no notifications.",
   "save.acceptText": "Yes, do it!",
   "save.cancelText": "Cancel",
@@ -23,6 +23,6 @@
   "severity.info": "Information",
   "severity.success": "Success",
   "severity.warning": "Warning",
-  "systemMessage.header": "System Message: ",
-  "systemMessage.none": "There is no system message."
+  "systemMessage.header": "Announcement",
+  "systemMessage.none": "There is no announcement."
 }
