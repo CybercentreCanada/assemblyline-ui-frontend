@@ -19,12 +19,12 @@ import {
 } from '@material-ui/core';
 import { blue } from '@material-ui/core/colors';
 import AddOutlinedIcon from '@material-ui/icons/AddOutlined';
-import ChatBubbleOutlineIcon from '@material-ui/icons/ChatBubbleOutline';
 import CheckCircleOutlinedIcon from '@material-ui/icons/CheckCircleOutlined';
 import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
 import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
+import FeedbackOutlinedIcon from '@material-ui/icons/FeedbackOutlined';
 import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 import NotificationsActiveOutlinedIcon from '@material-ui/icons/NotificationsActiveOutlined';
 import NotificationsNoneOutlinedIcon from '@material-ui/icons/NotificationsNoneOutlined';
@@ -40,7 +40,7 @@ import 'moment-timezone';
 import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FeedItem, NotificationItem, useNotificationFeed } from '.';
+import { JSONFeedItem, NotificationItem, useNotificationFeed } from '.';
 import ConfirmationDialog from '../ConfirmationDialog';
 
 const useStyles = makeStyles(theme => ({
@@ -57,7 +57,8 @@ const useStyles = makeStyles(theme => ({
     overflowX: 'hidden',
     pageBreakBefore: 'avoid',
     pageBreakInside: 'avoid',
-    padding: theme.spacing(2.5)
+    padding: theme.spacing(2.5),
+    paddingTop: theme.spacing(1)
   },
   container: {
     height: '100%',
@@ -77,6 +78,7 @@ const useStyles = makeStyles(theme => ({
   center: {
     justifyContent: 'center'
   },
+  close: {},
   skeleton: {
     width: '100%',
     height: theme.spacing(8)
@@ -95,11 +97,23 @@ const useStyles = makeStyles(theme => ({
     marginRight: theme.spacing(1.5)
   },
   header: {
-    marginTop: theme.spacing(4)
+    marginTop: theme.spacing(2)
   },
   title: {
-    flex: 1,
-    fontWeight: 500
+    fontSize: 'large',
+    fontWeight: 'bolder',
+    flex: 1
+  },
+  messageTitle: {
+    fontSize: 'large',
+    fontWeight: 'bolder',
+    paddingLeft: theme.spacing(1.25)
+  },
+  messageBody: {
+    paddingLeft: theme.spacing(1.25)
+  },
+  message: {
+    paddingLeft: theme.spacing(1.25)
   },
   item: {
     width: '100%',
@@ -161,9 +175,9 @@ const WrappedNotificationArea = () => {
   const { showSuccessMessage } = useMySnackbar();
 
   const { systemMessage, setSystemMessage, user: currentUser, configuration } = useALContext();
-  const { fetchNotifications } = useNotificationFeed();
+  const { fetchJSONNotifications } = useNotificationFeed();
 
-  const [notifications, setNotifications] = useState<Array<FeedItem>>([]);
+  const [notifications, setNotifications] = useState<Array<JSONFeedItem>>([]);
   const [newSystemMessage, setNewSystemMessage] = useState<SystemMessageDefinition>({
     user: '',
     title: '',
@@ -187,8 +201,7 @@ const WrappedNotificationArea = () => {
     const value = JSON.parse(data);
     if (typeof value !== 'number') return;
 
-    const newDate = new Date(value);
-    lastTimeOpen.current = newDate;
+    lastTimeOpen.current = new Date(value);
   }, [storageKey]);
 
   const onOpenNotificationArea = useCallback(() => {
@@ -202,7 +215,7 @@ const WrappedNotificationArea = () => {
 
     localStorage.setItem(storageKey, JSON.stringify(lastTimeOpen.current.valueOf()));
     setNotifications(nots =>
-      nots.map((n: FeedItem) => ({ ...n, isNew: n.pubDate.valueOf() > lastTimeOpen.current.valueOf() }))
+      nots.map((n: JSONFeedItem) => ({ ...n, _isNew: n.date_published.valueOf() > lastTimeOpen.current.valueOf() }))
     );
   }, [storageKey]);
 
@@ -271,13 +284,37 @@ const WrappedNotificationArea = () => {
   useEffect(() => {
     handleLastTimeOpen();
     if (!configuration) return;
-    fetchNotifications({
+    fetchJSONNotifications({
       urls: configuration.ui.rss_feeds,
       lastTimeOpen: lastTimeOpen.current,
-      onSuccess: (n: Array<FeedItem>) => setNotifications(n)
+      onSuccess: (n: Array<JSONFeedItem>) => setNotifications(n)
     });
     return () => setNotifications([]);
-  }, [configuration, fetchNotifications, handleLastTimeOpen]);
+  }, [configuration, fetchJSONNotifications, handleLastTimeOpen]);
+
+  // useEffect(() => {
+  //   handleLastTimeOpen();
+  //   !loaded &&
+  //     apiCall({
+  //       url: '/api/v4/feed/',
+  //       method: 'GET',
+  //       onSuccess: response => {
+  //         setLoaded(true);
+  //         const feeds = parseJSONFeedResponse(response);
+  //         setNotifications(
+  //           feeds
+  //             .flatMap(f => f.items)
+  //             .map((item: JSONFeedItem) => ({
+  //               ...item,
+  //               _isNew: item.date_published.valueOf() > lastTimeOpen.current.valueOf()
+  //             }))
+  //             .sort((a, b) => b.date_published.valueOf() - a.date_published.valueOf())
+  //         );
+  //       }
+  //     });
+  //   return () => null;
+  //   // return () => setNotifications([]);
+  // }, [apiCall, handleLastTimeOpen, loaded, parseJSONFeedResponse]);
 
   return (
     <>
@@ -360,7 +397,7 @@ const WrappedNotificationArea = () => {
 
       <IconButton color="inherit" aria-label="open drawer" onClick={onOpenNotificationArea}>
         <Badge
-          invisible={systemMessageRead && notifications.filter(n => n.isNew).length === 0}
+          invisible={systemMessageRead && notifications.filter(n => n._isNew).length === 0}
           classes={{ badge: clsx(classes.baseColor, systemMessage && getColor(systemMessage, 'bgColor', 1)) }}
           max={99}
           badgeContent={
@@ -374,10 +411,10 @@ const WrappedNotificationArea = () => {
                 : systemMessage.severity === 'success'
                 ? `\u2714`
                 : ''
-              : notifications.filter(n => n.isNew).length
+              : notifications.filter(n => n._isNew).length
           }
           children={
-            systemMessageRead && notifications.filter(n => n.isNew).length === 0 ? (
+            systemMessageRead && notifications.filter(n => n._isNew).length === 0 ? (
               <NotificationsNoneOutlinedIcon />
             ) : (
               <NotificationsActiveOutlinedIcon />
@@ -389,7 +426,11 @@ const WrappedNotificationArea = () => {
         <div className={classes.root}>
           <div className={classes.container}>
             <div className={classes.row}>
-              <IconButton onClick={onCloseNotificationArea} children={<CloseOutlinedIcon fontSize="medium" />} />
+              <IconButton
+                className={classes.close}
+                onClick={onCloseNotificationArea}
+                children={<CloseOutlinedIcon fontSize="medium" />}
+              />
             </div>
             {(systemMessage || (currentUser && currentUser.is_admin)) && (
               <>
@@ -466,16 +507,21 @@ const WrappedNotificationArea = () => {
                 {systemMessage ? (
                   <div className={clsx(classes.item)}>
                     <Typography
-                      className={clsx(classes.title, getColor(systemMessage, 'color', 2))}
+                      className={clsx(classes.messageTitle, getColor(systemMessage, 'color', 2))}
                       variant="body1"
                       children={systemMessage.title}
                     />
-                    <Typography variant="body2" color="textPrimary" children={systemMessage.message} />
+                    <Typography
+                      className={clsx(classes.messageBody)}
+                      variant="body2"
+                      color="textPrimary"
+                      children={systemMessage.message}
+                    />
                     <Typography
                       className={classes.user}
                       variant="caption"
                       color="textSecondary"
-                      children={' - ' + systemMessage.user}
+                      children={systemMessage.user}
                     />
                   </div>
                 ) : (
@@ -486,7 +532,7 @@ const WrappedNotificationArea = () => {
               </>
             )}
             <div className={clsx(classes.row, classes.header)}>
-              <ChatBubbleOutlineIcon className={clsx(classes.icon)} fontSize="medium" />
+              <FeedbackOutlinedIcon className={clsx(classes.icon)} fontSize="medium" />
               <Typography className={clsx(classes.title)} variant={'h6'} children={t(`notification.header`)} />
             </div>
             <Divider className={clsx(classes.divider)} variant="fullWidth" />
