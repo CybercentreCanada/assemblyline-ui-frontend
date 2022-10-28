@@ -346,6 +346,7 @@ function WrappedSubmissionDetail() {
   };
 
   const getParsedErrors = errorList => {
+    const services = new Set();
     const relevantErrors = errors =>
       errors.filter(error => {
         let eID = error.substr(65, error.length);
@@ -367,6 +368,8 @@ function WrappedSubmissionDetail() {
       errors.forEach(error => {
         const srv = getServiceFromKey(error);
         const eID = getErrorIDFromKey(error);
+
+        services.add(srv);
 
         if (eID === '20') {
           if (out.busy.indexOf(srv) === -1) {
@@ -403,7 +406,8 @@ function WrappedSubmissionDetail() {
 
     return {
       aggregated: futileErrors(errorList),
-      listed: relevantErrors(errorList)
+      listed: relevantErrors(errorList),
+      services: Array.from(services)
     };
   };
 
