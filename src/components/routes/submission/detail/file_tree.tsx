@@ -1,4 +1,5 @@
 import { Box, Collapse, Divider, IconButton, makeStyles, Tooltip, Typography, useTheme } from '@material-ui/core';
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 import { Skeleton } from '@material-ui/lab';
 import useHighlighter from 'components/hooks/useHighlighter';
@@ -13,7 +14,9 @@ const useStyles = makeStyles(theme => ({
     cursor: 'pointer',
     '&:hover, &:focus': {
       backgroundColor: theme.palette.action.hover
-    }
+    },
+    flexGrow: 1,
+    width: '100%'
   },
   title: {
     cursor: 'pointer',
@@ -93,7 +96,7 @@ const WrappedFileTreeSection: React.FC<FileTreeProps> = ({ tree, sid, force = fa
 };
 
 const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, forcedShown, setForcedShown, force = false }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('submissionDetail');
   const theme = useTheme();
   const classes = useStyles();
   const history = useHistory();
@@ -107,44 +110,64 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, forcedShown, setF
         return !isVisible(tree[sha256], forcedShown, isHighlighted) ||
           (item.score < 0 && !showSafeResults && !force) ? null : (
           <div key={i}>
-            <Box
-              className={classes.file_item}
-              onClick={
-                item.sha256
-                  ? () => {
-                      history.push(`/submission/detail/${sid}/${item.sha256}?name=${encodeURI(item.name[0])}`);
-                    }
-                  : null
-              }
-              style={{
-                wordBreak: 'break-word',
-                backgroundColor: isHighlighted(sha256) ? (theme.palette.type === 'dark' ? '#343a44' : '#d8e3ea') : null
-              }}
-            >
-              <span>
-                {item.children && Object.values(item.children).some(c => !isVisible(c, forcedShown, isHighlighted)) ? (
-                  <Tooltip title={t('more')}>
-                    <IconButton
-                      size="small"
-                      style={{ padding: 0 }}
-                      onClick={event => {
-                        event.stopPropagation();
-                        const tempForcedShown = new Set([...Array.from(forcedShown)]);
-                        Object.values(item.children).forEach(tempItem => tempForcedShown.add(tempItem.sha256));
-                        setForcedShown(tempForcedShown);
-                      }}
-                    >
-                      <ArrowRightIcon />
-                    </IconButton>
-                  </Tooltip>
-                ) : (
-                  <span style={{ marginLeft: theme.spacing(3) }} />
-                )}
-                <Verdict score={item.score} mono short />
-                {`:: ${item.name.join(' | ')} `}
-                <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{`[${item.type}]`}</span>
-              </span>
-            </Box>
+            <div style={{ display: 'flex', width: '100%' }}>
+              {item.children && Object.values(item.children).some(c => !isVisible(c, forcedShown, isHighlighted)) ? (
+                <Tooltip title={t('tree_more')}>
+                  <IconButton
+                    size="small"
+                    style={{ padding: 0 }}
+                    onClick={event => {
+                      const tempForcedShown = new Set([...Array.from(forcedShown)]);
+                      Object.values(item.children).forEach(tempItem => tempForcedShown.add(tempItem.sha256));
+                      setForcedShown(tempForcedShown);
+                    }}
+                  >
+                    <ArrowRightIcon />
+                  </IconButton>
+                </Tooltip>
+              ) : item.children && Object.values(item.children).some(c => forcedShown.has(c.sha256)) ? (
+                <Tooltip title={t('tree_less')}>
+                  <IconButton
+                    size="small"
+                    style={{ padding: 0 }}
+                    onClick={event => {
+                      const tempForcedShown = new Set([...Array.from(forcedShown)]);
+                      Object.values(item.children).forEach(tempItem => tempForcedShown.delete(tempItem.sha256));
+                      setForcedShown(tempForcedShown);
+                    }}
+                  >
+                    <ArrowDropDownIcon />
+                  </IconButton>
+                </Tooltip>
+              ) : (
+                <span style={{ marginLeft: theme.spacing(3) }} />
+              )}
+              <Box
+                className={classes.file_item}
+                component={'span'}
+                onClick={
+                  item.sha256
+                    ? () => {
+                        history.push(`/submission/detail/${sid}/${item.sha256}?name=${encodeURI(item.name[0])}`);
+                      }
+                    : null
+                }
+                style={{
+                  wordBreak: 'break-word',
+                  backgroundColor: isHighlighted(sha256)
+                    ? theme.palette.type === 'dark'
+                      ? '#343a44'
+                      : '#d8e3ea'
+                    : null
+                }}
+              >
+                <span>
+                  <Verdict score={item.score} mono short />
+                  {`:: ${item.name.join(' | ')} `}
+                  <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{`[${item.type}]`}</span>
+                </span>
+              </Box>
+            </div>
             <div style={{ marginLeft: theme.spacing(3) }}>
               <FileTree
                 tree={item.children}

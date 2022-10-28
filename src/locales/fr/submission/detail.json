@@ -56,6 +56,8 @@
   "times.submitted": "Temps de début",
   "title": "Détails de la soumission",
   "tree": "Fichiers",
+  "tree_less": "Masquer les sous-fichiers sans score",
+  "tree_more": "Afficher les sous-fichiers sans score",
   "verdict.info": "Informatif",
   "verdict.is.malicious": "Vous pensez que ce fichier est malveillant",
   "verdict.is.non_malicious": "Vous pensez que ce fichier n'est pas malveillant",

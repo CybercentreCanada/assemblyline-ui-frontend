@@ -56,6 +56,8 @@
   "times.submitted": "Start Time",
   "title": "Submission Details",
   "tree": "Files",
+  "tree_less": "Hide non-scoring sub-files",
+  "tree_more": "Show non-scoring sub-files",
   "verdict.info": "Informational",
   "verdict.is.malicious": "You believe this file is Malicious",
   "verdict.is.non_malicious": "You believe this file is Non-Malicious",
