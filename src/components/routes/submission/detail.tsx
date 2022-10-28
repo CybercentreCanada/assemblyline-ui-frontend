@@ -346,31 +346,20 @@ function WrappedSubmissionDetail() {
   };
 
   const getParsedErrors = errorList => {
-    const services = new Set();
-    const relevantErrors = errors =>
-      errors.filter(error => {
-        let eID = error.substr(65, error.length);
-
-        if (eID.indexOf('.e') !== -1) {
-          eID = eID.substr(eID.indexOf('.e') + 2, eID.length);
-        }
-
-        return ['30', '20', '21', '12', '10', '11'].indexOf(eID) === -1;
-      });
-    const futileErrors = errors => {
+    const aggregated = errors => {
       const out = {
         depth: [],
         files: [],
         retry: [],
         down: [],
         busy: [],
-        preempted: []
+        preempted: [],
+        exception: [],
+        unknown: []
       };
       errors.forEach(error => {
         const srv = getServiceFromKey(error);
         const eID = getErrorIDFromKey(error);
-
-        services.add(srv);
 
         if (eID === '20') {
           if (out.busy.indexOf(srv) === -1) {
@@ -397,6 +386,14 @@ function WrappedSubmissionDetail() {
           if (out.preempted.indexOf(srv) === -1) {
             out.preempted.push(srv);
           }
+        } else if (eID === '0') {
+          if (out.unknown.indexOf(srv) === -1) {
+            out.unknown.push(srv);
+          }
+        } else if (eID === '1') {
+          if (out.exception.indexOf(srv) === -1) {
+            out.exception.push(srv);
+          }
         }
       });
 
@@ -405,14 +402,15 @@ function WrappedSubmissionDetail() {
       out.depth.sort();
       out.files.sort();
       out.retry.sort();
+      out.exception.sort();
+      out.unknown.sort();
 
       return out;
     };
 
     return {
-      aggregated: futileErrors(errorList),
-      listed: relevantErrors(errorList),
-      services: Array.from(services)
+      aggregated: aggregated(errorList),
+      listed: errorList
     };
   };
 

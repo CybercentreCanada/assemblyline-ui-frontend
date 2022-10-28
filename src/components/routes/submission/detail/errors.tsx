@@ -26,6 +26,8 @@ type ErrorSectionProps = {
       down: string[];
       busy: string[];
       preempted: string[];
+      exception: string[];
+      unknown: string[];
     };
     listed: string[];
     services: string[];
@@ -78,32 +80,25 @@ const WrappedErrorSection: React.FC<ErrorSectionProps> = ({ sid, parsed_errors }
       <Collapse in={open} timeout="auto">
         <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
           <Collapse in={!detailled} timeout="auto">
-            <div
-              style={{
-                color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-              }}
-            >
-              {`${t('errors.services')}: ${parsed_errors.services.join(' | ')}`}
-            </div>
+            {Object.keys(parsed_errors.aggregated).map(
+              (errorType, i) =>
+                parsed_errors.aggregated[errorType].length > 0 && (
+                  <div
+                    key={i}
+                    style={{
+                      color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                    }}
+                  >
+                    {`${t('errors.aggregated').replace(
+                      '{errorType}',
+                      t(`errors.type.${errorType}`)
+                    )}: ${parsed_errors.aggregated[errorType].join(' | ')}`}
+                  </div>
+                )
+            )}
           </Collapse>
           <Collapse in={detailled} timeout="auto">
             <div>
-              {Object.keys(parsed_errors.aggregated).map(
-                (errorType, i) =>
-                  parsed_errors.aggregated[errorType].length > 0 && (
-                    <div
-                      key={i}
-                      style={{
-                        color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                      }}
-                    >
-                      {`${t('errors.aggregated').replace(
-                        '{errorType}',
-                        t(`errors.type.${errorType}`)
-                      )}: ${parsed_errors.aggregated[errorType].join(' | ')}`}
-                    </div>
-                  )
-              )}
               {parsed_errors.listed.map((error, i) => (
                 <div
                   key={i}
