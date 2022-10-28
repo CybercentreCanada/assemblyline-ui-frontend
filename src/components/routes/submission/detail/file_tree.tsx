@@ -5,7 +5,7 @@ import { Skeleton } from '@material-ui/lab';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';
 import Verdict from 'components/visual/Verdict';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 
@@ -46,9 +46,18 @@ type FileTreeProps = {
     [key: string]: FileItemProps;
   };
   sid: string;
-  force?: boolean;
-  forcedShown?: Set<string>;
+  force: boolean;
+  forcedShown: Set<string>;
   setForcedShown?: any;
+};
+
+type FileTreeSectionProps = {
+  tree: {
+    [key: string]: FileItemProps;
+  };
+  sid: string;
+  baseFiles: string[];
+  force?: boolean;
 };
 
 const isVisible = (curItem, forcedShown, isHighlighted) =>
@@ -57,13 +66,19 @@ const isVisible = (curItem, forcedShown, isHighlighted) =>
   isHighlighted(curItem.sha256) ||
   (curItem.children && Object.values(curItem.children).some(c => isVisible(c, forcedShown, isHighlighted)));
 
-const WrappedFileTreeSection: React.FC<FileTreeProps> = ({ tree, sid, force = false }) => {
+const WrappedFileTreeSection: React.FC<FileTreeSectionProps> = ({ tree, sid, baseFiles, force = false }) => {
   const { t } = useTranslation(['submissionDetail']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
   const classes = useStyles();
   const sp2 = theme.spacing(2);
   const [forcedShown, setForcedShown] = React.useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (baseFiles) {
+      setForcedShown(new Set([...Array.from(baseFiles)]));
+    }
+  }, [baseFiles, setForcedShown]);
 
   return (
     <div style={{ paddingTop: sp2 }}>
