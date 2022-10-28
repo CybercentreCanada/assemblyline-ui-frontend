@@ -1093,7 +1093,12 @@ function WrappedSubmissionDetail() {
           <ErrorSection sid={id} parsed_errors={liveErrors} />
         )}
 
-        <FileTreeSection tree={tree} sid={id} force={submission && submission.max_score < 0} />
+        <FileTreeSection
+          tree={tree}
+          sid={id}
+          baseFiles={submission && submission.files.map(f => f.sha256)}
+          force={submission && submission.max_score < 0}
+        />
       </div>
     </PageCenter>
   ) : (
