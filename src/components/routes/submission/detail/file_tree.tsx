@@ -1,4 +1,5 @@
-import { Box, Collapse, Divider, makeStyles, Typography, useTheme } from '@material-ui/core';
+import { Box, Collapse, Divider, IconButton, makeStyles, Tooltip, Typography, useTheme } from '@material-ui/core';
+import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 import { Skeleton } from '@material-ui/lab';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';
@@ -43,7 +44,15 @@ type FileTreeProps = {
   };
   sid: string;
   force?: boolean;
+  forcedShown?: Set<string>;
+  setForcedShown?: any;
 };
+
+const isVisible = (curItem, forcedShown, isHighlighted) =>
+  curItem.score > 0 ||
+  forcedShown.has(curItem.sha256) ||
+  isHighlighted(curItem.sha256) ||
+  (curItem.children && Object.values(curItem.children).some(c => isVisible(c, forcedShown, isHighlighted)));
 
 const WrappedFileTreeSection: React.FC<FileTreeProps> = ({ tree, sid, force = false }) => {
   const { t } = useTranslation(['submissionDetail']);
@@ -51,6 +60,7 @@ const WrappedFileTreeSection: React.FC<FileTreeProps> = ({ tree, sid, force = fa
   const theme = useTheme();
   const classes = useStyles();
   const sp2 = theme.spacing(2);
+  const [forcedShown, setForcedShown] = React.useState<Set<string>>(new Set());
 
   return (
     <div style={{ paddingTop: sp2 }}>
@@ -67,7 +77,7 @@ const WrappedFileTreeSection: React.FC<FileTreeProps> = ({ tree, sid, force = fa
       <Collapse in={open} timeout="auto">
         <div style={{ paddingTop: sp2 }}>
           {tree !== null ? (
-            <FileTree tree={tree} sid={sid} force={force} />
+            <FileTree tree={tree} sid={sid} force={force} forcedShown={forcedShown} setForcedShown={setForcedShown} />
           ) : (
             [...Array(3)].map((_, i) => (
               <div style={{ display: 'flex' }} key={i}>
@@ -82,7 +92,8 @@ const WrappedFileTreeSection: React.FC<FileTreeProps> = ({ tree, sid, force = fa
   );
 };
 
-const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, force = false }) => {
+const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, forcedShown, setForcedShown, force = false }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const classes = useStyles();
   const history = useHistory();
@@ -93,7 +104,8 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, force = false }) 
     <>
       {Object.keys(tree).map((sha256, i) => {
         const item = tree[sha256];
-        return item.score < 0 && !showSafeResults && !force ? null : (
+        return !isVisible(tree[sha256], forcedShown, isHighlighted) ||
+          (item.score < 0 && !showSafeResults && !force) ? null : (
           <div key={i}>
             <Box
               className={classes.file_item}
@@ -110,13 +122,37 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, force = false }) 
               }}
             >
               <span>
+                {item.children && Object.values(item.children).some(c => !isVisible(c, forcedShown, isHighlighted)) ? (
+                  <Tooltip title={t('more')}>
+                    <IconButton
+                      size="small"
+                      style={{ padding: 0 }}
+                      onClick={event => {
+                        event.stopPropagation();
+                        const tempForcedShown = new Set([...Array.from(forcedShown)]);
+                        Object.values(item.children).forEach(tempItem => tempForcedShown.add(tempItem.sha256));
+                        setForcedShown(tempForcedShown);
+                      }}
+                    >
+                      <ArrowRightIcon />
+                    </IconButton>
+                  </Tooltip>
+                ) : (
+                  <span style={{ marginLeft: theme.spacing(3) }} />
+                )}
                 <Verdict score={item.score} mono short />
                 {`:: ${item.name.join(' | ')} `}
                 <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{`[${item.type}]`}</span>
               </span>
             </Box>
             <div style={{ marginLeft: theme.spacing(3) }}>
-              <FileTree tree={item.children} sid={sid} force={force} />
+              <FileTree
+                tree={item.children}
+                sid={sid}
+                force={force}
+                forcedShown={forcedShown}
+                setForcedShown={setForcedShown}
+              />
             </div>
           </div>
         );
