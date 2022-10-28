@@ -355,7 +355,7 @@ function WrappedSubmissionDetail() {
           eID = eID.substr(eID.indexOf('.e') + 2, eID.length);
         }
 
-        return ['20', '21', '12', '10', '11'].indexOf(eID) === -1;
+        return ['30', '20', '21', '12', '10', '11'].indexOf(eID) === -1;
       });
     const futileErrors = errors => {
       const out = {
@@ -363,7 +363,8 @@ function WrappedSubmissionDetail() {
         files: [],
         retry: [],
         down: [],
-        busy: []
+        busy: [],
+        preempted: []
       };
       errors.forEach(error => {
         const srv = getServiceFromKey(error);
@@ -391,6 +392,10 @@ function WrappedSubmissionDetail() {
         } else if (eID === '11') {
           if (out.files.indexOf(srv) === -1) {
             out.files.push(srv);
+          }
+        } else if (eID === '30') {
+          if (out.preempted.indexOf(srv) === -1) {
+            out.preempted.push(srv);
           }
         }
       });

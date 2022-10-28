@@ -25,6 +25,7 @@ type ErrorSectionProps = {
       retry: string[];
       down: string[];
       busy: string[];
+      preempted: string[];
     };
     listed: string[];
     services: string[];
