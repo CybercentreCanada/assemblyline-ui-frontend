@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
 import { JSONFeedAuthor, JSONFeedItem } from '.';
+import CustomChip from '../CustomChip';
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -58,16 +59,27 @@ const useStyles = makeStyles(theme => ({
     paddingTop: theme.spacing(1),
     paddingRight: theme.spacing(1)
   },
-  user: {
-    textAlign: 'right'
+
+  userItem: {
+    display: 'contents'
   },
-  userName: {
-    marginRight: '4px'
+  userElement: {
+    marginLeft: theme.spacing(0.25),
+    marginRight: theme.spacing(0.25),
+    color: theme.palette.text.secondary
+  },
+  userLink: {
+    transition: 'color 225ms cubic-bezier(0, 0, 0.2, 1) 0ms',
+    '&:hover': {
+      color: theme.palette.type === 'dark' ? theme.palette.secondary.light : theme.palette.secondary.dark
+    }
   },
   userImg: {
     maxHeight: '25px',
-    marginRight: '4px',
     borderRadius: '50%'
+  },
+  tags: {
+    flexGrow: 1
   },
   content: {},
   descriptionImage: {
@@ -109,23 +121,40 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
 
   const Author = React.memo(({ author, index, last }: { author: JSONFeedAuthor; index: number; last: number }) => (
     <>
-      {author?.avatar && <img className={classes.userImg} src={author.avatar} alt={author.avatar} />}
-      {author?.name && author?.url ? (
-        <Typography
-          className={classes.userName}
-          variant="caption"
-          color="textSecondary"
-          children={<a href={author.url}>{`${author.name}${index !== last ? ',' : ''}`}</a>}
-        />
+      {author?.url && author?.url !== '' ? (
+        <Link
+          className={clsx(classes.userItem)}
+          title={author.url}
+          to={{ pathname: author.url }}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {author?.avatar && (
+            <img className={clsx(classes.userElement, classes.userImg)} src={author.avatar} alt={author.avatar} />
+          )}
+          {author?.name && (
+            <Typography
+              className={clsx(classes.userElement, classes.userLink)}
+              variant="caption"
+              color="textSecondary"
+              children={author.name}
+            />
+          )}
+        </Link>
       ) : (
-        author?.name && (
-          <Typography
-            className={classes.userName}
-            variant="caption"
-            color="textSecondary"
-            children={`${author.name}${index !== last ? ',' : ''}`}
-          />
-        )
+        <div className={clsx(classes.userItem)}>
+          {author?.avatar && (
+            <img className={clsx(classes.userElement, classes.userImg)} src={author.avatar} alt={author.avatar} />
+          )}
+          {author?.name && (
+            <Typography
+              className={clsx(classes.userElement)}
+              variant="caption"
+              color="textSecondary"
+              children={author.name}
+            />
+          )}
+        </div>
       )}
     </>
   ));
@@ -197,9 +226,24 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
           )}
           {notification.authors && (
             <div className={clsx(classes.row, classes.userRow)}>
-              {notification.authors.map((author, i) => (
-                <Author key={`${i} - ${author}`} author={author} index={i} last={notification.authors.length - 1} />
-              ))}
+              <div className={classes.tags}>
+                {notification.tags
+                  .filter(tag => ['core', 'service', 'blog'].includes(tag))
+                  .map(tag => (
+                    <CustomChip
+                      type="round"
+                      size="small"
+                      variant="outlined"
+                      color={tag === 'core' ? 'primary' : tag === 'service' ? 'secondary' : 'default'}
+                      label={tag}
+                    />
+                  ))}
+              </div>
+              {notification.authors
+                .filter((_, i) => i < 2)
+                .map((author, i) => (
+                  <Author key={`${i} - ${author}`} author={author} index={i} last={notification.authors.length - 1} />
+                ))}
             </div>
           )}
         </div>
