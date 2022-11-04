@@ -49,6 +49,8 @@ export default function Services() {
   const { setGlobalDrawer, closeGlobalDrawer } = useDrawer();
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
 
+  console.log('test');
+
   const handleAddService = () => {
     apiCall({
       method: 'PUT',
