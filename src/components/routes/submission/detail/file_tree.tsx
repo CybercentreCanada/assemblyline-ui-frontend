@@ -59,11 +59,13 @@ type FileTreeSectionProps = {
   force?: boolean;
 };
 
-const isVisible = (curItem, forcedShown, isHighlighted) =>
+const isVisible = (curItem, forcedShown, isHighlighted, showSafeResults) =>
+  (curItem.score < 0 && !showSafeResults) ||
   curItem.score > 0 ||
   forcedShown.includes(curItem.sha256) ||
   isHighlighted(curItem.sha256) ||
-  (curItem.children && Object.values(curItem.children).some(c => isVisible(c, forcedShown, isHighlighted)));
+  (curItem.children &&
+    Object.values(curItem.children).some(c => isVisible(c, forcedShown, isHighlighted, showSafeResults)));
 
 const WrappedFileTreeSection: React.FC<FileTreeSectionProps> = ({ tree, sid, baseFiles, force = false }) => {
   const { t } = useTranslation(['submissionDetail']);
@@ -74,9 +76,10 @@ const WrappedFileTreeSection: React.FC<FileTreeSectionProps> = ({ tree, sid, bas
   const [forcedShown, setForcedShown] = React.useState<Array<string>>([]);
 
   useEffect(() => {
-    if (baseFiles) {
+    if (baseFiles && forcedShown.length === 0) {
       setForcedShown([...baseFiles]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [baseFiles]);
 
   return (
@@ -116,23 +119,18 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, defaultForceShown
   const history = useHistory();
   const { isHighlighted } = useHighlighter();
   const { showSafeResults } = useSafeResults();
-  const [forcedShown, setForcedShown] = React.useState<Array<string>>([]);
-
-  useEffect(() => {
-    if (defaultForceShown) {
-      setForcedShown([...defaultForceShown]);
-    }
-  }, [defaultForceShown]);
+  const [forcedShown, setForcedShown] = React.useState<Array<string>>([...defaultForceShown]);
 
   return (
     <>
       {Object.keys(tree).map((sha256, i) => {
         const item = tree[sha256];
-        return !isVisible(tree[sha256], forcedShown, isHighlighted) ||
+        return !isVisible(tree[sha256], defaultForceShown, isHighlighted, showSafeResults) ||
           (item.score < 0 && !showSafeResults && !force) ? null : (
           <div key={i}>
             <div style={{ display: 'flex', width: '100%' }}>
-              {item.children && Object.values(item.children).some(c => !isVisible(c, forcedShown, isHighlighted)) ? (
+              {item.children &&
+              Object.values(item.children).some(c => !isVisible(c, forcedShown, isHighlighted, showSafeResults)) ? (
                 <Tooltip title={t('tree_more')}>
                   <IconButton
                     size="small"
