@@ -148,13 +148,7 @@ const WrappedHeuristic: React.FC<WrappedHeuristicProps> = ({ name, id, sections,
           </Tooltip>
         </Box>
       </Box>
-      <Collapse
-        in={open}
-        timeout="auto"
-        style={{ marginRight: theme.spacing(0.5) }}
-        onEnter={() => setRender(true)}
-        onExited={() => setRender(false)}
-      >
+      <Collapse in={open} timeout="auto" style={{ marginRight: theme.spacing(0.5) }} onEnter={() => setRender(true)}>
         {sections &&
           render &&
           sections.map((section, sid) => (
