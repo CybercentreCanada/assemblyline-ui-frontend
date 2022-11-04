@@ -521,9 +521,11 @@ const WrappedNotificationArea = () => {
                 <Typography variant="body2" color="secondary" children={t('notification.none')} />
               </div>
             ) : (
-              notifications.map((n, i) => (
-                <NotificationItem key={i} notification={n} hideDivider={i === notifications.length - 1} />
-              ))
+              notifications
+                .filter(notification => notification.date_published > new Date(Date.now() - 365 * 24 * 60 * 60 * 1000))
+                .map((n, i) => (
+                  <NotificationItem key={i} notification={n} hideDivider={i === notifications.length - 1} />
+                ))
             )}
           </div>
         </div>
