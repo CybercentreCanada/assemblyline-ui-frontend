@@ -47,8 +47,7 @@ type FileTreeProps = {
   };
   sid: string;
   force: boolean;
-  forcedShown: Set<string>;
-  setForcedShown?: any;
+  defaultForceShown: Array<string>;
 };
 
 type FileTreeSectionProps = {
@@ -60,11 +59,13 @@ type FileTreeSectionProps = {
   force?: boolean;
 };
 
-const isVisible = (curItem, forcedShown, isHighlighted) =>
+const isVisible = (curItem, forcedShown, isHighlighted, showSafeResults) =>
+  (curItem.score < 0 && !showSafeResults) ||
   curItem.score > 0 ||
-  forcedShown.has(curItem.sha256) ||
+  forcedShown.includes(curItem.sha256) ||
   isHighlighted(curItem.sha256) ||
-  (curItem.children && Object.values(curItem.children).some(c => isVisible(c, forcedShown, isHighlighted)));
+  (curItem.children &&
+    Object.values(curItem.children).some(c => isVisible(c, forcedShown, isHighlighted, showSafeResults)));
 
 const WrappedFileTreeSection: React.FC<FileTreeSectionProps> = ({ tree, sid, baseFiles, force = false }) => {
   const { t } = useTranslation(['submissionDetail']);
@@ -72,13 +73,14 @@ const WrappedFileTreeSection: React.FC<FileTreeSectionProps> = ({ tree, sid, bas
   const theme = useTheme();
   const classes = useStyles();
   const sp2 = theme.spacing(2);
-  const [forcedShown, setForcedShown] = React.useState<Set<string>>(new Set());
+  const [forcedShown, setForcedShown] = React.useState<Array<string>>([]);
 
   useEffect(() => {
-    if (baseFiles) {
-      setForcedShown(new Set([...Array.from(baseFiles)]));
+    if (baseFiles && forcedShown.length === 0) {
+      setForcedShown([...baseFiles]);
     }
-  }, [baseFiles, setForcedShown]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [baseFiles]);
 
   return (
     <div style={{ paddingTop: sp2 }}>
@@ -95,7 +97,7 @@ const WrappedFileTreeSection: React.FC<FileTreeSectionProps> = ({ tree, sid, bas
       <Collapse in={open} timeout="auto">
         <div style={{ paddingTop: sp2 }}>
           {tree !== null ? (
-            <FileTree tree={tree} sid={sid} force={force} forcedShown={forcedShown} setForcedShown={setForcedShown} />
+            <FileTree tree={tree} sid={sid} force={force} defaultForceShown={forcedShown} />
           ) : (
             [...Array(3)].map((_, i) => (
               <div style={{ display: 'flex' }} key={i}>
@@ -110,45 +112,44 @@ const WrappedFileTreeSection: React.FC<FileTreeSectionProps> = ({ tree, sid, bas
   );
 };
 
-const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, forcedShown, setForcedShown, force = false }) => {
+const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, defaultForceShown, force = false }) => {
   const { t } = useTranslation('submissionDetail');
   const theme = useTheme();
   const classes = useStyles();
   const history = useHistory();
   const { isHighlighted } = useHighlighter();
   const { showSafeResults } = useSafeResults();
+  const [forcedShown, setForcedShown] = React.useState<Array<string>>([...defaultForceShown]);
 
   return (
     <>
       {Object.keys(tree).map((sha256, i) => {
         const item = tree[sha256];
-        return !isVisible(tree[sha256], forcedShown, isHighlighted) ||
+        return !isVisible(tree[sha256], defaultForceShown, isHighlighted, showSafeResults) ||
           (item.score < 0 && !showSafeResults && !force) ? null : (
           <div key={i}>
             <div style={{ display: 'flex', width: '100%' }}>
-              {item.children && Object.values(item.children).some(c => !isVisible(c, forcedShown, isHighlighted)) ? (
+              {item.children &&
+              Object.values(item.children).some(c => !isVisible(c, forcedShown, isHighlighted, showSafeResults)) ? (
                 <Tooltip title={t('tree_more')}>
                   <IconButton
                     size="small"
                     style={{ padding: 0 }}
-                    onClick={event => {
-                      const tempForcedShown = new Set([...Array.from(forcedShown)]);
-                      Object.values(item.children).forEach(tempItem => tempForcedShown.add(tempItem.sha256));
-                      setForcedShown(tempForcedShown);
+                    onClick={() => {
+                      setForcedShown([...forcedShown, ...Object.keys(item.children)]);
                     }}
                   >
                     <ArrowRightIcon />
                   </IconButton>
                 </Tooltip>
-              ) : item.children && Object.values(item.children).some(c => forcedShown.has(c.sha256)) ? (
+              ) : item.children && Object.keys(item.children).some(key => forcedShown.includes(key)) ? (
                 <Tooltip title={t('tree_less')}>
                   <IconButton
                     size="small"
                     style={{ padding: 0 }}
                     onClick={event => {
-                      const tempForcedShown = new Set([...Array.from(forcedShown)]);
-                      Object.values(item.children).forEach(tempItem => tempForcedShown.delete(tempItem.sha256));
-                      setForcedShown(tempForcedShown);
+                      const excluded = Object.keys(item.children);
+                      setForcedShown(forcedShown.filter(val => !excluded.includes(val)));
                     }}
                   >
                     <ArrowDropDownIcon />
@@ -184,13 +185,7 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, forcedShown, setF
               </Box>
             </div>
             <div style={{ marginLeft: theme.spacing(3) }}>
-              <FileTree
-                tree={item.children}
-                sid={sid}
-                force={force}
-                forcedShown={forcedShown}
-                setForcedShown={setForcedShown}
-              />
+              <FileTree tree={item.children} sid={sid} force={force} defaultForceShown={forcedShown} />
             </div>
           </div>
         );

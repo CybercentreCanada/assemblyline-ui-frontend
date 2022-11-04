@@ -108,6 +108,7 @@ function WrappedSubmissionDetail() {
   const { user: currentUser, c12nDef, configuration: systemConfig } = useALContext();
   const { setHighlightMap } = useHighlighter();
   const { setGlobalDrawer, globalDrawer } = useDrawer();
+  const [baseFiles, setBaseFiles] = useState([]);
 
   const updateLiveSumary = (results: object) => {
     const tempSummary = summary !== null ? { ...summary } : { tags: {}, heuristics: {}, attack_matrix: {} };
@@ -598,6 +599,7 @@ function WrappedSubmissionDetail() {
           }
         });
       }
+      setBaseFiles(submission.files.map(f => f.sha256));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [submission]);
@@ -1093,12 +1095,7 @@ function WrappedSubmissionDetail() {
           <ErrorSection sid={id} parsed_errors={liveErrors} />
         )}
 
-        <FileTreeSection
-          tree={tree}
-          sid={id}
-          baseFiles={submission && submission.files.map(f => f.sha256)}
-          force={submission && submission.max_score < 0}
-        />
+        <FileTreeSection tree={tree} sid={id} baseFiles={baseFiles} force={submission && submission.max_score < 0} />
       </div>
     </PageCenter>
   ) : (

@@ -99,6 +99,7 @@ type WrappedHeuristicProps = {
 const WrappedHeuristic: React.FC<WrappedHeuristicProps> = ({ name, id, sections, level, force = false }) => {
   const { t } = useTranslation();
   const [open, setOpen] = React.useState(false);
+  const [render, setRender] = React.useState(false);
   const { isHighlighted, triggerHighlight, getKey } = useHighlighter();
   const classes = useStyles();
   const theme = useTheme();
@@ -147,11 +148,12 @@ const WrappedHeuristic: React.FC<WrappedHeuristicProps> = ({ name, id, sections,
           </Tooltip>
         </Box>
       </Box>
-      <Collapse in={open} timeout="auto" style={{ marginRight: theme.spacing(0.5) }}>
+      <Collapse in={open} timeout="auto" style={{ marginRight: theme.spacing(0.5) }} onEnter={() => setRender(true)}>
         {sections &&
+          render &&
           sections.map((section, sid) => (
             <div key={sid}>
-              <ResultSection section={sections[sid]} indent={1} depth={1} force={force} />
+              <ResultSection section={section} indent={1} depth={1} force={force} />
             </div>
           ))}
       </Collapse>
