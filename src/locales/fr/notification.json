@@ -1,4 +1,5 @@
 {
+  "add.title": "Ajouter une notification",
   "delete.acceptText": "Oui, fais le!",
   "delete.cancelText": "Annuler",
   "delete.success": "Le message système a été supprimé avec succès.",
@@ -11,6 +12,8 @@
   "edit.severity": "Gravité du message",
   "edit.text": "Ce message sera affiché en permanence pour tous les utilisateurs dans leur zone de notification. Un seul message peut être affiché à la fois et seuls les administrateurs peuvent modifier le message.",
   "edit.title": "Définir un message système",
+  "notification.header": "Quoi de neuf sur Assemblyline",
+  "notification.none": "Il n'y a aucune notification.",
   "save.acceptText": "Oui, fais le!",
   "save.cancelText": "Annuler",
   "save.success": "Le message système a été défini avec succès.",
@@ -19,5 +22,7 @@
   "severity.error": "Erreur",
   "severity.info": "Information",
   "severity.success": "Succès",
-  "severity.warning": "Avertissement"
+  "severity.warning": "Avertissement",
+  "systemMessage.header": "Avis",
+  "systemMessage.none": "Il n'y a pas d'avis."
 }
