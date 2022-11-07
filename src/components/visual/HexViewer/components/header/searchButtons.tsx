@@ -22,29 +22,29 @@ export const WrappedHexSearchButtons = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);
   const classes = useHexStyles();
   const { onSelectedSearchIndexChange, onSearchClear } = useDispatch();
-  const { value, selectedIndex } = store.search;
+  const { inputValue, selectedResult } = store.search;
 
   return (
     <>
       <TooltipIconButton
         classes={{ iconButton: classes.iconButton }}
         title={t('previous-match')}
-        onClick={() => onSelectedSearchIndexChange({ index: selectedIndex - 1 })}
-        disabled={selectedIndex === null}
+        onClick={() => onSelectedSearchIndexChange({ index: selectedResult - 1 })}
+        disabled={selectedResult === null}
         icon={<ArrowUpward />}
       />
       <TooltipIconButton
         classes={{ iconButton: classes.iconButton }}
         title={t('next-match')}
-        disabled={selectedIndex === null}
-        onClick={() => onSelectedSearchIndexChange({ index: selectedIndex + 1 })}
+        disabled={selectedResult === null}
+        onClick={() => onSelectedSearchIndexChange({ index: selectedResult + 1 })}
         icon={<ArrowDownward />}
       />
       <TooltipIconButton
         classes={{ iconButton: classes.iconButton }}
         title={t('clear')}
         onClick={() => onSearchClear()}
-        disabled={value === null || value === ''}
+        disabled={inputValue === null || inputValue === ''}
         icon={<ClearIcon />}
       />
     </>
@@ -54,6 +54,6 @@ export const WrappedHexSearchButtons = ({ store }: StoreProps) => {
 export const HexSearchButtons = React.memo(
   WrappedHexSearchButtons,
   (prevProps: Readonly<StoreProps>, nextProps: Readonly<StoreProps>) =>
-    prevProps.store.search.value === nextProps.store.search.value &&
-    prevProps.store.search.selectedIndex === nextProps.store.search.selectedIndex
+    prevProps.store.search.inputValue === nextProps.store.search.inputValue &&
+    prevProps.store.search.selectedResult === nextProps.store.search.selectedResult
 );

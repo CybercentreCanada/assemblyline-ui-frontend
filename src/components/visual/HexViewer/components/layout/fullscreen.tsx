@@ -13,7 +13,7 @@ export const WrappedHexFullscreenLayout = ({ store }: StoreProps) => {
   });
 
   return (
-    <Dialog ref={ref} fullScreen open={store.mode.layoutType === 'fullscreen'} onClose={e => onFullscreenToggle()}>
+    <Dialog ref={ref} fullScreen open={store.mode.layout === 'fullscreen'} onClose={e => onFullscreenToggle()}>
       <HexHeader store={store} />
       <HexBody store={store} />
       <HexSettings store={store} />

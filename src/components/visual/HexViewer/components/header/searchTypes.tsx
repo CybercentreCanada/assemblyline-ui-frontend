@@ -36,7 +36,7 @@ export const WrappedHexSearchTypes = ({ store }: StoreProps) => {
   const theme = useTheme();
   const { t } = useTranslation(['hexViewer']);
   const { onSearchTypeChange } = useDispatch();
-  const { type } = store.search;
+  const { type: searchType } = store.search.mode;
 
   const ref = useRef<HTMLDivElement>(null);
   const [popperAnchorEl, setPopperAnchorEl] = useState(null);
@@ -78,14 +78,14 @@ export const WrappedHexSearchTypes = ({ store }: StoreProps) => {
   return (
     <div ref={ref} onKeyDown={handleCloseKeyDown}>
       <TooltipIconButton
-        title={t('search.types')}
+        title={t('search.modes')}
         size="small"
         icon={
-          type === 'cursor' ? (
+          searchType === 'cursor' ? (
             <NavigationIcon />
-          ) : type === 'hex' ? (
+          ) : searchType === 'hex' ? (
             <ExposureZeroIcon />
-          ) : type === 'text' ? (
+          ) : searchType === 'text' ? (
             <TextFieldsIcon />
           ) : null
         }
@@ -106,8 +106,8 @@ export const WrappedHexSearchTypes = ({ store }: StoreProps) => {
               <List component="nav" aria-label="main mailbox folders" dense disablePadding>
                 <ListItem
                   button
-                  selected={type === 'cursor'}
-                  autoFocus={type === 'cursor'}
+                  selected={searchType === 'cursor'}
+                  autoFocus={searchType === 'cursor'}
                   dense
                   onClick={handleClick('cursor')}
                 >
@@ -116,8 +116,8 @@ export const WrappedHexSearchTypes = ({ store }: StoreProps) => {
                 </ListItem>
                 <ListItem
                   button
-                  selected={type === 'hex'}
-                  autoFocus={type === 'hex'}
+                  selected={searchType === 'hex'}
+                  autoFocus={searchType === 'hex'}
                   dense
                   onClick={handleClick('hex')}
                 >
@@ -126,8 +126,8 @@ export const WrappedHexSearchTypes = ({ store }: StoreProps) => {
                 </ListItem>
                 <ListItem
                   button
-                  selected={type === 'text'}
-                  autoFocus={type === 'text'}
+                  selected={searchType === 'text'}
+                  autoFocus={searchType === 'text'}
                   dense
                   onClick={handleClick('text')}
                 >
@@ -146,5 +146,5 @@ export const WrappedHexSearchTypes = ({ store }: StoreProps) => {
 export const HexSearchTypes = React.memo(
   WrappedHexSearchTypes,
   (prevProps: Readonly<StoreProps>, nextProps: Readonly<StoreProps>) =>
-    prevProps.store.search.type === nextProps.store.search.type
+    prevProps.store.search.mode === nextProps.store.search.mode
 );

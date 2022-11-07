@@ -5,23 +5,39 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { default as React } from 'react';
 import { useTranslation } from 'react-i18next';
-import { HexColumnSetting, HexEncoding, HexOffsetBaseSetting, StoreProps, useDispatch } from '../..';
+import {
+  CopyTypeSetting,
+  HexColumnSetting,
+  HexOffsetBaseSetting,
+  HexSearchModeEncodingSetting,
+  HexSearchModeTextSpanSetting,
+  HexSetSetting,
+  RowFoldingSetting,
+  StoreProps,
+  useDispatch
+} from '../..';
 
 export * from './bodyType';
 export * from './column';
-export * from './encoding';
+export * from './copyType';
+export * from './hexEncoding';
+export * from './hexSet';
 export * from './offsetBase';
 export * from './OutlinedField';
+export * from './rowFolding';
+export * from './searchModeEncoding';
+export * from './searchModeTextSpan';
 
 const useHexStyles = makeStyles(theme => ({
-  dialog: {}
+  dialog: {},
+  spacer: { flex: 1 }
 }));
 
 export const WrappedHexSettings = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);
   const classes = useHexStyles();
 
-  const { onSettingSave, onSettingClose } = useDispatch();
+  const { onSettingSave, onSettingClose, onSettingReset } = useDispatch();
 
   return (
     <div>
@@ -31,20 +47,28 @@ export const WrappedHexSettings = ({ store }: StoreProps) => {
           <Grid container spacing={1} alignItems="center">
             <Grid item xs={12}>
               <Grid container spacing={1} alignItems="center">
-                <HexEncoding store={store} />
                 {/* <HexBodyTypeSetting store={store} /> */}
-                <HexOffsetBaseSetting store={store} />
                 <HexColumnSetting store={store} />
+                <RowFoldingSetting store={store} />
+                <HexSearchModeEncodingSetting store={store} />
+                <HexSearchModeTextSpanSetting store={store} />
+                <HexOffsetBaseSetting store={store} />
+                <CopyTypeSetting store={store} />
+                <HexSetSetting store={store} />
               </Grid>
             </Grid>
           </Grid>
         </DialogContent>
         <DialogActions>
+          <Button onClick={() => onSettingReset()} color="primary" autoFocus>
+            {t('settings.reset')}
+          </Button>
+          <div className={classes.spacer} />
           <Button onClick={() => onSettingSave()} color="primary" autoFocus>
-            Save
+            {t('settings.save')}
           </Button>
           <Button onClick={() => onSettingClose()} color="primary">
-            Cancel
+            {t('settings.cancel')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -57,12 +81,7 @@ export const HexSettings = React.memo(
   (
     prevProps: Readonly<React.PropsWithChildren<StoreProps>>,
     nextProps: Readonly<React.PropsWithChildren<StoreProps>>
-  ) =>
-    prevProps.store.setting.open === nextProps.store.setting.open &&
-    prevProps.store.setting.bodyType === nextProps.store.setting.bodyType &&
-    prevProps.store.setting.hex === nextProps.store.setting.hex &&
-    prevProps.store.setting.offsetBase === nextProps.store.setting.offsetBase &&
-    prevProps.store.setting.column.auto === nextProps.store.setting.column.auto &&
-    prevProps.store.setting.column.size === nextProps.store.setting.column.size
+  ) => Object.is(prevProps.store.setting, nextProps.store.setting)
 );
+
 export default HexSettings;
