@@ -73,7 +73,7 @@ type AutoHideChipListState = {
 };
 
 const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items }) => {
-  const { t } = useTranslation('alerts');
+  const { t } = useTranslation();
   const [state, setState] = useState<AutoHideChipListState | null>(null);
   const [shownChips, setShownChips] = useState<CustomChipProps[]>([]);
 
