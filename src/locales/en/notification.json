@@ -25,5 +25,5 @@
   "severity.success": "Success",
   "severity.warning": "Warning",
   "systemMessage.header": "Announcement",
-  "systemMessage.none": "There is no announcement."
+  "systemMessage.none": "There are no announcements."
 }
