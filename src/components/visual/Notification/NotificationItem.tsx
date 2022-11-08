@@ -37,7 +37,6 @@ const useStyles = makeStyles(theme => ({
   title: {
     flex: 1,
     fontWeight: 500,
-    whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     color: theme.palette.primary.main,
@@ -89,7 +88,7 @@ const useStyles = makeStyles(theme => ({
     marginTop: '8px'
   },
   description: {
-    '&>a': {
+    '& a': {
       textDecoration: 'none',
       color: theme.palette.primary.main,
       transition: 'color 225ms cubic-bezier(0, 0, 0.2, 1) 0ms',
@@ -228,13 +227,14 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
             <div className={clsx(classes.row, classes.userRow)}>
               <div className={classes.tags}>
                 {notification.tags
-                  .filter(tag => ['core', 'service', 'blog'].includes(tag))
-                  .map(tag => (
+                  .filter(tag => ['dev', 'service', 'blog'].includes(tag))
+                  .map((tag, i) => (
                     <CustomChip
+                      key={'tag-' + i}
                       type="round"
                       size="small"
                       variant="outlined"
-                      color={tag === 'core' ? 'primary' : tag === 'service' ? 'secondary' : 'default'}
+                      color={tag === 'dev' ? 'warning' : tag === 'service' ? 'secondary' : 'default'}
                       label={tag}
                     />
                   ))}
