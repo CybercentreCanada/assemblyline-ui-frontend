@@ -26,6 +26,7 @@ export type JSONFeedItem = {
   title?: string;
   content_html?: string;
   content_text?: string;
+  content_md?: string;
   summary?: string;
   image?: string;
   banner_image?: string;
