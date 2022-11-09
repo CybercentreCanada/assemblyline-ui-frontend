@@ -82,17 +82,6 @@ const useStyles = makeStyles(theme => ({
     zIndex: 20000,
     top: '0px'
   },
-  notificationTitleRow: {
-    position: 'sticky',
-    backgroundColor: theme.palette.background.paper,
-    zIndex: 20000,
-    top: '56px'
-  },
-  notificationDividerRow: {
-    position: 'sticky',
-    zIndex: 20000,
-    top: '100.8px'
-  },
   center: {
     justifyContent: 'center'
   },
@@ -576,11 +565,11 @@ const WrappedNotificationArea = () => {
                 )}
               </>
             )}
-            <div className={clsx(classes.row, classes.header, classes.notificationTitleRow)}>
+            <div className={clsx(classes.row, classes.header)}>
               <FeedbackOutlinedIcon className={clsx(classes.icon)} fontSize="medium" />
               <Typography className={clsx(classes.title)} variant={'h6'} children={t(`notification.header`)} />
             </div>
-            <Divider className={clsx(classes.divider, classes.notificationDividerRow)} variant="fullWidth" />
+            <Divider className={clsx(classes.divider)} variant="fullWidth" />
             {notifications === null ? (
               <div className={clsx(classes.row)}>
                 <Skeleton className={clsx(classes.skeleton)} variant="text" animation="wave" />
