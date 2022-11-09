@@ -59,10 +59,9 @@ const useStyles = makeStyles(theme => ({
     pageBreakBefore: 'avoid',
     pageBreakInside: 'avoid',
     padding: theme.spacing(2.5),
-    paddingTop: theme.spacing(1)
+    paddingTop: 0
   },
   container: {
-    height: '100%',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'flex-start',
@@ -75,6 +74,24 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center'
+  },
+  closeRow: {
+    position: 'sticky',
+    backgroundColor: theme.palette.background.paper,
+    paddingTop: theme.spacing(1),
+    zIndex: 20000,
+    top: '0px'
+  },
+  notificationTitleRow: {
+    position: 'sticky',
+    backgroundColor: theme.palette.background.paper,
+    zIndex: 20000,
+    top: '56px'
+  },
+  notificationDividerRow: {
+    position: 'sticky',
+    zIndex: 20000,
+    top: '100.8px'
   },
   center: {
     justifyContent: 'center'
@@ -98,7 +115,7 @@ const useStyles = makeStyles(theme => ({
     marginRight: theme.spacing(1.5)
   },
   header: {
-    marginTop: theme.spacing(2)
+    paddingTop: theme.spacing(2)
   },
   title: {
     fontSize: 'large',
@@ -453,7 +470,7 @@ const WrappedNotificationArea = () => {
       <Drawer anchor="right" classes={{ paper: classes.drawer }} open={drawer} onClose={onCloseNotificationArea}>
         <div className={classes.root}>
           <div className={classes.container}>
-            <div className={classes.row}>
+            <div className={clsx(classes.row, classes.closeRow)}>
               <IconButton
                 className={classes.close}
                 onClick={onCloseNotificationArea}
@@ -559,11 +576,11 @@ const WrappedNotificationArea = () => {
                 )}
               </>
             )}
-            <div className={clsx(classes.row, classes.header)}>
+            <div className={clsx(classes.row, classes.header, classes.notificationTitleRow)}>
               <FeedbackOutlinedIcon className={clsx(classes.icon)} fontSize="medium" />
               <Typography className={clsx(classes.title)} variant={'h6'} children={t(`notification.header`)} />
             </div>
-            <Divider className={clsx(classes.divider)} variant="fullWidth" />
+            <Divider className={clsx(classes.divider, classes.notificationDividerRow)} variant="fullWidth" />
             {notifications === null ? (
               <div className={clsx(classes.row)}>
                 <Skeleton className={clsx(classes.skeleton)} variant="text" animation="wave" />

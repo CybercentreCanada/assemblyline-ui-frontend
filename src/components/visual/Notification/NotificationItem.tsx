@@ -123,7 +123,7 @@ type Props = {
 
 const WrappedNotificationItem = ({ notification = null, hideDivider = false }: Props) => {
   const classes = useStyles();
-  const { t, i18n } = useTranslation('notification');
+  const { i18n } = useTranslation('notification');
 
   const Author = React.memo(({ author, index, last }: { author: JSONFeedAuthor; index: number; last: number }) => (
     <>
