@@ -1,8 +1,9 @@
-import { Divider, makeStyles, Typography } from '@material-ui/core';
+import { Divider, Link as MuiLink, makeStyles, Typography } from '@material-ui/core';
 import clsx from 'clsx';
 import * as DOMPurify from 'dompurify';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import Markdown from 'react-markdown';
 import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
 import { JSONFeedAuthor, JSONFeedItem } from '.';
@@ -37,7 +38,6 @@ const useStyles = makeStyles(theme => ({
   title: {
     flex: 1,
     fontWeight: 500,
-    whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     color: theme.palette.primary.main,
@@ -82,6 +82,12 @@ const useStyles = makeStyles(theme => ({
     flexGrow: 1
   },
   content: {},
+  badge: {
+    marginLeft: theme.spacing(0.25),
+    marginRight: theme.spacing(0.25),
+    textTransform: 'capitalize'
+  },
+  center: { display: 'grid', justifyContent: 'center' },
   descriptionImage: {
     maxWidth: '256px',
     maxHeight: '256px',
@@ -89,7 +95,7 @@ const useStyles = makeStyles(theme => ({
     marginTop: '8px'
   },
   description: {
-    '&>a': {
+    '& a': {
       textDecoration: 'none',
       color: theme.palette.primary.main,
       transition: 'color 225ms cubic-bezier(0, 0, 0.2, 1) 0ms',
@@ -117,7 +123,7 @@ type Props = {
 
 const WrappedNotificationItem = ({ notification = null, hideDivider = false }: Props) => {
   const classes = useStyles();
-  const { i18n } = useTranslation('alerts');
+  const { i18n } = useTranslation('notification');
 
   const Author = React.memo(({ author, index, last }: { author: JSONFeedAuthor; index: number; last: number }) => (
     <>
@@ -201,17 +207,15 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
               />
             )}
           </div>
-          {notification.content_text ? (
+          {notification.content_md && notification.content_md !== '' ? (
             <div className={classes.content}>
-              <Typography
+              <Markdown
                 className={classes.description}
-                variant="body2"
-                color="textPrimary"
-                children={notification.content_text}
+                components={{ a: props => <MuiLink href={props.href}>{props.children}</MuiLink> }}
+                children={notification.content_md}
               />
-              <img className={classes.descriptionImage} src={notification.image} alt="" />
             </div>
-          ) : (
+          ) : notification.content_html && notification.content_html !== '' ? (
             <div className={classes.content}>
               <Typography
                 className={classes.description}
@@ -221,20 +225,47 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
                   __html: DOMPurify.sanitize(notification.content_html, { USE_PROFILES: { html: true } })
                 }}
               />
-              <img className={classes.descriptionImage} src={notification.image} alt="" />
+            </div>
+          ) : notification.content_text && notification.content_text !== '' ? (
+            <div className={classes.content}>
+              <Typography
+                className={classes.description}
+                variant="body2"
+                color="textPrimary"
+                children={notification.content_text}
+              />
+            </div>
+          ) : (
+            <></>
+          )}
+          {notification.image && (
+            <div className={classes.center}>
+              <img className={classes.descriptionImage} src={notification.image} alt={notification.image} />
             </div>
           )}
           {notification.authors && (
             <div className={clsx(classes.row, classes.userRow)}>
               <div className={classes.tags}>
                 {notification.tags
-                  .filter(tag => ['core', 'service', 'blog'].includes(tag))
-                  .map(tag => (
+                  .filter(tag => ['new', 'current', 'dev', 'service', 'blog'].includes(tag))
+                  .map((tag, i) => (
                     <CustomChip
+                      className={classes.badge}
+                      key={'tag-' + i}
                       type="round"
                       size="small"
                       variant="outlined"
-                      color={tag === 'core' ? 'primary' : tag === 'service' ? 'secondary' : 'default'}
+                      color={
+                        tag === 'new'
+                          ? 'info'
+                          : tag === 'current'
+                          ? 'success'
+                          : tag === 'dev'
+                          ? 'warning'
+                          : tag === 'service'
+                          ? 'secondary'
+                          : 'default'
+                      }
                       label={tag}
                     />
                   ))}

@@ -26,13 +26,14 @@ export type JSONFeedItem = {
   title?: string;
   content_html?: string;
   content_text?: string;
+  content_md?: string;
   summary?: string;
   image?: string;
   banner_image?: string;
   date_published?: Date;
   date_modified?: Date;
   authors?: Array<JSONFeedAuthor>;
-  tags?: Array<string>;
+  tags?: Array<'new' | 'current' | 'dev' | 'service' | 'blog'>;
   language?: string;
   attachments?: Array<JSONFeedItemAttachment>;
   _isNew: boolean;
@@ -57,14 +58,13 @@ export type JSONFeed = {
 
 type FetchJSONProps = {
   urls: Array<string>;
-  lastTimeOpen?: Date;
   onSuccess?: (feeds: Array<JSONFeedItem>) => void;
   onError?: (err: any) => void;
 };
 
 export type UseNotificationFeedReturn = {
   fetchJSONFeeds: (urls?: Array<string>) => Promise<JSONFeed[]>;
-  fetchJSONNotifications: ({ urls, lastTimeOpen, onSuccess, onError }: FetchJSONProps) => void;
+  fetchJSONNotifications: ({ urls, onSuccess, onError }: FetchJSONProps) => void;
 };
 
 export const useNotificationFeed = (): UseNotificationFeedReturn => {
@@ -215,15 +215,9 @@ export const useNotificationFeed = (): UseNotificationFeedReturn => {
   );
 
   const fetchJSONNotifications = useCallback(
-    ({ urls, lastTimeOpen = new Date(0), onSuccess = null, onError = null }: FetchJSONProps): void => {
+    ({ urls, onSuccess = null, onError = null }: FetchJSONProps): void => {
       fetchJSONFeeds(urls)
-        .then(feeds => {
-          const newNotifications = feeds
-            .flatMap(f => f.items)
-            .map((n: JSONFeedItem) => ({ ...n, _isNew: n.date_published.valueOf() > lastTimeOpen.valueOf() }))
-            .sort((a, b) => b.date_published.valueOf() - a.date_published.valueOf());
-          onSuccess(newNotifications);
-        })
+        .then(feeds => onSuccess && onSuccess(feeds.flatMap(f => f.items)))
         .catch(err => onError && onError(err));
     },
     [fetchJSONFeeds]

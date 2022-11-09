@@ -42,6 +42,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import { JSONFeedItem, NotificationItem, useNotificationFeed } from '.';
 import ConfirmationDialog from '../ConfirmationDialog';
+import { ServiceResult } from '../SearchResult/service';
 
 const useStyles = makeStyles(theme => ({
   drawer: {
@@ -58,10 +59,9 @@ const useStyles = makeStyles(theme => ({
     pageBreakBefore: 'avoid',
     pageBreakInside: 'avoid',
     padding: theme.spacing(2.5),
-    paddingTop: theme.spacing(1)
+    paddingTop: 0
   },
   container: {
-    height: '100%',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'flex-start',
@@ -74,6 +74,13 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center'
+  },
+  closeRow: {
+    position: 'sticky',
+    backgroundColor: theme.palette.background.paper,
+    paddingTop: theme.spacing(1),
+    zIndex: 20000,
+    top: '0px'
   },
   center: {
     justifyContent: 'center'
@@ -97,7 +104,7 @@ const useStyles = makeStyles(theme => ({
     marginRight: theme.spacing(1.5)
   },
   header: {
-    marginTop: theme.spacing(2)
+    paddingTop: theme.spacing(2)
   },
   title: {
     fontSize: 'large',
@@ -281,16 +288,67 @@ const WrappedNotificationArea = () => {
     [classes]
   );
 
+  const addVersionTag = useCallback(
+    (notification: JSONFeedItem): 'new' | 'current' | null => {
+      const version = notification.url.match(/(\d)+\.(\d)+\.(\d)+\..*/g)?.at(0);
+
+      if (
+        !version ||
+        !(
+          (/(d|D)ev/g.test(version) && /(d|D)ev/g.test(configuration.system.version)) ||
+          (/(s|S)table/g.test(version) && /(s|S)table/g.test(configuration.system.version))
+        )
+      )
+        return;
+
+      if (version === configuration.system.version) return 'current';
+      else if (version > configuration.system.version) return 'new';
+      else return;
+    },
+    [configuration.system]
+  );
+
+  const setIsNew = useCallback(
+    (notification: JSONFeedItem): boolean => notification.date_published.valueOf() > lastTimeOpen.current.valueOf(),
+    []
+  );
+
+  const addNewServiceTag = useCallback(
+    (notification: JSONFeedItem, services: Array<ServiceResult>): 'new' | null =>
+      !/(s|S)ervice/g.test(notification.title) ||
+      services.some(s => notification?.title?.toLowerCase().includes(s?.name?.toLowerCase()))
+        ? null
+        : 'new',
+    []
+  );
+
   useEffect(() => {
     handleLastTimeOpen();
     if (!configuration) return;
-    fetchJSONNotifications({
-      urls: configuration.ui.rss_feeds,
-      lastTimeOpen: lastTimeOpen.current,
-      onSuccess: (n: Array<JSONFeedItem>) => setNotifications(n)
+    apiCall({
+      url: '/api/v4/service/all/',
+      onSuccess: api_data => {
+        const services2: Array<ServiceResult> =
+          api_data && api_data.api_response && Array.isArray(api_data.api_response) ? api_data.api_response : null;
+        fetchJSONNotifications({
+          urls: configuration.ui.rss_feeds,
+          onSuccess: (feedItems: Array<JSONFeedItem>) =>
+            setNotifications(
+              feedItems
+                .map(n => ({
+                  ...n,
+                  tags: [addVersionTag(n), addNewServiceTag(n, services2), ...n.tags],
+                  _isNew: setIsNew(n)
+                }))
+                .filter(n => n.date_published > new Date(Date.now() - 365 * 24 * 60 * 60 * 1000))
+                .sort((a, b) => b.date_published.valueOf() - a.date_published.valueOf())
+            )
+        });
+      }
     });
     return () => setNotifications([]);
-  }, [configuration, fetchJSONNotifications, handleLastTimeOpen]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [addNewServiceTag, addVersionTag, configuration, fetchJSONNotifications, handleLastTimeOpen, setIsNew]);
 
   return (
     <>
@@ -401,7 +459,7 @@ const WrappedNotificationArea = () => {
       <Drawer anchor="right" classes={{ paper: classes.drawer }} open={drawer} onClose={onCloseNotificationArea}>
         <div className={classes.root}>
           <div className={classes.container}>
-            <div className={classes.row}>
+            <div className={clsx(classes.row, classes.closeRow)}>
               <IconButton
                 className={classes.close}
                 onClick={onCloseNotificationArea}
@@ -521,11 +579,9 @@ const WrappedNotificationArea = () => {
                 <Typography variant="body2" color="secondary" children={t('notification.none')} />
               </div>
             ) : (
-              notifications
-                .filter(notification => notification.date_published > new Date(Date.now() - 365 * 24 * 60 * 60 * 1000))
-                .map((n, i) => (
-                  <NotificationItem key={i} notification={n} hideDivider={i === notifications.length - 1} />
-                ))
+              notifications.map((n, i) => (
+                <NotificationItem key={i} notification={n} hideDivider={i === notifications.length - 1} />
+              ))
             )}
           </div>
         </div>
