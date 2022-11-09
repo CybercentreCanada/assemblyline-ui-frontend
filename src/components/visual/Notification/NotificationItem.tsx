@@ -236,11 +236,7 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
               />
             </div>
           ) : (
-            <div className={clsx(classes.content)}>
-              <div className={clsx(classes.description)}>
-                <p>{t('noContent')}</p>
-              </div>
-            </div>
+            <></>
           )}
           {notification.image && (
             <div className={classes.center}>
