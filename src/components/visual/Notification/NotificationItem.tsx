@@ -1,4 +1,4 @@
-import { Divider, Link as MuiLink, makeStyles, Typography, useTheme } from '@material-ui/core';
+import { Divider, Link as MuiLink, makeStyles, Typography } from '@material-ui/core';
 import clsx from 'clsx';
 import * as DOMPurify from 'dompurify';
 import React from 'react';
@@ -82,6 +82,11 @@ const useStyles = makeStyles(theme => ({
     flexGrow: 1
   },
   content: {},
+  badge: {
+    marginLeft: theme.spacing(0.25),
+    marginRight: theme.spacing(0.25),
+    textTransform: 'capitalize'
+  },
   center: { display: 'grid', justifyContent: 'center' },
   descriptionImage: {
     maxWidth: '256px',
@@ -231,11 +236,7 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
               />
             </div>
           ) : (
-            <div className={clsx(classes.content)}>
-              <div className={clsx(classes.description)}>
-                <p>{t('noContent')}</p>
-              </div>
-            </div>
+            <></>
           )}
           {notification.image && (
             <div className={classes.center}>
@@ -246,14 +247,25 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
             <div className={clsx(classes.row, classes.userRow)}>
               <div className={classes.tags}>
                 {notification.tags
-                  .filter(tag => ['dev', 'service', 'blog'].includes(tag))
+                  .filter(tag => ['new', 'current', 'dev', 'service', 'blog'].includes(tag))
                   .map((tag, i) => (
                     <CustomChip
+                      className={classes.badge}
                       key={'tag-' + i}
                       type="round"
                       size="small"
                       variant="outlined"
-                      color={tag === 'dev' ? 'warning' : tag === 'service' ? 'secondary' : 'default'}
+                      color={
+                        tag === 'new'
+                          ? 'info'
+                          : tag === 'current'
+                          ? 'success'
+                          : tag === 'dev'
+                          ? 'warning'
+                          : tag === 'service'
+                          ? 'secondary'
+                          : 'default'
+                      }
                       label={tag}
                     />
                   ))}
