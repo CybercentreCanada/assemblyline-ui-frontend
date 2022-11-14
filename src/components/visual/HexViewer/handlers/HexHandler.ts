@@ -1,76 +1,4 @@
-import { LanguageConfig, Store } from '..';
-
-export type OffsetSettingValues = LanguageConfig<Array<{ label: string; value: number }>>;
-
-export const OFFSET_SETTING_VALUES: OffsetSettingValues = {
-  en: [
-    { label: 'Octal', value: 8 },
-    { label: 'Decimal', value: 10 },
-    { label: 'Hexadecimal', value: 16 }
-  ],
-  fr: [
-    { label: 'Octal', value: 8 },
-    { label: 'Décimal', value: 10 },
-    { label: 'Hexadécimal', value: 16 }
-  ]
-};
-
-export type EncodingType =
-  | 'hidden'
-  | 'CP437'
-  | 'windows1252'
-  | 'ascii'
-  | 'base64'
-  | 'base64url'
-  | 'hex'
-  | 'latin1'
-  | 'ucs-2'
-  | 'ucs2'
-  | 'utf-8'
-  | 'utf16le'
-  | 'utf8';
-
-export type NonPrintableEncodingSettingValues = LanguageConfig<
-  Array<{ label: string; type: EncodingType; value: number }>
->;
-export type HigherEncodingSettingValues = LanguageConfig<Array<{ label: string; type: EncodingType; value: number }>>;
-
-export const NON_PRINTABLE_ENCODING_SETTING_VALUES: NonPrintableEncodingSettingValues = {
-  en: [
-    { label: 'Hidden', type: 'hidden', value: 0 },
-    { label: 'Code page 437', type: 'CP437', value: 1 }
-  ],
-  fr: [
-    { label: 'Caché', type: 'hidden', value: 0 },
-    { label: 'Code page 437', type: 'CP437', value: 1 }
-  ]
-};
-
-export const HIGHER_ENCODING_SETTING_VALUES: HigherEncodingSettingValues = {
-  en: [
-    { label: 'Hidden', type: 'hidden', value: 0 },
-    { label: 'Code page 437', type: 'CP437', value: 1 },
-    { label: 'Windows-1252', type: 'windows1252', value: 2 },
-    { label: 'ASCII', type: 'ascii', value: 3 },
-    { label: 'Latin-1', type: 'latin1', value: 4 }
-  ],
-  fr: [
-    { label: 'Caché', type: 'hidden', value: 0 },
-    { label: 'Code page 437', type: 'CP437', value: 1 },
-    { label: 'Windows-1252', type: 'windows1252', value: 2 },
-    { label: 'ASCII', type: 'ascii', value: 3 },
-    { label: 'Latin-1', type: 'latin1', value: 4 }
-  ]
-};
-
-export type HexASCIIType = 'null' | 'non printable' | 'lower ASCII' | 'higher ASCII';
-
-export type HexASCII = {
-  type: HexASCIIType;
-  regex: RegExp;
-  value?: string;
-  range: { start: number; end: number };
-};
+import { HexASCII, Store } from '..';
 
 export const ASCII: Array<HexASCII> = [
   {
@@ -100,46 +28,47 @@ export const ASCII: Array<HexASCII> = [
 
 export const NON_PRINTABLE_ASCII_TABLE = new Map<
   number,
-  { dec: number; hex: string; bin: string; html: string; code: string; char: string; text: string; copy: string }
+  { dec: number; hex: string; html: string; code: string; CP437: string; caret: string; text: string; copy: string }
 >([
-  [1, { dec: 1, hex: '01', bin: '00000001', html: '&#1;', code: 'SOH', char: 'A', text: '^A', copy: ' ' }],
-  [2, { dec: 2, hex: '02', bin: '00000010', html: '&#2;', code: 'STX', char: 'B', text: '^B', copy: ' ' }],
-  [0, { dec: 0, hex: '00', bin: '00000000', html: '&#0;', code: 'NUL', char: '@', text: '^@', copy: ' ' }],
-  [3, { dec: 3, hex: '03', bin: '00000011', html: '&#3;', code: 'ETX', char: 'C', text: '^C', copy: ' ' }],
-  [4, { dec: 4, hex: '04', bin: '00000100', html: '&#4;', code: 'EOT', char: 'D', text: '^D', copy: ' ' }],
-  [5, { dec: 5, hex: '05', bin: '00000101', html: '&#5;', code: 'ENQ', char: 'E', text: '^E', copy: ' ' }],
-  [6, { dec: 6, hex: '06', bin: '00000110', html: '&#6;', code: 'ACK', char: 'F', text: '^F', copy: ' ' }],
-  [7, { dec: 7, hex: '07', bin: '00000111', html: '&#7;', code: 'BEL', char: 'G', text: '^G', copy: ' ' }],
-  [8, { dec: 8, hex: '08', bin: '00001000', html: '&#8;', code: 'BS', char: 'H', text: '^H', copy: '\b' }],
-  [9, { dec: 9, hex: '09', bin: '00001001', html: '&#9;', code: 'HT', char: 't', text: '^I', copy: '\t' }],
-  [10, { dec: 10, hex: '0A', bin: '00001010', html: '&#10;', code: 'LF', char: 'n', text: '^J', copy: '\n' }],
-  [11, { dec: 11, hex: '0B', bin: '00001011', html: '&#11;', code: 'VT', char: 'v', text: '^K', copy: '\v' }],
-  [12, { dec: 12, hex: '0C', bin: '00001100', html: '&#12;', code: 'FF', char: 'f', text: '^L', copy: '\f' }],
-  [13, { dec: 13, hex: '0D', bin: '00001101', html: '&#13;', code: 'CR', char: 'r', text: '^M', copy: '\r' }],
-  [14, { dec: 14, hex: '0E', bin: '00001110', html: '&#14;', code: 'SO', char: 'N', text: '^N', copy: ' ' }],
-  [15, { dec: 15, hex: '0F', bin: '00001111', html: '&#15;', code: 'SI', char: 'O', text: '^O', copy: ' ' }],
-  [16, { dec: 16, hex: '10', bin: '00010000', html: '&#16;', code: 'DLE', char: 'P', text: '^P', copy: ' ' }],
-  [17, { dec: 17, hex: '11', bin: '00010001', html: '&#17;', code: 'DC1', char: 'Q', text: '^Q', copy: ' ' }],
-  [18, { dec: 18, hex: '12', bin: '00010010', html: '&#18;', code: 'DC2', char: 'R', text: '^R', copy: ' ' }],
-  [19, { dec: 19, hex: '13', bin: '00010011', html: '&#19;', code: 'DC3', char: 'S', text: '^S', copy: ' ' }],
-  [20, { dec: 20, hex: '14', bin: '00010100', html: '&#20;', code: 'DC4', char: 'T', text: '^T', copy: ' ' }],
-  [21, { dec: 21, hex: '15', bin: '00010101', html: '&#21;', code: 'NAK', char: 'U', text: '^U', copy: ' ' }],
-  [22, { dec: 22, hex: '16', bin: '00010110', html: '&#22;', code: 'SYN', char: 'V', text: '^V', copy: ' ' }],
-  [23, { dec: 23, hex: '17', bin: '00010111', html: '&#23;', code: 'ETB', char: 'W', text: '^W', copy: ' ' }],
-  [24, { dec: 24, hex: '18', bin: '00011000', html: '&#24;', code: 'CAN', char: 'X', text: '^X', copy: ' ' }],
-  [25, { dec: 25, hex: '19', bin: '00011001', html: '&#25;', code: 'EM', char: 'Y', text: '^Y', copy: ' ' }],
-  [26, { dec: 26, hex: '1A', bin: '00011010', html: '&#26;', code: 'SUB', char: 'Z', text: '^Z', copy: ' ' }],
-  [27, { dec: 27, hex: '1B', bin: '00011011', html: '&#27;', code: 'ESC', char: '[', text: '^[', copy: ' ' }],
-  [28, { dec: 28, hex: '1C', bin: '00011100', html: '&#28;', code: 'FS', char: '', text: '^', copy: ' ' }],
-  [29, { dec: 29, hex: '1D', bin: '00011101', html: '&#29;', code: 'GS', char: ']', text: '^]', copy: ' ' }],
-  [30, { dec: 30, hex: '1E', bin: '00011110', html: '&#30;', code: 'RS', char: '^', text: '^^', copy: ' ' }],
-  [31, { dec: 31, hex: '1F', bin: '00011111', html: '&#31;', code: 'US', char: '_', text: '^_', copy: ' ' }]
+  [1, { dec: 1, hex: '01', html: '&#1;', code: 'SOH', CP437: '☺', caret: 'A', text: '^A', copy: ' ' }],
+  [0, { dec: 0, hex: '00', html: '&#0;', code: 'NUL', CP437: ' ', caret: '@', text: '^@', copy: ' ' }],
+  [2, { dec: 2, hex: '02', html: '&#2;', code: 'STX', CP437: '☻', caret: 'B', text: '^B', copy: ' ' }],
+  [3, { dec: 3, hex: '03', html: '&#3;', code: 'ETX', CP437: '♥', caret: 'C', text: '^C', copy: ' ' }],
+  [4, { dec: 4, hex: '04', html: '&#4;', code: 'EOT', CP437: '♦', caret: 'D', text: '^D', copy: ' ' }],
+  [5, { dec: 5, hex: '05', html: '&#5;', code: 'ENQ', CP437: '♣', caret: 'E', text: '^E', copy: ' ' }],
+  [6, { dec: 6, hex: '06', html: '&#6;', code: 'ACK', CP437: '♠', caret: 'F', text: '^F', copy: ' ' }],
+  [7, { dec: 7, hex: '07', html: '&#7;', code: 'BEL', CP437: '•', caret: 'G', text: '^G', copy: ' ' }],
+  [8, { dec: 8, hex: '08', html: '&#8;', code: 'BS', CP437: '◘', caret: 'H', text: '^H', copy: '\b' }],
+  [9, { dec: 9, hex: '09', html: '&#9;', code: 'HT', CP437: '○', caret: 't', text: '^I', copy: '\t' }],
+  [10, { dec: 10, hex: '0A', html: '&#10;', code: 'LF', CP437: '◙', caret: 'n', text: '^J', copy: '\n' }],
+  [11, { dec: 11, hex: '0B', html: '&#11;', code: 'VT', CP437: '♂', caret: 'v', text: '^K', copy: '\v' }],
+  [12, { dec: 12, hex: '0C', html: '&#12;', code: 'FF', CP437: '♀', caret: 'f', text: '^L', copy: '\f' }],
+  [13, { dec: 13, hex: '0D', html: '&#13;', code: 'CR', CP437: '♪', caret: 'r', text: '^M', copy: '\r' }],
+  [14, { dec: 14, hex: '0E', html: '&#14;', code: 'SO', CP437: '♫', caret: 'N', text: '^N', copy: ' ' }],
+  [15, { dec: 15, hex: '0F', html: '&#15;', code: 'SI', CP437: '☼', caret: 'O', text: '^O', copy: ' ' }],
+  [16, { dec: 16, hex: '10', html: '&#16;', code: 'DLE', CP437: '►', caret: 'P', text: '^P', copy: ' ' }],
+  [17, { dec: 17, hex: '11', html: '&#17;', code: 'DC1', CP437: '◄', caret: 'Q', text: '^Q', copy: ' ' }],
+  [18, { dec: 18, hex: '12', html: '&#18;', code: 'DC2', CP437: '↕', caret: 'R', text: '^R', copy: ' ' }],
+  [19, { dec: 19, hex: '13', html: '&#19;', code: 'DC3', CP437: '‼', caret: 'S', text: '^S', copy: ' ' }],
+  [20, { dec: 20, hex: '14', html: '&#20;', code: 'DC4', CP437: '¶', caret: 'T', text: '^T', copy: ' ' }],
+  [21, { dec: 21, hex: '15', html: '&#21;', code: 'NAK', CP437: '§', caret: 'U', text: '^U', copy: ' ' }],
+  [22, { dec: 22, hex: '16', html: '&#22;', code: 'SYN', CP437: '▬', caret: 'V', text: '^V', copy: ' ' }],
+  [23, { dec: 23, hex: '17', html: '&#23;', code: 'ETB', CP437: '↨', caret: 'W', text: '^W', copy: ' ' }],
+  [24, { dec: 24, hex: '18', html: '&#24;', code: 'CAN', CP437: '↑', caret: 'X', text: '^X', copy: ' ' }],
+  [25, { dec: 25, hex: '19', html: '&#25;', code: 'EM', CP437: '↓', caret: 'Y', text: '^Y', copy: ' ' }],
+  [26, { dec: 26, hex: '1A', html: '&#26;', code: 'SUB', CP437: '→', caret: 'Z', text: '^Z', copy: ' ' }],
+  [27, { dec: 27, hex: '1B', html: '&#27;', code: 'ESC', CP437: '←', caret: '[', text: '^[', copy: ' ' }],
+  [28, { dec: 28, hex: '1C', html: '&#28;', code: 'FS', CP437: '∟', caret: '\\', text: '^\\', copy: ' ' }],
+  [29, { dec: 29, hex: '1D', html: '&#29;', code: 'GS', CP437: '↔', caret: ']', text: '^]', copy: ' ' }],
+  [30, { dec: 30, hex: '1E', html: '&#30;', code: 'RS', CP437: '▲', caret: '^', text: '^^', copy: ' ' }],
+  [31, { dec: 31, hex: '1F', html: '&#31;', code: 'US', CP437: '▼', caret: '_', text: '^_', copy: ' ' }]
 ]);
 
 export const HIGHER_ASCII_TABLE = new Map<
   number,
   { dec: number; hex: string; bin: string; html: string; CP437: string; windows1252: string }
 >([
+  [127, { dec: 127, hex: '7F', bin: '01111111', html: '&#127;', CP437: '', windows1252: '' }],
   [128, { dec: 128, hex: '80', bin: '10000000', html: '-', CP437: 'Ç', windows1252: '€' }],
   [129, { dec: 129, hex: '81', bin: '10000001', html: '-', CP437: 'ü', windows1252: '' }],
   [130, { dec: 130, hex: '82', bin: '10000010', html: '-', CP437: 'é', windows1252: '‚' }],
@@ -172,7 +101,7 @@ export const HIGHER_ASCII_TABLE = new Map<
   [157, { dec: 157, hex: '9D', bin: '10011101', html: '-', CP437: '¥', windows1252: '' }],
   [158, { dec: 158, hex: '9E', bin: '10011110', html: '-', CP437: '₧', windows1252: 'ž' }],
   [159, { dec: 159, hex: '9F', bin: '10011111', html: '-', CP437: 'ƒ', windows1252: 'Ÿ' }],
-  [160, { dec: 173, hex: 'AD', bin: '10101101', html: '&#173;', CP437: '¡', windows1252: '­' }],
+  [160, { dec: 160, hex: 'A0', bin: '10101101', html: '&#173;', CP437: 'á', windows1252: '­' }],
   [161, { dec: 161, hex: 'A1', bin: '10100001', html: '&#161;', CP437: 'í', windows1252: '¡' }],
   [162, { dec: 162, hex: 'A2', bin: '10100010', html: '&#162;', CP437: 'ó', windows1252: '¢' }],
   [163, { dec: 163, hex: 'A3', bin: '10100011', html: '&#163;', CP437: 'ú', windows1252: '£' }],
@@ -267,8 +196,40 @@ export const HIGHER_ASCII_TABLE = new Map<
   [252, { dec: 252, hex: 'FC', bin: '11111100', html: '&#252;', CP437: 'ⁿ', windows1252: 'ü' }],
   [253, { dec: 253, hex: 'FD', bin: '11111101', html: '&#253;', CP437: '²', windows1252: 'ý' }],
   [254, { dec: 254, hex: 'FE', bin: '11111110', html: '&#254;', CP437: '■', windows1252: 'þ' }],
-  [255, { dec: 255, hex: 'FF', bin: '11111111', html: '&#255;', CP437: ' ', windows1252: 'ÿ' }]
+  [255, { dec: 255, hex: 'FF', bin: '11111111', html: '&#255;', CP437: '⍽', windows1252: 'ÿ' }]
 ]);
+
+export const getNonPrintableAsciiFromDec = (index: number, encoding: 'CP437' | 'caret' | 'copy', prefix: string = '') =>
+  !['CP437', 'caret', 'copy'].includes(encoding) || index < 0 || index > 31
+    ? ''
+    : prefix.slice(-1) + NON_PRINTABLE_ASCII_TABLE.get(index)[encoding];
+
+export const getNonPrintableAsciiFromHex = (hex: string, encoding: 'CP437' | 'caret' | 'copy', prefix: string = '') => {
+  const index: number = parseInt(hex, 16);
+  return !['CP437', 'caret', 'copy'].includes(encoding) ||
+    isNaN(index) ||
+    index === undefined ||
+    index < 0 ||
+    index > 31
+    ? ''
+    : prefix.slice(-1) + NON_PRINTABLE_ASCII_TABLE.get(index)[encoding];
+};
+
+export const getHigherAsciiFromDec = (index: number, encoding: 'CP437' | 'windows1252') =>
+  !['CP437', 'windows1252'].includes(encoding) || index < 127 || index > 255
+    ? ''
+    : HIGHER_ASCII_TABLE.get(index)[encoding];
+
+export const getHigherAsciiFromHex = (hex: string, encoding: 'CP437' | 'windows1252') => {
+  const index: number = parseInt(hex, 16);
+  return !['CP437', 'windows1252'].includes(encoding) ||
+    isNaN(index) ||
+    index === undefined ||
+    index < 127 ||
+    index > 255
+    ? ''
+    : HIGHER_ASCII_TABLE.get(index)[encoding];
+};
 
 export const parseDataToHexcodeMap = (data: string) => {
   if (data === undefined || data === null || data === '') return new Map();
@@ -357,20 +318,22 @@ export const toHexChar2 = (store: Store, hexcode: string, copy: boolean = false)
     else return store.hex.null.char;
   } else if (1 <= value && value <= 31) {
     if (copy) return NON_PRINTABLE_ASCII_TABLE.get(value).copy;
-    else if (store.hex.nonPrintable.encoding === 'hidden') return store.hex.nonPrintable.char;
-    else return NON_PRINTABLE_ASCII_TABLE.get(value).char;
+    else if (store.hex.nonPrintable.set === 'hidden') return store.hex.nonPrintable.char;
+    else if (store.hex.nonPrintable.set === 'caret') return NON_PRINTABLE_ASCII_TABLE.get(value).caret;
+    else if (store.hex.nonPrintable.set === 'CP437') return NON_PRINTABLE_ASCII_TABLE.get(value).CP437;
+    else return NON_PRINTABLE_ASCII_TABLE.get(value).caret;
   } else if (32 <= value && value <= 127) {
     return Buffer.from(hexcode, 'hex').toString();
   } else if (128 <= value && value <= 255) {
-    if (store.hex.higher.encoding === 'hidden') return store.hex.higher.char;
-    else if (['CP437', 'windows1252'].includes(store.hex.higher.encoding))
-      return HIGHER_ASCII_TABLE.get(value)[store.hex.higher.encoding];
+    if (store.hex.higher.set === 'hidden') return store.hex.higher.char;
+    else if (['CP437', 'windows1252'].includes(store.hex.higher.set))
+      return HIGHER_ASCII_TABLE.get(value)[store.hex.higher.set];
     else if (
       ['ascii', 'base64', 'base64url', 'hex', 'latin1', 'ucs-2', 'ucs2', 'utf-8', 'utf16le', 'utf8'].includes(
-        store.hex.higher.encoding
+        store.hex.higher.set
       )
     )
-      return Buffer.from(hexcode, 'hex').toString(store.hex.higher.encoding as BufferEncoding);
+      return Buffer.from(hexcode, 'hex').toString(store.hex.higher.set as BufferEncoding);
     else return '';
   } else return '';
 };
@@ -396,3 +359,6 @@ export const clampHexIndex = (hexcodes: Map<number, string>, index: number): num
   else if (index >= hexcodes.size) return hexcodes.size - 1;
   else return index;
 };
+
+export const singleCharacterString = (value: any, base: string = undefined) =>
+  value === undefined || value === null || typeof value !== 'string' || value === '' ? base : value.slice(-1);

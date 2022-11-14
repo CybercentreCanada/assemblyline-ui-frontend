@@ -1,23 +1,20 @@
-import React, { useLayoutEffect, useState } from 'react';
+import React, { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { OFFSET_SETTING_VALUES, SelectField, StoreProps, useDispatch } from '../..';
+import { getItems, getType, getValue, SelectField, StoreProps, useStore } from '../..';
 
 export const WrappedHexOffsetBaseSetting = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);
-  const { onSettingOffsetBaseChange } = useDispatch();
-
-  const language = store.mode.languageType;
-  const offsetBaseValue = store.setting.offsetBase;
-  const [values, setValues] = useState<Array<{ label: string; value: number }>>(OFFSET_SETTING_VALUES[language]);
-  useLayoutEffect(() => setValues(OFFSET_SETTING_VALUES[language]), [language]);
+  const { update } = useStore();
 
   return (
     <SelectField
       label={t('base.label')}
       description={t('base.description')}
-      value={offsetBaseValue}
-      items={values}
-      onChange={event => onSettingOffsetBaseChange({ event })}
+      value={getValue.offset.base(store.setting.offset.base)}
+      items={getItems.offset.base(store)}
+      onChange={(event: ChangeEvent<{ name?: string; value: unknown }>) =>
+        update.store.setting.offset.setBase(getType.offset.base(event.target.value as number))
+      }
     />
   );
 };
@@ -25,6 +22,6 @@ export const WrappedHexOffsetBaseSetting = ({ store }: StoreProps) => {
 export const HexOffsetBaseSetting = React.memo(
   WrappedHexOffsetBaseSetting,
   (prevProps: Readonly<StoreProps>, nextProps: Readonly<StoreProps>) =>
-    prevProps.store.setting.offsetBase === nextProps.store.setting.offsetBase &&
-    prevProps.store.mode.languageType === nextProps.store.mode.languageType
+    prevProps.store.setting.offset.base === nextProps.store.setting.offset.base &&
+    prevProps.store.mode.language === nextProps.store.mode.language
 );

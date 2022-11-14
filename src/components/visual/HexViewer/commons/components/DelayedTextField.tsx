@@ -75,6 +75,7 @@ export type DelayedTextFieldProps = {
   onKeyDown?: React.KeyboardEventHandler<HTMLInputElement | HTMLTextAreaElement>;
   onChange?: (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => void;
   onSubmit?: (event: React.FormEvent<HTMLDivElement>) => void;
+  onPaste?: (event: React.ClipboardEvent<HTMLDivElement>) => void;
 };
 
 export const WrappedDelayedTextField = ({
@@ -107,7 +108,8 @@ export const WrappedDelayedTextField = ({
   onWheel = () => null,
   onKeyDown = () => null,
   onChange = () => null,
-  onSubmit = () => null
+  onSubmit = () => null,
+  onPaste = () => null
 }: DelayedTextFieldProps) => {
   const c = useStyles();
 
@@ -169,6 +171,9 @@ export const WrappedDelayedTextField = ({
         onFocus={onFocus}
         onBlur={onBlur}
         onWheel={onWheel}
+        onPaste={event => {
+          onPaste(event);
+        }}
         onKeyDown={(event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
           onKeyDown(event);
         }}

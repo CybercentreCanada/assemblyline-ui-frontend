@@ -1,4 +1,5 @@
 {
+  "add.title": "Add a notification",
   "delete.acceptText": "Yes, do it!",
   "delete.cancelText": "Cancel",
   "delete.success": "The system message was successfully removed.",
@@ -11,6 +12,8 @@
   "edit.severity": "Severity of the message",
   "edit.text": "This message will be permanently displayed for all users in their notification area. Only one message can be displayed at the time and only administrators can change the message.",
   "edit.title": "Set a system message",
+  "notification.header": "What's new in Assemblyline",
+  "notification.none": "There are no notifications.",
   "save.acceptText": "Yes, do it!",
   "save.cancelText": "Cancel",
   "save.success": "The system message was successfully set.",
@@ -19,5 +22,7 @@
   "severity.error": "Error",
   "severity.info": "Information",
   "severity.success": "Success",
-  "severity.warning": "Warning"
+  "severity.warning": "Warning",
+  "systemMessage.header": "Announcement",
+  "systemMessage.none": "There are no announcements."
 }

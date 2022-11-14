@@ -1,34 +1,8 @@
 import { isArrowDown, isArrowUp } from 'commons/addons/elements/utils/keyboard';
-import { useCallback, useMemo } from 'react';
-import { ActionProps, isAction, ReducerHandler, Reducers, SearchType, Store, UseReducer } from '..';
+import { useCallback } from 'react';
+import { ActionProps, HistoryType, isAction, ReducerHandler, Reducers, Store, UseReducer } from '..';
 
-export type HistoryType = {
-  type: SearchType;
-  value: string | number;
-};
-
-export type HistoryState = {
-  history: {
-    values: Array<HistoryType>;
-    index: number;
-    maxSize: number;
-    storageKey: string;
-  };
-};
-
-export const useHistoryReducer: UseReducer<HistoryState> = () => {
-  const initialState = useMemo<HistoryState>(
-    () => ({
-      history: {
-        values: [],
-        index: 0,
-        maxSize: 10,
-        storageKey: 'hexViewer.history'
-      }
-    }),
-    []
-  );
-
+export const useHistoryReducer: UseReducer = () => {
   const historyLoad: Reducers['appLoad'] = useCallback((store, { data }) => {
     const value = localStorage.getItem(store.history.storageKey);
     const json = JSON.parse(value) as HistoryType[];
@@ -41,7 +15,7 @@ export const useHistoryReducer: UseReducer<HistoryState> = () => {
         history: {
           ...store.history,
           values: [
-            { type: store.search.type, value: '' },
+            { type: store.search.mode.type, value: '' },
             ...json.filter(e => e.value !== null && e.value !== undefined && e.value !== '')
           ],
           index: 0
@@ -64,7 +38,9 @@ export const useHistoryReducer: UseReducer<HistoryState> = () => {
     const { value: inputValue } = event.target;
     const {
       cursor: { index: cursorIndex },
-      search: { type: searchType },
+      search: {
+        mode: { type: searchType }
+      },
       history: { values: historyValues }
     } = store;
 
@@ -81,7 +57,7 @@ export const useHistoryReducer: UseReducer<HistoryState> = () => {
           ...store.history,
           index: 1,
           values: [
-            { type: store.search.type, value: '' },
+            { type: store.search.mode.type, value: '' },
             ...[{ type: searchType, value: cursorIndex }, ...store.history.values]
               .filter(v => v.value !== null && v.value !== '' && v.value !== undefined)
               .slice(0, store.history.maxSize)
@@ -95,7 +71,7 @@ export const useHistoryReducer: UseReducer<HistoryState> = () => {
           ...store.history,
           index: 1,
           values: [
-            { type: store.search.type, value: '' },
+            { type: store.search.mode.type, value: '' },
             ...[{ type: searchType, value: inputValue }, ...store.history.values]
               .filter(v => v.value !== null && v.value !== '' && v.value !== undefined)
               .slice(0, store.history.maxSize)
@@ -122,13 +98,13 @@ export const useHistoryReducer: UseReducer<HistoryState> = () => {
       return {
         ...store,
         cursor: { index: newValue as number },
-        search: { ...store.search, type: newType, inputValue: '', value: '' },
+        search: { ...store.search, mode: { ...store.search.mode, type: newType }, inputValue: '', value: '' },
         history: { ...store.history, index: newHistoryIndex }
       };
     } else if (newType === 'hex' || newType === 'text') {
       return {
         ...store,
-        search: { ...store.search, type: newType, inputValue: newValue as string },
+        search: { ...store.search, mode: { ...store.search.mode, type: newType }, inputValue: newValue as string },
         history: { ...store.history, index: newHistoryIndex }
       };
     } else {
@@ -143,7 +119,10 @@ export const useHistoryReducer: UseReducer<HistoryState> = () => {
   const historyTypeChange: Reducers['searchTypeChange'] = useCallback((store, { type }) => {
     const {
       cursor: { index: cursorIndex },
-      search: { type: searchType, inputValue },
+      search: {
+        mode: { type: searchType },
+        inputValue
+      },
       history: { values: historyValues }
     } = store;
 
@@ -160,7 +139,7 @@ export const useHistoryReducer: UseReducer<HistoryState> = () => {
           ...store.history,
           index: 0,
           values: [
-            { type: store.search.type, value: '' },
+            { type: store.search.mode.type, value: '' },
             ...[{ type: searchType, value: cursorIndex }, ...store.history.values]
               .filter(v => v.value !== null && v.value !== '' && v.value !== undefined)
               .slice(0, store.history.maxSize)
@@ -174,7 +153,7 @@ export const useHistoryReducer: UseReducer<HistoryState> = () => {
           ...store.history,
           index: 0,
           values: [
-            { type: store.search.type, value: '' },
+            { type: store.search.mode.type, value: '' },
             ...[{ type: searchType, value: inputValue }, ...store.history.values]
               .filter(v => v.value !== null && v.value !== '' && v.value !== undefined)
               .slice(0, store.history.maxSize)
@@ -188,7 +167,7 @@ export const useHistoryReducer: UseReducer<HistoryState> = () => {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const historyClear = useCallback((store: Store, { type, payload }: ActionProps): Store => {
-    return { ...store, history: { ...store.history, index: 0, values: [{ type: store.search.type, value: '' }] } };
+    return { ...store, history: { ...store.history, index: 0, values: [{ type: store.search.mode.type, value: '' }] } };
   }, []);
 
   const reducer: ReducerHandler = useCallback(
@@ -204,5 +183,5 @@ export const useHistoryReducer: UseReducer<HistoryState> = () => {
     [historyAddValue, historyEscapeKeyDown, historyIndexChange, historyLoad, historySave, historyTypeChange]
   );
 
-  return { initialState, reducer };
+  return { reducer };
 };
