@@ -15,6 +15,7 @@
   "container.card.internet": "Internet access",
   "container.card.no": "no",
   "container.card.ram": "Max amount of memory allocated",
+  "container.card.service_account": "Kubernetes service account",
   "container.card.volumes": "Persistent volumes",
   "container.card.yes": "yes",
   "container.channel": "Service update channel",
