@@ -35,7 +35,7 @@ import clsx from 'clsx';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { SystemMessageDefinition } from 'components/hooks/useMyUser';
+import { ConfigurationDefinition, SystemMessageDefinition } from 'components/hooks/useMyUser';
 import 'moment-timezone';
 import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -288,24 +288,48 @@ const WrappedNotificationArea = () => {
     [classes]
   );
 
-  const addVersionTag = useCallback(
-    (notification: JSONFeedItem): 'new' | 'current' | null => {
-      const version = notification.url.match(/(\d)+\.(\d)+\.(\d)+\..*/g)?.at(0);
+  const arrayEquals = useCallback(
+    (a, b) =>
+      Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((val, index) => val === b[index]),
+    []
+  );
 
+  const arrayHigher = useCallback(
+    (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.some((val, index) => val > b[index]),
+    []
+  );
+
+  const getVersionValues = useCallback(
+    (value: string): Array<number> =>
+      value
+        ?.match(/(\d){1,}\.(\d){1,}\.(\d){1,}\..*/g)
+        ?.at(0)
+        ?.replaceAll(/[^0-9.]/g, '')
+        ?.split('.')
+        ?.map(v => parseInt(v)),
+    []
+  );
+
+  const addVersionTag = useCallback(
+    (notification: JSONFeedItem, config: ConfigurationDefinition): 'new' | 'current' | null => {
+      const notVer = notification?.url;
+      const sysVer = config?.system?.version;
       if (
-        !version ||
         !(
-          (/(d|D)ev/g.test(version) && /(d|D)ev/g.test(configuration.system.version)) ||
-          (/(s|S)table/g.test(version) && /(s|S)table/g.test(configuration.system.version))
+          (/(d|D)ev/g.test(notVer) && /(\d){1,}\.(\d){1,}\.(\d){1,}\.(d|D)ev(\d){1,}/g.test(sysVer)) ||
+          (/(s|S)table/g.test(notVer) && /(\d){1,}\.(\d){1,}\.(\d){1,}\.(\d){1,}/g.test(sysVer))
         )
       )
         return;
 
-      if (version === configuration.system.version) return 'current';
-      else if (version > configuration.system.version) return 'new';
+      const notValues: Array<number> = getVersionValues(notVer);
+      const sysValues: Array<number> = getVersionValues(sysVer);
+
+      if (arrayEquals(notValues, sysValues)) return 'current';
+      else if (arrayHigher(notValues, sysValues)) return 'new';
       else return;
     },
-    [configuration.system]
+    [arrayEquals, arrayHigher, getVersionValues]
   );
 
   const setIsNew = useCallback(
@@ -337,7 +361,7 @@ const WrappedNotificationArea = () => {
               feedItems
                 .map(n => ({
                   ...n,
-                  tags: [addVersionTag(n), addNewServiceTag(n, services2), ...n.tags],
+                  tags: [addVersionTag(n, configuration), addNewServiceTag(n, services2), ...n.tags],
                   _isNew: setIsNew(n)
                 }))
                 .filter(n => n.date_published > new Date(Date.now() - 365 * 24 * 60 * 60 * 1000))
