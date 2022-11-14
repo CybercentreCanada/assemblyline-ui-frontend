@@ -300,7 +300,7 @@ const DEFAULT_CONTAINER: Container = {
   registry_password: '',
   registry_username: '',
   registry_type: 'docker',
-  service_account: '',
+  service_account: ''
 };
 
 type ContainerDialogProps = {
