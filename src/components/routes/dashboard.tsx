@@ -425,7 +425,7 @@ const WrappedDispatcherCard = ({ dispatcher, up, down, handleStatusChange, statu
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
           <div>
-            <label>{t('queues')}</label>
+            <label>{t('queued')}</label>
           </div>
           <div>
             <MetricCounter
@@ -551,7 +551,15 @@ const WrappedArchiveCard = ({ archive }) => {
         </Grid>
         <Grid item xs={12} sm={6}>
           <div>
-            <label>{t('archived')}</label>
+            <label>{t('queued')}</label>
+          </div>
+          <div>
+            <MetricCounter init={archive.initialized} value={archive.queued} title="Q" tooltip={t('archive.queue')} />
+          </div>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <div>
+            <label>{t('throughput')}</label>
           </div>
           <div>
             <MetricCounter
@@ -644,7 +652,7 @@ const WrappedExpiryCard = ({ expiry }) => {
         </Grid>
         <Grid item xs={12} sm={6}>
           <div>
-            <label>{t('queues')}</label>
+            <label>{t('queued')}</label>
           </div>
           <div>
             <MetricCounter
@@ -681,7 +689,7 @@ const WrappedExpiryCard = ({ expiry }) => {
         </Grid>
         <Grid item xs={12} sm={6}>
           <div>
-            <label>{t('expired')}</label>
+            <label>{t('throughput')}</label>
           </div>
           <div>
             <MetricCounter
@@ -758,7 +766,7 @@ const WrappedAlerterCard = ({ alerter }) => {
         </Grid>
         <Grid item xs={12} sm={4}>
           <div>
-            <label>{t('queues')}</label>
+            <label>{t('queued')}</label>
           </div>
           <div>
             <MetricCounter
@@ -1042,7 +1050,8 @@ const DEFAULT_ARCHIVE = {
     webhook_failure: 0
   },
   error: null,
-  initialized: false
+  initialized: false,
+  queued: 0
 };
 
 const DEFAULT_EXPIRY = {
