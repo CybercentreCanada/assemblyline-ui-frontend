@@ -55,7 +55,7 @@
   "container.privileged.true": "Yes - Service has direct access to all core components",
   "container.privileged.false": "No - Service gets its tasking and files from service server",
   "count": "services loaded in the system",
-  "count.available": "services available to be downloaded",
+  "count.available": "services available to be added in the system",
   "delete.acceptText": "Remove",
   "delete.cancelText": "Cancel",
   "delete.success": "The service has been successfully removed from the system.",

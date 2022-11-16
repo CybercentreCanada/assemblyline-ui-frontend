@@ -130,23 +130,19 @@ export default function Services() {
 
   const onUpdate = useCallback(
     (svc, updateData) => {
-      console.log({
-        name: svc,
-        update_data: updateData
+      apiCall({
+        method: 'PUT',
+        url: '/api/v4/service/update/',
+        body: {
+          name: svc,
+          update_data: updateData
+        },
+        onSuccess: () => {
+          const newUpdates = { ...updates };
+          newUpdates[svc] = { ...newUpdates[svc], updating: true };
+          setUpdates(newUpdates);
+        }
       });
-      // apiCall({
-      //   method: 'PUT',
-      //   url: '/api/v4/service/update/',
-      //   body: {
-      //     name: svc,
-      //     update_data: updateData
-      //   },
-      //   onSuccess: () => {
-      //     const newUpdates = { ...updates };
-      //     newUpdates[svc] = { ...newUpdates[svc], updating: true };
-      //     setUpdates(newUpdates);
-      //   }
-      // });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [updates]
@@ -204,15 +200,6 @@ export default function Services() {
         setAvailableServices(allServices?.filter(s => !serviceResults?.some(r => s?.title.includes(r?.name))))
     });
   }, [configuration.ui.rss_feeds, fetchJSONNotifications, serviceResults]);
-
-  console.log(availableServices);
-
-  // const allServices: Array<string> = services?.map(s => s.title);
-  // const installedServices: Array<string> = serviceResults?.map(r => r.name);
-  // const servicesToBeInstalled: Array<string> = allServices?.filter(
-  //   (s, i) => !installedServices?.some((r, j) => s.includes(r))
-  // );
-  // console.log({ allServices, installedServices, servicesToBeInstalled, updates });
 
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>
@@ -344,34 +331,7 @@ export default function Services() {
         <ServiceTable serviceResults={serviceResults} updates={updates} setService={setService} onUpdate={onUpdate} />
       </div>
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
-        <NewServiceTable services={availableServices} />
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Title</th>
-              <th>URL</th>
-            </tr>
-          </thead>
-          <tbody>
-            {availableServices
-              .sort((a, b) => a.title.localeCompare(b.title))
-              .map(s => (
-                <tr key={s.id}>
-                  <td>{s.id}</td>
-                  <td>{s.title}</td>
-                  <td>{s.url}</td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-
-        {/* <NewServiceTable
-          serviceResults={serviceResults}
-          updates={updates}
-          setService={setService}
-          onUpdate={onUpdate}
-        /> */}
+        <NewServiceTable services={availableServices.sort((a, b) => a.id.localeCompare(b.id))} />
       </div>
     </PageFullWidth>
   ) : (

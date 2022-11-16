@@ -1,11 +1,12 @@
-import Paper from '@material-ui/core/Paper';
-import TableContainer from '@material-ui/core/TableContainer';
+import { IconButton, makeStyles, Paper, TableContainer, TableRow, Tooltip } from '@material-ui/core';
+import CloudDownloadOutlinedIcon from '@material-ui/icons/CloudDownloadOutlined';
+import LaunchOutlinedIcon from '@material-ui/icons/LaunchOutlined';
 import { AlertTitle, Skeleton } from '@material-ui/lab';
+import useMyAPI from 'components/hooks/useMyAPI';
 import 'moment/locale/fr';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
-import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from '../DivTable';
+import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow } from '../DivTable';
 import InformativeAlert from '../InformativeAlert';
 import { JSONFeedItem } from './';
 
@@ -29,18 +30,64 @@ type UpdateData = {
   updating: boolean;
 };
 
-type Updates = {
-  [name: string]: UpdateData;
-};
-
-type NewServiceTableProps = {
+type Props = {
   services: JSONFeedItem[];
   setService?: (svc: string) => void;
   onUpdate?: (svc: string, updateData: UpdateData) => void;
 };
 
-const WrappedNewServiceTable: React.FC<NewServiceTableProps> = ({ services, setService, onUpdate }) => {
+const useStyles = makeStyles(theme => ({
+  center: {
+    textAlign: 'center'
+  }
+}));
+
+const WrappedNewServiceTable: React.FC<Props> = ({ services, setService, onUpdate }: Props) => {
   const { t } = useTranslation(['search']);
+  const classes = useStyles();
+  const { apiCall } = useMyAPI();
+
+  const navigate = useCallback(url => {
+    window.open(url, '_blank');
+  }, []);
+
+  const onInstall = useCallback(
+    (service: JSONFeedItem) => {
+      console.log({
+        name: service.summary,
+        update_data: {
+          auth: null,
+          image: service.id + ':latest',
+          latest_tag: 'latest',
+          update_available: true,
+          updating: false
+        }
+      });
+
+      apiCall({
+        method: 'PUT',
+        url: '/api/v4/service/install/',
+        body: {
+          name: service.summary,
+          update_data: {
+            auth: null,
+            image: service.id + ':latest',
+            latest_tag: 'latest',
+            update_available: true,
+            updating: false
+          }
+        },
+        onSuccess: response => {
+          console.log(response);
+          // const newUpdates = { ...updates };
+          // newUpdates[svc] = { ...newUpdates[svc], updating: true };
+          // setUpdates(newUpdates);
+        }
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
   return services ? (
     services.length !== 0 ? (
@@ -50,67 +97,36 @@ const WrappedNewServiceTable: React.FC<NewServiceTableProps> = ({ services, setS
             <DivTableRow>
               <DivTableCell>{t('header.name')}</DivTableCell>
               <DivTableCell>{t('header.description')}</DivTableCell>
-              {/* <DivTableCell>{t('header.category')}</DivTableCell>
-              <DivTableCell>{t('header.stage')}</DivTableCell>
-              <DivTableCell>{t('header.accepts')}</DivTableCell>
-              <DivTableCell>{t('header.mode')}</DivTableCell>
-              <DivTableCell>{t('header.enabled')}</DivTableCell> */}
+              <DivTableCell>{t('header.docs')}</DivTableCell>
+              <DivTableCell>{t('header.install')}</DivTableCell>
               <DivTableCell />
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
-            {services.map(service => (
-              <LinkRow
-                key={service.title}
-                component={props => <Link {...props} href="https://www.google.com/" />}
-                // to={`/admin/services/${service.title}`}
-                to={`https://www.google.com/`}
+            {services.map((service, i) => (
+              <TableRow
+                key={i + ' - ' + service.title}
+                component={props => <div {...props} />}
                 hover
                 style={{ textDecoration: 'none' }}
-                onClick={event => {
-                  if (setService) {
-                    event.preventDefault();
-                    setService(service.title);
-                  }
-                }}
               >
                 <DivTableCell>{service.summary}</DivTableCell>
                 <DivTableCell>{service.content_text}</DivTableCell>
-                {/* <DivTableCell>{result.stage}</DivTableCell>
-                <DivTableCell breakable>{result.accepts}</DivTableCell>
-                <DivTableCell>
-                  <CustomChip
-                    size="tiny"
-                    type="rounded"
-                    mono
-                    label={result.privileged ? 'P' : 'S'}
-                    color={result.privileged ? 'primary' : 'default'}
-                    tooltip={result.privileged ? t('mode.privileged') : t('mode.service')}
-                  />
+                <DivTableCell className={classes.center}>
+                  <Tooltip title={service.url}>
+                    <IconButton size="small" onClick={e => navigate(service.url)}>
+                      <LaunchOutlinedIcon />
+                    </IconButton>
+                  </Tooltip>
                 </DivTableCell>
-                <DivTableCell>
-                  {result.enabled ? <DoneIcon color="primary" /> : <ClearIcon color="error" />}
+                <DivTableCell className={classes.center}>
+                  <Tooltip title={service.external_url}>
+                    <IconButton color="primary" size="small" onClick={e => onInstall(service)}>
+                      <CloudDownloadOutlinedIcon />
+                    </IconButton>
+                  </Tooltip>
                 </DivTableCell>
-                <DivTableCell style={{ whiteSpace: 'nowrap' }}>
-                  {updates[result.name] && updates[result.name].update_available && !updates[result.name].updating && (
-                    <Tooltip title={`${result.name} ${updates[result.name].latest_tag} ${t('available')}!`}>
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        color="primary"
-                        onClick={event => {
-                          event.preventDefault();
-                          event.stopPropagation();
-                          onUpdate(result.name, updates[result.name]);
-                        }}
-                      >
-                        {t('update')}
-                      </Button>
-                    </Tooltip>
-                  )}
-                  {updates[result.name] && updates[result.name].updating && t('updating')}
-                </DivTableCell> */}
-              </LinkRow>
+              </TableRow>
             ))}
           </DivTableBody>
         </DivTable>

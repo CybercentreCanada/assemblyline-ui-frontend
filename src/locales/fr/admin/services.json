@@ -55,7 +55,7 @@
   "container.privileged.true": "Oui - Le service a un accès direct à tous les composantes principales",
   "container.privileged.false": "Non - Le service obtient ses tâches et ses fichiers du serveur de services",
   "count": "services chargés dans le système",
-  "count.available": "services disponibles en téléchargement",
+  "count.available": "services disponibles pour être ajouter dans le système",
   "delete.acceptText": "Supprimé",
   "delete.cancelText": "Annuler",
   "delete.success": "Le service a été supprimé du système avec succès.",
