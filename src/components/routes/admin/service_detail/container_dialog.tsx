@@ -299,7 +299,8 @@ const DEFAULT_CONTAINER: Container = {
   ram_mb_min: 128,
   registry_password: '',
   registry_username: '',
-  registry_type: 'docker'
+  registry_type: 'docker',
+  service_account: ''
 };
 
 type ContainerDialogProps = {
@@ -349,7 +350,13 @@ const WrappedContainerDialog = ({
 
   const handleContainerValueChange = (field, value) => {
     setModified(true);
-    setTempContainer({ ...tempContainer, [field]: value });
+    if(value === undefined){
+      let clone = {...tempContainer};
+      delete clone[field];
+      setTempContainer(clone);
+    } else {
+      setTempContainer({ ...tempContainer, [field]: value });
+    }
   };
 
   const handleContainerCommandChange = event => {
@@ -551,7 +558,7 @@ const WrappedContainerDialog = ({
                 size="small"
                 margin="dense"
                 variant="outlined"
-                onChange={event => handleContainerValueChange('registry_username', event.target.value)}
+                onChange={event => handleContainerValueChange('registry_username', event.target.value || undefined)}
                 value={tempContainer.registry_username ? tempContainer.registry_username : ''}
               />
             </Grid>
@@ -573,8 +580,30 @@ const WrappedContainerDialog = ({
                 size="small"
                 margin="dense"
                 variant="outlined"
-                onChange={event => handleContainerValueChange('registry_password', event.target.value)}
+                onChange={event => handleContainerValueChange('registry_password', event.target.value || undefined)}
                 value={tempContainer.registry_password ? tempContainer.registry_password : ''}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="subtitle2">
+                {t('container.dialog.service_account')}
+                <ResetButton
+                  service={tempContainer}
+                  defaults={defaults}
+                  field="service_account"
+                  reset={() => {
+                    setModified(true);
+                    setTempContainer({ ...tempContainer, service_account: defaults.service_account });
+                  }}
+                />
+              </Typography>
+              <TextField
+                fullWidth
+                size="small"
+                margin="dense"
+                variant="outlined"
+                onChange={event => handleContainerValueChange('service_account', event.target.value || undefined)}
+                value={tempContainer.service_account ? tempContainer.service_account : ''}
               />
             </Grid>
             <Grid item xs={12}>
