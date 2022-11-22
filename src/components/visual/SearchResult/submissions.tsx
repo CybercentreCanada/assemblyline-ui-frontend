@@ -1,6 +1,7 @@
 import { Tooltip } from '@material-ui/core';
 import Paper from '@material-ui/core/Paper';
 import TableContainer from '@material-ui/core/TableContainer';
+import ArchiveOutlinedIcon from '@material-ui/icons/ArchiveOutlined';
 import { AlertTitle, Skeleton } from '@material-ui/lab';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
@@ -27,6 +28,7 @@ export type SubmissionResult = {
   classification: string;
   error_count: number;
   file_count: number;
+  from_archive: boolean;
   id: string;
   max_score: number;
   params: {
@@ -81,6 +83,7 @@ const WrappedSubmissionsTable: React.FC<SubmissionsTableProps> = ({ submissionRe
               <SortableHeaderCell sortField="error_count" allowSort={allowSort}>
                 {t('header.status')}
               </SortableHeaderCell>
+              <DivTableCell />
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
@@ -116,6 +119,13 @@ const WrappedSubmissionsTable: React.FC<SubmissionsTableProps> = ({ submissionRe
                 )}
                 <DivTableCell style={{ textAlign: 'center' }}>
                   <SubmissionState state={submission.state} error_count={submission.error_count} />
+                </DivTableCell>
+                <DivTableCell style={{ textAlign: 'center' }}>
+                  {submission.from_archive && (
+                    <Tooltip title={t('archive')}>
+                      <ArchiveOutlinedIcon />
+                    </Tooltip>
+                  )}
                 </DivTableCell>
               </LinkRow>
             ))}

@@ -11,9 +11,9 @@ import {
   useMediaQuery,
   useTheme
 } from '@material-ui/core';
+import ArchiveIcon from '@material-ui/icons/Archive';
+import ArchiveOutlinedIcon from '@material-ui/icons/ArchiveOutlined';
 import CenterFocusStrongOutlinedIcon from '@material-ui/icons/CenterFocusStrongOutlined';
-import FolderIcon from '@material-ui/icons/Folder';
-import FolderOutlinedIcon from '@material-ui/icons/FolderOutlined';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
@@ -260,9 +260,9 @@ function Search({ index }: SearchProps) {
                     {
                       icon:
                         query && query.get('use_archive') === 'true' ? (
-                          <FolderIcon fontSize={downSM ? 'small' : 'medium'} />
+                          <ArchiveIcon fontSize={downSM ? 'small' : 'medium'} />
                         ) : (
-                          <FolderOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />
+                          <ArchiveOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />
                         ),
                       tooltip:
                         query && query.get('use_archive') === 'true'

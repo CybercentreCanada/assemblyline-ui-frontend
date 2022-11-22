@@ -1,6 +1,7 @@
 import { Tooltip, useTheme } from '@material-ui/core';
 import Paper from '@material-ui/core/Paper';
 import TableContainer from '@material-ui/core/TableContainer';
+import ArchiveOutlinedIcon from '@material-ui/icons/ArchiveOutlined';
 import { AlertTitle, Skeleton } from '@material-ui/lab';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
@@ -25,6 +26,7 @@ export type ResultResult = {
   classification: string;
   created: number;
   drop_file: boolean;
+  from_archive: boolean;
   id: string;
   response: {
     service_name: string;
@@ -77,6 +79,7 @@ const WrappedResultsTable: React.FC<ResultsTableProps> = ({ resultResults, allow
                   {t('header.classification')}
                 </SortableHeaderCell>
               )}
+              <DivTableCell />
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
@@ -108,6 +111,13 @@ const WrappedResultsTable: React.FC<ResultsTableProps> = ({ resultResults, allow
                     <Classification type="text" size="tiny" c12n={result.classification} format="short" />
                   </DivTableCell>
                 )}
+                <DivTableCell style={{ textAlign: 'center' }}>
+                  {result.from_archive && (
+                    <Tooltip title={t('archive')}>
+                      <ArchiveOutlinedIcon />
+                    </Tooltip>
+                  )}
+                </DivTableCell>
               </LinkRow>
             ))}
           </DivTableBody>
