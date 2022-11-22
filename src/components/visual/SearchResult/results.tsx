@@ -83,9 +83,9 @@ const WrappedResultsTable: React.FC<ResultsTableProps> = ({ resultResults, allow
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
-            {resultResults.items.map(result => (
+            {resultResults.items.map((result, id) => (
               <LinkRow
-                key={result.id}
+                key={id}
                 component={Link}
                 to={`/file/detail/${result.id.substring(0, 64)}`}
                 hover

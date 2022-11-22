@@ -87,9 +87,9 @@ const WrappedSubmissionsTable: React.FC<SubmissionsTableProps> = ({ submissionRe
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
-            {submissionResults.items.map(submission => (
+            {submissionResults.items.map((submission, id) => (
               <LinkRow
-                key={submission.id}
+                key={id}
                 component={Link}
                 to={
                   submission.state === 'completed'

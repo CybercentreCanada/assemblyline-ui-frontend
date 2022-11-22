@@ -82,9 +82,9 @@ const WrappedFilesTable: React.FC<FilesTableProps> = ({ fileResults, allowSort =
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
-            {fileResults.items.map(file => (
+            {fileResults.items.map((file, id) => (
               <LinkRow
-                key={file.id}
+                key={id}
                 component={Link}
                 to={`/file/detail/${file.sha256}`}
                 hover
