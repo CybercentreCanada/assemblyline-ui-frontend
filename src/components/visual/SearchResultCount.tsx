@@ -26,13 +26,13 @@ const SearchResultCount: React.FC<SearchResultCountProps> = ({ count, max = 1000
     return (
       <Tooltip title={t('full_count')}>
         <Box component="span" style={{ cursor: 'pointer', wordSpacing: '-2px' }} onClick={trackFullHits}>
-          {formattedNumber(count)}+&nbsp;&nbsp;
+          {count ? formattedNumber(count) : 0}+&nbsp;&nbsp;
         </Box>
       </Tooltip>
     );
   }
 
-  return <span style={{ wordSpacing: '-2px' }}>{formattedNumber(count)}&nbsp;&nbsp;</span>;
+  return <span style={{ wordSpacing: '-2px' }}>{count ? formattedNumber(count) : 0}&nbsp;&nbsp;</span>;
 };
 
 export default SearchResultCount;
