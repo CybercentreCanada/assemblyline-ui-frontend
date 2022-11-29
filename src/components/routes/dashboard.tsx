@@ -522,8 +522,6 @@ const WrappedArchiveCard = ({ archive }) => {
       setError(t('archive.error.invalid'));
     } else if (archive.initialized && archive.metrics.not_found > 0) {
       setError(t('archive.error.not_found'));
-    } else if (archive.initialized && archive.metrics.webhook_failure > 0) {
-      setError(t('archive.error.webhook_failure'));
     } else if ((timer !== null && archive.initialized) || (timer === null && !archive.initialized)) {
       if (error !== null) setError(null);
       if (timer !== null) clearTimeout(timer);
@@ -604,12 +602,6 @@ const WrappedArchiveCard = ({ archive }) => {
               value={archive.metrics.not_found}
               title="N"
               tooltip={t('archived.not_found')}
-            />
-            <MetricCounter
-              init={archive.initialized}
-              value={archive.metrics.webhook_failure}
-              title="W"
-              tooltip={t('archived.webhook_failure')}
             />
           </div>
         </Grid>
@@ -1046,8 +1038,7 @@ const DEFAULT_ARCHIVE = {
     not_found: 0,
     received: 0,
     result: 0,
-    submission: 0,
-    webhook_failure: 0
+    submission: 0
   },
   error: null,
   initialized: false,
