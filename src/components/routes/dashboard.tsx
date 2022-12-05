@@ -425,7 +425,7 @@ const WrappedDispatcherCard = ({ dispatcher, up, down, handleStatusChange, statu
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
           <div>
-            <label>{t('queues')}</label>
+            <label>{t('queued')}</label>
           </div>
           <div>
             <MetricCounter
@@ -509,6 +509,107 @@ const WrappedDispatcherCard = ({ dispatcher, up, down, handleStatusChange, statu
   );
 };
 
+const WrappedArchiveCard = ({ archive }) => {
+  const { t } = useTranslation(['dashboard']);
+  const [timer, setTimer] = useState(null);
+  const [error, setError] = useState(null);
+  const classes = useStyles();
+
+  useEffect(() => {
+    if (archive.initialized && archive.metrics.exception > 0) {
+      setError(t('archive.error.exception'));
+    } else if (archive.initialized && archive.metrics.invalid > 0) {
+      setError(t('archive.error.invalid'));
+    } else if (archive.initialized && archive.metrics.not_found > 0) {
+      setError(t('archive.error.not_found'));
+    } else if ((timer !== null && archive.initialized) || (timer === null && !archive.initialized)) {
+      if (error !== null) setError(null);
+      if (timer !== null) clearTimeout(timer);
+      setTimer(
+        setTimeout(() => {
+          setError(t('timeout'));
+        }, 10000)
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [archive]);
+
+  return (
+    <Card className={`${classes.core_card} ${error || archive.error ? classes.error : classes.ok}`}>
+      <Grid container spacing={1}>
+        <Grid item xs={12}>
+          {(error || archive.error) && (
+            <Tooltip title={error || archive.error}>
+              <div className={classes.error_icon}>
+                <ErrorOutlineOutlinedIcon />
+              </div>
+            </Tooltip>
+          )}
+          <div className={classes.title}>{`${t('archiver')} :: x${archive.instances}`}</div>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <div>
+            <label>{t('queued')}</label>
+          </div>
+          <div>
+            <MetricCounter init={archive.initialized} value={archive.queued} title="Q" tooltip={t('archive.queue')} />
+          </div>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <div>
+            <label>{t('throughput')}</label>
+          </div>
+          <div>
+            <MetricCounter
+              init={archive.initialized}
+              value={archive.metrics.submission}
+              title="S"
+              tooltip={t('archived.submission')}
+            />
+            <MetricCounter
+              init={archive.initialized}
+              value={archive.metrics.file}
+              title="F"
+              tooltip={t('archived.file')}
+            />
+            <MetricCounter
+              init={archive.initialized}
+              value={archive.metrics.result}
+              title="R"
+              tooltip={t('archived.result')}
+            />
+          </div>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <div>
+            <label>{t('archived.error')}</label>
+          </div>
+          <div>
+            <MetricCounter
+              init={archive.initialized}
+              value={archive.metrics.exception}
+              title="E"
+              tooltip={t('archived.exception')}
+            />
+            <MetricCounter
+              init={archive.initialized}
+              value={archive.metrics.invalid}
+              title="I"
+              tooltip={t('archived.invalid')}
+            />
+            <MetricCounter
+              init={archive.initialized}
+              value={archive.metrics.not_found}
+              title="N"
+              tooltip={t('archived.not_found')}
+            />
+          </div>
+        </Grid>
+      </Grid>
+    </Card>
+  );
+};
+
 const WrappedExpiryCard = ({ expiry }) => {
   const { t } = useTranslation(['dashboard']);
   const [timer, setTimer] = useState(null);
@@ -543,7 +644,7 @@ const WrappedExpiryCard = ({ expiry }) => {
         </Grid>
         <Grid item xs={12} sm={6}>
           <div>
-            <label>{t('queues')}</label>
+            <label>{t('queued')}</label>
           </div>
           <div>
             <MetricCounter
@@ -580,7 +681,7 @@ const WrappedExpiryCard = ({ expiry }) => {
         </Grid>
         <Grid item xs={12} sm={6}>
           <div>
-            <label>{t('expired')}</label>
+            <label>{t('throughput')}</label>
           </div>
           <div>
             <MetricCounter
@@ -616,43 +717,6 @@ const WrappedExpiryCard = ({ expiry }) => {
           </div>
         </Grid>
         <Grid item xs={12} sm={6} />
-        <Grid item xs={12} sm={6}>
-          <div>
-            <label>{t('archived')}</label>
-          </div>
-          <div>
-            <MetricCounter
-              init={expiry.initialized}
-              value={expiry.archive.alert}
-              title="A"
-              tooltip={t('archived.alert')}
-            />
-            <MetricCounter
-              init={expiry.initialized}
-              value={expiry.archive.error}
-              title="E"
-              tooltip={t('archived.error')}
-            />
-            <MetricCounter
-              init={expiry.initialized}
-              value={expiry.archive.cached_file + expiry.archive.file + expiry.archive.filescore}
-              title="F"
-              tooltip={t('archived.file')}
-            />
-            <MetricCounter
-              init={expiry.initialized}
-              value={expiry.archive.result + expiry.archive.emptyresult}
-              title="R"
-              tooltip={t('archived.result')}
-            />
-            <MetricCounter
-              init={expiry.initialized}
-              value={expiry.archive.submission + expiry.archive.submission_summary + expiry.archive.submission_tree}
-              title="S"
-              tooltip={t('archived.submission')}
-            />
-          </div>
-        </Grid>
       </Grid>
     </Card>
   );
@@ -694,7 +758,7 @@ const WrappedAlerterCard = ({ alerter }) => {
         </Grid>
         <Grid item xs={12} sm={4}>
           <div>
-            <label>{t('queues')}</label>
+            <label>{t('queued')}</label>
           </div>
           <div>
             <MetricCounter
@@ -878,6 +942,7 @@ const WrappedServiceCard = ({ service, max_inflight }) => {
 const IngestCard = React.memo(WrappedIngestCard);
 const DispatcherCard = React.memo(WrappedDispatcherCard);
 const ExpiryCard = React.memo(WrappedExpiryCard);
+const ArchiveCard = React.memo(WrappedArchiveCard);
 const AlerterCard = React.memo(WrappedAlerterCard);
 const ScalerResourcesCard = React.memo(WrappedScalerResourcesCard);
 const ServiceCard = React.memo(WrappedServiceCard);
@@ -962,6 +1027,22 @@ const DEFAULT_DISPATCHER = {
   },
   error: null,
   initialized: false
+};
+
+const DEFAULT_ARCHIVE = {
+  instances: 0,
+  metrics: {
+    exception: 0,
+    file: 0,
+    invalid: 0,
+    not_found: 0,
+    received: 0,
+    result: 0,
+    submission: 0
+  },
+  error: null,
+  initialized: false,
+  queued: 0
 };
 
 const DEFAULT_EXPIRY = {
@@ -1103,6 +1184,7 @@ const DEFAULT_SERVICE_LIST = {
 const Dashboard = () => {
   const { t } = useTranslation(['dashboard']);
   const [alerter, setAlerter] = useReducer(basicReducer, DEFAULT_ALERTER);
+  const [archive, setArchive] = useReducer(basicReducer, DEFAULT_ARCHIVE);
   const [dispatcher, setDispatcher] = useReducer(basicReducer, DEFAULT_DISPATCHER);
   const [expiry, setExpiry] = useReducer(basicReducer, DEFAULT_EXPIRY);
   const [ingester, setIngester] = useReducer(basicReducer, DEFAULT_INGESTER);
@@ -1168,7 +1250,7 @@ const Dashboard = () => {
   const handleArchiveHeartbeat = hb => {
     // eslint-disable-next-line no-console
     console.debug('Socket-IO :: ArchiveHeartbeat', hb);
-    setExpiry({ archive: hb.metrics, initialized: true });
+    setArchive({ ...hb, initialized: true });
   };
 
   const handleDispatcherHeartbeat = hb => {
@@ -1256,10 +1338,13 @@ const Dashboard = () => {
             status={dispatcherStatus}
           />
         </Grid>
-        <Grid item xs={12} xl={5}>
+        <Grid item xs={6} xl={3}>
           <ExpiryCard expiry={expiry} />
         </Grid>
-        <Grid item xs={12} md={8} xl={4}>
+        <Grid item xs={6} xl={3}>
+          <ArchiveCard archive={archive} />
+        </Grid>
+        <Grid item xs={12} md={8} xl={3}>
           <AlerterCard alerter={alerter} />
         </Grid>
         <Grid item xs={12} md={4} xl={3}>

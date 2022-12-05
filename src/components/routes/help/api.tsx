@@ -90,6 +90,9 @@ export default function ApiDoc() {
     administration: 'error',
     alert_view: 'default',
     alert_manage: 'info',
+    archive_view: 'default',
+    archive_trigger: 'warning',
+    archive_manage: 'info',
     safelist_view: 'default',
     safelist_manage: 'info',
     workflow_view: 'default',
@@ -103,7 +106,7 @@ export default function ApiDoc() {
     submission_manage: 'info',
     file_detail: 'default',
     file_download: 'warning',
-    replay_trigger: 'default',
+    replay_trigger: 'warning',
     replay_system: 'info'
   };
 

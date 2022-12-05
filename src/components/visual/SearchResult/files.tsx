@@ -1,6 +1,7 @@
 import { Tooltip } from '@material-ui/core';
 import Paper from '@material-ui/core/Paper';
 import TableContainer from '@material-ui/core/TableContainer';
+import ArchiveOutlinedIcon from '@material-ui/icons/ArchiveOutlined';
 import { AlertTitle, Skeleton } from '@material-ui/lab';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
@@ -23,6 +24,7 @@ import InformativeAlert from '../InformativeAlert';
 export type FileResult = {
   classification: string;
   entropy: number;
+  from_archive: boolean;
   id: string;
   md5: string;
   seen: {
@@ -76,12 +78,13 @@ const WrappedFilesTable: React.FC<FilesTableProps> = ({ fileResults, allowSort =
                   {t('header.classification')}
                 </SortableHeaderCell>
               )}
+              <DivTableCell />
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
-            {fileResults.items.map(file => (
+            {fileResults.items.map((file, id) => (
               <LinkRow
-                key={file.id}
+                key={id}
                 component={Link}
                 to={`/file/detail/${file.sha256}`}
                 hover
@@ -103,6 +106,13 @@ const WrappedFilesTable: React.FC<FilesTableProps> = ({ fileResults, allowSort =
                     <Classification type="text" size="tiny" c12n={file.classification} format="short" />
                   </DivTableCell>
                 )}
+                <DivTableCell style={{ textAlign: 'center' }}>
+                  {file.from_archive && (
+                    <Tooltip title={t('archive')}>
+                      <ArchiveOutlinedIcon />
+                    </Tooltip>
+                  )}
+                </DivTableCell>
               </LinkRow>
             ))}
           </DivTableBody>
