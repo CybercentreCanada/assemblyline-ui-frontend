@@ -39,6 +39,11 @@ export type JSONFeedItem = {
   _isNew: boolean;
 };
 
+export type ServiceFeedItem = JSONFeedItem & {
+  _status?: 'available' | 'installing' | 'installed';
+  _isInstalling?: boolean;
+};
+
 export type JSONFeed = {
   version: string;
   title: string;

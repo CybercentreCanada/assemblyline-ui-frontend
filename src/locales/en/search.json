@@ -40,6 +40,7 @@
   "header.user": "User",
   "header.verdict": "Verdict",
   "header.version": "Version",
+  "installing": "Installing...",
   "matching_result": "matching result",
   "matching_results": "matching results",
   "mode.privileged": "Runs in Privileged Mode",

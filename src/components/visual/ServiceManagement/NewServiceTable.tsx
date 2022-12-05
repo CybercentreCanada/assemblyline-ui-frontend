@@ -1,14 +1,12 @@
 import { IconButton, makeStyles, Paper, TableContainer, TableRow, Tooltip } from '@material-ui/core';
 import CloudDownloadOutlinedIcon from '@material-ui/icons/CloudDownloadOutlined';
-import LaunchOutlinedIcon from '@material-ui/icons/LaunchOutlined';
 import { AlertTitle, Skeleton } from '@material-ui/lab';
-import useMyAPI from 'components/hooks/useMyAPI';
 import 'moment/locale/fr';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ServiceFeedItem } from '.';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow } from '../DivTable';
 import InformativeAlert from '../InformativeAlert';
-import { JSONFeedItem } from './';
 
 export type ServiceResult = {
   accepts: string;
@@ -22,18 +20,10 @@ export type ServiceResult = {
   version: string;
 };
 
-type UpdateData = {
-  auth: string;
-  image: string;
-  latest_tag: string;
-  update_available: boolean;
-  updating: boolean;
-};
-
 type Props = {
-  services: JSONFeedItem[];
-  setService?: (svc: string) => void;
-  onUpdate?: (svc: string, updateData: UpdateData) => void;
+  services: ServiceFeedItem[];
+  servicesBeingInstalled: ServiceFeedItem[];
+  onInstall: (s: ServiceFeedItem[]) => void;
 };
 
 const useStyles = makeStyles(theme => ({
@@ -42,52 +32,13 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const WrappedNewServiceTable: React.FC<Props> = ({ services, setService, onUpdate }: Props) => {
+const WrappedNewServiceTable: React.FC<Props> = ({ services, servicesBeingInstalled, onInstall }: Props) => {
   const { t } = useTranslation(['search']);
   const classes = useStyles();
-  const { apiCall } = useMyAPI();
 
   const navigate = useCallback(url => {
     window.open(url, '_blank');
   }, []);
-
-  const onInstall = useCallback(
-    (service: JSONFeedItem) => {
-      console.log({
-        name: service.summary,
-        update_data: {
-          auth: null,
-          image: service.id + ':latest',
-          latest_tag: 'latest',
-          update_available: true,
-          updating: false
-        }
-      });
-
-      apiCall({
-        method: 'PUT',
-        url: '/api/v4/service/install/',
-        body: {
-          name: service.summary,
-          update_data: {
-            auth: null,
-            image: service.id + ':latest',
-            latest_tag: 'latest',
-            update_available: true,
-            updating: false
-          }
-        },
-        onSuccess: response => {
-          console.log(response);
-          // const newUpdates = { ...updates };
-          // newUpdates[svc] = { ...newUpdates[svc], updating: true };
-          // setUpdates(newUpdates);
-        }
-      });
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
 
   return services ? (
     services.length !== 0 ? (
@@ -97,33 +48,45 @@ const WrappedNewServiceTable: React.FC<Props> = ({ services, setService, onUpdat
             <DivTableRow>
               <DivTableCell>{t('header.name')}</DivTableCell>
               <DivTableCell>{t('header.description')}</DivTableCell>
-              <DivTableCell>{t('header.docs')}</DivTableCell>
-              <DivTableCell>{t('header.install')}</DivTableCell>
               <DivTableCell />
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
-            {services.map((service, i) => (
+            {services?.map((service, i) => (
               <TableRow
                 key={i + ' - ' + service.title}
                 component={props => <div {...props} />}
                 hover
-                style={{ textDecoration: 'none' }}
+                style={{ cursor: 'pointer', textDecoration: 'none' }}
+                onClick={e => navigate(service.url)}
               >
                 <DivTableCell>{service.summary}</DivTableCell>
                 <DivTableCell>{service.content_text}</DivTableCell>
-                <DivTableCell className={classes.center}>
-                  <Tooltip title={service.url}>
-                    <IconButton size="small" onClick={e => navigate(service.url)}>
-                      <LaunchOutlinedIcon />
-                    </IconButton>
-                  </Tooltip>
-                </DivTableCell>
-                <DivTableCell className={classes.center}>
-                  <Tooltip title={service.external_url}>
-                    <IconButton color="primary" size="small" onClick={e => onInstall(service)}>
-                      <CloudDownloadOutlinedIcon />
-                    </IconButton>
+                <DivTableCell
+                  className={classes.center}
+                  style={{ whiteSpace: 'nowrap', paddingTop: 0, paddingBottom: 0 }}
+                >
+                  <Tooltip
+                    // title={service.external_url}
+                    title={
+                      servicesBeingInstalled?.map(s => s.summary).includes(service.summary)
+                        ? t('installing')
+                        : `${service.title} ${t('available')}!`
+                    }
+                  >
+                    <span>
+                      <IconButton
+                        color="primary"
+                        onClick={event => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          onInstall([service]);
+                        }}
+                        disabled={servicesBeingInstalled?.map(s => s.summary).includes(service.summary)}
+                      >
+                        <CloudDownloadOutlinedIcon />
+                      </IconButton>
+                    </span>
                   </Tooltip>
                 </DivTableCell>
               </TableRow>
