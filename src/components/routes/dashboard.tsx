@@ -1196,6 +1196,7 @@ const Dashboard = () => {
   const [ingestStatus, setIngestStatus] = useState(null);
 
   const { apiCall } = useMyAPI();
+  const { configuration } = useALContext();
 
   function handleIngesterStatusChange(event) {
     apiCall({
@@ -1338,16 +1339,22 @@ const Dashboard = () => {
             status={dispatcherStatus}
           />
         </Grid>
-        <Grid item xs={6} xl={3}>
+        <Grid
+          item
+          xs={configuration.datastore.archive.enabled ? 6 : 12}
+          xl={configuration.datastore.archive.enabled ? 3 : 4}
+        >
           <ExpiryCard expiry={expiry} />
         </Grid>
-        <Grid item xs={6} xl={3}>
-          <ArchiveCard archive={archive} />
-        </Grid>
-        <Grid item xs={12} md={8} xl={3}>
+        {configuration.datastore.archive.enabled && (
+          <Grid item xs={6} xl={3}>
+            <ArchiveCard archive={archive} />
+          </Grid>
+        )}
+        <Grid item xs={12} md={8} xl={configuration.datastore.archive.enabled ? 3 : 4}>
           <AlerterCard alerter={alerter} />
         </Grid>
-        <Grid item xs={12} md={4} xl={3}>
+        <Grid item xs={12} md={4} xl={configuration.datastore.archive.enabled ? 3 : 4}>
           <ScalerResourcesCard scaler={scaler} />
         </Grid>
         {Object.keys(services)

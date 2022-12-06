@@ -17,6 +17,7 @@
   "role.archive_manage": "Archive Manage",
   "role.archive_trigger": "Archive Trigger",
   "role.archive_view": "Archive View",
+  "role.archive_download": "Archive Download",
   "role.bundle_download": "Bundle Download",
   "role.file_detail": "File Detail",
   "role.file_download": "File Download",

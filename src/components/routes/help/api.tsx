@@ -91,6 +91,7 @@ export default function ApiDoc() {
     alert_view: 'default',
     alert_manage: 'info',
     archive_view: 'default',
+    archive_download: 'warning',
     archive_trigger: 'warning',
     archive_manage: 'info',
     safelist_view: 'default',

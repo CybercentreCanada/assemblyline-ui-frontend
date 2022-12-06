@@ -14,6 +14,8 @@
   "archive_trigger_label": "Archive Trigger",
   "archive_view": "ARC",
   "archive_view_label": "Archive View",
+  "archive_download": "ARC",
+  "archive_download_label": "Archive Download",
   "apikey_access": "APK",
   "apikey_access_label": "APIKey Access",
   "bundle_download": "BDL",
