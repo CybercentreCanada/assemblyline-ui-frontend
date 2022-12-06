@@ -63,6 +63,7 @@ export default function SiteMap() {
     alert_manage: 'info',
     archive_view: 'default',
     archive_trigger: 'warning',
+    archive_download: 'warning',
     archive_manage: 'info',
     safelist_view: 'default',
     safelist_manage: 'info',

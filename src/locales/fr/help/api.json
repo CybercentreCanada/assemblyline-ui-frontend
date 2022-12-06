@@ -16,6 +16,7 @@
   "role.archive_manage": "Gestion de l'Archive",
   "role.archive_trigger": "Déclencher Archivage",
   "role.archive_view": "Visionnement de l'Archive",
+  "role.archive_download": "Téléchargement de l'Archive",
   "role.apikey_access": "Accès à la clé API",
   "role.bundle_download": "Téléchargement de Paquets",
   "role.file_detail": "Détail de Fichiers",
