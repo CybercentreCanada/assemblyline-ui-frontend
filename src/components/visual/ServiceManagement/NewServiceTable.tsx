@@ -2,7 +2,7 @@ import { IconButton, makeStyles, Paper, TableContainer, TableRow, Tooltip } from
 import CloudDownloadOutlinedIcon from '@material-ui/icons/CloudDownloadOutlined';
 import { AlertTitle, Skeleton } from '@material-ui/lab';
 import 'moment/locale/fr';
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ServiceFeedItem } from '.';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow } from '../DivTable';
@@ -22,7 +22,7 @@ export type ServiceResult = {
 
 type Props = {
   services: ServiceFeedItem[];
-  servicesBeingInstalled: ServiceFeedItem[];
+  installingServices: ServiceFeedItem[];
   onInstall: (s: ServiceFeedItem[]) => void;
 };
 
@@ -32,13 +32,23 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const WrappedNewServiceTable: React.FC<Props> = ({ services, servicesBeingInstalled, onInstall }: Props) => {
+const WrappedNewServiceTable: React.FC<Props> = ({ services, installingServices, onInstall }: Props) => {
   const { t } = useTranslation(['search']);
   const classes = useStyles();
 
   const navigate = useCallback(url => {
     window.open(url, '_blank');
   }, []);
+
+  const installingNames = useMemo<string[]>(
+    () =>
+      !installingServices
+        ? []
+        : !Array.isArray(installingServices)
+        ? []
+        : installingServices?.map(s => s?.summary?.toLowerCase()),
+    [installingServices]
+  );
 
   return services ? (
     services.length !== 0 ? (
@@ -67,9 +77,8 @@ const WrappedNewServiceTable: React.FC<Props> = ({ services, servicesBeingInstal
                   style={{ whiteSpace: 'nowrap', paddingTop: 0, paddingBottom: 0 }}
                 >
                   <Tooltip
-                    // title={service.external_url}
                     title={
-                      servicesBeingInstalled?.map(s => s.summary).includes(service.summary)
+                      installingNames.includes(service?.summary.toLowerCase())
                         ? t('installing')
                         : `${service.title} ${t('available')}!`
                     }
@@ -82,7 +91,7 @@ const WrappedNewServiceTable: React.FC<Props> = ({ services, servicesBeingInstal
                           event.stopPropagation();
                           onInstall([service]);
                         }}
-                        disabled={servicesBeingInstalled?.map(s => s.summary).includes(service.summary)}
+                        disabled={installingNames.includes(service?.summary.toLowerCase())}
                       >
                         <CloudDownloadOutlinedIcon />
                       </IconButton>

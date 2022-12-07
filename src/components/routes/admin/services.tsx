@@ -28,7 +28,7 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
 import Service from 'components/routes/admin/service_detail';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
-import ServiceTable from 'components/visual/SearchResult/service';
+import ServiceTable, { ServiceResult } from 'components/visual/SearchResult/service';
 import NewServiceTable from 'components/visual/ServiceManagement/NewServiceTable';
 import {
   JSONFeedItem,
@@ -43,9 +43,9 @@ import { Redirect } from 'react-router-dom';
 
 export default function Services() {
   const { t } = useTranslation(['adminServices']);
-  const [serviceResults, setServiceResults] = useState(null);
+  const [serviceResults, setServiceResults] = useState<ServiceResult[]>(null);
   const [updates, setUpdates] = useState(null);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState<boolean>(false);
   const [openRestore, setOpenRestore] = useState(false);
   const [restoreConfirmation, setRestoreConfirmation] = useState(false);
   const [manifest, setManifest] = useState('');
@@ -56,6 +56,13 @@ export default function Services() {
   const { user: currentUser } = useUser<CustomUser>();
   const { setGlobalDrawer, closeGlobalDrawer } = useDrawer();
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
+  const { configuration } = useALContext();
+  const { fetchJSONNotifications } = useNotificationFeed();
+  const [serviceFeeds, setServiceFeeds] = useState<JSONFeedItem[]>(null);
+  const [availableServices, setAvailableServices] = useState<JSONFeedItem[]>(null);
+  const [installingServices, setInstallingServices] = useState<JSONFeedItem[]>(null);
+  const lastInstallingServices = useRef<ServiceFeedItem[]>(null);
+  const installingServicesTimeout = useRef<NodeJS.Timeout>(null);
 
   const handleAddService = () => {
     apiCall({
@@ -186,139 +193,66 @@ export default function Services() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const { configuration } = useALContext();
-  const { fetchJSONNotifications } = useNotificationFeed();
-  const [serviceFeeds, setServiceFeeds] = useState<JSONFeedItem[]>(null);
-  const [availableServices, setAvailableServices] = useState<ServiceFeedItem[]>(null);
-  const [servicesBeingInstalled, setServicesBeingInstalled] = useState<ServiceFeedItem[]>([]);
-  const installStatusTimeout = useRef<NodeJS.Timeout>(null);
-
-  const fetchServiceStatus = useCallback(
-    ({
-      data,
-      onResponse
-    }: {
-      data: Array<string>;
-      onResponse: (response: {
-        installed: Array<{
-          status: string;
-          accepts: string;
-          category: string;
-          description: string;
-          enabled: string;
-          name: string;
-          privileged: string;
-          rejects: string;
-          stage: string;
-          version: string;
-        }>;
-        installing: Array<string>;
-        invalid: Array<string>;
-      }) => void;
-    }) =>
-      apiCall({
-        method: 'POST',
-        url: '/api/v4/service/install_status/',
-        body: data,
-        onSuccess: api_data => onResponse(api_data.api_response)
-      }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
-
-  const requestServiceInstall = useCallback(
-    ({
-      data,
-      onResponse
-    }: {
-      data: Array<ServiceFeedItem>;
-      onResponse: (response: {
-        installed: Array<{
-          status: string;
-          accepts: string;
-          category: string;
-          description: string;
-          enabled: string;
-          name: string;
-          privileged: string;
-          rejects: string;
-          stage: string;
-          version: string;
-        }>;
-        installing: Array<string>;
-        invalid: Array<string>;
-      }) => void;
-    }) =>
-      apiCall({
-        method: 'PUT',
-        url: '/api/v4/service/install/',
-        body: [
-          ...data.map(s => ({
-            name: s.summary,
-            install_data: {
-              auth: null,
-              image: s.id
-            }
-          })),
-          { install_data: { auth: null, image: 'cccs/assemblyline-service-VirusTotal' }, name: 'VirusTotal' },
-          { install_data: { auth: null, image: 'cccs/assemblyline-service-random' }, name: 'random' }
-        ],
-        onSuccess: api_data => onResponse(api_data.api_response)
-      }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
-
-  const dispatchInstallStatus = useCallback(() => {
-    if (installStatusTimeout.current) clearTimeout(installStatusTimeout.current);
-    installStatusTimeout.current = setTimeout(
-      () => window.dispatchEvent(new CustomEvent('checkServiceInstallEvent')),
-      10000
+  const dispatchInstallingServices = useCallback(() => {
+    if (installingServicesTimeout.current) clearTimeout(installingServicesTimeout.current);
+    installingServicesTimeout.current = setTimeout(
+      () => window.dispatchEvent(new CustomEvent('installingServicesEvent')),
+      5000
     );
   }, []);
 
-  const onInstallStatusChange = useCallback(() => {
-    if (servicesBeingInstalled)
-      fetchServiceStatus({
-        data: servicesBeingInstalled.map(s => s.summary),
-        onResponse: ({ installed, installing, invalid }) => {
-          if (installed.length > 0) {
-            setServiceResults(results => {
-              installed.forEach(i => results.push(i));
-              return results.sort((a, b) => a.name.localeCompare(b.name));
-            });
-            setAvailableServices(as => as?.filter(s => !installed?.map(i => i.name).includes(s.summary)));
-            showSuccessMessage(
-              `${t('message.installed')} ${servicesBeingInstalled
-                .filter(s => installed?.map(i => i.name).includes(s.summary))
-                .map(s => s.summary)
-                .join(', ')}.`
-            );
-          }
-          if (invalid.length > 0) {
-            setServicesBeingInstalled(sbi => sbi?.filter(s => !invalid?.includes(s.summary)));
-            showErrorMessage(
-              `${t('message.failed')} ${servicesBeingInstalled
-                ?.filter(s => invalid?.includes(s.summary))
-                .map(s => s.summary)
-                .join(', ')}.`
-            );
-          }
-          if (installing.length > 0) {
-            setServicesBeingInstalled(sbi => sbi?.filter(s => installing.includes(s.summary)));
-            dispatchInstallStatus();
-          }
+  useEffect(() => {
+    if (!installingServices || installingServices.length === 0) return;
+    dispatchInstallingServices();
+  }, [dispatchInstallingServices, installingServices]);
+
+  const fetchInstallingServices = useCallback(() => {
+    if (!availableServices) return;
+    apiCall({
+      method: 'GET',
+      url: '/api/v4/service/installing/',
+      onSuccess: api_data => {
+        if (!api_data.api_response) return;
+        const installingNames = (api_data.api_response as { name: string; image: string }[]).map(i =>
+          i?.name.toLowerCase()
+        );
+        setInstallingServices(is => {
+          lastInstallingServices.current = is;
+          const newInstallingServices = availableServices.filter(service =>
+            installingNames?.includes(service?.summary.toLowerCase())
+          );
+          if (newInstallingServices && newInstallingServices.length > 0) dispatchInstallingServices();
+          return newInstallingServices;
+        });
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [availableServices, dispatchInstallingServices]);
+
+  const onInstallServices = useCallback(
+    (services: JSONFeedItem[]) => {
+      if (!services) return;
+      apiCall({
+        method: 'PUT',
+        url: '/api/v4/service/install/',
+        body: services.map(s => ({ name: s.summary, install_data: { auth: null, image: s.id } })),
+        onSuccess: () => {
+          dispatchInstallingServices();
+          fetchInstallingServices();
         }
       });
-  }, [dispatchInstallStatus, fetchServiceStatus, servicesBeingInstalled, showErrorMessage, showSuccessMessage, t]);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [dispatchInstallingServices, fetchInstallingServices]
+  );
 
   useEffect(() => {
-    window.addEventListener('checkServiceInstallEvent', onInstallStatusChange);
+    window.addEventListener('installingServicesEvent', fetchInstallingServices);
     return () => {
-      clearTimeout(installStatusTimeout.current);
-      window.removeEventListener('checkServiceInstallEvent', onInstallStatusChange);
+      clearTimeout(installingServicesTimeout.current);
+      window.removeEventListener('installingServicesEvent', fetchInstallingServices);
     };
-  }, [onInstallStatusChange]);
+  }, [fetchInstallingServices]);
 
   useEffect(() => {
     fetchJSONNotifications({
@@ -328,76 +262,43 @@ export default function Services() {
   }, [configuration?.ui?.services_feed, fetchJSONNotifications, setServiceFeeds]);
 
   useEffect(() => {
-    if (!serviceFeeds || !serviceResults || availableServices) return;
-    fetchServiceStatus({
-      data: serviceFeeds.filter(s => !serviceResults?.some(r => s?.title.includes(r?.name))).map(s => s.summary),
-      onResponse: ({ installing }) => {
-        setAvailableServices(serviceFeeds?.filter(s => !serviceResults?.some(r => s?.summary.includes(r?.name))));
+    if (!serviceFeeds || !serviceResults) return;
+    const serviceResultNames = serviceResults.map(result => result?.name.toLowerCase());
+    setAvailableServices(serviceFeeds.filter(feed => !serviceResultNames.includes(feed.summary.toLowerCase())));
+  }, [serviceFeeds, serviceResults]);
 
-        if (installing.length > 0) {
-          const newValue = serviceFeeds.filter(s => installing.includes(s.summary));
-          setServicesBeingInstalled(newValue);
-          showInfoMessage(`${t('message.installing')} ${newValue.map(s => s.summary).join(', ')}.`);
-          dispatchInstallStatus();
-        }
-      }
-    });
-  }, [
-    serviceFeeds,
-    serviceResults,
-    availableServices,
-    fetchServiceStatus,
-    showInfoMessage,
-    dispatchInstallStatus,
-    setAvailableServices,
-    servicesBeingInstalled,
-    t
-  ]);
+  useEffect(() => fetchInstallingServices(), [fetchInstallingServices]);
 
-  const onInstall = useCallback(
-    (services: Array<ServiceFeedItem>) => {
-      requestServiceInstall({
-        data: services,
-        onResponse: ({ installed, installing, invalid }) => {
-          if (installed.length > 0) {
-            setServiceResults((results: Array<any>) => {
-              installed.forEach(i => results.push(i));
-              return results
-                .filter((item, i) => results.findIndex(e => e.name === item.name) === i)
-                .sort((a, b) => a?.name?.localeCompare(b?.name));
-            });
-            setAvailableServices(as => as?.filter(s => !installed?.map(i => i.name).includes(s.summary)));
-            showSuccessMessage(`${t('message.installed')} ${installed.map(i => i?.name).join(', ')}.`);
-          }
-          if (invalid.length > 0) {
-            setServicesBeingInstalled(sbi => sbi?.filter(s => !invalid.includes(s.summary)));
-            showErrorMessage(`${t('message.failed')} ${invalid.join(', ')}.`);
-          }
-          if (installing.length > 0) {
-            setServicesBeingInstalled(sbi => {
-              installing.forEach(
-                i => serviceFeeds.find(f => f.summary === i) && sbi.push(serviceFeeds.find(f => f.summary === i))
-              );
-              return sbi
-                ?.filter((item, i) => sbi?.findIndex(e => e?.summary === item?.summary) === i)
-                .sort((a, b) => a?.summary?.localeCompare(b?.summary));
-            });
-            showInfoMessage(`${t('message.installing')} ${installing.join(', ')}.`);
-            dispatchInstallStatus();
-          }
-        }
-      });
-    },
-    [
-      dispatchInstallStatus,
-      requestServiceInstall,
-      serviceFeeds,
-      showErrorMessage,
-      showInfoMessage,
-      showSuccessMessage,
-      t
-    ]
-  );
+  useEffect(() => {
+    //  Info Message when installing a new service
+    if (installingServices) {
+      const prevName = lastInstallingServices.current?.map(service => service?.summary.toLowerCase());
+      const newInstallingServices = installingServices.filter(
+        installing => !prevName?.includes(installing?.summary?.toLowerCase())
+      );
+      if (newInstallingServices.length > 0)
+        showInfoMessage(`${t('message.installing')} ${newInstallingServices.map(s => s.summary).join(', ')}.`);
+    }
+
+    // Success Message when a service has been installed
+    if (installingServices) {
+      const prevName = lastInstallingServices.current?.map(service => service?.summary.toLowerCase());
+      const newInstalledServices = serviceResults.filter(result => prevName?.includes(result?.name?.toLowerCase()));
+      if (newInstalledServices.length > 0)
+        showSuccessMessage(`${t('message.installed')} ${newInstalledServices.map(s => s?.name).join(', ')}.`);
+    }
+
+    // Error Message when a service failed to be installed
+    if (installingServices && lastInstallingServices.current) {
+      let prevNames = lastInstallingServices.current?.map(service => service?.summary.toLowerCase());
+      let resultNames = serviceResults?.map(result => result?.name.toLowerCase());
+      let nextNames = installingServices?.map(service => service?.summary.toLowerCase());
+      prevNames = prevNames.filter(name => !resultNames?.includes(name));
+      prevNames = prevNames.filter(name => !nextNames?.includes(name));
+      const services = serviceFeeds.filter(feed => prevNames?.includes(feed?.summary.toLowerCase()));
+      if (prevNames.length > 0) showErrorMessage(`${t('message.failed')} ${services.map(s => s?.summary).join(', ')}.`);
+    }
+  }, [installingServices, serviceFeeds, serviceResults, showErrorMessage, showInfoMessage, showSuccessMessage, t]);
 
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>
@@ -501,7 +402,11 @@ export default function Services() {
             </Tooltip>
             <Tooltip
               title={
-                availableServices && availableServices.length > 0 && availableServices.some(s => !s._isInstalling)
+                availableServices &&
+                availableServices.length > 0 &&
+                availableServices.some(
+                  s => !installingServices?.map(i => i?.summary?.toLowerCase()).includes(s?.summary?.toLowerCase())
+                )
                   ? t('install_all')
                   : t('install_none')
               }
@@ -509,11 +414,13 @@ export default function Services() {
               <span>
                 <IconButton
                   color="primary"
-                  onClick={() => onInstall(availableServices)}
+                  onClick={() => onInstallServices(availableServices)}
                   disabled={
                     !availableServices ||
                     availableServices.length === 0 ||
-                    !availableServices.some(s => !s._isInstalling)
+                    availableServices.every(s =>
+                      installingServices?.map(i => i?.summary?.toLowerCase()).includes(s?.summary?.toLowerCase())
+                    )
                   }
                 >
                   <CloudDownloadOutlinedIcon />
@@ -563,8 +470,8 @@ export default function Services() {
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         <NewServiceTable
           services={availableServices?.sort((a, b) => a.id.localeCompare(b.id))}
-          servicesBeingInstalled={servicesBeingInstalled}
-          onInstall={onInstall}
+          installingServices={installingServices}
+          onInstall={onInstallServices}
         />
       </div>
     </PageFullWidth>
