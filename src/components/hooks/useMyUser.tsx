@@ -97,6 +97,7 @@ export type ConfigurationDefinition = {
     banner_level: 'info' | 'warning' | 'error' | 'success';
     read_only: boolean;
     rss_feeds: string[];
+    services_feed: string;
     tos: boolean;
     tos_lockout: boolean;
     tos_lockout_notify: boolean;
