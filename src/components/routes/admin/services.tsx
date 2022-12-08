@@ -30,11 +30,7 @@ import Service from 'components/routes/admin/service_detail';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import ServiceTable, { ServiceResult } from 'components/visual/SearchResult/service';
 import NewServiceTable from 'components/visual/ServiceManagement/NewServiceTable';
-import {
-  JSONFeedItem,
-  ServiceFeedItem,
-  useNotificationFeed
-} from 'components/visual/ServiceManagement/useNotificationFeed';
+import { JSONFeedItem, useNotificationFeed } from 'components/visual/ServiceManagement/useNotificationFeed';
 import getXSRFCookie from 'helpers/xsrf';
 import 'moment/locale/fr';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -60,8 +56,8 @@ export default function Services() {
   const { fetchJSONNotifications } = useNotificationFeed();
   const [serviceFeeds, setServiceFeeds] = useState<JSONFeedItem[]>(null);
   const [availableServices, setAvailableServices] = useState<JSONFeedItem[]>(null);
-  const [installingServices, setInstallingServices] = useState<JSONFeedItem[]>(null);
-  const lastInstallingServices = useRef<ServiceFeedItem[]>(null);
+  const [installingServices, setInstallingServices] = useState<string[]>([]);
+  const lastInstallingServices = useRef<string[]>([]);
   const installingServicesTimeout = useRef<NodeJS.Timeout>(null);
 
   const handleAddService = () => {
@@ -111,7 +107,7 @@ export default function Services() {
     setManifest(event.target.value);
   }
 
-  const reload = () => {
+  const reload = useCallback(() => {
     apiCall({
       url: '/api/v4/service/all/',
       onSuccess: api_data => setServiceResults(api_data.api_response)
@@ -120,7 +116,21 @@ export default function Services() {
       url: '/api/v4/service/updates/',
       onSuccess: api_data => setUpdates(api_data.api_response)
     });
-  };
+    apiCall({
+      url: '/api/v4/service/installing/',
+      onSuccess: api_data => setInstallingServices(api_data.api_response.map(r => r?.name.toLowerCase()))
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (currentUser.is_admin) reload();
+    window.addEventListener('reloadServicesEvent', reload);
+    return () => {
+      window.removeEventListener('reloadServicesEvent', reload);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onUpdate = useCallback(
     (svc, updateData) => {
@@ -163,15 +173,29 @@ export default function Services() {
     [updates]
   );
 
-  const onUpdated = () => {
-    if (!isXL) closeGlobalDrawer();
-    setTimeout(() => window.dispatchEvent(new CustomEvent('reloadServices')), 1000);
-  };
+  const onInstallServices = useCallback(
+    (services: JSONFeedItem[]) => {
+      if (!services) return;
+      apiCall({
+        method: 'PUT',
+        url: '/api/v4/service/install/',
+        body: services.map(s => ({ name: s.summary, install_data: { auth: null, image: s.id } })),
+        onSuccess: () => reload()
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [reload]
+  );
 
-  const onDeleted = () => {
+  const onUpdated = useCallback(() => {
+    if (!isXL) closeGlobalDrawer();
+    setTimeout(() => window.dispatchEvent(new CustomEvent('reloadServicesEvent')), 1000);
+  }, [closeGlobalDrawer, isXL]);
+
+  const onDeleted = useCallback(() => {
     closeGlobalDrawer();
-    setTimeout(() => window.dispatchEvent(new CustomEvent('reloadServices')), 1000);
-  };
+    setTimeout(() => window.dispatchEvent(new CustomEvent('reloadServicesEvent')), 1000);
+  }, [closeGlobalDrawer]);
 
   const setService = useCallback(
     (service_name: string) => {
@@ -180,79 +204,6 @@ export default function Services() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
-
-  useEffect(() => {
-    if (currentUser.is_admin) {
-      reload();
-    }
-
-    window.addEventListener('reloadServices', reload);
-    return () => {
-      window.removeEventListener('reloadServices', reload);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const dispatchInstallingServices = useCallback(() => {
-    if (installingServicesTimeout.current) clearTimeout(installingServicesTimeout.current);
-    installingServicesTimeout.current = setTimeout(
-      () => window.dispatchEvent(new CustomEvent('installingServicesEvent')),
-      5000
-    );
-  }, []);
-
-  useEffect(() => {
-    if (!installingServices || installingServices.length === 0) return;
-    dispatchInstallingServices();
-  }, [dispatchInstallingServices, installingServices]);
-
-  const fetchInstallingServices = useCallback(() => {
-    if (!availableServices) return;
-    apiCall({
-      method: 'GET',
-      url: '/api/v4/service/installing/',
-      onSuccess: api_data => {
-        if (!api_data.api_response) return;
-        const installingNames = (api_data.api_response as { name: string; image: string }[]).map(i =>
-          i?.name.toLowerCase()
-        );
-        setInstallingServices(is => {
-          lastInstallingServices.current = is;
-          const newInstallingServices = availableServices.filter(service =>
-            installingNames?.includes(service?.summary.toLowerCase())
-          );
-          if (newInstallingServices && newInstallingServices.length > 0) dispatchInstallingServices();
-          return newInstallingServices;
-        });
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [availableServices, dispatchInstallingServices]);
-
-  const onInstallServices = useCallback(
-    (services: JSONFeedItem[]) => {
-      if (!services) return;
-      apiCall({
-        method: 'PUT',
-        url: '/api/v4/service/install/',
-        body: services.map(s => ({ name: s.summary, install_data: { auth: null, image: s.id } })),
-        onSuccess: () => {
-          dispatchInstallingServices();
-          fetchInstallingServices();
-        }
-      });
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [dispatchInstallingServices, fetchInstallingServices]
-  );
-
-  useEffect(() => {
-    window.addEventListener('installingServicesEvent', fetchInstallingServices);
-    return () => {
-      clearTimeout(installingServicesTimeout.current);
-      window.removeEventListener('installingServicesEvent', fetchInstallingServices);
-    };
-  }, [fetchInstallingServices]);
 
   useEffect(() => {
     fetchJSONNotifications({
@@ -267,38 +218,56 @@ export default function Services() {
     setAvailableServices(serviceFeeds.filter(feed => !serviceResultNames.includes(feed.summary.toLowerCase())));
   }, [serviceFeeds, serviceResults]);
 
-  useEffect(() => fetchInstallingServices(), [fetchInstallingServices]);
+  useEffect(() => {
+    if (!installingServices || installingServices.length === 0) return;
+    if (installingServicesTimeout.current) clearTimeout(installingServicesTimeout.current);
+    installingServicesTimeout.current = setTimeout(
+      () => window.dispatchEvent(new CustomEvent('reloadServicesEvent')),
+      10000
+    );
+  }, [installingServices]);
+
+  const getServiceName = useCallback(
+    (names: string[] = []): string =>
+      serviceFeeds
+        ?.filter(f => names?.map(n => n.toLowerCase()).includes(f?.summary.toLowerCase()))
+        .map(s => s?.summary)
+        .join(', '),
+    [serviceFeeds]
+  );
 
   useEffect(() => {
-    //  Info Message when installing a new service
-    if (installingServices) {
-      const prevName = lastInstallingServices.current?.map(service => service?.summary.toLowerCase());
-      const newInstallingServices = installingServices.filter(
-        installing => !prevName?.includes(installing?.summary?.toLowerCase())
-      );
-      if (newInstallingServices.length > 0)
-        showInfoMessage(`${t('message.installing')} ${newInstallingServices.map(s => s.summary).join(', ')}.`);
-    }
+    const diff = installingServices
+      .filter(x => !lastInstallingServices.current.includes(x))
+      .concat(lastInstallingServices.current.filter(x => !installingServices.includes(x)))
+      .sort((a, b) => a.localeCompare(b));
 
-    // Success Message when a service has been installed
-    if (installingServices) {
-      const prevName = lastInstallingServices.current?.map(service => service?.summary.toLowerCase());
-      const newInstalledServices = serviceResults.filter(result => prevName?.includes(result?.name?.toLowerCase()));
-      if (newInstalledServices.length > 0)
-        showSuccessMessage(`${t('message.installed')} ${newInstalledServices.map(s => s?.name).join(', ')}.`);
-    }
+    if (diff.length === 0) return;
+    apiCall({
+      url: '/api/v4/service/installing/',
+      method: 'POST',
+      body: diff,
+      onSuccess: api_data => {
+        const response = api_data.api_response as {
+          installed: string[];
+          installing: string[];
+          not_installed: string[];
+        };
 
-    // Error Message when a service failed to be installed
-    if (installingServices && lastInstallingServices.current) {
-      let prevNames = lastInstallingServices.current?.map(service => service?.summary.toLowerCase());
-      let resultNames = serviceResults?.map(result => result?.name.toLowerCase());
-      let nextNames = installingServices?.map(service => service?.summary.toLowerCase());
-      prevNames = prevNames.filter(name => !resultNames?.includes(name));
-      prevNames = prevNames.filter(name => !nextNames?.includes(name));
-      const services = serviceFeeds.filter(feed => prevNames?.includes(feed?.summary.toLowerCase()));
-      if (prevNames.length > 0) showErrorMessage(`${t('message.failed')} ${services.map(s => s?.summary).join(', ')}.`);
-    }
-  }, [installingServices, serviceFeeds, serviceResults, showErrorMessage, showInfoMessage, showSuccessMessage, t]);
+        const installing = response.installing.filter(i => !lastInstallingServices.current.includes(i));
+        if (installing.length > 0) showInfoMessage(`${t('message.installing')} ${getServiceName(installing)}.`);
+
+        if (response.installed.length > 0)
+          showSuccessMessage(`${t('message.installed')} ${getServiceName(response.installed)}.`);
+
+        if (response.not_installed.length > 0)
+          showErrorMessage(`${t('message.failed')} ${getServiceName(response.not_installed)}.`);
+
+        lastInstallingServices.current = installingServices;
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [getServiceName, installingServices, serviceResults, showErrorMessage, showInfoMessage, t]);
 
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>
@@ -404,9 +373,7 @@ export default function Services() {
               title={
                 availableServices &&
                 availableServices.length > 0 &&
-                availableServices.some(
-                  s => !installingServices?.map(i => i?.summary?.toLowerCase()).includes(s?.summary?.toLowerCase())
-                )
+                availableServices.some(s => !installingServices?.includes(s?.summary?.toLowerCase()))
                   ? t('install_all')
                   : t('install_none')
               }
@@ -418,9 +385,7 @@ export default function Services() {
                   disabled={
                     !availableServices ||
                     availableServices.length === 0 ||
-                    availableServices.every(s =>
-                      installingServices?.map(i => i?.summary?.toLowerCase()).includes(s?.summary?.toLowerCase())
-                    )
+                    availableServices.every(s => installingServices?.includes(s?.summary?.toLowerCase()))
                   }
                 >
                   <CloudDownloadOutlinedIcon />

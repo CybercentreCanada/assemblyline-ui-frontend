@@ -2,9 +2,9 @@ import { IconButton, makeStyles, Paper, TableContainer, TableRow, Tooltip } from
 import CloudDownloadOutlinedIcon from '@material-ui/icons/CloudDownloadOutlined';
 import { AlertTitle, Skeleton } from '@material-ui/lab';
 import 'moment/locale/fr';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ServiceFeedItem } from '.';
+import { JSONFeedItem } from '.';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow } from '../DivTable';
 import InformativeAlert from '../InformativeAlert';
 
@@ -21,12 +21,12 @@ export type ServiceResult = {
 };
 
 type Props = {
-  services: ServiceFeedItem[];
-  installingServices: ServiceFeedItem[];
-  onInstall: (s: ServiceFeedItem[]) => void;
+  services: JSONFeedItem[];
+  installingServices: string[];
+  onInstall: (s: JSONFeedItem[]) => void;
 };
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   center: {
     textAlign: 'center'
   }
@@ -39,16 +39,6 @@ const WrappedNewServiceTable: React.FC<Props> = ({ services, installingServices,
   const navigate = useCallback(url => {
     window.open(url, '_blank');
   }, []);
-
-  const installingNames = useMemo<string[]>(
-    () =>
-      !installingServices
-        ? []
-        : !Array.isArray(installingServices)
-        ? []
-        : installingServices?.map(s => s?.summary?.toLowerCase()),
-    [installingServices]
-  );
 
   return services ? (
     services.length !== 0 ? (
@@ -68,7 +58,7 @@ const WrappedNewServiceTable: React.FC<Props> = ({ services, installingServices,
                 component={props => <div {...props} />}
                 hover
                 style={{ cursor: 'pointer', textDecoration: 'none' }}
-                onClick={e => navigate(service.url)}
+                onClick={() => navigate(service.url)}
               >
                 <DivTableCell>{service.summary}</DivTableCell>
                 <DivTableCell>{service.content_text}</DivTableCell>
@@ -78,7 +68,7 @@ const WrappedNewServiceTable: React.FC<Props> = ({ services, installingServices,
                 >
                   <Tooltip
                     title={
-                      installingNames.includes(service?.summary.toLowerCase())
+                      installingServices?.includes(service?.summary.toLowerCase())
                         ? t('installing')
                         : `${service.title} ${t('available')}!`
                     }
@@ -91,7 +81,7 @@ const WrappedNewServiceTable: React.FC<Props> = ({ services, installingServices,
                           event.stopPropagation();
                           onInstall([service]);
                         }}
-                        disabled={installingNames.includes(service?.summary.toLowerCase())}
+                        disabled={installingServices?.includes(service?.summary.toLowerCase())}
                       >
                         <CloudDownloadOutlinedIcon />
                       </IconButton>
@@ -106,8 +96,8 @@ const WrappedNewServiceTable: React.FC<Props> = ({ services, installingServices,
     ) : (
       <div style={{ width: '100%' }}>
         <InformativeAlert>
-          <AlertTitle>{t('no_results_title')}</AlertTitle>
-          {t('no_results_desc')}
+          <AlertTitle>{t('no_services_available_title')}</AlertTitle>
+          {t('no_services_available_desc')}
         </InformativeAlert>
       </div>
     )
@@ -116,5 +106,22 @@ const WrappedNewServiceTable: React.FC<Props> = ({ services, installingServices,
   );
 };
 
-const NewServiceTable = React.memo(WrappedNewServiceTable);
+const NewServiceTable = React.memo(
+  WrappedNewServiceTable,
+  (prevProps: Readonly<React.PropsWithChildren<Props>>, nextProps: Readonly<React.PropsWithChildren<Props>>) => {
+    function arrayEquals(a, b) {
+      return Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((val, index) => val === b[index]);
+    }
+
+    return (
+      Object.is(prevProps.onInstall, nextProps.onInstall) &&
+      arrayEquals(prevProps.installingServices, nextProps.installingServices) &&
+      arrayEquals(
+        prevProps.services?.map(s => s?.summary),
+        nextProps.services?.map(s => s?.summary)
+      )
+    );
+  }
+);
+
 export default NewServiceTable;

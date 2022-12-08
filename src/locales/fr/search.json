@@ -53,6 +53,8 @@
   "no_results_desc": "La requête que vous avez exécutée n'a renvoyé aucun résultat.",
   "no_results_title": "Aucun résultat trouvé!",
   "no_safelist_title": "Aucun hachage en liste sûre trouvé!",
+  "no_services_available_desc": "Il n'y a pas de nouveaux services disponibles.",
+  "no_services_available_title": "Aucun service trouvé!",
   "no_signatures_title": "Aucune signature trouvée!",
   "no_submissions_title": "Aucune soumission trouvée!",
   "no_workflows_title": "Aucune flu de travail trouvée!",
