@@ -1,13 +1,5 @@
 import { ClassNameMap } from '@material-ui/core/styles/withStyles';
-import { getHexType, isCursorIndex, isSearchIndex, isSelectedSearchIndex, isSelectIndex, Store } from '..';
-
-type Cell = { hex: 'hex'; text: 'text' };
-const CELL: Cell = { hex: 'hex', text: 'text' };
-export type CellType = typeof CELL[keyof typeof CELL];
-export type IsCell = { [Property in CellType]: (store: Store) => boolean };
-export const isCell = Object.fromEntries(
-  Object.keys(CELL).map(key => [key, (store: Store) => store.cell.mouseOverType === CELL[key]])
-) as IsCell;
+import { CellType, getHexType, isCursorIndex, isSearchIndex, isSelectedSearchIndex, isSelectIndex, Store } from '..';
 
 export const isCellMouseDown = (store: Store) => store.cell.isMouseDown;
 

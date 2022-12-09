@@ -44,7 +44,7 @@ type SettingsDefinition = {
   ttl: number;
 };
 
-type SystemMessageDefinition = {
+export type SystemMessageDefinition = {
   user: string;
   title: string;
   severity: 'success' | 'info' | 'warning' | 'error';

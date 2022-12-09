@@ -1,32 +1,7 @@
-import { useCallback, useMemo } from 'react';
-import { CellType, isAction, ReducerHandler, Reducers, UseReducer } from '..';
+import { useCallback } from 'react';
+import { isAction, ReducerHandler, Reducers, UseReducer } from '..';
 
-export type CellState = {
-  cell: {
-    mouseEnterIndex: number;
-    mouseLeaveIndex: number;
-    mouseDownIndex: number;
-    mouseUpIndex: number;
-    isMouseDown: boolean;
-    mouseOverType: CellType;
-  };
-};
-
-export const useCellReducer: UseReducer<CellState> = () => {
-  const initialState = useMemo<CellState>(
-    () => ({
-      cell: {
-        mouseEnterIndex: null,
-        mouseLeaveIndex: null,
-        mouseDownIndex: null,
-        mouseUpIndex: null,
-        isMouseDown: false,
-        mouseOverType: 'hex'
-      }
-    }),
-    []
-  );
-
+export const useCellReducer: UseReducer = () => {
   const cellMouseEnter: Reducers['cellMouseEnter'] = useCallback((store, { type, index }) => {
     return { ...store, cell: { ...store.cell, mouseOverType: type, mouseLeaveIndex: index, mouseEnterIndex: index } };
   }, []);
@@ -69,5 +44,5 @@ export const useCellReducer: UseReducer<CellState> = () => {
     [appClickAway, bodyMouseLeave, bodyMouseUp, cellMouseDown, cellMouseEnter]
   );
 
-  return { initialState, reducer };
+  return { reducer };
 };

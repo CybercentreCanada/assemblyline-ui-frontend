@@ -118,6 +118,7 @@ const WrappedResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates 
   const empty = emptyResult(result);
   const [displayedResult, setDisplayedResult] = React.useState<Result>(result);
   const [open, setOpen] = React.useState(!empty && displayedResult.result.score >= settings.expand_min_score);
+  const [render, setRender] = React.useState(!empty && displayedResult.result.score >= settings.expand_min_score);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [selected, setSelected] = React.useState(null);
   const { getKey, hasHighlightedKeys } = useHighlighter();
@@ -255,42 +256,44 @@ const WrappedResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates 
         )}
         {open ? <ExpandLess className={classes.muted} /> : <ExpandMore className={classes.muted} />}
       </Box>
-      <Collapse in={open} timeout="auto">
+      <Collapse in={open} timeout="auto" onEnter={() => setRender(true)}>
         {empty ? (
           <div className={classes.content} style={{ color: theme.palette.text.secondary }}>
             {t('nothing_to_report')}
           </div>
         ) : (
-          <div className={classes.content}>
-            {displayedResult.section_hierarchy
-              ? displayedResult.section_hierarchy.map(item => (
-                  <ResultSection
-                    key={`section_${item.id}`}
-                    section={displayedResult.result.sections[item.id]}
-                    section_list={displayedResult.result.sections}
-                    sub_sections={item.children}
-                    indent={1}
-                    force={force}
-                  />
-                ))
-              : displayedResult.result.sections.map((section, id) => (
-                  <ResultSection
-                    key={`section_${id}`}
-                    section={displayedResult.result.sections[id]}
-                    section_list={displayedResult.result.sections}
-                    sub_sections={[]}
-                    indent={section.depth + 1}
-                    depth={section.depth + 1}
-                    force={force}
-                  />
-                ))}
-            {displayedResult.response.supplementary.filter(item => !item.is_section_image).length !== 0 && (
-              <SupplementarySection supplementary={displayedResult.response.supplementary} sid={sid} />
-            )}
-            {displayedResult.response.extracted.length !== 0 && (
-              <ExtractedSection extracted={displayedResult.response.extracted} sid={sid} />
-            )}
-          </div>
+          render && (
+            <div className={classes.content}>
+              {displayedResult.section_hierarchy
+                ? displayedResult.section_hierarchy.map(item => (
+                    <ResultSection
+                      key={`section_${item.id}`}
+                      section={displayedResult.result.sections[item.id]}
+                      section_list={displayedResult.result.sections}
+                      sub_sections={item.children}
+                      indent={1}
+                      force={force}
+                    />
+                  ))
+                : displayedResult.result.sections.map((section, id) => (
+                    <ResultSection
+                      key={`section_${id}`}
+                      section={displayedResult.result.sections[id]}
+                      section_list={displayedResult.result.sections}
+                      sub_sections={[]}
+                      indent={section.depth + 1}
+                      depth={section.depth + 1}
+                      force={force}
+                    />
+                  ))}
+              {displayedResult.response.supplementary.filter(item => !item.is_section_image).length !== 0 && (
+                <SupplementarySection supplementary={displayedResult.response.supplementary} sid={sid} />
+              )}
+              {displayedResult.response.extracted.length !== 0 && (
+                <ExtractedSection extracted={displayedResult.response.extracted} sid={sid} />
+              )}
+            </div>
+          )
         )}
       </Collapse>
     </div>

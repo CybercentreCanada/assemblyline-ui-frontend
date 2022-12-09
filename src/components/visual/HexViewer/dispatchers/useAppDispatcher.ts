@@ -1,15 +1,15 @@
 import {
   ACTIONS,
   ActionTypesConfig,
-  BodyType,
   Dispatch,
   DispatchersConfig,
-  LanguageType,
-  LayoutType,
-  Store,
-  ThemeType,
-  ToolbarType,
-  WidthType
+  ModeBody,
+  ModeLanguage,
+  ModeLayout,
+  ModeTheme,
+  ModeToolbar,
+  ModeWidth,
+  Store
 } from '..';
 
 export type AppAction =
@@ -18,15 +18,16 @@ export type AppAction =
   | { type: 'appSave'; payload: void }
   | { type: 'appInit'; payload: null }
   | { type: 'appDataChange'; payload: { data: string } }
-  | { type: 'appThemeTypeChange'; payload: { themeType: ThemeType } }
-  | { type: 'appLanguageTypeChange'; payload: { languageType: LanguageType } }
-  | { type: 'appWidthTypeChange'; payload: { widthType: WidthType } }
-  | { type: 'appLayoutTypeChange'; payload: { layoutType: LayoutType } }
-  | { type: 'appToolbarTypeChange'; payload: { toolbarType: ToolbarType } }
-  | { type: 'appBodyTypeChange'; payload: { bodyType: BodyType } }
+  | { type: 'appModeThemeChange'; payload: { theme: ModeTheme } }
+  | { type: 'appModeLanguageChange'; payload: { language: ModeLanguage } }
+  | { type: 'appModeWidthChange'; payload: { width: ModeWidth } }
+  | { type: 'appModeLayoutChange'; payload: { layout: ModeLayout } }
+  | { type: 'appModeToolbarChange'; payload: { toolbar: ModeToolbar } }
+  | { type: 'appModeBodyChange'; payload: { body: ModeBody } }
   | { type: 'appHistoryLoad'; payload: null }
   | { type: 'appHistorySave'; payload: null }
-  | { type: 'appLocationInit'; payload: void }
+  | { type: 'locationFetch'; payload: void }
+  | { type: 'locationLoad'; payload: void }
   | { type: 'appClickAway'; payload: void; tracked: true; repeat: true };
 
 export type AppActionTypes = ActionTypesConfig<AppAction>;
@@ -38,15 +39,16 @@ export const APP_ACTION_TYPES: AppActionTypes = {
   appSave: 'AppSave_Action',
   appInit: 'AppInit_Action',
   appDataChange: 'AppDataChange_Action',
-  appThemeTypeChange: 'AppThemeTypeChange_Action',
-  appLanguageTypeChange: 'AppLanguageTypeChange_Action',
-  appWidthTypeChange: 'AppWidthTypeChange_Action',
-  appLayoutTypeChange: 'AppLayoutTypeChange_Action',
-  appToolbarTypeChange: 'AppToolbarTypeChange_Action',
-  appBodyTypeChange: 'AppBodyTypeChange_Action',
+  appModeThemeChange: 'AppModeThemeChange_Action',
+  appModeLanguageChange: 'AppModeLanguageChange_Action',
+  appModeWidthChange: 'AppModeWidthChange_Action',
+  appModeLayoutChange: 'AppModeLayoutChange_Action',
+  appModeToolbarChange: 'AppModeToolbarChange_Action',
+  appModeBodyChange: 'AppModeBodyChange_Action',
   appHistoryLoad: 'AppHistoryLoad_Action',
   appHistorySave: 'AppHistorySave_Action',
-  appLocationInit: 'AppLocationInit_Action',
+  locationFetch: 'LocationFetch_Action',
+  locationLoad: 'LocationLoad_Action',
   appClickAway: 'AppClickAway_Action'
 } as AppActionTypes;
 
@@ -57,15 +59,16 @@ export const useAppDispatcher = (dispatch: Dispatch): AppDispatchers => {
     onAppSave: payload => dispatch({ type: ACTIONS.appSave, payload }),
     onAppInit: payload => dispatch({ type: ACTIONS.appInit, payload }),
     onAppDataChange: payload => dispatch({ type: ACTIONS.appDataChange, payload }),
-    onAppThemeTypeChange: payload => dispatch({ type: ACTIONS.appThemeTypeChange, payload }),
-    onAppLanguageTypeChange: payload => dispatch({ type: ACTIONS.appLanguageTypeChange, payload }),
-    onAppWidthTypeChange: payload => dispatch({ type: ACTIONS.appWidthTypeChange, payload }),
-    onAppLayoutTypeChange: payload => dispatch({ type: ACTIONS.appLayoutTypeChange, payload }),
-    onAppToolbarTypeChange: payload => dispatch({ type: ACTIONS.appToolbarTypeChange, payload }),
-    onAppBodyTypeChange: payload => dispatch({ type: ACTIONS.appBodyTypeChange, payload }),
+    onAppModeThemeChange: payload => dispatch({ type: ACTIONS.appModeThemeChange, payload }),
+    onAppModeLanguageChange: payload => dispatch({ type: ACTIONS.appModeLanguageChange, payload }),
+    onAppModeWidthChange: payload => dispatch({ type: ACTIONS.appModeWidthChange, payload }),
+    onAppModeLayoutChange: payload => dispatch({ type: ACTIONS.appModeLayoutChange, payload }),
+    onAppModeToolbarChange: payload => dispatch({ type: ACTIONS.appModeToolbarChange, payload }),
+    onAppModeBodyChange: payload => dispatch({ type: ACTIONS.appModeBodyChange, payload }),
     onAppHistoryLoad: payload => dispatch({ type: ACTIONS.appHistoryLoad, payload }),
     onAppHistorySave: payload => dispatch({ type: ACTIONS.appHistorySave, payload }),
-    onAppLocationInit: payload => dispatch({ type: ACTIONS.appLocationInit, payload }),
+    onLocationFetch: payload => dispatch({ type: ACTIONS.locationFetch, payload }),
+    onLocationLoad: payload => dispatch({ type: ACTIONS.locationLoad, payload }),
     onAppClickAway: payload => dispatch({ type: ACTIONS.appClickAway, payload, tracked: true, repeat: true })
   };
 };

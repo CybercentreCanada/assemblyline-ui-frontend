@@ -1,104 +1,57 @@
 import { isArrowDown, isArrowUp } from 'commons/addons/elements/utils/keyboard';
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import {
   clampScrollIndex,
+  DEFAULT_STORE,
+  getFoldingRowIndex,
   getScrollLastIndex,
   getScrollMaxIndex,
   getTableCellsRendered,
   getWindowCellsRendered,
+  hasValidSearchResult,
   isAction,
-  isBody,
   isEnd,
   isHome,
   isPageDown,
   isPageUp,
+  isType,
   LAYOUT_SIZE,
   ReducerHandler,
   Reducers,
   scrollToTableIndex,
   ScrollType,
+  setStore,
   Store,
   UseReducer
 } from '..';
 
-export type ScrollState = {
-  scroll: {
-    index: number;
-    rowIndex: number;
-    maxRowIndex: number;
-    lastRowIndex: number;
-    speed: number;
-    overscanCount: number;
-    type: ScrollType;
-  };
-  cellsRendered: {
-    overscanStartRowIndex: number;
-    overscanStopRowIndex: number;
-    visibleStartRowIndex: number;
-    visibleStopRowIndex: number;
-
-    overscanStartIndex: number;
-    overscanStopIndex: number;
-    visibleStartIndex: number;
-    visibleStopIndex: number;
-  };
-  touchScroll: {
-    startTouchScreenY: number;
-    prevTouchDistance: number;
-  };
-};
-
-export const useScrollReducer: UseReducer<ScrollState> = () => {
-  const initialState = useMemo<ScrollState>(
-    () => ({
-      scroll: {
-        index: 0,
-        rowIndex: 0,
-        maxRowIndex: 1,
-        lastRowIndex: 1,
-        speed: 3,
-        overscanCount: 20,
-        type: 'top'
-      },
-      cellsRendered: {
-        overscanStartRowIndex: 0,
-        overscanStopRowIndex: 0,
-        visibleStartRowIndex: 0,
-        visibleStopRowIndex: 0,
-
-        overscanStartIndex: 0,
-        overscanStopIndex: 0,
-        visibleStartIndex: 0,
-        visibleStopIndex: 0
-      },
-      touchScroll: {
-        startTouchScreenY: 0,
-        prevTouchDistance: 0
-      }
-    }),
-    []
-  );
-
+export const useScrollReducer: UseReducer = () => {
   const scrollIndexChange = useCallback((store: Store, _index: number, scrollType: ScrollType): Store => {
     if (_index === null || _index === undefined || isNaN(_index)) return { ...store };
 
-    const hexcodeSize = store.hex.codes.size;
-    const index = Math.min(Math.max(_index, 0), hexcodeSize);
-    const rowIndex = Math.floor(index / store.layout.column.size);
-    const maxRowIndex = getScrollMaxIndex(store, hexcodeSize);
-    const lastRowIndex = getScrollLastIndex(store, hexcodeSize);
+    let { index, rowIndex, maxRowIndex, lastRowIndex } = store.scroll;
+    let hexcodeSize = store.hex.codes.size;
 
-    if (isBody.table(store)) {
-      let newStore = { ...store, scroll: { ...store.scroll, maxRowIndex, lastRowIndex } };
+    if (!store.layout.folding.active) {
+      hexcodeSize = store.hex.codes.size;
+      index = Math.min(Math.max(_index, 0), hexcodeSize);
+      rowIndex = Math.floor(index / store.layout.column.size);
+      maxRowIndex = getScrollMaxIndex(store, hexcodeSize);
+      lastRowIndex = getScrollLastIndex(store, hexcodeSize);
+    } else {
+      hexcodeSize = store.hex.codes.size;
+      index = Math.min(Math.max(_index, 0), hexcodeSize);
+      rowIndex = getFoldingRowIndex(store, index);
+      maxRowIndex = store.layout.folding.rows.size - store.layout.row.size;
+      lastRowIndex = store.layout.folding.rows.size;
+    }
+
+    if (isType.mode.body(store, 'table')) {
+      let newStore = setStore.store.Scroll(store, { maxRowIndex, lastRowIndex });
       newStore = scrollToTableIndex(newStore, index, scrollType);
-      const cellsRendered = getTableCellsRendered(store);
-      return { ...newStore, cellsRendered: { ...newStore.cellsRendered, ...cellsRendered } };
-    } else if (isBody.window(store)) {
-      let newStore = {
-        ...store,
-        scroll: { ...store.scroll, index, rowIndex, maxRowIndex, lastRowIndex, type: scrollType }
-      };
-      return { ...newStore };
+      return setStore.store.CellsRendered(newStore, { ...getTableCellsRendered(newStore) });
+    } else if (isType.mode.body(store, 'window')) {
+      return setStore.store.Scroll(store, { index, rowIndex, maxRowIndex, lastRowIndex, type: scrollType });
     } else return { ...store };
   }, []);
 
@@ -166,41 +119,30 @@ export const useScrollReducer: UseReducer<ScrollState> = () => {
 
   const scrollCellRendered: Reducers['bodyItemsRendered'] = useCallback((store, { event }) => {
     if (event === null) return { ...store };
-    const cellsRendered = getWindowCellsRendered({ ...event }, store.layout.column.size);
-    return {
-      ...store,
-      cellsRendered: {
-        ...store.cellsRendered,
-        ...cellsRendered
-      }
-    };
+    return setStore.store.CellsRendered(store, getWindowCellsRendered(store, { ...event }));
   }, []);
 
   const scrollTouchStart: Reducers['scrollTouchStart'] = useCallback((store, { event }) => {
-    return {
-      ...store,
-      touchScroll: { ...store.touchScroll, startTouchScreenY: event.targetTouches[0].screenY, prevTouchDistance: 0 }
-    };
+    return setStore.store.scroll.TouchScroll(store, {
+      startTouchScreenY: event.targetTouches[0].screenY,
+      prevTouchDistance: 0
+    });
   }, []);
 
   const scrollTouchEnd: Reducers['scrollTouchEnd'] = useCallback((store, payload) => {
-    return {
-      ...store,
-      touchScroll: { ...store.touchScroll, startTouchScreenY: 0, prevTouchDistance: 0 }
-    };
+    return setStore.store.scroll.TouchScroll(store, { startTouchScreenY: 0, prevTouchDistance: 0 });
   }, []);
 
   const scrollTouchMove: Reducers['scrollTouchMove'] = useCallback(
     (store, { event }) => {
-      const { startTouchScreenY, prevTouchDistance } = store.touchScroll;
+      const { startTouchScreenY, prevTouchDistance } = store.scroll.touchScroll;
       const distance: number = (event.targetTouches[0].screenY - startTouchScreenY) / LAYOUT_SIZE.rowHeight;
       const scrollDistance: number = distance >= 0 ? Math.floor(distance) : Math.ceil(distance);
 
       if (scrollDistance !== prevTouchDistance) {
         const newScrollIndex = store.scroll.rowIndex - (scrollDistance - prevTouchDistance);
         const newStore = scrollRowIndexChange(store, newScrollIndex);
-        store.touchScroll.prevTouchDistance = scrollDistance;
-        return { ...newStore };
+        return { ...setStore.store.scroll.touchScroll.PrevTouchDistance(newStore, scrollDistance) };
       } else return { ...store };
     },
     [scrollRowIndexChange]
@@ -208,10 +150,10 @@ export const useScrollReducer: UseReducer<ScrollState> = () => {
 
   const scrollLocation: Reducers['bodyInit'] = useCallback(
     (store, { initialized }) => {
-      if (store.location.scroll === null) return { ...store };
+      if (DEFAULT_STORE.location.scroll.index === store.location.scroll.index) return { ...store };
       else {
-        let newStore = { ...store, scroll: { ...store.scroll, index: store.location.scroll } };
-        return scrollIndexChange(newStore, store.location.scroll, 'top');
+        let newStore = { ...store, scroll: { ...store.scroll, index: store.location.scroll.index } };
+        return scrollIndexChange(newStore, store.location.scroll.index, 'top');
       }
     },
     [scrollIndexChange]
@@ -225,12 +167,13 @@ export const useScrollReducer: UseReducer<ScrollState> = () => {
         newStore = scrollIndexChange(nextStore, nextStore.cursor.index, 'smart');
 
       if (
-        prevStore.search.selectedIndex !== nextStore.search.selectedIndex ||
-        prevStore.search.value !== nextStore.search.value
+        (prevStore.search.selectedResult !== nextStore.search.selectedResult ||
+          prevStore.search.inputValue !== nextStore.search.inputValue) &&
+        hasValidSearchResult(newStore)
       )
         newStore = scrollIndexChange(
           nextStore,
-          nextStore.search.indexes[nextStore.search.selectedIndex],
+          nextStore.search.results[nextStore.search.selectedResult].index,
           'includeMiddle'
         );
 
@@ -250,7 +193,7 @@ export const useScrollReducer: UseReducer<ScrollState> = () => {
       else if (isAction.scrollTouchEnd(type)) return scrollTouchEnd(store, payload);
       else if (isAction.scrollTouchMove(type)) return scrollTouchMove(store, payload);
       else if (isAction.bodyInit(type)) return scrollLocation(store, payload);
-      else if (isAction.appLocationInit(type)) return scrollIndexChange(store, store.location.scroll, 'top');
+      else if (isAction.locationLoad(type)) return scrollIndexChange(store, store.location.scroll.index, 'top');
       else return scrollStoreChange(prevStore, store);
     },
     [
@@ -268,5 +211,5 @@ export const useScrollReducer: UseReducer<ScrollState> = () => {
     ]
   );
 
-  return { initialState, reducer };
+  return { reducer };
 };

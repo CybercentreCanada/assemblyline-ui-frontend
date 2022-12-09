@@ -44,8 +44,8 @@ export const HexOffset = React.memo(
     prevProps.index === nextProps.index &&
     prevProps.store.offset.base === nextProps.store.offset.base &&
     prevProps.store.offset.size === nextProps.store.offset.size &&
-    prevProps.store.mode.bodyType === nextProps.store.mode.bodyType &&
-    prevProps.store.mode.themeType === nextProps.store.mode.themeType &&
-    prevProps.store.mode.languageType === nextProps.store.mode.languageType &&
-    prevProps.store.mode.widthType === nextProps.store.mode.widthType
+    prevProps.store.mode.body === nextProps.store.mode.body &&
+    prevProps.store.mode.theme === nextProps.store.mode.theme &&
+    prevProps.store.mode.language === nextProps.store.mode.language &&
+    prevProps.store.mode.width === nextProps.store.mode.width
 );

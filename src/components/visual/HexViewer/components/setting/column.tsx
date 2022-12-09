@@ -3,17 +3,14 @@ import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { COLUMNS, NumericField, StoreProps, useDispatch } from '../..';
+import { COLUMNS, NumericField, StoreProps, useDispatch, useStore } from '../..';
 
 export const WrappedHexColumnSetting = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);
   const theme = useTheme();
   const upSM = useMediaQuery(theme.breakpoints.up('sm'));
-  const { onSettingAutoColumnChange, onSettingColumnChange } = useDispatch();
-
-  const {
-    column: { auto: columnAuto, size: columnSize }
-  } = store.setting;
+  const { onSettingAutoColumnChange } = useDispatch();
+  const { update } = useStore();
 
   return (
     <>
@@ -22,10 +19,14 @@ export const WrappedHexColumnSetting = ({ store }: StoreProps) => {
           <Typography variant="subtitle2">{t('columns.label')}</Typography>
         </Tooltip>
       </Grid>
-      <Grid item sm={2} xs={4} style={{ textAlign: 'right' }}>
+      <Grid item sm={2} xs={4} style={{ textAlign: 'left' }}>
         <FormControlLabel
           control={
-            <Checkbox name={t('columns.auto')} checked={columnAuto} onChange={() => onSettingAutoColumnChange()} />
+            <Checkbox
+              name={t('columns.auto')}
+              checked={store.setting.layout.column.auto}
+              onChange={() => onSettingAutoColumnChange()}
+            />
           }
           label={t('columns.auto')}
         />
@@ -37,14 +38,15 @@ export const WrappedHexColumnSetting = ({ store }: StoreProps) => {
             placeholder={t('columns.description')}
             fullWidth
             margin="dense"
-            value={columnSize as number}
+            value={store.setting.layout.column.max}
             min={1}
             max={264}
             base={10}
-            options={COLUMNS.map(c => c.columns)}
-            disabled={columnAuto}
+            options={COLUMNS.filter(c => ![0, 1].includes(c.columns)).map(c => c.columns)}
+            disabled={store.setting.layout.column.auto}
             allowNull={false}
-            onChange={event => onSettingColumnChange({ value: event.target.valueAsNumber as number })}
+            direction="inverse"
+            onChange={event => update.store.setting.layout.column.setMax(event.target.valueAsNumber)}
           />
         </FormControl>
       </Grid>
@@ -55,6 +57,7 @@ export const WrappedHexColumnSetting = ({ store }: StoreProps) => {
 export const HexColumnSetting = React.memo(
   WrappedHexColumnSetting,
   (prevProps: Readonly<StoreProps>, nextProps: Readonly<StoreProps>) =>
-    prevProps.store.setting.column.auto === nextProps.store.setting.column.auto &&
-    prevProps.store.setting.column.size === nextProps.store.setting.column.size
+    prevProps.store.setting.layout.column.auto === nextProps.store.setting.layout.column.auto &&
+    prevProps.store.setting.layout.column.max === nextProps.store.setting.layout.column.max &&
+    prevProps.store.mode.language === nextProps.store.mode.language
 );

@@ -64,6 +64,7 @@ export type Container = {
   registry_password: string;
   registry_username: string;
   registry_type: 'docker' | 'harbor';
+  service_account?: string;
 };
 
 export type SubmissionParams = {

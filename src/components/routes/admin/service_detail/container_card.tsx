@@ -91,6 +91,14 @@ const WrappedContainerCard = ({ container, defaults, name, volumes, onChange }: 
               </div>
             </Tooltip>
           </Grid>
+          {container.service_account && (
+            <>
+              <Grid item xs={5} sm={4} md={2} className={classes.label}>{`${t('container.card.service_account')}:`}</Grid>
+              <Grid item xs={7} sm={8} md={10} className={classes.mono}>
+                {container.service_account}
+              </Grid>
+            </>
+          )}
           {container.command && (
             <>
               <Grid item xs={5} sm={4} md={2} className={classes.label}>{`${t('container.card.command')}:`}</Grid>

@@ -1,7 +1,6 @@
 import { Collapse, Divider, Grid, makeStyles, Typography, useTheme } from '@material-ui/core';
-import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';
-import Tag from 'components/visual/Tag';
+import AutoHideTagList from 'components/visual/AutoHideTagList';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -31,7 +30,6 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ tag_group, tags, force =
   const theme = useTheme();
   const classes = useStyles();
   const sp2 = theme.spacing(2);
-  const { getKey } = useHighlighter();
   const { showSafeResults } = useSafeResults();
   const [tagUnsafeMap, setTagUnsafeMap] = React.useState({});
 
@@ -63,17 +61,13 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ tag_group, tags, force =
                   <span style={{ fontWeight: 500 }}>{tag_type}</span>
                 </Grid>
                 <Grid item xs={12} sm={9} lg={10}>
-                  {tags[tag_type].map(([value, lvl, safelisted], idx) => (
-                    <Tag
-                      key={idx}
-                      value={value}
-                      safelisted={safelisted}
-                      type={tag_type}
-                      lvl={lvl}
-                      highlight_key={getKey(tag_type, value)}
-                      force={force}
-                    />
-                  ))}
+                  <AutoHideTagList
+                    tag_type={tag_type}
+                    items={tags[tag_type].map(item => {
+                      return { value: item[0], lvl: item[1], safelisted: item[2] };
+                    })}
+                    force={force}
+                  />
                 </Grid>
               </Grid>
             ) : null

@@ -1,13 +1,21 @@
 import useClipboard from 'commons/components/hooks/useClipboard';
-import { useCallback, useMemo } from 'react';
-import { isAction, isCell, ReducerHandler, Reducers, Store, toHexChar2, UseReducer } from '..';
+import { useCallback } from 'react';
+import {
+  COPY_STATE,
+  getCopyHexCharacter,
+  isAction,
+  isType,
+  ReducerHandler,
+  Reducers,
+  setStore,
+  setStoreWithKeys,
+  singleCharacterString,
+  Store,
+  UseReducer
+} from '..';
 
-export type CopyState = {};
-
-export const useCopyReducer: UseReducer<CopyState> = () => {
+export const useCopyReducer: UseReducer = () => {
   const { copy } = useClipboard();
-
-  const initialState = useMemo<CopyState>(() => ({}), []);
 
   const copyHexCursor: (store: Store) => void = useCallback(
     store => copy(store.hex.codes.get(store.cursor.index)),
@@ -15,7 +23,7 @@ export const useCopyReducer: UseReducer<CopyState> = () => {
   );
 
   const copyTextCursor: (store: Store) => void = useCallback(
-    store => copy(toHexChar2(store, store.hex.codes.get(store.cursor.index), true)),
+    store => copy(getCopyHexCharacter(store, store.hex.codes.get(store.cursor.index))),
     [copy]
   );
 
@@ -40,7 +48,7 @@ export const useCopyReducer: UseReducer<CopyState> = () => {
         i => i + store.select.startIndex
       );
       array.forEach(index => {
-        value += toHexChar2(store, store.hex.codes.get(index), true);
+        value += getCopyHexCharacter(store, store.hex.codes.get(index));
       });
       copy(value);
     },
@@ -49,24 +57,59 @@ export const useCopyReducer: UseReducer<CopyState> = () => {
 
   const copyKeyDown: Reducers['copyKeyDown'] = useCallback(
     store => {
-      if (store.cursor.index !== null && isCell.hex(store)) copyHexCursor(store);
-      else if (store.cursor.index !== null && isCell.text(store)) copyTextCursor(store);
-      else if (store.select.startIndex !== -1 && store.select.endIndex !== -1 && isCell.hex(store))
+      if (store.cursor.index !== null && isType.cell.mouseOverType(store, 'hex')) copyHexCursor(store);
+      else if (store.cursor.index !== null && isType.cell.mouseOverType(store, 'text')) copyTextCursor(store);
+      else if (
+        store.select.startIndex !== -1 &&
+        store.select.endIndex !== -1 &&
+        isType.cell.mouseOverType(store, 'hex')
+      )
         copyHexSelect(store);
-      else if (store.select.startIndex !== -1 && store.select.endIndex !== -1 && isCell.text(store))
+      else if (
+        store.select.startIndex !== -1 &&
+        store.select.endIndex !== -1 &&
+        isType.cell.mouseOverType(store, 'text')
+      )
         copyTextSelect(store);
       return { ...store };
     },
     [copyHexCursor, copyHexSelect, copyTextCursor, copyTextSelect]
   );
 
-  const reducer: ReducerHandler = useCallback(
-    ({ store, action: { type } }) => {
-      if (isAction.copyKeyDown(type)) return copyKeyDown(store);
-      else return { ...store };
-    },
-    [copyKeyDown]
+  const settingLoad: Reducers['settingLoad'] = useCallback(
+    store =>
+      setStore.store.copy.NonPrintable(store, store.setting.storage.data?.copy?.nonPrintable, data => ({
+        mode: data?.mode,
+        prefix: singleCharacterString(data?.prefix)
+      })),
+    []
   );
 
-  return { initialState, reducer };
+  const settingOpen: Reducers['settingOpen'] = useCallback(
+    store => setStoreWithKeys.store.setting.copy.NonPrintable(store, store.copy.nonPrintable, ['mode', 'prefix']),
+    []
+  );
+
+  const settingSave: Reducers['settingSave'] = useCallback(store => {
+    return setStoreWithKeys.store.copy.NonPrintable(store, store.setting.copy.nonPrintable, ['mode', 'prefix']);
+  }, []);
+
+  const settingReset: Reducers['settingReset'] = useCallback(
+    store => setStoreWithKeys.store.setting.copy.NonPrintable(store, COPY_STATE.copy.nonPrintable, ['mode', 'prefix']),
+    []
+  );
+
+  const reducer: ReducerHandler = useCallback(
+    ({ store, action: { type, payload } }) => {
+      if (isAction.copyKeyDown(type)) return copyKeyDown(store);
+      else if (isAction.settingLoad(type)) return settingLoad(store, payload);
+      else if (isAction.settingOpen(type)) return settingOpen(store, payload);
+      else if (isAction.settingSave(type)) return settingSave(store, payload);
+      else if (isAction.settingReset(type)) return settingReset(store, payload);
+      else return { ...store };
+    },
+    [copyKeyDown, settingLoad, settingOpen, settingReset, settingSave]
+  );
+
+  return { reducer };
 };
