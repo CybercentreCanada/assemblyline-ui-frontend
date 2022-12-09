@@ -116,15 +116,28 @@ export default function Services() {
       url: '/api/v4/service/updates/',
       onSuccess: api_data => setUpdates(api_data.api_response)
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const pollInstalling = useCallback(first => {
     apiCall({
       url: '/api/v4/service/installing/',
-      onSuccess: api_data => setInstallingServices(api_data.api_response.map(r => r?.name.toLowerCase()))
+      onSuccess: api_data => {
+        if (first) {
+          lastInstallingServices.current = api_data.api_response;
+          showInfoMessage(`${t('message.installing')} ${api_data.api_response.join(', ')}.`);
+        }
+        setInstallingServices(api_data.api_response);
+      }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    if (currentUser.is_admin) reload();
+    if (currentUser.is_admin) {
+      reload();
+      pollInstalling(true);
+    }
     window.addEventListener('reloadServicesEvent', reload);
     return () => {
       window.removeEventListener('reloadServicesEvent', reload);
@@ -179,12 +192,12 @@ export default function Services() {
       apiCall({
         method: 'PUT',
         url: '/api/v4/service/install/',
-        body: services.map(s => ({ name: s.summary, install_data: { auth: null, image: s.id } })),
-        onSuccess: () => reload()
+        body: services.map(s => ({ name: s.summary, image: s.id })),
+        onSuccess: () => pollInstalling(false)
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [reload]
+    [pollInstalling]
   );
 
   const onUpdated = useCallback(() => {
@@ -214,27 +227,15 @@ export default function Services() {
 
   useEffect(() => {
     if (!serviceFeeds || !serviceResults) return;
-    const serviceResultNames = serviceResults.map(result => result?.name.toLowerCase());
-    setAvailableServices(serviceFeeds.filter(feed => !serviceResultNames.includes(feed.summary.toLowerCase())));
+    const serviceResultNames = serviceResults.map(result => result?.name);
+    setAvailableServices(serviceFeeds.filter(feed => !serviceResultNames.includes(feed.summary)));
   }, [serviceFeeds, serviceResults]);
 
   useEffect(() => {
     if (!installingServices || installingServices.length === 0) return;
     if (installingServicesTimeout.current) clearTimeout(installingServicesTimeout.current);
-    installingServicesTimeout.current = setTimeout(
-      () => window.dispatchEvent(new CustomEvent('reloadServicesEvent')),
-      10000
-    );
-  }, [installingServices]);
-
-  const getServiceName = useCallback(
-    (names: string[] = []): string =>
-      serviceFeeds
-        ?.filter(f => names?.map(n => n.toLowerCase()).includes(f?.summary.toLowerCase()))
-        .map(s => s?.summary)
-        .join(', '),
-    [serviceFeeds]
-  );
+    installingServicesTimeout.current = setTimeout(() => pollInstalling(false), 10000);
+  }, [installingServices, pollInstalling]);
 
   useEffect(() => {
     const diff = installingServices
@@ -255,19 +256,21 @@ export default function Services() {
         };
 
         const installing = response.installing.filter(i => !lastInstallingServices.current.includes(i));
-        if (installing.length > 0) showInfoMessage(`${t('message.installing')} ${getServiceName(installing)}.`);
+        if (installing.length > 0) showInfoMessage(`${t('message.installing')} ${installing.join(', ')}.`);
 
-        if (response.installed.length > 0)
-          showSuccessMessage(`${t('message.installed')} ${getServiceName(response.installed)}.`);
+        if (response.installed.length > 0) {
+          showSuccessMessage(`${t('message.installed')} ${response.installed.join(', ')}.`);
+          reload();
+        }
 
         if (response.not_installed.length > 0)
-          showErrorMessage(`${t('message.failed')} ${getServiceName(response.not_installed)}.`);
+          showErrorMessage(`${t('message.failed')} ${response.not_installed.join(', ')}.`);
 
         lastInstallingServices.current = installingServices;
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [getServiceName, installingServices, serviceResults, showErrorMessage, showInfoMessage, t]);
+  }, [installingServices, showErrorMessage, showInfoMessage, showSuccessMessage, t]);
 
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>
@@ -373,7 +376,7 @@ export default function Services() {
               title={
                 availableServices &&
                 availableServices.length > 0 &&
-                availableServices.some(s => !installingServices?.includes(s?.summary?.toLowerCase()))
+                availableServices.some(s => !installingServices?.includes(s?.summary))
                   ? t('install_all')
                   : t('install_none')
               }
@@ -385,7 +388,7 @@ export default function Services() {
                   disabled={
                     !availableServices ||
                     availableServices.length === 0 ||
-                    availableServices.every(s => installingServices?.includes(s?.summary?.toLowerCase()))
+                    availableServices.every(s => installingServices?.includes(s?.summary))
                   }
                 >
                   <CloudDownloadOutlinedIcon />
