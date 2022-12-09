@@ -68,7 +68,7 @@ const WrappedNewServiceTable: React.FC<Props> = ({ services, installingServices,
                 >
                   <Tooltip
                     title={
-                      installingServices?.includes(service?.summary.toLowerCase())
+                      installingServices?.includes(service?.summary)
                         ? t('installing')
                         : `${service.title} ${t('available')}!`
                     }
@@ -81,7 +81,7 @@ const WrappedNewServiceTable: React.FC<Props> = ({ services, installingServices,
                           event.stopPropagation();
                           onInstall([service]);
                         }}
-                        disabled={installingServices?.includes(service?.summary.toLowerCase())}
+                        disabled={installingServices?.includes(service?.summary)}
                       >
                         <CloudDownloadOutlinedIcon />
                       </IconButton>

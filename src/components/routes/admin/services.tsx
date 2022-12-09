@@ -125,7 +125,8 @@ export default function Services() {
       onSuccess: api_data => {
         if (first) {
           lastInstallingServices.current = api_data.api_response;
-          showInfoMessage(`${t('message.installing')} ${api_data.api_response.join(', ')}.`);
+          if (api_data.api_response && api_data.api_response.length > 0)
+            showInfoMessage(`${t('message.installing')} ${api_data.api_response.join(', ')}.`);
         }
         setInstallingServices(api_data.api_response);
       }
