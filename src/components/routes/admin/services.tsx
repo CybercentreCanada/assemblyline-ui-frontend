@@ -207,7 +207,7 @@ export default function Services() {
 
   useEffect(() => {
     fetchJSONNotifications({
-      urls: [configuration?.ui?.services_feed],
+      urls: configuration?.ui?.services_feed ? [configuration?.ui?.services_feed] : [],
       onSuccess: values => setServiceFeeds(values)
     });
   }, [configuration?.ui?.services_feed, fetchJSONNotifications, setServiceFeeds]);
@@ -416,11 +416,11 @@ export default function Services() {
           )}
         </Grid>
       </Grid>
-      <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
+      <div style={{ paddingTop: theme.spacing(2) }}>
         <ServiceTable serviceResults={serviceResults} updates={updates} setService={setService} onUpdate={onUpdate} />
       </div>
 
-      <Grid container alignItems="center" spacing={3} style={{ paddingTop: theme.spacing(2) }}>
+      <Grid container alignItems="center" spacing={3} style={{ paddingTop: theme.spacing(4) }}>
         <Grid item xs>
           <Typography variant="h5">{t('title.available')}</Typography>
           {availableServices ? (
@@ -432,7 +432,7 @@ export default function Services() {
           )}
         </Grid>
       </Grid>
-      <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
+      <div style={{ paddingTop: theme.spacing(2) }}>
         <NewServiceTable
           services={availableServices?.sort((a, b) => a.id.localeCompare(b.id))}
           installingServices={installingServices}

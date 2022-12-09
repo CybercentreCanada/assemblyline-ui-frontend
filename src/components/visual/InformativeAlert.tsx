@@ -5,8 +5,8 @@ import 'moment/locale/fr';
 const StyledAlert = withStyles((theme: Theme) =>
   createStyles({
     root: {
-      marginbottom: theme.spacing(2),
-      marginTop: theme.spacing(4),
+      marginBottom: theme.spacing(2),
+      marginTop: theme.spacing(2),
       color: theme.palette.text.secondary,
       backgroundColor: alpha(theme.palette.text.primary, 0.04)
     },
