@@ -54,6 +54,8 @@
   "no_results_desc": "The query that you ran did not return any results.",
   "no_results_title": "No results found!",
   "no_safelist_title": "No safelisted hash found!",
+  "no_services_title": "No services found!",
+  "no_services_desc": "There are currently no services loaded in the system.",
   "no_services_available_desc": "There are no new services available to be added.",
   "no_services_available_title": "No services found!",
   "no_signatures_title": "No signatures found!",

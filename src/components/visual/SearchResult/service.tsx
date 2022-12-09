@@ -129,8 +129,8 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
     ) : (
       <div style={{ width: '100%' }}>
         <InformativeAlert>
-          <AlertTitle>{t('no_results_title')}</AlertTitle>
-          {t('no_results_desc')}
+          <AlertTitle>{t('no_services_title')}</AlertTitle>
+          {t('no_services_desc')}
         </InformativeAlert>
       </div>
     )
