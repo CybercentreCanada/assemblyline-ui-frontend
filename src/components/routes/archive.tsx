@@ -82,9 +82,9 @@ type SearchResults = {
   total: number;
 };
 
-function Archive({ index }: SearchProps) {
+const WrappedArchive = ({ index }: SearchProps) => {
   const { id } = useParams<ParamProps>();
-  const { t } = useTranslation(['search']);
+  const { t } = useTranslation(['archive']);
   const [pageSize] = useState(PAGE_SIZE);
   const [searching, setSearching] = useState(false);
   const { indexes, user: currentUser, configuration } = useALContext();
@@ -240,7 +240,7 @@ function Archive({ index }: SearchProps) {
   ) : (
     <PageFullWidth margin={4}>
       <div style={{ paddingBottom: theme.spacing(2), textAlign: 'left', width: '100%' }}>
-        <Typography variant="h4">{t(`title_${index || id || 'all'}`)}</Typography>
+        <Typography variant="h4">{t(`title`)}</Typography>
       </div>
       <PageHeader isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
@@ -402,10 +402,11 @@ function Archive({ index }: SearchProps) {
       </div>
     </PageFullWidth>
   );
-}
+};
 
-Archive.defaultProps = {
+WrappedArchive.defaultProps = {
   index: null
 };
 
+export const Archive = React.memo(WrappedArchive);
 export default Archive;
