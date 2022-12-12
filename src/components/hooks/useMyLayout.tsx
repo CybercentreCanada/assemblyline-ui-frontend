@@ -1,6 +1,7 @@
 import AccountCircleOutlinedIcon from '@material-ui/icons/AccountCircleOutlined';
 import AccountTreeOutlinedIcon from '@material-ui/icons/AccountTreeOutlined';
 import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
+import ArchiveOutlinedIcon from '@material-ui/icons/ArchiveOutlined';
 import AssignmentOutlinedIcon from '@material-ui/icons/AssignmentOutlined';
 import BuildOutlinedIcon from '@material-ui/icons/BuildOutlined';
 import BusinessOutlinedIcon from '@material-ui/icons/BusinessOutlined';
@@ -60,6 +61,17 @@ const useMyLayout = (): AppLayoutProps => {
         userPropValidators: [{ prop: 'user.roles', value: 'alert_view' }],
         icon: <NotificationImportantOutlinedIcon />,
         route: '/alerts',
+        nested: false
+      }
+    },
+    {
+      type: 'item' as 'item',
+      element: {
+        id: 'archive',
+        text: t('drawer.archive'),
+        userPropValidators: [{ prop: 'user.roles', value: 'archive_view' }],
+        icon: <ArchiveOutlinedIcon />,
+        route: '/archive',
         nested: false
       }
     },

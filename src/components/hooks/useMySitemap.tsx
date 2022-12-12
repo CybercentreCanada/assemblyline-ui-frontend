@@ -1,6 +1,7 @@
 import AccountCircleOutlinedIcon from '@material-ui/icons/AccountCircleOutlined';
 import AccountTreeOutlinedIcon from '@material-ui/icons/AccountTreeOutlined';
 import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
+import ArchiveOutlinedIcon from '@material-ui/icons/ArchiveOutlined';
 import AssignmentOutlinedIcon from '@material-ui/icons/AssignmentOutlined';
 import BallotOutlinedIcon from '@material-ui/icons/BallotOutlined';
 import BlockIcon from '@material-ui/icons/Block';
@@ -97,6 +98,7 @@ export default function useMySitemap() {
         icon: <BallotOutlinedIcon />,
         breadcrumbs: ['/alerts']
       },
+      { path: '/archive', title: t('drawer.archive'), isRoot: true, icon: <ArchiveOutlinedIcon /> },
       { path: '/dashboard', title: t('drawer.dashboard'), isRoot: true, icon: <DashboardOutlinedIcon /> },
       { path: '/manage', title: t('drawer.manage'), isRoot: true, icon: <BuildOutlinedIcon /> },
       {
