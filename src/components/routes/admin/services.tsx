@@ -14,40 +14,51 @@ import {
   useTheme
 } from '@material-ui/core';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
+import CloudDownloadOutlinedIcon from '@material-ui/icons/CloudDownloadOutlined';
 import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
 import RestoreOutlinedIcon from '@material-ui/icons/RestoreOutlined';
 import SystemUpdateAltIcon from '@material-ui/icons/SystemUpdateAlt';
 import { Skeleton } from '@material-ui/lab';
 import useUser from 'commons/components/hooks/useAppUser';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
+import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
 import Service from 'components/routes/admin/service_detail';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
-import ServiceTable from 'components/visual/SearchResult/service';
+import ServiceTable, { ServiceResult } from 'components/visual/SearchResult/service';
+import NewServiceTable from 'components/visual/ServiceManagement/NewServiceTable';
+import { JSONFeedItem, useNotificationFeed } from 'components/visual/ServiceManagement/useNotificationFeed';
 import getXSRFCookie from 'helpers/xsrf';
 import 'moment/locale/fr';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Redirect } from 'react-router-dom';
 
 export default function Services() {
   const { t } = useTranslation(['adminServices']);
-  const [serviceResults, setServiceResults] = useState(null);
+  const [serviceResults, setServiceResults] = useState<ServiceResult[]>(null);
   const [updates, setUpdates] = useState(null);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState<boolean>(false);
   const [openRestore, setOpenRestore] = useState(false);
   const [restoreConfirmation, setRestoreConfirmation] = useState(false);
   const [manifest, setManifest] = useState('');
   const [restore, setRestore] = useState('');
-  const { showSuccessMessage } = useMySnackbar();
+  const { showSuccessMessage, showInfoMessage, showErrorMessage } = useMySnackbar();
   const theme = useTheme();
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useUser<CustomUser>();
   const { setGlobalDrawer, closeGlobalDrawer } = useDrawer();
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
+  const { configuration } = useALContext();
+  const { fetchJSONNotifications } = useNotificationFeed();
+  const [serviceFeeds, setServiceFeeds] = useState<JSONFeedItem[]>(null);
+  const [availableServices, setAvailableServices] = useState<JSONFeedItem[]>(null);
+  const [installingServices, setInstallingServices] = useState<string[]>([]);
+  const lastInstallingServices = useRef<string[]>([]);
+  const installingServicesTimeout = useRef<NodeJS.Timeout>(null);
 
   const handleAddService = () => {
     apiCall({
@@ -96,29 +107,41 @@ export default function Services() {
     setManifest(event.target.value);
   }
 
-  const reload = () => {
+  const reload = useCallback(() => {
     apiCall({
       url: '/api/v4/service/all/',
-      onSuccess: api_data => {
-        setServiceResults(api_data.api_response);
-      }
+      onSuccess: api_data => setServiceResults(api_data.api_response)
     });
     apiCall({
       url: '/api/v4/service/updates/',
+      onSuccess: api_data => setUpdates(api_data.api_response)
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const pollInstalling = useCallback(first => {
+    apiCall({
+      url: '/api/v4/service/installing/',
       onSuccess: api_data => {
-        setUpdates(api_data.api_response);
+        if (first) {
+          lastInstallingServices.current = api_data.api_response;
+          if (api_data.api_response && api_data.api_response.length > 0)
+            showInfoMessage(`${t('message.installing')} ${api_data.api_response.join(', ')}.`);
+        }
+        setInstallingServices(api_data.api_response);
       }
     });
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (currentUser.is_admin) {
       reload();
+      pollInstalling(true);
     }
-
-    window.addEventListener('reloadServices', reload);
+    window.addEventListener('reloadServicesEvent', reload);
     return () => {
-      window.removeEventListener('reloadServices', reload);
+      window.removeEventListener('reloadServicesEvent', reload);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -164,15 +187,29 @@ export default function Services() {
     [updates]
   );
 
-  const onUpdated = () => {
-    if (!isXL) closeGlobalDrawer();
-    setTimeout(() => window.dispatchEvent(new CustomEvent('reloadServices')), 1000);
-  };
+  const onInstallServices = useCallback(
+    (services: JSONFeedItem[]) => {
+      if (!services) return;
+      apiCall({
+        method: 'PUT',
+        url: '/api/v4/service/install/',
+        body: services.map(s => ({ name: s.summary, image: s.id })),
+        onSuccess: () => pollInstalling(false)
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [pollInstalling]
+  );
 
-  const onDeleted = () => {
+  const onUpdated = useCallback(() => {
+    if (!isXL) closeGlobalDrawer();
+    setTimeout(() => window.dispatchEvent(new CustomEvent('reloadServicesEvent')), 1000);
+  }, [closeGlobalDrawer, isXL]);
+
+  const onDeleted = useCallback(() => {
     closeGlobalDrawer();
-    setTimeout(() => window.dispatchEvent(new CustomEvent('reloadServices')), 1000);
-  };
+    setTimeout(() => window.dispatchEvent(new CustomEvent('reloadServicesEvent')), 1000);
+  }, [closeGlobalDrawer]);
 
   const setService = useCallback(
     (service_name: string) => {
@@ -181,6 +218,60 @@ export default function Services() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
+
+  useEffect(() => {
+    fetchJSONNotifications({
+      urls: configuration?.ui?.services_feed ? [configuration?.ui?.services_feed] : [],
+      onSuccess: values => setServiceFeeds(values)
+    });
+  }, [configuration?.ui?.services_feed, fetchJSONNotifications, setServiceFeeds]);
+
+  useEffect(() => {
+    if (!serviceFeeds || !serviceResults) return;
+    const serviceResultNames = serviceResults.map(result => result?.name);
+    setAvailableServices(serviceFeeds.filter(feed => !serviceResultNames.includes(feed.summary)));
+  }, [serviceFeeds, serviceResults]);
+
+  useEffect(() => {
+    if (!installingServices || installingServices.length === 0) return;
+    if (installingServicesTimeout.current) clearTimeout(installingServicesTimeout.current);
+    installingServicesTimeout.current = setTimeout(() => pollInstalling(false), 10000);
+  }, [installingServices, pollInstalling]);
+
+  useEffect(() => {
+    const diff = installingServices
+      .filter(x => !lastInstallingServices.current.includes(x))
+      .concat(lastInstallingServices.current.filter(x => !installingServices.includes(x)))
+      .sort((a, b) => a.localeCompare(b));
+
+    if (diff.length === 0) return;
+    apiCall({
+      url: '/api/v4/service/installing/',
+      method: 'POST',
+      body: diff,
+      onSuccess: api_data => {
+        const response = api_data.api_response as {
+          installed: string[];
+          installing: string[];
+          not_installed: string[];
+        };
+
+        const installing = response.installing.filter(i => !lastInstallingServices.current.includes(i));
+        if (installing.length > 0) showInfoMessage(`${t('message.installing')} ${installing.join(', ')}.`);
+
+        if (response.installed.length > 0) {
+          showSuccessMessage(`${t('message.installed')} ${response.installed.join(', ')}.`);
+          reload();
+        }
+
+        if (response.not_installed.length > 0)
+          showErrorMessage(`${t('message.failed')} ${response.not_installed.join(', ')}.`);
+
+        lastInstallingServices.current = installingServices;
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [installingServices, showErrorMessage, showInfoMessage, showSuccessMessage, t]);
 
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>
@@ -247,14 +338,9 @@ export default function Services() {
           </Button>
         </DialogActions>
       </Dialog>
-      <Grid container alignItems="center" spacing={3} style={{ paddingBottom: theme.spacing(2) }}>
+      <Grid container alignItems="center" spacing={3}>
         <Grid item xs>
           <Typography variant="h4">{t('title')}</Typography>
-          {serviceResults ? (
-            <Typography variant="caption">{`${serviceResults.length} ${t('count')}`}</Typography>
-          ) : (
-            <Skeleton width="8rem" />
-          )}
         </Grid>
         <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
           <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
@@ -287,6 +373,29 @@ export default function Services() {
                 </IconButton>
               </span>
             </Tooltip>
+            <Tooltip
+              title={
+                availableServices &&
+                availableServices.length > 0 &&
+                availableServices.some(s => !installingServices?.includes(s?.summary))
+                  ? t('install_all')
+                  : t('install_none')
+              }
+            >
+              <span>
+                <IconButton
+                  color="primary"
+                  onClick={() => onInstallServices(availableServices)}
+                  disabled={
+                    !availableServices ||
+                    availableServices.length === 0 ||
+                    availableServices.every(s => installingServices?.includes(s?.summary))
+                  }
+                >
+                  <CloudDownloadOutlinedIcon />
+                </IconButton>
+              </span>
+            </Tooltip>
             <Tooltip title={t('backup')}>
               <IconButton component={MaterialLink} href={`/api/v4/service/backup/?XSRF_TOKEN=${getXSRFCookie()}`}>
                 <GetAppOutlinedIcon color="action" />
@@ -301,8 +410,38 @@ export default function Services() {
         </Grid>
       </Grid>
 
-      <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
+      <Grid container alignItems="center" spacing={3}>
+        <Grid item xs>
+          <Typography variant="h5">{t('title.loaded')}</Typography>
+          {serviceResults ? (
+            <Typography variant="caption" component="p">{`${serviceResults.length} ${t('count')}`}</Typography>
+          ) : (
+            <Skeleton width="8rem" />
+          )}
+        </Grid>
+      </Grid>
+      <div style={{ paddingTop: theme.spacing(2) }}>
         <ServiceTable serviceResults={serviceResults} updates={updates} setService={setService} onUpdate={onUpdate} />
+      </div>
+
+      <Grid container alignItems="center" spacing={3} style={{ paddingTop: theme.spacing(4) }}>
+        <Grid item xs>
+          <Typography variant="h5">{t('title.available')}</Typography>
+          {availableServices ? (
+            <Typography variant="caption" component="p">{`${availableServices.length} ${t(
+              'count.available'
+            )}`}</Typography>
+          ) : (
+            <Skeleton width="8rem" />
+          )}
+        </Grid>
+      </Grid>
+      <div style={{ paddingTop: theme.spacing(2) }}>
+        <NewServiceTable
+          services={availableServices?.sort((a, b) => a.id.localeCompare(b.id))}
+          installingServices={installingServices}
+          onInstall={onInstallServices}
+        />
       </div>
     </PageFullWidth>
   ) : (
