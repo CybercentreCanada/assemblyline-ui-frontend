@@ -11,9 +11,9 @@ import {
   useMediaQuery,
   useTheme
 } from '@material-ui/core';
+import ArchiveIcon from '@material-ui/icons/Archive';
+import ArchiveOutlinedIcon from '@material-ui/icons/ArchiveOutlined';
 import CenterFocusStrongOutlinedIcon from '@material-ui/icons/CenterFocusStrongOutlined';
-import FolderIcon from '@material-ui/icons/Folder';
-import FolderOutlinedIcon from '@material-ui/icons/FolderOutlined';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
@@ -87,7 +87,7 @@ function Search({ index }: SearchProps) {
   const { t } = useTranslation(['search']);
   const [pageSize] = useState(PAGE_SIZE);
   const [searching, setSearching] = useState(false);
-  const { indexes, user: currentUser } = useALContext();
+  const { indexes, user: currentUser, configuration } = useALContext();
   const location = useLocation();
   const history = useHistory();
   const theme = useTheme();
@@ -252,24 +252,35 @@ function Search({ index }: SearchProps) {
             onValueChange={onFilterValueChange}
             onClear={onClear}
             onSearch={onSearch}
-            buttons={[
-              {
-                icon:
-                  query && query.get('use_archive') === 'true' ? (
-                    <FolderIcon fontSize={downSM ? 'small' : 'medium'} />
-                  ) : (
-                    <FolderOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />
-                  ),
-                tooltip:
-                  query && query.get('use_archive') === 'true' ? t('use_archive.turn_off') : t('use_archive.turn_on'),
-                props: {
-                  onClick: () => {
-                    query.set('use_archive', !query.has('use_archive') ? 'true' : query.get('use_archive') === 'false');
-                    history.push(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                  }
-                }
-              }
-            ]}
+            buttons={
+              configuration.datastore.archive.enabled &&
+              currentUser.roles.includes('archive_view') &&
+              ['submission', 'result', 'file', 'all'].includes(index || id || 'all')
+                ? [
+                    {
+                      icon:
+                        query && query.get('use_archive') === 'true' ? (
+                          <ArchiveIcon fontSize={downSM ? 'small' : 'medium'} />
+                        ) : (
+                          <ArchiveOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />
+                        ),
+                      tooltip:
+                        query && query.get('use_archive') === 'true'
+                          ? t('use_archive.turn_off')
+                          : t('use_archive.turn_on'),
+                      props: {
+                        onClick: () => {
+                          query.set(
+                            'use_archive',
+                            !query.has('use_archive') ? 'true' : query.get('use_archive') === 'false'
+                          );
+                          history.push(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                        }
+                      }
+                    }
+                  ]
+                : []
+            }
           />
 
           {!(index || id) && query && query.get('query') && (

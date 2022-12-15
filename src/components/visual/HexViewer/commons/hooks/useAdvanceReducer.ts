@@ -191,10 +191,7 @@ export const useAdvanceReducer = <State, Action>(
     [changeCallback]
   );
 
-  const updateMemo: UpdateMemo<{ store: State }, State> = React.useMemo(
-    () => updateCallback({ store: initialStateRef.current }),
-    [updateCallback]
-  );
+  const updateMemo = React.useMemo(() => updateCallback({ store: initialStateRef.current }), [updateCallback]);
 
   return [store, dispatchCallback, updateMemo, nextStateRef];
 };

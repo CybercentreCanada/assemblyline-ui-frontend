@@ -58,6 +58,11 @@ export type ConfigurationDefinition = {
     allow_extended_apikeys: boolean;
     allow_security_tokens: boolean;
   };
+  datastore: {
+    archive: {
+      enabled: boolean;
+    };
+  };
   submission: {
     dtl: number;
     max_dtl: number;

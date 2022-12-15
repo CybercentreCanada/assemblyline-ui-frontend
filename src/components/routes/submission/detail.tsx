@@ -8,6 +8,7 @@ import {
   Typography,
   useTheme
 } from '@material-ui/core';
+import ArchiveOutlinedIcon from '@material-ui/icons/ArchiveOutlined';
 import BugReportOutlinedIcon from '@material-ui/icons/BugReportOutlined';
 import ChromeReaderModeOutlinedIcon from '@material-ui/icons/ChromeReaderModeOutlined';
 import CloseIcon from '@material-ui/icons/Close';
@@ -439,6 +440,22 @@ function WrappedSubmissionDetail() {
       setWatchQueue(null);
     }
   }, [socket]);
+
+  const archive = useCallback(() => {
+    if (submission != null) {
+      apiCall({
+        method: 'PUT',
+        url: `/api/v4/archive/${submission.sid}/`,
+        onSuccess: api_data => {
+          showSuccessMessage(
+            t(api_data.api_response.action === 'archive' ? 'archive.success' : 'archive.success.resubmit')
+          );
+          setSubmission({ ...submission, archived: true });
+        }
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showSuccessMessage, submission, t]);
 
   const resubmit = useCallback(() => {
     if (submission != null) {
@@ -905,53 +922,64 @@ function WrappedSubmissionDetail() {
               <div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                   {submission ? (
-                    <div>
-                      {currentUser.roles.includes('submission_delete') && (
-                        <Tooltip title={t('delete')}>
-                          <IconButton
-                            onClick={() => setDeleteDialog(true)}
-                            style={{
-                              color:
-                                theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                            }}
-                          >
-                            <RemoveCircleOutlineOutlinedIcon />
+                    submission.state === 'completed' && (
+                      <div>
+                        {currentUser.roles.includes('submission_delete') && (
+                          <Tooltip title={t('delete')}>
+                            <IconButton
+                              onClick={() => setDeleteDialog(true)}
+                              style={{
+                                color:
+                                  theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                              }}
+                            >
+                              <RemoveCircleOutlineOutlinedIcon />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                        {currentUser.roles.includes('bundle_download') && (
+                          <Tooltip title={t('download')}>
+                            <IconButton
+                              component={MaterialLink}
+                              href={`/api/v4/bundle/${submission.sid}/?XSRF_TOKEN=${getXSRFCookie()}`}
+                            >
+                              <CloudDownloadOutlinedIcon color="action" />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                        {systemConfig.datastore.archive.enabled && currentUser.roles.includes('archive_trigger') && (
+                          <Tooltip title={t(submission.archived ? 'archived' : 'archive')}>
+                            <span>
+                              <IconButton onClick={archive} disabled={submission.archived}>
+                                <ArchiveOutlinedIcon />
+                              </IconButton>
+                            </span>
+                          </Tooltip>
+                        )}
+                        {currentUser.roles.includes('submission_create') && (
+                          <Tooltip title={t('resubmit')}>
+                            <IconButton onClick={resubmit}>
+                              <ReplayOutlinedIcon />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                        {systemConfig.ui.allow_replay && currentUser.roles.includes('replay_trigger') && (
+                          <Tooltip title={t('replay')}>
+                            <IconButton onClick={replay} disabled={submission.metadata.replay}>
+                              <PublishOutlinedIcon />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                        <Tooltip title={t('report_view')}>
+                          <IconButton component={Link} to={`/submission/report/${submission.sid}`}>
+                            <ChromeReaderModeOutlinedIcon />
                           </IconButton>
                         </Tooltip>
-                      )}
-                      {currentUser.roles.includes('bundle_download') && (
-                        <Tooltip title={t('download')}>
-                          <IconButton
-                            component={MaterialLink}
-                            href={`/api/v4/bundle/${submission.sid}/?XSRF_TOKEN=${getXSRFCookie()}`}
-                          >
-                            <CloudDownloadOutlinedIcon color="action" />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                      {currentUser.roles.includes('submission_create') && (
-                        <Tooltip title={t('resubmit')}>
-                          <IconButton onClick={resubmit}>
-                            <ReplayOutlinedIcon />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                      {systemConfig.ui.allow_replay && currentUser.roles.includes('replay_trigger') && (
-                        <Tooltip title={t('replay')}>
-                          <IconButton onClick={replay} disabled={submission.metadata.replay}>
-                            <PublishOutlinedIcon />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                      <Tooltip title={t('report_view')}>
-                        <IconButton component={Link} to={`/submission/report/${submission.sid}`}>
-                          <ChromeReaderModeOutlinedIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </div>
+                      </div>
+                    )
                   ) : (
                     <div style={{ display: 'inline-flex' }}>
-                      {[...Array(systemConfig.ui.allow_replay ? 5 : 4)].map((_, i) => (
+                      {[...Array(systemConfig.ui.allow_replay ? 6 : 5)].map((_, i) => (
                         <Skeleton
                           key={i}
                           variant="circle"
@@ -970,54 +998,58 @@ function WrappedSubmissionDetail() {
                     }}
                   >
                     {submission ? (
-                      <>
-                        <VerdictBar verdicts={submission.verdict} />
-                        {currentUser.roles.includes('submission_manage') && (
-                          <Grid container>
-                            <Grid item xs={5} style={{ textAlign: 'left' }}>
-                              <Tooltip
-                                title={t(
-                                  `verdict.${
-                                    submission.verdict.malicious.indexOf(currentUser.username) !== -1 ? 'is' : 'set'
-                                  }.malicious`
-                                )}
-                              >
-                                <IconButton size="small" onClick={() => setVerdict('malicious')}>
-                                  <BugReportOutlinedIcon
-                                    style={{
-                                      color:
-                                        submission.verdict.malicious.indexOf(currentUser.username) !== -1
-                                          ? theme.palette.error.dark
-                                          : null
-                                    }}
-                                  />
-                                </IconButton>
-                              </Tooltip>
+                      submission.state === 'completed' && (
+                        <>
+                          <VerdictBar verdicts={submission.verdict} />
+                          {currentUser.roles.includes('submission_manage') && (
+                            <Grid container>
+                              <Grid item xs={5} style={{ textAlign: 'left' }}>
+                                <Tooltip
+                                  title={t(
+                                    `verdict.${
+                                      submission.verdict.malicious.indexOf(currentUser.username) !== -1 ? 'is' : 'set'
+                                    }.malicious`
+                                  )}
+                                >
+                                  <IconButton size="small" onClick={() => setVerdict('malicious')}>
+                                    <BugReportOutlinedIcon
+                                      style={{
+                                        color:
+                                          submission.verdict.malicious.indexOf(currentUser.username) !== -1
+                                            ? theme.palette.error.dark
+                                            : null
+                                      }}
+                                    />
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
+                              <Grid item xs={2} />
+                              <Grid item xs={5} style={{ textAlign: 'right' }}>
+                                <Tooltip
+                                  title={t(
+                                    `verdict.${
+                                      submission.verdict.non_malicious.indexOf(currentUser.username) !== -1
+                                        ? 'is'
+                                        : 'set'
+                                    }.non_malicious`
+                                  )}
+                                >
+                                  <IconButton size="small" onClick={() => setVerdict('non_malicious')}>
+                                    <VerifiedUserOutlinedIcon
+                                      style={{
+                                        color:
+                                          submission.verdict.non_malicious.indexOf(currentUser.username) !== -1
+                                            ? theme.palette.success.dark
+                                            : null
+                                      }}
+                                    />
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
                             </Grid>
-                            <Grid item xs={2} />
-                            <Grid item xs={5} style={{ textAlign: 'right' }}>
-                              <Tooltip
-                                title={t(
-                                  `verdict.${
-                                    submission.verdict.non_malicious.indexOf(currentUser.username) !== -1 ? 'is' : 'set'
-                                  }.non_malicious`
-                                )}
-                              >
-                                <IconButton size="small" onClick={() => setVerdict('non_malicious')}>
-                                  <VerifiedUserOutlinedIcon
-                                    style={{
-                                      color:
-                                        submission.verdict.non_malicious.indexOf(currentUser.username) !== -1
-                                          ? theme.palette.success.dark
-                                          : null
-                                    }}
-                                  />
-                                </IconButton>
-                              </Tooltip>
-                            </Grid>
-                          </Grid>
-                        )}
-                      </>
+                          )}
+                        </>
+                      )
                     ) : (
                       <>
                         <Skeleton variant="rect" style={{ height: '15px', width: '100%' }} />
