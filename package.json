@@ -30,6 +30,7 @@
     "i18next-browser-languagedetector": "^6.1.2",
     "material-ui-chip-input": "^1.1.0",
     "md5": "^2.3.0",
+    "monaco-editor": "^0.34.1",
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.39",
     "node-fetch": "^3.3.0",
