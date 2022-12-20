@@ -25,7 +25,7 @@ const useHexStyles = makeStyles(theme => ({
     width: '100%',
     maxWidth: '1200px',
     '&:hover': {
-      backgroundColor: theme.palette.action.hover
+      backgroundColor: theme.palette.type === 'dark' ? '#484848' : '#FAFAFA'
     }
   },
   divider: {
@@ -43,7 +43,7 @@ const WrappedHexDesktopHeader = ({ store }: StoreProps) => {
 
   return (
     <div className={classes.root} ref={toolbarRef} onMouseEnter={() => onBodyMouseLeave()}>
-      <Paper component="form" className={classes.toolbar}>
+      <Paper component="form" className={classes.toolbar} elevation={2}>
         <HexSearchTypes store={store} />
         <HexSearchBar store={store} />
         <Divider className={classes.divider} orientation="vertical" />
