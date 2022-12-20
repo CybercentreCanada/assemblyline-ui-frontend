@@ -54,16 +54,18 @@ const WrappedJSONBody = ({ body, printable }) => {
         name={false}
         src={body}
         theme={jsonTheme}
-        enableClipboard={false}
-        collapsed
-        groupArraysAfterLength={10}
+        indentWidth={2}
+        iconStyle="square"
+        groupArraysAfterLength={25}
         displayDataTypes={false}
-        displayObjectSize={false}
+        shouldCollapse={field => Object.keys(field.src).length > 25}
         style={{
           backgroundColor: theme.palette.type === 'dark' ? '#FFFFFF05' : '#00000005',
           border: `1px solid ${theme.palette.divider}`,
           borderRadius: '4px',
-          padding: '4px'
+          padding: '4px',
+          maxHeight: '500px',
+          overflow: 'auto'
         }}
       />
     );

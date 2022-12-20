@@ -174,7 +174,7 @@ export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
                 <Tooltip title={t('related')}>
                   <IconButton
                     component={Link}
-                    to={`/search/submission?query=files.sha256:${error.sha256} OR results:${error.sha256}*`}
+                    to={`/search/submission?query=files.sha256:${error.sha256} OR results:${error.sha256}* OR errors:${error.sha256}*`}
                   >
                     <AmpStoriesOutlinedIcon />
                   </IconButton>
