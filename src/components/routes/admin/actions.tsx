@@ -21,8 +21,6 @@ import { useTranslation } from 'react-i18next';
 import ReactResizeDetector from 'react-resize-detector';
 import { Redirect } from 'react-router-dom';
 
-loader.config({ paths: { vs: '/cdn/monaco/' } });
-
 export default function AdminActions() {
   const { t, i18n } = useTranslation(['adminActions']);
   const theme = useTheme();
