@@ -264,7 +264,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                   <Tooltip title={t('related')}>
                     <IconButton
                       component={Link}
-                      to={`/search/submission?query=files.sha256:${file.file_info.sha256} OR results:${file.file_info.sha256}*`}
+                      to={`/search/submission?query=files.sha256:${file.file_info.sha256} OR results:${file.file_info.sha256}* OR errors:${file.file_info.sha256}*`}
                     >
                       <AmpStoriesOutlinedIcon />
                     </IconButton>

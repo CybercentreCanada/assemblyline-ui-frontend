@@ -73,12 +73,23 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'column',
     paddingTop: theme.spacing(2)
+  },
+  container: {
+    flexGrow: 1,
+    border: `1px solid ${theme.palette.divider}`,
+    position: 'relative'
+  },
+  innerContainer: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0
   }
 }));
 
 const WrappedMonacoViewer = ({ data, type, error, beautify = false }) => {
   const classes = useStyles();
-  const theme = useTheme();
   const containerEL = useRef<HTMLDivElement>();
   const { isDarkTheme } = useAppContext();
 
@@ -131,23 +142,8 @@ const WrappedMonacoViewer = ({ data, type, error, beautify = false }) => {
   };
 
   return data !== null && data !== undefined ? (
-    <div
-      ref={containerEL}
-      style={{
-        flexGrow: 1,
-        border: `1px solid ${theme.palette.divider}`,
-        position: 'relative'
-      }}
-    >
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          bottom: 0,
-          left: 0,
-          right: 0
-        }}
-      >
+    <div ref={containerEL} className={classes.container}>
+      <div className={classes.innerContainer}>
         <ReactResizeDetector handleHeight handleWidth targetRef={containerEL}>
           {({ width, height }) => (
             <div ref={containerEL}>
@@ -340,7 +336,10 @@ const FileViewer = () => {
               )}
               {currentUser.roles.includes('submission_view') && (
                 <Tooltip title={t('related')}>
-                  <IconButton component={Link} to={`/search/submission?query=files.sha256:${id} OR results:${id}*`}>
+                  <IconButton
+                    component={Link}
+                    to={`/search/submission?query=files.sha256:${id} OR results:${id}* OR errors:${id}*`}
+                  >
                     <AmpStoriesOutlinedIcon />
                   </IconButton>
                 </Tooltip>
@@ -361,7 +360,7 @@ const FileViewer = () => {
       </div>
       {sha256 && tab !== null ? (
         <div className={classes.main}>
-          <Paper square style={{ marginTop: theme.spacing(4), marginBottom: theme.spacing(2) }}>
+          <Paper square style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(1) }}>
             <Tabs
               value={tab}
               onChange={handleChangeTab}
