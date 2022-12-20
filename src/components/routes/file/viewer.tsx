@@ -6,6 +6,7 @@ import {
   makeStyles,
   Paper,
   Tab,
+  Tabs,
   Tooltip,
   Typography,
   useTheme
@@ -13,15 +14,18 @@ import {
 import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
 import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
 import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
-import { Alert, Skeleton, TabContext, TabList, TabPanel } from '@material-ui/lab';
+import Editor from '@monaco-editor/react';
+import { Alert, Skeleton } from '@material-ui/lab';
 import clsx from 'clsx';
-import PageCenter from 'commons/components/layout/pages/PageCenter';
+import PageFullSize from 'commons/components/layout/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import Empty from 'components/visual/Empty';
 import { HexViewerApp } from 'components/visual/HexViewer';
+import ReactResizeDetector from 'react-resize-detector';
 import getXSRFCookie from 'helpers/xsrf';
-import React, { useEffect, useState } from 'react';
+import useAppContext from 'commons/components/hooks/useAppContext';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory, useLocation, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
@@ -57,14 +61,109 @@ const useStyles = makeStyles(theme => ({
     width: '100%',
     maxWidth: '1200px',
     padding: 0
+  },
+  main: {
+    marginTop: theme.spacing(1),
+    flexGrow: 1,
+    display: 'flex',
+    flexDirection: 'column'
+  },
+  tab: {
+    flexGrow: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    paddingTop: theme.spacing(2)
   }
 }));
 
-const WrappedAsciiViewer = ({ ascii, error }) => {
+const WrappedMonacoViewer = ({ data, type, error, beautify = false }) => {
   const classes = useStyles();
+  const theme = useTheme();
+  const containerEL = useRef<HTMLDivElement>();
+  const { isDarkTheme } = useAppContext();
 
-  return ascii !== null && ascii !== undefined ? (
-    <pre className={classes.pre}>{ascii}</pre>
+  const beautifyJSON = inputData => {
+    if (!beautify) return inputData;
+
+    try {
+      return JSON.stringify(JSON.parse(inputData), null, 4);
+    } catch {
+      return inputData;
+    }
+  };
+
+  const languageSelector = {
+    'text/json': 'json',
+    'text/jsons': 'json',
+    'code/vbe': 'vb',
+    'code/vbs': 'vb',
+    'code/wsf': 'xml',
+    'code/batch': 'bat',
+    'code/ps1': 'powershell',
+    'text/ini': 'ini',
+    'text/autorun': 'ini',
+    'code/java': 'java',
+    'code/python': 'python',
+    'code/php': 'php',
+    'code/shell': 'shell',
+    'code/xml': 'xml',
+    'code/yaml': 'yaml',
+    'code/javascript': 'javascript',
+    'code/jscript': 'javascript',
+    'code/typescript': 'typescript',
+    'code/xfa': 'xml',
+    'code/html': 'html',
+    'code/hta': 'html',
+    'code/html/component': 'html',
+    'code/csharp': 'csharp',
+    'code/jsp': 'java',
+    'code/c': 'cpp',
+    'code/h': 'cpp',
+    'code/clickonce': 'xml',
+    'code/css': 'css',
+    'code/markdown': 'markdown',
+    'code/sql': 'sql',
+    'code/go': 'go',
+    'code/ruby': 'ruby',
+    'code/perl': 'perl',
+    'code/rust': 'rust',
+    'code/lisp': 'lisp'
+  };
+
+  return data !== null && data !== undefined ? (
+    <div
+      ref={containerEL}
+      style={{
+        flexGrow: 1,
+        border: `1px solid ${theme.palette.divider}`,
+        position: 'relative'
+      }}
+    >
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0
+        }}
+      >
+        <ReactResizeDetector handleHeight handleWidth targetRef={containerEL}>
+          {({ width, height }) => (
+            <div ref={containerEL}>
+              <Editor
+                language={languageSelector[type]}
+                width={width}
+                height={height}
+                theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                value={beautifyJSON(data)}
+                options={{ readOnly: true }}
+              />
+            </div>
+          )}
+        </ReactResizeDetector>
+      </div>
+    </div>
   ) : error ? (
     <Alert severity="error">{error}</Alert>
   ) : (
@@ -92,18 +191,6 @@ const WrappedHexViewer = ({ hex, error }) => {
   );
 };
 
-const WrappedStringViewer = ({ string, error }) => {
-  const classes = useStyles();
-
-  return string !== null && string !== undefined ? (
-    <pre className={classes.pre}>{string}</pre>
-  ) : error ? (
-    <Alert severity="error">{error}</Alert>
-  ) : (
-    <LinearProgress />
-  );
-};
-
 const WrappedImageViewer = ({ image, error }) => {
   const classes = useStyles();
 
@@ -116,9 +203,8 @@ const WrappedImageViewer = ({ image, error }) => {
   );
 };
 
-const AsciiViewer = React.memo(WrappedAsciiViewer);
+const MonacoViewer = React.memo(WrappedMonacoViewer);
 const HexViewer = React.memo(WrappedHexViewer);
-const StringViewer = React.memo(WrappedStringViewer);
 const ImageViewer = React.memo(WrappedImageViewer);
 
 const FileViewer = () => {
@@ -135,6 +221,7 @@ const FileViewer = () => {
   const [error, setError] = useState(null);
   const [image, setImage] = useState(null);
   const [imageAllowed, setImageAllowed] = useState(false);
+  const [type, setType] = useState('unknown');
   const [tab, setTab] = useState(null);
   const [sha256, setSha256] = useState(null);
   const { user: currentUser } = useALContext();
@@ -158,6 +245,7 @@ const FileViewer = () => {
         const imgAllowed = api_data.api_response.is_section_image === true;
         if (!imgAllowed && tab === 'image') setTab('ascii');
         setImageAllowed(imgAllowed);
+        setType(api_data.api_response.type);
         setSha256(id);
       }
     });
@@ -232,8 +320,8 @@ const FileViewer = () => {
   }, [sha256, tab]);
 
   return currentUser.roles.includes('file_detail') ? (
-    <PageCenter margin={4} width="100%" textAlign="left" maxWidth="100%">
-      <div className={classes.flexContainer}>
+    <PageFullSize margin={4}>
+      <div style={{ marginBottom: theme.spacing(2), textAlign: 'left' }}>
         <Grid className={classes.flexItem} container alignItems="center">
           <Grid item xs sm={8}>
             <Typography variant="h4">{t('title')}</Typography>
@@ -271,39 +359,45 @@ const FileViewer = () => {
           </Grid>
         </Grid>
       </div>
-
       {sha256 && tab !== null ? (
-        <TabContext value={tab}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-            <Paper
-              className={classes.flexItem}
-              square
-              style={{ marginTop: theme.spacing(4), marginBottom: theme.spacing(2) }}
+        <div className={classes.main}>
+          <Paper square style={{ marginTop: theme.spacing(4), marginBottom: theme.spacing(2) }}>
+            <Tabs
+              value={tab}
+              onChange={handleChangeTab}
+              indicatorColor="primary"
+              textColor="primary"
+              variant="scrollable"
+              scrollButtons="auto"
             >
-              <TabList onChange={handleChangeTab} indicatorColor="primary" textColor="primary">
-                <Tab label={t('ascii')} value="ascii" />
-                <Tab label={t('strings')} value="strings" />
-                <Tab label={t('hex')} value="hex" />
-                {imageAllowed ? <Tab label={t('image')} value="image" /> : <Empty />}
-              </TabList>
-            </Paper>
+              <Tab label={t('ascii')} value="ascii" />
+              <Tab label={t('strings')} value="strings" />
+              <Tab label={t('hex')} value="hex" />
+              {imageAllowed ? <Tab label={t('image')} value="image" /> : <Empty />}
+            </Tabs>
+          </Paper>
 
-            <TabPanel value="ascii" className={clsx(classes.flexItem, classes.no_pad)}>
-              <AsciiViewer ascii={ascii} error={error} />
-            </TabPanel>
-            <TabPanel value="strings" className={clsx(classes.flexItem, classes.no_pad)}>
-              <StringViewer string={string} error={error} />
-            </TabPanel>
-            <TabPanel value="hex" className={clsx(classes.no_pad)} style={{ width: '100%', maxWidth: '100%' }}>
+          {tab === 'ascii' && (
+            <div className={classes.tab}>
+              <MonacoViewer data={ascii} type={type} error={error} beautify />
+            </div>
+          )}
+          {tab === 'strings' && (
+            <div className={classes.tab}>
+              <MonacoViewer data={string} type={type} error={error} />
+            </div>
+          )}
+          {tab === 'hex' && (
+            <div className={classes.tab}>
               <HexViewer hex={hex} error={error} />
-            </TabPanel>
-            {imageAllowed && (
-              <TabPanel value="image" className={clsx(classes.flexItem)} style={{ paddingLeft: 0, paddingRight: 0 }}>
-                <ImageViewer image={image} error={error} />
-              </TabPanel>
-            )}
-          </div>
-        </TabContext>
+            </div>
+          )}
+          {tab === 'image' && (
+            <div className={classes.tab}>
+              <ImageViewer image={image} error={error} />{' '}
+            </div>
+          )}
+        </div>
       ) : (
         <div className={classes.flexContainer}>
           <div className={classes.flexItem} style={{ marginTop: theme.spacing(4), marginBottom: theme.spacing(2) }}>
@@ -311,7 +405,7 @@ const FileViewer = () => {
           </div>
         </div>
       )}
-    </PageCenter>
+    </PageFullSize>
   ) : (
     <ForbiddenPage />
   );
