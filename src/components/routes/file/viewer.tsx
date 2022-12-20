@@ -16,7 +16,6 @@ import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
 import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
 import Editor from '@monaco-editor/react';
 import { Alert, Skeleton } from '@material-ui/lab';
-import clsx from 'clsx';
 import PageFullSize from 'commons/components/layout/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -35,32 +34,14 @@ type ParamProps = {
 };
 
 const useStyles = makeStyles(theme => ({
-  pre: {
-    backgroundColor: theme.palette.type === 'dark' ? '#ffffff05' : '#00000005',
+  hexWrapper: {
+    backgroundColor: theme.palette.type === 'dark' ? '#1e1e1e' : '#FFFFFF',
     border: `1px solid ${theme.palette.divider}`,
-    borderRadius: '4px',
-    fontSize: '1rem',
-    padding: '16px 8px',
-    margin: '0.25rem 0',
-    overflow: 'auto',
-    wordBreak: 'break-word'
-  },
-  no_pad: {
-    padding: 0
+    padding: theme.spacing(1)
   },
   img: {
     maxWidth: '100%',
     maxHeight: '100%'
-  },
-  flexContainer: {
-    display: 'flex',
-    alignContent: 'center',
-    justifyContent: 'center'
-  },
-  flexItem: {
-    width: '100%',
-    maxWidth: '1200px',
-    padding: 0
   },
   main: {
     marginTop: theme.spacing(1),
@@ -163,27 +144,20 @@ const WrappedMonacoViewer = ({ data, type, error, beautify = false }) => {
   ) : error ? (
     <Alert severity="error">{error}</Alert>
   ) : (
-    <LinearProgress className={classes.flexItem} />
+    <LinearProgress />
   );
 };
 
 const WrappedHexViewer = ({ hex, error }) => {
   const classes = useStyles();
-
   return hex ? (
-    <pre className={classes.pre}>
+    <div className={classes.hexWrapper}>
       <HexViewerApp data={hex} />
-    </pre>
+    </div>
   ) : error ? (
-    <div className={clsx(classes.flexContainer)}>
-      <Alert className={clsx(classes.flexItem)} severity="error">
-        {error}
-      </Alert>
-    </div>
+    <Alert severity="error">{error}</Alert>
   ) : (
-    <div className={clsx(classes.flexContainer)}>
-      <LinearProgress className={clsx(classes.flexItem)} />
-    </div>
+    <LinearProgress />
   );
 };
 
@@ -317,50 +291,48 @@ const FileViewer = () => {
 
   return currentUser.roles.includes('file_detail') ? (
     <PageFullSize margin={4}>
-      <div style={{ marginBottom: theme.spacing(2), textAlign: 'left' }}>
-        <Grid className={classes.flexItem} container alignItems="center">
-          <Grid item xs sm={8}>
-            <Typography variant="h4">{t('title')}</Typography>
-            <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
-              {id}
-            </Typography>
-          </Grid>
-          <Grid item xs={12} sm>
-            <div style={{ textAlign: 'right' }}>
-              {currentUser.roles.includes('submission_view') && (
-                <Tooltip title={t('detail')}>
-                  <IconButton component={Link} to={`/file/detail/${id}`}>
-                    <DescriptionOutlinedIcon />
-                  </IconButton>
-                </Tooltip>
-              )}
-              {currentUser.roles.includes('submission_view') && (
-                <Tooltip title={t('related')}>
-                  <IconButton
-                    component={Link}
-                    to={`/search/submission?query=files.sha256:${id} OR results:${id}* OR errors:${id}*`}
-                  >
-                    <AmpStoriesOutlinedIcon />
-                  </IconButton>
-                </Tooltip>
-              )}
-              {currentUser.roles.includes('file_download') && (
-                <Tooltip title={t('download')}>
-                  <IconButton
-                    component={MaterialLink}
-                    href={`/api/v4/file/download/${id}/?XSRF_TOKEN=${getXSRFCookie()}`}
-                  >
-                    <GetAppOutlinedIcon color="action" />
-                  </IconButton>
-                </Tooltip>
-              )}
-            </div>
-          </Grid>
+      <Grid container alignItems="center">
+        <Grid item xs>
+          <Typography variant="h4">{t('title')}</Typography>
+          <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
+            {id}
+          </Typography>
         </Grid>
-      </div>
+        <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
+          <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
+            {currentUser.roles.includes('submission_view') && (
+              <Tooltip title={t('detail')}>
+                <IconButton component={Link} to={`/file/detail/${id}`}>
+                  <DescriptionOutlinedIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+            {currentUser.roles.includes('submission_view') && (
+              <Tooltip title={t('related')}>
+                <IconButton
+                  component={Link}
+                  to={`/search/submission?query=files.sha256:${id} OR results:${id}* OR errors:${id}*`}
+                >
+                  <AmpStoriesOutlinedIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+            {currentUser.roles.includes('file_download') && (
+              <Tooltip title={t('download')}>
+                <IconButton
+                  component={MaterialLink}
+                  href={`/api/v4/file/download/${id}/?XSRF_TOKEN=${getXSRFCookie()}`}
+                >
+                  <GetAppOutlinedIcon color="action" />
+                </IconButton>
+              </Tooltip>
+            )}
+          </div>
+        </Grid>
+      </Grid>
       {sha256 && tab !== null ? (
         <div className={classes.main}>
-          <Paper square style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(1) }}>
+          <Paper square style={{ marginTop: theme.spacing(2), marginBottom: theme.spacing(1) }}>
             <Tabs
               value={tab}
               onChange={handleChangeTab}
@@ -398,11 +370,11 @@ const FileViewer = () => {
           )}
         </div>
       ) : (
-        <div className={classes.flexContainer}>
-          <div className={classes.flexItem} style={{ marginTop: theme.spacing(4), marginBottom: theme.spacing(2) }}>
-            <Skeleton variant="rect" height={theme.spacing(6)} />
-          </div>
-        </div>
+        <Skeleton
+          variant="rect"
+          height={theme.spacing(6)}
+          style={{ marginTop: theme.spacing(2), marginBottom: theme.spacing(2) }}
+        />
       )}
     </PageFullSize>
   ) : (
