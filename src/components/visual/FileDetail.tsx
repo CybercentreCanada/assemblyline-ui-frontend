@@ -147,7 +147,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
 
   const resubmit = useCallback(() => {
     apiCall({
-      url: `/api/v4/submit/dynamic/${sha256}/`,
+      url: `/api/v4/submit/dynamic/${sha256}/${sid ? `?copy_sid=${sid}` : ''}`,
       onSuccess: api_data => {
         showSuccessMessage(t('resubmit.success'));
         setTimeout(() => {
