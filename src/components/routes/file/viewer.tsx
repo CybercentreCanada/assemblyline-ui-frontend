@@ -6,6 +6,7 @@ import {
   makeStyles,
   Paper,
   Tab,
+  Tabs,
   Tooltip,
   Typography,
   useTheme
@@ -13,15 +14,17 @@ import {
 import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
 import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
 import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
-import { Alert, Skeleton, TabContext, TabList, TabPanel } from '@material-ui/lab';
-import clsx from 'clsx';
-import PageCenter from 'commons/components/layout/pages/PageCenter';
+import Editor from '@monaco-editor/react';
+import { Alert, Skeleton } from '@material-ui/lab';
+import PageFullSize from 'commons/components/layout/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import Empty from 'components/visual/Empty';
 import { HexViewerApp } from 'components/visual/HexViewer';
+import ReactResizeDetector from 'react-resize-detector';
 import getXSRFCookie from 'helpers/xsrf';
-import React, { useEffect, useState } from 'react';
+import useAppContext from 'commons/components/hooks/useAppContext';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory, useLocation, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
@@ -31,72 +34,126 @@ type ParamProps = {
 };
 
 const useStyles = makeStyles(theme => ({
-  pre: {
-    backgroundColor: theme.palette.type === 'dark' ? '#ffffff05' : '#00000005',
+  hexWrapper: {
+    backgroundColor: theme.palette.type === 'dark' ? '#1e1e1e' : '#FFFFFF',
     border: `1px solid ${theme.palette.divider}`,
-    borderRadius: '4px',
-    fontSize: '1rem',
-    padding: '16px 8px',
-    margin: '0.25rem 0',
-    overflow: 'auto',
-    wordBreak: 'break-word'
-  },
-  no_pad: {
-    padding: 0
+    padding: theme.spacing(1)
   },
   img: {
     maxWidth: '100%',
     maxHeight: '100%'
   },
-  flexContainer: {
+  main: {
+    marginTop: theme.spacing(1),
+    flexGrow: 1,
     display: 'flex',
-    alignContent: 'center',
-    justifyContent: 'center'
+    flexDirection: 'column'
   },
-  flexItem: {
-    width: '100%',
-    maxWidth: '1200px',
-    padding: 0
+  tab: {
+    flexGrow: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    paddingTop: theme.spacing(2)
+  },
+  container: {
+    flexGrow: 1,
+    border: `1px solid ${theme.palette.divider}`,
+    position: 'relative'
+  },
+  innerContainer: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0
   }
 }));
 
-const WrappedAsciiViewer = ({ ascii, error }) => {
+const WrappedMonacoViewer = ({ data, type, error, beautify = false }) => {
   const classes = useStyles();
+  const containerEL = useRef<HTMLDivElement>();
+  const { isDarkTheme } = useAppContext();
 
-  return ascii !== null && ascii !== undefined ? (
-    <pre className={classes.pre}>{ascii}</pre>
+  const beautifyJSON = inputData => {
+    if (!beautify) return inputData;
+
+    try {
+      return JSON.stringify(JSON.parse(inputData), null, 4);
+    } catch {
+      return inputData;
+    }
+  };
+
+  const languageSelector = {
+    'text/json': 'json',
+    'text/jsons': 'json',
+    'code/vbe': 'vb',
+    'code/vbs': 'vb',
+    'code/wsf': 'xml',
+    'code/batch': 'bat',
+    'code/ps1': 'powershell',
+    'text/ini': 'ini',
+    'text/autorun': 'ini',
+    'code/java': 'java',
+    'code/python': 'python',
+    'code/php': 'php',
+    'code/shell': 'shell',
+    'code/xml': 'xml',
+    'code/yaml': 'yaml',
+    'code/javascript': 'javascript',
+    'code/jscript': 'javascript',
+    'code/typescript': 'typescript',
+    'code/xfa': 'xml',
+    'code/html': 'html',
+    'code/hta': 'html',
+    'code/html/component': 'html',
+    'code/csharp': 'csharp',
+    'code/jsp': 'java',
+    'code/c': 'cpp',
+    'code/h': 'cpp',
+    'code/clickonce': 'xml',
+    'code/css': 'css',
+    'code/markdown': 'markdown',
+    'code/sql': 'sql',
+    'code/go': 'go',
+    'code/ruby': 'ruby',
+    'code/perl': 'perl',
+    'code/rust': 'rust',
+    'code/lisp': 'lisp'
+  };
+
+  return data !== null && data !== undefined ? (
+    <div ref={containerEL} className={classes.container}>
+      <div className={classes.innerContainer}>
+        <ReactResizeDetector handleHeight handleWidth targetRef={containerEL}>
+          {({ width, height }) => (
+            <div ref={containerEL}>
+              <Editor
+                language={languageSelector[type]}
+                width={width}
+                height={height}
+                theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                value={beautifyJSON(data)}
+                options={{ readOnly: true }}
+              />
+            </div>
+          )}
+        </ReactResizeDetector>
+      </div>
+    </div>
   ) : error ? (
     <Alert severity="error">{error}</Alert>
   ) : (
-    <LinearProgress className={classes.flexItem} />
+    <LinearProgress />
   );
 };
 
 const WrappedHexViewer = ({ hex, error }) => {
   const classes = useStyles();
-
   return hex ? (
-    <pre className={classes.pre}>
+    <div className={classes.hexWrapper}>
       <HexViewerApp data={hex} />
-    </pre>
-  ) : error ? (
-    <div className={clsx(classes.flexContainer)}>
-      <Alert className={clsx(classes.flexItem)} severity="error">
-        {error}
-      </Alert>
     </div>
-  ) : (
-    <div className={clsx(classes.flexContainer)}>
-      <LinearProgress className={clsx(classes.flexItem)} />
-    </div>
-  );
-};
-
-const WrappedStringViewer = ({ string, error }) => {
-  const classes = useStyles();
-
-  return string !== null && string !== undefined ? (
-    <pre className={classes.pre}>{string}</pre>
   ) : error ? (
     <Alert severity="error">{error}</Alert>
   ) : (
@@ -116,9 +173,8 @@ const WrappedImageViewer = ({ image, error }) => {
   );
 };
 
-const AsciiViewer = React.memo(WrappedAsciiViewer);
+const MonacoViewer = React.memo(WrappedMonacoViewer);
 const HexViewer = React.memo(WrappedHexViewer);
-const StringViewer = React.memo(WrappedStringViewer);
 const ImageViewer = React.memo(WrappedImageViewer);
 
 const FileViewer = () => {
@@ -135,6 +191,7 @@ const FileViewer = () => {
   const [error, setError] = useState(null);
   const [image, setImage] = useState(null);
   const [imageAllowed, setImageAllowed] = useState(false);
+  const [type, setType] = useState('unknown');
   const [tab, setTab] = useState(null);
   const [sha256, setSha256] = useState(null);
   const { user: currentUser } = useALContext();
@@ -158,6 +215,7 @@ const FileViewer = () => {
         const imgAllowed = api_data.api_response.is_section_image === true;
         if (!imgAllowed && tab === 'image') setTab('ascii');
         setImageAllowed(imgAllowed);
+        setType(api_data.api_response.type);
         setSha256(id);
       }
     });
@@ -232,86 +290,93 @@ const FileViewer = () => {
   }, [sha256, tab]);
 
   return currentUser.roles.includes('file_detail') ? (
-    <PageCenter margin={4} width="100%" textAlign="left" maxWidth="100%">
-      <div className={classes.flexContainer}>
-        <Grid className={classes.flexItem} container alignItems="center">
-          <Grid item xs sm={8}>
-            <Typography variant="h4">{t('title')}</Typography>
-            <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
-              {id}
-            </Typography>
-          </Grid>
-          <Grid item xs={12} sm>
-            <div style={{ textAlign: 'right' }}>
-              {currentUser.roles.includes('submission_view') && (
-                <Tooltip title={t('detail')}>
-                  <IconButton component={Link} to={`/file/detail/${id}`}>
-                    <DescriptionOutlinedIcon />
-                  </IconButton>
-                </Tooltip>
-              )}
-              {currentUser.roles.includes('submission_view') && (
-                <Tooltip title={t('related')}>
-                  <IconButton component={Link} to={`/search/submission?query=files.sha256:${id} OR results:${id}*`}>
-                    <AmpStoriesOutlinedIcon />
-                  </IconButton>
-                </Tooltip>
-              )}
-              {currentUser.roles.includes('file_download') && (
-                <Tooltip title={t('download')}>
-                  <IconButton
-                    component={MaterialLink}
-                    href={`/api/v4/file/download/${id}/?XSRF_TOKEN=${getXSRFCookie()}`}
-                  >
-                    <GetAppOutlinedIcon color="action" />
-                  </IconButton>
-                </Tooltip>
-              )}
-            </div>
-          </Grid>
+    <PageFullSize margin={4}>
+      <Grid container alignItems="center">
+        <Grid item xs>
+          <Typography variant="h4">{t('title')}</Typography>
+          <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
+            {id}
+          </Typography>
         </Grid>
-      </div>
-
-      {sha256 && tab !== null ? (
-        <TabContext value={tab}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-            <Paper
-              className={classes.flexItem}
-              square
-              style={{ marginTop: theme.spacing(4), marginBottom: theme.spacing(2) }}
-            >
-              <TabList onChange={handleChangeTab} indicatorColor="primary" textColor="primary">
-                <Tab label={t('ascii')} value="ascii" />
-                <Tab label={t('strings')} value="strings" />
-                <Tab label={t('hex')} value="hex" />
-                {imageAllowed ? <Tab label={t('image')} value="image" /> : <Empty />}
-              </TabList>
-            </Paper>
-
-            <TabPanel value="ascii" className={clsx(classes.flexItem, classes.no_pad)}>
-              <AsciiViewer ascii={ascii} error={error} />
-            </TabPanel>
-            <TabPanel value="strings" className={clsx(classes.flexItem, classes.no_pad)}>
-              <StringViewer string={string} error={error} />
-            </TabPanel>
-            <TabPanel value="hex" className={clsx(classes.no_pad)} style={{ width: '100%', maxWidth: '100%' }}>
-              <HexViewer hex={hex} error={error} />
-            </TabPanel>
-            {imageAllowed && (
-              <TabPanel value="image" className={clsx(classes.flexItem)} style={{ paddingLeft: 0, paddingRight: 0 }}>
-                <ImageViewer image={image} error={error} />
-              </TabPanel>
+        <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
+          <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
+            {currentUser.roles.includes('submission_view') && (
+              <Tooltip title={t('detail')}>
+                <IconButton component={Link} to={`/file/detail/${id}`}>
+                  <DescriptionOutlinedIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+            {currentUser.roles.includes('submission_view') && (
+              <Tooltip title={t('related')}>
+                <IconButton
+                  component={Link}
+                  to={`/search/submission?query=files.sha256:${id} OR results:${id}* OR errors:${id}*`}
+                >
+                  <AmpStoriesOutlinedIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+            {currentUser.roles.includes('file_download') && (
+              <Tooltip title={t('download')}>
+                <IconButton
+                  component={MaterialLink}
+                  href={`/api/v4/file/download/${id}/?XSRF_TOKEN=${getXSRFCookie()}`}
+                >
+                  <GetAppOutlinedIcon color="action" />
+                </IconButton>
+              </Tooltip>
             )}
           </div>
-        </TabContext>
-      ) : (
-        <div className={classes.flexContainer}>
-          <div className={classes.flexItem} style={{ marginTop: theme.spacing(4), marginBottom: theme.spacing(2) }}>
-            <Skeleton variant="rect" height={theme.spacing(6)} />
-          </div>
+        </Grid>
+      </Grid>
+      {sha256 && tab !== null ? (
+        <div className={classes.main}>
+          <Paper square style={{ marginTop: theme.spacing(2), marginBottom: theme.spacing(1) }}>
+            <Tabs
+              value={tab}
+              onChange={handleChangeTab}
+              indicatorColor="primary"
+              textColor="primary"
+              variant="scrollable"
+              scrollButtons="auto"
+            >
+              <Tab label={t('ascii')} value="ascii" />
+              <Tab label={t('strings')} value="strings" />
+              <Tab label={t('hex')} value="hex" />
+              {imageAllowed ? <Tab label={t('image')} value="image" /> : <Empty />}
+            </Tabs>
+          </Paper>
+
+          {tab === 'ascii' && (
+            <div className={classes.tab}>
+              <MonacoViewer data={ascii} type={type} error={error} beautify />
+            </div>
+          )}
+          {tab === 'strings' && (
+            <div className={classes.tab}>
+              <MonacoViewer data={string} type={type} error={error} />
+            </div>
+          )}
+          {tab === 'hex' && (
+            <div className={classes.tab}>
+              <HexViewer hex={hex} error={error} />
+            </div>
+          )}
+          {tab === 'image' && (
+            <div className={classes.tab}>
+              <ImageViewer image={image} error={error} />{' '}
+            </div>
+          )}
         </div>
+      ) : (
+        <Skeleton
+          variant="rect"
+          height={theme.spacing(6)}
+          style={{ marginTop: theme.spacing(2), marginBottom: theme.spacing(2) }}
+        />
       )}
-    </PageCenter>
+    </PageFullSize>
   ) : (
     <ForbiddenPage />
   );

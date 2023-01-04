@@ -1,6 +1,5 @@
 import { Grid, Hidden, makeStyles, Paper, Tab, Tabs, Typography, useTheme } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
-import { loader } from '@monaco-editor/react';
 import useUser from 'commons/components/hooks/useAppUser';
 import PageFullSize from 'commons/components/layout/pages/PageFullSize';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -12,8 +11,6 @@ import LibMagic from './identify/libmagic';
 import Mimes from './identify/mimes';
 import Patterns from './identify/patterns';
 import Yara from './identify/yara';
-
-loader.config({ paths: { vs: '/cdn/monaco/' } });
 
 export default function AdminIdentify() {
   const { t } = useTranslation(['adminIdentify']);
