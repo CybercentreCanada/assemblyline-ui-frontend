@@ -205,7 +205,7 @@ const HexWindowBody = memo(({ store }: StoreProps) => {
           ref={listRef}
           innerRef={bodyRef}
           className={clsx(classes.root)}
-          height={height - 50}
+          height={height}
           width={width}
           itemSize={LAYOUT_SIZE.rowHeight}
           itemCount={!active ? store.scroll.lastRowIndex : rows.size}

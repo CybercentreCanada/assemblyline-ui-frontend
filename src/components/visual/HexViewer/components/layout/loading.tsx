@@ -5,18 +5,20 @@ import { default as React } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StoreProps } from '../..';
 
-const useHexStyles = ({ y = 0, height = 1000 }: { y: number; height: number }) =>
+const useHexStyles = ({ height = 0, width = 0 }: { height: number; width: number }) =>
   makeStyles(theme => ({
     root: {
       position: 'absolute',
-      height: '100%',
-      width: '100%',
-      display: 'grid',
-      alignContent: 'center',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
       whiteSpace: 'normal',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      width: width,
+      height: height
     },
     container: {
+      width: '100%',
       textAlign: 'center'
     },
     text: {
@@ -34,8 +36,8 @@ const useHexStyles = ({ y = 0, height = 1000 }: { y: number; height: number }) =
 export const WrappedHexLoading = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);
   const classes = useHexStyles({
-    y: document.getElementById('hex-viewer')?.getBoundingClientRect()?.y,
-    height: window.innerHeight
+    height: document.getElementById('hex-viewer')?.getBoundingClientRect()?.height,
+    width: document.getElementById('hex-viewer')?.getBoundingClientRect()?.width
   })();
 
   return (
