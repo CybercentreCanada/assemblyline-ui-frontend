@@ -1,42 +1,19 @@
 import { makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
-import clsx from 'clsx';
 import useAppContext from 'commons/components/hooks/useAppContext';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  ACTIONS,
-  DataProps,
-  HexLayout,
-  HexLoading,
-  LAYOUT_SIZE,
-  ModeLanguage,
-  ModeTheme,
-  ModeWidth,
-  useStore
-} from '..';
+import { ACTIONS, DataProps, HexLoading, HexPageLayout, ModeLanguage, ModeTheme, ModeWidth, useStore } from '..';
 
-const useHexStyles = ({ y = 275.890625, height = 1000 }: { y: number; height: number }) =>
-  makeStyles(theme => ({
-    root: {
-      position: 'relative',
-      height: `calc(${height}px - ${y}px - 75px)`,
-      width: '100%',
-      display: 'grid',
-      alignContent: 'center'
-    },
-    widescreen: {
-      height: `calc(${height}px - ${LAYOUT_SIZE.mobileWindowHeight}px)`
-    },
-    viewportAuto: {
-      height: 'auto'
-    }
-  }));
+const useStyles = makeStyles(theme => ({
+  root: {
+    flexGrow: 1,
+    display: 'flex',
+    flexDirection: 'column'
+  }
+}));
 
 const WrappedAppRoot = ({ data = '' }: DataProps) => {
-  const classes = useHexStyles({
-    y: document.getElementById('hex-viewer')?.getBoundingClientRect()?.y,
-    height: window.innerHeight
-  })();
+  const classes = useStyles();
   const { store, dispatch, update } = useStore();
 
   // Data
@@ -87,9 +64,9 @@ const WrappedAppRoot = ({ data = '' }: DataProps) => {
   }, [dispatch, store.loading.conditions.hasSettingsFetched, store.loading.conditions.hasSettingsLoaded]);
 
   return (
-    <div className={clsx(classes.root, window.innerHeight.valueOf() < 1000 && classes.widescreen)}>
+    <div className={classes.root}>
       <HexLoading store={store} />
-      {store.hex.codes.size !== 0 && store.loading.conditions.hasLocationInit && <HexLayout store={store} />}
+      {store.hex.codes.size !== 0 && store.loading.conditions.hasLocationInit && <HexPageLayout store={store} />}
     </div>
   );
 };

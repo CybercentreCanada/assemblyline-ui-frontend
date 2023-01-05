@@ -35,9 +35,12 @@ type ParamProps = {
 
 const useStyles = makeStyles(theme => ({
   hexWrapper: {
-    backgroundColor: theme.palette.type === 'dark' ? '#1e1e1e' : '#FFFFFF',
+    backgroundColor: theme.palette.type === 'dark' ? '#1e1e1e' : '#FAFAFA',
     border: `1px solid ${theme.palette.divider}`,
-    padding: theme.spacing(1)
+    padding: theme.spacing(1),
+    flexGrow: 1,
+    display: 'flex',
+    flexDirection: 'column'
   },
   img: {
     maxWidth: '100%',
@@ -134,7 +137,7 @@ const WrappedMonacoViewer = ({ data, type, error, beautify = false }) => {
                 height={height}
                 theme={isDarkTheme ? 'vs-dark' : 'vs'}
                 value={beautifyJSON(data)}
-                options={{ readOnly: true }}
+                options={{ links: false, readOnly: true }}
               />
             </div>
           )}

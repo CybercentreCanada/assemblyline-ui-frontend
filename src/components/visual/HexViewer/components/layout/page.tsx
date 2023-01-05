@@ -5,12 +5,10 @@ import { HexBody, HexHeader, HexSettings, StoreProps, useDispatch, useEventListe
 
 const useHexStyles = makeStyles(theme => ({
   root: {
-    position: 'absolute',
     display: 'flex',
     flexDirection: 'column',
-    height: '100%',
-    width: '100%',
     cursor: 'default',
+    flexGrow: 1,
 
     userSelection: 'none',
     '-webkit-user-select': 'none' /* Safari */,
@@ -21,6 +19,9 @@ const useHexStyles = makeStyles(theme => ({
 
   hidden: {
     visibility: 'hidden'
+  },
+  container: {
+    flexGrow: 1
   }
 }));
 
@@ -37,7 +38,9 @@ export const WrappedHexPageLayout = ({ store }: StoreProps) => {
   return (
     <div ref={ref} className={clsx(classes.root, store.loading.status !== 'initialized' && classes.hidden)}>
       <HexHeader store={store} />
-      <HexBody store={store} />
+      <div className={classes.container}>
+        <HexBody store={store} />
+      </div>
       <HexSettings store={store} />
     </div>
   );
