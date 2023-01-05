@@ -118,7 +118,7 @@ export const StoreProvider = ({ children }: StoreProviderProps) => {
   }, [dispatch, dispatchRef]);
 
   return (
-    <div id="hex-viewer">
+    <div id="hex-viewer" style={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
       <storeContext.Provider value={{ store, dispatch, update }}>
         {React.useMemo(() => children, [children])}
       </storeContext.Provider>
