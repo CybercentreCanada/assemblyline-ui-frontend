@@ -35,7 +35,7 @@ type ParamProps = {
 
 const useStyles = makeStyles(theme => ({
   hexWrapper: {
-    backgroundColor: theme.palette.type === 'dark' ? '#1e1e1e' : '#F8F8F8',
+    backgroundColor: theme.palette.type === 'dark' ? '#1e1e1e' : '#FAFAFA',
     border: `1px solid ${theme.palette.divider}`,
     padding: theme.spacing(1),
     flexGrow: 1,
