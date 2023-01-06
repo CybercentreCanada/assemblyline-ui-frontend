@@ -101,6 +101,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
   const [file, setFile] = useState<File | null>(null);
   const [safelistDialog, setSafelistDialog] = useState<boolean>(false);
   const [safelistReason, setSafelistReason] = useState<string>('');
+  const [waitingDialog, setWaitingDialog] = useState(false);
   const { apiCall } = useMyAPI();
   const { c12nDef, user: currentUser } = useALContext();
   const theme = useTheme();
@@ -198,7 +199,9 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
       onSuccess: _ => {
         setSafelistDialog(false);
         showSuccessMessage(t('safelist.success'));
-      }
+      },
+      onEnter: () => setWaitingDialog(true),
+      onExit: () => setWaitingDialog(false)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sha256, safelistReason, file]);
@@ -241,6 +244,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
         acceptText={t('safelist.acceptText')}
         inputLabel={t('safelist.input')}
         text={t('safelist.text')}
+        waiting={waitingDialog}
       />
       {c12nDef.enforce && (
         <div style={{ paddingBottom: sp4, paddingTop: sp2 }}>

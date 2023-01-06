@@ -188,7 +188,9 @@ const WrappedSourceDetailDrawer = ({ service, base, close, generatesSignatures }
       onSuccess: () => {
         showSuccessMessage(t('delete.success'));
         setTimeout(() => window.dispatchEvent(new CustomEvent('reloadUpdateSources')), 1000);
-      }
+      },
+      onEnter: () => setButtonLoading(true),
+      onExit: () => setButtonLoading(false)
     });
   };
 
@@ -215,6 +217,7 @@ const WrappedSourceDetailDrawer = ({ service, base, close, generatesSignatures }
           cancelText={t('delete.cancelText')}
           acceptText={t('delete.acceptText')}
           text={t('delete.text')}
+          waiting={buttonLoading}
         />
 
         <div style={{ paddingBottom: theme.spacing(2) }}>

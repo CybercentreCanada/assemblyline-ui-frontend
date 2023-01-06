@@ -44,6 +44,7 @@ export default function Services() {
   const [open, setOpen] = useState<boolean>(false);
   const [openRestore, setOpenRestore] = useState(false);
   const [restoreConfirmation, setRestoreConfirmation] = useState(false);
+  const [waitingDialog, setWaitingDialog] = useState(false);
   const [manifest, setManifest] = useState('');
   const [restore, setRestore] = useState('');
   const { showSuccessMessage, showInfoMessage, showErrorMessage } = useMySnackbar();
@@ -90,7 +91,9 @@ export default function Services() {
         closeRestoreDialog();
         setRestoreConfirmation(false);
         setTimeout(() => reload(), 1000);
-      }
+      },
+      onEnter: () => setWaitingDialog(true),
+      onExit: () => setWaitingDialog(false)
     });
   };
 
@@ -283,6 +286,7 @@ export default function Services() {
         text={t('restore.confirm.text')}
         cancelText={t('restore.confirm.cancel')}
         acceptText={t('restore.confirm.accept')}
+        waiting={waitingDialog}
       />
       <Dialog
         open={openRestore}
