@@ -122,7 +122,9 @@ function User({ width, username }: UserProps) {
       method: 'DELETE',
       onSuccess: () => {
         showSuccessMessage(t('delete.success'));
-        history.push('/admin/users');
+        setTimeout(() => {
+          history.push('/admin/users');
+        }, 500);
       },
       onEnter: () => setButtonLoading(true),
       onExit: () => setButtonLoading(false)
@@ -405,6 +407,7 @@ function User({ width, username }: UserProps) {
         cancelText={t('delete.cancelText')}
         acceptText={t('delete.acceptText')}
         text={t('delete.text')}
+        waiting={buttonLoading}
       />
 
       <Grid container spacing={2} justifyContent="center">

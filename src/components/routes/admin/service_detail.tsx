@@ -210,7 +210,9 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
         showSuccessMessage(t('delete.success'));
         if (svc) setTimeout(() => history.push('/admin/services'), 1000);
         onDeleted();
-      }
+      },
+      onEnter: () => setButtonLoading(true),
+      onExit: () => setButtonLoading(false)
     });
   };
 
@@ -286,6 +288,7 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
         cancelText={t('delete.cancelText')}
         acceptText={t('delete.acceptText')}
         text={t('delete.text')}
+        waiting={buttonLoading}
       />
       <Grid container alignItems="center" spacing={3} style={{ paddingBottom: theme.spacing(2) }}>
         <Grid item xs>

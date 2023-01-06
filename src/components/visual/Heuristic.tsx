@@ -53,6 +53,7 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({
   const [state, setState] = React.useState(initialMenuState);
   const [safelistDialog, setSafelistDialog] = React.useState(false);
   const [safelistReason, setSafelistReason] = React.useState(null);
+  const [waitingDialog, setWaitingDialog] = React.useState(false);
   const history = useHistory();
   const { apiCall } = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
@@ -126,7 +127,9 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({
       onSuccess: _ => {
         setSafelistDialog(false);
         showSuccessMessage(t('safelist.success'));
-      }
+      },
+      onEnter: () => setWaitingDialog(true),
+      onExit: () => setWaitingDialog(false)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [safelistReason, t, text]);
@@ -158,6 +161,7 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({
           acceptText={t('safelist.acceptText')}
           inputLabel={t('safelist.input')}
           text={t('safelist.text')}
+          waiting={waitingDialog}
         />
       )}
       <Menu

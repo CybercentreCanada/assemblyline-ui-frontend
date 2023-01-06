@@ -247,7 +247,9 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
         showSuccessMessage(t('delete.success'));
         if (id) setTimeout(() => history.push('/manage/signatures'), 1000);
         onDeleted();
-      }
+      },
+      onEnter: () => setButtonLoading(true),
+      onExit: () => setButtonLoading(false)
     });
   };
 
@@ -265,6 +267,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
         cancelText={t('delete.cancelText')}
         acceptText={t('delete.acceptText')}
         text={t('delete.text')}
+        waiting={buttonLoading}
       />
 
       <Dialog

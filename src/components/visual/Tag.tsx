@@ -55,6 +55,7 @@ const WrappedTag: React.FC<TagProps> = ({
   const [state, setState] = React.useState(initialMenuState);
   const [safelistDialog, setSafelistDialog] = React.useState(false);
   const [safelistReason, setSafelistReason] = React.useState(null);
+  const [waitingDialog, setWaitingDialog] = React.useState(false);
   const history = useHistory();
   const { user: currentUser, scoreToVerdict } = useALContext();
   const { apiCall } = useMyAPI();
@@ -139,7 +140,9 @@ const WrappedTag: React.FC<TagProps> = ({
       onSuccess: _ => {
         setSafelistDialog(false);
         showSuccessMessage(t('safelist.success'));
-      }
+      },
+      onEnter: () => setWaitingDialog(true),
+      onExit: () => setWaitingDialog(false)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [safelistReason, t, type, value]);
@@ -157,6 +160,7 @@ const WrappedTag: React.FC<TagProps> = ({
         acceptText={t('safelist.acceptText')}
         inputLabel={t('safelist.input')}
         text={t('safelist.text')}
+        waiting={waitingDialog}
       />
       <Menu
         open={state.mouseY !== null}

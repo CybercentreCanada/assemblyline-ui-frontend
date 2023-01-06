@@ -102,6 +102,7 @@ function WrappedSubmissionDetail() {
   const [loadInterval, setLoadInterval] = useState(null);
   const [lastSuccessfulTrigger, setLastSuccessfulTrigger] = useState(0);
   const [deleteDialog, setDeleteDialog] = useState(false);
+  const [waitingDialog, setWaitingDialog] = useState(false);
   const { apiCall } = useMyAPI();
   const sp4 = theme.spacing(4);
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
@@ -501,7 +502,9 @@ function WrappedSubmissionDetail() {
           setTimeout(() => {
             history.push('/submissions');
           }, 500);
-        }
+        },
+        onEnter: () => setWaitingDialog(true),
+        onExit: () => setWaitingDialog(false)
       });
     }
   };
@@ -804,6 +807,7 @@ function WrappedSubmissionDetail() {
         cancelText={t('delete.cancelText')}
         acceptText={t('delete.acceptText')}
         text={t('delete.text')}
+        waiting={waitingDialog}
       />
       <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
