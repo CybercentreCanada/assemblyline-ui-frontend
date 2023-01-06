@@ -6,7 +6,6 @@ import {
   DialogTitle,
   Grid,
   IconButton,
-  Link as MaterialLink,
   TextField,
   Tooltip,
   Typography,
@@ -28,10 +27,10 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
 import Service from 'components/routes/admin/service_detail';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
+import FileDownloader from 'components/visual/FileDownloader';
 import ServiceTable, { ServiceResult } from 'components/visual/SearchResult/service';
 import NewServiceTable from 'components/visual/ServiceManagement/NewServiceTable';
 import { JSONFeedItem, useNotificationFeed } from 'components/visual/ServiceManagement/useNotificationFeed';
-import getXSRFCookie from 'helpers/xsrf';
 import 'moment/locale/fr';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -396,11 +395,7 @@ export default function Services() {
                 </IconButton>
               </span>
             </Tooltip>
-            <Tooltip title={t('backup')}>
-              <IconButton component={MaterialLink} href={`/api/v4/service/backup/?XSRF_TOKEN=${getXSRFCookie()}`}>
-                <GetAppOutlinedIcon color="action" />
-              </IconButton>
-            </Tooltip>
+            <FileDownloader icon={<GetAppOutlinedIcon />} link={`/api/v4/service/backup/`} tooltip={t('backup')} />
             <Tooltip title={t('restore')}>
               <IconButton onClick={() => setOpenRestore(true)}>
                 <RestoreOutlinedIcon />

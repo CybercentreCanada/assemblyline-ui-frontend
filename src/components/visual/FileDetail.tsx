@@ -1,4 +1,4 @@
-import { Grid, IconButton, Link as MaterialLink, Tooltip, Typography, useTheme } from '@material-ui/core';
+import { Grid, IconButton, Tooltip, Typography, useTheme } from '@material-ui/core';
 import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
 import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
 import PageviewOutlinedIcon from '@material-ui/icons/PageviewOutlined';
@@ -13,7 +13,6 @@ import ForbiddenPage from 'components/routes/403';
 import Classification from 'components/visual/Classification';
 import { Error } from 'components/visual/ErrorCard';
 import { AlternateResult, emptyResult, Result } from 'components/visual/ResultCard';
-import getXSRFCookie from 'helpers/xsrf';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory, useLocation } from 'react-router-dom';
@@ -28,6 +27,7 @@ import MetadataSection from './FileDetail/metadata';
 import ParentSection from './FileDetail/parents';
 import ResultSection from './FileDetail/results';
 import TagSection from './FileDetail/tags';
+import FileDownloader from './FileDownloader';
 import InputDialog from './InputDialog';
 
 type FileInfo = {
@@ -270,16 +270,13 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                     </IconButton>
                   </Tooltip>
                   {currentUser.roles.includes('file_download') && (
-                    <Tooltip title={t('download')}>
-                      <IconButton
-                        component={MaterialLink}
-                        href={`/api/v4/file/download/${file.file_info.sha256}/?${
-                          fileName && file.file_info.sha256 !== fileName ? `name=${fileName}&` : ''
-                        }${sid ? `sid=${sid}&` : ''}XSRF_TOKEN=${getXSRFCookie()}`}
-                      >
-                        <GetAppOutlinedIcon color="action" />
-                      </IconButton>
-                    </Tooltip>
+                    <FileDownloader
+                      icon={<GetAppOutlinedIcon />}
+                      link={`/api/v4/file/download/${file.file_info.sha256}/?${
+                        fileName && file.file_info.sha256 !== fileName ? `name=${fileName}&` : ''
+                      }${sid ? `sid=${sid}&` : ''}`}
+                      tooltip={t('download')}
+                    />
                   )}
                   {currentUser.roles.includes('file_detail') && (
                     <Tooltip title={t('file_viewer')}>

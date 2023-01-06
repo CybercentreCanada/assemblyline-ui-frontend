@@ -1,13 +1,4 @@
-import {
-  Grid,
-  IconButton,
-  LinearProgress,
-  Link as MaterialLink,
-  Snackbar,
-  Tooltip,
-  Typography,
-  useTheme
-} from '@material-ui/core';
+import { Grid, IconButton, LinearProgress, Snackbar, Tooltip, Typography, useTheme } from '@material-ui/core';
 import ArchiveOutlinedIcon from '@material-ui/icons/ArchiveOutlined';
 import BugReportOutlinedIcon from '@material-ui/icons/BugReportOutlined';
 import ChromeReaderModeOutlinedIcon from '@material-ui/icons/ChromeReaderModeOutlined';
@@ -29,10 +20,10 @@ import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDetail from 'components/visual/FileDetail';
 import Detection from 'components/visual/FileDetail/detection';
+import FileDownloader from 'components/visual/FileDownloader';
 import VerdictBar from 'components/visual/VerdictBar';
 import { getErrorIDFromKey, getServiceFromKey } from 'helpers/errors';
 import { setNotifyFavicon } from 'helpers/utils';
-import getXSRFCookie from 'helpers/xsrf';
 import React, { useCallback, useEffect, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory, useParams } from 'react-router-dom';
@@ -938,14 +929,11 @@ function WrappedSubmissionDetail() {
                           </Tooltip>
                         )}
                         {currentUser.roles.includes('bundle_download') && (
-                          <Tooltip title={t('download')}>
-                            <IconButton
-                              component={MaterialLink}
-                              href={`/api/v4/bundle/${submission.sid}/?XSRF_TOKEN=${getXSRFCookie()}`}
-                            >
-                              <CloudDownloadOutlinedIcon color="action" />
-                            </IconButton>
-                          </Tooltip>
+                          <FileDownloader
+                            icon={<CloudDownloadOutlinedIcon />}
+                            link={`/api/v4/bundle/${submission.sid}/`}
+                            tooltip={t('download')}
+                          />
                         )}
                         {systemConfig.datastore.archive.enabled && currentUser.roles.includes('archive_trigger') && (
                           <Tooltip title={t(submission.archived ? 'archived' : 'archive')}>
