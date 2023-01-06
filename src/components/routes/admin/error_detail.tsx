@@ -1,13 +1,4 @@
-import {
-  Card,
-  Grid,
-  IconButton,
-  Link as MaterialLink,
-  makeStyles,
-  Tooltip,
-  Typography,
-  useTheme
-} from '@material-ui/core';
+import { Card, Grid, IconButton, makeStyles, Tooltip, Typography, useTheme } from '@material-ui/core';
 import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
 import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
 import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
@@ -19,7 +10,7 @@ import useClipboard from 'commons/components/hooks/useClipboard';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
-import getXSRFCookie from 'helpers/xsrf';
+import FileDownloader from 'components/visual/FileDownloader';
 import 'moment/locale/fr';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -184,14 +175,11 @@ export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
                     <DescriptionOutlinedIcon />
                   </IconButton>
                 </Tooltip>
-                <Tooltip title={t('download')}>
-                  <IconButton
-                    component={MaterialLink}
-                    href={`/api/v4/file/download/${error.sha256}/?XSRF_TOKEN=${getXSRFCookie()}`}
-                  >
-                    <GetAppOutlinedIcon color="action" />
-                  </IconButton>
-                </Tooltip>
+                <FileDownloader
+                  icon={<GetAppOutlinedIcon />}
+                  link={`/api/v4/file/download/${error.sha256}/`}
+                  tooltip={t('download')}
+                />
                 <Tooltip title={t('file_viewer')}>
                   <IconButton component={Link} to={`/file/viewer/${error.sha256}`}>
                     <PageviewOutlinedIcon />
