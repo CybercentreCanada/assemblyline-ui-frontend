@@ -200,6 +200,7 @@ const WrappedNotificationArea = () => {
   const [editDialog, setEditDialog] = useState<boolean>(false);
   const [saveConfirmation, setSaveConfirmation] = useState<boolean>(false);
   const [deleteConfirmation, setDeleteConfirmation] = useState<boolean>(false);
+  const [waitingDialog, setWaitingDialog] = useState(false);
 
   const handleLastTimeOpen = useCallback(() => {
     const data = localStorage.getItem(storageKey);
@@ -253,16 +254,18 @@ const WrappedNotificationArea = () => {
 
   const onSaveSystemMessage = event => {
     event.stopPropagation();
-    setSaveConfirmation(false);
     apiCall({
       url: '/api/v4/system/system_message/',
       method: 'PUT',
       body: newSystemMessage,
       onSuccess: () => {
         showSuccessMessage(t('save.success'));
+        setSaveConfirmation(false);
         setSystemMessage(newSystemMessage);
         setEditDialog(false);
-      }
+      },
+      onEnter: () => setWaitingDialog(true),
+      onExit: () => setWaitingDialog(false)
     });
   };
 
@@ -275,7 +278,9 @@ const WrappedNotificationArea = () => {
       onSuccess: () => {
         showSuccessMessage(t('delete.success'));
         setSystemMessage(null);
-      }
+      },
+      onEnter: () => setWaitingDialog(true),
+      onExit: () => setWaitingDialog(false)
     });
   };
 
@@ -442,6 +447,7 @@ const WrappedNotificationArea = () => {
         cancelText={t('save.cancelText')}
         acceptText={t('save.acceptText')}
         text={t('save.text')}
+        waiting={waitingDialog}
       />
       <ConfirmationDialog
         open={deleteConfirmation}
@@ -451,6 +457,7 @@ const WrappedNotificationArea = () => {
         cancelText={t('delete.cancelText')}
         acceptText={t('delete.acceptText')}
         text={t('delete.text')}
+        waiting={waitingDialog}
       />
 
       <IconButton color="inherit" aria-label="open drawer" onClick={onOpenNotificationArea}>

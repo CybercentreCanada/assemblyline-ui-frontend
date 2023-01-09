@@ -66,6 +66,7 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
   const [safelist, setSafelist] = useState<Safelist>(null);
   const [histogram, setHistogram] = useState<any>(null);
   const [deleteDialog, setDeleteDialog] = useState(false);
+  const [waitingDialog, setWaitingDialog] = useState(false);
   const [enableDialog, setEnableDialog] = useState(false);
   const [disableDialog, setDisableDialog] = useState(false);
   const { user: currentUser, c12nDef } = useALContext();
@@ -122,7 +123,9 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
         }
         setTimeout(() => window.dispatchEvent(new CustomEvent('reloadSafelist')), 1000);
         close();
-      }
+      },
+      onEnter: () => setWaitingDialog(true),
+      onExit: () => setWaitingDialog(false)
     });
   };
 
@@ -136,7 +139,9 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
         showSuccessMessage(t('enable.success'));
         setTimeout(() => window.dispatchEvent(new CustomEvent('reloadSafelist')), 1000);
         setSafelist({ ...safelist, enabled: true });
-      }
+      },
+      onEnter: () => setWaitingDialog(true),
+      onExit: () => setWaitingDialog(false)
     });
   };
 
@@ -150,7 +155,9 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
         showSuccessMessage(t('disable.success'));
         setTimeout(() => window.dispatchEvent(new CustomEvent('reloadSafelist')), 1000);
         setSafelist({ ...safelist, enabled: false });
-      }
+      },
+      onEnter: () => setWaitingDialog(true),
+      onExit: () => setWaitingDialog(false)
     });
   };
 
@@ -164,6 +171,7 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
         cancelText={t('delete.cancelText')}
         acceptText={t('delete.acceptText')}
         text={t('delete.text')}
+        waiting={waitingDialog}
       />
       <ConfirmationDialog
         open={enableDialog}
@@ -173,6 +181,7 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
         cancelText={t('enable.cancelText')}
         acceptText={t('enable.acceptText')}
         text={t('enable.text')}
+        waiting={waitingDialog}
       />
       <ConfirmationDialog
         open={disableDialog}
@@ -182,6 +191,7 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
         cancelText={t('disable.cancelText')}
         acceptText={t('disable.acceptText')}
         text={t('disable.text')}
+        waiting={waitingDialog}
       />
 
       {c12nDef.enforce && (

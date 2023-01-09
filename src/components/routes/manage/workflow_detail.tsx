@@ -168,7 +168,9 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
         }
         setTimeout(() => window.dispatchEvent(new CustomEvent('reloadWorkflows')), 1000);
         close();
-      }
+      },
+      onEnter: () => setButtonLoading(true),
+      onExit: () => setButtonLoading(false)
     });
   };
 
@@ -202,6 +204,7 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
         cancelText={t('delete.cancelText')}
         acceptText={t('delete.acceptText')}
         text={t('delete.text')}
+        waiting={buttonLoading}
       />
 
       {c12nDef.enforce && (
