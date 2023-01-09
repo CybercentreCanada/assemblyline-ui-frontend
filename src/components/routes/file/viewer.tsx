@@ -2,7 +2,6 @@ import {
   Grid,
   IconButton,
   LinearProgress,
-  Link as MaterialLink,
   makeStyles,
   Paper,
   Tab,
@@ -19,10 +18,10 @@ import { Alert, Skeleton } from '@material-ui/lab';
 import PageFullSize from 'commons/components/layout/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
+import FileDownloader from 'components/visual/FileDownloader';
 import Empty from 'components/visual/Empty';
 import { HexViewerApp } from 'components/visual/HexViewer';
 import ReactResizeDetector from 'react-resize-detector';
-import getXSRFCookie from 'helpers/xsrf';
 import useAppContext from 'commons/components/hooks/useAppContext';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -321,14 +320,11 @@ const FileViewer = () => {
               </Tooltip>
             )}
             {currentUser.roles.includes('file_download') && (
-              <Tooltip title={t('download')}>
-                <IconButton
-                  component={MaterialLink}
-                  href={`/api/v4/file/download/${id}/?XSRF_TOKEN=${getXSRFCookie()}`}
-                >
-                  <GetAppOutlinedIcon color="action" />
-                </IconButton>
-              </Tooltip>
+              <FileDownloader
+                icon={<GetAppOutlinedIcon />}
+                link={`/api/v4/file/download/${id}/`}
+                tooltip={t('download')}
+              />
             )}
           </div>
         </Grid>
