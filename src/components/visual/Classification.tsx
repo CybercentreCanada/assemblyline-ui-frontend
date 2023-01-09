@@ -312,26 +312,23 @@ function WrappedClassification({
                       <div style={{ paddingBottom: sp2 }}>
                         <Card variant="outlined">
                           <List disablePadding>
-                            {c12nDef.original_definition.groups.map(
-                              (grp, idx) =>
-                                (isUser || [grp.name, grp.short_name].some(g => uParts.groups.includes(g))) && (
-                                  <ListItem
-                                    key={idx}
-                                    button
-                                    disabled={
-                                      validated.disabled.groups.includes(grp.name) ||
-                                      validated.disabled.groups.includes(grp.short_name)
-                                    }
-                                    selected={
-                                      validated.parts.groups.includes(grp.name) ||
-                                      validated.parts.groups.includes(grp.short_name)
-                                    }
-                                    onClick={() => toggleGroups(grp)}
-                                  >
-                                    <ListItemText style={{ textAlign: 'center' }} primary={grp.name} />
-                                  </ListItem>
-                                )
-                            )}
+                            {c12nDef.original_definition.groups.map((grp, idx) => (
+                              <ListItem
+                                key={idx}
+                                button
+                                disabled={
+                                  validated.disabled.groups.includes(grp.name) ||
+                                  validated.disabled.groups.includes(grp.short_name)
+                                }
+                                selected={
+                                  validated.parts.groups.includes(grp.name) ||
+                                  validated.parts.groups.includes(grp.short_name)
+                                }
+                                onClick={() => toggleGroups(grp)}
+                              >
+                                <ListItemText style={{ textAlign: 'center' }} primary={grp.name} />
+                              </ListItem>
+                            ))}
                             {c12nDef.dynamic_groups && currentUser.email && (
                               <ListItem
                                 button
@@ -358,22 +355,19 @@ function WrappedClassification({
                       uParts.subgroups.length !== 0) && (
                       <Card variant="outlined">
                         <List disablePadding>
-                          {c12nDef.original_definition.subgroups.map(
-                            (sgrp, idx) =>
-                              (isUser || [sgrp.name, sgrp.short_name].some(sg => uParts.subgroups.includes(sg))) && (
-                                <ListItem
-                                  key={idx}
-                                  button
-                                  selected={
-                                    validated.parts.subgroups.includes(sgrp.name) ||
-                                    validated.parts.subgroups.includes(sgrp.short_name)
-                                  }
-                                  onClick={() => toggleSubGroups(sgrp)}
-                                >
-                                  <ListItemText style={{ textAlign: 'center' }} primary={sgrp.name} />
-                                </ListItem>
-                              )
-                          )}
+                          {c12nDef.original_definition.subgroups.map((sgrp, idx) => (
+                            <ListItem
+                              key={idx}
+                              button
+                              selected={
+                                validated.parts.subgroups.includes(sgrp.name) ||
+                                validated.parts.subgroups.includes(sgrp.short_name)
+                              }
+                              onClick={() => toggleSubGroups(sgrp)}
+                            >
+                              <ListItemText style={{ textAlign: 'center' }} primary={sgrp.name} />
+                            </ListItem>
+                          ))}
                         </List>
                       </Card>
                     )}

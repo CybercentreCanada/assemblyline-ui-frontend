@@ -304,6 +304,7 @@ export function normalizedClassification(
 
   let out = lvl;
 
+  let tempReq = [...req];
   const reqGrp = [];
   for (const r of req) {
     if (c12nDef.params_map[r] !== undefined) {
@@ -316,11 +317,11 @@ export function normalizedClassification(
   }
 
   for (const rg of reqGrp) {
-    req.splice(req.indexOf(rg), 1);
+    tempReq.splice(req.indexOf(rg), 1);
   }
 
-  if (req.length > 0) {
-    out += `//${req.join('/')}`;
+  if (tempReq.length > 0) {
+    out += `//${tempReq.join('/')}`;
   }
   if (reqGrp.length > 0) {
     out += `//${reqGrp.join('/')}`;
