@@ -25,6 +25,7 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import Histogram from 'components/visual/Histogram';
+import { RouterPrompt } from 'components/visual/RouterPrompt';
 import ResultsTable from 'components/visual/SearchResult/results';
 import SignatureStatus from 'components/visual/SignatureStatus';
 import { safeFieldValue, safeFieldValueURI } from 'helpers/utils';
@@ -474,6 +475,8 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
             </>
           )}
         </Grid>
+
+        <RouterPrompt when={modified} />
 
         {signature && modified ? (
           <div

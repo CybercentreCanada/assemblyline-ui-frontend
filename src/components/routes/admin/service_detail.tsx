@@ -21,6 +21,7 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
 import Empty from 'components/visual/Empty';
+import { RouterPrompt } from 'components/visual/RouterPrompt';
 import { getVersionQuery } from 'helpers/utils';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -400,6 +401,8 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
       ) : (
         <Skeleton variant="rect" height="10rem" />
       )}
+
+      <RouterPrompt when={modified} />
 
       {service && modified ? (
         <div
