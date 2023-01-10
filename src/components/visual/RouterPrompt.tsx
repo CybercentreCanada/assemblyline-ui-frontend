@@ -22,6 +22,12 @@ export function RouterPrompt(props) {
   const [open, setOpen] = useState(false);
   const [currentPath, setCurrentPath] = useState('');
 
+  const unblock = useCallback(() => {
+    setDrawerClosePrompt(false);
+    history.block(() => {});
+    window.onbeforeunload = undefined;
+  }, [history, setDrawerClosePrompt]);
+
   useEffect(() => {
     if (when) {
       // Prevent drawer from being closed
@@ -35,44 +41,34 @@ export function RouterPrompt(props) {
         return false;
       });
     } else {
-      // Restore drawer close ability
-      setDrawerClosePrompt(false);
-      // Restore URL change
-      history.block(() => {});
-      // Restore page reload
-      window.onbeforeunload = undefined;
+      unblock();
     }
 
     return () => {
-      // Restore drawer close ability
-      setDrawerClosePrompt(false);
-      // Restore URL change
-      history.block(() => {});
-      // Restore page reload
-      window.onbeforeunload = undefined;
+      unblock();
     };
-  }, [history, setDrawerClosePrompt, when]);
+  }, [history, setDrawerClosePrompt, unblock, when]);
 
   const handleAccept = useCallback(async () => {
     if (onAccept) {
       const canRoute = await Promise.resolve(onAccept());
       if (canRoute) {
-        history.block(() => {});
+        unblock();
         history.push(currentPath);
       }
     }
-  }, [currentPath, history, onAccept]);
+  }, [currentPath, history, onAccept, unblock]);
 
   const handleCancel = useCallback(async () => {
     if (onCancel) {
       const canRoute = await Promise.resolve(onCancel());
       if (canRoute) {
-        history.block(() => {});
+        unblock();
         history.push(currentPath);
       }
     }
     setOpen(false);
-  }, [currentPath, history, onCancel]);
+  }, [currentPath, history, onCancel, unblock]);
 
   return open ? (
     <ConfirmationDialog
