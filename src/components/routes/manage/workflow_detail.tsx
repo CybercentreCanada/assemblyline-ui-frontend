@@ -18,6 +18,7 @@ import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutl
 import { Autocomplete, Skeleton } from '@material-ui/lab';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
+import { RouterPrompt } from 'components/visual/RouterPrompt';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import Classification from 'components/visual/Classification';
@@ -367,6 +368,8 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
           )}{' '}
         </div>
       </div>
+
+      <RouterPrompt when={modified} />
 
       {workflow && modified && workflow.name && workflow.query ? (
         <div

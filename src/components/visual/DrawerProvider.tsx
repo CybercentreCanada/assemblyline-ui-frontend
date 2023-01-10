@@ -1,6 +1,8 @@
 import { Drawer, IconButton, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
 import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import ConfirmationDialog from './ConfirmationDialog';
 
 const XLWidth = '45vw';
 const LGWidth = '85%';
@@ -56,6 +58,7 @@ export type DrawerContextProps = {
   closeGlobalDrawer: () => void;
   closeTemporaryDrawer: () => void;
   setGlobalDrawer: (elements: React.ReactElement<any>) => void;
+  setDrawerClosePrompt: (boolean) => void;
   globalDrawer: React.ReactElement<any>;
 };
 
@@ -67,19 +70,30 @@ export const DrawerContext = React.createContext<DrawerContextProps>(null);
 
 function DrawerProvider(props: DrawerProviderProps) {
   const { children } = props;
+  const { t } = useTranslation();
   const [globalDrawer, setGlobalDrawer] = useState(null);
+  const [drawerClosePrompt, setDrawerClosePrompt] = useState(false);
   const theme = useTheme();
+  const [open, setOpen] = useState(false);
   const classes = useStyles();
   const isMD = useMediaQuery(theme.breakpoints.only('md'));
   const isLG = useMediaQuery(theme.breakpoints.only('lg'));
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
 
   const drawerWidth = isXL ? XLWidth : isLG ? LGWidth : isMD ? MDWidth : SMWidth;
-  const closeGlobalDrawer = () => {
-    setGlobalDrawer(null);
-  };
+  const closeGlobalDrawer = useCallback(() => {
+    if (drawerClosePrompt) {
+      setOpen(true);
+    } else {
+      setGlobalDrawer(null);
+    }
+  }, [drawerClosePrompt]);
   const closeTemporaryDrawer = () => {
-    if (!isXL) setGlobalDrawer(null);
+    if (drawerClosePrompt) {
+      setOpen(true);
+    } else {
+      if (!isXL) setGlobalDrawer(null);
+    }
   };
 
   return (
@@ -88,9 +102,23 @@ function DrawerProvider(props: DrawerProviderProps) {
         closeGlobalDrawer,
         closeTemporaryDrawer,
         setGlobalDrawer,
+        setDrawerClosePrompt,
         globalDrawer
       }}
     >
+      <ConfirmationDialog
+        title={t('router_prompt_title')}
+        open={open}
+        handleAccept={() => {
+          // setDrawerClosePrompt(false);
+          setOpen(false);
+          setGlobalDrawer(null);
+        }}
+        acceptText={t('router_prompt_accept')}
+        handleClose={() => setOpen(false)}
+        cancelText={t('router_prompt_cancel')}
+        text={t('router_prompt_text')}
+      />
       <div className={classes.appMain}>
         {useMemo(
           () => (
@@ -137,7 +165,7 @@ function DrawerProvider(props: DrawerProviderProps) {
                 </div>
               </>
             ),
-            [globalDrawer, theme]
+            [globalDrawer, theme, closeGlobalDrawer]
           )}
         </Drawer>
       </div>
