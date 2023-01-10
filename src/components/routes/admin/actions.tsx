@@ -16,6 +16,7 @@ import PageFullSize from 'commons/components/layout/pages/PageFullSize';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
+import { RouterPrompt } from 'components/visual/RouterPrompt';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactResizeDetector from 'react-resize-detector';
@@ -79,6 +80,8 @@ export default function AdminActions() {
 
   return currentUser.is_admin ? (
     <PageFullSize margin={4}>
+      <RouterPrompt when={actions !== originalActions} />
+
       <div style={{ marginBottom: theme.spacing(4), textAlign: 'left' }}>
         <Grid container alignItems="center" spacing={2}>
           <Grid item style={{ flexGrow: 1 }}>

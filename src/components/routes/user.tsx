@@ -37,6 +37,7 @@ import SecurityToken from 'components/routes/user/token';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
+import { RouterPrompt } from 'components/visual/RouterPrompt';
 import ChipInput from 'material-ui-chip-input';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -742,6 +743,8 @@ function User({ width, username }: UserProps) {
               </TableBody>
             </Table>
           </TableContainer>
+
+          <RouterPrompt when={modified} />
 
           {user && modified ? (
             <div

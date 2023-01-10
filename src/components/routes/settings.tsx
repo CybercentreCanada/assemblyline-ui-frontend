@@ -32,6 +32,7 @@ import ExternalSources from 'components/layout/externalSources';
 import ServiceSpec from 'components/layout/serviceSpec';
 import ServiceTree from 'components/layout/serviceTree';
 import Classification from 'components/visual/Classification';
+import { RouterPrompt } from 'components/visual/RouterPrompt';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -663,6 +664,8 @@ function Settings({ width }: SettingsProps) {
           )}
         </div>
       </Paper>
+
+      <RouterPrompt when={modified} />
 
       {settings && modified && (
         <div

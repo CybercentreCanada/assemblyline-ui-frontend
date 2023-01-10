@@ -1,4 +1,4 @@
-import { Grid, IconButton, Link, makeStyles, Tooltip, useMediaQuery, useTheme } from '@material-ui/core';
+import { Grid, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 import BlockIcon from '@material-ui/icons/Block';
 import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
@@ -8,6 +8,7 @@ import PageHeader from 'commons/components/layout/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
+import FileDownloader from 'components/visual/FileDownloader';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
@@ -189,15 +190,11 @@ export default function Signatures() {
           </Grid>
           {currentUser.roles.includes('signature_download') && (
             <Grid item xs style={{ textAlign: 'right' }}>
-              <Tooltip title={t('download_desc')}>
-                <IconButton
-                  component={Link}
-                  style={{ color: theme.palette.action.active }}
-                  href={`/api/v4/signature/download/?query=${query ? query.get('query', '*') : '*'}`}
-                >
-                  <GetAppOutlinedIcon />
-                </IconButton>
-              </Tooltip>
+              <FileDownloader
+                icon={<GetAppOutlinedIcon />}
+                link={`/api/v4/signature/download/?query=${query ? query.get('query', '*') : '*'}`}
+                tooltip={t('download_desc')}
+              />
             </Grid>
           )}
         </Grid>

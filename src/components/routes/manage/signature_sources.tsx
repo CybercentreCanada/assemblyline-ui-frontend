@@ -15,6 +15,7 @@ import {
 import AddCircleOutlineOutlinedIcon from '@material-ui/icons/AddCircleOutlineOutlined';
 import CardMembershipOutlinedIcon from '@material-ui/icons/CardMembershipOutlined';
 import DnsOutlinedIcon from '@material-ui/icons/DnsOutlined';
+import { RouterPrompt } from 'components/visual/RouterPrompt';
 import FingerprintOutlinedIcon from '@material-ui/icons/FingerprintOutlined';
 import NoEncryptionOutlinedIcon from '@material-ui/icons/NoEncryptionOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
@@ -277,6 +278,9 @@ const WrappedSourceDetailDrawer = ({ service, base, close, generatesSignatures }
           </Grid>
         </div>
         <SourceDetail source={source} defaults={null} addMode={!base} setSource={setSource} setModified={setModified} />
+
+        <RouterPrompt when={modified} />
+
         <div style={{ paddingTop: theme.spacing(2), paddingBottom: theme.spacing(2), textAlign: 'right' }}>
           <Button
             variant="contained"
