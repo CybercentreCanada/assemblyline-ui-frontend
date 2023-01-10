@@ -4,6 +4,7 @@ import useUser from 'commons/components/hooks/useAppUser';
 import PageFullSize from 'commons/components/layout/pages/PageFullSize';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
+import { RouterPrompt } from 'components/visual/RouterPrompt';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Redirect } from 'react-router-dom';
@@ -96,6 +97,14 @@ export default function AdminIdentify() {
 
   return currentUser.is_admin ? (
     <PageFullSize margin={4}>
+      <RouterPrompt
+        when={
+          magicFile !== originalMagicFile ||
+          mimesFile !== originalMimesFile ||
+          patternsFile !== originalPatternsFile ||
+          yaraFile !== originalYaraFile
+        }
+      />
       <div style={{ marginBottom: theme.spacing(2), textAlign: 'left' }}>
         <Grid container alignItems="center" spacing={1}>
           <Grid item xs={12}>
