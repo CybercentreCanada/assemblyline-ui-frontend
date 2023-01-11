@@ -13,7 +13,7 @@ import {
 import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
 import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
 import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
-import Editor from '@monaco-editor/react';
+import Editor, { loader } from '@monaco-editor/react';
 import { Alert, Skeleton } from '@material-ui/lab';
 import PageFullSize from 'commons/components/layout/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
@@ -27,6 +27,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useHistory, useLocation, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
+
+loader.config({ paths: { vs: '/cdn/monaco_0.34.1' } });
 
 type ParamProps = {
   id: string;
@@ -73,8 +75,20 @@ const useStyles = makeStyles(theme => ({
 
 const WrappedMonacoViewer = ({ data, type, error, beautify = false }) => {
   const classes = useStyles();
+  const { i18n } = useTranslation();
   const containerEL = useRef<HTMLDivElement>();
   const { isDarkTheme } = useAppContext();
+
+  useEffect(() => {
+    // I cannot find a way to hot switch monaco editor's locale but at least I can load
+    // the right language on first load...
+    if (i18n.language === 'fr') {
+      loader.config({ 'vs/nls': { availableLanguages: { '*': 'fr' } } });
+    } else {
+      loader.config({ 'vs/nls': { availableLanguages: { '*': '' } } });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const beautifyJSON = inputData => {
     if (!beautify) return inputData;

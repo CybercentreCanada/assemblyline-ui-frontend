@@ -22,6 +22,8 @@ import { useTranslation } from 'react-i18next';
 import ReactResizeDetector from 'react-resize-detector';
 import { Redirect } from 'react-router-dom';
 
+loader.config({ paths: { vs: '/cdn/monaco_0.34.1' } });
+
 export default function AdminTagSafelist() {
   const { t, i18n } = useTranslation(['adminTagSafelist']);
   const theme = useTheme();
