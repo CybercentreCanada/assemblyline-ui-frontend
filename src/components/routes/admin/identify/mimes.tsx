@@ -17,6 +17,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactResizeDetector from 'react-resize-detector';
 
+loader.config({ paths: { vs: '/cdn/monaco_0.34.1' } });
+
 function WrappedMimes({ reload, mimesFile, originalMimesFile, setMimesFile }) {
   const { t, i18n } = useTranslation(['adminIdentify']);
   const theme = useTheme();
