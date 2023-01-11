@@ -1,6 +1,6 @@
-import { IconButton } from '@material-ui/core';
-import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
-import { Pagination } from '@material-ui/lab';
+import { IconButton } from '@mui/material';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { Pagination } from '@mui/material';
 import useListStyles from 'commons/addons/elements/lists/hooks/useListStyles';
 import React from 'react';
 import Book from './Book';

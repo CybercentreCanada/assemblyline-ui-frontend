@@ -1,6 +1,7 @@
-import { AppBar, Avatar, Divider, List, makeStyles, Toolbar, useMediaQuery, useTheme } from '@material-ui/core';
-import AppsIcon from '@material-ui/icons/Apps';
-import Skeleton from '@material-ui/lab/Skeleton';
+import { AppBar, Avatar, Divider, List, Toolbar, useMediaQuery, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import AppsIcon from '@mui/icons-material/Apps';
+import Skeleton from '@mui/material/Skeleton';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import { LeftNavElement } from 'commons/components/layout/leftnav/LeftNavDrawer';
 import { useStyles as userProfileStyles } from 'commons/components/layout/topnav/UserProfile';
@@ -36,12 +37,12 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.palette.background.default
   },
   contentLeft: {
-    border: theme.palette.type === 'light' ? '1px solid rgba(0, 0, 0, 0.12)' : '1px solid rgba(255, 255, 255, 0.12)',
+    border: theme.palette.mode === 'light' ? '1px solid rgba(0, 0, 0, 0.12)' : '1px solid rgba(255, 255, 255, 0.12)',
     borderTopColor: 'transparent',
     backgroundColor: theme.palette.background.paper,
     marginRight: 5,
     flex: '0 0 auto',
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('lg')]: {
       display: 'none'
     }
   },
@@ -54,13 +55,13 @@ const useStyles = makeStyles(theme => ({
   },
   quickSearch: {
     padding: theme.spacing(2),
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('lg')]: {
       display: 'none'
     }
   },
   breadcrumbs: {
     height: theme.spacing(4),
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('lg')]: {
       display: 'none'
     }
   }
@@ -152,7 +153,7 @@ const SideLayoutSkeleton = () => {
                     marginRight: sp1
                   }}
                 />
-                <Skeleton animation="wave" variant="circle">
+                <Skeleton animation="wave" variant="circular">
                   <Avatar className={userProfileClasses.iconButton} />
                 </Skeleton>
               </Toolbar>
@@ -219,7 +220,7 @@ const TopLayoutSkeleton = () => {
                 marginRight: sp1
               }}
             />
-            <Skeleton animation="wave" variant="circle">
+            <Skeleton animation="wave" variant="circular">
               <Avatar className={userProfileClasses.iconButton} />
             </Skeleton>
           </Toolbar>

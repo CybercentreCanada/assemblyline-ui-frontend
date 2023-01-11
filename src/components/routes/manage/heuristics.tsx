@@ -1,5 +1,6 @@
-import { makeStyles, useTheme } from '@material-ui/core';
-import Typography from '@material-ui/core/Typography';
+import { useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import Typography from '@mui/material/Typography';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
@@ -31,7 +32,7 @@ const useStyles = makeStyles(theme => ({
   drawerPaper: {
     width: '80%',
     maxWidth: '800px',
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('lg')]: {
       width: '100%'
     }
   }

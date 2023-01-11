@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import { CircularProgress } from '@material-ui/core';
+import { CircularProgress } from '@mui/material';
 import useListKeyboard from 'commons/addons/elements/lists/hooks/useListKeyboard';
 import useListNavigator from 'commons/addons/elements/lists/hooks/useListNavigator';
 import useListStyles from 'commons/addons/elements/lists/hooks/useListStyles';

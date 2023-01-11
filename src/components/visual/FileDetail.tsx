@@ -1,11 +1,11 @@
-import { Grid, IconButton, Tooltip, Typography, useTheme } from '@material-ui/core';
-import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
-import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
-import PageviewOutlinedIcon from '@material-ui/icons/PageviewOutlined';
-import PlaylistAddCheckIcon from '@material-ui/icons/PlaylistAddCheck';
-import ReplayOutlinedIcon from '@material-ui/icons/ReplayOutlined';
-import RotateLeftOutlinedIcon from '@material-ui/icons/RotateLeftOutlined';
-import { Skeleton } from '@material-ui/lab';
+import { Grid, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
+import AmpStoriesOutlinedIcon from '@mui/icons-material/AmpStoriesOutlined';
+import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
+import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
+import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
+import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
+import RotateLeftOutlinedIcon from '@mui/icons-material/RotateLeftOutlined';
+import { Skeleton } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -269,7 +269,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                     <IconButton
                       component={Link}
                       to={`/search/submission?query=files.sha256:${file.file_info.sha256} OR results:${file.file_info.sha256}* OR errors:${file.file_info.sha256}*`}
-                    >
+                      size="large">
                       <AmpStoriesOutlinedIcon />
                     </IconButton>
                   </Tooltip>
@@ -284,7 +284,10 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                   )}
                   {currentUser.roles.includes('file_detail') && (
                     <Tooltip title={t('file_viewer')}>
-                      <IconButton component={Link} to={`/file/viewer/${file.file_info.sha256}`}>
+                      <IconButton
+                        component={Link}
+                        to={`/file/viewer/${file.file_info.sha256}`}
+                        size="large">
                         <PageviewOutlinedIcon />
                       </IconButton>
                     </Tooltip>
@@ -301,21 +304,21 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                             c12n: file.file_info.classification
                           }
                         }}
-                      >
+                        size="large">
                         <ReplayOutlinedIcon />
                       </IconButton>
                     </Tooltip>
                   )}
                   {currentUser.roles.includes('submission_create') && (
                     <Tooltip title={t('resubmit_dynamic')}>
-                      <IconButton onClick={resubmit}>
+                      <IconButton onClick={resubmit} size="large">
                         <RotateLeftOutlinedIcon />
                       </IconButton>
                     </Tooltip>
                   )}
                   {currentUser.roles.includes('safelist_manage') && (
                     <Tooltip title={t('safelist')}>
-                      <IconButton onClick={prepareSafelist}>
+                      <IconButton onClick={prepareSafelist} size="large">
                         <PlaylistAddCheckIcon />
                       </IconButton>
                     </Tooltip>
@@ -326,7 +329,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                   {[...Array(5)].map((_, i) => (
                     <Skeleton
                       key={i}
-                      variant="circle"
+                      variant="circular"
                       height="2.5rem"
                       width="2.5rem"
                       style={{ margin: theme.spacing(0.5) }}

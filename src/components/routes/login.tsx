@@ -1,15 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import {
-  Box,
-  Button,
-  CircularProgress,
-  createStyles,
-  Link,
-  makeStyles,
-  Theme,
-  Typography,
-  useTheme
-} from '@material-ui/core';
+import { Box, Button, CircularProgress, Link, Theme, Typography, useTheme } from '@mui/material';
+import createStyles from '@mui/styles/createStyles';
+import makeStyles from '@mui/styles/makeStyles';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import CardCentered from 'commons/components/layout/pages/CardCentered';
 import useMyAPI from 'components/hooks/useMyAPI';

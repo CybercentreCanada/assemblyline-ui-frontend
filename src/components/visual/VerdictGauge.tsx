@@ -1,4 +1,5 @@
-import { makeStyles, Tooltip, useTheme } from '@material-ui/core';
+import { Tooltip, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import { scaleLinear } from 'd3-scale';
 import { arc } from 'd3-shape';
 import React from 'react';
@@ -54,8 +55,8 @@ const VerdictGauge: React.FC<VerdictGaugeProps> = ({ verdicts, max = 20, colorBa
   const { t } = useTranslation();
   const classes = useStyles();
   const theme = useTheme();
-  const colorMalicious = theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark;
-  const colorNonMalicious = theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark;
+  const colorMalicious = theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark;
+  const colorNonMalicious = theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark;
 
   const backgroundArc = arc()
     .innerRadius(0.7)

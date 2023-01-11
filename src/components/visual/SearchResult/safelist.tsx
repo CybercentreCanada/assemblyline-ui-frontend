@@ -1,7 +1,7 @@
-import { Tooltip } from '@material-ui/core';
-import Paper from '@material-ui/core/Paper';
-import TableContainer from '@material-ui/core/TableContainer';
-import { AlertTitle, Skeleton } from '@material-ui/lab';
+import { Tooltip } from '@mui/material';
+import Paper from '@mui/material/Paper';
+import TableContainer from '@mui/material/TableContainer';
+import { AlertTitle, Skeleton } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
 import { maxLenStr } from 'helpers/utils';
@@ -153,7 +153,7 @@ const WrappedSafelistTable: React.FC<SafelistTableProps> = ({
       </div>
     )
   ) : (
-    <Skeleton variant="rect" style={{ height: '6rem', borderRadius: '4px' }} />
+    <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
   );
 };
 

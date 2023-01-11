@@ -1,10 +1,8 @@
 import {
   Button,
   CircularProgress,
-  createStyles,
   Grid,
   IconButton,
-  makeStyles,
   MenuItem,
   Select,
   TextField,
@@ -12,10 +10,12 @@ import {
   Tooltip,
   Typography,
   useTheme,
-  withStyles
-} from '@material-ui/core';
-import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
-import { Autocomplete, Skeleton } from '@material-ui/lab';
+} from '@mui/material';
+import createStyles from '@mui/styles/createStyles';
+import makeStyles from '@mui/styles/makeStyles';
+import withStyles from '@mui/styles/withStyles';
+import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
+import { Autocomplete, Skeleton } from '@mui/material';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
@@ -233,15 +233,15 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
                   <Tooltip title={t('remove')}>
                     <IconButton
                       style={{
-                        color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                        color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
                       }}
                       onClick={() => setDeleteDialog(true)}
-                    >
+                      size="large">
                       <RemoveCircleOutlineOutlinedIcon />
                     </IconButton>
                   </Tooltip>
                 ) : (
-                  <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+                  <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
                 )}
               </Grid>
             )}

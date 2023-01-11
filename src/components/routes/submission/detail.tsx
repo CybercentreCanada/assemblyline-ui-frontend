@@ -1,15 +1,15 @@
-import { Grid, IconButton, LinearProgress, Snackbar, Tooltip, Typography, useTheme } from '@material-ui/core';
-import ArchiveOutlinedIcon from '@material-ui/icons/ArchiveOutlined';
-import BugReportOutlinedIcon from '@material-ui/icons/BugReportOutlined';
-import ChromeReaderModeOutlinedIcon from '@material-ui/icons/ChromeReaderModeOutlined';
-import CloseIcon from '@material-ui/icons/Close';
-import CloudDownloadOutlinedIcon from '@material-ui/icons/CloudDownloadOutlined';
-import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
-import PublishOutlinedIcon from '@material-ui/icons/PublishOutlined';
-import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
-import ReplayOutlinedIcon from '@material-ui/icons/ReplayOutlined';
-import VerifiedUserOutlinedIcon from '@material-ui/icons/VerifiedUserOutlined';
-import { Alert, Skeleton } from '@material-ui/lab';
+import { Grid, IconButton, LinearProgress, Snackbar, Tooltip, Typography, useTheme } from '@mui/material';
+import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
+import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
+import ChromeReaderModeOutlinedIcon from '@mui/icons-material/ChromeReaderModeOutlined';
+import CloseIcon from '@mui/icons-material/Close';
+import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined';
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
+import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
+import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
+import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
+import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
+import { Alert, Skeleton } from '@mui/material';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
@@ -897,7 +897,7 @@ function WrappedSubmissionDetail() {
                   style={{
                     paddingBottom: theme.spacing(3),
                     paddingTop: theme.spacing(2),
-                    color: theme.palette.type === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark
+                    color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark
                   }}
                 >
                   <PlayCircleOutlineIcon
@@ -925,9 +925,9 @@ function WrappedSubmissionDetail() {
                               onClick={() => setDeleteDialog(true)}
                               style={{
                                 color:
-                                  theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                                  theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
                               }}
-                            >
+                              size="large">
                               <RemoveCircleOutlineOutlinedIcon />
                             </IconButton>
                           </Tooltip>
@@ -942,7 +942,7 @@ function WrappedSubmissionDetail() {
                         {systemConfig.datastore.archive.enabled && currentUser.roles.includes('archive_trigger') && (
                           <Tooltip title={t(submission.archived ? 'archived' : 'archive')}>
                             <span>
-                              <IconButton onClick={archive} disabled={submission.archived}>
+                              <IconButton onClick={archive} disabled={submission.archived} size="large">
                                 <ArchiveOutlinedIcon />
                               </IconButton>
                             </span>
@@ -950,20 +950,20 @@ function WrappedSubmissionDetail() {
                         )}
                         {currentUser.roles.includes('submission_create') && (
                           <Tooltip title={t('resubmit')}>
-                            <IconButton onClick={resubmit}>
+                            <IconButton onClick={resubmit} size="large">
                               <ReplayOutlinedIcon />
                             </IconButton>
                           </Tooltip>
                         )}
                         {systemConfig.ui.allow_replay && currentUser.roles.includes('replay_trigger') && (
                           <Tooltip title={t('replay')}>
-                            <IconButton onClick={replay} disabled={submission.metadata.replay}>
+                            <IconButton onClick={replay} disabled={submission.metadata.replay} size="large">
                               <PublishOutlinedIcon />
                             </IconButton>
                           </Tooltip>
                         )}
                         <Tooltip title={t('report_view')}>
-                          <IconButton component={Link} to={`/submission/report/${submission.sid}`}>
+                          <IconButton component={Link} to={`/submission/report/${submission.sid}`} size="large">
                             <ChromeReaderModeOutlinedIcon />
                           </IconButton>
                         </Tooltip>
@@ -974,7 +974,7 @@ function WrappedSubmissionDetail() {
                       {[...Array(systemConfig.ui.allow_replay ? 6 : 5)].map((_, i) => (
                         <Skeleton
                           key={i}
-                          variant="circle"
+                          variant="circular"
                           height="2.5rem"
                           width="2.5rem"
                           style={{ margin: theme.spacing(0.5) }}
@@ -1044,16 +1044,16 @@ function WrappedSubmissionDetail() {
                       )
                     ) : (
                       <>
-                        <Skeleton variant="rect" style={{ height: '15px', width: '100%' }} />
+                        <Skeleton variant="rectangular" style={{ height: '15px', width: '100%' }} />
                         <div style={{ display: 'inline-flex', width: '100%', justifyContent: 'space-between' }}>
                           <Skeleton
-                            variant="circle"
+                            variant="circular"
                             height="1.5rem"
                             width="1.5rem"
                             style={{ margin: theme.spacing(0.5) }}
                           />
                           <Skeleton
-                            variant="circle"
+                            variant="circular"
                             height="1.5rem"
                             width="1.5rem"
                             style={{ margin: theme.spacing(0.5) }}

@@ -5,17 +5,17 @@ import {
   Drawer,
   Grid,
   IconButton,
-  makeStyles,
   TextField,
   Tooltip,
   useMediaQuery,
-  useTheme
-} from '@material-ui/core';
-import Typography from '@material-ui/core/Typography';
-import BlockIcon from '@material-ui/icons/Block';
-import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
-import PersonAddIcon from '@material-ui/icons/PersonAdd';
-import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount';
+  useTheme,
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import Typography from '@mui/material/Typography';
+import BlockIcon from '@mui/icons-material/Block';
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
@@ -61,7 +61,7 @@ const useStyles = makeStyles(theme => ({
   drawerPaper: {
     width: '80%',
     maxWidth: '800px',
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('xl')]: {
       width: '100%'
     }
   },
@@ -206,7 +206,7 @@ export default function Users() {
     <PageFullWidth margin={4}>
       <Drawer anchor="right" classes={{ paper: classes.drawerPaper }} open={drawer} onClose={closeDrawer}>
         <div id="drawerTop" style={{ padding: theme.spacing(1) }}>
-          <IconButton onClick={closeDrawer}>
+          <IconButton onClick={closeDrawer} size="large">
             <CloseOutlinedIcon />
           </IconButton>
         </div>
@@ -345,12 +345,12 @@ export default function Users() {
             <Tooltip title={t('add_user')}>
               <IconButton
                 style={{
-                  color: theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark
+                  color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
                 }}
                 onClick={() => {
                   setDrawer(true);
                 }}
-              >
+                size="large">
                 <PersonAddIcon />
               </IconButton>
             </Tooltip>

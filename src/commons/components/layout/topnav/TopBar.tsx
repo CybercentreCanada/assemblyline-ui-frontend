@@ -1,5 +1,5 @@
-import { AppBar, makeStyles, Slide, Toolbar, useMediaQuery, useTheme } from '@material-ui/core';
-import withWidth, { isWidthUp } from '@material-ui/core/withWidth';
+import { AppBar, Slide, Toolbar, useMediaQuery, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import { APPBAR_READY_EVENT } from 'commons/components/hooks/useAppBarHeight';
 import useAppContext from 'commons/components/hooks/useAppContext';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
@@ -10,6 +10,9 @@ import ThemeSelectionIcon from 'commons/components/layout/topnav/ThemeSelectionI
 import UserProfile from 'commons/components/layout/topnav/UserProfile';
 import React, { useLayoutEffect } from 'react';
 import AppTitle from './AppTitle';
+
+// FIXME checkout https://mui.com/components/use-media-query/#migrating-from-withwidth
+const withWidth = () => (WrappedComponent) => (props) => <WrappedComponent {...props} width="xs" />;
 
 const useStyles = makeStyles(theme => ({
   appBarTopLayout: {
@@ -28,7 +31,7 @@ const useStyles = makeStyles(theme => ({
   },
   menuButton: {
     display: 'none',
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('md')]: {
       display: 'inline-block'
     }
   },
@@ -55,7 +58,7 @@ const TopBar: React.FC<AppBarProps> = ({ apps, width }) => {
   const classes = useStyles(currentLayout);
   const isTopLayout = currentLayout === 'top';
   const isXs = useMediaQuery(theme.breakpoints.only('xs'));
-  const isSm = useMediaQuery(theme.breakpoints.down('sm'));
+  const isSm = useMediaQuery(theme.breakpoints.down('lg'));
   const { elevation, ...appbarStyles } = getAppbarStyles(currentLayout as 'side' | 'top');
   const { left, leftAfterBreadcrumbs } = layoutProps.topnav;
 

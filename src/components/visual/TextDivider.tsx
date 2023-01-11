@@ -1,4 +1,4 @@
-import { makeStyles } from '@material-ui/core';
+import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -24,7 +24,7 @@ const TextDivider: React.FC<TextDividerProps> = ({ forcePaper = false }) => {
       position: 'absolute',
       top: '-10px',
       width: '60px',
-      [theme.breakpoints.down('xs')]: {
+      [theme.breakpoints.down('lg')]: {
         backgroundColor: forcePaper ? theme.palette.background.paper : theme.palette.background.default
       }
     }

@@ -1,7 +1,5 @@
 import {
   Card,
-  createStyles,
-  makeStyles,
   Table,
   TableBody,
   TableCell,
@@ -10,8 +8,10 @@ import {
   Theme,
   Typography,
   useTheme,
-  withStyles
-} from '@material-ui/core';
+} from '@mui/material';
+import createStyles from '@mui/styles/createStyles';
+import makeStyles from '@mui/styles/makeStyles';
+import withStyles from '@mui/styles/withStyles';
 import ContentWithTOC, { ContentWithTOCItemDef } from 'commons/addons/elements/toc/Toc';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
@@ -71,7 +71,7 @@ const StyledTableCell = withStyles((theme: Theme) =>
       paddingLeft: '8px'
     },
     head: {
-      backgroundColor: theme.palette.type === 'dark' ? '#404040' : '#EEE',
+      backgroundColor: theme.palette.mode === 'dark' ? '#404040' : '#EEE',
       whiteSpace: 'nowrap'
     }
   })
@@ -89,8 +89,8 @@ const useStyles = makeStyles(theme => ({
   pre: {
     fontFamily: 'monospace',
     fontSize: '1rem',
-    margin: `0 0 ${theme.spacing(1)}px 0`,
-    padding: `${theme.spacing(1)}px ${theme.spacing(1.5)}px`,
+    margin: `0 0 ${theme.spacing(1)} 0`,
+    padding: `${theme.spacing(1)} ${theme.spacing(1.5)}`,
     whiteSpace: 'pre-wrap',
     wordBreak: 'break-word'
   }

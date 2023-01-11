@@ -1,8 +1,8 @@
-import { Grid, IconButton, MenuItem, Select, Tooltip, Typography, useTheme } from '@material-ui/core';
-import ArrowDownwardOutlinedIcon from '@material-ui/icons/ArrowDownwardOutlined';
-import ArrowUpwardOutlinedIcon from '@material-ui/icons/ArrowUpwardOutlined';
-import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
-import { Skeleton } from '@material-ui/lab';
+import { Grid, IconButton, MenuItem, Select, Tooltip, Typography, useTheme } from '@mui/material';
+import ArrowDownwardOutlinedIcon from '@mui/icons-material/ArrowDownwardOutlined';
+import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
+import { Skeleton } from '@mui/material';
 import useUser from 'commons/components/hooks/useAppUser';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -58,67 +58,65 @@ function Counter({ stats, comp, field, titleVariant = 'h6' as 'h6', numberVarian
 function ServiceDetail({ stats, comp, show }) {
   const { t } = useTranslation(['adminServiceReview']);
   const theme = useTheme();
-  return (
-    show && (
-      <div style={{ marginTop: theme.spacing(4), marginBottom: theme.spacing(4) }}>
-        <Typography variant="h3" align="center" gutterBottom>
-          {stats ? stats.service.version : <Skeleton width="10rem" style={{ display: 'inline-block' }} />}
-        </Typography>
-        <Counter stats={stats} comp={comp} field={'result.count'} />
-        <Counter stats={stats} comp={comp} field={'result.score.avg'} />
-        <div style={{ marginBottom: theme.spacing(2) }}>
-          <LineGraph
-            dataset={stats && stats.result.score.distribution}
-            datatype={stats && stats.version}
-            height="200px"
-            title={t('result.score.distribution')}
-            titleSize={20}
-          />
-        </div>
-        <Counter stats={stats} comp={comp} field={'file.extracted.avg'} />
-        <Counter stats={stats} comp={comp} field={'file.supplementary.avg'} />
-        <div style={{ marginBottom: theme.spacing(2) }}>
-          <LineGraph
-            dataset={stats && stats.heuristic}
-            datatype={stats && stats.version}
-            sorter={(a, b) => parseInt(a.split('.', 2)[1]) - parseInt(b.split('.', 2)[1])}
-            height="250px"
-            title={t('heuristic')}
-            titleSize={20}
-          />
-        </div>
-        <div style={{ marginBottom: theme.spacing(2), display: 'flex', flexDirection: 'column' }}>
-          {stats ? (
-            <Tooltip title={t('errors')}>
-              <IconButton
-                component={Link}
-                style={{ color: theme.palette.action.active, alignSelf: 'self-end' }}
-                to={`/admin/errors?tc=1y&filters=response.service_name%3A${
-                  stats.service.name
-                }&filters=${getVersionQuery(stats.service.version)}`}
-              >
-                <ErrorOutlineOutlinedIcon />
-              </IconButton>
-            </Tooltip>
-          ) : (
-            <Skeleton
-              component="div"
-              variant="circle"
-              height="2.5rem"
-              width="2.5rem"
-              style={{ margin: theme.spacing(0.5), alignSelf: 'self-end' }}
-            />
-          )}
-          <LineGraph
-            dataset={stats && stats.error}
-            datatype={stats && stats.version}
-            height="250px"
-            title={t('error')}
-            titleSize={20}
-          />
-        </div>
+  return show && (
+    <div style={{ marginTop: theme.spacing(4), marginBottom: theme.spacing(4) }}>
+      <Typography variant="h3" align="center" gutterBottom>
+        {stats ? stats.service.version : <Skeleton width="10rem" style={{ display: 'inline-block' }} />}
+      </Typography>
+      <Counter stats={stats} comp={comp} field={'result.count'} />
+      <Counter stats={stats} comp={comp} field={'result.score.avg'} />
+      <div style={{ marginBottom: theme.spacing(2) }}>
+        <LineGraph
+          dataset={stats && stats.result.score.distribution}
+          datatype={stats && stats.version}
+          height="200px"
+          title={t('result.score.distribution')}
+          titleSize={20}
+        />
       </div>
-    )
+      <Counter stats={stats} comp={comp} field={'file.extracted.avg'} />
+      <Counter stats={stats} comp={comp} field={'file.supplementary.avg'} />
+      <div style={{ marginBottom: theme.spacing(2) }}>
+        <LineGraph
+          dataset={stats && stats.heuristic}
+          datatype={stats && stats.version}
+          sorter={(a, b) => parseInt(a.split('.', 2)[1]) - parseInt(b.split('.', 2)[1])}
+          height="250px"
+          title={t('heuristic')}
+          titleSize={20}
+        />
+      </div>
+      <div style={{ marginBottom: theme.spacing(2), display: 'flex', flexDirection: 'column' }}>
+        {stats ? (
+          <Tooltip title={t('errors')}>
+            <IconButton
+              component={Link}
+              style={{ color: theme.palette.action.active, alignSelf: 'self-end' }}
+              to={`/admin/errors?tc=1y&filters=response.service_name%3A${
+                stats.service.name
+              }&filters=${getVersionQuery(stats.service.version)}`}
+              size="large">
+              <ErrorOutlineOutlinedIcon />
+            </IconButton>
+          </Tooltip>
+        ) : (
+          <Skeleton
+            component="div"
+            variant="circular"
+            height="2.5rem"
+            width="2.5rem"
+            style={{ margin: theme.spacing(0.5), alignSelf: 'self-end' }}
+          />
+        )}
+        <LineGraph
+          dataset={stats && stats.error}
+          datatype={stats && stats.version}
+          height="250px"
+          title={t('error')}
+          titleSize={20}
+        />
+      </div>
+    </div>
   );
 }
 
@@ -147,7 +145,7 @@ function VersionSelector({ possibleVersions, selectedService, version, setVersio
         ))}
     </Select>
   ) : (
-    <Skeleton variant="rect" height={theme.spacing(5)} width="100%" />
+    <Skeleton variant="rectangular" height={theme.spacing(5)} width="100%" />
   );
 }
 
@@ -270,7 +268,7 @@ export default function ServiceReview() {
               </div>
             </>
           ) : (
-            <Skeleton variant="rect" height={theme.spacing(5)} width={theme.spacing(30)} />
+            <Skeleton variant="rectangular" height={theme.spacing(5)} width={theme.spacing(30)} />
           )}
         </Grid>
       </Grid>

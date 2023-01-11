@@ -1,4 +1,5 @@
-import { makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
+import { useMediaQuery, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import useAppSitemap from 'commons/components/hooks/useAppSitemap';
 import BreadcrumbList from 'commons/components/layout/breadcrumbs/BreadcrumbList';

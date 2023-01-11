@@ -14,9 +14,9 @@ import {
   Tooltip,
   Typography,
   useTheme
-} from '@material-ui/core';
-import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
-import { Skeleton } from '@material-ui/lab';
+} from '@mui/material';
+import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
+import { Skeleton } from '@mui/material';
 import { SourceCard } from 'components/routes/manage/signature_sources';
 import 'moment/locale/fr';
 import { useEffect, useState } from 'react';
@@ -346,10 +346,10 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
                 <Tooltip title={t('updater.sources.remove')}>
                   <IconButton
                     style={{
-                      color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                      color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
                     }}
                     onClick={() => handleDeleteSource(i)}
-                  >
+                    size="large">
                     <RemoveCircleOutlineOutlinedIcon />
                   </IconButton>
                 </Tooltip>

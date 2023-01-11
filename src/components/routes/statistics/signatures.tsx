@@ -1,5 +1,5 @@
-import { Typography, useTheme } from '@material-ui/core';
-import { Skeleton } from '@material-ui/lab';
+import { Typography, useTheme } from '@mui/material';
+import { Skeleton } from '@mui/material';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';

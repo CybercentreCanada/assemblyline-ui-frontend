@@ -1,4 +1,4 @@
-import { Tooltip, Typography } from '@material-ui/core';
+import { Tooltip, Typography } from '@mui/material';
 import useAppSitemap, { BreadcrumbItem } from 'commons/components/hooks/useAppSitemap';
 import BreadcrumbIcon from 'commons/components/layout/breadcrumbs/BreadcrumbIcon';
 import { useStyles as useLinkStyle, useStyles } from 'commons/components/layout/breadcrumbs/BreadcrumbLinkItem';

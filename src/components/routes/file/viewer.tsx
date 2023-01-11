@@ -2,19 +2,19 @@ import {
   Grid,
   IconButton,
   LinearProgress,
-  makeStyles,
   Paper,
   Tab,
   Tabs,
   Tooltip,
   Typography,
-  useTheme
-} from '@material-ui/core';
-import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
-import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
-import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
+  useTheme,
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import AmpStoriesOutlinedIcon from '@mui/icons-material/AmpStoriesOutlined';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import Editor, { loader } from '@monaco-editor/react';
-import { Alert, Skeleton } from '@material-ui/lab';
+import { Alert, Skeleton } from '@mui/material';
 import PageFullSize from 'commons/components/layout/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -36,7 +36,7 @@ type ParamProps = {
 
 const useStyles = makeStyles(theme => ({
   hexWrapper: {
-    backgroundColor: theme.palette.type === 'dark' ? '#1e1e1e' : '#FAFAFA',
+    backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#FAFAFA',
     border: `1px solid ${theme.palette.divider}`,
     padding: theme.spacing(1),
     flexGrow: 1,
@@ -318,7 +318,7 @@ const FileViewer = () => {
           <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
             {currentUser.roles.includes('submission_view') && (
               <Tooltip title={t('detail')}>
-                <IconButton component={Link} to={`/file/detail/${id}`}>
+                <IconButton component={Link} to={`/file/detail/${id}`} size="large">
                   <DescriptionOutlinedIcon />
                 </IconButton>
               </Tooltip>
@@ -328,7 +328,7 @@ const FileViewer = () => {
                 <IconButton
                   component={Link}
                   to={`/search/submission?query=files.sha256:${id} OR results:${id}* OR errors:${id}*`}
-                >
+                  size="large">
                   <AmpStoriesOutlinedIcon />
                 </IconButton>
               </Tooltip>
@@ -384,7 +384,7 @@ const FileViewer = () => {
         </div>
       ) : (
         <Skeleton
-          variant="rect"
+          variant="rectangular"
           height={theme.spacing(6)}
           style={{ marginTop: theme.spacing(2), marginBottom: theme.spacing(2) }}
         />

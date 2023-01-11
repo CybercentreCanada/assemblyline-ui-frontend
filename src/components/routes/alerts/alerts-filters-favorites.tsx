@@ -1,4 +1,4 @@
-import { Button, Divider, Switch, TextField, Typography, useTheme } from '@material-ui/core';
+import { Button, Divider, Switch, TextField, Typography, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { ChipList } from 'components/visual/ChipList';

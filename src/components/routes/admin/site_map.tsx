@@ -1,5 +1,4 @@
 import {
-  createStyles,
   Paper,
   Table,
   TableBody,
@@ -10,11 +9,12 @@ import {
   Theme,
   Typography,
   useTheme,
-  withStyles
-} from '@material-ui/core';
-import HttpsOutlinedIcon from '@material-ui/icons/HttpsOutlined';
-import NoEncryptionOutlinedIcon from '@material-ui/icons/NoEncryptionOutlined';
-import { Skeleton } from '@material-ui/lab';
+} from '@mui/material';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+import HttpsOutlinedIcon from '@mui/icons-material/HttpsOutlined';
+import NoEncryptionOutlinedIcon from '@mui/icons-material/NoEncryptionOutlined';
+import { Skeleton } from '@mui/material';
 import useUser from 'commons/components/hooks/useAppUser';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -34,7 +34,7 @@ const StyledTableCell = withStyles((theme: Theme) =>
       }
     },
     head: {
-      backgroundColor: theme.palette.type === 'dark' ? '#404040' : '#EEE',
+      backgroundColor: theme.palette.mode === 'dark' ? '#404040' : '#EEE',
       whiteSpace: 'nowrap'
     }
   })
@@ -170,7 +170,7 @@ export default function SiteMap() {
           </Table>
         </TableContainer>
       ) : (
-        <Skeleton variant="rect" height="10rem" style={{ borderRadius: '4px' }} />
+        <Skeleton variant="rectangular" height="10rem" style={{ borderRadius: '4px' }} />
       )}
     </PageFullWidth>
   ) : (

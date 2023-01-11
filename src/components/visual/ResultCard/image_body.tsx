@@ -1,5 +1,6 @@
-import { Button, CircularProgress, makeStyles, Theme, Tooltip } from '@material-ui/core';
-import BrokenImageOutlinedIcon from '@material-ui/icons/BrokenImageOutlined';
+import { Button, CircularProgress, Theme, Tooltip } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import BrokenImageOutlinedIcon from '@mui/icons-material/BrokenImageOutlined';
 import clsx from 'clsx';
 import useCarousel from 'components/hooks/useCarousel';
 import useMyAPI from 'components/hooks/useMyAPI';

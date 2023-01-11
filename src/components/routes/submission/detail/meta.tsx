@@ -1,7 +1,8 @@
-import { Button, Collapse, Divider, Grid, makeStyles, Typography, useTheme } from '@material-ui/core';
-import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
-import { Skeleton } from '@material-ui/lab';
+import { Button, Collapse, Divider, Grid, Typography, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import { Skeleton } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -25,7 +26,7 @@ const useStyles = makeStyles(theme => ({
       border: '1px solid #DDD',
       color: '#888'
     },
-    backgroundColor: theme.palette.type === 'dark' ? '#ffffff05' : '#00000005',
+    backgroundColor: theme.palette.mode === 'dark' ? '#ffffff05' : '#00000005',
     border: `1px solid ${theme.palette.divider}`,
     borderRadius: '4px',
     color: theme.palette.text.secondary,

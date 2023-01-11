@@ -13,7 +13,7 @@ import {
   Typography,
   useMediaQuery,
   useTheme
-} from '@material-ui/core';
+} from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -34,7 +34,7 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
   const [tempKeyPriv, setTempKeyPriv] = useState('READ');
   const { apiCall } = useMyAPI();
   const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const fullScreen = useMediaQuery(theme.breakpoints.down('lg'));
   const { showSuccessMessage } = useMySnackbar();
   const regex = RegExp('^[a-zA-Z][a-zA-Z0-9_]*$');
   const sp1 = theme.spacing(1);

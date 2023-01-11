@@ -5,7 +5,6 @@ import {
   CircularProgress,
   FormControlLabel,
   Grid,
-  makeStyles,
   MenuItem,
   Paper,
   Select,
@@ -15,9 +14,11 @@ import {
   Tooltip,
   Typography,
   useMediaQuery,
-  useTheme
-} from '@material-ui/core';
-import { Alert, Skeleton, TabContext, TabList, TabPanel } from '@material-ui/lab';
+  useTheme,
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import { Alert, Skeleton } from '@mui/material';
+import { TabContext, TabList, TabPanel } from '@mui/lab';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
@@ -54,7 +55,7 @@ function Submit() {
   const [validateCB, setValidateCB] = useState(null);
   const [allowClick, setAllowClick] = useState(true);
   const [file, setFile] = useState(null);
-  const downSM = useMediaQuery(theme.breakpoints.down('sm'));
+  const downSM = useMediaQuery(theme.breakpoints.down('xl'));
   const md = useMediaQuery(theme.breakpoints.only('md'));
   const { showErrorMessage, showSuccessMessage, closeSnackbar } = useMySnackbar();
   const history = useHistory();

@@ -1,5 +1,6 @@
-import { ClickAwayListener, Fade, makeStyles, Popper } from '@material-ui/core';
-import AdbIcon from '@material-ui/icons/Adb';
+import { ClickAwayListener, Fade, Popper } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import AdbIcon from '@mui/icons-material/Adb';
 import clsx from 'clsx';
 import { isEscape } from 'commons/addons/elements/utils/keyboard';
 import { default as React, forwardRef, useCallback, useImperativeHandle, useState } from 'react';

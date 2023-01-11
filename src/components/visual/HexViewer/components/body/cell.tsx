@@ -1,4 +1,4 @@
-import { makeStyles } from '@material-ui/core';
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import React from 'react';
 import {
@@ -16,7 +16,7 @@ const useHexStyles = makeStyles(theme => ({
   cell: {
     paddingLeft: theme.spacing(0.2),
     paddingRight: theme.spacing(0.2),
-    fontWeight: theme.palette.type === 'dark' ? 400 : 600,
+    fontWeight: theme.palette.mode === 'dark' ? 400 : 600,
     userSelect: 'none',
     'td&': {},
     'div&': {

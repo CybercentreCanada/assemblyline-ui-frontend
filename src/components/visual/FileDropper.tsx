@@ -1,6 +1,6 @@
-import { makeStyles } from '@material-ui/core';
-import Typography from '@material-ui/core/Typography';
-import BlockIcon from '@material-ui/icons/Block';
+import makeStyles from '@mui/styles/makeStyles';
+import Typography from '@mui/material/Typography';
+import BlockIcon from '@mui/icons-material/Block';
 import useALContext from 'components/hooks/useALContext';
 import { useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';

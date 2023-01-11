@@ -1,6 +1,7 @@
 /* eslint-disable no-param-reassign */
-import { Button, FormControl, makeStyles, MenuItem, Select, TextField, Typography, useTheme } from '@material-ui/core';
-import { Autocomplete } from '@material-ui/lab';
+import { Button, FormControl, MenuItem, Select, TextField, Typography, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import { Autocomplete } from '@mui/material';
 import CustomChip from 'components/visual/CustomChip';
 import SearchQuery, {
   SearchFilter,
@@ -266,7 +267,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
             options={statusFilters}
             value={selectedStatusFilters}
             getOptionLabel={option => option.label}
-            getOptionSelected={isSelected}
+            isOptionEqualToValue={isSelected}
             renderOption={renderOption}
             renderInput={params => <TextField {...params} variant="outlined" />}
             onChange={(event, value) => onStatusFilterChange(value as SearchFilter[])}
@@ -281,7 +282,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
             options={priorityFilters}
             value={selectedPriorityFilters}
             getOptionLabel={option => option.label}
-            getOptionSelected={isSelected}
+            isOptionEqualToValue={isSelected}
             renderOption={renderOption}
             renderInput={params => <TextField {...params} variant="outlined" />}
             onChange={(event, value) => onPriorityFilterChange(value as SearchFilter[])}
@@ -296,7 +297,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
             options={labelFilters}
             value={selectedLabelFilters}
             getOptionLabel={option => option.label}
-            getOptionSelected={isSelected}
+            isOptionEqualToValue={isSelected}
             renderOption={renderOption}
             renderInput={params => <TextField {...params} variant="outlined" />}
             onChange={(event, value) => onLabelFilterChange(value as SearchFilter[])}
@@ -311,7 +312,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
             options={userFavoritesFilters}
             value={selectedQueryFilters.filter(filter => filter.isFavorite).map(f => f.filter)}
             getOptionLabel={option => option.label}
-            getOptionSelected={isSelected}
+            isOptionEqualToValue={isSelected}
             renderOption={renderOption}
             renderInput={params => <TextField {...params} variant="outlined" />}
             onChange={(event, value) => onFavoriteChange(value as SearchFilter[])}
@@ -326,7 +327,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
             options={valueFilters}
             value={selectedQueryFilters.filter(filter => !filter.isFavorite).map(f => f.filter)}
             getOptionLabel={option => option.label}
-            getOptionSelected={isSelected}
+            isOptionEqualToValue={isSelected}
             renderOption={renderOption}
             renderInput={params => <TextField {...params} variant="outlined" />}
             onChange={(event, value) => onValueFilterChange(value as SearchFilter[])}

@@ -1,8 +1,9 @@
-import { Grid, IconButton, makeStyles, Tooltip, useMediaQuery, useTheme } from '@material-ui/core';
-import Typography from '@material-ui/core/Typography';
-import AddCircleOutlineOutlinedIcon from '@material-ui/icons/AddCircleOutlineOutlined';
-import EventBusyOutlinedIcon from '@material-ui/icons/EventBusyOutlined';
-import EventOutlinedIcon from '@material-ui/icons/EventOutlined';
+import { Grid, IconButton, Tooltip, useMediaQuery, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import Typography from '@mui/material/Typography';
+import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
+import EventBusyOutlinedIcon from '@mui/icons-material/EventBusyOutlined';
+import EventOutlinedIcon from '@mui/icons-material/EventOutlined';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
@@ -34,7 +35,7 @@ const useStyles = makeStyles(theme => ({
   drawerPaper: {
     width: '80%',
     maxWidth: '800px',
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('lg')]: {
       width: '100%'
     }
   }
@@ -160,10 +161,10 @@ export default function Workflows() {
               <Tooltip title={t('add_workflow')}>
                 <IconButton
                   style={{
-                    color: theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark
+                    color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
                   }}
                   onClick={() => setGlobalDrawer(<WorkflowDetail workflow_id={null} close={closeGlobalDrawer} />)}
-                >
+                  size="large">
                   <AddCircleOutlineOutlinedIcon />
                 </IconButton>
               </Tooltip>

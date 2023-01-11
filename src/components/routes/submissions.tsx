@@ -1,8 +1,9 @@
-import { makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
-import Typography from '@material-ui/core/Typography';
-import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn';
-import BugReportIcon from '@material-ui/icons/BugReport';
-import PersonIcon from '@material-ui/icons/Person';
+import { useMediaQuery, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import Typography from '@mui/material/Typography';
+import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
+import BugReportIcon from '@mui/icons-material/BugReport';
+import PersonIcon from '@mui/icons-material/Person';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';

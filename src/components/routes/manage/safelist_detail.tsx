@@ -1,7 +1,7 @@
-import { Divider, Grid, IconButton, Tooltip, Typography, useTheme } from '@material-ui/core';
-import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
-import YoutubeSearchedForIcon from '@material-ui/icons/YoutubeSearchedFor';
-import { Skeleton } from '@material-ui/lab';
+import { Divider, Grid, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
+import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
+import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
+import { Skeleton } from '@mui/material';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -230,7 +230,7 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
                                   safelist.tag.type
                                 }:${safeFieldValueURI(safelist.tag.value)}`
                           }
-                        >
+                          size="large">
                           <YoutubeSearchedForIcon />
                         </IconButton>
                       </Tooltip>
@@ -239,10 +239,10 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
                       <Tooltip title={t('remove')}>
                         <IconButton
                           style={{
-                            color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                            color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
                           }}
                           onClick={() => setDeleteDialog(true)}
-                        >
+                          size="large">
                           <RemoveCircleOutlineOutlinedIcon />
                         </IconButton>
                       </Tooltip>
@@ -262,11 +262,11 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
               ) : (
                 <>
                   <div style={{ display: 'flex' }}>
-                    <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-                    <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+                    <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+                    <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
                   </div>
                   <Skeleton
-                    variant="rect"
+                    variant="rectangular"
                     height="2rem"
                     width="6rem"
                     style={{

@@ -1,4 +1,4 @@
-import { makeStyles } from '@material-ui/core';
+import makeStyles from '@mui/styles/makeStyles';
 import { default as React } from 'react';
 
 const useStyles = makeStyles(theme => ({
@@ -7,7 +7,7 @@ const useStyles = makeStyles(theme => ({
       backgroundColor: '#00000005',
       border: '1px solid #DDD'
     },
-    backgroundColor: theme.palette.type === 'dark' ? '#ffffff05' : '#00000005',
+    backgroundColor: theme.palette.mode === 'dark' ? '#ffffff05' : '#00000005',
     border: `1px solid ${theme.palette.divider}`,
     borderRadius: '4px',
     padding: '4px',

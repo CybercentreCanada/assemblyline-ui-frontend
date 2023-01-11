@@ -1,5 +1,6 @@
-import { Collapse, Divider, Grid, makeStyles, Typography, useTheme } from '@material-ui/core';
-import { Skeleton } from '@material-ui/lab';
+import { Collapse, Divider, Grid, Typography, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import { Skeleton } from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import CustomChip from '../CustomChip';

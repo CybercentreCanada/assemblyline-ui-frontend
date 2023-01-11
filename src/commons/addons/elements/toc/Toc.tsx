@@ -1,4 +1,5 @@
-import { makeStyles, useTheme } from '@material-ui/core';
+import { useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import useUser from 'commons/components/hooks/useAppUser';
 import React, { ReactNode, useEffect, useMemo } from 'react';

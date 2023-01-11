@@ -1,8 +1,9 @@
-import { alpha, Box, CircularProgress, Drawer, IconButton, makeStyles, Tooltip, Typography } from '@material-ui/core';
-import BrokenImageOutlinedIcon from '@material-ui/icons/BrokenImageOutlined';
-import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
-import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
-import NavigateNextIcon from '@material-ui/icons/NavigateNext';
+import { alpha, Box, CircularProgress, Drawer, IconButton, Tooltip, Typography } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import BrokenImageOutlinedIcon from '@mui/icons-material/BrokenImageOutlined';
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import clsx from 'clsx';
 import Carousel from 'commons/addons/elements/carousel/Carousel';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -55,15 +56,15 @@ const useStyles = makeStyles(theme => ({
     minHeight: theme.spacing(12),
     minWidth: theme.spacing(12),
     maxWidth: '100vw',
-    maxHeight: `calc(95vh - 2*${theme.spacing(3)}px - 2*${theme.spacing(2)}px)`,
+    maxHeight: `calc(95vh - 2*${theme.spacing(3)} - 2*${theme.spacing(2)})`,
     '@media (min-height:500px)': {
-      maxHeight: `calc(95vh - ${MDSize} - 2*${theme.spacing(3)}px - 2*${theme.spacing(2)}px)`
+      maxHeight: `calc(95vh - ${MDSize} - 2*${theme.spacing(3)} - 2*${theme.spacing(2)})`
     },
     '@media (min-height:720px)': {
-      maxHeight: `calc(95vh - ${LGSize} - 2*${theme.spacing(3)}px - 2*${theme.spacing(2)}px)`
+      maxHeight: `calc(95vh - ${LGSize} - 2*${theme.spacing(3)} - 2*${theme.spacing(2)})`
     },
     '@media (min-height:1080px)': {
-      maxHeight: `calc(95vh - ${XLSize} - 2*${theme.spacing(3)}px - 2*${theme.spacing(2)}px)`
+      maxHeight: `calc(95vh - ${XLSize} - 2*${theme.spacing(3)} - 2*${theme.spacing(2)})`
     }
   },
   thumbsSection: {
@@ -349,15 +350,24 @@ function CarouselProvider(props: CarouselProviderProps) {
                   </div>
                 </div>
 
-                <IconButton className={clsx(classes.button, classes.closeButton)} onClick={closeCarousel}>
+                <IconButton
+                  className={clsx(classes.button, classes.closeButton)}
+                  onClick={closeCarousel}
+                  size="large">
                   <CloseOutlinedIcon />
                 </IconButton>
 
-                <IconButton className={clsx(classes.button, classes.beforeButton)} onClick={onPreviousImage}>
+                <IconButton
+                  className={clsx(classes.button, classes.beforeButton)}
+                  onClick={onPreviousImage}
+                  size="large">
                   <NavigateBeforeIcon />
                 </IconButton>
 
-                <IconButton className={clsx(classes.button, classes.nextButton)} onClick={onNextImage}>
+                <IconButton
+                  className={clsx(classes.button, classes.nextButton)}
+                  onClick={onNextImage}
+                  size="large">
                   <NavigateNextIcon />
                 </IconButton>
               </Carousel>

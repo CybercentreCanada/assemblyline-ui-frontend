@@ -1,7 +1,8 @@
-import { Box, Collapse, Divider, IconButton, makeStyles, Tooltip, Typography, useTheme } from '@material-ui/core';
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
-import ArrowRightIcon from '@material-ui/icons/ArrowRight';
-import { Skeleton } from '@material-ui/lab';
+import { Box, Collapse, Divider, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import { Skeleton } from '@mui/material';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';
 import Verdict from 'components/visual/Verdict';
@@ -171,7 +172,7 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, defaultForceShown
                 style={{
                   wordBreak: 'break-word',
                   backgroundColor: isHighlighted(sha256)
-                    ? theme.palette.type === 'dark'
+                    ? theme.palette.mode === 'dark'
                       ? '#343a44'
                       : '#d8e3ea'
                     : null

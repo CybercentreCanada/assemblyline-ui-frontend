@@ -1,5 +1,6 @@
-import { Link, makeStyles, Tooltip } from '@material-ui/core';
-import PageviewOutlinedIcon from '@material-ui/icons/PageviewOutlined';
+import { Link, Tooltip } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink } from 'react-router-dom';

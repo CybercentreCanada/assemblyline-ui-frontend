@@ -1,4 +1,4 @@
-import { Tooltip, useTheme } from '@material-ui/core';
+import { Tooltip, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import CustomChip from 'components/visual/CustomChip';
 import React from 'react';
@@ -34,31 +34,31 @@ const WrappedVerdict: React.FC<VerdictProps> = ({
       shortText: t('verdict.info.short'),
       text: t('verdict.info'),
       color: 'default' as 'default',
-      textColor: theme.palette.type === 'dark' ? '#AAA' : '#888'
+      textColor: theme.palette.mode === 'dark' ? '#AAA' : '#888'
     },
     safe: {
       shortText: t('verdict.safe.short'),
       text: t('verdict.safe'),
       color: 'success' as 'success',
-      textColor: theme.palette.type !== 'dark' ? theme.palette.success.dark : theme.palette.success.light
+      textColor: theme.palette.mode !== 'dark' ? theme.palette.success.dark : theme.palette.success.light
     },
     suspicious: {
       shortText: t('verdict.suspicious.short'),
       text: t('verdict.suspicious'),
       color: 'warning' as 'warning',
-      textColor: theme.palette.type !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
+      textColor: theme.palette.mode !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
     },
     highly_suspicious: {
       shortText: t('verdict.highly_suspicious.short'),
       text: t('verdict.highly_suspicious'),
       color: 'warning' as 'warning',
-      textColor: theme.palette.type !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
+      textColor: theme.palette.mode !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
     },
     malicious: {
       shortText: t('verdict.malicious.short'),
       text: t('verdict.malicious'),
       color: 'error' as 'error',
-      textColor: theme.palette.type !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
+      textColor: theme.palette.mode !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
     }
   };
 

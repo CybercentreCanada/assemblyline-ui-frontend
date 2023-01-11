@@ -1,4 +1,4 @@
-import { useTheme } from '@material-ui/core';
+import { useTheme } from '@mui/material';
 import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
 import React from 'react';
 

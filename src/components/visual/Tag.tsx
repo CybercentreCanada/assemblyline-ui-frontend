@@ -1,9 +1,9 @@
-import { Menu, MenuItem } from '@material-ui/core';
-import AssignmentOutlinedIcon from '@material-ui/icons/AssignmentOutlined';
-import FingerprintOutlinedIcon from '@material-ui/icons/FingerprintOutlined';
-import PlaylistAddCheckOutlinedIcon from '@material-ui/icons/PlaylistAddCheckOutlined';
-import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
-import SelectAllOutlinedIcon from '@material-ui/icons/SelectAllOutlined';
+import { Menu, MenuItem } from '@mui/material';
+import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
+import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
+import PlaylistAddCheckOutlinedIcon from '@mui/icons-material/PlaylistAddCheckOutlined';
+import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
+import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
 import useClipboard from 'commons/components/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';

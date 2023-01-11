@@ -1,6 +1,6 @@
-import { Box, IconButton } from '@material-ui/core';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import { Box, IconButton } from '@mui/material';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import useList from 'commons/addons/elements/lists/hooks/useListNavigator';
 
 const ListNavigator = ({ id }) => {
@@ -16,10 +16,10 @@ const ListNavigator = ({ id }) => {
 
   return (
     <Box display="flex" alignItems="center">
-      <IconButton onClick={onPreviousItem}>
+      <IconButton onClick={onPreviousItem} size="large">
         <ChevronLeftIcon />
       </IconButton>
-      <IconButton onClick={onNextItem}>
+      <IconButton onClick={onNextItem} size="large">
         <ChevronRightIcon />
       </IconButton>
     </Box>

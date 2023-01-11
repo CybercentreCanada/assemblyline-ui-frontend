@@ -7,17 +7,17 @@ import {
   DialogTitle,
   Grid,
   IconButton,
-  makeStyles,
   MenuItem,
   Paper,
   Select,
   Tooltip,
   Typography,
-  useTheme
-} from '@material-ui/core';
-import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
-import YoutubeSearchedForIcon from '@material-ui/icons/YoutubeSearchedFor';
-import { Skeleton } from '@material-ui/lab';
+  useTheme,
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
+import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
+import { Skeleton } from '@mui/material';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -84,11 +84,11 @@ const useStyles = makeStyles(theme => ({
   },
   stats: {
     margin: 0,
-    padding: `${theme.spacing(0.75)}px ${theme.spacing(1)}px`
+    padding: `${theme.spacing(0.75)} ${theme.spacing(1)}`
   },
   openPaper: {
     maxWidth: '1200px',
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('lg')]: {
       width: '100%'
     }
   },
@@ -330,7 +330,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
                         to={`/search/result/?query=result.sections.tags.file.rule.${signature.type}:${safeFieldValueURI(
                           `${signature.source}.${signature.name}`
                         )}`}
-                      >
+                        size="large">
                         <YoutubeSearchedForIcon />
                       </IconButton>
                     </Tooltip>
@@ -339,10 +339,10 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
                     <Tooltip title={t('remove')}>
                       <IconButton
                         style={{
-                          color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                          color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
                         }}
                         onClick={handleDeleteButtonClick}
-                      >
+                        size="large">
                         <RemoveCircleOutlineOutlinedIcon />
                       </IconButton>
                     </Tooltip>
@@ -356,11 +356,11 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
             ) : (
               <>
                 <div style={{ display: 'flex' }}>
-                  <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-                  <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+                  <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+                  <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
                 </div>
                 <Skeleton
-                  variant="rect"
+                  variant="rectangular"
                   height="1rem"
                   width="6rem"
                   style={{
@@ -378,7 +378,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
                 {signature.data}
               </Paper>
             ) : (
-              <Skeleton variant="rect" height="6rem" />
+              <Skeleton variant="rectangular" height="6rem" />
             )}
           </Grid>
           <Grid item xs={12}>

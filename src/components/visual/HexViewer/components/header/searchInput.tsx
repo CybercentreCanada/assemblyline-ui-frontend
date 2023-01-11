@@ -1,6 +1,7 @@
-import { makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
-import TextField from '@material-ui/core/TextField';
-import Autocomplete from '@material-ui/lab/Autocomplete';
+import { useMediaQuery, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import TextField from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { StoreProps, useDispatch } from '../..';
@@ -13,14 +14,14 @@ const useHexStyles = makeStyles(theme => ({
     }
   },
   autocompletePopper: {
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('md')]: {
       display: 'none'
     },
     width: '50vw'
   },
   autocompletePaper: {
-    margin: `${theme.spacing(1)}px 0px`,
-    borderRadius: `0 0 ${theme.spacing(0.5)}px ${theme.spacing(0.5)}px`,
+    margin: `${theme.spacing(1)} 0px`,
+    borderRadius: `0 0 ${theme.spacing(0.5)} ${theme.spacing(0.5)}`,
     width: '50vw'
   },
   autocompleteList: {
@@ -69,7 +70,7 @@ export const WrappedHexSearchbar = ({ store }: StoreProps) => {
       freeSolo
       disableClearable
       handleHomeEndKeys
-      closeIcon={null}
+      clearIcon={null}
       fullWidth
       size="small"
       open={suggestionOpen && upXS && false}

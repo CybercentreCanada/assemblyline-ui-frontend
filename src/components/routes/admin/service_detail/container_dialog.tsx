@@ -15,9 +15,9 @@ import {
   Tooltip,
   Typography,
   useTheme
-} from '@material-ui/core';
-import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
-import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
+} from '@mui/material';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import 'moment/locale/fr';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -80,10 +80,10 @@ const WrappedEnvironment = ({ envVar, onAdd, onUpdate, onDelete }: EnvironmentPr
         <Tooltip title={t('params.user.remove')}>
           <IconButton
             style={{
-              color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+              color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
             }}
             onClick={() => onDelete(envVar)}
-          >
+            size="large">
             <RemoveCircleOutlineOutlinedIcon />
           </IconButton>
         </Tooltip>
@@ -120,10 +120,10 @@ const WrappedEnvironment = ({ envVar, onAdd, onUpdate, onDelete }: EnvironmentPr
           <Tooltip title={t('params.user.add')}>
             <IconButton
               style={{
-                color: theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark
+                color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
               }}
               onClick={addEnvironment}
-            >
+              size="large">
               <AddCircleOutlineIcon />
             </IconButton>
           </Tooltip>
@@ -191,10 +191,10 @@ const WrappedVolumeControl = ({ name, vol, onAdd, onDelete }: VolumeControlProps
         <Tooltip title={t('params.user.remove')}>
           <IconButton
             style={{
-              color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+              color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
             }}
             onClick={() => onDelete(name)}
-          >
+            size="large">
             <RemoveCircleOutlineOutlinedIcon />
           </IconButton>
         </Tooltip>
@@ -264,10 +264,10 @@ const WrappedVolumeControl = ({ name, vol, onAdd, onDelete }: VolumeControlProps
           <Tooltip title={t('params.user.add')}>
             <IconButton
               style={{
-                color: theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark
+                color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
               }}
               onClick={addVolume}
-            >
+              size="large">
               <AddCircleOutlineIcon />
             </IconButton>
           </Tooltip>

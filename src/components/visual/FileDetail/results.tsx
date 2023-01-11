@@ -1,5 +1,6 @@
-import { Collapse, Divider, makeStyles, Typography, useTheme } from '@material-ui/core';
-import { Skeleton } from '@material-ui/lab';
+import { Collapse, Divider, Typography, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import { Skeleton } from '@mui/material';
 import useSafeResults from 'components/hooks/useSafeResults';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -57,7 +58,7 @@ const WrappedResultSection: React.FC<ResultSectionProps> = ({ results, sid, alte
               ))
             : [...Array(2)].map((_, i) => (
                 <Skeleton
-                  variant="rect"
+                  variant="rectangular"
                   key={i}
                   style={{ height: '12rem', marginBottom: '8px', borderRadius: '4px' }}
                 />

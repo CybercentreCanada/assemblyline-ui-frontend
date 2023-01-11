@@ -1,5 +1,6 @@
-import { Button, CircularProgress, Link, makeStyles, Typography, useTheme } from '@material-ui/core';
-import Skeleton from '@material-ui/lab/Skeleton';
+import { Button, CircularProgress, Link, Typography, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import Skeleton from '@mui/material/Skeleton';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
@@ -24,7 +25,7 @@ export default function Tos() {
     page: {
       maxWidth: '960px',
       width: '100%',
-      [curTheme.breakpoints.down('sm')]: {
+      [curTheme.breakpoints.down('xl')]: {
         maxWidth: '100%'
       },
       [curTheme.breakpoints.only('md')]: {

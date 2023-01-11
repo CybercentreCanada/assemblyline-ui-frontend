@@ -1,4 +1,6 @@
-import { Card, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
+import { Card, useMediaQuery, useTheme } from '@mui/material';
+
+import makeStyles from '@mui/styles/makeStyles';
 
 const useStyles = makeStyles(theme => ({
   card: {
@@ -11,7 +13,7 @@ const useStyles = makeStyles(theme => ({
     maxWidth: '22rem',
     backgroundColor: theme.palette.background.paper,
     borderRadius: '4px',
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('md')]: {
       backgroundColor: theme.palette.background.default,
       width: '100%',
       maxWidth: '22rem',

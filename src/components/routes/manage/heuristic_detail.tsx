@@ -1,6 +1,7 @@
-import { Grid, IconButton, makeStyles, Paper, Tooltip, Typography, useTheme } from '@material-ui/core';
-import YoutubeSearchedForIcon from '@material-ui/icons/YoutubeSearchedFor';
-import { Skeleton } from '@material-ui/lab';
+import { Grid, IconButton, Paper, Tooltip, Typography, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
+import { Skeleton } from '@mui/material';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -55,13 +56,13 @@ type HeuristicDetailProps = {
 const useStyles = makeStyles(theme => ({
   preview: {
     margin: 0,
-    padding: `${theme.spacing(0.75)}px ${theme.spacing(1)}px`,
+    padding: `${theme.spacing(0.75)} ${theme.spacing(1)}`,
     whiteSpace: 'pre-wrap',
     wordBreak: 'break-word'
   },
   drawerPaper: {
     maxWidth: '1200px',
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('lg')]: {
       width: '100%'
     }
   },
@@ -177,12 +178,12 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
                       to={`/search/result/?query=result.sections.heuristic.heur_id:${safeFieldValueURI(
                         heuristic.heur_id
                       )}`}
-                    >
+                      size="large">
                       <YoutubeSearchedForIcon />
                     </IconButton>
                   </Tooltip>
                 ) : (
-                  <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+                  <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
                 )}
               </Grid>
             )}

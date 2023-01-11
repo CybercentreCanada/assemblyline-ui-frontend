@@ -1,5 +1,5 @@
-import { useTheme } from '@material-ui/core';
-import { Skeleton } from '@material-ui/lab';
+import { useTheme } from '@mui/material';
+import { Skeleton } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
 
@@ -89,7 +89,7 @@ function WrappedLineGraph({ dataset, height, title, datatype, onClick, sorter, t
       <Bar data={barData} options={options} />
     </div>
   ) : (
-    <Skeleton variant="rect" height={height} />
+    <Skeleton variant="rectangular" height={height} />
   );
 }
 

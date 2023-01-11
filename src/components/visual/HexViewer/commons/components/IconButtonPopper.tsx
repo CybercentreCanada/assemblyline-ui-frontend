@@ -1,6 +1,7 @@
-import { ClickAwayListener, Fade, makeStyles, Paper, Popper, Tooltip } from '@material-ui/core';
-import IconButton from '@material-ui/core/IconButton';
-import AdbIcon from '@material-ui/icons/Adb';
+import { ClickAwayListener, Fade, Paper, Popper, Tooltip } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import IconButton from '@mui/material/IconButton';
+import AdbIcon from '@mui/icons-material/Adb';
 import clsx from 'clsx';
 import { isEnter, isEscape } from 'commons/addons/elements/utils/keyboard';
 import { default as React, useCallback, useState } from 'react';
@@ -8,10 +9,10 @@ import { default as React, useCallback, useState } from 'react';
 const useHexStyles = makeStyles(theme => ({
   iconButton: {
     padding: 10,
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('lg')]: {
       padding: 4
     },
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('md')]: {
       padding: 2
     }
   },

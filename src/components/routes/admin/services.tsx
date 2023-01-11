@@ -11,13 +11,13 @@ import {
   Typography,
   useMediaQuery,
   useTheme
-} from '@material-ui/core';
-import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
-import CloudDownloadOutlinedIcon from '@material-ui/icons/CloudDownloadOutlined';
-import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
-import RestoreOutlinedIcon from '@material-ui/icons/RestoreOutlined';
-import SystemUpdateAltIcon from '@material-ui/icons/SystemUpdateAlt';
-import { Skeleton } from '@material-ui/lab';
+} from '@mui/material';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined';
+import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
+import RestoreOutlinedIcon from '@mui/icons-material/RestoreOutlined';
+import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
+import { Skeleton } from '@mui/material';
 import useUser from 'commons/components/hooks/useAppUser';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import useALContext from 'components/hooks/useALContext';
@@ -350,10 +350,10 @@ export default function Services() {
             <Tooltip title={t('add')}>
               <IconButton
                 style={{
-                  color: theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark
+                  color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
                 }}
                 onClick={() => setOpen(true)}
-              >
+                size="large">
                 <AddCircleOutlineIcon />
               </IconButton>
             </Tooltip>
@@ -371,7 +371,7 @@ export default function Services() {
                   disabled={
                     !updates || !Object.values(updates).some((srv: any) => srv.update_available && !srv.updating)
                   }
-                >
+                  size="large">
                   <SystemUpdateAltIcon />
                 </IconButton>
               </span>
@@ -394,14 +394,14 @@ export default function Services() {
                     availableServices.length === 0 ||
                     availableServices.every(s => installingServices?.includes(s?.summary))
                   }
-                >
+                  size="large">
                   <CloudDownloadOutlinedIcon />
                 </IconButton>
               </span>
             </Tooltip>
             <FileDownloader icon={<GetAppOutlinedIcon />} link={`/api/v4/service/backup/`} tooltip={t('backup')} />
             <Tooltip title={t('restore')}>
-              <IconButton onClick={() => setOpenRestore(true)}>
+              <IconButton onClick={() => setOpenRestore(true)} size="large">
                 <RestoreOutlinedIcon />
               </IconButton>
             </Tooltip>

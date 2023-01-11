@@ -1,4 +1,5 @@
-import { CssBaseline, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
+import { CssBaseline, useMediaQuery, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/hooks/useAppUser';
 import LeftNavDrawer, { LeftNavElement } from 'commons/components/layout/leftnav/LeftNavDrawer';
 import { AppElement } from 'commons/components/layout/topnav/AppSwitcher';
@@ -15,7 +16,7 @@ const useNewStyles = makeStyles(theme => ({
   },
   appVerticalLeft: {
     height: '100%',
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('xl')]: {
       position: 'absolute',
       top: 0,
       left: 0,
@@ -232,8 +233,8 @@ function AppLayoutProvider(props: LayoutProviderProps) {
           ...layoutProps
         },
         showQuickSearch: quickSearch,
-        getBanner: curTheme => (curTheme.palette.type === 'dark' ? layoutProps.bannerDark : layoutProps.bannerLight),
-        getLogo: curTheme => (curTheme.palette.type === 'dark' ? layoutProps.appIconDark : layoutProps.appIconLight),
+        getBanner: curTheme => (curTheme.palette.mode === 'dark' ? layoutProps.bannerDark : layoutProps.bannerLight),
+        getLogo: curTheme => (curTheme.palette.mode === 'dark' ? layoutProps.appIconDark : layoutProps.appIconLight),
         hideMenus: () => setShowMenus(false),
         toggleLayout: onToggleLayout,
         toggleDrawer: onToggleDrawer,

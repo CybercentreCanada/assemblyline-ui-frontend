@@ -3,17 +3,18 @@ import {
   CircularProgress,
   Grid,
   IconButton,
-  makeStyles,
   Paper,
   Tab,
   Tooltip,
   Typography,
-  useTheme
-} from '@material-ui/core';
-import CompareArrowsOutlinedIcon from '@material-ui/icons/CompareArrowsOutlined';
-import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
-import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
-import { Skeleton, TabContext, TabList, TabPanel } from '@material-ui/lab';
+  useTheme,
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import CompareArrowsOutlinedIcon from '@mui/icons-material/CompareArrowsOutlined';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
+import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
+import { Skeleton } from '@mui/material';
+import { TabContext, TabList, TabPanel } from '@mui/lab';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -306,7 +307,7 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
                   to={`/admin/errors?filters=response.service_name%3A${service.name}&filters=${getVersionQuery(
                     service.version
                   )}`}
-                >
+                  size="large">
                   <ErrorOutlineOutlinedIcon />
                 </IconButton>
               </Tooltip>
@@ -315,26 +316,26 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
                   component={Link}
                   style={{ color: theme.palette.action.active }}
                   to={`/admin/service_review?service=${service.name}&v1=${service.version}`}
-                >
+                  size="large">
                   <CompareArrowsOutlinedIcon />
                 </IconButton>
               </Tooltip>
               <Tooltip title={t('remove')}>
                 <IconButton
                   style={{
-                    color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                    color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
                   }}
                   onClick={handleDeleteButtonClick}
-                >
+                  size="large">
                   <RemoveCircleOutlineOutlinedIcon />
                 </IconButton>
               </Tooltip>
             </div>
           ) : (
             <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
-              <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-              <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-              <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+              <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+              <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+              <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
             </div>
           )}
         </Grid>
@@ -350,7 +351,7 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
           style={{ marginBottom: theme.spacing(2) }}
         />
       ) : (
-        <Skeleton variant="rect" height="2.5rem" style={{ marginBottom: theme.spacing(1) }} />
+        <Skeleton variant="rectangular" height="2.5rem" style={{ marginBottom: theme.spacing(1) }} />
       )}
 
       {service ? (
@@ -399,7 +400,7 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
           </TabPanel>
         </TabContext>
       ) : (
-        <Skeleton variant="rect" height="10rem" />
+        <Skeleton variant="rectangular" height="10rem" />
       )}
 
       <RouterPrompt when={modified} />

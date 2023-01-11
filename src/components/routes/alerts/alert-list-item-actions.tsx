@@ -1,14 +1,15 @@
-import { makeStyles, Typography, useMediaQuery, useTheme } from '@material-ui/core';
-import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
-import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
-import BugReportOutlinedIcon from '@material-ui/icons/BugReportOutlined';
-import CenterFocusStrongOutlinedIcon from '@material-ui/icons/CenterFocusStrongOutlined';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import ExpandLessIcon from '@material-ui/icons/ExpandLess';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import VerifiedUserOutlinedIcon from '@material-ui/icons/VerifiedUserOutlined';
-import { SpeedDial, SpeedDialAction, SpeedDialIcon } from '@material-ui/lab';
+import { Typography, useMediaQuery, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import AmpStoriesOutlinedIcon from '@mui/icons-material/AmpStoriesOutlined';
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
+import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
+import CenterFocusStrongOutlinedIcon from '@mui/icons-material/CenterFocusStrongOutlined';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
+import { SpeedDial, SpeedDialAction, SpeedDialIcon } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
@@ -224,7 +225,7 @@ const WrappedAlertListItemActions: React.FC<AlertListItemActionsProps> = ({
                 boxShadow: permanent ? theme.shadows[0] : null,
                 margin: permanent ? '8px 2px 8px 2px' : null,
                 color: hasSetMalicious
-                  ? theme.palette.type === 'dark'
+                  ? theme.palette.mode === 'dark'
                     ? theme.palette.error.light
                     : theme.palette.error.dark
                   : null
@@ -251,7 +252,7 @@ const WrappedAlertListItemActions: React.FC<AlertListItemActionsProps> = ({
                 boxShadow: permanent ? theme.shadows[0] : null,
                 margin: permanent ? '8px 2px 8px 2px' : null,
                 color: hasSetNonMalicious
-                  ? theme.palette.type === 'dark'
+                  ? theme.palette.mode === 'dark'
                     ? theme.palette.success.light
                     : theme.palette.success.dark
                   : null

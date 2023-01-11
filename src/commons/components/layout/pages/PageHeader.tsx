@@ -8,7 +8,7 @@ import {
   Toolbar,
   Tooltip,
   useTheme
-} from '@material-ui/core';
+} from '@mui/material';
 import useAppBarHeight from 'commons/components/hooks/useAppBarHeight';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import React from 'react';
@@ -96,7 +96,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                       onClick={a.action}
                       {...(a.btnProp as IconButtonProps)}
                       style={{ marginRight: theme.spacing(1) }}
-                    >
+                      size="large">
                       {a.icon}
                     </IconButton>
                   );

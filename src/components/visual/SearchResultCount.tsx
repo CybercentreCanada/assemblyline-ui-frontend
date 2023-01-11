@@ -1,4 +1,4 @@
-import { Box, Tooltip } from '@material-ui/core';
+import { Box, Tooltip } from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';

@@ -7,8 +7,8 @@ import {
   Grid,
   Typography,
   useTheme
-} from '@material-ui/core';
-import { Skeleton } from '@material-ui/lab';
+} from '@mui/material';
+import { Skeleton } from '@mui/material';
 import Editor, { DiffEditor, loader } from '@monaco-editor/react';
 import useAppContext from 'commons/components/hooks/useAppContext';
 import useUser from 'commons/components/hooks/useAppUser';
@@ -186,7 +186,7 @@ export default function AdminActions() {
                     />
                   </>
                 ) : (
-                  <Skeleton width={width} height={height} variant="rect" animation="wave" />
+                  <Skeleton width={width} height={height} variant="rectangular" animation="wave" />
                 )}
               </div>
             )}

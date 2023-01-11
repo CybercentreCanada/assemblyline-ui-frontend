@@ -1,4 +1,4 @@
-import { useScrollTrigger } from '@material-ui/core';
+import { useScrollTrigger } from '@mui/material';
 
 export default function useTopBarScrollTrigger() {
   return useScrollTrigger({

@@ -1,8 +1,9 @@
-import { Box, Collapse, Divider, IconButton, makeStyles, Tooltip, Typography, useTheme } from '@material-ui/core';
-import OpenInNewOutlinedIcon from '@material-ui/icons/OpenInNewOutlined';
-import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
-import SelectAllOutlinedIcon from '@material-ui/icons/SelectAllOutlined';
-import { Skeleton } from '@material-ui/lab';
+import { Box, Collapse, Divider, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
+import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
+import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
+import { Skeleton } from '@mui/material';
 import clsx from 'clsx';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';
@@ -33,14 +34,14 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center'
   },
   header_malicious: {
-    color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark,
+    color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark,
     backgroundColor: '#f2000025',
     '&:hover, &:focus': {
       backgroundColor: '#f2000035'
     }
   },
   header_suspicious: {
-    color: theme.palette.type === 'dark' ? theme.palette.warning.light : theme.palette.warning.dark,
+    color: theme.palette.mode === 'dark' ? theme.palette.warning.light : theme.palette.warning.dark,
     backgroundColor: '#ff970025',
     '&:hover, &:focus': {
       backgroundColor: '#ff970035'
@@ -53,7 +54,7 @@ const useStyles = makeStyles(theme => ({
     }
   },
   header_safe: {
-    color: theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark,
+    color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark,
     backgroundColor: '#00f20025',
     '&:hover, &:focus': {
       backgroundColor: '#00f20035'
@@ -65,25 +66,25 @@ const useStyles = makeStyles(theme => ({
     overflow: 'hidden'
   },
   container_malicious: {
-    border: `1px solid ${theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark}`
+    border: `1px solid ${theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark}`
   },
   container_suspicious: {
-    border: `1px solid ${theme.palette.type === 'dark' ? theme.palette.warning.light : theme.palette.warning.dark}`
+    border: `1px solid ${theme.palette.mode === 'dark' ? theme.palette.warning.light : theme.palette.warning.dark}`
   },
   container_info: {
     border: `1px solid ${theme.palette.divider}`
   },
   container_safe: {
-    border: `1px solid ${theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark}`
+    border: `1px solid ${theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark}`
   },
   container_highlight: {
-    border: `1px solid ${theme.palette.type === 'dark' ? theme.palette.info.light : theme.palette.info.dark}`
+    border: `1px solid ${theme.palette.mode === 'dark' ? theme.palette.info.light : theme.palette.info.dark}`
   },
   highlighted: {
-    color: theme.palette.type === 'dark' ? theme.palette.info.light : theme.palette.primary.main,
-    backgroundColor: theme.palette.type === 'dark' ? '#3d485b' : '#cae8f9',
+    color: theme.palette.mode === 'dark' ? theme.palette.info.light : theme.palette.primary.main,
+    backgroundColor: theme.palette.mode === 'dark' ? '#3d485b' : '#cae8f9',
     '&:hover, &:focus': {
-      backgroundColor: theme.palette.type === 'dark' ? '#343a44' : '#e2f2fa'
+      backgroundColor: theme.palette.mode === 'dark' ? '#343a44' : '#e2f2fa'
     }
   }
 }));

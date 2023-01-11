@@ -1,10 +1,10 @@
-import { IconButton, Tooltip } from '@material-ui/core';
-import Paper from '@material-ui/core/Paper';
-import TableContainer from '@material-ui/core/TableContainer';
-import ClearIcon from '@material-ui/icons/Clear';
-import DoneIcon from '@material-ui/icons/Done';
-import SystemUpdateAltIcon from '@material-ui/icons/SystemUpdateAlt';
-import { AlertTitle, Skeleton } from '@material-ui/lab';
+import { IconButton, Tooltip } from '@mui/material';
+import Paper from '@mui/material/Paper';
+import TableContainer from '@mui/material/TableContainer';
+import ClearIcon from '@mui/icons-material/Clear';
+import DoneIcon from '@mui/icons-material/Done';
+import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
+import { AlertTitle, Skeleton } from '@mui/material';
 import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -114,7 +114,7 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
                             onUpdate(result.name, updates[result.name]);
                           }}
                           disabled={updates[result.name].updating}
-                        >
+                          size="large">
                           <SystemUpdateAltIcon />
                         </IconButton>
                       </span>
@@ -135,7 +135,7 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
       </div>
     )
   ) : (
-    <Skeleton variant="rect" style={{ height: '6rem', borderRadius: '4px' }} />
+    <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
   );
 };
 

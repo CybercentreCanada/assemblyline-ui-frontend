@@ -1,4 +1,5 @@
-import { Divider, Link as MuiLink, makeStyles, Typography } from '@material-ui/core';
+import { Divider, Link as MuiLink, Typography } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import * as DOMPurify from 'dompurify';
 import React from 'react';
@@ -47,7 +48,7 @@ const useStyles = makeStyles(theme => ({
     color: theme.palette.primary.main,
     transition: 'color 225ms cubic-bezier(0, 0, 0.2, 1) 0ms',
     '&:hover': {
-      color: theme.palette.type === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark
+      color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark
     }
   },
   isNew: {
@@ -71,7 +72,7 @@ const useStyles = makeStyles(theme => ({
   userLink: {
     transition: 'color 225ms cubic-bezier(0, 0, 0.2, 1) 0ms',
     '&:hover': {
-      color: theme.palette.type === 'dark' ? theme.palette.secondary.light : theme.palette.secondary.dark
+      color: theme.palette.mode === 'dark' ? theme.palette.secondary.light : theme.palette.secondary.dark
     }
   },
   userImg: {
@@ -100,7 +101,7 @@ const useStyles = makeStyles(theme => ({
       color: theme.palette.primary.main,
       transition: 'color 225ms cubic-bezier(0, 0, 0.2, 1) 0ms',
       '&:hover': {
-        color: theme.palette.type === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark
+        color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark
       }
     },
     '&>*': {

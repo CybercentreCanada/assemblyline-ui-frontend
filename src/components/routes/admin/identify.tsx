@@ -1,5 +1,6 @@
-import { Grid, Hidden, makeStyles, Paper, Tab, Tabs, Typography, useTheme } from '@material-ui/core';
-import { Alert } from '@material-ui/lab';
+import { Grid, Hidden, Paper, Tab, Tabs, Typography, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import { Alert } from '@mui/material';
 import { loader } from '@monaco-editor/react';
 import useUser from 'commons/components/hooks/useAppUser';
 import PageFullSize from 'commons/components/layout/pages/PageFullSize';
@@ -125,7 +126,7 @@ export default function AdminIdentify() {
             <Typography variant="h4">{t('title')}</Typography>
           </Grid>
           <Grid item xs={12}>
-            <Hidden xsDown>
+            <Hidden lgDown>
               <Alert severity="warning">{t('warning')}</Alert>
             </Hidden>
           </Grid>

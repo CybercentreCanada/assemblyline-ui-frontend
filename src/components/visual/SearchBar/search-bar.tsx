@@ -5,12 +5,12 @@ import {
   IconButton,
   IconButtonProps,
   LinearProgress,
-  makeStyles,
   Tooltip,
   useMediaQuery,
-  useTheme
-} from '@material-ui/core';
-import BackspaceIcon from '@material-ui/icons/Backspace';
+  useTheme,
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import BackspaceIcon from '@mui/icons-material/Backspace';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import SearchTextField from './search-textfield';

@@ -1,9 +1,10 @@
-import { Card, Grid, makeStyles, Switch, Theme, Tooltip, Typography } from '@material-ui/core';
-import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
-import PauseCircleOutlineIcon from '@material-ui/icons/PauseCircleOutline';
-import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
-import SpeedOutlinedIcon from '@material-ui/icons/SpeedOutlined';
-import { Skeleton } from '@material-ui/lab';
+import { Card, Grid, Switch, Theme, Tooltip, Typography } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
+import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutline';
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
+import SpeedOutlinedIcon from '@mui/icons-material/SpeedOutlined';
+import { Skeleton } from '@mui/material';
 import PageFullscreen from 'commons/components/layout/pages/PageFullScreen';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -34,15 +35,15 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   disabled: {
     color: theme.palette.text.hint,
-    backgroundColor: theme.palette.type === 'dark' ? '#63636317' : '#EAEAEA',
+    backgroundColor: theme.palette.mode === 'dark' ? '#63636317' : '#EAEAEA',
     border: `solid 1px ${theme.palette.divider}`
   },
   error: {
-    backgroundColor: theme.palette.type === 'dark' ? '#ff000017' : '#FFE4E4',
-    border: `solid 1px ${theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark}`
+    backgroundColor: theme.palette.mode === 'dark' ? '#ff000017' : '#FFE4E4',
+    border: `solid 1px ${theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark}`
   },
   error_icon: {
-    color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark,
+    color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark,
     float: 'right'
   },
   icon: {
@@ -72,7 +73,7 @@ const WrappedMetricCounter = ({ value, title, tooltip, init = false, margin = '8
 
   return !init ? (
     <Skeleton
-      variant="rect"
+      variant="rectangular"
       height="1.5rem"
       width="2rem"
       style={{ borderRadius: '4px', marginRight: margin, display: 'inline-block', verticalAlign: 'middle' }}

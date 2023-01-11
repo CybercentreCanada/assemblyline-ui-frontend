@@ -1,4 +1,4 @@
-import { CircularProgress, IconButton, Tooltip } from '@material-ui/core';
+import { CircularProgress, IconButton, Tooltip } from '@mui/material';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { useState } from 'react';
@@ -65,7 +65,7 @@ function FileDownloader({ icon, link, tooltip = null, successMessage = null }: E
   return (
     <Tooltip title={tooltip}>
       <span>
-        <IconButton onClick={downloadFile} disabled={waiting || total !== null}>
+        <IconButton onClick={downloadFile} disabled={waiting || total !== null} size="large">
           {(waiting || total === 0) && (
             <CircularProgress
               size={24}

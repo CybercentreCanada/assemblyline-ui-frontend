@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import { Backdrop, Button, Typography, useTheme } from '@material-ui/core';
+import { Backdrop, Button, Typography, useTheme } from '@mui/material';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import CardCentered from 'commons/components/layout/pages/CardCentered';
 import useALContext from 'components/hooks/useALContext';

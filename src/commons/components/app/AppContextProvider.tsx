@@ -1,13 +1,15 @@
 import {
   Button,
   CssBaseline,
-  makeStyles,
   Paper,
   ThemeProvider,
+  Theme,
+  StyledEngineProvider,
   Typography,
   useMediaQuery,
-  useTheme
-} from '@material-ui/core';
+  useTheme,
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import useAppTheme, { AppThemeProps } from 'commons/components/hooks/useAppTheme';
 import { SnackbarProvider } from 'notistack';
 import React, { useState } from 'react';
@@ -15,6 +17,30 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { useTranslation } from 'react-i18next';
 import { GiSpottedBug } from 'react-icons/gi';
 import PageCenter from '../layout/pages/PageCenter';
+
+
+
+
+declare module '@mui/styles/defaultTheme' {
+  // eslint-disable-next-line @typescript-eslint/no-empty-interface
+  interface DefaultTheme extends Theme {}
+}
+
+
+
+
+declare module '@mui/styles/defaultTheme' {
+  // eslint-disable-next-line @typescript-eslint/no-empty-interface
+  interface DefaultTheme extends Theme {}
+}
+
+
+
+declare module '@mui/styles/defaultTheme' {
+  // eslint-disable-next-line @typescript-eslint/no-empty-interface
+  interface DefaultTheme extends Theme {}
+}
+
 
 //
 interface AppbarStyles {
@@ -182,7 +208,7 @@ function ErrorFallback({ error, resetErrorBoundary }) {
   const { t } = useTranslation();
   const theme = useTheme();
   const classes = useStyles();
-  const downSM = useMediaQuery(theme.breakpoints.down('sm'));
+  const downSM = useMediaQuery(theme.breakpoints.down('xl'));
   const isXS = useMediaQuery(theme.breakpoints.only('xs'));
 
   return (
@@ -290,16 +316,18 @@ const AppContextProvider: React.FC<AppProviderProps> = ({ defaultTheme, colors, 
         getAppbarStyles
       }}
     >
-      <ThemeProvider theme={appTheme}>
-        <ErrorBoundary
-          FallbackComponent={ErrorFallback}
-          onReset={() => {
-            window.location.reload();
-          }}
-        >
-          <SnackbarProvider classes={{ root: classes.snackroot }}>{children}</SnackbarProvider>
-        </ErrorBoundary>
-      </ThemeProvider>
+      <StyledEngineProvider injectFirst>
+        <ThemeProvider theme={appTheme}>
+          <ErrorBoundary
+            FallbackComponent={ErrorFallback}
+            onReset={() => {
+              window.location.reload();
+            }}
+          >
+            <SnackbarProvider classes={{ root: classes.snackroot }}>{children}</SnackbarProvider>
+          </ErrorBoundary>
+        </ThemeProvider>
+      </StyledEngineProvider>
     </AppContext.Provider>
   );
 };

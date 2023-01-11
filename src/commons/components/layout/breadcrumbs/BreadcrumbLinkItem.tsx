@@ -1,4 +1,5 @@
-import { Link, makeStyles } from '@material-ui/core';
+import { Link } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import useAppSitemap, { BreadcrumbItem } from 'commons/components/hooks/useAppSitemap';
 import BreadcrumbIcon from 'commons/components/layout/breadcrumbs/BreadcrumbIcon';
 import React from 'react';

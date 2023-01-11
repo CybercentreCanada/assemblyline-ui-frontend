@@ -1,4 +1,5 @@
-import { makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
+import { useMediaQuery, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import useAppContext from 'commons/components/hooks/useAppContext';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -36,10 +37,10 @@ const WrappedAppRoot = ({ data = '' }: DataProps) => {
 
   // Width
   const theme = useTheme();
-  const isXS = useMediaQuery(theme.breakpoints.down('xs'));
-  const isSM = useMediaQuery(theme.breakpoints.down('sm'));
-  const isMD = useMediaQuery(theme.breakpoints.down('md'));
-  const isLG = useMediaQuery(theme.breakpoints.down('lg'));
+  const isXS = useMediaQuery(theme.breakpoints.down('md'));
+  const isSM = useMediaQuery(theme.breakpoints.down('lg'));
+  const isMD = useMediaQuery(theme.breakpoints.down('xl'));
+  const isLG = useMediaQuery(theme.breakpoints.down('xl'));
   const isXL = useMediaQuery(theme.breakpoints.down('xl'));
 
   React.useEffect(() => {

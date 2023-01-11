@@ -1,4 +1,5 @@
-import { makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
+import { useMediaQuery, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 import FilterInput from './filter-input';
 import { FilterField } from './filter-selector';
@@ -6,7 +7,7 @@ import { FilterField } from './filter-selector';
 const useStyles = makeStyles(theme => ({
   filter: {
     marginRight: theme.spacing(2),
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('lg')]: {
       marginBottom: theme.spacing(2)
     }
   }
@@ -22,7 +23,7 @@ interface FilterListProps {
 const FilterList: React.FC<FilterListProps> = ({ currentFilters, filterFields, list, onFiltered }) => {
   const theme = useTheme();
   const classes = useStyles();
-  const isSM = useMediaQuery(theme.breakpoints.down('sm'));
+  const isSM = useMediaQuery(theme.breakpoints.down('lg'));
 
   return (
     <div style={{ display: !isSM ? 'flex' : 'block' }}>

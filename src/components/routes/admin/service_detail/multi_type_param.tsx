@@ -9,11 +9,11 @@ import {
   Tooltip,
   Typography,
   useTheme
-} from '@material-ui/core';
-import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
-import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
-import VisibilityIcon from '@material-ui/icons/Visibility';
-import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
+} from '@mui/material';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import 'moment/locale/fr';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -141,7 +141,7 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
       </Grid>
       <Grid item xs={2} sm={1}>
         <Tooltip title={t(param.hide ? 'params.user.show' : 'params.user.hide')}>
-          <IconButton onClick={handleParamHide}>{param.hide ? <VisibilityOffIcon /> : <VisibilityIcon />}</IconButton>
+          <IconButton onClick={handleParamHide} size="large">{param.hide ? <VisibilityOffIcon /> : <VisibilityIcon />}</IconButton>
         </Tooltip>
       </Grid>
       {param.type === 'list' && (
@@ -206,10 +206,10 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
         <Tooltip title={t('params.user.remove')}>
           <IconButton
             style={{
-              color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+              color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
             }}
             onClick={() => onDelete(id)}
-          >
+            size="large">
             <RemoveCircleOutlineOutlinedIcon />
           </IconButton>
         </Tooltip>
@@ -302,10 +302,10 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
           <Tooltip title={t('params.user.add')}>
             <IconButton
               style={{
-                color: theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark
+                color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
               }}
               onClick={addUserSubmissionParam}
-            >
+              size="large">
               <AddCircleOutlineIcon />
             </IconButton>
           </Tooltip>

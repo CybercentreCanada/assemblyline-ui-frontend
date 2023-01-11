@@ -5,15 +5,17 @@ import {
   Fade,
   IconButton,
   Link,
-  makeStyles,
   Paper,
   Popper,
   Typography,
-  useTheme
-} from '@material-ui/core';
-import withWidth, { isWidthDown } from '@material-ui/core/withWidth';
-import AppsIcon from '@material-ui/icons/Apps';
+  useTheme,
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import AppsIcon from '@mui/icons-material/Apps';
 import React, { useState } from 'react';
+
+// FIXME checkout https://mui.com/components/use-media-query/#migrating-from-withwidth
+const withWidth = () => (WrappedComponent) => (props) => <WrappedComponent {...props} width="xs" />;
 
 export type AppElement = {
   alt: string;
@@ -44,7 +46,7 @@ const AppSwitcher: React.FC<AppsSwitcherProps> = ({ apps, width }) => {
   const theme = useTheme();
   const classes = useStyles();
   const [popperAnchorEl, setPopperAnchorEl] = useState(null);
-  const isDarkTheme = theme.palette.type === 'dark';
+  const isDarkTheme = theme.palette.mode === 'dark';
   const isPopperOpen = !!popperAnchorEl;
   const onTogglePopper = event => {
     setPopperAnchorEl(popperAnchorEl ? null : event.currentTarget);
@@ -58,7 +60,7 @@ const AppSwitcher: React.FC<AppsSwitcherProps> = ({ apps, width }) => {
 
   return (
     <ClickAwayListener onClickAway={onClickAway}>
-      <IconButton color="inherit" onClick={onTogglePopper}>
+      <IconButton color="inherit" onClick={onTogglePopper} size="large">
         <AppsIcon />
         <Popper
           open={isPopperOpen}

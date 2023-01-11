@@ -1,6 +1,6 @@
-import { useTheme } from '@material-ui/core';
-import Typography from '@material-ui/core/Typography';
-import HourglassEmptyOutlinedIcon from '@material-ui/icons/HourglassEmptyOutlined';
+import { useTheme } from '@mui/material';
+import Typography from '@mui/material/Typography';
+import HourglassEmptyOutlinedIcon from '@mui/icons-material/HourglassEmptyOutlined';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import ForbiddenPage from 'components/routes/403';

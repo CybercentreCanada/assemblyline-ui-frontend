@@ -1,6 +1,7 @@
-import { IconButton, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
-import FullscreenIcon from '@material-ui/icons/Fullscreen';
-import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
+import { IconButton, useMediaQuery, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import FullscreenIcon from '@mui/icons-material/Fullscreen';
+import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import useAppBarHeight from 'commons/components/hooks/useAppBarHeight';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import useFullscreenStatus from 'commons/components/hooks/useFullscreenStatus';
@@ -61,11 +62,11 @@ const PageFullscreen: React.FC<PageFullscreenProps> = ({ children, margin = null
     <div ref={maximizableElement} className={classes.root}>
       <div className={classes.toggle} style={{ top: barWillHide || isFullscreen ? 0 : appBarHeight }}>
         {fullscreenSupported ? null : isFullscreen ? (
-          <IconButton onClick={handleExitFullscreen}>
+          <IconButton onClick={handleExitFullscreen} size="large">
             <FullscreenExitIcon />
           </IconButton>
         ) : (
-          <IconButton onClick={handleEnterFullscreen}>
+          <IconButton onClick={handleEnterFullscreen} size="large">
             <FullscreenIcon />
           </IconButton>
         )}

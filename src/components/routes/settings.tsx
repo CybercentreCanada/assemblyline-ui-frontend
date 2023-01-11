@@ -4,7 +4,6 @@ import {
   Drawer,
   IconButton,
   isWidthDown,
-  makeStyles,
   MenuItem,
   Paper,
   Select,
@@ -18,12 +17,12 @@ import {
   TextField,
   Typography,
   useTheme,
-  withWidth
-} from '@material-ui/core';
-import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
-import CloseIcon from '@material-ui/icons/Close';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Skeleton from '@material-ui/lab/Skeleton';
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
+import CloseIcon from '@mui/icons-material/Close';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import Skeleton from '@mui/material/Skeleton';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -35,6 +34,9 @@ import Classification from 'components/visual/Classification';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+// FIXME checkout https://mui.com/components/use-media-query/#migrating-from-withwidth
+const withWidth = () => (WrappedComponent) => (props) => <WrappedComponent {...props} width="xs" />;
 
 type SettingsProps = {
   width: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -75,7 +77,7 @@ function Settings({ width }: SettingsProps) {
   const useStyles = makeStyles(curTheme => ({
     drawer: {
       width: '500px',
-      [theme.breakpoints.down('xs')]: {
+      [theme.breakpoints.down('lg')]: {
         width: '100vw'
       }
     },
@@ -246,7 +248,7 @@ function Settings({ width }: SettingsProps) {
       <React.Fragment key="right">
         <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
           <div style={{ alignSelf: 'flex-end' }}>
-            <IconButton onClick={() => setDrawerOpen(false)}>
+            <IconButton onClick={() => setDrawerOpen(false)} size="large">
               <CloseIcon />
             </IconButton>
           </div>

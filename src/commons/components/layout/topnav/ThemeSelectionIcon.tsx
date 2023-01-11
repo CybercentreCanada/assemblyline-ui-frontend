@@ -1,5 +1,6 @@
-import { ClickAwayListener, Fade, IconButton, makeStyles, Paper, Popper, useTheme } from '@material-ui/core';
-import TuneIcon from '@material-ui/icons/Tune';
+import { ClickAwayListener, Fade, IconButton, Paper, Popper, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import TuneIcon from '@mui/icons-material/Tune';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import ThemeSelection from 'commons/components/layout/topnav/ThemeSelection';
 import React, { useState } from 'react';
@@ -35,7 +36,11 @@ const ThemeSelectionIcon = () => {
 
   return allowPersonalization || layoutProps.allowTranslate || layoutProps.allowReset ? (
     <ClickAwayListener onClickAway={onClickAway}>
-      <IconButton color="inherit" aria-label="open drawer" onClick={onThemeSelectionClick}>
+      <IconButton
+        color="inherit"
+        aria-label="open drawer"
+        onClick={onThemeSelectionClick}
+        size="large">
         <TuneIcon />
         <Popper
           open={isPopperOpen}

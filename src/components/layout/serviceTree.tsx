@@ -1,5 +1,7 @@
-import { Checkbox, createStyles, FormControlLabel, makeStyles, Typography, useTheme } from '@material-ui/core';
-import Skeleton from '@material-ui/lab/Skeleton';
+import { Checkbox, FormControlLabel, Typography, useTheme } from '@mui/material';
+import createStyles from '@mui/styles/createStyles';
+import makeStyles from '@mui/styles/makeStyles';
+import Skeleton from '@mui/material/Skeleton';
 import React from 'react';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 

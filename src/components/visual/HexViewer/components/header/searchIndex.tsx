@@ -1,5 +1,6 @@
-import { makeStyles, Tooltip } from '@material-ui/core';
-import Typography from '@material-ui/core/Typography';
+import { Tooltip } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import Typography from '@mui/material/Typography';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FieldPopper, NumericField, StoreProps, useDispatch } from '../..';
@@ -12,10 +13,10 @@ const useHexStyles = makeStyles(theme => ({
     textAlign: 'center',
     cursor: 'pointer',
     padding: 8,
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('lg')]: {
       padding: 2
     },
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('md')]: {
       padding: 0
     }
   },
@@ -23,10 +24,10 @@ const useHexStyles = makeStyles(theme => ({
     textAlign: 'center',
     cursor: 'default',
     padding: 8,
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('lg')]: {
       padding: 2
     },
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('md')]: {
       padding: 0
     }
   }

@@ -1,5 +1,5 @@
-import { Button, ButtonProps, IconButton, IconButtonProps, Tooltip, useTheme } from '@material-ui/core';
-import { Skeleton } from '@material-ui/lab';
+import { Button, ButtonProps, IconButton, IconButtonProps, Tooltip, useTheme } from '@mui/material';
+import { Skeleton } from '@mui/material';
 import FlexHorizontal from 'commons/addons/elements/layout/flexers/FlexHorizontal';
 import FlexVertical from 'commons/addons/elements/layout/flexers/FlexVertical';
 import React from 'react';
@@ -40,7 +40,7 @@ const ActionList: React.FC<{
           color={a.color}
           onClick={a.action}
           {...(a.btnProps as IconButtonProps)}
-        >
+          size="large">
           {a.icon}
         </IconButton>
       );

@@ -1,6 +1,6 @@
-import { Tooltip } from '@material-ui/core';
-import MuiBreadcrumbs from '@material-ui/core/Breadcrumbs';
-import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
+import { Tooltip } from '@mui/material';
+import MuiBreadcrumbs from '@mui/material/Breadcrumbs';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { BreadcrumbItem } from 'commons/components/hooks/useAppSitemap';
 import BreadcrumbLastItem from 'commons/components/layout/breadcrumbs/BreadcrumbLastItem';
 import BreadcrumbLinkItem from 'commons/components/layout/breadcrumbs/BreadcrumbLinkItem';

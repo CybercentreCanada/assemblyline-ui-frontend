@@ -1,8 +1,9 @@
-import { makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
-import Typography from '@material-ui/core/Typography';
-import BlockOutlinedIcon from '@material-ui/icons/BlockOutlined';
-import LabelOutlinedIcon from '@material-ui/icons/LabelOutlined';
-import PersonOutlineOutlinedIcon from '@material-ui/icons/PersonOutlineOutlined';
+import { useMediaQuery, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import Typography from '@mui/material/Typography';
+import BlockOutlinedIcon from '@mui/icons-material/BlockOutlined';
+import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
+import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
@@ -34,7 +35,7 @@ const useStyles = makeStyles(theme => ({
   drawerPaper: {
     width: '80%',
     maxWidth: '800px',
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('lg')]: {
       width: '100%'
     }
   }

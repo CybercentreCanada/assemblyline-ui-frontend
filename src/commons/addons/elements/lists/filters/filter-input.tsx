@@ -1,5 +1,6 @@
-import { InputAdornment, makeStyles, TextField } from '@material-ui/core';
-import FilterListIcon from '@material-ui/icons/FilterList';
+import { InputAdornment, TextField } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import FilterListIcon from '@mui/icons-material/FilterList';
 import Throttler from 'commons/addons/elements/utils/throttler';
 import React, { useState } from 'react';
 import useFilters from '../hooks/useFilters';
@@ -10,7 +11,7 @@ const useStyles = makeStyles(theme => ({
     padding: 0,
     '& svg': {
       transition: theme.transitions.create(['color', 'transform']),
-      color: theme.palette.type === 'dark' ? 'hsl(0, 0%, 22%)' : 'hsl(0, 0%, 80%)'
+      color: theme.palette.mode === 'dark' ? 'hsl(0, 0%, 22%)' : 'hsl(0, 0%, 80%)'
     }
   },
   filterInputFocused: {

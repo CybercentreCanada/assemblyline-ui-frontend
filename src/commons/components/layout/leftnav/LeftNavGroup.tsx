@@ -1,6 +1,6 @@
-import { Collapse, List, ListItem, ListItemIcon, ListItemText, Popover, Tooltip } from '@material-ui/core';
-import ExpandLess from '@material-ui/icons/ExpandLess';
-import ExpandMore from '@material-ui/icons/ExpandMore';
+import { Collapse, List, ListItem, ListItemIcon, ListItemText, Popover, Tooltip } from '@mui/material';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import useAppUser from 'commons/components/hooks/useAppUser';
 import { LeftNavGroupProps } from 'commons/components/layout/leftnav/LeftNavDrawer';

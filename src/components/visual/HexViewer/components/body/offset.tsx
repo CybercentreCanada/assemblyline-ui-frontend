@@ -1,4 +1,4 @@
-import { makeStyles } from '@material-ui/core';
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import React from 'react';
 import { getAddressValue, StoreProps, useDispatch } from '../..';
@@ -9,7 +9,7 @@ const useHexStyles = makeStyles(theme => ({
     padding: 0,
     display: 'block',
     color: theme.palette.text.secondary,
-    fontWeight: theme.palette.type === 'dark' ? 400 : 600,
+    fontWeight: theme.palette.mode === 'dark' ? 400 : 600,
     userSelect: 'none'
   }
 }));

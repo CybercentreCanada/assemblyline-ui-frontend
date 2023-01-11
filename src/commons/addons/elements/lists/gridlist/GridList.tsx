@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
-import { CircularProgress, Grid, GridSpacing, useTheme } from '@material-ui/core';
+import { CircularProgress, Grid, GridSpacing, useTheme } from '@mui/material';
 import useListKeyboard from 'commons/addons/elements/lists/hooks/useListKeyboard';
 import useListStyles from 'commons/addons/elements/lists/hooks/useListStyles';
 import { LineItem } from 'commons/addons/elements/lists/item/ListItemBase';
@@ -17,7 +17,7 @@ interface Breakpoints {
   xl?: 1 | 2 | 3 | 4 | 6 | 12;
 }
 
-interface GridListProps {
+interface ImageListProps {
   id: string;
   items: LineItem[];
   emptyValue?: React.ReactNode;
@@ -33,7 +33,7 @@ interface GridListProps {
   onRenderActions?: (item: LineItem) => React.ReactNode;
 }
 
-const GridList: React.FC<GridListProps> = ({
+const ImageList: React.FC<ImageListProps> = ({
   id,
   loading = false,
   spacing = 1,
@@ -152,4 +152,4 @@ const GridList: React.FC<GridListProps> = ({
   );
 };
 
-export default GridList;
+export default ImageList;

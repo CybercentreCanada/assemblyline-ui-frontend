@@ -10,9 +10,9 @@ import {
   Tooltip,
   Typography,
   useTheme
-} from '@material-ui/core';
-import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
-import { Skeleton } from '@material-ui/lab';
+} from '@mui/material';
+import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
+import { Skeleton } from '@mui/material';
 import 'moment/locale/fr';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -152,10 +152,10 @@ const ServiceContainer = ({ service, defaults, setService, setModified }: Servic
                   <Tooltip title={t('container.dependencies.remove')}>
                     <IconButton
                       style={{
-                        color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                        color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
                       }}
                       onClick={() => onDependencyDelete(name)}
-                    >
+                      size="large">
                       <RemoveCircleOutlineOutlinedIcon />
                     </IconButton>
                   </Tooltip>

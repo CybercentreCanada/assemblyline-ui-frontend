@@ -1,11 +1,12 @@
-import { Card, Grid, IconButton, makeStyles, Tooltip, Typography, useTheme } from '@material-ui/core';
-import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
-import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
-import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
-import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
-import PageviewOutlinedIcon from '@material-ui/icons/PageviewOutlined';
-import PanToolOutlinedIcon from '@material-ui/icons/PanToolOutlined';
-import ReportProblemOutlinedIcon from '@material-ui/icons/ReportProblemOutlined';
+import { Card, Grid, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import AmpStoriesOutlinedIcon from '@mui/icons-material/AmpStoriesOutlined';
+import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
+import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
+import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
+import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import useClipboard from 'commons/components/hooks/useClipboard';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
@@ -166,12 +167,12 @@ export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
                   <IconButton
                     component={Link}
                     to={`/search/submission?query=files.sha256:${error.sha256} OR results:${error.sha256}* OR errors:${error.sha256}*`}
-                  >
+                    size="large">
                     <AmpStoriesOutlinedIcon />
                   </IconButton>
                 </Tooltip>
                 <Tooltip title={t('detail')}>
-                  <IconButton component={Link} to={`/file/detail/${error.sha256}`}>
+                  <IconButton component={Link} to={`/file/detail/${error.sha256}`} size="large">
                     <DescriptionOutlinedIcon />
                   </IconButton>
                 </Tooltip>
@@ -181,7 +182,7 @@ export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
                   tooltip={t('download')}
                 />
                 <Tooltip title={t('file_viewer')}>
-                  <IconButton component={Link} to={`/file/viewer/${error.sha256}`}>
+                  <IconButton component={Link} to={`/file/viewer/${error.sha256}`} size="large">
                     <PageviewOutlinedIcon />
                   </IconButton>
                 </Tooltip>

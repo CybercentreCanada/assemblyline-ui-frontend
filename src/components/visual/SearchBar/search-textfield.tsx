@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import { Box, ClickAwayListener, makeStyles, TextField, useMediaQuery, useTheme } from '@material-ui/core';
+import { Box, ClickAwayListener, TextField, useMediaQuery, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import { insertText } from 'commons/addons/elements/utils/browser';
 import {
   isArrowDown,

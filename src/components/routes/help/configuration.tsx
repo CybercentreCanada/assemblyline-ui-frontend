@@ -1,5 +1,5 @@
-import { Grid, Typography, useTheme } from '@material-ui/core';
-import Skeleton from '@material-ui/lab/Skeleton';
+import { Grid, Typography, useTheme } from '@mui/material';
+import Skeleton from '@mui/material/Skeleton';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import useMyAPI from 'components/hooks/useMyAPI';
 import CustomChip from 'components/visual/CustomChip';

@@ -9,13 +9,13 @@ import {
   ListItemIcon,
   ListItemText,
   ListSubheader,
-  makeStyles,
   Paper,
   Popper,
   Tooltip,
   Typography,
-  useTheme
-} from '@material-ui/core';
+  useTheme,
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import useUser from 'commons/components/hooks/useAppUser';
 import useGravatar from 'commons/components/hooks/useGravatar';
@@ -36,7 +36,7 @@ export const useStyles = makeStyles(theme => ({
   iconButton: {
     width: theme.spacing(5),
     height: theme.spacing(5),
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('md')]: {
       width: theme.spacing(4),
       height: theme.spacing(4)
     }
@@ -113,7 +113,7 @@ const UserProfile = () => {
             (a, i) =>
               a.icon && (
                 <Tooltip key={`buttonmenu-${i}`} title={a.name}>
-                  <IconButton component={Link} color="inherit" to={a.route}>
+                  <IconButton component={Link} color="inherit" to={a.route} size="large">
                     {a.icon}
                   </IconButton>
                 </Tooltip>
@@ -127,7 +127,11 @@ const UserProfile = () => {
 
   return (
     <ClickAwayListener onClickAway={onClickAway}>
-      <IconButton edge="end" className={classes.avatarButton} onClick={onProfileClick}>
+      <IconButton
+        edge="end"
+        className={classes.avatarButton}
+        onClick={onProfileClick}
+        size="large">
         <Avatar
           className={classes.iconButton}
           alt={currentUser.name}

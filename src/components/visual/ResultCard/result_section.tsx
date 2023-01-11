@@ -1,7 +1,8 @@
-import { Box, Collapse, IconButton, makeStyles, Menu, MenuItem, Tooltip, useTheme } from '@material-ui/core';
-import AssignmentOutlinedIcon from '@material-ui/icons/AssignmentOutlined';
-import LabelOutlinedIcon from '@material-ui/icons/LabelOutlined';
-import SimCardOutlinedIcon from '@material-ui/icons/SimCardOutlined';
+import { Box, Collapse, IconButton, Menu, MenuItem, Tooltip, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
+import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
+import SimCardOutlinedIcon from '@mui/icons-material/SimCardOutlined';
 import useClipboard from 'commons/components/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
@@ -271,7 +272,7 @@ const WrappedResultSection: React.FC<ResultSectionProps> = ({
           display: 'flex',
           flexWrap: 'nowrap',
           marginLeft: !printable ? `${depth}rem` : null,
-          backgroundColor: highlighted ? (theme.palette.type === 'dark' ? '#343a44' : '#e2f2fa') : null,
+          backgroundColor: highlighted ? (theme.palette.mode === 'dark' ? '#343a44' : '#e2f2fa') : null,
           pageBreakInside: 'avoid'
         }}
       >

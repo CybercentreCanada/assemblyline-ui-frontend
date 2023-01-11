@@ -1,6 +1,6 @@
-import { useTheme } from '@material-ui/core';
-import { alpha } from '@material-ui/core/styles/colorManipulator';
-import { Skeleton } from '@material-ui/lab';
+import { useTheme } from '@mui/material';
+import { alpha } from '@mui/material/styles';
+import { Skeleton } from '@mui/material';
 import 'chartjs-adapter-moment';
 import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
@@ -182,7 +182,7 @@ const WrappedHistogram = ({
       <Line data={histData} options={options} plugins={plugins} />
     </div>
   ) : (
-    <Skeleton variant="rect" height={height} />
+    <Skeleton variant="rectangular" height={height} />
   );
 };
 

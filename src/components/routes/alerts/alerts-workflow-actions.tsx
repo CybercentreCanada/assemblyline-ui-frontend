@@ -1,5 +1,5 @@
-import { Button, CircularProgress, TextField, Typography, useTheme } from '@material-ui/core';
-import { Alert, Autocomplete } from '@material-ui/lab';
+import { Button, CircularProgress, TextField, Typography, useTheme } from '@mui/material';
+import { Alert, Autocomplete } from '@mui/material';
 import SearchQuery, { SearchFilter } from 'components/visual/SearchBar/search-query';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -110,7 +110,7 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
               marginTop: theme.spacing(1),
               padding: theme.spacing(2),
               color: theme.palette.primary.light,
-              backgroundColor: theme.palette.type === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
+              backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
             }}
           >
             <AlertsFiltersSelected searchQuery={searchQuery} disableActions hideGroupBy />

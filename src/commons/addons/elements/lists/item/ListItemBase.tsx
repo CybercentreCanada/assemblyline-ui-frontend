@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 
-import { Divider, IconButtonProps } from '@material-ui/core';
+import { Divider, IconButtonProps } from '@mui/material';
 import useListStyles from 'commons/addons/elements/lists/hooks/useListStyles';
 import React, { useCallback } from 'react';
 

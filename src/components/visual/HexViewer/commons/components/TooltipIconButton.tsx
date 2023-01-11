@@ -1,16 +1,17 @@
-import { makeStyles, Tooltip } from '@material-ui/core';
-import IconButton from '@material-ui/core/IconButton';
-import AdbIcon from '@material-ui/icons/Adb';
+import { Tooltip } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import IconButton from '@mui/material/IconButton';
+import AdbIcon from '@mui/icons-material/Adb';
 import clsx from 'clsx';
 import { default as React } from 'react';
 
 const useHexStyles = makeStyles(theme => ({
   iconButton: {
     padding: 10,
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('lg')]: {
       padding: 4
     },
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('md')]: {
       padding: 2
     }
   }

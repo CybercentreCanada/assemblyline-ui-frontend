@@ -1,14 +1,6 @@
-import {
-  createStyles,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  TableSortLabel,
-  Theme,
-  withStyles
-} from '@material-ui/core';
+import { Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, Theme } from '@mui/material';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
 import 'moment/locale/fr';
 import React from 'react';
 import { Link, useHistory, useLocation } from 'react-router-dom';
@@ -20,7 +12,7 @@ const StyledTableCell = withStyles((theme: Theme) =>
       paddingLeft: theme.spacing(1)
     },
     head: {
-      backgroundColor: theme.palette.type === 'dark' ? '#404040' : '#EEE',
+      backgroundColor: theme.palette.mode === 'dark' ? '#404040' : '#EEE',
       whiteSpace: 'nowrap'
     }
   })
@@ -36,7 +28,7 @@ const BreakableTableCell = withStyles((theme: Theme) =>
       }
     },
     head: {
-      backgroundColor: theme.palette.type === 'dark' ? '#404040' : '#EEE',
+      backgroundColor: theme.palette.mode === 'dark' ? '#404040' : '#EEE',
       whiteSpace: 'nowrap'
     }
   })

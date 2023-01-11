@@ -1,7 +1,8 @@
-import { Box, makeStyles, Tooltip } from '@material-ui/core';
-import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
-import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
-import RemoveOutlinedIcon from '@material-ui/icons/RemoveOutlined';
+import { Box, Tooltip } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import RemoveOutlinedIcon from '@mui/icons-material/RemoveOutlined';
 import clsx from 'clsx';
 import CustomChip from 'components/visual/CustomChip';
 import React from 'react';
@@ -14,16 +15,16 @@ const useStyles = makeStyles(theme => ({
     }
   },
   success: {
-    color: theme.palette.type !== 'dark' ? theme.palette.success.dark : theme.palette.success.light
+    color: theme.palette.mode !== 'dark' ? theme.palette.success.dark : theme.palette.success.light
   },
   default: {
-    color: theme.palette.type !== 'dark' ? theme.palette.secondary.dark : theme.palette.secondary.light
+    color: theme.palette.mode !== 'dark' ? theme.palette.secondary.dark : theme.palette.secondary.light
   },
   warning: {
-    color: theme.palette.type !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
+    color: theme.palette.mode !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
   },
   error: {
-    color: theme.palette.type !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
+    color: theme.palette.mode !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
   }
 }));
 

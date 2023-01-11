@@ -1,4 +1,4 @@
-import { makeStyles } from '@material-ui/core';
+import makeStyles from '@mui/styles/makeStyles';
 
 const useMetaListStyles = makeStyles(theme => ({
   outer: {
@@ -132,17 +132,17 @@ const useListItemStyles = makeStyles(theme => ({
     }
   },
   cardItemBackground: {
-    backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 15%)' : 'hsl(0, 0%, 97%)'
+    backgroundColor: theme.palette.mode === 'dark' ? 'hsl(0, 0%, 15%)' : 'hsl(0, 0%, 97%)'
   },
   itemDefaultBackgrounds: {
     '&:hover': {
-      backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 19%)' : 'hsl(0, 0%, 95%)'
+      backgroundColor: theme.palette.mode === 'dark' ? 'hsl(0, 0%, 19%)' : 'hsl(0, 0%, 95%)'
     },
     '&[data-listitem-focus="true"]': {
-      backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 19%)' : 'hsl(0, 0%, 95%)'
+      backgroundColor: theme.palette.mode === 'dark' ? 'hsl(0, 0%, 19%)' : 'hsl(0, 0%, 95%)'
     },
     '&[data-listitem-selected="true"]': {
-      backgroundColor: theme.palette.type === 'dark' ? 'hsl(0, 0%, 17%)' : 'hsl(0, 0%, 92%)'
+      backgroundColor: theme.palette.mode === 'dark' ? 'hsl(0, 0%, 17%)' : 'hsl(0, 0%, 92%)'
     }
   },
   itemOuter: {

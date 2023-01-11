@@ -4,22 +4,22 @@ import {
   Divider,
   Grid,
   IconButton,
-  makeStyles,
   Tooltip,
   Typography,
   useMediaQuery,
   useTheme,
-  withStyles
-} from '@material-ui/core';
-import BugReportOutlinedIcon from '@material-ui/icons/BugReportOutlined';
-import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
-import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
-import ListAltOutlinedIcon from '@material-ui/icons/ListAltOutlined';
-import MoodBadIcon from '@material-ui/icons/MoodBad';
-import PrintOutlinedIcon from '@material-ui/icons/PrintOutlined';
-import VerifiedUserOutlinedIcon from '@material-ui/icons/VerifiedUserOutlined';
-import { Skeleton } from '@material-ui/lab';
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import withStyles from '@mui/styles/withStyles';
+import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import ListAltOutlinedIcon from '@mui/icons-material/ListAltOutlined';
+import MoodBadIcon from '@mui/icons-material/MoodBad';
+import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined';
+import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
+import { Skeleton } from '@mui/material';
 import clsx from 'clsx';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
@@ -56,7 +56,7 @@ const useStyles = makeStyles(theme => ({
       border: '1px solid #DDD',
       color: '#888'
     },
-    backgroundColor: theme.palette.type === 'dark' ? '#ffffff05' : '#00000005',
+    backgroundColor: theme.palette.mode === 'dark' ? '#ffffff05' : '#00000005',
     border: `1px solid ${theme.palette.divider}`,
     borderRadius: '4px',
     color: theme.palette.text.secondary,
@@ -70,7 +70,7 @@ const useStyles = makeStyles(theme => ({
     width: theme.spacing(16),
     height: theme.spacing(16),
     marginRight: theme.spacing(2),
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('md')]: {
       width: theme.spacing(12),
       height: theme.spacing(12),
       marginRight: 0
@@ -91,7 +91,7 @@ const useStyles = makeStyles(theme => ({
   banner_title: {
     fontWeight: 500,
     fontSize: '200%',
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('md')]: {
       fontSize: '180%'
     }
   },
@@ -113,7 +113,7 @@ const useStyles = makeStyles(theme => ({
     marginLeft: theme.spacing(3),
     marginRight: theme.spacing(4.5),
     fontSize: '400%',
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('md')]: {
       marginLeft: theme.spacing(2),
       marginRight: theme.spacing(2.5),
       fontSize: '350%'
@@ -197,27 +197,27 @@ function AttributionBanner({ report }) {
     info: {
       icon: <HelpOutlineIcon className={classes.icon} />,
       bgColor: '#6e6e6e15',
-      textColor: theme.palette.type === 'dark' ? '#AAA' : '#888'
+      textColor: theme.palette.mode === 'dark' ? '#AAA' : '#888'
     },
     safe: {
       icon: <VerifiedUserOutlinedIcon className={classes.icon} />,
       bgColor: '#00f20015',
-      textColor: theme.palette.type !== 'dark' ? theme.palette.success.dark : theme.palette.success.light
+      textColor: theme.palette.mode !== 'dark' ? theme.palette.success.dark : theme.palette.success.light
     },
     suspicious: {
       icon: <MoodBadIcon className={classes.icon} />,
       bgColor: '#ff970015',
-      textColor: theme.palette.type !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
+      textColor: theme.palette.mode !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
     },
     highly_suspicious: {
       icon: <MoodBadIcon className={classes.icon} />,
       bgColor: '#ff970015',
-      textColor: theme.palette.type !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
+      textColor: theme.palette.mode !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
     },
     malicious: {
       icon: <BugReportOutlinedIcon className={classes.icon} />,
       bgColor: '#f2000015',
-      textColor: theme.palette.type !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
+      textColor: theme.palette.mode !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
     }
   };
 
@@ -320,7 +320,7 @@ function AttributionBanner({ report }) {
           {report ? (
             <VerdictGauge verdicts={report.verdict} />
           ) : (
-            <Skeleton variant="circle" height="100px" width="100px" />
+            <Skeleton variant="circular" height="100px" width="100px" />
           )}
         </Grid>
       </Grid>
@@ -623,20 +623,20 @@ export default function SubmissionReport() {
                 {report ? (
                   <>
                     <NoPrintTooltip title={t('print')} PopperProps={{ disablePortal: true }}>
-                      <IconButton onClick={() => window.print()}>
+                      <IconButton onClick={() => window.print()} size="large">
                         <PrintOutlinedIcon />
                       </IconButton>
                     </NoPrintTooltip>
                     <Tooltip title={t('detail_view')}>
-                      <IconButton component={Link} to={`/submission/detail/${report.sid}`}>
+                      <IconButton component={Link} to={`/submission/detail/${report.sid}`} size="large">
                         <ListAltOutlinedIcon />
                       </IconButton>
                     </Tooltip>
                   </>
                 ) : (
                   <div style={{ display: 'inline-flex' }}>
-                    <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-                    <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+                    <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+                    <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
                   </div>
                 )}
               </div>
@@ -713,7 +713,7 @@ export default function SubmissionReport() {
                   <Grid item xs={8} sm={9} lg={10}>
                     <span
                       style={{
-                        color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                        color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
                       }}
                     >
                       {report.params.services.errors.join(' | ')}

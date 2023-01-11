@@ -1,4 +1,4 @@
-import { makeStyles } from '@material-ui/core';
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import { default as React, KeyboardEvent, memo, PropsWithChildren, useMemo } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';

@@ -1,4 +1,5 @@
-import { Chip, ChipProps, makeStyles, Theme, useTheme } from '@material-ui/core';
+import { Chip, ChipProps, Theme, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 
 const useStyles = makeStyles((theme: Theme) => ({

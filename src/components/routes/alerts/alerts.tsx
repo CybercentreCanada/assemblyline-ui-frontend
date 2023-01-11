@@ -1,8 +1,9 @@
-import { Box, Drawer, IconButton, makeStyles, Typography, useMediaQuery, useTheme } from '@material-ui/core';
-import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
-import FilterListIcon from '@material-ui/icons/FilterList';
-import StarIcon from '@material-ui/icons/Star';
-import { AlertTitle } from '@material-ui/lab';
+import { Box, Drawer, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import StarIcon from '@mui/icons-material/Star';
+import { AlertTitle } from '@mui/material';
 import ListCarousel from 'commons/addons/elements/lists/carousel/ListCarousel';
 import ListNavigator from 'commons/addons/elements/lists/navigator/ListNavigator';
 import SimpleList from 'commons/addons/elements/lists/simplelist/SimpleList';
@@ -70,7 +71,7 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column',
     padding: theme.spacing(3),
     width: '600px',
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('lg')]: {
       width: '100%'
     }
   },
@@ -137,7 +138,7 @@ const Alerts: React.FC = () => {
 
   // Media quries.
   const isMDUp = useMediaQuery(theme.breakpoints.up('md'));
-  const isLGDown = useMediaQuery(theme.breakpoints.down('lg'));
+  const isLGDown = useMediaQuery(theme.breakpoints.down('xl'));
 
   // Handler searchbar onSearch callback
   const onSearch = (filterValue: string = '', inputEl: HTMLInputElement = null) => {
@@ -346,7 +347,7 @@ const Alerts: React.FC = () => {
     <PageFullWidth margin={4}>
       <Drawer open={drawer.open} anchor="right" onClose={onDrawerClose}>
         <div style={{ padding: theme.spacing(1) }}>
-          <IconButton onClick={onDrawerClose}>
+          <IconButton onClick={onDrawerClose} size="large">
             <CloseOutlinedIcon />
           </IconButton>
         </div>

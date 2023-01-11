@@ -1,4 +1,4 @@
-import { CircularProgress, useTheme } from '@material-ui/core';
+import { CircularProgress, useTheme } from '@mui/material';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 
 function LoadingScreen() {

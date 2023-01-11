@@ -1,7 +1,5 @@
 import {
-  createStyles,
   IconButton,
-  makeStyles,
   Paper,
   Tab,
   Tabs,
@@ -9,11 +7,13 @@ import {
   Tooltip,
   Typography,
   useMediaQuery,
-  useTheme
-} from '@material-ui/core';
-import ArchiveIcon from '@material-ui/icons/Archive';
-import ArchiveOutlinedIcon from '@material-ui/icons/ArchiveOutlined';
-import CenterFocusStrongOutlinedIcon from '@material-ui/icons/CenterFocusStrongOutlined';
+  useTheme,
+} from '@mui/material';
+import createStyles from '@mui/styles/createStyles';
+import makeStyles from '@mui/styles/makeStyles';
+import ArchiveIcon from '@mui/icons-material/Archive';
+import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
+import CenterFocusStrongOutlinedIcon from '@mui/icons-material/CenterFocusStrongOutlined';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
@@ -50,7 +50,7 @@ const useStyles = makeStyles((theme: Theme) =>
           minWidth: 'unset'
         }
       },
-      [theme.breakpoints.down('sm')]: {
+      [theme.breakpoints.down('xl')]: {
         minHeight: 'unset',
         '& [role=tab]': {
           fontSize: '12px',
@@ -97,7 +97,7 @@ function Search({ index }: SearchProps) {
   const [searchSuggestion, setSearchSuggestion] = useState<string[]>(null);
   const [tab, setTab] = useState(null);
   const { showErrorMessage } = useMySnackbar();
-  const downSM = useMediaQuery(theme.breakpoints.down('sm'));
+  const downSM = useMediaQuery(theme.breakpoints.down('xl'));
 
   // Result lists
   const [submissionResults, setSubmissionResults] = useState<SearchResults>(null);

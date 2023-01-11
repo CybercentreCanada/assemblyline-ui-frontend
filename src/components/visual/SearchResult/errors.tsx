@@ -1,10 +1,10 @@
-import { Tooltip, useTheme } from '@material-ui/core';
-import Paper from '@material-ui/core/Paper';
-import TableContainer from '@material-ui/core/TableContainer';
-import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
-import PanToolOutlinedIcon from '@material-ui/icons/PanToolOutlined';
-import ReportProblemOutlinedIcon from '@material-ui/icons/ReportProblemOutlined';
-import { AlertTitle, Skeleton } from '@material-ui/lab';
+import { Tooltip, useTheme } from '@mui/material';
+import Paper from '@mui/material/Paper';
+import TableContainer from '@mui/material/TableContainer';
+import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
+import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
+import { AlertTitle, Skeleton } from '@mui/material';
 import {
   DivTable,
   DivTableBody,
@@ -124,7 +124,7 @@ const WrappedErrorsTable: React.FC<ErrorsTableProps> = ({ errorResults, setError
       </div>
     )
   ) : (
-    <Skeleton variant="rect" style={{ height: '6rem', borderRadius: '4px' }} />
+    <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
   );
 };
 

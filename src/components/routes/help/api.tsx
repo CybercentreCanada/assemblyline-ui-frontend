@@ -3,17 +3,17 @@ import {
   Card,
   Collapse,
   Grid,
-  makeStyles,
   MenuItem,
   Select,
   Typography,
   useMediaQuery,
-  useTheme
-} from '@material-ui/core';
-import CheckOutlinedIcon from '@material-ui/icons/CheckOutlined';
-import ClearOutlinedIcon from '@material-ui/icons/ClearOutlined';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import Skeleton from '@material-ui/lab/Skeleton';
+  useTheme,
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
+import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Skeleton from '@mui/material/Skeleton';
 import clsx from 'clsx';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -68,9 +68,9 @@ export default function ApiDoc() {
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
 
-  const downSM = useMediaQuery(theme.breakpoints.down('sm'));
+  const downSM = useMediaQuery(theme.breakpoints.down('xl'));
   const xs = useMediaQuery(theme.breakpoints.only('xs'));
-  const isDark = theme.palette.type === 'dark';
+  const isDark = theme.palette.mode === 'dark';
   const methodColor = {
     DELETE: 'error',
     GET: 'info',
@@ -187,7 +187,7 @@ export default function ApiDoc() {
                   ))}
                 </Select>
               ) : (
-                <Skeleton variant="rect" style={{ display: 'inline-block', height: '2rem', width: '14rem' }} />
+                <Skeleton variant="rectangular" style={{ display: 'inline-block', height: '2rem', width: '14rem' }} />
               )}
             </Grid>
           </Grid>

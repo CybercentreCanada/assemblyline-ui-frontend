@@ -1,12 +1,13 @@
-import { Box, CircularProgress, Divider, IconButton, IconButtonProps, makeStyles, useTheme } from '@material-ui/core';
-import BackspaceIcon from '@material-ui/icons/Backspace';
-import SearchIcon from '@material-ui/icons/Search';
+import { Box, CircularProgress, Divider, IconButton, IconButtonProps, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import BackspaceIcon from '@mui/icons-material/Backspace';
+import SearchIcon from '@mui/icons-material/Search';
 import React, { useEffect, useRef, useState } from 'react';
 import SearchTextField from './search-textfield';
 
 const useStyles = makeStyles(theme => ({
   root: {
-    backgroundColor: theme.palette.type === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200],
+    backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200],
     '& button': {
       marginRight: theme.spacing(1)
     }
@@ -106,7 +107,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             onClear={_onValueClear}
           />
         </Box>
-        <IconButton onClick={_onValueClear} edge="end" color="primary">
+        <IconButton onClick={_onValueClear} edge="end" color="primary" size="large">
           <BackspaceIcon />
         </IconButton>
         <Divider
@@ -115,7 +116,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
           style={{ marginLeft: theme.spacing(1), marginRight: theme.spacing(1) }}
         />
         {buttons.map((b, i) => (
-          <IconButton key={`searchbar-button-${i}`} {...b.props} edge="end" color="primary">
+          <IconButton
+            key={`searchbar-button-${i}`}
+            {...b.props}
+            edge="end"
+            color="primary"
+            size="large">
             {b.icon}
           </IconButton>
         ))}

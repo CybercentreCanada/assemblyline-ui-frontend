@@ -1,5 +1,6 @@
-import { LinearProgress, makeStyles, Typography } from '@material-ui/core';
-import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
+import { LinearProgress, Typography } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import clsx from 'clsx';
 import { default as React } from 'react';
 import { useTranslation } from 'react-i18next';

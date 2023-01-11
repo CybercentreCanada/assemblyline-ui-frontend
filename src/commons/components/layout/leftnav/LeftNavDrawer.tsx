@@ -8,15 +8,14 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  makeStyles,
   Toolbar,
   Tooltip,
   useMediaQuery,
-  useTheme
-} from '@material-ui/core';
-import withWidth, { isWidthDown } from '@material-ui/core/withWidth';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+  useTheme,
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import clsx from 'clsx';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import LeftNavGroup from 'commons/components/layout/leftnav/LeftNavGroup';
@@ -25,6 +24,9 @@ import { ValidatedProp } from 'commons/components/user/UserProvider';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import AppTitle from '../topnav/AppTitle';
+
+// FIXME checkout https://mui.com/components/use-media-query/#migrating-from-withwidth
+const withWidth = () => (WrappedComponent) => (props) => <WrappedComponent {...props} width="xs" />;
 
 const drawerWidth = 240;
 

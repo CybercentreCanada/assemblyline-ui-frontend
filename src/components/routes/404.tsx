@@ -1,6 +1,6 @@
-import { useTheme } from '@material-ui/core';
-import Typography from '@material-ui/core/Typography';
-import LinkOffIcon from '@material-ui/icons/LinkOff';
+import { useTheme } from '@mui/material';
+import Typography from '@mui/material/Typography';
+import LinkOffIcon from '@mui/icons-material/LinkOff';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import { useTranslation } from 'react-i18next';
 

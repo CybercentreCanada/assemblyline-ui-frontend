@@ -1,4 +1,5 @@
-import { makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
+import { useMediaQuery, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 
 const useStyles = (w, mxw, ta, mb, ml, mr, mt) =>
@@ -11,7 +12,7 @@ const useStyles = (w, mxw, ta, mb, ml, mr, mt) =>
       margin: '0 auto auto auto',
       width: w,
       maxWidth: mxw,
-      [theme.breakpoints.down('xs')]: {
+      [theme.breakpoints.down('md')]: {
         maxWidth: '100%'
       }
     },

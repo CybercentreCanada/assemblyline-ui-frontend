@@ -1,7 +1,8 @@
-import { Grid, makeStyles, MenuItem, Select, Typography, useMediaQuery, useTheme } from '@material-ui/core';
-import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
-import PanToolOutlinedIcon from '@material-ui/icons/PanToolOutlined';
-import ReportProblemOutlinedIcon from '@material-ui/icons/ReportProblemOutlined';
+import { Grid, MenuItem, Select, Typography, useMediaQuery, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
+import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import useUser from 'commons/components/hooks/useAppUser';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
@@ -38,7 +39,7 @@ const useStyles = makeStyles(theme => ({
   drawerPaper: {
     width: '80%',
     maxWidth: '800px',
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('xl')]: {
       width: '100%'
     }
   }

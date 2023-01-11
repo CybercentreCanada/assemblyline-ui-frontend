@@ -6,7 +6,6 @@ import {
   Grid,
   IconButton,
   isWidthDown,
-  makeStyles,
   Paper,
   Table,
   TableBody,
@@ -19,13 +18,13 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
-  withStyles,
-  withWidth
-} from '@material-ui/core';
-import { red } from '@material-ui/core/colors';
-import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
-import CloseIcon from '@material-ui/icons/Close';
-import Skeleton from '@material-ui/lab/Skeleton';
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import withStyles from '@mui/styles/withStyles';
+import { red } from '@mui/material/colors';
+import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
+import CloseIcon from '@mui/icons-material/Close';
+import Skeleton from '@mui/material/Skeleton';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -43,6 +42,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Redirect, useHistory, useLocation, useParams } from 'react-router-dom';
 import Apps from './user/apps';
+
+// FIXME checkout https://mui.com/components/use-media-query/#migrating-from-withwidth
+const withWidth = () => (WrappedComponent) => (props) => <WrappedComponent {...props} width="xs" />;
 
 type UserProps = {
   width: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -78,7 +80,7 @@ function User({ width, username }: UserProps) {
   const [modified, setModified] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
   const { user: currentUser, configuration } = useALContext();
-  const downSM = useMediaQuery(theme.breakpoints.down('sm'));
+  const downSM = useMediaQuery(theme.breakpoints.down('xl'));
   const { showErrorMessage, showSuccessMessage, showWarningMessage } = useMySnackbar();
   const sp1 = theme.spacing(1);
   const sp4 = theme.spacing(4);
@@ -88,7 +90,7 @@ function User({ width, username }: UserProps) {
   const useStyles = makeStyles(curTheme => ({
     drawer: {
       width: '500px',
-      [theme.breakpoints.down('xs')]: {
+      [theme.breakpoints.down('lg')]: {
         width: '100vw'
       }
     },
@@ -289,7 +291,7 @@ function User({ width, username }: UserProps) {
       <React.Fragment key="right">
         <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
           <div style={{ alignSelf: 'flex-end' }}>
-            <IconButton onClick={() => setDrawerOpen(false)}>
+            <IconButton onClick={() => setDrawerOpen(false)} size="large">
               <CloseIcon />
             </IconButton>
           </div>
@@ -429,7 +431,7 @@ function User({ width, username }: UserProps) {
                     </DeleteButton>
                   ) : (
                     <Skeleton
-                      variant="rect"
+                      variant="rectangular"
                       className={classes.skelButton}
                       style={{ minWidth: theme.spacing(16), width: downSM ? '100%' : null }}
                     />
@@ -453,7 +455,7 @@ function User({ width, username }: UserProps) {
                       onClick={e => {
                         inputRef.current.click();
                       }}
-                    >
+                      size="large">
                       <Avatar
                         style={{
                           width: downSM ? theme.spacing(24) : theme.spacing(16),
@@ -475,7 +477,7 @@ function User({ width, username }: UserProps) {
               ) : (
                 <Skeleton
                   className={classes.skelItem}
-                  variant="circle"
+                  variant="circular"
                   width={downSM ? theme.spacing(24.5) : theme.spacing(16.5)}
                   height={downSM ? theme.spacing(24.5) : theme.spacing(16.5)}
                 />
@@ -495,7 +497,7 @@ function User({ width, username }: UserProps) {
                   />
                 ) : (
                   <Skeleton
-                    variant="rect"
+                    variant="rectangular"
                     className={classes.skelButton}
                     style={{ minWidth: theme.spacing(16), width: downSM ? '100%' : null }}
                   />

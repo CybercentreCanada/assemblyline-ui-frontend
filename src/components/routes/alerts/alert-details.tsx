@@ -1,20 +1,11 @@
-import {
-  Button,
-  Collapse,
-  Divider,
-  Grid,
-  IconButton,
-  makeStyles,
-  Tooltip,
-  Typography,
-  useTheme
-} from '@material-ui/core';
-import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
-import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
-import MoreHorizOutlinedIcon from '@material-ui/icons/MoreHorizOutlined';
-import { Skeleton } from '@material-ui/lab';
-import Alert from '@material-ui/lab/Alert';
+import { Button, Collapse, Divider, Grid, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import AmpStoriesOutlinedIcon from '@mui/icons-material/AmpStoriesOutlined';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
+import { Skeleton } from '@mui/material';
+import Alert from '@mui/material/Alert';
 import useClipboard from 'commons/components/hooks/useClipboard';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import useALContext from 'components/hooks/useALContext';
@@ -179,12 +170,12 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                       component={Link}
                       style={{ color: theme.palette.action.active }}
                       to={`/submission/${item.sid}`}
-                    >
+                      size="large">
                       <AmpStoriesOutlinedIcon />
                     </IconButton>
                   </Tooltip>
                 ) : (
-                  <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+                  <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
                 )}
               </Grid>
             )}

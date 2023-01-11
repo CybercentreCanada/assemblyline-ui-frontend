@@ -1,8 +1,9 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { IconButton, makeStyles } from '@material-ui/core';
-import MenuOpenIcon from '@material-ui/icons/MenuOpen';
+import { IconButton } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import useSplitLayout from 'commons/addons/elements/layout/hooks/useSplitLayout';
 import React, { useEffect, useRef, useState } from 'react';
 import ReactResizeDetector from 'react-resize-detector';
@@ -148,7 +149,7 @@ const SplitLayout: React.FC<SplitLayoutProps> = React.memo(
     const renderLeftDock = () =>
       !disableManualResize && (
         <FlexVertical>
-          <IconButton onClick={onToggleLeft}>
+          <IconButton onClick={onToggleLeft} size="large">
             <MenuOpenIcon style={{ transform: !state.leftOpen ? 'rotate(180deg)' : null }} />
           </IconButton>
           {onRenderLeftDock && onRenderLeftDock()}
@@ -159,7 +160,7 @@ const SplitLayout: React.FC<SplitLayoutProps> = React.memo(
       !disableManualResize &&
       rightNode && (
         <FlexVertical>
-          <IconButton onClick={onToggleRight}>
+          <IconButton onClick={onToggleRight} size="large">
             <MenuOpenIcon style={{ transform: state.rightOpen ? 'rotate(180deg)' : null }} />
           </IconButton>
           {onRenderRightDock && onRenderRightDock()}

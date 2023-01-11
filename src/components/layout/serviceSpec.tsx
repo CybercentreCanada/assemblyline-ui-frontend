@@ -2,15 +2,15 @@ import {
   Button,
   Checkbox,
   FormControlLabel,
-  makeStyles,
   MenuItem,
   Select,
   TextField,
   Tooltip,
   Typography,
-  useTheme
-} from '@material-ui/core';
-import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
+  useTheme,
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

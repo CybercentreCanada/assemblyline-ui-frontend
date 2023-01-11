@@ -1,5 +1,6 @@
-import { makeStyles, Typography } from '@material-ui/core';
-import ClearIcon from '@material-ui/icons/Clear';
+import { Typography } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import ClearIcon from '@mui/icons-material/Clear';
 import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -18,10 +19,10 @@ const useHexStyles = makeStyles(theme => ({
   },
   iconButton: {
     padding: 10,
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('lg')]: {
       padding: 4
     },
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('md')]: {
       padding: 2
     }
   },
@@ -56,10 +57,10 @@ const useHexStyles = makeStyles(theme => ({
     textAlign: 'center',
     cursor: 'default',
     padding: 8,
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('lg')]: {
       padding: 2
     },
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('md')]: {
       padding: 0
     }
   }

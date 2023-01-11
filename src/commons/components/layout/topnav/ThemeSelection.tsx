@@ -8,13 +8,15 @@ import {
   Switch,
   Typography,
   useTheme
-} from '@material-ui/core';
-import withWidth, { isWidthDown } from '@material-ui/core/withWidth';
+} from '@mui/material';
 import useApp from 'commons/components/hooks/useAppContext';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import useSafeResults from 'components/hooks/useSafeResults';
 import i18n from 'i18next';
 import { useTranslation } from 'react-i18next';
+
+// FIXME checkout https://mui.com/components/use-media-query/#migrating-from-withwidth
+const withWidth = () => (WrappedComponent) => (props) => <WrappedComponent {...props} width="xs" />;
 
 export enum Lang {
   EN = 'en',
@@ -96,7 +98,7 @@ const ThemeSelection = ({ width }) => {
             <ListItem button onClick={toggleTheme}>
               <ListItemText>{t('personalization.dark')}</ListItemText>
               <ListItemSecondaryAction>
-                <Switch edge="end" onChange={toggleTheme} checked={theme.palette.type === 'dark'} />
+                <Switch edge="end" onChange={toggleTheme} checked={theme.palette.mode === 'dark'} />
               </ListItemSecondaryAction>
             </ListItem>
           )}

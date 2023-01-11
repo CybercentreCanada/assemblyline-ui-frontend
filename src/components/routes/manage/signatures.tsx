@@ -1,8 +1,9 @@
-import { Grid, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
-import Typography from '@material-ui/core/Typography';
-import BlockIcon from '@material-ui/icons/Block';
-import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
-import RecordVoiceOverOutlinedIcon from '@material-ui/icons/RecordVoiceOverOutlined';
+import { Grid, useMediaQuery, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import Typography from '@mui/material/Typography';
+import BlockIcon from '@mui/icons-material/Block';
+import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
+import RecordVoiceOverOutlinedIcon from '@mui/icons-material/RecordVoiceOverOutlined';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
@@ -35,7 +36,7 @@ const useStyles = makeStyles(theme => ({
   drawerPaper: {
     width: '80%',
     maxWidth: '800px',
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('lg')]: {
       width: '100%'
     }
   }

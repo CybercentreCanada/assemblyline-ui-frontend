@@ -1,6 +1,6 @@
-import { useTheme } from '@material-ui/core';
-import Typography from '@material-ui/core/Typography';
-import BlockIcon from '@material-ui/icons/Block';
+import { useTheme } from '@mui/material';
+import Typography from '@mui/material/Typography';
+import BlockIcon from '@mui/icons-material/Block';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -16,7 +16,7 @@ const ForbiddenPage: React.FC<ForbiddenPageProps> = ({ disabled = false }) => {
     <PageCenter width="65%" margin={4}>
       <div style={{ paddingTop: theme.spacing(10), fontSize: 200 }}>
         <BlockIcon
-          style={{ color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark }}
+          style={{ color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark }}
           fontSize="inherit"
         />
       </div>

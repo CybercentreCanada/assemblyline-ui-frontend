@@ -1,4 +1,4 @@
-import { ArrowDownward, ArrowUpward, Remove } from '@material-ui/icons';
+import { ArrowDownward, ArrowUpward, Remove } from '@mui/icons-material';
 import { SorterField } from 'commons/addons/elements/lists/sorters/sorter-selector';
 import lodash from 'lodash';
 import React from 'react';
