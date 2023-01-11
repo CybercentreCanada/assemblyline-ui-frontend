@@ -1,11 +1,12 @@
 import { Grid, Hidden, makeStyles, Paper, Tab, Tabs, Typography, useTheme } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
+import { loader } from '@monaco-editor/react';
 import useUser from 'commons/components/hooks/useAppUser';
 import PageFullSize from 'commons/components/layout/pages/PageFullSize';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Redirect } from 'react-router-dom';
 import LibMagic from './identify/libmagic';
@@ -13,8 +14,10 @@ import Mimes from './identify/mimes';
 import Patterns from './identify/patterns';
 import Yara from './identify/yara';
 
+loader.config({ paths: { vs: '/cdn/monaco_0.34.1' } });
+
 export default function AdminIdentify() {
-  const { t } = useTranslation(['adminIdentify']);
+  const { t, i18n } = useTranslation(['adminIdentify']);
   const theme = useTheme();
   const { user: currentUser } = useUser<CustomUser>();
   const { apiCall } = useMyAPI();
@@ -42,6 +45,17 @@ export default function AdminIdentify() {
     }
   }));
   const classes = useStyles();
+
+  useEffect(() => {
+    // I cannot find a way to hot switch monaco editor's locale but at least I can load
+    // the right language on first load...
+    if (i18n.language === 'fr') {
+      loader.config({ 'vs/nls': { availableLanguages: { '*': 'fr' } } });
+    } else {
+      loader.config({ 'vs/nls': { availableLanguages: { '*': '' } } });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
