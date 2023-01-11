@@ -7,7 +7,7 @@ import {
   StyledEngineProvider,
   Typography,
   useMediaQuery,
-  useTheme,
+  useTheme
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppTheme, { AppThemeProps } from 'commons/components/hooks/useAppTheme';
@@ -18,29 +18,10 @@ import { useTranslation } from 'react-i18next';
 import { GiSpottedBug } from 'react-icons/gi';
 import PageCenter from '../layout/pages/PageCenter';
 
-
-
-
 declare module '@mui/styles/defaultTheme' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
   interface DefaultTheme extends Theme {}
 }
-
-
-
-
-declare module '@mui/styles/defaultTheme' {
-  // eslint-disable-next-line @typescript-eslint/no-empty-interface
-  interface DefaultTheme extends Theme {}
-}
-
-
-
-declare module '@mui/styles/defaultTheme' {
-  // eslint-disable-next-line @typescript-eslint/no-empty-interface
-  interface DefaultTheme extends Theme {}
-}
-
 
 //
 interface AppbarStyles {
