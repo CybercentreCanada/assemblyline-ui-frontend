@@ -1,5 +1,8 @@
+import HttpsOutlinedIcon from '@mui/icons-material/HttpsOutlined';
+import NoEncryptionOutlinedIcon from '@mui/icons-material/NoEncryptionOutlined';
 import {
   Paper,
+  Skeleton,
   Table,
   TableBody,
   TableCell,
@@ -8,13 +11,10 @@ import {
   TableRow,
   Theme,
   Typography,
-  useTheme,
+  useTheme
 } from '@mui/material';
 import createStyles from '@mui/styles/createStyles';
 import withStyles from '@mui/styles/withStyles';
-import HttpsOutlinedIcon from '@mui/icons-material/HttpsOutlined';
-import NoEncryptionOutlinedIcon from '@mui/icons-material/NoEncryptionOutlined';
-import { Skeleton } from '@mui/material';
 import useUser from 'commons/components/hooks/useAppUser';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -22,7 +22,7 @@ import { CustomUser } from 'components/hooks/useMyUser';
 import CustomChip from 'components/visual/CustomChip';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Redirect } from 'react-router-dom';
+import { Navigate } from 'react-router';
 
 const StyledTableCell = withStyles((theme: Theme) =>
   createStyles({
@@ -174,6 +174,6 @@ export default function SiteMap() {
       )}
     </PageFullWidth>
   ) : (
-    <Redirect to="/forbidden" />
+    <Navigate to="/forbidden" />
   );
 }

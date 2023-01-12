@@ -33,8 +33,8 @@ import ChipInput from 'material-ui-chip-input';
 import 'moment/locale/fr';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { Redirect, useLocation } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router';
+import { useLocation } from 'react-router-dom';
 
 const PAGE_SIZE = 25;
 const DEFAULT_USER = {
@@ -431,6 +431,6 @@ export default function Users() {
       </div>
     </PageFullWidth>
   ) : (
-    <Redirect to="/forbidden" />
+    <Navigate to="/forbidden" />
   );
 }

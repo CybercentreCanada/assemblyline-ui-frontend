@@ -1,7 +1,6 @@
-import { Grid, Hidden, Paper, Tab, Tabs, Typography, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import { Alert } from '@mui/material';
 import { loader } from '@monaco-editor/react';
+import { Alert, Grid, Hidden, Paper, Tab, Tabs, Typography, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import useUser from 'commons/components/hooks/useAppUser';
 import PageFullSize from 'commons/components/layout/pages/PageFullSize';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -9,7 +8,7 @@ import { CustomUser } from 'components/hooks/useMyUser';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Redirect } from 'react-router-dom';
+import { Navigate } from 'react-router';
 import LibMagic from './identify/libmagic';
 import Mimes from './identify/mimes';
 import Patterns from './identify/patterns';
@@ -186,6 +185,6 @@ export default function AdminIdentify() {
       </div>
     </PageFullSize>
   ) : (
-    <Redirect to="/forbidden" />
+    <Navigate to="/forbidden" />
   );
 }

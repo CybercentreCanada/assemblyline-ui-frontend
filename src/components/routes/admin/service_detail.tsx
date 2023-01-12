@@ -26,8 +26,8 @@ import { RouterPrompt } from 'components/visual/RouterPrompt';
 import { getVersionQuery } from 'helpers/utils';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { Link, Redirect, useParams } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router';
+import { Link, useParams } from 'react-router-dom';
 import ServiceContainer from './service_detail/container';
 import ServiceGeneral from './service_detail/general';
 import ServiceParams from './service_detail/parameters';
@@ -280,7 +280,7 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
   }, []);
 
   return !currentUser.is_admin ? (
-    <Redirect to="/forbidden" />
+    <Navigate to="/forbidden" />
   ) : (
     <PageCenter margin={!svc ? 2 : 4} width="100%" textAlign="left">
       <ConfirmationDialog

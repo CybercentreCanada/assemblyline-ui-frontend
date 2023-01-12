@@ -1,3 +1,8 @@
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined';
+import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
+import RestoreOutlinedIcon from '@mui/icons-material/RestoreOutlined';
+import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
 import {
   Button,
   Dialog,
@@ -6,18 +11,13 @@ import {
   DialogTitle,
   Grid,
   IconButton,
+  Skeleton,
   TextField,
   Tooltip,
   Typography,
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined';
-import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
-import RestoreOutlinedIcon from '@mui/icons-material/RestoreOutlined';
-import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
-import { Skeleton } from '@mui/material';
 import useUser from 'commons/components/hooks/useAppUser';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import useALContext from 'components/hooks/useALContext';
@@ -34,7 +34,7 @@ import { JSONFeedItem, useNotificationFeed } from 'components/visual/ServiceMana
 import 'moment/locale/fr';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Redirect } from 'react-router-dom';
+import { Navigate } from 'react-router';
 
 export default function Services() {
   const { t } = useTranslation(['adminServices']);
@@ -353,7 +353,8 @@ export default function Services() {
                   color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
                 }}
                 onClick={() => setOpen(true)}
-                size="large">
+                size="large"
+              >
                 <AddCircleOutlineIcon />
               </IconButton>
             </Tooltip>
@@ -371,7 +372,8 @@ export default function Services() {
                   disabled={
                     !updates || !Object.values(updates).some((srv: any) => srv.update_available && !srv.updating)
                   }
-                  size="large">
+                  size="large"
+                >
                   <SystemUpdateAltIcon />
                 </IconButton>
               </span>
@@ -394,7 +396,8 @@ export default function Services() {
                     availableServices.length === 0 ||
                     availableServices.every(s => installingServices?.includes(s?.summary))
                   }
-                  size="large">
+                  size="large"
+                >
                   <CloudDownloadOutlinedIcon />
                 </IconButton>
               </span>
@@ -444,6 +447,6 @@ export default function Services() {
       </div>
     </PageFullWidth>
   ) : (
-    <Redirect to="/forbidden" />
+    <Navigate to="/forbidden" />
   );
 }

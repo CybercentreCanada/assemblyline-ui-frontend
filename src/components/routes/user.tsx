@@ -40,8 +40,8 @@ import { RouterPrompt } from 'components/visual/RouterPrompt';
 import ChipInput from 'material-ui-chip-input';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { Redirect, useLocation, useParams } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router';
+import { useLocation, useParams } from 'react-router-dom';
 import Apps from './user/apps';
 
 // FIXME checkout https://mui.com/components/use-media-query/#migrating-from-withwidth
@@ -286,7 +286,7 @@ function User({ width, username }: UserProps) {
   }, []);
 
   return !currentUser.is_admin && location.pathname.includes('/admin/') ? (
-    <Redirect to="/forbidden" />
+    <Navigate to="/forbidden" />
   ) : (
     <PageCenter margin={4} width="100%">
       <React.Fragment key="right">

@@ -22,8 +22,8 @@ import { safeFieldValue } from 'helpers/utils';
 import 'moment/locale/fr';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { Redirect, useLocation } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router';
+import { useLocation } from 'react-router-dom';
 import { ErrorDetail } from './error_detail';
 
 const PAGE_SIZE = 25;
@@ -396,6 +396,6 @@ export default function ErrorViewer() {
       </div>
     </PageFullWidth>
   ) : (
-    <Redirect to="/forbidden" />
+    <Navigate to="/forbidden" />
   );
 }

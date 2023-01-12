@@ -1,8 +1,7 @@
-import { Grid, IconButton, MenuItem, Select, Tooltip, Typography, useTheme } from '@mui/material';
 import ArrowDownwardOutlinedIcon from '@mui/icons-material/ArrowDownwardOutlined';
 import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
-import { Skeleton } from '@mui/material';
+import { Grid, IconButton, MenuItem, Select, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
 import useUser from 'commons/components/hooks/useAppUser';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -10,9 +9,10 @@ import { CustomUser } from 'components/hooks/useMyUser';
 import LineGraph from 'components/visual/LineGraph';
 import { getVersionQuery } from 'helpers/utils';
 import 'moment/locale/fr';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, Redirect, useLocation } from 'react-router-dom';
+import { Navigate } from 'react-router';
+import { Link, useLocation } from 'react-router-dom';
 
 function getDescendantProp(obj, desc) {
   if (obj == null) return null;
@@ -58,65 +58,68 @@ function Counter({ stats, comp, field, titleVariant = 'h6' as 'h6', numberVarian
 function ServiceDetail({ stats, comp, show }) {
   const { t } = useTranslation(['adminServiceReview']);
   const theme = useTheme();
-  return show && (
-    <div style={{ marginTop: theme.spacing(4), marginBottom: theme.spacing(4) }}>
-      <Typography variant="h3" align="center" gutterBottom>
-        {stats ? stats.service.version : <Skeleton width="10rem" style={{ display: 'inline-block' }} />}
-      </Typography>
-      <Counter stats={stats} comp={comp} field={'result.count'} />
-      <Counter stats={stats} comp={comp} field={'result.score.avg'} />
-      <div style={{ marginBottom: theme.spacing(2) }}>
-        <LineGraph
-          dataset={stats && stats.result.score.distribution}
-          datatype={stats && stats.version}
-          height="200px"
-          title={t('result.score.distribution')}
-          titleSize={20}
-        />
-      </div>
-      <Counter stats={stats} comp={comp} field={'file.extracted.avg'} />
-      <Counter stats={stats} comp={comp} field={'file.supplementary.avg'} />
-      <div style={{ marginBottom: theme.spacing(2) }}>
-        <LineGraph
-          dataset={stats && stats.heuristic}
-          datatype={stats && stats.version}
-          sorter={(a, b) => parseInt(a.split('.', 2)[1]) - parseInt(b.split('.', 2)[1])}
-          height="250px"
-          title={t('heuristic')}
-          titleSize={20}
-        />
-      </div>
-      <div style={{ marginBottom: theme.spacing(2), display: 'flex', flexDirection: 'column' }}>
-        {stats ? (
-          <Tooltip title={t('errors')}>
-            <IconButton
-              component={Link}
-              style={{ color: theme.palette.action.active, alignSelf: 'self-end' }}
-              to={`/admin/errors?tc=1y&filters=response.service_name%3A${
-                stats.service.name
-              }&filters=${getVersionQuery(stats.service.version)}`}
-              size="large">
-              <ErrorOutlineOutlinedIcon />
-            </IconButton>
-          </Tooltip>
-        ) : (
-          <Skeleton
-            component="div"
-            variant="circular"
-            height="2.5rem"
-            width="2.5rem"
-            style={{ margin: theme.spacing(0.5), alignSelf: 'self-end' }}
+  return (
+    show && (
+      <div style={{ marginTop: theme.spacing(4), marginBottom: theme.spacing(4) }}>
+        <Typography variant="h3" align="center" gutterBottom>
+          {stats ? stats.service.version : <Skeleton width="10rem" style={{ display: 'inline-block' }} />}
+        </Typography>
+        <Counter stats={stats} comp={comp} field={'result.count'} />
+        <Counter stats={stats} comp={comp} field={'result.score.avg'} />
+        <div style={{ marginBottom: theme.spacing(2) }}>
+          <LineGraph
+            dataset={stats && stats.result.score.distribution}
+            datatype={stats && stats.version}
+            height="200px"
+            title={t('result.score.distribution')}
+            titleSize={20}
           />
-        )}
-        <LineGraph
-          dataset={stats && stats.error}
-          datatype={stats && stats.version}
-          height="250px"
-          title={t('error')}
-          titleSize={20}
-        />
+        </div>
+        <Counter stats={stats} comp={comp} field={'file.extracted.avg'} />
+        <Counter stats={stats} comp={comp} field={'file.supplementary.avg'} />
+        <div style={{ marginBottom: theme.spacing(2) }}>
+          <LineGraph
+            dataset={stats && stats.heuristic}
+            datatype={stats && stats.version}
+            sorter={(a, b) => parseInt(a.split('.', 2)[1]) - parseInt(b.split('.', 2)[1])}
+            height="250px"
+            title={t('heuristic')}
+            titleSize={20}
+          />
+        </div>
+        <div style={{ marginBottom: theme.spacing(2), display: 'flex', flexDirection: 'column' }}>
+          {stats ? (
+            <Tooltip title={t('errors')}>
+              <IconButton
+                component={Link}
+                style={{ color: theme.palette.action.active, alignSelf: 'self-end' }}
+                to={`/admin/errors?tc=1y&filters=response.service_name%3A${
+                  stats.service.name
+                }&filters=${getVersionQuery(stats.service.version)}`}
+                size="large"
+              >
+                <ErrorOutlineOutlinedIcon />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            <Skeleton
+              component="div"
+              variant="circular"
+              height="2.5rem"
+              width="2.5rem"
+              style={{ margin: theme.spacing(0.5), alignSelf: 'self-end' }}
+            />
+          )}
+          <LineGraph
+            dataset={stats && stats.error}
+            datatype={stats && stats.version}
+            height="250px"
+            title={t('error')}
+            titleSize={20}
+          />
+        </div>
       </div>
-    </div>
+    )
   );
 }
 
@@ -308,6 +311,6 @@ export default function ServiceReview() {
       )}
     </PageFullWidth>
   ) : (
-    <Redirect to="/forbidden" />
+    <Navigate to="/forbidden" />
   );
 }

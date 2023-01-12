@@ -1,3 +1,4 @@
+import Editor, { DiffEditor, loader } from '@monaco-editor/react';
 import {
   Button,
   Dialog,
@@ -5,11 +6,10 @@ import {
   DialogContent,
   DialogTitle,
   Grid,
+  Skeleton,
   Typography,
   useTheme
 } from '@mui/material';
-import { Skeleton } from '@mui/material';
-import Editor, { DiffEditor, loader } from '@monaco-editor/react';
 import useAppContext from 'commons/components/hooks/useAppContext';
 import useUser from 'commons/components/hooks/useAppUser';
 import PageFullSize from 'commons/components/layout/pages/PageFullSize';
@@ -20,7 +20,7 @@ import { RouterPrompt } from 'components/visual/RouterPrompt';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactResizeDetector from 'react-resize-detector';
-import { Redirect } from 'react-router-dom';
+import { Navigate } from 'react-router';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.34.1' } });
 
@@ -194,6 +194,6 @@ export default function AdminTagSafelist() {
       </div>
     </PageFullSize>
   ) : (
-    <Redirect to="/forbidden" />
+    <Navigate to="/forbidden" />
   );
 }
