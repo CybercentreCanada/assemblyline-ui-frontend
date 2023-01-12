@@ -1,7 +1,7 @@
-import { Menu, MenuItem } from '@mui/material';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
+import { Menu, MenuItem } from '@mui/material';
 import useClipboard from 'commons/components/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
@@ -10,7 +10,7 @@ import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
 import { safeFieldValueURI } from 'helpers/utils';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 const STYLE = { height: 'auto', minHeight: '20px' };
 const SEARCH_ICON = <SearchOutlinedIcon style={{ marginRight: '16px' }} />;
@@ -42,7 +42,7 @@ const WrappedAttack: React.FC<AttackProps> = ({
 }) => {
   const { t } = useTranslation();
   const [state, setState] = React.useState(initialMenuState);
-  const history = useHistory();
+  const navigate = useNavigate();
   const { isHighlighted, triggerHighlight } = useHighlighter();
   const { copy } = useClipboard();
   const { showSafeResults } = useSafeResults();
@@ -51,7 +51,7 @@ const WrappedAttack: React.FC<AttackProps> = ({
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
 
   const searchAttack = useCallback(
-    () => history.push(`/search/result?query=result.sections.heuristic.attack.pattern:${safeFieldValueURI(text)}`),
+    () => navigate(`/search/result?query=result.sections.heuristic.attack.pattern:${safeFieldValueURI(text)}`),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [text]
   );

@@ -16,7 +16,8 @@ import TextDivider from 'components/visual/TextDivider';
 import { getProvider } from 'helpers/utils';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import { useLocation } from 'react-router-dom';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -39,7 +40,7 @@ type LoginScreenProps = {
 
 export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, oAuthProviders }: LoginScreenProps) {
   const location = useLocation();
-  const history = useHistory();
+  const navigate = useNavigate();
   const params = new URLSearchParams(location.search);
   const { t } = useTranslation(['login']);
   const theme = useTheme();
@@ -163,7 +164,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
         },
         onFinalize: () => {
           if (provider) {
-            history.push(localStorage.getItem('nextLocation') || '/');
+            navigate(localStorage.getItem('nextLocation') || '/');
           }
         }
       });
@@ -173,7 +174,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
         method: 'POST',
         body: { registration_key: params.get('registration_key') },
         onSuccess: () => showSuccessMessage(t('signup.completed'), 10000),
-        onFinalize: () => history.push('/')
+        onFinalize: () => navigate('/')
       });
     }
     // eslint-disable-next-line

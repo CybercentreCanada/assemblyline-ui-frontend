@@ -1,20 +1,20 @@
+import CompareArrowsOutlinedIcon from '@mui/icons-material/CompareArrowsOutlined';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
+import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
+import { TabContext, TabList, TabPanel } from '@mui/lab';
 import {
   Button,
   CircularProgress,
   Grid,
   IconButton,
   Paper,
+  Skeleton,
   Tab,
   Tooltip,
   Typography,
-  useTheme,
+  useTheme
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import CompareArrowsOutlinedIcon from '@mui/icons-material/CompareArrowsOutlined';
-import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
-import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
-import { Skeleton } from '@mui/material';
-import { TabContext, TabList, TabPanel } from '@mui/lab';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -26,7 +26,8 @@ import { RouterPrompt } from 'components/visual/RouterPrompt';
 import { getVersionQuery } from 'helpers/utils';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, Redirect, useHistory, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import { Link, Redirect, useParams } from 'react-router-dom';
 import ServiceContainer from './service_detail/container';
 import ServiceGeneral from './service_detail/general';
 import ServiceParams from './service_detail/parameters';
@@ -175,7 +176,7 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
   const [deleteDialog, setDeleteDialog] = useState(false);
   const { user: currentUser } = useALContext();
   const { showSuccessMessage } = useMySnackbar();
-  const history = useHistory();
+  const navigate = useNavigate();
   const classes = useStyles();
 
   const { apiCall } = useMyAPI();
@@ -210,7 +211,7 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
       method: 'DELETE',
       onSuccess: () => {
         showSuccessMessage(t('delete.success'));
-        if (svc) setTimeout(() => history.push('/admin/services'), 1000);
+        if (svc) setTimeout(() => navigate('/admin/services'), 1000);
         onDeleted();
       },
       onEnter: () => setButtonLoading(true),
@@ -307,7 +308,8 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
                   to={`/admin/errors?filters=response.service_name%3A${service.name}&filters=${getVersionQuery(
                     service.version
                   )}`}
-                  size="large">
+                  size="large"
+                >
                   <ErrorOutlineOutlinedIcon />
                 </IconButton>
               </Tooltip>
@@ -316,7 +318,8 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
                   component={Link}
                   style={{ color: theme.palette.action.active }}
                   to={`/admin/service_review?service=${service.name}&v1=${service.version}`}
-                  size="large">
+                  size="large"
+                >
                   <CompareArrowsOutlinedIcon />
                 </IconButton>
               </Tooltip>
@@ -326,7 +329,8 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
                     color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
                   }}
                   onClick={handleDeleteButtonClick}
-                  size="large">
+                  size="large"
+                >
                   <RemoveCircleOutlineOutlinedIcon />
                 </IconButton>
               </Tooltip>

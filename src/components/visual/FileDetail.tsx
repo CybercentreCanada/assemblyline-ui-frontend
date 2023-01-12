@@ -1,11 +1,10 @@
-import { Grid, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
 import AmpStoriesOutlinedIcon from '@mui/icons-material/AmpStoriesOutlined';
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
 import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
 import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
 import RotateLeftOutlinedIcon from '@mui/icons-material/RotateLeftOutlined';
-import { Skeleton } from '@mui/material';
+import { Grid, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -15,7 +14,8 @@ import { Error } from 'components/visual/ErrorCard';
 import { AlternateResult, emptyResult, Result } from 'components/visual/ResultCard';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useHistory, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import { Link, useLocation } from 'react-router-dom';
 import AttackSection from './FileDetail/attacks';
 import ChildrenSection from './FileDetail/childrens';
 import Detection from './FileDetail/detection';
@@ -105,7 +105,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
   const { apiCall } = useMyAPI();
   const { c12nDef, user: currentUser } = useALContext();
   const theme = useTheme();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { showSuccessMessage } = useMySnackbar();
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
@@ -152,7 +152,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
       onSuccess: api_data => {
         showSuccessMessage(t('resubmit.success'));
         setTimeout(() => {
-          history.push(`/submission/detail/${api_data.api_response.sid}`);
+          navigate(`/submission/detail/${api_data.api_response.sid}`);
         }, 500);
       }
     });
@@ -269,7 +269,8 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                     <IconButton
                       component={Link}
                       to={`/search/submission?query=files.sha256:${file.file_info.sha256} OR results:${file.file_info.sha256}* OR errors:${file.file_info.sha256}*`}
-                      size="large">
+                      size="large"
+                    >
                       <AmpStoriesOutlinedIcon />
                     </IconButton>
                   </Tooltip>
@@ -284,10 +285,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                   )}
                   {currentUser.roles.includes('file_detail') && (
                     <Tooltip title={t('file_viewer')}>
-                      <IconButton
-                        component={Link}
-                        to={`/file/viewer/${file.file_info.sha256}`}
-                        size="large">
+                      <IconButton component={Link} to={`/file/viewer/${file.file_info.sha256}`} size="large">
                         <PageviewOutlinedIcon />
                       </IconButton>
                     </Tooltip>
@@ -304,7 +302,8 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                             c12n: file.file_info.classification
                           }
                         }}
-                        size="large">
+                        size="large"
+                      >
                         <ReplayOutlinedIcon />
                       </IconButton>
                     </Tooltip>

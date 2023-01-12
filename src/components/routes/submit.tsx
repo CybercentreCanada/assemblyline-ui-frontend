@@ -1,5 +1,7 @@
 import Flow from '@flowjs/flow.js';
+import { TabContext, TabList, TabPanel } from '@mui/lab';
 import {
+  Alert,
   Button,
   Checkbox,
   CircularProgress,
@@ -8,17 +10,16 @@ import {
   MenuItem,
   Paper,
   Select,
+  Skeleton,
   Switch,
   Tab,
   TextField,
   Tooltip,
   Typography,
   useMediaQuery,
-  useTheme,
+  useTheme
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import { Alert, Skeleton } from '@mui/material';
-import { TabContext, TabList, TabPanel } from '@mui/lab';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
@@ -33,7 +34,8 @@ import { matchSHA256, matchURL } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router';
+import { Link } from 'react-router-dom';
 
 type SubmitState = {
   hash: string;
@@ -58,11 +60,12 @@ function Submit() {
   const downSM = useMediaQuery(theme.breakpoints.down('xl'));
   const md = useMediaQuery(theme.breakpoints.only('md'));
   const { showErrorMessage, showSuccessMessage, closeSnackbar } = useMySnackbar();
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
-  const state: SubmitState = history.location.state as SubmitState;
+  const state: SubmitState = location.state as SubmitState;
   const urlHashTitle = configuration.ui.allow_url_submissions ? 'URL/SHA256' : 'SHA256';
   const urlInputText = urlHashTitle + t('urlHash.input_suffix');
   const [urlHash, setUrlHash] = useState(state !== undefined ? state.hash : '');
@@ -200,7 +203,7 @@ function Submit() {
         onSuccess: api_data => {
           showSuccessMessage(`${t('submit.success')} ${api_data.api_response.sid}`);
           setTimeout(() => {
-            history.push(`/submission/detail/${api_data.api_response.sid}`);
+            navigate(`/submission/detail/${api_data.api_response.sid}`);
           }, 500);
         },
         onFailure: api_data => {
@@ -327,7 +330,7 @@ function Submit() {
         setAllowClick(false);
         showSuccessMessage(`${t('submit.success')} ${api_data.api_response.sid}`);
         setTimeout(() => {
-          history.push(`/submission/detail/${api_data.api_response.sid}`);
+          navigate(`/submission/detail/${api_data.api_response.sid}`);
         }, 500);
       },
       onFailure: api_data => {

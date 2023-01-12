@@ -3,7 +3,8 @@ import createStyles from '@mui/styles/createStyles';
 import withStyles from '@mui/styles/withStyles';
 import 'moment/locale/fr';
 import React from 'react';
-import { Link, useHistory, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import { Link, useLocation } from 'react-router-dom';
 
 const StyledTableCell = withStyles((theme: Theme) =>
   createStyles({
@@ -60,7 +61,7 @@ export const SortableHeaderCell = ({ children, sortField, allowSort = true, ...o
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const curSort = searchParams.get('sort');
-  const history = useHistory();
+  const navigate = useNavigate();
   const active = curSort && curSort.indexOf(sortField) !== -1;
   const dir = active && curSort.indexOf('asc') !== -1 ? 'asc' : 'desc';
 
@@ -70,7 +71,7 @@ export const SortableHeaderCell = ({ children, sortField, allowSort = true, ...o
     } else {
       searchParams.set('sort', `${sortField} desc`);
     }
-    history.push(`${location.pathname}?${searchParams.toString()}`);
+    navigate(`${location.pathname}?${searchParams.toString()}`);
   };
   return (
     <StyledTableCell {...other} component="div">

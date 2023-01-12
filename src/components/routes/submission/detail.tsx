@@ -1,4 +1,3 @@
-import { Grid, IconButton, LinearProgress, Snackbar, Tooltip, Typography, useTheme } from '@mui/material';
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import ChromeReaderModeOutlinedIcon from '@mui/icons-material/ChromeReaderModeOutlined';
@@ -9,7 +8,17 @@ import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
-import { Alert, Skeleton } from '@mui/material';
+import {
+  Alert,
+  Grid,
+  IconButton,
+  LinearProgress,
+  Skeleton,
+  Snackbar,
+  Tooltip,
+  Typography,
+  useTheme
+} from '@mui/material';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
@@ -26,7 +35,8 @@ import { getErrorIDFromKey, getServiceFromKey } from 'helpers/errors';
 import { setNotifyFavicon } from 'helpers/utils';
 import React, { useCallback, useEffect, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useHistory, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import { Link, useParams } from 'react-router-dom';
 import io from 'socket.io-client';
 import ForbiddenPage from '../403';
 import AttackSection from './detail/attack';
@@ -97,7 +107,7 @@ function WrappedSubmissionDetail() {
   const { apiCall } = useMyAPI();
   const sp4 = theme.spacing(4);
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { user: currentUser, c12nDef, configuration: systemConfig } = useALContext();
   const { setHighlightMap } = useHighlighter();
   const { setGlobalDrawer, globalDrawer } = useDrawer();
@@ -460,7 +470,7 @@ function WrappedSubmissionDetail() {
           setSummary(null);
           setTree(null);
           setTimeout(() => {
-            history.push(`/submission/detail/${api_data.api_response.sid}`);
+            navigate(`/submission/detail/${api_data.api_response.sid}`);
           }, 500);
         }
       });
@@ -491,7 +501,7 @@ function WrappedSubmissionDetail() {
           showSuccessMessage(t('delete.success'));
           setDeleteDialog(false);
           setTimeout(() => {
-            history.push('/submissions');
+            navigate('/submissions');
           }, 500);
         },
         onEnter: () => setWaitingDialog(true),
@@ -710,7 +720,7 @@ function WrappedSubmissionDetail() {
 
   useEffect(() => {
     if (submission !== null && globalDrawer === null && fid !== undefined) {
-      history.push(`/submission/detail/${id}`);
+      navigate(`/submission/detail/${id}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [globalDrawer]);
@@ -927,7 +937,8 @@ function WrappedSubmissionDetail() {
                                 color:
                                   theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
                               }}
-                              size="large">
+                              size="large"
+                            >
                               <RemoveCircleOutlineOutlinedIcon />
                             </IconButton>
                           </Tooltip>

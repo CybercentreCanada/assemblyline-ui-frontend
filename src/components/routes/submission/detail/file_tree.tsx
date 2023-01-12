@@ -1,14 +1,13 @@
-import { Box, Collapse, Divider, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import { Skeleton } from '@mui/material';
+import { Box, Collapse, Divider, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';
 import Verdict from 'components/visual/Verdict';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 const useStyles = makeStyles(theme => ({
   file_item: {
@@ -117,7 +116,7 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, defaultForceShown
   const { t } = useTranslation('submissionDetail');
   const theme = useTheme();
   const classes = useStyles();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { isHighlighted } = useHighlighter();
   const { showSafeResults } = useSafeResults();
   const [forcedShown, setForcedShown] = React.useState<Array<string>>([...defaultForceShown]);
@@ -165,7 +164,7 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, defaultForceShown
                 onClick={
                   item.sha256
                     ? () => {
-                        history.push(`/submission/detail/${sid}/${item.sha256}?name=${encodeURI(item.name[0])}`);
+                        navigate(`/submission/detail/${sid}/${item.sha256}?name=${encodeURI(item.name[0])}`);
                       }
                     : null
                 }

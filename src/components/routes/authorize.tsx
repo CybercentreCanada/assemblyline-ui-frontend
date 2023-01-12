@@ -5,14 +5,15 @@ import CardCentered from 'commons/components/layout/pages/CardCentered';
 import useALContext from 'components/hooks/useALContext';
 import getXSRFCookie from 'helpers/xsrf';
 import { useTranslation } from 'react-i18next';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import { useLocation } from 'react-router-dom';
 import ForbiddenPage from './403';
 
 const VALID_SCOPES = ['r', 'w', 'rw'];
 
 export default function AppRegistration() {
   const location = useLocation();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { t } = useTranslation(['authorize']);
   const theme = useTheme();
   const { getBanner } = useAppLayout();
@@ -32,7 +33,7 @@ export default function AppRegistration() {
           {!rUrl || !clientID || !scope || !server || VALID_SCOPES.indexOf(scope) === -1 ? (
             <>
               <div style={{ marginBottom: '3rem' }}>{t('invalid')}</div>
-              <Button variant="contained" color="primary" onClick={() => history.goBack()}>
+              <Button variant="contained" color="primary" onClick={() => navigate(-1)}>
                 {t('button.back')}
               </Button>
             </>

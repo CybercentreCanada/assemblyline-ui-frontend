@@ -1,33 +1,35 @@
+import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import {
+  Autocomplete,
   Button,
   CircularProgress,
   Grid,
   IconButton,
   MenuItem,
   Select,
+  Skeleton,
   TextField,
   Theme,
   Tooltip,
   Typography,
-  useTheme,
+  useTheme
 } from '@mui/material';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 import withStyles from '@mui/styles/withStyles';
-import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
-import { Autocomplete, Skeleton } from '@mui/material';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
-import { RouterPrompt } from 'components/visual/RouterPrompt';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
+import { RouterPrompt } from 'components/visual/RouterPrompt';
 import 'moment/locale/fr';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import { useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
 
 const DEFAULT_LABELS = [
@@ -96,7 +98,7 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
   const classes = useStyles();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const DEFAULT_WORKFLOW = {
     classification: c12nDef.UNRESTRICTED,
@@ -165,7 +167,7 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
         setDeleteDialog(false);
         showSuccessMessage(t('delete.success'));
         if (id) {
-          setTimeout(() => history.push('/manage/workflows'), 1000);
+          setTimeout(() => navigate('/manage/workflows'), 1000);
         }
         setTimeout(() => window.dispatchEvent(new CustomEvent('reloadWorkflows')), 1000);
         close();
@@ -236,7 +238,8 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
                         color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
                       }}
                       onClick={() => setDeleteDialog(true)}
-                      size="large">
+                      size="large"
+                    >
                       <RemoveCircleOutlineOutlinedIcon />
                     </IconButton>
                   </Tooltip>

@@ -1,3 +1,5 @@
+import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
+import CloseIcon from '@mui/icons-material/Close';
 import {
   Avatar,
   Button,
@@ -17,14 +19,12 @@ import {
   Theme,
   Typography,
   useMediaQuery,
-  useTheme,
+  useTheme
 } from '@mui/material';
+import { red } from '@mui/material/colors';
+import Skeleton from '@mui/material/Skeleton';
 import makeStyles from '@mui/styles/makeStyles';
 import withStyles from '@mui/styles/withStyles';
-import { red } from '@mui/material/colors';
-import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
-import CloseIcon from '@mui/icons-material/Close';
-import Skeleton from '@mui/material/Skeleton';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -40,11 +40,12 @@ import { RouterPrompt } from 'components/visual/RouterPrompt';
 import ChipInput from 'material-ui-chip-input';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Redirect, useHistory, useLocation, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import { Redirect, useLocation, useParams } from 'react-router-dom';
 import Apps from './user/apps';
 
 // FIXME checkout https://mui.com/components/use-media-query/#migrating-from-withwidth
-const withWidth = () => (WrappedComponent) => (props) => <WrappedComponent {...props} width="xs" />;
+const withWidth = () => WrappedComponent => props => <WrappedComponent {...props} width="xs" />;
 
 type UserProps = {
   width: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -72,7 +73,7 @@ function User({ width, username }: UserProps) {
   const inputRef = useRef(null);
   const { t } = useTranslation(['user']);
   const theme = useTheme();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [drawerType, setDrawerType] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState(false);
@@ -126,7 +127,7 @@ function User({ width, username }: UserProps) {
       onSuccess: () => {
         showSuccessMessage(t('delete.success'));
         setTimeout(() => {
-          history.push('/admin/users');
+          navigate('/admin/users');
         }, 500);
       },
       onEnter: () => setButtonLoading(true),
@@ -455,7 +456,8 @@ function User({ width, username }: UserProps) {
                       onClick={e => {
                         inputRef.current.click();
                       }}
-                      size="large">
+                      size="large"
+                    >
                       <Avatar
                         style={{
                           width: downSM ? theme.spacing(24) : theme.spacing(16),

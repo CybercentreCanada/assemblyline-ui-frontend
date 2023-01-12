@@ -1,10 +1,10 @@
+import SearchIcon from '@mui/icons-material/Search';
 import { alpha, InputBase } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import SearchIcon from '@mui/icons-material/Search';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 const useStyles = breadcrumbsEnabled =>
   makeStyles(theme => ({
@@ -52,14 +52,14 @@ const QuickSearch = () => {
   const { layoutProps, breadcrumbsEnabled } = useAppLayout();
   const classes = useStyles(layoutProps.allowBreadcrumbs && breadcrumbsEnabled);
   const [value, setValue] = useState('');
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const uri = layoutProps.topnav.quickSearchURI ? layoutProps.topnav.quickSearchURI : '/search/';
   const param = layoutProps.topnav.quickSearchParam ? layoutProps.topnav.quickSearchParam : 'q';
 
   const submit = event => {
     event.preventDefault();
-    history.push(`${uri}?${param}=${encodeURIComponent(value)}`);
+    navigate(`${uri}?${param}=${encodeURIComponent(value)}`);
     setValue('');
   };
 

@@ -1,7 +1,6 @@
-import { Divider, Grid, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
-import { Skeleton } from '@mui/material';
+import { Divider, Grid, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -12,10 +11,11 @@ import CustomChip from 'components/visual/CustomChip';
 import Histogram from 'components/visual/Histogram';
 import { bytesToSize, safeFieldValue, safeFieldValueURI } from 'helpers/utils';
 import 'moment/locale/fr';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
-import { Link, useHistory, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import { Link, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
 
 export type Safelist = {
@@ -72,7 +72,7 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
   const { user: currentUser, c12nDef } = useALContext();
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if ((safelist_id || id) && currentUser.roles.includes('safelist_view')) {
@@ -119,7 +119,7 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
         setDeleteDialog(false);
         showSuccessMessage(t('delete.success'));
         if (id) {
-          setTimeout(() => history.push('/manage/safelist'), 1000);
+          setTimeout(() => navigate('/manage/safelist'), 1000);
         }
         setTimeout(() => window.dispatchEvent(new CustomEvent('reloadSafelist')), 1000);
         close();
@@ -230,7 +230,8 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
                                   safelist.tag.type
                                 }:${safeFieldValueURI(safelist.tag.value)}`
                           }
-                          size="large">
+                          size="large"
+                        >
                           <YoutubeSearchedForIcon />
                         </IconButton>
                       </Tooltip>
@@ -242,7 +243,8 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
                             color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
                           }}
                           onClick={() => setDeleteDialog(true)}
-                          size="large">
+                          size="large"
+                        >
                           <RemoveCircleOutlineOutlinedIcon />
                         </IconButton>
                       </Tooltip>
@@ -262,8 +264,18 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
               ) : (
                 <>
                   <div style={{ display: 'flex' }}>
-                    <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-                    <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+                    <Skeleton
+                      variant="circular"
+                      height="2.5rem"
+                      width="2.5rem"
+                      style={{ margin: theme.spacing(0.5) }}
+                    />
+                    <Skeleton
+                      variant="circular"
+                      height="2.5rem"
+                      width="2.5rem"
+                      style={{ margin: theme.spacing(0.5) }}
+                    />
                   </div>
                   <Skeleton
                     variant="rectangular"

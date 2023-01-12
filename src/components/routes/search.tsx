@@ -1,19 +1,9 @@
-import {
-  IconButton,
-  Paper,
-  Tab,
-  Tabs,
-  Theme,
-  Tooltip,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from '@mui/material';
-import createStyles from '@mui/styles/createStyles';
-import makeStyles from '@mui/styles/makeStyles';
 import ArchiveIcon from '@mui/icons-material/Archive';
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import CenterFocusStrongOutlinedIcon from '@mui/icons-material/CenterFocusStrongOutlined';
+import { IconButton, Paper, Tab, Tabs, Theme, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
+import createStyles from '@mui/styles/createStyles';
+import makeStyles from '@mui/styles/makeStyles';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
@@ -31,9 +21,10 @@ import SignaturesTable from 'components/visual/SearchResult/signatures';
 import SubmissionsTable from 'components/visual/SearchResult/submissions';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import { searchResultsDisplay } from 'helpers/utils';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useHistory, useLocation, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import ForbiddenPage from './403';
 
 const PAGE_SIZE = 25;
@@ -89,7 +80,7 @@ function Search({ index }: SearchProps) {
   const [searching, setSearching] = useState(false);
   const { indexes, user: currentUser, configuration } = useALContext();
   const location = useLocation();
-  const history = useHistory();
+  const navigate = useNavigate();
   const theme = useTheme();
   const classes = useStyles();
   const { apiCall } = useMyAPI();
@@ -133,18 +124,18 @@ function Search({ index }: SearchProps) {
   const queryValue = useRef<string>('');
 
   const handleChangeTab = (event, newTab) => {
-    history.push(`${location.pathname}?${query.toString()}#${newTab}`);
+    navigate(`${location.pathname}?${query.toString()}#${newTab}`);
   };
 
   const onClear = () => {
     query.delete('query');
-    history.push(`${location.pathname}?${query.toString()}${location.hash}`);
+    navigate(`${location.pathname}?${query.toString()}${location.hash}`);
   };
 
   const onSearch = () => {
     if (queryValue.current !== '') {
       query.set('query', queryValue.current);
-      history.push(`${location.pathname}?${query.toString()}${location.hash}`);
+      navigate(`${location.pathname}?${query.toString()}${location.hash}`);
     } else {
       onClear();
     }
@@ -274,7 +265,7 @@ function Search({ index }: SearchProps) {
                             'use_archive',
                             !query.has('use_archive') ? 'true' : query.get('use_archive') === 'false'
                           );
-                          history.push(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
                         }
                       }
                     }

@@ -1,31 +1,33 @@
+import Editor, { loader } from '@monaco-editor/react';
+import AmpStoriesOutlinedIcon from '@mui/icons-material/AmpStoriesOutlined';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import {
+  Alert,
   Grid,
   IconButton,
   LinearProgress,
   Paper,
+  Skeleton,
   Tab,
   Tabs,
   Tooltip,
   Typography,
-  useTheme,
+  useTheme
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import AmpStoriesOutlinedIcon from '@mui/icons-material/AmpStoriesOutlined';
-import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
-import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
-import Editor, { loader } from '@monaco-editor/react';
-import { Alert, Skeleton } from '@mui/material';
+import useAppContext from 'commons/components/hooks/useAppContext';
 import PageFullSize from 'commons/components/layout/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
-import FileDownloader from 'components/visual/FileDownloader';
 import Empty from 'components/visual/Empty';
+import FileDownloader from 'components/visual/FileDownloader';
 import { HexViewerApp } from 'components/visual/HexViewer';
-import ReactResizeDetector from 'react-resize-detector';
-import useAppContext from 'commons/components/hooks/useAppContext';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useHistory, useLocation, useParams } from 'react-router-dom';
+import ReactResizeDetector from 'react-resize-detector';
+import { useNavigate } from 'react-router';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.34.1' } });
@@ -199,7 +201,7 @@ const FileViewer = () => {
   const classes = useStyles();
   const theme = useTheme();
   const location = useLocation();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { apiCall } = useMyAPI();
   const [string, setString] = useState(null);
   const [hex, setHex] = useState(null);
@@ -215,7 +217,7 @@ const FileViewer = () => {
   const handleChangeTab = (event, newTab) => {
     const currentTab = location.hash.substring(1, location.hash.length) || 'ascii';
     if (currentTab !== newTab) {
-      history.push(`${location.pathname}#${newTab}`);
+      navigate(`${location.pathname}#${newTab}`);
     }
   };
 
@@ -328,7 +330,8 @@ const FileViewer = () => {
                 <IconButton
                   component={Link}
                   to={`/search/submission?query=files.sha256:${id} OR results:${id}* OR errors:${id}*`}
-                  size="large">
+                  size="large"
+                >
                   <AmpStoriesOutlinedIcon />
                 </IconButton>
               </Tooltip>

@@ -1,8 +1,8 @@
-import { Grid, MenuItem, Select, Typography, useMediaQuery, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
+import { Grid, MenuItem, Select, Typography, useMediaQuery, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import useUser from 'commons/components/hooks/useAppUser';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
@@ -20,9 +20,10 @@ import ErrorsTable from 'components/visual/SearchResult/errors';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import { safeFieldValue } from 'helpers/utils';
 import 'moment/locale/fr';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Redirect, useHistory, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import { Redirect, useLocation } from 'react-router-dom';
 import { ErrorDetail } from './error_detail';
 
 const PAGE_SIZE = 25;
@@ -83,7 +84,7 @@ export default function ErrorViewer() {
   const [searching, setSearching] = useState(false);
   const [errorResults, setErrorResults] = useState<ErrorResults>(null);
   const classes = useStyles();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
   const theme = useTheme();
   const { apiCall } = useMyAPI();
@@ -103,7 +104,7 @@ export default function ErrorViewer() {
 
   useEffect(() => {
     if (errorResults !== null && globalDrawer === null && location.hash) {
-      history.push(`${location.pathname}${location.search ? location.search : ''}`);
+      navigate(`${location.pathname}${location.search ? location.search : ''}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [globalDrawer]);
@@ -184,9 +185,9 @@ export default function ErrorViewer() {
     () => {
       if (query.getAll('filters').length !== 0) {
         query.delete('query');
-        history.push(`${location.pathname}?${query.getDeltaString()}`);
+        navigate(`${location.pathname}?${query.getDeltaString()}`);
       } else {
-        history.push(location.pathname);
+        navigate(location.pathname);
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -197,7 +198,7 @@ export default function ErrorViewer() {
     () => {
       if (filterValue.current !== '') {
         query.set('query', filterValue.current);
-        history.push(`${location.pathname}?${query.getDeltaString()}`);
+        navigate(`${location.pathname}?${query.getDeltaString()}`);
       } else {
         onClear();
       }
@@ -212,7 +213,7 @@ export default function ErrorViewer() {
 
   const setErrorKey = useCallback(
     (error_key: string) => {
-      history.push(`${location.pathname}${location.search ? location.search : ''}#${error_key}`);
+      navigate(`${location.pathname}${location.search ? location.search : ''}#${error_key}`);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [location.search]
@@ -232,7 +233,7 @@ export default function ErrorViewer() {
             variant="outlined"
             onChange={event => {
               query.set('tc', event.target.value);
-              history.push(`${location.pathname}?${query.getDeltaString()}`);
+              navigate(`${location.pathname}?${query.getDeltaString()}`);
             }}
             fullWidth
           >
@@ -262,7 +263,7 @@ export default function ErrorViewer() {
                 props: {
                   onClick: () => {
                     query.set('query', 'type:(EXCEPTION OR UNKNOWN)');
-                    history.push(`${location.pathname}?${query.getDeltaString()}`);
+                    navigate(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
               },
@@ -272,7 +273,7 @@ export default function ErrorViewer() {
                 props: {
                   onClick: () => {
                     query.set('query', 'type:(SERVICE* OR TASK*)');
-                    history.push(`${location.pathname}?${query.getDeltaString()}`);
+                    navigate(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
               },
@@ -282,7 +283,7 @@ export default function ErrorViewer() {
                 props: {
                   onClick: () => {
                     query.set('query', 'type:MAX*');
-                    history.push(`${location.pathname}?${query.getDeltaString()}`);
+                    navigate(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
               }
@@ -331,11 +332,11 @@ export default function ErrorViewer() {
                         v,
                         v.indexOf('NOT ') === 0 ? v.substring(5, v.length - 1) : `NOT (${v})`
                       );
-                      history.push(`${location.pathname}?${query.getDeltaString()}`);
+                      navigate(`${location.pathname}?${query.getDeltaString()}`);
                     },
                     onDelete: () => {
                       query.remove('filters', v);
-                      history.push(`${location.pathname}?${query.getDeltaString()}`);
+                      navigate(`${location.pathname}?${query.getDeltaString()}`);
                     }
                   }))}
                 />
@@ -367,7 +368,7 @@ export default function ErrorViewer() {
                 if (!searching && element.length > 0) {
                   var ind = element[0].index;
                   query.add('filters', `response.service_name:${Object.keys(names)[ind]}`);
-                  history.push(`${location.pathname}?${query.getDeltaString()}`);
+                  navigate(`${location.pathname}?${query.getDeltaString()}`);
                 }
               }}
             />
@@ -382,7 +383,7 @@ export default function ErrorViewer() {
                 if (!searching && element.length > 0) {
                   var ind = element[0].index;
                   query.add('filters', `type:${safeFieldValue(Object.keys(types)[ind])}`);
-                  history.push(`${location.pathname}?${query.getDeltaString()}`);
+                  navigate(`${location.pathname}?${query.getDeltaString()}`);
                 }
               }}
             />

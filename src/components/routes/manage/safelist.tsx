@@ -1,9 +1,9 @@
-import { useMediaQuery, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import Typography from '@mui/material/Typography';
 import BlockOutlinedIcon from '@mui/icons-material/BlockOutlined';
 import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
+import { useMediaQuery, useTheme } from '@mui/material';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
@@ -16,9 +16,10 @@ import SearchPager from 'components/visual/SearchPager';
 import SafelistTable from 'components/visual/SearchResult/safelist';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import 'moment/locale/fr';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import { useLocation } from 'react-router-dom';
 import ForbiddenPage from '../403';
 import SafelistDetail from './safelist_detail';
 
@@ -56,7 +57,7 @@ export default function Safelist() {
   const [safelistResults, setSafelistResults] = useState<SearchResults>(null);
   const location = useLocation();
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
-  const history = useHistory();
+  const navigate = useNavigate();
   const theme = useTheme();
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
   const { apiCall } = useMyAPI();
@@ -75,7 +76,7 @@ export default function Safelist() {
 
   useEffect(() => {
     if (safelistResults !== null && globalDrawer === null && location.hash) {
-      history.push(`${location.pathname}${location.search ? location.search : ''}`);
+      navigate(`${location.pathname}${location.search ? location.search : ''}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [globalDrawer]);
@@ -135,7 +136,7 @@ export default function Safelist() {
 
   const onClear = useCallback(
     () => {
-      history.push(location.pathname);
+      navigate(location.pathname);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [location.pathname]
@@ -145,8 +146,8 @@ export default function Safelist() {
     () => {
       if (filterValue.current !== '') {
         query.set('query', filterValue.current);
-        // history.push(`${location.pathname}?${query.toString()}`);
-        history.push(`${location.pathname}?${query.getDeltaString()}${location.hash ? location.hash : ''}`);
+        // navigate(`${location.pathname}?${query.toString()}`);
+        navigate(`${location.pathname}?${query.getDeltaString()}${location.hash ? location.hash : ''}`);
       } else {
         onClear();
       }
@@ -161,7 +162,7 @@ export default function Safelist() {
 
   const setSafelistID = useCallback(
     (wf_id: string) => {
-      history.push(`${location.pathname}${location.search ? location.search : ''}#${wf_id}`);
+      navigate(`${location.pathname}${location.search ? location.search : ''}#${wf_id}`);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [location.search]
@@ -190,7 +191,7 @@ export default function Safelist() {
                 props: {
                   onClick: () => {
                     query.set('query', 'sources.type:user');
-                    history.push(`${location.pathname}?${query.getDeltaString()}`);
+                    navigate(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
               },
@@ -200,7 +201,7 @@ export default function Safelist() {
                 props: {
                   onClick: () => {
                     query.set('query', 'type:tag');
-                    history.push(`${location.pathname}?${query.getDeltaString()}`);
+                    navigate(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
               },
@@ -210,7 +211,7 @@ export default function Safelist() {
                 props: {
                   onClick: () => {
                     query.set('query', 'enabled:false');
-                    history.push(`${location.pathname}?${query.getDeltaString()}`);
+                    navigate(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
               }

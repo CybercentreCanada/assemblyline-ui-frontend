@@ -1,3 +1,5 @@
+import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
+import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
 import {
   Button,
   CircularProgress,
@@ -10,14 +12,12 @@ import {
   MenuItem,
   Paper,
   Select,
+  Skeleton,
   Tooltip,
   Typography,
-  useTheme,
+  useTheme
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
-import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
-import { Skeleton } from '@mui/material';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -33,7 +33,8 @@ import 'moment/locale/fr';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
-import { Link, useHistory, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import { Link, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
 
 export type Signature = {
@@ -123,7 +124,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
   const [modified, setModified] = useState(false);
-  const history = useHistory();
+  const navigate = useNavigate();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
   const classes = useStyles();
@@ -246,7 +247,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
       method: 'DELETE',
       onSuccess: () => {
         showSuccessMessage(t('delete.success'));
-        if (id) setTimeout(() => history.push('/manage/signatures'), 1000);
+        if (id) setTimeout(() => navigate('/manage/signatures'), 1000);
         onDeleted();
       },
       onEnter: () => setButtonLoading(true),
@@ -330,7 +331,8 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
                         to={`/search/result/?query=result.sections.tags.file.rule.${signature.type}:${safeFieldValueURI(
                           `${signature.source}.${signature.name}`
                         )}`}
-                        size="large">
+                        size="large"
+                      >
                         <YoutubeSearchedForIcon />
                       </IconButton>
                     </Tooltip>
@@ -342,7 +344,8 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
                           color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
                         }}
                         onClick={handleDeleteButtonClick}
-                        size="large">
+                        size="large"
+                      >
                         <RemoveCircleOutlineOutlinedIcon />
                       </IconButton>
                     </Tooltip>

@@ -1,3 +1,7 @@
+import BlockIcon from '@mui/icons-material/Block';
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
 import {
   Box,
   Button,
@@ -8,14 +12,10 @@ import {
   TextField,
   Tooltip,
   useMediaQuery,
-  useTheme,
+  useTheme
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import Typography from '@mui/material/Typography';
-import BlockIcon from '@mui/icons-material/Block';
-import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
+import makeStyles from '@mui/styles/makeStyles';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
@@ -31,9 +31,10 @@ import UsersTable from 'components/visual/SearchResult/users';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import ChipInput from 'material-ui-chip-input';
 import 'moment/locale/fr';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Redirect, useHistory, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import { Redirect, useLocation } from 'react-router-dom';
 
 const PAGE_SIZE = 25;
 const DEFAULT_USER = {
@@ -101,7 +102,7 @@ export default function Users() {
   const location = useLocation();
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
   const { showSuccessMessage } = useMySnackbar();
-  const history = useHistory();
+  const navigate = useNavigate();
   const theme = useTheme();
   const { apiCall } = useMyAPI();
   const classes = useStyles();
@@ -154,13 +155,13 @@ export default function Users() {
   }, []);
 
   const onClear = () => {
-    history.push(location.pathname);
+    navigate(location.pathname);
   };
 
   const onSearch = () => {
     if (filterValue.current !== '') {
       query.set('query', filterValue.current);
-      history.push(`${location.pathname}?${query.toString()}`);
+      navigate(`${location.pathname}?${query.toString()}`);
     } else {
       onClear();
     }
@@ -350,7 +351,8 @@ export default function Users() {
                 onClick={() => {
                   setDrawer(true);
                 }}
-                size="large">
+                size="large"
+              >
                 <PersonAddIcon />
               </IconButton>
             </Tooltip>
@@ -375,7 +377,7 @@ export default function Users() {
                 props: {
                   onClick: () => {
                     query.set('query', 'type:admin');
-                    history.push(`${location.pathname}?${query.getDeltaString()}`);
+                    navigate(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
               },
@@ -385,7 +387,7 @@ export default function Users() {
                 props: {
                   onClick: () => {
                     query.set('query', 'is_active:false');
-                    history.push(`${location.pathname}?${query.getDeltaString()}`);
+                    navigate(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
               }

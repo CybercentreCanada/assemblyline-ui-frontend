@@ -1,16 +1,3 @@
-import {
-  Button,
-  Collapse,
-  Divider,
-  Grid,
-  IconButton,
-  Tooltip,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import withStyles from '@mui/styles/withStyles';
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -19,7 +6,20 @@ import ListAltOutlinedIcon from '@mui/icons-material/ListAltOutlined';
 import MoodBadIcon from '@mui/icons-material/MoodBad';
 import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
-import { Skeleton } from '@mui/material';
+import {
+  Button,
+  Collapse,
+  Divider,
+  Grid,
+  IconButton,
+  Skeleton,
+  Tooltip,
+  Typography,
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import withStyles from '@mui/styles/withStyles';
 import clsx from 'clsx';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
@@ -34,7 +34,8 @@ import { bytesToSize } from 'helpers/utils';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
-import { Link, useHistory, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import { Link, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
 
 type ParamProps = {
@@ -560,7 +561,7 @@ export default function SubmissionReport() {
   const { t } = useTranslation(['submissionReport']);
   const { id } = useParams<ParamProps>();
   const { c12nDef, configuration, user: currentUser } = useALContext();
-  const history = useHistory();
+  const navigate = useNavigate();
   const theme = useTheme();
   const [report, setReport] = useState(null);
   const { apiCall } = useMyAPI();
@@ -635,8 +636,18 @@ export default function SubmissionReport() {
                   </>
                 ) : (
                   <div style={{ display: 'inline-flex' }}>
-                    <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-                    <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+                    <Skeleton
+                      variant="circular"
+                      height="2.5rem"
+                      width="2.5rem"
+                      style={{ margin: theme.spacing(0.5) }}
+                    />
+                    <Skeleton
+                      variant="circular"
+                      height="2.5rem"
+                      width="2.5rem"
+                      style={{ margin: theme.spacing(0.5) }}
+                    />
                   </div>
                 )}
               </div>
