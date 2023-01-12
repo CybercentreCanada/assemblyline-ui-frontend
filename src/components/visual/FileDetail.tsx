@@ -1,9 +1,9 @@
-import AmpStoriesOutlinedIcon from '@mui/icons-material/AmpStoriesOutlined';
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
 import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
 import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
 import RotateLeftOutlinedIcon from '@mui/icons-material/RotateLeftOutlined';
+import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import { Grid, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -271,7 +271,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                       to={`/search/submission?query=files.sha256:${file.file_info.sha256} OR results:${file.file_info.sha256}* OR errors:${file.file_info.sha256}*`}
                       size="large"
                     >
-                      <AmpStoriesOutlinedIcon />
+                      <ViewCarouselOutlinedIcon />
                     </IconButton>
                   </Tooltip>
                   {currentUser.roles.includes('file_download') && (

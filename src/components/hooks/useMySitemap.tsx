@@ -1,6 +1,5 @@
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
-import AmpStoriesOutlinedIcon from '@mui/icons-material/AmpStoriesOutlined';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import BallotOutlinedIcon from '@mui/icons-material/BallotOutlined';
 import BlockIcon from '@mui/icons-material/Block';
@@ -31,6 +30,7 @@ import SettingsApplicationsOutlinedIcon from '@mui/icons-material/SettingsApplic
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import SimCardOutlinedIcon from '@mui/icons-material/SimCardOutlined';
 import SupervisorAccountOutlinedIcon from '@mui/icons-material/SupervisorAccountOutlined';
+import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import WebAssetIcon from '@mui/icons-material/WebAsset';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
@@ -59,7 +59,7 @@ export default function useMySitemap() {
 
       { path: '/', title: t('drawer.submit'), isRoot: true, icon: <PublishOutlinedIcon /> },
       { path: '/submit', title: t('drawer.submit'), isRoot: true, icon: <PublishOutlinedIcon /> },
-      { path: '/submissions', title: t('drawer.submissions'), isRoot: true, icon: <AmpStoriesOutlinedIcon /> },
+      { path: '/submissions', title: t('drawer.submissions'), isRoot: true, icon: <ViewCarouselOutlinedIcon /> },
       {
         path: '/submission/detail/:id',
         title: t('breadcrumb.submission.detail'),

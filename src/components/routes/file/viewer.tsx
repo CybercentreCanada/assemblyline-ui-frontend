@@ -1,7 +1,7 @@
 import Editor, { loader } from '@monaco-editor/react';
-import AmpStoriesOutlinedIcon from '@mui/icons-material/AmpStoriesOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
+import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import {
   Alert,
   Grid,
@@ -332,7 +332,7 @@ const FileViewer = () => {
                   to={`/search/submission?query=files.sha256:${id} OR results:${id}* OR errors:${id}*`}
                   size="large"
                 >
-                  <AmpStoriesOutlinedIcon />
+                  <ViewCarouselOutlinedIcon />
                 </IconButton>
               </Tooltip>
             )}

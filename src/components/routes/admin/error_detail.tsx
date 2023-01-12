@@ -1,10 +1,10 @@
-import AmpStoriesOutlinedIcon from '@mui/icons-material/AmpStoriesOutlined';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
 import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
+import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import { Card, Grid, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useClipboard from 'commons/components/hooks/useClipboard';
@@ -170,7 +170,7 @@ export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
                     to={`/search/submission?query=files.sha256:${error.sha256} OR results:${error.sha256}* OR errors:${error.sha256}*`}
                     size="large"
                   >
-                    <AmpStoriesOutlinedIcon />
+                    <ViewCarouselOutlinedIcon />
                   </IconButton>
                 </Tooltip>
                 <Tooltip title={t('detail')}>

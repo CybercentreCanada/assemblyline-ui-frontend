@@ -1,11 +1,10 @@
-import { Button, Collapse, Divider, Grid, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import AmpStoriesOutlinedIcon from '@mui/icons-material/AmpStoriesOutlined';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
-import { Skeleton } from '@mui/material';
+import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
+import { Button, Collapse, Divider, Grid, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
 import Alert from '@mui/material/Alert';
+import makeStyles from '@mui/styles/makeStyles';
 import useClipboard from 'commons/components/hooks/useClipboard';
 import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
 import useALContext from 'components/hooks/useALContext';
@@ -170,8 +169,9 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                       component={Link}
                       style={{ color: theme.palette.action.active }}
                       to={`/submission/${item.sid}`}
-                      size="large">
-                      <AmpStoriesOutlinedIcon />
+                      size="large"
+                    >
+                      <ViewCarouselOutlinedIcon />
                     </IconButton>
                   </Tooltip>
                 ) : (

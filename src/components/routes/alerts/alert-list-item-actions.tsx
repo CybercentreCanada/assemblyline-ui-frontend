@@ -1,6 +1,3 @@
-import { Typography, useMediaQuery, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import AmpStoriesOutlinedIcon from '@mui/icons-material/AmpStoriesOutlined';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import CenterFocusStrongOutlinedIcon from '@mui/icons-material/CenterFocusStrongOutlined';
@@ -9,7 +6,9 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
-import { SpeedDial, SpeedDialAction, SpeedDialIcon } from '@mui/material';
+import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
+import { SpeedDial, SpeedDialAction, SpeedDialIcon, Typography, useMediaQuery, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
@@ -302,7 +301,7 @@ const WrappedAlertListItemActions: React.FC<AlertListItemActionsProps> = ({
         )}
         {currentUser.roles.includes('submission_view') && (
           <SpeedDialActionLink
-            icon={<AmpStoriesOutlinedIcon />}
+            icon={<ViewCarouselOutlinedIcon />}
             to={`/submission/${item.sid}`}
             tooltipTitle={t('submission')}
             tooltipPlacement={vertical ? 'left' : 'bottom'}

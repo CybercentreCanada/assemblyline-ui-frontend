@@ -1,6 +1,5 @@
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
-import AmpStoriesOutlinedIcon from '@mui/icons-material/AmpStoriesOutlined';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import BuildOutlinedIcon from '@mui/icons-material/BuildOutlined';
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
@@ -23,6 +22,7 @@ import SettingsApplicationsOutlinedIcon from '@mui/icons-material/SettingsApplic
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import SimCardOutlinedIcon from '@mui/icons-material/SimCardOutlined';
 import SupervisorAccountOutlinedIcon from '@mui/icons-material/SupervisorAccountOutlined';
+import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import { AppLayoutProps } from 'commons/components/layout/LayoutProvider';
 import { Notification } from 'components/visual/Notification';
 import { useTranslation } from 'react-i18next';
@@ -47,7 +47,7 @@ const useMyLayout = (): AppLayoutProps => {
         id: 'submissions',
         text: t('drawer.submissions'),
         userPropValidators: [{ prop: 'user.roles', value: 'submission_view' }],
-        icon: <AmpStoriesOutlinedIcon />,
+        icon: <ViewCarouselOutlinedIcon />,
         route: '/submissions',
         nested: false
       }
