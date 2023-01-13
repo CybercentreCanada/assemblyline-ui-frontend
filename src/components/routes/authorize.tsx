@@ -22,6 +22,7 @@ export default function AppRegistration() {
   const rUrl = params.get('redirect_url');
   const clientID = params.get('client_id');
   const scope = params.get('scope');
+  const roles = params.get('roles');
   const server = params.get('server');
 
   return currentUser.roles.includes('obo_access') ? (
@@ -29,7 +30,7 @@ export default function AppRegistration() {
       <CardCentered>
         {getBanner(theme)}
         <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'center', justifyContent: 'center' }}>
-          {!rUrl || !clientID || !scope || !server || VALID_SCOPES.indexOf(scope) === -1 ? (
+          {!rUrl || !clientID || (!scope && !roles) || !server || (scope && VALID_SCOPES.indexOf(scope) === -1) ? (
             <>
               <div style={{ marginBottom: '3rem' }}>{t('invalid')}</div>
               <Button variant="contained" color="primary" onClick={() => history.goBack()}>
@@ -49,9 +50,21 @@ export default function AppRegistration() {
               <Typography variant="subtitle2" gutterBottom>
                 {t('scope')}
               </Typography>
-              <Typography variant="caption" color="secondary" gutterBottom style={{ marginTop: '1rem' }}>
-                {t(`scope.${scope}`)}
-              </Typography>
+              {scope && (
+                <Typography variant="caption" color="secondary" gutterBottom style={{ marginTop: '1rem' }}>
+                  {t(`scope.${scope}`)}
+                </Typography>
+              )}
+              {roles && (
+                <>
+                  <Typography variant="caption" color="secondary" gutterBottom style={{ marginTop: '1rem' }}>
+                    {t(`roles`)}
+                  </Typography>
+                  {roles.split(',').map(role => (
+                    <Typography variant="caption">{t(`role.${role}`)}</Typography>
+                  ))}
+                </>
+              )}
               <Typography
                 variant="caption"
                 color="textSecondary"
