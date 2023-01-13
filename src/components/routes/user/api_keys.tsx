@@ -32,6 +32,7 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
   const [tempAPIKey, setTempAPIKey] = useState(null);
   const [tempKeyName, setTempKeyName] = useState('');
   const [tempKeyPriv, setTempKeyPriv] = useState('READ');
+  const [tempKeyRoles, setTempKeyRoles] = useState(null);
   const { apiCall } = useMyAPI();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -55,6 +56,8 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
 
   function handleCreate() {
     apiCall({
+      method: 'PUT',
+      body: tempKeyRoles,
       url: `/api/v4/auth/apikey/${tempKeyName}/${tempKeyPriv}/`,
       onSuccess: api_data => {
         setTempAPIKey(api_data.api_response.apikey);
