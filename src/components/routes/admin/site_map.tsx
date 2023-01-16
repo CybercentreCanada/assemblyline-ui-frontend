@@ -47,12 +47,6 @@ export default function SiteMap() {
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useUser<CustomUser>();
 
-  const privMap = {
-    R: 'success',
-    W: 'warning',
-    E: 'error'
-  };
-
   const reqMapColor = {
     signature_import: 'success',
     signature_manage: 'info',
@@ -65,6 +59,7 @@ export default function SiteMap() {
     archive_trigger: 'warning',
     archive_download: 'warning',
     archive_manage: 'info',
+    self_manage: 'info',
     safelist_view: 'default',
     safelist_manage: 'info',
     workflow_view: 'default',
@@ -114,7 +109,7 @@ export default function SiteMap() {
                 <StyledTableCell>{t('header.function')}</StyledTableCell>
                 <StyledTableCell>{t('header.methods')}</StyledTableCell>
                 <StyledTableCell>{t('header.protected')}</StyledTableCell>
-                <StyledTableCell colSpan={2}>{t('header.permissions')}</StyledTableCell>
+                <StyledTableCell>{t('header.roles')}</StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -133,36 +128,18 @@ export default function SiteMap() {
                     )}
                   </StyledTableCell>
                   <StyledTableCell>
-                    <div style={{ display: 'flex' }}>
-                      {path.req_priv &&
-                        path.req_priv.map((priv, pid) => (
+                    {path.required_type &&
+                      path.required_type.map((req, rid) => (
+                        <div key={rid}>
                           <CustomChip
-                            key={pid}
-                            mono
-                            type="rounded"
-                            color={privMap[priv]}
-                            size="tiny"
-                            label={priv}
-                            tooltip={t(`${priv}`)}
-                          />
-                        ))}
-                    </div>
-                  </StyledTableCell>
-                  <StyledTableCell>
-                    <div style={{ display: 'flex' }}>
-                      {path.required_type &&
-                        path.required_type.map((req, rid) => (
-                          <CustomChip
-                            key={rid}
                             mono
                             type="rounded"
                             color={reqMapColor[req]}
                             size="tiny"
-                            label={t(req)}
-                            tooltip={t(`${req}_label`)}
+                            label={t(`role.${req}`)}
                           />
-                        ))}
-                    </div>
+                        </div>
+                      ))}
                   </StyledTableCell>
                 </TableRow>
               ))}

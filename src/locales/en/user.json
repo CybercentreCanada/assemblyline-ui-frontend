@@ -76,6 +76,7 @@
   "role.replay_trigger": "Replay Trigger",
   "role.safelist_manage": "Safelist Manage",
   "role.safelist_view": "Safelist View",
+  "role.self_manage": "Manage Current User",
   "role.signature_download": "Signature Download",
   "role.signature_import": "Signature Import",
   "role.signature_manage": "Signature Manage",

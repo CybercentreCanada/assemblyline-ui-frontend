@@ -23,6 +23,7 @@
   "role.replay_trigger": "Déclencher des Rediffusions",
   "role.safelist_manage": "Gestion de la Liste sure",
   "role.safelist_view": "Visionnement de la Liste sure",
+  "role.self_manage": "Gestion de l'Utilisateur en cours",
   "role.search": "Recherche",
   "role.signature_download": "Téléchargement de Signatures",
   "role.signature_import": "Ajout de Signatures",
