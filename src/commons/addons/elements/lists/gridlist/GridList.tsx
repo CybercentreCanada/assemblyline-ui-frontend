@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
-import { CircularProgress, Grid, GridSpacing, useTheme } from '@mui/material';
+import { CircularProgress, Grid, useTheme } from '@mui/material';
 import useListKeyboard from 'commons/addons/elements/lists/hooks/useListKeyboard';
 import useListStyles from 'commons/addons/elements/lists/hooks/useListStyles';
 import { LineItem } from 'commons/addons/elements/lists/item/ListItemBase';
@@ -21,7 +21,7 @@ interface ImageListProps {
   id: string;
   items: LineItem[];
   emptyValue?: React.ReactNode;
-  spacing?: GridSpacing;
+  spacing?: number;
   view?: 'table' | 'card';
   breakpoints?: Breakpoints;
   loading?: boolean;
