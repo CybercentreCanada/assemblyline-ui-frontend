@@ -7,7 +7,7 @@ type AlertListChipProps = {
   title: string;
   color?: PossibleColors;
   size?: 'tiny' | 'small' | 'medium';
-  variant?: 'default' | 'outlined';
+  variant?: 'filled' | 'outlined';
 };
 
 const WrappedAlertListChip: React.FC<AlertListChipProps> = ({

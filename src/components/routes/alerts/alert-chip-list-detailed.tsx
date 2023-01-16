@@ -7,7 +7,7 @@ type AlertListChipProps = {
   items: DetailedItem[];
   title: string;
   size?: 'tiny' | 'small' | 'medium';
-  variant?: 'default' | 'outlined';
+  variant?: 'filled' | 'outlined';
 };
 
 const WrappedAlertListChipDetailed: React.FC<AlertListChipProps> = ({
