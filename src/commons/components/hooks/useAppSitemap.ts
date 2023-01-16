@@ -1,11 +1,11 @@
 import { SiteMapContext, SiteMapContextProps, SiteMapRoute } from 'commons/components/sitemap/SitemapProvider';
 import i18n from 'i18n';
 import { useContext } from 'react';
-import { match, matchPath } from 'react-router-dom';
+import { matchPath } from 'react-router-dom';
 
 const TITLE_404 = i18n.t('breadcrumb.404');
 
-export type BreadcrumbItem = { route: SiteMapRoute; matcher: match };
+export type BreadcrumbItem = { route: SiteMapRoute; matcher: any };
 
 type SitemapProps = {
   breadcrumbs: BreadcrumbItem[];
@@ -20,12 +20,12 @@ type SitemapProps = {
 export const getRoute = (route: string, siteMap: SiteMapRoute[]): BreadcrumbItem => {
   // match all the route provide in sitemap with current route.
   const matchers = siteMap.map(_route => {
-    const matcher = matchPath(route, { path: _route.path });
+    const matcher = matchPath({ path: _route.path }, route);
     return { route: _route, matcher };
   });
 
   // only keep the exact matched routes.
-  const matched = matchers.filter(m => m.matcher && m.matcher.isExact);
+  const matched = matchers.filter(m => m.matcher);
 
   // hopefully, we only have a single match.
   if (matched && matched.length > 1) {
