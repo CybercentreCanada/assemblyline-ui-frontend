@@ -294,13 +294,11 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                     <Tooltip title={t('resubmit_file')}>
                       <IconButton
                         component={Link}
-                        to={{
-                          pathname: '/submit',
-                          state: {
-                            hash: file.file_info.sha256,
-                            tabContext: '1',
-                            c12n: file.file_info.classification
-                          }
+                        to="/submit"
+                        state={{
+                          hash: file.file_info.sha256,
+                          tabContext: '1',
+                          c12n: file.file_info.classification
                         }}
                         size="large"
                       >
