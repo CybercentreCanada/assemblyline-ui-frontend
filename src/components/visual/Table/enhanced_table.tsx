@@ -1,16 +1,16 @@
-import { Grid, IconButton, InputBase, TablePagination, Tooltip } from '@mui/material';
-import Paper from '@mui/material/Paper';
-import { alpha, Theme } from '@mui/material/styles';
-import createStyles from '@mui/styles/createStyles';
-import makeStyles from '@mui/styles/makeStyles';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableSortLabel from '@mui/material/TableSortLabel';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import FirstPageIcon from '@mui/icons-material/FirstPage';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
+import { Grid, IconButton, InputBase, TablePagination, Tooltip } from '@mui/material';
+import Paper from '@mui/material/Paper';
+import { alpha, Theme } from '@mui/material/styles';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableSortLabel from '@mui/material/TableSortLabel';
+import createStyles from '@mui/styles/createStyles';
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import Throttler from 'commons/addons/elements/utils/throttler';
 import PageHeader from 'commons/components/layout/pages/PageHeader';
@@ -121,27 +121,27 @@ interface TablePaginationActionsProps {
   count: number;
   page: number;
   rowsPerPage: number;
-  onChangePage: (event: React.MouseEvent<HTMLButtonElement>, newPage: number) => void;
+  onPageChange: (event: React.MouseEvent<HTMLButtonElement>, newPage: number) => void;
 }
 
 function TablePaginationActions(props: TablePaginationActionsProps) {
   const { t } = useTranslation();
-  const { count, page, rowsPerPage, onChangePage } = props;
+  const { count, page, rowsPerPage, onPageChange } = props;
 
   const handleFirstPageButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    onChangePage(event, 0);
+    onPageChange(event, 0);
   };
 
   const handleBackButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    onChangePage(event, page - 1);
+    onPageChange(event, page - 1);
   };
 
   const handleNextButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    onChangePage(event, page + 1);
+    onPageChange(event, page + 1);
   };
 
   const handleLastPageButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    onChangePage(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
+    onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
   };
 
   return (
@@ -165,7 +165,8 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
           <IconButton
             onClick={handleNextButtonClick}
             disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-            size="large">
+            size="large"
+          >
             <KeyboardArrowRight />
           </IconButton>
         </span>
@@ -175,7 +176,8 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
           <IconButton
             onClick={handleLastPageButtonClick}
             disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-            size="large">
+            size="large"
+          >
             <LastPageIcon />
           </IconButton>
         </span>
