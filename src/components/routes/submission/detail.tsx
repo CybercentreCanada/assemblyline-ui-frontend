@@ -476,7 +476,7 @@ function WrappedSubmissionDetail() {
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [history, resetLiveMode, showSuccessMessage, submission, t]);
+  }, [resetLiveMode, showSuccessMessage, submission, t]);
 
   const replay = useCallback(() => {
     if (submission != null && systemConfig.ui.allow_replay) {
