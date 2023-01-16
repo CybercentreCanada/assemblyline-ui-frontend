@@ -1,7 +1,7 @@
-import { Button, CircularProgress, TextField, Typography, useTheme } from '@mui/material';
-import { Alert, Autocomplete } from '@mui/material';
+import { Alert, Button, CircularProgress, TextField, Typography, useTheme } from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
 import SearchQuery, { SearchFilter } from 'components/visual/SearchBar/search-query';
-import React, { useState } from 'react';
+import React, { SyntheticEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import AlertsFiltersSelected from './alerts-filters-selected';
 
@@ -39,8 +39,8 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
     ...DEFAULT_LABELS,
     ...labelFilters.filter(lbl => DEFAULT_LABELS.indexOf(lbl.label) === -1).map(val => val.label)
   ]);
-  const [selectedStatus, setSelectedStatus] = useState<string>(null);
-  const [selectedPriority, setSelectedPriority] = useState<string>(null);
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+  const [selectedPriority, setSelectedPriority] = useState<string | null>(null);
   const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
 
   const validateForm = (status: string, priority: string, labels: string[]) => {
@@ -122,19 +122,21 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
         <div style={{ marginBottom: theme.spacing(2) }}>
           <Autocomplete
             fullWidth
+            multiple={false}
             options={POSSIBLE_STATUS}
             value={selectedStatus}
+            onChange={(event: SyntheticEvent<Element, Event>, value: string) => onStatusChange(value as string)}
             renderInput={params => <TextField {...params} label={t('status')} variant="outlined" />}
-            onChange={(event, value) => onStatusChange(value as string)}
           />
         </div>
         <div style={{ marginBottom: theme.spacing(2) }}>
           <Autocomplete
             fullWidth
+            multiple={false}
             options={POSSIBLE_PRIORITY}
             value={selectedPriority}
+            onChange={(event: SyntheticEvent<Element, Event>, value: string) => onPriorityChange(value as string)}
             renderInput={params => <TextField {...params} label={t('priority')} variant="outlined" />}
-            onChange={(event, value) => onPriorityChange(value as string)}
           />
         </div>
         <div style={{ marginBottom: theme.spacing(2) }}>

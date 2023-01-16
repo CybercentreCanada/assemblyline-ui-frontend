@@ -67,6 +67,7 @@ export const WrappedHexSearchbar = ({ store }: StoreProps) => {
         listbox: classes.autocompleteList,
         option: classes.autocompleteOption
       }}
+      multiple={false}
       freeSolo
       disableClearable
       handleHomeEndKeys
@@ -75,10 +76,10 @@ export const WrappedHexSearchbar = ({ store }: StoreProps) => {
       size="small"
       open={suggestionOpen && upXS && false}
       options={suggestionLabels}
-      value={[value]}
-      onChange={(event: SyntheticEvent<Element, Event>, newValue: string[]) => {
-        setValue(newValue[0]);
-        onSearchBarChange({ value: newValue[0] });
+      value={value}
+      onChange={(event: SyntheticEvent<Element, Event>, newValue: string) => {
+        setValue(newValue);
+        onSearchBarChange({ value: newValue });
       }}
       inputValue={inputValue}
       onInputChange={(event: React.ChangeEvent, newInputValue: string) => {
