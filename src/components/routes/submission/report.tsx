@@ -580,10 +580,10 @@ export default function SubmissionReport() {
         onFailure: api_data => {
           if (api_data.api_status_code === 425) {
             showWarningMessage(t('error.too_early'));
-            history.replace(`/submission/detail/${id}`);
+            navigate(`/submission/detail/${id}`);
           } else if (api_data.api_status_code === 404) {
             showErrorMessage(t('error.notfound'));
-            history.replace('/notfound');
+            navigate('/notfound');
           } else {
             showErrorMessage(api_data.api_error_message);
           }
