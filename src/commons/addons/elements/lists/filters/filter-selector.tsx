@@ -1,7 +1,6 @@
-import { Checkbox, TextField } from '@mui/material';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
-import { Autocomplete } from '@mui/material';
+import { Autocomplete, Checkbox, TextField } from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -39,10 +38,10 @@ const FilterSelector: React.FC<FilterSelectorProps> = ({ fields, selections, onC
       style={{ minWidth: 150 }}
       options={fields}
       value={selections}
-      getOptionLabel={option => option.label}
+      getOptionLabel={(option: FilterField) => option.label}
       isOptionEqualToValue={isSelected}
       renderInput={params => <TextField {...params} label={t('list.selector.filters')} />}
-      renderOption={(option, { selected }) => (
+      renderOption={(props, option, { selected }) => (
         <>
           <Checkbox icon={icon} checkedIcon={checkedIcon} style={{ marginRight: 8 }} checked={selected} />
           {option.label}
