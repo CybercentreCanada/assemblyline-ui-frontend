@@ -28,7 +28,7 @@ export interface CustomChipProps {
   type?: 'round' | 'square' | 'rounded';
   size?: 'tiny' | 'small' | 'medium';
   color?: PossibleColors;
-  variant?: 'default' | 'outlined';
+  variant?: 'filled' | 'outlined';
   mono?: boolean;
   wrap?: boolean;
   tooltip?: string;
@@ -159,7 +159,7 @@ const WrappedCustomChip: React.FC<CustomChipProps> = ({
   type = 'round',
   size = 'medium',
   color = 'default',
-  variant = 'default',
+  variant = 'filled',
   mono = false,
   wrap = false,
   tooltip = null,

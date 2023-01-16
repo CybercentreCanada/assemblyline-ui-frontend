@@ -207,7 +207,7 @@ const WrappedTag: React.FC<TagProps> = ({
       </Menu>
       <CustomChip
         wrap
-        variant={safelisted ? 'outlined' : 'default'}
+        variant={safelisted ? 'outlined' : 'filled'}
         size="tiny"
         type="rounded"
         color={highlight_key && isHighlighted(highlight_key) ? ('primary' as 'info') : color}

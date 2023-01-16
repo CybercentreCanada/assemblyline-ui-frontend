@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 type VerdictProps = {
   score: number;
   short?: boolean;
-  variant?: 'outlined' | 'default';
+  variant?: 'outlined' | 'filled';
   size?: 'tiny' | 'small' | 'medium';
   type?: 'rounded' | 'text';
   mono?: boolean;
@@ -18,7 +18,7 @@ type VerdictProps = {
 const WrappedVerdict: React.FC<VerdictProps> = ({
   score,
   type = 'rounded',
-  variant = 'default',
+  variant = 'filled',
   size = 'tiny',
   short = false,
   mono = false,

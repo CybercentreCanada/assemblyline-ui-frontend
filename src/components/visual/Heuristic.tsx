@@ -195,7 +195,7 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({
       </Menu>
       <CustomChip
         wrap
-        variant={safe ? 'outlined' : 'default'}
+        variant={safe ? 'outlined' : 'filled'}
         size="tiny"
         type="rounded"
         color={highlight_key && isHighlighted(highlight_key) ? ('primary' as 'info') : color}
