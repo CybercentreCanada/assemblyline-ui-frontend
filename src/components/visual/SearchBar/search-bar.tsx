@@ -1,3 +1,4 @@
+import BackspaceIcon from '@mui/icons-material/Backspace';
 import {
   alpha,
   Box,
@@ -7,10 +8,9 @@ import {
   LinearProgress,
   Tooltip,
   useMediaQuery,
-  useTheme,
+  useTheme
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import BackspaceIcon from '@mui/icons-material/Backspace';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import SearchTextField from './search-textfield';
@@ -46,6 +46,7 @@ export interface SearchBarButton {
 }
 
 interface SearchBarProps {
+  children?: React.ReactNode;
   initValue: string;
   placeholder?: string;
   searching?: boolean;
