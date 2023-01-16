@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import {
@@ -36,7 +37,6 @@ import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
-import ChipInput from 'material-ui-chip-input';
 import React, { memo, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router';
@@ -349,12 +349,12 @@ function User({ username }: UserProps) {
                       <Typography variant="caption" color="textSecondary" gutterBottom>
                         {t('groups_edit_title')}
                       </Typography>
-                      <ChipInput
+                      {/* <ChipInput
                         margin="normal"
                         defaultValue={user.groups}
                         onChange={chips => setGroups(chips)}
                         variant="outlined"
-                      />
+                      /> */}
                     </>
                   ),
                   name: (

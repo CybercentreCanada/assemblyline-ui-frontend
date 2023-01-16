@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import BlockIcon from '@mui/icons-material/Block';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
@@ -29,7 +30,6 @@ import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
 import UsersTable from 'components/visual/SearchResult/users';
 import SearchResultCount from 'components/visual/SearchResultCount';
-import ChipInput from 'material-ui-chip-input';
 import 'moment/locale/fr';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -253,13 +253,13 @@ export default function Users() {
             </Grid>
             <Grid item xs={12}>
               <Typography variant="caption">{t('newuser.groups')}</Typography>
-              <ChipInput
+              {/* <ChipInput
                 style={{ display: 'block' }}
                 margin="dense"
                 defaultValue={newUser.groups}
                 onChange={chips => updateNewUser('groups', chips)}
                 variant="outlined"
-              />
+              /> */}
             </Grid>
             <Grid item xs={12} md={6}>
               <Typography variant="caption">{t('newuser.new_pass')}</Typography>
