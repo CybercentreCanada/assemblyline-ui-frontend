@@ -1,7 +1,7 @@
-import { Box, CircularProgress, Divider, IconButton, IconButtonProps, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import BackspaceIcon from '@mui/icons-material/Backspace';
 import SearchIcon from '@mui/icons-material/Search';
+import { Box, CircularProgress, Divider, IconButton, IconButtonProps, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { useEffect, useRef, useState } from 'react';
 import SearchTextField from './search-textfield';
 
@@ -32,6 +32,7 @@ export interface SearchBarButton {
 }
 
 interface SearchBarProps {
+  children?: React.ReactNode;
   initValue: string;
   searching?: boolean;
   buttons?: SearchBarButton[];
@@ -116,12 +117,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           style={{ marginLeft: theme.spacing(1), marginRight: theme.spacing(1) }}
         />
         {buttons.map((b, i) => (
-          <IconButton
-            key={`searchbar-button-${i}`}
-            {...b.props}
-            edge="end"
-            color="primary"
-            size="large">
+          <IconButton key={`searchbar-button-${i}`} {...b.props} edge="end" color="primary" size="large">
             {b.icon}
           </IconButton>
         ))}
