@@ -1,4 +1,6 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import {
   Box,
   ClickAwayListener,
@@ -11,22 +13,17 @@ import {
   Toolbar,
   Tooltip,
   useMediaQuery,
-  useTheme,
+  useTheme
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import clsx from 'clsx';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import LeftNavGroup from 'commons/components/layout/leftnav/LeftNavGroup';
 import LeftNavItem from 'commons/components/layout/leftnav/LeftNavItem';
 import { ValidatedProp } from 'commons/components/user/UserProvider';
-import React from 'react';
+import React, { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import AppTitle from '../topnav/AppTitle';
-
-// FIXME checkout https://mui.com/components/use-media-query/#migrating-from-withwidth
-const withWidth = () => (WrappedComponent) => (props) => <WrappedComponent {...props} width="xs" />;
 
 const drawerWidth = 240;
 
@@ -121,9 +118,10 @@ const LeftNavDrawer: React.FC<LeftNavDrawerProps> = props => {
   const { layoutProps, drawerState, currentLayout, toggleDrawer } = useAppLayout();
   const isTopLayout = currentLayout === 'top';
   const isXs = useMediaQuery(theme.breakpoints.only('xs'));
+  const isSMDown = useMediaQuery(theme.breakpoints.down('sm'));
 
   const onCloseDrawerIfOpen = () => {
-    if (isWidthDown('sm', props.width) && drawerState) {
+    if (isSMDown && drawerState) {
       toggleDrawer();
     }
   };
@@ -198,4 +196,4 @@ const LeftNavDrawer: React.FC<LeftNavDrawerProps> = props => {
   );
 };
 
-export default withWidth()(LeftNavDrawer);
+export default memo(LeftNavDrawer);

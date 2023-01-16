@@ -7,16 +7,15 @@ import {
   ListSubheader,
   Switch,
   Typography,
+  useMediaQuery,
   useTheme
 } from '@mui/material';
 import useApp from 'commons/components/hooks/useAppContext';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import useSafeResults from 'components/hooks/useSafeResults';
 import i18n from 'i18next';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
-
-// FIXME checkout https://mui.com/components/use-media-query/#migrating-from-withwidth
-const withWidth = () => (WrappedComponent) => (props) => <WrappedComponent {...props} width="xs" />;
 
 export enum Lang {
   EN = 'en',
@@ -25,8 +24,9 @@ export enum Lang {
 
 const isLang = (lang: Lang): boolean => i18n.language === lang.valueOf();
 
-const ThemeSelection = ({ width }) => {
+const ThemeSelection = () => {
   const theme = useTheme();
+  const isXSDown = useMediaQuery(theme.breakpoints.down('xs'));
   const { t } = useTranslation();
   const { toggleTheme } = useApp();
   const {
@@ -110,7 +110,7 @@ const ThemeSelection = ({ width }) => {
               </ListItemSecondaryAction>
             </ListItem>
           )}
-          {layoutProps.allowQuickSearch && !isWidthDown('xs', width) && (
+          {layoutProps.allowQuickSearch && !isXSDown && (
             <ListItem button onClick={toggleQuickSearch}>
               <ListItemText>{t('personalization.quicksearch')}</ListItemText>
               <ListItemSecondaryAction>
@@ -131,7 +131,7 @@ const ThemeSelection = ({ width }) => {
               </ListItemSecondaryAction>
             </ListItem>
           )}
-          {layoutProps.allowBreadcrumbs && !isWidthDown('sm', width) && (
+          {layoutProps.allowBreadcrumbs && !isXSDown && (
             <>
               <ListItem button onClick={toggleShowBreadcrumbs}>
                 <ListItemText>{t('personalization.showbreadcrumbs')}</ListItemText>
@@ -177,4 +177,4 @@ const ThemeSelection = ({ width }) => {
   );
 };
 
-export default withWidth()(ThemeSelection);
+export default memo(ThemeSelection);

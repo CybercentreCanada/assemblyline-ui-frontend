@@ -8,11 +8,8 @@ import AppSwitcher, { AppElement } from 'commons/components/layout/topnav/AppSwi
 import QuickSearch from 'commons/components/layout/topnav/QuickSearch';
 import ThemeSelectionIcon from 'commons/components/layout/topnav/ThemeSelectionIcon';
 import UserProfile from 'commons/components/layout/topnav/UserProfile';
-import React, { useLayoutEffect } from 'react';
+import React, { memo, useLayoutEffect } from 'react';
 import AppTitle from './AppTitle';
-
-// FIXME checkout https://mui.com/components/use-media-query/#migrating-from-withwidth
-const withWidth = () => (WrappedComponent) => (props) => <WrappedComponent {...props} width="xs" />;
 
 const useStyles = makeStyles(theme => ({
   appBarTopLayout: {
@@ -47,10 +44,9 @@ const useStyles = makeStyles(theme => ({
 
 type AppBarProps = {
   apps: AppElement[];
-  width: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 };
 
-const TopBar: React.FC<AppBarProps> = ({ apps, width }) => {
+const TopBar: React.FC<AppBarProps> = ({ apps }) => {
   const { currentLayout, layoutProps, showQuickSearch, autoHideAppbar, breadcrumbsEnabled, appbarState } =
     useAppLayout();
   const theme = useTheme();
@@ -59,6 +55,7 @@ const TopBar: React.FC<AppBarProps> = ({ apps, width }) => {
   const isTopLayout = currentLayout === 'top';
   const isXs = useMediaQuery(theme.breakpoints.only('xs'));
   const isSm = useMediaQuery(theme.breakpoints.down('lg'));
+  const isSMUp = useMediaQuery(theme.breakpoints.up('sm'));
   const { elevation, ...appbarStyles } = getAppbarStyles(currentLayout as 'side' | 'top');
   const { left, leftAfterBreadcrumbs } = layoutProps.topnav;
 
@@ -105,7 +102,7 @@ const TopBar: React.FC<AppBarProps> = ({ apps, width }) => {
             (breadcrumbsEnabled && !isSm) ||
             (!showQuickSearch && !breadcrumbsEnabled) ||
             (!showQuickSearch && breadcrumbsEnabled && isSm)) && <div style={{ flexGrow: 1 }} />}
-          {showQuickSearch && isWidthUp('sm', width) && <QuickSearch />}
+          {showQuickSearch && isSMUp && <QuickSearch />}
           {layoutProps.topnav.right}
           <AppSwitcher apps={apps} />
           {layoutProps.topnav.themeSelectionUnder === 'icon' && <ThemeSelectionIcon />}
@@ -124,4 +121,4 @@ function SlideIn({ children, show }) {
   );
 }
 
-export default withWidth()(TopBar);
+export default memo(TopBar);

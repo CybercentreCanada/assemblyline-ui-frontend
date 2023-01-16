@@ -1,15 +1,12 @@
-import { ListItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
-import { Theme } from '@mui/material/styles';
+import { ListItem, ListItemIcon, ListItemText, Tooltip, useMediaQuery } from '@mui/material';
+import { Theme, useTheme } from '@mui/material/styles';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import useAppUser from 'commons/components/hooks/useAppUser';
 import { LeftNavItemProps } from 'commons/components/layout/leftnav/LeftNavDrawer';
-import React from 'react';
+import React, { memo } from 'react';
 import { Link } from 'react-router-dom';
-
-// FIXME checkout https://mui.com/components/use-media-query/#migrating-from-withwidth
-const withWidth = () => (WrappedComponent) => (props) => <WrappedComponent {...props} width="xs" />;
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -20,13 +17,15 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 const LeftNavItem: React.FC<LeftNavItemProps> = props => {
+  const theme = useTheme();
   const classes = useStyles();
   const { drawerState, hideNestedIcons, toggleDrawer } = useAppLayout();
   const { text, icon, nested, route, userPropValidators } = props;
   const { validateProps } = useAppUser();
+  const isSMDown = useMediaQuery(theme.breakpoints.down('sm'));
 
   const onCloseDrawerIfOpen = () => {
-    if (isWidthDown('sm', props.width) && drawerState) {
+    if (isSMDown && drawerState) {
       setTimeout(toggleDrawer, 150);
     }
   };
@@ -57,4 +56,4 @@ const LeftNavItem: React.FC<LeftNavItemProps> = props => {
   ) : null;
 };
 
-export default withWidth()(LeftNavItem);
+export default memo(LeftNavItem);

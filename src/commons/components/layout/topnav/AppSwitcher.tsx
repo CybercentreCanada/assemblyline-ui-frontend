@@ -1,3 +1,4 @@
+import AppsIcon from '@mui/icons-material/Apps';
 import {
   Avatar,
   Button,
@@ -8,14 +9,10 @@ import {
   Paper,
   Popper,
   Typography,
-  useTheme,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import AppsIcon from '@mui/icons-material/Apps';
-import React, { useState } from 'react';
-
-// FIXME checkout https://mui.com/components/use-media-query/#migrating-from-withwidth
-const withWidth = () => (WrappedComponent) => (props) => <WrappedComponent {...props} width="xs" />;
+import React, { memo, useState } from 'react';
 
 export type AppElement = {
   alt: string;
@@ -26,25 +23,12 @@ export type AppElement = {
   newWindow?: boolean;
 };
 
-const useStyles = makeStyles(theme => ({
-  popper: {
-    zIndex: theme.zIndex.drawer + 2
-  },
-  avatarIcon: {
-    '& img': {
-      objectFit: 'contain'
-    }
-  }
-}));
-
 type AppsSwitcherProps = {
   apps: AppElement[];
-  width: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 };
 
-const AppSwitcher: React.FC<AppsSwitcherProps> = ({ apps, width }) => {
+const AppSwitcher: React.FC<AppsSwitcherProps> = ({ apps }) => {
   const theme = useTheme();
-  const classes = useStyles();
   const [popperAnchorEl, setPopperAnchorEl] = useState(null);
   const isDarkTheme = theme.palette.mode === 'dark';
   const isPopperOpen = !!popperAnchorEl;
@@ -53,6 +37,7 @@ const AppSwitcher: React.FC<AppsSwitcherProps> = ({ apps, width }) => {
   };
   const onClickAway = () => setPopperAnchorEl(null);
   const sp1 = theme.spacing(1);
+  const isXSDown = useMediaQuery(theme.breakpoints.down('xs'));
 
   if (apps.length === 0) {
     return null;
@@ -66,7 +51,7 @@ const AppSwitcher: React.FC<AppsSwitcherProps> = ({ apps, width }) => {
           open={isPopperOpen}
           anchorEl={popperAnchorEl}
           placement="bottom-end"
-          className={classes.popper}
+          sx={{ zIndex: theme.zIndex.drawer + 2 }}
           transition
         >
           {({ TransitionProps }) => (
@@ -74,7 +59,7 @@ const AppSwitcher: React.FC<AppsSwitcherProps> = ({ apps, width }) => {
               <Paper style={{ textAlign: 'center', padding: theme.spacing(1) }} elevation={4}>
                 <div
                   style={{
-                    maxWidth: apps.length <= 4 || isWidthDown('xs', width) ? '240px' : '360px',
+                    maxWidth: apps.length <= 4 || isXSDown ? '240px' : '360px',
                     display: 'flex',
                     flexDirection: 'row',
                     flexWrap: 'wrap'
@@ -108,7 +93,11 @@ const AppSwitcher: React.FC<AppsSwitcherProps> = ({ apps, width }) => {
                                 ? { width: theme.spacing(8), height: theme.spacing(8) }
                                 : { backgroundColor: 'transparent', width: theme.spacing(8), height: theme.spacing(8) }
                             }
-                            className={classes.avatarIcon}
+                            sx={{
+                              '& img': {
+                                objectFit: 'contain'
+                              }
+                            }}
                           >
                             {isDarkTheme
                               ? a.img_d !== null && typeof a.img_d !== 'string'
@@ -135,4 +124,4 @@ const AppSwitcher: React.FC<AppsSwitcherProps> = ({ apps, width }) => {
   );
 };
 
-export default withWidth()(AppSwitcher);
+export default memo(AppSwitcher);
