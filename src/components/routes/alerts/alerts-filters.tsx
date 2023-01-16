@@ -1,7 +1,6 @@
 /* eslint-disable no-param-reassign */
-import { Button, FormControl, MenuItem, Select, TextField, Typography, useTheme } from '@mui/material';
+import { Autocomplete, Button, FormControl, MenuItem, Select, TextField, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import { Autocomplete } from '@mui/material';
 import CustomChip from 'components/visual/CustomChip';
 import SearchQuery, {
   SearchFilter,
@@ -197,7 +196,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
   };
 
   // Render method of a single Autocomplete component option.
-  const renderOption = (item: SearchFilter) => (
+  const renderOption = (props, item: SearchFilter, state) => (
     <div>
       {item.other && <CustomChip label={item.other.count} size="tiny" />} {item.label}
     </div>
