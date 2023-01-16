@@ -1,3 +1,15 @@
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
+import FeedbackOutlinedIcon from '@mui/icons-material/FeedbackOutlined';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import NotificationsActiveOutlinedIcon from '@mui/icons-material/NotificationsActiveOutlined';
+import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
+import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
+import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import {
   Badge,
   Button,
@@ -11,26 +23,15 @@ import {
   IconButton,
   MenuItem,
   Select,
+  SelectChangeEvent,
+  Skeleton,
   TextField,
   Tooltip,
   Typography,
-  useTheme,
+  useTheme
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import { blue } from '@mui/material/colors';
-import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
-import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
-import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
-import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
-import FeedbackOutlinedIcon from '@mui/icons-material/FeedbackOutlined';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import NotificationsActiveOutlinedIcon from '@mui/icons-material/NotificationsActiveOutlined';
-import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
-import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
-import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
-import { Skeleton } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -247,7 +248,7 @@ const WrappedNotificationArea = () => {
     });
   }, [currentUser.username, systemMessage]);
 
-  const handleSeverityChange = useCallback((event: React.ChangeEvent<{ name?: string; value: unknown }>) => {
+  const handleSeverityChange = useCallback((event: SelectChangeEvent) => {
     if (!['error', 'warning', 'info', 'success'].includes(event.target.value as string)) return;
     setNewSystemMessage(sm => ({ ...sm, severity: event.target.value as 'error' | 'warning' | 'info' | 'success' }));
   }, []);
@@ -379,248 +380,247 @@ const WrappedNotificationArea = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addNewServiceTag, addVersionTag, configuration, fetchJSONNotifications, handleLastTimeOpen, setIsNew]);
 
-  return <>
-    <Dialog
-      fullWidth
-      open={editDialog}
-      onClose={() => setEditDialog(false)}
-      aria-labelledby="na-dialog-title"
-      aria-describedby="na-dialog-description"
-    >
-      <DialogTitle id="na-dialog-title">{t('edit.title')}</DialogTitle>
-      <DialogContent>
-        <DialogContentText id="na-dialog-description">{t('edit.text')}</DialogContentText>
-      </DialogContent>
-      <DialogContent>
-        <Typography variant="subtitle2">{t('edit.severity')}</Typography>
-        <Select
-          fullWidth
-          id="na-severity"
-          value={newSystemMessage.severity}
-          onChange={handleSeverityChange}
-          variant="outlined"
-          margin="dense"
-          style={{ marginBottom: theme.spacing(2) }}
-        >
-          <MenuItem value="info">{t('severity.info')}</MenuItem>
-          <MenuItem value="warning">{t('severity.warning')}</MenuItem>
-          <MenuItem value="success">{t('severity.success')}</MenuItem>
-          <MenuItem value="error">{t('severity.error')}</MenuItem>
-        </Select>
-        <Typography variant="subtitle2">{t('edit.message.title')}</Typography>
-        <TextField
-          autoFocus
-          size="small"
-          variant="outlined"
-          fullWidth
-          onChange={event => setNewSystemMessage(sm => ({ ...sm, title: event.target.value }))}
-          value={newSystemMessage.title}
-          style={{ marginBottom: theme.spacing(2) }}
-        />
-        <Typography variant="subtitle2">{t('edit.message')}</Typography>
-        <TextField
-          size="small"
-          variant="outlined"
-          multiline
-          fullWidth
-          rows={4}
-          onChange={event => setNewSystemMessage(sm => ({ ...sm, message: event.target.value }))}
-          value={newSystemMessage.message}
-        />
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={() => setEditDialog(false)} color="secondary">
-          {t('edit.button.cancel')}
-        </Button>
-        <Button onClick={() => setSaveConfirmation(true)} color="primary" disabled={!newSystemMessage.message}>
-          {t('edit.button.save')}
-        </Button>
-      </DialogActions>
-    </Dialog>
+  return (
+    <>
+      <Dialog
+        fullWidth
+        open={editDialog}
+        onClose={() => setEditDialog(false)}
+        aria-labelledby="na-dialog-title"
+        aria-describedby="na-dialog-description"
+      >
+        <DialogTitle id="na-dialog-title">{t('edit.title')}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="na-dialog-description">{t('edit.text')}</DialogContentText>
+        </DialogContent>
+        <DialogContent>
+          <Typography variant="subtitle2">{t('edit.severity')}</Typography>
+          <Select
+            fullWidth
+            id="na-severity"
+            value={newSystemMessage.severity}
+            onChange={handleSeverityChange}
+            variant="outlined"
+            margin="dense"
+            style={{ marginBottom: theme.spacing(2) }}
+          >
+            <MenuItem value="info">{t('severity.info')}</MenuItem>
+            <MenuItem value="warning">{t('severity.warning')}</MenuItem>
+            <MenuItem value="success">{t('severity.success')}</MenuItem>
+            <MenuItem value="error">{t('severity.error')}</MenuItem>
+          </Select>
+          <Typography variant="subtitle2">{t('edit.message.title')}</Typography>
+          <TextField
+            autoFocus
+            size="small"
+            variant="outlined"
+            fullWidth
+            onChange={event => setNewSystemMessage(sm => ({ ...sm, title: event.target.value }))}
+            value={newSystemMessage.title}
+            style={{ marginBottom: theme.spacing(2) }}
+          />
+          <Typography variant="subtitle2">{t('edit.message')}</Typography>
+          <TextField
+            size="small"
+            variant="outlined"
+            multiline
+            fullWidth
+            rows={4}
+            onChange={event => setNewSystemMessage(sm => ({ ...sm, message: event.target.value }))}
+            value={newSystemMessage.message}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setEditDialog(false)} color="secondary">
+            {t('edit.button.cancel')}
+          </Button>
+          <Button onClick={() => setSaveConfirmation(true)} color="primary" disabled={!newSystemMessage.message}>
+            {t('edit.button.save')}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
-    <ConfirmationDialog
-      open={saveConfirmation}
-      handleClose={() => setSaveConfirmation(false)}
-      handleAccept={onSaveSystemMessage}
-      title={t('save.title')}
-      cancelText={t('save.cancelText')}
-      acceptText={t('save.acceptText')}
-      text={t('save.text')}
-      waiting={waitingDialog}
-    />
-    <ConfirmationDialog
-      open={deleteConfirmation}
-      handleClose={() => setDeleteConfirmation(false)}
-      handleAccept={onDeleteSystemMessage}
-      title={t('delete.title')}
-      cancelText={t('delete.cancelText')}
-      acceptText={t('delete.acceptText')}
-      text={t('delete.text')}
-      waiting={waitingDialog}
-    />
-
-    <IconButton
-      color="inherit"
-      aria-label="open drawer"
-      onClick={onOpenNotificationArea}
-      size="large">
-      <Badge
-        invisible={systemMessageRead && notifications.filter(n => n._isNew).length === 0}
-        classes={{ badge: clsx(classes.baseColor, systemMessage && getColor(systemMessage, 'bgColor', 1)) }}
-        max={99}
-        badgeContent={
-          systemMessage
-            ? systemMessage.severity === 'error'
-              ? `!`
-              : systemMessage.severity === 'warning'
-              ? `!`
-              : systemMessage.severity === 'info'
-              ? `i`
-              : systemMessage.severity === 'success'
-              ? `\u2714`
-              : ''
-            : notifications.filter(n => n._isNew).length
-        }
-        children={
-          systemMessageRead && notifications.filter(n => n._isNew).length === 0 ? (
-            <NotificationsNoneOutlinedIcon />
-          ) : (
-            <NotificationsActiveOutlinedIcon />
-          )
-        }
+      <ConfirmationDialog
+        open={saveConfirmation}
+        handleClose={() => setSaveConfirmation(false)}
+        handleAccept={onSaveSystemMessage}
+        title={t('save.title')}
+        cancelText={t('save.cancelText')}
+        acceptText={t('save.acceptText')}
+        text={t('save.text')}
+        waiting={waitingDialog}
       />
-    </IconButton>
-    <Drawer anchor="right" classes={{ paper: classes.drawer }} open={drawer} onClose={onCloseNotificationArea}>
-      <div className={classes.root}>
-        <div className={classes.container}>
-          <div className={clsx(classes.row, classes.closeRow)}>
-            <IconButton
-              className={classes.close}
-              onClick={onCloseNotificationArea}
-              children={<CloseOutlinedIcon fontSize="medium" />}
-              size="large" />
-          </div>
-          {(systemMessage || (currentUser && currentUser.is_admin)) && (
-            <>
-              <div className={clsx(classes.row, classes.header)}>
-                {systemMessage ? (
-                  systemMessage.severity === 'error' ? (
-                    <ErrorOutlineOutlinedIcon
-                      className={clsx(classes.icon, getColor(systemMessage, 'color', 1))}
-                      fontSize="medium"
-                    />
-                  ) : systemMessage.severity === 'warning' ? (
-                    <ReportProblemOutlinedIcon
-                      className={clsx(classes.icon, getColor(systemMessage, 'color', 1))}
-                      fontSize="medium"
-                    />
-                  ) : systemMessage.severity === 'info' ? (
-                    <InfoOutlinedIcon
-                      className={clsx(classes.icon, getColor(systemMessage, 'color', 1))}
-                      fontSize="medium"
-                    />
-                  ) : systemMessage.severity === 'success' ? (
-                    <CheckCircleOutlinedIcon
-                      className={clsx(classes.icon, getColor(systemMessage, 'color', 1))}
-                      fontSize="medium"
-                    />
-                  ) : null
-                ) : (
-                  <NotificationsOutlinedIcon className={clsx(classes.icon)} fontSize="medium" />
-                )}
-                <Typography
-                  className={clsx(classes.title, getColor(systemMessage, 'color', 2))}
-                  variant={'h6'}
-                  children={t('systemMessage.header')}
-                />
-                {currentUser &&
-                  currentUser.is_admin &&
-                  (systemMessage ? (
-                    <>
-                      <div className={clsx(classes.action)}>
-                        <Tooltip title={t('edit.title')} aria-label={t('edit.title')}>
-                          <IconButton
-                            className={clsx(getColor(systemMessage, 'color', 2))}
-                            size="small"
-                            onClick={onOpenEditSystemMessageDialog}
-                            children={<EditOutlinedIcon />}
-                          />
-                        </Tooltip>
-                      </div>
-                      <div className={clsx(classes.action)}>
-                        <Tooltip title={t('delete.title')} aria-label={t('delete.title')}>
-                          <IconButton
-                            className={clsx(getColor(systemMessage, 'color', 2))}
-                            size="small"
-                            onClick={() => setDeleteConfirmation(true)}
-                            children={<DeleteOutlineOutlinedIcon />}
-                          />
-                        </Tooltip>
-                      </div>
-                    </>
+      <ConfirmationDialog
+        open={deleteConfirmation}
+        handleClose={() => setDeleteConfirmation(false)}
+        handleAccept={onDeleteSystemMessage}
+        title={t('delete.title')}
+        cancelText={t('delete.cancelText')}
+        acceptText={t('delete.acceptText')}
+        text={t('delete.text')}
+        waiting={waitingDialog}
+      />
+
+      <IconButton color="inherit" aria-label="open drawer" onClick={onOpenNotificationArea} size="large">
+        <Badge
+          invisible={systemMessageRead && notifications.filter(n => n._isNew).length === 0}
+          classes={{ badge: clsx(classes.baseColor, systemMessage && getColor(systemMessage, 'bgColor', 1)) }}
+          max={99}
+          badgeContent={
+            systemMessage
+              ? systemMessage.severity === 'error'
+                ? `!`
+                : systemMessage.severity === 'warning'
+                ? `!`
+                : systemMessage.severity === 'info'
+                ? `i`
+                : systemMessage.severity === 'success'
+                ? `\u2714`
+                : ''
+              : notifications.filter(n => n._isNew).length
+          }
+          children={
+            systemMessageRead && notifications.filter(n => n._isNew).length === 0 ? (
+              <NotificationsNoneOutlinedIcon />
+            ) : (
+              <NotificationsActiveOutlinedIcon />
+            )
+          }
+        />
+      </IconButton>
+      <Drawer anchor="right" classes={{ paper: classes.drawer }} open={drawer} onClose={onCloseNotificationArea}>
+        <div className={classes.root}>
+          <div className={classes.container}>
+            <div className={clsx(classes.row, classes.closeRow)}>
+              <IconButton
+                className={classes.close}
+                onClick={onCloseNotificationArea}
+                children={<CloseOutlinedIcon fontSize="medium" />}
+                size="large"
+              />
+            </div>
+            {(systemMessage || (currentUser && currentUser.is_admin)) && (
+              <>
+                <div className={clsx(classes.row, classes.header)}>
+                  {systemMessage ? (
+                    systemMessage.severity === 'error' ? (
+                      <ErrorOutlineOutlinedIcon
+                        className={clsx(classes.icon, getColor(systemMessage, 'color', 1))}
+                        fontSize="medium"
+                      />
+                    ) : systemMessage.severity === 'warning' ? (
+                      <ReportProblemOutlinedIcon
+                        className={clsx(classes.icon, getColor(systemMessage, 'color', 1))}
+                        fontSize="medium"
+                      />
+                    ) : systemMessage.severity === 'info' ? (
+                      <InfoOutlinedIcon
+                        className={clsx(classes.icon, getColor(systemMessage, 'color', 1))}
+                        fontSize="medium"
+                      />
+                    ) : systemMessage.severity === 'success' ? (
+                      <CheckCircleOutlinedIcon
+                        className={clsx(classes.icon, getColor(systemMessage, 'color', 1))}
+                        fontSize="medium"
+                      />
+                    ) : null
                   ) : (
-                    <div className={clsx(classes.action)}>
-                      <Tooltip title={t('add.title')} aria-label={t('add.title')}>
-                        <IconButton
-                          size="small"
-                          color="inherit"
-                          onClick={onOpenCreateSystemMessageDialog}
-                          children={<AddOutlinedIcon />}
-                        />
-                      </Tooltip>
-                    </div>
-                  ))}
+                    <NotificationsOutlinedIcon className={clsx(classes.icon)} fontSize="medium" />
+                  )}
+                  <Typography
+                    className={clsx(classes.title, getColor(systemMessage, 'color', 2))}
+                    variant={'h6'}
+                    children={t('systemMessage.header')}
+                  />
+                  {currentUser &&
+                    currentUser.is_admin &&
+                    (systemMessage ? (
+                      <>
+                        <div className={clsx(classes.action)}>
+                          <Tooltip title={t('edit.title')} aria-label={t('edit.title')}>
+                            <IconButton
+                              className={clsx(getColor(systemMessage, 'color', 2))}
+                              size="small"
+                              onClick={onOpenEditSystemMessageDialog}
+                              children={<EditOutlinedIcon />}
+                            />
+                          </Tooltip>
+                        </div>
+                        <div className={clsx(classes.action)}>
+                          <Tooltip title={t('delete.title')} aria-label={t('delete.title')}>
+                            <IconButton
+                              className={clsx(getColor(systemMessage, 'color', 2))}
+                              size="small"
+                              onClick={() => setDeleteConfirmation(true)}
+                              children={<DeleteOutlineOutlinedIcon />}
+                            />
+                          </Tooltip>
+                        </div>
+                      </>
+                    ) : (
+                      <div className={clsx(classes.action)}>
+                        <Tooltip title={t('add.title')} aria-label={t('add.title')}>
+                          <IconButton
+                            size="small"
+                            color="inherit"
+                            onClick={onOpenCreateSystemMessageDialog}
+                            children={<AddOutlinedIcon />}
+                          />
+                        </Tooltip>
+                      </div>
+                    ))}
+                </div>
+                <Divider className={clsx(classes.divider, getColor(systemMessage, 'bgColor', 1))} variant="fullWidth" />
+                {systemMessage ? (
+                  <div className={clsx(classes.item)}>
+                    <Typography
+                      className={clsx(classes.messageTitle, getColor(systemMessage, 'color', 2))}
+                      variant="body1"
+                      children={systemMessage.title}
+                    />
+                    <Typography
+                      className={clsx(classes.messageBody)}
+                      variant="body2"
+                      color="textPrimary"
+                      children={systemMessage.message}
+                    />
+                    <Typography
+                      className={classes.user}
+                      variant="caption"
+                      color="textSecondary"
+                      children={systemMessage.user}
+                    />
+                  </div>
+                ) : (
+                  <div className={clsx(classes.row, classes.center)}>
+                    <Typography variant="body2" color="secondary" children={t(`systemMessage.none`)} />
+                  </div>
+                )}
+              </>
+            )}
+            <div className={clsx(classes.row, classes.header)}>
+              <FeedbackOutlinedIcon className={clsx(classes.icon)} fontSize="medium" />
+              <Typography className={clsx(classes.title)} variant={'h6'} children={t(`notification.header`)} />
+            </div>
+            <Divider className={clsx(classes.divider)} variant="fullWidth" />
+            {notifications === null ? (
+              <div className={clsx(classes.row)}>
+                <Skeleton className={clsx(classes.skeleton)} variant="text" animation="wave" />
               </div>
-              <Divider className={clsx(classes.divider, getColor(systemMessage, 'bgColor', 1))} variant="fullWidth" />
-              {systemMessage ? (
-                <div className={clsx(classes.item)}>
-                  <Typography
-                    className={clsx(classes.messageTitle, getColor(systemMessage, 'color', 2))}
-                    variant="body1"
-                    children={systemMessage.title}
-                  />
-                  <Typography
-                    className={clsx(classes.messageBody)}
-                    variant="body2"
-                    color="textPrimary"
-                    children={systemMessage.message}
-                  />
-                  <Typography
-                    className={classes.user}
-                    variant="caption"
-                    color="textSecondary"
-                    children={systemMessage.user}
-                  />
-                </div>
-              ) : (
-                <div className={clsx(classes.row, classes.center)}>
-                  <Typography variant="body2" color="secondary" children={t(`systemMessage.none`)} />
-                </div>
-              )}
-            </>
-          )}
-          <div className={clsx(classes.row, classes.header)}>
-            <FeedbackOutlinedIcon className={clsx(classes.icon)} fontSize="medium" />
-            <Typography className={clsx(classes.title)} variant={'h6'} children={t(`notification.header`)} />
+            ) : notifications.length === 0 ? (
+              <div className={clsx(classes.row, classes.center)}>
+                <Typography variant="body2" color="secondary" children={t('notification.none')} />
+              </div>
+            ) : (
+              notifications.map((n, i) => (
+                <NotificationItem key={i} notification={n} hideDivider={i === notifications.length - 1} />
+              ))
+            )}
           </div>
-          <Divider className={clsx(classes.divider)} variant="fullWidth" />
-          {notifications === null ? (
-            <div className={clsx(classes.row)}>
-              <Skeleton className={clsx(classes.skeleton)} variant="text" animation="wave" />
-            </div>
-          ) : notifications.length === 0 ? (
-            <div className={clsx(classes.row, classes.center)}>
-              <Typography variant="body2" color="secondary" children={t('notification.none')} />
-            </div>
-          ) : (
-            notifications.map((n, i) => (
-              <NotificationItem key={i} notification={n} hideDivider={i === notifications.length - 1} />
-            ))
-          )}
         </div>
-      </div>
-    </Drawer>
-  </>;
+      </Drawer>
+    </>
+  );
 };
 
 export const NotificationArea = React.memo(WrappedNotificationArea);
