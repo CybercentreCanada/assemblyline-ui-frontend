@@ -7,7 +7,6 @@ import {
   Drawer,
   Grid,
   IconButton,
-  isWidthDown,
   Paper,
   Table,
   TableBody,
@@ -38,17 +37,13 @@ import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import ChipInput from 'material-ui-chip-input';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router';
 import { useLocation, useParams } from 'react-router-dom';
 import Apps from './user/apps';
 
-// FIXME checkout https://mui.com/components/use-media-query/#migrating-from-withwidth
-const withWidth = () => WrappedComponent => props => <WrappedComponent {...props} width="xs" />;
-
 type UserProps = {
-  width: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   username?: string | null;
 };
 
@@ -67,7 +62,7 @@ const DeleteButton = withStyles((theme: Theme) => ({
   }
 }))(Button);
 
-function User({ width, username }: UserProps) {
+function User({ username }: UserProps) {
   const { id } = useParams<ParamProps>();
   const location = useLocation();
   const inputRef = useRef(null);
@@ -86,6 +81,7 @@ function User({ width, username }: UserProps) {
   const sp1 = theme.spacing(1);
   const sp4 = theme.spacing(4);
   const sp6 = theme.spacing(6);
+  const isXSDown = useMediaQuery(theme.breakpoints.down('xs'));
 
   const { apiCall } = useMyAPI();
   const useStyles = makeStyles(curTheme => ({
@@ -523,7 +519,7 @@ function User({ width, username }: UserProps) {
             <Table aria-label={t('profile')}>
               <TableHead>
                 <TableRow>
-                  <TableCell colSpan={isWidthDown('xs', width) ? 2 : 3}>
+                  <TableCell colSpan={isXSDown ? 2 : 3}>
                     <Typography variant="h6" gutterBottom>
                       {t('profile')}
                     </Typography>
@@ -532,21 +528,17 @@ function User({ width, username }: UserProps) {
               </TableHead>
               <TableBody>
                 <TableRow className={classes.row}>
-                  {isWidthDown('xs', width) ? null : (
-                    <TableCell style={{ whiteSpace: 'nowrap' }}>{t('uname')}</TableCell>
-                  )}
+                  {isXSDown ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('uname')}</TableCell>}
                   <TableCell width="100%">
-                    {!isWidthDown('xs', width) ? null : <Typography variant="caption">{t('uname')}</Typography>}
+                    {!isXSDown ? null : <Typography variant="caption">{t('uname')}</Typography>}
                     {user ? <div>{user.uname}</div> : <Skeleton />}
                   </TableCell>
                   <TableCell align="right" />
                 </TableRow>
                 <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('name')}>
-                  {isWidthDown('xs', width) ? null : (
-                    <TableCell style={{ whiteSpace: 'nowrap' }}>{t('name')}</TableCell>
-                  )}
+                  {isXSDown ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('name')}</TableCell>}
                   <TableCell width="100%">
-                    {!isWidthDown('xs', width) ? null : <Typography variant="caption">{t('name')}</Typography>}
+                    {!isXSDown ? null : <Typography variant="caption">{t('name')}</Typography>}
                     {user ? <div>{user.name}</div> : <Skeleton />}
                   </TableCell>
                   <TableCell align="right">
@@ -554,11 +546,9 @@ function User({ width, username }: UserProps) {
                   </TableCell>
                 </TableRow>
                 <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('groups')}>
-                  {isWidthDown('xs', width) ? null : (
-                    <TableCell style={{ whiteSpace: 'nowrap' }}>{t('groups')}</TableCell>
-                  )}
+                  {isXSDown ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('groups')}</TableCell>}
                   <TableCell width="100%">
-                    {!isWidthDown('xs', width) ? null : <Typography variant="caption">{t('groups')}</Typography>}
+                    {!isXSDown ? null : <Typography variant="caption">{t('groups')}</Typography>}
                     {user ? <div>{user.groups.join(' | ')}</div> : <Skeleton />}
                   </TableCell>
                   <TableCell align="right">
@@ -566,11 +556,9 @@ function User({ width, username }: UserProps) {
                   </TableCell>
                 </TableRow>
                 <TableRow className={classes.row}>
-                  {isWidthDown('xs', width) ? null : (
-                    <TableCell style={{ whiteSpace: 'nowrap' }}>{t('email')}</TableCell>
-                  )}
+                  {isXSDown ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('email')}</TableCell>}
                   <TableCell width="100%">
-                    {!isWidthDown('xs', width) ? null : <Typography variant="caption">{t('email')}</Typography>}
+                    {!isXSDown ? null : <Typography variant="caption">{t('email')}</Typography>}
                     {user ? <div>{user.email}</div> : <Skeleton />}
                   </TableCell>
                   <TableCell align="right" />
@@ -592,11 +580,9 @@ function User({ width, username }: UserProps) {
               </TableHead>
               <TableBody>
                 <TableRow>
-                  {isWidthDown('xs', width) ? null : (
-                    <TableCell style={{ whiteSpace: 'nowrap' }}>{t('type')}</TableCell>
-                  )}
+                  {isXSDown ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('type')}</TableCell>}
                   <TableCell width="100%">
-                    {!isWidthDown('xs', width) ? null : <Typography variant="caption">{t('type')}</Typography>}
+                    {!isXSDown ? null : <Typography variant="caption">{t('type')}</Typography>}
                     {user ? (
                       <div>
                         {configuration.user.types.map((uType, type_id) => (
@@ -620,11 +606,9 @@ function User({ width, username }: UserProps) {
                   <TableCell align="right" />
                 </TableRow>
                 <TableRow>
-                  {isWidthDown('xs', width) ? null : (
-                    <TableCell style={{ whiteSpace: 'nowrap' }}>{t('roles')}</TableCell>
-                  )}
+                  {isXSDown ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('roles')}</TableCell>}
                   <TableCell width="100%">
-                    {!isWidthDown('xs', width) ? null : <Typography variant="caption">{t('roles')}</Typography>}
+                    {!isXSDown ? null : <Typography variant="caption">{t('roles')}</Typography>}
                     {user ? (
                       <div>
                         {configuration.user.roles.sort().map((role, role_id) => (
@@ -653,11 +637,9 @@ function User({ width, username }: UserProps) {
                   style={{ cursor: currentUser.is_admin ? 'pointer' : 'default' }}
                   onClick={currentUser.is_admin ? event => toggleDrawer('api_quota') : null}
                 >
-                  {isWidthDown('xs', width) ? null : (
-                    <TableCell style={{ whiteSpace: 'nowrap' }}>{t('api_quota')}</TableCell>
-                  )}
+                  {isXSDown ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('api_quota')}</TableCell>}
                   <TableCell width="100%">
-                    {!isWidthDown('xs', width) ? null : <Typography variant="caption">{t('api_quota')}</Typography>}
+                    {!isXSDown ? null : <Typography variant="caption">{t('api_quota')}</Typography>}
                     {user ? <div>{user.api_quota}</div> : <Skeleton />}
                   </TableCell>
                   <TableCell align="right">{currentUser.is_admin ? <ChevronRightOutlinedIcon /> : null}</TableCell>
@@ -667,13 +649,9 @@ function User({ width, username }: UserProps) {
                   style={{ cursor: currentUser.is_admin ? 'pointer' : 'default' }}
                   onClick={currentUser.is_admin ? event => toggleDrawer('submission_quota') : null}
                 >
-                  {isWidthDown('xs', width) ? null : (
-                    <TableCell style={{ whiteSpace: 'nowrap' }}>{t('submission_quota')}</TableCell>
-                  )}
+                  {isXSDown ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('submission_quota')}</TableCell>}
                   <TableCell width="100%">
-                    {!isWidthDown('xs', width) ? null : (
-                      <Typography variant="caption">{t('submission_quota')}</Typography>
-                    )}
+                    {!isXSDown ? null : <Typography variant="caption">{t('submission_quota')}</Typography>}
                     {user ? <div>{user.submission_quota}</div> : <Skeleton />}
                   </TableCell>
                   <TableCell align="right">{currentUser.is_admin ? <ChevronRightOutlinedIcon /> : null}</TableCell>
@@ -780,4 +758,4 @@ User.defaultProps = {
   username: null
 };
 
-export default withWidth()(User);
+export default memo(User);
