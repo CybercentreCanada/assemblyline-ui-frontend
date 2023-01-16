@@ -1,10 +1,9 @@
-import { Card, Grid, Switch, Theme, Tooltip, Typography } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutline';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import SpeedOutlinedIcon from '@mui/icons-material/SpeedOutlined';
-import { Skeleton } from '@mui/material';
+import { Card, Grid, Skeleton, Switch, Theme, Tooltip, Typography } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import PageFullscreen from 'commons/components/layout/pages/PageFullScreen';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -34,7 +33,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     }
   },
   disabled: {
-    color: theme.palette.text.hint,
+    color: theme.palette.text.secondary,
     backgroundColor: theme.palette.mode === 'dark' ? '#63636317' : '#EAEAEA',
     border: `solid 1px ${theme.palette.divider}`
   },

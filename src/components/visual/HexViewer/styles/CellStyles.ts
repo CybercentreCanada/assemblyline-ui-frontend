@@ -1,14 +1,14 @@
-import makeStyles from '@mui/styles/makeStyles';
 import { yellow } from '@mui/material/colors';
+import makeStyles from '@mui/styles/makeStyles';
 
 export const useCellStyles = makeStyles(theme => ({
   hexBorder: {
     '& > div > div:nth-child(4n + 1):nth-child(n+2) ': {
-      borderLeft: `1px solid ${theme.palette.text.hint}`
+      borderLeft: `1px solid ${theme.palette.text.secondary}`
     }
   },
   border: {
-    borderLeft: `1px solid ${theme.palette.text.hint}`
+    borderLeft: `1px solid ${theme.palette.text.secondary}`
   },
   nullColor: {
     color: theme.palette.text.disabled

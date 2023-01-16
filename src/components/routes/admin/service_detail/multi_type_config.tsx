@@ -1,6 +1,6 @@
-import { Grid, IconButton, MenuItem, Select, TextField, Tooltip, useTheme } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
+import { Grid, IconButton, MenuItem, Select, TextField, Tooltip, useTheme } from '@mui/material';
 import 'moment/locale/fr';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -38,7 +38,7 @@ const WrappedMultiTypeConfig = ({ config, onAdd, onUpdate, onDelete }: MultiType
   const jsonTheme = {
     base00: 'transparent', // Background
     base01: '#f1f1f1', // Edit key text
-    base02: theme.palette.mode === 'dark' ? theme.palette.text.hint : theme.palette.divider, // Borders and DataType Background
+    base02: theme.palette.mode === 'dark' ? theme.palette.text.secondary : theme.palette.divider, // Borders and DataType Background
     base03: '#444', // Unused
     base04: theme.palette.grey[theme.palette.mode === 'dark' ? 700 : 400], // Object size and Add key border
     base05: theme.palette.grey[theme.palette.mode === 'dark' ? 700 : 700], // Undefined and Add key background
@@ -191,7 +191,8 @@ const WrappedMultiTypeConfig = ({ config, onAdd, onUpdate, onDelete }: MultiType
               color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
             }}
             onClick={() => onDelete(parsedConfig)}
-            size="large">
+            size="large"
+          >
             <RemoveCircleOutlineOutlinedIcon />
           </IconButton>
         </Tooltip>
@@ -280,7 +281,8 @@ const WrappedMultiTypeConfig = ({ config, onAdd, onUpdate, onDelete }: MultiType
                 color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
               }}
               onClick={addConfig}
-              size="large">
+              size="large"
+            >
               <AddCircleOutlineIcon />
             </IconButton>
           </Tooltip>

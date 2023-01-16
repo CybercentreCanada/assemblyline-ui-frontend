@@ -34,7 +34,7 @@ const WrappedJSONBody = ({ body, printable }) => {
     const jsonTheme = {
       base00: 'transparent', // Background
       base01: '#f1f1f1', // Edit key text
-      base02: theme.palette.mode === 'dark' ? theme.palette.text.hint : theme.palette.divider, // Borders and DataType Background
+      base02: theme.palette.mode === 'dark' ? theme.palette.text.secondary : theme.palette.divider, // Borders and DataType Background
       base03: '#444', // Unused
       base04: theme.palette.grey[theme.palette.mode === 'dark' ? 700 : 400], // Object size and Add key border
       base05: theme.palette.grey[theme.palette.mode === 'dark' ? 700 : 700], // Undefined and Add key background
