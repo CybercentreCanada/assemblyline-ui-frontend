@@ -1,7 +1,6 @@
-import { Checkbox, Chip, TextField, useTheme } from '@mui/material';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
-import { Autocomplete } from '@mui/material';
+import { Autocomplete, Checkbox, Chip, TextField, useTheme } from '@mui/material';
 import useSorters from 'commons/addons/elements/lists/hooks/useSorters';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -51,7 +50,7 @@ const SorterSelector: React.FC<SorterSelectorProps> = ({ list, fields, selection
       style={{ minWidth: 150 }}
       options={fields}
       value={selections}
-      getOptionLabel={option => option.label}
+      getOptionLabel={(option: SorterField) => option.label}
       isOptionEqualToValue={isSelected}
       renderTags={value => (
         <>
@@ -69,7 +68,7 @@ const SorterSelector: React.FC<SorterSelectorProps> = ({ list, fields, selection
         </>
       )}
       renderInput={params => <TextField {...params} label={t('list.selector.sorters')} />}
-      renderOption={(option, { selected }) => (
+      renderOption={(props, option, { selected }) => (
         <>
           <Checkbox
             icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
