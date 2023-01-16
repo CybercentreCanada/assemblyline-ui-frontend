@@ -1,9 +1,11 @@
+import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
+import CloseIcon from '@mui/icons-material/Close';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import {
   Button,
   CircularProgress,
   Drawer,
   IconButton,
-  isWidthDown,
   MenuItem,
   Paper,
   Select,
@@ -16,13 +18,11 @@ import {
   TableRow,
   TextField,
   Typography,
-  useTheme,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
-import CloseIcon from '@mui/icons-material/Close';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Skeleton from '@mui/material/Skeleton';
+import makeStyles from '@mui/styles/makeStyles';
 import PageCenter from 'commons/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -32,15 +32,8 @@ import ServiceSpec from 'components/layout/serviceSpec';
 import ServiceTree from 'components/layout/serviceTree';
 import Classification from 'components/visual/Classification';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
-import React, { useEffect, useState } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-// FIXME checkout https://mui.com/components/use-media-query/#migrating-from-withwidth
-const withWidth = () => (WrappedComponent) => (props) => <WrappedComponent {...props} width="xs" />;
-
-type SettingsProps = {
-  width: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-};
 
 function Skel() {
   return (
@@ -58,7 +51,7 @@ function Skel() {
   );
 }
 
-function Settings({ width }: SettingsProps) {
+function Settings() {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
   const [drawerType, setDrawerType] = useState(null);
@@ -72,6 +65,7 @@ function Settings({ width }: SettingsProps) {
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
   const sp6 = theme.spacing(6);
+  const isXSDown = useMediaQuery(theme.breakpoints.down('xs'));
 
   const { apiCall } = useMyAPI();
   const useStyles = makeStyles(curTheme => ({
@@ -383,7 +377,7 @@ function Settings({ width }: SettingsProps) {
         <Table aria-label={t('submissions')}>
           <TableHead>
             <TableRow>
-              <TableCell colSpan={isWidthDown('xs', width) ? 2 : 3}>
+              <TableCell colSpan={isXSDown ? 2 : 3}>
                 <Typography variant="h6" gutterBottom>
                   {t('submissions')}
                 </Typography>
@@ -467,14 +461,14 @@ function Settings({ width }: SettingsProps) {
               </TableCell>
             </TableRow>
             <TableRow hover style={{ cursor: 'pointer' }} onClick={event => toggleDrawer('ttl')}>
-              {isWidthDown('xs', width) ? null : (
+              {isXSDown ? null : (
                 <TableCell>
                   <Typography variant="body1">{t('submissions.ttl')}</Typography>
                   <Typography variant="caption">{t('submissions.ttl_desc')}</Typography>
                 </TableCell>
               )}
-              <TableCell colSpan={isWidthDown('xs', width) ? 2 : 1}>
-                {!isWidthDown('xs', width) ? null : (
+              <TableCell colSpan={isXSDown ? 2 : 1}>
+                {!isXSDown ? null : (
                   <>
                     <Typography variant="body1">{t('submissions.ttl')}</Typography>
                     <Typography variant="caption" gutterBottom>
@@ -496,14 +490,14 @@ function Settings({ width }: SettingsProps) {
             </TableRow>
             {c12nDef.enforce && (
               <TableRow style={{ cursor: 'pointer' }}>
-                {isWidthDown('xs', width) ? null : (
+                {isXSDown ? null : (
                   <TableCell>
                     <Typography variant="body1">{t('submissions.classification')}</Typography>
                     <Typography variant="caption">{t('submissions.classification_desc')}</Typography>
                   </TableCell>
                 )}
-                <TableCell colSpan={isWidthDown('xs', width) ? 3 : 2}>
-                  {!isWidthDown('xs', width) ? null : (
+                <TableCell colSpan={isXSDown ? 3 : 2}>
+                  {!isXSDown ? null : (
                     <>
                       <Typography variant="body1">{t('submissions.classification')}</Typography>
                       <Typography variant="caption" gutterBottom>
@@ -537,14 +531,14 @@ function Settings({ width }: SettingsProps) {
           </TableHead>
           <TableBody>
             <TableRow hover style={{ cursor: 'pointer' }} onClick={event => toggleDrawer('view')}>
-              {isWidthDown('xs', width) ? null : (
+              {isXSDown ? null : (
                 <TableCell>
                   <Typography variant="body1">{t('interface.view')}</Typography>
                   <Typography variant="caption">{t('interface.view_desc')}</Typography>
                 </TableCell>
               )}
-              <TableCell colSpan={isWidthDown('xs', width) ? 2 : 1}>
-                {!isWidthDown('xs', width) ? null : (
+              <TableCell colSpan={isXSDown ? 2 : 1}>
+                {!isXSDown ? null : (
                   <>
                     <Typography variant="body1">{t('interface.view')}</Typography>
                     <Typography variant="caption" gutterBottom>
@@ -565,14 +559,14 @@ function Settings({ width }: SettingsProps) {
               </TableCell>
             </TableRow>
             <TableRow hover style={{ cursor: 'pointer' }} onClick={event => toggleDrawer('encoding')}>
-              {isWidthDown('xs', width) ? null : (
+              {isXSDown ? null : (
                 <TableCell>
                   <Typography variant="body1">{t('interface.encoding')}</Typography>
                   <Typography variant="caption">{t('interface.encoding_desc')}</Typography>
                 </TableCell>
               )}
-              <TableCell colSpan={isWidthDown('xs', width) ? 2 : 1}>
-                {!isWidthDown('xs', width) ? null : (
+              <TableCell colSpan={isXSDown ? 2 : 1}>
+                {!isXSDown ? null : (
                   <>
                     <Typography variant="body1">{t('interface.encoding')}</Typography>
                     <Typography variant="caption" gutterBottom>
@@ -603,14 +597,14 @@ function Settings({ width }: SettingsProps) {
               </TableCell>
             </TableRow>
             <TableRow hover style={{ cursor: 'pointer' }} onClick={event => toggleDrawer('score')}>
-              {isWidthDown('xs', width) ? null : (
+              {isXSDown ? null : (
                 <TableCell>
                   <Typography variant="body1">{t('interface.score')}</Typography>
                   <Typography variant="caption">{t('interface.score_desc')}</Typography>
                 </TableCell>
               )}
-              <TableCell colSpan={isWidthDown('xs', width) ? 2 : 1}>
-                {!isWidthDown('xs', width) ? null : (
+              <TableCell colSpan={isXSDown ? 2 : 1}>
+                {!isXSDown ? null : (
                   <>
                     <Typography variant="body1">{t('interface.score')}</Typography>
                     <Typography variant="caption" gutterBottom>
@@ -693,4 +687,4 @@ function Settings({ width }: SettingsProps) {
   );
 }
 
-export default withWidth()(Settings);
+export default memo(Settings);
