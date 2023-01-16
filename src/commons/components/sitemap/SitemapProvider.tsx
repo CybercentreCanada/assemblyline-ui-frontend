@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { appendRoute, BreadcrumbItem, getRoute } from 'commons/components/hooks/useAppSitemap';
 import React, { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import useAppUser from '../hooks/useAppUser';
 
 export type SiteMapRoute = {
@@ -35,28 +35,32 @@ export const SiteMapContext = React.createContext<SitemapProviderContextProps>(n
 
 function SiteMapProvider(props: SiteMapProviderProps) {
   const { children, ...contextProps } = props;
-  const history = useHistory();
+  const location = useLocation();
   const { isReady } = useAppUser();
   const [breadcrumbs, setBreadcrumbs] = useState([]);
   const isUserReady = isReady();
 
   // Reset the breadcrumbs if the user ready state changes.
   useEffect(() => {
-    setBreadcrumbs(
-      appendRoute([getRoute('/', contextProps.routes)], getRoute(history.location.pathname, contextProps.routes))
-    );
+    setBreadcrumbs(appendRoute([getRoute('/', contextProps.routes)], getRoute(location.pathname, contextProps.routes)));
   }, [isUserReady]);
 
-  useEffect(() =>
-    // The return callback will ensure the event handler deregisters when component
-    //  is unmounted.  Failure to do this will result in an event handler
-    //  being registered each time this component renders.
-    history.listen(location => {
-      const _matchedRoute = getRoute(location.pathname, contextProps.routes);
-      const _breadcrumbs = appendRoute(breadcrumbs, _matchedRoute);
-      setBreadcrumbs(_breadcrumbs);
-    })
-  );
+  // useEffect(() =>
+  //   // The return callback will ensure the event handler deregisters when component
+  //   //  is unmounted.  Failure to do this will result in an event handler
+  //   //  being registered each time this component renders.
+  //   history.listen(location => {
+  //     const _matchedRoute = getRoute(location.pathname, contextProps.routes);
+  //     const _breadcrumbs = appendRoute(breadcrumbs, _matchedRoute);
+  //     setBreadcrumbs(_breadcrumbs);
+  //   })
+  // );
+
+  useEffect(() => {
+    const _matchedRoute = getRoute(location.pathname, contextProps.routes);
+    const _breadcrumbs = appendRoute(breadcrumbs, _matchedRoute);
+    setBreadcrumbs(_breadcrumbs);
+  }, [location]);
 
   return <SiteMapContext.Provider value={{ breadcrumbs, ...contextProps }}>{children}</SiteMapContext.Provider>;
 }
