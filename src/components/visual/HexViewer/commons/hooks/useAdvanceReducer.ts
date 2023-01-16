@@ -53,7 +53,7 @@ const updateObject = (first: any, second: any): any => {
 const applySubObject = (
   origin: any,
   value: any,
-  path: Array<string> = [],
+  path: Array<string>,
   method: (origin: any, value: any) => any
 ): any => {
   if (path !== null && path.length === 0) return method(origin, value);

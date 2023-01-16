@@ -71,7 +71,7 @@ export type StoreProps = {
   store?: Store;
 };
 
-export type AT = typeof ACTIONS[keyof typeof ACTIONS];
+export type AT = (typeof ACTIONS)[keyof typeof ACTIONS];
 
 export const DEFAULT_STORE: Store = Object.freeze({
   ...CELL_STATE,
@@ -177,7 +177,7 @@ const mergeObject = (first: any, second: any): any => {
 const applySubObject = (
   origin: object,
   value: any,
-  path: Array<string> = [],
+  path: Array<string>,
   method: (origin: any, value: any) => any
 ): any => {
   if (path !== null && path.length === 0) return method(origin, value);
