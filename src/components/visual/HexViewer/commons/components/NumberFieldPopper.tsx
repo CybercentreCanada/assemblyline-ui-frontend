@@ -22,7 +22,7 @@ export type NumberFieldPopperProps = {
   max?: number;
   base?: number;
   labelWidth?: number;
-  onClickAway?: (event: React.MouseEvent<Document, MouseEvent>) => void;
+  onClickAway?: (event: MouseEvent | TouchEvent) => void;
   onChange?: (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => void;
   onNumberChange?: (value: number) => void;
 };
@@ -60,7 +60,7 @@ export const WrappedNumberFieldPopper = (
   );
 
   const handleClickAway = useCallback(
-    (event: React.MouseEvent<Document, MouseEvent>) => {
+    (event: MouseEvent | TouchEvent) => {
       setOpen(false);
       setAnchorEl(null);
       onClickAway(event);

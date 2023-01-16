@@ -1,4 +1,5 @@
-import { ChangeEvent, default as React } from 'react';
+import { SelectChangeEvent } from '@mui/material';
+import { default as React } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getItems, getType, getValue, SelectField, StoreProps, useStore } from '../..';
 
@@ -12,7 +13,7 @@ export const WrappedHexEncodingSetting = ({ store }: StoreProps) => {
       description={t('hex.byteSize.description')}
       value={getValue.hex.encoding(store.setting.hex.encoding)}
       items={getItems.hex.encoding(store)}
-      onChange={(event: ChangeEvent<{ name?: string; value: unknown }>) =>
+      onChange={(event: SelectChangeEvent<number>, child: React.ReactNode) =>
         update.store.setting.hex.setEncoding(getType.hex.encoding(event.target.value as number))
       }
     />

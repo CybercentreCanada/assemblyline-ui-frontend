@@ -1,6 +1,6 @@
 import { FormControl, Grid, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { Theme } from '@mui/material/styles';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
@@ -32,18 +32,9 @@ const useStyles = makeStyles((theme: Theme) =>
 export type SelectFieldProps = {
   label?: string;
   description?: string;
-  items?: Array<{
-    value: number;
-    label: string;
-  }>;
+  items?: Array<{ value: number; label: string }>;
   value?: number;
-  onChange?: (
-    event: React.ChangeEvent<{
-      name?: string;
-      value: unknown;
-    }>,
-    child: React.ReactNode
-  ) => void;
+  onChange?: (event: SelectChangeEvent<number>, child: React.ReactNode) => void;
 };
 
 export const WrappedSelectField = ({

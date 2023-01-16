@@ -1,3 +1,5 @@
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import FormControl from '@mui/material/FormControl';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -6,8 +8,6 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import { Theme } from '@mui/material/styles';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import clsx from 'clsx';
 import { isArrowDown, isArrowUp, isEnter } from 'commons/addons/elements/utils/keyboard';
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
@@ -386,7 +386,7 @@ export const WrappedNumericField = ({
             </div>
           </InputAdornment>
         }
-        labelWidth={labelWidth}
+        label={<InputLabel sx={{ width: labelWidth }} />}
       />
     </FormControl>
   );

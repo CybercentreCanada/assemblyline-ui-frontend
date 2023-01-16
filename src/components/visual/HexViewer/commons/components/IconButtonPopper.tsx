@@ -1,7 +1,7 @@
-import { ClickAwayListener, Fade, Paper, Popper, Tooltip } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import IconButton from '@mui/material/IconButton';
 import AdbIcon from '@mui/icons-material/Adb';
+import { ClickAwayListener, Fade, Paper, Popper, Tooltip } from '@mui/material';
+import IconButton from '@mui/material/IconButton';
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import { isEnter, isEscape } from 'commons/addons/elements/utils/keyboard';
 import { default as React, useCallback, useState } from 'react';
@@ -65,7 +65,7 @@ export const WrappedIconButtonPopper = ({
     setOpen(true);
   }, []);
 
-  const handleClickAway = useCallback((event: React.MouseEvent<Document, MouseEvent>) => {
+  const handleClickAway = useCallback((event: MouseEvent | TouchEvent) => {
     setOpen(false);
     setAnchorEl(null);
   }, []);

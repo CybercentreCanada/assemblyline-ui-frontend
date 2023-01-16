@@ -1,8 +1,8 @@
 import { useMediaQuery, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
-import React from 'react';
+import TextField from '@mui/material/TextField';
+import makeStyles from '@mui/styles/makeStyles';
+import React, { SyntheticEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StoreProps, useDispatch } from '../..';
 
@@ -75,15 +75,13 @@ export const WrappedHexSearchbar = ({ store }: StoreProps) => {
       size="small"
       open={suggestionOpen && upXS && false}
       options={suggestionLabels}
-      value={value}
-      onChange={(event: React.ChangeEvent, newValue: string | null) => {
-        console.log('onChange', newValue);
-        setValue(newValue);
-        onSearchBarChange({ value: newValue });
+      value={[value]}
+      onChange={(event: SyntheticEvent<Element, Event>, newValue: string[]) => {
+        setValue(newValue[0]);
+        onSearchBarChange({ value: newValue[0] });
       }}
       inputValue={inputValue}
       onInputChange={(event: React.ChangeEvent, newInputValue: string) => {
-        console.log('onInputChange', newInputValue);
         setInputValue(newInputValue);
         onSearchBarInputChange({ inputValue: newInputValue });
       }}

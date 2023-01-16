@@ -58,7 +58,7 @@ export const WrappedButtonPopper = ({
     setOpen(true);
   }, []);
 
-  const handleClickAway = useCallback((event: React.MouseEvent<Document, MouseEvent>) => {
+  const handleClickAway = useCallback((event: MouseEvent | TouchEvent) => {
     setOpen(false);
     setAnchorEl(null);
   }, []);
