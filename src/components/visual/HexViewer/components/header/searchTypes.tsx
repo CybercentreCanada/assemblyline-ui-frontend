@@ -1,12 +1,12 @@
+import NavigationIcon from '@mui/icons-material/Navigation';
+import NumbersOutlinedIcon from '@mui/icons-material/NumbersOutlined';
+import TextFieldsIcon from '@mui/icons-material/TextFields';
 import { Fade, Paper, Popper, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import ExposureZeroIcon from '@mui/icons-material/ExposureZero';
-import NavigationIcon from '@mui/icons-material/Navigation';
-import TextFieldsIcon from '@mui/icons-material/TextFields';
+import makeStyles from '@mui/styles/makeStyles';
 import { isEscape } from 'commons/addons/elements/utils/keyboard';
 import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -85,7 +85,7 @@ export const WrappedHexSearchTypes = ({ store }: StoreProps) => {
           searchType === 'cursor' ? (
             <NavigationIcon />
           ) : searchType === 'hex' ? (
-            <ExposureZeroIcon />
+            <NumbersOutlinedIcon />
           ) : searchType === 'text' ? (
             <TextFieldsIcon />
           ) : null
@@ -122,7 +122,7 @@ export const WrappedHexSearchTypes = ({ store }: StoreProps) => {
                   dense
                   onClick={handleClick('hex')}
                 >
-                  <ListItemIcon children={<ExposureZeroIcon />} />
+                  <ListItemIcon children={<NumbersOutlinedIcon />} />
                   <ListItemText primary={t('header.selector.hexcode')} />
                 </ListItem>
                 <ListItem
