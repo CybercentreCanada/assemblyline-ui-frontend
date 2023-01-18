@@ -28,9 +28,54 @@ type APIKeyProps = {
   roles: string[];
 };
 
+type APIKeyCardProps = {
+  name: string;
+  apikey: APIKeyProps;
+  askForDelete: (name: string) => void;
+};
+
 type APIKeysProps = {
-  user: { [name: string]: any; apikeys: { [name: string]: APIKeyProps } };
+  user: {
+    [name: string]: any;
+    apikeys: {
+      [name: string]: APIKeyProps;
+    };
+  };
   toggleAPIKey: (name: string, apiKey?: APIKeyProps) => void;
+};
+
+const APIKeyCard = ({ name, apikey, askForDelete }: APIKeyCardProps) => {
+  const { t } = useTranslation(['user']);
+  const theme = useTheme();
+  return (
+    <Paper
+      style={{
+        backgroundColor: '#00000015',
+        padding: theme.spacing(1),
+        borderRadius: theme.spacing(0.5),
+        marginBottom: theme.spacing(1)
+      }}
+      variant="outlined"
+    >
+      <div style={{ display: 'flex', marginBottom: theme.spacing(1), alignItems: 'center' }}>
+        <Typography variant="button" style={{ flexGrow: 1 }}>
+          {name} [{apikey.acl}]
+        </Typography>
+        <div>
+          <IconButton size="small" onClick={() => askForDelete(name)}>
+            <DeleteOutlineOutlinedIcon />
+          </IconButton>
+        </div>
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+        {apikey.roles?.map((e, x) => (
+          <div key={x} style={{ marginRight: theme.spacing(0.5), marginBottom: theme.spacing(0.25) }}>
+            <CustomChip type="rounded" label={t(`role.${e}`)} size="tiny" color="primary" />
+          </div>
+        ))}
+      </div>
+    </Paper>
+  );
 };
 
 export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
@@ -110,29 +155,7 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
         </Typography>
         {Object.keys(user.apikeys).length !== 0 ? (
           Object.entries(user.apikeys).map(([name, apikey], i) => (
-            <Paper
-              key={i}
-              style={{ backgroundColor: '#00000015', padding: theme.spacing(1), borderRadius: '5px' }}
-              variant="outlined"
-            >
-              <div style={{ display: 'flex', marginBottom: theme.spacing(1), alignItems: 'center' }}>
-                <Typography variant="button" style={{ flexGrow: 1 }}>
-                  {name} [{apikey.acl}]
-                </Typography>
-                <div>
-                  <IconButton size="small" onClick={() => askForDelete(name)}>
-                    <DeleteOutlineOutlinedIcon />
-                  </IconButton>
-                </div>
-              </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                {apikey.roles.map((e, x) => (
-                  <div key={x} style={{ marginRight: theme.spacing(0.5), marginBottom: theme.spacing(0.25) }}>
-                    <CustomChip type="rounded" label={t(`role.${e}`)} size="tiny" color="primary" />
-                  </div>
-                ))}
-              </div>
-            </Paper>
+            <APIKeyCard key={i} name={name} apikey={apikey} askForDelete={askForDelete} />
           ))
         ) : (
           <Typography variant="subtitle2" color="secondary">
