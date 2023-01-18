@@ -1,13 +1,14 @@
 import {
   Button,
   Card,
-  Chip,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
+  IconButton,
   MenuItem,
+  Paper,
   Select,
   TextField,
   Typography,
@@ -17,12 +18,19 @@ import {
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import CustomChip from 'components/visual/CustomChip';
+import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+type APIKeyProps = {
+  acl: string;
+  roles: string[];
+};
+
 type APIKeysProps = {
-  user: any;
-  toggleAPIKey: (apiKey: string) => void;
+  user: { [name: string]: any; apikeys: { [name: string]: APIKeyProps } };
+  toggleAPIKey: (name: string, apiKey?: APIKeyProps) => void;
 };
 
 export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
@@ -61,7 +69,7 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
       url: `/api/v4/auth/apikey/${tempKeyName}/${tempKeyPriv}/`,
       onSuccess: api_data => {
         setTempAPIKey(api_data.api_response.apikey);
-        toggleAPIKey(tempKeyName);
+        toggleAPIKey(tempKeyName, { acl: tempKeyPriv, roles: tempKeyRoles });
       }
     });
   }
@@ -100,9 +108,31 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
         <Typography variant="subtitle1" gutterBottom>
           {t('apikeys.list')}
         </Typography>
-        {user.apikeys.length !== 0 ? (
-          user.apikeys.map((e, i) => (
-            <Chip key={i} label={e} onDelete={() => askForDelete(e)} style={{ marginRight: sp1, marginBottom: sp1 }} />
+        {Object.keys(user.apikeys).length !== 0 ? (
+          Object.entries(user.apikeys).map(([name, apikey], i) => (
+            <Paper
+              key={i}
+              style={{ backgroundColor: '#00000015', padding: theme.spacing(1), borderRadius: '5px' }}
+              variant="outlined"
+            >
+              <div style={{ display: 'flex', marginBottom: theme.spacing(1), alignItems: 'center' }}>
+                <Typography variant="button" style={{ flexGrow: 1 }}>
+                  {name} [{apikey.acl}]
+                </Typography>
+                <div>
+                  <IconButton size="small" onClick={() => askForDelete(name)}>
+                    <DeleteOutlineOutlinedIcon />
+                  </IconButton>
+                </div>
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                {apikey.roles.map((e, x) => (
+                  <div key={x} style={{ marginRight: theme.spacing(0.5), marginBottom: theme.spacing(0.25) }}>
+                    <CustomChip type="rounded" label={t(`role.${e}`)} size="tiny" color="primary" />
+                  </div>
+                ))}
+              </div>
+            </Paper>
           ))
         ) : (
           <Typography variant="subtitle2" color="secondary">
