@@ -19,12 +19,13 @@ import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import CustomChip from 'components/visual/CustomChip';
+import AddCircleOutlineOutlinedIcon from '@material-ui/icons/AddCircleOutlineOutlined';
 import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type APIKeyProps = {
-  acl: string;
+  acl: string[];
   roles: string[];
 };
 
@@ -81,6 +82,7 @@ const APIKeyCard = ({ name, apikey, askForDelete }: APIKeyCardProps) => {
 export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
   const { t } = useTranslation(['user']);
   const [selectedAPIKey, setSelectedAPIKey] = useState(null);
+  const [addApikey, setAddApikey] = useState(false);
   const { configuration } = useALContext();
   const [tempAPIKey, setTempAPIKey] = useState(null);
   const [tempKeyName, setTempKeyName] = useState('');
@@ -91,9 +93,6 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const { showSuccessMessage } = useMySnackbar();
   const regex = RegExp('^[a-zA-Z][a-zA-Z0-9_]*$');
-  const sp1 = theme.spacing(1);
-  const sp2 = theme.spacing(2);
-  const sp4 = theme.spacing(4);
 
   function handleDelete() {
     apiCall({
@@ -113,8 +112,9 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
       body: tempKeyRoles,
       url: `/api/v4/auth/apikey/${tempKeyName}/${tempKeyPriv}/`,
       onSuccess: api_data => {
+        setAddApikey(false);
         setTempAPIKey(api_data.api_response.apikey);
-        toggleAPIKey(tempKeyName, { acl: tempKeyPriv, roles: tempKeyRoles });
+        toggleAPIKey(tempKeyName, { acl: configuration.user.api_priv_map[tempKeyPriv], roles: tempKeyRoles });
       }
     });
   }
@@ -132,6 +132,7 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
   }
 
   function handleNew() {
+    setAddApikey(false);
     setTempAPIKey(null);
     setTempKeyName('');
     setTempKeyPriv('READ');
@@ -143,13 +144,18 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
 
   return (
     <>
-      <Typography variant="h4" gutterBottom>
-        {t('apikeys.title')}
-      </Typography>
+      <div style={{ display: 'flex', marginBottom: theme.spacing(1), alignItems: 'center' }}>
+        <Typography variant="h4" style={{ flexGrow: 1 }}>
+          {t('apikeys.title')}
+        </Typography>
+        <IconButton onClick={() => setAddApikey(true)}>
+          <AddCircleOutlineOutlinedIcon />
+        </IconButton>
+      </div>
       <Typography variant="caption" gutterBottom>
         {t('apikeys.desc')}
       </Typography>
-      <div style={{ paddingTop: sp4, paddingBottom: sp4 }}>
+      <div style={{ paddingTop: theme.spacing(4), paddingBottom: theme.spacing(4) }}>
         <Typography variant="subtitle1" gutterBottom>
           {t('apikeys.list')}
         </Typography>
@@ -164,33 +170,6 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
         )}
       </div>
 
-      <div style={{ paddingTop: sp4 }}>
-        <TextField
-          style={{ width: '100%' }}
-          size="small"
-          margin="normal"
-          variant="outlined"
-          label={t('apikeys.temp_token')}
-          onChange={handleKeyNameChange}
-          value={tempKeyName}
-        />
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
-        <div style={{ alignSelf: 'center', flexGrow: 2 }}>
-          <Select id="priv" value={tempKeyPriv} onChange={handleSelectChange} variant="outlined" margin="dense">
-            <MenuItem value="READ">{t('apikeys.r_token')}</MenuItem>
-            <MenuItem value="READ_WRITE">{t('apikeys.rw_token')}</MenuItem>
-            <MenuItem value="WRITE">{t('apikeys.w_token')}</MenuItem>
-            {configuration.auth.allow_extended_apikeys && <MenuItem value="EXTENDED">{t('apikeys.e_token')}</MenuItem>}
-          </Select>
-        </div>
-        <div style={{ alignSelf: 'flex-end', paddingLeft: sp1 }}>
-          <Button disabled={tempKeyName === ''} onClick={() => handleCreate()} color="primary" variant="contained">
-            {t('apikeys.add')}
-          </Button>
-        </div>
-      </div>
-
       <Dialog
         fullScreen={fullScreen}
         open={tempAPIKey !== null}
@@ -201,9 +180,9 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
         <DialogTitle id="new-dialog-title">{t('apikeys.new_title')}</DialogTitle>
         <DialogContent>
           <DialogContentText id="new-dialog-description" component="div">
-            <div style={{ paddingTop: sp2, paddingBottom: sp4 }}>
+            <div style={{ paddingTop: theme.spacing(2), paddingBottom: theme.spacing(4) }}>
               <Card variant="outlined" style={{ backgroundColor: theme.palette.background.default }}>
-                <div style={{ padding: sp2 }}>
+                <div style={{ padding: theme.spacing(2) }}>
                   <Typography style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>{tempAPIKey}</Typography>
                 </div>
               </Card>
@@ -244,6 +223,50 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
           </Button>
           <Button onClick={() => handleDelete()} color="primary">
             {t('apikeys.remove')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        fullScreen={fullScreen}
+        open={addApikey}
+        onClose={() => handleNew()}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {t('apikeys.add_title')}: {selectedAPIKey}
+        </DialogTitle>
+        <DialogContent>
+          <TextField
+            style={{ width: '100%' }}
+            size="small"
+            margin="normal"
+            variant="outlined"
+            label={t('apikeys.temp_token')}
+            onChange={handleKeyNameChange}
+            value={tempKeyName}
+            autoFocus
+          />
+          <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
+            <div style={{ alignSelf: 'center', flexGrow: 2 }}>
+              <Select id="priv" value={tempKeyPriv} onChange={handleSelectChange} variant="outlined" margin="dense">
+                <MenuItem value="READ">{t('apikeys.r_token')}</MenuItem>
+                <MenuItem value="READ_WRITE">{t('apikeys.rw_token')}</MenuItem>
+                <MenuItem value="WRITE">{t('apikeys.w_token')}</MenuItem>
+                {configuration.auth.allow_extended_apikeys && (
+                  <MenuItem value="EXTENDED">{t('apikeys.e_token')}</MenuItem>
+                )}
+              </Select>
+            </div>
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => handleNew()} color="primary">
+            {t('cancel')}
+          </Button>
+          <Button onClick={() => handleCreate()} color="primary" disabled={tempKeyName === null || tempKeyName === ''}>
+            {t('apikeys.add')}
           </Button>
         </DialogActions>
       </Dialog>
