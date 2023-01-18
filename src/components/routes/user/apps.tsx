@@ -16,12 +16,12 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-type APIKeysProps = {
+type AppsProps = {
   user: any;
   toggleApp: (apiKey: string) => void;
 };
 
-export default function Apps({ user, toggleApp }: APIKeysProps) {
+export default function Apps({ user, toggleApp }: AppsProps) {
   const { t } = useTranslation(['user']);
   const [selectedApp, setSelectedApp] = useState(null);
   const { apiCall } = useMyAPI();
