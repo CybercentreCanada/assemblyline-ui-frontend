@@ -180,14 +180,15 @@ function User({ width, username }: UserProps) {
     setUser({ ...user, apps: newApps });
   }
 
-  function toggleAPIKey(apiKey) {
-    const newKeys = user.apikeys;
-    if (newKeys.indexOf(apiKey) === -1) {
-      newKeys.push(apiKey);
+  function toggleAPIKey(name, apiKey) {
+    const newKeys = { ...user.apikeys };
+    if (name in user.apikeys) {
+      delete newKeys[name];
+      setUser({ ...user, apikeys: newKeys });
     } else {
-      newKeys.splice(newKeys.indexOf(apiKey), 1);
+      newKeys[name] = apiKey;
+      setUser({ ...user, apikeys: newKeys });
     }
-    setUser({ ...user, apikeys: newKeys });
   }
 
   function setName(value) {
