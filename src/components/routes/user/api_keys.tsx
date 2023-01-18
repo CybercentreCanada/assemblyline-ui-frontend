@@ -87,7 +87,7 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
   const [tempAPIKey, setTempAPIKey] = useState(null);
   const [tempKeyName, setTempKeyName] = useState('');
   const [tempKeyPriv, setTempKeyPriv] = useState('READ');
-  const [tempKeyRoles, setTempKeyRoles] = useState(null);
+  const [tempKeyRoles, setTempKeyRoles] = useState(configuration.user.priv_role_dependencies.R);
   const { apiCall } = useMyAPI();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
