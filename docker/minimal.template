@@ -32,7 +32,7 @@ server {
         proxy_set_header      Scheme                     ${DOLLAR}scheme;
         proxy_set_header      Server-Port                ${DOLLAR}server_port;
 
-        proxy_pass            http://${FRONTEND_HOST}:3000;
+        proxy_pass            https://${FRONTEND_HOST}:3000;
     }
 
     location /sockjs-node {
@@ -47,7 +47,7 @@ server {
         proxy_set_header      Upgrade         ${DOLLAR}http_upgrade;
         proxy_set_header      Connection      "upgrade";
 
-        proxy_pass            http://${FRONTEND_HOST}:3000/sockjs-node;
+        proxy_pass            https://${FRONTEND_HOST}:3000/sockjs-node;
     }
 
     location /socket.io/ {

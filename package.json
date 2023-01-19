@@ -65,8 +65,7 @@
     "web-vitals": "^3.1.1"
   },
   "scripts": {
-    "start-dev": "serve -s build",
-    "start": "BROWSER=none react-scripts start",
+    "start": "HTTPS=true BROWSER=none react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
