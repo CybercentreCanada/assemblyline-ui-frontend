@@ -6,7 +6,6 @@ import useALContext from 'components/hooks/useALContext';
 import getXSRFCookie from 'helpers/xsrf';
 import { useTranslation } from 'react-i18next';
 import { useHistory, useLocation } from 'react-router-dom';
-import ForbiddenPage from './403';
 
 const VALID_SCOPES = ['r', 'w', 'rw'];
 
@@ -30,12 +29,19 @@ export default function AppRegistration() {
     roles = rolesP.split(',').filter(r => configuration.user.roles.includes(r));
   }
 
-  return currentUser.roles.includes('obo_access') ? (
+  return (
     <Backdrop open style={{ backgroundColor: theme.palette.background.default, zIndex: 10000 }} transitionDuration={0}>
       <CardCentered>
         {getBanner(theme)}
         <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'center', justifyContent: 'center' }}>
-          {!rUrl || !clientID || (!scope && !roles) || !server || (scope && VALID_SCOPES.indexOf(scope) === -1) ? (
+          {!currentUser.roles.includes('obo_access') ? (
+            <>
+              <Typography style={{ marginBottom: '3rem' }}>{t('forbidden')}</Typography>
+              <Button variant="contained" color="primary" onClick={() => history.goBack()}>
+                {t('button.back')}
+              </Button>
+            </>
+          ) : !rUrl || !clientID || (!scope && !roles) || !server || (scope && VALID_SCOPES.indexOf(scope) === -1) ? (
             <>
               <div style={{ marginBottom: '3rem' }}>{t('invalid')}</div>
               <Button variant="contained" color="primary" onClick={() => history.goBack()}>
@@ -97,7 +103,5 @@ export default function AppRegistration() {
         </div>
       </CardCentered>
     </Backdrop>
-  ) : (
-    <ForbiddenPage />
   );
 }

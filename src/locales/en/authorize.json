@@ -4,6 +4,7 @@
   "button.allow": "Allow",
   "button.cancel": "Cancel",
   "scope": "This will allow the application to:",
+  "forbidden": "The currently logged in user is not allowed to use On Behalf Of access.",
   "invalid": "Invalid parameters were provided for the app registration. We will not be able to proceed.",
   "roles": "Use to following roles on your behalf",
   "role.administration": "Administration",

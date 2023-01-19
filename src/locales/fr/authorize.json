@@ -4,6 +4,7 @@
   "button.allow": "Permettre",
   "button.cancel": "Annuler",
   "scope": "Cela permettra à l'application de:",
+  "forbidden": "L'utilisateur actuellement connecté n'est pas autorisé à utiliser l'Accès au nom de.",
   "invalid": "Des paramètres non valides ont été fournis pour l'enregistrement de l'application. Nous ne pourrons pas continuer.",
   "roles": "Utiliser les rôles suivant en votre nom",
   "role.administration": "Administration",
