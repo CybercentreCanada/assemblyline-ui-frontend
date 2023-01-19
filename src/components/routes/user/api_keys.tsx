@@ -11,6 +11,7 @@ import {
   Paper,
   Select,
   TextField,
+  Tooltip,
   Typography,
   useMediaQuery,
   useTheme
@@ -69,7 +70,7 @@ const APIKeyCard = ({ name, apikey, askForDelete }: APIKeyCardProps) => {
         </div>
       </div>
       <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-        {apikey.roles?.map((e, x) => (
+        {apikey.roles?.sort().map((e, x) => (
           <div key={x} style={{ marginRight: theme.spacing(0.5), marginBottom: theme.spacing(0.25) }}>
             <CustomChip type="rounded" label={t(`role.${e}`)} size="tiny" color="primary" />
           </div>
@@ -83,7 +84,7 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
   const { t } = useTranslation(['user']);
   const [selectedAPIKey, setSelectedAPIKey] = useState(null);
   const [addApikey, setAddApikey] = useState(false);
-  const { configuration } = useALContext();
+  const { configuration, user: currentUser } = useALContext();
   const [tempAPIKey, setTempAPIKey] = useState(null);
   const [tempKeyName, setTempKeyName] = useState('');
   const [tempKeyPriv, setTempKeyPriv] = useState('READ');
@@ -114,7 +115,10 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
       onSuccess: api_data => {
         setAddApikey(false);
         setTempAPIKey(api_data.api_response.apikey);
-        toggleAPIKey(tempKeyName, { acl: configuration.user.api_priv_map[tempKeyPriv], roles: tempKeyRoles });
+        toggleAPIKey(api_data.api_response.name, {
+          acl: api_data.api_response.acl,
+          roles: api_data.api_response.roles
+        });
       }
     });
   }
@@ -129,6 +133,29 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
 
   function handleSelectChange(event) {
     setTempKeyPriv(event.target.value);
+    const acl = configuration.user.api_priv_map[event.target.value];
+    let roles = [];
+    if (acl) {
+      for (const ac of acl) {
+        const aclRoles = configuration.user.priv_role_dependencies[ac];
+        if (aclRoles) {
+          roles.push(...aclRoles.filter(r => currentUser.roles.includes(r)));
+        }
+      }
+    }
+    setTempKeyRoles(roles);
+  }
+
+  function toggleRole(role) {
+    const newRoles = [...tempKeyRoles];
+    if (newRoles.indexOf(role) === -1) {
+      newRoles.push(role);
+    } else {
+      newRoles.splice(newRoles.indexOf(role), 1);
+    }
+
+    setTempKeyPriv('CUSTOM');
+    setTempKeyRoles(newRoles);
   }
 
   function handleNew() {
@@ -136,6 +163,7 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
     setTempAPIKey(null);
     setTempKeyName('');
     setTempKeyPriv('READ');
+    setTempKeyRoles(configuration.user.priv_role_dependencies.R);
   }
 
   function askForDelete(securityToken) {
@@ -148,9 +176,16 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
         <Typography variant="h4" style={{ flexGrow: 1 }}>
           {t('apikeys.title')}
         </Typography>
-        <IconButton onClick={() => setAddApikey(true)}>
-          <AddCircleOutlineOutlinedIcon />
-        </IconButton>
+        <Tooltip title={t('apikeys.add')}>
+          <IconButton
+            onClick={() => setAddApikey(true)}
+            style={{
+              color: theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark
+            }}
+          >
+            <AddCircleOutlineOutlinedIcon />
+          </IconButton>
+        </Tooltip>
       </div>
       <Typography variant="caption" gutterBottom>
         {t('apikeys.desc')}
@@ -234,9 +269,7 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">
-          {t('apikeys.add_title')}: {selectedAPIKey}
-        </DialogTitle>
+        <DialogTitle id="alert-dialog-title">{t('apikeys.add_title')}</DialogTitle>
         <DialogContent>
           <TextField
             style={{ width: '100%' }}
@@ -257,15 +290,32 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
                 {configuration.auth.allow_extended_apikeys && (
                   <MenuItem value="EXTENDED">{t('apikeys.e_token')}</MenuItem>
                 )}
+                <MenuItem value="CUSTOM">{t('apikeys.c_token')}</MenuItem>
               </Select>
             </div>
+          </div>
+          <div style={{ marginTop: theme.spacing(2) }}>
+            {currentUser.roles.sort().map((role, role_id) => (
+              <CustomChip
+                key={role_id}
+                type="rounded"
+                size="small"
+                color={tempKeyRoles.includes(role) ? 'primary' : 'default'}
+                onClick={() => toggleRole(role)}
+                label={t(`role.${role}`)}
+              />
+            ))}
           </div>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => handleNew()} color="primary">
             {t('cancel')}
           </Button>
-          <Button onClick={() => handleCreate()} color="primary" disabled={tempKeyName === null || tempKeyName === ''}>
+          <Button
+            onClick={() => handleCreate()}
+            color="primary"
+            disabled={tempKeyName === null || tempKeyName === '' || tempKeyRoles.length === 0}
+          >
             {t('apikeys.add')}
           </Button>
         </DialogActions>
