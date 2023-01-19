@@ -1,4 +1,4 @@
-import { adaptV4Theme, createTheme } from '@mui/material';
+import { createTheme, CSSObject } from '@mui/material/styles';
 import { useMemo } from 'react';
 
 export type AppThemeProps = {
@@ -56,28 +56,39 @@ const useAppTheme = (isDark: boolean, colors: AppThemeProps) => {
       }
     }
 
-    return createTheme(
-      adaptV4Theme({
-        overrides: {
-          MuiCssBaseline: {
-            '@global': {
-              body: {
-                width: '100%',
-                height: '100%'
-              },
-              '#root': {
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0
-              }
+    return createTheme({
+      components: {
+        ...theme.components,
+        MuiCssBaseline: {
+          ...(theme.components?.MuiCssBaseline || {}),
+          styleOverrides: {
+            ...((theme.components.MuiCssBaseline?.styleOverrides as CSSObject) || {}),
+            html: {
+              width: '100%',
+              height: '100%'
+            },
+            body: {
+              width: '100%',
+              height: '100%'
+            },
+            '#root': {
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0
             }
           }
         },
-        palette
-      })
-    );
+        MuiUseMediaQuery: {
+          ...(theme.components.MuiUseMediaQuery || {}),
+          defaultProps: {
+            noSsr: true
+          }
+        }
+      },
+      palette
+    });
   }, [colors, isDark]);
   return [theme];
 };

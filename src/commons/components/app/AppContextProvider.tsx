@@ -1,14 +1,4 @@
-import {
-  Button,
-  CssBaseline,
-  Paper,
-  ThemeProvider,
-  Theme,
-  StyledEngineProvider,
-  Typography,
-  useMediaQuery,
-  useTheme
-} from '@mui/material';
+import { Button, CssBaseline, Paper, Theme, Typography, useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppTheme, { AppThemeProps } from 'commons/components/hooks/useAppTheme';
 import { SnackbarProvider } from 'notistack';
@@ -185,53 +175,9 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function ErrorFallback({ error, resetErrorBoundary }) {
-  const { t } = useTranslation();
-  const theme = useTheme();
-  const classes = useStyles();
-  const downSM = useMediaQuery(theme.breakpoints.down('xl'));
-  const isXS = useMediaQuery(theme.breakpoints.only('xs'));
-
-  return (
-    <div role="alert">
-      <CssBaseline />
-      <PageCenter width={isXS ? '100%' : '70%'} margin={4}>
-        <div style={{ paddingTop: theme.spacing(10), fontSize: 200, color: theme.palette.secondary.main }}>
-          <GiSpottedBug fontSize="inherit" className={classes.bug} />
-        </div>
-        <Typography variant={downSM ? 'h4' : 'h3'} gutterBottom>
-          {t('error.title')}
-        </Typography>
-        <Typography variant={downSM ? 'body1' : 'h6'} gutterBottom>
-          {t('error.description')}
-        </Typography>
-        <Paper
-          component="pre"
-          variant="outlined"
-          style={{
-            padding: theme.spacing(2),
-            whiteSpace: 'pre-wrap',
-            wordBreak: 'break-word',
-            minHeight: downSM ? theme.spacing(8) : theme.spacing(16),
-            display: 'flex',
-            alignContent: 'center',
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}
-        >
-          {error.message}
-        </Paper>
-        <Button onClick={resetErrorBoundary} style={{ margin: theme.spacing(4) }} color="primary">
-          {t('error.button')}
-        </Button>
-      </PageCenter>
-    </div>
-  );
-}
-
 // Implementation of the AppContext provider component.
 // This should be the root application component renderered by the index.tsx into the dom element-id 'root'
-const AppContextProvider: React.FC<AppProviderProps> = ({ defaultTheme, colors, defaultContext, children }) => {
+const AppThemeInit: React.FC<any> = ({ defaultTheme, colors, defaultContext, children }) => {
   // Application provided context.
   const [context, setContext] = useState<any>(defaultContext);
   const classes = useStyles();
@@ -297,19 +243,147 @@ const AppContextProvider: React.FC<AppProviderProps> = ({ defaultTheme, colors, 
         getAppbarStyles
       }}
     >
-      <StyledEngineProvider injectFirst>
-        <ThemeProvider theme={appTheme}>
-          <ErrorBoundary
-            FallbackComponent={ErrorFallback}
-            onReset={() => {
-              window.location.reload();
-            }}
-          >
-            <SnackbarProvider classes={{ root: classes.snackroot }}>{children}</SnackbarProvider>
-          </ErrorBoundary>
-        </ThemeProvider>
-      </StyledEngineProvider>
+      {/* <StyledEngineProvider injectFirst>
+        <ThemeProvider theme={appTheme}> */}
+      <ErrorBoundary
+        FallbackComponent={ErrorFallback}
+        onReset={() => {
+          window.location.reload();
+        }}
+      >
+        <SnackbarProvider classes={{ root: classes.snackroot }}>{children}</SnackbarProvider>
+      </ErrorBoundary>
+      {/* </ThemeProvider>
+      </StyledEngineProvider> */}
     </AppContext.Provider>
+  );
+};
+
+function ErrorFallback({ error, resetErrorBoundary }) {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const classes = useStyles();
+  const downSM = useMediaQuery(theme.breakpoints.down('xl'));
+  const isXS = useMediaQuery(theme.breakpoints.only('xs'));
+
+  return (
+    <div role="alert">
+      <CssBaseline />
+      <PageCenter width={isXS ? '100%' : '70%'} margin={4}>
+        <div style={{ paddingTop: theme.spacing(10), fontSize: 200, color: theme.palette.secondary.main }}>
+          <GiSpottedBug fontSize="inherit" className={classes.bug} />
+        </div>
+        <Typography variant={downSM ? 'h4' : 'h3'} gutterBottom>
+          {t('error.title')}
+        </Typography>
+        <Typography variant={downSM ? 'body1' : 'h6'} gutterBottom>
+          {t('error.description')}
+        </Typography>
+        <Paper
+          component="pre"
+          variant="outlined"
+          style={{
+            padding: theme.spacing(2),
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word',
+            minHeight: downSM ? theme.spacing(8) : theme.spacing(16),
+            display: 'flex',
+            alignContent: 'center',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}
+        >
+          {error.message}
+        </Paper>
+        <Button onClick={resetErrorBoundary} style={{ margin: theme.spacing(4) }} color="primary">
+          {t('error.button')}
+        </Button>
+      </PageCenter>
+    </div>
+  );
+}
+
+// Implementation of the AppContext provider component.
+// This should be the root application component renderered by the index.tsx into the dom element-id 'root'
+const AppContextProvider: React.FC<AppProviderProps> = ({ defaultTheme, colors, defaultContext, children }) => {
+  // Application provided context.
+  const [context, setContext] = useState<any>(defaultContext);
+  const classes = useStyles();
+
+  // // Theme state.
+  // const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  // const [theme, setTheme] = useState<'dark' | 'light'>(getInitialTheme(defaultTheme, prefersDarkMode));
+
+  // // Theme toggle handler.
+  // const toggleTheme = () => {
+  //   const newTheme = theme === 'dark' ? 'light' : 'dark';
+  //   localStorage.setItem('darkMode', JSON.stringify(newTheme === 'dark'));
+  //   setTheme(newTheme);
+  // };
+
+  // // Build the theme.
+  // const [appTheme] = useAppTheme(theme === 'dark', colors);
+
+  // // Compute appbar styles for specified layout.
+  // const getAppbarStyles = (layout: 'side' | 'top'): AppbarStyles => {
+  //   const isTopLayout = layout === 'top';
+  //   const isDarkTheme = theme === 'dark';
+  //   const isLightTheme = theme === 'light';
+
+  //   // Compute background color.
+  //   let backgroundColor = isTopLayout ? appTheme.palette.primary.dark : appTheme.palette.background.default;
+  //   if (isTopLayout) {
+  //     if (isDarkTheme && colors.appbar?.sticky?.dark) {
+  //       backgroundColor = colors.appbar.sticky.dark.backgroundColor;
+  //     }
+  //     if (isLightTheme && colors.appbar?.sticky?.light) {
+  //       backgroundColor = colors.appbar.sticky.light.backgroundColor;
+  //     }
+  //   }
+
+  //   // Compute elevation.
+  //   const elevation = isTopLayout
+  //     ? colors.appbar?.sticky?.elevation !== undefined
+  //       ? colors.appbar?.sticky?.elevation
+  //       : 2
+  //     : 0;
+
+  //   // Wrap it up and send-it!
+  //   return {
+  //     color: appTheme.palette.getContrastText(backgroundColor),
+  //     backgroundColor,
+  //     elevation
+  //   };
+  // };
+
+  // Initialize app context provider, theme, snackbar and render children component.
+  // Snackbar needs to be rendered as child of theme provider.  CSS glitches ensues if not the case.
+  return (
+    // <AppContext.Provider
+    //   value={{
+    //     context,
+    //     theme,
+    //     colors,
+    //     isDarkTheme: theme === 'dark',
+    //     isLightTheme: theme === 'light',
+    //     toggleTheme,
+    //     setContext,
+    //     getAppbarStyles
+    //   }}
+    // >
+    //    <StyledEngineProvider injectFirst>
+    //     <ThemeProvider theme={appTheme}>
+    <ErrorBoundary
+      FallbackComponent={ErrorFallback}
+      onReset={() => {
+        window.location.reload();
+      }}
+    >
+      <SnackbarProvider classes={{ root: classes.snackroot }}>{children}</SnackbarProvider>
+    </ErrorBoundary>
+    //  </ThemeProvider>
+    //   </StyledEngineProvider>
+    // </AppContext.Provider>
   );
 };
 

@@ -1,3 +1,5 @@
+import { StyledEngineProvider, ThemeProvider } from '@mui/material';
+import { createTheme } from '@mui/material/styles';
 import AppContextProvider from 'commons/components/app/AppContextProvider';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import AppLayoutProvider from 'commons/components/layout/LayoutProvider';
@@ -106,6 +108,16 @@ const AppInit: React.FC = () => {
   );
 };
 
+const appTheme = createTheme();
+
+const AppThemeInit = ({ children }) => {
+  return (
+    <StyledEngineProvider injectFirst>
+      <ThemeProvider theme={appTheme}>{children}</ThemeProvider>
+    </StyledEngineProvider>
+  );
+};
+
 // Main Application entry component.
 // This will initialize things like theme and snackar providers which will then be available
 //  from this point on.
@@ -117,9 +129,11 @@ const App = () => {
     lightSecondary: '#939dac'
   };
   return (
-    <AppContextProvider defaultTheme="light" colors={colors}>
-      <AppInit />
-    </AppContextProvider>
+    <AppThemeInit>
+      <AppContextProvider defaultTheme="light" colors={colors}>
+        <AppInit />
+      </AppContextProvider>
+    </AppThemeInit>
   );
 };
 
