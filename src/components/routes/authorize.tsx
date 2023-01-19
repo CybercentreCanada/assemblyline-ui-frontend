@@ -16,14 +16,19 @@ export default function AppRegistration() {
   const { t } = useTranslation(['authorize']);
   const theme = useTheme();
   const { getBanner } = useAppLayout();
-  const { user: currentUser } = useALContext();
+  const { configuration, user: currentUser } = useALContext();
 
   const params = new URLSearchParams(location.search);
   const rUrl = params.get('redirect_url');
   const clientID = params.get('client_id');
   const scope = params.get('scope');
-  const roles = params.get('roles');
+  const rolesP = params.get('roles');
   const server = params.get('server');
+
+  let roles = [];
+  if (rolesP) {
+    roles = rolesP.split(',').filter(r => configuration.user.roles.includes(r));
+  }
 
   return currentUser.roles.includes('obo_access') ? (
     <Backdrop open style={{ backgroundColor: theme.palette.background.default, zIndex: 10000 }} transitionDuration={0}>
@@ -55,12 +60,12 @@ export default function AppRegistration() {
                   {t(`scope.${scope}`)}
                 </Typography>
               )}
-              {roles && (
+              {roles.length > 0 && (
                 <>
                   <Typography variant="caption" color="secondary" gutterBottom style={{ marginTop: '1rem' }}>
                     {t(`roles`)}
                   </Typography>
-                  {roles.split(',').map(role => (
+                  {roles.map(role => (
                     <Typography variant="caption">{t(`role.${role}`)}</Typography>
                   ))}
                 </>
