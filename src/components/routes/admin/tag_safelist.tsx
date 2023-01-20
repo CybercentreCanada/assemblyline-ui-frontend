@@ -10,9 +10,9 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import useAppContext from 'commons/components/hooks/useAppContext';
-import useUser from 'commons/components/hooks/useAppUser';
-import PageFullSize from 'commons/components/layout/pages/PageFullSize';
+import useAppContext from 'commons_deprecated/components/hooks/useAppContext';
+import useUser from 'commons_deprecated/components/hooks/useAppUser';
+import PageFullSize from 'commons_deprecated/components/layout/pages/PageFullSize';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';

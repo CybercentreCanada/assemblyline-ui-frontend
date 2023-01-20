@@ -1,4 +1,4 @@
-import { isArrowDown, isArrowLeft, isArrowRight, isArrowUp } from 'commons/addons/elements/utils/keyboard';
+import { isArrowDown, isArrowLeft, isArrowRight, isArrowUp } from 'commons_deprecated/addons/elements/utils/keyboard';
 import { useCallback } from 'react';
 import {
   DEFAULT_STORE,

@@ -1,7 +1,7 @@
 import { ClickAwayListener, Fade, Paper, Popper } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
-import { isEnter, isEscape } from 'commons/addons/elements/utils/keyboard';
+import { isEnter, isEscape } from 'commons_deprecated/addons/elements/utils/keyboard';
 import { default as React, forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 
 const useHexStyles = makeStyles(theme => ({

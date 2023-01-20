@@ -4,8 +4,8 @@ import CenterFocusStrongOutlinedIcon from '@mui/icons-material/CenterFocusStrong
 import { IconButton, Paper, Tab, Tabs, Theme, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
-import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
-import PageHeader from 'commons/components/layout/pages/PageHeader';
+import PageFullWidth from 'commons_deprecated/components/layout/pages/PageFullWidth';
+import PageHeader from 'commons_deprecated/components/layout/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';

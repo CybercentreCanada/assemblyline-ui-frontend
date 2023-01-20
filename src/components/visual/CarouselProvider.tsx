@@ -1,11 +1,11 @@
-import { alpha, Box, CircularProgress, Drawer, IconButton, Tooltip, Typography } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import BrokenImageOutlinedIcon from '@mui/icons-material/BrokenImageOutlined';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import { alpha, Box, CircularProgress, Drawer, IconButton, Tooltip, Typography } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
-import Carousel from 'commons/addons/elements/carousel/Carousel';
+import Carousel from 'commons_deprecated/addons/elements/carousel/Carousel';
 import useMyAPI from 'components/hooks/useMyAPI';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -350,24 +350,19 @@ function CarouselProvider(props: CarouselProviderProps) {
                   </div>
                 </div>
 
-                <IconButton
-                  className={clsx(classes.button, classes.closeButton)}
-                  onClick={closeCarousel}
-                  size="large">
+                <IconButton className={clsx(classes.button, classes.closeButton)} onClick={closeCarousel} size="large">
                   <CloseOutlinedIcon />
                 </IconButton>
 
                 <IconButton
                   className={clsx(classes.button, classes.beforeButton)}
                   onClick={onPreviousImage}
-                  size="large">
+                  size="large"
+                >
                   <NavigateBeforeIcon />
                 </IconButton>
 
-                <IconButton
-                  className={clsx(classes.button, classes.nextButton)}
-                  onClick={onNextImage}
-                  size="large">
+                <IconButton className={clsx(classes.button, classes.nextButton)} onClick={onNextImage} size="large">
                   <NavigateNextIcon />
                 </IconButton>
               </Carousel>

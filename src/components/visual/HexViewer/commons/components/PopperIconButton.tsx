@@ -2,7 +2,7 @@ import AdbIcon from '@mui/icons-material/Adb';
 import { ClickAwayListener, Fade, Popper } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
-import { isEscape } from 'commons/addons/elements/utils/keyboard';
+import { isEscape } from 'commons_deprecated/addons/elements/utils/keyboard';
 import { default as React, forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 import { TooltipIconButton } from '.';
 

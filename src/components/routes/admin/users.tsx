@@ -17,8 +17,8 @@ import {
 } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
-import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
-import PageHeader from 'commons/components/layout/pages/PageHeader';
+import PageFullWidth from 'commons_deprecated/components/layout/pages/PageFullWidth';
+import PageHeader from 'commons_deprecated/components/layout/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';

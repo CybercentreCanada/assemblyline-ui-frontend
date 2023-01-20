@@ -1,4 +1,4 @@
-import { LineItem } from 'commons/addons/elements/lists/item/ListItemBase';
+import { LineItem } from 'commons_deprecated/addons/elements/lists/item/ListItemBase';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { ALField } from 'components/hooks/useMyUser';

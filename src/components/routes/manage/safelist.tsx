@@ -4,8 +4,8 @@ import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined
 import { useMediaQuery, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
-import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
-import PageHeader from 'commons/components/layout/pages/PageHeader';
+import PageFullWidth from 'commons_deprecated/components/layout/pages/PageFullWidth';
+import PageHeader from 'commons_deprecated/components/layout/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';

@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import { Box, ClickAwayListener, TextField, useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import { insertText } from 'commons/addons/elements/utils/browser';
+import { insertText } from 'commons_deprecated/addons/elements/utils/browser';
 import {
   isArrowDown,
   isArrowLeft,
@@ -9,7 +9,7 @@ import {
   isArrowUp,
   isEnter,
   isEscape
-} from 'commons/addons/elements/utils/keyboard';
+} from 'commons_deprecated/addons/elements/utils/keyboard';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

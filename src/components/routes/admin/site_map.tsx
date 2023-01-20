@@ -15,8 +15,8 @@ import {
 } from '@mui/material';
 import createStyles from '@mui/styles/createStyles';
 import withStyles from '@mui/styles/withStyles';
-import useUser from 'commons/components/hooks/useAppUser';
-import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
+import useUser from 'commons_deprecated/components/hooks/useAppUser';
+import PageFullWidth from 'commons_deprecated/components/layout/pages/PageFullWidth';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import CustomChip from 'components/visual/CustomChip';

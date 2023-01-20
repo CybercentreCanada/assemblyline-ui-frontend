@@ -1,8 +1,8 @@
 import { loader } from '@monaco-editor/react';
 import { Alert, Grid, Hidden, Paper, Tab, Tabs, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import useUser from 'commons/components/hooks/useAppUser';
-import PageFullSize from 'commons/components/layout/pages/PageFullSize';
+import useUser from 'commons_deprecated/components/hooks/useAppUser';
+import PageFullSize from 'commons_deprecated/components/layout/pages/PageFullSize';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import { RouterPrompt } from 'components/visual/RouterPrompt';

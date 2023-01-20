@@ -2,8 +2,8 @@
 import { Box, Button, CircularProgress, Link, Theme, Typography, useTheme } from '@mui/material';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
-import useAppLayout from 'commons/components/hooks/useAppLayout';
-import CardCentered from 'commons/components/layout/pages/CardCentered';
+import useAppLayout from 'commons_deprecated/components/hooks/useAppLayout';
+import CardCentered from 'commons_deprecated/components/layout/pages/CardCentered';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { OAuthLogin } from 'components/routes/login/oauth';

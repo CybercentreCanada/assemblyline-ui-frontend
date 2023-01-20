@@ -9,7 +9,7 @@ import { Theme } from '@mui/material/styles';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
-import { isArrowDown, isArrowUp, isEnter } from 'commons/addons/elements/utils/keyboard';
+import { isArrowDown, isArrowUp, isEnter } from 'commons_deprecated/addons/elements/utils/keyboard';
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 const useStyles = makeStyles((theme: Theme) =>

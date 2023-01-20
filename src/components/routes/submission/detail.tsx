@@ -19,7 +19,7 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import PageCenter from 'commons/components/layout/pages/PageCenter';
+import PageCenter from 'commons_deprecated/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useHighlighter from 'components/hooks/useHighlighter';

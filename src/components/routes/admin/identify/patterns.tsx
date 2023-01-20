@@ -1,3 +1,4 @@
+import Editor, { DiffEditor, loader } from '@monaco-editor/react';
 import {
   Button,
   Dialog,
@@ -5,12 +6,11 @@ import {
   DialogContent,
   DialogTitle,
   Grid,
+  Skeleton,
   Typography,
   useTheme
 } from '@mui/material';
-import { Skeleton } from '@mui/material';
-import Editor, { DiffEditor, loader } from '@monaco-editor/react';
-import useAppContext from 'commons/components/hooks/useAppContext';
+import useAppContext from 'commons_deprecated/components/hooks/useAppContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import React, { useEffect, useRef, useState } from 'react';
@@ -58,117 +58,119 @@ function WrappedPatterns({ reload, patternsFile, originalPatternsFile, setPatter
     editor.focus();
   };
 
-  return <>
-    <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby="dialog-title" fullWidth maxWidth="md">
-      <DialogTitle id="dialog-title">{t('save.title')}</DialogTitle>
-      <DialogContent>
-        <div style={{ border: `1px solid ${theme.palette.divider}` }}>
-          <ReactResizeDetector handleWidth targetRef={containerDialogEL}>
-            {({ width }) => (
-              <div ref={containerDialogEL}>
-                <DiffEditor
-                  language="patterns"
-                  theme={isDarkTheme ? 'vs-dark' : 'vs'}
-                  original={originalPatternsFile}
-                  width={width}
-                  height="50vh"
-                  loading={t('loading.patterns')}
-                  modified={patternsFile}
-                  options={{ renderSideBySide: false, readOnly: true }}
-                />
+  return (
+    <>
+      <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby="dialog-title" fullWidth maxWidth="md">
+        <DialogTitle id="dialog-title">{t('save.title')}</DialogTitle>
+        <DialogContent>
+          <div style={{ border: `1px solid ${theme.palette.divider}` }}>
+            <ReactResizeDetector handleWidth targetRef={containerDialogEL}>
+              {({ width }) => (
+                <div ref={containerDialogEL}>
+                  <DiffEditor
+                    language="patterns"
+                    theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                    original={originalPatternsFile}
+                    width={width}
+                    height="50vh"
+                    loading={t('loading.patterns')}
+                    modified={patternsFile}
+                    options={{ renderSideBySide: false, readOnly: true }}
+                  />
+                </div>
+              )}
+            </ReactResizeDetector>
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpen(false)} color="secondary">
+            {t('save.cancelText')}
+          </Button>
+          <Button onClick={() => saveChanges(patternsFile)} color="primary">
+            {t('save.acceptText')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Grid container justifyContent="flex-end" spacing={1} style={{ marginBottom: theme.spacing(1) }}>
+        <Grid item style={{ flexGrow: 1 }}>
+          <div>
+            <Typography variant="h5">{t('title.patterns')}</Typography>
+          </div>
+        </Grid>
+        <Grid item>
+          <Grid container spacing={1}>
+            <Grid item>
+              <Button size="small" variant="outlined" onClick={() => reload(true, setOpen)}>
+                {t('reset')}
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                size="small"
+                variant="contained"
+                onClick={() => setPatternsFile(originalPatternsFile)}
+                disabled={patternsFile === originalPatternsFile}
+              >
+                {t('undo')}
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                variant="contained"
+                size="small"
+                color="primary"
+                disabled={patternsFile === originalPatternsFile}
+                onClick={() => setOpen(true)}
+              >
+                {t('save')}
+              </Button>
+            </Grid>
+          </Grid>
+        </Grid>
+      </Grid>
+      <div
+        ref={containerEL}
+        style={{
+          flexGrow: 1,
+          border: `1px solid ${theme.palette.divider}`,
+          position: 'relative'
+        }}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0
+          }}
+        >
+          <ReactResizeDetector handleHeight handleWidth targetRef={containerEL}>
+            {({ width, height }) => (
+              <div ref={containerEL}>
+                {patternsFile !== null ? (
+                  <>
+                    <Editor
+                      language="yaml"
+                      width={width}
+                      height={height}
+                      theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                      loading={t('loading.patterns')}
+                      value={patternsFile}
+                      onChange={setPatternsFile}
+                      onMount={onMount}
+                    />
+                  </>
+                ) : (
+                  <Skeleton width={width} height={height} variant="rectangular" animation="wave" />
+                )}
               </div>
             )}
           </ReactResizeDetector>
         </div>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={() => setOpen(false)} color="secondary">
-          {t('save.cancelText')}
-        </Button>
-        <Button onClick={() => saveChanges(patternsFile)} color="primary">
-          {t('save.acceptText')}
-        </Button>
-      </DialogActions>
-    </Dialog>
-    <Grid container justifyContent="flex-end" spacing={1} style={{ marginBottom: theme.spacing(1) }}>
-      <Grid item style={{ flexGrow: 1 }}>
-        <div>
-          <Typography variant="h5">{t('title.patterns')}</Typography>
-        </div>
-      </Grid>
-      <Grid item>
-        <Grid container spacing={1}>
-          <Grid item>
-            <Button size="small" variant="outlined" onClick={() => reload(true, setOpen)}>
-              {t('reset')}
-            </Button>
-          </Grid>
-          <Grid item>
-            <Button
-              size="small"
-              variant="contained"
-              onClick={() => setPatternsFile(originalPatternsFile)}
-              disabled={patternsFile === originalPatternsFile}
-            >
-              {t('undo')}
-            </Button>
-          </Grid>
-          <Grid item>
-            <Button
-              variant="contained"
-              size="small"
-              color="primary"
-              disabled={patternsFile === originalPatternsFile}
-              onClick={() => setOpen(true)}
-            >
-              {t('save')}
-            </Button>
-          </Grid>
-        </Grid>
-      </Grid>
-    </Grid>
-    <div
-      ref={containerEL}
-      style={{
-        flexGrow: 1,
-        border: `1px solid ${theme.palette.divider}`,
-        position: 'relative'
-      }}
-    >
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          bottom: 0,
-          left: 0,
-          right: 0
-        }}
-      >
-        <ReactResizeDetector handleHeight handleWidth targetRef={containerEL}>
-          {({ width, height }) => (
-            <div ref={containerEL}>
-              {patternsFile !== null ? (
-                <>
-                  <Editor
-                    language="yaml"
-                    width={width}
-                    height={height}
-                    theme={isDarkTheme ? 'vs-dark' : 'vs'}
-                    loading={t('loading.patterns')}
-                    value={patternsFile}
-                    onChange={setPatternsFile}
-                    onMount={onMount}
-                  />
-                </>
-              ) : (
-                <Skeleton width={width} height={height} variant="rectangular" animation="wave" />
-              )}
-            </div>
-          )}
-        </ReactResizeDetector>
       </div>
-    </div>
-  </>;
+    </>
+  );
 }
 
 const Patterns = React.memo(WrappedPatterns);

@@ -18,8 +18,8 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import useUser from 'commons/components/hooks/useAppUser';
-import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
+import useUser from 'commons_deprecated/components/hooks/useAppUser';
+import PageFullWidth from 'commons_deprecated/components/layout/pages/PageFullWidth';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';

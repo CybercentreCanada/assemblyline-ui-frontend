@@ -1,5 +1,5 @@
 import { CircularProgress, useTheme } from '@mui/material';
-import useAppLayout from 'commons/components/hooks/useAppLayout';
+import useAppLayout from 'commons_deprecated/components/hooks/useAppLayout';
 
 function LoadingScreen() {
   const theme = useTheme();

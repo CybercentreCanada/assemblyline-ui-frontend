@@ -1,8 +1,8 @@
 import { Button, CircularProgress, Link, Typography, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import Skeleton from '@mui/material/Skeleton';
-import useAppLayout from 'commons/components/hooks/useAppLayout';
-import PageCenter from 'commons/components/layout/pages/PageCenter';
+import makeStyles from '@mui/styles/makeStyles';
+import useAppLayout from 'commons_deprecated/components/hooks/useAppLayout';
+import PageCenter from 'commons_deprecated/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import NotFoundPage from 'components/routes/404_dl';

@@ -1,6 +1,5 @@
-import { Typography, useTheme } from '@mui/material';
-import { Skeleton } from '@mui/material';
-import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
+import { Skeleton, Typography, useTheme } from '@mui/material';
+import PageFullWidth from 'commons_deprecated/components/layout/pages/PageFullWidth';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';

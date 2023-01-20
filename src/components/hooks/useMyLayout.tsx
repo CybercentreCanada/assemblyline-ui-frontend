@@ -23,7 +23,7 @@ import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import SimCardOutlinedIcon from '@mui/icons-material/SimCardOutlined';
 import SupervisorAccountOutlinedIcon from '@mui/icons-material/SupervisorAccountOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
-import { AppLayoutProps } from 'commons/components/layout/LayoutProvider';
+import { AppLayoutProps } from 'commons_deprecated/components/layout/LayoutProvider';
 import { Notification } from 'components/visual/Notification';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';

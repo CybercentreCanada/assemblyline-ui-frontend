@@ -1,3 +1,11 @@
+import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
+import CardMembershipOutlinedIcon from '@mui/icons-material/CardMembershipOutlined';
+import DnsOutlinedIcon from '@mui/icons-material/DnsOutlined';
+import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
+import NoEncryptionOutlinedIcon from '@mui/icons-material/NoEncryptionOutlined';
+import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
+import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
+import VpnKeyOutlinedIcon from '@mui/icons-material/VpnKeyOutlined';
 import {
   Button,
   Card,
@@ -6,29 +14,21 @@ import {
   Divider,
   Grid,
   IconButton,
+  Skeleton,
   Tooltip,
   Typography,
   useMediaQuery,
-  useTheme,
+  useTheme
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
-import CardMembershipOutlinedIcon from '@mui/icons-material/CardMembershipOutlined';
-import DnsOutlinedIcon from '@mui/icons-material/DnsOutlined';
-import { RouterPrompt } from 'components/visual/RouterPrompt';
-import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
-import NoEncryptionOutlinedIcon from '@mui/icons-material/NoEncryptionOutlined';
-import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
-import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
-import VpnKeyOutlinedIcon from '@mui/icons-material/VpnKeyOutlined';
-import { Skeleton } from '@mui/material';
-import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
+import PageFullWidth from 'commons_deprecated/components/layout/pages/PageFullWidth';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
+import { RouterPrompt } from 'components/visual/RouterPrompt';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DiGitBranch } from 'react-icons/di';
@@ -207,91 +207,96 @@ const WrappedSourceDetailDrawer = ({ service, base, close, generatesSignatures }
     });
   };
 
-  return source && (
-    <div style={{ paddingTop: theme.spacing(2) }}>
-      <ConfirmationDialog
-        open={deleteDialog}
-        handleClose={() => setDeleteDialog(false)}
-        handleAccept={executeDeleteSource}
-        title={t('delete.title')}
-        cancelText={t('delete.cancelText')}
-        acceptText={t('delete.acceptText')}
-        text={t('delete.text')}
-        waiting={buttonLoading}
-      />
+  return (
+    source && (
+      <div style={{ paddingTop: theme.spacing(2) }}>
+        <ConfirmationDialog
+          open={deleteDialog}
+          handleClose={() => setDeleteDialog(false)}
+          handleAccept={executeDeleteSource}
+          title={t('delete.title')}
+          cancelText={t('delete.cancelText')}
+          acceptText={t('delete.acceptText')}
+          text={t('delete.text')}
+          waiting={buttonLoading}
+        />
 
-      <div style={{ paddingBottom: theme.spacing(2) }}>
-        <Grid container alignItems="center">
-          <Grid item xs>
-            <Typography variant="h4">{service}</Typography>
-            <Typography variant="caption">
-              {`${t(base ? 'editing_source' : 'adding_source')}${base ? ` (${base.name})` : ''}`}
-            </Typography>
-          </Grid>
-          {base && (
-            <Grid item xs style={{ textAlign: 'right', flexGrow: 1 }}>
-              {generatesSignatures && (
-                <Tooltip title={t('view_signatures')}>
-                  <IconButton
-                    style={{
-                      color: theme.palette.mode === 'dark' ? '#F' : '#0'
-                    }}
-                    component={Link}
-                    to={`/manage/signatures/?query=${encodeURIComponent(
-                      `type:${service.toLowerCase()} AND source:${source.name}`
-                    )}`}
-                    size="large">
-                    <FingerprintOutlinedIcon />
-                  </IconButton>
-                </Tooltip>
-              )}
-              {base && (
-                <Tooltip title={t('update')}>
-                  <IconButton
-                    style={{
-                      color: isSourceUpdating(source)
-                        ? theme.palette.action.disabled
-                        : theme.palette.mode === 'dark'
-                        ? theme.palette.info.light
-                        : theme.palette.info.dark
-                    }}
-                    disabled={isSourceUpdating(source)}
-                    onClick={triggerSourceUpdate}
-                    size="large">
-                    <SystemUpdateAltIcon />
-                  </IconButton>
-                </Tooltip>
-              )}
-              <Tooltip title={t('delete')}>
-                <IconButton
-                  style={{
-                    color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                  }}
-                  onClick={deleteSource}
-                  size="large">
-                  <RemoveCircleOutlineOutlinedIcon />
-                </IconButton>
-              </Tooltip>
+        <div style={{ paddingBottom: theme.spacing(2) }}>
+          <Grid container alignItems="center">
+            <Grid item xs>
+              <Typography variant="h4">{service}</Typography>
+              <Typography variant="caption">
+                {`${t(base ? 'editing_source' : 'adding_source')}${base ? ` (${base.name})` : ''}`}
+              </Typography>
             </Grid>
-          )}
-        </Grid>
-      </div>
-      <SourceDetail source={source} defaults={null} addMode={!base} setSource={setSource} setModified={setModified} />
+            {base && (
+              <Grid item xs style={{ textAlign: 'right', flexGrow: 1 }}>
+                {generatesSignatures && (
+                  <Tooltip title={t('view_signatures')}>
+                    <IconButton
+                      style={{
+                        color: theme.palette.mode === 'dark' ? '#F' : '#0'
+                      }}
+                      component={Link}
+                      to={`/manage/signatures/?query=${encodeURIComponent(
+                        `type:${service.toLowerCase()} AND source:${source.name}`
+                      )}`}
+                      size="large"
+                    >
+                      <FingerprintOutlinedIcon />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                {base && (
+                  <Tooltip title={t('update')}>
+                    <IconButton
+                      style={{
+                        color: isSourceUpdating(source)
+                          ? theme.palette.action.disabled
+                          : theme.palette.mode === 'dark'
+                          ? theme.palette.info.light
+                          : theme.palette.info.dark
+                      }}
+                      disabled={isSourceUpdating(source)}
+                      onClick={triggerSourceUpdate}
+                      size="large"
+                    >
+                      <SystemUpdateAltIcon />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                <Tooltip title={t('delete')}>
+                  <IconButton
+                    style={{
+                      color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                    }}
+                    onClick={deleteSource}
+                    size="large"
+                  >
+                    <RemoveCircleOutlineOutlinedIcon />
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+            )}
+          </Grid>
+        </div>
+        <SourceDetail source={source} defaults={null} addMode={!base} setSource={setSource} setModified={setModified} />
 
-      <RouterPrompt when={modified} />
+        <RouterPrompt when={modified} />
 
-      <div style={{ paddingTop: theme.spacing(2), paddingBottom: theme.spacing(2), textAlign: 'right' }}>
-        <Button
-          variant="contained"
-          color="primary"
-          disabled={!source.name || !source.uri || !modified || buttonLoading}
-          onClick={saveChanges}
-        >
-          {t(base ? 'change.save' : 'add.save')}
-          {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
-        </Button>
+        <div style={{ paddingTop: theme.spacing(2), paddingBottom: theme.spacing(2), textAlign: 'right' }}>
+          <Button
+            variant="contained"
+            color="primary"
+            disabled={!source.name || !source.uri || !modified || buttonLoading}
+            onClick={saveChanges}
+          >
+            {t(base ? 'change.save' : 'add.save')}
+            {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+          </Button>
+        </div>
       </div>
-    </div>
+    )
   );
 };
 
@@ -359,7 +364,8 @@ export const SourceCard = ({ source, onClick, service, generatesSignatures, show
                       onClick={e => {
                         e.stopPropagation();
                       }}
-                      size="large">
+                      size="large"
+                    >
                       <FingerprintOutlinedIcon />
                     </IconButton>
                   </Tooltip>
@@ -376,7 +382,8 @@ export const SourceCard = ({ source, onClick, service, generatesSignatures, show
                     }}
                     disabled={isSourceUpdating(source)}
                     onClick={triggerSourceUpdate}
-                    size="large">
+                    size="large"
+                  >
                     <SystemUpdateAltIcon />
                   </IconButton>
                 </Tooltip>
@@ -515,7 +522,8 @@ const ServiceDetail = ({ service, sources, generatesSignatures }) => {
                   margin: '-4px 0'
                 }}
                 onClick={() => openDrawer(service, null)}
-                size="large">
+                size="large"
+              >
                 <AddCircleOutlineOutlinedIcon />
               </IconButton>
             </Tooltip>
@@ -527,7 +535,8 @@ const ServiceDetail = ({ service, sources, generatesSignatures }) => {
                   style={{
                     color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#000000'
                   }}
-                  size="large">
+                  size="large"
+                >
                   <FingerprintOutlinedIcon />
                 </IconButton>
               </Tooltip>
@@ -544,7 +553,8 @@ const ServiceDetail = ({ service, sources, generatesSignatures }) => {
                   }}
                   disabled={sources.some(isSourceUpdating)}
                   onClick={triggerSourceUpdateAll}
-                  size="large">
+                  size="large"
+                >
                   <SystemUpdateAltIcon />
                 </IconButton>
               </Tooltip>
@@ -633,7 +643,11 @@ export default function SignatureSources() {
                   <Skeleton />
                 </Typography>
                 <Divider />
-                <Skeleton variant="rectangular" height="6rem" style={{ marginTop: theme.spacing(2), borderRadius: '4px' }} />
+                <Skeleton
+                  variant="rectangular"
+                  height="6rem"
+                  style={{ marginTop: theme.spacing(2), borderRadius: '4px' }}
+                />
               </div>
             ))}
       </div>

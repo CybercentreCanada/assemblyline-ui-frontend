@@ -1,9 +1,9 @@
-import { Box, Collapse, IconButton, Menu, MenuItem, Tooltip, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
 import SimCardOutlinedIcon from '@mui/icons-material/SimCardOutlined';
-import useClipboard from 'commons/components/hooks/useClipboard';
+import { Box, Collapse, IconButton, Menu, MenuItem, Tooltip, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import useClipboard from 'commons_deprecated/components/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';

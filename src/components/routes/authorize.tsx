@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { Backdrop, Button, Typography, useTheme } from '@mui/material';
-import useAppLayout from 'commons/components/hooks/useAppLayout';
-import CardCentered from 'commons/components/layout/pages/CardCentered';
+import useAppLayout from 'commons_deprecated/components/hooks/useAppLayout';
+import CardCentered from 'commons_deprecated/components/layout/pages/CardCentered';
 import useALContext from 'components/hooks/useALContext';
 import getXSRFCookie from 'helpers/xsrf';
 import { useTranslation } from 'react-i18next';

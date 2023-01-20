@@ -1,8 +1,7 @@
-import { Grid, IconButton, Paper, Tooltip, Typography, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
-import { Skeleton } from '@mui/material';
-import PageCenter from 'commons/components/layout/pages/PageCenter';
+import { Grid, IconButton, Paper, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import PageCenter from 'commons_deprecated/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import Classification from 'components/visual/Classification';
@@ -178,7 +177,8 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
                       to={`/search/result/?query=result.sections.heuristic.heur_id:${safeFieldValueURI(
                         heuristic.heur_id
                       )}`}
-                      size="large">
+                      size="large"
+                    >
                       <YoutubeSearchedForIcon />
                     </IconButton>
                   </Tooltip>

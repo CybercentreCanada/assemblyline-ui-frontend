@@ -4,7 +4,7 @@ import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import SpeedOutlinedIcon from '@mui/icons-material/SpeedOutlined';
 import { Card, Grid, Skeleton, Switch, Theme, Tooltip, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import PageFullscreen from 'commons/components/layout/pages/PageFullScreen';
+import PageFullscreen from 'commons_deprecated/components/layout/pages/PageFullScreen';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import ArcGauge from 'components/visual/ArcGauge';

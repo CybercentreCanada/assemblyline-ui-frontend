@@ -1,20 +1,10 @@
-import {
-  Card,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Theme,
-  Typography,
-  useTheme,
-} from '@mui/material';
+import { Card, Table, TableBody, TableCell, TableHead, TableRow, Theme, Typography, useTheme } from '@mui/material';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 import withStyles from '@mui/styles/withStyles';
-import ContentWithTOC, { ContentWithTOCItemDef } from 'commons/addons/elements/toc/Toc';
-import useAppLayout from 'commons/components/hooks/useAppLayout';
-import PageCenter from 'commons/components/layout/pages/PageCenter';
+import ContentWithTOC, { ContentWithTOCItemDef } from 'commons_deprecated/addons/elements/toc/Toc';
+import useAppLayout from 'commons_deprecated/components/hooks/useAppLayout';
+import PageCenter from 'commons_deprecated/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import CustomChip from 'components/visual/CustomChip';
 import { useMemo } from 'react';

@@ -16,8 +16,8 @@ import {
   useTheme
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import useAppContext from 'commons/components/hooks/useAppContext';
-import PageFullSize from 'commons/components/layout/pages/PageFullSize';
+import useAppContext from 'commons_deprecated/components/hooks/useAppContext';
+import PageFullSize from 'commons_deprecated/components/layout/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import Empty from 'components/visual/Empty';

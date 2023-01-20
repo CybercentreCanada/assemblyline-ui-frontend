@@ -7,8 +7,8 @@ import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import { Card, Grid, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import useClipboard from 'commons/components/hooks/useClipboard';
-import PageCenter from 'commons/components/layout/pages/PageCenter';
+import useClipboard from 'commons_deprecated/components/hooks/useClipboard';
+import PageCenter from 'commons_deprecated/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import FileDownloader from 'components/visual/FileDownloader';

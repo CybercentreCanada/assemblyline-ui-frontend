@@ -1,4 +1,4 @@
-import useUser from 'commons/components/hooks/useAppUser';
+import useUser from 'commons_deprecated/components/hooks/useAppUser';
 import { CustomUser } from 'components/hooks/useMyUser';
 import User from 'components/routes/user';
 

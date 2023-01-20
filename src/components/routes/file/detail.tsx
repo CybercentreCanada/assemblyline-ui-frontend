@@ -1,4 +1,4 @@
-import PageCenter from 'commons/components/layout/pages/PageCenter';
+import PageCenter from 'commons_deprecated/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import FileDetail from 'components/visual/FileDetail';
 import { useParams } from 'react-router-dom';

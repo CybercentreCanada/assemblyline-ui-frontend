@@ -2,7 +2,7 @@ import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
 import { Menu, MenuItem } from '@mui/material';
-import useClipboard from 'commons/components/hooks/useClipboard';
+import useClipboard from 'commons_deprecated/components/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';

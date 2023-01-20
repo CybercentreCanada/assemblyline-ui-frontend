@@ -1,6 +1,6 @@
 import { Grid, Typography, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
-import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
+import PageFullWidth from 'commons_deprecated/components/layout/pages/PageFullWidth';
 import useMyAPI from 'components/hooks/useMyAPI';
 import CustomChip from 'components/visual/CustomChip';
 import { useEffect, useState } from 'react';
