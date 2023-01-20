@@ -29,7 +29,7 @@ type AppsSwitcherProps = {
   apps: AppElement[];
 };
 
-const AppSwitcher: React.FC<AppsSwitcherProps> = () => {
+const AppSwitcher: React.FC<AppsSwitcherProps | any> = () => {
   const theme = useTheme();
   const anchorRef = useRef();
   const appSwitcher = useAppSwitcher();
