@@ -15,7 +15,21 @@ import {
 import useAppSwitcher from 'commons/components/app/hooks/useAppSwitcher';
 import { memo, useCallback, useRef, useState } from 'react';
 
-const AppSwitcher = () => {
+// TODO: added this in the template-ui
+export type AppElement = {
+  alt: string;
+  name: string;
+  img_d: React.ReactElement<any> | string;
+  img_l: React.ReactElement<any> | string;
+  route: string;
+  newWindow?: boolean;
+};
+
+type AppsSwitcherProps = {
+  apps: AppElement[];
+};
+
+const AppSwitcher: React.FC<AppsSwitcherProps> = () => {
   const theme = useTheme();
   const anchorRef = useRef();
   const appSwitcher = useAppSwitcher();
