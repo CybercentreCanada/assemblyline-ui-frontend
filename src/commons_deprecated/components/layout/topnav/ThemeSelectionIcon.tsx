@@ -1,8 +1,8 @@
+import TuneIcon from '@mui/icons-material/Tune';
 import { ClickAwayListener, Fade, IconButton, Paper, Popper, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import TuneIcon from '@mui/icons-material/Tune';
-import useAppLayout from 'commons/components/hooks/useAppLayout';
-import ThemeSelection from 'commons/components/layout/topnav/ThemeSelection';
+import useAppLayout from 'commons_deprecated/components/hooks/useAppLayout';
+import ThemeSelection from 'commons_deprecated/components/layout/topnav/ThemeSelection';
 import React, { useState } from 'react';
 
 const useStyles = () =>
@@ -36,11 +36,7 @@ const ThemeSelectionIcon = () => {
 
   return allowPersonalization || layoutProps.allowTranslate || layoutProps.allowReset ? (
     <ClickAwayListener onClickAway={onClickAway}>
-      <IconButton
-        color="inherit"
-        aria-label="open drawer"
-        onClick={onThemeSelectionClick}
-        size="large">
+      <IconButton color="inherit" aria-label="open drawer" onClick={onThemeSelectionClick} size="large">
         <TuneIcon />
         <Popper
           open={isPopperOpen}

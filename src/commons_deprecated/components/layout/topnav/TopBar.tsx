@@ -1,13 +1,13 @@
 import { AppBar, Slide, Toolbar, useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import { APPBAR_READY_EVENT } from 'commons/components/hooks/useAppBarHeight';
-import useAppContext from 'commons/components/hooks/useAppContext';
-import useAppLayout from 'commons/components/hooks/useAppLayout';
-import Breadcrumbs from 'commons/components/layout/breadcrumbs/Breadcrumbs';
-import AppSwitcher, { AppElement } from 'commons/components/layout/topnav/AppSwitcher';
-import QuickSearch from 'commons/components/layout/topnav/QuickSearch';
-import ThemeSelectionIcon from 'commons/components/layout/topnav/ThemeSelectionIcon';
-import UserProfile from 'commons/components/layout/topnav/UserProfile';
+import { APPBAR_READY_EVENT } from 'commons_deprecated/components/hooks/useAppBarHeight';
+import useAppContext from 'commons_deprecated/components/hooks/useAppContext';
+import useAppLayout from 'commons_deprecated/components/hooks/useAppLayout';
+import Breadcrumbs from 'commons_deprecated/components/layout/breadcrumbs/Breadcrumbs';
+import AppSwitcher, { AppElement } from 'commons_deprecated/components/layout/topnav/AppSwitcher';
+import QuickSearch from 'commons_deprecated/components/layout/topnav/QuickSearch';
+import ThemeSelectionIcon from 'commons_deprecated/components/layout/topnav/ThemeSelectionIcon';
+import UserProfile from 'commons_deprecated/components/layout/topnav/UserProfile';
 import React, { memo, useLayoutEffect } from 'react';
 import AppTitle from './AppTitle';
 

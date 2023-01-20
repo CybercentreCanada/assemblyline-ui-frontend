@@ -1,7 +1,7 @@
 import SearchIcon from '@mui/icons-material/Search';
 import { alpha, InputBase } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import useAppLayout from 'commons/components/hooks/useAppLayout';
+import useAppLayout from 'commons_deprecated/components/hooks/useAppLayout';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';

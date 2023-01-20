@@ -10,8 +10,8 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import useApp from 'commons/components/hooks/useAppContext';
-import useAppLayout from 'commons/components/hooks/useAppLayout';
+import useApp from 'commons_deprecated/components/hooks/useAppContext';
+import useAppLayout from 'commons_deprecated/components/hooks/useAppLayout';
 import useSafeResults from 'components/hooks/useSafeResults';
 import i18n from 'i18next';
 import { memo } from 'react';

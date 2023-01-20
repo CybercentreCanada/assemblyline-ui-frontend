@@ -13,13 +13,13 @@ import {
   Popper,
   Tooltip,
   Typography,
-  useTheme,
+  useTheme
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import useAppLayout from 'commons/components/hooks/useAppLayout';
-import useUser from 'commons/components/hooks/useAppUser';
-import useGravatar from 'commons/components/hooks/useGravatar';
-import ThemeSelection from 'commons/components/layout/topnav/ThemeSelection';
+import useAppLayout from 'commons_deprecated/components/hooks/useAppLayout';
+import useUser from 'commons_deprecated/components/hooks/useAppUser';
+import useGravatar from 'commons_deprecated/components/hooks/useGravatar';
+import ThemeSelection from 'commons_deprecated/components/layout/topnav/ThemeSelection';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -127,11 +127,7 @@ const UserProfile = () => {
 
   return (
     <ClickAwayListener onClickAway={onClickAway}>
-      <IconButton
-        edge="end"
-        className={classes.avatarButton}
-        onClick={onProfileClick}
-        size="large">
+      <IconButton edge="end" className={classes.avatarButton} onClick={onProfileClick} size="large">
         <Avatar
           className={classes.iconButton}
           alt={currentUser.name}

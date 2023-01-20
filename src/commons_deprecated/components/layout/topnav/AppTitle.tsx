@@ -1,7 +1,7 @@
+import MenuIcon from '@mui/icons-material/Menu';
 import { IconButton, useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import MenuIcon from '@mui/icons-material/Menu';
-import useAppLayout from 'commons/components/hooks/useAppLayout';
+import useAppLayout from 'commons_deprecated/components/hooks/useAppLayout';
 import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
@@ -34,12 +34,7 @@ export default function AppTitle({ disabled = false, noTitle = false }) {
     return isXs ? (
       <div className={classes.topBarTitle} style={{ paddingLeft: theme.spacing(2) }}>
         <div className={classes.icon}>
-          <IconButton
-            aria-label="open drawer"
-            edge="start"
-            color="inherit"
-            onClick={toggleDrawer}
-            size="large">
+          <IconButton aria-label="open drawer" edge="start" color="inherit" onClick={toggleDrawer} size="large">
             <MenuIcon />
           </IconButton>
         </div>
