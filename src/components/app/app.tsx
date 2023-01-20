@@ -1,5 +1,5 @@
 import { StyledEngineProvider, ThemeProvider } from '@mui/material';
-import { createTheme } from '@mui/material/styles';
+import { createTheme, Theme } from '@mui/material/styles';
 import AppContextProvider from 'commons/components/app/AppContextProvider';
 import useAppLayout from 'commons/components/hooks/useAppLayout';
 import AppLayoutProvider from 'commons/components/layout/LayoutProvider';
@@ -22,6 +22,12 @@ import SafeResultsProvider from 'components/visual/SafeResultsProvider';
 import { getProvider } from 'helpers/utils';
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
+
+// Constructs the theme object with the default parameters
+declare module '@mui/styles/defaultTheme' {
+  // eslint-disable-next-line @typescript-eslint/no-empty-interface
+  interface DefaultTheme extends Theme {}
+}
 
 type PossibleApps = 'load' | 'locked' | 'login' | 'routes' | 'tos';
 
