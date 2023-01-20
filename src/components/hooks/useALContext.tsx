@@ -1,7 +1,7 @@
-import { UserContext } from 'commons/components/user/UserProvider';
-import { CustomUserContextProps } from 'components/hooks/useMyUser';
+import { AppUserContext } from 'commons/components/app/providers/AppUserProvider';
+import { CustomAppUserService } from 'components/hooks/useMyUser';
 import { useContext } from 'react';
 
-export default function useALContext(): CustomUserContextProps {
-  return useContext(UserContext) as CustomUserContextProps;
+export default function useALContext(): CustomAppUserService {
+  return useContext(AppUserContext) as CustomAppUserService;
 }
