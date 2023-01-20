@@ -68,10 +68,10 @@ function Submit() {
   const state: SubmitState = location.state as SubmitState;
   const urlHashTitle = configuration.ui.allow_url_submissions ? 'URL/SHA256' : 'SHA256';
   const urlInputText = urlHashTitle + t('urlHash.input_suffix');
-  const [urlHash, setUrlHash] = useState(state !== undefined ? state.hash : '');
+  const [urlHash, setUrlHash] = useState(state ? state.hash : '');
   const [urlHashHasError, setUrlHashHasError] = useState(false);
-  const [value, setValue] = useState(state !== undefined ? state.tabContext : '0');
-  const classification = useState(state !== undefined ? state.c12n : null)[0];
+  const [value, setValue] = useState(state ? state.tabContext : '0');
+  const classification = useState(state ? state.c12n : null)[0];
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
