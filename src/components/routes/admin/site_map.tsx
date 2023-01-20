@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import createStyles from '@mui/styles/createStyles';
 import withStyles from '@mui/styles/withStyles';
-import useUser from 'commons_deprecated/components/hooks/useAppUser';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons_deprecated/components/layout/pages/PageFullWidth';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
@@ -45,7 +45,7 @@ export default function SiteMap() {
   const theme = useTheme();
   const [siteMap, setSiteMap] = useState(null);
   const { apiCall } = useMyAPI();
-  const { user: currentUser } = useUser<CustomUser>();
+  const { user: currentUser } = useAppUser<CustomUser>();
 
   const privMap = {
     R: 'success',

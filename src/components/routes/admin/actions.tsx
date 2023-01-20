@@ -10,8 +10,8 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useAppContext from 'commons_deprecated/components/hooks/useAppContext';
-import useUser from 'commons_deprecated/components/hooks/useAppUser';
 import PageFullSize from 'commons_deprecated/components/layout/pages/PageFullSize';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -34,7 +34,7 @@ export default function AdminActions() {
   const [open, setOpen] = useState(false);
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
-  const { user: currentUser } = useUser<CustomUser>();
+  const { user: currentUser } = useAppUser<CustomUser>();
   const { isDarkTheme } = useAppContext();
 
   useEffect(() => {

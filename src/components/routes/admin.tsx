@@ -1,4 +1,4 @@
-import useUser from 'commons_deprecated/components/hooks/useAppUser';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCenter from 'commons_deprecated/components/layout/pages/PageCenter';
 import useMyLayout from 'components/hooks/useMyLayout';
 import { CustomUser } from 'components/hooks/useMyUser';
@@ -7,7 +7,7 @@ import { Navigate } from 'react-router';
 
 export default function Admin() {
   const layout = useMyLayout();
-  const { user: currentUser, validateProps } = useUser<CustomUser>();
+  const { user: currentUser, validateProps } = useAppUser<CustomUser>();
   let items = [];
   for (const item of layout.leftnav.elements) {
     if (item.type === 'group' && item.element.id === 'adminmenu') {

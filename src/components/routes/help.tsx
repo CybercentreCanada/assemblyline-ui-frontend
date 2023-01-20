@@ -1,4 +1,4 @@
-import useAppUser from 'commons_deprecated/components/hooks/useAppUser';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCenter from 'commons_deprecated/components/layout/pages/PageCenter';
 import useMyLayout from 'components/hooks/useMyLayout';
 import { CustomUser } from 'components/hooks/useMyUser';

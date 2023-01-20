@@ -3,7 +3,7 @@ import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import { Grid, MenuItem, Select, Typography, useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import useUser from 'commons_deprecated/components/hooks/useAppUser';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons_deprecated/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons_deprecated/components/layout/pages/PageHeader';
 import useDrawer from 'components/hooks/useDrawer';
@@ -88,7 +88,7 @@ export default function ErrorViewer() {
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
   const theme = useTheme();
   const { apiCall } = useMyAPI();
-  const { user: currentUser } = useUser<CustomUser>();
+  const { user: currentUser } = useAppUser<CustomUser>();
   const [suggestions, setSuggestions] = useState(DEFAULT_SUGGESTION);
   const location = useLocation();
   const upMD = useMediaQuery(theme.breakpoints.up('md'));

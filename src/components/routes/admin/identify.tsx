@@ -1,7 +1,7 @@
 import { loader } from '@monaco-editor/react';
 import { Alert, Grid, Hidden, Paper, Tab, Tabs, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import useUser from 'commons_deprecated/components/hooks/useAppUser';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullSize from 'commons_deprecated/components/layout/pages/PageFullSize';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
@@ -19,7 +19,7 @@ loader.config({ paths: { vs: '/cdn/monaco_0.34.1' } });
 export default function AdminIdentify() {
   const { t, i18n } = useTranslation(['adminIdentify']);
   const theme = useTheme();
-  const { user: currentUser } = useUser<CustomUser>();
+  const { user: currentUser } = useAppUser<CustomUser>();
   const { apiCall } = useMyAPI();
   const [value, setValue] = useState('magic');
   const [magicFile, setMagicFile] = useState(null);

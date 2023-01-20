@@ -18,7 +18,7 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import useUser from 'commons_deprecated/components/hooks/useAppUser';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons_deprecated/components/layout/pages/PageFullWidth';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
@@ -49,7 +49,7 @@ export default function Services() {
   const { showSuccessMessage, showInfoMessage, showErrorMessage } = useMySnackbar();
   const theme = useTheme();
   const { apiCall } = useMyAPI();
-  const { user: currentUser } = useUser<CustomUser>();
+  const { user: currentUser } = useAppUser<CustomUser>();
   const { setGlobalDrawer, closeGlobalDrawer } = useDrawer();
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
   const { configuration } = useALContext();
