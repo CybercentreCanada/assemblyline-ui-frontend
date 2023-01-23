@@ -19,9 +19,9 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import { makeStyles } from '@mui/styles';
+import useAppBanner from 'commons/components/app/hooks/useAppBanner';
 import PageCenter from 'commons/components/pages/PageCenter';
-import useAppLayout from 'commons_deprecated/components/hooks/useAppLayout';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -32,7 +32,7 @@ import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDropper from 'components/visual/FileDropper';
 import { matchSHA256, matchURL } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -43,11 +43,31 @@ type SubmitState = {
   c12n: string;
 };
 
-function Submit() {
-  const { getBanner } = useAppLayout();
+const useStyles = makeStyles(theme => ({
+  no_pad: {
+    padding: 0
+  },
+  item: {
+    marginLeft: 0,
+    width: '100%',
+    '&:hover': {
+      background: theme.palette.action.hover
+    }
+  },
+  buttonProgress: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginTop: -12,
+    marginLeft: -12
+  }
+}));
+
+const Submit: React.FC<any> = () => {
   const { apiCall } = useMyAPI();
   const { t, i18n } = useTranslation(['submit']);
   const theme = useTheme();
+  const classes = useStyles();
   const { user: currentUser, c12nDef, configuration } = useALContext();
   const [uuid, setUUID] = useState(null);
   const [flow, setFlow] = useState(null);
@@ -72,31 +92,11 @@ function Submit() {
   const [urlHashHasError, setUrlHashHasError] = useState(false);
   const [value, setValue] = useState(state ? state.tabContext : '0');
   const classification = useState(state ? state.c12n : null)[0];
+  const banner = useAppBanner();
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
-
-  const useStyles = makeStyles(curTheme => ({
-    no_pad: {
-      padding: 0
-    },
-    item: {
-      marginLeft: 0,
-      width: '100%',
-      '&:hover': {
-        background: theme.palette.action.hover
-      }
-    },
-    buttonProgress: {
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      marginTop: -12,
-      marginLeft: -12
-    }
-  }));
-  const classes = useStyles();
 
   const getFileUUID = selectedFile => {
     const relativePath =
@@ -376,7 +376,7 @@ function Submit() {
         acceptText={t('validate.acceptText')}
         text={t('validate.text')}
       />
-      <div style={{ marginBottom: !downSM && !configuration.ui.banner ? '2rem' : null }}>{getBanner(theme)}</div>
+      <div style={{ marginBottom: !downSM && !configuration.ui.banner ? '2rem' : null }}>{banner}</div>
       {configuration.ui.banner && (
         <Alert severity={configuration.ui.banner_level} style={{ marginBottom: '2rem' }}>
           {configuration.ui.banner[i18n.language] ? configuration.ui.banner[i18n.language] : configuration.ui.banner.en}
@@ -733,6 +733,6 @@ function Submit() {
       )} */}
     </PageCenter>
   );
-}
+};
 
-export default Submit;
+export default memo(Submit);
