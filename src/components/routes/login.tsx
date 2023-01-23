@@ -2,6 +2,7 @@
 import { Box, Button, CircularProgress, Link, Theme, Typography, useTheme } from '@mui/material';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
+import useAppBanner from 'commons/components/app/hooks/useAppBanner';
 import useAppLayout from 'commons_deprecated/components/hooks/useAppLayout';
 import CardCentered from 'commons_deprecated/components/layout/pages/CardCentered';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -46,7 +47,8 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
   const theme = useTheme();
   const classes = useStyles();
   const { apiCall } = useMyAPI();
-  const { getBanner, hideMenus } = useAppLayout();
+  const banner = useAppBanner();
+  const { hideMenus } = useAppLayout();
   const provider = getProvider();
   const [shownControls, setShownControls] = useState(
     provider ? 'oauth' : params.get('reset_id') ? 'reset_now' : 'login'
@@ -187,7 +189,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
   return (
     <CardCentered>
       <Box style={{ cursor: 'pointer' }} onClick={reset}>
-        {getBanner(theme)}
+        {banner}
       </Box>
       {
         {

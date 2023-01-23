@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { Backdrop, Button, Typography, useTheme } from '@mui/material';
-import useAppLayout from 'commons_deprecated/components/hooks/useAppLayout';
+import useAppBanner from 'commons/components/app/hooks/useAppBanner';
 import CardCentered from 'commons_deprecated/components/layout/pages/CardCentered';
 import useALContext from 'components/hooks/useALContext';
 import getXSRFCookie from 'helpers/xsrf';
@@ -16,7 +16,7 @@ export default function AppRegistration() {
   const navigate = useNavigate();
   const { t } = useTranslation(['authorize']);
   const theme = useTheme();
-  const { getBanner } = useAppLayout();
+  const banner = useAppBanner();
   const { user: currentUser } = useALContext();
 
   const params = new URLSearchParams(location.search);
@@ -28,7 +28,7 @@ export default function AppRegistration() {
   return currentUser.roles.includes('obo_access') ? (
     <Backdrop open style={{ backgroundColor: theme.palette.background.default, zIndex: 10000 }} transitionDuration={0}>
       <CardCentered>
-        {getBanner(theme)}
+        {banner}
         <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'center', justifyContent: 'center' }}>
           {!rUrl || !clientID || !scope || !server || VALID_SCOPES.indexOf(scope) === -1 ? (
             <>

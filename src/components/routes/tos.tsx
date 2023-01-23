@@ -1,7 +1,7 @@
 import { Button, CircularProgress, Link, Typography, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
 import makeStyles from '@mui/styles/makeStyles';
-import useAppLayout from 'commons_deprecated/components/hooks/useAppLayout';
+import useAppBanner from 'commons/components/app/hooks/useAppBanner';
 import PageCenter from 'commons_deprecated/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -15,8 +15,8 @@ export default function Tos() {
   const theme = useTheme();
   const [tos, setTos] = useState('');
   const [buttonLoading, setButtonLoading] = useState(false);
-  const { getBanner } = useAppLayout();
   const { user: currentUser, configuration } = useALContext();
+  const banner = useAppBanner();
   const { apiCall } = useMyAPI();
   const useStyles = makeStyles(curTheme => ({
     no_pad: {
@@ -74,7 +74,7 @@ export default function Tos() {
   return configuration.ui.tos ? (
     <PageCenter margin={4} width="100%">
       <div className={classes.page} style={{ display: 'inline-block', textAlign: 'center' }}>
-        <div>{getBanner(theme)}</div>
+        <div>{banner}</div>
         <div style={{ marginBottom: sp6, textAlign: 'left' }}>
           <Typography variant="h3" gutterBottom>
             {t('title')}

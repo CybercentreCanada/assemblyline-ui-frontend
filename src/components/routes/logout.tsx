@@ -1,4 +1,5 @@
 import { CircularProgress, Typography, useTheme } from '@mui/material';
+import useAppBanner from 'commons/components/app/hooks/useAppBanner';
 import useAppLayout from 'commons_deprecated/components/hooks/useAppLayout';
 import CardCentered from 'commons_deprecated/components/layout/pages/CardCentered';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -9,7 +10,8 @@ function Logout() {
   const { t } = useTranslation(['logout']);
   const theme = useTheme();
   const { apiCall } = useMyAPI();
-  const { getBanner, hideMenus } = useAppLayout();
+  const { hideMenus } = useAppLayout();
+  const banner = useAppBanner();
 
   useEffect(() => {
     hideMenus();
@@ -28,7 +30,7 @@ function Logout() {
   return (
     <CardCentered>
       <div style={{ textAlign: 'center' }}>
-        {getBanner(theme)}
+        {banner}
         <div style={{ marginBottom: theme.spacing(3) }}>
           <Typography>{t('title')}</Typography>
         </div>
