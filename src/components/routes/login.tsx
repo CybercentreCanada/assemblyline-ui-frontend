@@ -3,7 +3,7 @@ import { Box, Button, CircularProgress, Link, Theme, Typography, useTheme } from
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppBanner from 'commons/components/app/hooks/useAppBanner';
-import useAppLayout from 'commons_deprecated/components/hooks/useAppLayout';
+import useAppLayout from 'commons/components/app/hooks/useAppLayout';
 import CardCentered from 'commons_deprecated/components/layout/pages/CardCentered';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
