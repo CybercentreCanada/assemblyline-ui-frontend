@@ -317,7 +317,7 @@ export function normalizedClassification(
   }
 
   for (const rg of reqGrp) {
-    tempReq.splice(req.indexOf(rg), 1);
+    tempReq.splice(tempReq.indexOf(rg), 1);
   }
 
   if (tempReq.length > 0) {
