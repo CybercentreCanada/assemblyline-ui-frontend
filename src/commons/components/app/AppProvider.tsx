@@ -3,10 +3,12 @@ import { AppPreferenceConfigs, AppSiteMapConfigs, AppThemeConfigs } from 'common
 import useLocalStorageItem from 'commons/components/utils/hooks/useLocalStorageItem';
 import i18n from 'i18n';
 import { createContext, ReactNode, useCallback, useMemo } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 import useThemeBuilder from '../utils/hooks/useThemeBuilder';
 import { AppStorageKeys } from './AppConstants';
 import { AppContextType } from './AppContexts';
 import { AppDefaultsPreferencesConfigs } from './AppDefaults';
+import { ErrorFallback } from './AppErrorBoundary';
 import { AppSearchService } from './AppSearchService';
 import { AppUser, AppUserService } from './AppUserService';
 import AppBarProvider from './providers/AppBarProvider';
@@ -70,15 +72,22 @@ export default function AppProvider<U extends AppUser>({
     <AppContext.Provider value={contextValue}>
       <StyledEngineProvider injectFirst>
         <ThemeProvider theme={_darkMode ? darkTheme : lightTheme}>
-          <AppSnackbarProvider>
-            <AppUserProvider service={user}>
-              <AppBarProvider search={search}>
-                <AppLeftNavProvider>
-                  <AppLayoutProvider>{children}</AppLayoutProvider>
-                </AppLeftNavProvider>
-              </AppBarProvider>
-            </AppUserProvider>
-          </AppSnackbarProvider>
+          <ErrorBoundary
+            FallbackComponent={ErrorFallback}
+            onReset={() => {
+              window.location.reload();
+            }}
+          >
+            <AppSnackbarProvider>
+              <AppUserProvider service={user}>
+                <AppBarProvider search={search}>
+                  <AppLeftNavProvider>
+                    <AppLayoutProvider>{children}</AppLayoutProvider>
+                  </AppLeftNavProvider>
+                </AppBarProvider>
+              </AppUserProvider>
+            </AppSnackbarProvider>
+          </ErrorBoundary>
         </ThemeProvider>
       </StyledEngineProvider>
     </AppContext.Provider>
