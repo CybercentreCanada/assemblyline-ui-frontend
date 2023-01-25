@@ -70,15 +70,15 @@ export default function AppProvider<U extends AppUser>({
     <AppContext.Provider value={contextValue}>
       <StyledEngineProvider injectFirst>
         <ThemeProvider theme={_darkMode ? darkTheme : lightTheme}>
-          <AppUserProvider service={user}>
-            <AppBarProvider search={search}>
-              <AppLeftNavProvider>
-                <AppLayoutProvider>
-                  <AppSnackbarProvider>{children}</AppSnackbarProvider>
-                </AppLayoutProvider>
-              </AppLeftNavProvider>
-            </AppBarProvider>
-          </AppUserProvider>
+          <AppSnackbarProvider>
+            <AppUserProvider service={user}>
+              <AppBarProvider search={search}>
+                <AppLeftNavProvider>
+                  <AppLayoutProvider>{children}</AppLayoutProvider>
+                </AppLeftNavProvider>
+              </AppBarProvider>
+            </AppUserProvider>
+          </AppSnackbarProvider>
         </ThemeProvider>
       </StyledEngineProvider>
     </AppContext.Provider>
