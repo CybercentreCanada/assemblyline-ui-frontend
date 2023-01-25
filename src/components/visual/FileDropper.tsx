@@ -33,6 +33,8 @@ const useStyles = makeStyles(theme => ({
     color: theme.palette.text.disabled
   },
   drop_zone_hover_enabled: {
+    transition: '150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
+    '-webkit-transition': '150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
     '&:hover': {
       border: `2px ${theme.palette.text.disabled} dashed`,
       backgroundColor: theme.palette.action.selected,
