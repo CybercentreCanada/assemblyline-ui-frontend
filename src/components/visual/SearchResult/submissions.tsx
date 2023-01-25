@@ -1,8 +1,7 @@
-import { Tooltip } from '@mui/material';
+import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
+import { AlertTitle, Skeleton, Tooltip } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
-import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
-import { AlertTitle, Skeleton } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
 import SubmissionState from 'components/visual/SubmissionState';
@@ -101,9 +100,9 @@ const WrappedSubmissionsTable: React.FC<SubmissionsTableProps> = ({ submissionRe
               >
                 <DivTableCell>
                   <Tooltip title={submission.times.submitted}>
-                    <Moment fromNow locale={i18n.language}>
-                      {submission.times.submitted}
-                    </Moment>
+                    <>
+                      <Moment fromNow locale={i18n.language} date={submission.times.submitted} />
+                    </>
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell>
