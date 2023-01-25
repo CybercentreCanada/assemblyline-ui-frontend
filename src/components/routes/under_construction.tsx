@@ -1,7 +1,7 @@
 import DeveloperModeOutlinedIcon from '@mui/icons-material/DeveloperModeOutlined';
 import { useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import PageCenter from 'commons_deprecated/components/layout/pages/PageCenter';
+import PageCenter from 'commons/components/pages/PageCenter';
 import { useTranslation } from 'react-i18next';
 
 const UnderConstruction = ({ page }) => {

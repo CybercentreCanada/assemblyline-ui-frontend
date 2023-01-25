@@ -1,5 +1,5 @@
 import useAppUser from 'commons/components/app/hooks/useAppUser';
-import PageCenter from 'commons_deprecated/components/layout/pages/PageCenter';
+import PageCenter from 'commons/components/pages/PageCenter';
 import useMyLayout from 'components/hooks/useMyLayout';
 import { CustomUser } from 'components/hooks/useMyUser';
 import LinkGrid from 'components/layout/linkgrid';

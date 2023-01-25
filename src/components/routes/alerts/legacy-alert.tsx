@@ -1,4 +1,4 @@
-import PageCenter from 'commons_deprecated/components/layout/pages/PageCenter';
+import PageCenter from 'commons/components/pages/PageCenter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { useEffect, useState } from 'react';
 import AlertCardItem from './alert-card';

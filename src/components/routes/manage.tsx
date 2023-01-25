@@ -1,4 +1,4 @@
-import PageCenter from 'commons_deprecated/components/layout/pages/PageCenter';
+import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyLayout from 'components/hooks/useMyLayout';
 import LinkGrid from 'components/layout/linkgrid';
