@@ -1,7 +1,8 @@
+import useAppUser from 'commons/components/app/hooks/useAppUser';
 import { LineItem } from 'commons_deprecated/addons/elements/lists/item/ListItemBase';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { ALField } from 'components/hooks/useMyUser';
+import { ALField, CustomUser } from 'components/hooks/useMyUser';
 import SearchQuery, { SearchFilter, SearchFilterType } from 'components/visual/SearchBar/search-query';
 import { safeFieldValue, verdictRank } from 'helpers/utils';
 import { useCallback, useEffect, useReducer, useState } from 'react';
@@ -183,7 +184,8 @@ export function detailedItemCompare(a: DetailedItem, b: DetailedItem) {
 export default function useAlerts(pageSize: number): UsingAlerts {
   const location = useLocation();
   const { apiCall } = useMyAPI();
-  const { indexes: fieldIndexes, user: currentUser } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
+  const { indexes: fieldIndexes } = useALContext();
   const [searchQuery, setSearchQuery] = useState<SearchQuery>(null);
   const [fields, setFields] = useState<ALField[]>([]);
   const [statusFilters, setStatusFilters] = useState<SearchFilter[]>([]);

@@ -7,10 +7,11 @@ import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import { Card, Grid, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useClipboard from 'commons_deprecated/components/hooks/useClipboard';
-import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
+import { CustomUser } from 'components/hooks/useMyUser';
 import FileDownloader from 'components/visual/FileDownloader';
 import 'moment/locale/fr';
 import { useEffect, useState } from 'react';
@@ -64,7 +65,7 @@ export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
   const [error, setError] = useState<Error>(null);
   const { apiCall } = useMyAPI();
   const { key, type, source, name } = useParams<ParamProps>();
-  const { user: currentUser } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
 
   const errorMap = {
     'MAX DEPTH REACHED': <PanToolOutlinedIcon style={{ color: theme.palette.action.active }} />,

@@ -2,7 +2,8 @@ import BlockIcon from '@mui/icons-material/Block';
 import Typography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 import clsx from 'clsx';
-import useALContext from 'components/hooks/useALContext';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { CustomUser } from 'components/hooks/useMyUser';
 import { memo, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
@@ -47,7 +48,7 @@ const useStyles = makeStyles(theme => ({
 const FileDropper: React.FC<FileDropperProps> = ({ file, setFile, disabled }) => {
   const { t } = useTranslation(['submit']);
   const { acceptedFiles, getRootProps, getInputProps, isDragActive } = useDropzone({ disabled });
-  const { user: currentUser } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
   const classes = useStyles();
 
   useEffect(() => {

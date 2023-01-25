@@ -16,10 +16,11 @@ import {
   useTheme
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useAppContext from 'commons_deprecated/components/hooks/useAppContext';
 import PageFullSize from 'commons_deprecated/components/layout/pages/PageFullSize';
-import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
+import { CustomUser } from 'components/hooks/useMyUser';
 import Empty from 'components/visual/Empty';
 import FileDownloader from 'components/visual/FileDownloader';
 import { HexViewerApp } from 'components/visual/HexViewer';
@@ -212,7 +213,7 @@ const FileViewer = () => {
   const [type, setType] = useState('unknown');
   const [tab, setTab] = useState(null);
   const [sha256, setSha256] = useState(null);
-  const { user: currentUser } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
 
   const handleChangeTab = (event, newTab) => {
     const currentTab = location.hash.substring(1, location.hash.length) || 'ascii';

@@ -17,10 +17,12 @@ import {
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 import withStyles from '@mui/styles/withStyles';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import { CustomUser } from 'components/hooks/useMyUser';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
@@ -94,7 +96,8 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
   const [modified, setModified] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState(false);
-  const { c12nDef, user: currentUser } = useALContext();
+  const { c12nDef } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
   const classes = useStyles();

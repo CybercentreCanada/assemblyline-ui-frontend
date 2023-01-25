@@ -21,11 +21,13 @@ import {
   useTheme
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons_deprecated/components/layout/pages/PageFullWidth';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import { CustomUser } from 'components/hooks/useMyUser';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
@@ -590,7 +592,7 @@ const ServiceDetail = ({ service, sources, generatesSignatures }) => {
 export default function SignatureSources() {
   const { t } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
-  const { user: currentUser } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
   const [sources, setSources] = useState(null);
   const { apiCall } = useMyAPI();
 

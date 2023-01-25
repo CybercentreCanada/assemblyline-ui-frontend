@@ -15,10 +15,11 @@ import {
   useTheme
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCenter from 'commons/components/pages/PageCenter';
-import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import { CustomUser } from 'components/hooks/useMyUser';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
 import Empty from 'components/visual/Empty';
@@ -174,7 +175,7 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
   const [buttonLoading, setButtonLoading] = useState(false);
   const theme = useTheme();
   const [deleteDialog, setDeleteDialog] = useState(false);
-  const { user: currentUser } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
   const { showSuccessMessage } = useMySnackbar();
   const navigate = useNavigate();
   const classes = useStyles();

@@ -4,9 +4,11 @@ import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import SpeedOutlinedIcon from '@mui/icons-material/SpeedOutlined';
 import { Card, Grid, Skeleton, Switch, Theme, Tooltip, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullscreen from 'commons_deprecated/components/layout/pages/PageFullScreen';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
+import { CustomUser } from 'components/hooks/useMyUser';
 import ArcGauge from 'components/visual/ArcGauge';
 import CustomChip from 'components/visual/CustomChip';
 import React, { useEffect, useReducer, useState } from 'react';
@@ -94,7 +96,7 @@ const WrappedIngestCard = ({ ingester, handleStatusChange, status }) => {
   const [error, setError] = useState(null);
   const classes = useStyles();
   const busyness = (ingester.metrics.cpu_seconds * ingester.metrics.cpu_seconds_count) / ingester.instances / 60;
-  const { user: currentUser } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
 
   useEffect(() => {
     if (ingester.processing_chance.critical !== 1) {
@@ -327,7 +329,7 @@ const WrappedDispatcherCard = ({ dispatcher, up, down, handleStatusChange, statu
   const startQueue = dispatcher.queues.start.reduce((x, y) => x + y, 0);
   const resultQueue = dispatcher.queues.result.reduce((x, y) => x + y, 0);
   const commandQueue = dispatcher.queues.command.reduce((x, y) => x + y, 0);
-  const { user: currentUser } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
 
   useEffect(() => {
     if (dispatcher.initialized && dispatcher.queues.ingest >= dispatcher.inflight.max / 10) {

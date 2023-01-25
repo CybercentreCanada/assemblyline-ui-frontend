@@ -3,15 +3,17 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import StarIcon from '@mui/icons-material/Star';
 import { AlertTitle, Box, Drawer, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import SearchBar from 'commons/addons/search/SearchBar';
 import ListCarousel from 'commons_deprecated/addons/elements/lists/carousel/ListCarousel';
 import ListNavigator from 'commons_deprecated/addons/elements/lists/navigator/ListNavigator';
 import SimpleList from 'commons_deprecated/addons/elements/lists/simplelist/SimpleList';
 import PageFullWidth from 'commons_deprecated/components/layout/pages/PageFullWidth';
 import PageHeader from 'commons_deprecated/components/layout/pages/PageHeader';
-import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import InformativeAlert from 'components/visual/InformativeAlert';
-import SearchBar from 'components/visual/SearchBar/search-bar';
+// import SearchBar from 'components/visual/SearchBar/search-bar';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { CustomUser } from 'components/hooks/useMyUser';
 import SearchQuery, { SearchQueryFilters } from 'components/visual/SearchBar/search-query';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SearchResultCount from 'components/visual/SearchResultCount';
@@ -93,7 +95,7 @@ const Alerts: React.FC = () => {
   const { t } = useTranslation('alerts');
   const classes = useStyles();
   const theme = useTheme();
-  const { user: currentUser } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
   const { setGlobalDrawer } = useDrawer();
 
   // Alerts hook.
@@ -504,6 +506,9 @@ const SearchResultLarge = ({ searching, total, query, onApplyFilters }) => {
 const SearchResultSmall = ({ searching, total, query }) => {
   const theme = useTheme();
   const { t } = useTranslation('alerts');
+
+  console.log(query);
+
   const filtered = query ? hasFilters(query.parseFilters()) : false;
   return (
     <>

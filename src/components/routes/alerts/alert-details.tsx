@@ -5,10 +5,12 @@ import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import { Button, Collapse, Divider, Grid, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import makeStyles from '@mui/styles/makeStyles';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useClipboard from 'commons_deprecated/components/hooks/useClipboard';
 import PageFullWidth from 'commons_deprecated/components/layout/pages/PageFullWidth';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
+import { CustomUser } from 'components/hooks/useMyUser';
 import { AlertItem, DetailedItem, detailedItemCompare } from 'components/routes/alerts/hooks/useAlerts';
 import { ChipList, ChipSkeleton, ChipSkeletonInline } from 'components/visual/ChipList';
 import Classification from 'components/visual/Classification';
@@ -113,7 +115,8 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
   const { copy } = useClipboard();
   const [item, setItem] = useState<AlertItem>(null);
   const { id: paramId } = useParams<{ id: string }>();
-  const { configuration, user: currentUser } = useALContext();
+  const { configuration } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
   const [metaOpen, setMetaOpen] = React.useState(false);
 
   useEffect(() => {

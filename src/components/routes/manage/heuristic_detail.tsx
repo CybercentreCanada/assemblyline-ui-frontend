@@ -1,9 +1,11 @@
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
 import { Grid, IconButton, Paper, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
+import { CustomUser } from 'components/hooks/useMyUser';
 import Classification from 'components/visual/Classification';
 import Histogram from 'components/visual/Histogram';
 import ResultsTable from 'components/visual/SearchResult/results';
@@ -94,7 +96,8 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
   const [results, setResults] = useState<any>(null);
   const { apiCall } = useMyAPI();
   const classes = useStyles();
-  const { c12nDef, user: currentUser } = useALContext();
+  const { c12nDef } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
 
   useEffect(() => {
     if (currentUser.roles.includes('heuristic_view')) {

@@ -2,9 +2,11 @@ import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
 import { Menu, MenuItem } from '@mui/material';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useClipboard from 'commons_deprecated/components/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
+import { CustomUser } from 'components/hooks/useMyUser';
 import useSafeResults from 'components/hooks/useSafeResults';
 import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
 import { safeFieldValueURI } from 'helpers/utils';
@@ -46,7 +48,8 @@ const WrappedAttack: React.FC<AttackProps> = ({
   const { isHighlighted, triggerHighlight } = useHighlighter();
   const { copy } = useClipboard();
   const { showSafeResults } = useSafeResults();
-  const { scoreToVerdict, user: currentUser } = useALContext();
+  const { scoreToVerdict } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
 
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
 

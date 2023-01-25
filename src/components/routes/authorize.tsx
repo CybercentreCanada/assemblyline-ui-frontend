@@ -1,8 +1,9 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { Backdrop, Button, Typography, useTheme } from '@mui/material';
 import useAppBanner from 'commons/components/app/hooks/useAppBanner';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
 import CardCentered from 'commons_deprecated/components/layout/pages/CardCentered';
-import useALContext from 'components/hooks/useALContext';
+import { CustomUser } from 'components/hooks/useMyUser';
 import getXSRFCookie from 'helpers/xsrf';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -17,7 +18,7 @@ export default function AppRegistration() {
   const { t } = useTranslation(['authorize']);
   const theme = useTheme();
   const banner = useAppBanner();
-  const { user: currentUser } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
 
   const params = new URLSearchParams(location.search);
   const rUrl = params.get('redirect_url');

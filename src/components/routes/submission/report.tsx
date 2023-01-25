@@ -21,10 +21,12 @@ import {
 import makeStyles from '@mui/styles/makeStyles';
 import withStyles from '@mui/styles/withStyles';
 import clsx from 'clsx';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import { CustomUser } from 'components/hooks/useMyUser';
 import Classification from 'components/visual/Classification';
 import ResultSection from 'components/visual/ResultCard/result_section';
 import TextVerdict from 'components/visual/TextVerdict';
@@ -560,7 +562,8 @@ function FileTreeSkel() {
 export default function SubmissionReport() {
   const { t } = useTranslation(['submissionReport']);
   const { id } = useParams<ParamProps>();
-  const { c12nDef, configuration, user: currentUser } = useALContext();
+  const { c12nDef, configuration } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
   const navigate = useNavigate();
   const theme = useTheme();
   const [report, setReport] = useState(null);
