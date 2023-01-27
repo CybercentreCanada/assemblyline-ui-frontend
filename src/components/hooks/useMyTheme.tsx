@@ -8,9 +8,9 @@ const LEGACY_THEME: AppThemeConfigs = {
     dark: {
       background: {
         default: 'rgb(48, 48, 48)',
-        // paper: 'rgb(66, 66, 66)'
+        paper: 'rgb(66, 66, 66)'
         // default: 'rgb(66, 66, 66)'
-        paper: 'rgb(48, 48, 48)'
+        // paper: 'rgb(48, 48, 48)'
       },
       primary: {
         main: 'rgb(124, 147, 185)'
@@ -18,11 +18,28 @@ const LEGACY_THEME: AppThemeConfigs = {
       secondary: {
         main: 'rgb(146, 156, 173)'
       }
+    },
+    light: {
+      background: {
+        // default: 'rgb(48, 48, 48)',
+        // paper: 'rgb(66, 66, 66)'
+        // default: 'rgb(66, 66, 66)'
+        // paper: 'rgb(48, 48, 48)'
+      },
+      primary: {
+        main: 'rgb(11, 101, 161)'
+      },
+      secondary: {
+        main: '#939DAC'
+      }
     }
   },
   appbar: {
     dark: {
-      backgroundColor: 'rgb(76, 89, 122)'
+      backgroundColor: 'rgb(86, 102, 129)'
+    },
+    light: {
+      backgroundColor: 'rgb(7, 70, 112)'
     }
   }
 };

@@ -7,6 +7,13 @@ const create = (components: Components<Omit<Theme, 'components'>>, palette: Pale
   createTheme({
     components: {
       ...components,
+      MuiPaper: {
+        styleOverrides: {
+          elevation: {
+            backgroundImage: 'none'
+          }
+        }
+      },
       MuiCssBaseline: {
         ...(components?.MuiCssBaseline || {}),
         styleOverrides: {

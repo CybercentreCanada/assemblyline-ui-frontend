@@ -46,8 +46,8 @@ export const AppBarBase = ({ children }) => {
               ...(configs.theme.appbar ? configs.theme.appbar[theme.palette.mode] : {})
             }
           : {
-              color: theme.palette.getContrastText(theme.palette.background.paper),
-              backgroundColor: theme.palette.background.paper
+              color: theme.palette.getContrastText(theme.palette.background.default),
+              backgroundColor: theme.palette.background.default
             })
       })}
     >
