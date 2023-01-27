@@ -506,8 +506,6 @@ const SearchResultSmall = ({ searching, total, query }) => {
   const theme = useTheme();
   const { t } = useTranslation('alerts');
 
-  console.log(query);
-
   const filtered = query ? hasFilters(query.parseFilters()) : false;
   return (
     <>

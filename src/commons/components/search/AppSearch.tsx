@@ -87,7 +87,6 @@ export default function AppSearch() {
       if (isCtrl && key === 'k') {
         event.preventDefault();
         const inputRef = menuRef.current.querySelector('input');
-        console.log(state);
         if (provided && (state.menu || !inputRef)) {
           state.set({ ...state, mode: 'fullscreen' });
         } else {

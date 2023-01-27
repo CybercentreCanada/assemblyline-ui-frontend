@@ -55,8 +55,6 @@ const WrappedSubmissionsTable: React.FC<SubmissionsTableProps> = ({ submissionRe
   const { t, i18n } = useTranslation(['search']);
   const { c12nDef } = useALContext();
 
-  console.log(submissionResults);
-
   return submissionResults ? (
     submissionResults.total !== 0 ? (
       <TableContainer component={Paper}>

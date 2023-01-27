@@ -573,8 +573,6 @@ export default function SubmissionReport() {
   const { showErrorMessage, showWarningMessage } = useMySnackbar();
   const [metaOpen, setMetaOpen] = useState(false);
 
-  console.log('SubmissionReport', id);
-
   useEffect(() => {
     if (currentUser.roles.includes('submission_view')) {
       apiCall({
