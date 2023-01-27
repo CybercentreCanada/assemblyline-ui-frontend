@@ -35,7 +35,7 @@ server {
         proxy_pass            https://${FRONTEND_HOST}:3000;
     }
 
-    location /sockjs-node {
+    location /ws {
         add_header            Strict-Transport-Security    "max-age=31536000; includeSubDomains";
 
         proxy_set_header      X-Remote-User   ${DOLLAR}remote_user;
@@ -47,7 +47,7 @@ server {
         proxy_set_header      Upgrade         ${DOLLAR}http_upgrade;
         proxy_set_header      Connection      "upgrade";
 
-        proxy_pass            https://${FRONTEND_HOST}:3000/sockjs-node;
+        proxy_pass            https://${FRONTEND_HOST}:3000/ws;
     }
 
     location /socket.io/ {
