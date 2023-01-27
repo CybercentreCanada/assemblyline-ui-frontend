@@ -2,13 +2,8 @@ import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-interface TextDividerProps {
-  forcePaper?: boolean;
-}
-
-const TextDivider: React.FC<TextDividerProps> = ({ forcePaper = false }) => {
-  const { t } = useTranslation();
-  const useStyles = makeStyles(theme => ({
+const useStyles = (forcePaper: boolean) =>
+  makeStyles(theme => ({
     divider: {
       display: 'inline-block',
       textAlign: 'center',
@@ -28,8 +23,16 @@ const TextDivider: React.FC<TextDividerProps> = ({ forcePaper = false }) => {
         backgroundColor: forcePaper ? theme.palette.background.paper : theme.palette.background.default
       }
     }
-  }));
-  const classes = useStyles();
+  }))();
+
+interface TextDividerProps {
+  forcePaper?: boolean;
+}
+
+const TextDivider: React.FC<TextDividerProps> = ({ forcePaper = false }) => {
+  const { t } = useTranslation();
+  const classes = useStyles(forcePaper);
+
   return (
     <div>
       <div className={classes.divider}>
