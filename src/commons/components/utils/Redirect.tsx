@@ -13,7 +13,7 @@ export const Redirect: React.FC<Props> = ({ to = '' }: Props) => {
     newTo = newTo.replace(`/:${p[0]}`, `/${p[1]}`);
   });
 
-  return <Navigate to={newTo} />;
+  return <Navigate to={newTo} replace />;
 };
 
 export default Redirect;
