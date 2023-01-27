@@ -23,7 +23,7 @@ import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import SimCardOutlinedIcon from '@mui/icons-material/SimCardOutlined';
 import SupervisorAccountOutlinedIcon from '@mui/icons-material/SupervisorAccountOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
-import { AppElement } from 'commons/components/topnav/AppSwitcher';
+import { AppSwitcherItem } from 'commons/components/app/AppConfigs';
 import { AppLayoutProps } from 'commons_deprecated/components/layout/LayoutProvider';
 import { Notification } from 'components/visual/Notification';
 import { useTranslation } from 'react-i18next';
@@ -311,7 +311,7 @@ const useMyLayout = (): AppLayoutProps => {
     }
   ];
 
-  const APP_SWITCHER_ITEMS: AppElement[] = [
+  const APP_SWITCHER_ITEMS: AppSwitcherItem[] = [
     {
       alt: 'AL',
       name: 'Assemblyline',

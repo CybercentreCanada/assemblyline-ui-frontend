@@ -1,5 +1,5 @@
+import { AppSwitcherItem } from 'commons/components/app/AppConfigs';
 import { AppUser, AppUserService, AppUserValidatedProp } from 'commons/components/app/AppUserService';
-import { AppElement } from 'commons/components/topnav/AppSwitcher';
 import { ClassificationDefinition } from 'helpers/classificationParser';
 import { useState } from 'react';
 
@@ -90,7 +90,7 @@ export type ConfigurationDefinition = {
     allow_replay: boolean;
     allow_url_submissions: boolean;
     allow_zip_downloads: boolean;
-    apps: AppElement[];
+    apps: AppSwitcherItem[];
     banner: {
       [lang: string]: string;
     };

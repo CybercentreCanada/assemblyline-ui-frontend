@@ -25,7 +25,12 @@ import SimCardOutlinedIcon from '@mui/icons-material/SimCardOutlined';
 import SupervisorAccountOutlinedIcon from '@mui/icons-material/SupervisorAccountOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import { Box } from '@mui/material';
-import { AppBarUserMenuElement, AppLeftNavElement, AppPreferenceConfigs } from 'commons/components/app/AppConfigs';
+import {
+  AppBarUserMenuElement,
+  AppLeftNavElement,
+  AppPreferenceConfigs,
+  AppSwitcherItem
+} from 'commons/components/app/AppConfigs';
 import { Notification } from 'components/visual/Notification';
 import { ReactElement, ReactNode, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -367,7 +372,7 @@ const useMyPreferences = () => {
     [t]
   );
 
-  const APP_SWITCHER_ITEMS = [
+  const APP_SWITCHER_ITEMS: AppSwitcherItem[] = [
     // {
     //   alt: 'AL',
     //   name: 'Assemblyline',
@@ -441,6 +446,7 @@ const useMyPreferences = () => {
       allowReset: false,
       avatarD: 'robohash',
       topnav: {
+        // apps: APP_SWITCHER_ITEMS,
         apps: [],
         userMenu: USER_MENU_ITEMS,
         userMenuI18nKey: 'usermenu',

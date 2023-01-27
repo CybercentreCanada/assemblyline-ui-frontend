@@ -14,19 +14,10 @@ import {
 } from '@mui/material';
 import useAppSwitcher from 'commons/components/app/hooks/useAppSwitcher';
 import { memo, useCallback, useRef, useState } from 'react';
-
-// TODO: added this in the template-ui
-export type AppElement = {
-  alt: string;
-  name: string;
-  img_d: React.ReactElement<any> | string;
-  img_l: React.ReactElement<any> | string;
-  route: string;
-  newWindow?: boolean;
-};
+import { AppSwitcherItem } from '../app/AppConfigs';
 
 type AppsSwitcherProps = {
-  apps: AppElement[];
+  apps: AppSwitcherItem[];
 };
 
 const AppSwitcher: React.FC<AppsSwitcherProps | any> = () => {
