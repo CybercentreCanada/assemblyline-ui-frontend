@@ -1,6 +1,9 @@
 import { PaletteMode, StyledEngineProvider, ThemeProvider, useMediaQuery } from '@mui/material';
 import { AppPreferenceConfigs, AppSiteMapConfigs, AppThemeConfigs } from 'commons/components/app/AppConfigs';
 import useLocalStorageItem from 'commons/components/utils/hooks/useLocalStorageItem';
+import CarouselProvider from 'components/visual/CarouselProvider';
+import DrawerProvider from 'components/visual/DrawerProvider';
+import HighlightProvider from 'components/visual/HighlightProvider';
 import i18n from 'i18n';
 import { createContext, ReactNode, useCallback, useMemo } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -80,11 +83,17 @@ export default function AppProvider<U extends AppUser>({
           >
             <AppSnackbarProvider>
               <AppUserProvider service={user}>
-                <AppBarProvider search={search}>
-                  <AppLeftNavProvider>
-                    <AppLayoutProvider>{children}</AppLayoutProvider>
-                  </AppLeftNavProvider>
-                </AppBarProvider>
+                <HighlightProvider>
+                  <CarouselProvider>
+                    <DrawerProvider>
+                      <AppBarProvider search={search}>
+                        <AppLeftNavProvider>
+                          <AppLayoutProvider>{children}</AppLayoutProvider>
+                        </AppLeftNavProvider>
+                      </AppBarProvider>
+                    </DrawerProvider>
+                  </CarouselProvider>
+                </HighlightProvider>
               </AppUserProvider>
             </AppSnackbarProvider>
           </ErrorBoundary>
