@@ -1,3 +1,4 @@
+import Redirect from 'commons/components/utils/Redirect';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import ForbiddenPage from 'components/routes/403';
@@ -49,8 +50,7 @@ import Tos from 'components/routes/tos';
 import User from 'components/routes/user';
 import { resetFavicon } from 'helpers/utils';
 import { memo, useEffect, useState } from 'react';
-import { matchPath, Navigate, useLocation } from 'react-router';
-import { Route, Routes } from 'react-router-dom';
+import { matchPath, Navigate, Route, Routes, useLocation } from 'react-router';
 
 const APP_NAME = 'AL4';
 
@@ -86,6 +86,7 @@ function RouteActions() {
 
 const WrappedRoutes = () => {
   const { configuration, settings } = useALContext();
+
   return (
     <>
       <RouteActions />
@@ -138,9 +139,9 @@ const WrappedRoutes = () => {
         <Route path="/submission/detail/:id" element={<SubmissionDetail />} />
         <Route path="/submission/report/:id" element={<SubmissionReport />} />
         {settings.submission_view === 'details' ? (
-          <Route path="/submission/:id" element={<Navigate to="/submission/detail/:id" />} />
+          <Route path="/submission/:id" element={<Redirect to="/submission/detail/:id" />} />
         ) : (
-          <Route path="/submission/:id" element={<Navigate to="/submission/report/:id" />} />
+          <Route path="/submission/:id" element={<Redirect to="/submission/report/:id" />} />
         )}
         <Route path="/submissions" element={<Submissions />} />
         <Route path="/tos" element={<Tos />} />

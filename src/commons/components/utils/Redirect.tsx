@@ -1,28 +1,19 @@
-import { useEffect } from 'react';
-import { Navigate, useLocation, useParams } from 'react-router';
+import { Navigate, useParams } from 'react-router';
 
 type Props = {
-  from: string;
   to: string;
 };
 
 // TODO: Add this to commons
-export const Redirect: React.FC<Props> = ({ from = '', to = '' }: Props) => {
+export const Redirect: React.FC<Props> = ({ to = '' }: Props) => {
   const params = useParams();
-  const { pathname } = useLocation();
 
-  useEffect(() => {
-    const from1 = from.split('/');
-    const to1 = to.split('/');
-    const pathname1 = pathname.split('/');
+  let newTo = to;
+  Object.entries(params).forEach(p => {
+    newTo = newTo.replace(`/:${p[0]}`, `/${p[1]}`);
+  });
 
-    console.log(from1, to1, pathname1);
-  }, [from, pathname, to]);
-
-  // const [{ route }] = matchRoutes(routes, location);
-  console.log('navigate', from, to, pathname, params);
-
-  return <Navigate to={to} />;
+  return <Navigate to={newTo} />;
 };
 
 export default Redirect;
