@@ -7,7 +7,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import makeStyles from '@mui/styles/makeStyles';
-import { isEscape } from 'commons_deprecated/addons/elements/utils/keyboard';
+import { isEscape } from 'commons/components/utils/keyboard';
 import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SearchType, StoreProps, useDispatch, useEventListener } from '../..';

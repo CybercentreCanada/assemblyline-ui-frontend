@@ -1,4 +1,4 @@
-import { isArrowDown, isArrowUp } from 'commons_deprecated/addons/elements/utils/keyboard';
+import { isArrowDown, isArrowUp } from 'commons/components/utils/keyboard';
 import { useCallback } from 'react';
 import {
   clampScrollIndex,

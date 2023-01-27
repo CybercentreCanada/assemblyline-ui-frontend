@@ -1,6 +1,6 @@
 import { ClickAwayListener, Fade, Paper, Popper } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import { isEnter, isEscape } from 'commons_deprecated/addons/elements/utils/keyboard';
+import { isEnter, isEscape } from 'commons/components/utils/keyboard';
 import { default as React, forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 import { NumericField } from '../..';
 
