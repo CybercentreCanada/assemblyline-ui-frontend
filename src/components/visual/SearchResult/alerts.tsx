@@ -1,7 +1,6 @@
-import { Tooltip } from '@mui/material';
+import { AlertTitle, Skeleton, Tooltip } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
-import { AlertTitle, Skeleton } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
 import Verdict from 'components/visual/Verdict';
@@ -98,9 +97,11 @@ const WrappedAlertsTable: React.FC<AlertsTableProps> = ({ alertResults, allowSor
               >
                 <DivTableCell>
                   <Tooltip title={alert.reporting_ts}>
-                    <Moment fromNow locale={i18n.language}>
-                      {alert.reporting_ts}
-                    </Moment>
+                    <>
+                      <Moment fromNow locale={i18n.language}>
+                        {alert.reporting_ts}
+                      </Moment>
+                    </>
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell>

@@ -109,9 +109,11 @@ const WrappedSafelistTable: React.FC<SafelistTableProps> = ({
               >
                 <DivTableCell>
                   <Tooltip title={sl_item.added}>
-                    <Moment fromNow locale={i18n.language}>
-                      {sl_item.added}
-                    </Moment>
+                    <>
+                      <Moment fromNow locale={i18n.language}>
+                        {sl_item.added}
+                      </Moment>
+                    </>
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell>{sl_item.type}</DivTableCell>

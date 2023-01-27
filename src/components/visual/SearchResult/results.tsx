@@ -1,8 +1,7 @@
-import { Tooltip, useTheme } from '@mui/material';
+import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
+import { AlertTitle, Skeleton, Tooltip, useTheme } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
-import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
-import { AlertTitle, Skeleton } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
 import Verdict from 'components/visual/Verdict';
@@ -93,9 +92,11 @@ const WrappedResultsTable: React.FC<ResultsTableProps> = ({ resultResults, allow
               >
                 <DivTableCell>
                   <Tooltip title={result.created}>
-                    <Moment fromNow locale={i18n.language}>
-                      {result.created}
-                    </Moment>
+                    <>
+                      <Moment fromNow locale={i18n.language}>
+                        {result.created}
+                      </Moment>
+                    </>
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell>

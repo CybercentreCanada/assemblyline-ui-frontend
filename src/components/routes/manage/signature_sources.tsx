@@ -405,9 +405,11 @@ export const SourceCard = ({ source, onClick, service, generatesSignatures, show
               <div>
                 <span className={classes.card_caption}>{t('update.label.last_successful')}:&nbsp;</span>
                 <Tooltip title={source.status.last_successful_update}>
-                  <Moment className={classes.card_caption} fromNow locale={i18n.language}>
-                    {source.status.last_successful_update}
-                  </Moment>
+                  <>
+                    <Moment className={classes.card_caption} fromNow locale={i18n.language}>
+                      {source.status.last_successful_update}
+                    </Moment>
+                  </>
                 </Tooltip>
               </div>
               <Tooltip title={`${source.status.message} @ ${source.status.ts}`}>

@@ -1,10 +1,9 @@
-import { Tooltip, useTheme } from '@mui/material';
-import Paper from '@mui/material/Paper';
-import TableContainer from '@mui/material/TableContainer';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
-import { AlertTitle, Skeleton } from '@mui/material';
+import { AlertTitle, Skeleton, Tooltip, useTheme } from '@mui/material';
+import Paper from '@mui/material/Paper';
+import TableContainer from '@mui/material/TableContainer';
 import {
   DivTable,
   DivTableBody,
@@ -98,9 +97,11 @@ const WrappedErrorsTable: React.FC<ErrorsTableProps> = ({ errorResults, setError
               >
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>
                   <Tooltip title={error.created}>
-                    <Moment fromNow locale={i18n.language}>
-                      {error.created}
-                    </Moment>
+                    <>
+                      <Moment fromNow locale={i18n.language}>
+                        {error.created}
+                      </Moment>
+                    </>
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>{error.response.service_name}</DivTableCell>

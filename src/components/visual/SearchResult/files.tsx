@@ -1,8 +1,7 @@
-import { Tooltip } from '@mui/material';
+import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
+import { AlertTitle, Skeleton, Tooltip } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
-import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
-import { AlertTitle, Skeleton } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
 import 'moment/locale/fr';
@@ -92,9 +91,11 @@ const WrappedFilesTable: React.FC<FilesTableProps> = ({ fileResults, allowSort =
               >
                 <DivTableCell>
                   <Tooltip title={file.seen.last}>
-                    <Moment fromNow locale={i18n.language}>
-                      {file.seen.last}
-                    </Moment>
+                    <>
+                      <Moment fromNow locale={i18n.language}>
+                        {file.seen.last}
+                      </Moment>
+                    </>
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell>{file.seen.count}</DivTableCell>
