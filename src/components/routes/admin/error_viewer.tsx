@@ -5,8 +5,8 @@ import { Grid, MenuItem, Select, Typography, useMediaQuery, useTheme } from '@mu
 import makeStyles from '@mui/styles/makeStyles';
 import SearchBar from 'commons/addons/search/SearchBar';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
-import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
+import PageFullWidth from 'commons_deprecated/components/layout/pages/PageFullWidth';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';

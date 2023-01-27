@@ -22,7 +22,7 @@ import {
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
-import PageFullWidth from 'commons/components/pages/PageFullWidth';
+import PageFullWidth from 'commons_deprecated/components/layout/pages/PageFullWidth';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';

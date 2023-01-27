@@ -5,7 +5,7 @@ import { Box, Card, Collapse, Grid, MenuItem, Select, Typography, useMediaQuery,
 import Skeleton from '@mui/material/Skeleton';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
-import PageFullWidth from 'commons/components/pages/PageFullWidth';
+import PageFullWidth from 'commons_deprecated/components/layout/pages/PageFullWidth';
 import useMyAPI from 'components/hooks/useMyAPI';
 import CustomChip from 'components/visual/CustomChip';
 import { useEffect, useState } from 'react';
