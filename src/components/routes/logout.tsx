@@ -1,7 +1,7 @@
 import { CircularProgress, Typography, useTheme } from '@mui/material';
 import useAppBanner from 'commons/components/app/hooks/useAppBanner';
-import useAppLayout from 'commons_deprecated/components/hooks/useAppLayout';
-import CardCentered from 'commons_deprecated/components/layout/pages/CardCentered';
+import useAppLayout from 'commons/components/app/hooks/useAppLayout';
+import PageCardCentered from 'commons/components/pages/PageCardCentered';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -28,7 +28,7 @@ function Logout() {
   }, []);
 
   return (
-    <CardCentered>
+    <PageCardCentered>
       <div style={{ textAlign: 'center' }}>
         {banner}
         <div style={{ marginBottom: theme.spacing(3) }}>
@@ -36,7 +36,7 @@ function Logout() {
         </div>
         <CircularProgress size={24} />
       </div>
-    </CardCentered>
+    </PageCardCentered>
   );
 }
 
