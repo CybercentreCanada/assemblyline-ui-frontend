@@ -10,8 +10,8 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
+import useAppTheme from 'commons/components/app/hooks/useAppTheme';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
-import useAppContext from 'commons_deprecated/components/hooks/useAppContext';
 import PageFullSize from 'commons_deprecated/components/layout/pages/PageFullSize';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -35,7 +35,7 @@ export default function AdminTagSafelist() {
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const { isDarkTheme } = useAppContext();
+  const { isDark: isDarkTheme } = useAppTheme();
 
   useEffect(() => {
     if (currentUser.is_admin) {

@@ -16,8 +16,8 @@ import {
   useTheme
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import useAppTheme from 'commons/components/app/hooks/useAppTheme';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
-import useAppContext from 'commons_deprecated/components/hooks/useAppContext';
 import PageFullSize from 'commons_deprecated/components/layout/pages/PageFullSize';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
@@ -80,7 +80,7 @@ const WrappedMonacoViewer = ({ data, type, error, beautify = false }) => {
   const classes = useStyles();
   const { i18n } = useTranslation();
   const containerEL = useRef<HTMLDivElement>();
-  const { isDarkTheme } = useAppContext();
+  const { isDark: isDarkTheme } = useAppTheme();
 
   useEffect(() => {
     // I cannot find a way to hot switch monaco editor's locale but at least I can load

@@ -10,7 +10,7 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import useAppContext from 'commons_deprecated/components/hooks/useAppContext';
+import useAppTheme from 'commons/components/app/hooks/useAppTheme';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import React, { useEffect, useRef, useState } from 'react';
@@ -71,7 +71,7 @@ function WrappedLibMagic({ reload, magicFile, originalMagicFile, setMagicFile })
   const [open, setOpen] = useState(false);
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
-  const { isDarkTheme } = useAppContext();
+  const { isDark } = useAppTheme();
 
   useEffect(() => {
     if (!magicFile) reload();
@@ -124,7 +124,7 @@ function WrappedLibMagic({ reload, magicFile, originalMagicFile, setMagicFile })
                 <div ref={containerDialogEL}>
                   <DiffEditor
                     language="magic"
-                    theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                    theme={isDark ? 'vs-dark' : 'vs'}
                     original={originalMagicFile}
                     width={width}
                     height="50vh"
@@ -210,7 +210,7 @@ function WrappedLibMagic({ reload, magicFile, originalMagicFile, setMagicFile })
                       language="magic"
                       width={width}
                       height={height}
-                      theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                      theme={isDark ? 'vs-dark' : 'vs'}
                       loading={t('loading.magic')}
                       value={magicFile}
                       onChange={setMagicFile}

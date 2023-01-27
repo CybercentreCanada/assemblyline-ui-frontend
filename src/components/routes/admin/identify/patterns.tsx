@@ -10,7 +10,7 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import useAppContext from 'commons_deprecated/components/hooks/useAppContext';
+import useAppTheme from 'commons/components/app/hooks/useAppTheme';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import React, { useEffect, useRef, useState } from 'react';
@@ -27,7 +27,7 @@ function WrappedPatterns({ reload, patternsFile, originalPatternsFile, setPatter
   const [open, setOpen] = useState(false);
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
-  const { isDarkTheme } = useAppContext();
+  const { isDark: isDarkTheme } = useAppTheme();
 
   useEffect(() => {
     if (!patternsFile) reload();
