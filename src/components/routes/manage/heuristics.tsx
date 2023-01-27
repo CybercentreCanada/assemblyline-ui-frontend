@@ -1,12 +1,14 @@
 import { useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
-import PageFullWidth from 'commons_deprecated/components/layout/pages/PageFullWidth';
-import PageHeader from 'commons_deprecated/components/layout/pages/PageHeader';
+import SearchBar from 'commons/addons/search/SearchBar';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
+import PageFullWidth from 'commons/components/pages/PageFullWidth';
+import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
-import SearchBar from 'components/visual/SearchBar/search-bar';
+import { CustomUser } from 'components/hooks/useMyUser';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
@@ -50,7 +52,8 @@ export default function Heuristics() {
   const { t } = useTranslation(['manageHeuristics']);
   const [pageSize] = useState(PAGE_SIZE);
   const [searching, setSearching] = useState(false);
-  const { indexes, user: currentUser } = useALContext();
+  const { indexes } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
   const [heuristicResults, setHeuristicResults] = useState<SearchResults>(null);
   const location = useLocation();
   const [query, setQuery] = useState<SimpleSearchQuery>(null);

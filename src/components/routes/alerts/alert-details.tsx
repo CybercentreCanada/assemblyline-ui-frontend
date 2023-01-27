@@ -6,8 +6,8 @@ import { Button, Collapse, Divider, Grid, IconButton, Skeleton, Tooltip, Typogra
 import Alert from '@mui/material/Alert';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
+import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import useClipboard from 'commons_deprecated/components/hooks/useClipboard';
-import PageFullWidth from 'commons_deprecated/components/layout/pages/PageFullWidth';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';

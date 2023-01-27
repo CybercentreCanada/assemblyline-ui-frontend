@@ -4,13 +4,13 @@ import CenterFocusStrongOutlinedIcon from '@mui/icons-material/CenterFocusStrong
 import { IconButton, Paper, Tab, Tabs, Theme, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
-import PageFullWidth from 'commons_deprecated/components/layout/pages/PageFullWidth';
-import PageHeader from 'commons_deprecated/components/layout/pages/PageHeader';
+import SearchBar from 'commons/addons/search/SearchBar';
+import PageFullWidth from 'commons/components/pages/PageFullWidth';
+import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import Empty from 'components/visual/Empty';
-import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
