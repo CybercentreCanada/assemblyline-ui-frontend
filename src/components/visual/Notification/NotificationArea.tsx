@@ -61,6 +61,7 @@ const useStyles = makeStyles(theme => ({
     pageBreakInside: 'avoid',
     padding: theme.spacing(2.5),
     paddingTop: 0
+    // backgroundColor: theme.palette.background.paper
   },
   container: {
     display: 'flex',
@@ -78,10 +79,10 @@ const useStyles = makeStyles(theme => ({
   },
   closeRow: {
     position: 'sticky',
-    backgroundColor: theme.palette.background.paper,
     paddingTop: theme.spacing(1),
     zIndex: 20000,
     top: '0px'
+    // backgroundColor: theme.palette.background.paper
   },
   center: {
     justifyContent: 'center'
@@ -139,7 +140,6 @@ const useStyles = makeStyles(theme => ({
     paddingLeft: theme.spacing(0.5),
     paddingRight: theme.spacing(0.5)
   },
-
   baseColor: {
     color: theme.palette.getContrastText(theme.palette.primary.main),
     backgroundColor: theme.palette.primary.main

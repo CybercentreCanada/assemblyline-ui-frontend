@@ -12,6 +12,7 @@ export type AppConfigs = {
 };
 
 // Specification interface for the AppProvider's 'preferences' attribute.
+// TODO: Show Safe Results
 export type AppPreferenceConfigs = {
   appName: string; // Name of your app, it will show up in the drawer and the top nav bar
   appLink?: To; // Route to navigate to when the icon on the left nav bar is pressed
@@ -33,6 +34,7 @@ export type AppPreferenceConfigs = {
   defaultShowQuickSearch?: boolean; // Should the quick search be shown by default
   defaultAutoHideAppbar?: boolean; // Should the top bar autohide (applies only to "side" layout)
   defaultShowBreadcrumbs?: boolean; // Indicate whether breadcrumbs should be shown by default.
+  allowShowSafeResults?: boolean; // Indicate whether Show Safe Results should be shown by default.
   topnav?: AppTopNavConfigs; // top nav appbar specific configurations.
   leftnav?: AppLeftNavConfigs; // left nav drawer specific configurations.
   avatarD?: GravatarD; // The gravatar api uses this parameter to generate a themed image unique to an email address.
@@ -55,12 +57,14 @@ export type AppSiteMapConfigs = {
 
 // Specification inteface for 'topnav' configurations.
 // These configurations apply to the top navigation appbar.
+// TODO: Add userMenuType to commons
 export type AppTopNavConfigs = {
   themeSelectionMode?: AppThemeSelectionMode; // Where does the theme selection menu shows up either. In separate icon ("icon") or under user profile ("profile").
   apps?: AppSwitcherItem[]; // The list of appliations to display in the app-switcher.
   userMenu?: AppBarUserMenuElement[]; // The list of userprofile menu elements.  If no item is provided, the menu is hidden.
   userMenuI18nKey?: string; // (RECOMMENDED) The i18nKey to use to resolve the user menu title.
   userMenuTitle?: string; // Title displayed for the user menu if not using 'userMenuI18nKey' for some reason.
+  userMenuType?: 'icon' | 'list'; // Display type of the user menu
   adminMenu?: AppBarUserMenuElement[]; // The list of userprofile admin menu elements.  If no item is provided, the menu is hidden.
   adminMenuI18nKey?: string; // (RECOMMENDED) The i18nKey to use to resolve the admin menu title.
   adminMenuTitle?: string; // Title displayed for the admin menu

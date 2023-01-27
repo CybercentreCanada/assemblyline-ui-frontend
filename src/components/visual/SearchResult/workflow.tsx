@@ -1,7 +1,7 @@
+import { AlertTitle, Skeleton } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
-import { AlertTitle, Skeleton } from '@mui/material';
-import useALContext from 'components/hooks/useALContext';
+import useMyUser from 'components/hooks/useMyUser';
 import Classification from 'components/visual/Classification';
 import 'moment/locale/fr';
 import React from 'react';
@@ -49,7 +49,8 @@ type WorkflowTableProps = {
 
 const WrappedWorflowTable: React.FC<WorkflowTableProps> = ({ workflowResults, setWorkflowID = null }) => {
   const { t, i18n } = useTranslation(['search']);
-  const { c12nDef } = useALContext();
+  // const { c12nDef } = useALContext();
+  const { c12nDef } = useMyUser();
 
   return workflowResults ? (
     workflowResults.total !== 0 ? (

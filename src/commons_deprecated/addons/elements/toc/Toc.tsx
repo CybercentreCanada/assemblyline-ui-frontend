@@ -1,6 +1,7 @@
 import { useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import useAppLayout from 'commons_deprecated/components/hooks/useAppLayout';
+import useAppBar from 'commons/components/app/hooks/useAppBar';
+import useAppLayout from 'commons/components/app/hooks/useAppLayout';
 import useUser from 'commons_deprecated/components/hooks/useAppUser';
 import React, { ReactNode, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -74,7 +75,8 @@ export type ContentWithTOCItemProps = {
 };
 
 const ContentWithTOCItem: React.FC<ContentWithTOCItemProps> = ({ translation, item }) => {
-  const { autoHideAppbar, currentLayout } = useAppLayout();
+  const { autoHide: autoHideAppbar } = useAppBar();
+  const { current: currentLayout } = useAppLayout();
   const classes = useStyles(autoHideAppbar && currentLayout !== 'top');
   const location = useLocation();
   const { t } = useTranslation([translation]);
@@ -117,7 +119,8 @@ const WrappedContentWithTOC: React.FC<ContentWithTOCProps> = ({
   title = null,
   top = null
 }) => {
-  const { autoHideAppbar, currentLayout } = useAppLayout();
+  const { autoHide: autoHideAppbar } = useAppBar();
+  const { current: currentLayout } = useAppLayout();
   const theme = useTheme();
   const classes = useStyles();
   const location = useLocation();

@@ -23,6 +23,7 @@ import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import SimCardOutlinedIcon from '@mui/icons-material/SimCardOutlined';
 import SupervisorAccountOutlinedIcon from '@mui/icons-material/SupervisorAccountOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
+import { AppElement } from 'commons/components/topnav/AppSwitcher';
 import { AppLayoutProps } from 'commons_deprecated/components/layout/LayoutProvider';
 import { Notification } from 'components/visual/Notification';
 import { useTranslation } from 'react-i18next';
@@ -310,14 +311,14 @@ const useMyLayout = (): AppLayoutProps => {
     }
   ];
 
-  const APP_SWITCHER_ITEMS = [
-    // {
-    //   alt: 'AL',
-    //   name: 'Assemblyline',
-    //   img_d: '/images/al_dark.svg',
-    //   img_l: '/images/al.svg',
-    //   route: 'https://localhost'
-    // }
+  const APP_SWITCHER_ITEMS: AppElement[] = [
+    {
+      alt: 'AL',
+      name: 'Assemblyline',
+      img_d: '/images/al_dark.svg',
+      img_l: '/images/al.svg',
+      route: 'https://localhost'
+    }
   ];
 
   const USER_MENU_ITEMS = [

@@ -1,19 +1,20 @@
 import BackspaceIcon from '@mui/icons-material/Backspace';
+import SearchIcon from '@mui/icons-material/Search';
 import {
   alpha,
   Box,
+  CircularProgress,
   Divider,
   IconButton,
   IconButtonProps,
-  LinearProgress,
   Tooltip,
   useMediaQuery,
   useTheme
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import React, { useEffect, useRef, useState } from 'react';
+import { ReactElement, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import SearchTextField from './search-textfield';
+import SearchTextField from './SearchBarTextField';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -38,7 +39,7 @@ const useStyles = makeStyles(theme => ({
     paddingBottom: theme.spacing(1)
   }
 }));
-
+// TODO: Add tooltip to searchbar button
 export interface SearchBarButton {
   icon: React.ReactElement;
   props: IconButtonProps;
@@ -46,16 +47,15 @@ export interface SearchBarButton {
 }
 
 interface SearchBarProps {
-  children?: React.ReactNode;
   initValue: string;
   placeholder?: string;
   searching?: boolean;
   buttons?: SearchBarButton[];
-  extras?: React.ReactNode;
   suggestions?: string[];
+  children?: React.ReactNode | ReactElement | ReactElement[];
   onValueChange?: (filterValue: string) => void;
   onSearch: (filterValue: string, inputElement: HTMLInputElement) => void;
-  onClear: (inputElement: HTMLInputElement) => void;
+  onClear: () => void;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
@@ -65,7 +65,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
   searching = false,
   suggestions = [],
   buttons = [],
-  extras,
   onValueChange,
   onSearch,
   onClear
@@ -77,8 +76,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const [value, setValue] = useState<string>(initValue);
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
 
-  //
-  const getInputEl = () => element.current.querySelector('input');
+  const getInputEl = () => {
+    return element.current.querySelector('input');
+  };
 
   // handler[onchange]: textfield change handler.
   // track value of filter..
@@ -91,28 +91,34 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const _onValueClear = () => {
     // textFieldEl.current.querySelector('input').focus();
     setValue('');
-    onClear(getInputEl());
+    onClear();
   };
 
   // When requesting a search.
   const _onSearch = () => {
-    onSearch(value, getInputEl());
+    if (value && value.length > 0) {
+      onSearch(value, getInputEl());
+    } else {
+      onClear();
+    }
   };
 
-  //
   useEffect(() => {
     setValue(initValue);
   }, [initValue]);
 
   return (
     <div ref={element} className={classes.root}>
-      <Box
-        display="flex"
-        flexDirection="row"
-        className={classes.searchbar}
-        alignItems="center"
-        style={{ paddingRight: !extras ? theme.spacing(0.5) : null }}
-      >
+      <Box display="flex" flexDirection="row" className={classes.searchbar} alignItems="center">
+        <Box mr={2}>
+          {searching ? (
+            <Box style={{ width: 35, height: 35 }}>
+              <CircularProgress color="primary" size={30} />
+            </Box>
+          ) : (
+            <SearchIcon color="primary" fontSize="large" />
+          )}
+        </Box>
         <Box flex={1} display="relative">
           <SearchTextField
             value={value}
@@ -124,50 +130,23 @@ const SearchBar: React.FC<SearchBarProps> = ({
             onClear={_onValueClear}
           />
         </Box>
-        <IconButton
-          onClick={_onValueClear}
-          edge="end"
-          size={!upMD ? 'small' : null}
-          style={{ marginRight: theme.spacing(upMD ? 0 : 0.5) }}
-          disabled={searching}
-        >
+        <IconButton onClick={_onValueClear} edge="end" color="primary" size="large">
           <Tooltip title={t('clear_filter')}>
             <BackspaceIcon fontSize={!upMD ? 'small' : 'medium'} />
           </Tooltip>
         </IconButton>
-        {buttons.length !== 0 && (
-          <Divider
-            orientation="vertical"
-            flexItem
-            style={{ marginLeft: theme.spacing(upMD ? 1 : 0.5), marginRight: theme.spacing(upMD ? 1 : 0.5) }}
-          />
-        )}
+        <Divider
+          orientation="vertical"
+          flexItem
+          style={{ marginLeft: theme.spacing(1), marginRight: theme.spacing(1) }}
+        />
         {buttons.map((b, i) => (
-          <IconButton
-            key={`searchbar-button-${i}`}
-            // {...b.props}
-            edge="end"
-            size={!upMD ? 'small' : null}
-            style={{ marginRight: theme.spacing(upMD ? 0 : 0.5) }}
-            disabled={searching}
-          >
+          <IconButton key={`searchbar-button-${i}`} {...b.props} edge="end" color="primary" size="large">
             {b.tooltip ? <Tooltip title={b.tooltip}>{b.icon}</Tooltip> : b.icon}
           </IconButton>
         ))}
-        {extras}
       </Box>
-      {searching && (
-        <LinearProgress
-          style={{
-            position: 'absolute',
-            height: theme.spacing(upMD ? 0.5 : 0.25),
-            marginTop: theme.spacing(upMD ? -0.5 : -0.25),
-            width: '100%',
-            borderRadius: '0 0 4px 4px'
-          }}
-        />
-      )}
-      <div className={classes.searchresult}>{children}</div>
+      <Box className={classes.searchresult}>{children}</Box>
     </div>
   );
 };

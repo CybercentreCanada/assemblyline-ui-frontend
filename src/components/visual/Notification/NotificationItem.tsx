@@ -96,6 +96,7 @@ const useStyles = makeStyles(theme => ({
     marginTop: '8px'
   },
   description: {
+    fontSize: 'smaller',
     '& a': {
       textDecoration: 'none',
       color: theme.palette.primary.main,

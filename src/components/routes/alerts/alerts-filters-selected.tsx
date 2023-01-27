@@ -20,8 +20,10 @@ const AlertsFiltersSelected: React.FC<AlertFiltersSelectedProps> = ({
 }) => {
   const { t } = useTranslation('alerts');
 
-  const filters = searchQuery.parseFilters();
-  const query = searchQuery.getQuery();
+  console.log(searchQuery);
+
+  const filters = searchQuery?.parseFilters();
+  const query = searchQuery?.getQuery();
 
   const onDeleteMainQuery = () => {
     onChange(filters, '');

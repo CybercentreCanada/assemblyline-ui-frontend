@@ -19,7 +19,7 @@ import 'moment/locale/fr';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import ForbiddenPage from './403';
 
 const PAGE_SIZE = 25;
@@ -105,6 +105,7 @@ export default function Submissions() {
     <PageFullWidth margin={4}>
       <div style={{ paddingBottom: theme.spacing(2) }}>
         <Typography variant="h4">{t('title')}</Typography>
+        <Link to={`/submission/report/${'asd'}`}>Link</Link>
       </div>
       <PageHeader isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>

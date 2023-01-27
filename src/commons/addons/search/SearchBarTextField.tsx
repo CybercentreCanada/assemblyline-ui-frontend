@@ -3,49 +3,80 @@ import { Box, TextField, Typography, useMediaQuery, useTheme } from '@mui/materi
 import makeStyles from '@mui/styles/makeStyles';
 import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { insertText } from '../utils/browser';
 import { isArrowDown, isArrowLeft, isArrowRight, isArrowUp, isEnter, isEscape } from '../utils/keyboard';
 
 const useStyles = makeStyles(theme => ({
   searchTextFieldOptionsCt: {
+    textAlign: 'left',
     position: 'relative',
     height: 0,
-    outline: 'none'
+    outline: 'none',
+    borderRadius: '0 0 4px 4px'
   },
   searchTextFieldOptionsInner: {
     display: 'inline-block',
     position: 'absolute',
     overflow: 'auto',
     zIndex: 1,
-    top: 0,
-    minWidth: 400,
+    top: theme.spacing(1),
+    minWidth: '100%',
     maxHeight: 250,
-    backgroundColor: theme.palette.mode === 'dark' ? 'hsl(0, 0%, 10%)' : 'hsl(0, 0%, 95%)',
-    boxShadow: theme.shadows[4]
+    backgroundColor: theme.palette.background.default,
+    boxShadow: theme.shadows[4],
+    borderRadius: '0 0 4px 4px'
   },
+  searchTextFieldItem: {
+    padding: theme.spacing(1),
+    '&:hover': {
+      cursor: 'pointer',
+      backgroundColor: theme.palette.action.hover
+    },
+    '&[data-searchtextfieldoption-selected="true"]': {
+      backgroundColor: theme.palette.action.selected
+    }
+  },
+  // searchTextFieldOptionsCt: {
+  //   position: 'relative',
+  //   height: 0,
+  //   outline: 'none'
+  // },
+  // searchTextFieldOptionsInner: {
+  //   display: 'inline-block',
+  //   position: 'absolute',
+  //   overflow: 'auto',
+  //   zIndex: 1,
+  //   top: 0,
+  //   minWidth: 400,
+  //   maxHeight: 250,
+  //   backgroundColor: theme.palette.mode === 'dark' ? 'hsl(0, 0%, 10%)' : 'hsl(0, 0%, 95%)',
+  //   boxShadow: theme.shadows[4]
+  // },
   serachTextFieldOptionsInnerSpacer: {
     display: 'inline-block',
     height: 0,
     lineHeight: 0,
     overflow: 'hidden',
     whiteSpace: 'pre'
-  },
-  searchTextFieldItem: {
-    padding: theme.spacing(1),
-    color: theme.palette.primary.light,
-    '&:hover': {
-      cursor: 'pointer',
-      backgroundColor: theme.palette.mode === 'dark' ? 'hsl(0, 0%, 17%)' : 'hsl(0, 0%, 90%)'
-    },
-    '&[data-searchtextfieldoption-selected="true"]': {
-      backgroundColor: theme.palette.mode === 'dark' ? 'hsl(0, 0%, 15%)' : 'hsl(0, 0%, 92%)'
-    }
   }
+  // searchTextFieldItem: {
+  //   padding: theme.spacing(1),
+  //   color: theme.palette.primary.light,
+  //   '&:hover': {
+  //     cursor: 'pointer',
+  //     backgroundColor: theme.palette.mode === 'dark' ? 'hsl(0, 0%, 17%)' : 'hsl(0, 0%, 90%)'
+  //   },
+  //   '&[data-searchtextfieldoption-selected="true"]': {
+  //     backgroundColor: theme.palette.mode === 'dark' ? 'hsl(0, 0%, 15%)' : 'hsl(0, 0%, 92%)'
+  //   }
+  // }
 }));
 
 interface SearchTextFieldProps {
   value: string;
   options: string[];
+  placeholder?: string;
   disabled?: boolean;
   onChange: (value: string) => void;
   onClear: () => void;
@@ -56,12 +87,14 @@ interface SearchTextFieldProps {
 const SearchTextField: React.FC<SearchTextFieldProps> = ({
   value,
   options,
+  placeholder = null,
   disabled = false,
   onSearch,
   onChange,
   onSelection,
   onClear
 }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const classes = useStyles();
   const [cursor, setCursor] = useState<number>(0);
@@ -261,7 +294,7 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
   return (
     <div ref={element}>
       <TextField
-        placeholder="Filter..."
+        placeholder={placeholder || t('filter')}
         value={value}
         color="secondary"
         // InputProps={{ disableUnderline: true }}

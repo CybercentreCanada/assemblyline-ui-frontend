@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
@@ -81,14 +82,7 @@ const useMyPreferences = () => {
     [t]
   );
 
-  const TOP_NAV_RIGHT = useMemo(
-    (): ReactNode => (
-      <Box mr={2}>
-        <Notification />
-      </Box>
-    ),
-    []
-  );
+  const TOP_NAV_RIGHT = useMemo((): ReactNode => <Box mr={2}>{<Notification />}</Box>, []);
 
   const LEFT_MENU_ITEMS = useMemo(
     (): AppLeftNavElement[] => [
@@ -441,21 +435,26 @@ const useMyPreferences = () => {
       bannerDark: AL_DARK_BANNER,
       bannerLight: AL_LIGHT_BANNER,
       defaultShowQuickSearch: true,
-      allowGravatar: true,
+      allowShowSafeResults: true,
+      // allowGravatar: true,
+      allowQuickSearch: true,
+      allowReset: false,
       avatarD: 'robohash',
       topnav: {
         apps: [],
         userMenu: USER_MENU_ITEMS,
         userMenuI18nKey: 'usermenu',
+        userMenuType: 'icon',
         adminMenu: ADMIN_MENU_ITEMS,
         adminMenuI18nKey: 'adminmenu',
         // leftAfterBreadcrumbs: <CreateButton />,
-        rightBeforeSearch: TOP_NAV_RIGHT,
+        right: TOP_NAV_RIGHT,
+
         quickSearchURI: '/search/jobs',
         quickSearchParam: 'js'
       },
       leftnav: {
-        width: 320,
+        width: 240,
         elements: LEFT_MENU_ITEMS
       }
     }),

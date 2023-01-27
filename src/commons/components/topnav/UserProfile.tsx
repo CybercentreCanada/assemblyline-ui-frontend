@@ -12,6 +12,7 @@ import {
   Paper,
   Popper,
   styled,
+  Tooltip,
   Typography,
   useTheme
 } from '@mui/material';
@@ -88,6 +89,30 @@ const UserProfile = () => {
     [t]
   );
 
+  // TODO: Add renderButtonMenu to commons
+  const renderButtonMenu = useCallback(
+    (menuItems: AppBarUserMenuElement[]) => {
+      if (menuItems !== undefined && menuItems !== null && menuItems.length !== 0) {
+        return (
+          <div style={{ marginBottom: theme.spacing(-2), textAlign: 'end' }}>
+            {menuItems.map(
+              (a, i) =>
+                a.icon && (
+                  <Tooltip key={`buttonmenu-${i}`} title={t(a.i18nKey)}>
+                    <IconButton component={Link} color="inherit" to={a.route} size="large">
+                      {a.icon}
+                    </IconButton>
+                  </Tooltip>
+                )
+            )}
+          </div>
+        );
+      }
+      return null;
+    },
+    [t, theme]
+  );
+
   return (
     <ClickAwayListener onClickAway={onClickAway}>
       <IconButton
@@ -147,16 +172,19 @@ const UserProfile = () => {
                         <Typography variant="caption" noWrap>
                           {user.email}
                         </Typography>
+                        {configs.preferences.topnav.userMenuType === 'icon' &&
+                          renderButtonMenu(configs.preferences.topnav.userMenu)}
                       </Box>
                     </Box>
                   </ListItem>
                 </List>
-                {renderMenu(
-                  'usermenu',
-                  configs.preferences.topnav.userMenu,
-                  configs.preferences.topnav.userMenuTitle,
-                  configs.preferences.topnav.userMenuI18nKey
-                )}
+                {configs.preferences.topnav.userMenuType === 'list' &&
+                  renderMenu(
+                    'usermenu',
+                    configs.preferences.topnav.userMenu,
+                    configs.preferences.topnav.userMenuTitle,
+                    configs.preferences.topnav.userMenuI18nKey
+                  )}
                 {user.is_admin &&
                   renderMenu(
                     'adminmenu',

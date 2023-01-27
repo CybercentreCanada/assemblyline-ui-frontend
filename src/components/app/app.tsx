@@ -1,15 +1,14 @@
-import { StyledEngineProvider, ThemeProvider } from '@mui/material';
-import { createTheme, Theme } from '@mui/material/styles';
-import AppContextProvider from 'commons/components/app/AppContextProvider';
-import useAppLayout from 'commons/components/hooks/useAppLayout';
-import AppLayoutProvider from 'commons/components/layout/LayoutProvider';
-import SiteMapProvider from 'commons/components/sitemap/SitemapProvider';
-import UserProvider from 'commons/components/user/UserProvider';
+import { Theme } from '@mui/material/styles';
+import { AppPreferenceConfigs, AppSiteMapConfigs, AppThemeConfigs } from 'commons/components/app/AppConfigs';
+import AppProvider from 'commons/components/app/AppProvider';
+import useAppLayout from 'commons/components/app/hooks/useAppLayout';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI, { LoginParamsProps } from 'components/hooks/useMyAPI';
 import useMyLayout from 'components/hooks/useMyLayout';
+import useMyPreferences from 'components/hooks/useMyPreferences';
 import useMySitemap from 'components/hooks/useMySitemap';
-import useMyUser from 'components/hooks/useMyUser';
+import useMyTheme from 'components/hooks/useMyTheme';
+import useMyUser, { CustomAppUserService } from 'components/hooks/useMyUser';
 import LoadingScreen from 'components/routes/loading';
 import LockedPage from 'components/routes/locked';
 import LoginScreen from 'components/routes/login';
@@ -31,13 +30,13 @@ declare module '@mui/styles/defaultTheme' {
 
 type PossibleApps = 'load' | 'locked' | 'login' | 'routes' | 'tos';
 
-const MyApp = () => {
+const MyAppMain = () => {
   const storedLoginParams = localStorage.getItem('loginParams');
   const defaultLoginParams = storedLoginParams ? JSON.parse(storedLoginParams) : null;
 
   const provider = getProvider();
   const { setUser, setConfiguration, user, configuration } = useALContext();
-  const { setReady, setApps } = useAppLayout();
+  const { setReady /* setApps */ } = useAppLayout();
   const { bootstrap } = useMyAPI();
 
   const [renderedApp, setRenderedApp] = useState<PossibleApps>(user ? 'routes' : provider ? 'login' : 'load');
@@ -49,11 +48,11 @@ const MyApp = () => {
     }
   };
 
-  useEffect(() => {
-    if (configuration && configuration.ui.apps) {
-      setApps(configuration.ui.apps);
-    }
-  }, [configuration, setApps]);
+  // useEffect(() => {
+  //   if (configuration && configuration.ui.apps) {
+  //     setApps(configuration.ui.apps);
+  //   }
+  // }, [configuration, setApps]);
 
   useEffect(() => {
     if (user || provider) {
@@ -81,7 +80,7 @@ const MyApp = () => {
   }[renderedApp];
 };
 
-const AppInit: React.FC = () => {
+const MyAppProvider: React.FC<any> = () => {
   // WARNING: do not use these hooks any other places than here.
   // Each of these hooks have corresponding hooks in the commons
   //  that accesses they global state stored in react context providers.
@@ -94,53 +93,63 @@ const AppInit: React.FC = () => {
 
   // General TemplateUI layout structure.
   return (
-    <BrowserRouter basename={process.env.PUBLIC_URL}>
-      <SafeResultsProvider>
-        <UserProvider {...userProps}>
-          <SiteMapProvider {...sitemapProps}>
-            <HighlightProvider>
-              <CarouselProvider>
-                <DrawerProvider>
-                  <AppLayoutProvider {...layoutProps}>
-                    <MyApp />
-                  </AppLayoutProvider>
-                </DrawerProvider>
-              </CarouselProvider>
-            </HighlightProvider>
-          </SiteMapProvider>
-        </UserProvider>
-      </SafeResultsProvider>
-    </BrowserRouter>
+    <>
+      {/* <SafeResultsProvider> */}
+      {/* <UserProvider {...userProps}> */}
+      {/* <SiteMapProvider {...sitemapProps}> */}
+      <HighlightProvider>
+        <CarouselProvider>
+          <DrawerProvider>
+            {/* <AppLayoutProvider {...layoutProps}> */}
+            <MyAppMain />
+            {/* </AppLayoutProvider> */}
+          </DrawerProvider>
+        </CarouselProvider>
+      </HighlightProvider>
+      {/* </SiteMapProvider> */}
+      {/* </UserProvider> */}
+      {/* </SafeResultsProvider> */}
+    </>
   );
 };
 
-const appTheme = createTheme();
-
-const AppThemeInit = ({ children }) => {
+export const MyApp: React.FC<any> = () => {
+  const myPreferences: AppPreferenceConfigs = useMyPreferences();
+  const myTheme: AppThemeConfigs = useMyTheme();
+  const mySitemap: AppSiteMapConfigs = useMySitemap();
+  const myUser: CustomAppUserService = useMyUser();
+  // const mySearch: AppSearchService<SearchJobRow> = useMySearch();
   return (
-    <StyledEngineProvider injectFirst>
-      <ThemeProvider theme={appTheme}>{children}</ThemeProvider>
-    </StyledEngineProvider>
+    <BrowserRouter basename={process.env.PUBLIC_URL}>
+      <SafeResultsProvider>
+        <AppProvider
+          user={myUser}
+          preferences={myPreferences}
+          theme={myTheme}
+          sitemap={mySitemap} /* search={mySearch} */
+        >
+          <MyAppProvider />
+        </AppProvider>
+      </SafeResultsProvider>
+    </BrowserRouter>
   );
 };
 
 // Main Application entry component.
 // This will initialize things like theme and snackar providers which will then be available
 //  from this point on.
-const App = () => {
-  const colors = {
-    darkPrimary: '#7c93b9',
-    darkSecondary: '#929cad',
-    lightPrimary: '#0b65a1',
-    lightSecondary: '#939dac'
-  };
-  return (
-    <AppThemeInit>
-      <AppContextProvider defaultTheme="light" colors={colors}>
-        <AppInit />
-      </AppContextProvider>
-    </AppThemeInit>
-  );
-};
+// const MyApp = () => {
+//   const colors = {
+//     darkPrimary: '#7c93b9',
+//     darkSecondary: '#929cad',
+//     lightPrimary: '#0b65a1',
+//     lightSecondary: '#939dac'
+//   };
+//   return (
+//     <AppContextProvider defaultTheme="light" colors={colors}>
+//       <AppInit />
+//     </AppContextProvider>
+//   );
+// };
 
-export default App;
+export default MyApp;

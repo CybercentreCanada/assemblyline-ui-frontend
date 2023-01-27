@@ -2,9 +2,11 @@ import { Card, Table, TableBody, TableCell, TableHead, TableRow, Theme, Typograp
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 import withStyles from '@mui/styles/withStyles';
+import clsx from 'clsx';
+import useAppBar from 'commons/components/app/hooks/useAppBar';
+import useAppLayout from 'commons/components/app/hooks/useAppLayout';
+import PageCenter from 'commons/components/pages/PageCenter';
 import ContentWithTOC, { ContentWithTOCItemDef } from 'commons_deprecated/addons/elements/toc/Toc';
-import useAppLayout from 'commons_deprecated/components/hooks/useAppLayout';
-import PageCenter from 'commons_deprecated/components/layout/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import CustomChip from 'components/visual/CustomChip';
 import { useMemo } from 'react';
@@ -67,38 +69,47 @@ const StyledTableCell = withStyles((theme: Theme) =>
   })
 )(TableCell);
 
-const useStyles = makeStyles(theme => ({
-  multipleEx: {
-    marginBlockStart: theme.spacing(1),
-    paddingInlineStart: theme.spacing(2)
-  },
-  padded: {
-    paddingBottom: theme.spacing(1),
-    paddingTop: theme.spacing(1)
-  },
-  pre: {
-    fontFamily: 'monospace',
-    fontSize: '1rem',
-    margin: `0 0 ${theme.spacing(1)} 0`,
-    padding: `${theme.spacing(1)} ${theme.spacing(1.5)}`,
-    whiteSpace: 'pre-wrap',
-    wordBreak: 'break-word'
-  }
-}));
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    multipleEx: {
+      marginBlockStart: theme.spacing(1),
+      paddingInlineStart: theme.spacing(2)
+    },
+    padded: {
+      paddingBottom: theme.spacing(1),
+      paddingTop: theme.spacing(1)
+    },
+    pre: {
+      fontFamily: 'monospace',
+      fontSize: '1rem',
+      margin: `0 0 ${theme.spacing(1)} 0`,
+      padding: `${theme.spacing(1)} ${theme.spacing(1.5)}`,
+      whiteSpace: 'pre-wrap',
+      wordBreak: 'break-word',
+      backgroundColor: 'rgb(66, 66, 66)'
+    }
+  })
+);
 
-const useParagraphStyles = autoHide =>
-  makeStyles(theme => ({
+const useParagraphStyles = makeStyles((theme: Theme) =>
+  createStyles({
     paragraph: {
-      marginTop: theme.spacing(autoHide ? 0 : -8),
-      paddingTop: theme.spacing(autoHide ? 4 : 12),
+      marginTop: theme.spacing(-8),
+      paddingTop: theme.spacing(12),
       '& h6': {
         fontWeight: 300
       }
+    },
+    autoHide: {
+      marginTop: theme.spacing(0),
+      paddingTop: theme.spacing(4)
     }
-  }))();
+  })
+);
 
 function Title({ children }) {
-  const { autoHideAppbar, currentLayout } = useAppLayout();
+  const { autoHide: autoHideAppbar } = useAppBar();
+  const { current: currentLayout } = useAppLayout();
   const theme = useTheme();
   const autoHide = autoHideAppbar && currentLayout !== 'top';
   return (
@@ -115,10 +126,12 @@ function Title({ children }) {
 }
 
 function Paragraph({ id, children }) {
-  const { autoHideAppbar, currentLayout } = useAppLayout();
-  const classes = useParagraphStyles(autoHideAppbar && currentLayout !== 'top');
+  const { autoHide: autoHideAppbar } = useAppBar();
+  const { current: currentLayout } = useAppLayout();
+  const classes = useParagraphStyles();
+
   return (
-    <div id={id} className={classes.paragraph}>
+    <div id={id} className={clsx(classes.paragraph, autoHideAppbar && currentLayout !== 'top' && classes.autoHide)}>
       {useMemo(() => children, [children])}
     </div>
   );

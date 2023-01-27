@@ -24,6 +24,7 @@ export const AppDefaultsPreferencesConfigs: AppPreferenceConfigs = {
   allowLayoutSelection: true,
   allowThemeSelection: true,
   allowTranslate: true,
+  allowShowSafeResults: true,
   avatarD: 'mp'
 };
 
@@ -37,7 +38,8 @@ export const AppDefaultsLeftNavConfigs: AppLeftNavConfigs = {
 export const AppDefaultsTopNavConfigs: AppTopNavConfigs = {
   themeSelectionMode: 'profile',
   quickSearchURI: '/search/',
-  quickSearchParam: 'q'
+  quickSearchParam: 'q',
+  userMenuType: 'list'
 };
 
 // AppSiteMapConfigs defaults.

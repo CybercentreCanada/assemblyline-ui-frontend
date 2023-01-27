@@ -7,11 +7,16 @@ const LEGACY_THEME: AppThemeConfigs = {
   palette: {
     dark: {
       background: {
-        default: '#303030',
-        paper: '#303030'
+        default: 'rgb(48, 48, 48)',
+        // paper: 'rgb(66, 66, 66)'
+        // default: 'rgb(66, 66, 66)'
+        paper: 'rgb(48, 48, 48)'
+      },
+      primary: {
+        main: 'rgb(124, 147, 185)'
       },
       secondary: {
-        main: '#fd5d1c'
+        main: 'rgb(146, 156, 173)'
       }
     }
   },

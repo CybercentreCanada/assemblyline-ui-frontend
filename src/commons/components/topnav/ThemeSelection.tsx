@@ -15,6 +15,7 @@ import useAppConfigs from 'commons/components/app/hooks/useAppConfigs';
 import useAppLanguage from 'commons/components/app/hooks/useAppLanguage';
 import useAppLayout from 'commons/components/app/hooks/useAppLayout';
 import useAppQuickSearch from 'commons/components/app/hooks/useAppQuickSearch';
+import useSafeResults from 'components/hooks/useSafeResults';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { APP_STORAGE_PREFIX } from '../app/AppConstants';
@@ -34,6 +35,8 @@ const ThemeSelection = () => {
   const quicksearch = useAppQuickSearch();
   const localStorage = useLocalStorage(APP_STORAGE_PREFIX);
   const isSmDown = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const { showSafeResults, toggleShowSafeResults } = useSafeResults();
 
   const clearStorage = () => {
     localStorage.clear();
@@ -119,6 +122,15 @@ const ThemeSelection = () => {
                 </ListItemSecondaryAction>
               </ListItem>
             </>
+          )}
+
+          {configs.preferences.allowShowSafeResults && (
+            <ListItem button onClick={toggleShowSafeResults}>
+              <ListItemText>{t('personalization.showsaferesults')}</ListItemText>
+              <ListItemSecondaryAction>
+                <Switch edge="end" checked={showSafeResults} onClick={toggleShowSafeResults} />
+              </ListItemSecondaryAction>
+            </ListItem>
           )}
         </List>
       )}

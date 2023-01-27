@@ -45,6 +45,7 @@ const useStyles = makeStyles(theme => ({
 interface SearchTextFieldProps {
   value: string;
   options: string[];
+  placeholder?: string;
   disabled?: boolean;
   onChange: (value: string) => void;
   onClear: () => void;
@@ -55,6 +56,7 @@ interface SearchTextFieldProps {
 const SearchTextField: React.FC<SearchTextFieldProps> = ({
   value,
   options,
+  placeholder = null,
   disabled = false,
   onSearch,
   onChange,
@@ -263,7 +265,7 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
         placeholder="Filter..."
         value={value}
         color="secondary"
-        InputProps={{ disableUnderline: true }}
+        // InputProps={{ disableUnderline: true }}
         disabled={disabled}
         onChange={_onChange}
         onKeyDown={_onKeyDown}
