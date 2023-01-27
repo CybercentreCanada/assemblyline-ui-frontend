@@ -16,7 +16,23 @@ import Yara from './identify/yara';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.34.1' } });
 
+const useStyles = makeStyles(theme => ({
+  main: {
+    marginTop: theme.spacing(1),
+    flexGrow: 1,
+    display: 'flex',
+    flexDirection: 'column'
+  },
+  tab: {
+    flexGrow: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    paddingTop: theme.spacing(2)
+  }
+}));
+
 export default function AdminIdentify() {
+  const classes = useStyles();
   const { t, i18n } = useTranslation(['adminIdentify']);
   const theme = useTheme();
   const { user: currentUser } = useAppUser<CustomUser>();
@@ -30,21 +46,6 @@ export default function AdminIdentify() {
   const [originalMimesFile, setOriginalMimesFile] = useState(null);
   const [patternsFile, setPatternsFile] = useState(null);
   const [originalPatternsFile, setOriginalPatternsFile] = useState(null);
-  const useStyles = makeStyles(curTheme => ({
-    main: {
-      marginTop: theme.spacing(1),
-      flexGrow: 1,
-      display: 'flex',
-      flexDirection: 'column'
-    },
-    tab: {
-      flexGrow: 1,
-      display: 'flex',
-      flexDirection: 'column',
-      paddingTop: theme.spacing(2)
-    }
-  }));
-  const classes = useStyles();
 
   useEffect(() => {
     // I cannot find a way to hot switch monaco editor's locale but at least I can load
