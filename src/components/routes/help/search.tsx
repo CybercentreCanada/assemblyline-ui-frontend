@@ -94,8 +94,7 @@ const useStyles = makeStyles((theme: Theme) =>
 const useParagraphStyles = makeStyles((theme: Theme) =>
   createStyles({
     paragraph: {
-      marginTop: theme.spacing(-8),
-      paddingTop: theme.spacing(12),
+      marginTop: theme.spacing(4),
       '& h6': {
         fontWeight: 300
       }
