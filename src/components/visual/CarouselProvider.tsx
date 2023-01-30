@@ -5,7 +5,7 @@ import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { alpha, Box, CircularProgress, Drawer, IconButton, Tooltip, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
-import Carousel from 'commons_deprecated/addons/elements/carousel/Carousel';
+import Carousel from 'commons/addons/carousel/Carousel';
 import useMyAPI from 'components/hooks/useMyAPI';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
