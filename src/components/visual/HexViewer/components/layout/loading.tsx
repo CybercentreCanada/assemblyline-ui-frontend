@@ -1,48 +1,50 @@
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { LinearProgress, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import clsx from 'clsx';
 import { default as React } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StoreProps } from '../..';
 
-const useHexStyles = ({ height = 0, width = 0 }: { height: number; width: number }) =>
-  makeStyles(theme => ({
-    root: {
-      position: 'absolute',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      whiteSpace: 'normal',
-      overflow: 'hidden',
-      width: width,
-      height: height
-    },
-    container: {
-      width: '100%',
-      textAlign: 'center'
-    },
-    text: {
-      padding: theme.spacing(2)
-    },
-    hidden: {
-      visibility: 'hidden'
-    },
-    progressSpinner: {
-      width: '50%',
-      margin: 'auto'
-    }
-  }));
+const useHexStyles = makeStyles(theme => ({
+  root: {
+    position: 'absolute',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    whiteSpace: 'normal',
+    overflow: 'hidden',
+    width: '100%',
+    height: '100%'
+  },
+  container: {
+    width: '100%',
+    textAlign: 'center'
+  },
+  text: {
+    padding: theme.spacing(2)
+  },
+  hidden: {
+    visibility: 'hidden'
+  },
+  progressSpinner: {
+    width: '50%',
+    margin: 'auto'
+  }
+}));
 
 export const WrappedHexLoading = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);
-  const classes = useHexStyles({
-    height: document.getElementById('hex-viewer')?.getBoundingClientRect()?.height,
-    width: document.getElementById('hex-viewer')?.getBoundingClientRect()?.width
-  })();
+  const classes = useHexStyles();
 
   return (
-    <div className={clsx(classes.root)}>
+    <div
+      className={clsx(classes.root)}
+      style={{
+        width: document.getElementById('hex-viewer')?.getBoundingClientRect()?.width,
+        height: document.getElementById('hex-viewer')?.getBoundingClientRect()?.height
+      }}
+    >
       <div className={clsx(classes.container)}>
         {store.loading.status === 'loading' && (
           <>
