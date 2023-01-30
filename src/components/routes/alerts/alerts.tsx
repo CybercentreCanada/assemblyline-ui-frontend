@@ -5,11 +5,11 @@ import { AlertTitle, Box, Drawer, IconButton, Typography, useMediaQuery, useThem
 import makeStyles from '@mui/styles/makeStyles';
 import SearchBar from 'commons/addons/search/SearchBar';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
+import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
 import ListCarousel from 'commons_deprecated/addons/elements/lists/carousel/ListCarousel';
 import ListNavigator from 'commons_deprecated/addons/elements/lists/navigator/ListNavigator';
 import SimpleList from 'commons_deprecated/addons/elements/lists/simplelist/SimpleList';
-import PageFullWidth from 'commons_deprecated/components/layout/pages/PageFullWidth';
 import useDrawer from 'components/hooks/useDrawer';
 import { CustomUser } from 'components/hooks/useMyUser';
 import InformativeAlert from 'components/visual/InformativeAlert';
