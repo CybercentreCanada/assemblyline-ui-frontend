@@ -24,9 +24,7 @@ const useStyles = makeStyles(theme => ({
     }
   },
   forcePaper: {
-    [theme.breakpoints.down('xl')]: {
-      backgroundColor: theme.palette.background.paper
-    }
+    backgroundColor: theme.palette.background.paper
   }
 }));
 
