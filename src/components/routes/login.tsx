@@ -4,7 +4,7 @@ import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppBanner from 'commons/components/app/hooks/useAppBanner';
 import useAppLayout from 'commons/components/app/hooks/useAppLayout';
-import CardCentered from 'commons_deprecated/components/layout/pages/CardCentered';
+import PageCardCentered from 'commons/components/pages/PageCardCentered';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { OAuthLogin } from 'components/routes/login/oauth';
@@ -187,7 +187,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
   }, [hideMenus]);
 
   return (
-    <CardCentered>
+    <PageCardCentered>
       <Box style={{ cursor: 'pointer' }} onClick={reset}>
         {banner}
       </Box>
@@ -275,6 +275,6 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
           )
         }[shownControls]
       }
-    </CardCentered>
+    </PageCardCentered>
   );
 }

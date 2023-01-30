@@ -2,7 +2,7 @@
 import { Backdrop, Button, Typography, useTheme } from '@mui/material';
 import useAppBanner from 'commons/components/app/hooks/useAppBanner';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
-import CardCentered from 'commons_deprecated/components/layout/pages/CardCentered';
+import PageCardCentered from 'commons/components/pages/PageCardCentered';
 import { CustomUser } from 'components/hooks/useMyUser';
 import getXSRFCookie from 'helpers/xsrf';
 import { useTranslation } from 'react-i18next';
@@ -28,7 +28,7 @@ export default function AppRegistration() {
 
   return currentUser.roles.includes('obo_access') ? (
     <Backdrop open style={{ backgroundColor: theme.palette.background.default, zIndex: 10000 }} transitionDuration={0}>
-      <CardCentered>
+      <PageCardCentered>
         {banner}
         <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'center', justifyContent: 'center' }}>
           {!rUrl || !clientID || !scope || !server || VALID_SCOPES.indexOf(scope) === -1 ? (
@@ -79,7 +79,7 @@ export default function AppRegistration() {
             </>
           )}
         </div>
-      </CardCentered>
+      </PageCardCentered>
     </Backdrop>
   ) : (
     <ForbiddenPage />
