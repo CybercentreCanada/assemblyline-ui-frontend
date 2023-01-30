@@ -12,12 +12,13 @@ import {
 } from '@mui/material';
 import useAppTheme from 'commons/components/app/hooks/useAppTheme';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import PageFullSize from 'commons_deprecated/components/layout/pages/PageFullSize';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactResizeDetector from 'react-resize-detector';
 import { Navigate } from 'react-router';
@@ -37,7 +38,7 @@ export default function AdminActions() {
   const { user: currentUser } = useAppUser<CustomUser>();
   const { isDark: isDarkTheme } = useAppTheme();
 
-  useEffect(() => {
+  useEffectOnce(() => {
     reload(false);
     // I cannot find a way to hot switch monaco editor's locale but at least I can load
     // the right language on first load...
@@ -46,8 +47,7 @@ export default function AdminActions() {
     } else {
       loader.config({ 'vs/nls': { availableLanguages: { '*': '' } } });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   const reload = defValue => {
     if (currentUser.is_admin) {

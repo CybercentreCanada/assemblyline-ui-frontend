@@ -19,6 +19,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import useAppTheme from 'commons/components/app/hooks/useAppTheme';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullSize from 'commons/components/pages/PageFullSize';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import Empty from 'components/visual/Empty';
@@ -82,7 +83,7 @@ const WrappedMonacoViewer = ({ data, type, error, beautify = false }) => {
   const containerEL = useRef<HTMLDivElement>();
   const { isDark: isDarkTheme } = useAppTheme();
 
-  useEffect(() => {
+  useEffectOnce(() => {
     // I cannot find a way to hot switch monaco editor's locale but at least I can load
     // the right language on first load...
     if (i18n.language === 'fr') {
@@ -90,8 +91,7 @@ const WrappedMonacoViewer = ({ data, type, error, beautify = false }) => {
     } else {
       loader.config({ 'vs/nls': { availableLanguages: { '*': '' } } });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   const beautifyJSON = inputData => {
     if (!beautify) return inputData;

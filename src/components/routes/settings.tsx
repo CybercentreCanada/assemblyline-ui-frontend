@@ -24,6 +24,7 @@ import {
 import Skeleton from '@mui/material/Skeleton';
 import makeStyles from '@mui/styles/makeStyles';
 import PageCenter from 'commons/components/pages/PageCenter';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -32,7 +33,7 @@ import ServiceSpec from 'components/layout/serviceSpec';
 import ServiceTree from 'components/layout/serviceTree';
 import Classification from 'components/visual/Classification';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
-import React, { memo, useEffect, useState } from 'react';
+import React, { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 function Skel() {
@@ -226,7 +227,7 @@ function Settings() {
     }
   }
 
-  useEffect(() => {
+  useEffectOnce(() => {
     // Load user on start
     apiCall({
       url: `/api/v4/user/settings/${currentUser.username}/`,
@@ -234,8 +235,7 @@ function Settings() {
         setSettings(api_data.api_response);
       }
     });
-    // eslint-disable-next-line
-  }, []);
+  });
 
   return (
     <PageCenter margin={4} width="100%">

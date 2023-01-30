@@ -2,11 +2,12 @@ import { loader } from '@monaco-editor/react';
 import { Alert, Grid, Hidden, Paper, Tab, Tabs, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import PageFullSize from 'commons_deprecated/components/layout/pages/PageFullSize';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router';
 import LibMagic from './identify/libmagic';
@@ -47,7 +48,7 @@ export default function AdminIdentify() {
   const [patternsFile, setPatternsFile] = useState(null);
   const [originalPatternsFile, setOriginalPatternsFile] = useState(null);
 
-  useEffect(() => {
+  useEffectOnce(() => {
     // I cannot find a way to hot switch monaco editor's locale but at least I can load
     // the right language on first load...
     if (i18n.language === 'fr') {
@@ -55,8 +56,7 @@ export default function AdminIdentify() {
     } else {
       loader.config({ 'vs/nls': { availableLanguages: { '*': '' } } });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   const handleChange = (event, newValue) => {
     setValue(newValue);

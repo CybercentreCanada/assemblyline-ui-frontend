@@ -26,6 +26,7 @@ import Skeleton from '@mui/material/Skeleton';
 import makeStyles from '@mui/styles/makeStyles';
 import withStyles from '@mui/styles/withStyles';
 import PageCenter from 'commons/components/pages/PageCenter';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -37,7 +38,7 @@ import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
-import React, { memo, useEffect, useRef, useState } from 'react';
+import React, { memo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router';
 import { useLocation, useParams } from 'react-router-dom';
@@ -268,7 +269,7 @@ function User({ username }: UserProps) {
     reader.readAsDataURL(file);
   }
 
-  useEffect(() => {
+  useEffectOnce(() => {
     // Load user on start
     if (currentUser.is_admin || !location.pathname.includes('/admin/')) {
       apiCall({
@@ -278,8 +279,7 @@ function User({ username }: UserProps) {
         }
       });
     }
-    // eslint-disable-next-line
-  }, []);
+  });
 
   return !currentUser.is_admin && location.pathname.includes('/admin/') ? (
     <Navigate to="/forbidden" />

@@ -1,8 +1,9 @@
 import { Button, TextField, Typography, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import TextDivider from 'components/visual/TextDivider';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type OTPProps = {
@@ -38,7 +39,7 @@ export default function OTP({ setDrawerOpen, set2FAEnabled }: OTPProps) {
     });
   }
 
-  useEffect(() => {
+  useEffectOnce(() => {
     // Load OTP setup on start
     apiCall({
       url: '/api/v4/auth/setup_otp/',
@@ -52,64 +53,65 @@ export default function OTP({ setDrawerOpen, set2FAEnabled }: OTPProps) {
         }, 1000);
       }
     });
+  });
 
-    // eslint-disable-next-line
-  }, []);
-  return <>
-    <Typography variant="h4" gutterBottom>
-      {t('2fa_setup_title')}
-    </Typography>
-    <div style={{ textAlign: 'center' }}>
-      <Typography>{t('2fa_scan')}</Typography>
-      <div
-        style={{
-          paddingTop: sp4,
-          paddingBottom: sp4,
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'center'
-        }}
-      >
-        {response ? (
-          <div
-            style={{ backgroundColor: 'white' }}
-            // eslint-disable-next-line react/no-danger
-            dangerouslySetInnerHTML={{
-              __html: response.qrcode
-            }}
-          />
-        ) : (
-          <Skeleton variant="rectangular" style={{ width: '195px', height: '195px' }} />
-        )}
-      </div>
-      <TextDivider forcePaper />
-      <Typography gutterBottom>{t('2fa_manual')}</Typography>
-      <div style={{ paddingTop: sp4, paddingBottom: sp4 }}>
-        <Typography variant="caption">{response ? response.secret_key : <Skeleton />}</Typography>
-      </div>
-      <TextField
-        disabled={response === null}
-        style={{ width: '100%' }}
-        margin="normal"
-        variant="outlined"
-        label={t('2fa_temp_otp')}
-        onChange={handleOTPChange}
-        value={tempOTP}
-      />
-
-      <div style={{ paddingTop: sp6, textAlign: 'end' }}>
-        <Button style={{ marginRight: '8px' }} variant="contained" onClick={() => setDrawerOpen(false)}>
-          {t('cancel')}
-        </Button>
-        <Button
-          disabled={response === null || tempOTP === ''}
-          variant="contained"
-          color="primary"
-          onClick={() => validateOTP()}
+  return (
+    <>
+      <Typography variant="h4" gutterBottom>
+        {t('2fa_setup_title')}
+      </Typography>
+      <div style={{ textAlign: 'center' }}>
+        <Typography>{t('2fa_scan')}</Typography>
+        <div
+          style={{
+            paddingTop: sp4,
+            paddingBottom: sp4,
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'center'
+          }}
         >
-          {t('validate')}
-        </Button>
+          {response ? (
+            <div
+              style={{ backgroundColor: 'white' }}
+              // eslint-disable-next-line react/no-danger
+              dangerouslySetInnerHTML={{
+                __html: response.qrcode
+              }}
+            />
+          ) : (
+            <Skeleton variant="rectangular" style={{ width: '195px', height: '195px' }} />
+          )}
+        </div>
+        <TextDivider forcePaper />
+        <Typography gutterBottom>{t('2fa_manual')}</Typography>
+        <div style={{ paddingTop: sp4, paddingBottom: sp4 }}>
+          <Typography variant="caption">{response ? response.secret_key : <Skeleton />}</Typography>
+        </div>
+        <TextField
+          disabled={response === null}
+          style={{ width: '100%' }}
+          margin="normal"
+          variant="outlined"
+          label={t('2fa_temp_otp')}
+          onChange={handleOTPChange}
+          value={tempOTP}
+        />
+
+        <div style={{ paddingTop: sp6, textAlign: 'end' }}>
+          <Button style={{ marginRight: '8px' }} variant="contained" onClick={() => setDrawerOpen(false)}>
+            {t('cancel')}
+          </Button>
+          <Button
+            disabled={response === null || tempOTP === ''}
+            variant="contained"
+            color="primary"
+            onClick={() => validateOTP()}
+          >
+            {t('validate')}
+          </Button>
+        </div>
       </div>
-    </div>
-  </>;
+    </>
+  );
 }

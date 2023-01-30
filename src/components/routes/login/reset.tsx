@@ -1,9 +1,10 @@
 import { Button, CircularProgress, TextField, Typography } from '@mui/material';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
@@ -64,14 +65,12 @@ export function ResetPasswordNow({ buttonLoading, setButtonLoading, reset }: Res
     event.preventDefault();
   }
 
-  useEffect(() => {
+  useEffectOnce(() => {
     setResetID(params.get('reset_id'));
-
     if (params.get('reset_id')) {
       navigate('/');
     }
-    // eslint-disable-next-line
-  }, []);
+  });
 
   return (
     <form onSubmit={onSubmit}>

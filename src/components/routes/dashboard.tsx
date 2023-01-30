@@ -6,6 +6,7 @@ import { Card, Grid, Skeleton, Switch, Theme, Tooltip, Typography } from '@mui/m
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullScreen from 'commons/components/pages/PageFullScreen';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
@@ -1234,15 +1235,14 @@ const Dashboard = () => {
     });
   }
 
-  useEffect(() => {
+  useEffectOnce(() => {
     reloadStatuses();
     const intervalID = setInterval(reloadStatuses, 30000);
 
     return () => {
       clearInterval(intervalID);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   const handleAlerterHeartbeat = hb => {
     // eslint-disable-next-line no-console
@@ -1293,7 +1293,7 @@ const Dashboard = () => {
     setServices({ type: 'scaler', hb });
   };
 
-  useEffect(() => {
+  useEffectOnce(() => {
     const socket = io(NAMESPACE);
 
     socket.on('connect', () => {
@@ -1321,7 +1321,7 @@ const Dashboard = () => {
     return () => {
       socket.disconnect();
     };
-  }, []);
+  });
 
   return (
     <PageFullScreen margin={4}>

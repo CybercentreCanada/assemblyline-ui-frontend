@@ -16,6 +16,7 @@ import {
   useTheme
 } from '@mui/material';
 
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import { parseEvent } from 'commons/components/utils/keyboard';
 import { ChangeEvent, forwardRef, KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -72,12 +73,11 @@ export default function AppSearch() {
   const [value, setValue] = useState<string>('');
   // const [fullscreen, setFullscreen] = useState<boolean>(false);
 
-  useEffect(() => {
+  useEffectOnce(() => {
     if (service.onMounted) {
       service.onMounted(setValue, state);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   // keyboard[window] handler.
   // this is to trigger the CTLR+K shortcut to appsearch.

@@ -2,8 +2,8 @@ import { CircularProgress, Typography, useTheme } from '@mui/material';
 import useAppBanner from 'commons/components/app/hooks/useAppBanner';
 import useAppLayout from 'commons/components/app/hooks/useAppLayout';
 import PageCardCentered from 'commons/components/pages/PageCardCentered';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 function Logout() {
@@ -13,7 +13,7 @@ function Logout() {
   const { hideMenus } = useAppLayout();
   const banner = useAppBanner();
 
-  useEffect(() => {
+  useEffectOnce(() => {
     hideMenus();
 
     apiCall({
@@ -24,8 +24,7 @@ function Logout() {
         }, 500);
       }
     });
-    // eslint-disable-next-line
-  }, []);
+  });
 
   return (
     <PageCardCentered>

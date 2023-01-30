@@ -22,6 +22,7 @@ import {
 import { makeStyles } from '@mui/styles';
 import useAppBanner from 'commons/components/app/hooks/useAppBanner';
 import PageCenter from 'commons/components/pages/PageCenter';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -32,7 +33,7 @@ import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDropper from 'components/visual/FileDropper';
 import { matchSHA256, matchURL } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
-import { memo, useEffect, useState } from 'react';
+import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -341,7 +342,7 @@ const Submit: React.FC<any> = () => {
     });
   }
 
-  useEffect(() => {
+  useEffectOnce(() => {
     // Setup Flow
     setFlow(
       new Flow({
@@ -361,8 +362,7 @@ const Submit: React.FC<any> = () => {
       }
     });
     setUUID(generateUUID());
-    // eslint-disable-next-line
-  }, []);
+  });
 
   return (
     <PageCenter maxWidth={md ? '800px' : downSM ? '100%' : '1024px'} margin={4} width="100%">

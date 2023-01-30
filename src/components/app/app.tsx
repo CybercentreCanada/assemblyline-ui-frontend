@@ -3,8 +3,8 @@ import { AppPreferenceConfigs, AppSiteMapConfigs, AppThemeConfigs } from 'common
 import AppProvider from 'commons/components/app/AppProvider';
 import useAppLayout from 'commons/components/app/hooks/useAppLayout';
 import useAppSwitcher from 'commons/components/app/hooks/useAppSwitcher';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
-import { useEffectOnce } from 'components/hooks/useEffectOnce';
 import useMyAPI, { LoginParamsProps } from 'components/hooks/useMyAPI';
 import useMyPreferences from 'components/hooks/useMyPreferences';
 import useMySitemap from 'components/hooks/useMySitemap';

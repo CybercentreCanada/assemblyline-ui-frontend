@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
+// TODO: add to commons
 export const useEffectOnce = effect => {
   const effectFn = useRef(effect);
   const destroyFn = useRef(() => null);

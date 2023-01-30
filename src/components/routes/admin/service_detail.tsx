@@ -17,6 +17,7 @@ import {
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCenter from 'commons/components/pages/PageCenter';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
@@ -267,7 +268,7 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
     // eslint-disable-next-line
   }, [serviceVersion]);
 
-  useEffect(() => {
+  useEffectOnce(() => {
     // Load constants on page load
     if (currentUser.is_admin) {
       apiCall({
@@ -277,8 +278,7 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
         }
       });
     }
-    // eslint-disable-next-line
-  }, []);
+  });
 
   return !currentUser.is_admin ? (
     <Navigate to="/forbidden" />

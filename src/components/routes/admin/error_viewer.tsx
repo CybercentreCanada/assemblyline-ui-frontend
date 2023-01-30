@@ -7,6 +7,7 @@ import SearchBar from 'commons/addons/search/SearchBar';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
@@ -167,7 +168,7 @@ export default function ErrorViewer() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
-  useEffect(() => {
+  useEffectOnce(() => {
     apiCall({
       url: '/api/v4/search/fields/error/',
       onSuccess: api_data => {
@@ -177,9 +178,7 @@ export default function ErrorViewer() {
         ]);
       }
     });
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   const onClear = useCallback(
     () => {

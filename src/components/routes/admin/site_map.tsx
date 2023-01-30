@@ -17,10 +17,11 @@ import createStyles from '@mui/styles/createStyles';
 import withStyles from '@mui/styles/withStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import CustomChip from 'components/visual/CustomChip';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router';
 
@@ -82,7 +83,7 @@ export default function SiteMap() {
     replay_system: 'info'
   };
 
-  useEffect(() => {
+  useEffectOnce(() => {
     if (currentUser.is_admin) {
       apiCall({
         method: 'GET',
@@ -92,8 +93,7 @@ export default function SiteMap() {
         }
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>

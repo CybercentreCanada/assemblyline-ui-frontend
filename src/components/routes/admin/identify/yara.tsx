@@ -11,9 +11,10 @@ import {
   useTheme
 } from '@mui/material';
 import useAppTheme from 'commons/components/app/hooks/useAppTheme';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactResizeDetector from 'react-resize-detector';
 
@@ -239,7 +240,7 @@ function WrappedYara({ reload, yaraFile, originalYaraFile, setYaraFile }) {
   const { apiCall } = useMyAPI();
   const { isDark: isDarkTheme } = useAppTheme();
 
-  useEffect(() => {
+  useEffectOnce(() => {
     if (!yaraFile) reload();
     // I cannot find a way to hot switch monaco editor's locale but at least I can load
     // the right language on first load...
@@ -248,8 +249,7 @@ function WrappedYara({ reload, yaraFile, originalYaraFile, setYaraFile }) {
     } else {
       loader.config({ 'vs/nls': { availableLanguages: { '*': '' } } });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   const saveChanges = tagData => {
     setOpen(false);

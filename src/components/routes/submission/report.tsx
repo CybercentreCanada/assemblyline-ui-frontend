@@ -23,6 +23,7 @@ import withStyles from '@mui/styles/withStyles';
 import clsx from 'clsx';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCenter from 'commons/components/pages/PageCenter';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -33,7 +34,7 @@ import TextVerdict from 'components/visual/TextVerdict';
 import Verdict from 'components/visual/Verdict';
 import VerdictGauge from 'components/visual/VerdictGauge';
 import { bytesToSize } from 'helpers/utils';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { useNavigate } from 'react-router';
@@ -573,7 +574,7 @@ export default function SubmissionReport() {
   const { showErrorMessage, showWarningMessage } = useMySnackbar();
   const [metaOpen, setMetaOpen] = useState(false);
 
-  useEffect(() => {
+  useEffectOnce(() => {
     if (currentUser.roles.includes('submission_view')) {
       apiCall({
         url: `/api/v4/submission/report/${id}/`,
@@ -593,9 +594,7 @@ export default function SubmissionReport() {
         }
       });
     }
-
-    // eslint-disable-next-line
-  }, []);
+  });
 
   return currentUser.roles.includes('submission_view') ? (
     <PageCenter margin={4} width="100%">

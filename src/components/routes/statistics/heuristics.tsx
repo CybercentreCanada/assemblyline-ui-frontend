@@ -1,10 +1,11 @@
 import { Skeleton, Typography, useTheme } from '@mui/material';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import EnhancedTable, { Cell } from 'components/visual/Table/enhanced_table';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import HeuristicDetail from '../manage/heuristic_detail';
 
@@ -21,7 +22,7 @@ export default function StatisticsSignatures() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
+  useEffectOnce(() => {
     apiCall({
       method: 'GET',
       url: '/api/v4/heuristics/stats/',
@@ -29,8 +30,7 @@ export default function StatisticsSignatures() {
         setSignatureStats(api_data.api_response);
       }
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   const cells: Cell[] = [
     { id: 'heur_id', break: false, numeric: false, disablePadding: false, label: t('heur_id') },

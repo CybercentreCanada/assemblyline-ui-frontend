@@ -20,6 +20,7 @@ import {
 } from '@mui/material';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -136,7 +137,7 @@ export default function Services() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
+  useEffectOnce(() => {
     if (currentUser.is_admin) {
       reload();
       pollInstalling(true);
@@ -145,8 +146,7 @@ export default function Services() {
     return () => {
       window.removeEventListener('reloadServicesEvent', reload);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   const onUpdate = useCallback(
     (svc, updateData) => {

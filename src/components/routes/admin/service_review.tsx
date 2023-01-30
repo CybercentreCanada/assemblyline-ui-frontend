@@ -4,6 +4,7 @@ import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import { Grid, IconButton, MenuItem, Select, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import LineGraph from 'components/visual/LineGraph';
@@ -217,7 +218,7 @@ export default function ServiceReview() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedService]);
 
-  useEffect(() => {
+  useEffectOnce(() => {
     if (currentUser.is_admin) {
       apiCall({
         url: '/api/v4/service/all/',
@@ -226,8 +227,7 @@ export default function ServiceReview() {
         }
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>

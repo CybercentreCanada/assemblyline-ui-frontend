@@ -1,9 +1,10 @@
 import { Card, CardHeader, Grid, Typography, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import CustomChip from 'components/visual/CustomChip';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 function ServiceCard({ service }) {
@@ -78,7 +79,7 @@ export default function Services() {
   const [services, setServices] = useState(null);
   const minCardHeight = '240px';
 
-  useEffect(() => {
+  useEffectOnce(() => {
     // Load all services on start
     apiCall({
       url: '/api/v4/service/all/',
@@ -86,8 +87,7 @@ export default function Services() {
         setServices(api_data.api_response);
       }
     });
-    // eslint-disable-next-line
-  }, []);
+  });
   return (
     <PageFullWidth margin={4}>
       <div style={{ marginBottom: theme.spacing(4) }}>

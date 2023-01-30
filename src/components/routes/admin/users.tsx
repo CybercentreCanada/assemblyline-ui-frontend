@@ -20,6 +20,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import SearchBar from 'commons/addons/search/SearchBar';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -137,7 +138,7 @@ export default function Users() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
-  useEffect(() => {
+  useEffectOnce(() => {
     if (currentUser.is_admin) {
       setClassification(c12nDef.UNRESTRICTED);
       apiCall({
@@ -150,9 +151,7 @@ export default function Users() {
         }
       });
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   const onClear = () => {
     navigate(location.pathname);
