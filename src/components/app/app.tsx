@@ -4,6 +4,7 @@ import AppProvider from 'commons/components/app/AppProvider';
 import useAppLayout from 'commons/components/app/hooks/useAppLayout';
 import useAppSwitcher from 'commons/components/app/hooks/useAppSwitcher';
 import useALContext from 'components/hooks/useALContext';
+import { useEffectOnce } from 'components/hooks/useEffectOnce';
 import useMyAPI, { LoginParamsProps } from 'components/hooks/useMyAPI';
 import useMyPreferences from 'components/hooks/useMyPreferences';
 import useMySitemap from 'components/hooks/useMySitemap';
@@ -52,14 +53,14 @@ const MyAppMain = () => {
     }
   }, [configuration, setItems]);
 
-  useEffect(() => {
+  useEffectOnce(() => {
     if (user || provider) {
       return;
     }
 
     bootstrap({ switchRenderedApp, setConfiguration, setLoginParams, setUser, setReady });
-    // eslint-disable-next-line
-  }, []);
+  });
+
   return {
     load: <LoadingScreen />,
     locked: <LockedPage />,

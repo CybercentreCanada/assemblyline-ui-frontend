@@ -4,11 +4,35 @@ import makeStyles from '@mui/styles/makeStyles';
 import useAppBanner from 'commons/components/app/hooks/useAppBanner';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
+import { useEffectOnce } from 'components/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import NotFoundPage from 'components/routes/404_dl';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Markdown from 'react-markdown';
+
+const useStyles = makeStyles(curTheme => ({
+  no_pad: {
+    padding: 0
+  },
+  page: {
+    maxWidth: '960px',
+    width: '100%',
+    [curTheme.breakpoints.down('sm')]: {
+      maxWidth: '100%'
+    },
+    [curTheme.breakpoints.only('md')]: {
+      maxWidth: '630px'
+    }
+  },
+  buttonProgress: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginTop: -12,
+    marginLeft: -12
+  }
+}));
 
 export default function Tos() {
   const { t } = useTranslation(['tos']);
@@ -18,28 +42,7 @@ export default function Tos() {
   const { user: currentUser, configuration } = useALContext();
   const banner = useAppBanner();
   const { apiCall } = useMyAPI();
-  const useStyles = makeStyles(curTheme => ({
-    no_pad: {
-      padding: 0
-    },
-    page: {
-      maxWidth: '960px',
-      width: '100%',
-      [curTheme.breakpoints.down('xl')]: {
-        maxWidth: '100%'
-      },
-      [curTheme.breakpoints.only('md')]: {
-        maxWidth: '630px'
-      }
-    },
-    buttonProgress: {
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      marginTop: -12,
-      marginLeft: -12
-    }
-  }));
+
   const classes = useStyles();
   const sp6 = theme.spacing(6);
 
@@ -61,15 +64,14 @@ export default function Tos() {
     });
   }
 
-  useEffect(() => {
+  useEffectOnce(() => {
     if (configuration.ui.tos) {
       apiCall({
         url: '/api/v4/help/tos/',
         onSuccess: api_data => setTos(api_data.api_response)
       });
     }
-    // eslint-disable-next-line
-  }, []);
+  });
 
   return configuration.ui.tos ? (
     <PageCenter margin={4} width="100%">
