@@ -18,7 +18,7 @@ import {
 import makeStyles from '@mui/styles/makeStyles';
 import useAppTheme from 'commons/components/app/hooks/useAppTheme';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
-import PageFullSize from 'commons_deprecated/components/layout/pages/PageFullSize';
+import PageFullSize from 'commons/components/pages/PageFullSize';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import Empty from 'components/visual/Empty';
