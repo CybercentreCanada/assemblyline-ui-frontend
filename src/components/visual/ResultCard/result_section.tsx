@@ -3,7 +3,7 @@ import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
 import SimCardOutlinedIcon from '@mui/icons-material/SimCardOutlined';
 import { Box, Collapse, IconButton, Menu, MenuItem, Tooltip, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import useClipboard from 'commons_deprecated/components/hooks/useClipboard';
+import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';

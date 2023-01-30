@@ -1,4 +1,4 @@
-import useClipboard from 'commons_deprecated/components/hooks/useClipboard';
+import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import { useCallback } from 'react';
 import {
   COPY_STATE,

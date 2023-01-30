@@ -3,7 +3,7 @@ import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
 import { Menu, MenuItem } from '@mui/material';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
-import useClipboard from 'commons_deprecated/components/hooks/useClipboard';
+import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
 import { CustomUser } from 'components/hooks/useMyUser';

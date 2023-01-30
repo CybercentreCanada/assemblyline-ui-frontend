@@ -9,7 +9,7 @@ import { Card, Grid, IconButton, Tooltip, Typography, useTheme } from '@mui/mate
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCenter from 'commons/components/pages/PageCenter';
-import useClipboard from 'commons_deprecated/components/hooks/useClipboard';
+import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import FileDownloader from 'components/visual/FileDownloader';
