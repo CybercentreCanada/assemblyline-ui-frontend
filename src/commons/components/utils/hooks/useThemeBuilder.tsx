@@ -5,15 +5,17 @@ import { useMemo } from 'react';
 
 const create = (components: Components<Omit<Theme, 'components'>>, palette: PaletteOptions) =>
   createTheme({
+    breakpoints: {
+      values: {
+        xs: 0,
+        sm: 600,
+        md: 960,
+        lg: 1280,
+        xl: 1920
+      }
+    },
     components: {
       ...components,
-      MuiPaper: {
-        styleOverrides: {
-          elevation: {
-            backgroundImage: 'none'
-          }
-        }
-      },
       MuiCssBaseline: {
         ...(components?.MuiCssBaseline || {}),
         styleOverrides: {
