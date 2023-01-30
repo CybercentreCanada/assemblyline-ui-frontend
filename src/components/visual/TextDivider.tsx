@@ -19,12 +19,12 @@ const useStyles = makeStyles(theme => ({
     position: 'absolute',
     top: '-10px',
     width: '60px',
-    [theme.breakpoints.down('lg')]: {
+    [theme.breakpoints.down('xs')]: {
       backgroundColor: theme.palette.background.default
     }
   },
   forcePaper: {
-    [theme.breakpoints.down('lg')]: {
+    [theme.breakpoints.down('xl')]: {
       backgroundColor: theme.palette.background.paper
     }
   }
