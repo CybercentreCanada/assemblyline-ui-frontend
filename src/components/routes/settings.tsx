@@ -36,6 +36,36 @@ import { RouterPrompt } from 'components/visual/RouterPrompt';
 import React, { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+const useStyles = makeStyles(theme => ({
+  drawer: {
+    width: '500px',
+    [theme.breakpoints.down('xs')]: {
+      width: '100vw'
+    }
+  },
+  row: {
+    height: '62px'
+  },
+  group: {
+    marginTop: '1rem'
+  },
+  skelItem: {
+    display: 'inline-block'
+  },
+  skelButton: {
+    display: 'inline-block',
+    width: '9rem',
+    height: '4rem'
+  },
+  buttonProgress: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginTop: -12,
+    marginLeft: -12
+  }
+}));
+
 function Skel() {
   return (
     <div>
@@ -69,35 +99,7 @@ function Settings() {
   const isXSDown = useMediaQuery(theme.breakpoints.down('xs'));
 
   const { apiCall } = useMyAPI();
-  const useStyles = makeStyles(curTheme => ({
-    drawer: {
-      width: '500px',
-      [theme.breakpoints.down('lg')]: {
-        width: '100vw'
-      }
-    },
-    row: {
-      height: '62px'
-    },
-    group: {
-      marginTop: '1rem'
-    },
-    skelItem: {
-      display: 'inline-block'
-    },
-    skelButton: {
-      display: 'inline-block',
-      width: '9rem',
-      height: '4rem'
-    },
-    buttonProgress: {
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      marginTop: -12,
-      marginLeft: -12
-    }
-  }));
+
   const classes = useStyles();
 
   const setParam = (service_idx, param_idx, p_value) => {

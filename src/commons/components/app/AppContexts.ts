@@ -32,6 +32,7 @@ export type AppSearchServiceContextType<T = any> = {
 export type AppLeftNavContextType = {
   open: boolean; // left nav is open/expanded?
   elements: AppLeftNavElement[]; // the elements to render in the left nav.
+  hideNestedIcons: boolean; // Hide icons for the nested left nav items.
   toggle: () => void; // minimize/expand left nav.
   setOpen: (show: boolean) => void; // specify whether the left nav should be expanded[true] or minimized[false]
   setElements: (elements: AppLeftNavElement[]) => void; // specify the elements to render in the left nav.

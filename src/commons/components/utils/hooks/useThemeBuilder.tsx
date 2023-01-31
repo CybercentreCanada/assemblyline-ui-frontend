@@ -25,6 +25,9 @@ const create = (components: Components<Omit<Theme, 'components'>>, palette: Pale
             height: '100%'
           },
           body: {
+            fontSize: '0.875rem',
+            lineHeight: 1.43,
+            letterSpacing: '0.01071em',
             width: '100%',
             height: '100%'
           },

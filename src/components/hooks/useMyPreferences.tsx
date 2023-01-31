@@ -24,13 +24,7 @@ import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import SimCardOutlinedIcon from '@mui/icons-material/SimCardOutlined';
 import SupervisorAccountOutlinedIcon from '@mui/icons-material/SupervisorAccountOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
-import { Box } from '@mui/material';
-import {
-  AppBarUserMenuElement,
-  AppLeftNavElement,
-  AppPreferenceConfigs,
-  AppSwitcherItem
-} from 'commons/components/app/AppConfigs';
+import { AppBarUserMenuElement, AppLeftNavElement, AppPreferenceConfigs } from 'commons/components/app/AppConfigs';
 import { Notification } from 'components/visual/Notification';
 import { ReactElement, ReactNode, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -87,7 +81,7 @@ const useMyPreferences = () => {
     [t]
   );
 
-  const TOP_NAV_RIGHT = useMemo((): ReactNode => <Box mr={2}>{<Notification />}</Box>, []);
+  const TOP_NAV_RIGHT = useMemo((): ReactNode => <Notification />, []);
 
   const LEFT_MENU_ITEMS = useMemo(
     (): AppLeftNavElement[] => [
@@ -372,16 +366,6 @@ const useMyPreferences = () => {
     [t]
   );
 
-  const APP_SWITCHER_ITEMS: AppSwitcherItem[] = [
-    // {
-    //   alt: 'AL',
-    //   name: 'Assemblyline',
-    //   img_d: '/images/al_dark.svg',
-    //   img_l: '/images/al.svg',
-    //   route: 'https://localhost'
-    // }
-  ];
-
   const USER_MENU_ITEMS = useMemo(
     (): AppBarUserMenuElement[] => [
       {
@@ -403,34 +387,6 @@ const useMyPreferences = () => {
     []
   );
 
-  const ADMIN_MENU_ITEMS = [
-    // {
-    //   name: t('adminmenu.errors'),
-    //   route: '/admin/errors',
-    //   icon: <ErrorOutlineOutlinedIcon />
-    // },
-    // {
-    //   name: t('adminmenu.services'),
-    //   route: '/admin/services',
-    //   icon: <AccountTreeOutlinedIcon />
-    // },
-    // {
-    //   name: t('adminmenu.sitemap'),
-    //   route: '/admin/sitemap',
-    //   icon: <MapOutlinedIcon />
-    // },
-    // {
-    //   name: t('adminmenu.tag_safelist'),
-    //   route: '/admin/tag_safelist',
-    //   icon: <PlaylistAddCheckIcon />
-    // },
-    // {
-    //   name: t('adminmenu.users'),
-    //   route: '/admin/users',
-    //   icon: <SupervisorAccountOutlinedIcon />
-    // }
-  ];
-
   return useMemo(
     (): AppPreferenceConfigs => ({
       appName: 'Assemblyline',
@@ -441,39 +397,29 @@ const useMyPreferences = () => {
       bannerLight: AL_LIGHT_BANNER,
       defaultShowQuickSearch: true,
       allowShowSafeResults: true,
-      // allowGravatar: true,
       allowQuickSearch: true,
       allowReset: false,
       avatarD: 'robohash',
       topnav: {
-        // apps: APP_SWITCHER_ITEMS,
         apps: [],
         userMenu: USER_MENU_ITEMS,
         userMenuI18nKey: 'usermenu',
         userMenuType: 'icon',
-        adminMenu: ADMIN_MENU_ITEMS,
+        adminMenu: [],
         adminMenuI18nKey: 'adminmenu',
         // leftAfterBreadcrumbs: <CreateButton />,
         right: TOP_NAV_RIGHT,
 
-        quickSearchURI: '/search/jobs',
-        quickSearchParam: 'js'
+        quickSearchURI: '/search',
+        quickSearchParam: 'query'
       },
       leftnav: {
         width: 240,
-        elements: LEFT_MENU_ITEMS
+        elements: LEFT_MENU_ITEMS,
+        hideNestedIcons: true
       }
     }),
-    [
-      AL_DARK_LOGO,
-      AL_LIGHT_LOGO,
-      AL_DARK_BANNER,
-      AL_LIGHT_BANNER,
-      USER_MENU_ITEMS,
-      ADMIN_MENU_ITEMS,
-      TOP_NAV_RIGHT,
-      LEFT_MENU_ITEMS
-    ]
+    [AL_DARK_LOGO, AL_LIGHT_LOGO, AL_DARK_BANNER, AL_LIGHT_BANNER, USER_MENU_ITEMS, TOP_NAV_RIGHT, LEFT_MENU_ITEMS]
   );
 };
 
