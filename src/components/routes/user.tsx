@@ -52,6 +52,37 @@ type ParamProps = {
   id: string;
 };
 
+const useStyles = makeStyles(theme => ({
+  drawer: {
+    width: '500px',
+    [theme.breakpoints.down('xs')]: {
+      width: '100vw'
+    }
+  },
+  row: {
+    height: '62px'
+  },
+  group: {
+    marginTop: '1rem'
+  },
+  skelItem: {
+    display: 'inline-block',
+    margin: theme.spacing(0.5)
+  },
+  skelButton: {
+    display: 'inline-block',
+    width: '9rem',
+    height: theme.spacing(5)
+  },
+  buttonProgress: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginTop: -12,
+    marginLeft: -12
+  }
+}));
+
 const DeleteButton = withStyles((theme: Theme) => ({
   root: {
     color: theme.palette.getContrastText(red[500]),
@@ -77,44 +108,15 @@ function User({ username }: UserProps) {
   const [modified, setModified] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
   const { user: currentUser, configuration } = useALContext();
-  const downSM = useMediaQuery(theme.breakpoints.down('xl'));
+  const downSM = useMediaQuery(theme.breakpoints.down('sm'));
+  const isXSDown = useMediaQuery(theme.breakpoints.down('xs'));
   const { showErrorMessage, showSuccessMessage, showWarningMessage } = useMySnackbar();
   const sp1 = theme.spacing(1);
   const sp4 = theme.spacing(4);
   const sp6 = theme.spacing(6);
-  const isXSDown = useMediaQuery(theme.breakpoints.down('xs'));
 
   const { apiCall } = useMyAPI();
-  const useStyles = makeStyles(curTheme => ({
-    drawer: {
-      width: '500px',
-      [theme.breakpoints.down('lg')]: {
-        width: '100vw'
-      }
-    },
-    row: {
-      height: '62px'
-    },
-    group: {
-      marginTop: '1rem'
-    },
-    skelItem: {
-      display: 'inline-block',
-      margin: theme.spacing(0.5)
-    },
-    skelButton: {
-      display: 'inline-block',
-      width: '9rem',
-      height: theme.spacing(5)
-    },
-    buttonProgress: {
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      marginTop: -12,
-      marginLeft: -12
-    }
-  }));
+
   const classes = useStyles();
 
   const doDeleteUser = () => {
