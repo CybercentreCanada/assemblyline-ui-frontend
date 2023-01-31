@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import { Box, ClickAwayListener, TextField, useMediaQuery, useTheme } from '@mui/material';
+import { Box, ClickAwayListener, InputBase, useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { insertText } from 'commons/addons/utils/browser';
 import {
@@ -268,7 +268,7 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
   return (
     <ClickAwayListener onClickAway={() => setOpen(false)}>
       <div ref={element}>
-        <TextField
+        <InputBase
           placeholder={placeholder || t('filter')}
           value={value}
           color="secondary"

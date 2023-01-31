@@ -127,7 +127,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         <IconButton
           onClick={_onValueClear}
           edge="end"
-          size={!upMD ? 'small' : null}
+          size={!upMD ? 'small' : 'large'}
           style={{ marginRight: theme.spacing(upMD ? 0 : 0.5) }}
           disabled={searching}
         >
@@ -145,9 +145,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
         {buttons.map((b, i) => (
           <IconButton
             key={`searchbar-button-${i}`}
-            // {...b.props}
+            {...b.props}
             edge="end"
-            size={!upMD ? 'small' : null}
+            size={!upMD ? 'small' : 'large'}
             style={{ marginRight: theme.spacing(upMD ? 0 : 0.5) }}
             disabled={searching}
           >
