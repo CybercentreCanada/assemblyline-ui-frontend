@@ -22,11 +22,12 @@ export default function AppLeftNavProvider({ children }: LeftNavProviderProps) {
     () => ({
       open,
       elements: elements || preferences.leftnav.elements,
+      hideNestedIcons: preferences.leftnav.hideNestedIcons,
       setOpen,
       setElements,
       toggle
     }),
-    [open, elements, preferences.leftnav.elements, setOpen, toggle]
+    [open, elements, preferences.leftnav.elements, preferences.leftnav.hideNestedIcons, setOpen, toggle]
   );
   return <AppLeftNavContext.Provider value={context}>{children}</AppLeftNavContext.Provider>;
 }
