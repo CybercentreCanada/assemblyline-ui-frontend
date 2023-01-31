@@ -14,6 +14,7 @@ const DEFAULT_CONTEXT: AppSearchServiceContextType = {
     menu: false,
     mode: 'inline',
     items: null,
+    autoReset: true,
     set: () => null
   }
 };
