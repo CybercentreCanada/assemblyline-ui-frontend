@@ -23,13 +23,12 @@ import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import SimCardOutlinedIcon from '@mui/icons-material/SimCardOutlined';
 import SupervisorAccountOutlinedIcon from '@mui/icons-material/SupervisorAccountOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
-import { AppSwitcherItem } from 'commons/components/app/AppConfigs';
-import { AppLayoutProps } from 'commons_deprecated/components/layout/LayoutProvider';
+import { AppPreferenceConfigs, AppSwitcherItem } from 'commons/components/app/AppConfigs';
 import { Notification } from 'components/visual/Notification';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 
-const useMyLayout = (): AppLayoutProps => {
+const useMyLayout = (): AppPreferenceConfigs => {
   const { t } = useTranslation();
   const MENU_ITEMS = [
     {
