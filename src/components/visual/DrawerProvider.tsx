@@ -1,6 +1,6 @@
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import { Drawer, IconButton, useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ConfirmationDialog from './ConfirmationDialog';
@@ -49,7 +49,7 @@ const useStyles = makeStyles(theme => ({
     [theme.breakpoints.only('md')]: {
       width: MDWidth
     },
-    [theme.breakpoints.down('xl')]: {
+    [theme.breakpoints.down('sm')]: {
       width: SMWidth
     }
   }
