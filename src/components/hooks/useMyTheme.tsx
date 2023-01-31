@@ -29,7 +29,7 @@ const AL_THEME: AppThemeConfigs = {
     light: {
       background: {
         default: '#fafafa',
-        paper: 'fff'
+        paper: '#fff'
       },
       primary: {
         main: 'rgb(11, 101, 161)'
