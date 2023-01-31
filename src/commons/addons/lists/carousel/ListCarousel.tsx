@@ -1,5 +1,5 @@
-import Carousel from 'commons/addons/elements/carousel/Carousel';
-import useListNavigator from 'commons/addons/elements/lists/hooks/useListNavigator';
+import Carousel from 'commons/addons/carousel/Carousel';
+import useListNavigator from 'commons/addons/lists/hooks/useListNavigator';
 import * as React from 'react';
 
 interface ListCarouselProps {

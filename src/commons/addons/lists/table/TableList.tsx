@@ -1,9 +1,9 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
+import FlexVertical from 'commons/addons/layout/flexers/FlexVertical';
 import lodash from 'lodash';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import ReactResizeDetector from 'react-resize-detector';
-import FlexVertical from '../../layout/flexers/FlexVertical';
 import FilterList from '../filters/FilterList';
 import FilterSelector, { FilterField } from '../filters/FilterSelector';
 import useListKeyboard from '../hooks/useListKeyboard';

@@ -1,11 +1,11 @@
 import { CircularProgress, Grid, useTheme } from '@mui/material';
-import useListKeyboard from 'commons/addons/elements/lists/hooks/useListKeyboard';
-import useListNavigator from 'commons/addons/elements/lists/hooks/useListNavigator';
-import ListItemBase, { LineItem } from 'commons/addons/elements/lists/item/ListItemBase';
-import ListScroller from 'commons/addons/elements/lists/scrollers/ListScroller';
-import SimpleListScroller from 'commons/addons/elements/lists/scrollers/SimpleListScroller';
-import { useStyles } from 'commons/addons/elements/lists/simplelist/SimpleList';
-import TableListMoreBtn, { TableListMoreConfig } from 'commons/addons/elements/lists/table/TableListMoreBtn';
+import useListKeyboard from 'commons/addons/lists/hooks/useListKeyboard';
+import useListNavigator from 'commons/addons/lists/hooks/useListNavigator';
+import ListItemBase, { LineItem } from 'commons/addons/lists/item/ListItemBase';
+import ListScroller from 'commons/addons/lists/scrollers/ListScroller';
+import SimpleListScroller from 'commons/addons/lists/scrollers/SimpleListScroller';
+import { useStyles } from 'commons/addons/lists/simplelist/SimpleList';
+import TableListMoreBtn, { TableListMoreConfig } from 'commons/addons/lists/table/TableListMoreBtn';
 import PageCenter from 'commons/components/pages/PageCenter';
 import { useCallback, useEffect, useRef, useState } from 'react';
 

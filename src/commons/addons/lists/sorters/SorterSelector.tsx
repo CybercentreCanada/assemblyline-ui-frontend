@@ -2,8 +2,8 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import { Autocomplete, Checkbox, Chip, TextField, useTheme } from '@mui/material';
 import { AutocompleteChangeDetails, AutocompleteChangeReason } from '@mui/material/useAutocomplete';
-import useSorters from 'commons/addons/elements/lists/hooks/useSorters';
 import { useTranslation } from 'react-i18next';
+import useSorters from '../hooks/useSorters';
 
 export interface SorterField {
   id: string | number;

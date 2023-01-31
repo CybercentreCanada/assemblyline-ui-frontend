@@ -1,7 +1,7 @@
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { InputAdornment, TextField, TextFieldProps } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import Throttler from 'commons/addons/elements/utils/throttler';
+import Throttler from 'commons/addons/utils/throttler';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FilterField } from './FilterSelector';

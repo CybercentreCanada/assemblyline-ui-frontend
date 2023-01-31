@@ -2,10 +2,10 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { CircularProgress } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import useListKeyboard from 'commons/addons/elements/lists/hooks/useListKeyboard';
-import useListNavigator from 'commons/addons/elements/lists/hooks/useListNavigator';
-import ListItemBase, { LineItem } from 'commons/addons/elements/lists/item/ListItemBase';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import useListKeyboard from '../hooks/useListKeyboard';
+import useListNavigator from '../hooks/useListNavigator';
+import ListItemBase, { LineItem } from '../item/ListItemBase';
 import ListScroller from '../scrollers/ListScroller';
 import SimpleListScroller from '../scrollers/SimpleListScroller';
 
