@@ -1,5 +1,5 @@
+import { LineItem } from 'commons/addons/lists/item/ListItemBase';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
-import { LineItem } from 'commons_deprecated/addons/elements/lists/item/ListItemBase';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { ALField, CustomUser } from 'components/hooks/useMyUser';
