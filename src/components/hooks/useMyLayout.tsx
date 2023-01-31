@@ -28,6 +28,7 @@ import { Notification } from 'components/visual/Notification';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 
+// TODO: this is deprecated and not used
 const useMyLayout = (): AppPreferenceConfigs => {
   const { t } = useTranslation();
   const MENU_ITEMS = [
