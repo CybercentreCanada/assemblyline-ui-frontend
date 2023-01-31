@@ -364,8 +364,6 @@ const Submit: React.FC<any> = () => {
     setUUID(generateUUID());
   });
 
-  console.log(md, downSM);
-
   return (
     <PageCenter maxWidth={md ? '800px' : downSM ? '100%' : '1024px'} margin={4} width="100%">
       <ConfirmationDialog
