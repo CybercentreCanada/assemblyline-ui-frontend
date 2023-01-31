@@ -1,7 +1,7 @@
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import { IconButton } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import useSplitLayout from 'commons/addons/elements/layout/hooks/useSplitLayout';
+import useSplitLayout from 'commons/addons/layout/hooks/useSplitLayout';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import ReactResizeDetector from 'react-resize-detector';
 import FlexHorizontal from '../flexers/FlexHorizontal';

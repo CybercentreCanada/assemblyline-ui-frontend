@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable class-methods-use-this */
-import { Layout, LayoutComputer, LayoutState } from 'commons/addons/elements/layout/split/layouts/Layouts';
+import { Layout, LayoutComputer, LayoutState } from 'commons/addons/layout/split/layouts/Layouts';
 
 export default class TwoLayout implements LayoutComputer {
   private width: number;
