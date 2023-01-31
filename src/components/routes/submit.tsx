@@ -78,7 +78,7 @@ const Submit: React.FC<any> = () => {
   const [validateCB, setValidateCB] = useState(null);
   const [allowClick, setAllowClick] = useState(true);
   const [file, setFile] = useState(null);
-  const downSM = useMediaQuery(theme.breakpoints.down('xl'));
+  const downSM = useMediaQuery(theme.breakpoints.down('sm'));
   const md = useMediaQuery(theme.breakpoints.only('md'));
   const { showErrorMessage, showSuccessMessage, closeSnackbar } = useMySnackbar();
   const navigate = useNavigate();
@@ -363,6 +363,8 @@ const Submit: React.FC<any> = () => {
     });
     setUUID(generateUUID());
   });
+
+  console.log(md, downSM);
 
   return (
     <PageCenter maxWidth={md ? '800px' : downSM ? '100%' : '1024px'} margin={4} width="100%">
