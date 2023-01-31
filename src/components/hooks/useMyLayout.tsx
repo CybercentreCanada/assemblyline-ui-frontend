@@ -401,7 +401,7 @@ const useMyLayout = (): AppPreferenceConfigs => {
 
   return {
     appName: 'Assemblyline',
-    allowBreadcrumbsMinimize: false,
+    allowBreadcrumbs: false,
     allowReset: false,
     appIconDark: darkLogo,
     appIconLight: lightLogo,
@@ -412,7 +412,6 @@ const useMyLayout = (): AppPreferenceConfigs => {
     defaultShowQuickSearch: true,
     defaultAutoHideAppbar: false,
     defaultShowBreadcrumbs: true,
-    defaultBreadcrumbsOpen: true,
     leftnav: {
       elements: MENU_ITEMS,
       hideNestedIcons: true
@@ -424,7 +423,7 @@ const useMyLayout = (): AppPreferenceConfigs => {
       quickSearchURI: '/search',
       quickSearchParam: 'query',
       right: <Notification />,
-      themeSelectionUnder: 'profile' as 'profile',
+      themeSelectionMode: 'profile' as 'profile',
       userMenu: USER_MENU_ITEMS,
       userMenuTitle: t('usermenu'),
       userMenuType: 'icon' as 'icon'
