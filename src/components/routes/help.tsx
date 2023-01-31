@@ -1,11 +1,11 @@
+import useAppConfigs from 'commons/components/app/hooks/useAppConfigs';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCenter from 'commons/components/pages/PageCenter';
-import useMyLayout from 'components/hooks/useMyLayout';
 import { CustomUser } from 'components/hooks/useMyUser';
 import LinkGrid from 'components/layout/linkgrid';
 
 export default function Help() {
-  const layout = useMyLayout();
+  const { preferences: layout } = useAppConfigs();
   const { validateProps } = useAppUser<CustomUser>();
   let items = [];
   for (const item of layout.leftnav.elements) {
