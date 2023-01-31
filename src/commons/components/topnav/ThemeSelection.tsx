@@ -92,7 +92,7 @@ const ThemeSelection = () => {
               </ListItemSecondaryAction>
             </ListItem>
           )}
-          {configs.preferences.allowQuickSearch && !isSmDown && (
+          {configs.preferences.allowQuickSearch && (
             <ListItem button onClick={quicksearch.toggle}>
               <ListItemText>{t('personalization.quicksearch')}</ListItemText>
               <ListItemSecondaryAction>

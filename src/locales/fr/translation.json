@@ -11,6 +11,7 @@
   "api.invalid": "Données non valides renvoyées par le serveur API",
   "api.unreachable": "Serveur API inaccessible, nous nous reconnecterons automatiquement une fois que le serveur sera de retour en ligne...",
   "app.language": "Langue",
+  "app.search.fullscreen": "Recherche rapide",
   "banner.alt": "Banière d'Assemblyline",
   "breadcrumb.404": "Non disponible",
   "breadcrumb.alert.detail": "Détails",

@@ -1,13 +1,12 @@
 import { Clear, Search } from '@mui/icons-material';
 import {
-  Button,
   CircularProgress,
   IconButton,
   InputAdornment,
   InputBase,
   InputBaseProps,
   Stack,
-  Tooltip
+  Typography
 } from '@mui/material';
 
 import { memo, useCallback, useRef } from 'react';
@@ -17,9 +16,9 @@ type AppSearchInputProps = {
   searching?: boolean;
   provided?: boolean;
   showToggle?: boolean;
+  showClear?: boolean;
   open?: boolean;
   onClear: () => void;
-  onToggleFullscreen: () => void;
 } & InputBaseProps;
 
 const AppSearchInput = ({
@@ -27,10 +26,10 @@ const AppSearchInput = ({
   provided,
   autoFocus,
   showToggle,
+  showClear,
   value,
   open,
   onClear,
-  onToggleFullscreen,
   onFocus,
   onChange,
   onKeyDown,
@@ -42,12 +41,8 @@ const AppSearchInput = ({
   // CTRL+K button click handler.
   // Decicde whether to open search in normal or fullscreen/modal mode.
   const onToggleClick = useCallback(() => {
-    if (open && provided) {
-      onToggleFullscreen();
-    } else {
-      rootRef.current.querySelector('input').focus();
-    }
-  }, [open, provided, onToggleFullscreen]);
+    rootRef.current.querySelector('input').focus();
+  }, []);
 
   return (
     <Stack direction="row" ref={rootRef}>
@@ -70,15 +65,15 @@ const AppSearchInput = ({
         endAdornment={
           <InputAdornment position="end" sx={theme => ({ color: theme.palette.text.disabled })}>
             {showToggle && (
-              <Tooltip title={t(open && provided ? 'app.search.fullscreen' : 'app.search.shortcut')}>
-                <Button size="small" color="inherit" onClick={onToggleClick}>
-                  CTRL+K
-                </Button>
-              </Tooltip>
+              <Typography variant="button" color="inherit" sx={{ fontSize: 'small' }} onClick={onToggleClick}>
+                CTRL+K
+              </Typography>
             )}
-            <IconButton color="inherit" onClick={onClear}>
-              <Clear />
-            </IconButton>
+            {showClear && (
+              <IconButton color="inherit" onClick={onClear} disabled={!value}>
+                <Clear />
+              </IconButton>
+            )}
           </InputAdornment>
         }
         sx={theme => ({
@@ -88,13 +83,10 @@ const AppSearchInput = ({
           paddingBottom: 0.5,
           paddingLeft: 1.5,
           paddingRight: 1,
-          // backgroundColor: emphasize(theme.palette.background.default, 0.1),
-          // backgroundColor: theme.palette.background,
           borderTopLeftRadius: theme.spacing(0.5),
           borderTopRightRadius: theme.spacing(0.5),
           borderBottomLeftRadius: open ? 0 : theme.spacing(0.5),
           borderBottomRightRadius: open ? 0 : theme.spacing(0.5)
-          // boxShadow: theme.palette.mode === 'light' && theme.shadows[2]
         })}
       />
     </Stack>

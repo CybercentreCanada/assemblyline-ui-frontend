@@ -9,7 +9,6 @@ import {
   IconButton,
   Popper,
   Slide,
-  Stack,
   styled,
   Tooltip,
   useMediaQuery,
@@ -28,20 +27,14 @@ const MENU_LIST_SX = { maxHeight: 500, overflow: 'auto' };
 
 const AppSearchRoot = styled(Box, { shouldForwardProp: prop => prop !== 'menuOpen' })<{ menuOpen: boolean }>(
   ({ theme, menuOpen }) => {
-    const backgroundColor = emphasize(theme.palette.background.default, 0.1);
+    const backgroundColor = emphasize(theme.palette.background.default, theme.palette.mode === 'dark' ? 0.1 : 0.033);
     return {
       position: 'relative',
       borderRadius: theme.shape.borderRadius,
       borderBottomLeftRadius: menuOpen && 0,
       borderBottomRightRadius: menuOpen && 0,
-
       '.app-search-input': {
-        backgroundColor:
-          theme.palette.mode === 'dark'
-            ? backgroundColor
-            : menuOpen
-            ? theme.palette.background.default
-            : backgroundColor,
+        backgroundColor: backgroundColor,
         boxShadow: menuOpen && theme.shadows[4]
       },
       '.app-search-result': {
@@ -67,11 +60,10 @@ const ModalTransition = forwardRef(function Transition(props: any, ref: any) {
 export default function AppSearch() {
   const theme = useTheme();
   const menuRef = useRef<HTMLDivElement>(null);
-  const showSearchIcon = useMediaQuery(theme.breakpoints.down('lg'));
+  const showSearchIcon = useMediaQuery(theme.breakpoints.down('sm'));
   const { t } = useTranslation();
   const { provided, state, service } = useAppSearchService();
   const [value, setValue] = useState<string>('');
-  // const [fullscreen, setFullscreen] = useState<boolean>(false);
 
   useEffectOnce(() => {
     if (service.onMounted) {
@@ -87,8 +79,8 @@ export default function AppSearch() {
       if (isCtrl && key === 'k') {
         event.preventDefault();
         const inputRef = menuRef.current.querySelector('input');
-        if (provided && (state.menu || !inputRef)) {
-          state.set({ ...state, mode: 'fullscreen' });
+        if (!inputRef || showSearchIcon) {
+          state.set({ ...state, menu: state.menu || showSearchIcon, mode: 'fullscreen' });
         } else {
           inputRef.focus();
         }
@@ -98,7 +90,7 @@ export default function AppSearch() {
     return () => {
       window.removeEventListener('keydown', keyHandler);
     };
-  }, [provided, state]);
+  }, [provided, showSearchIcon, state]);
 
   // Search input focus handler.
   const onFocus = useCallback(() => {
@@ -120,7 +112,16 @@ export default function AppSearch() {
   // keyboard[ENTER] handler.
   const onEnter = useCallback(() => {
     if (service.onEnter) {
-      state.set({ ...state, menu: true });
+      if (state.autoReset) {
+        const inputRef = menuRef.current.querySelector('input');
+        if (inputRef) {
+          inputRef.blur();
+        }
+        state.set({ ...state, menu: false, mode: 'inline' });
+        setValue('');
+      } else {
+        state.set({ ...state, menu: true });
+      }
       service.onEnter(value, state);
     }
   }, [value, state, service]);
@@ -155,27 +156,26 @@ export default function AppSearch() {
 
   // Fullscreen modal toggle handler.
   const onToggleFullscreen = useCallback(() => {
-    state.set({ ...state, mode: state.mode === 'inline' ? 'fullscreen' : 'inline' });
-  }, [state]);
+    state.set({
+      ...state,
+      menu: state.menu || showSearchIcon,
+      mode: state.mode === 'inline' ? 'fullscreen' : 'inline'
+    });
+  }, [showSearchIcon, state]);
 
   return (
     <ClickAwayListener onClickAway={() => state.set({ ...state, menu: false })}>
       <AppSearchRoot ref={menuRef} sx={{ mr: !showSearchIcon && 1 }} menuOpen={state.menu}>
         {showSearchIcon ? (
           <IconButton color="inherit" size="large" onClick={onToggleFullscreen}>
-            <Tooltip
-              title={
-                <Stack direction="column" textAlign="center">
-                  <span>{t('app.search.fullscreen')}</span> <span>CTLR+K</span>
-                </Stack>
-              }
-            >
+            <Tooltip title={t('app.search.fullscreen')}>
               <Search />
             </Tooltip>
           </IconButton>
         ) : (
           <>
             <AppSearchInput
+              autoFocus={false}
               showToggle
               provided={provided}
               className="app-search-input"
@@ -186,7 +186,6 @@ export default function AppSearch() {
               onChange={onChange}
               onKeyDown={onKeyDown}
               onClear={onClear}
-              onToggleFullscreen={onToggleFullscreen}
             />
             {provided && (
               <Popper
@@ -224,7 +223,11 @@ export default function AppSearch() {
             }
           }}
         >
-          <DialogTitle>
+          <DialogTitle
+            sx={{
+              padding: theme.spacing(1, 1.5)
+            }}
+          >
             <AppSearchInput
               autoFocus
               className="app-search-input"
@@ -237,7 +240,6 @@ export default function AppSearch() {
               onChange={onChange}
               onKeyDown={onKeyDown}
               onClear={onClear}
-              onToggleFullscreen={onToggleFullscreen}
             />
           </DialogTitle>
           {provided && state.items && (
