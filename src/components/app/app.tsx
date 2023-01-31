@@ -84,38 +84,15 @@ export const MyApp: React.FC<any> = () => {
   const myTheme: AppThemeConfigs = useMyTheme();
   const mySitemap: AppSiteMapConfigs = useMySitemap();
   const myUser: CustomAppUserService = useMyUser();
-  // const mySearch: AppSearchService<SearchJobRow> = useMySearch();
   return (
     <BrowserRouter basename={process.env.PUBLIC_URL}>
       <SafeResultsProvider>
-        <AppProvider
-          user={myUser}
-          preferences={myPreferences}
-          theme={myTheme}
-          sitemap={mySitemap} /* search={mySearch} */
-        >
+        <AppProvider user={myUser} preferences={myPreferences} theme={myTheme} sitemap={mySitemap}>
           <MyAppMain />
         </AppProvider>
       </SafeResultsProvider>
     </BrowserRouter>
   );
 };
-
-// Main Application entry component.
-// This will initialize things like theme and snackar providers which will then be available
-//  from this point on.
-// const MyApp = () => {
-//   const colors = {
-//     darkPrimary: '#7c93b9',
-//     darkSecondary: '#929cad',
-//     lightPrimary: '#0b65a1',
-//     lightSecondary: '#939dac'
-//   };
-//   return (
-//     <AppContextProvider defaultTheme="light" colors={colors}>
-//       <AppInit />
-//     </AppContextProvider>
-//   );
-// };
 
 export default MyApp;
