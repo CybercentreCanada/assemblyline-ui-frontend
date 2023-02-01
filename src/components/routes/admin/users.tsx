@@ -6,6 +6,7 @@ import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
 import {
   Box,
   Button,
+  Chip,
   CircularProgress,
   Drawer,
   Grid,
@@ -15,6 +16,7 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
@@ -252,13 +254,19 @@ export default function Users() {
             </Grid>
             <Grid item xs={12}>
               <Typography variant="caption">{t('newuser.groups')}</Typography>
-              {/* <ChipInput
-                style={{ display: 'block' }}
-                margin="dense"
+              <Autocomplete
+                sx={{ display: 'block', margin: theme.spacing(2, 0) }}
+                multiple
+                freeSolo
+                size="small"
+                options={[]}
                 defaultValue={newUser.groups}
-                onChange={chips => updateNewUser('groups', chips)}
-                variant="outlined"
-              /> */}
+                renderInput={params => <TextField {...params} />}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => <Chip variant="outlined" label={option} {...getTagProps({ index })} />)
+                }
+                onChange={(event, chips) => updateNewUser('groups', chips)}
+              />
             </Grid>
             <Grid item xs={12} md={6}>
               <Typography variant="caption">{t('newuser.new_pass')}</Typography>
