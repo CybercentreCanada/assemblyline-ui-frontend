@@ -1,5 +1,5 @@
-import makeStyles from '@mui/styles/makeStyles';
 import ClearIcon from '@mui/icons-material/Clear';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericField, StoreProps, TooltipIconButton, useDispatch, useEventListener } from '../../..';
@@ -53,6 +53,7 @@ export const WrappedHexCursorBar = ({ store }: StoreProps) => {
         labelWidth={0}
         placeholder={t('header.searchfield.cursor')}
         fullWidth
+        size="small"
         margin="dense"
         range="loop"
         value={cursorIndex as number}

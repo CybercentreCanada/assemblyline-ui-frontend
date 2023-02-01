@@ -1,6 +1,6 @@
 import { Tooltip } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FieldPopper, NumericField, StoreProps, useDispatch } from '../..';
@@ -51,6 +51,7 @@ export const WrappedHexSearchIndex = ({ store }: StoreProps) => {
           id="search-index"
           classes={{ formControl: classes.formControl }}
           placeholder={t('search.placeholder')}
+          size="small"
           margin="dense"
           range="loop"
           direction="inverse"
@@ -84,6 +85,7 @@ export const WrappedHexSearchIndex = ({ store }: StoreProps) => {
               id="search-index"
               label={t('search.label')}
               placeholder={t('search.placeholder')}
+              size="small"
               margin="dense"
               range="loop"
               direction="inverse"

@@ -56,6 +56,8 @@ export type NumericFieldProps = {
   disabled?: boolean;
   disabledArrow?: boolean;
   margin?: 'none' | 'dense';
+  size?: 'small' | 'medium';
+  variant?: 'filled' | 'outlined' | 'standard';
   range?: 'none' | 'clamp' | 'loop';
   direction?: 'normal' | 'inverse';
   allowNull?: boolean;
@@ -94,9 +96,11 @@ export const WrappedNumericField = ({
   autoFocus = false,
   disabled = false,
   disabledArrow = false,
-  margin = 'none',
+  size = 'medium',
   range = 'none',
   direction = 'normal',
+  margin = 'dense',
+  variant = 'outlined',
   allowNull = false,
   options = null,
   startAdornment = <></>,
@@ -333,8 +337,8 @@ export const WrappedNumericField = ({
     <FormControl
       fullWidth={fullWidth}
       className={clsx(fieldClasses.formControl, classes.formControl)}
-      variant="outlined"
-      size="small"
+      variant={variant}
+      size={size}
     >
       <InputLabel htmlFor={id}>{label}</InputLabel>
       <OutlinedInput
@@ -345,9 +349,9 @@ export const WrappedNumericField = ({
         }}
         id={id}
         type="text"
+        margin={margin}
         placeholder={placeholder}
         fullWidth={fullWidth}
-        margin={margin}
         disabled={disabled}
         value={textValue}
         onFocus={focus}
@@ -386,7 +390,7 @@ export const WrappedNumericField = ({
             </div>
           </InputAdornment>
         }
-        label={<InputLabel sx={{ width: labelWidth }} />}
+        // label={<InputLabel sx={{ width: labelWidth }} />}
       />
     </FormControl>
   );

@@ -37,6 +37,7 @@ export const WrappedHexColumnSetting = ({ store }: StoreProps) => {
             id={t('columns.label')}
             placeholder={t('columns.description')}
             fullWidth
+            size="small"
             margin="dense"
             value={store.setting.layout.column.max}
             min={1}

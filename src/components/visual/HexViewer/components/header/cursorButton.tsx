@@ -24,6 +24,7 @@ export const WrappedHexCursorButton = ({ store }: StoreProps) => {
           label={t('offset.label')}
           placeholder={t('offset.placeholder')}
           fullWidth
+          size="small"
           margin="dense"
           range="loop"
           value={cursorIndex as number}

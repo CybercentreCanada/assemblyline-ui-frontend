@@ -107,6 +107,7 @@ export const WrappedHexField = ({
         placeholder={'text'}
         fullWidth
         autoFocus
+        size="small"
         margin="dense"
         multiline
         maxRows={1}
