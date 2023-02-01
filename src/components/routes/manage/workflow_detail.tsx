@@ -294,6 +294,7 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
                 fullWidth
                 multiple
                 freeSolo
+                size="small"
                 options={DEFAULT_LABELS}
                 value={workflow.labels}
                 renderInput={params => <TextField {...params} variant="outlined" />}

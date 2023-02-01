@@ -262,6 +262,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
           <Autocomplete
             fullWidth
             multiple
+            size="small"
             classes={{ option: classes.option }}
             options={statusFilters}
             value={selectedStatusFilters}
@@ -277,6 +278,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
           <Autocomplete
             fullWidth
             multiple
+            size="small"
             classes={{ option: classes.option }}
             options={priorityFilters}
             value={selectedPriorityFilters}
@@ -292,6 +294,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
           <Autocomplete
             fullWidth
             multiple
+            size="small"
             classes={{ option: classes.option }}
             options={labelFilters}
             value={selectedLabelFilters}
@@ -307,6 +310,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
           <Autocomplete
             fullWidth
             multiple
+            size="small"
             classes={{ option: classes.option }}
             options={userFavoritesFilters}
             value={selectedQueryFilters.filter(filter => filter.isFavorite).map(f => f.filter)}
@@ -322,6 +326,7 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
           <Autocomplete
             fullWidth
             multiple
+            size="small"
             classes={{ option: classes.option }}
             options={valueFilters}
             value={selectedQueryFilters.filter(filter => !filter.isFavorite).map(f => f.filter)}
