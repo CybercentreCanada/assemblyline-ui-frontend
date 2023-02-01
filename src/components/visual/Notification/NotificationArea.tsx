@@ -81,7 +81,8 @@ const useStyles = makeStyles(theme => ({
     position: 'sticky',
     paddingTop: theme.spacing(1),
     zIndex: 20000,
-    top: '0px'
+    top: '0px',
+    backgroundColor: theme.palette.background.default
   },
   center: {
     justifyContent: 'center'
