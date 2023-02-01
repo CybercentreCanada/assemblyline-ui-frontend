@@ -10,7 +10,7 @@ import { TextBody } from './text_body';
 const useStyles = printable =>
   makeStyles(theme => ({
     root: {
-      [theme.breakpoints.down('lg')]: {
+      [theme.breakpoints.down('sm')]: {
         width: printable ? '100%' : 'max-content'
       }
     }
