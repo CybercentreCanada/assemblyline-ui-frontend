@@ -1,5 +1,5 @@
-import makeStyles from '@mui/styles/makeStyles';
 import ClearIcon from '@mui/icons-material/Clear';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericField, StoreProps, TooltipIconButton, useDispatch, useEventListener } from '../../..';
@@ -16,10 +16,10 @@ const useHexStyles = makeStyles(theme => ({
   },
   iconButton: {
     padding: 10,
-    [theme.breakpoints.down('lg')]: {
+    [theme.breakpoints.down('sm')]: {
       padding: 4
     },
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down('xs')]: {
       padding: 2
     }
   }
