@@ -4,6 +4,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import {
   Avatar,
   Button,
+  Chip,
   CircularProgress,
   Drawer,
   Grid,
@@ -21,6 +22,7 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
 import { red } from '@mui/material/colors';
 import Skeleton from '@mui/material/Skeleton';
 import makeStyles from '@mui/styles/makeStyles';
@@ -351,12 +353,20 @@ function User({ username }: UserProps) {
                       <Typography variant="caption" color="textSecondary" gutterBottom>
                         {t('groups_edit_title')}
                       </Typography>
-                      {/* <ChipInput
-                        margin="normal"
-                        defaultValue={user.groups}
-                        onChange={chips => setGroups(chips)}
-                        variant="outlined"
-                      /> */}
+                      <Autocomplete
+                        sx={{ margin: theme.spacing(2, 0) }}
+                        multiple
+                        freeSolo
+                        options={[]}
+                        value={user.groups}
+                        renderInput={params => <TextField {...params} />}
+                        renderTags={(value, getTagProps) =>
+                          value.map((option, index) => (
+                            <Chip variant="outlined" label={option} {...getTagProps({ index })} />
+                          ))
+                        }
+                        onChange={(event, value) => setGroups(value)}
+                      />
                     </>
                   ),
                   name: (
