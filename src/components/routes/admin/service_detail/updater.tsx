@@ -195,8 +195,8 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
               <OutlinedInput
                 fullWidth
                 type="number"
-                size="small"
                 margin="dense"
+                size="small"
                 value={service.update_config.update_interval_seconds}
                 onChange={handleIntervalChange}
                 endAdornment={<InputAdornment position="end">sec</InputAdornment>}

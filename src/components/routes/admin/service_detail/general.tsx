@@ -333,8 +333,8 @@ const ServiceGeneral = ({ service, defaults, constants, versions, setService, se
             <TextField
               fullWidth
               type="number"
-              size="small"
               margin="dense"
+              size="small"
               variant="outlined"
               InputProps={{ inputProps: { min: 5 } }}
               onChange={handleTimeoutChange}
@@ -361,8 +361,8 @@ const ServiceGeneral = ({ service, defaults, constants, versions, setService, se
             <TextField
               fullWidth
               type="number"
-              size="small"
               margin="dense"
+              size="small"
               variant="outlined"
               InputProps={{ inputProps: { min: 0 } }}
               onChange={handleLicenceChange}
@@ -389,8 +389,8 @@ const ServiceGeneral = ({ service, defaults, constants, versions, setService, se
             <TextField
               fullWidth
               type="number"
-              size="small"
               margin="dense"
+              size="small"
               variant="outlined"
               InputProps={{ inputProps: { min: 0 } }}
               onChange={handleMaxQueueSizeChange}

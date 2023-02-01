@@ -695,8 +695,9 @@ const Submit: React.FC<any> = () => {
                     {settings ? (
                       <TextField
                         id="ttl"
-                        size="small"
                         type="number"
+                        margin="dense"
+                        size="small"
                         inputProps={{
                           min: configuration.submission.max_dtl !== 0 ? 1 : 0,
                           max: configuration.submission.max_dtl !== 0 ? configuration.submission.max_dtl : 365

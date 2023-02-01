@@ -318,7 +318,8 @@ function User({ username }: UserProps) {
                       <TextField
                         autoFocus
                         type="number"
-                        margin="normal"
+                        margin="dense"
+                        size="small"
                         variant="outlined"
                         onChange={event => setAPIQuota(event.target.value)}
                         value={user.api_quota}

@@ -502,8 +502,8 @@ const WrappedContainerDialog = ({
               <TextField
                 fullWidth
                 type="number"
-                size="small"
                 margin="dense"
+                size="small"
                 variant="outlined"
                 onChange={event => handleContainerValueChange('cpu_cores', event.target.value)}
                 value={tempContainer.cpu_cores}
@@ -527,8 +527,8 @@ const WrappedContainerDialog = ({
                   <TextField
                     fullWidth
                     type="number"
-                    size="small"
                     margin="dense"
+                    size="small"
                     variant="outlined"
                     onChange={event => handleContainerValueChange('ram_mb_min', event.target.value)}
                     value={tempContainer.ram_mb_min}
@@ -538,8 +538,8 @@ const WrappedContainerDialog = ({
                   <TextField
                     fullWidth
                     type="number"
-                    size="small"
                     margin="dense"
+                    size="small"
                     variant="outlined"
                     onChange={event => handleContainerValueChange('ram_mb', event.target.value)}
                     value={tempContainer.ram_mb}
