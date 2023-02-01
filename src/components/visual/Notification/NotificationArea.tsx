@@ -61,7 +61,6 @@ const useStyles = makeStyles(theme => ({
     pageBreakInside: 'avoid',
     padding: theme.spacing(2.5),
     paddingTop: 0
-    // backgroundColor: theme.palette.background.paper
   },
   container: {
     display: 'flex',
@@ -82,7 +81,6 @@ const useStyles = makeStyles(theme => ({
     paddingTop: theme.spacing(1),
     zIndex: 20000,
     top: '0px'
-    // backgroundColor: theme.palette.background.paper
   },
   center: {
     justifyContent: 'center'
@@ -461,33 +459,35 @@ const WrappedNotificationArea = () => {
         waiting={waitingDialog}
       />
 
-      <IconButton color="inherit" aria-label="open drawer" onClick={onOpenNotificationArea} size="large">
-        <Badge
-          invisible={systemMessageRead && notifications.filter(n => n._isNew).length === 0}
-          classes={{ badge: clsx(classes.baseColor, systemMessage && getColor(systemMessage, 'bgColor', 1)) }}
-          max={99}
-          badgeContent={
-            systemMessage
-              ? systemMessage.severity === 'error'
-                ? `!`
-                : systemMessage.severity === 'warning'
-                ? `!`
-                : systemMessage.severity === 'info'
-                ? `i`
-                : systemMessage.severity === 'success'
-                ? `\u2714`
-                : ''
-              : notifications.filter(n => n._isNew).length
-          }
-          children={
-            systemMessageRead && notifications.filter(n => n._isNew).length === 0 ? (
-              <NotificationsNoneOutlinedIcon />
-            ) : (
-              <NotificationsActiveOutlinedIcon />
-            )
-          }
-        />
-      </IconButton>
+      <Tooltip title={t('notification.title')} aria-label={t('add.title')}>
+        <IconButton color="inherit" aria-label="open drawer" onClick={onOpenNotificationArea} size="large">
+          <Badge
+            invisible={systemMessageRead && notifications.filter(n => n._isNew).length === 0}
+            classes={{ badge: clsx(classes.baseColor, systemMessage && getColor(systemMessage, 'bgColor', 1)) }}
+            max={99}
+            badgeContent={
+              systemMessage
+                ? systemMessage.severity === 'error'
+                  ? `!`
+                  : systemMessage.severity === 'warning'
+                  ? `!`
+                  : systemMessage.severity === 'info'
+                  ? `i`
+                  : systemMessage.severity === 'success'
+                  ? `\u2714`
+                  : ''
+                : notifications.filter(n => n._isNew).length
+            }
+            children={
+              systemMessageRead && notifications.filter(n => n._isNew).length === 0 ? (
+                <NotificationsNoneOutlinedIcon />
+              ) : (
+                <NotificationsActiveOutlinedIcon />
+              )
+            }
+          />
+        </IconButton>
+      </Tooltip>
       <Drawer anchor="right" classes={{ paper: classes.drawer }} open={drawer} onClose={onCloseNotificationArea}>
         <div className={classes.root}>
           <div className={classes.container}>
