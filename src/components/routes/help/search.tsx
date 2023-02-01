@@ -82,11 +82,10 @@ const useStyles = makeStyles((theme: Theme) =>
     pre: {
       fontFamily: 'monospace',
       fontSize: '1rem',
-      margin: `0 0 ${theme.spacing(1)} 0`,
-      padding: `${theme.spacing(1)} ${theme.spacing(1.5)}`,
+      margin: theme.spacing(0, 0, 1, 0),
+      padding: theme.spacing(1, 1.5),
       whiteSpace: 'pre-wrap',
-      wordBreak: 'break-word',
-      backgroundColor: 'rgb(66, 66, 66)'
+      wordBreak: 'break-word'
     }
   })
 );
