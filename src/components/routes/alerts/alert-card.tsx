@@ -1,6 +1,6 @@
-import { Button, Grid, Hidden, IconButton, Paper, Typography, useMediaQuery, useTheme } from '@mui/material';
 import MoodIcon from '@mui/icons-material/Mood';
 import MoodBadIcon from '@mui/icons-material/MoodBad';
+import { Button, Grid, Hidden, IconButton, Paper, Typography, useMediaQuery, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -28,7 +28,7 @@ const AlertCardItem: React.FC<AlertCardItemProps> = ({ item, setItem = null }) =
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
-  const isDownSM = useMediaQuery(theme.breakpoints.down('xl'));
+  const isDownSM = useMediaQuery(theme.breakpoints.down('sm'));
   const { apiCall } = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
   const { user: currentUser, c12nDef } = useALContext();
@@ -155,7 +155,7 @@ const AlertCardItem: React.FC<AlertCardItemProps> = ({ item, setItem = null }) =
               </Moment>
             </Grid>
             {c12nDef.enforce && (
-              <Hidden xlDown>
+              <Hidden smDown>
                 <Grid item md={4} style={{ textAlign: 'right' }}>
                   <Classification c12n={item.classification} size="tiny" type="outlined" inline />
                 </Grid>
@@ -230,7 +230,7 @@ const AlertCardItem: React.FC<AlertCardItemProps> = ({ item, setItem = null }) =
               <b>{item.file.size} </b>
               <span style={{ fontWeight: 300 }}>({bytesToSize(item.file.size)})</span>
             </Grid>
-            <Hidden xlDown>
+            <Hidden smDown>
               <Grid item md={2}>
                 <span style={{ fontFamily: 'monospace', fontWeight: 600 }}>MD5</span>
               </Grid>
@@ -238,7 +238,7 @@ const AlertCardItem: React.FC<AlertCardItemProps> = ({ item, setItem = null }) =
             <Grid item xs={12} md={10}>
               <span style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>{item.file.md5}</span>
             </Grid>
-            <Hidden xlDown>
+            <Hidden smDown>
               <Grid item md={2}>
                 <span style={{ fontFamily: 'monospace', fontWeight: 600 }}>SHA1</span>
               </Grid>
@@ -246,7 +246,7 @@ const AlertCardItem: React.FC<AlertCardItemProps> = ({ item, setItem = null }) =
             <Grid item xs={12} md={10}>
               <span style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>{item.file.sha1}</span>
             </Grid>
-            <Hidden xlDown>
+            <Hidden smDown>
               <Grid item md={2}>
                 <span style={{ fontFamily: 'monospace', fontWeight: 600 }}>SHA256</span>
               </Grid>

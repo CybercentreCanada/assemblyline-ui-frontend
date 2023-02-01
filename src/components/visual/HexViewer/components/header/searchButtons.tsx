@@ -1,7 +1,7 @@
-import makeStyles from '@mui/styles/makeStyles';
 import ArrowDownward from '@mui/icons-material/ArrowDownward';
 import ArrowUpward from '@mui/icons-material/ArrowUpward';
 import ClearIcon from '@mui/icons-material/Clear';
+import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { StoreProps, TooltipIconButton, useDispatch } from '../..';
@@ -9,10 +9,10 @@ import { StoreProps, TooltipIconButton, useDispatch } from '../..';
 const useHexStyles = makeStyles(theme => ({
   iconButton: {
     padding: 10,
-    [theme.breakpoints.down('lg')]: {
+    [theme.breakpoints.down('sm')]: {
       padding: 4
     },
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down('xs')]: {
       padding: 2
     }
   }

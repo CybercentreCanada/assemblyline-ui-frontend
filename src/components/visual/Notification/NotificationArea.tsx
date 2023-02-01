@@ -50,7 +50,7 @@ const useStyles = makeStyles(theme => ({
   drawer: {
     width: '80%',
     maxWidth: '500px',
-    [theme.breakpoints.down('lg')]: {
+    [theme.breakpoints.down('sm')]: {
       width: '100%'
     }
   },

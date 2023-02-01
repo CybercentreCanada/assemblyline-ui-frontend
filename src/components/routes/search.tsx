@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme: Theme) =>
           minWidth: 'unset'
         }
       },
-      [theme.breakpoints.down('xl')]: {
+      [theme.breakpoints.down('sm')]: {
         minHeight: 'unset',
         '& [role=tab]': {
           fontSize: '12px',

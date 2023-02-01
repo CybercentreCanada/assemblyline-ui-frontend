@@ -35,7 +35,7 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
   const [tempKeyPriv, setTempKeyPriv] = useState('READ');
   const { apiCall } = useMyAPI();
   const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('lg'));
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const { showSuccessMessage } = useMySnackbar();
   const regex = RegExp('^[a-zA-Z][a-zA-Z0-9_]*$');
   const sp1 = theme.spacing(1);

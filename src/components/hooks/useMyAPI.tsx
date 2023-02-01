@@ -51,11 +51,11 @@ export default function useMyAPI() {
   };
 
   type BootstrapProps = {
-    switchRenderedApp?: (value: string) => void;
-    setConfiguration?: (cfg: ConfigurationDefinition) => void;
-    setLoginParams?: (params: LoginParamsProps) => void;
-    setUser?: (user: WhoAmIProps) => void;
-    setReady?: (isReady: boolean) => void;
+    switchRenderedApp: (value: string) => void;
+    setConfiguration: (cfg: ConfigurationDefinition) => void;
+    setLoginParams: (params: LoginParamsProps) => void;
+    setUser: (user: WhoAmIProps) => void;
+    setReady: (isReady: boolean) => void;
     retryAfter?: number;
   };
 

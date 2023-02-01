@@ -14,7 +14,7 @@ const useHexStyles = makeStyles(theme => ({
     }
   },
   autocompletePopper: {
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down('xs')]: {
       display: 'none'
     },
     width: '50vw'

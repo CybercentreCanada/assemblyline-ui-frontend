@@ -447,6 +447,6 @@ export default function Services() {
       </div>
     </PageFullWidth>
   ) : (
-    <Navigate to="/forbidden" />
+    <Navigate to="/forbidden" replace />
   );
 }

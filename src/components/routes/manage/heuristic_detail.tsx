@@ -57,13 +57,13 @@ type HeuristicDetailProps = {
 const useStyles = makeStyles(theme => ({
   preview: {
     margin: 0,
-    padding: `${theme.spacing(0.75)} ${theme.spacing(1)}`,
+    padding: theme.spacing(0.75, 1),
     whiteSpace: 'pre-wrap',
     wordBreak: 'break-word'
   },
   drawerPaper: {
     maxWidth: '1200px',
-    [theme.breakpoints.down('lg')]: {
+    [theme.breakpoints.down('sm')]: {
       width: '100%'
     }
   },

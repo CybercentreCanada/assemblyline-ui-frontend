@@ -186,6 +186,6 @@ export default function AdminIdentify() {
       </div>
     </PageFullSize>
   ) : (
-    <Navigate to="/forbidden" />
+    <Navigate to="/forbidden" replace />
   );
 }

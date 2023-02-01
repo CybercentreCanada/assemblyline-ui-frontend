@@ -194,6 +194,6 @@ export default function AdminTagSafelist() {
       </div>
     </PageFullSize>
   ) : (
-    <Navigate to="/forbidden" />
+    <Navigate to="/forbidden" replace />
   );
 }

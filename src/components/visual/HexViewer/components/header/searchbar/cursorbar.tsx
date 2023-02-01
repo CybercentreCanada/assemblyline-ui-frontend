@@ -16,10 +16,10 @@ const useHexStyles = makeStyles(theme => ({
   },
   iconButton: {
     padding: 10,
-    [theme.breakpoints.down('lg')]: {
+    [theme.breakpoints.down('sm')]: {
       padding: 4
     },
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down('xs')]: {
       padding: 2
     }
   }

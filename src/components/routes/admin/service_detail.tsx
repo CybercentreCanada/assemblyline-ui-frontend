@@ -281,7 +281,7 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
   });
 
   return !currentUser.is_admin ? (
-    <Navigate to="/forbidden" />
+    <Navigate to="/forbidden" replace />
   ) : (
     <PageCenter margin={!svc ? 2 : 4} width="100%" textAlign="left">
       <ConfirmationDialog

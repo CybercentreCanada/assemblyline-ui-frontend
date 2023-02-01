@@ -26,7 +26,7 @@ export default function Apps({ user, toggleApp }: APIKeysProps) {
   const [selectedApp, setSelectedApp] = useState(null);
   const { apiCall } = useMyAPI();
   const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('lg'));
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
   const sp1 = theme.spacing(1);
   const sp4 = theme.spacing(4);

@@ -72,7 +72,7 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column',
     padding: theme.spacing(3),
     width: '600px',
-    [theme.breakpoints.down('lg')]: {
+    [theme.breakpoints.down('xs')]: {
       width: '100%'
     }
   },
@@ -139,7 +139,7 @@ const Alerts: React.FC = () => {
 
   // Media quries.
   const isMDUp = useMediaQuery(theme.breakpoints.up('md'));
-  const isLGDown = useMediaQuery(theme.breakpoints.down('xl'));
+  const isLGDown = useMediaQuery(theme.breakpoints.down('lg'));
 
   // Handler searchbar onSearch callback
   const onSearch = (filterValue: string = '', inputEl: HTMLInputElement = null) => {

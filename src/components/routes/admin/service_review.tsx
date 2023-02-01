@@ -314,6 +314,6 @@ export default function ServiceReview() {
       )}
     </PageFullWidth>
   ) : (
-    <Navigate to="/forbidden" />
+    <Navigate to="/forbidden" replace />
   );
 }

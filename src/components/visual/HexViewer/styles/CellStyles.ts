@@ -4,11 +4,11 @@ import makeStyles from '@mui/styles/makeStyles';
 export const useCellStyles = makeStyles(theme => ({
   hexBorder: {
     '& > div > div:nth-child(4n + 1):nth-child(n+2) ': {
-      borderLeft: `1px solid ${theme.palette.text.secondary}`
+      borderLeft: `1px solid ${theme.palette.text.disabled}`
     }
   },
   border: {
-    borderLeft: `1px solid ${theme.palette.text.secondary}`
+    borderLeft: `1px solid ${theme.palette.text.disabled}`
   },
   nullColor: {
     color: theme.palette.text.disabled

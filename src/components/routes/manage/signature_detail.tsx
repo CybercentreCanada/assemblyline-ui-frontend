@@ -86,11 +86,11 @@ const useStyles = makeStyles(theme => ({
   },
   stats: {
     margin: 0,
-    padding: `${theme.spacing(0.75)} ${theme.spacing(1)}`
+    padding: theme.spacing(0.75, 1)
   },
   openPaper: {
     maxWidth: '1200px',
-    [theme.breakpoints.down('lg')]: {
+    [theme.breakpoints.down('sm')]: {
       width: '100%'
     }
   },
