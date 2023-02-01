@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     }
   },
   disabled: {
-    color: theme.palette.text.secondary,
+    color: theme.palette.text.disabled,
     backgroundColor: theme.palette.mode === 'dark' ? '#63636317' : '#EAEAEA',
     border: `solid 1px ${theme.palette.divider}`
   },
