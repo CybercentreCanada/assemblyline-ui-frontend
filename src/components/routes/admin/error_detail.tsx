@@ -196,7 +196,7 @@ export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
       )}
     </PageCenter>
   ) : (
-    <Navigate to="/forbidden" />
+    <Navigate to="/forbidden" replace />
   );
 };
 

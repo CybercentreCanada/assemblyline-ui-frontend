@@ -195,6 +195,6 @@ export default function AdminActions() {
       </div>
     </PageFullSize>
   ) : (
-    <Navigate to="/forbidden" />
+    <Navigate to="/forbidden" replace />
   );
 }

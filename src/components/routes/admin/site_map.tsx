@@ -174,6 +174,6 @@ export default function SiteMap() {
       )}
     </PageFullWidth>
   ) : (
-    <Navigate to="/forbidden" />
+    <Navigate to="/forbidden" replace />
   );
 }

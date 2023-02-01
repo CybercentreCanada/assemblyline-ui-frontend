@@ -284,7 +284,7 @@ function User({ username }: UserProps) {
   });
 
   return !currentUser.is_admin && location.pathname.includes('/admin/') ? (
-    <Navigate to="/forbidden" />
+    <Navigate to="/forbidden" replace />
   ) : (
     <PageCenter margin={4} width="100%">
       <React.Fragment key="right">

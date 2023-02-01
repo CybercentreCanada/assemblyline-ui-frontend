@@ -147,7 +147,7 @@ const WrappedRoutes = () => {
         <Route path="/tos" element={<Tos />} />
         <Route path="/forbidden" element={<ForbiddenPage />} />
         <Route path="/notfound" element={<NotFoundPage />} />
-        <Route path="*" element={<Navigate to="/notfound" />} />
+        <Route path="*" element={<Navigate to="/notfound" replace />} />
       </Routes>
       {configuration.system && configuration.system.type !== 'production' && (
         <div

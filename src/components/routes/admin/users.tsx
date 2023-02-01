@@ -430,6 +430,6 @@ export default function Users() {
       </div>
     </PageFullWidth>
   ) : (
-    <Navigate to="/forbidden" />
+    <Navigate to="/forbidden" replace />
   );
 }

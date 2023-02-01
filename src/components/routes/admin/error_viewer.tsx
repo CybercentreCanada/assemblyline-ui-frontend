@@ -395,6 +395,6 @@ export default function ErrorViewer() {
       </div>
     </PageFullWidth>
   ) : (
-    <Navigate to="/forbidden" />
+    <Navigate to="/forbidden" replace />
   );
 }
