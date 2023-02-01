@@ -58,7 +58,7 @@ export default function ApiDoc() {
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
 
-  const downSM = useMediaQuery(theme.breakpoints.down('xl'));
+  const downSM = useMediaQuery(theme.breakpoints.down('sm'));
   const xs = useMediaQuery(theme.breakpoints.only('xs'));
   const isDark = theme.palette.mode === 'dark';
   const methodColor = {
