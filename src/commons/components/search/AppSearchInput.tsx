@@ -65,7 +65,12 @@ const AppSearchInput = ({
         endAdornment={
           <InputAdornment position="end" sx={theme => ({ color: theme.palette.text.disabled })}>
             {showToggle && (
-              <Typography variant="button" color="inherit" sx={{ fontSize: 'small' }} onClick={onToggleClick}>
+              <Typography
+                variant="button"
+                color="inherit"
+                sx={{ fontSize: 'small', marginRight: '8px' }}
+                onClick={onToggleClick}
+              >
                 CTRL+K
               </Typography>
             )}
