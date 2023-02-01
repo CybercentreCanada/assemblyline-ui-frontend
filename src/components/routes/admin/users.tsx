@@ -63,7 +63,7 @@ const useStyles = makeStyles(theme => ({
   drawerPaper: {
     width: '80%',
     maxWidth: '800px',
-    [theme.breakpoints.down('xl')]: {
+    [theme.breakpoints.down('sm')]: {
       width: '100%'
     }
   },
