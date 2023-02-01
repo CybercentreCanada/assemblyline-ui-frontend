@@ -2,6 +2,7 @@ import useAppConfigs from 'commons/components/app/hooks/useAppConfigs';
 import useAppSitemap, { BreadcrumbItem, getRoute } from 'commons/components/app/hooks/useAppSitemap';
 import useLocalStorageItem from 'commons/components/utils/hooks/useLocalStorageItem';
 import { createContext, ReactNode, useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router';
 import { AppStorageKeys } from '../AppConstants';
 import { AppBreadcrumbsContextType } from '../AppContexts';
 import useAppUser from '../hooks/useAppUser';
@@ -15,7 +16,7 @@ type AppBreadcrumbsProviderProps = {
 export const AppBreadcrumbsContext = createContext<AppBreadcrumbsContextType>(null);
 
 export default function AppBreadcrumbsProvider({ children }: AppBreadcrumbsProviderProps) {
-  const pathname = window.location.pathname;
+  const { pathname } = useLocation();
   const { sitemap, preferences } = useAppConfigs();
   const user = useAppUser();
   const { appendRoute } = useAppSitemap();
