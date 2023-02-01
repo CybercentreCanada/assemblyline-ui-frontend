@@ -164,7 +164,7 @@ export default function ApiDoc() {
             </Grid>
             <Grid item xs={12} sm style={{ textAlign: 'end' }}>
               {apiList && apiSelected ? (
-                <FormControl size="small" fullWidth>
+                <FormControl size="small">
                   <Select
                     id="api"
                     value={apiSelected}
