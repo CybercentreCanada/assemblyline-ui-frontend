@@ -358,7 +358,6 @@ function User({ username }: UserProps) {
                         sx={{ margin: theme.spacing(2, 0) }}
                         multiple
                         freeSolo
-                        size="small"
                         options={[]}
                         value={user.groups}
                         renderInput={params => <TextField {...params} />}
