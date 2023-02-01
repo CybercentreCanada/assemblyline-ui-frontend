@@ -346,7 +346,7 @@ const Alerts: React.FC = () => {
 
   return currentUser.roles.includes('alert_view') ? (
     <PageFullWidth margin={4}>
-      <Drawer open={drawer.open} anchor="right" onClose={onDrawerClose}>
+      <Drawer open={drawer.open} anchor="right" onClose={onDrawerClose} sx={{ zIndex: 1301 }}>
         <div style={{ padding: theme.spacing(1) }}>
           <IconButton onClick={onDrawerClose} size="large">
             <CloseOutlinedIcon />
