@@ -493,7 +493,7 @@ function HeuristicsListSkel() {
 function FileTree({ tree, important_files }) {
   const classes = useStyles();
 
-  return (
+  return tree && important_files ? (
     <div>
       {Object.keys(tree).map((f, i) =>
         important_files.indexOf(f) !== -1 ? (
@@ -532,7 +532,7 @@ function FileTree({ tree, important_files }) {
         ) : null
       )}
     </div>
-  );
+  ) : null;
 }
 
 function FileTreeSkel() {
@@ -1007,8 +1007,8 @@ export default function SubmissionReport() {
             <div className={classes.section_content}>
               {report ? (
                 <FileTree
-                  tree={report.file_tree[report.files[0].sha256].children}
-                  important_files={report.important_files}
+                  tree={report?.file_tree[report?.files[0]?.sha256]?.children}
+                  important_files={report?.important_files}
                 />
               ) : (
                 <FileTreeSkel />
