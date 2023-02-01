@@ -197,9 +197,9 @@ const AlertsFilters: React.FC<AlertsFiltersProps> = ({
 
   // Render method of a single Autocomplete component option.
   const renderOption = (props, item: SearchFilter, state) => (
-    <div>
+    <li {...props}>
       {item.other && <CustomChip label={item.other.count} size="tiny" />} {item.label}
-    </div>
+    </li>
   );
 
   // Apply updates to selected filters if required.
