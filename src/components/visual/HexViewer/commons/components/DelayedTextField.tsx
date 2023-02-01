@@ -62,6 +62,8 @@ export type DelayedTextFieldProps = {
     | 'url'
     | 'week';
   margin?: 'none' | 'dense';
+  size?: 'small' | 'medium';
+  variant?: 'filled' | 'outlined' | 'standard';
   fullWidth?: boolean;
   autoFocus?: boolean;
   disabled?: boolean;
@@ -97,6 +99,8 @@ export const WrappedDelayedTextField = ({
 
   type = 'text',
   margin = 'dense',
+  size = 'small',
+  variant = 'outlined',
   fullWidth = true,
   autoFocus = true,
   disabled = false,
@@ -148,7 +152,7 @@ export const WrappedDelayedTextField = ({
   }, [_value]);
 
   return (
-    <FormControl className={clsx(c.formControl, classes.formControl)} variant="outlined" size="small">
+    <FormControl className={clsx(c.formControl, classes.formControl)} variant={variant} size={size}>
       <OutlinedInput
         id={id}
         label={label}

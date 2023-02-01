@@ -122,6 +122,7 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
         <div style={{ marginBottom: theme.spacing(2) }}>
           <Autocomplete
             fullWidth
+            size="small"
             multiple={false}
             options={POSSIBLE_STATUS}
             value={selectedStatus}
@@ -132,6 +133,7 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
         <div style={{ marginBottom: theme.spacing(2) }}>
           <Autocomplete
             fullWidth
+            size="small"
             multiple={false}
             options={POSSIBLE_PRIORITY}
             value={selectedPriority}
@@ -144,6 +146,7 @@ const AlertsWorkflowActions: React.FC<AlertsWorkflowActionsProps> = ({
             fullWidth
             multiple
             freeSolo
+            size="small"
             options={possibleLabels}
             value={selectedLabels}
             renderInput={params => <TextField {...params} label={t('labels')} variant="outlined" />}

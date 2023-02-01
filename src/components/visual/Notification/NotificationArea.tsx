@@ -31,6 +31,7 @@ import {
   useTheme
 } from '@mui/material';
 import { blue } from '@mui/material/colors';
+import FormControl from '@mui/material/FormControl';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import useALContext from 'components/hooks/useALContext';
@@ -393,20 +394,21 @@ const WrappedNotificationArea = () => {
         </DialogContent>
         <DialogContent>
           <Typography variant="subtitle2">{t('edit.severity')}</Typography>
-          <Select
-            fullWidth
-            id="na-severity"
-            value={newSystemMessage.severity}
-            onChange={handleSeverityChange}
-            variant="outlined"
-            margin="dense"
-            style={{ marginBottom: theme.spacing(2) }}
-          >
-            <MenuItem value="info">{t('severity.info')}</MenuItem>
-            <MenuItem value="warning">{t('severity.warning')}</MenuItem>
-            <MenuItem value="success">{t('severity.success')}</MenuItem>
-            <MenuItem value="error">{t('severity.error')}</MenuItem>
-          </Select>
+          <FormControl size="small" fullWidth>
+            <Select
+              fullWidth
+              id="na-severity"
+              value={newSystemMessage.severity}
+              onChange={handleSeverityChange}
+              variant="outlined"
+              style={{ marginBottom: theme.spacing(2) }}
+            >
+              <MenuItem value="info">{t('severity.info')}</MenuItem>
+              <MenuItem value="warning">{t('severity.warning')}</MenuItem>
+              <MenuItem value="success">{t('severity.success')}</MenuItem>
+              <MenuItem value="error">{t('severity.error')}</MenuItem>
+            </Select>
+          </FormControl>
           <Typography variant="subtitle2">{t('edit.message.title')}</Typography>
           <TextField
             autoFocus

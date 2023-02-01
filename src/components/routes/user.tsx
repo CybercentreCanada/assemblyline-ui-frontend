@@ -318,7 +318,8 @@ function User({ username }: UserProps) {
                       <TextField
                         autoFocus
                         type="number"
-                        margin="normal"
+                        margin="dense"
+                        size="small"
                         variant="outlined"
                         onChange={event => setAPIQuota(event.target.value)}
                         value={user.api_quota}
@@ -357,6 +358,7 @@ function User({ username }: UserProps) {
                         sx={{ margin: theme.spacing(2, 0) }}
                         multiple
                         freeSolo
+                        size="small"
                         options={[]}
                         value={user.groups}
                         renderInput={params => <TextField {...params} />}

@@ -106,6 +106,7 @@ export const WrappedTextBar = ({ store }: StoreProps) => {
         autoFocus
         delay={250}
         value={inputValue}
+        size="small"
         margin="dense"
         preventSubmit={true}
         onFocus={() => onSearchBarFocus()}
@@ -133,8 +134,9 @@ export const WrappedTextBar = ({ store }: StoreProps) => {
             // label={t('offset.label')}
             labelWidth={0}
             placeholder={''}
-            margin="dense"
+            size="small"
             range="loop"
+            margin="dense"
             value={selectedResult as number}
             min={0}
             max={results.length - 1}

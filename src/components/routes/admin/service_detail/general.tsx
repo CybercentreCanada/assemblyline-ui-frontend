@@ -5,11 +5,12 @@ import {
   Radio,
   RadioGroup,
   Select,
+  Skeleton,
   TextField,
   Typography,
   useTheme
 } from '@mui/material';
-import { Skeleton } from '@mui/material';
+import FormControl from '@mui/material/FormControl';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
 import 'moment/locale/fr';
@@ -117,25 +118,26 @@ const ServiceGeneral = ({ service, defaults, constants, versions, setService, se
           </Typography>
 
           {service ? (
-            <Select
-              id="version"
-              fullWidth
-              value={service.version}
-              onChange={handleVersionChange}
-              variant="outlined"
-              margin="dense"
-              style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(0.5) }}
-            >
-              {versions ? (
-                versions.map((v, i) => (
-                  <MenuItem key={i} value={v}>
-                    {v}
-                  </MenuItem>
-                ))
-              ) : (
-                <MenuItem value={service.version}>{service.version}</MenuItem>
-              )}
-            </Select>
+            <FormControl size="small" fullWidth>
+              <Select
+                id="version"
+                fullWidth
+                value={service.version}
+                onChange={handleVersionChange}
+                variant="outlined"
+                style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(0.5) }}
+              >
+                {versions ? (
+                  versions.map((v, i) => (
+                    <MenuItem key={i} value={v}>
+                      {v}
+                    </MenuItem>
+                  ))
+                ) : (
+                  <MenuItem value={service.version}>{service.version}</MenuItem>
+                )}
+              </Select>
+            </FormControl>
           ) : (
             <Skeleton style={{ height: '2.5rem' }} />
           )}
@@ -200,25 +202,26 @@ const ServiceGeneral = ({ service, defaults, constants, versions, setService, se
             />
           </Typography>
           {service ? (
-            <Select
-              id="stage"
-              fullWidth
-              value={service.stage}
-              onChange={handleStageChange}
-              variant="outlined"
-              margin="dense"
-              style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(0.5) }}
-            >
-              {constants ? (
-                constants.stages.map((s, i) => (
-                  <MenuItem key={i} value={s}>
-                    {s}
-                  </MenuItem>
-                ))
-              ) : (
-                <MenuItem value={service.stage}>{service.stage}</MenuItem>
-              )}
-            </Select>
+            <FormControl size="small" fullWidth>
+              <Select
+                id="stage"
+                fullWidth
+                value={service.stage}
+                onChange={handleStageChange}
+                variant="outlined"
+                style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(0.5) }}
+              >
+                {constants ? (
+                  constants.stages.map((s, i) => (
+                    <MenuItem key={i} value={s}>
+                      {s}
+                    </MenuItem>
+                  ))
+                ) : (
+                  <MenuItem value={service.stage}>{service.stage}</MenuItem>
+                )}
+              </Select>
+            </FormControl>
           ) : (
             <Skeleton style={{ height: '2.5rem' }} />
           )}
@@ -237,25 +240,26 @@ const ServiceGeneral = ({ service, defaults, constants, versions, setService, se
             />
           </Typography>
           {service ? (
-            <Select
-              id="category"
-              fullWidth
-              value={service.category}
-              onChange={handleCategoryChange}
-              variant="outlined"
-              margin="dense"
-              style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(0.5) }}
-            >
-              {constants ? (
-                constants.categories.map((c, i) => (
-                  <MenuItem key={i} value={c}>
-                    {c}
-                  </MenuItem>
-                ))
-              ) : (
-                <MenuItem value={service.category}>{service.category}</MenuItem>
-              )}
-            </Select>
+            <FormControl size="small" fullWidth>
+              <Select
+                id="category"
+                fullWidth
+                value={service.category}
+                onChange={handleCategoryChange}
+                variant="outlined"
+                style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(0.5) }}
+              >
+                {constants ? (
+                  constants.categories.map((c, i) => (
+                    <MenuItem key={i} value={c}>
+                      {c}
+                    </MenuItem>
+                  ))
+                ) : (
+                  <MenuItem value={service.category}>{service.category}</MenuItem>
+                )}
+              </Select>
+            </FormControl>
           ) : (
             <Skeleton style={{ height: '2.5rem' }} />
           )}
@@ -329,8 +333,8 @@ const ServiceGeneral = ({ service, defaults, constants, versions, setService, se
             <TextField
               fullWidth
               type="number"
-              size="small"
               margin="dense"
+              size="small"
               variant="outlined"
               InputProps={{ inputProps: { min: 5 } }}
               onChange={handleTimeoutChange}
@@ -357,8 +361,8 @@ const ServiceGeneral = ({ service, defaults, constants, versions, setService, se
             <TextField
               fullWidth
               type="number"
-              size="small"
               margin="dense"
+              size="small"
               variant="outlined"
               InputProps={{ inputProps: { min: 0 } }}
               onChange={handleLicenceChange}
@@ -385,8 +389,8 @@ const ServiceGeneral = ({ service, defaults, constants, versions, setService, se
             <TextField
               fullWidth
               type="number"
-              size="small"
               margin="dense"
+              size="small"
               variant="outlined"
               InputProps={{ inputProps: { min: 0 } }}
               onChange={handleMaxQueueSizeChange}

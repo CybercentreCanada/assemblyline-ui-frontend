@@ -19,6 +19,7 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
+import FormControl from '@mui/material/FormControl';
 import { makeStyles } from '@mui/styles';
 import useAppBanner from 'commons/components/app/hooks/useAppBanner';
 import PageCenter from 'commons/components/pages/PageCenter';
@@ -578,18 +579,19 @@ const Submit: React.FC<any> = () => {
                       {t('options.submission.priority')}
                     </Typography>
                     {settings ? (
-                      <Select
-                        id="priority"
-                        margin="dense"
-                        value={settings.priority}
-                        variant="outlined"
-                        onChange={event => setSettingValue('priority', event.target.value)}
-                        fullWidth
-                      >
-                        <MenuItem value="500">{t('options.submission.priority.low')}</MenuItem>
-                        <MenuItem value="1000">{t('options.submission.priority.medium')}</MenuItem>
-                        <MenuItem value="1500">{t('options.submission.priority.high')}</MenuItem>
-                      </Select>
+                      <FormControl size="small" fullWidth>
+                        <Select
+                          id="priority"
+                          value={settings.priority}
+                          variant="outlined"
+                          onChange={event => setSettingValue('priority', event.target.value)}
+                          fullWidth
+                        >
+                          <MenuItem value="500">{t('options.submission.priority.low')}</MenuItem>
+                          <MenuItem value="1000">{t('options.submission.priority.medium')}</MenuItem>
+                          <MenuItem value="1500">{t('options.submission.priority.high')}</MenuItem>
+                        </Select>
+                      </FormControl>
                     ) : (
                       <Skeleton style={{ height: '3rem' }} />
                     )}
@@ -693,8 +695,9 @@ const Submit: React.FC<any> = () => {
                     {settings ? (
                       <TextField
                         id="ttl"
-                        size="small"
                         type="number"
+                        margin="dense"
+                        size="small"
                         inputProps={{
                           min: configuration.submission.max_dtl !== 0 ? 1 : 0,
                           max: configuration.submission.max_dtl !== 0 ? configuration.submission.max_dtl : 365

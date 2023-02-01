@@ -85,6 +85,7 @@ export const WrappedNumberFieldPopper = (
                 label={label}
                 placeholder={placeholder}
                 fullWidth
+                size="small"
                 margin="dense"
                 value={value as number}
                 labelWidth={labelWidth}

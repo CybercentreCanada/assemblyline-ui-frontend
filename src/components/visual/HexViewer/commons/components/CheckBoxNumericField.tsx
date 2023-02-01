@@ -50,11 +50,12 @@ export const WrappedCheckBoxNumericField = ({
         />
       </Grid>
       <Grid item sm={6} xs={8}>
-        <FormControl style={{ width: '100%' }}>
+        <FormControl style={{ width: '100%' }} size="small">
           <NumericField
             id={label}
             placeholder={description}
             fullWidth
+            size="small"
             margin="dense"
             value={value as number}
             min={min}

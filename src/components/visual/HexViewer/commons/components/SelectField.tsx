@@ -32,6 +32,7 @@ const useStyles = makeStyles((theme: Theme) =>
 export type SelectFieldProps = {
   label?: string;
   description?: string;
+  size?: 'small' | 'medium';
   items?: Array<{ value: number; label: string }>;
   value?: number;
   onChange?: (event: SelectChangeEvent<number>, child: React.ReactNode) => void;
@@ -40,6 +41,7 @@ export type SelectFieldProps = {
 export const WrappedSelectField = ({
   label = '',
   description = '',
+  size = 'small',
   items = [],
   value = null,
   onChange = () => null
@@ -59,7 +61,7 @@ export const WrappedSelectField = ({
         </Tooltip>
       </Grid>
       <Grid item sm={8} xs={12} style={{ textAlign: 'right' }}>
-        <FormControl style={{ width: '100%' }}>
+        <FormControl style={{ width: '100%' }} size={size}>
           <Select
             className={classes.select}
             open={open}

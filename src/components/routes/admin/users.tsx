@@ -305,6 +305,7 @@ export default function Users() {
                 fullWidth
                 type="number"
                 margin="dense"
+                size="small"
                 variant="outlined"
                 onChange={event => updateNewUser('api_quota', event.target.value)}
                 value={newUser.api_quota}
@@ -316,6 +317,7 @@ export default function Users() {
                 fullWidth
                 type="number"
                 margin="dense"
+                size="small"
                 variant="outlined"
                 onChange={event => updateNewUser('submission_quota', event.target.value)}
                 value={newUser.submission_quota}

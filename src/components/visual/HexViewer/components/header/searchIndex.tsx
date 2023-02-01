@@ -51,6 +51,7 @@ export const WrappedHexSearchIndex = ({ store }: StoreProps) => {
           id="search-index"
           classes={{ formControl: classes.formControl }}
           placeholder={t('search.placeholder')}
+          size="small"
           margin="dense"
           range="loop"
           direction="inverse"
@@ -84,6 +85,7 @@ export const WrappedHexSearchIndex = ({ store }: StoreProps) => {
               id="search-index"
               label={t('search.label')}
               placeholder={t('search.placeholder')}
+              size="small"
               margin="dense"
               range="loop"
               direction="inverse"

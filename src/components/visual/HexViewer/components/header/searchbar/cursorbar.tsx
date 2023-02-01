@@ -53,6 +53,7 @@ export const WrappedHexCursorBar = ({ store }: StoreProps) => {
         labelWidth={0}
         placeholder={t('header.searchfield.cursor')}
         fullWidth
+        size="small"
         margin="dense"
         range="loop"
         value={cursorIndex as number}
