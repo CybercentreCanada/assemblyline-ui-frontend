@@ -1,6 +1,7 @@
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import { Grid, IconButton, MenuItem, Select, TextField, Tooltip, useTheme } from '@mui/material';
+import FormControl from '@mui/material/FormControl';
 import 'moment/locale/fr';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -140,17 +141,18 @@ const WrappedMultiTypeConfig = ({ config, onAdd, onUpdate, onDelete }: MultiType
       </Grid>
       <Grid item xs={10} sm={8}>
         {parsedConfig.type === 'bool' ? (
-          <Select
-            id="user_spec_params"
-            fullWidth
-            value={parsedConfig.value}
-            onChange={handleConfigUpdate}
-            variant="outlined"
-            margin="dense"
-          >
-            <MenuItem value="false">{t('params.false')}</MenuItem>
-            <MenuItem value="true">{t('params.true')}</MenuItem>
-          </Select>
+          <FormControl size="small" fullWidth>
+            <Select
+              id="user_spec_params"
+              fullWidth
+              value={parsedConfig.value}
+              onChange={handleConfigUpdate}
+              variant="outlined"
+            >
+              <MenuItem value="false">{t('params.false')}</MenuItem>
+              <MenuItem value="true">{t('params.true')}</MenuItem>
+            </Select>
+          </FormControl>
         ) : parsedConfig.type === 'json' ? (
           <ReactJson
             name={false}
@@ -212,34 +214,36 @@ const WrappedMultiTypeConfig = ({ config, onAdd, onUpdate, onDelete }: MultiType
         />
       </Grid>
       <Grid item xs={10} sm={2}>
-        <Select
-          id="user_spec_params"
-          fullWidth
-          value={tempConfig.type}
-          onChange={handleConfigTypeChange}
-          variant="outlined"
-          margin="dense"
-        >
-          <MenuItem value="bool">bool</MenuItem>
-          <MenuItem value="int">int</MenuItem>
-          <MenuItem value="json">json</MenuItem>
-          <MenuItem value="list">list ({t('params.comma')})</MenuItem>
-          <MenuItem value="str">str</MenuItem>
-        </Select>
-      </Grid>
-      <Grid item xs={10} sm={6}>
-        {tempConfig.type === 'bool' ? (
+        <FormControl size="small" fullWidth>
           <Select
             id="user_spec_params"
             fullWidth
-            value={tempConfig.value}
-            onChange={handleConfigChange}
+            value={tempConfig.type}
+            onChange={handleConfigTypeChange}
             variant="outlined"
-            margin="dense"
           >
-            <MenuItem value="false">{t('params.false')}</MenuItem>
-            <MenuItem value="true">{t('params.true')}</MenuItem>
+            <MenuItem value="bool">bool</MenuItem>
+            <MenuItem value="int">int</MenuItem>
+            <MenuItem value="json">json</MenuItem>
+            <MenuItem value="list">list ({t('params.comma')})</MenuItem>
+            <MenuItem value="str">str</MenuItem>
           </Select>
+        </FormControl>
+      </Grid>
+      <Grid item xs={10} sm={6}>
+        {tempConfig.type === 'bool' ? (
+          <FormControl size="small" fullWidth>
+            <Select
+              id="user_spec_params"
+              fullWidth
+              value={tempConfig.value}
+              onChange={handleConfigChange}
+              variant="outlined"
+            >
+              <MenuItem value="false">{t('params.false')}</MenuItem>
+              <MenuItem value="true">{t('params.true')}</MenuItem>
+            </Select>
+          </FormControl>
         ) : tempConfig.type === 'json' ? (
           <ReactJson
             name={false}

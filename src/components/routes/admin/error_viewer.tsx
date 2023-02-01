@@ -2,6 +2,7 @@ import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import { Grid, MenuItem, Select, Typography, useMediaQuery, useTheme } from '@mui/material';
+import FormControl from '@mui/material/FormControl';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
@@ -225,23 +226,24 @@ export default function ErrorViewer() {
           <Typography variant="h4">{t('title')}</Typography>
         </Grid>
         <Grid item xs={12} sm={5} md={3} xl={2}>
-          <Select
-            margin="dense"
-            disabled={searching}
-            value={query ? query.get('tc') || DEFAULT_TC : DEFAULT_TC}
-            variant="outlined"
-            onChange={event => {
-              query.set('tc', event.target.value);
-              navigate(`${location.pathname}?${query.getDeltaString()}`);
-            }}
-            fullWidth
-          >
-            <MenuItem value="24h">{t('tc.24h')}</MenuItem>
-            <MenuItem value="4d">{t('tc.4d')}</MenuItem>
-            <MenuItem value="7d">{t('tc.7d')}</MenuItem>
-            <MenuItem value="1m">{t('tc.1m')}</MenuItem>
-            <MenuItem value="1y">{t('tc.1y')}</MenuItem>
-          </Select>
+          <FormControl size="small" fullWidth>
+            <Select
+              disabled={searching}
+              value={query ? query.get('tc') || DEFAULT_TC : DEFAULT_TC}
+              variant="outlined"
+              onChange={event => {
+                query.set('tc', event.target.value);
+                navigate(`${location.pathname}?${query.getDeltaString()}`);
+              }}
+              fullWidth
+            >
+              <MenuItem value="24h">{t('tc.24h')}</MenuItem>
+              <MenuItem value="4d">{t('tc.4d')}</MenuItem>
+              <MenuItem value="7d">{t('tc.7d')}</MenuItem>
+              <MenuItem value="1m">{t('tc.1m')}</MenuItem>
+              <MenuItem value="1y">{t('tc.1y')}</MenuItem>
+            </Select>
+          </FormControl>
         </Grid>
       </Grid>
 

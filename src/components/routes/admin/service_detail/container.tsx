@@ -1,5 +1,7 @@
+import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import {
   Button,
+  FormControl,
   FormControlLabel,
   Grid,
   IconButton,
@@ -7,12 +9,11 @@ import {
   Radio,
   RadioGroup,
   Select,
+  Skeleton,
   Tooltip,
   Typography,
   useTheme
 } from '@mui/material';
-import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
-import { Skeleton } from '@mui/material';
 import 'moment/locale/fr';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -81,20 +82,21 @@ const ServiceContainer = ({ service, defaults, setService, setModified }: Servic
           />
         </Typography>
         {service ? (
-          <Select
-            id="channel"
-            fullWidth
-            value={service.update_channel}
-            onChange={handleChannelChange}
-            variant="outlined"
-            margin="dense"
-            style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(0.5) }}
-          >
-            <MenuItem value="stable">{t('container.channel.stable')}</MenuItem>
-            {/* <MenuItem value="rc">{t('container.channel.rc')}</MenuItem> */}
-            {/* <MenuItem value="beta">{t('container.channel.beta')}</MenuItem> */}
-            <MenuItem value="dev">{t('container.channel.dev')}</MenuItem>
-          </Select>
+          <FormControl size="small" fullWidth>
+            <Select
+              id="channel"
+              fullWidth
+              value={service.update_channel}
+              onChange={handleChannelChange}
+              variant="outlined"
+              style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(0.5) }}
+            >
+              <MenuItem value="stable">{t('container.channel.stable')}</MenuItem>
+              {/* <MenuItem value="rc">{t('container.channel.rc')}</MenuItem> */}
+              {/* <MenuItem value="beta">{t('container.channel.beta')}</MenuItem> */}
+              <MenuItem value="dev">{t('container.channel.dev')}</MenuItem>
+            </Select>
+          </FormControl>
         ) : (
           <Skeleton style={{ height: '2.5rem' }} />
         )}
@@ -155,7 +157,8 @@ const ServiceContainer = ({ service, defaults, setService, setModified }: Servic
                         color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
                       }}
                       onClick={() => onDependencyDelete(name)}
-                      size="large">
+                      size="large"
+                    >
                       <RemoveCircleOutlineOutlinedIcon />
                     </IconButton>
                   </Tooltip>

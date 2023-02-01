@@ -2,6 +2,7 @@ import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Box, Card, Collapse, Grid, MenuItem, Select, Typography, useMediaQuery, useTheme } from '@mui/material';
+import FormControl from '@mui/material/FormControl';
 import Skeleton from '@mui/material/Skeleton';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
@@ -163,19 +164,20 @@ export default function ApiDoc() {
             </Grid>
             <Grid item xs={12} sm style={{ textAlign: 'end' }}>
               {apiList && apiSelected ? (
-                <Select
-                  id="api"
-                  value={apiSelected}
-                  onChange={event => setApiSelected(event.target.value)}
-                  variant="outlined"
-                  margin="dense"
-                >
-                  {apiList.map((version, index) => (
-                    <MenuItem key={index} value={version}>
-                      {version.replace('v', t('version')) + t('version_end')}
-                    </MenuItem>
-                  ))}
-                </Select>
+                <FormControl size="small" fullWidth>
+                  <Select
+                    id="api"
+                    value={apiSelected}
+                    onChange={event => setApiSelected(event.target.value)}
+                    variant="outlined"
+                  >
+                    {apiList.map((version, index) => (
+                      <MenuItem key={index} value={version}>
+                        {version.replace('v', t('version')) + t('version_end')}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               ) : (
                 <Skeleton variant="rectangular" style={{ display: 'inline-block', height: '2rem', width: '14rem' }} />
               )}

@@ -1,3 +1,7 @@
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import {
   Checkbox,
   FormControlLabel,
@@ -10,10 +14,7 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import FormControl from '@mui/material/FormControl';
 import 'moment/locale/fr';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -141,7 +142,9 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
       </Grid>
       <Grid item xs={2} sm={1}>
         <Tooltip title={t(param.hide ? 'params.user.show' : 'params.user.hide')}>
-          <IconButton onClick={handleParamHide} size="large">{param.hide ? <VisibilityOffIcon /> : <VisibilityIcon />}</IconButton>
+          <IconButton onClick={handleParamHide} size="large">
+            {param.hide ? <VisibilityOffIcon /> : <VisibilityIcon />}
+          </IconButton>
         </Tooltip>
       </Grid>
       {param.type === 'list' && (
@@ -159,36 +162,38 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
       )}
       <Grid item xs={10} sm={param.type === 'list' ? 2 : 7}>
         {param.type === 'bool' ? (
-          <Select
-            id="user_spec_params"
-            fullWidth
-            value={param.default}
-            onChange={handleSubmissionParamUpdate}
-            variant="outlined"
-            margin="dense"
-          >
-            <MenuItem value="false">{t('params.false')}</MenuItem>
-            <MenuItem value="true">{t('params.true')}</MenuItem>
-          </Select>
+          <FormControl size="small" fullWidth>
+            <Select
+              id="user_spec_params"
+              fullWidth
+              value={param.default}
+              onChange={handleSubmissionParamUpdate}
+              variant="outlined"
+            >
+              <MenuItem value="false">{t('params.false')}</MenuItem>
+              <MenuItem value="true">{t('params.true')}</MenuItem>
+            </Select>
+          </FormControl>
         ) : param.type === 'list' ? (
-          <Select
-            id="user_spec_params"
-            fullWidth
-            value={param.default}
-            onChange={handleSubmissionParamUpdate}
-            variant="outlined"
-            margin="dense"
-          >
-            {param.list ? (
-              param.list.map((value, x) => (
-                <MenuItem key={x} value={value}>
-                  {value}
-                </MenuItem>
-              ))
-            ) : (
-              <MenuItem value="" />
-            )}
-          </Select>
+          <FormControl size="small" fullWidth>
+            <Select
+              id="user_spec_params"
+              fullWidth
+              value={param.default}
+              onChange={handleSubmissionParamUpdate}
+              variant="outlined"
+            >
+              {param.list ? (
+                param.list.map((value, x) => (
+                  <MenuItem key={x} value={value}>
+                    {value}
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem value="" />
+              )}
+            </Select>
+          </FormControl>
         ) : (
           <TextField
             fullWidth
@@ -209,7 +214,8 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
               color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
             }}
             onClick={() => onDelete(id)}
-            size="large">
+            size="large"
+          >
             <RemoveCircleOutlineOutlinedIcon />
           </IconButton>
         </Tooltip>
@@ -229,19 +235,20 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
         />
       </Grid>
       <Grid item xs={10} sm={2}>
-        <Select
-          id="user_spec_params"
-          fullWidth
-          value={tempUserParams.type}
-          onChange={handleSPTypeChange}
-          variant="outlined"
-          margin="dense"
-        >
-          <MenuItem value="bool">bool</MenuItem>
-          <MenuItem value="int">int</MenuItem>
-          <MenuItem value="list">list ({t('params.comma')})</MenuItem>
-          <MenuItem value="str">str</MenuItem>
-        </Select>
+        <FormControl size="small" fullWidth>
+          <Select
+            id="user_spec_params"
+            fullWidth
+            value={tempUserParams.type}
+            onChange={handleSPTypeChange}
+            variant="outlined"
+          >
+            <MenuItem value="bool">bool</MenuItem>
+            <MenuItem value="int">int</MenuItem>
+            <MenuItem value="list">list ({t('params.comma')})</MenuItem>
+            <MenuItem value="str">str</MenuItem>
+          </Select>
+        </FormControl>
       </Grid>
       {tempUserParams.type === 'list' && (
         <Grid item xs={10} sm={4}>
@@ -258,32 +265,34 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
       )}
       <Grid item xs={10} sm={tempUserParams.type === 'list' ? 2 : 6}>
         {tempUserParams.type === 'bool' ? (
-          <Select
-            id="user_spec_params"
-            fullWidth
-            value={tempUserParams.default}
-            onChange={handleSPDefaultChange}
-            variant="outlined"
-            margin="dense"
-          >
-            <MenuItem value="false">{t('params.false')}</MenuItem>
-            <MenuItem value="true">{t('params.true')}</MenuItem>
-          </Select>
+          <FormControl size="small" fullWidth>
+            <Select
+              id="user_spec_params"
+              fullWidth
+              value={tempUserParams.default}
+              onChange={handleSPDefaultChange}
+              variant="outlined"
+            >
+              <MenuItem value="false">{t('params.false')}</MenuItem>
+              <MenuItem value="true">{t('params.true')}</MenuItem>
+            </Select>
+          </FormControl>
         ) : tempUserParams.type === 'list' ? (
-          <Select
-            id="user_spec_params"
-            fullWidth
-            value={tempUserParams.default}
-            onChange={handleSPDefaultChange}
-            variant="outlined"
-            margin="dense"
-          >
-            {tempUserParams.list.map((value, x) => (
-              <MenuItem key={x} value={value}>
-                {value}
-              </MenuItem>
-            ))}
-          </Select>
+          <FormControl size="small" fullWidth>
+            <Select
+              id="user_spec_params"
+              fullWidth
+              value={tempUserParams.default}
+              onChange={handleSPDefaultChange}
+              variant="outlined"
+            >
+              {tempUserParams.list.map((value, x) => (
+                <MenuItem key={x} value={value}>
+                  {value}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         ) : (
           <TextField
             fullWidth
@@ -305,7 +314,8 @@ const WrappedMultiTypeParam = ({ param, id, onAdd, onUpdate, onDelete }: MultiTy
                 color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
               }}
               onClick={addUserSubmissionParam}
-              size="large">
+              size="large"
+            >
               <AddCircleOutlineIcon />
             </IconButton>
           </Tooltip>

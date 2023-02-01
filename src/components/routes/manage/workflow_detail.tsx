@@ -14,6 +14,7 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
+import FormControl from '@mui/material/FormControl';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 import withStyles from '@mui/styles/withStyles';
@@ -306,21 +307,22 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
           <Grid item xs={12} sm={6}>
             <Typography variant="subtitle2">{t('priority')}</Typography>
             {workflow ? (
-              <Select
-                id="priority"
-                fullWidth
-                value={workflow.priority}
-                onChange={handlePriorityChange}
-                variant="outlined"
-                margin="dense"
-                disabled={!currentUser.roles.includes('workflow_manage')}
-              >
-                <MyMenuItem value="">{t('priority.null')}</MyMenuItem>
-                <MyMenuItem value="LOW">{t('priority.LOW')}</MyMenuItem>
-                <MyMenuItem value="MEDIUM">{t('priority.MEDIUM')}</MyMenuItem>
-                <MyMenuItem value="HIGH">{t('priority.HIGH')}</MyMenuItem>
-                <MyMenuItem value="CRITICAL">{t('priority.CRITICAL')}</MyMenuItem>
-              </Select>
+              <FormControl size="small" fullWidth>
+                <Select
+                  id="priority"
+                  fullWidth
+                  value={workflow.priority}
+                  onChange={handlePriorityChange}
+                  variant="outlined"
+                  disabled={!currentUser.roles.includes('workflow_manage')}
+                >
+                  <MyMenuItem value="">{t('priority.null')}</MyMenuItem>
+                  <MyMenuItem value="LOW">{t('priority.LOW')}</MyMenuItem>
+                  <MyMenuItem value="MEDIUM">{t('priority.MEDIUM')}</MyMenuItem>
+                  <MyMenuItem value="HIGH">{t('priority.HIGH')}</MyMenuItem>
+                  <MyMenuItem value="CRITICAL">{t('priority.CRITICAL')}</MyMenuItem>
+                </Select>
+              </FormControl>
             ) : (
               <Skeleton style={{ height: '2.5rem' }} />
             )}
@@ -328,20 +330,21 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
           <Grid item xs={12} sm={6}>
             <Typography variant="subtitle2">{t('status')}</Typography>
             {workflow ? (
-              <Select
-                id="priority"
-                fullWidth
-                value={workflow.status}
-                onChange={handleStatusChange}
-                variant="outlined"
-                margin="dense"
-                disabled={!currentUser.roles.includes('workflow_manage')}
-              >
-                <MyMenuItem value="">{t('status.null')}</MyMenuItem>
-                <MyMenuItem value="MALICIOUS">{t('status.MALICIOUS')}</MyMenuItem>
-                <MyMenuItem value="NON-MALICIOUS">{t('status.NON-MALICIOUS')}</MyMenuItem>
-                <MyMenuItem value="ASSESS">{t('status.ASSESS')}</MyMenuItem>
-              </Select>
+              <FormControl size="small" fullWidth>
+                <Select
+                  id="priority"
+                  fullWidth
+                  value={workflow.status}
+                  onChange={handleStatusChange}
+                  variant="outlined"
+                  disabled={!currentUser.roles.includes('workflow_manage')}
+                >
+                  <MyMenuItem value="">{t('status.null')}</MyMenuItem>
+                  <MyMenuItem value="MALICIOUS">{t('status.MALICIOUS')}</MyMenuItem>
+                  <MyMenuItem value="NON-MALICIOUS">{t('status.NON-MALICIOUS')}</MyMenuItem>
+                  <MyMenuItem value="ASSESS">{t('status.ASSESS')}</MyMenuItem>
+                </Select>
+              </FormControl>
             ) : (
               <Skeleton style={{ height: '2.5rem' }} />
             )}

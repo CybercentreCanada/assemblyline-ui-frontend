@@ -21,6 +21,7 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
+import FormControl from '@mui/material/FormControl';
 import Skeleton from '@mui/material/Skeleton';
 import makeStyles from '@mui/styles/makeStyles';
 import PageCenter from 'commons/components/pages/PageCenter';
@@ -271,7 +272,8 @@ function Settings() {
                     <TextField
                       autoFocus
                       type="number"
-                      margin="normal"
+                      margin="dense"
+                      size="small"
                       variant="outlined"
                       onChange={event => setTTL(event.target.value)}
                       value={settings.ttl}
@@ -289,17 +291,18 @@ function Settings() {
                       {t('interface.view_desc')}
                     </Typography>
                     <div style={{ paddingTop: sp2, width: '100%' }}>
-                      <Select
-                        id="view"
-                        margin="dense"
-                        value={settings.submission_view}
-                        onChange={handleViewChange}
-                        variant="outlined"
-                        style={{ width: '100%' }}
-                      >
-                        <MenuItem value="report">{t('interface.view_report')}</MenuItem>
-                        <MenuItem value="details">{t('interface.view_details')}</MenuItem>
-                      </Select>
+                      <FormControl size="small" fullWidth>
+                        <Select
+                          id="view"
+                          value={settings.submission_view}
+                          onChange={handleViewChange}
+                          variant="outlined"
+                          style={{ width: '100%' }}
+                        >
+                          <MenuItem value="report">{t('interface.view_report')}</MenuItem>
+                          <MenuItem value="details">{t('interface.view_details')}</MenuItem>
+                        </Select>
+                      </FormControl>
                     </div>
                   </>
                 ),
@@ -310,22 +313,23 @@ function Settings() {
                       {t('interface.encoding_desc')}
                     </Typography>
                     <div style={{ paddingTop: sp2, width: '100%' }}>
-                      <Select
-                        id="view"
-                        margin="dense"
-                        value={settings.download_encoding}
-                        onChange={handleEncodingChange}
-                        variant="outlined"
-                        style={{ width: '100%' }}
-                      >
-                        {!configuration.ui.allow_raw_downloads ? null : (
-                          <MenuItem value="raw">{t('interface.encoding_raw')}</MenuItem>
-                        )}
-                        <MenuItem value="cart">{t('interface.encoding_cart')}</MenuItem>
-                        {!configuration.ui.allow_zip_downloads ? null : (
-                          <MenuItem value="zip">{t('interface.encoding_zip')}</MenuItem>
-                        )}
-                      </Select>
+                      <FormControl size="small" fullWidth>
+                        <Select
+                          id="view"
+                          value={settings.download_encoding}
+                          onChange={handleEncodingChange}
+                          variant="outlined"
+                          style={{ width: '100%' }}
+                        >
+                          {!configuration.ui.allow_raw_downloads ? null : (
+                            <MenuItem value="raw">{t('interface.encoding_raw')}</MenuItem>
+                          )}
+                          <MenuItem value="cart">{t('interface.encoding_cart')}</MenuItem>
+                          {!configuration.ui.allow_zip_downloads ? null : (
+                            <MenuItem value="zip">{t('interface.encoding_zip')}</MenuItem>
+                          )}
+                        </Select>
+                      </FormControl>
                     </div>
                     {settings.download_encoding !== 'zip' ? null : (
                       <>
@@ -334,7 +338,7 @@ function Settings() {
                             {t('interface.encoding_password')}
                           </Typography>
                           <TextField
-                            fullWidth={true}
+                            fullWidth
                             required={true}
                             onChange={handleEncodingPasswordChange}
                             variant="outlined"
@@ -352,21 +356,22 @@ function Settings() {
                       {t('interface.score_desc')}
                     </Typography>
                     <div style={{ paddingTop: sp2, width: '100%' }}>
-                      <Select
-                        id="view"
-                        margin="dense"
-                        value={settings.expand_min_score}
-                        onChange={handleScoreChange}
-                        variant="outlined"
-                        style={{ width: '100%' }}
-                      >
-                        <MenuItem value="-1000000">{t('interface.score_-1000000')}</MenuItem>
-                        <MenuItem value="0">{t('interface.score_0')}</MenuItem>
-                        <MenuItem value="100">{t('interface.score_100')}</MenuItem>
-                        <MenuItem value="500">{t('interface.score_500')}</MenuItem>
-                        <MenuItem value="2000">{t('interface.score_2000')}</MenuItem>
-                        <MenuItem value="100000000">{t('interface.score_100000000')}</MenuItem>
-                      </Select>
+                      <FormControl size="small" fullWidth>
+                        <Select
+                          id="view"
+                          value={settings.expand_min_score}
+                          onChange={handleScoreChange}
+                          variant="outlined"
+                          style={{ width: '100%' }}
+                        >
+                          <MenuItem value="-1000000">{t('interface.score_-1000000')}</MenuItem>
+                          <MenuItem value="0">{t('interface.score_0')}</MenuItem>
+                          <MenuItem value="100">{t('interface.score_100')}</MenuItem>
+                          <MenuItem value="500">{t('interface.score_500')}</MenuItem>
+                          <MenuItem value="2000">{t('interface.score_2000')}</MenuItem>
+                          <MenuItem value="100000000">{t('interface.score_100000000')}</MenuItem>
+                        </Select>
+                      </FormControl>
                     </div>
                   </>
                 )

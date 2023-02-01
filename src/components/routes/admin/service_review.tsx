@@ -2,6 +2,7 @@ import ArrowDownwardOutlinedIcon from '@mui/icons-material/ArrowDownwardOutlined
 import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import { Grid, IconButton, MenuItem, Select, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import FormControl from '@mui/material/FormControl';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
@@ -128,26 +129,27 @@ function VersionSelector({ possibleVersions, selectedService, version, setVersio
   const theme = useTheme();
   const { t } = useTranslation(['adminServiceReview']);
   return selectedService && possibleVersions ? (
-    <Select
-      fullWidth
-      value={version}
-      onChange={event => setVersion(event.target.value)}
-      displayEmpty
-      variant="outlined"
-      margin="dense"
-      style={{ minWidth: theme.spacing(30), color: version === '' ? theme.palette.text.disabled : null }}
-    >
-      <MenuItem value="" disabled>
-        {t('service.version')}
-      </MenuItem>
-      {possibleVersions
-        .filter(item => item !== except)
-        .map((v, id) => (
-          <MenuItem key={id} value={v}>
-            {`${selectedService}: ${v}`}
-          </MenuItem>
-        ))}
-    </Select>
+    <FormControl size="small" fullWidth>
+      <Select
+        fullWidth
+        value={version}
+        onChange={event => setVersion(event.target.value)}
+        displayEmpty
+        variant="outlined"
+        style={{ minWidth: theme.spacing(30), color: version === '' ? theme.palette.text.disabled : null }}
+      >
+        <MenuItem value="" disabled>
+          {t('service.version')}
+        </MenuItem>
+        {possibleVersions
+          .filter(item => item !== except)
+          .map((v, id) => (
+            <MenuItem key={id} value={v}>
+              {`${selectedService}: ${v}`}
+            </MenuItem>
+          ))}
+      </Select>
+    </FormControl>
   ) : (
     <Skeleton variant="rectangular" height={theme.spacing(5)} width="100%" />
   );
@@ -246,28 +248,29 @@ export default function ServiceReview() {
           {services ? (
             <>
               <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
-                <Select
-                  id="channel"
-                  fullWidth
-                  value={selectedService}
-                  onChange={handleServiceChange}
-                  displayEmpty
-                  variant="outlined"
-                  margin="dense"
-                  style={{
-                    minWidth: theme.spacing(30),
-                    color: selectedService === '' ? theme.palette.text.disabled : null
-                  }}
-                >
-                  <MenuItem value="" disabled>
-                    {t('service.selection')}
-                  </MenuItem>
-                  {services.map((srv, id) => (
-                    <MenuItem key={id} value={srv}>
-                      {srv}
+                <FormControl size="small" fullWidth>
+                  <Select
+                    id="channel"
+                    fullWidth
+                    value={selectedService}
+                    onChange={handleServiceChange}
+                    displayEmpty
+                    variant="outlined"
+                    style={{
+                      minWidth: theme.spacing(30),
+                      color: selectedService === '' ? theme.palette.text.disabled : null
+                    }}
+                  >
+                    <MenuItem value="" disabled>
+                      {t('service.selection')}
                     </MenuItem>
-                  ))}
-                </Select>
+                    {services.map((srv, id) => (
+                      <MenuItem key={id} value={srv}>
+                        {srv}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               </div>
             </>
           ) : (

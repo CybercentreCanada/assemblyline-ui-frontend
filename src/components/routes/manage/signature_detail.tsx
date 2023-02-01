@@ -17,6 +17,7 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
+import FormControl from '@mui/material/FormControl';
 import makeStyles from '@mui/styles/makeStyles';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
@@ -287,11 +288,13 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
           </ul>
           <div>{t('change.warning.action')}</div>
           {signature ? (
-            <Select fullWidth onChange={handleSelectChange} variant="outlined" margin="dense" value={signature.status}>
-              <MenuItem value="DEPLOYED">{t('status.DEPLOYED')}</MenuItem>
-              <MenuItem value="NOISY">{t('status.NOISY')}</MenuItem>
-              <MenuItem value="DISABLED">{t('status.DISABLED')}</MenuItem>
-            </Select>
+            <FormControl size="small" fullWidth>
+              <Select fullWidth onChange={handleSelectChange} variant="outlined" value={signature.status}>
+                <MenuItem value="DEPLOYED">{t('status.DEPLOYED')}</MenuItem>
+                <MenuItem value="NOISY">{t('status.NOISY')}</MenuItem>
+                <MenuItem value="DISABLED">{t('status.DISABLED')}</MenuItem>
+              </Select>
+            </FormControl>
           ) : (
             <Skeleton height={2} />
           )}
