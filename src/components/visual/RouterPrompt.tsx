@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { useBlocker } from 'components/hooks/useBlocker';
 import useDrawer from 'components/hooks/useDrawer';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -20,19 +21,15 @@ export function RouterPrompt(props) {
     acceptText = null,
     cancelText = null
   } = props;
-
-  // const blocker = useBlocker(when);
   const { t } = useTranslation();
   const { setDrawerClosePrompt } = useDrawer();
-  // const blocker = useBlocker(when);
-
   const [open, setOpen] = useState(false);
+  const [currentTX, setCurrentTX] = useState(null);
 
+  // Blockers for the reload even and the drawer getting close or re-used
   const unblock = useCallback(() => {
     setDrawerClosePrompt(false);
-    // blocker.reset();
     window.onbeforeunload = undefined;
-    // }, [blocker, setDrawerClosePrompt]);
   }, [setDrawerClosePrompt]);
 
   useEffect(() => {
@@ -47,31 +44,41 @@ export function RouterPrompt(props) {
     return () => {
       unblock();
     };
-    // }, [setDrawerClosePrompt, unblock, blocker, when]);
   }, [setDrawerClosePrompt, unblock, when]);
 
+  // Blocker for the history
+  const blocker = useCallback(tx => {
+    setCurrentTX(tx);
+    setOpen(true);
+  }, []);
+
+  useBlocker(blocker, when);
+
+  // Dialog actions
   const handleAccept = useCallback(async () => {
     if (onAccept) {
       const canRoute = await Promise.resolve(onAccept());
       if (canRoute) {
+        if (currentTX) currentTX.retry();
         unblock();
       }
     }
-  }, [onAccept, unblock]);
+  }, [currentTX, onAccept, unblock]);
 
   const handleCancel = useCallback(async () => {
     if (onCancel) {
       const canRoute = await Promise.resolve(onCancel());
       if (canRoute) {
+        if (currentTX) currentTX.retry();
         unblock();
       }
     }
     setOpen(false);
-  }, [onCancel, unblock]);
+  }, [currentTX, onCancel, unblock]);
 
   return open ? (
     <ConfirmationDialog
-      title={title || t('router_prompt_titleg')}
+      title={title || t('router_prompt_title')}
       open={open}
       handleAccept={handleAccept}
       acceptText={acceptText || t('router_prompt_accept')}
