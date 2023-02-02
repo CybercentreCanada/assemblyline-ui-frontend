@@ -1,4 +1,4 @@
-import Redirect from 'commons/components/utils/Redirect';
+import RedirectSubmission from 'commons/components/utils/RedirectSubmission';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import ForbiddenPage from 'components/routes/403';
@@ -85,7 +85,7 @@ function RouteActions() {
 }
 
 const WrappedRoutes = () => {
-  const { configuration, settings } = useALContext();
+  const { configuration } = useALContext();
 
   return (
     <>
@@ -138,11 +138,7 @@ const WrappedRoutes = () => {
         <Route path="/submission/detail/:id/:fid" element={<SubmissionDetail />} />
         <Route path="/submission/detail/:id" element={<SubmissionDetail />} />
         <Route path="/submission/report/:id" element={<SubmissionReport />} />
-        {settings.submission_view === 'details' ? (
-          <Route path="/submission/:id" element={<Redirect to="/submission/detail/:id" />} />
-        ) : (
-          <Route path="/submission/:id" element={<Redirect to="/submission/report/:id" />} />
-        )}
+        <Route path="/submission/:id" element={<RedirectSubmission />} />
         <Route path="/submissions" element={<Submissions />} />
         <Route path="/tos" element={<Tos />} />
         <Route path="/forbidden" element={<ForbiddenPage />} />

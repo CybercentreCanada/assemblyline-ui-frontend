@@ -217,8 +217,7 @@ export default function Services() {
     (service_name: string) => {
       setGlobalDrawer(<Service name={service_name} onDeleted={onDeleted} onUpdated={onUpdated} />);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [onDeleted, onUpdated, setGlobalDrawer]
   );
 
   useEffect(() => {

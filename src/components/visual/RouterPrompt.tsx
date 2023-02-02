@@ -2,7 +2,13 @@
 import useDrawer from 'components/hooks/useDrawer';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+// import { unstable_useBlocker as useBlocker } from 'react-router';
 import ConfirmationDialog from './ConfirmationDialog';
+
+// IMPORTANT, the URL blocker does not work with the current BrowserRouter
+// This is only partially working, the drawer will be prevented from closing and
+// the page will be prevented from being refreshed but you can still use the
+// Router to navigate away
 
 export function RouterPrompt(props) {
   const {
@@ -15,63 +21,57 @@ export function RouterPrompt(props) {
     cancelText = null
   } = props;
 
+  // const blocker = useBlocker(when);
   const { t } = useTranslation();
-  // const history = useHistory();
   const { setDrawerClosePrompt } = useDrawer();
+  // const blocker = useBlocker(when);
 
   const [open, setOpen] = useState(false);
-  const [currentPath, setCurrentPath] = useState('');
 
   const unblock = useCallback(() => {
     setDrawerClosePrompt(false);
-    // history.block(() => {});
+    // blocker.reset();
     window.onbeforeunload = undefined;
+    // }, [blocker, setDrawerClosePrompt]);
   }, [setDrawerClosePrompt]);
 
   useEffect(() => {
-    // if (when) {
-    //   // Prevent drawer from being closed
-    //   setDrawerClosePrompt(true);
-    //   // Prevent page to be reload
-    //   window.onbeforeunload = () => true;
-    //   // Prevent URL to change
-    //   history.block(prompt => {
-    //     setCurrentPath(prompt.pathname);
-    //     setOpen(true);
-    //     return false;
-    //   });
-    // } else {
-    //   unblock();
-    // }
-    // return () => {
-    //   unblock();
-    // };
+    if (when) {
+      // Prevent drawer from being closed
+      setDrawerClosePrompt(true);
+      // Prevent page to be reload
+      window.onbeforeunload = () => true;
+    } else {
+      unblock();
+    }
+    return () => {
+      unblock();
+    };
+    // }, [setDrawerClosePrompt, unblock, blocker, when]);
   }, [setDrawerClosePrompt, unblock, when]);
 
   const handleAccept = useCallback(async () => {
-    // if (onAccept) {
-    //   const canRoute = await Promise.resolve(onAccept());
-    //   if (canRoute) {
-    //     unblock();
-    //     history.push(currentPath);
-    //   }
-    // }
-  }, []);
+    if (onAccept) {
+      const canRoute = await Promise.resolve(onAccept());
+      if (canRoute) {
+        unblock();
+      }
+    }
+  }, [onAccept, unblock]);
 
   const handleCancel = useCallback(async () => {
-    // if (onCancel) {
-    //   const canRoute = await Promise.resolve(onCancel());
-    //   if (canRoute) {
-    //     unblock();
-    //     history.push(currentPath);
-    //   }
-    // }
-    // setOpen(false);
-  }, []);
+    if (onCancel) {
+      const canRoute = await Promise.resolve(onCancel());
+      if (canRoute) {
+        unblock();
+      }
+    }
+    setOpen(false);
+  }, [onCancel, unblock]);
 
   return open ? (
     <ConfirmationDialog
-      title={title || t('router_prompt_title')}
+      title={title || t('router_prompt_titleg')}
       open={open}
       handleAccept={handleAccept}
       acceptText={acceptText || t('router_prompt_accept')}
