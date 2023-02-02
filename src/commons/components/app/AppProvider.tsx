@@ -1,4 +1,4 @@
-import { PaletteMode, StyledEngineProvider, ThemeProvider, useMediaQuery } from '@mui/material';
+import { CssBaseline, PaletteMode, StyledEngineProvider, ThemeProvider, useMediaQuery } from '@mui/material';
 import { AppPreferenceConfigs, AppSiteMapConfigs, AppThemeConfigs } from 'commons/components/app/AppConfigs';
 import useLocalStorageItem from 'commons/components/utils/hooks/useLocalStorageItem';
 import CarouselProvider from 'components/visual/CarouselProvider';
@@ -6,15 +6,14 @@ import DrawerProvider from 'components/visual/DrawerProvider';
 import HighlightProvider from 'components/visual/HighlightProvider';
 import i18n from 'i18n';
 import { createContext, ReactNode, useCallback, useMemo } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
 import useThemeBuilder from '../utils/hooks/useThemeBuilder';
 import { AppStorageKeys } from './AppConstants';
 import { AppContextType } from './AppContexts';
 import { AppDefaultsPreferencesConfigs } from './AppDefaults';
-import { ErrorFallback } from './AppErrorBoundary';
 import { AppSearchService } from './AppSearchService';
 import { AppUser, AppUserService } from './AppUserService';
 import AppBarProvider from './providers/AppBarProvider';
+import { AppErrorProvider } from './providers/AppErrorProvider';
 import AppLayoutProvider from './providers/AppLayoutProvider';
 import AppLeftNavProvider from './providers/AppLeftNavProvider';
 import AppSnackbarProvider from './providers/AppSnackbarProvider';
@@ -75,12 +74,8 @@ export default function AppProvider<U extends AppUser>({
     <AppContext.Provider value={contextValue}>
       <StyledEngineProvider injectFirst>
         <ThemeProvider theme={_darkMode ? darkTheme : lightTheme}>
-          <ErrorBoundary
-            FallbackComponent={ErrorFallback}
-            onReset={() => {
-              window.location.reload();
-            }}
-          >
+          <CssBaseline />
+          <AppErrorProvider>
             <AppSnackbarProvider>
               <AppUserProvider service={user}>
                 <HighlightProvider>
@@ -96,7 +91,7 @@ export default function AppProvider<U extends AppUser>({
                 </HighlightProvider>
               </AppUserProvider>
             </AppSnackbarProvider>
-          </ErrorBoundary>
+          </AppErrorProvider>
         </ThemeProvider>
       </StyledEngineProvider>
     </AppContext.Provider>

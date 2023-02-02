@@ -1,16 +1,54 @@
-import { Button, CssBaseline, Paper, Typography, useMediaQuery, useTheme } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Button, Collapse, Paper, SvgIcon, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';
 import PageCenter from 'commons/components/pages/PageCenter';
+import * as React from 'react';
+import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { useTranslation } from 'react-i18next';
 import { GiSpottedBug } from 'react-icons/gi';
 
+// TODO: Add Error Boundary
 const useStyles = makeStyles(theme => ({
   snackroot: {
     [theme.breakpoints.only('xs')]: { wordBreak: 'break-word' }
   },
+  bugContainer: {
+    paddingTop: theme.spacing(10),
+    fontSize: 200,
+    color: theme.palette.secondary.main,
+    [theme.breakpoints.down('md')]: {
+      paddingTop: theme.spacing(2),
+      transform: 'translateY(50px)'
+    }
+  },
   bug: {
     animation: `$bugPath 4000ms ${theme.transitions.easing.easeInOut}`,
     animationIterationCount: 'infinite'
+  },
+  errorContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignContent: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: theme.spacing(2),
+    width: '100%'
+  },
+  errorMessage: {
+    paddingTop: theme.spacing(1),
+    whiteSpace: 'pre-wrap',
+    wordBreak: 'break-word'
+  },
+  errorButton: {
+    margin: theme.spacing(1),
+    color: theme.palette.primary.main
+  },
+  errorStack: {
+    textAlign: 'left',
+    whiteSpace: 'pre-wrap',
+    wordBreak: 'break-word',
+    paddingBottom: theme.spacing(1)
   },
   '@keyframes bugPath': {
     '0%': {
@@ -118,42 +156,48 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-// TODO: Add Error Boundary
-export const ErrorFallback = ({ error, resetErrorBoundary }) => {
+const ExpandMore = styled((props: any & { expand: boolean }) => {
+  const { expand, ...other } = props;
+  return <SvgIcon {...other} />;
+})(({ theme, expand }) => ({
+  transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
+  marginLeft: 'auto',
+  transition: theme.transitions.create('transform', {
+    duration: theme.transitions.duration.shortest
+  })
+}));
+
+export const ErrorFallback: React.FC<FallbackProps> = ({ error, resetErrorBoundary }) => {
   const { t } = useTranslation();
   const theme = useTheme();
   const classes = useStyles();
   const downSM = useMediaQuery(theme.breakpoints.down('sm'));
-  const isXS = useMediaQuery(theme.breakpoints.only('xs'));
+  const [expanded, setExpanded] = React.useState(false);
 
   return (
     <div role="alert">
-      <CssBaseline />
-      <PageCenter width={isXS ? '100%' : '70%'} margin={4}>
-        <div style={{ paddingTop: theme.spacing(10), fontSize: 200, color: theme.palette.secondary.main }}>
-          <GiSpottedBug fontSize="inherit" className={classes.bug} />
+      <PageCenter margin={4}>
+        <div className={classes.bugContainer}>
+          <GiSpottedBug className={classes.bug} fontSize="inherit" />
         </div>
-        <Typography variant={downSM ? 'h4' : 'h3'} gutterBottom>
-          {t('error.title')}
-        </Typography>
-        <Typography variant={downSM ? 'body1' : 'h6'} gutterBottom>
-          {t('error.description')}
-        </Typography>
-        <Paper
-          component="pre"
-          variant="outlined"
-          style={{
-            padding: theme.spacing(2),
-            whiteSpace: 'pre-wrap',
-            wordBreak: 'break-word',
-            minHeight: downSM ? theme.spacing(8) : theme.spacing(16),
-            display: 'flex',
-            alignContent: 'center',
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}
-        >
-          {error.message}
+        <Typography children={t('error.title')} variant={downSM ? 'h4' : 'h3'} gutterBottom />
+        <Typography children={t('error.description')} variant={downSM ? 'body1' : 'h6'} gutterBottom />
+        <Paper className={classes.errorContainer} variant="outlined">
+          <Typography className={classes.errorMessage} children={error.message} variant="inherit" component="pre" />
+          <Button className={classes.errorButton} onClick={() => setExpanded(e => !e)}>
+            {expanded ? t('error.hideStack') : t('error.showStack')}
+            <ExpandMore
+              expand={expanded}
+              onClick={() => setExpanded(e => !e)}
+              aria-expanded={expanded}
+              aria-label="show more"
+            >
+              <ExpandMoreIcon />
+            </ExpandMore>
+          </Button>
+          <Collapse in={expanded} timeout="auto" unmountOnExit>
+            <Typography className={classes.errorStack} children={error.stack} variant="inherit" component="pre" />
+          </Collapse>
         </Paper>
         <Button onClick={resetErrorBoundary} style={{ margin: theme.spacing(4) }} color="primary">
           {t('error.button')}
@@ -162,3 +206,22 @@ export const ErrorFallback = ({ error, resetErrorBoundary }) => {
     </div>
   );
 };
+
+type ProviderProps = {
+  children?: React.ReactNode;
+};
+
+const WrappedAppErrorProvider = ({ children = null }: ProviderProps) => {
+  return (
+    <ErrorBoundary
+      FallbackComponent={props => ErrorFallback(props)}
+      onReset={() => {
+        window.location.reload();
+      }}
+    >
+      {children}
+    </ErrorBoundary>
+  );
+};
+
+export const AppErrorProvider = React.memo(WrappedAppErrorProvider);
