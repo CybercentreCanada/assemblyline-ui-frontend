@@ -72,8 +72,9 @@ export const DrawerContext = React.createContext<DrawerContextProps>(null);
 function DrawerProvider(props: DrawerProviderProps) {
   const { children } = props;
   const { t } = useTranslation();
-  const [globalDrawer, setGlobalDrawer] = useState(null);
+  const [globalDrawer, setGlobalDrawerState] = useState(null);
   const [drawerClosePrompt, setDrawerClosePrompt] = useState(false);
+  const [nextDrawer, setNextDrawer] = useState(null);
   const theme = useTheme();
   const [open, setOpen] = useState(false);
   const classes = useStyles();
@@ -82,20 +83,27 @@ function DrawerProvider(props: DrawerProviderProps) {
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
 
   const drawerWidth = isXL ? XLWidth : isLG ? LGWidth : isMD ? MDWidth : SMWidth;
+
+  const setGlobalDrawer = useCallback(
+    newDrawer => {
+      if (drawerClosePrompt) {
+        setNextDrawer(newDrawer);
+        setOpen(true);
+      } else {
+        setNextDrawer(null);
+        setGlobalDrawerState(newDrawer);
+      }
+    },
+    [drawerClosePrompt]
+  );
+
   const closeGlobalDrawer = useCallback(() => {
-    if (drawerClosePrompt) {
-      setOpen(true);
-    } else {
-      setGlobalDrawer(null);
-    }
-  }, [drawerClosePrompt]);
-  const closeTemporaryDrawer = () => {
-    if (drawerClosePrompt) {
-      setOpen(true);
-    } else {
-      if (!isXL) setGlobalDrawer(null);
-    }
-  };
+    setGlobalDrawer(null);
+  }, [setGlobalDrawer]);
+
+  const closeTemporaryDrawer = useCallback(() => {
+    if (!isXL) setGlobalDrawer(null);
+  }, [isXL, setGlobalDrawer]);
 
   return (
     <DrawerContext.Provider
@@ -109,11 +117,10 @@ function DrawerProvider(props: DrawerProviderProps) {
     >
       <ConfirmationDialog
         title={t('router_prompt_title')}
-        open={open}
+        open={open && globalDrawer !== null}
         handleAccept={() => {
-          // setDrawerClosePrompt(false);
           setOpen(false);
-          setGlobalDrawer(null);
+          setGlobalDrawerState(nextDrawer);
         }}
         acceptText={t('router_prompt_accept')}
         handleClose={() => setOpen(false)}

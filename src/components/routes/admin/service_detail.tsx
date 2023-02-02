@@ -235,6 +235,7 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
     setTab('general');
     setVersions(null);
     setServiceDefault(null);
+    setModified(false);
 
     // Load user on start
     if (currentUser.is_admin) {
