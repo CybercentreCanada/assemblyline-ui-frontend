@@ -65,7 +65,7 @@ export default function Signatures() {
   const theme = useTheme();
   const { apiCall } = useMyAPI();
   const classes = useStyles();
-  const { closeGlobalDrawer, setGlobalDrawer, globalDrawer } = useDrawer();
+  const { closeGlobalDrawer, setGlobalDrawer, globalDrawerOpened } = useDrawer();
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
   const [suggestions] = useState([
@@ -79,11 +79,11 @@ export default function Signatures() {
   }, [location.pathname, location.search, pageSize]);
 
   useEffect(() => {
-    if (signatureResults !== null && globalDrawer === null && location.hash) {
+    if (signatureResults !== null && !globalDrawerOpened && location.hash) {
       navigate(`${location.pathname}${location.search ? location.search : ''}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalDrawer]);
+  }, [globalDrawerOpened]);
 
   useEffect(() => {
     if (location.hash) {

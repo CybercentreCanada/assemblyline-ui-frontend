@@ -95,7 +95,7 @@ export default function ErrorViewer() {
   const location = useLocation();
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
   const filterValue = useRef<string>('');
-  const { closeGlobalDrawer, setGlobalDrawer, globalDrawer } = useDrawer();
+  const { closeGlobalDrawer, setGlobalDrawer, globalDrawerOpened } = useDrawer();
   const [histogram, setHistogram] = useState(null);
   const [types, setTypes] = useState(null);
   const [names, setNames] = useState(null);
@@ -105,11 +105,11 @@ export default function ErrorViewer() {
   }, [location.pathname, location.search, pageSize]);
 
   useEffect(() => {
-    if (errorResults !== null && globalDrawer === null && location.hash) {
+    if (errorResults !== null && !globalDrawerOpened && location.hash) {
       navigate(`${location.pathname}${location.search ? location.search : ''}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalDrawer]);
+  }, [globalDrawerOpened]);
 
   useEffect(() => {
     if (location.hash) {

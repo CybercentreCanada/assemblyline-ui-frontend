@@ -38,13 +38,14 @@ export function RouterPrompt(props) {
       setDrawerClosePrompt(true);
       // Prevent page to be reload
       window.onbeforeunload = () => true;
-    } else {
-      unblock();
     }
+  }, [setDrawerClosePrompt, unblock, when]);
+
+  useEffect(() => {
     return () => {
       unblock();
     };
-  }, [setDrawerClosePrompt, unblock, when]);
+  }, [unblock]);
 
   // Blocker for the history
   const blocker = useCallback(tx => {
@@ -63,6 +64,7 @@ export function RouterPrompt(props) {
         unblock();
       }
     }
+    setOpen(false);
   }, [currentTX, onAccept, unblock]);
 
   const handleCancel = useCallback(async () => {

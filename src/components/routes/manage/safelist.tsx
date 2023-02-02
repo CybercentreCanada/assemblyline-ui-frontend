@@ -65,7 +65,7 @@ export default function Safelist() {
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
   const { apiCall } = useMyAPI();
   const classes = useStyles();
-  const { closeGlobalDrawer, setGlobalDrawer, globalDrawer } = useDrawer();
+  const { closeGlobalDrawer, setGlobalDrawer, globalDrawerOpened } = useDrawer();
   const [suggestions] = useState(
     indexes.safelist
       ? [...Object.keys(indexes.safelist).filter(name => indexes.safelist[name].indexed), ...DEFAULT_SUGGESTION]
@@ -78,11 +78,11 @@ export default function Safelist() {
   }, [location.pathname, location.search, pageSize]);
 
   useEffect(() => {
-    if (safelistResults !== null && globalDrawer === null && location.hash) {
+    if (safelistResults !== null && !globalDrawerOpened && location.hash) {
       navigate(`${location.pathname}${location.search ? location.search : ''}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalDrawer]);
+  }, [globalDrawerOpened]);
 
   useEffect(() => {
     if (location.hash) {

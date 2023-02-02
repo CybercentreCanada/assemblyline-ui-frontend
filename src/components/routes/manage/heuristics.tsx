@@ -61,7 +61,7 @@ export default function Heuristics() {
   const theme = useTheme();
   const { apiCall } = useMyAPI();
   const classes = useStyles();
-  const { closeGlobalDrawer, setGlobalDrawer, globalDrawer } = useDrawer();
+  const { closeGlobalDrawer, setGlobalDrawer, globalDrawerOpened } = useDrawer();
   const [suggestions] = useState([
     ...Object.keys(indexes.heuristic).filter(name => indexes.heuristic[name].indexed),
     ...DEFAULT_SUGGESTION
@@ -73,11 +73,11 @@ export default function Heuristics() {
   }, [location.pathname, location.search, pageSize]);
 
   useEffect(() => {
-    if (heuristicResults !== null && globalDrawer === null && location.hash) {
+    if (heuristicResults !== null && !globalDrawerOpened && location.hash) {
       navigate(`${location.pathname}${location.search ? location.search : ''}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalDrawer]);
+  }, [globalDrawerOpened]);
 
   useEffect(() => {
     if (location.hash) {

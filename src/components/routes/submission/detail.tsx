@@ -110,7 +110,7 @@ function WrappedSubmissionDetail() {
   const navigate = useNavigate();
   const { user: currentUser, c12nDef, configuration: systemConfig } = useALContext();
   const { setHighlightMap } = useHighlighter();
-  const { setGlobalDrawer, globalDrawer } = useDrawer();
+  const { setGlobalDrawer, globalDrawerOpened } = useDrawer();
   const [baseFiles, setBaseFiles] = useState([]);
 
   const updateLiveSumary = (results: object) => {
@@ -719,11 +719,11 @@ function WrappedSubmissionDetail() {
   }, [watchQueue, socket, handleErrorMessage]);
 
   useEffect(() => {
-    if (submission !== null && globalDrawer === null && fid !== undefined) {
+    if (submission !== null && !globalDrawerOpened && fid !== undefined) {
       navigate(`/submission/detail/${id}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalDrawer]);
+  }, [globalDrawerOpened]);
 
   useEffect(() => {
     if (fid) {
