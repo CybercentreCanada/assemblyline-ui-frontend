@@ -1,9 +1,9 @@
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import { Drawer, IconButton, useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ConfirmationDialog from './ConfirmationDialog';
 
 const XLWidth = '45vw';
 const LGWidth = '85%';

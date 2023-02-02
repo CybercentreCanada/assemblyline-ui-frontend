@@ -1,4 +1,4 @@
-import { SafeResultsContext, SafeResultsContextProps } from 'components/visual/SafeResultsProvider';
+import { SafeResultsContext, SafeResultsContextProps } from 'components/providers/SafeResultsProvider';
 import { useContext } from 'react';
 
 export default function useSafeResults(): SafeResultsContextProps {
