@@ -1,4 +1,4 @@
-import { Divider, Link as MuiLink, Typography } from '@mui/material';
+import { Divider, Link, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import * as DOMPurify from 'dompurify';
@@ -6,7 +6,6 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Markdown from 'react-markdown';
 import Moment from 'react-moment';
-import { Link } from 'react-router-dom';
 import { JSONFeedAuthor, JSONFeedItem } from '.';
 import CustomChip from '../CustomChip';
 
@@ -132,7 +131,7 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
         <Link
           className={clsx(classes.userItem)}
           title={author.url}
-          to={{ pathname: author.url }}
+          href={author.url}
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -187,7 +186,7 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
                 <Link
                   className={clsx(classes.link)}
                   title={notification.url}
-                  to={{ pathname: notification.url }}
+                  href={notification.url}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -212,7 +211,7 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
             <div className={classes.content}>
               <Markdown
                 className={classes.description}
-                components={{ a: props => <MuiLink href={props.href}>{props.children}</MuiLink> }}
+                components={{ a: props => <Link href={props.href}>{props.children}</Link> }}
                 children={notification.content_md}
               />
             </div>
