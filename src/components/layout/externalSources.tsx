@@ -35,8 +35,8 @@ function ExternalSources({ settings, onChange, disabled = false, size = 'medium'
       <Typography variant="caption" gutterBottom>
         {t('submissions.default_external_sources_desc')}
       </Typography>
-      {configuration.submission.sha256_sources.map(source => (
-        <div>
+      {configuration.submission.sha256_sources.map((source, i) => (
+        <div key={i}>
           <FormControlLabel
             control={
               settings ? (
