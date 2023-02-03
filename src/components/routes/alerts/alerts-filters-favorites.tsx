@@ -1,6 +1,8 @@
-import { Button, Divider, Switch, TextField, Typography, useTheme } from '@material-ui/core';
+import { Button, Divider, Switch, TextField, Typography, useTheme } from '@mui/material';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useALContext from 'components/hooks/useALContext';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import { CustomUser } from 'components/hooks/useMyUser';
 import { ChipList } from 'components/visual/ChipList';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
@@ -32,7 +34,8 @@ const AlertsFiltersFavorites: React.FC<AlertsFiltersFavoritesProps> = ({
     onDeleteGlobalFavorite
   } = useFavorites();
   const { showErrorMessage, showSuccessMessage } = useMySnackbar();
-  const { c12nDef, user: currentUser } = useALContext();
+  const { c12nDef } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
   const [formValid, setFormValid] = useState<boolean>(false);
   const [classification, setClassification] = useState<string>(c12nDef.UNRESTRICTED);
   const [queryValue, setQueryValue] = useState<{ valid: boolean; value: string }>({ valid: true, value: initValue });

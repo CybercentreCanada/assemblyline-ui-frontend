@@ -1,8 +1,8 @@
-import { Grid, Tooltip, useTheme } from '@material-ui/core';
-import BugReportOutlinedIcon from '@material-ui/icons/BugReportOutlined';
-import GroupOutlinedIcon from '@material-ui/icons/GroupOutlined';
-import PersonOutlineOutlinedIcon from '@material-ui/icons/PersonOutlineOutlined';
-import VerifiedUserOutlinedIcon from '@material-ui/icons/VerifiedUserOutlined';
+import { Grid, Tooltip, useTheme } from '@mui/material';
+import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
+import GroupOutlinedIcon from '@mui/icons-material/GroupOutlined';
+import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
+import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import useALContext from 'components/hooks/useALContext';
 import { AlertItem, detailedItemCompare } from 'components/routes/alerts/hooks/useAlerts';
 import { ChipList } from 'components/visual/ChipList';

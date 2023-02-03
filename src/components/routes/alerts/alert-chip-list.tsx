@@ -1,4 +1,4 @@
-import { useTheme } from '@material-ui/core';
+import { useTheme } from '@mui/material';
 import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
 import React from 'react';
 
@@ -7,7 +7,7 @@ type AlertListChipProps = {
   title: string;
   color?: PossibleColors;
   size?: 'tiny' | 'small' | 'medium';
-  variant?: 'default' | 'outlined';
+  variant?: 'filled' | 'outlined';
 };
 
 const WrappedAlertListChip: React.FC<AlertListChipProps> = ({

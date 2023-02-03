@@ -1,8 +1,9 @@
-import { ClickAwayListener, Fade, makeStyles, Paper, Popper, Tooltip } from '@material-ui/core';
-import IconButton from '@material-ui/core/IconButton';
-import AdbIcon from '@material-ui/icons/Adb';
+import AdbIcon from '@mui/icons-material/Adb';
+import { ClickAwayListener, Fade, Paper, Popper, Tooltip } from '@mui/material';
+import IconButton from '@mui/material/IconButton';
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
-import { isEnter, isEscape } from 'commons/addons/elements/utils/keyboard';
+import { isEnter, isEscape } from 'commons/components/utils/keyboard';
 import { default as React, useCallback, useState } from 'react';
 
 const useHexStyles = makeStyles(theme => ({
@@ -64,7 +65,7 @@ export const WrappedIconButtonPopper = ({
     setOpen(true);
   }, []);
 
-  const handleClickAway = useCallback((event: React.MouseEvent<Document, MouseEvent>) => {
+  const handleClickAway = useCallback((event: MouseEvent | TouchEvent) => {
     setOpen(false);
     setAnchorEl(null);
   }, []);

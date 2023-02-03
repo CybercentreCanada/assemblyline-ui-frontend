@@ -1,9 +1,13 @@
-import { Button, CircularProgress, createStyles, makeStyles, TextField, Typography } from '@material-ui/core';
+import { Button, CircularProgress, TextField, Typography } from '@mui/material';
+import createStyles from '@mui/styles/createStyles';
+import makeStyles from '@mui/styles/makeStyles';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import { useLocation } from 'react-router-dom';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -25,7 +29,7 @@ type ResetPasswordNowProps = {
 
 export function ResetPasswordNow({ buttonLoading, setButtonLoading, reset }: ResetPasswordNowProps) {
   const location = useLocation();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { t } = useTranslation(['login']);
   const classes = useStyles();
   const { apiCall } = useMyAPI();
@@ -61,14 +65,12 @@ export function ResetPasswordNow({ buttonLoading, setButtonLoading, reset }: Res
     event.preventDefault();
   }
 
-  useEffect(() => {
+  useEffectOnce(() => {
     setResetID(params.get('reset_id'));
-
     if (params.get('reset_id')) {
-      history.push('/');
+      navigate('/');
     }
-    // eslint-disable-next-line
-  }, []);
+  });
 
   return (
     <form onSubmit={onSubmit}>

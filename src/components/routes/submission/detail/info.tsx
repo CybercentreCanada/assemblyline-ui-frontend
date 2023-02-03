@@ -1,7 +1,8 @@
-import { Collapse, Divider, Grid, makeStyles, Typography, useTheme } from '@material-ui/core';
-import CheckBoxOutlineBlankOutlinedIcon from '@material-ui/icons/CheckBoxOutlineBlankOutlined';
-import CheckBoxOutlinedIcon from '@material-ui/icons/CheckBoxOutlined';
-import { Skeleton } from '@material-ui/lab';
+import { Collapse, Divider, Grid, Typography, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import CheckBoxOutlineBlankOutlinedIcon from '@mui/icons-material/CheckBoxOutlineBlankOutlined';
+import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
+import { Skeleton } from '@mui/material';
 import Priority from 'components/visual/Priority';
 import Verdict from 'components/visual/Verdict';
 import React, { Fragment, useMemo } from 'react';
@@ -117,7 +118,7 @@ const WrappedInfoSection: React.FC<InfoSectionProps> = ({ submission }) => {
                           <CheckBoxOutlineBlankOutlinedIcon />
                         )
                       ) : (
-                        <Skeleton variant="rect" style={{ width: theme.spacing(3), height: theme.spacing(3) }} />
+                        <Skeleton variant="rectangular" style={{ width: theme.spacing(3), height: theme.spacing(3) }} />
                       )}
                     </Grid>
                   </Fragment>
@@ -137,7 +138,7 @@ const WrappedInfoSection: React.FC<InfoSectionProps> = ({ submission }) => {
                   {submission ? (
                     <Verdict score={submission.max_score} />
                   ) : (
-                    <Skeleton variant="rect" style={{ width: theme.spacing(8), height: theme.spacing(2.5) }} />
+                    <Skeleton variant="rectangular" style={{ width: theme.spacing(8), height: theme.spacing(2.5) }} />
                   )}
                 </Grid>
 
@@ -148,7 +149,7 @@ const WrappedInfoSection: React.FC<InfoSectionProps> = ({ submission }) => {
                   {submission ? (
                     <Priority priority={submission.params.priority} />
                   ) : (
-                    <Skeleton variant="rect" style={{ width: theme.spacing(8), height: theme.spacing(2.5) }} />
+                    <Skeleton variant="rectangular" style={{ width: theme.spacing(8), height: theme.spacing(2.5) }} />
                   )}
                 </Grid>
 

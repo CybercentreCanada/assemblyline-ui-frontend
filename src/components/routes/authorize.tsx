@@ -1,38 +1,54 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import { Backdrop, Button, Typography, useTheme } from '@material-ui/core';
-import useAppLayout from 'commons/components/hooks/useAppLayout';
-import CardCentered from 'commons/components/layout/pages/CardCentered';
+import { Backdrop, Button, Typography, useTheme } from '@mui/material';
+import useAppBanner from 'commons/components/app/hooks/useAppBanner';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
+import PageCardCentered from 'commons/components/pages/PageCardCentered';
 import useALContext from 'components/hooks/useALContext';
+import { CustomUser } from 'components/hooks/useMyUser';
 import getXSRFCookie from 'helpers/xsrf';
 import { useTranslation } from 'react-i18next';
-import { useHistory, useLocation } from 'react-router-dom';
-import ForbiddenPage from './403';
+import { useNavigate } from 'react-router';
+import { useLocation } from 'react-router-dom';
 
 const VALID_SCOPES = ['r', 'w', 'rw'];
 
 export default function AppRegistration() {
   const location = useLocation();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { t } = useTranslation(['authorize']);
   const theme = useTheme();
-  const { getBanner } = useAppLayout();
-  const { user: currentUser } = useALContext();
+  const banner = useAppBanner();
+  const { user: currentUser } = useAppUser<CustomUser>();
+  const { configuration } = useALContext();
 
   const params = new URLSearchParams(location.search);
   const rUrl = params.get('redirect_url');
   const clientID = params.get('client_id');
   const scope = params.get('scope');
+  const rolesP = params.get('roles');
   const server = params.get('server');
 
-  return currentUser.roles.includes('obo_access') ? (
+  let roles = [];
+  if (rolesP) {
+    roles = rolesP.split(',').filter(r => configuration.user.roles.includes(r));
+  }
+
+  return (
     <Backdrop open style={{ backgroundColor: theme.palette.background.default, zIndex: 10000 }} transitionDuration={0}>
-      <CardCentered>
-        {getBanner(theme)}
+      <PageCardCentered>
+        {banner}
         <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'center', justifyContent: 'center' }}>
-          {!rUrl || !clientID || !scope || !server || VALID_SCOPES.indexOf(scope) === -1 ? (
+          {!currentUser.roles.includes('obo_access') ? (
+            <>
+              <Typography style={{ marginBottom: '3rem' }}>{t('forbidden')}</Typography>
+              <Button variant="contained" color="primary" onClick={() => navigate(-1)}>
+                {t('button.back')}
+              </Button>
+            </>
+          ) : !rUrl || !clientID || (!scope && !roles) || !server || (scope && VALID_SCOPES.indexOf(scope) === -1) ? (
             <>
               <div style={{ marginBottom: '3rem' }}>{t('invalid')}</div>
-              <Button variant="contained" color="primary" onClick={() => history.goBack()}>
+              <Button variant="contained" color="primary" onClick={() => navigate(-1)}>
                 {t('button.back')}
               </Button>
             </>
@@ -49,9 +65,21 @@ export default function AppRegistration() {
               <Typography variant="subtitle2" gutterBottom>
                 {t('scope')}
               </Typography>
-              <Typography variant="caption" color="secondary" gutterBottom style={{ marginTop: '1rem' }}>
-                {t(`scope.${scope}`)}
-              </Typography>
+              {scope && (
+                <Typography variant="caption" color="secondary" gutterBottom style={{ marginTop: '1rem' }}>
+                  {t(`scope.${scope}`)}
+                </Typography>
+              )}
+              {roles.length > 0 && (
+                <>
+                  <Typography variant="caption" color="secondary" gutterBottom style={{ marginTop: '1rem' }}>
+                    {t(`roles`)}
+                  </Typography>
+                  {roles.map(role => (
+                    <Typography variant="caption">{t(`role.${role}`)}</Typography>
+                  ))}
+                </>
+              )}
               <Typography
                 variant="caption"
                 color="textSecondary"
@@ -77,9 +105,7 @@ export default function AppRegistration() {
             </>
           )}
         </div>
-      </CardCentered>
+      </PageCardCentered>
     </Backdrop>
-  ) : (
-    <ForbiddenPage />
   );
 }

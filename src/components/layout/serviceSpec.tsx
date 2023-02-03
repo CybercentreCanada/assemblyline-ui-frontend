@@ -1,16 +1,17 @@
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import {
   Button,
   Checkbox,
   FormControlLabel,
-  makeStyles,
   MenuItem,
   Select,
   TextField,
   Tooltip,
   Typography,
   useTheme
-} from '@material-ui/core';
-import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
+} from '@mui/material';
+import FormControl from '@mui/material/FormControl';
+import makeStyles from '@mui/styles/makeStyles';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -27,7 +28,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function Service({ service, idx, setParam, setParamAsync }) {
+function Service({ disabled, service, idx, setParam, setParamAsync }) {
   const theme = useTheme();
   const [showMore, setShowMore] = useState(false);
   const { t } = useTranslation();
@@ -39,7 +40,15 @@ function Service({ service, idx, setParam, setParamAsync }) {
       {service.params.map(
         (param, pidx) =>
           !param.hide && (
-            <Param key={pidx} param={param} pidx={pidx} idx={idx} setParam={setParam} setParamAsync={setParamAsync} />
+            <Param
+              key={pidx}
+              disabled={disabled}
+              param={param}
+              pidx={pidx}
+              idx={idx}
+              setParam={setParam}
+              setParamAsync={setParamAsync}
+            />
           )
       )}
       {showMore
@@ -48,6 +57,7 @@ function Service({ service, idx, setParam, setParamAsync }) {
               param.hide && (
                 <Param
                   key={pidx}
+                  disabled={disabled}
                   param={param}
                   pidx={pidx}
                   idx={idx}
@@ -67,7 +77,7 @@ function Service({ service, idx, setParam, setParamAsync }) {
   );
 }
 
-function Param({ param, pidx, idx, setParam, setParamAsync }) {
+function Param({ disabled, param, pidx, idx, setParam, setParamAsync }) {
   const classes = useStyles();
   const theme = useTheme();
   return (
@@ -78,6 +88,7 @@ function Param({ param, pidx, idx, setParam, setParamAsync }) {
             control={
               <Checkbox
                 size="small"
+                disabled={disabled}
                 checked={param.value === 'true' || param.value === true}
                 name="label"
                 onChange={() => setParam(idx, pidx, !param.value)}
@@ -88,7 +99,7 @@ function Param({ param, pidx, idx, setParam, setParamAsync }) {
                 {param.name.replace(/_/g, ' ')}
               </Typography>
             }
-            className={classes.item}
+            className={!disabled ? classes.item : null}
           />
         </div>
       ) : (
@@ -99,26 +110,29 @@ function Param({ param, pidx, idx, setParam, setParamAsync }) {
             </Typography>
           </div>
           {param.type === 'list' ? (
-            <Select
-              margin="dense"
-              value={param.value}
-              variant="outlined"
-              onChange={event => setParam(idx, pidx, event.target.value)}
-              fullWidth
-            >
-              {param.list ? (
-                param.list.map((item, i) => (
-                  <MenuItem key={i} value={item}>
-                    {item}
-                  </MenuItem>
-                ))
-              ) : (
-                <MenuItem value="" />
-              )}
-            </Select>
+            <FormControl size="small" fullWidth>
+              <Select
+                disabled={disabled}
+                value={param.value}
+                variant="outlined"
+                onChange={event => setParam(idx, pidx, event.target.value)}
+                fullWidth
+              >
+                {param.list ? (
+                  param.list.map((item, i) => (
+                    <MenuItem key={i} value={item}>
+                      {item}
+                    </MenuItem>
+                  ))
+                ) : (
+                  <MenuItem value="" />
+                )}
+              </Select>
+            </FormControl>
           ) : (
             <TextField
               variant="outlined"
+              disabled={disabled}
               type={param.type === 'int' ? 'number' : 'text'}
               size="small"
               fullWidth
@@ -137,10 +151,11 @@ type ServiceSpecProps = {
   setParam: (service_id: number, param_id: number, param_value: any) => void;
   setParamAsync: (service_id: number, param_id: number, param_value: any) => void;
   isSelected?: (name: string) => boolean;
+  disabled?: boolean;
   compressed?: boolean;
 };
 
-function ServiceSpec({ service_spec, setParam, setParamAsync, isSelected, compressed }: ServiceSpecProps) {
+function ServiceSpec({ service_spec, setParam, setParamAsync, isSelected, disabled, compressed }: ServiceSpecProps) {
   const theme = useTheme();
   return (
     <div
@@ -161,7 +176,14 @@ function ServiceSpec({ service_spec, setParam, setParamAsync, isSelected, compre
       {service_spec.map(
         (service, idx) =>
           isSelected(service.name) && (
-            <Service key={idx} service={service} idx={idx} setParam={setParam} setParamAsync={setParamAsync} />
+            <Service
+              key={idx}
+              disabled={disabled}
+              service={service}
+              idx={idx}
+              setParam={setParam}
+              setParamAsync={setParamAsync}
+            />
           )
       )}
     </div>
@@ -170,6 +192,7 @@ function ServiceSpec({ service_spec, setParam, setParamAsync, isSelected, compre
 
 ServiceSpec.defaultProps = {
   isSelected: (name: string) => true,
+  disabled: false,
   compressed: false
 };
 

@@ -1,10 +1,11 @@
-import { makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
-import Typography from '@material-ui/core/Typography';
-import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn';
-import BugReportIcon from '@material-ui/icons/BugReport';
-import PersonIcon from '@material-ui/icons/Person';
-import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
-import PageHeader from 'commons/components/layout/pages/PageHeader';
+import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
+import BugReportIcon from '@mui/icons-material/BugReport';
+import PersonIcon from '@mui/icons-material/Person';
+import { useMediaQuery, useTheme } from '@mui/material';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
+import PageFullWidth from 'commons/components/pages/PageFullWidth';
+import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import SearchBar from 'components/visual/SearchBar/search-bar';
@@ -15,9 +16,10 @@ import SubmissionsTable, { SubmissionResult } from 'components/visual/SearchResu
 import SearchResultCount from 'components/visual/SearchResultCount';
 import { safeFieldValue } from 'helpers/utils';
 import 'moment/locale/fr';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import { useLocation } from 'react-router-dom';
 import ForbiddenPage from './403';
 
 const PAGE_SIZE = 25;
@@ -45,7 +47,7 @@ export default function Submissions() {
   const [submissionResults, setSubmissionResults] = useState<SearchResults>(null);
   const [searching, setSearching] = useState(false);
   const { user: currentUser, indexes } = useALContext();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { apiCall } = useMyAPI();
   const theme = useTheme();
   const location = useLocation();
@@ -59,13 +61,13 @@ export default function Submissions() {
   ]);
 
   const onClear = () => {
-    history.push(location.pathname);
+    navigate(location.pathname);
   };
 
   const onSearch = () => {
     if (filterValue.current !== '') {
       query.set('query', filterValue.current);
-      history.push(`${location.pathname}?${query.toString()}`);
+      navigate(`${location.pathname}?${query.toString()}`);
     } else {
       onClear();
     }
@@ -121,7 +123,7 @@ export default function Submissions() {
                 props: {
                   onClick: () => {
                     query.set('query', `params.submitter:${safeFieldValue(currentUser.username)}`);
-                    history.push(`${location.pathname}?${query.getDeltaString()}`);
+                    navigate(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
               },
@@ -131,7 +133,7 @@ export default function Submissions() {
                 props: {
                   onClick: () => {
                     query.set('query', 'state:completed');
-                    history.push(`${location.pathname}?${query.getDeltaString()}`);
+                    navigate(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
               },
@@ -141,7 +143,7 @@ export default function Submissions() {
                 props: {
                   onClick: () => {
                     query.set('query', 'max_score:>=1000');
-                    history.push(`${location.pathname}?${query.getDeltaString()}`);
+                    navigate(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
               }

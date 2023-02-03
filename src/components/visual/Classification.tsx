@@ -5,14 +5,15 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Grid,
   List,
   ListItem,
   ListItemText,
-  useMediaQuery
-} from '@material-ui/core';
-import Grid from '@material-ui/core/Grid/Grid';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
-import Skeleton from '@material-ui/lab/Skeleton';
+  Skeleton,
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
 import CustomChip, { ColorMap, PossibleColors } from 'components/visual/CustomChip';
 import {
@@ -53,7 +54,7 @@ const useStyles = makeStyles(theme => ({
   // Text Color
   default: {
     fontWeight: 500,
-    color: theme.palette.type === 'dark' ? '#AAA' : '#888'
+    color: theme.palette.mode === 'dark' ? '#AAA' : '#888'
   },
   primary: {
     fontWeight: 500,
@@ -65,19 +66,19 @@ const useStyles = makeStyles(theme => ({
   },
   success: {
     fontWeight: 500,
-    color: theme.palette.type !== 'dark' ? theme.palette.success.dark : theme.palette.success.light
+    color: theme.palette.mode !== 'dark' ? theme.palette.success.dark : theme.palette.success.light
   },
   info: {
     fontWeight: 500,
-    color: theme.palette.type !== 'dark' ? theme.palette.info.dark : theme.palette.info.light
+    color: theme.palette.mode !== 'dark' ? theme.palette.info.dark : theme.palette.info.light
   },
   warning: {
     fontWeight: 500,
-    color: theme.palette.type !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
+    color: theme.palette.mode !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
   },
   error: {
     fontWeight: 500,
-    color: theme.palette.type !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
+    color: theme.palette.mode !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
   }
 }));
 
@@ -223,7 +224,7 @@ function WrappedClassification({
           <div style={{ display: inline ? 'inline-block' : null }}>
             <CustomChip
               type="rounded"
-              variant={type === 'outlined' ? 'outlined' : 'default'}
+              variant={type === 'outlined' ? 'outlined' : 'filled'}
               size={size}
               color={computeColor()}
               className={classes.classification}
@@ -385,7 +386,7 @@ function WrappedClassification({
       </>
     ) : (
       <Skeleton
-        variant={type === 'text' ? 'text' : 'rect'}
+        variant={type === 'text' ? 'text' : 'rectangular'}
         className={inline ? classes.inlineSkel : null}
         height={type !== 'text' ? skelheight[size] : null}
         style={{ borderRadius: theme.spacing(0.5) }}

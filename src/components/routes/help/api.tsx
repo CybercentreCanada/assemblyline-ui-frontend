@@ -1,21 +1,12 @@
-import {
-  Box,
-  Card,
-  Collapse,
-  Grid,
-  makeStyles,
-  MenuItem,
-  Select,
-  Typography,
-  useMediaQuery,
-  useTheme
-} from '@material-ui/core';
-import CheckOutlinedIcon from '@material-ui/icons/CheckOutlined';
-import ClearOutlinedIcon from '@material-ui/icons/ClearOutlined';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import Skeleton from '@material-ui/lab/Skeleton';
+import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
+import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Box, Card, Collapse, Grid, MenuItem, Select, Typography, useMediaQuery, useTheme } from '@mui/material';
+import FormControl from '@mui/material/FormControl';
+import Skeleton from '@mui/material/Skeleton';
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
-import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
+import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import useMyAPI from 'components/hooks/useMyAPI';
 import CustomChip from 'components/visual/CustomChip';
 import { useEffect, useState } from 'react';
@@ -70,17 +61,12 @@ export default function ApiDoc() {
 
   const downSM = useMediaQuery(theme.breakpoints.down('sm'));
   const xs = useMediaQuery(theme.breakpoints.only('xs'));
-  const isDark = theme.palette.type === 'dark';
+  const isDark = theme.palette.mode === 'dark';
   const methodColor = {
     DELETE: 'error',
     GET: 'info',
     POST: 'success',
     PUT: 'warning'
-  };
-  const privColor = {
-    E: 'error',
-    R: 'success',
-    W: 'warning'
   };
   const userColor = {
     signature_import: 'success',
@@ -94,6 +80,7 @@ export default function ApiDoc() {
     archive_download: 'warning',
     archive_trigger: 'warning',
     archive_manage: 'info',
+    self_manage: 'info',
     safelist_view: 'default',
     safelist_manage: 'info',
     workflow_view: 'default',
@@ -173,21 +160,22 @@ export default function ApiDoc() {
             </Grid>
             <Grid item xs={12} sm style={{ textAlign: 'end' }}>
               {apiList && apiSelected ? (
-                <Select
-                  id="api"
-                  value={apiSelected}
-                  onChange={event => setApiSelected(event.target.value)}
-                  variant="outlined"
-                  margin="dense"
-                >
-                  {apiList.map((version, index) => (
-                    <MenuItem key={index} value={version}>
-                      {version.replace('v', t('version')) + t('version_end')}
-                    </MenuItem>
-                  ))}
-                </Select>
+                <FormControl size="small">
+                  <Select
+                    id="api"
+                    value={apiSelected}
+                    onChange={event => setApiSelected(event.target.value)}
+                    variant="outlined"
+                  >
+                    {apiList.map((version, index) => (
+                      <MenuItem key={index} value={version}>
+                        {version.replace('v', t('version')) + t('version_end')}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               ) : (
-                <Skeleton variant="rect" style={{ display: 'inline-block', height: '2rem', width: '14rem' }} />
+                <Skeleton variant="rectangular" style={{ display: 'inline-block', height: '2rem', width: '14rem' }} />
               )}
             </Grid>
           </Grid>
@@ -331,24 +319,6 @@ export default function ApiDoc() {
                                   ))}
                                 </Grid>
                               </>
-                              {api.required_priv ? (
-                                <>
-                                  <Grid item xs={12} sm={4} md={3} lg={2}>
-                                    <div style={{ fontWeight: 500 }}>{t('required_priv')}:</div>
-                                  </Grid>
-                                  <Grid item xs={12} sm={8} md={9} lg={4}>
-                                    {api.required_priv.map((ptype, pidx) => (
-                                      <CustomChip
-                                        key={pidx}
-                                        color={privColor[ptype]}
-                                        type="rounded"
-                                        size="tiny"
-                                        label={t(`priv.${ptype}`)}
-                                      />
-                                    ))}
-                                  </Grid>
-                                </>
-                              ) : null}
                               <>
                                 <Grid item xs={12} sm={4} md={3} lg={2}>
                                   <div style={{ fontWeight: 500 }}>{t('methods')}:</div>

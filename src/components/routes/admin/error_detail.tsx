@@ -1,22 +1,25 @@
-import { Card, Grid, IconButton, makeStyles, Tooltip, Typography, useTheme } from '@material-ui/core';
-import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
-import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
-import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
-import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
-import PageviewOutlinedIcon from '@material-ui/icons/PageviewOutlined';
-import PanToolOutlinedIcon from '@material-ui/icons/PanToolOutlined';
-import ReportProblemOutlinedIcon from '@material-ui/icons/ReportProblemOutlined';
-import useClipboard from 'commons/components/hooks/useClipboard';
-import PageCenter from 'commons/components/layout/pages/PageCenter';
-import useALContext from 'components/hooks/useALContext';
+import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
+import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
+import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
+import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
+import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
+import { Card, Grid, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
+import PageCenter from 'commons/components/pages/PageCenter';
+import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useMyAPI from 'components/hooks/useMyAPI';
+import { CustomUser } from 'components/hooks/useMyUser';
 import FileDownloader from 'components/visual/FileDownloader';
 import 'moment/locale/fr';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
 import Moment from 'react-moment';
-import { Link, Redirect, useParams } from 'react-router-dom';
+import { Navigate } from 'react-router';
+import { Link, useParams } from 'react-router-dom';
 
 export type Error = {
   created: string;
@@ -62,7 +65,7 @@ export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
   const [error, setError] = useState<Error>(null);
   const { apiCall } = useMyAPI();
   const { key, type, source, name } = useParams<ParamProps>();
-  const { user: currentUser } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
 
   const errorMap = {
     'MAX DEPTH REACHED': <PanToolOutlinedIcon style={{ color: theme.palette.action.active }} />,
@@ -166,12 +169,13 @@ export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
                   <IconButton
                     component={Link}
                     to={`/search/submission?query=files.sha256:${error.sha256} OR results:${error.sha256}* OR errors:${error.sha256}*`}
+                    size="large"
                   >
-                    <AmpStoriesOutlinedIcon />
+                    <ViewCarouselOutlinedIcon />
                   </IconButton>
                 </Tooltip>
                 <Tooltip title={t('detail')}>
-                  <IconButton component={Link} to={`/file/detail/${error.sha256}`}>
+                  <IconButton component={Link} to={`/file/detail/${error.sha256}`} size="large">
                     <DescriptionOutlinedIcon />
                   </IconButton>
                 </Tooltip>
@@ -181,7 +185,7 @@ export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
                   tooltip={t('download')}
                 />
                 <Tooltip title={t('file_viewer')}>
-                  <IconButton component={Link} to={`/file/viewer/${error.sha256}`}>
+                  <IconButton component={Link} to={`/file/viewer/${error.sha256}`} size="large">
                     <PageviewOutlinedIcon />
                   </IconButton>
                 </Tooltip>
@@ -192,7 +196,7 @@ export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
       )}
     </PageCenter>
   ) : (
-    <Redirect to="/forbidden" />
+    <Navigate to="/forbidden" replace />
   );
 };
 

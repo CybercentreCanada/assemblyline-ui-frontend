@@ -1,8 +1,10 @@
-import { makeStyles } from '@material-ui/core';
-import Typography from '@material-ui/core/Typography';
-import BlockIcon from '@material-ui/icons/Block';
-import useALContext from 'components/hooks/useALContext';
-import { useEffect } from 'react';
+import BlockIcon from '@mui/icons-material/Block';
+import Typography from '@mui/material/Typography';
+import { makeStyles } from '@mui/styles';
+import clsx from 'clsx';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { CustomUser } from 'components/hooks/useMyUser';
+import { memo, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
 import { AiOutlineSecurityScan } from 'react-icons/ai';
@@ -13,37 +15,41 @@ type FileDropperProps = {
   disabled: boolean;
 };
 
-export default function FileDropper({ file, setFile, disabled }: FileDropperProps) {
+const useStyles = makeStyles(theme => ({
+  drop_zone: {
+    flex: '1',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding: theme.spacing(3),
+    backgroundColor: theme.palette.action.hover,
+    outline: 'none',
+    border: `2px ${theme.palette.action.disabled} dashed`,
+    borderRadius: '6px',
+    color: theme.palette.action.disabled
+  },
+  drag_enter: {
+    border: `2px ${theme.palette.text.disabled} dashed`,
+    backgroundColor: theme.palette.action.selected,
+    color: theme.palette.text.disabled
+  },
+  drop_zone_hover_enabled: {
+    transition: '150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
+    '-webkit-transition': '150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
+    '&:hover': {
+      border: `2px ${theme.palette.text.disabled} dashed`,
+      backgroundColor: theme.palette.action.selected,
+      color: theme.palette.text.disabled,
+      cursor: 'pointer'
+    }
+  }
+}));
+
+const FileDropper: React.FC<FileDropperProps> = ({ file, setFile, disabled }) => {
   const { t } = useTranslation(['submit']);
   const { acceptedFiles, getRootProps, getInputProps, isDragActive } = useDropzone({ disabled });
-  const { user: currentUser } = useALContext();
-  const useStyles = ctrlDisabled =>
-    makeStyles(theme => ({
-      drop_zone: {
-        flex: '1',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        padding: theme.spacing(3),
-        backgroundColor: theme.palette.action.hover,
-        outline: 'none',
-        border: `2px ${theme.palette.action.disabled} dashed`,
-        borderRadius: '6px',
-        color: theme.palette.action.disabled,
-        '&:hover': {
-          border: !ctrlDisabled ? `2px ${theme.palette.text.disabled} dashed` : null,
-          backgroundColor: !ctrlDisabled ? theme.palette.action.selected : null,
-          color: !ctrlDisabled ? theme.palette.text.disabled : null,
-          cursor: !ctrlDisabled ? 'pointer' : null
-        }
-      },
-      drag_enter: {
-        border: `2px ${theme.palette.text.disabled} dashed`,
-        backgroundColor: theme.palette.action.selected,
-        color: theme.palette.text.disabled
-      }
-    }))();
-  const classes = useStyles(disabled);
+  const { user: currentUser } = useAppUser<CustomUser>();
+  const classes = useStyles();
 
   useEffect(() => {
     if (acceptedFiles.length !== 0) {
@@ -55,7 +61,11 @@ export default function FileDropper({ file, setFile, disabled }: FileDropperProp
   return (
     <div
       {...getRootProps()}
-      className={isDragActive && !disabled ? `${classes.drop_zone} ${classes.drag_enter}` : classes.drop_zone}
+      className={clsx(
+        classes.drop_zone,
+        isDragActive && !disabled && classes.drag_enter,
+        !disabled && classes.drop_zone_hover_enabled
+      )}
     >
       <input {...getInputProps()} />
       {currentUser.roles.includes('submission_create') ? (
@@ -81,4 +91,6 @@ export default function FileDropper({ file, setFile, disabled }: FileDropperProp
       </div>
     </div>
   );
-}
+};
+
+export default memo(FileDropper);

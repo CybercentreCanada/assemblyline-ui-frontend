@@ -1,9 +1,10 @@
-import { Grid, Typography, useTheme } from '@material-ui/core';
-import Skeleton from '@material-ui/lab/Skeleton';
-import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
+import { Grid, Typography, useTheme } from '@mui/material';
+import Skeleton from '@mui/material/Skeleton';
+import PageFullWidth from 'commons/components/pages/PageFullWidth';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import CustomChip from 'components/visual/CustomChip';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export default function Configuration() {
@@ -24,7 +25,7 @@ export default function Configuration() {
     return false;
   }
 
-  useEffect(() => {
+  useEffectOnce(() => {
     // Load all services on start
     apiCall({
       url: '/api/v4/help/constants/',
@@ -38,8 +39,7 @@ export default function Configuration() {
         setConfiguration(api_data.api_response);
       }
     });
-    // eslint-disable-next-line
-  }, []);
+  });
 
   return (
     <PageFullWidth margin={4}>

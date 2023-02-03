@@ -1,6 +1,5 @@
-import { Typography, useTheme } from '@material-ui/core';
-import { Skeleton } from '@material-ui/lab';
-import PageCenter from 'commons/components/layout/pages/PageCenter';
+import { Skeleton, Typography, useTheme } from '@mui/material';
+import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import NotFoundPage from 'components/routes/404_dl';
 import Classification from 'components/visual/Classification';

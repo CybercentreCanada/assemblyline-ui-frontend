@@ -1,4 +1,4 @@
-import { Grid, Typography, useTheme } from '@material-ui/core';
+import { Grid, Typography, useTheme } from '@mui/material';
 import 'moment/locale/fr';
 import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';

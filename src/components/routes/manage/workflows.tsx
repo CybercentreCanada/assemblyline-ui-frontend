@@ -1,13 +1,16 @@
-import { Grid, IconButton, makeStyles, Tooltip, useMediaQuery, useTheme } from '@material-ui/core';
-import Typography from '@material-ui/core/Typography';
-import AddCircleOutlineOutlinedIcon from '@material-ui/icons/AddCircleOutlineOutlined';
-import EventBusyOutlinedIcon from '@material-ui/icons/EventBusyOutlined';
-import EventOutlinedIcon from '@material-ui/icons/EventOutlined';
-import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
-import PageHeader from 'commons/components/layout/pages/PageHeader';
+import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
+import EventBusyOutlinedIcon from '@mui/icons-material/EventBusyOutlined';
+import EventOutlinedIcon from '@mui/icons-material/EventOutlined';
+import { Grid, IconButton, Tooltip, useMediaQuery, useTheme } from '@mui/material';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
+import PageFullWidth from 'commons/components/pages/PageFullWidth';
+import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
+import { CustomUser } from 'components/hooks/useMyUser';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
@@ -15,9 +18,10 @@ import SearchPager from 'components/visual/SearchPager';
 import WorkflowTable from 'components/visual/SearchResult/workflow';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import 'moment/locale/fr';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import { useLocation } from 'react-router-dom';
 import ForbiddenPage from '../403';
 import WorkflowDetail from './workflow_detail';
 
@@ -51,11 +55,12 @@ export default function Workflows() {
   const { t } = useTranslation(['manageWorkflows']);
   const [pageSize] = useState(PAGE_SIZE);
   const [searching, setSearching] = useState(false);
-  const { indexes, user: currentUser } = useALContext();
+  const { indexes } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
   const [workflowResults, setWorkflowResults] = useState<SearchResults>(null);
   const location = useLocation();
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
-  const history = useHistory();
+  const navigate = useNavigate();
   const theme = useTheme();
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
   const { apiCall } = useMyAPI();
@@ -117,7 +122,7 @@ export default function Workflows() {
 
   const onClear = useCallback(
     () => {
-      history.push(location.pathname);
+      navigate(location.pathname);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [location.pathname]
@@ -127,7 +132,7 @@ export default function Workflows() {
     () => {
       if (filterValue.current !== '') {
         query.set('query', filterValue.current);
-        history.push(`${location.pathname}?${query.toString()}`);
+        navigate(`${location.pathname}?${query.toString()}`);
       } else {
         onClear();
       }
@@ -160,9 +165,10 @@ export default function Workflows() {
               <Tooltip title={t('add_workflow')}>
                 <IconButton
                   style={{
-                    color: theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark
+                    color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
                   }}
                   onClick={() => setGlobalDrawer(<WorkflowDetail workflow_id={null} close={closeGlobalDrawer} />)}
+                  size="large"
                 >
                   <AddCircleOutlineOutlinedIcon />
                 </IconButton>
@@ -189,7 +195,7 @@ export default function Workflows() {
                 props: {
                   onClick: () => {
                     query.set('query', 'hit_count:0');
-                    history.push(`${location.pathname}?${query.getDeltaString()}`);
+                    navigate(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
               },
@@ -199,7 +205,7 @@ export default function Workflows() {
                 props: {
                   onClick: () => {
                     query.set('query', 'last_seen:[* TO now-3m]');
-                    history.push(`${location.pathname}?${query.getDeltaString()}`);
+                    navigate(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
               }

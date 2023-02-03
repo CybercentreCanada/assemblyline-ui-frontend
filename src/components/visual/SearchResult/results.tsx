@@ -1,8 +1,7 @@
-import { Tooltip, useTheme } from '@material-ui/core';
-import Paper from '@material-ui/core/Paper';
-import TableContainer from '@material-ui/core/TableContainer';
-import ArchiveOutlinedIcon from '@material-ui/icons/ArchiveOutlined';
-import { AlertTitle, Skeleton } from '@material-ui/lab';
+import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
+import { AlertTitle, Skeleton, Tooltip, useTheme } from '@mui/material';
+import Paper from '@mui/material/Paper';
+import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
 import Verdict from 'components/visual/Verdict';
@@ -93,9 +92,11 @@ const WrappedResultsTable: React.FC<ResultsTableProps> = ({ resultResults, allow
               >
                 <DivTableCell>
                   <Tooltip title={result.created}>
-                    <Moment fromNow locale={i18n.language}>
-                      {result.created}
-                    </Moment>
+                    <>
+                      <Moment fromNow locale={i18n.language}>
+                        {result.created}
+                      </Moment>
+                    </>
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell>
@@ -132,7 +133,7 @@ const WrappedResultsTable: React.FC<ResultsTableProps> = ({ resultResults, allow
       </div>
     )
   ) : (
-    <Skeleton variant="rect" style={{ height: '6rem', borderRadius: '4px' }} />
+    <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
   );
 };
 

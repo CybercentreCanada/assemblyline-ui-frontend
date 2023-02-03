@@ -1,3 +1,4 @@
+import Editor, { DiffEditor, loader } from '@monaco-editor/react';
 import {
   Button,
   Dialog,
@@ -5,22 +6,22 @@ import {
   DialogContent,
   DialogTitle,
   Grid,
+  Skeleton,
   Typography,
   useTheme
-} from '@material-ui/core';
-import { Skeleton } from '@material-ui/lab';
-import Editor, { DiffEditor, loader } from '@monaco-editor/react';
-import useAppContext from 'commons/components/hooks/useAppContext';
-import useUser from 'commons/components/hooks/useAppUser';
-import PageFullSize from 'commons/components/layout/pages/PageFullSize';
+} from '@mui/material';
+import useAppTheme from 'commons/components/app/hooks/useAppTheme';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
+import PageFullSize from 'commons/components/pages/PageFullSize';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactResizeDetector from 'react-resize-detector';
-import { Redirect } from 'react-router-dom';
+import { Navigate } from 'react-router';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.34.1' } });
 
@@ -34,10 +35,10 @@ export default function AdminTagSafelist() {
   const [open, setOpen] = useState(false);
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
-  const { user: currentUser } = useUser<CustomUser>();
-  const { isDarkTheme } = useAppContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
+  const { isDark: isDarkTheme } = useAppTheme();
 
-  useEffect(() => {
+  useEffectOnce(() => {
     if (currentUser.is_admin) {
       reload(false);
     }
@@ -48,8 +49,7 @@ export default function AdminTagSafelist() {
     } else {
       loader.config({ 'vs/nls': { availableLanguages: { '*': '' } } });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   const reload = defValue => {
     apiCall({
@@ -185,7 +185,7 @@ export default function AdminTagSafelist() {
                     />
                   </>
                 ) : (
-                  <Skeleton width={width} height={height} variant="rect" animation="wave" />
+                  <Skeleton width={width} height={height} variant="rectangular" animation="wave" />
                 )}
               </div>
             )}
@@ -194,6 +194,6 @@ export default function AdminTagSafelist() {
       </div>
     </PageFullSize>
   ) : (
-    <Redirect to="/forbidden" />
+    <Navigate to="/forbidden" replace />
   );
 }

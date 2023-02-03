@@ -1,4 +1,5 @@
-import React, { ChangeEvent } from 'react';
+import { SelectChangeEvent } from '@mui/material';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { getItems, getType, getValue, SelectField, StoreProps, useStore } from '../..';
 
@@ -12,7 +13,7 @@ export const WrappedHexSearchModeEncodingSetting = ({ store }: StoreProps) => {
       description={t('search.mode.encoding.description')}
       value={getValue.search.mode.encoding(store.setting.search.mode.encoding)}
       items={getItems.search.mode.encoding(store)}
-      onChange={(event: ChangeEvent<{ name?: string; value: unknown }>) =>
+      onChange={(event: SelectChangeEvent<number>, child: React.ReactNode) =>
         update.store.setting.search.mode.setEncoding(getType.search.mode.encoding(event.target.value as number))
       }
     />

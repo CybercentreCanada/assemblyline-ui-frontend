@@ -1,6 +1,6 @@
-import { FormControl, Grid, Tooltip, Typography, useMediaQuery, useTheme } from '@material-ui/core';
-import Checkbox from '@material-ui/core/Checkbox';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
+import { FormControl, Grid, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { COLUMNS, NumericField, StoreProps, useDispatch, useStore } from '../..';
@@ -37,6 +37,7 @@ export const WrappedHexColumnSetting = ({ store }: StoreProps) => {
             id={t('columns.label')}
             placeholder={t('columns.description')}
             fullWidth
+            size="small"
             margin="dense"
             value={store.setting.layout.column.max}
             min={1}

@@ -1,5 +1,5 @@
-import { Button, useTheme } from '@material-ui/core';
-import LinkIcon from '@material-ui/icons/Link';
+import { Button, useTheme } from '@mui/material';
+import LinkIcon from '@mui/icons-material/Link';
 import React from 'react';
 import { Link } from 'react-router-dom';
 

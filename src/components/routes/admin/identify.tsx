@@ -1,14 +1,15 @@
-import { Grid, Hidden, makeStyles, Paper, Tab, Tabs, Typography, useTheme } from '@material-ui/core';
-import { Alert } from '@material-ui/lab';
 import { loader } from '@monaco-editor/react';
-import useUser from 'commons/components/hooks/useAppUser';
-import PageFullSize from 'commons/components/layout/pages/PageFullSize';
+import { Alert, Grid, Hidden, Paper, Tab, Tabs, Typography, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
+import PageFullSize from 'commons/components/pages/PageFullSize';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Redirect } from 'react-router-dom';
+import { Navigate } from 'react-router';
 import LibMagic from './identify/libmagic';
 import Mimes from './identify/mimes';
 import Patterns from './identify/patterns';
@@ -16,10 +17,26 @@ import Yara from './identify/yara';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.34.1' } });
 
+const useStyles = makeStyles(theme => ({
+  main: {
+    marginTop: theme.spacing(1),
+    flexGrow: 1,
+    display: 'flex',
+    flexDirection: 'column'
+  },
+  tab: {
+    flexGrow: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    paddingTop: theme.spacing(2)
+  }
+}));
+
 export default function AdminIdentify() {
+  const classes = useStyles();
   const { t, i18n } = useTranslation(['adminIdentify']);
   const theme = useTheme();
-  const { user: currentUser } = useUser<CustomUser>();
+  const { user: currentUser } = useAppUser<CustomUser>();
   const { apiCall } = useMyAPI();
   const [value, setValue] = useState('magic');
   const [magicFile, setMagicFile] = useState(null);
@@ -30,23 +47,8 @@ export default function AdminIdentify() {
   const [originalMimesFile, setOriginalMimesFile] = useState(null);
   const [patternsFile, setPatternsFile] = useState(null);
   const [originalPatternsFile, setOriginalPatternsFile] = useState(null);
-  const useStyles = makeStyles(curTheme => ({
-    main: {
-      marginTop: theme.spacing(1),
-      flexGrow: 1,
-      display: 'flex',
-      flexDirection: 'column'
-    },
-    tab: {
-      flexGrow: 1,
-      display: 'flex',
-      flexDirection: 'column',
-      paddingTop: theme.spacing(2)
-    }
-  }));
-  const classes = useStyles();
 
-  useEffect(() => {
+  useEffectOnce(() => {
     // I cannot find a way to hot switch monaco editor's locale but at least I can load
     // the right language on first load...
     if (i18n.language === 'fr') {
@@ -54,8 +56,7 @@ export default function AdminIdentify() {
     } else {
       loader.config({ 'vs/nls': { availableLanguages: { '*': '' } } });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -125,7 +126,7 @@ export default function AdminIdentify() {
             <Typography variant="h4">{t('title')}</Typography>
           </Grid>
           <Grid item xs={12}>
-            <Hidden xsDown>
+            <Hidden lgDown>
               <Alert severity="warning">{t('warning')}</Alert>
             </Hidden>
           </Grid>
@@ -185,6 +186,6 @@ export default function AdminIdentify() {
       </div>
     </PageFullSize>
   ) : (
-    <Redirect to="/forbidden" />
+    <Navigate to="/forbidden" replace />
   );
 }

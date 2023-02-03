@@ -1,6 +1,6 @@
-import Paper from '@material-ui/core/Paper';
-import TableContainer from '@material-ui/core/TableContainer';
-import { AlertTitle, Skeleton } from '@material-ui/lab';
+import Paper from '@mui/material/Paper';
+import TableContainer from '@mui/material/TableContainer';
+import { AlertTitle, Skeleton } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import { Statistics } from 'components/routes/manage/heuristic_detail';
 import Classification from 'components/visual/Classification';
@@ -132,7 +132,7 @@ const WrappedHeuristicsTable: React.FC<HeuristicsTableProps> = ({
       </div>
     )
   ) : (
-    <Skeleton variant="rect" style={{ height: '6rem', borderRadius: '4px' }} />
+    <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
   );
 };
 

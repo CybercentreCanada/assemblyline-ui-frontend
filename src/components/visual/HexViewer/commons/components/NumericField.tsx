@@ -1,13 +1,15 @@
-import FormControl from '@material-ui/core/FormControl';
-import IconButton from '@material-ui/core/IconButton';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import InputLabel from '@material-ui/core/InputLabel';
-import OutlinedInput from '@material-ui/core/OutlinedInput';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
-import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import FormControl from '@mui/material/FormControl';
+import IconButton from '@mui/material/IconButton';
+import InputAdornment from '@mui/material/InputAdornment';
+import InputLabel from '@mui/material/InputLabel';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import { Theme } from '@mui/material/styles';
+import createStyles from '@mui/styles/createStyles';
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
-import { isArrowDown, isArrowUp, isEnter } from 'commons/addons/elements/utils/keyboard';
+import { isArrowDown, isArrowUp, isEnter } from 'commons/components/utils/keyboard';
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -54,6 +56,8 @@ export type NumericFieldProps = {
   disabled?: boolean;
   disabledArrow?: boolean;
   margin?: 'none' | 'dense';
+  size?: 'small' | 'medium';
+  variant?: 'filled' | 'outlined' | 'standard';
   range?: 'none' | 'clamp' | 'loop';
   direction?: 'normal' | 'inverse';
   allowNull?: boolean;
@@ -92,9 +96,11 @@ export const WrappedNumericField = ({
   autoFocus = false,
   disabled = false,
   disabledArrow = false,
-  margin = 'none',
+  size = 'medium',
   range = 'none',
   direction = 'normal',
+  margin = 'dense',
+  variant = 'outlined',
   allowNull = false,
   options = null,
   startAdornment = <></>,
@@ -331,8 +337,8 @@ export const WrappedNumericField = ({
     <FormControl
       fullWidth={fullWidth}
       className={clsx(fieldClasses.formControl, classes.formControl)}
-      variant="outlined"
-      size="small"
+      variant={variant}
+      size={size}
     >
       <InputLabel htmlFor={id}>{label}</InputLabel>
       <OutlinedInput
@@ -343,9 +349,9 @@ export const WrappedNumericField = ({
         }}
         id={id}
         type="text"
+        margin={margin}
         placeholder={placeholder}
         fullWidth={fullWidth}
-        margin={margin}
         disabled={disabled}
         value={textValue}
         onFocus={focus}
@@ -384,7 +390,7 @@ export const WrappedNumericField = ({
             </div>
           </InputAdornment>
         }
-        labelWidth={labelWidth}
+        // label={<InputLabel sx={{ width: labelWidth }} />}
       />
     </FormControl>
   );

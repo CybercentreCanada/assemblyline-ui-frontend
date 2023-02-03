@@ -1,5 +1,7 @@
-import { alpha, createStyles, Theme, withStyles } from '@material-ui/core';
-import { Alert } from '@material-ui/lab';
+import { alpha, Theme } from '@mui/material';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+import { Alert } from '@mui/material';
 import 'moment/locale/fr';
 
 const StyledAlert = withStyles((theme: Theme) =>

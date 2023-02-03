@@ -1,4 +1,4 @@
-import { Button, Typography, useTheme } from '@material-ui/core';
+import { Button, Typography, useTheme } from '@mui/material';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { useTranslation } from 'react-i18next';
 

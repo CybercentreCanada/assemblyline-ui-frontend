@@ -1,4 +1,4 @@
-import { Pagination } from '@material-ui/lab';
+import { Pagination } from '@mui/material';
 import useMyAPI from 'components/hooks/useMyAPI';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React from 'react';

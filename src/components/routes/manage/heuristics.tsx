@@ -1,10 +1,13 @@
-import { makeStyles, useTheme } from '@material-ui/core';
-import Typography from '@material-ui/core/Typography';
-import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
-import PageHeader from 'commons/components/layout/pages/PageHeader';
+import { useTheme } from '@mui/material';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
+import PageFullWidth from 'commons/components/pages/PageFullWidth';
+import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
+import { CustomUser } from 'components/hooks/useMyUser';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
@@ -12,9 +15,10 @@ import SearchPager from 'components/visual/SearchPager';
 import HeuristicsTable from 'components/visual/SearchResult/heuristics';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import 'moment/locale/fr';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import { useLocation } from 'react-router-dom';
 import ForbiddenPage from '../403';
 import HeuristicDetail from './heuristic_detail';
 
@@ -48,15 +52,16 @@ export default function Heuristics() {
   const { t } = useTranslation(['manageHeuristics']);
   const [pageSize] = useState(PAGE_SIZE);
   const [searching, setSearching] = useState(false);
-  const { indexes, user: currentUser } = useALContext();
+  const { indexes } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
   const [heuristicResults, setHeuristicResults] = useState<SearchResults>(null);
   const location = useLocation();
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
-  const history = useHistory();
+  const navigate = useNavigate();
   const theme = useTheme();
   const { apiCall } = useMyAPI();
   const classes = useStyles();
-  const { closeGlobalDrawer, setGlobalDrawer, globalDrawer } = useDrawer();
+  const { closeGlobalDrawer, setGlobalDrawer, globalDrawerOpened } = useDrawer();
   const [suggestions] = useState([
     ...Object.keys(indexes.heuristic).filter(name => indexes.heuristic[name].indexed),
     ...DEFAULT_SUGGESTION
@@ -68,11 +73,11 @@ export default function Heuristics() {
   }, [location.pathname, location.search, pageSize]);
 
   useEffect(() => {
-    if (heuristicResults !== null && globalDrawer === null && location.hash) {
-      history.push(`${location.pathname}${location.search ? location.search : ''}`);
+    if (heuristicResults !== null && !globalDrawerOpened && location.hash) {
+      navigate(`${location.pathname}${location.search ? location.search : ''}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalDrawer]);
+  }, [globalDrawerOpened]);
 
   useEffect(() => {
     if (location.hash) {
@@ -106,7 +111,7 @@ export default function Heuristics() {
 
   const onClear = useCallback(
     () => {
-      history.push(location.pathname);
+      navigate(location.pathname);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [location.pathname]
@@ -116,7 +121,7 @@ export default function Heuristics() {
     () => {
       if (filterValue.current !== '') {
         query.set('query', filterValue.current);
-        history.push(`${location.pathname}?${query.getDeltaString()}${location.hash ? location.hash : ''}`);
+        navigate(`${location.pathname}?${query.getDeltaString()}${location.hash ? location.hash : ''}`);
       } else {
         onClear();
       }
@@ -131,7 +136,7 @@ export default function Heuristics() {
 
   const setHeuristicID = useCallback(
     (heur_id: string) => {
-      history.push(`${location.pathname}${location.search ? location.search : ''}#${heur_id}`);
+      navigate(`${location.pathname}${location.search ? location.search : ''}#${heur_id}`);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [location.search]

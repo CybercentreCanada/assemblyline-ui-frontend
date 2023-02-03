@@ -1,10 +1,10 @@
-import { Menu, MenuItem } from '@material-ui/core';
-import AssignmentOutlinedIcon from '@material-ui/icons/AssignmentOutlined';
-import FingerprintOutlinedIcon from '@material-ui/icons/FingerprintOutlined';
-import PlaylistAddCheckOutlinedIcon from '@material-ui/icons/PlaylistAddCheckOutlined';
-import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
-import SelectAllOutlinedIcon from '@material-ui/icons/SelectAllOutlined';
-import useClipboard from 'commons/components/hooks/useClipboard';
+import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
+import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
+import PlaylistAddCheckOutlinedIcon from '@mui/icons-material/PlaylistAddCheckOutlined';
+import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
+import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
+import { Menu, MenuItem } from '@mui/material';
+import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -14,7 +14,8 @@ import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
 import { safeFieldValueURI } from 'helpers/utils';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import { Link } from 'react-router-dom';
 import InputDialog from './InputDialog';
 
 const STYLE = { height: 'auto', minHeight: '20px' };
@@ -56,7 +57,7 @@ const WrappedTag: React.FC<TagProps> = ({
   const [safelistDialog, setSafelistDialog] = React.useState(false);
   const [safelistReason, setSafelistReason] = React.useState(null);
   const [waitingDialog, setWaitingDialog] = React.useState(false);
-  const history = useHistory();
+  const navigate = useNavigate();
   const { user: currentUser, scoreToVerdict } = useALContext();
   const { apiCall } = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
@@ -67,7 +68,7 @@ const WrappedTag: React.FC<TagProps> = ({
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
 
   const searchTag = useCallback(
-    () => history.push(`/search/result?query=result.sections.tags.${type}:${safeFieldValueURI(value)}`),
+    () => navigate(`/search/result?query=result.sections.tags.${type}:${safeFieldValueURI(value)}`),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [type, value]
   );
@@ -206,7 +207,7 @@ const WrappedTag: React.FC<TagProps> = ({
       </Menu>
       <CustomChip
         wrap
-        variant={safelisted ? 'outlined' : 'default'}
+        variant={safelisted ? 'outlined' : 'filled'}
         size="tiny"
         type="rounded"
         color={highlight_key && isHighlighted(highlight_key) ? ('primary' as 'info') : color}

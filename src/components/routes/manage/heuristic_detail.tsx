@@ -1,9 +1,11 @@
-import { Grid, IconButton, makeStyles, Paper, Tooltip, Typography, useTheme } from '@material-ui/core';
-import YoutubeSearchedForIcon from '@material-ui/icons/YoutubeSearchedFor';
-import { Skeleton } from '@material-ui/lab';
-import PageCenter from 'commons/components/layout/pages/PageCenter';
+import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
+import { Grid, IconButton, Paper, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
+import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
+import { CustomUser } from 'components/hooks/useMyUser';
 import Classification from 'components/visual/Classification';
 import Histogram from 'components/visual/Histogram';
 import ResultsTable from 'components/visual/SearchResult/results';
@@ -55,7 +57,7 @@ type HeuristicDetailProps = {
 const useStyles = makeStyles(theme => ({
   preview: {
     margin: 0,
-    padding: `${theme.spacing(0.75)}px ${theme.spacing(1)}px`,
+    padding: theme.spacing(0.75, 1),
     whiteSpace: 'pre-wrap',
     wordBreak: 'break-word'
   },
@@ -94,7 +96,8 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
   const [results, setResults] = useState<any>(null);
   const { apiCall } = useMyAPI();
   const classes = useStyles();
-  const { c12nDef, user: currentUser } = useALContext();
+  const { c12nDef } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
 
   useEffect(() => {
     if (currentUser.roles.includes('heuristic_view')) {
@@ -177,12 +180,13 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
                       to={`/search/result/?query=result.sections.heuristic.heur_id:${safeFieldValueURI(
                         heuristic.heur_id
                       )}`}
+                      size="large"
                     >
                       <YoutubeSearchedForIcon />
                     </IconButton>
                   </Tooltip>
                 ) : (
-                  <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+                  <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
                 )}
               </Grid>
             )}

@@ -1,7 +1,8 @@
-import { makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
-import TextField from '@material-ui/core/TextField';
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import React from 'react';
+import { useMediaQuery, useTheme } from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
+import makeStyles from '@mui/styles/makeStyles';
+import React, { SyntheticEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StoreProps, useDispatch } from '../..';
 
@@ -19,8 +20,8 @@ const useHexStyles = makeStyles(theme => ({
     width: '50vw'
   },
   autocompletePaper: {
-    margin: `${theme.spacing(1)}px 0px`,
-    borderRadius: `0 0 ${theme.spacing(0.5)}px ${theme.spacing(0.5)}px`,
+    margin: `${theme.spacing(1)} 0px`,
+    borderRadius: `0 0 ${theme.spacing(0.5)} ${theme.spacing(0.5)}`,
     width: '50vw'
   },
   autocompleteList: {
@@ -66,23 +67,22 @@ export const WrappedHexSearchbar = ({ store }: StoreProps) => {
         listbox: classes.autocompleteList,
         option: classes.autocompleteOption
       }}
+      multiple={false}
       freeSolo
       disableClearable
       handleHomeEndKeys
-      closeIcon={null}
+      clearIcon={null}
       fullWidth
       size="small"
       open={suggestionOpen && upXS && false}
       options={suggestionLabels}
       value={value}
-      onChange={(event: React.ChangeEvent, newValue: string | null) => {
-        console.log('onChange', newValue);
+      onChange={(event: SyntheticEvent<Element, Event>, newValue: string) => {
         setValue(newValue);
         onSearchBarChange({ value: newValue });
       }}
       inputValue={inputValue}
       onInputChange={(event: React.ChangeEvent, newInputValue: string) => {
-        console.log('onInputChange', newInputValue);
         setInputValue(newInputValue);
         onSearchBarInputChange({ inputValue: newInputValue });
       }}

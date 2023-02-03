@@ -1,21 +1,23 @@
-import { Grid, IconButton, Tooltip, Typography, useTheme } from '@material-ui/core';
-import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
-import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
-import PageviewOutlinedIcon from '@material-ui/icons/PageviewOutlined';
-import PlaylistAddCheckIcon from '@material-ui/icons/PlaylistAddCheck';
-import ReplayOutlinedIcon from '@material-ui/icons/ReplayOutlined';
-import RotateLeftOutlinedIcon from '@material-ui/icons/RotateLeftOutlined';
-import { Skeleton } from '@material-ui/lab';
+import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
+import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
+import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
+import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
+import RotateLeftOutlinedIcon from '@mui/icons-material/RotateLeftOutlined';
+import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
+import { Grid, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import { CustomUser } from 'components/hooks/useMyUser';
 import ForbiddenPage from 'components/routes/403';
 import Classification from 'components/visual/Classification';
 import { Error } from 'components/visual/ErrorCard';
 import { AlternateResult, emptyResult, Result } from 'components/visual/ResultCard';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useHistory, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import { Link, useLocation } from 'react-router-dom';
 import AttackSection from './FileDetail/attacks';
 import ChildrenSection from './FileDetail/childrens';
 import Detection from './FileDetail/detection';
@@ -103,9 +105,10 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
   const [safelistReason, setSafelistReason] = useState<string>('');
   const [waitingDialog, setWaitingDialog] = useState(false);
   const { apiCall } = useMyAPI();
-  const { c12nDef, user: currentUser } = useALContext();
+  const { c12nDef } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
   const theme = useTheme();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { showSuccessMessage } = useMySnackbar();
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
@@ -152,7 +155,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
       onSuccess: api_data => {
         showSuccessMessage(t('resubmit.success'));
         setTimeout(() => {
-          history.push(`/submission/detail/${api_data.api_response.sid}`);
+          navigate(`/submission/detail/${api_data.api_response.sid}`);
         }, 500);
       }
     });
@@ -269,8 +272,9 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                     <IconButton
                       component={Link}
                       to={`/search/submission?query=files.sha256:${file.file_info.sha256} OR results:${file.file_info.sha256}* OR errors:${file.file_info.sha256}*`}
+                      size="large"
                     >
-                      <AmpStoriesOutlinedIcon />
+                      <ViewCarouselOutlinedIcon />
                     </IconButton>
                   </Tooltip>
                   {currentUser.roles.includes('file_download') && (
@@ -284,7 +288,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                   )}
                   {currentUser.roles.includes('file_detail') && (
                     <Tooltip title={t('file_viewer')}>
-                      <IconButton component={Link} to={`/file/viewer/${file.file_info.sha256}`}>
+                      <IconButton component={Link} to={`/file/viewer/${file.file_info.sha256}`} size="large">
                         <PageviewOutlinedIcon />
                       </IconButton>
                     </Tooltip>
@@ -293,14 +297,13 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                     <Tooltip title={t('resubmit_file')}>
                       <IconButton
                         component={Link}
-                        to={{
-                          pathname: '/submit',
-                          state: {
-                            hash: file.file_info.sha256,
-                            tabContext: '1',
-                            c12n: file.file_info.classification
-                          }
+                        to="/submit"
+                        state={{
+                          hash: file.file_info.sha256,
+                          tabContext: '1',
+                          c12n: file.file_info.classification
                         }}
+                        size="large"
                       >
                         <ReplayOutlinedIcon />
                       </IconButton>
@@ -308,14 +311,14 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                   )}
                   {currentUser.roles.includes('submission_create') && (
                     <Tooltip title={t('resubmit_dynamic')}>
-                      <IconButton onClick={resubmit}>
+                      <IconButton onClick={resubmit} size="large">
                         <RotateLeftOutlinedIcon />
                       </IconButton>
                     </Tooltip>
                   )}
                   {currentUser.roles.includes('safelist_manage') && (
                     <Tooltip title={t('safelist')}>
-                      <IconButton onClick={prepareSafelist}>
+                      <IconButton onClick={prepareSafelist} size="large">
                         <PlaylistAddCheckIcon />
                       </IconButton>
                     </Tooltip>
@@ -326,7 +329,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                   {[...Array(5)].map((_, i) => (
                     <Skeleton
                       key={i}
-                      variant="circle"
+                      variant="circular"
                       height="2.5rem"
                       width="2.5rem"
                       style={{ margin: theme.spacing(0.5) }}

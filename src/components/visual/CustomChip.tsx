@@ -1,6 +1,7 @@
-import { Tooltip } from '@material-ui/core';
-import Chip from '@material-ui/core/Chip';
-import { darken, makeStyles } from '@material-ui/core/styles';
+import { Tooltip } from '@mui/material';
+import Chip from '@mui/material/Chip';
+import { darken } from '@mui/material/styles';
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import React, { ReactNode } from 'react';
 
@@ -27,7 +28,7 @@ export interface CustomChipProps {
   type?: 'round' | 'square' | 'rounded';
   size?: 'tiny' | 'small' | 'medium';
   color?: PossibleColors;
-  variant?: 'default' | 'outlined';
+  variant?: 'filled' | 'outlined';
   mono?: boolean;
   wrap?: boolean;
   tooltip?: string;
@@ -88,10 +89,10 @@ const useStyles = makeStyles(theme => ({
   },
   // Filled
   default: {
-    backgroundColor: theme.palette.type === 'dark' ? '#616161' : '#999',
+    backgroundColor: theme.palette.mode === 'dark' ? '#616161' : '#999',
     color: theme.palette.common.white,
     '[role=button]&:hover, [role=button]&:focus': {
-      backgroundColor: darken(theme.palette.type === 'dark' ? '#616161' : '#999', 0.15)
+      backgroundColor: darken(theme.palette.mode === 'dark' ? '#616161' : '#999', 0.15)
     }
   },
   primary: {
@@ -113,17 +114,17 @@ const useStyles = makeStyles(theme => ({
     }
   },
   info: {
-    backgroundColor: theme.palette.type === 'dark' ? '#28abd2' : '#00baf1',
+    backgroundColor: theme.palette.mode === 'dark' ? '#28abd2' : '#00baf1',
     color: theme.palette.common.white,
     '[role=button]&:hover, [role=button]&:focus': {
-      backgroundColor: darken(theme.palette.type === 'dark' ? '#28abd2' : '#00baf1', 0.15)
+      backgroundColor: darken(theme.palette.mode === 'dark' ? '#28abd2' : '#00baf1', 0.15)
     }
   },
   warning: {
-    backgroundColor: theme.palette.type === 'dark' ? '#ed8b00' : '#ff9d12',
+    backgroundColor: theme.palette.mode === 'dark' ? '#ed8b00' : '#ff9d12',
     color: theme.palette.common.white,
     '[role=button]&:hover, [role=button]&:focus': {
-      backgroundColor: darken(theme.palette.type === 'dark' ? '#ed8b00' : '#ff9d12', 0.15)
+      backgroundColor: darken(theme.palette.mode === 'dark' ? '#ed8b00' : '#ff9d12', 0.15)
     }
   },
   error: {
@@ -135,20 +136,20 @@ const useStyles = makeStyles(theme => ({
   },
   // Outlined
   success_outlined: {
-    borderColor: theme.palette.type !== 'dark' ? theme.palette.success.dark : theme.palette.success.light,
-    color: theme.palette.type !== 'dark' ? theme.palette.success.dark : theme.palette.success.light
+    borderColor: theme.palette.mode !== 'dark' ? theme.palette.success.dark : theme.palette.success.light,
+    color: theme.palette.mode !== 'dark' ? theme.palette.success.dark : theme.palette.success.light
   },
   info_outlined: {
-    borderColor: theme.palette.type !== 'dark' ? theme.palette.info.dark : theme.palette.info.light,
-    color: theme.palette.type !== 'dark' ? theme.palette.info.dark : theme.palette.info.light
+    borderColor: theme.palette.mode !== 'dark' ? theme.palette.info.dark : theme.palette.info.light,
+    color: theme.palette.mode !== 'dark' ? theme.palette.info.dark : theme.palette.info.light
   },
   warning_outlined: {
-    borderColor: theme.palette.type !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light,
-    color: theme.palette.type !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
+    borderColor: theme.palette.mode !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light,
+    color: theme.palette.mode !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
   },
   error_outlined: {
-    borderColor: theme.palette.type !== 'dark' ? theme.palette.error.dark : theme.palette.error.light,
-    color: theme.palette.type !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
+    borderColor: theme.palette.mode !== 'dark' ? theme.palette.error.dark : theme.palette.error.light,
+    color: theme.palette.mode !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
   },
   icon: { color: theme.palette.common.white }
 }));
@@ -158,7 +159,7 @@ const WrappedCustomChip: React.FC<CustomChipProps> = ({
   type = 'round',
   size = 'medium',
   color = 'default',
-  variant = 'default',
+  variant = 'filled',
   mono = false,
   wrap = false,
   tooltip = null,

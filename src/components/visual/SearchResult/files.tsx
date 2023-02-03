@@ -1,8 +1,7 @@
-import { Tooltip } from '@material-ui/core';
-import Paper from '@material-ui/core/Paper';
-import TableContainer from '@material-ui/core/TableContainer';
-import ArchiveOutlinedIcon from '@material-ui/icons/ArchiveOutlined';
-import { AlertTitle, Skeleton } from '@material-ui/lab';
+import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
+import { AlertTitle, Skeleton, Tooltip } from '@mui/material';
+import Paper from '@mui/material/Paper';
+import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
 import 'moment/locale/fr';
@@ -92,9 +91,11 @@ const WrappedFilesTable: React.FC<FilesTableProps> = ({ fileResults, allowSort =
               >
                 <DivTableCell>
                   <Tooltip title={file.seen.last}>
-                    <Moment fromNow locale={i18n.language}>
-                      {file.seen.last}
-                    </Moment>
+                    <>
+                      <Moment fromNow locale={i18n.language}>
+                        {file.seen.last}
+                      </Moment>
+                    </>
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell>{file.seen.count}</DivTableCell>
@@ -127,7 +128,7 @@ const WrappedFilesTable: React.FC<FilesTableProps> = ({ fileResults, allowSort =
       </div>
     )
   ) : (
-    <Skeleton variant="rect" style={{ height: '6rem', borderRadius: '4px' }} />
+    <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
   );
 };
 

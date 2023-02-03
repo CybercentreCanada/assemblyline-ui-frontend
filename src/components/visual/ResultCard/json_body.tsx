@@ -1,4 +1,5 @@
-import { makeStyles, useTheme } from '@material-ui/core';
+import { useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import { default as React } from 'react';
 import ReactJson from 'react-json-view';
 
@@ -8,7 +9,7 @@ const useStyles = makeStyles(theme => ({
       backgroundColor: '#00000005',
       border: '1px solid #DDD'
     },
-    backgroundColor: theme.palette.type === 'dark' ? '#ffffff05' : '#00000005',
+    backgroundColor: theme.palette.mode === 'dark' ? '#ffffff05' : '#00000005',
     border: `1px solid ${theme.palette.divider}`,
     borderRadius: '4px',
     padding: '4px',
@@ -33,20 +34,20 @@ const WrappedJSONBody = ({ body, printable }) => {
     const jsonTheme = {
       base00: 'transparent', // Background
       base01: '#f1f1f1', // Edit key text
-      base02: theme.palette.type === 'dark' ? theme.palette.text.hint : theme.palette.divider, // Borders and DataType Background
+      base02: theme.palette.mode === 'dark' ? theme.palette.text.disabled : theme.palette.divider, // Borders and DataType Background
       base03: '#444', // Unused
-      base04: theme.palette.grey[theme.palette.type === 'dark' ? 700 : 400], // Object size and Add key border
-      base05: theme.palette.grey[theme.palette.type === 'dark' ? 700 : 700], // Undefined and Add key background
+      base04: theme.palette.grey[theme.palette.mode === 'dark' ? 700 : 400], // Object size and Add key border
+      base05: theme.palette.grey[theme.palette.mode === 'dark' ? 700 : 700], // Undefined and Add key background
       base06: '#444', // Unused
       base07: theme.palette.text.primary, // Brace, Key and Borders
       base08: theme.palette.text.secondary, // NaN
-      base09: theme.palette.type === 'dark' ? theme.palette.warning.light : theme.palette.warning.dark, // Strings and Icons
+      base09: theme.palette.mode === 'dark' ? theme.palette.warning.light : theme.palette.warning.dark, // Strings and Icons
       base0A: '#333', // Null, Regex and edit color
-      base0B: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark, // Float
-      base0C: theme.palette.type === 'dark' ? theme.palette.secondary.light : theme.palette.secondary.dark, // Array Key
-      base0D: theme.palette.type === 'dark' ? theme.palette.info.light : theme.palette.info.dark, // Date, function, expand icon
-      base0E: theme.palette.type === 'dark' ? theme.palette.info.light : theme.palette.info.dark, // Boolean
-      base0F: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark // Integer
+      base0B: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark, // Float
+      base0C: theme.palette.mode === 'dark' ? theme.palette.secondary.light : theme.palette.secondary.dark, // Array Key
+      base0D: theme.palette.mode === 'dark' ? theme.palette.info.light : theme.palette.info.dark, // Date, function, expand icon
+      base0E: theme.palette.mode === 'dark' ? theme.palette.info.light : theme.palette.info.dark, // Boolean
+      base0F: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark // Integer
     };
 
     return (
@@ -60,7 +61,7 @@ const WrappedJSONBody = ({ body, printable }) => {
         displayDataTypes={false}
         shouldCollapse={field => Object.keys(field.src).length > 25}
         style={{
-          backgroundColor: theme.palette.type === 'dark' ? '#FFFFFF05' : '#00000005',
+          backgroundColor: theme.palette.mode === 'dark' ? '#FFFFFF05' : '#00000005',
           border: `1px solid ${theme.palette.divider}`,
           borderRadius: '4px',
           padding: '4px',

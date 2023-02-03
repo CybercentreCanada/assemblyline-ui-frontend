@@ -1,5 +1,6 @@
-import { makeStyles, Theme, useTheme } from '@material-ui/core';
-import { Skeleton } from '@material-ui/lab';
+import { Theme, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import { Skeleton } from '@mui/material';
 import CustomChip, { CustomChipProps } from 'components/visual/CustomChip';
 import React from 'react';
 
@@ -23,12 +24,12 @@ type ChipListProps = {
 };
 
 const ChipSkeleton = () => (
-  <Skeleton variant="rect" height="24px" width="4rem" style={{ borderRadius: '16px', marginRight: '4px' }} />
+  <Skeleton variant="rectangular" height="24px" width="4rem" style={{ borderRadius: '16px', marginRight: '4px' }} />
 );
 
 const ChipSkeletonInline = () => (
   <Skeleton
-    variant="rect"
+    variant="rectangular"
     height="24px"
     width="4rem"
     style={{ borderRadius: '16px', marginRight: '4px', display: 'inline-block', verticalAlign: 'middle' }}
@@ -49,7 +50,7 @@ const ChipList: React.FC<ChipListProps> = ({ items }) => {
         : [...Array(3)].map((k, i) => (
             <Skeleton
               key={`chiplist-${i}`}
-              variant="rect"
+              variant="rectangular"
               height={theme.spacing(3)}
               width="4rem"
               style={{

@@ -1,17 +1,19 @@
-import { Grid, IconButton, InputBase, TablePagination, Tooltip } from '@material-ui/core';
-import Paper from '@material-ui/core/Paper';
-import { alpha, createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableSortLabel from '@material-ui/core/TableSortLabel';
-import FilterListIcon from '@material-ui/icons/FilterList';
-import FirstPageIcon from '@material-ui/icons/FirstPage';
-import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
-import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
-import LastPageIcon from '@material-ui/icons/LastPage';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
+import LastPageIcon from '@mui/icons-material/LastPage';
+import { Grid, IconButton, InputBase, TablePagination, Tooltip } from '@mui/material';
+import Paper from '@mui/material/Paper';
+import { alpha, Theme } from '@mui/material/styles';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableSortLabel from '@mui/material/TableSortLabel';
+import createStyles from '@mui/styles/createStyles';
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
-import Throttler from 'commons/addons/elements/utils/throttler';
-import PageHeader from 'commons/components/layout/pages/PageHeader';
+import Throttler from 'commons/addons/utils/throttler';
+import PageHeader from 'commons/components/pages/PageHeader';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -119,55 +121,63 @@ interface TablePaginationActionsProps {
   count: number;
   page: number;
   rowsPerPage: number;
-  onChangePage: (event: React.MouseEvent<HTMLButtonElement>, newPage: number) => void;
+  onPageChange: (event: React.MouseEvent<HTMLButtonElement>, newPage: number) => void;
 }
 
 function TablePaginationActions(props: TablePaginationActionsProps) {
   const { t } = useTranslation();
-  const { count, page, rowsPerPage, onChangePage } = props;
+  const { count, page, rowsPerPage, onPageChange } = props;
 
   const handleFirstPageButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    onChangePage(event, 0);
+    onPageChange(event, 0);
   };
 
   const handleBackButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    onChangePage(event, page - 1);
+    onPageChange(event, page - 1);
   };
 
   const handleNextButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    onChangePage(event, page + 1);
+    onPageChange(event, page + 1);
   };
 
   const handleLastPageButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    onChangePage(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
+    onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
   };
 
   return (
     <div style={{ flexShrink: 0, marginLeft: '20px' }}>
       <Tooltip title={t('pager.first')}>
         <span>
-          <IconButton onClick={handleFirstPageButtonClick} disabled={page === 0}>
+          <IconButton onClick={handleFirstPageButtonClick} disabled={page === 0} size="large">
             <FirstPageIcon />
           </IconButton>
         </span>
       </Tooltip>
       <Tooltip title={t('pager.back')}>
         <span>
-          <IconButton onClick={handleBackButtonClick} disabled={page === 0}>
+          <IconButton onClick={handleBackButtonClick} disabled={page === 0} size="large">
             <KeyboardArrowLeft />
           </IconButton>
         </span>
       </Tooltip>
       <Tooltip title={t('pager.next')}>
         <span>
-          <IconButton onClick={handleNextButtonClick} disabled={page >= Math.ceil(count / rowsPerPage) - 1}>
+          <IconButton
+            onClick={handleNextButtonClick}
+            disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+            size="large"
+          >
             <KeyboardArrowRight />
           </IconButton>
         </span>
       </Tooltip>
       <Tooltip title={t('pager.last')}>
         <span>
-          <IconButton onClick={handleLastPageButtonClick} disabled={page >= Math.ceil(count / rowsPerPage) - 1}>
+          <IconButton
+            onClick={handleLastPageButtonClick}
+            disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+            size="large"
+          >
             <LastPageIcon />
           </IconButton>
         </span>
@@ -214,7 +224,7 @@ const useToolbarStyles = makeStyles((theme: Theme) =>
     },
     inputInput: {
       padding: theme.spacing(1, 1, 1, 0),
-      paddingLeft: `calc(1em + ${theme.spacing(3)}px)`,
+      paddingLeft: `calc(1em + ${theme.spacing(3)})`,
       width: '100%'
     }
   })

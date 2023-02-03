@@ -8,14 +8,21 @@ This repo is dedicated for the new version off Assemblyline 4 UI. It uses React 
 
 Follow these simple command to get NodeJS installed
 
-    curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+    curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+    sudo apt-get install gcc g++ make
     sudo apt-get install -y nodejs
+
+### Install Yarn (NPM modules manager)
+
+    curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | sudo tee /usr/share/keyrings/yarnkey.gpg >/dev/null
+    echo "deb [signed-by=/usr/share/keyrings/yarnkey.gpg] https://dl.yarnpkg.com/debian stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+    sudo apt-get update && sudo apt-get install yarn
 
 ### Install NPM dependencies
 
 Go to your `assemblyline-ui-frontend` directory and type:
 
-    npm install
+    yarn install
 
 ### Install docker (Ubuntu)
 
@@ -51,11 +58,12 @@ For reference, here are the instructions on Docker’s website: <https://docs.do
 
 ### Setup Webpack for debugging behing a proxy
 
-Create a file named `.env.local` at the root of the assemblyline-ui-frontend directory.
+Create a file named `.env.local` at the root of the assemblyline-ui-frontend directory with the following content:
 
-The file should only contain the following where `<YOUR_IP>` is replaced by your dev computer IP.
-
-    HOST=<YOUR_IP>.nip.io
+    HOST=0.0.0.0
+    WDS_SOCKET_PORT=443
+    HTTPS=true
+    BROWSER=none
 
 ### Setup docker compose environment
 

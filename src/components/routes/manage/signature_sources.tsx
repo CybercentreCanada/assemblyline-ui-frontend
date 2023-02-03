@@ -1,3 +1,11 @@
+import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
+import CardMembershipOutlinedIcon from '@mui/icons-material/CardMembershipOutlined';
+import DnsOutlinedIcon from '@mui/icons-material/DnsOutlined';
+import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
+import NoEncryptionOutlinedIcon from '@mui/icons-material/NoEncryptionOutlined';
+import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
+import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
+import VpnKeyOutlinedIcon from '@mui/icons-material/VpnKeyOutlined';
 import {
   Button,
   Card,
@@ -6,29 +14,23 @@ import {
   Divider,
   Grid,
   IconButton,
-  makeStyles,
+  Skeleton,
   Tooltip,
   Typography,
   useMediaQuery,
   useTheme
-} from '@material-ui/core';
-import AddCircleOutlineOutlinedIcon from '@material-ui/icons/AddCircleOutlineOutlined';
-import CardMembershipOutlinedIcon from '@material-ui/icons/CardMembershipOutlined';
-import DnsOutlinedIcon from '@material-ui/icons/DnsOutlined';
-import { RouterPrompt } from 'components/visual/RouterPrompt';
-import FingerprintOutlinedIcon from '@material-ui/icons/FingerprintOutlined';
-import NoEncryptionOutlinedIcon from '@material-ui/icons/NoEncryptionOutlined';
-import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
-import SystemUpdateAltIcon from '@material-ui/icons/SystemUpdateAlt';
-import VpnKeyOutlinedIcon from '@material-ui/icons/VpnKeyOutlined';
-import { Skeleton } from '@material-ui/lab';
-import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
+import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import { CustomUser } from 'components/hooks/useMyUser';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
+import { RouterPrompt } from 'components/visual/RouterPrompt';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DiGitBranch } from 'react-icons/di';
@@ -57,7 +59,7 @@ const useStyles = makeStyles(theme => ({
     overflow: 'auto',
     wordBreak: 'break-word',
     '&:hover': {
-      backgroundColor: theme.palette.type === 'dark' ? '#ffffff10' : '#00000005',
+      backgroundColor: theme.palette.mode === 'dark' ? '#ffffff10' : '#00000005',
       cursor: 'pointer'
     }
   },
@@ -67,7 +69,7 @@ const useStyles = makeStyles(theme => ({
     padding: '8px',
     margin: '0.25rem 0',
     overflow: 'auto',
-    backgroundColor: theme.palette.type === 'dark' ? '#ff000017' : '#FFE4E4',
+    backgroundColor: theme.palette.mode === 'dark' ? '#ff000017' : '#FFE4E4',
     wordBreak: 'break-word',
     '&:hover': {
       cursor: 'pointer'
@@ -235,12 +237,13 @@ const WrappedSourceDetailDrawer = ({ service, base, close, generatesSignatures }
                   <Tooltip title={t('view_signatures')}>
                     <IconButton
                       style={{
-                        color: theme.palette.type === 'dark' ? '#F' : '#0'
+                        color: theme.palette.mode === 'dark' ? '#F' : '#0'
                       }}
                       component={Link}
                       to={`/manage/signatures/?query=${encodeURIComponent(
                         `type:${service.toLowerCase()} AND source:${source.name}`
                       )}`}
+                      size="large"
                     >
                       <FingerprintOutlinedIcon />
                     </IconButton>
@@ -252,12 +255,13 @@ const WrappedSourceDetailDrawer = ({ service, base, close, generatesSignatures }
                       style={{
                         color: isSourceUpdating(source)
                           ? theme.palette.action.disabled
-                          : theme.palette.type === 'dark'
+                          : theme.palette.mode === 'dark'
                           ? theme.palette.info.light
                           : theme.palette.info.dark
                       }}
                       disabled={isSourceUpdating(source)}
                       onClick={triggerSourceUpdate}
+                      size="large"
                     >
                       <SystemUpdateAltIcon />
                     </IconButton>
@@ -266,9 +270,10 @@ const WrappedSourceDetailDrawer = ({ service, base, close, generatesSignatures }
                 <Tooltip title={t('delete')}>
                   <IconButton
                     style={{
-                      color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                      color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
                     }}
                     onClick={deleteSource}
+                    size="large"
                   >
                     <RemoveCircleOutlineOutlinedIcon />
                   </IconButton>
@@ -356,11 +361,12 @@ export const SourceCard = ({ source, onClick, service, generatesSignatures, show
                         `type:${service.toLowerCase()} AND source:${source.name}`
                       )}`}
                       style={{
-                        color: theme.palette.type === 'dark' ? '#FFFFFF' : '#000000'
+                        color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#000000'
                       }}
                       onClick={e => {
                         e.stopPropagation();
                       }}
+                      size="large"
                     >
                       <FingerprintOutlinedIcon />
                     </IconButton>
@@ -372,12 +378,13 @@ export const SourceCard = ({ source, onClick, service, generatesSignatures, show
                     style={{
                       color: isSourceUpdating(source)
                         ? theme.palette.action.disabled
-                        : theme.palette.type === 'dark'
+                        : theme.palette.mode === 'dark'
                         ? theme.palette.info.light
                         : theme.palette.info.dark
                     }}
                     disabled={isSourceUpdating(source)}
                     onClick={triggerSourceUpdate}
+                    size="large"
                   >
                     <SystemUpdateAltIcon />
                   </IconButton>
@@ -398,9 +405,11 @@ export const SourceCard = ({ source, onClick, service, generatesSignatures, show
               <div>
                 <span className={classes.card_caption}>{t('update.label.last_successful')}:&nbsp;</span>
                 <Tooltip title={source.status.last_successful_update}>
-                  <Moment className={classes.card_caption} fromNow locale={i18n.language}>
-                    {source.status.last_successful_update}
-                  </Moment>
+                  <>
+                    <Moment className={classes.card_caption} fromNow locale={i18n.language}>
+                      {source.status.last_successful_update}
+                    </Moment>
+                  </>
                 </Tooltip>
               </div>
               <Tooltip title={`${source.status.message} @ ${source.status.ts}`}>
@@ -513,10 +522,11 @@ const ServiceDetail = ({ service, sources, generatesSignatures }) => {
             <Tooltip title={t('add_source')}>
               <IconButton
                 style={{
-                  color: theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark,
+                  color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark,
                   margin: '-4px 0'
                 }}
                 onClick={() => openDrawer(service, null)}
+                size="large"
               >
                 <AddCircleOutlineOutlinedIcon />
               </IconButton>
@@ -527,8 +537,9 @@ const ServiceDetail = ({ service, sources, generatesSignatures }) => {
                   component={Link}
                   to={`/manage/signatures/?query=${encodeURIComponent(`type:${service.toLowerCase()}`)}`}
                   style={{
-                    color: theme.palette.type === 'dark' ? '#FFFFFF' : '#000000'
+                    color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#000000'
                   }}
+                  size="large"
                 >
                   <FingerprintOutlinedIcon />
                 </IconButton>
@@ -540,12 +551,13 @@ const ServiceDetail = ({ service, sources, generatesSignatures }) => {
                   style={{
                     color: sources.some(isSourceUpdating)
                       ? theme.palette.action.disabled
-                      : theme.palette.type === 'dark'
+                      : theme.palette.mode === 'dark'
                       ? theme.palette.info.light
                       : theme.palette.info.dark
                   }}
                   disabled={sources.some(isSourceUpdating)}
                   onClick={triggerSourceUpdateAll}
+                  size="large"
                 >
                   <SystemUpdateAltIcon />
                 </IconButton>
@@ -582,7 +594,7 @@ const ServiceDetail = ({ service, sources, generatesSignatures }) => {
 export default function SignatureSources() {
   const { t } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
-  const { user: currentUser } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
   const [sources, setSources] = useState(null);
   const { apiCall } = useMyAPI();
 
@@ -635,7 +647,11 @@ export default function SignatureSources() {
                   <Skeleton />
                 </Typography>
                 <Divider />
-                <Skeleton variant="rect" height="6rem" style={{ marginTop: theme.spacing(2), borderRadius: '4px' }} />
+                <Skeleton
+                  variant="rectangular"
+                  height="6rem"
+                  style={{ marginTop: theme.spacing(2), borderRadius: '4px' }}
+                />
               </div>
             ))}
       </div>

@@ -1,7 +1,9 @@
-import { FormControl, Grid, Tooltip, Typography, useMediaQuery, useTheme } from '@material-ui/core';
-import MenuItem from '@material-ui/core/MenuItem';
-import Select from '@material-ui/core/Select';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import { FormControl, Grid, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
+import MenuItem from '@mui/material/MenuItem';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import { Theme } from '@mui/material/styles';
+import createStyles from '@mui/styles/createStyles';
+import makeStyles from '@mui/styles/makeStyles';
 import { default as React, memo, PropsWithChildren, useState } from 'react';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -30,23 +32,16 @@ const useStyles = makeStyles((theme: Theme) =>
 export type SelectFieldProps = {
   label?: string;
   description?: string;
-  items?: Array<{
-    value: number;
-    label: string;
-  }>;
+  size?: 'small' | 'medium';
+  items?: Array<{ value: number; label: string }>;
   value?: number;
-  onChange?: (
-    event: React.ChangeEvent<{
-      name?: string;
-      value: unknown;
-    }>,
-    child: React.ReactNode
-  ) => void;
+  onChange?: (event: SelectChangeEvent<number>, child: React.ReactNode) => void;
 };
 
 export const WrappedSelectField = ({
   label = '',
   description = '',
+  size = 'small',
   items = [],
   value = null,
   onChange = () => null
@@ -66,7 +61,7 @@ export const WrappedSelectField = ({
         </Tooltip>
       </Grid>
       <Grid item sm={8} xs={12} style={{ textAlign: 'right' }}>
-        <FormControl style={{ width: '100%' }}>
+        <FormControl style={{ width: '100%' }} size={size}>
           <Select
             className={classes.select}
             open={open}

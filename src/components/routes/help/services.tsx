@@ -1,15 +1,16 @@
-import { Card, CardHeader, Grid, Typography, useTheme } from '@material-ui/core';
-import Skeleton from '@material-ui/lab/Skeleton';
-import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
+import { Card, CardHeader, Grid, Typography, useTheme } from '@mui/material';
+import Skeleton from '@mui/material/Skeleton';
+import PageFullWidth from 'commons/components/pages/PageFullWidth';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import CustomChip from 'components/visual/CustomChip';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 function ServiceCard({ service }) {
   const { t } = useTranslation(['helpServices']);
   const theme = useTheme();
-  const isDark = theme.palette.type === 'dark';
+  const isDark = theme.palette.mode === 'dark';
   const minCardHeight = '240px';
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
@@ -78,7 +79,7 @@ export default function Services() {
   const [services, setServices] = useState(null);
   const minCardHeight = '240px';
 
-  useEffect(() => {
+  useEffectOnce(() => {
     // Load all services on start
     apiCall({
       url: '/api/v4/service/all/',
@@ -86,8 +87,7 @@ export default function Services() {
         setServices(api_data.api_response);
       }
     });
-    // eslint-disable-next-line
-  }, []);
+  });
   return (
     <PageFullWidth margin={4}>
       <div style={{ marginBottom: theme.spacing(4) }}>
@@ -110,7 +110,7 @@ export default function Services() {
         <Grid container spacing={2}>
           {[...Array(8)].map((_, i) => (
             <Grid key={i} item xs={12} md={6} xl={4}>
-              <Skeleton variant="rect" style={{ height: minCardHeight }} />
+              <Skeleton variant="rectangular" style={{ height: minCardHeight }} />
             </Grid>
           ))}
         </Grid>

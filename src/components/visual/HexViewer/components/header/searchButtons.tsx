@@ -1,7 +1,7 @@
-import { makeStyles } from '@material-ui/core';
-import ArrowDownward from '@material-ui/icons/ArrowDownward';
-import ArrowUpward from '@material-ui/icons/ArrowUpward';
-import ClearIcon from '@material-ui/icons/Clear';
+import ArrowDownward from '@mui/icons-material/ArrowDownward';
+import ArrowUpward from '@mui/icons-material/ArrowUpward';
+import ClearIcon from '@mui/icons-material/Clear';
+import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { StoreProps, TooltipIconButton, useDispatch } from '../..';

@@ -1,4 +1,5 @@
-import { Box, Collapse, makeStyles } from '@material-ui/core';
+import { Box, Collapse } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import ExtractedFile, { ExtractedFiles } from './extracted_file';

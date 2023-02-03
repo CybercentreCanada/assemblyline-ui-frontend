@@ -12,7 +12,7 @@ type SignatureStatusProps = {
   status: 'DEPLOYED' | 'NOISY' | 'DISABLED';
   fullWidth?: boolean;
   size?: 'tiny' | 'small' | 'medium';
-  variant?: 'default' | 'outlined';
+  variant?: 'outlined' | 'filled';
   onClick?: () => void;
 };
 
@@ -21,7 +21,7 @@ const WrappedSignatureStatus: React.FC<SignatureStatusProps> = ({
   fullWidth = true,
   onClick = null,
   size = 'small',
-  variant = 'default'
+  variant = 'filled'
 }) => {
   const { t } = useTranslation();
 

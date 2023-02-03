@@ -1,4 +1,4 @@
-import useClipboard from 'commons/components/hooks/useClipboard';
+import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React, { useCallback } from 'react';
 import {

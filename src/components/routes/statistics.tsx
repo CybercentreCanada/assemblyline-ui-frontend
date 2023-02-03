@@ -1,9 +1,9 @@
-import PageCenter from 'commons/components/layout/pages/PageCenter';
-import useMyLayout from 'components/hooks/useMyLayout';
+import useAppConfigs from 'commons/components/app/hooks/useAppConfigs';
+import PageCenter from 'commons/components/pages/PageCenter';
 import LinkGrid from 'components/layout/linkgrid';
 
 export default function Statistics() {
-  const layout = useMyLayout();
+  const { preferences: layout } = useAppConfigs();
   let items = [];
   for (const item of layout.leftnav.elements) {
     if (item.type === 'group' && item.element.id === 'stats') {

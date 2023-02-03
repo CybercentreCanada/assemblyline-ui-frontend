@@ -1,3 +1,8 @@
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined';
+import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
+import RestoreOutlinedIcon from '@mui/icons-material/RestoreOutlined';
+import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
 import {
   Button,
   Dialog,
@@ -6,20 +11,16 @@ import {
   DialogTitle,
   Grid,
   IconButton,
+  Skeleton,
   TextField,
   Tooltip,
   Typography,
   useMediaQuery,
   useTheme
-} from '@material-ui/core';
-import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
-import CloudDownloadOutlinedIcon from '@material-ui/icons/CloudDownloadOutlined';
-import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
-import RestoreOutlinedIcon from '@material-ui/icons/RestoreOutlined';
-import SystemUpdateAltIcon from '@material-ui/icons/SystemUpdateAlt';
-import { Skeleton } from '@material-ui/lab';
-import useUser from 'commons/components/hooks/useAppUser';
-import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
+} from '@mui/material';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
+import PageFullWidth from 'commons/components/pages/PageFullWidth';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -34,7 +35,7 @@ import { JSONFeedItem, useNotificationFeed } from 'components/visual/ServiceMana
 import 'moment/locale/fr';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Redirect } from 'react-router-dom';
+import { Navigate } from 'react-router';
 
 export default function Services() {
   const { t } = useTranslation(['adminServices']);
@@ -49,7 +50,7 @@ export default function Services() {
   const { showSuccessMessage, showInfoMessage, showErrorMessage } = useMySnackbar();
   const theme = useTheme();
   const { apiCall } = useMyAPI();
-  const { user: currentUser } = useUser<CustomUser>();
+  const { user: currentUser } = useAppUser<CustomUser>();
   const { setGlobalDrawer, closeGlobalDrawer } = useDrawer();
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
   const { configuration } = useALContext();
@@ -136,7 +137,7 @@ export default function Services() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
+  useEffectOnce(() => {
     if (currentUser.is_admin) {
       reload();
       pollInstalling(true);
@@ -145,8 +146,7 @@ export default function Services() {
     return () => {
       window.removeEventListener('reloadServicesEvent', reload);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   const onUpdate = useCallback(
     (svc, updateData) => {
@@ -217,8 +217,7 @@ export default function Services() {
     (service_name: string) => {
       setGlobalDrawer(<Service name={service_name} onDeleted={onDeleted} onUpdated={onUpdated} />);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [onDeleted, onUpdated, setGlobalDrawer]
   );
 
   useEffect(() => {
@@ -350,9 +349,10 @@ export default function Services() {
             <Tooltip title={t('add')}>
               <IconButton
                 style={{
-                  color: theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark
+                  color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
                 }}
                 onClick={() => setOpen(true)}
+                size="large"
               >
                 <AddCircleOutlineIcon />
               </IconButton>
@@ -371,6 +371,7 @@ export default function Services() {
                   disabled={
                     !updates || !Object.values(updates).some((srv: any) => srv.update_available && !srv.updating)
                   }
+                  size="large"
                 >
                   <SystemUpdateAltIcon />
                 </IconButton>
@@ -394,6 +395,7 @@ export default function Services() {
                     availableServices.length === 0 ||
                     availableServices.every(s => installingServices?.includes(s?.summary))
                   }
+                  size="large"
                 >
                   <CloudDownloadOutlinedIcon />
                 </IconButton>
@@ -401,7 +403,7 @@ export default function Services() {
             </Tooltip>
             <FileDownloader icon={<GetAppOutlinedIcon />} link={`/api/v4/service/backup/`} tooltip={t('backup')} />
             <Tooltip title={t('restore')}>
-              <IconButton onClick={() => setOpenRestore(true)}>
+              <IconButton onClick={() => setOpenRestore(true)} size="large">
                 <RestoreOutlinedIcon />
               </IconButton>
             </Tooltip>
@@ -444,6 +446,6 @@ export default function Services() {
       </div>
     </PageFullWidth>
   ) : (
-    <Redirect to="/forbidden" />
+    <Navigate to="/forbidden" replace />
   );
 }

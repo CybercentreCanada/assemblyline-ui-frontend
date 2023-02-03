@@ -1,13 +1,16 @@
-import { makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
-import Typography from '@material-ui/core/Typography';
-import BlockOutlinedIcon from '@material-ui/icons/BlockOutlined';
-import LabelOutlinedIcon from '@material-ui/icons/LabelOutlined';
-import PersonOutlineOutlinedIcon from '@material-ui/icons/PersonOutlineOutlined';
-import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
-import PageHeader from 'commons/components/layout/pages/PageHeader';
+import BlockOutlinedIcon from '@mui/icons-material/BlockOutlined';
+import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
+import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
+import { useMediaQuery, useTheme } from '@mui/material';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
+import PageFullWidth from 'commons/components/pages/PageFullWidth';
+import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
+import { CustomUser } from 'components/hooks/useMyUser';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
@@ -15,9 +18,10 @@ import SearchPager from 'components/visual/SearchPager';
 import SafelistTable from 'components/visual/SearchResult/safelist';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import 'moment/locale/fr';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import { useLocation } from 'react-router-dom';
 import ForbiddenPage from '../403';
 import SafelistDetail from './safelist_detail';
 
@@ -51,16 +55,17 @@ export default function Safelist() {
   const { t } = useTranslation(['manageSafelist']);
   const [pageSize] = useState(PAGE_SIZE);
   const [searching, setSearching] = useState(false);
-  const { indexes, user: currentUser } = useALContext();
+  const { indexes } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
   const [safelistResults, setSafelistResults] = useState<SearchResults>(null);
   const location = useLocation();
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
-  const history = useHistory();
+  const navigate = useNavigate();
   const theme = useTheme();
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
   const { apiCall } = useMyAPI();
   const classes = useStyles();
-  const { closeGlobalDrawer, setGlobalDrawer, globalDrawer } = useDrawer();
+  const { closeGlobalDrawer, setGlobalDrawer, globalDrawerOpened } = useDrawer();
   const [suggestions] = useState(
     indexes.safelist
       ? [...Object.keys(indexes.safelist).filter(name => indexes.safelist[name].indexed), ...DEFAULT_SUGGESTION]
@@ -73,11 +78,11 @@ export default function Safelist() {
   }, [location.pathname, location.search, pageSize]);
 
   useEffect(() => {
-    if (safelistResults !== null && globalDrawer === null && location.hash) {
-      history.push(`${location.pathname}${location.search ? location.search : ''}`);
+    if (safelistResults !== null && !globalDrawerOpened && location.hash) {
+      navigate(`${location.pathname}${location.search ? location.search : ''}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalDrawer]);
+  }, [globalDrawerOpened]);
 
   useEffect(() => {
     if (location.hash) {
@@ -134,7 +139,7 @@ export default function Safelist() {
 
   const onClear = useCallback(
     () => {
-      history.push(location.pathname);
+      navigate(location.pathname);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [location.pathname]
@@ -144,8 +149,8 @@ export default function Safelist() {
     () => {
       if (filterValue.current !== '') {
         query.set('query', filterValue.current);
-        // history.push(`${location.pathname}?${query.toString()}`);
-        history.push(`${location.pathname}?${query.getDeltaString()}${location.hash ? location.hash : ''}`);
+        // navigate(`${location.pathname}?${query.toString()}`);
+        navigate(`${location.pathname}?${query.getDeltaString()}${location.hash ? location.hash : ''}`);
       } else {
         onClear();
       }
@@ -160,7 +165,7 @@ export default function Safelist() {
 
   const setSafelistID = useCallback(
     (wf_id: string) => {
-      history.push(`${location.pathname}${location.search ? location.search : ''}#${wf_id}`);
+      navigate(`${location.pathname}${location.search ? location.search : ''}#${wf_id}`);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [location.search]
@@ -189,7 +194,7 @@ export default function Safelist() {
                 props: {
                   onClick: () => {
                     query.set('query', 'sources.type:user');
-                    history.push(`${location.pathname}?${query.getDeltaString()}`);
+                    navigate(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
               },
@@ -199,7 +204,7 @@ export default function Safelist() {
                 props: {
                   onClick: () => {
                     query.set('query', 'type:tag');
-                    history.push(`${location.pathname}?${query.getDeltaString()}`);
+                    navigate(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
               },
@@ -209,7 +214,7 @@ export default function Safelist() {
                 props: {
                   onClick: () => {
                     query.set('query', 'enabled:false');
-                    history.push(`${location.pathname}?${query.getDeltaString()}`);
+                    navigate(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
               }
