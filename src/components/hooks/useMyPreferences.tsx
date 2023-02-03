@@ -389,6 +389,10 @@ const useMyPreferences = () => {
 
   return useMemo(
     (): AppPreferenceConfigs => ({
+      allowBreadcrumbs: true,
+      allowShowSafeResults: true,
+      allowQuickSearch: true,
+      allowReset: false,
       appName: 'Assemblyline',
       appLink: '/',
       appIconDark: AL_DARK_LOGO,
@@ -396,31 +400,26 @@ const useMyPreferences = () => {
       bannerDark: AL_DARK_BANNER,
       bannerLight: AL_LIGHT_BANNER,
       defaultAutoHideAppbar: false,
-      defaultLayout: 'side',
       defaultDrawerOpen: false,
+      defaultLayout: 'side',
       defaultShowBreadcrumbs: true,
       defaultShowQuickSearch: true,
-      allowShowSafeResults: true,
-      allowQuickSearch: true,
-      allowReset: false,
-      allowGravatar: false,
-      avatarD: 'robohash',
-      topnav: {
-        apps: [],
-        userMenu: USER_MENU_ITEMS,
-        userMenuI18nKey: 'usermenu',
-        userMenuType: 'icon',
-        adminMenu: [],
-        adminMenuI18nKey: 'adminmenu',
-        right: TOP_NAV_RIGHT,
-
-        quickSearchURI: '/search',
-        quickSearchParam: 'query'
-      },
       leftnav: {
         width: 240,
         elements: LEFT_MENU_ITEMS,
         hideNestedIcons: true
+      },
+      topnav: {
+        adminMenu: [],
+        adminMenuI18nKey: 'adminmenu',
+        apps: [],
+        quickSearchURI: '/search',
+        quickSearchParam: 'query',
+        right: TOP_NAV_RIGHT,
+        themeSelectionMode: 'profile',
+        userMenu: USER_MENU_ITEMS,
+        userMenuI18nKey: 'usermenu',
+        userMenuType: 'icon'
       }
     }),
     [AL_DARK_LOGO, AL_LIGHT_LOGO, AL_DARK_BANNER, AL_LIGHT_BANNER, USER_MENU_ITEMS, TOP_NAV_RIGHT, LEFT_MENU_ITEMS]
