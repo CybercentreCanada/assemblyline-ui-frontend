@@ -6,6 +6,7 @@ import { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AppLeftNavGroup } from '../app/AppConfigs';
 import useAppLeftNav from '../app/hooks/useAppLeftNav';
+import useAppUser from '../app/hooks/useAppUser';
 
 interface LeftNavGroupProps {
   group: AppLeftNavGroup;
@@ -16,6 +17,7 @@ const LeftNavGroup = ({ group, onItemClick }: LeftNavGroupProps) => {
   const leftnav = useAppLeftNav();
   const [popoverTarget, setPopoverTarget] = useState<(EventTarget & Element) | undefined>();
   const [collapseOpen, setCollapseOpen] = useState(false);
+  const { validateProps } = useAppUser();
 
   const handleClick = useCallback(
     (event: React.MouseEvent) => {
@@ -36,7 +38,7 @@ const LeftNavGroup = ({ group, onItemClick }: LeftNavGroupProps) => {
     }
   }, [leftnav.open, collapseOpen]);
 
-  return (
+  return validateProps(group.userPropValidators) ? (
     <div>
       <GroupListItem group={group} leftNavOpen={leftnav.open} collapsed={collapseOpen} onClick={handleClick} />
       <Collapse in={collapseOpen} timeout="auto" unmountOnExit>
@@ -67,7 +69,7 @@ const LeftNavGroup = ({ group, onItemClick }: LeftNavGroupProps) => {
         </List>
       </Popover>
     </div>
-  );
+  ) : null;
 };
 
 const GroupListItem = memo(

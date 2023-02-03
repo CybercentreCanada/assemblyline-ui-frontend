@@ -148,6 +148,7 @@ export type AppLeftNavGroup = {
   title?: string; // The text/label to use when rendering the group header if not using i18nKey (for some reason).
   icon: React.ReactElement<any>; // The icon to render on the left of the group header's 'text'
   items: AppLeftNavItem[]; // A list of items to render for this group.
+  userPropValidators?: AppUserValidatedProp[]; // The list of user props to assert before rendering the item.
 };
 
 // Specification interface for an item provided to the app swithcer.
