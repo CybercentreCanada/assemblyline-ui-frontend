@@ -3,8 +3,8 @@ FROM node:18-alpine AS builder
 WORKDIR /tmp
 COPY . ./frontend/
 WORKDIR /tmp/frontend
-RUN npm ci --prod --silent
-RUN npm run build
+RUN yarn install --prod --silent
+RUN yarn run build
 
 
 # Production container creation
