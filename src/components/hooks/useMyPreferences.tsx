@@ -395,10 +395,15 @@ const useMyPreferences = () => {
       appIconLight: AL_LIGHT_LOGO,
       bannerDark: AL_DARK_BANNER,
       bannerLight: AL_LIGHT_BANNER,
+      defaultAutoHideAppbar: false,
+      defaultLayout: 'side',
+      defaultDrawerOpen: false,
+      defaultShowBreadcrumbs: true,
       defaultShowQuickSearch: true,
       allowShowSafeResults: true,
       allowQuickSearch: true,
       allowReset: false,
+      allowGravatar: false,
       avatarD: 'robohash',
       topnav: {
         apps: [],
@@ -407,7 +412,6 @@ const useMyPreferences = () => {
         userMenuType: 'icon',
         adminMenu: [],
         adminMenuI18nKey: 'adminmenu',
-        // leftAfterBreadcrumbs: <CreateButton />,
         right: TOP_NAV_RIGHT,
 
         quickSearchURI: '/search',
