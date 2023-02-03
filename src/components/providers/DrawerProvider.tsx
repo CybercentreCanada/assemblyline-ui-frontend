@@ -1,10 +1,10 @@
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import { Drawer, IconButton, useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
+export const GD_EVENT_PREVENTED = 'GlobalDrawerClose.Prevented';
+export const GD_EVENT_PROCEED = 'GlobalDrawerClose.Proceed';
 const XLWidth = '45vw';
 const LGWidth = '85%';
 const MDWidth = '85%';
@@ -72,13 +72,11 @@ export const DrawerContext = React.createContext<DrawerContextProps>(null);
 
 function DrawerProvider(props: DrawerProviderProps) {
   const { children } = props;
-  const { t } = useTranslation();
   const [globalDrawer, setGlobalDrawerState] = useState(null);
   const [globalDrawerOpened, setGlobalDrawerOpened] = useState(false);
   const [drawerClosePrompt, setDrawerClosePrompt] = useState(false);
   const [nextDrawer, setNextDrawer] = useState(null);
   const theme = useTheme();
-  const [open, setOpen] = useState(false);
   const classes = useStyles();
   const isMD = useMediaQuery(theme.breakpoints.only('md'));
   const isLG = useMediaQuery(theme.breakpoints.only('lg'));
@@ -90,7 +88,7 @@ function DrawerProvider(props: DrawerProviderProps) {
     newDrawer => {
       if (drawerClosePrompt) {
         setNextDrawer(newDrawer);
-        setOpen(true);
+        window.dispatchEvent(new CustomEvent(GD_EVENT_PREVENTED));
       } else {
         setNextDrawer(null);
         setGlobalDrawerState(newDrawer);
@@ -98,6 +96,17 @@ function DrawerProvider(props: DrawerProviderProps) {
     },
     [drawerClosePrompt]
   );
+
+  useEffect(() => {
+    function proceedWithDrawerChange(event: CustomEvent) {
+      setNextDrawer(null);
+      setGlobalDrawerState(nextDrawer);
+    }
+    window.addEventListener(GD_EVENT_PROCEED, proceedWithDrawerChange);
+    return () => {
+      window.removeEventListener(GD_EVENT_PROCEED, proceedWithDrawerChange);
+    };
+  }, [nextDrawer]);
 
   useEffect(() => {
     setGlobalDrawerOpened(globalDrawer !== null);
@@ -122,18 +131,6 @@ function DrawerProvider(props: DrawerProviderProps) {
         globalDrawerOpened
       }}
     >
-      <ConfirmationDialog
-        title={t('router_prompt_title')}
-        open={open && globalDrawerOpened}
-        handleAccept={() => {
-          setOpen(false);
-          setGlobalDrawerState(nextDrawer);
-        }}
-        acceptText={t('router_prompt_accept')}
-        handleClose={() => setOpen(false)}
-        cancelText={t('router_prompt_cancel')}
-        text={t('router_prompt_text')}
-      />
       <div className={classes.appMain} id="globalDrawer">
         {useMemo(
           () => (

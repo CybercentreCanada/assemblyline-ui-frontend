@@ -1,15 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useBlocker } from 'components/hooks/useBlocker';
 import useDrawer from 'components/hooks/useDrawer';
+import { GD_EVENT_PREVENTED, GD_EVENT_PROCEED } from 'components/providers/DrawerProvider';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-// import { unstable_useBlocker as useBlocker } from 'react-router';
 import ConfirmationDialog from './ConfirmationDialog';
-
-// IMPORTANT, the URL blocker does not work with the current BrowserRouter
-// This is only partially working, the drawer will be prevented from closing and
-// the page will be prevented from being refreshed but you can still use the
-// Router to navigate away
 
 export function RouterPrompt(props) {
   const {
@@ -24,59 +18,81 @@ export function RouterPrompt(props) {
   const { t } = useTranslation();
   const { setDrawerClosePrompt } = useDrawer();
   const [open, setOpen] = useState(false);
+  const [cancel, setCancel] = useState(false);
   const [currentTX, setCurrentTX] = useState(null);
 
-  // Blockers for the reload even and the drawer getting close or re-used
+  // Cancel blocking
   const unblock = useCallback(() => {
+    setCancel(true);
     setDrawerClosePrompt(false);
     window.onbeforeunload = undefined;
   }, [setDrawerClosePrompt]);
 
+  // Block history transactions
+  const blocker = useCallback(tx => {
+    setCurrentTX(tx);
+    setOpen(true);
+  }, []);
+
+  // When condition is met, prevent drawer from being closed and prevent page to be reloaded
   useEffect(() => {
-    if (when) {
-      // Prevent drawer from being closed
+    if (when && !cancel) {
       setDrawerClosePrompt(true);
-      // Prevent page to be reload
       window.onbeforeunload = () => true;
     }
-  }, [setDrawerClosePrompt, unblock, when]);
+  }, [setDrawerClosePrompt, when, cancel]);
 
+  // Receive drawer close prevented messages
+  useEffect(() => {
+    function showDialog(event: CustomEvent) {
+      if (when) {
+        setCurrentTX(null);
+        setOpen(true);
+      }
+    }
+
+    window.addEventListener(GD_EVENT_PREVENTED, showDialog);
+    return () => {
+      window.removeEventListener(GD_EVENT_PREVENTED, showDialog);
+    };
+  }, [when]);
+
+  // unblock all on un-mount
   useEffect(() => {
     return () => {
       unblock();
     };
   }, [unblock]);
 
-  // Blocker for the history
-  const blocker = useCallback(tx => {
-    setCurrentTX(tx);
-    setOpen(true);
-  }, []);
+  // Setup route blocker
+  useBlocker(blocker, when && !cancel);
 
-  useBlocker(blocker, when);
+  // Unblock and allow transaction if successful
+  const routeOnSuccess = useCallback(
+    canRoute => {
+      if (canRoute) {
+        unblock();
+        window.dispatchEvent(new CustomEvent(GD_EVENT_PROCEED));
+        if (currentTX) currentTX.retry();
+      }
+    },
+    [currentTX, unblock]
+  );
 
   // Dialog actions
   const handleAccept = useCallback(async () => {
     if (onAccept) {
-      const canRoute = await Promise.resolve(onAccept());
-      if (canRoute) {
-        if (currentTX) currentTX.retry();
-        unblock();
-      }
+      routeOnSuccess(await Promise.resolve(onAccept()));
     }
     setOpen(false);
-  }, [currentTX, onAccept, unblock]);
+  }, [onAccept, routeOnSuccess]);
 
   const handleCancel = useCallback(async () => {
     if (onCancel) {
-      const canRoute = await Promise.resolve(onCancel());
-      if (canRoute) {
-        if (currentTX) currentTX.retry();
-        unblock();
-      }
+      routeOnSuccess(await Promise.resolve(onCancel()));
     }
     setOpen(false);
-  }, [currentTX, onCancel, unblock]);
+  }, [onCancel, routeOnSuccess]);
 
   return open ? (
     <ConfirmationDialog
