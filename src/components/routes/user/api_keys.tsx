@@ -16,7 +16,7 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-// import FormControl from '@mui/material/FormControl';
+import FormControl from '@mui/material/FormControl';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -284,15 +284,17 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
           />
           <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
             <div style={{ alignSelf: 'center', flexGrow: 2 }}>
-              <Select id="priv" value={tempKeyPriv} onChange={handleSelectChange} variant="outlined" margin="dense">
-                <MenuItem value="READ">{t('apikeys.r_token')}</MenuItem>
-                <MenuItem value="READ_WRITE">{t('apikeys.rw_token')}</MenuItem>
-                <MenuItem value="WRITE">{t('apikeys.w_token')}</MenuItem>
-                {configuration.auth.allow_extended_apikeys && (
-                  <MenuItem value="EXTENDED">{t('apikeys.e_token')}</MenuItem>
-                )}
-                <MenuItem value="CUSTOM">{t('apikeys.c_token')}</MenuItem>
-              </Select>
+              <FormControl size="small">
+                <Select id="priv" value={tempKeyPriv} onChange={handleSelectChange} variant="outlined">
+                  <MenuItem value="READ">{t('apikeys.r_token')}</MenuItem>
+                  <MenuItem value="READ_WRITE">{t('apikeys.rw_token')}</MenuItem>
+                  <MenuItem value="WRITE">{t('apikeys.w_token')}</MenuItem>
+                  {configuration.auth.allow_extended_apikeys && (
+                    <MenuItem value="EXTENDED">{t('apikeys.e_token')}</MenuItem>
+                  )}
+                  <MenuItem value="CUSTOM">{t('apikeys.c_token')}</MenuItem>
+                </Select>
+              </FormControl>
             </div>
           </div>
           <div style={{ marginTop: theme.spacing(2) }}>
