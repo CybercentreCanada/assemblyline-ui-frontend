@@ -9,7 +9,7 @@ RUN yarn run build
 
 # Production container creation
 FROM node:18-alpine
-RUN npm install -g serve
+RUN yarn global add serve
 WORKDIR /usr/src/app
 COPY --from=builder /tmp/frontend/build .
 EXPOSE 3000
