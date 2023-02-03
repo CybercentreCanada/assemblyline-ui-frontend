@@ -1,8 +1,8 @@
-import { Tooltip } from '@material-ui/core';
-import BlockIcon from '@material-ui/icons/Block';
-import ClearIcon from '@material-ui/icons/Clear';
-import DoneIcon from '@material-ui/icons/Done';
-import TimerIcon from '@material-ui/icons/Timer';
+import { Tooltip } from '@mui/material';
+import BlockIcon from '@mui/icons-material/Block';
+import ClearIcon from '@mui/icons-material/Clear';
+import DoneIcon from '@mui/icons-material/Done';
+import TimerIcon from '@mui/icons-material/Timer';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 

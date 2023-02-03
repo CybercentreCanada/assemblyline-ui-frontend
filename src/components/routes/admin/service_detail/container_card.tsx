@@ -1,4 +1,5 @@
-import { Card, Grid, makeStyles, Tooltip, useTheme } from '@material-ui/core';
+import { Card, Grid, Tooltip, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import 'moment/locale/fr';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -15,7 +16,7 @@ const useStyles = makeStyles(theme => ({
     overflow: 'auto',
     wordBreak: 'break-word',
     '&:hover': {
-      backgroundColor: theme.palette.type === 'dark' ? '#ffffff10' : '#00000005',
+      backgroundColor: theme.palette.mode === 'dark' ? '#ffffff10' : '#00000005',
       cursor: 'pointer'
     }
   },
@@ -44,8 +45,8 @@ const WrappedContainerCard = ({ container, defaults, name, volumes, onChange }: 
   const [dialog, setDialog] = useState(false);
   const theme = useTheme();
   const classes = useStyles();
-  const yesColor = theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark;
-  const noColor = theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark;
+  const yesColor = theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark;
+  const noColor = theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark;
 
   const handleContainerChange = (tempContainer, tempName, tempVolumes) => {
     onChange(tempContainer, tempName, tempVolumes);

@@ -1,33 +1,38 @@
+import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import {
+  Autocomplete,
   Button,
   CircularProgress,
-  createStyles,
   Grid,
   IconButton,
-  makeStyles,
   MenuItem,
   Select,
+  Skeleton,
   TextField,
   Theme,
   Tooltip,
   Typography,
-  useTheme,
-  withStyles
-} from '@material-ui/core';
-import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
-import { Autocomplete, Skeleton } from '@material-ui/lab';
-import PageCenter from 'commons/components/layout/pages/PageCenter';
+  useTheme
+} from '@mui/material';
+import FormControl from '@mui/material/FormControl';
+import createStyles from '@mui/styles/createStyles';
+import makeStyles from '@mui/styles/makeStyles';
+import withStyles from '@mui/styles/withStyles';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
+import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
-import { RouterPrompt } from 'components/visual/RouterPrompt';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import { CustomUser } from 'components/hooks/useMyUser';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
+import { RouterPrompt } from 'components/visual/RouterPrompt';
 import 'moment/locale/fr';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import { useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
 
 const DEFAULT_LABELS = [
@@ -92,11 +97,12 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
   const [modified, setModified] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState(false);
-  const { c12nDef, user: currentUser } = useALContext();
+  const { c12nDef } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
   const classes = useStyles();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const DEFAULT_WORKFLOW = {
     classification: c12nDef.UNRESTRICTED,
@@ -165,7 +171,7 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
         setDeleteDialog(false);
         showSuccessMessage(t('delete.success'));
         if (id) {
-          setTimeout(() => history.push('/manage/workflows'), 1000);
+          setTimeout(() => navigate('/manage/workflows'), 1000);
         }
         setTimeout(() => window.dispatchEvent(new CustomEvent('reloadWorkflows')), 1000);
         close();
@@ -233,15 +239,16 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
                   <Tooltip title={t('remove')}>
                     <IconButton
                       style={{
-                        color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                        color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
                       }}
                       onClick={() => setDeleteDialog(true)}
+                      size="large"
                     >
                       <RemoveCircleOutlineOutlinedIcon />
                     </IconButton>
                   </Tooltip>
                 ) : (
-                  <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+                  <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
                 )}
               </Grid>
             )}
@@ -300,21 +307,22 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
           <Grid item xs={12} sm={6}>
             <Typography variant="subtitle2">{t('priority')}</Typography>
             {workflow ? (
-              <Select
-                id="priority"
-                fullWidth
-                value={workflow.priority}
-                onChange={handlePriorityChange}
-                variant="outlined"
-                margin="dense"
-                disabled={!currentUser.roles.includes('workflow_manage')}
-              >
-                <MyMenuItem value="">{t('priority.null')}</MyMenuItem>
-                <MyMenuItem value="LOW">{t('priority.LOW')}</MyMenuItem>
-                <MyMenuItem value="MEDIUM">{t('priority.MEDIUM')}</MyMenuItem>
-                <MyMenuItem value="HIGH">{t('priority.HIGH')}</MyMenuItem>
-                <MyMenuItem value="CRITICAL">{t('priority.CRITICAL')}</MyMenuItem>
-              </Select>
+              <FormControl size="small" fullWidth>
+                <Select
+                  id="priority"
+                  fullWidth
+                  value={workflow.priority}
+                  onChange={handlePriorityChange}
+                  variant="outlined"
+                  disabled={!currentUser.roles.includes('workflow_manage')}
+                >
+                  <MyMenuItem value="">{t('priority.null')}</MyMenuItem>
+                  <MyMenuItem value="LOW">{t('priority.LOW')}</MyMenuItem>
+                  <MyMenuItem value="MEDIUM">{t('priority.MEDIUM')}</MyMenuItem>
+                  <MyMenuItem value="HIGH">{t('priority.HIGH')}</MyMenuItem>
+                  <MyMenuItem value="CRITICAL">{t('priority.CRITICAL')}</MyMenuItem>
+                </Select>
+              </FormControl>
             ) : (
               <Skeleton style={{ height: '2.5rem' }} />
             )}
@@ -322,20 +330,21 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
           <Grid item xs={12} sm={6}>
             <Typography variant="subtitle2">{t('status')}</Typography>
             {workflow ? (
-              <Select
-                id="priority"
-                fullWidth
-                value={workflow.status}
-                onChange={handleStatusChange}
-                variant="outlined"
-                margin="dense"
-                disabled={!currentUser.roles.includes('workflow_manage')}
-              >
-                <MyMenuItem value="">{t('status.null')}</MyMenuItem>
-                <MyMenuItem value="MALICIOUS">{t('status.MALICIOUS')}</MyMenuItem>
-                <MyMenuItem value="NON-MALICIOUS">{t('status.NON-MALICIOUS')}</MyMenuItem>
-                <MyMenuItem value="ASSESS">{t('status.ASSESS')}</MyMenuItem>
-              </Select>
+              <FormControl size="small" fullWidth>
+                <Select
+                  id="priority"
+                  fullWidth
+                  value={workflow.status}
+                  onChange={handleStatusChange}
+                  variant="outlined"
+                  disabled={!currentUser.roles.includes('workflow_manage')}
+                >
+                  <MyMenuItem value="">{t('status.null')}</MyMenuItem>
+                  <MyMenuItem value="MALICIOUS">{t('status.MALICIOUS')}</MyMenuItem>
+                  <MyMenuItem value="NON-MALICIOUS">{t('status.NON-MALICIOUS')}</MyMenuItem>
+                  <MyMenuItem value="ASSESS">{t('status.ASSESS')}</MyMenuItem>
+                </Select>
+              </FormControl>
             ) : (
               <Skeleton style={{ height: '2.5rem' }} />
             )}

@@ -1,15 +1,16 @@
-import { Box, Drawer, IconButton, makeStyles, Typography, useMediaQuery, useTheme } from '@material-ui/core';
-import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
-import FilterListIcon from '@material-ui/icons/FilterList';
-import StarIcon from '@material-ui/icons/Star';
-import { AlertTitle } from '@material-ui/lab';
-import ListCarousel from 'commons/addons/elements/lists/carousel/ListCarousel';
-import ListNavigator from 'commons/addons/elements/lists/navigator/ListNavigator';
-import SimpleList from 'commons/addons/elements/lists/simplelist/SimpleList';
-import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
-import PageHeader from 'commons/components/layout/pages/PageHeader';
-import useALContext from 'components/hooks/useALContext';
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import StarIcon from '@mui/icons-material/Star';
+import { AlertTitle, Box, Drawer, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import ListCarousel from 'commons/addons/lists/carousel/ListCarousel';
+import ListNavigator from 'commons/addons/lists/navigator/ListNavigator';
+import SimpleList from 'commons/addons/lists/simplelist/SimpleList';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
+import PageFullWidth from 'commons/components/pages/PageFullWidth';
+import PageHeader from 'commons/components/pages/PageHeader';
 import useDrawer from 'components/hooks/useDrawer';
+import { CustomUser } from 'components/hooks/useMyUser';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import SearchQuery, { SearchQueryFilters } from 'components/visual/SearchBar/search-query';
@@ -19,7 +20,8 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 import { FiFilter } from 'react-icons/fi';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import { useLocation } from 'react-router-dom';
 import ForbiddenPage from '../403';
 import AlertDetails from './alert-details';
 import AlertListItem from './alert-list-item';
@@ -92,7 +94,7 @@ const Alerts: React.FC = () => {
   const { t } = useTranslation('alerts');
   const classes = useStyles();
   const theme = useTheme();
-  const { user: currentUser } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
   const { setGlobalDrawer } = useDrawer();
 
   // Alerts hook.
@@ -121,7 +123,7 @@ const Alerts: React.FC = () => {
     open: false,
     type: null
   });
-  const history = useHistory();
+  const navigate = useNavigate();
   const location = useLocation();
   const { userFavorites, globalFavorites } = useFavorites();
 
@@ -143,7 +145,7 @@ const Alerts: React.FC = () => {
   const onSearch = (filterValue: string = '', inputEl: HTMLInputElement = null) => {
     // Update query and url before reloading data.
     searchQuery.setQuery(filterValue);
-    history.push(`${location.pathname}?${searchQuery.buildURLQueryString()}`);
+    navigate(`${location.pathname}?${searchQuery.buildURLQueryString()}`);
 
     if (inputEl) inputEl.focus();
   };
@@ -152,7 +154,7 @@ const Alerts: React.FC = () => {
   const onClearSearch = (inputEl: HTMLInputElement = null) => {
     // Reset the query.
     searchQuery.deleteQuery();
-    history.push(`${location.pathname}?${searchQuery.buildURLQueryString()}`);
+    navigate(`${location.pathname}?${searchQuery.buildURLQueryString()}`);
 
     // Update the search text field reference.
     searchTextValue.current = '';
@@ -248,7 +250,7 @@ const Alerts: React.FC = () => {
     // Set the newly selected filters and up location url bar.
     if (query !== undefined && query !== null) searchQuery.setQuery(query);
     searchQuery.setFilters(filters);
-    history.push(`${location.pathname}?${searchQuery.buildURLQueryString()}`);
+    navigate(`${location.pathname}?${searchQuery.buildURLQueryString()}`);
 
     // Close the Filters drawer.
     if (drawer.open) {
@@ -282,7 +284,7 @@ const Alerts: React.FC = () => {
   const onFavoriteSelected = (favorite: { name: string; query: string }) => {
     // Update query with selected favorite.
     searchQuery.addFq(favorite.query);
-    history.push(`${location.pathname}?${searchQuery.buildURLQueryString()}`);
+    navigate(`${location.pathname}?${searchQuery.buildURLQueryString()}`);
 
     // Close the Filters drawer.
     if (drawer.open) {
@@ -346,7 +348,7 @@ const Alerts: React.FC = () => {
     <PageFullWidth margin={4}>
       <Drawer open={drawer.open} anchor="right" onClose={onDrawerClose}>
         <div style={{ padding: theme.spacing(1) }}>
-          <IconButton onClick={onDrawerClose}>
+          <IconButton onClick={onDrawerClose} size="large">
             <CloseOutlinedIcon />
           </IconButton>
         </div>
@@ -503,6 +505,7 @@ const SearchResultLarge = ({ searching, total, query, onApplyFilters }) => {
 const SearchResultSmall = ({ searching, total, query }) => {
   const theme = useTheme();
   const { t } = useTranslation('alerts');
+
   const filtered = query ? hasFilters(query.parseFilters()) : false;
   return (
     <>

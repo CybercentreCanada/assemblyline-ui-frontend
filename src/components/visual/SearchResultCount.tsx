@@ -1,7 +1,8 @@
-import { Box, Tooltip } from '@material-ui/core';
+import { Box, Tooltip } from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import { useLocation } from 'react-router-dom';
 
 type SearchResultCountProps = {
   count: number;
@@ -13,11 +14,11 @@ const SearchResultCount: React.FC<SearchResultCountProps> = ({ count, max = 1000
   const params = new URLSearchParams(window.location.search);
   const trackedHits = params.get('track_total_hits');
   const location = useLocation();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const trackFullHits = () => {
     params.set('track_total_hits', 'true');
-    history.push(`${location.pathname}?${params.toString()}${location.hash}`);
+    navigate(`${location.pathname}?${params.toString()}${location.hash}`);
   };
 
   const formattedNumber = x => x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ' ');

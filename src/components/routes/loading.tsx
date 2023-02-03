@@ -1,10 +1,9 @@
-import { CircularProgress, useTheme } from '@material-ui/core';
-import useAppLayout from 'commons/components/hooks/useAppLayout';
+import { CircularProgress } from '@mui/material';
+import useAppBanner from 'commons/components/app/hooks/useAppBanner';
+import { memo } from 'react';
 
-function LoadingScreen() {
-  const theme = useTheme();
-  const { getBanner } = useAppLayout();
-
+const WrappedLoadingScreen: React.FC = () => {
+  const banner = useAppBanner();
   return (
     <div
       style={{
@@ -15,10 +14,11 @@ function LoadingScreen() {
         transform: 'translate(-50%, -50%)'
       }}
     >
-      {getBanner(theme)}
+      {banner}
       <CircularProgress variant="indeterminate" />
     </div>
   );
-}
+};
 
+export const LoadingScreen = memo(WrappedLoadingScreen);
 export default LoadingScreen;

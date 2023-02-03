@@ -1,4 +1,5 @@
-import React, { ChangeEvent } from 'react';
+import { SelectChangeEvent } from '@mui/material';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { getItems, getType, getValue, SelectField, StoreProps, useStore } from '../..';
 
@@ -12,7 +13,7 @@ export const WrappedHexBodyTypeSetting = ({ store }: StoreProps) => {
       description={t('bodyType.description')}
       value={getValue.mode.body(store.setting.mode.body)}
       items={getItems.mode.body(store)}
-      onChange={(event: ChangeEvent<{ name?: string; value: unknown }>) =>
+      onChange={(event: SelectChangeEvent<number>, child: React.ReactNode) =>
         update.store.setting.mode.setBody(getType.mode.body(event.target.value as number))
       }
     />

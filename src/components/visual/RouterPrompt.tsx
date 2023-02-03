@@ -1,7 +1,8 @@
+import { useBlocker } from 'components/hooks/useBlocker';
 import useDrawer from 'components/hooks/useDrawer';
+import { GD_EVENT_PREVENTED, GD_EVENT_PROCEED } from 'components/providers/DrawerProvider';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useHistory } from 'react-router-dom';
 import ConfirmationDialog from './ConfirmationDialog';
 
 export function RouterPrompt(props) {
@@ -14,61 +15,84 @@ export function RouterPrompt(props) {
     acceptText = null,
     cancelText = null
   } = props;
-
   const { t } = useTranslation();
-  const history = useHistory();
   const { setDrawerClosePrompt } = useDrawer();
-
   const [open, setOpen] = useState(false);
-  const [currentPath, setCurrentPath] = useState('');
+  const [cancel, setCancel] = useState(false);
+  const [currentTX, setCurrentTX] = useState(null);
 
+  // Cancel blocking
   const unblock = useCallback(() => {
+    setCancel(true);
     setDrawerClosePrompt(false);
-    history.block(() => {});
     window.onbeforeunload = undefined;
-  }, [history, setDrawerClosePrompt]);
+  }, [setDrawerClosePrompt]);
 
+  // Block history transactions
+  const blocker = useCallback(tx => {
+    setCurrentTX(tx);
+    setOpen(true);
+  }, []);
+
+  // When condition is met, prevent drawer from being closed and prevent page to be reloaded
   useEffect(() => {
-    if (when) {
-      // Prevent drawer from being closed
+    if (when && !cancel) {
       setDrawerClosePrompt(true);
-      // Prevent page to be reload
       window.onbeforeunload = () => true;
-      // Prevent URL to change
-      history.block(prompt => {
-        setCurrentPath(prompt.pathname);
+    }
+  }, [setDrawerClosePrompt, when, cancel]);
+
+  // Receive drawer close prevented messages
+  useEffect(() => {
+    function showDialog(event: CustomEvent) {
+      if (when) {
+        setCurrentTX(null);
         setOpen(true);
-        return false;
-      });
-    } else {
-      unblock();
+      }
     }
 
+    window.addEventListener(GD_EVENT_PREVENTED, showDialog);
+    return () => {
+      window.removeEventListener(GD_EVENT_PREVENTED, showDialog);
+    };
+  }, [when]);
+
+  // unblock all on un-mount
+  useEffect(() => {
     return () => {
       unblock();
     };
-  }, [history, setDrawerClosePrompt, unblock, when]);
+  }, [unblock]);
 
-  const handleAccept = useCallback(async () => {
-    if (onAccept) {
-      const canRoute = await Promise.resolve(onAccept());
+  // Setup route blocker
+  useBlocker(blocker, when && !cancel);
+
+  // Unblock and allow transaction if successful
+  const routeOnSuccess = useCallback(
+    canRoute => {
       if (canRoute) {
         unblock();
-        history.push(currentPath);
+        window.dispatchEvent(new CustomEvent(GD_EVENT_PROCEED));
+        if (currentTX) currentTX.retry();
       }
+    },
+    [currentTX, unblock]
+  );
+
+  // Dialog actions
+  const handleAccept = useCallback(async () => {
+    if (onAccept) {
+      routeOnSuccess(await Promise.resolve(onAccept()));
     }
-  }, [currentPath, history, onAccept, unblock]);
+    setOpen(false);
+  }, [onAccept, routeOnSuccess]);
 
   const handleCancel = useCallback(async () => {
     if (onCancel) {
-      const canRoute = await Promise.resolve(onCancel());
-      if (canRoute) {
-        unblock();
-        history.push(currentPath);
-      }
+      routeOnSuccess(await Promise.resolve(onCancel()));
     }
     setOpen(false);
-  }, [currentPath, history, onCancel, unblock]);
+  }, [onCancel, routeOnSuccess]);
 
   return open ? (
     <ConfirmationDialog

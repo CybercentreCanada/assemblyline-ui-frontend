@@ -1,5 +1,6 @@
-import { makeStyles, Typography } from '@material-ui/core';
-import ClearIcon from '@material-ui/icons/Clear';
+import ClearIcon from '@mui/icons-material/Clear';
+import { Typography } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -105,6 +106,7 @@ export const WrappedHexcodeBar = ({ store }: StoreProps) => {
         autoFocus
         delay={250}
         value={inputValue}
+        size="small"
         margin="dense"
         preventSubmit={true}
         onFocus={() => onSearchBarFocus()}
@@ -132,6 +134,7 @@ export const WrappedHexcodeBar = ({ store }: StoreProps) => {
             // label={t('offset.label')}
             labelWidth={0}
             placeholder={''}
+            size="small"
             margin="dense"
             range="loop"
             value={selectedResult as number}

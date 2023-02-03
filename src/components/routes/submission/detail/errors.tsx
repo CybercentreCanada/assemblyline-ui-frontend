@@ -1,6 +1,7 @@
-import { Button, Collapse, Divider, Link as MaterialLink, makeStyles, Typography, useTheme } from '@material-ui/core';
-import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
+import { Button, Collapse, Divider, Link as MaterialLink, Typography, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { getErrorTypeFromKey, getHashFromKey, getServiceFromKey } from 'helpers/errors';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -53,7 +54,7 @@ const WrappedErrorSection: React.FC<ErrorSectionProps> = ({ sid, parsed_errors }
         <Typography
           variant="h6"
           style={{
-            color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+            color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
           }}
           onClick={() => {
             setOpen(!open);
@@ -86,7 +87,7 @@ const WrappedErrorSection: React.FC<ErrorSectionProps> = ({ sid, parsed_errors }
                   <div
                     key={i}
                     style={{
-                      color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                      color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
                     }}
                   >
                     {`${t('errors.aggregated').replace(
@@ -103,7 +104,7 @@ const WrappedErrorSection: React.FC<ErrorSectionProps> = ({ sid, parsed_errors }
                 <div
                   key={i}
                   style={{
-                    color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                    color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
                   }}
                 >
                   <strong>{getServiceFromKey(error)}</strong>
@@ -112,7 +113,7 @@ const WrappedErrorSection: React.FC<ErrorSectionProps> = ({ sid, parsed_errors }
                     <MaterialLink
                       component={Link}
                       style={{
-                        color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                        color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
                       }}
                       to={`/submission/detail/${sid}/${getHashFromKey(error)}`}
                     >

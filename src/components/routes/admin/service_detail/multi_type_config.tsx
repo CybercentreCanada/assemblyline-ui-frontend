@@ -1,6 +1,7 @@
-import { Grid, IconButton, MenuItem, Select, TextField, Tooltip, useTheme } from '@material-ui/core';
-import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
-import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
+import { Grid, IconButton, MenuItem, Select, TextField, Tooltip, useTheme } from '@mui/material';
+import FormControl from '@mui/material/FormControl';
 import 'moment/locale/fr';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -38,20 +39,20 @@ const WrappedMultiTypeConfig = ({ config, onAdd, onUpdate, onDelete }: MultiType
   const jsonTheme = {
     base00: 'transparent', // Background
     base01: '#f1f1f1', // Edit key text
-    base02: theme.palette.type === 'dark' ? theme.palette.text.hint : theme.palette.divider, // Borders and DataType Background
+    base02: theme.palette.mode === 'dark' ? theme.palette.text.secondary : theme.palette.divider, // Borders and DataType Background
     base03: '#444', // Unused
-    base04: theme.palette.grey[theme.palette.type === 'dark' ? 700 : 400], // Object size and Add key border
-    base05: theme.palette.grey[theme.palette.type === 'dark' ? 700 : 700], // Undefined and Add key background
+    base04: theme.palette.grey[theme.palette.mode === 'dark' ? 700 : 400], // Object size and Add key border
+    base05: theme.palette.grey[theme.palette.mode === 'dark' ? 700 : 700], // Undefined and Add key background
     base06: '#444', // Unused
     base07: theme.palette.text.primary, // Brace, Key and Borders
     base08: theme.palette.text.secondary, // NaN
-    base09: theme.palette.type === 'dark' ? theme.palette.warning.light : theme.palette.warning.dark, // Strings and Icons
+    base09: theme.palette.mode === 'dark' ? theme.palette.warning.light : theme.palette.warning.dark, // Strings and Icons
     base0A: '#333', // Null, Regex and edit color
-    base0B: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark, // Float
-    base0C: theme.palette.type === 'dark' ? theme.palette.secondary.light : theme.palette.secondary.dark, // Array Key
-    base0D: theme.palette.type === 'dark' ? theme.palette.info.light : theme.palette.info.dark, // Date, function, expand icon
-    base0E: theme.palette.type === 'dark' ? theme.palette.info.light : theme.palette.info.dark, // Boolean
-    base0F: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark // Integer
+    base0B: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark, // Float
+    base0C: theme.palette.mode === 'dark' ? theme.palette.secondary.light : theme.palette.secondary.dark, // Array Key
+    base0D: theme.palette.mode === 'dark' ? theme.palette.info.light : theme.palette.info.dark, // Date, function, expand icon
+    base0E: theme.palette.mode === 'dark' ? theme.palette.info.light : theme.palette.info.dark, // Boolean
+    base0F: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark // Integer
   };
 
   const detectConfigType = (cfg: ServiceConfig): ExtendedServiceConfig => {
@@ -140,17 +141,18 @@ const WrappedMultiTypeConfig = ({ config, onAdd, onUpdate, onDelete }: MultiType
       </Grid>
       <Grid item xs={10} sm={8}>
         {parsedConfig.type === 'bool' ? (
-          <Select
-            id="user_spec_params"
-            fullWidth
-            value={parsedConfig.value}
-            onChange={handleConfigUpdate}
-            variant="outlined"
-            margin="dense"
-          >
-            <MenuItem value="false">{t('params.false')}</MenuItem>
-            <MenuItem value="true">{t('params.true')}</MenuItem>
-          </Select>
+          <FormControl size="small" fullWidth>
+            <Select
+              id="user_spec_params"
+              fullWidth
+              value={parsedConfig.value}
+              onChange={handleConfigUpdate}
+              variant="outlined"
+            >
+              <MenuItem value="false">{t('params.false')}</MenuItem>
+              <MenuItem value="true">{t('params.true')}</MenuItem>
+            </Select>
+          </FormControl>
         ) : parsedConfig.type === 'json' ? (
           <ReactJson
             name={false}
@@ -188,9 +190,10 @@ const WrappedMultiTypeConfig = ({ config, onAdd, onUpdate, onDelete }: MultiType
         <Tooltip title={t('params.user.remove')}>
           <IconButton
             style={{
-              color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+              color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
             }}
             onClick={() => onDelete(parsedConfig)}
+            size="large"
           >
             <RemoveCircleOutlineOutlinedIcon />
           </IconButton>
@@ -211,34 +214,36 @@ const WrappedMultiTypeConfig = ({ config, onAdd, onUpdate, onDelete }: MultiType
         />
       </Grid>
       <Grid item xs={10} sm={2}>
-        <Select
-          id="user_spec_params"
-          fullWidth
-          value={tempConfig.type}
-          onChange={handleConfigTypeChange}
-          variant="outlined"
-          margin="dense"
-        >
-          <MenuItem value="bool">bool</MenuItem>
-          <MenuItem value="int">int</MenuItem>
-          <MenuItem value="json">json</MenuItem>
-          <MenuItem value="list">list ({t('params.comma')})</MenuItem>
-          <MenuItem value="str">str</MenuItem>
-        </Select>
-      </Grid>
-      <Grid item xs={10} sm={6}>
-        {tempConfig.type === 'bool' ? (
+        <FormControl size="small" fullWidth>
           <Select
             id="user_spec_params"
             fullWidth
-            value={tempConfig.value}
-            onChange={handleConfigChange}
+            value={tempConfig.type}
+            onChange={handleConfigTypeChange}
             variant="outlined"
-            margin="dense"
           >
-            <MenuItem value="false">{t('params.false')}</MenuItem>
-            <MenuItem value="true">{t('params.true')}</MenuItem>
+            <MenuItem value="bool">bool</MenuItem>
+            <MenuItem value="int">int</MenuItem>
+            <MenuItem value="json">json</MenuItem>
+            <MenuItem value="list">list ({t('params.comma')})</MenuItem>
+            <MenuItem value="str">str</MenuItem>
           </Select>
+        </FormControl>
+      </Grid>
+      <Grid item xs={10} sm={6}>
+        {tempConfig.type === 'bool' ? (
+          <FormControl size="small" fullWidth>
+            <Select
+              id="user_spec_params"
+              fullWidth
+              value={tempConfig.value}
+              onChange={handleConfigChange}
+              variant="outlined"
+            >
+              <MenuItem value="false">{t('params.false')}</MenuItem>
+              <MenuItem value="true">{t('params.true')}</MenuItem>
+            </Select>
+          </FormControl>
         ) : tempConfig.type === 'json' ? (
           <ReactJson
             name={false}
@@ -277,9 +282,10 @@ const WrappedMultiTypeConfig = ({ config, onAdd, onUpdate, onDelete }: MultiType
           <Tooltip title={t('params.user.add')}>
             <IconButton
               style={{
-                color: theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark
+                color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
               }}
               onClick={addConfig}
+              size="large"
             >
               <AddCircleOutlineIcon />
             </IconButton>

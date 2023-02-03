@@ -1,4 +1,5 @@
-import { Divider, makeStyles, useTheme } from '@material-ui/core';
+import { Divider, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { GraphBody } from './graph_body';

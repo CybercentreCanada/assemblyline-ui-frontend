@@ -1,7 +1,10 @@
-import { useTheme } from '@material-ui/core';
-import { Skeleton } from '@material-ui/lab';
+import { Skeleton, useTheme } from '@mui/material';
+import { BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip } from 'chart.js';
+import 'chart.js/auto';
 import React, { useEffect, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 type LineGraphProps = {
   dataset: { [s: string]: number };
@@ -89,7 +92,7 @@ function WrappedLineGraph({ dataset, height, title, datatype, onClick, sorter, t
       <Bar data={barData} options={options} />
     </div>
   ) : (
-    <Skeleton variant="rect" height={height} />
+    <Skeleton variant="rectangular" height={height} />
   );
 }
 

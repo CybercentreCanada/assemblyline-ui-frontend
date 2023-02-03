@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, useTheme } from '@material-ui/core';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import { SourceDetail } from 'components/routes/manage/signature_sources_details';
 import 'moment/locale/fr';

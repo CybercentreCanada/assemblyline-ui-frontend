@@ -1,4 +1,4 @@
-import { isArrowDown, isArrowUp } from 'commons/addons/elements/utils/keyboard';
+import { isArrowDown, isArrowUp } from 'commons/components/utils/keyboard';
 import { useCallback } from 'react';
 import { ActionProps, HistoryType, isAction, ReducerHandler, Reducers, Store, UseReducer } from '..';
 

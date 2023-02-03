@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
+import React from 'react';
 
 export const useTrottledReducer = <State, Action>(
   reducer: (state: Partial<State>, action: Action) => State,
@@ -15,9 +16,9 @@ export const useTrottledReducer = <State, Action>(
   const dispatchRef = React.useRef(setState);
   const timeout = React.useRef(null);
 
-  useEffect(() => {
+  useEffectOnce(() => {
     dispatchRef.current = setState;
-  }, []);
+  });
 
   const clear = React.useCallback(() => {
     clearTimeout(timeout.current);

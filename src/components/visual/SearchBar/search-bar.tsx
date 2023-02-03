@@ -1,3 +1,4 @@
+import BackspaceIcon from '@mui/icons-material/Backspace';
 import {
   alpha,
   Box,
@@ -5,12 +6,11 @@ import {
   IconButton,
   IconButtonProps,
   LinearProgress,
-  makeStyles,
   Tooltip,
   useMediaQuery,
   useTheme
-} from '@material-ui/core';
-import BackspaceIcon from '@material-ui/icons/Backspace';
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import SearchTextField from './search-textfield';
@@ -46,6 +46,7 @@ export interface SearchBarButton {
 }
 
 interface SearchBarProps {
+  children?: React.ReactNode;
   initValue: string;
   placeholder?: string;
   searching?: boolean;
@@ -126,7 +127,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         <IconButton
           onClick={_onValueClear}
           edge="end"
-          size={!upMD ? 'small' : null}
+          size={!upMD ? 'small' : 'large'}
           style={{ marginRight: theme.spacing(upMD ? 0 : 0.5) }}
           disabled={searching}
         >
@@ -146,7 +147,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             key={`searchbar-button-${i}`}
             {...b.props}
             edge="end"
-            size={!upMD ? 'small' : null}
+            size={!upMD ? 'small' : 'large'}
             style={{ marginRight: theme.spacing(upMD ? 0 : 0.5) }}
             disabled={searching}
           >

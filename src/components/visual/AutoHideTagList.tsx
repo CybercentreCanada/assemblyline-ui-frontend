@@ -1,5 +1,5 @@
-import { IconButton, Tooltip } from '@material-ui/core';
-import MoreHorizOutlinedIcon from '@material-ui/icons/MoreHorizOutlined';
+import { IconButton, Tooltip } from '@mui/material';
+import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';
 import Tag from 'components/visual/Tag';

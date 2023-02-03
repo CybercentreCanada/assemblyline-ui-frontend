@@ -1,18 +1,20 @@
-import { Grid, IconButton, MenuItem, Select, Tooltip, Typography, useTheme } from '@material-ui/core';
-import ArrowDownwardOutlinedIcon from '@material-ui/icons/ArrowDownwardOutlined';
-import ArrowUpwardOutlinedIcon from '@material-ui/icons/ArrowUpwardOutlined';
-import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
-import { Skeleton } from '@material-ui/lab';
-import useUser from 'commons/components/hooks/useAppUser';
-import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
+import ArrowDownwardOutlinedIcon from '@mui/icons-material/ArrowDownwardOutlined';
+import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
+import { Grid, IconButton, MenuItem, Select, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import FormControl from '@mui/material/FormControl';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
+import PageFullWidth from 'commons/components/pages/PageFullWidth';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import LineGraph from 'components/visual/LineGraph';
 import { getVersionQuery } from 'helpers/utils';
 import 'moment/locale/fr';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, Redirect, useLocation } from 'react-router-dom';
+import { Navigate } from 'react-router';
+import { Link, useLocation } from 'react-router-dom';
 
 function getDescendantProp(obj, desc) {
   if (obj == null) return null;
@@ -96,6 +98,7 @@ function ServiceDetail({ stats, comp, show }) {
                 to={`/admin/errors?tc=1y&filters=response.service_name%3A${
                   stats.service.name
                 }&filters=${getVersionQuery(stats.service.version)}`}
+                size="large"
               >
                 <ErrorOutlineOutlinedIcon />
               </IconButton>
@@ -103,7 +106,7 @@ function ServiceDetail({ stats, comp, show }) {
           ) : (
             <Skeleton
               component="div"
-              variant="circle"
+              variant="circular"
               height="2.5rem"
               width="2.5rem"
               style={{ margin: theme.spacing(0.5), alignSelf: 'self-end' }}
@@ -126,28 +129,29 @@ function VersionSelector({ possibleVersions, selectedService, version, setVersio
   const theme = useTheme();
   const { t } = useTranslation(['adminServiceReview']);
   return selectedService && possibleVersions ? (
-    <Select
-      fullWidth
-      value={version}
-      onChange={event => setVersion(event.target.value)}
-      displayEmpty
-      variant="outlined"
-      margin="dense"
-      style={{ minWidth: theme.spacing(30), color: version === '' ? theme.palette.text.disabled : null }}
-    >
-      <MenuItem value="" disabled>
-        {t('service.version')}
-      </MenuItem>
-      {possibleVersions
-        .filter(item => item !== except)
-        .map((v, id) => (
-          <MenuItem key={id} value={v}>
-            {`${selectedService}: ${v}`}
-          </MenuItem>
-        ))}
-    </Select>
+    <FormControl size="small" fullWidth>
+      <Select
+        fullWidth
+        value={version}
+        onChange={event => setVersion(event.target.value)}
+        displayEmpty
+        variant="outlined"
+        style={{ minWidth: theme.spacing(30), color: version === '' ? theme.palette.text.disabled : null }}
+      >
+        <MenuItem value="" disabled>
+          {t('service.version')}
+        </MenuItem>
+        {possibleVersions
+          .filter(item => item !== except)
+          .map((v, id) => (
+            <MenuItem key={id} value={v}>
+              {`${selectedService}: ${v}`}
+            </MenuItem>
+          ))}
+      </Select>
+    </FormControl>
   ) : (
-    <Skeleton variant="rect" height={theme.spacing(5)} width="100%" />
+    <Skeleton variant="rectangular" height={theme.spacing(5)} width="100%" />
   );
 }
 
@@ -170,7 +174,7 @@ export default function ServiceReview() {
   const [stats2, setStats2] = useState(null);
 
   const { apiCall } = useMyAPI();
-  const { user: currentUser } = useUser<CustomUser>();
+  const { user: currentUser } = useAppUser<CustomUser>();
 
   const handleServiceChange = event => {
     setVersion1('');
@@ -216,7 +220,7 @@ export default function ServiceReview() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedService]);
 
-  useEffect(() => {
+  useEffectOnce(() => {
     if (currentUser.is_admin) {
       apiCall({
         url: '/api/v4/service/all/',
@@ -225,8 +229,7 @@ export default function ServiceReview() {
         }
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>
@@ -245,32 +248,33 @@ export default function ServiceReview() {
           {services ? (
             <>
               <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
-                <Select
-                  id="channel"
-                  fullWidth
-                  value={selectedService}
-                  onChange={handleServiceChange}
-                  displayEmpty
-                  variant="outlined"
-                  margin="dense"
-                  style={{
-                    minWidth: theme.spacing(30),
-                    color: selectedService === '' ? theme.palette.text.disabled : null
-                  }}
-                >
-                  <MenuItem value="" disabled>
-                    {t('service.selection')}
-                  </MenuItem>
-                  {services.map((srv, id) => (
-                    <MenuItem key={id} value={srv}>
-                      {srv}
+                <FormControl size="small" fullWidth>
+                  <Select
+                    id="channel"
+                    fullWidth
+                    value={selectedService}
+                    onChange={handleServiceChange}
+                    displayEmpty
+                    variant="outlined"
+                    style={{
+                      minWidth: theme.spacing(30),
+                      color: selectedService === '' ? theme.palette.text.disabled : null
+                    }}
+                  >
+                    <MenuItem value="" disabled>
+                      {t('service.selection')}
                     </MenuItem>
-                  ))}
-                </Select>
+                    {services.map((srv, id) => (
+                      <MenuItem key={id} value={srv}>
+                        {srv}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               </div>
             </>
           ) : (
-            <Skeleton variant="rect" height={theme.spacing(5)} width={theme.spacing(30)} />
+            <Skeleton variant="rectangular" height={theme.spacing(5)} width={theme.spacing(30)} />
           )}
         </Grid>
       </Grid>
@@ -310,6 +314,6 @@ export default function ServiceReview() {
       )}
     </PageFullWidth>
   ) : (
-    <Redirect to="/forbidden" />
+    <Navigate to="/forbidden" replace />
   );
 }

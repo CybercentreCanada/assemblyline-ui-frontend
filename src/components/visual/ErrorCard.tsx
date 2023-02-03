@@ -1,6 +1,7 @@
-import { Box, Collapse, makeStyles, useTheme } from '@material-ui/core';
-import ExpandLess from '@material-ui/icons/ExpandLess';
-import ExpandMore from '@material-ui/icons/ExpandMore';
+import { Box, Collapse, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
@@ -27,19 +28,19 @@ type ErrorCardProps = {
 
 const useStyles = makeStyles(theme => ({
   card: {
-    backgroundColor: theme.palette.type === 'dark' ? '#371a1a' : '#fce9e9',
-    border: `solid 1px ${theme.palette.type === 'dark' ? '#502121' : '#ffcbcb'}`,
+    backgroundColor: theme.palette.mode === 'dark' ? '#371a1a' : '#fce9e9',
+    border: `solid 1px ${theme.palette.mode === 'dark' ? '#502121' : '#ffcbcb'}`,
     borderRadius: '4px'
   },
   card_title: {
-    backgroundColor: theme.palette.type === 'dark' ? '#502121' : '#ffd9d9',
+    backgroundColor: theme.palette.mode === 'dark' ? '#502121' : '#ffd9d9',
     padding: '6px',
     borderRadius: '4px 4px 0px 0px',
     display: 'flex',
     alignItems: 'center',
     flexWrap: 'wrap',
     '&:hover': {
-      backgroundColor: theme.palette.type === 'dark' ? '#6e2b2b' : '#ffc5c5',
+      backgroundColor: theme.palette.mode === 'dark' ? '#6e2b2b' : '#ffc5c5',
       cursor: 'pointer'
     }
   },

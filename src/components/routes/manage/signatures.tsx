@@ -1,13 +1,16 @@
-import { Grid, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
-import Typography from '@material-ui/core/Typography';
-import BlockIcon from '@material-ui/icons/Block';
-import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
-import RecordVoiceOverOutlinedIcon from '@material-ui/icons/RecordVoiceOverOutlined';
-import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
-import PageHeader from 'commons/components/layout/pages/PageHeader';
+import BlockIcon from '@mui/icons-material/Block';
+import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
+import RecordVoiceOverOutlinedIcon from '@mui/icons-material/RecordVoiceOverOutlined';
+import { Grid, useMediaQuery, useTheme } from '@mui/material';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
+import PageFullWidth from 'commons/components/pages/PageFullWidth';
+import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
+import { CustomUser } from 'components/hooks/useMyUser';
 import FileDownloader from 'components/visual/FileDownloader';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
@@ -16,9 +19,10 @@ import SearchPager from 'components/visual/SearchPager';
 import SignaturesTable from 'components/visual/SearchResult/signatures';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import 'moment/locale/fr';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import { useLocation } from 'react-router-dom';
 import ForbiddenPage from '../403';
 import SignatureDetail from './signature_detail';
 
@@ -52,15 +56,16 @@ export default function Signatures() {
   const { t } = useTranslation(['manageSignatures']);
   const [pageSize] = useState(PAGE_SIZE);
   const [searching, setSearching] = useState(false);
-  const { indexes, user: currentUser } = useALContext();
+  const { indexes } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
   const [signatureResults, setSignatureResults] = useState<SearchResults>(null);
   const location = useLocation();
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
-  const history = useHistory();
+  const navigate = useNavigate();
   const theme = useTheme();
   const { apiCall } = useMyAPI();
   const classes = useStyles();
-  const { closeGlobalDrawer, setGlobalDrawer, globalDrawer } = useDrawer();
+  const { closeGlobalDrawer, setGlobalDrawer, globalDrawerOpened } = useDrawer();
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
   const [suggestions] = useState([
@@ -74,11 +79,11 @@ export default function Signatures() {
   }, [location.pathname, location.search, pageSize]);
 
   useEffect(() => {
-    if (signatureResults !== null && globalDrawer === null && location.hash) {
-      history.push(`${location.pathname}${location.search ? location.search : ''}`);
+    if (signatureResults !== null && !globalDrawerOpened && location.hash) {
+      navigate(`${location.pathname}${location.search ? location.search : ''}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalDrawer]);
+  }, [globalDrawerOpened]);
 
   useEffect(() => {
     if (location.hash) {
@@ -140,7 +145,7 @@ export default function Signatures() {
 
   const onClear = useCallback(
     () => {
-      history.push(location.pathname);
+      navigate(location.pathname);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [location.pathname]
@@ -150,7 +155,7 @@ export default function Signatures() {
     () => {
       if (filterValue.current !== '') {
         query.set('query', filterValue.current);
-        history.push(`${location.pathname}?${query.toString()}`);
+        navigate(`${location.pathname}?${query.toString()}`);
       } else {
         onClear();
       }
@@ -165,7 +170,7 @@ export default function Signatures() {
 
   const setSignatureID = useCallback(
     (sig_id: string) => {
-      history.push(`${location.pathname}${location.search ? location.search : ''}#${sig_id}`);
+      navigate(`${location.pathname}${location.search ? location.search : ''}#${sig_id}`);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [location.search]
@@ -217,7 +222,7 @@ export default function Signatures() {
                 props: {
                   onClick: () => {
                     query.set('query', 'status:NOISY');
-                    history.push(`${location.pathname}?${query.getDeltaString()}`);
+                    navigate(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
               },
@@ -228,7 +233,7 @@ export default function Signatures() {
                 props: {
                   onClick: () => {
                     query.set('query', 'status:DISABLED');
-                    history.push(`${location.pathname}?${query.getDeltaString()}`);
+                    navigate(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
               }

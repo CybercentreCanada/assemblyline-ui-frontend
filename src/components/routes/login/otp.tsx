@@ -1,4 +1,6 @@
-import { Button, CircularProgress, createStyles, makeStyles, TextField } from '@material-ui/core';
+import { Button, CircularProgress, TextField } from '@mui/material';
+import createStyles from '@mui/styles/createStyles';
+import makeStyles from '@mui/styles/makeStyles';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(() =>

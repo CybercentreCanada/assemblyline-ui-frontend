@@ -1,4 +1,4 @@
-import { Tooltip, useTheme } from '@material-ui/core';
+import { Tooltip, useTheme } from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 

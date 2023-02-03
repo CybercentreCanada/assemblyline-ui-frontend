@@ -1,5 +1,6 @@
-import { ClickAwayListener, Fade, makeStyles, Paper, Popper } from '@material-ui/core';
-import { isEnter, isEscape } from 'commons/addons/elements/utils/keyboard';
+import { ClickAwayListener, Fade, Paper, Popper } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import { isEnter, isEscape } from 'commons/components/utils/keyboard';
 import { default as React, forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 import { NumericField } from '../..';
 
@@ -21,7 +22,7 @@ export type NumberFieldPopperProps = {
   max?: number;
   base?: number;
   labelWidth?: number;
-  onClickAway?: (event: React.MouseEvent<Document, MouseEvent>) => void;
+  onClickAway?: (event: MouseEvent | TouchEvent) => void;
   onChange?: (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => void;
   onNumberChange?: (value: number) => void;
 };
@@ -59,7 +60,7 @@ export const WrappedNumberFieldPopper = (
   );
 
   const handleClickAway = useCallback(
-    (event: React.MouseEvent<Document, MouseEvent>) => {
+    (event: MouseEvent | TouchEvent) => {
       setOpen(false);
       setAnchorEl(null);
       onClickAway(event);
@@ -84,6 +85,7 @@ export const WrappedNumberFieldPopper = (
                 label={label}
                 placeholder={placeholder}
                 fullWidth
+                size="small"
                 margin="dense"
                 value={value as number}
                 labelWidth={labelWidth}

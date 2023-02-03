@@ -1,16 +1,17 @@
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import {
   Button,
   Checkbox,
   FormControlLabel,
-  makeStyles,
   MenuItem,
   Select,
   TextField,
   Tooltip,
   Typography,
   useTheme
-} from '@material-ui/core';
-import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
+} from '@mui/material';
+import FormControl from '@mui/material/FormControl';
+import makeStyles from '@mui/styles/makeStyles';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -109,24 +110,25 @@ function Param({ disabled, param, pidx, idx, setParam, setParamAsync }) {
             </Typography>
           </div>
           {param.type === 'list' ? (
-            <Select
-              margin="dense"
-              disabled={disabled}
-              value={param.value}
-              variant="outlined"
-              onChange={event => setParam(idx, pidx, event.target.value)}
-              fullWidth
-            >
-              {param.list ? (
-                param.list.map((item, i) => (
-                  <MenuItem key={i} value={item}>
-                    {item}
-                  </MenuItem>
-                ))
-              ) : (
-                <MenuItem value="" />
-              )}
-            </Select>
+            <FormControl size="small" fullWidth>
+              <Select
+                disabled={disabled}
+                value={param.value}
+                variant="outlined"
+                onChange={event => setParam(idx, pidx, event.target.value)}
+                fullWidth
+              >
+                {param.list ? (
+                  param.list.map((item, i) => (
+                    <MenuItem key={i} value={item}>
+                      {item}
+                    </MenuItem>
+                  ))
+                ) : (
+                  <MenuItem value="" />
+                )}
+              </Select>
+            </FormControl>
           ) : (
             <TextField
               variant="outlined"

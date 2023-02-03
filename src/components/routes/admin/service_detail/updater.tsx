@@ -1,3 +1,4 @@
+import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import {
   Button,
   FormControlLabel,
@@ -9,14 +10,14 @@ import {
   Radio,
   RadioGroup,
   Select,
+  Skeleton,
   Slider,
   TextField,
   Tooltip,
   Typography,
   useTheme
-} from '@material-ui/core';
-import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
-import { Skeleton } from '@material-ui/lab';
+} from '@mui/material';
+import FormControl from '@mui/material/FormControl';
 import { SourceCard } from 'components/routes/manage/signature_sources';
 import 'moment/locale/fr';
 import { useEffect, useState } from 'react';
@@ -194,9 +195,8 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
               <OutlinedInput
                 fullWidth
                 type="number"
-                // size="small"
                 margin="dense"
-                // variant="outlined"
+                size="small"
                 value={service.update_config.update_interval_seconds}
                 onChange={handleIntervalChange}
                 endAdornment={<InputAdornment position="end">sec</InputAdornment>}
@@ -285,24 +285,25 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
               sm={service.update_config.signature_delimiter === 'custom' ? 7 : 12}
               md={service.update_config.signature_delimiter === 'custom' ? 8 : 12}
             >
-              <Select
-                id="delimiter"
-                fullWidth
-                value={service.update_config.signature_delimiter}
-                onChange={handleDelimiterChange}
-                variant="outlined"
-                margin="dense"
-                style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(0.5) }}
-              >
-                <MenuItem value="new_line">{t('updater.signature_delimiter.new_line')}</MenuItem>
-                <MenuItem value="double_new_line">{t('updater.signature_delimiter.double_new_line')}</MenuItem>
-                <MenuItem value="pipe">{t('updater.signature_delimiter.pipe')}</MenuItem>
-                <MenuItem value="comma">{t('updater.signature_delimiter.comma')}</MenuItem>
-                <MenuItem value="space">{t('updater.signature_delimiter.space')}</MenuItem>
-                <MenuItem value="none">{t('updater.signature_delimiter.none')}</MenuItem>
-                <MenuItem value="file">{t('updater.signature_delimiter.file')}</MenuItem>
-                <MenuItem value="custom">{t('updater.signature_delimiter.custom')}</MenuItem>
-              </Select>
+              <FormControl size="small" fullWidth>
+                <Select
+                  id="delimiter"
+                  fullWidth
+                  value={service.update_config.signature_delimiter}
+                  onChange={handleDelimiterChange}
+                  variant="outlined"
+                  style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(0.5) }}
+                >
+                  <MenuItem value="new_line">{t('updater.signature_delimiter.new_line')}</MenuItem>
+                  <MenuItem value="double_new_line">{t('updater.signature_delimiter.double_new_line')}</MenuItem>
+                  <MenuItem value="pipe">{t('updater.signature_delimiter.pipe')}</MenuItem>
+                  <MenuItem value="comma">{t('updater.signature_delimiter.comma')}</MenuItem>
+                  <MenuItem value="space">{t('updater.signature_delimiter.space')}</MenuItem>
+                  <MenuItem value="none">{t('updater.signature_delimiter.none')}</MenuItem>
+                  <MenuItem value="file">{t('updater.signature_delimiter.file')}</MenuItem>
+                  <MenuItem value="custom">{t('updater.signature_delimiter.custom')}</MenuItem>
+                </Select>
+              </FormControl>
             </Grid>
             {service.update_config.signature_delimiter === 'custom' && (
               <Grid item xs={12} sm={5} md={4}>
@@ -346,9 +347,10 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
                 <Tooltip title={t('updater.sources.remove')}>
                   <IconButton
                     style={{
-                      color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                      color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
                     }}
                     onClick={() => handleDeleteSource(i)}
+                    size="large"
                   >
                     <RemoveCircleOutlineOutlinedIcon />
                   </IconButton>

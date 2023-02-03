@@ -1,5 +1,5 @@
-import { AppElement } from 'commons/components/layout/topnav/AppSwitcher';
-import { UserContextProps, UserProfileProps, ValidatedProp } from 'commons/components/user/UserProvider';
+import { AppSwitcherItem } from 'commons/components/app/AppConfigs';
+import { AppUser, AppUserService, AppUserValidatedProp } from 'commons/components/app/AppUserService';
 import { ClassificationDefinition } from 'helpers/classificationParser';
 import { useState } from 'react';
 
@@ -90,7 +90,7 @@ export type ConfigurationDefinition = {
     allow_replay: boolean;
     allow_url_submissions: boolean;
     allow_zip_downloads: boolean;
-    apps: AppElement[];
+    apps: AppSwitcherItem[];
     banner: {
       [lang: string]: string;
     };
@@ -117,7 +117,7 @@ export type ConfigurationDefinition = {
   };
 };
 
-export interface CustomUser extends UserProfileProps {
+export interface CustomUser extends AppUser {
   // Al specific props
   agrees_with_tos: boolean;
   classification: string;
@@ -128,7 +128,7 @@ export interface CustomUser extends UserProfileProps {
   roles: string[];
 }
 
-export interface CustomUserContextProps extends UserContextProps<CustomUser> {
+export interface CustomAppUserService extends AppUserService<CustomUser> {
   c12nDef: ClassificationDefinition;
   configuration: ConfigurationDefinition;
   indexes: IndexDefinitionMap;
@@ -148,7 +148,7 @@ export interface WhoAmIProps extends CustomUser {
 }
 
 // Application specific hook that will provide configuration to commons [useUser] hook.
-export default function useMyUser(): CustomUserContextProps {
+export default function useMyUser(): CustomAppUserService {
   const [user, setState] = useState<CustomUser>(null);
   const [c12nDef, setC12nDef] = useState<ClassificationDefinition>(null);
   const [configuration, setConfiguration] = useState<ConfigurationDefinition>(null);
@@ -230,7 +230,7 @@ export default function useMyUser(): CustomUserContextProps {
     );
   };
 
-  const validateProp = (propDef: ValidatedProp) => {
+  const validateProp = (propDef: AppUserValidatedProp) => {
     const obj = flattenedProps[propDef.prop];
     if (Array.isArray(obj)) {
       return obj.indexOf(propDef.value) !== -1;
@@ -238,7 +238,7 @@ export default function useMyUser(): CustomUserContextProps {
     return obj === propDef.value;
   };
 
-  const validateProps = (props: ValidatedProp[]) => {
+  const validateProps = (props: AppUserValidatedProp[]) => {
     if (props === undefined) return true;
     return props.some(validateProp);
   };

@@ -1,6 +1,7 @@
-import { IconButton, makeStyles, Paper, TableContainer, TableRow, Tooltip } from '@material-ui/core';
-import CloudDownloadOutlinedIcon from '@material-ui/icons/CloudDownloadOutlined';
-import { AlertTitle, Skeleton } from '@material-ui/lab';
+import { IconButton, Paper, TableContainer, TableRow, Tooltip } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined';
+import { AlertTitle, Skeleton } from '@mui/material';
 import 'moment/locale/fr';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -82,7 +83,7 @@ const WrappedNewServiceTable: React.FC<Props> = ({ services, installingServices,
                           onInstall([service]);
                         }}
                         disabled={installingServices?.includes(service?.summary)}
-                      >
+                        size="large">
                         <CloudDownloadOutlinedIcon />
                       </IconButton>
                     </span>
@@ -102,7 +103,7 @@ const WrappedNewServiceTable: React.FC<Props> = ({ services, installingServices,
       </div>
     )
   ) : (
-    <Skeleton variant="rect" style={{ height: '6rem', borderRadius: '4px' }} />
+    <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
   );
 };
 

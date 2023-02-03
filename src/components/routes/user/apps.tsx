@@ -10,7 +10,7 @@ import {
   Typography,
   useMediaQuery,
   useTheme
-} from '@material-ui/core';
+} from '@mui/material';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined';

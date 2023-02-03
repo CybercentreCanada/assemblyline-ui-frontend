@@ -1,4 +1,5 @@
-import { ChangeEvent, default as React } from 'react';
+import { SelectChangeEvent } from '@mui/material';
+import { default as React } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getItems, getType, getValue, SelectField, StoreProps, useStore } from '../..';
 
@@ -13,7 +14,7 @@ export const WrappedCopyTypeSetting = ({ store }: StoreProps) => {
         description={t('copy.nonPrintable.mode.description')}
         value={getValue.copy.nonPrintable.mode(store.setting.copy.nonPrintable.mode)}
         items={getItems.copy.nonPrintable.mode(store)}
-        onChange={(event: ChangeEvent<{ name?: string; value: unknown }>) =>
+        onChange={(event: SelectChangeEvent<number>, child: React.ReactNode) =>
           update.store.setting.copy.nonPrintable.setMode(getType.copy.nonPrintable.mode(event.target.value as number))
         }
       />

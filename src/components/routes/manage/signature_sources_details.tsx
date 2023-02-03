@@ -3,13 +3,13 @@ import {
   FormControlLabel,
   Grid,
   IconButton,
-  makeStyles,
   TextField,
   Typography,
-  useTheme
-} from '@material-ui/core';
-import AddCircleOutlineOutlinedIcon from '@material-ui/icons/AddCircleOutlineOutlined';
-import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
+  useTheme,
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
+import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
 import React, { useState } from 'react';
@@ -135,317 +135,315 @@ const WrappedSourceDetail = ({
     setModified(true);
   };
 
-  return (
-    source && (
-      <Grid container spacing={1}>
-        <Grid item xs={9}>
+  return source && (
+    <Grid container spacing={1}>
+      <Grid item xs={9}>
+        <div className={classes.label}>
+          {t('uri')}
+          <ResetButton
+            service={source}
+            defaults={defaults}
+            field="uri"
+            reset={() => {
+              setSource({ ...source, uri: defaults.uri });
+              setModified(true);
+            }}
+          />
+        </div>
+        <TextField size="small" value={source.uri} fullWidth variant="outlined" onChange={handleURIChange} />
+      </Grid>
+      <Grid item xs={3}>
+        <div className={classes.label}>{t('git_branch')}</div>
+        <TextField
+          size="small"
+          value={source.git_branch}
+          fullWidth
+          variant="outlined"
+          onChange={handleBranchChange}
+        />
+      </Grid>
+      {c12nDef.enforce && (
+        <Grid item xs={12}>
           <div className={classes.label}>
-            {t('uri')}
+            {t('classification')}
             <ResetButton
               service={source}
               defaults={defaults}
-              field="uri"
+              field="default_classification"
               reset={() => {
-                setSource({ ...source, uri: defaults.uri });
+                setSource({ ...source, default_classification: defaults.default_classification });
                 setModified(true);
               }}
             />
           </div>
-          <TextField size="small" value={source.uri} fullWidth variant="outlined" onChange={handleURIChange} />
-        </Grid>
-        <Grid item xs={3}>
-          <div className={classes.label}>{t('git_branch')}</div>
-          <TextField
-            size="small"
-            value={source.git_branch}
-            fullWidth
-            variant="outlined"
-            onChange={handleBranchChange}
+          <Classification
+            c12n={source.default_classification}
+            type="picker"
+            setClassification={handleClassificationChange}
           />
         </Grid>
-        {c12nDef.enforce && (
-          <Grid item xs={12}>
-            <div className={classes.label}>
-              {t('classification')}
-              <ResetButton
-                service={source}
-                defaults={defaults}
-                field="default_classification"
-                reset={() => {
-                  setSource({ ...source, default_classification: defaults.default_classification });
-                  setModified(true);
-                }}
-              />
-            </div>
-            <Classification
-              c12n={source.default_classification}
-              type="picker"
-              setClassification={handleClassificationChange}
-            />
-          </Grid>
-        )}
-        <Grid item xs={12} md={6}>
-          <div>
-            <div className={classes.label}>{t('name')}</div>
-            <TextField
-              disabled={!addMode}
-              size="small"
-              value={source.name}
-              fullWidth
-              variant="outlined"
-              onChange={handleNameChange}
-            />
-          </div>
-          <div style={{ paddingTop: theme.spacing(1) }}>
-            <div className={classes.label}>
-              {t('pattern')}
-              <ResetButton
-                service={source}
-                defaults={defaults}
-                field="pattern"
-                reset={() => {
-                  setSource({ ...source, pattern: defaults.pattern });
-                  setModified(true);
-                }}
-              />
-            </div>
-            <TextField
-              size="small"
-              value={source.pattern}
-              fullWidth
-              variant="outlined"
-              onChange={handlePatternChange}
-            />
-          </div>
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <div>
-            <div className={classes.label}>
-              {t('username')}
-              <ResetButton
-                service={source}
-                defaults={defaults}
-                field="username"
-                reset={() => {
-                  setSource({ ...source, username: defaults.username });
-                  setModified(true);
-                }}
-              />
-            </div>
-            <TextField
-              size="small"
-              value={source.username}
-              fullWidth
-              variant="outlined"
-              onChange={handleUsernameChange}
-            />
-          </div>
-          <div style={{ paddingTop: theme.spacing(1) }}>
-            <div className={classes.label}>
-              {t('password')}
-              <ResetButton
-                service={source}
-                defaults={defaults}
-                field="password"
-                reset={() => {
-                  setSource({ ...source, password: defaults.password });
-                  setModified(true);
-                }}
-              />
-            </div>
-            <TextField
-              size="small"
-              value={source.password}
-              fullWidth
-              variant="outlined"
-              onChange={handlePasswordChange}
-            />
-          </div>
-        </Grid>
-        <Grid item xs={12}>
+      )}
+      <Grid item xs={12} md={6}>
+        <div>
+          <div className={classes.label}>{t('name')}</div>
+          <TextField
+            disabled={!addMode}
+            size="small"
+            value={source.name}
+            fullWidth
+            variant="outlined"
+            onChange={handleNameChange}
+          />
+        </div>
+        <div style={{ paddingTop: theme.spacing(1) }}>
           <div className={classes.label}>
-            {t('private_key')}
+            {t('pattern')}
             <ResetButton
               service={source}
               defaults={defaults}
-              field="private_key"
+              field="pattern"
               reset={() => {
-                setSource({ ...source, private_key: defaults.private_key });
+                setSource({ ...source, pattern: defaults.pattern });
                 setModified(true);
               }}
             />
           </div>
           <TextField
             size="small"
-            value={source.private_key}
-            multiline
-            rows={6}
+            value={source.pattern}
             fullWidth
             variant="outlined"
-            InputProps={{ style: { fontFamily: 'monospace' } }}
-            onChange={handlePrivateKeyChange}
+            onChange={handlePatternChange}
           />
-        </Grid>
-        <Grid item xs={12}>
-          <div className={classes.label}>{t('headers')}</div>
-        </Grid>
-        {source.headers.map((header, id) => (
-          <Grid key={id} item xs={12}>
-            <Grid container spacing={1} alignItems="center">
-              <Grid item xs={10} md={3}>
-                <div className={classes.label}>{header.name}</div>
-              </Grid>
-              <Grid item xs={10} md={8}>
-                <TextField
-                  size="small"
-                  value={header.value}
-                  fullWidth
-                  variant="outlined"
-                  onChange={event => handleHeaderValueChange(event, id)}
-                />
-              </Grid>
-              <Grid item xs={2} md={1} style={{ textAlign: 'end' }}>
-                <IconButton
-                  style={{
-                    color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark,
-                    margin: '-4px 0'
-                  }}
-                  onClick={() => {
-                    removeHeader(id);
-                  }}
-                >
-                  <RemoveCircleOutlineOutlinedIcon />
-                </IconButton>
-              </Grid>
-            </Grid>
-          </Grid>
-        ))}
-        <Grid item xs={12}>
-          <Grid container spacing={1}>
+        </div>
+      </Grid>
+      <Grid item xs={12} md={6}>
+        <div>
+          <div className={classes.label}>
+            {t('username')}
+            <ResetButton
+              service={source}
+              defaults={defaults}
+              field="username"
+              reset={() => {
+                setSource({ ...source, username: defaults.username });
+                setModified(true);
+              }}
+            />
+          </div>
+          <TextField
+            size="small"
+            value={source.username}
+            fullWidth
+            variant="outlined"
+            onChange={handleUsernameChange}
+          />
+        </div>
+        <div style={{ paddingTop: theme.spacing(1) }}>
+          <div className={classes.label}>
+            {t('password')}
+            <ResetButton
+              service={source}
+              defaults={defaults}
+              field="password"
+              reset={() => {
+                setSource({ ...source, password: defaults.password });
+                setModified(true);
+              }}
+            />
+          </div>
+          <TextField
+            size="small"
+            value={source.password}
+            fullWidth
+            variant="outlined"
+            onChange={handlePasswordChange}
+          />
+        </div>
+      </Grid>
+      <Grid item xs={12}>
+        <div className={classes.label}>
+          {t('private_key')}
+          <ResetButton
+            service={source}
+            defaults={defaults}
+            field="private_key"
+            reset={() => {
+              setSource({ ...source, private_key: defaults.private_key });
+              setModified(true);
+            }}
+          />
+        </div>
+        <TextField
+          size="small"
+          value={source.private_key}
+          multiline
+          rows={6}
+          fullWidth
+          variant="outlined"
+          InputProps={{ style: { fontFamily: 'monospace' } }}
+          onChange={handlePrivateKeyChange}
+        />
+      </Grid>
+      <Grid item xs={12}>
+        <div className={classes.label}>{t('headers')}</div>
+      </Grid>
+      {source.headers.map((header, id) => (
+        <Grid key={id} item xs={12}>
+          <Grid container spacing={1} alignItems="center">
             <Grid item xs={10} md={3}>
-              <TextField
-                size="small"
-                value={tempHeader.name}
-                fullWidth
-                placeholder={t('headers.name')}
-                variant="outlined"
-                onChange={handleTempHeaderName}
-              />
+              <div className={classes.label}>{header.name}</div>
             </Grid>
             <Grid item xs={10} md={8}>
               <TextField
                 size="small"
-                value={tempHeader.value}
+                value={header.value}
                 fullWidth
-                placeholder={t('headers.value')}
                 variant="outlined"
-                onChange={handleTempHeaderValue}
+                onChange={event => handleHeaderValueChange(event, id)}
               />
             </Grid>
             <Grid item xs={2} md={1} style={{ textAlign: 'end' }}>
               <IconButton
                 style={{
-                  color:
-                    !tempHeader.name || !tempHeader.value
-                      ? theme.palette.action.disabled
-                      : theme.palette.type === 'dark'
-                      ? theme.palette.success.light
-                      : theme.palette.success.dark,
+                  color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark,
                   margin: '-4px 0'
                 }}
-                disabled={!tempHeader.name || !tempHeader.value}
                 onClick={() => {
-                  addHeader();
+                  removeHeader(id);
                 }}
-              >
-                <AddCircleOutlineOutlinedIcon />
+                size="large">
+                <RemoveCircleOutlineOutlinedIcon />
               </IconButton>
             </Grid>
           </Grid>
         </Grid>
-        <Grid item xs={12}>
-          <div className={classes.label}>
-            {t('proxy')}
-            <ResetButton
-              service={source}
-              defaults={defaults}
-              field="proxy"
-              reset={() => {
-                setSource({ ...source, proxy: defaults.proxy });
-                setModified(true);
-              }}
+      ))}
+      <Grid item xs={12}>
+        <Grid container spacing={1}>
+          <Grid item xs={10} md={3}>
+            <TextField
+              size="small"
+              value={tempHeader.name}
+              fullWidth
+              placeholder={t('headers.name')}
+              variant="outlined"
+              onChange={handleTempHeaderName}
             />
-          </div>
-          <TextField
-            size="small"
-            value={source.proxy}
-            placeholder={t('proxy.placeholder')}
-            fullWidth
-            variant="outlined"
-            onChange={handleProxyChange}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <div className={classes.label}>
-            {t('ca')}
-            <ResetButton
-              service={source}
-              defaults={defaults}
-              field="ca_cert"
-              reset={() => {
-                setSource({ ...source, ca_cert: defaults.ca_cert });
-                setModified(true);
-              }}
+          </Grid>
+          <Grid item xs={10} md={8}>
+            <TextField
+              size="small"
+              value={tempHeader.value}
+              fullWidth
+              placeholder={t('headers.value')}
+              variant="outlined"
+              onChange={handleTempHeaderValue}
             />
-          </div>
-          <TextField
-            size="small"
-            value={source.ca_cert}
-            multiline
-            rows={6}
-            fullWidth
-            variant="outlined"
-            InputProps={{ style: { fontFamily: 'monospace' } }}
-            onChange={handleCAChange}
-          />
+          </Grid>
+          <Grid item xs={2} md={1} style={{ textAlign: 'end' }}>
+            <IconButton
+              style={{
+                color:
+                  !tempHeader.name || !tempHeader.value
+                    ? theme.palette.action.disabled
+                    : theme.palette.mode === 'dark'
+                    ? theme.palette.success.light
+                    : theme.palette.success.dark,
+                margin: '-4px 0'
+              }}
+              disabled={!tempHeader.name || !tempHeader.value}
+              onClick={() => {
+                addHeader();
+              }}
+              size="large">
+              <AddCircleOutlineOutlinedIcon />
+            </IconButton>
+          </Grid>
         </Grid>
-        <Grid item xs={12}>
-          <FormControlLabel
-            control={
-              <Checkbox size="small" checked={source.ssl_ignore_errors} name="label" onChange={handleSSLChange} />
-            }
-            label={
-              <Typography variant="body2">
-                {t('ignore_ssl')}
-                <ResetButton
-                  service={source}
-                  defaults={defaults}
-                  field="ssl_ignore_errors"
-                  reset={() => {
-                    setSource({ ...source, ssl_ignore_errors: defaults.ssl_ignore_errors });
-                    setModified(true);
-                  }}
-                />
-              </Typography>
-            }
-            className={classes.checkbox}
-          />
-        </Grid>
-        {showDetails && (
-          <div style={{ textAlign: 'center', paddingTop: theme.spacing(3), flexGrow: 1 }}>
-            <Typography variant="subtitle2" color="textSecondary">
-              {`${t('update.label.last_successful')}: `}
-              <Moment fromNow locale={i18n.language}>
-                {source.status.last_successful_update}
-              </Moment>
-            </Typography>
-            <Typography variant="subtitle2" color="textSecondary">
-              {`${t('update.label.status')}: ${source.status.message}`}
-            </Typography>
-          </div>
-        )}
       </Grid>
-    )
+      <Grid item xs={12}>
+        <div className={classes.label}>
+          {t('proxy')}
+          <ResetButton
+            service={source}
+            defaults={defaults}
+            field="proxy"
+            reset={() => {
+              setSource({ ...source, proxy: defaults.proxy });
+              setModified(true);
+            }}
+          />
+        </div>
+        <TextField
+          size="small"
+          value={source.proxy}
+          placeholder={t('proxy.placeholder')}
+          fullWidth
+          variant="outlined"
+          onChange={handleProxyChange}
+        />
+      </Grid>
+      <Grid item xs={12}>
+        <div className={classes.label}>
+          {t('ca')}
+          <ResetButton
+            service={source}
+            defaults={defaults}
+            field="ca_cert"
+            reset={() => {
+              setSource({ ...source, ca_cert: defaults.ca_cert });
+              setModified(true);
+            }}
+          />
+        </div>
+        <TextField
+          size="small"
+          value={source.ca_cert}
+          multiline
+          rows={6}
+          fullWidth
+          variant="outlined"
+          InputProps={{ style: { fontFamily: 'monospace' } }}
+          onChange={handleCAChange}
+        />
+      </Grid>
+      <Grid item xs={12}>
+        <FormControlLabel
+          control={
+            <Checkbox size="small" checked={source.ssl_ignore_errors} name="label" onChange={handleSSLChange} />
+          }
+          label={
+            <Typography variant="body2">
+              {t('ignore_ssl')}
+              <ResetButton
+                service={source}
+                defaults={defaults}
+                field="ssl_ignore_errors"
+                reset={() => {
+                  setSource({ ...source, ssl_ignore_errors: defaults.ssl_ignore_errors });
+                  setModified(true);
+                }}
+              />
+            </Typography>
+          }
+          className={classes.checkbox}
+        />
+      </Grid>
+      {showDetails && (
+        <div style={{ textAlign: 'center', paddingTop: theme.spacing(3), flexGrow: 1 }}>
+          <Typography variant="subtitle2" color="textSecondary">
+            {`${t('update.label.last_successful')}: `}
+            <Moment fromNow locale={i18n.language}>
+              {source.status.last_successful_update}
+            </Moment>
+          </Typography>
+          <Typography variant="subtitle2" color="textSecondary">
+            {`${t('update.label.status')}: ${source.status.message}`}
+          </Typography>
+        </div>
+      )}
+    </Grid>
   );
 };
 

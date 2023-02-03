@@ -1,8 +1,7 @@
-import { Divider, Grid, IconButton, Tooltip, Typography, useTheme } from '@material-ui/core';
-import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
-import YoutubeSearchedForIcon from '@material-ui/icons/YoutubeSearchedFor';
-import { Skeleton } from '@material-ui/lab';
-import PageCenter from 'commons/components/layout/pages/PageCenter';
+import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
+import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
+import { Divider, Grid, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -12,10 +11,11 @@ import CustomChip from 'components/visual/CustomChip';
 import Histogram from 'components/visual/Histogram';
 import { bytesToSize, safeFieldValue, safeFieldValueURI } from 'helpers/utils';
 import 'moment/locale/fr';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
-import { Link, useHistory, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import { Link, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
 
 export type Safelist = {
@@ -72,7 +72,7 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
   const { user: currentUser, c12nDef } = useALContext();
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if ((safelist_id || id) && currentUser.roles.includes('safelist_view')) {
@@ -119,7 +119,7 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
         setDeleteDialog(false);
         showSuccessMessage(t('delete.success'));
         if (id) {
-          setTimeout(() => history.push('/manage/safelist'), 1000);
+          setTimeout(() => navigate('/manage/safelist'), 1000);
         }
         setTimeout(() => window.dispatchEvent(new CustomEvent('reloadSafelist')), 1000);
         close();
@@ -230,6 +230,7 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
                                   safelist.tag.type
                                 }:${safeFieldValueURI(safelist.tag.value)}`
                           }
+                          size="large"
                         >
                           <YoutubeSearchedForIcon />
                         </IconButton>
@@ -239,9 +240,10 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
                       <Tooltip title={t('remove')}>
                         <IconButton
                           style={{
-                            color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                            color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
                           }}
                           onClick={() => setDeleteDialog(true)}
+                          size="large"
                         >
                           <RemoveCircleOutlineOutlinedIcon />
                         </IconButton>
@@ -262,11 +264,21 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
               ) : (
                 <>
                   <div style={{ display: 'flex' }}>
-                    <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-                    <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+                    <Skeleton
+                      variant="circular"
+                      height="2.5rem"
+                      width="2.5rem"
+                      style={{ margin: theme.spacing(0.5) }}
+                    />
+                    <Skeleton
+                      variant="circular"
+                      height="2.5rem"
+                      width="2.5rem"
+                      style={{ margin: theme.spacing(0.5) }}
+                    />
                   </div>
                   <Skeleton
-                    variant="rect"
+                    variant="rectangular"
                     height="2rem"
                     width="6rem"
                     style={{

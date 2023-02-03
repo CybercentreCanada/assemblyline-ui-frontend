@@ -1,4 +1,5 @@
-import { Collapse, Divider, makeStyles, Typography, useTheme } from '@material-ui/core';
+import { Collapse, Divider, Typography, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import ErrorCard from '../ErrorCard';

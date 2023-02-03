@@ -1,11 +1,11 @@
-import { Typography } from '@material-ui/core';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import { Typography } from '@mui/material';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 // eslint-disable-next-line import/extensions
 import CBOR from 'helpers/cbor.js';
 import toArrayBuffer from 'helpers/toArrayBuffer';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type SecTokenProps = {
@@ -19,7 +19,7 @@ export function SecurityTokenLogin({ username, setShownControls, setWebAuthNResp
   const { apiCall } = useMyAPI();
   const { showErrorMessage } = useMySnackbar();
 
-  useEffect(() => {
+  useEffectOnce(() => {
     apiCall({
       url: `/api/v4/webauthn/authenticate/begin/${username}/`,
       onSuccess: api_data => {
@@ -52,8 +52,7 @@ export function SecurityTokenLogin({ username, setShownControls, setWebAuthNResp
         }
       }
     });
-    // eslint-disable-next-line
-  }, []);
+  });
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'center' }}>

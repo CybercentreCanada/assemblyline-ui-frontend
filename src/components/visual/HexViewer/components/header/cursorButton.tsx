@@ -1,4 +1,4 @@
-import NavigationIcon from '@material-ui/icons/Navigation';
+import NavigationIcon from '@mui/icons-material/Navigation';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericField, PopperIconButton, StoreProps, useDispatch } from '../..';
@@ -24,6 +24,7 @@ export const WrappedHexCursorButton = ({ store }: StoreProps) => {
           label={t('offset.label')}
           placeholder={t('offset.placeholder')}
           fullWidth
+          size="small"
           margin="dense"
           range="loop"
           value={cursorIndex as number}

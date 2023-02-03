@@ -1,31 +1,35 @@
+import Editor, { loader } from '@monaco-editor/react';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
+import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import {
+  Alert,
   Grid,
   IconButton,
   LinearProgress,
-  makeStyles,
   Paper,
+  Skeleton,
   Tab,
   Tabs,
   Tooltip,
   Typography,
   useTheme
-} from '@material-ui/core';
-import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
-import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined';
-import GetAppOutlinedIcon from '@material-ui/icons/GetAppOutlined';
-import Editor, { loader } from '@monaco-editor/react';
-import { Alert, Skeleton } from '@material-ui/lab';
-import PageFullSize from 'commons/components/layout/pages/PageFullSize';
-import useALContext from 'components/hooks/useALContext';
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import useAppTheme from 'commons/components/app/hooks/useAppTheme';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
+import PageFullSize from 'commons/components/pages/PageFullSize';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
-import FileDownloader from 'components/visual/FileDownloader';
+import { CustomUser } from 'components/hooks/useMyUser';
 import Empty from 'components/visual/Empty';
+import FileDownloader from 'components/visual/FileDownloader';
 import { HexViewerApp } from 'components/visual/HexViewer';
-import ReactResizeDetector from 'react-resize-detector';
-import useAppContext from 'commons/components/hooks/useAppContext';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useHistory, useLocation, useParams } from 'react-router-dom';
+import ReactResizeDetector from 'react-resize-detector';
+import { useNavigate } from 'react-router';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.34.1' } });
@@ -36,7 +40,7 @@ type ParamProps = {
 
 const useStyles = makeStyles(theme => ({
   hexWrapper: {
-    backgroundColor: theme.palette.type === 'dark' ? '#1e1e1e' : '#FAFAFA',
+    backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#FAFAFA',
     border: `1px solid ${theme.palette.divider}`,
     padding: theme.spacing(1),
     flexGrow: 1,
@@ -77,9 +81,9 @@ const WrappedMonacoViewer = ({ data, type, error, beautify = false }) => {
   const classes = useStyles();
   const { i18n } = useTranslation();
   const containerEL = useRef<HTMLDivElement>();
-  const { isDarkTheme } = useAppContext();
+  const { isDark: isDarkTheme } = useAppTheme();
 
-  useEffect(() => {
+  useEffectOnce(() => {
     // I cannot find a way to hot switch monaco editor's locale but at least I can load
     // the right language on first load...
     if (i18n.language === 'fr') {
@@ -87,8 +91,7 @@ const WrappedMonacoViewer = ({ data, type, error, beautify = false }) => {
     } else {
       loader.config({ 'vs/nls': { availableLanguages: { '*': '' } } });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   const beautifyJSON = inputData => {
     if (!beautify) return inputData;
@@ -199,7 +202,7 @@ const FileViewer = () => {
   const classes = useStyles();
   const theme = useTheme();
   const location = useLocation();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { apiCall } = useMyAPI();
   const [string, setString] = useState(null);
   const [hex, setHex] = useState(null);
@@ -210,12 +213,12 @@ const FileViewer = () => {
   const [type, setType] = useState('unknown');
   const [tab, setTab] = useState(null);
   const [sha256, setSha256] = useState(null);
-  const { user: currentUser } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
 
   const handleChangeTab = (event, newTab) => {
     const currentTab = location.hash.substring(1, location.hash.length) || 'ascii';
     if (currentTab !== newTab) {
-      history.push(`${location.pathname}#${newTab}`);
+      navigate(`${location.pathname}#${newTab}`);
     }
   };
 
@@ -318,7 +321,7 @@ const FileViewer = () => {
           <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
             {currentUser.roles.includes('submission_view') && (
               <Tooltip title={t('detail')}>
-                <IconButton component={Link} to={`/file/detail/${id}`}>
+                <IconButton component={Link} to={`/file/detail/${id}`} size="large">
                   <DescriptionOutlinedIcon />
                 </IconButton>
               </Tooltip>
@@ -328,8 +331,9 @@ const FileViewer = () => {
                 <IconButton
                   component={Link}
                   to={`/search/submission?query=files.sha256:${id} OR results:${id}* OR errors:${id}*`}
+                  size="large"
                 >
-                  <AmpStoriesOutlinedIcon />
+                  <ViewCarouselOutlinedIcon />
                 </IconButton>
               </Tooltip>
             )}
@@ -384,7 +388,7 @@ const FileViewer = () => {
         </div>
       ) : (
         <Skeleton
-          variant="rect"
+          variant="rectangular"
           height={theme.spacing(6)}
           style={{ marginTop: theme.spacing(2), marginBottom: theme.spacing(2) }}
         />

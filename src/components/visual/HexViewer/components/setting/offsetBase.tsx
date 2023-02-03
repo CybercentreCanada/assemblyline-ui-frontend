@@ -1,4 +1,5 @@
-import React, { ChangeEvent } from 'react';
+import { SelectChangeEvent } from '@mui/material';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { getItems, getType, getValue, SelectField, StoreProps, useStore } from '../..';
 
@@ -12,7 +13,7 @@ export const WrappedHexOffsetBaseSetting = ({ store }: StoreProps) => {
       description={t('base.description')}
       value={getValue.offset.base(store.setting.offset.base)}
       items={getItems.offset.base(store)}
-      onChange={(event: ChangeEvent<{ name?: string; value: unknown }>) =>
+      onChange={(event: SelectChangeEvent<number>, child: React.ReactNode) =>
         update.store.setting.offset.setBase(getType.offset.base(event.target.value as number))
       }
     />

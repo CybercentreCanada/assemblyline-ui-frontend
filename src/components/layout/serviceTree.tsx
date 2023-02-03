@@ -1,5 +1,7 @@
-import { Checkbox, createStyles, FormControlLabel, makeStyles, Typography, useTheme } from '@material-ui/core';
-import Skeleton from '@material-ui/lab/Skeleton';
+import { Checkbox, FormControlLabel, Typography, useTheme } from '@mui/material';
+import Skeleton from '@mui/material/Skeleton';
+import createStyles from '@mui/styles/createStyles';
+import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 
@@ -87,7 +89,7 @@ function ServiceTreeItem({ item, onChange, disabled = false, size = 'medium' as 
 
 type SkelItemsProps = {
   size: 'medium' | 'small';
-  spacing: number;
+  spacing: number | string;
 };
 
 function SkelItems({ size, spacing }: SkelItemsProps) {

@@ -1,5 +1,5 @@
-import { IconButton, Menu, MenuItem, Tooltip } from '@material-ui/core';
-import MenuIcon from '@material-ui/icons/Menu';
+import MenuIcon from '@mui/icons-material/Menu';
+import { IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -13,13 +13,12 @@ const AlertActionsMenu = () => {
   return (
     <>
       <Tooltip title={t('tooltip.actions')}>
-        <IconButton aria-controls="simple-menu" aria-haspopup="true" onClick={onClick}>
+        <IconButton aria-controls="simple-menu" aria-haspopup="true" onClick={onClick} size="large">
           <MenuIcon />
         </IconButton>
       </Tooltip>
       <Menu
         anchorEl={anchorEl}
-        getContentAnchorEl={null}
         keepMounted
         open={!!anchorEl}
         onClose={onClick}

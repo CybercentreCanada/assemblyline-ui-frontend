@@ -1,6 +1,7 @@
-import { makeStyles, Tooltip } from '@material-ui/core';
-import IconButton from '@material-ui/core/IconButton';
-import AdbIcon from '@material-ui/icons/Adb';
+import AdbIcon from '@mui/icons-material/Adb';
+import { Tooltip } from '@mui/material';
+import IconButton from '@mui/material/IconButton';
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import { default as React } from 'react';
 

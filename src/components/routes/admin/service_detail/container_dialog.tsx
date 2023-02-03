@@ -1,3 +1,5 @@
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import {
   Button,
   Dialog,
@@ -15,9 +17,8 @@ import {
   Tooltip,
   Typography,
   useTheme
-} from '@material-ui/core';
-import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
-import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
+} from '@mui/material';
+import FormControl from '@mui/material/FormControl';
 import 'moment/locale/fr';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -80,9 +81,10 @@ const WrappedEnvironment = ({ envVar, onAdd, onUpdate, onDelete }: EnvironmentPr
         <Tooltip title={t('params.user.remove')}>
           <IconButton
             style={{
-              color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+              color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
             }}
             onClick={() => onDelete(envVar)}
+            size="large"
           >
             <RemoveCircleOutlineOutlinedIcon />
           </IconButton>
@@ -120,9 +122,10 @@ const WrappedEnvironment = ({ envVar, onAdd, onUpdate, onDelete }: EnvironmentPr
           <Tooltip title={t('params.user.add')}>
             <IconButton
               style={{
-                color: theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark
+                color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
               }}
               onClick={addEnvironment}
+              size="large"
             >
               <AddCircleOutlineIcon />
             </IconButton>
@@ -191,9 +194,10 @@ const WrappedVolumeControl = ({ name, vol, onAdd, onDelete }: VolumeControlProps
         <Tooltip title={t('params.user.remove')}>
           <IconButton
             style={{
-              color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+              color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
             }}
             onClick={() => onDelete(name)}
+            size="large"
           >
             <RemoveCircleOutlineOutlinedIcon />
           </IconButton>
@@ -215,19 +219,20 @@ const WrappedVolumeControl = ({ name, vol, onAdd, onDelete }: VolumeControlProps
         />
       </Grid>
       <Grid item xs={10} sm={8}>
-        <Select
-          fullWidth
-          label={t('container.dialog.volumes.access_mode')}
-          id="access_mode"
-          variant="outlined"
-          margin="dense"
-          value={tempVol.access_mode}
-          style={{ margin: 0 }}
-          onChange={event => handleValueChange('access_mode', event.target.value)}
-        >
-          <MenuItem value="ReadWriteOnce">{t('ReadWriteOnce')}</MenuItem>
-          <MenuItem value="ReadWriteMany">{t('ReadWriteMany')}</MenuItem>
-        </Select>
+        <FormControl size="small" fullWidth>
+          <Select
+            fullWidth
+            label={t('container.dialog.volumes.access_mode')}
+            id="access_mode"
+            variant="outlined"
+            value={tempVol.access_mode}
+            style={{ margin: 0 }}
+            onChange={event => handleValueChange('access_mode', event.target.value)}
+          >
+            <MenuItem value="ReadWriteOnce">{t('ReadWriteOnce')}</MenuItem>
+            <MenuItem value="ReadWriteMany">{t('ReadWriteMany')}</MenuItem>
+          </Select>
+        </FormControl>
         <TextField
           fullWidth
           placeholder={t('container.dialog.volumes.mount_path')}
@@ -264,9 +269,10 @@ const WrappedVolumeControl = ({ name, vol, onAdd, onDelete }: VolumeControlProps
           <Tooltip title={t('params.user.add')}>
             <IconButton
               style={{
-                color: theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark
+                color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
               }}
               onClick={addVolume}
+              size="large"
             >
               <AddCircleOutlineIcon />
             </IconButton>
@@ -350,8 +356,8 @@ const WrappedContainerDialog = ({
 
   const handleContainerValueChange = (field, value) => {
     setModified(true);
-    if(value === undefined){
-      let clone = {...tempContainer};
+    if (value === undefined) {
+      let clone = { ...tempContainer };
       delete clone[field];
       setTempContainer(clone);
     } else {
@@ -466,18 +472,19 @@ const WrappedContainerDialog = ({
                   }}
                 />
               </Typography>
-              <Select
-                fullWidth
-                id="registry_type"
-                variant="outlined"
-                margin="dense"
-                value={tempContainer.registry_type}
-                style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(0.5) }}
-                onChange={event => handleContainerValueChange('registry_type', event.target.value)}
-              >
-                <MenuItem value="docker">{t('Docker')}</MenuItem>
-                <MenuItem value="harbor">{t('Harbor')}</MenuItem>
-              </Select>
+              <FormControl size="small" fullWidth>
+                <Select
+                  fullWidth
+                  id="registry_type"
+                  variant="outlined"
+                  value={tempContainer.registry_type}
+                  style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(0.5) }}
+                  onChange={event => handleContainerValueChange('registry_type', event.target.value)}
+                >
+                  <MenuItem value="docker">{t('Docker')}</MenuItem>
+                  <MenuItem value="harbor">{t('Harbor')}</MenuItem>
+                </Select>
+              </FormControl>
             </Grid>
             <Grid item xs={12} md={6}>
               <Typography variant="subtitle2">
@@ -495,8 +502,8 @@ const WrappedContainerDialog = ({
               <TextField
                 fullWidth
                 type="number"
-                size="small"
                 margin="dense"
+                size="small"
                 variant="outlined"
                 onChange={event => handleContainerValueChange('cpu_cores', event.target.value)}
                 value={tempContainer.cpu_cores}
@@ -520,8 +527,8 @@ const WrappedContainerDialog = ({
                   <TextField
                     fullWidth
                     type="number"
-                    size="small"
                     margin="dense"
+                    size="small"
                     variant="outlined"
                     onChange={event => handleContainerValueChange('ram_mb_min', event.target.value)}
                     value={tempContainer.ram_mb_min}
@@ -531,8 +538,8 @@ const WrappedContainerDialog = ({
                   <TextField
                     fullWidth
                     type="number"
-                    size="small"
                     margin="dense"
+                    size="small"
                     variant="outlined"
                     onChange={event => handleContainerValueChange('ram_mb', event.target.value)}
                     value={tempContainer.ram_mb}

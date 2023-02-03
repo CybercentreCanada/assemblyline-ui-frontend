@@ -1,8 +1,7 @@
-import { Tooltip } from '@material-ui/core';
-import Paper from '@material-ui/core/Paper';
-import TableContainer from '@material-ui/core/TableContainer';
-import ArchiveOutlinedIcon from '@material-ui/icons/ArchiveOutlined';
-import { AlertTitle, Skeleton } from '@material-ui/lab';
+import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
+import { AlertTitle, Skeleton, Tooltip } from '@mui/material';
+import Paper from '@mui/material/Paper';
+import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
 import SubmissionState from 'components/visual/SubmissionState';
@@ -101,9 +100,9 @@ const WrappedSubmissionsTable: React.FC<SubmissionsTableProps> = ({ submissionRe
               >
                 <DivTableCell>
                   <Tooltip title={submission.times.submitted}>
-                    <Moment fromNow locale={i18n.language}>
-                      {submission.times.submitted}
-                    </Moment>
+                    <>
+                      <Moment fromNow locale={i18n.language} date={submission.times.submitted} />
+                    </>
                   </Tooltip>
                 </DivTableCell>
                 <DivTableCell>
@@ -141,7 +140,7 @@ const WrappedSubmissionsTable: React.FC<SubmissionsTableProps> = ({ submissionRe
       </div>
     )
   ) : (
-    <Skeleton variant="rect" style={{ height: '6rem', borderRadius: '4px' }} />
+    <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
   );
 };
 

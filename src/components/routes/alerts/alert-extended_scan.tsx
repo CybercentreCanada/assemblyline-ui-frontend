@@ -1,8 +1,9 @@
-import { Box, makeStyles, Tooltip } from '@material-ui/core';
-import BlockIcon from '@material-ui/icons/Block';
-import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
-import RemoveCircleOutlineIcon from '@material-ui/icons/RemoveCircleOutline';
-import SlowMotionVideoIcon from '@material-ui/icons/SlowMotionVideo';
+import { Box, Tooltip } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import BlockIcon from '@mui/icons-material/Block';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+import SlowMotionVideoIcon from '@mui/icons-material/SlowMotionVideo';
 import clsx from 'clsx';
 import CustomChip from 'components/visual/CustomChip';
 import React from 'react';
@@ -15,16 +16,16 @@ const useStyles = makeStyles(theme => ({
     }
   },
   success: {
-    color: theme.palette.type !== 'dark' ? theme.palette.success.dark : theme.palette.success.light
+    color: theme.palette.mode !== 'dark' ? theme.palette.success.dark : theme.palette.success.light
   },
   info: {
-    color: theme.palette.type !== 'dark' ? theme.palette.info.dark : theme.palette.info.light
+    color: theme.palette.mode !== 'dark' ? theme.palette.info.dark : theme.palette.info.light
   },
   default: {
     color: theme.palette.text.disabled
   },
   error: {
-    color: theme.palette.type !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
+    color: theme.palette.mode !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
   }
 }));
 

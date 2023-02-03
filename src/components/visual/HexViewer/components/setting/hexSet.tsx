@@ -1,3 +1,4 @@
+import { SelectChangeEvent } from '@mui/material';
 import { ChangeEvent, default as React } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -31,7 +32,7 @@ export const WrappedHexSetSetting = ({ store }: StoreProps) => {
         description={t('nonPrintable.encoding.description')}
         value={getValue.hex.nonPrintable.set(store.setting.hex.nonPrintable.set)}
         items={getItems.hex.nonPrintable.set(store)}
-        onChange={(event: ChangeEvent<{ name?: string; value: unknown }>) =>
+        onChange={(event: SelectChangeEvent<number>, child: React.ReactNode) =>
           update.store.setting.hex.nonPrintable.setSet(getType.hex.nonPrintable.set(event.target.value as number))
         }
       />

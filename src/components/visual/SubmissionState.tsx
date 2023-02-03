@@ -1,7 +1,7 @@
-import { Tooltip } from '@material-ui/core';
-import ClearIcon from '@material-ui/icons/Clear';
-import DoneIcon from '@material-ui/icons/Done';
-import UpdateIcon from '@material-ui/icons/Update';
+import { Tooltip } from '@mui/material';
+import ClearIcon from '@mui/icons-material/Clear';
+import DoneIcon from '@mui/icons-material/Done';
+import UpdateIcon from '@mui/icons-material/Update';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 

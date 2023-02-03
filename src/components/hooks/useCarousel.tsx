@@ -1,4 +1,4 @@
-import { CarouselContext, CarouselContextProps } from 'components/visual/CarouselProvider';
+import { CarouselContext, CarouselContextProps } from 'components/providers/CarouselProvider';
 import { useContext } from 'react';
 
 export default function useCarousel(): CarouselContextProps {
