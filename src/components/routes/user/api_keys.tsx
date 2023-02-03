@@ -16,13 +16,13 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import FormControl from '@mui/material/FormControl';
+// import FormControl from '@mui/material/FormControl';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import CustomChip from 'components/visual/CustomChip';
-import AddCircleOutlineOutlinedIcon from '@material-ui/icons/AddCircleOutlineOutlined';
-import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined';
+import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -181,7 +181,7 @@ export default function APIKeys({ user, toggleAPIKey }: APIKeysProps) {
           <IconButton
             onClick={() => setAddApikey(true)}
             style={{
-              color: theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark
+              color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
             }}
           >
             <AddCircleOutlineOutlinedIcon />
