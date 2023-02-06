@@ -66,7 +66,12 @@ const AppSwitcher: React.FC<AppsSwitcherProps | any> = () => {
                         target={a.newWindow ? '_blank' : null}
                         href={a.route}
                         key={`button-${i}`}
-                        style={{ display: 'inherit', textDecoration: 'none', fontWeight: 400 }}
+                        style={{
+                          display: 'inherit',
+                          textDecoration: 'none',
+                          fontWeight: 400,
+                          color: theme.palette.text.primary
+                        }}
                       >
                         <div style={{ display: 'inline-flex' }}>
                           <Avatar
