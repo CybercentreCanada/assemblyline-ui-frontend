@@ -31,8 +31,6 @@ const AppSearchRoot = styled(Box, { shouldForwardProp: prop => prop !== 'menuOpe
     return {
       position: 'relative',
       borderRadius: theme.shape.borderRadius,
-      borderBottomLeftRadius: menuOpen && 0,
-      borderBottomRightRadius: menuOpen && 0,
       '.app-search-input': {
         backgroundColor: backgroundColor,
         boxShadow: menuOpen && theme.shadows[4]
@@ -165,7 +163,11 @@ export default function AppSearch() {
 
   return (
     <ClickAwayListener onClickAway={() => state.set({ ...state, menu: false })}>
-      <AppSearchRoot ref={menuRef} sx={{ mr: !showSearchIcon && 1 }} menuOpen={state.menu}>
+      <AppSearchRoot
+        ref={menuRef}
+        sx={{ mr: !showSearchIcon && 1, display: 'flex', flexGrow: 1, justifyItems: 'flex-end' }}
+        menuOpen={state.menu}
+      >
         {showSearchIcon ? (
           <IconButton color="inherit" size="large" onClick={onToggleFullscreen}>
             <Tooltip title={t('app.search.fullscreen')}>
@@ -186,6 +188,8 @@ export default function AppSearch() {
               onChange={onChange}
               onKeyDown={onKeyDown}
               onClear={onClear}
+              minWidth="250px"
+              maxWidth="350px"
             />
             {provided && (
               <Popper
