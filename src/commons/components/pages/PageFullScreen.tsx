@@ -45,7 +45,11 @@ const PageFullscreen = ({ children, margin = null, mb = 2, ml = 2, mr = 2, mt = 
   };
 
   return (
-    <Box ref={maximizableElement} component="div" sx={theme => ({ backgroundColor: theme.palette.background.default })}>
+    <Box
+      ref={maximizableElement}
+      component="div"
+      sx={theme => ({ backgroundColor: theme.palette.background.default, overflowY: 'auto' })}
+    >
       <Box
         component="div"
         sx={theme => ({
