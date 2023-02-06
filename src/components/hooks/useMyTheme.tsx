@@ -13,7 +13,7 @@ const AL_THEME: AppThemeConfigs = {
     MuiTab: {
       styleOverrides: {
         root: {
-          minWidth: '120px'
+          minWidth: '145px'
         }
       }
     }

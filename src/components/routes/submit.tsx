@@ -62,6 +62,13 @@ const useStyles = makeStyles(theme => ({
     left: '50%',
     marginTop: -12,
     marginLeft: -12
+  },
+  tweaked_tabs: {
+    [theme.breakpoints.only('xs')]: {
+      '& [role=tab]': {
+        minWidth: '90px'
+      }
+    }
   }
 }));
 
@@ -399,7 +406,13 @@ const Submit: React.FC<any> = () => {
         ) : null}
         <TabContext value={value}>
           <Paper square>
-            <TabList centered onChange={handleChange} indicatorColor="primary" textColor="primary">
+            <TabList
+              centered
+              onChange={handleChange}
+              indicatorColor="primary"
+              textColor="primary"
+              className={classes.tweaked_tabs}
+            >
               <Tab label={t('file')} value="0" disabled={!currentUser.roles.includes('submission_create')} />
               <Tab label={urlHashTitle} value="1" disabled={!currentUser.roles.includes('submission_create')} />
               <Tab label={t('options')} value="2" disabled={!currentUser.roles.includes('submission_create')} />
