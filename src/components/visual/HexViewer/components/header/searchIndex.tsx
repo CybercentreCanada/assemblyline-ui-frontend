@@ -13,10 +13,10 @@ const useHexStyles = makeStyles(theme => ({
     textAlign: 'center',
     cursor: 'pointer',
     padding: 8,
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.only('sm')]: {
       padding: 2
     },
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.only('xs')]: {
       padding: 0
     }
   },
@@ -24,10 +24,10 @@ const useHexStyles = makeStyles(theme => ({
     textAlign: 'center',
     cursor: 'default',
     padding: 8,
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.only('sm')]: {
       padding: 2
     },
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.only('xs')]: {
       padding: 0
     }
   }

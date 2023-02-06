@@ -74,7 +74,7 @@ const useStyles = makeStyles(theme => ({
     width: theme.spacing(16),
     height: theme.spacing(16),
     marginRight: theme.spacing(2),
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.only('xs')]: {
       width: theme.spacing(12),
       height: theme.spacing(12),
       marginRight: 0
@@ -95,7 +95,7 @@ const useStyles = makeStyles(theme => ({
   banner_title: {
     fontWeight: 500,
     fontSize: '200%',
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.only('xs')]: {
       fontSize: '180%'
     }
   },
@@ -117,7 +117,7 @@ const useStyles = makeStyles(theme => ({
     marginLeft: theme.spacing(3),
     marginRight: theme.spacing(4.5),
     fontSize: '400%',
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.only('xs')]: {
       marginLeft: theme.spacing(2),
       marginRight: theme.spacing(2.5),
       fontSize: '350%'
