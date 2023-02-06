@@ -19,10 +19,10 @@ const useHexStyles = makeStyles(theme => ({
   },
   iconButton: {
     padding: 10,
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.only('sm')]: {
       padding: 4
     },
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.only('xs')]: {
       padding: 2
     }
   },
@@ -57,10 +57,10 @@ const useHexStyles = makeStyles(theme => ({
     textAlign: 'center',
     cursor: 'default',
     padding: 8,
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.only('sm')]: {
       padding: 2
     },
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.only('xs')]: {
       padding: 0
     }
   }

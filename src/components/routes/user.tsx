@@ -57,7 +57,7 @@ type ParamProps = {
 const useStyles = makeStyles(theme => ({
   drawer: {
     width: '500px',
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.only('xs')]: {
       width: '100vw'
     }
   },
@@ -125,7 +125,7 @@ function User({ username }: UserProps) {
   const [buttonLoading, setButtonLoading] = useState(false);
   const { user: currentUser, configuration } = useALContext();
   const downSM = useMediaQuery(theme.breakpoints.down('sm'));
-  const isXSDown = useMediaQuery(theme.breakpoints.down('xs'));
+  const isXS = useMediaQuery(theme.breakpoints.only('xs'));
   const { showErrorMessage, showSuccessMessage, showWarningMessage } = useMySnackbar();
   const sp1 = theme.spacing(1);
   const sp4 = theme.spacing(4);
@@ -552,7 +552,7 @@ function User({ username }: UserProps) {
             <Table aria-label={t('profile')}>
               <TableHead>
                 <TableRow>
-                  <TableCell colSpan={isXSDown ? 2 : 3}>
+                  <TableCell colSpan={isXS ? 2 : 3}>
                     <Typography variant="h6" gutterBottom>
                       {t('profile')}
                     </Typography>
@@ -561,31 +561,31 @@ function User({ username }: UserProps) {
               </TableHead>
               <TableBody>
                 <TableRow className={classes.row}>
-                  {isXSDown ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('uname')}</TableCell>}
+                  {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('uname')}</TableCell>}
                   <TableCell width="100%">
-                    {!isXSDown ? null : <Typography variant="caption">{t('uname')}</Typography>}
+                    {!isXS ? null : <Typography variant="caption">{t('uname')}</Typography>}
                     {user ? <div>{user.uname}</div> : <Skeleton />}
                   </TableCell>
                   <TableCell align="right" />
                 </TableRow>
                 <ClickRow enabled={editable} chevron onClick={() => toggleDrawer('name')}>
-                  {isXSDown ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('name')}</TableCell>}
+                  {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('name')}</TableCell>}
                   <TableCell width="100%">
-                    {!isXSDown ? null : <Typography variant="caption">{t('name')}</Typography>}
+                    {!isXS ? null : <Typography variant="caption">{t('name')}</Typography>}
                     {user ? <div>{user.name}</div> : <Skeleton />}
                   </TableCell>
                 </ClickRow>
                 <ClickRow enabled={editable} chevron onClick={() => toggleDrawer('groups')}>
-                  {isXSDown ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('groups')}</TableCell>}
+                  {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('groups')}</TableCell>}
                   <TableCell width="100%">
-                    {!isXSDown ? null : <Typography variant="caption">{t('groups')}</Typography>}
+                    {!isXS ? null : <Typography variant="caption">{t('groups')}</Typography>}
                     {user ? <div>{user.groups.join(' | ')}</div> : <Skeleton />}
                   </TableCell>
                 </ClickRow>
                 <TableRow className={classes.row}>
-                  {isXSDown ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('email')}</TableCell>}
+                  {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('email')}</TableCell>}
                   <TableCell width="100%">
-                    {!isXSDown ? null : <Typography variant="caption">{t('email')}</Typography>}
+                    {!isXS ? null : <Typography variant="caption">{t('email')}</Typography>}
                     {user ? <div>{user.email}</div> : <Skeleton />}
                   </TableCell>
                   <TableCell align="right" />
@@ -607,9 +607,9 @@ function User({ username }: UserProps) {
               </TableHead>
               <TableBody>
                 <TableRow>
-                  {isXSDown ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('type')}</TableCell>}
+                  {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('type')}</TableCell>}
                   <TableCell width="100%">
-                    {!isXSDown ? null : <Typography variant="caption">{t('type')}</Typography>}
+                    {!isXS ? null : <Typography variant="caption">{t('type')}</Typography>}
                     {user ? (
                       <div>
                         {configuration.user.types.map((uType, type_id) => (
@@ -633,9 +633,9 @@ function User({ username }: UserProps) {
                   <TableCell align="right" />
                 </TableRow>
                 <TableRow>
-                  {isXSDown ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('roles')}</TableCell>}
+                  {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('roles')}</TableCell>}
                   <TableCell width="100%">
-                    {!isXSDown ? null : <Typography variant="caption">{t('roles')}</Typography>}
+                    {!isXS ? null : <Typography variant="caption">{t('roles')}</Typography>}
                     {user ? (
                       <div>
                         {configuration.user.roles.sort().map((role, role_id) => (
@@ -665,9 +665,9 @@ function User({ username }: UserProps) {
                   style={{ cursor: currentUser.is_admin ? 'pointer' : 'default' }}
                   onClick={currentUser.is_admin ? event => toggleDrawer('api_quota') : null}
                 >
-                  {isXSDown ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('api_quota')}</TableCell>}
+                  {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('api_quota')}</TableCell>}
                   <TableCell width="100%">
-                    {!isXSDown ? null : <Typography variant="caption">{t('api_quota')}</Typography>}
+                    {!isXS ? null : <Typography variant="caption">{t('api_quota')}</Typography>}
                     {user ? <div>{user.api_quota}</div> : <Skeleton />}
                   </TableCell>
                   <TableCell align="right">{currentUser.is_admin ? <ChevronRightOutlinedIcon /> : null}</TableCell>
@@ -678,9 +678,9 @@ function User({ username }: UserProps) {
                   style={{ cursor: currentUser.is_admin ? 'pointer' : 'default' }}
                   onClick={currentUser.is_admin ? event => toggleDrawer('submission_quota') : null}
                 >
-                  {isXSDown ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('submission_quota')}</TableCell>}
+                  {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('submission_quota')}</TableCell>}
                   <TableCell width="100%">
-                    {!isXSDown ? null : <Typography variant="caption">{t('submission_quota')}</Typography>}
+                    {!isXS ? null : <Typography variant="caption">{t('submission_quota')}</Typography>}
                     {user ? <div>{user.submission_quota}</div> : <Skeleton />}
                   </TableCell>
                   <TableCell align="right">{currentUser.is_admin ? <ChevronRightOutlinedIcon /> : null}</TableCell>

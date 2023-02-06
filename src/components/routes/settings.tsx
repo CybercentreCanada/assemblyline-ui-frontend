@@ -40,7 +40,7 @@ import { useTranslation } from 'react-i18next';
 const useStyles = makeStyles(theme => ({
   drawer: {
     width: '500px',
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.only('xs')]: {
       width: '100vw'
     }
   },
@@ -111,7 +111,7 @@ function Settings() {
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
   const sp6 = theme.spacing(6);
-  const isXSDown = useMediaQuery(theme.breakpoints.down('xs'));
+  const isXS = useMediaQuery(theme.breakpoints.only('xs'));
 
   const { apiCall } = useMyAPI();
 
@@ -401,7 +401,7 @@ function Settings() {
         <Table aria-label={t('submissions')}>
           <TableHead>
             <TableRow>
-              <TableCell colSpan={isXSDown ? 2 : 3}>
+              <TableCell colSpan={isXS ? 2 : 3}>
                 <Typography variant="h6" gutterBottom>
                   {t('submissions')}
                 </Typography>
@@ -485,14 +485,14 @@ function Settings() {
               </TableCell>
             </ClickRow>
             <ClickRow enabled={editable} chevron onClick={event => toggleDrawer('ttl')}>
-              {isXSDown ? null : (
+              {isXS ? null : (
                 <TableCell>
                   <Typography variant="body1">{t('submissions.ttl')}</Typography>
                   <Typography variant="caption">{t('submissions.ttl_desc')}</Typography>
                 </TableCell>
               )}
-              <TableCell colSpan={isXSDown ? 2 : 1}>
-                {!isXSDown ? null : (
+              <TableCell colSpan={isXS ? 2 : 1}>
+                {!isXS ? null : (
                   <>
                     <Typography variant="body1">{t('submissions.ttl')}</Typography>
                     <Typography variant="caption" gutterBottom>
@@ -511,14 +511,14 @@ function Settings() {
             </ClickRow>
             {c12nDef.enforce && (
               <TableRow>
-                {isXSDown ? null : (
+                {isXS ? null : (
                   <TableCell>
                     <Typography variant="body1">{t('submissions.classification')}</Typography>
                     <Typography variant="caption">{t('submissions.classification_desc')}</Typography>
                   </TableCell>
                 )}
-                <TableCell colSpan={isXSDown ? 3 : 2}>
-                  {!isXSDown ? null : (
+                <TableCell colSpan={isXS ? 3 : 2}>
+                  {!isXS ? null : (
                     <>
                       <Typography variant="body1">{t('submissions.classification')}</Typography>
                       <Typography variant="caption" gutterBottom>
@@ -552,14 +552,14 @@ function Settings() {
           </TableHead>
           <TableBody>
             <ClickRow enabled={editable} chevron onClick={event => toggleDrawer('view')}>
-              {isXSDown ? null : (
+              {isXS ? null : (
                 <TableCell>
                   <Typography variant="body1">{t('interface.view')}</Typography>
                   <Typography variant="caption">{t('interface.view_desc')}</Typography>
                 </TableCell>
               )}
-              <TableCell colSpan={isXSDown ? 2 : 1}>
-                {!isXSDown ? null : (
+              <TableCell colSpan={isXS ? 2 : 1}>
+                {!isXS ? null : (
                   <>
                     <Typography variant="body1">{t('interface.view')}</Typography>
                     <Typography variant="caption" gutterBottom>
@@ -577,14 +577,14 @@ function Settings() {
               </TableCell>
             </ClickRow>
             <ClickRow enabled={editable} chevron onClick={event => toggleDrawer('encoding')}>
-              {isXSDown ? null : (
+              {isXS ? null : (
                 <TableCell>
                   <Typography variant="body1">{t('interface.encoding')}</Typography>
                   <Typography variant="caption">{t('interface.encoding_desc')}</Typography>
                 </TableCell>
               )}
-              <TableCell colSpan={isXSDown ? 2 : 1}>
-                {!isXSDown ? null : (
+              <TableCell colSpan={isXS ? 2 : 1}>
+                {!isXS ? null : (
                   <>
                     <Typography variant="body1">{t('interface.encoding')}</Typography>
                     <Typography variant="caption" gutterBottom>
@@ -612,14 +612,14 @@ function Settings() {
               </TableCell>
             </ClickRow>
             <ClickRow enabled={editable} chevron onClick={event => toggleDrawer('score')}>
-              {isXSDown ? null : (
+              {isXS ? null : (
                 <TableCell>
                   <Typography variant="body1">{t('interface.score')}</Typography>
                   <Typography variant="caption">{t('interface.score_desc')}</Typography>
                 </TableCell>
               )}
-              <TableCell colSpan={isXSDown ? 2 : 1}>
-                {!isXSDown ? null : (
+              <TableCell colSpan={isXS ? 2 : 1}>
+                {!isXS ? null : (
                   <>
                     <Typography variant="body1">{t('interface.score')}</Typography>
                     <Typography variant="caption" gutterBottom>

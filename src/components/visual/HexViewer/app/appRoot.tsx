@@ -37,11 +37,11 @@ const WrappedAppRoot = ({ data = '' }: DataProps) => {
 
   // Width
   const theme = useTheme();
-  const isXS = useMediaQuery(theme.breakpoints.down('xs'));
-  const isSM = useMediaQuery(theme.breakpoints.down('sm'));
-  const isMD = useMediaQuery(theme.breakpoints.down('md'));
-  const isLG = useMediaQuery(theme.breakpoints.down('lg'));
-  const isXL = useMediaQuery(theme.breakpoints.down('xl'));
+  const isXS = useMediaQuery(theme.breakpoints.only('xs'));
+  const isSM = useMediaQuery(theme.breakpoints.only('sm'));
+  const isMD = useMediaQuery(theme.breakpoints.only('md'));
+  const isLG = useMediaQuery(theme.breakpoints.only('lg'));
+  const isXL = useMediaQuery(theme.breakpoints.only('xl'));
 
   React.useEffect(() => {
     const width: ModeWidth = isXS ? 'xs' : isSM ? 'sm' : isMD ? 'md' : isLG ? 'lg' : isXL ? 'xl' : 'wd';
