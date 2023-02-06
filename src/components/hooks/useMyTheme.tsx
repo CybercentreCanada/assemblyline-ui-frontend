@@ -9,6 +9,13 @@ const AL_THEME: AppThemeConfigs = {
           backgroundImage: 'none'
         }
       }
+    },
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          minWidth: '120px'
+        }
+      }
     }
   },
   palette: {
