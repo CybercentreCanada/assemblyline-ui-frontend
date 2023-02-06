@@ -49,9 +49,15 @@ type VerdictGaugeProps = {
   };
   max?: number;
   colorBack?: string;
+  autoHide?: boolean;
 };
 
-const VerdictGauge: React.FC<VerdictGaugeProps> = ({ verdicts, max = 20, colorBack = '#68686815' }) => {
+const VerdictGauge: React.FC<VerdictGaugeProps> = ({
+  verdicts,
+  max = 20,
+  colorBack = '#68686815',
+  autoHide = false
+}) => {
   const { t } = useTranslation();
   const classes = useStyles();
   const theme = useTheme();
@@ -82,7 +88,7 @@ const VerdictGauge: React.FC<VerdictGaugeProps> = ({ verdicts, max = 20, colorBa
     .endAngle(0)
     .cornerRadius(0)();
 
-  return (
+  return autoHide && verdicts.non_malicious.length + verdicts.malicious.length === 0 ? null : (
     <div>
       <Tooltip
         title={`${t('verdict.non_malicious')}: ${verdicts.non_malicious.length} / ${t('verdict.malicious')}: ${

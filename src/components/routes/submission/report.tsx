@@ -320,9 +320,13 @@ function AttributionBanner({ report }) {
             </tbody>
           </table>
         </Grid>
-        <Grid item xs style={{ color: textColor, marginLeft: theme.spacing(1), marginRight: theme.spacing(1) }}>
+        <Grid
+          item
+          xs
+          style={{ color: textColor, marginLeft: theme.spacing(1), marginRight: theme.spacing(1), minHeight: '100px' }}
+        >
           {report ? (
-            <VerdictGauge verdicts={report.verdict} />
+            <VerdictGauge verdicts={report.verdict} autoHide />
           ) : (
             <Skeleton variant="circular" height="100px" width="100px" />
           )}
