@@ -58,7 +58,8 @@ const ModalTransition = forwardRef(function Transition(props: any, ref: any) {
 export default function AppSearch() {
   const theme = useTheme();
   const menuRef = useRef<HTMLDivElement>(null);
-  const showSearchIcon = useMediaQuery(theme.breakpoints.down('sm'));
+  const isPhoneMode = useMediaQuery(theme.breakpoints.only('xs'));
+  const isTabletMode = useMediaQuery(theme.breakpoints.only('sm'));
   const { t } = useTranslation();
   const { provided, state, service } = useAppSearchService();
   const [value, setValue] = useState<string>('');
@@ -77,8 +78,8 @@ export default function AppSearch() {
       if (isCtrl && key === 'k') {
         event.preventDefault();
         const inputRef = menuRef.current.querySelector('input');
-        if (!inputRef || showSearchIcon) {
-          state.set({ ...state, menu: state.menu || showSearchIcon, mode: 'fullscreen' });
+        if (!inputRef || isPhoneMode) {
+          state.set({ ...state, menu: state.menu || isPhoneMode, mode: 'fullscreen' });
         } else {
           inputRef.focus();
         }
@@ -88,7 +89,7 @@ export default function AppSearch() {
     return () => {
       window.removeEventListener('keydown', keyHandler);
     };
-  }, [provided, showSearchIcon, state]);
+  }, [provided, isPhoneMode, state]);
 
   // Search input focus handler.
   const onFocus = useCallback(() => {
@@ -156,19 +157,19 @@ export default function AppSearch() {
   const onToggleFullscreen = useCallback(() => {
     state.set({
       ...state,
-      menu: state.menu || showSearchIcon,
+      menu: state.menu || isPhoneMode,
       mode: state.mode === 'inline' ? 'fullscreen' : 'inline'
     });
-  }, [showSearchIcon, state]);
+  }, [isPhoneMode, state]);
 
   return (
     <ClickAwayListener onClickAway={() => state.set({ ...state, menu: false })}>
       <AppSearchRoot
         ref={menuRef}
-        sx={{ mr: !showSearchIcon && 1, display: 'flex', flexGrow: 1, justifyItems: 'flex-end' }}
+        sx={{ mr: !isPhoneMode && 1, display: 'flex', flexGrow: 1, justifyContent: 'flex-end' }}
         menuOpen={state.menu}
       >
-        {showSearchIcon ? (
+        {isPhoneMode ? (
           <IconButton color="inherit" size="large" onClick={onToggleFullscreen}>
             <Tooltip title={t('app.search.fullscreen')}>
               <Search />
@@ -188,8 +189,8 @@ export default function AppSearch() {
               onChange={onChange}
               onKeyDown={onKeyDown}
               onClear={onClear}
-              minWidth="250px"
-              maxWidth="350px"
+              minWidth={isTabletMode ? '100%' : '250px'}
+              maxWidth={isTabletMode ? '100%' : '350px'}
             />
             {provided && (
               <Popper
