@@ -300,10 +300,16 @@ const WrappedNotificationArea = () => {
     []
   );
 
-  const arrayHigher = useCallback(
-    (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.some((val, index) => val > b[index]),
-    []
-  );
+  const arrayHigher = useCallback((a: any, b: any) => {
+    if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) return false;
+    let i = 0;
+    while (i < a.length) {
+      if (a[i] > b[i]) return true;
+      else if (a[i] < b[i]) return false;
+      else i++;
+    }
+    return false;
+  }, []);
 
   const getVersionValues = useCallback(
     (value: string): Array<number> =>
