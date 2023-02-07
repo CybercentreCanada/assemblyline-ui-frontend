@@ -138,7 +138,8 @@ export default function AppSearch() {
       if (isEnter) {
         onEnter();
       } else if (isEscape) {
-        state.set({ ...state, menu: !state.menu });
+        setTimeout(() => menuRef.current.querySelector('input')?.blur(), 50);
+        state.set({ ...state, menu: false });
       } else if (isArrowDown) {
         const result = document.querySelector('[data-tui-id="tui-app-search-result"]') as HTMLElement;
         if (result) {
@@ -229,8 +230,7 @@ export default function AppSearch() {
           }}
           PaperProps={{
             sx: {
-              borderTopLeftRadius: 0,
-              borderTopRightRadius: 0,
+              borderRadius: 0,
               margin: 0,
               width: '100%'
             }
