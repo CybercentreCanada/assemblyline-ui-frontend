@@ -134,10 +134,10 @@ export default function AppSearch() {
   // Keyboard handler.
   const onKeyDown = useCallback(
     (event: KeyboardEvent<HTMLElement>) => {
-      const { isEnter, isEscape, isArrowDown } = parseEvent(event);
+      const { isEnter, isEscape, isTab, isArrowDown } = parseEvent(event);
       if (isEnter) {
         onEnter();
-      } else if (isEscape) {
+      } else if (isEscape || isTab) {
         setTimeout(() => menuRef.current.querySelector('input')?.blur(), 50);
         state.set({ ...state, menu: false });
       } else if (isArrowDown) {
