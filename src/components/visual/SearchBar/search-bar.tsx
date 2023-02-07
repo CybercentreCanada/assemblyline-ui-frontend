@@ -126,15 +126,17 @@ const SearchBar: React.FC<SearchBarProps> = ({
           />
         </Box>
         <Tooltip title={t('clear_filter')}>
-          <IconButton
-            onClick={_onValueClear}
-            edge="end"
-            size={!upMD ? 'small' : 'large'}
-            style={{ marginRight: theme.spacing(upMD ? 0 : 0.5) }}
-            disabled={searching}
-          >
-            <BackspaceIcon fontSize={!upMD ? 'small' : 'medium'} />
-          </IconButton>
+          <span>
+            <IconButton
+              onClick={_onValueClear}
+              edge="end"
+              size={!upMD ? 'small' : 'large'}
+              style={{ marginRight: theme.spacing(upMD ? 0 : 0.5) }}
+              disabled={searching}
+            >
+              <BackspaceIcon fontSize={!upMD ? 'small' : 'medium'} />
+            </IconButton>{' '}
+          </span>
         </Tooltip>
         {buttons.length !== 0 && (
           <Divider
@@ -145,19 +147,27 @@ const SearchBar: React.FC<SearchBarProps> = ({
         )}
         {buttons.map((b, i) => {
           const button = (
-            <IconButton
-              {...b.props}
-              edge="end"
-              size={!upMD ? 'small' : 'large'}
-              style={{ marginRight: theme.spacing(upMD ? 0 : 0.5) }}
-              disabled={searching}
-            >
-              {b.icon}
-            </IconButton>
+            <span>
+              <IconButton
+                {...b.props}
+                edge="end"
+                size={!upMD ? 'small' : 'large'}
+                style={{ marginRight: theme.spacing(upMD ? 0 : 0.5) }}
+                disabled={searching}
+              >
+                {b.icon}
+              </IconButton>
+            </span>
           );
           return (
             <span key={`searchbar-button-${i}`}>
-              {b.tooltip ? <Tooltip title={b.tooltip}>{button}</Tooltip> : button}
+              {b.tooltip ? (
+                <Tooltip title={b.tooltip}>
+                  <span>{button}</span>
+                </Tooltip>
+              ) : (
+                button
+              )}
             </span>
           );
         })}
