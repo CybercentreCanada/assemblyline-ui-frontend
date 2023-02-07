@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 type AppSearchInputProps = {
   searching?: boolean;
   provided?: boolean;
+  focused?: boolean;
   showToggle?: boolean;
   showClear?: boolean;
   open?: boolean;
@@ -26,6 +27,7 @@ type AppSearchInputProps = {
 const AppSearchInput = ({
   searching,
   provided,
+  focused,
   autoFocus,
   showToggle,
   showClear,
@@ -33,6 +35,7 @@ const AppSearchInput = ({
   open,
   maxWidth = '100%',
   minWidth = '100%',
+  onBlur,
   onClear,
   onFocus,
   onChange,
@@ -56,6 +59,7 @@ const AppSearchInput = ({
         autoComplete="off"
         autoFocus={autoFocus}
         value={value}
+        onBlur={onBlur}
         onFocus={onFocus}
         onChange={onChange}
         onKeyDown={onKeyDown}
@@ -68,7 +72,7 @@ const AppSearchInput = ({
         }
         endAdornment={
           <InputAdornment position="end" sx={theme => ({ color: theme.palette.text.disabled })}>
-            {showToggle && (
+            {showToggle && !focused && (
               <Typography
                 variant="button"
                 color="inherit"
