@@ -119,9 +119,9 @@ const UserProfile = () => {
         ref={anchorRef}
         edge="end"
         sx={{
-          padding: 0,
+          padding: '6px',
           marginLeft: theme.spacing(1),
-          marginRight: theme.spacing(1)
+          marginRight: theme.spacing(0)
         }}
         onClick={onProfileClick}
         size="large"
