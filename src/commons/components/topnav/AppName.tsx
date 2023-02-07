@@ -1,54 +1,82 @@
 import MenuIcon from '@mui/icons-material/Menu';
-import { IconButton, styled, useMediaQuery, useTheme } from '@mui/material';
+import { ButtonBase, IconButton, styled, useMediaQuery, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import useAppConfigs from 'commons/components/app/hooks/useAppConfigs';
 import useAppLeftNav from 'commons/components/app/hooks/useAppLeftNav';
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
+
 import useAppLogo from '../app/hooks/useAppLogo';
 
-const StyledTitle = styled('div')({
+export const useStyles = makeStyles(theme => ({
+  alignedButton: {
+    justifyContent: 'unset',
+    WebkitJustifyContent: 'unset',
+    '&:hover': {
+      backgroundColor: theme.palette.action.hover
+    }
+  },
+  nonSelectLink: {
+    color: 'inherit',
+    textDecoration: 'none',
+    outlineOffset: 'unset',
+    outline: 'unset'
+  }
+}));
+
+const StyledTitle = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   flex: '0 0 auto',
   fontSize: '1.5rem',
-  letterSpacing: '-1px'
-});
+  letterSpacing: '-1px',
+  height: theme.spacing(8),
+  padding: theme.spacing(0, 2),
+  [theme.breakpoints.only('xs')]: {
+    height: theme.spacing(7)
+  }
+}));
 
 const StyledIcon = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   padding: '0',
-  minWidth: theme.spacing(7)
+  minWidth: theme.spacing(6)
 }));
 
-const AppName = ({ noName }: { noName?: boolean }) => {
+const AppName = ({ noName, onCloseDrawerIfOpen }: { noName?: boolean; onCloseDrawerIfOpen?: () => void }) => {
   const theme = useTheme();
+  const classes = useStyles();
   const logo = useAppLogo();
   const configs = useAppConfigs();
   const leftnav = useAppLeftNav();
   const isXs = useMediaQuery(theme.breakpoints.only('xs'));
-  if (isXs) {
-    return (
-      <StyledTitle style={{ paddingLeft: theme.spacing(2) }}>
-        <StyledIcon>
-          <IconButton aria-label="open drawer" edge="start" onClick={leftnav.toggle} size="large" color="inherit">
-            <MenuIcon />
-          </IconButton>
-        </StyledIcon>
-        <div>{!noName && configs.preferences.appName}</div>
-      </StyledTitle>
-    );
-  }
-  return (
-    <Link
-      to={configs.preferences.appLink}
-      style={{ color: 'inherit', textDecoration: 'none', paddingLeft: theme.spacing(2) }}
-    >
-      <StyledTitle>
-        <StyledIcon>{logo}</StyledIcon>
-        <div>{!noName && configs.preferences.appName}</div>
-      </StyledTitle>
-    </Link>
+  return isXs ? (
+    <StyledTitle>
+      <StyledIcon>
+        <IconButton aria-label="open drawer" edge="start" onClick={leftnav.toggle} size="large" color="inherit">
+          <MenuIcon />
+        </IconButton>
+      </StyledIcon>
+      {!noName && (
+        <ButtonBase className={classes.alignedButton}>
+          <Link to={configs.preferences.appLink} className={classes.nonSelectLink} onClick={onCloseDrawerIfOpen}>
+            <StyledTitle style={{ padding: theme.spacing(0, 1) }}>{configs.preferences.appName}</StyledTitle>
+          </Link>
+        </ButtonBase>
+      )}
+    </StyledTitle>
+  ) : (
+    <ButtonBase tabIndex={-1} className={classes.alignedButton}>
+      <Link to={configs.preferences.appLink} className={classes.nonSelectLink} onClick={onCloseDrawerIfOpen}>
+        <StyledTitle>
+          <StyledIcon>
+            <StyledIcon>{logo}</StyledIcon>
+          </StyledIcon>
+          {!noName && <div style={{ paddingLeft: theme.spacing(1) }}>{configs.preferences.appName}</div>}
+        </StyledTitle>
+      </Link>
+    </ButtonBase>
   );
 };
 
