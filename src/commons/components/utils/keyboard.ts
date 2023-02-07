@@ -7,6 +7,7 @@ export const ARROW_UP = 'ArrowUp';
 export const ARROW_RIGHT = 'ArrowRight';
 export const ARROW_DOWN = 'ArrowDown';
 export const BACKSPACE = 'Backspace';
+export const TAB = 'Tab';
 export const SPACE = ' ';
 
 export function is(key: string, check: string) {
@@ -41,6 +42,10 @@ export function isBackspace(key: string) {
   return is(key, BACKSPACE);
 }
 
+export function isTab(key: string) {
+  return is(key, TAB);
+}
+
 export function isSpace(key: string) {
   return is(key, SPACE);
 }
@@ -51,6 +56,7 @@ export function parseEvent(event: KeyboardEvent<HTMLElement>) {
     isCtrl: event.ctrlKey,
     isEnter: isEnter(event.key),
     isSpace: isSpace(event.key),
+    isTab: isTab(event.key),
     isBackspace: isBackspace(event.key),
     isEscape: isEscape(event.key),
     isArrowLeft: isArrowLeft(event.key),

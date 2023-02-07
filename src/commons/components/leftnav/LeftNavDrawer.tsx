@@ -11,13 +11,11 @@ import {
   ListItemIcon,
   ListItemText,
   styled,
-  Toolbar,
   Tooltip,
   useMediaQuery,
   useTheme
 } from '@mui/material';
 import useAppConfigs from 'commons/components/app/hooks/useAppConfigs';
-import useAppLayout from 'commons/components/app/hooks/useAppLayout';
 import useAppLeftNav from 'commons/components/app/hooks/useAppLeftNav';
 import LeftNavGroup from 'commons/components/leftnav/LeftNavGroup';
 import LeftNavItem from 'commons/components/leftnav/LeftNavItem';
@@ -83,10 +81,8 @@ const LeftNavDrawer = () => {
   const { t } = useTranslation();
   const theme = useTheme();
   const { preferences } = useAppConfigs();
-  const layout = useAppLayout();
   const leftnav = useAppLeftNav();
-  const isSmDown = useMediaQuery(theme.breakpoints.down('sm'));
-  const isTopLayout = layout.current === 'top';
+  const isSmDown = useMediaQuery(theme.breakpoints.down('md'));
 
   const onCloseDrawerIfOpen = useCallback(() => {
     if (isSmDown && leftnav.open) {
@@ -95,18 +91,10 @@ const LeftNavDrawer = () => {
   }, [isSmDown, leftnav]);
 
   const header = (
-    <div>
-      <Toolbar
-        sx={{
-          [theme.breakpoints.up('xs')]: {
-            padding: 0
-          }
-        }}
-      >
-        <AppName />
-      </Toolbar>
-      {!isTopLayout && <Divider />}
-    </div>
+    <>
+      <AppName onCloseDrawerIfOpen={onCloseDrawerIfOpen} />
+      <Divider />
+    </>
   );
 
   const hide = (

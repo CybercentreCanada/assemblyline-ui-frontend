@@ -125,17 +125,19 @@ const SearchBar: React.FC<SearchBarProps> = ({
             onClear={_onValueClear}
           />
         </Box>
-        <IconButton
-          onClick={_onValueClear}
-          edge="end"
-          size={!upMD ? 'small' : 'large'}
-          style={{ marginRight: theme.spacing(upMD ? 0 : 0.5) }}
-          disabled={searching}
-        >
-          <Tooltip title={t('clear_filter')}>
-            <BackspaceIcon fontSize={!upMD ? 'small' : 'medium'} />
-          </Tooltip>
-        </IconButton>
+        <Tooltip title={t('clear_filter')}>
+          <span>
+            <IconButton
+              onClick={_onValueClear}
+              edge="end"
+              size={!upMD ? 'small' : 'large'}
+              style={{ marginRight: theme.spacing(upMD ? 0 : 0.5) }}
+              disabled={searching}
+            >
+              <BackspaceIcon fontSize={!upMD ? 'small' : 'medium'} />
+            </IconButton>{' '}
+          </span>
+        </Tooltip>
         {buttons.length !== 0 && (
           <Divider
             orientation="vertical"
@@ -143,18 +145,32 @@ const SearchBar: React.FC<SearchBarProps> = ({
             style={{ marginLeft: theme.spacing(upMD ? 1 : 0.5), marginRight: theme.spacing(upMD ? 1 : 0.5) }}
           />
         )}
-        {buttons.map((b, i) => (
-          <IconButton
-            key={`searchbar-button-${i}`}
-            {...b.props}
-            edge="end"
-            size={!upMD ? 'small' : 'large'}
-            style={{ marginRight: theme.spacing(upMD ? 0 : 0.5) }}
-            disabled={searching}
-          >
-            {b.tooltip ? <Tooltip title={b.tooltip}>{b.icon}</Tooltip> : b.icon}
-          </IconButton>
-        ))}
+        {buttons.map((b, i) => {
+          const button = (
+            <span>
+              <IconButton
+                {...b.props}
+                edge="end"
+                size={!upMD ? 'small' : 'large'}
+                style={{ marginRight: theme.spacing(upMD ? 0 : 0.5) }}
+                disabled={searching}
+              >
+                {b.icon}
+              </IconButton>
+            </span>
+          );
+          return (
+            <span key={`searchbar-button-${i}`}>
+              {b.tooltip ? (
+                <Tooltip title={b.tooltip}>
+                  <span>{button}</span>
+                </Tooltip>
+              ) : (
+                button
+              )}
+            </span>
+          );
+        })}
         {extras}
       </Box>
       {searching && (

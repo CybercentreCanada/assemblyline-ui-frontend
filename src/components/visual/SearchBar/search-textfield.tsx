@@ -95,7 +95,7 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
 
   // Handler for KeyDown event on either the text input of the options menu.
   const _onKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
-    const { isCtrl, isEnter, isEscape, isArrowUp, isArrowDown, isArrowLeft, isArrowRight } = parseEvent(event);
+    const { isCtrl, isTab, isEnter, isEscape, isArrowUp, isArrowDown, isArrowLeft, isArrowRight } = parseEvent(event);
 
     if (isEnter) {
       // key[ENTER ]: handler
@@ -136,7 +136,7 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
     } else if (isArrowRight) {
       // key[ARROW_RIGHT]: handler
       filterOptions(value, 1);
-    } else if (!open && !isCtrl) {
+    } else if (!open && !isCtrl && !isTab) {
       onOptionsOpen();
     }
   };
