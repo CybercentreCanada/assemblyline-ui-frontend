@@ -32,7 +32,7 @@ const StyledDrawer = styled(Drawer, { shouldForwardProp: prop => prop !== 'open'
 }>(({ theme, open, width }) => ({
   width,
   flexShrink: 0,
-  heigth: '100%',
+  height: '100%',
   whiteSpace: 'nowrap',
   '@media print': {
     display: 'none !important'
@@ -57,6 +57,7 @@ const StyledDrawer = styled(Drawer, { shouldForwardProp: prop => prop !== 'open'
   }),
   '& .MuiDrawer-paper': {
     width,
+    overflowX: 'hidden',
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen

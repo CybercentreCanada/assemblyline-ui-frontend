@@ -93,8 +93,12 @@ export default function AppSearch() {
 
   // Search input focus handler.
   const onFocus = useCallback(() => {
-    //state.setMenu(!!state?.items && state.items.length > 0);
-    state.set({ ...state, menu: true });
+    state.set({ ...state, menu: true, focused: true });
+  }, [state]);
+
+  // Search input focus handler.
+  const onBlur = useCallback(() => {
+    state.set({ ...state, focused: false });
   }, [state]);
 
   // Search input change handler.
@@ -113,10 +117,12 @@ export default function AppSearch() {
     if (service.onEnter) {
       if (state.autoReset) {
         const inputRef = menuRef.current.querySelector('input');
+        let newFocus = true;
         if (inputRef) {
           inputRef.blur();
+          newFocus = false;
         }
-        state.set({ ...state, menu: false, mode: 'inline' });
+        state.set({ ...state, menu: false, mode: 'inline', focused: newFocus });
         setValue('');
       } else {
         state.set({ ...state, menu: true });
@@ -179,6 +185,7 @@ export default function AppSearch() {
           <>
             <AppSearchInput
               autoFocus={false}
+              focused={state.focused}
               showToggle
               provided={provided}
               className="app-search-input"
@@ -186,6 +193,7 @@ export default function AppSearch() {
               searching={state.searching}
               open={state.menu}
               onFocus={onFocus}
+              onBlur={onBlur}
               onChange={onChange}
               onKeyDown={onKeyDown}
               onClear={onClear}
@@ -235,6 +243,7 @@ export default function AppSearch() {
           >
             <AppSearchInput
               autoFocus
+              focused={state.focused}
               className="app-search-input"
               style={{ backgroundColor: emphasize(theme.palette.background.default, 0.1) }}
               showToggle={false}
@@ -242,6 +251,7 @@ export default function AppSearch() {
               searching={state.searching}
               open={false}
               onFocus={onFocus}
+              onBlur={onBlur}
               onChange={onChange}
               onKeyDown={onKeyDown}
               onClear={onClear}

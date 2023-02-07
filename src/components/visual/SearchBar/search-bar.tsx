@@ -102,6 +102,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   //
   useEffect(() => {
     setValue(initValue);
+    getInputEl().focus();
   }, [initValue]);
 
   return (

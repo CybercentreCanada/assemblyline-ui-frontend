@@ -89,7 +89,7 @@ const useMyPreferences = () => {
         type: 'item' as 'item',
         element: {
           id: 'submit',
-          text: t('drawer.submit'),
+          i18nKey: 'drawer.submit',
           icon: <PublishOutlinedIcon />,
           route: '/submit',
           nested: false
@@ -99,7 +99,7 @@ const useMyPreferences = () => {
         type: 'item' as 'item',
         element: {
           id: 'submissions',
-          text: t('drawer.submissions'),
+          i18nKey: 'drawer.submissions',
           userPropValidators: [{ prop: 'user.roles', value: 'submission_view' }],
           icon: <ViewCarouselOutlinedIcon />,
           route: '/submissions',
@@ -110,7 +110,7 @@ const useMyPreferences = () => {
         type: 'item' as 'item',
         element: {
           id: 'alerts',
-          text: t('drawer.alerts'),
+          i18nKey: 'drawer.alerts',
           userPropValidators: [{ prop: 'user.roles', value: 'alert_view' }],
           icon: <NotificationImportantOutlinedIcon />,
           route: '/alerts',
@@ -121,7 +121,7 @@ const useMyPreferences = () => {
         type: 'group' as 'group',
         element: {
           id: 'search',
-          title: t('drawer.search'),
+          i18nKey: 'drawer.search',
           userPropValidators: [
             { prop: 'user.roles', value: 'alert_view' },
             { prop: 'user.roles', value: 'signature_view' },
@@ -131,41 +131,41 @@ const useMyPreferences = () => {
           items: [
             {
               id: 'search.all',
-              text: t('drawer.search.all'),
+              i18nKey: 'drawer.search.all',
               route: '/search',
               nested: true
             },
             {
               id: 'search.alert',
-              text: t('drawer.search.alert'),
+              i18nKey: 'drawer.search.alert',
               userPropValidators: [{ prop: 'user.roles', value: 'alert_view' }],
               route: '/search/alert',
               nested: true
             },
             {
               id: 'search.file',
-              text: t('drawer.search.file'),
+              i18nKey: 'drawer.search.file',
               userPropValidators: [{ prop: 'user.roles', value: 'submission_view' }],
               route: '/search/file',
               nested: true
             },
             {
               id: 'search.result',
-              text: t('drawer.search.result'),
+              i18nKey: 'drawer.search.result',
               userPropValidators: [{ prop: 'user.roles', value: 'submission_view' }],
               route: '/search/result',
               nested: true
             },
             {
               id: 'search.signature',
-              text: t('drawer.search.signature'),
+              i18nKey: 'drawer.search.signature',
               userPropValidators: [{ prop: 'user.roles', value: 'signature_view' }],
               route: '/search/signature',
               nested: true
             },
             {
               id: 'search.submission',
-              text: t('drawer.search.submission'),
+              i18nKey: 'drawer.search.submission',
               userPropValidators: [{ prop: 'user.roles', value: 'submission_view' }],
               route: '/search/submission',
               nested: true
@@ -181,7 +181,7 @@ const useMyPreferences = () => {
         type: 'item' as 'item',
         element: {
           id: 'dashboard',
-          text: t('drawer.dashboard'),
+          i18nKey: 'drawer.dashboard',
           icon: <DashboardOutlinedIcon />,
           route: '/dashboard',
           nested: false
@@ -191,7 +191,7 @@ const useMyPreferences = () => {
         type: 'group' as 'group',
         element: {
           id: 'manage',
-          title: t('drawer.manage'),
+          i18nKey: 'drawer.manage',
           userPropValidators: [
             { prop: 'user.roles', value: 'heuristic_view' },
             { prop: 'user.roles', value: 'safelist_view' },
@@ -203,7 +203,7 @@ const useMyPreferences = () => {
           items: [
             {
               id: 'manage.heuristics',
-              text: t('drawer.manage.heuristics'),
+              i18nKey: 'drawer.manage.heuristics',
               userPropValidators: [{ prop: 'user.roles', value: 'heuristic_view' }],
               icon: <SimCardOutlinedIcon />,
               route: '/manage/heuristics',
@@ -211,7 +211,7 @@ const useMyPreferences = () => {
             },
             {
               id: 'manage.safelist',
-              text: t('drawer.manage.safelist'),
+              i18nKey: 'drawer.manage.safelist',
               userPropValidators: [{ prop: 'user.roles', value: 'safelist_view' }],
               icon: <PlaylistAddCheckIcon />,
               route: '/manage/safelist',
@@ -219,7 +219,7 @@ const useMyPreferences = () => {
             },
             {
               id: 'manage.signatures',
-              text: t('drawer.manage.signatures'),
+              i18nKey: 'drawer.manage.signatures',
               userPropValidators: [{ prop: 'user.roles', value: 'signature_view' }],
               icon: <FingerprintOutlinedIcon />,
               route: '/manage/signatures',
@@ -227,7 +227,7 @@ const useMyPreferences = () => {
             },
             {
               id: 'manage.source',
-              text: t('drawer.manage.source'),
+              i18nKey: 'drawer.manage.source',
               userPropValidators: [{ prop: 'user.roles', value: 'signature_manage' }],
               icon: <CodeOutlinedIcon />,
               route: '/manage/sources',
@@ -235,7 +235,7 @@ const useMyPreferences = () => {
             },
             {
               id: 'manage.workflow',
-              text: t('drawer.manage.workflow'),
+              i18nKey: 'drawer.manage.workflow',
               userPropValidators: [{ prop: 'user.roles', value: 'workflow_view' }],
               icon: <BiNetworkChart />,
               route: '/manage/workflows',
@@ -249,62 +249,62 @@ const useMyPreferences = () => {
         type: 'group' as 'group',
         element: {
           id: 'adminmenu',
-          title: t('adminmenu'),
+          i18nKey: 'adminmenu',
           userPropValidators: [{ prop: 'user.is_admin', value: true }],
           icon: <BusinessOutlinedIcon />,
           items: [
             {
               id: 'adminmenu.errors',
-              text: t('adminmenu.errors'),
+              i18nKey: 'adminmenu.errors',
               route: '/admin/errors',
               icon: <ErrorOutlineOutlinedIcon />,
               nested: true
             },
             {
               id: 'adminmenu.identify',
-              text: t('adminmenu.identify'),
+              i18nKey: 'adminmenu.identify',
               route: '/admin/identify',
               icon: <FindInPageOutlinedIcon />,
               nested: true
             },
             {
               id: 'adminmenu.actions',
-              text: t('adminmenu.actions'),
+              i18nKey: 'adminmenu.actions',
               route: '/admin/actions',
               icon: <PlaylistPlayOutlinedIcon />,
               nested: true
             },
             {
               id: 'adminmenu.services',
-              text: t('adminmenu.services'),
+              i18nKey: 'adminmenu.services',
               route: '/admin/services',
               icon: <AccountTreeOutlinedIcon />,
               nested: true
             },
             {
               id: 'adminmenu.service_review',
-              text: t('adminmenu.service_review'),
+              i18nKey: 'adminmenu.service_review',
               icon: <CompareArrowsOutlinedIcon />,
               route: '/admin/service_review',
               nested: true
             },
             {
               id: 'adminmenu.sitemap',
-              text: t('adminmenu.sitemap'),
+              i18nKey: 'adminmenu.sitemap',
               route: '/admin/sitemap',
               icon: <MapOutlinedIcon />,
               nested: true
             },
             {
               id: 'adminmenu.tag_safelist',
-              text: t('adminmenu.tag_safelist'),
+              i18nKey: 'adminmenu.tag_safelist',
               route: '/admin/tag_safelist',
               icon: <PlaylistAddCheckIcon />,
               nested: true
             },
             {
               id: 'adminmenu.users',
-              text: t('adminmenu.users'),
+              i18nKey: 'adminmenu.users',
               route: '/admin/users',
               icon: <SupervisorAccountOutlinedIcon />,
               nested: true
@@ -320,19 +320,19 @@ const useMyPreferences = () => {
         type: 'group' as 'group',
         element: {
           id: 'help',
-          title: t('drawer.help'),
+          i18nKey: 'drawer.help',
           icon: <HelpOutlineOutlinedIcon />,
           items: [
             {
               id: 'help.api',
-              text: t('drawer.help.api'),
+              i18nKey: 'drawer.help.api',
               icon: <AssignmentOutlinedIcon />,
               route: '/help/api',
               nested: true
             },
             {
               id: 'help.classification',
-              text: t('drawer.help.classification'),
+              i18nKey: 'drawer.help.classification',
               userPropValidators: [{ prop: 'c12nDef.enforce', value: true }],
               icon: <LabelOutlinedIcon />,
               route: '/help/classification',
@@ -340,21 +340,21 @@ const useMyPreferences = () => {
             },
             {
               id: 'help.configuration',
-              text: t('drawer.help.configuration'),
+              i18nKey: 'drawer.help.configuration',
               icon: <SettingsApplicationsOutlinedIcon />,
               route: '/help/configuration',
               nested: true
             },
             {
               id: 'help.search',
-              text: t('drawer.help.search'),
+              i18nKey: 'drawer.help.search',
               icon: <SearchIcon />,
               route: '/help/search',
               nested: true
             },
             {
               id: 'help.services',
-              text: t('drawer.help.services'),
+              i18nKey: 'drawer.help.services',
               icon: <AccountTreeOutlinedIcon />,
               route: '/help/services',
               nested: true
@@ -363,7 +363,7 @@ const useMyPreferences = () => {
         }
       }
     ],
-    [t]
+    []
   );
 
   const USER_MENU_ITEMS = useMemo(
