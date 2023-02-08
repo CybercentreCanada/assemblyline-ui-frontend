@@ -194,7 +194,7 @@ export default function Signatures() {
             <Typography variant="h4">{t('title')}</Typography>
           </Grid>
           {currentUser.roles.includes('signature_download') && (
-            <Grid item xs style={{ textAlign: 'right' }}>
+            <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
               <FileDownloader
                 icon={<GetAppOutlinedIcon />}
                 link={`/api/v4/signature/download/?query=${query ? query.get('query', '*') : '*'}`}

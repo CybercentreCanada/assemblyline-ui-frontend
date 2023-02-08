@@ -90,22 +90,6 @@ const LeftNavDrawer = () => {
     }
   }, [isSmDown, leftnav]);
 
-  const header = (
-    <>
-      <AppName onCloseDrawerIfOpen={onCloseDrawerIfOpen} />
-      <Divider />
-    </>
-  );
-
-  const hide = (
-    <List disablePadding>
-      <ListItem button key="chevron" onClick={leftnav.toggle}>
-        <ListItemIcon>{leftnav.open ? <ChevronLeftIcon /> : <ChevronRightIcon />}</ListItemIcon>
-        <ListItemText primary={t('drawer.collapse')} />
-      </ListItem>
-    </List>
-  );
-
   return (
     <ClickAwayListener mouseEvent="onMouseDown" touchEvent="onTouchStart" onClickAway={onCloseDrawerIfOpen}>
       <StyledDrawer
@@ -115,13 +99,10 @@ const LeftNavDrawer = () => {
         width={preferences.leftnav.width}
         open={leftnav.open}
       >
-        {leftnav.open ? (
-          header
-        ) : (
-          <Tooltip title={preferences.appName} aria-label={preferences.appName} placement="right">
-            {header}
-          </Tooltip>
-        )}
+        <AppName onCloseDrawerIfOpen={onCloseDrawerIfOpen} />
+
+        <Divider />
+
         <List disablePadding>
           {leftnav.elements.map((e, i) => {
             if (e.type === 'item') {
@@ -138,14 +119,18 @@ const LeftNavDrawer = () => {
             return null;
           })}
         </List>
+
         <Divider />
-        {leftnav.open ? (
-          hide
-        ) : (
-          <Tooltip title={t('drawer.expand')} aria-label={t('drawer.expand')} placement="right">
-            {hide}
-          </Tooltip>
-        )}
+
+        <Tooltip title={leftnav.open ? '' : t('drawer.expand')} aria-label={t('drawer.expand')} placement="right">
+          <List disablePadding>
+            <ListItem button key="chevron" onClick={leftnav.toggle}>
+              <ListItemIcon>{leftnav.open ? <ChevronLeftIcon /> : <ChevronRightIcon />}</ListItemIcon>
+              <ListItemText primary={t('drawer.collapse')} />
+            </ListItem>
+          </List>
+        </Tooltip>
+
         <Box
           sx={{
             height: '100%',

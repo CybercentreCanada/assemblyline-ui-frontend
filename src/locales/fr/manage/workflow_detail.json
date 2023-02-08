@@ -19,6 +19,7 @@
   "priority.MEDIUM": "MOYENNE",
   "priority.null": "",
   "query": "Requête (Requis)",
+  "remove": "Enlever le flux de travail",
   "save": "Sauvegarder les modifications",
   "save.success": "Le flux de travail a été enregistré avec succès.",
   "status": "Statut",

@@ -97,12 +97,14 @@ export default function AppLayoutProvider({ children }: AppLayoutProps) {
             id="app-scrollct"
             style={{ overflow: 'auto', paddingLeft: showMenus && isSM && !isPrinting ? muiTheme.spacing(7) : 0 }}
           >
+            <div id="top"></div>
             {user.isReady() && layoutReady && showMenus && <AppBar />}
             {children}
           </AppVerticalRight>
         </AppVertical>
       ) : (
         <AppHorizontal id="app-scrollct" style={{ overflow: 'auto' }}>
+          <div id="top"></div>
           {user.isReady() && layoutReady && showMenus && <AppBar />}
           <AppVertical>
             <AppVerticalLeft>{user.isReady() && layoutReady && showMenus && <LeftNavDrawer />}</AppVerticalLeft>
