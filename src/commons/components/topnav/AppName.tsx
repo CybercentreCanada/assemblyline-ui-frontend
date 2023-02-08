@@ -1,10 +1,11 @@
 import MenuIcon from '@mui/icons-material/Menu';
-import { ButtonBase, IconButton, styled, useMediaQuery, useTheme } from '@mui/material';
+import { ButtonBase, IconButton, styled, Tooltip, useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppConfigs from 'commons/components/app/hooks/useAppConfigs';
 import useAppLeftNav from 'commons/components/app/hooks/useAppLeftNav';
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
+import useAppLayout from '../app/hooks/useAppLayout';
 
 import useAppLogo from '../app/hooks/useAppLogo';
 
@@ -50,6 +51,7 @@ const AppName = ({ noName, onCloseDrawerIfOpen }: { noName?: boolean; onCloseDra
   const logo = useAppLogo();
   const configs = useAppConfigs();
   const leftnav = useAppLeftNav();
+  const { current: currentLayout } = useAppLayout();
   const isXs = useMediaQuery(theme.breakpoints.only('xs'));
   return isXs ? (
     <StyledTitle>
@@ -67,16 +69,18 @@ const AppName = ({ noName, onCloseDrawerIfOpen }: { noName?: boolean; onCloseDra
       )}
     </StyledTitle>
   ) : (
-    <ButtonBase tabIndex={-1} className={classes.alignedButton}>
-      <Link to={configs.preferences.appLink} className={classes.nonSelectLink} onClick={onCloseDrawerIfOpen}>
-        <StyledTitle>
-          <StyledIcon>
-            <StyledIcon>{logo}</StyledIcon>
-          </StyledIcon>
-          {!noName && <div style={{ paddingLeft: theme.spacing(1) }}>{configs.preferences.appName}</div>}
-        </StyledTitle>
-      </Link>
-    </ButtonBase>
+    <Tooltip title={leftnav.open || currentLayout === 'top' ? '' : configs.preferences.appName} placement="right">
+      <ButtonBase tabIndex={-1} className={classes.alignedButton}>
+        <Link to={configs.preferences.appLink} className={classes.nonSelectLink} onClick={onCloseDrawerIfOpen}>
+          <StyledTitle>
+            <StyledIcon>
+              <StyledIcon>{logo}</StyledIcon>
+            </StyledIcon>
+            {!noName && <div style={{ paddingLeft: theme.spacing(1) }}>{configs.preferences.appName}</div>}
+          </StyledTitle>
+        </Link>
+      </ButtonBase>
+    </Tooltip>
   );
 };
 
