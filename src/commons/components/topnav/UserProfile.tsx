@@ -120,7 +120,7 @@ const UserProfile = () => {
         edge="end"
         sx={{
           padding: '6px',
-          marginLeft: theme.spacing(1),
+          marginLeft: theme.spacing(0),
           marginRight: theme.spacing(0)
         }}
         onClick={onProfileClick}
