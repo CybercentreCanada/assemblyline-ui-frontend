@@ -19,6 +19,7 @@
   "priority.MEDIUM": "MEDIUM",
   "priority.null": "",
   "query": "Query (Required)",
+  "remove": "Remove workflow",
   "save": "Save Changes",
   "save.success": "Workflow was successfully saved.",
   "status": "Status",
