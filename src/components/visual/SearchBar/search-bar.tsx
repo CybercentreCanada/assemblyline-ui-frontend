@@ -147,23 +147,21 @@ const SearchBar: React.FC<SearchBarProps> = ({
         )}
         {buttons.map((b, i) => {
           const button = (
-            <span>
-              <IconButton
-                {...b.props}
-                edge="end"
-                size={!upMD ? 'small' : 'large'}
-                style={{ marginRight: theme.spacing(upMD ? 0 : 0.5) }}
-                disabled={searching}
-              >
-                {b.icon}
-              </IconButton>
-            </span>
+            <IconButton
+              {...b.props}
+              edge="end"
+              size={!upMD ? 'small' : 'large'}
+              style={{ marginRight: theme.spacing(upMD ? 0 : 0.5) }}
+              disabled={searching}
+            >
+              {b.icon}
+            </IconButton>
           );
           return (
             <span key={`searchbar-button-${i}`}>
               {b.tooltip ? (
                 <Tooltip title={b.tooltip}>
-                  <span>{button}</span>
+                  <span style={{ paddingBottom: theme.spacing(2) }}>{button}</span>
                 </Tooltip>
               ) : (
                 button
