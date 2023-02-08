@@ -115,23 +115,27 @@ const UserProfile = () => {
 
   return (
     <ClickAwayListener onClickAway={onClickAway}>
-      <IconButton
-        ref={anchorRef}
-        edge="end"
-        sx={{
-          padding: '6px',
-          marginLeft: theme.spacing(0),
-          marginRight: theme.spacing(0)
-        }}
-        onClick={onProfileClick}
-        size="large"
-      >
-        <AppUserAvatar alt={user.name} url={user.avatar} email={user.email}>
-          {user.name
-            .split(' ', 2)
-            .map(n => n[0].toUpperCase())
-            .join('')}
-        </AppUserAvatar>
+      <div>
+        <Tooltip title={t('usermenu')}>
+          <IconButton
+            ref={anchorRef}
+            edge="end"
+            sx={{
+              padding: '6px',
+              marginLeft: theme.spacing(0),
+              marginRight: theme.spacing(0)
+            }}
+            onClick={onProfileClick}
+            size="large"
+          >
+            <AppUserAvatar alt={user.name} url={user.avatar} email={user.email}>
+              {user.name
+                .split(' ', 2)
+                .map(n => n[0].toUpperCase())
+                .join('')}
+            </AppUserAvatar>
+          </IconButton>
+        </Tooltip>
         <Popper
           sx={{ zIndex: theme.zIndex.appBar + 200, minWidth: '280px' }}
           open={open}
@@ -197,7 +201,7 @@ const UserProfile = () => {
             </Fade>
           )}
         </Popper>
-      </IconButton>
+      </div>
     </ClickAwayListener>
   );
 };
