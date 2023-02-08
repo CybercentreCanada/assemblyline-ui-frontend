@@ -923,156 +923,152 @@ function WrappedSubmissionDetail() {
                 </div>
               )}
             </Grid>
-            <Grid item xs={12} sm={6} md={4} style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <div>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  {submission ? (
-                    submission.state === 'completed' && (
-                      <div style={{ display: 'flex' }}>
-                        {currentUser.roles.includes('submission_delete') && (
-                          <Tooltip title={t('delete')}>
-                            <IconButton
-                              onClick={() => setDeleteDialog(true)}
-                              style={{
-                                color:
-                                  theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                              }}
-                              size="large"
-                            >
-                              <RemoveCircleOutlineOutlinedIcon />
-                            </IconButton>
-                          </Tooltip>
-                        )}
-                        {currentUser.roles.includes('bundle_download') && (
-                          <FileDownloader
-                            icon={<CloudDownloadOutlinedIcon />}
-                            link={`/api/v4/bundle/${submission.sid}/`}
-                            tooltip={t('download')}
-                          />
-                        )}
-                        {systemConfig.datastore.archive.enabled && currentUser.roles.includes('archive_trigger') && (
-                          <Tooltip title={t(submission.archived ? 'archived' : 'archive')}>
-                            <div>
-                              <IconButton onClick={archive} disabled={submission.archived} size="large">
-                                <ArchiveOutlinedIcon />
-                              </IconButton>
-                            </div>
-                          </Tooltip>
-                        )}
-                        {currentUser.roles.includes('submission_create') && (
-                          <Tooltip title={t('resubmit')}>
-                            <IconButton onClick={resubmit} size="large">
-                              <ReplayOutlinedIcon />
-                            </IconButton>
-                          </Tooltip>
-                        )}
-                        {systemConfig.ui.allow_replay && currentUser.roles.includes('replay_trigger') && (
-                          <Tooltip title={t('replay')}>
-                            <IconButton onClick={replay} disabled={submission.metadata.replay} size="large">
-                              <PublishOutlinedIcon />
-                            </IconButton>
-                          </Tooltip>
-                        )}
-                        <Tooltip title={t('report_view')}>
-                          <IconButton component={Link} to={`/submission/report/${submission.sid}`} size="large">
-                            <ChromeReaderModeOutlinedIcon />
+            <Grid item xs={12} sm={6} md={4} style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 0 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                {submission ? (
+                  submission.state === 'completed' && (
+                    <div style={{ display: 'flex' }}>
+                      {currentUser.roles.includes('submission_delete') && (
+                        <Tooltip title={t('delete')}>
+                          <IconButton
+                            onClick={() => setDeleteDialog(true)}
+                            style={{
+                              color:
+                                theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                            }}
+                            size="large"
+                          >
+                            <RemoveCircleOutlineOutlinedIcon />
                           </IconButton>
                         </Tooltip>
-                      </div>
+                      )}
+                      {currentUser.roles.includes('bundle_download') && (
+                        <FileDownloader
+                          icon={<CloudDownloadOutlinedIcon />}
+                          link={`/api/v4/bundle/${submission.sid}/`}
+                          tooltip={t('download')}
+                        />
+                      )}
+                      {systemConfig.datastore.archive.enabled && currentUser.roles.includes('archive_trigger') && (
+                        <Tooltip title={t(submission.archived ? 'archived' : 'archive')}>
+                          <div>
+                            <IconButton onClick={archive} disabled={submission.archived} size="large">
+                              <ArchiveOutlinedIcon />
+                            </IconButton>
+                          </div>
+                        </Tooltip>
+                      )}
+                      {currentUser.roles.includes('submission_create') && (
+                        <Tooltip title={t('resubmit')}>
+                          <IconButton onClick={resubmit} size="large">
+                            <ReplayOutlinedIcon />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                      {systemConfig.ui.allow_replay && currentUser.roles.includes('replay_trigger') && (
+                        <Tooltip title={t('replay')}>
+                          <IconButton onClick={replay} disabled={submission.metadata.replay} size="large">
+                            <PublishOutlinedIcon />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                      <Tooltip title={t('report_view')}>
+                        <IconButton component={Link} to={`/submission/report/${submission.sid}`} size="large">
+                          <ChromeReaderModeOutlinedIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </div>
+                  )
+                ) : (
+                  <div style={{ display: 'inline-flex' }}>
+                    {[...Array(systemConfig.ui.allow_replay ? 6 : 5)].map((_, i) => (
+                      <Skeleton
+                        key={i}
+                        variant="circular"
+                        height="2.5rem"
+                        width="2.5rem"
+                        style={{ margin: theme.spacing(0.5) }}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                <div
+                  style={{
+                    width: '164px',
+                    marginTop: '8px'
+                  }}
+                >
+                  {submission ? (
+                    submission.state === 'completed' && (
+                      <>
+                        <VerdictBar verdicts={submission.verdict} />
+                        {currentUser.roles.includes('submission_manage') && (
+                          <Grid container>
+                            <Grid item xs={5} style={{ textAlign: 'left' }}>
+                              <Tooltip
+                                title={t(
+                                  `verdict.${
+                                    submission.verdict.malicious.indexOf(currentUser.username) !== -1 ? 'is' : 'set'
+                                  }.malicious`
+                                )}
+                              >
+                                <IconButton size="small" onClick={() => setVerdict('malicious')}>
+                                  <BugReportOutlinedIcon
+                                    style={{
+                                      color:
+                                        submission.verdict.malicious.indexOf(currentUser.username) !== -1
+                                          ? theme.palette.error.dark
+                                          : null
+                                    }}
+                                  />
+                                </IconButton>
+                              </Tooltip>
+                            </Grid>
+                            <Grid item xs={2} />
+                            <Grid item xs={5} style={{ textAlign: 'right' }}>
+                              <Tooltip
+                                title={t(
+                                  `verdict.${
+                                    submission.verdict.non_malicious.indexOf(currentUser.username) !== -1 ? 'is' : 'set'
+                                  }.non_malicious`
+                                )}
+                              >
+                                <IconButton size="small" onClick={() => setVerdict('non_malicious')}>
+                                  <VerifiedUserOutlinedIcon
+                                    style={{
+                                      color:
+                                        submission.verdict.non_malicious.indexOf(currentUser.username) !== -1
+                                          ? theme.palette.success.dark
+                                          : null
+                                    }}
+                                  />
+                                </IconButton>
+                              </Tooltip>
+                            </Grid>
+                          </Grid>
+                        )}
+                      </>
                     )
                   ) : (
-                    <div style={{ display: 'inline-flex' }}>
-                      {[...Array(systemConfig.ui.allow_replay ? 6 : 5)].map((_, i) => (
+                    <>
+                      <Skeleton variant="rectangular" style={{ height: '15px', width: '100%' }} />
+                      <div style={{ display: 'inline-flex', width: '100%', justifyContent: 'space-between' }}>
                         <Skeleton
-                          key={i}
                           variant="circular"
-                          height="2.5rem"
-                          width="2.5rem"
+                          height="1.5rem"
+                          width="1.5rem"
                           style={{ margin: theme.spacing(0.5) }}
                         />
-                      ))}
-                    </div>
+                        <Skeleton
+                          variant="circular"
+                          height="1.5rem"
+                          width="1.5rem"
+                          style={{ margin: theme.spacing(0.5) }}
+                        />
+                      </div>
+                    </>
                   )}
-
-                  <div
-                    style={{
-                      width: '164px',
-                      marginTop: '8px'
-                    }}
-                  >
-                    {submission ? (
-                      submission.state === 'completed' && (
-                        <>
-                          <VerdictBar verdicts={submission.verdict} />
-                          {currentUser.roles.includes('submission_manage') && (
-                            <Grid container>
-                              <Grid item xs={5} style={{ textAlign: 'left' }}>
-                                <Tooltip
-                                  title={t(
-                                    `verdict.${
-                                      submission.verdict.malicious.indexOf(currentUser.username) !== -1 ? 'is' : 'set'
-                                    }.malicious`
-                                  )}
-                                >
-                                  <IconButton size="small" onClick={() => setVerdict('malicious')}>
-                                    <BugReportOutlinedIcon
-                                      style={{
-                                        color:
-                                          submission.verdict.malicious.indexOf(currentUser.username) !== -1
-                                            ? theme.palette.error.dark
-                                            : null
-                                      }}
-                                    />
-                                  </IconButton>
-                                </Tooltip>
-                              </Grid>
-                              <Grid item xs={2} />
-                              <Grid item xs={5} style={{ textAlign: 'right' }}>
-                                <Tooltip
-                                  title={t(
-                                    `verdict.${
-                                      submission.verdict.non_malicious.indexOf(currentUser.username) !== -1
-                                        ? 'is'
-                                        : 'set'
-                                    }.non_malicious`
-                                  )}
-                                >
-                                  <IconButton size="small" onClick={() => setVerdict('non_malicious')}>
-                                    <VerifiedUserOutlinedIcon
-                                      style={{
-                                        color:
-                                          submission.verdict.non_malicious.indexOf(currentUser.username) !== -1
-                                            ? theme.palette.success.dark
-                                            : null
-                                      }}
-                                    />
-                                  </IconButton>
-                                </Tooltip>
-                              </Grid>
-                            </Grid>
-                          )}
-                        </>
-                      )
-                    ) : (
-                      <>
-                        <Skeleton variant="rectangular" style={{ height: '15px', width: '100%' }} />
-                        <div style={{ display: 'inline-flex', width: '100%', justifyContent: 'space-between' }}>
-                          <Skeleton
-                            variant="circular"
-                            height="1.5rem"
-                            width="1.5rem"
-                            style={{ margin: theme.spacing(0.5) }}
-                          />
-                          <Skeleton
-                            variant="circular"
-                            height="1.5rem"
-                            width="1.5rem"
-                            style={{ margin: theme.spacing(0.5) }}
-                          />
-                        </div>
-                      </>
-                    )}
-                  </div>
                 </div>
               </div>
             </Grid>
