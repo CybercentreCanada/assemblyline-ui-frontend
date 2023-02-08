@@ -72,6 +72,8 @@
   "filter": "Filtrer...",
   "forbidden": "Interdit",
   "full_count": "Suivez tous les documents pour obtenir le décompte complet",
+  "fullscreen.on": "Afficher en mode plein écran",
+  "fullscreen.off": "Fermer le mode plein écran",
   "goto_heuristic": "Aller à l'heuristique",
   "goto_signature": "Aller à la signature",
   "highlight": "Activer la surbrillance",
