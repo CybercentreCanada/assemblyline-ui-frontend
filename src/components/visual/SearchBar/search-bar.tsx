@@ -161,7 +161,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             <span key={`searchbar-button-${i}`}>
               {b.tooltip ? (
                 <Tooltip title={b.tooltip}>
-                  <span style={{ paddingBottom: theme.spacing(2) }}>{button}</span>
+                  <div>{button}</div>
                 </Tooltip>
               ) : (
                 button

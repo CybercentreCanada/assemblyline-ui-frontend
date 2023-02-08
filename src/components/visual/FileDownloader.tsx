@@ -1,4 +1,4 @@
-import { CircularProgress, IconButton, Tooltip, useTheme } from '@mui/material';
+import { CircularProgress, IconButton, Tooltip } from '@mui/material';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { useState } from 'react';
@@ -13,7 +13,6 @@ type EmptyProps = {
 function FileDownloader({ icon, link, tooltip = null, successMessage = null }: EmptyProps) {
   const { downloadBlob } = useMyAPI();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
-  const theme = useTheme();
   const [progress, setProgress] = useState(null);
   const [total, setTotal] = useState(null);
   const [waiting, setWaiting] = useState(false);
@@ -65,7 +64,7 @@ function FileDownloader({ icon, link, tooltip = null, successMessage = null }: E
 
   return (
     <Tooltip title={tooltip}>
-      <span style={{ paddingBottom: theme.spacing(2) }}>
+      <div>
         <IconButton onClick={downloadFile} disabled={waiting || total !== null} size="large">
           {(waiting || total === 0) && (
             <CircularProgress
@@ -95,7 +94,7 @@ function FileDownloader({ icon, link, tooltip = null, successMessage = null }: E
           )}
           {icon}
         </IconButton>
-      </span>
+      </div>
     </Tooltip>
   );
 }

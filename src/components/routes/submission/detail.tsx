@@ -928,7 +928,7 @@ function WrappedSubmissionDetail() {
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                   {submission ? (
                     submission.state === 'completed' && (
-                      <div>
+                      <div style={{ display: 'flex' }}>
                         {currentUser.roles.includes('submission_delete') && (
                           <Tooltip title={t('delete')}>
                             <IconButton
@@ -952,11 +952,11 @@ function WrappedSubmissionDetail() {
                         )}
                         {systemConfig.datastore.archive.enabled && currentUser.roles.includes('archive_trigger') && (
                           <Tooltip title={t(submission.archived ? 'archived' : 'archive')}>
-                            <span style={{ paddingBottom: theme.spacing(2) }}>
+                            <div>
                               <IconButton onClick={archive} disabled={submission.archived} size="large">
                                 <ArchiveOutlinedIcon />
                               </IconButton>
-                            </span>
+                            </div>
                           </Tooltip>
                         )}
                         {currentUser.roles.includes('submission_create') && (
