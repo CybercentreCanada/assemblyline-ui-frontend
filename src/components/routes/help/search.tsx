@@ -1,4 +1,4 @@
-import { Card, Table, TableBody, TableCell, TableHead, TableRow, Theme, Typography, useTheme } from '@mui/material';
+import { Card, Table, TableBody, TableCell, TableHead, TableRow, Theme, Typography } from '@mui/material';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 import withStyles from '@mui/styles/withStyles';
@@ -93,7 +93,8 @@ const useStyles = makeStyles((theme: Theme) =>
 const useParagraphStyles = makeStyles((theme: Theme) =>
   createStyles({
     paragraph: {
-      marginTop: theme.spacing(4),
+      marginTop: theme.spacing(-8),
+      paddingTop: theme.spacing(12),
       '& h6': {
         fontWeight: 300
       }
@@ -104,24 +105,6 @@ const useParagraphStyles = makeStyles((theme: Theme) =>
     }
   })
 );
-
-function Title({ children }) {
-  const { autoHide: autoHideAppbar } = useAppBar();
-  const { current: currentLayout } = useAppLayout();
-  const theme = useTheme();
-  const autoHide = autoHideAppbar && currentLayout !== 'top';
-  return (
-    <div
-      id="title"
-      style={{
-        marginTop: theme.spacing(autoHide ? -4 : -12),
-        paddingTop: theme.spacing(autoHide ? 4 : 12)
-      }}
-    >
-      {useMemo(() => children, [children])}
-    </div>
-  );
-}
 
 function Paragraph({ id, children }) {
   const { autoHide: autoHideAppbar } = useAppBar();
@@ -142,11 +125,9 @@ export default function Search() {
 
   return (
     <PageCenter margin={4} width="100%" textAlign="left">
-      <ContentWithTOC translation="helpSearch" items={Toc} title="toc" top="top">
-        <Title>
-          <Typography variant="h4">{t('title')}</Typography>
-          <Typography variant="subtitle2">{t('subtitle')}</Typography>
-        </Title>
+      <ContentWithTOC translation="helpSearch" items={Toc}>
+        <Typography variant="h4">{t('title')}</Typography>
+        <Typography variant="subtitle2">{t('subtitle')}</Typography>
 
         <Paragraph id="overview">
           <Typography variant="h5">{t('overview')}</Typography>
