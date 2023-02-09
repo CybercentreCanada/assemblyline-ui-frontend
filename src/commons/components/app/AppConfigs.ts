@@ -12,7 +12,6 @@ export type AppConfigs = {
 };
 
 // Specification interface for the AppProvider's 'preferences' attribute.
-// TODO: Show Safe Results
 export type AppPreferenceConfigs = {
   appName: string; // Name of your app, it will show up in the drawer and the top nav bar
   appLink?: To; // Route to navigate to when the icon on the left nav bar is pressed
@@ -38,7 +37,6 @@ export type AppPreferenceConfigs = {
   topnav?: AppTopNavConfigs; // top nav appbar specific configurations.
   leftnav?: AppLeftNavConfigs; // left nav drawer specific configurations.
   avatarD?: GravatarD; // The gravatar api uses this parameter to generate a themed image unique to an email address.
-  // browserRouter?: BrowserRouterProps; // BrowserRouter props to pass to AppProvider
 };
 
 // Specification interface for the AppProvider's 'theme' attribute.
@@ -150,6 +148,7 @@ export type AppLeftNavGroup = {
   title?: string; // The text/label to use when rendering the group header if not using i18nKey (for some reason).
   icon: React.ReactElement<any>; // The icon to render on the left of the group header's 'text'
   items: AppLeftNavItem[]; // A list of items to render for this group.
+  userPropValidators?: AppUserValidatedProp[]; // The list of user props to assert before rendering the item.
 };
 
 // Specification interface for an item provided to the app swithcer.

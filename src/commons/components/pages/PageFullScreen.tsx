@@ -1,11 +1,12 @@
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
-import { Box, IconButton } from '@mui/material';
+import { Box, IconButton, Tooltip } from '@mui/material';
 import useAppBar from 'commons/components/app/hooks/useAppBar';
 import useAppBarHeight from 'commons/components/app/hooks/useAppBarHeight';
 import useAppLayout from 'commons/components/app/hooks/useAppLayout';
 import useFullscreenStatus from 'commons/components/utils/hooks/useFullscreenStatus';
 import { memo, useCallback, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import PageContent from './PageContent';
 
 type PageFullscreenProps = {
@@ -22,6 +23,7 @@ const PageFullscreen = ({ children, margin = null, mb = 2, ml = 2, mr = 2, mt = 
   const appBarHeight = useAppBarHeight();
   const layout = useAppLayout();
   const appbar = useAppBar();
+  const { t } = useTranslation();
   let isFullscreen: boolean;
   let setIsFullscreen: () => void;
   let fullscreenSupported: boolean;
@@ -45,7 +47,11 @@ const PageFullscreen = ({ children, margin = null, mb = 2, ml = 2, mr = 2, mt = 
   };
 
   return (
-    <Box ref={maximizableElement} component="div" sx={theme => ({ backgroundColor: theme.palette.background.default })}>
+    <Box
+      ref={maximizableElement}
+      component="div"
+      sx={theme => ({ backgroundColor: theme.palette.background.default, overflowY: isFullscreen ? 'auto' : 'unset' })}
+    >
       <Box
         component="div"
         sx={theme => ({
@@ -57,14 +63,12 @@ const PageFullscreen = ({ children, margin = null, mb = 2, ml = 2, mr = 2, mt = 
           zIndex: theme.zIndex.appBar + 1
         })}
       >
-        {fullscreenSupported ? null : isFullscreen ? (
-          <IconButton onClick={handleExitFullscreen} size="large">
-            <FullscreenExitIcon />
-          </IconButton>
-        ) : (
-          <IconButton onClick={handleEnterFullscreen} size="large">
-            <FullscreenIcon />
-          </IconButton>
+        {fullscreenSupported ? null : (
+          <Tooltip title={t(isFullscreen ? 'fullscreen.off' : 'fullscreen.on')}>
+            <IconButton onClick={isFullscreen ? handleExitFullscreen : handleEnterFullscreen} size="large">
+              {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
+            </IconButton>
+          </Tooltip>
         )}
       </Box>
       <PageContent margin={margin} mb={mb} ml={ml} mr={mr} mt={mt}>

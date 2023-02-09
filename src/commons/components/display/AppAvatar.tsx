@@ -26,10 +26,7 @@ export default function AppAvatar({
     <Avatar
       {...props}
       sx={{
-        ...(props.sx || {}),
-        '&:hover': {
-          cursor: 'pointer'
-        }
+        ...(props.sx || {})
       }}
       src={avatarUrl}
     />

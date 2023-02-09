@@ -68,5 +68,6 @@ export type AppSearchServiceState<T = any> = {
   mode: AppSearchMode; // inline vs fullscreen.
   items: AppSearchItem<T>[]; // the app search result items to render.
   autoReset: boolean; // should the search provider auto reset onEnter?
+  focused: boolean; // is the search bar in focus?
   set: (state: AppSearchServiceState<T>) => void; // update app search state.
 };

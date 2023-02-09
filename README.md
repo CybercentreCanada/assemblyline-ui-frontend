@@ -58,11 +58,9 @@ For reference, here are the instructions on Docker’s website: <https://docs.do
 
 ### Setup Webpack for debugging behing a proxy
 
-Create a file named `.env.local` at the root of the assemblyline-ui-frontend directory.
+Create a file named `.env.local` at the root of the assemblyline-ui-frontend directory with the following content:
 
-The file should only contain the following where `<YOUR_IP>` is replaced by your dev computer IP.
-
-    HOST=<YOUR_IP>.nip.io
+    HOST=0.0.0.0
     WDS_SOCKET_PORT=443
     HTTPS=true
     BROWSER=none

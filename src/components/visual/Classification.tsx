@@ -98,7 +98,7 @@ function WrappedClassification({
   const { t } = useTranslation();
   const theme = useTheme();
   const { user: currentUser, c12nDef } = useALContext();
-  const isPhone = useMediaQuery(theme.breakpoints.down('xs'));
+  const isPhone = useMediaQuery(theme.breakpoints.only('xs'));
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [showPicker, setShowPicker] = useState(false);
   const [uParts, setUserParts] = useState(defaultParts);

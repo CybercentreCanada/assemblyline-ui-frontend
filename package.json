@@ -1,6 +1,13 @@
 {
   "name": "assemblyline-ui-frontend",
-  "version": "4.1.0",
+  "description": "Assemblyline 4 frontend",
+  "repository": {
+    "url": "https://github.com/CybercentreCanada/assemblyline-ui-frontend",
+    "type": "git"
+  },
+  "author": "assemblyline@cyber.gc.ca",
+  "version": "4.3.0",
+  "license": "MIT",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.10.5",

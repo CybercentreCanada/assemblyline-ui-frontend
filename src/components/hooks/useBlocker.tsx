@@ -42,5 +42,8 @@ export function useBlocker(blocker: Blocker, when = true) {
 
         blocker(autoUnblockingTx);
       });
+    return () => {
+      refUnBlock.current?.();
+    };
   }, [navigator, blocker, when]);
 }

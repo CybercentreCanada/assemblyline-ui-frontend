@@ -21,13 +21,6 @@ export function RouterPrompt(props) {
   const [cancel, setCancel] = useState(false);
   const [currentTX, setCurrentTX] = useState(null);
 
-  // Cancel blocking
-  const unblock = useCallback(() => {
-    setCancel(true);
-    setDrawerClosePrompt(false);
-    window.onbeforeunload = undefined;
-  }, [setDrawerClosePrompt]);
-
   // Block history transactions
   const blocker = useCallback(tx => {
     setCurrentTX(tx);
@@ -38,7 +31,8 @@ export function RouterPrompt(props) {
   useEffect(() => {
     if (when && !cancel) {
       setDrawerClosePrompt(true);
-      window.onbeforeunload = () => true;
+    } else {
+      setDrawerClosePrompt(false);
     }
   }, [setDrawerClosePrompt, when, cancel]);
 
@@ -60,9 +54,10 @@ export function RouterPrompt(props) {
   // unblock all on un-mount
   useEffect(() => {
     return () => {
-      unblock();
+      setCancel(true);
+      setDrawerClosePrompt(false);
     };
-  }, [unblock]);
+  }, [setDrawerClosePrompt]);
 
   // Setup route blocker
   useBlocker(blocker, when && !cancel);
@@ -71,12 +66,12 @@ export function RouterPrompt(props) {
   const routeOnSuccess = useCallback(
     canRoute => {
       if (canRoute) {
-        unblock();
+        setCancel(true);
         window.dispatchEvent(new CustomEvent(GD_EVENT_PROCEED));
         if (currentTX) currentTX.retry();
       }
     },
-    [currentTX, unblock]
+    [currentTX]
   );
 
   // Dialog actions

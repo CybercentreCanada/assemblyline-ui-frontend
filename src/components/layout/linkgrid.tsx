@@ -1,15 +1,12 @@
-import { Button, useTheme } from '@mui/material';
 import LinkIcon from '@mui/icons-material/Link';
+import { Button, useTheme } from '@mui/material';
+import { AppLeftNavItem } from 'commons/components/app/AppConfigs';
+import { t } from 'i18next';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
 type LinkGridProps = {
-  items: {
-    route: string;
-    icon?: React.ReactElement<any>;
-    name?: string;
-    text?: string;
-  }[];
+  items: AppLeftNavItem[];
 };
 
 export default function LinkGrid({ items }: LinkGridProps) {
@@ -26,7 +23,7 @@ export default function LinkGrid({ items }: LinkGridProps) {
             ) : (
               <LinkIcon style={{ fontSize: '8rem' }} />
             )}
-            <span style={{ fontSize: 'medium' }}>{e.name || e.text}</span>
+            <span style={{ fontSize: 'medium' }}>{e.text || t(e.i18nKey)}</span>
           </div>
         </Button>
       ))}

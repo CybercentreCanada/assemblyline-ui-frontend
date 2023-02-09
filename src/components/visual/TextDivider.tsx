@@ -19,7 +19,7 @@ const useStyles = makeStyles(theme => ({
     position: 'absolute',
     top: '-10px',
     width: '60px',
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.only('xs')]: {
       backgroundColor: theme.palette.background.default
     }
   },

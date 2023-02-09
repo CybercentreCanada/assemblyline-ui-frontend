@@ -40,7 +40,7 @@ import { useTranslation } from 'react-i18next';
 const useStyles = makeStyles(theme => ({
   drawer: {
     width: '500px',
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.only('xs')]: {
       width: '100vw'
     }
   },
@@ -83,6 +83,19 @@ function Skel() {
   );
 }
 
+const ClickRow = ({ children, enabled, onClick, chevron = false, ...other }) => (
+  <TableRow
+    hover={enabled}
+    style={{ cursor: enabled ? 'pointer' : 'default' }}
+    onClick={enabled ? () => onClick() : null}
+    {...other}
+  >
+    {children}
+
+    {chevron && <TableCell align="right">{enabled && <ChevronRightOutlinedIcon />}</TableCell>}
+  </TableRow>
+);
+
 function Settings() {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
@@ -90,6 +103,7 @@ function Settings() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [settings, setSettings] = useState(null);
   const [modified, setModified] = useState(false);
+  const [editable, setEditable] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
   const { user: currentUser, c12nDef, configuration } = useALContext();
   const { showErrorMessage, showSuccessMessage } = useMySnackbar();
@@ -97,7 +111,7 @@ function Settings() {
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
   const sp6 = theme.spacing(6);
-  const isXSDown = useMediaQuery(theme.breakpoints.down('xs'));
+  const isXS = useMediaQuery(theme.breakpoints.only('xs'));
 
   const { apiCall } = useMyAPI();
 
@@ -231,6 +245,9 @@ function Settings() {
   }
 
   useEffectOnce(() => {
+    // Make interface editable
+    setEditable(currentUser.is_admin || currentUser.roles.includes('self_manage'));
+
     // Load user on start
     apiCall({
       url: `/api/v4/user/settings/${currentUser.username}/`,
@@ -384,7 +401,7 @@ function Settings() {
         <Table aria-label={t('submissions')}>
           <TableHead>
             <TableRow>
-              <TableCell colSpan={isXSDown ? 2 : 3}>
+              <TableCell colSpan={isXS ? 2 : 3}>
                 <Typography variant="h6" gutterBottom>
                   {t('submissions')}
                 </Typography>
@@ -392,7 +409,7 @@ function Settings() {
             </TableRow>
           </TableHead>
           <TableBody>
-            <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDynamicPrevention()}>
+            <ClickRow enabled={editable} onClick={toggleDynamicPrevention}>
               <TableCell colSpan={2} width="100%">
                 <Typography variant="body1">{t('submissions.dynamic_recursion')}</Typography>
                 <Typography variant="caption">{t('submissions.dynamic_recursion_desc')}</Typography>
@@ -400,14 +417,14 @@ function Settings() {
               <TableCell align="right">
                 <Switch
                   checked={settings ? !settings.ignore_dynamic_recursion_prevention : true}
-                  disabled={settings === null}
+                  disabled={settings === null || !editable}
                   onChange={() => toggleDynamicPrevention()}
                   color="secondary"
                   name="dynamic_resursion"
                 />
               </TableCell>
-            </TableRow>
-            <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleFiltering()}>
+            </ClickRow>
+            <ClickRow enabled={editable} onClick={toggleFiltering}>
               <TableCell colSpan={2} width="100%">
                 <Typography variant="body1">{t('submissions.filtering')}</Typography>
                 <Typography variant="caption">{t('submissions.filtering_desc')}</Typography>
@@ -415,14 +432,14 @@ function Settings() {
               <TableCell align="right">
                 <Switch
                   checked={settings ? !settings.ignore_filtering : true}
-                  disabled={settings === null}
+                  disabled={settings === null || !editable}
                   onChange={() => toggleFiltering()}
                   color="secondary"
                   name="filtering"
                 />
               </TableCell>
-            </TableRow>
-            <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleCaching()}>
+            </ClickRow>
+            <ClickRow enabled={editable} onClick={toggleCaching}>
               <TableCell colSpan={2} width="100%">
                 <Typography variant="body1">{t('submissions.result_caching')}</Typography>
                 <Typography variant="caption">{t('submissions.result_caching_desc')}</Typography>
@@ -430,14 +447,14 @@ function Settings() {
               <TableCell align="right">
                 <Switch
                   checked={settings ? !settings.ignore_cache : true}
-                  disabled={settings === null}
+                  disabled={settings === null || !editable}
                   onChange={() => toggleCaching()}
                   color="secondary"
                   name="result_caching"
                 />
               </TableCell>
-            </TableRow>
-            <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDeepScan()}>
+            </ClickRow>
+            <ClickRow enabled={editable} onClick={toggleDeepScan}>
               <TableCell colSpan={2} width="100%">
                 <Typography variant="body1">{t('submissions.deep_scan')}</Typography>
                 <Typography variant="caption">{t('submissions.deep_scan_desc')}</Typography>
@@ -445,14 +462,14 @@ function Settings() {
               <TableCell align="right">
                 <Switch
                   checked={settings ? settings.deep_scan : true}
-                  disabled={settings === null}
+                  disabled={settings === null || !editable}
                   onChange={() => toggleDeepScan()}
                   color="secondary"
                   name="deep_scan"
                 />
               </TableCell>
-            </TableRow>
-            <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleProfile()}>
+            </ClickRow>
+            <ClickRow enabled={editable} onClick={toggleProfile}>
               <TableCell colSpan={2} width="100%">
                 <Typography variant="body1">{t('submissions.profile')}</Typography>
                 <Typography variant="caption">{t('submissions.profile_desc')}</Typography>
@@ -460,22 +477,22 @@ function Settings() {
               <TableCell align="right">
                 <Switch
                   checked={settings ? settings.profile : true}
-                  disabled={settings === null}
+                  disabled={settings === null || !editable}
                   onChange={() => toggleProfile()}
                   color="secondary"
                   name="profile"
                 />
               </TableCell>
-            </TableRow>
-            <TableRow hover style={{ cursor: 'pointer' }} onClick={event => toggleDrawer('ttl')}>
-              {isXSDown ? null : (
+            </ClickRow>
+            <ClickRow enabled={editable} chevron onClick={event => toggleDrawer('ttl')}>
+              {isXS ? null : (
                 <TableCell>
                   <Typography variant="body1">{t('submissions.ttl')}</Typography>
                   <Typography variant="caption">{t('submissions.ttl_desc')}</Typography>
                 </TableCell>
               )}
-              <TableCell colSpan={isXSDown ? 2 : 1}>
-                {!isXSDown ? null : (
+              <TableCell colSpan={isXS ? 2 : 1}>
+                {!isXS ? null : (
                   <>
                     <Typography variant="body1">{t('submissions.ttl')}</Typography>
                     <Typography variant="caption" gutterBottom>
@@ -491,20 +508,17 @@ function Settings() {
                   <Skeleton />
                 )}
               </TableCell>
-              <TableCell align="right">
-                <ChevronRightOutlinedIcon />
-              </TableCell>
-            </TableRow>
+            </ClickRow>
             {c12nDef.enforce && (
-              <TableRow style={{ cursor: 'pointer' }}>
-                {isXSDown ? null : (
+              <TableRow>
+                {isXS ? null : (
                   <TableCell>
                     <Typography variant="body1">{t('submissions.classification')}</Typography>
                     <Typography variant="caption">{t('submissions.classification_desc')}</Typography>
                   </TableCell>
                 )}
-                <TableCell colSpan={isXSDown ? 3 : 2}>
-                  {!isXSDown ? null : (
+                <TableCell colSpan={isXS ? 3 : 2}>
+                  {!isXS ? null : (
                     <>
                       <Typography variant="body1">{t('submissions.classification')}</Typography>
                       <Typography variant="caption" gutterBottom>
@@ -513,7 +527,7 @@ function Settings() {
                     </>
                   )}
                   <Classification
-                    type="picker"
+                    type={editable ? 'picker' : 'pill'}
                     size="small"
                     c12n={settings ? settings.classification : null}
                     setClassification={setClassification}
@@ -537,15 +551,15 @@ function Settings() {
             </TableRow>
           </TableHead>
           <TableBody>
-            <TableRow hover style={{ cursor: 'pointer' }} onClick={event => toggleDrawer('view')}>
-              {isXSDown ? null : (
+            <ClickRow enabled={editable} chevron onClick={event => toggleDrawer('view')}>
+              {isXS ? null : (
                 <TableCell>
                   <Typography variant="body1">{t('interface.view')}</Typography>
                   <Typography variant="caption">{t('interface.view_desc')}</Typography>
                 </TableCell>
               )}
-              <TableCell colSpan={isXSDown ? 2 : 1}>
-                {!isXSDown ? null : (
+              <TableCell colSpan={isXS ? 2 : 1}>
+                {!isXS ? null : (
                   <>
                     <Typography variant="body1">{t('interface.view')}</Typography>
                     <Typography variant="caption" gutterBottom>
@@ -561,19 +575,16 @@ function Settings() {
                   <Skeleton />
                 )}
               </TableCell>
-              <TableCell align="right">
-                <ChevronRightOutlinedIcon />
-              </TableCell>
-            </TableRow>
-            <TableRow hover style={{ cursor: 'pointer' }} onClick={event => toggleDrawer('encoding')}>
-              {isXSDown ? null : (
+            </ClickRow>
+            <ClickRow enabled={editable} chevron onClick={event => toggleDrawer('encoding')}>
+              {isXS ? null : (
                 <TableCell>
                   <Typography variant="body1">{t('interface.encoding')}</Typography>
                   <Typography variant="caption">{t('interface.encoding_desc')}</Typography>
                 </TableCell>
               )}
-              <TableCell colSpan={isXSDown ? 2 : 1}>
-                {!isXSDown ? null : (
+              <TableCell colSpan={isXS ? 2 : 1}>
+                {!isXS ? null : (
                   <>
                     <Typography variant="body1">{t('interface.encoding')}</Typography>
                     <Typography variant="caption" gutterBottom>
@@ -599,19 +610,16 @@ function Settings() {
                   <Skeleton />
                 )}
               </TableCell>
-              <TableCell align="right">
-                <ChevronRightOutlinedIcon />
-              </TableCell>
-            </TableRow>
-            <TableRow hover style={{ cursor: 'pointer' }} onClick={event => toggleDrawer('score')}>
-              {isXSDown ? null : (
+            </ClickRow>
+            <ClickRow enabled={editable} chevron onClick={event => toggleDrawer('score')}>
+              {isXS ? null : (
                 <TableCell>
                   <Typography variant="body1">{t('interface.score')}</Typography>
                   <Typography variant="caption">{t('interface.score_desc')}</Typography>
                 </TableCell>
               )}
-              <TableCell colSpan={isXSDown ? 2 : 1}>
-                {!isXSDown ? null : (
+              <TableCell colSpan={isXS ? 2 : 1}>
+                {!isXS ? null : (
                   <>
                     <Typography variant="body1">{t('interface.score')}</Typography>
                     <Typography variant="caption" gutterBottom>
@@ -627,17 +635,14 @@ function Settings() {
                   <Skeleton />
                 )}
               </TableCell>
-              <TableCell align="right">
-                <ChevronRightOutlinedIcon />
-              </TableCell>
-            </TableRow>
+            </ClickRow>
           </TableBody>
         </Table>
       </TableContainer>
 
       {configuration.submission.sha256_sources && configuration.submission.sha256_sources.length > 0 && (
         <Paper className={classes.group}>
-          <ExternalSources settings={settings} onChange={toggleExternalSource} />
+          <ExternalSources disabled={!editable} settings={settings} onChange={toggleExternalSource} />
         </Paper>
       )}
 
@@ -646,7 +651,13 @@ function Settings() {
           <Typography variant="h6" gutterBottom>
             {t('service')}
           </Typography>
-          <ServiceTree settings={settings} setSettings={setSettings} setModified={setModified} compressed />
+          <ServiceTree
+            disabled={!editable}
+            settings={settings}
+            setSettings={setSettings}
+            setModified={setModified}
+            compressed
+          />
         </div>
       </Paper>
 
@@ -656,7 +667,13 @@ function Settings() {
             {t('service_spec')}
           </Typography>
           {settings ? (
-            <ServiceSpec service_spec={settings.service_spec} setParam={setParam} setParamAsync={setParam} compressed />
+            <ServiceSpec
+              disabled={!editable}
+              service_spec={settings.service_spec}
+              setParam={setParam}
+              setParamAsync={setParam}
+              compressed
+            />
           ) : (
             <div>
               <Skel />

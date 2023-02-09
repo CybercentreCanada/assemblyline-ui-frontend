@@ -161,7 +161,7 @@ export default function Workflows() {
             <Typography variant="h4">{t('title')}</Typography>
           </Grid>
           {currentUser.roles.includes('workflow_manage') && (
-            <Grid item xs style={{ textAlign: 'right' }}>
+            <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
               <Tooltip title={t('add_workflow')}>
                 <IconButton
                   style={{

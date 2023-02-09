@@ -8,12 +8,14 @@ import {
   Link,
   Paper,
   Popper,
+  Tooltip,
   Typography,
   useMediaQuery,
   useTheme
 } from '@mui/material';
 import useAppSwitcher from 'commons/components/app/hooks/useAppSwitcher';
 import { memo, useCallback, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AppSwitcherItem } from '../app/AppConfigs';
 
 type AppsSwitcherProps = {
@@ -21,6 +23,7 @@ type AppsSwitcherProps = {
 };
 
 const AppSwitcher: React.FC<AppsSwitcherProps | any> = () => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const anchorRef = useRef();
   const appSwitcher = useAppSwitcher();
@@ -39,8 +42,12 @@ const AppSwitcher: React.FC<AppsSwitcherProps | any> = () => {
 
   return (
     <ClickAwayListener onClickAway={onClickAway}>
-      <IconButton ref={anchorRef} color="inherit" onClick={onTogglePopper} size="large">
-        <AppsIcon />
+      <div>
+        <Tooltip title={t('apps')}>
+          <IconButton ref={anchorRef} color="inherit" onClick={onTogglePopper} size="large">
+            <AppsIcon />
+          </IconButton>
+        </Tooltip>
         <Popper
           sx={{ zIndex: theme.zIndex.drawer + 2 }}
           open={open}
@@ -66,7 +73,12 @@ const AppSwitcher: React.FC<AppsSwitcherProps | any> = () => {
                         target={a.newWindow ? '_blank' : null}
                         href={a.route}
                         key={`button-${i}`}
-                        style={{ display: 'inherit', textDecoration: 'none', fontWeight: 400 }}
+                        style={{
+                          display: 'inherit',
+                          textDecoration: 'none',
+                          fontWeight: 400,
+                          color: theme.palette.text.primary
+                        }}
                       >
                         <div style={{ display: 'inline-flex' }}>
                           <Avatar
@@ -113,7 +125,7 @@ const AppSwitcher: React.FC<AppsSwitcherProps | any> = () => {
             </Fade>
           )}
         </Popper>
-      </IconButton>
+      </div>
     </ClickAwayListener>
   );
 };

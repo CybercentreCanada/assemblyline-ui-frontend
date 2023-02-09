@@ -64,7 +64,7 @@ function FileDownloader({ icon, link, tooltip = null, successMessage = null }: E
 
   return (
     <Tooltip title={tooltip}>
-      <span>
+      <div>
         <IconButton onClick={downloadFile} disabled={waiting || total !== null} size="large">
           {(waiting || total === 0) && (
             <CircularProgress
@@ -94,7 +94,7 @@ function FileDownloader({ icon, link, tooltip = null, successMessage = null }: E
           )}
           {icon}
         </IconButton>
-      </span>
+      </div>
     </Tooltip>
   );
 }

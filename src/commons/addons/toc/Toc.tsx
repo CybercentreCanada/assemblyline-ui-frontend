@@ -109,16 +109,16 @@ type ContentWithTOCProps = {
   children: ReactNode;
   translation: string;
   items: ContentWithTOCItemDef[];
-  title?: string;
-  top?: string;
+  titleI18nKey?: string;
+  topI18nKey?: string;
 };
 
 const WrappedContentWithTOC: React.FC<ContentWithTOCProps> = ({
   children,
   translation,
   items,
-  title = null,
-  top = null
+  titleI18nKey = 'toc',
+  topI18nKey = 'top'
 }) => {
   const { autoHide: autoHideAppbar } = useAppBar();
   const { current: currentLayout } = useAppLayout();
@@ -147,27 +147,27 @@ const WrappedContentWithTOC: React.FC<ContentWithTOCProps> = ({
         <div
           style={{
             position: 'sticky',
-            top: theme.spacing(autoHideAppbar && currentLayout !== 'top' ? 4 : 12)
+            top: theme.spacing(autoHideAppbar && currentLayout !== 'top' ? 5 : 13)
           }}
         >
           {useMemo(
             () => (
               <>
-                {title && <div style={{ fontSize: '1.25rem', marginLeft: '18px' }}>{t(title)}</div>}
+                {titleI18nKey && <div style={{ fontSize: '1.25rem', marginLeft: '18px' }}>{t(titleI18nKey)}</div>}
                 <ul className={classes.toc}>
                   {items &&
                     items.map(item => <ContentWithTOCItem key={item.id} item={item} translation={translation} />)}
-                  {top && (
+                  {topI18nKey && (
                     <div className={classes.top}>
-                      <Link to={`#${top}`} target="_self">
-                        {t(top)}
+                      <Link to="#top" target="_self">
+                        {t(topI18nKey)}
                       </Link>
                     </div>
                   )}
                 </ul>
               </>
             ),
-            [classes.toc, classes.top, items, t, title, top, translation]
+            [classes.toc, classes.top, items, t, titleI18nKey, topI18nKey, translation]
           )}
         </div>
       </div>

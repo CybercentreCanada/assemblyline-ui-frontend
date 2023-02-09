@@ -20,10 +20,11 @@ const useStyles = makeStyles(theme =>
 type ExternalSourcesProps = {
   settings: any;
   onChange: (name: string) => void;
+  disabled?: boolean;
   size?: 'medium' | 'small';
 };
 
-function ExternalSources({ settings, onChange, size = 'medium' as 'medium' }: ExternalSourcesProps) {
+function ExternalSources({ settings, onChange, disabled = false, size = 'medium' as 'medium' }: ExternalSourcesProps) {
   const { t } = useTranslation(['settings']);
   const classes = useStyles();
   const theme = useTheme();
@@ -34,13 +35,14 @@ function ExternalSources({ settings, onChange, size = 'medium' as 'medium' }: Ex
       <Typography variant="caption" gutterBottom>
         {t('submissions.default_external_sources_desc')}
       </Typography>
-      {configuration.submission.sha256_sources.map(source => (
-        <div>
+      {configuration.submission.sha256_sources.map((source, i) => (
+        <div key={i}>
           <FormControlLabel
             control={
               settings ? (
                 <Checkbox
                   size={size}
+                  disabled={disabled}
                   checked={settings.default_external_sources.indexOf(source) !== -1}
                   name="label"
                   onChange={() => onChange(source)}
@@ -57,7 +59,7 @@ function ExternalSources({ settings, onChange, size = 'medium' as 'medium' }: Ex
               )
             }
             label={<Typography variant="body2">{source}</Typography>}
-            className={settings ? classes.item : null}
+            className={settings && !disabled ? classes.item : null}
           />
         </div>
       ))}

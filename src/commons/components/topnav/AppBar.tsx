@@ -69,13 +69,12 @@ const AppBar = () => {
 
   // media queries.
   const isXs = useMediaQuery(muiTheme.breakpoints.only('xs'));
-  // const isSmUp = useMediaQuery(muiTheme.breakpoints.up('sm'));
   const isMdDown = useMediaQuery(muiTheme.breakpoints.down('md'));
-  // const isMdUp = useMediaQuery(muiTheme.breakpoints.up('md'));
+  const isMdUp = useMediaQuery(muiTheme.breakpoints.up('md'));
 
   // compute some flags we need to perform render.
   const isTopLayout = layout.current === 'top';
-  // const showSpacer = isXs || !quicksearch.show || (isMdUp && (breadcrumbs.show || !!left || !!leftAfterBreadcrumbs));
+  const showSpacer = isXs || !quicksearch.show || (isMdUp && (breadcrumbs.show || !!left || !!leftAfterBreadcrumbs));
   const showBreadcrumbs = breadcrumbs.show && !isMdDown;
 
   // Once the dom is mounted, dispatch event to let listeners know
@@ -119,7 +118,7 @@ const AppBar = () => {
         }}
       >
         {renderLeft()}
-        <div style={{ flex: 1 }} />
+        {showSpacer && <div style={{ flex: 1 }} />}
         {rightBeforeSearch}
         {quicksearch.show && <AppSearch />}
         {right}

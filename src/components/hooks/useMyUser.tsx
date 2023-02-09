@@ -103,6 +103,12 @@ export type ConfigurationDefinition = {
     tos_lockout_notify: boolean;
   };
   user: {
+    api_priv_map: {
+      [api_priv: string]: string[];
+    };
+    priv_role_dependencies: {
+      [priv: string]: string[];
+    };
     roles: string[];
     role_dependencies: {
       [role: string]: string[];

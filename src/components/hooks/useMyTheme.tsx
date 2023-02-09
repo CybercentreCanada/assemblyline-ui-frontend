@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-// TODO: Switch to the new theme ?
 import { AppThemeConfigs } from 'commons/components/app/AppConfigs';
 import { useMemo } from 'react';
 
@@ -9,6 +7,13 @@ const AL_THEME: AppThemeConfigs = {
       styleOverrides: {
         elevation: {
           backgroundImage: 'none'
+        }
+      }
+    },
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          minWidth: '145px'
         }
       }
     }

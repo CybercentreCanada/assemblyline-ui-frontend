@@ -2,14 +2,7 @@
 import { Box, ClickAwayListener, InputBase, useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { insertText } from 'commons/addons/utils/browser';
-import {
-  isArrowDown,
-  isArrowLeft,
-  isArrowRight,
-  isArrowUp,
-  isEnter,
-  isEscape
-} from 'commons/components/utils/keyboard';
+import { parseEvent } from 'commons/components/utils/keyboard';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -102,9 +95,9 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
 
   // Handler for KeyDown event on either the text input of the options menu.
   const _onKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
-    const { key: keyCode } = event;
+    const { isCtrl, isTab, isEnter, isEscape, isArrowUp, isArrowDown, isArrowLeft, isArrowRight } = parseEvent(event);
 
-    if (isEnter(keyCode)) {
+    if (isEnter) {
       // key[ENTER ]: handler
       if (open && cursor !== -1) {
         onOptionSelection(filteredOptions.start, filteredOptions.end, filteredOptions.items[cursor]);
@@ -112,14 +105,14 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
         onSearch(value);
         if (open) onOptionsClose();
       }
-    } else if (isEscape(keyCode)) {
+    } else if (isEscape) {
       // key[ESCAPE]: handler
       if (open) {
         onOptionsClose();
       } else {
         onClear();
       }
-    } else if (isArrowUp(keyCode)) {
+    } else if (isArrowUp) {
       // key[ARROW_UP]: handler
       event.preventDefault();
       if (open) {
@@ -127,7 +120,7 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
         setCursor(nextIndex);
         scrollTo(nextIndex);
       }
-    } else if (isArrowDown(keyCode)) {
+    } else if (isArrowDown) {
       // key[ARROW_DOWN]: handler
       event.preventDefault();
       if (open) {
@@ -137,13 +130,13 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
       } else {
         onOptionsOpen();
       }
-    } else if (isArrowLeft(keyCode)) {
+    } else if (isArrowLeft) {
       // key[ARROW_LEFT]: handler
       filterOptions(value, -1);
-    } else if (isArrowRight(keyCode)) {
+    } else if (isArrowRight) {
       // key[ARROW_RIGHT]: handler
       filterOptions(value, 1);
-    } else if (!open) {
+    } else if (!open && !isCtrl && !isTab) {
       onOptionsOpen();
     }
   };

@@ -57,7 +57,7 @@ type ParamProps = {
 const useStyles = makeStyles(theme => ({
   drawer: {
     width: '500px',
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.only('xs')]: {
       width: '100vw'
     }
   },
@@ -96,6 +96,19 @@ const DeleteButton = withStyles((theme: Theme) => ({
   }
 }))(Button);
 
+const ClickRow = ({ children, enabled, onClick, chevron = false, ...other }) => (
+  <TableRow
+    hover={enabled}
+    style={{ cursor: enabled ? 'pointer' : 'default' }}
+    onClick={enabled ? () => onClick() : null}
+    {...other}
+  >
+    {children}
+
+    {chevron && <TableCell align="right">{enabled && <ChevronRightOutlinedIcon />}</TableCell>}
+  </TableRow>
+);
+
 function User({ username }: UserProps) {
   const { id } = useParams<ParamProps>();
   const location = useLocation();
@@ -108,10 +121,11 @@ function User({ username }: UserProps) {
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [user, setUser] = useState(null);
   const [modified, setModified] = useState(false);
+  const [editable, setEditable] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
   const { user: currentUser, configuration } = useALContext();
   const downSM = useMediaQuery(theme.breakpoints.down('sm'));
-  const isXSDown = useMediaQuery(theme.breakpoints.down('xs'));
+  const isXS = useMediaQuery(theme.breakpoints.only('xs'));
   const { showErrorMessage, showSuccessMessage, showWarningMessage } = useMySnackbar();
   const sp1 = theme.spacing(1);
   const sp4 = theme.spacing(4);
@@ -170,14 +184,15 @@ function User({ username }: UserProps) {
     setUser({ ...user, apps: newApps });
   }
 
-  function toggleAPIKey(apiKey) {
-    const newKeys = user.apikeys;
-    if (newKeys.indexOf(apiKey) === -1) {
-      newKeys.push(apiKey);
+  function toggleAPIKey(name, apiKey) {
+    const newKeys = { ...user.apikeys };
+    if (name in user.apikeys) {
+      delete newKeys[name];
+      setUser({ ...user, apikeys: newKeys });
     } else {
-      newKeys.splice(newKeys.indexOf(apiKey), 1);
+      newKeys[name] = apiKey;
+      setUser({ ...user, apikeys: newKeys });
     }
-    setUser({ ...user, apikeys: newKeys });
   }
 
   function setName(value) {
@@ -232,7 +247,7 @@ function User({ username }: UserProps) {
   }
 
   function toggleDrawer(type) {
-    if (user) {
+    if (user && editable) {
       setDrawerType(type);
       setDrawerOpen(true);
     }
@@ -274,6 +289,9 @@ function User({ username }: UserProps) {
   }
 
   useEffectOnce(() => {
+    // Make interface editable
+    setEditable(currentUser.is_admin || currentUser.roles.includes('self_manage'));
+
     // Load user on start
     if (currentUser.is_admin || !location.pathname.includes('/admin/')) {
       apiCall({
@@ -459,12 +477,14 @@ function User({ username }: UserProps) {
                     type="file"
                     style={{ display: 'none' }}
                     onChange={handleAvatar}
+                    disabled={!editable}
                   />
                   <label htmlFor="contained-button-file">
                     <IconButton
                       onClick={e => {
                         inputRef.current.click();
                       }}
+                      disabled={!editable}
                       size="large"
                     >
                       <Avatar
@@ -520,7 +540,7 @@ function User({ username }: UserProps) {
 
         <Grid item sm={12} md={9} style={{ width: '100%' }}>
           <Classification
-            type={currentUser.is_admin ? 'picker' : 'pill'}
+            type={editable ? 'picker' : 'pill'}
             size="medium"
             format="long"
             c12n={user && user.classification}
@@ -532,7 +552,7 @@ function User({ username }: UserProps) {
             <Table aria-label={t('profile')}>
               <TableHead>
                 <TableRow>
-                  <TableCell colSpan={isXSDown ? 2 : 3}>
+                  <TableCell colSpan={isXS ? 2 : 3}>
                     <Typography variant="h6" gutterBottom>
                       {t('profile')}
                     </Typography>
@@ -541,37 +561,31 @@ function User({ username }: UserProps) {
               </TableHead>
               <TableBody>
                 <TableRow className={classes.row}>
-                  {isXSDown ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('uname')}</TableCell>}
+                  {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('uname')}</TableCell>}
                   <TableCell width="100%">
-                    {!isXSDown ? null : <Typography variant="caption">{t('uname')}</Typography>}
+                    {!isXS ? null : <Typography variant="caption">{t('uname')}</Typography>}
                     {user ? <div>{user.uname}</div> : <Skeleton />}
                   </TableCell>
                   <TableCell align="right" />
                 </TableRow>
-                <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('name')}>
-                  {isXSDown ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('name')}</TableCell>}
+                <ClickRow enabled={editable} chevron onClick={() => toggleDrawer('name')}>
+                  {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('name')}</TableCell>}
                   <TableCell width="100%">
-                    {!isXSDown ? null : <Typography variant="caption">{t('name')}</Typography>}
+                    {!isXS ? null : <Typography variant="caption">{t('name')}</Typography>}
                     {user ? <div>{user.name}</div> : <Skeleton />}
                   </TableCell>
-                  <TableCell align="right">
-                    <ChevronRightOutlinedIcon />
-                  </TableCell>
-                </TableRow>
-                <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('groups')}>
-                  {isXSDown ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('groups')}</TableCell>}
+                </ClickRow>
+                <ClickRow enabled={editable} chevron onClick={() => toggleDrawer('groups')}>
+                  {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('groups')}</TableCell>}
                   <TableCell width="100%">
-                    {!isXSDown ? null : <Typography variant="caption">{t('groups')}</Typography>}
+                    {!isXS ? null : <Typography variant="caption">{t('groups')}</Typography>}
                     {user ? <div>{user.groups.join(' | ')}</div> : <Skeleton />}
                   </TableCell>
-                  <TableCell align="right">
-                    <ChevronRightOutlinedIcon />
-                  </TableCell>
-                </TableRow>
+                </ClickRow>
                 <TableRow className={classes.row}>
-                  {isXSDown ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('email')}</TableCell>}
+                  {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('email')}</TableCell>}
                   <TableCell width="100%">
-                    {!isXSDown ? null : <Typography variant="caption">{t('email')}</Typography>}
+                    {!isXS ? null : <Typography variant="caption">{t('email')}</Typography>}
                     {user ? <div>{user.email}</div> : <Skeleton />}
                   </TableCell>
                   <TableCell align="right" />
@@ -593,9 +607,9 @@ function User({ username }: UserProps) {
               </TableHead>
               <TableBody>
                 <TableRow>
-                  {isXSDown ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('type')}</TableCell>}
+                  {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('type')}</TableCell>}
                   <TableCell width="100%">
-                    {!isXSDown ? null : <Typography variant="caption">{t('type')}</Typography>}
+                    {!isXS ? null : <Typography variant="caption">{t('type')}</Typography>}
                     {user ? (
                       <div>
                         {configuration.user.types.map((uType, type_id) => (
@@ -619,9 +633,9 @@ function User({ username }: UserProps) {
                   <TableCell align="right" />
                 </TableRow>
                 <TableRow>
-                  {isXSDown ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('roles')}</TableCell>}
+                  {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('roles')}</TableCell>}
                   <TableCell width="100%">
-                    {!isXSDown ? null : <Typography variant="caption">{t('roles')}</Typography>}
+                    {!isXS ? null : <Typography variant="caption">{t('roles')}</Typography>}
                     {user ? (
                       <div>
                         {configuration.user.roles.sort().map((role, role_id) => (
@@ -646,25 +660,27 @@ function User({ username }: UserProps) {
                   <TableCell align="right" />
                 </TableRow>
                 <TableRow
+                  className={classes.row}
                   hover={currentUser.is_admin}
                   style={{ cursor: currentUser.is_admin ? 'pointer' : 'default' }}
                   onClick={currentUser.is_admin ? event => toggleDrawer('api_quota') : null}
                 >
-                  {isXSDown ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('api_quota')}</TableCell>}
+                  {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('api_quota')}</TableCell>}
                   <TableCell width="100%">
-                    {!isXSDown ? null : <Typography variant="caption">{t('api_quota')}</Typography>}
+                    {!isXS ? null : <Typography variant="caption">{t('api_quota')}</Typography>}
                     {user ? <div>{user.api_quota}</div> : <Skeleton />}
                   </TableCell>
                   <TableCell align="right">{currentUser.is_admin ? <ChevronRightOutlinedIcon /> : null}</TableCell>
                 </TableRow>
                 <TableRow
+                  className={classes.row}
                   hover={currentUser.is_admin}
                   style={{ cursor: currentUser.is_admin ? 'pointer' : 'default' }}
                   onClick={currentUser.is_admin ? event => toggleDrawer('submission_quota') : null}
                 >
-                  {isXSDown ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('submission_quota')}</TableCell>}
+                  {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('submission_quota')}</TableCell>}
                   <TableCell width="100%">
-                    {!isXSDown ? null : <Typography variant="caption">{t('submission_quota')}</Typography>}
+                    {!isXS ? null : <Typography variant="caption">{t('submission_quota')}</Typography>}
                     {user ? <div>{user.submission_quota}</div> : <Skeleton />}
                   </TableCell>
                   <TableCell align="right">{currentUser.is_admin ? <ChevronRightOutlinedIcon /> : null}</TableCell>
@@ -673,71 +689,73 @@ function User({ username }: UserProps) {
             </Table>
           </TableContainer>
 
-          <TableContainer className={classes.group} component={Paper}>
-            <Table aria-label={t('security')}>
-              <TableHead>
-                <TableRow>
-                  <TableCell colSpan={2}>
-                    <Typography variant="h6" gutterBottom>
-                      {t('security')}
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('change_password')}>
-                  <TableCell width="100%">{user ? t('change_password') : <Skeleton />}</TableCell>
-                  <TableCell align="right">
-                    <ChevronRightOutlinedIcon />
-                  </TableCell>
-                </TableRow>
-                {user && currentUser.username === user.uname && configuration.auth.allow_2fa && (
-                  <TableRow
-                    hover
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => toggleDrawer(user && user['2fa_enabled'] ? 'disable_otp' : 'otp')}
-                  >
-                    <TableCell width="100%">
-                      {user ? user['2fa_enabled'] ? t('2fa_off') : t('2fa_on') : <Skeleton />}
+          {editable && (
+            <TableContainer className={classes.group} component={Paper}>
+              <Table aria-label={t('security')}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell colSpan={2}>
+                      <Typography variant="h6" gutterBottom>
+                        {t('security')}
+                      </Typography>
                     </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('change_password')}>
+                    <TableCell width="100%">{user ? t('change_password') : <Skeleton />}</TableCell>
                     <TableCell align="right">
                       <ChevronRightOutlinedIcon />
                     </TableCell>
                   </TableRow>
-                )}
-                {user &&
-                  currentUser.username === user.uname &&
-                  user['2fa_enabled'] &&
-                  configuration.auth.allow_security_tokens && (
-                    <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('token')}>
-                      <TableCell width="100%">{t('token')}</TableCell>
+                  {user && currentUser.username === user.uname && configuration.auth.allow_2fa && (
+                    <TableRow
+                      hover
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => toggleDrawer(user && user['2fa_enabled'] ? 'disable_otp' : 'otp')}
+                    >
+                      <TableCell width="100%">
+                        {user ? user['2fa_enabled'] ? t('2fa_off') : t('2fa_on') : <Skeleton />}
+                      </TableCell>
                       <TableCell align="right">
                         <ChevronRightOutlinedIcon />
                       </TableCell>
                     </TableRow>
                   )}
-                {user &&
-                  currentUser.username === user.uname &&
-                  configuration.auth.allow_apikeys &&
-                  user.roles.includes('apikey_access') && (
-                    <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('api_key')}>
-                      <TableCell width="100%">{t('apikeys')}</TableCell>
+                  {user &&
+                    currentUser.username === user.uname &&
+                    user['2fa_enabled'] &&
+                    configuration.auth.allow_security_tokens && (
+                      <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('token')}>
+                        <TableCell width="100%">{t('token')}</TableCell>
+                        <TableCell align="right">
+                          <ChevronRightOutlinedIcon />
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  {user &&
+                    currentUser.username === user.uname &&
+                    configuration.auth.allow_apikeys &&
+                    user.roles.includes('apikey_access') && (
+                      <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('api_key')}>
+                        <TableCell width="100%">{t('apikeys')}</TableCell>
+                        <TableCell align="right">
+                          <ChevronRightOutlinedIcon />
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  {user && currentUser.username === user.uname && user.roles.includes('obo_access') && (
+                    <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('apps')}>
+                      <TableCell width="100%">{t('apps')}</TableCell>
                       <TableCell align="right">
                         <ChevronRightOutlinedIcon />
                       </TableCell>
                     </TableRow>
                   )}
-                {user && currentUser.username === user.uname && user.roles.includes('obo_access') && (
-                  <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('apps')}>
-                    <TableCell width="100%">{t('apps')}</TableCell>
-                    <TableCell align="right">
-                      <ChevronRightOutlinedIcon />
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
 
           <RouterPrompt when={modified} />
 

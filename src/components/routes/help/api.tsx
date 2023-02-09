@@ -68,11 +68,6 @@ export default function ApiDoc() {
     POST: 'success',
     PUT: 'warning'
   };
-  const privColor = {
-    E: 'error',
-    R: 'success',
-    W: 'warning'
-  };
   const userColor = {
     signature_import: 'success',
     signature_manage: 'info',
@@ -85,6 +80,7 @@ export default function ApiDoc() {
     archive_download: 'warning',
     archive_trigger: 'warning',
     archive_manage: 'info',
+    self_manage: 'info',
     safelist_view: 'default',
     safelist_manage: 'info',
     workflow_view: 'default',
@@ -323,24 +319,6 @@ export default function ApiDoc() {
                                   ))}
                                 </Grid>
                               </>
-                              {api.required_priv ? (
-                                <>
-                                  <Grid item xs={12} sm={4} md={3} lg={2}>
-                                    <div style={{ fontWeight: 500 }}>{t('required_priv')}:</div>
-                                  </Grid>
-                                  <Grid item xs={12} sm={8} md={9} lg={4}>
-                                    {api.required_priv.map((ptype, pidx) => (
-                                      <CustomChip
-                                        key={pidx}
-                                        color={privColor[ptype]}
-                                        type="rounded"
-                                        size="tiny"
-                                        label={t(`priv.${ptype}`)}
-                                      />
-                                    ))}
-                                  </Grid>
-                                </>
-                              ) : null}
                               <>
                                 <Grid item xs={12} sm={4} md={3} lg={2}>
                                   <div style={{ fontWeight: 500 }}>{t('methods')}:</div>

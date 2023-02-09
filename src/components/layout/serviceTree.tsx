@@ -32,10 +32,11 @@ function ServiceTreeItemSkel({ size = 'medium' }: ServiceTreeItemSkelProps) {
 type ServiceTreeItemProps = {
   item: any;
   onChange: (name: string, category: string) => void;
+  disabled?: boolean;
   size: 'medium' | 'small';
 };
 
-function ServiceTreeItem({ item, onChange, size = 'medium' as 'medium' }: ServiceTreeItemProps) {
+function ServiceTreeItem({ item, onChange, disabled = false, size = 'medium' as 'medium' }: ServiceTreeItemProps) {
   const classes = useStyles();
   const theme = useTheme();
   const sp1 = theme.spacing(1);
@@ -54,6 +55,7 @@ function ServiceTreeItem({ item, onChange, size = 'medium' as 'medium' }: Servic
         control={
           <Checkbox
             size={size}
+            disabled={disabled}
             indeterminate={
               item.services ? !item.services.every(e => e.selected) && !item.services.every(e => !e.selected) : false
             }
@@ -72,12 +74,12 @@ function ServiceTreeItem({ item, onChange, size = 'medium' as 'medium' }: Servic
             )}
           </Typography>
         }
-        className={classes.item}
+        className={!disabled ? classes.item : null}
       />
       <div style={{ paddingLeft: sp4 }}>
         {item.services
           ? item.services.map((service, service_id) => (
-              <ServiceTreeItem size={size} key={service_id} item={service} onChange={onChange} />
+              <ServiceTreeItem disabled={disabled} size={size} key={service_id} item={service} onChange={onChange} />
             ))
           : null}
       </div>
@@ -149,6 +151,7 @@ type ServiceTreeProps = {
   setSettings: (settings: any) => void;
   setModified?: (isModified: boolean) => void;
   compressed?: boolean;
+  disabled?: boolean;
   size?: 'medium' | 'small';
 };
 
@@ -157,6 +160,7 @@ const ServiceTree: React.FC<ServiceTreeProps> = ({
   setSettings,
   setModified = null,
   compressed = false,
+  disabled = false,
   size = 'medium' as 'medium'
 }) => {
   const theme = useTheme();
@@ -230,7 +234,13 @@ const ServiceTree: React.FC<ServiceTreeProps> = ({
         settings.services
           .sort(sortFunc)
           .map((category, cat_id) => (
-            <ServiceTreeItem size={size} key={cat_id} item={category} onChange={handleServiceChange} />
+            <ServiceTreeItem
+              disabled={disabled}
+              size={size}
+              key={cat_id}
+              item={category}
+              onChange={handleServiceChange}
+            />
           ))
       ) : (
         <SkelItems size={size} spacing={sp4} />

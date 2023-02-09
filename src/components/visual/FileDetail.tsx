@@ -257,87 +257,83 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
       <div style={{ paddingBottom: sp4 }}>
         <Grid container alignItems="center">
           <Grid item xs>
-            <div>
-              <Typography variant="h4">{t('title')}</Typography>
-              <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
-                {file ? fileName : <Skeleton style={{ width: '10rem' }} />}
-              </Typography>
-            </div>
+            <Typography variant="h4">{t('title')}</Typography>
+            <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
+              {file ? fileName : <Skeleton style={{ width: '10rem' }} />}
+            </Typography>
           </Grid>
-          <Grid item xs={12} sm>
-            <div style={{ textAlign: 'right' }}>
-              {file ? (
-                <>
-                  <Tooltip title={t('related')}>
-                    <IconButton
-                      component={Link}
-                      to={`/search/submission?query=files.sha256:${file.file_info.sha256} OR results:${file.file_info.sha256}* OR errors:${file.file_info.sha256}*`}
-                      size="large"
-                    >
-                      <ViewCarouselOutlinedIcon />
+          <Grid item xs={12} sm style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 0 }}>
+            {file ? (
+              <>
+                <Tooltip title={t('related')}>
+                  <IconButton
+                    component={Link}
+                    to={`/search/submission?query=files.sha256:${file.file_info.sha256} OR results:${file.file_info.sha256}* OR errors:${file.file_info.sha256}*`}
+                    size="large"
+                  >
+                    <ViewCarouselOutlinedIcon />
+                  </IconButton>
+                </Tooltip>
+                {currentUser.roles.includes('file_download') && (
+                  <FileDownloader
+                    icon={<GetAppOutlinedIcon />}
+                    link={`/api/v4/file/download/${file.file_info.sha256}/?${
+                      fileName && file.file_info.sha256 !== fileName ? `name=${fileName}&` : ''
+                    }${sid ? `sid=${sid}&` : ''}`}
+                    tooltip={t('download')}
+                  />
+                )}
+                {currentUser.roles.includes('file_detail') && (
+                  <Tooltip title={t('file_viewer')}>
+                    <IconButton component={Link} to={`/file/viewer/${file.file_info.sha256}`} size="large">
+                      <PageviewOutlinedIcon />
                     </IconButton>
                   </Tooltip>
-                  {currentUser.roles.includes('file_download') && (
-                    <FileDownloader
-                      icon={<GetAppOutlinedIcon />}
-                      link={`/api/v4/file/download/${file.file_info.sha256}/?${
-                        fileName && file.file_info.sha256 !== fileName ? `name=${fileName}&` : ''
-                      }${sid ? `sid=${sid}&` : ''}`}
-                      tooltip={t('download')}
-                    />
-                  )}
-                  {currentUser.roles.includes('file_detail') && (
-                    <Tooltip title={t('file_viewer')}>
-                      <IconButton component={Link} to={`/file/viewer/${file.file_info.sha256}`} size="large">
-                        <PageviewOutlinedIcon />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                  {currentUser.roles.includes('submission_create') && (
-                    <Tooltip title={t('resubmit_file')}>
-                      <IconButton
-                        component={Link}
-                        to="/submit"
-                        state={{
-                          hash: file.file_info.sha256,
-                          tabContext: '1',
-                          c12n: file.file_info.classification
-                        }}
-                        size="large"
-                      >
-                        <ReplayOutlinedIcon />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                  {currentUser.roles.includes('submission_create') && (
-                    <Tooltip title={t('resubmit_dynamic')}>
-                      <IconButton onClick={resubmit} size="large">
-                        <RotateLeftOutlinedIcon />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                  {currentUser.roles.includes('safelist_manage') && (
-                    <Tooltip title={t('safelist')}>
-                      <IconButton onClick={prepareSafelist} size="large">
-                        <PlaylistAddCheckIcon />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                </>
-              ) : (
-                <div style={{ display: 'inline-flex' }}>
-                  {[...Array(5)].map((_, i) => (
-                    <Skeleton
-                      key={i}
-                      variant="circular"
-                      height="2.5rem"
-                      width="2.5rem"
-                      style={{ margin: theme.spacing(0.5) }}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
+                )}
+                {currentUser.roles.includes('submission_create') && (
+                  <Tooltip title={t('resubmit_file')}>
+                    <IconButton
+                      component={Link}
+                      to="/submit"
+                      state={{
+                        hash: file.file_info.sha256,
+                        tabContext: '1',
+                        c12n: file.file_info.classification
+                      }}
+                      size="large"
+                    >
+                      <ReplayOutlinedIcon />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                {currentUser.roles.includes('submission_create') && (
+                  <Tooltip title={t('resubmit_dynamic')}>
+                    <IconButton onClick={resubmit} size="large">
+                      <RotateLeftOutlinedIcon />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                {currentUser.roles.includes('safelist_manage') && (
+                  <Tooltip title={t('safelist')}>
+                    <IconButton onClick={prepareSafelist} size="large">
+                      <PlaylistAddCheckIcon />
+                    </IconButton>
+                  </Tooltip>
+                )}
+              </>
+            ) : (
+              <div style={{ display: 'inline-flex' }}>
+                {[...Array(5)].map((_, i) => (
+                  <Skeleton
+                    key={i}
+                    variant="circular"
+                    height="2.5rem"
+                    width="2.5rem"
+                    style={{ margin: theme.spacing(0.5) }}
+                  />
+                ))}
+              </div>
+            )}
           </Grid>
         </Grid>
       </div>

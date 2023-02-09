@@ -11,13 +11,11 @@ import {
   ListItemIcon,
   ListItemText,
   styled,
-  Toolbar,
   Tooltip,
   useMediaQuery,
   useTheme
 } from '@mui/material';
 import useAppConfigs from 'commons/components/app/hooks/useAppConfigs';
-import useAppLayout from 'commons/components/app/hooks/useAppLayout';
 import useAppLeftNav from 'commons/components/app/hooks/useAppLeftNav';
 import LeftNavGroup from 'commons/components/leftnav/LeftNavGroup';
 import LeftNavItem from 'commons/components/leftnav/LeftNavItem';
@@ -32,7 +30,7 @@ const StyledDrawer = styled(Drawer, { shouldForwardProp: prop => prop !== 'open'
 }>(({ theme, open, width }) => ({
   width,
   flexShrink: 0,
-  heigth: '100%',
+  height: '100%',
   whiteSpace: 'nowrap',
   '@media print': {
     display: 'none !important'
@@ -57,6 +55,7 @@ const StyledDrawer = styled(Drawer, { shouldForwardProp: prop => prop !== 'open'
   }),
   '& .MuiDrawer-paper': {
     width,
+    overflowX: 'hidden',
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen
@@ -82,40 +81,14 @@ const LeftNavDrawer = () => {
   const { t } = useTranslation();
   const theme = useTheme();
   const { preferences } = useAppConfigs();
-  const layout = useAppLayout();
   const leftnav = useAppLeftNav();
-  const isSmDown = useMediaQuery(theme.breakpoints.down('sm'));
-  const isTopLayout = layout.current === 'top';
+  const isSmDown = useMediaQuery(theme.breakpoints.down('md'));
 
   const onCloseDrawerIfOpen = useCallback(() => {
     if (isSmDown && leftnav.open) {
       leftnav.setOpen(false);
     }
   }, [isSmDown, leftnav]);
-
-  const header = (
-    <div>
-      <Toolbar
-        sx={{
-          [theme.breakpoints.up('xs')]: {
-            padding: 0
-          }
-        }}
-      >
-        <AppName />
-      </Toolbar>
-      {!isTopLayout && <Divider />}
-    </div>
-  );
-
-  const hide = (
-    <List disablePadding>
-      <ListItem button key="chevron" onClick={leftnav.toggle}>
-        <ListItemIcon>{leftnav.open ? <ChevronLeftIcon /> : <ChevronRightIcon />}</ListItemIcon>
-        <ListItemText primary={t('drawer.collapse')} />
-      </ListItem>
-    </List>
-  );
 
   return (
     <ClickAwayListener mouseEvent="onMouseDown" touchEvent="onTouchStart" onClickAway={onCloseDrawerIfOpen}>
@@ -126,13 +99,10 @@ const LeftNavDrawer = () => {
         width={preferences.leftnav.width}
         open={leftnav.open}
       >
-        {leftnav.open ? (
-          header
-        ) : (
-          <Tooltip title={preferences.appName} aria-label={preferences.appName} placement="right">
-            {header}
-          </Tooltip>
-        )}
+        <AppName onCloseDrawerIfOpen={onCloseDrawerIfOpen} />
+
+        <Divider />
+
         <List disablePadding>
           {leftnav.elements.map((e, i) => {
             if (e.type === 'item') {
@@ -149,14 +119,18 @@ const LeftNavDrawer = () => {
             return null;
           })}
         </List>
+
         <Divider />
-        {leftnav.open ? (
-          hide
-        ) : (
-          <Tooltip title={t('drawer.expand')} aria-label={t('drawer.expand')} placement="right">
-            {hide}
-          </Tooltip>
-        )}
+
+        <Tooltip title={leftnav.open ? '' : t('drawer.expand')} aria-label={t('drawer.expand')} placement="right">
+          <List disablePadding>
+            <ListItem button key="chevron" onClick={leftnav.toggle}>
+              <ListItemIcon>{leftnav.open ? <ChevronLeftIcon /> : <ChevronRightIcon />}</ListItemIcon>
+              <ListItemText primary={t('drawer.collapse')} />
+            </ListItem>
+          </List>
+        </Tooltip>
+
         <Box
           sx={{
             height: '100%',
