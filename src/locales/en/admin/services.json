@@ -45,6 +45,7 @@
   "container.dialog.registry_username": "Container registry username",
   "container.dialog.service_account": "Kubernetes service account",
   "container.dialog.title.container": "Modifying container",
+  "container.dialog.title.dependency": "Modifying dependency",
   "container.dialog.volumes": "Persistent Volumes",
   "container.dialog.volumes.access_mode": "Access Mode",
   "container.dialog.volumes.capacity": "Capacity",
