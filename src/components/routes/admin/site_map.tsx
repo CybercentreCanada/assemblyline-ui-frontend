@@ -1,6 +1,8 @@
+import HttpsOutlinedIcon from '@mui/icons-material/HttpsOutlined';
+import NoEncryptionOutlinedIcon from '@mui/icons-material/NoEncryptionOutlined';
 import {
-  createStyles,
   Paper,
+  Skeleton,
   Table,
   TableBody,
   TableCell,
@@ -9,20 +11,19 @@ import {
   TableRow,
   Theme,
   Typography,
-  useTheme,
-  withStyles
-} from '@material-ui/core';
-import HttpsOutlinedIcon from '@material-ui/icons/HttpsOutlined';
-import NoEncryptionOutlinedIcon from '@material-ui/icons/NoEncryptionOutlined';
-import { Skeleton } from '@material-ui/lab';
-import useUser from 'commons/components/hooks/useAppUser';
-import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
+  useTheme
+} from '@mui/material';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
+import PageFullWidth from 'commons/components/pages/PageFullWidth';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
 import CustomChip from 'components/visual/CustomChip';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Redirect } from 'react-router-dom';
+import { Navigate } from 'react-router';
 
 const StyledTableCell = withStyles((theme: Theme) =>
   createStyles({
@@ -34,7 +35,7 @@ const StyledTableCell = withStyles((theme: Theme) =>
       }
     },
     head: {
-      backgroundColor: theme.palette.type === 'dark' ? '#404040' : '#EEE',
+      backgroundColor: theme.palette.mode === 'dark' ? '#404040' : '#EEE',
       whiteSpace: 'nowrap'
     }
   })
@@ -45,7 +46,7 @@ export default function SiteMap() {
   const theme = useTheme();
   const [siteMap, setSiteMap] = useState(null);
   const { apiCall } = useMyAPI();
-  const { user: currentUser } = useUser<CustomUser>();
+  const { user: currentUser } = useAppUser<CustomUser>();
 
   const privMap = {
     R: 'success',
@@ -82,7 +83,7 @@ export default function SiteMap() {
     replay_system: 'info'
   };
 
-  useEffect(() => {
+  useEffectOnce(() => {
     if (currentUser.is_admin) {
       apiCall({
         method: 'GET',
@@ -92,8 +93,7 @@ export default function SiteMap() {
         }
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>
@@ -170,10 +170,10 @@ export default function SiteMap() {
           </Table>
         </TableContainer>
       ) : (
-        <Skeleton variant="rect" height="10rem" style={{ borderRadius: '4px' }} />
+        <Skeleton variant="rectangular" height="10rem" style={{ borderRadius: '4px' }} />
       )}
     </PageFullWidth>
   ) : (
-    <Redirect to="/forbidden" />
+    <Navigate to="/forbidden" replace />
   );
 }

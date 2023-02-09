@@ -1,9 +1,9 @@
-import { Menu, MenuItem } from '@material-ui/core';
-import AssignmentOutlinedIcon from '@material-ui/icons/AssignmentOutlined';
-import PlaylistAddCheckOutlinedIcon from '@material-ui/icons/PlaylistAddCheckOutlined';
-import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
-import SelectAllOutlinedIcon from '@material-ui/icons/SelectAllOutlined';
-import useClipboard from 'commons/components/hooks/useClipboard';
+import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
+import PlaylistAddCheckOutlinedIcon from '@mui/icons-material/PlaylistAddCheckOutlined';
+import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
+import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
+import { Menu, MenuItem } from '@mui/material';
+import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -13,7 +13,7 @@ import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
 import { safeFieldValueURI } from 'helpers/utils';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import InputDialog from './InputDialog';
 
 const STYLE = { height: 'auto', minHeight: '20px' };
@@ -54,7 +54,7 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({
   const [safelistDialog, setSafelistDialog] = React.useState(false);
   const [safelistReason, setSafelistReason] = React.useState(null);
   const [waitingDialog, setWaitingDialog] = React.useState(false);
-  const history = useHistory();
+  const navigate = useNavigate();
   const { apiCall } = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
   const { isHighlighted, triggerHighlight } = useHighlighter();
@@ -66,7 +66,7 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({
 
   const searchHeuristic = useCallback(
     () =>
-      history.push(
+      navigate(
         `/search/result?query=result.sections.heuristic${signature ? '.signature' : ''}.name:${safeFieldValueURI(text)}`
       ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -195,7 +195,7 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({
       </Menu>
       <CustomChip
         wrap
-        variant={safe ? 'outlined' : 'default'}
+        variant={safe ? 'outlined' : 'filled'}
         size="tiny"
         type="rounded"
         color={highlight_key && isHighlighted(highlight_key) ? ('primary' as 'info') : color}

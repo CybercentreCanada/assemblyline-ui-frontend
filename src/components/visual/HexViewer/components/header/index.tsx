@@ -1,7 +1,8 @@
-import { makeStyles, Paper } from '@material-ui/core';
-import Divider from '@material-ui/core/Divider';
-import SettingsIcon from '@material-ui/icons/Settings';
-import ShareIcon from '@material-ui/icons/Share';
+import { Paper } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import Divider from '@mui/material/Divider';
+import SettingsIcon from '@mui/icons-material/Settings';
+import ShareIcon from '@mui/icons-material/Share';
 import React, { memo, PropsWithChildren } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HexSearchBar, HexSearchTypes, StoreProps, TooltipIconButton, useDispatch } from '../..';
@@ -25,7 +26,7 @@ const useHexStyles = makeStyles(theme => ({
     width: '100%',
     maxWidth: '1200px',
     '&:hover': {
-      backgroundColor: theme.palette.type === 'dark' ? '#484848' : '#FAFAFA'
+      backgroundColor: theme.palette.mode === 'dark' ? '#484848' : '#FAFAFA'
     }
   },
   divider: {

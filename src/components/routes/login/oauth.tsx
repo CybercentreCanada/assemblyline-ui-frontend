@@ -1,15 +1,8 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import {
-  Avatar,
-  Button,
-  CircularProgress,
-  createStyles,
-  Link,
-  makeStyles,
-  Typography,
-  useTheme
-} from '@material-ui/core';
-import Skeleton from '@material-ui/lab/Skeleton';
+import { Avatar, Button, CircularProgress, Link, Typography, useTheme } from '@mui/material';
+import createStyles from '@mui/styles/createStyles';
+import makeStyles from '@mui/styles/makeStyles';
+import Skeleton from '@mui/material/Skeleton';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(() =>
@@ -43,7 +36,7 @@ export function OAuthLogin({ avatar, username, email, oAuthTokenID, buttonLoadin
     <form onSubmit={onSubmit}>
       <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'center', justifyContent: 'center' }}>
         {!oAuthTokenID ? (
-          <Skeleton variant="circle" style={{ alignSelf: 'center' }} width={144} height={144} />
+          <Skeleton variant="circular" style={{ alignSelf: 'center' }} width={144} height={144} />
         ) : (
           <Avatar style={{ alignSelf: 'center', width: theme.spacing(18), height: theme.spacing(18) }} src={avatar} />
         )}
@@ -52,7 +45,7 @@ export function OAuthLogin({ avatar, username, email, oAuthTokenID, buttonLoadin
           {!oAuthTokenID ? <Skeleton /> : email}
         </Typography>
         {!oAuthTokenID ? (
-          <Skeleton variant="rect" style={{ height: '36px', marginTop: '1.5rem', marginBottom: '1.5rem' }} />
+          <Skeleton variant="rectangular" style={{ height: '36px', marginTop: '1.5rem', marginBottom: '1.5rem' }} />
         ) : (
           <Button
             type="submit"

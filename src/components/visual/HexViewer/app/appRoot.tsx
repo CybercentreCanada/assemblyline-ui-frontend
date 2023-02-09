@@ -1,5 +1,6 @@
-import { makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
-import useAppContext from 'commons/components/hooks/useAppContext';
+import { useMediaQuery, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import useAppTheme from 'commons/components/app/hooks/useAppTheme';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ACTIONS, DataProps, HexLoading, HexPageLayout, ModeLanguage, ModeTheme, ModeWidth, useStore } from '..';
@@ -23,7 +24,7 @@ const WrappedAppRoot = ({ data = '' }: DataProps) => {
   }, [data, dispatch]);
 
   // Theme
-  const { theme: appTheme } = useAppContext();
+  const { theme: appTheme } = useAppTheme();
   React.useEffect(() => {
     update.store.mode.setTheme(appTheme as ModeTheme);
   }, [appTheme, update]);

@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer';
 import { HIGHER_ASCII_TABLE, NON_PRINTABLE_ASCII_TABLE, Store, toHexChar2 } from '..';
 
 export const addRegexAlternation = (text1: string, text2: string): string =>

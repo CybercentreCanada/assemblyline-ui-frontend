@@ -1,12 +1,13 @@
-import { Fade, makeStyles, Paper, Popper, useTheme } from '@material-ui/core';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import ExposureZeroIcon from '@material-ui/icons/ExposureZero';
-import NavigationIcon from '@material-ui/icons/Navigation';
-import TextFieldsIcon from '@material-ui/icons/TextFields';
-import { isEscape } from 'commons/addons/elements/utils/keyboard';
+import NavigationIcon from '@mui/icons-material/Navigation';
+import NumbersOutlinedIcon from '@mui/icons-material/NumbersOutlined';
+import TextFieldsIcon from '@mui/icons-material/TextFields';
+import { Fade, Paper, Popper, useTheme } from '@mui/material';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import makeStyles from '@mui/styles/makeStyles';
+import { isEscape } from 'commons/components/utils/keyboard';
 import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SearchType, StoreProps, useDispatch, useEventListener } from '../..';
@@ -84,7 +85,7 @@ export const WrappedHexSearchTypes = ({ store }: StoreProps) => {
           searchType === 'cursor' ? (
             <NavigationIcon />
           ) : searchType === 'hex' ? (
-            <ExposureZeroIcon />
+            <NumbersOutlinedIcon />
           ) : searchType === 'text' ? (
             <TextFieldsIcon />
           ) : null
@@ -121,7 +122,7 @@ export const WrappedHexSearchTypes = ({ store }: StoreProps) => {
                   dense
                   onClick={handleClick('hex')}
                 >
-                  <ListItemIcon children={<ExposureZeroIcon />} />
+                  <ListItemIcon children={<NumbersOutlinedIcon />} />
                   <ListItemText primary={t('header.selector.hexcode')} />
                 </ListItem>
                 <ListItem

@@ -1,14 +1,16 @@
 import Flow from '@flowjs/flow.js';
+import { TabContext, TabList, TabPanel } from '@mui/lab';
 import {
+  Alert,
   Button,
   Checkbox,
   CircularProgress,
   FormControlLabel,
   Grid,
-  makeStyles,
   MenuItem,
   Paper,
   Select,
+  Skeleton,
   Switch,
   Tab,
   TextField,
@@ -16,10 +18,12 @@ import {
   Typography,
   useMediaQuery,
   useTheme
-} from '@material-ui/core';
-import { Alert, Skeleton, TabContext, TabList, TabPanel } from '@material-ui/lab';
-import useAppLayout from 'commons/components/hooks/useAppLayout';
-import PageCenter from 'commons/components/layout/pages/PageCenter';
+} from '@mui/material';
+import FormControl from '@mui/material/FormControl';
+import { makeStyles } from '@mui/styles';
+import useAppBanner from 'commons/components/app/hooks/useAppBanner';
+import PageCenter from 'commons/components/pages/PageCenter';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -30,9 +34,10 @@ import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDropper from 'components/visual/FileDropper';
 import { matchSHA256, matchURL } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
-import { useEffect, useState } from 'react';
+import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router';
+import { Link } from 'react-router-dom';
 
 type SubmitState = {
   hash: string;
@@ -40,11 +45,31 @@ type SubmitState = {
   c12n: string;
 };
 
-function Submit() {
-  const { getBanner } = useAppLayout();
+const useStyles = makeStyles(theme => ({
+  no_pad: {
+    padding: 0
+  },
+  item: {
+    marginLeft: 0,
+    width: '100%',
+    '&:hover': {
+      background: theme.palette.action.hover
+    }
+  },
+  buttonProgress: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginTop: -12,
+    marginLeft: -12
+  }
+}));
+
+const Submit: React.FC<any> = () => {
   const { apiCall } = useMyAPI();
   const { t, i18n } = useTranslation(['submit']);
   const theme = useTheme();
+  const classes = useStyles();
   const { user: currentUser, c12nDef, configuration } = useALContext();
   const [uuid, setUUID] = useState(null);
   const [flow, setFlow] = useState(null);
@@ -57,42 +82,23 @@ function Submit() {
   const downSM = useMediaQuery(theme.breakpoints.down('sm'));
   const md = useMediaQuery(theme.breakpoints.only('md'));
   const { showErrorMessage, showSuccessMessage, closeSnackbar } = useMySnackbar();
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
-  const state: SubmitState = history.location.state as SubmitState;
+  const state: SubmitState = location.state as SubmitState;
   const urlHashTitle = configuration.ui.allow_url_submissions ? 'URL/SHA256' : 'SHA256';
   const urlInputText = urlHashTitle + t('urlHash.input_suffix');
-  const [urlHash, setUrlHash] = useState(state !== undefined ? state.hash : '');
+  const [urlHash, setUrlHash] = useState(state ? state.hash : '');
   const [urlHashHasError, setUrlHashHasError] = useState(false);
-  const [value, setValue] = useState(state !== undefined ? state.tabContext : '0');
-  const classification = useState(state !== undefined ? state.c12n : null)[0];
+  const [value, setValue] = useState(state ? state.tabContext : '0');
+  const classification = useState(state ? state.c12n : null)[0];
+  const banner = useAppBanner();
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
-
-  const useStyles = makeStyles(curTheme => ({
-    no_pad: {
-      padding: 0
-    },
-    item: {
-      marginLeft: 0,
-      width: '100%',
-      '&:hover': {
-        background: theme.palette.action.hover
-      }
-    },
-    buttonProgress: {
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      marginTop: -12,
-      marginLeft: -12
-    }
-  }));
-  const classes = useStyles();
 
   const getFileUUID = selectedFile => {
     const relativePath =
@@ -199,7 +205,7 @@ function Submit() {
         onSuccess: api_data => {
           showSuccessMessage(`${t('submit.success')} ${api_data.api_response.sid}`);
           setTimeout(() => {
-            history.push(`/submission/detail/${api_data.api_response.sid}`);
+            navigate(`/submission/detail/${api_data.api_response.sid}`);
           }, 500);
         },
         onFailure: api_data => {
@@ -326,7 +332,7 @@ function Submit() {
         setAllowClick(false);
         showSuccessMessage(`${t('submit.success')} ${api_data.api_response.sid}`);
         setTimeout(() => {
-          history.push(`/submission/detail/${api_data.api_response.sid}`);
+          navigate(`/submission/detail/${api_data.api_response.sid}`);
         }, 500);
       },
       onFailure: api_data => {
@@ -337,7 +343,7 @@ function Submit() {
     });
   }
 
-  useEffect(() => {
+  useEffectOnce(() => {
     // Setup Flow
     setFlow(
       new Flow({
@@ -357,8 +363,7 @@ function Submit() {
       }
     });
     setUUID(generateUUID());
-    // eslint-disable-next-line
-  }, []);
+  });
 
   return (
     <PageCenter maxWidth={md ? '800px' : downSM ? '100%' : '1024px'} margin={4} width="100%">
@@ -372,7 +377,7 @@ function Submit() {
         acceptText={t('validate.acceptText')}
         text={t('validate.text')}
       />
-      <div style={{ marginBottom: !downSM && !configuration.ui.banner ? '2rem' : null }}>{getBanner(theme)}</div>
+      <div style={{ marginBottom: !downSM && !configuration.ui.banner ? '2rem' : null }}>{banner}</div>
       {configuration.ui.banner && (
         <Alert severity={configuration.ui.banner_level} style={{ marginBottom: '2rem' }}>
           {configuration.ui.banner[i18n.language] ? configuration.ui.banner[i18n.language] : configuration.ui.banner.en}
@@ -574,18 +579,19 @@ function Submit() {
                       {t('options.submission.priority')}
                     </Typography>
                     {settings ? (
-                      <Select
-                        id="priority"
-                        margin="dense"
-                        value={settings.priority}
-                        variant="outlined"
-                        onChange={event => setSettingValue('priority', event.target.value)}
-                        fullWidth
-                      >
-                        <MenuItem value="500">{t('options.submission.priority.low')}</MenuItem>
-                        <MenuItem value="1000">{t('options.submission.priority.medium')}</MenuItem>
-                        <MenuItem value="1500">{t('options.submission.priority.high')}</MenuItem>
-                      </Select>
+                      <FormControl size="small" fullWidth>
+                        <Select
+                          id="priority"
+                          value={settings.priority}
+                          variant="outlined"
+                          onChange={event => setSettingValue('priority', event.target.value)}
+                          fullWidth
+                        >
+                          <MenuItem value="500">{t('options.submission.priority.low')}</MenuItem>
+                          <MenuItem value="1000">{t('options.submission.priority.medium')}</MenuItem>
+                          <MenuItem value="1500">{t('options.submission.priority.high')}</MenuItem>
+                        </Select>
+                      </FormControl>
                     ) : (
                       <Skeleton style={{ height: '3rem' }} />
                     )}
@@ -689,8 +695,9 @@ function Submit() {
                     {settings ? (
                       <TextField
                         id="ttl"
-                        size="small"
                         type="number"
+                        margin="dense"
+                        size="small"
                         inputProps={{
                           min: configuration.submission.max_dtl !== 0 ? 1 : 0,
                           max: configuration.submission.max_dtl !== 0 ? configuration.submission.max_dtl : 365
@@ -729,6 +736,6 @@ function Submit() {
       )} */}
     </PageCenter>
   );
-}
+};
 
-export default Submit;
+export default memo(Submit);

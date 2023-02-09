@@ -9,7 +9,7 @@ import {
   TextField,
   Typography,
   useTheme
-} from '@material-ui/core';
+} from '@mui/material';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 // eslint-disable-next-line import/extensions

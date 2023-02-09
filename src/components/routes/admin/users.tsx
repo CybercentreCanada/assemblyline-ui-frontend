@@ -1,23 +1,27 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import BlockIcon from '@mui/icons-material/Block';
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
 import {
   Box,
   Button,
+  Chip,
   CircularProgress,
   Drawer,
   Grid,
   IconButton,
-  makeStyles,
   TextField,
   Tooltip,
   useMediaQuery,
   useTheme
-} from '@material-ui/core';
-import Typography from '@material-ui/core/Typography';
-import BlockIcon from '@material-ui/icons/Block';
-import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
-import PersonAddIcon from '@material-ui/icons/PersonAdd';
-import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount';
-import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
-import PageHeader from 'commons/components/layout/pages/PageHeader';
+} from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
+import PageFullWidth from 'commons/components/pages/PageFullWidth';
+import PageHeader from 'commons/components/pages/PageHeader';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -29,11 +33,11 @@ import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
 import UsersTable from 'components/visual/SearchResult/users';
 import SearchResultCount from 'components/visual/SearchResultCount';
-import ChipInput from 'material-ui-chip-input';
 import 'moment/locale/fr';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Redirect, useHistory, useLocation } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router';
+import { useLocation } from 'react-router-dom';
 
 const PAGE_SIZE = 25;
 const DEFAULT_USER = {
@@ -101,7 +105,7 @@ export default function Users() {
   const location = useLocation();
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
   const { showSuccessMessage } = useMySnackbar();
-  const history = useHistory();
+  const navigate = useNavigate();
   const theme = useTheme();
   const { apiCall } = useMyAPI();
   const classes = useStyles();
@@ -136,7 +140,7 @@ export default function Users() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
-  useEffect(() => {
+  useEffectOnce(() => {
     if (currentUser.is_admin) {
       setClassification(c12nDef.UNRESTRICTED);
       apiCall({
@@ -149,18 +153,16 @@ export default function Users() {
         }
       });
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   const onClear = () => {
-    history.push(location.pathname);
+    navigate(location.pathname);
   };
 
   const onSearch = () => {
     if (filterValue.current !== '') {
       query.set('query', filterValue.current);
-      history.push(`${location.pathname}?${query.toString()}`);
+      navigate(`${location.pathname}?${query.toString()}`);
     } else {
       onClear();
     }
@@ -206,7 +208,7 @@ export default function Users() {
     <PageFullWidth margin={4}>
       <Drawer anchor="right" classes={{ paper: classes.drawerPaper }} open={drawer} onClose={closeDrawer}>
         <div id="drawerTop" style={{ padding: theme.spacing(1) }}>
-          <IconButton onClick={closeDrawer}>
+          <IconButton onClick={closeDrawer} size="large">
             <CloseOutlinedIcon />
           </IconButton>
         </div>
@@ -252,12 +254,18 @@ export default function Users() {
             </Grid>
             <Grid item xs={12}>
               <Typography variant="caption">{t('newuser.groups')}</Typography>
-              <ChipInput
-                style={{ display: 'block' }}
-                margin="dense"
+              <Autocomplete
+                sx={{ display: 'block', margin: theme.spacing(2, 0) }}
+                multiple
+                freeSolo
+                size="small"
+                options={[]}
                 defaultValue={newUser.groups}
-                onChange={chips => updateNewUser('groups', chips)}
-                variant="outlined"
+                renderInput={params => <TextField {...params} />}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => <Chip variant="outlined" label={option} {...getTagProps({ index })} />)
+                }
+                onChange={(event, chips) => updateNewUser('groups', chips)}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -305,6 +313,7 @@ export default function Users() {
                 fullWidth
                 type="number"
                 margin="dense"
+                size="small"
                 variant="outlined"
                 onChange={event => updateNewUser('api_quota', event.target.value)}
                 value={newUser.api_quota}
@@ -316,6 +325,7 @@ export default function Users() {
                 fullWidth
                 type="number"
                 margin="dense"
+                size="small"
                 variant="outlined"
                 onChange={event => updateNewUser('submission_quota', event.target.value)}
                 value={newUser.submission_quota}
@@ -345,11 +355,12 @@ export default function Users() {
             <Tooltip title={t('add_user')}>
               <IconButton
                 style={{
-                  color: theme.palette.type === 'dark' ? theme.palette.success.light : theme.palette.success.dark
+                  color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
                 }}
                 onClick={() => {
                   setDrawer(true);
                 }}
+                size="large"
               >
                 <PersonAddIcon />
               </IconButton>
@@ -375,7 +386,7 @@ export default function Users() {
                 props: {
                   onClick: () => {
                     query.set('query', 'type:admin');
-                    history.push(`${location.pathname}?${query.getDeltaString()}`);
+                    navigate(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
               },
@@ -385,7 +396,7 @@ export default function Users() {
                 props: {
                   onClick: () => {
                     query.set('query', 'is_active:false');
-                    history.push(`${location.pathname}?${query.getDeltaString()}`);
+                    navigate(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
               }
@@ -429,6 +440,6 @@ export default function Users() {
       </div>
     </PageFullWidth>
   ) : (
-    <Redirect to="/forbidden" />
+    <Navigate to="/forbidden" replace />
   );
 }

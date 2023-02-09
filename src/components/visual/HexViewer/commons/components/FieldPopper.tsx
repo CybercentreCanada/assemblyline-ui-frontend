@@ -1,6 +1,7 @@
-import { ClickAwayListener, Fade, makeStyles, Paper, Popper } from '@material-ui/core';
+import { ClickAwayListener, Fade, Paper, Popper } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
-import { isEnter, isEscape } from 'commons/addons/elements/utils/keyboard';
+import { isEnter, isEscape } from 'commons/components/utils/keyboard';
 import { default as React, forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 
 const useHexStyles = makeStyles(theme => ({
@@ -58,7 +59,7 @@ export const WrappedFieldPopper = (
     []
   );
 
-  const handleClickAway = useCallback((event: React.MouseEvent<Document, MouseEvent>) => {
+  const handleClickAway = useCallback((event: MouseEvent | TouchEvent) => {
     setOpen(false);
     setAnchorEl(null);
   }, []);

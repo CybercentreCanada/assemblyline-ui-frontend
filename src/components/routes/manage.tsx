@@ -1,11 +1,11 @@
-import PageCenter from 'commons/components/layout/pages/PageCenter';
+import useAppConfigs from 'commons/components/app/hooks/useAppConfigs';
+import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
-import useMyLayout from 'components/hooks/useMyLayout';
 import LinkGrid from 'components/layout/linkgrid';
 import ForbiddenPage from './403';
 
 export default function Manage() {
-  const layout = useMyLayout();
+  const { preferences: layout } = useAppConfigs();
   const { validateProps } = useALContext();
 
   let items = [];

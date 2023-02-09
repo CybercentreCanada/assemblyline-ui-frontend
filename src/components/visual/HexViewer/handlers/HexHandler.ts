@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer';
 import { HexASCII, Store } from '..';
 
 export const ASCII: Array<HexASCII> = [

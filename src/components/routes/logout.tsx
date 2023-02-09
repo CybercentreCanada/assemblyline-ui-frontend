@@ -1,17 +1,19 @@
-import { CircularProgress, Typography, useTheme } from '@material-ui/core';
-import useAppLayout from 'commons/components/hooks/useAppLayout';
-import CardCentered from 'commons/components/layout/pages/CardCentered';
+import { CircularProgress, Typography, useTheme } from '@mui/material';
+import useAppBanner from 'commons/components/app/hooks/useAppBanner';
+import useAppLayout from 'commons/components/app/hooks/useAppLayout';
+import PageCardCentered from 'commons/components/pages/PageCardCentered';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 function Logout() {
   const { t } = useTranslation(['logout']);
   const theme = useTheme();
   const { apiCall } = useMyAPI();
-  const { getBanner, hideMenus } = useAppLayout();
+  const { hideMenus } = useAppLayout();
+  const banner = useAppBanner();
 
-  useEffect(() => {
+  useEffectOnce(() => {
     hideMenus();
 
     apiCall({
@@ -22,19 +24,18 @@ function Logout() {
         }, 500);
       }
     });
-    // eslint-disable-next-line
-  }, []);
+  });
 
   return (
-    <CardCentered>
+    <PageCardCentered>
       <div style={{ textAlign: 'center' }}>
-        {getBanner(theme)}
+        {banner}
         <div style={{ marginBottom: theme.spacing(3) }}>
           <Typography>{t('title')}</Typography>
         </div>
         <CircularProgress size={24} />
       </div>
-    </CardCentered>
+    </PageCardCentered>
   );
 }
 

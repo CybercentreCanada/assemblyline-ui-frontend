@@ -1,34 +1,35 @@
-import AccountCircleOutlinedIcon from '@material-ui/icons/AccountCircleOutlined';
-import AccountTreeOutlinedIcon from '@material-ui/icons/AccountTreeOutlined';
-import AmpStoriesOutlinedIcon from '@material-ui/icons/AmpStoriesOutlined';
-import AssignmentOutlinedIcon from '@material-ui/icons/AssignmentOutlined';
-import BuildOutlinedIcon from '@material-ui/icons/BuildOutlined';
-import BusinessOutlinedIcon from '@material-ui/icons/BusinessOutlined';
-import CodeOutlinedIcon from '@material-ui/icons/CodeOutlined';
-import CompareArrowsOutlinedIcon from '@material-ui/icons/CompareArrowsOutlined';
-import DashboardOutlinedIcon from '@material-ui/icons/DashboardOutlined';
-import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
-import ExitToAppIcon from '@material-ui/icons/ExitToApp';
-import FindInPageOutlinedIcon from '@material-ui/icons/FindInPageOutlined';
-import FingerprintOutlinedIcon from '@material-ui/icons/FingerprintOutlined';
-import HelpOutlineOutlinedIcon from '@material-ui/icons/HelpOutlineOutlined';
-import LabelOutlinedIcon from '@material-ui/icons/LabelOutlined';
-import MapOutlinedIcon from '@material-ui/icons/MapOutlined';
-import NotificationImportantOutlinedIcon from '@material-ui/icons/NotificationImportantOutlined';
-import PlaylistAddCheckIcon from '@material-ui/icons/PlaylistAddCheck';
-import PlaylistPlayOutlinedIcon from '@material-ui/icons/PlaylistPlayOutlined';
-import PublishOutlinedIcon from '@material-ui/icons/PublishOutlined';
-import SearchIcon from '@material-ui/icons/Search';
-import SettingsApplicationsOutlinedIcon from '@material-ui/icons/SettingsApplicationsOutlined';
-import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
-import SimCardOutlinedIcon from '@material-ui/icons/SimCardOutlined';
-import SupervisorAccountOutlinedIcon from '@material-ui/icons/SupervisorAccountOutlined';
-import { AppLayoutProps } from 'commons/components/layout/LayoutProvider';
+import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
+import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
+import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
+import BuildOutlinedIcon from '@mui/icons-material/BuildOutlined';
+import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
+import CodeOutlinedIcon from '@mui/icons-material/CodeOutlined';
+import CompareArrowsOutlinedIcon from '@mui/icons-material/CompareArrowsOutlined';
+import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import FindInPageOutlinedIcon from '@mui/icons-material/FindInPageOutlined';
+import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
+import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
+import NotificationImportantOutlinedIcon from '@mui/icons-material/NotificationImportantOutlined';
+import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
+import PlaylistPlayOutlinedIcon from '@mui/icons-material/PlaylistPlayOutlined';
+import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
+import SearchIcon from '@mui/icons-material/Search';
+import SettingsApplicationsOutlinedIcon from '@mui/icons-material/SettingsApplicationsOutlined';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import SimCardOutlinedIcon from '@mui/icons-material/SimCardOutlined';
+import SupervisorAccountOutlinedIcon from '@mui/icons-material/SupervisorAccountOutlined';
+import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
+import { AppPreferenceConfigs, AppSwitcherItem } from 'commons/components/app/AppConfigs';
 import { Notification } from 'components/visual/Notification';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 
-const useMyLayout = (): AppLayoutProps => {
+// TODO: this is deprecated and not used
+const useMyLayout = (): AppPreferenceConfigs => {
   const { t } = useTranslation();
   const MENU_ITEMS = [
     {
@@ -47,7 +48,7 @@ const useMyLayout = (): AppLayoutProps => {
         id: 'submissions',
         text: t('drawer.submissions'),
         userPropValidators: [{ prop: 'user.roles', value: 'submission_view' }],
-        icon: <AmpStoriesOutlinedIcon />,
+        icon: <ViewCarouselOutlinedIcon />,
         route: '/submissions',
         nested: false
       }
@@ -310,14 +311,14 @@ const useMyLayout = (): AppLayoutProps => {
     }
   ];
 
-  const APP_SWITCHER_ITEMS = [
-    // {
-    //   alt: 'AL',
-    //   name: 'Assemblyline',
-    //   img_d: '/images/al_dark.svg',
-    //   img_l: '/images/al.svg',
-    //   route: 'https://localhost'
-    // }
+  const APP_SWITCHER_ITEMS: AppSwitcherItem[] = [
+    {
+      alt: 'AL',
+      name: 'Assemblyline',
+      img_d: '/images/al_dark.svg',
+      img_l: '/images/al.svg',
+      route: 'https://localhost'
+    }
   ];
 
   const USER_MENU_ITEMS = [
@@ -401,7 +402,7 @@ const useMyLayout = (): AppLayoutProps => {
 
   return {
     appName: 'Assemblyline',
-    allowBreadcrumbsMinimize: false,
+    allowBreadcrumbs: false,
     allowReset: false,
     appIconDark: darkLogo,
     appIconLight: lightLogo,
@@ -412,7 +413,6 @@ const useMyLayout = (): AppLayoutProps => {
     defaultShowQuickSearch: true,
     defaultAutoHideAppbar: false,
     defaultShowBreadcrumbs: true,
-    defaultBreadcrumbsOpen: true,
     leftnav: {
       elements: MENU_ITEMS,
       hideNestedIcons: true
@@ -424,7 +424,7 @@ const useMyLayout = (): AppLayoutProps => {
       quickSearchURI: '/search',
       quickSearchParam: 'query',
       right: <Notification />,
-      themeSelectionUnder: 'profile' as 'profile',
+      themeSelectionMode: 'profile' as 'profile',
       userMenu: USER_MENU_ITEMS,
       userMenuTitle: t('usermenu'),
       userMenuType: 'icon' as 'icon'

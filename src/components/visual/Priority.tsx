@@ -1,4 +1,4 @@
-import { Tooltip } from '@material-ui/core';
+import { Tooltip } from '@mui/material';
 import CustomChip from 'components/visual/CustomChip';
 import { priorityText } from 'helpers/utils';
 import React from 'react';

@@ -1,17 +1,10 @@
-import {
-  createStyles,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  TableSortLabel,
-  Theme,
-  withStyles
-} from '@material-ui/core';
+import { Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, Theme } from '@mui/material';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
 import 'moment/locale/fr';
 import React from 'react';
-import { Link, useHistory, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import { Link, useLocation } from 'react-router-dom';
 
 const StyledTableCell = withStyles((theme: Theme) =>
   createStyles({
@@ -20,7 +13,7 @@ const StyledTableCell = withStyles((theme: Theme) =>
       paddingLeft: theme.spacing(1)
     },
     head: {
-      backgroundColor: theme.palette.type === 'dark' ? '#404040' : '#EEE',
+      backgroundColor: theme.palette.mode === 'dark' ? '#404040' : '#EEE',
       whiteSpace: 'nowrap'
     }
   })
@@ -36,7 +29,7 @@ const BreakableTableCell = withStyles((theme: Theme) =>
       }
     },
     head: {
-      backgroundColor: theme.palette.type === 'dark' ? '#404040' : '#EEE',
+      backgroundColor: theme.palette.mode === 'dark' ? '#404040' : '#EEE',
       whiteSpace: 'nowrap'
     }
   })
@@ -68,7 +61,7 @@ export const SortableHeaderCell = ({ children, sortField, allowSort = true, ...o
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const curSort = searchParams.get('sort');
-  const history = useHistory();
+  const navigate = useNavigate();
   const active = curSort && curSort.indexOf(sortField) !== -1;
   const dir = active && curSort.indexOf('asc') !== -1 ? 'asc' : 'desc';
 
@@ -78,7 +71,7 @@ export const SortableHeaderCell = ({ children, sortField, allowSort = true, ...o
     } else {
       searchParams.set('sort', `${sortField} desc`);
     }
-    history.push(`${location.pathname}?${searchParams.toString()}`);
+    navigate(`${location.pathname}?${searchParams.toString()}`);
   };
   return (
     <StyledTableCell {...other} component="div">

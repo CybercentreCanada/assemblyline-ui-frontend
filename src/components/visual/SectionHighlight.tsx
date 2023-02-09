@@ -1,4 +1,4 @@
-import { useTheme } from '@material-ui/core';
+import { useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import React from 'react';
 
@@ -21,19 +21,19 @@ const SectionHighlight: React.FC<SectionHighlightProps> = ({
   const { scoreToVerdict } = useALContext();
 
   const VERDICT_SCORE_MAP = {
-    // suspicious: theme.palette.type === 'dark' ? '#1f5c6e' : '#a8ebff',
-    info: theme.palette.type === 'dark' ? '#393939' : '#f0f0f0',
-    safe: theme.palette.type === 'dark' ? '#2a492b' : '#9ae99d',
-    suspicious: theme.palette.type === 'dark' ? '#654312' : '#ffd395',
-    highly_suspicious: theme.palette.type === 'dark' ? '#654312' : '#ffd395',
-    malicious: theme.palette.type === 'dark' ? '#6e2b2b' : '#ffa1a1'
+    // suspicious: theme.palette.mode === 'dark' ? '#1f5c6e' : '#a8ebff',
+    info: theme.palette.mode === 'dark' ? '#393939' : '#f0f0f0',
+    safe: theme.palette.mode === 'dark' ? '#2a492b' : '#9ae99d',
+    suspicious: theme.palette.mode === 'dark' ? '#654312' : '#ffd395',
+    highly_suspicious: theme.palette.mode === 'dark' ? '#654312' : '#ffd395',
+    malicious: theme.palette.mode === 'dark' ? '#6e2b2b' : '#ffa1a1'
   };
 
   return (
     <div
       style={{
         backgroundColor: highlighted
-          ? theme.palette.type === 'dark'
+          ? theme.palette.mode === 'dark'
             ? '#343a44'
             : '#e2f2fa'
           : VERDICT_SCORE_MAP[scoreToVerdict(score)],

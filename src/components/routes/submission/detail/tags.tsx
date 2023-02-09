@@ -1,4 +1,5 @@
-import { Collapse, Divider, Grid, makeStyles, Typography, useTheme } from '@material-ui/core';
+import { Collapse, Divider, Grid, Typography, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import useSafeResults from 'components/hooks/useSafeResults';
 import AutoHideTagList from 'components/visual/AutoHideTagList';
 import React, { useEffect } from 'react';

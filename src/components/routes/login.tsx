@@ -1,17 +1,10 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import {
-  Box,
-  Button,
-  CircularProgress,
-  createStyles,
-  Link,
-  makeStyles,
-  Theme,
-  Typography,
-  useTheme
-} from '@material-ui/core';
-import useAppLayout from 'commons/components/hooks/useAppLayout';
-import CardCentered from 'commons/components/layout/pages/CardCentered';
+import { Box, Button, CircularProgress, Link, Theme, Typography, useTheme } from '@mui/material';
+import createStyles from '@mui/styles/createStyles';
+import makeStyles from '@mui/styles/makeStyles';
+import useAppBanner from 'commons/components/app/hooks/useAppBanner';
+import useAppLayout from 'commons/components/app/hooks/useAppLayout';
+import PageCardCentered from 'commons/components/pages/PageCardCentered';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { OAuthLogin } from 'components/routes/login/oauth';
@@ -24,7 +17,8 @@ import TextDivider from 'components/visual/TextDivider';
 import { getProvider } from 'helpers/utils';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import { useLocation } from 'react-router-dom';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -47,13 +41,14 @@ type LoginScreenProps = {
 
 export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, oAuthProviders }: LoginScreenProps) {
   const location = useLocation();
-  const history = useHistory();
+  const navigate = useNavigate();
   const params = new URLSearchParams(location.search);
   const { t } = useTranslation(['login']);
   const theme = useTheme();
   const classes = useStyles();
   const { apiCall } = useMyAPI();
-  const { getBanner, hideMenus } = useAppLayout();
+  const banner = useAppBanner();
+  const { hideMenus } = useAppLayout();
   const provider = getProvider();
   const [shownControls, setShownControls] = useState(
     provider ? 'oauth' : params.get('reset_id') ? 'reset_now' : 'login'
@@ -171,7 +166,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
         },
         onFinalize: () => {
           if (provider) {
-            history.push(localStorage.getItem('nextLocation') || '/');
+            navigate(localStorage.getItem('nextLocation') || '/');
           }
         }
       });
@@ -181,7 +176,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
         method: 'POST',
         body: { registration_key: params.get('registration_key') },
         onSuccess: () => showSuccessMessage(t('signup.completed'), 10000),
-        onFinalize: () => history.push('/')
+        onFinalize: () => navigate('/')
       });
     }
     // eslint-disable-next-line
@@ -192,9 +187,9 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
   }, [hideMenus]);
 
   return (
-    <CardCentered>
+    <PageCardCentered>
       <Box style={{ cursor: 'pointer' }} onClick={reset}>
-        {getBanner(theme)}
+        {banner}
       </Box>
       {
         {
@@ -280,6 +275,6 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
           )
         }[shownControls]
       }
-    </CardCentered>
+    </PageCardCentered>
   );
 }

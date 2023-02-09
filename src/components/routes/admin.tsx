@@ -1,13 +1,13 @@
-import useUser from 'commons/components/hooks/useAppUser';
-import PageCenter from 'commons/components/layout/pages/PageCenter';
-import useMyLayout from 'components/hooks/useMyLayout';
+import useAppConfigs from 'commons/components/app/hooks/useAppConfigs';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
+import PageCenter from 'commons/components/pages/PageCenter';
 import { CustomUser } from 'components/hooks/useMyUser';
 import LinkGrid from 'components/layout/linkgrid';
-import { Redirect } from 'react-router-dom';
+import { Navigate } from 'react-router';
 
 export default function Admin() {
-  const layout = useMyLayout();
-  const { user: currentUser, validateProps } = useUser<CustomUser>();
+  const { preferences: layout } = useAppConfigs();
+  const { user: currentUser, validateProps } = useAppUser<CustomUser>();
   let items = [];
   for (const item of layout.leftnav.elements) {
     if (item.type === 'group' && item.element.id === 'adminmenu') {
@@ -25,6 +25,6 @@ export default function Admin() {
       <LinkGrid items={layout.topnav.adminMenu.length !== 0 ? layout.topnav.adminMenu : items} />
     </PageCenter>
   ) : (
-    <Redirect to="/forbidden" />
+    <Navigate to="/forbidden" replace />
   );
 }

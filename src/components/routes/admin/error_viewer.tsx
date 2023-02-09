@@ -1,10 +1,13 @@
-import { Grid, makeStyles, MenuItem, Select, Typography, useMediaQuery, useTheme } from '@material-ui/core';
-import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
-import PanToolOutlinedIcon from '@material-ui/icons/PanToolOutlined';
-import ReportProblemOutlinedIcon from '@material-ui/icons/ReportProblemOutlined';
-import useUser from 'commons/components/hooks/useAppUser';
-import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
-import PageHeader from 'commons/components/layout/pages/PageHeader';
+import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
+import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
+import { Grid, MenuItem, Select, Typography, useMediaQuery, useTheme } from '@mui/material';
+import FormControl from '@mui/material/FormControl';
+import makeStyles from '@mui/styles/makeStyles';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
+import PageFullWidth from 'commons/components/pages/PageFullWidth';
+import PageHeader from 'commons/components/pages/PageHeader';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
@@ -19,9 +22,10 @@ import ErrorsTable from 'components/visual/SearchResult/errors';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import { safeFieldValue } from 'helpers/utils';
 import 'moment/locale/fr';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Redirect, useHistory, useLocation } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router';
+import { useLocation } from 'react-router-dom';
 import { ErrorDetail } from './error_detail';
 
 const PAGE_SIZE = 25;
@@ -38,7 +42,7 @@ const useStyles = makeStyles(theme => ({
   drawerPaper: {
     width: '80%',
     maxWidth: '800px',
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('xl')]: {
       width: '100%'
     }
   }
@@ -82,16 +86,16 @@ export default function ErrorViewer() {
   const [searching, setSearching] = useState(false);
   const [errorResults, setErrorResults] = useState<ErrorResults>(null);
   const classes = useStyles();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
   const theme = useTheme();
   const { apiCall } = useMyAPI();
-  const { user: currentUser } = useUser<CustomUser>();
+  const { user: currentUser } = useAppUser<CustomUser>();
   const [suggestions, setSuggestions] = useState(DEFAULT_SUGGESTION);
   const location = useLocation();
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
   const filterValue = useRef<string>('');
-  const { closeGlobalDrawer, setGlobalDrawer, globalDrawer } = useDrawer();
+  const { closeGlobalDrawer, setGlobalDrawer, globalDrawerOpened } = useDrawer();
   const [histogram, setHistogram] = useState(null);
   const [types, setTypes] = useState(null);
   const [names, setNames] = useState(null);
@@ -101,11 +105,11 @@ export default function ErrorViewer() {
   }, [location.pathname, location.search, pageSize]);
 
   useEffect(() => {
-    if (errorResults !== null && globalDrawer === null && location.hash) {
-      history.push(`${location.pathname}${location.search ? location.search : ''}`);
+    if (errorResults !== null && !globalDrawerOpened && location.hash) {
+      navigate(`${location.pathname}${location.search ? location.search : ''}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalDrawer]);
+  }, [globalDrawerOpened]);
 
   useEffect(() => {
     if (location.hash) {
@@ -165,7 +169,7 @@ export default function ErrorViewer() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
-  useEffect(() => {
+  useEffectOnce(() => {
     apiCall({
       url: '/api/v4/search/fields/error/',
       onSuccess: api_data => {
@@ -175,17 +179,15 @@ export default function ErrorViewer() {
         ]);
       }
     });
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   const onClear = useCallback(
     () => {
       if (query.getAll('filters').length !== 0) {
         query.delete('query');
-        history.push(`${location.pathname}?${query.getDeltaString()}`);
+        navigate(`${location.pathname}?${query.getDeltaString()}`);
       } else {
-        history.push(location.pathname);
+        navigate(location.pathname);
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -196,7 +198,7 @@ export default function ErrorViewer() {
     () => {
       if (filterValue.current !== '') {
         query.set('query', filterValue.current);
-        history.push(`${location.pathname}?${query.getDeltaString()}`);
+        navigate(`${location.pathname}?${query.getDeltaString()}`);
       } else {
         onClear();
       }
@@ -211,7 +213,7 @@ export default function ErrorViewer() {
 
   const setErrorKey = useCallback(
     (error_key: string) => {
-      history.push(`${location.pathname}${location.search ? location.search : ''}#${error_key}`);
+      navigate(`${location.pathname}${location.search ? location.search : ''}#${error_key}`);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [location.search]
@@ -224,23 +226,24 @@ export default function ErrorViewer() {
           <Typography variant="h4">{t('title')}</Typography>
         </Grid>
         <Grid item xs={12} sm={5} md={3} xl={2}>
-          <Select
-            margin="dense"
-            disabled={searching}
-            value={query ? query.get('tc') || DEFAULT_TC : DEFAULT_TC}
-            variant="outlined"
-            onChange={event => {
-              query.set('tc', event.target.value);
-              history.push(`${location.pathname}?${query.getDeltaString()}`);
-            }}
-            fullWidth
-          >
-            <MenuItem value="24h">{t('tc.24h')}</MenuItem>
-            <MenuItem value="4d">{t('tc.4d')}</MenuItem>
-            <MenuItem value="7d">{t('tc.7d')}</MenuItem>
-            <MenuItem value="1m">{t('tc.1m')}</MenuItem>
-            <MenuItem value="1y">{t('tc.1y')}</MenuItem>
-          </Select>
+          <FormControl size="small" fullWidth>
+            <Select
+              disabled={searching}
+              value={query ? query.get('tc') || DEFAULT_TC : DEFAULT_TC}
+              variant="outlined"
+              onChange={event => {
+                query.set('tc', event.target.value);
+                navigate(`${location.pathname}?${query.getDeltaString()}`);
+              }}
+              fullWidth
+            >
+              <MenuItem value="24h">{t('tc.24h')}</MenuItem>
+              <MenuItem value="4d">{t('tc.4d')}</MenuItem>
+              <MenuItem value="7d">{t('tc.7d')}</MenuItem>
+              <MenuItem value="1m">{t('tc.1m')}</MenuItem>
+              <MenuItem value="1y">{t('tc.1y')}</MenuItem>
+            </Select>
+          </FormControl>
         </Grid>
       </Grid>
 
@@ -261,7 +264,7 @@ export default function ErrorViewer() {
                 props: {
                   onClick: () => {
                     query.set('query', 'type:(EXCEPTION OR UNKNOWN)');
-                    history.push(`${location.pathname}?${query.getDeltaString()}`);
+                    navigate(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
               },
@@ -271,7 +274,7 @@ export default function ErrorViewer() {
                 props: {
                   onClick: () => {
                     query.set('query', 'type:(SERVICE* OR TASK*)');
-                    history.push(`${location.pathname}?${query.getDeltaString()}`);
+                    navigate(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
               },
@@ -281,7 +284,7 @@ export default function ErrorViewer() {
                 props: {
                   onClick: () => {
                     query.set('query', 'type:MAX*');
-                    history.push(`${location.pathname}?${query.getDeltaString()}`);
+                    navigate(`${location.pathname}?${query.getDeltaString()}`);
                   }
                 }
               }
@@ -330,11 +333,11 @@ export default function ErrorViewer() {
                         v,
                         v.indexOf('NOT ') === 0 ? v.substring(5, v.length - 1) : `NOT (${v})`
                       );
-                      history.push(`${location.pathname}?${query.getDeltaString()}`);
+                      navigate(`${location.pathname}?${query.getDeltaString()}`);
                     },
                     onDelete: () => {
                       query.remove('filters', v);
-                      history.push(`${location.pathname}?${query.getDeltaString()}`);
+                      navigate(`${location.pathname}?${query.getDeltaString()}`);
                     }
                   }))}
                 />
@@ -366,7 +369,7 @@ export default function ErrorViewer() {
                 if (!searching && element.length > 0) {
                   var ind = element[0].index;
                   query.add('filters', `response.service_name:${Object.keys(names)[ind]}`);
-                  history.push(`${location.pathname}?${query.getDeltaString()}`);
+                  navigate(`${location.pathname}?${query.getDeltaString()}`);
                 }
               }}
             />
@@ -381,7 +384,7 @@ export default function ErrorViewer() {
                 if (!searching && element.length > 0) {
                   var ind = element[0].index;
                   query.add('filters', `type:${safeFieldValue(Object.keys(types)[ind])}`);
-                  history.push(`${location.pathname}?${query.getDeltaString()}`);
+                  navigate(`${location.pathname}?${query.getDeltaString()}`);
                 }
               }}
             />
@@ -394,6 +397,6 @@ export default function ErrorViewer() {
       </div>
     </PageFullWidth>
   ) : (
-    <Redirect to="/forbidden" />
+    <Navigate to="/forbidden" replace />
   );
 }

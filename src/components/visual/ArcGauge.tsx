@@ -1,5 +1,6 @@
-import { makeStyles, useTheme } from '@material-ui/core';
-import { Skeleton } from '@material-ui/lab';
+import { useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import { Skeleton } from '@mui/material';
 import { scaleLinear } from 'd3-scale';
 import { arc } from 'd3-shape';
 import React from 'react';
@@ -58,7 +59,7 @@ const ArcGauge: React.FC<ArcGaugeProps> = ({
 }) => {
   const classes = useStyles();
   const theme = useTheme();
-  const colorFilled = theme.palette.type === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark;
+  const colorFilled = theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark;
 
   const backgroundArc = arc()
     .innerRadius(0.7)
@@ -87,7 +88,7 @@ const ArcGauge: React.FC<ArcGaugeProps> = ({
           <span className={classes.text}>{`${Number(pctValue).toFixed(0)}%`}</span>
         ) : (
           <span className={classes.text}>
-            <Skeleton variant="rect" width="2rem" style={{ borderRadius: '4px', display: 'inline-block' }} />
+            <Skeleton variant="rectangular" width="2rem" style={{ borderRadius: '4px', display: 'inline-block' }} />
           </span>
         )}
         <svg className={classes.graph} viewBox={[-1, -1, 2, 1].join(' ')}>

@@ -1,4 +1,4 @@
-import { Tooltip } from '@material-ui/core';
+import { Tooltip } from '@mui/material';
 import CustomChip from 'components/visual/CustomChip';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -13,7 +13,7 @@ const VERDICT_COLOR_MAP = {
 
 type TextVerdictProps = {
   verdict: string;
-  variant?: 'outlined' | 'default';
+  variant?: 'outlined' | 'filled';
   size?: 'tiny' | 'small' | 'medium';
   mono?: boolean;
   fullWidth?: boolean;
@@ -21,7 +21,7 @@ type TextVerdictProps = {
 
 const WrappedTextVerdict: React.FC<TextVerdictProps> = ({
   verdict,
-  variant = 'default',
+  variant = 'filled',
   size = 'tiny',
   mono = false,
   fullWidth = false

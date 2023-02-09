@@ -1,7 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 export interface Favorite {
   classification: string;
@@ -141,10 +142,10 @@ export default function useFavorites(): UsingFavorites {
   };
 
   // Load favorites.
-  useEffect(() => {
+  useEffectOnce(() => {
     onLoadUserFavorites();
     onLoadGlobalFavorites();
-  }, []);
+  });
 
   // The Custom Hook API:
   return {

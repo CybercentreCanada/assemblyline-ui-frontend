@@ -1,10 +1,11 @@
+import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
+import CloseIcon from '@mui/icons-material/Close';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import {
   Button,
   CircularProgress,
   Drawer,
   IconButton,
-  isWidthDown,
-  makeStyles,
   MenuItem,
   Paper,
   Select,
@@ -17,14 +18,14 @@ import {
   TableRow,
   TextField,
   Typography,
-  useTheme,
-  withWidth
-} from '@material-ui/core';
-import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
-import CloseIcon from '@material-ui/icons/Close';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Skeleton from '@material-ui/lab/Skeleton';
-import PageCenter from 'commons/components/layout/pages/PageCenter';
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
+import FormControl from '@mui/material/FormControl';
+import Skeleton from '@mui/material/Skeleton';
+import makeStyles from '@mui/styles/makeStyles';
+import PageCenter from 'commons/components/pages/PageCenter';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -33,12 +34,38 @@ import ServiceSpec from 'components/layout/serviceSpec';
 import ServiceTree from 'components/layout/serviceTree';
 import Classification from 'components/visual/Classification';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
-import React, { useEffect, useState } from 'react';
+import React, { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-type SettingsProps = {
-  width: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-};
+const useStyles = makeStyles(theme => ({
+  drawer: {
+    width: '500px',
+    [theme.breakpoints.down('xs')]: {
+      width: '100vw'
+    }
+  },
+  row: {
+    height: '62px'
+  },
+  group: {
+    marginTop: '1rem'
+  },
+  skelItem: {
+    display: 'inline-block'
+  },
+  skelButton: {
+    display: 'inline-block',
+    width: '9rem',
+    height: '4rem'
+  },
+  buttonProgress: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginTop: -12,
+    marginLeft: -12
+  }
+}));
 
 function Skel() {
   return (
@@ -56,7 +83,7 @@ function Skel() {
   );
 }
 
-function Settings({ width }: SettingsProps) {
+function Settings() {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
   const [drawerType, setDrawerType] = useState(null);
@@ -70,37 +97,10 @@ function Settings({ width }: SettingsProps) {
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
   const sp6 = theme.spacing(6);
+  const isXSDown = useMediaQuery(theme.breakpoints.down('xs'));
 
   const { apiCall } = useMyAPI();
-  const useStyles = makeStyles(curTheme => ({
-    drawer: {
-      width: '500px',
-      [theme.breakpoints.down('xs')]: {
-        width: '100vw'
-      }
-    },
-    row: {
-      height: '62px'
-    },
-    group: {
-      marginTop: '1rem'
-    },
-    skelItem: {
-      display: 'inline-block'
-    },
-    skelButton: {
-      display: 'inline-block',
-      width: '9rem',
-      height: '4rem'
-    },
-    buttonProgress: {
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      marginTop: -12,
-      marginLeft: -12
-    }
-  }));
+
   const classes = useStyles();
 
   const setParam = (service_idx, param_idx, p_value) => {
@@ -230,7 +230,7 @@ function Settings({ width }: SettingsProps) {
     }
   }
 
-  useEffect(() => {
+  useEffectOnce(() => {
     // Load user on start
     apiCall({
       url: `/api/v4/user/settings/${currentUser.username}/`,
@@ -238,15 +238,14 @@ function Settings({ width }: SettingsProps) {
         setSettings(api_data.api_response);
       }
     });
-    // eslint-disable-next-line
-  }, []);
+  });
 
   return (
     <PageCenter margin={4} width="100%">
       <React.Fragment key="right">
         <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
           <div style={{ alignSelf: 'flex-end' }}>
-            <IconButton onClick={() => setDrawerOpen(false)}>
+            <IconButton onClick={() => setDrawerOpen(false)} size="large">
               <CloseIcon />
             </IconButton>
           </div>
@@ -273,7 +272,8 @@ function Settings({ width }: SettingsProps) {
                     <TextField
                       autoFocus
                       type="number"
-                      margin="normal"
+                      margin="dense"
+                      size="small"
                       variant="outlined"
                       onChange={event => setTTL(event.target.value)}
                       value={settings.ttl}
@@ -291,17 +291,18 @@ function Settings({ width }: SettingsProps) {
                       {t('interface.view_desc')}
                     </Typography>
                     <div style={{ paddingTop: sp2, width: '100%' }}>
-                      <Select
-                        id="view"
-                        margin="dense"
-                        value={settings.submission_view}
-                        onChange={handleViewChange}
-                        variant="outlined"
-                        style={{ width: '100%' }}
-                      >
-                        <MenuItem value="report">{t('interface.view_report')}</MenuItem>
-                        <MenuItem value="details">{t('interface.view_details')}</MenuItem>
-                      </Select>
+                      <FormControl size="small" fullWidth>
+                        <Select
+                          id="view"
+                          value={settings.submission_view}
+                          onChange={handleViewChange}
+                          variant="outlined"
+                          style={{ width: '100%' }}
+                        >
+                          <MenuItem value="report">{t('interface.view_report')}</MenuItem>
+                          <MenuItem value="details">{t('interface.view_details')}</MenuItem>
+                        </Select>
+                      </FormControl>
                     </div>
                   </>
                 ),
@@ -312,22 +313,23 @@ function Settings({ width }: SettingsProps) {
                       {t('interface.encoding_desc')}
                     </Typography>
                     <div style={{ paddingTop: sp2, width: '100%' }}>
-                      <Select
-                        id="view"
-                        margin="dense"
-                        value={settings.download_encoding}
-                        onChange={handleEncodingChange}
-                        variant="outlined"
-                        style={{ width: '100%' }}
-                      >
-                        {!configuration.ui.allow_raw_downloads ? null : (
-                          <MenuItem value="raw">{t('interface.encoding_raw')}</MenuItem>
-                        )}
-                        <MenuItem value="cart">{t('interface.encoding_cart')}</MenuItem>
-                        {!configuration.ui.allow_zip_downloads ? null : (
-                          <MenuItem value="zip">{t('interface.encoding_zip')}</MenuItem>
-                        )}
-                      </Select>
+                      <FormControl size="small" fullWidth>
+                        <Select
+                          id="view"
+                          value={settings.download_encoding}
+                          onChange={handleEncodingChange}
+                          variant="outlined"
+                          style={{ width: '100%' }}
+                        >
+                          {!configuration.ui.allow_raw_downloads ? null : (
+                            <MenuItem value="raw">{t('interface.encoding_raw')}</MenuItem>
+                          )}
+                          <MenuItem value="cart">{t('interface.encoding_cart')}</MenuItem>
+                          {!configuration.ui.allow_zip_downloads ? null : (
+                            <MenuItem value="zip">{t('interface.encoding_zip')}</MenuItem>
+                          )}
+                        </Select>
+                      </FormControl>
                     </div>
                     {settings.download_encoding !== 'zip' ? null : (
                       <>
@@ -336,7 +338,7 @@ function Settings({ width }: SettingsProps) {
                             {t('interface.encoding_password')}
                           </Typography>
                           <TextField
-                            fullWidth={true}
+                            fullWidth
                             required={true}
                             onChange={handleEncodingPasswordChange}
                             variant="outlined"
@@ -354,21 +356,22 @@ function Settings({ width }: SettingsProps) {
                       {t('interface.score_desc')}
                     </Typography>
                     <div style={{ paddingTop: sp2, width: '100%' }}>
-                      <Select
-                        id="view"
-                        margin="dense"
-                        value={settings.expand_min_score}
-                        onChange={handleScoreChange}
-                        variant="outlined"
-                        style={{ width: '100%' }}
-                      >
-                        <MenuItem value="-1000000">{t('interface.score_-1000000')}</MenuItem>
-                        <MenuItem value="0">{t('interface.score_0')}</MenuItem>
-                        <MenuItem value="100">{t('interface.score_100')}</MenuItem>
-                        <MenuItem value="500">{t('interface.score_500')}</MenuItem>
-                        <MenuItem value="2000">{t('interface.score_2000')}</MenuItem>
-                        <MenuItem value="100000000">{t('interface.score_100000000')}</MenuItem>
-                      </Select>
+                      <FormControl size="small" fullWidth>
+                        <Select
+                          id="view"
+                          value={settings.expand_min_score}
+                          onChange={handleScoreChange}
+                          variant="outlined"
+                          style={{ width: '100%' }}
+                        >
+                          <MenuItem value="-1000000">{t('interface.score_-1000000')}</MenuItem>
+                          <MenuItem value="0">{t('interface.score_0')}</MenuItem>
+                          <MenuItem value="100">{t('interface.score_100')}</MenuItem>
+                          <MenuItem value="500">{t('interface.score_500')}</MenuItem>
+                          <MenuItem value="2000">{t('interface.score_2000')}</MenuItem>
+                          <MenuItem value="100000000">{t('interface.score_100000000')}</MenuItem>
+                        </Select>
+                      </FormControl>
                     </div>
                   </>
                 )
@@ -381,7 +384,7 @@ function Settings({ width }: SettingsProps) {
         <Table aria-label={t('submissions')}>
           <TableHead>
             <TableRow>
-              <TableCell colSpan={isWidthDown('xs', width) ? 2 : 3}>
+              <TableCell colSpan={isXSDown ? 2 : 3}>
                 <Typography variant="h6" gutterBottom>
                   {t('submissions')}
                 </Typography>
@@ -465,14 +468,14 @@ function Settings({ width }: SettingsProps) {
               </TableCell>
             </TableRow>
             <TableRow hover style={{ cursor: 'pointer' }} onClick={event => toggleDrawer('ttl')}>
-              {isWidthDown('xs', width) ? null : (
+              {isXSDown ? null : (
                 <TableCell>
                   <Typography variant="body1">{t('submissions.ttl')}</Typography>
                   <Typography variant="caption">{t('submissions.ttl_desc')}</Typography>
                 </TableCell>
               )}
-              <TableCell colSpan={isWidthDown('xs', width) ? 2 : 1}>
-                {!isWidthDown('xs', width) ? null : (
+              <TableCell colSpan={isXSDown ? 2 : 1}>
+                {!isXSDown ? null : (
                   <>
                     <Typography variant="body1">{t('submissions.ttl')}</Typography>
                     <Typography variant="caption" gutterBottom>
@@ -494,14 +497,14 @@ function Settings({ width }: SettingsProps) {
             </TableRow>
             {c12nDef.enforce && (
               <TableRow style={{ cursor: 'pointer' }}>
-                {isWidthDown('xs', width) ? null : (
+                {isXSDown ? null : (
                   <TableCell>
                     <Typography variant="body1">{t('submissions.classification')}</Typography>
                     <Typography variant="caption">{t('submissions.classification_desc')}</Typography>
                   </TableCell>
                 )}
-                <TableCell colSpan={isWidthDown('xs', width) ? 3 : 2}>
-                  {!isWidthDown('xs', width) ? null : (
+                <TableCell colSpan={isXSDown ? 3 : 2}>
+                  {!isXSDown ? null : (
                     <>
                       <Typography variant="body1">{t('submissions.classification')}</Typography>
                       <Typography variant="caption" gutterBottom>
@@ -535,14 +538,14 @@ function Settings({ width }: SettingsProps) {
           </TableHead>
           <TableBody>
             <TableRow hover style={{ cursor: 'pointer' }} onClick={event => toggleDrawer('view')}>
-              {isWidthDown('xs', width) ? null : (
+              {isXSDown ? null : (
                 <TableCell>
                   <Typography variant="body1">{t('interface.view')}</Typography>
                   <Typography variant="caption">{t('interface.view_desc')}</Typography>
                 </TableCell>
               )}
-              <TableCell colSpan={isWidthDown('xs', width) ? 2 : 1}>
-                {!isWidthDown('xs', width) ? null : (
+              <TableCell colSpan={isXSDown ? 2 : 1}>
+                {!isXSDown ? null : (
                   <>
                     <Typography variant="body1">{t('interface.view')}</Typography>
                     <Typography variant="caption" gutterBottom>
@@ -563,14 +566,14 @@ function Settings({ width }: SettingsProps) {
               </TableCell>
             </TableRow>
             <TableRow hover style={{ cursor: 'pointer' }} onClick={event => toggleDrawer('encoding')}>
-              {isWidthDown('xs', width) ? null : (
+              {isXSDown ? null : (
                 <TableCell>
                   <Typography variant="body1">{t('interface.encoding')}</Typography>
                   <Typography variant="caption">{t('interface.encoding_desc')}</Typography>
                 </TableCell>
               )}
-              <TableCell colSpan={isWidthDown('xs', width) ? 2 : 1}>
-                {!isWidthDown('xs', width) ? null : (
+              <TableCell colSpan={isXSDown ? 2 : 1}>
+                {!isXSDown ? null : (
                   <>
                     <Typography variant="body1">{t('interface.encoding')}</Typography>
                     <Typography variant="caption" gutterBottom>
@@ -601,14 +604,14 @@ function Settings({ width }: SettingsProps) {
               </TableCell>
             </TableRow>
             <TableRow hover style={{ cursor: 'pointer' }} onClick={event => toggleDrawer('score')}>
-              {isWidthDown('xs', width) ? null : (
+              {isXSDown ? null : (
                 <TableCell>
                   <Typography variant="body1">{t('interface.score')}</Typography>
                   <Typography variant="caption">{t('interface.score_desc')}</Typography>
                 </TableCell>
               )}
-              <TableCell colSpan={isWidthDown('xs', width) ? 2 : 1}>
-                {!isWidthDown('xs', width) ? null : (
+              <TableCell colSpan={isXSDown ? 2 : 1}>
+                {!isXSDown ? null : (
                   <>
                     <Typography variant="body1">{t('interface.score')}</Typography>
                     <Typography variant="caption" gutterBottom>
@@ -691,4 +694,4 @@ function Settings({ width }: SettingsProps) {
   );
 }
 
-export default withWidth()(Settings);
+export default memo(Settings);

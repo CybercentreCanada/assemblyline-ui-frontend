@@ -3,10 +3,7 @@ import { ACTIONS, ActionTypesConfig, Dispatch, DispatchersConfig } from '..';
 
 export type ScrollAction =
   | { type: 'scrollButtonClick'; payload: { value: number } }
-  | {
-      type: 'scrollSliderChange';
-      payload: { event: React.ChangeEvent<{}> | KeyboardEvent; newValue: number | number[] };
-    }
+  | { type: 'scrollSliderChange'; payload: { event: Event; newValue: number | number[] } }
   | { type: 'scrollSliderMouseDown'; payload: null }
   | { type: 'scrollTouchStart'; payload: { event: TouchEvent<HTMLDivElement> } }
   | { type: 'scrollTouchEnd'; payload: void }

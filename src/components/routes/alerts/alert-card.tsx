@@ -1,6 +1,6 @@
-import { Button, Grid, Hidden, IconButton, Paper, Typography, useMediaQuery, useTheme } from '@material-ui/core';
-import MoodIcon from '@material-ui/icons/Mood';
-import MoodBadIcon from '@material-ui/icons/MoodBad';
+import MoodIcon from '@mui/icons-material/Mood';
+import MoodBadIcon from '@mui/icons-material/MoodBad';
+import { Button, Grid, Hidden, IconButton, Paper, Typography, useMediaQuery, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';

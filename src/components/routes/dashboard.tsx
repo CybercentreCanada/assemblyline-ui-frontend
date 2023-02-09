@@ -1,12 +1,15 @@
-import { Card, Grid, makeStyles, Switch, Theme, Tooltip, Typography } from '@material-ui/core';
-import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
-import PauseCircleOutlineIcon from '@material-ui/icons/PauseCircleOutline';
-import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
-import SpeedOutlinedIcon from '@material-ui/icons/SpeedOutlined';
-import { Skeleton } from '@material-ui/lab';
-import PageFullscreen from 'commons/components/layout/pages/PageFullScreen';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
+import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutline';
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
+import SpeedOutlinedIcon from '@mui/icons-material/SpeedOutlined';
+import { Card, Grid, Skeleton, Switch, Theme, Tooltip, Typography } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
+import PageFullScreen from 'commons/components/pages/PageFullScreen';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
+import { CustomUser } from 'components/hooks/useMyUser';
 import ArcGauge from 'components/visual/ArcGauge';
 import CustomChip from 'components/visual/CustomChip';
 import React, { useEffect, useReducer, useState } from 'react';
@@ -33,16 +36,16 @@ const useStyles = makeStyles((theme: Theme) => ({
     }
   },
   disabled: {
-    color: theme.palette.text.hint,
-    backgroundColor: theme.palette.type === 'dark' ? '#63636317' : '#EAEAEA',
+    color: theme.palette.text.disabled,
+    backgroundColor: theme.palette.mode === 'dark' ? '#63636317' : '#EAEAEA',
     border: `solid 1px ${theme.palette.divider}`
   },
   error: {
-    backgroundColor: theme.palette.type === 'dark' ? '#ff000017' : '#FFE4E4',
-    border: `solid 1px ${theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark}`
+    backgroundColor: theme.palette.mode === 'dark' ? '#ff000017' : '#FFE4E4',
+    border: `solid 1px ${theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark}`
   },
   error_icon: {
-    color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark,
+    color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark,
     float: 'right'
   },
   icon: {
@@ -72,7 +75,7 @@ const WrappedMetricCounter = ({ value, title, tooltip, init = false, margin = '8
 
   return !init ? (
     <Skeleton
-      variant="rect"
+      variant="rectangular"
       height="1.5rem"
       width="2rem"
       style={{ borderRadius: '4px', marginRight: margin, display: 'inline-block', verticalAlign: 'middle' }}
@@ -94,7 +97,7 @@ const WrappedIngestCard = ({ ingester, handleStatusChange, status }) => {
   const [error, setError] = useState(null);
   const classes = useStyles();
   const busyness = (ingester.metrics.cpu_seconds * ingester.metrics.cpu_seconds_count) / ingester.instances / 60;
-  const { user: currentUser } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
 
   useEffect(() => {
     if (ingester.processing_chance.critical !== 1) {
@@ -327,7 +330,7 @@ const WrappedDispatcherCard = ({ dispatcher, up, down, handleStatusChange, statu
   const startQueue = dispatcher.queues.start.reduce((x, y) => x + y, 0);
   const resultQueue = dispatcher.queues.result.reduce((x, y) => x + y, 0);
   const commandQueue = dispatcher.queues.command.reduce((x, y) => x + y, 0);
-  const { user: currentUser } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
 
   useEffect(() => {
     if (dispatcher.initialized && dispatcher.queues.ingest >= dispatcher.inflight.max / 10) {
@@ -1232,15 +1235,14 @@ const Dashboard = () => {
     });
   }
 
-  useEffect(() => {
+  useEffectOnce(() => {
     reloadStatuses();
     const intervalID = setInterval(reloadStatuses, 30000);
 
     return () => {
       clearInterval(intervalID);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   const handleAlerterHeartbeat = hb => {
     // eslint-disable-next-line no-console
@@ -1291,7 +1293,7 @@ const Dashboard = () => {
     setServices({ type: 'scaler', hb });
   };
 
-  useEffect(() => {
+  useEffectOnce(() => {
     const socket = io(NAMESPACE);
 
     socket.on('connect', () => {
@@ -1319,10 +1321,10 @@ const Dashboard = () => {
     return () => {
       socket.disconnect();
     };
-  }, []);
+  });
 
   return (
-    <PageFullscreen margin={4}>
+    <PageFullScreen margin={4}>
       <Typography gutterBottom color="primary" variant="h2" align="center">
         {t('title')}
       </Typography>
@@ -1365,7 +1367,7 @@ const Dashboard = () => {
             </Grid>
           ))}
       </Grid>
-    </PageFullscreen>
+    </PageFullScreen>
   );
 };
 

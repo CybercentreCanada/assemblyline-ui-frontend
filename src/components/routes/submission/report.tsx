@@ -1,40 +1,44 @@
+import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import ListAltOutlinedIcon from '@mui/icons-material/ListAltOutlined';
+import MoodBadIcon from '@mui/icons-material/MoodBad';
+import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined';
+import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import {
   Button,
   Collapse,
   Divider,
   Grid,
   IconButton,
-  makeStyles,
+  Skeleton,
   Tooltip,
   Typography,
   useMediaQuery,
-  useTheme,
-  withStyles
-} from '@material-ui/core';
-import BugReportOutlinedIcon from '@material-ui/icons/BugReportOutlined';
-import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
-import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
-import ListAltOutlinedIcon from '@material-ui/icons/ListAltOutlined';
-import MoodBadIcon from '@material-ui/icons/MoodBad';
-import PrintOutlinedIcon from '@material-ui/icons/PrintOutlined';
-import VerifiedUserOutlinedIcon from '@material-ui/icons/VerifiedUserOutlined';
-import { Skeleton } from '@material-ui/lab';
+  useTheme
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import withStyles from '@mui/styles/withStyles';
 import clsx from 'clsx';
-import PageCenter from 'commons/components/layout/pages/PageCenter';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
+import PageCenter from 'commons/components/pages/PageCenter';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import { CustomUser } from 'components/hooks/useMyUser';
 import Classification from 'components/visual/Classification';
 import ResultSection from 'components/visual/ResultCard/result_section';
 import TextVerdict from 'components/visual/TextVerdict';
 import Verdict from 'components/visual/Verdict';
 import VerdictGauge from 'components/visual/VerdictGauge';
 import { bytesToSize } from 'helpers/utils';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
-import { Link, useHistory, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import { Link, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
 
 type ParamProps = {
@@ -56,7 +60,7 @@ const useStyles = makeStyles(theme => ({
       border: '1px solid #DDD',
       color: '#888'
     },
-    backgroundColor: theme.palette.type === 'dark' ? '#ffffff05' : '#00000005',
+    backgroundColor: theme.palette.mode === 'dark' ? '#ffffff05' : '#00000005',
     border: `1px solid ${theme.palette.divider}`,
     borderRadius: '4px',
     color: theme.palette.text.secondary,
@@ -197,27 +201,27 @@ function AttributionBanner({ report }) {
     info: {
       icon: <HelpOutlineIcon className={classes.icon} />,
       bgColor: '#6e6e6e15',
-      textColor: theme.palette.type === 'dark' ? '#AAA' : '#888'
+      textColor: theme.palette.mode === 'dark' ? '#AAA' : '#888'
     },
     safe: {
       icon: <VerifiedUserOutlinedIcon className={classes.icon} />,
       bgColor: '#00f20015',
-      textColor: theme.palette.type !== 'dark' ? theme.palette.success.dark : theme.palette.success.light
+      textColor: theme.palette.mode !== 'dark' ? theme.palette.success.dark : theme.palette.success.light
     },
     suspicious: {
       icon: <MoodBadIcon className={classes.icon} />,
       bgColor: '#ff970015',
-      textColor: theme.palette.type !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
+      textColor: theme.palette.mode !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
     },
     highly_suspicious: {
       icon: <MoodBadIcon className={classes.icon} />,
       bgColor: '#ff970015',
-      textColor: theme.palette.type !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
+      textColor: theme.palette.mode !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
     },
     malicious: {
       icon: <BugReportOutlinedIcon className={classes.icon} />,
       bgColor: '#f2000015',
-      textColor: theme.palette.type !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
+      textColor: theme.palette.mode !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
     }
   };
 
@@ -320,7 +324,7 @@ function AttributionBanner({ report }) {
           {report ? (
             <VerdictGauge verdicts={report.verdict} />
           ) : (
-            <Skeleton variant="circle" height="100px" width="100px" />
+            <Skeleton variant="circular" height="100px" width="100px" />
           )}
         </Grid>
       </Grid>
@@ -489,7 +493,7 @@ function HeuristicsListSkel() {
 function FileTree({ tree, important_files }) {
   const classes = useStyles();
 
-  return (
+  return tree && important_files ? (
     <div>
       {Object.keys(tree).map((f, i) =>
         important_files.indexOf(f) !== -1 ? (
@@ -528,7 +532,7 @@ function FileTree({ tree, important_files }) {
         ) : null
       )}
     </div>
-  );
+  ) : null;
 }
 
 function FileTreeSkel() {
@@ -559,8 +563,9 @@ function FileTreeSkel() {
 export default function SubmissionReport() {
   const { t } = useTranslation(['submissionReport']);
   const { id } = useParams<ParamProps>();
-  const { c12nDef, configuration, user: currentUser } = useALContext();
-  const history = useHistory();
+  const { c12nDef, configuration } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
+  const navigate = useNavigate();
   const theme = useTheme();
   const [report, setReport] = useState(null);
   const { apiCall } = useMyAPI();
@@ -569,7 +574,7 @@ export default function SubmissionReport() {
   const { showErrorMessage, showWarningMessage } = useMySnackbar();
   const [metaOpen, setMetaOpen] = useState(false);
 
-  useEffect(() => {
+  useEffectOnce(() => {
     if (currentUser.roles.includes('submission_view')) {
       apiCall({
         url: `/api/v4/submission/report/${id}/`,
@@ -579,19 +584,17 @@ export default function SubmissionReport() {
         onFailure: api_data => {
           if (api_data.api_status_code === 425) {
             showWarningMessage(t('error.too_early'));
-            history.replace(`/submission/detail/${id}`);
+            navigate(`/submission/detail/${id}`);
           } else if (api_data.api_status_code === 404) {
             showErrorMessage(t('error.notfound'));
-            history.replace('/notfound');
+            navigate('/notfound');
           } else {
             showErrorMessage(api_data.api_error_message);
           }
         }
       });
     }
-
-    // eslint-disable-next-line
-  }, []);
+  });
 
   return currentUser.roles.includes('submission_view') ? (
     <PageCenter margin={4} width="100%">
@@ -623,20 +626,30 @@ export default function SubmissionReport() {
                 {report ? (
                   <>
                     <NoPrintTooltip title={t('print')} PopperProps={{ disablePortal: true }}>
-                      <IconButton onClick={() => window.print()}>
+                      <IconButton onClick={() => window.print()} size="large">
                         <PrintOutlinedIcon />
                       </IconButton>
                     </NoPrintTooltip>
                     <Tooltip title={t('detail_view')}>
-                      <IconButton component={Link} to={`/submission/detail/${report.sid}`}>
+                      <IconButton component={Link} to={`/submission/detail/${report.sid}`} size="large">
                         <ListAltOutlinedIcon />
                       </IconButton>
                     </Tooltip>
                   </>
                 ) : (
                   <div style={{ display: 'inline-flex' }}>
-                    <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-                    <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+                    <Skeleton
+                      variant="circular"
+                      height="2.5rem"
+                      width="2.5rem"
+                      style={{ margin: theme.spacing(0.5) }}
+                    />
+                    <Skeleton
+                      variant="circular"
+                      height="2.5rem"
+                      width="2.5rem"
+                      style={{ margin: theme.spacing(0.5) }}
+                    />
                   </div>
                 )}
               </div>
@@ -713,7 +726,7 @@ export default function SubmissionReport() {
                   <Grid item xs={8} sm={9} lg={10}>
                     <span
                       style={{
-                        color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                        color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
                       }}
                     >
                       {report.params.services.errors.join(' | ')}
@@ -994,8 +1007,8 @@ export default function SubmissionReport() {
             <div className={classes.section_content}>
               {report ? (
                 <FileTree
-                  tree={report.file_tree[report.files[0].sha256].children}
-                  important_files={report.important_files}
+                  tree={report?.file_tree[report?.files[0]?.sha256]?.children}
+                  important_files={report?.important_files}
                 />
               ) : (
                 <FileTreeSkel />

@@ -4,16 +4,16 @@ import {
   ClickAwayListener,
   Collapse,
   Fade,
-  makeStyles,
   MenuItem,
   MenuList,
   Paper,
   Popper,
   Typography,
-  useTheme
-} from '@material-ui/core';
-import ExpandLess from '@material-ui/icons/ExpandLess';
-import ExpandMore from '@material-ui/icons/ExpandMore';
+  useTheme,
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -79,18 +79,18 @@ type ResultCardProps = {
 const useStyles = makeStyles(theme => ({
   card: {
     backgroundColor: theme.palette.background.default,
-    border: `solid 1px ${theme.palette.type === 'dark' ? '#393939' : '#ddd'}`,
+    border: `solid 1px ${theme.palette.mode === 'dark' ? '#393939' : '#ddd'}`,
     borderRadius: '4px'
   },
   card_title: {
-    backgroundColor: theme.palette.type === 'dark' ? '#393939' : '#f0f0f0',
+    backgroundColor: theme.palette.mode === 'dark' ? '#393939' : '#f0f0f0',
     padding: '6px',
     borderRadius: '4px 4px 0px 0px',
     display: 'flex',
     alignItems: 'center',
     flexWrap: 'wrap',
     '&:hover': {
-      backgroundColor: theme.palette.type === 'dark' ? '#505050' : '#e6e6e6',
+      backgroundColor: theme.palette.mode === 'dark' ? '#505050' : '#e6e6e6',
       cursor: 'pointer'
     }
   },
@@ -218,7 +218,7 @@ const WrappedResultCard: React.FC<ResultCardProps> = ({ result, sid, alternates 
         className={classes.card_title}
         onClick={handleClick}
         style={{
-          backgroundColor: hasHighlightedKeys(allTags) ? (theme.palette.type === 'dark' ? '#343a44' : '#d8e3ea') : null
+          backgroundColor: hasHighlightedKeys(allTags) ? (theme.palette.mode === 'dark' ? '#343a44' : '#d8e3ea') : null
         }}
       >
         {c12nDef.enforce && <Classification c12n={displayedResult.classification} type="text" />}

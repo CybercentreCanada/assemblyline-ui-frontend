@@ -14,6 +14,7 @@
   "edit.title": "Définir un message système",
   "notification.header": "Quoi de neuf sur Assemblyline",
   "notification.none": "Il n'y a aucune notification.",
+  "notification.title": "Notifications",
   "save.acceptText": "Oui, fais le!",
   "save.cancelText": "Annuler",
   "save.success": "Le message système a été défini avec succès.",

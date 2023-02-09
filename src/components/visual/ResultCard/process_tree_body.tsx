@@ -1,11 +1,12 @@
-import { makeStyles, Theme, Tooltip } from '@material-ui/core';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import FingerprintOutlinedIcon from '@material-ui/icons/FingerprintOutlined';
-import InsertDriveFileOutlinedIcon from '@material-ui/icons/InsertDriveFileOutlined';
-import SettingsEthernetOutlinedIcon from '@material-ui/icons/SettingsEthernetOutlined';
-import WidgetsOutlinedIcon from '@material-ui/icons/WidgetsOutlined';
-import { TreeItem, TreeView } from '@material-ui/lab';
+import { Theme, Tooltip } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
+import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
+import SettingsEthernetOutlinedIcon from '@mui/icons-material/SettingsEthernetOutlined';
+import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
+import { TreeItem, TreeView } from '@mui/lab';
 import clsx from 'clsx';
 import useALContext from 'components/hooks/useALContext';
 import useSafeResults from 'components/hooks/useSafeResults';
@@ -28,7 +29,7 @@ const useTreeItemStyles = makeStyles((theme: Theme) => ({
   },
   treeItem: {
     '&:hover': {
-      backgroundColor: theme.palette.type === 'dark' ? '#FFFFFF10' : '#00000010'
+      backgroundColor: theme.palette.mode === 'dark' ? '#FFFFFF10' : '#00000010'
     },
     '@media print': {
       border: '1px solid #DDD'
@@ -51,7 +52,7 @@ const useTreeItemStyles = makeStyles((theme: Theme) => ({
       backgroundColor: '#00000010'
     },
     padding: '5px',
-    backgroundColor: theme.palette.type === 'dark' ? '#FFFFFF10' : '#00000010',
+    backgroundColor: theme.palette.mode === 'dark' ? '#FFFFFF10' : '#00000010',
     borderRadius: '4px 0px 0px 4px'
   },
   counter: {
@@ -60,7 +61,7 @@ const useTreeItemStyles = makeStyles((theme: Theme) => ({
       color: 'black'
     },
     alignItems: 'flex-end',
-    backgroundColor: theme.palette.type === 'dark' ? '#FFFFFF10' : '#00000010',
+    backgroundColor: theme.palette.mode === 'dark' ? '#FFFFFF10' : '#00000010',
     color: theme.palette.text.secondary,
     display: 'flex',
     flexDirection: 'column',
@@ -79,30 +80,30 @@ const useTreeItemStyles = makeStyles((theme: Theme) => ({
   },
   safe: {
     '&:hover': {
-      backgroundColor: theme.palette.type === 'dark' ? '#355e35' : '#c0efc0'
+      backgroundColor: theme.palette.mode === 'dark' ? '#355e35' : '#c0efc0'
     },
     '@media print': {
       backgroundColor: '#d0ffd0'
     },
-    backgroundColor: theme.palette.type === 'dark' ? '#254e25' : '#d0ffd0'
+    backgroundColor: theme.palette.mode === 'dark' ? '#254e25' : '#d0ffd0'
   },
   suspicious: {
     '&:hover': {
-      backgroundColor: theme.palette.type === 'dark' ? '#755322' : '#efddc4'
+      backgroundColor: theme.palette.mode === 'dark' ? '#755322' : '#efddc4'
     },
     '@media print': {
       backgroundColor: '#ffedd4'
     },
-    backgroundColor: theme.palette.type === 'dark' ? '#654312' : '#ffedd4'
+    backgroundColor: theme.palette.mode === 'dark' ? '#654312' : '#ffedd4'
   },
   malicious: {
     '&:hover': {
-      backgroundColor: theme.palette.type === 'dark' ? '#5e3535' : '#efc0c0'
+      backgroundColor: theme.palette.mode === 'dark' ? '#5e3535' : '#efc0c0'
     },
     '@media print': {
       backgroundColor: '#ffd0d0'
     },
-    backgroundColor: theme.palette.type === 'dark' ? '#4e2525' : '#ffd0d0'
+    backgroundColor: theme.palette.mode === 'dark' ? '#4e2525' : '#ffd0d0'
   }
 }));
 

@@ -1,4 +1,4 @@
-import { HighlightContext, HighlightContextProps } from 'components/visual/HighlightProvider';
+import { HighlightContext, HighlightContextProps } from 'components/providers/HighlightProvider';
 import { useContext } from 'react';
 
 export default function useHighlighter(): HighlightContextProps {

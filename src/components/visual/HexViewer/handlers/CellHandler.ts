@@ -1,4 +1,4 @@
-import { ClassNameMap } from '@material-ui/core/styles/withStyles';
+import { ClassNameMap } from '@mui/styles';
 import { CellType, getHexType, isCursorIndex, isSearchIndex, isSelectedSearchIndex, isSelectIndex, Store } from '..';
 
 export const isCellMouseDown = (store: Store) => store.cell.isMouseDown;

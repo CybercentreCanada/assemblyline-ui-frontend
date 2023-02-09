@@ -1,12 +1,14 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
+import CloseIcon from '@mui/icons-material/Close';
 import {
   Avatar,
   Button,
+  Chip,
   CircularProgress,
   Drawer,
   Grid,
   IconButton,
-  isWidthDown,
-  makeStyles,
   Paper,
   Table,
   TableBody,
@@ -18,15 +20,15 @@ import {
   Theme,
   Typography,
   useMediaQuery,
-  useTheme,
-  withStyles,
-  withWidth
-} from '@material-ui/core';
-import { red } from '@material-ui/core/colors';
-import ChevronRightOutlinedIcon from '@material-ui/icons/ChevronRightOutlined';
-import CloseIcon from '@material-ui/icons/Close';
-import Skeleton from '@material-ui/lab/Skeleton';
-import PageCenter from 'commons/components/layout/pages/PageCenter';
+  useTheme
+} from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
+import { red } from '@mui/material/colors';
+import Skeleton from '@mui/material/Skeleton';
+import makeStyles from '@mui/styles/makeStyles';
+import withStyles from '@mui/styles/withStyles';
+import PageCenter from 'commons/components/pages/PageCenter';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -38,20 +40,50 @@ import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
-import ChipInput from 'material-ui-chip-input';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { memo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Redirect, useHistory, useLocation, useParams } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router';
+import { useLocation, useParams } from 'react-router-dom';
 import Apps from './user/apps';
 
 type UserProps = {
-  width: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   username?: string | null;
 };
 
 type ParamProps = {
   id: string;
 };
+
+const useStyles = makeStyles(theme => ({
+  drawer: {
+    width: '500px',
+    [theme.breakpoints.down('xs')]: {
+      width: '100vw'
+    }
+  },
+  row: {
+    height: '62px'
+  },
+  group: {
+    marginTop: '1rem'
+  },
+  skelItem: {
+    display: 'inline-block',
+    margin: theme.spacing(0.5)
+  },
+  skelButton: {
+    display: 'inline-block',
+    width: '9rem',
+    height: theme.spacing(5)
+  },
+  buttonProgress: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginTop: -12,
+    marginLeft: -12
+  }
+}));
 
 const DeleteButton = withStyles((theme: Theme) => ({
   root: {
@@ -64,13 +96,13 @@ const DeleteButton = withStyles((theme: Theme) => ({
   }
 }))(Button);
 
-function User({ width, username }: UserProps) {
+function User({ username }: UserProps) {
   const { id } = useParams<ParamProps>();
   const location = useLocation();
   const inputRef = useRef(null);
   const { t } = useTranslation(['user']);
   const theme = useTheme();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [drawerType, setDrawerType] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState(false);
@@ -79,42 +111,14 @@ function User({ width, username }: UserProps) {
   const [buttonLoading, setButtonLoading] = useState(false);
   const { user: currentUser, configuration } = useALContext();
   const downSM = useMediaQuery(theme.breakpoints.down('sm'));
+  const isXSDown = useMediaQuery(theme.breakpoints.down('xs'));
   const { showErrorMessage, showSuccessMessage, showWarningMessage } = useMySnackbar();
   const sp1 = theme.spacing(1);
   const sp4 = theme.spacing(4);
   const sp6 = theme.spacing(6);
 
   const { apiCall } = useMyAPI();
-  const useStyles = makeStyles(curTheme => ({
-    drawer: {
-      width: '500px',
-      [theme.breakpoints.down('xs')]: {
-        width: '100vw'
-      }
-    },
-    row: {
-      height: '62px'
-    },
-    group: {
-      marginTop: '1rem'
-    },
-    skelItem: {
-      display: 'inline-block',
-      margin: theme.spacing(0.5)
-    },
-    skelButton: {
-      display: 'inline-block',
-      width: '9rem',
-      height: theme.spacing(5)
-    },
-    buttonProgress: {
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      marginTop: -12,
-      marginLeft: -12
-    }
-  }));
+
   const classes = useStyles();
 
   const doDeleteUser = () => {
@@ -124,7 +128,7 @@ function User({ width, username }: UserProps) {
       onSuccess: () => {
         showSuccessMessage(t('delete.success'));
         setTimeout(() => {
-          history.push('/admin/users');
+          navigate('/admin/users');
         }, 500);
       },
       onEnter: () => setButtonLoading(true),
@@ -269,7 +273,7 @@ function User({ width, username }: UserProps) {
     reader.readAsDataURL(file);
   }
 
-  useEffect(() => {
+  useEffectOnce(() => {
     // Load user on start
     if (currentUser.is_admin || !location.pathname.includes('/admin/')) {
       apiCall({
@@ -279,17 +283,16 @@ function User({ width, username }: UserProps) {
         }
       });
     }
-    // eslint-disable-next-line
-  }, []);
+  });
 
   return !currentUser.is_admin && location.pathname.includes('/admin/') ? (
-    <Redirect to="/forbidden" />
+    <Navigate to="/forbidden" replace />
   ) : (
     <PageCenter margin={4} width="100%">
       <React.Fragment key="right">
         <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
           <div style={{ alignSelf: 'flex-end' }}>
-            <IconButton onClick={() => setDrawerOpen(false)}>
+            <IconButton onClick={() => setDrawerOpen(false)} size="large">
               <CloseIcon />
             </IconButton>
           </div>
@@ -315,7 +318,8 @@ function User({ width, username }: UserProps) {
                       <TextField
                         autoFocus
                         type="number"
-                        margin="normal"
+                        margin="dense"
+                        size="small"
                         variant="outlined"
                         onChange={event => setAPIQuota(event.target.value)}
                         value={user.api_quota}
@@ -350,11 +354,19 @@ function User({ width, username }: UserProps) {
                       <Typography variant="caption" color="textSecondary" gutterBottom>
                         {t('groups_edit_title')}
                       </Typography>
-                      <ChipInput
-                        margin="normal"
-                        defaultValue={user.groups}
-                        onChange={chips => setGroups(chips)}
-                        variant="outlined"
+                      <Autocomplete
+                        sx={{ margin: theme.spacing(2, 0) }}
+                        multiple
+                        freeSolo
+                        options={[]}
+                        value={user.groups}
+                        renderInput={params => <TextField {...params} />}
+                        renderTags={(value, getTagProps) =>
+                          value.map((option, index) => (
+                            <Chip variant="outlined" label={option} {...getTagProps({ index })} />
+                          ))
+                        }
+                        onChange={(event, value) => setGroups(value)}
                       />
                     </>
                   ),
@@ -429,7 +441,7 @@ function User({ width, username }: UserProps) {
                     </DeleteButton>
                   ) : (
                     <Skeleton
-                      variant="rect"
+                      variant="rectangular"
                       className={classes.skelButton}
                       style={{ minWidth: theme.spacing(16), width: downSM ? '100%' : null }}
                     />
@@ -453,6 +465,7 @@ function User({ width, username }: UserProps) {
                       onClick={e => {
                         inputRef.current.click();
                       }}
+                      size="large"
                     >
                       <Avatar
                         style={{
@@ -475,7 +488,7 @@ function User({ width, username }: UserProps) {
               ) : (
                 <Skeleton
                   className={classes.skelItem}
-                  variant="circle"
+                  variant="circular"
                   width={downSM ? theme.spacing(24.5) : theme.spacing(16.5)}
                   height={downSM ? theme.spacing(24.5) : theme.spacing(16.5)}
                 />
@@ -495,7 +508,7 @@ function User({ width, username }: UserProps) {
                   />
                 ) : (
                   <Skeleton
-                    variant="rect"
+                    variant="rectangular"
                     className={classes.skelButton}
                     style={{ minWidth: theme.spacing(16), width: downSM ? '100%' : null }}
                   />
@@ -519,7 +532,7 @@ function User({ width, username }: UserProps) {
             <Table aria-label={t('profile')}>
               <TableHead>
                 <TableRow>
-                  <TableCell colSpan={isWidthDown('xs', width) ? 2 : 3}>
+                  <TableCell colSpan={isXSDown ? 2 : 3}>
                     <Typography variant="h6" gutterBottom>
                       {t('profile')}
                     </Typography>
@@ -528,21 +541,17 @@ function User({ width, username }: UserProps) {
               </TableHead>
               <TableBody>
                 <TableRow className={classes.row}>
-                  {isWidthDown('xs', width) ? null : (
-                    <TableCell style={{ whiteSpace: 'nowrap' }}>{t('uname')}</TableCell>
-                  )}
+                  {isXSDown ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('uname')}</TableCell>}
                   <TableCell width="100%">
-                    {!isWidthDown('xs', width) ? null : <Typography variant="caption">{t('uname')}</Typography>}
+                    {!isXSDown ? null : <Typography variant="caption">{t('uname')}</Typography>}
                     {user ? <div>{user.uname}</div> : <Skeleton />}
                   </TableCell>
                   <TableCell align="right" />
                 </TableRow>
                 <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('name')}>
-                  {isWidthDown('xs', width) ? null : (
-                    <TableCell style={{ whiteSpace: 'nowrap' }}>{t('name')}</TableCell>
-                  )}
+                  {isXSDown ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('name')}</TableCell>}
                   <TableCell width="100%">
-                    {!isWidthDown('xs', width) ? null : <Typography variant="caption">{t('name')}</Typography>}
+                    {!isXSDown ? null : <Typography variant="caption">{t('name')}</Typography>}
                     {user ? <div>{user.name}</div> : <Skeleton />}
                   </TableCell>
                   <TableCell align="right">
@@ -550,11 +559,9 @@ function User({ width, username }: UserProps) {
                   </TableCell>
                 </TableRow>
                 <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('groups')}>
-                  {isWidthDown('xs', width) ? null : (
-                    <TableCell style={{ whiteSpace: 'nowrap' }}>{t('groups')}</TableCell>
-                  )}
+                  {isXSDown ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('groups')}</TableCell>}
                   <TableCell width="100%">
-                    {!isWidthDown('xs', width) ? null : <Typography variant="caption">{t('groups')}</Typography>}
+                    {!isXSDown ? null : <Typography variant="caption">{t('groups')}</Typography>}
                     {user ? <div>{user.groups.join(' | ')}</div> : <Skeleton />}
                   </TableCell>
                   <TableCell align="right">
@@ -562,11 +569,9 @@ function User({ width, username }: UserProps) {
                   </TableCell>
                 </TableRow>
                 <TableRow className={classes.row}>
-                  {isWidthDown('xs', width) ? null : (
-                    <TableCell style={{ whiteSpace: 'nowrap' }}>{t('email')}</TableCell>
-                  )}
+                  {isXSDown ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('email')}</TableCell>}
                   <TableCell width="100%">
-                    {!isWidthDown('xs', width) ? null : <Typography variant="caption">{t('email')}</Typography>}
+                    {!isXSDown ? null : <Typography variant="caption">{t('email')}</Typography>}
                     {user ? <div>{user.email}</div> : <Skeleton />}
                   </TableCell>
                   <TableCell align="right" />
@@ -588,11 +593,9 @@ function User({ width, username }: UserProps) {
               </TableHead>
               <TableBody>
                 <TableRow>
-                  {isWidthDown('xs', width) ? null : (
-                    <TableCell style={{ whiteSpace: 'nowrap' }}>{t('type')}</TableCell>
-                  )}
+                  {isXSDown ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('type')}</TableCell>}
                   <TableCell width="100%">
-                    {!isWidthDown('xs', width) ? null : <Typography variant="caption">{t('type')}</Typography>}
+                    {!isXSDown ? null : <Typography variant="caption">{t('type')}</Typography>}
                     {user ? (
                       <div>
                         {configuration.user.types.map((uType, type_id) => (
@@ -616,11 +619,9 @@ function User({ width, username }: UserProps) {
                   <TableCell align="right" />
                 </TableRow>
                 <TableRow>
-                  {isWidthDown('xs', width) ? null : (
-                    <TableCell style={{ whiteSpace: 'nowrap' }}>{t('roles')}</TableCell>
-                  )}
+                  {isXSDown ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('roles')}</TableCell>}
                   <TableCell width="100%">
-                    {!isWidthDown('xs', width) ? null : <Typography variant="caption">{t('roles')}</Typography>}
+                    {!isXSDown ? null : <Typography variant="caption">{t('roles')}</Typography>}
                     {user ? (
                       <div>
                         {configuration.user.roles.sort().map((role, role_id) => (
@@ -649,11 +650,9 @@ function User({ width, username }: UserProps) {
                   style={{ cursor: currentUser.is_admin ? 'pointer' : 'default' }}
                   onClick={currentUser.is_admin ? event => toggleDrawer('api_quota') : null}
                 >
-                  {isWidthDown('xs', width) ? null : (
-                    <TableCell style={{ whiteSpace: 'nowrap' }}>{t('api_quota')}</TableCell>
-                  )}
+                  {isXSDown ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('api_quota')}</TableCell>}
                   <TableCell width="100%">
-                    {!isWidthDown('xs', width) ? null : <Typography variant="caption">{t('api_quota')}</Typography>}
+                    {!isXSDown ? null : <Typography variant="caption">{t('api_quota')}</Typography>}
                     {user ? <div>{user.api_quota}</div> : <Skeleton />}
                   </TableCell>
                   <TableCell align="right">{currentUser.is_admin ? <ChevronRightOutlinedIcon /> : null}</TableCell>
@@ -663,13 +662,9 @@ function User({ width, username }: UserProps) {
                   style={{ cursor: currentUser.is_admin ? 'pointer' : 'default' }}
                   onClick={currentUser.is_admin ? event => toggleDrawer('submission_quota') : null}
                 >
-                  {isWidthDown('xs', width) ? null : (
-                    <TableCell style={{ whiteSpace: 'nowrap' }}>{t('submission_quota')}</TableCell>
-                  )}
+                  {isXSDown ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('submission_quota')}</TableCell>}
                   <TableCell width="100%">
-                    {!isWidthDown('xs', width) ? null : (
-                      <Typography variant="caption">{t('submission_quota')}</Typography>
-                    )}
+                    {!isXSDown ? null : <Typography variant="caption">{t('submission_quota')}</Typography>}
                     {user ? <div>{user.submission_quota}</div> : <Skeleton />}
                   </TableCell>
                   <TableCell align="right">{currentUser.is_admin ? <ChevronRightOutlinedIcon /> : null}</TableCell>
@@ -776,4 +771,4 @@ User.defaultProps = {
   username: null
 };
 
-export default withWidth()(User);
+export default memo(User);

@@ -1,9 +1,14 @@
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import OutlinedInput from '@material-ui/core/OutlinedInput';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+/* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import { Theme } from '@mui/material/styles';
+import createStyles from '@mui/styles/createStyles';
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
+import React, { useCallback, useRef, useState } from 'react';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -65,7 +70,7 @@ export const WrappedHexField = ({
     console.log(event.type, paste, inputRef.current.selectionStart);
   }, []);
 
-  useEffect(() => {
+  useEffectOnce(() => {
     inputRef.current.addEventListener('mousedown', onMouseDown);
     inputRef.current.addEventListener('keydown', onKeyDown);
     inputRef.current.addEventListener('keypress', onKeyPress);
@@ -76,14 +81,14 @@ export const WrappedHexField = ({
       inputRef.current.removeEventListener('keypress', onKeyPress);
       inputRef.current.removeEventListener('paste', onPaste);
     };
-  }, []);
+  });
 
-  useEffect(() => {
+  useEffectOnce(() => {
     inputRef.current.addEventListener('mousedown', onMouseDown);
     inputRef.current.addEventListener('keydown', onKeyDown);
     inputRef.current.addEventListener('keypress', onKeyPress);
     inputRef.current.addEventListener('paste', onPaste);
-  }, []);
+  });
 
   return (
     <FormControl
@@ -102,6 +107,7 @@ export const WrappedHexField = ({
         placeholder={'text'}
         fullWidth
         autoFocus
+        size="small"
         margin="dense"
         multiline
         maxRows={1}

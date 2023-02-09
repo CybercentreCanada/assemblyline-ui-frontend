@@ -1,15 +1,7 @@
-import {
-  createStyles,
-  makeStyles,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Theme,
-  withStyles
-} from '@material-ui/core';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Theme } from '@mui/material';
+import createStyles from '@mui/styles/createStyles';
+import makeStyles from '@mui/styles/makeStyles';
+import withStyles from '@mui/styles/withStyles';
 import { default as React } from 'react';
 import TitleKey from '../TitleKey';
 import { KVBody } from './kv_body';
@@ -38,7 +30,7 @@ const StyledTableCell = withStyles((theme: Theme) =>
         color: 'black',
         backgroundColor: '#DDD !important'
       },
-      backgroundColor: theme.palette.type === 'dark' ? '#404040' : '#EEE'
+      backgroundColor: theme.palette.mode === 'dark' ? '#404040' : '#EEE'
     },
     body: {
       [theme.breakpoints.up('md')]: {
@@ -55,7 +47,7 @@ const StyledTableRow = withStyles((theme: Theme) =>
         '@media print': {
           backgroundColor: '#EEE !important'
         },
-        backgroundColor: theme.palette.type === 'dark' ? '#ffffff08' : '#00000008'
+        backgroundColor: theme.palette.mode === 'dark' ? '#ffffff08' : '#00000008'
       }
     }
   })

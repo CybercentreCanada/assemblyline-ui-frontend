@@ -1,4 +1,4 @@
-import { useTheme } from '@material-ui/core';
+import { useTheme } from '@mui/material';
 import CustomChip from 'components/visual/CustomChip';
 import React from 'react';
 import { DetailedItem } from './hooks/useAlerts';
@@ -7,7 +7,7 @@ type AlertListChipProps = {
   items: DetailedItem[];
   title: string;
   size?: 'tiny' | 'small' | 'medium';
-  variant?: 'default' | 'outlined';
+  variant?: 'filled' | 'outlined';
 };
 
 const WrappedAlertListChipDetailed: React.FC<AlertListChipProps> = ({

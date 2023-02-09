@@ -1,8 +1,9 @@
-import { Button, TextField, Typography, useTheme } from '@material-ui/core';
-import Skeleton from '@material-ui/lab/Skeleton';
+import { Button, TextField, Typography, useTheme } from '@mui/material';
+import Skeleton from '@mui/material/Skeleton';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import TextDivider from 'components/visual/TextDivider';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type OTPProps = {
@@ -38,7 +39,7 @@ export default function OTP({ setDrawerOpen, set2FAEnabled }: OTPProps) {
     });
   }
 
-  useEffect(() => {
+  useEffectOnce(() => {
     // Load OTP setup on start
     apiCall({
       url: '/api/v4/auth/setup_otp/',
@@ -52,9 +53,8 @@ export default function OTP({ setDrawerOpen, set2FAEnabled }: OTPProps) {
         }, 1000);
       }
     });
+  });
 
-    // eslint-disable-next-line
-  }, []);
   return (
     <>
       <Typography variant="h4" gutterBottom>
@@ -80,7 +80,7 @@ export default function OTP({ setDrawerOpen, set2FAEnabled }: OTPProps) {
               }}
             />
           ) : (
-            <Skeleton variant="rect" style={{ width: '195px', height: '195px' }} />
+            <Skeleton variant="rectangular" style={{ width: '195px', height: '195px' }} />
           )}
         </div>
         <TextDivider forcePaper />

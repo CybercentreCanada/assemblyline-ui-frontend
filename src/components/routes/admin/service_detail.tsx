@@ -1,23 +1,26 @@
+import CompareArrowsOutlinedIcon from '@mui/icons-material/CompareArrowsOutlined';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
+import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
+import { TabContext, TabList, TabPanel } from '@mui/lab';
 import {
   Button,
   CircularProgress,
   Grid,
   IconButton,
-  makeStyles,
   Paper,
+  Skeleton,
   Tab,
   Tooltip,
   Typography,
   useTheme
-} from '@material-ui/core';
-import CompareArrowsOutlinedIcon from '@material-ui/icons/CompareArrowsOutlined';
-import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
-import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutlineOutlined';
-import { Skeleton, TabContext, TabList, TabPanel } from '@material-ui/lab';
-import PageCenter from 'commons/components/layout/pages/PageCenter';
-import useALContext from 'components/hooks/useALContext';
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
+import PageCenter from 'commons/components/pages/PageCenter';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import { CustomUser } from 'components/hooks/useMyUser';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
 import Empty from 'components/visual/Empty';
@@ -25,7 +28,8 @@ import { RouterPrompt } from 'components/visual/RouterPrompt';
 import { getVersionQuery } from 'helpers/utils';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, Redirect, useHistory, useParams } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router';
+import { Link, useParams } from 'react-router-dom';
 import ServiceContainer from './service_detail/container';
 import ServiceGeneral from './service_detail/general';
 import ServiceParams from './service_detail/parameters';
@@ -172,9 +176,9 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
   const [buttonLoading, setButtonLoading] = useState(false);
   const theme = useTheme();
   const [deleteDialog, setDeleteDialog] = useState(false);
-  const { user: currentUser } = useALContext();
+  const { user: currentUser } = useAppUser<CustomUser>();
   const { showSuccessMessage } = useMySnackbar();
-  const history = useHistory();
+  const navigate = useNavigate();
   const classes = useStyles();
 
   const { apiCall } = useMyAPI();
@@ -209,7 +213,7 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
       method: 'DELETE',
       onSuccess: () => {
         showSuccessMessage(t('delete.success'));
-        if (svc) setTimeout(() => history.push('/admin/services'), 1000);
+        if (svc) setTimeout(() => navigate('/admin/services'), 1000);
         onDeleted();
       },
       onEnter: () => setButtonLoading(true),
@@ -231,6 +235,7 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
     setTab('general');
     setVersions(null);
     setServiceDefault(null);
+    setModified(false);
 
     // Load user on start
     if (currentUser.is_admin) {
@@ -264,7 +269,7 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
     // eslint-disable-next-line
   }, [serviceVersion]);
 
-  useEffect(() => {
+  useEffectOnce(() => {
     // Load constants on page load
     if (currentUser.is_admin) {
       apiCall({
@@ -274,11 +279,10 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
         }
       });
     }
-    // eslint-disable-next-line
-  }, []);
+  });
 
   return !currentUser.is_admin ? (
-    <Redirect to="/forbidden" />
+    <Navigate to="/forbidden" replace />
   ) : (
     <PageCenter margin={!svc ? 2 : 4} width="100%" textAlign="left">
       <ConfirmationDialog
@@ -306,6 +310,7 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
                   to={`/admin/errors?filters=response.service_name%3A${service.name}&filters=${getVersionQuery(
                     service.version
                   )}`}
+                  size="large"
                 >
                   <ErrorOutlineOutlinedIcon />
                 </IconButton>
@@ -315,6 +320,7 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
                   component={Link}
                   style={{ color: theme.palette.action.active }}
                   to={`/admin/service_review?service=${service.name}&v1=${service.version}`}
+                  size="large"
                 >
                   <CompareArrowsOutlinedIcon />
                 </IconButton>
@@ -322,9 +328,10 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
               <Tooltip title={t('remove')}>
                 <IconButton
                   style={{
-                    color: theme.palette.type === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                    color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
                   }}
                   onClick={handleDeleteButtonClick}
+                  size="large"
                 >
                   <RemoveCircleOutlineOutlinedIcon />
                 </IconButton>
@@ -332,9 +339,9 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
             </div>
           ) : (
             <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
-              <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-              <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-              <Skeleton variant="circle" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+              <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+              <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+              <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
             </div>
           )}
         </Grid>
@@ -350,7 +357,7 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
           style={{ marginBottom: theme.spacing(2) }}
         />
       ) : (
-        <Skeleton variant="rect" height="2.5rem" style={{ marginBottom: theme.spacing(1) }} />
+        <Skeleton variant="rectangular" height="2.5rem" style={{ marginBottom: theme.spacing(1) }} />
       )}
 
       {service ? (
@@ -399,7 +406,7 @@ function Service({ name, onDeleted, onUpdated }: ServiceProps) {
           </TabPanel>
         </TabContext>
       ) : (
-        <Skeleton variant="rect" height="10rem" />
+        <Skeleton variant="rectangular" height="10rem" />
       )}
 
       <RouterPrompt when={modified} />
