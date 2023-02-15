@@ -23,7 +23,7 @@ import { useTranslation } from 'react-i18next';
 import ReactResizeDetector from 'react-resize-detector';
 import { Navigate } from 'react-router';
 
-loader.config({ paths: { vs: '/cdn/monaco_0.34.1' } });
+loader.config({ paths: { vs: '/vs' } });
 
 export default function AdminActions() {
   const { t, i18n } = useTranslation(['adminActions']);
