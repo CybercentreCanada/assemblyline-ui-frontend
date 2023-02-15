@@ -18,7 +18,7 @@ import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactResizeDetector from 'react-resize-detector';
 
-loader.config({ paths: { vs: '/cdn/monaco_0.34.1' } });
+loader.config({ paths: { vs: '/vs' } });
 
 const yaraDef = {
   defaultToken: '',
@@ -140,8 +140,8 @@ const yaraDef = {
     root: [[/[{}]/, 'delimiter.bracket'], { include: 'common' }],
 
     common: [
-      // to show class names nicely
-      [/\$[\w_]*/, 'attribute.name'],
+      // Variables
+      [/[$@][\w_]*/, 'attribute.name'],
       // identifiers and keywords
       [
         /[a-z_$][\w$]*/,
@@ -158,7 +158,7 @@ const yaraDef = {
       { include: '@whitespace' },
 
       // regular expression: ensure it is terminated before beginning (otherwise it is an opeator)
-      [/(\/(?:[^\\/]|\\.)+\/)(i|is|si|i)?[ \t\n\r$]*/, 'annotation'],
+      [/(\/(?:[^\\/]|\\.)+\/)([si]{1,2})?[ \t\n\r$]*/, 'regexp'],
 
       // delimiters and operators
       [/[()[\]]/, '@brackets'],
@@ -204,7 +204,6 @@ const yaraDef = {
   }
 };
 
-// This config defines the editor's behavior.
 const yaraConfig = {
   comments: {
     // symbol used for single line comment. Remove this entry if your language does not support line comments
@@ -216,9 +215,15 @@ const yaraConfig = {
   brackets: [
     ['{', '}'],
     ['[', ']'],
-    ['(', ')'],
-    ['"', '"'],
-    ['/', '/']
+    ['(', ')']
+  ],
+  // symbols that are auto closed when typing
+  autoClosingPairs: [
+    { open: '"', close: '"', notIn: ['string', 'annotation'] },
+    { open: '/', close: '/', notIn: ['string', 'annotation'] },
+    { open: '{', close: '}', notIn: ['string', 'annotation'] },
+    { open: '[', close: ']', notIn: ['string', 'annotation'] },
+    { open: '(', close: ')', notIn: ['string', 'annotation'] }
   ],
   // symbols that that can be used to surround a selection
   surroundingPairs: [
@@ -297,7 +302,7 @@ function WrappedYara({ reload, yaraFile, originalYaraFile, setYaraFile }) {
                     loading={t('loading.yara')}
                     modified={yaraFile}
                     beforeMount={beforeMount}
-                    options={{ renderSideBySide: false, readOnly: true }}
+                    options={{ links: false, renderSideBySide: false, readOnly: true }}
                   />
                 </div>
               )}
@@ -382,6 +387,7 @@ function WrappedYara({ reload, yaraFile, originalYaraFile, setYaraFile }) {
                       onChange={setYaraFile}
                       beforeMount={beforeMount}
                       onMount={onMount}
+                      options={{ links: false }}
                     />
                   </>
                 ) : (
