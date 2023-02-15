@@ -135,7 +135,7 @@ export default function AdminTagSafelist() {
                     height="50vh"
                     loading={t('loading')}
                     modified={tagSafelist}
-                    options={{ renderSideBySide: false, readOnly: true }}
+                    options={{ links: false, renderSideBySide: false, readOnly: true }}
                   />
                 </div>
               )}
@@ -182,6 +182,7 @@ export default function AdminTagSafelist() {
                       value={tagSafelist}
                       onChange={setTagSafelist}
                       onMount={onMount}
+                      options={{ links: false }}
                     />
                   </>
                 ) : (

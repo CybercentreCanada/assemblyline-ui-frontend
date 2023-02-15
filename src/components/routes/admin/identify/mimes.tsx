@@ -75,7 +75,7 @@ function WrappedMimes({ reload, mimesFile, originalMimesFile, setMimesFile }) {
                     height="50vh"
                     loading={t('loading.mimes')}
                     modified={mimesFile}
-                    options={{ renderSideBySide: false, readOnly: true }}
+                    options={{ links: false, renderSideBySide: false, readOnly: true }}
                   />
                 </div>
               )}
@@ -159,6 +159,7 @@ function WrappedMimes({ reload, mimesFile, originalMimesFile, setMimesFile }) {
                       value={mimesFile}
                       onChange={setMimesFile}
                       onMount={onMount}
+                      options={{ links: false }}
                     />
                   </>
                 ) : (

@@ -136,7 +136,7 @@ export default function AdminActions() {
                     height="50vh"
                     loading={t('loading')}
                     modified={actions}
-                    options={{ renderSideBySide: false, readOnly: true }}
+                    options={{ links: false, renderSideBySide: false, readOnly: true }}
                   />
                 </div>
               )}
@@ -183,6 +183,7 @@ export default function AdminActions() {
                       value={actions}
                       onChange={setActions}
                       onMount={onMount}
+                      options={{ links: false }}
                     />
                   </>
                 ) : (

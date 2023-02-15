@@ -75,7 +75,7 @@ function WrappedPatterns({ reload, patternsFile, originalPatternsFile, setPatter
                     height="50vh"
                     loading={t('loading.patterns')}
                     modified={patternsFile}
-                    options={{ renderSideBySide: false, readOnly: true }}
+                    options={{ links: false, renderSideBySide: false, readOnly: true }}
                   />
                 </div>
               )}
@@ -159,6 +159,7 @@ function WrappedPatterns({ reload, patternsFile, originalPatternsFile, setPatter
                       value={patternsFile}
                       onChange={setPatternsFile}
                       onMount={onMount}
+                      options={{ links: false }}
                     />
                   </>
                 ) : (

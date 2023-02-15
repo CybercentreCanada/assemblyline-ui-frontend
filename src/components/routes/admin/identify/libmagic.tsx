@@ -131,7 +131,7 @@ function WrappedLibMagic({ reload, magicFile, originalMagicFile, setMagicFile })
                     loading={t('loading.magic')}
                     modified={magicFile}
                     beforeMount={beforeMount}
-                    options={{ renderSideBySide: false, readOnly: true }}
+                    options={{ links: false, renderSideBySide: false, readOnly: true }}
                   />
                 </div>
               )}
@@ -216,6 +216,7 @@ function WrappedLibMagic({ reload, magicFile, originalMagicFile, setMagicFile })
                       onChange={setMagicFile}
                       beforeMount={beforeMount}
                       onMount={onMount}
+                      options={{ links: false }}
                     />
                   </>
                 ) : (
