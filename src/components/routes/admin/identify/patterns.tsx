@@ -18,7 +18,7 @@ import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactResizeDetector from 'react-resize-detector';
 
-loader.config({ paths: { vs: '/vs' } });
+loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 
 function WrappedPatterns({ reload, patternsFile, originalPatternsFile, setPatternsFile }) {
   const { t, i18n } = useTranslation(['adminIdentify']);

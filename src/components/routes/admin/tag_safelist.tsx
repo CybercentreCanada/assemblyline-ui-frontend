@@ -23,7 +23,7 @@ import { useTranslation } from 'react-i18next';
 import ReactResizeDetector from 'react-resize-detector';
 import { Navigate } from 'react-router';
 
-loader.config({ paths: { vs: '/vs' } });
+loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 
 export default function AdminTagSafelist() {
   const { t, i18n } = useTranslation(['adminTagSafelist']);
