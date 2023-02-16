@@ -32,7 +32,7 @@ import { useNavigate } from 'react-router';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
 
-loader.config({ paths: { vs: '/vs' } });
+loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 
 type ParamProps = {
   id: string;
