@@ -23,7 +23,7 @@ import { useTranslation } from 'react-i18next';
 import ReactResizeDetector from 'react-resize-detector';
 import { Navigate } from 'react-router';
 
-loader.config({ paths: { vs: '/cdn/monaco_0.34.1' } });
+loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 
 export default function AdminActions() {
   const { t, i18n } = useTranslation(['adminActions']);
@@ -136,7 +136,7 @@ export default function AdminActions() {
                     height="50vh"
                     loading={t('loading')}
                     modified={actions}
-                    options={{ renderSideBySide: false, readOnly: true }}
+                    options={{ links: false, renderSideBySide: false, readOnly: true }}
                   />
                 </div>
               )}
@@ -183,6 +183,7 @@ export default function AdminActions() {
                       value={actions}
                       onChange={setActions}
                       onMount={onMount}
+                      options={{ links: false }}
                     />
                   </>
                 ) : (

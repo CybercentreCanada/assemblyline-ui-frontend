@@ -18,7 +18,7 @@ import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactResizeDetector from 'react-resize-detector';
 
-loader.config({ paths: { vs: '/cdn/monaco_0.34.1' } });
+loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 
 function WrappedMimes({ reload, mimesFile, originalMimesFile, setMimesFile }) {
   const { t, i18n } = useTranslation(['adminIdentify']);
@@ -75,7 +75,7 @@ function WrappedMimes({ reload, mimesFile, originalMimesFile, setMimesFile }) {
                     height="50vh"
                     loading={t('loading.mimes')}
                     modified={mimesFile}
-                    options={{ renderSideBySide: false, readOnly: true }}
+                    options={{ links: false, renderSideBySide: false, readOnly: true }}
                   />
                 </div>
               )}
@@ -159,6 +159,7 @@ function WrappedMimes({ reload, mimesFile, originalMimesFile, setMimesFile }) {
                       value={mimesFile}
                       onChange={setMimesFile}
                       onMount={onMount}
+                      options={{ links: false }}
                     />
                   </>
                 ) : (

@@ -15,7 +15,7 @@ import Mimes from './identify/mimes';
 import Patterns from './identify/patterns';
 import Yara from './identify/yara';
 
-loader.config({ paths: { vs: '/cdn/monaco_0.34.1' } });
+loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 
 const useStyles = makeStyles(theme => ({
   main: {

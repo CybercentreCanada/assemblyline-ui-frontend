@@ -23,7 +23,7 @@ import { useTranslation } from 'react-i18next';
 import ReactResizeDetector from 'react-resize-detector';
 import { Navigate } from 'react-router';
 
-loader.config({ paths: { vs: '/cdn/monaco_0.34.1' } });
+loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 
 export default function AdminTagSafelist() {
   const { t, i18n } = useTranslation(['adminTagSafelist']);
@@ -135,7 +135,7 @@ export default function AdminTagSafelist() {
                     height="50vh"
                     loading={t('loading')}
                     modified={tagSafelist}
-                    options={{ renderSideBySide: false, readOnly: true }}
+                    options={{ links: false, renderSideBySide: false, readOnly: true }}
                   />
                 </div>
               )}
@@ -182,6 +182,7 @@ export default function AdminTagSafelist() {
                       value={tagSafelist}
                       onChange={setTagSafelist}
                       onMount={onMount}
+                      options={{ links: false }}
                     />
                   </>
                 ) : (
