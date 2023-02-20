@@ -19,6 +19,8 @@
   "options.submission.ignore_cache": "Ignore result cache",
   "options.submission.ignore_dynamic_recursion_prevention": "Ignore dynamic recursion prevention",
   "options.submission.ignore_filtering": "Ignore filtering services",
+  "options.submission.metadata": "Metadata data that will be carried over:",
+  "options.submission.metadata.clear": "clear",
   "options.submission.priority": "Priority",
   "options.submission.priority.high": "High: 1500",
   "options.submission.priority.low": "Low: 500",

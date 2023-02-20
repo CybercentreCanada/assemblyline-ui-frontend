@@ -2,9 +2,19 @@ import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
 import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
 import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
-import RotateLeftOutlinedIcon from '@mui/icons-material/RotateLeftOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
-import { Grid, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import {
+  Grid,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  Popover,
+  Skeleton,
+  Tooltip,
+  Typography,
+  useTheme
+} from '@mui/material';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -110,6 +120,8 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
   const theme = useTheme();
   const navigate = useNavigate();
   const { showSuccessMessage } = useMySnackbar();
+  const [resubmitAnchor, setResubmitAnchor] = useState(null);
+  const popoverOpen = Boolean(resubmitAnchor);
   const sp2 = theme.spacing(2);
   const sp4 = theme.spacing(4);
 
@@ -291,27 +303,46 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                   </Tooltip>
                 )}
                 {currentUser.roles.includes('submission_create') && (
-                  <Tooltip title={t('resubmit_file')}>
-                    <IconButton
-                      component={Link}
-                      to="/submit"
-                      state={{
-                        hash: file.file_info.sha256,
-                        tabContext: '1',
-                        c12n: file.file_info.classification
+                  <>
+                    <Tooltip title={t('resubmit')}>
+                      <IconButton onClick={event => setResubmitAnchor(event.currentTarget)} size="large">
+                        <ReplayOutlinedIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Popover
+                      open={popoverOpen}
+                      anchorEl={resubmitAnchor}
+                      onClose={() => setResubmitAnchor(null)}
+                      anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'right'
                       }}
-                      size="large"
+                      transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right'
+                      }}
                     >
-                      <ReplayOutlinedIcon />
-                    </IconButton>
-                  </Tooltip>
-                )}
-                {currentUser.roles.includes('submission_create') && (
-                  <Tooltip title={t('resubmit_dynamic')}>
-                    <IconButton onClick={resubmit} size="large">
-                      <RotateLeftOutlinedIcon />
-                    </IconButton>
-                  </Tooltip>
+                      <List disablePadding>
+                        <ListItem
+                          button
+                          component={Link}
+                          to="/submit"
+                          state={{
+                            hash: file.file_info.sha256,
+                            tabContext: '1',
+                            c12n: file.file_info.classification
+                          }}
+                          dense
+                          onClick={() => setResubmitAnchor(null)}
+                        >
+                          <ListItemText primary={t('resubmit.modify')} />
+                        </ListItem>
+                        <ListItem button dense onClick={resubmit}>
+                          <ListItemText primary={t('resubmit.dynamic')} />
+                        </ListItem>
+                      </List>
+                    </Popover>
+                  </>
                 )}
                 {currentUser.roles.includes('safelist_manage') && (
                   <Tooltip title={t('safelist')}>

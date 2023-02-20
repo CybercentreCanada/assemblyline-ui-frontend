@@ -43,11 +43,17 @@ type SubmitState = {
   hash: string;
   tabContext: string;
   c12n: string;
+  metadata?: any;
 };
 
 const useStyles = makeStyles(theme => ({
   no_pad: {
     padding: 0
+  },
+  meta_key: {
+    overflowX: 'hidden',
+    whiteSpace: 'nowrap',
+    textOverflow: 'ellipsis'
   },
   item: {
     marginLeft: 0,
@@ -98,6 +104,7 @@ const Submit: React.FC<any> = () => {
   const urlHashTitle = configuration.ui.allow_url_submissions ? 'URL/SHA256' : 'SHA256';
   const urlInputText = urlHashTitle + t('urlHash.input_suffix');
   const [urlHash, setUrlHash] = useState(state ? state.hash : '');
+  const [submissionMetadata, setSubmissionMetadata] = useState(state ? state.metadata : null);
   const [urlHashHasError, setUrlHashHasError] = useState(false);
   const [value, setValue] = useState(state ? state.tabContext : '0');
   const classification = useState(state ? state.c12n : null)[0];
@@ -305,6 +312,7 @@ const Submit: React.FC<any> = () => {
     closeSnackbar();
     setUrlHashHasError(false);
     setUrlHash(event.target.value);
+    setSubmissionMetadata(null);
   }
 
   function analyseUrlHash() {
@@ -321,12 +329,13 @@ const Submit: React.FC<any> = () => {
     }
 
     if (sha256) {
-      data = { ui_params: settings, name: urlHash, sha256: urlHash };
+      data = { ui_params: settings, name: urlHash, sha256: urlHash, metadata: submissionMetadata };
     } else {
       data = {
         ui_params: settings,
         name: url[15] === undefined || url[15] === '' ? 'file' : url[15],
-        url: urlHash
+        url: urlHash,
+        metadata: submissionMetadata
       };
     }
 
@@ -515,8 +524,8 @@ const Submit: React.FC<any> = () => {
               configuration.submission.sha256_sources.length > 0 && (
                 <div style={{ textAlign: 'start', marginTop: theme.spacing(1) }}>
                   <Typography variant="subtitle1">{t('options.submission.default_external_sources')}</Typography>
-                  {configuration.submission.sha256_sources.map(source => (
-                    <div>
+                  {configuration.submission.sha256_sources.map((source, i) => (
+                    <div key={i}>
                       <FormControlLabel
                         control={
                           settings ? (
@@ -537,6 +546,30 @@ const Submit: React.FC<any> = () => {
                   ))}
                 </div>
               )}
+            {submissionMetadata && Object.keys(submissionMetadata).length !== 0 && (
+              <div style={{ textAlign: 'start', marginTop: theme.spacing(2) }}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <Typography style={{ flexGrow: 1 }} variant="subtitle1">
+                    {t('options.submission.metadata')}
+                  </Typography>
+                  <Button style={{ display: 'inline' }} onClick={() => setSubmissionMetadata(null)}>
+                    {t('clear')}
+                  </Button>
+                </div>
+                <div>
+                  {Object.keys(submissionMetadata).map((meta, i) => (
+                    <Grid container key={i}>
+                      <Grid className={classes.meta_key} item xs={12} sm={3} lg={2}>
+                        <span style={{ fontWeight: 500 }}>{meta}</span>
+                      </Grid>
+                      <Grid item xs={12} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                        {submissionMetadata[meta]}
+                      </Grid>
+                    </Grid>
+                  ))}
+                </div>
+              </div>
+            )}
             {configuration.ui.tos ? (
               <div style={{ marginTop: sp4, textAlign: 'center' }}>
                 <Typography variant="body2">
