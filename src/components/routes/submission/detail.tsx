@@ -995,11 +995,11 @@ function WrappedSubmissionDetail() {
                               <ReplayOutlinedIcon />
                               {popoverOpen ? (
                                 <ExpandLessIcon
-                                  style={{ position: 'absolute', right: 0, bottom: 10, fontSize: 'medium' }}
+                                  style={{ position: 'absolute', right: 2, bottom: 10, fontSize: 'medium' }}
                                 />
                               ) : (
                                 <ExpandMoreIcon
-                                  style={{ position: 'absolute', right: 0, bottom: 10, fontSize: 'medium' }}
+                                  style={{ position: 'absolute', right: 2, bottom: 10, fontSize: 'medium' }}
                                 />
                               )}
                             </IconButton>
