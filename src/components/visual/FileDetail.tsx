@@ -1,3 +1,5 @@
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
 import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
@@ -307,6 +309,11 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                     <Tooltip title={t('resubmit')}>
                       <IconButton onClick={event => setResubmitAnchor(event.currentTarget)} size="large">
                         <ReplayOutlinedIcon />
+                        {popoverOpen ? (
+                          <ExpandLessIcon style={{ position: 'absolute', right: 0, fontSize: 'medium' }} />
+                        ) : (
+                          <ExpandMoreIcon style={{ position: 'absolute', right: 0, fontSize: 'medium' }} />
+                        )}
                       </IconButton>
                     </Tooltip>
                     <Popover

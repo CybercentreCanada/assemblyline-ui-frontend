@@ -3,6 +3,8 @@ import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import ChromeReaderModeOutlinedIcon from '@mui/icons-material/ChromeReaderModeOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
@@ -991,6 +993,11 @@ function WrappedSubmissionDetail() {
                           <Tooltip title={t('resubmit')}>
                             <IconButton onClick={event => setResubmitAnchor(event.currentTarget)} size="large">
                               <ReplayOutlinedIcon />
+                              {popoverOpen ? (
+                                <ExpandLessIcon style={{ position: 'absolute', right: 0, fontSize: 'medium' }} />
+                              ) : (
+                                <ExpandMoreIcon style={{ position: 'absolute', right: 0, fontSize: 'medium' }} />
+                              )}
                             </IconButton>
                           </Tooltip>
                           <Popover
