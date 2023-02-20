@@ -20,7 +20,7 @@
   "options.submission.ignore_dynamic_recursion_prevention": "Ignorer la prévention de la récursivité dynamique",
   "options.submission.ignore_filtering": "Ignorer les services de filtrage",
   "options.submission.metadata": "Données de métadonnées qui seront transférées:",
-  "options.submission.metadata.clear": "effacer",
+  "options.submission.metadata.clear": "Ne pas transférer les métadonnées",
   "options.submission.priority": "Priorité",
   "options.submission.priority.high": "Haute: 1500",
   "options.submission.priority.low": "Basse: 500",

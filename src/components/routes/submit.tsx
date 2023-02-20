@@ -1,4 +1,5 @@
 import Flow from '@flowjs/flow.js';
+import ClearIcon from '@mui/icons-material/Clear';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import {
   Alert,
@@ -7,6 +8,7 @@ import {
   CircularProgress,
   FormControlLabel,
   Grid,
+  IconButton,
   MenuItem,
   Paper,
   Select,
@@ -104,7 +106,7 @@ const Submit: React.FC<any> = () => {
   const urlHashTitle = configuration.ui.allow_url_submissions ? 'URL/SHA256' : 'SHA256';
   const urlInputText = urlHashTitle + t('urlHash.input_suffix');
   const [urlHash, setUrlHash] = useState(state ? state.hash : '');
-  const [submissionMetadata, setSubmissionMetadata] = useState(state ? state.metadata : null);
+  const [submissionMetadata, setSubmissionMetadata] = useState(state ? state.metadata : {});
   const [urlHashHasError, setUrlHashHasError] = useState(false);
   const [value, setValue] = useState(state ? state.tabContext : '0');
   const classification = useState(state ? state.c12n : null)[0];
@@ -552,9 +554,11 @@ const Submit: React.FC<any> = () => {
                   <Typography style={{ flexGrow: 1 }} variant="subtitle1">
                     {t('options.submission.metadata')}
                   </Typography>
-                  <Button style={{ display: 'inline' }} onClick={() => setSubmissionMetadata(null)}>
-                    {t('clear')}
-                  </Button>
+                  <Tooltip title={t('options.submission.metadata.clear')}>
+                    <IconButton onClick={() => setSubmissionMetadata({})}>
+                      <ClearIcon />
+                    </IconButton>
+                  </Tooltip>
                 </div>
                 <div>
                   {Object.keys(submissionMetadata).map((meta, i) => (
