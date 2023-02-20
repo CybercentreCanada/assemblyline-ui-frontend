@@ -310,9 +310,9 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                       <IconButton onClick={event => setResubmitAnchor(event.currentTarget)} size="large">
                         <ReplayOutlinedIcon />
                         {popoverOpen ? (
-                          <ExpandLessIcon style={{ position: 'absolute', right: 0, fontSize: 'medium' }} />
+                          <ExpandLessIcon style={{ position: 'absolute', right: 0, bottom: 10, fontSize: 'medium' }} />
                         ) : (
-                          <ExpandMoreIcon style={{ position: 'absolute', right: 0, fontSize: 'medium' }} />
+                          <ExpandMoreIcon style={{ position: 'absolute', right: 0, bottom: 10, fontSize: 'medium' }} />
                         )}
                       </IconButton>
                     </Tooltip>
