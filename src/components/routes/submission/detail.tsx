@@ -926,7 +926,7 @@ function WrappedSubmissionDetail() {
             <Grid item xs={12} sm={6} md={4} style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 0 }}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 {submission ? (
-                  submission.state === 'completed' && (
+                  submission.state === 'completed' ? (
                     <div style={{ display: 'flex' }}>
                       {currentUser.roles.includes('submission_delete') && (
                         <Tooltip title={t('delete')}>
@@ -978,6 +978,20 @@ function WrappedSubmissionDetail() {
                         </IconButton>
                       </Tooltip>
                     </div>
+                  ) : (
+                    currentUser.roles.includes('submission_delete') && (
+                      <Tooltip title={t('delete')}>
+                        <IconButton
+                          onClick={() => setDeleteDialog(true)}
+                          style={{
+                            color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                          }}
+                          size="large"
+                        >
+                          <RemoveCircleOutlineOutlinedIcon />
+                        </IconButton>
+                      </Tooltip>
+                    )
                   )
                 ) : (
                   <div style={{ display: 'inline-flex' }}>
@@ -993,83 +1007,87 @@ function WrappedSubmissionDetail() {
                   </div>
                 )}
 
-                <div
-                  style={{
-                    width: '164px',
-                    marginTop: '8px'
-                  }}
-                >
-                  {submission ? (
-                    submission.state === 'completed' && (
+                {!(submission && submission.state !== 'completed') && (
+                  <div
+                    style={{
+                      width: '164px',
+                      marginTop: '8px'
+                    }}
+                  >
+                    {submission ? (
+                      submission.state === 'completed' && (
+                        <>
+                          <VerdictBar verdicts={submission.verdict} />
+                          {currentUser.roles.includes('submission_manage') && (
+                            <Grid container>
+                              <Grid item xs={5} style={{ textAlign: 'left' }}>
+                                <Tooltip
+                                  title={t(
+                                    `verdict.${
+                                      submission.verdict.malicious.indexOf(currentUser.username) !== -1 ? 'is' : 'set'
+                                    }.malicious`
+                                  )}
+                                >
+                                  <IconButton size="small" onClick={() => setVerdict('malicious')}>
+                                    <BugReportOutlinedIcon
+                                      style={{
+                                        color:
+                                          submission.verdict.malicious.indexOf(currentUser.username) !== -1
+                                            ? theme.palette.error.dark
+                                            : null
+                                      }}
+                                    />
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
+                              <Grid item xs={2} />
+                              <Grid item xs={5} style={{ textAlign: 'right' }}>
+                                <Tooltip
+                                  title={t(
+                                    `verdict.${
+                                      submission.verdict.non_malicious.indexOf(currentUser.username) !== -1
+                                        ? 'is'
+                                        : 'set'
+                                    }.non_malicious`
+                                  )}
+                                >
+                                  <IconButton size="small" onClick={() => setVerdict('non_malicious')}>
+                                    <VerifiedUserOutlinedIcon
+                                      style={{
+                                        color:
+                                          submission.verdict.non_malicious.indexOf(currentUser.username) !== -1
+                                            ? theme.palette.success.dark
+                                            : null
+                                      }}
+                                    />
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
+                            </Grid>
+                          )}
+                        </>
+                      )
+                    ) : (
                       <>
-                        <VerdictBar verdicts={submission.verdict} />
-                        {currentUser.roles.includes('submission_manage') && (
-                          <Grid container>
-                            <Grid item xs={5} style={{ textAlign: 'left' }}>
-                              <Tooltip
-                                title={t(
-                                  `verdict.${
-                                    submission.verdict.malicious.indexOf(currentUser.username) !== -1 ? 'is' : 'set'
-                                  }.malicious`
-                                )}
-                              >
-                                <IconButton size="small" onClick={() => setVerdict('malicious')}>
-                                  <BugReportOutlinedIcon
-                                    style={{
-                                      color:
-                                        submission.verdict.malicious.indexOf(currentUser.username) !== -1
-                                          ? theme.palette.error.dark
-                                          : null
-                                    }}
-                                  />
-                                </IconButton>
-                              </Tooltip>
-                            </Grid>
-                            <Grid item xs={2} />
-                            <Grid item xs={5} style={{ textAlign: 'right' }}>
-                              <Tooltip
-                                title={t(
-                                  `verdict.${
-                                    submission.verdict.non_malicious.indexOf(currentUser.username) !== -1 ? 'is' : 'set'
-                                  }.non_malicious`
-                                )}
-                              >
-                                <IconButton size="small" onClick={() => setVerdict('non_malicious')}>
-                                  <VerifiedUserOutlinedIcon
-                                    style={{
-                                      color:
-                                        submission.verdict.non_malicious.indexOf(currentUser.username) !== -1
-                                          ? theme.palette.success.dark
-                                          : null
-                                    }}
-                                  />
-                                </IconButton>
-                              </Tooltip>
-                            </Grid>
-                          </Grid>
-                        )}
+                        <Skeleton variant="rectangular" style={{ height: '15px', width: '100%' }} />
+                        <div style={{ display: 'inline-flex', width: '100%', justifyContent: 'space-between' }}>
+                          <Skeleton
+                            variant="circular"
+                            height="1.5rem"
+                            width="1.5rem"
+                            style={{ margin: theme.spacing(0.5) }}
+                          />
+                          <Skeleton
+                            variant="circular"
+                            height="1.5rem"
+                            width="1.5rem"
+                            style={{ margin: theme.spacing(0.5) }}
+                          />
+                        </div>
                       </>
-                    )
-                  ) : (
-                    <>
-                      <Skeleton variant="rectangular" style={{ height: '15px', width: '100%' }} />
-                      <div style={{ display: 'inline-flex', width: '100%', justifyContent: 'space-between' }}>
-                        <Skeleton
-                          variant="circular"
-                          height="1.5rem"
-                          width="1.5rem"
-                          style={{ margin: theme.spacing(0.5) }}
-                        />
-                        <Skeleton
-                          variant="circular"
-                          height="1.5rem"
-                          width="1.5rem"
-                          style={{ margin: theme.spacing(0.5) }}
-                        />
-                      </div>
-                    </>
-                  )}
-                </div>
+                    )}
+                  </div>
+                )}
               </div>
             </Grid>
           </Grid>
