@@ -614,9 +614,9 @@ function WrappedSubmissionDetail() {
           setSocket(tempSocket);
         }
         setLoadInterval(setInterval(() => incrementLoadTrigger(1), MESSAGE_TIMEOUT));
+        setLiveStatus('processing');
       }
       setBaseFiles(submission.files.map(f => f.sha256));
-      setLiveStatus('processing');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [submission]);
@@ -795,7 +795,7 @@ function WrappedSubmissionDetail() {
       });
     } else if (
       loadTrigger >= lastSuccessfulTrigger + OUTSTANDING_TRIGGER_COUNT &&
-      (!outstanding || loadTrigger % OUTSTANDING_TRIGGER_COUNT === 0)
+      loadTrigger % OUTSTANDING_TRIGGER_COUNT === 0
     ) {
       // eslint-disable-next-line no-console
       console.debug('LIVE :: Finding out oustanding services...');
@@ -803,16 +803,33 @@ function WrappedSubmissionDetail() {
       apiCall({
         url: `/api/v4/live/outstanding_services/${id}/`,
         onSuccess: api_data => {
+          let newLiveStatus: 'processing' | 'rescheduled' | 'queued' = 'processing' as 'processing';
           // Set live status based on outstanding services output
           if (api_data.api_response === null) {
-            setLiveStatus('rescheduled');
+            newLiveStatus = 'rescheduled' as 'rescheduled';
           } else if (Object.keys(api_data.api_response).length === 0) {
-            setLiveStatus('queued');
-          } else {
-            setLiveStatus('processing');
+            newLiveStatus = 'queued' as 'queued';
           }
 
           setOutstanding(api_data.api_response);
+          setLiveStatus(newLiveStatus);
+
+          // Maybe the submission completed in between two checks
+          if (liveStatus !== 'processing' && newLiveStatus !== 'processing') {
+            // eslint-disable-next-line no-console
+            console.debug('LIVE :: Checking if the submission is completed...');
+            apiCall({
+              url: `/api/v4/submission/${id}/`,
+              onSuccess: submission_api_data => {
+                if (submission_api_data.api_response.state === 'completed') {
+                  if (loadInterval) clearInterval(loadInterval);
+                  setLoadInterval(null);
+                  setOutstanding(null);
+                  setSubmission(parseSubmissionErrors(submission_api_data.api_response));
+                }
+              }
+            });
+          }
         }
       });
     }
