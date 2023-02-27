@@ -1,15 +1,18 @@
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
+import OndemandVideoOutlinedIcon from '@mui/icons-material/OndemandVideoOutlined';
 import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
 import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
 import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
+import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import {
   Grid,
   IconButton,
   List,
   ListItem,
+  ListItemIcon,
   ListItemText,
   Popover,
   Skeleton,
@@ -342,9 +345,15 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
                           dense
                           onClick={() => setResubmitAnchor(null)}
                         >
+                          <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
+                            <TuneOutlinedIcon />
+                          </ListItemIcon>
                           <ListItemText primary={t('resubmit.modify')} />
                         </ListItem>
                         <ListItem button dense onClick={resubmit}>
+                          <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
+                            <OndemandVideoOutlinedIcon />
+                          </ListItemIcon>
                           <ListItemText primary={t('resubmit.dynamic')} />
                         </ListItem>
                       </List>

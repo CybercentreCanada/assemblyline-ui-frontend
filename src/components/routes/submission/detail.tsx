@@ -5,10 +5,13 @@ import CloseIcon from '@mui/icons-material/Close';
 import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import OndemandVideoOutlinedIcon from '@mui/icons-material/OndemandVideoOutlined';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
+import RepeatOutlinedIcon from '@mui/icons-material/RepeatOutlined';
 import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
+import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import {
   Alert,
@@ -17,6 +20,7 @@ import {
   LinearProgress,
   List,
   ListItem,
+  ListItemIcon,
   ListItemText,
   Popover,
   Skeleton,
@@ -1031,12 +1035,21 @@ function WrappedSubmissionDetail() {
                                 dense
                                 onClick={() => setResubmitAnchor(null)}
                               >
+                                <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
+                                  <TuneOutlinedIcon />
+                                </ListItemIcon>
                                 <ListItemText primary={t('resubmit.modify')} />
                               </ListItem>
                               <ListItem button dense onClick={resubmitDynamic}>
+                                <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
+                                  <OndemandVideoOutlinedIcon />
+                                </ListItemIcon>
                                 <ListItemText primary={t('resubmit.dynamic')} />
                               </ListItem>
                               <ListItem button dense onClick={resubmit}>
+                                <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
+                                  <RepeatOutlinedIcon />
+                                </ListItemIcon>
                                 <ListItemText primary={t('resubmit.carbon_copy')} />
                               </ListItem>
                             </List>
