@@ -79,7 +79,9 @@ export default function Submissions() {
 
   useEffect(() => {
     setSearching(true);
-    setQuery(new SimpleSearchQuery(location.search, `query=*&rows=${pageSize}&offset=0`));
+    setQuery(
+      new SimpleSearchQuery(location.search, `query=*&rows=${pageSize}&offset=0&filters=NOT%20to_be_deleted:true`)
+    );
   }, [location.search, pageSize]);
 
   useEffect(() => {

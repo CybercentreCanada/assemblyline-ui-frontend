@@ -6,6 +6,7 @@ import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import OndemandVideoOutlinedIcon from '@mui/icons-material/OndemandVideoOutlined';
+import PauseCircleOutlineOutlinedIcon from '@mui/icons-material/PauseCircleOutlineOutlined';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
@@ -109,6 +110,7 @@ function WrappedSubmissionDetail() {
   const [liveTagMap, setLiveTagMap] = useState(null);
   const [outstanding, setOutstanding] = useState(null);
   const [loadTrigger, incrementLoadTrigger] = useReducer(incrementReducer, 0);
+  const [liveStatus, setLiveStatus] = useState<'queued' | 'processing' | 'rescheduled'>('queued');
   const [socket, setSocket] = useState(null);
   const [loadInterval, setLoadInterval] = useState(null);
   const [lastSuccessfulTrigger, setLastSuccessfulTrigger] = useState(0);
@@ -117,7 +119,7 @@ function WrappedSubmissionDetail() {
   const [resubmitAnchor, setResubmitAnchor] = useState(null);
   const { apiCall } = useMyAPI();
   const sp4 = theme.spacing(4);
-  const { showSuccessMessage, showErrorMessage } = useMySnackbar();
+  const { showSuccessMessage } = useMySnackbar();
   const navigate = useNavigate();
   const { user: currentUser, c12nDef, configuration: systemConfig } = useALContext();
   const { setHighlightMap } = useHighlighter();
@@ -646,28 +648,39 @@ function WrappedSubmissionDetail() {
           setSocket(tempSocket);
         }
         setLoadInterval(setInterval(() => incrementLoadTrigger(1), MESSAGE_TIMEOUT));
-
-        apiCall({
-          url: `/api/v4/live/setup_watch_queue/${id}/`,
-          onSuccess: summ_data => {
-            setWatchQueue(summ_data.api_response.wq_id);
-          }
-        });
+        setLiveStatus('processing');
       }
       setBaseFiles(submission.files.map(f => f.sha256));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [submission]);
 
-  const handleErrorMessage = useCallback(
-    data => {
-      // eslint-disable-next-line no-console
-      console.debug(`SocketIO :: onError => ${data.msg}`);
-      showErrorMessage(t('dispatcher.not_responding'), 15000);
+  useEffect(() => {
+    if (liveStatus === 'processing') {
       apiCall({
         url: `/api/v4/live/setup_watch_queue/${id}/`,
         onSuccess: summ_data => {
           setWatchQueue(summ_data.api_response.wq_id);
+        },
+        onFailure: () => {
+          setLiveStatus('queued');
+        }
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [liveStatus]);
+
+  const handleErrorMessage = useCallback(
+    data => {
+      // eslint-disable-next-line no-console
+      console.debug(`SocketIO :: onError => ${data.msg}`);
+      apiCall({
+        url: `/api/v4/live/setup_watch_queue/${id}/`,
+        onSuccess: summ_data => {
+          setWatchQueue(summ_data.api_response.wq_id);
+        },
+        onFailure: () => {
+          setLiveStatus('queued');
         }
       });
     },
@@ -816,7 +829,7 @@ function WrappedSubmissionDetail() {
       });
     } else if (
       loadTrigger >= lastSuccessfulTrigger + OUTSTANDING_TRIGGER_COUNT &&
-      (!outstanding || loadTrigger % OUTSTANDING_TRIGGER_COUNT === 0)
+      loadTrigger % OUTSTANDING_TRIGGER_COUNT === 0
     ) {
       // eslint-disable-next-line no-console
       console.debug('LIVE :: Finding out oustanding services...');
@@ -824,7 +837,33 @@ function WrappedSubmissionDetail() {
       apiCall({
         url: `/api/v4/live/outstanding_services/${id}/`,
         onSuccess: api_data => {
+          let newLiveStatus: 'processing' | 'rescheduled' | 'queued' = 'processing' as 'processing';
+          // Set live status based on outstanding services output
+          if (api_data.api_response === null) {
+            newLiveStatus = 'rescheduled' as 'rescheduled';
+          } else if (Object.keys(api_data.api_response).length === 0) {
+            newLiveStatus = 'queued' as 'queued';
+          }
+
           setOutstanding(api_data.api_response);
+          setLiveStatus(newLiveStatus);
+
+          // Maybe the submission completed in between two checks
+          if (liveStatus !== 'processing' && newLiveStatus !== 'processing') {
+            // eslint-disable-next-line no-console
+            console.debug('LIVE :: Checking if the submission is completed...');
+            apiCall({
+              url: `/api/v4/submission/${id}/`,
+              onSuccess: submission_api_data => {
+                if (submission_api_data.api_response.state === 'completed') {
+                  if (loadInterval) clearInterval(loadInterval);
+                  setLoadInterval(null);
+                  setOutstanding(null);
+                  setSubmission(parseSubmissionErrors(submission_api_data.api_response));
+                }
+              }
+            });
+          }
         }
       });
     }
@@ -844,70 +883,51 @@ function WrappedSubmissionDetail() {
         text={t('delete.text')}
         waiting={waitingDialog}
       />
-      <Snackbar
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        open={outstanding !== null}
-        key="outstanding"
-        style={{ top: theme.spacing(8), zIndex: 100 }}
-      >
-        {outstanding &&
-          (Object.keys(outstanding).length > 0 ? (
-            <Alert
-              elevation={6}
-              severity="info"
-              style={{ textAlign: 'left' }}
-              action={
-                <IconButton
-                  aria-label="close"
-                  color="inherit"
-                  size="small"
-                  onClick={resetOutstanding}
-                  style={{ alignSelf: 'start', margin: '6px 6px 0 0' }}
-                >
-                  <CloseIcon fontSize="inherit" />
-                </IconButton>
-              }
-            >
-              <span style={{ fontWeight: 500, textAlign: 'left' }}>{t('outstanding.title')}</span>
-              <Grid container style={{ marginTop: theme.spacing(1) }}>
+      {outstanding && Object.keys(outstanding).length > 0 && (
+        <Snackbar
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+          open={outstanding !== null}
+          key="outstanding"
+          style={{ top: theme.spacing(8), zIndex: 100 }}
+        >
+          <Alert
+            elevation={6}
+            severity="info"
+            style={{ textAlign: 'left' }}
+            action={
+              <IconButton
+                aria-label="close"
+                color="inherit"
+                size="small"
+                onClick={resetOutstanding}
+                style={{ alignSelf: 'start' }}
+              >
+                <CloseIcon fontSize="inherit" />
+              </IconButton>
+            }
+          >
+            <span style={{ fontWeight: 500, textAlign: 'left' }}>{t('outstanding.title')}</span>
+            <Grid container style={{ marginTop: theme.spacing(1) }}>
+              <Grid item xs={6}>
+                <b>{t('outstanding.services')}</b>
+              </Grid>
+              <Grid item xs={6}>
+                <b>{t('outstanding.files')}</b>
+              </Grid>
+            </Grid>
+            {Object.keys(outstanding).map(service => (
+              <Grid key={service} container>
                 <Grid item xs={6}>
-                  <b>{t('outstanding.services')}</b>
+                  <b>{service}</b>
                 </Grid>
                 <Grid item xs={6}>
-                  <b>{t('outstanding.files')}</b>
+                  {outstanding[service]}
                 </Grid>
               </Grid>
-              {Object.keys(outstanding).map(service => (
-                <Grid key={service} container>
-                  <Grid item xs={6}>
-                    <b>{service}</b>
-                  </Grid>
-                  <Grid item xs={6}>
-                    {outstanding[service]}
-                  </Grid>
-                </Grid>
-              ))}
-            </Alert>
-          ) : (
-            <Alert
-              elevation={6}
-              severity="error"
-              action={
-                <IconButton
-                  aria-label="close"
-                  color="inherit"
-                  size="small"
-                  onClick={resetOutstanding}
-                  style={{ alignSelf: 'start', margin: '6px 6px 0 0' }}
-                >
-                  <CloseIcon fontSize="inherit" />
-                </IconButton>
-              }
-            >
-              <div style={{ textAlign: 'left' }}>{t('outstanding.error')}</div>
-            </Alert>
-          ))}
-      </Snackbar>
+            ))}
+          </Alert>
+        </Snackbar>
+      )}
       <div style={{ textAlign: 'left' }}>
         {c12nDef.enforce && (
           <div style={{ paddingBottom: sp4 }}>
@@ -939,28 +959,40 @@ function WrappedSubmissionDetail() {
               {socket && (
                 <div
                   style={{
+                    display: 'flex',
+                    color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark,
                     paddingBottom: theme.spacing(3),
-                    paddingTop: theme.spacing(2),
-                    color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark
+                    paddingTop: theme.spacing(2)
                   }}
                 >
-                  <PlayCircleOutlineIcon
-                    style={{
-                      height: theme.spacing(2),
-                      width: theme.spacing(2),
-                      verticalAlign: 'sub',
-                      marginRight: theme.spacing(1)
-                    }}
-                  />
-                  {t('live_mode')}
-                  <LinearProgress />
+                  {liveStatus === 'processing' ? (
+                    <PlayCircleOutlineIcon
+                      style={{
+                        height: theme.spacing(3),
+                        width: theme.spacing(3),
+                        marginRight: theme.spacing(1)
+                      }}
+                    />
+                  ) : (
+                    <PauseCircleOutlineOutlinedIcon
+                      style={{
+                        height: theme.spacing(3),
+                        width: theme.spacing(3),
+                        marginRight: theme.spacing(1)
+                      }}
+                    />
+                  )}
+                  <div style={{ width: '100%' }}>
+                    {t(liveStatus)}
+                    <LinearProgress />
+                  </div>
                 </div>
               )}
             </Grid>
             <Grid item xs={12} sm={6} md={4} style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 0 }}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 {submission ? (
-                  submission.state === 'completed' && (
+                  submission.state === 'completed' ? (
                     <div style={{ display: 'flex' }}>
                       {currentUser.roles.includes('submission_delete') && (
                         <Tooltip title={t('delete')}>
@@ -1069,6 +1101,20 @@ function WrappedSubmissionDetail() {
                         </IconButton>
                       </Tooltip>
                     </div>
+                  ) : (
+                    currentUser.roles.includes('submission_delete') && (
+                      <Tooltip title={t('delete')}>
+                        <IconButton
+                          onClick={() => setDeleteDialog(true)}
+                          style={{
+                            color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                          }}
+                          size="large"
+                        >
+                          <RemoveCircleOutlineOutlinedIcon />
+                        </IconButton>
+                      </Tooltip>
+                    )
                   )
                 ) : (
                   <div style={{ display: 'inline-flex' }}>
@@ -1084,83 +1130,87 @@ function WrappedSubmissionDetail() {
                   </div>
                 )}
 
-                <div
-                  style={{
-                    width: '164px',
-                    marginTop: '8px'
-                  }}
-                >
-                  {submission ? (
-                    submission.state === 'completed' && (
+                {!(submission && submission.state !== 'completed') && (
+                  <div
+                    style={{
+                      width: '164px',
+                      marginTop: '8px'
+                    }}
+                  >
+                    {submission ? (
+                      submission.state === 'completed' && (
+                        <>
+                          <VerdictBar verdicts={submission.verdict} />
+                          {currentUser.roles.includes('submission_manage') && (
+                            <Grid container>
+                              <Grid item xs={5} style={{ textAlign: 'left' }}>
+                                <Tooltip
+                                  title={t(
+                                    `verdict.${
+                                      submission.verdict.malicious.indexOf(currentUser.username) !== -1 ? 'is' : 'set'
+                                    }.malicious`
+                                  )}
+                                >
+                                  <IconButton size="small" onClick={() => setVerdict('malicious')}>
+                                    <BugReportOutlinedIcon
+                                      style={{
+                                        color:
+                                          submission.verdict.malicious.indexOf(currentUser.username) !== -1
+                                            ? theme.palette.error.dark
+                                            : null
+                                      }}
+                                    />
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
+                              <Grid item xs={2} />
+                              <Grid item xs={5} style={{ textAlign: 'right' }}>
+                                <Tooltip
+                                  title={t(
+                                    `verdict.${
+                                      submission.verdict.non_malicious.indexOf(currentUser.username) !== -1
+                                        ? 'is'
+                                        : 'set'
+                                    }.non_malicious`
+                                  )}
+                                >
+                                  <IconButton size="small" onClick={() => setVerdict('non_malicious')}>
+                                    <VerifiedUserOutlinedIcon
+                                      style={{
+                                        color:
+                                          submission.verdict.non_malicious.indexOf(currentUser.username) !== -1
+                                            ? theme.palette.success.dark
+                                            : null
+                                      }}
+                                    />
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
+                            </Grid>
+                          )}
+                        </>
+                      )
+                    ) : (
                       <>
-                        <VerdictBar verdicts={submission.verdict} />
-                        {currentUser.roles.includes('submission_manage') && (
-                          <Grid container>
-                            <Grid item xs={5} style={{ textAlign: 'left' }}>
-                              <Tooltip
-                                title={t(
-                                  `verdict.${
-                                    submission.verdict.malicious.indexOf(currentUser.username) !== -1 ? 'is' : 'set'
-                                  }.malicious`
-                                )}
-                              >
-                                <IconButton size="small" onClick={() => setVerdict('malicious')}>
-                                  <BugReportOutlinedIcon
-                                    style={{
-                                      color:
-                                        submission.verdict.malicious.indexOf(currentUser.username) !== -1
-                                          ? theme.palette.error.dark
-                                          : null
-                                    }}
-                                  />
-                                </IconButton>
-                              </Tooltip>
-                            </Grid>
-                            <Grid item xs={2} />
-                            <Grid item xs={5} style={{ textAlign: 'right' }}>
-                              <Tooltip
-                                title={t(
-                                  `verdict.${
-                                    submission.verdict.non_malicious.indexOf(currentUser.username) !== -1 ? 'is' : 'set'
-                                  }.non_malicious`
-                                )}
-                              >
-                                <IconButton size="small" onClick={() => setVerdict('non_malicious')}>
-                                  <VerifiedUserOutlinedIcon
-                                    style={{
-                                      color:
-                                        submission.verdict.non_malicious.indexOf(currentUser.username) !== -1
-                                          ? theme.palette.success.dark
-                                          : null
-                                    }}
-                                  />
-                                </IconButton>
-                              </Tooltip>
-                            </Grid>
-                          </Grid>
-                        )}
+                        <Skeleton variant="rectangular" style={{ height: '15px', width: '100%' }} />
+                        <div style={{ display: 'inline-flex', width: '100%', justifyContent: 'space-between' }}>
+                          <Skeleton
+                            variant="circular"
+                            height="1.5rem"
+                            width="1.5rem"
+                            style={{ margin: theme.spacing(0.5) }}
+                          />
+                          <Skeleton
+                            variant="circular"
+                            height="1.5rem"
+                            width="1.5rem"
+                            style={{ margin: theme.spacing(0.5) }}
+                          />
+                        </div>
                       </>
-                    )
-                  ) : (
-                    <>
-                      <Skeleton variant="rectangular" style={{ height: '15px', width: '100%' }} />
-                      <div style={{ display: 'inline-flex', width: '100%', justifyContent: 'space-between' }}>
-                        <Skeleton
-                          variant="circular"
-                          height="1.5rem"
-                          width="1.5rem"
-                          style={{ margin: theme.spacing(0.5) }}
-                        />
-                        <Skeleton
-                          variant="circular"
-                          height="1.5rem"
-                          width="1.5rem"
-                          style={{ margin: theme.spacing(0.5) }}
-                        />
-                      </div>
-                    </>
-                  )}
-                </div>
+                    )}
+                  </div>
+                )}
               </div>
             </Grid>
           </Grid>

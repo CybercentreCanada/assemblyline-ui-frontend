@@ -163,7 +163,7 @@ function Search({ index }: SearchProps) {
 
   useEffect(() => {
     // On location.search change we need to change the query object and reset the results
-    setQuery(new SimpleSearchQuery(location.search, `rows=${pageSize}&offset=0`));
+    setQuery(new SimpleSearchQuery(location.search, `rows=${pageSize}&offset=0&filters=NOT%20to_be_deleted:true`));
     resetResults();
   }, [location.search, pageSize]);
 
