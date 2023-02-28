@@ -106,7 +106,7 @@ const Submit: React.FC<any> = () => {
   const urlHashTitle = configuration.ui.allow_url_submissions ? 'URL/SHA256' : 'SHA256';
   const urlInputText = urlHashTitle + t('urlHash.input_suffix');
   const [urlHash, setUrlHash] = useState(state ? state.hash : '');
-  const [submissionMetadata, setSubmissionMetadata] = useState(state ? state.metadata : {});
+  const [submissionMetadata, setSubmissionMetadata] = useState(state ? state.metadata : undefined);
   const [urlHashHasError, setUrlHashHasError] = useState(false);
   const [value, setValue] = useState(state ? state.tabContext : '0');
   const classification = useState(state ? state.c12n : null)[0];
@@ -314,7 +314,7 @@ const Submit: React.FC<any> = () => {
     closeSnackbar();
     setUrlHashHasError(false);
     setUrlHash(event.target.value);
-    setSubmissionMetadata(null);
+    setSubmissionMetadata(undefined);
   }
 
   function analyseUrlHash() {
@@ -555,7 +555,7 @@ const Submit: React.FC<any> = () => {
                     {t('options.submission.metadata')}
                   </Typography>
                   <Tooltip title={t('options.submission.metadata.clear')}>
-                    <IconButton onClick={() => setSubmissionMetadata({})}>
+                    <IconButton onClick={() => setSubmissionMetadata(undefined)}>
                       <ClearIcon />
                     </IconButton>
                   </Tooltip>
