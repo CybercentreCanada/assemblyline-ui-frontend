@@ -4,16 +4,26 @@ import ChromeReaderModeOutlinedIcon from '@mui/icons-material/ChromeReaderModeOu
 import CloseIcon from '@mui/icons-material/Close';
 import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined';
 import PauseCircleOutlineOutlinedIcon from '@mui/icons-material/PauseCircleOutlineOutlined';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import OndemandVideoOutlinedIcon from '@mui/icons-material/OndemandVideoOutlined';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
+import RepeatOutlinedIcon from '@mui/icons-material/RepeatOutlined';
 import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
+import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import {
   Alert,
   Grid,
   IconButton,
   LinearProgress,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Popover,
   Skeleton,
   Snackbar,
   Tooltip,
@@ -106,6 +116,7 @@ function WrappedSubmissionDetail() {
   const [lastSuccessfulTrigger, setLastSuccessfulTrigger] = useState(0);
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [waitingDialog, setWaitingDialog] = useState(false);
+  const [resubmitAnchor, setResubmitAnchor] = useState(null);
   const { apiCall } = useMyAPI();
   const sp4 = theme.spacing(4);
   const { showSuccessMessage } = useMySnackbar();
@@ -114,6 +125,8 @@ function WrappedSubmissionDetail() {
   const { setHighlightMap } = useHighlighter();
   const { setGlobalDrawer, globalDrawerOpened } = useDrawer();
   const [baseFiles, setBaseFiles] = useState([]);
+
+  const popoverOpen = Boolean(resubmitAnchor);
 
   const updateLiveSumary = (results: object) => {
     const tempSummary = summary !== null ? { ...summary } : { tags: {}, heuristics: {}, attack_matrix: {} };
@@ -477,8 +490,29 @@ function WrappedSubmissionDetail() {
         }
       });
     }
+    setResubmitAnchor(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resetLiveMode, showSuccessMessage, submission, t]);
+
+  const resubmitDynamic = useCallback(() => {
+    if (submission != null) {
+      apiCall({
+        url: `/api/v4/submit/dynamic/${submission.files[0].sha256}/?copy_sid=${submission.sid}`,
+        onSuccess: api_data => {
+          showSuccessMessage(t('submit.success'));
+          resetLiveMode();
+          setSubmission(null);
+          setSummary(null);
+          setTree(null);
+          setTimeout(() => {
+            navigate(`/submission/detail/${api_data.api_response.sid}`);
+          }, 500);
+        }
+      });
+    }
+    setResubmitAnchor(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showSuccessMessage, submission, t]);
 
   const replay = useCallback(() => {
     if (submission != null && systemConfig.ui.allow_replay) {
@@ -991,11 +1025,68 @@ function WrappedSubmissionDetail() {
                         </Tooltip>
                       )}
                       {currentUser.roles.includes('submission_create') && (
-                        <Tooltip title={t('resubmit')}>
-                          <IconButton onClick={resubmit} size="large">
-                            <ReplayOutlinedIcon />
-                          </IconButton>
-                        </Tooltip>
+                        <>
+                          <Tooltip title={t('resubmit')}>
+                            <IconButton onClick={event => setResubmitAnchor(event.currentTarget)} size="large">
+                              <ReplayOutlinedIcon />
+                              {popoverOpen ? (
+                                <ExpandLessIcon
+                                  style={{ position: 'absolute', right: 0, bottom: 10, fontSize: 'medium' }}
+                                />
+                              ) : (
+                                <ExpandMoreIcon
+                                  style={{ position: 'absolute', right: 0, bottom: 10, fontSize: 'medium' }}
+                                />
+                              )}
+                            </IconButton>
+                          </Tooltip>
+                          <Popover
+                            open={popoverOpen}
+                            anchorEl={resubmitAnchor}
+                            onClose={() => setResubmitAnchor(null)}
+                            anchorOrigin={{
+                              vertical: 'bottom',
+                              horizontal: 'right'
+                            }}
+                            transformOrigin={{
+                              vertical: 'top',
+                              horizontal: 'right'
+                            }}
+                          >
+                            <List disablePadding>
+                              <ListItem
+                                button
+                                component={Link}
+                                to="/submit"
+                                state={{
+                                  hash: submission.files[0].sha256,
+                                  tabContext: '1',
+                                  c12n: submission.classification,
+                                  metadata: submission.metadata
+                                }}
+                                dense
+                                onClick={() => setResubmitAnchor(null)}
+                              >
+                                <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
+                                  <TuneOutlinedIcon />
+                                </ListItemIcon>
+                                <ListItemText primary={t('resubmit.modify')} />
+                              </ListItem>
+                              <ListItem button dense onClick={resubmitDynamic}>
+                                <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
+                                  <OndemandVideoOutlinedIcon />
+                                </ListItemIcon>
+                                <ListItemText primary={t('resubmit.dynamic')} />
+                              </ListItem>
+                              <ListItem button dense onClick={resubmit}>
+                                <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
+                                  <RepeatOutlinedIcon />
+                                </ListItemIcon>
+                                <ListItemText primary={t('resubmit.carbon_copy')} />
+                              </ListItem>
+                            </List>
+                          </Popover>
+                        </>
                       )}
                       {systemConfig.ui.allow_replay && currentUser.roles.includes('replay_trigger') && (
                         <Tooltip title={t('replay')}>
