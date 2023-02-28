@@ -99,7 +99,13 @@ const UserProfile = () => {
               (a, i) =>
                 a.icon && (
                   <Tooltip key={`buttonmenu-${i}`} title={t(a.i18nKey)}>
-                    <IconButton component={Link} color="inherit" to={a.route} size="large">
+                    <IconButton
+                      component={Link}
+                      color="inherit"
+                      to={a.route}
+                      size="large"
+                      onClick={() => setOpen(false)}
+                    >
                       {a.icon}
                     </IconButton>
                   </Tooltip>
