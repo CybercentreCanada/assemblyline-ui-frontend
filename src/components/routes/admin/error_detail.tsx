@@ -5,7 +5,7 @@ import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
 import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
-import { Card, Grid, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
+import { Card, Grid, IconButton, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCenter from 'commons/components/pages/PageCenter';
@@ -66,6 +66,7 @@ export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
   const { apiCall } = useMyAPI();
   const { key, type, source, name } = useParams<ParamProps>();
   const { user: currentUser } = useAppUser<CustomUser>();
+  const downSM = useMediaQuery(theme.breakpoints.down('sm'));
 
   const errorMap = {
     'MAX DEPTH REACHED': <PanToolOutlinedIcon style={{ color: theme.palette.action.active }} />,
@@ -93,9 +94,15 @@ export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
   return currentUser.is_admin ? (
     <PageCenter margin={!key && !type && !name && !source ? 2 : 4} width="100%">
       {error && (
-        <div style={{ paddingLeft: theme.spacing(2), paddingRight: theme.spacing(2), textAlign: 'left' }}>
+        <div
+          style={{
+            paddingLeft: theme.spacing(downSM ? 0 : 2),
+            paddingRight: theme.spacing(downSM ? 0 : 2),
+            textAlign: 'left'
+          }}
+        >
           <Grid container spacing={2}>
-            <Grid item xs={6} sm={8}>
+            <Grid item xs={12} sm={8}>
               <Typography variant="h5">{error.response.service_name}</Typography>
               <Typography variant="caption">
                 {error.response.service_version !== 0 &&
@@ -104,7 +111,7 @@ export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
                 {error.response.service_tool_version && ` (${error.response.service_tool_version})`}
               </Typography>
             </Grid>
-            <Grid item xs={6} sm={4}>
+            <Grid item xs={12} sm={4}>
               <div style={{ display: 'inline-block', textAlign: 'start' }}>
                 <Typography component="div" variant="body1">
                   <Moment fromNow locale={i18n.language}>
@@ -116,11 +123,11 @@ export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
                 </Typography>
               </div>
             </Grid>
-            <Grid item xs={6} sm={8}>
+            <Grid item xs={12} sm={8}>
               <span style={{ verticalAlign: 'middle' }}>{errorMap[error.type]}&nbsp;</span>
               <span style={{ verticalAlign: 'middle' }}>{t(`type.${error.type}`)}</span>
             </Grid>
-            <Grid item xs={6} sm={4} style={{ alignSelf: 'center' }}>
+            <Grid item xs={12} sm={4} style={{ alignSelf: 'center' }}>
               <span style={{ verticalAlign: 'middle' }}>{t(`fail.${error.response.status}`)}</span>
             </Grid>
             <Grid item xs={12}>
