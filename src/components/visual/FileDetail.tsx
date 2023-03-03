@@ -279,7 +279,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
               {file ? fileName : <Skeleton style={{ width: '10rem' }} />}
             </Typography>
           </Grid>
-          <Grid item xs={12} sm style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 0 }}>
+          <Grid item xs={12} sm={12} md={4} style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 0 }}>
             {file ? (
               <>
                 <Tooltip title={t('related')}>
