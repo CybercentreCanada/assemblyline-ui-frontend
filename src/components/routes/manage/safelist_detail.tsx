@@ -208,10 +208,10 @@ const SafelistDetail = ({ safelist_id, close }: SafelistDetailProps) => {
                 {safelist ? safelist_id || id : <Skeleton style={{ width: '10rem' }} />}
               </Typography>
             </Grid>
-            <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
+            <Grid item xs={12} sm style={{ textAlign: 'right', flexGrow: 0 }}>
               {safelist ? (
                 <>
-                  <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'center' }}>
+                  <div style={{ display: 'flex', marginBottom: theme.spacing(1) }}>
                     {currentUser.roles.includes('submission_view') && (
                       <Tooltip title={t('usage')}>
                         <IconButton
