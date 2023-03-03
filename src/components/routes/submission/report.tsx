@@ -739,65 +739,69 @@ export default function SubmissionReport() {
                 </>
               )}
 
-              <Grid item xs={12}>
-                <div style={{ height: theme.spacing(2) }} />
-              </Grid>
+              {(!report || report.file_info) && (
+                <>
+                  <Grid item xs={12}>
+                    <div style={{ height: theme.spacing(2) }} />
+                  </Grid>
 
-              <Grid item xs={4} sm={3} lg={2}>
-                <span style={{ fontWeight: 500 }}>{t('file.type')}</span>
-              </Grid>
-              <Grid item xs={8} sm={9} lg={10}>
-                {report ? report.file_info.type : <Skeleton />}
-              </Grid>
+                  <Grid item xs={4} sm={3} lg={2}>
+                    <span style={{ fontWeight: 500 }}>{t('file.type')}</span>
+                  </Grid>
+                  <Grid item xs={8} sm={9} lg={10}>
+                    {report ? report.file_info.type : <Skeleton />}
+                  </Grid>
 
-              <Grid item xs={4} sm={3} lg={2}>
-                <span style={{ fontWeight: 500 }}>{t('file.mime')}</span>
-              </Grid>
-              <Grid item xs={8} sm={9} lg={10}>
-                {report ? report.file_info.mime : <Skeleton />}
-              </Grid>
+                  <Grid item xs={4} sm={3} lg={2}>
+                    <span style={{ fontWeight: 500 }}>{t('file.mime')}</span>
+                  </Grid>
+                  <Grid item xs={8} sm={9} lg={10}>
+                    {report ? report.file_info.mime : <Skeleton />}
+                  </Grid>
 
-              <Grid item xs={4} sm={3} lg={2}>
-                <span style={{ fontWeight: 500 }}>{t('file.magic')}</span>
-              </Grid>
-              <Grid item xs={8} sm={9} lg={10}>
-                {report ? report.file_info.magic : <Skeleton />}
-              </Grid>
+                  <Grid item xs={4} sm={3} lg={2}>
+                    <span style={{ fontWeight: 500 }}>{t('file.magic')}</span>
+                  </Grid>
+                  <Grid item xs={8} sm={9} lg={10}>
+                    {report ? report.file_info.magic : <Skeleton />}
+                  </Grid>
 
-              <Grid item xs={4} sm={3} lg={2}>
-                <span style={{ fontWeight: 500 }}>{t('file.size')}</span>
-              </Grid>
-              <Grid item xs={8} sm={9} lg={10}>
-                {report ? report.file_info.size : <Skeleton />}
-              </Grid>
+                  <Grid item xs={4} sm={3} lg={2}>
+                    <span style={{ fontWeight: 500 }}>{t('file.size')}</span>
+                  </Grid>
+                  <Grid item xs={8} sm={9} lg={10}>
+                    {report ? report.file_info.size : <Skeleton />}
+                  </Grid>
 
-              <Grid item xs={4} sm={3} lg={2}>
-                <span style={{ fontWeight: 500 }}>{t('file.md5')}</span>
-              </Grid>
-              <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                {report ? report.file_info.md5 : <Skeleton />}
-              </Grid>
+                  <Grid item xs={4} sm={3} lg={2}>
+                    <span style={{ fontWeight: 500 }}>{t('file.md5')}</span>
+                  </Grid>
+                  <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+                    {report ? report.file_info.md5 : <Skeleton />}
+                  </Grid>
 
-              <Grid item xs={4} sm={3} lg={2}>
-                <span style={{ fontWeight: 500 }}>{t('file.sha1')}</span>
-              </Grid>
-              <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                {report ? report.file_info.sha1 : <Skeleton />}
-              </Grid>
+                  <Grid item xs={4} sm={3} lg={2}>
+                    <span style={{ fontWeight: 500 }}>{t('file.sha1')}</span>
+                  </Grid>
+                  <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+                    {report ? report.file_info.sha1 : <Skeleton />}
+                  </Grid>
 
-              <Grid item xs={4} sm={3} lg={2}>
-                <span style={{ fontWeight: 500 }}>{t('file.sha256')}</span>
-              </Grid>
-              <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                {report ? report.file_info.sha256 : <Skeleton />}
-              </Grid>
+                  <Grid item xs={4} sm={3} lg={2}>
+                    <span style={{ fontWeight: 500 }}>{t('file.sha256')}</span>
+                  </Grid>
+                  <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+                    {report ? report.file_info.sha256 : <Skeleton />}
+                  </Grid>
 
-              <Grid item xs={4} sm={3} lg={2}>
-                <span style={{ fontWeight: 500 }}>{t('file.ssdeep')}</span>
-              </Grid>
-              <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                {report ? report.file_info.ssdeep : <Skeleton />}
-              </Grid>
+                  <Grid item xs={4} sm={3} lg={2}>
+                    <span style={{ fontWeight: 500 }}>{t('file.ssdeep')}</span>
+                  </Grid>
+                  <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+                    {report ? report.file_info.ssdeep : <Skeleton />}
+                  </Grid>
+                </>
+              )}
             </Grid>
           </div>
         </div>

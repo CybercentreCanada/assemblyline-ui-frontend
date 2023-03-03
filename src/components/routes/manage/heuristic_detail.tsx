@@ -171,7 +171,7 @@ const HeuristicDetail = ({ heur_id }: HeuristicDetailProps) => {
               </Typography>
             </Grid>
             {currentUser.roles.includes('submission_view') && (
-              <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
+              <Grid item xs={12} sm style={{ textAlign: 'right', flexGrow: 0 }}>
                 {heuristic ? (
                   <Tooltip title={t('usage')}>
                     <IconButton

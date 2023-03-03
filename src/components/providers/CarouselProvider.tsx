@@ -39,7 +39,8 @@ const useStyles = makeStyles(theme => ({
     display: 'none',
     '@media (min-height:500px)': {
       display: 'block'
-    }
+    },
+    textAlign: 'center'
   },
   textContainer: {
     maxWidth: '90vh'
@@ -144,10 +145,10 @@ const useStyles = makeStyles(theme => ({
   },
   button: {
     '&:hover': {
-      backgroundColor: alpha(theme.palette.secondary.main, 0.2)
+      backgroundColor: alpha(theme.palette.secondary.main, 0.5)
     },
     cursor: 'pointer',
-    backgroundColor: alpha(theme.palette.secondary.main, 0.1),
+    backgroundColor: alpha(theme.palette.secondary.main, 0.3),
     color: 'white',
     margin: theme.spacing(2)
   },
@@ -318,13 +319,13 @@ function CarouselProvider(props: CarouselProviderProps) {
                 <div id="carousel-image" className={classes.carousel} tabIndex={-1}>
                   <div className={classes.spacer} />
                   <div className={classes.textContainer} style={{ paddingBottom: '4px' }}>
-                    <Typography className={classes.text} variant="body2" noWrap>
+                    <Typography className={classes.text} variant="body2">
                       {images[index].name}
                     </Typography>
                   </div>
                   <Image alt={images[index].name} src={images[index].imgSrc} />
                   <div className={classes.textContainer} style={{ paddingTop: '4px' }}>
-                    <Typography className={classes.text} variant="body2" noWrap>
+                    <Typography className={classes.text} variant="body2">
                       {images[index].description}
                     </Typography>
                   </div>

@@ -2,7 +2,18 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
-import { Button, Collapse, Divider, Grid, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import {
+  Box,
+  Button,
+  Collapse,
+  Divider,
+  Grid,
+  IconButton,
+  Skeleton,
+  Tooltip,
+  Typography,
+  useTheme
+} from '@mui/material';
 import Alert from '@mui/material/Alert';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
@@ -204,7 +215,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                     {t('alert_id')}
                   </Grid>
                   <Grid item xs={9} sm={10} md={8}>
-                    {item ? item.alert_id : <Skeleton />}
+                    <span style={{ wordBreak: 'break-word' }}>{item ? item.alert_id : <Skeleton />}</span>
                   </Grid>
                   {/* Alert Type */}
                   <Grid item xs={3} sm={2} md={4}>
@@ -327,16 +338,22 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
           <Divider />
           <div className={classes.sectionContent}>
             <Grid container>
-              <Grid item xs={12} style={{ marginBottom: theme.spacing(1) }}>
-                <span>{item ? item.file.name : <SkeletonInline />}</span>
-                <span style={{ marginLeft: theme.spacing(1), marginRight: theme.spacing(1), wordBreak: 'break-word' }}>
+              <Grid
+                item
+                xs={12}
+                style={{ marginBottom: theme.spacing(1), display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}
+              >
+                <div style={{ marginRight: theme.spacing(1), wordBreak: 'break-word' }}>
+                  {item ? item.file.name : <SkeletonInline />}
+                </div>
+                <div style={{ marginRight: theme.spacing(1), wordBreak: 'break-word' }}>
                   {item ? (
                     <CustomChip label={item.file.type} variant="outlined" size="small" />
                   ) : (
                     <ChipSkeletonInline />
                   )}
-                </span>
-                <Typography variant="caption">
+                </div>
+                <Typography variant="caption" component={Box}>
                   {item ? `${item.file.size} (${(item.file.size / 1024).toFixed(2)} Kb)` : <SkeletonInline />}
                 </Typography>
               </Grid>

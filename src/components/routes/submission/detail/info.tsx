@@ -1,8 +1,7 @@
-import { Collapse, Divider, Grid, Typography, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import CheckBoxOutlineBlankOutlinedIcon from '@mui/icons-material/CheckBoxOutlineBlankOutlined';
 import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
-import { Skeleton } from '@mui/material';
+import { Collapse, Divider, Grid, Skeleton, Typography, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import Priority from 'components/visual/Priority';
 import Verdict from 'components/visual/Verdict';
 import React, { Fragment, useMemo } from 'react';

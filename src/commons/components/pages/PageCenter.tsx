@@ -31,7 +31,7 @@ const PageCenter = ({
         flexDirection: 'column',
         margin: '0 auto 0 auto',
         maxWidth,
-        [theme.breakpoints.down('sm')]: {
+        [theme.breakpoints.down('md')]: {
           maxWidth: '100%'
         }
       })}

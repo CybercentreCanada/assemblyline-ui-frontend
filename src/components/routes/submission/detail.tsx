@@ -989,7 +989,7 @@ function WrappedSubmissionDetail() {
                 </div>
               )}
             </Grid>
-            <Grid item xs={12} sm={6} md={4} style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 0 }}>
+            <Grid item xs={12} sm={12} md={4} style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 0 }}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 {submission ? (
                   submission.state === 'completed' ? (
