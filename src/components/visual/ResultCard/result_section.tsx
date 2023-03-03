@@ -50,11 +50,15 @@ const ATTACK_ICON = (
 const useStyles = makeStyles(theme => ({
   section_title: {
     display: 'flex',
-    alignItems: 'baseline',
+    alignItems: 'center',
     '&:hover': {
       backgroundColor: theme.palette.action.hover,
       cursor: 'pointer'
-    }
+    },
+    minHeight: theme.spacing(4.5),
+    marginLeft: theme.spacing(-1),
+    padding: theme.spacing(0.25, 1),
+    borderRadius: theme.spacing(0.5)
   },
   printable_section_title: {
     display: 'flex',
