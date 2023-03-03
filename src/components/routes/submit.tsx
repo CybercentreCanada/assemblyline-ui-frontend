@@ -441,7 +441,7 @@ const Submit: React.FC<any> = () => {
                   <>
                     {configuration.ui.allow_malicious_hinting ? (
                       <div style={{ padding: sp1 }}>
-                        <Tooltip title={t('malicious.tooltip')}>
+                        <Tooltip title={t('malicious.tooltip')} placement="top">
                           <FormControlLabel
                             control={
                               <Switch
