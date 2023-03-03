@@ -232,7 +232,7 @@ const WrappedSourceDetailDrawer = ({ service, base, close, generatesSignatures }
               </Typography>
             </Grid>
             {base && (
-              <Grid item xs style={{ textAlign: 'right', flexGrow: 1 }}>
+              <Grid item xs={12} sm style={{ textAlign: 'right', flexGrow: 1 }}>
                 {generatesSignatures && (
                   <Tooltip title={t('view_signatures')}>
                     <IconButton
@@ -506,8 +506,8 @@ const ServiceDetail = ({ service, sources, generatesSignatures }) => {
   return useMemo(
     () => (
       <div style={{ paddingTop: theme.spacing(2) }}>
-        <Grid container>
-          <Grid item xs={9} style={{ alignSelf: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
             <Typography
               variant="h6"
               className={classes.title}
@@ -517,8 +517,8 @@ const ServiceDetail = ({ service, sources, generatesSignatures }) => {
             >
               {service}
             </Typography>
-          </Grid>
-          <Grid item xs={3} style={{ textAlign: 'right', paddingRight: '8px' }}>
+          </div>
+          <div style={{ paddingRight: '8px' }}>
             <Tooltip title={t('add_source')}>
               <IconButton
                 style={{
@@ -563,8 +563,8 @@ const ServiceDetail = ({ service, sources, generatesSignatures }) => {
                 </IconButton>
               </Tooltip>
             )}
-          </Grid>
-        </Grid>
+          </div>
+        </div>
         <Divider />
         <Collapse in={open} timeout="auto">
           <div>
