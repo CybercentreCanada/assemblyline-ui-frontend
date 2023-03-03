@@ -168,8 +168,8 @@ function DrawerProvider(props: DrawerProviderProps) {
                 </div>
                 <div
                   style={{
-                    paddingLeft: theme.spacing(2),
-                    paddingRight: theme.spacing(2)
+                    paddingLeft: theme.spacing(SMWidth ? 1 : 2),
+                    paddingRight: theme.spacing(SMWidth ? 1 : 2)
                   }}
                 >
                   {globalDrawer}
