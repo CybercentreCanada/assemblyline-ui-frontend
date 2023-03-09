@@ -6,7 +6,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 export const GD_EVENT_PREVENTED = 'GlobalDrawerClose.Prevented';
 export const GD_EVENT_PROCEED = 'GlobalDrawerClose.Proceed';
 const XLWidth = '45vw';
-const LGWidth = '85%';
+const LGWidth = '75%';
 const MDWidth = '85%';
 const SMWidth = '100%';
 
@@ -49,7 +49,7 @@ const useStyles = makeStyles(theme => ({
     [theme.breakpoints.only('md')]: {
       width: MDWidth
     },
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       width: SMWidth
     }
   }

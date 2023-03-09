@@ -1,9 +1,8 @@
-import { Box, Collapse, Divider, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
-import { Skeleton } from '@mui/material';
+import { Collapse, Divider, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';
@@ -120,14 +119,14 @@ const WrappedHeuristic: React.FC<WrappedHeuristicProps> = ({ name, id, sections,
         highlighted ? classes.container_highlight : null
       )}
     >
-      <Box
+      <div
         className={clsx(classes.header, classes[`header_${level}`], highlighted ? classes.highlighted : null)}
         onClick={() => setOpen(!open)}
       >
         <div>
           {name} <span style={{ fontSize: 'small' }}>({id})</span>
         </div>
-        <Box onClick={stopPropagating}>
+        <div onClick={stopPropagating} style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 0 }}>
           <Tooltip title={t('related')}>
             <IconButton
               size="small"
@@ -147,8 +146,8 @@ const WrappedHeuristic: React.FC<WrappedHeuristicProps> = ({ name, id, sections,
               <OpenInNewOutlinedIcon />
             </IconButton>
           </Tooltip>
-        </Box>
-      </Box>
+        </div>
+      </div>
       <Collapse in={open} timeout="auto" style={{ marginRight: theme.spacing(0.5) }} onEnter={() => setRender(true)}>
         {sections &&
           render &&

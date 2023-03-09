@@ -234,7 +234,7 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
               </Typography>
             </Grid>
             {(workflow_id || id) && currentUser.roles.includes('workflow_manage') && (
-              <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
+              <Grid item xs={12} sm style={{ textAlign: 'right', flexGrow: 0 }}>
                 {workflow ? (
                   <Tooltip title={t('remove')}>
                     <IconButton
