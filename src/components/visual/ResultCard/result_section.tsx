@@ -26,6 +26,7 @@ import { OrderedKVBody } from './ordered_kv_body';
 import { ProcessTreeBody } from './process_tree_body';
 import { TblBody } from './table_body';
 import { TextBody } from './text_body';
+import { TimelineBody } from './timeline_body';
 import { URLBody } from './url_body';
 
 const CLIPBOARD_ICON = <AssignmentOutlinedIcon style={{ marginRight: '16px' }} />;
@@ -384,6 +385,8 @@ const WrappedResultSection: React.FC<ResultSectionProps> = ({
                             return <ImageBody body={section.body} printable={printable} />;
                           case 'MULTI':
                             return <MultiBody body={section.body} printable={printable} />;
+                          case 'TIMELINE':
+                            return <TimelineBody body={section.body} />;
                           default:
                             return <InvalidBody />;
                         }
