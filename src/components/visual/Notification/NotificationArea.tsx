@@ -376,6 +376,9 @@ const WrappedNotificationArea = () => {
                   tags: [addVersionTag(n, configuration), addNewServiceTag(n, services2), ...n.tags],
                   _isNew: setIsNew(n)
                 }))
+                .map(n =>
+                  currentUser.is_admin ? n : { ...n, tags: n.tags.filter(tag => !['new', 'current'].includes(tag)) }
+                )
                 .filter(n => n.date_published > new Date(Date.now() - 365 * 24 * 60 * 60 * 1000))
                 .sort((a, b) => b.date_published.valueOf() - a.date_published.valueOf())
             )
