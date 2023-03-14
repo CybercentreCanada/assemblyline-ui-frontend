@@ -38,7 +38,7 @@ const WrappedMultiTypeConfig = ({ config, onAdd, onUpdate, onDelete }: MultiType
 
   const jsonTheme = {
     base00: 'transparent', // Background
-    base01: theme.palette.grey[theme.palette.mode === 'dark' ? 900 : 300], // Add key title + Edit value background
+    base01: theme.palette.grey[theme.palette.mode === 'dark' ? 800 : 300], // Add key title + Edit value background
     base02: theme.palette.grey[theme.palette.mode === 'dark' ? 700 : 400], // Borders and DataType Background
     base03: '#444', // Unused
     base04: theme.palette.grey[theme.palette.mode === 'dark' ? 700 : 400], // Object size and Add key border
