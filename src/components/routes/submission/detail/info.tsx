@@ -69,9 +69,11 @@ const WrappedInfoSection: React.FC<InfoSectionProps> = ({ submission }) => {
                         ...submission.params.services.rescan.filter(
                           word => submission.params.services.selected.indexOf(word) === -1
                         )
-                      ].join(' | ')
+                      ]
+                        .sort((a: string, b: string) => a.localeCompare(b))
+                        .join(' | ')
                     ) : (
-                      submission.params.services.selected.join(' | ')
+                      submission.params.services.selected.sort((a: string, b: string) => a.localeCompare(b)).join(' | ')
                     )
                   ) : (
                     <Skeleton />
