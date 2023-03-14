@@ -136,8 +136,10 @@ const UserProfile = () => {
           >
             <AppUserAvatar alt={user.name} url={user.avatar} email={user.email}>
               {user.name
-                .split(' ', 2)
-                .map(n => n[0].toUpperCase())
+                .split(' ')
+                .filter(w => w !== '')
+                .splice(0, 2)
+                .map(n => (n ? n[0].toUpperCase() : ''))
                 .join('')}
             </AppUserAvatar>
           </IconButton>
@@ -171,8 +173,10 @@ const UserProfile = () => {
                         email={user.email}
                       >
                         {user.name
-                          .split(' ', 2)
-                          .map(n => n[0].toUpperCase())
+                          .split(' ')
+                          .filter(w => w !== '')
+                          .splice(0, 2)
+                          .map(n => (n ? n[0].toUpperCase() : ''))
                           .join('')}
                       </AppAvatar>
                       <Box sx={{ paddingLeft: 2 }}>
