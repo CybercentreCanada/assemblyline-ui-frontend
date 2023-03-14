@@ -322,8 +322,8 @@ const WrappedNotificationArea = () => {
     []
   );
 
-  const addVersionTag = useCallback(
-    (notification: JSONFeedItem, config: ConfigurationDefinition): 'new' | 'current' | null => {
+  const getVersionType = useCallback(
+    (notification: JSONFeedItem, config: ConfigurationDefinition): null | 'newer' | 'current' | 'older' => {
       const notVer = notification?.url;
       const sysVer = config?.system?.version;
       if (
@@ -332,14 +332,14 @@ const WrappedNotificationArea = () => {
           (/(s|S)table/g.test(notVer) && /(\d){1,}\.(\d){1,}\.(\d){1,}\.(\d){1,}/g.test(sysVer))
         )
       )
-        return;
+        return null;
 
       const notValues: Array<number> = getVersionValues(notVer);
       const sysValues: Array<number> = getVersionValues(sysVer);
 
       if (arrayEquals(notValues, sysValues)) return 'current';
-      else if (arrayHigher(notValues, sysValues)) return 'new';
-      else return;
+      else if (arrayHigher(notValues, sysValues)) return 'newer';
+      else return 'older';
     },
     [arrayEquals, arrayHigher, getVersionValues]
   );
@@ -349,18 +349,15 @@ const WrappedNotificationArea = () => {
     []
   );
 
-  const addNewServiceTag = useCallback(
-    (notification: JSONFeedItem, services: Array<ServiceResult>): 'new' | null =>
-      !/(s|S)ervice/g.test(notification.title) ||
-      services.some(s => notification?.title?.toLowerCase().includes(s?.name?.toLowerCase()))
-        ? null
-        : 'new',
-    []
-  );
+  const getNewService = useCallback((notification: JSONFeedItem, services: Array<ServiceResult>): null | boolean => {
+    if (!/(s|S)ervice/g.test(notification.title)) return null;
+    const notificationTitle = notification?.title?.toLowerCase().slice(0, -16);
+    return services.some(s => notificationTitle === s?.name?.toLowerCase());
+  }, []);
 
   useEffect(() => {
     handleLastTimeOpen();
-    if (!configuration) return;
+    if (!configuration || !currentUser) return;
     apiCall({
       url: '/api/v4/service/all/',
       onSuccess: api_data => {
@@ -369,25 +366,47 @@ const WrappedNotificationArea = () => {
         fetchJSONNotifications({
           urls: configuration.ui.rss_feeds,
           onSuccess: (feedItems: Array<JSONFeedItem>) =>
-            setNotifications(
-              feedItems
-                .map(n => ({
-                  ...n,
-                  tags: [addVersionTag(n, configuration), addNewServiceTag(n, services2), ...n.tags],
-                  _isNew: setIsNew(n)
-                }))
-                .map(n =>
-                  currentUser.is_admin ? n : { ...n, tags: n.tags.filter(tag => !['new', 'current'].includes(tag)) }
-                )
-                .filter(n => n.date_published > new Date(Date.now() - 365 * 24 * 60 * 60 * 1000))
-                .sort((a, b) => b.date_published.valueOf() - a.date_published.valueOf())
-            )
+            setNotifications(_n => {
+              const isAdmin = currentUser?.is_admin;
+              let newNots = feedItems.filter(n => {
+                if (n.date_published < new Date(Date.now() - 365 * 24 * 60 * 60 * 1000)) return false;
+
+                if (!isAdmin) {
+                  const isNewService = getNewService(n, services2);
+                  if (isNewService === false) return false;
+
+                  const isNewVersion = getVersionType(n, configuration);
+                  if (isNewVersion === 'newer') return false;
+                }
+
+                return true;
+              });
+
+              newNots = newNots.map(n => {
+                const _isNew = setIsNew(n);
+                let tags = [...n?.tags];
+                if (isAdmin) {
+                  const isNewService = getNewService(n, services2);
+                  const isNewVersion = getVersionType(n, configuration);
+                  tags = [
+                    isNewService === false ? 'new' : null,
+                    isNewVersion === 'newer' ? 'new' : null,
+                    isNewVersion === 'current' ? 'current' : null,
+                    ...tags
+                  ];
+                }
+                return { ...n, _isNew, tags };
+              });
+
+              newNots = newNots.sort((a, b) => b.date_published.valueOf() - a.date_published.valueOf());
+              return newNots;
+            })
         });
       }
     });
     return () => setNotifications([]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [addNewServiceTag, addVersionTag, configuration, fetchJSONNotifications, handleLastTimeOpen, setIsNew]);
+  }, [configuration, currentUser, fetchJSONNotifications, getNewService, getVersionType, handleLastTimeOpen, setIsNew]);
 
   return (
     <>
