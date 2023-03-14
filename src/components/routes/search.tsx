@@ -88,7 +88,7 @@ function Search({ index }: SearchProps) {
   const [searchSuggestion, setSearchSuggestion] = useState<string[]>(null);
   const [tab, setTab] = useState(null);
   const { showErrorMessage } = useMySnackbar();
-  const downSM = useMediaQuery(theme.breakpoints.down('sm'));
+  const downSM = useMediaQuery(theme.breakpoints.down('md'));
 
   // Result lists
   const [submissionResults, setSubmissionResults] = useState<SearchResults>(null);

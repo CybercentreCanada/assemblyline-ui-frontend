@@ -66,7 +66,7 @@ export const ErrorDetail = ({ error_key }: ErrorDetailProps) => {
   const { apiCall } = useMyAPI();
   const { key, type, source, name } = useParams<ParamProps>();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const downSM = useMediaQuery(theme.breakpoints.down('sm'));
+  const downSM = useMediaQuery(theme.breakpoints.down('md'));
 
   const errorMap = {
     'MAX DEPTH REACHED': <PanToolOutlinedIcon style={{ color: theme.palette.action.active }} />,

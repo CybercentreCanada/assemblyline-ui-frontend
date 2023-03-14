@@ -134,7 +134,14 @@ const UserProfile = () => {
             onClick={onProfileClick}
             size="large"
           >
-            <AppUserAvatar alt={user.name} url={user.avatar} email={user.email}>
+            <AppUserAvatar
+              sx={{
+                fontWeight: 500
+              }}
+              alt={user.name}
+              url={user.avatar}
+              email={user.email}
+            >
               {user.name
                 .split(' ')
                 .filter(w => w !== '')
@@ -167,7 +174,12 @@ const UserProfile = () => {
                       }}
                     >
                       <AppAvatar
-                        sx={{ width: theme.spacing(8), height: theme.spacing(8) }}
+                        sx={{
+                          width: theme.spacing(8),
+                          height: theme.spacing(8),
+                          fontWeight: 500,
+                          fontSize: theme.spacing(3.5)
+                        }}
                         alt={user.name}
                         url={user.avatar}
                         email={user.email}
