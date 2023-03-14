@@ -171,7 +171,7 @@ export const ErrorFallback: React.FC<FallbackProps> = ({ error, resetErrorBounda
   const { t } = useTranslation();
   const theme = useTheme();
   const classes = useStyles();
-  const downSM = useMediaQuery(theme.breakpoints.down('sm'));
+  const downSM = useMediaQuery(theme.breakpoints.down('md'));
   const [expanded, setExpanded] = React.useState(false);
 
   return (

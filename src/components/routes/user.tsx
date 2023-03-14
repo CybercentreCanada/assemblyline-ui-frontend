@@ -124,7 +124,7 @@ function User({ username }: UserProps) {
   const [editable, setEditable] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
   const { user: currentUser, configuration } = useALContext();
-  const downSM = useMediaQuery(theme.breakpoints.down('sm'));
+  const downSM = useMediaQuery(theme.breakpoints.down('md'));
   const isXS = useMediaQuery(theme.breakpoints.only('xs'));
   const { showErrorMessage, showSuccessMessage, showWarningMessage } = useMySnackbar();
   const sp1 = theme.spacing(1);
@@ -490,7 +490,9 @@ function User({ username }: UserProps) {
                       <Avatar
                         style={{
                           width: downSM ? theme.spacing(24) : theme.spacing(16),
-                          height: downSM ? theme.spacing(24) : theme.spacing(16)
+                          height: downSM ? theme.spacing(24) : theme.spacing(16),
+                          fontSize: downSM ? theme.spacing(8) : theme.spacing(6),
+                          fontWeight: 500
                         }}
                         alt={user.name}
                         src={user.avatar}

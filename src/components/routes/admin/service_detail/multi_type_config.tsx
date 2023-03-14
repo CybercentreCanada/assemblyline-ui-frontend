@@ -170,7 +170,8 @@ const WrappedMultiTypeConfig = ({ config, onAdd, onUpdate, onDelete }: MultiType
               borderRadius: '4px',
               fontSize: '1rem',
               minHeight: theme.spacing(5),
-              padding: '4px'
+              padding: '4px',
+              overflowX: 'auto'
             }}
           />
         ) : (
@@ -261,7 +262,8 @@ const WrappedMultiTypeConfig = ({ config, onAdd, onUpdate, onDelete }: MultiType
               borderRadius: '4px',
               fontSize: '1rem',
               minHeight: theme.spacing(5),
-              padding: '4px'
+              padding: '4px',
+              overflowX: 'auto'
             }}
           />
         ) : (
