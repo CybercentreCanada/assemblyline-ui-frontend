@@ -94,7 +94,7 @@ const Submit: React.FC<any> = () => {
   const [validateCB, setValidateCB] = useState(null);
   const [allowClick, setAllowClick] = useState(true);
   const [file, setFile] = useState(null);
-  const downSM = useMediaQuery(theme.breakpoints.down('sm'));
+  const downSM = useMediaQuery(theme.breakpoints.down('md'));
   const md = useMediaQuery(theme.breakpoints.only('md'));
   const { showErrorMessage, showSuccessMessage, closeSnackbar } = useMySnackbar();
   const navigate = useNavigate();

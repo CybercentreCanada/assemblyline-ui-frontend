@@ -134,10 +134,19 @@ const UserProfile = () => {
             onClick={onProfileClick}
             size="large"
           >
-            <AppUserAvatar alt={user.name} url={user.avatar} email={user.email}>
+            <AppUserAvatar
+              sx={{
+                fontWeight: 500
+              }}
+              alt={user.name}
+              url={user.avatar}
+              email={user.email}
+            >
               {user.name
-                .split(' ', 2)
-                .map(n => n[0].toUpperCase())
+                .split(' ')
+                .filter(w => w !== '')
+                .splice(0, 2)
+                .map(n => (n ? n[0].toUpperCase() : ''))
                 .join('')}
             </AppUserAvatar>
           </IconButton>
@@ -165,14 +174,21 @@ const UserProfile = () => {
                       }}
                     >
                       <AppAvatar
-                        sx={{ width: theme.spacing(8), height: theme.spacing(8) }}
+                        sx={{
+                          width: theme.spacing(8),
+                          height: theme.spacing(8),
+                          fontWeight: 500,
+                          fontSize: theme.spacing(3.5)
+                        }}
                         alt={user.name}
                         url={user.avatar}
                         email={user.email}
                       >
                         {user.name
-                          .split(' ', 2)
-                          .map(n => n[0].toUpperCase())
+                          .split(' ')
+                          .filter(w => w !== '')
+                          .splice(0, 2)
+                          .map(n => (n ? n[0].toUpperCase() : ''))
                           .join('')}
                       </AppAvatar>
                       <Box sx={{ paddingLeft: 2 }}>

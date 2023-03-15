@@ -59,7 +59,7 @@ export default function ApiDoc() {
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
 
-  const downSM = useMediaQuery(theme.breakpoints.down('sm'));
+  const downSM = useMediaQuery(theme.breakpoints.down('md'));
   const xs = useMediaQuery(theme.breakpoints.only('xs'));
   const isDark = theme.palette.mode === 'dark';
   const methodColor = {
@@ -158,7 +158,7 @@ export default function ApiDoc() {
             <Grid item xs={12} sm>
               <Typography variant="h4">{t('title')}</Typography>
             </Grid>
-            <Grid item xs={12} sm style={{ textAlign: 'end' }}>
+            <Grid item xs={12} sm={12} md style={{ textAlign: 'end' }}>
               {apiList && apiSelected ? (
                 <FormControl size="small">
                   <Select
