@@ -281,14 +281,16 @@ const Submit: React.FC<any> = () => {
   const setParam = (service_idx, param_idx, p_value) => {
     if (settings) {
       const newSettings = { ...settings };
-      newSettings.service_spec[service_idx].params[param_idx].value = p_value;
+      const type = newSettings.service_spec[service_idx].params[param_idx].type;
+      newSettings.service_spec[service_idx].params[param_idx].value = type === 'int' ? parseInt(p_value) : p_value;
       setSettings(newSettings);
     }
   };
 
   function setParamAsync(service_idx, param_idx, p_value) {
     if (settings) {
-      settings.service_spec[service_idx].params[param_idx].value = p_value;
+      const type = settings.service_spec[service_idx].params[param_idx].type;
+      settings.service_spec[service_idx].params[param_idx].value = type === 'int' ? parseInt(p_value) : p_value;
     }
   }
 
