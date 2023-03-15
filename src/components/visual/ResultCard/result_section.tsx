@@ -1,4 +1,6 @@
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
 import SimCardOutlinedIcon from '@mui/icons-material/SimCardOutlined';
 import { Box, Collapse, IconButton, Menu, MenuItem, Tooltip, useTheme } from '@mui/material';
@@ -57,12 +59,15 @@ const useStyles = makeStyles(theme => ({
     },
     minHeight: theme.spacing(4.5),
     marginLeft: theme.spacing(-1),
-    padding: theme.spacing(0.25, 1),
+    padding: theme.spacing(0.25, 0, 0.25, 1),
     borderRadius: theme.spacing(0.5)
   },
   printable_section_title: {
     display: 'flex',
     alignItems: 'center'
+  },
+  muted: {
+    color: theme.palette.text.secondary
   }
 }));
 
@@ -125,8 +130,8 @@ const WrappedResultSection: React.FC<ResultSectionProps> = ({
   const { t } = useTranslation(['fileDetail']);
   const classes = useStyles();
   const theme = useTheme();
-  const [open, setOpen] = React.useState(!section.auto_collapse);
-  const [render, setRender] = React.useState(!section.auto_collapse);
+  const [open, setOpen] = React.useState(!section.auto_collapse || printable);
+  const [render, setRender] = React.useState(!section.auto_collapse || printable);
   const [showTags, setShowTags] = React.useState(false);
   const [showHeur, setShowHeur] = React.useState(false);
   const [showAttack, setShowAttack] = React.useState(false);
@@ -315,49 +320,53 @@ const WrappedResultSection: React.FC<ResultSectionProps> = ({
               {section.title_text}
             </span>
             {!printable && (
-              <div style={{ color: theme.palette.text.disabled, whiteSpace: 'nowrap' }} onClick={stopPropagation}>
-                {section.heuristic && (
-                  <Tooltip title={t('show_heur')} placement="top">
-                    <IconButton size="small" onClick={handleShowHeur} color={showHeur ? 'default' : 'inherit'}>
-                      <SimCardOutlinedIcon />
-                    </IconButton>
-                  </Tooltip>
-                )}
-                {Array.isArray(section.tags) && section.tags.length > 0 && (
-                  <Tooltip title={t('show_tags')} placement="top">
-                    <IconButton size="small" onClick={handleShowTags} color={showTags ? 'default' : 'inherit'}>
-                      <LabelOutlinedIcon />
-                    </IconButton>
-                  </Tooltip>
-                )}
-                {section.heuristic &&
-                  section.heuristic.attack &&
-                  Array.isArray(section.heuristic.attack) &&
-                  section.heuristic.attack.length > 0 && (
-                    <Tooltip title={t('show_attack')} placement="top">
-                      <IconButton size="small" onClick={handleShowAttack} color={showAttack ? 'default' : 'inherit'}>
-                        {/* <FontDownloadOutlinedIcon /> */}
-                        <span
-                          style={{
-                            display: 'inline-flex',
-                            width: '24px',
-                            height: '24px',
-                            justifyContent: 'center',
-                            alignItems: 'center'
-                          }}
-                        >
-                          {'[&]'}
-                        </span>
+              <>
+                <div style={{ color: theme.palette.text.disabled, whiteSpace: 'nowrap' }} onClick={stopPropagation}>
+                  {section.heuristic && (
+                    <Tooltip title={t('show_heur')} placement="top">
+                      <IconButton size="small" onClick={handleShowHeur} color={showHeur ? 'default' : 'inherit'}>
+                        <SimCardOutlinedIcon />
                       </IconButton>
                     </Tooltip>
                   )}
-              </div>
+                  {Array.isArray(section.tags) && section.tags.length > 0 && (
+                    <Tooltip title={t('show_tags')} placement="top">
+                      <IconButton size="small" onClick={handleShowTags} color={showTags ? 'default' : 'inherit'}>
+                        <LabelOutlinedIcon />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                  {section.heuristic &&
+                    section.heuristic.attack &&
+                    Array.isArray(section.heuristic.attack) &&
+                    section.heuristic.attack.length > 0 && (
+                      <Tooltip title={t('show_attack')} placement="top">
+                        <IconButton size="small" onClick={handleShowAttack} color={showAttack ? 'default' : 'inherit'}>
+                          {/* <FontDownloadOutlinedIcon /> */}
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              width: '24px',
+                              height: '24px',
+                              justifyContent: 'center',
+                              alignItems: 'center'
+                            }}
+                          >
+                            {'[&]'}
+                          </span>
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                </div>
+                {!printable &&
+                  (open ? <ExpandLess className={classes.muted} /> : <ExpandMore className={classes.muted} />)}
+              </>
             )}
           </Box>
           <Collapse in={open || printable} timeout="auto" onEnter={() => setRender(true)}>
             {render && (
               <>
-                <div style={{ marginLeft: printable ? '2rem' : '1rem', marginBottom: '0.75rem' }}>
+                <div style={{ marginLeft: printable ? '2rem' : '1rem', marginBottom: section.body ? '0.75rem' : 0 }}>
                   <div style={{ cursor: 'context-menu' }} onContextMenu={handleMenuClick}>
                     {section.body &&
                       (() => {
