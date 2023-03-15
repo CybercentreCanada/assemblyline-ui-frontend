@@ -22,10 +22,9 @@ const useTreeItemStyles = makeStyles((theme: Theme) => ({
       }
   },
   treeItem: {
-    '&:hover, .MuiTreeItem-content:hover &, .MuiTreeItem-content.Mui-focused &, .MuiTreeItem-content.Mui-selected.Mui-focused &':
-      {
-        backgroundColor: theme.palette.mode === 'dark' ? '#FFFFFF10' : '#00000010'
-      },
+    '&:hover, .MuiTreeItem-content:hover &, .MuiTreeItem-content.Mui-focused &': {
+      backgroundColor: theme.palette.mode === 'dark' ? '#FFFFFF10' : '#00000010'
+    },
     '@media print': {
       border: '1px solid #DDD'
     },
@@ -74,30 +73,27 @@ const useTreeItemStyles = makeStyles((theme: Theme) => ({
     alignItems: 'center'
   },
   safe: {
-    '&:hover, .MuiTreeItem-content:hover &, .MuiTreeItem-content.Mui-focused &, .MuiTreeItem-content.Mui-selected.Mui-focused &':
-      {
-        backgroundColor: theme.palette.mode === 'dark' ? '#355e35' : '#c0efc0'
-      },
+    '&:hover, .MuiTreeItem-content:hover &, .MuiTreeItem-content.Mui-focused &': {
+      backgroundColor: theme.palette.mode === 'dark' ? '#355e35' : '#c0efc0'
+    },
     '@media print': {
       backgroundColor: '#d0ffd0'
     },
     backgroundColor: theme.palette.mode === 'dark' ? '#254e25' : '#d0ffd0'
   },
   suspicious: {
-    '&:hover, .MuiTreeItem-content:hover &, .MuiTreeItem-content.Mui-focused &, .MuiTreeItem-content.Mui-selected.Mui-focused &':
-      {
-        backgroundColor: theme.palette.mode === 'dark' ? '#755322' : '#efddc4'
-      },
+    '&:hover, .MuiTreeItem-content:hover &, .MuiTreeItem-content.Mui-focused &': {
+      backgroundColor: theme.palette.mode === 'dark' ? '#755322' : '#efddc4'
+    },
     '@media print': {
       backgroundColor: '#ffedd4'
     },
     backgroundColor: theme.palette.mode === 'dark' ? '#654312' : '#ffedd4'
   },
   malicious: {
-    '&:hover, .MuiTreeItem-content:hover &, .MuiTreeItem-content.Mui-focused &, .MuiTreeItem-content.Mui-selected.Mui-focused &':
-      {
-        backgroundColor: theme.palette.mode === 'dark' ? '#5e3535' : '#efc0c0'
-      },
+    '&:hover, .MuiTreeItem-content:hover &, .MuiTreeItem-content.Mui-focused &': {
+      backgroundColor: theme.palette.mode === 'dark' ? '#5e3535' : '#efc0c0'
+    },
     '@media print': {
       backgroundColor: '#ffd0d0'
     },
