@@ -1,3 +1,5 @@
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
@@ -18,6 +20,9 @@ const SCORE_SHOW_THRESHOLD = 0;
 
 const useStyles = makeStyles(theme => ({
   title: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     cursor: 'pointer',
     '&:hover, &:focus': {
       color: theme.palette.text.secondary
@@ -236,7 +241,8 @@ const WrappedDetection: React.FC<WrappedDetectionProps> = ({
         }}
         className={classes.title}
       >
-        {t('heuristics')}
+        <span>{t('heuristics')}</span>
+        {open ? <ExpandLess /> : <ExpandMore />}
       </Typography>
       <Divider />
       <Collapse in={open} timeout="auto">

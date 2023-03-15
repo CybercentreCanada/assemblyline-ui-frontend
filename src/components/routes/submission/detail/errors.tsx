@@ -1,7 +1,7 @@
-import { Button, Collapse, Divider, Link as MaterialLink, Typography, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import { Button, Collapse, Divider, Link as MaterialLink, Typography, useTheme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import { getErrorTypeFromKey, getHashFromKey, getServiceFromKey } from 'helpers/errors';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -9,10 +9,6 @@ import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
   title: {
-    cursor: 'pointer',
-    '&:hover, &:focus': {
-      color: theme.palette.text.secondary
-    },
     flexGrow: 1
   }
 }));
@@ -37,7 +33,6 @@ type ErrorSectionProps = {
 
 const WrappedErrorSection: React.FC<ErrorSectionProps> = ({ sid, parsed_errors }) => {
   const { t } = useTranslation(['submissionDetail']);
-  const [open, setOpen] = React.useState(true);
   const [detailled, setDetailed] = React.useState(false);
   const theme = useTheme();
   const classes = useStyles();
@@ -56,12 +51,9 @@ const WrappedErrorSection: React.FC<ErrorSectionProps> = ({ sid, parsed_errors }
           style={{
             color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
           }}
-          onClick={() => {
-            setOpen(!open);
-          }}
           className={classes.title}
         >
-          {t('errors')}
+          <span>{t('errors')}</span>
         </Typography>
         <Button size="small" onClick={() => setDetailed(!detailled)} style={{ color: theme.palette.text.secondary }}>
           {!detailled ? (
@@ -78,57 +70,55 @@ const WrappedErrorSection: React.FC<ErrorSectionProps> = ({ sid, parsed_errors }
         </Button>
       </div>
       <Divider />
-      <Collapse in={open} timeout="auto">
-        <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
-          <Collapse in={!detailled} timeout="auto">
-            {Object.keys(parsed_errors.aggregated).map(
-              (errorType, i) =>
-                parsed_errors.aggregated[errorType].length > 0 && (
-                  <div
-                    key={i}
-                    style={{
-                      color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                    }}
-                  >
-                    {`${t('errors.aggregated').replace(
-                      '{errorType}',
-                      t(`errors.type.${errorType}`)
-                    )}: ${parsed_errors.aggregated[errorType].join(' | ')}`}
-                  </div>
-                )
-            )}
-          </Collapse>
-          <Collapse in={detailled} timeout="auto">
-            <div>
-              {parsed_errors.listed.map((error, i) => (
+      <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+        <Collapse in={!detailled} timeout="auto">
+          {Object.keys(parsed_errors.aggregated).map(
+            (errorType, i) =>
+              parsed_errors.aggregated[errorType].length > 0 && (
                 <div
                   key={i}
                   style={{
                     color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
                   }}
                 >
-                  <strong>{getServiceFromKey(error)}</strong>
-                  {t('errors.listed')}
-                  <strong>
-                    <MaterialLink
-                      component={Link}
-                      style={{
-                        color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                      }}
-                      to={`/submission/detail/${sid}/${getHashFromKey(error)}`}
-                    >
-                      {getHashFromKey(error)}
-                    </MaterialLink>
-                  </strong>
-                  <span style={{ fontSize: 'smaller' }}>
-                    &nbsp;::&nbsp;{t(`errors.type.${getErrorTypeFromKey(error)}`)}
-                  </span>
+                  {`${t('errors.aggregated').replace(
+                    '{errorType}',
+                    t(`errors.type.${errorType}`)
+                  )}: ${parsed_errors.aggregated[errorType].join(' | ')}`}
                 </div>
-              ))}
-            </div>
-          </Collapse>
-        </div>
-      </Collapse>
+              )
+          )}
+        </Collapse>
+        <Collapse in={detailled} timeout="auto">
+          <div>
+            {parsed_errors.listed.map((error, i) => (
+              <div
+                key={i}
+                style={{
+                  color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                }}
+              >
+                <strong>{getServiceFromKey(error)}</strong>
+                {t('errors.listed')}
+                <strong>
+                  <MaterialLink
+                    component={Link}
+                    style={{
+                      color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                    }}
+                    to={`/submission/detail/${sid}/${getHashFromKey(error)}`}
+                  >
+                    {getHashFromKey(error)}
+                  </MaterialLink>
+                </strong>
+                <span style={{ fontSize: 'smaller' }}>
+                  &nbsp;::&nbsp;{t(`errors.type.${getErrorTypeFromKey(error)}`)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </Collapse>
+      </div>
     </div>
   );
 };
