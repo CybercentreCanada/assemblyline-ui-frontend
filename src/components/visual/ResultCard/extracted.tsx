@@ -1,3 +1,5 @@
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Box, Collapse } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import React, { useMemo } from 'react';
@@ -6,6 +8,9 @@ import ExtractedFile, { ExtractedFiles } from './extracted_file';
 
 const useStyles = makeStyles(theme => ({
   title: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     cursor: 'pointer',
     '&:hover, &:focus': {
       color: theme.palette.text.secondary
@@ -32,6 +37,7 @@ const WrappedExtractedSection: React.FC<ExtractedSectionProps> = ({ extracted, s
         }}
       >
         <h3>{t('extracted')}</h3>
+        {open ? <ExpandLess /> : <ExpandMore />}
       </Box>
       <Collapse in={open} timeout="auto">
         {useMemo(() => extracted.map((file, id) => <ExtractedFile key={id} file={file} sid={sid} />), [extracted, sid])}
