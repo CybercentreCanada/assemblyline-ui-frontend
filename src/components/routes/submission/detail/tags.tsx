@@ -1,3 +1,5 @@
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Collapse, Divider, Grid, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useSafeResults from 'components/hooks/useSafeResults';
@@ -7,6 +9,9 @@ import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(theme => ({
   title: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     cursor: 'pointer',
     '&:hover, &:focus': {
       color: theme.palette.text.secondary
@@ -50,7 +55,8 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ tag_group, tags, force =
   return someTagNotSafe || forceShowTag ? (
     <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
       <Typography variant="h6" onClick={() => setOpen(!open)} className={classes.title}>
-        {t(tag_group)}
+        <span>{t(tag_group)}</span>
+        {open ? <ExpandLess /> : <ExpandMore />}
       </Typography>
       <Divider />
       <Collapse in={open} timeout="auto">

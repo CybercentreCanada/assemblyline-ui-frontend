@@ -1,6 +1,7 @@
-import { Collapse, Divider, Grid, Typography, useTheme } from '@mui/material';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import { Collapse, Divider, Grid, Skeleton, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import { Skeleton } from '@mui/material';
 import useHighlighter from 'components/hooks/useHighlighter';
 import Heuristic from 'components/visual/Heuristic';
 import React, { useMemo } from 'react';
@@ -8,6 +9,9 @@ import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(theme => ({
   title: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     cursor: 'pointer',
     '&:hover, &:focus': {
       color: theme.palette.text.secondary
@@ -36,7 +40,8 @@ const WrappedHeuristicSection: React.FC<HeuristicSectionProps> = ({ heuristics }
         }}
         className={classes.title}
       >
-        {t('heuristics')}
+        <span>{t('heuristics')}</span>
+        {open ? <ExpandLess /> : <ExpandMore />}
       </Typography>
       <Divider />
       <Collapse in={open} timeout="auto">

@@ -1,6 +1,7 @@
-import { Collapse, Divider, Typography, useTheme } from '@mui/material';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import { Collapse, Divider, Skeleton, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import { Skeleton } from '@mui/material';
 import useSafeResults from 'components/hooks/useSafeResults';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +9,9 @@ import ResultCard, { AlternateResult } from '../ResultCard';
 
 const useStyles = makeStyles(theme => ({
   title: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     cursor: 'pointer',
     '&:hover, &:focus': {
       color: theme.palette.text.secondary
@@ -41,7 +45,8 @@ const WrappedResultSection: React.FC<ResultSectionProps> = ({ results, sid, alte
         }}
         className={classes.title}
       >
-        {t('results')}
+        <span>{t('results')}</span>
+        {open ? <ExpandLess /> : <ExpandMore />}
       </Typography>
       <Divider />
       <Collapse in={open} timeout="auto">
