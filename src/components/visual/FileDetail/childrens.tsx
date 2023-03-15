@@ -1,3 +1,5 @@
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Collapse, Divider, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
@@ -15,6 +17,9 @@ const useStyles = makeStyles(theme => ({
     }
   },
   title: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     cursor: 'pointer',
     '&:hover, &:focus': {
       color: theme.palette.text.secondary
@@ -42,7 +47,8 @@ const WrappedChildrenSection: React.FC<ChildrenSectionProps> = ({ childrens }) =
         }}
         className={classes.title}
       >
-        {t('childrens')}
+        <span>{t('childrens')}</span>
+        {open ? <ExpandLess /> : <ExpandMore />}
       </Typography>
       <Divider />
       <Collapse in={open} timeout="auto">

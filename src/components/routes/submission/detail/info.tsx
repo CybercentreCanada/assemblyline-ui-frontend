@@ -1,5 +1,7 @@
 import CheckBoxOutlineBlankOutlinedIcon from '@mui/icons-material/CheckBoxOutlineBlankOutlined';
 import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Collapse, Divider, Grid, Skeleton, Typography, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import Priority from 'components/visual/Priority';
@@ -10,6 +12,9 @@ import Moment from 'react-moment';
 
 const useStyles = makeStyles(theme => ({
   title: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     cursor: 'pointer',
     '&:hover, &:focus': {
       color: theme.palette.text.secondary
@@ -36,7 +41,8 @@ const WrappedInfoSection: React.FC<InfoSectionProps> = ({ submission }) => {
         }}
         className={classes.title}
       >
-        {t('information')}
+        <span>{t('information')}</span>
+        {open ? <ExpandLess /> : <ExpandMore />}
       </Typography>
       <Divider />
       <Collapse in={open} timeout="auto">
