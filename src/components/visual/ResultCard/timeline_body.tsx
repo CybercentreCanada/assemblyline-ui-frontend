@@ -68,7 +68,12 @@ const WrappedTimelineBody = ({ body }) => {
               </Tooltip>
               <TimelineConnector />
             </TimelineSeparator>
-            <TimelineContent alignSelf="center">
+            <TimelineContent
+              alignSelf="center"
+              textOverflow={'ellipsis'}
+              whiteSpace="nowrap"
+              overflow={{ 'overflow-x': 'hidden' }}
+            >
               <Typography variant="button" display="block">
                 {element.title}
               </Typography>
