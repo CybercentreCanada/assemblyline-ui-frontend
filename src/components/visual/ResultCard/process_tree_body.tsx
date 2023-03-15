@@ -1,5 +1,3 @@
-import { Theme, Tooltip } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
@@ -7,6 +5,8 @@ import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutl
 import SettingsEthernetOutlinedIcon from '@mui/icons-material/SettingsEthernetOutlined';
 import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
 import { TreeItem, TreeView } from '@mui/lab';
+import { Theme, Tooltip } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import useALContext from 'components/hooks/useALContext';
 import useSafeResults from 'components/hooks/useSafeResults';
@@ -16,21 +16,16 @@ import { useTranslation } from 'react-i18next';
 
 const useTreeItemStyles = makeStyles((theme: Theme) => ({
   root: {
-    '&:hover > .MuiTreeItem-content': {
-      backgroundColor: 'transparent'
-    },
-    '&:focus > .MuiTreeItem-content, &$root.Mui-selected > .MuiTreeItem-content': {
-      backgroundColor: 'transparent'
-    },
-    '&:focus > .MuiTreeItem-content .MuiTreeItem-label, &:hover > .MuiTreeItem-content .MuiTreeItem-label, &$root.Mui-selected > .MuiTreeItem-content .MuiTreeItem-label':
+    '&:hover > .MuiTreeItem-content, &:focus > .MuiTreeItem-content, .MuiTreeItem-content.Mui-focused, .MuiTreeItem-content.Mui-selected, .MuiTreeItem-content.Mui-selected.Mui-focused':
       {
         backgroundColor: 'transparent'
       }
   },
   treeItem: {
-    '&:hover': {
-      backgroundColor: theme.palette.mode === 'dark' ? '#FFFFFF10' : '#00000010'
-    },
+    '&:hover, .MuiTreeItem-content:hover &, .MuiTreeItem-content.Mui-focused &, .MuiTreeItem-content.Mui-selected.Mui-focused &':
+      {
+        backgroundColor: theme.palette.mode === 'dark' ? '#FFFFFF10' : '#00000010'
+      },
     '@media print': {
       border: '1px solid #DDD'
     },
@@ -79,27 +74,30 @@ const useTreeItemStyles = makeStyles((theme: Theme) => ({
     alignItems: 'center'
   },
   safe: {
-    '&:hover': {
-      backgroundColor: theme.palette.mode === 'dark' ? '#355e35' : '#c0efc0'
-    },
+    '&:hover, .MuiTreeItem-content:hover &, .MuiTreeItem-content.Mui-focused &, .MuiTreeItem-content.Mui-selected.Mui-focused &':
+      {
+        backgroundColor: theme.palette.mode === 'dark' ? '#355e35' : '#c0efc0'
+      },
     '@media print': {
       backgroundColor: '#d0ffd0'
     },
     backgroundColor: theme.palette.mode === 'dark' ? '#254e25' : '#d0ffd0'
   },
   suspicious: {
-    '&:hover': {
-      backgroundColor: theme.palette.mode === 'dark' ? '#755322' : '#efddc4'
-    },
+    '&:hover, .MuiTreeItem-content:hover &, .MuiTreeItem-content.Mui-focused &, .MuiTreeItem-content.Mui-selected.Mui-focused &':
+      {
+        backgroundColor: theme.palette.mode === 'dark' ? '#755322' : '#efddc4'
+      },
     '@media print': {
       backgroundColor: '#ffedd4'
     },
     backgroundColor: theme.palette.mode === 'dark' ? '#654312' : '#ffedd4'
   },
   malicious: {
-    '&:hover': {
-      backgroundColor: theme.palette.mode === 'dark' ? '#5e3535' : '#efc0c0'
-    },
+    '&:hover, .MuiTreeItem-content:hover &, .MuiTreeItem-content.Mui-focused &, .MuiTreeItem-content.Mui-selected.Mui-focused &':
+      {
+        backgroundColor: theme.palette.mode === 'dark' ? '#5e3535' : '#efc0c0'
+      },
     '@media print': {
       backgroundColor: '#ffd0d0'
     },
@@ -158,6 +156,7 @@ const ProcessTreeItem = ({ process, force = false }) => {
             <div className={classes.counter}>
               {process.signatures && Object.keys(process.signatures).length !== 0 && (
                 <Tooltip
+                  placement="left"
                   title={`${Object.keys(process.signatures).length} ${t('process_signatures')} (${Object.keys(
                     process.signatures
                   ).join(' | ')})`}
@@ -169,7 +168,7 @@ const ProcessTreeItem = ({ process, force = false }) => {
                 </Tooltip>
               )}
               {process.network_count && process.network_count !== 0 ? (
-                <Tooltip title={`${process.network_count} ${t('process_network')}`}>
+                <Tooltip placement="left" title={`${process.network_count} ${t('process_network')}`}>
                   <div className={classes.counter_item}>
                     <SettingsEthernetOutlinedIcon className={classes.counter_img} />
                     <span>{humanReadableNumber(process.network_count)}</span>
@@ -177,7 +176,7 @@ const ProcessTreeItem = ({ process, force = false }) => {
                 </Tooltip>
               ) : null}
               {process.file_count && process.file_count !== 0 ? (
-                <Tooltip title={`${process.file_count} ${t('process_file')}`}>
+                <Tooltip placement="left" title={`${process.file_count} ${t('process_file')}`}>
                   <div className={classes.counter_item}>
                     <InsertDriveFileOutlinedIcon className={classes.counter_img} />
                     <span>{humanReadableNumber(process.file_count)}</span>
@@ -185,7 +184,7 @@ const ProcessTreeItem = ({ process, force = false }) => {
                 </Tooltip>
               ) : null}
               {process.registry_count && process.registry_count !== 0 ? (
-                <Tooltip title={`${process.registry_count} ${t('process_registry')}`}>
+                <Tooltip placement="left" title={`${process.registry_count} ${t('process_registry')}`}>
                   <div className={classes.counter_item}>
                     <WidgetsOutlinedIcon className={classes.counter_img} />
                     <span>{humanReadableNumber(process.registry_count)}</span>
