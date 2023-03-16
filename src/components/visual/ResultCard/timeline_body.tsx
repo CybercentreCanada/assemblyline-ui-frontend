@@ -42,47 +42,55 @@ const WrappedTimelineBody = ({ body }) => {
     error: theme.palette.error.main
   };
   return (
-    <Timeline>
-      {body.map(element => {
-        return (
-          <TimelineItem>
-            {element.opposite_content ? (
-              <TimelineOppositeContent alignSelf="center" variant="body2">
-                {element.opposite_content}
-              </TimelineOppositeContent>
-            ) : null}
-            <TimelineSeparator>
-              <TimelineConnector />
-              <Tooltip title={element.signatures.join(' | ')} placement="top">
-                <TimelineDot
-                  variant="outlined"
-                  sx={{
-                    fontSize: 'large',
-                    borderWidth: 'medium',
-                    borderColor: COLOR_MAP[verdictToColor(scoreToVerdict(element.score))],
-                    padding: '5px'
-                  }}
+    <div style={{ overflowX: 'auto' }}>
+      <Timeline style={{ minWidth: '460px' }}>
+        {body.map(element => {
+          return (
+            <TimelineItem>
+              {element.opposite_content ? (
+                <TimelineOppositeContent
+                  alignSelf="center"
+                  variant="body2"
+                  textOverflow={'ellipsis'}
+                  whiteSpace="nowrap"
+                  overflow={{ 'overflow-x': 'hidden' }}
                 >
-                  {AL_TYPE_ICON[element.icon]}
-                </TimelineDot>
-              </Tooltip>
-              <TimelineConnector />
-            </TimelineSeparator>
-            <TimelineContent
-              alignSelf="center"
-              textOverflow={'ellipsis'}
-              whiteSpace="nowrap"
-              overflow={{ 'overflow-x': 'hidden' }}
-            >
-              <Typography variant="button" display="block">
-                {element.title}
-              </Typography>
-              {element.content ? <Typography variant="caption">{element.content}</Typography> : null}
-            </TimelineContent>
-          </TimelineItem>
-        );
-      })}
-    </Timeline>
+                  {element.opposite_content}
+                </TimelineOppositeContent>
+              ) : null}
+              <TimelineSeparator>
+                <TimelineConnector />
+                <Tooltip title={element.signatures.join(' | ')} placement="top">
+                  <TimelineDot
+                    variant="outlined"
+                    sx={{
+                      fontSize: 'large',
+                      borderWidth: 'medium',
+                      borderColor: COLOR_MAP[verdictToColor(scoreToVerdict(element.score))],
+                      padding: '5px'
+                    }}
+                  >
+                    {AL_TYPE_ICON[element.icon]}
+                  </TimelineDot>
+                </Tooltip>
+                <TimelineConnector />
+              </TimelineSeparator>
+              <TimelineContent
+                alignSelf="center"
+                textOverflow={'ellipsis'}
+                whiteSpace="nowrap"
+                overflow={{ 'overflow-x': 'hidden' }}
+              >
+                <Typography variant="button" display="block">
+                  {element.title}
+                </Typography>
+                {element.content ? <Typography variant="caption">{element.content}</Typography> : null}
+              </TimelineContent>
+            </TimelineItem>
+          );
+        })}
+      </Timeline>
+    </div>
   );
 };
 
