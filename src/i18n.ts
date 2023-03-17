@@ -36,6 +36,7 @@ import manageSignatureSourcesEN from 'locales/en/manage/signature_sources.json';
 import manageWorkflowsEN from 'locales/en/manage/workflows.json';
 import manageWorkflowDetailEN from 'locales/en/manage/workflow_detail.json';
 import notificationEN from 'locales/en/notification.json';
+import retrohuntEN from 'locales/en/retrohunt.json';
 import searchEN from 'locales/en/search.json';
 import settingsEN from 'locales/en/settings.json';
 import statisticsHeuristicsEN from 'locales/en/statistics/heuristics.json';
@@ -83,6 +84,7 @@ import manageSignatureSourcesFR from 'locales/fr/manage/signature_sources.json';
 import manageWorkflowsFR from 'locales/fr/manage/workflows.json';
 import manageWorkflowDetailFR from 'locales/fr/manage/workflow_detail.json';
 import notificationFR from 'locales/fr/notification.json';
+import retrohuntFR from 'locales/fr/retrohunt.json';
 import searchFR from 'locales/fr/search.json';
 import settingsFR from 'locales/fr/settings.json';
 import statisticsHeuristicsFR from 'locales/fr/statistics/heuristics.json';
@@ -101,16 +103,18 @@ const resources = {
     adminActions: adminActionsEN,
     adminErrorViewer: adminErrorViewerEN,
     adminIdentify: adminIdentifyEN,
-    adminServices: adminServicesEN,
     adminServiceReview: adminServiceReviewEN,
+    adminServices: adminServicesEN,
     adminSiteMap: adminSiteMapEN,
     adminTagSafelist: adminTagSafelistEN,
     adminUsers: adminUsersEN,
+    alerts: alertsEN,
     authorize: authorizeEN,
     carousel: carouselEN,
     dashboard: dashboardEN,
     error403: error403EN,
     error404: error404EN,
+    favorites: favoritesEN,
     fileDetail: fileDetailEN,
     fileViewer: fileViewerEN,
     helpAPI: helpAPIEN,
@@ -122,44 +126,45 @@ const resources = {
     locked: lockedEN,
     login: loginEN,
     logout: logoutEN,
-    manageHeuristics: manageHeuristicsEN,
     manageHeuristicDetail: manageHeuristicDetailEN,
-    manageSignatures: manageSignaturesEN,
+    manageHeuristics: manageHeuristicsEN,
+    manageSafelist: manageSafelistEN,
+    manageSafelistDetail: manageSafelistDetailEN,
     manageSignatureDetail: manageSignatureDetailEN,
+    manageSignatures: manageSignaturesEN,
     manageSignatureSources: manageSignatureSourcesEN,
     manageWorkflowDetail: manageWorkflowDetailEN,
     manageWorkflows: manageWorkflowsEN,
-    manageSafelistDetail: manageSafelistDetailEN,
-    manageSafelist: manageSafelistEN,
     notification: notificationEN,
+    retrohunt: retrohuntEN,
     search: searchEN,
     settings: settingsEN,
     statisticsHeuristics: statisticsHeuristicsEN,
     statisticsSignatures: statisticsSignaturesEN,
-    submissions: submissionsEN,
     submissionDetail: submissionDetailEN,
     submissionReport: submissionReportEN,
+    submissions: submissionsEN,
     submit: submitEN,
-    translation: translationEN,
     tos: tosEN,
-    user: userEN,
-    alerts: alertsEN,
-    favorites: favoritesEN
+    translation: translationEN,
+    user: userEN
   },
   fr: {
     adminActions: adminActionsFR,
     adminErrorViewer: adminErrorViewerFR,
     adminIdentify: adminIdentifyFR,
-    adminServices: adminServicesFR,
     adminServiceReview: adminServiceReviewFR,
+    adminServices: adminServicesFR,
     adminSiteMap: adminSiteMapFR,
     adminTagSafelist: adminTagSafelistFR,
     adminUsers: adminUsersFR,
+    alerts: alertsFR,
     authorize: authorizeFR,
     carousel: carouselFR,
     dashboard: dashboardFR,
     error403: error403FR,
     error404: error404FR,
+    favorites: favoritesFR,
     fileDetail: fileDetailFR,
     fileViewer: fileViewerFR,
     helpAPI: helpAPIFR,
@@ -171,29 +176,28 @@ const resources = {
     locked: lockedFR,
     login: loginFR,
     logout: logoutFR,
-    manageHeuristics: manageHeuristicsFR,
     manageHeuristicDetail: manageHeuristicDetailFR,
-    manageSignatures: manageSignaturesFR,
+    manageHeuristics: manageHeuristicsFR,
+    manageSafelist: manageSafelistFR,
+    manageSafelistDetail: manageSafelistDetailFR,
     manageSignatureDetail: manageSignatureDetailFR,
+    manageSignatures: manageSignaturesFR,
     manageSignatureSources: manageSignatureSourcesFR,
     manageWorkflowDetail: manageWorkflowDetailFR,
     manageWorkflows: manageWorkflowsFR,
-    manageSafelistDetail: manageSafelistDetailFR,
-    manageSafelist: manageSafelistFR,
     notification: notificationFR,
+    retrohunt: retrohuntFR,
     search: searchFR,
     settings: settingsFR,
     statisticsHeuristics: statisticsHeuristicsFR,
     statisticsSignatures: statisticsSignaturesFR,
-    submissions: submissionsFR,
     submissionDetail: submissionDetailFR,
     submissionReport: submissionReportFR,
+    submissions: submissionsFR,
     submit: submitFR,
-    translation: translationFR,
     tos: tosFR,
-    user: userFR,
-    alerts: alertsFR,
-    favorites: favoritesFR
+    translation: translationFR,
+    user: userFR
   }
 };
 

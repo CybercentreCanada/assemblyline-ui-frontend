@@ -1,0 +1,12 @@
+{
+  "add_job": "Ajouter un travail de chasse rétro",
+  "filter": "Filtrer les travaux de chasse rétro...",
+  "filtered": "travail de chasse rétro correspondant au filtre",
+  "filtereds": "travaux de chasse rétro correspondant au filtre",
+  "searching": "Recherche en cours...",
+  "title": "Chasse rétro",
+  "total": "travail de chasse rétro",
+  "totals": "travaux de chasse rétro",
+  "never_used": "Travaux de chasse rétro qui n'ont jamais été utilisés",
+  "old": "Travaux de chasse rétro non utilisés au cours des 3 derniers mois"
+}
