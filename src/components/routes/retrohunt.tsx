@@ -11,11 +11,12 @@ import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
+import { RetrohuntJobDetail } from 'components/visual/Retrohunt';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
-import WorkflowTable from 'components/visual/SearchResult/workflow';
+import RetrohuntTable, { RetrohuntResults } from 'components/visual/SearchResult/retrohunt';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import 'moment/locale/fr';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -23,7 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import ForbiddenPage from './403';
-import WorkflowDetail from './manage/workflow_detail';
+import RetrohuntDetail from './retrohunt_detail';
 
 const PAGE_SIZE = 25;
 
@@ -44,20 +45,13 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-type SearchResults = {
-  items: any[];
-  offset: number;
-  rows: number;
-  total: number;
-};
-
-export default function Workflows() {
-  const { t } = useTranslation(['manageWorkflows']);
+export default function RetrohuntPage() {
+  const { t } = useTranslation(['retrohunt']);
   const [pageSize] = useState(PAGE_SIZE);
   const [searching, setSearching] = useState(false);
   const { indexes } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const [workflowResults, setWorkflowResults] = useState<SearchResults>(null);
+  const [retrohuntResults, setRetrohuntResults] = useState<RetrohuntResults>(null);
   const location = useLocation();
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
   const navigate = useNavigate();
@@ -67,7 +61,7 @@ export default function Workflows() {
   const classes = useStyles();
   const { closeGlobalDrawer, setGlobalDrawer } = useDrawer();
   const [suggestions] = useState([
-    ...Object.keys(indexes.workflow).filter(name => indexes.workflow[name].indexed),
+    ...Object.keys(indexes.retrohunt).filter(name => indexes.retrohunt[name].indexed),
     ...DEFAULT_SUGGESTION
   ]);
   const filterValue = useRef<string>('');
@@ -77,7 +71,7 @@ export default function Workflows() {
   }, [location.pathname, location.search, pageSize]);
 
   useEffect(() => {
-    if (query && currentUser.roles.includes('workflow_view')) {
+    if (query && currentUser.roles.includes('retrohunt_view')) {
       reload(0);
     }
 
@@ -86,25 +80,26 @@ export default function Workflows() {
 
   useEffect(() => {
     function handleReload() {
-      reload(workflowResults ? workflowResults.offset : 0);
+      reload(retrohuntResults ? retrohuntResults.offset : 0);
     }
 
-    window.addEventListener('reloadWorkflows', handleReload);
+    window.addEventListener('reloadRetrohunts', handleReload);
 
     return () => {
-      window.removeEventListener('reloadWorkflows', handleReload);
+      window.removeEventListener('reloadRetrohunts', handleReload);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, workflowResults]);
+  }, [query, retrohuntResults]);
 
   const reload = offset => {
     query.set('rows', PAGE_SIZE);
     query.set('offset', offset);
     apiCall({
       method: 'POST',
-      url: '/api/v4/search/workflow/',
+      url: '/api/v4/search/retrohunt/',
       body: query.getParams(),
       onSuccess: api_data => {
+        console.log(api_data);
         if (
           api_data.api_response.items.length === 0 &&
           api_data.api_response.offset !== 0 &&
@@ -112,7 +107,7 @@ export default function Workflows() {
         ) {
           reload(Math.max(0, api_data.api_response.offset - api_data.api_response.rows));
         } else {
-          setWorkflowResults(api_data.api_response);
+          setRetrohuntResults(api_data.api_response);
         }
       },
       onEnter: () => setSearching(true),
@@ -145,29 +140,29 @@ export default function Workflows() {
     filterValue.current = inputValue;
   };
 
-  const setWorkflowID = useCallback(
+  const setRetrohuntID = useCallback(
     (wf_id: string) => {
-      setGlobalDrawer(<WorkflowDetail workflow_id={wf_id} close={closeGlobalDrawer} />);
+      setGlobalDrawer(<RetrohuntDetail retrohunt_code={wf_id} close={closeGlobalDrawer} />);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 
-  return currentUser.roles.includes('workflow_view') ? (
+  return currentUser.roles.includes('retrohunt_view') ? (
     <PageFullWidth margin={4}>
       <div style={{ paddingBottom: theme.spacing(2) }}>
         <Grid container alignItems="center">
           <Grid item xs>
             <Typography variant="h4">{t('title')}</Typography>
           </Grid>
-          {currentUser.roles.includes('workflow_manage') && (
+          {currentUser.roles.includes('retrohunt_run') && (
             <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
-              <Tooltip title={t('add_workflow')}>
+              <Tooltip title={t('tooltip.add')}>
                 <IconButton
                   style={{
                     color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
                   }}
-                  onClick={() => setGlobalDrawer(<WorkflowDetail workflow_id={null} close={closeGlobalDrawer} />)}
+                  onClick={() => setGlobalDrawer(<RetrohuntJobDetail retrohuntCode={null} close={closeGlobalDrawer} />)}
                   size="large"
                 >
                   <AddCircleOutlineOutlinedIcon />
@@ -211,28 +206,28 @@ export default function Workflows() {
               }
             ]}
           >
-            {workflowResults !== null && (
+            {retrohuntResults !== null && (
               <div className={classes.searchresult}>
-                {workflowResults.total !== 0 && (
+                {retrohuntResults.total !== 0 && (
                   <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
                     {searching ? (
                       <span>{t('searching')}</span>
                     ) : (
                       <span>
-                        <SearchResultCount count={workflowResults.total} />
+                        <SearchResultCount count={retrohuntResults.total} />
                         {query.get('query')
-                          ? t(`filtered${workflowResults.total === 1 ? '' : 's'}`)
-                          : t(`total${workflowResults.total === 1 ? '' : 's'}`)}
+                          ? t(`filtered${retrohuntResults.total === 1 ? '' : 's'}`)
+                          : t(`total${retrohuntResults.total === 1 ? '' : 's'}`)}
                       </span>
                     )}
                   </Typography>
                 )}
 
                 <SearchPager
-                  total={workflowResults.total}
-                  setResults={setWorkflowResults}
+                  total={retrohuntResults.total}
+                  setResults={setRetrohuntResults}
                   pageSize={pageSize}
-                  index="workflow"
+                  index="retrohunt"
                   query={query}
                   setSearching={setSearching}
                 />
@@ -243,7 +238,10 @@ export default function Workflows() {
       </PageHeader>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
-        <WorkflowTable workflowResults={workflowResults} setWorkflowID={setWorkflowID} />
+        <RetrohuntTable
+          retrohuntResults={retrohuntResults}
+          onRowClick={code => setGlobalDrawer(<RetrohuntJobDetail retrohuntCode={code} close={closeGlobalDrawer} />)}
+        />
       </div>
     </PageFullWidth>
   ) : (
