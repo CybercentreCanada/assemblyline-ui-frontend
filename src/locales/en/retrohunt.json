@@ -1,6 +1,13 @@
 {
+  "header.view": "Retrohunt Job Details",
+  "header.add": "Add Retrohunt Job",
+  "tooltip.add": "Create a new Retrohunt job",
+  "tab.details": "Details",
+  "tab.signature": "Signature",
+  "tab.results": "Results",
+  "yara.loading": "Loading",
   "add_job": "Add Retrohunt job",
-  "filter": "Filter Retrohunt job...",
+  "filter": "Filter Retrohunt jobs...",
   "filtered": "Retrohunt job matching filter",
   "filtereds": "Retrohunt jobs matching filter",
   "noisy": "Show noisy Retrohunt jobs",
@@ -9,5 +16,9 @@
   "total": "Retrohunt job",
   "totals": "Retrohunt jobs",
   "never_used": "Retrohunt jobs that were never used",
-  "old": "Retrohunt jobs not used in the past 3 months"
+  "old": "Retrohunt jobs not used in the past 3 months",
+
+  "details.classification": "Classification",
+  "details.archive_only": "Archive Only",
+  "details.description": "Description"
 }

@@ -37,6 +37,7 @@ import manageWorkflowsEN from 'locales/en/manage/workflows.json';
 import manageWorkflowDetailEN from 'locales/en/manage/workflow_detail.json';
 import notificationEN from 'locales/en/notification.json';
 import retrohuntEN from 'locales/en/retrohunt.json';
+import retrohuntDetailEN from 'locales/en/retrohunt_detail.json';
 import searchEN from 'locales/en/search.json';
 import settingsEN from 'locales/en/settings.json';
 import statisticsHeuristicsEN from 'locales/en/statistics/heuristics.json';
@@ -85,6 +86,7 @@ import manageWorkflowsFR from 'locales/fr/manage/workflows.json';
 import manageWorkflowDetailFR from 'locales/fr/manage/workflow_detail.json';
 import notificationFR from 'locales/fr/notification.json';
 import retrohuntFR from 'locales/fr/retrohunt.json';
+import retrohuntDetailFR from 'locales/fr/retrohunt_detail.json';
 import searchFR from 'locales/fr/search.json';
 import settingsFR from 'locales/fr/settings.json';
 import statisticsHeuristicsFR from 'locales/fr/statistics/heuristics.json';
@@ -137,6 +139,7 @@ const resources = {
     manageWorkflows: manageWorkflowsEN,
     notification: notificationEN,
     retrohunt: retrohuntEN,
+    retrohuntDetail: retrohuntDetailEN,
     search: searchEN,
     settings: settingsEN,
     statisticsHeuristics: statisticsHeuristicsEN,
@@ -187,6 +190,7 @@ const resources = {
     manageWorkflows: manageWorkflowsFR,
     notification: notificationFR,
     retrohunt: retrohuntFR,
+    retrohuntDetail: retrohuntDetailFR,
     search: searchFR,
     settings: settingsFR,
     statisticsHeuristics: statisticsHeuristicsFR,
