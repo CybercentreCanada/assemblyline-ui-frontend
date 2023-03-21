@@ -17,6 +17,7 @@ import SearchPager from 'components/visual/SearchPager';
 import AlertsTable from 'components/visual/SearchResult/alerts';
 import FilesTable from 'components/visual/SearchResult/files';
 import ResultsTable from 'components/visual/SearchResult/results';
+import RetrohuntTable from 'components/visual/SearchResult/retrohunt';
 import SignaturesTable from 'components/visual/SearchResult/signatures';
 import SubmissionsTable from 'components/visual/SearchResult/submissions';
 import SearchResultCount from 'components/visual/SearchResultCount';
@@ -96,13 +97,15 @@ function Search({ index }: SearchProps) {
   const [resultResults, setResultResults] = useState<SearchResults>(null);
   const [signatureResults, setSignatureResults] = useState<SearchResults>(null);
   const [alertResults, setAlertResults] = useState<SearchResults>(null);
+  const [retrohuntResults, setRetrohuntResults] = useState<SearchResults>(null);
 
   const stateMap = {
     submission: setSubmissionResults,
     file: setFileResults,
     result: setResultResults,
     signature: setSignatureResults,
-    alert: setAlertResults
+    alert: setAlertResults,
+    retrohunt: setRetrohuntResults
   };
 
   const resMap = {
@@ -110,7 +113,8 @@ function Search({ index }: SearchProps) {
     file: fileResults,
     result: resultResults,
     signature: signatureResults,
-    alert: alertResults
+    alert: alertResults,
+    retrohunt: retrohuntResults
   };
 
   const permissionMap = {
@@ -118,7 +122,8 @@ function Search({ index }: SearchProps) {
     file: 'submission_view',
     result: 'submission_view',
     signature: 'signature_view',
-    alert: 'alert_view'
+    alert: 'alert_view',
+    retrohunt: 'retrohunt_view'
   };
 
   const queryValue = useRef<string>('');
@@ -383,6 +388,9 @@ function Search({ index }: SearchProps) {
         )}
         {tab === 'result' && query && query.get('query') && (
           <ResultsTable resultResults={resultResults} allowSort={!!(index || id)} />
+        )}
+        {tab === 'retrohunt' && query && query.get('query') && (
+          <RetrohuntTable retrohuntResults={retrohuntResults} allowSort={!!(index || id)} />
         )}
         {tab === 'signature' && query && query.get('query') && (
           <SignaturesTable signatureResults={signatureResults} allowSort={!!(index || id)} />
