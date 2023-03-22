@@ -194,9 +194,11 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, close = () => null, page
           />
         </Grid>
 
-        <Grid item display={tab === 'results' ? 'flex' : 'none'} flex={1} height="100%" paddingTop={theme.spacing(2)}>
-          <RetrohuntResults retrohunt={retrohunt} />
-        </Grid>
+        {type === 'view' && (
+          <Grid item display={tab === 'results' ? 'flex' : 'none'} flex={1} height="100%" paddingTop={theme.spacing(2)}>
+            <RetrohuntResults retrohunt={retrohunt} />
+          </Grid>
+        )}
       </PageFullSize>
     );
 }

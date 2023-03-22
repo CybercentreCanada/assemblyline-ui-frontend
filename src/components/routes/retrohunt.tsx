@@ -11,8 +11,6 @@ import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
-import { RetrohuntDetail } from 'components/routes/retrohunt/detail';
-import { RetrohuntJobDetail } from 'components/visual/Retrohunt';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
@@ -25,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import ForbiddenPage from './403';
+import { RetrohuntDetail } from './retrohunt/detail';
 
 const PAGE_SIZE = 25;
 
@@ -106,7 +105,6 @@ export default function Retrohunt() {
       url: '/api/v4/search/retrohunt/',
       body: query.getParams(),
       onSuccess: api_data => {
-        console.log(api_data);
         if (
           api_data.api_response.items.length === 0 &&
           api_data.api_response.offset !== 0 &&
@@ -169,7 +167,11 @@ export default function Retrohunt() {
                   style={{
                     color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
                   }}
-                  onClick={() => setGlobalDrawer(<RetrohuntJobDetail retrohuntCode={null} close={closeGlobalDrawer} />)}
+                  onClick={() =>
+                    setGlobalDrawer(
+                      <RetrohuntDetail retrohuntCode={null} close={closeGlobalDrawer} pageType="drawer" />
+                    )
+                  }
                   size="large"
                 >
                   <AddCircleOutlineOutlinedIcon />

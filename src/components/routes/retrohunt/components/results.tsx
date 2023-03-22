@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useTheme } from '@mui/material';
 import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
@@ -33,11 +34,11 @@ export const WrappedRetrohuntResults = ({ retrohunt = { ...DEFAULT_RETROHUNT } }
   const { apiCall } = useMyAPI();
   const { indexes, user: currentUser, configuration } = useALContext();
 
+  const queryValue = useRef<string>('');
   const [pageSize] = useState(PAGE_SIZE);
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
   const [searchSuggestion, setSearchSuggestion] = useState<string[]>(null);
   const [searching, setSearching] = useState(false);
-  const queryValue = useRef<string>('');
 
   const [fileResults, setFileResults] = useState<SearchResults>({ items: [], offset: 0, rows: 0, total: 25 });
 
@@ -61,9 +62,7 @@ export const WrappedRetrohuntResults = ({ retrohunt = { ...DEFAULT_RETROHUNT } }
       method: 'POST',
       url: `/api/v4/search/file/`,
       body: { ...query.getParams(), rows: pageSize, offset: 0 },
-      onSuccess: api_data => {
-        console.log(api_data);
-      },
+      onSuccess: api_data => {},
       onFailure: api_data => {
         // if (index || id || !api_data.api_error_message.includes('Rewrite first')) {
         //   showErrorMessage(api_data.api_error_message);
@@ -98,27 +97,31 @@ export const WrappedRetrohuntResults = ({ retrohunt = { ...DEFAULT_RETROHUNT } }
     }
   };
 
-  return (
-    <>
-      <PageHeader isSticky>
-        <div style={{ paddingTop: theme.spacing(1) }}>
-          <SearchBar
-            initValue={query ? query.get('query', '') : ''}
-            searching={searching}
-            // placeholder={t(`search_${index || id || 'all'}`)}
-            suggestions={searchSuggestion}
-            onValueChange={onFilterValueChange}
-            onClear={onClear}
-            onSearch={onSearch}
-            buttons={[]}
-          />
+  if (!queryValue.current) return <></>;
+  else
+    return (
+      <>
+        <PageHeader isSticky>
+          <div style={{ paddingTop: theme.spacing(1) }}>
+            <SearchBar
+              initValue={query ? query.get('query', '') : ''}
+              searching={searching}
+              // placeholder={t(`search_${index || id || 'all'}`)}
+              suggestions={searchSuggestion}
+              onValueChange={onFilterValueChange}
+              onClear={onClear}
+              onSearch={onSearch}
+              buttons={[]}
+            />
+          </div>
+        </PageHeader>
+        <div
+          style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}
+        >
+          {query && query.get('query') && fileResults && <FilesTable fileResults={fileResults} allowSort={true} />}
         </div>
-      </PageHeader>
-      <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
-        {query && query.get('query') && fileResults && <FilesTable fileResults={fileResults} allowSort={true} />}
-      </div>
-    </>
-  );
+      </>
+    );
 };
 
 export const RetrohuntResults = React.memo(WrappedRetrohuntResults);
