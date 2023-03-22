@@ -1,6 +1,8 @@
 import { AlertTitle, Skeleton, Tooltip } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
+import useALContext from 'components/hooks/useALContext';
+import Classification from 'components/visual/Classification';
 import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -16,17 +18,33 @@ import {
   SortableHeaderCell
 } from '../DivTable';
 import InformativeAlert from '../InformativeAlert';
-import { Retrohunt } from '../Retrohunt';
 
-export type RetrohuntResults = {
-  items: Retrohunt[];
-  offset: number;
-  rows: number;
+export type RetrohuntResult = {
+  code: any;
+  creator: any;
+  tags: any;
+  description: any;
+  created: any;
+  classification: any;
+  yara_signature: any;
+  raw_query: any;
+  total_indices: any;
+  pending_indices: any;
+  pending_candidates: any;
+  errors: any;
+  hits: any;
+  finished: any;
+  truncated: any;
+  archive_only?: boolean;
+};
+
+type SearchResults = {
+  items: RetrohuntResult[];
   total: number;
 };
 
 type RetrohuntTableProps = {
-  retrohuntResults: RetrohuntResults;
+  retrohuntResults: SearchResults;
   allowSort?: boolean;
   onRowClick?: (code: string) => void;
 };
@@ -34,9 +52,10 @@ type RetrohuntTableProps = {
 const WrappedRetrohuntTable: React.FC<RetrohuntTableProps> = ({
   retrohuntResults,
   allowSort = true,
-  onRowClick = () => null
+  onRowClick = null
 }) => {
   const { t, i18n } = useTranslation(['search']);
+  const { c12nDef } = useALContext();
 
   return retrohuntResults ? (
     retrohuntResults.total !== 0 ? (
@@ -53,9 +72,11 @@ const WrappedRetrohuntTable: React.FC<RetrohuntTableProps> = ({
               <SortableHeaderCell sortField="creator" allowSort={allowSort}>
                 {t('header.creator')}
               </SortableHeaderCell>
-              <SortableHeaderCell sortField="classification" allowSort={allowSort}>
-                {t('header.classification')}
-              </SortableHeaderCell>
+              {c12nDef.enforce && (
+                <SortableHeaderCell sortField="classification" allowSort={allowSort}>
+                  {t('header.classification')}
+                </SortableHeaderCell>
+              )}
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
@@ -63,8 +84,9 @@ const WrappedRetrohuntTable: React.FC<RetrohuntTableProps> = ({
               <LinkRow
                 key={id}
                 component={Link}
-                to={() => undefined}
+                to={onRowClick ? () => null : `/retrohunt/${retrohunt.code}`}
                 onClick={event => {
+                  if (!onRowClick) return;
                   event.preventDefault();
                   onRowClick(retrohunt?.code);
                 }}
@@ -72,7 +94,7 @@ const WrappedRetrohuntTable: React.FC<RetrohuntTableProps> = ({
                 style={{ textDecoration: 'none' }}
               >
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>
-                  <Tooltip title={retrohunt?.created}>
+                  <Tooltip title={retrohunt.created}>
                     <>
                       <Moment fromNow locale={i18n.language}>
                         {retrohunt?.created}
@@ -80,9 +102,13 @@ const WrappedRetrohuntTable: React.FC<RetrohuntTableProps> = ({
                     </>
                   </Tooltip>
                 </DivTableCell>
-                <DivTableCell>{retrohunt?.code}</DivTableCell>
-                <DivTableCell>{retrohunt?.creator}</DivTableCell>
-                <DivTableCell>{retrohunt?.classification}</DivTableCell>
+                <DivTableCell>{retrohunt.code}</DivTableCell>
+                <DivTableCell>{retrohunt.creator}</DivTableCell>
+                {c12nDef.enforce && (
+                  <DivTableCell>
+                    <Classification type="text" size="tiny" c12n={retrohunt.classification} format="short" />
+                  </DivTableCell>
+                )}
               </LinkRow>
             ))}
           </DivTableBody>
