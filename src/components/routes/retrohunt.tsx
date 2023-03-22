@@ -11,12 +11,13 @@ import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
+import { RetrohuntDetail } from 'components/routes/retrohunt/detail';
 import { RetrohuntJobDetail } from 'components/visual/Retrohunt';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
-import RetrohuntTable, { RetrohuntResults } from 'components/visual/SearchResult/retrohunt';
+import RetrohuntTable, { RetrohuntResult } from 'components/visual/SearchResult/retrohunt';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import 'moment/locale/fr';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -24,7 +25,6 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import ForbiddenPage from './403';
-import RetrohuntDetail from './retrohunt_detail';
 
 const PAGE_SIZE = 25;
 
@@ -45,13 +45,20 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function RetrohuntPage() {
+type SearchResults = {
+  items: RetrohuntResult[];
+  offset: number;
+  rows: number;
+  total: number;
+};
+
+export default function Retrohunt() {
   const { t } = useTranslation(['retrohunt']);
   const [pageSize] = useState(PAGE_SIZE);
   const [searching, setSearching] = useState(false);
   const { indexes } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const [retrohuntResults, setRetrohuntResults] = useState<RetrohuntResults>(null);
+  const [retrohuntResults, setRetrohuntResults] = useState<SearchResults>(null);
   const location = useLocation();
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
   const navigate = useNavigate();
@@ -140,9 +147,9 @@ export default function RetrohuntPage() {
     filterValue.current = inputValue;
   };
 
-  const setRetrohuntID = useCallback(
-    (wf_id: string) => {
-      setGlobalDrawer(<RetrohuntDetail retrohunt_code={wf_id} close={closeGlobalDrawer} />);
+  const openRetrohuntDrawer = useCallback(
+    (code: string) => {
+      setGlobalDrawer(<RetrohuntDetail retrohuntCode={code} close={closeGlobalDrawer} pageType="drawer" />);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
@@ -238,10 +245,7 @@ export default function RetrohuntPage() {
       </PageHeader>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
-        <RetrohuntTable
-          retrohuntResults={retrohuntResults}
-          onRowClick={code => setGlobalDrawer(<RetrohuntJobDetail retrohuntCode={code} close={closeGlobalDrawer} />)}
-        />
+        <RetrohuntTable retrohuntResults={retrohuntResults} onRowClick={code => openRetrohuntDrawer(code)} />
       </div>
     </PageFullWidth>
   ) : (
