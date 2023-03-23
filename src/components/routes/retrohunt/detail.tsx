@@ -53,6 +53,11 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, close = () => null, page
   const [tab, setTab] = useState<RetrohuntTab>('details');
   const [confirmationOpen, setConfirmationOpen] = useState<boolean>(false);
 
+  const currentHash = useMemo(
+    () => (location.hash && location.hash !== '' ? location.hash.substring(1) : null),
+    [location.hash]
+  );
+
   useEffect(() => {
     if (retrohuntCode) setCode(retrohuntCode);
     else if (paramCode) setCode(paramCode);
@@ -76,11 +81,6 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, close = () => null, page
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [retrohuntCode, code]);
-
-  const currentHash = useMemo(
-    () => (location.hash && location.hash !== '' ? location.hash.substring(1) : null),
-    [location.hash]
-  );
 
   useEffect(() => {
     const tabOptions: RetrohuntTab[] = ['details', 'results', 'signature'];
@@ -106,7 +106,6 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, close = () => null, page
 
   const onCreateRetrohunt = useCallback(() => {
     if (!currentUser.roles.includes('retrohunt_run')) return;
-
     apiCall({
       url: `/api/v4/retrohunt/`,
       method: 'POST',
