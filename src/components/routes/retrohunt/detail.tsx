@@ -4,8 +4,10 @@ import { Grid, IconButton, Paper, Skeleton, Tab, Tabs, Tooltip, Typography, useT
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullSize from 'commons/components/pages/PageFullSize';
 import useMyAPI from 'components/hooks/useMyAPI';
+import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
 import ForbiddenPage from 'components/routes/403';
+import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -40,24 +42,33 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, close = () => null, page
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();
   const location = useLocation();
+  const { showErrorMessage } = useMySnackbar();
 
-  const { code } = useParams<ParamProps>();
+  const { code: paramCode } = useParams<ParamProps>();
   const { user: currentUser } = useAppUser<CustomUser>();
 
   const [retrohunt, setRetrohunt] = useState<Retrohunt>(null);
+  const [code, setCode] = useState<string>(null);
   const [type, setType] = useState<RetrohuntPageState>('loading');
   const [tab, setTab] = useState<RetrohuntTab>('details');
+  const [confirmationOpen, setConfirmationOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    if ((retrohuntCode || code) && currentUser.roles.includes('retrohunt_view')) {
+    if (retrohuntCode) setCode(retrohuntCode);
+    else if (paramCode) setCode(paramCode);
+    else setCode(null);
+  }, [paramCode, retrohuntCode]);
+
+  useEffect(() => {
+    if (code && currentUser.roles.includes('retrohunt_view')) {
       apiCall({
-        url: `/api/v4/retrohunt/${retrohuntCode || code}/`,
+        url: `/api/v4/retrohunt/${code}/`,
         onSuccess: api_data => {
           setRetrohunt({ ...api_data.api_response });
           setType('view');
         }
       });
-    } else if (!(retrohuntCode || code) && currentUser.roles.includes('retrohunt_run')) {
+    } else if (!code && currentUser.roles.includes('retrohunt_run')) {
       setRetrohunt({ ...DEFAULT_RETROHUNT });
       setType('add');
     } else {
@@ -86,13 +97,52 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, close = () => null, page
   );
 
   const onViewDetailedPage = useCallback(() => {
-    navigate(`/retrohunt/${retrohuntCode || code}#${tab}`);
-  }, [code, navigate, retrohuntCode, tab]);
+    navigate(`/retrohunt/${code}#${tab}`);
+  }, [code, navigate, tab]);
+
+  const onCancelRetrohuntConfirmation = useCallback(() => {
+    setConfirmationOpen(false);
+  }, []);
+
+  const onCreateRetrohunt = useCallback(() => {
+    if (!currentUser.roles.includes('retrohunt_run')) return;
+
+    apiCall({
+      url: `/api/v4/retrohunt/`,
+      method: 'POST',
+      body: {
+        classification: retrohunt.classification,
+        description: retrohunt.description,
+        archive_only: retrohunt.archive_only ? retrohunt.archive_only : false,
+        yara_signature: retrohunt.yara_signature
+      },
+      onSuccess: api_data => {
+        setRetrohunt({ ...api_data.api_response });
+        setConfirmationOpen(false);
+        setType('view');
+        setCode((api_data.api_response as Retrohunt)?.code);
+      },
+      onFailure: api_data => {
+        showErrorMessage(api_data.api_error_message);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser.roles, retrohunt, showErrorMessage]);
 
   if (type === 'forbidden') return <ForbiddenPage />;
   else
     return (
       <PageFullSize margin={!code ? 2 : 4}>
+        <ConfirmationDialog
+          open={confirmationOpen}
+          handleClose={event => setConfirmationOpen(false)}
+          handleCancel={onCancelRetrohuntConfirmation}
+          handleAccept={onCreateRetrohunt}
+          title={t('validate.title')}
+          cancelText={t('validate.cancelText')}
+          acceptText={t('validate.acceptText')}
+          text={t('validate.text')}
+        />
         <Grid container flexDirection="row" spacing={3} paddingBottom={theme.spacing(2)}>
           <Grid item flexGrow={1}>
             {type === 'loading' && (
@@ -126,6 +176,7 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, close = () => null, page
               {type === 'add' && (
                 <Tooltip title={t('tooltip.add')}>
                   <IconButton
+                    onClick={() => setConfirmationOpen(true)}
                     style={{
                       color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
                     }}
@@ -138,9 +189,9 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, close = () => null, page
               {type === 'view' && pageType === 'drawer' && (
                 <Tooltip title={t('tooltip.view')}>
                   <IconButton
+                    onClick={() => onViewDetailedPage()}
                     style={{ color: theme.palette.action.active }}
                     size="large"
-                    onClick={() => onViewDetailedPage()}
                   >
                     <ListAltOutlinedIcon />
                   </IconButton>
@@ -189,7 +240,7 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, close = () => null, page
         <Grid item display={tab === 'signature' ? 'flex' : 'none'} flex={1} height="100%" paddingTop={theme.spacing(2)}>
           <RetrohuntYara
             retrohunt={retrohunt}
-            isReadyOnly={type === 'add' ? true : false}
+            isReadyOnly={type === 'add' ? false : true}
             onYaraSignatureChange={ys => setRetrohunt(r => ({ ...r, yara_signature: ys }))}
           />
         </Grid>
