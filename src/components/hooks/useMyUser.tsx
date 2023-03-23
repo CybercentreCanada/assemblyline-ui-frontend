@@ -21,6 +21,7 @@ type IndexDefinitionMap = {
   file: IndexDefinition;
   heuristic: IndexDefinition;
   result: IndexDefinition;
+  retrohunt: IndexDefinition;
   safelist: IndexDefinition;
   signature: IndexDefinition;
   submission: IndexDefinition;

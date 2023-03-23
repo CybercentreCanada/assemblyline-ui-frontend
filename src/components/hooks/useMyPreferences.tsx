@@ -137,7 +137,8 @@ const useMyPreferences = () => {
           userPropValidators: [
             { prop: 'user.roles', value: 'alert_view' },
             { prop: 'user.roles', value: 'signature_view' },
-            { prop: 'user.roles', value: 'submission_view' }
+            { prop: 'user.roles', value: 'submission_view' },
+            { prop: 'user.roles', value: 'retrohunt_view' }
           ],
           icon: <SearchIcon />,
           items: [
@@ -166,6 +167,13 @@ const useMyPreferences = () => {
               i18nKey: 'drawer.search.result',
               userPropValidators: [{ prop: 'user.roles', value: 'submission_view' }],
               route: '/search/result',
+              nested: true
+            },
+            {
+              id: 'search.retrohunt',
+              i18nKey: 'drawer.search.retrohunt',
+              userPropValidators: [{ prop: 'user.roles', value: 'retrohunt_view' }],
+              route: '/search/retrohunt',
               nested: true
             },
             {
