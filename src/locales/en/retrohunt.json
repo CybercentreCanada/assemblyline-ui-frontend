@@ -17,6 +17,7 @@
   "tab.signature": "Signature",
   "title": "Retrohunt",
   "tooltip.add": "Create a new Retrohunt job",
+  "tooltip.view": "View this Retrohunt job in a new page",
   "total": "Retrohunt job",
   "totals": "Retrohunt jobs",
   "validate.acceptText": "Create",
