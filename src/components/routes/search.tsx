@@ -17,6 +17,7 @@ import SearchPager from 'components/visual/SearchPager';
 import AlertsTable from 'components/visual/SearchResult/alerts';
 import FilesTable from 'components/visual/SearchResult/files';
 import ResultsTable from 'components/visual/SearchResult/results';
+import RetrohuntTable from 'components/visual/SearchResult/retrohunt';
 import SignaturesTable from 'components/visual/SearchResult/signatures';
 import SubmissionsTable from 'components/visual/SearchResult/submissions';
 import SearchResultCount from 'components/visual/SearchResultCount';
@@ -91,34 +92,38 @@ function Search({ index }: SearchProps) {
   const downSM = useMediaQuery(theme.breakpoints.down('md'));
 
   // Result lists
-  const [submissionResults, setSubmissionResults] = useState<SearchResults>(null);
+  const [alertResults, setAlertResults] = useState<SearchResults>(null);
   const [fileResults, setFileResults] = useState<SearchResults>(null);
   const [resultResults, setResultResults] = useState<SearchResults>(null);
+  const [retrohuntResults, setRetrohuntResults] = useState<SearchResults>(null);
   const [signatureResults, setSignatureResults] = useState<SearchResults>(null);
-  const [alertResults, setAlertResults] = useState<SearchResults>(null);
+  const [submissionResults, setSubmissionResults] = useState<SearchResults>(null);
 
   const stateMap = {
-    submission: setSubmissionResults,
+    alert: setAlertResults,
     file: setFileResults,
     result: setResultResults,
+    retrohunt: setRetrohuntResults,
     signature: setSignatureResults,
-    alert: setAlertResults
+    submission: setSubmissionResults
   };
 
   const resMap = {
-    submission: submissionResults,
+    alert: alertResults,
     file: fileResults,
     result: resultResults,
+    retrohunt: retrohuntResults,
     signature: signatureResults,
-    alert: alertResults
+    submission: submissionResults
   };
 
   const permissionMap = {
-    submission: 'submission_view',
+    alert: 'alert_view',
     file: 'submission_view',
     result: 'submission_view',
+    retrohunt: 'retrohunt_view',
     signature: 'signature_view',
-    alert: 'alert_view'
+    submission: 'submission_view'
   };
 
   const queryValue = useRef<string>('');
@@ -146,11 +151,12 @@ function Search({ index }: SearchProps) {
   };
 
   const resetResults = () => {
-    setSubmissionResults(null);
+    setAlertResults(null);
     setFileResults(null);
     setResultResults(null);
+    setRetrohuntResults(null);
     setSignatureResults(null);
-    setAlertResults(null);
+    setSubmissionResults(null);
   };
 
   useEffect(() => {
@@ -285,12 +291,10 @@ function Search({ index }: SearchProps) {
                 scrollButtons="auto"
                 variant="scrollable"
               >
-                {currentUser.roles.includes(permissionMap.submission) ? (
+                {currentUser.roles.includes(permissionMap.alert) ? (
                   <Tab
-                    label={`${t('submission')} (${
-                      submissionResults ? searchResultsDisplay(submissionResults.total) : '...'
-                    })`}
-                    value="submission"
+                    label={`${t('alert')} (${alertResults ? searchResultsDisplay(alertResults.total) : '...'})`}
+                    value="alert"
                   />
                 ) : (
                   <Empty />
@@ -311,6 +315,16 @@ function Search({ index }: SearchProps) {
                 ) : (
                   <Empty />
                 )}
+                {currentUser.roles.includes(permissionMap.retrohunt) ? (
+                  <Tab
+                    label={`${t('retrohunt')} (${
+                      resultResults ? searchResultsDisplay(retrohuntResults.total) : '...'
+                    })`}
+                    value="retrohunt"
+                  />
+                ) : (
+                  <Empty />
+                )}
                 {currentUser.roles.includes(permissionMap.signature) ? (
                   <Tab
                     label={`${t('signature')} (${
@@ -321,10 +335,12 @@ function Search({ index }: SearchProps) {
                 ) : (
                   <Empty />
                 )}
-                {currentUser.roles.includes(permissionMap.alert) ? (
+                {currentUser.roles.includes(permissionMap.submission) ? (
                   <Tab
-                    label={`${t('alert')} (${alertResults ? searchResultsDisplay(alertResults.total) : '...'})`}
-                    value="alert"
+                    label={`${t('submission')} (${
+                      submissionResults ? searchResultsDisplay(submissionResults.total) : '...'
+                    })`}
+                    value="submission"
                   />
                 ) : (
                   <Empty />
@@ -375,8 +391,8 @@ function Search({ index }: SearchProps) {
         </div>
       </PageHeader>
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
-        {tab === 'submission' && query && query.get('query') && (
-          <SubmissionsTable submissionResults={submissionResults} allowSort={!!(index || id)} />
+        {tab === 'alert' && query && query.get('query') && (
+          <AlertsTable alertResults={alertResults} allowSort={!!(index || id)} />
         )}
         {tab === 'file' && query && query.get('query') && (
           <FilesTable fileResults={fileResults} allowSort={!!(index || id)} />
@@ -384,11 +400,14 @@ function Search({ index }: SearchProps) {
         {tab === 'result' && query && query.get('query') && (
           <ResultsTable resultResults={resultResults} allowSort={!!(index || id)} />
         )}
+        {tab === 'retrohunt' && query && query.get('query') && (
+          <RetrohuntTable retrohuntResults={retrohuntResults} allowSort={!!(index || id)} />
+        )}
         {tab === 'signature' && query && query.get('query') && (
           <SignaturesTable signatureResults={signatureResults} allowSort={!!(index || id)} />
         )}
-        {tab === 'alert' && query && query.get('query') && (
-          <AlertsTable alertResults={alertResults} allowSort={!!(index || id)} />
+        {tab === 'submission' && query && query.get('query') && (
+          <SubmissionsTable submissionResults={submissionResults} allowSort={!!(index || id)} />
         )}
       </div>
     </PageFullWidth>
