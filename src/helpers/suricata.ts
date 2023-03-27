@@ -126,6 +126,7 @@ export const suricataDef = {
           cases: {
             pcre: { token: 'keyword', next: '@pcre_string' },
             url: { token: 'keyword', next: '@url_string' },
+            metadata: { token: 'keyword', next: '@metadata' },
             '@default': { token: 'keyword' }
           }
         }
@@ -162,9 +163,17 @@ export const suricataDef = {
     ],
 
     url_string: [
+      [/,/, 'delimiter'],
       [/[^\\";:|]+/, 'string'],
       [/\\[\\";:|]/, 'escape'],
       [/\\./, 'invalid', '@pop'],
+      [/;/, 'delimiter', '@pop'],
+    ],
+
+    metadata: [
+      [/[:,]/, 'delimiter'],
+      [/(\w+ )(\w+)/, ['string', 'meta']],
+//       [/\\./, 'invalid', '@pop'],
       [/;/, 'delimiter', '@pop'],
     ],
 
