@@ -341,7 +341,14 @@ export const yaraDef = {
           token: 'delimiter',
           switchTo: '@hex_string'
         }
-      ] // hex strings
+      ], // hex strings
+      [
+        /\S.*$/,
+        {
+          token: 'invalid',
+          next: '@pop'
+        }
+      ] // premature end of line
     ],
     // Condition
     rule_condition_start: [
@@ -358,7 +365,8 @@ export const yaraDef = {
         include: '@whitespace'
       },
       [/(meta|strings|condition|\})/, { token: '@rematch', next: '@pop' }],
-      [/@string_names/, 'variable'],
+      [/(@string_names)(\[)(@digits)(])/, ['variable', 'delimiter', 'number', 'delimiter']],
+      [/(@string_names)(\*?)/, ['variable', 'operator']],
       [
         /@identifiers/,
         {
@@ -378,6 +386,7 @@ export const yaraDef = {
           }
         }
       ],
+      [',', 'delimiter'],
       [
         /@operator_chars/,
         {
