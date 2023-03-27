@@ -84,11 +84,6 @@ type SignatureDetailProps = {
 };
 
 const useStyles = makeStyles(theme => ({
-  preview: {
-    padding: theme.spacing(2),
-    whiteSpace: 'pre-wrap',
-    wordBreak: 'break-word'
-  },
   stats: {
     margin: 0,
     padding: theme.spacing(0.75, 1)
@@ -130,7 +125,6 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
   const [modified, setModified] = useState(false);
-  const [height, setHeight] = useState('500px');
   const navigate = useNavigate();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
@@ -200,7 +194,6 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
 
   useEffect(() => {
     if (signature) {
-      setHeight(`${Math.max(200, Math.min((signature.data.split(/\r\n|\r|\n/).length + 1) * 19, 500))}px`);
       if (currentUser.roles.includes('submission_view')) {
         if (!signature.stats) {
           apiCall({
@@ -338,12 +331,12 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
         </DialogActions>
       </Dialog>
       {c12nDef.enforce && (
-        <div style={{ paddingBottom: theme.spacing(4) }}>
+        <div style={{ paddingBottom: theme.spacing(3) }}>
           <Classification size="tiny" c12n={signature ? signature.classification : null} />
         </div>
       )}
       <div style={{ textAlign: 'left' }}>
-        <Grid container alignItems="center" spacing={3}>
+        <Grid container alignItems="center" spacing={2.5}>
           <Grid item xs>
             <Typography variant="h4">{t('title')}</Typography>
             <Typography variant="caption">
@@ -412,34 +405,30 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
           </Grid>
           <Grid item xs={12}>
             {signature ? (
-              <>
+              <div
+                style={{
+                  border: `1px solid ${theme.palette.divider}`
+                }}
+              >
                 <Editor
                   language="yara"
                   width="100%"
-                  height={height}
+                  height="450px"
                   theme={isDarkTheme ? 'vs-dark' : 'vs'}
                   loading={t('loading.yara')}
                   value={signature.data}
                   beforeMount={beforeMount}
-                  // onMount={editorMounted}
                   options={{
                     links: false,
                     readOnly: true,
                     minimap: { enabled: false },
                     overviewRulerLanes: 0,
-                    // scrollbar: {
-                    //   vertical: 'hidden',
-                    //   handleMouseWheel: false
-                    // },
                     wordWrap: 'on',
                     scrollBeyondLastLine: false
                   }}
                 />
-              </>
+              </div>
             ) : (
-              // <Paper component="pre" variant="outlined" className={classes.preview}>
-              //   {signature.data}
-              // </Paper>
               <Skeleton variant="rectangular" height="6rem" />
             )}
           </Grid>
@@ -521,7 +510,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
               <Grid item xs={12}>
                 <Histogram
                   dataset={histogram}
-                  height="300px"
+                  height="250px"
                   isDate
                   title={t('chart.title')}
                   datatype={signature_id || id}
