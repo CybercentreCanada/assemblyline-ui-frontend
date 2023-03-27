@@ -2,9 +2,8 @@ import { Checkbox, Grid, Skeleton, TextField, Typography } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
 import 'moment/locale/fr';
-import React, { useState } from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router';
 import { DEFAULT_RETROHUNT, Retrohunt } from '.';
 
 type SubmitState = {
@@ -20,51 +19,41 @@ type Props = {
   setModified?: (value: boolean) => void;
 };
 
-export const WrappedRetrohuntAdd = (props: Props) => {
-  const { retrohunt = { ...DEFAULT_RETROHUNT }, setRetrohunt = () => null, setModified = () => null } = props;
-
+export const WrappedRetrohuntAdd = ({
+  retrohunt = { ...DEFAULT_RETROHUNT },
+  setRetrohunt = null,
+  setModified = () => null
+}: Props) => {
   const { t } = useTranslation(['retrohunt']);
+  const { user: currentUser } = useALContext();
 
-  const { user: currentUser, c12nDef, configuration } = useALContext();
-  const location = useLocation();
-  const state: SubmitState = location.state as SubmitState;
-  const [settings, setSettings] = useState(null);
-  const classification = useState(state ? state.c12n : null)[0];
-
-  function setClassification(c12n) {
-    if (settings) {
-      setSettings({ ...settings, classification: c12n });
-    }
-  }
+  const setClassification = useCallback(
+    (c12n: string) => {
+      if (setRetrohunt) {
+        setRetrohunt(rh => ({ ...rh, classification: c12n }));
+        setModified(true);
+      }
+    },
+    [setModified, setRetrohunt]
+  );
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs={12}>
+      <Grid item xs={12} sm={6}>
         <Typography variant="subtitle2">{t('details.classification')}</Typography>
         {retrohunt ? (
           <Classification
             format="long"
             type="picker"
-            c12n={classification ? classification : settings ? settings.classification : null}
+            c12n={retrohunt ? retrohunt?.classification : null}
             setClassification={setClassification}
             disabled={!currentUser.roles.includes('retrohunt_run')}
           />
         ) : (
-          // <TextField
-          //   fullWidth
-          //   size="small"
-          //   margin="dense"
-          //   variant="outlined"
-          //   value={retrohunt.classification}
-          //   onChange={event => {
-          //     setModified(true);
-          //     setRetrohunt(r => ({ ...r, classification: event.target.value }));
-          //   }}
-          // />
           <Skeleton style={{ height: '2.5rem' }} />
         )}
       </Grid>
-      <Grid item xs={12}>
+      <Grid item xs={12} sm={6}>
         <Typography variant="subtitle2">{t('details.archive_only')}</Typography>
         {retrohunt ? (
           <Checkbox
@@ -86,7 +75,7 @@ export const WrappedRetrohuntAdd = (props: Props) => {
             fullWidth
             size="small"
             multiline
-            minRows={6}
+            minRows={3}
             margin="dense"
             variant="outlined"
             value={retrohunt.description}
