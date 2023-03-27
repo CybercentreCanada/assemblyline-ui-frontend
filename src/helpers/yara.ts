@@ -341,7 +341,14 @@ export const yaraDef = {
           token: 'delimiter',
           switchTo: '@hex_string'
         }
-      ] // hex strings
+      ], // hex strings
+      [
+        /[^{/"]+$/,
+        {
+          token: 'invalid',
+          next: '@pop'
+        }
+      ] // premature end of line
     ],
     // Condition
     rule_condition_start: [
@@ -358,15 +365,19 @@ export const yaraDef = {
         include: '@whitespace'
       },
       [/(meta|strings|condition|\})/, { token: '@rematch', next: '@pop' }],
-      [/@string_names/, 'variable'],
+      [/(@string_names)(\[)(@digits)(])/, ['variable', 'delimiter', 'number', 'delimiter']],
+      [/(@string_names)(\*?)/, ['variable', 'operator']],
       [
         /@identifiers/,
         {
           cases: {
+            'and|or|not': {
+              token: 'operator'
+            },
             'all|any': {
               token: 'number'
             },
-            'global|private|rule|meta|strings|condition': {
+            'global|private|rule|meta|strings|condition|nocase|ascii|wide|base64|base64wide|xor|fullword': {
               token: 'invalid'
             },
             '@keywords': {
@@ -378,6 +389,7 @@ export const yaraDef = {
           }
         }
       ],
+      [',', 'delimiter'],
       [
         /@operator_chars/,
         {
@@ -506,7 +518,10 @@ export const yaraDef = {
       },
       [/}/, 'delimiter', '@pop'], // End of hex string
       [/(meta|strings|condition|\})/, { token: '@rematch', next: '@pop' }],
-      ['@hexchars', 'string'], // hex values
+      [/\?\?/, 'constant'],  // hex values with wildcard (?)
+      [/(\?)([0-9A-Fa-f])/, ['constant', 'string']],
+      [/([0-9A-Fa-f])(\?)/, ['string', 'constant']],
+      ['@hexchars', 'string'],  // hex values
       [/[|]/, 'delimiter'], // alternate values
       [/(\[)\s*(?:([1-9][0-9]*|[0-9]*\s*-|[0-9]+\s*-\s*[0-9]*)\s*(\]))/, ['delimiter', 'number', 'delimiter']] // hex jump
     ]
