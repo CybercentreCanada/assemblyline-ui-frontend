@@ -98,6 +98,7 @@ export const suricataDef = {
       [/([0-9]{1,5})( *: *)([0-9]{1,5})/, ['number', 'delimiter', 'number']],
       [/[0-9]{1,5}/, 'number'],
       [/[[\]]/, '@brackets'],
+      [/,/, 'delimiter'],
       [/\(/, '@brackets', '@rule_options']
     ],
     ip_networks: [
@@ -112,16 +113,19 @@ export const suricataDef = {
 
     // TODO: Highlight variables from byte_extract and used elsewhere
     rule_options: [
-      [/[\w.:;]+[^\\]$/, 'invalid', '@popall'],
+      [/[\w.:;]+[^\\)]$/, 'invalid', '@popall'],
       { include: '@whitespace' },
       [/!/, 'operators'], // operators (!=) and some option keywords (content:!"value", isdataat:!2) can be negated
       [/[&*+\-/<=>^]+/, { cases: { '@comparison_operators': 'operators' } }],
       [/[*+\-/<>]+/, { cases: { '@math_operators': 'operators' } }],
+      [/2[0-9]{3}[_-]?[0-1][0-9][_-]?[0-3][0-9]/, 'number'],
+      [/(?=\w+-)[\w.-]+/, 'string'],
       [
         /[a-z][a-z_.]+/,
         {
           cases: {
             pcre: { token: 'keyword', next: '@pcre_string' },
+            url: { token: 'keyword', next: '@url_string' },
             '@default': { token: 'keyword' }
           }
         }
@@ -139,7 +143,7 @@ export const suricataDef = {
       [/[^\\";:|]+/, 'string'],
       [/(\|)( *(?:[0-9A-Fa-f]{2} *)+)(\|)/, ['delimiter', 'number', 'delimiter']],
       [/@string_escapes/, 'escape'],
-      [/\\./, 'invalid'],
+      [/\\./, 'invalid', '@pop'],
       [/"/, { token: 'string', bracket: '@close', next: '@pop' }]
     ],
 
@@ -155,6 +159,13 @@ export const suricataDef = {
       [/@pcre_escapes/, 'escape'],
       [/[^\\/";:.|{}()[\]]+/, 'regexp'],
       [/(\/)(@pcre_flags)(")/, [{ token: 'regexp', bracket: '@close', next: '@pop' }, 'keyword', 'regexp']]
+    ],
+
+    url_string: [
+      [/[^\\";:|]+/, 'string'],
+      [/\\[\\";:|]/, 'escape'],
+      [/\\./, 'invalid', '@pop'],
+      [/;/, 'delimiter', '@pop'],
     ],
 
     whitespace: [
