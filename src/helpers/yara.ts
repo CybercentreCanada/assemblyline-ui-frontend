@@ -123,7 +123,7 @@ export const yaraDef = {
       [
         'import',
         {
-          token: 'keyword',
+          token: 'regexp',
           next: '@quoted_string'
         }
       ]
@@ -156,7 +156,7 @@ export const yaraDef = {
         {
           cases: {
             '@keywords': 'invalid',
-            '@default': 'variable'
+            '@default': 'type.identifier'
           }
         }
       ],
@@ -169,7 +169,7 @@ export const yaraDef = {
         {
           cases: {
             '@keywords': 'invalid',
-            '@default': 'variable'
+            '@default': 'meta.content'
           }
         }
       ],
@@ -208,7 +208,7 @@ export const yaraDef = {
               next: '@meta_assign'
             },
             '@default': {
-              token: 'variable',
+              token: 'meta.content',
               next: '@meta_assign'
             }
           }
@@ -282,14 +282,14 @@ export const yaraDef = {
       [
         /[$][0-9A-Z_a-z]*\b/,
         {
-          token: 'variable',
+          token: 'attribute.name',
           next: '@strings_assign'
         }
       ],
       [
         /[$]/,
         {
-          token: 'variable',
+          token: 'attribute.name',
           next: '@strings_assign'
         } // anonymous name
       ],
@@ -365,8 +365,8 @@ export const yaraDef = {
         include: '@whitespace'
       },
       [/(meta|strings|condition|\})/, { token: '@rematch', next: '@pop' }],
-      [/(@string_names)(\[)(@digits)(])/, ['variable', 'delimiter', 'number', 'delimiter']],
-      [/(@string_names)(\*?)/, ['variable', 'operator']],
+      [/(@string_names)(\[)(@digits)(])/, ['attribute.name', 'delimiter', 'number', 'delimiter']],
+      [/(@string_names)(\*?)/, ['attribute.name', 'operator']],
       [
         /@identifiers/,
         {
@@ -384,7 +384,7 @@ export const yaraDef = {
               token: 'keyword'
             },
             '@default': {
-              token: 'variable'
+              token: 'attribute.name'
             }
           }
         }
@@ -518,10 +518,10 @@ export const yaraDef = {
       },
       [/}/, 'delimiter', '@pop'], // End of hex string
       [/(meta|strings|condition|\})/, { token: '@rematch', next: '@pop' }],
-      [/\?\?/, 'constant'],  // hex values with wildcard (?)
+      [/\?\?/, 'constant'], // hex values with wildcard (?)
       [/(\?)([0-9A-Fa-f])/, ['constant', 'string']],
       [/([0-9A-Fa-f])(\?)/, ['string', 'constant']],
-      ['@hexchars', 'string'],  // hex values
+      ['@hexchars', 'string'], // hex values
       [/[|]/, 'delimiter'], // alternate values
       [/(\[)\s*(?:([1-9][0-9]*|[0-9]*\s*-|[0-9]+\s*-\s*[0-9]*)\s*(\]))/, ['delimiter', 'number', 'delimiter']] // hex jump
     ]
