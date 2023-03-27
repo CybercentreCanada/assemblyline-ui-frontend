@@ -31,6 +31,7 @@ import Histogram from 'components/visual/Histogram';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import ResultsTable from 'components/visual/SearchResult/results';
 import SignatureStatus from 'components/visual/SignatureStatus';
+import { suricataConfig, suricataDef } from 'helpers/suricata';
 import { safeFieldValue, safeFieldValueURI } from 'helpers/utils';
 import { yaraConfig, yaraDef } from 'helpers/yara';
 import 'moment/locale/fr';
@@ -42,6 +43,14 @@ import { Link, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
+
+const LANG_SELECTOR = {
+  yara: 'yara',
+  suricata: 'suricata',
+  configextractor: 'python',
+  sigma: 'yaml',
+  tagcheck: 'yara'
+};
 
 export type Signature = {
   classification: string;
@@ -144,12 +153,15 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
   });
 
   const beforeMount = monaco => {
-    // Register a new language
+    // Register Yara language
     monaco.languages.register({ id: 'yara' });
-    // Register a tokens provider for the language
     monaco.languages.setMonarchTokensProvider('yara', yaraDef);
-    // Set the editing configuration for the language
     monaco.languages.setLanguageConfiguration('yara', yaraConfig);
+
+    // Register Suricata language
+    monaco.languages.register({ id: 'suricata' });
+    monaco.languages.setMonarchTokensProvider('suricata', suricataDef);
+    monaco.languages.setLanguageConfiguration('suricata', suricataConfig);
   };
 
   // const editorMounted = (editor, monaco) => {
@@ -411,7 +423,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
                 }}
               >
                 <Editor
-                  language="yara"
+                  language={LANG_SELECTOR[signature.type] || 'plaintext'}
                   width="100%"
                   height="450px"
                   theme={isDarkTheme ? 'vs-dark' : 'vs'}
