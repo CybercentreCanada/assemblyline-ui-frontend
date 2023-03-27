@@ -394,9 +394,9 @@ export const yaraDef = {
           }
         }
       ],
-      [/@digits/, 'number'],
       [/@hexdigits/, 'number'],
       [/@octaldigits/, 'number'],
+      [/@digits/, 'number'],
       [
         /[()]/,
         {
