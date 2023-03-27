@@ -3,7 +3,6 @@ import EventBusyOutlinedIcon from '@mui/icons-material/EventBusyOutlined';
 import EventOutlinedIcon from '@mui/icons-material/EventOutlined';
 import { Grid, IconButton, Tooltip, useMediaQuery, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
@@ -27,23 +26,6 @@ import { RetrohuntDetail } from './retrohunt/detail';
 
 const PAGE_SIZE = 25;
 
-const useStyles = makeStyles(theme => ({
-  searchresult: {
-    fontStyle: 'italic',
-    paddingTop: theme.spacing(0.5),
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-end'
-  },
-  drawerPaper: {
-    width: '80%',
-    maxWidth: '800px',
-    [theme.breakpoints.down('sm')]: {
-      width: '100%'
-    }
-  }
-}));
-
 type SearchResults = {
   items: RetrohuntResult[];
   offset: number;
@@ -52,73 +34,53 @@ type SearchResults = {
 };
 
 export default function Retrohunt() {
+  const theme = useTheme();
   const { t } = useTranslation(['retrohunt']);
-  const [pageSize] = useState(PAGE_SIZE);
-  const [searching, setSearching] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { apiCall } = useMyAPI();
   const { indexes } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const [retrohuntResults, setRetrohuntResults] = useState<SearchResults>(null);
-  const location = useLocation();
-  const [query, setQuery] = useState<SimpleSearchQuery>(null);
-  const navigate = useNavigate();
-  const theme = useTheme();
+  const { closeGlobalDrawer, setGlobalDrawer, globalDrawerOpened } = useDrawer();
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
-  const { apiCall } = useMyAPI();
-  const classes = useStyles();
-  const { closeGlobalDrawer, setGlobalDrawer } = useDrawer();
+
+  const [retrohuntResults, setRetrohuntResults] = useState<SearchResults>(null);
+  const [pageSize] = useState(PAGE_SIZE);
+  const [searching, setSearching] = useState(false);
+  const [query, setQuery] = useState<SimpleSearchQuery>(null);
   const [suggestions] = useState([
     ...Object.keys(indexes.retrohunt).filter(name => indexes.retrohunt[name].indexed),
     ...DEFAULT_SUGGESTION
   ]);
+
   const filterValue = useRef<string>('');
 
-  useEffect(() => {
-    setQuery(new SimpleSearchQuery(location.search, `query=*&rows=${pageSize}&offset=0`));
-  }, [location.pathname, location.search, pageSize]);
-
-  useEffect(() => {
-    if (query && currentUser.roles.includes('retrohunt_view')) {
-      reload(0);
-    }
-
+  const onReload = useCallback(
+    (offset: number) => {
+      query.set('rows', PAGE_SIZE);
+      query.set('offset', offset);
+      apiCall({
+        method: 'POST',
+        url: '/api/v4/search/retrohunt/',
+        body: query.getParams(),
+        onSuccess: api_data => {
+          if (
+            api_data.api_response.items.length === 0 &&
+            api_data.api_response.offset !== 0 &&
+            api_data.api_response.offset >= api_data.api_response.total
+          ) {
+            onReload(Math.max(0, api_data.api_response.offset - api_data.api_response.rows));
+          } else {
+            setRetrohuntResults(api_data.api_response);
+          }
+        },
+        onEnter: () => setSearching(true),
+        onExit: () => setSearching(false)
+      });
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query]);
-
-  useEffect(() => {
-    function handleReload() {
-      reload(retrohuntResults ? retrohuntResults.offset : 0);
-    }
-
-    window.addEventListener('reloadRetrohunts', handleReload);
-
-    return () => {
-      window.removeEventListener('reloadRetrohunts', handleReload);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, retrohuntResults]);
-
-  const reload = offset => {
-    query.set('rows', PAGE_SIZE);
-    query.set('offset', offset);
-    apiCall({
-      method: 'POST',
-      url: '/api/v4/search/retrohunt/',
-      body: query.getParams(),
-      onSuccess: api_data => {
-        if (
-          api_data.api_response.items.length === 0 &&
-          api_data.api_response.offset !== 0 &&
-          api_data.api_response.offset >= api_data.api_response.total
-        ) {
-          reload(Math.max(0, api_data.api_response.offset - api_data.api_response.rows));
-        } else {
-          setRetrohuntResults(api_data.api_response);
-        }
-      },
-      onEnter: () => setSearching(true),
-      onExit: () => setSearching(false)
-    });
-  };
+    [query]
+  );
 
   const onClear = useCallback(
     () => {
@@ -147,11 +109,52 @@ export default function Retrohunt() {
 
   const openRetrohuntDrawer = useCallback(
     (code: string) => {
-      setGlobalDrawer(<RetrohuntDetail retrohuntCode={code} close={closeGlobalDrawer} pageType="drawer" />);
+      navigate(`${location.pathname}${location.search ? location.search : ''}#${code}`);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
+
+  useEffect(() => {
+    setQuery(new SimpleSearchQuery(location.search, `query=*&rows=${pageSize}&offset=0`));
+  }, [location.pathname, location.search, pageSize]);
+
+  useEffect(() => {
+    if (query && currentUser.roles.includes('retrohunt_view')) {
+      onReload(0);
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query]);
+
+  useEffect(() => {
+    function handleReload() {
+      onReload(retrohuntResults ? retrohuntResults.offset : 0);
+    }
+    window.addEventListener('reloadRetrohunts', handleReload);
+    return () => {
+      window.removeEventListener('reloadRetrohunts', handleReload);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query, retrohuntResults]);
+
+  useEffect(() => {
+    if (retrohuntResults !== null && !globalDrawerOpened && location.hash) {
+      navigate(`${location.pathname}${location.search ? location.search : ''}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [globalDrawerOpened]);
+
+  useEffect(() => {
+    if (location.hash) {
+      setGlobalDrawer(
+        <RetrohuntDetail retrohuntCode={location.hash.substr(1)} close={closeGlobalDrawer} pageType="drawer" />
+      );
+    } else {
+      closeGlobalDrawer();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.hash]);
 
   return currentUser.roles.includes('retrohunt_view') ? (
     <PageFullWidth margin={4}>
@@ -216,7 +219,15 @@ export default function Retrohunt() {
             ]}
           >
             {retrohuntResults !== null && (
-              <div className={classes.searchresult}>
+              <div
+                style={{
+                  fontStyle: 'italic',
+                  paddingTop: theme.spacing(0.5),
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  justifyContent: 'flex-end'
+                }}
+              >
                 {retrohuntResults.total !== 0 && (
                   <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
                     {searching ? (
