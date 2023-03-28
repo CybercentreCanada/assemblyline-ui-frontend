@@ -107,8 +107,8 @@ export const suricataDef = {
       { include: '@ip_addresses' }
     ],
     ip_addresses: [
-      [/@ipv4/, 'variable'],
-      [/@ipv6/, 'variable']
+      [/@ipv4/, 'number'],
+      [/@ipv6/, 'number']
     ],
 
     // TODO: Highlight variables from byte_extract and used elsewhere
@@ -167,14 +167,13 @@ export const suricataDef = {
       [/[^\\";:|]+/, 'string'],
       [/\\[\\";:|]/, 'escape'],
       [/\\./, 'invalid', '@pop'],
-      [/;/, 'delimiter', '@pop'],
+      [/;/, 'delimiter', '@pop']
     ],
 
     metadata: [
       [/[:,]/, 'delimiter'],
-      [/(\w+ )(\w+)/, ['string', 'meta']],
-//       [/\\./, 'invalid', '@pop'],
-      [/;/, 'delimiter', '@pop'],
+      [/(\w+ )([^,;]+)/, ['variable', 'string']],
+      [/;/, 'delimiter', '@pop']
     ],
 
     whitespace: [
