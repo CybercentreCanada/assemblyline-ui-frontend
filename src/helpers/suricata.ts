@@ -102,13 +102,13 @@ export const suricataDef = {
       [/\(/, '@brackets', '@rule_options']
     ],
     ip_networks: [
-      [/@ipv4_net/, ['variable', 'delimiter', 'number']],
-      [/@ipv6_net/, ['variable', 'delimiter', 'number']],
+      [/@ipv4_net/, ['attribute.name', 'delimiter', 'number']],
+      [/@ipv6_net/, ['attribute.name', 'delimiter', 'number']],
       { include: '@ip_addresses' }
     ],
     ip_addresses: [
-      [/@ipv4/, 'number'],
-      [/@ipv6/, 'number']
+      [/@ipv4/, 'attribute.name'],
+      [/@ipv6/, 'attribute.name']
     ],
 
     // TODO: Highlight variables from byte_extract and used elsewhere
