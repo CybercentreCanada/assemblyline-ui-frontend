@@ -2,16 +2,9 @@ import { Checkbox, Grid, Skeleton, TextField, Typography } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import Classification from 'components/visual/Classification';
 import 'moment/locale/fr';
-import React, { useCallback } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { DEFAULT_RETROHUNT, Retrohunt } from '.';
-
-type SubmitState = {
-  hash: string;
-  tabContext: string;
-  c12n: string;
-  metadata?: any;
-};
 
 type Props = {
   retrohunt: Retrohunt;
@@ -27,16 +20,6 @@ export const WrappedRetrohuntAdd = ({
   const { t } = useTranslation(['retrohunt']);
   const { user: currentUser } = useALContext();
 
-  const setClassification = useCallback(
-    (c12n: string) => {
-      if (setRetrohunt) {
-        setRetrohunt(rh => ({ ...rh, classification: c12n }));
-        setModified(true);
-      }
-    },
-    [setModified, setRetrohunt]
-  );
-
   return (
     <Grid container spacing={2}>
       <Grid item xs={12} sm={6}>
@@ -46,7 +29,12 @@ export const WrappedRetrohuntAdd = ({
             format="long"
             type="picker"
             c12n={retrohunt ? retrohunt?.classification : null}
-            setClassification={setClassification}
+            setClassification={(c12n: string) => {
+              if (setRetrohunt) {
+                setRetrohunt(rh => ({ ...rh, classification: c12n }));
+                setModified(true);
+              }
+            }}
             disabled={!currentUser.roles.includes('retrohunt_run')}
           />
         ) : (
