@@ -9,7 +9,7 @@ export type RetrohuntPost = {
   yara_signature: string;
 };
 
-export type Retrohunt = {
+type Retrohunt = {
   code: any;
   creator: any;
   tags: any;

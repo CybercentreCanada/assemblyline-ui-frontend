@@ -123,7 +123,6 @@ export default function Retrohunt() {
     if (query && currentUser.roles.includes('retrohunt_view')) {
       onReload(0);
     }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
@@ -170,11 +169,7 @@ export default function Retrohunt() {
                   style={{
                     color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
                   }}
-                  onClick={() =>
-                    setGlobalDrawer(
-                      <RetrohuntDetail retrohuntCode={null} close={closeGlobalDrawer} pageType="drawer" />
-                    )
-                  }
+                  onClick={() => openRetrohuntDrawer('new')}
                   size="large"
                 >
                   <AddCircleOutlineOutlinedIcon />
