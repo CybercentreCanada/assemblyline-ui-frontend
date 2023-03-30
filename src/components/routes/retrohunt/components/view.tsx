@@ -2,7 +2,8 @@ import { Divider, Grid, Skeleton, Typography, useTheme } from '@mui/material';
 import 'moment/locale/fr';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DEFAULT_RETROHUNT, Retrohunt } from '.';
+import { DEFAULT_RETROHUNT } from '.';
+import { Retrohunt } from '../retrohunt_detail';
 
 type ItemProps = {
   isLoading?: boolean;

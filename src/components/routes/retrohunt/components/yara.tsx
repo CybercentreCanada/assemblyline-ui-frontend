@@ -231,7 +231,7 @@ type Props = {
 };
 
 export const RetrohuntYara = ({
-  yara_signature = null,
+  yara_signature = ``,
   isEditable = true,
   onYaraSignatureChange = () => null,
   reload = () => null
@@ -267,7 +267,7 @@ export const RetrohuntYara = ({
     editor.focus();
   };
 
-  if (!yara_signature) return null;
+  if (yara_signature === null || yara_signature === undefined) return null;
   else
     return (
       <div
