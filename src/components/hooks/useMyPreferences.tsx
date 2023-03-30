@@ -7,6 +7,7 @@ import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 import CodeOutlinedIcon from '@mui/icons-material/CodeOutlined';
 import CompareArrowsOutlinedIcon from '@mui/icons-material/CompareArrowsOutlined';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
+import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import FindInPageOutlinedIcon from '@mui/icons-material/FindInPageOutlined';
@@ -117,17 +118,17 @@ const useMyPreferences = () => {
           nested: false
         }
       },
-      // {
-      //   type: 'item' as 'item',
-      //   element: {
-      //     id: 'retrohunt',
-      //     i18nKey: 'drawer.retrohunt',
-      //     userPropValidators: [{ prop: 'user.roles', value: 'retrohunt_view' }],
-      //     icon: <DataObjectOutlinedIcon />,
-      //     route: '/retrohunt',
-      //     nested: false
-      //   }
-      // },
+      {
+        type: 'item' as 'item',
+        element: {
+          id: 'retrohunt',
+          i18nKey: 'drawer.retrohunt',
+          userPropValidators: [{ prop: 'user.roles', value: 'retrohunt_view' }],
+          icon: <DataObjectOutlinedIcon />,
+          route: '/retrohunt',
+          nested: false
+        }
+      },
       {
         type: 'group' as 'group',
         element: {
