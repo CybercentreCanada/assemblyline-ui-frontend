@@ -13,7 +13,7 @@ import { RouterPrompt } from 'components/visual/RouterPrompt';
 import 'moment/locale/fr';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 import { useParams } from 'react-router-dom';
 import {
   DEFAULT_RETROHUNT,
@@ -28,7 +28,6 @@ type ParamProps = {
   code: string;
 };
 
-type RetrohuntTab = 'details' | 'signature' | 'results';
 type RetrohuntPageType = 'page' | 'drawer';
 type RetrohuntPageState = 'loading' | 'view' | 'add' | 'error' | 'forbidden';
 
@@ -43,7 +42,6 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, close = () => null, page
   const theme = useTheme();
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();
-  const location = useLocation();
   const { showErrorMessage } = useMySnackbar();
 
   const { code: paramCode } = useParams<ParamProps>();
