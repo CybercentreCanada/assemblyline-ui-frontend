@@ -40,14 +40,14 @@ export const WrappedRetrohuntView = ({ retrohunt = { ...DEFAULT_RETROHUNT } }: P
         <Typography variant="h6">{t('general')}</Typography>
         <Divider sx={{ '@media print': { backgroundColor: '#0000001f !important' } }} />
       </Grid>
-      <Item title="title.code" value={retrohunt.code} isLoading={!retrohunt} />
-      <Item title="title.raw_query" value={retrohunt.raw_query} isLoading={!retrohunt} />
-      <Item title="title.classification" value={retrohunt.classification} isLoading={!retrohunt} />
-      <Item title="title.description" value={retrohunt.description} isLoading={!retrohunt} />
+      <Item title="details.code" value={retrohunt.code} isLoading={!retrohunt} />
+      <Item title="details.raw_query" value={retrohunt.raw_query} isLoading={!retrohunt} />
+      <Item title="details.classification" value={retrohunt.classification} isLoading={!retrohunt} />
+      <Item title="details.description" value={retrohunt.description} isLoading={!retrohunt} />
       <Grid item xs={12} style={{ height: theme.spacing(2) }} />
-      <Item title="title.created" value={retrohunt.created} isLoading={!retrohunt} />
-      <Item title="title.creator" value={retrohunt.creator} isLoading={!retrohunt} />
-      <Item title="title.tags" value={retrohunt.tags} isLoading={!retrohunt} />
+      <Item title="details.created" value={retrohunt.created} isLoading={!retrohunt} />
+      <Item title="details.creator" value={retrohunt.creator} isLoading={!retrohunt} />
+      <Item title="details.tags" value={retrohunt.tags} isLoading={!retrohunt} />
     </Grid>
   );
 };

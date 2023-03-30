@@ -1,12 +1,10 @@
 import Editor, { loader } from '@monaco-editor/react';
-import { Skeleton, useTheme } from '@mui/material';
+import { useTheme } from '@mui/material';
 import useAppTheme from 'commons/components/app/hooks/useAppTheme';
-import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import 'moment/locale/fr';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactResizeDetector from 'react-resize-detector';
-import { DEFAULT_RETROHUNT, Retrohunt } from '.';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 
@@ -226,15 +224,15 @@ const yaraConfig = {
 };
 
 type Props = {
-  retrohunt: Retrohunt;
-  isReadyOnly?: boolean;
+  yara_signature: string;
+  isEditable?: boolean;
   onYaraSignatureChange?: (value: string) => void;
   reload?: () => void;
 };
 
 export const RetrohuntYara = ({
-  retrohunt = { ...DEFAULT_RETROHUNT },
-  isReadyOnly = false,
+  yara_signature = null,
+  isEditable = true,
   onYaraSignatureChange = () => null,
   reload = () => null
 }: Props) => {
@@ -243,8 +241,8 @@ export const RetrohuntYara = ({
   const containerEL = useRef<HTMLDivElement>();
   const { isDark: isDarkTheme } = useAppTheme();
 
-  useEffectOnce(() => {
-    if (!retrohunt?.yara_signature) reload();
+  useEffect(() => {
+    if (!yara_signature) reload();
     // I cannot find a way to hot switch monaco editor's locale but at least I can load
     // the right language on first load...
     if (i18n.language === 'fr') {
@@ -269,51 +267,45 @@ export const RetrohuntYara = ({
     editor.focus();
   };
 
-  return retrohunt ? (
-    <div
-      ref={containerEL}
-      style={{
-        flexGrow: 1,
-        border: `1px solid ${theme.palette.divider}`,
-        position: 'relative'
-      }}
-    >
+  if (!yara_signature) return null;
+  else
+    return (
       <div
+        ref={containerEL}
         style={{
-          position: 'absolute',
-          top: 0,
-          bottom: 0,
-          left: 0,
-          right: 0
+          flexGrow: 1,
+          border: `1px solid ${theme.palette.divider}`,
+          position: 'relative'
         }}
       >
-        <ReactResizeDetector handleHeight handleWidth targetRef={containerEL}>
-          {({ width, height }) => (
-            <div ref={containerEL}>
-              {retrohunt.yara_signature !== null ? (
-                <>
-                  <Editor
-                    language="yara"
-                    width={width}
-                    height={height}
-                    theme={isDarkTheme ? 'vs-dark' : 'vs'}
-                    loading={t('loading.yara')}
-                    value={retrohunt.yara_signature}
-                    onChange={value => onYaraSignatureChange(value)}
-                    beforeMount={beforeMount}
-                    onMount={onMount}
-                    options={{ links: false, readOnly: isReadyOnly }}
-                  />
-                </>
-              ) : (
-                <Skeleton width={width} height={height} variant="rectangular" animation="wave" />
-              )}
-            </div>
-          )}
-        </ReactResizeDetector>
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0
+          }}
+        >
+          <ReactResizeDetector handleHeight handleWidth targetRef={containerEL}>
+            {({ width, height }) => (
+              <div ref={containerEL}>
+                <Editor
+                  language="yara"
+                  width={width}
+                  height={height}
+                  theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                  loading={t('yara.loading')}
+                  value={yara_signature}
+                  onChange={value => onYaraSignatureChange(value)}
+                  beforeMount={beforeMount}
+                  onMount={onMount}
+                  options={{ links: false, readOnly: !isEditable }}
+                />
+              </div>
+            )}
+          </ReactResizeDetector>
+        </div>
       </div>
-    </div>
-  ) : (
-    <Skeleton style={{ height: '2.5rem' }} />
-  );
+    );
 };

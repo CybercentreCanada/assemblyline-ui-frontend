@@ -1,127 +1,322 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+import Editor, { loader } from '@monaco-editor/react';
 import { useTheme } from '@mui/material';
-import PageHeader from 'commons/components/pages/PageHeader';
-import useALContext from 'components/hooks/useALContext';
-import useMyAPI from 'components/hooks/useMyAPI';
-import SearchBar from 'components/visual/SearchBar/search-bar';
-import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
-import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
-import FilesTable, { FileResult } from 'components/visual/SearchResult/files';
+import useAppTheme from 'commons/components/app/hooks/useAppTheme';
 import 'moment/locale/fr';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { DEFAULT_RETROHUNT, Retrohunt } from '.';
+import ReactResizeDetector from 'react-resize-detector';
 
-const PAGE_SIZE = 25;
+loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 
-type SearchResults = {
-  items: FileResult[];
-  offset: number;
-  rows: number;
-  total: number;
+const yaraDef = {
+  defaultToken: '',
+  digits: /\d+(_+\d+)*/,
+  octaldigits: /[0-7]+(_+[0-7]+)*/,
+  binarydigits: /[0-1]+(_+[0-1]+)*/,
+  hexdigits: /[[0-9a-fA-F]+(_+[0-9a-fA-F]+)*/,
+  keywords: [
+    'all',
+    'and',
+    'any',
+    'ascii',
+    'at',
+    'base64',
+    'base64wide',
+    'condition',
+    'contains',
+    'endswith',
+    'entrypoint',
+    'false',
+    'filesize',
+    'for',
+    'fullword',
+    'global',
+    'import',
+    'icontains',
+    'iendswith',
+    'iequals',
+    'in',
+    'include',
+    'int16',
+    'int16be',
+    'int32',
+    'int32be',
+    'int8',
+    'int8be',
+    'istartswith',
+    'matches',
+    'meta',
+    'nocase',
+    'none',
+    'not',
+    'of',
+    'or',
+    'private',
+    'rule',
+    'startswith',
+    'strings',
+    'them',
+    'true',
+    'uint16',
+    'uint16be',
+    'uint32',
+    'uint32be',
+    'uint8',
+    'uint8be',
+    'wide',
+    'xor',
+    'defined'
+  ],
+  typeKeywords: [
+    'any',
+    'of',
+    'them',
+    'contains',
+    'icontains',
+    'startswith',
+    'istartswith',
+    'endswith',
+    'iendswith',
+    'iequals',
+    'matches',
+    'and',
+    'or'
+  ],
+  common: [
+    [
+      /[a-z_$][\w$]*/,
+      {
+        cases: {
+          '@typeKeywords': 'keyword',
+          '@keywords': 'keyword',
+          '@default': 'identifier'
+        }
+      }
+    ],
+    { include: '@whitespace' },
+    { include: '@brackets' },
+    { include: '@numbers' },
+    { include: '@strings' },
+    { include: '@tags' }
+  ],
+  escapes: /(\\[nrt\\"]|x\d{2})/,
+
+  operators: [
+    '.',
+    '-',
+    '~',
+    '*',
+    '\\',
+    '%',
+    '+',
+    '-',
+    '>>',
+    '<<',
+    '&',
+    '^',
+    '|',
+    '<',
+    '<=',
+    '>',
+    '>=',
+    '==',
+    '!=',
+    '='
+  ],
+  // The main tokenizer for our languages
+  tokenizer: {
+    root: [[/[{}]/, 'delimiter.bracket'], { include: 'common' }],
+
+    common: [
+      // Variables
+      [/[$@][\w_]*/, 'attribute.name'],
+      // identifiers and keywords
+      [
+        /[a-z_$][\w$]*/,
+        {
+          cases: {
+            '@typeKeywords': 'keyword',
+            '@keywords': 'keyword',
+            '@default': 'identifier'
+          }
+        }
+      ],
+
+      // whitespace
+      { include: '@whitespace' },
+
+      // regular expression: ensure it is terminated before beginning (otherwise it is an opeator)
+      [/(\/(?:[^\\/]|\\.)+\/)([si]{1,2})?[ \t\n\r$]*/, 'regexp'],
+
+      // delimiters and operators
+      [/[()[\]]/, '@brackets'],
+
+      // numbers
+      [/(@digits)[eE]([-+]?(@digits))?/, 'number.float'],
+      [/(@digits)\.(@digits)([eE][-+]?(@digits))?/, 'number.float'],
+      [/0[xX](@hexdigits)/, 'number.hex'],
+      [/0[oO]?(@octaldigits)/, 'number.octal'],
+      [/0[bB](@binarydigits)/, 'number.binary'],
+      [/(@digits)/, 'number'],
+
+      // delimiter: after number because of .\d floats
+      [/[;,.]/, 'delimiter'],
+
+      // strings
+      [/"/, 'string', '@string_double']
+    ],
+
+    whitespace: [
+      [/[ \t\r\n]+/, ''],
+      [/\/\*/, 'comment', '@comment'],
+      [/\/\/.*$/, 'comment']
+    ],
+
+    comment: [
+      [/[^/*]+/, 'comment'],
+      [/\*\//, 'comment', '@pop'],
+      [/[/*]/, 'comment']
+    ],
+
+    string_double: [
+      [/[^\\"]+/, 'string'],
+      [/@escapes/, 'string.escape'],
+      [/"/, 'string', '@pop']
+    ],
+
+    bracketCounting: [
+      [/\{/, 'delimiter.bracket', '@bracketCounting'],
+      [/\}/, 'delimiter.bracket', '@pop'],
+      { include: 'common' }
+    ]
+  }
+};
+
+const yaraConfig = {
+  comments: {
+    // symbol used for single line comment. Remove this entry if your language does not support line comments
+    lineComment: '//',
+    // symbols used for start and end a block comment. Remove this entry if your language does not support block comments
+    blockComment: ['/*', '*/']
+  },
+  // symbols used as brackets
+  brackets: [
+    ['{', '}'],
+    ['[', ']'],
+    ['(', ')']
+  ],
+  // symbols that are auto closed when typing
+  autoClosingPairs: [
+    { open: '"', close: '"', notIn: ['string', 'annotation'] },
+    { open: '/', close: '/', notIn: ['string', 'annotation'] },
+    { open: '{', close: '}', notIn: ['string', 'annotation'] },
+    { open: '[', close: ']', notIn: ['string', 'annotation'] },
+    { open: '(', close: ')', notIn: ['string', 'annotation'] }
+  ],
+  // symbols that that can be used to surround a selection
+  surroundingPairs: [
+    ['{', '}'],
+    ['[', ']'],
+    ['(', ')'],
+    ['"', '"'],
+    ['/', '/']
+  ]
 };
 
 type Props = {
-  retrohunt: Retrohunt;
+  data: string;
+  isEditable?: boolean;
+  beautify?: boolean;
+  onDataChange?: (d: object) => void;
+  reload?: () => void;
 };
 
-export const WrappedRetrohuntResults = ({ retrohunt = { ...DEFAULT_RETROHUNT } }: Props) => {
-  const { t } = useTranslation(['retrohunt']);
+export const RetrohuntResults = ({
+  data = null,
+  isEditable = true,
+  beautify = false,
+  onDataChange = () => null,
+  reload = () => null
+}: Props) => {
+  const { t, i18n } = useTranslation(['retrohunt']);
   const theme = useTheme();
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { apiCall } = useMyAPI();
-  const { indexes, user: currentUser, configuration } = useALContext();
-
-  const queryValue = useRef<string>('');
-  const [pageSize] = useState(PAGE_SIZE);
-  const [query, setQuery] = useState<SimpleSearchQuery>(null);
-  const [searchSuggestion, setSearchSuggestion] = useState<string[]>(null);
-  const [searching, setSearching] = useState(false);
-
-  const [fileResults, setFileResults] = useState<SearchResults>({ items: [], offset: 0, rows: 0, total: 25 });
+  const containerEL = useRef<HTMLDivElement>();
+  const { isDark: isDarkTheme } = useAppTheme();
 
   useEffect(() => {
-    // On index change we need to update the search suggestion
-    setSearchSuggestion([
-      ...Object.keys(indexes?.retrohunt || {}).filter(name => indexes.retrohunt[name].indexed),
-      ...DEFAULT_SUGGESTION
-    ]);
-  }, [indexes]);
-
-  useEffect(() => {
-    if (!query) return;
-    query.set('query', '*');
-  }, [query]);
-
-  useEffect(() => {
-    if (!query) return;
-    queryValue.current = query.get('query', '*');
-    apiCall({
-      method: 'POST',
-      url: `/api/v4/search/file/`,
-      body: { ...query.getParams(), rows: pageSize, offset: 0 },
-      onSuccess: api_data => {},
-      onFailure: api_data => {
-        // if (index || id || !api_data.api_error_message.includes('Rewrite first')) {
-        //   showErrorMessage(api_data.api_error_message);
-        // } else {
-        //   stateMap[searchIndex]({ total: 0, offset: 0, items: [], rows: pageSize });
-        // }
-      },
-      onFinalize: () => {
-        // if (index || id) {
-        //   setSearching(false);
-        // }
-      }
-    });
-    // eslint-disable-next-line
-  }, [query]);
-
-  const onFilterValueChange = (inputValue: string) => {
-    queryValue.current = inputValue;
-  };
-
-  const onClear = () => {
-    query.delete('query');
-    navigate(`${location.pathname}?${query.toString()}${location.hash}`);
-  };
-
-  const onSearch = () => {
-    if (queryValue.current !== '') {
-      query.set('query', queryValue.current);
-      navigate(`${location.pathname}?${query.toString()}${location.hash}`);
+    if (!data) reload();
+    // I cannot find a way to hot switch monaco editor's locale but at least I can load
+    // the right language on first load...
+    if (i18n.language === 'fr') {
+      loader.config({ 'vs/nls': { availableLanguages: { '*': 'fr' } } });
     } else {
-      onClear();
+      loader.config({ 'vs/nls': { availableLanguages: { '*': '' } } });
+    }
+  });
+
+  const beforeMount = monaco => {
+    if (!monaco.languages.getLanguages().some(({ id }) => id === 'yara')) {
+      // Register a new language
+      monaco.languages.register({ id: 'yara' });
+      // Register a tokens provider for the language
+      monaco.languages.setMonarchTokensProvider('yara', yaraDef);
+      // Set the editing configuration for the language
+      monaco.languages.setLanguageConfiguration('yara', yaraConfig);
     }
   };
 
-  if (!queryValue.current) return <></>;
+  const onMount = editor => {
+    editor.focus();
+  };
+
+  const beautifyJSON = inputData => {
+    if (!beautify) return inputData;
+
+    try {
+      return JSON.stringify(JSON.parse(inputData), null, 4);
+    } catch {
+      return inputData;
+    }
+  };
+
+  if (!data) return null;
   else
     return (
-      <>
-        <PageHeader isSticky>
-          <div style={{ paddingTop: theme.spacing(1) }}>
-            <SearchBar
-              initValue={query ? query.get('query', '') : ''}
-              searching={searching}
-              // placeholder={t(`search_${index || id || 'all'}`)}
-              suggestions={searchSuggestion}
-              onValueChange={onFilterValueChange}
-              onClear={onClear}
-              onSearch={onSearch}
-              buttons={[]}
-            />
-          </div>
-        </PageHeader>
+      <div
+        ref={containerEL}
+        style={{
+          flexGrow: 1,
+          border: `1px solid ${theme.palette.divider}`,
+          position: 'relative'
+        }}
+      >
         <div
-          style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0
+          }}
         >
-          {query && query.get('query') && fileResults && <FilesTable fileResults={fileResults} allowSort={true} />}
+          <ReactResizeDetector handleHeight handleWidth targetRef={containerEL}>
+            {({ width, height }) => (
+              <div ref={containerEL}>
+                <Editor
+                  language="json"
+                  width={width}
+                  height={height}
+                  theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                  loading={t('loading.yara')}
+                  value={beautifyJSON(data)}
+                  beforeMount={beforeMount}
+                  onMount={onMount}
+                  options={{ links: false, readOnly: !isEditable }}
+                />
+              </div>
+            )}
+          </ReactResizeDetector>
         </div>
-      </>
+      </div>
     );
 };
-
-export const RetrohuntResults = React.memo(WrappedRetrohuntResults);
