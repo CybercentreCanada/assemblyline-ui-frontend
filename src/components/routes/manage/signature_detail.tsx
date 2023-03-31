@@ -1,3 +1,4 @@
+import Editor, { loader } from '@monaco-editor/react';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
 import {
@@ -10,7 +11,6 @@ import {
   Grid,
   IconButton,
   MenuItem,
-  Paper,
   Select,
   Skeleton,
   Tooltip,
@@ -19,7 +19,9 @@ import {
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import makeStyles from '@mui/styles/makeStyles';
+import useAppTheme from 'commons/components/app/hooks/useAppTheme';
 import PageCenter from 'commons/components/pages/PageCenter';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -29,7 +31,9 @@ import Histogram from 'components/visual/Histogram';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import ResultsTable from 'components/visual/SearchResult/results';
 import SignatureStatus from 'components/visual/SignatureStatus';
+import { suricataConfig, suricataDef } from 'helpers/suricata';
 import { safeFieldValue, safeFieldValueURI } from 'helpers/utils';
+import { yaraConfig, yaraDef } from 'helpers/yara';
 import 'moment/locale/fr';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -37,6 +41,16 @@ import Moment from 'react-moment';
 import { useNavigate } from 'react-router';
 import { Link, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
+
+loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
+
+const LANG_SELECTOR = {
+  yara: 'yara',
+  suricata: 'suricata',
+  configextractor: 'python',
+  sigma: 'yaml',
+  tagcheck: 'yara'
+};
 
 export type Signature = {
   classification: string;
@@ -79,11 +93,6 @@ type SignatureDetailProps = {
 };
 
 const useStyles = makeStyles(theme => ({
-  preview: {
-    padding: theme.spacing(2),
-    whiteSpace: 'pre-wrap',
-    wordBreak: 'break-word'
-  },
   stats: {
     margin: 0,
     padding: theme.spacing(0.75, 1)
@@ -130,6 +139,34 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
   const { apiCall } = useMyAPI();
   const classes = useStyles();
   const { user: currentUser, c12nDef } = useALContext();
+  const { isDark: isDarkTheme } = useAppTheme();
+  // const editorRef = useRef(null);
+
+  useEffectOnce(() => {
+    // I cannot find a way to hot switch monaco editor's locale but at least I can load
+    // the right language on first load...
+    if (i18n.language === 'fr') {
+      loader.config({ 'vs/nls': { availableLanguages: { '*': 'fr' } } });
+    } else {
+      loader.config({ 'vs/nls': { availableLanguages: { '*': '' } } });
+    }
+  });
+
+  const beforeMount = monaco => {
+    // Register Yara language
+    monaco.languages.register({ id: 'yara' });
+    monaco.languages.setMonarchTokensProvider('yara', yaraDef);
+    monaco.languages.setLanguageConfiguration('yara', yaraConfig);
+
+    // Register Suricata language
+    monaco.languages.register({ id: 'suricata' });
+    monaco.languages.setMonarchTokensProvider('suricata', suricataDef);
+    monaco.languages.setLanguageConfiguration('suricata', suricataConfig);
+  };
+
+  // const editorMounted = (editor, monaco) => {
+  //   editorRef.current = editor;
+  // };
 
   useEffect(() => {
     if ((signature_id || id) && currentUser.roles.includes('signature_view')) {
@@ -306,12 +343,12 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
         </DialogActions>
       </Dialog>
       {c12nDef.enforce && (
-        <div style={{ paddingBottom: theme.spacing(4) }}>
+        <div style={{ paddingBottom: theme.spacing(3) }}>
           <Classification size="tiny" c12n={signature ? signature.classification : null} />
         </div>
       )}
       <div style={{ textAlign: 'left' }}>
-        <Grid container alignItems="center" spacing={3}>
+        <Grid container alignItems="center" spacing={2.5}>
           <Grid item xs>
             <Typography variant="h4">{t('title')}</Typography>
             <Typography variant="caption">
@@ -380,9 +417,29 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
           </Grid>
           <Grid item xs={12}>
             {signature ? (
-              <Paper component="pre" variant="outlined" className={classes.preview}>
-                {signature.data}
-              </Paper>
+              <div
+                style={{
+                  border: `1px solid ${theme.palette.divider}`
+                }}
+              >
+                <Editor
+                  language={LANG_SELECTOR[signature.type] || 'plaintext'}
+                  width="100%"
+                  height="450px"
+                  theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                  loading={t('loading.yara')}
+                  value={signature.data}
+                  beforeMount={beforeMount}
+                  options={{
+                    links: false,
+                    readOnly: true,
+                    minimap: { enabled: false },
+                    overviewRulerLanes: 0,
+                    wordWrap: 'on',
+                    scrollBeyondLastLine: false
+                  }}
+                />
+              </div>
             ) : (
               <Skeleton variant="rectangular" height="6rem" />
             )}
@@ -465,7 +522,7 @@ const SignatureDetail = ({ signature_id, onUpdated, onDeleted }: SignatureDetail
               <Grid item xs={12}>
                 <Histogram
                   dataset={histogram}
-                  height="300px"
+                  height="250px"
                   isDate
                   title={t('chart.title')}
                   datatype={signature_id || id}
