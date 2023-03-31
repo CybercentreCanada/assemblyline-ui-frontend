@@ -1,7 +1,7 @@
 version: '2.4'
 
 services:
-  # Dependancies
+  # Dependencies
   minio:
     image: minio/minio
     environment:
