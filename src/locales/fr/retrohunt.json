@@ -19,6 +19,7 @@
   "filtereds": "tâches Retrohunt correspondant au filtre",
   "header.add": "Ajouter une tâche Retrohunt",
   "header.view": "Détails de la tâche Retrohunt",
+  "loading.yara": "Chargement",
   "never_used": "Tâches Retrohunt qui n'ont jamais été utilisées",
   "old": "Tâches Retrohunt non utilisés au cours des 3 derniers mois",
   "save": "Sauvegarder",
@@ -31,6 +32,5 @@
   "validate.acceptText": "Créer",
   "validate.cancelText": "Annuler",
   "validate.text": "Vous souhaitez créer une nouvelle tâche Retrohunt. Voulez-vous continuer?",
-  "validate.title": "Créer un nouvelle tâche Retrohunt",
-  "yara.loading": "Chargement"
+  "validate.title": "Créer un nouvelle tâche Retrohunt"
 }

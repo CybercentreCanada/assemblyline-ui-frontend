@@ -155,7 +155,10 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, pageType = 'page', close
           window.dispatchEvent(new CustomEvent('reloadRetrohunts'));
         }, 100);
       },
-      onFailure: api_data => showErrorMessage(api_data.api_error_message),
+      onFailure: api_data => {
+        showErrorMessage(api_data.api_error_message);
+        setConfirmationOpen(false);
+      },
       onEnter: () => setButtonLoading(true),
       onExit: () => setButtonLoading(false)
     });
@@ -213,7 +216,7 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, pageType = 'page', close
                   variant="contained"
                   color="primary"
                   disabled={buttonLoading || !retrohunt?.description || !retrohunt?.yara_signature}
-                  onClick={() => onCreateRetrohunt()}
+                  onClick={() => setConfirmationOpen(true)}
                 >
                   {t('add.button')}
                   {buttonLoading && (

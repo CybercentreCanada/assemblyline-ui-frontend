@@ -298,7 +298,7 @@ export const RetrohuntYara = ({
                   width={width}
                   height={height}
                   theme={isDarkTheme ? 'vs-dark' : 'vs'}
-                  loading={t('yara.loading')}
+                  loading={t('loading.yara')}
                   value={yara_signature}
                   onChange={value => onYaraSignatureChange(value)}
                   beforeMount={beforeMount}

@@ -19,6 +19,7 @@
   "filtereds": "Retrohunt jobs matching filter",
   "header.add": "Adding a Retrohunt Job",
   "header.view": "Retrohunt Job Details",
+  "loading.yara": "Loading",
   "never_used": "Retrohunt jobs that were never used",
   "old": "Retrohunt jobs not used in the past 3 months",
   "save": "Save",
@@ -31,6 +32,5 @@
   "validate.acceptText": "Create",
   "validate.cancelText": "Cancel",
   "validate.text": "You want to create a new Retrohunt job. Do you want to continue?",
-  "validate.title": "Create a new Retrohunt Job",
-  "yara.loading": "Loading"
+  "validate.title": "Create a new Retrohunt Job"
 }
