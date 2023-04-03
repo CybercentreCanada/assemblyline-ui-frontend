@@ -36,12 +36,14 @@ export const DEFAULT_RETROHUNT: Retrohunt = {
   created: '2023-03-13T18:21:48.744095Z',
   classification: 'TLP:W',
   yara_signature: `
-  rule test_sig {
+  rule my_rule {
+    meta:
+        KEY = "VALUE"
     strings:
-      $first = "Content_Types"
+        $name = { HEX }
     condition:
-      $first
-  }
+        any of them
+}
   `,
   raw_query: '{436f6e74656e745f5479706573}',
   total_indices: 3,

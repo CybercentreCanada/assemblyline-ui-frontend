@@ -94,6 +94,12 @@ export default function useMySitemap() {
       { path: '/alerts', title: t('drawer.alerts'), isRoot: true, icon: <NotificationImportantOutlinedIcon /> },
       { path: '/retrohunt', title: t('drawer.retrohunt'), isRoot: true, icon: <DataObjectOutlinedIcon /> },
       {
+        path: '/retrohunt/:code',
+        title: t('breadcrumb.workflow.detail'),
+        icon: <ListOutlinedIcon />,
+        breadcrumbs: ['/retrohunt']
+      },
+      {
         path: '/alerts/:id',
         title: t('breadcrumb.alert.detail'),
         icon: <BallotOutlinedIcon />,

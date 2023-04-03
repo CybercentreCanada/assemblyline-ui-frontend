@@ -84,7 +84,7 @@ const WrappedRetrohuntTable: React.FC<RetrohuntTableProps> = ({
               <LinkRow
                 key={id}
                 component={Link}
-                to={onRowClick ? () => null : `/retrohunt/${retrohunt.code}`}
+                to={`/retrohunt/${retrohunt.code}`}
                 onClick={event => {
                   if (!onRowClick) return;
                   event.preventDefault();

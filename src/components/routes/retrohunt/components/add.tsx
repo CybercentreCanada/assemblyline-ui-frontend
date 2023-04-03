@@ -28,7 +28,7 @@ export const WrappedRetrohuntAdd = ({
             fullWidth
             size="small"
             multiline
-            rows={6}
+            rows={3}
             margin="dense"
             variant="outlined"
             value={retrohunt.description}

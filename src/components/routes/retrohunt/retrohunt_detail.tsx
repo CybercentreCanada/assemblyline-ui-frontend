@@ -1,9 +1,7 @@
-import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
-import { Button, CircularProgress, Grid, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import { Button, CircularProgress, Grid, Skeleton, Typography, useTheme } from '@mui/material';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullSize from 'commons/components/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
-import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
@@ -61,7 +59,6 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, pageType = 'page', close
   const { c12nDef } = useALContext();
   const { code: paramCode } = useParams<ParamProps>();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const { globalDrawerOpened, closeGlobalDrawer } = useDrawer();
 
   const [retrohunt, setRetrohunt] = useState<Retrohunt>(null);
   const [code, setCode] = useState<string>(paramCode || retrohuntCode);
@@ -78,7 +75,16 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, pageType = 'page', close
       description: '',
       created: '',
       classification: c12nDef.UNRESTRICTED,
-      yara_signature: ``,
+      yara_signature: [
+        'rule my_rule {',
+        '\tmeta:',
+        '\t\tKEY = "VALUE"',
+        '\tstrings:',
+        '\t\t$name = "string"',
+        '\tcondition:',
+        '\t\tany of them',
+        '}'
+      ].join('\n'),
       raw_query: null,
       total_indices: 0,
       pending_indices: 0,
@@ -121,11 +127,6 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, pageType = 'page', close
     setRetrohunt(rh => ({ ...rh, ...newRetrohunt }));
     setModified(true);
   }, []);
-
-  const onViewDetailedPage = useCallback(() => {
-    navigate(`/retrohunt/${code}`);
-    close();
-  }, [close, code, navigate]);
 
   const onCancelRetrohuntConfirmation = useCallback(() => {
     setConfirmationOpen(false);
@@ -178,11 +179,11 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, pageType = 'page', close
           text={t('validate.text')}
         />
 
-        {c12nDef.enforce && (
+        {c12nDef.enforce && ['add', 'view'].includes(type) && (
           <Grid container flexDirection="column" style={{ paddingBottom: theme.spacing(4) }}>
             <Classification
               format="long"
-              type="picker"
+              type={type === 'add' ? 'picker' : 'pill'}
               c12n={retrohunt && 'classification' in retrohunt ? retrohunt.classification : null}
               setClassification={(c12n: string) => onRetrohuntChange({ classification: c12n })}
               disabled={!currentUser.roles.includes('retrohunt_run')}
@@ -207,29 +208,21 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, pageType = 'page', close
                   style={{ margin: theme.spacing(0.5), height: '2.5rem', width: '2.5rem' }}
                 />
               )}
-              {/* {type === 'add' && (
-                <Tooltip title={t('tooltip.add')}>
-                  <IconButton
-                    onClick={() => setConfirmationOpen(true)}
-                    style={{
-                      color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
-                    }}
-                    size="large"
-                  >
-                    <AddCircleOutlineOutlinedIcon />
-                  </IconButton>
-                </Tooltip>
-              )} */}
-              {type === 'view' && (
-                <Tooltip title={t('tooltip.view')}>
-                  <IconButton
-                    onClick={() => onViewDetailedPage()}
-                    style={{ color: theme.palette.action.active }}
-                    size="large"
-                  >
-                    <YoutubeSearchedForIcon />
-                  </IconButton>
-                </Tooltip>
+              {type === 'add' && (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  disabled={buttonLoading || !retrohunt?.description || !retrohunt?.yara_signature}
+                  onClick={() => onCreateRetrohunt()}
+                >
+                  {t('add.button')}
+                  {buttonLoading && (
+                    <CircularProgress
+                      size={24}
+                      style={{ position: 'absolute', top: '50%', left: '50%', marginTop: -12, marginLeft: -12 }}
+                    />
+                  )}
+                </Button>
               )}
             </div>
           </Grid>
@@ -267,22 +260,6 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, pageType = 'page', close
             <Skeleton style={{ height: '10rem', transform: 'none', marginTop: theme.spacing(1) }} />
           )}
         </Grid>
-
-        {code === 'new' && modified && retrohunt && retrohunt?.description && retrohunt?.yara_signature && (
-          <Grid container flexDirection="column" alignItems="flex-end">
-            <Grid item>
-              <Button variant="contained" color="primary" disabled={buttonLoading} onClick={() => onCreateRetrohunt()}>
-                {t('add.button')}
-                {buttonLoading && (
-                  <CircularProgress
-                    size={24}
-                    style={{ position: 'absolute', top: '50%', left: '50%', marginTop: -12, marginLeft: -12 }}
-                  />
-                )}
-              </Button>
-            </Grid>
-          </Grid>
-        )}
       </PageFullSize>
     );
 }

@@ -1,6 +1,7 @@
 import Editor, { loader } from '@monaco-editor/react';
 import { useTheme } from '@mui/material';
 import useAppTheme from 'commons/components/app/hooks/useAppTheme';
+import { registerYaraCompletionItemProvider } from 'helpers/yara';
 import 'moment/locale/fr';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -260,6 +261,8 @@ export const RetrohuntYara = ({
       monaco.languages.setMonarchTokensProvider('yara', yaraDef);
       // Set the editing configuration for the language
       monaco.languages.setLanguageConfiguration('yara', yaraConfig);
+      // Set the yara snippets
+      monaco.languages.registerCompletionItemProvider('yara', registerYaraCompletionItemProvider(monaco));
     }
   };
 
