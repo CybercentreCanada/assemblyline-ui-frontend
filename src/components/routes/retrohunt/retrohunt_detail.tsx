@@ -75,16 +75,7 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, pageType = 'page', close
       description: '',
       created: '',
       classification: c12nDef.UNRESTRICTED,
-      yara_signature: [
-        'rule my_rule {',
-        '\tmeta:',
-        '\t\tKEY = "VALUE"',
-        '\tstrings:',
-        '\t\t$name = "string"',
-        '\tcondition:',
-        '\t\tany of them',
-        '}'
-      ].join('\n'),
+      yara_signature: '',
       raw_query: null,
       total_indices: 0,
       pending_indices: 0,

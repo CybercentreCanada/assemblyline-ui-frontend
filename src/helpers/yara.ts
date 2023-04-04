@@ -680,42 +680,24 @@ export const registerYaraCompletionItemProvider = (monaco: RegisterYaraCompletio
         kind: kinds.Variable
       },
       {
-        prefix: '$s',
+        prefix: '$str',
         description: 'string',
-        insert: ['\\$s = "${CLIPBOARD/([\\"\\\\])/\\$1/g}" ${1|ascii,wide|} ${2:fullword}'],
-        detail: 'Generate a string with the escaped content of your clipboard',
+        insert: ['\\$${1:str} = "${2}" ${3|ascii,wide|} ${4:fullword}'],
+        detail: 'Generate a new string',
         kind: kinds.Snippet
       },
       {
         prefix: '$re',
         description: 'regex',
-        insert: [
-          '\\$re = /${CLIPBOARD/([\\\\/\\\\^\\\\$\\|(){}\\[\\]*+?\\\\.])|(\\n)|(\\t)|(\\r)/${1:+\\\\}${1}${2:+\\\\n}${3:+\\\\t}${4:+\\\\r}/g}/'
-        ],
-        detail: 'Generate a regex string with the escaped content of your clipboard',
+        insert: ['\\$${1:re} = /${2}/'],
+        detail: 'Generate a new regex string',
         kind: kinds.Snippet
       },
       {
-        prefix: 'pasteString',
-        description: 'pasteString',
-        insert: ['${CLIPBOARD/([\\"\\\\])/\\$1/g}'],
-        detail: 'Paste current clipboard escaped for yara strings',
-        kind: kinds.Snippet
-      },
-      {
-        prefix: 'pasteRegex',
-        description: 'pasteRegex',
-        insert: [
-          '${CLIPBOARD/([\\\\/\\\\^\\\\$\\|(){}\\[\\]*+?\\\\.])|(\\n)|(\\t)|(\\r)/${1:+\\\\}${1}${2:+\\\\n}${3:+\\\\t}${4:+\\\\r}/g}'
-        ],
-        detail: 'Paste current clipboard escaped for yara regex',
-        kind: kinds.Snippet
-      },
-      {
-        prefix: '$c',
-        description: 'hex',
-        insert: ['\\$c ={${CLIPBOARD/[\t]*(.+?)\\n/${1}\n\t\t\t  /g}}'],
-        detail: 'Generate a hex-string with the content of your clipboard',
+        prefix: '$hex',
+        description: 'hex-string',
+        insert: ['\\$${1:hex} = { ${2} }'],
+        detail: 'Generate a new hex-string',
         kind: kinds.Snippet
       },
       {
