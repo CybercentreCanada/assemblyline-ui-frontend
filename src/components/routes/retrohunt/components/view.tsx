@@ -3,7 +3,6 @@ import 'moment/locale/fr';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
-import { DEFAULT_RETROHUNT } from '.';
 import { Retrohunt } from '../retrohunt_detail';
 
 type Sizes = {
@@ -27,6 +26,34 @@ type Props = {
   retrohunt: Retrohunt;
   setRetrohunt?: React.Dispatch<React.SetStateAction<Retrohunt>>;
   setModified?: (value: boolean) => void;
+};
+
+export const DEFAULT_RETROHUNT: Retrohunt = {
+  code: 'c7e5da580df940ed8883182396be4baa',
+  creator: 'admin',
+  tags: {},
+  description: 'words',
+  created: '2023-03-13T18:21:48.744095Z',
+  classification: 'TLP:W',
+  yara_signature: `
+  rule my_rule {
+    meta:
+        KEY = "VALUE"
+    strings:
+        $name = { HEX }
+    condition:
+        any of them
+}
+  `,
+  raw_query: '{436f6e74656e745f5479706573}',
+  total_indices: 3,
+  pending_indices: 3,
+  pending_candidates: 0,
+  errors: [],
+  hits: [],
+  finished: false,
+  truncated: false,
+  archive_only: false
 };
 
 export const WrappedRetrohuntView = ({ retrohunt = { ...DEFAULT_RETROHUNT } }: Props) => {

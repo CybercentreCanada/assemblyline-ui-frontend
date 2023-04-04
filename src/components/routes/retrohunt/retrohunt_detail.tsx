@@ -15,11 +15,13 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation, useParams } from 'react-router-dom';
-import { RetrohuntAdd, RetrohuntPageType, RetrohuntResults, RetrohuntView, RetrohuntYara } from './components';
+import { RetrohuntAdd, RetrohuntResults, RetrohuntView, RetrohuntYara } from './components';
 
 type ParamProps = {
   code: string;
 };
+
+type RetrohuntPageType = 'drawer' | 'page';
 
 export type Retrohunt = {
   code: any;
