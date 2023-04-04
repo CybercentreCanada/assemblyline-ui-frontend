@@ -713,9 +713,11 @@ export default function SubmissionReport() {
                       ...report.params.services.rescan.filter(
                         word => report.params.services.selected.indexOf(word) === -1
                       )
-                    ].join(' | ')
+                    ]
+                      .sort((a: string, b: string) => a.localeCompare(b))
+                      .join(' | ')
                   ) : (
-                    report.params.services.selected.join(' | ')
+                    report.params.services.selected.sort((a: string, b: string) => a.localeCompare(b)).join(' | ')
                   )
                 ) : (
                   <Skeleton />
