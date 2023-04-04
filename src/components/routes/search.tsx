@@ -92,38 +92,38 @@ function Search({ index }: SearchProps) {
   const downSM = useMediaQuery(theme.breakpoints.down('md'));
 
   // Result lists
-  const [alertResults, setAlertResults] = useState<SearchResults>(null);
+  const [submissionResults, setSubmissionResults] = useState<SearchResults>(null);
   const [fileResults, setFileResults] = useState<SearchResults>(null);
   const [resultResults, setResultResults] = useState<SearchResults>(null);
-  const [retrohuntResults, setRetrohuntResults] = useState<SearchResults>(null);
   const [signatureResults, setSignatureResults] = useState<SearchResults>(null);
-  const [submissionResults, setSubmissionResults] = useState<SearchResults>(null);
+  const [alertResults, setAlertResults] = useState<SearchResults>(null);
+  const [retrohuntResults, setRetrohuntResults] = useState<SearchResults>(null);
 
   const stateMap = {
-    alert: setAlertResults,
+    submission: setSubmissionResults,
     file: setFileResults,
     result: setResultResults,
-    retrohunt: setRetrohuntResults,
     signature: setSignatureResults,
-    submission: setSubmissionResults
+    alert: setAlertResults,
+    retrohunt: setRetrohuntResults
   };
 
   const resMap = {
-    alert: alertResults,
+    submission: submissionResults,
     file: fileResults,
     result: resultResults,
-    retrohunt: retrohuntResults,
     signature: signatureResults,
-    submission: submissionResults
+    alert: alertResults,
+    retrohunt: retrohuntResults
   };
 
   const permissionMap = {
-    alert: 'alert_view',
+    submission: 'submission_view',
     file: 'submission_view',
     result: 'submission_view',
-    retrohunt: 'retrohunt_view',
     signature: 'signature_view',
-    submission: 'submission_view'
+    alert: 'alert_view',
+    retrohunt: 'retrohunt_view'
   };
 
   const queryValue = useRef<string>('');
@@ -291,10 +291,12 @@ function Search({ index }: SearchProps) {
                 scrollButtons="auto"
                 variant="scrollable"
               >
-                {currentUser.roles.includes(permissionMap.alert) ? (
+                {currentUser.roles.includes(permissionMap.submission) ? (
                   <Tab
-                    label={`${t('alert')} (${alertResults ? searchResultsDisplay(alertResults.total) : '...'})`}
-                    value="alert"
+                    label={`${t('submission')} (${
+                      submissionResults ? searchResultsDisplay(submissionResults.total) : '...'
+                    })`}
+                    value="submission"
                   />
                 ) : (
                   <Empty />
@@ -315,16 +317,6 @@ function Search({ index }: SearchProps) {
                 ) : (
                   <Empty />
                 )}
-                {currentUser.roles.includes(permissionMap.retrohunt) ? (
-                  <Tab
-                    label={`${t('retrohunt')} (${
-                      resultResults ? searchResultsDisplay(retrohuntResults.total) : '...'
-                    })`}
-                    value="retrohunt"
-                  />
-                ) : (
-                  <Empty />
-                )}
                 {currentUser.roles.includes(permissionMap.signature) ? (
                   <Tab
                     label={`${t('signature')} (${
@@ -335,12 +327,20 @@ function Search({ index }: SearchProps) {
                 ) : (
                   <Empty />
                 )}
-                {currentUser.roles.includes(permissionMap.submission) ? (
+                {currentUser.roles.includes(permissionMap.alert) ? (
                   <Tab
-                    label={`${t('submission')} (${
-                      submissionResults ? searchResultsDisplay(submissionResults.total) : '...'
+                    label={`${t('alert')} (${alertResults ? searchResultsDisplay(alertResults.total) : '...'})`}
+                    value="alert"
+                  />
+                ) : (
+                  <Empty />
+                )}
+                {currentUser.roles.includes(permissionMap.retrohunt) ? (
+                  <Tab
+                    label={`${t('retrohunt')} (${
+                      retrohuntResults ? searchResultsDisplay(retrohuntResults.total) : '...'
                     })`}
-                    value="submission"
+                    value="retrohunt"
                   />
                 ) : (
                   <Empty />
