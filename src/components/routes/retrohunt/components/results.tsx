@@ -39,16 +39,7 @@ export const RetrohuntResults = ({
     }
   });
 
-  const beforeMount = monaco => {
-    // if (!monaco.languages.getLanguages().some(({ id }) => id === 'yara')) {
-    //   // Register a new language
-    //   monaco.languages.register({ id: 'yara' });
-    //   // Register a tokens provider for the language
-    //   monaco.languages.setMonarchTokensProvider('yara', yaraDef);
-    //   // Set the editing configuration for the language
-    //   monaco.languages.setLanguageConfiguration('yara', yaraConfig);
-    // }
-  };
+  const beforeMount = monaco => {};
 
   const onMount = editor => {
     editor.focus();

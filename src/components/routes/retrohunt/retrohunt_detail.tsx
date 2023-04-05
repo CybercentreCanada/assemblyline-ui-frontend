@@ -17,12 +17,6 @@ import { useNavigate } from 'react-router';
 import { useLocation, useParams } from 'react-router-dom';
 import { RetrohuntAdd, RetrohuntResults, RetrohuntView, RetrohuntYara } from './components';
 
-type ParamProps = {
-  code: string;
-};
-
-type RetrohuntPageType = 'drawer' | 'page';
-
 export type Retrohunt = {
   code: any;
   creator: any;
@@ -41,6 +35,12 @@ export type Retrohunt = {
   truncated: any;
   archive_only?: boolean;
 };
+
+type ParamProps = {
+  code: string;
+};
+
+type RetrohuntPageType = 'drawer' | 'page';
 
 type RetrohuntPageState = 'loading' | 'view' | 'add' | 'error' | 'forbidden';
 
@@ -146,7 +146,7 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, pageType = 'page', close
         setTimeout(() => {
           navigate(`${location.pathname}${location.search ? location.search : ''}#${newCode}`);
           window.dispatchEvent(new CustomEvent('reloadRetrohunts'));
-        }, 100);
+        }, 1000);
       },
       onFailure: api_data => {
         showErrorMessage(api_data.api_error_message);

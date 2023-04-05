@@ -67,7 +67,7 @@ const WrappedRetrohuntTable: React.FC<RetrohuntTableProps> = ({
                 {t('header.created')}
               </SortableHeaderCell>
               <SortableHeaderCell sortField="code" allowSort={allowSort}>
-                {t('header.code')}
+                {t('header.description')}
               </SortableHeaderCell>
               <SortableHeaderCell sortField="creator" allowSort={allowSort}>
                 {t('header.creator')}
@@ -102,7 +102,16 @@ const WrappedRetrohuntTable: React.FC<RetrohuntTableProps> = ({
                     </>
                   </Tooltip>
                 </DivTableCell>
-                <DivTableCell>{retrohunt.code}</DivTableCell>
+                <DivTableCell
+                  style={{
+                    maxWidth: '25vw',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}
+                >
+                  {retrohunt.description}
+                </DivTableCell>
                 <DivTableCell>{retrohunt.creator}</DivTableCell>
                 {c12nDef.enforce && (
                   <DivTableCell>
