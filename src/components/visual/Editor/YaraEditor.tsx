@@ -55,7 +55,7 @@ export const WrappedYaraEditor = ({
     editor.focus();
   };
 
-  if (!data) return null;
+  if (data === null || data === undefined) return null;
   else
     return (
       <div

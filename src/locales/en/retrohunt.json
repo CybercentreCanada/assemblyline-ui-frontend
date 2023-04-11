@@ -1,5 +1,6 @@
 {
   "add.button": "ADD RETROHUNT JOB",
+  "created_by": "Created by ",
   "details.all": "live data + malware archive",
   "details.archive_only": "malware archive only",
   "details.classification": "Classification",
