@@ -40,6 +40,8 @@ import SignatureDetail from 'components/routes/manage/signature_detail';
 import ManageSignatureSources from 'components/routes/manage/signature_sources';
 import ManageWorkflows from 'components/routes/manage/workflows';
 import WorkflowDetail from 'components/routes/manage/workflow_detail';
+import RetroHunt from 'components/routes/retrohunt';
+import RetroHuntDetail from 'components/routes/retrohunt/detail';
 import Search from 'components/routes/search';
 import Settings from 'components/routes/settings';
 import SubmissionDetail from 'components/routes/submission/detail';
@@ -131,6 +133,8 @@ const WrappedRoutes = () => {
         <Route path="/manage/safelist/:id" element={<SafelistDetail />} />
         <Route path="/manage/safelist" element={<ManageSafelist />} />
         <Route path="/manage" element={<Manage />} />
+        <Route path="/retrohunt" element={<RetroHunt />} />
+        <Route path="/retrohunt/:code" element={<RetroHuntDetail />} />
         <Route path="/search" element={<Search />} />
         <Route path="/search/:id" element={<Search />} />
         <Route path="/settings" element={<Settings />} />

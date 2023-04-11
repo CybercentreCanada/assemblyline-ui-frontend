@@ -1,3 +1,6 @@
+/* eslint-disable no-template-curly-in-string */
+import { editor as Editor, languages as Languages, Position, Range } from 'monaco-editor';
+
 export const yaraDef = {
   defaultToken: 'invalid',
   octaldigits: /-?0o[0-7]+/,
@@ -578,3 +581,192 @@ export const yaraConfig = {
     ['/', '/']
   ]
 };
+
+/**
+ * The following configuration is based on the VSCode extension for the YARA pattern matching language made by infosec-intern on Github
+ *
+ * Source :
+ *  - Author: infosec-intern
+ *  - Extension: infosec-intern.yara
+ *  - Repository: https://github.com/infosec-intern/vscode-yara
+ */
+
+type RegisterYaraCompletionItemProviderProps = {
+  editor: typeof Editor;
+  languages: typeof Languages;
+};
+
+type Snippet = {
+  prefix: string;
+  description: string;
+  insert: string | string[];
+  detail: string;
+  kind: Languages.CompletionItemKind;
+};
+
+export const registerYaraCompletionItemProvider = (monaco: RegisterYaraCompletionItemProviderProps) => ({
+  provideCompletionItems: (
+    model: Editor.ITextModel,
+    position: Position,
+    context: Languages.CompletionContext
+  ): Languages.CompletionList => {
+    const word: Editor.IWordAtPosition = model.getWordUntilPosition(position);
+    const range = new Range(position.lineNumber, word.startColumn, position.lineNumber, word.endColumn);
+    const kinds = monaco.languages.CompletionItemKind;
+    const rules = monaco.languages.CompletionItemInsertTextRule;
+
+    const snippets: Snippet[] = [
+      {
+        prefix: 'import',
+        description: 'Import',
+        insert: 'import "${1|pe,elf,cuckoo,magic,hash,math,dotnet,time,console,vt|}"',
+        detail: 'Import a YARA module',
+        kind: kinds.Module
+      },
+      {
+        prefix: 'include',
+        description: 'Include',
+        insert: 'include "external_rules.yara"',
+        detail: 'Include an external YARA file',
+        kind: kinds.Module
+      },
+      {
+        prefix: 'for_of',
+        description: 'for..of',
+        insert: ['for ${1:any} of ${2:them} : (', '\t${3:boolean_expression}', ')'],
+        detail: 'Apply the same condition to many strings',
+        kind: kinds.Method
+      },
+      {
+        prefix: 'for_in',
+        description: 'for..in',
+        insert: ['for ${1:any i} in ( ${2:them} ) : (', '\t${3:boolean_expression}', ')'],
+        detail: 'Loop over items',
+        kind: kinds.Method
+      },
+      {
+        prefix: 'any',
+        description: 'any',
+        insert: 'any of ${them}',
+        detail: 'String set keyword: any',
+        kind: kinds.Operator
+      },
+      {
+        prefix: 'all',
+        description: 'all',
+        insert: 'all of ${them}',
+        detail: 'String set keyword: all',
+        kind: kinds.Operator
+      },
+      {
+        prefix: 'header_pe',
+        description: 'PE Header',
+        insert: 'uint16(0) == 0x5A4D ',
+        detail: 'Generate a condition to check for a PE file header',
+        kind: kinds.Variable
+      },
+      {
+        prefix: 'header_elf',
+        description: 'ELF Header',
+        insert: 'uint32(0) == 0x464C457F ',
+        detail: 'Generate a condition to check for an ELF file header',
+        kind: kinds.Variable
+      },
+      {
+        prefix: 'header_macho',
+        description: 'Mach-O Header',
+        insert: 'uint32(0) == 0xFEEDFACF ',
+        detail: 'Generate a condition to check for a Mach-O file header',
+        kind: kinds.Variable
+      },
+      {
+        prefix: '$str',
+        description: 'string',
+        insert: ['\\$${1:str} = "${2}" ${3|ascii,wide|} ${4:fullword}'],
+        detail: 'Generate a new string',
+        kind: kinds.Snippet
+      },
+      {
+        prefix: '$re',
+        description: 'regex',
+        insert: ['\\$${1:re} = /${2}/'],
+        detail: 'Generate a new regex string',
+        kind: kinds.Snippet
+      },
+      {
+        prefix: '$hex',
+        description: 'hex-string',
+        insert: ['\\$${1:hex} = { ${2} }'],
+        detail: 'Generate a new hex-string',
+        kind: kinds.Snippet
+      },
+      {
+        prefix: 'condition',
+        description: '',
+        insert: ['condition:', '\t${6:any of them}'],
+        detail: 'Generate a condition section (YARA)',
+        kind: kinds.Snippet
+      },
+      {
+        prefix: 'meta',
+        description: '',
+        insert: ['meta:', '\t${2:KEY} = ${3:"VALUE"}'],
+        detail: 'Generate a meta section (YARA)',
+        kind: kinds.Snippet
+      },
+      {
+        prefix: 'strings',
+        description: '',
+        insert: ['strings:', '\t$${4:name} = ${5|"string",/regex/,{ HEX }|}'],
+        detail: 'Generate a strings section (YARA)',
+        kind: kinds.Snippet
+      },
+      {
+        prefix: 'rule',
+        description: '',
+        insert: [
+          'rule ${1:my_rule} {',
+          '\tmeta:',
+          '\t\t${2:KEY} = ${3:"VALUE"}',
+          '\tstrings:',
+          '\t\t$${4:name} = ${5|"string",/regex/,{ HEX }|}',
+          '\tcondition:',
+          '\t\t${6:any of them}',
+          '}'
+        ],
+        detail: 'Generate a rule skeleton (YARA)',
+        kind: kinds.Snippet
+      }
+    ];
+
+    const parseInsertText = snippet =>
+      'insert' in snippet
+        ? typeof snippet.insert === 'string'
+          ? snippet.insert
+          : Array.isArray(snippet.insert)
+          ? snippet.insert.join('\n')
+          : `${JSON.stringify(snippet.insert)}`
+        : '';
+
+    const suggestions: Languages.CompletionItem[] = snippets.map(
+      snippet =>
+        ({
+          label: {
+            label: 'prefix' in snippet ? snippet.prefix : '',
+            description: 'description' in snippet ? snippet.description : ''
+          },
+          insertText: parseInsertText(snippet),
+          kind: 'kind' in snippet ? snippet.kind : kinds.Text,
+          detail: 'detail' in snippet ? snippet.detail : '',
+          documentation: {
+            value: `<pre>${parseInsertText(snippet)}</pre>`,
+            supportHtml: true,
+            supportThemeIcons: true
+          },
+          insertTextRules: rules.InsertAsSnippet,
+          range: range
+        } as Languages.CompletionItem)
+    );
+    return { suggestions };
+  }
+});
