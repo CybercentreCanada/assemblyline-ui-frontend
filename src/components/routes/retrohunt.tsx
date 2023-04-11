@@ -22,7 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import ForbiddenPage from './403';
-import { RetrohuntDetail } from './retrohunt/retrohunt_detail';
+import { RetrohuntDetail } from './retrohunt/detail';
 
 const PAGE_SIZE = 25;
 

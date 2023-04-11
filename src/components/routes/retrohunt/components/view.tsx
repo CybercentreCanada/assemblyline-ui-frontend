@@ -3,7 +3,7 @@ import 'moment/locale/fr';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
-import { Retrohunt } from '../retrohunt_detail';
+import { Retrohunt } from '../detail';
 
 type Sizes = {
   max: number;

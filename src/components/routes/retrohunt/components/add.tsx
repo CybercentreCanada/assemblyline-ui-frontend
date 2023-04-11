@@ -5,7 +5,7 @@ import RadioGroup from '@mui/material/RadioGroup';
 import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Retrohunt } from '../retrohunt_detail';
+import { Retrohunt } from '../detail';
 
 type Props = {
   retrohunt?: Retrohunt;

@@ -1,4 +1,7 @@
-import { Button, CircularProgress, Grid, Skeleton, Typography, useTheme } from '@mui/material';
+import { Button, CircularProgress, Divider, Grid, Skeleton, TextField, Typography, useTheme } from '@mui/material';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullSize from 'commons/components/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
@@ -9,13 +12,15 @@ import ForbiddenPage from 'components/routes/403';
 import NotFoundPage from 'components/routes/404';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
+import { YaraEditor } from 'components/visual/Editor/YaraEditor';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import 'moment/locale/fr';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { useTranslation } from 'react-i18next';
+import Moment from 'react-moment';
 import { useNavigate } from 'react-router';
 import { useLocation, useParams } from 'react-router-dom';
-import { RetrohuntAdd, RetrohuntResults, RetrohuntView, RetrohuntYara } from './components';
+import { RetrohuntResults } from './components';
 
 export type Retrohunt = {
   code: any;
@@ -44,6 +49,13 @@ type RetrohuntPageType = 'drawer' | 'page';
 
 type RetrohuntPageState = 'loading' | 'view' | 'add' | 'error' | 'forbidden';
 
+type ItemProps = {
+  children?: React.ReactNode;
+  text?: string;
+  isLoading?: boolean;
+  title?: string;
+};
+
 type Props = {
   pageType?: RetrohuntPageType;
   retrohuntCode: string;
@@ -51,7 +63,7 @@ type Props = {
 };
 
 function WrappedRetrohuntDetail({ retrohuntCode = null, pageType = 'page', close = () => null }: Props) {
-  const { t } = useTranslation(['retrohunt']);
+  const { t, i18n } = useTranslation(['retrohunt']);
   const theme = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
@@ -68,6 +80,10 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, pageType = 'page', close
   const [modified, setModified] = useState<boolean>(false);
   const [buttonLoading, setButtonLoading] = useState<boolean>(false);
   const [confirmationOpen, setConfirmationOpen] = useState<boolean>(false);
+
+  const pageRef = useRef<HTMLDivElement>(null);
+  const [, startTransition] = useTransition();
+  const [isMDUp, setIsMDUp] = useState<boolean>(false);
 
   const DEFAULT_RETROHUNT = useMemo<Retrohunt>(
     () => ({
@@ -94,6 +110,21 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, pageType = 'page', close
   useEffect(() => {
     retrohuntCode ? setCode(retrohuntCode) : paramCode ? setCode(paramCode) : setCode(null);
   }, [paramCode, retrohuntCode]);
+
+  useEffect(() => {
+    function handleResize(data) {
+      if (!pageRef || !pageRef.current) return;
+      startTransition(() => {
+        const { width } = pageRef.current.getBoundingClientRect();
+        setIsMDUp(width > theme.breakpoints.values.md);
+      });
+    }
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [theme.breakpoints.values]);
 
   useEffect(() => {
     if (code === 'new' && currentUser.roles.includes('retrohunt_run')) {
@@ -158,11 +189,21 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, pageType = 'page', close
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser?.roles, location, navigate, retrohunt, showErrorMessage]);
 
+  const Item = useCallback(
+    ({ children = null, title = '', isLoading = true }: ItemProps) => (
+      <>
+        <Grid item xs={12} sm={3} md={3} children={<span style={{ fontWeight: 500 }}>{t(`${title}`)}</span>} />
+        <Grid item xs={12} sm={9} md={9} children={isLoading ? <Skeleton /> : children} />
+      </>
+    ),
+    [t]
+  );
+
   if (type === 'error') return <NotFoundPage />;
   else if (type === 'forbidden') return <ForbiddenPage />;
   else
     return (
-      <PageFullSize margin={pageType === 'page' ? 4 : 2}>
+      <PageFullSize innerRef={pageRef} margin={pageType === 'page' ? 4 : 2}>
         <RouterPrompt when={modified} />
         <ConfirmationDialog
           open={confirmationOpen}
@@ -175,8 +216,8 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, pageType = 'page', close
           text={t('validate.text')}
         />
 
-        {c12nDef.enforce && ['add', 'view'].includes(type) && (
-          <Grid container flexDirection="column" style={{ paddingBottom: theme.spacing(4) }}>
+        {c12nDef.enforce && ['loading', 'add', 'view'].includes(type) && (
+          <Grid container flexDirection="column" paddingBottom={theme.spacing(4)}>
             <Classification
               format="long"
               type={type === 'add' ? 'picker' : 'pill'}
@@ -189,8 +230,8 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, pageType = 'page', close
 
         <Grid container flexDirection="row" spacing={0} paddingBottom={theme.spacing(0)}>
           <Grid item flexGrow={1}>
-            {type === 'loading' && <Typography variant="h4" children={<Skeleton style={{ width: '20rem' }} />} />}
-            {type === 'loading' && <Typography variant="caption" children={<Skeleton style={{ width: '20rem' }} />} />}
+            {type === 'loading' && <Typography variant="h4" children={<Skeleton width="30rem" />} />}
+            {type === 'loading' && <Typography variant="caption" children={<Skeleton width="20rem" />} />}
             {type === 'add' && <Typography variant="h4" children={t('header.add')} />}
             {type === 'view' && <Typography variant="h4" children={t('header.view')} />}
             {type === 'view' && <Typography variant="caption" children={retrohunt.code} />}
@@ -199,10 +240,7 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, pageType = 'page', close
           <Grid item>
             <div style={{ display: 'flex', marginBottom: theme.spacing(1) }}>
               {type === 'loading' && (
-                <Skeleton
-                  variant="circular"
-                  style={{ margin: theme.spacing(0.5), height: '2.5rem', width: '2.5rem' }}
-                />
+                <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
               )}
               {type === 'add' && (
                 <Button
@@ -224,11 +262,81 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, pageType = 'page', close
           </Grid>
         </Grid>
 
-        <Grid container paddingTop={theme.spacing(2)} flexDirection="column">
-          {type === 'loading' && <RetrohuntAdd />}
-          {type === 'add' && <RetrohuntAdd retrohunt={retrohunt} onRetrohuntChange={onRetrohuntChange} />}
-          {type === 'view' && <RetrohuntView retrohunt={retrohunt} />}
-        </Grid>
+        {['loading', 'add'].includes(type) && (
+          <Grid container paddingTop={theme.spacing(2)} spacing={2}>
+            <Grid item xs={12}>
+              <Typography variant="subtitle2">{t('details.description')}</Typography>
+              {retrohunt && 'description' in retrohunt ? (
+                <TextField
+                  fullWidth
+                  size="small"
+                  multiline
+                  rows={3}
+                  margin="dense"
+                  variant="outlined"
+                  value={retrohunt.description}
+                  onChange={event => onRetrohuntChange({ description: event.target.value })}
+                />
+              ) : (
+                <Skeleton style={{ height: '8rem', transform: 'none', marginTop: theme.spacing(1) }} />
+              )}
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="subtitle2">{t('details.search')}</Typography>
+              {retrohunt && 'archive_only' in retrohunt ? (
+                <RadioGroup
+                  row
+                  value={retrohunt.archive_only ? 'archive_only' : 'all'}
+                  onChange={(event, value) => onRetrohuntChange({ archive_only: value === 'archive_only' })}
+                >
+                  <FormControlLabel value="all" control={<Radio />} label={t('details.all')} />
+                  <FormControlLabel value="archive_only" control={<Radio />} label={t('details.archive_only')} />
+                </RadioGroup>
+              ) : (
+                <Skeleton style={{ height: '2rem', transform: 'none', marginTop: theme.spacing(1) }} />
+              )}
+            </Grid>
+          </Grid>
+        )}
+
+        {true && retrohunt && (
+          <>
+            <Grid item xs={12} paddingTop={theme.spacing(2)} paddingBottom={theme.spacing(2)}>
+              <Typography variant="h6">{t('details.general')}</Typography>
+              <Divider sx={{ '@media print': { backgroundColor: '#0000001f !important' } }} />
+            </Grid>
+            <Grid container>
+              <Grid item xs={isMDUp ? 4 : 12}>
+                <Grid container spacing={2}>
+                  <Item
+                    title="details.created"
+                    isLoading={!('created' in retrohunt)}
+                    children={<Moment fromNow locale={i18n.language} children={retrohunt.created} />}
+                  />
+                  <Item title="details.creator" isLoading={!('creator' in retrohunt)} children={retrohunt.creator} />
+                </Grid>
+              </Grid>
+              <Grid item xs={isMDUp ? 8 : 12}>
+                <Grid container spacing={2}>
+                  <Item
+                    title="details.tags"
+                    isLoading={!('tags' in retrohunt)}
+                    children={
+                      Object.keys(retrohunt.tags).length > 0
+                        ? Object.keys(retrohunt.tags).join(', ')
+                        : t('details.none')
+                    }
+                  />
+                  <Item
+                    title="details.description"
+                    isLoading={!('description' in retrohunt)}
+                    children={retrohunt.description}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+          </>
+        )}
 
         {type === 'view' && (
           <Grid container flex={1} paddingTop={theme.spacing(2)} flexDirection="column" minHeight="500px">
@@ -247,10 +355,10 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, pageType = 'page', close
         >
           <Typography variant="subtitle2" children={t('details.yara_signature')} />
           {type !== 'loading' && retrohunt && 'yara_signature' in retrohunt ? (
-            <RetrohuntYara
-              yara_signature={retrohunt.yara_signature}
+            <YaraEditor
+              data={retrohunt.yara_signature}
               isEditable={type === 'add' ? true : false}
-              onYaraSignatureChange={ys => setRetrohunt(r => ({ ...r, yara_signature: ys }))}
+              onDataChange={data => setRetrohunt(r => ({ ...r, yara_signature: data }))}
             />
           ) : (
             <Skeleton style={{ height: '10rem', transform: 'none', marginTop: theme.spacing(1) }} />
