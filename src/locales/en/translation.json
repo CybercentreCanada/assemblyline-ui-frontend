@@ -108,6 +108,7 @@
   "quicksearch.aria": "search",
   "quicksearch.placeholder": "Search ...",
   "related": "Find related results",
+  "related_external": "Search external systems",
   "router_prompt_accept": "Discard changes",
   "router_prompt_cancel": "Stay on page",
   "router_prompt_text": "You have unsaved changes, are you sure you want to leave?",

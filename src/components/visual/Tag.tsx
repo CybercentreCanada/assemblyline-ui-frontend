@@ -2,6 +2,7 @@ import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
 import PlaylistAddCheckOutlinedIcon from '@mui/icons-material/PlaylistAddCheckOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
+import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
 import { Menu, MenuItem } from '@mui/material';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
@@ -20,6 +21,7 @@ import InputDialog from './InputDialog';
 
 const STYLE = { height: 'auto', minHeight: '20px' };
 const SEARCH_ICON = <SearchOutlinedIcon style={{ marginRight: '16px' }} />;
+const TRAVEL_EXPLORE_ICON = <TravelExploreOutlinedIcon style={{ marginRight: '16px' }} />;
 const CLIPBOARD_ICON = <AssignmentOutlinedIcon style={{ marginRight: '16px' }} />;
 const HIGHLIGHT_ICON = <SelectAllOutlinedIcon style={{ marginRight: '16px' }} />;
 const SAFELIST_ICON = <PlaylistAddCheckOutlinedIcon style={{ marginRight: '16px' }} />;
@@ -73,6 +75,19 @@ const WrappedTag: React.FC<TagProps> = ({
     [type, value]
   );
 
+  const searchTagExternal = useCallback(() => {
+    apiCall({
+      method: 'GET',
+      url: `/api/v4/federated_lookup/search/${type}/${safeFieldValueURI(value)}/`,
+      onSuccess: api_data => {
+        showSuccessMessage('DID QUERY');
+      },
+      onEnter: () => setWaitingDialog(true),
+      onExit: () => setWaitingDialog(false)
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showSuccessMessage, type, value]);
+
   let maliciousness = lvl || scoreToVerdict(score);
   if (safelisted) {
     maliciousness = 'safe';
@@ -107,6 +122,11 @@ const WrappedTag: React.FC<TagProps> = ({
     searchTag();
     handleClose();
   }, [searchTag, handleClose]);
+
+  const handleMenuExternalSearch = useCallback(() => {
+    searchTagExternal();
+    handleClose();
+  }, [searchTagExternal, handleClose]);
 
   const handleMenuHighlight = useCallback(() => {
     handleClick();
@@ -192,6 +212,12 @@ const WrappedTag: React.FC<TagProps> = ({
           <MenuItem dense onClick={handleMenuSearch}>
             {SEARCH_ICON}
             {t('related')}
+          </MenuItem>
+        )}
+        {currentUser.roles.includes('submission_view') && (
+          <MenuItem dense onClick={handleMenuExternalSearch}>
+            {TRAVEL_EXPLORE_ICON}
+            {t('related_external')}
           </MenuItem>
         )}
         <MenuItem dense onClick={handleMenuHighlight}>
