@@ -9,10 +9,14 @@ import adminServicesEN from 'locales/en/admin/services.json';
 import adminServiceReviewEN from 'locales/en/admin/service_review.json';
 import adminSiteMapEN from 'locales/en/admin/site_map.json';
 import adminTagSafelistEN from 'locales/en/admin/tag_safelist.json';
+import archiveEN from 'locales/en/archive.json';
+
 import adminUsersEN from 'locales/en/admin/users.json';
 import alertsEN from 'locales/en/alerts.json';
 import authorizeEN from 'locales/en/authorize.json';
 import carouselEN from 'locales/en/carousel.json';
+import archiveFR from 'locales/fr/archive.json';
+
 import dashboardEN from 'locales/en/dashboard.json';
 import favoritesEN from 'locales/en/favorites.json';
 import fileDetailEN from 'locales/en/file/detail.json';
@@ -109,6 +113,7 @@ const resources = {
     adminTagSafelist: adminTagSafelistEN,
     adminUsers: adminUsersEN,
     alerts: alertsEN,
+    archive: archiveEN,
     authorize: authorizeEN,
     carousel: carouselEN,
     dashboard: dashboardEN,
@@ -159,6 +164,7 @@ const resources = {
     adminTagSafelist: adminTagSafelistFR,
     adminUsers: adminUsersFR,
     alerts: alertsFR,
+    archive: archiveFR,
     authorize: authorizeFR,
     carousel: carouselFR,
     dashboard: dashboardFR,
