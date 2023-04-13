@@ -12,8 +12,7 @@ import ForbiddenPage from 'components/routes/403';
 import NotFoundPage from 'components/routes/404';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
-import JSONEditor from 'components/visual/Editor/JSONEditor';
-import { YaraEditor } from 'components/visual/Editor/YaraEditor';
+import { MonacoEditor } from 'components/visual/MonacoEditor';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -321,7 +320,11 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, pageType = 'page', close
             <Grid item flex={1}>
               <Grid container flexDirection="column" height="100%" minHeight="500px">
                 <Typography variant="subtitle2" children={t('details.results')} />
-                <JSONEditor data={JSON.stringify(retrohunt ? retrohunt : {})} isEditable={false} beautify={true} />
+                <MonacoEditor
+                  language="json"
+                  value={JSON.stringify(retrohunt ? retrohunt : {})}
+                  options={{ readOnly: true, beautify: true }}
+                />
               </Grid>
             </Grid>
           )}
@@ -332,10 +335,11 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, pageType = 'page', close
               {type === 'loading' || !retrohunt || !('yara_signature' in retrohunt) ? (
                 <Skeleton style={{ height: '10rem', transform: 'none', marginTop: theme.spacing(1) }} />
               ) : (
-                <YaraEditor
-                  data={retrohunt.yara_signature}
-                  isEditable={type === 'add' ? true : false}
-                  onDataChange={data => setRetrohunt(r => ({ ...r, yara_signature: data }))}
+                <MonacoEditor
+                  language="yara"
+                  value={retrohunt.yara_signature}
+                  onChange={data => setRetrohunt(r => ({ ...r, yara_signature: data }))}
+                  options={{ readOnly: type !== 'add' }}
                 />
               )}
             </Grid>
