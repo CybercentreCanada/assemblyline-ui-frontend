@@ -95,6 +95,7 @@ export type ConfigurationDefinition = {
       [lang: string]: string;
     };
     banner_level: 'info' | 'warning' | 'error' | 'success';
+    external_sources: string[];
     read_only: boolean;
     rss_feeds: string[];
     services_feed: string;

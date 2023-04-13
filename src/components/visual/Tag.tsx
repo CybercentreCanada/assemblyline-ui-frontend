@@ -1,10 +1,13 @@
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
+import LinkOutlinedIcon from '@mui/icons-material/LinkOutlined';
 import PlaylistAddCheckOutlinedIcon from '@mui/icons-material/PlaylistAddCheckOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
-import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
+import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
 import { Menu, MenuItem } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
@@ -13,11 +16,12 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import useSafeResults from 'components/hooks/useSafeResults';
 import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
 import { safeFieldValueURI } from 'helpers/utils';
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
 import InputDialog from './InputDialog';
+
 
 const STYLE = { height: 'auto', minHeight: '20px' };
 const SEARCH_ICON = <SearchOutlinedIcon style={{ marginRight: '16px' }} />;
@@ -26,10 +30,19 @@ const CLIPBOARD_ICON = <AssignmentOutlinedIcon style={{ marginRight: '16px' }} /
 const HIGHLIGHT_ICON = <SelectAllOutlinedIcon style={{ marginRight: '16px' }} />;
 const SAFELIST_ICON = <PlaylistAddCheckOutlinedIcon style={{ marginRight: '16px' }} />;
 const SIGNATURE_ICON = <FingerprintOutlinedIcon style={{ marginRight: '16px' }} />;
+const LINK_ICON = <LinkOutlinedIcon style={{ marginRight: '2px' }} />;
 const initialMenuState = {
   mouseX: null,
   mouseY: null
 };
+
+const NoMaxWidthTooltip = styled(({ className, ...props }: TooltipProps) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))({
+  [`& .${tooltipClasses.tooltip}`]: {
+    maxWidth: 'none',
+  },
+});
 
 type TagProps = {
   type: string;
@@ -43,6 +56,13 @@ type TagProps = {
   force?: boolean;
 };
 
+type LookupSourceDetails = {
+  link: string;
+  count: number;
+  classification: string;
+};
+
+// TODO: add classification to prevent sending tags to external sources
 const WrappedTag: React.FC<TagProps> = ({
   type,
   value,
@@ -60,9 +80,9 @@ const WrappedTag: React.FC<TagProps> = ({
   const [safelistReason, setSafelistReason] = React.useState(null);
   const [waitingDialog, setWaitingDialog] = React.useState(false);
   const navigate = useNavigate();
-  const { user: currentUser, scoreToVerdict } = useALContext();
+  const { user: currentUser, configuration: currentUserConfig, scoreToVerdict } = useALContext();
   const { apiCall } = useMyAPI();
-  const { showSuccessMessage } = useMySnackbar();
+  const { showSuccessMessage, showWarningMessage } = useMySnackbar();
   const { isHighlighted, triggerHighlight } = useHighlighter();
   const { copy } = useClipboard();
   const { showSafeResults } = useSafeResults();
@@ -75,12 +95,44 @@ const WrappedTag: React.FC<TagProps> = ({
     [type, value]
   );
 
+  const externalResults = useRef(null);
+  const linkIcon = useRef(null);
   const searchTagExternal = useCallback(() => {
     apiCall({
       method: 'GET',
-      url: `/api/v4/federated_lookup/search/${type}/${safeFieldValueURI(value)}/`,
+      url: `/api/v4/federated_lookup/search/${type}/${value}/`,
       onSuccess: api_data => {
-        showSuccessMessage('DID QUERY');
+        if (Object.keys(api_data.api_response).length !== 0) {
+          showSuccessMessage(t('related_external.found'));
+          linkIcon.current = LINK_ICON;
+          /*let test = {
+            'malware_bazaar': {
+              'link': 'https://link.com',
+              'classification': 'UNRESTRICTED',
+              'count': 2
+            },
+            'virustotal': {
+              'link': 'https://linktovt.com',
+              'classification': 'UNRESTRICTED',
+              'count': 1
+            }
+          };
+          externalResults.current = Object.keys(test).map((sourceName: keyof LookupSourceDetails) => (
+              <h3>{sourceName}: <a href={test[sourceName].link}>{test[sourceName].count} results</a></h3>
+
+          */
+          externalResults.current = Object.keys(api_data.api_response).map((sourceName: keyof LookupSourceDetails) => (
+            <p>
+              <h3>
+                {sourceName}:
+                <a href={api_data.api_response[sourceName].link}>{api_data.api_response[sourceName].count} results</a>
+              </h3>
+            </p>
+          ));
+        }
+        else {
+          showWarningMessage(t('related_external.notfound'));
+        }
       },
       onEnter: () => setWaitingDialog(true),
       onExit: () => setWaitingDialog(false)
@@ -214,11 +266,21 @@ const WrappedTag: React.FC<TagProps> = ({
             {t('related')}
           </MenuItem>
         )}
-        {currentUser.roles.includes('submission_view') && (
+        {currentUser.roles.includes('submission_view') && currentUserConfig.ui.external_sources?.length && (
+          /* TODO: convert this into a nested menu with each source available for the user */
+          // TODO: enable valid tags to be sent in config so we can only show context menu on supported tags for user
           <MenuItem dense onClick={handleMenuExternalSearch}>
             {TRAVEL_EXPLORE_ICON}
-            {t('related_external')}
+            {t('related_external') + t('related_external.all')}
           </MenuItem>
+        )}
+        {currentUser.roles.includes('submission_view') && (
+          currentUserConfig.ui.external_sources?.map(source =>
+            <MenuItem dense onClick={handleMenuExternalSearch}>
+              {TRAVEL_EXPLORE_ICON}
+              {t('related_external') + source}
+            </MenuItem>
+          )
         )}
         <MenuItem dense onClick={handleMenuHighlight}>
           {HIGHLIGHT_ICON}
@@ -231,18 +293,21 @@ const WrappedTag: React.FC<TagProps> = ({
           </MenuItem>
         )}
       </Menu>
-      <CustomChip
-        wrap
-        variant={safelisted ? 'outlined' : 'filled'}
-        size="tiny"
-        type="rounded"
-        color={highlight_key && isHighlighted(highlight_key) ? ('primary' as 'info') : color}
-        label={short_type ? `[${short_type.toUpperCase()}] ${value}` : value}
-        style={STYLE}
-        onClick={highlight_key ? handleClick : null}
-        fullWidth={fullWidth}
-        onContextMenu={handleMenuClick}
-      />
+      <NoMaxWidthTooltip title={externalResults.current}>
+        <CustomChip
+          wrap
+          variant={safelisted ? 'outlined' : 'filled'}
+          size="tiny"
+          type="rounded"
+          color={highlight_key && isHighlighted(highlight_key) ? ('primary' as 'info') : color}
+          label={short_type ? `[${short_type.toUpperCase()}] ${value}` : value}
+          style={STYLE}
+          onClick={highlight_key ? handleClick : null}
+          fullWidth={fullWidth}
+          onContextMenu={handleMenuClick}
+          icon={linkIcon.current}
+        />
+      </NoMaxWidthTooltip>
     </>
   );
 };
