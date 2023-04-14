@@ -4,7 +4,6 @@ import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
-import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { CustomUser } from 'components/hooks/useMyUser';
@@ -79,23 +78,64 @@ const GAP_MAP = {
 
 export default function MalwareArchive() {
   const { t } = useTranslation(['adminErrorViewer']);
-  const [pageSize] = useState(PAGE_SIZE);
-  const [searching, setSearching] = useState(false);
-  const [errorResults, setErrorResults] = useState<ErrorResults>(null);
-  const classes = useStyles();
-  const navigate = useNavigate();
-  const [query, setQuery] = useState<SimpleSearchQuery>(null);
   const theme = useTheme();
-  const { apiCall } = useMyAPI();
-  const { user: currentUser } = useAppUser<CustomUser>();
-  const [suggestions, setSuggestions] = useState(DEFAULT_SUGGESTION);
+  const classes = useStyles();
   const location = useLocation();
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
-  const filterValue = useRef<string>('');
+
+  const navigate = useNavigate();
+  const { apiCall } = useMyAPI();
+  const { user: currentUser } = useAppUser<CustomUser>();
   const { closeGlobalDrawer, setGlobalDrawer, globalDrawerOpened } = useDrawer();
+
+  const [errorResults, setErrorResults] = useState<ErrorResults>(null);
+  const [query, setQuery] = useState<SimpleSearchQuery>(null);
+  const [suggestions, setSuggestions] = useState<string[]>(DEFAULT_SUGGESTION);
   const [histogram, setHistogram] = useState(null);
   const [types, setTypes] = useState(null);
   const [names, setNames] = useState(null);
+  const [pageSize] = useState<number>(PAGE_SIZE);
+  const [searching, setSearching] = useState<boolean>(false);
+
+  const filterValue = useRef<string>('');
+
+  const onClear = useCallback(
+    () => {
+      if (query.getAll('filters').length !== 0) {
+        query.delete('query');
+        navigate(`${location.pathname}?${query.getDeltaString()}`);
+      } else {
+        navigate(location.pathname);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [location.pathname, query]
+  );
+
+  const onSearch = useCallback(
+    () => {
+      if (filterValue.current !== '') {
+        query.set('query', filterValue.current);
+        navigate(`${location.pathname}?${query.getDeltaString()}`);
+      } else {
+        onClear();
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [query, location.pathname, onClear]
+  );
+
+  const onFilterValueChange = useCallback((inputValue: string) => {
+    filterValue.current = inputValue;
+  }, []);
+
+  const setErrorKey = useCallback(
+    (error_key: string) => {
+      navigate(`${location.pathname}${location.search ? location.search : ''}#${error_key}`);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [location.search]
+  );
 
   useEffect(() => {
     setQuery(new SimpleSearchQuery(location.search, `rows=${pageSize}&offset=0&tc=${DEFAULT_TC}`));
@@ -166,9 +206,9 @@ export default function MalwareArchive() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
-  useEffectOnce(() => {
+  useEffect(() => {
     apiCall({
-      url: '/api/v4/search/fields/error/',
+      url: '/api/v4/search/fields/file/',
       onSuccess: api_data => {
         setSuggestions([
           ...Object.keys(api_data.api_response).filter(name => api_data.api_response[name].indexed),
@@ -177,44 +217,6 @@ export default function MalwareArchive() {
       }
     });
   });
-
-  const onClear = useCallback(
-    () => {
-      if (query.getAll('filters').length !== 0) {
-        query.delete('query');
-        navigate(`${location.pathname}?${query.getDeltaString()}`);
-      } else {
-        navigate(location.pathname);
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [location.pathname, query]
-  );
-
-  const onSearch = useCallback(
-    () => {
-      if (filterValue.current !== '') {
-        query.set('query', filterValue.current);
-        navigate(`${location.pathname}?${query.getDeltaString()}`);
-      } else {
-        onClear();
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [query, location.pathname, onClear]
-  );
-
-  const onFilterValueChange = (inputValue: string) => {
-    filterValue.current = inputValue;
-  };
-
-  const setErrorKey = useCallback(
-    (error_key: string) => {
-      navigate(`${location.pathname}${location.search ? location.search : ''}#${error_key}`);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [location.search]
-  );
 
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>
