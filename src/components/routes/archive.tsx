@@ -51,6 +51,37 @@ type ErrorResults = {
   total: number;
 };
 
+type FileInfo = {
+  archive_ts: string;
+  ascii: string;
+  classification: string;
+  entropy: number;
+  expiry_ts: string | null;
+  hex: string;
+  id: string;
+  magic: string;
+  md5: string;
+  mime: string;
+  seen: {
+    count: number;
+    first: string;
+    last: string;
+  };
+  sha1: string;
+  sha256: string;
+  size: number;
+  ssdeep: string;
+  tags: string[];
+  type: string;
+};
+
+type FileResults = {
+  items: FileInfo[];
+  offset: number;
+  rows: number;
+  total: number;
+};
+
 const DEFAULT_TC = '4d';
 
 const TC_MAP = {
@@ -77,7 +108,7 @@ const GAP_MAP = {
 };
 
 export default function MalwareArchive() {
-  const { t } = useTranslation(['adminErrorViewer']);
+  const { t } = useTranslation(['archive']);
   const theme = useTheme();
   const classes = useStyles();
   const location = useLocation();
@@ -88,6 +119,7 @@ export default function MalwareArchive() {
   const { user: currentUser } = useAppUser<CustomUser>();
   const { closeGlobalDrawer, setGlobalDrawer, globalDrawerOpened } = useDrawer();
 
+  const [fileResults, setFileResults] = useState<FileResults>(null);
   const [errorResults, setErrorResults] = useState<ErrorResults>(null);
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
   const [suggestions, setSuggestions] = useState<string[]>(DEFAULT_SUGGESTION);
@@ -98,6 +130,7 @@ export default function MalwareArchive() {
   const [searching, setSearching] = useState<boolean>(false);
 
   const filterValue = useRef<string>('');
+  const queryValue = useRef<string>('');
 
   const onClear = useCallback(
     () => {
@@ -216,7 +249,41 @@ export default function MalwareArchive() {
         ]);
       }
     });
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    console.log(query);
+    if (query) {
+      queryValue.current = query.get('query', '');
+      if (query.get('query')) {
+        console.log(query.getParams());
+
+        apiCall({
+          method: 'POST',
+          url: `/api/v4/search/file/`,
+          body: { ...query.getParams(), rows: pageSize, offset: 0 },
+          onSuccess: api_data => {
+            console.log(api_data);
+            setFileResults(api_data.api_response);
+          },
+          onFailure: api_data => {
+            // if (index || id || !api_data.api_error_message.includes('Rewrite first')) {
+            //   showErrorMessage(api_data.api_error_message);
+            // } else {
+            //   stateMap[searchIndex]({ total: 0, offset: 0, items: [], rows: pageSize });
+            // }
+          },
+          onFinalize: () => {
+            // if (index || id) {
+            //   setSearching(false);
+            // }
+          }
+        });
+      }
+    }
+    // eslint-disable-next-line
+  }, [query]);
 
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>
@@ -360,7 +427,7 @@ export default function MalwareArchive() {
       )}
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
-        <ArchivesTable errorResults={errorResults} setErrorKey={setErrorKey} />
+        <ArchivesTable fileResults={fileResults} setErrorKey={setErrorKey} />
       </div>
     </PageFullWidth>
   ) : (
