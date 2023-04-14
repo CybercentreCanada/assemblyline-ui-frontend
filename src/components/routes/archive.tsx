@@ -1,412 +1,367 @@
-import {
-  createStyles,
-  IconButton,
-  makeStyles,
-  Paper,
-  Tab,
-  Tabs,
-  Theme,
-  Tooltip,
-  Typography,
-  useMediaQuery,
-  useTheme
-} from '@material-ui/core';
-import ArchiveIcon from '@material-ui/icons/Archive';
-import ArchiveOutlinedIcon from '@material-ui/icons/ArchiveOutlined';
-import CenterFocusStrongOutlinedIcon from '@material-ui/icons/CenterFocusStrongOutlined';
-import PageFullWidth from 'commons/components/layout/pages/PageFullWidth';
-import PageHeader from 'commons/components/layout/pages/PageHeader';
-import useALContext from 'components/hooks/useALContext';
+import { Grid, MenuItem, Select, Typography, useMediaQuery, useTheme } from '@mui/material';
+import FormControl from '@mui/material/FormControl';
+import makeStyles from '@mui/styles/makeStyles';
+import useAppUser from 'commons/components/app/hooks/useAppUser';
+import PageFullWidth from 'commons/components/pages/PageFullWidth';
+import PageHeader from 'commons/components/pages/PageHeader';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
+import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
-import useMySnackbar from 'components/hooks/useMySnackbar';
-import Empty from 'components/visual/Empty';
+import { CustomUser } from 'components/hooks/useMyUser';
+import { ChipList } from 'components/visual/ChipList';
+import Histogram from 'components/visual/Histogram';
+import LineGraph from 'components/visual/LineGraph';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
-import AlertsTable from 'components/visual/SearchResult/alerts';
-import FilesTable from 'components/visual/SearchResult/files';
-import ResultsTable from 'components/visual/SearchResult/results';
-import SignaturesTable from 'components/visual/SearchResult/signatures';
-import SubmissionsTable from 'components/visual/SearchResult/submissions';
+import ArchivesTable from 'components/visual/SearchResult/archives';
 import SearchResultCount from 'components/visual/SearchResultCount';
-import { searchResultsDisplay } from 'helpers/utils';
-import React, { useEffect, useRef, useState } from 'react';
+import { safeFieldValue } from 'helpers/utils';
+import 'moment/locale/fr';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useHistory, useLocation, useParams } from 'react-router-dom';
-import ForbiddenPage from './403';
+import { Navigate, useNavigate } from 'react-router';
+import { useLocation } from 'react-router-dom';
+import ErrorDetail from './admin/error_detail';
 
 const PAGE_SIZE = 25;
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    tweaked_tabs: {
-      minHeight: 'unset',
-      [theme.breakpoints.up('md')]: {
-        '& [role=tab]': {
-          padding: '8px 20px',
-          fontSize: '13px',
-          minHeight: 'unset',
-          minWidth: 'unset'
-        }
-      },
-      [theme.breakpoints.down('sm')]: {
-        minHeight: 'unset',
-        '& [role=tab]': {
-          fontSize: '12px',
-          minHeight: 'unset',
-          minWidth: 'unset'
-        }
-      }
-    },
-    searchresult: {
-      paddingLeft: theme.spacing(1),
-      color: theme.palette.primary.main,
-      fontStyle: 'italic'
+const useStyles = makeStyles(theme => ({
+  searchresult: {
+    fontStyle: 'italic',
+    paddingTop: theme.spacing(0.5),
+    paddingBottom: theme.spacing(0.5),
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-end'
+  },
+  drawerPaper: {
+    width: '80%',
+    maxWidth: '800px',
+    [theme.breakpoints.down('xl')]: {
+      width: '100%'
     }
-  })
-);
+  }
+}));
 
-type SearchProps = {
-  index?: string | null;
-};
-
-type ParamProps = {
-  id: string;
-};
-
-type SearchResults = {
+type ErrorResults = {
   items: any[];
   offset: number;
   rows: number;
   total: number;
 };
 
-const WrappedArchive = ({ index }: SearchProps) => {
-  const { id } = useParams<ParamProps>();
-  const { t } = useTranslation(['archive']);
+const DEFAULT_TC = '4d';
+
+const TC_MAP = {
+  '24h': 'created:[now-24h TO now]',
+  '4d': 'created:[now-4d TO now]',
+  '7d': 'created:[now-7d TO now]',
+  '1m': 'created:[now-1M TO now]'
+};
+
+const START_MAP = {
+  '24h': 'now-1d',
+  '4d': 'now-4d',
+  '7d': 'now-7d',
+  '1m': 'now-1M',
+  '1y': 'now-1y'
+};
+
+const GAP_MAP = {
+  '24h': '1h',
+  '4d': '2h',
+  '7d': '4h',
+  '1m': '1d',
+  '1y': '15d'
+};
+
+export default function MalwareArchive() {
+  const { t } = useTranslation(['adminErrorViewer']);
   const [pageSize] = useState(PAGE_SIZE);
   const [searching, setSearching] = useState(false);
-  const { indexes, user: currentUser, configuration } = useALContext();
-  const location = useLocation();
-  const history = useHistory();
-  const theme = useTheme();
+  const [errorResults, setErrorResults] = useState<ErrorResults>(null);
   const classes = useStyles();
-  const { apiCall } = useMyAPI();
+  const navigate = useNavigate();
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
-  const [searchSuggestion, setSearchSuggestion] = useState<string[]>(null);
-  const [tab, setTab] = useState(null);
-  const { showErrorMessage } = useMySnackbar();
-  const downSM = useMediaQuery(theme.breakpoints.down('sm'));
+  const theme = useTheme();
+  const { apiCall } = useMyAPI();
+  const { user: currentUser } = useAppUser<CustomUser>();
+  const [suggestions, setSuggestions] = useState(DEFAULT_SUGGESTION);
+  const location = useLocation();
+  const upMD = useMediaQuery(theme.breakpoints.up('md'));
+  const filterValue = useRef<string>('');
+  const { closeGlobalDrawer, setGlobalDrawer, globalDrawerOpened } = useDrawer();
+  const [histogram, setHistogram] = useState(null);
+  const [types, setTypes] = useState(null);
+  const [names, setNames] = useState(null);
 
-  // Result lists
-  const [submissionResults, setSubmissionResults] = useState<SearchResults>(null);
-  const [fileResults, setFileResults] = useState<SearchResults>(null);
-  const [resultResults, setResultResults] = useState<SearchResults>(null);
-  const [signatureResults, setSignatureResults] = useState<SearchResults>(null);
-  const [alertResults, setAlertResults] = useState<SearchResults>(null);
+  useEffect(() => {
+    setQuery(new SimpleSearchQuery(location.search, `rows=${pageSize}&offset=0&tc=${DEFAULT_TC}`));
+  }, [location.pathname, location.search, pageSize]);
 
-  const stateMap = {
-    submission: setSubmissionResults,
-    file: setFileResults,
-    result: setResultResults,
-    signature: setSignatureResults,
-    alert: setAlertResults
-  };
-
-  const resMap = {
-    submission: submissionResults,
-    file: fileResults,
-    result: resultResults,
-    signature: signatureResults,
-    alert: alertResults
-  };
-
-  const permissionMap = {
-    submission: 'submission_view',
-    file: 'submission_view',
-    result: 'submission_view',
-    signature: 'signature_view',
-    alert: 'alert_view'
-  };
-
-  const queryValue = useRef<string>('');
-
-  const handleChangeTab = (event, newTab) => {
-    history.push(`${location.pathname}?${query.toString()}#${newTab}`);
-  };
-
-  const onClear = () => {
-    query.delete('query');
-    history.push(`${location.pathname}?${query.toString()}${location.hash}`);
-  };
-
-  const onSearch = () => {
-    if (queryValue.current !== '') {
-      query.set('query', queryValue.current);
-      history.push(`${location.pathname}?${query.toString()}${location.hash}`);
-    } else {
-      onClear();
+  useEffect(() => {
+    if (errorResults !== null && !globalDrawerOpened && location.hash) {
+      navigate(`${location.pathname}${location.search ? location.search : ''}`);
     }
-  };
-
-  const onFilterValueChange = (inputValue: string) => {
-    queryValue.current = inputValue;
-  };
-
-  const resetResults = () => {
-    setSubmissionResults(null);
-    setFileResults(null);
-    setResultResults(null);
-    setSignatureResults(null);
-    setAlertResults(null);
-  };
-
-  useEffect(() => {
-    // On index change we need to update the search suggestion
-    setSearchSuggestion([
-      ...Object.keys(indexes[index || id] || {}).filter(name => indexes[index || id][name].indexed),
-      ...DEFAULT_SUGGESTION
-    ]);
-  }, [index, id, indexes]);
-
-  useEffect(() => {
-    // On location.search change we need to change the query object and reset the results
-    setQuery(new SimpleSearchQuery(location.search, `rows=${pageSize}&offset=0`));
-    resetResults();
-  }, [location.search, pageSize]);
-
-  useEffect(() => {
-    const nextAvailableTab = () => {
-      for (const curTab of [...Object.keys(stateMap)]) {
-        if (currentUser.roles.includes(permissionMap[curTab])) return curTab;
-      }
-      return 'submission';
-    };
-    // On location.hash change, we need to change the tab
-    const newTab = location.hash.substring(1, location.hash.length) || index || id || nextAvailableTab();
-    setTab(newTab);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, index, location.hash]);
+  }, [globalDrawerOpened]);
 
   useEffect(() => {
-    if (query) {
-      queryValue.current = query.get('query', '');
-      if (query.get('query')) {
-        const searchList = [];
-        if (!(index || id)) {
-          searchList.push(...Object.keys(stateMap));
-        } else {
-          searchList.push(tab);
-          if (!searching) setSearching(true);
-        }
-        for (const searchIndex of searchList) {
-          // Do no perform search if user has no rights
-          if (!currentUser.roles.includes(permissionMap[searchIndex])) continue;
-
-          apiCall({
-            method: 'POST',
-            url: `/api/v4/search/${searchIndex}/`,
-            body: { ...query.getParams(), rows: pageSize, offset: 0 },
-            onSuccess: api_data => {
-              stateMap[searchIndex](api_data.api_response);
-            },
-            onFailure: api_data => {
-              if (index || id || !api_data.api_error_message.includes('Rewrite first')) {
-                showErrorMessage(api_data.api_error_message);
-              } else {
-                stateMap[searchIndex]({ total: 0, offset: 0, items: [], rows: pageSize });
-              }
-            },
-            onFinalize: () => {
-              if (index || id) {
-                setSearching(false);
-              }
-            }
-          });
-        }
-      }
+    if (location.hash) {
+      setGlobalDrawer(<ErrorDetail error_key={location.hash.substr(1)} />);
+    } else {
+      closeGlobalDrawer();
     }
-    // eslint-disable-next-line
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.hash]);
+
+  useEffect(() => {
+    if (query && currentUser.is_admin) {
+      const curQuery = new SimpleSearchQuery(query.toString(), `rows=${pageSize}&offset=0`);
+      const tc = curQuery.pop('tc') || DEFAULT_TC;
+      curQuery.set('rows', pageSize);
+      curQuery.set('offset', 0);
+      if (tc !== '1y') {
+        curQuery.add('filters', TC_MAP[tc]);
+      }
+      setSearching(true);
+      apiCall({
+        url: `/api/v4/error/list/?${curQuery.toString()}`,
+        onSuccess: api_data => {
+          setErrorResults(api_data.api_response);
+        },
+        onFinalize: () => {
+          setSearching(false);
+        }
+      });
+      apiCall({
+        url: `/api/v4/search/facet/error/response.service_name/?${curQuery.toString([
+          'rows',
+          'offset',
+          'sort',
+          'track_total_hits'
+        ])}`,
+        onSuccess: api_data => {
+          setNames(api_data.api_response);
+        }
+      });
+      apiCall({
+        url: `/api/v4/search/facet/error/type/?${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
+        onSuccess: api_data => {
+          setTypes(api_data.api_response);
+        }
+      });
+      apiCall({
+        url: `/api/v4/search/histogram/error/created/?start=${START_MAP[tc]}&end=now&gap=${
+          GAP_MAP[tc]
+        }&mincount=0&${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
+        onSuccess: api_data => {
+          setHistogram(api_data.api_response);
+        }
+      });
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
-  const TabSpacer = props => <div style={{ flexGrow: 1 }} />;
+  useEffectOnce(() => {
+    apiCall({
+      url: '/api/v4/search/fields/error/',
+      onSuccess: api_data => {
+        setSuggestions([
+          ...Object.keys(api_data.api_response).filter(name => api_data.api_response[name].indexed),
+          ...DEFAULT_SUGGESTION
+        ]);
+      }
+    });
+  });
 
-  const SpecialTab = ({ children, ...otherProps }) => children;
+  const onClear = useCallback(
+    () => {
+      if (query.getAll('filters').length !== 0) {
+        query.delete('query');
+        navigate(`${location.pathname}?${query.getDeltaString()}`);
+      } else {
+        navigate(location.pathname);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [location.pathname, query]
+  );
 
-  return ((index || id) && !currentUser.roles.includes(permissionMap[index || id])) ||
-    (!(index || id) && Object.values(permissionMap).every(val => !currentUser.roles.includes(val))) ? (
-    <ForbiddenPage />
-  ) : (
+  const onSearch = useCallback(
+    () => {
+      if (filterValue.current !== '') {
+        query.set('query', filterValue.current);
+        navigate(`${location.pathname}?${query.getDeltaString()}`);
+      } else {
+        onClear();
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [query, location.pathname, onClear]
+  );
+
+  const onFilterValueChange = (inputValue: string) => {
+    filterValue.current = inputValue;
+  };
+
+  const setErrorKey = useCallback(
+    (error_key: string) => {
+      navigate(`${location.pathname}${location.search ? location.search : ''}#${error_key}`);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [location.search]
+  );
+
+  return currentUser.is_admin ? (
     <PageFullWidth margin={4}>
-      <div style={{ paddingBottom: theme.spacing(2), textAlign: 'left', width: '100%' }}>
-        <Typography variant="h4">{t(`title`)}</Typography>
-      </div>
+      <Grid container spacing={2} style={{ paddingBottom: theme.spacing(2) }}>
+        <Grid item xs={12} sm={7} md={9} xl={10}>
+          <Typography variant="h4">{t('title')}</Typography>
+        </Grid>
+        <Grid item xs={12} sm={5} md={3} xl={2}>
+          <FormControl size="small" fullWidth>
+            <Select
+              disabled={searching}
+              value={query ? query.get('tc') || DEFAULT_TC : DEFAULT_TC}
+              variant="outlined"
+              onChange={event => {
+                query.set('tc', event.target.value);
+                navigate(`${location.pathname}?${query.getDeltaString()}`);
+              }}
+              fullWidth
+            >
+              <MenuItem value="24h">{t('tc.24h')}</MenuItem>
+              <MenuItem value="4d">{t('tc.4d')}</MenuItem>
+              <MenuItem value="7d">{t('tc.7d')}</MenuItem>
+              <MenuItem value="1m">{t('tc.1m')}</MenuItem>
+              <MenuItem value="1y">{t('tc.1y')}</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+      </Grid>
+
       <PageHeader isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchBar
             initValue={query ? query.get('query', '') : ''}
+            placeholder={t('filter')}
             searching={searching}
-            placeholder={t(`search_${index || id || 'all'}`)}
-            suggestions={searchSuggestion}
+            suggestions={suggestions}
             onValueChange={onFilterValueChange}
             onClear={onClear}
             onSearch={onSearch}
-            buttons={
-              configuration.datastore.archive.enabled &&
-              currentUser.roles.includes('archive_view') &&
-              ['submission', 'result', 'file', 'all'].includes(index || id || 'all')
-                ? [
-                    {
-                      icon:
-                        query && query.get('use_archive') === 'true' ? (
-                          <ArchiveIcon fontSize={downSM ? 'small' : 'medium'} />
-                        ) : (
-                          <ArchiveOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />
-                        ),
-                      tooltip:
-                        query && query.get('use_archive') === 'true'
-                          ? t('use_archive.turn_off')
-                          : t('use_archive.turn_on'),
-                      props: {
-                        onClick: () => {
-                          query.set(
-                            'use_archive',
-                            !query.has('use_archive') ? 'true' : query.get('use_archive') === 'false'
-                          );
-                          history.push(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                        }
-                      }
-                    }
-                  ]
-                : []
-            }
-          />
-
-          {!(index || id) && query && query.get('query') && (
-            <Paper square style={{ marginBottom: theme.spacing(0.5) }}>
-              <Tabs
-                className={classes.tweaked_tabs}
-                value={tab}
-                onChange={handleChangeTab}
-                indicatorColor="primary"
-                textColor="primary"
-                scrollButtons="auto"
-                variant="scrollable"
-              >
-                {currentUser.roles.includes(permissionMap.submission) ? (
-                  <Tab
-                    label={`${t('submission')} (${
-                      submissionResults ? searchResultsDisplay(submissionResults.total) : '...'
-                    })`}
-                    value="submission"
-                  />
-                ) : (
-                  <Empty />
-                )}
-                {currentUser.roles.includes(permissionMap.file) ? (
-                  <Tab
-                    label={`${t('file')} (${fileResults ? searchResultsDisplay(fileResults.total) : '...'})`}
-                    value="file"
-                  />
-                ) : (
-                  <Empty />
-                )}
-                {currentUser.roles.includes(permissionMap.result) ? (
-                  <Tab
-                    label={`${t('result')} (${resultResults ? searchResultsDisplay(resultResults.total) : '...'})`}
-                    value="result"
-                  />
-                ) : (
-                  <Empty />
-                )}
-                {currentUser.roles.includes(permissionMap.signature) ? (
-                  <Tab
-                    label={`${t('signature')} (${
-                      signatureResults ? searchResultsDisplay(signatureResults.total) : '...'
-                    })`}
-                    value="signature"
-                  />
-                ) : (
-                  <Empty />
-                )}
-                {currentUser.roles.includes(permissionMap.alert) ? (
-                  <Tab
-                    label={`${t('alert')} (${alertResults ? searchResultsDisplay(alertResults.total) : '...'})`}
-                    value="alert"
-                  />
-                ) : (
-                  <Empty />
-                )}
-                <TabSpacer />
-                <SpecialTab>
-                  <Tooltip title={t('focus_search')}>
-                    <IconButton
-                      size={downSM ? 'small' : 'medium'}
-                      component={Link}
-                      to={`/search/${tab}${location.search}`}
-                    >
-                      <CenterFocusStrongOutlinedIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                </SpecialTab>
-              </Tabs>
-            </Paper>
-          )}
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              marginBottom: theme.spacing(0.5),
-              justifyContent: 'flex-end'
-            }}
           >
-            {resMap[tab] && resMap[tab].total !== 0 && (index || id) && (
+            {errorResults !== null && (
               <div className={classes.searchresult}>
-                <SearchResultCount count={resMap[tab].total} />
-                {t(resMap[tab].total === 1 ? 'matching_result' : 'matching_results')}
+                {errorResults.total !== 0 && (
+                  <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
+                    {searching ? (
+                      <span>{t('searching')}</span>
+                    ) : (
+                      <span>
+                        <SearchResultCount count={errorResults.total} />
+                        {query.get('query')
+                          ? t(`filtered${errorResults.total === 1 ? '' : 's'}`)
+                          : t(`total${errorResults.total === 1 ? '' : 's'}`)}
+                      </span>
+                    )}
+                  </Typography>
+                )}
+
+                <SearchPager
+                  method="GET"
+                  url="/api/v4/error/list/"
+                  total={errorResults.total}
+                  setResults={setErrorResults}
+                  pageSize={pageSize}
+                  index="user"
+                  query={query}
+                  setSearching={setSearching}
+                />
               </div>
             )}
-            <div style={{ flexGrow: 1 }} />
-            {resMap[tab] && (
-              <SearchPager
-                total={resMap[tab].total}
-                setResults={stateMap[tab]}
-                page={resMap[tab].offset / resMap[tab].rows + 1}
-                pageSize={pageSize}
-                index={tab}
-                query={query}
-                setSearching={setSearching}
-              />
+
+            {query && (
+              <div>
+                <ChipList
+                  items={query.getAll('filters', []).map(v => ({
+                    variant: 'outlined',
+                    label: `${v}`,
+                    color: v.indexOf('NOT ') === 0 ? 'error' : null,
+                    onClick: () => {
+                      query.replace(
+                        'filters',
+                        v,
+                        v.indexOf('NOT ') === 0 ? v.substring(5, v.length - 1) : `NOT (${v})`
+                      );
+                      navigate(`${location.pathname}?${query.getDeltaString()}`);
+                    },
+                    onDelete: () => {
+                      query.remove('filters', v);
+                      navigate(`${location.pathname}?${query.getDeltaString()}`);
+                    }
+                  }))}
+                />
+              </div>
             )}
-          </div>
+          </SearchBar>
         </div>
       </PageHeader>
+
+      {errorResults !== null && errorResults.total !== 0 && (
+        <Grid container spacing={2}>
+          <Grid item xs={12} lg={4}>
+            <Histogram
+              dataset={histogram}
+              height="200px"
+              title={t(`graph.histogram.title.${query ? query.get('tc') || DEFAULT_TC : DEFAULT_TC}`)}
+              datatype={t('graph.datatype')}
+              isDate
+              verticalLine
+            />
+          </Grid>
+          <Grid item xs={12} md={6} lg={4}>
+            <LineGraph
+              dataset={names}
+              height="200px"
+              title={t('graph.name.title')}
+              datatype={t('graph.datatype')}
+              onClick={(evt, element) => {
+                if (!searching && element.length > 0) {
+                  var ind = element[0].index;
+                  query.add('filters', `response.service_name:${Object.keys(names)[ind]}`);
+                  navigate(`${location.pathname}?${query.getDeltaString()}`);
+                }
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} md={6} lg={4}>
+            <LineGraph
+              dataset={types}
+              height="200px"
+              title={t('graph.type.title')}
+              datatype={t('graph.datatype')}
+              onClick={(evt, element) => {
+                if (!searching && element.length > 0) {
+                  var ind = element[0].index;
+                  query.add('filters', `type:${safeFieldValue(Object.keys(types)[ind])}`);
+                  navigate(`${location.pathname}?${query.getDeltaString()}`);
+                }
+              }}
+            />
+          </Grid>
+        </Grid>
+      )}
+
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
-        {tab === 'submission' && query && query.get('query') && (
-          <SubmissionsTable submissionResults={submissionResults} allowSort={!!(index || id)} />
-        )}
-        {tab === 'file' && query && query.get('query') && (
-          <FilesTable fileResults={fileResults} allowSort={!!(index || id)} />
-        )}
-        {tab === 'result' && query && query.get('query') && (
-          <ResultsTable resultResults={resultResults} allowSort={!!(index || id)} />
-        )}
-        {tab === 'signature' && query && query.get('query') && (
-          <SignaturesTable signatureResults={signatureResults} allowSort={!!(index || id)} />
-        )}
-        {tab === 'alert' && query && query.get('query') && (
-          <AlertsTable alertResults={alertResults} allowSort={!!(index || id)} />
-        )}
+        <ArchivesTable errorResults={errorResults} setErrorKey={setErrorKey} />
       </div>
     </PageFullWidth>
+  ) : (
+    <Navigate to="/forbidden" replace />
   );
-};
-
-WrappedArchive.defaultProps = {
-  index: null
-};
-
-export const Archive = React.memo(WrappedArchive);
-export default Archive;
+}
