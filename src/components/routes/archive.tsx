@@ -2,12 +2,11 @@
 import { Grid, MenuItem, Select, Typography, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import makeStyles from '@mui/styles/makeStyles';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
+import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { CustomUser } from 'components/hooks/useMyUser';
 import { ChipList } from 'components/visual/ChipList';
 import FileDetail from 'components/visual/FileDetail';
 import Histogram from 'components/visual/Histogram';
@@ -44,13 +43,6 @@ const useStyles = makeStyles(theme => ({
     }
   }
 }));
-
-type ErrorResults = {
-  items: any[];
-  offset: number;
-  rows: number;
-  total: number;
-};
 
 type FileInfo = {
   archive_ts: string;
@@ -117,21 +109,23 @@ export default function MalwareArchive() {
 
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();
-  const { user: currentUser } = useAppUser<CustomUser>();
+  // const { user: currentUser } = useAppUser<CustomUser>();
   const { closeGlobalDrawer, setGlobalDrawer, globalDrawerOpened } = useDrawer();
+  const { user: currentUser, indexes } = useALContext();
 
   const [fileResults, setFileResults] = useState<FileResults>(null);
-  const [errorResults, setErrorResults] = useState<ErrorResults>(null);
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
-  const [suggestions, setSuggestions] = useState<string[]>(DEFAULT_SUGGESTION);
   const [histogram, setHistogram] = useState(null);
   const [types, setTypes] = useState<{ [k: string]: number }>(null);
   const [labels, setLabels] = useState<{ [k: string]: number }>(null);
   const [pageSize] = useState<number>(PAGE_SIZE);
   const [searching, setSearching] = useState<boolean>(false);
+  const [suggestions] = useState<string[]>([
+    ...Object.keys(indexes.file).filter(p => indexes.file[p].indexed),
+    ...DEFAULT_SUGGESTION
+  ]);
 
   const filterValue = useRef<string>('');
-  const queryValue = useRef<string>('');
 
   const onClear = useCallback(
     () => {
@@ -172,11 +166,12 @@ export default function MalwareArchive() {
   );
 
   useEffect(() => {
-    setQuery(new SimpleSearchQuery(location.search, `rows=${pageSize}&offset=0&tc=${DEFAULT_TC}`));
+    setSearching(true);
+    setQuery(new SimpleSearchQuery(location.search, `query=*&rows=${pageSize}&offset=0&tc=${DEFAULT_TC}`));
   }, [location.pathname, location.search, pageSize]);
 
   useEffect(() => {
-    if (errorResults !== null && !globalDrawerOpened && location.hash) {
+    if (fileResults !== null && !globalDrawerOpened && location.hash) {
       navigate(`${location.pathname}${location.search ? location.search : ''}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -193,66 +188,66 @@ export default function MalwareArchive() {
 
   useEffect(() => {
     return;
-    if (query && currentUser.is_admin) {
-      const curQuery = new SimpleSearchQuery(query.toString(), `rows=${pageSize}&offset=0`);
-      const tc = curQuery.pop('tc') || DEFAULT_TC;
-      curQuery.set('rows', pageSize);
-      curQuery.set('offset', 0);
-      if (tc !== '1y') {
-        curQuery.add('filters', TC_MAP[tc]);
-      }
-      setSearching(true);
-      apiCall({
-        url: `/api/v4/error/list/?${curQuery.toString()}`,
-        onSuccess: api_data => {
-          setErrorResults(api_data.api_response);
-        },
-        onFinalize: () => {
-          setSearching(false);
-        }
-      });
-      apiCall({
-        url: `/api/v4/search/facet/error/response.service_name/?${curQuery.toString([
-          'rows',
-          'offset',
-          'sort',
-          'track_total_hits'
-        ])}`,
-        onSuccess: api_data => {
-          // setLabels(api_data.api_response);
-        }
-      });
-      apiCall({
-        url: `/api/v4/search/facet/error/type/?${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
-        onSuccess: api_data => {
-          // setTypes(api_data.api_response);
-        }
-      });
-      apiCall({
-        url: `/api/v4/search/histogram/error/created/?start=${START_MAP[tc]}&end=now&gap=${
-          GAP_MAP[tc]
-        }&mincount=0&${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
-        onSuccess: api_data => {
-          setHistogram(api_data.api_response);
-        }
-      });
-    }
+    // if (query && currentUser.is_admin) {
+    //   const curQuery = new SimpleSearchQuery(query.toString(), `rows=${pageSize}&offset=0`);
+    //   const tc = curQuery.pop('tc') || DEFAULT_TC;
+    //   curQuery.set('rows', pageSize);
+    //   curQuery.set('offset', 0);
+    //   if (tc !== '1y') {
+    //     curQuery.add('filters', TC_MAP[tc]);
+    //   }
+    //   setSearching(true);
+    //   apiCall({
+    //     url: `/api/v4/error/list/?${curQuery.toString()}`,
+    //     onSuccess: api_data => {
+    //       setErrorResults(api_data.api_response);
+    //     },
+    //     onFinalize: () => {
+    //       setSearching(false);
+    //     }
+    //   });
+    //   apiCall({
+    //     url: `/api/v4/search/facet/error/response.service_name/?${curQuery.toString([
+    //       'rows',
+    //       'offset',
+    //       'sort',
+    //       'track_total_hits'
+    //     ])}`,
+    //     onSuccess: api_data => {
+    //       // setLabels(api_data.api_response);
+    //     }
+    //   });
+    //   apiCall({
+    //     url: `/api/v4/search/facet/error/type/?${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
+    //     onSuccess: api_data => {
+    //       // setTypes(api_data.api_response);
+    //     }
+    //   });
+    //   apiCall({
+    //     url: `/api/v4/search/histogram/error/created/?start=${START_MAP[tc]}&end=now&gap=${
+    //       GAP_MAP[tc]
+    //     }&mincount=0&${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
+    //     onSuccess: api_data => {
+    //       setHistogram(api_data.api_response);
+    //     }
+    //   });
+    // }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
-  useEffect(() => {
-    apiCall({
-      url: '/api/v4/search/fields/file/',
-      onSuccess: api_data => {
-        setSuggestions([
-          ...Object.keys(api_data.api_response).filter(name => api_data.api_response[name].indexed),
-          ...DEFAULT_SUGGESTION
-        ]);
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // useEffect(() => {
+  //   apiCall({
+  //     url: '/api/v4/search/fields/file/',
+  //     onSuccess: api_data => {
+  //       setSuggestions([
+  //         ...Object.keys(api_data.api_response).filter(name => api_data.api_response[name].indexed),
+  //         ...DEFAULT_SUGGESTION
+  //       ]);
+  //     }
+  //   });
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   useEffect(() => {
     if (query && currentUser.is_admin) {
@@ -265,12 +260,14 @@ export default function MalwareArchive() {
       }
       setSearching(true);
 
+      query.set('rows', pageSize);
+      query.set('offset', 0);
+
       apiCall({
         method: 'POST',
         url: `/api/v4/search/file/`,
-        body: { ...curQuery.getParams() },
+        body: query.getParams(),
         onSuccess: api_data => {
-          console.log(api_data);
           setFileResults(api_data.api_response);
         },
         onFailure: api_data => {
@@ -387,7 +384,7 @@ export default function MalwareArchive() {
                   items={query.getAll('filters', []).map(v => ({
                     variant: 'outlined',
                     label: `${v}`,
-                    color: v.indexOf('NOT ') === 0 ? 'error' : null,
+                    color: v.indexOf('NOT ') === 0 ? 'file' : null,
                     onClick: () => {
                       query.replace(
                         'filters',
