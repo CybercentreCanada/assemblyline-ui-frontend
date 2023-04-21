@@ -1,5 +1,5 @@
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
-import { AlertTitle, Skeleton, Tooltip } from '@mui/material';
+import { AlertTitle, Chip, Skeleton, Tooltip, useMediaQuery, useTheme } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
@@ -60,14 +60,16 @@ type ArchivesTableProps = {
 
 const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({ fileResults, setFileID = null, allowSort = true }) => {
   const { t, i18n } = useTranslation(['archive']);
+  const theme = useTheme();
+  const upLG = useMediaQuery(theme.breakpoints.up('lg'));
   const { user: currentUser } = useAppUser<CustomUser>();
 
   return fileResults ? (
     fileResults.total !== 0 ? (
       <TableContainer component={Paper}>
-        <DivTable size="small">
+        <DivTable>
           <DivTableHead>
-            <DivTableRow style={{ whiteSpace: 'nowrap' }}>
+            <DivTableRow>
               <SortableHeaderCell children={t('header.seen.last')} sortField="seen.last" allowSort={allowSort} />
               <SortableHeaderCell children={t('header.sha256')} sortField="sha256" allowSort={allowSort} />
               <SortableHeaderCell children={t('header.type')} sortField="type" allowSort={allowSort} />
@@ -76,9 +78,9 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({ fileResults, setFi
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
-            {fileResults.items.map(file => (
+            {fileResults.items.map((file, i) => (
               <LinkRow
-                key={file.id}
+                key={`${file.id}-${i}`}
                 component={Link}
                 to={`/file/detail/${file.id}`}
                 onClick={event => {
@@ -88,17 +90,43 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({ fileResults, setFi
                   }
                 }}
                 hover
+                style={{ textDecoration: 'none' }}
               >
-                <DivTableCell style={{ whiteSpace: 'nowrap' }}>
+                <DivTableCell>
                   <Tooltip title={file.seen.last}>
                     <>
                       <Moment fromNow locale={i18n.language} children={file.seen.last} />
                     </>
                   </Tooltip>
                 </DivTableCell>
-                <DivTableCell children={'sha256' in file ? file.sha256 : null} style={{ whiteSpace: 'nowrap' }} />
-                <DivTableCell children={'type' in file ? file.type : null} style={{ whiteSpace: 'nowrap' }} />
-                <DivTableCell children={'labels' in file ? file.labels : null} style={{ whiteSpace: 'nowrap' }} />
+                <DivTableCell>
+                  {!('sha256' in file) ? null : (
+                    <div
+                      children={file.sha256}
+                      style={{
+                        // width: upLG ? '100%' : '10vw',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis'
+                      }}
+                    />
+                  )}
+                </DivTableCell>
+                <DivTableCell children={'type' in file ? file.type : null} />
+                <DivTableCell>
+                  {
+                    !('labels' in file)
+                      ? null
+                      : file.labels.map(label => <Chip label={label} color="success" variant="outlined" size="small" />)
+                    // <Stack direction="row" spacing={1}>
+                    // <>
+                    //   {file.labels.map(label => (
+                    //     <Chip label={label} color="success" variant="outlined" size="small" />
+                    //   ))}
+                    // </>
+                    // </Stack>
+                  }
+                </DivTableCell>
                 <DivTableCell style={{ padding: 'unset', textAlign: 'center' }}>
                   {currentUser.roles.includes('file_download') && 'sha256' in file && (
                     <FileDownloader
