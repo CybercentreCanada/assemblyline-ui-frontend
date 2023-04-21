@@ -7,6 +7,7 @@ import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
+import useMySnackbar from 'components/hooks/useMySnackbar';
 import { ChipList } from 'components/visual/ChipList';
 import FileDetail from 'components/visual/FileDetail';
 import Histogram from 'components/visual/Histogram';
@@ -16,6 +17,7 @@ import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
 import ArchivesTable from 'components/visual/SearchResult/archives';
+import ArchivesTable2 from 'components/visual/SearchResult/archives2';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import { safeFieldValue } from 'helpers/utils';
 import 'moment/locale/fr';
@@ -75,6 +77,8 @@ type FileResults = {
   total: number;
 };
 
+const DEFAULT_QUERY = '*';
+
 const DEFAULT_TC = '1m';
 
 const TC_MAP = {
@@ -109,9 +113,9 @@ export default function MalwareArchive() {
 
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();
-  // const { user: currentUser } = useAppUser<CustomUser>();
+  const { user: currentUser } = useALContext();
+  const { showErrorMessage } = useMySnackbar();
   const { closeGlobalDrawer, setGlobalDrawer, globalDrawerOpened } = useDrawer();
-  const { user: currentUser, indexes } = useALContext();
 
   const [fileResults, setFileResults] = useState<FileResults>(null);
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
@@ -120,38 +124,28 @@ export default function MalwareArchive() {
   const [labels, setLabels] = useState<{ [k: string]: number }>(null);
   const [pageSize] = useState<number>(PAGE_SIZE);
   const [searching, setSearching] = useState<boolean>(false);
-  const [suggestions] = useState<string[]>([
-    ...Object.keys(indexes.file).filter(p => indexes.file[p].indexed),
-    ...DEFAULT_SUGGESTION
-  ]);
+  const [suggestions, setSuggestions] = useState<string[]>();
 
   const filterValue = useRef<string>('');
 
-  const onClear = useCallback(
-    () => {
-      if (query.getAll('filters').length !== 0) {
-        query.delete('query');
-        navigate(`${location.pathname}?${query.getDeltaString()}`);
-      } else {
-        navigate(location.pathname);
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [location.pathname, query]
-  );
+  const onClear = useCallback(() => {
+    if (query.getAll('filters').length !== 0) {
+      query.delete('query');
+      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash ? location.hash : ''}`);
+    } else {
+      navigate(`${location.pathname}${location.hash ? location.hash : ''}`);
+    }
+  }, [location.hash, location.pathname, navigate, query]);
 
-  const onSearch = useCallback(
-    () => {
-      if (filterValue.current !== '') {
-        query.set('query', filterValue.current);
-        navigate(`${location.pathname}?${query.getDeltaString()}`);
-      } else {
-        onClear();
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [query, location.pathname, onClear]
-  );
+  const onSearch = useCallback(() => {
+    if (query.get('query') === filterValue.current) return;
+    if (filterValue.current !== '') {
+      query.set('query', filterValue.current);
+      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash ? location.hash : ''}`);
+    } else {
+      onClear();
+    }
+  }, [query, navigate, location.pathname, location.hash, onClear]);
 
   const onFilterValueChange = useCallback((inputValue: string) => {
     filterValue.current = inputValue;
@@ -161,13 +155,17 @@ export default function MalwareArchive() {
     (file_id: string) => {
       navigate(`${location.pathname}${location.search ? location.search : ''}#${file_id}`);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [location.search]
+    [location.pathname, location.search, navigate]
   );
 
   useEffect(() => {
     setSearching(true);
-    setQuery(new SimpleSearchQuery(location.search, `query=*&rows=${pageSize}&offset=0&tc=${DEFAULT_TC}`));
+    const newSearchQuery = new SimpleSearchQuery(
+      location.search,
+      `query=${DEFAULT_QUERY}&rows=${pageSize}&offset=0&tc=${DEFAULT_TC}`
+    );
+    filterValue.current = newSearchQuery.get('query');
+    setQuery(newSearchQuery);
   }, [location.pathname, location.search, pageSize]);
 
   useEffect(() => {
@@ -185,6 +183,19 @@ export default function MalwareArchive() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.hash]);
+
+  useEffect(() => {
+    apiCall({
+      url: '/api/v4/search/fields/file/',
+      onSuccess: api_data => {
+        setSuggestions([
+          ...Object.keys(api_data.api_response).filter(name => api_data.api_response[name].indexed),
+          ...DEFAULT_SUGGESTION
+        ]);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     return;
@@ -236,46 +247,31 @@ export default function MalwareArchive() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
-  // useEffect(() => {
-  //   apiCall({
-  //     url: '/api/v4/search/fields/file/',
-  //     onSuccess: api_data => {
-  //       setSuggestions([
-  //         ...Object.keys(api_data.api_response).filter(name => api_data.api_response[name].indexed),
-  //         ...DEFAULT_SUGGESTION
-  //       ]);
-  //     }
-  //   });
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
-
   useEffect(() => {
     if (query && currentUser.is_admin) {
-      const curQuery = new SimpleSearchQuery(query.toString(), `rows=${pageSize}&offset=0`);
-      const tc = curQuery.pop('tc') || DEFAULT_TC;
+      console.log(query.toString());
+      const curQuery = new SimpleSearchQuery(query.toString(), `query=${DEFAULT_QUERY}&rows=${pageSize}&offset=0`);
+
       curQuery.set('rows', pageSize);
       curQuery.set('offset', 0);
+      curQuery.set('archive_only', true);
+      const tc = curQuery.pop('tc') || DEFAULT_TC;
       if (tc !== '1y') {
         curQuery.add('filters', TC_MAP[tc]);
       }
+
+      console.log({ query: query.getParams(), curQuery: curQuery.getParams() });
+
       setSearching(true);
-
-      query.set('rows', pageSize);
-      query.set('offset', 0);
-
       apiCall({
         method: 'POST',
         url: `/api/v4/search/file/`,
-        body: query.getParams(),
+        body: curQuery.getParams(),
         onSuccess: api_data => {
           setFileResults(api_data.api_response);
         },
         onFailure: api_data => {
-          // if (index || id || !api_data.api_error_message.includes('Rewrite first')) {
-          //   showErrorMessage(api_data.api_error_message);
-          // } else {
-          //   stateMap[searchIndex]({ total: 0, offset: 0, items: [], rows: pageSize });
-          // }
+          showErrorMessage(api_data.api_error_message);
         },
         onFinalize: () => {
           setSearching(false);
@@ -284,19 +280,31 @@ export default function MalwareArchive() {
       apiCall({
         url: `/api/v4/search/histogram/file/seen.last/?start=${START_MAP[tc]}&end=now&gap=${
           GAP_MAP[tc]
-        }&mincount=0&${query.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
+        }&mincount=0&${query.toString(['rows', 'offset', 'sort', 'track_total_hits', 'archive_only'])}`,
         onSuccess: api_data => {
           setHistogram(api_data.api_response);
         }
       });
       apiCall({
-        url: `/api/v4/search/facet/file/labels/?${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
+        url: `/api/v4/search/facet/file/labels/?${curQuery.toString([
+          'rows',
+          'offset',
+          'sort',
+          'track_total_hits',
+          'archive_only'
+        ])}`,
         onSuccess: api_data => {
           setLabels(api_data.api_response);
         }
       });
       apiCall({
-        url: `/api/v4/search/facet/file/type/?${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
+        url: `/api/v4/search/facet/file/type/?${curQuery.toString([
+          'rows',
+          'offset',
+          'sort',
+          'track_total_hits',
+          'archive_only'
+        ])}`,
         onSuccess: api_data => {
           let newTypes: { [k: string]: number } = api_data.api_response;
           newTypes = Object.fromEntries(
@@ -325,7 +333,7 @@ export default function MalwareArchive() {
               variant="outlined"
               onChange={event => {
                 query.set('tc', event.target.value);
-                navigate(`${location.pathname}?${query.getDeltaString()}`);
+                navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
               }}
               fullWidth
             >
@@ -426,7 +434,7 @@ export default function MalwareArchive() {
               onClick={(evt, element) => {
                 if (!searching && element.length > 0) {
                   var ind = element[0].index;
-                  query.add('filters', `response.service_name:${Object.keys(labels)[ind]}`);
+                  query.add('filters', `labels:${Object.keys(labels)[ind]}`);
                   navigate(`${location.pathname}?${query.getDeltaString()}`);
                 }
               }}
@@ -452,6 +460,9 @@ export default function MalwareArchive() {
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         <ArchivesTable fileResults={fileResults} setFileID={setFileID} />
+      </div>
+      <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
+        <ArchivesTable2 fileResults={fileResults} setFileID={setFileID} />
       </div>
     </PageFullWidth>
   ) : (
