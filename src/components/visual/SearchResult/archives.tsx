@@ -1,5 +1,5 @@
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
-import { AlertTitle, Chip, Skeleton, Tooltip, useMediaQuery, useTheme } from '@mui/material';
+import { AlertTitle, Chip, Skeleton, Tooltip } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
@@ -60,8 +60,6 @@ type ArchivesTableProps = {
 
 const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({ fileResults, setFileID = null, allowSort = true }) => {
   const { t, i18n } = useTranslation(['archive']);
-  const theme = useTheme();
-  const upLG = useMediaQuery(theme.breakpoints.up('lg'));
   const { user: currentUser } = useAppUser<CustomUser>();
 
   return fileResults ? (
@@ -114,18 +112,17 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({ fileResults, setFi
                 </DivTableCell>
                 <DivTableCell children={'type' in file ? file.type : null} />
                 <DivTableCell>
-                  {
-                    !('labels' in file)
-                      ? null
-                      : file.labels.map(label => <Chip label={label} color="success" variant="outlined" size="small" />)
-                    // <Stack direction="row" spacing={1}>
-                    // <>
-                    //   {file.labels.map(label => (
-                    //     <Chip label={label} color="success" variant="outlined" size="small" />
-                    //   ))}
-                    // </>
-                    // </Stack>
-                  }
+                  {!('labels' in file)
+                    ? null
+                    : file.labels.map((label, j) => (
+                        <Chip
+                          key={`${file.id}-${label}-${j}`}
+                          label={label}
+                          color="success"
+                          variant="outlined"
+                          size="small"
+                        />
+                      ))}
                 </DivTableCell>
                 <DivTableCell style={{ padding: 'unset', textAlign: 'center' }}>
                   {currentUser.roles.includes('file_download') && 'sha256' in file && (

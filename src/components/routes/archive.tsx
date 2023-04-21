@@ -1,4 +1,3 @@
-/* eslint-disable no-unreachable */
 import { Grid, MenuItem, Select, Typography, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import makeStyles from '@mui/styles/makeStyles';
@@ -17,7 +16,7 @@ import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
 import ArchivesTable from 'components/visual/SearchResult/archives';
-import ArchivesTable2 from 'components/visual/SearchResult/archives2';
+import { ArchivedFileResult, ArchivesTable2 } from 'components/visual/SearchResult/archives2';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import { safeFieldValue } from 'helpers/utils';
 import 'moment/locale/fr';
@@ -46,32 +45,8 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-type FileInfo = {
-  archive_ts: string;
-  ascii: string;
-  classification: string;
-  entropy: number;
-  expiry_ts: string | null;
-  hex: string;
-  id: string;
-  labels: string[];
-  magic: string;
-  md5: string;
-  mime: string;
-  seen: {
-    count: number;
-    first: string;
-    last: string;
-  };
-  sha1: string;
-  sha256: string;
-  size: number;
-  ssdeep: string;
-  type: string;
-};
-
 type FileResults = {
-  items: FileInfo[];
+  items: ArchivedFileResult[];
   offset: number;
   rows: number;
   total: number;
@@ -109,7 +84,6 @@ export default function MalwareArchive() {
   const theme = useTheme();
   const classes = useStyles();
   const location = useLocation();
-  // const upMD = useMediaQuery(theme.breakpoints.up('md'));
 
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();
@@ -158,6 +132,16 @@ export default function MalwareArchive() {
     [location.pathname, location.search, navigate]
   );
 
+  const onLabelClick = useCallback(
+    (event: React.MouseEvent<HTMLDivElement, MouseEvent>, label: string) => {
+      if (!searching) {
+        query.add('filters', `labels:${label}`);
+        navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+      }
+    },
+    [location.hash, location.pathname, navigate, query, searching]
+  );
+
   useEffect(() => {
     setSearching(true);
     const newSearchQuery = new SimpleSearchQuery(
@@ -198,60 +182,8 @@ export default function MalwareArchive() {
   }, []);
 
   useEffect(() => {
-    return;
-    // if (query && currentUser.is_admin) {
-    //   const curQuery = new SimpleSearchQuery(query.toString(), `rows=${pageSize}&offset=0`);
-    //   const tc = curQuery.pop('tc') || DEFAULT_TC;
-    //   curQuery.set('rows', pageSize);
-    //   curQuery.set('offset', 0);
-    //   if (tc !== '1y') {
-    //     curQuery.add('filters', TC_MAP[tc]);
-    //   }
-    //   setSearching(true);
-    //   apiCall({
-    //     url: `/api/v4/error/list/?${curQuery.toString()}`,
-    //     onSuccess: api_data => {
-    //       setErrorResults(api_data.api_response);
-    //     },
-    //     onFinalize: () => {
-    //       setSearching(false);
-    //     }
-    //   });
-    //   apiCall({
-    //     url: `/api/v4/search/facet/error/response.service_name/?${curQuery.toString([
-    //       'rows',
-    //       'offset',
-    //       'sort',
-    //       'track_total_hits'
-    //     ])}`,
-    //     onSuccess: api_data => {
-    //       // setLabels(api_data.api_response);
-    //     }
-    //   });
-    //   apiCall({
-    //     url: `/api/v4/search/facet/error/type/?${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
-    //     onSuccess: api_data => {
-    //       // setTypes(api_data.api_response);
-    //     }
-    //   });
-    //   apiCall({
-    //     url: `/api/v4/search/histogram/error/created/?start=${START_MAP[tc]}&end=now&gap=${
-    //       GAP_MAP[tc]
-    //     }&mincount=0&${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
-    //     onSuccess: api_data => {
-    //       setHistogram(api_data.api_response);
-    //     }
-    //   });
-    // }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query]);
-
-  useEffect(() => {
     if (query && currentUser.is_admin) {
-      console.log(query.toString());
       const curQuery = new SimpleSearchQuery(query.toString(), `query=${DEFAULT_QUERY}&rows=${pageSize}&offset=0`);
-
       curQuery.set('rows', pageSize);
       curQuery.set('offset', 0);
       curQuery.set('archive_only', true);
@@ -259,8 +191,6 @@ export default function MalwareArchive() {
       if (tc !== '1y') {
         curQuery.add('filters', TC_MAP[tc]);
       }
-
-      console.log({ query: query.getParams(), curQuery: curQuery.getParams() });
 
       setSearching(true);
       apiCall({
@@ -294,7 +224,13 @@ export default function MalwareArchive() {
           'archive_only'
         ])}`,
         onSuccess: api_data => {
-          setLabels(api_data.api_response);
+          let newLabels: { [k: string]: number } = api_data.api_response;
+          newLabels = Object.fromEntries(
+            Object.keys(newLabels)
+              .sort((a, b) => newLabels[b] - newLabels[a])
+              .map(k => [k, newLabels[k]])
+          );
+          setLabels(newLabels);
         }
       });
       apiCall({
@@ -399,11 +335,11 @@ export default function MalwareArchive() {
                         v,
                         v.indexOf('NOT ') === 0 ? v.substring(5, v.length - 1) : `NOT (${v})`
                       );
-                      navigate(`${location.pathname}?${query.getDeltaString()}`);
+                      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
                     },
                     onDelete: () => {
                       query.remove('filters', v);
-                      navigate(`${location.pathname}?${query.getDeltaString()}`);
+                      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
                     }
                   }))}
                 />
@@ -423,6 +359,17 @@ export default function MalwareArchive() {
               datatype={t('graph.datatype')}
               isDate
               verticalLine
+              onClick={(evt, element) => {
+                if (!searching && element.length > 0) {
+                  const ind = element[0].index;
+                  const keys = Object.keys(histogram);
+                  query.add(
+                    'filters',
+                    `seen.last:[${keys[ind]} TO ${keys.length - 1 === ind ? 'now' : keys[ind + 1]}]`
+                  );
+                  navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                }
+              }}
             />
           </Grid>
           <Grid item xs={12} md={6} lg={4}>
@@ -435,7 +382,7 @@ export default function MalwareArchive() {
                 if (!searching && element.length > 0) {
                   var ind = element[0].index;
                   query.add('filters', `labels:${Object.keys(labels)[ind]}`);
-                  navigate(`${location.pathname}?${query.getDeltaString()}`);
+                  navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
                 }
               }}
             />
@@ -450,7 +397,7 @@ export default function MalwareArchive() {
                 if (!searching && element.length > 0) {
                   var ind = element[0].index;
                   query.add('filters', `type:${safeFieldValue(Object.keys(types)[ind])}`);
-                  navigate(`${location.pathname}?${query.getDeltaString()}`);
+                  navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
                 }
               }}
             />
@@ -462,7 +409,7 @@ export default function MalwareArchive() {
         <ArchivesTable fileResults={fileResults} setFileID={setFileID} />
       </div>
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
-        <ArchivesTable2 fileResults={fileResults} setFileID={setFileID} />
+        <ArchivesTable2 fileResults={fileResults} setFileID={setFileID} onLabelClick={onLabelClick} />
       </div>
     </PageFullWidth>
   ) : (
