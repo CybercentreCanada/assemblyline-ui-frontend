@@ -15,7 +15,6 @@ import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
-import ArchivesTable from 'components/visual/SearchResult/archives';
 import { ArchivedFileResult, ArchivesTable2 } from 'components/visual/SearchResult/archives2';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import { safeFieldValue } from 'helpers/utils';
@@ -87,7 +86,7 @@ export default function MalwareArchive() {
 
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();
-  const { user: currentUser } = useALContext();
+  const { user: currentUser, configuration } = useALContext();
   const { showErrorMessage } = useMySnackbar();
   const { closeGlobalDrawer, setGlobalDrawer, globalDrawerOpened } = useDrawer();
 
@@ -255,164 +254,167 @@ export default function MalwareArchive() {
     // eslint-disable-next-line
   }, [query]);
 
-  return currentUser.is_admin ? (
-    <PageFullWidth margin={4}>
-      <Grid container spacing={2} style={{ paddingBottom: theme.spacing(2) }}>
-        <Grid item xs={12} sm={7} md={9} xl={10}>
-          <Typography variant="h4">{t('title')}</Typography>
+  if (!configuration?.datastore?.archive?.enabled) return <Navigate to="/notfound" replace />;
+  else if (!currentUser.is_admin) return <Navigate to="/forbidden" replace />;
+  else
+    return (
+      <PageFullWidth margin={4}>
+        <Grid container spacing={2} style={{ paddingBottom: theme.spacing(2) }}>
+          <Grid item xs={12} sm={7} md={9} xl={10}>
+            <Typography variant="h4">{t('title')}</Typography>
+          </Grid>
+          <Grid item xs={12} sm={5} md={3} xl={2}>
+            <FormControl size="small" fullWidth>
+              <Select
+                disabled={searching}
+                value={query ? query.get('tc') || DEFAULT_TC : DEFAULT_TC}
+                variant="outlined"
+                onChange={event => {
+                  query.set('tc', event.target.value);
+                  navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                }}
+                fullWidth
+              >
+                <MenuItem value="24h">{t('tc.24h')}</MenuItem>
+                <MenuItem value="4d">{t('tc.4d')}</MenuItem>
+                <MenuItem value="7d">{t('tc.7d')}</MenuItem>
+                <MenuItem value="1m">{t('tc.1m')}</MenuItem>
+                <MenuItem value="1y">{t('tc.1y')}</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
         </Grid>
-        <Grid item xs={12} sm={5} md={3} xl={2}>
-          <FormControl size="small" fullWidth>
-            <Select
-              disabled={searching}
-              value={query ? query.get('tc') || DEFAULT_TC : DEFAULT_TC}
-              variant="outlined"
-              onChange={event => {
-                query.set('tc', event.target.value);
-                navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-              }}
-              fullWidth
+
+        <PageHeader isSticky>
+          <div style={{ paddingTop: theme.spacing(1) }}>
+            <SearchBar
+              initValue={query ? query.get('query', '') : ''}
+              placeholder={t('filter')}
+              searching={searching}
+              suggestions={suggestions}
+              onValueChange={onFilterValueChange}
+              onClear={onClear}
+              onSearch={onSearch}
             >
-              <MenuItem value="24h">{t('tc.24h')}</MenuItem>
-              <MenuItem value="4d">{t('tc.4d')}</MenuItem>
-              <MenuItem value="7d">{t('tc.7d')}</MenuItem>
-              <MenuItem value="1m">{t('tc.1m')}</MenuItem>
-              <MenuItem value="1y">{t('tc.1y')}</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-      </Grid>
+              {fileResults !== null && (
+                <div className={classes.searchresult}>
+                  {fileResults.total !== 0 && (
+                    <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
+                      {searching ? (
+                        <span>{t('searching')}</span>
+                      ) : (
+                        <span>
+                          <SearchResultCount count={fileResults.total} />
+                          {query.get('query')
+                            ? t(`filtered${fileResults.total === 1 ? '' : 's'}`)
+                            : t(`total${fileResults.total === 1 ? '' : 's'}`)}
+                        </span>
+                      )}
+                    </Typography>
+                  )}
 
-      <PageHeader isSticky>
-        <div style={{ paddingTop: theme.spacing(1) }}>
-          <SearchBar
-            initValue={query ? query.get('query', '') : ''}
-            placeholder={t('filter')}
-            searching={searching}
-            suggestions={suggestions}
-            onValueChange={onFilterValueChange}
-            onClear={onClear}
-            onSearch={onSearch}
-          >
-            {fileResults !== null && (
-              <div className={classes.searchresult}>
-                {fileResults.total !== 0 && (
-                  <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
-                    {searching ? (
-                      <span>{t('searching')}</span>
-                    ) : (
-                      <span>
-                        <SearchResultCount count={fileResults.total} />
-                        {query.get('query')
-                          ? t(`filtered${fileResults.total === 1 ? '' : 's'}`)
-                          : t(`total${fileResults.total === 1 ? '' : 's'}`)}
-                      </span>
-                    )}
-                  </Typography>
-                )}
+                  <SearchPager
+                    total={fileResults.total}
+                    setResults={setFileResults}
+                    pageSize={pageSize}
+                    index="file"
+                    query={query}
+                    setSearching={setSearching}
+                  />
+                </div>
+              )}
 
-                <SearchPager
-                  total={fileResults.total}
-                  setResults={setFileResults}
-                  pageSize={pageSize}
-                  index="file"
-                  query={query}
-                  setSearching={setSearching}
-                />
-              </div>
-            )}
+              {query && (
+                <div>
+                  <ChipList
+                    items={query.getAll('filters', []).map(v => ({
+                      variant: 'outlined',
+                      label: `${v}`,
+                      color: v.indexOf('NOT ') === 0 ? 'file' : null,
+                      onClick: () => {
+                        query.replace(
+                          'filters',
+                          v,
+                          v.indexOf('NOT ') === 0 ? v.substring(5, v.length - 1) : `NOT (${v})`
+                        );
+                        navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                      },
+                      onDelete: () => {
+                        query.remove('filters', v);
+                        navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                      }
+                    }))}
+                  />
+                </div>
+              )}
+            </SearchBar>
+          </div>
+        </PageHeader>
 
-            {query && (
-              <div>
-                <ChipList
-                  items={query.getAll('filters', []).map(v => ({
-                    variant: 'outlined',
-                    label: `${v}`,
-                    color: v.indexOf('NOT ') === 0 ? 'file' : null,
-                    onClick: () => {
-                      query.replace(
-                        'filters',
-                        v,
-                        v.indexOf('NOT ') === 0 ? v.substring(5, v.length - 1) : `NOT (${v})`
-                      );
-                      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                    },
-                    onDelete: () => {
-                      query.remove('filters', v);
-                      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                    }
-                  }))}
-                />
-              </div>
-            )}
-          </SearchBar>
-        </div>
-      </PageHeader>
-
-      {fileResults !== null && fileResults.total !== 0 && (
-        <Grid container spacing={2}>
-          <Grid item xs={12} lg={4}>
-            <Histogram
-              dataset={histogram}
-              height="200px"
-              title={t(`graph.histogram.title.${query ? query.get('tc') || DEFAULT_TC : DEFAULT_TC}`)}
-              datatype={t('graph.datatype')}
-              isDate
-              verticalLine
-              onClick={(evt, element) => {
-                if (!searching && element.length > 0) {
-                  const ind = element[0].index;
-                  const keys = Object.keys(histogram);
-                  query.add(
-                    'filters',
-                    `seen.last:[${keys[ind]} TO ${keys.length - 1 === ind ? 'now' : keys[ind + 1]}]`
-                  );
-                  navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                }
-              }}
-            />
+        {fileResults !== null && fileResults.total !== 0 && (
+          <Grid container spacing={2}>
+            <Grid item xs={12} lg={4}>
+              <Histogram
+                dataset={histogram}
+                height="200px"
+                title={t(`graph.histogram.title.${query ? query.get('tc') || DEFAULT_TC : DEFAULT_TC}`)}
+                datatype={t('graph.datatype')}
+                isDate
+                verticalLine
+                onClick={(evt, element) => {
+                  if (!searching && element.length > 0) {
+                    const ind = element[0].index;
+                    const keys = Object.keys(histogram);
+                    query.add(
+                      'filters',
+                      `seen.last:[${keys[ind]} TO ${keys.length - 1 === ind ? 'now' : keys[ind + 1]}]`
+                    );
+                    navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                  }
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} md={6} lg={4}>
+              <LineGraph
+                dataset={labels}
+                height="200px"
+                title={t('graph.labels.title')}
+                datatype={t('graph.datatype')}
+                onClick={(evt, element) => {
+                  if (!searching && element.length > 0) {
+                    var ind = element[0].index;
+                    query.add('filters', `labels:${Object.keys(labels)[ind]}`);
+                    navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                  }
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} md={6} lg={4}>
+              <LineGraph
+                dataset={types}
+                height="200px"
+                title={t('graph.type.title')}
+                datatype={t('graph.datatype')}
+                onClick={(evt, element) => {
+                  if (!searching && element.length > 0) {
+                    var ind = element[0].index;
+                    query.add('filters', `type:${safeFieldValue(Object.keys(types)[ind])}`);
+                    navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                  }
+                }}
+              />
+            </Grid>
           </Grid>
-          <Grid item xs={12} md={6} lg={4}>
-            <LineGraph
-              dataset={labels}
-              height="200px"
-              title={t('graph.labels.title')}
-              datatype={t('graph.datatype')}
-              onClick={(evt, element) => {
-                if (!searching && element.length > 0) {
-                  var ind = element[0].index;
-                  query.add('filters', `labels:${Object.keys(labels)[ind]}`);
-                  navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                }
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} md={6} lg={4}>
-            <LineGraph
-              dataset={types}
-              height="200px"
-              title={t('graph.type.title')}
-              datatype={t('graph.datatype')}
-              onClick={(evt, element) => {
-                if (!searching && element.length > 0) {
-                  var ind = element[0].index;
-                  query.add('filters', `type:${safeFieldValue(Object.keys(types)[ind])}`);
-                  navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                }
-              }}
-            />
-          </Grid>
-        </Grid>
-      )}
+        )}
 
-      <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
+        {/* <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         <ArchivesTable fileResults={fileResults} setFileID={setFileID} />
-      </div>
-      <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
-        <ArchivesTable2 fileResults={fileResults} setFileID={setFileID} onLabelClick={onLabelClick} />
-      </div>
-    </PageFullWidth>
-  ) : (
-    <Navigate to="/forbidden" replace />
-  );
+      </div> */}
+        <div
+          style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}
+        >
+          <ArchivesTable2 fileResults={fileResults} setFileID={setFileID} onLabelClick={onLabelClick} />
+        </div>
+      </PageFullWidth>
+    );
 }
