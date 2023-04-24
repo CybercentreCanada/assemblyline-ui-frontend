@@ -71,11 +71,11 @@ const WrappedArchivesTable2 = ({
         <GridTable nbOfColumns={5}>
           <GridTableHead>
             <GridTableRow>
-              <GridTableHeader children={t('header.seen.last')} sortField="seen.last" allowSort invertedSort noWrap />
-              <GridTableHeader children={t('header.sha256')} sortField="sha256" allowSort noWrap />
-              <GridTableHeader children={t('header.type')} sortField="type" allowSort noWrap />
+              <GridTableHeader children={t('header.seen.last')} sortField="seen.last" allowSort invertedSort />
+              <GridTableHeader children={t('header.sha256')} sortField="sha256" allowSort />
+              <GridTableHeader children={t('header.type')} sortField="type" allowSort />
               <GridTableHeader children={t('header.labels')} />
-              <GridTableHeader children={t('header.download')} noWrap style={{ justifyContent: 'center' }} />
+              <GridTableHeader children={null} />
             </GridTableRow>
           </GridTableHead>
           <GridTableBody>
@@ -131,7 +131,7 @@ const WrappedArchivesTable2 = ({
                   }
                 />
                 <GridTableCell
-                  style={{ justifyContent: 'center', margin: 0, padding: 0 }}
+                  style={{ justifyContent: 'right', padding: `0px ${theme.spacing(1)} 0px` }}
                   children={
                     currentUser.roles.includes('file_download') &&
                     'sha256' in file && (
@@ -165,5 +165,5 @@ const WrappedArchivesTable2 = ({
   );
 };
 
-const ArchivesTable2 = React.memo(WrappedArchivesTable2);
+export const ArchivesTable2 = React.memo(WrappedArchivesTable2);
 export default ArchivesTable2;
