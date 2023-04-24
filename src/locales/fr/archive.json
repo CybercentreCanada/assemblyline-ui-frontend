@@ -20,7 +20,7 @@
   "graph.labels.title": "Répartition des étiquettes des fichiers archivés",
   "graph.type.title": "Répartition des types des fichiers archivés",
   "header.download": "Télécharger",
-  "header.labels": "Étiquette",
+  "header.labels": "Étiquettes",
   "header.seen.last": "Dernière fois vu",
   "header.sha256": "SHA256",
   "header.type": "Type de fichiers",

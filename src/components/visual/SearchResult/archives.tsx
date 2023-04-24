@@ -1,5 +1,5 @@
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
-import { AlertTitle, Chip, Skeleton, Tooltip } from '@mui/material';
+import { AlertTitle, Chip, Skeleton, Tooltip, useTheme } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
@@ -30,6 +30,12 @@ export type ArchivedFileResult = {
   hex: string;
   id: string;
   labels: string[];
+  label_categories?: {
+    info: string[];
+    safe: string[];
+    suspicious: string[];
+    malicious: string[];
+  };
   magic: string;
   md5: string;
   mime: string;
@@ -60,6 +66,7 @@ type ArchivesTableProps = {
 
 const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({ fileResults, setFileID = null, allowSort = true }) => {
   const { t, i18n } = useTranslation(['archive']);
+  const theme = useTheme();
   const { user: currentUser } = useAppUser<CustomUser>();
 
   return fileResults ? (
@@ -72,7 +79,7 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({ fileResults, setFi
               <SortableHeaderCell children={t('header.sha256')} sortField="sha256" allowSort={allowSort} />
               <SortableHeaderCell children={t('header.type')} sortField="type" allowSort={allowSort} />
               <DivTableCell children={t('header.labels')} />
-              <DivTableCell children={t('header.download')} style={{ textAlign: 'center' }} />
+              <DivTableCell children={null} style={{ textAlign: 'center' }} />
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
@@ -124,7 +131,14 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({ fileResults, setFi
                         />
                       ))}
                 </DivTableCell>
-                <DivTableCell style={{ padding: 'unset', textAlign: 'center' }}>
+                <DivTableCell
+                  style={{
+                    padding: 'unset',
+                    textAlign: 'center',
+                    paddingLeft: theme.spacing(1),
+                    paddingRight: theme.spacing(1)
+                  }}
+                >
                   {currentUser.roles.includes('file_download') && 'sha256' in file && (
                     <FileDownloader
                       icon={<GetAppOutlinedIcon fontSize="small" />}
