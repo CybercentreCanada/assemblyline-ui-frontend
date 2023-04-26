@@ -87,39 +87,39 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ signatures, tags, force 
           )}
           {tags
             ? Object.keys(tags).map((tag_type, i) =>
-                tagUnsafeMap[tag_type] || showSafeResults || force ? (
-                  <Grid container key={i}>
-                    <Grid className={classes.meta_key} item xs={12} sm={3} lg={2}>
-                      <span
-                        style={{
-                          fontWeight: 500
-                        }}
-                      >
-                        {tag_type}
-                      </span>
-                    </Grid>
-                    <Grid item xs={12} sm={9} lg={10}>
-                      <AutoHideTagList
-                        tag_type={tag_type}
-                        items={tags[tag_type].map(item => {
-                          return { value: item[0], lvl: item[1], safelisted: item[2] };
-                        })}
-                        force={force}
-                      />
-                    </Grid>
-                  </Grid>
-                ) : null
-              )
-            : [...Array(3)].map((_, i) => (
-                <Grid container key={i} spacing={1}>
-                  <Grid item xs={12} sm={3} lg={2}>
-                    <Skeleton style={{ height: '2rem' }} />
+              tagUnsafeMap[tag_type] || showSafeResults || force ? (
+                <Grid container key={i}>
+                  <Grid className={classes.meta_key} item xs={12} sm={3} lg={2}>
+                    <span
+                      style={{
+                        fontWeight: 500
+                      }}
+                    >
+                      {tag_type}
+                    </span>
                   </Grid>
                   <Grid item xs={12} sm={9} lg={10}>
-                    <Skeleton style={{ height: '2rem' }} />
+                    <AutoHideTagList
+                      tag_type={tag_type}
+                      items={tags[tag_type].map(item => {
+                        return { value: item[0], lvl: item[1], safelisted: item[2], classification: item[3] };
+                      })}
+                      force={force}
+                    />
                   </Grid>
                 </Grid>
-              ))}
+              ) : null
+            )
+            : [...Array(3)].map((_, i) => (
+              <Grid container key={i} spacing={1}>
+                <Grid item xs={12} sm={3} lg={2}>
+                  <Skeleton style={{ height: '2rem' }} />
+                </Grid>
+                <Grid item xs={12} sm={9} lg={10}>
+                  <Skeleton style={{ height: '2rem' }} />
+                </Grid>
+              </Grid>
+            ))}
         </div>
       </Collapse>
     </div>

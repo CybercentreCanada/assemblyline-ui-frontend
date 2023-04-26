@@ -6,8 +6,6 @@ import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
 import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
 import { Menu, MenuItem } from '@mui/material';
-import { styled } from '@mui/material/styles';
-import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
@@ -36,14 +34,6 @@ const initialMenuState = {
   mouseY: null
 };
 
-const NoMaxWidthTooltip = styled(({ className, ...props }: TooltipProps) => (
-  <Tooltip {...props} classes={{ popper: className }} />
-))({
-  [`& .${tooltipClasses.tooltip}`]: {
-    maxWidth: 'none',
-  },
-});
-
 type TagProps = {
   type: string;
   value: string;
@@ -54,6 +44,7 @@ type TagProps = {
   safelisted?: boolean;
   fullWidth?: boolean;
   force?: boolean;
+  classification?: string | null;
 };
 
 type LookupSourceDetails = {
@@ -62,7 +53,6 @@ type LookupSourceDetails = {
   classification: string;
 };
 
-// TODO: add classification to prevent sending tags to external sources
 const WrappedTag: React.FC<TagProps> = ({
   type,
   value,
@@ -72,7 +62,8 @@ const WrappedTag: React.FC<TagProps> = ({
   highlight_key = null,
   safelisted = false,
   fullWidth = false,
-  force = false
+  force = false,
+  classification
 }) => {
   const { t } = useTranslation();
   const [state, setState] = React.useState(initialMenuState);
@@ -97,10 +88,27 @@ const WrappedTag: React.FC<TagProps> = ({
 
   const externalResults = useRef(null);
   const linkIcon = useRef(null);
-  const searchTagExternal = useCallback(() => {
+  const searchTagExternal = useCallback(source => {
+    let url = `/api/v4/federated_lookup/search/${type}/${encodeURIComponent(value)}/`;
+
+    // construct approporiate query param string
+    let qs = '';
+    if (classification != null) {
+      qs += `classification=${encodeURIComponent(classification)}`;
+    }
+    if (source != null) {
+      if (qs != '') {
+        qs += '&';
+      }
+      qs += `sources=${encodeURIComponent(source)}`;
+    }
+    if (qs != '') {
+      url += `?${qs}`;
+    }
+
     apiCall({
       method: 'GET',
-      url: `/api/v4/federated_lookup/search/${type}/${value}/`,
+      url: url,
       onSuccess: api_data => {
         if (Object.keys(api_data.api_response).length !== 0) {
           showSuccessMessage(t('related_external.found'));
@@ -138,7 +146,7 @@ const WrappedTag: React.FC<TagProps> = ({
       onExit: () => setWaitingDialog(false)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showSuccessMessage, type, value]);
+  }, [type, value, classification]);
 
   let maliciousness = lvl || scoreToVerdict(score);
   if (safelisted) {
@@ -175,8 +183,8 @@ const WrappedTag: React.FC<TagProps> = ({
     handleClose();
   }, [searchTag, handleClose]);
 
-  const handleMenuExternalSearch = useCallback(() => {
-    searchTagExternal();
+  const handleMenuExternalSearch = useCallback(source => {
+    searchTagExternal(source);
     handleClose();
   }, [searchTagExternal, handleClose]);
 
@@ -266,17 +274,17 @@ const WrappedTag: React.FC<TagProps> = ({
             {t('related')}
           </MenuItem>
         )}
-        {currentUser.roles.includes('submission_view') && currentUserConfig.ui.external_sources?.length && (
-          /* TODO: convert this into a nested menu with each source available for the user */
-          // TODO: enable valid tags to be sent in config so we can only show context menu on supported tags for user
-          <MenuItem dense onClick={handleMenuExternalSearch}>
-            {TRAVEL_EXPLORE_ICON}
-            {t('related_external') + t('related_external.all')}
-          </MenuItem>
-        )}
+        {currentUser.roles.includes('submission_view') && currentUserConfig.ui.external_sources?.length &&
+          currentUserConfig.ui.external_source_tags.hasOwnProperty(type) && (
+            /* TODO: convert this into a nested menu with each source available for the user */
+            <MenuItem dense onClick={() => handleMenuExternalSearch(null)}>
+              {TRAVEL_EXPLORE_ICON}
+              {t('related_external') + t('related_external.all')}
+            </MenuItem>
+          )}
         {currentUser.roles.includes('submission_view') && (
-          currentUserConfig.ui.external_sources?.map(source =>
-            <MenuItem dense onClick={handleMenuExternalSearch}>
+          currentUserConfig.ui.external_source_tags[type]?.map((source, i) =>
+            <MenuItem dense key={i} onClick={() => handleMenuExternalSearch(source)}>
               {TRAVEL_EXPLORE_ICON}
               {t('related_external') + source}
             </MenuItem>
@@ -293,21 +301,20 @@ const WrappedTag: React.FC<TagProps> = ({
           </MenuItem>
         )}
       </Menu>
-      <NoMaxWidthTooltip title={externalResults.current}>
-        <CustomChip
-          wrap
-          variant={safelisted ? 'outlined' : 'filled'}
-          size="tiny"
-          type="rounded"
-          color={highlight_key && isHighlighted(highlight_key) ? ('primary' as 'info') : color}
-          label={short_type ? `[${short_type.toUpperCase()}] ${value}` : value}
-          style={STYLE}
-          onClick={highlight_key ? handleClick : null}
-          fullWidth={fullWidth}
-          onContextMenu={handleMenuClick}
-          icon={linkIcon.current}
-        />
-      </NoMaxWidthTooltip>
+      <CustomChip
+        wrap
+        variant={safelisted ? 'outlined' : 'filled'}
+        size="tiny"
+        type="rounded"
+        color={highlight_key && isHighlighted(highlight_key) ? ('primary' as 'info') : color}
+        label={short_type ? `[${short_type.toUpperCase()}] ${value}` : value}
+        style={STYLE}
+        onClick={highlight_key ? handleClick : null}
+        fullWidth={fullWidth}
+        onContextMenu={handleMenuClick}
+        icon={linkIcon.current}
+        tooltip={externalResults.current}
+      />
     </>
   );
 };
