@@ -237,6 +237,7 @@ export default function LoginScreen({ allowUserPass, allowSignup, allowPWReset, 
                               ? '/'
                               : `${location.pathname}${location.search}${location.hash}`
                           );
+                          setButtonLoading(true);
                         }}
                         href={`/api/v4/auth/login/?oauth_provider=${item}`}
                       >
