@@ -5,7 +5,8 @@ import PlaylistAddCheckOutlinedIcon from '@mui/icons-material/PlaylistAddCheckOu
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
 import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
-import { Menu, MenuItem } from '@mui/material';
+import { Divider, ListSubheader, Menu, MenuItem } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
@@ -23,16 +24,22 @@ import InputDialog from './InputDialog';
 
 const STYLE = { height: 'auto', minHeight: '20px' };
 const SEARCH_ICON = <SearchOutlinedIcon style={{ marginRight: '16px' }} />;
-const TRAVEL_EXPLORE_ICON = <TravelExploreOutlinedIcon style={{ marginRight: '16px' }} />;
 const CLIPBOARD_ICON = <AssignmentOutlinedIcon style={{ marginRight: '16px' }} />;
 const HIGHLIGHT_ICON = <SelectAllOutlinedIcon style={{ marginRight: '16px' }} />;
 const SAFELIST_ICON = <PlaylistAddCheckOutlinedIcon style={{ marginRight: '16px' }} />;
 const SIGNATURE_ICON = <FingerprintOutlinedIcon style={{ marginRight: '16px' }} />;
+const TRAVEL_EXPLORE_ICON = <TravelExploreOutlinedIcon style={{ marginRight: '16px' }} />;
 const LINK_ICON = <LinkOutlinedIcon style={{ marginRight: '2px' }} />;
 const initialMenuState = {
   mouseX: null,
   mouseY: null
 };
+
+const useStyles = makeStyles(theme => ({
+  listSubHeaderRoot: {
+    lineHeight: '32px'
+  }
+}));
 
 type TagProps = {
   type: string;
@@ -77,6 +84,7 @@ const WrappedTag: React.FC<TagProps> = ({
   const { isHighlighted, triggerHighlight } = useHighlighter();
   const { copy } = useClipboard();
   const { showSafeResults } = useSafeResults();
+  const classes = useStyles();
 
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
 
@@ -126,9 +134,8 @@ const WrappedTag: React.FC<TagProps> = ({
             }
           };
           externalResults.current = Object.keys(test).map((sourceName: keyof LookupSourceDetails) => (
-              <h3>{sourceName}: <a href={test[sourceName].link}>{test[sourceName].count} results</a></h3>
+            <h3>{sourceName}: <a href={test[sourceName].link}>{test[sourceName].count} results</a></h3>));*/
 
-          */
           externalResults.current = Object.keys(api_data.api_response).map((sourceName: keyof LookupSourceDetails) => (
             <p>
               <h3>
@@ -274,22 +281,6 @@ const WrappedTag: React.FC<TagProps> = ({
             {t('related')}
           </MenuItem>
         )}
-        {currentUser.roles.includes('submission_view') && currentUserConfig.ui.external_sources?.length &&
-          currentUserConfig.ui.external_source_tags.hasOwnProperty(type) && (
-            /* TODO: convert this into a nested menu with each source available for the user */
-            <MenuItem dense onClick={() => handleMenuExternalSearch(null)}>
-              {TRAVEL_EXPLORE_ICON}
-              {t('related_external') + t('related_external.all')}
-            </MenuItem>
-          )}
-        {currentUser.roles.includes('submission_view') && (
-          currentUserConfig.ui.external_source_tags[type]?.map((source, i) =>
-            <MenuItem dense key={i} onClick={() => handleMenuExternalSearch(source)}>
-              {TRAVEL_EXPLORE_ICON}
-              {t('related_external') + source}
-            </MenuItem>
-          )
-        )}
         <MenuItem dense onClick={handleMenuHighlight}>
           {HIGHLIGHT_ICON}
           {t('highlight')}
@@ -300,6 +291,25 @@ const WrappedTag: React.FC<TagProps> = ({
             {t('safelist')}
           </MenuItem>
         )}
+        {currentUser.roles.includes('submission_view') && currentUserConfig.ui.external_sources?.length &&
+          currentUserConfig.ui.external_source_tags.hasOwnProperty(type) && (
+            <>
+              <Divider />
+              <ListSubheader disableSticky classes={{ root: classes.listSubHeaderRoot }}>
+                {t('related_external')}
+              </ListSubheader>
+
+              <MenuItem dense onClick={() => handleMenuExternalSearch(null)}>
+                {TRAVEL_EXPLORE_ICON} {t('related_external.all')}
+              </MenuItem>
+
+              {currentUserConfig.ui.external_source_tags[type]?.map((source, i) =>
+                <MenuItem dense key={i} onClick={() => handleMenuExternalSearch(source)}>
+                  {TRAVEL_EXPLORE_ICON} {source}
+                </MenuItem>
+              )}
+            </>
+          )}
       </Menu>
       <CustomChip
         wrap
