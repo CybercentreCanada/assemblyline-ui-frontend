@@ -330,24 +330,43 @@ function WrappedClassification({
                                 <ListItemText style={{ textAlign: 'center' }} primary={grp.name} />
                               </ListItem>
                             ))}
-                            {c12nDef.dynamic_groups && currentUser.email && (
-                              <ListItem
-                                button
-                                disabled={validated.disabled.groups.includes(dynGroup || currentUser.dynamic_group)}
-                                selected={validated.parts.groups.includes(dynGroup || currentUser.dynamic_group)}
-                                onClick={() =>
-                                  toggleGroups({
-                                    name: dynGroup || currentUser.dynamic_group,
-                                    short_name: dynGroup || currentUser.dynamic_group
-                                  })
-                                }
-                              >
-                                <ListItemText
-                                  style={{ textAlign: 'center' }}
-                                  primary={dynGroup || currentUser.dynamic_group}
-                                />
-                              </ListItem>
-                            )}
+                            {c12nDef.dynamic_groups &&
+                              ['email', 'all'].includes(c12nDef.dynamic_groups_type) &&
+                              currentUser.email && (
+                                <ListItem
+                                  button
+                                  disabled={validated.disabled.groups.includes(dynGroup || currentUser.dynamic_group)}
+                                  selected={validated.parts.groups.includes(dynGroup || currentUser.dynamic_group)}
+                                  onClick={() =>
+                                    toggleGroups({
+                                      name: dynGroup || currentUser.dynamic_group,
+                                      short_name: dynGroup || currentUser.dynamic_group
+                                    })
+                                  }
+                                >
+                                  <ListItemText
+                                    style={{ textAlign: 'center' }}
+                                    primary={dynGroup || currentUser.dynamic_group}
+                                  />
+                                </ListItem>
+                              )}
+                            {c12nDef.dynamic_groups &&
+                              ['group', 'all'].includes(c12nDef.dynamic_groups_type) &&
+                              currentUser.groups.map((group, idx) => (
+                                <ListItem
+                                  button
+                                  disabled={validated.disabled.groups.includes(group)}
+                                  selected={validated.parts.groups.includes(group)}
+                                  onClick={() =>
+                                    toggleGroups({
+                                      name: group,
+                                      short_name: group
+                                    })
+                                  }
+                                >
+                                  <ListItemText style={{ textAlign: 'center' }} primary={group} />
+                                </ListItem>
+                              ))}
                           </List>
                         </Card>
                       </div>
