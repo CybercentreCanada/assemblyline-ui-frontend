@@ -577,7 +577,7 @@ function User({ username }: UserProps) {
                     {user ? <div>{user.name}</div> : <Skeleton />}
                   </TableCell>
                 </ClickRow>
-                <ClickRow enabled={editable} chevron onClick={() => toggleDrawer('groups')}>
+                <ClickRow enabled={editable && currentUser.is_admin} chevron onClick={() => toggleDrawer('groups')}>
                   {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('groups')}</TableCell>}
                   <TableCell width="100%">
                     {!isXS ? null : <Typography variant="caption">{t('groups')}</Typography>}
