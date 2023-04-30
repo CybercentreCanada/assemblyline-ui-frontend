@@ -1,11 +1,14 @@
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import LinkOutlinedIcon from '@mui/icons-material/LinkOutlined';
-import { Button, Collapse, IconButton, Typography, TypographyTypeMap } from '@mui/material';
-import { DefaultComponentProps } from '@mui/material/OverridableComponent';
+import { Button, Collapse, IconButton, Theme, Typography, TypographyTypeMap } from '@mui/material';
+import { DefaultComponentProps, OverrideProps } from '@mui/material/OverridableComponent';
 import makeStyles from '@mui/styles/makeStyles';
+import { SystemProps } from '@mui/system';
 import clsx from 'clsx';
+import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import React, {
+  ElementType,
+  MouseEventHandler,
   useCallback,
   useContext,
   useEffect,
@@ -97,10 +100,34 @@ const useStyles = makeStyles(theme => ({
     '&>li>a &>li>a.active': {}
   },
   li: {
+    display: 'flex',
     padding: 0,
     margin: 0,
     fontWeight: 500,
-    fontSize: '0.8125rem'
+    fontSize: '0.8125rem',
+    '&:hover>.expand': {
+      opacity: 1
+    }
+  },
+  link: {
+    flex: 1,
+    color: theme.palette.text.secondary,
+    textDecoration: 'none',
+    padding: '0px 8px 0px 10px',
+    margin: '4px 0px 8px',
+    borderLeft: `1px solid transparent`,
+    '&:hover': {
+      color: theme.palette.text.primary,
+      borderLeft: `1px solid ${theme.palette.text.primary}`
+    },
+    '&:active': {
+      color: `${theme.palette.primary.main} !important`,
+      borderLeft: `1px solid ${theme.palette.primary.main} !important`
+    },
+    '&:active:hover': {
+      color: `${theme.palette.secondary.main} !important`,
+      borderLeft: `1px solid ${theme.palette.secondary.main} !important`
+    }
   },
   active: {
     '&>a': {
@@ -111,6 +138,19 @@ const useStyles = makeStyles(theme => ({
         borderLeft: `1px solid ${theme.palette.secondary.main} !important`
       }
     }
+  },
+  expandContainer: {
+    opacity: 0,
+    '&.visible': {
+      opacity: 1
+    }
+  },
+  expandIconButton: {
+    transform: 'rotate(90deg)',
+    transition: 'transform 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms'
+  },
+  expanded: {
+    transform: 'rotate(0deg)'
   }
 }));
 
@@ -121,7 +161,7 @@ type ToCContextProps = {
   onLinkClick?: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, item: TocItem) => void;
 };
 
-type PageWithToCProps = {
+type TableOfContentProps = {
   children: React.ReactNode;
   margin?: number;
 };
@@ -151,8 +191,9 @@ const ToCContext = React.createContext<ToCContextProps>(null);
 
 const useMyToc: () => ToCContextProps = () => useContext(ToCContext) as ToCContextProps;
 
-const WrappedPageWithToC = ({ children, margin }: PageWithToCProps) => {
+const WrappedTableOfContent = ({ children, margin }: TableOfContentProps) => {
   const classes = useStyles();
+  const { copy } = useClipboard();
 
   const [tableOfContent, setTableOfContent] = useState<TocNode[]>([]);
   const [anchors, setAnchors] = useState<TocItem[]>([]);
@@ -281,9 +322,15 @@ const WrappedPageWithToC = ({ children, margin }: PageWithToCProps) => {
     [formatAnchorPath]
   );
 
-  const onAnchorClick: ToCContextProps['onAnchorClick'] = useCallback((event, item) => {
-    item.anchor.scrollIntoView({ behavior: 'smooth', block: 'start' } as ScrollIntoViewOptions);
-  }, []);
+  const onAnchorClick: ToCContextProps['onAnchorClick'] = useCallback(
+    (event, item) => {
+      item.anchor.scrollIntoView({ behavior: 'smooth', block: 'start' } as ScrollIntoViewOptions);
+      const currentItem = anchorsRef.current.find(a => a.anchor === item.anchor);
+      const { origin, pathname, search } = window.location;
+      copy(`${origin}${pathname}${search}#${currentItem.hash}`);
+    },
+    [copy]
+  );
 
   const onLinkCreate: ToCContextProps['onLinkCreate'] = useCallback(
     (node, link) => {
@@ -297,9 +344,17 @@ const WrappedPageWithToC = ({ children, margin }: PageWithToCProps) => {
     [updateValueFromPath]
   );
 
-  const onLinkClick: ToCContextProps['onLinkClick'] = useCallback((event, item) => {
-    item.anchor.scrollIntoView({ behavior: 'smooth', block: 'start' } as ScrollIntoViewOptions);
-  }, []);
+  const onLinkClick: ToCContextProps['onLinkClick'] = useCallback(
+    (event, item) => {
+      item.anchor.scrollIntoView({ behavior: 'smooth', block: 'start' } as ScrollIntoViewOptions);
+      const currentItem = anchorsRef.current.find(a => a.anchor === item.anchor);
+      const { origin, pathname, search } = window.location;
+      copy(`${origin}${pathname}${search}#${currentItem.hash}`);
+    },
+    [copy]
+  );
+
+  console.count('asd');
 
   return (
     <ToCContext.Provider value={{ onAnchorCreate, onAnchorClick, onLinkCreate, onLinkClick }}>
@@ -342,7 +397,19 @@ const ToCLink: React.FC<ToCElementProps> = ({ node, depth = 0 }) => {
   const classes = useStyles();
 
   const { onLinkCreate, onLinkClick } = useMyToc();
-  const ref = useRef();
+
+  const [open, setOpen] = useState<boolean>(false);
+
+  const ref = useRef<HTMLLIElement>();
+
+  const hasSubNodes = useMemo<boolean>(
+    () => true || ('subNodes' in node && Array.isArray(node.subNodes) && node.subNodes.length > 0),
+    [node]
+  );
+
+  const handleCollapseClick: MouseEventHandler<HTMLButtonElement> = useCallback(event => {
+    setOpen(o => !o);
+  }, []);
 
   useEffect(() => {
     onLinkCreate(node, ref.current);
@@ -352,20 +419,33 @@ const ToCLink: React.FC<ToCElementProps> = ({ node, depth = 0 }) => {
     <>
       <Typography ref={ref} component="li" className={classes.li} style={{ marginLeft: `calc(${depth}*10px)` }}>
         <Link
+          className={classes.link}
           children={node.title}
           data-no-markdown-link={node.id}
-          to={`#${node.hash}`}
+          to={`${window.location.search}#${node.hash}`}
           onClick={event => {
             onLinkClick(event, { ...node, link: ref.current });
           }}
         />
-        <IconButton size="small">{node.collapse ? <ExpandMore /> : <ExpandLess />}</IconButton>
+        {hasSubNodes && (
+          <div className={clsx('expand', classes.expandContainer, open && 'visible')}>
+            <IconButton
+              className={clsx(classes.expandIconButton, open && classes.expanded)}
+              size="small"
+              onClick={e => handleCollapseClick(e)}
+            >
+              <ExpandMoreIcon fontSize="inherit" />
+            </IconButton>
+          </div>
+        )}
       </Typography>
-      <Collapse in={node.collapse} timeout="auto" unmountOnExit>
-        {node.subNodes.map(subNode => (
-          <ToCLink key={`${subNode.path.join('-')}-${subNode.title}`} node={subNode} depth={depth + 1} />
-        ))}
-      </Collapse>
+      {hasSubNodes && (
+        <Collapse /*in={node.collapse}*/ in={open} timeout="auto" unmountOnExit component="ul" className={classes.ul}>
+          {node.subNodes.map(subNode => (
+            <ToCLink key={`${subNode.path.join('-')}-${subNode.title}`} node={subNode} depth={depth + 1} />
+          ))}
+        </Collapse>
+      )}
     </>
   );
 };
@@ -373,9 +453,46 @@ const ToCLink: React.FC<ToCElementProps> = ({ node, depth = 0 }) => {
 /**
  * TYPOGRAPHY ANCHOR
  */
-type ToCAnchorProps = DefaultComponentProps<TypographyTypeMap<{ label?: string; level?: number }, 'span'>>;
+type AnchorProps = DefaultComponentProps<
+  TypographyTypeMap<{ component?: ElementType; label?: string; level?: number }, 'p'>
+>;
 
-export const ToCAnchor = ({ children, label = null, level = 0, ...props }: ToCAnchorProps) => {
+interface AnchorTypeMap<P = {}, D extends React.ElementType = 'span'> {
+  props: P &
+    SystemProps<Theme> & {
+      /**
+       * The content of the component.
+       */
+      children?: React.ReactNode;
+      /**
+       * If `true`, the text will not wrap, but instead will truncate with a text overflow ellipsis.
+       *
+       * Note that text overflow can only happen with block or inline-block level elements
+       * (the element needs to have a width in order to overflow).
+       * @default 0
+       */
+      level: number;
+
+      component?: D;
+
+      label?: string;
+    };
+  defaultComponent: D;
+}
+
+type AnchorPros2<D extends React.ElementType = AnchorTypeMap['defaultComponent'], P = {}> = OverrideProps<
+  AnchorTypeMap<P, D>,
+  D
+>;
+
+type AnchorProps3 = {
+  children?: React.ReactNode;
+  component?: React.ElementType;
+  label?: string;
+  level?: number;
+};
+
+export const Anchor = ({ children, component: Element = 'p', label = null, level = 0, ...props }: AnchorProps3) => {
   const classes = useStyles();
 
   const { onAnchorCreate, onAnchorClick } = useMyToc();
@@ -392,14 +509,14 @@ export const ToCAnchor = ({ children, label = null, level = 0, ...props }: ToCAn
     <>
       {useMemo(
         () => (
-          <Typography id={hash} ref={ref} className={classes.typography} {...props}>
-            {`${children}`}
+          <Element id={hash} ref={ref} className={classes.typography} {...props}>
+            {children}
             <Button
               classes={{ root: clsx(classes.anchor) }}
               component={Link}
               size="small"
               tabIndex={-1}
-              to={`#${hash}`}
+              to={`${window.location.search}#${hash}`}
               variant="outlined"
               onClick={event => {
                 onAnchorClick(event, {
@@ -411,13 +528,22 @@ export const ToCAnchor = ({ children, label = null, level = 0, ...props }: ToCAn
             >
               <LinkOutlinedIcon className={classes.icon} />
             </Button>
-          </Typography>
+          </Element>
         ),
-        [children, classes, hash, onAnchorClick, props]
+        [Element, children, classes, hash, onAnchorClick, props]
       )}
     </>
   );
 };
 
-export const PageWithToC = React.memo(WrappedPageWithToC);
-export default PageWithToC;
+/**
+ * **Table of Content:**
+ *
+ * This is the context provider for adding a table of content in your layout.
+ * It needs to be at the top-most level of your component of your layout as it
+ * will format it to allow the space to add the table of content on the right
+ * side of the page.
+ *
+ */
+export const TableOfContent = React.memo(WrappedTableOfContent);
+export default TableOfContent;

@@ -1,6 +1,6 @@
-import { Grid } from '@mui/material';
-import { PageWithToC, ToCAnchor } from 'commons/addons/toc/Toc2';
-import { memo, useCallback, useMemo } from 'react';
+import { Grid, Typography } from '@mui/material';
+import TableOfContent, { Anchor } from 'commons/addons/toc/Toc2';
+import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type List = { label: string; level: number; path?: number[] };
@@ -38,78 +38,22 @@ export const Test = () => {
     []
   );
 
-  const nextPath = useCallback((path: number[] = [0], depth: number = 0): number[] => {
-    let next = [];
-    for (let i = 0; i <= depth; ++i) {
-      if (i < path.length && i < depth) next = [...next, path[i]];
-      else if (i < path.length && i === depth) next = [...next, path[i] + 1];
-      else next = [...next, 1];
-    }
-    return next;
-  }, []);
-
-  const formatPath = useCallback(
-    (items: List[] = []): List[] => {
-      let item = items[0];
-      let result = [{ ...item, path: [1] }];
-      let depth = 0;
-
-      for (let i = 1; i < items.length; i++) {
-        const lastResult = result[result.length - 1];
-
-        if (items[i].level < lastResult.level) depth -= 1;
-        else if (items[i].level > lastResult.level) depth += 1;
-        depth = Math.max(depth, 0);
-
-        result = [...result, { ...items[i], path: nextPath(lastResult.path, depth) }];
-      }
-
-      return result;
-    },
-    [nextPath]
-  );
-
-  const formatTree = useCallback(
-    (items: List[] = [], result: Item[] = [], depth: number = 1): { items: List[]; result: Item[] } => {
-      if (!Array.isArray(items) || items.length === 0) return { items, result };
-
-      const item = items[0];
-
-      // Same Level
-      if (item.path.length === depth) {
-        return formatTree(items.slice(1), [...result, { label: item.label, subItems: [] }], depth);
-      }
-
-      // lower level
-      else if (item.path.length > depth) {
-        const { items: newItems, result: subResult } = formatTree(
-          items.slice(1),
-          [{ label: item.label, subItems: [] }],
-          depth + 1
-        );
-        result[result.length - 1].subItems = subResult;
-        return formatTree(newItems, result, depth);
-      }
-      // other
-      else return { items, result };
-    },
-    []
-  );
-
-  // useEffect(() => {
-  //   const newToc2 = formatPath(toc);
-  //   const tree = formatTree(newToc2);
-  //   console.log(JSON.stringify(tree.result, null, 2));
-  // }, [formatPath, formatTree, toc]);
-
   return (
-    <PageWithToC>
+    <TableOfContent>
       <Grid container alignItems="center">
+        <div style={{ height: '200px' }} />
+
+        <Anchor level={0}>
+          <Typography variant="h2">1. This is a test</Typography>
+        </Anchor>
+
+        <Typography component={Anchor} variant="h2" children={'3. This is a typography'} level={2} />
+
         {toc.map(item => (
           <Grid key={item.label} item xs={12}>
-            <ToCAnchor label={item.label} level={item.level} variant="h2">
-              {item.label}
-            </ToCAnchor>
+            <Typography component={Anchor} variant="h2" level={item.level}>
+              {`Title ${item.label}`}
+            </Typography>
             <p>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam fermentum fermentum est, ut dignissim urna
               finibus vitae. Vestibulum facilisis nunc vel porta porttitor. Maecenas condimentum lectus semper,
@@ -151,7 +95,7 @@ export const Test = () => {
           </Grid>
         ))}
       </Grid>
-    </PageWithToC>
+    </TableOfContent>
   );
 };
 
