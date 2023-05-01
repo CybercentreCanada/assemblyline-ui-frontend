@@ -384,7 +384,7 @@ function User({ username }: UserProps) {
                             <Chip variant="outlined" label={option} {...getTagProps({ index })} />
                           ))
                         }
-                        onChange={(event, value) => setGroups(value)}
+                        onChange={(event, value) => setGroups([...new Set(value.map(x => x.toUpperCase()))])}
                       />
                     </>
                   ),
