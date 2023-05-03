@@ -34,6 +34,7 @@ const HelpApiDoc = lazy(() => import('components/routes/help/api'));
 const HelpClassification = lazy(() => import('components/routes/help/classification'));
 const HelpConfiguration = lazy(() => import('components/routes/help/configuration'));
 const HelpSearch = lazy(() => import('components/routes/help/search'));
+const HelpSearch2 = lazy(() => import('components/routes/help/search2'));
 const HelpServices = lazy(() => import('components/routes/help/services'));
 const Logout = lazy(() => import('components/routes/logout'));
 const Manage = lazy(() => import('components/routes/manage'));
@@ -125,6 +126,7 @@ const WrappedRoutes = () => {
         <Route path="/help/classification" element={<HelpClassification />} />
         <Route path="/help/configuration" element={<HelpConfiguration />} />
         <Route path="/help/search" element={<HelpSearch />} />
+        <Route path="/help/search2" element={<HelpSearch2 />} />
         <Route path="/help/services" element={<HelpServices />} />
         <Route path="/logout" element={<Logout />} />
         <Route path="/manage/heuristics" element={<ManageHeuristics />} />
