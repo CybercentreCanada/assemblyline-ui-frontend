@@ -101,16 +101,16 @@ const WrappedTag: React.FC<TagProps> = ({
 
     // construct approporiate query param string
     let qs = '';
-    if (classification != null) {
+    if (!!classification) {
       qs += `classification=${encodeURIComponent(classification)}`;
     }
-    if (source != null) {
-      if (qs != '') {
+    if (!!source) {
+      if (!!qs) {
         qs += '&';
       }
       qs += `sources=${encodeURIComponent(source)}`;
     }
-    if (qs != '') {
+    if (!!qs) {
       url += `?${qs}`;
     }
 
@@ -121,21 +121,6 @@ const WrappedTag: React.FC<TagProps> = ({
         if (Object.keys(api_data.api_response).length !== 0) {
           showSuccessMessage(t('related_external.found'));
           linkIcon.current = LINK_ICON;
-          /*let test = {
-            'malware_bazaar': {
-              'link': 'https://link.com',
-              'classification': 'UNRESTRICTED',
-              'count': 2
-            },
-            'virustotal': {
-              'link': 'https://linktovt.com',
-              'classification': 'UNRESTRICTED',
-              'count': 1
-            }
-          };
-          externalResults.current = Object.keys(test).map((sourceName: keyof LookupSourceDetails) => (
-            <h3>{sourceName}: <a href={test[sourceName].link}>{test[sourceName].count} results</a></h3>));*/
-
           externalResults.current = Object.keys(api_data.api_response).map((sourceName: keyof LookupSourceDetails) => (
             <p>
               <h3>
@@ -148,9 +133,7 @@ const WrappedTag: React.FC<TagProps> = ({
         else {
           showWarningMessage(t('related_external.notfound'));
         }
-      },
-      onEnter: () => setWaitingDialog(true),
-      onExit: () => setWaitingDialog(false)
+      }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type, value, classification]);
@@ -293,7 +276,7 @@ const WrappedTag: React.FC<TagProps> = ({
         )}
         {currentUser.roles.includes('submission_view') && currentUserConfig.ui.external_sources?.length &&
           currentUserConfig.ui.external_source_tags.hasOwnProperty(type) && (
-            <>
+            <div>
               <Divider />
               <ListSubheader disableSticky classes={{ root: classes.listSubHeaderRoot }}>
                 {t('related_external')}
@@ -308,7 +291,7 @@ const WrappedTag: React.FC<TagProps> = ({
                   {TRAVEL_EXPLORE_ICON} {source}
                 </MenuItem>
               )}
-            </>
+            </div>
           )}
       </Menu>
       <CustomChip
