@@ -20,15 +20,21 @@ const useStyles = makeStyles(theme => ({
     '&:hover, &:focus': {
       color: theme.palette.text.secondary
     }
+  },
+  externalLookupButtonRoot: {
+    marginLeft: '0px',
+    height: '0px',
+    '&:hover': {
+      backgroundColor: "inherit",
+      color: theme.palette.text.secondary
+    }
   }
 }));
 
 const LINK_ICON = <LinkOutlinedIcon style={{ marginRight: '2px' }} />;
 const TRAVEL_EXPLORE_ICON = <TravelExploreOutlinedIcon style={{
   display: 'inline-flex',
-  width: '20px',
-  height: '20px',
-  marginLeft: '8px'
+  height: '18px'
 }} />;
 
 type IdentificationSectionProps = {
@@ -53,27 +59,28 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
   const openExternaLookup = Boolean(anchorEl);
   const { apiCall } = useMyAPI();
   const { showSuccessMessage, showWarningMessage } = useMySnackbar();
-  const [waitingDialog, setWaitingDialog] = React.useState(false);
 
   const externalResults = useRef(null);
   const linkIcon = useRef(null);
   const lookupType = useRef(null);
+  const lookupValue = useRef(null);
+  const lookupClassification = useRef(null);
 
   const searchTagExternal = useCallback(source => {
-    let url = `/api/v4/federated_lookup/search/${lookupType.current}/${encodeURIComponent(fileinfo[lookupType.current])}/`;
+    let url = `/api/v4/federated_lookup/search/${lookupType.current}/${encodeURIComponent(lookupValue.current)}/`;
 
     // construct approporiate query param string
     let qs = '';
-    if (fileinfo.classification != null) {
-      qs += `classification=${encodeURIComponent(fileinfo.classification)}`;
+    if (lookupClassification.current != null) {
+      qs += `classification=${encodeURIComponent(lookupClassification.current)}`;
     }
-    if (source != null) {
-      if (qs != '') {
+    if (!!source) {
+      if (!!qs) {
         qs += '&';
       }
       qs += `sources=${encodeURIComponent(source)}`;
     }
-    if (qs != '') {
+    if (!!qs) {
       url += `?${qs}`;
     }
 
@@ -97,11 +104,9 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
           showWarningMessage(t('related_external.notfound'));
         }
       },
-      onEnter: () => setWaitingDialog(true),
-      onExit: () => setWaitingDialog(false)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lookupType]);
+  }, [lookupType, lookupClassification]);
 
   const handleClose = () => {
     setAnchorEl(null);
@@ -110,11 +115,13 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
   const handleMenuExternalSearch = useCallback(source => {
     searchTagExternal(source);
     handleClose();
-  }, []);
+  }, [searchTagExternal]);
 
-  const handleShowExternalLookup = useCallback((event: React.MouseEvent<HTMLButtonElement>, type: string) => {
+  const handleShowExternalSearch = useCallback((event: React.MouseEvent<HTMLButtonElement>, type: string, value: string, classification: string) => {
     setAnchorEl(event.currentTarget);
     lookupType.current = type;
+    lookupValue.current = value;
+    lookupClassification.current = classification;
   }, []);
 
 
@@ -159,7 +166,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                   {currentUser.roles.includes('submission_view') && currentUserConfig.ui.external_sources?.length &&
                     currentUserConfig.ui.external_source_tags.hasOwnProperty('md5') && (
                       <Tooltip title={t('related_external')} placement="top">
-                        <IconButton size="small" onClick={e => handleShowExternalLookup(e, 'md5')}>
+                        <IconButton size="small" onClick={e => handleShowExternalSearch(e, 'md5', fileinfo.md5, fileinfo.classification)} classes={{ root: classes.externalLookupButtonRoot }}>
                           {TRAVEL_EXPLORE_ICON}
                         </IconButton>
                       </Tooltip>
@@ -174,7 +181,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                   {currentUser.roles.includes('submission_view') && currentUserConfig.ui.external_sources?.length &&
                     currentUserConfig.ui.external_source_tags.hasOwnProperty('sha1') && (
                       <Tooltip title={t('related_external')} placement="top">
-                        <IconButton size="small" onClick={e => handleShowExternalLookup(e, 'sha1')}>
+                        <IconButton size="small" onClick={e => handleShowExternalSearch(e, 'sha1', fileinfo.sha1, fileinfo.classification)} classes={{ root: classes.externalLookupButtonRoot }}>
                           {TRAVEL_EXPLORE_ICON}
                         </IconButton>
                       </Tooltip>
@@ -189,7 +196,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                   {currentUser.roles.includes('submission_view') && currentUserConfig.ui.external_sources?.length &&
                     currentUserConfig.ui.external_source_tags.hasOwnProperty('sha256') && (
                       <Tooltip title={t('related_external')} placement="top">
-                        <IconButton size="small" onClick={e => handleShowExternalLookup(e, 'sha256')}>
+                        <IconButton size="small" onClick={e => handleShowExternalSearch(e, 'sha256', fileinfo.sha256, fileinfo.classification)} classes={{ root: classes.externalLookupButtonRoot }}>
                           {TRAVEL_EXPLORE_ICON}
                         </IconButton>
                       </Tooltip>
@@ -204,7 +211,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                   {currentUser.roles.includes('submission_view') && currentUserConfig.ui.external_sources?.length &&
                     currentUserConfig.ui.external_source_tags.hasOwnProperty('ssdeep') && (
                       <Tooltip title={t('related_external')} placement="top">
-                        <IconButton size="small" onClick={e => handleShowExternalLookup(e, 'ssdeep')}>
+                        <IconButton size="small" onClick={e => handleShowExternalSearch(e, 'ssdeep', fileinfo.ssdeep, fileinfo.classification)} classes={{ root: classes.externalLookupButtonRoot }}>
                           {TRAVEL_EXPLORE_ICON}
                         </IconButton>
                       </Tooltip>
