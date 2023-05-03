@@ -149,7 +149,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
         <MenuItem dense onClick={() => handleMenuExternalSearch(null)}>
           {t('related_external.all')}
         </MenuItem>
-        {currentUserConfig.ui.external_source_tags[lookupType.current]?.map((source, i) =>
+        {currentUserConfig.ui.external_source_tags?.[lookupType.current]?.map((source, i) =>
           <MenuItem dense key={i} onClick={() => handleMenuExternalSearch(source)}>
             {source}
           </MenuItem>
@@ -164,7 +164,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                   <span style={{ fontWeight: 500 }}>MD5</span>
 
                   {currentUser.roles.includes('submission_view') && currentUserConfig.ui.external_sources?.length &&
-                    currentUserConfig.ui.external_source_tags.hasOwnProperty('md5') && (
+                    currentUserConfig.ui.external_source_tags?.hasOwnProperty('md5') && (
                       <Tooltip title={t('related_external')} placement="top">
                         <IconButton size="small" onClick={e => handleShowExternalSearch(e, 'md5', fileinfo.md5, fileinfo.classification)} classes={{ root: classes.externalLookupButtonRoot }}>
                           {TRAVEL_EXPLORE_ICON}
@@ -179,7 +179,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                 <Grid item xs={4} sm={3} lg={2}>
                   <span style={{ fontWeight: 500 }}>SHA1</span>
                   {currentUser.roles.includes('submission_view') && currentUserConfig.ui.external_sources?.length &&
-                    currentUserConfig.ui.external_source_tags.hasOwnProperty('sha1') && (
+                    currentUserConfig.ui.external_source_tags?.hasOwnProperty('sha1') && (
                       <Tooltip title={t('related_external')} placement="top">
                         <IconButton size="small" onClick={e => handleShowExternalSearch(e, 'sha1', fileinfo.sha1, fileinfo.classification)} classes={{ root: classes.externalLookupButtonRoot }}>
                           {TRAVEL_EXPLORE_ICON}
@@ -194,7 +194,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                 <Grid item xs={4} sm={3} lg={2}>
                   <span style={{ fontWeight: 500 }}>SHA256</span>
                   {currentUser.roles.includes('submission_view') && currentUserConfig.ui.external_sources?.length &&
-                    currentUserConfig.ui.external_source_tags.hasOwnProperty('sha256') && (
+                    currentUserConfig.ui.external_source_tags?.hasOwnProperty('sha256') && (
                       <Tooltip title={t('related_external')} placement="top">
                         <IconButton size="small" onClick={e => handleShowExternalSearch(e, 'sha256', fileinfo.sha256, fileinfo.classification)} classes={{ root: classes.externalLookupButtonRoot }}>
                           {TRAVEL_EXPLORE_ICON}
@@ -209,7 +209,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                 <Grid item xs={4} sm={3} lg={2}>
                   <span style={{ fontWeight: 500 }}>SSDEEP</span>
                   {currentUser.roles.includes('submission_view') && currentUserConfig.ui.external_sources?.length &&
-                    currentUserConfig.ui.external_source_tags.hasOwnProperty('ssdeep') && (
+                    currentUserConfig.ui.external_source_tags?.hasOwnProperty('ssdeep') && (
                       <Tooltip title={t('related_external')} placement="top">
                         <IconButton size="small" onClick={e => handleShowExternalSearch(e, 'ssdeep', fileinfo.ssdeep, fileinfo.classification)} classes={{ root: classes.externalLookupButtonRoot }}>
                           {TRAVEL_EXPLORE_ICON}

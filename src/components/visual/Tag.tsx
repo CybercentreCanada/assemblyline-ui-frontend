@@ -275,7 +275,7 @@ const WrappedTag: React.FC<TagProps> = ({
           </MenuItem>
         )}
         {currentUser.roles.includes('submission_view') && currentUserConfig.ui.external_sources?.length &&
-          currentUserConfig.ui.external_source_tags.hasOwnProperty(type) && (
+          currentUserConfig.ui.external_source_tags?.hasOwnProperty(type) && (
             <div>
               <Divider />
               <ListSubheader disableSticky classes={{ root: classes.listSubHeaderRoot }}>
@@ -286,7 +286,7 @@ const WrappedTag: React.FC<TagProps> = ({
                 {TRAVEL_EXPLORE_ICON} {t('related_external.all')}
               </MenuItem>
 
-              {currentUserConfig.ui.external_source_tags[type]?.map((source, i) =>
+              {currentUserConfig.ui.external_source_tags?.[type]?.map((source, i) =>
                 <MenuItem dense key={i} onClick={() => handleMenuExternalSearch(source)}>
                   {TRAVEL_EXPLORE_ICON} {source}
                 </MenuItem>
