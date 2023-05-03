@@ -352,21 +352,32 @@ function WrappedClassification({
                               )}
                             {c12nDef.dynamic_groups &&
                               ['group', 'all'].includes(c12nDef.dynamic_groups_type) &&
-                              currentUser.groups.map((group, idx) => (
-                                <ListItem
-                                  button
-                                  disabled={validated.disabled.groups.includes(group)}
-                                  selected={validated.parts.groups.includes(group)}
-                                  onClick={() =>
-                                    toggleGroups({
-                                      name: group,
-                                      short_name: group
-                                    })
-                                  }
-                                >
-                                  <ListItemText style={{ textAlign: 'center' }} primary={group} />
-                                </ListItem>
-                              ))}
+                              currentUser.groups
+                                .filter(
+                                  group =>
+                                    !(
+                                      group in c12nDef.groups_map_lts ||
+                                      group in c12nDef.groups_map_stl ||
+                                      group in c12nDef.subgroups_map_lts ||
+                                      group in c12nDef.subgroups_map_stl
+                                    )
+                                )
+                                .map((group, idx_group) => (
+                                  <ListItem
+                                    key={idx_group}
+                                    button
+                                    disabled={validated.disabled.groups.includes(group)}
+                                    selected={validated.parts.groups.includes(group)}
+                                    onClick={() =>
+                                      toggleGroups({
+                                        name: group,
+                                        short_name: group
+                                      })
+                                    }
+                                  >
+                                    <ListItemText style={{ textAlign: 'center' }} primary={group} />
+                                  </ListItem>
+                                ))}
                           </List>
                         </Card>
                       </div>
