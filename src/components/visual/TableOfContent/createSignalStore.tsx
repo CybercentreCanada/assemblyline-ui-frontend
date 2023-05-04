@@ -1,15 +1,11 @@
 import React, { createContext, useCallback, useContext, useRef, useSyncExternalStore } from 'react';
 
-export function createStore<Store>(initialState: Store) {
-  type NonObject = null | Array<any> | Date | Map<any, any>;
-  // type IsObject<O> = O extends NonObject ? never : O extends object ? (keyof O extends never ? never : O) : never;
-  // type Value<O, P> = IsObject<O> extends never ? never : P extends keyof O ? O[P] : never;
-  // type PartialR2<T> = { [P in keyof T]?: IsObject<T> extends never ? T[P] : PartialR2<T[P]> };
-
-  type PartialR<T> = T extends NonObject ? T : { [P in keyof T]?: PartialR<T[P]> };
+export function createSignalStore<Store>(initialState: Store) {
+  // type Primitives = boolean | number | bigint | string | symbol | null | undefined | Date | Buffer | RegExp;
+  // type PartialR<T> = T extends Primitives ? T : { [P in keyof T]?: PartialR<T[P]> };
 
   type GetStore = () => Store;
-  type SetStore = (value: PartialR<Store> | ((store: Store) => PartialR<Store>)) => void;
+  type SetStore = (value: Partial<Store> | ((store: Store) => Partial<Store>)) => void;
   type Subscribe = (callback: () => void) => () => void;
 
   function isObject(data: any): boolean {
@@ -21,7 +17,7 @@ export function createStore<Store>(initialState: Store) {
     else return true;
   }
 
-  function update<DataStore>(store: DataStore, data: PartialR<DataStore>): DataStore {
+  function update<DataStore>(store: DataStore, data: Partial<DataStore>): DataStore {
     return {
       ...store,
       ...Object.fromEntries(
@@ -59,20 +55,24 @@ export function createStore<Store>(initialState: Store) {
     return <StoreContext.Provider value={useStoreData()}>{children}</StoreContext.Provider>;
   }
 
-  function useStore<SelectorOutput>(selector: (store: Store) => SelectorOutput): [SelectorOutput, SetStore] {
+  function useSignal<SelectorOutput>(selector: (store: Store) => SelectorOutput): SelectorOutput {
     const store = useContext(StoreContext);
-    if (!store) {
-      throw new Error('Store not found');
-    }
+    if (!store) throw new Error('Store not found');
     const state = useSyncExternalStore(
       store.subscribe,
       () => selector(store.get()),
       () => selector(initialState)
     );
-    return [state, store.set];
+    return state;
   }
 
-  return { Provider, useStore };
+  function useStore(): SetStore {
+    const store = useContext(StoreContext);
+    if (!store) throw new Error('Store not found');
+    return store.set;
+  }
+
+  return { Provider, useSignal, useStore };
 }
 
-export default createStore;
+export default createSignalStore;

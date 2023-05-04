@@ -1,8 +1,7 @@
 import makeStyles from '@mui/styles/makeStyles';
 import React, { useCallback, useEffect, useLayoutEffect, useTransition } from 'react';
-import { AnchorDef, NodeDef, useStore } from './Provider';
+import { AnchorDef, NodeDef, Props, useSignal, useStore } from './ContentWithTOC';
 import Section from './Section';
-import { getValueFromPath } from './utils';
 
 const useStyles = makeStyles(theme => ({
   main: {
@@ -36,31 +35,6 @@ const useStyles = makeStyles(theme => ({
       display: 'none'
     }
   },
-  ul: {
-    listStyle: 'none',
-    padding: 0,
-    margin: 0,
-    '&>li>a': {
-      color: theme.palette.text.secondary,
-      textDecoration: 'none',
-      padding: '0px 8px 0px 10px',
-      margin: '4px 0px 8px',
-      borderLeft: `1px solid transparent`,
-      '&:hover': {
-        color: theme.palette.text.primary,
-        borderLeft: `1px solid ${theme.palette.text.primary}`
-      },
-      '&:active': {
-        color: `${theme.palette.primary.main} !important`,
-        borderLeft: `1px solid ${theme.palette.primary.main} !important`
-      },
-      '&:active:hover': {
-        color: `${theme.palette.secondary.main} !important`,
-        borderLeft: `1px solid ${theme.palette.secondary.main} !important`
-      }
-    },
-    '&>li>a &>li>a.active': {}
-  },
   active: {
     '&>a': {
       color: `${theme.palette.primary.main} !important`,
@@ -73,30 +47,27 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-type MainProps = {
-  children: React.ReactNode;
-};
-
 type FormatNodes = (
   _anchors?: AnchorDef[],
   _nodes?: NodeDef[],
   _depth?: number
 ) => { _anchors: AnchorDef[]; _nodes: NodeDef[] };
 
-export const WrappedMain = ({ children }: MainProps) => {
+export const WrappedMain = ({ translation, children, titleI18nKey = 'toc', topI18nKey = 'top' }: Props) => {
   const classes = useStyles();
-  const [anchors, setStore] = useStore(store => store.anchors);
+  const anchors = useSignal(store => store.anchors);
+  const setStore = useStore();
   const [, startScrollTransition] = useTransition();
 
   const formatNodes: FormatNodes = useCallback((_anchors = [], _nodes = [], _depth = 1) => {
     if (!Array.isArray(_anchors) || _anchors.length === 0) return { _anchors, _nodes };
     const _anchor = _anchors[0];
     if (_anchor.path.length === _depth) {
-      return formatNodes(_anchors.slice(1), [..._nodes, { ..._anchor, subNodes: [] }], _depth);
+      return formatNodes(_anchors.slice(1), [..._nodes, { anchorHash: _anchor.hash, subNodes: [] }], _depth);
     } else if (_anchor.path.length > _depth) {
       const { _anchors: newAnchors, _nodes: subNodes } = formatNodes(
         _anchors.slice(1),
-        [{ ..._anchor, subNodes: [] }],
+        [{ anchorHash: _anchor.hash, subNodes: [] }],
         _depth + 1
       );
       _nodes[_nodes.length - 1].subNodes = subNodes;
@@ -105,13 +76,16 @@ export const WrappedMain = ({ children }: MainProps) => {
   }, []);
 
   useEffect(() => {
+    setStore(store => ({ translation, titleI18nKey, topI18nKey }));
+  }, [setStore, titleI18nKey, topI18nKey, translation]);
+
+  useEffect(() => {
     setStore(store => ({ nodes: formatNodes(anchors)._nodes }));
   }, [anchors, formatNodes, setStore]);
 
   useLayoutEffect(() => {
     const item = anchors?.find(anchor => anchor.hash === window?.location?.hash?.slice(1));
-    if (!item) return;
-    item.element.scrollIntoView({ behavior: 'smooth' } as ScrollIntoViewOptions);
+    if (item) item.element.scrollIntoView({ behavior: 'smooth' } as ScrollIntoViewOptions);
   }, [anchors]);
 
   useEffect(() => {
@@ -128,12 +102,8 @@ export const WrappedMain = ({ children }: MainProps) => {
           }
           if (index === null || index === undefined || index < 0) return { activeIndex: null };
 
-          const node1 = getValueFromPath(store.nodes, store.anchors[store.activeIndex]?.path);
-          node1?.link?.classList?.remove(classes.active);
-
-          const node2 = getValueFromPath(store.nodes, store.anchors[index]?.path);
-          node2?.link?.classList?.add(classes.active);
-
+          store.anchors[store.activeIndex]?.link?.classList?.remove(classes.active);
+          store.anchors[index]?.link?.classList?.add(classes.active);
           return { activeIndex: index, activePath: store.anchors[index].path };
         });
       });
@@ -148,10 +118,10 @@ export const WrappedMain = ({ children }: MainProps) => {
 
   return (
     <main className={classes.main}>
-      <div id="main-content" className={classes.content}>
+      <div id="content" className={classes.content}>
         {children}
       </div>
-      <nav id="table-of-content" className={classes.toc}>
+      <nav id="toc" className={classes.toc}>
         <Section />
       </nav>
     </main>

@@ -1,4 +1,4 @@
-import { NodeDef } from './Provider';
+import { NodeDef } from './ContentWithTOC';
 
 export const getValueFromPath = (_nodes: NodeDef[] = null, _path: number[] = []): NodeDef => {
   if (!_nodes || !_path) return undefined;

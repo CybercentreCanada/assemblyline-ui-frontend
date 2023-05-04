@@ -1,2 +1,2 @@
 export { Anchor } from './Anchor';
-export { TableOfContent } from './Provider';
+export { ContentWithTOC } from './ContentWithTOC';

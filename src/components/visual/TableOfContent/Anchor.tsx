@@ -3,9 +3,9 @@ import { Button } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
-import React, { MouseEventHandler, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { MouseEventHandler, useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AnchorDef, useStore } from './Provider';
+import { AnchorDef, useStore } from './ContentWithTOC';
 
 const useStyles = makeStyles(theme => ({
   anchor: {
@@ -36,7 +36,7 @@ type AnchorProps = {
   children?: React.ReactNode;
   className?: string;
   component?: React.ElementType;
-  label?: string;
+  i18nKey: string;
   level?: number;
 };
 
@@ -44,18 +44,16 @@ export const WrappedAnchor = ({
   children,
   className,
   component: Element = 'div',
-  label = null,
+  i18nKey,
   level = 0,
   ...props
 }: AnchorProps) => {
   const classes = useStyles();
   const { copy } = useClipboard();
 
-  const [, setStore] = useStore(store => null);
+  const setStore = useStore();
   const [hash, setHash] = useState<string>(null);
   const ref = useRef<HTMLSpanElement>();
-
-  const appBarHeight = useMemo(() => Math.floor(document.getElementById('appbar').getBoundingClientRect().height), []);
 
   const nextPath = useCallback((path: number[] = [0], depth: number = 0): number[] => {
     let next = [];
@@ -82,20 +80,28 @@ export const WrappedAnchor = ({
   );
 
   const handleClick: MouseEventHandler<HTMLAnchorElement> = useCallback(() => {
+    const appBarHeight = Math.floor(document.getElementById('appbar').getBoundingClientRect().height);
     document.getElementById('app-scrollct').scrollTo({ top: ref.current.offsetTop - appBarHeight, behavior: 'smooth' });
     const { origin, pathname, search } = window.location;
     copy(`${origin}${pathname}${search}#${hash}`);
-  }, [appBarHeight, copy, hash]);
+  }, [copy, hash]);
 
   useEffect(() => {
+    let newHash: string = null;
+
     setStore(store => {
       const path: number[] = getNextPath(store.anchors, level);
-      const newLabel: string = label || ref?.current?.innerText;
-      const newHash: string = `${path.map(p => p + 1).join('.')}-${newLabel.replace(/\s/g, '-')}`;
+      newHash = `${path.map(p => p + 1).join('.')}-${i18nKey.replace(/\s/g, '-')}`;
       setHash(newHash);
-      return { anchors: [...store.anchors, { hash: newHash, level, path, element: ref.current, label: newLabel }] };
+      return {
+        anchors: [...store.anchors, { hash: newHash, level, path, element: ref.current, i18nKey }]
+      };
     });
-  }, [getNextPath, label, level, setStore]);
+
+    return () => {
+      setStore(store => ({ anchors: store.anchors.filter(anchor => anchor.hash === newHash) }));
+    };
+  }, [getNextPath, i18nKey, level, setStore]);
 
   return (
     <Element {...props} id={hash} ref={ref} className={clsx(className, classes.anchor)}>

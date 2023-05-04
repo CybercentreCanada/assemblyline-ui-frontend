@@ -3,64 +3,12 @@ import { Collapse, IconButton, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import React, { MouseEventHandler, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { useStore } from './Provider';
-import { arraySubset, getValueFromPath, setValueFromPath } from './utils';
+import { useSignal, useStore } from './ContentWithTOC';
+import { arrayEquals, arraySubset, getValueFromPath, setValueFromPath } from './utils';
 
 const useStyles = makeStyles(theme => ({
-  main: {
-    display: 'grid',
-    width: '100%',
-    marginTop: '-64px',
-    [theme.breakpoints.up('sm')]: {
-      gridTemplateColumns: '1fr 242px'
-    }
-  },
-  content: {
-    paddingTop: '64px',
-    paddingLeft: theme.spacing(4),
-    paddingRight: theme.spacing(4)
-  },
-  toc: {
-    display: 'none',
-    height: '100vh',
-    overflowY: 'auto',
-    paddingBottom: '32px',
-    paddingLeft: '2px',
-    paddingRight: '32px',
-    paddingTop: '100px',
-    position: 'sticky',
-    top: 0,
-    [theme.breakpoints.up('sm')]: {
-      display: 'block'
-    },
-    scrollbarWidth: 'none',
-    '&::-webkit-scrollbar': {
-      display: 'none'
-    }
-  },
-  typography: {
-    display: 'flex',
-    gap: '10px',
-    alignItems: 'center',
-    scrollSnapMarginTop: theme.typography.h1.fontSize,
-    scrollMarginTop: theme.typography.h1.fontSize,
-    '&:hover>a': {
-      display: 'inline-flex',
-      opacity: 1
-    }
-  },
-  anchor: {
-    transition: 'display 50ms, opacity 50ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
-    display: 'hidden',
-    opacity: 0,
-    minWidth: 0,
-    padding: theme.spacing(0.25)
-  },
-  icon: {
-    width: theme.spacing(2.5),
-    height: theme.spacing(2.5)
-  },
   ul: {
     listStyle: 'none',
     padding: 0,
@@ -147,24 +95,32 @@ type NodeProps = {
 };
 
 export const WrappedNode: React.FC<NodeProps> = ({ path = [], depth = 0 }) => {
+  const translation = useSignal(store => store.translation);
+
+  const { t } = useTranslation(translation);
   const classes = useStyles();
   const [open, setOpen] = useState<boolean>(false);
   const ref = useRef<HTMLLIElement>();
-  const [node, setStore] = useStore(store => getValueFromPath(store.nodes, path));
-  const [expandAll] = useStore(store => store.expandAll);
-  const [isActive] = useStore(store => arraySubset(path, store.activePath));
-  const appBarHeight = useMemo(() => Math.floor(document.getElementById('appbar').getBoundingClientRect().height), []);
-  const isExpanded = useMemo<boolean>(() => expandAll || isActive || open, [expandAll, isActive, open]);
+
+  const node = useSignal(store => getValueFromPath(store.nodes, path));
+  const anchor = useSignal(store => store.anchors.find(a => a.hash === node.anchorHash));
+  const expandAll = useSignal(store => store.expandAll);
+  const isActive = useSignal(store => arrayEquals(path, store.anchors[store.activeIndex]?.path));
+  const isSubset = useSignal(store => arraySubset(path, store.anchors[store.activeIndex]?.path));
+  const setStore = useStore();
+
+  const isExpanded = useMemo<boolean>(() => expandAll || isSubset || open, [expandAll, isSubset, open]);
   const hasSubNodes = useMemo<boolean>(
     () => 'subNodes' in node && Array.isArray(node.subNodes) && node.subNodes.length > 0,
     [node]
   );
 
   const handleClick: MouseEventHandler<HTMLAnchorElement> = useCallback(() => {
+    const appBarHeight = Math.floor(document.getElementById('appbar').getBoundingClientRect().height);
     document
       .getElementById('app-scrollct')
-      .scrollTo({ top: node.element.offsetTop - appBarHeight, behavior: 'smooth' });
-  }, [appBarHeight, node.element]);
+      .scrollTo({ top: anchor.element.offsetTop - appBarHeight, behavior: 'smooth' });
+  }, [anchor.element]);
 
   const handleCollapseClick: MouseEventHandler<HTMLButtonElement> = useCallback(event => {
     setOpen(o => !o);
@@ -176,16 +132,14 @@ export const WrappedNode: React.FC<NodeProps> = ({ path = [], depth = 0 }) => {
     }));
   }, [path, setStore]);
 
-  // console.log(node);
-
   return (
     <>
-      <Typography ref={ref} component="li" className={classes.li}>
+      <Typography ref={ref} component="li" className={clsx(classes.li, isActive && classes.active)}>
         <Link
           className={classes.link}
-          children={node.label}
-          data-no-markdown-link={node.hash}
-          to={`${window.location.search}#${node.hash}`}
+          children={t(anchor.i18nKey)}
+          data-no-markdown-link={anchor.hash}
+          to={`${window.location.search}#${anchor.hash}`}
           tabIndex={-1}
           onClick={handleClick}
           style={{ paddingLeft: `calc(${depth + 1}*10px)` }}
@@ -205,7 +159,7 @@ export const WrappedNode: React.FC<NodeProps> = ({ path = [], depth = 0 }) => {
       {hasSubNodes && (
         <Collapse in={isExpanded} timeout="auto" unmountOnExit component="ul" className={classes.ul}>
           {node.subNodes.map((_, i) => (
-            <Node key={`${node.subNodes[i].hash}`} path={[...path, i]} depth={depth + 1} />
+            <Node key={`${node.subNodes[i].anchorHash}`} path={[...path, i]} depth={depth + 1} />
           ))}
         </Collapse>
       )}

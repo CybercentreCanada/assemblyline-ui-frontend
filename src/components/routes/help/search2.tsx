@@ -3,59 +3,58 @@ import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 import withStyles from '@mui/styles/withStyles';
 import clsx from 'clsx';
-import { ContentWithTOCItemDef } from 'commons/addons/toc/Toc';
 import useAppBar from 'commons/components/app/hooks/useAppBar';
 import useAppLayout from 'commons/components/app/hooks/useAppLayout';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import CustomChip from 'components/visual/CustomChip';
-import { Anchor, TableOfContent } from 'components/visual/TableOfContent';
+import { Anchor, ContentWithTOC } from 'components/visual/TableOfContent';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const Toc: ContentWithTOCItemDef[] = [
-  { id: 'overview' },
-  { id: 'basic' },
-  {
-    id: 'fields',
-    subItems: [
-      { id: 'fields.legend' },
-      { id: 'fields.idx_alert' },
-      { id: 'fields.idx_emptyresult', is_admin: true },
-      { id: 'fields.idx_error', is_admin: true },
-      { id: 'fields.idx_file' },
-      { id: 'fields.idx_heuristic' },
-      { id: 'fields.idx_result' },
-      { id: 'fields.idx_safelist' },
-      { id: 'fields.idx_signature' },
-      { id: 'fields.idx_submission' },
-      { id: 'fields.idx_user', is_admin: true },
-      { id: 'fields.idx_workflow' }
-    ]
-  },
-  { id: 'wildcard' },
-  {
-    id: 'regex',
-    subItems: [
-      { id: 'regex.anchoring' },
-      { id: 'regex.chars' },
-      { id: 'regex.any' },
-      { id: 'regex.oneplus' },
-      { id: 'regex.zeroplus' },
-      { id: 'regex.zeroone' },
-      { id: 'regex.minmax' },
-      { id: 'regex.grouping' },
-      { id: 'regex.alternation' },
-      { id: 'regex.class' }
-    ]
-  },
-  { id: 'fuzziness' },
-  { id: 'proximity' },
-  { id: 'ranges', subItems: [{ id: 'ranges.datemath' }] },
-  { id: 'operator' },
-  { id: 'grouping' },
-  { id: 'reserved' }
-];
+// const Toc: ContentWithTOCItemDef[] = [
+//   { id: 'overview' },
+//   { id: 'basic' },
+//   {
+//     id: 'fields',
+//     subItems: [
+//       { id: 'fields.legend' },
+//       { id: 'fields.idx_alert' },
+//       { id: 'fields.idx_emptyresult', is_admin: true },
+//       { id: 'fields.idx_error', is_admin: true },
+//       { id: 'fields.idx_file' },
+//       { id: 'fields.idx_heuristic' },
+//       { id: 'fields.idx_result' },
+//       { id: 'fields.idx_safelist' },
+//       { id: 'fields.idx_signature' },
+//       { id: 'fields.idx_submission' },
+//       { id: 'fields.idx_user', is_admin: true },
+//       { id: 'fields.idx_workflow' }
+//     ]
+//   },
+//   { id: 'wildcard' },
+//   {
+//     id: 'regex',
+//     subItems: [
+//       { id: 'regex.anchoring' },
+//       { id: 'regex.chars' },
+//       { id: 'regex.any' },
+//       { id: 'regex.oneplus' },
+//       { id: 'regex.zeroplus' },
+//       { id: 'regex.zeroone' },
+//       { id: 'regex.minmax' },
+//       { id: 'regex.grouping' },
+//       { id: 'regex.alternation' },
+//       { id: 'regex.class' }
+//     ]
+//   },
+//   { id: 'fuzziness' },
+//   { id: 'proximity' },
+//   { id: 'ranges', subItems: [{ id: 'ranges.datemath' }] },
+//   { id: 'operator' },
+//   { id: 'grouping' },
+//   { id: 'reserved' }
+// ];
 
 const StyledTableCell = withStyles((theme: Theme) =>
   createStyles({
@@ -125,20 +124,20 @@ export default function Search() {
   const { indexes } = useALContext();
 
   return (
-    <TableOfContent>
-      <PageCenter margin={4} width="100%" textAlign="left">
+    <PageCenter margin={4} width="100%" textAlign="left">
+      <ContentWithTOC translation={'helpSearch'}>
         <Typography variant="h4">{t('title')}</Typography>
         <Typography variant="subtitle2">{t('subtitle')}</Typography>
 
         <Paragraph id="overview">
-          <Typography component={Anchor} level={0} variant="h5">
+          <Typography component={Anchor} level={0} variant="h5" i18nKey="overview">
             {t('overview')}
           </Typography>
           {t('overview.text')}
         </Paragraph>
 
         <Paragraph id="basic">
-          <Typography component={Anchor} level={0} variant="h5">
+          <Typography component={Anchor} level={0} variant="h5" i18nKey="basic">
             {t('basic')}
           </Typography>
           {t('basic.text')}
@@ -154,7 +153,7 @@ export default function Search() {
         </Paragraph>
 
         <Paragraph id="fields">
-          <Typography component={Anchor} level={0} variant="h5">
+          <Typography component={Anchor} level={0} variant="h5" i18nKey="fields">
             {t('fields')}
           </Typography>
           {t('fields.text')}
@@ -203,7 +202,7 @@ export default function Search() {
         </Paragraph>
 
         <Paragraph id="fields.legend">
-          <Typography component={Anchor} level={1} variant="h6">
+          <Typography component={Anchor} level={1} variant="h6" i18nKey="fields.legend">
             {t('fields.legend')}
           </Typography>
           {t('fields.legend.text')}
@@ -233,7 +232,7 @@ export default function Search() {
 
         {Object.keys(indexes).map(idx => (
           <Paragraph id={`fields.idx_${idx}`} key={idx}>
-            <Typography component={Anchor} level={1} variant="h6" gutterBottom>
+            <Typography component={Anchor} level={1} variant="h6" gutterBottom i18nKey={`fields.idx_${idx}`}>
               {t(`fields.idx_${idx}`)}
             </Typography>
             <Table size="small">
@@ -291,7 +290,7 @@ export default function Search() {
         ))}
 
         <Paragraph id="wildcard">
-          <Typography component={Anchor} level={0} variant="h5">
+          <Typography component={Anchor} level={0} variant="h5" i18nKey="wildcard">
             {t('wildcard')}
           </Typography>
           <div className={classes.padded}>{t('wildcard.text')}</div>
@@ -308,7 +307,7 @@ export default function Search() {
         </Paragraph>
 
         <Paragraph id="regex">
-          <Typography component={Anchor} level={0} variant="h5">
+          <Typography component={Anchor} level={0} variant="h5" i18nKey="regex">
             {t('regex')}
           </Typography>
           <div className={classes.padded}>{t('regex.text')}</div>
@@ -328,7 +327,7 @@ export default function Search() {
         </Paragraph>
 
         <Paragraph id="regex.anchoring">
-          <Typography component={Anchor} level={1} variant="h6">
+          <Typography component={Anchor} level={1} variant="h6" i18nKey="regex.anchoring">
             {t('regex.anchoring')}
           </Typography>
           <div className={classes.padded}>{t('regex.anchoring.text')}</div>
@@ -339,7 +338,7 @@ export default function Search() {
         </Paragraph>
 
         <Paragraph id="regex.chars">
-          <Typography component={Anchor} level={1} variant="h6">
+          <Typography component={Anchor} level={1} variant="h6" i18nKey="regex.chars">
             {t('regex.chars')}
           </Typography>
           <div className={classes.padded}>{t('regex.chars.text')}</div>
@@ -354,7 +353,7 @@ export default function Search() {
         </Paragraph>
 
         <Paragraph id="regex.any">
-          <Typography component={Anchor} level={1} variant="h6">
+          <Typography component={Anchor} level={1} variant="h6" i18nKey="regex.any">
             {t('regex.any')}
           </Typography>
           <div className={classes.padded}>{t('regex.any.text')}</div>
@@ -364,7 +363,7 @@ export default function Search() {
         </Paragraph>
 
         <Paragraph id="regex.oneplus">
-          <Typography component={Anchor} level={1} variant="h6">
+          <Typography component={Anchor} level={1} variant="h6" i18nKey="regex.oneplus">
             {t('regex.oneplus')}
           </Typography>
           <div className={classes.padded}>{t('regex.oneplus.text')}</div>
@@ -374,7 +373,7 @@ export default function Search() {
         </Paragraph>
 
         <Paragraph id="regex.zeroplus">
-          <Typography component={Anchor} level={1} variant="h6">
+          <Typography component={Anchor} level={1} variant="h6" i18nKey="regex.zeroplus">
             {t('regex.zeroplus')}
           </Typography>
           <div className={classes.padded}>{t('regex.zeroplus.text')}</div>
@@ -384,7 +383,7 @@ export default function Search() {
         </Paragraph>
 
         <Paragraph id="regex.zeroone">
-          <Typography component={Anchor} level={1} variant="h6">
+          <Typography component={Anchor} level={1} variant="h6" i18nKey="regex.zeroone">
             {t('regex.zeroone')}
           </Typography>
           <div className={classes.padded}>{t('regex.zeroone.text')}</div>
@@ -394,7 +393,7 @@ export default function Search() {
         </Paragraph>
 
         <Paragraph id="regex.minmax">
-          <Typography component={Anchor} level={1} variant="h6">
+          <Typography component={Anchor} level={1} variant="h6" i18nKey="regex.minmax">
             {t('regex.minmax')}
           </Typography>
           <div className={classes.padded}>{t('regex.minmax.text')}</div>
@@ -408,7 +407,7 @@ export default function Search() {
         </Paragraph>
 
         <Paragraph id="regex.grouping">
-          <Typography component={Anchor} level={1} variant="h6">
+          <Typography component={Anchor} level={1} variant="h6" i18nKey="regex.grouping">
             {t('regex.grouping')}
           </Typography>
           <div className={classes.padded}>{t('regex.grouping.text')}</div>
@@ -418,7 +417,7 @@ export default function Search() {
         </Paragraph>
 
         <Paragraph id="regex.alternation">
-          <Typography component={Anchor} level={1} variant="h6">
+          <Typography component={Anchor} level={1} variant="h6" i18nKey="regex.alternation">
             {t('regex.alternation')}
           </Typography>
           <div className={classes.padded}>{t('regex.alternation.text')}</div>
@@ -428,7 +427,7 @@ export default function Search() {
         </Paragraph>
 
         <Paragraph id="regex.class">
-          <Typography component={Anchor} level={1} variant="h6">
+          <Typography component={Anchor} level={1} variant="h6" i18nKey="regex.class">
             {t('regex.class')}
           </Typography>
           <div className={classes.padded}>{t('regex.class.text')}</div>
@@ -443,7 +442,7 @@ export default function Search() {
         </Paragraph>
 
         <Paragraph id="fuzziness">
-          <Typography component={Anchor} level={0} variant="h5">
+          <Typography component={Anchor} level={0} variant="h5" i18nKey="fuzziness">
             {t('fuzziness')}
           </Typography>
           <div className={classes.padded}>{t('fuzziness.text')}</div>
@@ -458,7 +457,7 @@ export default function Search() {
         </Paragraph>
 
         <Paragraph id="proximity">
-          <Typography component={Anchor} level={0} variant="h5">
+          <Typography component={Anchor} level={0} variant="h5" i18nKey="proximity">
             {t('proximity')}
           </Typography>
           <div className={classes.padded}>{t('proximity.text')}</div>
@@ -469,7 +468,7 @@ export default function Search() {
         </Paragraph>
 
         <Paragraph id="ranges">
-          <Typography component={Anchor} level={0} variant="h5">
+          <Typography component={Anchor} level={0} variant="h5" i18nKey="ranges">
             {t('ranges')}
           </Typography>
           {t('ranges.text')}
@@ -540,7 +539,7 @@ export default function Search() {
         </Paragraph>
 
         <Paragraph id="ranges.datemath">
-          <Typography component={Anchor} level={1} variant="h6">
+          <Typography component={Anchor} level={1} variant="h6" i18nKey="ranges.datemath">
             {t('ranges.datemath')}
           </Typography>
           <div className={classes.padded}>{t('ranges.datemath.text')}</div>
@@ -560,7 +559,7 @@ export default function Search() {
         </Paragraph>
 
         <Paragraph id="operator">
-          <Typography component={Anchor} level={0} variant="h5">
+          <Typography component={Anchor} level={0} variant="h5" i18nKey="operator">
             {t('operator')}
           </Typography>
           <div className={classes.padded}>{t('operator.text')}</div>
@@ -582,7 +581,7 @@ export default function Search() {
         </Paragraph>
 
         <Paragraph id="grouping">
-          <Typography component={Anchor} level={0} variant="h5">
+          <Typography component={Anchor} level={0} variant="h5" i18nKey="grouping">
             {t('grouping')}
           </Typography>
           <div className={classes.padded}>{t('grouping.text')}</div>
@@ -596,7 +595,7 @@ export default function Search() {
         </Paragraph>
 
         <Paragraph id="reserved">
-          <Typography component={Anchor} level={0} variant="h5">
+          <Typography component={Anchor} level={0} variant="h5" i18nKey="reserved">
             {t('reserved')}
           </Typography>
           <div className={classes.padded}>{t('reserved.text')}</div>
@@ -616,7 +615,7 @@ export default function Search() {
             {`: ${t('reserved.text5')}`}
           </div>
         </Paragraph>
-      </PageCenter>
-    </TableOfContent>
+      </ContentWithTOC>
+    </PageCenter>
   );
 }

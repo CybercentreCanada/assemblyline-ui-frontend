@@ -3,63 +3,11 @@ import { IconButton, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import React, { MouseEventHandler, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useSignal, useStore } from './ContentWithTOC';
 import { Node } from './Node';
-import { useStore } from './Provider';
 
 const useStyles = makeStyles(theme => ({
-  main: {
-    display: 'grid',
-    width: '100%',
-    marginTop: '-64px',
-    [theme.breakpoints.up('sm')]: {
-      gridTemplateColumns: '1fr 242px'
-    }
-  },
-  content: {
-    paddingTop: '64px',
-    paddingLeft: theme.spacing(4),
-    paddingRight: theme.spacing(4)
-  },
-  toc: {
-    display: 'none',
-    height: '100vh',
-    overflowY: 'auto',
-    paddingBottom: '32px',
-    paddingLeft: '2px',
-    paddingRight: '32px',
-    paddingTop: '100px',
-    position: 'sticky',
-    top: 0,
-    [theme.breakpoints.up('sm')]: {
-      display: 'block'
-    },
-    scrollbarWidth: 'none',
-    '&::-webkit-scrollbar': {
-      display: 'none'
-    }
-  },
-  typography: {
-    display: 'flex',
-    gap: '10px',
-    alignItems: 'center',
-    scrollSnapMarginTop: theme.typography.h1.fontSize,
-    scrollMarginTop: theme.typography.h1.fontSize,
-    '&:hover>a': {
-      display: 'inline-flex',
-      opacity: 1
-    }
-  },
-  anchor: {
-    transition: 'display 50ms, opacity 50ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
-    display: 'hidden',
-    opacity: 0,
-    minWidth: 0,
-    padding: theme.spacing(0.25)
-  },
-  icon: {
-    width: theme.spacing(2.5),
-    height: theme.spacing(2.5)
-  },
   ul: {
     listStyle: 'none',
     padding: 0,
@@ -142,14 +90,20 @@ const useStyles = makeStyles(theme => ({
     flex: 1,
     textDecoration: 'none',
     padding: '0px 8px 0px 0px',
-    margin: '4px 0px 8px'
+    margin: '4px 0px 8px',
+    fontSize: '1.25rem',
+    marginLeft: '10px'
   }
 }));
 
 export const WrappedSection = () => {
+  const translation = useSignal(store => store.translation);
+  const { t } = useTranslation(translation);
   const classes = useStyles();
-  const [nodes, setStore] = useStore(store => store.nodes);
-  const [expandAll] = useStore(store => store.expandAll);
+  const nodes = useSignal(store => store.nodes);
+  const expandAll = useSignal(store => store.expandAll);
+  const titleI18nKey = useSignal(store => store.titleI18nKey);
+  const setStore = useStore();
 
   const handleClick: MouseEventHandler<HTMLButtonElement> = useCallback(() => {
     setStore(store => ({ expandAll: !store.expandAll }));
@@ -158,9 +112,7 @@ export const WrappedSection = () => {
   return (
     <>
       <Typography className={clsx(classes.li)} component="div" variant="body1">
-        <div className={classes.title}>
-          <span>{'Contents'}</span>
-        </div>
+        <div className={classes.title}>{t(titleI18nKey)}</div>
         <div className={clsx('expand', classes.expandContainer, expandAll && 'visible')}>
           <IconButton
             className={clsx(classes.expandIconButton, expandAll && classes.expanded)}
@@ -173,7 +125,7 @@ export const WrappedSection = () => {
       </Typography>
       <Typography component="ul" className={classes.ul} variant="body1">
         {nodes.map((_, i) => (
-          <Node key={`${nodes[i].hash}`} path={[i]} depth={0} />
+          <Node key={`${nodes[i].anchorHash}`} path={[i]} depth={0} />
         ))}
       </Typography>
     </>
