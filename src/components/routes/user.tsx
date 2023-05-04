@@ -542,7 +542,7 @@ function User({ username }: UserProps) {
 
         <Grid item sm={12} md={9} style={{ width: '100%' }}>
           <Classification
-            type={editable ? 'picker' : 'pill'}
+            type={currentUser.is_admin ? 'picker' : 'pill'}
             size="medium"
             format="long"
             c12n={user && user.classification}
@@ -577,7 +577,7 @@ function User({ username }: UserProps) {
                     {user ? <div>{user.name}</div> : <Skeleton />}
                   </TableCell>
                 </ClickRow>
-                <ClickRow enabled={editable && currentUser.is_admin} chevron onClick={() => toggleDrawer('groups')}>
+                <ClickRow enabled={currentUser.is_admin} chevron onClick={() => toggleDrawer('groups')}>
                   {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('groups')}</TableCell>}
                   <TableCell width="100%">
                     {!isXS ? null : <Typography variant="caption">{t('groups')}</Typography>}
