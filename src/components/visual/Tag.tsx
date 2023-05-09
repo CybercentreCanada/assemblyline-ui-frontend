@@ -274,8 +274,8 @@ const WrappedTag: React.FC<TagProps> = ({
             {t('safelist')}
           </MenuItem>
         )}
-        {!!currentUser.roles.includes('external_query') && currentUserConfig.ui.external_sources?.length &&
-          currentUserConfig.ui.external_source_tags?.hasOwnProperty(type) && (
+        {!!currentUser.roles.includes('external_query') && !!currentUserConfig.ui.external_sources?.length &&
+          !!currentUserConfig.ui.external_source_tags?.hasOwnProperty(type) && (
             <div>
               <Divider />
               <ListSubheader disableSticky classes={{ root: classes.listSubHeaderRoot }}>
