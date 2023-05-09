@@ -274,7 +274,7 @@ const WrappedTag: React.FC<TagProps> = ({
             {t('safelist')}
           </MenuItem>
         )}
-        {!!currentUser.roles.includes('external_lookup') && currentUserConfig.ui.external_sources?.length &&
+        {!!currentUser.roles.includes('external_query') && currentUserConfig.ui.external_sources?.length &&
           currentUserConfig.ui.external_source_tags?.hasOwnProperty(type) && (
             <div>
               <Divider />
