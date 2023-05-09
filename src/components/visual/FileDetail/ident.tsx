@@ -163,7 +163,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                 <Grid item xs={4} sm={3} lg={2}>
                   <span style={{ fontWeight: 500 }}>MD5</span>
 
-                  {currentUser.roles.includes('submission_view') && currentUserConfig.ui.external_sources?.length &&
+                  {!!currentUser.roles.includes('external_query') && currentUserConfig.ui.external_sources?.length &&
                     currentUserConfig.ui.external_source_tags?.hasOwnProperty('md5') && (
                       <Tooltip title={t('related_external')} placement="top">
                         <IconButton size="small" onClick={e => handleShowExternalSearch(e, 'md5', fileinfo.md5, fileinfo.classification)} classes={{ root: classes.externalLookupButtonRoot }}>
@@ -178,7 +178,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
 
                 <Grid item xs={4} sm={3} lg={2}>
                   <span style={{ fontWeight: 500 }}>SHA1</span>
-                  {currentUser.roles.includes('submission_view') && currentUserConfig.ui.external_sources?.length &&
+                  {!!currentUser.roles.includes('external_query') && currentUserConfig.ui.external_sources?.length &&
                     currentUserConfig.ui.external_source_tags?.hasOwnProperty('sha1') && (
                       <Tooltip title={t('related_external')} placement="top">
                         <IconButton size="small" onClick={e => handleShowExternalSearch(e, 'sha1', fileinfo.sha1, fileinfo.classification)} classes={{ root: classes.externalLookupButtonRoot }}>
@@ -193,7 +193,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
 
                 <Grid item xs={4} sm={3} lg={2}>
                   <span style={{ fontWeight: 500 }}>SHA256</span>
-                  {currentUser.roles.includes('submission_view') && currentUserConfig.ui.external_sources?.length &&
+                  {!!currentUser.roles.includes('external_query') && currentUserConfig.ui.external_sources?.length &&
                     currentUserConfig.ui.external_source_tags?.hasOwnProperty('sha256') && (
                       <Tooltip title={t('related_external')} placement="top">
                         <IconButton size="small" onClick={e => handleShowExternalSearch(e, 'sha256', fileinfo.sha256, fileinfo.classification)} classes={{ root: classes.externalLookupButtonRoot }}>
@@ -208,7 +208,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
 
                 <Grid item xs={4} sm={3} lg={2}>
                   <span style={{ fontWeight: 500 }}>SSDEEP</span>
-                  {currentUser.roles.includes('submission_view') && currentUserConfig.ui.external_sources?.length &&
+                  {!!currentUser.roles.includes('external_query') && currentUserConfig.ui.external_sources?.length &&
                     currentUserConfig.ui.external_source_tags?.hasOwnProperty('ssdeep') && (
                       <Tooltip title={t('related_external')} placement="top">
                         <IconButton size="small" onClick={e => handleShowExternalSearch(e, 'ssdeep', fileinfo.ssdeep, fileinfo.classification)} classes={{ root: classes.externalLookupButtonRoot }}>
