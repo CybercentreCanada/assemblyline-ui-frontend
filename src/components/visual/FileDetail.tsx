@@ -54,6 +54,13 @@ type FileInfo = {
   entropy: number;
   expiry_ts: string | null;
   hex: string;
+  labels: string[];
+  label_categories?: {
+    info: string[];
+    safe: string[];
+    suspicious: string[];
+    malicious: string[];
+  };
   magic: string;
   md5: string;
   mime: string;
@@ -105,6 +112,7 @@ type FileDetailProps = {
   liveResultKeys?: string[];
   liveErrors?: Error[];
   force?: boolean;
+  isArchive?: boolean;
 };
 
 const WrappedFileDetail: React.FC<FileDetailProps> = ({
@@ -112,7 +120,8 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
   sid = null,
   liveResultKeys = null,
   liveErrors = null,
-  force = false
+  force = false,
+  isArchive = false
 }) => {
   const { t } = useTranslation(['fileDetail']);
   const [file, setFile] = useState<File | null>(null);
@@ -385,7 +394,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
         </Grid>
       </div>
       <div style={{ paddingBottom: sp2 }}>
-        <IdentificationSection fileinfo={file ? file.file_info : null} />
+        <IdentificationSection fileinfo={file ? file.file_info : null} isArchive />
         <FrequencySection fileinfo={file ? file.file_info : null} />
         <MetadataSection metadata={file ? file.metadata : null} />
         <ChildrenSection childrens={file ? file.childrens : null} />

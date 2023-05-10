@@ -1,14 +1,31 @@
+import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
 import LinkOutlinedIcon from '@mui/icons-material/LinkOutlined';
-import { Collapse, Divider, Grid, IconButton, Menu, MenuItem, Skeleton, Typography, useTheme, Tooltip, ListSubheader } from '@mui/material';
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
+import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
+import {
+  Autocomplete,
+  Chip,
+  Collapse,
+  Divider,
+  Grid,
+  IconButton,
+  Menu, 
+  MenuItem, 
+  Skeleton,
+  TextField,
+  Typography,
+  useTheme, 
+  Tooltip, 
+  ListSubheader
+} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { bytesToSize } from 'helpers/utils';
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(theme => ({
@@ -39,32 +56,86 @@ const TRAVEL_EXPLORE_ICON = <TravelExploreOutlinedIcon style={{
 
 type IdentificationSectionProps = {
   fileinfo: any;
+  isArchive?: boolean;
 };
 
+const LABELS_COLOR_MAP = {
+  info: 'info',
+  safe: 'success',
+  suspicious: 'warning',
+  malicious: 'error'
+};
+
+type LabelCategories = {
+  info?: string[];
+  safe?: string[];
+  suspicious?: string[];
+  malicious?: string[];
+};
+        
 type LookupSourceDetails = {
   link: string;
   count: number;
   classification: string;
 };
-
-
-const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fileinfo }) => {
+        
+const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fileinfo, isArchive = false }) => {
+  const { user: currentUser, configuration: currentUserConfig } = useALContext();
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const openExternaLookup = Boolean(anchorEl);
   const { t } = useTranslation(['fileDetail']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
   const classes = useStyles();
   const sp2 = theme.spacing(2);
-  const { user: currentUser, configuration: currentUserConfig } = useALContext();
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const openExternaLookup = Boolean(anchorEl);
   const { apiCall } = useMyAPI();
-  const { showSuccessMessage, showWarningMessage } = useMySnackbar();
-
+  const { showSuccessMessage, showWarningMessage, showErrorMessage } = useMySnackbar();
+  
   const externalResults = useRef(null);
   const linkIcon = useRef(null);
   const lookupType = useRef(null);
   const lookupValue = useRef(null);
   const lookupClassification = useRef(null);
+
+  const [labels, setLabels] = useState<LabelCategories>(null);
+  const [isEditingLabels, setIsEditingLabels] = useState<boolean>(false);
+
+  const sortingLabels = useCallback(
+    (data: LabelCategories): LabelCategories =>
+      Object.fromEntries(
+        Object.entries(data).map(([category, l]: [string, string[]]) => [
+          category,
+          l.sort((a, b) => a.localeCompare(b))
+        ])
+      ),
+    []
+  );
+
+  useEffect(() => {
+    if (!fileinfo) return;
+    setLabels(sortingLabels(fileinfo.label_categories));
+  }, [fileinfo, sortingLabels]);
+
+  const handleSaveLabels = useCallback(
+    data => {
+      if (!fileinfo) return;
+      apiCall({
+        method: 'POST',
+        url: `/api/v4/file/label/${fileinfo.sha256}/`,
+        body: { ...data },
+        onSuccess: api_data => {
+          showSuccessMessage(t('labels.success'));
+          setLabels(sortingLabels(api_data.api_response?.response?.label_categories));
+          setIsEditingLabels(v => !v);
+        },
+        onFailure(api_data) {
+          showErrorMessage(api_data.api_response);
+        }
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [fileinfo?.sha256, showErrorMessage, showSuccessMessage, sortingLabels, t]
+  );
 
   const searchTagExternal = useCallback(source => {
     let url = `/api/v4/federated_lookup/search/${lookupType.current}/${encodeURIComponent(lookupValue.current)}/`;
@@ -123,7 +194,6 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
     lookupValue.current = value;
     lookupClassification.current = classification;
   }, []);
-
 
   return (
     <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
@@ -262,11 +332,85 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                 <Grid item xs={8} sm={9} lg={10}>
                   {fileinfo ? fileinfo.entropy : <Skeleton />}
                 </Grid>
+                <Grid item xs={4} sm={3} lg={2}>
+                  <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5) }}>{t('labels')}</span>
+                  {!isEditingLabels && (
+                    <IconButton
+                      children={<CreateOutlinedIcon fontSize="small" />}
+                      size="small"
+                      onClick={() => setIsEditingLabels(v => !v)}
+                    />
+                  )}
+                  {isEditingLabels && (
+                    <IconButton
+                      children={<SaveOutlinedIcon fontSize="small" />}
+                      size="small"
+                      onClick={() => handleSaveLabels(labels)}
+                    />
+                  )}
+                </Grid>
+                <Grid item xs={8} sm={9} lg={10}>
+                  {fileinfo ? (
+                    <>
+                      <Collapse in={!isEditingLabels} timeout="auto">
+                        <div style={{ display: 'flex', gap: theme.spacing(1), flexWrap: 'wrap' }}>
+                          {labels &&
+                            ['malicious', 'suspicious', 'info', 'safe'].map(
+                              category =>
+                                category in labels &&
+                                labels[category].map(label => (
+                                  <Chip
+                                    key={`${category}-${label}`}
+                                    label={label}
+                                    color={category in LABELS_COLOR_MAP ? LABELS_COLOR_MAP[category] : 'primary'}
+                                    variant="outlined"
+                                    size="small"
+                                  />
+                                ))
+                            )}
+                        </div>
+                      </Collapse>
+                      <Collapse in={isEditingLabels} timeout="auto">
+                        <div style={{ display: 'flex', gap: theme.spacing(1), flexWrap: 'wrap' }}>
+                          {labels &&
+                            ['malicious', 'suspicious', 'info', 'safe'].map(
+                              category =>
+                                category in labels && (
+                                  <Autocomplete
+                                    options={[]}
+                                    multiple
+                                    fullWidth
+                                    freeSolo
+                                    value={labels[category]}
+                                    onChange={(e, newValue) => setLabels(l => ({ ...l, [category]: newValue }))}
+                                    renderInput={p => <TextField {...p} variant="standard" />}
+                                    renderTags={(value: readonly string[], getTagProps) =>
+                                      value.map((option: string, index: number) => (
+                                        <Chip
+                                          component="div"
+                                          variant="outlined"
+                                          size="small"
+                                          color={category in LABELS_COLOR_MAP ? LABELS_COLOR_MAP[category] : 'primary'}
+                                          label={option}
+                                          {...getTagProps({ index })}
+                                        />
+                                      ))
+                                    }
+                                  />
+                                )
+                            )}
+                        </div>
+                      </Collapse>
+                    </>
+                  ) : (
+                    <Skeleton />
+                  )}
+                </Grid>
               </Grid>
             </div>
           ),
           // eslint-disable-next-line react-hooks/exhaustive-deps
-          [fileinfo]
+          [fileinfo, isEditingLabels, labels, sp2, t, theme]
         )}
       </Collapse>
     </div>
