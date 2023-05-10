@@ -28,6 +28,8 @@
   "process_registry": "Registry events",
   "process_signatures": "Signature hits",
   "related": "Related Submissions",
+  "related_external": "Find in external sources",
+  "related_external.all": "All sources",
   "resubmit": "Resubmit the current file",
   "resubmit.dynamic": "Resubmit for Dynamic analysis",
   "resubmit.modify": "Adjust parameters before submission",

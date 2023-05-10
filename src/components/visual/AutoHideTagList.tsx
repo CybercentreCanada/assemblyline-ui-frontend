@@ -12,6 +12,7 @@ type TagProps = {
   value: string;
   lvl: string;
   safelisted: boolean;
+  classification: string;
 };
 
 type AutoHideTagListProps = {
@@ -81,6 +82,7 @@ const WrappedAutoHideTagList: React.FC<AutoHideTagListProps> = ({ tag_type, item
           <Tag
             key={idx}
             value={tag.value}
+            classification={tag.classification}
             safelisted={tag.safelisted}
             type={tag_type}
             lvl={tag.lvl}

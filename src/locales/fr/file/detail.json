@@ -28,6 +28,8 @@
   "process_registry": "Événements du registre",
   "process_signatures": "Signatures déclenchées",
   "related": "Soumissions connexes",
+  "related_external": "Rechercher dans des sources externes",
+  "related_external.all": "Toutes sources",
   "resubmit": "Soumettre à nouveau le fichier en cours",
   "resubmit.dynamic": "Resoumettre pour analyse dynamique",
   "resubmit.modify": "Ajustez les paramètres avant la soumission",
