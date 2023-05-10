@@ -16,7 +16,7 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import useSafeResults from 'components/hooks/useSafeResults';
 import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
 import { safeFieldValueURI } from 'helpers/utils';
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -96,8 +96,8 @@ const WrappedTag: React.FC<TagProps> = ({
     [type, value]
   );
 
-  const externalResults = useRef(null);
-  const linkIcon = useRef(null);
+  const [linkIcon, setLinkIcon] = React.useState(null);
+  const [externalResults, setExternalResults] = React.useState(null);
   const searchTagExternal = useCallback(source => {
     let url = `/api/v4/federated_lookup/search/${type}/${encodeURIComponent(value)}/`;
 
@@ -122,8 +122,8 @@ const WrappedTag: React.FC<TagProps> = ({
       onSuccess: api_data => {
         if (Object.keys(api_data.api_response).length !== 0) {
           showSuccessMessage(t('related_external.found'));
-          linkIcon.current = LINK_ICON;
-          externalResults.current = (
+          setLinkIcon(LINK_ICON);
+          setExternalResults((
             <div>
               {Object.keys(api_data.api_response).map((sourceName: keyof LookupSourceDetails, i) => (
                 <p key={`success_${i}`}>
@@ -142,17 +142,19 @@ const WrappedTag: React.FC<TagProps> = ({
                 </p>
               ))}
             </div>
-          );
+          ));
         }
         else {
           showWarningMessage(t('related_external.notfound'));
+          setLinkIcon(null);
+          setExternalResults(null);
         }
       },
       onFailure: api_data => {
         if (Object.keys(api_data.api_error_message).length !== 0) {
           showErrorMessage(t('related_external.error'));
-          linkIcon.current = ERROR_ICON;
-          externalResults.current = (
+          setLinkIcon(ERROR_ICON);
+          setExternalResults((
             <div>
               <h3>Errors</h3>
               {api_data.api_error_message.split(new RegExp('\\r?\\n')).map((err, i) => (
@@ -161,7 +163,7 @@ const WrappedTag: React.FC<TagProps> = ({
                 </p>
               ))}
             </div>
-          );
+          ));
         }
       }
     });
@@ -335,8 +337,8 @@ const WrappedTag: React.FC<TagProps> = ({
         onClick={highlight_key ? handleClick : null}
         fullWidth={fullWidth}
         onContextMenu={handleMenuClick}
-        icon={linkIcon.current}
-        tooltip={externalResults.current}
+        icon={linkIcon}
+        tooltip={externalResults}
       />
     </>
   );
