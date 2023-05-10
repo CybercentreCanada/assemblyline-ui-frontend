@@ -2,6 +2,7 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
 import LinkOutlinedIcon from '@mui/icons-material/LinkOutlined';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import { Collapse, Divider, Grid, IconButton, Menu, MenuItem, Skeleton, Typography, useTheme, Tooltip, ListSubheader } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
@@ -31,8 +32,15 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const LINK_ICON = <LinkOutlinedIcon style={{ marginRight: '2px' }} />;
+const LINK_ICON = <LinkOutlinedIcon style={{
+  display: 'inline-flex',
+  height: '18px'
+}} />;
 const TRAVEL_EXPLORE_ICON = <TravelExploreOutlinedIcon style={{
+  display: 'inline-flex',
+  height: '18px'
+}} />;
+const ERROR_ICON = <ErrorOutlineOutlinedIcon style={{
   display: 'inline-flex',
   height: '18px'
 }} />;
@@ -58,20 +66,42 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const openExternaLookup = Boolean(anchorEl);
   const { apiCall } = useMyAPI();
-  const { showSuccessMessage, showWarningMessage } = useMySnackbar();
+  const { showSuccessMessage, showWarningMessage, showErrorMessage } = useMySnackbar();
 
-  const externalResults = useRef(null);
-  const linkIcon = useRef(null);
   const lookupType = useRef(null);
   const lookupValue = useRef(null);
   const lookupClassification = useRef(null);
 
-  const searchTagExternal = useCallback(source => {
-    let url = `/api/v4/federated_lookup/search/${lookupType.current}/${encodeURIComponent(lookupValue.current)}/`;
+  const [md5LinkIcon, setMd5LinkIcon] = React.useState(null);
+  const [md5ExternalResults, setMd5ExternalResults] = React.useState(null);
+  const [sha1LinkIcon, setSha1LinkIcon] = React.useState(null);
+  const [sha1ExternalResults, setSha1ExternalResults] = React.useState(null);
+  const [sha256LinkIcon, setSha256LinkIcon] = React.useState(null);
+  const [sha256ExternalResults, setSha256ExternalResults] = React.useState(null);
+  const [ssdeepLinkIcon, setSsdeepLinkIcon] = React.useState(null);
+  const [ssdeepExternalResults, setSsdeepExternalResults] = React.useState(null);
 
+  const searchTagExternal = useCallback(source => {
+    let setIcon = setMd5LinkIcon;
+    let setResults = setMd5ExternalResults;
+    switch (lookupType.current) {
+      case 'sha1':
+        setIcon = setSha1LinkIcon;
+        setResults = setSha1ExternalResults;
+        break;
+      case 'sha256':
+        setIcon = setSha256LinkIcon;
+        setResults = setSha256ExternalResults;
+        break;
+      case 'ssdeep':
+        setIcon = setSsdeepLinkIcon;
+        setResults = setSsdeepExternalResults;
+        break;
+    }
+    let url = `/api/v4/federated_lookup/search/${lookupType.current}/${encodeURIComponent(lookupValue.current)}/`;
     // construct approporiate query param string
     let qs = '';
-    if (lookupClassification.current != null) {
+    if (!!lookupClassification.current) {
       qs += `classification=${encodeURIComponent(lookupClassification.current)}`;
     }
     if (!!source) {
@@ -90,18 +120,48 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
       onSuccess: api_data => {
         if (Object.keys(api_data.api_response).length !== 0) {
           showSuccessMessage(t('related_external.found'));
-          linkIcon.current = LINK_ICON;
-          externalResults.current = Object.keys(api_data.api_response).map((sourceName: keyof LookupSourceDetails) => (
-            <p>
-              <h3>
-                {sourceName}:
-                <a href={api_data.api_response[sourceName].link}>{api_data.api_response[sourceName].count} results</a>
-              </h3>
-            </p>
+          setIcon(LINK_ICON);
+          setResults((
+            <div>
+              {Object.keys(api_data.api_response).map((sourceName: keyof LookupSourceDetails, i) => (
+                <p key={`success_${i}`}>
+                  <h3>
+                    {sourceName}:
+                    <a href={api_data.api_response[sourceName].link}>{api_data.api_response[sourceName].count} results</a>
+                  </h3>
+                </p>
+              ))}
+              {!!api_data.api_error_message.length && (
+                <h3>Errors</h3>
+              )}
+              {api_data.api_error_message?.split(new RegExp('\\r?\\n')).map((err, i) => (
+                <p key={`error_${i}`}>
+                  {err}
+                </p>
+              ))}
+            </div>
           ));
         }
         else {
           showWarningMessage(t('related_external.notfound'));
+          setIcon(null);
+          setResults(null);
+        }
+      },
+      onFailure: api_data => {
+        if (Object.keys(api_data.api_error_message).length !== 0) {
+          showErrorMessage(t('related_external.error'));
+          setIcon(ERROR_ICON);
+          setResults((
+            <div>
+              <h3>Errors</h3>
+              {api_data.api_error_message.split(new RegExp('\\r?\\n')).map((err, i) => (
+                <p key={`error_${i}`}>
+                  {err}
+                </p>
+              ))}
+            </div>
+          ));
         }
       },
     });
@@ -173,7 +233,13 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                     )}
                 </Grid>
                 <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+                  {!!md5ExternalResults && (
+                    <Tooltip title={md5ExternalResults}>
+                      {md5LinkIcon}
+                    </Tooltip>
+                  )}
                   {fileinfo ? fileinfo.md5 : <Skeleton />}
+                  {md5ExternalResults}
                 </Grid>
 
                 <Grid item xs={4} sm={3} lg={2}>
@@ -189,6 +255,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                 </Grid>
                 <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
                   {fileinfo ? fileinfo.sha1 : <Skeleton />}
+                  {sha1ExternalResults}
                 </Grid>
 
                 <Grid item xs={4} sm={3} lg={2}>
@@ -204,6 +271,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                 </Grid>
                 <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
                   {fileinfo ? fileinfo.sha256 : <Skeleton />}
+                  {sha256ExternalResults}
                 </Grid>
 
                 <Grid item xs={4} sm={3} lg={2}>
@@ -219,6 +287,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                 </Grid>
                 <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
                   {fileinfo ? fileinfo.ssdeep : <Skeleton />}
+                  {ssdeepExternalResults}
                 </Grid>
 
                 <Grid item xs={4} sm={3} lg={2}>
