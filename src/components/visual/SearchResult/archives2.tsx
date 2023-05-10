@@ -48,10 +48,9 @@ export type ArchivedFileResult = {
 };
 
 const LABELS_COLOR_MAP = {
-  info: 'info',
-  safe: 'success',
-  suspicious: 'warning',
-  malicious: 'error'
+  info: 'default',
+  type: 'warning',
+  attribution: 'error'
 };
 
 type SearchResults = {

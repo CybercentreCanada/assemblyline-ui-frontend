@@ -1,9 +1,10 @@
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
-import { AlertTitle, Chip, Skeleton, Tooltip, useTheme } from '@mui/material';
+import { AlertTitle, Skeleton, Tooltip, useTheme } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import { CustomUser } from 'components/hooks/useMyUser';
+import CustomChip from 'components/visual/CustomChip';
 import {
   DivTable,
   DivTableBody,
@@ -60,11 +61,23 @@ type SearchResults = {
 
 type ArchivesTableProps = {
   fileResults: SearchResults;
-  setFileID?: (id: string) => void;
   allowSort?: boolean;
+  setFileID?: (id: string) => void;
+  onLabelClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, label: string) => void;
 };
 
-const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({ fileResults, setFileID = null, allowSort = true }) => {
+const LABELS_COLOR_MAP = {
+  info: 'default',
+  type: 'warning',
+  attribution: 'error'
+};
+
+const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
+  fileResults,
+  allowSort = true,
+  setFileID = null,
+  onLabelClick = null
+}) => {
   const { t, i18n } = useTranslation(['archive']);
   const theme = useTheme();
   const { user: currentUser } = useAppUser<CustomUser>();
@@ -118,19 +131,37 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({ fileResults, setFi
                   )}
                 </DivTableCell>
                 <DivTableCell children={'type' in file ? file.type : null} />
-                <DivTableCell>
-                  {!('labels' in file)
-                    ? null
-                    : file.labels.map((label, j) => (
-                        <Chip
-                          key={`${file.id}-${label}-${j}`}
-                          label={label}
-                          color="success"
-                          variant="outlined"
-                          size="small"
-                        />
-                      ))}
-                </DivTableCell>
+                <DivTableCell
+                  children={
+                    <div style={{ display: 'flex', gap: theme.spacing(1), flexWrap: 'wrap' }}>
+                      {['attribution', 'type', 'info'].map(
+                        (category, j) =>
+                          category in file.label_categories &&
+                          file.label_categories[category].map((label, k) => (
+                            <CustomChip
+                              key={`${j}-${k}`}
+                              wrap
+                              variant="filled"
+                              size="tiny"
+                              type="rounded"
+                              color={category in LABELS_COLOR_MAP ? LABELS_COLOR_MAP[category] : 'primary'}
+                              label={label}
+                              style={{ height: 'auto', minHeight: '20px' }}
+                              onClick={
+                                !onLabelClick
+                                  ? null
+                                  : event => {
+                                      event.preventDefault();
+                                      event.stopPropagation();
+                                      onLabelClick(event, label);
+                                    }
+                              }
+                            />
+                          ))
+                      )}
+                    </div>
+                  }
+                />
                 <DivTableCell
                   style={{
                     padding: 'unset',
