@@ -89,7 +89,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
   const classes = useStyles();
   const sp2 = theme.spacing(2);
   const { apiCall } = useMyAPI();
-  const { showSuccessMessage, showErrorMessage } = useMySnackbar();
+  const { showSuccessMessage, showWarningMessage, showErrorMessage } = useMySnackbar();
   
   const externalResults = useRef(null);
   const linkIcon = useRef(null);
