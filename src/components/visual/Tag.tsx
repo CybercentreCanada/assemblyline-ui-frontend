@@ -5,6 +5,7 @@ import PlaylistAddCheckOutlinedIcon from '@mui/icons-material/PlaylistAddCheckOu
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
 import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import { Divider, ListSubheader, Menu, MenuItem } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
@@ -30,6 +31,7 @@ const SAFELIST_ICON = <PlaylistAddCheckOutlinedIcon style={{ marginRight: '16px'
 const SIGNATURE_ICON = <FingerprintOutlinedIcon style={{ marginRight: '16px' }} />;
 const TRAVEL_EXPLORE_ICON = <TravelExploreOutlinedIcon style={{ marginRight: '16px' }} />;
 const LINK_ICON = <LinkOutlinedIcon style={{ marginRight: '2px' }} />;
+const ERROR_ICON = <ErrorOutlineOutlinedIcon style={{ marginRight: '2px' }} />;
 const initialMenuState = {
   mouseX: null,
   mouseY: null
@@ -80,7 +82,7 @@ const WrappedTag: React.FC<TagProps> = ({
   const navigate = useNavigate();
   const { user: currentUser, configuration: currentUserConfig, scoreToVerdict } = useALContext();
   const { apiCall } = useMyAPI();
-  const { showSuccessMessage, showWarningMessage } = useMySnackbar();
+  const { showSuccessMessage, showWarningMessage, showErrorMessage } = useMySnackbar();
   const { isHighlighted, triggerHighlight } = useHighlighter();
   const { copy } = useClipboard();
   const { showSafeResults } = useSafeResults();
@@ -121,17 +123,45 @@ const WrappedTag: React.FC<TagProps> = ({
         if (Object.keys(api_data.api_response).length !== 0) {
           showSuccessMessage(t('related_external.found'));
           linkIcon.current = LINK_ICON;
-          externalResults.current = Object.keys(api_data.api_response).map((sourceName: keyof LookupSourceDetails) => (
-            <p>
-              <h3>
-                {sourceName}:
-                <a href={api_data.api_response[sourceName].link}>{api_data.api_response[sourceName].count} results</a>
-              </h3>
-            </p>
-          ));
+          externalResults.current = (
+            <div>
+              {Object.keys(api_data.api_response).map((sourceName: keyof LookupSourceDetails, i) => (
+                <p key={`success_${i}`}>
+                  <h3>
+                    {sourceName}:
+                    <a href={api_data.api_response[sourceName].link}>{api_data.api_response[sourceName].count} results</a>
+                  </h3>
+                </p>
+              ))}
+              {!!api_data.api_error_message.length && (
+                <h3>Errors</h3>
+              )}
+              {api_data.api_error_message?.split(new RegExp('\\r?\\n')).map((err, i) => (
+                <p key={`error_${i}`}>
+                  {err}
+                </p>
+              ))}
+            </div>
+          );
         }
         else {
           showWarningMessage(t('related_external.notfound'));
+        }
+      },
+      onFailure: api_data => {
+        if (Object.keys(api_data.api_error_message).length !== 0) {
+          showErrorMessage(t('related_external.error'));
+          linkIcon.current = ERROR_ICON;
+          externalResults.current = (
+            <div>
+              <h3>Errors</h3>
+              {api_data.api_error_message.split(new RegExp('\\r?\\n')).map((err, i) => (
+                <p key={`error_${i}`}>
+                  {err}
+                </p>
+              ))}
+            </div>
+          );
         }
       }
     });
@@ -287,7 +317,7 @@ const WrappedTag: React.FC<TagProps> = ({
               </MenuItem>
 
               {currentUserConfig.ui.external_source_tags?.[type]?.map((source, i) =>
-                <MenuItem dense key={i} onClick={() => handleMenuExternalSearch(source)}>
+                <MenuItem dense key={`source_${i}`} onClick={() => handleMenuExternalSearch(source)}>
                   {TRAVEL_EXPLORE_ICON} {source}
                 </MenuItem>
               )}
