@@ -26,6 +26,12 @@ export type ArchivedFileResult = {
   hex: string;
   id: string;
   labels: string[];
+  label_categories?: {
+    info: string[];
+    safe: string[];
+    suspicious: string[];
+    malicious: string[];
+  };
   magic: string;
   md5: string;
   mime: string;
@@ -39,6 +45,13 @@ export type ArchivedFileResult = {
   size: number;
   ssdeep: string;
   type: string;
+};
+
+const LABELS_COLOR_MAP = {
+  info: 'info',
+  safe: 'success',
+  suspicious: 'warning',
+  malicious: 'error'
 };
 
 type SearchResults = {
@@ -109,24 +122,28 @@ const WrappedArchivesTable2 = ({
                 <GridTableCell
                   children={
                     <div style={{ display: 'flex', gap: theme.spacing(1), flexWrap: 'wrap' }}>
-                      {file.labels.map((label, j) => (
-                        <Chip
-                          key={`${file.id}-${label}-${j}`}
-                          label={label}
-                          color="success"
-                          variant="outlined"
-                          size="small"
-                          onClick={
-                            !onLabelClick
-                              ? null
-                              : event => {
-                                  event.preventDefault();
-                                  event.stopPropagation();
-                                  onLabelClick(event, label);
-                                }
-                          }
-                        />
-                      ))}
+                      {['malicious', 'suspicious', 'info', 'safe'].map(
+                        (category, j) =>
+                          category in file.label_categories &&
+                          file.label_categories[category].map(label => (
+                            <Chip
+                              key={`${file.id}-${category}-${label}-${j}`}
+                              label={label}
+                              color={category in LABELS_COLOR_MAP ? LABELS_COLOR_MAP[category] : 'primary'}
+                              variant="outlined"
+                              size="small"
+                              onClick={
+                                !onLabelClick
+                                  ? null
+                                  : event => {
+                                      event.preventDefault();
+                                      event.stopPropagation();
+                                      onLabelClick(event, label);
+                                    }
+                              }
+                            />
+                          ))
+                      )}
                     </div>
                   }
                 />

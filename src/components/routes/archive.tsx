@@ -160,7 +160,7 @@ export default function MalwareArchive() {
 
   useEffect(() => {
     if (location.hash) {
-      setGlobalDrawer(<FileDetail sha256={location.hash.substr(1)} />);
+      setGlobalDrawer(<FileDetail sha256={location.hash.substr(1)} isArchive />);
     } else {
       closeGlobalDrawer();
     }
