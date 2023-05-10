@@ -15,7 +15,8 @@ import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
-import { ArchivedFileResult, ArchivesTable2 } from 'components/visual/SearchResult/archives2';
+import ArchivesTable from 'components/visual/SearchResult/archives';
+import { ArchivedFileResult } from 'components/visual/SearchResult/archives2';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import { safeFieldValue } from 'helpers/utils';
 import 'moment/locale/fr';
@@ -50,8 +51,6 @@ type FileResults = {
   rows: number;
   total: number;
 };
-
-const DEFAULT_QUERY = '*';
 
 const DEFAULT_TC = '1m';
 
@@ -134,7 +133,7 @@ export default function MalwareArchive() {
   const onLabelClick = useCallback(
     (event: React.MouseEvent<HTMLDivElement, MouseEvent>, label: string) => {
       if (!searching) {
-        query.add('filters', `labels:${label}`);
+        query.add('filters', `labels:${safeFieldValue(label)}`);
         navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
       }
     },
@@ -145,9 +144,10 @@ export default function MalwareArchive() {
     setSearching(true);
     const newSearchQuery = new SimpleSearchQuery(
       location.search,
-      `query=${DEFAULT_QUERY}&rows=${pageSize}&offset=0&tc=${DEFAULT_TC}`
+      `rows=${pageSize}&offset=0&tc=${DEFAULT_TC}&archive_only=true`
     );
     filterValue.current = newSearchQuery.get('query');
+    newSearchQuery.set('query', filterValue.current || '*');
     setQuery(newSearchQuery);
   }, [location.pathname, location.search, pageSize]);
 
@@ -182,7 +182,7 @@ export default function MalwareArchive() {
 
   useEffect(() => {
     if (query && currentUser.is_admin) {
-      const curQuery = new SimpleSearchQuery(query.toString(), `query=${DEFAULT_QUERY}&rows=${pageSize}&offset=0`);
+      const curQuery = new SimpleSearchQuery(query.toString(), `rows=${pageSize}&offset=0`);
       curQuery.set('rows', pageSize);
       curQuery.set('offset', 0);
       curQuery.set('archive_only', true);
@@ -193,9 +193,7 @@ export default function MalwareArchive() {
 
       setSearching(true);
       apiCall({
-        method: 'POST',
-        url: `/api/v4/search/file/`,
-        body: curQuery.getParams(),
+        url: `/api/v4/search/file/?${curQuery.toString()}`,
         onSuccess: api_data => {
           setFileResults(api_data.api_response);
         },
@@ -209,19 +207,13 @@ export default function MalwareArchive() {
       apiCall({
         url: `/api/v4/search/histogram/file/seen.last/?start=${START_MAP[tc]}&end=now&gap=${
           GAP_MAP[tc]
-        }&mincount=0&${query.toString(['rows', 'offset', 'sort', 'track_total_hits', 'archive_only'])}`,
+        }&mincount=0&${query.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
         onSuccess: api_data => {
           setHistogram(api_data.api_response);
         }
       });
       apiCall({
-        url: `/api/v4/search/facet/file/labels/?${curQuery.toString([
-          'rows',
-          'offset',
-          'sort',
-          'track_total_hits',
-          'archive_only'
-        ])}`,
+        url: `/api/v4/search/facet/file/labels/?${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
         onSuccess: api_data => {
           let newLabels: { [k: string]: number } = api_data.api_response;
           newLabels = Object.fromEntries(
@@ -233,13 +225,7 @@ export default function MalwareArchive() {
         }
       });
       apiCall({
-        url: `/api/v4/search/facet/file/type/?${curQuery.toString([
-          'rows',
-          'offset',
-          'sort',
-          'track_total_hits',
-          'archive_only'
-        ])}`,
+        url: `/api/v4/search/facet/file/type/?${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
         onSuccess: api_data => {
           let newTypes: { [k: string]: number } = api_data.api_response;
           newTypes = Object.fromEntries(
@@ -255,7 +241,7 @@ export default function MalwareArchive() {
   }, [query]);
 
   if (!configuration?.datastore?.archive?.enabled) return <Navigate to="/notfound" replace />;
-  else if (!currentUser.is_admin) return <Navigate to="/forbidden" replace />;
+  else if (!currentUser.roles.includes('archive_view')) return <Navigate to="/forbidden" replace />;
   else
     return (
       <PageFullWidth margin={4}>
@@ -288,7 +274,7 @@ export default function MalwareArchive() {
         <PageHeader isSticky>
           <div style={{ paddingTop: theme.spacing(1) }}>
             <SearchBar
-              initValue={query ? query.get('query', '') : ''}
+              initValue={query && query.get('query') !== '*' ? query.get('query', '') : ''}
               placeholder={t('filter')}
               searching={searching}
               suggestions={suggestions}
@@ -407,14 +393,16 @@ export default function MalwareArchive() {
           </Grid>
         )}
 
-        {/* <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
-        <ArchivesTable fileResults={fileResults} setFileID={setFileID} />
-      </div> */}
         <div
           style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}
         >
-          <ArchivesTable2 fileResults={fileResults} setFileID={setFileID} onLabelClick={onLabelClick} />
+          <ArchivesTable fileResults={fileResults} setFileID={setFileID} onLabelClick={onLabelClick} />
         </div>
+        {/* <div
+          style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}
+        >
+          <ArchivesTable2 fileResults={fileResults} setFileID={setFileID} onLabelClick={onLabelClick} />
+        </div> */}
       </PageFullWidth>
     );
 }

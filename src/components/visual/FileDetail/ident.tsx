@@ -4,7 +4,6 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import {
   Autocomplete,
-  Chip,
   Collapse,
   Divider,
   Grid,
@@ -17,6 +16,7 @@ import {
 import makeStyles from '@mui/styles/makeStyles';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import CustomChip from 'components/visual/CustomChip';
 import { bytesToSize } from 'helpers/utils';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -39,17 +39,15 @@ type IdentificationSectionProps = {
 };
 
 const LABELS_COLOR_MAP = {
-  info: 'info',
-  safe: 'success',
-  suspicious: 'warning',
-  malicious: 'error'
+  info: 'default',
+  type: 'warning',
+  attribution: 'error'
 };
 
 type LabelCategories = {
   info?: string[];
-  safe?: string[];
-  suspicious?: string[];
-  malicious?: string[];
+  type?: string[];
+  attribution?: string[];
 };
 
 const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fileinfo, isArchive = false }) => {
@@ -76,7 +74,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
   );
 
   useEffect(() => {
-    if (!fileinfo) return;
+    if (!fileinfo || !('label_categories' in fileinfo)) return;
     setLabels(sortingLabels(fileinfo.label_categories));
   }, [fileinfo, sortingLabels]);
 
@@ -211,16 +209,19 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                       <Collapse in={!isEditingLabels} timeout="auto">
                         <div style={{ display: 'flex', gap: theme.spacing(1), flexWrap: 'wrap' }}>
                           {labels &&
-                            ['malicious', 'suspicious', 'info', 'safe'].map(
+                            ['attribution', 'type', 'info'].map(
                               category =>
                                 category in labels &&
-                                labels[category].map(label => (
-                                  <Chip
-                                    key={`${category}-${label}`}
-                                    label={label}
+                                labels[category].map((label, i) => (
+                                  <CustomChip
+                                    key={i}
+                                    wrap
+                                    variant="filled"
+                                    size="tiny"
+                                    type="rounded"
                                     color={category in LABELS_COLOR_MAP ? LABELS_COLOR_MAP[category] : 'primary'}
-                                    variant="outlined"
-                                    size="small"
+                                    label={label}
+                                    style={{ height: 'auto', minHeight: '20px' }}
                                   />
                                 ))
                             )}
@@ -229,32 +230,34 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                       <Collapse in={isEditingLabels} timeout="auto">
                         <div style={{ display: 'flex', gap: theme.spacing(1), flexWrap: 'wrap' }}>
                           {labels &&
-                            ['malicious', 'suspicious', 'info', 'safe'].map(
-                              category =>
-                                category in labels && (
-                                  <Autocomplete
-                                    options={[]}
-                                    multiple
-                                    fullWidth
-                                    freeSolo
-                                    value={labels[category]}
-                                    onChange={(e, newValue) => setLabels(l => ({ ...l, [category]: newValue }))}
-                                    renderInput={p => <TextField {...p} variant="standard" />}
-                                    renderTags={(value: readonly string[], getTagProps) =>
-                                      value.map((option: string, index: number) => (
-                                        <Chip
-                                          component="div"
-                                          variant="outlined"
-                                          size="small"
-                                          color={category in LABELS_COLOR_MAP ? LABELS_COLOR_MAP[category] : 'primary'}
-                                          label={option}
-                                          {...getTagProps({ index })}
-                                        />
-                                      ))
-                                    }
-                                  />
-                                )
-                            )}
+                            ['attribution', 'type', 'info'].map(category => (
+                              <Autocomplete
+                                key={category}
+                                options={[]}
+                                multiple
+                                fullWidth
+                                freeSolo
+                                value={labels[category]}
+                                onChange={(e, newValue) => setLabels(l => ({ ...l, [category]: newValue }))}
+                                renderInput={p => <TextField {...p} variant="standard" />}
+                                renderTags={(value: readonly string[], getTagProps) =>
+                                  value.map((option: string, index: number) => (
+                                    <CustomChip
+                                      key={`${category}-${index}`}
+                                      component="div"
+                                      wrap
+                                      variant="filled"
+                                      size="small"
+                                      type="rounded"
+                                      color={category in LABELS_COLOR_MAP ? LABELS_COLOR_MAP[category] : 'primary'}
+                                      label={option}
+                                      style={{ height: 'auto', minHeight: '20px' }}
+                                      {...getTagProps({ index })}
+                                    />
+                                  ))
+                                }
+                              />
+                            ))}
                         </div>
                       </Collapse>
                     </>
