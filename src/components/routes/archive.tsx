@@ -206,7 +206,7 @@ export default function MalwareArchive() {
       apiCall({
         url: `/api/v4/search/histogram/file/seen.last/?start=${START_MAP[tc]}&end=now&gap=${
           GAP_MAP[tc]
-        }&mincount=0&${query.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
+        }&mincount=0&${curQuery.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
         onSuccess: api_data => {
           setHistogram(api_data.api_response);
         }
