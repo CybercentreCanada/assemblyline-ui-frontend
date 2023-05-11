@@ -136,6 +136,7 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
                     <div style={{ display: 'flex', gap: theme.spacing(1), flexWrap: 'wrap' }}>
                       {['attribution', 'type', 'info'].map(
                         (category, j) =>
+                          file.label_categories &&
                           category in file.label_categories &&
                           file.label_categories[category].map((label, k) => (
                             <CustomChip
