@@ -368,7 +368,7 @@ export default function MalwareArchive() {
                 onClick={(evt, element) => {
                   if (!searching && element.length > 0) {
                     var ind = element[0].index;
-                    query.add('filters', `labels:${Object.keys(labels)[ind]}`);
+                    query.add('filters', `labels:${safeFieldValue(Object.keys(labels)[ind])}`);
                     navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
                   }
                 }}
