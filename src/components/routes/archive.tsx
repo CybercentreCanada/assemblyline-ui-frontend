@@ -180,7 +180,7 @@ export default function MalwareArchive() {
   }, []);
 
   useEffect(() => {
-    if (query && currentUser.is_admin) {
+    if (query && currentUser.roles.includes('archive_view')) {
       const curQuery = new SimpleSearchQuery(query.toString(), `rows=${pageSize}&offset=0`);
       curQuery.set('rows', pageSize);
       curQuery.set('offset', 0);
