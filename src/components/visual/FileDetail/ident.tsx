@@ -3,13 +3,25 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import LinkOutlinedIcon from '@mui/icons-material/LinkOutlined';
 import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
-import { Collapse, Divider, Grid, IconButton, ListSubheader, Menu, MenuItem, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import {
+  Collapse,
+  Divider,
+  Grid,
+  IconButton,
+  ListSubheader,
+  Menu,
+  MenuItem,
+  Skeleton,
+  Tooltip,
+  Typography,
+  useTheme
+} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { bytesToSize } from 'helpers/utils';
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(theme => ({
@@ -26,24 +38,36 @@ const useStyles = makeStyles(theme => ({
     marginLeft: '0px',
     height: '0px',
     '&:hover': {
-      backgroundColor: "inherit",
+      backgroundColor: 'inherit',
       color: theme.palette.text.secondary
     }
   }
 }));
 
-const LINK_ICON = <LinkOutlinedIcon style={{
-  display: 'inline-flex',
-  height: '18px'
-}} />;
-const TRAVEL_EXPLORE_ICON = <TravelExploreOutlinedIcon style={{
-  display: 'inline-flex',
-  height: '18px'
-}} />;
-const ERROR_ICON = <ErrorOutlineOutlinedIcon style={{
-  display: 'inline-flex',
-  height: '18px'
-}} />;
+const LINK_ICON = (
+  <LinkOutlinedIcon
+    style={{
+      display: 'inline-flex',
+      height: '18px'
+    }}
+  />
+);
+const TRAVEL_EXPLORE_ICON = (
+  <TravelExploreOutlinedIcon
+    style={{
+      display: 'inline-flex',
+      height: '18px'
+    }}
+  />
+);
+const ERROR_ICON = (
+  <ErrorOutlineOutlinedIcon
+    style={{
+      display: 'inline-flex',
+      height: '18px'
+    }}
+  />
+);
 
 type IdentificationSectionProps = {
   fileinfo: any;
@@ -55,17 +79,18 @@ type LookupSourceDetails = {
   classification: string;
 };
 
-type DigestExternalLookup = {
-  results: null | {
-    [sourceName: string]: {
-      link: string;
-      count: number;
-    }
+type ExternalLookupResults = {
+  [digestType: string]: {
+    results: null | {
+      [sourceName: string]: {
+        link: string;
+        count: number;
+      };
+    };
+    errors: null | string;
+    success: null | boolean;
   };
-  errors: null | string;
-  success: null | boolean;
 };
-
 
 const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fileinfo }) => {
   const { t } = useTranslation(['fileDetail']);
@@ -79,32 +104,34 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
   const { apiCall } = useMyAPI();
   const { showSuccessMessage, showWarningMessage, showErrorMessage } = useMySnackbar();
 
-  //const externalSourcesConfig = React.useMemo(() => {
-  //  return currentUserConfig.ui.external_sources;
-  //}, [currentUserConfig]);
-
   const lookupType = useRef(null);
   const lookupValue = useRef(null);
 
-  const [md5LookupState, setMd5LookupState] = React.useState<DigestExternalLookup>(null);
-  const [sha1LookupState, setSha1LookupState] = React.useState<DigestExternalLookup>(null);
-  const [sha256LookupState, setSha256LookupState] = React.useState<DigestExternalLookup>(null);
-  const [ssdeepLookupState, setSsdeepLookupState] = React.useState<DigestExternalLookup>(null);
+  const [lookupState, setLookupState] = React.useState<ExternalLookupResults>({
+    md5: {
+      results: null,
+      errors: null,
+      success: null
+    },
+    sha1: {
+      results: null,
+      errors: null,
+      success: null
+    },
+    sha256: {
+      results: null,
+      errors: null,
+      success: null
+    },
+    ssdeep: {
+      results: null,
+      errors: null,
+      success: null
+    }
+  });
 
   const searchTagExternal = useCallback(
-    source => {
-      let setLookupState = setMd5LookupState;
-      switch (lookupType.current) {
-        case 'sha1':
-          setLookupState = setSha1LookupState;
-          break;
-        case 'sha256':
-          setLookupState = setSha256LookupState;
-          break;
-        case 'ssdeep':
-          setLookupState = setSsdeepLookupState;
-          break;
-      }
+    (source: string) => {
       let url = `/api/v4/federated_lookup/search/${lookupType.current}/${encodeURIComponent(lookupValue.current)}/`;
       // construct approporiate query param string
       let qs = `classification=${encodeURIComponent(fileinfo.classification)}`;
@@ -120,104 +147,140 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
           if (Object.keys(api_data.api_response).length !== 0) {
             showSuccessMessage(t('related_external.found'));
             setLookupState({
-              success: true,
-              results: api_data.api_response,
-              errors: api_data.api_error_message,
+              ...lookupState,
+              [lookupType.current]: {
+                success: true,
+                results: api_data.api_response,
+                errors: api_data.api_error_message
+              }
             });
           } else {
             showWarningMessage(t('related_external.notfound'));
             setLookupState({
-              success: null,
-              results: null,
-              errors: null,
+              ...lookupState,
+              [lookupType.current]: {
+                success: null,
+                results: null,
+                errors: null
+              }
             });
           }
         },
         onFailure: api_data => {
           if (Object.keys(api_data.api_error_message).length !== 0) {
             showErrorMessage(t('related_external.error'));
-            setLookupState({
-              success: false,
-              results: null,
-              errors: api_data.api_error_message,
+            setLookupState(prevState => {
+              return {
+                ...prevState,
+                [lookupType.current]: {
+                  success: false,
+                  results: null,
+                  errors: api_data.api_error_message
+                }
+              };
             });
           }
         }
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [lookupType, fileinfo]
+    [lookupType.current, fileinfo]
   );
 
-  const ExternalLookupResult: React.FC<any> = useCallback(({ results, errors, digestType }) => {
-    return (
-      <>
-        {!!results?.length && Object.keys(results).map((sourceName: keyof LookupSourceDetails, i) => (
-          <p key={`success_${digestType}_${i}`}>
-            <h3>
-              {sourceName}:
-              <a href={results[sourceName].link}>
-                {results[sourceName].count} results
-              </a>
-            </h3>
-          </p>
-        ))}
-        {!!errors?.length && <h3>Errors</h3>}
-        {errors?.split(new RegExp('\\r?\\n')).map((err, i) => (
-          <p key={`error_${digestType}_${i}`}>{err}</p>
-        ))}
-      </>
-    );
-  }, []);
+  //const ExternalLookupResult: React.FC<any> = useCallback(({ lookup }) => {
+  const ExternalLookupResult = useCallback(
+    (lookup, digestType) => {
+      let results = lookup?.results;
+      let errors = lookup?.errors;
+      let success = lookup?.success;
+      console.log('Displaying tooltip');
+      console.log(`lookup: ${lookup}`);
+      console.log(`success: ${success}, errors: ${errors}`);
+      console.log(`s: ${lookupState?.[digestType]?.success}, e: ${lookupState?.[digestType]?.errors}`);
+      return (
+        <div>
+          {!!results?.length &&
+            Object.keys(results).map((sourceName: keyof LookupSourceDetails, i) => (
+              <p key={`success_${i}`}>
+                <h3>
+                  {sourceName}:<a href={results[sourceName].link}>{results[sourceName].count} results</a>
+                </h3>
+              </p>
+            ))}
+          {!!errors?.length && <h3>Errors</h3>}
+          {errors?.split(new RegExp('\\r?\\n')).map((err, i) => (
+            <p key={`error_${i}`}>{err}</p>
+          ))}
+        </div>
+      );
+    },
+    [lookupState]
+  );
 
-  const FileHash: React.FC<any> = useCallback(({ digestType, results, errors, status }) => {
-    return (
-      <>
-        {fileinfo ? fileinfo[digestType] : <Skeleton />}
-        {(!!results || !!errors) && (
-          <Tooltip title={<ExternalLookupResult results={results} errors={errors} digestType={digestType} />}>
+  const FileHash: React.FC<any> = useCallback(
+    ({ value, lookup, digestType }) => {
+      let success = lookup?.success;
+      let title = lookup ? ExternalLookupResult(lookup, digestType) : null;
+      return (
+        <>
+          {value ? value : <Skeleton />}
+          <Tooltip title={title}>
             <>
-              {status === true && LINK_ICON}
-              {status === false && ERROR_ICON}
+              {success === true && LINK_ICON}
+              {success === false && ERROR_ICON}
             </>
           </Tooltip>
-        )}
-      </>
-    );
-  }, [fileinfo]);
+        </>
+      );
+    },
+    [ExternalLookupResult]
+  );
 
-  const ExternalSearchButton: React.FC<any> = useCallback(({digestType}) => {
-    return (
-      <>
-        {!!currentUser.roles.includes('external_query') && !!currentUserConfig.ui.external_sources?.length &&
-          currentUserConfig.ui.external_source_tags?.hasOwnProperty(digestType) && (
-            <Tooltip title={t('related_external')} placement="top">
-              <IconButton size="small" onClick={e => handleShowExternalSearch(e, digestType, fileinfo[digestType])} classes={{ root: classes.externalLookupButtonRoot }}>
-                {TRAVEL_EXPLORE_ICON}
-              </IconButton>
-            </Tooltip>
-        )}
-      </>
-    );
-  }, [currentUser, currentUserConfig, fileinfo]);
+  const ExternalSearchButton: React.FC<any> = useCallback(
+    ({ digestType }) => {
+      return (
+        <>
+          {!!currentUser.roles.includes('external_query') &&
+            !!currentUserConfig.ui.external_sources?.length &&
+            currentUserConfig.ui.external_source_tags?.hasOwnProperty(digestType) && (
+              <Tooltip title={t('related_external')} placement="top">
+                <IconButton
+                  size="small"
+                  onClick={e => handleShowExternalSearch(e, digestType, fileinfo[digestType])}
+                  classes={{ root: classes.externalLookupButtonRoot }}
+                >
+                  {TRAVEL_EXPLORE_ICON}
+                </IconButton>
+              </Tooltip>
+            )}
+        </>
+      );
+    },
+    [currentUser, currentUserConfig, fileinfo, classes.externalLookupButtonRoot, t]
+  );
 
   const handleClose = () => {
     setAnchorEl(null);
   };
 
+  /* handle selecting a menu item in the external search menu */
   const handleMenuExternalSearch = useCallback(
-    source => {
+    (source: string) => {
       searchTagExternal(source);
       handleClose();
     },
     [searchTagExternal]
   );
 
-  const handleShowExternalSearch = useCallback((event: React.MouseEvent<HTMLButtonElement>, type: string, value: string) => {
+  /* handle showing the external search menu */
+  const handleShowExternalSearch = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>, type: string, value: string) => {
       setAnchorEl(event.currentTarget);
       lookupType.current = type;
       lookupValue.current = value;
-  }, []);
+    },
+    []
+  );
 
   return (
     <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
@@ -253,7 +316,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                   <ExternalSearchButton digestType="md5"></ExternalSearchButton>
                 </Grid>
                 <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                  <FileHash digestType="md5" results={md5LookupState?.results} errors={md5LookupState?.errors} status={md5LookupState?.success} />
+                  <FileHash value={fileinfo?.md5} lookup={lookupState?.md5} digestType={'md5'} />
                 </Grid>
 
                 <Grid item xs={4} sm={3} lg={2}>
@@ -261,7 +324,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                   <ExternalSearchButton digestType="sha1"></ExternalSearchButton>
                 </Grid>
                 <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                  <FileHash digestType="sha1" results={sha1LookupState?.results} errors={sha1LookupState?.errors} status={sha1LookupState?.success} />
+                  <FileHash value={fileinfo?.sha1} lookup={lookupState?.sha1} />
                 </Grid>
 
                 <Grid item xs={4} sm={3} lg={2}>
@@ -269,7 +332,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                   <ExternalSearchButton digestType="sha256"></ExternalSearchButton>
                 </Grid>
                 <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                  <FileHash digestType="sha256" results={sha256LookupState?.results} errors={sha256LookupState?.errors} status={sha256LookupState?.success} />
+                  <FileHash value={fileinfo?.sha256} lookup={lookupState?.sha256} />
                 </Grid>
 
                 <Grid item xs={4} sm={3} lg={2}>
@@ -278,7 +341,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                 </Grid>
                 <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
                   {fileinfo ? fileinfo.ssdeep : <Skeleton />}
-                  <FileHash digestType="ssdeep" results={ssdeepLookupState?.results} errors={ssdeepLookupState?.errors} status={ssdeepLookupState?.success} />
+                  <FileHash value={fileinfo?.ssdeep} lookup={lookupState?.ssdeep} />
                 </Grid>
 
                 <Grid item xs={4} sm={3} lg={2}>
@@ -325,8 +388,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
               </Grid>
             </div>
           ),
-          // eslint-disable-next-line react-hooks/exhaustive-deps
-          [fileinfo]
+          [fileinfo, lookupState, ExternalSearchButton, sp2, t, FileHash]
         )}
       </Collapse>
     </div>
