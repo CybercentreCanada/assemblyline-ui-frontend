@@ -63,6 +63,9 @@ export type ConfigurationDefinition = {
     archive: {
       enabled: boolean;
     };
+    retrohunt: {
+      enabled: boolean;
+    };
   };
   submission: {
     dtl: number;
