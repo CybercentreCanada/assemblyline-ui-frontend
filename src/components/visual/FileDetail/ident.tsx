@@ -40,13 +40,13 @@ type IdentificationSectionProps = {
 
 const LABELS_COLOR_MAP = {
   info: 'default',
-  type: 'warning',
-  attribution: 'error'
+  technique: 'secondary',
+  attribution: 'primary'
 };
 
 type LabelCategories = {
   info?: string[];
-  type?: string[];
+  technique?: string[];
   attribution?: string[];
 };
 
@@ -209,14 +209,14 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                       <Collapse in={!isEditingLabels} timeout="auto">
                         <div style={{ display: 'flex', gap: theme.spacing(1), flexWrap: 'wrap' }}>
                           {labels &&
-                            ['attribution', 'type', 'info'].map(
+                            ['attribution', 'technique', 'info'].map(
                               category =>
                                 category in labels &&
                                 labels[category].map((label, i) => (
                                   <CustomChip
                                     key={i}
                                     wrap
-                                    variant="filled"
+                                    variant="outlined"
                                     size="tiny"
                                     type="rounded"
                                     color={category in LABELS_COLOR_MAP ? LABELS_COLOR_MAP[category] : 'primary'}
@@ -230,7 +230,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                       <Collapse in={isEditingLabels} timeout="auto">
                         <div style={{ display: 'flex', gap: theme.spacing(1), flexWrap: 'wrap' }}>
                           {labels &&
-                            ['attribution', 'type', 'info'].map(category => (
+                            ['attribution', 'technique', 'info'].map(category => (
                               <Autocomplete
                                 key={category}
                                 options={[]}
@@ -246,7 +246,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                                       key={`${category}-${index}`}
                                       component="div"
                                       wrap
-                                      variant="filled"
+                                      variant="outlined"
                                       size="small"
                                       type="rounded"
                                       color={category in LABELS_COLOR_MAP ? LABELS_COLOR_MAP[category] : 'primary'}

@@ -68,8 +68,8 @@ type ArchivesTableProps = {
 
 const LABELS_COLOR_MAP = {
   info: 'default',
-  type: 'warning',
-  attribution: 'error'
+  technique: 'secondary',
+  attribution: 'primary'
 };
 
 const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
@@ -134,7 +134,7 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
                 <DivTableCell
                   children={
                     <div style={{ display: 'flex', gap: theme.spacing(1), flexWrap: 'wrap' }}>
-                      {['attribution', 'type', 'info'].map(
+                      {['attribution', 'technique', 'info'].map(
                         (category, j) =>
                           file.label_categories &&
                           category in file.label_categories &&
@@ -142,7 +142,7 @@ const WrappedArchivesTable: React.FC<ArchivesTableProps> = ({
                             <CustomChip
                               key={`${j}-${k}`}
                               wrap
-                              variant="filled"
+                              variant="outlined"
                               size="tiny"
                               type="rounded"
                               color={category in LABELS_COLOR_MAP ? LABELS_COLOR_MAP[category] : 'primary'}
