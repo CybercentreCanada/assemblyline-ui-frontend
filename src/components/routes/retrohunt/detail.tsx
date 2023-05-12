@@ -1,7 +1,21 @@
-import { Button, CircularProgress, Grid, Paper, Skeleton, TextField, Typography, useTheme } from '@mui/material';
+import ClearIcon from '@mui/icons-material/Clear';
+import DoneIcon from '@mui/icons-material/Done';
+import UpdateIcon from '@mui/icons-material/Update';
+import {
+  Button,
+  CircularProgress,
+  Grid,
+  Pagination,
+  Paper,
+  Skeleton,
+  TextField,
+  Typography,
+  useTheme
+} from '@mui/material';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
+import { tableCellClasses } from '@mui/material/TableCell';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullSize from 'commons/components/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
@@ -12,8 +26,10 @@ import ForbiddenPage from 'components/routes/403';
 import NotFoundPage from 'components/routes/404';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
+import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
 import { MonacoEditor } from 'components/visual/MonacoEditor';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
+import FilesTable from 'components/visual/SearchResult/files';
 import 'moment/locale/fr';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -22,21 +38,23 @@ import { useNavigate } from 'react-router';
 import { useLocation, useParams } from 'react-router-dom';
 
 export type Retrohunt = {
-  code: any;
-  creator: any;
-  tags: any;
-  description: any;
-  created: any;
-  classification: any;
-  yara_signature: any;
-  raw_query: any;
-  total_indices: any;
-  pending_indices: any;
-  pending_candidates: any;
-  errors: any;
-  hits: any;
-  finished: any;
-  truncated: any;
+  classification?: string;
+  code?: string;
+  created?: string;
+  creator?: string;
+  id?: string;
+  total_hits?: number;
+  tags?: any;
+  description?: any;
+  yara_signature?: any;
+  raw_query?: any;
+  total_indices?: any;
+  pending_indices?: any;
+  pending_candidates?: any;
+  errors?: any;
+  hits?: any;
+  finished?: any;
+  truncated?: boolean;
   archive_only?: boolean;
 };
 
@@ -52,6 +70,16 @@ type Props = {
   pageType?: RetrohuntPageType;
   retrohuntCode: string;
   close?: () => void;
+};
+
+const PAGE_SIZE = 10;
+
+const MAX_TRACKED_RECORDS = 10000;
+
+const STATUS_MAP = {
+  submitted: { color: 'action', label: 'submitted', icon: <UpdateIcon color="action" /> },
+  error: { color: 'error', label: 'error', icon: <ClearIcon color="error" /> },
+  completed: { color: 'primary', label: 'completed', icon: <DoneIcon color="primary" /> }
 };
 
 function WrappedRetrohuntDetail({ retrohuntCode = null, pageType = 'page', close = () => null }: Props) {
@@ -72,6 +100,16 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, pageType = 'page', close
   const [modified, setModified] = useState<boolean>(false);
   const [buttonLoading, setButtonLoading] = useState<boolean>(false);
   const [confirmationOpen, setConfirmationOpen] = useState<boolean>(false);
+
+  const [offset, setOffset] = useState<number>(0);
+  const nbOfPages = useMemo(
+    () => Math.ceil(Math.min(retrohunt?.total_hits, MAX_TRACKED_RECORDS) / PAGE_SIZE),
+    [retrohunt?.total_hits]
+  );
+  const status = useMemo<keyof typeof STATUS_MAP>(
+    () => (retrohunt ? (retrohunt?.finished ? (retrohunt?.truncated ? 'error' : 'completed') : 'submitted') : null),
+    [retrohunt]
+  );
 
   const DEFAULT_RETROHUNT = useMemo<Retrohunt>(
     () => ({
@@ -105,7 +143,7 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, pageType = 'page', close
       setType('add');
     } else if (code && currentUser.roles.includes('retrohunt_view')) {
       apiCall({
-        url: `/api/v4/retrohunt/${code}/`,
+        url: `/api/v4/retrohunt/${code}/?offset=${offset}&rows=${PAGE_SIZE}`,
         onSuccess: api_data => {
           setRetrohunt({ ...api_data.api_response });
           setType('view');
@@ -118,7 +156,7 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, pageType = 'page', close
       setType('forbidden');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [DEFAULT_RETROHUNT, code, currentUser.roles]);
+  }, [DEFAULT_RETROHUNT, code, currentUser.roles, offset]);
 
   const onRetrohuntChange = useCallback((newRetrohunt: Partial<Retrohunt>) => {
     setRetrohunt(rh => ({ ...rh, ...newRetrohunt }));
@@ -162,6 +200,10 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, pageType = 'page', close
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser?.roles, location, navigate, retrohunt, showErrorMessage]);
 
+  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    setOffset((value - 1) * PAGE_SIZE);
+  };
+
   if (type === 'error') return <NotFoundPage />;
   else if (type === 'forbidden') return <ForbiddenPage />;
   else
@@ -204,6 +246,16 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, pageType = 'page', close
                 {type === 'add' && <Typography variant="h4" children={t('header.add')} />}
                 {type === 'view' && <Typography variant="h4" children={t('header.view')} />}
                 {type === 'view' && <Typography variant="caption" children={retrohunt.code} />}
+                {['view', 'add'].includes(type) && status && (
+                  <div style={{ marginTop: theme.spacing(1) }}>
+                    <CustomChip
+                      icon={STATUS_MAP[status].icon}
+                      label={t(`status.${status}`)}
+                      color={STATUS_MAP[status].color as PossibleColors}
+                      variant="outlined"
+                    />
+                  </div>
+                )}
               </Grid>
 
               <Grid item>
@@ -319,11 +371,32 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, pageType = 'page', close
           {type === 'view' && retrohunt && (
             <Grid item flex={1}>
               <Grid container flexDirection="column" height="100%" minHeight="500px">
-                <Typography variant="subtitle2" children={t('details.results')} />
-                <MonacoEditor
-                  language="json"
-                  value={JSON.stringify(retrohunt ? retrohunt : {})}
-                  options={{ readOnly: true, beautify: true }}
+                <Typography variant="h6" children={t('details.results')} />
+                {nbOfPages > 1 && (
+                  <Pagination
+                    count={nbOfPages}
+                    onChange={handlePageChange}
+                    shape="rounded"
+                    size="small"
+                    sx={{ alignSelf: 'flex-end' }}
+                  />
+                )}
+                <FilesTable
+                  fileResults={{ items: retrohunt.hits, total: retrohunt.total_hits }}
+                  component={props => (
+                    <Paper
+                      {...props}
+                      variant="outlined"
+                      sx={{
+                        ...props.sx,
+                        backgroundColor: theme.palette.background.default,
+                        [`& .${tableCellClasses.head}`]: {
+                          backgroundColor: theme.palette.background.default
+                        }
+                      }}
+                    />
+                  )}
+                  allowSort={false}
                 />
               </Grid>
             </Grid>
@@ -331,7 +404,7 @@ function WrappedRetrohuntDetail({ retrohuntCode = null, pageType = 'page', close
 
           <Grid item flex={1}>
             <Grid container flexDirection="column" height="100%" minHeight="500px">
-              <Typography variant="subtitle2" children={t('details.yara_signature')} />
+              <Typography variant="h6" children={t('details.yara_signature')} />
               {type === 'loading' || !retrohunt || !('yara_signature' in retrohunt) ? (
                 <Skeleton style={{ height: '10rem', transform: 'none', marginTop: theme.spacing(1) }} />
               ) : (
