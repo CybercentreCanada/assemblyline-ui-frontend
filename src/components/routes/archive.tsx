@@ -315,7 +315,7 @@ export default function MalwareArchive() {
                     items={query.getAll('filters', []).map(v => ({
                       variant: 'outlined',
                       label: `${v}`,
-                      color: v.indexOf('NOT ') === 0 ? 'file' : null,
+                      color: v.indexOf('NOT ') === 0 ? 'error' : null,
                       onClick: () => {
                         query.replace(
                           'filters',
