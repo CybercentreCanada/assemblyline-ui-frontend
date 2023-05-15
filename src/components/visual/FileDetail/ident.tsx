@@ -12,6 +12,7 @@ import {
   Menu,
   MenuItem,
   Skeleton,
+  SvgIconTypeMap,
   Tooltip,
   Typography,
   useTheme
@@ -21,7 +22,7 @@ import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { bytesToSize } from 'helpers/utils';
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, { forwardRef, useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(theme => ({
@@ -44,14 +45,6 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const LINK_ICON = (
-  <LinkOutlinedIcon
-    style={{
-      display: 'inline-flex',
-      height: '18px'
-    }}
-  />
-);
 const TRAVEL_EXPLORE_ICON = (
   <TravelExploreOutlinedIcon
     style={{
@@ -60,14 +53,20 @@ const TRAVEL_EXPLORE_ICON = (
     }}
   />
 );
-const ERROR_ICON = (
-  <ErrorOutlineOutlinedIcon
-    style={{
-      display: 'inline-flex',
-      height: '18px'
-    }}
-  />
-);
+
+const EXTERNAL_RESULTS_ICON = forwardRef<SvgIconTypeMap | null, any>((props, ref) => {
+  const { success, ...remainingProps } = props;
+  return (
+    <React.Fragment>
+      {success === true && (
+        <LinkOutlinedIcon ref={ref} style={{ display: 'inline-flex', height: '18px' }} {...remainingProps} />
+      )}
+      {success === false && (
+        <ErrorOutlineOutlinedIcon ref={ref} style={{ display: 'inline-flex', height: '18px' }} {...remainingProps} />
+      )}
+    </React.Fragment>
+  );
+});
 
 type IdentificationSectionProps = {
   fileinfo: any;
@@ -99,14 +98,14 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
   const classes = useStyles();
   const sp2 = theme.spacing(2);
   const { user: currentUser, configuration: currentUserConfig } = useALContext();
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const openExternaLookup = Boolean(anchorEl);
   const { apiCall } = useMyAPI();
   const { showSuccessMessage, showWarningMessage, showErrorMessage } = useMySnackbar();
 
+  /* External search/lookup */
+  const [externalSearchAnchorEl, setExternalSearchMenuAnchorEl] = React.useState<null | HTMLElement>(null);
+  const openExternaLookupMenu = Boolean(externalSearchAnchorEl);
   const lookupType = useRef(null);
   const lookupValue = useRef(null);
-
   const [lookupState, setLookupState] = React.useState<ExternalLookupResults>({
     md5: {
       results: null,
@@ -187,53 +186,49 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
     [lookupType.current, fileinfo]
   );
 
-  //const ExternalLookupResult: React.FC<any> = useCallback(({ lookup }) => {
-  const ExternalLookupResult = useCallback(
-    (lookup, digestType) => {
-      let results = lookup?.results;
-      let errors = lookup?.errors;
-      let success = lookup?.success;
-      console.log('Displaying tooltip');
-      console.log(`lookup: ${lookup}`);
-      console.log(`success: ${success}, errors: ${errors}`);
-      console.log(`s: ${lookupState?.[digestType]?.success}, e: ${lookupState?.[digestType]?.errors}`);
-      return (
-        <div>
-          {!!results?.length &&
-            Object.keys(results).map((sourceName: keyof LookupSourceDetails, i) => (
-              <p key={`success_${i}`}>
-                <h3>
-                  {sourceName}:<a href={results[sourceName].link}>{results[sourceName].count} results</a>
-                </h3>
-              </p>
-            ))}
-          {!!errors?.length && <h3>Errors</h3>}
-          {errors?.split(new RegExp('\\r?\\n')).map((err, i) => (
-            <p key={`error_${i}`}>{err}</p>
-          ))}
-        </div>
-      );
-    },
-    [lookupState]
-  );
-
-  const FileHash: React.FC<any> = useCallback(
-    ({ value, lookup, digestType }) => {
-      let success = lookup?.success;
-      let title = lookup ? ExternalLookupResult(lookup, digestType) : null;
-      return (
-        <>
-          {value ? value : <Skeleton />}
-          <Tooltip title={title}>
-            <>
-              {success === true && LINK_ICON}
-              {success === false && ERROR_ICON}
-            </>
+  /* Display fileinfo hash value.
+   If an external search was also perfomred for this hash, also show returned results via a tooltip*/
+  const FileHash: React.FC<any> = useCallback(({ value, lookup }) => {
+    let success = lookup?.success;
+    let errors = lookup?.errors;
+    let results = lookup?.results;
+    return (
+      <>
+        {value ? value : <Skeleton />}
+        {success !== null ? (
+          <Tooltip
+            title={
+              <>
+                {!!results?.length &&
+                  Object.keys(results).map((sourceName: keyof LookupSourceDetails, i) => (
+                    <p key={`success_${i}`}>
+                      <h3>
+                        {sourceName}:<a href={results[sourceName].link}>{results[sourceName].count} results</a>
+                      </h3>
+                    </p>
+                  ))}
+                {!!errors?.length && <h3>Errors</h3>}
+                {errors?.split(new RegExp('\\r?\\n')).map((err, i) => (
+                  <p key={`error_${i}`}>{err}</p>
+                ))}
+              </>
+            }
+          >
+            <EXTERNAL_RESULTS_ICON success={success} />
           </Tooltip>
-        </>
-      );
+        ) : null}
+      </>
+    );
+  }, []);
+
+  /* handle showing the external search menu */
+  const handleShowExternalSearchMenu = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>, type: string, value: string) => {
+      setExternalSearchMenuAnchorEl(event.currentTarget);
+      lookupType.current = type;
+      lookupValue.current = value;
     },
-    [ExternalLookupResult]
+    []
   );
 
   const ExternalSearchButton: React.FC<any> = useCallback(
@@ -246,7 +241,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
               <Tooltip title={t('related_external')} placement="top">
                 <IconButton
                   size="small"
-                  onClick={e => handleShowExternalSearch(e, digestType, fileinfo[digestType])}
+                  onClick={e => handleShowExternalSearchMenu(e, digestType, fileinfo[digestType])}
                   classes={{ root: classes.externalLookupButtonRoot }}
                 >
                   {TRAVEL_EXPLORE_ICON}
@@ -256,31 +251,45 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
         </>
       );
     },
-    [currentUser, currentUserConfig, fileinfo, classes.externalLookupButtonRoot, t]
+    [currentUser, currentUserConfig, fileinfo, classes.externalLookupButtonRoot, handleShowExternalSearchMenu, t]
   );
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  const handleCloseExternalSearchMenu = useCallback(() => {
+    setExternalSearchMenuAnchorEl(null);
+  }, [setExternalSearchMenuAnchorEl]);
 
   /* handle selecting a menu item in the external search menu */
   const handleMenuExternalSearch = useCallback(
     (source: string) => {
       searchTagExternal(source);
-      handleClose();
+      handleCloseExternalSearchMenu();
     },
-    [searchTagExternal]
+    [searchTagExternal, handleCloseExternalSearchMenu]
   );
 
-  /* handle showing the external search menu */
-  const handleShowExternalSearch = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement>, type: string, value: string) => {
-      setAnchorEl(event.currentTarget);
-      lookupType.current = type;
-      lookupValue.current = value;
-    },
-    []
-  );
+  /* build the external search menu */
+  const ExternalSearchMenu: React.FC<any> = useCallback(() => {
+    return (
+      <Menu open={openExternaLookupMenu} onClose={handleCloseExternalSearchMenu} anchorEl={externalSearchAnchorEl}>
+        <ListSubheader disableSticky>{t('related_external')}</ListSubheader>
+        <MenuItem dense onClick={() => handleMenuExternalSearch(null)}>
+          {t('related_external.all')}
+        </MenuItem>
+        {currentUserConfig.ui.external_source_tags?.[lookupType.current]?.map((source, i) => (
+          <MenuItem dense key={`${lookupType.current}_${i}`} onClick={() => handleMenuExternalSearch(source)}>
+            {source}
+          </MenuItem>
+        ))}
+      </Menu>
+    );
+  }, [
+    handleCloseExternalSearchMenu,
+    handleMenuExternalSearch,
+    t,
+    openExternaLookupMenu,
+    externalSearchAnchorEl,
+    currentUserConfig.ui.external_source_tags
+  ]);
 
   return (
     <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
@@ -295,17 +304,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
         {open ? <ExpandLess /> : <ExpandMore />}
       </Typography>
       <Divider />
-      <Menu open={openExternaLookup} onClose={handleClose} anchorEl={anchorEl}>
-        <ListSubheader disableSticky>{t('related_external')}</ListSubheader>
-        <MenuItem dense onClick={() => handleMenuExternalSearch(null)}>
-          {t('related_external.all')}
-        </MenuItem>
-        {currentUserConfig.ui.external_source_tags?.[lookupType.current]?.map((source, i) => (
-          <MenuItem dense key={`${lookupType.current}_${i}`} onClick={() => handleMenuExternalSearch(source)}>
-            {source}
-          </MenuItem>
-        ))}
-      </Menu>
+      <ExternalSearchMenu />
       <Collapse in={open} timeout="auto">
         {useMemo(
           () => (
@@ -324,7 +323,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                   <ExternalSearchButton digestType="sha1"></ExternalSearchButton>
                 </Grid>
                 <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                  <FileHash value={fileinfo?.sha1} lookup={lookupState?.sha1} />
+                  <FileHash value={fileinfo?.sha1} lookup={lookupState?.sha1} digestType={'sha1'} />
                 </Grid>
 
                 <Grid item xs={4} sm={3} lg={2}>
@@ -332,7 +331,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                   <ExternalSearchButton digestType="sha256"></ExternalSearchButton>
                 </Grid>
                 <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                  <FileHash value={fileinfo?.sha256} lookup={lookupState?.sha256} />
+                  <FileHash value={fileinfo?.sha256} lookup={lookupState?.sha256} digestType={'sha256'} />
                 </Grid>
 
                 <Grid item xs={4} sm={3} lg={2}>
@@ -341,7 +340,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                 </Grid>
                 <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
                   {fileinfo ? fileinfo.ssdeep : <Skeleton />}
-                  <FileHash value={fileinfo?.ssdeep} lookup={lookupState?.ssdeep} />
+                  <FileHash value={fileinfo?.ssdeep} lookup={lookupState?.ssdeep} digestType={'ssdeep'} />
                 </Grid>
 
                 <Grid item xs={4} sm={3} lg={2}>
@@ -388,7 +387,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
               </Grid>
             </div>
           ),
-          [fileinfo, lookupState, ExternalSearchButton, sp2, t, FileHash]
+          [fileinfo, lookupState, sp2, t, FileHash, ExternalSearchButton]
         )}
       </Collapse>
     </div>
