@@ -1,7 +1,11 @@
 {
   "attack_matrix": "Att&ck Matrix",
+  "cancel": "Cancel",
   "childrens": "Possible Children",
   "clipboard": "Copy to clipboard",
+  "comment": "Comment",
+  "comment.placeholder": "Add a comment...",
+  "comments": "Comments",
   "detailled": "Services",
   "detection": "Detection",
   "download": "Download File",
