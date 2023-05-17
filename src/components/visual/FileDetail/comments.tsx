@@ -69,7 +69,9 @@ const WrappedCommentSection: React.FC<CommentSectionProps> = ({ sha256 = null, c
   const [comments, setComments] = useState<Comment[]>(cmts);
   const [newComment, setNewComment] = useState<Comment>(DEFAULT_COMMENT);
   const [isAddingComment, setIsAddingComment] = useState<boolean>(false);
+  const [isEditingComment, setIsEditingComment] = useState<boolean>(false);
 
+  const inputRef = useRef(null);
   const socket = useRef(null);
 
   const username = useMemo<string>(
@@ -100,45 +102,57 @@ const WrappedCommentSection: React.FC<CommentSectionProps> = ({ sha256 = null, c
     setNewComment(nc => ({ ...nc, content: { ...nc.content, text: e.target.value } }));
   }, []);
 
-  const handleAddComment = useCallback(() => {
-    setIsAddingComment(false);
-    setComments(c => [
-      {
-        author: { name: currentUser.name, avatar: currentUser.avatar, email: currentUser.email },
-        content: { date: new Date().toISOString(), text: newComment?.content?.text }
-      },
-      ...c
-    ]);
-    setNewComment(DEFAULT_COMMENT);
-
-    apiCall({
-      method: 'PUT',
-      url: `/api/v4/file/comment/${sha256}/`,
-      body: { text: newComment?.content?.text },
-      onSuccess: api_data => {
-        setComments(api_data.api_response);
-        socket.current.emit('comments_change', { sha256: sha256 });
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    currentUser.avatar,
-    currentUser.email,
-    currentUser.name,
-    newComment?.content?.text,
-    sha256,
-    showSuccessMessage,
-    t
-  ]);
-
-  const handleEditComment = useCallback(
-    (_comments: Comment[]) => (cid: string) => {
-      if (!cid || !sha256 || !_comments.find(c => c?.cid === cid)) return;
+  const handleAddComment = useCallback(
+    (_comment: Comment) => {
       apiCall({
-        method: 'POST',
-        url: `/api/v4/file/comment/${sha256}/${cid}/`,
+        method: 'PUT',
+        url: `/api/v4/file/comment/${sha256}/`,
+        body: { text: _comment?.content?.text },
         onSuccess: api_data => {
           setComments(api_data.api_response);
+          setNewComment(DEFAULT_COMMENT);
+          setIsAddingComment(false);
+          socket.current.emit('comments_change', { sha256: sha256 });
+        }
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [sha256]
+  );
+
+  const handleIsAddingComment = useCallback((_isEditingComment: boolean) => {
+    if (_isEditingComment) return;
+    setIsAddingComment(true);
+  }, []);
+
+  const handleIsEditingComment = useCallback(
+    (_comments: Comment[]) => (cid: string) => {
+      const commentToBeEdited = _comments.find(c => c?.cid === cid);
+      if (!commentToBeEdited) return;
+      inputRef.current.focus();
+      setIsEditingComment(true);
+      setIsAddingComment(false);
+      setNewComment(commentToBeEdited);
+    },
+    []
+  );
+
+  const handleEditComment = useCallback(
+    (comment: Comment) => {
+      if (!sha256) return;
+      apiCall({
+        method: 'POST',
+        url: `/api/v4/file/comment/${sha256}/${comment?.cid}/`,
+        body: { text: comment?.content?.text },
+        onSuccess: api_data => {
+          setComments(cs =>
+            cs.map(c =>
+              c?.cid === comment?.cid ? { ...c, content: { ...c?.content, text: comment?.content?.text } } : c
+            )
+          );
+          setNewComment(DEFAULT_COMMENT);
+          setIsEditingComment(false);
+          setIsAddingComment(false);
           socket.current.emit('comments_change', { sha256: sha256 });
         }
       });
@@ -148,8 +162,8 @@ const WrappedCommentSection: React.FC<CommentSectionProps> = ({ sha256 = null, c
   );
 
   const handleDeleteComment = useCallback(
-    (_comments: Comment[]) => (cid: string) => {
-      if (!cid || !sha256 || !_comments.find(c => c?.cid === cid)) return;
+    (cid: string) => {
+      if (!cid || !sha256) return;
       apiCall({
         method: 'DELETE',
         url: `/api/v4/file/comment/${sha256}/${cid}/`,
@@ -165,6 +179,7 @@ const WrappedCommentSection: React.FC<CommentSectionProps> = ({ sha256 = null, c
 
   const handleCancelComment = useCallback(() => {
     setIsAddingComment(false);
+    setIsEditingComment(false);
     setNewComment(DEFAULT_COMMENT);
   }, []);
 
@@ -226,8 +241,8 @@ const WrappedCommentSection: React.FC<CommentSectionProps> = ({ sha256 = null, c
           />
           <TextField
             className={classes.newCommentInput}
-            sx={{}}
             type="text"
+            inputRef={inputRef}
             placeholder={t('comment.placeholder')}
             multiline
             maxRows={3}
@@ -235,10 +250,10 @@ const WrappedCommentSection: React.FC<CommentSectionProps> = ({ sha256 = null, c
             value={newComment?.content?.text}
             size="small"
             margin="dense"
-            onFocus={() => setIsAddingComment(true)}
+            onFocus={() => handleIsAddingComment(isEditingComment)}
             onChange={handleCommentChange}
           />
-          {isAddingComment && (
+          {(isAddingComment || isEditingComment) && (
             <Button
               className={classes.newCommentCancel}
               children={t('cancel')}
@@ -251,7 +266,16 @@ const WrappedCommentSection: React.FC<CommentSectionProps> = ({ sha256 = null, c
             <Button
               className={classes.newCommentComment}
               children={t('comment')}
-              onClick={handleAddComment}
+              onClick={() => handleAddComment(newComment)}
+              variant="contained"
+              size="small"
+            />
+          )}
+          {isEditingComment && (
+            <Button
+              className={classes.newCommentComment}
+              children={t('update')}
+              onClick={() => handleEditComment(newComment)}
               variant="contained"
               size="small"
             />
@@ -264,8 +288,8 @@ const WrappedCommentSection: React.FC<CommentSectionProps> = ({ sha256 = null, c
               <CommentCard
                 key={comment?.cid && i}
                 comment={comment}
-                onEdit={handleEditComment(comments)}
-                onDelete={handleDeleteComment(comments)}
+                onEdit={handleIsEditingComment(comments)}
+                onDelete={handleDeleteComment}
               />
             ))}
           </div>
