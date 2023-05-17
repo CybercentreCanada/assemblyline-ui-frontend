@@ -52,7 +52,12 @@ type FileInfo = {
   archive_ts: string;
   ascii: string;
   classification: string;
-  comments: any[];
+  comments: {
+    cid: string;
+    uname: string;
+    date: string;
+    text: string;
+  }[];
   entropy: number;
   expiry_ts: string | null;
   hex: string;

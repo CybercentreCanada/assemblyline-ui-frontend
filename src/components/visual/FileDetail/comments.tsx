@@ -27,6 +27,10 @@ const useStyles = makeStyles(theme => ({
     }
   },
   newCommentSection: {
+    top: '64px',
+    position: 'sticky',
+    backgroundColor: theme.palette.background.paper,
+    zIndex: 9000,
     marginTop: theme.spacing(2),
     display: 'grid',
     alignItems: 'start',
@@ -113,7 +117,7 @@ const WrappedCommentSection: React.FC<CommentSectionProps> = ({ sha256 = null, c
       body: { text: newComment?.content?.text },
       onSuccess: api_data => {
         setComments(api_data.api_response);
-        socket.current.emit('comment', { sha256: sha256 });
+        socket.current.emit('comments_change', { sha256: sha256 });
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -126,6 +130,38 @@ const WrappedCommentSection: React.FC<CommentSectionProps> = ({ sha256 = null, c
     showSuccessMessage,
     t
   ]);
+
+  const handleEditComment = useCallback(
+    (_comments: Comment[]) => (cid: string) => {
+      if (!cid || !sha256 || !_comments.find(c => c?.cid === cid)) return;
+      apiCall({
+        method: 'POST',
+        url: `/api/v4/file/comment/${sha256}/${cid}/`,
+        onSuccess: api_data => {
+          setComments(api_data.api_response);
+          socket.current.emit('comments_change', { sha256: sha256 });
+        }
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [sha256]
+  );
+
+  const handleDeleteComment = useCallback(
+    (_comments: Comment[]) => (cid: string) => {
+      if (!cid || !sha256 || !_comments.find(c => c?.cid === cid)) return;
+      apiCall({
+        method: 'DELETE',
+        url: `/api/v4/file/comment/${sha256}/${cid}/`,
+        onSuccess: api_data => {
+          setComments(cs => cs.filter(c => c?.cid !== cid));
+          socket.current.emit('comments_change', { sha256: sha256 });
+        }
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [sha256]
+  );
 
   const handleCancelComment = useCallback(() => {
     setIsAddingComment(false);
@@ -166,13 +202,13 @@ const WrappedCommentSection: React.FC<CommentSectionProps> = ({ sha256 = null, c
   }, [handleRefreshComments, sha256]);
 
   return (
-    <div className={classes.commentSection} style={{}}>
+    <div className={classes.commentSection}>
       <Typography
+        className={classes.title}
         variant="h6"
         onClick={() => {
           setOpen(!open);
         }}
-        className={classes.title}
       >
         <span>{t('comments')}</span>
         {open ? <ExpandLess /> : <ExpandMore />}
@@ -225,7 +261,12 @@ const WrappedCommentSection: React.FC<CommentSectionProps> = ({ sha256 = null, c
         {comments && comments.length !== 0 && (
           <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
             {comments.map((comment, i) => (
-              <CommentCard key={i} comment={comment} />
+              <CommentCard
+                key={comment?.cid && i}
+                comment={comment}
+                onEdit={handleEditComment(comments)}
+                onDelete={handleDeleteComment(comments)}
+              />
             ))}
           </div>
         )}
