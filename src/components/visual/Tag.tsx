@@ -1,11 +1,11 @@
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
 import LinkOutlinedIcon from '@mui/icons-material/LinkOutlined';
 import PlaylistAddCheckOutlinedIcon from '@mui/icons-material/PlaylistAddCheckOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
 import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
-import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import { Divider, ListSubheader, Menu, MenuItem } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
@@ -22,7 +22,6 @@ import { useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
 import InputDialog from './InputDialog';
 
-
 const STYLE = { height: 'auto', minHeight: '20px' };
 const SEARCH_ICON = <SearchOutlinedIcon style={{ marginRight: '16px' }} />;
 const CLIPBOARD_ICON = <AssignmentOutlinedIcon style={{ marginRight: '16px' }} />;
@@ -30,8 +29,8 @@ const HIGHLIGHT_ICON = <SelectAllOutlinedIcon style={{ marginRight: '16px' }} />
 const SAFELIST_ICON = <PlaylistAddCheckOutlinedIcon style={{ marginRight: '16px' }} />;
 const SIGNATURE_ICON = <FingerprintOutlinedIcon style={{ marginRight: '16px' }} />;
 const TRAVEL_EXPLORE_ICON = <TravelExploreOutlinedIcon style={{ marginRight: '16px' }} />;
-const LINK_ICON = <LinkOutlinedIcon style={{ marginRight: '2px' }} />;
-const ERROR_ICON = <ErrorOutlineOutlinedIcon style={{ marginRight: '2px' }} />;
+const LINK_ICON = <LinkOutlinedIcon style={{ marginRight: '-3px', marginLeft: '3px', height: '18px' }} />;
+const ERROR_ICON = <ErrorOutlineOutlinedIcon style={{ marginRight: '-3px', marginLeft: '3px', height: '18px' }} />;
 const initialMenuState = {
   mouseX: null,
   mouseY: null
@@ -98,77 +97,73 @@ const WrappedTag: React.FC<TagProps> = ({
 
   const [linkIcon, setLinkIcon] = React.useState(null);
   const [externalResults, setExternalResults] = React.useState(null);
-  const searchTagExternal = useCallback(source => {
-    let url = `/api/v4/federated_lookup/search/${type}/${encodeURIComponent(value)}/`;
+  const searchTagExternal = useCallback(
+    source => {
+      let url = `/api/v4/federated_lookup/search/${type}/${encodeURIComponent(value)}/`;
 
-    // construct approporiate query param string
-    let qs = '';
-    if (!!classification) {
-      qs += `classification=${encodeURIComponent(classification)}`;
-    }
-    if (!!source) {
+      // construct approporiate query param string
+      let qs = '';
+      if (!!classification) {
+        qs += `classification=${encodeURIComponent(classification)}`;
+      }
+      if (!!source) {
+        if (!!qs) {
+          qs += '&';
+        }
+        qs += `sources=${encodeURIComponent(source)}`;
+      }
       if (!!qs) {
-        qs += '&';
+        url += `?${qs}`;
       }
-      qs += `sources=${encodeURIComponent(source)}`;
-    }
-    if (!!qs) {
-      url += `?${qs}`;
-    }
 
-    apiCall({
-      method: 'GET',
-      url: url,
-      onSuccess: api_data => {
-        if (Object.keys(api_data.api_response).length !== 0) {
-          showSuccessMessage(t('related_external.found'));
-          setLinkIcon(LINK_ICON);
-          setExternalResults((
-            <div>
-              {Object.keys(api_data.api_response).map((sourceName: keyof LookupSourceDetails, i) => (
-                <p key={`success_${i}`}>
-                  <h3>
+      apiCall({
+        method: 'GET',
+        url: url,
+        onSuccess: api_data => {
+          if (Object.keys(api_data.api_response).length !== 0) {
+            showSuccessMessage(t('related_external.found'));
+            setLinkIcon(LINK_ICON);
+            setExternalResults(
+              <div>
+                {Object.keys(api_data.api_response).map((sourceName: keyof LookupSourceDetails, i) => (
+                  <h3 key={`success_${i}`}>
                     {sourceName}:
-                    <a href={api_data.api_response[sourceName].link}>{api_data.api_response[sourceName].count} results</a>
+                    <a href={api_data.api_response[sourceName].link}>
+                      {api_data.api_response[sourceName].count} results
+                    </a>
                   </h3>
-                </p>
-              ))}
-              {!!api_data.api_error_message.length && (
+                ))}
+                {!!api_data.api_error_message.length && <h3>Errors</h3>}
+                {api_data.api_error_message?.split(new RegExp('\\r?\\n')).map((err, i) => (
+                  <p key={`error_${i}`}>{err}</p>
+                ))}
+              </div>
+            );
+          } else {
+            showWarningMessage(t('related_external.notfound'));
+            setLinkIcon(null);
+            setExternalResults(null);
+          }
+        },
+        onFailure: api_data => {
+          if (Object.keys(api_data.api_error_message).length !== 0) {
+            showErrorMessage(t('related_external.error'));
+            setLinkIcon(ERROR_ICON);
+            setExternalResults(
+              <div>
                 <h3>Errors</h3>
-              )}
-              {api_data.api_error_message?.split(new RegExp('\\r?\\n')).map((err, i) => (
-                <p key={`error_${i}`}>
-                  {err}
-                </p>
-              ))}
-            </div>
-          ));
+                {api_data.api_error_message.split(new RegExp('\\r?\\n')).map((err, i) => (
+                  <p key={`error_${i}`}>{err}</p>
+                ))}
+              </div>
+            );
+          }
         }
-        else {
-          showWarningMessage(t('related_external.notfound'));
-          setLinkIcon(null);
-          setExternalResults(null);
-        }
-      },
-      onFailure: api_data => {
-        if (Object.keys(api_data.api_error_message).length !== 0) {
-          showErrorMessage(t('related_external.error'));
-          setLinkIcon(ERROR_ICON);
-          setExternalResults((
-            <div>
-              <h3>Errors</h3>
-              {api_data.api_error_message.split(new RegExp('\\r?\\n')).map((err, i) => (
-                <p key={`error_${i}`}>
-                  {err}
-                </p>
-              ))}
-            </div>
-          ));
-        }
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [type, value, classification]);
+      });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    [type, value, classification]
+  );
 
   let maliciousness = lvl || scoreToVerdict(score);
   if (safelisted) {
@@ -205,10 +200,13 @@ const WrappedTag: React.FC<TagProps> = ({
     handleClose();
   }, [searchTag, handleClose]);
 
-  const handleMenuExternalSearch = useCallback(source => {
-    searchTagExternal(source);
-    handleClose();
-  }, [searchTagExternal, handleClose]);
+  const handleMenuExternalSearch = useCallback(
+    source => {
+      searchTagExternal(source);
+      handleClose();
+    },
+    [searchTagExternal, handleClose]
+  );
 
   const handleMenuHighlight = useCallback(() => {
     handleClick();
@@ -306,7 +304,8 @@ const WrappedTag: React.FC<TagProps> = ({
             {t('safelist')}
           </MenuItem>
         )}
-        {!!currentUser.roles.includes('external_query') && !!currentUserConfig.ui.external_sources?.length &&
+        {!!currentUser.roles.includes('external_query') &&
+          !!currentUserConfig.ui.external_sources?.length &&
           !!currentUserConfig.ui.external_source_tags?.hasOwnProperty(type) && (
             <div>
               <Divider />
@@ -318,11 +317,11 @@ const WrappedTag: React.FC<TagProps> = ({
                 {TRAVEL_EXPLORE_ICON} {t('related_external.all')}
               </MenuItem>
 
-              {currentUserConfig.ui.external_source_tags?.[type]?.map((source, i) =>
+              {currentUserConfig.ui.external_source_tags?.[type]?.map((source, i) => (
                 <MenuItem dense key={`source_${i}`} onClick={() => handleMenuExternalSearch(source)}>
                   {TRAVEL_EXPLORE_ICON} {source}
                 </MenuItem>
-              )}
+              ))}
             </div>
           )}
       </Menu>

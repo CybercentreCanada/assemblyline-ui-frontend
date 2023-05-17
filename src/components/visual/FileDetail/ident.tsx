@@ -45,15 +45,6 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const TRAVEL_EXPLORE_ICON = (
-  <TravelExploreOutlinedIcon
-    style={{
-      display: 'inline-flex',
-      height: '18px'
-    }}
-  />
-);
-
 const EXTERNAL_RESULTS_ICON = forwardRef<SvgIconTypeMap | null, any>((props, ref) => {
   const { success, ...remainingProps } = props;
   return (
@@ -80,13 +71,15 @@ type LookupSourceDetails = {
 
 type ExternalLookupResults = {
   [digestType: string]: {
-    results: null | {
+    results: {
       [sourceName: string]: {
         link: string;
         count: number;
       };
     };
-    errors: null | string;
+    errors: {
+      [sourceName: string]: string;
+    };
     success: null | boolean;
   };
 };
@@ -108,23 +101,23 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
   const lookupValue = useRef(null);
   const [lookupState, setLookupState] = React.useState<ExternalLookupResults>({
     md5: {
-      results: null,
-      errors: null,
+      results: {},
+      errors: {},
       success: null
     },
     sha1: {
-      results: null,
-      errors: null,
+      results: {},
+      errors: {},
       success: null
     },
     sha256: {
-      results: null,
-      errors: null,
+      results: {},
+      errors: {},
       success: null
     },
     ssdeep: {
-      results: null,
-      errors: null,
+      results: {},
+      errors: {},
       success: null
     }
   });
@@ -139,42 +132,67 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
       }
       url += `?${qs}`;
 
+      // use source to append rather than overwrite
       apiCall({
         method: 'GET',
         url: url,
         onSuccess: api_data => {
           if (Object.keys(api_data.api_response).length !== 0) {
             showSuccessMessage(t('related_external.found'));
-            setLookupState({
-              ...lookupState,
-              [lookupType.current]: {
-                success: true,
-                results: api_data.api_response,
-                errors: api_data.api_error_message
-              }
+            let digestType = lookupType.current;
+            let newState = {
+              success: true,
+              results: {},
+              errors: {}
+            };
+            for (let sourceName in api_data.api_response) {
+              newState.results[sourceName] = api_data.api_response[sourceName];
+            }
+            for (let sourceName in api_data.api_error_message as Object) {
+              newState.errors[sourceName] = api_data.api_error_message[sourceName];
+            }
+            setLookupState(prevState => {
+              return {
+                ...prevState,
+                [digestType]: {
+                  results: {
+                    ...prevState[digestType].results,
+                    ...newState.results
+                  },
+                  errors: {
+                    ...prevState[digestType].errors,
+                    ...newState.errors
+                  },
+                  success: newState.success
+                }
+              };
             });
           } else {
             showWarningMessage(t('related_external.notfound'));
-            setLookupState({
-              ...lookupState,
-              [lookupType.current]: {
-                success: null,
-                results: null,
-                errors: null
-              }
-            });
           }
         },
         onFailure: api_data => {
           if (Object.keys(api_data.api_error_message).length !== 0) {
             showErrorMessage(t('related_external.error'));
+            let digestType = lookupType.current;
+            let newState = {
+              errors: {},
+              // take existing success from previous source search if available
+              success: lookupState[digestType].success || false
+            };
+            for (let sourceName in api_data.api_error_message as Object) {
+              newState.errors[sourceName] = api_data.api_error_message[sourceName];
+            }
             setLookupState(prevState => {
               return {
                 ...prevState,
-                [lookupType.current]: {
-                  success: false,
-                  results: null,
-                  errors: api_data.api_error_message
+                [digestType]: {
+                  ...prevState[digestType],
+                  errors: {
+                    ...prevState[digestType].errors,
+                    ...newState.errors
+                  },
+                  success: newState.success
                 }
               };
             });
@@ -187,37 +205,38 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
   );
 
   /* Display fileinfo hash value.
-   If an external search was also perfomred for this hash, also show returned results via a tooltip*/
+   If an external search was also performed for this hash, also show returned results via a tooltip*/
   const FileHash: React.FC<any> = useCallback(({ value, lookup }) => {
     let success = lookup?.success;
     let errors = lookup?.errors;
     let results = lookup?.results;
     return (
-      <>
+      <span style={{ display: 'flex' }}>
         {value ? value : <Skeleton />}
         {success !== null ? (
           <Tooltip
             title={
               <>
-                {!!results?.length &&
-                  Object.keys(results).map((sourceName: keyof LookupSourceDetails, i) => (
-                    <p key={`success_${i}`}>
-                      <h3>
-                        {sourceName}:<a href={results[sourceName].link}>{results[sourceName].count} results</a>
-                      </h3>
-                    </p>
-                  ))}
-                {!!errors?.length && <h3>Errors</h3>}
-                {errors?.split(new RegExp('\\r?\\n')).map((err, i) => (
-                  <p key={`error_${i}`}>{err}</p>
+                {Object.keys(results)?.map((sourceName: keyof LookupSourceDetails, i) => (
+                  <h3 key={`success_${i}`}>
+                    {sourceName}: <a href={results[sourceName].link}>{results[sourceName].count} results</a>
+                  </h3>
                 ))}
+                {!!Object.keys(errors).length && (
+                  <>
+                    <h3>Errors</h3>
+                    {Object.keys(errors).map((sourceName: keyof LookupSourceDetails, i) => (
+                      <p key={`error_${i}`}>{errors[sourceName]}</p>
+                    ))}
+                  </>
+                )}
               </>
             }
           >
             <EXTERNAL_RESULTS_ICON success={success} />
           </Tooltip>
         ) : null}
-      </>
+      </span>
     );
   }, []);
 
@@ -242,10 +261,9 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                 <IconButton
                   size="small"
                   onClick={e => handleShowExternalSearchMenu(e, digestType, fileinfo[digestType])}
-                  classes={{ root: classes.externalLookupButtonRoot }}
-                >
-                  {TRAVEL_EXPLORE_ICON}
-                </IconButton>
+                  //classes={{ root: classes.externalLookupButtonRoot }}
+                  children={<TravelExploreOutlinedIcon fontSize="small" />}
+                />
               </Tooltip>
             )}
         </>
@@ -311,7 +329,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
             <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
               <Grid container>
                 <Grid item xs={4} sm={3} lg={2}>
-                  <span style={{ fontWeight: 500 }}> MD5 </span>
+                  <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5) }}> MD5 </span>
                   <ExternalSearchButton digestType="md5"></ExternalSearchButton>
                 </Grid>
                 <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
@@ -319,7 +337,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                 </Grid>
 
                 <Grid item xs={4} sm={3} lg={2}>
-                  <span style={{ fontWeight: 500 }}>SHA1</span>
+                  <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5) }}>SHA1</span>
                   <ExternalSearchButton digestType="sha1"></ExternalSearchButton>
                 </Grid>
                 <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
@@ -327,7 +345,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                 </Grid>
 
                 <Grid item xs={4} sm={3} lg={2}>
-                  <span style={{ fontWeight: 500 }}>SHA256</span>
+                  <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5) }}>SHA256</span>
                   <ExternalSearchButton digestType="sha256"></ExternalSearchButton>
                 </Grid>
                 <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
@@ -335,11 +353,10 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                 </Grid>
 
                 <Grid item xs={4} sm={3} lg={2}>
-                  <span style={{ fontWeight: 500 }}>SSDEEP</span>
+                  <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5) }}>SSDEEP</span>
                   <ExternalSearchButton digestType="ssdeep"></ExternalSearchButton>
                 </Grid>
                 <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                  {fileinfo ? fileinfo.ssdeep : <Skeleton />}
                   <FileHash value={fileinfo?.ssdeep} lookup={lookupState?.ssdeep} digestType={'ssdeep'} />
                 </Grid>
 
