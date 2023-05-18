@@ -802,6 +802,17 @@ export default function SubmissionReport() {
                   <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
                     {report ? report.file_info.ssdeep : <Skeleton />}
                   </Grid>
+
+                  {report && report.file_info.tlsh && (
+                    <>
+                      <Grid item xs={4} sm={3} lg={2}>
+                        <span style={{ fontWeight: 500 }}>{t('file.tlsh')}</span>
+                      </Grid>
+                      <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+                        {report.file_info.tlsh}
+                      </Grid>
+                    </>
+                  )}
                 </>
               )}
             </Grid>
