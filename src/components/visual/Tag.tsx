@@ -19,6 +19,7 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
+import { useSearchTagExternal } from './ExternalLookup/useExternalLookup';
 import InputDialog from './InputDialog';
 
 const STYLE = { height: 'auto', minHeight: '20px' };
@@ -52,19 +53,6 @@ type TagProps = {
   classification?: string | null;
 };
 
-type ExternalLookupResult = {
-  results: {
-    [sourceName: string]: {
-      link: string;
-      count: number;
-    };
-  };
-  errors: {
-    [sourceName: string]: string;
-  };
-  success: null | boolean;
-};
-
 const WrappedTag: React.FC<TagProps> = ({
   type,
   value,
@@ -85,7 +73,7 @@ const WrappedTag: React.FC<TagProps> = ({
   const navigate = useNavigate();
   const { user: currentUser, configuration: currentUserConfig, scoreToVerdict } = useALContext();
   const { apiCall } = useMyAPI();
-  const { showSuccessMessage, showWarningMessage, showErrorMessage } = useMySnackbar();
+  const { showSuccessMessage } = useMySnackbar();
   const { isHighlighted, triggerHighlight } = useHighlighter();
   const { copy } = useClipboard();
   const { showSafeResults } = useSafeResults();
@@ -99,85 +87,13 @@ const WrappedTag: React.FC<TagProps> = ({
     [type, value]
   );
 
-  const [lookupState, setLookupState] = React.useState<ExternalLookupResult>({
-    results: {},
-    errors: {},
-    success: null
+  const { lookupState, searchTagExternal } = useSearchTagExternal({
+    [type]: {
+      results: {},
+      errors: {},
+      success: null
+    }
   });
-
-  const searchTagExternal = useCallback(
-    source => {
-      let url = `/api/v4/federated_lookup/search/${type}/${encodeURIComponent(value)}/`;
-
-      // construct approporiate query param string
-      let qs = '';
-      if (!!classification) {
-        qs += `classification=${encodeURIComponent(classification)}`;
-      }
-      if (!!source) {
-        if (!!qs) {
-          qs += '&';
-        }
-        qs += `sources=${encodeURIComponent(source)}`;
-      }
-      if (!!qs) {
-        url += `?${qs}`;
-      }
-
-      apiCall({
-        method: 'GET',
-        url: url,
-        onSuccess: api_data => {
-          if (Object.keys(api_data.api_response).length !== 0) {
-            showSuccessMessage(t('related_external.found'));
-            // cast error response into object
-            let errors = {};
-            for (let sourceName in api_data.api_error_message as Object) {
-              errors[sourceName] = api_data.api_error_message[sourceName];
-            }
-            setLookupState(prevState => {
-              return {
-                results: {
-                  ...prevState.results,
-                  ...api_data.api_response
-                },
-                errors: {
-                  ...prevState.errors,
-                  ...errors
-                },
-                success: true
-              };
-            });
-          } else {
-            showWarningMessage(t('related_external.notfound'));
-          }
-        },
-        onFailure: api_data => {
-          if (Object.keys(api_data.api_error_message).length !== 0) {
-            showErrorMessage(t('related_external.error'));
-            // take existing success from previous source search if available
-            let success = lookupState.success || false;
-            let errors = {};
-            for (let sourceName in api_data.api_error_message as Object) {
-              errors[sourceName] = api_data.api_error_message[sourceName];
-            }
-            setLookupState(prevState => {
-              return {
-                ...prevState,
-                errors: {
-                  ...prevState.errors,
-                  ...errors
-                },
-                success: success
-              };
-            });
-          }
-        }
-      });
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [type, value, classification]
-  );
 
   let maliciousness = lvl || scoreToVerdict(score);
   if (safelisted) {
@@ -216,10 +132,10 @@ const WrappedTag: React.FC<TagProps> = ({
 
   const handleMenuExternalSearch = useCallback(
     source => {
-      searchTagExternal(source);
+      searchTagExternal(source, type, value, classification);
       handleClose();
     },
-    [searchTagExternal, handleClose]
+    [searchTagExternal, handleClose, type, value, classification]
   );
 
   const handleMenuHighlight = useCallback(() => {
@@ -352,9 +268,9 @@ const WrappedTag: React.FC<TagProps> = ({
         onContextMenu={handleMenuClick}
         icon={
           <ExternalLinks
-            success={lookupState.success}
-            results={lookupState.results}
-            errors={lookupState.errors}
+            success={lookupState[type].success}
+            results={lookupState[type].results}
+            errors={lookupState[type].errors}
             iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '18px' }}
           />
         }

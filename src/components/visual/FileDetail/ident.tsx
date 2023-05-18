@@ -16,12 +16,11 @@ import {
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
-import useMyAPI from 'components/hooks/useMyAPI';
-import useMySnackbar from 'components/hooks/useMySnackbar';
 import ExternalLinks from 'components/visual/ExternalLookup/ExternalLinks';
 import { bytesToSize } from 'helpers/utils';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchTagExternal } from '../ExternalLookup/useExternalLookup';
 
 const useStyles = makeStyles(theme => ({
   title: {
@@ -39,21 +38,6 @@ type IdentificationSectionProps = {
   fileinfo: any;
 };
 
-type ExternalLookupResults = {
-  [digestType: string]: {
-    results: {
-      [sourceName: string]: {
-        link: string;
-        count: number;
-      };
-    };
-    errors: {
-      [sourceName: string]: string;
-    };
-    success: null | boolean;
-  };
-};
-
 const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fileinfo }) => {
   const { t } = useTranslation(['fileDetail']);
   const [open, setOpen] = React.useState(true);
@@ -61,15 +45,13 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
   const classes = useStyles();
   const sp2 = theme.spacing(2);
   const { user: currentUser, configuration: currentUserConfig } = useALContext();
-  const { apiCall } = useMyAPI();
-  const { showSuccessMessage, showWarningMessage, showErrorMessage } = useMySnackbar();
 
   /* External search/lookup */
   const [externalSearchAnchorEl, setExternalSearchMenuAnchorEl] = React.useState<null | HTMLElement>(null);
   const openExternaLookupMenu = Boolean(externalSearchAnchorEl);
   const lookupType = useRef(null);
   const lookupValue = useRef(null);
-  const [lookupState, setLookupState] = React.useState<ExternalLookupResults>({
+  const { lookupState, searchTagExternal } = useSearchTagExternal({
     md5: {
       results: {},
       errors: {},
@@ -91,88 +73,6 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
       success: null
     }
   });
-
-  const searchTagExternal = useCallback(
-    (source: string) => {
-      let url = `/api/v4/federated_lookup/search/${lookupType.current}/${encodeURIComponent(lookupValue.current)}/`;
-      // construct approporiate query param string
-      let qs = `classification=${encodeURIComponent(fileinfo.classification)}`;
-      if (!!source) {
-        qs += `&sources=${encodeURIComponent(source)}`;
-      }
-      url += `?${qs}`;
-
-      // use source to append rather than overwrite
-      apiCall({
-        method: 'GET',
-        url: url,
-        onSuccess: api_data => {
-          if (Object.keys(api_data.api_response).length !== 0) {
-            showSuccessMessage(t('related_external.found'));
-            let digestType = lookupType.current;
-            let newState = {
-              success: true,
-              results: {},
-              errors: {}
-            };
-            for (let sourceName in api_data.api_response) {
-              newState.results[sourceName] = api_data.api_response[sourceName];
-            }
-            for (let sourceName in api_data.api_error_message as Object) {
-              newState.errors[sourceName] = api_data.api_error_message[sourceName];
-            }
-            setLookupState(prevState => {
-              return {
-                ...prevState,
-                [digestType]: {
-                  results: {
-                    ...prevState[digestType].results,
-                    ...newState.results
-                  },
-                  errors: {
-                    ...prevState[digestType].errors,
-                    ...newState.errors
-                  },
-                  success: newState.success
-                }
-              };
-            });
-          } else {
-            showWarningMessage(t('related_external.notfound'));
-          }
-        },
-        onFailure: api_data => {
-          if (Object.keys(api_data.api_error_message).length !== 0) {
-            showErrorMessage(t('related_external.error'));
-            let digestType = lookupType.current;
-            let newState = {
-              errors: {},
-              // take existing success from previous source search if available
-              success: lookupState[digestType].success || false
-            };
-            for (let sourceName in api_data.api_error_message as Object) {
-              newState.errors[sourceName] = api_data.api_error_message[sourceName];
-            }
-            setLookupState(prevState => {
-              return {
-                ...prevState,
-                [digestType]: {
-                  ...prevState[digestType],
-                  errors: {
-                    ...prevState[digestType].errors,
-                    ...newState.errors
-                  },
-                  success: newState.success
-                }
-              };
-            });
-          }
-        }
-      });
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [lookupType.current, fileinfo]
-  );
 
   /* Display fileinfo hash value.
    If an external search was also performed for this hash, also show returned results via a tooltip*/
@@ -234,10 +134,10 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
   /* handle selecting a menu item in the external search menu */
   const handleMenuExternalSearch = useCallback(
     (source: string) => {
-      searchTagExternal(source);
+      searchTagExternal(source, lookupType.current, lookupValue.current, fileinfo.classification);
       handleCloseExternalSearchMenu();
     },
-    [searchTagExternal, handleCloseExternalSearchMenu]
+    [handleCloseExternalSearchMenu, searchTagExternal, fileinfo]
   );
 
   /* build the external search menu */
