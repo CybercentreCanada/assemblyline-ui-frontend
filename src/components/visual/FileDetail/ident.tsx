@@ -1,7 +1,5 @@
-import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import LinkOutlinedIcon from '@mui/icons-material/LinkOutlined';
 import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
 import {
   Collapse,
@@ -12,7 +10,6 @@ import {
   Menu,
   MenuItem,
   Skeleton,
-  SvgIconTypeMap,
   Tooltip,
   Typography,
   useTheme
@@ -21,8 +18,9 @@ import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import ExternalLinks from 'components/visual/ExternalLookup/ExternalLinks';
 import { bytesToSize } from 'helpers/utils';
-import React, { forwardRef, useCallback, useMemo, useRef } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(theme => ({
@@ -34,39 +32,11 @@ const useStyles = makeStyles(theme => ({
     '&:hover, &:focus': {
       color: theme.palette.text.secondary
     }
-  },
-  externalLookupButtonRoot: {
-    marginLeft: '0px',
-    height: '0px',
-    '&:hover': {
-      backgroundColor: 'inherit',
-      color: theme.palette.text.secondary
-    }
   }
 }));
 
-const EXTERNAL_RESULTS_ICON = forwardRef<SvgIconTypeMap | null, any>((props, ref) => {
-  const { success, ...remainingProps } = props;
-  return (
-    <React.Fragment>
-      {success === true && (
-        <LinkOutlinedIcon ref={ref} style={{ display: 'inline-flex', height: '18px' }} {...remainingProps} />
-      )}
-      {success === false && (
-        <ErrorOutlineOutlinedIcon ref={ref} style={{ display: 'inline-flex', height: '18px' }} {...remainingProps} />
-      )}
-    </React.Fragment>
-  );
-});
-
 type IdentificationSectionProps = {
   fileinfo: any;
-};
-
-type LookupSourceDetails = {
-  link: string;
-  count: number;
-  classification: string;
 };
 
 type ExternalLookupResults = {
@@ -214,27 +184,12 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
       <span style={{ display: 'flex' }}>
         {value ? value : <Skeleton />}
         {success !== null ? (
-          <Tooltip
-            title={
-              <>
-                {Object.keys(results)?.map((sourceName: keyof LookupSourceDetails, i) => (
-                  <h3 key={`success_${i}`}>
-                    {sourceName}: <a href={results[sourceName].link}>{results[sourceName].count} results</a>
-                  </h3>
-                ))}
-                {!!Object.keys(errors).length && (
-                  <>
-                    <h3>Errors</h3>
-                    {Object.keys(errors).map((sourceName: keyof LookupSourceDetails, i) => (
-                      <p key={`error_${i}`}>{errors[sourceName]}</p>
-                    ))}
-                  </>
-                )}
-              </>
-            }
-          >
-            <EXTERNAL_RESULTS_ICON success={success} />
-          </Tooltip>
+          <ExternalLinks
+            success={success}
+            errors={errors}
+            results={results}
+            iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '18px' }}
+          />
         ) : null}
       </span>
     );
@@ -261,15 +216,15 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                 <IconButton
                   size="small"
                   onClick={e => handleShowExternalSearchMenu(e, digestType, fileinfo[digestType])}
-                  //classes={{ root: classes.externalLookupButtonRoot }}
                   children={<TravelExploreOutlinedIcon fontSize="small" />}
+                  style={{ height: '18px' }}
                 />
               </Tooltip>
             )}
         </>
       );
     },
-    [currentUser, currentUserConfig, fileinfo, classes.externalLookupButtonRoot, handleShowExternalSearchMenu, t]
+    [currentUser, currentUserConfig, fileinfo, handleShowExternalSearchMenu, t]
   );
 
   const handleCloseExternalSearchMenu = useCallback(() => {
@@ -329,35 +284,43 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
             <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
               <Grid container>
                 <Grid item xs={4} sm={3} lg={2}>
-                  <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5) }}> MD5 </span>
-                  <ExternalSearchButton digestType="md5"></ExternalSearchButton>
+                  <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>
+                    MD5
+                    <ExternalSearchButton digestType="md5"></ExternalSearchButton>
+                  </span>
                 </Grid>
                 <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                  <FileHash value={fileinfo?.md5} lookup={lookupState?.md5} digestType={'md5'} />
+                  <FileHash value={fileinfo?.md5} lookup={lookupState.md5} />
                 </Grid>
 
                 <Grid item xs={4} sm={3} lg={2}>
-                  <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5) }}>SHA1</span>
-                  <ExternalSearchButton digestType="sha1"></ExternalSearchButton>
+                  <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>
+                    SHA1
+                    <ExternalSearchButton digestType="sha1"></ExternalSearchButton>
+                  </span>
                 </Grid>
                 <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                  <FileHash value={fileinfo?.sha1} lookup={lookupState?.sha1} digestType={'sha1'} />
+                  <FileHash value={fileinfo?.sha1} lookup={lookupState.sha1} />
                 </Grid>
 
                 <Grid item xs={4} sm={3} lg={2}>
-                  <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5) }}>SHA256</span>
-                  <ExternalSearchButton digestType="sha256"></ExternalSearchButton>
+                  <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>
+                    SHA256
+                    <ExternalSearchButton digestType="sha256"></ExternalSearchButton>
+                  </span>
                 </Grid>
                 <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                  <FileHash value={fileinfo?.sha256} lookup={lookupState?.sha256} digestType={'sha256'} />
+                  <FileHash value={fileinfo?.sha256} lookup={lookupState.sha256} />
                 </Grid>
 
                 <Grid item xs={4} sm={3} lg={2}>
-                  <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5) }}>SSDEEP</span>
-                  <ExternalSearchButton digestType="ssdeep"></ExternalSearchButton>
+                  <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>
+                    SSDEEP
+                    <ExternalSearchButton digestType="ssdeep"></ExternalSearchButton>
+                  </span>
                 </Grid>
                 <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                  <FileHash value={fileinfo?.ssdeep} lookup={lookupState?.ssdeep} digestType={'ssdeep'} />
+                  <FileHash value={fileinfo?.ssdeep} lookup={lookupState.ssdeep} />
                 </Grid>
 
                 <Grid item xs={4} sm={3} lg={2}>
@@ -404,7 +367,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
               </Grid>
             </div>
           ),
-          [fileinfo, lookupState, sp2, t, FileHash, ExternalSearchButton]
+          [fileinfo, lookupState, sp2, t, theme, FileHash, ExternalSearchButton]
         )}
       </Collapse>
     </div>

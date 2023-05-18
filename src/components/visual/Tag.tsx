@@ -1,7 +1,5 @@
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
-import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
-import LinkOutlinedIcon from '@mui/icons-material/LinkOutlined';
 import PlaylistAddCheckOutlinedIcon from '@mui/icons-material/PlaylistAddCheckOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
@@ -15,6 +13,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import useSafeResults from 'components/hooks/useSafeResults';
 import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
+import ExternalLinks from 'components/visual/ExternalLookup/ExternalLinks';
 import { safeFieldValueURI } from 'helpers/utils';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -29,8 +28,6 @@ const HIGHLIGHT_ICON = <SelectAllOutlinedIcon style={{ marginRight: '16px' }} />
 const SAFELIST_ICON = <PlaylistAddCheckOutlinedIcon style={{ marginRight: '16px' }} />;
 const SIGNATURE_ICON = <FingerprintOutlinedIcon style={{ marginRight: '16px' }} />;
 const TRAVEL_EXPLORE_ICON = <TravelExploreOutlinedIcon style={{ marginRight: '16px' }} />;
-const LINK_ICON = <LinkOutlinedIcon style={{ marginRight: '-3px', marginLeft: '3px', height: '18px' }} />;
-const ERROR_ICON = <ErrorOutlineOutlinedIcon style={{ marginRight: '-3px', marginLeft: '3px', height: '18px' }} />;
 const initialMenuState = {
   mouseX: null,
   mouseY: null
@@ -55,10 +52,17 @@ type TagProps = {
   classification?: string | null;
 };
 
-type LookupSourceDetails = {
-  link: string;
-  count: number;
-  classification: string;
+type ExternalLookupResult = {
+  results: {
+    [sourceName: string]: {
+      link: string;
+      count: number;
+    };
+  };
+  errors: {
+    [sourceName: string]: string;
+  };
+  success: null | boolean;
 };
 
 const WrappedTag: React.FC<TagProps> = ({
@@ -95,8 +99,12 @@ const WrappedTag: React.FC<TagProps> = ({
     [type, value]
   );
 
-  const [linkIcon, setLinkIcon] = React.useState(null);
-  const [externalResults, setExternalResults] = React.useState(null);
+  const [lookupState, setLookupState] = React.useState<ExternalLookupResult>({
+    results: {},
+    errors: {},
+    success: null
+  });
+
   const searchTagExternal = useCallback(
     source => {
       let url = `/api/v4/federated_lookup/search/${type}/${encodeURIComponent(value)}/`;
@@ -122,46 +130,52 @@ const WrappedTag: React.FC<TagProps> = ({
         onSuccess: api_data => {
           if (Object.keys(api_data.api_response).length !== 0) {
             showSuccessMessage(t('related_external.found'));
-            setLinkIcon(LINK_ICON);
-            setExternalResults(
-              <div>
-                {Object.keys(api_data.api_response).map((sourceName: keyof LookupSourceDetails, i) => (
-                  <h3 key={`success_${i}`}>
-                    {sourceName}:
-                    <a href={api_data.api_response[sourceName].link}>
-                      {api_data.api_response[sourceName].count} results
-                    </a>
-                  </h3>
-                ))}
-                {!!api_data.api_error_message.length && <h3>Errors</h3>}
-                {api_data.api_error_message?.split(new RegExp('\\r?\\n')).map((err, i) => (
-                  <p key={`error_${i}`}>{err}</p>
-                ))}
-              </div>
-            );
+            // cast error response into object
+            let errors = {};
+            for (let sourceName in api_data.api_error_message as Object) {
+              errors[sourceName] = api_data.api_error_message[sourceName];
+            }
+            setLookupState(prevState => {
+              return {
+                results: {
+                  ...prevState.results,
+                  ...api_data.api_response
+                },
+                errors: {
+                  ...prevState.errors,
+                  ...errors
+                },
+                success: true
+              };
+            });
           } else {
             showWarningMessage(t('related_external.notfound'));
-            setLinkIcon(null);
-            setExternalResults(null);
           }
         },
         onFailure: api_data => {
           if (Object.keys(api_data.api_error_message).length !== 0) {
             showErrorMessage(t('related_external.error'));
-            setLinkIcon(ERROR_ICON);
-            setExternalResults(
-              <div>
-                <h3>Errors</h3>
-                {api_data.api_error_message.split(new RegExp('\\r?\\n')).map((err, i) => (
-                  <p key={`error_${i}`}>{err}</p>
-                ))}
-              </div>
-            );
+            // take existing success from previous source search if available
+            let success = lookupState.success || false;
+            let errors = {};
+            for (let sourceName in api_data.api_error_message as Object) {
+              errors[sourceName] = api_data.api_error_message[sourceName];
+            }
+            setLookupState(prevState => {
+              return {
+                ...prevState,
+                errors: {
+                  ...prevState.errors,
+                  ...errors
+                },
+                success: success
+              };
+            });
           }
         }
       });
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [type, value, classification]
   );
 
@@ -336,8 +350,14 @@ const WrappedTag: React.FC<TagProps> = ({
         onClick={highlight_key ? handleClick : null}
         fullWidth={fullWidth}
         onContextMenu={handleMenuClick}
-        icon={linkIcon}
-        tooltip={externalResults}
+        icon={
+          <ExternalLinks
+            success={lookupState.success}
+            results={lookupState.results}
+            errors={lookupState.errors}
+            iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '18px' }}
+          />
+        }
       />
     </>
   );
