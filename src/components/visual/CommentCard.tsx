@@ -36,7 +36,7 @@ const useStyles = makeStyles(theme => ({
   },
   icon: {
     alignSelf: 'start',
-    width: '40px'
+    minWidth: '40px'
   },
   container: {
     flex: 1,
@@ -279,13 +279,15 @@ const WrappedCommentCard = ({
       )}
     >
       <div className={classes.icon}>
-        {(isAdding || !isSameAuthor) && (
+        {isAdding || !isSameAuthor ? (
           <AppUserAvatar
             children={username}
-            alt={currentUser.name}
-            url={currentUser.avatar}
-            email={currentUser.email}
+            alt={isAdding ? currentUser.name : comment.name}
+            url={isAdding ? currentUser.avatar : comment.avatar}
+            email={isAdding ? currentUser.email : comment.email}
           />
+        ) : (
+          <div />
         )}
       </div>
 
