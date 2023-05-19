@@ -63,8 +63,6 @@ export function useSearchTagExternal(initialState: ExternalLookupResults) {
                 }
               };
             });
-          } else {
-            showWarningMessage(t('related_external.notfound'));
           }
         },
         onFailure: api_data => {
@@ -88,6 +86,8 @@ export function useSearchTagExternal(initialState: ExternalLookupResults) {
                 }
               };
             });
+          } else {
+            showWarningMessage(t('related_external.notfound'));
           }
         }
       });

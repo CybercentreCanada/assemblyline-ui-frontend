@@ -39,12 +39,12 @@ type IdentificationSectionProps = {
 };
 
 const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fileinfo }) => {
+  const { user: currentUser, configuration: currentUserConfig } = useALContext();
   const { t } = useTranslation(['fileDetail']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
   const classes = useStyles();
   const sp2 = theme.spacing(2);
-  const { user: currentUser, configuration: currentUserConfig } = useALContext();
 
   /* External search/lookup */
   const [externalSearchAnchorEl, setExternalSearchMenuAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -117,7 +117,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                   size="small"
                   onClick={e => handleShowExternalSearchMenu(e, digestType, fileinfo[digestType])}
                   children={<TravelExploreOutlinedIcon fontSize="small" />}
-                  style={{ height: '18px' }}
+                  style={{ height: '16px', width: '16px', marginLeft: '8px' }}
                 />
               </Tooltip>
             )}
