@@ -7,6 +7,7 @@ type PageCenterProps = PageProps & {
   children: React.ReactNode;
   maxWidth?: string;
   textAlign?: string;
+  flex?: number;
 };
 
 const PageCenter = ({
@@ -15,6 +16,7 @@ const PageCenter = ({
   width = '95%',
   maxWidth = '1200px',
   textAlign = 'center',
+  flex,
   ...props
 }: PageCenterProps) => {
   return (
@@ -23,6 +25,7 @@ const PageCenter = ({
       height={height}
       width={width}
       maxWidth={maxWidth}
+      flex={flex}
       sx={theme => ({
         height,
         width,

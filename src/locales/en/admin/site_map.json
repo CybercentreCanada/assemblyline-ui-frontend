@@ -24,6 +24,8 @@
   "role.obo_access": "On Behalf Of Access",
   "role.replay_system": "Replay System",
   "role.replay_trigger": "Replay Trigger",
+  "role.retrohunt_run": "Retrohunt Run",
+  "role.retrohunt_view": "Retrohunt View",
   "role.safelist_manage": "Safelist Manage",
   "role.safelist_view": "Safelist View",
   "role.search": "Search",
