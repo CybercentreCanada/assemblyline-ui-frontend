@@ -29,11 +29,6 @@ const useStyles = makeStyles(theme => ({
   diffComment: {
     margin: `${theme.spacing(2)} 0 0 0`
   },
-  stickyComment: {
-    position: 'sticky',
-    top: '64px',
-    backgroundColor: theme.palette.background.paper
-  },
   icon: {
     alignSelf: 'start',
     minWidth: '40px'
@@ -91,14 +86,25 @@ const useStyles = makeStyles(theme => ({
 
 export type Comment = {
   cid?: string;
-  name?: string;
-  avatar?: string;
-  email?: string;
+  uname?: string;
   text?: string;
   date?: string;
 };
 
-export const DEFAULT_COMMENT: Comment = { name: null, avatar: null, email: null, text: '', date: null };
+export type Author = {
+  name?: string;
+  avatar?: string;
+  email?: string;
+};
+
+export const DEFAULT_COMMENT: Comment = {
+  cid: null,
+  uname: null,
+  text: '',
+  date: null
+};
+
+export const DEFAULT_AUTHOR: Author = { name: null, avatar: null, email: null };
 
 export type CommentProp = {
   comment: Comment;
@@ -109,7 +115,8 @@ export type CommentProp = {
 type Props = {
   currentComment?: Comment;
   previousComment?: Comment;
-  nextComment?: Comment;
+  currentAuthor?: Author;
+  previousAuthor?: Author;
   isAdding?: boolean;
   onAddComment?: ({ comment, successCallback = () => null, finalizeCallback = () => null }: CommentProp) => void;
   onEditComment?: ({ comment, successCallback = () => null, finalizeCallback = () => null }: CommentProp) => void;
@@ -131,15 +138,16 @@ const CALENDAR_STRINGS = {
   }
 };
 
-const WrappedCommentCard = ({
+const WrappedCommentCard: React.FC<Props> = ({
   currentComment = DEFAULT_COMMENT,
   previousComment = null,
-  nextComment = null,
+  currentAuthor = DEFAULT_AUTHOR,
+  previousAuthor = DEFAULT_AUTHOR,
   isAdding = false,
   onAddComment = () => null,
   onEditComment = () => null,
   onDeleteComment = () => null
-}: Props) => {
+}) => {
   const { t, i18n } = useTranslation(['fileDetail']);
   const classes = useStyles();
   const { user: currentUser } = useALContext();
@@ -154,13 +162,13 @@ const WrappedCommentCard = ({
 
   const username = useMemo<string>(
     () =>
-      (comment.name || currentUser?.name || '')
+      (currentAuthor?.name || currentUser?.name || '')
         .split(' ')
         .filter(w => w !== '')
         .splice(0, 2)
         .map(n => (n ? n[0].toUpperCase() : ''))
         .join(''),
-    [comment, currentUser?.name]
+    [currentAuthor?.name, currentUser?.name]
   );
 
   const calendar = useMemo<(typeof CALENDAR_STRINGS)['en']>(
@@ -169,8 +177,8 @@ const WrappedCommentCard = ({
   );
 
   const isSameAuthor = useMemo<boolean>(
-    () => currentComment?.name === previousComment?.name,
-    [currentComment?.name, previousComment?.name]
+    () => currentAuthor?.name === previousAuthor?.name,
+    [currentAuthor?.name, previousAuthor?.name]
   );
 
   const isNarrowTimeSpan = useMemo<boolean>(
@@ -232,7 +240,7 @@ const WrappedCommentCard = ({
   const handlePopoverClose = useCallback(() => setAnchorEl(null), []);
 
   const handleEditAction = useCallback(
-    (c: Comment) => () => {
+    () => () => {
       setIsEditing(true);
       setAnchorEl(null);
       setTimeout(() => {
@@ -271,20 +279,14 @@ const WrappedCommentCard = ({
   useEffect(() => setComment(currentComment), [currentComment]);
 
   return (
-    <div
-      className={clsx(
-        classes.comment,
-        isAdding && classes.stickyComment,
-        (isAdding || !isSameAuthor || !isNarrowTimeSpan) && classes.diffComment
-      )}
-    >
+    <div className={clsx(classes.comment, (isAdding || !isSameAuthor || !isNarrowTimeSpan) && classes.diffComment)}>
       <div className={classes.icon}>
         {isAdding || !isSameAuthor ? (
           <AppUserAvatar
             children={username}
-            alt={isAdding ? currentUser.name : comment.name}
-            url={isAdding ? currentUser.avatar : comment.avatar}
-            email={isAdding ? currentUser.email : comment.email}
+            alt={isAdding ? currentUser.name : currentAuthor.name}
+            url={isAdding ? currentUser.avatar : currentAuthor.avatar}
+            email={isAdding ? currentUser.email : currentAuthor.email}
           />
         ) : (
           <div />
@@ -353,7 +355,7 @@ const WrappedCommentCard = ({
 
       {!isAdding && !isEditing && (
         <Paper
-          className={clsx(classes.content, comment?.email === currentUser?.email && classes.authorText)}
+          className={clsx(classes.content, currentAuthor?.email === currentUser?.email && classes.authorText)}
           ref={contentRef}
           variant="outlined"
           onMouseEnter={handlePopoverOpen}
@@ -363,7 +365,7 @@ const WrappedCommentCard = ({
             <div className={classes.header}>
               {!isSameAuthor && (
                 <Typography className={classes.name} variant="body1">
-                  {comment?.name}
+                  {currentAuthor?.name}
                 </Typography>
               )}
               {(!isSameAuthor || !isNarrowTimeSpan) && (
@@ -383,7 +385,7 @@ const WrappedCommentCard = ({
               <Fade {...TransitionProps} timeout={350}>
                 <ButtonGroup className={classes.actions} variant="outlined" color="inherit">
                   <Tooltip classes={{ tooltip: classes.tooltip }} title={t('comment.popper.edit')}>
-                    <Button className={classes.action} size="small" onClick={handleEditAction(comment)}>
+                    <Button className={classes.action} size="small" onClick={handleEditAction()}>
                       <CreateOutlinedIcon />
                     </Button>
                   </Tooltip>

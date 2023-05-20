@@ -3,7 +3,7 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Collapse, Divider, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { Comment, CommentProp } from 'components/visual/CommentCard';
+import { Author, Comment, CommentProp } from 'components/visual/CommentCard';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { io } from 'socket.io-client';
@@ -25,19 +25,20 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-type CommentSectionProps = {
+type Props = {
   sha256: string;
   comments: Comment[];
 };
 
 const SOCKETIO_NAMESPACE = '/file_comments';
 
-const WrappedCommentSection: React.FC<CommentSectionProps> = ({ sha256 = null, comments: _comments }) => {
+const WrappedCommentSection: React.FC<Props> = ({ sha256 = null, comments: _comments }) => {
   const { t } = useTranslation(['fileDetail']);
   const classes = useStyles();
   const { apiCall } = useMyAPI();
 
   const [comments, setComments] = useState<Comment[]>(_comments);
+  const [authors, setAuthors] = useState<{ [uname: string]: Author }>(null);
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
   const socket = useRef(null);
 
@@ -47,7 +48,10 @@ const WrappedCommentSection: React.FC<CommentSectionProps> = ({ sha256 = null, c
       method: 'GET',
       url: `/api/v4/file/comment/${file_sha256}/`,
       onSuccess: api_data => {
-        setComments(api_data.api_response);
+        setAuthors(api_data.api_response.authors);
+        setComments(
+          api_data.api_response.comments.sort((a: Comment, b: Comment) => Date.parse(b.date) - Date.parse(a.date))
+        );
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -60,7 +64,7 @@ const WrappedCommentSection: React.FC<CommentSectionProps> = ({ sha256 = null, c
         url: `/api/v4/file/comment/${sha256}/`,
         body: { text: comment?.text },
         onSuccess: api_data => {
-          setComments(api_data.api_response);
+          setComments(cs => [api_data.api_response, ...cs]);
           successCallback(null);
           socket.current.emit('comments_change', { sha256: sha256 });
         },
@@ -78,7 +82,7 @@ const WrappedCommentSection: React.FC<CommentSectionProps> = ({ sha256 = null, c
         method: 'POST',
         url: `/api/v4/file/comment/${sha256}/${comment?.cid}/`,
         body: { text: comment?.text },
-        onSuccess: api_data => {
+        onSuccess: () => {
           successCallback(comment);
           socket.current.emit('comments_change', { sha256: sha256 });
         },
@@ -95,7 +99,7 @@ const WrappedCommentSection: React.FC<CommentSectionProps> = ({ sha256 = null, c
       apiCall({
         method: 'DELETE',
         url: `/api/v4/file/comment/${sha256}/${comment?.cid}/`,
-        onSuccess: api_data => {
+        onSuccess: () => {
           setComments(cs => cs.filter(c => c?.cid !== comment?.cid));
           socket.current.emit('comments_change', { sha256: sha256 });
         },
@@ -156,12 +160,13 @@ const WrappedCommentSection: React.FC<CommentSectionProps> = ({ sha256 = null, c
                 key={`${comment?.cid}`}
                 currentComment={comment}
                 previousComment={i > 0 ? comments[i - 1] : null}
-                nextComment={i < comments.length - 1 ? comments[i + 1] : null}
+                currentAuthor={comment?.uname in authors ? authors[comment?.uname] : undefined}
+                previousAuthor={i > 0 && comment?.uname in authors ? authors[comments[i - 1]?.uname] : undefined}
                 onEditComment={handleEditComment}
                 onDeleteComment={handleDeleteComment}
               />
             )),
-          [comments, handleDeleteComment, handleEditComment]
+          [authors, comments, handleDeleteComment, handleEditComment]
         )}
       </Collapse>
     </div>
