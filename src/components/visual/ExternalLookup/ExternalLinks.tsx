@@ -37,6 +37,12 @@ const useStyles = makeStyles(theme => ({
     '&:hover': {
       color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark
     }
+  },
+  popover: {
+    pointerEvents: 'none'
+  },
+  popoverContent: {
+    pointerEvents: 'auto'
   }
 }));
 
@@ -73,18 +79,18 @@ const EXTERNAL_RESULTS_ICON = forwardRef<SvgIconTypeMap | null, any>((props, ref
 
 const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ results, errors, success, iconStyle }) => {
   const classes = useStyles();
-  const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
+  const [openedPopover, setOpenedPopover] = React.useState(false);
+  const popoverAnchor = React.useRef(null);
 
-  const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
+  const popoverEnter = ({ currentTarget }) => {
+    setOpenedPopover(true);
   };
 
-  const handlePopoverClose = () => {
-    setAnchorEl(null);
+  const popoverLeave = ({ currentTarget }) => {
+    setOpenedPopover(false);
   };
 
-  const open = Boolean(anchorEl);
-  const id = open ? 'external-result-popover' : undefined;
+  const id = openedPopover ? 'external-result-popover' : undefined;
 
   return (
     <div>
@@ -94,18 +100,20 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ results, errors, 
           style={iconStyle}
           aria-owns={id}
           aria-haspopup="true"
-          onMouseEnter={handlePopoverOpen}
-          onMouseLeave={handlePopoverClose}
+          onMouseEnter={popoverEnter}
+          onMouseLeave={popoverLeave}
+          ref={popoverAnchor}
         />
       ) : null}
 
       <Popover
         id={id}
-        sx={{
-          pointerEvents: 'none'
+        className={classes.popover}
+        classes={{
+          paper: classes.popoverContent
         }}
-        open={open}
-        anchorEl={anchorEl}
+        open={openedPopover}
+        anchorEl={popoverAnchor.current}
         anchorOrigin={{
           vertical: 'bottom',
           horizontal: 'left'
@@ -114,8 +122,8 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ results, errors, 
           vertical: 'top',
           horizontal: 'left'
         }}
-        onClose={handlePopoverClose}
         disableRestoreFocus
+        PaperProps={{ onMouseEnter: popoverEnter, onMouseLeave: popoverLeave }}
       >
         <Typography sx={{ p: 1 }}>
           {Object.keys(results)?.map((sourceName: keyof LookupSourceDetails, i) => (
