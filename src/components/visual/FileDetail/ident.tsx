@@ -39,12 +39,12 @@ type IdentificationSectionProps = {
 };
 
 const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fileinfo }) => {
-  const { user: currentUser, configuration: currentUserConfig } = useALContext();
   const { t } = useTranslation(['fileDetail']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
   const classes = useStyles();
   const sp2 = theme.spacing(2);
+  const { user: currentUser, configuration: currentUserConfig } = useALContext();
 
   /* External search/lookup */
   const [externalSearchAnchorEl, setExternalSearchMenuAnchorEl] = React.useState<null | HTMLElement>(null);
