@@ -71,7 +71,7 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ tag_group, tags, force =
                   <AutoHideTagList
                     tag_type={tag_type}
                     items={tags[tag_type].map(item => {
-                      return { value: item[0], lvl: item[1], safelisted: item[2] };
+                      return { value: item[0], lvl: item[1], safelisted: item[2], classification: item[3] };
                     })}
                     force={force}
                   />
