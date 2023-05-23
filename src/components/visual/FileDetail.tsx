@@ -35,6 +35,7 @@ import { useNavigate } from 'react-router';
 import { Link, useLocation } from 'react-router-dom';
 import AttackSection from './FileDetail/attacks';
 import ChildrenSection from './FileDetail/childrens';
+import CommentSection from './FileDetail/comments';
 import Detection from './FileDetail/detection';
 import EmptySection from './FileDetail/emptys';
 import ErrorSection from './FileDetail/errors';
@@ -51,6 +52,12 @@ type FileInfo = {
   archive_ts: string;
   ascii: string;
   classification: string;
+  comments: {
+    cid: string;
+    uname: string;
+    date: string;
+    text: string;
+  }[];
   entropy: number;
   expiry_ts: string | null;
   hex: string;
@@ -411,6 +418,9 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
         />
         <EmptySection emptys={file ? file.emptys : null} sid={sid} />
         <ErrorSection errors={file ? file.errors : null} />
+        {isArchive && (
+          <CommentSection sha256={file?.file_info?.sha256} comments={file ? file?.file_info?.comments : null} />
+        )}
       </div>
     </div>
   ) : (
