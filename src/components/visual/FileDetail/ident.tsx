@@ -1,3 +1,4 @@
+import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
@@ -25,7 +26,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import CustomChip from 'components/visual/CustomChip';
 import { bytesToSize } from 'helpers/utils';
-import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchTagExternal } from '../ExternalLookup/useExternalLookup';
 
@@ -38,6 +39,10 @@ const useStyles = makeStyles(theme => ({
     '&:hover, &:focus': {
       color: theme.palette.text.secondary
     }
+  },
+  labels: {
+    display: 'flex',
+    alignItems: 'center'
   }
 }));
 
@@ -98,6 +103,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
   const [labels, setLabels] = useState<LabelCategories>(null);
   const [isEditingLabels, setIsEditingLabels] = useState<boolean>(false);
+  const prevLabels = useRef<LabelCategories>(null);
 
   const sortingLabels = useCallback(
     (data: LabelCategories): LabelCategories =>
@@ -115,8 +121,13 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
     setLabels(sortingLabels(fileinfo.label_categories));
   }, [fileinfo, sortingLabels]);
 
+  const handleEditingLabels = useCallback((data: LabelCategories) => {
+    setIsEditingLabels(true);
+    prevLabels.current = data;
+  }, []);
+
   const handleSaveLabels = useCallback(
-    data => {
+    (data: LabelCategories) => {
       if (!fileinfo) return;
       apiCall({
         method: 'POST',
@@ -125,7 +136,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
         onSuccess: api_data => {
           showSuccessMessage(t('labels.success'));
           setLabels(sortingLabels(api_data.api_response?.response?.label_categories));
-          setIsEditingLabels(v => !v);
+          setIsEditingLabels(false);
         },
         onFailure(api_data) {
           showErrorMessage(api_data.api_response);
@@ -136,6 +147,10 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
     [fileinfo?.sha256, showErrorMessage, showSuccessMessage, sortingLabels, t]
   );
 
+  const handleCancelLabels = useCallback(() => {
+    setLabels(prevLabels.current);
+    setIsEditingLabels(false);
+  }, []);
 
   /* Display fileinfo hash value.
    If an external search was also performed for this hash, also show returned results via a tooltip*/
@@ -339,21 +354,30 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                   {fileinfo ? fileinfo.entropy : <Skeleton />}
                 </Grid>
                 <Grid item xs={4} sm={3} lg={2}>
-                  <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5) }}>{t('labels')}</span>
-                  {!isEditingLabels && (
-                    <IconButton
-                      children={<CreateOutlinedIcon fontSize="small" />}
-                      size="small"
-                      onClick={() => setIsEditingLabels(v => !v)}
-                    />
-                  )}
-                  {isEditingLabels && (
-                    <IconButton
-                      children={<SaveOutlinedIcon fontSize="small" />}
-                      size="small"
-                      onClick={() => handleSaveLabels(labels)}
-                    />
-                  )}
+                  <div className={classes.labels}>
+                    <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5) }}>{t('labels')}</span>
+                    {!isEditingLabels && (
+                      <IconButton
+                        children={<CreateOutlinedIcon fontSize="small" />}
+                        size="small"
+                        onClick={() => handleEditingLabels(labels)}
+                      />
+                    )}
+                    {isEditingLabels && (
+                      <IconButton
+                        children={<SaveOutlinedIcon fontSize="small" />}
+                        size="small"
+                        onClick={() => handleSaveLabels(labels)}
+                      />
+                    )}
+                    {isEditingLabels && (
+                      <IconButton
+                        children={<ClearOutlinedIcon fontSize="small" />}
+                        size="small"
+                        onClick={() => handleCancelLabels()}
+                      />
+                    )}
+                  </div>
                 </Grid>
                 <Grid item xs={8} sm={9} lg={10}>
                   {fileinfo ? (
