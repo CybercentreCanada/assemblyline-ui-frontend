@@ -1,10 +1,11 @@
-import { IconButton, Tooltip } from '@mui/material';
-import Paper from '@mui/material/Paper';
-import TableContainer from '@mui/material/TableContainer';
 import ClearIcon from '@mui/icons-material/Clear';
+import CloudDoneOutlinedIcon from '@mui/icons-material/CloudDoneOutlined';
+import CloudOffOutlinedIcon from '@mui/icons-material/CloudOffOutlined';
 import DoneIcon from '@mui/icons-material/Done';
 import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
-import { AlertTitle, Skeleton } from '@mui/material';
+import { AlertTitle, IconButton, Skeleton, Tooltip } from '@mui/material';
+import Paper from '@mui/material/Paper';
+import TableContainer from '@mui/material/TableContainer';
 import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -18,6 +19,7 @@ export type ServiceResult = {
   category: string;
   description: string;
   enabled: boolean;
+  is_external: boolean;
   name: string;
   privileged: boolean;
   rejects: string;
@@ -58,6 +60,7 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
               <DivTableCell>{t('header.category')}</DivTableCell>
               <DivTableCell>{t('header.stage')}</DivTableCell>
               <DivTableCell>{t('header.accepts')}</DivTableCell>
+              <DivTableCell>{t('header.location')}</DivTableCell>
               <DivTableCell>{t('header.mode')}</DivTableCell>
               <DivTableCell>{t('header.enabled')}</DivTableCell>
               <DivTableCell />
@@ -83,6 +86,17 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
                 <DivTableCell>{result.category}</DivTableCell>
                 <DivTableCell>{result.stage}</DivTableCell>
                 <DivTableCell breakable>{result.accepts}</DivTableCell>
+                <DivTableCell>
+                  {result.is_external ? (
+                    <Tooltip title={t('location.external')}>
+                      <CloudDoneOutlinedIcon color="primary" />
+                    </Tooltip>
+                  ) : (
+                    <Tooltip title={t('location.internal')}>
+                      <CloudOffOutlinedIcon color="disabled" />
+                    </Tooltip>
+                  )}
+                </DivTableCell>
                 <DivTableCell>
                   <CustomChip
                     size="tiny"
@@ -114,7 +128,8 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
                             onUpdate(result.name, updates[result.name]);
                           }}
                           disabled={updates[result.name].updating}
-                          size="large">
+                          size="large"
+                        >
                           <SystemUpdateAltIcon />
                         </IconButton>
                       </span>
