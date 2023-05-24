@@ -71,7 +71,7 @@
   "general.caching.disabled": "Désactivée",
   "general.caching.enabled": "Activé",
   "general.category": "Catégorie de service",
-  "general.classification": "Classement du services",
+  "general.classification": "Classification du service",
   "general.description": "Description",
   "general.licence": "Nombre maximum d'instances",
   "general.location": "Emplacement du service",
