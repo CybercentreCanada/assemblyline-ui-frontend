@@ -1,14 +1,14 @@
-import { IconButton, Tooltip } from '@mui/material';
-import Paper from '@mui/material/Paper';
-import TableContainer from '@mui/material/TableContainer';
 import ClearIcon from '@mui/icons-material/Clear';
 import DoneIcon from '@mui/icons-material/Done';
 import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
-import { AlertTitle, Skeleton } from '@mui/material';
+import { AlertTitle, IconButton, Skeleton, Tooltip } from '@mui/material';
+import Paper from '@mui/material/Paper';
+import TableContainer from '@mui/material/TableContainer';
 import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import Classification from '../Classification';
 import CustomChip from '../CustomChip';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from '../DivTable';
 import InformativeAlert from '../InformativeAlert';
@@ -16,6 +16,7 @@ import InformativeAlert from '../InformativeAlert';
 export type ServiceResult = {
   accepts: string;
   category: string;
+  classification: string;
   description: string;
   enabled: boolean;
   name: string;
@@ -59,6 +60,7 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
               <DivTableCell>{t('header.stage')}</DivTableCell>
               <DivTableCell>{t('header.accepts')}</DivTableCell>
               <DivTableCell>{t('header.mode')}</DivTableCell>
+              <DivTableCell>{t('header.classification')}</DivTableCell>
               <DivTableCell>{t('header.enabled')}</DivTableCell>
               <DivTableCell />
             </DivTableRow>
@@ -94,6 +96,11 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
                   />
                 </DivTableCell>
                 <DivTableCell>
+                  <div style={{ marginBottom: '-1.5px' }}>
+                    <Classification type="text" c12n={result ? result.classification : null} />
+                  </div>
+                </DivTableCell>
+                <DivTableCell>
                   {result.enabled ? <DoneIcon color="primary" /> : <ClearIcon color="error" />}
                 </DivTableCell>
                 <DivTableCell style={{ whiteSpace: 'nowrap', paddingTop: 0, paddingBottom: 0 }}>
@@ -114,7 +121,8 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
                             onUpdate(result.name, updates[result.name]);
                           }}
                           disabled={updates[result.name].updating}
-                          size="large">
+                          size="large"
+                        >
                           <SystemUpdateAltIcon />
                         </IconButton>
                       </span>
