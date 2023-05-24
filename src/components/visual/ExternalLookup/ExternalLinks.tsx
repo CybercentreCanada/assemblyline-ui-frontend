@@ -128,7 +128,7 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ results, errors, 
         onClick={event => event.stopPropagation()}
       >
         <Typography sx={{ p: 1 }}>
-          {Object.keys(results)?.map((sourceName: keyof LookupSourceDetails, i) => (
+          {[...Object.keys(results)]?.sort().map((sourceName: keyof LookupSourceDetails, i) => (
             <div key={`success_${i}`}>
               <Typography className={clsx(classes.title)} sx={{ display: 'inline' }}>
                 {toTitleCase(sourceName)} :
@@ -152,7 +152,7 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ results, errors, 
           {!!Object.keys(errors).length && (
             <>
               <Typography className={clsx(classes.title)}>Errors:</Typography>
-              {Object.keys(errors).map((sourceName: keyof LookupSourceDetails, i) => (
+              {[...Object.keys(errors)].sort().map((sourceName: keyof LookupSourceDetails, i) => (
                 <Typography key={`error_${i}`} className={clsx(classes.error)}>
                   {errors[sourceName]}
                 </Typography>
