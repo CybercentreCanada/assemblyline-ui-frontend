@@ -20,6 +20,14 @@ type ExternalLookupResults = {
   [tagName: string]: ExternalLookupResult;
 };
 
+function toTitleCase(s: string) {
+  return s
+    .replace(/_/g, ' ')
+    .split(' ')
+    .map(w => w[0].toUpperCase() + w.substring(1).toLowerCase())
+    .join(' ');
+}
+
 export function useSearchTagExternal(initialState: ExternalLookupResults) {
   const { t } = useTranslation();
   const { apiCall } = useMyAPI();
@@ -98,6 +106,7 @@ export function useSearchTagExternal(initialState: ExternalLookupResults) {
 
   return {
     lookupState,
-    searchTagExternal
+    searchTagExternal,
+    toTitleCase
   };
 }

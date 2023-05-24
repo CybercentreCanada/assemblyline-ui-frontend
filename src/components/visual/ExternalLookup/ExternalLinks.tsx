@@ -5,6 +5,7 @@ import { Link, Popover, SvgIconTypeMap, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import React, { forwardRef } from 'react';
+import { useSearchTagExternal } from './useExternalLookup';
 
 const useStyles = makeStyles(theme => ({
   link: {
@@ -16,14 +17,12 @@ const useStyles = makeStyles(theme => ({
   title: {
     flex: 1,
     fontWeight: 500,
-    color: theme.palette.text.primary,
-    fontSize: 'medium'
+    color: theme.palette.text.primary
   },
   content: {
     flex: 1,
     fontWeight: 400,
-    color: theme.palette.primary.main,
-    fontSize: 'medium'
+    color: theme.palette.primary.main
   },
   error: {
     flex: 1,
@@ -80,6 +79,7 @@ const EXTERNAL_RESULTS_ICON = forwardRef<SvgIconTypeMap | null, any>((props, ref
 
 const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ results, errors, success, iconStyle }) => {
   const classes = useStyles();
+  const { toTitleCase } = useSearchTagExternal({});
   const [openedPopover, setOpenedPopover] = React.useState(false);
   const popoverAnchor = React.useRef(null);
 
@@ -125,12 +125,13 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ results, errors, 
         }}
         disableRestoreFocus
         PaperProps={{ onMouseEnter: popoverEnter, onMouseLeave: popoverLeave }}
+        onClick={event => event.stopPropagation()}
       >
         <Typography sx={{ p: 1 }}>
           {Object.keys(results)?.map((sourceName: keyof LookupSourceDetails, i) => (
-            <React.Fragment key={`success_${i}`}>
+            <div key={`success_${i}`}>
               <Typography className={clsx(classes.title)} sx={{ display: 'inline' }}>
-                {sourceName}:
+                {toTitleCase(sourceName)} :
               </Typography>
               <Link
                 className={clsx(classes.link)}
@@ -146,7 +147,7 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ results, errors, 
                   <LaunchOutlinedIcon sx={{ verticalAlign: 'middle', height: '16px' }} />
                 </Typography>
               </Link>
-            </React.Fragment>
+            </div>
           ))}
           {!!Object.keys(errors).length && (
             <>

@@ -51,7 +51,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
   const openExternaLookupMenu = Boolean(externalSearchAnchorEl);
   const lookupType = useRef(null);
   const lookupValue = useRef(null);
-  const { lookupState, searchTagExternal } = useSearchTagExternal({
+  const { lookupState, searchTagExternal, toTitleCase } = useSearchTagExternal({
     md5: {
       results: {},
       errors: {},
@@ -148,9 +148,9 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
         <MenuItem dense onClick={() => handleMenuExternalSearch(null)}>
           {t('related_external.all')}
         </MenuItem>
-        {currentUserConfig.ui.external_source_tags?.[lookupType.current]?.map((source, i) => (
+        {currentUserConfig.ui.external_source_tags?.[lookupType.current]?.sort().map((source, i) => (
           <MenuItem dense key={`${lookupType.current}_${i}`} onClick={() => handleMenuExternalSearch(source)}>
-            {source}
+            {toTitleCase(source)}
           </MenuItem>
         ))}
       </Menu>
@@ -159,6 +159,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
     handleCloseExternalSearchMenu,
     handleMenuExternalSearch,
     t,
+    toTitleCase,
     openExternaLookupMenu,
     externalSearchAnchorEl,
     currentUserConfig.ui.external_source_tags
