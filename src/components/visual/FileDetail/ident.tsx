@@ -88,7 +88,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
             success={success}
             errors={errors}
             results={results}
-            iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '18px' }}
+            iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '20px', verticalAlign: 'text-bottom' }}
           />
         ) : null}
       </span>

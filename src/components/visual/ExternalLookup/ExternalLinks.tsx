@@ -66,7 +66,8 @@ type ExternalLookupProps = {
   iconStyle?: null | Object;
 };
 
-// This needs to be taken out into it's own `forwardRef` to enable ref to be passed onto the Icon for tooltips to work
+// This needs to be taken out into it's own `forwardRef` to enable ref to be
+// passed onto the Icon for hover popover to work
 const EXTERNAL_RESULTS_ICON = forwardRef<SvgIconTypeMap | null, any>((props, ref) => {
   const { success, iconHeight, ...remainingProps } = props;
   return (
