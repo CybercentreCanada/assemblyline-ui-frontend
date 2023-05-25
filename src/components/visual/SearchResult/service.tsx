@@ -10,6 +10,7 @@ import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import Classification from '../Classification';
 import CustomChip from '../CustomChip';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from '../DivTable';
 import InformativeAlert from '../InformativeAlert';
@@ -17,6 +18,7 @@ import InformativeAlert from '../InformativeAlert';
 export type ServiceResult = {
   accepts: string;
   category: string;
+  classification: string;
   description: string;
   enabled: boolean;
   is_external: boolean;
@@ -62,6 +64,7 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
               <DivTableCell>{t('header.accepts')}</DivTableCell>
               <DivTableCell>{t('header.location')}</DivTableCell>
               <DivTableCell>{t('header.mode')}</DivTableCell>
+              <DivTableCell>{t('header.classification')}</DivTableCell>
               <DivTableCell>{t('header.enabled')}</DivTableCell>
               <DivTableCell />
             </DivTableRow>
@@ -106,6 +109,11 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
                     color={result.privileged ? 'primary' : 'default'}
                     tooltip={result.privileged ? t('mode.privileged') : t('mode.service')}
                   />
+                </DivTableCell>
+                <DivTableCell>
+                  <div style={{ marginBottom: '-1.5px' }}>
+                    <Classification type="text" c12n={result ? result.classification : null} />
+                  </div>
                 </DivTableCell>
                 <DivTableCell>
                   {result.enabled ? <DoneIcon color="primary" /> : <ClearIcon color="error" />}
