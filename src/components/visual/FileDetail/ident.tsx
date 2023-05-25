@@ -76,7 +76,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
   const openExternaLookupMenu = Boolean(externalSearchAnchorEl);
   const lookupType = useRef(null);
   const lookupValue = useRef(null);
-  const { lookupState, searchTagExternal } = useSearchTagExternal({
+  const { lookupState, searchTagExternal, toTitleCase } = useSearchTagExternal({
     md5: {
       results: {},
       errors: {},
@@ -166,7 +166,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
             success={success}
             errors={errors}
             results={results}
-            iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '18px' }}
+            iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '20px', verticalAlign: 'text-bottom' }}
           />
         ) : null}
       </span>
@@ -195,7 +195,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                   size="small"
                   onClick={e => handleShowExternalSearchMenu(e, digestType, fileinfo[digestType])}
                   children={<TravelExploreOutlinedIcon fontSize="small" />}
-                  style={{ height: '18px' }}
+                  style={{ height: '16px', width: '16px', marginLeft: '8px' }}
                 />
               </Tooltip>
             )}
@@ -226,9 +226,9 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
         <MenuItem dense onClick={() => handleMenuExternalSearch(null)}>
           {t('related_external.all')}
         </MenuItem>
-        {currentUserConfig.ui.external_source_tags?.[lookupType.current]?.map((source, i) => (
+        {currentUserConfig.ui.external_source_tags?.[lookupType.current]?.sort().map((source, i) => (
           <MenuItem dense key={`${lookupType.current}_${i}`} onClick={() => handleMenuExternalSearch(source)}>
-            {source}
+            {toTitleCase(source)}
           </MenuItem>
         ))}
       </Menu>
@@ -237,6 +237,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
     handleCloseExternalSearchMenu,
     handleMenuExternalSearch,
     t,
+    toTitleCase,
     openExternaLookupMenu,
     externalSearchAnchorEl,
     currentUserConfig.ui.external_source_tags
