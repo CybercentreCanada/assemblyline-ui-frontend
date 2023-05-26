@@ -8,7 +8,6 @@ import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
-import useMySnackbar from 'components/hooks/useMySnackbar';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
@@ -40,7 +39,6 @@ export default function Retrohunt() {
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();
   const { user: currentUser, indexes, configuration } = useALContext();
-  const { showErrorMessage } = useMySnackbar();
   const { closeGlobalDrawer, setGlobalDrawer, globalDrawerOpened } = useDrawer();
 
   const [retrohuntResults, setRetrohuntResults] = useState<SearchResults>(null);

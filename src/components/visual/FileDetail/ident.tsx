@@ -21,10 +21,10 @@ import {
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
-import ExternalLinks from 'components/visual/ExternalLookup/ExternalLinks';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import CustomChip from 'components/visual/CustomChip';
+import ExternalLinks from 'components/visual/ExternalLookup/ExternalLinks';
 import { bytesToSize } from 'helpers/utils';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -62,7 +62,7 @@ type LabelCategories = {
   technique?: string[];
   attribution?: string[];
 };
-        
+
 const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fileinfo, isArchive = false }) => {
   const { user: currentUser, configuration: currentUserConfig } = useALContext();
   const { t } = useTranslation(['fileDetail']);
@@ -444,7 +444,21 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
               </Grid>
             </div>
           ),
-          [fileinfo, isEditingLabels,labels, lookupState, sp2, t, theme, FileHash, ExternalSearchButton]
+          [
+            ExternalSearchButton,
+            FileHash,
+            classes,
+            fileinfo,
+            handleCancelLabels,
+            handleEditingLabels,
+            handleSaveLabels,
+            isEditingLabels,
+            labels,
+            lookupState,
+            sp2,
+            t,
+            theme
+          ]
         )}
       </Collapse>
     </div>
