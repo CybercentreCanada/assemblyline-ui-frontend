@@ -2,6 +2,7 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Collapse, Divider, Typography } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { Author, Comment, CommentProp } from 'components/visual/CommentCard';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -36,6 +37,7 @@ const WrappedCommentSection: React.FC<Props> = ({ sha256 = null, comments: _comm
   const { t } = useTranslation(['fileDetail']);
   const classes = useStyles();
   const { apiCall } = useMyAPI();
+  const { user: currentUser } = useALContext();
 
   const [comments, setComments] = useState<Comment[]>(_comments);
   const [authors, setAuthors] = useState<{ [uname: string]: Author }>(null);
@@ -48,7 +50,7 @@ const WrappedCommentSection: React.FC<Props> = ({ sha256 = null, comments: _comm
       method: 'GET',
       url: `/api/v4/file/comment/${file_sha256}/`,
       onSuccess: api_data => {
-        setAuthors(api_data.api_response.authors);
+        setAuthors(a => ({ ...a, ...api_data.api_response.authors }));
         setComments(
           api_data.api_response.comments.sort((a: Comment, b: Comment) => Date.parse(b.date) - Date.parse(a.date))
         );
@@ -111,13 +113,25 @@ const WrappedCommentSection: React.FC<Props> = ({ sha256 = null, comments: _comm
   );
 
   useEffect(() => {
+    setAuthors(a => ({
+      ...a,
+      [currentUser.username]: {
+        uname: currentUser?.username,
+        name: currentUser?.name,
+        avatar: currentUser?.avatar,
+        email: currentUser?.email
+      }
+    }));
+  }, [currentUser]);
+
+  useEffect(() => {
     if (sha256) handleRefreshComments(sha256);
   }, [handleRefreshComments, sha256]);
 
   useEffect(() => {
     if (!sha256) return;
 
-    socket.current = io(SOCKETIO_NAMESPACE);
+    socket.current = io(SOCKETIO_NAMESPACE, { reconnection: false });
 
     socket.current.on('connect', () => {
       // eslint-disable-next-line no-console

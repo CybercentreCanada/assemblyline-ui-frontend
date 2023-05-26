@@ -418,9 +418,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
         />
         <EmptySection emptys={file ? file.emptys : null} sid={sid} />
         <ErrorSection errors={file ? file.errors : null} />
-        {isArchive && (
-          <CommentSection sha256={file?.file_info?.sha256} comments={file ? file?.file_info?.comments : null} />
-        )}
+        <CommentSection sha256={file?.file_info?.sha256} comments={file ? file?.file_info?.comments : null} />
       </div>
     </div>
   ) : (
