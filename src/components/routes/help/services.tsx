@@ -69,7 +69,7 @@ function ServiceCard({ service }) {
           </Grid>
         </Grid>
       </div>
-      <div style={{ marginBottom: '-1.5px' }}>
+      <div style={{ marginBottom: '-2px' }}>
         <Classification size="tiny" format="long" c12n={service ? service.classification : null} />
       </div>
     </Card>
