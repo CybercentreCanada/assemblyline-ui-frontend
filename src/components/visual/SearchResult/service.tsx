@@ -1,14 +1,13 @@
 import ClearIcon from '@mui/icons-material/Clear';
-import CloudDoneOutlinedIcon from '@mui/icons-material/CloudDoneOutlined';
-import CloudOffOutlinedIcon from '@mui/icons-material/CloudOffOutlined';
 import DoneIcon from '@mui/icons-material/Done';
 import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
-import { AlertTitle, IconButton, Skeleton, Tooltip } from '@mui/material';
+import { AlertTitle, IconButton, Skeleton, Tooltip, useTheme } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { HiOutlineExternalLink } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 import CustomChip from '../CustomChip';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from '../DivTable';
@@ -48,6 +47,7 @@ type ServiceTableProps = {
 
 const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, updates, setService, onUpdate }) => {
   const { t } = useTranslation(['search']);
+  const theme = useTheme();
 
   return serviceResults && updates ? (
     serviceResults.length !== 0 ? (
@@ -87,13 +87,13 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
                 <DivTableCell>{result.stage}</DivTableCell>
                 <DivTableCell breakable>{result.accepts}</DivTableCell>
                 <DivTableCell>
-                  {result.is_external ? (
+                  {result.is_external && (
                     <Tooltip title={t('location.external')}>
-                      <CloudDoneOutlinedIcon color="primary" />
-                    </Tooltip>
-                  ) : (
-                    <Tooltip title={t('location.internal')}>
-                      <CloudOffOutlinedIcon color="disabled" />
+                      <div>
+                        <HiOutlineExternalLink
+                          style={{ fontSize: 'x-large', verticalAlign: 'middle', color: theme.palette.primary.main }}
+                        />
+                      </div>
                     </Tooltip>
                   )}
                 </DivTableCell>
