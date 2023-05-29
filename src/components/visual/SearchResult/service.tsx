@@ -64,7 +64,7 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
               <DivTableCell>{t('header.category')}</DivTableCell>
               <DivTableCell>{t('header.stage')}</DivTableCell>
               <DivTableCell>{t('header.accepts')}</DivTableCell>
-              <DivTableCell>{t('header.location')}</DivTableCell>
+              <DivTableCell>{t('header.external')}</DivTableCell>
               <DivTableCell>{t('header.mode')}</DivTableCell>
               {c12nDef.enforce ? <DivTableCell>{t('header.classification')}</DivTableCell> : null}
               <DivTableCell>{t('header.enabled')}</DivTableCell>
@@ -78,7 +78,6 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
                 component={Link}
                 to={`/admin/services/${result.name}`}
                 hover
-                style={{ textDecoration: 'none' }}
                 onClick={event => {
                   if (setService) {
                     event.preventDefault();
@@ -92,13 +91,18 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
                 <DivTableCell>{result.stage}</DivTableCell>
                 <DivTableCell breakable>{result.accepts}</DivTableCell>
                 <DivTableCell>
-                  {result.is_external && (
+                  {result.is_external ? (
                     <Tooltip title={t('location.external')}>
                       <div>
                         <HiOutlineExternalLink
                           style={{ fontSize: 'x-large', verticalAlign: 'middle', color: theme.palette.primary.main }}
                         />
                       </div>
+                    </Tooltip>
+                  ) : (
+                    <Tooltip title={t('location.internal')}>
+                      <div>&nbsp;</div>
+                      {/* <ClearIcon color="disabled" /> */}
                     </Tooltip>
                   )}
                 </DivTableCell>

@@ -425,7 +425,7 @@ export default function Services() {
         <ServiceTable serviceResults={serviceResults} updates={updates} setService={setService} onUpdate={onUpdate} />
       </div>
 
-      <Grid container alignItems="center" spacing={3} style={{ paddingTop: theme.spacing(4) }}>
+      <Grid container alignItems="center" spacing={3} style={{ marginTop: theme.spacing(2) }}>
         <Grid item xs>
           <Typography variant="h5">{t('title.available')}</Typography>
           {availableServices ? (
