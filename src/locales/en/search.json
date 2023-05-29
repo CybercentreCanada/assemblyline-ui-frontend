@@ -20,7 +20,7 @@
   "header.hit_count": "Times seen",
   "header.id": "ID",
   "header.identifier": "Identifier",
-  "header.location": "Location",
+  "header.external": "External",
   "header.last_hit": "Last Seen",
   "header.last_modified": "Modified",
   "header.lasttimeseen": "Last Time Seen",
