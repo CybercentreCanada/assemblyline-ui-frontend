@@ -21,6 +21,7 @@ type IndexDefinitionMap = {
   file: IndexDefinition;
   heuristic: IndexDefinition;
   result: IndexDefinition;
+  retrohunt: IndexDefinition;
   safelist: IndexDefinition;
   signature: IndexDefinition;
   submission: IndexDefinition;
@@ -62,6 +63,9 @@ export type ConfigurationDefinition = {
     archive: {
       enabled: boolean;
     };
+    retrohunt: {
+      enabled: boolean;
+    };
   };
   submission: {
     dtl: number;
@@ -95,6 +99,10 @@ export type ConfigurationDefinition = {
       [lang: string]: string;
     };
     banner_level: 'info' | 'warning' | 'error' | 'success';
+    external_sources: string[];
+    external_source_tags: {
+      [tag_name: string]: string[];
+    };
     read_only: boolean;
     rss_feeds: string[];
     services_feed: string;
@@ -239,8 +247,14 @@ export default function useMyUser(): CustomAppUserService {
   };
 
   const validateProps = (props: AppUserValidatedProp[]) => {
-    if (props === undefined) return true;
-    return props.some(validateProp);
+    if (props === undefined || !Array.isArray(props)) return true;
+
+    let enforcedProps: AppUserValidatedProp[] = [];
+    let unEnforcedProps: AppUserValidatedProp[] = [];
+    props.forEach(prop => (prop?.enforce ? enforcedProps.push(prop) : unEnforcedProps.push(prop)));
+    const enforcedValidated = enforcedProps.length > 0 ? enforcedProps.every(validateProp) : false;
+
+    return enforcedValidated || unEnforcedProps.some(validateProp);
   };
 
   const isReady = () => {

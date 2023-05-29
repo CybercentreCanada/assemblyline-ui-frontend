@@ -53,8 +53,7 @@ const StyledTableRow = withStyles((theme: Theme) =>
   })
 )(TableRow);
 
-const WrappedTblBody = ({ body, printable }) => {
-  const headers = [];
+const WrappedTblBody = ({ body, printable, headers }) => {
   const classes = useStyles(printable);
 
   if (!Array.isArray(body)) {
