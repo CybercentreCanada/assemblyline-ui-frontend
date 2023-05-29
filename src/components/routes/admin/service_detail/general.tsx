@@ -148,7 +148,7 @@ const ServiceGeneral = ({ service, defaults, constants, versions, setService, se
           )}
         </Grid>
         {c12nDef.enforce && (
-          <Grid item xs={12}>
+          <Grid item xs={12} sm={6}>
             <Typography variant="subtitle2">
               {t('general.classification')}
               <ResetButton
@@ -163,6 +163,10 @@ const ServiceGeneral = ({ service, defaults, constants, versions, setService, se
               c12n={service ? service.classification : null}
               setClassification={setClassification}
             />
+          </Grid>
+        )}
+        {c12nDef.enforce && (
+          <Grid item xs={12} sm={6}>
             <Typography variant="subtitle2">
               {t('general.result_classification')}
               <ResetButton

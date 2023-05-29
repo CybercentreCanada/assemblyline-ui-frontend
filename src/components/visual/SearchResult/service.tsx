@@ -4,6 +4,7 @@ import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
 import { AlertTitle, IconButton, Skeleton, Tooltip, useTheme } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
+import useALContext from 'components/hooks/useALContext';
 import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -49,6 +50,7 @@ type ServiceTableProps = {
 
 const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, updates, setService, onUpdate }) => {
   const { t } = useTranslation(['search']);
+  const { c12nDef } = useALContext();
   const theme = useTheme();
 
   return serviceResults && updates ? (
@@ -64,7 +66,7 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
               <DivTableCell>{t('header.accepts')}</DivTableCell>
               <DivTableCell>{t('header.location')}</DivTableCell>
               <DivTableCell>{t('header.mode')}</DivTableCell>
-              <DivTableCell>{t('header.classification')}</DivTableCell>
+              {c12nDef.enforce ? <DivTableCell>{t('header.classification')}</DivTableCell> : null}
               <DivTableCell>{t('header.enabled')}</DivTableCell>
               <DivTableCell />
             </DivTableRow>
@@ -110,11 +112,13 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
                     tooltip={result.privileged ? t('mode.privileged') : t('mode.service')}
                   />
                 </DivTableCell>
-                <DivTableCell>
-                  <div style={{ marginBottom: '-1.5px' }}>
-                    <Classification type="text" c12n={result ? result.classification : null} />
-                  </div>
-                </DivTableCell>
+                {c12nDef.enforce ? (
+                  <DivTableCell>
+                    <div style={{ marginBottom: '-1.5px' }}>
+                      <Classification type="text" c12n={result ? result.classification : null} />
+                    </div>
+                  </DivTableCell>
+                ) : null}
                 <DivTableCell>
                   {result.enabled ? <DoneIcon color="primary" /> : <ClearIcon color="error" />}
                 </DivTableCell>
