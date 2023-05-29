@@ -82,6 +82,7 @@ export type ClassificationDefinition = {
   access_req_map_stl: StringMap;
   description: StringMap;
   dynamic_groups: boolean;
+  dynamic_groups_type: 'email' | 'group' | 'all';
   enforce: boolean;
   groups_aliases: StringMapArray;
   groups_auto_select: string[];
