@@ -76,6 +76,17 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
                 </Grid>
 
                 <Grid item xs={4} sm={3} lg={2}>
+                  <span style={{ fontWeight: 500 }}>TLSH</span>
+                </Grid>
+                <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+                  {fileinfo ? (
+                    fileinfo.tlsh || <span style={{ color: theme.palette.text.disabled }}>{t('not_available')}</span>
+                  ) : (
+                    <Skeleton />
+                  )}
+                </Grid>
+
+                <Grid item xs={4} sm={3} lg={2}>
                   <span style={{ fontWeight: 500 }}>{t('size')}</span>
                 </Grid>
                 <Grid item xs={8} sm={9} lg={10}>
