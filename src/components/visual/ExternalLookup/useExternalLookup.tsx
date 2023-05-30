@@ -108,7 +108,8 @@ export function useSearchTagExternal(initialState: ExternalLookupResults, key: s
         }
       });
     },
-    [apiCall, showErrorMessage, showSuccessMessage, showWarningMessage, t]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [showErrorMessage, showSuccessMessage, showWarningMessage, t]
   );
 
   return {
