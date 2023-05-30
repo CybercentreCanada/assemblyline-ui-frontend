@@ -267,12 +267,14 @@ const WrappedTag: React.FC<TagProps> = ({
         fullWidth={fullWidth}
         onContextMenu={handleMenuClick}
         icon={
-          <ExternalLinks
-            success={lookupState[type].success}
-            results={lookupState[type].results}
-            errors={lookupState[type].errors}
-            iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '20px', verticalAlign: 'middle' }}
-          />
+          lookupState ? (
+            <ExternalLinks
+              success={lookupState[type].success}
+              results={lookupState[type].results}
+              errors={lookupState[type].errors}
+              iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '20px', verticalAlign: 'middle' }}
+            />
+          ) : null
         }
       />
     </>
