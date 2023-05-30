@@ -3,7 +3,9 @@ import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
 import PlaylistAddCheckOutlinedIcon from '@mui/icons-material/PlaylistAddCheckOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
-import { Menu, MenuItem } from '@mui/material';
+import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
+import { Divider, ListSubheader, Menu, MenuItem } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
@@ -11,11 +13,13 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import useSafeResults from 'components/hooks/useSafeResults';
 import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
+import ExternalLinks from 'components/visual/ExternalLookup/ExternalLinks';
 import { safeFieldValueURI } from 'helpers/utils';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
+import { useSearchTagExternal } from './ExternalLookup/useExternalLookup';
 import InputDialog from './InputDialog';
 
 const STYLE = { height: 'auto', minHeight: '20px' };
@@ -24,10 +28,17 @@ const CLIPBOARD_ICON = <AssignmentOutlinedIcon style={{ marginRight: '16px' }} /
 const HIGHLIGHT_ICON = <SelectAllOutlinedIcon style={{ marginRight: '16px' }} />;
 const SAFELIST_ICON = <PlaylistAddCheckOutlinedIcon style={{ marginRight: '16px' }} />;
 const SIGNATURE_ICON = <FingerprintOutlinedIcon style={{ marginRight: '16px' }} />;
+const TRAVEL_EXPLORE_ICON = <TravelExploreOutlinedIcon style={{ marginRight: '16px' }} />;
 const initialMenuState = {
   mouseX: null,
   mouseY: null
 };
+
+const useStyles = makeStyles(theme => ({
+  listSubHeaderRoot: {
+    lineHeight: '32px'
+  }
+}));
 
 type TagProps = {
   type: string;
@@ -39,6 +50,7 @@ type TagProps = {
   safelisted?: boolean;
   fullWidth?: boolean;
   force?: boolean;
+  classification?: string | null;
 };
 
 const WrappedTag: React.FC<TagProps> = ({
@@ -50,7 +62,8 @@ const WrappedTag: React.FC<TagProps> = ({
   highlight_key = null,
   safelisted = false,
   fullWidth = false,
-  force = false
+  force = false,
+  classification
 }) => {
   const { t } = useTranslation();
   const [state, setState] = React.useState(initialMenuState);
@@ -58,12 +71,13 @@ const WrappedTag: React.FC<TagProps> = ({
   const [safelistReason, setSafelistReason] = React.useState(null);
   const [waitingDialog, setWaitingDialog] = React.useState(false);
   const navigate = useNavigate();
-  const { user: currentUser, scoreToVerdict } = useALContext();
+  const { user: currentUser, configuration: currentUserConfig, scoreToVerdict } = useALContext();
   const { apiCall } = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
   const { isHighlighted, triggerHighlight } = useHighlighter();
   const { copy } = useClipboard();
   const { showSafeResults } = useSafeResults();
+  const classes = useStyles();
 
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
 
@@ -72,6 +86,14 @@ const WrappedTag: React.FC<TagProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [type, value]
   );
+
+  const { lookupState, searchTagExternal, toTitleCase } = useSearchTagExternal({
+    [type]: {
+      results: {},
+      errors: {},
+      success: null
+    }
+  });
 
   let maliciousness = lvl || scoreToVerdict(score);
   if (safelisted) {
@@ -107,6 +129,14 @@ const WrappedTag: React.FC<TagProps> = ({
     searchTag();
     handleClose();
   }, [searchTag, handleClose]);
+
+  const handleMenuExternalSearch = useCallback(
+    source => {
+      searchTagExternal(source, type, value, classification);
+      handleClose();
+    },
+    [searchTagExternal, handleClose, type, value, classification]
+  );
 
   const handleMenuHighlight = useCallback(() => {
     handleClick();
@@ -204,6 +234,26 @@ const WrappedTag: React.FC<TagProps> = ({
             {t('safelist')}
           </MenuItem>
         )}
+        {!!currentUser.roles.includes('external_query') &&
+          !!currentUserConfig.ui.external_sources?.length &&
+          !!currentUserConfig.ui.external_source_tags?.hasOwnProperty(type) && (
+            <div>
+              <Divider />
+              <ListSubheader disableSticky classes={{ root: classes.listSubHeaderRoot }}>
+                {t('related_external')}
+              </ListSubheader>
+
+              <MenuItem dense onClick={() => handleMenuExternalSearch(null)}>
+                {TRAVEL_EXPLORE_ICON} {t('related_external.all')}
+              </MenuItem>
+
+              {currentUserConfig.ui.external_source_tags?.[type]?.sort().map((source, i) => (
+                <MenuItem dense key={`source_${i}`} onClick={() => handleMenuExternalSearch(source)}>
+                  {TRAVEL_EXPLORE_ICON} {toTitleCase(source)}
+                </MenuItem>
+              ))}
+            </div>
+          )}
       </Menu>
       <CustomChip
         wrap
@@ -216,6 +266,14 @@ const WrappedTag: React.FC<TagProps> = ({
         onClick={highlight_key ? handleClick : null}
         fullWidth={fullWidth}
         onContextMenu={handleMenuClick}
+        icon={
+          <ExternalLinks
+            success={lookupState[type].success}
+            results={lookupState[type].results}
+            errors={lookupState[type].errors}
+            iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '20px', verticalAlign: 'middle' }}
+          />
+        }
       />
     </>
   );

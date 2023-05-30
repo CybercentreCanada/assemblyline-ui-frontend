@@ -106,6 +106,7 @@ export type Section = {
     short_type: string;
     value: string;
     safelisted: boolean;
+    classification: string;
   }[];
   title_text: string;
 };
@@ -183,13 +184,13 @@ const WrappedResultSection: React.FC<ResultSectionProps> = ({
         setState(
           state === null
             ? {
-                mouseX: event.clientX - 2,
-                mouseY: event.clientY - 4
-              }
+              mouseX: event.clientX - 2,
+              mouseY: event.clientY - 4
+            }
             : // repeated contextmenu when it is already open closes it with Chrome 84 on Ubuntu
-              // Other native context menus might behave different.
-              // With this behavior we prevent contextmenu from the backdrop to re-locale existing context menus.
-              null
+            // Other native context menus might behave different.
+            // With this behavior we prevent contextmenu from the backdrop to re-locale existing context menus.
+            null
         );
       }
     },
@@ -442,6 +443,7 @@ const WrappedResultSection: React.FC<ResultSectionProps> = ({
                               key={idx}
                               type={tag.type}
                               value={tag.value}
+                              classification={tag.classification}
                               safelisted={tag.safelisted}
                               short_type={tag.short_type}
                               score={section.heuristic ? section.heuristic.score : 0}
