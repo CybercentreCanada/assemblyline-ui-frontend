@@ -4,11 +4,13 @@ import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
 import { AlertTitle, IconButton, Skeleton, Tooltip, useTheme } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
+import useALContext from 'components/hooks/useALContext';
 import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
+import Classification from '../Classification';
 import CustomChip from '../CustomChip';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from '../DivTable';
 import InformativeAlert from '../InformativeAlert';
@@ -16,6 +18,7 @@ import InformativeAlert from '../InformativeAlert';
 export type ServiceResult = {
   accepts: string;
   category: string;
+  classification: string;
   description: string;
   enabled: boolean;
   is_external: boolean;
@@ -47,6 +50,7 @@ type ServiceTableProps = {
 
 const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, updates, setService, onUpdate }) => {
   const { t } = useTranslation(['search']);
+  const { c12nDef } = useALContext();
   const theme = useTheme();
 
   return serviceResults && updates ? (
@@ -62,6 +66,7 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
               <DivTableCell>{t('header.accepts')}</DivTableCell>
               <DivTableCell>{t('header.external')}</DivTableCell>
               <DivTableCell>{t('header.mode')}</DivTableCell>
+              {c12nDef.enforce ? <DivTableCell>{t('header.classification')}</DivTableCell> : null}
               <DivTableCell>{t('header.enabled')}</DivTableCell>
               <DivTableCell />
             </DivTableRow>
@@ -111,6 +116,13 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
                     tooltip={result.privileged ? t('mode.privileged') : t('mode.service')}
                   />
                 </DivTableCell>
+                {c12nDef.enforce ? (
+                  <DivTableCell>
+                    <div style={{ marginBottom: '-1.5px' }}>
+                      <Classification type="text" c12n={result ? result.classification : null} />
+                    </div>
+                  </DivTableCell>
+                ) : null}
                 <DivTableCell>
                   {result.enabled ? <DoneIcon color="primary" /> : <ClearIcon color="error" />}
                 </DivTableCell>
