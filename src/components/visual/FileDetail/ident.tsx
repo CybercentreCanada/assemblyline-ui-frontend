@@ -18,7 +18,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
 import ExternalLinks from 'components/visual/ExternalLookup/ExternalLinks';
 import { bytesToSize } from 'helpers/utils';
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchTagExternal } from '../ExternalLookup/useExternalLookup';
 
@@ -38,6 +38,29 @@ type IdentificationSectionProps = {
   fileinfo: any;
 };
 
+const initialLookupState = {
+  md5: {
+    results: {},
+    errors: {},
+    success: null
+  },
+  sha1: {
+    results: {},
+    errors: {},
+    success: null
+  },
+  sha256: {
+    results: {},
+    errors: {},
+    success: null
+  },
+  ssdeep: {
+    results: {},
+    errors: {},
+    success: null
+  }
+};
+
 const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fileinfo }) => {
   const { t } = useTranslation(['fileDetail']);
   const [open, setOpen] = React.useState(true);
@@ -51,31 +74,10 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
   const openExternaLookupMenu = Boolean(externalSearchAnchorEl);
   const lookupType = useRef(null);
   const lookupValue = useRef(null);
-  const { lookupState, searchTagExternal, toTitleCase } = useSearchTagExternal({
-    md5: {
-      results: {},
-      errors: {},
-      success: null
-    },
-    sha1: {
-      results: {},
-      errors: {},
-      success: null
-    },
-    sha256: {
-      results: {},
-      errors: {},
-      success: null
-    },
-    ssdeep: {
-      results: {},
-      errors: {},
-      success: null
-    }
-  });
+  const { lookupState, searchTagExternal, toTitleCase } = useSearchTagExternal(initialLookupState, fileinfo);
 
   /* Display fileinfo hash value.
-   If an external search was also performed for this hash, also show returned results via a tooltip*/
+   If an external search was also performed for this hash, also show returned results via a popover*/
   const FileHash: React.FC<any> = useCallback(({ value, lookup }) => {
     let success = lookup?.success;
     let errors = lookup?.errors;
@@ -180,107 +182,102 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
       <Divider />
       <ExternalSearchMenu />
       <Collapse in={open} timeout="auto">
-        {useMemo(
-          () => (
-            <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
-              <Grid container>
-                <Grid item xs={4} sm={3} lg={2}>
-                  <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>
-                    MD5
-                    <ExternalSearchButton digestType="md5"></ExternalSearchButton>
-                  </span>
-                </Grid>
-                <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                  <FileHash value={fileinfo?.md5} lookup={lookupState.md5} />
-                </Grid>
+        <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+          <Grid container>
+            <Grid item xs={4} sm={3} lg={2}>
+              <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>
+                MD5
+                <ExternalSearchButton digestType="md5"></ExternalSearchButton>
+              </span>
+            </Grid>
+            <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+              <FileHash value={fileinfo?.md5} lookup={lookupState.md5} />
+            </Grid>
 
-                <Grid item xs={4} sm={3} lg={2}>
-                  <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>
-                    SHA1
-                    <ExternalSearchButton digestType="sha1"></ExternalSearchButton>
-                  </span>
-                </Grid>
-                <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                  <FileHash value={fileinfo?.sha1} lookup={lookupState.sha1} />
-                </Grid>
+            <Grid item xs={4} sm={3} lg={2}>
+              <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>
+                SHA1
+                <ExternalSearchButton digestType="sha1"></ExternalSearchButton>
+              </span>
+            </Grid>
+            <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+              <FileHash value={fileinfo?.sha1} lookup={lookupState.sha1} />
+            </Grid>
 
-                <Grid item xs={4} sm={3} lg={2}>
-                  <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>
-                    SHA256
-                    <ExternalSearchButton digestType="sha256"></ExternalSearchButton>
-                  </span>
-                </Grid>
-                <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                  <FileHash value={fileinfo?.sha256} lookup={lookupState.sha256} />
-                </Grid>
+            <Grid item xs={4} sm={3} lg={2}>
+              <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>
+                SHA256
+                <ExternalSearchButton digestType="sha256"></ExternalSearchButton>
+              </span>
+            </Grid>
+            <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+              <FileHash value={fileinfo?.sha256} lookup={lookupState.sha256} />
+            </Grid>
 
-                <Grid item xs={4} sm={3} lg={2}>
-                  <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>
-                    SSDEEP
-                    <ExternalSearchButton digestType="ssdeep"></ExternalSearchButton>
-                  </span>
-                </Grid>
-                <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                  <FileHash value={fileinfo?.ssdeep} lookup={lookupState.ssdeep} />
-                </Grid>
+            <Grid item xs={4} sm={3} lg={2}>
+              <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>
+                SSDEEP
+                <ExternalSearchButton digestType="ssdeep"></ExternalSearchButton>
+              </span>
+            </Grid>
+            <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+              <FileHash value={fileinfo?.ssdeep} lookup={lookupState.ssdeep} />
+            </Grid>
 
-                <Grid item xs={4} sm={3} lg={2}>
-                  <span style={{ fontWeight: 500 }}>TLSH</span>
-                </Grid>
-                <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-                  {fileinfo ? (
-                    fileinfo.tlsh || <span style={{ color: theme.palette.text.disabled }}>{t('not_available')}</span>
-                  ) : (
-                    <Skeleton />
-                  )}
-                </Grid>
+            <Grid item xs={4} sm={3} lg={2}>
+              <span style={{ fontWeight: 500 }}>TLSH</span>
+            </Grid>
+            <Grid item xs={8} sm={9} lg={10} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+              {fileinfo ? (
+                fileinfo.tlsh || <span style={{ color: theme.palette.text.disabled }}>{t('not_available')}</span>
+              ) : (
+                <Skeleton />
+              )}
+            </Grid>
 
-                <Grid item xs={4} sm={3} lg={2}>
-                  <span style={{ fontWeight: 500 }}>{t('size')}</span>
-                </Grid>
-                <Grid item xs={8} sm={9} lg={10}>
-                  {fileinfo ? (
-                    <span>
-                      {fileinfo.size}
-                      <span style={{ fontWeight: 300 }}> ({bytesToSize(fileinfo.size)})</span>
-                    </span>
-                  ) : (
-                    <Skeleton />
-                  )}
-                </Grid>
+            <Grid item xs={4} sm={3} lg={2}>
+              <span style={{ fontWeight: 500 }}>{t('size')}</span>
+            </Grid>
+            <Grid item xs={8} sm={9} lg={10}>
+              {fileinfo ? (
+                <span>
+                  {fileinfo.size}
+                  <span style={{ fontWeight: 300 }}> ({bytesToSize(fileinfo.size)})</span>
+                </span>
+              ) : (
+                <Skeleton />
+              )}
+            </Grid>
 
-                <Grid item xs={4} sm={3} lg={2}>
-                  <span style={{ fontWeight: 500 }}>{t('type')}</span>
-                </Grid>
-                <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
-                  {fileinfo ? fileinfo.type : <Skeleton />}
-                </Grid>
+            <Grid item xs={4} sm={3} lg={2}>
+              <span style={{ fontWeight: 500 }}>{t('type')}</span>
+            </Grid>
+            <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+              {fileinfo ? fileinfo.type : <Skeleton />}
+            </Grid>
 
-                <Grid item xs={4} sm={3} lg={2}>
-                  <span style={{ fontWeight: 500 }}>{t('mime')}</span>
-                </Grid>
-                <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
-                  {fileinfo ? fileinfo.mime : <Skeleton />}
-                </Grid>
+            <Grid item xs={4} sm={3} lg={2}>
+              <span style={{ fontWeight: 500 }}>{t('mime')}</span>
+            </Grid>
+            <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+              {fileinfo ? fileinfo.mime : <Skeleton />}
+            </Grid>
 
-                <Grid item xs={4} sm={3} lg={2}>
-                  <span style={{ fontWeight: 500 }}>{t('magic')}</span>
-                </Grid>
-                <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
-                  {fileinfo ? fileinfo.magic : <Skeleton />}
-                </Grid>
+            <Grid item xs={4} sm={3} lg={2}>
+              <span style={{ fontWeight: 500 }}>{t('magic')}</span>
+            </Grid>
+            <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+              {fileinfo ? fileinfo.magic : <Skeleton />}
+            </Grid>
 
-                <Grid item xs={4} sm={3} lg={2}>
-                  <span style={{ fontWeight: 500 }}>{t('entropy')}</span>
-                </Grid>
-                <Grid item xs={8} sm={9} lg={10}>
-                  {fileinfo ? fileinfo.entropy : <Skeleton />}
-                </Grid>
-              </Grid>
-            </div>
-          ),
-          [fileinfo, lookupState, sp2, t, theme, FileHash, ExternalSearchButton]
-        )}
+            <Grid item xs={4} sm={3} lg={2}>
+              <span style={{ fontWeight: 500 }}>{t('entropy')}</span>
+            </Grid>
+            <Grid item xs={8} sm={9} lg={10}>
+              {fileinfo ? fileinfo.entropy : <Skeleton />}
+            </Grid>
+          </Grid>
+        </div>
       </Collapse>
     </div>
   );
