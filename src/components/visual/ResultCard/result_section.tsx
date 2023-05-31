@@ -184,13 +184,13 @@ const WrappedResultSection: React.FC<ResultSectionProps> = ({
         setState(
           state === null
             ? {
-              mouseX: event.clientX - 2,
-              mouseY: event.clientY - 4
-            }
+                mouseX: event.clientX - 2,
+                mouseY: event.clientY - 4
+              }
             : // repeated contextmenu when it is already open closes it with Chrome 84 on Ubuntu
-            // Other native context menus might behave different.
-            // With this behavior we prevent contextmenu from the backdrop to re-locale existing context menus.
-            null
+              // Other native context menus might behave different.
+              // With this behavior we prevent contextmenu from the backdrop to re-locale existing context menus.
+              null
         );
       }
     },
@@ -397,7 +397,7 @@ const WrappedResultSection: React.FC<ResultSectionProps> = ({
                               <TblBody
                                 body={section.body}
                                 printable={printable}
-                                headers={section.body_config ? section.body_config.column_order : []}
+                                order={section.body_config ? section.body_config.column_order : []}
                               />
                             );
                           case 'IMAGE':
