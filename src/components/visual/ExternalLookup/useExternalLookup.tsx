@@ -1,6 +1,6 @@
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type ExternalLookupResult = {
@@ -28,11 +28,19 @@ function toTitleCase(s: string) {
     .join(' ');
 }
 
-export function useSearchTagExternal(initialState: ExternalLookupResults) {
+export function useSearchTagExternal(initialState: ExternalLookupResults, key: string = null) {
   const { t } = useTranslation();
   const { apiCall } = useMyAPI();
   const { showSuccessMessage, showWarningMessage, showErrorMessage } = useMySnackbar();
   const [lookupState, setLookupState] = React.useState<ExternalLookupResults>(initialState);
+
+  useEffect(
+    () => {
+      setLookupState(initialState);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [key]
+  );
 
   const searchTagExternal = useCallback(
     (source: string, tagName: string, tagValue: string, classification: string) => {
@@ -101,7 +109,7 @@ export function useSearchTagExternal(initialState: ExternalLookupResults) {
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [showErrorMessage, showSuccessMessage, showWarningMessage, t]
   );
 
   return {
