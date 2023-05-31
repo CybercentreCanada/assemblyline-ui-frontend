@@ -654,6 +654,22 @@ const Submit: React.FC<any> = () => {
                         settings ? (
                           <Checkbox
                             size="small"
+                            checked={settings.generate_alerts}
+                            name="label"
+                            onChange={event => setSettingValue('generate_alert', event.target.checked)}
+                          />
+                        ) : (
+                          <Skeleton style={{ height: '2rem', width: '1.5rem', marginLeft: sp2, marginRight: sp2 }} />
+                        )
+                      }
+                      label={<Typography variant="body2">{t('options.submission.generate_alert')}</Typography>}
+                      className={settings ? classes.item : null}
+                    />
+                    <FormControlLabel
+                      control={
+                        settings ? (
+                          <Checkbox
+                            size="small"
                             checked={settings.ignore_filtering}
                             name="label"
                             onChange={event => setSettingValue('ignore_filtering', event.target.checked)}

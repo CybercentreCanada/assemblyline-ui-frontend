@@ -16,6 +16,7 @@
   "options.submission.deep_scan": "Perform deep analysis",
   "options.submission.default_external_sources": "Also check the following external sources:",
   "options.submission.desc": "Description",
+  "options.submission.generate_alert": "Generate alert",
   "options.submission.ignore_cache": "Ignore result cache",
   "options.submission.ignore_dynamic_recursion_prevention": "Ignore dynamic recursion prevention",
   "options.submission.ignore_filtering": "Ignore filtering services",
