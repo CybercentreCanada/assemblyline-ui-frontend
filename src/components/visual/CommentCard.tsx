@@ -92,6 +92,7 @@ export type Comment = {
 };
 
 export type Author = {
+  uname?: string;
   name?: string;
   avatar?: string;
   email?: string;
@@ -104,7 +105,7 @@ export const DEFAULT_COMMENT: Comment = {
   date: null
 };
 
-export const DEFAULT_AUTHOR: Author = { name: null, avatar: null, email: null };
+export const DEFAULT_AUTHOR: Author = { uname: null, name: null, avatar: null, email: null };
 
 export type CommentProp = {
   comment: Comment;
@@ -169,6 +170,11 @@ const WrappedCommentCard: React.FC<Props> = ({
         .map(n => (n ? n[0].toUpperCase() : ''))
         .join(''),
     [currentAuthor?.name, currentUser?.name]
+  );
+
+  const isCurrentUser = useMemo<boolean>(
+    () => currentUser?.username === currentAuthor?.uname,
+    [currentAuthor, currentUser]
   );
 
   const calendar = useMemo<(typeof CALENDAR_STRINGS)['en']>(
@@ -380,24 +386,28 @@ const WrappedCommentCard: React.FC<Props> = ({
             {comment?.text}
           </Typography>
 
-          <Popper open={actionsOpen} anchorEl={anchorEl} placement="top-end" transition disablePortal>
-            {({ TransitionProps }) => (
-              <Fade {...TransitionProps} timeout={350}>
-                <ButtonGroup className={classes.actions} variant="outlined" color="inherit">
-                  <Tooltip classes={{ tooltip: classes.tooltip }} title={t('comment.popper.edit')}>
-                    <Button className={classes.action} size="small" onClick={handleEditAction()}>
-                      <CreateOutlinedIcon />
-                    </Button>
-                  </Tooltip>
-                  <Tooltip classes={{ tooltip: classes.tooltip }} title={t('comment.popper.delete')}>
-                    <Button className={classes.action} size="small" onClick={handleDeleteAction(comment)}>
-                      <ClearOutlinedIcon />
-                    </Button>
-                  </Tooltip>
-                </ButtonGroup>
-              </Fade>
-            )}
-          </Popper>
+          {isCurrentUser && (
+            <Popper open={actionsOpen} anchorEl={anchorEl} placement="top-end" transition disablePortal>
+              {({ TransitionProps }) => (
+                <Fade {...TransitionProps} timeout={350}>
+                  <ButtonGroup className={classes.actions} variant="outlined" color="inherit">
+                    <Tooltip classes={{ tooltip: classes.tooltip }} title={t('comment.popper.edit')}>
+                      <Button className={classes.action} size="small" onClick={handleEditAction()}>
+                        <CreateOutlinedIcon />
+                        {isLoading && <CircularProgress className={classes.progress} size={24} />}
+                      </Button>
+                    </Tooltip>
+                    <Tooltip classes={{ tooltip: classes.tooltip }} title={t('comment.popper.delete')}>
+                      <Button className={classes.action} size="small" onClick={handleDeleteAction(comment)}>
+                        <ClearOutlinedIcon />
+                        {isLoading && <CircularProgress className={classes.progress} size={24} />}
+                      </Button>
+                    </Tooltip>
+                  </ButtonGroup>
+                </Fade>
+              )}
+            </Popper>
+          )}
         </Paper>
       )}
     </div>
