@@ -118,6 +118,7 @@ type UpdateConfig = {
 export type ServiceDetail = {
   accepts: string;
   category: string;
+  classification: string;
   config: {
     [name: string]: string;
   };

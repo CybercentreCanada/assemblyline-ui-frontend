@@ -87,9 +87,14 @@ const ServiceGeneral = ({ service, defaults, constants, versions, setService, se
     setService({ ...service, disable_cache: !service.disable_cache });
   };
 
-  const setClassification = default_result_classification => {
+  const setResultClassification = default_result_classification => {
     setModified(true);
     setService({ ...service, default_result_classification });
+  };
+
+  const setClassification = classification => {
+    setModified(true);
+    setService({ ...service, classification });
   };
 
   return (
@@ -143,20 +148,38 @@ const ServiceGeneral = ({ service, defaults, constants, versions, setService, se
           )}
         </Grid>
         {c12nDef.enforce && (
-          <Grid item xs={12}>
+          <Grid item xs={12} sm={6}>
             <Typography variant="subtitle2">
               {t('general.classification')}
               <ResetButton
                 service={service}
                 defaults={defaults}
+                field="classification"
+                reset={() => setClassification(defaults.classification)}
+              />
+            </Typography>
+            <Classification
+              type="picker"
+              c12n={service ? service.classification : null}
+              setClassification={setClassification}
+            />
+          </Grid>
+        )}
+        {c12nDef.enforce && (
+          <Grid item xs={12} sm={6}>
+            <Typography variant="subtitle2">
+              {t('general.result_classification')}
+              <ResetButton
+                service={service}
+                defaults={defaults}
                 field="default_result_classification"
-                reset={() => setClassification(defaults.default_result_classification)}
+                reset={() => setResultClassification(defaults.default_result_classification)}
               />
             </Typography>
             <Classification
               type="picker"
               c12n={service ? service.default_result_classification : null}
-              setClassification={setClassification}
+              setClassification={setResultClassification}
             />
           </Grid>
         )}

@@ -87,7 +87,7 @@ const WrappedTag: React.FC<TagProps> = ({
     [type, value]
   );
 
-  const { lookupState, searchTagExternal } = useSearchTagExternal({
+  const { lookupState, searchTagExternal, toTitleCase } = useSearchTagExternal({
     [type]: {
       results: {},
       errors: {},
@@ -247,9 +247,9 @@ const WrappedTag: React.FC<TagProps> = ({
                 {TRAVEL_EXPLORE_ICON} {t('related_external.all')}
               </MenuItem>
 
-              {currentUserConfig.ui.external_source_tags?.[type]?.map((source, i) => (
+              {currentUserConfig.ui.external_source_tags?.[type]?.sort().map((source, i) => (
                 <MenuItem dense key={`source_${i}`} onClick={() => handleMenuExternalSearch(source)}>
-                  {TRAVEL_EXPLORE_ICON} {source}
+                  {TRAVEL_EXPLORE_ICON} {toTitleCase(source)}
                 </MenuItem>
               ))}
             </div>
@@ -271,7 +271,7 @@ const WrappedTag: React.FC<TagProps> = ({
             success={lookupState[type].success}
             results={lookupState[type].results}
             errors={lookupState[type].errors}
-            iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '18px' }}
+            iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '20px', verticalAlign: 'middle' }}
           />
         }
       />
