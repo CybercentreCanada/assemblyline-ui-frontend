@@ -3,6 +3,7 @@ import Skeleton from '@mui/material/Skeleton';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
+import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -67,6 +68,9 @@ function ServiceCard({ service }) {
             </Typography>
           </Grid>
         </Grid>
+      </div>
+      <div style={{ marginBottom: '-2px' }}>
+        <Classification size="tiny" format="long" c12n={service ? service.classification : null} />
       </div>
     </Card>
   );

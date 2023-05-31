@@ -66,6 +66,7 @@ type FileInfo = {
   sha256: string;
   size: number;
   ssdeep: string;
+  tlsh: string;
   type: string;
 };
 
