@@ -53,9 +53,9 @@ const StyledTableRow = withStyles((theme: Theme) =>
   })
 )(TableRow);
 
-const WrappedTblBody = ({ body, printable }) => {
-  const headers = [];
+const WrappedTblBody = ({ body, printable, order }) => {
   const classes = useStyles(printable);
+  const headers = [];
 
   if (!Array.isArray(body)) {
     return <TextBody body={body} />;
@@ -73,6 +73,17 @@ const WrappedTblBody = ({ body, printable }) => {
         }
       }
     }
+  }
+
+  // Set the order of the detected headers, if any
+  if (order) {
+    headers.sort((a, b) => {
+      if (order.indexOf(a) < order.indexOf(b)) {
+        return -1;
+      } else {
+        return 1;
+      }
+    });
   }
 
   return (

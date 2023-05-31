@@ -1,6 +1,6 @@
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type ExternalLookupResult = {
@@ -20,11 +20,27 @@ type ExternalLookupResults = {
   [tagName: string]: ExternalLookupResult;
 };
 
-export function useSearchTagExternal(initialState: ExternalLookupResults) {
+function toTitleCase(s: string) {
+  return s
+    .replace(/_/g, ' ')
+    .split(' ')
+    .map(w => w[0].toUpperCase() + w.substring(1).toLowerCase())
+    .join(' ');
+}
+
+export function useSearchTagExternal(initialState: ExternalLookupResults, key: string = null) {
   const { t } = useTranslation();
   const { apiCall } = useMyAPI();
   const { showSuccessMessage, showWarningMessage, showErrorMessage } = useMySnackbar();
   const [lookupState, setLookupState] = React.useState<ExternalLookupResults>(initialState);
+
+  useEffect(
+    () => {
+      setLookupState(initialState);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [key]
+  );
 
   const searchTagExternal = useCallback(
     (source: string, tagName: string, tagValue: string, classification: string) => {
@@ -63,8 +79,6 @@ export function useSearchTagExternal(initialState: ExternalLookupResults) {
                 }
               };
             });
-          } else {
-            showWarningMessage(t('related_external.notfound'));
           }
         },
         onFailure: api_data => {
@@ -88,16 +102,19 @@ export function useSearchTagExternal(initialState: ExternalLookupResults) {
                 }
               };
             });
+          } else {
+            showWarningMessage(t('related_external.notfound'));
           }
         }
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [showErrorMessage, showSuccessMessage, showWarningMessage, t]
   );
 
   return {
     lookupState,
-    searchTagExternal
+    searchTagExternal,
+    toTitleCase
   };
 }

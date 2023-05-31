@@ -63,6 +63,7 @@ export type Container = {
   cpu_cores: number;
   environment: Environment[];
   image: string;
+  operating_system: string;
   ports: string[];
   ram_mb: number;
   ram_mb_min: number;
@@ -118,6 +119,7 @@ type UpdateConfig = {
 export type ServiceDetail = {
   accepts: string;
   category: string;
+  classification: string;
   config: {
     [name: string]: string;
   };

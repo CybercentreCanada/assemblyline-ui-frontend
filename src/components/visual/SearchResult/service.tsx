@@ -1,14 +1,16 @@
-import { IconButton, Tooltip } from '@mui/material';
-import Paper from '@mui/material/Paper';
-import TableContainer from '@mui/material/TableContainer';
 import ClearIcon from '@mui/icons-material/Clear';
 import DoneIcon from '@mui/icons-material/Done';
 import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
-import { AlertTitle, Skeleton } from '@mui/material';
+import { AlertTitle, IconButton, Skeleton, Tooltip, useTheme } from '@mui/material';
+import Paper from '@mui/material/Paper';
+import TableContainer from '@mui/material/TableContainer';
+import useALContext from 'components/hooks/useALContext';
 import 'moment/locale/fr';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { HiOutlineExternalLink } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
+import Classification from '../Classification';
 import CustomChip from '../CustomChip';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from '../DivTable';
 import InformativeAlert from '../InformativeAlert';
@@ -16,8 +18,10 @@ import InformativeAlert from '../InformativeAlert';
 export type ServiceResult = {
   accepts: string;
   category: string;
+  classification: string;
   description: string;
   enabled: boolean;
+  is_external: boolean;
   name: string;
   privileged: boolean;
   rejects: string;
@@ -46,6 +50,8 @@ type ServiceTableProps = {
 
 const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, updates, setService, onUpdate }) => {
   const { t } = useTranslation(['search']);
+  const { c12nDef } = useALContext();
+  const theme = useTheme();
 
   return serviceResults && updates ? (
     serviceResults.length !== 0 ? (
@@ -58,7 +64,9 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
               <DivTableCell>{t('header.category')}</DivTableCell>
               <DivTableCell>{t('header.stage')}</DivTableCell>
               <DivTableCell>{t('header.accepts')}</DivTableCell>
+              <DivTableCell>{t('header.external')}</DivTableCell>
               <DivTableCell>{t('header.mode')}</DivTableCell>
+              {c12nDef.enforce ? <DivTableCell>{t('header.classification')}</DivTableCell> : null}
               <DivTableCell>{t('header.enabled')}</DivTableCell>
               <DivTableCell />
             </DivTableRow>
@@ -70,7 +78,6 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
                 component={Link}
                 to={`/admin/services/${result.name}`}
                 hover
-                style={{ textDecoration: 'none' }}
                 onClick={event => {
                   if (setService) {
                     event.preventDefault();
@@ -84,6 +91,22 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
                 <DivTableCell>{result.stage}</DivTableCell>
                 <DivTableCell breakable>{result.accepts}</DivTableCell>
                 <DivTableCell>
+                  {result.is_external ? (
+                    <Tooltip title={t('location.external')}>
+                      <div>
+                        <HiOutlineExternalLink
+                          style={{ fontSize: 'x-large', verticalAlign: 'middle', color: theme.palette.primary.main }}
+                        />
+                      </div>
+                    </Tooltip>
+                  ) : (
+                    <Tooltip title={t('location.internal')}>
+                      <div>&nbsp;</div>
+                      {/* <ClearIcon color="disabled" /> */}
+                    </Tooltip>
+                  )}
+                </DivTableCell>
+                <DivTableCell>
                   <CustomChip
                     size="tiny"
                     type="rounded"
@@ -93,6 +116,13 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
                     tooltip={result.privileged ? t('mode.privileged') : t('mode.service')}
                   />
                 </DivTableCell>
+                {c12nDef.enforce ? (
+                  <DivTableCell>
+                    <div style={{ marginBottom: '-1.5px' }}>
+                      <Classification type="text" c12n={result ? result.classification : null} />
+                    </div>
+                  </DivTableCell>
+                ) : null}
                 <DivTableCell>
                   {result.enabled ? <DoneIcon color="primary" /> : <ClearIcon color="error" />}
                 </DivTableCell>
@@ -114,7 +144,8 @@ const WrappedServiceTable: React.FC<ServiceTableProps> = ({ serviceResults, upda
                             onUpdate(result.name, updates[result.name]);
                           }}
                           disabled={updates[result.name].updating}
-                          size="large">
+                          size="large"
+                        >
                           <SystemUpdateAltIcon />
                         </IconButton>
                       </span>

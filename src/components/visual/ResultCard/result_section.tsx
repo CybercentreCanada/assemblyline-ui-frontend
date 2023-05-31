@@ -81,6 +81,9 @@ export type Section = {
   auto_collapse: boolean;
   body: any;
   body_format: string;
+  body_config?: {
+    column_order?: string[];
+  };
   classification: string;
   depth: number;
   heuristic: {
@@ -181,13 +184,13 @@ const WrappedResultSection: React.FC<ResultSectionProps> = ({
         setState(
           state === null
             ? {
-              mouseX: event.clientX - 2,
-              mouseY: event.clientY - 4
-            }
+                mouseX: event.clientX - 2,
+                mouseY: event.clientY - 4
+              }
             : // repeated contextmenu when it is already open closes it with Chrome 84 on Ubuntu
-            // Other native context menus might behave different.
-            // With this behavior we prevent contextmenu from the backdrop to re-locale existing context menus.
-            null
+              // Other native context menus might behave different.
+              // With this behavior we prevent contextmenu from the backdrop to re-locale existing context menus.
+              null
         );
       }
     },
@@ -390,7 +393,13 @@ const WrappedResultSection: React.FC<ResultSectionProps> = ({
                           case 'PROCESS_TREE':
                             return <ProcessTreeBody body={section.body} force={force} />;
                           case 'TABLE':
-                            return <TblBody body={section.body} printable={printable} />;
+                            return (
+                              <TblBody
+                                body={section.body}
+                                printable={printable}
+                                order={section.body_config ? section.body_config.column_order : []}
+                              />
+                            );
                           case 'IMAGE':
                             return <ImageBody body={section.body} printable={printable} />;
                           case 'MULTI':
