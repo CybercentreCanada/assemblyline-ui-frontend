@@ -15,7 +15,7 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": false,
-    "target": "es6"
+    "target": "ES2015"
   },
   "include": ["src"]
 }
