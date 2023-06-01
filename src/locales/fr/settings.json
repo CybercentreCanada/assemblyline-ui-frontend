@@ -32,6 +32,8 @@
   "submissions.dynamic_recursion_desc": "Garantit que les enfants des services d'analyse dynamique ne sont pas renvoyés ceux-ci pour l'analyse.",
   "submissions.filtering": "Filtration",
   "submissions.filtering_desc": "Autorisez les services de filtrage à ignorer les fichiers s'ils pensent que les fichiers sont sûrs.",
+  "submissions.generate_alert": "Générer une alerte",
+  "submissions.generate_alert_desc": "La soumission déclenchera une alerte à la fin de l'analyse",
   "submissions.profile": "Profilage de soumission",
   "submissions.profile_desc": "Ajoutez des étapes de débogage supplémentaires à vos analyses afin qu'elles puissent être mieux suivies dans les journaux.",
   "submissions.result_caching": "Mise en cache des résultats",
