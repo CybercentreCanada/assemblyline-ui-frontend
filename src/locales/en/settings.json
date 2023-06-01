@@ -32,6 +32,8 @@
   "submissions.dynamic_recursion_desc": "Ensures that children of dynamic analysis services are not sent back to dynamic services for analysis.",
   "submissions.filtering": "Filtering",
   "submissions.filtering_desc": "Allow filtering services to skip files if they believe the files are safe.",
+  "submissions.generate_alert": "Generate alert",
+  "submissions.generate_alert_desc": "Submission will trigger an alert on completion of analysis",
   "submissions.profile": "Submission profiling",
   "submissions.profile_desc": "Add extra debugging steps to your scans so they can be traced better in the logs.",
   "submissions.result_caching": "Result caching",

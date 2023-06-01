@@ -654,7 +654,7 @@ const Submit: React.FC<any> = () => {
                         settings ? (
                           <Checkbox
                             size="small"
-                            checked={settings.generate_alerts}
+                            checked={settings.generate_alert}
                             name="label"
                             onChange={event => setSettingValue('generate_alert', event.target.checked)}
                           />
