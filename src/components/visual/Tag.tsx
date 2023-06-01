@@ -267,7 +267,7 @@ const WrappedTag: React.FC<TagProps> = ({
         fullWidth={fullWidth}
         onContextMenu={handleMenuClick}
         icon={
-          lookupState ? (
+          lookupState && lookupState[type] ? (
             <ExternalLinks
               success={lookupState[type].success}
               results={lookupState[type].results}
