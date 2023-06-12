@@ -129,9 +129,9 @@ const WrappedCommentSection: React.FC<Props> = ({ sha256 = null, comments: _comm
   }, [handleRefreshComments, sha256]);
 
   useEffect(() => {
-    if (!sha256) return;
+    if (!sha256 || socket.current) return;
 
-    socket.current = io(SOCKETIO_NAMESPACE, { reconnection: false });
+    socket.current = io(SOCKETIO_NAMESPACE, { reconnection: false, transports: ['websocket', 'polling'] });
 
     socket.current.on('connect', () => {
       // eslint-disable-next-line no-console
