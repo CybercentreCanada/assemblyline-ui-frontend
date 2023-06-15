@@ -1,8 +1,11 @@
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
+import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
 import {
   Autocomplete,
   Button,
+  Checkbox,
   CircularProgress,
+  FormControlLabel,
   Grid,
   IconButton,
   MenuItem,
@@ -26,13 +29,15 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
+import Histogram from 'components/visual/Histogram';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
+import AlertsTable from 'components/visual/SearchResult/alerts';
 import 'moment/locale/fr';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
 import { useNavigate } from 'react-router';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
 
 const DEFAULT_LABELS = [
@@ -51,11 +56,13 @@ export type Workflow = {
   creation_date?: number;
   creator?: string;
   edited_by?: string;
+  first_seen?: string;
   hit_count: number;
   labels: string[];
   last_edit?: string;
   last_seen?: string;
   name: string;
+  origin: string;
   priority: string;
   query: string;
   status: string;
@@ -69,6 +76,7 @@ type ParamProps = {
 type WorkflowDetailProps = {
   workflow_id?: string;
   close?: () => void;
+  mode?: string;
 };
 
 const MyMenuItem = withStyles((theme: Theme) =>
@@ -89,11 +97,15 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
+const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailProps) => {
   const { t, i18n } = useTranslation(['manageWorkflowDetail']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
   const [workflow, setWorkflow] = useState<Workflow>(null);
+  const [histogram, setHistogram] = useState(null);
+  const [results, setResults] = useState<any>(null);
+  const [hits, setHits] = useState(0);
+  const [runWorkflow, setRunWorkflow] = useState(false);
   const [modified, setModified] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState(false);
@@ -111,7 +123,8 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
     name: '',
     priority: '',
     query: '',
-    status: ''
+    status: '',
+    origin: ''
   };
 
   useEffect(() => {
@@ -124,6 +137,27 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
             status: api_data.api_response.status || '',
             priority: api_data.api_response.priority || ''
           });
+        }
+      });
+      apiCall({
+        method: 'POST',
+        url: '/api/v4/search/histogram/alert/reporting_ts/',
+        body: {
+          query: `workflow_ids:${workflow_id || id}`,
+          mincount: 0,
+          start: 'now-30d/d',
+          end: 'now+1d/d-1s',
+          gap: '+1d'
+        },
+        onSuccess: api_data => {
+          setHistogram(api_data.api_response);
+        }
+      });
+      apiCall({
+        method: 'GET',
+        url: `/api/v4/search/alert/?query=workflow_ids:${workflow_id || id}&rows=10`,
+        onSuccess: api_data => {
+          setResults(api_data.api_response);
         }
       });
     } else {
@@ -141,6 +175,10 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
   const handleQueryChange = event => {
     setModified(true);
     setWorkflow({ ...workflow, query: event.target.value });
+  };
+
+  const handleCheckboxChange = () => {
+    setRunWorkflow(!runWorkflow);
   };
 
   const handleLabelsChange = labels => {
@@ -183,7 +221,10 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
 
   const saveWorkflow = () => {
     apiCall({
-      url: workflow_id || id ? `/api/v4/workflow/${workflow_id || id}/` : '/api/v4/workflow/',
+      url:
+        workflow_id || id
+          ? `/api/v4/workflow/${workflow_id || id}/?run_workflow=${runWorkflow}`
+          : `/api/v4/workflow/?run_workflow=${runWorkflow}`,
       method: workflow_id || id ? 'POST' : 'PUT',
       body: {
         ...workflow,
@@ -233,6 +274,24 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
                 {workflow ? workflow.workflow_id : <Skeleton style={{ width: '10rem' }} />}
               </Typography>
             </Grid>
+            {currentUser.roles.includes('workflow_view') && mode === 'edit' && (
+              <Grid item xs={12} sm style={{ textAlign: 'right', flexGrow: 0 }}>
+                {workflow ? (
+                  <Tooltip title={t('usage')}>
+                    <IconButton
+                      component={Link}
+                      style={{ color: theme.palette.action.active }}
+                      to={`/search/alert/?query=workflow_ids:${workflow_id || id}`}
+                      size="large"
+                    >
+                      <YoutubeSearchedForIcon />
+                    </IconButton>
+                  </Tooltip>
+                ) : (
+                  <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+                )}
+              </Grid>
+            )}
             {(workflow_id || id) && currentUser.roles.includes('workflow_manage') && (
               <Grid item xs={12} sm style={{ textAlign: 'right', flexGrow: 0 }}>
                 {workflow ? (
@@ -280,6 +339,18 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
                 margin="dense"
                 variant="outlined"
                 onChange={handleQueryChange}
+                onBlur={() => {
+                  apiCall({
+                    method: 'GET',
+                    url: `/api/v4/search/alert/?query=${encodeURI(workflow.query)}&track_total_hits=true`,
+                    onSuccess: api_data => {
+                      setHits(api_data.api_response.total || 0);
+                    },
+                    onFailure: () => {
+                      setResults(0);
+                    }
+                  });
+                }}
                 value={workflow.query}
                 disabled={!currentUser.roles.includes('workflow_manage')}
               />
@@ -354,7 +425,7 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
           {workflow ? (
             workflow.creator && (
               <Typography variant="subtitle2" color="textSecondary">
-                {`${t('created_by')} ${workflow.creator} `}
+                {`${t('created_by')} ${workflow.creator} [${workflow.origin}] `}
                 <Moment fromNow locale={i18n.language}>
                   {workflow.creation_date}
                 </Moment>
@@ -374,33 +445,111 @@ const WorkflowDetail = ({ workflow_id, close }: WorkflowDetailProps) => {
             )
           ) : (
             <Skeleton />
-          )}{' '}
+          )}
         </div>
+
+        <RouterPrompt when={modified} />
+
+        {workflow && modified && workflow.name && workflow.query ? (
+          <>
+            <div
+              style={{
+                position: id ? 'fixed' : 'inherit',
+                bottom: id ? 0 : 'inherit',
+                left: id ? 0 : 'inherit',
+                width: id ? '100%' : 'inherit',
+                textAlign: id ? 'center' : 'left',
+                zIndex: id ? theme.zIndex.drawer - 1 : 'auto',
+                backgroundColor: id ? theme.palette.background.default : 'inherit',
+                boxShadow: id ? theme.shadows[4] : 'inherit'
+              }}
+            >
+              <FormControlLabel
+                control={<Checkbox onChange={handleCheckboxChange} checked={runWorkflow}></Checkbox>}
+                label={
+                  <Typography variant="body2">
+                    {t('backport_workflow_prompt')} ({hits} {t('backport_workflow_matching')})
+                  </Typography>
+                }
+              ></FormControlLabel>
+            </div>
+            <div
+              style={{
+                paddingTop: id ? theme.spacing(1) : theme.spacing(2),
+                paddingBottom: id ? theme.spacing(1) : theme.spacing(2),
+                position: id ? 'fixed' : 'inherit',
+                bottom: id ? 0 : 'inherit',
+                left: id ? 0 : 'inherit',
+                width: id ? '100%' : 'inherit',
+                textAlign: id ? 'center' : 'right',
+                zIndex: id ? theme.zIndex.drawer - 1 : 'auto',
+                backgroundColor: id ? theme.palette.background.default : 'inherit',
+                boxShadow: id ? theme.shadows[4] : 'inherit'
+              }}
+            >
+              <Button variant="contained" color="primary" disabled={buttonLoading} onClick={saveWorkflow}>
+                {t(workflow_id || id ? 'save' : 'add.button')}
+                {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+              </Button>
+            </div>
+          </>
+        ) : null}
+        {mode === 'edit' ? (
+          <div style={{ textAlign: 'left' }}>
+            <Grid item xs={12}>
+              <Typography variant="h6">{t('statistics')}</Typography>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Grid container style={{ placeContent: 'center' }}>
+                <Grid item xs={3} sm={4} md={3} lg={2}>
+                  <span style={{ fontWeight: 500 }}>
+                    {t('hit.count')} {workflow ? workflow.hit_count : 0}
+                  </span>
+                </Grid>
+                <Grid item xs={3} sm={4} md={3} lg={2}>
+                  <span style={{ fontWeight: 500 }}>{t('hit.first')} </span>
+                  {workflow && workflow.first_seen ? (
+                    <Moment fromNow locale={i18n.language}>
+                      {workflow.first_seen}
+                    </Moment>
+                  ) : (
+                    t('hit.none')
+                  )}
+                </Grid>
+                <Grid item xs={3} sm={4} md={3} lg={2}>
+                  <span style={{ fontWeight: 500 }}>{t('hit.last')} </span>
+                  {workflow && workflow.last_seen ? (
+                    <Moment fromNow locale={i18n.language}>
+                      {workflow.last_seen}
+                    </Moment>
+                  ) : (
+                    t('hit.none')
+                  )}
+                </Grid>
+              </Grid>
+            </Grid>
+          </div>
+        ) : null}
+        {currentUser.roles.includes('alert_view') && mode === 'edit' ? (
+          <>
+            <Grid item xs={12} style={{ paddingTop: '10px' }}>
+              <Histogram
+                dataset={histogram}
+                height="300px"
+                isDate
+                title={t('chart.title')}
+                datatype={workflow_id || id}
+              />
+            </Grid>
+            <Grid item xs={12} style={{ paddingTop: '10px', paddingBottom: '10px' }}>
+              <Typography variant="h6">{t('last10')}</Typography>
+            </Grid>
+            <Grid item xs={12} style={{ paddingTop: '10px' }}>
+              <AlertsTable alertResults={results} allowSort={false} />
+            </Grid>
+          </>
+        ) : null}
       </div>
-
-      <RouterPrompt when={modified} />
-
-      {workflow && modified && workflow.name && workflow.query ? (
-        <div
-          style={{
-            paddingTop: id ? theme.spacing(1) : theme.spacing(2),
-            paddingBottom: id ? theme.spacing(1) : theme.spacing(2),
-            position: id ? 'fixed' : 'inherit',
-            bottom: id ? 0 : 'inherit',
-            left: id ? 0 : 'inherit',
-            width: id ? '100%' : 'inherit',
-            textAlign: id ? 'center' : 'right',
-            zIndex: id ? theme.zIndex.drawer - 1 : 'auto',
-            backgroundColor: id ? theme.palette.background.default : 'inherit',
-            boxShadow: id ? theme.shadows[4] : 'inherit'
-          }}
-        >
-          <Button variant="contained" color="primary" disabled={buttonLoading} onClick={saveWorkflow}>
-            {t(workflow_id || id ? 'save' : 'add.button')}
-            {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
-          </Button>
-        </div>
-      ) : null}
     </PageCenter>
   ) : (
     <ForbiddenPage />
