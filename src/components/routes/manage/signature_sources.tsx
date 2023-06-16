@@ -327,7 +327,10 @@ export const SourceCard = ({ source, onClick, service, generatesSignatures, show
 
   return (
     <div style={{ paddingTop: theme.spacing(1) }}>
-      <Card className={source.status.state === 'ERROR' ? classes.errorCard : classes.card} onClick={onClick}>
+      <Card
+        className={source.status && source.status.state === 'ERROR' ? classes.errorCard : classes.card}
+        onClick={onClick}
+      >
         <div style={{ paddingBottom: theme.spacing(2) }}>
           <div style={{ float: 'right', marginTop: '8px' }}>
             {source.private_key && (
