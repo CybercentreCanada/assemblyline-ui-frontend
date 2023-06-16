@@ -24,6 +24,8 @@
   "role.obo_access": "Accès au nom de",
   "role.replay_system": "Gestion des Rediffusions",
   "role.replay_trigger": "Déclencher des Rediffusions",
+  "role.retrohunt_run": "Exécution de Retrohunt",
+  "role.retrohunt_view": "Visionnement de Retrohunt",
   "role.safelist_manage": "Gestion de la Liste sure",
   "role.safelist_view": "Visionnement de la Liste sure",
   "role.search": "Recherche",
