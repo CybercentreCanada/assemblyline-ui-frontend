@@ -26,7 +26,7 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import CustomChip from 'components/visual/CustomChip';
 import ExternalLinks from 'components/visual/ExternalLookup/ExternalLinks';
 import { bytesToSize } from 'helpers/utils';
-import React, { useCallback, useEffect, useRef, useState  } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchTagExternal } from '../ExternalLookup/useExternalLookup';
 
@@ -87,12 +87,12 @@ type LabelCategories = {
 };
 
 const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fileinfo, isArchive = false }) => {
-  const { user: currentUser, configuration: currentUserConfig } = useALContext();
   const { t } = useTranslation(['fileDetail']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
   const classes = useStyles();
   const sp2 = theme.spacing(2);
+  const { user: currentUser, configuration: currentUserConfig } = useALContext();
 
   /* External search/lookup */
   const [externalSearchAnchorEl, setExternalSearchMenuAnchorEl] = React.useState<null | HTMLElement>(null);

@@ -131,12 +131,12 @@ const WrappedCommentSection: React.FC<Props> = ({ sha256 = null, comments: _comm
   useEffect(() => {
     if (!sha256) return;
 
-    socket.current = io(SOCKETIO_NAMESPACE, { reconnection: false });
+    socket.current = io(SOCKETIO_NAMESPACE);
 
     socket.current.on('connect', () => {
+      socket.current.emit('enter_room', { sha256: sha256 });
       // eslint-disable-next-line no-console
       console.debug('Socket-IO :: Connected from socketIO server.');
-      socket.current.emit('enter_room', { sha256: sha256 });
     });
 
     socket.current.on('disconnect', () => {
@@ -151,7 +151,6 @@ const WrappedCommentSection: React.FC<Props> = ({ sha256 = null, comments: _comm
     });
 
     return () => {
-      socket.current.emit('leave_room', { sha256: sha256 });
       socket.current.disconnect();
     };
   }, [handleRefreshComments, sha256]);
