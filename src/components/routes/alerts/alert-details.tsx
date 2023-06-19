@@ -32,6 +32,7 @@ import { verdictToColor } from 'helpers/utils';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
+import { useNavigate } from 'react-router';
 import { Link, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
 import AlertExtendedScan from './alert-extended_scan';
@@ -129,6 +130,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
   const { configuration } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
   const [metaOpen, setMetaOpen] = React.useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const alertId = id || paramId;
@@ -328,6 +330,29 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
                   <ChipList items={item ? item.label.map(label => ({ label, variant: 'outlined' })) : null} />
                 </div>
               </div>
+              {/* Workflows Section */}
+              {item && item.workflow_ids ? (
+                <div className={classes.section}>
+                  <Typography className={classes.sectionTitle}>{t('workflows')}</Typography>
+                  <Divider />
+                  <div className={classes.sectionContent}>
+                    <ChipList
+                      items={
+                        item
+                          ? item.workflow_ids.map(workflow => ({
+                              label: workflow,
+                              variant: 'outlined',
+                              clickable: true,
+                              onClick: () => {
+                                navigate(`/manage/workflow/${workflow}`);
+                              }
+                            }))
+                          : null
+                      }
+                    />
+                  </div>
+                </div>
+              ) : null}
             </div>
           </Grid>
         </Grid>

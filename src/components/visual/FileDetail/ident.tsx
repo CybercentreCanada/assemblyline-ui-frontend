@@ -87,12 +87,12 @@ type LabelCategories = {
 };
 
 const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fileinfo, isArchive = false }) => {
-  const { user: currentUser, configuration: currentUserConfig } = useALContext();
   const { t } = useTranslation(['fileDetail']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
   const classes = useStyles();
   const sp2 = theme.spacing(2);
+  const { user: currentUser, configuration: currentUserConfig } = useALContext();
 
   /* External search/lookup */
   const [externalSearchAnchorEl, setExternalSearchMenuAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -354,7 +354,6 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({ fi
             <Grid item xs={8} sm={9} lg={10}>
               {fileinfo ? fileinfo.entropy : <Skeleton />}
             </Grid>
-
             <Grid item xs={4} sm={3} lg={2}>
               <div className={classes.labels}>
                 <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5) }}>{t('labels')}</span>

@@ -147,7 +147,7 @@ export default function Workflows() {
 
   const setWorkflowID = useCallback(
     (wf_id: string) => {
-      setGlobalDrawer(<WorkflowDetail workflow_id={wf_id} close={closeGlobalDrawer} />);
+      setGlobalDrawer(<WorkflowDetail workflow_id={wf_id} close={closeGlobalDrawer} mode="edit" />);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
@@ -167,7 +167,9 @@ export default function Workflows() {
                   style={{
                     color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
                   }}
-                  onClick={() => setGlobalDrawer(<WorkflowDetail workflow_id={null} close={closeGlobalDrawer} />)}
+                  onClick={() =>
+                    setGlobalDrawer(<WorkflowDetail workflow_id={null} close={closeGlobalDrawer} mode="add" />)
+                  }
                   size="large"
                 >
                   <AddCircleOutlineOutlinedIcon />

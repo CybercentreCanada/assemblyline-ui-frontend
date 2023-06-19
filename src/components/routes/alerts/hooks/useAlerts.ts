@@ -99,6 +99,8 @@ export interface AlertItem extends LineItem {
     malicious: string[];
     non_malicious: string[];
   };
+  workflow_ids: string[];
+  workflow_completed: boolean;
 }
 
 // The Custom Hook API.
