@@ -42,55 +42,18 @@ export default function usePromiseAPI(): UsingPromiseAPI {
     selectedPriority: string,
     selectedLabels: string[]
   ): Promise<boolean> => {
-    const statusPromise = new Promise((resolve, reject) => {
-      if (selectedStatus) {
-        apiCall({
-          url: `/api/v4/alert/status/batch/?${query.buildAPIQueryString()}`,
-          method: 'post',
-          body: selectedStatus,
-          onSuccess: () => {
-            resolve(true);
-          },
-          onFailure: api_data => reject(api_data)
-        });
-      } else {
-        resolve(false);
-      }
+    const actionPromise = new Promise((resolve, reject) => {
+      apiCall({
+        url: `/api/v4/alert/all/batch/?${query.buildAPIQueryString()}`,
+        method: 'post',
+        body: { priority: selectedPriority, status: selectedStatus, labels: selectedLabels },
+        onSuccess: () => {
+          resolve(true);
+        },
+        onFailure: api_data => reject(api_data)
+      });
     });
-
-    const priorityPromise = new Promise((resolve, reject) => {
-      if (selectedPriority) {
-        apiCall({
-          url: `/api/v4/alert/priority/batch/?${query.buildAPIQueryString()}`,
-          method: 'post',
-          body: selectedPriority,
-          onSuccess: () => {
-            resolve(true);
-          },
-          onFailure: api_data => reject(api_data)
-        });
-      } else {
-        resolve(false);
-      }
-    });
-
-    const labelPromise = new Promise((resolve, reject) => {
-      if (selectedLabels && selectedLabels.length > 0) {
-        apiCall({
-          url: `/api/v4/alert/label/batch/?${query.buildAPIQueryString()}`,
-          method: 'post',
-          body: selectedLabels,
-          onSuccess: () => {
-            resolve(true);
-          },
-          onFailure: api_data => reject(api_data)
-        });
-      } else {
-        resolve(true);
-      }
-    });
-
-    return Promise.all([statusPromise, priorityPromise, labelPromise]).then(() => true);
+    return actionPromise.then(() => true);
   };
 
   // Hook API: take ownership of alerts matching specified query.

@@ -141,9 +141,9 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailPro
       });
       apiCall({
         method: 'POST',
-        url: '/api/v4/search/histogram/alert/reporting_ts/',
+        url: '/api/v4/search/histogram/alert/events.ts/',
         body: {
-          query: `workflow_ids:${workflow_id || id}`,
+          query: `events.entity_id:${workflow_id || id}`,
           mincount: 0,
           start: 'now-30d/d',
           end: 'now+1d/d-1s',
@@ -155,7 +155,7 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailPro
       });
       apiCall({
         method: 'GET',
-        url: `/api/v4/search/alert/?query=workflow_ids:${workflow_id || id}&rows=10`,
+        url: `/api/v4/search/alert/?query=events.entity_id:${workflow_id || id}&rows=10`,
         onSuccess: api_data => {
           setResults(api_data.api_response);
         }
@@ -281,7 +281,7 @@ const WorkflowDetail = ({ workflow_id, close, mode = 'edit' }: WorkflowDetailPro
                     <IconButton
                       component={Link}
                       style={{ color: theme.palette.action.active }}
-                      to={`/search/alert/?query=workflow_ids:${workflow_id || id}`}
+                      to={`/search/alert/?query=events.entity_id:${workflow_id || id}`}
                       size="large"
                     >
                       <YoutubeSearchedForIcon />
