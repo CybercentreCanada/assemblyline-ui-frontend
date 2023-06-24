@@ -1,5 +1,6 @@
 {
   "classification": "The following classification will be applied to your submission:",
+  "egress": "Egress from",
   "file": "File",
   "file.button": "Upload and Scan",
   "file.cancel": "Cancel",
