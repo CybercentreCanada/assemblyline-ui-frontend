@@ -244,7 +244,7 @@ const WrappedTag: React.FC<TagProps> = ({
             state={{
               hash: value,
               tabContext: '1',
-              classification
+              c12n: classification
             }}
           >
             {SUBMIT_ICON}
