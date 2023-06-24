@@ -1,6 +1,7 @@
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
 import PlaylistAddCheckOutlinedIcon from '@mui/icons-material/PlaylistAddCheckOutlined';
+import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
 import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
@@ -28,6 +29,7 @@ const CLIPBOARD_ICON = <AssignmentOutlinedIcon style={{ marginRight: '16px' }} /
 const HIGHLIGHT_ICON = <SelectAllOutlinedIcon style={{ marginRight: '16px' }} />;
 const SAFELIST_ICON = <PlaylistAddCheckOutlinedIcon style={{ marginRight: '16px' }} />;
 const SIGNATURE_ICON = <FingerprintOutlinedIcon style={{ marginRight: '16px' }} />;
+const SUBMIT_ICON = <PublishOutlinedIcon style={{ marginRight: '16px' }} />;
 const TRAVEL_EXPLORE_ICON = <TravelExploreOutlinedIcon style={{ marginRight: '16px' }} />;
 const initialMenuState = {
   mouseX: null,
@@ -254,6 +256,21 @@ const WrappedTag: React.FC<TagProps> = ({
               ))}
             </div>
           )}
+        {type.endsWith('uri') && (
+          <MenuItem
+            dense
+            component={Link}
+            to="/submit"
+            state={{
+              hash: value,
+              tabContext: '1',
+              classification
+            }}
+          >
+            {SUBMIT_ICON}
+            {t('submit_uri')}
+          </MenuItem>
+        )}
       </Menu>
       <CustomChip
         wrap

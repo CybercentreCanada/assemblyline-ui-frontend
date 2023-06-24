@@ -70,6 +70,7 @@
   "extended_scan.incomplete": "Extended Scan completed with errors that were not present in original scan",
   "extended_scan.skipped": "Extended Scan was skipped for this alert",
   "extended_scan.submitted": "Waiting on extended scan to be completed...",
+  "submit_uri": "Submit URI",
   "filter": "Filter...",
   "forbidden": "Forbidden",
   "full_count": "Track all documents to get the full count",
