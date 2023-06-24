@@ -562,25 +562,27 @@ const Submit: React.FC<any> = () => {
                   ))}
                 </div>
               )}
-            {matchURL(urlHash) && configuration.ui.url_egress_proxies && (
-              <FormControl variant="outlined" fullWidth style={{ paddingTop: sp2 }}>
-                <InputLabel style={{ paddingTop: sp2 }}>{t('egress')}</InputLabel>
-                <Select
-                  label={t('egress')}
-                  value={urlProxy}
-                  onChange={event => {
-                    setUrlProxy(event.target.value);
-                  }}
-                >
-                  <MenuItem value={null}>
-                    <em>None</em>
-                  </MenuItem>
-                  {configuration.ui.url_egress_proxies.map(proxy => (
-                    <MenuItem value={proxy}>{capitalizeWords(proxy)}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            )}
+            {matchURL(urlHash) &&
+              configuration.ui.url_egress_proxies &&
+              configuration.ui.url_egress_proxies.length !== 0 && (
+                <FormControl variant="outlined" fullWidth style={{ paddingTop: sp2 }}>
+                  <InputLabel style={{ paddingTop: sp2 }}>{t('egress')}</InputLabel>
+                  <Select
+                    label={t('egress')}
+                    value={urlProxy}
+                    onChange={event => {
+                      setUrlProxy(event.target.value);
+                    }}
+                  >
+                    <MenuItem value={null}>
+                      <em>None</em>
+                    </MenuItem>
+                    {configuration.ui.url_egress_proxies.map(proxy => (
+                      <MenuItem value={proxy}>{capitalizeWords(proxy)}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
             {submissionMetadata && Object.keys(submissionMetadata).length !== 0 && (
               <div style={{ textAlign: 'start', marginTop: theme.spacing(2) }}>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
