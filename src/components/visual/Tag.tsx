@@ -236,6 +236,21 @@ const WrappedTag: React.FC<TagProps> = ({
             {t('safelist')}
           </MenuItem>
         )}
+        {type.endsWith('uri') && (
+          <MenuItem
+            dense
+            component={Link}
+            to="/submit"
+            state={{
+              hash: value,
+              tabContext: '1',
+              classification
+            }}
+          >
+            {SUBMIT_ICON}
+            {t('submit_uri')}
+          </MenuItem>
+        )}
         {!!currentUser.roles.includes('external_query') &&
           !!currentUserConfig.ui.external_sources?.length &&
           !!currentUserConfig.ui.external_source_tags?.hasOwnProperty(type) && (
@@ -256,21 +271,6 @@ const WrappedTag: React.FC<TagProps> = ({
               ))}
             </div>
           )}
-        {type.endsWith('uri') && (
-          <MenuItem
-            dense
-            component={Link}
-            to="/submit"
-            state={{
-              hash: value,
-              tabContext: '1',
-              classification
-            }}
-          >
-            {SUBMIT_ICON}
-            {t('submit_uri')}
-          </MenuItem>
-        )}
       </Menu>
       <CustomChip
         wrap
