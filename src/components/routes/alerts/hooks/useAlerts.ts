@@ -43,6 +43,7 @@ export interface DetailedItem {
 }
 
 export interface WorkflowEvent {
+  entity_name: string;
   entity_type: 'user' | 'workflow';
   entity_id: string;
   labels?: string[];

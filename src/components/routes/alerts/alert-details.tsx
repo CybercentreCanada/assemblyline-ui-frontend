@@ -10,12 +10,6 @@ import {
   Grid,
   IconButton,
   Skeleton,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Tooltip,
   Typography,
   useTheme
@@ -38,9 +32,6 @@ import { verdictToColor } from 'helpers/utils';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
-import { HiOutlineExternalLink } from 'react-icons/hi';
-import Moment from 'react-moment';
-import { useNavigate } from 'react-router';
 import { Link, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
 import AlertExtendedScan from './alert-extended_scan';
@@ -137,8 +128,7 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
   const { configuration } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
   const [metaOpen, setMetaOpen] = React.useState(false);
-  const [workflowOpen, setWorkflowOpen] = React.useState(false);
-  const navigate = useNavigate();
+  // eslint-disable-next-line
   const { t, i18n } = useTranslation(['alerts']);
 
   useEffect(() => {
@@ -841,120 +831,6 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
             </Grid>
           </>
         )}
-        {/* Workflow Section */}
-        {item && item.events.length > 0 ? (
-          <div className={classes.section}>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'flex-end',
-                justifyContent: 'space-between'
-              }}
-            >
-              <Typography className={classes.sectionTitle}>{t('workflows')}</Typography>
-              {item && item.events.length !== 0 && (
-                <Button
-                  size="small"
-                  onClick={() => setWorkflowOpen(!workflowOpen)}
-                  style={{ color: theme.palette.text.secondary }}
-                >
-                  {!workflowOpen ? (
-                    <>
-                      {t('more')}
-                      <KeyboardArrowDownIcon style={{ marginLeft: theme.spacing(1) }} />
-                    </>
-                  ) : (
-                    <>
-                      {t('less')}
-                      <KeyboardArrowUpIcon style={{ marginLeft: theme.spacing(1) }} />
-                    </>
-                  )}
-                </Button>
-              )}
-            </div>
-            <Divider />
-            <div className={classes.sectionContent}>
-              <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
-                {item && item.events.length !== 0 && (
-                  <Collapse in={workflowOpen} timeout="auto" style={{ marginTop: theme.spacing(0.5) }}>
-                    {item ? (
-                      <TableContainer>
-                        <Table size="small">
-                          <TableHead>
-                            <TableRow>
-                              {['ts', 'ID', 'priority', 'status', 'labels'].map(column => (
-                                <TableCell key={column}>
-                                  <Typography sx={{ fontWeight: 'bold' }}>{t(column)}</Typography>
-                                </TableCell>
-                              ))}
-                              <TableCell></TableCell>
-                            </TableRow>
-                          </TableHead>
-                          <TableBody>
-                            {item.events
-                              .sort((a, b) => a.ts.localeCompare(b.ts) || b.ts.localeCompare(a.ts))
-                              .reverse()
-                              .map(event => {
-                                return (
-                                  <TableRow hover tabIndex={-1}>
-                                    <Tooltip title={event.ts}>
-                                      <TableCell>
-                                        <Moment fromNow locale={i18n.language}>
-                                          {event.ts}
-                                        </Moment>
-                                      </TableCell>
-                                    </Tooltip>
-                                    <Tooltip title={event.entity_type} style={{ textTransform: 'capitalize' }}>
-                                      <TableCell>{event.entity_id}</TableCell>
-                                    </Tooltip>
-                                    <TableCell>
-                                      {event.priority ? <AlertPriority name={event.priority} withChip /> : null}
-                                    </TableCell>
-                                    <TableCell>{event.status ? <AlertStatus name={event.status} /> : null}</TableCell>
-                                    <TableCell>
-                                      {event.labels ? (
-                                        <ChipList items={event.labels.map(label => ({ label, variant: 'outlined' }))} />
-                                      ) : null}
-                                    </TableCell>
-                                    <TableCell>
-                                      {event.entity_type === 'workflow' ? (
-                                        <Tooltip
-                                          title={t('workflow')}
-                                          onClick={() => {
-                                            navigate(`/manage/workflow/${event.entity_id}`);
-                                          }}
-                                        >
-                                          <div>
-                                            <HiOutlineExternalLink
-                                              style={{
-                                                fontSize: 'x-large',
-                                                verticalAlign: 'middle',
-                                                color: theme.palette.primary.main
-                                              }}
-                                            />
-                                          </div>
-                                        </Tooltip>
-                                      ) : null}
-                                    </TableCell>
-                                  </TableRow>
-                                );
-                              })}
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
-                    ) : (
-                      <>
-                        <Skeleton />
-                        <Skeleton />
-                        <Skeleton />
-                      </>
-                    )}
-                  </Collapse>
-                )}
-              </pre>
-            </div>
-          </div>
-        ) : null}
       </div>
     </PageFullWidth>
   ) : (
