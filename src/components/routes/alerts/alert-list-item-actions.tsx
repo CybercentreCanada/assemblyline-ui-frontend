@@ -7,18 +7,43 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
-import { SpeedDial, SpeedDialAction, SpeedDialIcon, Typography, useMediaQuery, useTheme } from '@mui/material';
+import WorkHistoryOutlinedIcon from '@mui/icons-material/WorkHistoryOutlined';
+import {
+  Badge,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  SpeedDial,
+  SpeedDialAction,
+  SpeedDialIcon,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Tooltip,
+  Typography,
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
+import { ChipList } from 'components/visual/ChipList';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import SearchQuery from 'components/visual/SearchBar/search-query';
 import { getValueFromPath } from 'helpers/utils';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
+import { HiOutlineExternalLink } from 'react-icons/hi';
+import Moment from 'react-moment';
+import { useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
+import AlertPriority from './alert-priority';
+import AlertStatus from './alert-status';
 import { AlertDrawerState } from './alerts';
 import { AlertItem } from './hooks/useAlerts';
 import usePromiseAPI from './hooks/usePromiseAPI';
@@ -106,6 +131,7 @@ const WrappedAlertListItemActions: React.FC<AlertListItemActionsProps> = ({
   const theme = useTheme();
   const { showErrorMessage, showSuccessMessage } = useMySnackbar();
   const [takeOwnershipConfirmation, setTakeOwnershipConfirmation] = useState<OwnerProps>(DEFAULT_OWNER);
+  const [viewHistory, setViewHistory] = useState(false);
   const [open, setOpen] = useState(false);
   const { user: currentUser } = useAppUser<CustomUser>();
   const [hasSetMalicious, setHasSetMalicious] = useState(false);
@@ -113,6 +139,7 @@ const WrappedAlertListItemActions: React.FC<AlertListItemActionsProps> = ({
   const upSM = useMediaQuery(theme.breakpoints.up('sm'));
   const vertical = type === 'drawer' && !upSM;
   const permanent = type === 'drawer' && upSM;
+  const navigate = useNavigate();
 
   useEffect(() => {
     setHasSetMalicious(item.verdict.malicious.indexOf(currentUser.username) !== -1);
@@ -350,6 +377,28 @@ const WrappedAlertListItemActions: React.FC<AlertListItemActionsProps> = ({
             onClick={() => handleClose(null, 'toggle')}
           />
         )}
+        {item.events && (
+          <SpeedDialActionButton
+            disabled={item.events.length === 0}
+            icon={
+              <Badge badgeContent={item.events.length}>
+                <WorkHistoryOutlinedIcon />
+              </Badge>
+            }
+            tooltipTitle={t('history')}
+            tooltipPlacement={vertical ? 'left' : 'bottom'}
+            FabProps={{
+              size: permanent ? 'medium' : 'small',
+              style: {
+                margin: permanent ? '8px 2px 8px 2px' : null,
+                boxShadow: permanent ? theme.shadows[0] : null
+              }
+            }}
+            onClick={() => {
+              setViewHistory(true);
+            }}
+          />
+        )}
       </SpeedDial>
       {takeOwnershipConfirmation.open && (
         <ConfirmationDialog
@@ -372,6 +421,86 @@ const WrappedAlertListItemActions: React.FC<AlertListItemActionsProps> = ({
             )
           }
         />
+      )}
+      {viewHistory && (
+        <Dialog
+          open={viewHistory}
+          onClose={(event, reason) => {
+            if (reason === 'backdropClick') {
+              setViewHistory(false);
+            }
+          }}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+          maxWidth="xl"
+        >
+          <DialogTitle id="alert-dialog-title">{t('history.events')}</DialogTitle>
+          <DialogContent>
+            <TableContainer>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    {['ts', 'workflow_or_user', 'priority', 'status', 'labels'].map(column => (
+                      <TableCell key={column}>
+                        <Typography sx={{ fontWeight: 'bold' }}>{t(column)}</Typography>
+                      </TableCell>
+                    ))}
+                    <TableCell></TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {item.events
+                    .sort((a, b) => a.ts.localeCompare(b.ts) || b.ts.localeCompare(a.ts))
+                    .reverse()
+                    .map(event => {
+                      return (
+                        <TableRow hover tabIndex={-1}>
+                          <Tooltip title={event.ts}>
+                            <TableCell>
+                              <Moment fromNow>{event.ts}</Moment>
+                            </TableCell>
+                          </Tooltip>
+                          <Tooltip title={event.entity_type} style={{ textTransform: 'capitalize' }}>
+                            <TableCell>{event.entity_name}</TableCell>
+                          </Tooltip>
+                          <TableCell>
+                            {event.priority ? <AlertPriority name={event.priority} withChip /> : null}
+                          </TableCell>
+                          <TableCell>{event.status ? <AlertStatus name={event.status} /> : null}</TableCell>
+                          <TableCell width="40%">
+                            {event.labels ? (
+                              <ChipList items={event.labels.map(label => ({ label, variant: 'outlined' }))} />
+                            ) : null}
+                          </TableCell>
+                          <TableCell>
+                            {event.entity_type === 'workflow' ? (
+                              <Tooltip
+                                title={t('workflow')}
+                                onClick={() => {
+                                  navigate(`/manage/workflow/${event.entity_id}`);
+                                  setViewHistory(false);
+                                }}
+                              >
+                                <div>
+                                  <HiOutlineExternalLink
+                                    style={{
+                                      fontSize: 'x-large',
+                                      verticalAlign: 'middle',
+                                      color: theme.palette.primary.main
+                                    }}
+                                  />
+                                </div>
+                              </Tooltip>
+                            ) : null}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );
