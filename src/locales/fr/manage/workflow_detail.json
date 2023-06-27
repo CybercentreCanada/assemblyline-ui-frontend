@@ -1,6 +1,6 @@
 {
   "add.button": "Ajouter",
-  "add.success": "Le flu de travail a été ajouter avec succès.",
+  "add.success": "Le flux de travail a été ajouté avec succès.",
   "add.title": "Ajouter un flu de travail",
   "backport_workflow_prompt": "Appliquer le workflow à toutes les alertes existantes ?",
   "backport_workflow_matching": "alertes correspondantes",
