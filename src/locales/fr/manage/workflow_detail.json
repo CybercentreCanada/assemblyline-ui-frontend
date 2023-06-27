@@ -38,5 +38,5 @@
   "status.NON-MALICIOUS": "NON-MALICIEUX",
   "status.null": "",
   "title": "Détails du flu de travail",
-  "usage": "Afficher l'utilisation du workflow"
+  "usage": "Afficher l'utilisation du flux de travail"
 }
