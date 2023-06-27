@@ -6,7 +6,7 @@
   "backport_workflow_matching": "alertes correspondantes",
   "chart.title": "Nombre de fois utilisé dans les derniers 30 jours",
   "created_by": "Créé par ",
-  "delete.acceptText": "Yes, remove it!",
+  "delete.acceptText": "Oui, supprimez-le !",
   "delete.cancelText": "Annuler",
   "delete.success": "Le flux de travail a été supprimé avec succès.",
   "delete.text": "Voulez-vous vraiment supprimer le flux de travail actuel?",
