@@ -122,7 +122,7 @@
   "verdict.user.non_malicious": "utilisateurs pensent que cette alerte est non-malveillante",
   "workflow": "Aller au flux de travail",
   "workflow_or_user": "Flux de travail/Utilisateur",
-  "workflow.apply": "Appliquer les actions du flu de travail",
+  "workflow.apply": "Appliquer les actions du flux de travail",
   "workflow.impact.all": "L'action de flu de travail sera appliquée à toutes les alertes du système!",
   "workflow.impact.high": "L'action de flu de travail sera appliquée à toutes les alertes correspondant aux filtres suivants:",
   "workflow.impact.low": "L'action de flu de travail affectera uniquement l'alerte actuellement sélectionnée qui correspond aux filtres suivants:",
