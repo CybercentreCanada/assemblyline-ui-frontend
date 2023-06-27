@@ -70,6 +70,7 @@
   "extended_scan.incomplete": "Analyse étendue terminée avec des erreurs qui n'étaient pas présentes dans l'analyse d'origine",
   "extended_scan.skipped": "L'analyse étendu a été ignoré pour cette alerte",
   "extended_scan.submitted": "En attente de la fin de l'analyse étendu ...",
+  "submit_uri": "Soumettre l'URI",
   "filter": "Filtrer...",
   "forbidden": "Interdit",
   "full_count": "Suivez tous les documents pour obtenir le décompte complet",
