@@ -56,7 +56,7 @@
   "hint_owner": "Il y a des propriétaires pour les alertes précédentes dans le groupe",
   "hint_owner_detail": "Une alerte similaire appartient à quelqu'un",
   "history": "Voir l'historique",
-  "history.events": "Collecte d'événements",
+  "history.events": "Registre des événements",
   "history.none": "Aucun historique des événements",
   "ip": "IPs",
   "ip_dynamic": "Dynamique",
