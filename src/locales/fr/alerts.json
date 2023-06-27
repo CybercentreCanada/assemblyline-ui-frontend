@@ -124,7 +124,7 @@
   "workflow_or_user": "Flux de travail/Utilisateur",
   "workflow.apply": "Appliquer les actions du flux de travail",
   "workflow.impact.all": "L'action du flux de travail sera appliquée à toutes les alertes du système!",
-  "workflow.impact.high": "L'action de flu de travail sera appliquée à toutes les alertes correspondant aux filtres suivants:",
+  "workflow.impact.high": "L'action du flux de travail sera appliquée à toutes les alertes correspondant aux filtres suivants:",
   "workflow.impact.low": "L'action de flu de travail affectera uniquement l'alerte actuellement sélectionnée qui correspond aux filtres suivants:",
   "workflow.title": "Effectuer une action de flu de travail",
   "workflow_action": "Effectuer une action de flu de travail",
