@@ -306,7 +306,8 @@ const DEFAULT_CONTAINER: Container = {
   registry_password: '',
   registry_username: '',
   registry_type: 'docker',
-  service_account: ''
+  service_account: '',
+  operating_system: null
 };
 
 type ContainerDialogProps = {
@@ -488,6 +489,77 @@ const WrappedContainerDialog = ({
             </Grid>
             <Grid item xs={12} md={6}>
               <Typography variant="subtitle2">
+                {t('container.dialog.registry_username')}
+                <ResetButton
+                  service={tempContainer}
+                  defaults={defaults}
+                  field="registry_username"
+                  reset={() => {
+                    setModified(true);
+                    setTempContainer({ ...tempContainer, registry_username: defaults.registry_username || '' });
+                  }}
+                />
+              </Typography>
+              <TextField
+                fullWidth
+                size="small"
+                margin="dense"
+                variant="outlined"
+                onChange={event => handleContainerValueChange('registry_username', event.target.value || undefined)}
+                value={tempContainer.registry_username ? tempContainer.registry_username : ''}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Typography variant="subtitle2">
+                {t('container.dialog.registry_password')}
+                <ResetButton
+                  service={tempContainer}
+                  defaults={defaults}
+                  field="registry_password"
+                  reset={() => {
+                    setModified(true);
+                    setTempContainer({ ...tempContainer, registry_password: defaults.registry_password || '' });
+                  }}
+                />
+              </Typography>
+              <TextField
+                fullWidth
+                size="small"
+                margin="dense"
+                variant="outlined"
+                onChange={event => handleContainerValueChange('registry_password', event.target.value || undefined)}
+                value={tempContainer.registry_password ? tempContainer.registry_password : ''}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="subtitle2">
+                {t('container.card.os')}
+                <ResetButton
+                  service={tempContainer}
+                  defaults={defaults}
+                  field="operating_system"
+                  reset={() => {
+                    setModified(true);
+                    setTempContainer({ ...tempContainer, operating_system: defaults.operating_system });
+                  }}
+                />
+              </Typography>
+              <FormControl size="small" fullWidth>
+                <Select
+                  fullWidth
+                  id="operating_system"
+                  variant="outlined"
+                  value={tempContainer.operating_system}
+                  style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(0.5) }}
+                  onChange={event => handleContainerValueChange('operating_system', event.target.value)}
+                >
+                  <MenuItem value="linux">{'Linux'}</MenuItem>
+                  <MenuItem value="windows">{'Windows'}</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Typography variant="subtitle2">
                 {t('container.dialog.cpu')}
                 <ResetButton
                   service={tempContainer}
@@ -546,50 +618,6 @@ const WrappedContainerDialog = ({
                   />
                 </Grid>
               </Grid>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Typography variant="subtitle2">
-                {t('container.dialog.registry_username')}
-                <ResetButton
-                  service={tempContainer}
-                  defaults={defaults}
-                  field="registry_username"
-                  reset={() => {
-                    setModified(true);
-                    setTempContainer({ ...tempContainer, registry_username: defaults.registry_username || '' });
-                  }}
-                />
-              </Typography>
-              <TextField
-                fullWidth
-                size="small"
-                margin="dense"
-                variant="outlined"
-                onChange={event => handleContainerValueChange('registry_username', event.target.value || undefined)}
-                value={tempContainer.registry_username ? tempContainer.registry_username : ''}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Typography variant="subtitle2">
-                {t('container.dialog.registry_password')}
-                <ResetButton
-                  service={tempContainer}
-                  defaults={defaults}
-                  field="registry_password"
-                  reset={() => {
-                    setModified(true);
-                    setTempContainer({ ...tempContainer, registry_password: defaults.registry_password || '' });
-                  }}
-                />
-              </Typography>
-              <TextField
-                fullWidth
-                size="small"
-                margin="dense"
-                variant="outlined"
-                onChange={event => handleContainerValueChange('registry_password', event.target.value || undefined)}
-                value={tempContainer.registry_password ? tempContainer.registry_password : ''}
-              />
             </Grid>
             <Grid item xs={12}>
               <Typography variant="subtitle2">
