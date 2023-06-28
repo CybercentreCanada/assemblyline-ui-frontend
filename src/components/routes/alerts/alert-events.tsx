@@ -38,6 +38,7 @@ const WrappedAlertEventsTable = ({ alert, viewHistory, setViewHistory }) => {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
         maxWidth="xl"
+        fullWidth
       >
         <DialogTitle id="alert-dialog-title">{t('history.events')}</DialogTitle>
         <DialogContent>
