@@ -1,5 +1,5 @@
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
-import { Grid, IconButton, Tooltip, useTheme } from '@mui/material';
+import { Grid, IconButton, Tooltip } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
@@ -68,14 +68,12 @@ type SearchResults = {
 
 export default function Retrohunt() {
   const { t } = useTranslation(['retrohunt']);
-  const theme = useTheme();
   const classes = useStyles();
   const location = useLocation();
   const navigate = useNavigate();
 
   const { apiCall } = useMyAPI();
-  const { c12nDef } = useALContext();
-  const { closeGlobalDrawer, setGlobalDrawer, globalDrawerOpened } = useDrawer();
+  const { setGlobalDrawer, globalDrawerOpened } = useDrawer();
   const { user: currentUser, indexes, configuration } = useALContext();
 
   const [retrohuntResults, setRetrohuntResults] = useState<SearchResults>(null);
@@ -184,7 +182,7 @@ export default function Retrohunt() {
 
   useEffect(() => {
     if (location.hash) {
-      setGlobalDrawer(<RetrohuntDetail retrohuntRef={retrohuntRef} code={location.hash.substr(1)} isDrawer />);
+      setGlobalDrawer(<RetrohuntDetail code={location.hash.substr(1)} isDrawer />);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.hash, retrohuntRef]);
