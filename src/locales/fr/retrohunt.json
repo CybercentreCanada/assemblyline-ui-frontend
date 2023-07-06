@@ -1,5 +1,6 @@
 {
   "add.button": "AJOUTER",
+  "add.success": "Le travail Retrohunt a été ajouter avec succès.",
   "created_by": "Créé par ",
   "details.all": "données en direct + archive de maliciels",
   "details.archive_only": "seulement l'archive de maliciels",

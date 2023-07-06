@@ -5,6 +5,7 @@ import { AlertTitle, Skeleton, Tooltip } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
+import { RetrohuntResult } from 'components/routes/retrohunt';
 import Classification from 'components/visual/Classification';
 import 'moment/locale/fr';
 import React, { useCallback } from 'react';
@@ -22,27 +23,6 @@ import {
 } from '../DivTable';
 import InformativeAlert from '../InformativeAlert';
 
-export type RetrohuntResult = {
-  classification?: string;
-  code?: string;
-  created?: string;
-  creator?: string;
-  id?: string;
-  total_hits?: number;
-  tags?: any;
-  description?: any;
-  yara_signature?: any;
-  raw_query?: any;
-  total_indices?: any;
-  pending_indices?: any;
-  pending_candidates?: any;
-  errors?: any;
-  hits?: any;
-  finished?: any;
-  truncated?: boolean;
-  archive_only?: boolean;
-};
-
 type SearchResults = {
   items: RetrohuntResult[];
   total: number;
@@ -55,12 +35,12 @@ type RetrohuntStatusProp = {
 type RetrohuntTableProps = {
   retrohuntResults: SearchResults;
   allowSort?: boolean;
-  onRowClick?: (code: string) => void;
+  onRowClick?: (retrohunt: RetrohuntResult) => void;
 };
 
 const STATE_ICON_MAP = {
-  error: <ClearIcon color="error" />,
   completed: <DoneIcon color="primary" />,
+  error: <ClearIcon color="error" />,
   submitted: <UpdateIcon color="action" />
 };
 
@@ -113,7 +93,7 @@ const WrappedRetrohuntTable: React.FC<RetrohuntTableProps> = ({
                 onClick={event => {
                   if (!onRowClick) return;
                   event.preventDefault();
-                  onRowClick(retrohunt?.code);
+                  onRowClick(retrohunt);
                 }}
                 hover
                 style={{ textDecoration: 'none' }}
@@ -144,7 +124,7 @@ const WrappedRetrohuntTable: React.FC<RetrohuntTableProps> = ({
                   </DivTableCell>
                 )}
                 <DivTableCell>{retrohunt.total_hits}</DivTableCell>
-                <DivTableCell style={{ textAlign: 'center' }}>
+                <DivTableCell>
                   <RetrohuntStatus result={retrohunt} />
                 </DivTableCell>
               </LinkRow>
