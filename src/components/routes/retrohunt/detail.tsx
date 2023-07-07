@@ -1,425 +1,495 @@
-import ClearIcon from '@mui/icons-material/Clear';
-import DoneIcon from '@mui/icons-material/Done';
-import UpdateIcon from '@mui/icons-material/Update';
-import {
-  Button,
-  CircularProgress,
-  Grid,
-  Pagination,
-  Paper,
-  Skeleton,
-  TextField,
-  Typography,
-  useTheme
-} from '@mui/material';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
-import { tableCellClasses } from '@mui/material/TableCell';
+import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import { AlertTitle, Collapse, Divider, Grid, Paper, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import TableContainer from '@mui/material/TableContainer';
+import makeStyles from '@mui/styles/makeStyles';
+import clsx from 'clsx';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullSize from 'commons/components/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
-import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
 import ForbiddenPage from 'components/routes/403';
-import NotFoundPage from 'components/routes/404';
 import Classification from 'components/visual/Classification';
-import ConfirmationDialog from 'components/visual/ConfirmationDialog';
-import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
-import { MonacoEditor } from 'components/visual/MonacoEditor';
-import { RouterPrompt } from 'components/visual/RouterPrompt';
-import FilesTable from 'components/visual/SearchResult/files';
+import CustomChip from 'components/visual/CustomChip';
+import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from 'components/visual/DivTable';
+import InformativeAlert from 'components/visual/InformativeAlert';
+import MonacoEditor from 'components/visual/MonacoEditor';
+import { FileResult } from 'components/visual/SearchResult/files';
 import 'moment/locale/fr';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Moment from 'react-moment';
-import { useNavigate } from 'react-router';
-import { useLocation, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+
+const useStyles = makeStyles(theme => ({
+  header: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    cursor: 'pointer',
+    '&:hover, &:focus': {
+      color: theme.palette.text.secondary
+    }
+  },
+  title: {
+    fontWeight: 500,
+    marginRight: theme.spacing(0.5),
+    display: 'flex'
+  },
+  value: {
+    fontFamily: 'monospace',
+    wordBreak: 'break-word'
+  },
+  collapse: {
+    paddingBottom: theme.spacing(2),
+    paddingTop: theme.spacing(2)
+  },
+  circularProgress: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginTop: -12,
+    marginLeft: -12
+  },
+  containerSpacer: {
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(2)
+  },
+  tableContainer: {
+    // maxHeight: `calc(${10} * 32.34px)`
+    maxHeight: `50vh`
+  },
+  tableCell: {
+    paddingLeft: theme.spacing(2),
+    paddingRight: theme.spacing(2)
+  }
+}));
+
+type RetrohuntPhase = null | 'submitted' | 'error' | 'yara' | 'finished';
+
+type OpenSection = { [K in 'information' | 'signature' | 'results' | 'errors']: boolean };
 
 export type Retrohunt = {
+  archive_only?: boolean;
   classification?: string;
   code?: string;
   created?: string;
   creator?: string;
-  id?: string;
-  total_hits?: number;
-  tags?: any;
   description?: any;
-  yara_signature?: any;
-  raw_query?: any;
-  total_indices?: any;
-  pending_indices?: any;
-  pending_candidates?: any;
   errors?: any;
-  hits?: any;
   finished?: any;
+  hits?: any;
+  id?: string;
+  pending_candidates?: any;
+  pending_indices?: any;
+  phase?: RetrohuntPhase;
+  progress?: [number, number];
+  raw_query?: any;
+  tags?: any;
+  total_hits?: number;
+  total_indices?: any;
   truncated?: boolean;
-  archive_only?: boolean;
+  yara_signature?: any;
 };
 
 type ParamProps = {
   code: string;
 };
 
-type RetrohuntPageType = 'drawer' | 'page';
-
-type RetrohuntPageState = 'loading' | 'view' | 'add' | 'error' | 'forbidden';
-
 type Props = {
-  pageType?: RetrohuntPageType;
-  retrohuntCode: string;
-  close?: () => void;
+  code?: string;
+  isDrawer?: boolean;
 };
 
 const PAGE_SIZE = 10;
 
-const MAX_TRACKED_RECORDS = 10000;
+const RELOAD_DELAY = 5000;
 
-const STATUS_MAP = {
-  submitted: { color: 'action', label: 'submitted', icon: <UpdateIcon color="action" /> },
-  error: { color: 'error', label: 'error', icon: <ClearIcon color="error" /> },
-  completed: { color: 'primary', label: 'completed', icon: <DoneIcon color="primary" /> }
-};
+// const PHASE_MAP: { [K in Phase]: { color: PossibleColors; label: string; icon: React.ReactNode } } = {
+//   submitted: { color: 'default', label: 'submitted', icon: <UpdateIcon color="action" /> },
+//   error: { color: 'error', label: 'error', icon: <ClearIcon color="error" /> },
+//   finished: { color: 'primary', label: 'completed', icon: <DoneIcon color="primary" /> }
+// };
 
-function WrappedRetrohuntDetail({ retrohuntCode = null, pageType = 'page', close = () => null }: Props) {
+function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Props) {
   const { t, i18n } = useTranslation(['retrohunt']);
   const theme = useTheme();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const classes = useStyles();
   const { apiCall } = useMyAPI();
-  const { showErrorMessage } = useMySnackbar();
 
   const { c12nDef } = useALContext();
   const { code: paramCode } = useParams<ParamProps>();
   const { user: currentUser } = useAppUser<CustomUser>();
 
   const [retrohunt, setRetrohunt] = useState<Retrohunt>(null);
-  const [code, setCode] = useState<string>(paramCode || retrohuntCode);
-  const [type, setType] = useState<RetrohuntPageState>('loading');
-  const [modified, setModified] = useState<boolean>(false);
-  const [buttonLoading, setButtonLoading] = useState<boolean>(false);
-  const [confirmationOpen, setConfirmationOpen] = useState<boolean>(false);
+  const [hits, setHits] = useState<FileResult[]>([]);
+  const [isOpen, setIsOpen] = useState<OpenSection>({
+    information: true,
+    signature: false,
+    results: true,
+    errors: false
+  });
 
-  const [offset, setOffset] = useState<number>(0);
-  const nbOfPages = useMemo(
-    () => Math.ceil(Math.min(retrohunt?.total_hits, MAX_TRACKED_RECORDS) / PAGE_SIZE),
-    [retrohunt?.total_hits]
-  );
-  const status = useMemo<keyof typeof STATUS_MAP>(
-    () => (retrohunt ? (retrohunt?.finished ? (retrohunt?.truncated ? 'error' : 'completed') : 'submitted') : null),
-    [retrohunt]
-  );
+  const previousHits = useRef<FileResult[]>([]);
+  const timer = useRef<boolean>(false);
+  const isFetching = useRef<boolean>(false);
+  const offsetRef = useRef<number>(0);
 
   const DEFAULT_RETROHUNT = useMemo<Retrohunt>(
     () => ({
-      code: null,
-      creator: null,
-      tags: {},
-      description: '',
-      created: '2020-01-01T00:00:00.000000Z',
+      archive_only: false,
       classification: c12nDef.UNRESTRICTED,
-      yara_signature: '',
-      raw_query: null,
-      total_indices: 0,
-      pending_indices: 0,
-      pending_candidates: 0,
+      code: null,
+      created: '2020-01-01T00:00:00.000000Z',
+      creator: null,
+      description: '',
       errors: [],
-      hits: [],
       finished: false,
+      hits: [],
+      pending_candidates: 0,
+      pending_indices: 0,
+      phase: 'finished',
+      progress: [1, 1],
+      raw_query: null,
+      tags: {},
+      total_indices: 0,
       truncated: false,
-      archive_only: false
+      yara_signature: ''
     }),
     [c12nDef.UNRESTRICTED]
   );
 
-  useEffect(() => {
-    retrohuntCode ? setCode(retrohuntCode) : paramCode ? setCode(paramCode) : setCode(null);
-  }, [paramCode, retrohuntCode]);
+  const phase = useMemo<RetrohuntPhase>(
+    () => (retrohunt && 'phase' in retrohunt ? (retrohunt.phase as RetrohuntPhase) : null),
+    [retrohunt]
+  );
 
-  useEffect(() => {
-    if (code === 'new' && currentUser.roles.includes('retrohunt_run')) {
-      setRetrohunt({ ...DEFAULT_RETROHUNT });
-      setType('add');
-    } else if (code && currentUser.roles.includes('retrohunt_view')) {
-      apiCall({
-        url: `/api/v4/retrohunt/${code}/?offset=${offset}&rows=${PAGE_SIZE}`,
-        onSuccess: api_data => {
-          setRetrohunt({ ...api_data.api_response });
-          setType('view');
-        },
-        onFailure: () => {
-          setType('error');
-        }
-      });
-    } else {
-      setType('forbidden');
+  const progress = useMemo<[number, number]>(
+    () =>
+      retrohunt && 'progress' in retrohunt && Array.isArray(retrohunt.progress) && retrohunt.progress.length === 2
+        ? retrohunt.progress
+        : [0, 0],
+    [retrohunt]
+  );
+
+  const handleIsOpenChange = useCallback(
+    (key: keyof OpenSection) => () => setIsOpen(o => ({ ...o, [key]: !o[key] })),
+    []
+  );
+
+  const handleReload = useCallback(
+    (jobCode: string) => {
+      if (currentUser.roles.includes('retrohunt_view')) {
+        isFetching.current = true;
+        apiCall({
+          url: `/api/v4/retrohunt/${jobCode}/?offset=${offsetRef.current}&rows=${PAGE_SIZE}`,
+          onSuccess: api_data => {
+            const job: Retrohunt = api_data.api_response;
+            setRetrohunt({ ...DEFAULT_RETROHUNT, ...job });
+            setHits([...previousHits.current, ...job?.hits]);
+            offsetRef.current = offsetRef.current + PAGE_SIZE;
+          },
+          onExit: () => {
+            isFetching.current = false;
+          }
+        });
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [DEFAULT_RETROHUNT, currentUser]
+  );
+
+  const handleShouldFetch = useCallback((total_hits: number): boolean => {
+    if (offsetRef.current + PAGE_SIZE >= total_hits) return false;
+
+    const tableEl = document.getElementById('hits-table');
+    if (!tableEl) return false;
+
+    const tableRect = tableEl.getBoundingClientRect();
+    const lastEl = document.getElementById('hit-body').lastElementChild;
+    if (!lastEl) return true;
+
+    const lastRect = lastEl.getBoundingClientRect();
+    if (tableRect.bottom > lastRect.top && lastRect.bottom > tableRect.top) return true;
+
+    return false;
+  }, []);
+
+  const handleHitsScroll = useCallback(() => {
+    if (!isFetching.current && retrohunt && 'total_hits' in retrohunt && handleShouldFetch(retrohunt?.total_hits)) {
+      previousHits.current = hits;
+      handleReload(retrohunt?.code);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [DEFAULT_RETROHUNT, code, currentUser.roles, offset]);
+  }, [handleReload, handleShouldFetch, hits, retrohunt]);
 
-  const onRetrohuntChange = useCallback((newRetrohunt: Partial<Retrohunt>) => {
-    setRetrohunt(rh => ({ ...rh, ...newRetrohunt }));
-    setModified(true);
-  }, []);
+  useEffect(() => {
+    previousHits.current = [];
+    offsetRef.current = 0;
+    handleReload(propCode || paramCode);
+  }, [handleReload, propCode, paramCode]);
 
-  const onCancelRetrohuntConfirmation = useCallback(() => {
-    setConfirmationOpen(false);
-  }, []);
+  useEffect(() => {
+    if (!timer.current && retrohunt && 'finished' in retrohunt && !retrohunt.finished) {
+      timer.current = true;
+      setTimeout(() => {
+        previousHits.current = [];
+        offsetRef.current = 0;
+        handleReload(retrohunt?.code);
+        timer.current = false;
+      }, RELOAD_DELAY);
+    }
+  }, [handleReload, retrohunt]);
 
-  const onCreateRetrohunt = useCallback(() => {
-    if (!currentUser.roles.includes('retrohunt_run')) return;
-    apiCall({
-      url: `/api/v4/retrohunt/`,
-      method: 'POST',
-      body: {
-        classification: retrohunt.classification,
-        description: retrohunt.description,
-        archive_only: retrohunt.archive_only ? retrohunt.archive_only : false,
-        yara_signature: retrohunt.yara_signature
-      },
-      onSuccess: api_data => {
-        const newCode: string = api_data.api_response?.code ? api_data.api_response?.code : 'new';
-        setRetrohunt({ ...api_data.api_response });
-        setConfirmationOpen(false);
-        setType('view');
-        setModified(false);
-        setCode(newCode);
-        setTimeout(() => {
-          navigate(`${location.pathname}${location.search ? location.search : ''}#${newCode}`);
-          window.dispatchEvent(new CustomEvent('reloadRetrohunts'));
-        }, 1000);
-      },
-      onFailure: api_data => {
-        showErrorMessage(api_data.api_error_message);
-        setConfirmationOpen(false);
-      },
-      onEnter: () => setButtonLoading(true),
-      onExit: () => setButtonLoading(false)
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser?.roles, location, navigate, retrohunt, showErrorMessage]);
+  useEffect(() => {
+    handleHitsScroll();
+  }, [handleHitsScroll]);
 
-  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
-    setOffset((value - 1) * PAGE_SIZE);
-  };
-
-  if (type === 'error') return <NotFoundPage />;
-  else if (type === 'forbidden') return <ForbiddenPage />;
-  else
-    return (
-      <PageFullSize margin={pageType === 'page' ? 4 : 2}>
-        <RouterPrompt when={modified} />
-        <ConfirmationDialog
-          open={confirmationOpen}
-          handleClose={_event => setConfirmationOpen(false)}
-          handleCancel={onCancelRetrohuntConfirmation}
-          handleAccept={onCreateRetrohunt}
-          title={t('validate.title')}
-          cancelText={t('validate.cancelText')}
-          acceptText={t('validate.acceptText')}
-          text={t('validate.text')}
-        />
-
-        <Grid container flexDirection="column" flexWrap="nowrap" flex={1} spacing={2}>
-          {c12nDef.enforce && (
-            <Grid item paddingBottom={theme.spacing(2)}>
-              <Classification
-                format="long"
-                type={type === 'add' ? 'picker' : 'pill'}
-                c12n={retrohunt && 'classification' in retrohunt ? retrohunt.classification : null}
-                setClassification={(c12n: string) => onRetrohuntChange({ classification: c12n })}
-                disabled={!currentUser.roles.includes('retrohunt_run')}
-              />
-            </Grid>
-          )}
-
-          <Grid item>
-            <Grid container flexDirection="row">
-              <Grid item flexGrow={1}>
-                {type === 'loading' && (
-                  <Typography variant="h4" children={<Skeleton height="2.5rem" width="30rem" />} />
-                )}
-                {type === 'loading' && (
-                  <Typography variant="caption" children={<Skeleton height="2.5rem" width="20rem" />} />
-                )}
-                {type === 'add' && <Typography variant="h4" children={t('header.add')} />}
-                {type === 'view' && <Typography variant="h4" children={t('header.view')} />}
-                {type === 'view' && <Typography variant="caption" children={retrohunt.code} />}
-                {['view', 'add'].includes(type) && status && (
-                  <div style={{ marginTop: theme.spacing(1) }}>
-                    <CustomChip
-                      icon={STATUS_MAP[status].icon}
-                      label={t(`status.${status}`)}
-                      color={STATUS_MAP[status].color as PossibleColors}
-                      variant="outlined"
-                    />
-                  </div>
-                )}
-              </Grid>
-
-              <Grid item>
-                <div style={{ display: 'flex', marginBottom: theme.spacing(1) }}>
-                  {type === 'loading' && (
-                    <Skeleton
-                      variant="circular"
-                      height="2.5rem"
-                      width="2.5rem"
-                      style={{ margin: theme.spacing(0.5) }}
-                    />
-                  )}
-                  {type === 'add' && (
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      disabled={buttonLoading || !retrohunt?.description || !retrohunt?.yara_signature}
-                      onClick={() => setConfirmationOpen(true)}
-                    >
-                      {t('add.button')}
-                      {buttonLoading && (
-                        <CircularProgress
-                          size={24}
-                          style={{ position: 'absolute', top: '50%', left: '50%', marginTop: -12, marginLeft: -12 }}
-                        />
-                      )}
-                    </Button>
-                  )}
-                </div>
-              </Grid>
-            </Grid>
+  return currentUser.roles.includes('retrohunt_view') ? (
+    <PageFullSize margin={isDrawer ? 2 : 4}>
+      <Grid container flexDirection="column" flexWrap="nowrap" flex={1} spacing={2}>
+        {c12nDef.enforce && (
+          <Grid item paddingBottom={theme.spacing(2)}>
+            <Classification
+              format="long"
+              type="pill"
+              c12n={retrohunt && 'classification' in retrohunt ? retrohunt.classification : null}
+            />
           </Grid>
+        )}
 
-          {type === 'loading' && <Grid item children={<Skeleton height="2.5rem" />} />}
-          {type === 'view' && 'creator' in retrohunt && 'created' in retrohunt && (
-            <Grid item textAlign="center">
-              <Typography variant="subtitle2" color="textSecondary">
-                {`${t('created_by')} ${retrohunt.creator} `}
-                <Moment fromNow locale={i18n.language}>
-                  {retrohunt.created}
-                </Moment>
-              </Typography>
+        <Grid item>
+          <Grid container flexDirection="row">
+            <Grid item flexGrow={1}>
+              <Typography variant="h4" children={!retrohunt ? <Skeleton width="30rem" /> : t('header.view')} />
+              <Typography variant="caption" children={!retrohunt ? <Skeleton width="20rem" /> : retrohunt.code} />
             </Grid>
-          )}
-
-          {type === 'view' && retrohunt && 'tags' in retrohunt && (
             <Grid item>
-              <Typography variant="subtitle2">{t('details.tags')}</Typography>
-              <Paper
-                component="pre"
+              <CustomChip
+                icon={!retrohunt ? <Skeleton variant="circular" width="1rem" height="1rem" /> : null}
+                label={!retrohunt ? <Skeleton width="5rem" /> : `${progress[0]} - ${progress[1]} : ${phase} `}
+                color={!retrohunt ? 'default' : 'primary'}
                 variant="outlined"
-                style={{
-                  margin: 0,
-                  padding: theme.spacing(0.75, 1),
-                  whiteSpace: 'pre-wrap',
-                  wordBreak: 'break-word'
-                }}
-              >
-                {Object.keys(retrohunt.tags).length > 0 ? Object.keys(retrohunt.tags).join(', ') : t('details.none')}
-              </Paper>
-            </Grid>
-          )}
-
-          <Grid item>
-            <Typography variant="subtitle2">{t('details.description')}</Typography>
-            {type === 'loading' || !retrohunt || !('description' in retrohunt) ? (
-              <Skeleton style={{ height: '8rem', transform: 'none', marginTop: theme.spacing(1) }} />
-            ) : (
-              <>
-                {type === 'add' && (
-                  <TextField
-                    fullWidth
-                    size="small"
-                    multiline
-                    rows={3}
-                    margin="dense"
-                    variant="outlined"
-                    value={retrohunt.description}
-                    onChange={event => onRetrohuntChange({ description: event.target.value })}
-                  />
-                )}
-                {type === 'view' && (
-                  <Paper
-                    component="pre"
-                    variant="outlined"
-                    children={retrohunt.description}
-                    style={{
-                      margin: 0,
-                      padding: theme.spacing(0.75, 1),
-                      whiteSpace: 'pre-wrap',
-                      wordBreak: 'break-word'
-                    }}
-                  />
-                )}
-              </>
-            )}
-          </Grid>
-
-          {type === 'add' && retrohunt && 'archive_only' in retrohunt && (
-            <Grid item>
-              <Typography variant="subtitle2">{t('details.search')}</Typography>
-              <RadioGroup
-                row
-                value={retrohunt.archive_only ? 'archive_only' : 'all'}
-                onChange={(_, value) => onRetrohuntChange({ archive_only: value === 'archive_only' })}
-              >
-                <FormControlLabel value="all" control={<Radio />} label={t('details.all')} />
-                <FormControlLabel value="archive_only" control={<Radio />} label={t('details.archive_only')} />
-              </RadioGroup>
-            </Grid>
-          )}
-
-          {type === 'view' && retrohunt && (
-            <Grid item flex={1}>
-              <Grid container flexDirection="column" height="100%" minHeight="500px">
-                <Typography variant="h6" children={t('details.results')} />
-                {nbOfPages > 1 && (
-                  <Pagination
-                    count={nbOfPages}
-                    onChange={handlePageChange}
-                    shape="rounded"
-                    size="small"
-                    sx={{ alignSelf: 'flex-end' }}
-                  />
-                )}
-                <FilesTable
-                  fileResults={{ items: retrohunt.hits, total: retrohunt.total_hits }}
-                  component={props => (
-                    <Paper
-                      {...props}
-                      variant="outlined"
-                      sx={{
-                        ...props.sx,
-                        backgroundColor: theme.palette.background.default,
-                        [`& .${tableCellClasses.head}`]: {
-                          backgroundColor: theme.palette.background.default
-                        }
-                      }}
-                    />
-                  )}
-                  allowSort={false}
-                />
-              </Grid>
-            </Grid>
-          )}
-
-          <Grid item flex={1}>
-            <Grid container flexDirection="column" height="100%" minHeight="500px">
-              <Typography variant="h6" children={t('details.yara_signature')} />
-              {type === 'loading' || !retrohunt || !('yara_signature' in retrohunt) ? (
-                <Skeleton style={{ height: '10rem', transform: 'none', marginTop: theme.spacing(1) }} />
-              ) : (
-                <MonacoEditor
-                  language="yara"
-                  value={retrohunt.yara_signature}
-                  onChange={data => setRetrohunt(r => ({ ...r, yara_signature: data }))}
-                  options={{ readOnly: type !== 'add' }}
-                />
-              )}
+              />
+              {/* <CustomChip
+                  icon={isLoading ? <Skeleton variant="circular" width="1rem" height="1rem" /> : PHASE_MAP[phase]?.icon}
+                  label={isLoading ? <Skeleton width="5rem" /> : `${pourcentage}% ${t(`phase.${phase}`)} `}
+                  color={isLoading ? 'default' : PHASE_MAP[phase]?.color}
+                  variant="outlined"
+                /> */}
             </Grid>
           </Grid>
         </Grid>
-      </PageFullSize>
-    );
+
+        <Grid item>
+          <Typography className={classes.header} variant="h6" onClick={handleIsOpenChange('information')}>
+            <span>{t('header.information')}</span>
+            {isOpen.information ? <ExpandLess /> : <ExpandMore />}
+          </Typography>
+          <Divider />
+          <Collapse in={isOpen.information} timeout="auto">
+            <div className={classes.collapse}>
+              <Grid container>
+                <Grid item xs={4} sm={3} lg={2}>
+                  <span className={classes.title}>{t('details.creator')}</span>
+                </Grid>
+                <Grid className={classes.value} item xs={8} sm={9} lg={10}>
+                  {!retrohunt ? <Skeleton width="auto" /> : 'creator' in retrohunt ? retrohunt.creator : null}
+                </Grid>
+
+                <Grid item xs={4} sm={3} lg={2}>
+                  <span className={classes.title}>{t('details.created')}</span>
+                </Grid>
+                <Grid className={classes.value} item xs={8} sm={9} lg={10}>
+                  {!retrohunt ? (
+                    <Skeleton width="auto" />
+                  ) : 'created' in retrohunt ? (
+                    <Moment locale={i18n.language} format="YYYY-MM-DD HH:mm:ss.SSS">
+                      {retrohunt.created}
+                    </Moment>
+                  ) : null}
+                </Grid>
+
+                <Grid item xs={4} sm={3} lg={2}>
+                  <span className={classes.title}>{t('details.tags')}</span>
+                </Grid>
+                <Grid className={classes.value} item xs={8} sm={9} lg={10}>
+                  {!retrohunt ? (
+                    <Skeleton width="auto" />
+                  ) : 'tags' in retrohunt && Object.keys(retrohunt.tags).length > 0 ? (
+                    Object.keys(retrohunt.tags).join(', ')
+                  ) : (
+                    t('details.none')
+                  )}
+                </Grid>
+
+                <Grid item xs={4} sm={3} lg={2}>
+                  <span className={classes.title}>{t('details.truncated')}</span>
+                </Grid>
+                <Grid className={classes.value} item xs={8} sm={9} lg={10}>
+                  {!retrohunt ? <Skeleton width="auto" /> : 'truncated' in retrohunt ? retrohunt.truncated : null}
+                </Grid>
+
+                <Grid item xs={4} sm={3} lg={2}>
+                  <span className={classes.title}>{t('details.description')}</span>
+                </Grid>
+                <Grid className={classes.value} item xs={8} sm={9} lg={10}>
+                  {!retrohunt ? <Skeleton width="auto" /> : 'description' in retrohunt ? retrohunt.description : null}
+                </Grid>
+              </Grid>
+            </div>
+          </Collapse>
+        </Grid>
+
+        <Grid item>
+          <Typography className={classes.header} variant="h6" onClick={handleIsOpenChange('signature')}>
+            <span>{t('header.signature')}</span>
+            {isOpen.signature ? <ExpandLess /> : <ExpandMore />}
+          </Typography>
+          <Divider />
+          <Collapse in={isOpen.signature} timeout="auto">
+            <div className={classes.collapse}>
+              {!retrohunt ? (
+                <Skeleton style={{ height: '10rem', transform: 'none', marginTop: theme.spacing(1) }} />
+              ) : (
+                <Grid container flexDirection="column" height="100%" minHeight="500px">
+                  <MonacoEditor
+                    language="yara"
+                    value={'yara_signature' in retrohunt ? retrohunt.yara_signature : ''}
+                    options={{ readOnly: true }}
+                  />
+                </Grid>
+              )}
+            </div>
+          </Collapse>
+        </Grid>
+
+        <Grid item>
+          <Typography className={classes.header} variant="h6" onClick={handleIsOpenChange('results')}>
+            <span>{t('header.results')}</span>
+            {isOpen.results ? <ExpandLess /> : <ExpandMore />}
+          </Typography>
+          <Divider />
+          <Collapse in={isOpen.results} timeout="auto">
+            <Grid container className={classes.collapse}>
+              <Grid item xs={4} sm={3} lg={2}>
+                <span className={classes.title}>{t('details.hit-count')}</span>
+              </Grid>
+              <Grid className={classes.value} item xs={8} sm={9} lg={10}>
+                {!retrohunt ? <Skeleton width="auto" /> : 'total_hits' in retrohunt ? retrohunt.total_hits : null}
+              </Grid>
+
+              <Grid className={clsx(classes.value, classes.containerSpacer)} item xs={12}>
+                {hits.length > 0 ? (
+                  <TableContainer
+                    id="hits-table"
+                    className={classes.tableContainer}
+                    component={Paper}
+                    onScroll={handleHitsScroll}
+                  >
+                    <DivTable stickyHeader>
+                      <DivTableHead>
+                        <DivTableRow>
+                          <DivTableCell children={t('details.lasttimeseen')} />
+                          <DivTableCell children={t('details.count')} />
+                          <DivTableCell children={t('details.sha256')} />
+                          <DivTableCell children={t('details.filetype')} />
+                          <DivTableCell children={t('details.size')} />
+                          {c12nDef.enforce && <DivTableCell children={t('details.classification')} />}
+                          <DivTableCell />
+                        </DivTableRow>
+                      </DivTableHead>
+                      <DivTableBody id="hit-body">
+                        {hits.map((file, id) => (
+                          <LinkRow
+                            key={id}
+                            component={Link}
+                            to={`/file/detail/${file.sha256}`}
+                            hover
+                            style={{ textDecoration: 'none' }}
+                          >
+                            <DivTableCell>
+                              <Tooltip title={file.seen.last}>
+                                <>
+                                  <Moment fromNow locale={i18n.language}>
+                                    {file.seen.last}
+                                  </Moment>
+                                </>
+                              </Tooltip>
+                            </DivTableCell>
+                            <DivTableCell>{file.seen.count}</DivTableCell>
+                            <DivTableCell breakable>{file.sha256}</DivTableCell>
+                            <DivTableCell>{file.type}</DivTableCell>
+                            <DivTableCell>{file.size}</DivTableCell>
+                            {c12nDef.enforce && (
+                              <DivTableCell>
+                                <Classification type="text" size="tiny" c12n={file.classification} format="short" />
+                              </DivTableCell>
+                            )}
+                            <DivTableCell style={{ textAlign: 'center' }}>
+                              {file.from_archive && (
+                                <Tooltip title={t('archive')}>
+                                  <ArchiveOutlinedIcon />
+                                </Tooltip>
+                              )}
+                            </DivTableCell>
+                          </LinkRow>
+                        ))}
+                      </DivTableBody>
+                    </DivTable>
+                  </TableContainer>
+                ) : (
+                  <div style={{ width: '100%' }}>
+                    <InformativeAlert>
+                      <AlertTitle>{t('no_results_title')}</AlertTitle>
+                      {t('no_results_desc')}
+                    </InformativeAlert>
+                  </div>
+                )}
+              </Grid>
+            </Grid>
+          </Collapse>
+        </Grid>
+
+        {retrohunt && 'errors' in retrohunt && Array.isArray(retrohunt.errors) && retrohunt.errors.length > 0 && (
+          <Grid item>
+            <Typography className={classes.header} variant="h6" onClick={handleIsOpenChange('errors')}>
+              <span>{t('header.errors')}</span>
+              {isOpen.errors ? <ExpandLess /> : <ExpandMore />}
+            </Typography>
+            <Divider />
+            <Collapse in={isOpen.errors} timeout="auto">
+              <Grid container className={classes.collapse}>
+                <Grid item xs={4} sm={3} lg={2}>
+                  <span className={classes.title}>{t('details.error-count')}</span>
+                </Grid>
+                <Grid className={classes.value} item xs={8} sm={9} lg={10}>
+                  {retrohunt.errors.length}
+                </Grid>
+
+                <Grid className={clsx(classes.value, classes.containerSpacer)} item xs={12}>
+                  <TableContainer className={classes.tableContainer} component={Paper}>
+                    <DivTable>
+                      <DivTableBody>
+                        {retrohunt.errors.map((error, i) => (
+                          <DivTableRow key={`${i}`}>
+                            <DivTableCell className={classes.tableCell}>{error}</DivTableCell>
+                          </DivTableRow>
+                        ))}
+                      </DivTableBody>
+                    </DivTable>
+                  </TableContainer>
+                </Grid>
+              </Grid>
+            </Collapse>
+          </Grid>
+        )}
+      </Grid>
+    </PageFullSize>
+  ) : (
+    <ForbiddenPage />
+  );
 }
 
 export const RetrohuntDetail = React.memo(WrappedRetrohuntDetail);
@@ -427,7 +497,7 @@ export const RetrohuntDetail = React.memo(WrappedRetrohuntDetail);
 WrappedRetrohuntDetail.defaultProps = {
   pageType: 'page',
   retrohuntCode: null,
-  close: null
+  retrohuntRef: null
 } as Props;
 
 export default WrappedRetrohuntDetail;
