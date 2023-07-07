@@ -167,6 +167,13 @@ function Settings() {
     }
   }
 
+  function toggleGenerateAlert() {
+    if (settings) {
+      setModified(true);
+      setSettings({ ...settings, generate_alert: !settings.generate_alert });
+    }
+  }
+
   function toggleCaching() {
     if (settings) {
       setModified(true);
@@ -409,6 +416,21 @@ function Settings() {
             </TableRow>
           </TableHead>
           <TableBody>
+            <ClickRow enabled={editable} onClick={toggleGenerateAlert}>
+              <TableCell colSpan={2} width="100%">
+                <Typography variant="body1">{t('submissions.generate_alert')}</Typography>
+                <Typography variant="caption">{t('submissions.generate_alert_desc')}</Typography>
+              </TableCell>
+              <TableCell align="right">
+                <Switch
+                  checked={settings ? settings.generate_alert : false}
+                  disabled={settings === null || !editable}
+                  onChange={() => toggleGenerateAlert()}
+                  color="secondary"
+                  name="generate_alert"
+                />
+              </TableCell>
+            </ClickRow>
             <ClickRow enabled={editable} onClick={toggleDynamicPrevention}>
               <TableCell colSpan={2} width="100%">
                 <Typography variant="body1">{t('submissions.dynamic_recursion')}</Typography>

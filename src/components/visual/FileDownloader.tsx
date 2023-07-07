@@ -1,16 +1,25 @@
 import { CircularProgress, IconButton, Tooltip } from '@mui/material';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { useState } from 'react';
+import { MouseEventHandler, useState } from 'react';
 
 type EmptyProps = {
   icon: React.ReactNode;
   link: string;
   tooltip?: string;
   successMessage?: string;
+  size?: 'small' | 'medium' | 'large';
+  onClick?: MouseEventHandler<HTMLButtonElement>;
 };
 
-function FileDownloader({ icon, link, tooltip = null, successMessage = null }: EmptyProps) {
+function FileDownloader({
+  icon,
+  link,
+  tooltip = null,
+  successMessage = null,
+  size = 'large',
+  onClick = () => null
+}: EmptyProps) {
   const { downloadBlob } = useMyAPI();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
   const [progress, setProgress] = useState(null);
@@ -65,7 +74,14 @@ function FileDownloader({ icon, link, tooltip = null, successMessage = null }: E
   return (
     <Tooltip title={tooltip}>
       <div>
-        <IconButton onClick={downloadFile} disabled={waiting || total !== null} size="large">
+        <IconButton
+          onClick={e => {
+            downloadFile();
+            onClick(e);
+          }}
+          disabled={waiting || total !== null}
+          size={size}
+        >
           {(waiting || total === 0) && (
             <CircularProgress
               size={24}

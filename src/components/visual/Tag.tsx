@@ -1,6 +1,7 @@
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
 import PlaylistAddCheckOutlinedIcon from '@mui/icons-material/PlaylistAddCheckOutlined';
+import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
 import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
@@ -28,6 +29,7 @@ const CLIPBOARD_ICON = <AssignmentOutlinedIcon style={{ marginRight: '16px' }} /
 const HIGHLIGHT_ICON = <SelectAllOutlinedIcon style={{ marginRight: '16px' }} />;
 const SAFELIST_ICON = <PlaylistAddCheckOutlinedIcon style={{ marginRight: '16px' }} />;
 const SIGNATURE_ICON = <FingerprintOutlinedIcon style={{ marginRight: '16px' }} />;
+const SUBMIT_ICON = <PublishOutlinedIcon style={{ marginRight: '16px' }} />;
 const TRAVEL_EXPLORE_ICON = <TravelExploreOutlinedIcon style={{ marginRight: '16px' }} />;
 const initialMenuState = {
   mouseX: null,
@@ -234,6 +236,21 @@ const WrappedTag: React.FC<TagProps> = ({
             {t('safelist')}
           </MenuItem>
         )}
+        {type.endsWith('uri') && (
+          <MenuItem
+            dense
+            component={Link}
+            to="/submit"
+            state={{
+              hash: value,
+              tabContext: '1',
+              c12n: classification
+            }}
+          >
+            {SUBMIT_ICON}
+            {t('submit_uri')}
+          </MenuItem>
+        )}
         {!!currentUser.roles.includes('external_query') &&
           !!currentUserConfig.ui.external_sources?.length &&
           !!currentUserConfig.ui.external_source_tags?.hasOwnProperty(type) && (
@@ -267,12 +284,14 @@ const WrappedTag: React.FC<TagProps> = ({
         fullWidth={fullWidth}
         onContextMenu={handleMenuClick}
         icon={
-          <ExternalLinks
-            success={lookupState[type].success}
-            results={lookupState[type].results}
-            errors={lookupState[type].errors}
-            iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '20px', verticalAlign: 'middle' }}
-          />
+          lookupState && lookupState[type] ? (
+            <ExternalLinks
+              success={lookupState[type].success}
+              results={lookupState[type].results}
+              errors={lookupState[type].errors}
+              iconStyle={{ marginRight: '-3px', marginLeft: '3px', height: '20px', verticalAlign: 'middle' }}
+            />
+          ) : null
         }
       />
     </>

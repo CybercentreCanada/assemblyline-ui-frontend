@@ -7,7 +7,8 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
-import { SpeedDial, SpeedDialAction, SpeedDialIcon, Typography, useMediaQuery, useTheme } from '@mui/material';
+import WorkHistoryOutlinedIcon from '@mui/icons-material/WorkHistoryOutlined';
+import { Badge, SpeedDial, SpeedDialAction, SpeedDialIcon, Typography, useMediaQuery, useTheme } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -19,6 +20,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 import { Link } from 'react-router-dom';
+import AlertEventsTable from './alert-events';
 import { AlertDrawerState } from './alerts';
 import { AlertItem } from './hooks/useAlerts';
 import usePromiseAPI from './hooks/usePromiseAPI';
@@ -106,6 +108,7 @@ const WrappedAlertListItemActions: React.FC<AlertListItemActionsProps> = ({
   const theme = useTheme();
   const { showErrorMessage, showSuccessMessage } = useMySnackbar();
   const [takeOwnershipConfirmation, setTakeOwnershipConfirmation] = useState<OwnerProps>(DEFAULT_OWNER);
+  const [viewHistory, setViewHistory] = useState(false);
   const [open, setOpen] = useState(false);
   const { user: currentUser } = useAppUser<CustomUser>();
   const [hasSetMalicious, setHasSetMalicious] = useState(false);
@@ -113,6 +116,7 @@ const WrappedAlertListItemActions: React.FC<AlertListItemActionsProps> = ({
   const upSM = useMediaQuery(theme.breakpoints.up('sm'));
   const vertical = type === 'drawer' && !upSM;
   const permanent = type === 'drawer' && upSM;
+  const hasEvents = item && item.events && item.events.length > 0 ? true : false;
 
   useEffect(() => {
     setHasSetMalicious(item.verdict.malicious.indexOf(currentUser.username) !== -1);
@@ -350,6 +354,29 @@ const WrappedAlertListItemActions: React.FC<AlertListItemActionsProps> = ({
             onClick={() => handleClose(null, 'toggle')}
           />
         )}
+        <SpeedDialActionButton
+          icon={
+            <Badge badgeContent={hasEvents ? item.events.length : 0}>
+              <WorkHistoryOutlinedIcon color={hasEvents ? 'inherit' : 'disabled'} />
+            </Badge>
+          }
+          disableRipple={!hasEvents}
+          tooltipTitle={t(hasEvents ? 'history' : 'history.none')}
+          tooltipPlacement={vertical ? 'left' : 'bottom'}
+          FabProps={{
+            size: permanent ? 'medium' : 'small',
+            style: {
+              margin: permanent ? '8px 2px 8px 2px' : null,
+              boxShadow: permanent ? theme.shadows[0] : null
+            }
+          }}
+          onClick={() => {
+            if (hasEvents) {
+              setViewHistory(true);
+            }
+          }}
+        />
+        <AlertEventsTable alert={item} viewHistory={viewHistory} setViewHistory={setViewHistory} />
       </SpeedDial>
       {takeOwnershipConfirmation.open && (
         <ConfirmationDialog

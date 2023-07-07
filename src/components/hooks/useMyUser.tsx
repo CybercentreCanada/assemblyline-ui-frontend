@@ -109,6 +109,7 @@ export type ConfigurationDefinition = {
     tos: boolean;
     tos_lockout: boolean;
     tos_lockout_notify: boolean;
+    url_egress_proxies?: string[];
   };
   user: {
     api_priv_map: {
@@ -247,8 +248,14 @@ export default function useMyUser(): CustomAppUserService {
   };
 
   const validateProps = (props: AppUserValidatedProp[]) => {
-    if (props === undefined) return true;
-    return props.some(validateProp);
+    if (props === undefined || !Array.isArray(props)) return true;
+
+    let enforcedProps: AppUserValidatedProp[] = [];
+    let unEnforcedProps: AppUserValidatedProp[] = [];
+    props.forEach(prop => (prop?.enforce ? enforcedProps.push(prop) : unEnforcedProps.push(prop)));
+    const enforcedValidated = enforcedProps.length > 0 ? enforcedProps.every(validateProp) : false;
+
+    return enforcedValidated || unEnforcedProps.some(validateProp);
   };
 
   const isReady = () => {

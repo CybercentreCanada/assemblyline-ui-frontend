@@ -35,6 +35,7 @@ import { useNavigate } from 'react-router';
 import { Link, useLocation } from 'react-router-dom';
 import AttackSection from './FileDetail/attacks';
 import ChildrenSection from './FileDetail/childrens';
+import CommentSection from './FileDetail/comments';
 import Detection from './FileDetail/detection';
 import EmptySection from './FileDetail/emptys';
 import ErrorSection from './FileDetail/errors';
@@ -51,9 +52,22 @@ type FileInfo = {
   archive_ts: string;
   ascii: string;
   classification: string;
+  comments: {
+    cid: string;
+    uname: string;
+    date: string;
+    text: string;
+  }[];
   entropy: number;
   expiry_ts: string | null;
   hex: string;
+  labels: string[];
+  label_categories?: {
+    info: string[];
+    safe: string[];
+    suspicious: string[];
+    malicious: string[];
+  };
   magic: string;
   md5: string;
   mime: string;
@@ -106,6 +120,7 @@ type FileDetailProps = {
   liveResultKeys?: string[];
   liveErrors?: Error[];
   force?: boolean;
+  isArchive?: boolean;
 };
 
 const WrappedFileDetail: React.FC<FileDetailProps> = ({
@@ -113,7 +128,8 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
   sid = null,
   liveResultKeys = null,
   liveErrors = null,
-  force = false
+  force = false,
+  isArchive = false
 }) => {
   const { t } = useTranslation(['fileDetail']);
   const [file, setFile] = useState<File | null>(null);
@@ -386,7 +402,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
         </Grid>
       </div>
       <div style={{ paddingBottom: sp2 }}>
-        <IdentificationSection fileinfo={file ? file.file_info : null} />
+        <IdentificationSection fileinfo={file ? file.file_info : null} isArchive />
         <FrequencySection fileinfo={file ? file.file_info : null} />
         <MetadataSection metadata={file ? file.metadata : null} />
         <ChildrenSection childrens={file ? file.childrens : null} />
@@ -402,6 +418,7 @@ const WrappedFileDetail: React.FC<FileDetailProps> = ({
         />
         <EmptySection emptys={file ? file.emptys : null} sid={sid} />
         <ErrorSection errors={file ? file.errors : null} />
+        <CommentSection sha256={file?.file_info?.sha256} comments={file ? file?.file_info?.comments : null} />
       </div>
     </div>
   ) : (

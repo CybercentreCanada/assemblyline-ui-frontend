@@ -15,6 +15,7 @@ const AdminErrorDetail = lazy(() => import('components/routes/admin/error_detail
 const AdminErrorViewer = lazy(() => import('components/routes/admin/error_viewer'));
 const AdminIdentify = lazy(() => import('components/routes/admin/identify'));
 const AdminServices = lazy(() => import('components/routes/admin/services'));
+const Archive = lazy(() => import('components/routes/archive'));
 const Service = lazy(() => import('components/routes/admin/service_detail'));
 const ServiceReview = lazy(() => import('components/routes/admin/service_review'));
 const AdminSiteMap = lazy(() => import('components/routes/admin/site_map'));
@@ -112,6 +113,7 @@ const WrappedRoutes = () => {
         <Route path="/admin/tag_safelist" element={<AdminTagSafelist />} />
         <Route path="/admin/users" element={<AdminUsers />} />
         <Route path="/admin/users/:id" element={<User />} />
+        <Route path="/archive" element={<Archive />} />
         <Route path="/authorize" element={<AppRegistration />} />
         <Route path="/crash" element={<CrashTest />} />
         <Route path="/dashboard" element={<Dashboard />} />

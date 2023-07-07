@@ -49,7 +49,13 @@ const WrappedMultiBody = ({ body, printable = false }) => {
                   case 'PROCESS_TREE':
                     return <ProcessTreeBody body={part[1]} />;
                   case 'TABLE':
-                    return <TblBody body={part[1]} printable={printable} headers={part.length === 3 ? part[2] : []} />;
+                    return (
+                      <TblBody
+                        body={part[1]}
+                        printable={printable}
+                        order={part.length === 3 ? part[2].column_order : []}
+                      />
+                    );
                   case 'IMAGE':
                     return <ImageBody body={part[1]} printable={printable} />;
                   case 'MULTI':

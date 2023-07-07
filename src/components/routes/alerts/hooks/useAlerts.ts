@@ -42,6 +42,16 @@ export interface DetailedItem {
   verdict: 'safe' | 'info' | 'suspicious' | 'malicious';
 }
 
+export interface WorkflowEvent {
+  entity_name: string;
+  entity_type: 'user' | 'workflow';
+  entity_id: string;
+  labels?: string[];
+  status?: string;
+  priority?: string;
+  ts: string;
+}
+
 export interface AlertItem extends LineItem {
   al: {
     attrib: string[];
@@ -99,6 +109,8 @@ export interface AlertItem extends LineItem {
     malicious: string[];
     non_malicious: string[];
   };
+  events: WorkflowEvent[];
+  workflow_completed: boolean;
 }
 
 // The Custom Hook API.

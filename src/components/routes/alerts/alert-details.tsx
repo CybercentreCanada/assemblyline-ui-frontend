@@ -2,6 +2,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
+import WorkHistoryOutlinedIcon from '@mui/icons-material/WorkHistoryOutlined';
 import {
   Box,
   Button,
@@ -34,6 +35,7 @@ import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
 import { Link, useParams } from 'react-router-dom';
 import ForbiddenPage from '../403';
+import AlertEventsTable from './alert-events';
 import AlertExtendedScan from './alert-extended_scan';
 import AlertPriority from './alert-priority';
 import AlertStatus from './alert-status';
@@ -118,7 +120,6 @@ const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items }) => 
 const AutoHideChipList = React.memo(WrappedAutoHideChipList);
 
 const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
-  const { t } = useTranslation('alerts');
   const theme = useTheme();
   const classes = useStyles();
   const { apiCall } = useMyAPI();
@@ -129,6 +130,10 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
   const { configuration } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
   const [metaOpen, setMetaOpen] = React.useState(false);
+  const [viewHistory, setViewHistory] = React.useState(false);
+  const [hasEvents, setHasEvents] = React.useState(false);
+  // eslint-disable-next-line
+  const { t, i18n } = useTranslation(['alerts']);
 
   useEffect(() => {
     const alertId = id || paramId;
@@ -136,7 +141,9 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
       apiCall({
         url: `/api/v4/alert/${alertId}/`,
         onSuccess: api_data => {
-          setItem(api_data.api_response);
+          let alertItem = api_data.api_response;
+          setItem(alertItem);
+          setHasEvents(alertItem && alertItem.events && alertItem.events.length > 0 ? true : false);
         }
       });
     }
@@ -174,6 +181,31 @@ const WrappedAlertDetails: React.FC<AlertDetailsProps> = ({ id, alert }) => {
           <Grid container alignItems="center">
             <Grid item xs>
               <Typography variant="h4">{t('detail.title')}</Typography>
+            </Grid>
+            <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
+              {item ? (
+                <>
+                  <Tooltip title={t(hasEvents ? 'history' : 'history.none')}>
+                    <IconButton
+                      disableRipple={!hasEvents}
+                      style={{
+                        color: hasEvents ? theme.palette.action.active : theme.palette.action.disabled
+                      }}
+                      size="large"
+                      onClick={() => {
+                        if (hasEvents) {
+                          setViewHistory(true);
+                        }
+                      }}
+                    >
+                      <WorkHistoryOutlinedIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <AlertEventsTable alert={item} viewHistory={viewHistory} setViewHistory={setViewHistory} />
+                </>
+              ) : (
+                <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+              )}
             </Grid>
             {currentUser.roles.includes('submission_view') && (
               <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
