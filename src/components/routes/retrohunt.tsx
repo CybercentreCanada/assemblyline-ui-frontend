@@ -1,8 +1,7 @@
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
-import EventBusyOutlinedIcon from '@mui/icons-material/EventBusyOutlined';
-import EventOutlinedIcon from '@mui/icons-material/EventOutlined';
-import { Grid, IconButton, Tooltip, useMediaQuery, useTheme } from '@mui/material';
+import { Grid, IconButton, Tooltip } from '@mui/material';
 import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
@@ -12,16 +11,53 @@ import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import SearchPager from 'components/visual/SearchPager';
-import RetrohuntTable, { RetrohuntResult } from 'components/visual/SearchResult/retrohunt';
+import RetrohuntTable from 'components/visual/SearchResult/retrohunt';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import 'moment/locale/fr';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
+import { RetrohuntCreate } from './retrohunt/create';
 import { RetrohuntDetail } from './retrohunt/detail';
 
 const PAGE_SIZE = 25;
+
+const useStyles = makeStyles(theme => ({
+  header: { paddingBottom: theme.spacing(2) },
+  headerButton: { textAlign: 'right', flexGrow: 0 },
+  headerIconButton: { color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark },
+  searchContainer: { paddingTop: theme.spacing(1) },
+  searchBar: {
+    fontStyle: 'italic',
+    paddingTop: theme.spacing(0.5),
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-end'
+  },
+  tableContainer: { paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }
+}));
+
+export type RetrohuntResult = {
+  archive_only?: boolean;
+  classification?: string;
+  code?: string;
+  created?: string;
+  creator?: string;
+  description?: any;
+  errors?: any;
+  finished?: any;
+  hits?: any;
+  id?: string;
+  pending_candidates?: any;
+  pending_indices?: any;
+  raw_query?: any;
+  tags?: any;
+  total_hits?: number;
+  total_indices?: any;
+  truncated?: boolean;
+  yara_signature?: any;
+};
 
 type SearchResults = {
   items: RetrohuntResult[];
@@ -32,18 +68,18 @@ type SearchResults = {
 
 export default function Retrohunt() {
   const { t } = useTranslation(['retrohunt']);
-  const theme = useTheme();
+  const classes = useStyles();
   const location = useLocation();
-  const upMD = useMediaQuery(theme.breakpoints.up('md'));
-
   const navigate = useNavigate();
+
   const { apiCall } = useMyAPI();
+  const { setGlobalDrawer, globalDrawerOpened } = useDrawer();
   const { user: currentUser, indexes, configuration } = useALContext();
-  const { closeGlobalDrawer, setGlobalDrawer, globalDrawerOpened } = useDrawer();
 
   const [retrohuntResults, setRetrohuntResults] = useState<SearchResults>(null);
-  const [pageSize] = useState(PAGE_SIZE);
-  const [searching, setSearching] = useState(false);
+  const retrohuntRef = useRef<RetrohuntResult>(null);
+  const [pageSize] = useState<number>(PAGE_SIZE);
+  const [searching, setSearching] = useState<boolean>(false);
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
 
   const [suggestions] = useState([
@@ -53,7 +89,7 @@ export default function Retrohunt() {
 
   const filterValue = useRef<string>('');
 
-  const onReload = useCallback(
+  const handleReload = useCallback(
     (offset: number) => {
       query.set('rows', PAGE_SIZE);
       query.set('offset', offset);
@@ -64,7 +100,7 @@ export default function Retrohunt() {
         onSuccess: api_data => {
           const { items, total, rows, offset: ofs } = api_data.api_response;
           if (items.length === 0 && ofs !== 0 && ofs >= total) {
-            onReload(Math.max(0, ofs - rows));
+            handleReload(Math.max(0, ofs - rows));
           } else {
             setRetrohuntResults(api_data.api_response);
           }
@@ -77,57 +113,62 @@ export default function Retrohunt() {
     [query]
   );
 
-  const onClear = useCallback(
-    () => {
-      navigate(location.pathname);
-    },
+  const handleCreate = useCallback(() => {
+    if (currentUser.roles.includes('retrohunt_run')) {
+      setGlobalDrawer(<RetrohuntCreate retrohuntRef={retrohuntRef} isDrawer />);
+    }
+  }, [currentUser.roles, setGlobalDrawer]);
+
+  const handleClear = useCallback(
+    () => navigate(`${location.pathname}${location.hash}`),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [location.pathname]
+    [location.pathname, location.hash]
   );
 
-  const onSearch = useCallback(
+  const handleSearch = useCallback(
     () => {
       if (filterValue.current !== '') {
         query.set('query', filterValue.current);
-        navigate(`${location.pathname}?${query.toString()}`);
+        navigate(`${location.pathname}?${query.toString()}${location.hash}`);
       } else {
-        onClear();
+        handleClear();
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [query, location.pathname, onClear]
+    [handleClear, location.pathname, location.hash, query]
   );
 
-  const onFilterValueChange = (inputValue: string) => {
+  const handleFilterValueChange = useCallback((inputValue: string) => {
     filterValue.current = inputValue;
-  };
+  }, []);
 
   const openRetrohuntDrawer = useCallback(
-    (code: string) => {
-      navigate(`${location.pathname}${location.search ? location.search : ''}#${code}`);
+    (rh: RetrohuntResult) => {
+      navigate(`${location.pathname}${location.search ? location.search : ''}#${rh?.code}`);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 
   useEffect(() => {
+    setSearching(true);
     setQuery(new SimpleSearchQuery(location.search, `query=*&rows=${pageSize}&offset=0`));
-  }, [location.pathname, location.search, pageSize]);
+  }, [location.search, pageSize]);
 
   useEffect(() => {
     if (query && currentUser.roles.includes('retrohunt_view')) {
-      onReload(0);
+      handleReload(0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
   useEffect(() => {
-    function handleReload() {
-      onReload(retrohuntResults ? retrohuntResults.offset : 0);
+    function reload() {
+      handleReload(retrohuntResults ? retrohuntResults.offset : 0);
     }
-    window.addEventListener('reloadRetrohunts', handleReload);
+    window.addEventListener('reloadRetrohunts', reload);
     return () => {
-      window.removeEventListener('reloadRetrohunts', handleReload);
+      window.removeEventListener('reloadRetrohunts', reload);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, retrohuntResults]);
@@ -141,35 +182,25 @@ export default function Retrohunt() {
 
   useEffect(() => {
     if (location.hash) {
-      setGlobalDrawer(
-        <RetrohuntDetail retrohuntCode={location.hash.substr(1)} close={closeGlobalDrawer} pageType="drawer" />
-      );
-    } else {
-      closeGlobalDrawer();
+      setGlobalDrawer(<RetrohuntDetail code={location.hash.substr(1)} isDrawer />);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.hash]);
+  }, [location.hash, retrohuntRef]);
 
   if (!configuration?.datastore?.retrohunt?.enabled) return <Navigate to="/notfound" replace />;
   else if (!currentUser.roles.includes('retrohunt_view')) return <Navigate to="/forbidden" replace />;
   else
     return (
       <PageFullWidth margin={4}>
-        <div style={{ paddingBottom: theme.spacing(2) }}>
+        <div className={classes.header}>
           <Grid container alignItems="center">
             <Grid item xs>
               <Typography variant="h4">{t('title')}</Typography>
             </Grid>
             {currentUser.roles.includes('retrohunt_run') && (
-              <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
+              <Grid className={classes.headerButton} item xs>
                 <Tooltip title={t('tooltip.add')}>
-                  <IconButton
-                    style={{
-                      color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
-                    }}
-                    onClick={() => openRetrohuntDrawer('new')}
-                    size="large"
-                  >
+                  <IconButton className={classes.headerIconButton} onClick={handleCreate} size="large">
                     <AddCircleOutlineOutlinedIcon />
                   </IconButton>
                 </Tooltip>
@@ -179,48 +210,18 @@ export default function Retrohunt() {
         </div>
 
         <PageHeader isSticky>
-          <div style={{ paddingTop: theme.spacing(1) }}>
+          <div className={classes.searchContainer}>
             <SearchBar
               initValue={query ? query.get('query', '') : ''}
               placeholder={t('filter')}
               searching={searching}
               suggestions={suggestions}
-              onValueChange={onFilterValueChange}
-              onClear={onClear}
-              onSearch={onSearch}
-              buttons={[
-                {
-                  icon: <EventBusyOutlinedIcon fontSize={upMD ? 'medium' : 'small'} />,
-                  tooltip: t('never_used'),
-                  props: {
-                    onClick: () => {
-                      query.set('query', 'hit_count:0');
-                      navigate(`${location.pathname}?${query.getDeltaString()}`);
-                    }
-                  }
-                },
-                {
-                  icon: <EventOutlinedIcon fontSize={upMD ? 'medium' : 'small'} />,
-                  tooltip: t('old'),
-                  props: {
-                    onClick: () => {
-                      query.set('query', 'last_seen:[* TO now-3m]');
-                      navigate(`${location.pathname}?${query.getDeltaString()}`);
-                    }
-                  }
-                }
-              ]}
+              onClear={handleClear}
+              onSearch={handleSearch}
+              onValueChange={handleFilterValueChange}
             >
               {retrohuntResults !== null && (
-                <div
-                  style={{
-                    fontStyle: 'italic',
-                    paddingTop: theme.spacing(0.5),
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    justifyContent: 'flex-end'
-                  }}
-                >
+                <div className={classes.searchBar}>
                   {retrohuntResults.total !== 0 && (
                     <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
                       {searching ? (
@@ -250,10 +251,8 @@ export default function Retrohunt() {
           </div>
         </PageHeader>
 
-        <div
-          style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}
-        >
-          <RetrohuntTable retrohuntResults={retrohuntResults} onRowClick={code => openRetrohuntDrawer(code)} />
+        <div className={classes.tableContainer}>
+          <RetrohuntTable retrohuntResults={retrohuntResults} onRowClick={rh => openRetrohuntDrawer(rh)} />
         </div>
       </PageFullWidth>
     );
