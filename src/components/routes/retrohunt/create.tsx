@@ -13,10 +13,12 @@ import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullSize from 'commons/components/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
+import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
 import ForbiddenPage from 'components/routes/403';
+import { RetrohuntResult } from 'components/routes/retrohunt';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import { MonacoEditor } from 'components/visual/MonacoEditor';
@@ -26,7 +28,6 @@ import React, { MutableRefObject, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
-import { Retrohunt } from './detail';
 
 const useStyles = makeStyles(theme => ({
   circularProgress: {
@@ -40,7 +41,8 @@ const useStyles = makeStyles(theme => ({
 
 type Props = {
   isDrawer?: boolean;
-  retrohuntRef?: MutableRefObject<Retrohunt>;
+  retrohuntRef?: MutableRefObject<RetrohuntResult>;
+  closeDrawer;
 };
 
 function WrappedRetrohuntCreate({ isDrawer = false, retrohuntRef = null }: Props) {
@@ -50,12 +52,13 @@ function WrappedRetrohuntCreate({ isDrawer = false, retrohuntRef = null }: Props
   const navigate = useNavigate();
   const location = useLocation();
   const { apiCall } = useMyAPI();
+  const { closeGlobalDrawer } = useDrawer();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
 
   const { c12nDef } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
 
-  const DEFAULT_RETROHUNT = useMemo<Retrohunt>(
+  const DEFAULT_RETROHUNT = useMemo<RetrohuntResult>(
     () => ({
       archive_only: false,
       classification: c12nDef?.UNRESTRICTED,
@@ -68,13 +71,13 @@ function WrappedRetrohuntCreate({ isDrawer = false, retrohuntRef = null }: Props
   const [isModified, setIsModified] = useState<boolean>(false);
   const [isButtonLoading, setIsButtonLoading] = useState<boolean>(false);
   const [isConfirmationOpen, setIsConfirmationOpen] = useState<boolean>(false);
-  const [retrohunt, setRetrohunt] = useState<Retrohunt>({
+  const [retrohunt, setRetrohunt] = useState<RetrohuntResult>({
     ...DEFAULT_RETROHUNT,
     ...retrohuntRef.current
   });
 
   const onRetrohuntChange = useCallback(
-    (newRetrohunt: Partial<Retrohunt>) => {
+    (newRetrohunt: Partial<RetrohuntResult>) => {
       setRetrohunt(rh => ({ ...rh, ...newRetrohunt }));
       retrohuntRef.current = { ...retrohuntRef.current, ...newRetrohunt };
       setIsModified(true);
@@ -87,7 +90,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, retrohuntRef = null }: Props
   }, []);
 
   const onCreateRetrohunt = useCallback(
-    (rh: Retrohunt) => {
+    (rh: RetrohuntResult) => {
       if (!currentUser.roles.includes('retrohunt_run')) return;
       apiCall({
         url: `/api/v4/retrohunt/`,
@@ -101,14 +104,15 @@ function WrappedRetrohuntCreate({ isDrawer = false, retrohuntRef = null }: Props
         onSuccess: api_data => {
           const newCode: string = api_data.api_response?.code ? api_data.api_response?.code : 'new';
           showSuccessMessage('add.success');
-          setRetrohunt({ ...DEFAULT_RETROHUNT });
-          retrohuntRef.current = { ...DEFAULT_RETROHUNT };
-          setIsModified(false);
+          // setRetrohunt({ ...DEFAULT_RETROHUNT });
+          // retrohuntRef.current = { ...DEFAULT_RETROHUNT };
+          // setIsModified(false);
           setIsConfirmationOpen(false);
+          closeGlobalDrawer();
+          window.dispatchEvent(new CustomEvent('reloadRetrohunts'));
           setTimeout(() => {
             navigate(`${location.pathname}${location.search ? location.search : ''}#${newCode}`);
-            window.dispatchEvent(new CustomEvent('reloadRetrohunts'));
-          }, 1000);
+          }, 20);
         },
         onFailure: api_data => {
           showErrorMessage(api_data.api_error_message);
@@ -119,7 +123,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, retrohuntRef = null }: Props
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [apiCall, currentUser?.roles, location, navigate, retrohunt, retrohuntRef, showErrorMessage, showSuccessMessage]
+    [currentUser?.roles, location, navigate, retrohunt, retrohuntRef, showErrorMessage, showSuccessMessage]
   );
 
   if (currentUser.roles.includes('retrohunt_run'))
