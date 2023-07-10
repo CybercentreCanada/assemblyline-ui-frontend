@@ -13,7 +13,6 @@ import makeStyles from '@mui/styles/makeStyles';
 import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageFullSize from 'commons/components/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
-import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { CustomUser } from 'components/hooks/useMyUser';
@@ -43,17 +42,16 @@ const useStyles = makeStyles(theme => ({
 type Props = {
   isDrawer?: boolean;
   retrohuntRef?: MutableRefObject<RetrohuntResult>;
-  closeDrawer;
+  onSetGlobalDrawer?: (prop: any) => void;
 };
 
-function WrappedRetrohuntCreate({ isDrawer = false, retrohuntRef = null }: Props) {
+function WrappedRetrohuntCreate({ isDrawer = false, retrohuntRef = null, onSetGlobalDrawer = null }: Props) {
   const { t } = useTranslation(['retrohunt']);
   const theme = useTheme();
   const classes = useStyles();
   const navigate = useNavigate();
   const location = useLocation();
   const { apiCall } = useMyAPI();
-  const { closeGlobalDrawer, setGlobalDrawer } = useDrawer();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
 
   const { c12nDef } = useALContext();
@@ -105,21 +103,14 @@ function WrappedRetrohuntCreate({ isDrawer = false, retrohuntRef = null }: Props
         onSuccess: api_data => {
           const newCode: string = api_data.api_response?.code ? api_data.api_response?.code : 'new';
           showSuccessMessage(t('add.success'));
-          setRetrohunt({ ...DEFAULT_RETROHUNT });
           retrohuntRef.current = { ...DEFAULT_RETROHUNT };
           setIsModified(false);
           setIsConfirmationOpen(false);
-          closeGlobalDrawer();
           setTimeout(() => {
             window.dispatchEvent(new CustomEvent('reloadRetrohunts'));
-            setGlobalDrawer(<RetrohuntDetail code={newCode} isDrawer />);
-            window.history.pushState(
-              {},
-              undefined,
-              `${location.pathname}${location.search ? location.search : ''}#${newCode}`
-            );
-            // navigate(`${locatiopathname}${location.search ? location.search : ''}#${newCode}`);
-          }, 100);
+            onSetGlobalDrawer(<RetrohuntDetail code={newCode} isDrawer />);
+            navigate(`${location.pathname}${location.search ? location.search : ''}#${newCode}`);
+          }, 10);
         },
         onFailure: api_data => {
           showErrorMessage(api_data.api_error_message);
@@ -130,7 +121,18 @@ function WrappedRetrohuntCreate({ isDrawer = false, retrohuntRef = null }: Props
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currentUser?.roles, location, navigate, retrohunt, retrohuntRef, showErrorMessage, showSuccessMessage]
+    [
+      DEFAULT_RETROHUNT,
+      currentUser.roles,
+      location.pathname,
+      location.search,
+      navigate,
+      onSetGlobalDrawer,
+      retrohuntRef,
+      showErrorMessage,
+      showSuccessMessage,
+      t
+    ]
   );
 
   if (currentUser.roles.includes('retrohunt_run'))

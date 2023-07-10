@@ -123,9 +123,10 @@ export default function Retrohunt() {
 
   const handleCreate = useCallback(() => {
     if (currentUser.roles.includes('retrohunt_run')) {
-      setGlobalDrawer(<RetrohuntCreate retrohuntRef={retrohuntRef} isDrawer />);
+      window.history.pushState({}, undefined, `${location.pathname}${location.search ? location.search : ''}`);
+      setGlobalDrawer(<RetrohuntCreate retrohuntRef={retrohuntRef} isDrawer onSetGlobalDrawer={setGlobalDrawer} />);
     }
-  }, [currentUser.roles, setGlobalDrawer]);
+  }, [currentUser.roles, location.pathname, location.search, setGlobalDrawer]);
 
   const handleClear = useCallback(
     () => navigate(`${location.pathname}${location.hash}`),
@@ -143,7 +144,7 @@ export default function Retrohunt() {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [handleClear, location.pathname, location.hash, query]
+    [query, navigate, location.pathname, location.hash, handleClear]
   );
 
   const handleFilterValueChange = useCallback((inputValue: string) => {
@@ -154,21 +155,19 @@ export default function Retrohunt() {
     (rh: RetrohuntResult) => {
       navigate(`${location.pathname}${location.search ? location.search : ''}#${rh?.code}`);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [location, navigate]
   );
 
   useEffect(() => {
     setSearching(true);
     setQuery(new SimpleSearchQuery(location.search, `query=*&rows=${pageSize}&offset=0`));
-  }, [location.search, pageSize]);
+  }, [location.pathname, location.search, pageSize]);
 
   useEffect(() => {
     if (query && currentUser.roles.includes('retrohunt_view')) {
       handleReload(0);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query]);
+  }, [currentUser.roles, handleReload, query]);
 
   useEffect(() => {
     function reload() {
@@ -179,7 +178,7 @@ export default function Retrohunt() {
       window.removeEventListener('reloadRetrohunts', reload);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, retrohuntResults]);
+  }, [handleReload, query, retrohuntResults]);
 
   useEffect(() => {
     if (retrohuntResults !== null && !globalDrawerOpened && location.hash) {
@@ -192,8 +191,7 @@ export default function Retrohunt() {
     if (location.hash) {
       setGlobalDrawer(<RetrohuntDetail code={location.hash.substr(1)} isDrawer />);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.hash, retrohuntRef]);
+  }, [location.hash, retrohuntRef, setGlobalDrawer]);
 
   useEffect(() => {
     if (!timer.current && retrohuntResults && retrohuntResults?.items.some(item => !item?.finished)) {
