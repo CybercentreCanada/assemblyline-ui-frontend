@@ -117,6 +117,11 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
   const isFetching = useRef<boolean>(false);
   const offsetRef = useRef<number>(0);
 
+  const momentFormat = useMemo(
+    () => (i18n.language === 'fr' ? 'dddd D MMMM YYYY [à] h[h]mm' : 'dddd, MMMM D, YYYY [at] h:mm'),
+    [i18n.language]
+  );
+
   const DEFAULT_RETROHUNT = useMemo<RetrohuntResult>(
     () => ({
       archive_only: false,
@@ -308,7 +313,7 @@ function WrappedRetrohuntDetail({ code: propCode = null, isDrawer = false }: Pro
                     {!retrohunt ? (
                       <Skeleton width="auto" />
                     ) : 'created' in retrohunt ? (
-                      <Moment locale={i18n.language} format="YYYY-MM-DD HH:mm:ss.SSS">
+                      <Moment locale={i18n.language} format={momentFormat}>
                         {retrohunt.created}
                       </Moment>
                     ) : null}
